@@ -30,7 +30,9 @@ function layoutEqual(a: PopoverLayout, b: PopoverLayout): boolean {
     a.style.top === b.style.top &&
     a.style.left === b.style.left &&
     a.style.maxHeight === b.style.maxHeight &&
-    a.style.minWidth === b.style.minWidth
+    a.style.minWidth === b.style.minWidth &&
+    a.style.width === b.style.width &&
+    a.style.boxSizing === b.style.boxSizing
   );
 }
 
@@ -64,6 +66,14 @@ export function usePopoverPosition({
       matchTriggerMinWidth: sameMinWidthAsTrigger,
     });
 
+    const anchorW = Math.round(anchorRect.width);
+    const matchTriggerBox =
+      sameMinWidthAsTrigger && anchorW > 0
+        ? { width: anchorW, minWidth: anchorW, boxSizing: "border-box" as const }
+        : pos.minWidth !== undefined
+          ? { minWidth: pos.minWidth }
+          : {};
+
     const next: PopoverLayout = {
       resolvedSide: pos.resolvedSide,
       style: {
@@ -77,7 +87,7 @@ export function usePopoverPosition({
           panelOffset,
           viewportPad,
         ),
-        ...(pos.minWidth !== undefined ? { minWidth: pos.minWidth } : {}),
+        ...matchTriggerBox,
       },
     };
 

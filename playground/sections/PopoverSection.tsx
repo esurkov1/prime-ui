@@ -90,7 +90,8 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
     type: "boolean",
     defaultValue: "false",
     required: "Нет",
-    description: "Минимальная ширина панели не меньше ширины триггера.",
+    description:
+      "Ширина панели по триггеру (border-box): текст переносится; не шире max-width панели и вьюпорта.",
   },
   {
     prop: "size",
@@ -258,8 +259,8 @@ export default function PopoverSection() {
         <div className="demoBlock">
           <h4>Ширина относительно триггера</h4>
           <p className="demoBlockDescription">
-            <code>sameMinWidthAsTrigger</code> — панель не уже кнопки; удобно в узкой колонке
-            карточки.
+            <code>sameMinWidthAsTrigger</code> — ширина панели как у триггера (не только min-width);
+            удобно в узкой колонке.
           </p>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>

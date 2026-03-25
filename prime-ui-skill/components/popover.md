@@ -269,7 +269,7 @@ export function AccessRequestPopover() {
 |------|-----|-------------|-------------|----------|
 | align | `"start" \| "center" \| "end"` | `"start"` | No | Horizontal alignment of the panel relative to the trigger. |
 | side | `"bottom" \| "top"` | `"bottom"` | No | Preferred side; may flip at the viewport edge. |
-| sameMinWidthAsTrigger | `boolean` | `false` | No | Panel minimum width is at least the trigger width. |
+| sameMinWidthAsTrigger | `boolean` | `false` | No | Panel width matches the trigger (`border-box`); still capped by panel `max-width` / viewport. |
 | size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control density tier; nested controls get size via provider. |
 | trapFocus | `boolean` | `false` | No | Trap focus inside the panel when open (Tab cycles within). |
 | className | `string` | — | No | Extra class on the panel container. |

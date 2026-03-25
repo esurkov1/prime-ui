@@ -20,8 +20,8 @@ export default function PopoverFullWidthSnippet() {
         <Popover.Content align="start" sameMinWidthAsTrigger side="bottom" size="m">
           <Popover.Inset>
             <p className={preview.panelTextMuted}>
-              <code>sameMinWidthAsTrigger</code> выравнивает минимальную ширину панели по триггеру —
-              удобно в узких колонках и карточках.
+              <code>sameMinWidthAsTrigger</code> задаёт ширину панели по триггеру (с переносом
+              текста) — удобно в узких колонках и карточках.
             </p>
           </Popover.Inset>
         </Popover.Content>
