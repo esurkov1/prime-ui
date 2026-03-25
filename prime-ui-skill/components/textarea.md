@@ -1,38 +1,38 @@
 # Textarea
 
-## Что это
+## What it is
 
-Составной компонент многострочного ввода: поле ввода, опциональный счётчик символов в подвале, слоты подсказки и ошибки с автоматической связью по `aria-describedby`.
+A composite multiline input: the text field, an optional character counter in the footer, hint and error slots with automatic linkage via `aria-describedby`.
 
-## Для чего нужен
+## When to use it
 
-- **Логистика и доставка** — уточнить адрес, пожелания по времени или комментарий курьеру в карточке заказа без отдельного экрана.
-- **Образование и проверка заданий** — собрать развёрнутый ответ учащегося с подсказкой по объёму или критериям оценки.
-- **Поддержка и обратная связь** — описать проблему с лимитом длины, счётчиком и явным сообщением об ошибке, если поле не заполнено.
+- **Logistics and delivery** — clarify an address, time preferences, or a note for the courier on the order card without a separate screen.
+- **Education and assignments** — collect a free-text answer from a learner with guidance on length or grading criteria.
+- **Support and feedback** — describe an issue with a length limit, counter, and explicit error when the field is empty.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример рассчитан на другой тип экрана и набор пропсов.
+Each example targets a different screen type and prop set.
 
-### Базовый
+### Basic
 
-Тикет в сервисе доставки: короткая подсказка, без внешнего состояния.
+A delivery-service ticket: short hint, no external state.
 
 ```tsx
 import { Textarea } from "prime-ui-kit";
 
 export function DeliveryNoteField() {
   return (
-    <Textarea.Root size="m" placeholder="Комментарий к заказу (необязательно)">
-      <Textarea.Hint>Не указывайте пароли и коды от домофона в этом поле.</Textarea.Hint>
+    <Textarea.Root size="m" placeholder="Order comment (optional)">
+      <Textarea.Hint>Do not enter passwords or intercom codes in this field.</Textarea.Hint>
     </Textarea.Root>
   );
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Медицинская анкета: крупное поле для хронологии симптомов и явная ошибка валидации.
+A medical form: large field for symptom timeline and explicit validation error.
 
 ```tsx
 import * as React from "react";
@@ -45,18 +45,18 @@ export function SymptomTimelineField() {
     <Textarea.Root
       size="l"
       variant={variant}
-      placeholder="Опишите, когда начались симптомы и как менялись"
+      placeholder="Describe when symptoms started and how they changed"
       onChange={() => setVariant("default")}
     >
-      <Textarea.Error>Заполните поле, чтобы врач увидел анамнез до приёма.</Textarea.Error>
+      <Textarea.Error>Fill in this field so the doctor can review history before the visit.</Textarea.Error>
     </Textarea.Root>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Редакция материала: заголовок блока и поле с лимитом по символам для лид-абзаца.
+Editorial workflow: block title and character-limited field for the lead paragraph.
 
 ```tsx
 import * as React from "react";
@@ -71,26 +71,26 @@ export function ArticleLeadBlock() {
   return (
     <section style={{ maxWidth: "36rem" }}>
       <Typography.Root size="s" weight="semibold" as="h3">
-        Лид-абзац
+        Lead paragraph
       </Typography.Root>
       <Textarea.Root
         size="m"
         value={lead}
         maxLength={LEAD_MAX}
         onChange={(e) => setLead(e.target.value)}
-        placeholder="Два-три предложения для списка статей и соцсетей"
+        placeholder="Two or three sentences for article lists and social previews"
       >
         <Textarea.CharCounter current={lead.length} max={LEAD_MAX} />
-        <Textarea.Hint>Лимит {LEAD_MAX} символов совпадает с maxLength у textarea.</Textarea.Hint>
+        <Textarea.Hint>The {LEAD_MAX}-character limit matches the textarea maxLength.</Textarea.Hint>
       </Textarea.Root>
     </section>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Внутренний отчёт об инциденте: текст и метаданные хранятся в родителе, высота растёт при вводе (`autoResize` по умолчанию).
+Internal incident report: text and metadata live in the parent; height grows with input (`autoResize` by default).
 
 ```tsx
 import * as React from "react";
@@ -104,97 +104,97 @@ export function IncidentReportBody() {
       size="m"
       value={body}
       onChange={(e) => setBody(e.target.value)}
-      placeholder="Что произошло, кто затронут, какие действия уже предприняты"
+      placeholder="What happened, who is affected, what actions were already taken"
     >
-      <Textarea.Hint>Набрано символов: {body.length}. Черновик можно сериализовать вместе с формой.</Textarea.Hint>
+      <Textarea.Hint>Characters typed: {body.length}. The draft can be serialized with the form.</Textarea.Hint>
     </Textarea.Root>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-`Textarea` — объект с подкомпонентами:
+`Textarea` is an object with subcomponents:
 
-- **`Textarea.Root`** — внешний `div.field` с контекстом; внутри `label.control` с `textarea` (и при `autoResize` — обёртка с `data-value`), опциональный подвал для `Textarea.CharCounter`; после `label` рендерятся `Textarea.Hint` и `Textarea.Error`.
-- **`Textarea.CharCounter`** — только прямой ребёнок `Root`, попадает в подвал.
-- **`Textarea.Hint`** / **`Textarea.Error`** — прямые дети `Root`, рендерятся как `Hint.Root` с нужным `id` для связи с полем.
+- **`Textarea.Root`** — outer `div.field` with context; inside, `label.control` with `textarea` (and with `autoResize`, a wrapper with `data-value`), optional footer for `Textarea.CharCounter`; after `label`, `Textarea.Hint` and `Textarea.Error` render.
+- **`Textarea.CharCounter`** — must be a direct child of `Root`; rendered in the footer.
+- **`Textarea.Hint`** / **`Textarea.Error`** — direct children of `Root`, rendered as `Hint.Root` with the correct `id` linked to the field.
 
 ## API
 
 ### Textarea.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|--------------|--------------|----------|
-| variant | `"default" \| "error"` | `"default"` | Нет | Визуальная роль и базовая инвалидность, если не переопределено `aria-invalid`. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размерная сетка поля (текст, отступы, минимальная высота). |
-| autoResize | `boolean` | `true` | Нет | Подстройка высоты по содержимому через разметку и `data-value`; при `false` остаётся нативный resize. |
-| id | `string` | из `useId()` | Нет | Якорь для `htmlFor` не нужен — корень сам `label`; id нужен для стабильных `aria-describedby`. |
-| className | `string` | — | Нет | Класс на элементе-оболочке с рамкой (`label`). |
-| disabled | `boolean` | — | Нет | Нативная блокировка; Hint переключается в «disabled»-вид. |
-| readOnly | `boolean` | — | Нет | Только чтение; Hint ведёт себя как при disabled. |
-| value | `string` | — | Нет | Контролируемое значение. |
-| defaultValue | `string` | — | Нет | Неконтролируемый стартовый текст. |
-| onInput | `React.FormEventHandler<HTMLTextAreaElement>` | — | Нет | Внутри дополняется обновлением `data-value` при `autoResize`. |
-| aria-describedby | `string` | — | Нет | Дополняется id подсказки и ошибки при их наличии. |
-| aria-invalid | `Booleanish` | из variant / Error | Нет | Явная инвалидность поверх эвристики. |
-| children | `React.ReactNode` | — | Нет | `CharCounter` в подвале; `Hint` и `Error` снаружи `label`. |
-| …rest | `Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size">` | — | Нет | Все стандартные атрибуты textarea: `placeholder`, `rows`, `maxLength`, `required`, `onChange`, `name` и т.д. |
+| variant | `"default" \| "error"` | `"default"` | No | Visual role and baseline invalid state unless `aria-invalid` overrides. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Size scale for the field (text, padding, minimum height). |
+| autoResize | `boolean` | `true` | No | Height follows content via markup and `data-value`; when `false`, native resize remains. |
+| id | `string` | from `useId()` | No | No `htmlFor` anchor needed — the root is the `label`; id is used for stable `aria-describedby`. |
+| className | `string` | — | No | Class on the bordered wrapper (`label`). |
+| disabled | `boolean` | — | No | Native disabled; Hint switches to a disabled appearance. |
+| readOnly | `boolean` | — | No | Read-only; Hint behaves like disabled. |
+| value | `string` | — | No | Controlled value. |
+| defaultValue | `string` | — | No | Uncontrolled initial text. |
+| onInput | `React.FormEventHandler<HTMLTextAreaElement>` | — | No | Internally extended to update `data-value` when `autoResize` is on. |
+| aria-describedby | `string` | — | No | Appended with hint and error ids when present. |
+| aria-invalid | `Booleanish` | from variant / Error | No | Explicit invalidity on top of heuristics. |
+| children | `React.ReactNode` | — | No | `CharCounter` in the footer; `Hint` and `Error` outside `label`. |
+| …rest | `Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size">` | — | No | All standard textarea attributes: `placeholder`, `rows`, `maxLength`, `required`, `onChange`, `name`, etc. |
 
 ### Textarea.CharCounter
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|--------------|--------------|----------|
-| current | `number` | — | Да | Текущее число символов. |
-| max | `number` | — | Да | Отображаемый лимит; при `current > max` выставляется `data-overflow="true"`. |
+| current | `number` | — | Yes | Current character count. |
+| max | `number` | — | Yes | Displayed limit; when `current > max`, `data-overflow="true"` is set. |
 
 ### Textarea.Hint
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | Да | Текст подсказки. |
-| className | `string` | — | Нет | Дополнительный класс. |
-| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | Нет | Атрибуты `p`; `id` задаётся контекстом. |
+| children | `React.ReactNode` | — | Yes | Hint text. |
+| className | `string` | — | No | Extra class. |
+| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | No | `p` attributes; `id` comes from context. |
 
 ### Textarea.Error
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | Да | Текст ошибки. |
-| className | `string` | — | Нет | Дополнительный класс. |
-| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | Нет | Атрибуты `p`; `id` задаётся контекстом. |
+| children | `React.ReactNode` | — | Yes | Error text. |
+| className | `string` | — | No | Extra class. |
+| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | No | `p` attributes; `id` comes from context. |
 
-## Варианты
+## Variants
 
-- **`default`** — обычное поле с нейтральной рамкой.
-- **`error`** — акцент ошибки; в сочетании с `Textarea.Error` и автоматическим `aria-invalid` даёт согласованную доступность.
+- **`default`** — normal field with a neutral border.
+- **`error`** — error emphasis; together with `Textarea.Error` and automatic `aria-invalid`, accessibility stays consistent.
 
-Отдельно от `variant` счётчик может показывать логическое переполнение (`current > max`), не блокируя ввод — это не `variant`, а визуальный флаг `data-overflow` на счётчике.
+Separately from `variant`, the counter can show logical overflow (`current > max`) without blocking input — that is not `variant` but the visual `data-overflow` flag on the counter.
 
-## Состояния
+## States
 
-- **Обычное** — фокус по клику на рамку (`label` с `cursor: text`), стили по `data`-атрибутам размера.
-- **disabled / readOnly** — нативные атрибуты textarea; подсказка получает приглушённый вариант.
-- **Ошибка** — `variant="error"` и/или смонтированный `Textarea.Error`; поле получает невалидность для вспомогательных технологий.
-- **Обязательность** — нативный `required` на textarea для подсказки браузеру и валидации формы.
+- **Default** — focus on border click (`label` with `cursor: text`), styles from size `data` attributes.
+- **disabled / readOnly** — native textarea attributes; hint uses a muted style.
+- **Error** — `variant="error"` and/or mounted `Textarea.Error`; field is invalid for assistive tech.
+- **Required** — native `required` on the textarea for browser hints and form validation.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Поле внутри `label` — кликабельная область расширена на рамку.
-- `Textarea.Hint` и `Textarea.Error` получают стабильные `id` и добавляются в `aria-describedby` у textarea.
-- `aria-invalid` выводится из `variant`, наличия `Error` или явного пропа.
-- Счётчик объявляет изменения политично (`aria-live="polite"`), не мешая набору текста.
+- Field inside `label` — clickable area includes the border.
+- `Textarea.Hint` and `Textarea.Error` get stable `id`s and are merged into textarea `aria-describedby`.
+- `aria-invalid` derives from `variant`, presence of `Error`, or an explicit prop.
+- Counter announces changes politely (`aria-live="polite"`) without disrupting typing.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- **`Textarea.CharCounter`** должен быть **прямым** ребёнком `Root` (разделение по `child.type`); Hint и Error в том же дереве, но не в подвале.
-- Полиморфного `asChild` у Textarea нет — корень зафиксирован как обёртка с `label` и `textarea`.
-- Ориентации «horizontal/vertical» у компонента нет — это одноколоночный блок.
-- Лимит по символам: либо нативный `maxLength`, либо только отображение через счётчик; переполнение в счётчике не блокирует ввод само по себе.
+- **`Textarea.CharCounter`** must be a **direct** child of `Root` (split by `child.type`); Hint and Error live in the same tree but not in the footer.
+- Textarea has no polymorphic `asChild` — the root is fixed as a wrapper with `label` and `textarea`.
+- There is no horizontal/vertical orientation — it is a single-column block.
+- Character limit: either native `maxLength` or display-only via the counter; counter overflow does not block input by itself.
 
-## Связанные компоненты
+## Related components
 
-- **Input** — однострочный ввод в той же визуальной семье полей.
-- **Hint** (через `Textarea.Hint`) — общий примитив подсказки.
-- **Label** — внешний заголовок к полю, если нужен текст **над** рамкой (согласуйте `htmlFor` с `id`, переданным в `Textarea.Root`, и избегайте вложенных `label`).
-- **Typography** — заголовки и пояснения рядом с полем в макете формы.
+- **Input** — single-line input in the same visual field family.
+- **Hint** (via `Textarea.Hint`) — shared hint primitive.
+- **Label** — external title above the field when text must sit **above** the border (align `htmlFor` with `id` passed to `Textarea.Root` and avoid nested `label`s).
+- **Typography** — headings and supporting copy next to the field in form layouts.
