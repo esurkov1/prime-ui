@@ -20,6 +20,7 @@
         "@vitejs/plugin-react": "^5",
         "@vitest/coverage-v8": "^4.1.0",
         "date-fns": "^4.1.0",
+        "esbuild": "^0.27.0",
         "jsdom": "latest",
         "react-aria-components": "^1.16.0",
         "react-day-picker": "^9.14.0",

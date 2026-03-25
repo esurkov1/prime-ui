@@ -1,6 +1,7 @@
 # Dependencies & build
 node_modules/
 dist/
+.tsup-dts/
 coverage/
 playground/dist/
 *.tsbuildinfo
