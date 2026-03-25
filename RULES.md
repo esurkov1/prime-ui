@@ -1,120 +1,120 @@
 # prime-ui-kit Rules
 
-Нормативный контракт разработки **prime-ui-kit** — отдельного репозитория React UI-kit.  
-Если правило помечено как **MUST**, его нарушение блокирует merge.
+Normative development contract for **prime-ui-kit** — a standalone React UI kit repository.  
+If a rule is marked **MUST**, violating it blocks merge.
 
 ## 1. Foundation Contract
 
-- **MUST**: строить систему снизу вверх — tokens -> themes -> states -> components.
-- **MUST**: использовать единый источник правды для цветов, размеров, отступов и состояний.
-- **MUST**: не добавлять runtime-зависимости без доказанной необходимости.
-- **SHOULD**: не вводить абстракции до появления повторения.
+- **MUST**: build the system bottom-up — tokens -> themes -> states -> components.
+- **MUST**: use a single source of truth for colors, sizes, spacing, and states.
+- **MUST**: do not add runtime dependencies without proven need.
+- **SHOULD**: do not introduce abstractions until repetition appears.
 
 ## 2. Styling Contract
 
-- **MUST**: не использовать Tailwind в **prime-ui-kit**.
-- **MUST**: не хардкодить визуальные значения в JSX.
-- **MUST**: использовать `CSS Modules` + CSS variables.
-- **MUST**: читать значения только из semantic token layer.
+- **MUST**: do not use Tailwind in **prime-ui-kit**.
+- **MUST**: do not hardcode visual values in JSX.
+- **MUST**: use `CSS Modules` + CSS variables.
+- **MUST**: read values only from the semantic token layer.
 
 ## 3. Token Contract
 
-- **MUST**: соблюдать иерархию:
+- **MUST**: follow the hierarchy:
   - `tokens/primitives.ts`
   - `tokens/semantic.ts`
   - `tokens/themes/*`
-- **MUST**: публичные компоненты не используют `--prime-ref-*` напрямую.
-- **MUST**: после изменений токенов обновлять:
+- **MUST**: public components do not use `--prime-ref-*` directly.
+- **MUST**: after token changes, update:
   - `src/styles/tokens.css`
   - `src/styles/theme-light.css`
   - `src/styles/theme-dark.css`
-- **MUST**: проходить `bun run verify:tokens` перед merge.
+- **MUST**: pass `bun run verify:tokens` before merge.
 
 ## 4. Theme Contract
 
-- **MUST**: переключение тем только через `data-theme` на `:root` или на изолированном контейнере (semantic-токены применяются к `[data-theme="light"]` / `[data-theme="dark"]`).
-- **MUST**: компонент не знает о теме, знает только semantic roles.
-- **MUST**: темы `light` и `dark` поддерживаются в равной степени.
+- **MUST**: switch themes only via `data-theme` on `:root` or on an isolated container (semantic tokens apply under `[data-theme="light"]` / `[data-theme="dark"]`).
+- **MUST**: a component does not know about theme; it only knows semantic roles.
+- **MUST**: `light` and `dark` themes are supported equally.
 
 ## 5. State Naming Contract
 
-- **MUST**: единый destructive-термин — `error`.
-- **MUST**: использовать общий словарь из `src/internal/states.ts`.
-- **MUST**: не вводить новые naming-оси без обновления `states.ts`, docs и playground.
+- **MUST**: the single destructive term is `error`.
+- **MUST**: use the shared vocabulary from `src/internal/states.ts`.
+- **MUST**: do not introduce new naming axes without updating `states.ts`, docs, and playground.
 
 ## 6. API Consistency Contract
 
-- **MUST**: похожие компоненты имеют одинаковую логику props (`size`, `variant`, controlled/uncontrolled).
-- **MUST**: значения `size`/`variant` опираются на единый словарь, а не локальные строки.
-- **MUST**: не смешивать визуальный режим, состояние и бизнес-логику в одном prop.
-- **SHOULD**: использовать нативные HTML-атрибуты там, где это возможно.
+- **MUST**: similar components share the same prop logic (`size`, `variant`, controlled/uncontrolled).
+- **MUST**: `size`/`variant` values rely on a shared vocabulary, not ad hoc strings.
+- **MUST**: do not mix visual mode, state, and business logic in a single prop.
+- **SHOULD**: use native HTML attributes where possible.
 
 ## 7. DOM and Data-Attributes Contract
 
-- **MUST**: React отвечает за поведение и accessibility.
-- **MUST**: CSS отвечает только за визуал.
-- **MUST**: контрактные состояния передаются через `data-*` или нативные HTML/ARIA атрибуты.
+- **MUST**: React owns behavior and accessibility.
+- **MUST**: CSS owns visuals only.
+- **MUST**: contract states are conveyed via `data-*` or native HTML/ARIA attributes.
 
 ## 8. Accessibility Minimum Contract
 
-- **MUST**: каждый интерактивный компонент поддерживает клавиатуру.
-- **MUST**: `focus-visible` визуально заметен в light и dark.
-- **MUST**: смысл не кодируется только цветом.
-- **MUST**: для кастомных контролов есть явные ARIA-атрибуты и тесты поведения.
+- **MUST**: every interactive component supports keyboard use.
+- **MUST**: `focus-visible` is visually obvious in light and dark.
+- **MUST**: meaning is not conveyed by color alone.
+- **MUST**: custom controls have explicit ARIA attributes and behavior tests.
 
 ## 9. Internal Architecture Contract
 
-- **MUST**: повторяющуюся механику выносить в `src/hooks` / `src/internal`.
-- **MUST**: низкоуровневая логика не просачивается в публичный API.
-- **SHOULD**: размер публичного API меньше и стабильнее внутреннего слоя.
+- **MUST**: factor repeated mechanics into `src/hooks` / `src/internal`.
+- **MUST**: low-level logic does not leak into the public API.
+- **SHOULD**: the public API is smaller and more stable than the internal layer.
 
 ## 10. Testing Contract
 
-- **MUST**: каждый публичный компонент имеет примеры и interaction tests.
-- **MUST**: сложные интерактивные компоненты имеют keyboard tests.
-- **MUST**: минимальный gate перед merge:
+- **MUST**: every public component has examples and interaction tests.
+- **MUST**: complex interactive components have keyboard tests.
+- **MUST**: minimum gate before merge:
   - `bun run check`
   - `bun run typecheck`
   - `bun run test`
   - `bun run build`
-- **SHOULD**: визуально критичные компоненты покрыты screenshot/visual-regression.
+- **SHOULD**: visually critical components are covered by screenshot/visual regression.
 
 ## 11. Documentation Contract
 
-Для каждого публичного компонента **MUST** быть описаны:
+For every public component, **MUST** document:
 
-- назначение;
+- purpose;
 - anatomy;
 - props;
 - variants;
 - states;
 - accessibility contract;
-- примеры;
-- ограничения.
+- examples;
+- limitations.
 
 ## 12. Workflow Contract
 
-- **MUST**: для изменений в корне репозитория (в т.ч. `src/**`, `tokens/**`, `playground/**`) pre-commit/CI запускают проверки из `package.json` (`verify` / отдельные скрипты).
-- **MUST**: CI для **prime-ui-kit** зелёный до merge.
-- **MUST**: breaking change сопровождается обновлением:
+- **MUST**: for changes at the repo root (including `src/**`, `tokens/**`, `playground/**`), pre-commit/CI runs checks from `package.json` (`verify` / individual scripts).
+- **MUST**: CI for **prime-ui-kit** is green before merge.
+- **MUST**: a breaking change is accompanied by updates to:
   - `README.md`
   - `RULES.md`
   - playground
   - tests
 
-## 13. Breaking Changes Policy (до v1)
+## 13. Breaking Changes Policy (pre-v1)
 
-- **Разрешены**, если укрепляют foundation.
-- **MUST**: каждая ломающая правка имеет migration note в PR/коммите.
-- **MUST**: migration path проверен на playground и тестах.
+- **Allowed** if they strengthen the foundation.
+- **MUST**: every breaking change includes a migration note in the PR/commit.
+- **MUST**: the migration path is verified on playground and in tests.
 
-## 14. Definition of Done (компонент)
+## 14. Definition of Done (component)
 
-Компонент считается готовым, если:
+A component is considered done when it:
 
-- реализован на semantic tokens;
-- имеет единый API (`size/variant/state`);
-- имеет interaction + keyboard/a11y tests;
-- добавлен в публичные exports;
-- покрыт примерами в playground;
-- задокументирован в `README.md`.
+- is implemented on semantic tokens;
+- has a consistent API (`size`/`variant`/`state`);
+- has interaction + keyboard/a11y tests;
+- is added to public exports;
+- is covered by playground examples;
+- is documented in `README.md`.
