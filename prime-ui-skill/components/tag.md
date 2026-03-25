@@ -1,20 +1,20 @@
 # Tag
 
-## Что это
+## What it is
 
-Компактная метка (чип): текст, опциональная иконка и опциональная кнопка снятия. Составной компонент с корневым элементом (`Tag.Root`) и слотом для иконки (`Tag.Icon`), согласованные по размеру через контекст.
+A compact label (chip): text, an optional icon, and an optional remove control. A compound component with a root element (`Tag.Root`) and an icon slot (`Tag.Icon`), sized consistently via context.
 
-## Для чего нужен
+## When to use it
 
-- **Фильтры и поиск** — выбранные критерии в панели фильтров каталога, теги товаров или категорий с возможностью быстрого удаления одним кликом.
-- **Формы и редакторы** — список получателей письма, прикреплённые файлы или выбранные навыки в профиле, где каждый элемент можно снять без возврата к полю ввода.
-- **Метаданные и классификация** — технологии проекта, статусы задачи или метки документа в карточке, когда важна компактность и визуальная группировка без лишних колонок.
+- **Filters and search** — selected criteria in a catalog filter panel, product or category tags with one-click removal.
+- **Forms and editors** — email recipients, attached files, or selected skills in a profile, where each item can be removed without returning to the input field.
+- **Metadata and classification** — project technologies, task statuses, or document labels on a card when compactness and visual grouping matter without extra columns.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Статичные метки технологий в карточке проекта без возможности удаления.
+Static technology labels on a project card with no removal.
 
 ```tsx
 import { Tag } from "prime-ui-kit";
@@ -30,9 +30,9 @@ export function ProjectTechStack() {
 }
 ```
 
-### С вариантами/размерами
+### Sizes
 
-Панель фильтров: разные размеры для акцентов, крупные — активные фильтры, мелкие — доступные опции.
+Filter panel: different sizes for emphasis — larger for active filters, smaller for available options.
 
 ```tsx
 import { Tag } from "prime-ui-kit";
@@ -40,17 +40,17 @@ import { Tag } from "prime-ui-kit";
 export function FilterTags() {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-      <Tag.Root size="l">Активный фильтр</Tag.Root>
-      <Tag.Root size="m">Средняя метка</Tag.Root>
-      <Tag.Root size="s">Мелкая метка</Tag.Root>
+      <Tag.Root size="l">Active filter</Tag.Root>
+      <Tag.Root size="m">Medium tag</Tag.Root>
+      <Tag.Root size="s">Small tag</Tag.Root>
     </div>
   );
 }
 ```
 
-### В контексте (съёмные теги)
+### Removable tags
 
-Список выбранных получателей с возможностью удаления каждого.
+A list of selected recipients with per-item removal.
 
 ```tsx
 import * as React from "react";
@@ -74,9 +74,9 @@ export function RecipientList() {
 }
 ```
 
-### С иконками
+### With icons
 
-Метки с иконками для визуальной категоризации.
+Labels with icons for visual categorization.
 
 ```tsx
 import { Tag } from "prime-ui-kit";
@@ -102,13 +102,13 @@ export function TagsWithIcons() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- `Tag.Root` — корневой `span` с `data-size` и `data-disabled`; внутри оборачивает детей в `ControlSizeProvider` для согласования размера иконок.
-- `Tag.Icon` — `span` для иконки слева от текста.
-- Кнопка удаления — рендерится автоматически при наличии `onRemove`; встроенная SVG-иконка крестика с фиксированным `aria-label="Remove"`.
+- `Tag.Root` — root `span` with `data-size` and `data-disabled`; wraps children in `ControlSizeProvider` so icon sizes match.
+- `Tag.Icon` — `span` for the icon to the left of the text.
+- Remove button — rendered automatically when `onRemove` is set; built-in cross SVG with fixed `aria-label="Remove"`.
 
-## Импорт
+## Import
 
 ```ts
 import { Tag } from "prime-ui-kit";
@@ -118,49 +118,49 @@ import { Tag } from "prime-ui-kit";
 
 ### Tag.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` или размер из `ControlSizeContext` | Нет | Размер тега; визуальный ярус высоты, радиуса, текста и иконки. |
-| `onRemove` | `() => void` | — | Нет | Если задан — справа рендерится кнопка удаления с крестиком. |
-| `disabled` | `boolean` | — | Нет | Блокирует тег и кнопку удаления, выставляет `aria-disabled` на корне. |
-| `children` | `React.ReactNode` | — | Нет | Контент тела: текст, `Tag.Icon`, другие узлы. |
-| `className` | `string` | — | Нет | Дополнительный класс на корневом `span`. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Прочие атрибуты корневого `span` (`data-*`, `aria-*` и т.д.). |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` or size from `ControlSizeContext` | No | Tag size; visual tier for height, radius, text, and icon. |
+| `onRemove` | `() => void` | — | No | When set, a remove button with a cross is rendered on the right. |
+| `disabled` | `boolean` | — | No | Disables the tag and remove button; sets `aria-disabled` on the root. |
+| `children` | `React.ReactNode` | — | No | Body content: text, `Tag.Icon`, other nodes. |
+| `className` | `string` | — | No | Extra class on the root `span`. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other root `span` attributes (`data-*`, `aria-*`, etc.). |
 
 ### Tag.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `children` | `React.ReactNode` | — | Да | Узел иконки. |
-| `className` | `string` | — | Нет | Дополнительный класс обёртки. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `children` | `React.ReactNode` | — | Yes | Icon node. |
+| `className` | `string` | — | No | Extra class on the wrapper. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет. Визуальное различие задаётся только **`size`** (четыре ступени от `s` до `xl`) и наличием **`onRemove`** (съёмный или статичный тег).
+There is no separate `variant` prop. Visual differences come only from **`size`** (four steps from `s` to `xl`) and **`onRemove`** (removable vs static tag).
 
-## Состояния
+## States
 
-- **Обычное** — интерактивно (если есть `onRemove`), без `disabled`.
-- **disabled** — визуально приглушён, кнопка удаления отключена нативно (`disabled` на `<button>`), на корне выставлен `aria-disabled`.
-- **Статичный** — без `onRemove` тег не имеет кнопки удаления и не интерактивен.
+- **Default** — interactive when `onRemove` is present, without `disabled`.
+- **disabled** — visually muted; remove button is natively disabled (`disabled` on `<button>`); root has `aria-disabled`.
+- **Static** — without `onRemove`, there is no remove button and the tag is not interactive.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Корень — нативный `span`; клавиатурного управления у самого тега нет (это не кнопка и не ссылка).
-- Кнопка удаления — нативная `<button type="button">` с фиксированным `aria-label="Remove"`; фокусируется по Tab, активируется Enter/Space.
-- Для осмысленного контекста удаления рекомендуется обернуть группу тегов в элемент с `aria-label` или `aria-labelledby`, чтобы скринридер понимал, что именно удаляется.
-- `Tag.Icon` не имеет `aria-hidden` — если иконка декоративная, убедитесь, что текст рядом достаточен для понимания смысла.
+- Root is a native `span`; the tag itself has no keyboard behavior (it is not a button or link).
+- Remove control is a native `<button type="button">` with fixed `aria-label="Remove"`; focusable with Tab, activated with Enter/Space.
+- For meaningful removal context, wrap a group of tags in an element with `aria-label` or `aria-labelledby` so screen readers know what is being removed.
+- `Tag.Icon` does not set `aria-hidden` — if the icon is decorative, ensure adjacent text is enough to convey meaning.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Это **не** переключатель состояния и **не** кнопка выбора; для выбора из набора опций смотрите `Checkbox`, `SegmentedControl` или `Select`.
-- Кнопка удаления имеет **фиксированный** `aria-label="Remove"` (в исходнике компонента); для локализации потребуется форк или обёртка.
-- Размер без явного `size` зависит от **`ControlSizeProvider`** выше по дереву; вне контекста используется **`m`**.
-- **Иконки** внутри `Tag.Icon` автоматически наследуют размер от `Tag.Root` через `ControlSizeProvider`.
+- This is **not** a toggle and **not** a selection control; for choosing from options use `Checkbox`, `SegmentedControl`, or `Select`.
+- The remove button has a **fixed** `aria-label="Remove"` (in the component source); localization requires a fork or wrapper.
+- Size without an explicit `size` depends on **`ControlSizeProvider`** higher in the tree; **`m`** is used outside that context.
+- **Icons** inside `Tag.Icon` automatically inherit size from `Tag.Root` via `ControlSizeProvider`.
 
-## Связанные компоненты
+## Related components
 
-- **Badge** — статичная метка без возможности удаления, для подписи статуса или счётчика.
-- **Button** — если метка должна быть действием (клик), а не просто визуальным элементом.
-- **Chip** (если есть в библиотеке) — альтернативный вариант интерактивной метки с выбором.
-- **Input**, **Select** — теги часто используются для отображения выбранных значений в мультиселектах или полях с автодополнением.
+- **Badge** — static label without removal, for status or count.
+- **Button** — when the label should be an action (click), not only visual.
+- **Chip** (if present in the library) — alternative interactive label pattern.
+- **Input**, **Select** — tags often show selected values in multiselects or autocomplete fields.
