@@ -155,7 +155,7 @@ GitHub Secrets must include **`NPM_TOKEN`**.
 - On push to `main` and on PRs — `bun run verify` runs.
 - Release via **GitHub Release**: the workflow builds the package and runs `npm publish`.
 
-Before a release, bump **`version`** in `package.json` and create a release with a tag like `v0.2.1` matching the package version.
+Before a release, bump **`version`** in `package.json` and create a release with a tag like `v0.2.2` matching the package version.
 
 ---
 
