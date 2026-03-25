@@ -1,20 +1,20 @@
 # ProgressCircle
 
-## Что это
+## What it is
 
-`ProgressCircle` — круговой индикатор доли выполнения: SVG-кольцо с ролью `progressbar` и опциональным содержимым в центре.
+`ProgressCircle` is a circular completion indicator: an SVG ring with `progressbar` role and optional centered content.
 
-## Для чего нужен
+## What it’s for
 
-- **Загрузка и фоновые задачи** — показать процент копирования или подготовки отчёта прямо в центре кольца рядом с кнопкой «Отмена».
-- **Подписки и лицензии** — визуализировать «месяц 4 из 12» или оставшуюся часть периода через `max` и подпись в центре или сбоку.
-- **Запись на услугу и пошаговые сценарии** — отразить текущий шаг из пяти (например «Шаг 2 из 5») без линейной полосы, когда важна компактная иконка статуса.
+- **Loading and background tasks** — show copy or report preparation percentage in the ring center next to a Cancel button.
+- **Subscriptions and licenses** — visualize “month 4 of 12” or remaining period via `max` and a label in the center or beside the ring.
+- **Service booking and step flows** — show current step of five (e.g. “Step 2 of 5”) without a linear bar when a compact status icon matters.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Частый случай: процент готовности одной операции с подписью в центре.
+Common case: readiness percentage for one operation with a centered label.
 
 ```tsx
 import { ProgressCircle } from "prime-ui-kit";
@@ -26,17 +26,17 @@ export function BackupStatus() {
         68%
       </ProgressCircle.Root>
       <div>
-        <strong>Резервная копия</strong>
-        <p style={{ margin: "4px 0 0", color: "#666" }}>Осталось около минуты</p>
+        <strong>Backup</strong>
+        <p style={{ margin: "4px 0 0", color: "#666" }}>About a minute left</p>
       </div>
     </section>
   );
 }
 ```
 
-### С вариантами и размерами
+### Variants and sizes
 
-Другая область — панель преподавателя: три компактных кольца разного `size` для разных групп заданий.
+Another scenario: instructor dashboard — three compact rings with different `size` for different assignment groups.
 
 ```tsx
 import { ProgressCircle } from "prime-ui-kit";
@@ -48,28 +48,28 @@ export function ClassProgressRow() {
         <ProgressCircle.Root value={90} size="s">
           90%
         </ProgressCircle.Root>
-        <div style={{ fontSize: 12, marginTop: 6 }}>Гр. А</div>
+        <div style={{ fontSize: 12, marginTop: 6 }}>Group A</div>
       </div>
       <div style={{ textAlign: "center" }}>
         <ProgressCircle.Root value={55} size="m">
           55%
         </ProgressCircle.Root>
-        <div style={{ fontSize: 12, marginTop: 6 }}>Гр. Б</div>
+        <div style={{ fontSize: 12, marginTop: 6 }}>Group B</div>
       </div>
       <div style={{ textAlign: "center" }}>
         <ProgressCircle.Root value={40} size="xl">
           40%
         </ProgressCircle.Root>
-        <div style={{ fontSize: 12, marginTop: 6 }}>Гр. В</div>
+        <div style={{ fontSize: 12, marginTop: 6 }}>Group C</div>
       </div>
     </div>
   );
 }
 ```
 
-### В контексте (карточка бронирования)
+### In context (booking card)
 
-Экран выбора слота: кольцо показывает занятость дня (места из вместимости зала), рядом текст и кнопка без смены макета.
+Slot selection screen: the ring shows day occupancy (seats vs venue capacity), with text and button alongside without changing layout.
 
 ```tsx
 import { Button, ProgressCircle } from "prime-ui-kit";
@@ -96,20 +96,20 @@ export function VenueDayCard() {
         </span>
       </ProgressCircle.Root>
       <div style={{ flex: 1 }}>
-        <h3 style={{ margin: "0 0 4px" }}>Суббота, 14:00</h3>
-        <p style={{ margin: 0, fontSize: 14, color: "#555" }}>Зал «Север» — осталось места</p>
+        <h3 style={{ margin: "0 0 4px" }}>Saturday, 2:00 PM</h3>
+        <p style={{ margin: 0, fontSize: 14, color: "#555" }}>North Hall — seats still available</p>
       </div>
       <Button.Root size="s" type="button">
-        Забронировать
+        Book
       </Button.Root>
     </article>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Данные приходят из состояния или подписки (имитация потока прогресса импорта).
+Data comes from state or a subscription (simulated import progress stream).
 
 ```tsx
 import * as React from "react";
@@ -128,62 +128,62 @@ export function CatalogImportMonitor() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-      <ProgressCircle.Root value={done} max={total} size="xl" label={`Импортировано ${done} из ${total} позиций`}>
+      <ProgressCircle.Root value={done} max={total} size="xl" label={`Imported ${done} of ${total} items`}>
         <span style={{ fontSize: 13, fontWeight: 600 }}>{Math.round((done / total) * 100)}%</span>
       </ProgressCircle.Root>
       <span style={{ fontSize: 13, color: "#666" }}>
-        Обработка каталога поставщика…
+        Processing supplier catalog…
       </span>
     </div>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`ProgressCircle.Root`** — обёртка `display: inline-flex` с `data-size`.
-  - **`<svg role="progressbar">`** — трек и дуга заполнения (`stroke-dasharray` / `stroke-dashoffset`).
-  - **Необязательный блок по центру** — потомки рендерятся в контейнере поверх SVG, если `children` заданы.
+- **`ProgressCircle.Root`** — `display: inline-flex` wrapper with `data-size`.
+  - **`<svg role="progressbar">`** — track and fill arc (`stroke-dasharray` / `stroke-dashoffset`).
+  - **Optional center block** — children render in a container above the SVG when `children` are provided.
 
 ## API
 
 ### ProgressCircle.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `value` | `number` | — | Да | Текущее значение; ограничивается диапазоном `[0, max]`. |
-| `max` | `number` | `100` | Нет | Верхняя граница; если `max <= 0`, подставляется `100`. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Диаметр и толщина штриха из примитивов `progressCircle`. |
-| `label` | `string` | — | Нет | Текст для `aria-label` на SVG, когда в центре нет видимой подписи. |
-| `children` | `React.ReactNode` | — | Нет | Контент в центре кольца. |
-| `className` | `string` | — | Нет | Дополнительный класс корневого элемента. |
-| `ref` | `React.Ref<HTMLDivElement>` | — | Нет | Ref на корневой `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `value` | `number` | — | Yes | Current value; clamped to `[0, max]`. |
+| `max` | `number` | `100` | No | Upper bound; if `max <= 0`, `100` is used. |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Diameter and stroke width from `progressCircle` primitives. |
+| `label` | `string` | — | No | Text for `aria-label` on the SVG when there is no visible label in the center. |
+| `children` | `React.ReactNode` | — | No | Content inside the ring. |
+| `className` | `string` | — | No | Extra class on the root element. |
+| `ref` | `React.Ref<HTMLDivElement>` | — | No | Ref on the root `div`. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет: визуальный стиль один (трек и акцентная дуга из системных цветов). Настраивается **масштаб** через `size` (`s` → `xl`) и **шкала** через пару `value` / `max`.
+There is no separate `variant` prop: one visual style (track and accent arc from system colors). Adjust **visual size** via `size` (`s` → `xl`) and **the numeric range** via the `value` / `max` pair.
 
-## Состояния
+## States
 
-- **Заполнение** задаётся числом `value`; дуга пересчитывается относительно `max`.
-- **Выход за пределы**: значения ниже `0` становятся `0`, выше `max` — `max`.
-- **Некорректный max**: при `max <= 0` используется `100`, чтобы избежать деления на ноль и пустой шкалы.
-- Состояний «загрузка», «ошибка» или «неактивно» в самом компоненте нет — их отражают соседняя разметка или приостановка обновления `value`.
+- **Fill** is driven by `value`; the arc is computed relative to `max`.
+- **Out of range**: values below `0` become `0`, above `max` become `max`.
+- **Invalid max**: when `max <= 0`, `100` is used to avoid division by zero and an empty scale.
+- There are no built-in “loading”, “error”, or “disabled” states — reflect those with adjacent markup or by pausing `value` updates.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- SVG объявлен как **`role="progressbar"`** с **`aria-valuenow`**, **`aria-valuemin={0}`**, **`aria-valuemax`** равным используемому `max`.
-- Проп **`label`** задаёт **`aria-label`** на SVG — используйте его, если в центре нет текста, иначе индикатор может остаться без имени для скринридеров.
-- Компонент **не фокусируется** и не ожидает клавиатурного ввода: это декоративно-информативный виджет, управление прогрессом остаётся за родителем.
+- SVG is **`role="progressbar"`** with **`aria-valuenow`**, **`aria-valuemin={0}`**, **`aria-valuemax`** equal to the effective `max`.
+- **`label`** sets **`aria-label`** on the SVG — use it when the center has no text, or screen readers may lack a name for the indicator.
+- The component is **not focusable** and does not expect keyboard input: it is decorative/informational; progress control stays with the parent.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет режима **indeterminate** (бесконечная загрузка без числа) — только определённая доля по `value` и `max`.
-- Нет **`asChild`** и полиморфного корня: всегда рендерится обёртка и SVG внутри неё.
-- **Ширина на весь контейнер** не поддерживается: корень `inline-flex`; для растягивания оборачивайте в собственный flex/grid-контейнер.
+- No **indeterminate** mode (infinite loading without a number) — only a definite fraction via `value` and `max`.
+- No **`asChild`** or polymorphic root: always a wrapper with SVG inside.
+- **Full container width** is not supported: root is `inline-flex`; wrap in your own flex/grid container to stretch.
 
-## Связанные компоненты
+## Related components
 
-- **`ProgressBar`** — линейный тот же смысл «доля от max», если ось должна быть горизонтальной или в потоке формы.
-- **`Typography`** — подписи и единицы рядом с кольцом или внутри `children`.
-- **`Button`** — действия «Отмена», «Повторить» рядом с индикатором долгой операции.
+- **`ProgressBar`** — linear same meaning “fraction of max” when the axis should be horizontal or inline in a form.
+- **`Typography`** — labels and units beside the ring or inside `children`.
+- **`Button`** — Cancel, Retry, etc. next to a long-running operation indicator.
