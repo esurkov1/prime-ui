@@ -1,415 +1,415 @@
-# Каталог компонентов prime-ui-kit — responsive-контекст
+# prime-ui-kit component catalog — responsive context
 
-Полная таблица всех 41 компонентов с привязкой к responsive-макету.
+Full table of all 41 components mapped to responsive layout.
 
-**Условные обозначения зон:** header, sidebar, content, footer, overlay, form, inline, navigation.
+**Zone shorthand:** header, sidebar, content, footer, overlay, form, inline, navigation.
 
 ## Accordion
 
 | | |
 |---|---|
-| **Назначение** | Набор раскрывающихся секций: по клику на триггер показывается контент с анимацией высоты. |
-| **Responsive-роль** | На узких viewport занимает 100 % ширины; заменяет вертикальные табы на мобильных. |
-| **Зоны** | content, sidebar, form |
-| **Сценарии** | FAQ на лендинге; настройки ЛК по группам; детали заказа/доставки; статьи базы знаний; описание тарифов; навигация в узком сайдбаре. |
-| **Документация** | `../components/accordion.md` |
+| **Purpose** | A set of expandable sections: clicking a trigger reveals content with height animation. |
+| **Responsive role** | Full width on narrow viewports; replaces vertical tabs on mobile. |
+| **Zones** | content, sidebar, form |
+| **Scenarios** | FAQ on a landing; account settings by group; order/shipping details; knowledge-base articles; plan descriptions; navigation in a narrow sidebar. |
+| **Documentation** | `../components/accordion.md` |
 
 ## Avatar
 
 | | |
 |---|---|
-| **Назначение** | Составной круглый аватар: фото, fallback-инициалы и группа с наложением. |
-| **Responsive-роль** | Масштабируется через `size`; в группе на мобильных показывать меньше элементов. |
-| **Зоны** | header, content, inline, navigation |
-| **Сценарии** | Профиль в шапке; аватар в чате; карточка коллеги; таблица аудита; команда на лендинге; участники созвона. |
-| **Документация** | `../components/avatar.md` |
+| **Purpose** | Composite circular avatar: photo, fallback initials, and stacked group. |
+| **Responsive role** | Scales via `size`; on mobile, show fewer items in a group. |
+| **Zones** | header, content, inline, navigation |
+| **Scenarios** | Profile in the header; chat avatar; colleague card; audit table; team on a landing; meeting participants. |
+| **Documentation** | `../components/avatar.md` |
 
 ## Badge
 
 | | |
 |---|---|
-| **Назначение** | Компактная метка статуса, категории или числа с опциональной точкой и иконкой. |
-| **Responsive-роль** | Всегда inline; на мобильных можно скрыть текст, оставив только точку или число. |
-| **Зоны** | header, content, inline, form |
-| **Сценарии** | Счётчик у вкладки; этап доставки; роль в панели; статус присутствия; метка темы; «в наличии» в карточке. |
-| **Документация** | `../components/badge.md` |
+| **Purpose** | Compact label for status, category, or count, with optional dot and icon. |
+| **Responsive role** | Always inline; on mobile you can hide text and keep only the dot or number. |
+| **Zones** | header, content, inline, form |
+| **Scenarios** | Tab counter; delivery stage; role in a panel; presence status; topic label; “in stock” on a card. |
+| **Documentation** | `../components/badge.md` |
 
 ## Banner
 
 | | |
 |---|---|
-| **Назначение** | Полоса объявления с иконкой, заголовком, описанием, действиями и кнопкой закрытия. |
-| **Responsive-роль** | Растягивается на 100 % ширины; на мобильных действия переносятся в столбец. |
-| **Зоны** | header, content, form |
-| **Сценарии** | Статус заказа; дедлайн; онбординг/релиз; подсказка в чек-ауте; глобальный инцидент; напоминание о несохранённых настройках. |
-| **Документация** | `../components/banner.md` |
+| **Purpose** | Announcement strip with icon, title, description, actions, and dismiss button. |
+| **Responsive role** | Full width; on mobile, actions stack vertically. |
+| **Zones** | header, content, form |
+| **Scenarios** | Order status; deadline; onboarding/release; checkout hint; global incident; unsaved-settings reminder. |
+| **Documentation** | `../components/banner.md` |
 
 ## Breadcrumb
 
 | | |
 |---|---|
-| **Назначение** | Хлебные крошки с разделителями и многоточием для длинного пути. |
-| **Responsive-роль** | На мобильных автоматически сокращает середину; оставляет первый и последний элемент. |
-| **Зоны** | header, content, navigation |
-| **Сценарии** | Путь по каталогу; ЛК: заказы → карточка; документация с collapse; шапка отчёта; уровень без ссылки; иконка «дом». |
-| **Документация** | `../components/breadcrumb.md` |
+| **Purpose** | Breadcrumbs with separators and ellipsis for long paths. |
+| **Responsive role** | On mobile, automatically shortens the middle; keeps first and last items. |
+| **Zones** | header, content, navigation |
+| **Scenarios** | Catalog path; account: orders → detail; docs with collapse; report header; non-link level; home icon. |
+| **Documentation** | `../components/breadcrumb.md` |
 
 ## Button
 
 | | |
 |---|---|
-| **Назначение** | Кнопка действия с иконкой и индикатором загрузки, согласованными по размеру. |
-| **Responsive-роль** | На мобильных использовать `size="l"` для touch-target ≥ 44 px; `fullWidth` для блочных CTA. |
-| **Зоны** | header, footer, content, form, overlay, navigation |
-| **Сценарии** | Сохранение в панели; оплата и повтор; пустой экран «Начать»; submit формы; действия в карточке; массовые операции. |
-| **Документация** | `../components/button.md` |
+| **Purpose** | Action button with icon and loading indicator, sizes aligned. |
+| **Responsive role** | On mobile use `size="l"` for touch target ≥ 44 px; `fullWidth` for block CTAs. |
+| **Zones** | header, footer, content, form, overlay, navigation |
+| **Scenarios** | Save in a panel; pay and retry; empty state “Get started”; form submit; card actions; bulk operations. |
+| **Documentation** | `../components/button.md` |
 
 ## ButtonGroup
 
 | | |
 |---|---|
-| **Назначение** | Несколько сегментов-кнопок в одной обводке с общими скруглениями. |
-| **Responsive-роль** | Переключается в `vertical` на узких viewport; уменьшает `size` при нехватке места. |
-| **Зоны** | header, content, form, navigation |
-| **Сценарии** | Интервал в аналитике; тулбар форматирования; выбор тарифа; фильтр наличия; вертикальный вариант в узкой колонке; submit/reset. |
-| **Документация** | `../components/button-group.md` |
+| **Purpose** | Multiple segment buttons in one outline with shared corner radius. |
+| **Responsive role** | Switch to `vertical` on narrow viewports; reduce `size` when space is tight. |
+| **Zones** | header, content, form, navigation |
+| **Scenarios** | Date range in analytics; formatting toolbar; plan selection; stock filter; vertical variant in a narrow column; submit/reset. |
+| **Documentation** | `../components/button-group.md` |
 
 ## Checkbox
 
 | | |
 |---|---|
-| **Назначение** | Флажок с подписью, подсказкой, ошибкой и состоянием indeterminate. |
-| **Responsive-роль** | Размер фиксирован; на мобильных увеличивать отступ для touch-area. |
-| **Зоны** | form, content, sidebar |
-| **Сценарии** | Согласие перед оплатой; «выбрать всё» в таблице; каналы уведомлений; приватность; фильтр «архив / только мои»; согласование документа. |
-| **Документация** | `../components/checkbox.md` |
+| **Purpose** | Checkbox with label, hint, error, and indeterminate state. |
+| **Responsive role** | Fixed size; on mobile increase spacing for touch area. |
+| **Zones** | form, content, sidebar |
+| **Scenarios** | Consent before payment; “select all” in a table; notification channels; privacy; “archive / mine only” filter; document approval. |
+| **Documentation** | `../components/checkbox.md` |
 
 ## CodeBlock
 
 | | |
 |---|---|
-| **Назначение** | Статичный фрагмент кода с подсветкой синтаксиса и светлой/тёмной схемой. |
-| **Responsive-роль** | Горизонтальная прокрутка при переполнении; ширина 100 % контейнера. |
-| **Зоны** | content, inline |
-| **Сценарии** | API-документация; примеры интеграции; лог/конфиг в саппорте; JSON-тело запроса; сравнение light/dark на лендинге. |
-| **Документация** | `../components/code-block.md` |
+| **Purpose** | Static code snippet with syntax highlighting and light/dark themes. |
+| **Responsive role** | Horizontal scroll on overflow; width 100% of container. |
+| **Zones** | content, inline |
+| **Scenarios** | API docs; integration examples; log/config in support; JSON request body; light/dark comparison on a landing. |
+| **Documentation** | `../components/code-block.md` |
 
 ## ColorPicker
 
 | | |
 |---|---|
-| **Назначение** | Виджет выбора цвета: область, слайдеры, пресеты, hex-ввод, пипетка. |
-| **Responsive-роль** | На мобильных помещать в Drawer вместо inline; пресеты в flex-wrap. |
-| **Зоны** | form, overlay, sidebar |
-| **Сценарии** | Цвета бренда/темы; визуальный редактор; цвет серии на графике; вариант товара; поле «любимый цвет»; компактная панель в Popover. |
-| **Документация** | `../components/color-picker.md` |
+| **Purpose** | Color picker: area, sliders, presets, hex input, eyedropper. |
+| **Responsive role** | On mobile, place in a Drawer instead of inline; presets in flex-wrap. |
+| **Zones** | form, overlay, sidebar |
+| **Scenarios** | Brand/theme colors; visual editor; series color on a chart; product variant; “favorite color” field; compact panel in a Popover. |
+| **Documentation** | `../components/color-picker.md` |
 
 ## CommandMenu
 
 | | |
 |---|---|
-| **Назначение** | Палитра команд: модальное окно с поиском и списком действий с клавиатурной навигацией. |
-| **Responsive-роль** | На мобильных растягивается на всю ширину; триггер через кнопку вместо горячей клавиши. |
-| **Зоны** | overlay, navigation, header |
-| **Сценарии** | Быстрый переход по разделам; действия над сделкой; команды редактора; поиск заказов; поддержка с поиском статей; фильтры медиатеки. |
-| **Документация** | `../components/command-menu.md` |
+| **Purpose** | Command palette: modal with search and action list, keyboard navigation. |
+| **Responsive role** | On mobile, full width; trigger via button instead of hotkey. |
+| **Zones** | overlay, navigation, header |
+| **Scenarios** | Quick jump between sections; deal actions; editor commands; order search; support with article search; media library filters. |
+| **Documentation** | `../components/command-menu.md` |
 
 ## DataTable
 
 | | |
 |---|---|
-| **Назначение** | Таблица с сортировкой, пагинацией, закрепляемой шапкой и первой колонкой. |
-| **Responsive-роль** | Горизонтальная прокрутка с `overflow-x: auto`; закрепление первой колонки; на мобильных — карточный вид или скрытие второстепенных колонок. |
-| **Зоны** | content |
-| **Сценарии** | Склад и отгрузки; счета и оплата; широкие отчёты; тикеты с кастомными ячейками; журнал с бесконечной подгрузкой; компактная таблица в карточке. |
-| **Документация** | `../components/data-table.md` |
+| **Purpose** | Table with sorting, pagination, sticky header and first column. |
+| **Responsive role** | Horizontal scroll with `overflow-x: auto`; sticky first column; on mobile — card layout or hide secondary columns. |
+| **Zones** | content |
+| **Scenarios** | Warehouse and shipments; invoices and payments; wide reports; tickets with custom cells; log with infinite scroll; compact table inside a card. |
+| **Documentation** | `../components/data-table.md` |
 
 ## Datepicker
 
 | | |
 |---|---|
-| **Назначение** | Календарь для одной даты или периода с пресетами, временем и подписью. |
-| **Responsive-роль** | Попап привязывается к viewport на мобильных; пресеты переносятся из бока вниз. |
-| **Зоны** | form, content, overlay, sidebar |
-| **Сценарии** | Бронирование слота; период отчёта с пресетами; отложенная публикация; фильтр по дате; интервал отгрузки; день рождения в профиле. |
-| **Документация** | `../components/datepicker.md` |
+| **Purpose** | Calendar for single date or range with presets, time, and label. |
+| **Responsive role** | Popup clamps to viewport on mobile; presets move from side to bottom. |
+| **Zones** | form, content, overlay, sidebar |
+| **Scenarios** | Slot booking; report period with presets; scheduled publish; date filter; shipping window; birthday in profile. |
+| **Documentation** | `../components/datepicker.md` |
 
 ## DigitInput
 
 | | |
 |---|---|
-| **Назначение** | Набор полей по одной цифре с навигацией и вставкой из буфера. |
-| **Responsive-роль** | Крупный `size` на мобильных для удобного ввода пальцем; `inputMode="numeric"` для цифровой клавиатуры. |
-| **Зоны** | form, overlay |
-| **Сценарии** | OTP из SMS; код выдачи заказа; PIN контента; крупные ячейки на планшете; код сопряжения; подтверждение email в мастере. |
-| **Документация** | `../components/digit-input.md` |
+| **Purpose** | One digit per field with navigation and paste from clipboard. |
+| **Responsive role** | Larger `size` on mobile for thumb input; `inputMode="numeric"` for numeric keyboard. |
+| **Zones** | form, overlay |
+| **Scenarios** | SMS OTP; pickup code; content PIN; large cells on tablet; pairing code; email confirmation in a wizard. |
+| **Documentation** | `../components/digit-input.md` |
 
 ## Divider
 
 | | |
 |---|---|
-| **Назначение** | Горизонтальный или вертикальный разделитель, опционально с текстом или иконкой. |
-| **Responsive-роль** | Переключать `orientation` при смене flex-direction контейнера. |
-| **Зоны** | content, sidebar, form, inline |
-| **Сценарии** | Итоги заказа; секции описания товара; вертикальные черты в тулбаре; секции настроек; карточка статьи; панель редактора. |
-| **Документация** | `../components/divider.md` |
+| **Purpose** | Horizontal or vertical divider, optionally with text or icon. |
+| **Responsive role** | Toggle `orientation` when the container’s flex-direction changes. |
+| **Zones** | content, sidebar, form, inline |
+| **Scenarios** | Order totals; product description sections; vertical rules in a toolbar; settings sections; article card; editor panel. |
+| **Documentation** | `../components/divider.md` |
 
 ## Drawer
 
 | | |
 |---|---|
-| **Назначение** | Выдвижная панель с оверлеем, блокировкой скролла и удержанием фокуса. |
-| **Responsive-роль** | Основной паттерн для мобильных: заменяет модалки, сайдбары и вложенные панели; `position="bottom"` для нижнего листа. |
-| **Зоны** | overlay |
-| **Сценарии** | Фильтры каталога на мобильных; приёмка на планшете; метаданные справа; нижний лист поверх карты; заметки по кандидату; разбор строки счёта. |
-| **Документация** | `../components/drawer.md` |
+| **Purpose** | Slide-out panel with overlay, scroll lock, and focus trap. |
+| **Responsive role** | Primary mobile pattern: replaces modals, sidebars, and nested panels; `position="bottom"` for bottom sheet. |
+| **Zones** | overlay |
+| **Scenarios** | Catalog filters on mobile; receiving on tablet; metadata on the right; bottom sheet over a map; candidate notes; invoice line drill-down. |
+| **Documentation** | `../components/drawer.md` |
 
 ## Dropdown
 
 | | |
 |---|---|
-| **Назначение** | Меню действий по триггеру: группы, шапка, разделители в портале. |
-| **Responsive-роль** | Позиционируется автоматически через портал; на мобильных может переходить в Drawer для длинных списков. |
-| **Зоны** | header, content, form, inline, navigation |
-| **Сценарии** | Действия над карточкой задачи; меню строки таблицы; профиль/выход в шапке; короткий триггер; внешнее управление `open`; текстовый триггер. |
-| **Документация** | `../components/dropdown.md` |
+| **Purpose** | Action menu on a trigger: groups, header, dividers in a portal. |
+| **Responsive role** | Auto-positioned via portal; on mobile can switch to Drawer for long lists. |
+| **Zones** | header, content, form, inline, navigation |
+| **Scenarios** | Task card actions; table row menu; profile/logout in header; short trigger; externally controlled `open`; text trigger. |
+| **Documentation** | `../components/dropdown.md` |
 
 ## FileUpload
 
 | | |
 |---|---|
-| **Назначение** | Зона drag-n-drop файлов и список загруженных с бейджем формата и прогрессом. |
-| **Responsive-роль** | Зона занимает 100 % ширины; на мобильных drag-n-drop менее актуален — акцент на кнопку выбора. |
-| **Зоны** | form, overlay, content |
-| **Сценарии** | Резюме и портфолио; фото товара; медицинские снимки; аватар с внешней кнопкой; вложения к B2B-заявке; сдача работ в LMS. |
-| **Документация** | `../components/file-upload.md` |
+| **Purpose** | Drag-and-drop zone and uploaded list with format badge and progress. |
+| **Responsive role** | Zone is full width; on mobile drag-and-drop is less relevant — emphasize pick-file button. |
+| **Zones** | form, overlay, content |
+| **Scenarios** | Resume and portfolio; product photos; medical images; avatar with external button; B2B application attachments; LMS submissions. |
+| **Documentation** | `../components/file-upload.md` |
 
 ## Hint
 
 | | |
 |---|---|
-| **Назначение** | Строка пояснения под полем: нейтральный текст, ошибка или disabled, опционально с иконкой. |
-| **Responsive-роль** | Ширина следует за полем; на мобильных важно не обрезать текст ошибки. |
-| **Зоны** | form, inline |
-| **Сценарии** | Правила пароля; read-only с пояснением роли; лимит у числового поля; приглашение по email; ошибка промокода; подсказка к ползунку. |
-| **Документация** | `../components/hint.md` |
+| **Purpose** | Helper text under a field: neutral, error, or disabled, optionally with icon. |
+| **Responsive role** | Width follows the field; on mobile avoid clipping error text. |
+| **Zones** | form, inline |
+| **Scenarios** | Password rules; read-only with role explanation; numeric field limit; email invite; promo error; slider hint. |
+| **Documentation** | `../components/hint.md` |
 
 ## Input
 
 | | |
 |---|---|
-| **Назначение** | Однострочное поле с подписью, обводкой, иконками и аффиксами. |
-| **Responsive-роль** | `fullWidth` по умолчанию в мобильных формах; `size="l"` для touch-target. |
-| **Зоны** | header, form, content, sidebar |
-| **Сценарии** | Логин/контакты; адрес и промокод; SKU в таблице; поиск в каталоге; суммы с валютой; лид-форма на лендинге. |
-| **Документация** | `../components/input.md` |
+| **Purpose** | Single-line field with label, border, icons, and affixes. |
+| **Responsive role** | `fullWidth` by default in mobile forms; `size="l"` for touch target. |
+| **Zones** | header, form, content, sidebar |
+| **Scenarios** | Login/contacts; address and promo; SKU in table; catalog search; amounts with currency; landing lead form. |
+| **Documentation** | `../components/input.md` |
 
 ## Kbd
 
 | | |
 |---|---|
-| **Назначение** | Оформленная подпись клавиши или сочетания. |
-| **Responsive-роль** | Скрывать на мобильных (нет клавиатуры); показывать только на `min-width: 1024px`. |
-| **Зоны** | content, form, inline, overlay |
-| **Сценарии** | Горячие клавиши в меню редактора; шорткаты в настройках; онбординг с клавишами; Enter у кнопки в модалке. |
-| **Документация** | `../components/kbd.md` |
+| **Purpose** | Styled key or shortcut label. |
+| **Responsive role** | Hide on mobile (no keyboard); show only from `min-width: 1024px`. |
+| **Zones** | content, form, inline, overlay |
+| **Scenarios** | Editor menu hotkeys; shortcuts in settings; onboarding with keys; Enter next to modal button. |
+| **Documentation** | `../components/kbd.md` |
 
 ## Label
 
 | | |
 |---|---|
-| **Назначение** | Лейбл для полей формы с иконкой, звёздочкой обязательности и подзаголовком. |
-| **Responsive-роль** | Размер наследуется от контекста; `Sub` переносится на новую строку на узких viewport. |
-| **Зоны** | form |
-| **Сценарии** | Поля профиля с `htmlFor`; длинные формы с пояснением; компактные фильтры отчёта; модалка с иконкой и форматом в `Sub`. |
-| **Документация** | `../components/label.md` |
+| **Purpose** | Form field label with icon, required asterisk, and subtitle. |
+| **Responsive role** | Size inherits from context; `Sub` wraps to a new line on narrow viewports. |
+| **Zones** | form |
+| **Scenarios** | Profile fields with `htmlFor`; long forms with hints; compact report filters; modal with icon and format in `Sub`. |
+| **Documentation** | `../components/label.md` |
 
 ## LinkButton
 
 | | |
 |---|---|
-| **Назначение** | Ссылка с типографикой кнопки, подчёркиванием при hover/focus и размерами. |
-| **Responsive-роль** | Inline-элемент; на мобильных увеличивать `size` для touch-target. |
-| **Зоны** | header, footer, content, navigation, inline |
-| **Сценарии** | Пункт навигации в шапке; ссылки в футере; политика в тексте; компактные ссылки в панели; интеграция из карточки. |
-| **Документация** | `../components/link-button.md` |
+| **Purpose** | Link with button typography, underline on hover/focus, and sizes. |
+| **Responsive role** | Inline element; on mobile increase `size` for touch target. |
+| **Zones** | header, footer, content, navigation, inline |
+| **Scenarios** | Nav item in header; footer links; policy in copy; compact links in a panel; integration from a card. |
+| **Documentation** | `../components/link-button.md` |
 
 ## Modal
 
 | | |
 |---|---|
-| **Назначение** | Модальное окно с затемнением, блокировкой скролла и фокус-ловушкой. |
-| **Responsive-роль** | На мобильных заменять на Drawer (bottom) для лучшего UX; на desktop — центрированное окно с max-width. |
-| **Зоны** | overlay |
-| **Сценарии** | Подтверждение удаления; шаг оплаты; онбординг; быстрое редактирование записи; превью медиа; оферта и согласия. |
-| **Документация** | `../components/modal.md` |
+| **Purpose** | Modal with backdrop, scroll lock, and focus trap. |
+| **Responsive role** | On mobile prefer Drawer (bottom) for UX; on desktop centered with max-width. |
+| **Zones** | overlay |
+| **Scenarios** | Delete confirmation; payment step; onboarding; quick record edit; media preview; terms and consents. |
+| **Documentation** | `../components/modal.md` |
 
 ## Notification
 
 | | |
 |---|---|
-| **Назначение** | Система тостов на провайдере и портале с очередью сообщений. |
-| **Responsive-роль** | На мобильных — полная ширина внизу; на desktop — фиксированная ширина в углу. |
-| **Зоны** | overlay |
-| **Сценарии** | Успех/ошибка платежей; совместное редактирование; статус доставки; готовность экспорта; загрузка файла; потеря сессии. |
-| **Документация** | `../components/notification.md` |
+| **Purpose** | Toast system on provider and portal with message queue. |
+| **Responsive role** | On mobile full width at bottom; on desktop fixed width in a corner. |
+| **Zones** | overlay |
+| **Scenarios** | Payment success/error; co-editing; delivery status; export ready; file upload; session lost. |
+| **Documentation** | `../components/notification.md` |
 
 ## Pagination
 
 | | |
 |---|---|
-| **Назначение** | Навигация по страницам со стрелками, номерами и многоточием. |
-| **Responsive-роль** | На мобильных компактный вариант: только стрелки и текущая страница; `size="s"`. |
-| **Зоны** | content, footer |
-| **Сценарии** | Каталог товаров; журнал аудита; медиатека; многостраничный урок; логи API; компактный вид на мобиле. |
-| **Документация** | `../components/pagination.md` |
+| **Purpose** | Page navigation with arrows, numbers, and ellipsis. |
+| **Responsive role** | Compact on mobile: arrows and current page only; `size="s"`. |
+| **Zones** | content, footer |
+| **Scenarios** | Product catalog; audit log; media library; multi-page lesson; API logs; compact mobile view. |
+| **Documentation** | `../components/pagination.md` |
 
 ## Popover
 
 | | |
 |---|---|
-| **Назначение** | Якорь и портальная панель с произвольным контентом, закрытие по Escape и клику снаружи. |
-| **Responsive-роль** | На мобильных переходит в Drawer при сложном содержимом; простой popover остаётся. |
-| **Зоны** | overlay, content, form, inline |
-| **Сценарии** | Сноска к термину; условия акции; мини-форма настроек; комментарий к заявке; контекстная подсказка. |
-| **Документация** | `../components/popover.md` |
+| **Purpose** | Anchor and portal panel with arbitrary content; closes on Escape and outside click. |
+| **Responsive role** | On mobile switches to Drawer for heavy content; simple popover can stay. |
+| **Zones** | overlay, content, form, inline |
+| **Scenarios** | Term footnote; promo terms; mini settings form; application comment; contextual hint. |
+| **Documentation** | `../components/popover.md` |
 
 ## ProgressBar
 
 | | |
 |---|---|
-| **Назначение** | Горизонтальный индикатор прогресса с `value`/`max` и подписью. |
-| **Responsive-роль** | Растягивается на 100 % ширины контейнера; компактный `size` на мобильных. |
-| **Зоны** | content, form |
-| **Сценарии** | Загрузка файла; шаги анкеты; фоновая сборка отчёта; синхронизации; карточка «формирование выгрузки»; контролируемое значение. |
-| **Документация** | `../components/progress-bar.md` |
+| **Purpose** | Horizontal progress with `value`/`max` and label. |
+| **Responsive role** | Stretches to full container width; compact `size` on mobile. |
+| **Zones** | content, form |
+| **Scenarios** | File upload; survey steps; background report build; sync jobs; “building export” card; controlled value. |
+| **Documentation** | `../components/progress-bar.md` |
 
 ## ProgressCircle
 
 | | |
 |---|---|
-| **Назначение** | Круговой индикатор доли с контентом в центре. |
-| **Responsive-роль** | Фиксированный размер; на мобильных уменьшать через `size` для экономии места. |
-| **Зоны** | content, inline, form |
-| **Сценарии** | Процент бэкапа; лицензия «месяц N из 12»; шаг мастера; группы в панели; занятость слота бронирования. |
-| **Документация** | `../components/progress-circle.md` |
+| **Purpose** | Circular fraction indicator with center content. |
+| **Responsive role** | Fixed size; on mobile reduce via `size` to save space. |
+| **Zones** | content, inline, form |
+| **Scenarios** | Backup percent; license “month N of 12”; wizard step; groups in a panel; booking slot occupancy. |
+| **Documentation** | `../components/progress-circle.md` |
 
 ## Radio
 
 | | |
 |---|---|
-| **Назначение** | Радиокнопка с подписью, подсказкой и ошибкой. |
-| **Responsive-роль** | Группа переключается из горизонтальной в вертикальную раскладку на мобильных. |
-| **Зоны** | form, content, sidebar |
-| **Сценарии** | Цель онбординга; согласие с ошибкой; способ оплаты; выбор тарифа; окно доставки; роль доступа. |
-| **Документация** | `../components/radio.md` |
+| **Purpose** | Radio with label, hint, and error. |
+| **Responsive role** | Group switches from horizontal to vertical layout on mobile. |
+| **Zones** | form, content, sidebar |
+| **Scenarios** | Onboarding goal; consent with error; payment method; plan selection; delivery window; access role. |
+| **Documentation** | `../components/radio.md` |
 
 ## SegmentedControl
 
 | | |
 |---|---|
-| **Назначение** | Группа сегментов с одним выбранным значением и плавающим индикатором. |
-| **Responsive-роль** | На мобильных уменьшать до `size="s"` или заменять на Select/Tabs при > 4 сегментов. |
-| **Зоны** | header, content, form, navigation |
-| **Сценарии** | Период графика; вид каталога (сетка/список); тема/плотность UI; стадии доски; режим документа; компактное переключение. |
-| **Документация** | `../components/segmented-control.md` |
+| **Purpose** | Segment group with one selected value and floating indicator. |
+| **Responsive role** | On mobile shrink to `size="s"` or replace with Select/Tabs when > 4 segments. |
+| **Zones** | header, content, form, navigation |
+| **Scenarios** | Chart period; catalog view (grid/list); theme/UI density; board stages; document mode; compact toggle. |
+| **Documentation** | `../components/segmented-control.md` |
 
 ## Select
 
 | | |
 |---|---|
-| **Назначение** | Выпадающий список: триггер с значением и портальное меню. |
-| **Responsive-роль** | На мобильных меню раскрывается поверх; `fullWidth` в формах; `size="l"` для touch-target. |
-| **Зоны** | form, header, content, sidebar |
-| **Сценарии** | Роль/страна в анкете; язык и часовой пояс; доставка/валюта; фильтр дашборда; приоритет тикета; окружение в ops. |
-| **Документация** | `../components/select.md` |
+| **Purpose** | Dropdown: trigger with value and portal menu. |
+| **Responsive role** | On mobile menu opens over content; `fullWidth` in forms; `size="l"` for touch target. |
+| **Zones** | form, header, content, sidebar |
+| **Scenarios** | Role/country in a form; language and timezone; shipping/currency; dashboard filter; ticket priority; environment in ops. |
+| **Documentation** | `../components/select.md` |
 
 ## Sidebar
 
 | | |
 |---|---|
-| **Назначение** | Боковая навигация: колонка разделов, группы пунктов и подвал. |
-| **Responsive-роль** | На desktop — фиксированная боковая колонка; на мобильных — сворачивается в Drawer или скрывается за гамбургером. |
-| **Зоны** | sidebar, navigation |
-| **Сценарии** | Переключение продуктов; документация с оглавлением; логистика fleet/warehouse; настройки с разделами; каталог с фильтрами; маршруты на NavLink. |
-| **Документация** | `../components/sidebar.md` |
+| **Purpose** | Side navigation: section column, grouped items, and footer. |
+| **Responsive role** | On desktop fixed side column; on mobile collapses into Drawer or hides behind hamburger. |
+| **Zones** | sidebar, navigation |
+| **Scenarios** | Product switching; docs with TOC; fleet/warehouse logistics; settings sections; catalog with filters; routes on NavLink. |
+| **Documentation** | `../components/sidebar.md` |
 
 ## Slider
 
 | | |
 |---|---|
-| **Назначение** | Горизонтальный ползунок с подписью и размерами s–xl. |
-| **Responsive-роль** | Растягивается на 100 % контейнера; увеличивать thumb на мобильных через `size="l"`. |
-| **Зоны** | form, content, sidebar |
-| **Сценарии** | Громкость плеера; яркость/температура IoT; целевой запас; прозрачность слоя; дискретная шкала опроса; скорость TTS. |
-| **Документация** | `../components/slider.md` |
+| **Purpose** | Horizontal slider with label and sizes s–xl. |
+| **Responsive role** | Stretches to full container width; larger thumb on mobile via `size="l"`. |
+| **Zones** | form, content, sidebar |
+| **Scenarios** | Player volume; IoT brightness/color temp; target stock; layer opacity; discrete survey scale; TTS speed. |
+| **Documentation** | `../components/slider.md` |
 
 ## Stepper
 
 | | |
 |---|---|
-| **Назначение** | Многошаговый процесс: горизонтальный или вертикальный степпер. |
-| **Responsive-роль** | Горизонтальный на desktop → вертикальный на мобильных; текст шагов может скрываться, оставляя номера. |
-| **Зоны** | content, form, header |
-| **Сценарии** | Онбординг; этапы чек-аута; согласование с ошибкой; редакционный пайплайн; кликабельные шаги; CI/CD на карточке. |
-| **Документация** | `../components/stepper.md` |
+| **Purpose** | Multi-step flow: horizontal or vertical stepper. |
+| **Responsive role** | Horizontal on desktop → vertical on mobile; step text can hide, leaving numbers. |
+| **Zones** | content, form, header |
+| **Scenarios** | Onboarding; checkout stages; approval with error; editorial pipeline; clickable steps; CI/CD on a card. |
+| **Documentation** | `../components/stepper.md` |
 
 ## Switch
 
 | | |
 |---|---|
-| **Назначение** | Переключатель вкл/выкл с подписью, подсказкой и ошибкой. |
-| **Responsive-роль** | Фиксированный размер; на мобильных — достаточный touch-target из коробки. |
-| **Зоны** | form, content, sidebar |
-| **Сценарии** | Каналы уведомлений; бесконтактная доставка; правила обработки; напоминания; витрина размеров; обязательное согласие с ошибкой. |
-| **Документация** | `../components/switch.md` |
+| **Purpose** | On/off toggle with label, hint, and error. |
+| **Responsive role** | Fixed size; on mobile adequate touch target out of the box. |
+| **Zones** | form, content, sidebar |
+| **Scenarios** | Notification channels; contactless delivery; processing rules; reminders; size showcase; mandatory consent with error. |
+| **Documentation** | `../components/switch.md` |
 
 ## Tabs
 
 | | |
 |---|---|
-| **Назначение** | Вкладки: список переключателей и панели контента, одна активная. |
-| **Responsive-роль** | Горизонтальная прокрутка табов на мобильных; на узких viewport можно заменить на Accordion. |
-| **Зоны** | content, navigation, sidebar |
-| **Сценарии** | Настройки: профиль/безопасность/биллинг; дашборд; описание/характеристики/отзывы; вертикальные вкладки; шаги мастера; сегменты лендинга. |
-| **Документация** | `../components/tabs.md` |
+| **Purpose** | Tabs: switcher list and content panels, one active. |
+| **Responsive role** | Horizontal tab scroll on mobile; on narrow viewports can replace with Accordion. |
+| **Zones** | content, navigation, sidebar |
+| **Scenarios** | Settings: profile/security/billing; dashboard; description/specs/reviews; vertical tabs; wizard steps; landing segments. |
+| **Documentation** | `../components/tabs.md` |
 
 ## Tag
 
 | | |
 |---|---|
-| **Назначение** | Компактный чип с текстом, иконкой и кнопкой удаления. |
-| **Responsive-роль** | Inline; группы тегов — в flex-wrap контейнере; на мобильных увеличивать отступ. |
-| **Зоны** | content, form, inline, header |
-| **Сценарии** | Активные фильтры как снимаемые чипы; ключевые слова формы; метки в списке; теги карточки; группировка в шапке; disabled-тег. |
-| **Документация** | `../components/tag.md` |
+| **Purpose** | Compact chip with text, icon, and remove button. |
+| **Responsive role** | Inline; tag groups in flex-wrap; on mobile increase spacing. |
+| **Zones** | content, form, inline, header |
+| **Scenarios** | Active filters as removable chips; form keywords; list labels; card tags; grouping in header; disabled tag. |
+| **Documentation** | `../components/tag.md` |
 
 ## Textarea
 
 | | |
 |---|---|
-| **Назначение** | Многострочное поле со счётчиком символов, подсказкой и ошибкой. |
-| **Responsive-роль** | `fullWidth` в мобильных формах; высота адаптируется через `rows` или auto-resize. |
-| **Зоны** | form, content |
-| **Сценарии** | Комментарий курьеру; развёрнутый ответ ученика; описание проблемы в тикете; лид-абзац с лимитом; валидация анкеты. |
-| **Документация** | `../components/textarea.md` |
+| **Purpose** | Multiline field with character counter, hint, and error. |
+| **Responsive role** | `fullWidth` in mobile forms; height via `rows` or auto-resize. |
+| **Zones** | form, content |
+| **Scenarios** | Note to courier; student long answer; ticket problem description; lead paragraph with limit; form validation. |
+| **Documentation** | `../components/textarea.md` |
 
 ## Tooltip
 
 | | |
 |---|---|
-| **Назначение** | Всплывающая подсказка: провайдер задержки, триггер и портальный контент. |
-| **Responsive-роль** | На мобильных заменять на Popover (tooltip не работает с touch без hover). |
-| **Зоны** | overlay, form, content, inline |
-| **Сценарии** | Пояснение к кнопке «Сохранить»; иконка избранного; термин в сводке; метрика в таблице; условия акции; подсказка на пустом экране. |
-| **Документация** | `../components/tooltip.md` |
+| **Purpose** | Tooltip: delay provider, trigger, and portal content. |
+| **Responsive role** | On mobile prefer Popover (tooltip without hover is poor on touch). |
+| **Zones** | overlay, form, content, inline |
+| **Scenarios** | “Save” button explanation; favorite icon; term in a summary; metric in a table; promo terms; empty-state hint. |
+| **Documentation** | `../components/tooltip.md` |
 
 ## Typography
 
 | | |
 |---|---|
-| **Назначение** | Стилизованный текст: шкала размеров, оси веса, трекинга, курсива и приглушённого тона. |
-| **Responsive-роль** | Размер текста масштабируется через `variant`; использовать fluid typography или менять `variant` по breakpoint. |
-| **Зоны** | content, header, footer, inline |
-| **Сценарии** | Лендинг с акцентами; вторичный текст в ЛК; основной текст курса; плитка метрик на дашборде; сводка заказа с вложенными акцентами. |
-| **Документация** | `../components/typography.md` |
+| **Purpose** | Styled text: size scale, weight, tracking, italic, and muted tone. |
+| **Responsive role** | Text size scales via `variant`; use fluid typography or change `variant` by breakpoint. |
+| **Zones** | content, header, footer, inline |
+| **Scenarios** | Landing with emphasis; secondary copy in account; course body text; dashboard metric tiles; order summary with nested emphasis. |
+| **Documentation** | `../components/typography.md` |
