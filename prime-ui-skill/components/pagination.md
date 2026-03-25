@@ -1,25 +1,25 @@
 # Pagination
 
-## Что это
+## What it is
 
-Однокомпонентная навигация по страницам списка: стрелки «назад» и «вперёд», кликабельные номера и сокращённый ряд с многоточием при большом числе страниц.
+Single-component navigation for paged lists: “previous” and “next” arrows, clickable page numbers, and a shortened row with an ellipsis when there are many pages.
 
-## Для чего нужен
+## When to use it
 
-- **Каталог и поиск** — листинг товаров или результатов запроса, когда данные приходят порциями с сервера.
-- **Журнал событий и аудит** — таблица операций в админке: перелистывание без прокрутки тысяч строк.
-- **Медиатека** — сетка превью или список файлов, разбитый на страницы фиксированного размера.
-- **Публикации и обучение** — многостраничная статья или урок, где «страница» — логический кусок контента.
-- **Внутренние инструменты** — просмотр ответов API или логов с пейджингом в широкой панели под таблицей.
-- **Компактный мобильный экран** — нижняя или верхняя полоса с уменьшенным `size`, когда места мало, а страниц много.
+- **Catalog and search** — product listings or query results when data arrives in chunks from the server.
+- **Event log and audit** — operation tables in admin: flip pages without scrolling thousands of rows.
+- **Media library** — preview grids or file lists split into fixed-size pages.
+- **Publishing and learning** — multi-page article or lesson where a “page” is a logical chunk of content.
+- **Internal tools** — browsing API responses or logs with pagination in a wide bar under the table.
+- **Compact mobile** — bottom or top bar with a smaller `size` when space is tight but there are many pages.
 
-## Юзкейсы
+## Use cases
 
-Примеры из разных продуктовых зон; в каждом — свой смысл экрана и набор пропсов.
+Examples from different product areas; each screen has its own meaning and prop set.
 
-### Базовый
+### Basic
 
-Интернет-витрина: пользователь листает выдачу, состояние страницы хранится в React.
+Storefront: the user pages through results; page state lives in React.
 
 ```tsx
 import * as React from "react";
@@ -35,9 +35,9 @@ export function CatalogPagination() {
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Панель модерации на десктопе: крупнее кликабельная зона и текст номеров через `size`, при этом тот же контролируемый пейджинг.
+Moderation panel on desktop: larger hit area and number text via `size`, with the same controlled paging.
 
 ```tsx
 import * as React from "react";
@@ -58,9 +58,9 @@ export function ModerationQueuePagination() {
 }
 ```
 
-### В контексте (панель списка)
+### In context (list bar)
 
-Подвал таблицы заказов: слева сводка «показано N–M», справа пагинация на всю ширину строки инструментов.
+Orders table footer: summary “showing N–M” on the left, full-width pagination on the toolbar row to the right.
 
 ```tsx
 import * as React from "react";
@@ -86,7 +86,7 @@ export function OrdersFooterBar() {
       }}
     >
       <span style={{ fontSize: 14, opacity: 0.8 }}>
-        Показано {from}–{to} из {totalItems}
+        Showing {from}–{to} of {totalItems}
       </span>
       <Pagination.Root page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
@@ -94,9 +94,9 @@ export function OrdersFooterBar() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Страница синхронизирована с запросом: смена номера обновляет данные; при пустом ответе (`totalPages === 0`) блок навигации не показывают.
+Page is synced with the request: changing the number refetches data; when the response is empty (`totalPages === 0`), the nav block is not shown.
 
 ```tsx
 import * as React from "react";
@@ -130,52 +130,52 @@ export function InvoicesPagination() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Плоский API: экспортируется объект `Pagination` с единственным подкомпонентом `Root`.
+Flat API: a `Pagination` object is exported with a single subcomponent, `Root`.
 
-- **`Pagination.Root`** — элемент `nav` с `aria-label="Pagination"`. Внутри: две кнопки-стрелки (`Button.Root` с иконками) и серия кнопок с номерами или невзаимодействующие ячейки с символом многоточия (`span`, `aria-hidden`).
+- **`Pagination.Root`** — a `nav` element with `aria-label="Pagination"`. Inside: two arrow buttons (`Button.Root` with icons) and a series of number buttons or non-interactive cells with an ellipsis (`span`, `aria-hidden`).
 
 ## API
 
 ### Pagination.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `page` | `number` | — | Да | Текущая страница; при расчёте ограничивается диапазоном `1 … totalPages`. |
-| `totalPages` | `number` | — | Да | Количество страниц. Если `< 1`, компонент возвращает `null`. |
-| `onPageChange` | `(page: number) => void` | — | Да | Обработчик смены страницы (номер или стрелка). |
-| `siblingCount` | `number` | `1` | Нет | Сколько номеров слева и справа от текущей в сокращённом ряду (при `totalPages > 7`). |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размер кнопок и согласованный размер ячейки многоточия. |
-| `className` | `string` | — | Нет | Дополнительный класс на корневой `nav`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| `page` | `number` | — | Yes | Current page; clamped to `1 … totalPages` when computed. |
+| `totalPages` | `number` | — | Yes | Number of pages. If `< 1`, the component returns `null`. |
+| `onPageChange` | `(page: number) => void` | — | Yes | Handler for page changes (number or arrow). |
+| `siblingCount` | `number` | `1` | No | How many numbers to show left and right of the current page in the shortened row (when `totalPages > 7`). |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Button size and matching ellipsis cell size. |
+| `className` | `string` | — | No | Extra class on the root `nav`. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет. Визуальные роли зашиты в разметку: активная страница — `Button` с `variant="primary"` и `mode="filled"`, остальные номера и стрелки — `variant="neutral"`, `mode="ghost"`. Пользовательский «вариант» масштаба задаётся только `size`.
+There is no separate `variant` prop. Visual roles are fixed in the markup: the active page is a `Button` with `variant="primary"` and `mode="filled"`; other numbers and arrows use `variant="neutral"`, `mode="ghost"`. User-facing “variant” of scale is only `size`.
 
-## Состояния
+## States
 
-- **Текущая страница** — у соответствующей кнопки `aria-current="page"`.
-- **Первая страница** — кнопка «назад» с `disabled`.
-- **Последняя страница** — кнопка «вперёд» с `disabled`.
-- **Одна страница** — обе стрелки неактивны.
-- **Нет страниц** — при `totalPages < 1` рендер пустой.
+- **Current page** — the matching button has `aria-current="page"`.
+- **First page** — “previous” button is `disabled`.
+- **Last page** — “next” button is `disabled`.
+- **Single page** — both arrows are inactive.
+- **No pages** — when `totalPages < 1`, nothing is rendered.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Корень — семантический `nav` с меткой `aria-label="Pagination"`.
-- Стрелки имеют `aria-label` «Previous page» / «Next page» (в коде кита — на английском).
-- Номера страниц — `aria-label` вида `Page N`.
-- Многоточие декоративное: `aria-hidden="true"`, не участвует в порядке фокуса.
+- Root is semantic `nav` with label `aria-label="Pagination"`.
+- Arrows have `aria-label` “Previous page” / “Next page” (in the kit source they are in English).
+- Page numbers use `aria-label` like `Page N`.
+- Ellipsis is decorative: `aria-hidden="true"`, not in tab order.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет неконтролируемого режима: всегда нужны `page` и `onPageChange`.
-- Нельзя подменить разметку слотов или текст стрелок без форка: состав фиксирован.
-- Номер страницы и подписи стрелок не локализуются пропами; при необходимости другого языка — обёртка или собственная реализация.
-- URL-синхронизация (`?page=`) — задача роутера или родителя, не компонента.
+- No uncontrolled mode: `page` and `onPageChange` are always required.
+- You cannot swap slot markup or arrow text without forking: structure is fixed.
+- Page numbers and arrow labels are not localized via props; for another language use a wrapper or a custom implementation.
+- URL sync (`?page=`) is the router or parent’s job, not the component’s.
 
-## Связанные компоненты
+## Related components
 
-- **DataTable** — таблицы с встроенной пагинацией данных; `Pagination` удобен под кастомными списками и простыми таблицами без DataTable.
-- **Button** — пагинация построена на кнопках кита; стили согласованы с системой контролов.
+- **DataTable** — tables with built-in data pagination; `Pagination` fits custom lists and simple tables without DataTable.
+- **Button** — pagination is built on kit buttons; styles align with the control system.
