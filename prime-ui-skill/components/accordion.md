@@ -1,25 +1,25 @@
 # Accordion
 
-## Что это
+## What it is
 
-Набор вложенных частей (`Root`, `Item`, `Header`, `Trigger`, `Content`, плюс слоты `Icon` и `Arrow`), который показывает список секций: по клику на триггер раскрывается связанный контент с анимацией высоты.
+A set of nested parts (`Root`, `Item`, `Header`, `Trigger`, `Content`, plus `Icon` and `Arrow` slots) that shows a list of sections: clicking the trigger expands the associated content with a height animation.
 
-## Для чего нужен
+## What it’s for
 
-- **Маркетинг и лендинги** — блок «вопрос–ответ» без отдельной страницы на каждый пункт: компактно на мобильных, без перегрузки скролла длинным текстом.
-- **Настройки продукта и личный кабинет** — группы опций (уведомления, безопасность, оплата) в одной колонке, чтобы не строить глубокое меню на каждый подраздел.
-- **Каталоги и заказы** — детали состава, доставки и условий в карточке заказа: покупатель раскрывает только интересующие разделы.
-- **Базы знаний и внутренние порталы** — статьи с вложенными инструкциями: редактор держит единый стиль раскрытия и размер текста.
-- **Админка и роли** — часть пунктов недоступна (`disabled` на `Item`), остальные остаются в том же списке без отдельного «заглушечного» экрана.
-- **Боковые панели и узкие колонки** — корень можно растянуть на ширину сайдбара; `layout="separate"` визуально отделяет тяжёлые блоки.
+- **Marketing and landing pages** — FAQ-style blocks without a separate page per item: compact on mobile, without overwhelming the scroll with long text.
+- **Product settings and account areas** — groups of options (notifications, security, billing) in one column, so you don’t need deep navigation for every subsection.
+- **Catalogs and orders** — composition, delivery, and terms inside an order card: the buyer expands only the sections they care about.
+- **Knowledge bases and internal portals** — articles with nested instructions: editors keep a consistent expand/collapse style and text size.
+- **Admin and roles** — some items are unavailable (`disabled` on `Item`), the rest stay in the same list without a separate “placeholder” screen.
+- **Side panels and narrow columns** — the root can stretch to the sidebar width; `layout="separate"` visually separates heavier blocks.
 
-## Юзкейсы
+## Use cases
 
-Импорт из пакета `prime-ui-kit`. Каждый фрагмент — другой экран и другой смысл, не только смена пропсов.
+Import from the `prime-ui-kit` package. Each snippet is a different screen and meaning, not just different props.
 
-### Базовый
+### Basic
 
-Страница доставки интернет-магазина: три типовых вопроса, один открыт по умолчанию, режим «только один открыт».
+E‑commerce delivery page: three typical questions, one open by default, “only one open” mode.
 
 ```tsx
 import { Accordion } from "prime-ui-kit";
@@ -30,38 +30,38 @@ export function DeliveryFaqBlock() {
       <Accordion.Item value="time">
         <Accordion.Header>
           <Accordion.Trigger>
-            Сроки доставки по городу
+            City delivery times
             <Accordion.Arrow />
           </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content>Курьер привозит заказ в день заказа или на следующий рабочий день до 22:00.</Accordion.Content>
+        <Accordion.Content>The courier delivers the same day or the next business day by 10:00 PM.</Accordion.Content>
       </Accordion.Item>
       <Accordion.Item value="pickup">
         <Accordion.Header>
           <Accordion.Trigger>
-            Пункты самовывоза
+            Pickup points
             <Accordion.Arrow />
           </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content>Выберите точку на карте при оформлении; хранение заказа — до 5 дней.</Accordion.Content>
+        <Accordion.Content>Choose a location on the map at checkout; order storage — up to 5 days.</Accordion.Content>
       </Accordion.Item>
       <Accordion.Item value="return">
         <Accordion.Header>
           <Accordion.Trigger>
-            Возврат без вопросов
+            Hassle-free returns
             <Accordion.Arrow />
           </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content>14 дней на возврат товара надлежащего качества при сохранении упаковки.</Accordion.Content>
+        <Accordion.Content>14 days to return goods in proper condition with packaging intact.</Accordion.Content>
       </Accordion.Item>
     </Accordion.Root>
   );
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Витрина справочника для врачей: крупный размер для сенсорных панелей в клинике, отдельные «карточки» по разделам специализаций.
+Reference showcase for clinicians: larger size for touch panels in the clinic, separate “cards” per specialization section.
 
 ```tsx
 import { Accordion } from "prime-ui-kit";
@@ -72,29 +72,29 @@ export function ClinicReferenceAccordion() {
       <Accordion.Item value="cardio">
         <Accordion.Header>
           <Accordion.Trigger>
-            Кардиология — быстрые назначения
+            Cardiology — quick prescribing
             <Accordion.Arrow />
           </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content>Шаблоны назначений и контрольные визиты после стационара.</Accordion.Content>
+        <Accordion.Content>Prescription templates and follow-up visits after hospital discharge.</Accordion.Content>
       </Accordion.Item>
       <Accordion.Item value="ped">
         <Accordion.Header>
           <Accordion.Trigger>
-            Педиатрия — вакцинация
+            Pediatrics — vaccination
             <Accordion.Arrow />
           </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content>Календарь прививок и напоминания родителям в личном кабинете.</Accordion.Content>
+        <Accordion.Content>Immunization calendar and reminders for parents in the account area.</Accordion.Content>
       </Accordion.Item>
     </Accordion.Root>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Вложенный блок в карточке проекта: несколько юридических и финансовых секций открыты одновременно для сверки договора.
+Nested block on a project card: several legal and financial sections open at once for contract review.
 
 ```tsx
 import { Accordion } from "prime-ui-kit";
@@ -102,34 +102,34 @@ import { Accordion } from "prime-ui-kit";
 export function ProjectLegalAccordion() {
   return (
     <section style={{ maxWidth: 560, padding: 16, borderRadius: 12, border: "1px solid var(--prime-sys-color-border-subtle, #e4e4e7)" }}>
-      <h2 style={{ margin: "0 0 12px", fontSize: "1.125rem" }}>Проект «Северный склад»</h2>
+      <h2 style={{ margin: "0 0 12px", fontSize: "1.125rem" }}>Project “Northern warehouse”</h2>
       <Accordion.Root type="multiple" size="m" defaultValue={["scope", "budget"]} layout="grouped">
         <Accordion.Item value="scope">
           <Accordion.Header>
             <Accordion.Trigger>
-              Объём работ
+              Scope of work
               <Accordion.Arrow />
             </Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Content>Поставка оборудования, монтаж линий, пусконаладка — 90 календарных дней.</Accordion.Content>
+          <Accordion.Content>Equipment supply, line installation, commissioning — 90 calendar days.</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item value="budget">
           <Accordion.Header>
             <Accordion.Trigger>
-              Бюджет и этапы оплаты
+              Budget and payment milestones
               <Accordion.Arrow />
             </Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Content>40% аванс, 40% после монтажа, 20% после приёмки актом.</Accordion.Content>
+          <Accordion.Content>40% advance, 40% after installation, 20% after acceptance per act.</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item value="risk">
           <Accordion.Header>
             <Accordion.Trigger>
-              Штрафы и ответственность
+              Penalties and liability
               <Accordion.Arrow />
             </Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Content>Просрочка поставки — 0,1% в день, не более 10% от контракта.</Accordion.Content>
+          <Accordion.Content>Delivery delay — 0.1% per day, capped at 10% of the contract.</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>
     </section>
@@ -137,9 +137,9 @@ export function ProjectLegalAccordion() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Панель диспетчера: кнопки сценариев сбрасывают или переключают открытую зону трека без клика по заголовку.
+Dispatcher panel: scenario buttons reset or switch the open track area without clicking the header.
 
 ```tsx
 import * as React from "react";
@@ -152,33 +152,33 @@ export function DispatchControlledAccordion() {
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         <Button.Root mode="stroke" size="m" variant="neutral" onClick={() => setPanel("fleet")}>
-          Автопарк
+          Fleet
         </Button.Root>
         <Button.Root mode="stroke" size="m" variant="neutral" onClick={() => setPanel("routes")}>
-          Маршруты
+          Routes
         </Button.Root>
         <Button.Root mode="stroke" size="m" variant="neutral" onClick={() => setPanel("")}>
-          Свернуть
+          Collapse all
         </Button.Root>
       </div>
       <Accordion.Root type="single" size="m" value={panel} onValueChange={(v) => typeof v === "string" && setPanel(v)}>
         <Accordion.Item value="fleet">
           <Accordion.Header>
             <Accordion.Trigger>
-              Статус машин
+              Vehicle status
               <Accordion.Arrow />
             </Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Content>12 на линии, 3 на ТО, 1 в резерве.</Accordion.Content>
+          <Accordion.Content>12 on route, 3 in maintenance, 1 in reserve.</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item value="routes">
           <Accordion.Header>
             <Accordion.Trigger>
-              Задержки на маршрутах
+              Route delays
               <Accordion.Arrow />
             </Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Content>Север: +18 мин из‑за ремонта моста; юг: по графику.</Accordion.Content>
+          <Accordion.Content>North: +18 min due to bridge repair; south: on schedule.</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>
     </div>
@@ -186,118 +186,118 @@ export function DispatchControlledAccordion() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-`Accordion.Root` — контейнер с контекстом размера и состояния открытых `value`.
+`Accordion.Root` — container with context for size and open `value` state.
 
-Для каждого пункта:
+For each item:
 
-`Accordion.Item` → `Accordion.Header` → `Accordion.Trigger` (кнопка; внутри часто `Accordion.Icon`, текст, `Accordion.Arrow`) → рядом по дереву `Accordion.Content` (внешний узел в DOM — `section`, внутренний блок с отступами для текста).
+`Accordion.Item` → `Accordion.Header` → `Accordion.Trigger` (button; often `Accordion.Icon`, text, `Accordion.Arrow` inside) → sibling in the tree `Accordion.Content` (outer DOM node is `section`, inner block with padding for text).
 
 ## API
 
 ### Accordion.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| type | `"single" \| "multiple"` | `"single"` | Нет | Один открытый пункт или несколько. |
-| value | `string \| string[]` | — | Нет | Контролируемое состояние: строка или массив id открытых пунктов. |
-| defaultValue | `string \| string[]` | — | Нет | Начальное раскрытие без `value`. |
-| onValueChange | `(value: string \| string[]) => void` | — | Нет | В `single` в колбэк передаётся строка; в `multiple` — массив. |
-| collapsible | `boolean` | `true` | Нет | Только `single`: `false` запрещает закрыть единственный открытый пункт. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Токены текста, иконок и отступов. |
-| layout | `"grouped" \| "separate"` | `"grouped"` | Нет | Общая рамка или отдельные карточки. |
-| className | `string` | — | Нет | Класс корневого `div`. |
-| children | `React.ReactNode` | — | Нет | Набор `Accordion.Item`. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты корня. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| type | `"single" \| "multiple"` | `"single"` | No | One open item or several. |
+| value | `string \| string[]` | — | No | Controlled state: string or array of open item ids. |
+| defaultValue | `string \| string[]` | — | No | Initial expansion without `value`. |
+| onValueChange | `(value: string \| string[]) => void` | — | No | In `single` the callback receives a string; in `multiple` — an array. |
+| collapsible | `boolean` | `true` | No | `single` only: `false` prevents closing the only open item. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Tokens for text, icons, and spacing. |
+| layout | `"grouped" \| "separate"` | `"grouped"` | No | Shared frame or separate cards. |
+| className | `string` | — | No | Class on the root `div`. |
+| children | `React.ReactNode` | — | No | Set of `Accordion.Item`. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other root attributes. |
 
 ### Accordion.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| value | `string` | — | Да | Уникальный id в пределах одного Root. |
-| disabled | `boolean` | `false` | Нет | Пункт не раскрывается, триггер отключён. |
-| className | `string` | — | Нет | Класс обёртки пункта. |
-| children | `React.ReactNode` | — | Нет | Заголовок и контент. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты на `div` пункта. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| value | `string` | — | Yes | Unique id within one Root. |
+| disabled | `boolean` | `false` | No | Item does not expand; trigger is disabled. |
+| className | `string` | — | No | Class on the item wrapper. |
+| children | `React.ReactNode` | — | No | Header and content. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the item `div`. |
 
 ### Accordion.Header
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс заголовка. |
-| children | `React.ReactNode` | — | Нет | Обычно один `Accordion.Trigger`. |
-| …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | Нет | Рендерится как `h3`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class on the header. |
+| children | `React.ReactNode` | — | No | Usually one `Accordion.Trigger`. |
+| …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | Rendered as `h3`. |
 
 ### Accordion.Trigger
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Рекомендуется `button`, чтобы не сабмитить формы. |
-| className | `string` | — | Нет | Класс кнопки. |
-| children | `React.ReactNode` | — | Нет | Подпись, иконки, стрелка. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | Нет | `onClick` вызывается первым; при `preventDefault` переключение отменяется. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Prefer `button` so forms are not submitted accidentally. |
+| className | `string` | — | No | Class on the button. |
+| children | `React.ReactNode` | — | No | Label, icons, arrow. |
+| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | `onClick` runs first; `preventDefault` cancels toggling. |
 
 ### Accordion.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| as | `React.ElementType` | `"div"` | Нет | Полиморфная оболочка (например компонент иконки или `span`). |
-| className | `string` | — | Нет | Класс оболочки. |
-| children | `React.ReactNode` | — | Нет | Содержимое при `as="span"` или подобном. |
-| …rest | Зависит от `as` | — | Нет | Пропсы выбранного элемента, кроме `as` и `className`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| as | `React.ElementType` | `"div"` | No | Polymorphic wrapper (e.g. icon component or `span`). |
+| className | `string` | — | No | Class on the wrapper. |
+| children | `React.ReactNode` | — | No | Content when `as="span"` or similar. |
+| …rest | Depends on `as` | — | No | Props for the chosen element, except `as` and `className`. |
 
 ### Accordion.Arrow
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| openIcon | `React.ElementType` | `ChevronDown` | Нет | Иконка «закрыто» или единственная при повороте. |
-| closeIcon | `React.ElementType` | — | Нет | Если задана и отличается от `openIcon` — показ двух иконок без поворота. |
-| className | `string` | — | Нет | Класс `span`-обёртки. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Иконки помечены `aria-hidden`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| openIcon | `React.ElementType` | `ChevronDown` | No | “Closed” icon, or the only one if rotation is used. |
+| closeIcon | `React.ElementType` | — | No | If set and differs from `openIcon` — two icons without rotation. |
+| className | `string` | — | No | Class on the `span` wrapper. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Icons marked with `aria-hidden`. |
 
 ### Accordion.Content
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс **внутреннего** блока с padding и типографикой. |
-| style | `React.CSSProperties` | — | Нет | Сливается со стилем внешнего узла (в т.ч. переменная высоты анимации). |
-| children | `React.ReactNode` | — | Нет | Текст и вложенная разметка. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Попадает на внешний узел (`section` в DOM); `aria-labelledby` и `aria-hidden` выставляются из контекста. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class on the **inner** block with padding and typography. |
+| style | `React.CSSProperties` | — | No | Merged with the outer node style (incl. animation height variable). |
+| children | `React.ReactNode` | — | No | Text and nested markup. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Applied to the outer node (`section` in DOM); `aria-labelledby` and `aria-hidden` come from context. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет; визуальные отличия задаются:
+There is no separate `variant` prop; visual differences come from:
 
-- **`layout`**: `grouped` — единый бордер и общий фон; `separate` — каждый `Item` как карточка с зазором.
-- **`size`**: дискретные ступени `s`–`xl` для текста триггера, иконок и полей контента.
-- **`type`**: не меняет палитру, но меняет логику: в `multiple` допускается несколько открытых `value` и `defaultValue` в виде массива.
+- **`layout`**: `grouped` — single border and shared background; `separate` — each `Item` as a card with gap.
+- **`size`**: discrete steps `s`–`xl` for trigger text, icons, and content padding.
+- **`type`**: does not change palette, but changes behavior: in `multiple` several open `value`s are allowed and `defaultValue` can be an array.
 
-## Состояния
+## States
 
-- **Открыт / закрыт** — хранится в корне; на `Item`, `Trigger` и обёртке контента выставляются `data-state="open" | "closed"`.
-- **Пункт отключён** — `disabled` на `Item`: `data-disabled`, триггер `disabled`, клик не обрабатывается.
-- **Неконтролируемый режим** — только `defaultValue` / внутренний стейт.
-- **Контролируемый** — передан `value`; обновление через `onValueChange`.
-- **`collapsible={false}`** в `single` — нельзя оставить список полностью закрытым после первого открытия.
+- **Open / closed** — stored on the root; `Item`, `Trigger`, and the content wrapper get `data-state="open" | "closed"`.
+- **Disabled item** — `disabled` on `Item`: `data-disabled`, trigger `disabled`, clicks ignored.
+- **Uncontrolled** — only `defaultValue` / internal state.
+- **Controlled** — `value` is passed; updates via `onValueChange`.
+- **`collapsible={false}`** in `single` — the list cannot be fully collapsed after the first open.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Триггер — нативная кнопка: активация с клавиатуры Enter/Пробел.
-- У кнопки есть `aria-expanded` и `aria-controls`, у области контента — `aria-labelledby` и `aria-hidden` в зависимости от открытости.
-- Иконки в `Accordion.Arrow` скрыты от вспомогательных технологий через `aria-hidden`; смысл должен быть в тексте триггера или отдельной подписи.
-- Видимый фокус на триггере — стиль `:focus-visible` в теме кита.
+- Trigger is a native button: keyboard activation with Enter/Space.
+- The button has `aria-expanded` and `aria-controls`; the content region has `aria-labelledby` and `aria-hidden` depending on open state.
+- Icons in `Accordion.Arrow` are hidden from assistive tech via `aria-hidden`; meaning should be in trigger text or a separate label.
+- Visible focus on the trigger uses `:focus-visible` from the kit theme.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Это не табы: не управляет панелями по «вкладкам» с общей панелью без повторения заголовков — для переключения без вертикального списка смотрите `Tabs`.
-- Высота анимации считается через `ResizeObserver` и измерение контента; тяжёлый контент внутри (большие списки, графики) может влиять на производительность при частых изменениях размера.
-- Тип экспорта `AccordionContentProps` основан на `HTMLAttributes<HTMLDivElement>`, хотя в разметке внешний узел — `section`; при селекторах и тестах ориентируйтесь на фактический DOM.
-- Вложенный аккордеон внутри контента возможен разметкой, но клавиатурная навигация и читаемость страдают — для глубокой иерархии предпочтительнее плоский список или дерево.
+- This is not tabs: it does not drive “tab” panels with a shared panel area without repeating headers — for switching without a vertical list of headers, see `Tabs`.
+- Animation height uses `ResizeObserver` and content measurement; heavy inner content (large lists, charts) can affect performance when size changes often.
+- The exported type `AccordionContentProps` is based on `HTMLAttributes<HTMLDivElement>` even though the outer markup node is `section`; for selectors and tests, rely on the actual DOM.
+- A nested accordion inside content is possible in markup, but keyboard navigation and readability suffer — for deep hierarchy prefer a flat list or a tree.
 
-## Связанные компоненты
+## Related components
 
-- **Typography** — согласованные отступы и кегль внутри `Accordion.Content`.
-- **Button** — внешние действия, синхронизированные с контролируемым `value` корня.
-- **Tabs** — альтернатива, когда нужно переключать панели без повторяющегося вертикального списка заголовков.
-- **Modal / Drawer** — часто содержат компактный аккордеон для длинных форм в ограниченной высоте.
+- **Typography** — consistent spacing and type scale inside `Accordion.Content`.
+- **Button** — external actions synchronized with the controlled `value` on the root.
+- **Tabs** — alternative when you need to switch panels without a repeating vertical list of headers.
+- **Modal / Drawer** — often host a compact accordion for long forms in limited height.
