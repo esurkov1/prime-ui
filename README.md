@@ -37,22 +37,33 @@ bun add prime-ui-kit react react-dom react-aria-components react-day-picker date
 
 ## Styles
 
-Import **tokens**, a **theme**, and **global component styles** (this order):
+Import the **global styles** (fonts, reset, tokens, and both themes) and then the **bundled component CSS** (CSS Modules output from the published build):
+
+```css
+@import "prime-ui-kit/styles.css";
+@import "prime-ui-kit/bundle.css";
+```
+
+`bundle.css` contains the scoped class rules that match the class names embedded in the JS bundle (Button, Input, etc.). `styles.css` includes the Google Fonts load, CSS reset, design tokens, and both light and dark themes.
+
+**Light / dark:** set `data-theme="light"` or `data-theme="dark"` on `<html>`, a layout root, or any wrapper.
+
+If you want fine-grained control (e.g. supply your own reset or only one theme), import the individual files instead:
 
 ```css
 @import "prime-ui-kit/tokens.css";
 @import "prime-ui-kit/theme-light.css";
-/* or: theme-dark.css */
-@import "prime-ui-kit/styles.css";
+/* @import "prime-ui-kit/theme-dark.css"; */
+@import "prime-ui-kit/bundle.css";
 ```
 
-**Light / dark:** set `data-theme="light"` or `data-theme="dark"` on `<html>`, a layout root, or any wrapper. You can import both theme files and switch only the attribute.
+If you only use `prime-ui-kit/components`, replace `bundle.css` with `prime-ui-kit/components.css`.
 
 ---
 
 ## Usage
 
-Importing from `prime-ui-kit` loads the kit’s global CSS (side effect). You still add **tokens**, **theme**, and **`styles.css`** in your own stylesheet as shown above.
+Import **`styles.css`** and **`bundle.css`** as described above so components receive the correct layout and appearance.
 
 ```tsx
 import { Button, Input, Modal } from "prime-ui-kit";
@@ -79,6 +90,7 @@ export function Example() {
 ```tsx
 import { DataTable } from "prime-ui-kit/components";
 ```
+
 
 ---
 
