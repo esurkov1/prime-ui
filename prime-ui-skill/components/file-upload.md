@@ -1,25 +1,25 @@
 # FileUpload
 
-## Что это
+## What it is
 
-Композиционный набор для выбора файлов: зона на основе `label` со скрытым `input type="file"`, поддержкой перетаскивания, и отдельные блоки разметки для списка загруженных файлов с бейджем формата и прогрессом.
+A compositional set for file selection: a zone built on a `label` with a hidden `input type="file"`, drag-and-drop support, and separate markup blocks for lists of uploaded files with a format badge and progress.
 
-## Для чего нужен
+## What it’s for
 
-- **Кадры и соискатели** — загрузка резюме и портфолио в форматах PDF/изображений с понятной зоной «перетащите или выберите».
-- **Интернет-магазин и маркетплейс** — фото товара, сертификаты и видеообзоры: фильтр `accept`, множественный выбор и список имён перед отправкой на сервер.
-- **Медицинские и лабораторные порталы** — загрузка снимков и заключений с карточками статуса (идёт / готово / ошибка) и кнопкой повтора.
-- **Профиль пользователя** — круглая или компактная зона для аватара плюс внешняя кнопка, открывающая тот же `input` через `inputRef`.
-- **B2B и тендеры** — вложения к заявке в контролируемом списке: несколько файлов, очистка, валидация размера на стороне приложения.
-- **Образование и LMS** — сдача работ учеником: ограничение типов файла, отключённая зона после дедлайна через `disabled`.
+- **Hiring and applicants** — uploading résumés and portfolios as PDFs/images with a clear “drag or choose” zone.
+- **E-commerce and marketplaces** — product photos, certificates, and video reviews: `accept` filter, multi-select, and a list of names before sending to the server.
+- **Medical and lab portals** — uploading scans and reports with status cards (in progress / done / error) and a retry button.
+- **User profile** — a round or compact zone for an avatar plus an external button that opens the same `input` via `inputRef`.
+- **B2B and tenders** — attachments to applications in a controlled list: multiple files, clearing, and app-side size validation.
+- **Education and LMS** — student submissions: file type limits and a disabled zone after the deadline via `disabled`.
 
-## Юзкейсы
+## Use cases
 
-Импорт из пакета `prime-ui-kit`. Примеры относятся к разным продуктам и экранам.
+Import from the `prime-ui-kit` package. Examples cover different products and screens.
 
-### Базовый
+### Basic
 
-Страница отклика на вакансию: одна зона, выбранный файл показывается текстом под зоной.
+Job application page: one zone; the selected file is shown as text below the zone.
 
 ```tsx
 import * as React from "react";
@@ -37,16 +37,16 @@ export function JobApplyUpload() {
         }}
       />
       {files[0] ? (
-        <p style={{ marginTop: 12, fontSize: 14 }}>Прикреплён: {files[0].name}</p>
+        <p style={{ marginTop: 12, fontSize: 14 }}>Attached: {files[0].name}</p>
       ) : null}
     </div>
   );
 }
 ```
 
-### С вариантами/размерами
+### Variants and sizes
 
-Кабинет поставщика: зона в карточке со сплошной рамкой и увеличенный размер; рядом карточка файла в состоянии ошибки.
+Supplier dashboard: a zone in a card with a solid border and larger size; next to it, a file card in an error state.
 
 ```tsx
 import { FileUpload } from "prime-ui-kit";
@@ -61,7 +61,7 @@ export function SupplierInvoiceUpload() {
           <FileUpload.ItemMain>
             <FileUpload.ItemName>invoice_wrong_currency.xlsx</FileUpload.ItemName>
             <FileUpload.ItemMeta>
-              <span>Неверный формат колонки «Сумма»</span>
+              <span>Invalid format for the “Amount” column</span>
             </FileUpload.ItemMeta>
           </FileUpload.ItemMain>
         </FileUpload.ItemRow>
@@ -71,9 +71,9 @@ export function SupplierInvoiceUpload() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Модальное окно импорта: колонка `DropBody`, приглушённый заголовок, ссылка «browse» и чипы источников с общим `inputRef`.
+Import modal: a `DropBody` column, muted title, a “browse” link, and source chips sharing one `inputRef`.
 
 ```tsx
 import * as React from "react";
@@ -84,21 +84,21 @@ export function ImportModalDropzone() {
 
   return (
     <section style={{ padding: 24, borderRadius: 12, background: "var(--prime-sys-color-surface-elevated, #fff)", maxWidth: 400 }}>
-      <h2 style={{ margin: "0 0 16px", fontSize: 18 }}>Импорт таблицы</h2>
+      <h2 style={{ margin: "0 0 16px", fontSize: 18 }}>Import spreadsheet</h2>
       <FileUpload.Root inputRef={inputRef} appearance="solid" size="m" multiple>
         <FileUpload.DropBody>
           <FileUpload.Title tone="muted">
-            Перетащите файл или{" "}
+            Drag a file here or{" "}
             <FileUpload.BrowseLink type="button" onClick={() => inputRef.current?.click()}>
-              выберите на диске
+              choose from disk
             </FileUpload.BrowseLink>
           </FileUpload.Title>
           <FileUpload.ActionsRow>
             <FileUpload.Chip type="button" onClick={() => inputRef.current?.click()}>
-              <FileUpload.ChipLabel>Локальный диск</FileUpload.ChipLabel>
+              <FileUpload.ChipLabel>Local disk</FileUpload.ChipLabel>
             </FileUpload.Chip>
             <FileUpload.Chip type="button">
-              <FileUpload.ChipLabel>Сетевой каталог</FileUpload.ChipLabel>
+              <FileUpload.ChipLabel>Network folder</FileUpload.ChipLabel>
             </FileUpload.Chip>
           </FileUpload.ActionsRow>
         </FileUpload.DropBody>
@@ -108,9 +108,9 @@ export function ImportModalDropzone() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Панель вложений к заявке в поддержку: несколько файлов, список имён и кнопка очистки.
+Support ticket attachments panel: multiple files, a list of names, and a clear button.
 
 ```tsx
 import * as React from "react";
@@ -137,7 +137,7 @@ export function SupportTicketAttachments() {
       ) : null}
       {files.length > 0 ? (
         <Button.Root type="button" size="s" variant="neutral" mode="stroke" onClick={() => setFiles([])}>
-          Убрать вложения
+          Remove attachments
         </Button.Root>
       ) : null}
     </div>
@@ -145,194 +145,194 @@ export function SupportTicketAttachments() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-**Зона выбора:** `FileUpload.Root` (рендер `label` + скрытый `input`) → по умолчанию внутри `ControlSizeProvider` встроенные `Icon`, `Title`, `Hint`, `BrowseLabel`, либо собственные `children` (`DropBody`, `Title`, `BrowseLink`, `ActionsRow`, `Chip`, …).
+**Selection zone:** `FileUpload.Root` (renders `label` + hidden `input`) → by default, inside `ControlSizeProvider`, built-in `Icon`, `Title`, `Hint`, `BrowseLabel`, or custom `children` (`DropBody`, `Title`, `BrowseLink`, `ActionsRow`, `Chip`, …).
 
-**Карточка файла:** `FileUpload.Item` → `ItemRow` → `FormatBadge` + `ItemMain` (часто `ItemTextGroup` с `ItemName` и `ItemMeta`, или `ItemStack` с ошибкой и `ItemTryAgain`) + при необходимости `ItemActions`; под рядом — `ItemProgress` или `ItemFooter`.
+**File card:** `FileUpload.Item` → `ItemRow` → `FormatBadge` + `ItemMain` (often `ItemTextGroup` with `ItemName` and `ItemMeta`, or `ItemStack` with an error and `ItemTryAgain`) + optionally `ItemActions`; below the row — `ItemProgress` or `ItemFooter`.
 
 ## API
 
 ### FileUpload.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Токены для зоны, текста, чипа Browse и контекста Hint. |
-| appearance | `"dashed" \| "solid"` | `"dashed"` | Нет | Пунктир или сплошная рамка и фон «как поле». |
-| inputRef | `React.Ref<HTMLInputElement>` | — | Нет | Доступ к скрытому input для программного `click()`. |
-| accept | `string` | — | Нет | Нативный `accept`. |
-| multiple | `boolean` | — | Нет | Множественный выбор в диалоге. |
-| disabled | `boolean` | — | Нет | Отключает выбор и drop; `aria-disabled` на input. |
-| onFilesChange | `(files: File[]) => void` | — | Нет | После change или drop; значение input сбрасывается. |
-| children | `React.ReactNode` | — | Нет | Кастомная разметка зоны. |
-| className | `string` | — | Нет | Класс `label`. |
-| …rest | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "children">` | — | Нет | `htmlFor`, `id`, aria и др. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Tokens for the zone, text, Browse chip, and Hint context. |
+| appearance | `"dashed" \| "solid"` | `"dashed"` | No | Dashed or solid border and a field-like background. |
+| inputRef | `React.Ref<HTMLInputElement>` | — | No | Access to the hidden input for programmatic `click()`. |
+| accept | `string` | — | No | Native `accept`. |
+| multiple | `boolean` | — | No | Multi-select in the file dialog. |
+| disabled | `boolean` | — | No | Disables selection and drop; sets `aria-disabled` on the input. |
+| onFilesChange | `(files: File[]) => void` | — | No | After change or drop; the input value is reset. |
+| children | `React.ReactNode` | — | No | Custom zone markup. |
+| className | `string` | — | No | Class on the `label`. |
+| …rest | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "children">` | — | No | `htmlFor`, `id`, ARIA, etc. |
 
 ### FileUpload.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс обёртки. |
-| children | `React.ReactNode` | — | Нет | Обычно иконка из кита. |
-| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | Нет | Корень с `aria-hidden`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Wrapper class. |
+| children | `React.ReactNode` | — | No | Usually an icon from the kit. |
+| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | No | Root with `aria-hidden`. |
 
 ### FileUpload.Title
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| tone | `"default" \| "muted"` | `"default"` | Нет | Цвет текста заголовка. |
-| className | `string` | — | Нет | Класс параграфа. |
-| children | `React.ReactNode` | — | Нет | Текст. |
-| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | Нет | Прочие атрибуты `p`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| tone | `"default" \| "muted"` | `"default"` | No | Title text color. |
+| className | `string` | — | No | Paragraph class. |
+| children | `React.ReactNode` | — | No | Text. |
+| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Other `p` attributes. |
 
 ### FileUpload.Hint
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс. |
-| children | `React.ReactNode` | — | Нет | Подсказка (рендер через `Hint.Root`). |
-| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | Нет | Размер подставляется из контекста корня зоны. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Class. |
+| children | `React.ReactNode` | — | No | Hint (rendered via `Hint.Root`). |
+| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Size comes from the root zone context. |
 
 ### FileUpload.BrowseLabel
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс `span`. |
-| children | `React.ReactNode` | — | Нет | Подпись чипа Browse. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | `span` class. |
+| children | `React.ReactNode` | — | No | Browse chip label. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
 ### FileUpload.BrowseLink
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Клик не всплывает к `label`. |
-| className | `string` | — | Нет | Класс кнопки. |
-| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | Нет | Часто открывает диалог через `inputRef`. |
-| children | `React.ReactNode` | — | Нет | Текст ссылки. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | Нет | Остальные атрибуты кнопки. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Click does not bubble to the `label`. |
+| className | `string` | — | No | Button class. |
+| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | No | Often opens the dialog via `inputRef`. |
+| children | `React.ReactNode` | — | No | Link text. |
+| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | Other button attributes. |
 
 ### FileUpload.DropBody
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс колонки. |
-| children | `React.ReactNode` | — | Нет | Текст и чипы. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Column class. |
+| children | `React.ReactNode` | — | No | Text and chips. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### FileUpload.ActionsRow
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс ряда. |
-| children | `React.ReactNode` | — | Нет | `Chip` и др. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Row class. |
+| children | `React.ReactNode` | — | No | `Chip` and others. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### FileUpload.Chip
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Не открывает диалог без обработчика. |
-| className | `string` | — | Нет | Класс кнопки. |
-| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | Нет | Остановка всплытия к `label`. |
-| children | `React.ReactNode` | — | Нет | Иконка и `ChipLabel`. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | Нет | Остальные атрибуты. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Does not open the dialog without a handler. |
+| className | `string` | — | No | Button class. |
+| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | No | Stops bubbling to the `label`. |
+| children | `React.ReactNode` | — | No | Icon and `ChipLabel`. |
+| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | Other attributes. |
 
 ### FileUpload.ChipLabel
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс. |
-| children | `React.ReactNode` | — | Нет | Текст чипа. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Class. |
+| children | `React.ReactNode` | — | No | Chip text. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
 ### FileUpload.FormatBadge
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| format | `string` | — | Да | Строка расширения; в UI укорачивается и капсом. |
-| color | `FileUploadFormatBadgeColor` | `"gray"` | Нет | Палитра бейджа. |
-| className | `string` | — | Нет | Доп. класс. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| format | `string` | — | Yes | Extension string; shortened and uppercased in the UI. |
+| color | `FileUploadFormatBadgeColor` | `"gray"` | No | Badge palette. |
+| className | `string` | — | No | Extra class. |
 
 ### FileUpload.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| variant | `"default" \| "error"` | `"default"` | Нет | Обычная или ошибочная карточка. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размеры карточки и типографики. |
-| className | `string` | — | Нет | Класс контейнера. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| variant | `"default" \| "error"` | `"default"` | No | Default or error card. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Card and typography sizing. |
+| className | `string` | — | No | Container class. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
-### Слоты карточки и ряда (`ItemRow`, `ItemMain`, `ItemStack`, `ItemTextGroup`, `ItemName`, `ItemMeta`, `ItemActions`, `ItemFooter`)
+### Card and row slots (`ItemRow`, `ItemMain`, `ItemStack`, `ItemTextGroup`, `ItemName`, `ItemMeta`, `ItemActions`, `ItemFooter`)
 
-Для каждого из перечисленных компонентов контракт совпадает:
+For each listed component, the contract is the same:
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Доп. класс. |
-| children | `React.ReactNode` | — | Нет | Вложенная разметка. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Extra class. |
+| children | `React.ReactNode` | — | No | Nested markup. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### FileUpload.ItemMetaSep
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| className | `string` | — | Нет | Класс `span`. |
-| children | `React.ReactNode` | — | Нет | Игнорируется в разметке; показывается «·». |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Узел с `aria-hidden`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | `span` class. |
+| children | `React.ReactNode` | — | No | Ignored in markup; shows “·”. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Node with `aria-hidden`. |
 
 ### FileUpload.ItemTryAgain
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Тип кнопки. |
-| className | `string` | — | Нет | Класс. |
-| children | `React.ReactNode` | — | Нет | Подпись. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | Нет | Остальные атрибуты. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Button type. |
+| className | `string` | — | No | Class. |
+| children | `React.ReactNode` | — | No | Label. |
+| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | Other attributes. |
 
 ### FileUpload.ItemProgress
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| value | `number` | — | Нет | Если задано без `children` — рендер `ProgressBar.Root`. |
-| max | `number` | — | Нет | Максимум прогресса. |
-| className | `string` | — | Нет | Класс обёртки. |
-| children | `React.ReactNode` | — | Нет | Свой индикатор вместо полосы. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| value | `number` | — | No | If set without `children` — renders `ProgressBar.Root`. |
+| max | `number` | — | No | Progress maximum. |
+| className | `string` | — | No | Wrapper class. |
+| children | `React.ReactNode` | — | No | Custom indicator instead of the bar. |
 
-## Варианты
+## Variants
 
-- **`appearance` у Root:** `dashed` — типовая зона с пунктиром; `solid` — сплошная граница и фон ближе к полю ввода, удобно внутри карточек и модалок.
-- **`variant` у Item:** `default` — нейтральная карточка; `error` — акцентная рамка и фон для сбоя загрузки или отклонения файла.
-- **`size`:** общая ось `s`–`xl` для зоны и для карточки; кнопки рядом с карточкой лучше брать того же размера.
-- **`FormatBadge.color`:** `gray`, `red`, `blue`, `green`, `orange`, `purple`, `sky`, `yellow` — визуальная группировка типов файлов.
-- **`Title.tone`:** `muted` для второстепенного текста в плотных макетах.
+- **`appearance` on Root:** `dashed` — typical dashed zone; `solid` — solid border and background closer to an input field, handy inside cards and modals.
+- **`variant` on Item:** `default` — neutral card; `error` — emphasized border and background for upload failure or rejected file.
+- **`size`:** shared `s`–`xl` scale for the zone and the card; buttons next to the card should match the same size.
+- **`FormatBadge.color`:** `gray`, `red`, `blue`, `green`, `orange`, `purple`, `sky`, `yellow` — visual grouping of file types.
+- **`Title.tone`:** `muted` for secondary text in dense layouts.
 
-## Состояния
+## States
 
-- **Обычная зона** — клик по свободной области открывает диалог; hover и фокус меняют обводку и тень.
-- **Перетаскивание** — пока файл над зоной, на `label` выставляется `data-dragover` (подсветка рамки и фона).
-- **`disabled`** — курсор `not-allowed`, снижена непрозрачность; drop не обрабатывается.
-- **Карточка** — состояния «загрузка / успех / ошибка» в разметке и иконках задаёт приложение; `ItemProgress` опционален; для ошибок — `variant="error"` и `ItemTryAgain`.
+- **Default zone** — clicking empty area opens the dialog; hover and focus change outline and shadow.
+- **Dragging** — while a file is over the zone, `data-dragover` is set on the `label` (highlighted border and background).
+- **`disabled`** — `not-allowed` cursor, reduced opacity; drop is ignored.
+- **Card** — loading / success / error in markup and icons is up to the app; `ItemProgress` is optional; for errors use `variant="error"` and `ItemTryAgain`.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Зона кликабельна через связку `label` + скрытый `input`; фокус с клавиатуры приводит к видимому кольцу на зоне (`focus-within`).
-- У скрытого поля выставляется `aria-disabled` при `disabled`.
-- `BrowseLink` и `Chip` останавливают всплытие, чтобы не дублировать открытие диалога без явного `onClick`.
-- `FormatBadge` и декоративные иконки в примерах помечайте `aria-hidden`, если статус дублируется текстом в `ItemName`.
-- Иконки в `FileUpload.Icon` по умолчанию в обёртке с `aria-hidden` — смысл должен быть в тексте рядом.
+- The zone is clickable via `label` + hidden `input`; keyboard focus shows a visible ring on the zone (`focus-within`).
+- The hidden field gets `aria-disabled` when `disabled`.
+- `BrowseLink` and `Chip` stop propagation so the dialog does not open twice without an explicit `onClick`.
+- Mark `FormatBadge` and decorative icons in examples with `aria-hidden` if status is duplicated in text in `ItemName`.
+- Icons in `FileUpload.Icon` are wrapped with `aria-hidden` by default — meaning must come from adjacent text.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет встроенной загрузки на сервер, проверки вирусов или облачных коннекторов — только UI и событие `onFilesChange` / нативный выбор.
-- Повторный выбор того же файла снова вызовет `onFilesChange`, потому что значение input очищается после выбора.
-- Чипы «облако» в демо — визуальные заглушки: реальную интеграцию с хранилищами нужно подключать отдельно.
-- Список файлов и удаление элементов — ответственность приложения; карточки `Item` не хранят состояние файлов.
-- Для строки настроек без видимой зоны достаточно скрытого `input` и кнопок — блок `FileUpload` может не понадобиться; в доке показан соседний паттерн с `Avatar` для контекста.
+- No built-in server upload, virus scanning, or cloud connectors — only UI and `onFilesChange` / native file picking.
+- Picking the same file again still fires `onFilesChange` because the input value is cleared after selection.
+- “Cloud” chips in demos are visual placeholders; real storage integration must be wired separately.
+- File list and removing items are the app’s responsibility; `Item` cards do not hold file state.
+- For a settings row without a visible zone, a hidden `input` and buttons are enough — the `FileUpload` block may be unnecessary; the docs show a nearby pattern with `Avatar` for context.
 
-## Связанные компоненты
+## Related components
 
-- **Button** — внешний вызов `inputRef.click()`, сброс списка, действия в `ItemActions`.
-- **Hint** — используется внутри `FileUpload.Hint` с размером из контекста.
-- **ProgressBar** — рендер внутри `ItemProgress`, если передан `value` без кастомных `children`.
-- **Avatar** — превью изображения в списке настроек рядом с действиями загрузки.
-- **Divider** — разделители между строками списка в макетах профиля.
+- **Button** — external `inputRef.click()`, clearing the list, actions in `ItemActions`.
+- **Hint** — used inside `FileUpload.Hint` with size from context.
+- **ProgressBar** — rendered inside `ItemProgress` when `value` is passed without custom `children`.
+- **Avatar** — image preview in settings lists next to upload actions.
+- **Divider** — separators between list rows in profile layouts.
