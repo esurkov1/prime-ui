@@ -1,20 +1,20 @@
 # Button
 
-## Что это
+## What it is
 
-Составной контрол действия: корневая кнопка (`Button.Root`), опциональная иконка (`Button.Icon`) и индикатор загрузки (`Button.Spinner`), согласованные по размеру через контекст.
+A compound action control: root button (`Button.Root`), optional icon (`Button.Icon`), and loading indicator (`Button.Spinner`), aligned in size through context.
 
-## Для чего нужен
+## What it’s for
 
-- **Внутренние сервисы и панели** — подтвердить сохранение черновика, открыть модальное окно, запустить массовую операцию над строками таблицы.
-- **Поток покупки или подписки** — перейти к оплате, повторить попытку после ошибки сети, отменить оформление без путаницы с текстовыми ссылками.
-- **Онбординг и пустые экраны** — одна заметная кнопка «Начать» или «Создать первый проект», когда экран почти без другого UI.
+- **Internal tools and panels** — confirm saving a draft, open a modal, run a bulk operation on table rows.
+- **Checkout or subscription flows** — proceed to payment, retry after a network error, cancel checkout without mixing in plain text links.
+- **Onboarding and empty states** — one prominent “Get started” or “Create your first project” button when the screen has little other UI.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Типичная первичная кнопка в шапке экрана или в блоке действий.
+A typical primary button in a screen header or action block.
 
 ```tsx
 import { Button } from "prime-ui-kit";
@@ -22,15 +22,15 @@ import { Button } from "prime-ui-kit";
 export function SaveToolbar() {
   return (
     <Button.Root variant="primary" mode="filled" size="m" type="button">
-      Сохранить
+      Save
     </Button.Root>
   );
 }
 ```
 
-### С вариантами/размерами
+### Variants and sizes
 
-Карточка медиатеки: основное действие крупнее, второстепенные — нейтральные и в обводке.
+Media library card: main action is larger; secondary actions are neutral and outlined.
 
 ```tsx
 import { Button } from "prime-ui-kit";
@@ -39,22 +39,22 @@ export function AssetCardActions() {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
       <Button.Root variant="primary" mode="filled" size="l">
-        Скачать оригинал
+        Download original
       </Button.Root>
       <Button.Root variant="neutral" mode="stroke" size="m">
-        Поделиться
+        Share
       </Button.Root>
       <Button.Root variant="neutral" mode="ghost" size="s">
-        Подробнее
+        Details
       </Button.Root>
     </div>
   );
 }
 ```
 
-### В контексте (форма)
+### In context (form)
 
-Поисковая строка: отправка и сброс через нативные типы кнопки, ширина на колонку.
+Search bar: submit and reset via native button types, full-width column layout.
 
 ```tsx
 import { Button } from "prime-ui-kit";
@@ -67,21 +67,21 @@ export function CatalogSearchForm() {
       }}
       style={{ display: "grid", gap: "0.75rem", maxWidth: 320 }}
     >
-      <input name="q" placeholder="Название или артикул" />
+      <input name="q" placeholder="Name or SKU" />
       <Button.Root type="submit" variant="primary" mode="filled" size="m" fullWidth>
-        Искать
+        Search
       </Button.Root>
       <Button.Root type="reset" variant="neutral" mode="stroke" size="m" fullWidth>
-        Сбросить фильтр
+        Reset filters
       </Button.Root>
     </form>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled loading
 
-Долгий запрос: родитель держит `loading`, кнопка блокируется и показывает спиннер.
+Long-running request: parent holds `loading`; the button is blocked and shows a spinner.
 
 ```tsx
 import { useState } from "react";
@@ -109,82 +109,82 @@ export function PublishDraftButton() {
       type="button"
     >
       <Button.Spinner />
-      {loading ? "Публикация…" : "Опубликовать"}
+      {loading ? "Publishing…" : "Publish"}
     </Button.Root>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`Button.Root`** — элемент `<button>` или один дочерний узел при `asChild` (через слот); оборачивает детей в `ControlSizeProvider` (кроме режима `asChild`, где размер задаётся на слоте).
-- **`Button.Icon`** — `<span aria-hidden>` для иконки; визуальный размер из токенов размера контрола.
-- **`Button.Spinner`** — индикатор в разметке; отображается только при `loading === true` на ближайшем `Button.Root` (контекст).
+- **`Button.Root`** — a `<button>` element or a single child when `asChild` (via slot); wraps children in `ControlSizeProvider` (except in `asChild` mode, where size is set on the slot).
+- **`Button.Icon`** — `<span aria-hidden>` for the icon; visual size from control size tokens.
+- **`Button.Spinner`** — indicator in the markup; shown only when `loading === true` on the nearest `Button.Root` (context).
 
 ## API
 
 ### Button.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| variant | `"primary" \| "neutral" \| "error"` | `"primary"` | Нет | Семантика цвета. |
-| mode | `"filled" \| "stroke" \| "lighter" \| "ghost" \| "fancy"` | `"filled"` | Нет | Заливка, обводка, акцентный «fancy». |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Единый ярус высоты, радиуса, текста и иконки. |
-| fullWidth | `boolean` | — | Нет | Кнопка на ширину контейнера (`data-full-width`). |
-| loading | `boolean` | `false` | Нет | Блокировка клика, `aria-busy`, контекст для `Button.Spinner`. |
-| asChild | `boolean` | `false` | Нет | Слить пропсы с единственным ребёнком вместо `<button>`. |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Для нативной кнопки; при `asChild` не передаётся дочернему элементу. |
-| disabled | `boolean` | — | Нет | Неактивное состояние; вместе с `loading` клик запрещён. |
-| className | `string` | — | Нет | Доп. класс на корне. |
-| children | `React.ReactNode` | — | Нет | Текст, `Button.Icon`, `Button.Spinner` и т.д. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` (без `size`) | — | Нет | `onClick`, `aria-*`, `data-*` и прочие атрибуты кнопки. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| variant | `"primary" \| "neutral" \| "error"` | `"primary"` | No | Color semantics. |
+| mode | `"filled" \| "stroke" \| "lighter" \| "ghost" \| "fancy"` | `"filled"` | No | Fill, stroke, or accent **fancy**. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Unified height, radius, text, and icon scale. |
+| fullWidth | `boolean` | — | No | Button spans container width (`data-full-width`). |
+| loading | `boolean` | `false` | No | Blocks click, sets `aria-busy`, context for `Button.Spinner`. |
+| asChild | `boolean` | `false` | No | Merge props with the only child instead of rendering `<button>`. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | For native button; with `asChild`, not forwarded to the child. |
+| disabled | `boolean` | — | No | Inactive state; with `loading`, clicks are blocked. |
+| className | `string` | — | No | Extra class on the root. |
+| children | `React.ReactNode` | — | No | Text, `Button.Icon`, `Button.Spinner`, etc. |
+| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` (without `size`) | — | No | `onClick`, `aria-*`, `data-*`, and other button attributes. |
 
 ### Button.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | Да | Узел иконки. |
-| className | `string` | — | Нет | Доп. класс на `span`. |
-| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | Нет | Прочие атрибуты `span` (корень с `aria-hidden`). |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactNode` | — | Yes | Icon node. |
+| className | `string` | — | No | Extra class on `span`. |
+| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | No | Other `span` attributes (root has `aria-hidden`). |
 
 ### Button.Spinner
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | Нет | Доп. класс индикатора. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Если `loading` на корне ложь, ничего не рендерится. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Extra class on the indicator. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | If root `loading` is false, nothing is rendered. |
 
-## Варианты
+## Variants
 
-- **primary** — основное позитивное действие.
-- **neutral** — вторичное или нейтральное (отмена, «назад», фильтры).
-- **error** — деструктивное или связанное с ошибкой (удалить, отменить подписку).
+- **primary** — main positive action.
+- **neutral** — secondary or neutral (cancel, “back”, filters).
+- **error** — destructive or error-related (delete, cancel subscription).
 
-Режимы **filled**, **stroke**, **lighter**, **ghost** задают плотность; **fancy** — отдельный акцентный визуальный режим на том же API.
+**filled**, **stroke**, **lighter**, and **ghost** set visual weight; **fancy** is a separate accent style on the same API.
 
-## Состояния
+## States
 
-- **Обычное** — интерактивно, без `disabled` и `loading`.
-- **disabled** — нативно отключённая кнопка (`disabled` на `<button>`); клики не проходят.
-- **loading** — кнопка ведёт себя как отключённая для действия, выставляется `aria-busy`; `Button.Spinner` при наличии в дереве показывается.
-- **asChild + disabled/loading** — нативный `disabled` на ссылке не ставится; используются `aria-disabled`, блокировка `onClick` и визуал из стилей.
+- **Default** — interactive, without `disabled` or `loading`.
+- **disabled** — native disabled button (`disabled` on `<button>`); clicks do not fire.
+- **loading** — behaves like disabled for interaction, sets `aria-busy`; `Button.Spinner` in the tree shows when present.
+- **asChild + disabled/loading** — native `disabled` is not set on links; `aria-disabled`, `onClick` blocking, and styles handle the state.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Корень — нативная кнопка с фокусом по Tab; для `type="submit"`/`reset` соблюдайте иерархию формы и одну явную отправку на шаг, где это уместно.
-- Иконка без текста: задайте осмысленный `aria-label` (или связанный видимый лейбл) на `Button.Root`; `Button.Icon` скрыт от вспомогательных технологий (`aria-hidden`).
-- В режиме загрузки сохраняйте понятную подпись (текст или `aria-label`), чтобы не оставлять кнопку без имени.
-- При `asChild` дочерний элемент должен поддерживать передачу `className`, ARIA и обработчиков; ссылка остаётся фокусируемой как ссылка.
+- Root is a native button with Tab focus; for `type="submit"` / `reset`, respect form hierarchy and one clear submit per step where appropriate.
+- Icon-only: set a meaningful `aria-label` (or a linked visible label) on `Button.Root`; `Button.Icon` is hidden from assistive tech (`aria-hidden`).
+- While loading, keep a clear name (text or `aria-label`) so the button is not unnamed.
+- With `asChild`, the child must accept `className`, ARIA, and handlers; a link remains focusable as a link.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Это не переключатель состояния и не «кнопка-таб»; для переключателей смотрите `Switch`, `Checkbox`, `SegmentedControl` и т.п.
-- `Button.Spinner` не заменяет текстовое описание процесса — его лучше комбинировать с подписью или `aria-busy` + видимым статусом.
-- `asChild` допускает ровно одного ребёнка; тип `type` на нём не форвардится.
+- Not a toggle or tab-like control; for toggles see `Switch`, `Checkbox`, `SegmentedControl`, etc.
+- `Button.Spinner` does not replace a textual description of progress — combine it with a label or `aria-busy` plus visible status.
+- `asChild` allows exactly one child; `type` is not forwarded in that mode.
 
-## Связанные компоненты
+## Related components
 
-- **LinkButton** — когда нужен стиль ссылки, а не кнопка.
-- **ButtonGroup** — сгруппировать несколько кнопок с общим размером и разделителями.
-- **Modal**, **Drawer** — триггеры открытия часто оформляются через `Button.Root` или `asChild` на кастомном якоре.
-- **Input**, **Label**, **Hint** — в формах кнопки отправки и сброса стоят рядом с полями ввода.
+- **LinkButton** — when you need link styling, not a button.
+- **ButtonGroup** — group several buttons with shared size and dividers.
+- **Modal**, **Drawer** — open triggers are often `Button.Root` or `asChild` on a custom anchor.
+- **Input**, **Label**, **Hint** — in forms, submit and reset sit next to inputs.
