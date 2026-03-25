@@ -1,6 +1,6 @@
 {
   "name": "prime-ui-kit",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "React 19 UI kit: CSS Modules, semantic design tokens (--prime-sys-*), composable components — forms, modals, selects, tables, navigation, overlays. TypeScript, ESM, a11y-oriented.",
   "keywords": [
     "a11y",
@@ -79,6 +79,7 @@
     "@vitejs/plugin-react": "^5",
     "@vitest/coverage-v8": "^4.1.0",
     "jsdom": "latest",
+    "esbuild": "^0.27.0",
     "tsup": "latest",
     "typescript": "^5",
     "vite": "^7",
@@ -103,12 +104,14 @@
     "./styles.css": "./src/styles/globals.css",
     "./tokens.css": "./src/styles/tokens.css",
     "./theme-light.css": "./src/styles/theme-light.css",
-    "./theme-dark.css": "./src/styles/theme-dark.css"
+    "./theme-dark.css": "./src/styles/theme-dark.css",
+    "./bundle.css": "./dist/index.css",
+    "./components.css": "./dist/components/index.css"
   },
   "scripts": {
     "tokens:build": "bun run scripts/build-tokens.ts",
-    "build": "bun run tokens:build && tsup",
-    "dev": "tsup --watch",
+    "build": "bun run tokens:build && tsup --dts-only --config tsup.dts.config.ts && bun run scripts/rm-dist.ts && bun run scripts/bundle-lib.ts && bun run scripts/copy-dts-to-dist.ts",
+    "dev": "bun run scripts/bundle-lib.ts --watch",
     "playground:dev": "vite playground --config playground/vite.config.ts",
     "check": "biome check .",
     "check:ci": "biome ci .",
