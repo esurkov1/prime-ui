@@ -53,12 +53,11 @@
   color: var(--prime-sys-color-content-secondary);
 }
 
-.fakeCheckboxRow {
+.checkboxStack {
   display: flex;
-  align-items: center;
-  gap: var(--prime-sys-spacing-x2);
-  font-size: var(--prime-sys-size-control-m-supportText);
-  color: var(--prime-sys-color-content-primary);
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-x3);
 }
 
 .textLinkTrigger {

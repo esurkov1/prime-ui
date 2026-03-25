@@ -1,5 +1,6 @@
 import { Filter, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/button/Button";
+import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Popover } from "@/components/popover/Popover";
 import { Typography } from "@/components/typography/Typography";
 
@@ -28,14 +29,14 @@ export default function PopoverCompositionSnippet() {
             Иконка на триггере, заголовок и текст внутри <code>Popover.Inset</code> с колонкой и
             зазорами.
           </Typography.Root>
-          <label className={preview.fakeCheckboxRow}>
-            <input type="checkbox" defaultChecked />
-            <span>Только активные</span>
-          </label>
-          <label className={preview.fakeCheckboxRow}>
-            <input type="checkbox" />
-            <span>Скрыть нулевые</span>
-          </label>
+          <div className={preview.checkboxStack}>
+            <Checkbox.Root size="m" defaultChecked>
+              <Checkbox.Label>Только активные</Checkbox.Label>
+            </Checkbox.Root>
+            <Checkbox.Root size="m">
+              <Checkbox.Label>Скрыть нулевые</Checkbox.Label>
+            </Checkbox.Root>
+          </div>
         </Popover.Inset>
       </Popover.Content>
     </Popover.Root>
