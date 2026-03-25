@@ -1,0 +1,116 @@
+.triggerWide {
+  width: 14rem;
+  justify-content: space-between;
+}
+
+.fullWidthTrigger {
+  width: 100%;
+  justify-content: center;
+}
+
+.narrowColumn {
+  width: min(12rem, 100%);
+}
+
+.sizesRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.placementGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.placementTrigger {
+  min-width: 10rem;
+}
+
+.controlledRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.stateLine {
+  margin: 0;
+}
+
+.compositionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.headerIcon {
+  width: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-icon);
+  flex-shrink: 0;
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.fakeCheckboxRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-size-control-m-supportText);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.textLinkTrigger {
+  margin: 0;
+  border: none;
+  padding: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--prime-sys-size-control-m-text);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+.textLinkTrigger:focus-visible {
+  outline: 2px solid var(--prime-sys-color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--prime-sys-shape-radius-s);
+}
+
+.panelText {
+  margin: 0;
+  max-width: 20rem;
+}
+
+.panelTextMuted {
+  margin: 0;
+  max-width: 22rem;
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.flushText {
+  margin: 0;
+  max-width: 18rem;
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.formPanel {
+  width: min(22rem, 100vw);
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.actionsRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--prime-sys-spacing-x2);
+}

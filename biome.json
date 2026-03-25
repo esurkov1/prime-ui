@@ -1,0 +1,39 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "root": true,
+  "files": {
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "src/**/*.css",
+      "playground/**/*.ts",
+      "playground/**/*.tsx",
+      "playground/playground.css",
+      "scripts/**/*.ts",
+      "tokens/**/*.ts",
+      "vitest.config.ts",
+      "tsup.config.ts"
+    ]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": { "recommended": true }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "overrides": [
+    {
+      "includes": [
+        "src/styles/tokens.css",
+        "src/styles/theme-light.css",
+        "src/styles/theme-dark.css"
+      ],
+      "formatter": { "enabled": false },
+      "linter": { "enabled": false }
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+.panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 25rem;
+  margin-inline: auto;
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  /* Контраст к полотну превью (`surface-elevated` у внутренней рамки фрейма) */
+  background: var(--prime-sys-color-surface-default);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.body {
+  padding: var(--prime-sys-spacing-x5);
+}
+
+.headRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--prime-sys-spacing-x6);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--prime-sys-size-control-m-text);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x6);
+}
+
+.circleWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.circleZone {
+  width: 12.5rem;
+  height: 12.5rem;
+  max-width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--prime-sys-shape-radius-round);
+  padding: var(--prime-sys-spacing-x8);
+}
+
+.footer {
+  display: flex;
+  width: 100%;
+  gap: var(--prime-sys-spacing-x3);
+  padding: var(--prime-sys-spacing-x5);
+  padding-top: 0;
+}
+
+.footerBtn {
+  flex: 1;
+}
+
+.dropBody {
+  gap: var(--prime-sys-spacing-x4);
+}
+
+.dropTitle {
+  margin: 0;
+  font-size: var(--prime-sys-size-control-m-text);
+}

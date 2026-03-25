@@ -1,0 +1,91 @@
+/* Roboto Flex: variable opsz + wght; Roboto Mono: код и моноширинные зоны */
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Roboto+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+@import "./reset.css";
+@import "./tokens.css";
+@import "./theme-light.css";
+@import "./theme-dark.css";
+@import "./units.css";
+
+:root {
+  font-family: var(--prime-sys-typography-family-base);
+  font-size: 16px;
+  color: var(--prime-sys-color-content-primary);
+  background: var(--prime-sys-color-surface-default);
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--prime-sys-color-surface-default);
+  color: var(--prime-sys-color-content-primary);
+  font-size: var(--prime-sys-typography-body-size);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  font-weight: var(--prime-sys-typography-weight-regular);
+  letter-spacing: var(--prime-sys-typography-body-letterSpacing);
+}
+
+:where(*, *::before, *::after):focus {
+  outline: none;
+}
+
+:where(*, *::before, *::after):focus-visible {
+  outline: none;
+}
+
+:where(a, button, input, textarea, select, [role="button"], [tabindex]) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner,
+select::-moz-focus-inner,
+textarea::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/* Поля с оболочкой (Input, Textarea и т.д.) рисуют фокус на wrapper — не дублируем кольцо на нативном элементе. */
+:where(input, textarea, select):focus-visible {
+  box-shadow: none;
+}
+
+:where(a, button, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+/* Курсор при наведении на неактивные контролы (без pointer-events: none на корне). */
+:where(:disabled, [aria-disabled="true"], [data-disabled="true"]) {
+  cursor: not-allowed;
+}
+
+/* Accordion: высота задаётся компонентом через --prime-accordion-content-height */
+@keyframes prime-accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: var(--prime-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes prime-accordion-up {
+  from {
+    height: var(--prime-accordion-content-height);
+    opacity: 1;
+  }
+
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}

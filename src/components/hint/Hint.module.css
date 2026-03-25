@@ -1,0 +1,59 @@
+.root {
+  margin: 0;
+  display: inline-flex;
+  align-items: flex-start;
+  color: var(--prime-sys-color-content-secondary);
+}
+
+/*
+ * Номинальный `data-size` = размер поля.
+ * Визуальный ярус подсказки на ступень ниже: s→xs, m→s, l→m, xl→l.
+ */
+.root[data-size="s"] {
+  --prime-hint-icon: var(--prime-sys-size-control-xs-icon);
+  gap: var(--prime-sys-size-control-xs-gap);
+  font-size: var(--prime-sys-size-control-xs-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+}
+
+.root[data-size="m"] {
+  --prime-hint-icon: var(--prime-sys-size-control-s-icon);
+  gap: var(--prime-sys-size-control-s-gap);
+  font-size: var(--prime-sys-size-control-s-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-xs);
+}
+
+.root[data-size="l"] {
+  --prime-hint-icon: var(--prime-sys-size-control-m-icon);
+  gap: var(--prime-sys-size-control-m-gap);
+  font-size: var(--prime-sys-size-control-m-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+}
+
+.root[data-size="xl"] {
+  --prime-hint-icon: var(--prime-sys-size-control-l-icon);
+  gap: var(--prime-sys-size-control-l-gap);
+  font-size: var(--prime-sys-size-control-l-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-m);
+}
+
+.root[data-variant="error"] {
+  color: var(--prime-sys-color-content-danger);
+}
+
+.root[data-variant="disabled"] {
+  color: var(--prime-sys-color-content-disabled);
+}
+
+.icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  width: var(--prime-hint-icon);
+  height: var(--prime-hint-icon);
+}
+
+.icon :where(svg) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

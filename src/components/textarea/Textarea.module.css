@@ -1,0 +1,226 @@
+.field {
+  --prime-textarea-body-size: var(--prime-sys-size-control-m-text);
+  --prime-textarea-line-height: var(--prime-sys-typography-body-lineHeight);
+  --prime-textarea-min-height: var(--prime-sys-size-textarea-m-minHeight);
+  --prime-textarea-stack-gap: var(--prime-sys-size-control-m-gap);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  gap: var(--prime-textarea-stack-gap);
+}
+
+.field[data-size="s"] {
+  --prime-textarea-body-size: var(--prime-sys-size-control-s-text);
+  --prime-textarea-min-height: var(--prime-sys-size-textarea-s-minHeight);
+  --prime-textarea-stack-gap: var(--prime-sys-size-control-s-gap);
+}
+
+.field[data-size="l"] {
+  --prime-textarea-body-size: var(--prime-sys-size-control-l-text);
+  --prime-textarea-min-height: var(--prime-sys-size-textarea-l-minHeight);
+  --prime-textarea-stack-gap: var(--prime-sys-size-control-l-gap);
+}
+
+.field[data-size="xl"] {
+  --prime-textarea-body-size: var(--prime-sys-size-control-xl-text);
+  --prime-textarea-min-height: var(--prime-sys-size-textarea-xl-minHeight);
+  --prime-textarea-stack-gap: var(--prime-sys-size-control-xl-gap);
+}
+
+.control {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  cursor: text;
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  background: var(--prime-sys-color-field-bg);
+  color: var(--prime-sys-color-field-text);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  transition:
+    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.control[data-size="s"] {
+  min-height: var(--prime-sys-size-textarea-s-minHeight);
+  border-radius: var(--prime-sys-size-textarea-s-radius);
+  padding: var(--prime-sys-size-textarea-s-paddingX);
+}
+
+.control[data-size="m"] {
+  min-height: var(--prime-sys-size-textarea-m-minHeight);
+  border-radius: var(--prime-sys-size-textarea-m-radius);
+  padding: var(--prime-sys-size-textarea-m-paddingX);
+}
+
+.control[data-size="l"] {
+  min-height: var(--prime-sys-size-textarea-l-minHeight);
+  border-radius: var(--prime-sys-size-textarea-l-radius);
+  padding: var(--prime-sys-size-textarea-l-paddingX);
+}
+
+.control[data-size="xl"] {
+  min-height: var(--prime-sys-size-textarea-xl-minHeight);
+  border-radius: var(--prime-sys-size-textarea-xl-radius);
+  padding: var(--prime-sys-size-textarea-xl-paddingX);
+}
+
+.control:hover {
+  border-color: var(--prime-sys-color-field-borderHover);
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  box-shadow: none;
+}
+
+.control:focus-within {
+  border-color: var(--prime-sys-color-field-borderFocus);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.control[data-invalid="true"] {
+  border-color: var(--prime-sys-color-field-borderError);
+}
+
+.control[data-invalid="true"]:focus-within {
+  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+}
+
+.control[data-disabled="true"] {
+  background: var(--prime-sys-color-surface-accentSoft);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.controlStack {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.textareaRegion {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.controlFooter {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--prime-sys-spacing-x1);
+  padding-top: var(--prime-sys-spacing-x1);
+}
+
+/* ── Auto-resize wrapper (CSS grid trick) ── */
+
+.autoResize {
+  display: grid;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.autoResize::after {
+  content: attr(data-value) " ";
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  visibility: hidden;
+  grid-area: 1 / 1 / 2 / 2;
+  font: inherit;
+  min-width: 0;
+  min-height: var(--prime-textarea-min-height);
+  /* padding/border must match .textarea exactly */
+  padding: 0;
+  border: 0;
+}
+
+/* ── Base textarea ── */
+
+.textarea {
+  -webkit-appearance: none;
+  appearance: none;
+  resize: vertical;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  outline: none;
+  box-shadow: none;
+  font-size: var(--prime-textarea-body-size);
+  line-height: var(--prime-textarea-line-height);
+  /* Не наследовать nowrap от предков; переносы в value и мягкий перенос длинных строк */
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.textarea:focus,
+.textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Applied to textarea when autoResize=true — overrides resize/overflow */
+.textareaAutoResize {
+  grid-area: 1 / 1 / 2 / 2;
+  resize: none;
+  overflow: hidden;
+}
+
+.textarea:not(.textareaAutoResize) {
+  flex: 1 1 auto;
+  min-height: var(--prime-textarea-min-height);
+}
+
+.textarea:disabled {
+  color: var(--prime-sys-color-content-disabled);
+}
+
+.textarea::placeholder {
+  color: var(--prime-sys-color-field-placeholder);
+  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.control:hover .textarea::placeholder,
+.control:focus-within .textarea::placeholder {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+/* ── Hint / error (типографика — Hint.Root) ── */
+
+.hintSlot {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ── Char counter (компактно, внутри поля — как AlignUI) ── */
+
+.charCounter {
+  font-size: var(--prime-textarea-body-size);
+  line-height: var(--prime-textarea-line-height);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-sys-color-content-muted);
+  letter-spacing: var(--prime-sys-typography-tracking-normal);
+}
+
+.control[data-disabled="true"] .charCounter {
+  color: var(--prime-sys-color-content-disabled);
+}
+
+.charCounter[data-overflow="true"] {
+  color: var(--prime-sys-color-content-danger);
+}

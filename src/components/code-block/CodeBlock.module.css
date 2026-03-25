@@ -1,0 +1,59 @@
+.root {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  tab-size: 2;
+  background: transparent;
+  font-family: var(--prime-ref-font-family-mono);
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--prime-sys-color-content-primary);
+}
+
+.code {
+  font-family: inherit;
+}
+
+/* Подсветка TS/TSX (`highlightTsxHtml`) */
+.root[data-theme="light"] :global(.prime-tok-k) {
+  color: var(--prime-ref-color-purple-800);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.root[data-theme="dark"] :global(.prime-tok-k) {
+  color: var(--prime-ref-color-purple-300);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.root[data-theme="light"] :global(.prime-tok-s) {
+  color: var(--prime-ref-color-teal-800);
+}
+
+.root[data-theme="dark"] :global(.prime-tok-s) {
+  color: var(--prime-ref-color-teal-200);
+}
+
+.root[data-theme="light"] :global(.prime-tok-c) {
+  color: var(--prime-sys-color-content-muted);
+}
+
+.root[data-theme="dark"] :global(.prime-tok-c) {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.root[data-theme="light"] :global(.prime-tok-n) {
+  color: var(--prime-ref-color-orange-700);
+}
+
+.root[data-theme="dark"] :global(.prime-tok-n) {
+  color: var(--prime-ref-color-orange-300);
+}
+
+.root[data-theme="light"] :global(.prime-tok-x) {
+  color: var(--prime-ref-color-blue-700);
+}
+
+.root[data-theme="dark"] :global(.prime-tok-x) {
+  color: var(--prime-ref-color-blue-300);
+}

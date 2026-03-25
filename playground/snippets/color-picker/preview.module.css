@@ -1,0 +1,141 @@
+.card {
+  display: flex;
+  width: 19.5rem;
+  max-width: 100%;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.sectionLabel {
+  margin: 0;
+}
+
+.formatRow {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+}
+
+.divider {
+  margin: 0;
+  width: 100%;
+  border: 0;
+  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+}
+
+.fieldRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.fieldRow > *:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Панель ColorPicker внутри китового Popover */
+.popoverPickerContent {
+  min-width: 19.5rem;
+  max-width: min(22rem, 100vw);
+}
+
+.popoverPickerTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.popoverTriggerSwatch {
+  box-sizing: border-box;
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--prime-sys-shape-radius-s);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.sizesRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--prime-sys-spacing-x4);
+}
+
+.formatGrid {
+  display: grid;
+  width: 100%;
+  max-width: 100%;
+  gap: var(--prime-sys-spacing-x4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 52rem) {
+  .formatGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formatColumn {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.formatColumnTitle {
+  margin: 0;
+}
+
+.stateRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x5);
+  align-items: flex-start;
+}
+
+.stateCaption {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-typography-size-s);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.miniPicker {
+  display: flex;
+  width: 12.5rem;
+  max-width: 100%;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.placementRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x4);
+  align-items: flex-start;
+}
+
+.controlledReadout {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+}
+
+.monoCode {
+  font-family: var(--prime-sys-typography-family-mono, ui-monospace, monospace);
+  font-size: 0.95em;
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.fullWidthStretch {
+  width: 100%;
+  max-width: min(28rem, 100%);
+}
+
+.fieldGrow {
+  flex: 1;
+  min-width: 0;
+}

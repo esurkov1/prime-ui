@@ -1,0 +1,14 @@
+.label {
+  margin: var(--prime-sys-spacing-x4) 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.label:first-child {
+  margin-top: 0;
+}
+
+.table {
+  margin-bottom: var(--prime-sys-spacing-x2);
+}

@@ -1,0 +1,318 @@
+/* Палитра команд: панель сверху экрана */
+.dialogOverlay[data-size] {
+  /* Перебиваем Modal overlay (grid + place-items: center), иначе панель не сжимается по ширине вьюпорта (min-width: auto у grid-item). */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: var(--prime-sys-spacing-x5);
+  padding-bottom: max(
+    var(--prime-sys-size-control-m-buttonPaddingY),
+    env(safe-area-inset-bottom, 0)
+  );
+  padding-left: max(var(--prime-sys-size-control-m-buttonPaddingX), env(safe-area-inset-left, 0));
+  padding-right: max(var(--prime-sys-size-control-m-buttonPaddingX), env(safe-area-inset-right, 0));
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dialogContent {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  width: min(100%, var(--prime-sys-unit-45rem));
+  max-height: min(88vh, var(--prime-sys-unit-44rem));
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 0;
+  background: var(--prime-sys-color-surface-elevated);
+  border-radius: var(--prime-sys-size-modal-radius);
+  box-shadow: var(--prime-sys-elevation-shadow-modal);
+}
+
+/*
+ * Modal.Content всегда добавляет класс .content из Modal.module.css с правилами
+ * `.content[data-size]` (padding, gap, display: grid). У них специфичность выше,
+ * чем у одного `.dialogContent`, из‑за чего визуально появляется «вторая оболочка»
+ * с отступом ~var(--prime-sys-unit-16px). Комбинируем с role и data-size на том же узле.
+ */
+.dialogContent[role="dialog"][data-size] {
+  padding: 0;
+  gap: 0;
+  display: flex;
+  flex-direction: column;
+  /* Перебиваем width/border-radius из Modal `.content[data-size]` (та же проблема специфичности). */
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  width: min(100%, var(--prime-sys-unit-45rem));
+  border-radius: var(--prime-sys-size-modal-radius);
+}
+
+/* Узкая панель (ограничение max-width) */
+.dialogContentNarrow {
+  width: min(100%, var(--prime-sys-unit-39p5rem));
+  max-width: 100%;
+}
+
+.dialogContent.dialogContentNarrow[role="dialog"][data-size] {
+  max-width: 100%;
+  width: min(100%, var(--prime-sys-unit-39p5rem));
+}
+
+.dialogContentWide {
+  width: min(100%, var(--prime-sys-unit-43p75rem));
+  max-width: 100%;
+}
+
+.dialogContent.dialogContentWide[role="dialog"][data-size] {
+  max-width: 100%;
+  width: min(100%, var(--prime-sys-unit-43p75rem));
+}
+
+/* Компактная высота панели */
+.dialogContent.dialogContentTight[role="dialog"][data-size] {
+  max-height: min(88vh, var(--prime-sys-unit-27p5rem));
+}
+
+@media (min-width: var(--prime-sys-unit-768px)) {
+  .dialogContent.dialogContentTight[role="dialog"][data-size] {
+    height: var(--prime-sys-unit-27p5rem);
+    max-height: min(88vh, var(--prime-sys-unit-27p5rem));
+  }
+}
+
+/* Split: фиксированная высота на широких вьюпортах */
+.dialogContent.dialogContentSplitMd[role="dialog"][data-size] {
+  overflow: hidden;
+}
+
+@media (min-width: var(--prime-sys-unit-768px)) {
+  .dialogContent.dialogContentSplitMd[role="dialog"][data-size] {
+    height: var(--prime-sys-unit-27p5rem);
+    max-height: min(88vh, var(--prime-sys-unit-27p5rem));
+  }
+}
+
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.inputRow {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--prime-sys-unit-3rem);
+  padding-block: 0;
+  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
+  background: var(--prime-sys-color-surface-elevated);
+  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+.inputRowComfortable {
+  min-height: var(--prime-sys-unit-3p5rem);
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.inputIcon {
+  flex-shrink: 0;
+  width: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-icon);
+  color: var(--prime-sys-color-content-muted);
+  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.inputRow:focus-within .inputIcon {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--prime-sys-color-content-primary);
+  font-size: var(--prime-sys-size-control-m-text);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  outline: none;
+  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.input::placeholder {
+  color: var(--prime-sys-color-content-muted);
+  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.inputRow:hover .input::placeholder {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.group {
+  position: relative;
+  padding: var(--prime-sys-spacing-x2) var(--prime-sys-spacing-x2);
+}
+
+.groupFlush {
+  padding: 0;
+}
+
+.groupHeading {
+  font-size: var(--prime-sys-size-control-s-supportText);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--prime-sys-color-content-secondary);
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  padding: var(--prime-sys-spacing-x2) var(--prime-sys-size-control-m-buttonPaddingX) 0;
+}
+
+/* Заголовок из JSX (иконки, счётчики) — без uppercase */
+.groupHeadingRich {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  padding: var(--prime-sys-spacing-x2) var(--prime-sys-size-control-m-buttonPaddingX) 0;
+  font-size: var(--prime-sys-size-control-m-text);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-primary);
+  font-weight: var(--prime-sys-typography-weight-regular);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-size-control-m-gap);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  background: transparent;
+  color: var(--prime-sys-color-content-primary);
+  font-size: var(--prime-sys-size-control-m-text);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition:
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.item[data-size="s"] {
+  padding-block: var(--prime-sys-spacing-x2);
+  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
+}
+
+.item[data-size="m"] {
+  padding-block: var(--prime-sys-spacing-x3);
+  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
+}
+
+.item:not([data-disabled="true"]):hover {
+  background: var(--prime-sys-color-surface-default);
+}
+
+.item[data-selected="true"] {
+  background: var(--prime-sys-color-surface-default);
+}
+
+.item[data-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.itemAlignStart {
+  align-items: flex-start;
+}
+
+.itemIcon {
+  flex-shrink: 0;
+  width: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-icon);
+  color: var(--prime-sys-color-content-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-sys-size-control-m-gap);
+  min-height: var(--prime-sys-unit-3rem);
+  padding: var(--prime-sys-spacing-x3) var(--prime-sys-size-control-m-buttonPaddingX);
+  background: var(--prime-sys-color-surface-elevated);
+  border-top: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+.footerDense {
+  min-height: var(--prime-sys-unit-3p5rem);
+  padding-block: var(--prime-sys-spacing-x3);
+}
+
+.footerMuted {
+  background: var(--prime-sys-color-surface-default);
+}
+
+/* Подсказки клавиш в футере — реализованы через Badge (см. CommandMenuFooterKeyBox). */
+.footerKeyBadge {
+  flex-shrink: 0;
+}
+
+.footerHint {
+  font-size: var(--prime-sys-size-control-s-supportText);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.tagSection {
+  flex-shrink: 0;
+  padding: var(--prime-sys-spacing-x3) var(--prime-sys-size-control-m-buttonPaddingX);
+}
+
+.tagSectionLabel {
+  margin: 0 0 var(--prime-sys-spacing-x3);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+/* Действие справа в пункте — появляется при hover / выделении */
+.itemAction {
+  opacity: 0;
+  transition: opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.item:hover .itemAction,
+.item:focus-visible .itemAction,
+.item[data-selected="true"] .itemAction {
+  opacity: 1;
+}

@@ -1,0 +1,330 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-4xl);
+  background: var(--prime-sys-color-surface-elevated);
+  overflow: hidden;
+  text-align: start;
+  /* Иначе длинные строки кода раздувают раскладку и вылезают за родителя playground. */
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Сжатие и прокрутка панелей превью/кода в колонке flex */
+.root > * {
+  min-width: 0;
+}
+
+/*
+ * Тулбар: одна строка, пока помещается; при нехватке места — перенос (flex-wrap).
+ * Первая группа — по ширине контента; сегмент устройств прижат вправо (margin-left: auto)
+ * и забирает остаток строки (flex-grow). На отдельной строке после переноса — растягивается
+ * на всю ширину (единственный flex-grow на линии).
+ * Без фиксированных @media/@container: только intrinsic wrap.
+ */
+.toolbar {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  row-gap: var(--prime-sys-spacing-x3);
+  column-gap: var(--prime-sys-spacing-x3);
+  padding: var(--prime-sys-spacing-x3) var(--prime-sys-spacing-x4);
+  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-raised);
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.toolbarLine1 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.toolbarLine1End {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.toolbarPaneSegment {
+  flex: 0 1 auto;
+  min-width: 0;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.toolbarViewportSegment {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-left: auto;
+  width: fit-content;
+}
+
+/* Перебить min-width: max-content у SegmentedControl.root, иначе перенос не срабатывает */
+.toolbar .toolbarPaneSegment,
+.toolbar .toolbarViewportSegment {
+  min-width: 0;
+}
+
+@container (max-width: 44rem) {
+  .toolbarLine1 {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .toolbarPaneSegment {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .toolbarViewportSegment {
+    flex: 1 1 100%;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .toolbarPaneSegment :global([role="radio"]),
+  .toolbarViewportSegment :global([role="radio"]) {
+    min-width: 0;
+  }
+}
+
+.previewShell {
+  padding: var(--prime-sys-spacing-x4);
+  background: var(--prime-sys-color-surface-default);
+}
+
+.previewViewport {
+  margin-inline: auto;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  transition: max-width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.previewViewport[data-viewport="desktop"] {
+  max-width: none;
+}
+
+.previewViewport[data-viewport="tablet"] {
+  max-width: var(--prime-sys-unit-48rem);
+}
+
+.previewViewport[data-viewport="mobile"] {
+  max-width: var(--prime-sys-unit-24p375rem);
+}
+
+.previewInner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--prime-sys-unit-10rem);
+  padding: var(--prime-sys-spacing-x4);
+  border-radius: var(--prime-sys-shape-radius-l);
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  background: transparent;
+  /* Обрезка контента шире карточки (широкие группы кнопок, таблицы без своей прокрутки). */
+  overflow: hidden;
+}
+
+/*
+ * Без align-self: center дочерний канвас получает stretch по умолчанию и на всю ширину
+ * внутренней области — при width: fit-content у контролов (SegmentedControl и т.д.) блок
+ * визуально «прилипает» к логическому start, хотя внутри канваса стоит align-items: center.
+ */
+.previewInner > * {
+  align-self: center;
+  margin-inline: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* fullWidth в превью: иначе канвас остаётся fit-content + align-self:center и не даёт ширины дочерним 100%. */
+.previewInner > .previewCanvas:global(:has([data-full-width="true"])) {
+  align-self: stretch;
+  width: 100%;
+  margin-inline: 0;
+}
+
+.previewCanvas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* dense-stack: скролл и плотная колонка на всю ширину. stack / stack-narrow — по ширине контента. */
+.previewCanvas[data-preview-layout="dense-stack"] {
+  width: 100%;
+}
+
+/* По ширине содержимого, не шире области превью. */
+.previewCanvas[data-preview-layout="default"],
+.previewCanvas[data-preview-layout="stack-center"],
+.previewCanvas[data-preview-layout="row"],
+.previewCanvas[data-preview-layout="row-start"],
+.previewCanvas[data-preview-layout="row-wrap"] {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+/* Раскладка превью: без лишних обёрток в сниппетах (колонка / ряд). */
+.previewCanvas[data-preview-layout="stack"] {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--prime-sys-spacing-x4);
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.previewCanvas[data-preview-layout="stack"]:global(:has([data-full-width="true"])),
+.previewCanvas[data-preview-layout="stack-narrow"]:global(:has([data-full-width="true"])) {
+  width: 100%;
+  align-items: stretch;
+  margin-inline: 0;
+}
+
+/*
+ * Строка превью для stack / stack-narrow: колонка, чтобы сниппет из одного компонента
+ * с Fragment внутри (Input sizes, Textarea sizes…) не оказывался в одном flex-row.
+ * Ширина по содержимому (не одна общая полоса на весь превью); max-width 100% — не вылезать за карточку.
+ * Узкий лимит на весь блок — previewLayout="stack-narrow" на .previewCanvas.
+ */
+.previewStackLine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--prime-sys-spacing-x4);
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.previewStackLine:global(:has(.examplePreviewBleed)) {
+  width: 100%;
+  max-width: none;
+}
+
+.previewStackLine:global(:has(table)) {
+  width: 100%;
+  max-width: none;
+}
+
+/* fullWidth у Button: строка на ширину канваса + stretch — иначе align-items:center сжимает flex-item по контенту. */
+.previewStackLine:global(:has([data-full-width="true"])) {
+  width: 100%;
+  max-width: 100%;
+  align-items: stretch;
+}
+
+.previewCanvas[data-preview-layout="stack-narrow"] .previewStackLine {
+  max-width: 100%;
+}
+
+.previewStackLine > * {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.previewCanvas[data-preview-layout="stack-center"] {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.previewCanvas[data-preview-layout="row"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-sys-spacing-x3);
+  padding-block: clamp(var(--prime-sys-unit-1p5rem), 4vh, var(--prime-sys-unit-3rem));
+}
+
+.previewCanvas[data-preview-layout="row-start"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--prime-sys-spacing-x3);
+  padding-block: clamp(var(--prime-sys-unit-1rem), 3vh, var(--prime-sys-unit-2rem));
+}
+
+.previewCanvas[data-preview-layout="row-wrap"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.previewCanvas[data-preview-layout="stack-narrow"] {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--prime-sys-spacing-x3);
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: min(100%, var(--prime-sys-unit-28rem));
+  margin-inline: auto;
+}
+
+.previewCanvas[data-preview-layout="dense-stack"] {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--prime-sys-unit-0p35rem);
+  box-sizing: border-box;
+  max-height: var(--prime-sys-unit-22rem);
+  width: 100%;
+  overflow: auto;
+  padding-right: var(--prime-sys-unit-0p25rem);
+}
+
+.previewInner[data-theme="dark"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-border-subtle);
+}
+
+/*
+ * Вкладка «Код»: контейнер для `CodeBlock` (подсветка TS/TSX без Shiki).
+ */
+.codePane {
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--prime-sys-spacing-x4);
+  background: var(--prime-sys-color-surface-default);
+  min-width: 0;
+  max-width: 100%;
+  max-height: min(var(--prime-sys-unit-32rem), 70vh);
+  overflow-x: auto;
+  overflow-y: auto;
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  line-height: 1.55;
+  color: var(--prime-sys-color-content-primary);
+}

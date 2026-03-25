@@ -1,0 +1,219 @@
+.root {
+  --prime-tabs-trigger-height: var(--prime-sys-size-control-m-height);
+  --prime-tabs-trigger-text: var(--prime-sys-size-control-m-text);
+  --prime-tabs-trigger-gap: var(--prime-sys-size-control-m-gap);
+  --prime-tabs-trigger-pad-x: var(--prime-sys-size-control-m-buttonPaddingX);
+  --prime-tabs-trigger-pad-y: var(--prime-sys-size-control-m-buttonPaddingY);
+  /* Расстояние между триггерами в горизонтальном списке. */
+  --prime-tabs-item-gap: var(--prime-sys-spacing-x6);
+  --prime-tabs-icon-size: var(--prime-sys-size-control-m-icon);
+}
+
+.root[data-size="s"] {
+  --prime-tabs-trigger-height: var(--prime-sys-size-control-s-height);
+  --prime-tabs-trigger-text: var(--prime-sys-size-control-s-text);
+  --prime-tabs-trigger-gap: var(--prime-sys-size-control-s-gap);
+  --prime-tabs-trigger-pad-x: var(--prime-sys-size-control-s-buttonPaddingX);
+  --prime-tabs-trigger-pad-y: var(--prime-sys-size-control-s-buttonPaddingY);
+  --prime-tabs-item-gap: var(--prime-sys-spacing-x4);
+  --prime-tabs-icon-size: var(--prime-sys-size-control-s-icon);
+}
+
+.root[data-size="l"] {
+  --prime-tabs-trigger-height: var(--prime-sys-size-control-l-height);
+  --prime-tabs-trigger-text: var(--prime-sys-size-control-l-text);
+  --prime-tabs-trigger-gap: var(--prime-sys-size-control-l-gap);
+  --prime-tabs-trigger-pad-x: var(--prime-sys-size-control-l-buttonPaddingX);
+  --prime-tabs-trigger-pad-y: var(--prime-sys-size-control-l-buttonPaddingY);
+  --prime-tabs-item-gap: var(--prime-sys-spacing-x8);
+  --prime-tabs-icon-size: var(--prime-sys-size-control-l-icon);
+}
+
+.root[data-size="xl"] {
+  --prime-tabs-trigger-height: var(--prime-sys-size-control-xl-height);
+  --prime-tabs-trigger-text: var(--prime-sys-size-control-xl-text);
+  --prime-tabs-trigger-gap: var(--prime-sys-size-control-xl-gap);
+  --prime-tabs-trigger-pad-x: var(--prime-sys-size-control-xl-buttonPaddingX);
+  --prime-tabs-trigger-pad-y: var(--prime-sys-size-control-xl-buttonPaddingY);
+  --prime-tabs-item-gap: var(--prime-sys-spacing-x8);
+  --prime-tabs-icon-size: var(--prime-sys-size-control-xl-icon);
+}
+
+.root[data-orientation="vertical"] {
+  display: flex;
+  gap: var(--prime-sys-spacing-x4);
+}
+
+.list {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  gap: var(--prime-tabs-item-gap);
+  box-sizing: border-box;
+}
+
+.root[data-orientation="horizontal"] .list {
+  flex-wrap: nowrap;
+  align-items: center;
+  border-top: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+.root[data-orientation="vertical"] .list {
+  flex-direction: column;
+  gap: var(--prime-tabs-trigger-gap);
+  border-right: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+/* Плавающая полоса активной вкладки (в одном стиле с SegmentedControl). */
+.indicator {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--prime-sys-color-action-primaryBackground);
+  opacity: 0;
+  transition:
+    transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    height var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    opacity var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.indicator[data-visible="true"] {
+  opacity: 1;
+}
+
+.indicatorHorizontal {
+  bottom: var(--prime-sys-unit-neg-1px);
+  left: 0;
+  height: var(--prime-sys-unit-2px);
+  width: 0;
+}
+
+.indicatorVertical {
+  right: var(--prime-sys-unit-neg-1px);
+  top: 0;
+  width: var(--prime-sys-unit-2px);
+  height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    transition: none;
+  }
+}
+
+.tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-tabs-trigger-gap);
+  padding-inline: var(--prime-tabs-trigger-pad-x);
+  padding-block: var(--prime-tabs-trigger-pad-y);
+  height: var(--prime-tabs-trigger-height);
+  box-sizing: border-box;
+  font-size: var(--prime-tabs-trigger-text);
+  font-family: inherit;
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  white-space: nowrap;
+  color: var(--prime-sys-color-content-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+/* Слот иконки — как у Button.Icon (две иконки: слева и справа от подписи). */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--prime-tabs-icon-size);
+  height: var(--prime-tabs-icon-size);
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/*
+ * Явный кегль для всего DOM внутри триггера, кроме дерева слота .icon:
+ * иначе Typography / стили превью (.root[data-size]) перебивают с той же специфичностью.
+ * Одинаковая жирность у всех вкладок (medium) — без скачка при смене активной; disabled — regular.
+ */
+.root .tab *:not(.icon, .icon *) {
+  font-size: var(--prime-tabs-trigger-text);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.tab .icon {
+  line-height: 0;
+}
+
+/* Опциональная обёртка подписи: сжатие в flex-ряду при длинном тексте. */
+.label {
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* У активной вкладки первая иконка — primary, остальные слоты остаются subtle. */
+.tab[aria-selected="true"] .icon:first-of-type :global(svg) {
+  color: var(--prime-sys-color-action-primaryBackground);
+}
+
+.tab:hover {
+  color: var(--prime-sys-color-content-primary);
+}
+
+.tab[aria-selected="true"] {
+  color: var(--prime-sys-color-content-primary);
+}
+
+.tab:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
+  border-radius: var(--prime-sys-shape-radius-s);
+}
+
+.tab[data-disabled="true"] {
+  color: var(--prime-sys-color-content-disabled);
+  cursor: not-allowed;
+  font-weight: var(--prime-sys-typography-weight-regular);
+}
+
+.root .tab[data-disabled="true"] *:not(.icon, .icon *) {
+  font-weight: var(--prime-sys-typography-weight-regular);
+}
+
+.tab[data-disabled="true"] .icon:first-of-type :global(svg) {
+  color: var(--prime-sys-color-content-disabled);
+}
+
+/* Кегль как у триггеров: токен задан на `.root` по `data-size` и наследуется сюда. */
+.panel {
+  box-sizing: border-box;
+  padding: var(--prime-sys-spacing-x4) 0;
+  font-size: var(--prime-tabs-trigger-text);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-primary);
+}
+
+/* Вложенная типографика — тот же ярус, что и `size` у Tabs.Root (не фиксированный body). */
+.root .panel
+  *:not(a, a *, button, button *, input, textarea, select, code, code *, kbd, kbd *, pre, pre *) {
+  font-size: var(--prime-tabs-trigger-text);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+}
+
+.panel :where(p, ul, ol) {
+  margin: 0;
+}

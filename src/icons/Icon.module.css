@@ -1,0 +1,48 @@
+.root {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Размеры = size.control.*.icon из семантических токенов (theme-light/dark.css). */
+.sizeXs {
+  width: var(--prime-sys-size-control-xs-icon);
+  height: var(--prime-sys-size-control-xs-icon);
+}
+
+.sizeS {
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
+}
+
+.sizeM {
+  width: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-icon);
+}
+
+.sizeL {
+  width: var(--prime-sys-size-control-l-icon);
+  height: var(--prime-sys-size-control-l-icon);
+}
+
+.sizeXl {
+  width: var(--prime-sys-size-control-xl-icon);
+  height: var(--prime-sys-size-control-xl-icon);
+}
+
+.toneDefault {
+  color: currentColor;
+}
+
+.toneSubtle {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.toneAccent {
+  color: var(--prime-sys-color-content-accent);
+}
+
+.toneDanger {
+  color: var(--prime-sys-color-content-danger);
+}

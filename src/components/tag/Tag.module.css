@@ -1,0 +1,165 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  /* В колонке flex/grid с `align-items: stretch` иначе растягивается на всю ширину родителя */
+  width: fit-content;
+  max-width: 100%;
+  gap: var(--prime-sys-size-tag-m-gap);
+  padding-block: var(--prime-sys-size-tag-m-paddingY);
+  padding-inline: var(--prime-sys-size-tag-m-paddingX);
+  font-size: var(--prime-sys-size-tag-m-text);
+  line-height: 1;
+  border-radius: var(--prime-sys-size-tag-m-radius);
+  background: var(--prime-sys-color-surface-accentSoft);
+  color: var(--prime-sys-color-content-primary);
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.root[data-size="s"] {
+  gap: var(--prime-sys-size-tag-s-gap);
+  padding-block: var(--prime-sys-size-tag-s-paddingY);
+  padding-inline: var(--prime-sys-size-tag-s-paddingX);
+  font-size: var(--prime-sys-size-tag-s-text);
+  border-radius: var(--prime-sys-size-tag-s-radius);
+}
+
+.root[data-size="l"] {
+  gap: var(--prime-sys-size-tag-l-gap);
+  padding-block: var(--prime-sys-size-tag-l-paddingY);
+  padding-inline: var(--prime-sys-size-tag-l-paddingX);
+  font-size: var(--prime-sys-size-tag-l-text);
+  border-radius: var(--prime-sys-size-tag-l-radius);
+}
+
+.root[data-size="xl"] {
+  gap: var(--prime-sys-size-tag-xl-gap);
+  padding-block: var(--prime-sys-size-tag-xl-paddingY);
+  padding-inline: var(--prime-sys-size-tag-xl-paddingX);
+  font-size: var(--prime-sys-size-tag-xl-text);
+  border-radius: var(--prime-sys-size-tag-xl-radius);
+}
+
+.root[data-disabled="true"] {
+  opacity: 0.5;
+}
+
+.body {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-size-tag-m-gap);
+  min-width: 0;
+  line-height: 1;
+}
+
+.root[data-size="s"] .body {
+  gap: var(--prime-sys-size-tag-s-gap);
+}
+
+.root[data-size="l"] .body {
+  gap: var(--prime-sys-size-tag-l-gap);
+}
+
+.root[data-size="xl"] .body {
+  gap: var(--prime-sys-size-tag-xl-gap);
+}
+
+.icon {
+  display: inline-flex;
+  width: var(--prime-sys-size-tag-m-iconSize);
+  height: var(--prime-sys-size-tag-m-iconSize);
+  flex-shrink: 0;
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.root[data-size="s"] .icon {
+  width: var(--prime-sys-size-tag-s-iconSize);
+  height: var(--prime-sys-size-tag-s-iconSize);
+}
+
+.root[data-size="l"] .icon {
+  width: var(--prime-sys-size-tag-l-iconSize);
+  height: var(--prime-sys-size-tag-l-iconSize);
+}
+
+.root[data-size="xl"] .icon {
+  width: var(--prime-sys-size-tag-xl-iconSize);
+  height: var(--prime-sys-size-tag-xl-iconSize);
+}
+
+.icon > * {
+  width: 100%;
+  height: 100%;
+}
+
+.remove {
+  display: inline-flex;
+  flex: 0 0 var(--prime-sys-size-tag-m-iconSize);
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-sys-size-tag-m-iconSize);
+  min-width: var(--prime-sys-size-tag-m-iconSize);
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--prime-sys-shape-radius-s);
+  background: transparent;
+  color: var(--prime-sys-color-content-secondary);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.root[data-size="s"] .remove {
+  flex-basis: var(--prime-sys-size-tag-s-iconSize);
+  width: var(--prime-sys-size-tag-s-iconSize);
+  min-width: var(--prime-sys-size-tag-s-iconSize);
+}
+
+.root[data-size="l"] .remove {
+  flex-basis: var(--prime-sys-size-tag-l-iconSize);
+  width: var(--prime-sys-size-tag-l-iconSize);
+  min-width: var(--prime-sys-size-tag-l-iconSize);
+}
+
+.root[data-size="xl"] .remove {
+  flex-basis: var(--prime-sys-size-tag-xl-iconSize);
+  width: var(--prime-sys-size-tag-xl-iconSize);
+  min-width: var(--prime-sys-size-tag-xl-iconSize);
+}
+
+.remove:hover:not(:disabled) {
+  background: transparent;
+  color: var(--prime-sys-color-content-primary);
+  outline: none;
+  box-shadow: none;
+}
+
+.remove:active:not(:disabled) {
+  outline: none;
+  box-shadow: none;
+}
+
+.remove:focus-visible {
+  outline: none;
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.remove:disabled {
+  cursor: not-allowed;
+}
+
+.removeIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62.5%;
+  height: 62.5%;
+  flex-shrink: 0;
+}

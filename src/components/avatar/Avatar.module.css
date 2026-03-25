@@ -1,0 +1,226 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--prime-sys-color-surface-accentSoft);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.root[data-size="s"] {
+  width: var(--prime-sys-size-avatar-s-size);
+  height: var(--prime-sys-size-avatar-s-size);
+  font-size: var(--prime-sys-size-avatar-s-text);
+  border-radius: var(--prime-sys-size-avatar-s-radius);
+}
+
+.root[data-size="m"] {
+  width: var(--prime-sys-size-avatar-m-size);
+  height: var(--prime-sys-size-avatar-m-size);
+  font-size: var(--prime-sys-size-avatar-m-text);
+  border-radius: var(--prime-sys-size-avatar-m-radius);
+}
+
+.root[data-size="l"] {
+  width: var(--prime-sys-size-avatar-l-size);
+  height: var(--prime-sys-size-avatar-l-size);
+  font-size: var(--prime-sys-size-avatar-l-text);
+  border-radius: var(--prime-sys-size-avatar-l-radius);
+}
+
+.root[data-size="xl"] {
+  width: var(--prime-sys-size-avatar-xl-size);
+  height: var(--prime-sys-size-avatar-xl-size);
+  font-size: var(--prime-sys-size-avatar-xl-text);
+  border-radius: var(--prime-sys-size-avatar-xl-radius);
+}
+
+.root[data-size="2xl"] {
+  width: var(--prime-sys-size-avatar-2xl-size);
+  height: var(--prime-sys-size-avatar-2xl-size);
+  font-size: var(--prime-sys-size-avatar-2xl-text);
+  border-radius: var(--prime-sys-size-avatar-2xl-radius);
+}
+
+.root[data-size="3xl"] {
+  width: var(--prime-sys-size-avatar-3xl-size);
+  height: var(--prime-sys-size-avatar-3xl-size);
+  font-size: var(--prime-sys-size-avatar-3xl-text);
+  border-radius: var(--prime-sys-size-avatar-3xl-radius);
+}
+
+.root[data-size="4xl"] {
+  width: var(--prime-sys-size-avatar-4xl-size);
+  height: var(--prime-sys-size-avatar-4xl-size);
+  font-size: var(--prime-sys-size-avatar-4xl-text);
+  border-radius: var(--prime-sys-size-avatar-4xl-radius);
+}
+
+.root[data-size="5xl"] {
+  width: var(--prime-sys-size-avatar-5xl-size);
+  height: var(--prime-sys-size-avatar-5xl-size);
+  font-size: var(--prime-sys-size-avatar-5xl-text);
+  border-radius: var(--prime-sys-size-avatar-5xl-radius);
+}
+
+.root[data-size="6xl"] {
+  width: var(--prime-sys-size-avatar-6xl-size);
+  height: var(--prime-sys-size-avatar-6xl-size);
+  font-size: var(--prime-sys-size-avatar-6xl-text);
+  border-radius: var(--prime-sys-size-avatar-6xl-radius);
+}
+
+.image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image[data-status="loading"] {
+  opacity: 0;
+}
+
+.image[data-status="loaded"] {
+  opacity: 1;
+}
+
+.image[data-status="error"] {
+  display: none;
+}
+
+.fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-secondary);
+  font-size: inherit;
+  user-select: none;
+  text-align: center;
+}
+
+/* Avatar.Group.Root — горизонтальный ряд: слева направо, последний в DOM перекрывает предыдущие */
+.groupRoot {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.groupRoot > * {
+  position: relative;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border: var(--prime-sys-unit-2px) solid var(--prime-sys-color-surface-raised);
+  border-radius: var(--prime-sys-shape-radius-round);
+}
+
+.groupRoot[data-size="s"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-0p56rem);
+}
+
+.groupRoot[data-size="m"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-0p7rem);
+}
+
+.groupRoot[data-size="l"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-0p84rem);
+}
+
+.groupRoot[data-size="xl"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-0p98rem);
+}
+
+.groupRoot[data-size="2xl"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-1p12rem);
+}
+
+.groupRoot[data-size="3xl"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-1p26rem);
+}
+
+.groupRoot[data-size="4xl"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-1p4rem);
+}
+
+.groupRoot[data-size="5xl"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-1p54rem);
+}
+
+.groupRoot[data-size="6xl"] > * + * {
+  margin-inline-start: var(--prime-sys-unit-neg-1p68rem);
+}
+
+/* Слот +N: тот же диаметр и типографика, что у Avatar.Root этого размера */
+.groupOverflow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--prime-sys-color-surface-accentSoft);
+  color: var(--prime-sys-color-content-secondary);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  user-select: none;
+  text-align: center;
+}
+
+.groupOverflow[data-size="s"] {
+  width: var(--prime-sys-size-avatar-s-size);
+  height: var(--prime-sys-size-avatar-s-size);
+  font-size: var(--prime-sys-size-avatar-s-text);
+}
+
+.groupOverflow[data-size="m"] {
+  width: var(--prime-sys-size-avatar-m-size);
+  height: var(--prime-sys-size-avatar-m-size);
+  font-size: var(--prime-sys-size-avatar-m-text);
+}
+
+.groupOverflow[data-size="l"] {
+  width: var(--prime-sys-size-avatar-l-size);
+  height: var(--prime-sys-size-avatar-l-size);
+  font-size: var(--prime-sys-size-avatar-l-text);
+}
+
+.groupOverflow[data-size="xl"] {
+  width: var(--prime-sys-size-avatar-xl-size);
+  height: var(--prime-sys-size-avatar-xl-size);
+  font-size: var(--prime-sys-size-avatar-xl-text);
+}
+
+.groupOverflow[data-size="2xl"] {
+  width: var(--prime-sys-size-avatar-2xl-size);
+  height: var(--prime-sys-size-avatar-2xl-size);
+  font-size: var(--prime-sys-size-avatar-2xl-text);
+}
+
+.groupOverflow[data-size="3xl"] {
+  width: var(--prime-sys-size-avatar-3xl-size);
+  height: var(--prime-sys-size-avatar-3xl-size);
+  font-size: var(--prime-sys-size-avatar-3xl-text);
+}
+
+.groupOverflow[data-size="4xl"] {
+  width: var(--prime-sys-size-avatar-4xl-size);
+  height: var(--prime-sys-size-avatar-4xl-size);
+  font-size: var(--prime-sys-size-avatar-4xl-text);
+}
+
+.groupOverflow[data-size="5xl"] {
+  width: var(--prime-sys-size-avatar-5xl-size);
+  height: var(--prime-sys-size-avatar-5xl-size);
+  font-size: var(--prime-sys-size-avatar-5xl-text);
+}
+
+.groupOverflow[data-size="6xl"] {
+  width: var(--prime-sys-size-avatar-6xl-size);
+  height: var(--prime-sys-size-avatar-6xl-size);
+  font-size: var(--prime-sys-size-avatar-6xl-text);
+}

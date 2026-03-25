@@ -1,0 +1,381 @@
+/* Дополняет react-day-picker/style.css и синхронизирует датпикер с Prime tokens */
+
+/* ─── Корневой блок календаря ─────────────────────────────────────────────── */
+
+.pickerRoot {
+  --dp-control-height: var(--prime-sys-size-control-m-height);
+  --dp-control-icon: var(--prime-sys-size-control-m-icon);
+  --dp-control-gap: var(--prime-sys-size-control-m-gap);
+  --dp-control-text: var(--prime-sys-size-control-m-text);
+  --dp-support-text: var(--prime-sys-size-control-m-supportText);
+  --dp-shell-gap: var(--prime-sys-spacing-x4);
+  --dp-month-gap: var(--prime-sys-spacing-x4);
+  --dp-header-pad-x: var(--prime-sys-spacing-x2);
+  --dp-header-gap: var(--prime-sys-spacing-x2);
+  --dp-nav-control-height: var(--prime-sys-size-control-s-height);
+
+  --rdp-accent-color: var(--prime-sys-color-action-primaryBackground);
+  --rdp-accent-background-color: var(--prime-sys-color-surface-accentSoft);
+  --rdp-day-height: var(--dp-control-height);
+  --rdp-day-width: var(--dp-control-height);
+  --rdp-day_button-height: var(--dp-control-height);
+  --rdp-day_button-width: var(--dp-control-height);
+  --rdp-day_button-border-radius: var(--prime-sys-size-control-m-radius);
+  --rdp-months-gap: var(--dp-month-gap);
+  --rdp-nav_button-height: var(--dp-control-height);
+  --rdp-nav_button-width: var(--dp-control-height);
+  --rdp-nav-height: var(--dp-control-height);
+  --rdp-weekday-padding: var(--prime-sys-spacing-x1) 0;
+  --rdp-range_start-color: var(--prime-sys-color-content-inverse);
+  --rdp-range_end-color: var(--prime-sys-color-content-inverse);
+
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: var(--dp-control-text);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.pickerRoot[data-size="s"] {
+  --dp-control-height: var(--prime-sys-size-control-s-height);
+  --dp-control-icon: var(--prime-sys-size-control-s-icon);
+  --dp-control-gap: var(--prime-sys-size-control-s-gap);
+  --dp-control-text: var(--prime-sys-size-control-s-text);
+  --dp-support-text: var(--prime-sys-size-control-s-supportText);
+  --dp-shell-gap: var(--prime-sys-spacing-x3);
+  --dp-month-gap: var(--prime-sys-spacing-x3);
+  --dp-header-pad-x: var(--prime-sys-spacing-x2);
+  --dp-nav-control-height: var(--prime-sys-size-control-xs-height);
+}
+
+.pickerRoot[data-size="l"] {
+  --dp-control-height: var(--prime-sys-size-control-l-height);
+  --dp-control-icon: var(--prime-sys-size-control-l-icon);
+  --dp-control-gap: var(--prime-sys-size-control-l-gap);
+  --dp-control-text: var(--prime-sys-size-control-l-text);
+  --dp-support-text: var(--prime-sys-size-control-l-supportText);
+  --dp-shell-gap: var(--prime-sys-spacing-x5);
+  --dp-month-gap: var(--prime-sys-spacing-x5);
+  --dp-header-pad-x: var(--prime-sys-spacing-x3);
+  --dp-nav-control-height: var(--prime-sys-size-control-m-height);
+}
+
+.pickerRoot[data-size="xl"] {
+  --dp-control-height: var(--prime-sys-size-control-xl-height);
+  --dp-control-icon: var(--prime-sys-size-control-xl-icon);
+  --dp-control-gap: var(--prime-sys-size-control-xl-gap);
+  --dp-control-text: var(--prime-sys-size-control-xl-text);
+  --dp-support-text: var(--prime-sys-size-control-xl-supportText);
+  --dp-shell-gap: var(--prime-sys-spacing-x6);
+  --dp-month-gap: var(--prime-sys-spacing-x6);
+  --dp-header-pad-x: var(--prime-sys-spacing-x3);
+  --dp-nav-control-height: var(--prime-sys-size-control-l-height);
+}
+
+/* ─── Day-button: transitions, hover, today, selected ───────────────────── */
+
+.pickerRoot :global(.rdp-day_button) {
+  transition:
+    background-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
+    color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  font-size: var(--dp-control-text);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.pickerRoot :global(.rdp-day_button:hover:not([disabled]):not([aria-selected="true"])) {
+  background-color: var(--prime-sys-color-action-primarySoftBackground);
+  color: var(--prime-sys-color-action-primarySoftForeground);
+}
+
+/* Текущая дата: акцентный цвет текста, если не выбрана */
+.pickerRoot :global(.rdp-today:not(.rdp-selected):not(.rdp-range_middle) .rdp-day_button) {
+  color: var(--prime-sys-color-action-primaryBackground);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+/* Выбранная дата (single + range_start + range_end) — единый стиль: залитый фон */
+.pickerRoot :global(.rdp-day_button[aria-selected="true"]) {
+  background-color: var(--prime-sys-color-action-primaryBackground);
+  color: var(--prime-sys-color-action-primaryForeground);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+/* Средина диапазона перекрывает залитый фон выше */
+.pickerRoot :global(.rdp-range_middle) {
+  background-color: var(--prime-sys-color-action-primarySoftBackground);
+}
+
+.pickerRoot :global(.rdp-range_middle .rdp-day_button) {
+  background-color: transparent;
+  color: var(--prime-sys-color-action-primarySoftForeground);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  box-shadow: none;
+}
+
+.pickerRoot :global(.rdp-day_button:focus-visible) {
+  outline: none;
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+/* ─── Сетка месяцев ─────────────────────────────────────────────────────── */
+
+.months {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: none;
+  gap: var(--dp-month-gap);
+}
+
+.month {
+  min-width: min(100%, var(--prime-sys-unit-15rem));
+  flex: 1 1 min(100%, var(--prime-sys-unit-15rem));
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+/* react-day-picker рендерит <table> без явной ширины */
+.pickerRoot :global(.rdp-month_grid) {
+  width: 100%;
+}
+
+/* ─── Навигация (prev/next) ─────────────────────────────────────────────── */
+
+.nav {
+  display: none;
+}
+
+.navButton {
+  flex: 0 0 auto;
+}
+
+.pickerRoot[data-size="s"] .navButton {
+  --prime-icon-size: var(--prime-sys-size-control-xs-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-xs-text);
+  height: var(--prime-sys-size-control-xs-height);
+  min-width: var(--prime-sys-size-control-xs-height);
+  border-radius: var(--prime-sys-size-control-xs-radius);
+  gap: var(--prime-sys-size-control-xs-gap);
+  padding-inline: var(--prime-sys-size-control-xs-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-xs-buttonPaddingY);
+}
+
+.pickerRoot[data-size="m"] .navButton {
+  --prime-icon-size: var(--prime-sys-size-control-s-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-s-text);
+  height: var(--prime-sys-size-control-s-height);
+  min-width: var(--prime-sys-size-control-s-height);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  gap: var(--prime-sys-size-control-s-gap);
+  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-s-buttonPaddingY);
+}
+
+.pickerRoot[data-size="l"] .navButton {
+  --prime-icon-size: var(--prime-sys-size-control-m-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-m-text);
+  height: var(--prime-sys-size-control-m-height);
+  min-width: var(--prime-sys-size-control-m-height);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  gap: var(--prime-sys-size-control-m-gap);
+  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
+}
+
+.pickerRoot[data-size="xl"] .navButton {
+  --prime-icon-size: var(--prime-sys-size-control-l-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-l-text);
+  height: var(--prime-sys-size-control-l-height);
+  min-width: var(--prime-sys-size-control-l-height);
+  border-radius: var(--prime-sys-size-control-l-radius);
+  gap: var(--prime-sys-size-control-l-gap);
+  padding-inline: var(--prime-sys-size-control-l-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-l-buttonPaddingY);
+}
+
+.monthCaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dp-header-gap);
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  margin-bottom: 0;
+  padding: var(--dp-header-pad-x);
+  border-radius: var(--prime-sys-shape-radius-m);
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  box-sizing: border-box;
+  font-size: var(--dp-control-text);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  text-align: center;
+}
+
+.monthCaptionLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Текст заголовка месяца внутри общей pill-шапки */
+.monthCaptionLabel :global(.rdp-caption_label) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 0;
+  text-align: center;
+}
+
+.monthCaptionSpacer {
+  width: var(--dp-nav-control-height);
+  height: var(--dp-nav-control-height);
+  flex: 0 0 var(--dp-nav-control-height);
+}
+
+.weekday {
+  font-size: var(--dp-support-text);
+  color: var(--prime-sys-color-content-secondary);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+/* ─── Shell — карточка-обёртка ───────────────────────────────────────────── */
+
+.shell {
+  --dp-shell-gap: var(--prime-sys-spacing-x4);
+  --dp-support-text: var(--prime-sys-size-control-m-supportText);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.shell[data-size="s"] {
+  --dp-shell-gap: var(--prime-sys-spacing-x3);
+  --dp-support-text: var(--prime-sys-size-control-s-supportText);
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.shell[data-size="l"] {
+  --dp-shell-gap: var(--prime-sys-spacing-x5);
+  --dp-support-text: var(--prime-sys-size-control-l-supportText);
+  gap: var(--prime-sys-spacing-x4);
+}
+
+.shell[data-size="xl"] {
+  --dp-shell-gap: var(--prime-sys-spacing-x6);
+  --dp-support-text: var(--prime-sys-size-control-xl-supportText);
+  gap: var(--prime-sys-spacing-x5);
+}
+
+/* ─── .presetsRow — полоса пресетов снизу ───────────────────────────────── */
+
+.presetsRow {
+  width: 100%;
+  overflow: hidden;
+  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-raised);
+}
+
+/* ─── .presetsBlock — горизонтальный скролл-контейнер с кнопками ────────── */
+
+.presetsBlock {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x3);
+  padding: var(--prime-sys-spacing-x3) var(--dp-shell-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  box-sizing: border-box;
+}
+
+.presetsBlock[data-size="s"] {
+  gap: var(--prime-sys-spacing-x2);
+  padding: var(--prime-sys-spacing-x2) var(--dp-shell-gap);
+}
+
+.presetsBlock[data-size="l"] {
+  gap: var(--prime-sys-spacing-x3);
+  padding: var(--prime-sys-spacing-x3) var(--dp-shell-gap);
+}
+
+.presetsBlock[data-size="xl"] {
+  gap: var(--prime-sys-spacing-x4);
+  padding: var(--prime-sys-spacing-x4) var(--dp-shell-gap);
+}
+
+.presetsGroup {
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+/* ─── Time section ──────────────────────────────────────────────────────── */
+
+.timeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+  padding-top: var(--prime-sys-spacing-x3);
+  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+}
+
+.timeSection[data-size="s"] {
+  padding-top: var(--prime-sys-spacing-x2);
+}
+
+.timeSection[data-size="l"] {
+  padding-top: var(--prime-sys-spacing-x4);
+}
+
+.timeSection[data-size="xl"] {
+  padding-top: var(--prime-sys-spacing-x5);
+}
+
+.timeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.timeField {
+  flex: 1 1 min(100%, var(--prime-sys-unit-11rem));
+  min-width: 0;
+}
+
+.timeInputRoot {
+  width: 100%;
+}
+
+.timeInputField {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Value text ────────────────────────────────────────────────────────── */
+
+.valueText {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Viewport-обёртка Calendar ─────────────────────────────────────────── */
+
+.calendarViewport {
+  min-width: 0;
+  width: 100%;
+}

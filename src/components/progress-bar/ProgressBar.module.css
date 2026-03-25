@@ -1,0 +1,63 @@
+/* Высота трека — доля control-height того же яруса, как у Slider. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--progress-root-gap);
+  width: 100%;
+}
+
+.root[data-size="s"] {
+  --progress-root-gap: var(--prime-sys-size-control-s-gap);
+  --progress-track-h: var(--prime-sys-spacing-xs);
+  --progress-label-size: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="m"] {
+  --progress-root-gap: var(--prime-sys-size-control-m-gap);
+  --progress-track-h: var(--prime-sys-spacing-xs);
+  --progress-label-size: var(--prime-sys-size-control-m-text);
+}
+
+.root[data-size="l"] {
+  --progress-root-gap: var(--prime-sys-size-control-l-gap);
+  --progress-track-h: var(--prime-sys-spacing-s);
+  --progress-label-size: var(--prime-sys-size-control-l-text);
+}
+
+.root[data-size="xl"] {
+  --progress-root-gap: var(--prime-sys-size-control-xl-gap);
+  --progress-track-h: var(--prime-sys-spacing-s);
+  --progress-label-size: var(--prime-sys-size-control-xl-text);
+}
+
+.label {
+  font-size: var(--progress-label-size);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.track {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--progress-track-h);
+  border: 0;
+  background: var(--prime-sys-color-surface-accentSoft);
+  border-radius: var(--prime-sys-shape-radius-round);
+  overflow: hidden;
+}
+
+.track::-webkit-progress-bar {
+  background: var(--prime-sys-color-surface-accentSoft);
+}
+
+.track::-webkit-progress-value {
+  background: var(--prime-sys-color-action-primaryBackground);
+  border-radius: var(--prime-sys-shape-radius-round);
+  transition: width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.track::-moz-progress-bar {
+  background: var(--prime-sys-color-action-primaryBackground);
+  border-radius: var(--prime-sys-shape-radius-round);
+  transition: width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}

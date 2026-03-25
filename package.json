@@ -1,0 +1,94 @@
+{
+  "name": "prime-ui-kit",
+  "version": "0.2.0",
+  "description": "React 19 UI kit: CSS Modules, design tokens, composable components (forms, overlays, navigation, tables).",
+  "keywords": [
+    "react",
+    "ui-kit",
+    "components",
+    "css-modules",
+    "design-tokens",
+    "accessibility"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esurkov1/prime-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/esurkov1/prime-ui/issues"
+  },
+  "homepage": "https://github.com/esurkov1/prime-ui#readme",
+  "files": [
+    "dist",
+    "src/styles",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "date-fns": "^4.1.0",
+    "react-day-picker": "^9.14.0",
+    "react-aria-components": "^1.16.0",
+    "@biomejs/biome": "latest",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/user-event": "latest",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5",
+    "@vitest/coverage-v8": "^4.1.0",
+    "jsdom": "latest",
+    "tsup": "latest",
+    "typescript": "^5",
+    "vite": "^7",
+    "vitest": "latest"
+  },
+  "peerDependencies": {
+    "date-fns": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-aria-components": "^1.16.0",
+    "react-day-picker": "^9.14.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "default": "./dist/components/index.js"
+    },
+    "./styles.css": "./src/styles/globals.css",
+    "./tokens.css": "./src/styles/tokens.css",
+    "./theme-light.css": "./src/styles/theme-light.css",
+    "./theme-dark.css": "./src/styles/theme-dark.css"
+  },
+  "scripts": {
+    "tokens:build": "bun run scripts/build-tokens.ts",
+    "build": "bun run tokens:build && tsup",
+    "dev": "tsup --watch",
+    "playground:dev": "vite playground --config playground/vite.config.ts",
+    "check": "biome check .",
+    "check:ci": "biome ci .",
+    "check:fix": "biome check . --write --unsafe",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "bun run check:ci && bun run typecheck && bun run test && bun run build",
+    "verify:quick": "bun run check:ci && bun run typecheck && bun run test",
+    "verify:tokens": "bun run tokens:build && git diff --exit-code -- src/styles/tokens.css src/styles/theme-light.css src/styles/theme-dark.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "type": "module",
+  "dependencies": {
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^0.577.0",
+    "react-router-dom": "^7.13.1"
+  }
+}

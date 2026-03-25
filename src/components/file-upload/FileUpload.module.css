@@ -1,0 +1,573 @@
+.root {
+  /* Размер по умолчанию — m (ярлык всегда с data-size из TS) */
+  --fu-pad: var(--prime-sys-spacing-x6);
+  --fu-stack: var(--prime-sys-spacing-x4);
+  --fu-copy-gap: var(--prime-sys-size-control-m-gap);
+  --fu-title: var(--prime-sys-size-control-m-text);
+  --fu-chip-h: var(--prime-sys-size-control-m-height);
+  --fu-chip-px: var(--prime-sys-size-control-m-buttonPaddingX);
+  --fu-chip-py: var(--prime-sys-size-control-m-buttonPaddingY);
+  --fu-chip-radius: var(--prime-sys-size-control-m-radius);
+  --fu-chip-font: var(--prime-sys-size-control-m-supportText);
+  --fu-surface-radius: var(--prime-sys-shape-radius-l);
+  --fu-maxw: var(--prime-sys-unit-22rem);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--fu-pad);
+  border: var(--prime-sys-border-width-control) dashed var(--prime-sys-color-border-subtle);
+  border-radius: var(--fu-surface-radius);
+  background: var(--prime-sys-color-surface-elevated);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.root[data-size="s"] {
+  --fu-pad: var(--prime-sys-spacing-x5);
+  --fu-stack: var(--prime-sys-spacing-x3);
+  --fu-copy-gap: var(--prime-sys-size-control-s-gap);
+  --fu-title: var(--prime-sys-size-control-s-text);
+  --fu-chip-h: var(--prime-sys-size-control-s-height);
+  --fu-chip-px: var(--prime-sys-size-control-s-buttonPaddingX);
+  --fu-chip-py: var(--prime-sys-size-control-s-buttonPaddingY);
+  --fu-chip-radius: var(--prime-sys-size-control-s-radius);
+  --fu-chip-font: var(--prime-sys-size-control-s-supportText);
+  --fu-surface-radius: var(--prime-sys-shape-radius-m);
+  --fu-maxw: var(--prime-sys-unit-18rem);
+}
+
+.root[data-size="l"] {
+  --fu-pad: var(--prime-sys-spacing-x8);
+  --fu-stack: var(--prime-sys-spacing-x5);
+  --fu-copy-gap: var(--prime-sys-size-control-l-gap);
+  --fu-title: var(--prime-sys-size-control-l-text);
+  --fu-chip-h: var(--prime-sys-size-control-l-height);
+  --fu-chip-px: var(--prime-sys-size-control-l-buttonPaddingX);
+  --fu-chip-py: var(--prime-sys-size-control-l-buttonPaddingY);
+  --fu-chip-radius: var(--prime-sys-size-control-l-radius);
+  --fu-chip-font: var(--prime-sys-size-control-l-supportText);
+  --fu-surface-radius: var(--prime-sys-shape-radius-4xl);
+  --fu-maxw: var(--prime-sys-unit-26rem);
+}
+
+.root[data-size="xl"] {
+  --fu-pad: var(--prime-sys-spacing-x10);
+  --fu-stack: var(--prime-sys-spacing-x5);
+  --fu-copy-gap: var(--prime-sys-size-control-xl-gap);
+  --fu-title: var(--prime-sys-size-control-xl-text);
+  --fu-chip-h: var(--prime-sys-size-control-xl-height);
+  --fu-chip-px: var(--prime-sys-size-control-xl-buttonPaddingX);
+  --fu-chip-py: var(--prime-sys-size-control-xl-buttonPaddingY);
+  --fu-chip-radius: var(--prime-sys-size-control-xl-radius);
+  --fu-chip-font: var(--prime-sys-size-control-xl-supportText);
+  --fu-surface-radius: var(--prime-sys-shape-radius-4xl);
+  --fu-maxw: var(--prime-sys-unit-28rem);
+}
+
+.root:hover:not([data-disabled="true"]) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  border-color: var(--prime-sys-color-border-subtle);
+  box-shadow: none;
+}
+
+.root[data-dragover="true"]:not([data-disabled="true"]) {
+  border-color: var(--prime-sys-color-border-accent);
+  background: var(--prime-sys-color-surface-accentSoft);
+  box-shadow: none;
+}
+
+.root:focus-within:not([data-disabled="true"]) {
+  border-color: var(--prime-sys-color-content-primary);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.root[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Модалки Align: сплошная граница, фон как у поля, hover «светлее» */
+.root[data-appearance="solid"] {
+  border-style: solid;
+  border-color: var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-default);
+  box-shadow: none;
+}
+
+.root[data-appearance="solid"]:hover:not([data-disabled="true"]) {
+  background: var(--prime-sys-color-surface-elevated);
+  border-color: var(--prime-sys-color-border-subtle);
+  box-shadow: none;
+}
+
+.root[data-appearance="solid"][data-dragover="true"]:not([data-disabled="true"]) {
+  border-color: var(--prime-sys-color-border-accent);
+  background: var(--prime-sys-color-surface-accentSoft);
+}
+
+.root[data-appearance="solid"]:focus-within:not([data-disabled="true"]) {
+  border-color: var(--prime-sys-color-content-primary);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.input {
+  position: absolute;
+  width: var(--prime-sys-unit-1px);
+  height: var(--prime-sys-unit-1px);
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--fu-stack);
+  max-width: var(--fu-maxw);
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--prime-sys-color-content-muted);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--fu-copy-gap);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fu-title);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-primary);
+  letter-spacing: var(--prime-sys-typography-tracking-normal);
+}
+
+.titleMuted {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+/* Чип «Browse» — та же ярусность, что контрол данного size */
+.browse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: var(--fu-chip-h);
+  padding-inline: var(--fu-chip-px);
+  padding-block: var(--fu-chip-py);
+  border-radius: var(--fu-chip-radius);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-field-bg);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  font-size: var(--fu-chip-font);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: 1.2;
+  color: var(--prime-sys-color-content-secondary);
+  pointer-events: none;
+  user-select: none;
+}
+
+.root[data-disabled="true"] .browse {
+  background: var(--prime-sys-color-surface-accentSoft);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.browseLink {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-action-primaryBackground);
+  text-decoration: underline;
+  text-underline-offset: var(--prime-sys-unit-2px);
+}
+
+.browseLink:hover {
+  color: var(--prime-sys-color-action-primaryBackgroundHover);
+}
+
+.browseLink:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
+  border-radius: var(--prime-sys-shape-radius-s);
+}
+
+/* ─── Модалки: тело без pointer-events, интерактив внутри с pointer-events: auto ─ */
+.dropBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fu-stack, var(--prime-sys-spacing-x5));
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.actionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--prime-sys-spacing-x3);
+  pointer-events: auto;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  box-sizing: border-box;
+  min-height: var(--fu-chip-h, var(--prime-sys-unit-2p5rem));
+  padding: var(--prime-sys-unit-0p375rem) var(--prime-sys-unit-1rem) var(--prime-sys-unit-0p375rem)
+    var(--prime-sys-unit-0p375rem);
+  margin: 0;
+  border: none;
+  border-radius: var(--prime-sys-shape-radius-round);
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition:
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.chip:hover {
+  background: var(--prime-sys-color-surface-accentSoft);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.chip:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
+}
+
+.chipLabel {
+  font-size: var(--fu-chip-font, var(--prime-sys-size-control-m-text));
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+/* ─── Карточка файла (списки загрузки) — ring inset как Align `ring-1 ring-inset` ─ */
+.item {
+  --fu-item-pad-block: var(--prime-sys-spacing-x4);
+  --fu-item-pad-inline: var(--prime-sys-spacing-x4);
+  --fu-item-pad-inline-start: var(--fu-item-pad-inline);
+  --fu-item-col-gap: var(--prime-sys-spacing-x4);
+  --fu-item-row-gap: var(--prime-sys-spacing-x3);
+  --fu-item-main-gap: var(--prime-sys-spacing-x1);
+  --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
+  --fu-item-stack-gap: var(--prime-sys-spacing-x2);
+  --fu-item-name-font: var(--prime-sys-typography-control-m);
+  --fu-item-meta-font: var(--prime-sys-typography-support-2xs);
+  --fu-item-badge: var(--prime-sys-unit-2p5rem);
+  --fu-item-badge-radius: var(--prime-sys-shape-radius-m);
+  --fu-item-progress-h: var(--prime-sys-unit-0p5rem);
+  --fu-item-status-icon: var(--prime-sys-size-control-m-icon);
+  --fu-item-radius: var(--prime-sys-shape-radius-4xl);
+  --fu-item-maxw: var(--prime-sys-unit-25rem);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--fu-item-col-gap);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--fu-item-maxw);
+  padding-block: var(--fu-item-pad-block);
+  padding-inline: var(--fu-item-pad-inline);
+  padding-inline-start: var(--fu-item-pad-inline-start);
+  border: none;
+  border-radius: var(--fu-item-radius);
+  background: var(--prime-sys-color-surface-elevated);
+  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
+}
+
+.item[data-size="s"] {
+  --fu-item-pad-block: var(--prime-sys-spacing-x3);
+  --fu-item-pad-inline: var(--prime-sys-spacing-x3);
+  --fu-item-pad-inline-start: var(--fu-item-pad-inline);
+  --fu-item-col-gap: var(--prime-sys-spacing-x3);
+  --fu-item-row-gap: var(--prime-sys-spacing-x2);
+  --fu-item-main-gap: var(--prime-sys-spacing-x1);
+  --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
+  --fu-item-stack-gap: var(--prime-sys-spacing-x2);
+  --fu-item-name-font: var(--prime-sys-size-control-s-text);
+  --fu-item-meta-font: var(--prime-sys-size-control-s-supportText);
+  --fu-item-badge: var(--prime-sys-unit-2rem);
+  --fu-item-badge-radius: var(--prime-sys-shape-radius-s);
+  --fu-item-progress-h: var(--prime-sys-unit-0p375rem);
+  --fu-item-status-icon: var(--prime-sys-size-control-s-icon);
+  --fu-item-radius: var(--prime-sys-shape-radius-l);
+  --fu-item-maxw: var(--prime-sys-unit-22rem);
+}
+
+.item[data-size="l"] {
+  --fu-item-pad-block: var(--prime-sys-spacing-x4);
+  --fu-item-pad-inline: var(--prime-sys-spacing-x4);
+  --fu-item-pad-inline-start: var(--fu-item-pad-inline);
+  --fu-item-col-gap: var(--prime-sys-spacing-x4);
+  --fu-item-row-gap: var(--prime-sys-spacing-x2);
+  --fu-item-main-gap: var(--prime-sys-spacing-x1);
+  --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
+  --fu-item-stack-gap: var(--prime-sys-spacing-x2);
+  --fu-item-name-font: var(--prime-sys-size-control-l-text);
+  --fu-item-meta-font: var(--prime-sys-size-control-l-supportText);
+  --fu-item-badge: var(--prime-sys-unit-2p75rem);
+  --fu-item-badge-radius: var(--prime-sys-shape-radius-m);
+  --fu-item-progress-h: var(--prime-sys-unit-0p5rem);
+  --fu-item-status-icon: var(--prime-sys-size-control-l-icon);
+  --fu-item-radius: var(--prime-sys-shape-radius-4xl);
+  --fu-item-maxw: var(--prime-sys-unit-28rem);
+}
+
+.item[data-size="xl"] {
+  --fu-item-pad-block: var(--prime-sys-spacing-x5);
+  --fu-item-pad-inline: var(--prime-sys-spacing-x5);
+  --fu-item-pad-inline-start: var(--fu-item-pad-inline);
+  --fu-item-col-gap: var(--prime-sys-spacing-x4);
+  --fu-item-row-gap: var(--prime-sys-spacing-x3);
+  --fu-item-main-gap: var(--prime-sys-spacing-x1);
+  --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
+  --fu-item-stack-gap: var(--prime-sys-spacing-x2);
+  --fu-item-name-font: var(--prime-sys-size-control-xl-text);
+  --fu-item-meta-font: var(--prime-sys-size-control-xl-supportText);
+  --fu-item-badge: var(--prime-sys-unit-3rem);
+  --fu-item-badge-radius: var(--prime-sys-shape-radius-l);
+  --fu-item-progress-h: var(--prime-sys-unit-0p5625rem);
+  --fu-item-status-icon: var(--prime-sys-size-control-xl-icon);
+  --fu-item-radius: var(--prime-sys-shape-radius-4xl);
+  --fu-item-maxw: var(--prime-sys-unit-30rem);
+}
+
+.item[data-variant="error"] {
+  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-danger);
+}
+
+.itemRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fu-item-row-gap);
+}
+
+.itemMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fu-item-main-gap);
+}
+
+.itemName {
+  font-size: var(--fu-item-name-font);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.itemNameRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+}
+
+.itemInlineStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x1);
+  flex-shrink: 0;
+  font-size: var(--fu-item-meta-font);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+}
+
+.itemInlineStatus strong {
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.itemMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x1);
+  font-size: var(--fu-item-meta-font);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.itemMeta strong {
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.itemMetaSep {
+  color: var(--prime-sys-color-content-secondary);
+  user-select: none;
+}
+
+.itemStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--fu-item-stack-gap);
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fu-item-text-group-gap);
+  width: 100%;
+  min-width: 0;
+}
+
+.itemTryAgain {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  font-size: var(--fu-item-meta-font);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  text-decoration: underline;
+  text-underline-offset: var(--prime-sys-unit-2px);
+  color: var(--prime-sys-color-content-danger);
+}
+
+.itemTryAgain:hover {
+  color: var(--prime-sys-color-action-errorBackgroundHover);
+}
+
+.itemTryAgain:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
+  border-radius: var(--prime-sys-shape-radius-s);
+}
+
+.itemActions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+
+.itemFooter {
+  width: 100%;
+}
+
+.itemProgress {
+  width: 100%;
+}
+
+.itemProgress > * {
+  height: var(--fu-item-progress-h, var(--prime-sys-unit-0p5rem));
+}
+
+.formatBadge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--fu-item-badge, var(--prime-sys-unit-2p5rem));
+  height: var(--fu-item-badge, var(--prime-sys-unit-2p5rem));
+  min-width: var(--fu-item-badge, var(--prime-sys-unit-2p5rem));
+  padding-inline: 0;
+  border-radius: var(--fu-item-badge-radius, var(--prime-sys-shape-radius-m));
+  font-size: var(--fu-item-meta-font, var(--prime-sys-typography-support-2xs));
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.formatBadge[data-color="gray"] {
+  background: var(--prime-sys-color-surface-accentSoft);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.formatBadge[data-color="red"] {
+  background: var(--prime-sys-color-status-error-background);
+  color: var(--prime-sys-color-status-error-foreground);
+}
+
+.formatBadge[data-color="blue"] {
+  background: var(--prime-sys-color-status-information-background);
+  color: var(--prime-sys-color-status-information-foreground);
+}
+
+.formatBadge[data-color="green"] {
+  background: var(--prime-sys-color-status-success-background);
+  color: var(--prime-sys-color-status-success-foreground);
+}
+
+.formatBadge[data-color="orange"] {
+  background: var(--prime-sys-color-status-warning-background);
+  color: var(--prime-sys-color-status-warning-foreground);
+}
+
+.formatBadge[data-color="purple"] {
+  background: var(--prime-sys-color-status-feature-background);
+  color: var(--prime-sys-color-status-feature-foreground);
+}
+
+.formatBadge[data-color="sky"] {
+  background: var(--prime-sys-color-status-verified-background);
+  color: var(--prime-sys-color-status-verified-foreground);
+}
+
+.formatBadge[data-color="yellow"] {
+  background: var(--prime-sys-color-status-away-background);
+  color: var(--prime-sys-color-status-away-foreground);
+}
+
+/* Иконки статуса в мета-строке — размер с `Item` (`data-size`) */
+.itemStatusIcon {
+  flex-shrink: 0;
+  width: var(--fu-item-status-icon);
+  height: var(--fu-item-status-icon);
+}
+
+.itemStatusIcon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Для иконки «загрузка» в мета-строке карточки файла */
+.statusIconSpin {
+  animation: fileUploadSpin 0.8s linear infinite;
+}
+
+@keyframes fileUploadSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

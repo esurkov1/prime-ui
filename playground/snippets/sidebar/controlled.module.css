@@ -1,0 +1,29 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x2);
+  align-items: center;
+}
+
+.stage {
+  box-sizing: border-box;
+  height: 22rem;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--prime-sys-shape-radius-m);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  padding: var(--prime-sys-spacing-x2);
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-surface-raised) 96%,
+    var(--prime-sys-color-surface-default)
+  );
+}

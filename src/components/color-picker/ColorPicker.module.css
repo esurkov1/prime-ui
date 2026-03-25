@@ -1,0 +1,351 @@
+/* —— Размеры слайдера как у Slider (control-m) —— */
+.slider[data-size="m"] {
+  --slider-root-gap: var(--prime-sys-spacing-x3);
+  --slider-track-h: var(--prime-sys-spacing-xs);
+  --slider-thumb-size: var(--prime-sys-size-control-m-icon);
+  --slider-label-size: var(--prime-sys-size-control-m-text);
+}
+
+/* ---- Slider (hue / alpha) — внешний вид как у китового Slider ---- */
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slider-root-gap);
+  width: 100%;
+}
+
+.slider + .slider {
+  margin-block-start: var(--prime-sys-spacing-x2);
+}
+
+.sliderHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+}
+
+.sliderLabel {
+  font-size: var(--slider-label-size);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.sliderValue {
+  font-size: var(--prime-sys-size-control-s-supportText);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-sys-color-content-muted);
+}
+
+.sliderTrack {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--slider-track-h);
+  border-radius: var(--prime-sys-shape-radius-round);
+  outline: none;
+  cursor: pointer;
+}
+
+.sliderTrack:focus-visible {
+  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-spacing-xs);
+}
+
+.slider[data-disabled] .sliderTrack {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Thumb на слайдере: тот же вид, что у маркера области (.thumbArea) ---- */
+.thumb {
+  z-index: 2;
+  box-sizing: border-box;
+  width: var(--slider-thumb-size);
+  height: var(--slider-thumb-size);
+  border-radius: var(--prime-sys-shape-radius-round);
+  border: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-border-inverse);
+  box-shadow:
+    0 0 0 var(--prime-sys-border-width-control) var(--prime-sys-color-border-strong),
+    var(--prime-sys-elevation-shadow-surface);
+  cursor: pointer;
+  transition: box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.thumb[data-hovered]:not([data-disabled]) {
+  box-shadow:
+    0 0 0 var(--prime-sys-border-width-control) var(--prime-sys-color-border-strong),
+    var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.thumb[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* RAC задаёт только left + translate(-50%,-50%); без top вертикаль не по центру трека */
+.slider[data-orientation="horizontal"] .thumb {
+  top: 50%;
+}
+
+/* ---- Область выбора: маркер с белым кольцом (как в референсе) ---- */
+.area {
+  --area-thumb-size: var(--prime-sys-size-control-m-icon);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--prime-sys-unit-14p5rem);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  background-clip: padding-box;
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  outline: none;
+}
+
+.area:focus-visible {
+  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-spacing-xs);
+}
+
+.area[data-disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.thumbArea {
+  z-index: 2;
+  box-sizing: border-box;
+  width: var(--area-thumb-size);
+  height: var(--area-thumb-size);
+  border-radius: var(--prime-sys-shape-radius-round);
+  border: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-border-inverse);
+  box-shadow:
+    0 0 0 var(--prime-sys-border-width-control) var(--prime-sys-color-border-strong),
+    var(--prime-sys-elevation-shadow-surface);
+  cursor: pointer;
+  transition: box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.thumbArea[data-hovered]:not([data-disabled]) {
+  box-shadow:
+    0 0 0 var(--prime-sys-border-width-control) var(--prime-sys-color-border-strong),
+    var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.thumbArea[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Селектор формата (стандартный Select на всю ширину) ---- */
+.formatSelectWrap {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+}
+
+/*
+ * ColorPicker часто используется внутри Popover (z-index: 1000).
+ * Select внутри ColorPicker использует стандартный dropdown (1100), который выше Popover.
+ * Дополнительное смещение не требуется.
+ */
+.formatSelectContent {
+  z-index: var(--prime-sys-elevation-zIndex-dropdown);
+}
+
+/* ---- Полоса: пипетка + сегменты каналов ---- */
+.channelStrip {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: var(--prime-sys-size-control-m-height);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  background: var(--prime-sys-color-field-bg);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  overflow: hidden;
+}
+
+.channelStrip > * + * {
+  border-inline-start: var(--prime-sys-border-width-control) solid
+    var(--prime-sys-color-border-subtle);
+}
+
+.channelStripLead {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+}
+
+.channelStrip .channelStripEyedropperBtn.channelStripEyedropperBtn {
+  min-width: var(--prime-sys-size-control-m-height);
+  width: var(--prime-sys-size-control-m-height);
+  height: auto;
+  min-height: 100%;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.channelStrip .channelStripEyedropperBtn.channelStripEyedropperBtn:hover:not(:disabled) {
+  box-shadow: none;
+}
+
+.channelCell {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-sys-spacing-x1);
+  min-width: 0;
+  padding-inline: var(--prime-sys-spacing-x2);
+}
+
+.channelCellHex {
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+}
+
+.channelInput {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding-block: var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-size-control-s-text);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-field-text);
+  text-align: center;
+  outline: none;
+}
+
+.channelCellHex .channelInput {
+  text-align: start;
+}
+
+.channelInput:focus-visible {
+  outline: none;
+}
+
+.channelSuffix {
+  flex-shrink: 0;
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-muted);
+}
+
+/* ---- Swatches ---- */
+.swatchPicker {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+  justify-content: flex-start;
+  overflow-x: auto;
+  padding-block-end: var(--prime-sys-spacing-x1);
+  scrollbar-width: thin;
+}
+
+.swatchItem {
+  flex-shrink: 0;
+  cursor: pointer;
+  padding: var(--prime-sys-spacing-x1);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  outline: none;
+  transition: background-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.swatchItem[data-hovered]:not([data-disabled]) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.swatchItem[data-focus-visible] {
+  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-spacing-xs);
+}
+
+.triggerSwatch {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: var(--prime-sys-unit-1rem);
+  height: var(--prime-sys-unit-1rem);
+  border-radius: var(--prime-sys-shape-radius-s);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.triggerSwatchSvg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.swatch {
+  box-sizing: border-box;
+  width: var(--prime-sys-size-control-l-icon);
+  height: var(--prime-sys-size-control-l-icon);
+  border-radius: var(--prime-sys-shape-radius-round);
+  border: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-border-inverse);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.swatchItem[data-selected] .swatch {
+  box-shadow: 0 0 0 var(--prime-sys-border-width-focusRing)
+    var(--prime-sys-color-action-primaryBackground);
+}
+
+/* ---- RAC ColorField (опционально) ---- */
+.field :global(.react-aria-Group) {
+  display: flex;
+  align-items: center;
+  min-height: var(--prime-sys-size-control-m-height);
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+  padding-block: var(--prime-sys-size-control-m-inputPaddingY);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  background: var(--prime-sys-color-field-bg);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  transition:
+    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.field :global(.react-aria-Group):focus-within {
+  border-color: var(--prime-sys-color-field-borderFocus);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.field :global(.react-aria-Input) {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: var(--prime-sys-size-control-m-text);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-sys-color-field-text);
+  outline: none;
+}
+
+.field :global(.react-aria-Label) {
+  margin-inline-end: var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-secondary);
+  white-space: nowrap;
+}
+
+/* ---- Пипетка: отдельная квадратная кнопка (вне полосы) ---- */
+.eyeDropperSquare {
+  flex-shrink: 0;
+  padding: 0;
+  min-width: var(--prime-sys-size-control-m-height);
+}

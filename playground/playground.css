@@ -1,0 +1,740 @@
+@import "../src/styles/globals.css";
+
+body {
+  min-height: 100vh;
+  background: var(--prime-sys-color-surface-default);
+  transition: background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+#root {
+  min-height: 100vh;
+  background: var(--prime-sys-color-surface-default);
+  transition: background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+/* Корень `PageShell`: колонка на всю высоту без полей; колонки скролла без внешнего padding корня. */
+div.playgroundShellRoot {
+  box-sizing: border-box;
+  flex-direction: column;
+  padding: 0;
+  gap: 0;
+  background: var(--prime-sys-color-surface-default);
+}
+
+/* Ряд на всю высоту: у контентной страницы (main) полей нет — только зазор до колонки Nav. */
+.playgroundShellInset {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  align-items: stretch;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+/* `PageShell.NavArea`: без видимой обёртки — только поле до края вьюпорта; flex+gap между барами задаёт `Sidebar` `.navArea`. */
+.playgroundShellNavOuter {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  margin-block: var(--prime-sys-spacing-x2);
+  margin-inline-start: var(--prime-sys-spacing-x2);
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* Контент без подложки/карточки — поля только внутри скроллящейся колонки. */
+main#playground-main.playgroundMain {
+  scroll-behavior: auto;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-block: var(--prime-sys-spacing-x6);
+  padding-inline: var(--prime-sys-spacing-x6);
+}
+
+.playgroundDocPage {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.playgroundContextLogo {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--prime-sys-spacing-x1);
+  width: var(--prime-sys-unit-2rem);
+  height: var(--prime-sys-unit-2rem);
+}
+
+.playgroundContextLogo > span {
+  display: block;
+  border-radius: var(--prime-sys-shape-radius-xs);
+  background: var(--prime-sys-color-action-primaryForeground);
+}
+
+/* Шкала: 700 (hover, тёмный акцент) → 600 (primary) → 500 → 300 → 100 → 50 (тинты). */
+
+:root[data-theme-preset="obsidian"],
+[data-theme-preset="obsidian"] {
+  /* Фиолетовый акцент интерфейса Obsidian, не цвет панелей */
+  --prime-preset-accent-700: #5b21b6;
+  --prime-preset-accent-600: #7c3aed;
+  --prime-preset-accent-500: #8b5cf6;
+  --prime-preset-accent-300: #c4b5fd;
+  --prime-preset-accent-100: #ede9fe;
+  --prime-preset-accent-50: #f5f3ff;
+}
+
+:root[data-theme-preset="vercel-blue"],
+[data-theme-preset="vercel-blue"] {
+  --prime-preset-accent-700: #0050b3;
+  --prime-preset-accent-600: #0070f3;
+  --prime-preset-accent-500: #38a0ff;
+  --prime-preset-accent-300: #79b8ff;
+  --prime-preset-accent-100: #d1e9ff;
+  --prime-preset-accent-50: #ecf6ff;
+}
+
+:root[data-theme-preset="linear-indigo"],
+[data-theme-preset="linear-indigo"] {
+  --prime-preset-accent-700: #434cb5;
+  --prime-preset-accent-600: #5e6ad2;
+  --prime-preset-accent-500: #7a85e0;
+  --prime-preset-accent-300: #b4bbf0;
+  --prime-preset-accent-100: #e8eaf9;
+  --prime-preset-accent-50: #f3f4fd;
+}
+
+:root[data-theme-preset="stripe-violet"],
+[data-theme-preset="stripe-violet"] {
+  --prime-preset-accent-700: #5746e6;
+  --prime-preset-accent-600: #635bff;
+  --prime-preset-accent-500: #816dff;
+  --prime-preset-accent-300: #b8aefe;
+  --prime-preset-accent-100: #e9e7ff;
+  --prime-preset-accent-50: #f4f3ff;
+}
+
+:root[data-theme-preset="github-accent"],
+[data-theme-preset="github-accent"] {
+  --prime-preset-accent-700: #0550ae;
+  --prime-preset-accent-600: #0969da;
+  --prime-preset-accent-500: #218bff;
+  --prime-preset-accent-300: #79c0ff;
+  --prime-preset-accent-100: #ddf4ff;
+  --prime-preset-accent-50: #eff8ff;
+}
+
+:root[data-theme-preset="shopify-emerald"],
+[data-theme-preset="shopify-emerald"] {
+  --prime-preset-accent-700: #005e46;
+  --prime-preset-accent-600: #008060;
+  --prime-preset-accent-500: #00a37a;
+  --prime-preset-accent-300: #45d4b4;
+  --prime-preset-accent-100: #cdfaef;
+  --prime-preset-accent-50: #e6fcf5;
+}
+
+:root[data-theme-preset="slack-plum"],
+[data-theme-preset="slack-plum"] {
+  /* Aubergine #4A154B */
+  --prime-preset-accent-700: #3f0e42;
+  --prime-preset-accent-600: #4a154b;
+  --prime-preset-accent-500: #611f69;
+  --prime-preset-accent-300: #c9a0cf;
+  --prime-preset-accent-100: #f4e8f6;
+  --prime-preset-accent-50: #faf5fb;
+}
+
+:root[data-theme-preset="figma-sunset"],
+[data-theme-preset="figma-sunset"] {
+  --prime-preset-accent-700: #cc3b12;
+  --prime-preset-accent-600: #f24e1e;
+  --prime-preset-accent-500: #ff6b42;
+  --prime-preset-accent-300: #ffb39a;
+  --prime-preset-accent-100: #ffe8e0;
+  --prime-preset-accent-50: #fff3ef;
+}
+
+:root[data-theme-preset="spotify-green"],
+[data-theme-preset="spotify-green"] {
+  --prime-preset-accent-700: #15863d;
+  --prime-preset-accent-600: #1db954;
+  --prime-preset-accent-500: #1ed760;
+  --prime-preset-accent-300: #8eedaa;
+  --prime-preset-accent-100: #d4f4de;
+  --prime-preset-accent-50: #e8fcf0;
+}
+
+:root[data-theme-preset="monaco-cyan"],
+[data-theme-preset="monaco-cyan"] {
+  /* VS Code / Monaco: сине-бирюзовый, не чистый cyan */
+  --prime-preset-accent-700: #0467b8;
+  --prime-preset-accent-600: #0b84d8;
+  --prime-preset-accent-500: #2fb0ff;
+  --prime-preset-accent-300: #7dd3fc;
+  --prime-preset-accent-100: #cff4fe;
+  --prime-preset-accent-50: #e6fbff;
+}
+
+/* Приглушённые премиальные акценты: лёгкий оттенок (slate / sage / mauve и т.д.), без «кислотных» брендов.
+   Ориентиры: Radix Colors (slate, sage, mauve) и спокойные editorial / finance UI. */
+
+:root[data-theme-preset="slate-steel"],
+[data-theme-preset="slate-steel"] {
+  /* Холодный стальной сине-серый */
+  --prime-preset-accent-700: #3f4f5f;
+  --prime-preset-accent-600: #52606f;
+  --prime-preset-accent-500: #6b7c8c;
+  --prime-preset-accent-300: #a3b0bc;
+  --prime-preset-accent-100: #e4e9ed;
+  --prime-preset-accent-50: #f1f3f6;
+}
+
+:root[data-theme-preset="sage-studio"],
+[data-theme-preset="sage-studio"] {
+  /* Приглушённый шалфей, едва зелёный */
+  --prime-preset-accent-700: #3d4f42;
+  --prime-preset-accent-600: #4d6352;
+  --prime-preset-accent-500: #637a6a;
+  --prime-preset-accent-300: #a3b5a8;
+  --prime-preset-accent-100: #e6ebe7;
+  --prime-preset-accent-50: #f2f4f2;
+}
+
+:root[data-theme-preset="mauve-dusk"],
+[data-theme-preset="mauve-dusk"] {
+  /* Пыльный mauve в сером, без яркой фиолетовости */
+  --prime-preset-accent-700: #4a4352;
+  --prime-preset-accent-600: #5c5466;
+  --prime-preset-accent-500: #746b7f;
+  --prime-preset-accent-300: #b0a8b8;
+  --prime-preset-accent-100: #ebe8ef;
+  --prime-preset-accent-50: #f5f3f6;
+}
+
+:root[data-theme-preset="petrol-quiet"],
+[data-theme-preset="petrol-quiet"] {
+  /* Петроль: сине-зелёный серый */
+  --prime-preset-accent-700: #2f4a50;
+  --prime-preset-accent-600: #3d5c64;
+  --prime-preset-accent-500: #52757e;
+  --prime-preset-accent-300: #93aeb5;
+  --prime-preset-accent-100: #dde7ea;
+  --prime-preset-accent-50: #eef3f4;
+}
+
+:root[data-theme-preset="taupe-umber"],
+[data-theme-preset="taupe-umber"] {
+  /* Тёплый тауп / умбра, не чистый нейтраль */
+  --prime-preset-accent-700: #4a433c;
+  --prime-preset-accent-600: #5d554c;
+  --prime-preset-accent-500: #756a5f;
+  --prime-preset-accent-300: #b5aaa0;
+  --prime-preset-accent-100: #ebe6e1;
+  --prime-preset-accent-50: #f5f2ef;
+}
+
+/* Ещё строже: luxury / editorial (anthracite, ink, champagne, cordovan, patina и т.д.). */
+
+:root[data-theme-preset="anthracite-cool"],
+[data-theme-preset="anthracite-cool"] {
+  /* Антрацит / gunmetal, холодный */
+  --prime-preset-accent-700: #363b42;
+  --prime-preset-accent-600: #454b54;
+  --prime-preset-accent-500: #5a6270;
+  --prime-preset-accent-300: #8b93a3;
+  --prime-preset-accent-100: #e8eaee;
+  --prime-preset-accent-50: #f3f4f6;
+}
+
+:root[data-theme-preset="ink-grape"],
+[data-theme-preset="ink-grape"] {
+  /* Глубокий «чернильный» с лёгким виноградом */
+  --prime-preset-accent-700: #3d2f45;
+  --prime-preset-accent-600: #4c3c56;
+  --prime-preset-accent-500: #655875;
+  --prime-preset-accent-300: #a898b5;
+  --prime-preset-accent-100: #ebe6f0;
+  --prime-preset-accent-50: #f4f2f7;
+}
+
+:root[data-theme-preset="bronze-champagne"],
+[data-theme-preset="bronze-champagne"] {
+  /* Тёмный шампань / бронза, тёплый премиум */
+  --prime-preset-accent-700: #5c4a38;
+  --prime-preset-accent-600: #6f5b46;
+  --prime-preset-accent-500: #8a7359;
+  --prime-preset-accent-300: #c4b5a3;
+  --prime-preset-accent-100: #efe9e2;
+  --prime-preset-accent-50: #f7f4f0;
+}
+
+:root[data-theme-preset="navy-fog"],
+[data-theme-preset="navy-fog"] {
+  /* Приглушённый полуночный navy */
+  --prime-preset-accent-700: #2c3a4a;
+  --prime-preset-accent-600: #3a4a5e;
+  --prime-preset-accent-500: #4f6378;
+  --prime-preset-accent-300: #8e9eb0;
+  --prime-preset-accent-100: #e2e7ed;
+  --prime-preset-accent-50: #f0f2f6;
+}
+
+:root[data-theme-preset="iris-ash"],
+[data-theme-preset="iris-ash"] {
+  /* Холодный серо-ирисовый, editorial */
+  --prime-preset-accent-700: #444654;
+  --prime-preset-accent-600: #56586a;
+  --prime-preset-accent-500: #6f7288;
+  --prime-preset-accent-300: #a8aabf;
+  --prime-preset-accent-100: #eaeaef;
+  --prime-preset-accent-50: #f3f3f6;
+}
+
+:root[data-theme-preset="wine-leather"],
+[data-theme-preset="wine-leather"] {
+  /* Cordovan: приглушённое вино / кожа */
+  --prime-preset-accent-700: #4a2f35;
+  --prime-preset-accent-600: #5d3b42;
+  --prime-preset-accent-500: #755058;
+  --prime-preset-accent-300: #b89aa0;
+  --prime-preset-accent-100: #efe8ea;
+  --prime-preset-accent-50: #f7f3f4;
+}
+
+:root[data-theme-preset="oxide-teal"],
+[data-theme-preset="oxide-teal"] {
+  /* Патина: окисленный приглушённый teal */
+  --prime-preset-accent-700: #2d4a4a;
+  --prime-preset-accent-600: #3a5c5c;
+  --prime-preset-accent-500: #4d7373;
+  --prime-preset-accent-300: #8eb0b0;
+  --prime-preset-accent-100: #dde8e8;
+  --prime-preset-accent-50: #eef4f4;
+}
+
+:root[data-theme-preset="pearl-stone"],
+[data-theme-preset="pearl-stone"] {
+  /* Известняк: тёплый серый камень */
+  --prime-preset-accent-700: #4a4a45;
+  --prime-preset-accent-600: #5c5c56;
+  --prime-preset-accent-500: #75756d;
+  --prime-preset-accent-300: #b5b5ac;
+  --prime-preset-accent-100: #ebebe8;
+  --prime-preset-accent-50: #f5f5f3;
+}
+
+:root[data-theme-preset="mist-indigo"],
+[data-theme-preset="mist-indigo"] {
+  /* Индиго в дымке, почти серый */
+  --prime-preset-accent-700: #383c4d;
+  --prime-preset-accent-600: #474c60;
+  --prime-preset-accent-500: #5d647a;
+  --prime-preset-accent-300: #9aa1b5;
+  --prime-preset-accent-100: #e8eaf0;
+  --prime-preset-accent-50: #f2f3f7;
+}
+
+:root[data-theme-preset="cedar-moss"],
+[data-theme-preset="cedar-moss"] {
+  /* Тёмный мох / кедр, не яркий зелёный */
+  --prime-preset-accent-700: #3a4538;
+  --prime-preset-accent-600: #4a5746;
+  --prime-preset-accent-500: #5f6f5b;
+  --prime-preset-accent-300: #9daa96;
+  --prime-preset-accent-100: #e6eae3;
+  --prime-preset-accent-50: #f2f4ef;
+}
+
+:root[data-theme-preset],
+[data-theme-preset] {
+  --prime-sys-color-action-primaryBackground: var(--prime-preset-accent-600);
+  --prime-sys-color-action-primaryBackgroundHover: var(--prime-preset-accent-700);
+  --prime-sys-color-action-primaryForeground: var(--prime-ref-color-white);
+  --prime-sys-color-action-primarySoftBackground: color-mix(
+    in srgb,
+    var(--prime-preset-accent-600) 18%,
+    transparent
+  );
+  --prime-sys-color-action-primarySoftForeground: var(--prime-preset-accent-700);
+  --prime-sys-color-focus-ring: var(--prime-preset-accent-600);
+  --prime-sys-color-field-borderFocus: var(--prime-preset-accent-600);
+  --prime-sys-color-border-accent: var(--prime-preset-accent-500);
+  --prime-sys-elevation-shadow-primaryFocus: 0 0 0 2px
+    color-mix(in srgb, var(--prime-preset-accent-500) 45%, transparent);
+}
+
+:root[data-theme="light"][data-theme-preset],
+[data-theme="light"][data-theme-preset] {
+  --prime-sys-color-surface-default: color-mix(in srgb, #ffffff 95%, var(--prime-preset-accent-50));
+  --prime-sys-color-surface-raised: color-mix(in srgb, #ffffff 88%, var(--prime-preset-accent-50));
+  --prime-sys-color-surface-elevated: #ffffff;
+  --prime-sys-color-surface-accentSoft: color-mix(
+    in srgb,
+    var(--prime-preset-accent-100) 68%,
+    #ffffff
+  );
+  --prime-sys-color-content-primary: color-mix(
+    in srgb,
+    #111827 92%,
+    var(--prime-preset-accent-700)
+  );
+  --prime-sys-color-content-secondary: color-mix(
+    in srgb,
+    #4b5563 84%,
+    var(--prime-preset-accent-700)
+  );
+  --prime-sys-color-content-muted: color-mix(in srgb, #6b7280 84%, var(--prime-preset-accent-600));
+  --prime-sys-color-content-accent: var(--prime-preset-accent-700);
+  --prime-sys-color-border-subtle: color-mix(in srgb, #e5e7eb 82%, var(--prime-preset-accent-100));
+  --prime-sys-color-border-strong: color-mix(in srgb, #d1d5db 72%, var(--prime-preset-accent-300));
+  --prime-sys-color-field-bg: #ffffff;
+  --prime-sys-color-field-border: color-mix(in srgb, #d1d5db 76%, var(--prime-preset-accent-100));
+  --prime-sys-color-field-borderHover: color-mix(
+    in srgb,
+    #9ca3af 72%,
+    var(--prime-preset-accent-300)
+  );
+  --prime-sys-color-field-placeholder: color-mix(
+    in srgb,
+    #9ca3af 80%,
+    var(--prime-preset-accent-500)
+  );
+  --prime-sys-color-action-neutralBackground: color-mix(
+    in srgb,
+    #f9fafb 88%,
+    var(--prime-preset-accent-50)
+  );
+  --prime-sys-color-action-neutralBackgroundHover: color-mix(
+    in srgb,
+    #f3f4f6 76%,
+    var(--prime-preset-accent-100)
+  );
+}
+
+:root[data-theme="dark"][data-theme-preset],
+[data-theme="dark"][data-theme-preset] {
+  --prime-sys-color-surface-default: color-mix(
+    in srgb,
+    #030712 92%,
+    var(--prime-preset-accent-700)
+  );
+  --prime-sys-color-surface-raised: color-mix(in srgb, #0f172a 88%, var(--prime-preset-accent-700));
+  --prime-sys-color-surface-elevated: color-mix(
+    in srgb,
+    #111827 84%,
+    var(--prime-preset-accent-700)
+  );
+  --prime-sys-color-surface-accentSoft: color-mix(
+    in srgb,
+    var(--prime-preset-accent-600) 26%,
+    #030712
+  );
+  --prime-sys-color-content-primary: color-mix(
+    in srgb,
+    #f9fafb 94%,
+    var(--prime-preset-accent-100)
+  );
+  --prime-sys-color-content-secondary: color-mix(
+    in srgb,
+    #cbd5e1 88%,
+    var(--prime-preset-accent-100)
+  );
+  --prime-sys-color-content-muted: color-mix(in srgb, #94a3b8 84%, var(--prime-preset-accent-300));
+  --prime-sys-color-content-accent: var(--prime-preset-accent-300);
+  --prime-sys-color-border-subtle: color-mix(in srgb, #374151 78%, var(--prime-preset-accent-700));
+  --prime-sys-color-border-strong: color-mix(in srgb, #475569 72%, var(--prime-preset-accent-600));
+  --prime-sys-color-field-bg: color-mix(in srgb, #0f172a 86%, var(--prime-preset-accent-700));
+  --prime-sys-color-field-border: color-mix(in srgb, #475569 72%, var(--prime-preset-accent-700));
+  --prime-sys-color-field-borderHover: color-mix(
+    in srgb,
+    #64748b 68%,
+    var(--prime-preset-accent-600)
+  );
+  --prime-sys-color-field-placeholder: color-mix(
+    in srgb,
+    #94a3b8 76%,
+    var(--prime-preset-accent-300)
+  );
+  --prime-sys-color-action-neutralBackground: color-mix(
+    in srgb,
+    #111827 84%,
+    var(--prime-preset-accent-700)
+  );
+  --prime-sys-color-action-neutralBackgroundHover: color-mix(
+    in srgb,
+    #1f2937 74%,
+    var(--prime-preset-accent-600)
+  );
+  --prime-sys-color-action-primarySoftForeground: var(--prime-preset-accent-300);
+}
+
+h3 {
+  color: var(--prime-sys-color-content-primary);
+}
+
+.demoExamples {
+  display: grid;
+  gap: var(--prime-sys-spacing-5xl);
+}
+
+.demoBlock {
+  display: grid;
+  gap: var(--prime-sys-spacing-x4);
+  justify-items: stretch;
+  width: 100%;
+}
+
+.demoBlock > h4 {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-m);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  color: var(--prime-sys-color-content-primary);
+  line-height: var(--prime-sys-typography-lineHeightScale-m);
+}
+
+.demoBlock > h5 {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  color: var(--prime-sys-color-content-primary);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+}
+
+.demoBlock > :not(h4):not(h5):not(.demoBlockDescription) {
+  justify-self: stretch;
+  width: 100%;
+  max-width: 100%;
+}
+
+.demoBlockDescription {
+  margin: 0;
+  max-width: 48rem;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.codeBlockSnippetWrap {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(100%, 42rem);
+  margin-inline: auto;
+}
+
+/* Длинная строка в CodeBlock: пре выходит за колонку, родитель даёт overflow-x. */
+.codeBlockFullBleed {
+  box-sizing: border-box;
+  display: block;
+  width: max-content;
+  min-width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-m);
+  justify-content: center;
+}
+
+/* Размеры в playground: по одному варианту на строку (вертикальный столбец). */
+.sizesStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-sys-spacing-m);
+  width: 100%;
+}
+
+.rowAlignCenter {
+  align-items: center;
+}
+
+.rowAlignStart {
+  align-items: flex-start;
+}
+
+.rowAlignStretch {
+  align-items: stretch;
+}
+
+.row.rowGapTight {
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.row.rowGapMedium {
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.row.rowGapKbd {
+  gap: var(--prime-sys-spacing-x1);
+}
+
+.previewCaption.previewCaptionTopTight {
+  margin-top: var(--prime-sys-spacing-s);
+}
+
+.previewCaption.previewCaptionTopBase {
+  margin-top: var(--prime-sys-spacing-m);
+}
+
+.previewCaption.previewCaptionTopLoose {
+  margin-top: var(--prime-sys-spacing-l);
+}
+
+.previewStackColumnCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.accordionDemo {
+  width: 100%;
+  max-width: 480px;
+}
+
+.accordionContentDemo {
+  padding-inline: var(--prime-sys-spacing-x4);
+}
+
+.stack {
+  display: grid;
+  gap: var(--prime-sys-spacing-l);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Корень примера на всю ширину превью ExampleFrame (fullWidth и т.п.). */
+.examplePreviewBleed {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.typographyScaleList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x4);
+}
+
+.typographyScaleRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--prime-sys-spacing-m);
+  width: 100%;
+}
+
+.grid2 > * {
+  width: 100%;
+}
+
+.previewCaption {
+  box-sizing: border-box;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  line-height: var(--prime-sys-typography-lineHeightScale-xs);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.previewCenteredColumn {
+  display: grid;
+  gap: var(--prime-sys-spacing-l);
+  width: 100%;
+  justify-items: center;
+}
+
+.previewLabeledCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.previewAlertColumn {
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+  width: 100%;
+  max-width: 28rem;
+}
+
+.previewBannerColumn {
+  display: grid;
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+}
+
+.previewBannerMatrix {
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  max-height: 22rem;
+  overflow: auto;
+  padding-right: 0.25rem;
+  box-sizing: border-box;
+}
+
+.previewRowWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.previewBlockSpacer {
+  margin-top: var(--prime-sys-spacing-l);
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 732px) {
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.playgroundSidebarDemo {
+  box-sizing: border-box;
+  height: 22rem;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.playgroundSidebarBrandMark {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--prime-sys-shape-radius-s);
+  background: var(--prime-sys-color-action-primaryBackground);
+}
+
+.playgroundSidebarTitle {
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.playgroundSidebarSubtitle {
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+}

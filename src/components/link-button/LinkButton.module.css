@@ -1,0 +1,45 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-size-control-m-gap);
+  font-size: var(--prime-sys-size-control-m-text);
+  color: var(--prime-sys-color-content-primary);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: var(--prime-sys-unit-2px);
+  transition:
+    color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
+    text-decoration-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  cursor: pointer;
+}
+
+.root:hover {
+  color: var(--prime-sys-color-content-accent);
+  text-decoration-color: currentColor;
+}
+
+.root:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
+  text-decoration-color: currentColor;
+}
+
+.root[data-disabled="true"] {
+  color: var(--prime-sys-color-content-disabled);
+  text-decoration: none;
+}
+
+.root[data-size="s"] {
+  gap: var(--prime-sys-size-control-s-gap);
+  font-size: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="l"] {
+  gap: var(--prime-sys-size-control-l-gap);
+  font-size: var(--prime-sys-size-control-l-text);
+}
+
+.root[data-size="xl"] {
+  gap: var(--prime-sys-size-control-xl-gap);
+  font-size: var(--prime-sys-size-control-xl-text);
+}

@@ -1,0 +1,55 @@
+/* Stepper: семантический ol + li; визуал шагов — StepperAlign.module.css. */
+
+.root {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stepLi {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.root[data-orientation="horizontal"] .stepLi {
+  flex: 0 0 auto;
+}
+
+.separatorLi {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Title & description внутри ячейки сетки (vertical) / flex (horizontal) */
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--st-text, var(--prime-sys-size-control-m-text));
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: inherit;
+}
+
+.description {
+  font-size: var(--st-support, var(--prime-sys-size-control-m-supportText));
+  color: var(--prime-sys-color-content-secondary);
+  margin-top: var(--prime-sys-spacing-x1);
+}
+
+.stepLi[data-status="pending"] .title {
+  color: inherit;
+}
+
+.stepLi[data-status="active"] .description,
+.stepLi[data-status="completed"] .description,
+.stepLi[data-status="error"] .description {
+  color: var(--prime-sys-color-content-secondary);
+}

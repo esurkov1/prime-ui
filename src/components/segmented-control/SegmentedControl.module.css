@@ -1,0 +1,165 @@
+.root {
+  /* isolate creates a new stacking context so z-index on items works correctly */
+  isolation: isolate;
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  justify-content: start;
+  gap: var(--prime-seg-gap);
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--prime-seg-pad);
+  background: var(--prime-sys-color-surface-accentSoft);
+  border-radius: var(--prime-seg-radius);
+}
+
+/* Пилюля: визуальный ярус на ступень ниже номинального размера. */
+.root[data-size="s"] {
+  --prime-seg-height: var(--prime-sys-size-control-xs-height);
+  --prime-seg-radius: var(--prime-sys-size-control-xs-radius);
+  --prime-seg-pad: var(--prime-sys-unit-0p125rem);
+  --prime-seg-gap: var(--prime-sys-size-control-xs-gap);
+  --prime-seg-text: var(--prime-sys-size-control-xs-text);
+  --prime-seg-item-pad-x: var(--prime-sys-size-control-xs-buttonPaddingX);
+  --prime-seg-item-pad-y: var(--prime-sys-size-control-xs-buttonPaddingY);
+  --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p125rem);
+  --prime-seg-indicator-radius: var(--prime-sys-size-control-xs-radius);
+}
+
+.root[data-size="m"] {
+  --prime-seg-gap: var(--prime-sys-size-control-s-gap);
+  --prime-seg-height: var(--prime-sys-size-control-s-height);
+  --prime-seg-text: var(--prime-sys-size-control-s-text);
+  --prime-seg-radius: var(--prime-sys-size-control-s-radius);
+  --prime-seg-pad: var(--prime-sys-unit-0p1875rem);
+  --prime-seg-item-pad-x: var(--prime-sys-spacing-x3);
+  --prime-seg-item-pad-y: var(--prime-sys-spacing-x3);
+  --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p125rem);
+}
+
+.root[data-size="l"] {
+  --prime-seg-gap: var(--prime-sys-size-control-m-gap);
+  --prime-seg-height: var(--prime-sys-size-control-m-height);
+  --prime-seg-text: var(--prime-sys-size-control-m-text);
+  --prime-seg-radius: var(--prime-sys-size-control-m-radius);
+  --prime-seg-pad: var(--prime-sys-unit-0p3125rem);
+  --prime-seg-item-pad-x: var(--prime-sys-unit-1p25rem);
+  --prime-seg-item-pad-y: var(--prime-sys-unit-1p25rem);
+  --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p15rem);
+}
+
+.root[data-size="xl"] {
+  --prime-seg-gap: var(--prime-sys-size-control-l-gap);
+  --prime-seg-height: var(--prime-sys-size-control-l-height);
+  --prime-seg-text: var(--prime-sys-size-control-l-text);
+  --prime-seg-radius: var(--prime-sys-size-control-l-radius);
+  --prime-seg-pad: var(--prime-sys-unit-0p35rem);
+  --prime-seg-item-pad-x: var(--prime-sys-unit-1p75rem);
+  --prime-seg-item-pad-y: var(--prime-sys-unit-1p75rem);
+  --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p175rem);
+}
+
+/* ─── Item ──────────────────────────────────────────────────────────────────── */
+
+.item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-seg-gap);
+  padding-inline: var(--prime-seg-item-pad-x);
+  padding-block: var(--prime-seg-item-pad-y);
+  height: var(--prime-seg-height);
+  font-size: var(--prime-seg-text);
+  font-family: inherit;
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--prime-seg-radius);
+  cursor: pointer;
+  transition:
+    color var(--prime-sys-motion-fast),
+    background-color var(--prime-sys-motion-fast),
+    box-shadow var(--prime-sys-motion-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.item[aria-checked="true"] {
+  color: var(--prime-sys-color-content-primary);
+}
+
+.item:not([data-disabled="true"]):not([aria-checked="true"]):hover {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.item:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
+}
+
+/* Тёмная тема: неактивные — text-disabled, hover — muted. */
+[data-theme="dark"] .item:not([aria-checked="true"]):not([data-disabled="true"]) {
+  color: var(--prime-sys-color-content-disabled);
+}
+
+[data-theme="dark"] .item:not([data-disabled="true"]):not([aria-checked="true"]):hover {
+  color: var(--prime-sys-color-content-muted);
+}
+
+.item[data-disabled="true"] {
+  color: var(--prime-sys-color-content-disabled);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ─── Icon ──────────────────────────────────────────────────────────────────── */
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.root[data-size="s"] .icon :global(svg) {
+  width: var(--prime-sys-size-control-xs-icon);
+  height: var(--prime-sys-size-control-xs-icon);
+}
+
+/* ─── Floating indicator (geometry from TS + inset-block / inset-inline) ─ */
+
+/*
+ * Пилюля светлее/выше трека: elevated поверх accentSoft (light) / default (dark),
+ * иначе в light трек и индикатор сливались (оба gray.100).
+ */
+.indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  border-radius: var(--prime-seg-indicator-radius, var(--prime-seg-radius));
+  background: var(--prime-sys-color-surface-elevated);
+  box-shadow:
+    var(--prime-sys-elevation-shadow-surface),
+    0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
+  transition: none;
+  pointer-events: none;
+}
+
+/* Тёмная тема: трек — surface-default; пилюля — elevated + тонкая обводка для отрыва от рельса. */
+:root[data-theme="dark"] .root,
+[data-theme="dark"] .root {
+  background: var(--prime-sys-color-surface-default);
+}
+
+.root[data-animate="true"] .indicator {
+  transition:
+    transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    height var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}

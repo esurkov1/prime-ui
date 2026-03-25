@@ -1,0 +1,45 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.track {
+  stroke: var(--prime-sys-color-surface-accentSoft);
+}
+
+.fill {
+  stroke: var(--prime-sys-color-action-primaryBackground);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.inner {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+  width: var(--progress-circle-inner-size);
+  height: var(--progress-circle-inner-size);
+  padding: var(--prime-sys-spacing-xs);
+  box-sizing: border-box;
+}
+
+.root[data-size="s"] .inner {
+  font-size: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="m"] .inner {
+  font-size: var(--prime-sys-size-control-m-text);
+}
+
+.root[data-size="l"] .inner {
+  font-size: var(--prime-sys-size-control-l-text);
+}
+
+.root[data-size="xl"] .inner {
+  font-size: var(--prime-sys-size-control-xl-text);
+}

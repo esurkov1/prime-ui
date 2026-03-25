@@ -1,0 +1,134 @@
+import { ChevronRight, Ellipsis, FileText, FolderOpen, Sparkles } from "lucide-react";
+import * as React from "react";
+import { Sidebar } from "@/components/sidebar/Sidebar";
+
+import styles from "./composition.module.css";
+
+function FavoritesCategory() {
+  const [open, setOpen] = React.useState(true);
+  return (
+    <Sidebar.NavCategory>
+      <Sidebar.NavCategoryTrigger
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <Sidebar.NavCategoryLabel>Документация</Sidebar.NavCategoryLabel>
+        <Sidebar.NavCategoryCount>4</Sidebar.NavCategoryCount>
+      </Sidebar.NavCategoryTrigger>
+      {open ? (
+        <Sidebar.NavCategoryPanel>
+          <Sidebar.NavDocTree>
+            <div className={styles.treeRow}>
+              <ChevronRight size={14} strokeWidth={2} aria-hidden className={styles.treeChevron} />
+              <Sidebar.Text>Введение</Sidebar.Text>
+            </div>
+            <div className={styles.treeRow}>
+              <ChevronRight size={14} strokeWidth={2} aria-hidden className={styles.treeChevron} />
+              <Sidebar.Text>Установка</Sidebar.Text>
+            </div>
+            <div className={styles.treeRow}>
+              <FileText size={14} strokeWidth={1.9} aria-hidden className={styles.treeIcon} />
+              <Sidebar.Text>API reference</Sidebar.Text>
+            </div>
+          </Sidebar.NavDocTree>
+        </Sidebar.NavCategoryPanel>
+      ) : null}
+    </Sidebar.NavCategory>
+  );
+}
+
+const contextItems = [
+  { id: "docs", label: "Docs", icon: <FolderOpen size={16} strokeWidth={1.9} /> },
+  { id: "labs", label: "Labs", icon: <Sparkles size={16} strokeWidth={1.9} /> },
+];
+
+export default function SidebarCompositionSnippet() {
+  const [open, setOpen] = React.useState(true);
+
+  return (
+    <div
+      className="playgroundSidebarDemo"
+      style={{ height: "24rem", maxWidth: "100%", overflow: "hidden" }}
+    >
+      <Sidebar.Root
+        size="m"
+        variant="double"
+        defaultActiveSection="docs"
+        open={open}
+        onOpenChange={setOpen}
+        responsive={false}
+        aria-label="Композиция сайдбара"
+      >
+        <Sidebar.ContextBar items={contextItems} />
+
+        <Sidebar.NavPanel>
+          <Sidebar.Header>
+            <Sidebar.HeaderRow>
+              <Sidebar.HeaderMain>
+                <Sidebar.IdentityButton
+                  leading={
+                    <span className={styles.brandMark} aria-hidden="true">
+                      P
+                    </span>
+                  }
+                  title="Prime UI Kit"
+                  subtitle="Playground"
+                  type="button"
+                />
+              </Sidebar.HeaderMain>
+              <Sidebar.ToggleButton />
+            </Sidebar.HeaderRow>
+          </Sidebar.Header>
+
+          <Sidebar.Content>
+            <Sidebar.PanelSwitch
+              sections={{
+                docs: (
+                  <Sidebar.NavPanelBody>
+                    <FavoritesCategory />
+                    <Sidebar.Group>
+                      <Sidebar.GroupLabel>Разделы</Sidebar.GroupLabel>
+                      <Sidebar.Menu>
+                        <Sidebar.MenuItem>
+                          <Sidebar.MenuButton type="button" active>
+                            <Sidebar.MenuIcon>
+                              <FileText size={16} strokeWidth={1.9} />
+                            </Sidebar.MenuIcon>
+                            <Sidebar.MenuLabel>Обзор</Sidebar.MenuLabel>
+                          </Sidebar.MenuButton>
+                          <Sidebar.MenuAction type="button" aria-label="Действия раздела">
+                            <Ellipsis size={16} strokeWidth={2} />
+                          </Sidebar.MenuAction>
+                        </Sidebar.MenuItem>
+                        <Sidebar.MenuItem>
+                          <Sidebar.MenuButton type="button">
+                            <Sidebar.MenuIcon>
+                              <FolderOpen size={16} strokeWidth={1.9} />
+                            </Sidebar.MenuIcon>
+                            <Sidebar.MenuLabel>Структура</Sidebar.MenuLabel>
+                          </Sidebar.MenuButton>
+                        </Sidebar.MenuItem>
+                      </Sidebar.Menu>
+                    </Sidebar.Group>
+                  </Sidebar.NavPanelBody>
+                ),
+                labs: (
+                  <Sidebar.NavPanelBody>
+                    <Sidebar.Menu>
+                      <Sidebar.MenuItem>
+                        <Sidebar.MenuButton type="button" active>
+                          <Sidebar.MenuLabel>Песочница</Sidebar.MenuLabel>
+                        </Sidebar.MenuButton>
+                      </Sidebar.MenuItem>
+                    </Sidebar.Menu>
+                  </Sidebar.NavPanelBody>
+                ),
+              }}
+            />
+          </Sidebar.Content>
+        </Sidebar.NavPanel>
+      </Sidebar.Root>
+    </div>
+  );
+}

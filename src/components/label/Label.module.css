@@ -1,0 +1,42 @@
+.root {
+  font-size: var(--prime-sys-size-control-m-text);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-size-control-m-gap);
+}
+
+.root[data-size="s"] {
+  font-size: var(--prime-sys-size-control-s-text);
+  gap: var(--prime-sys-size-control-s-gap);
+}
+
+.root[data-size="l"] {
+  font-size: var(--prime-sys-size-control-l-text);
+  gap: var(--prime-sys-size-control-l-gap);
+}
+
+.root[data-size="xl"] {
+  font-size: var(--prime-sys-size-control-xl-text);
+  gap: var(--prime-sys-size-control-xl-gap);
+}
+
+.iconSlot {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.root[data-disabled="true"] {
+  color: var(--prime-sys-color-content-disabled);
+}
+
+.asterisk {
+  color: var(--prime-sys-color-content-danger);
+}
+
+.sub {
+  color: var(--prime-sys-color-content-secondary);
+  font-weight: var(--prime-sys-typography-weight-regular);
+}

@@ -1,0 +1,140 @@
+.field {
+  --prime-choice-control-size: var(--prime-sys-size-choice-m-control);
+  --prime-choice-col-gap: var(--prime-sys-size-control-m-inputPaddingX);
+  --prime-choice-hint-offset: calc(var(--prime-choice-control-size) + var(--prime-choice-col-gap));
+  --prime-choice-stack-gap: var(--prime-sys-size-control-m-gap);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-choice-stack-gap);
+}
+
+.field[data-size="s"] {
+  --prime-choice-control-size: var(--prime-sys-size-choice-s-control);
+  --prime-choice-col-gap: var(--prime-sys-size-control-s-inputPaddingX);
+}
+
+.field[data-size="l"] {
+  --prime-choice-control-size: var(--prime-sys-size-choice-l-control);
+  --prime-choice-col-gap: var(--prime-sys-size-control-l-inputPaddingX);
+}
+
+.field[data-size="xl"] {
+  --prime-choice-control-size: var(--prime-sys-size-choice-xl-control);
+  --prime-choice-col-gap: var(--prime-sys-size-control-xl-inputPaddingX);
+}
+
+.field .labelRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0;
+  row-gap: 0;
+  column-gap: var(--prime-choice-col-gap);
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.controlCell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--prime-choice-control-size);
+  height: var(--prime-choice-control-size);
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.svg {
+  width: var(--prime-choice-control-size);
+  height: var(--prime-choice-control-size);
+  flex-shrink: 0;
+  display: inline-flex;
+  transition: box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.outerCircle {
+  fill: var(--prime-sys-color-surface-raised);
+  stroke: var(--prime-sys-color-field-border);
+  stroke-width: 1;
+  transition:
+    fill var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    stroke var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.innerCircle {
+  fill: var(--prime-sys-color-action-primaryBackground);
+  transform-origin: center;
+  transform: scale(0);
+  opacity: 0;
+  transition:
+    transform var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
+    opacity var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.controlCell .input:checked + .svg .outerCircle {
+  stroke: var(--prime-sys-color-action-primaryBackground);
+}
+
+.controlCell .input:checked + .svg .innerCircle {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.labelRow:hover .svg .outerCircle {
+  stroke: var(--prime-sys-color-field-borderHover);
+  fill: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.labelRow:hover .controlCell .input:checked + .svg .outerCircle {
+  stroke: var(--prime-sys-color-action-primaryBackgroundHover);
+}
+
+.controlCell .input:focus-visible + .svg {
+  border-radius: var(--prime-sys-shape-radius-round);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.controlCell .input:focus-visible + .svg .outerCircle {
+  stroke: var(--prime-sys-color-field-borderFocus);
+}
+
+.field[data-invalid="true"] .svg .outerCircle {
+  stroke: var(--prime-sys-color-field-borderError);
+}
+
+.field[data-invalid="true"] .svg .innerCircle {
+  fill: var(--prime-sys-color-border-danger);
+}
+
+.field[data-disabled="true"] .labelRow {
+  cursor: not-allowed;
+}
+
+.field[data-disabled="true"] .svg .outerCircle {
+  filter: none;
+  stroke: var(--prime-sys-color-border-subtle);
+  fill: var(--prime-sys-color-surface-accentSoft);
+}
+
+.text {
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  min-width: 0;
+}
+
+.hintSlot {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding-inline-start: var(--prime-choice-hint-offset);
+  justify-content: flex-start;
+}

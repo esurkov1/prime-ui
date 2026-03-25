@@ -1,0 +1,372 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-size-badge-m-gap);
+  padding-block: var(--prime-sys-size-badge-m-paddingY);
+  padding-inline: var(--prime-sys-size-badge-m-paddingX);
+  font-size: var(--prime-sys-size-badge-m-text);
+  line-height: 1;
+  border-radius: var(--prime-sys-size-badge-m-radius);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  white-space: nowrap;
+  border: var(--prime-sys-unit-1px) solid transparent;
+  box-sizing: border-box;
+}
+
+.root[data-size="s"] {
+  gap: var(--prime-sys-size-badge-s-gap);
+  padding-block: var(--prime-sys-size-badge-s-paddingY);
+  padding-inline: var(--prime-sys-size-badge-s-paddingX);
+  font-size: var(--prime-sys-size-badge-s-text);
+  border-radius: var(--prime-sys-size-badge-s-radius);
+}
+
+.root[data-size="l"] {
+  gap: var(--prime-sys-size-badge-l-gap);
+  padding-block: var(--prime-sys-size-badge-l-paddingY);
+  padding-inline: var(--prime-sys-size-badge-l-paddingX);
+  font-size: var(--prime-sys-size-badge-l-text);
+  border-radius: var(--prime-sys-size-badge-l-radius);
+}
+
+.root[data-size="xl"] {
+  gap: var(--prime-sys-size-badge-xl-gap);
+  padding-block: var(--prime-sys-size-badge-xl-paddingY);
+  padding-inline: var(--prime-sys-size-badge-xl-paddingX);
+  font-size: var(--prime-sys-size-badge-xl-text);
+  border-radius: var(--prime-sys-size-badge-xl-radius);
+}
+
+/* gray */
+.root[data-color="gray"][data-variant="light"] {
+  background: var(--prime-sys-color-surface-accentSoft);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.root[data-color="gray"][data-variant="filled"] {
+  background: var(--prime-sys-color-badge-grayFilled-background);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="gray"][data-variant="lighter"] {
+  background: var(--prime-sys-color-surface-default);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.root[data-color="gray"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-border-subtle);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+/* red → error */
+.root[data-color="red"][data-variant="light"] {
+  background: var(--prime-sys-color-status-error-background);
+  color: var(--prime-sys-color-status-error-foreground);
+}
+
+.root[data-color="red"][data-variant="filled"] {
+  background: var(--prime-sys-color-status-error-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="red"][data-variant="lighter"] {
+  background: var(--prime-sys-color-status-error-background);
+  color: var(--prime-sys-color-status-error-foreground);
+  opacity: 0.7;
+}
+
+.root[data-color="red"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-status-error-border);
+  color: var(--prime-sys-color-status-error-foreground);
+}
+
+/* blue → information */
+.root[data-color="blue"][data-variant="light"] {
+  background: var(--prime-sys-color-status-information-background);
+  color: var(--prime-sys-color-status-information-foreground);
+}
+
+.root[data-color="blue"][data-variant="filled"] {
+  background: var(--prime-sys-color-status-information-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="blue"][data-variant="lighter"] {
+  background: var(--prime-sys-color-status-information-background);
+  color: var(--prime-sys-color-status-information-foreground);
+  opacity: 0.7;
+}
+
+.root[data-color="blue"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-status-information-border);
+  color: var(--prime-sys-color-status-information-foreground);
+}
+
+/* green → success */
+.root[data-color="green"][data-variant="light"] {
+  background: var(--prime-sys-color-status-success-background);
+  color: var(--prime-sys-color-status-success-foreground);
+}
+
+.root[data-color="green"][data-variant="filled"] {
+  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="green"][data-variant="lighter"] {
+  background: var(--prime-sys-color-status-success-background);
+  color: var(--prime-sys-color-status-success-foreground);
+  opacity: 0.7;
+}
+
+.root[data-color="green"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-status-success-border);
+  color: var(--prime-sys-color-status-success-foreground);
+}
+
+/* orange → warning */
+.root[data-color="orange"][data-variant="light"] {
+  background: var(--prime-sys-color-status-warning-background);
+  color: var(--prime-sys-color-status-warning-foreground);
+}
+
+.root[data-color="orange"][data-variant="filled"] {
+  background: var(--prime-sys-color-status-warning-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="orange"][data-variant="lighter"] {
+  background: var(--prime-sys-color-status-warning-background);
+  color: var(--prime-sys-color-status-warning-foreground);
+  opacity: 0.7;
+}
+
+.root[data-color="orange"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-status-warning-border);
+  color: var(--prime-sys-color-status-warning-foreground);
+}
+
+/* yellow → away */
+.root[data-color="yellow"][data-variant="light"] {
+  background: var(--prime-sys-color-status-away-background);
+  color: var(--prime-sys-color-status-away-foreground);
+}
+
+.root[data-color="yellow"][data-variant="filled"] {
+  background: var(--prime-sys-color-status-away-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="yellow"][data-variant="lighter"] {
+  background: var(--prime-sys-color-status-away-background);
+  color: var(--prime-sys-color-status-away-foreground);
+  opacity: 0.7;
+}
+
+.root[data-color="yellow"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-status-away-border);
+  color: var(--prime-sys-color-status-away-foreground);
+}
+
+/* purple → feature */
+.root[data-color="purple"][data-variant="light"] {
+  background: var(--prime-sys-color-status-feature-background);
+  color: var(--prime-sys-color-status-feature-foreground);
+}
+
+.root[data-color="purple"][data-variant="filled"] {
+  background: var(--prime-sys-color-status-feature-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="purple"][data-variant="lighter"] {
+  background: var(--prime-sys-color-status-feature-background);
+  color: var(--prime-sys-color-status-feature-foreground);
+  opacity: 0.7;
+}
+
+.root[data-color="purple"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-status-feature-border);
+  color: var(--prime-sys-color-status-feature-foreground);
+}
+
+/* sky → verified */
+.root[data-color="sky"][data-variant="light"] {
+  background: var(--prime-sys-color-status-verified-background);
+  color: var(--prime-sys-color-status-verified-foreground);
+}
+
+.root[data-color="sky"][data-variant="filled"] {
+  background: var(--prime-sys-color-status-verified-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="sky"][data-variant="lighter"] {
+  background: var(--prime-sys-color-status-verified-background);
+  color: var(--prime-sys-color-status-verified-foreground);
+  opacity: 0.7;
+}
+
+.root[data-color="sky"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-status-verified-border);
+  color: var(--prime-sys-color-status-verified-foreground);
+}
+
+/* pink / teal — семантика `color.badge.*` */
+.root[data-color="pink"][data-variant="light"] {
+  background: var(--prime-sys-color-badge-pink-backgroundSoft);
+  color: var(--prime-sys-color-badge-pink-foregroundOnSoft);
+}
+
+.root[data-color="pink"][data-variant="filled"] {
+  background: var(--prime-sys-color-badge-pink-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="pink"][data-variant="lighter"] {
+  background: var(--prime-sys-color-badge-pink-backgroundSoft);
+  color: var(--prime-sys-color-badge-pink-foregroundOnSoft);
+  opacity: 0.7;
+}
+
+.root[data-color="pink"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-badge-pink-border);
+  color: var(--prime-sys-color-badge-pink-foregroundOnSoft);
+}
+
+.root[data-color="teal"][data-variant="light"] {
+  background: var(--prime-sys-color-badge-teal-backgroundSoft);
+  color: var(--prime-sys-color-badge-teal-foregroundOnSoft);
+}
+
+.root[data-color="teal"][data-variant="filled"] {
+  background: var(--prime-sys-color-badge-teal-backgroundEmphasis);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-color="teal"][data-variant="lighter"] {
+  background: var(--prime-sys-color-badge-teal-backgroundSoft);
+  color: var(--prime-sys-color-badge-teal-foregroundOnSoft);
+  opacity: 0.7;
+}
+
+.root[data-color="teal"][data-variant="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-badge-teal-border);
+  color: var(--prime-sys-color-badge-teal-foregroundOnSoft);
+}
+
+.root[data-disabled="true"] {
+  opacity: 0.5;
+}
+
+.dot {
+  width: var(--prime-sys-size-badge-m-dotSize);
+  height: var(--prime-sys-size-badge-m-dotSize);
+  border-radius: var(--prime-sys-shape-radius-round);
+  background: currentcolor;
+  flex-shrink: 0;
+}
+
+.root[data-size="s"] .dot {
+  width: var(--prime-sys-size-badge-s-dotSize);
+  height: var(--prime-sys-size-badge-s-dotSize);
+}
+
+.root[data-size="l"] .dot {
+  width: var(--prime-sys-size-badge-l-dotSize);
+  height: var(--prime-sys-size-badge-l-dotSize);
+}
+
+.root[data-size="xl"] .dot {
+  width: var(--prime-sys-size-badge-xl-dotSize);
+  height: var(--prime-sys-size-badge-xl-dotSize);
+}
+
+.icon {
+  width: var(--prime-sys-size-badge-m-iconSize);
+  height: var(--prime-sys-size-badge-m-iconSize);
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.root[data-size="s"] .icon {
+  width: var(--prime-sys-size-badge-s-iconSize);
+  height: var(--prime-sys-size-badge-s-iconSize);
+}
+
+.root[data-size="l"] .icon {
+  width: var(--prime-sys-size-badge-l-iconSize);
+  height: var(--prime-sys-size-badge-l-iconSize);
+}
+
+.root[data-size="xl"] .icon {
+  width: var(--prime-sys-size-badge-xl-iconSize);
+  height: var(--prime-sys-size-badge-xl-iconSize);
+}
+
+.icon > * {
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── variant status: точка + подпись (раньше отдельный StatusBadge) ───────── */
+.root[data-variant="status"] {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-weight: var(--prime-sys-typography-weight-regular);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.statusDot {
+  width: var(--prime-sys-size-badge-m-dotSize);
+  height: var(--prime-sys-size-badge-m-dotSize);
+  border-radius: var(--prime-sys-shape-radius-round);
+  flex-shrink: 0;
+}
+
+.root[data-size="s"] .statusDot {
+  width: var(--prime-sys-size-badge-s-dotSize);
+  height: var(--prime-sys-size-badge-s-dotSize);
+}
+
+.root[data-size="l"] .statusDot {
+  width: var(--prime-sys-size-badge-l-dotSize);
+  height: var(--prime-sys-size-badge-l-dotSize);
+}
+
+.root[data-size="xl"] .statusDot {
+  width: var(--prime-sys-size-badge-xl-dotSize);
+  height: var(--prime-sys-size-badge-xl-dotSize);
+}
+
+.root[data-variant="status"][data-status="online"] .statusDot {
+  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+}
+
+.root[data-variant="status"][data-status="offline"] .statusDot {
+  background: var(--prime-sys-color-content-disabled);
+}
+
+.root[data-variant="status"][data-status="away"] .statusDot {
+  background: var(--prime-sys-color-status-away-backgroundEmphasis);
+}
+
+.root[data-variant="status"][data-status="busy"] .statusDot {
+  background: var(--prime-sys-color-status-error-backgroundEmphasis);
+}

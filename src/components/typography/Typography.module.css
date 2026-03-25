@@ -1,0 +1,91 @@
+.root {
+  margin: 0;
+  color: var(--prime-sys-color-content-primary);
+  text-wrap: balance;
+  font-style: var(--prime-sys-typography-style-normal);
+  font-weight: var(--prime-sys-typography-weight-regular);
+  letter-spacing: var(--prime-sys-typography-tracking-normal);
+}
+
+.root[data-tone="muted"] {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.root[data-italic="true"] {
+  font-style: var(--prime-sys-typography-style-italic);
+}
+
+.root[data-weight="medium"] {
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.root[data-weight="semibold"] {
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.root[data-tracking="tight"] {
+  letter-spacing: var(--prime-sys-typography-tracking-tight);
+}
+
+.root[data-tracking="tighter"] {
+  letter-spacing: var(--prime-sys-typography-tracking-tighter);
+}
+
+.root[data-tracking="wide"] {
+  letter-spacing: var(--prime-sys-typography-tracking-wide);
+}
+
+.root[data-size="2xs"] {
+  font-size: var(--prime-sys-typography-sizeScale-2xs);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+}
+
+.root[data-size="xs"] {
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  line-height: var(--prime-sys-typography-lineHeightScale-xs);
+}
+
+.root[data-size="s"] {
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+}
+
+.root[data-size="m"] {
+  font-size: var(--prime-sys-typography-sizeScale-m);
+  line-height: var(--prime-sys-typography-lineHeightScale-m);
+}
+
+.root[data-size="l"] {
+  font-size: var(--prime-sys-typography-sizeScale-l);
+  line-height: var(--prime-sys-typography-lineHeightScale-l);
+}
+
+.root[data-size="xl"] {
+  font-size: var(--prime-sys-typography-sizeScale-xl);
+  line-height: var(--prime-sys-typography-lineHeightScale-xl);
+}
+
+.root[data-size="2xl"] {
+  font-size: var(--prime-sys-typography-sizeScale-2xl);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xl);
+}
+
+.root[data-size="3xl"] {
+  font-size: var(--prime-sys-typography-sizeScale-3xl);
+  line-height: var(--prime-sys-typography-lineHeightScale-3xl);
+}
+
+.root[data-size="4xl"] {
+  font-size: var(--prime-sys-typography-sizeScale-4xl);
+  line-height: var(--prime-sys-typography-lineHeightScale-4xl);
+}
+
+.root[data-size="5xl"] {
+  font-size: var(--prime-sys-typography-sizeScale-5xl);
+  line-height: var(--prime-sys-typography-lineHeightScale-5xl);
+}
+
+.root[data-size="6xl"] {
+  font-size: var(--prime-sys-typography-sizeScale-6xl);
+  line-height: var(--prime-sys-typography-lineHeightScale-6xl);
+}

@@ -1,0 +1,290 @@
+/* ---- Root ---- */
+.root {
+  --prime-input-text: var(--prime-sys-size-control-m-text);
+  --prime-input-support-text: var(--prime-sys-size-control-m-supportText);
+  --prime-input-icon: var(--prime-sys-size-control-m-icon);
+  --prime-input-stack-gap: var(--prime-sys-size-control-m-gap);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  gap: var(--prime-input-stack-gap);
+}
+
+.root[data-size="s"] {
+  --prime-input-text: var(--prime-sys-size-control-s-text);
+  --prime-input-support-text: var(--prime-sys-size-control-s-supportText);
+  --prime-input-icon: var(--prime-sys-size-control-s-icon);
+  --prime-input-stack-gap: var(--prime-sys-size-control-s-gap);
+}
+
+.root[data-size="l"] {
+  --prime-input-text: var(--prime-sys-size-control-l-text);
+  --prime-input-support-text: var(--prime-sys-size-control-l-supportText);
+  --prime-input-icon: var(--prime-sys-size-control-l-icon);
+  --prime-input-stack-gap: var(--prime-sys-size-control-l-gap);
+}
+
+.root[data-size="xl"] {
+  --prime-input-text: var(--prime-sys-size-control-xl-text);
+  --prime-input-support-text: var(--prime-sys-size-control-xl-supportText);
+  --prime-input-icon: var(--prime-sys-size-control-xl-icon);
+  --prime-input-stack-gap: var(--prime-sys-size-control-xl-gap);
+}
+
+/* ---- Header ---- */
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-input-stack-gap);
+}
+
+.label {
+  font-size: var(--prime-input-support-text);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.optionalLabel {
+  font-size: var(--prime-input-support-text);
+  color: var(--prime-sys-color-content-muted);
+}
+
+/* ---- Wrapper ---- */
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  background: var(--prime-sys-color-field-bg);
+  color: var(--prime-sys-color-field-text);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  transition:
+    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+/* Hover — fires on wrapper hover, disabled + focus excluded */
+.wrapper:hover:not(:has(input:focus-visible)):not(:has(input:disabled)) {
+  border-color: var(--prime-sys-color-field-borderHover);
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  box-shadow: none;
+}
+
+/* Focus ring via :has */
+.wrapper:has(input:focus-visible) {
+  border-color: var(--prime-sys-color-field-borderFocus);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+/* Error */
+.wrapper[data-has-error="true"] {
+  border-color: var(--prime-sys-color-field-borderError);
+}
+
+.wrapper[data-has-error="true"]:has(input:focus-visible) {
+  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+}
+
+/* Disabled */
+.wrapper:has(input:disabled) {
+  background: var(--prime-sys-color-surface-accentSoft);
+  border-color: transparent;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ---- Size variants ---- */
+.wrapper[data-size="s"] {
+  height: var(--prime-sys-size-control-s-height);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  padding-inline: var(--prime-sys-size-control-s-inputPaddingX);
+  padding-block: var(--prime-sys-size-control-s-inputPaddingY);
+  gap: var(--prime-sys-size-control-s-gap);
+}
+
+.wrapper[data-size="m"] {
+  height: var(--prime-sys-size-control-m-height);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+  padding-block: var(--prime-sys-size-control-m-inputPaddingY);
+  gap: var(--prime-sys-size-control-m-gap);
+}
+
+.wrapper[data-size="l"] {
+  height: var(--prime-sys-size-control-l-height);
+  border-radius: var(--prime-sys-size-control-l-radius);
+  padding-inline: var(--prime-sys-size-control-l-inputPaddingX);
+  padding-block: var(--prime-sys-size-control-l-inputPaddingY);
+  gap: var(--prime-sys-size-control-l-gap);
+}
+
+.wrapper[data-size="xl"] {
+  height: var(--prime-sys-size-control-xl-height);
+  border-radius: var(--prime-sys-size-control-xl-radius);
+  padding-inline: var(--prime-sys-size-control-xl-inputPaddingX);
+  padding-block: var(--prime-sys-size-control-xl-inputPaddingY);
+  gap: var(--prime-sys-size-control-xl-gap);
+}
+
+/* When affix is present, remove wrapper padding on that side */
+.wrapper:has(.affix[data-side="start"]) {
+  padding-inline-start: 0;
+}
+
+.wrapper:has(.affix[data-side="end"]) {
+  padding-inline-end: 0;
+}
+
+/* ---- Field (input element) ---- */
+.field {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  outline: none;
+  box-shadow: none;
+  font-size: var(--prime-input-text);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+}
+
+.field:focus,
+.field:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.field::-webkit-search-decoration,
+.field::-webkit-search-cancel-button,
+.field::-webkit-search-results-button,
+.field::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+.field::placeholder {
+  color: var(--prime-sys-color-field-placeholder);
+  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.wrapper:hover .field::placeholder,
+.wrapper:has(input:focus-visible) .field::placeholder {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.field:disabled {
+  color: var(--prime-sys-color-content-disabled);
+  cursor: not-allowed;
+}
+
+/* ---- Icon ---- */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--prime-input-icon);
+  height: var(--prime-input-icon);
+  color: var(--prime-sys-color-content-muted);
+  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.icon[data-side="start"] {
+  order: -1;
+}
+
+.icon[data-side="end"] {
+  order: 1;
+}
+
+.wrapper:hover .icon,
+.wrapper:has(input:focus-visible) .icon {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.wrapper:has(input:disabled) .icon {
+  color: var(--prime-sys-color-content-disabled);
+}
+
+/* ---- Affix (sectioned block with border) ---- */
+.affix {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  background: transparent;
+  color: var(--prime-sys-color-content-secondary);
+  font-size: var(--prime-input-text);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+}
+
+.affix[data-side="start"] {
+  border-right: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  order: -1;
+}
+
+.affix[data-side="end"] {
+  border-left: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  order: 1;
+}
+
+.wrapper[data-size="s"] .affix {
+  padding-inline: var(--prime-sys-size-control-s-inputPaddingX);
+}
+
+.wrapper[data-size="m"] .affix {
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+}
+
+.wrapper[data-size="l"] .affix {
+  padding-inline: var(--prime-sys-size-control-l-inputPaddingX);
+}
+
+.wrapper[data-size="xl"] .affix {
+  padding-inline: var(--prime-sys-size-control-xl-inputPaddingX);
+}
+
+/* ---- InlineAffix ---- */
+.inlineAffix {
+  color: var(--prime-sys-color-content-muted);
+  font-size: var(--prime-input-text);
+  flex-shrink: 0;
+  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.inlineAffix[data-side="start"] {
+  order: -1;
+}
+
+.inlineAffix[data-side="end"] {
+  order: 1;
+}
+
+.wrapper:hover .inlineAffix,
+.wrapper:has(input:focus-visible) .inlineAffix {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+/* ---- Meta (hint + error) ---- */
+.meta {
+  display: grid;
+  gap: var(--prime-sys-spacing-x1);
+}
+
+.metaHint {
+  width: 100%;
+  max-width: 100%;
+}

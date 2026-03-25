@@ -1,0 +1,26 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x8);
+  width: 100%;
+}
+
+.blockLabel {
+  margin: 0 0 var(--prime-sys-spacing-x3);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.roots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x4);
+  align-items: flex-start;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x4);
+  max-width: 25rem;
+}

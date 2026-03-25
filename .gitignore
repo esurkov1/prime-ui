@@ -1,0 +1,41 @@
+# Dependencies & build
+node_modules/
+dist/
+coverage/
+playground/dist/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS & editors
+.DS_Store
+**/.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+*.sublime-*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Caches
+.cache/
+.turbo/
+.vite/
+
+# Test / tooling
+*.lcov
+
+# IDE / agent (локальные планы Cursor, не часть пакета)
+.cursor/
+
+# Устаревшие референсы (не публиковать)
+alignui-references/

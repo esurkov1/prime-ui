@@ -1,0 +1,15 @@
+.shell {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 40rem;
+  padding: var(--prime-sys-spacing-x4);
+  border-radius: var(--prime-sys-shape-radius-l);
+  border: 1px dashed var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-default);
+}
+
+.caption {
+  margin: 0 0 var(--prime-sys-spacing-x3);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+}

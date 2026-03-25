@@ -1,0 +1,373 @@
+.root {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+  border: var(--prime-sys-unit-1px) solid transparent;
+}
+
+.content {
+  grid-column: 2;
+  justify-self: center;
+  display: inline-flex;
+  max-width: min(100%, var(--prime-sys-unit-72rem));
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.title {
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: 1.25;
+}
+
+.description {
+  line-height: 1.35;
+  opacity: 0.92;
+}
+
+.actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.root[data-size="s"] {
+  column-gap: var(--prime-sys-size-control-s-gap);
+  min-height: var(--prime-sys-size-control-s-height);
+  padding-block: var(--prime-sys-spacing-x2);
+  padding-inline: var(--prime-sys-size-control-s-inputPaddingX);
+  border-radius: var(--prime-sys-size-control-s-radius);
+}
+
+.root[data-size="s"] .content {
+  gap: var(--prime-sys-size-control-s-gap);
+}
+
+.root[data-size="s"] .icon {
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
+}
+
+.root[data-size="s"] .title {
+  font-size: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="s"] .description {
+  font-size: var(--prime-sys-size-control-s-supportText);
+}
+
+.root[data-size="s"] .actions {
+  gap: var(--prime-sys-size-control-s-gap);
+}
+
+.root[data-size="m"] {
+  column-gap: var(--prime-sys-size-control-m-gap);
+  min-height: var(--prime-sys-size-control-m-height);
+  padding-block: var(--prime-sys-spacing-x2);
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+  border-radius: var(--prime-sys-size-control-m-radius);
+}
+
+.root[data-size="m"] .content {
+  gap: var(--prime-sys-size-control-m-gap);
+}
+
+.root[data-size="m"] .icon {
+  width: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-icon);
+}
+
+.root[data-size="m"] .title {
+  font-size: var(--prime-sys-size-control-m-text);
+}
+
+.root[data-size="m"] .description {
+  font-size: var(--prime-sys-size-control-m-supportText);
+}
+
+.root[data-size="m"] .actions {
+  gap: var(--prime-sys-size-control-m-gap);
+}
+
+.root[data-size="l"] {
+  column-gap: var(--prime-sys-size-control-l-gap);
+  min-height: var(--prime-sys-size-control-l-height);
+  padding-block: var(--prime-sys-spacing-x3);
+  padding-inline: var(--prime-sys-size-control-l-inputPaddingX);
+  border-radius: var(--prime-sys-size-control-l-radius);
+}
+
+.root[data-size="l"] .content {
+  gap: var(--prime-sys-size-control-l-gap);
+}
+
+.root[data-size="l"] .icon {
+  width: var(--prime-sys-size-control-l-icon);
+  height: var(--prime-sys-size-control-l-icon);
+}
+
+.root[data-size="l"] .title {
+  font-size: var(--prime-sys-size-control-l-text);
+}
+
+.root[data-size="l"] .description {
+  font-size: var(--prime-sys-size-control-l-supportText);
+}
+
+.root[data-size="l"] .actions {
+  gap: var(--prime-sys-size-control-l-gap);
+}
+
+.root[data-size="xl"] {
+  column-gap: var(--prime-sys-size-control-xl-gap);
+  min-height: var(--prime-sys-size-control-xl-height);
+  padding-block: var(--prime-sys-spacing-x4);
+  padding-inline: var(--prime-sys-size-control-xl-inputPaddingX);
+  border-radius: var(--prime-sys-size-control-xl-radius);
+}
+
+.root[data-size="xl"] .content {
+  gap: var(--prime-sys-size-control-xl-gap);
+}
+
+.root[data-size="xl"] .icon {
+  width: var(--prime-sys-size-control-xl-icon);
+  height: var(--prime-sys-size-control-xl-icon);
+}
+
+.root[data-size="xl"] .title {
+  font-size: var(--prime-sys-size-control-xl-text);
+}
+
+.root[data-size="xl"] .description {
+  font-size: var(--prime-sys-size-control-xl-supportText);
+}
+
+.root[data-size="xl"] .actions {
+  gap: var(--prime-sys-size-control-xl-gap);
+}
+
+.closeButton {
+  grid-column: 3;
+  justify-self: end;
+  flex-shrink: 0;
+  margin: 0;
+  color: inherit;
+  transition: opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.root[data-variant="light"]
+  .closeButton[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled),
+.root[data-variant="lighter"]
+  .closeButton[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled),
+.root[data-variant="stroke"]
+  .closeButton[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled) {
+  color: inherit;
+}
+
+.closeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.root[data-variant="filled"]
+  .closeButton[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled) {
+  background: transparent;
+  color: inherit;
+}
+
+.root[data-variant="filled"] .closeButton[data-variant="neutral"][data-mode="ghost"]:focus-visible {
+  box-shadow: 0 0 0 var(--prime-sys-border-width-focusRing) var(--prime-sys-color-focus-ring);
+  border-color: transparent;
+}
+
+.root[data-variant="filled"] .closeButton {
+  opacity: 0.72;
+}
+
+.root[data-variant="light"] .closeButton,
+.root[data-variant="lighter"] .closeButton,
+.root[data-variant="stroke"] .closeButton {
+  opacity: 0.48;
+}
+
+.root[data-variant="light"] .closeButton:hover:not(:disabled),
+.root[data-variant="lighter"] .closeButton:hover:not(:disabled),
+.root[data-variant="stroke"] .closeButton:hover:not(:disabled) {
+  opacity: 0.72;
+}
+
+.root[data-variant="filled"] .closeButton:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+/* --- Filled --- */
+.root[data-variant="filled"][data-status="error"] {
+  background: var(--prime-sys-color-status-error-backgroundEmphasis);
+  color: var(--prime-sys-color-content-inverse);
+}
+
+.root[data-variant="filled"][data-status="warning"] {
+  background: var(--prime-sys-color-status-warning-backgroundEmphasis);
+  color: var(--prime-sys-color-content-inverse);
+}
+
+.root[data-variant="filled"][data-status="success"] {
+  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+  color: var(--prime-sys-color-content-inverse);
+}
+
+.root[data-variant="filled"][data-status="information"] {
+  background: var(--prime-sys-color-status-information-backgroundEmphasis);
+  color: var(--prime-sys-color-content-inverse);
+}
+
+.root[data-variant="filled"][data-status="feature"] {
+  background: var(--prime-sys-color-status-feature-backgroundEmphasis);
+  color: var(--prime-sys-color-content-inverse);
+}
+
+/* --- Light --- */
+.root[data-variant="light"][data-status="error"] {
+  background: var(--prime-sys-color-status-error-background);
+  color: var(--prime-sys-color-status-error-foreground);
+}
+
+.root[data-variant="light"][data-status="warning"] {
+  background: var(--prime-sys-color-status-warning-background);
+  color: var(--prime-sys-color-status-warning-foreground);
+}
+
+.root[data-variant="light"][data-status="success"] {
+  background: var(--prime-sys-color-status-success-background);
+  color: var(--prime-sys-color-status-success-foreground);
+}
+
+.root[data-variant="light"][data-status="information"] {
+  background: var(--prime-sys-color-status-information-background);
+  color: var(--prime-sys-color-status-information-foreground);
+}
+
+.root[data-variant="light"][data-status="feature"] {
+  background: var(--prime-sys-color-status-feature-background);
+  color: var(--prime-sys-color-status-feature-foreground);
+}
+
+/* --- Lighter --- */
+.root[data-variant="lighter"][data-status="error"] {
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-status-error-background) 58%,
+    var(--prime-sys-color-surface-default)
+  );
+  color: var(--prime-sys-color-status-error-foreground);
+}
+
+.root[data-variant="lighter"][data-status="warning"] {
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-status-warning-background) 58%,
+    var(--prime-sys-color-surface-default)
+  );
+  color: var(--prime-sys-color-status-warning-foreground);
+}
+
+.root[data-variant="lighter"][data-status="success"] {
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-status-success-background) 58%,
+    var(--prime-sys-color-surface-default)
+  );
+  color: var(--prime-sys-color-status-success-foreground);
+}
+
+.root[data-variant="lighter"][data-status="information"] {
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-status-information-background) 58%,
+    var(--prime-sys-color-surface-default)
+  );
+  color: var(--prime-sys-color-status-information-foreground);
+}
+
+.root[data-variant="lighter"][data-status="feature"] {
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-status-feature-background) 58%,
+    var(--prime-sys-color-surface-default)
+  );
+  color: var(--prime-sys-color-status-feature-foreground);
+}
+
+/* --- Stroke: нижняя акцентная полоса по статусу --- */
+.root[data-variant="stroke"] {
+  background: var(--prime-sys-color-surface-raised);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.root[data-variant="stroke"]::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--prime-sys-unit-1px);
+  pointer-events: none;
+}
+
+.root[data-variant="stroke"][data-status="error"] .icon {
+  color: var(--prime-sys-color-status-error-foreground);
+}
+
+.root[data-variant="stroke"][data-status="error"]::after {
+  background: var(--prime-sys-color-status-error-border);
+}
+
+.root[data-variant="stroke"][data-status="warning"] .icon {
+  color: var(--prime-sys-color-status-warning-foreground);
+}
+
+.root[data-variant="stroke"][data-status="warning"]::after {
+  background: var(--prime-sys-color-status-warning-border);
+}
+
+.root[data-variant="stroke"][data-status="success"] .icon {
+  color: var(--prime-sys-color-status-success-foreground);
+}
+
+.root[data-variant="stroke"][data-status="success"]::after {
+  background: var(--prime-sys-color-status-success-border);
+}
+
+.root[data-variant="stroke"][data-status="information"] .icon {
+  color: var(--prime-sys-color-status-information-foreground);
+}
+
+.root[data-variant="stroke"][data-status="information"]::after {
+  background: var(--prime-sys-color-status-information-border);
+}
+
+.root[data-variant="stroke"][data-status="feature"] .icon {
+  color: var(--prime-sys-color-status-feature-foreground);
+}
+
+.root[data-variant="stroke"][data-status="feature"]::after {
+  background: var(--prime-sys-color-status-feature-border);
+}

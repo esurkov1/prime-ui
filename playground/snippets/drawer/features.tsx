@@ -1,0 +1,106 @@
+import * as React from "react";
+
+import { Button } from "@/components/button/Button";
+import { Drawer } from "@/components/drawer/Drawer";
+
+export default function DrawerFeaturesSnippet() {
+  const [portalHost, setPortalHost] = React.useState<HTMLDivElement | null>(null);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div
+        ref={setPortalHost}
+        style={{
+          minHeight: "8rem",
+          border: "1px dashed var(--prime-sys-color-border-default, #ccc)",
+          borderRadius: "8px",
+          padding: "0.75rem",
+          position: "relative",
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.875rem",
+            color: "var(--prime-sys-color-content-secondary)",
+          }}
+        >
+          Узел для <code>Drawer.Portal</code> с пропом <code>container</code>: портал монтируется в
+          заданный DOM-элемент.
+        </p>
+        {portalHost ? (
+          <Drawer.Root>
+            <Drawer.Trigger>
+              <Button.Root size="m" variant="neutral" mode="stroke">
+                Портал в контейнер
+              </Button.Root>
+            </Drawer.Trigger>
+            <Drawer.Portal container={portalHost}>
+              <Drawer.Overlay />
+              <Drawer.Content aria-label="Служебная панель без видимого заголовка в разметке шапки">
+                <Drawer.Header showCloseButton={false} />
+                <Drawer.Body>
+                  <p>
+                    Для доступности задан только <code>aria-label</code> на{" "}
+                    <code>Drawer.Content</code>
+                    (без связки <code>aria-labelledby</code> с заголовком).
+                  </p>
+                </Drawer.Body>
+                <Drawer.Footer>
+                  <Drawer.Close>
+                    <Button.Root size="m" variant="primary">
+                      Закрыть
+                    </Button.Root>
+                  </Drawer.Close>
+                </Drawer.Footer>
+              </Drawer.Content>
+            </Drawer.Portal>
+          </Drawer.Root>
+        ) : null}
+      </div>
+
+      <Drawer.Root>
+        <Drawer.Trigger>
+          <Button.Root size="m" variant="neutral" mode="stroke">
+            Длинное содержимое с прокруткой
+          </Button.Root>
+        </Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Overlay />
+          <Drawer.Content side="right" aria-labelledby="drawer-feat-scroll-title">
+            <Drawer.Header>
+              <Drawer.Title id="drawer-feat-scroll-title">Прокрутка внутри панели</Drawer.Title>
+            </Drawer.Header>
+            <Drawer.Body style={{ maxHeight: "10rem", overflowY: "auto" }}>
+              {[
+                "Пункт A: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт B: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт C: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт D: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт E: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт F: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт G: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт H: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт I: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт J: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт K: текст для проверки прокрутки при заблокированном фоне страницы.",
+                "Пункт L: текст для проверки прокрутки при заблокированном фоне страницы.",
+              ].map((line) => (
+                <p key={line} style={{ margin: "0 0 0.5rem" }}>
+                  {line}
+                </p>
+              ))}
+            </Drawer.Body>
+            <Drawer.Footer>
+              <Drawer.Close>
+                <Button.Root size="m" variant="primary">
+                  Закрыть
+                </Button.Root>
+              </Drawer.Close>
+            </Drawer.Footer>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+    </div>
+  );
+}

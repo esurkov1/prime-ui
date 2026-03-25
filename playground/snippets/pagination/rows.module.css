@@ -1,0 +1,35 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x4);
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x4);
+  flex-wrap: wrap;
+}
+
+.label {
+  margin: 0;
+  flex-shrink: 0;
+  min-width: 10rem;
+  font-size: var(--prime-sys-size-control-s-supportText);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.emptySlot {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.emptyHint {
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-muted);
+}

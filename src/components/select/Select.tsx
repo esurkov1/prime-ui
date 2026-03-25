@@ -1,0 +1,501 @@
+import * as React from "react";
+
+import { useControllableState } from "@/hooks/useControllableState";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { usePosition } from "@/hooks/usePosition";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { createComponentContext } from "@/internal/context";
+import { cx } from "@/internal/cx";
+import { toDataAttributes } from "@/internal/data-attributes";
+import { Portal } from "@/internal/Portal";
+import type { SelectSize } from "@/internal/states";
+
+import styles from "./Select.module.css";
+import { handleSelectListboxKeyDown, queryEnabledSelectOptions } from "./selectListbox";
+
+// ─── Context ─────────────────────────────────────────────────────────────────
+
+type SelectContextValue = {
+  size: SelectSize;
+  hasError: boolean;
+  isOpen: boolean;
+  selectedValue: string | undefined;
+  selectedLabel: string | undefined;
+  onSelect: (value: string, label: string) => void;
+  onClose: () => void;
+  onOpen: () => void;
+  highlightedValue: string | undefined;
+  setHighlightedValue: (v: string | undefined) => void;
+  triggerId: string;
+  listboxId: string;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
+  disabled?: boolean;
+  placeholder?: string;
+  onInitLabel: (value: string, label: string) => void;
+};
+
+const [SelectProvider, useSelectContext] = createComponentContext<SelectContextValue>("Select");
+
+// ─── SelectRoot ───────────────────────────────────────────────────────────────
+
+export type SelectRootProps = {
+  size?: SelectSize;
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
+  hasError?: boolean;
+  children: React.ReactNode;
+};
+
+function SelectRoot({
+  size = "m",
+  value,
+  defaultValue,
+  onChange,
+  disabled,
+  placeholder,
+  hasError = false,
+  children,
+}: SelectRootProps) {
+  const handleChange = React.useCallback(
+    (v: string | undefined) => {
+      if (v !== undefined) onChange?.(v);
+    },
+    [onChange],
+  );
+
+  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>({
+    value,
+    defaultValue,
+    onChange: handleChange,
+  });
+
+  const [selectedLabel, setSelectedLabel] = React.useState<string | undefined>(undefined);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
+
+  const generatedId = React.useId();
+  const triggerId = `${generatedId}-trigger`;
+  const listboxId = `${generatedId}-listbox`;
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+
+  // Sync ref so onInitLabel doesn't go stale
+  const selectedValueRef = React.useRef(selectedValue);
+  selectedValueRef.current = selectedValue;
+
+  const onInitLabel = React.useCallback((val: string, label: string) => {
+    if (val === selectedValueRef.current) {
+      setSelectedLabel(label);
+    }
+  }, []);
+
+  const onSelect = React.useCallback(
+    (val: string, label: string) => {
+      setSelectedValue(val);
+      setSelectedLabel(label);
+      setIsOpen(false);
+    },
+    [setSelectedValue],
+  );
+
+  const onClose = React.useCallback(() => setIsOpen(false), []);
+  const onOpen = React.useCallback(() => setIsOpen(true), []);
+
+  return (
+    <SelectProvider
+      value={{
+        size,
+        hasError,
+        isOpen,
+        selectedValue,
+        selectedLabel,
+        onSelect,
+        onClose,
+        onOpen,
+        highlightedValue,
+        setHighlightedValue,
+        triggerId,
+        listboxId,
+        triggerRef,
+        disabled,
+        placeholder,
+        onInitLabel,
+      }}
+    >
+      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+    </SelectProvider>
+  );
+}
+SelectRoot.displayName = "SelectRoot";
+
+// ─── SelectTrigger ────────────────────────────────────────────────────────────
+
+export type SelectTriggerProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "id" | "type" | "role"
+>;
+
+const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
+  ({ className, children, onClick, onKeyDown, ...rest }, forwardedRef) => {
+    const { isOpen, onOpen, onClose, triggerId, listboxId, disabled, size, hasError, triggerRef } =
+      useSelectContext();
+
+    const setRefs = React.useCallback(
+      (el: HTMLButtonElement | null) => {
+        (triggerRef as React.MutableRefObject<HTMLButtonElement | null>).current = el;
+        if (typeof forwardedRef === "function") {
+          forwardedRef(el);
+        } else if (forwardedRef) {
+          (forwardedRef as React.MutableRefObject<HTMLButtonElement | null>).current = el;
+        }
+      },
+      [forwardedRef, triggerRef],
+    );
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(e);
+      if (!disabled) {
+        if (isOpen) onClose();
+        else onOpen();
+      }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      onKeyDown?.(e);
+      if (["ArrowDown", "ArrowUp", " ", "Enter"].includes(e.key)) {
+        e.preventDefault();
+        if (!isOpen) onOpen();
+      }
+    };
+
+    return (
+      <button
+        ref={setRefs}
+        id={triggerId}
+        type="button"
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-controls={listboxId}
+        disabled={disabled}
+        className={cx(styles.trigger, className)}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        {...toDataAttributes({ open: isOpen, size, "has-error": hasError })}
+        {...rest}
+      >
+        <span className={styles.triggerMain}>{children}</span>
+        <span className={styles.triggerChevronSlot} aria-hidden>
+          <span className={styles.triggerChevron} />
+        </span>
+      </button>
+    );
+  },
+);
+SelectTrigger.displayName = "SelectTrigger";
+
+// ─── SelectValue ─────────────────────────────────────────────────────────────
+
+export type SelectValueProps = {
+  className?: string;
+};
+
+function SelectValue({ className }: SelectValueProps) {
+  const { selectedLabel, selectedValue, placeholder } = useSelectContext();
+  /* Пока список закрыт, Option не смонтированы — onInitLabel не вызывается; показываем value */
+  const display = selectedLabel ?? selectedValue ?? placeholder;
+  return (
+    <span
+      className={cx(styles.triggerValue, className)}
+      {...toDataAttributes({ placeholder: display == null || display === "" })}
+    >
+      {display}
+    </span>
+  );
+}
+SelectValue.displayName = "SelectValue";
+
+// ─── SelectTriggerIcon ────────────────────────────────────────────────────────
+
+export type SelectTriggerIconProps = React.HTMLAttributes<HTMLSpanElement>;
+
+function SelectTriggerIcon({ className, children, ...rest }: SelectTriggerIconProps) {
+  return (
+    <span className={cx(styles.triggerIcon, className)} {...rest}>
+      {children}
+    </span>
+  );
+}
+SelectTriggerIcon.displayName = "SelectTriggerIcon";
+
+// ─── SelectContent ────────────────────────────────────────────────────────────
+
+export type SelectContentProps = {
+  className?: string;
+  children: React.ReactNode;
+};
+
+function SelectContent({ className, children }: SelectContentProps) {
+  const {
+    isOpen,
+    onClose,
+    onSelect,
+    triggerId,
+    listboxId,
+    triggerRef,
+    highlightedValue,
+    setHighlightedValue,
+    selectedValue,
+    size,
+  } = useSelectContext();
+
+  const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const { resolvedSide, update } = usePosition(triggerRef, contentRef, {
+    side: "bottom",
+    align: "start",
+  });
+
+  const getItems = React.useCallback(() => queryEnabledSelectOptions(contentRef.current), []);
+
+  /* Позиционирование только когда список открыт */
+  React.useLayoutEffect(() => {
+    if (!isOpen) return;
+    update();
+    const rafId = requestAnimationFrame(() => update());
+    return () => cancelAnimationFrame(rafId);
+  }, [isOpen, update]);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      setHighlightedValue(undefined);
+      return;
+    }
+
+    const reposition = () => {
+      requestAnimationFrame(() => update());
+    };
+
+    const bootstrap = () => {
+      requestAnimationFrame(() => {
+        const el = contentRef.current;
+        if (!el) return;
+        el.focus({ preventScroll: true });
+        const items = queryEnabledSelectOptions(el);
+        const selectedIndex = items.findIndex((i) => i.dataset.value === selectedValue);
+        // Выделяем только если есть выбранное значение; иначе оставляем undefined
+        if (selectedIndex >= 0 && selectedValue) {
+          setHighlightedValue(selectedValue);
+        }
+      });
+    };
+
+    bootstrap();
+    window.addEventListener("resize", reposition);
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", reposition);
+    return () => {
+      window.removeEventListener("resize", reposition);
+      vv?.removeEventListener("resize", reposition);
+    };
+  }, [isOpen, update, selectedValue, setHighlightedValue]);
+
+  useEscapeKey({ enabled: isOpen, onEscape: onClose });
+  useOutsideClick({ refs: [triggerRef, contentRef], enabled: isOpen, onOutsideClick: onClose });
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    handleSelectListboxKeyDown(e, {
+      items: getItems(),
+      highlightedValue,
+      setHighlightedValue,
+      onSelect,
+      onClose,
+    });
+  };
+
+  return (
+    <Portal>
+      <div
+        ref={contentRef}
+        id={listboxId}
+        role="listbox"
+        aria-labelledby={triggerId}
+        aria-hidden={!isOpen}
+        tabIndex={-1}
+        data-react-aria-top-layer="true"
+        className={cx(styles.content, className)}
+        onKeyDown={handleKeyDown}
+        style={{ display: isOpen ? undefined : "none" }}
+        {...toDataAttributes({ side: resolvedSide, size })}
+      >
+        {children}
+      </div>
+    </Portal>
+  );
+}
+SelectContent.displayName = "SelectContent";
+
+// ─── SelectItemIcon (объявлен до SelectItem — partition по child.type) ───────
+
+export type SelectItemIconProps = React.HTMLAttributes<HTMLSpanElement>;
+
+function SelectItemIcon({ className, children, ...rest }: SelectItemIconProps) {
+  return (
+    <span className={cx(styles.itemIcon, className)} {...rest}>
+      {children}
+    </span>
+  );
+}
+SelectItemIcon.displayName = "SelectItemIcon";
+
+function selectItemTextFromRest(rest: React.ReactNode[]): string | undefined {
+  const parts: string[] = [];
+  for (const node of rest) {
+    if (typeof node === "string" || typeof node === "number") {
+      const s = String(node).trim();
+      if (s.length > 0) parts.push(s);
+    }
+  }
+  return parts.length > 0 ? parts.join(" ") : undefined;
+}
+
+function partitionSelectItemChildren(children: React.ReactNode) {
+  const icons: React.ReactElement[] = [];
+  const rest: React.ReactNode[] = [];
+
+  React.Children.forEach(children, (child) => {
+    if (React.isValidElement(child) && child.type === SelectItemIcon) {
+      icons.push(child);
+    } else if (child != null && child !== false) {
+      rest.push(child);
+    }
+  });
+
+  return { icons, rest };
+}
+
+// ─── SelectItem ───────────────────────────────────────────────────────────────
+
+export type SelectItemProps = {
+  value: string;
+  /** Explicit label for display in trigger; falls back to string children, then value */
+  label?: string;
+  disabled?: boolean;
+  className?: string;
+  children: React.ReactNode;
+};
+
+const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
+  ({ value, label, disabled, className, children }, ref) => {
+    const { selectedValue, highlightedValue, setHighlightedValue, onSelect, onInitLabel } =
+      useSelectContext();
+
+    const { icons, rest } = partitionSelectItemChildren(children);
+
+    const isSelected = selectedValue === value;
+    const isHighlighted = highlightedValue === value;
+    const resolvedLabel =
+      label ??
+      selectItemTextFromRest(rest) ??
+      (typeof children === "string" ? children : undefined) ??
+      value;
+
+    React.useEffect(() => {
+      onInitLabel(value, resolvedLabel);
+    }, [value, resolvedLabel, onInitLabel]);
+
+    const handleClick = () => {
+      if (!disabled) onSelect(value, resolvedLabel);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if ((e.key === "Enter" || e.key === " ") && !disabled) {
+        e.preventDefault();
+        onSelect(value, resolvedLabel);
+      }
+    };
+
+    const handleMouseEnter = () => {
+      if (!disabled) setHighlightedValue(value);
+    };
+
+    return (
+      <div
+        ref={ref}
+        role="option"
+        aria-selected={isSelected}
+        aria-disabled={disabled || undefined}
+        tabIndex={-1}
+        className={cx(styles.item, className)}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        onMouseEnter={handleMouseEnter}
+        {...toDataAttributes({
+          value,
+          label: resolvedLabel,
+          selected: isSelected,
+          highlighted: isHighlighted,
+          disabled: Boolean(disabled),
+        })}
+      >
+        {icons.map((icon, index) =>
+          React.cloneElement(icon, {
+            key: icon.key ?? `prime-select-item-icon-${String(index)}`,
+          }),
+        )}
+        <span className={styles.itemText}>{rest}</span>
+        {isSelected ? (
+          <span className={styles.itemCheckSlot} aria-hidden="true">
+            <span className={styles.itemCheck} />
+          </span>
+        ) : null}
+      </div>
+    );
+  },
+);
+SelectItem.displayName = "SelectItem";
+
+// ─── SelectGroup ──────────────────────────────────────────────────────────────
+
+export type SelectGroupProps = React.HTMLAttributes<HTMLDivElement>;
+
+function SelectGroup({ className, ...rest }: SelectGroupProps) {
+  // biome-ignore lint/a11y/useSemanticElements: role="group" is correct for ARIA listbox groups; <fieldset> is not valid inside role="listbox"
+  return <div role="group" className={cx(styles.group, className)} {...rest} />;
+}
+SelectGroup.displayName = "SelectGroup";
+
+// ─── SelectGroupLabel ─────────────────────────────────────────────────────────
+
+export type SelectGroupLabelProps = React.HTMLAttributes<HTMLDivElement>;
+
+function SelectGroupLabel({ className, ...rest }: SelectGroupLabelProps) {
+  return <div className={cx(styles.groupLabel, className)} {...rest} />;
+}
+SelectGroupLabel.displayName = "SelectGroupLabel";
+
+// ─── SelectSeparator ─────────────────────────────────────────────────────────
+
+export type SelectSeparatorProps = React.HTMLAttributes<HTMLHRElement>;
+
+function SelectSeparator({ className, ...rest }: SelectSeparatorProps) {
+  return <hr className={cx(styles.separator, className)} {...rest} />;
+}
+SelectSeparator.displayName = "SelectSeparator";
+
+// ─── Namespace export ─────────────────────────────────────────────────────────
+
+export const Select = {
+  Root: SelectRoot,
+  Trigger: SelectTrigger,
+  Value: SelectValue,
+  TriggerIcon: SelectTriggerIcon,
+  Content: SelectContent,
+  Item: SelectItem,
+  ItemIcon: SelectItemIcon,
+  Group: SelectGroup,
+  GroupLabel: SelectGroupLabel,
+  Separator: SelectSeparator,
+};

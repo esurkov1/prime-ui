@@ -1,0 +1,165 @@
+.field {
+  --prime-switch-track-width: var(--prime-sys-size-switch-m-trackWidth);
+  --prime-switch-track-height: var(--prime-sys-size-switch-m-trackHeight);
+  --prime-switch-thumb-size: var(--prime-sys-size-switch-m-thumb);
+  --prime-switch-offset: var(--prime-sys-unit-0p125rem);
+  --prime-switch-col-gap: var(--prime-sys-size-control-m-inputPaddingX);
+  --prime-switch-thumb-translate: var(--prime-sys-unit-0p875rem);
+  --prime-switch-thumb-disabled-size: var(--prime-sys-unit-0p75rem);
+  --prime-switch-hint-offset: calc(var(--prime-switch-track-width) + var(--prime-switch-col-gap));
+  --prime-switch-stack-gap: var(--prime-sys-size-control-m-gap);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-switch-stack-gap);
+}
+
+.field[data-size="s"] {
+  --prime-switch-track-width: var(--prime-sys-size-switch-s-trackWidth);
+  --prime-switch-track-height: var(--prime-sys-size-switch-s-trackHeight);
+  --prime-switch-thumb-size: var(--prime-sys-size-switch-s-thumb);
+  --prime-switch-col-gap: var(--prime-sys-size-control-s-inputPaddingX);
+  --prime-switch-thumb-translate: var(--prime-sys-unit-0p75rem);
+  --prime-switch-thumb-disabled-size: var(--prime-sys-unit-0p625rem);
+}
+
+.field[data-size="l"] {
+  --prime-switch-track-width: var(--prime-sys-size-switch-l-trackWidth);
+  --prime-switch-track-height: var(--prime-sys-size-switch-l-trackHeight);
+  --prime-switch-thumb-size: var(--prime-sys-size-switch-l-thumb);
+  --prime-switch-col-gap: var(--prime-sys-size-control-l-inputPaddingX);
+  --prime-switch-thumb-translate: var(--prime-sys-unit-1rem);
+  --prime-switch-thumb-disabled-size: var(--prime-sys-unit-0p875rem);
+}
+
+.field[data-size="xl"] {
+  --prime-switch-track-width: var(--prime-sys-size-switch-xl-trackWidth);
+  --prime-switch-track-height: var(--prime-sys-size-switch-xl-trackHeight);
+  --prime-switch-thumb-size: var(--prime-sys-size-switch-xl-thumb);
+  --prime-switch-col-gap: var(--prime-sys-size-control-xl-inputPaddingX);
+  --prime-switch-thumb-translate: var(--prime-sys-unit-1rem);
+  --prime-switch-thumb-disabled-size: var(--prime-sys-unit-1p125rem);
+}
+
+.field .labelRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0;
+  row-gap: 0;
+  column-gap: var(--prime-switch-col-gap);
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.controlCell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.track {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  width: var(--prime-switch-track-width);
+  height: var(--prime-switch-track-height);
+  border-radius: var(--prime-sys-shape-radius-round);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  transition:
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.track::before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: var(--prime-switch-offset);
+  width: var(--prime-switch-thumb-size);
+  height: var(--prime-switch-thumb-size);
+  border-radius: var(--prime-sys-shape-radius-round);
+  background: var(--prime-sys-color-surface-elevated);
+  box-shadow: 0 var(--prime-sys-unit-1px) var(--prime-sys-unit-2px)
+    color-mix(in srgb, var(--prime-sys-color-content-primary) 18%, transparent);
+  transform: translateY(-50%);
+  transition: transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.text {
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  min-width: 0;
+}
+
+.controlCell .input:checked + .track {
+  background: var(--prime-sys-color-action-primaryBackground);
+  border-color: var(--prime-sys-color-action-primaryBackground);
+  box-shadow: none;
+}
+
+.controlCell .input:checked + .track::before {
+  transform: translate(var(--prime-switch-thumb-translate), -50%);
+}
+
+.labelRow:hover .track {
+  border-color: var(--prime-sys-color-field-borderHover);
+  background: var(--prime-sys-color-field-bg);
+  box-shadow: none;
+}
+
+.labelRow:hover .controlCell .input:checked + .track {
+  background: var(--prime-sys-color-action-primaryBackgroundHover);
+  border-color: var(--prime-sys-color-action-primaryBackgroundHover);
+}
+
+.controlCell .input:focus-visible + .track {
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.field[data-invalid="true"] .track {
+  border-color: var(--prime-sys-color-field-borderError);
+}
+
+.field[data-disabled="true"] .labelRow {
+  cursor: not-allowed;
+}
+
+.field[data-disabled="true"] .track {
+  background: var(--prime-sys-color-surface-raised);
+  border-color: var(--prime-sys-color-border-subtle);
+  box-shadow: 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
+  opacity: 1;
+}
+
+.field[data-disabled="true"] .controlCell .input:checked + .track {
+  background: var(--prime-sys-color-surface-raised);
+  border-color: var(--prime-sys-color-border-subtle);
+}
+
+.field[data-disabled="true"] .track::before {
+  --prime-switch-thumb-size: var(--prime-switch-thumb-disabled-size);
+  background: var(--prime-sys-color-border-subtle);
+}
+
+.hintSlot {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding-inline-start: var(--prime-switch-hint-offset);
+  justify-content: flex-start;
+}

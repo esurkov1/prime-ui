@@ -1,0 +1,283 @@
+/* HorizontalStepper / VerticalStepper: круг от высоты контрола data-size; гепы и паддинги растут с тиром. */
+
+.hRoot,
+.vRoot {
+  --st-ctrl-h: var(--prime-sys-size-control-m-height);
+  --st-ctrl-icon: var(--prime-sys-size-control-m-icon);
+  --st-text: var(--prime-sys-size-control-m-text);
+  --st-support: var(--prime-sys-size-control-m-supportText);
+  --st-ind-num: var(--prime-sys-typography-support-2xs);
+  --st-radius: var(--prime-sys-size-control-m-radius);
+  /* Доля высоты контрола — заметный шаг s/m/l/xl; вертикаль больше не «мелкая» vs паддинги */
+  --st-circle: var(--prime-sys-unit-1p65rem);
+  --st-stepper-chevron: var(--st-ctrl-icon);
+  --st-stepper-check: var(--prime-sys-unit-0p86rem);
+  /* m: зазор круг–текст; в вертикали шире (сетка 3 колонки) */
+  --st-h-gap: var(--prime-sys-spacing-x3);
+  --st-v-gap: var(--prime-sys-spacing-x4);
+  --st-v-pad: var(--prime-sys-spacing-x2);
+  --st-root-h-gap: var(--prime-sys-spacing-x4);
+  --st-root-v-gap: var(--prime-sys-spacing-x2);
+}
+
+.hRoot[data-size="s"],
+.vRoot[data-size="s"] {
+  --st-ctrl-h: var(--prime-sys-size-control-s-height);
+  --st-ctrl-icon: var(--prime-sys-size-control-s-icon);
+  --st-text: var(--prime-sys-size-control-s-text);
+  --st-support: var(--prime-sys-size-control-s-supportText);
+  --st-ind-num: var(--prime-sys-typography-support-2xs);
+  --st-radius: var(--prime-sys-size-control-s-radius);
+  --st-circle: var(--prime-sys-unit-1p32rem);
+  --st-stepper-check: var(--prime-sys-unit-0p69rem);
+  --st-h-gap: var(--prime-sys-spacing-x3);
+  --st-v-gap: var(--prime-sys-spacing-x3);
+  --st-v-pad: var(--prime-sys-spacing-x2);
+  --st-root-h-gap: var(--prime-sys-spacing-x3);
+  --st-root-v-gap: var(--prime-sys-spacing-x2);
+}
+
+.hRoot[data-size="l"],
+.vRoot[data-size="l"] {
+  --st-ctrl-h: var(--prime-sys-size-control-l-height);
+  --st-ctrl-icon: var(--prime-sys-size-control-l-icon);
+  --st-text: var(--prime-sys-size-control-l-text);
+  --st-support: var(--prime-sys-size-control-l-supportText);
+  --st-ind-num: var(--prime-sys-typography-support-xs);
+  --st-radius: var(--prime-sys-size-control-l-radius);
+  --st-circle: var(--prime-sys-unit-1p98rem);
+  --st-stepper-check: var(--prime-sys-unit-1p03rem);
+  --st-h-gap: var(--prime-sys-spacing-x4);
+  --st-v-gap: var(--prime-sys-spacing-x5);
+  --st-v-pad: var(--prime-sys-spacing-x3);
+  --st-root-h-gap: var(--prime-sys-spacing-x5);
+  --st-root-v-gap: var(--prime-sys-spacing-x3);
+}
+
+.hRoot[data-size="xl"],
+.vRoot[data-size="xl"] {
+  --st-ctrl-h: var(--prime-sys-size-control-xl-height);
+  --st-ctrl-icon: var(--prime-sys-size-control-xl-icon);
+  --st-text: var(--prime-sys-size-control-xl-text);
+  --st-support: var(--prime-sys-size-control-xl-supportText);
+  --st-ind-num: var(--prime-sys-typography-support-xs);
+  --st-radius: var(--prime-sys-size-control-xl-radius);
+  --st-circle: var(--prime-sys-unit-2p31rem);
+  --st-stepper-check: var(--prime-sys-unit-1p2rem);
+  --st-h-gap: var(--prime-sys-spacing-x5);
+  --st-v-gap: var(--prime-sys-spacing-x6);
+  --st-v-pad: var(--prime-sys-spacing-x4);
+  --st-root-h-gap: var(--prime-sys-spacing-x6);
+  --st-root-v-gap: var(--prime-sys-spacing-x4);
+}
+
+/* ─── Horizontal ─── */
+
+.hRoot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--st-root-h-gap);
+}
+
+.hItem {
+  appearance: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--st-h-gap);
+  font-size: var(--st-text);
+  font-weight: var(--prime-sys-typography-weight-regular);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  background: transparent;
+  color: var(--prime-sys-color-content-secondary);
+  transition: color 0.15s ease;
+}
+
+.hItem[data-state="active"],
+.hItem[data-state="completed"] {
+  color: var(--prime-sys-color-content-primary);
+}
+
+.hItem:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-action-primaryBackground);
+  outline-offset: var(--prime-sys-unit-2px);
+}
+
+.hItem:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.hIndicator {
+  display: flex;
+  width: var(--st-circle);
+  height: var(--st-circle);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--prime-sys-shape-radius-round);
+  font-size: var(--st-ind-num);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: 1;
+}
+
+.hIndicator[data-state="default"] {
+  background: var(--prime-sys-color-surface-elevated);
+  color: var(--prime-sys-color-content-secondary);
+  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
+}
+
+.hIndicator[data-state="active"] {
+  background: var(--prime-sys-color-action-primaryBackground);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.hIndicator[data-state="completed"] {
+  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+  color: var(--prime-sys-color-surface-elevated);
+}
+
+.hCheck {
+  width: var(--st-stepper-check);
+  height: var(--st-stepper-check);
+}
+
+.hSeparator {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  color: var(--prime-sys-color-content-secondary);
+  opacity: 0.7;
+}
+
+.hSeparatorIcon {
+  width: var(--st-stepper-chevron);
+  height: var(--st-stepper-chevron);
+  flex-shrink: 0;
+}
+
+/* ─── Vertical ─── */
+
+.vRoot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--st-root-v-gap);
+  width: 100%;
+}
+
+.vItem {
+  appearance: none;
+  border: none;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--st-v-gap);
+  padding: var(--st-v-pad);
+  border-radius: var(--st-radius);
+  text-align: start;
+  font-size: var(--st-text);
+  font-weight: var(--prime-sys-typography-weight-regular);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.vItem[data-state="completed"],
+.vItem[data-state="default"] {
+  background: var(--prime-sys-color-surface-accentSoft);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.vItem[data-state="active"] {
+  background: var(--prime-sys-color-surface-elevated);
+  color: var(--prime-sys-color-content-primary);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.vItem:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-action-primaryBackground);
+  outline-offset: var(--prime-sys-unit-2px);
+}
+
+.vItem:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.vIndicator {
+  display: flex;
+  width: var(--st-circle);
+  height: var(--st-circle);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--prime-sys-shape-radius-round);
+  font-size: var(--st-ind-num);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: 1;
+}
+
+.vIndicator[data-state="completed"] {
+  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+  color: var(--prime-sys-color-surface-elevated);
+}
+
+.vIndicator[data-state="active"] {
+  background: var(--prime-sys-color-action-primaryBackground);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.vIndicator[data-state="default"] {
+  background: var(--prime-sys-color-surface-elevated);
+  color: var(--prime-sys-color-content-secondary);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.vCheck {
+  width: var(--st-stepper-check);
+  height: var(--st-stepper-check);
+}
+
+.vArrow {
+  flex-shrink: 0;
+  width: var(--st-stepper-chevron);
+  height: var(--st-stepper-chevron);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+/* Высокоуровневый Stepper: статус error (доп. стиль поверх базовых состояний) */
+.hItem[data-legacy-status="error"],
+.vItem[data-legacy-status="error"] {
+  background: var(--prime-sys-color-surface-dangerSoft);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.hItem[data-legacy-status="error"] {
+  background: transparent;
+  color: var(--prime-sys-color-content-danger);
+}
+
+.hIndicator[data-legacy-status="error"] {
+  background: var(--prime-sys-color-surface-dangerSoft);
+  color: var(--prime-sys-color-content-danger);
+  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-danger);
+}
+
+.vIndicator[data-legacy-status="error"] {
+  background: var(--prime-sys-color-surface-dangerSoft);
+  color: var(--prime-sys-color-content-danger);
+  box-shadow: none;
+}

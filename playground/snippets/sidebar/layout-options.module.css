@@ -1,0 +1,80 @@
+.root {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--prime-sys-spacing-x4);
+  width: 100%;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .root {
+    grid-template-columns: 1fr;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+  min-width: 0;
+}
+
+.caption {
+  margin: 0;
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+  line-height: 1.45;
+}
+
+.stage {
+  box-sizing: border-box;
+  height: 16rem;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--prime-sys-shape-radius-m);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  padding: var(--prime-sys-spacing-x2);
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-surface-raised) 96%,
+    var(--prime-sys-color-surface-default)
+  );
+}
+
+.stageWide {
+  box-sizing: border-box;
+  height: 14rem;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--prime-sys-shape-radius-m);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  padding: var(--prime-sys-spacing-x2);
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-surface-raised) 96%,
+    var(--prime-sys-color-surface-default)
+  );
+}
+
+.pageShell {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-x3);
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--prime-sys-spacing-x3);
+  border-radius: var(--prime-sys-shape-radius-m);
+  border: 1px dashed var(--prime-sys-color-border-subtle);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+}

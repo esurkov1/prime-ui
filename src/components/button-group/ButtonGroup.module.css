@@ -1,0 +1,143 @@
+/* Сегментированная группа: общая обводка, скругления только снаружи, стыковка сегментов через var(--prime-sys-unit-neg-1px) */
+
+.root {
+  --prime-bg-group-radius: var(--prime-sys-size-control-m-radius);
+  --prime-bg-item-height: var(--prime-sys-size-control-m-height);
+  /* Чуть шире, чем у Button: сегменты с иконкой+текстом читаются лучше */
+  --prime-bg-item-pad-x: var(--prime-sys-spacing-x4);
+  --prime-bg-item-font: var(--prime-sys-size-control-m-text);
+  --prime-bg-item-icon: var(--prime-sys-size-control-m-icon);
+
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.root[data-size="s"] {
+  --prime-bg-group-radius: var(--prime-sys-size-control-s-radius);
+  --prime-bg-item-height: var(--prime-sys-size-control-s-height);
+  --prime-bg-item-pad-x: var(--prime-sys-spacing-x3);
+  --prime-bg-item-font: var(--prime-sys-size-control-s-text);
+  --prime-bg-item-icon: var(--prime-sys-size-control-s-icon);
+}
+
+.root[data-size="l"] {
+  --prime-bg-group-radius: var(--prime-sys-size-control-l-radius);
+  --prime-bg-item-height: var(--prime-sys-size-control-l-height);
+  --prime-bg-item-pad-x: var(--prime-sys-spacing-x5);
+  --prime-bg-item-font: var(--prime-sys-size-control-l-text);
+  --prime-bg-item-icon: var(--prime-sys-size-control-l-icon);
+}
+
+.root[data-size="xl"] {
+  --prime-bg-group-radius: var(--prime-sys-size-control-xl-radius);
+  --prime-bg-item-height: var(--prime-sys-size-control-xl-height);
+  --prime-bg-item-pad-x: var(--prime-sys-spacing-x6);
+  --prime-bg-item-font: var(--prime-sys-size-control-xl-text);
+  --prime-bg-item-icon: var(--prime-sys-size-control-xl-icon);
+}
+
+.root[data-orientation="vertical"] {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.item {
+  position: relative;
+  z-index: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-bg-item-pad-x);
+  height: var(--prime-bg-item-height);
+  padding-block: 0;
+  padding-inline: var(--prime-bg-item-pad-x);
+  margin: 0;
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-elevated);
+  color: var(--prime-sys-color-content-secondary);
+  font-family: inherit;
+  font-size: var(--prime-bg-item-font);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.item:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.item:focus {
+  outline: none;
+}
+
+.item:focus-visible {
+  z-index: 1;
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.item[data-state="on"] {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.item:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  color: var(--prime-sys-color-content-disabled);
+}
+
+.item:disabled:hover {
+  background: var(--prime-sys-color-surface-elevated);
+}
+
+/* Horizontal: скругления слева / справа у краёв группы */
+.root:not([data-orientation="vertical"]) > .item:first-child {
+  border-start-start-radius: var(--prime-bg-group-radius);
+  border-end-start-radius: var(--prime-bg-group-radius);
+}
+
+.root:not([data-orientation="vertical"]) > .item:last-child {
+  border-start-end-radius: var(--prime-bg-group-radius);
+  border-end-end-radius: var(--prime-bg-group-radius);
+}
+
+.root:not([data-orientation="vertical"]) > .item + .item {
+  margin-inline-start: var(--prime-sys-unit-neg-1px);
+}
+
+/* Vertical */
+.root[data-orientation="vertical"] > .item:first-child {
+  border-start-start-radius: var(--prime-bg-group-radius);
+  border-start-end-radius: var(--prime-bg-group-radius);
+}
+
+.root[data-orientation="vertical"] > .item:last-child {
+  border-end-start-radius: var(--prime-bg-group-radius);
+  border-end-end-radius: var(--prime-bg-group-radius);
+}
+
+.root[data-orientation="vertical"] > .item + .item {
+  margin-top: var(--prime-sys-unit-neg-1px);
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-bg-item-icon);
+  height: var(--prime-bg-item-icon);
+  margin-inline: var(--prime-sys-unit-neg-0p25rem);
+}
+
+.icon > svg {
+  width: 100%;
+  height: 100%;
+}

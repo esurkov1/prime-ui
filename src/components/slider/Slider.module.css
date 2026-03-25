@@ -1,0 +1,97 @@
+/* Высота трека и бегунка — доля control-height того же яруса, чтобы масштаб шёл с токенами. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slider-root-gap);
+  width: 100%;
+}
+
+.root[data-size="s"] {
+  --slider-root-gap: var(--prime-sys-size-control-s-gap);
+  --slider-track-h: var(--prime-sys-spacing-xs);
+  --slider-thumb-size: var(--prime-sys-size-control-s-icon);
+  --slider-label-size: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="m"] {
+  --slider-root-gap: var(--prime-sys-size-control-m-gap);
+  --slider-track-h: var(--prime-sys-spacing-xs);
+  --slider-thumb-size: var(--prime-sys-size-control-m-icon);
+  --slider-label-size: var(--prime-sys-size-control-m-text);
+}
+
+.root[data-size="l"] {
+  --slider-root-gap: var(--prime-sys-size-control-l-gap);
+  --slider-track-h: var(--prime-sys-spacing-s);
+  --slider-thumb-size: var(--prime-sys-size-control-l-icon);
+  --slider-label-size: var(--prime-sys-size-control-l-text);
+}
+
+.root[data-size="xl"] {
+  --slider-root-gap: var(--prime-sys-size-control-xl-gap);
+  --slider-track-h: var(--prime-sys-spacing-s);
+  --slider-thumb-size: var(--prime-sys-size-control-xl-icon);
+  --slider-label-size: var(--prime-sys-size-control-xl-text);
+}
+
+.track {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--slider-track-h);
+  border-radius: var(--prime-sys-shape-radius-round);
+  outline: none;
+  cursor: pointer;
+  background: var(--prime-sys-color-surface-accentSoft);
+  accent-color: var(--prime-sys-color-action-primaryBackground);
+}
+
+.track::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--slider-thumb-size);
+  height: var(--slider-thumb-size);
+  border-radius: var(--prime-sys-shape-radius-round);
+  background: var(--prime-sys-color-surface-elevated);
+  border: var(--prime-sys-border-width-focusRing) solid
+    var(--prime-sys-color-action-primaryBackground);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  cursor: pointer;
+  transition: box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.track:focus-visible {
+  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
+}
+
+.track::-webkit-slider-thumb:hover {
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.track:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.track::-moz-range-thumb {
+  width: var(--slider-thumb-size);
+  height: var(--slider-thumb-size);
+  border-radius: var(--prime-sys-shape-radius-round);
+  background: var(--prime-sys-color-surface-elevated);
+  border: var(--prime-sys-border-width-focusRing) solid
+    var(--prime-sys-color-action-primaryBackground);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  cursor: pointer;
+  transition: box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.track::-moz-range-track {
+  height: var(--slider-track-h);
+  border-radius: var(--prime-sys-shape-radius-round);
+  background: var(--prime-sys-color-surface-accentSoft);
+}
+
+.label {
+  font-size: var(--slider-label-size);
+  color: var(--prime-sys-color-content-primary);
+}

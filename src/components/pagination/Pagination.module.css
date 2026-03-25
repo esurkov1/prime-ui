@@ -1,0 +1,92 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-size-control-s-gap);
+  --pagination-ellipsis-box: var(--prime-sys-size-control-s-height);
+  --pagination-ellipsis-text: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="s"] {
+  gap: var(--prime-sys-size-control-xs-gap);
+  --pagination-ellipsis-box: var(--prime-sys-size-control-xs-height);
+  --pagination-ellipsis-text: var(--prime-sys-size-control-xs-text);
+}
+
+.root[data-size="m"] {
+  gap: var(--prime-sys-size-control-s-gap);
+  --pagination-ellipsis-box: var(--prime-sys-size-control-s-height);
+  --pagination-ellipsis-text: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="l"] {
+  gap: var(--prime-sys-size-control-m-gap);
+  --pagination-ellipsis-box: var(--prime-sys-size-control-m-height);
+  --pagination-ellipsis-text: var(--prime-sys-size-control-m-text);
+}
+
+.root[data-size="xl"] {
+  gap: var(--prime-sys-size-control-l-gap);
+  --pagination-ellipsis-box: var(--prime-sys-size-control-l-height);
+  --pagination-ellipsis-text: var(--prime-sys-size-control-l-text);
+}
+
+.root .pageButton[data-size="s"] {
+  --prime-icon-size: var(--prime-sys-size-control-xs-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-xs-text);
+  height: var(--prime-sys-size-control-xs-height);
+  min-width: var(--prime-sys-size-control-xs-height);
+  border-radius: var(--prime-sys-size-control-xs-radius);
+  gap: var(--prime-sys-size-control-xs-gap);
+  padding-inline: var(--prime-sys-size-control-xs-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-xs-buttonPaddingY);
+}
+
+.root .pageButton[data-size="m"] {
+  --prime-icon-size: var(--prime-sys-size-control-s-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-s-text);
+  height: var(--prime-sys-size-control-s-height);
+  min-width: var(--prime-sys-size-control-s-height);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  gap: var(--prime-sys-size-control-s-gap);
+  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-s-buttonPaddingY);
+}
+
+.root .pageButton[data-size="l"] {
+  --prime-icon-size: var(--prime-sys-size-control-m-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-m-text);
+  height: var(--prime-sys-size-control-m-height);
+  min-width: var(--prime-sys-size-control-m-height);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  gap: var(--prime-sys-size-control-m-gap);
+  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
+}
+
+.root .pageButton[data-size="xl"] {
+  --prime-icon-size: var(--prime-sys-size-control-l-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-l-text);
+  height: var(--prime-sys-size-control-l-height);
+  min-width: var(--prime-sys-size-control-l-height);
+  border-radius: var(--prime-sys-size-control-l-radius);
+  gap: var(--prime-sys-size-control-l-gap);
+  padding-inline: var(--prime-sys-size-control-l-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-l-buttonPaddingY);
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--pagination-ellipsis-box);
+  min-width: var(--pagination-ellipsis-box);
+  height: var(--pagination-ellipsis-box);
+  color: var(--prime-sys-color-content-muted);
+  font-size: var(--pagination-ellipsis-text);
+}

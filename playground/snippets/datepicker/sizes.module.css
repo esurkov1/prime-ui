@@ -1,0 +1,30 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x4);
+  width: max-content;
+  max-width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x3);
+  align-items: flex-start;
+}
+
+.item {
+  display: grid;
+  gap: var(--prime-sys-spacing-x2);
+  width: max-content;
+  max-width: 100%;
+}
+
+.label {
+  margin: 0;
+  color: var(--prime-sys-color-content-secondary);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

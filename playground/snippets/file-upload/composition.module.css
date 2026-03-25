@@ -1,0 +1,59 @@
+.panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 36.25rem;
+  margin-inline: auto;
+  border-radius: var(--prime-sys-shape-radius-l);
+  background: var(--prime-sys-color-surface-elevated);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.body {
+  padding: var(--prime-sys-spacing-x4);
+  padding-top: var(--prime-sys-spacing-x5);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--prime-sys-spacing-x5);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--prime-sys-size-control-l-text);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.chipGlyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--prime-sys-shape-radius-round);
+}
+
+.uploadRootMinHeight {
+  min-height: 16.75rem;
+}
+
+.dropLeadTitle {
+  margin: 0;
+  max-width: 100%;
+  font-size: var(--prime-sys-size-control-l-text);
+}
+
+.chipGlyphAway {
+  background: var(--prime-sys-color-status-away-background);
+}
+
+.chipGlyphPrimary {
+  background: var(--prime-sys-color-action-primaryBackground);
+}
+
+.chipGlyphAccentSoft {
+  background: var(--prime-sys-color-surface-accentSoft);
+}

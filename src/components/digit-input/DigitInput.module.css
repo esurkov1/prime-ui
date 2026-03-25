@@ -1,0 +1,75 @@
+.root {
+  display: flex;
+  justify-content: center;
+  gap: var(--prime-digit-gap);
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.root[data-size="s"] {
+  --prime-digit-cell-size: var(--prime-sys-size-control-s-height);
+  --prime-digit-cell-radius: var(--prime-sys-size-control-s-radius);
+  --prime-digit-cell-text: var(--prime-sys-size-control-s-text);
+  --prime-digit-gap: var(--prime-sys-size-control-s-gap);
+}
+
+.root[data-size="m"] {
+  --prime-digit-cell-size: var(--prime-sys-size-control-m-height);
+  --prime-digit-cell-radius: var(--prime-sys-size-control-m-radius);
+  --prime-digit-cell-text: var(--prime-sys-size-control-m-text);
+  --prime-digit-gap: var(--prime-sys-size-control-m-gap);
+}
+
+.root[data-size="l"] {
+  --prime-digit-cell-size: var(--prime-sys-size-control-l-height);
+  --prime-digit-cell-radius: var(--prime-sys-size-control-l-radius);
+  --prime-digit-cell-text: var(--prime-sys-size-control-l-text);
+  --prime-digit-gap: var(--prime-sys-size-control-l-gap);
+}
+
+.root[data-size="xl"] {
+  --prime-digit-cell-size: var(--prime-sys-size-control-xl-height);
+  --prime-digit-cell-radius: var(--prime-sys-size-control-xl-radius);
+  --prime-digit-cell-text: var(--prime-sys-size-control-xl-text);
+  --prime-digit-gap: var(--prime-sys-size-control-xl-gap);
+}
+
+.root[data-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.cell {
+  box-sizing: border-box;
+  width: var(--prime-digit-cell-size);
+  min-width: 0;
+  height: var(--prime-digit-cell-size);
+  text-align: center;
+  font-size: var(--prime-digit-cell-text);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  border-radius: var(--prime-digit-cell-radius);
+  background: var(--prime-sys-color-field-bg);
+  color: var(--prime-sys-color-field-text);
+  outline: none;
+  transition:
+    border-color var(--prime-sys-motion-medium),
+    box-shadow var(--prime-sys-motion-medium);
+}
+
+.cell:focus {
+  border-color: var(--prime-sys-color-field-borderFocus);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.root[data-has-error="true"] .cell {
+  border-color: var(--prime-sys-color-field-borderError);
+}
+
+.root[data-disabled="true"] .cell {
+  background: var(--prime-sys-color-surface-accentSoft);
+  color: var(--prime-sys-color-content-disabled);
+  cursor: not-allowed;
+}

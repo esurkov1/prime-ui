@@ -1,0 +1,75 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--prime-sys-size-control-xs-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-3xs);
+  font-family: var(--prime-sys-typography-family-base);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+  background: var(--prime-sys-color-surface-raised);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.root > * {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Номинальный size как у инпута; визуально на ступень ниже кнопки того же имени (`size.control.*`). */
+.root[data-size="s"] {
+  --prime-icon-size: var(--prime-sys-size-control-xs-icon);
+  height: var(--prime-sys-size-kbd-height);
+  min-width: var(--prime-sys-size-kbd-height);
+  padding-inline: var(--prime-sys-size-kbd-paddingX);
+  padding-block: var(--prime-sys-size-kbd-paddingY);
+  font-size: var(--prime-sys-size-kbd-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-3xs);
+  border-radius: var(--prime-sys-size-kbd-radius);
+  gap: var(--prime-sys-size-control-xs-gap);
+}
+
+.root[data-size="m"] {
+  --prime-icon-size: var(--prime-sys-size-control-xs-icon);
+  height: var(--prime-sys-size-control-xs-height);
+  min-width: var(--prime-sys-size-control-xs-height);
+  padding-inline: var(--prime-sys-size-control-xs-inputPaddingX);
+  padding-block: var(--prime-sys-size-control-xs-inputPaddingY);
+  font-size: var(--prime-sys-size-control-xs-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-3xs);
+  border-radius: var(--prime-sys-size-control-xs-radius);
+  gap: var(--prime-sys-size-control-xs-gap);
+}
+
+.root[data-size="l"] {
+  --prime-icon-size: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-height);
+  min-width: var(--prime-sys-size-control-s-height);
+  padding-inline: var(--prime-sys-size-control-s-inputPaddingX);
+  padding-block: var(--prime-sys-size-control-s-inputPaddingY);
+  font-size: var(--prime-sys-size-control-s-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  gap: var(--prime-sys-size-control-s-gap);
+}
+
+.root[data-size="xl"] {
+  --prime-icon-size: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-height);
+  min-width: var(--prime-sys-size-control-m-height);
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+  padding-block: var(--prime-sys-size-control-m-inputPaddingY);
+  font-size: var(--prime-sys-size-control-m-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-xs);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  gap: var(--prime-sys-size-control-m-gap);
+}
+
+.root :where(svg) {
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+  flex-shrink: 0;
+}

@@ -1,0 +1,19 @@
+.root {
+  display: flex;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  flex-direction: column;
+  padding: var(--prime-sys-spacing-x4);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background: linear-gradient(
+      to bottom,
+      var(--prime-sys-color-surface-elevated),
+      var(--prime-sys-color-surface-raised)
+    )
+    padding-box;
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  box-sizing: border-box;
+}

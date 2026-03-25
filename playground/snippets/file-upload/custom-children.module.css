@@ -1,0 +1,5 @@
+.customDrop {
+  padding: var(--prime-sys-spacing-x4);
+  font-size: var(--prime-sys-size-control-l-text);
+  color: var(--prime-sys-color-content-secondary);
+}

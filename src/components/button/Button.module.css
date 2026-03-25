@@ -1,0 +1,441 @@
+.root {
+  --prime-button-font-size: var(--prime-sys-size-control-m-text);
+  position: relative;
+  border: var(--prime-sys-border-width-control) solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-sys-size-control-m-gap);
+  font-size: var(--prime-button-font-size);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.root[data-full-width="true"] {
+  width: 100%;
+}
+
+.root[data-size="m"] {
+  --prime-icon-size: var(--prime-sys-size-control-m-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-m-text);
+  height: var(--prime-sys-size-control-m-height);
+  /* Не ниже высоты (icon-only), но не сужать ниже текста при flex-shrink. */
+  min-width: max(var(--prime-sys-size-control-m-height), min-content);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  gap: var(--prime-sys-size-control-m-gap);
+  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
+}
+
+.root[data-size="s"] {
+  --prime-icon-size: var(--prime-sys-size-control-s-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-s-text);
+  height: var(--prime-sys-size-control-s-height);
+  min-width: max(var(--prime-sys-size-control-s-height), min-content);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  gap: var(--prime-sys-size-control-s-gap);
+  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-s-buttonPaddingY);
+}
+
+.root[data-size="l"] {
+  --prime-icon-size: var(--prime-sys-size-control-l-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-l-text);
+  height: var(--prime-sys-size-control-l-height);
+  min-width: max(var(--prime-sys-size-control-l-height), min-content);
+  border-radius: var(--prime-sys-size-control-l-radius);
+  gap: var(--prime-sys-size-control-l-gap);
+  padding-inline: var(--prime-sys-size-control-l-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-l-buttonPaddingY);
+}
+
+.root[data-size="xl"] {
+  --prime-icon-size: var(--prime-sys-size-control-xl-icon);
+  --prime-button-font-size: var(--prime-sys-size-control-xl-text);
+  height: var(--prime-sys-size-control-xl-height);
+  min-width: max(var(--prime-sys-size-control-xl-height), min-content);
+  border-radius: var(--prime-sys-size-control-xl-radius);
+  gap: var(--prime-sys-size-control-xl-gap);
+  padding-inline: var(--prime-sys-size-control-xl-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-xl-buttonPaddingY);
+}
+
+.root:focus-visible {
+  outline: none;
+}
+
+.root[data-variant="primary"][data-mode="filled"] {
+  background: var(--prime-sys-color-action-primaryBackground);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.root[data-variant="primary"][data-mode="filled"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-primaryBackgroundHover);
+}
+
+.root[data-variant="primary"][data-mode="filled"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-primaryFocus);
+}
+
+.root[data-variant="primary"][data-mode="stroke"] {
+  background: transparent;
+  color: var(--prime-sys-color-action-primaryBackground);
+  border-color: var(--prime-sys-color-action-primaryBackground);
+}
+
+.root[data-variant="primary"][data-mode="stroke"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-surface-accentSoft);
+  border-color: transparent;
+}
+
+.root[data-variant="primary"][data-mode="stroke"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-primaryFocus);
+}
+
+.root[data-variant="primary"][data-mode="lighter"] {
+  background: var(--prime-sys-color-action-primarySoftBackground);
+  color: var(--prime-sys-color-action-primarySoftForeground);
+  border-color: transparent;
+}
+
+.root[data-variant="primary"][data-mode="lighter"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-surface-raised);
+  border-color: var(--prime-sys-color-action-primaryBackground);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.root[data-variant="primary"][data-mode="lighter"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-primaryFocus);
+}
+
+.root[data-variant="primary"][data-mode="ghost"] {
+  background: transparent;
+  color: var(--prime-sys-color-action-primaryBackground);
+  border-color: transparent;
+}
+
+.root[data-variant="primary"][data-mode="ghost"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-surface-accentSoft);
+}
+
+.root[data-variant="primary"][data-mode="ghost"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-primaryFocus);
+}
+
+.root[data-variant="neutral"][data-mode="filled"] {
+  background: var(--prime-sys-color-content-primary);
+  color: var(--prime-sys-color-content-inverse);
+}
+
+.root[data-variant="neutral"][data-mode="filled"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-content-secondary);
+  color: var(--prime-sys-color-content-inverse);
+}
+
+.root[data-variant="neutral"][data-mode="filled"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.root[data-variant="neutral"][data-mode="stroke"] {
+  background: transparent;
+  border-color: var(--prime-sys-color-border-strong);
+  color: var(--prime-sys-color-action-neutralForeground);
+  box-shadow: none;
+}
+
+.root[data-variant="neutral"][data-mode="stroke"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  color: var(--prime-sys-color-content-primary);
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.root[data-variant="neutral"][data-mode="stroke"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+  border-color: var(--prime-sys-color-content-primary);
+}
+
+.root[data-variant="neutral"][data-mode="lighter"] {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  color: var(--prime-sys-color-action-neutralForeground);
+  border-color: transparent;
+}
+
+.root[data-variant="neutral"][data-mode="lighter"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-neutralBackground);
+  color: var(--prime-sys-color-content-primary);
+  border-color: var(--prime-sys-color-border-strong);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.root[data-variant="neutral"][data-mode="lighter"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+  border-color: var(--prime-sys-color-content-primary);
+}
+
+.root[data-variant="neutral"][data-mode="ghost"] {
+  background: transparent;
+  color: var(--prime-sys-color-action-neutralForeground);
+  border-color: transparent;
+}
+
+.root[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.root[data-variant="neutral"][data-mode="ghost"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+  border-color: var(--prime-sys-color-content-primary);
+}
+
+.root[data-variant="error"][data-mode="filled"] {
+  background: var(--prime-sys-color-action-errorBackground);
+  color: var(--prime-sys-color-action-errorForeground);
+}
+
+.root[data-variant="error"][data-mode="filled"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-errorBackgroundHover);
+}
+
+.root[data-variant="error"][data-mode="filled"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+}
+
+.root[data-variant="error"][data-mode="stroke"] {
+  background: transparent;
+  color: var(--prime-sys-color-border-danger);
+  border-color: var(--prime-sys-color-border-danger);
+}
+
+.root[data-variant="error"][data-mode="stroke"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-surface-dangerSoft);
+  border-color: transparent;
+}
+
+.root[data-variant="error"][data-mode="stroke"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+}
+
+.root[data-variant="error"][data-mode="lighter"] {
+  background: var(--prime-sys-color-surface-dangerSoft);
+  color: var(--prime-sys-color-border-danger);
+  border-color: transparent;
+}
+
+.root[data-variant="error"][data-mode="lighter"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-surface-raised);
+  border-color: var(--prime-sys-color-border-danger);
+}
+
+.root[data-variant="error"][data-mode="lighter"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+}
+
+.root[data-variant="error"][data-mode="ghost"] {
+  background: transparent;
+  color: var(--prime-sys-color-border-danger);
+  border-color: transparent;
+}
+
+.root[data-variant="error"][data-mode="ghost"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-surface-dangerSoft);
+}
+
+.root[data-variant="error"][data-mode="ghost"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.spinner {
+  width: 1em;
+  height: 1em;
+  border: var(--prime-sys-unit-2px) solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--prime-sys-shape-radius-round);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* AlignUI FancyButton: тень, верхний блик (::after), градиентное кольцо (::before) */
+.root[data-mode="fancy"] {
+  border-color: transparent;
+  isolation: isolate;
+}
+
+.root[data-mode="fancy"] .icon,
+.root[data-mode="fancy"] .spinner {
+  position: relative;
+  z-index: 2;
+}
+
+.root[data-variant="primary"][data-mode="fancy"] {
+  background: var(--prime-sys-color-action-primaryBackground);
+  color: var(--prime-sys-color-action-primaryForeground);
+  box-shadow: var(--prime-sys-elevation-shadow-fancyButtonPrimary);
+}
+
+.root[data-variant="primary"][data-mode="fancy"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-primaryBackground);
+}
+
+.root[data-variant="primary"][data-mode="fancy"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-primaryFocus);
+}
+
+.root[data-variant="neutral"][data-mode="fancy"] {
+  background: var(--prime-sys-color-content-primary);
+  color: var(--prime-sys-color-content-inverse);
+  box-shadow: var(--prime-sys-elevation-shadow-fancyButtonNeutral);
+}
+
+.root[data-variant="neutral"][data-mode="fancy"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-content-primary);
+  color: var(--prime-sys-color-content-inverse);
+}
+
+.root[data-variant="neutral"][data-mode="fancy"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.root[data-variant="error"][data-mode="fancy"] {
+  background: var(--prime-sys-color-action-errorBackground);
+  color: var(--prime-sys-color-action-errorForeground);
+  box-shadow: var(--prime-sys-elevation-shadow-fancyButtonError);
+}
+
+.root[data-variant="error"][data-mode="fancy"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-errorBackground);
+}
+
+.root[data-variant="error"][data-mode="fancy"]:focus-visible {
+  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+}
+
+.root[data-variant="primary"][data-mode="fancy"]::before,
+.root[data-variant="neutral"][data-mode="fancy"]::before,
+.root[data-variant="error"][data-mode="fancy"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: var(--prime-sys-unit-1px);
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--prime-sys-color-border-inverse) 12%, transparent),
+    transparent
+  );
+  mask-image:
+    linear-gradient(var(--prime-sys-color-border-inverse) 0 0),
+    linear-gradient(var(--prime-sys-color-border-inverse) 0 0);
+  mask-clip: content-box, border-box;
+  mask-composite: exclude;
+  mask-origin: border-box;
+  -webkit-mask-image:
+    linear-gradient(var(--prime-sys-color-border-inverse) 0 0),
+    linear-gradient(var(--prime-sys-color-border-inverse) 0 0);
+  -webkit-mask-clip: content-box, border-box;
+  -webkit-mask-composite: xor;
+}
+
+.root[data-variant="primary"][data-mode="fancy"]::after,
+.root[data-variant="neutral"][data-mode="fancy"]::after,
+.root[data-variant="error"][data-mode="fancy"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--prime-sys-color-border-inverse), transparent);
+  opacity: 0.16;
+  transition: opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.root[data-variant="primary"][data-mode="fancy"]:hover:not(:disabled)::after,
+.root[data-variant="neutral"][data-mode="fancy"]:hover:not(:disabled)::after,
+.root[data-variant="error"][data-mode="fancy"]:hover:not(:disabled)::after {
+  opacity: 0.24;
+}
+
+.root:disabled[data-variant][data-mode]:not([data-loading="true"]),
+.root[aria-disabled="true"][data-variant][data-mode]:not([data-loading="true"]) {
+  background: var(--prime-sys-color-surface-raised);
+  color: var(--prime-sys-color-content-disabled);
+  border-color: var(--prime-sys-color-border-subtle);
+  box-shadow: none;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* asChild: non-button elements need pointer-events blocked at CSS level */
+.root[aria-disabled="true"]:not([data-loading="true"]) {
+  pointer-events: none;
+}
+
+.root:disabled[data-variant][data-mode="fancy"]:not([data-loading="true"]),
+.root[aria-disabled="true"][data-variant][data-mode="fancy"]:not([data-loading="true"]) {
+  border-color: transparent;
+}
+
+.root:disabled[data-variant][data-mode="fancy"]:not([data-loading="true"])::before,
+.root:disabled[data-variant][data-mode="fancy"]:not([data-loading="true"])::after,
+.root[aria-disabled="true"][data-variant][data-mode="fancy"]:not([data-loading="true"])::before,
+.root[aria-disabled="true"][data-variant][data-mode="fancy"]:not([data-loading="true"])::after {
+  display: none;
+}
+
+.root[data-loading="true"][data-variant][data-mode] {
+  opacity: 0.92;
+  cursor: progress;
+}
+
+/* Active navigation link when Button.Root is used via asChild (e.g. NavLink sets aria-current). */
+.root[aria-current="page"] {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.root[data-loading="true"] .icon {
+  display: none;
+}
+
+.root[data-loading="true"] .spinner {
+  order: -1;
+}
+
+/* Перебить min-width по размеру: на всю ширину родителя в узкой колонке без раздува по min-content. */
+.root[data-full-width="true"] {
+  min-width: 0;
+}

@@ -1,0 +1,54 @@
+.stage {
+  box-sizing: border-box;
+  height: 18rem;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--prime-sys-shape-radius-m);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  padding: var(--prime-sys-spacing-x2);
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-surface-raised) 96%,
+    var(--prime-sys-color-surface-default)
+  );
+}
+
+.ctxList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x1);
+}
+
+.ctxItem {
+  margin: 0;
+}
+
+.ctxLink {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ctxIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menuAnchor {
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  align-items: center;
+}

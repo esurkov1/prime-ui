@@ -1,0 +1,334 @@
+.root {
+  --dt-row-height: var(--prime-sys-size-control-m-height);
+  --dt-cell-gap: var(--prime-sys-size-control-m-gap);
+  --dt-cell-pad-x: var(--prime-sys-size-control-m-buttonPaddingX);
+  --dt-cell-pad-y: var(--prime-sys-size-control-m-buttonPaddingY);
+  --dt-text: var(--prime-sys-size-control-m-text);
+
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+  width: 100%;
+  --dt-head-bg: var(--prime-sys-color-dataTable-headBackground);
+  --dt-row-bg: var(--prime-sys-color-dataTable-rowBackground);
+  --dt-divider-color-vertical: var(--prime-sys-color-dataTable-dividerVertical);
+  --dt-divider-color-horizontal: var(--prime-sys-color-dataTable-dividerHorizontal);
+  --dt-divider-style: solid;
+  --dt-divider-width: var(--prime-sys-unit-1px);
+  --dt-sort-icon: var(--prime-sys-size-control-m-icon);
+  --dt-z-sticky-first-column: 10;
+  --dt-z-sticky-header: 20;
+  --dt-z-sticky-header-first-column: 30;
+  --dt-z-sticky-corner: 40;
+  --dt-sticky-header-shadow: 0 var(--prime-sys-unit-1px) 0 0 var(--prime-sys-color-border-subtle);
+  --dt-sticky-first-column-shadow:
+    var(--prime-sys-unit-1px) 0 0 0 var(--prime-sys-color-border-subtle),
+    8px 0 16px -14px color-mix(in srgb, var(--prime-sys-color-content-primary) 42%, transparent);
+  --dt-sticky-corner-shadow:
+    var(--prime-sys-unit-1px) 0 0 0 var(--prime-sys-color-border-subtle),
+    0 var(--prime-sys-unit-1px) 0 0 var(--prime-sys-color-border-subtle),
+    8px 0 16px -14px color-mix(in srgb, var(--prime-sys-color-content-primary) 42%, transparent),
+    0 8px 16px -14px color-mix(in srgb, var(--prime-sys-color-content-primary) 42%, transparent);
+  /* Подсветки: смесь с фоном строки/шапки, без «заливки» action-hover */
+  --dt-row-hover-bg: color-mix(
+    in srgb,
+    var(--prime-sys-color-content-primary) 7%,
+    var(--dt-row-bg)
+  );
+  --dt-column-hover-bg: color-mix(
+    in srgb,
+    var(--prime-sys-color-content-primary) 9%,
+    var(--dt-row-bg)
+  );
+  --dt-column-hover-head-bg: color-mix(
+    in srgb,
+    var(--prime-sys-color-content-primary) 9%,
+    var(--dt-head-bg)
+  );
+  --dt-row-striped-bg: color-mix(
+    in srgb,
+    var(--prime-sys-color-content-primary) 4.5%,
+    var(--dt-row-bg)
+  );
+}
+
+.root[data-size="s"] {
+  --dt-row-height: var(--prime-sys-size-control-s-height);
+  --dt-cell-gap: var(--prime-sys-size-control-s-gap);
+  --dt-cell-pad-x: var(--prime-sys-size-control-s-buttonPaddingX);
+  --dt-cell-pad-y: var(--prime-sys-size-control-s-buttonPaddingY);
+  --dt-text: var(--prime-sys-size-control-s-text);
+  --dt-sort-icon: var(--prime-sys-size-control-s-icon);
+}
+
+.root[data-size="l"] {
+  --dt-row-height: var(--prime-sys-size-control-l-height);
+  --dt-cell-gap: var(--prime-sys-size-control-l-gap);
+  --dt-cell-pad-x: var(--prime-sys-size-control-l-buttonPaddingX);
+  --dt-cell-pad-y: var(--prime-sys-size-control-l-buttonPaddingY);
+  --dt-text: var(--prime-sys-size-control-l-text);
+  --dt-sort-icon: var(--prime-sys-size-control-l-icon);
+}
+
+.root[data-size="xl"] {
+  --dt-row-height: var(--prime-sys-size-control-xl-height);
+  --dt-cell-gap: var(--prime-sys-size-control-xl-gap);
+  --dt-cell-pad-x: var(--prime-sys-size-control-xl-buttonPaddingX);
+  --dt-cell-pad-y: var(--prime-sys-size-control-xl-buttonPaddingY);
+  --dt-text: var(--prime-sys-size-control-xl-text);
+  --dt-sort-icon: var(--prime-sys-size-control-xl-icon);
+}
+
+.viewport {
+  width: 100%;
+  overflow: auto;
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background: var(--dt-row-bg);
+  isolation: isolate;
+}
+
+.table {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.head {
+  background: var(--dt-head-bg);
+}
+
+.headRow {
+  box-shadow: inset 0 var(--prime-sys-unit-neg-1px) 0 0 var(--prime-sys-color-border-subtle);
+}
+
+.headCell {
+  height: var(--dt-row-height);
+  padding: var(--dt-cell-pad-y) var(--dt-cell-pad-x);
+  font-size: var(--dt-text);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  color: var(--prime-sys-color-content-primary);
+  line-height: 1.25;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.headCell[data-align="start"] {
+  text-align: left;
+}
+
+.headCell[data-align="center"] {
+  text-align: center;
+}
+
+.headCell[data-align="end"] {
+  text-align: right;
+}
+
+.headCell[data-sortable="true"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+.headCell + .headCell {
+  border-inline-start: var(--dt-divider-width) var(--dt-divider-style)
+    var(--dt-divider-color-vertical);
+}
+
+.root[data-sticky-header="true"] .headCell {
+  position: sticky;
+  top: 0;
+  z-index: var(--dt-z-sticky-header);
+  background: var(--dt-head-bg);
+  box-shadow: var(--dt-sticky-header-shadow);
+}
+
+.headLabel {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dt-cell-gap);
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  color: inherit;
+  pointer-events: none;
+}
+
+.sortLabel {
+  line-height: 1.25;
+  font-weight: inherit;
+}
+
+.sortIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--prime-sys-color-content-muted);
+  width: var(--dt-sort-icon);
+  height: var(--dt-sort-icon);
+  flex-shrink: 0;
+}
+
+.sortGlyph {
+  width: var(--dt-sort-icon);
+  height: var(--dt-sort-icon);
+}
+
+.body {
+  background: var(--dt-row-bg);
+}
+
+.row {
+  background: var(--dt-row-bg);
+  transition: background-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.cell {
+  height: var(--dt-row-height);
+  padding: var(--dt-cell-pad-y) var(--dt-cell-pad-x);
+  font-size: var(--dt-text);
+  line-height: 1.25;
+  color: var(--prime-sys-color-content-primary);
+  vertical-align: middle;
+}
+
+.cell[data-align="start"] {
+  text-align: left;
+}
+
+.cell[data-align="center"] {
+  text-align: center;
+}
+
+.cell[data-align="end"] {
+  text-align: right;
+}
+
+.cell + .cell {
+  border-inline-start: var(--dt-divider-width) var(--dt-divider-style)
+    var(--dt-divider-color-vertical);
+}
+
+.row + .row .cell {
+  border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color-horizontal);
+}
+
+.firstColumnSticky {
+  position: sticky;
+  left: 0;
+  z-index: var(--dt-z-sticky-first-column);
+  background: var(--dt-row-bg);
+  box-shadow: var(--dt-sticky-first-column-shadow);
+}
+
+.headCell.firstColumnSticky {
+  z-index: var(--dt-z-sticky-header-first-column);
+  background: var(--dt-head-bg);
+}
+
+.cornerCellSticky {
+  top: 0;
+  left: 0;
+  z-index: var(--dt-z-sticky-corner);
+  box-shadow: var(--dt-sticky-corner-shadow);
+}
+
+/* Надежный layering-паттерн для sticky header + first column:
+   body first column < header cells < corner 0x0 */
+.root[data-sticky-first-column="true"] .body .cell[data-first-column="true"] {
+  z-index: var(--dt-z-sticky-first-column);
+}
+
+.root[data-sticky-header="true"] .head .headCell {
+  z-index: var(--dt-z-sticky-header);
+}
+
+.root[data-sticky-header="true"][data-sticky-first-column="true"]
+  .head
+  .headCell[data-first-column="true"] {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: var(--dt-z-sticky-corner);
+}
+
+.root[data-highlight-row="true"] .row:hover {
+  background: var(--dt-row-hover-bg);
+}
+
+.root[data-highlight-row="true"] .row:hover .cell {
+  background: var(--dt-row-hover-bg);
+}
+
+.root[data-highlight-row="true"] .row:hover .firstColumnSticky {
+  background: var(--dt-row-hover-bg);
+}
+
+/* Колонка под курсором */
+.root[data-highlight-column="true"] thead .headCell[data-column-hovered="true"] {
+  background: var(--dt-column-hover-head-bg);
+}
+
+.root[data-highlight-column="true"] .cell[data-column-hovered="true"] {
+  background: var(--dt-column-hover-bg);
+}
+
+.root[data-highlight-column="true"] .firstColumnSticky[data-column-hovered="true"] {
+  background: var(--dt-column-hover-bg);
+}
+
+/* Зебра */
+.root[data-striped="true"] .row[data-stripe="alt"] {
+  background: var(--dt-row-striped-bg);
+}
+
+.root[data-striped="true"] .row[data-stripe="alt"] .cell {
+  background: var(--dt-row-striped-bg);
+}
+
+.root[data-striped="true"] .row[data-stripe="alt"] .firstColumnSticky {
+  background: var(--dt-row-striped-bg);
+}
+
+.stateCell {
+  padding: var(--prime-sys-spacing-x8) var(--prime-sys-spacing-x4);
+  text-align: center;
+  font-size: var(--dt-text);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.sentinel {
+  height: var(--prime-sys-unit-2px);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.meta {
+  margin: 0;
+  font-size: var(--dt-text);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.root[data-divider="dashed"] {
+  --dt-divider-style: dashed;
+}
+
+.root[data-divider="dotted"] {
+  --dt-divider-style: dotted;
+}
+
+.root[data-divider="none"] {
+  --dt-divider-width: 0;
+}

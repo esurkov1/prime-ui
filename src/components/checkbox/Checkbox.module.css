@@ -1,0 +1,195 @@
+/*
+ * Зазор контрол–текст: не меньше, чем у поля m; для l/xl растёт пропорционально размеру
+ * контрола (фиксированный px при крупном чекбоксе выглядел «уже», чем у s).
+ */
+.field {
+  --prime-choice-control-size: var(--prime-sys-size-choice-m-control);
+  --prime-choice-col-gap: var(--prime-sys-size-control-m-inputPaddingX);
+  /* Совпадает с левым краем колонки текста в `labelRow` (grid: control | text). */
+  --prime-choice-hint-offset: calc(var(--prime-choice-control-size) + var(--prime-choice-col-gap));
+  --prime-choice-stack-gap: var(--prime-sys-size-control-m-gap);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-choice-stack-gap);
+}
+
+.field[data-size="s"] {
+  --prime-choice-control-size: var(--prime-sys-size-choice-s-control);
+  --prime-choice-col-gap: var(--prime-sys-size-control-s-inputPaddingX);
+}
+
+.field[data-size="l"] {
+  --prime-choice-control-size: var(--prime-sys-size-choice-l-control);
+  --prime-choice-col-gap: var(--prime-sys-size-control-l-inputPaddingX);
+}
+
+.field[data-size="xl"] {
+  --prime-choice-control-size: var(--prime-sys-size-choice-xl-control);
+  --prime-choice-col-gap: var(--prime-sys-size-control-xl-inputPaddingX);
+}
+
+/* .field — выше специфичность, чем у Label.Root (inline-flex + gap), чтобы сетка не ломалась. */
+.field .labelRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0;
+  row-gap: 0;
+  column-gap: var(--prime-choice-col-gap);
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.controlCell {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--prime-choice-control-size);
+  height: var(--prime-choice-control-size);
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.control {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  overflow: visible;
+}
+
+/* ---- rect (background + border) ---- */
+
+.rect {
+  fill: var(--prime-sys-color-surface-raised);
+  stroke: var(--prime-sys-color-field-border);
+  stroke-width: 1;
+  transition:
+    fill var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    stroke var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+/* ---- checkmark path ---- */
+
+.checkPath {
+  fill: none;
+  stroke: var(--prime-sys-color-content-inverse);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 14;
+  stroke-dashoffset: 14;
+  transition: stroke-dashoffset var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+/* ---- indeterminate line ---- */
+
+.indeterminateLine {
+  fill: none;
+  stroke: var(--prime-sys-color-content-inverse);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 7;
+  stroke-dashoffset: 7;
+  transition: stroke-dashoffset var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+/* Текст подписи наследует кегль от Label.Root; ограничиваем перенос. */
+.text {
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  min-width: 0;
+}
+
+/* ---- hover (unchecked) ---- */
+
+.labelRow:hover .rect {
+  stroke: var(--prime-sys-color-field-borderHover);
+  fill: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+/* ---- checked / indeterminate — rect fill ---- */
+
+.field[data-checked="true"] .rect,
+.field[data-indeterminate="true"] .rect {
+  fill: var(--prime-sys-color-action-primaryBackground);
+  stroke: var(--prime-sys-color-action-primaryBackground);
+}
+
+/* ---- checked / indeterminate — hover ---- */
+
+.field[data-checked="true"] .labelRow:hover .rect,
+.field[data-indeterminate="true"] .labelRow:hover .rect {
+  fill: var(--prime-sys-color-action-primaryBackgroundHover);
+  stroke: var(--prime-sys-color-action-primaryBackgroundHover);
+}
+
+/* ---- animate checkmark ---- */
+
+.field[data-checked="true"] .checkPath {
+  stroke-dashoffset: 0;
+}
+
+/* ---- animate indeterminate line ---- */
+
+.field[data-indeterminate="true"] .indeterminateLine {
+  stroke-dashoffset: 0;
+}
+
+/* ---- focus-visible ---- */
+
+.input:focus-visible + .control {
+  border-radius: var(--prime-sys-shape-radius-s);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+/* ---- invalid (variant=error или Checkbox.Error) — как у Radio ---- */
+
+.field[data-invalid="true"] .rect {
+  stroke: var(--prime-sys-color-field-borderError);
+}
+
+/* ---- disabled ---- */
+
+.field[data-disabled="true"] .labelRow {
+  cursor: not-allowed;
+}
+
+.field[data-disabled="true"] .rect {
+  stroke: var(--prime-sys-color-border-subtle);
+  fill: var(--prime-sys-color-surface-accentSoft);
+}
+
+.field[data-disabled="true"] .checkPath,
+.field[data-disabled="true"] .indeterminateLine {
+  stroke: var(--prime-sys-color-content-disabled);
+}
+
+.field[data-disabled="true"] .labelRow:hover .rect {
+  stroke: var(--prime-sys-color-border-subtle);
+  fill: var(--prime-sys-color-surface-accentSoft);
+}
+
+/* Hint / error — под колонкой текста (как meta у Input), не под квадратом. */
+.hintSlot {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding-inline-start: var(--prime-choice-hint-offset);
+  justify-content: flex-start;
+}

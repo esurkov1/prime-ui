@@ -1,0 +1,74 @@
+.root {
+  --bc-text: var(--prime-sys-size-control-m-text);
+}
+
+.root[data-size="s"] {
+  --bc-text: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="l"] {
+  --bc-text: var(--prime-sys-size-control-l-text);
+}
+
+.root[data-size="xl"] {
+  --bc-text: var(--prime-sys-size-control-xl-text);
+}
+
+.root ol {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Первый пункт «только иконка» (дом): выравнивание, без лишней высоты строки. */
+.itemHome .breadcrumbLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+/* Предыдущие сегменты: приглушённый текст; hover чуть сильнее, без «акцентного» цвета ссылки.
+   Кегль задаёт LinkButton по `size` у Root. */
+.item a.breadcrumbLink {
+  color: var(--prime-sys-color-content-muted);
+}
+
+.item a.breadcrumbLink:hover {
+  color: var(--prime-sys-color-content-primary);
+  text-decoration-color: transparent;
+}
+
+.item a.breadcrumbLink:focus-visible {
+  color: var(--prime-sys-color-content-primary);
+  text-decoration-color: transparent;
+}
+
+/* Текущая страница: тот же кегль, что и ссылки при данном `size`. */
+.itemCurrent {
+  color: var(--prime-sys-color-content-primary);
+  font-size: var(--bc-text);
+}
+
+.separator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--prime-sys-color-content-muted);
+  user-select: none;
+}
+
+.ellipsis {
+  color: var(--prime-sys-color-content-muted);
+  font-size: var(--bc-text);
+}

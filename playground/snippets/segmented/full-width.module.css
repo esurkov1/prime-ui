@@ -1,0 +1,8 @@
+.shelf {
+  width: min(100%, 22rem);
+}
+
+/* Перекрываем `width: fit-content` у корня сегментированного контроля в демо */
+.fill {
+  width: 100% !important;
+}

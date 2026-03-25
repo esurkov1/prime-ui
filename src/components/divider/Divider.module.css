@@ -1,0 +1,122 @@
+/*
+ * Номинальный `data-size` = размер родителя.
+ * Визуальный ярус на ступень ниже: s→xs, m→xs, l→s, xl→m.
+ */
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-divider-gap);
+  color: var(--prime-sys-color-content-secondary);
+  box-sizing: border-box;
+}
+
+.root[data-size="s"] {
+  --prime-divider-gap: var(--prime-sys-size-control-xs-gap);
+  --prime-divider-icon: var(--prime-sys-size-control-xs-icon);
+  --prime-divider-inline-pad: var(--prime-sys-size-control-xs-buttonPaddingX);
+  --prime-divider-align-stub: var(--prime-sys-size-control-xs-buttonPaddingX);
+  --prime-divider-label-font-size: var(--prime-sys-size-control-xs-text);
+  --prime-divider-label-line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+}
+
+.root[data-size="m"] {
+  --prime-divider-gap: var(--prime-sys-size-control-xs-gap);
+  --prime-divider-icon: var(--prime-sys-size-control-xs-icon);
+  --prime-divider-inline-pad: var(--prime-sys-size-control-xs-buttonPaddingX);
+  --prime-divider-align-stub: var(--prime-sys-size-control-xs-buttonPaddingX);
+  --prime-divider-label-font-size: var(--prime-sys-size-control-xs-text);
+  --prime-divider-label-line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+}
+
+.root[data-size="l"] {
+  --prime-divider-gap: var(--prime-sys-size-control-s-gap);
+  --prime-divider-icon: var(--prime-sys-size-control-s-icon);
+  --prime-divider-inline-pad: var(--prime-sys-size-control-s-buttonPaddingX);
+  --prime-divider-align-stub: var(--prime-sys-size-control-s-buttonPaddingX);
+  --prime-divider-label-font-size: var(--prime-sys-size-control-s-text);
+  --prime-divider-label-line-height: var(--prime-sys-typography-lineHeightScale-xs);
+}
+
+.root[data-size="xl"] {
+  --prime-divider-gap: var(--prime-sys-size-control-m-gap);
+  --prime-divider-icon: var(--prime-sys-size-control-m-icon);
+  --prime-divider-inline-pad: var(--prime-sys-size-control-m-buttonPaddingX);
+  --prime-divider-align-stub: var(--prime-sys-size-control-m-buttonPaddingX);
+  --prime-divider-label-font-size: var(--prime-sys-size-control-m-text);
+  --prime-divider-label-line-height: var(--prime-sys-typography-lineHeightScale-s);
+}
+
+/* В колонке flex (меню, карточки) тянем линию на всю ширину ряда */
+.root:not([data-orientation="vertical"]) {
+  width: 100%;
+  min-width: 0;
+}
+
+.content {
+  min-width: 0;
+}
+
+.root::before,
+.root::after {
+  content: "";
+  flex: 1;
+  height: var(--prime-sys-unit-1px);
+  background: var(--prime-sys-color-border-subtle);
+}
+
+.root[data-align="start"]::before {
+  flex: 0 0 var(--prime-divider-align-stub);
+}
+
+.root[data-align="end"]::after {
+  flex: 0 0 var(--prime-divider-align-stub);
+}
+
+.root:empty::before {
+  flex: 1;
+}
+
+.root:empty::after {
+  display: none;
+}
+
+.root:empty {
+  gap: 0;
+}
+
+.root[data-orientation="vertical"] {
+  flex-direction: column;
+  width: var(--prime-sys-unit-1px);
+  height: 100%;
+}
+
+.root[data-orientation="vertical"]::before,
+.root[data-orientation="vertical"]::after {
+  width: var(--prime-sys-unit-1px);
+  height: auto;
+  flex: 1;
+}
+
+.root[data-variant="line-spacing"] {
+  flex: 0 0 auto;
+}
+
+.root[data-variant="text"] {
+  flex: 0 0 auto;
+  font-size: var(--prime-divider-label-font-size);
+  line-height: var(--prime-divider-label-line-height);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--prime-sys-color-content-muted);
+}
+
+.root[data-variant="text"] .content {
+  padding-inline: var(--prime-divider-inline-pad);
+}
+
+.root .content :where(svg) {
+  width: var(--prime-divider-icon);
+  height: var(--prime-divider-icon);
+  flex-shrink: 0;
+}
