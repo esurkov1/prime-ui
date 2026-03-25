@@ -32,6 +32,8 @@ const MIN_MENU_ESTIMATE = 176;
 const FALLBACK_VIEWPORT_PAD_PX = 8;
 /** Минимальная высота скролла выпадашки при очень маленьком вьюпорте. */
 const MIN_FLOATING_MAX_HEIGHT = 120;
+/** Пока offsetHeight === 0, для side=top задаём top от якоря с грубой оценкой высоты (следующий кадр поправит). */
+const FIRST_PAINT_FLOAT_HEIGHT_GUESS_PX = 280;
 
 export type ComputeFloatingOptions = {
   preferredSide: PositionSide;
@@ -65,6 +67,8 @@ function pickSideForFlip(
     if (fitsT && !fitsB) return "top";
     if (fitsB && fitsT) return "bottom";
   }
+  /* Без высоты нельзя сравнивать «куда влезет» и нельзя брать сторону по room*: иначе side=top, а top в px считают как для bottom — панель уезжает, maxHeight берётся от неверной стороны. */
+  if (contentH === 0) return preferred;
   if (roomBottom > roomTop) return "bottom";
   if (roomTop > roomBottom) return "top";
   return preferred;
@@ -88,7 +92,9 @@ export function computeFloatingPosition(
 
   const top =
     contentH === 0
-      ? anchorRect.bottom + offset
+      ? side === "bottom"
+        ? anchorRect.bottom + offset
+        : Math.max(pad, anchorRect.top - offset - FIRST_PAINT_FLOAT_HEIGHT_GUESS_PX)
       : side === "bottom"
         ? anchorRect.bottom + offset
         : anchorRect.top - offset - contentH;

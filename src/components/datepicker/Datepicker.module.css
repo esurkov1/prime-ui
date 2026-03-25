@@ -136,8 +136,10 @@
 }
 
 .month {
-  min-width: min(100%, var(--prime-sys-unit-15rem));
-  flex: 1 1 min(100%, var(--prime-sys-unit-15rem));
+  /* Семь колонок дней + table-layout:fixed — стабильная ширина при смене месяца (подпись, строки) и без лишнего пересчёта max-content у поповера */
+  --dp-month-grid-min-width: calc(7 * var(--rdp-day_button-width));
+  min-width: min(100%, max(var(--dp-month-grid-min-width), var(--prime-sys-unit-15rem)));
+  flex: 1 1 var(--dp-month-grid-min-width);
   display: flex;
   flex-direction: column;
   gap: var(--prime-sys-spacing-x2);
@@ -146,6 +148,7 @@
 /* react-day-picker рендерит <table> без явной ширины */
 .pickerRoot :global(.rdp-month_grid) {
   width: 100%;
+  table-layout: fixed;
 }
 
 /* ─── Навигация (prev/next) ─────────────────────────────────────────────── */
