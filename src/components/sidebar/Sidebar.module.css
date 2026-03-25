@@ -864,6 +864,16 @@
     }
   }
 
+  /* На очень узких экранах (≤320px) — панель на всю ширину. */
+  @media (max-width: 320px) {
+    .root[data-responsive="true"] .navPanel {
+      width: 100%;
+      min-width: 100%;
+      max-width: 100%;
+      border-radius: 0;
+    }
+  }
+
   .root[data-responsive="true"][data-open="true"] .navPanel {
     transform: translateX(0);
     opacity: 1;

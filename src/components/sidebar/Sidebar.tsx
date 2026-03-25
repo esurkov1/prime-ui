@@ -81,6 +81,12 @@ export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"aside">, "ch
   panelWidth?: "compact";
   /** Размещение в колонке навигации рядом с контентом (flex-слот). */
   sidebarSlot?: "page-nav";
+  /**
+   * При `responsive` и узком viewport: открывать оверлей, когда указатель оказывается
+   * у левого края окна (только если устройство поддерживает hover + fine pointer).
+   * При контролируемом `open` задайте `onOpenChange`, иначе родитель не узнает о запросе открытия.
+   */
+  edgeHoverOpen?: boolean;
 };
 
 function SidebarRoot({
@@ -97,6 +103,7 @@ function SidebarRoot({
   defaultOpen = true,
   onOpenChange,
   responsive = true,
+  edgeHoverOpen = true,
   panelWidth,
   sidebarSlot,
   "aria-label": ariaLabel = "Sidebar",
@@ -182,6 +189,50 @@ function SidebarRoot({
   const toggleOpen = React.useCallback(() => {
     setOpenState((prev) => !prev);
   }, [setOpenState]);
+
+  const [edgeHoverRevealEnabled, setEdgeHoverRevealEnabled] = React.useState(false);
+
+  React.useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function" ||
+      edgeHoverOpen !== true
+    ) {
+      setEdgeHoverRevealEnabled(false);
+      return;
+    }
+    const query = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const sync = () => setEdgeHoverRevealEnabled(query.matches);
+    sync();
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", sync);
+      return () => query.removeEventListener("change", sync);
+    }
+    query.addListener(sync);
+    return () => query.removeListener(sync);
+  }, [edgeHoverOpen]);
+
+  const edgeOpenPx = 12;
+
+  React.useEffect(() => {
+    if (
+      edgeHoverOpen !== true ||
+      responsive !== true ||
+      !isResponsiveViewport ||
+      open ||
+      !edgeHoverRevealEnabled ||
+      typeof window === "undefined"
+    ) {
+      return;
+    }
+    const onMove = (event: MouseEvent) => {
+      if (event.clientX <= edgeOpenPx) {
+        setOpenState(true);
+      }
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [edgeHoverOpen, edgeHoverRevealEnabled, isResponsiveViewport, open, responsive, setOpenState]);
 
   const shouldShowInlineOverlay = responsive === true && isResponsiveViewport && open;
   const shouldShowFloatingToggle = open === false;

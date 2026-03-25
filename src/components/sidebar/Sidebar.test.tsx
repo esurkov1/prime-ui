@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
@@ -79,6 +79,46 @@ describe("Sidebar", () => {
 
     const root = screen.getByRole("complementary", { name: "Sidebar" });
     expect(root).toHaveAttribute("data-responsive", "true");
+  });
+
+  it("opens overlay when pointer reaches left edge in responsive hover mode", async () => {
+    const matchMediaImpl = (query: string) => {
+      const matches =
+        (query.includes("64rem") && query.includes("max-width")) ||
+        (query.includes("hover: hover") && query.includes("pointer: fine"));
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as MediaQueryList;
+    };
+    const previousMatchMedia = window.matchMedia;
+    window.matchMedia = matchMediaImpl as typeof window.matchMedia;
+
+    try {
+      render(
+        <Sidebar.Root defaultOpen={false} responsive>
+          <Sidebar.NavPanel />
+        </Sidebar.Root>,
+      );
+
+      const root = screen.getByRole("complementary", { name: "Sidebar" });
+      expect(root).toHaveAttribute("data-open", "false");
+
+      await waitFor(() => {
+        window.dispatchEvent(
+          new MouseEvent("mousemove", { bubbles: true, clientX: 8, clientY: 50 }),
+        );
+        expect(root).toHaveAttribute("data-open", "true");
+      });
+    } finally {
+      window.matchMedia = previousMatchMedia;
+    }
   });
 
   it("shows collapsed open handle only when sidebar is closed", () => {
