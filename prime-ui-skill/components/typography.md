@@ -1,20 +1,20 @@
 # Typography
 
-## Что это
+## What it is
 
-Набор стилей для абзаца, строки или блока текста с фиксированной шкалой размеров и опциональными осями: насыщенность, трекинг, курсив и приглушённый цвет.
+A set of styles for a paragraph, line, or text block with a fixed size scale and optional axes: weight, tracking, italic, and muted color.
 
-## Для чего нужен
+## What it’s for
 
-- **Публичный сайт и маркетинг** — единообразные крупные акценты и подписи на лендингах без ручного подбора кегля и интерлиньяжа.
-- **Личный кабинет и операционные экраны** — вторичные пояснения (`tone="muted"`), мелкий юридический текст (`2xs`) и акценты внутри карточек заказов или уведомлений.
-- **Редакционный или образовательный контент** — согласованная типографика основного текста с возможностью вложить выделения и ссылки, не ломая вертикальный ритм.
+- **Public site and marketing** — consistent large accents and captions on landing pages without manually picking font size and line height.
+- **Account area and operational screens** — secondary explanations (`tone="muted"`), small legal copy (`2xs`), and accents inside order cards or notifications.
+- **Editorial or educational content** — aligned typography for body text with room for emphasis and links without breaking vertical rhythm.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Основной абзац статьи или описания раздела с обязательным размером `m`.
+Main paragraph of an article or section description with a required `m` size.
 
 ```tsx
 import { Typography } from "prime-ui-kit";
@@ -22,15 +22,15 @@ import { Typography } from "prime-ui-kit";
 export function ArticleLead() {
   return (
     <Typography.Root size="m">
-      Мы обновили правила доставки: теперь интервал выбирается в корзине до оплаты.
+      We updated delivery rules: you now pick the time window in the cart before payment.
     </Typography.Root>
   );
 }
 ```
 
-### С вариантами и размерами
+### Variants and sizes
 
-Панель метрик на дашборде: крупное число и подпись разного веса и тона.
+Metrics panel on a dashboard: a large number and a caption with different weight and tone.
 
 ```tsx
 import { Typography } from "prime-ui-kit";
@@ -42,16 +42,16 @@ export function MetricTile() {
         94 %
       </Typography.Root>
       <Typography.Root size="s" tone="muted">
-        Доля успешных синхронизаций за последние 24 часа
+        Share of successful syncs in the last 24 hours
       </Typography.Root>
     </div>
   );
 }
 ```
 
-### В контексте (карточка заказа)
+### In context (order card)
 
-Составной абзац: вложенные `Typography.Root` для суммы и статуса, обычная ссылка для действия.
+Composite paragraph: nested `Typography.Root` for amount and status, a plain link for the action.
 
 ```tsx
 import { Typography } from "prime-ui-kit";
@@ -59,72 +59,72 @@ import { Typography } from "prime-ui-kit";
 export function OrderSummary() {
   return (
     <Typography.Root size="m" as="div">
-      Заказ № 9012:{" "}
+      Order #9012:{" "}
       <Typography.Root as="span" size="m" weight="semibold">
-        в пути
+        in transit
       </Typography.Root>
-      . Сумма{" "}
+      . Total{" "}
       <Typography.Root as="span" size="m" weight="medium" tracking="tight">
-        4 250 ₽
+        4,250 ₽
       </Typography.Root>
       .{" "}
       <a href="/orders/9012" style={{ color: "inherit" }}>
-        Открыть детали
+        View details
       </a>
     </Typography.Root>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Не применяется: у `Typography.Root` нет внутреннего состояния и событий изменения стиля; все параметры задаются пропами при рендере.
+Not applicable: `Typography.Root` has no internal state or style-change events; all options are set via props at render time.
 
-## Анатомия
+## Anatomy
 
-Плоский API: один подкомпонент `Typography.Root`, который рендерит нативный элемент `p`, `span` или `div` (проп `as`, по умолчанию `p`).
+Flat API: a single subcomponent `Typography.Root` that renders a native `p`, `span`, or `div` element (`as` prop, default `p`).
 
 ## API
 
 ### Typography.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| as | `"p" \| "span" \| "div"` | `"p"` | Нет | Тег обёртки |
-| size | `"2xs" \| "xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl" \| "3xl" \| "4xl" \| "5xl" \| "6xl"` | — | Да | Шкала кегля и межстрочного интервала |
-| weight | `"regular" \| "medium" \| "semibold"` | `"regular"` | Нет | Начертание |
-| tracking | `"normal" \| "tight" \| "tighter" \| "wide"` | `"normal"` | Нет | Межбуквенное расстояние |
-| italic | `boolean` | `false` | Нет | Курсив |
-| tone | `"default" \| "muted"` | `"default"` | Нет | Основной или вторичный цвет текста |
-| className | `string` | — | Нет | Дополнительный класс |
-| children | `React.ReactNode` | — | Нет | Содержимое |
-| ref | `React.Ref<HTMLElement>` | — | Нет | Ссылка на DOM-узел |
-| …rest | `React.HTMLAttributes<HTMLElement>` | — | Нет | Прочие HTML-атрибуты выбранного элемента |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| as | `"p" \| "span" \| "div"` | `"p"` | No | Wrapper tag |
+| size | `"2xs" \| "xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl" \| "3xl" \| "4xl" \| "5xl" \| "6xl"` | — | Yes | Font size and line-height scale |
+| weight | `"regular" \| "medium" \| "semibold"` | `"regular"` | No | Font weight |
+| tracking | `"normal" \| "tight" \| "tighter" \| "wide"` | `"normal"` | No | Letter spacing |
+| italic | `boolean` | `false` | No | Italic |
+| tone | `"default" \| "muted"` | `"default"` | No | Primary or secondary text color |
+| className | `string` | — | No | Extra class name |
+| children | `React.ReactNode` | — | No | Content |
+| ref | `React.Ref<HTMLElement>` | — | No | Ref to the DOM node |
+| …rest | `React.HTMLAttributes<HTMLElement>` | — | No | Other HTML attributes for the chosen element |
 
-## Варианты
+## Variants
 
-- **size** — одиннадцать ступеней от `2xs` до `6xl`; к каждой привязаны токены кегля и межстрочного интервала.
-- **weight** — `regular` (без `data-weight`), `medium`, `semibold`.
-- **tracking** — `normal` (без `data-tracking`), `tight`, `tighter`, `wide`.
-- **tone** — `default` (основной цвет контента) и `muted` (вторичный).
+- **size** — eleven steps from `2xs` to `6xl`; each maps to font size and line-height tokens.
+- **weight** — `regular` (no `data-weight`), `medium`, `semibold`.
+- **tracking** — `normal` (no `data-tracking`), `tight`, `tighter`, `wide`.
+- **tone** — `default` (primary content color) and `muted` (secondary).
 
-## Состояния
+## States
 
-Интерактивных состояний (disabled, loading, ошибка валидации) нет. Визуальное отличие курсива задаётся булевым пропом `italic` и `data-italic` в разметке.
+No interactive states (disabled, loading, validation error). Italic appearance is controlled by the boolean `italic` prop and `data-italic` in the markup.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-Семантику заголовков страницы и секций обеспечивают нативные `h1`–`h6`; `Typography` не подставляет роль заголовка. Для интерактивных фрагментов внутри текста используйте настоящие ссылки и кнопки с осмысленными подписями. При необходимости пробрасывайте `id`, `aria-*` и прочие атрибуты через `...rest` на корневой элемент.
+Page and section heading semantics come from native `h1`–`h6`; `Typography` does not assign a heading role. For interactive fragments inside text, use real links and buttons with meaningful labels. Pass `id`, `aria-*`, and other attributes through `...rest` to the root element when needed.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Проп `as` допускает только `p`, `span` и `div` — не заголовки и не интерактивные элементы по умолчанию.
-- Отдельного пропа межстрочного интервала нет: он согласован с `size` в CSS модуля компонента.
-- Включён `text-wrap: balance` у корневого класса для более ровных переносов в коротких блоках; кастомизация переносов — через `className` или внешние стили контейнера.
+- The `as` prop only allows `p`, `span`, and `div` — not headings or interactive elements by default.
+- There is no separate line-height prop: it is tied to `size` in the component’s CSS module.
+- The root class uses `text-wrap: balance` for more even breaks in short blocks; customize wrapping via `className` or outer container styles.
 
-## Связанные компоненты
+## Related components
 
-- **Label** и **Hint** — подписи и подсказки к полям форм.
-- **PageContent** — типичная оболочка страницы с заголовком и описанием.
-- **LinkButton** — действие в виде текста-ссылки с отступами клика.
-- **Banner** и **NotificationCard** — блоки, где текст часто сочетается с `tone` и иерархией размеров.
+- **Label** and **Hint** — field labels and hints in forms.
+- **PageContent** — typical page shell with title and description.
+- **LinkButton** — text-link action with comfortable click padding.
+- **Banner** and **NotificationCard** — blocks where text often pairs with `tone` and a size hierarchy.

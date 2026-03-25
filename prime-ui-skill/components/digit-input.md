@@ -1,25 +1,25 @@
 # DigitInput
 
-## Что это
+## What it is
 
-Группа отдельных полей ввода, в каждой — ровно одна цифра, с общей логикой сбора строки, фокусом по стрелке ввода и поддержкой вставки кода из буфера.
+A group of separate input fields, each holding exactly one digit, with shared logic to assemble the string, arrow-key focus navigation, and support for pasting a code from the clipboard.
 
-## Для чего нужен
+## What it’s for
 
-- **Подтверждение личности:** одноразовый код из SMS или приложения-аутентификатора на экране входа или смены устройства.
-- **Выдача заказа:** короткий числовой код, который покупатель называет или вводит на кассе самообслуживания.
-- **Доступ к ограниченному контенту:** родительский PIN или код сеанса в образовательном или медиасервисе.
-- **Промышленные и полевые сценарии:** крупные ячейки на планшете на складе или в цеху, где важны размер и попадание пальцем.
-- **Парная привязка устройств:** ввод отображаемого на экране ТВ или роутера кода в мобильном приложении.
-- **Формы с пошаговой проверкой:** код подтверждения email или телефона внутри мастера настроек, рядом с подписью и текстом подсказки.
+- **Identity verification:** one-time codes from SMS or an authenticator app on sign-in or device-change screens.
+- **Order pickup:** short numeric codes the customer states or enters at a self-service kiosk.
+- **Gated content:** parental PIN or session code in education or media products.
+- **Industrial and field use:** large cells on a warehouse or shop-floor tablet where size and touch accuracy matter.
+- **Device pairing:** entering a code shown on a TV or router screen in a mobile app.
+- **Step-by-step forms:** email or phone confirmation codes inside a settings wizard, next to a label and hint text.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример рассчитан на другой тип экрана и набор пропсов.
+Each example targets a different screen type and prop set.
 
-### Базовый
+### Basic
 
-Частый случай — четырёхзначный код после отправки SMS. Достаточно неконтролируемого режима с колбэком по завершении, чтобы перейти к следующему шагу.
+A common case is a four-digit code after sending an SMS. Uncontrolled mode with an `onComplete` callback is enough to move to the next step.
 
 ```tsx
 import * as React from "react";
@@ -37,9 +37,9 @@ export function SmsVerifyStep({ onSuccess }: { onSuccess: (code: string) => void
 }
 ```
 
-### С вариантами/размерами
+### Sizes
 
-Отдельный контекст — терминал в зоне выдачи: нужен увеличенный контроль и шестизначный код заказа. Меняется только `size` и `length`, без смены «варианта» (у компонента нет enum `variant`).
+A different context is a pickup-terminal kiosk: larger touch targets and a six-digit order code. Only `size` and `length` change; there is no separate `variant` enum on the component.
 
 ```tsx
 import { DigitInput } from "prime-ui-kit";
@@ -58,9 +58,9 @@ export function PickupKioskCode() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Экран восстановления доступа в боковой панели настроек: подпись, поле кода и пояснение — отдельные примитивы кита, DigitInput отвечает только за ячейки.
+Account recovery in a settings sidebar: label, code field, and explanation are separate kit primitives; DigitInput only owns the cells.
 
 ```tsx
 import { DigitInput } from "prime-ui-kit";
@@ -70,19 +70,19 @@ import { Label } from "prime-ui-kit";
 export function RecoverySidebarPanel() {
   return (
     <section>
-      <Label.Root size="m">Код из письма</Label.Root>
+      <Label.Root size="m">Code from email</Label.Root>
       <DigitInput.Root length={8} size="m" />
       <Hint.Root size="m" variant="default">
-        Сообщение могло попасть в папку «Спам». Код действует 15 минут.
+        The message may be in your Spam folder. The code is valid for 15 minutes.
       </Hint.Root>
     </section>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Панель администратора: код ввода синхронизирован с состоянием, его можно сбросить кнопкой после неудачной проверки на сервере.
+Admin panel: the entered code stays in sync with state and can be cleared with a button after a failed server check.
 
 ```tsx
 import * as React from "react";
@@ -96,60 +96,60 @@ export function AdminReauthChip() {
     <div>
       <DigitInput.Root length={4} value={pin} onChange={setPin} />
       <Button.Root type="button" variant="neutral" mode="stroke" onClick={() => setPin("")}>
-        Очистить
+        Clear
       </Button.Root>
     </div>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Публичная точка входа — `DigitInput.Root`. Внутри рендерится `fieldset` с `aria-label="Digit input"` и массив из `length` элементов `input type="text"` (`inputMode="numeric"`, `maxLength={1}`, `autoComplete="one-time-code"`). Отдельных слотов (`Icon`, `Label` и т.д.) у компонента нет.
+The public entry point is `DigitInput.Root`. Internally it renders a `fieldset` with `aria-label="Digit input"` and an array of `length` `input type="text"` elements (`inputMode="numeric"`, `maxLength={1}`, `autoComplete="one-time-code"`). There are no separate slots (`Icon`, `Label`, etc.) on this component.
 
 ## API
 
 ### DigitInput.Root
 
-| Проп           | Тип                      | По умолчанию | Обязательный | Описание                                                                 |
-| -------------- | ------------------------ | ------------ | ------------ | ------------------------------------------------------------------------ |
-| `length`       | `number`                 | `4`          | Нет          | Число ячеек (одна цифра на ячейку).                                      |
-| `size`         | `"s" \| "m" \| "l" \| "xl"` | `"m"`     | Нет          | Визуальный размер ячеек (токены контролов).                              |
-| `value`        | `string`                 | —            | Нет          | Контролируемое значение; нецифровые символы отбрасываются, обрезка по `length`. |
-| `defaultValue` | `string`                 | `""`         | Нет          | Начальное значение в неконтролируемом режиме.                            |
-| `onChange`     | `(value: string) => void` | —           | Нет          | Каждое изменение нормализованной строки цифр.                            |
-| `disabled`     | `boolean`                | —            | Нет          | Отключает все ячейки.                                                    |
-| `hasError`     | `boolean`                | —            | Нет          | Стиль ошибки на обводке ячеек.                                           |
-| `onComplete`   | `(value: string) => void` | —           | Нет          | Вызывается один раз при переходе длины значения к `length` с меньшей.   |
-| `className`    | `string`                 | —            | Нет          | Класс на корневом `fieldset`.                                            |
+| Prop           | Type                      | Default | Required | Description                                                                 |
+| -------------- | ------------------------- | ------- | -------- | --------------------------------------------------------------------------- |
+| `length`       | `number`                  | `4`     | No       | Number of cells (one digit per cell).                                      |
+| `size`         | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No       | Visual size of cells (control tokens).                                     |
+| `value`        | `string`                  | —       | No       | Controlled value; non-digit characters are stripped, truncated to `length`. |
+| `defaultValue` | `string`                  | `""`    | No       | Initial value in uncontrolled mode.                                        |
+| `onChange`     | `(value: string) => void` | —       | No       | Fires on every change to the normalized digit string.                      |
+| `disabled`     | `boolean`                 | —       | No       | Disables all cells.                                                        |
+| `hasError`     | `boolean`                 | —       | No       | Error styling on cell borders.                                             |
+| `onComplete`   | `(value: string) => void` | —       | No       | Called once when the value length becomes `length` after being shorter.    |
+| `className`    | `string`                  | —       | No       | Class on the root `fieldset`.                                              |
 
-Экспортируемый объект: `DigitInput = { Root }`. Типы: `DigitInputRootProps`, `DigitInputSize`.
+Exported object: `DigitInput = { Root }`. Types: `DigitInputRootProps`, `DigitInputSize`.
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет. Визуально компонент масштабируется через `size` (`s` | `m` | `l` | `xl`). Семантику «ошибка» задаёт `hasError`.
+There is no separate `variant` prop. The component scales visually via `size` (`s` | `m` | `l` | `xl`). The “error” semantics come from `hasError`.
 
-## Состояния
+## States
 
-- **Обычный:** ввод и навигация с клавиатуры активны.
-- **`disabled`:** все инпуты с атрибутом `disabled`, курсор «запрещён» на группе.
-- **`hasError`:** обводка ячеек в цвете ошибки (`data-has-error` на корне).
-- **Заполненность:** значение всегда нормализуется до строки из цифр длиной не больше `length`; пустые позиции отображаются как пустые ячейки.
+- **Default:** typing and keyboard navigation are active.
+- **`disabled`:** all inputs have `disabled`; the group shows a not-allowed cursor.
+- **`hasError`:** cell borders use the error color (`data-has-error` on the root).
+- **Fill level:** the value is always normalized to a digit string at most `length` long; empty positions show as empty cells.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-Группа объявляется как `role="group"` с именем «Digit input». У каждой ячейки свой `aria-label` вида «Digit i of n». Фокус при вводе цифры переходит к следующей ячейке; при пустой текущей ячейке Backspace переносит фокус назад. Для подписи всей группы снаружи используйте `Label` или заголовок секции — встроенной связи `htmlFor` с одним полем нет, так как контролов несколько.
+The group is exposed as `role="group"` with the name “Digit input”. Each cell has its own `aria-label` like “Digit i of n”. After entering a digit, focus moves to the next cell; with the current cell empty, Backspace moves focus backward. For a label for the whole group, use `Label` or a section heading outside — there is no built-in `htmlFor` link to a single field because there are multiple controls.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Принимаются только цифры; буквы и знаки при вводе и вставке отбрасываются.
-- `onComplete` срабатывает при **переходе** к полной длине (если до этого строка была короче); повторный ввод без очистки не вызовет колбэк снова.
-- Нет встроенной маски, таймера или кнопки «отправить код снова» — это зона родительского UI.
-- Полиморфного корня (`asChild`) и режима «на всю ширину контейнера» у компонента нет; ширину задаёт содержимое (фиксированный размер ячеек и промежуток).
+- Only digits are accepted; letters and symbols are dropped on type and paste.
+- `onComplete` fires on the **transition** to full length (when the string was shorter before); changing digits without clearing will not fire the callback again.
+- There is no built-in mask, timer, or “resend code” button — that belongs in the parent UI.
+- There is no polymorphic root (`asChild`) or “full container width” mode; width comes from content (fixed cell size and gap).
 
-## Связанные компоненты
+## Related components
 
-- **Label** — заголовок группы ячеек.
-- **Hint** — пояснение или правила ввода под блоком.
-- **Input** — если нужна одна строка без разбиения по ячейкам.
-- **Button** — действия «продолжить», «очистить», «отправить снова» рядом с кодом.
+- **Label** — heading for the cell group.
+- **Hint** — explanation or input rules below the block.
+- **Input** — when you need a single line without per-digit cells.
+- **Button** — “continue”, “clear”, “resend code” actions next to the code.

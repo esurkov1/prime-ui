@@ -1,24 +1,24 @@
 # Banner
 
-## Что это
+## What it is
 
-Составная полоса объявления: корневая сетка с центральным блоком текста и опциональной кнопкой закрытия, внутри — слоты под иконку, заголовок, описание и ряд действий.
+A composite announcement strip: a root grid with a central text block and an optional close button; inside — slots for an icon, title, description, and a row of actions.
 
-## Для чего нужен
+## What it’s for
 
-- **Логистика и статусы заказа** — одна заметная строка над трекингом: доставка задерживается, заказ собран или ожидает оплаты, с кнопкой «Подробнее» без открытия модального окна.
-- **Согласования и внутренние панели** — предупреждение о дедлайне согласования документа или блокировке этапа, с семантикой `warning` или `error` и возможностью скрыть полосу после прочтения.
-- **Онбординг и релизы** — короткое сообщение о новой функции (`feature`) или изменении интерфейса, с лёгким вариантом фона и ссылкой в действиях.
-- **Формы и чек-аут** — ненавязчивая подсказка перед отправкой (политика, доставка, ограничения по региону) с вариантом `stroke` или `lighter`, не конкурирующая с полями ввода.
-- **Технические инциденты** — глобальная плашка о сбое API или регламентных работах (`information` / `error`), на всю ширину области контента и с явным закрытием для повторяющихся визитов.
+- **Logistics and order status** — one prominent row above tracking: delivery delayed, order picked, or awaiting payment, with a “Learn more” action without opening a modal.
+- **Approvals and internal panels** — warning about a document approval deadline or a blocked stage, with `warning` or `error` semantics and the ability to hide the strip after reading.
+- **Onboarding and releases** — short message about a new feature (`feature`) or UI change, with a lighter background variant and a link in the actions.
+- **Forms and checkout** — unobtrusive hint before submit (policy, shipping, regional limits) with `stroke` or `lighter`, not competing with inputs.
+- **Technical incidents** — global strip about an API outage or maintenance (`information` / `error`), full width of the content area and explicit dismiss for repeat visits.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример — другой тип экрана и другой набор пропсов; импорт из пакета `prime-ui-kit`.
+Each example is a different screen type and prop set; import from the `prime-ui-kit` package.
 
-### Базовый
+### Basic
 
-Страница настроек профиля: нейтральное напоминание сохранить изменения перед уходом, без кнопок и без закрытия.
+Profile settings page: neutral reminder to save changes before leaving, without actions and without dismiss.
 
 ```tsx
 import { User } from "lucide-react";
@@ -29,17 +29,17 @@ export function ProfileSettingsHint() {
     <Banner.Root status="information" variant="lighter" size="m">
       <Banner.Content>
         <Banner.Icon as={User} aria-hidden />
-        <Banner.Title>Черновик не сохранён</Banner.Title>
-        <Banner.Description>Несохранённые поля будут потеряны при переходе на другую вкладку.</Banner.Description>
+        <Banner.Title>Draft not saved</Banner.Title>
+        <Banner.Description>Unsaved fields will be lost if you switch to another tab.</Banner.Description>
       </Banner.Content>
     </Banner.Root>
   );
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Витрина тарифов: один и тот же текст акции в четырёх размерах, чтобы согласовать с сеткой карточек планов.
+Pricing page: the same promo copy in four sizes to align with the plan card grid.
 
 ```tsx
 import { Sparkles } from "lucide-react";
@@ -52,8 +52,8 @@ export function PricingPromoStripes() {
         <Banner.Root key={size} status="feature" variant="light" size={size}>
           <Banner.Content>
             <Banner.Icon as={Sparkles} aria-hidden />
-            <Banner.Title>Первый месяц со скидкой 40%</Banner.Title>
-            <Banner.Description>Действует для новых рабочих пространств до конца квартала.</Banner.Description>
+            <Banner.Title>40% off your first month</Banner.Title>
+            <Banner.Description>Valid for new workspaces until the end of the quarter.</Banner.Description>
           </Banner.Content>
         </Banner.Root>
       ))}
@@ -62,9 +62,9 @@ export function PricingPromoStripes() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Модальное окно импорта таблицы: ошибка разбора файла в шапке диалога, с действием «Скачать шаблон» и закрытием полосы после исправления.
+Table import modal: parse error at the top of the dialog, with “Download template” and dismissing the strip after fixing.
 
 ```tsx
 import { AlertCircle } from "lucide-react";
@@ -75,11 +75,11 @@ export function ImportModalErrorBanner({ onDismiss }: { onDismiss: () => void })
     <Banner.Root status="error" variant="filled" size="m" onDismiss={onDismiss}>
       <Banner.Content>
         <Banner.Icon as={AlertCircle} aria-hidden />
-        <Banner.Title>Не удалось прочитать файл</Banner.Title>
-        <Banner.Description>Проверьте кодировку UTF-8 и наличие колонок «Код» и «Количество».</Banner.Description>
+        <Banner.Title>Could not read the file</Banner.Title>
+        <Banner.Description>Check UTF-8 encoding and that columns “Code” and “Quantity” are present.</Banner.Description>
         <Banner.Actions>
           <Button.Root size="s" type="button" variant="neutral" mode="ghost">
-            Скачать шаблон
+            Download template
           </Button.Root>
         </Banner.Actions>
       </Banner.Content>
@@ -88,9 +88,9 @@ export function ImportModalErrorBanner({ onDismiss }: { onDismiss: () => void })
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Дашборд мониторинга: полоса о снижении точности метрик показывается только пока оператор не нажал «Понятно»; состояние хранится в родителе.
+Monitoring dashboard: strip about degraded metric accuracy only until the operator clicks “Got it”; visibility is held in the parent.
 
 ```tsx
 import * as React from "react";
@@ -103,7 +103,7 @@ export function MetricsDegradedBanner() {
   if (!visible) {
     return (
       <Button.Root size="s" type="button" variant="neutral" onClick={() => setVisible(true)}>
-        Показать уведомление о метриках
+        Show metrics notice
       </Button.Root>
     );
   }
@@ -112,11 +112,11 @@ export function MetricsDegradedBanner() {
     <Banner.Root status="warning" variant="stroke" size="m">
       <Banner.Content>
         <Banner.Icon as={Activity} aria-hidden />
-        <Banner.Title>Задержка агрегации 5–10 минут</Banner.Title>
-        <Banner.Description>Данные за последний интервал могут догружаться; алерты работают в штатном режиме.</Banner.Description>
+        <Banner.Title>Aggregation delay 5–10 minutes</Banner.Title>
+        <Banner.Description>Data for the latest interval may still be loading; alerts operate normally.</Banner.Description>
         <Banner.Actions>
           <Button.Root size="s" type="button" variant="primary" onClick={() => setVisible(false)}>
-            Понятно
+            Got it
           </Button.Root>
         </Banner.Actions>
       </Banner.Content>
@@ -125,111 +125,111 @@ export function MetricsDegradedBanner() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-`Banner.Root` → провайдер размера для вложенных контролов.
+`Banner.Root` → size provider for nested controls.
 
-Внутри корня обычно:
+Inside the root, typically:
 
-- `Banner.Content` → `Banner.Icon` + `Banner.Title` + `Banner.Description` + опционально `Banner.Actions`
-- опционально `Banner.CloseButton` соседом с `Banner.Content` (колонка сетки справа)
+- `Banner.Content` → `Banner.Icon` + `Banner.Title` + `Banner.Description` + optional `Banner.Actions`
+- optional `Banner.CloseButton` as a sibling of `Banner.Content` (right-hand grid column)
 
-Если передан `onDismiss` и в дереве нет `Banner.CloseButton`, кнопка закрытия добавляется автоматически.
+If `onDismiss` is passed and there is no `Banner.CloseButton` in the tree, a close button is added automatically.
 
 ## API
 
 ### Banner.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| variant | `"filled" \| "light" \| "lighter" \| "stroke"` | `"filled"` | Нет | Плотность фона и стиль акцента (у `stroke` — нижняя цветная полоска). |
-| status | `"information" \| "warning" \| "error" \| "success" \| "feature"` | `"information"` | Нет | Семантика палитры и типичного смысла сообщения. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размерная шкала для отступов, текста и иконки; задаёт контекст для `Banner.CloseButton`. |
-| onDismiss | `() => void` | — | Нет | При наличии и отсутствии дочернего `Banner.CloseButton` рендерит кнопку закрытия с `aria-label` «Dismiss». |
-| className | `string` | — | Нет | Дополнительный класс корня. |
-| children | `React.ReactNode` | — | Нет | Контент и при необходимости явная кнопка закрытия. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты корневого `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| variant | `"filled" \| "light" \| "lighter" \| "stroke"` | `"filled"` | No | Background density and accent style (`stroke` adds a colored bottom bar). |
+| status | `"information" \| "warning" \| "error" \| "success" \| "feature"` | `"information"` | No | Palette semantics and typical message meaning. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Scale for spacing, text, and icon; provides context for `Banner.CloseButton`. |
+| onDismiss | `() => void` | — | No | When set and no child `Banner.CloseButton`, renders a close button with `aria-label` “Dismiss”. |
+| className | `string` | — | No | Extra class on the root. |
+| children | `React.ReactNode` | — | No | Content and, if needed, an explicit close button. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other attributes on the root `div`. |
 
 ### Banner.Content
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | Нет | Класс flex-контейнера центральной колонки. |
-| children | `React.ReactNode` | — | Нет | Иконка, заголовок, описание, действия. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты внутреннего `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class for the central column flex container. |
+| children | `React.ReactNode` | — | No | Icon, title, description, actions. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the inner `div`. |
 
 ### Banner.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| as | `React.ElementType` | `"div"` | Нет | Элемент или компонент иконки (часто SVG-компонент с `aria-hidden`). |
-| className | `string` | — | Нет | Дополнительный класс обёртки. |
-| children | `React.ReactNode` | — | Нет | Содержимое при `as="div"` или кастомной обёртке. |
-| …rest | пропсы `T` без `as` и `className` | — | Нет | Пробрасываются в выбранный элемент. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| as | `React.ElementType` | `"div"` | No | Element or icon component (often an SVG component with `aria-hidden`). |
+| className | `string` | — | No | Extra class on the wrapper. |
+| children | `React.ReactNode` | — | No | Content when `as="div"` or with a custom wrapper. |
+| …rest | props of `T` without `as` and `className` | — | No | Forwarded to the chosen element. |
 
 ### Banner.Title
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | Нет | Класс `span` заголовка. |
-| children | `React.ReactNode` | — | Нет | Текст заголовка. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class for the title `span`. |
+| children | `React.ReactNode` | — | No | Title text. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
 ### Banner.Description
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | Нет | Класс `span` описания. |
-| children | `React.ReactNode` | — | Нет | Вторичный текст. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class for the description `span`. |
+| children | `React.ReactNode` | — | No | Secondary text. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
 ### Banner.Actions
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | Нет | Класс контейнера кнопок. |
-| children | `React.ReactNode` | — | Нет | `Button`, `LinkButton` и т.п. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class for the button row container. |
+| children | `React.ReactNode` | — | No | `Button`, `LinkButton`, etc. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### Banner.CloseButton
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Тип нативной кнопки. |
-| className | `string` | — | Нет | Дополнительный класс. |
-| children | `React.ReactNode` | — | Нет | По умолчанию крестик в `Button.Icon`. |
-| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | Нет | В т.ч. `onClick`, `aria-label`, `disabled`; размер кнопки выводится из контекста баннера. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Native button `type`. |
+| className | `string` | — | No | Extra class. |
+| children | `React.ReactNode` | — | No | Defaults to a cross icon in `Button.Icon`. |
+| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | No | Including `onClick`, `aria-label`, `disabled`; button size comes from banner context. |
 
-## Варианты
+## Variants
 
-- **filled** — насыщенный фон статуса и контрастный текст; максимальная заметность.
-- **light** — мягкий фон из палитры статуса и текст в цвете статуса; универсальный баланс.
-- **lighter** — смешение фона статуса с поверхностью страницы; спокойное напоминание.
-- **stroke** — нейтральная подложка, акцент — цветная линия снизу и цвет иконки по статусу.
+- **filled** — saturated status background and high-contrast text; maximum prominence.
+- **light** — soft background from the status palette and status-colored text; balanced default.
+- **lighter** — status background blended with the page surface; calm reminder.
+- **stroke** — neutral surface, accent is a colored bottom line and status-colored icon.
 
-## Состояния
+## States
 
-Семантика задаётся пропом **`status`**: под каждый тип подбираются токены фона, текста и акцента. Отдельных пропов `disabled` или `loading` у корня нет.
+Semantics are driven by the **`status`** prop: tokens for background, text, and accent are chosen per type. The root has no separate `disabled` or `loading` props.
 
-**Закрытие:** либо **`onDismiss`** (и тогда при отсутствии своей `Banner.CloseButton` добавляется стандартная), либо только **`Banner.CloseButton`** с собственным `onClick`, либо оба — тогда автоматическая кнопка **не** дублируется, если `Banner.CloseButton` уже есть среди потомков.
+**Dismissal:** either **`onDismiss`** (and if there is no custom `Banner.CloseButton`, the default one is added), or only **`Banner.CloseButton`** with its own `onClick`, or both — then the automatic button is **not** duplicated if `Banner.CloseButton` already exists among descendants.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Корень — `div`; при необходимости задайте **`role="region"`** и **`aria-label` / `aria-labelledby`**, если полоса — осмысленный ориентир на странице.
-- Иконки в `Banner.Icon` обычно декоративны: **`aria-hidden`** на компоненте иконки.
-- Автоматически вставляемая кнопка закрытия использует **`aria-label="Dismiss"`**; при собственной кнопке задайте понятный **`aria-label`** на языке интерфейса.
-- `Banner.Title` и `Banner.Description` — `span`; при длинном тексте переносы идут за счёт flex-вёрстки контента.
+- Root is a `div`; set **`role="region"`** and **`aria-label` / `aria-labelledby`** when the strip is a meaningful landmark.
+- Icons in `Banner.Icon` are usually decorative: **`aria-hidden`** on the icon component.
+- The auto-inserted close button uses **`aria-label="Dismiss"`**; for a custom button, set a clear **`aria-label`** in the UI language.
+- `Banner.Title` and `Banner.Description` are `span`s; long text wraps via the content flex layout.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет встроенного **`open` / `visible`**: показ и скрытие реализуются условным рендером или состоянием родителя.
-- **`Banner.Icon`** использует проп **`as`**, а не `asChild` у корня.
-- Сетка рассчитана на **одну** центральную группу контента и **одну** зону закрытия справа; сложные макеты с несколькими колонками лучше собирать снаружи.
-- Тексты заголовка и описания — инлайновые `span`; для богатого форматирования вкладывайте в них допустимую вложенную разметку осознанно.
+- No built-in **`open` / `visible`**: show/hide via conditional render or parent state.
+- **`Banner.Icon`** uses the **`as`** prop, not `asChild` on the root.
+- The grid expects **one** central content group and **one** dismiss zone on the right; multi-column layouts are better composed outside.
+- Title and description are inline `span`s; for rich formatting, nest allowed markup deliberately.
 
-## Связанные компоненты
+## Related components
 
-- **Button** — действия в `Banner.Actions`; `Banner.CloseButton` построен на `Button.Root` (ghost neutral).
-- **LinkButton** — вторичные переходы в полосе без имитации кнопки через `button`.
-- **Typography** — подписи и пояснения рядом с баннером вне слота (например после скрытия).
-- **Notification** — если нужен тост или временное всплывающее сообщение вместо полосы в потоке документа.
+- **Button** — actions in `Banner.Actions`; `Banner.CloseButton` is built on `Button.Root` (ghost neutral).
+- **LinkButton** — secondary navigation in the strip without faking a `button`.
+- **Typography** — captions and hints next to the banner outside the slot (e.g. after dismissal).
+- **Notification** — for a toast or transient overlay instead of an in-flow strip.

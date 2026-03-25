@@ -1,27 +1,27 @@
 # Datepicker
 
-## Что это
+## What it is
 
-Набор частей для календарного выбора даты или периода: сетка дней, оболочка с контекстом размера, быстрые пресеты, время суток и текстовая подпись; сетка построена на react-day-picker с оформлением prime-ui-kit, локаль и форматирование дат удобно подключать через date-fns.
+A set of pieces for calendar date or range selection: day grid, size-context shell, quick presets, time of day, and a text caption; the grid is built on react-day-picker with prime-ui-kit styling, and locale plus date formatting integrate cleanly via date-fns.
 
-## Для чего нужен
+## What it’s for
 
-- **Бронирование и слоты** — клиент выбирает день и время визита; календарь и `Datepicker.Time` делят одно состояние, подпись рядом объясняет выбранный слот.
-- **Аналитика и отчёты** — задание периода «с–по» с пресетами «эта неделя», «этот месяц»; на широкой панели два месяца рядом ускоряют навигацию.
-- **Публикация контента** — отложенная дата публикации статьи или акции: одиночная дата, валидация недоступных дней (выходные, прошлое).
-- **Документооборот** — фильтр по дате подписания или срока действия договора во всплывающем блоке рядом с полем поиска.
-- **Логистика и доставка** — интервал отгрузки с разным временем начала и конца в режиме диапазона.
-- **Настройки профиля** — день рождения или юбилейная дата в форме с понятной подписью и локалью интерфейса.
+- **Booking and slots** — the user picks a day and visit time; the calendar and `Datepicker.Time` share one state, with a caption explaining the chosen slot.
+- **Analytics and reports** — “from–to” periods with presets like “this week”, “this month”; on wide panels, two months side by side speed up navigation.
+- **Content publishing** — scheduled publish date for an article or promo: single date, validation for unavailable days (weekends, past dates).
+- **Document workflows** — filter by signing date or contract validity in a popover next to the search field.
+- **Logistics and delivery** — shipment window with different start and end times in range mode.
+- **Profile settings** — birthday or anniversary in a form with a clear caption and UI locale.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Одна дата в форме; состояние в React, подпись форматируется через date-fns.
+Single date in a form; state in React, caption formatted with date-fns.
 
 ```tsx
 import { format } from "date-fns";
-import { ru } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import * as React from "react";
 
 import { Datepicker } from "prime-ui-kit";
@@ -32,26 +32,26 @@ export function ProfileBirthDateField() {
   return (
     <Datepicker.Shell>
       <Datepicker.Calendar
-        locale={ru}
+        locale={enUS}
         mode="single"
         month={new Date(2026, 0, 1)}
         selected={born}
         onSelect={setBorn}
       />
       <Datepicker.Value as="p">
-        {born ? format(born, "d MMMM yyyy", { locale: ru }) : "Укажите дату рождения"}
+        {born ? format(born, "MMMM d, yyyy", { locale: enUS }) : "Enter your birth date"}
       </Datepicker.Value>
     </Datepicker.Shell>
   );
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Витрина тарифов: компактный календарь в карточке ограниченной ширины.
+Pricing page: compact calendar in a card with limited width.
 
 ```tsx
-import { ru } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import * as React from "react";
 
 import { Datepicker } from "prime-ui-kit";
@@ -62,7 +62,7 @@ export function PlanTrialStartPicker() {
   return (
     <Datepicker.Shell size="s">
       <Datepicker.Calendar
-        locale={ru}
+        locale={enUS}
         mode="single"
         numberOfMonths={1}
         selected={start}
@@ -74,12 +74,12 @@ export function PlanTrialStartPicker() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Панель фильтров в боковой колонке отчёта: диапазон с адаптивными двумя месяцами.
+Report filter panel in a side column: range with two responsive months.
 
 ```tsx
-import { ru } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import * as React from "react";
 import type { DateRange } from "react-day-picker";
 
@@ -92,7 +92,7 @@ export function ReportSidebarDateFilter() {
     <aside style={{ minWidth: 0, width: "100%" }}>
       <Datepicker.Shell>
         <Datepicker.Calendar
-          locale={ru}
+          locale={enUS}
           mode="range"
           responsiveMonths
           responsiveBreakpoints={{ twoColumns: 480 }}
@@ -105,20 +105,20 @@ export function ReportSidebarDateFilter() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Бронирование: пресеты «сегодня / завтра», время и одно состояние `Date`, синхронизируемое с API.
+Booking: “today / tomorrow” presets, time, and one `Date` state synced with the API.
 
 ```tsx
 import { addDays } from "date-fns";
-import { ru } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import * as React from "react";
 
 import { Datepicker, type DatepickerPresetSingle } from "prime-ui-kit";
 
 const presets: DatepickerPresetSingle[] = [
-  { label: "Сегодня", date: new Date() },
-  { label: "Завтра", date: addDays(new Date(), 1) },
+  { label: "Today", date: new Date() },
+  { label: "Tomorrow", date: addDays(new Date(), 1) },
 ];
 
 export function BookingSlotPicker({
@@ -133,7 +133,7 @@ export function BookingSlotPicker({
       presets={<Datepicker.Presets mode="single" presets={presets} onSelect={onChange} />}
     >
       <Datepicker.Calendar
-        locale={ru}
+        locale={enUS}
         mode="single"
         selected={value}
         onSelect={onChange}
@@ -144,13 +144,13 @@ export function BookingSlotPicker({
 }
 ```
 
-### Композиция с Popover
+### Composition with Popover
 
-Выпадающий календарь по клику на кнопку с автоматическим закрытием после выбора даты.
+Dropdown calendar on button click, auto-closing after a date is chosen.
 
 ```tsx
 import { format } from "date-fns";
-import { ru } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { CalendarDays } from "lucide-react";
 import * as React from "react";
 
@@ -165,7 +165,7 @@ export function DatepickerPopoverField() {
     if (date) setOpen(false);
   };
 
-  const label = value ? format(value, "d MMMM yyyy", { locale: ru }) : "Выберите дату";
+  const label = value ? format(value, "MMMM d, yyyy", { locale: enUS }) : "Pick a date";
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -181,7 +181,7 @@ export function DatepickerPopoverField() {
         <Popover.Inset padding="none">
           <Datepicker.Shell>
             <Datepicker.Calendar
-              locale={ru}
+              locale={enUS}
               mode="single"
               responsiveMonths
               selected={value}
@@ -195,101 +195,101 @@ export function DatepickerPopoverField() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`Datepicker.Shell`** — корневая обёртка: провайдер размера и запроса месяца для пресетов; опционально слот `presets` (нижняя полоса).
-- **`Datepicker.Calendar`** — сетка react-day-picker с классами Prime; внутри — кастомные шевроны и подпись месяца с кнопками навигации на базе `Button`.
-- **`Datepicker.Presets`** — `ButtonGroup` с вариантами быстрого выбора (single или range).
-- **`Datepicker.Time`** — одно или два поля `Input` с `type="time"`, время вшивается в выбранные даты.
-- **`Datepicker.Value`** — обёртка над `Typography.Root` с кеглем, привязанным к размеру датпикера.
+- **`Datepicker.Shell`** — root wrapper: size provider and month request for presets; optional `presets` slot (bottom bar).
+- **`Datepicker.Calendar`** — react-day-picker grid with Prime classes; custom chevrons and month caption with navigation buttons built on `Button`.
+- **`Datepicker.Presets`** — `ButtonGroup` for quick single or range choices.
+- **`Datepicker.Time`** — one or two `Input` fields with `type="time"`, merging time into selected dates.
+- **`Datepicker.Value`** — wrapper around `Typography.Root` with font size tied to datepicker scale.
 
-Экспортируемые утилиты: **`formatTimeInputValue`**, **`mergeTimeIntoDate`** — для согласования `Date` с нативным `input type="time"` и обратно.
+Exported utilities: **`formatTimeInputValue`**, **`mergeTimeIntoDate`** — align `Date` with native `input type="time"` and back.
 
 ## API
 
 ### Datepicker.Calendar
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | из контекста Shell или `m` | Нет | Размер ячеек и типографики. |
-| responsiveMonths | boolean | false | Нет | 1 или 2 месяца по ширине контейнера; при `true` `numberOfMonths` игнорируется. |
-| responsiveBreakpoints | `{ twoColumns: number }` | `{ twoColumns: 500 }` | Нет | Порог ширины (px) для второй колонки. |
-| weekStartsOn | 0–6 | 1 | Нет | Первый день недели. |
-| navLayout | см. react-day-picker | `after` | Нет | Положение навигации по месяцам. |
-| month | Date | — | Нет | Текущий отображаемый месяц (контролируемо). |
-| onMonthChange | `(d: Date) => void` | — | Нет | Смена месяца; связана с контекстом Shell. |
-| numberOfMonths | number | 1 | Нет | Фиксированное число месяцев без responsive. |
-| mode, selected, onSelect, disabled, locale, classNames, components, style | см. DayPickerProps | — | Зависит от режима | Режим выбора и остальные пропсы react-day-picker пробрасываются в `DayPicker`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | from Shell context or `m` | No | Cell and typography size. |
+| responsiveMonths | boolean | false | No | 1 or 2 months by container width; when `true`, `numberOfMonths` is ignored. |
+| responsiveBreakpoints | `{ twoColumns: number }` | `{ twoColumns: 500 }` | No | Width threshold (px) for the second column. |
+| weekStartsOn | 0–6 | 1 | No | First day of the week. |
+| navLayout | see react-day-picker | `after` | No | Month navigation placement. |
+| month | Date | — | No | Currently displayed month (controlled). |
+| onMonthChange | `(d: Date) => void` | — | No | Month change; tied to Shell context. |
+| numberOfMonths | number | 1 | No | Fixed month count without responsive. |
+| mode, selected, onSelect, disabled, locale, classNames, components, style | see DayPickerProps | — | Depends on mode | Selection mode and other react-day-picker props are forwarded to `DayPicker`. |
 
 ### Datepicker.Shell
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `m` | Нет | Контекст размера для дочерних частей. |
-| presets | ReactNode | — | Нет | Содержимое нижней полосы (часто `Datepicker.Presets`). |
-| children | ReactNode | — | Да | Календарь, время, подпись. |
-| className | string | — | Нет | Доп. класс корня. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `m` | No | Size context for child parts. |
+| presets | ReactNode | — | No | Bottom bar content (often `Datepicker.Presets`). |
+| children | ReactNode | — | Yes | Calendar, time, caption. |
+| className | string | — | No | Extra root class. |
 
 ### Datepicker.Presets
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| mode | `"single" \| "range"` | — | Да | Тип пресетов и сигнатура onSelect. |
-| presets | массив с `label` и `date` или `range` | — | Да | Кнопки быстрого выбора. |
-| onSelect | функция | — | Да | Вызов при выборе пресета. |
-| size | `"s" \| "m" \| "l" \| "xl"` | из контекста | Нет | Размер сегментов. |
-| className | string | — | Нет | Класс блока. |
-| title | string | — | Нет | Есть в типе; в разметке компонента не рендерится. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| mode | `"single" \| "range"` | — | Yes | Preset type and `onSelect` signature. |
+| presets | array with `label` and `date` or `range` | — | Yes | Quick-select buttons. |
+| onSelect | function | — | Yes | Called when a preset is chosen. |
+| size | `"s" \| "m" \| "l" \| "xl"` | from context | No | Segment size. |
+| className | string | — | No | Block class. |
+| title | string | — | No | Present in types; not rendered in the component markup. |
 
 ### Datepicker.Time
 
-**Режим single** (по умолчанию): `value`, `onChange`, опционально `labels.time`, `size`.
+**Single mode** (default): `value`, `onChange`, optional `labels.time`, `size`.
 
-**Режим range**: `mode="range"`, `from`, `to`, `onFromChange`, `onToChange`, опционально `labels.from` / `labels.to`, `size`.
+**Range mode**: `mode="range"`, `from`, `to`, `onFromChange`, `onToChange`, optional `labels.from` / `labels.to`, `size`.
 
-Поля времени неактивны, пока нет соответствующей даты-якоря.
+Time fields stay disabled until the corresponding anchor date exists.
 
 ### Datepicker.Value
 
-Наследует пропсы `Typography.Root`, кроме обязательного `size` у типографики: здесь `size` задаёт шкалу датпикера (`s`–`xl`) и маппится на кегль подписи. Доступны `as`, `tone`, `weight`, `children`, `className`, атрибуты корневого элемента.
+Inherits `Typography.Root` props except required typography `size`: here `size` sets the datepicker scale (`s`–`xl`) and maps to caption font size. Supports `as`, `tone`, `weight`, `children`, `className`, and root element attributes.
 
-### Утилиты
+### Utilities
 
-| Имя | Сигнатура | Описание |
-|-----|-----------|----------|
-| formatTimeInputValue | `(date?: Date) => string` | Строка `HH:mm` для `value` у `<input type="time" />`. |
-| mergeTimeIntoDate | `(date: Date, timeHHmm: string) => Date` | Новая дата с часами и минутами из строки. |
+| Name | Signature | Description |
+|------|-----------|-------------|
+| formatTimeInputValue | `(date?: Date) => string` | `HH:mm` string for `<input type="time" />` `value`. |
+| mergeTimeIntoDate | `(date: Date, timeHHmm: string) => Date` | New date with hours and minutes from the string. |
 
-## Варианты
+## Variants
 
-- **Режим календаря** (`mode` у `Calendar`): в первую очередь `single` и `range`; остальные режимы react-day-picker доступны через те же пропсы, если типы это допускают.
-- **Размер** (`size` у `Shell` / `Calendar` / частей): `s`, `m`, `l`, `xl` — единый ярус токенов контрола.
-- **Пресеты**: только смысловое разделение `mode="single"` и `mode="range"`; набор кнопок задаётся массивом `presets`.
+- **Calendar mode** (`mode` on `Calendar`): mainly `single` and `range`; other react-day-picker modes are available via the same props when types allow.
+- **Size** (`size` on `Shell` / `Calendar` / parts): `s`, `m`, `l`, `xl` — one control token tier.
+- **Presets**: semantic split only between `mode="single"` and `mode="range"`; button set comes from the `presets` array.
 
-## Состояния
+## States
 
-- **Выбор даты/диапазона** — через `selected` и `onSelect` (контролируемо) или внутреннее состояние day-picker при неконтролируемом использовании.
-- **Недоступные дни** — проп `disabled` у `Calendar` (matcher-ы react-day-picker).
-- **Время без даты** — `Datepicker.Time` отключает `input type="time"`, пока нет `value` / `from` / `to`.
-- **Месяц для пресетов** — при выборе пресета вызывается `requestMonth` контекста, чтобы сетка перешла к нужному месяцу.
+- **Date / range selection** — via `selected` and `onSelect` (controlled) or day-picker internal state when uncontrolled.
+- **Unavailable days** — `disabled` on `Calendar` (react-day-picker matchers).
+- **Time without date** — `Datepicker.Time` disables `input type="time"` until `value` / `from` / `to` exist.
+- **Month for presets** — choosing a preset calls context `requestMonth` so the grid jumps to the right month.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Сетка дней — разметка и роли react-day-picker (например `grid`, `gridcell`); клавиатурная навигация по дням — из библиотеки.
-- Кнопки навигации по месяцам в кастомном caption — нативные `button` с `aria-label` (в коде на английском; при продукте на другом языке задайте свои подписи через кастомизацию компонентов day-picker при необходимости).
-- Поля времени — связка `label` + `Input.Field` с `id` из `useId`.
-- Пресеты — отдельные `button` внутри группы.
+- Day grid — react-day-picker markup and roles (e.g. `grid`, `gridcell`); keyboard navigation between days comes from the library.
+- Month navigation buttons in the custom caption — native `button` with `aria-label` (labels in code are English; for other product languages, supply your own via day-picker component customization if needed).
+- Time fields — `label` + `Input.Field` with `id` from `useId`.
+- Presets — separate `button` elements inside the group.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Пресеты для диапазона не смешиваются с режимом single в одном `Datepicker.Presets`: нужен отдельный экземпляр с `mode="range"`.
-- `responsiveMonths` измеряет ширину контейнера-календаря; в узкой вёрстке без `min-width: 0` flex может обрезать ширину — учитывайте в сетке страницы.
-- Стили react-day-picker подключены в модуле компонента (`react-day-picker/style.css`); кастомизация вне классов Prime может потребовать аккуратного `classNames`.
-- Часовые пояса и UTC: поведение зависит от переданных `Date` и отображения в `input type="time"` в локальном времени браузера.
+- Range presets are not mixed with single mode in one `Datepicker.Presets`: use a separate instance with `mode="range"`.
+- `responsiveMonths` measures the calendar container width; in tight layouts without `min-width: 0`, flex can clip width — account for this in the page grid.
+- react-day-picker styles are imported in the component module (`react-day-picker/style.css`); customization beyond Prime classes may need careful `classNames`.
+- Time zones and UTC: behavior depends on the `Date` values passed and how `input type="time"` shows local browser time.
 
-## Связанные компоненты
+## Related components
 
-- **Button** / **ButtonGroup** — навигация по месяцам и пресеты.
-- **Input** — поля времени.
-- **Typography** — основа `Datepicker.Value`.
-- **Popover** — типичная оболочка для выпадающего календаря по клику на триггер.
+- **Button** / **ButtonGroup** — month navigation and presets.
+- **Input** — time fields.
+- **Typography** — base for `Datepicker.Value`.
+- **Popover** — typical wrapper for a dropdown calendar on trigger click.

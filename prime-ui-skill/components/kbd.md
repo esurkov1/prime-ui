@@ -1,20 +1,20 @@
 # Kbd
 
-## Что это
+## What it is
 
-Компонент `Kbd.Root` — оформленная подпись для обозначения клавиши или шага сочетания клавиш в интерфейсе (рендерится как элемент `kbd`).
+The `Kbd.Root` component is styled markup for indicating a key or a step in a keyboard shortcut in the UI (rendered as a `kbd` element).
 
-## Для чего нужен
+## What it’s for
 
-- В текстовых редакторах, таск-трекерах и IDE-подобных экранах показать горячие клавиши рядом с пунктами меню и действиями без дублирования длинных формулировок в каждой строке.
-- В формах настроек и админских карточках кратко обозначить сочетание для «Сохранить», «Отменить» или «Отправить», чтобы пользователь видел шорткат в том же визуальном языке, что и остальные контролы.
-- В пошаговом онбординге или туре по продукту выделить одну-две клавиши в тексте подсказки так, чтобы они читались как элементы интерфейса, а не как обычный абзац.
+- In text editors, task trackers, and IDE-like screens, show hotkeys next to menu items and actions without repeating long wording on every line.
+- In settings forms and admin cards, briefly label shortcuts for “Save”, “Cancel”, or “Submit” so users see them in the same visual language as other controls.
+- In step-by-step onboarding or a product tour, highlight one or two keys in hint text so they read as UI elements, not plain paragraph text.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Одиночная клавиша в подсказке к действию (например закрыть диалог):
+A single key in a hint for an action (e.g. closing a dialog):
 
 ```tsx
 import { Kbd } from "prime-ui-kit";
@@ -22,15 +22,15 @@ import { Kbd } from "prime-ui-kit";
 export function CloseHint() {
   return (
     <p>
-      Нажмите <Kbd.Root>Esc</Kbd.Root>, чтобы закрыть окно.
+      Press <Kbd.Root>Esc</Kbd.Root> to close the window.
     </p>
   );
 }
 ```
 
-### С вариантами/размерами
+### With variants / sizes
 
-Таблица шорткатов в разделе «Справка» веб-аналитики: разные размеры для плотной сетки и для акцента в заголовке блока.
+A shortcuts table in the “Help” section of a web analytics app: different sizes for a dense grid and for emphasis in a block heading.
 
 ```tsx
 import { Kbd } from "prime-ui-kit";
@@ -39,19 +39,19 @@ export function AnalyticsShortcutsLegend() {
   return (
     <ul>
       <li>
-        Обновить отчёт: <Kbd.Root size="s">R</Kbd.Root>
+        Refresh report: <Kbd.Root size="s">R</Kbd.Root>
       </li>
       <li>
-        Экспорт: <Kbd.Root size="l">Ctrl</Kbd.Root> + <Kbd.Root size="l">E</Kbd.Root>
+        Export: <Kbd.Root size="l">Ctrl</Kbd.Root> + <Kbd.Root size="l">E</Kbd.Root>
       </li>
     </ul>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Подвал модального окна подтверждения в e-commerce: текст действия и рядом компактное сочетание для опытных пользователей.
+Footer of a confirmation modal in e-commerce: action text with a compact shortcut for power users.
 
 ```tsx
 import { Button, Kbd } from "prime-ui-kit";
@@ -60,19 +60,19 @@ export function CheckoutConfirmFooter() {
   return (
     <div>
       <Button.Root type="submit" variant="primary" mode="filled" size="m">
-        Оплатить
+        Pay
       </Button.Root>
       <span>
-        или <Kbd.Root size="m">Enter</Kbd.Root>
+        or <Kbd.Root size="m">Enter</Kbd.Root>
       </span>
     </div>
   );
 }
 ```
 
-### Наследование размера от контекста
+### Size inherited from context
 
-Подсказка внутри поля поиска в каталоге запчастей: размер клавиши совпадает с размером инпута без дублирования `size` на каждом `Kbd`.
+A hint inside a search field in a parts catalog: key size matches the input without repeating `size` on every `Kbd`.
 
 ```tsx
 import { Input, Kbd } from "prime-ui-kit";
@@ -81,52 +81,52 @@ export function PartsSearchField() {
   return (
     <Input.Root
       size="l"
-      label="Поиск"
+      label="Search"
       hint={
         <>
-          Быстрый фокус: <Kbd.Root>/</Kbd.Root>
+          Quick focus: <Kbd.Root>/</Kbd.Root>
         </>
       }
     >
       <Input.Wrapper>
-        <Input.Field placeholder="Артикул или название" />
+        <Input.Field placeholder="Part number or name" />
       </Input.Wrapper>
     </Input.Root>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Плоская структура: экспортируется объект `Kbd` с единственным подкомпонентом `Root`. `Root` рендерит `kbd` и оборачивает `children` в `ControlSizeProvider`, чтобы вложенные иконки наследовали масштаб.
+Flat structure: the `Kbd` object exports a single subcomponent, `Root`. `Root` renders `kbd` and wraps `children` in `ControlSizeProvider` so nested icons inherit scale.
 
 ## API
 
 ### Kbd.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `size` | `"s" \| "m" \| "l" \| "xl"` | контекст или `"m"` | Нет | Номинальный размер; без пропа берётся из `ControlSizeProvider`, иначе `"m"`; контекст `xs` даёт размер `s`. |
-| `className` | `string` | — | Нет | Дополнительный класс для `kbd`. |
-| `children` | `React.ReactNode` | — | Да | Текст, иконки, смешанный контент. |
-| `…rest` | `Omit<React.HTMLAttributes<HTMLElement>, "size">` | — | Нет | В т.ч. `title`, `hidden`, ARIA и `data-*`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| `size` | `"s" \| "m" \| "l" \| "xl"` | context or `"m"` | No | Nominal size; without the prop, taken from `ControlSizeProvider`, otherwise `"m"`; `xs` context maps to size `s`. |
+| `className` | `string` | — | No | Extra class for `kbd`. |
+| `children` | `React.ReactNode` | — | Yes | Text, icons, or mixed content. |
+| `…rest` | `Omit<React.HTMLAttributes<HTMLElement>, "size">` | — | No | Including `title`, `hidden`, ARIA, and `data-*`. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет: у компонента один визуальный стиль (фон «приподнятой» поверхности, тонкая рамка, лёгкая тень). Дополнительное оформление — только через `className` и токены/стили проекта.
+There is no separate `variant` prop: the component has one visual style (raised-surface background, thin border, light shadow). Further styling is only via `className` and project tokens/styles.
 
-## Состояния
+## States
 
-Встроенных состояний вроде `disabled` или `loading` нет: элемент не выполняет действие сам по себе. Поведение и доступность настраиваются атрибутами разметки (`title`, `hidden`, `aria-hidden` и т.д.), передаваемыми в `Root`.
+There are no built-in states like `disabled` or `loading`: the element does not perform an action by itself. Behavior and accessibility are configured with markup attributes (`title`, `hidden`, `aria-hidden`, etc.) passed to `Root`.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-Используется семантический `kbd`, что помогает вспомогательным технологиям отличить обозначение клавиши от обычного текста. Сочетания из нескольких клавиш разбивайте на несколько `Kbd.Root` и короткие разделители (`+`, «или») вне `kbd` или с `aria-hidden`, чтобы не зачитывать служебные символы дважды. Для подсказок по смыслу сочетания уместен `title`. Не полагайте на цвет плашки как на единственный носитель смысла.
+Semantic `kbd` helps assistive technologies distinguish key labels from normal text. For multi-key shortcuts, split into several `Kbd.Root` instances and keep short separators (`+`, “or”) outside `kbd` or with `aria-hidden` so decorative characters are not announced twice. `title` is appropriate for semantic hints about the shortcut. Do not rely on chip color as the only carrier of meaning.
 
-## Ограничения и заметки
+## Limitations and notes
 
-Компонент не перехватывает нажатия клавиш и не синхронизируется с ОС: он только отображает подпись. Не заменяет кнопку или ссылку. Подписи вроде «⌘» зависят от платформы — текст и разбиение на шаги задаёт продукт. Полиморфного `asChild` у `Kbd` нет: корень всегда `kbd`.
+The component does not handle key events or sync with the OS—it only displays a label. It does not replace a button or link. Labels like “⌘” are platform-dependent—copy and step breakdown are product decisions. `Kbd` has no polymorphic `asChild`: the root is always `kbd`.
 
-## Связанные компоненты
+## Related components
 
-Часто рядом в интерфейсе: **Button**, **Link button** — действие, для которого показывают шорткат; **Input**, **Textarea**, **Select** — контролы, внутри подсказок которых стоят `Kbd`; **Tooltip** — всплывающее пояснение с более длинным текстом, где клавиши можно продублировать `Kbd`; **Command menu** — списки команд с отображением сочетаний.
+Often seen nearby: **Button**, **Link button**—the action the shortcut refers to; **Input**, **Textarea**, **Select**—controls whose hints include `Kbd`; **Tooltip**—a popover with longer copy where keys can be repeated with `Kbd`; **Command menu**—command lists that show shortcuts.

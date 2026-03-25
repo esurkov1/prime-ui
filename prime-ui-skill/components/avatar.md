@@ -1,29 +1,29 @@
 # Avatar
 
-## Что это
+## What it is
 
-Составной компонент круглого аватара: фотография (`Avatar.Image`), запасной слой (`Avatar.Fallback`) и опциональная группа с наложением (`Avatar.Group`).
+A composite circular avatar component: photo (`Avatar.Image`), fallback layer (`Avatar.Fallback`), and optional overlapping group (`Avatar.Group`).
 
-## Для чего нужен
+## What it’s for
 
-- **Профили и совместная работа** — узнаваемое лицо в шапке чата, карточке коллеги или списке участников звонка, когда важно быстро сопоставить человека с действием.
-- **Торговые и сервисные сценарии** — визуальная привязка заказа, доставки или обращения к конкретному менеджеру или курьеру без длинных подписей.
-- **Администрирование и каталоги** — компактное представление учётной записи в таблицах, фильтрах и журналах аудита, где рядом идут имя, роль и статус.
+- **Profiles and collaboration** — a recognizable face in a chat header, colleague card, or call participant list when you need to quickly match a person to an action.
+- **Commerce and service flows** — visual tie-in of an order, delivery, or ticket to a specific manager or courier without long captions.
+- **Admin and catalogs** — compact account representation in tables, filters, and audit logs where name, role, and status sit side by side.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример рассчитан на другой тип экрана и набор пропсов.
+Each example targets a different screen type and prop set.
 
-### Базовый
+### Basic
 
-Портрет с подстраховкой инициалами: пока грузится фото, виден fallback; после успешной загрузки скрывается от скринридеров через `aria-hidden`.
+Portrait with initials fallback: while the photo loads, the fallback shows; after a successful load it is hidden from screen readers via `aria-hidden`.
 
 ```tsx
 import { Avatar } from "prime-ui-kit";
 
 export function UserAvatar({ photoUrl, initials }: { photoUrl: string; initials: string }) {
   return (
-    <Avatar.Root size="l" aria-label="Аватар пользователя">
+    <Avatar.Root size="l" aria-label="User avatar">
       <Avatar.Image src={photoUrl} alt="" />
       <Avatar.Fallback>{initials}</Avatar.Fallback>
     </Avatar.Root>
@@ -31,17 +31,17 @@ export function UserAvatar({ photoUrl, initials }: { photoUrl: string; initials:
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Лендинг команды: одинаковая структура, разные `size` для акцентов (крупный руководитель, мелче остальные).
+Team landing: same structure, different `size` for emphasis (large lead, smaller others).
 
 ```tsx
 import { Avatar, type AvatarSize } from "prime-ui-kit";
 
 const team: { name: string; src: string; size: AvatarSize }[] = [
-  { name: "Руководитель", src: "/photos/lead.jpg", size: "3xl" },
-  { name: "Аналитик", src: "/photos/analyst.jpg", size: "xl" },
-  { name: "Дизайнер", src: "/photos/designer.jpg", size: "l" },
+  { name: "Lead", src: "/photos/lead.jpg", size: "3xl" },
+  { name: "Analyst", src: "/photos/analyst.jpg", size: "xl" },
+  { name: "Designer", src: "/photos/designer.jpg", size: "l" },
 ];
 
 export function TeamRow() {
@@ -58,9 +58,9 @@ export function TeamRow() {
 }
 ```
 
-### В контексте (панель участников)
+### In context (participant bar)
 
-Горизонтальная «стопка» с перекрытием и счётчик скрытых людей — типично для панели созвона или совместного редактирования.
+A horizontal “stack” with overlap and a counter for hidden people — typical for a call panel or co-editing UI.
 
 ```tsx
 import { Avatar } from "prime-ui-kit";
@@ -70,7 +70,7 @@ export function CallParticipantsBar(props: {
   extraCount: number;
 }) {
   return (
-    <Avatar.Group.Root size="m" aria-label={`Участники, ещё ${props.extraCount}`}>
+    <Avatar.Group.Root size="m" aria-label={`Participants, ${props.extraCount} more`}>
       {props.visible.map((p) => (
         <Avatar.Root key={p.id}>
           {p.src ? <Avatar.Image src={p.src} alt="" /> : null}
@@ -78,7 +78,7 @@ export function CallParticipantsBar(props: {
         </Avatar.Root>
       ))}
       {props.extraCount > 0 ? (
-        <Avatar.Group.Overflow aria-label={`Ещё участников: ${props.extraCount}`}>
+        <Avatar.Group.Overflow aria-label={`Additional participants: ${props.extraCount}`}>
           +{props.extraCount}
         </Avatar.Group.Overflow>
       ) : null}
@@ -87,9 +87,9 @@ export function CallParticipantsBar(props: {
 }
 ```
 
-### Смена изображения из состояния родителя
+### Image swap from parent state
 
-Список с выбором строки: URL портрета приходит из состояния. Компонент сбрасывает внутренний цикл загрузки при смене `src` (внутри реализации используется ключ по `src`).
+List with row selection: portrait URL comes from state. The component resets its internal load cycle when `src` changes (implementation uses a key derived from `src`).
 
 ```tsx
 import * as React from "react";
@@ -104,7 +104,7 @@ export function InspectorAvatar(props: { candidates: { id: string; photo: string
   return (
     <aside>
       <label>
-        Запись
+        Record
         <select value={activeId} onChange={(e) => setActiveId(e.target.value)}>
           {props.candidates.map((c) => (
             <option key={c.id} value={c.id}>
@@ -122,94 +122,94 @@ export function InspectorAvatar(props: { candidates: { id: string; photo: string
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`Avatar.Root`** — `div` с `data-size`, контекст со статусом изображения (`idle` | `loading` | `loaded` | `error`).
-- **`Avatar.Image`** — `img` с `data-status` (`loading` | `loaded` | `error`), позиционируется поверх fallback.
-- **`Avatar.Fallback`** — `span` под картинкой; при `imageStatus === "loaded"` получает `aria-hidden`.
-- **`Avatar.Group.Root`** — `div` с flex-рядом; дочерним `Avatar.Root` и `Avatar.Group.Overflow` без собственного `size` подставляется `size` группы.
-- **`Avatar.Group.Overflow`** — `div` с тем же визуальным размером, что аватар выбранного `size`.
+- **`Avatar.Root`** — `div` with `data-size`, context with image status (`idle` | `loading` | `loaded` | `error`).
+- **`Avatar.Image`** — `img` with `data-status` (`loading` | `loaded` | `error`), positioned above the fallback.
+- **`Avatar.Fallback`** — `span` under the image; when `imageStatus === "loaded"` it gets `aria-hidden`.
+- **`Avatar.Group.Root`** — `div` with a flex row; child `Avatar.Root` and `Avatar.Group.Overflow` without their own `size` inherit the group `size`.
+- **`Avatar.Group.Overflow`** — `div` with the same visual size as an avatar of the chosen `size`.
 
 ## API
 
 ### Avatar.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl" \| "2xl" \| "3xl" \| "4xl" \| "5xl" \| "6xl"` | `"m"` | Нет | Диаметр, радиус и кегль fallback |
-| children | `React.ReactNode` | — | Нет | Обычно `Avatar.Image` и `Avatar.Fallback` |
-| className | `string` | — | Нет | Дополнительный класс |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты корня |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl" \| "2xl" \| "3xl" \| "4xl" \| "5xl" \| "6xl"` | `"m"` | No | Diameter, radius, and fallback type size |
+| children | `React.ReactNode` | — | No | Usually `Avatar.Image` and `Avatar.Fallback` |
+| className | `string` | — | No | Extra class |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other root attributes |
 
 ### Avatar.Image
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| src | `string` | — | Да | URL; при смене монтирование заново |
-| alt | `string` | `""` | Нет | Альтернативный текст |
-| className | `string` | — | Нет | Класс на `img` |
-| …rest | `Omit<ImgHTMLAttributes, "src" \| "alt">` | — | Нет | `loading`, `decoding`, обработчики и т.д. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| src | `string` | — | Yes | URL; remounts when changed |
+| alt | `string` | `""` | No | Alternative text |
+| className | `string` | — | No | Class on `img` |
+| …rest | `Omit<ImgHTMLAttributes, "src" \| "alt">` | — | No | `loading`, `decoding`, handlers, etc. |
 
 ### Avatar.Fallback
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| children | `React.ReactNode` | — | Нет | Текст, иконка или плейсхолдер |
-| className | `string` | — | Нет | Класс на `span` |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Прочие атрибуты |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | No | Text, icon, or placeholder |
+| className | `string` | — | No | Class on `span` |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other attributes |
 
 ### Avatar.Group.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| size | см. Avatar.Root | `"m"` | Нет | Размер для детей без своего `size` |
-| children | `React.ReactNode` | — | Нет | Аватары и опционально `Overflow` |
-| className | `string` | — | Нет | Класс контейнера |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| size | see Avatar.Root | `"m"` | No | Size for children without their own `size` |
+| children | `React.ReactNode` | — | No | Avatars and optional `Overflow` |
+| className | `string` | — | No | Container class |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other attributes |
 
 ### Avatar.Group.Overflow
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| size | см. Avatar.Root | `"m"` | Нет | Локальный размер, если не задан группой |
-| children | `React.ReactNode` | — | Нет | Например `+3` |
-| className | `string` | — | Нет | Класс ячейки |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| size | see Avatar.Root | `"m"` | No | Local size if not set by the group |
+| children | `React.ReactNode` | — | No | e.g. `+3` |
+| className | `string` | — | No | Cell class |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other attributes |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет. Визуальное различие задаётся только **`size`** (девять ступеней от `s` до `6xl`) и содержимым **`Fallback`** (текст, иконка, символ).
+There is no separate `variant` prop. Visual difference comes only from **`size`** (nine steps from `s` to `6xl`) and **`Fallback`** content (text, icon, symbol).
 
-## Состояния
+## States
 
-Статус изображения в контексте корня:
+Image status in root context:
 
-| Статус | Когда | Поведение |
-|--------|--------|-----------|
-| `idle` | Нет `Avatar.Image` или до эффекта | Fallback видим, без `aria-hidden` на fallback |
-| `loading` | После монтирования `Image`, до `onLoad` / `onError` | Картинка с `data-status="loading"` скрыта по стилям (opacity 0) |
-| `loaded` | Успешный `onLoad` | Картинка видима; `Avatar.Fallback` с `aria-hidden` |
-| `error` | `onError` | Картинка скрыта (`display: none` в стилях); снова виден fallback |
+| Status | When | Behavior |
+|--------|------|----------|
+| `idle` | No `Avatar.Image` or before effect | Fallback visible, no `aria-hidden` on fallback |
+| `loading` | After `Image` mounts, until `onLoad` / `onError` | Image with `data-status="loading"` hidden by styles (opacity 0) |
+| `loaded` | Successful `onLoad` | Image visible; `Avatar.Fallback` with `aria-hidden` |
+| `error` | `onError` | Image hidden (`display: none` in styles); fallback visible again |
 
-Пользовательского пропа `disabled` у аватара нет — при необходимости неактивность оформляют на уровне родителя (кнопка, ссылка, opacity).
+There is no user-facing `disabled` prop on the avatar — disable styling is handled at the parent level (button, link, opacity) when needed.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Осмысленный контекст задавайте на **`Avatar.Root`** или обёртке: `aria-label`, `aria-labelledby`, или соседний видимый текст.
-- Для **`Avatar.Image`** указывайте осмысленный **`alt`**, если аватар несёт смысл; декоративные дубликаты имени можно оставить с пустым `alt`.
-- После загрузки фото **`Avatar.Fallback`** помечается **`aria-hidden`**, чтобы дубли не озвучивались.
-- Для **`Avatar.Group.Root`** и **`Avatar.Group.Overflow`** полезны суммарные подписи (`aria-label`), особенно при счётчике «+N».
+- Provide meaningful context on **`Avatar.Root`** or a wrapper: `aria-label`, `aria-labelledby`, or adjacent visible text.
+- For **`Avatar.Image`**, set a meaningful **`alt`** when the avatar carries meaning; decorative duplicates of a name can use an empty `alt`.
+- After the photo loads, **`Avatar.Fallback`** is marked **`aria-hidden`** so duplicates are not announced.
+- For **`Avatar.Group.Root`** and **`Avatar.Group.Overflow`**, summary labels (`aria-label`) help, especially with a “+N” counter.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Статус загрузки **не вынесен** наружу: нельзя подставить «контролируемый» статус без обходных путей; смена **`src`** — основной способ сбросить состояние.
-- **`Avatar.Fallback`** не принимает `src`: картинки только через **`Avatar.Image`**.
-- Группа рассчитана на **горизонтальный** ряд; вертикальной компоновки в API нет.
-- Вложенность **`Avatar.Root`** внутри другого **`Avatar.Root`** не предусмотрена паттерном.
+- Load status is **not exposed** externally: you cannot plug in a “controlled” status without workarounds; changing **`src`** is the main way to reset state.
+- **`Avatar.Fallback`** does not accept `src`: images only via **`Avatar.Image`**.
+- The group is built for a **horizontal** row; there is no vertical layout in the API.
+- Nesting **`Avatar.Root`** inside another **`Avatar.Root`** is not part of the intended pattern.
 
-## Связанные компоненты
+## Related components
 
-- **Button** — кликабельная обёртка, если аватар ведёт в профиль или меню.
-- **Dropdown** — триггер с аватаром и списком действий.
-- **Typography** — подпись рядом с аватаром (имя, роль).
-- **Tooltip** — краткая информация по наведению на аватар.
+- **Button** — clickable wrapper when the avatar opens a profile or menu.
+- **Dropdown** — trigger with avatar and action list.
+- **Typography** — caption next to the avatar (name, role).
+- **Tooltip** — short info on avatar hover.

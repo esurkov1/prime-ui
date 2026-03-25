@@ -1,25 +1,25 @@
 # CommandMenu
 
-## Что это
+## What it is
 
-Составной компонент «палитра команд»: модальное окно со строкой поиска и списком действий, где пункты фильтруются по вводу и выбираются с клавиатуры или мышью.
+A composite “command palette” component: a modal with a search field and a list of actions, where items filter as you type and can be chosen with the keyboard or the mouse.
 
-## Для чего нужен
+## What it’s for
 
-- **Корпоративное веб-приложение:** быстрый переход между разделами (отчёты, настройки, биллинг) без раскрытия полного меню.
-- **CRM или десктоп оператора:** одна комбинация клавиш открывает действия над текущей сделкой или тикетом.
-- **Редактор или студия контента:** команды «создать», «экспорт», «превью» в одном списке с поиском по названию.
-- **Служба поддержки:** подтягивание статей базы знаний и готовых ответов по ключевым словам в строке поиска.
-- **Интернет-магазин или личный кабинет:** поиск заказов и разделов по номеру, статусу или человекочитаемой метке.
-- **Медиатека или каталог:** узкие фильтры-теги под поиском плюс команды «открыть плейлист», «поделиться» без отдельной страницы фильтрации.
+- **Enterprise web app:** jump between sections (reports, settings, billing) without opening the full menu.
+- **CRM or operator desktop:** one shortcut opens actions for the current deal or ticket.
+- **Editor or content studio:** “create”, “export”, “preview” in one searchable list.
+- **Support:** pull knowledge-base articles and canned replies from keywords in the search box.
+- **E‑commerce or account area:** find orders and sections by number, status, or human-readable label.
+- **Media library or catalog:** narrow filter tags under the search plus commands like “open playlist”, “share” without a separate filter page.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример рассчитан на другой экран продукта и другой набор пропсов.
+Each example targets a different product screen and a different set of props.
 
-### Базовый
+### Basic
 
-Типичный сценарий: кнопка открывает палитру, строка поиска фильтрует пункты по `value` и `keywords`, выбор закрывает окно.
+Typical flow: a button opens the palette, the search field filters items by `value` and `keywords`, selecting an item closes the dialog.
 
 ```tsx
 import { FileText, Search, Settings } from "lucide-react";
@@ -32,35 +32,35 @@ export function CommandPaletteBasic() {
   return (
     <>
       <Button.Root size="m" variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
-        Команды
+        Commands
       </Button.Root>
 
       <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l" aria-labelledby="cmd-basic-title">
         <CommandMenu.DialogTitle id="cmd-basic-title" style={{ margin: "1rem 1rem 0", fontSize: "1.125rem" }}>
-          Команды приложения
+          Application commands
         </CommandMenu.DialogTitle>
         <CommandMenu.InputRow leading={<Search size={18} strokeWidth={2} aria-hidden />}>
-          <CommandMenu.Input placeholder="Команда или поиск…" aria-label="Поиск команд" />
+          <CommandMenu.Input placeholder="Command or search…" aria-label="Search commands" />
         </CommandMenu.InputRow>
         <CommandMenu.List>
-          <CommandMenu.Group heading="Файл">
+          <CommandMenu.Group heading="File">
             <CommandMenu.Item
-              value="новый документ"
+              value="new document"
               keywords="create new doc"
               onSelect={() => setOpen(false)}
             >
               <CommandMenu.ItemIcon as={FileText} strokeWidth={2} />
-              Новый документ
+              New document
             </CommandMenu.Item>
           </CommandMenu.Group>
-          <CommandMenu.Group heading="Приложение">
+          <CommandMenu.Group heading="Application">
             <CommandMenu.Item
-              value="настройки"
+              value="settings"
               keywords="settings preferences"
               onSelect={() => setOpen(false)}
             >
               <CommandMenu.ItemIcon as={Settings} strokeWidth={2} />
-              Настройки
+              Settings
             </CommandMenu.Item>
           </CommandMenu.Group>
         </CommandMenu.List>
@@ -70,9 +70,9 @@ export function CommandPaletteBasic() {
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Другой контекст — настройка плотности интерфейса справочника: высота строки поиска и кегль строк списка задаются независимо от масштаба всего модального окна.
+Another context—tuning density for a directory UI: search row height and list row type size are independent of the overall modal scale.
 
 ```tsx
 import { Search } from "lucide-react";
@@ -88,15 +88,15 @@ export function CommandPaletteDensityAndItems() {
         density="comfortable"
         leading={<Search size={18} strokeWidth={2} aria-hidden />}
       >
-        <CommandMenu.Input placeholder="Справочник контрагентов…" aria-label="Поиск" />
+        <CommandMenu.Input placeholder="Counterparty directory…" aria-label="Search" />
       </CommandMenu.InputRow>
       <CommandMenu.List>
-        <CommandMenu.Group heading="Юрлица">
-          <CommandMenu.Item value="ООО Ромашка" size="m" onSelect={() => setOpen(false)}>
-            ООО «Ромашка»
+        <CommandMenu.Group heading="Legal entities">
+          <CommandMenu.Item value="Daisy LLC" size="m" onSelect={() => setOpen(false)}>
+            Daisy LLC
           </CommandMenu.Item>
-          <CommandMenu.Item value="ИП Иванов" size="s" onSelect={() => setOpen(false)}>
-            ИП Иванов
+          <CommandMenu.Item value="Sole proprietor Ivanov" size="s" onSelect={() => setOpen(false)}>
+            Sole proprietor Ivanov
           </CommandMenu.Item>
         </CommandMenu.Group>
       </CommandMenu.List>
@@ -105,9 +105,9 @@ export function CommandPaletteDensityAndItems() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Экран настроек рабочего пространства: сверху заголовок и описание, под строкой поиска — съёмные теги области поиска, внизу футер с пояснением клавиш. Рядом используются `Tag`, `Kbd`, `Button` того же кита.
+A workspace settings screen: title and description at the top, removable search-scope tags under the search field, footer with keyboard hints. Uses `Tag`, `Kbd`, and `Button` from the same kit.
 
 ```tsx
 import { Search, X } from "lucide-react";
@@ -116,16 +116,16 @@ import { Button, CommandMenu, Kbd, Tag, Typography } from "prime-ui-kit";
 
 export function WorkspaceSettingsCommandPalette() {
   const [open, setOpen] = React.useState(true);
-  const [scopes, setScopes] = React.useState(["Проекты", "Люди"]);
+  const [scopes, setScopes] = React.useState(["Projects", "People"]);
 
   return (
     <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l" aria-labelledby="ws-cmd-title">
       <div style={{ padding: "1rem 1rem 0" }}>
         <Typography.Root as="div" id="ws-cmd-title" role="heading" aria-level={2} size="l" weight="semibold">
-          Рабочее пространство
+          Workspace
         </Typography.Root>
         <Typography.Root size="s" tone="muted">
-          Поиск по объектам и быстрые действия
+          Search objects and quick actions
         </Typography.Root>
       </div>
 
@@ -133,8 +133,8 @@ export function WorkspaceSettingsCommandPalette() {
         leading={<Search size={18} strokeWidth={2} aria-hidden />}
         trailing={
           <>
-            <Kbd.Root aria-label="Открыть палитру">⌘K</Kbd.Root>
-            <Button.Root size="m" variant="neutral" mode="ghost" aria-label="Закрыть" onClick={() => setOpen(false)}>
+            <Kbd.Root aria-label="Open command palette">⌘K</Kbd.Root>
+            <Button.Root size="m" variant="neutral" mode="ghost" aria-label="Close" onClick={() => setOpen(false)}>
               <Button.Icon>
                 <X size={18} strokeWidth={2} aria-hidden />
               </Button.Icon>
@@ -142,13 +142,13 @@ export function WorkspaceSettingsCommandPalette() {
           </>
         }
       >
-        <CommandMenu.Input placeholder="Куда перейти…" aria-label="Поиск" />
+        <CommandMenu.Input placeholder="Where to go…" aria-label="Search" />
       </CommandMenu.InputRow>
 
       <CommandMenu.TagSection style={{ padding: "0.75rem 1rem" }}>
         <CommandMenu.TagSectionLabel>
           <Typography.Root size="xs" tone="muted">
-            Область
+            Scope
           </Typography.Root>
         </CommandMenu.TagSectionLabel>
         <CommandMenu.TagRow style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
@@ -161,16 +161,16 @@ export function WorkspaceSettingsCommandPalette() {
       </CommandMenu.TagSection>
 
       <CommandMenu.List>
-        <CommandMenu.Group heading="Действия">
-          <CommandMenu.Item value="пригласить" onSelect={() => setOpen(false)}>
-            Пригласить участника
+        <CommandMenu.Group heading="Actions">
+          <CommandMenu.Item value="invite" onSelect={() => setOpen(false)}>
+            Invite member
           </CommandMenu.Item>
         </CommandMenu.Group>
       </CommandMenu.List>
 
       <CommandMenu.Footer style={{ padding: "0.75rem 1rem", borderTop: "1px solid var(--prime-sys-color-border-subtle, #e4e4e7)" }}>
         <Typography.Root size="xs" tone="muted">
-          Стрелки и Enter работают из поля поиска.
+          Arrow keys and Enter work from the search field.
         </Typography.Root>
       </CommandMenu.Footer>
     </CommandMenu.Dialog>
@@ -178,9 +178,9 @@ export function WorkspaceSettingsCommandPalette() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Сценарий интеграции с роутером или аналитикой: открытие и строка поиска живут в состоянии родителя; при закрытии запрос сбрасывается.
+Integration with a router or analytics: open state and search query live in the parent; the query resets when the dialog closes.
 
 ```tsx
 import { Search } from "lucide-react";
@@ -194,7 +194,7 @@ export function ControlledCommandPalette() {
   return (
     <>
       <Typography.Root size="s" tone="muted">
-        Запрос: «{query || "—"}»
+        Query: “{query || "—"}”
       </Typography.Root>
 
       <CommandMenu.Dialog
@@ -209,14 +209,14 @@ export function ControlledCommandPalette() {
           <CommandMenu.Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Синхронизированный ввод…"
-            aria-label="Поиск"
+            placeholder="Synchronized input…"
+            aria-label="Search"
           />
         </CommandMenu.InputRow>
         <CommandMenu.List>
-          <CommandMenu.Group heading="Сброс">
-            <CommandMenu.Item value="очистить" onSelect={() => setQuery("")}>
-              Очистить строку
+          <CommandMenu.Group heading="Reset">
+            <CommandMenu.Item value="clear" onSelect={() => setQuery("")}>
+              Clear search
             </CommandMenu.Item>
           </CommandMenu.Group>
         </CommandMenu.List>
@@ -226,142 +226,142 @@ export function ControlledCommandPalette() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Дерево подкомпонентов:
+Subcomponent tree:
 
-`CommandMenu.Dialog` → провайдер внутреннего состояния → дочерние узлы:
+`CommandMenu.Dialog` → internal state provider → child nodes:
 
-- опционально `DialogTitle` / `DialogDescription` (экспорты совместимы с `Modal`);
+- optional `DialogTitle` / `DialogDescription` (exports align with `Modal`);
 - `InputRow` → `Input`;
-- опционально `TagSection` → `TagSectionLabel`, `TagRow`;
-- `List` → `Group` → `Item` (внутри — `ItemIcon` и текст);
-- опционально `Footer` → `FooterKeyBox` и текст.
+- optional `TagSection` → `TagSectionLabel`, `TagRow`;
+- `List` → `Group` → `Item` (with `ItemIcon` and text inside);
+- optional `Footer` → `FooterKeyBox` and text.
 
 ## API
 
 ### CommandMenu.Dialog
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| open | boolean | — | Нет | Контролируемое открытие |
-| defaultOpen | boolean | false | Нет | Начальное состояние |
-| onOpenChange | (open: boolean) => void | — | Нет | Смена открытости |
-| closeOnEscape | boolean | true | Нет | Закрытие по Escape |
-| closeOnOverlayClick | boolean | true | Нет | Закрытие по клику на подложку |
-| size | "s" \| "m" \| "l" \| "xl" | "l" | Нет | Масштаб модального окна |
-| overlayClassName | string | — | Нет | Класс подложки |
-| className | string | — | Нет | Класс панели контента (модификаторы ширины из CSS-модуля) |
-| contentClassName | string | — | Нет | Доп. класс панели |
-| aria-labelledby | string | — | Нет | Связь с заголовком |
-| aria-describedby | string | — | Нет | Связь с описанием |
-| children | React.ReactNode | — | Нет | Разметка палитры |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| open | boolean | — | No | Controlled open state |
+| defaultOpen | boolean | false | No | Initial open state |
+| onOpenChange | (open: boolean) => void | — | No | Open state change |
+| closeOnEscape | boolean | true | No | Close on Escape |
+| closeOnOverlayClick | boolean | true | No | Close on overlay click |
+| size | "s" \| "m" \| "l" \| "xl" | "l" | No | Modal scale |
+| overlayClassName | string | — | No | Overlay class |
+| className | string | — | No | Content panel class (width modifiers from the CSS module) |
+| contentClassName | string | — | No | Extra panel class |
+| aria-labelledby | string | — | No | Reference to title |
+| aria-describedby | string | — | No | Reference to description |
+| children | React.ReactNode | — | No | Palette markup |
 
 ### CommandMenu.DialogTitle / DialogDescription
 
-Совпадают с `Modal.Title` и `Modal.Description`: стандартные HTML-атрибуты заголовка и параграфа плюс `children`, `className`.
+Same as `Modal.Title` and `Modal.Description`: standard heading/paragraph HTML attributes plus `children`, `className`.
 
 ### CommandMenu.InputRow
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| leading | React.ReactNode | — | Нет | Слот слева |
-| trailing | React.ReactNode | — | Нет | Слот справа |
-| density | "compact" \| "comfortable" | "compact" | Нет | Высота строки ввода |
-| children | React.ReactNode | — | Нет | Обычно `Input` |
-| className | string | — | Нет | Класс обёртки |
-| …rest | HTMLAttributes\<div\> | — | Нет | Прочие атрибуты |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| leading | React.ReactNode | — | No | Left slot |
+| trailing | React.ReactNode | — | No | Right slot |
+| density | "compact" \| "comfortable" | "compact" | No | Input row height |
+| children | React.ReactNode | — | No | Usually `Input` |
+| className | string | — | No | Wrapper class |
+| …rest | HTMLAttributes\<div\> | — | No | Other div attributes |
 
 ### CommandMenu.Input
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| value | string и др. | — | Нет | Контролируемая строка поиска |
-| onChange | ChangeEventHandler | — | Нет | Ввод текста |
-| …rest | InputHTMLAttributes (без size, type) | — | Нет | type фиксирован как search; стрелки/Home/End/Enter обрабатываются внутри |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| value | string, etc. | — | No | Controlled search string |
+| onChange | ChangeEventHandler | — | No | Text input |
+| …rest | InputHTMLAttributes (without size, type) | — | No | `type` is fixed to `search`; arrow keys, Home, End, and Enter are handled internally |
 
 ### CommandMenu.List
 
-Контейнер с `role="listbox"`: `children`, `className`, стандартные атрибуты `div`.
+Container with `role="listbox"`: `children`, `className`, standard `div` attributes.
 
 ### CommandMenu.Group
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| heading | React.ReactNode | — | Нет | Заголовок секции |
-| children | React.ReactNode | — | Нет | Пункты |
-| …rest | HTMLAttributes\<div\> | — | Нет | Скрывается, если нет видимых пунктов |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| heading | React.ReactNode | — | No | Section heading |
+| children | React.ReactNode | — | No | Items |
+| …rest | HTMLAttributes\<div\> | — | No | Hidden when there are no visible items |
 
 ### CommandMenu.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| value | string | — | Да | Строка для фильтра; `""` — всегда виден |
-| keywords | string | "" | Нет | Доп. слова для поиска |
-| size | "s" \| "m" | "s" | Нет | Размер строки |
-| onSelect | () => void | — | Нет | Выбор |
-| disabled | boolean | — | Нет | Исключён из фильтра и навигации |
-| …rest | ButtonHTMLAttributes (без type) | — | Нет | type всегда button |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| value | string | — | Yes | String used for filtering; `""` is always visible |
+| keywords | string | "" | No | Extra search terms |
+| size | "s" \| "m" | "s" | No | Row size |
+| onSelect | () => void | — | No | Selection callback |
+| disabled | boolean | — | No | Excluded from filtering and keyboard nav |
+| …rest | ButtonHTMLAttributes (without type) | — | No | `type` is always `button` |
 
 ### CommandMenu.ItemIcon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| as | ElementType | "span" | Нет | Корневой элемент или компонент иконки |
-| className | string | — | Нет | Класс |
-| …rest | пропсы `as` | — | Нет | Пробрасываются в выбранный элемент |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| as | ElementType | "span" | No | Root element or icon component |
+| className | string | — | No | Class |
+| …rest | props for `as` | — | No | Forwarded to the chosen element |
 
 ### CommandMenu.TagSection / TagSectionLabel / TagRow
 
-Семантические обёртки для блока под строкой поиска: атрибуты `div` и `children`.
+Semantic wrappers for the block under the search field: `div` attributes and `children`.
 
 ### CommandMenu.Footer
 
-Нижняя панель: атрибуты `div`, в т.ч. класс `footerMuted` из CSS-модуля для приглушённого фона.
+Bottom bar: `div` attributes, including the `footerMuted` class from the CSS module for a subdued background.
 
 ### CommandMenu.FooterKeyBox
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|-------------|----------|
-| tone | "default" \| "muted" | "default" | Нет | Вариант бейджа (обводка / lighter) |
-| children | React.ReactNode | — | Нет | Иконка или подпись клавиши |
-| …rest | HTMLAttributes\<div\> (без color) | — | Нет | Остальное на корень Badge |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| tone | "default" \| "muted" | "default" | No | Badge variant (outline / lighter) |
+| children | React.ReactNode | — | No | Icon or key label |
+| …rest | HTMLAttributes\<div\> (without color) | — | No | Everything else on the Badge root |
 
-## Варианты
+## Variants
 
-- **Размер диалога** `Dialog size`: `s` | `m` | `l` | `xl` — влияет на типографику и каскад `ControlSizeProvider` внутри модалки.
-- **Плотность строки поиска** `InputRow density`: `compact` или `comfortable`.
-- **Размер пункта** `Item size`: `s` или `m`.
-- **Тон подсказки клавиши** `FooterKeyBox tone`: `default` (контурный бейдж) или `muted` (светлый фон на тёмном футере).
-- **Ширина панели:** классы из `CommandMenu.module.css` (например `dialogContentWide`) через `className` на `Dialog`.
+- **Dialog size** `Dialog size`: `s` | `m` | `l` | `xl` — affects typography and the `ControlSizeProvider` cascade inside the modal.
+- **Search row density** `InputRow density`: `compact` or `comfortable`.
+- **Item size** `Item size`: `s` or `m`.
+- **Key hint tone** `FooterKeyBox tone`: `default` (outlined badge) or `muted` (light fill on a dark footer).
+- **Panel width:** classes from `CommandMenu.module.css` (e.g. `dialogContentWide`) via `className` on `Dialog`.
 
-## Состояния
+## States
 
-- **Открытие модалки:** контролируемое (`open` / `onOpenChange`) или неконтролируемое (`defaultOpen`).
-- **Фильтрация:** при вводе в `Input` список сокращается; пункты с `disabled` не участвуют; `value=""` не отфильтровывается по запросу.
-- **Активный пункт:** подсветка и `aria-activedescendant` на поле поиска; группа без видимых пунктов скрывается (`hidden`).
-- **Выбор:** клик или Enter вызывают `onSelect` активного пункта.
+- **Modal open:** controlled (`open` / `onOpenChange`) or uncontrolled (`defaultOpen`).
+- **Filtering:** typing in `Input` shrinks the list; items with `disabled` are skipped; `value=""` is never filtered out by the query.
+- **Active item:** highlight and `aria-activedescendant` on the search field; groups with no visible items are hidden (`hidden`).
+- **Selection:** click or Enter calls `onSelect` on the active item.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Поле поиска: `role="combobox"`, `aria-controls` указывает на `List`, `aria-activedescendant` — на id опции.
-- Список: `role="listbox"`.
-- Пункт: `role="option"`, `aria-selected`.
-- Задавайте видимый или визуально скрытый `DialogTitle` и при необходимости `aria-labelledby` на `Dialog`.
-- Навигация с клавиатуры из поля ввода: стрелки вверх/вниз, Home, End, Enter (Escape обрабатывает модалка).
+- Search field: `role="combobox"`, `aria-controls` points at `List`, `aria-activedescendant` at the option id.
+- List: `role="listbox"`.
+- Item: `role="option"`, `aria-selected`.
+- Provide a visible or visually hidden `DialogTitle` and, if needed, `aria-labelledby` on `Dialog`.
+- Keyboard navigation from the input: Up/Down, Home, End, Enter (Escape is handled by the modal).
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет встроенного экрана «ничего не найдено» — при пустой выдаче группы скрываются; пустое состояние добавляйте сами под списком.
-- Один активный пункт; множественный выбор не поддерживается.
-- Фильтрация синхронная и на клиенте; для больших списков может понадобиться виртуализация или серверный поиск снаружи.
-- Глобальные сочетания (например ⌘K) не встроены — вешайте слушатель на `document` в приложении.
+- No built-in “no results” screen—when there are no matches, groups hide; add your own empty state below the list.
+- Single active item; multi-select is not supported.
+- Filtering is synchronous and client-side; large lists may need virtualization or external server-side search.
+- Global shortcuts (e.g. ⌘K) are not built in—attach a listener on `document` in your app.
 
-## Связанные компоненты
+## Related components
 
-- **Modal** — основа диалога.
-- **Badge** — внутри `FooterKeyBox`.
-- **Button**, **LinkButton** — триггеры и ссылки в футере.
-- **Tag** — часто в паре с `TagSection` / `TagRow`.
-- **Kbd** — отображение сочетаний рядом с полем поиска.
-- **Typography** — заголовки и подписи вокруг палитры.
+- **Modal** — dialog foundation.
+- **Badge** — used inside `FooterKeyBox`.
+- **Button**, **LinkButton** — triggers and footer links.
+- **Tag** — often paired with `TagSection` / `TagRow`.
+- **Kbd** — shortcut display next to the search field.
+- **Typography** — titles and captions around the palette.

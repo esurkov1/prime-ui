@@ -1,25 +1,25 @@
 # Stepper
 
-## Что это
+## What it is
 
-Набор компонентов для отображения многошагового процесса: высокоуровневый `Stepper` на семантическом списке и примитивы `HorizontalStepper` / `VerticalStepper` с ручным `state` у каждого шага.
+A set of components for displaying a multi-step process: a high-level `Stepper` on a semantic list and primitive `HorizontalStepper` / `VerticalStepper` with manual `state` on each step.
 
-## Для чего нужен
+## What it’s for
 
-- **Онбординг и мастера настройки** — пользователь видит, на каком этапе знакомства с продуктом или конфигурации он находится.
-- **Оформление заказа и длинные формы** — короткие горизонтальные подписи этапов (корзина, доставка, оплата) без перегрузки экрана.
-- **Документооборот и согласования** — отражение стадий заявки или договора с возможностью выделить проблемный шаг (`status="error"`).
-- **Редакционный контент** — вертикальная линия шагов с стрелкой у активного этапа (черновик, правки, публикация).
-- **Настройки уведомлений и профиля** — примитивный API с кликом по шагам и явным `state`, когда логика приходит из API или стора.
-- **CI/CD и внутренние панели** — полоса этапов на всю ширину карточки релиза или пайплайна.
+- **Onboarding and setup wizards** — the user sees where they are in product onboarding or configuration.
+- **Checkout and long forms** — short horizontal step labels (cart, delivery, payment) without cluttering the screen.
+- **Document workflows and approvals** — reflecting application or contract stages with the option to highlight a problematic step (`status="error"`).
+- **Editorial content** — a vertical step line with an arrow on the active stage (draft, edits, publish).
+- **Notification and profile settings** — a primitive API with clickable steps and explicit `state` when logic comes from an API or store.
+- **CI/CD and internal dashboards** — a full-width stage bar on a release or pipeline card.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример рассчитан на другой тип экрана и другой срез API.
+Each example targets a different screen type and API slice.
 
-### Базовый
+### Basic
 
-Вертикальный мастер с автоматическим номером шага и подписями; активный шаг задаётся через `currentStep`.
+A vertical wizard with automatic step numbers and labels; the active step is set via `currentStep`.
 
 ```tsx
 import { Stepper } from "prime-ui-kit";
@@ -31,26 +31,26 @@ export function OnboardingSteps() {
     <Stepper.Root currentStep={step} size="m">
       <Stepper.Step>
         <Stepper.Indicator />
-        <Stepper.Content title="Аккаунт" description="Создайте или привяжите вход" />
+        <Stepper.Content title="Account" description="Create or link sign-in" />
         <Stepper.Arrow />
       </Stepper.Step>
       <Stepper.Step>
         <Stepper.Indicator />
-        <Stepper.Content title="Команда" description="Пригласите коллег" />
+        <Stepper.Content title="Team" description="Invite colleagues" />
         <Stepper.Arrow />
       </Stepper.Step>
       <Stepper.Step>
         <Stepper.Indicator />
-        <Stepper.Content title="Готово" description="Можно пользоваться продуктом" />
+        <Stepper.Content title="Done" description="You can start using the product" />
       </Stepper.Step>
     </Stepper.Root>
   );
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Горизонтальная витрина этапов заказа: `orientation="horizontal"`, разделители `SeparatorIcon`, без описаний под заголовками.
+A horizontal checkout stage rail: `orientation="horizontal"`, `SeparatorIcon` dividers, no descriptions under titles.
 
 ```tsx
 import { Stepper } from "prime-ui-kit";
@@ -60,35 +60,35 @@ export function CheckoutRail() {
     <Stepper.Root orientation="horizontal" currentStep={1} size="l" className="w-full max-w-2xl">
       <Stepper.Step>
         <Stepper.Indicator />
-        <Stepper.Content title="Корзина" />
+        <Stepper.Content title="Cart" />
       </Stepper.Step>
       <Stepper.SeparatorIcon />
       <Stepper.Step>
         <Stepper.Indicator />
-        <Stepper.Content title="Доставка" />
+        <Stepper.Content title="Delivery" />
       </Stepper.Step>
       <Stepper.SeparatorIcon />
       <Stepper.Step>
         <Stepper.Indicator />
-        <Stepper.Content title="Оплата" />
+        <Stepper.Content title="Payment" />
       </Stepper.Step>
     </Stepper.Root>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Колонка настроек с примитивным вертикальным степпером: состояние шагов вычисляется в родителе, клик переключает активный индекс (типично для боковой панели).
+A settings column with a primitive vertical stepper: step state is computed in the parent; click switches the active index (typical for a side panel).
 
 ```tsx
 import * as React from "react";
 import { VerticalStepper } from "prime-ui-kit";
 
 const rows = [
-  { id: "channels", label: "Каналы", hint: "1" },
-  { id: "quiet", label: "Тишина", hint: "2" },
-  { id: "digest", label: "Дайджест", hint: "3" },
+  { id: "channels", label: "Channels", hint: "1" },
+  { id: "quiet", label: "Quiet hours", hint: "2" },
+  { id: "digest", label: "Digest", hint: "3" },
 ] as const;
 
 export function NotificationSidebarPanel() {
@@ -113,9 +113,9 @@ export function NotificationSidebarPanel() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Индекс шага и кнопки навигации живут в одном контейнере анкеты или мастера.
+Step index and navigation buttons live in one survey or wizard container.
 
 ```tsx
 import * as React from "react";
@@ -130,17 +130,17 @@ export function ControlledWizard() {
       <Stepper.Root currentStep={currentStep}>
         <Stepper.Step onClick={() => setCurrentStep(0)}>
           <Stepper.Indicator />
-          <Stepper.Content title="Условия" />
+          <Stepper.Content title="Terms" />
           <Stepper.Arrow />
         </Stepper.Step>
         <Stepper.Step onClick={() => setCurrentStep(1)}>
           <Stepper.Indicator />
-          <Stepper.Content title="Анкета" />
+          <Stepper.Content title="Survey" />
           <Stepper.Arrow />
         </Stepper.Step>
         <Stepper.Step onClick={() => setCurrentStep(2)}>
           <Stepper.Indicator />
-          <Stepper.Content title="Отправка" />
+          <Stepper.Content title="Submit" />
         </Stepper.Step>
       </Stepper.Root>
       <div className="flex gap-2">
@@ -150,7 +150,7 @@ export function ControlledWizard() {
           disabled={currentStep <= 0}
           onClick={() => setCurrentStep((s) => s - 1)}
         >
-          Назад
+          Back
         </Button.Root>
         <Button.Root
           mode="filled"
@@ -158,7 +158,7 @@ export function ControlledWizard() {
           disabled={currentStep >= max}
           onClick={() => setCurrentStep((s) => s + 1)}
         >
-          Далее
+          Next
         </Button.Root>
       </div>
     </div>
@@ -166,183 +166,183 @@ export function ControlledWizard() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-**Высокоуровневый Stepper**
+**High-level Stepper**
 
-- `Stepper.Root` — `<ol>` с контекстом ориентации, `currentStep`, размера и счётчиком индексов для дочерних шагов.
-- `Stepper.Step` / `Stepper.Item` — `<li>` + `<button>`; в контексте шага доступны статус и индекс.
-- `Stepper.Indicator` / `Stepper.ItemIndicator` — `span` с номером, галочкой при `completed` или своим `children`.
-- `Stepper.Content` — заголовок и опциональное описание.
-- `Stepper.SeparatorIcon` — `<li>` с шевроном между горизонтальными шагами.
-- `Stepper.Arrow` — стрелка у вертикального шага (делегирует в `VerticalStepper.Arrow`).
+- `Stepper.Root` — `<ol>` with context for orientation, `currentStep`, size, and an index counter for child steps.
+- `Stepper.Step` / `Stepper.Item` — `<li>` + `<button>`; step context exposes status and index.
+- `Stepper.Indicator` / `Stepper.ItemIndicator` — `span` with a number, a checkmark when `completed`, or custom `children`.
+- `Stepper.Content` — title and optional description.
+- `Stepper.SeparatorIcon` — `<li>` with a chevron between horizontal steps.
+- `Stepper.Arrow` — arrow on a vertical step (delegates to `VerticalStepper.Arrow`).
 
 **HorizontalStepper**
 
-- `Root` → `SeparatorIcon` | `Item` (кнопка) → внутри `ItemIndicator`.
+- `Root` → `SeparatorIcon` | `Item` (button) → inside, `ItemIndicator`.
 
 **VerticalStepper**
 
-- `Root` → `Item` → `ItemIndicator`, текст, опционально `Arrow`.
+- `Root` → `Item` → `ItemIndicator`, text, optional `Arrow`.
 
 ## API
 
 ### Stepper.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| orientation | `"horizontal" \| "vertical"` | `"vertical"` | Нет | Направление списка шагов. |
-| currentStep | `number` | `0` | Нет | Индекс активного шага для авто-статусов. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Тир контрола и типографики. |
-| children | `React.ReactNode` | — | Да | Шаги и при горизонтали — `SeparatorIcon`. |
-| className | `string` | — | Нет | Класс на `<ol>`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| orientation | `"horizontal" \| "vertical"` | `"vertical"` | No | Direction of the step list. |
+| currentStep | `number` | `0` | No | Active step index for auto statuses. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control tier and typography. |
+| children | `React.ReactNode` | — | Yes | Steps and, when horizontal, `SeparatorIcon`. |
+| className | `string` | — | No | Class on `<ol>`. |
 
 ### Stepper.Step (Stepper.Item)
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| index | `number` | авто | Нет | Явный индекс для статуса и номера в индикаторе. |
-| status | `StepStatus` | из `currentStep` | Нет | `pending` \| `active` \| `completed` \| `error`. |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Тип кнопки. |
-| disabled | `boolean` | — | Нет | Отключение шага. |
-| className | `string` | — | Нет | Класс кнопки. |
-| children | `React.ReactNode` | — | Да | Разметка шага. |
-| …rest | `ButtonHTMLAttributes` (без `type`) | — | Нет | Остальные атрибуты кнопки. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| index | `number` | auto | No | Explicit index for status and indicator number. |
+| status | `StepStatus` | from `currentStep` | No | `pending` \| `active` \| `completed` \| `error`. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Button type. |
+| disabled | `boolean` | — | No | Disables the step. |
+| className | `string` | — | No | Button class. |
+| children | `React.ReactNode` | — | Yes | Step markup. |
+| …rest | `ButtonHTMLAttributes` (without `type`) | — | No | Remaining button attributes. |
 
 ### Stepper.Indicator (Stepper.ItemIndicator)
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | номер / галочка | Нет | Кастомный индикатор. |
-| className | `string` | — | Нет | Класс `span`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactNode` | number / checkmark | No | Custom indicator. |
+| className | `string` | — | No | `span` class. |
 
 ### Stepper.Content
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| title | `string` | — | Да | Заголовок. |
-| description | `string` | — | Нет | Подзаголовок. |
-| className | `string` | — | Нет | Обёртка блока текста. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| title | `string` | — | Yes | Title. |
+| description | `string` | — | No | Subtitle. |
+| className | `string` | — | No | Text block wrapper class. |
 
 ### Stepper.SeparatorIcon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | Нет | Класс на иконку внутри `li`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class on the icon inside `li`. |
 
 ### Stepper.Arrow
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| as | `ElementType` | `IconChevronRight` | Нет | Замена компонента иконки. |
-| className | `string` | — | Нет | Класс иконки. |
-| …rest | пропсы `as` | — | Нет | Проброс на иконку. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| as | `ElementType` | `IconChevronRight` | No | Replace icon component. |
+| className | `string` | — | No | Icon class. |
+| …rest | props of `as` | — | No | Forwarded to the icon. |
 
 ### HorizontalStepper.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размер тира. |
-| className | `string` | — | Нет | Класс `div`. |
-| children | `React.ReactNode` | — | Нет | Разметка полосы. |
-| …rest | `HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты контейнера. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Tier size. |
+| className | `string` | — | No | `div` class. |
+| children | `React.ReactNode` | — | No | Rail markup. |
+| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | Container attributes. |
 
 ### HorizontalStepper.SeparatorIcon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| as | `ElementType` | `IconChevronRight` | Нет | Другая иконка-разделитель. |
-| className | `string` | — | Нет | Класс svg. |
-| …rest | пропсы `as` | — | Нет | Проброс на иконку. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| as | `ElementType` | `IconChevronRight` | No | Alternate separator icon. |
+| className | `string` | — | No | SVG class. |
+| …rest | props of `as` | — | No | Forwarded to the icon. |
 
 ### HorizontalStepper.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| state | `StepperAlignItemState` | `"default"` | Нет | `default` \| `active` \| `completed`. |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Тип кнопки. |
-| className | `string` | — | Нет | Класс кнопки. |
-| children | `React.ReactNode` | — | Нет | Индикатор и подпись. |
-| …rest | `ButtonHTMLAttributes` (без `type`) | — | Нет | Остальные атрибуты. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| state | `StepperAlignItemState` | `"default"` | No | `default` \| `active` \| `completed`. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Button type. |
+| className | `string` | — | No | Button class. |
+| children | `React.ReactNode` | — | No | Indicator and label. |
+| …rest | `ButtonHTMLAttributes` (without `type`) | — | No | Remaining attributes. |
 
 ### HorizontalStepper.ItemIndicator
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| state | `StepperAlignItemState` | из контекста | Нет | Переопределение состояния. |
-| className | `string` | — | Нет | Класс обёртки. |
-| children | `React.ReactNode` | галочка при completed | Нет | Содержимое круга. |
-| …rest | `HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| state | `StepperAlignItemState` | from context | No | State override. |
+| className | `string` | — | No | Wrapper class. |
+| children | `React.ReactNode` | checkmark when completed | No | Circle contents. |
+| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### VerticalStepper.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размер тира. |
-| className | `string` | — | Нет | Класс `div`. |
-| children | `React.ReactNode` | — | Нет | Вертикальные `Item`. |
-| …rest | `HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты контейнера. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Tier size. |
+| className | `string` | — | No | `div` class. |
+| children | `React.ReactNode` | — | No | Vertical `Item`s. |
+| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | Container attributes. |
 
 ### VerticalStepper.Arrow
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| as | `ElementType` | `IconChevronRight` | Нет | Другая иконка. |
-| className | `string` | — | Нет | Класс иконки. |
-| …rest | пропсы `as` | — | Нет | Проброс на иконку. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| as | `ElementType` | `IconChevronRight` | No | Alternate icon. |
+| className | `string` | — | No | Icon class. |
+| …rest | props of `as` | — | No | Forwarded to the icon. |
 
 ### VerticalStepper.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| state | `StepperAlignItemState` | `"default"` | Нет | Состояние строки. |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | Нет | Тип кнопки. |
-| className | `string` | — | Нет | Класс кнопки. |
-| children | `React.ReactNode` | — | Нет | Индикатор, текст, стрелка. |
-| …rest | `ButtonHTMLAttributes` (без `type`) | — | Нет | Остальные атрибуты. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| state | `StepperAlignItemState` | `"default"` | No | Row state. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Button type. |
+| className | `string` | — | No | Button class. |
+| children | `React.ReactNode` | — | No | Indicator, text, arrow. |
+| …rest | `ButtonHTMLAttributes` (without `type`) | — | No | Remaining attributes. |
 
 ### VerticalStepper.ItemIndicator
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| state | `StepperAlignItemState` | из контекста | Нет | Состояние индикатора. |
-| className | `string` | — | Нет | Класс обёртки. |
-| children | `React.ReactNode` | галочка при completed | Нет | Содержимое круга. |
-| …rest | `HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| state | `StepperAlignItemState` | from context | No | Indicator state. |
+| className | `string` | — | No | Wrapper class. |
+| children | `React.ReactNode` | checkmark when completed | No | Circle contents. |
+| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
-Тип `StepperAlignItemState` экспортируется из пакета для примитивов; у высокоуровневого `Stepper` для шагов используется `StepStatus` (`pending` вместо `default` в примитивах).
+The `StepperAlignItemState` type is exported from the package for primitives; the high-level `Stepper` uses `StepStatus` for steps (`pending` instead of `default` in primitives).
 
-## Варианты
+## Variants
 
-- **Два уровня API:** семантический `Stepper` с `currentStep` и автоматической нумерацией либо `HorizontalStepper` / `VerticalStepper` с явным `state` на каждом `Item`.
-- **Ориентация:** `horizontal` — полоса с опциональными `SeparatorIcon`; `vertical` (по умолчанию) — колонка, часто со `Stepper.Arrow` у активного шага.
-- **Размер:** `size` на корне задаёт единый тир для шага и текста во всех подкомпонентах этой ветки.
+- **Two API levels:** semantic `Stepper` with `currentStep` and automatic numbering, or `HorizontalStepper` / `VerticalStepper` with explicit `state` on each `Item`.
+- **Orientation:** `horizontal` — a rail with optional `SeparatorIcon`; `vertical` (default) — a column, often with `Stepper.Arrow` on the active step.
+- **Size:** root `size` sets a single tier for the step and text across all subcomponents in that branch.
 
-## Состояния
+## States
 
-- **Авто по `currentStep`:** шаги до индекса — `completed`, равный индексу — `active`, после — `pending`.
-- **Ручной `status` на `Stepper.Step`:** можно зафиксировать ошибку (`error`) или иной статус независимо от индекса; для ошибки стилизуется `data-legacy-status="error"` на кнопке и индикаторе.
-- **Примитивы:** только три визуальных значения `state`: `default`, `active`, `completed` (без отдельного `error` в типе — ошибки оформляйте на высокоуровневом `Stepper` или кастомным содержимым индикатора).
-- **disabled:** стандартная блокировка кнопки шага.
+- **Auto from `currentStep`:** steps before the index are `completed`, equal index is `active`, after are `pending`.
+- **Manual `status` on `Stepper.Step`:** you can pin an error (`error`) or another status independent of index; for errors, `data-legacy-status="error"` is styled on the button and indicator.
+- **Primitives:** only three visual `state` values: `default`, `active`, `completed` (no separate `error` in the type — handle errors on the high-level `Stepper` or with custom indicator content).
+- **disabled:** standard button disabling.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Высокоуровневый `Stepper` рендерит **упорядоченный список** `<ol>` / `<li>` — скринридеры получают порядок шагов.
-- У активного шага выставляется **`aria-current="step"`** на кнопке.
-- Индикатор и разделители помечены **`aria-hidden`** там, где число дублируется текстом рядом; при кастомных символах в индикаторе смысл должен быть в подписи шага.
-- Клавиатура: фокус на кнопках шагов, логика перехода — на стороне приложения (`onClick`, роутинг, controlled `currentStep`).
+- The high-level `Stepper` renders an **ordered list** `<ol>` / `<li>` — screen readers get step order.
+- The active step sets **`aria-current="step"`** on the button.
+- Indicators and separators use **`aria-hidden`** where the number is duplicated in adjacent text; with custom indicator symbols, meaning should live in the step label.
+- Keyboard: focus on step buttons; transition logic is app-side (`onClick`, routing, controlled `currentStep`).
 
-## Ограничения и заметки
+## Limitations and notes
 
-- `SeparatorIcon` в составе `Stepper` предназначен для **горизонтальной** ориентации; во вертикали разделители между пунктами не вставляются тем же компонентом.
-- Примитивы **не** формируют семантический список шагов сами по себе — при необходимости задайте `role` / разметку снаружи.
-- Счётчик индексов у `Stepper.Root` **последовательный** для шагов без явного `index`; смешение явных и автоматических индексов требует внимания к порядку детей.
-- Переход между шагами (валидация, сохранение черновика) в пакет **не встроен** — только отображение и клики по кнопкам.
+- `SeparatorIcon` inside `Stepper` is meant for **horizontal** orientation; in vertical layout, separators between items are not inserted with the same component.
+- Primitives do **not** form a semantic step list by themselves — set `role` / markup externally if needed.
+- The index counter on `Stepper.Root` is **sequential** for steps without explicit `index`; mixing explicit and automatic indices requires attention to child order.
+- Step transitions (validation, draft save) are **not built into** the package — only display and button clicks.
 
-## Связанные компоненты
+## Related components
 
-- **Button** — действия «Далее» / «Назад» рядом с контролируемым степпером.
-- **Modal / Drawer** — обёртки многошаговых мастеров.
-- **Breadcrumb** — если нужна иерархия страниц, а не этапы одного потока.
-- **Progress bar** — когда важна доля выполнения, а не дискретные шаги.
-- **Icon** (или экспорты из `prime-ui-kit/icons`) — подстановка в `as` у разделителя и стрелки в примитивах.
+- **Button** — “Next” / “Back” actions next to a controlled stepper.
+- **Modal / Drawer** — wrappers for multi-step wizards.
+- **Breadcrumb** — when you need page hierarchy, not stages of one flow.
+- **Progress bar** — when completion fraction matters, not discrete steps.
+- **Icon** (or exports from `prime-ui-kit/icons`) — pass into `as` on separator and arrow in primitives.

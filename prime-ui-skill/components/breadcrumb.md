@@ -1,22 +1,22 @@
 # Breadcrumb
 
-## Что это
+## What it is
 
-Составной компонент «хлебных крошек»: навигация `nav` со списком `ol`, пункты-ссылки или текст текущей страницы, опциональные разделители и многоточие для длинного пути.
+A composite breadcrumb component: a `nav` with an `ol` list, link or plain-text items for the current page, optional separators, and an ellipsis for long paths.
 
-## Для чего нужен
+## What it’s for
 
-- **Витрина и каталог** — показать путь «главная → категория → подкатегория → товар» и быстро подняться на уровень выше.
-- **Личный кабинет и операционные экраны** — ориентир в разделах вроде «заказы → карточка заказа» без поиска по меню.
-- **База знаний и документация** — длинные ветки разделов с возможностью сократить середину пути через многоточие.
+- **Storefront and catalog** — show the path “home → category → subcategory → product” and jump up a level quickly.
+- **Account and operational screens** — orient users in flows like “orders → order detail” without hunting through the menu.
+- **Knowledge base and docs** — long section trees with the middle of the path collapsed behind an ellipsis.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример самодостаточен; сценарии не повторяют одну и ту же задачу.
+Each example stands on its own; scenarios do not repeat the same task.
 
-### Базовый
+### Basic
 
-Типичная цепочка: все родители кликабельны, последний пункт — текущая страница.
+Typical chain: all parents are clickable, the last item is the current page.
 
 ```tsx
 import { Breadcrumb } from "prime-ui-kit";
@@ -24,19 +24,19 @@ import { Breadcrumb } from "prime-ui-kit";
 export function OrderBreadcrumb() {
   return (
     <Breadcrumb.Root>
-      <Breadcrumb.Item href="/">Главная</Breadcrumb.Item>
+      <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
       <Breadcrumb.Separator />
-      <Breadcrumb.Item href="/orders">Заказы</Breadcrumb.Item>
+      <Breadcrumb.Item href="/orders">Orders</Breadcrumb.Item>
       <Breadcrumb.Separator />
-      <Breadcrumb.Item current>Заказ № 1042</Breadcrumb.Item>
+      <Breadcrumb.Item current>Order #1042</Breadcrumb.Item>
     </Breadcrumb.Root>
   );
 }
 ```
 
-### С размерами
+### Sizes
 
-Тот же паттерн навигации в компактной шапке отчёта: весь блок масштабируется через `size`.
+Same navigation pattern in a compact report header: the whole block scales via `size`.
 
 ```tsx
 import { Breadcrumb } from "prime-ui-kit";
@@ -44,19 +44,19 @@ import { Breadcrumb } from "prime-ui-kit";
 export function ReportHeaderBreadcrumb() {
   return (
     <Breadcrumb.Root size="s">
-      <Breadcrumb.Item href="/analytics">Аналитика</Breadcrumb.Item>
+      <Breadcrumb.Item href="/analytics">Analytics</Breadcrumb.Item>
       <Breadcrumb.Separator />
       <Breadcrumb.Item href="/analytics/2025">2025</Breadcrumb.Item>
       <Breadcrumb.Separator />
-      <Breadcrumb.Item current>Квартал 1</Breadcrumb.Item>
+      <Breadcrumb.Item current>Q1</Breadcrumb.Item>
     </Breadcrumb.Root>
   );
 }
 ```
 
-### В контексте узкой колонки
+### In a narrow column
 
-Обучающий портал: средний уровень без ссылки (только заголовок модуля), урок — текущая страница. В узкой колонке элементы переносятся за счёт `flex-wrap` у списка.
+Learning portal: middle level has no link (module title only), lesson is the current page. In a narrow column items wrap thanks to `flex-wrap` on the list.
 
 ```tsx
 import { Breadcrumb } from "prime-ui-kit";
@@ -65,20 +65,20 @@ export function CourseLessonBreadcrumb() {
   return (
     <div style={{ maxWidth: 240 }}>
       <Breadcrumb.Root>
-        <Breadcrumb.Item href="/courses">Курсы</Breadcrumb.Item>
+        <Breadcrumb.Item href="/courses">Courses</Breadcrumb.Item>
         <Breadcrumb.Separator />
-        <Breadcrumb.Item>Модуль 3</Breadcrumb.Item>
+        <Breadcrumb.Item>Module 3</Breadcrumb.Item>
         <Breadcrumb.Separator />
-        <Breadcrumb.Item current>Введение в тему</Breadcrumb.Item>
+        <Breadcrumb.Item current>Introduction</Breadcrumb.Item>
       </Breadcrumb.Root>
     </div>
   );
 }
 ```
 
-### Иконка «дом» и свой разделитель
+### Home icon and custom separator
 
-Центр поддержки: первый переход только значком (нужен `aria-label`), между уровнями — слэш вместо шеврона через `children` у `Separator`. Класс `itemHome` задаёт выравнивание иконки в модуле стилей крошек (в репозитории кита — `@/components/breadcrumb/Breadcrumb.module.css`; у себя можно подставить эквивалентный класс).
+Support center: first hop is icon-only (needs `aria-label`), levels separated by a slash instead of a chevron via `children` on `Separator`. The `itemHome` class aligns the icon in the breadcrumb style module (in the kit repo — `@/components/breadcrumb/Breadcrumb.module.css`; use an equivalent class in your app).
 
 ```tsx
 import { Breadcrumb, Icon } from "prime-ui-kit";
@@ -87,21 +87,21 @@ import styles from "@/components/breadcrumb/Breadcrumb.module.css";
 export function HelpBreadcrumb() {
   return (
     <Breadcrumb.Root>
-      <Breadcrumb.Item href="/help" className={styles.itemHome} aria-label="Справка">
+      <Breadcrumb.Item href="/help" className={styles.itemHome} aria-label="Help">
         <Icon name="nav.home" tone="default" />
       </Breadcrumb.Item>
       <Breadcrumb.Separator>/</Breadcrumb.Separator>
-      <Breadcrumb.Item href="/help/billing">Оплата</Breadcrumb.Item>
+      <Breadcrumb.Item href="/help/billing">Billing</Breadcrumb.Item>
       <Breadcrumb.Separator>/</Breadcrumb.Separator>
-      <Breadcrumb.Item current>Возврат средств</Breadcrumb.Item>
+      <Breadcrumb.Item current>Refunds</Breadcrumb.Item>
     </Breadcrumb.Root>
   );
 }
 ```
 
-### Длинный путь и Ellipsis
+### Long path and Ellipsis
 
-Глубокая структура каталога: середина пути свёрнута в `Ellipsis`, видны корень, ближайший родитель и лист.
+Deep catalog structure: the middle of the path is collapsed into `Ellipsis`; root, nearest parent, and leaf stay visible.
 
 ```tsx
 import { Breadcrumb } from "prime-ui-kit";
@@ -109,96 +109,96 @@ import { Breadcrumb } from "prime-ui-kit";
 export function DeepCatalogBreadcrumb() {
   return (
     <Breadcrumb.Root>
-      <Breadcrumb.Item href="/">Главная</Breadcrumb.Item>
+      <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
       <Breadcrumb.Separator />
-      <Breadcrumb.Item href="/catalog">Каталог</Breadcrumb.Item>
+      <Breadcrumb.Item href="/catalog">Catalog</Breadcrumb.Item>
       <Breadcrumb.Separator />
       <Breadcrumb.Ellipsis />
       <Breadcrumb.Separator />
-      <Breadcrumb.Item href="/catalog/furniture/chairs/office">Офисные кресла</Breadcrumb.Item>
+      <Breadcrumb.Item href="/catalog/furniture/chairs/office">Office chairs</Breadcrumb.Item>
       <Breadcrumb.Separator />
-      <Breadcrumb.Item current>Модель X</Breadcrumb.Item>
+      <Breadcrumb.Item current>Model X</Breadcrumb.Item>
     </Breadcrumb.Root>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-`Breadcrumb.Root` (`nav` → `ol`) содержит в произвольном порядке:
+`Breadcrumb.Root` (`nav` → `ol`) may contain, in any order:
 
-- `Breadcrumb.Item` — `li` с `LinkButton` (если есть `href`) или `span` (иначе; при `current` — стиль текущей страницы и `aria-current="page"`).
-- `Breadcrumb.Separator` — `li` с `aria-hidden`, между пунктами; по умолчанию иконка-шеврон.
-- `Breadcrumb.Ellipsis` — `li` с символом многоточия.
+- `Breadcrumb.Item` — `li` with `LinkButton` (if `href` is set) or `span` (otherwise; with `current` — current-page styling and `aria-current="page"`).
+- `Breadcrumb.Separator` — `li` with `aria-hidden`, between items; default is a chevron icon.
+- `Breadcrumb.Ellipsis` — `li` with an ellipsis character.
 
-`Root` задаёт контекст размера (`BreadcrumbSizeContext` и `ControlSizeProvider`) для ссылок и иконок.
+`Root` provides size context (`BreadcrumbSizeContext` and `ControlSizeProvider`) for links and icons.
 
 ## API
 
 ### Breadcrumb.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | да | Узлы `Item`, `Separator`, `Ellipsis` внутри списка |
-| className | `string` | — | нет | Дополнительный класс на `nav` |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | нет | Кегль ссылок, текущей страницы, многоточия; размер иконок разделителя и «дом» |
-| …rest | `React.HTMLAttributes<HTMLElement>` | — | нет | Прочие атрибуты `nav` (например свой `aria-label` вместо значения по умолчанию) |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | yes | `Item`, `Separator`, and `Ellipsis` nodes inside the list |
+| className | `string` | — | no | Extra class on `nav` |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Type scale for links, current page, and ellipsis; separator and home icon size |
+| …rest | `React.HTMLAttributes<HTMLElement>` | — | no | Other `nav` attributes (e.g. your own `aria-label` instead of the default) |
 
 ### Breadcrumb.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| href | `string` | — | нет | При наличии — ссылка; иначе текстовый `span` |
-| current | `boolean` | — | нет | Текущая страница: оформление и `aria-current="page"` |
-| children | `React.ReactNode` | — | нет | Подпись или иконка |
-| className | `string` | — | нет | Класс на `li` (например `itemHome` из модульных стилей крошек для иконки «дом») |
-| aria-label | `string` | — | нет | Нужен для ссылки без видимого текста (icon-only) |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| href | `string` | — | no | If set — link; otherwise plain `span` |
+| current | `boolean` | — | no | Current page: styling and `aria-current="page"` |
+| children | `React.ReactNode` | — | no | Label or icon |
+| className | `string` | — | no | Class on `li` (e.g. `itemHome` from breadcrumb module styles for the home icon) |
+| aria-label | `string` | — | no | Required for links without visible text (icon-only) |
 
 ### Breadcrumb.Separator
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | иконка `nav.chevronRight` | нет | Произвольный разделитель между пунктами |
-| className | `string` | — | нет | Класс на `li` |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | `nav.chevronRight` icon | no | Custom separator between items |
+| className | `string` | — | no | Class on `li` |
 
 ### Breadcrumb.Ellipsis
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | нет | Класс на `li` с символом «…» |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | no | Class on `li` with the “…” character |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет. Визуальная иерархия строится за счёт:
+There is no separate `variant` prop. Visual hierarchy comes from:
 
-- `size` на корне (`s` … `xl`);
-- приглушённого цвета ссылок и более контрастного текста текущей страницы (стили модуля);
-- кастомных `children` у `Separator` (шеврон, слэш, текст).
+- `size` on the root (`s` … `xl`);
+- muted link color and stronger contrast for the current page (module styles);
+- custom `children` on `Separator` (chevron, slash, text).
 
-## Состояния
+## States
 
-- **Ссылка** — `Item` с `href`: интерактивный `LinkButton`, hover/focus из кнопки-ссылки.
-- **Текущая страница** — `Item` с `current` без `href`: `span` с `aria-current="page"` и классом текущего пункта.
-- **Неактивный сегмент** — `Item` без `href` и без `current`: обычный `span` (например заголовок раздела без URL).
+- **Link** — `Item` with `href`: interactive `LinkButton`, hover/focus from the link button.
+- **Current page** — `Item` with `current` and no `href`: `span` with `aria-current="page"` and the current-item class.
+- **Inactive segment** — `Item` without `href` and without `current`: plain `span` (e.g. section title with no URL).
 
-Явных пропов `disabled`, `loading` или `error` у крошек нет.
+Breadcrumbs expose no explicit `disabled`, `loading`, or `error` props.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Корень — `nav` с `aria-label="Breadcrumb"` по умолчанию; при необходимости передайте свой ярлык через атрибуты корня.
-- Путь — упорядоченный список `ol` / `li`.
-- Текущая позиция помечается `aria-current="page"` на соответствующем пункте.
-- Разделители в `Separator` скрыты от дерева доступности (`aria-hidden`).
-- Для ссылки только с иконкой задайте осмысленный `aria-label` на `Item`.
+- Root is `nav` with default `aria-label="Breadcrumb"`; override with root attributes if needed.
+- Path is an ordered `ol` / `li` list.
+- Current position is marked with `aria-current="page"` on the matching item.
+- Separators are hidden from the accessibility tree (`aria-hidden`).
+- For icon-only links, set a meaningful `aria-label` on `Item`.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет режима `asChild` и нет встроенного «контролируемого» состояния — это презентационная разметка пути; данные и переходы задаёт приложение.
-- `Ellipsis` не раскрывается и не открывает меню: это статический маркер; полноценное сокращение пути с выпадающим списком нужно собирать отдельно.
-- Дополнительные атрибуты на `Item` (кроме перечисленных в API) в компонент не прокидываются — расширение только через правки исходника или обёртки.
+- No `asChild` mode and no built-in “controlled” state — this is presentational path markup; data and navigation are app-owned.
+- `Ellipsis` does not expand or open a menu: it is a static marker; a full collapsed path with a dropdown must be composed separately.
+- Extra attributes on `Item` (beyond those in the API) are not forwarded — extend only by changing the source or wrapping.
 
-## Связанные компоненты
+## Related components
 
-- **LinkButton** — внутри `Item` с `href` для оформления ссылки в стиле кита.
-- **Icon** — для шеврона в `Separator` по умолчанию и для icon-only первого пункта.
-- **Typography** — если рядом с крошками нужен заголовок страницы или подпись раздела.
+- **LinkButton** — inside `Item` with `href` for kit-styled links.
+- **Icon** — default chevron in `Separator` and icon-only first item.
+- **Typography** — when you need a page title or section caption next to breadcrumbs.

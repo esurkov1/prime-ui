@@ -1,25 +1,25 @@
 # Popover
 
-## Что это
+## What it is
 
-Композитный блок «якорь + портальная панель»: по клику на триггер рядом с ним открывается диалоговая панель с произвольным содержимым, позиционируемая у края окна и закрываемая по Escape или клику снаружи.
+A composite block of “anchor + portal panel”: clicking the trigger opens a dialog panel with arbitrary content next to it, positioned at the viewport edge and dismissible via Escape or an outside click.
 
-## Для чего нужен
+## What it’s for
 
-- **Статьи и справка** — краткое пояснение термина или сноска без перехода на другую страницу.
-- **Каталог и витрина** — фильтры, сортировка или превью опций в компактной панели у кнопки действия.
-- **Настройки и профиль** — несколько полей или переключателей, которые не стоит выносить на отдельный экран.
-- **Отчёты и дашборды** — уточнение метрики, быстрый срез данных или выбор периода у виджета.
-- **Согласования и заявки** — короткая форма комментария, выбор роли или причины рядом с основным потоком.
-- **Онбординг и подсказки к интерфейсу** — контекстная подсказка к элементу, не перекрывающая всю страницу модальным окном.
+- **Articles and help** — short explanation of a term or a footnote without leaving the page.
+- **Catalog and storefront** — filters, sorting, or option previews in a compact panel by an action button.
+- **Settings and profile** — a few fields or toggles that shouldn’t get their own full screen.
+- **Reports and dashboards** — metric detail, a quick data slice, or period selection by a widget.
+- **Approvals and requests** — a short comment form, role or reason choice alongside the main flow.
+- **Onboarding and UI hints** — contextual help for an element without covering the whole page with a modal.
 
-## Юзкейсы
+## Use cases
 
-Каждый фрагмент кода относится к другому типу экрана; сочетания пропсов не повторяют одну и ту же задачу.
+Each code snippet targets a different screen type; prop combinations are not duplicated for the same task.
 
-### Базовый
+### Basic
 
-Самый частый случай: пояснение к термину по клику на кнопку в тексте статьи (внешне как сноска).
+The most common case: explain a term on a button click in article text (visually like a footnote).
 
 ```tsx
 import { Button, Popover } from "prime-ui-kit";
@@ -35,7 +35,7 @@ export function GlossaryTerm() {
       <Popover.Content align="start" side="bottom" size="m">
         <Popover.Inset>
           <p style={{ margin: 0, maxWidth: "18rem" }}>
-            Соглашение об уровне сервиса: целевое время реакции и восстановления для инцидентов.
+            Service level agreement: target response and recovery time for incidents.
           </p>
         </Popover.Inset>
       </Popover.Content>
@@ -44,9 +44,9 @@ export function GlossaryTerm() {
 }
 ```
 
-### С вариантами/размерами
+### Variants and sizes
 
-Карточка товара: крупная панель и просторные отступы внутри `Popover.Inset` для читаемого описания акции.
+Product card: a large panel and generous `Popover.Inset` padding for a readable promo description.
 
 ```tsx
 import { Button, Popover, Typography } from "prime-ui-kit";
@@ -56,16 +56,16 @@ export function PromoHint() {
     <Popover.Root>
       <Popover.Trigger asChild>
         <Button.Root mode="stroke" size="m" variant="neutral">
-          Условия акции
+          Promo terms
         </Button.Root>
       </Popover.Trigger>
       <Popover.Content align="start" side="bottom" size="xl">
         <Popover.Inset padding="x3" gap="x4">
           <Typography.Root as="p" size="s" weight="semibold">
-            Скидка до 15 марта
+            Discount until March 15
           </Typography.Root>
           <Typography.Root as="p" size="s">
-            Суммируется с бонусами программы лояльности. Не распространяется на подарочные карты.
+            Stacks with loyalty program bonuses. Does not apply to gift cards.
           </Typography.Root>
         </Popover.Inset>
       </Popover.Content>
@@ -74,9 +74,9 @@ export function PromoHint() {
 }
 ```
 
-### В контексте (форма рядом с полем)
+### In context (form next to a field)
 
-Экран уведомлений: компактный выбор канала доставки алертов в панели у переключателя.
+Notifications screen: compact alert delivery channel selection in a panel by the toggle.
 
 ```tsx
 import { Button, Checkbox, Popover, Switch, Typography } from "prime-ui-kit";
@@ -86,24 +86,24 @@ export function AlertChannelRow() {
     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
       <Switch.Root defaultChecked size="m" />
       <Typography.Root as="span" size="m">
-        Push-уведомления
+        Push notifications
       </Typography.Root>
       <Popover.Root>
         <Popover.Trigger asChild>
           <Button.Root mode="ghost" size="m" variant="neutral" style={{ fontSize: "0.875rem", textDecoration: "underline" }}>
-            Настроить
+            Configure
           </Button.Root>
         </Popover.Trigger>
         <Popover.Content align="end" side="bottom" size="m" sameMinWidthAsTrigger>
           <Popover.Inset>
             <Typography.Root as="p" size="s" style={{ margin: "0 0 0.5rem" }}>
-              Каналы
+              Channels
             </Typography.Root>
             <Checkbox.Root defaultChecked size="m">
-              <Checkbox.Label>Критические</Checkbox.Label>
+              <Checkbox.Label>Critical</Checkbox.Label>
             </Checkbox.Root>
             <Checkbox.Root size="m">
-              <Checkbox.Label>Маркетинг</Checkbox.Label>
+              <Checkbox.Label>Marketing</Checkbox.Label>
             </Checkbox.Root>
           </Popover.Inset>
         </Popover.Content>
@@ -113,9 +113,9 @@ export function AlertChannelRow() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Панель бронирования: родитель открывает слот по кнопке «Выбрать время» и синхронизирует состояние с подписью в шапке шага.
+Booking panel: parent opens the slot via “Choose time” and syncs state with the step header caption.
 
 ```tsx
 import * as React from "react";
@@ -127,25 +127,25 @@ export function BookingStep() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "flex-start" }}>
       <Typography.Root as="p" size="s">
-        Шаг 2 · {open ? "Выберите интервал в панели" : "Интервал не выбран"}
+        Step 2 · {open ? "Pick a slot in the panel" : "No slot selected"}
       </Typography.Root>
       <div style={{ display: "flex", gap: "0.5rem" }}>
         <Button.Root mode="stroke" size="m" variant="neutral" onClick={() => setOpen(true)}>
-          Открыть слоты
+          Open slots
         </Button.Root>
         <Popover.Root open={open} onOpenChange={setOpen}>
           <Popover.Trigger asChild>
             <Button.Root mode="filled" size="m" variant="primary">
-              Или тут
+              Or here
             </Button.Root>
           </Popover.Trigger>
           <Popover.Content align="start" side="bottom" size="m">
             <Popover.Inset>
               <Typography.Root as="p" size="s" style={{ margin: "0 0 0.5rem" }}>
-                Доступно сегодня
+                Available today
               </Typography.Root>
               <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
-                14:00–15:00
+                2:00–3:00 PM
               </Button.Root>
             </Popover.Inset>
           </Popover.Content>
@@ -156,9 +156,9 @@ export function BookingStep() {
 }
 ```
 
-### Расположение относительно якоря
+### Placement relative to anchor
 
-Плотная панель инструментов редактора: панель открывается сверху и выравнивается по концу кнопки, чтобы не вылезать за край холста.
+Dense editor toolbar: panel opens above and aligns to the end of the button so it doesn’t overflow the canvas edge.
 
 ```tsx
 import { Button, Popover } from "prime-ui-kit";
@@ -168,16 +168,16 @@ export function CanvasToolMenu() {
     <Popover.Root>
       <Popover.Trigger asChild>
         <Button.Root mode="stroke" size="s" variant="neutral">
-          Слои
+          Layers
         </Button.Root>
       </Popover.Trigger>
       <Popover.Content align="end" side="top" size="s">
         <Popover.Inset padding="x2" gap="x2">
           <Button.Root mode="ghost" size="s" variant="neutral" style={{ display: "block", width: "100%", textAlign: "left" }}>
-            Дублировать
+            Duplicate
           </Button.Root>
           <Button.Root mode="ghost" size="s" variant="neutral" style={{ display: "block", width: "100%", textAlign: "left" }}>
-            Сгруппировать
+            Group
           </Button.Root>
         </Popover.Inset>
       </Popover.Content>
@@ -186,9 +186,9 @@ export function CanvasToolMenu() {
 }
 ```
 
-### Фокус и вложенный портальный список
+### Focus and nested portal list
 
-Заявка на доступ: форма внутри панели с `trapFocus` и `Select`, чтобы выпадающий список не закрывал поповер как «клик снаружи».
+Access request: form inside the panel with `trapFocus` and `Select` so the dropdown list doesn’t close the popover as an “outside” click.
 
 ```tsx
 import * as React from "react";
@@ -201,34 +201,34 @@ export function AccessRequestPopover() {
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
         <Button.Root mode="stroke" size="m" variant="neutral">
-          Запросить доступ
+          Request access
         </Button.Root>
       </Popover.Trigger>
       <Popover.Content align="start" side="bottom" size="m" trapFocus>
         <Popover.Inset>
           <Typography.Root as="p" size="s" weight="medium">
-            Доступ к проекту
+            Project access
           </Typography.Root>
-          <Input.Root label="Обоснование" size="m">
+          <Input.Root label="Justification" size="m">
             <Input.Wrapper>
-              <Input.Field placeholder="Зачем нужен доступ" />
+              <Input.Field placeholder="Why you need access" />
             </Input.Wrapper>
           </Input.Root>
-          <Select.Root placeholder="Роль" size="m">
+          <Select.Root placeholder="Role" size="m">
             <Select.Trigger>
               <Select.Value />
             </Select.Trigger>
             <Select.Content>
-              <Select.Item value="viewer">Наблюдатель</Select.Item>
-              <Select.Item value="editor">Редактор</Select.Item>
+              <Select.Item value="viewer">Viewer</Select.Item>
+              <Select.Item value="editor">Editor</Select.Item>
             </Select.Content>
           </Select.Root>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
             <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
-              Отмена
+              Cancel
             </Button.Root>
             <Button.Root mode="filled" size="m" variant="primary" onClick={() => setOpen(false)}>
-              Отправить
+              Submit
             </Button.Root>
           </div>
         </Popover.Inset>
@@ -238,93 +238,93 @@ export function AccessRequestPopover() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- `Popover.Root` — открыто/закрыто (контролируемо или нет), идентификаторы связи триггера и контента, ref якоря для геометрии.
-- `Popover.Trigger` — ровно один дочерний элемент; на него сливаются ref, `aria-*` и переключение по клику (`cloneElement`).
-- `Popover.Content` — портальный контейнер с `role="dialog"`, позиционированием относительно триггера, опциональной ловушкой фокуса; оборачивает детей в `ControlSizeProvider` по `size`.
-- `Popover.Inset` — внутренняя колонка с отступами (`padding`) и вертикальным зазором между прямыми дочерними узлами (`gap`).
+- `Popover.Root` — open/closed (controlled or not), wiring ids between trigger and content, anchor ref for geometry.
+- `Popover.Trigger` — exactly one child; ref, `aria-*`, and click toggle are merged onto it (`cloneElement`).
+- `Popover.Content` — portal container with `role="dialog"`, positioning relative to the trigger, optional focus trap; wraps children in `ControlSizeProvider` for `size`.
+- `Popover.Inset` — inner column with padding (`padding`) and vertical gap between direct children (`gap`).
 
 ## API
 
 ### Popover.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| open | `boolean` | — | Нет | Контролируемое открытие; вместе с `onOpenChange`. |
-| defaultOpen | `boolean` | `false` | Нет | Начальное состояние в неконтролируемом режиме. |
-| onOpenChange | `(open: boolean) => void` | — | Нет | Срабатывает при открытии и закрытии (триггер, Escape, клик вне области). |
-| children | `React.ReactNode` | — | Да | Обычно `Popover.Trigger` и `Popover.Content`. |
+| open | `boolean` | — | No | Controlled open state; use with `onOpenChange`. |
+| defaultOpen | `boolean` | `false` | No | Initial state in uncontrolled mode. |
+| onOpenChange | `(open: boolean) => void` | — | No | Fires on open and close (trigger, Escape, outside click). |
+| children | `React.ReactNode` | — | Yes | Usually `Popover.Trigger` and `Popover.Content`. |
 
 ### Popover.Trigger
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| children | `React.ReactElement` | — | Да | Один элемент-якорь; на него накладываются ref, ARIA и обработчик клика. |
-| asChild | `boolean` | `true` | Нет | В API для совместимости со слотом; фактически поведение всегда через слияние с единственным ребёнком. |
+| children | `React.ReactElement` | — | Yes | Single anchor element; ref, ARIA, and click handler are merged in. |
+| asChild | `boolean` | `true` | No | Reserved for slot API compatibility; behavior always merges with the single child. |
 
 ### Popover.Content
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| align | `"start" \| "center" \| "end"` | `"start"` | Нет | Горизонтальное выравнивание панели относительно триггера. |
-| side | `"bottom" \| "top"` | `"bottom"` | Нет | Предпочтительная сторона; у границы вьюпорта может смениться (flip). |
-| sameMinWidthAsTrigger | `boolean` | `false` | Нет | Минимальная ширина панели не меньше ширины триггера. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Ярус отступов и типографики; дочерние контролы получают размер через провайдер. |
-| trapFocus | `boolean` | `false` | Нет | Ловушка фокуса внутри панели при открытии (Tab циклически внутри). |
-| className | `string` | — | Нет | Дополнительный класс на контейнере панели. |
-| children | `React.ReactNode` | — | Да | Содержимое; часто оборачивают в `Popover.Inset`. |
+| align | `"start" \| "center" \| "end"` | `"start"` | No | Horizontal alignment of the panel relative to the trigger. |
+| side | `"bottom" \| "top"` | `"bottom"` | No | Preferred side; may flip at the viewport edge. |
+| sameMinWidthAsTrigger | `boolean` | `false` | No | Panel minimum width is at least the trigger width. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control density tier; nested controls get size via provider. |
+| trapFocus | `boolean` | `false` | No | Trap focus inside the panel when open (Tab cycles within). |
+| className | `string` | — | No | Extra class on the panel container. |
+| children | `React.ReactNode` | — | Yes | Content; often wrapped in `Popover.Inset`. |
 
 ### Popover.Inset
 
-Наследует атрибуты `HTMLDivElement`; кроме перечисленного ниже можно передать `id`, `style`, `data-*` и др.
+Inherits `HTMLDivElement` attributes; besides the props below you can pass `id`, `style`, `data-*`, etc.
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| padding | `"none" \| "x1" \| "x2" \| "x3"` | `"x2"` | Нет | Внутренние отступы (`data-inset-padding`). |
-| gap | `"none" \| "x2" \| "x3" \| "x4"` | `"x3"` | Нет | Вертикальный зазор между прямыми дочерними элементами (`data-inset-gap`). |
-| className | `string` | — | Нет | Дополнительный класс обёртки. |
-| children | `React.ReactNode` | — | Да | Колонка контента внутри панели. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты корневого `div`. |
+| padding | `"none" \| "x1" \| "x2" \| "x3"` | `"x2"` | No | Inner padding (`data-inset-padding`). |
+| gap | `"none" \| "x2" \| "x3" \| "x4"` | `"x3"` | No | Vertical gap between direct children (`data-inset-gap`). |
+| className | `string` | — | No | Extra class on the wrapper. |
+| children | `React.ReactNode` | — | Yes | Content column inside the panel. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other attributes on the root `div`. |
 
-## Варианты
+## Variants
 
-Отдельного `variant` у корня нет. Визуальная плотность задаётся:
+There is no separate root `variant`. Visual density is set by:
 
-- **`Popover.Content` → `size`** — согласованный ярус токенов контрола для панели и вложенных полей.
-- **`Popover.Inset` → `padding` и `gap`** — от «вплотную» (`padding="none"`, `gap="none"`) до просторной колонки (`padding="x3"`, `gap="x4"`).
+- **`Popover.Content` → `size`** — aligned control token tier for the panel and nested fields.
+- **`Popover.Inset` → `padding` and `gap`** — from tight (`padding="none"`, `gap="none"`) to a spacious column (`padding="x3"`, `gap="x4"`).
 
-Дополнительная стилизация — `className` на `Popover.Content` и `Popover.Inset`.
+Further styling: `className` on `Popover.Content` and `Popover.Inset`.
 
-## Состояния
+## States
 
-- **Закрыт** — `Popover.Content` не рендерится (`null`).
-- **Открыт** — панель в портале, позиция пересчитывается при прокрутке и ресайзе (через хук позиционирования).
-- **Неконтролируемый** — `defaultOpen` задаёт начальное открытие после монтирования.
-- **Контролируемый** — `open` и `onOpenChange` на `Popover.Root`; родитель может открывать панель извне и закрывать по своей логике.
-- **Триггер неактивен** — отдельного `disabled` у поповера нет: если якорь (например `Button`) с `disabled`, клик не откроет панель.
-- **Ловушка фокуса** — при `trapFocus` на `Popover.Content` фокус остаётся внутри панели, пока она открыта (с восстановлением фокуса при закрытии).
+- **Closed** — `Popover.Content` is not rendered (`null`).
+- **Open** — panel in portal; position updates on scroll and resize (via positioning hook).
+- **Uncontrolled** — `defaultOpen` sets initial open after mount.
+- **Controlled** — `open` and `onOpenChange` on `Popover.Root`; parent can open from outside and close with custom logic.
+- **Trigger inactive** — no separate popover `disabled`: if the anchor (e.g. `Button`) is `disabled`, click won’t open the panel.
+- **Focus trap** — with `trapFocus` on `Popover.Content`, focus stays inside the panel while open (restored on close).
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Триггер получает `aria-expanded`, `aria-haspopup="dialog"`, `aria-controls` на id контента; стабильные `id` генерируются на корне.
-- Панель: `role="dialog"`, `aria-modal={false}`, `aria-labelledby` указывает на id триггера (подпись диалога берётся из элемента-якоря).
-- **Escape** закрывает панель.
-- **Клик вне** области триггера и контента закрывает панель; клики по портальному listbox `Select`, принадлежащему контейнеру панели, подавляются как «внешние» (см. `isPortaledSelectListboxOwnedByContainer`).
-- Для якоря без видимого текста задайте доступное имя (`aria-label` на кнопке или осмысленную подпись внутри элемента).
+- Trigger gets `aria-expanded`, `aria-haspopup="dialog"`, `aria-controls` pointing at content id; stable ids are generated on the root.
+- Panel: `role="dialog"`, `aria-modal={false}`, `aria-labelledby` points at trigger id (dialog label comes from the anchor element).
+- **Escape** closes the panel.
+- **Outside click** on area outside trigger and content closes the panel; clicks on the portaled `Select` listbox owned by the panel container are suppressed as “outside” (see `isPortaledSelectListboxOwnedByContainer`).
+- For anchors without visible text, set an accessible name (`aria-label` on the button or meaningful text inside the element).
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Позиционирование поддерживает только стороны **`top` и `bottom`**; влево/вправо от якоря как отдельные режимы в API не выставляются.
-- Это **немодальная** панель (`aria-modal={false}`): фокус может уходить за пределы страницы; для модального сценария смотрите компонент **Modal**.
-- `Popover.Trigger` принимает **строго один** элемент React; фрагменты и несколько узлов не поддерживаются.
-- Проп `asChild` зарезервирован под единый паттерн слота, но слияние с дочерним элементом выполняется всегда — передача `asChild={false}` не переключает на внутреннюю обёртку-кнопку.
+- Positioning supports only **`top` and `bottom`** sides; left/right of the anchor are not separate API modes.
+- This is a **non-modal** panel (`aria-modal={false}`): focus can leave the page; for a modal flow use **Modal**.
+- `Popover.Trigger` accepts **exactly one** React element; fragments and multiple nodes are not supported.
+- `asChild` is reserved for the slot pattern, but merging with the child always happens — `asChild={false}` does not switch to an internal button wrapper.
 
-## Связанные компоненты
+## Related components
 
-- **Button**, **LinkButton** — типичные якоря для `Popover.Trigger`.
-- **Select**, **Dropdown** — вложенные выпадающие списки внутри панели; для Select предусмотрено игнорирование «внешнего» клика по портальному listbox.
-- **Input**, **Textarea**, **Checkbox**, **Switch** — поля и переключатели внутри `Popover.Inset`.
-- **Typography**, **Label**, **Hint** — структура текста и подписей в панели.
-- **Modal** — когда нужно заблокировать остальной интерфейс и явный модальный поток.
-- **Tooltip** — короткая подсказка по наведению или фокусу без отдельной «панели действий».
+- **Button**, **LinkButton** — typical anchors for `Popover.Trigger`.
+- **Select**, **Dropdown** — nested dropdowns inside the panel; Select ignores “outside” clicks on the portaled listbox.
+- **Input**, **Textarea**, **Checkbox**, **Switch** — fields and toggles inside `Popover.Inset`.
+- **Typography**, **Label**, **Hint** — text structure and labels in the panel.
+- **Modal** — when you need to block the rest of the UI and a clear modal flow.
+- **Tooltip** — short hint on hover or focus without a separate “action panel”.

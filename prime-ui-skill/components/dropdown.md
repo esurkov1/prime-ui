@@ -1,25 +1,25 @@
 # Dropdown
 
-## Что это
+## What it is
 
-Композитное меню действий: по клику на триггер открывается портальная панель со списком команд, группами, шапкой и разделителями.
+A composite action menu: clicking the trigger opens a portal panel with a list of commands, groups, a header, and separators.
 
-## Для чего нужен
+## When to use it
 
-- **Карточки сущностей** — вторичные операции над задачей, документом или тикетом без отдельной страницы настроек.
-- **Таблицы и журналы** — «⋯» у строки: дублировать, экспортировать, открыть историю, не уводя фокус со списка.
-- **Шапка продукта** — профиль, выход, тариф и справка в одном компактном меню у аватара или кнопки.
-- **Узкие колонки и плотные интерфейсы** — короткий триггер и длинные подписи пунктов: ширина панели подстраивается под триггер и размер контента.
-- **Мастера и пошаговые сценарии** — внешнее состояние `open`, чтобы подсветить шаг, синхронизировать подсказку или отправить событие в аналитику.
-- **Текстовые триггеры и ссылки** — тот же паттерн меню на ссылке или подчёркнутом тексте, если не нужна отдельная кнопка.
+- **Entity cards** — secondary operations on a task, document, or ticket without a separate settings page.
+- **Tables and logs** — “⋯” on a row: duplicate, export, open history, without moving focus away from the list.
+- **Product header** — profile, sign out, plan, and help in one compact menu next to an avatar or button.
+- **Narrow columns and dense UIs** — short trigger and long item labels: panel width follows the trigger and content size.
+- **Wizards and step flows** — external `open` state to highlight a step, sync a hint, or send an analytics event.
+- **Text triggers and links** — the same menu pattern on a link or underlined text when a separate button is not needed.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример — другой экран и смысл; комбинации пропсов не повторяют одну задачу.
+Each example is a different screen and intent; prop combinations do not repeat the same task.
 
-### Базовый
+### Basic
 
-Частый случай: меню действий над карточкой задачи в трекере.
+Common case: action menu on a task card in a tracker.
 
 ```tsx
 import { Button, Dropdown } from "prime-ui-kit";
@@ -28,16 +28,16 @@ export function TaskCardMenu() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke" aria-label="Действия с задачей">
+        <Button.Root size="m" variant="neutral" mode="stroke" aria-label="Task actions">
           ⋯
         </Button.Root>
       </Dropdown.Trigger>
       <Dropdown.Content align="end">
-        <Dropdown.Item onSelect={() => console.log("edit")}>Редактировать</Dropdown.Item>
-        <Dropdown.Item onSelect={() => console.log("copy")}>Дублировать</Dropdown.Item>
+        <Dropdown.Item onSelect={() => console.log("edit")}>Edit</Dropdown.Item>
+        <Dropdown.Item onSelect={() => console.log("copy")}>Duplicate</Dropdown.Item>
         <Dropdown.Separator />
         <Dropdown.Item destructive onSelect={() => console.log("archive")}>
-          В архив
+          Archive
         </Dropdown.Item>
       </Dropdown.Content>
     </Dropdown.Root>
@@ -45,9 +45,9 @@ export function TaskCardMenu() {
 }
 ```
 
-### С вариантами/размерами
+### Variants and sizes
 
-Логистика: компактная панель на мобильной ширине и явное опасное действие.
+Logistics: compact panel on mobile width and a clearly dangerous action.
 
 ```tsx
 import { Button, Dropdown } from "prime-ui-kit";
@@ -57,23 +57,23 @@ export function ShipmentCardMenu() {
     <Dropdown.Root>
       <Dropdown.Trigger>
         <Button.Root size="s" variant="neutral" mode="lighter">
-          Заказ #4821
+          Order #4821
         </Button.Root>
       </Dropdown.Trigger>
       <Dropdown.Content size="s" align="start" side="bottom">
-        <Dropdown.Item>Показать маршрут</Dropdown.Item>
-        <Dropdown.Item>Связаться с курьером</Dropdown.Item>
+        <Dropdown.Item>Show route</Dropdown.Item>
+        <Dropdown.Item>Contact courier</Dropdown.Item>
         <Dropdown.Separator />
-        <Dropdown.Item destructive>Отменить доставку</Dropdown.Item>
+        <Dropdown.Item destructive>Cancel delivery</Dropdown.Item>
       </Dropdown.Content>
     </Dropdown.Root>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Реестр платежей: подпись строки и меню операций рядом, в одной строке панели фильтров.
+Payout registry: row caption and operations menu side by side on one line of the filter bar.
 
 ```tsx
 import { Button, Dropdown, Typography } from "prime-ui-kit";
@@ -91,26 +91,26 @@ export function PayoutRowToolbar() {
     >
       <div style={{ minWidth: 0 }}>
         <Typography.Root size="m" weight="medium">
-          Выплата 12.04.2025
+          Payout 12 Apr 2025
         </Typography.Root>
         <Typography.Root size="s" tone="muted">
-          Получатель: ООО «Север» · 128 400 ₽
+          Payee: North LLC · 128,400 ₽
         </Typography.Root>
       </div>
       <Dropdown.Root>
         <Dropdown.Trigger>
-          <Button.Root size="s" variant="neutral" mode="stroke" aria-label="Операции по выплате">
-            Действия
+          <Button.Root size="s" variant="neutral" mode="stroke" aria-label="Payout actions">
+            Actions
           </Button.Root>
         </Dropdown.Trigger>
         <Dropdown.Content align="end" sameMinWidthAsTrigger>
           <Dropdown.Group>
-            <Dropdown.GroupLabel>Документы</Dropdown.GroupLabel>
-            <Dropdown.Item>Скачать акт</Dropdown.Item>
-            <Dropdown.Item>Отправить на почту</Dropdown.Item>
+            <Dropdown.GroupLabel>Documents</Dropdown.GroupLabel>
+            <Dropdown.Item>Download statement</Dropdown.Item>
+            <Dropdown.Item>Email copy</Dropdown.Item>
           </Dropdown.Group>
           <Dropdown.Separator />
-          <Dropdown.Item disabled>Сторно (недоступно)</Dropdown.Item>
+          <Dropdown.Item disabled>Reversal (unavailable)</Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
     </div>
@@ -118,9 +118,9 @@ export function PayoutRowToolbar() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Панель мониторинга: родитель держит флаг открытия, чтобы показать подсказку рядом с меню фильтров.
+Monitoring dashboard: parent holds the open flag to show a hint next to the filter menu.
 
 ```tsx
 import * as React from "react";
@@ -134,208 +134,208 @@ export function FilterMenuWithHint() {
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger>
           <Button.Root size="m" variant="neutral" mode="stroke">
-            Интервал
+            Range
           </Button.Root>
         </Dropdown.Trigger>
         <Dropdown.Content align="start">
-          <Dropdown.Item onSelect={() => setOpen(false)}>Сегодня</Dropdown.Item>
-          <Dropdown.Item onSelect={() => setOpen(false)}>7 дней</Dropdown.Item>
-          <Dropdown.Item onSelect={() => setOpen(false)}>30 дней</Dropdown.Item>
+          <Dropdown.Item onSelect={() => setOpen(false)}>Today</Dropdown.Item>
+          <Dropdown.Item onSelect={() => setOpen(false)}>7 days</Dropdown.Item>
+          <Dropdown.Item onSelect={() => setOpen(false)}>30 days</Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
       <span style={{ fontSize: "0.875rem", opacity: 0.8 }}>
-        Меню {open ? "открыто — можно подсветить шаг онбординга" : "закрыто"}
+        Menu {open ? "open — you can highlight an onboarding step" : "closed"}
       </span>
     </div>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- `Dropdown.Root` — открытие/закрытие, контролируемый и неконтролируемый режим, id для связи триггера и меню, ref триггера для позиции.
-- `Dropdown.Trigger` — ровно один дочерний элемент; на него сливаются ref, `aria-*` и переключение по клику.
-- `Dropdown.Content` — портал, `role="menu"`, позиционирование у триггера, ловушка фокуса, закрытие по Escape и клику снаружи.
-- `Dropdown.Inset` — внутренние поля и вертикальный шаг между прямыми дочерними узлами внутри панели.
-- `Dropdown.Block` — секция внутри панели (шапка + список).
-- `Dropdown.Header`, `HeaderRow`, `HeaderLeading`, `HeaderMain`, `HeaderTitle`, `HeaderDescription`, `HeaderTrailing` — разметка шапки профиля или промо-блока.
-- `Dropdown.Item` — кнопка `role="menuitem"`; при активации вызывает `onSelect` и закрывает меню (если пункт не `disabled`).
-- `Dropdown.ItemIcon` — иконка слева от текста строки; размер по умолчанию от яруса `Content`.
-- `Dropdown.Group`, `Dropdown.GroupLabel`, `Dropdown.Separator` — группировка и визуальное разделение блоков.
+- `Dropdown.Root` — open/close, controlled and uncontrolled modes, id linking trigger and menu, trigger ref for positioning.
+- `Dropdown.Trigger` — exactly one child; ref, `aria-*`, and click toggle are merged onto it.
+- `Dropdown.Content` — portal, `role="menu"`, positioning relative to the trigger, focus trap, close on Escape and outside click.
+- `Dropdown.Inset` — inner padding and vertical spacing between direct children inside the panel.
+- `Dropdown.Block` — section inside the panel (header + list).
+- `Dropdown.Header`, `HeaderRow`, `HeaderLeading`, `HeaderMain`, `HeaderTitle`, `HeaderDescription`, `HeaderTrailing` — markup for a profile header or promo block.
+- `Dropdown.Item` — button with `role="menuitem"`; on activation calls `onSelect` and closes the menu (unless the item is `disabled`).
+- `Dropdown.ItemIcon` — icon to the left of the row text; default size comes from the `Content` tier.
+- `Dropdown.Group`, `Dropdown.GroupLabel`, `Dropdown.Separator` — grouping and visual separation of blocks.
 
 ## API
 
 ### Dropdown.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| open | `boolean` | — | Нет | Контролируемое открытие панели. |
-| defaultOpen | `boolean` | `false` | Нет | Начальное состояние в неконтролируемом режиме. |
-| onOpenChange | `(open: boolean) => void` | — | Нет | Событие при открытии и закрытии. |
-| children | `React.ReactNode` | — | Да | Триггер, контент и вложенная разметка. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| open | `boolean` | — | No | Controlled panel open state. |
+| defaultOpen | `boolean` | `false` | No | Initial state in uncontrolled mode. |
+| onOpenChange | `(open: boolean) => void` | — | No | Fired on open and close. |
+| children | `React.ReactNode` | — | Yes | Trigger, content, and nested markup. |
 
 ### Dropdown.Trigger
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| children | `React.ReactElement` | — | Да | Один элемент; на него навешиваются ref, aria и объединённый `onClick`. |
-| asChild | `boolean` | `true` | Нет | В типе сохранён для согласованности; триггер всегда клонирует дочерний элемент. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactElement` | — | Yes | Single element; ref, aria, and merged `onClick` are applied to it. |
+| asChild | `boolean` | `true` | No | Kept in the type for consistency; the trigger always clones the child element. |
 
 ### Dropdown.Content
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| align | `"start" \| "center" \| "end"` | `"start"` | Нет | Горизонтальное выравнивание панели относительно триггера. |
-| side | `"bottom" \| "top"` | `"bottom"` | Нет | Предпочтительная сторона; при нехватке места пересчитывается. |
-| sameMinWidthAsTrigger | `boolean` | `false` | Нет | Минимальная ширина панели не меньше ширины триггера. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Ярус токенов для панели, строк, подписей групп и иконки по умолчанию. |
-| className | `string` | — | Нет | Дополнительный класс портальной панели. |
-| children | `React.ReactNode` | — | Да | Вложенное меню: Inset, Block, Group, Item и т.д. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| align | `"start" \| "center" \| "end"` | `"start"` | No | Horizontal alignment of the panel relative to the trigger. |
+| side | `"bottom" \| "top"` | `"bottom"` | No | Preferred side; recalculated when there is not enough space. |
+| sameMinWidthAsTrigger | `boolean` | `false` | No | Minimum panel width is not less than the trigger width. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Token tier for the panel, rows, group labels, and default icon size. |
+| className | `string` | — | No | Extra class on the portal panel. |
+| children | `React.ReactNode` | — | Yes | Nested menu: Inset, Block, Group, Item, etc. |
 
 ### Dropdown.Inset
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| padding | `"none" \| "x1" \| "x2" \| "x3"` | `"x2"` | Нет | Внутренние поля от края `Content`. |
-| gap | `"none" \| "x2" \| "x3" \| "x4"` | `"x3"` | Нет | Вертикальный зазор между прямыми дочерними узлами. |
-| className | `string` | — | Нет | Дополнительный класс. |
-| children | `React.ReactNode` | — | Да | Блоки и пункты внутри inset. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты контейнера. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| padding | `"none" \| "x1" \| "x2" \| "x3"` | `"x2"` | No | Inner padding from the `Content` edge. |
+| gap | `"none" \| "x2" \| "x3" \| "x4"` | `"x3"` | No | Vertical gap between direct children. |
+| className | `string` | — | No | Extra class. |
+| children | `React.ReactNode` | — | Yes | Blocks and items inside the inset. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other container attributes. |
 
 ### Dropdown.Block
 
-Наследует атрибуты `HTMLDivElement`.
+Inherits `HTMLDivElement` attributes.
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Дополнительный класс секции. |
-| children | `React.ReactNode` | — | Нет | Шапка, группы и пункты. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Extra class on the section. |
+| children | `React.ReactNode` | — | No | Header, groups, and items. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other `div` attributes. |
 
 ### Dropdown.Header
 
-Как у `Dropdown.Block`: `className`, `children`, остальные атрибуты `div`.
+Same as `Dropdown.Block`: `className`, `children`, remaining `div` attributes.
 
 ### Dropdown.HeaderRow
 
-Как у `Dropdown.Block`.
+Same as `Dropdown.Block`.
 
 ### Dropdown.HeaderLeading
 
-Как у `Dropdown.Block`.
+Same as `Dropdown.Block`.
 
 ### Dropdown.HeaderMain
 
-Как у `Dropdown.Block`.
+Same as `Dropdown.Block`.
 
 ### Dropdown.HeaderTitle
 
-Как у `Dropdown.Block`.
+Same as `Dropdown.Block`.
 
 ### Dropdown.HeaderDescription
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| truncate | `boolean` | — | Нет | Однострочное усечение с многоточием. |
-| className | `string` | — | Нет | Дополнительный класс. |
-| children | `React.ReactNode` | — | Нет | Текст описания. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| truncate | `boolean` | — | No | Single-line truncation with ellipsis. |
+| className | `string` | — | No | Extra class. |
+| children | `React.ReactNode` | — | No | Description text. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other `div` attributes. |
 
 ### Dropdown.HeaderTrailing
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| alignSelf | `"start" \| "center"` | `"start"` | Нет | Вертикальное выравнивание слота в строке шапки. |
-| className | `string` | — | Нет | Дополнительный класс. |
-| children | `React.ReactNode` | — | Нет | Бейдж, кнопка и т.п. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты контейнера. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| alignSelf | `"start" \| "center"` | `"start"` | No | Vertical alignment of the slot in the header row. |
+| className | `string` | — | No | Extra class. |
+| children | `React.ReactNode` | — | No | Badge, button, etc. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other container attributes. |
 
 ### Dropdown.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| onSelect | `() => void` | — | Нет | Вызывается при активации; затем меню закрывается. |
-| disabled | `boolean` | — | Нет | Пункт не активен, не закрывает меню по клику. |
-| destructive | `boolean` | — | Нет | Визуальный акцент опасного действия (`data-destructive`). |
-| className | `string` | — | Нет | Дополнительный класс кнопки пункта. |
-| children | `React.ReactNode` | — | Да | Текст, `ItemIcon` и прочая разметка строки. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| onSelect | `() => void` | — | No | Called on activation; then the menu closes. |
+| disabled | `boolean` | — | No | Item is inactive; does not close the menu on click. |
+| destructive | `boolean` | — | No | Visual emphasis for a dangerous action (`data-destructive`). |
+| className | `string` | — | No | Extra class on the item button. |
+| children | `React.ReactNode` | — | Yes | Text, `ItemIcon`, and other row markup. |
 
 ### Dropdown.ItemIcon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| as | `React.ElementType` | `"span"` | Нет | Корневой элемент или компонент иконки. |
-| aria-hidden | `boolean \| "true" \| "false"` | `true` | Нет | Скрыть декоративную иконку от вспомогательных технологий, если есть текст пункта. |
-| className | `string` | — | Нет | Дополнительный класс обёртки. |
-| children | `React.ReactNode` | — | Нет | Содержимое, если иконка не задаётся через `as`. |
-| size | `number` | из яруса `Content` | Нет | Размер иконки в px. |
-| …rest | `Record<string, unknown>` | — | Нет | Пробрасываются в элемент `as` (например `strokeWidth`), кроме зарезервированных полей. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| as | `React.ElementType` | `"span"` | No | Root element or icon component. |
+| aria-hidden | `boolean \| "true" \| "false"` | `true` | No | Hide decorative icon from assistive tech when the item has text. |
+| className | `string` | — | No | Extra class on the wrapper. |
+| children | `React.ReactNode` | — | No | Content when the icon is not set via `as`. |
+| size | `number` | from `Content` tier | No | Icon size in px. |
+| …rest | `Record<string, unknown>` | — | No | Passed through to the `as` element (e.g. `strokeWidth`), except reserved fields. |
 
 ### Dropdown.Group
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Дополнительный класс (`role="group"`). |
-| children | `React.ReactNode` | — | Нет | Подпись группы и пункты. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Прочие атрибуты `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Extra class (`role="group"`). |
+| children | `React.ReactNode` | — | No | Group label and items. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other `div` attributes. |
 
 ### Dropdown.GroupLabel
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Дополнительный класс подписи. |
-| children | `React.ReactNode` | — | Да | Текст заголовка группы. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Extra class on the label. |
+| children | `React.ReactNode` | — | Yes | Group heading text. |
 
 ### Dropdown.Separator
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Дополнительный класс для `hr`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Extra class on the `hr`. |
 
-## Варианты
+## Variants
 
-- **`Dropdown.Content` · `size`** — единый ярус для панели, высоты строк, типографики подписей групп и размера иконки по умолчанию в `ItemIcon`. Доступные размеры: `s`, `m` (по умолчанию), `l`, `xl`. При изменении размера автоматически меняются:
-  - Отступы панели (`padding`)
-  - Высота пунктов меню (`min-height`)
-  - Горизонтальные отступы пунктов (`padding-inline`)
-  - Размер шрифта пунктов и подписей групп (`font-size`)
-  - Размер иконок в `ItemIcon` (если не указан явно через проп `size`)
-  - Радиус скругления пунктов (`border-radius`)
-  - Отступы в шапке и между элементами
-- **`Dropdown.Item` · `destructive`** — выделение опасных команд (удаление, отмена, блокировка).
-- **`Dropdown.Content` · `align` / `side`** — привязка к краю триггера и предпочтение открываться снизу или сверху; итоговая сторона может смениться при нехватке места во вьюпорте.
-- **`Dropdown.HeaderDescription` · `truncate`** — длинный вторичный текст в шапке в одну строку.
-- **`Dropdown.Inset` · `padding` / `gap`** — плотный или разреженный блок текста и списка внутри панели.
+- **`Dropdown.Content` · `size`** — single tier for the panel, row height, group label typography, and default size in `ItemIcon`. Sizes: `s`, `m` (default), `l`, `xl`. When size changes, the following update automatically:
+  - Panel padding
+  - Menu item min height
+  - Item horizontal padding (`padding-inline`)
+  - Item and group label font size
+  - Icon size in `ItemIcon` (unless overridden with the `size` prop)
+  - Item border radius
+  - Header padding and spacing between elements
+- **`Dropdown.Item` · `destructive`** — highlight dangerous commands (delete, cancel, block).
+- **`Dropdown.Content` · `align` / `side`** — anchor to the trigger edge and preference to open below or above; the final side may change if the viewport is tight.
+- **`Dropdown.HeaderDescription` · `truncate`** — long secondary text in the header on one line.
+- **`Dropdown.Inset` · `padding` / `gap`** — tighter or looser text and list block inside the panel.
 
-## Состояния
+## States
 
-- **Закрыто** — портальное меню не смонтировано; триггер с `aria-expanded={false}`.
-- **Открыто** — панель в портале, `aria-expanded={true}`, на контейнере меню задаются `data-size` и `data-side` (фактическая сторона после расчёта).
-- **Неконтролируемый режим** — `defaultOpen` задаёт начальное значение; дальше состояние внутри `Root`.
-- **Контролируемый режим** — `open` и `onOpenChange` полностью управляют видимостью снаружи.
-- **Недоступный пункт** — `disabled` на `Dropdown.Item`: `aria-disabled`, `tabIndex={-1}`, клик и активация клавишей не вызывают `onSelect` и не закрывают меню.
+- **Closed** — portal menu is not mounted; trigger has `aria-expanded={false}`.
+- **Open** — panel in the portal, `aria-expanded={true}`, `data-size` and `data-side` on the menu container (actual side after layout).
+- **Uncontrolled mode** — `defaultOpen` sets the initial value; state lives inside `Root` afterward.
+- **Controlled mode** — `open` and `onOpenChange` fully control visibility from outside.
+- **Disabled item** — `disabled` on `Dropdown.Item`: `aria-disabled`, `tabIndex={-1}`, click and keyboard activation do not call `onSelect` or close the menu.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Триггер получает `aria-expanded`, `aria-haspopup="menu"`, `aria-controls` на id панели; у панели `role="menu"` и `aria-labelledby` на id триггера.
-- Пункты — `role="menuitem"`; у отключённых — `aria-disabled` и исключение из логики активации.
-- В открытой панели работает ловушка фокуса с возвратом на триггер после закрытия; **Escape** и клик вне триггера и панели закрывают меню.
-- Стрелки **вверх/вниз**, **Home** и **End** перемещают фокус между доступными пунктами; **Enter** и **Пробел** активируют пункт.
-- Для триггера только с иконкой или символом задайте доступное имя: `aria-label` на кнопке или осмысленный текст внутри ссылки.
+- Trigger gets `aria-expanded`, `aria-haspopup="menu"`, `aria-controls` pointing at the panel id; panel has `role="menu"` and `aria-labelledby` pointing at the trigger id.
+- Items use `role="menuitem"`; disabled items get `aria-disabled` and are excluded from activation logic.
+- Open panel uses a focus trap and returns focus to the trigger on close; **Escape** and clicks outside the trigger and panel close the menu.
+- **Up/Down** arrows, **Home**, and **End** move focus among enabled items; **Enter** and **Space** activate an item.
+- For icon-only or symbol-only triggers, provide an accessible name: `aria-label` on the button or meaningful text inside the link.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Компонент рассчитан на **плоское меню**: вложенные подменю «вторым уровнем» в API не предусмотрены — для сложной иерархии комбинируйте с навигацией или отдельными паттернами.
-- Это **меню действий**, а не выбор значения поля формы — для закрытого поля с выбранным значением используйте **Select**.
-- **`Dropdown.Trigger`** принимает ровно **один** элемент React; составные триггеры оборачивайте в один узел (например `span` или `Button.Root`).
-- После успешного `onSelect` меню **закрывается**; отключённый пункт меню не закрывает.
-- Панель рендерится в **портале**; учитывайте z-index и фокус при вложении в **Modal** или **Drawer**.
-- **Размеры иконок**: `Dropdown.ItemIcon` автоматически подбирает размер иконки в зависимости от `size` у `Dropdown.Content`. **Не указывайте** явно проп `size` у `ItemIcon`, если хотите, чтобы иконки масштабировались вместе с меню. Явный `size` переопределяет автоматический размер и нарушает согласованность дизайн-системы.
+- The component targets a **flat menu**: nested second-level submenus are not part of the API — combine with navigation or other patterns for deep hierarchies.
+- This is an **action menu**, not a form value picker — for a closed field showing the selected value, use **Select**.
+- **`Dropdown.Trigger`** accepts exactly **one** React element; wrap composite triggers in a single node (e.g. `span` or `Button.Root`).
+- After a successful `onSelect`, the menu **closes**; a disabled item does not close it.
+- The panel renders in a **portal**; account for z-index and focus when nested inside **Modal** or **Drawer**.
+- **Icon sizes**: `Dropdown.ItemIcon` picks icon size from `Dropdown.Content`’s `size`. **Do not** set the `size` prop on `ItemIcon` if you want icons to scale with the menu. An explicit `size` overrides the automatic size and breaks design-system consistency.
 
-## Связанные компоненты
+## Related components
 
-- **Button** — типичный триггер меню; **LinkButton** — если нужен текстовый акцент вне кнопки.
-- **Select** — выбор одного значения из списка с подписью в триггере.
-- **Popover** — нейтральный портальный контейнер без роли меню и без обхода пунктов как `menuitem`.
-- **Modal** / **Drawer** — обёртки сценариев, куда меню могут открываться из шапки или строки.
-- **Avatar**, **Badge**, **Typography** — частые элементы внутри `Header` и строк `Item`.
+- **Button** — typical menu trigger; **LinkButton** — when you need text emphasis outside a button.
+- **Select** — pick one value from a list with a label on the trigger.
+- **Popover** — neutral portal container without menu role or `menuitem` traversal.
+- **Modal** / **Drawer** — scenario shells where menus may open from a header or row.
+- **Avatar**, **Badge**, **Typography** — common content inside `Header` and `Item` rows.

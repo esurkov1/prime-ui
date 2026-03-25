@@ -1,22 +1,22 @@
 # Radio
 
-## Что это
+## What it is
 
-Составной контроль «радиокнопка»: обёртка поля, подпись с нативным `input type="radio"`, опциональные подсказка и сообщение об ошибке.
+A composite “radio button” control: a field wrapper, label with native `input type="radio"`, and optional hint and error message.
 
-## Для чего нужен
+## What it’s for
 
-- **Подписки и тарифы** — выбрать один план из нескольких витринных карточек с разной ценой и набором функций.
-- **Логистика и слоты** — назначить одно окно доставки или приёма из списка взаимоисключающих интервалов.
-- **Настройки доступа** — указать единственную роль или уровень видимости документа без множественного выбора.
+- **Subscriptions and plans** — pick one plan from several showcase cards with different pricing and feature sets.
+- **Logistics and slots** — assign one delivery or pickup window from a list of mutually exclusive intervals.
+- **Access settings** — set a single role or document visibility level without multi-select.
 
-## Юзкейсы
+## Use cases
 
-Примеры разнесены по разным продуктовым зонам и показывают разные части API.
+Examples are split across product areas and illustrate different parts of the API.
 
-### Базовый
+### Basic
 
-Онбординг: пользователь выбирает одну цель использования сервиса; пункты с общим `name` ведут себя как одна группа.
+Onboarding: the user picks one primary goal for using the service; items with the same `name` behave as one group.
 
 ```tsx
 import { Radio } from "prime-ui-kit";
@@ -24,16 +24,16 @@ import { Radio } from "prime-ui-kit";
 export function OnboardingGoalStep() {
   return (
     <fieldset style={{ border: "none", padding: 0, margin: 0 }}>
-      <legend style={{ fontWeight: 600, marginBottom: 12 }}>Что хотите сделать в первую очередь?</legend>
+      <legend style={{ fontWeight: 600, marginBottom: 12 }}>What do you want to do first?</legend>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <Radio.Root name="goal" value="tasks" defaultChecked size="m">
-          <Radio.Label>Вести задачи команды</Radio.Label>
+          <Radio.Label>Manage team tasks</Radio.Label>
         </Radio.Root>
         <Radio.Root name="goal" value="reports" size="m">
-          <Radio.Label>Собирать отчёты</Radio.Label>
+          <Radio.Label>Build reports</Radio.Label>
         </Radio.Root>
         <Radio.Root name="goal" value="integrations" size="m">
-          <Radio.Label>Подключить интеграции</Radio.Label>
+          <Radio.Label>Connect integrations</Radio.Label>
         </Radio.Root>
       </div>
     </fieldset>
@@ -41,9 +41,9 @@ export function OnboardingGoalStep() {
 }
 ```
 
-### С вариантами/размерами
+### Variants and sizes
 
-Медицинский портал: согласие на обработку данных с акцентом на ошибку валидации и компактный размер в боковой колонке записи.
+Medical portal: consent for data processing with emphasis on validation error and compact size in the appointment sidebar.
 
 ```tsx
 import { Radio } from "prime-ui-kit";
@@ -52,21 +52,21 @@ export function ConsentSidebar() {
   return (
     <aside style={{ maxWidth: 320 }}>
       <Radio.Root name="consent" value="yes" defaultChecked size="s">
-        <Radio.Label>Согласен с политикой</Radio.Label>
-        <Radio.Hint>Можно изменить в профиле до подписания договора.</Radio.Hint>
+        <Radio.Label>I agree to the policy</Radio.Label>
+        <Radio.Hint>You can change this in your profile before signing the agreement.</Radio.Hint>
       </Radio.Root>
       <Radio.Root name="consent" value="no" variant="error" size="s">
-        <Radio.Label>Не согласен</Radio.Label>
-        <Radio.Error>Без согласия запись к специалисту недоступна.</Radio.Error>
+        <Radio.Label>I do not agree</Radio.Label>
+        <Radio.Error>Without consent, booking a specialist is not available.</Radio.Error>
       </Radio.Root>
     </aside>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Корзина магазина: блок способа оплаты в карточке оформления — у каждого способа подпись и краткое пояснение.
+E-commerce checkout: payment method block in the order card — each method has a label and short explanation.
 
 ```tsx
 import { Radio } from "prime-ui-kit";
@@ -74,15 +74,15 @@ import { Radio } from "prime-ui-kit";
 export function CheckoutPaymentCard() {
   return (
     <section style={{ padding: 16, borderRadius: 12, border: "1px solid #e4e4e7" }}>
-      <h3 style={{ margin: "0 0 16px", fontSize: 16 }}>Оплата</h3>
+      <h3 style={{ margin: "0 0 16px", fontSize: 16 }}>Payment</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <Radio.Root name="pay" value="card" defaultChecked size="m">
-          <Radio.Label>Карта онлайн</Radio.Label>
-          <Radio.Hint>3-D Secure при необходимости.</Radio.Hint>
+          <Radio.Label>Card online</Radio.Label>
+          <Radio.Hint>3-D Secure when required.</Radio.Hint>
         </Radio.Root>
         <Radio.Root name="pay" value="cod" size="m">
-          <Radio.Label>Наличные курьеру</Radio.Label>
-          <Radio.Hint>Подготовьте сумму без сдачи.</Radio.Hint>
+          <Radio.Label>Cash to courier</Radio.Label>
+          <Radio.Hint>Please have the exact amount ready.</Radio.Hint>
         </Radio.Root>
       </div>
     </section>
@@ -90,9 +90,9 @@ export function CheckoutPaymentCard() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Панель администратора: режим публикации страницы хранится в состоянии экрана и синхронизируется с черновиком API.
+Admin panel: page publish mode is held in screen state and synced with the API draft.
 
 ```tsx
 import * as React from "react";
@@ -112,7 +112,7 @@ export function PageVisibilityControl() {
         }}
         size="m"
       >
-        <Radio.Label>Публичная</Radio.Label>
+        <Radio.Label>Public</Radio.Label>
       </Radio.Root>
       <Radio.Root
         name="visibility"
@@ -123,7 +123,7 @@ export function PageVisibilityControl() {
         }}
         size="m"
       >
-        <Radio.Label>Только сотрудники</Radio.Label>
+        <Radio.Label>Staff only</Radio.Label>
       </Radio.Root>
       <Radio.Root
         name="visibility"
@@ -134,93 +134,93 @@ export function PageVisibilityControl() {
         }}
         size="m"
       >
-        <Radio.Label>Черновик (скрыта)</Radio.Label>
+        <Radio.Label>Draft (hidden)</Radio.Label>
       </Radio.Root>
     </div>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-`Radio.Root` — обёртка `.field` с `data-size`, `data-variant`, `data-disabled`, `data-invalid` и провайдером контекста.
+`Radio.Root` — a `.field` wrapper with `data-size`, `data-variant`, `data-disabled`, `data-invalid`, and a context provider.
 
-Внутри по смыслу:
+Inside, by role:
 
-- `Radio.Label` — `Label.Root` + нативный `input[type=radio]` + декоративный SVG; опциональный текст в `.text`.
-- `Radio.Hint` — `Hint.Root` под маркером, с отступом слева под длину контроля.
-- `Radio.Error` — тот же слот, вариант ошибки; при монтировании помечает группу как невалидную.
+- `Radio.Label` — `Label.Root` + native `input[type=radio]` + decorative SVG; optional text in `.text`.
+- `Radio.Hint` — `Hint.Root` below the marker, left-indented to align with the control width.
+- `Radio.Error` — the same slot in error variant; when mounted, marks the group as invalid.
 
-Порядок слотов на практике: `Label` первым, затем `Hint` и/или `Error`.
+Practical slot order: `Label` first, then `Hint` and/or `Error`.
 
 ## API
 
 ### Radio.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| variant | `"default"` \| `"error"` | `"default"` | Нет | Ошибка оформления и `data-invalid` при `error` или при наличии `Radio.Error`. |
-| size | `"s"` \| `"m"` \| `"l"` \| `"xl"` | `"m"` | Нет | Единый размер для маркера, типографики и отступов hint/error. |
-| disabled | `boolean` | — | Нет | Неактивный пункт; `cursor` и стили disabled на маркере и подписи. |
-| id | `string` | автогенерация | Нет | id input; связь с `label[for]`. |
-| className | `string` | — | Нет | Класс корневой обёртки поля. |
-| aria-describedby | `string` | — | Нет | Склеивается с id hint и error при их наличии. |
-| children | `React.ReactNode` | — | Нет | Вложенные `Radio.Label`, `Radio.Hint`, `Radio.Error`. |
-| …rest | `Omit<InputHTMLAttributes<HTMLInputElement>, "type" \| "size">` | — | Нет | В том числе `name`, `value`, `checked`, `defaultChecked`, `onChange`, `required`, `readOnly` и прочие атрибуты радио input. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| variant | `"default"` \| `"error"` | `"default"` | No | Error styling and `data-invalid` when `error` or when `Radio.Error` is present. |
+| size | `"s"` \| `"m"` \| `"l"` \| `"xl"` | `"m"` | No | Unified size for marker, typography, and hint/error spacing. |
+| disabled | `boolean` | — | No | Disabled item; disabled `cursor` and styles on marker and label. |
+| id | `string` | auto-generated | No | Input id; association with `label[for]`. |
+| className | `string` | — | No | Class on the root field wrapper. |
+| aria-describedby | `string` | — | No | Merged with hint and error ids when those slots exist. |
+| children | `React.ReactNode` | — | No | Nested `Radio.Label`, `Radio.Hint`, `Radio.Error`. |
+| …rest | `Omit<InputHTMLAttributes<HTMLInputElement>, "type" \| "size">` | — | No | Including `name`, `value`, `checked`, `defaultChecked`, `onChange`, `required`, `readOnly`, and other radio input attributes. |
 
 ### Radio.Label
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | Нет | Текст подписи; если пусто — обеспечьте имя через `aria-label` на корне. |
-| className | `string` | — | Нет | Дополнительный класс строки подписи. |
-| …rest | `Omit<HTMLAttributes<HTMLLabelElement>, "htmlFor" \| "size">` | — | Нет | `htmlFor` и `size` задаются из контекста. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactNode` | — | No | Label text; if empty, provide a name via `aria-label` on the root. |
+| className | `string` | — | No | Additional class on the label row. |
+| …rest | `Omit<HTMLAttributes<HTMLLabelElement>, "htmlFor" \| "size">` | — | No | `htmlFor` and `size` come from context. |
 
 ### Radio.Hint
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | Да | Текст подсказки. |
-| className | `string` | — | Нет | Класс слота hint. |
-| …rest | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | Нет | `id` фиксирован для доступности. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactNode` | — | Yes | Hint text. |
+| className | `string` | — | No | Class on the hint slot. |
+| …rest | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | No | `id` is fixed for accessibility. |
 
 ### Radio.Error
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | Да | Текст ошибки. |
-| className | `string` | — | Нет | Класс слота ошибки. |
-| …rest | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | Нет | `id` фиксирован для `aria-describedby`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactNode` | — | Yes | Error text. |
+| className | `string` | — | No | Class on the error slot. |
+| …rest | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | No | `id` is fixed for `aria-describedby`. |
 
-## Варианты
+## Variants
 
-- **default** — стандартная обводка маркера, hover на подписи, выбранное состояние с заливкой центра.
-- **error** — обводка и заливка в цветах ошибки; имеет смысл вместе с `Radio.Error` или для внешней индикации невалидности.
+- **default** — standard marker outline, hover on label, selected state with filled center.
+- **error** — outline and fill in error colors; use with `Radio.Error` or for external invalidity indication.
 
-## Состояния
+## States
 
-- **Не выбрано / выбрано** — нативное `checked` или неконтролируемое `defaultChecked`.
-- **disabled** — проп на `Radio.Root`: input и подпись неактивны, стили приглушены.
-- **Невалидно** — `variant="error"` или смонтированный `Radio.Error`: `aria-invalid` на input, `data-invalid` на корне.
-- **С подсказкой** — при монтировании `Radio.Hint` в `aria-describedby` добавляется id подсказки.
+- **Unchecked / checked** — native `checked` or uncontrolled `defaultChecked`.
+- **disabled** — prop on `Radio.Root`: input and label are inactive, styles muted.
+- **Invalid** — `variant="error"` or mounted `Radio.Error`: `aria-invalid` on input, `data-invalid` on root.
+- **With hint** — when `Radio.Hint` mounts, its id is added to `aria-describedby`.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Нативный `input type="radio"` сохраняет поведение в формах и при навигации с клавиатуры.
-- Подпись связана с полем через `htmlFor` / `id`.
-- Подсказка и ошибка участвуют в `aria-describedby`; при ошибке выставляется `aria-invalid`.
-- Для пункта без видимого текста задайте доступное имя (`aria-label` на корне, пробрасывается на input через остальные пропсы).
+- Native `input type="radio"` keeps form behavior and keyboard navigation.
+- Label is tied to the field via `htmlFor` / `id`.
+- Hint and error participate in `aria-describedby`; on error, `aria-invalid` is set.
+- For an option without visible text, set an accessible name (`aria-label` on the root; forwarded to the input via remaining props).
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Один `Radio.Root` — один пункт группы; саму группу нужно собирать несколькими корнями с **одинаковым** `name` (и при необходимости оборачивать в `fieldset` / `legend`).
-- Нет встроенного «RadioGroup»-компонента: логика выбора — нативная или контролируемая вручную.
-- Полиморфного `asChild` у Radio нет: маркер и подпись фиксированы реализацией.
-- `type` и `size` HTML input зафиксированы (`radio` и исключены из пропсов в пользу `size` дизайн-системы).
+- One `Radio.Root` is one group item; build the group with multiple roots sharing the **same** `name` (and wrap in `fieldset` / `legend` when appropriate).
+- There is no built-in “RadioGroup” component: selection is native or manually controlled.
+- Radio has no polymorphic `asChild`: marker and label are fixed by the implementation.
+- HTML input `type` and `size` are fixed (`radio` and excluded from props in favor of design-system `size`).
 
-## Связанные компоненты
+## Related components
 
-- **Checkbox** — когда допускается несколько независимых флагов.
-- **Switch** — бинарное да/нет без списка вариантов.
-- **Label** и **Hint** — используются внутри Radio; их можно изучить для согласованных форм.
-- **Segmented control** — если нужен переключатель сегментами в одной панели, а не список радиопунктов.
+- **Checkbox** — when multiple independent flags are allowed.
+- **Switch** — binary on/off without a list of options.
+- **Label** and **Hint** — used inside Radio; review them for consistent forms.
+- **Segmented control** — when you need a segmented toggle in one bar instead of a radio list.

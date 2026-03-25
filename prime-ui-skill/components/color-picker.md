@@ -1,25 +1,25 @@
 # ColorPicker
 
-## Что это
+## What it is
 
-Составной виджет выбора цвета в интерфейсе prime-ui-kit: область на двух каналах, слайдеры каналов, палитра пресетов, ввод hex и полоса каналов с пипеткой; состояние цвета синхронизируется через примитивы **react-aria-components** (модель `Color`, разметка и a11y из React Aria).
+A composite color-picker widget in the prime-ui-kit UI: a two-channel area, channel sliders, a preset palette, hex input, and a channel strip with an eyedropper; color state stays in sync via **react-aria-components** primitives (`Color` model, markup and a11y from React Aria).
 
-## Для чего нужен
+## What it’s for
 
-- **Бренд и темы:** настройка основного, акцентного и фонового цвета продукта с предпросмотром и пресетами палитры.
-- **Контент и редакторы:** выбор цвета текста, заливки блока или обводки в визуальном редакторе без привязки к «настройкам темы».
-- **Данные и визуализация:** цвет серии на графике, легенды и условные подсветки в отчётах, когда значение уходит в конфиг дашборда.
-- **E-commerce и витрина:** персонализация товара (цвет варианта), согласование оттенка с фото карточки.
-- **Формы заявок и анкет:** «любимый цвет», визуальные метки статуса или категории с понятным цветовым кодом.
-- **Встраивание в оверлей:** компактная панель в поповере от кнопки с `TriggerSwatch`, чтобы не занимать место на основном экране.
+- **Brand and themes:** set primary, accent, and background product colors with preview and palette presets.
+- **Content and editors:** pick text, block fill, or stroke color in a visual editor without tying it to “theme settings.”
+- **Data and visualization:** series color on a chart, legends, and conditional highlights in reports when the value is stored in dashboard config.
+- **E-commerce and storefronts:** product personalization (variant color), aligning the shade with the product card photo.
+- **Forms and surveys:** “favorite color,” visual status or category markers with a clear color code.
+- **Overlay embedding:** a compact panel in a popover from a button with `TriggerSwatch` so the main screen stays uncluttered.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример рассчитан на другой контекст продукта и другую комбинацию API.
+Each example targets a different product context and API combination.
 
-### Базовый
+### Basic
 
-Встроенная панель на странице настроек: пользователь сразу видит область HSL, оттенок, альфу, переключение формата и пресеты.
+An inline panel on a settings page: the user sees the HSL area, hue, alpha, format switching, and presets at once.
 
 ```tsx
 import { Pipette } from "lucide-react";
@@ -36,13 +36,13 @@ export function BrandAccentField() {
           <ColorPicker.AreaThumb />
         </ColorPicker.Area>
         <ColorPicker.Slider channel="hue" colorSpace="hsl">
-          <ColorPicker.SliderMeta label="Оттенок" />
+          <ColorPicker.SliderMeta label="Hue" />
           <ColorPicker.SliderTrack>
             <ColorPicker.Thumb />
           </ColorPicker.SliderTrack>
         </ColorPicker.Slider>
         <ColorPicker.Slider channel="alpha">
-          <ColorPicker.SliderMeta label="Непрозрачность" />
+          <ColorPicker.SliderMeta label="Opacity" />
           <ColorPicker.SliderTrack>
             <ColorPicker.Thumb />
           </ColorPicker.SliderTrack>
@@ -50,7 +50,7 @@ export function BrandAccentField() {
         <ColorPicker.ChannelStrip
           pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
         />
-        <ColorPicker.SwatchPicker aria-label="Пресеты бренда">
+        <ColorPicker.SwatchPicker aria-label="Brand presets">
           {PRESETS.map((c) => (
             <ColorPicker.SwatchPickerItem key={c} color={c}>
               <ColorPicker.Swatch />
@@ -63,9 +63,9 @@ export function BrandAccentField() {
 }
 ```
 
-### С вариантами / размерами
+### Variants / sizes
 
-Маркетинговый лендинг: редактор блока CTA с разными размерами поля hex для мобильного и десктопа (несколько корней, в каждом только `HexInput`).
+Marketing landing: CTA block editor with different hex field sizes for mobile and desktop (multiple roots, each with only `HexInput`).
 
 ```tsx
 import { ColorPicker } from "prime-ui-kit";
@@ -74,19 +74,19 @@ export function CtaHexRow() {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "flex-end" }}>
       <ColorPicker.Root defaultValue="#2563eb">
-        <ColorPicker.HexInput label="Кнопка (s)" size="s" />
+        <ColorPicker.HexInput label="Button (s)" size="s" />
       </ColorPicker.Root>
       <ColorPicker.Root defaultValue="#2563eb">
-        <ColorPicker.HexInput label="Кнопка (xl)" size="xl" />
+        <ColorPicker.HexInput label="Button (xl)" size="xl" />
       </ColorPicker.Root>
     </div>
   );
 }
 ```
 
-### В контексте (поповер)
+### In context (popover)
 
-Документооборот или задачи: цвет метки в карточке — панель открывается из кнопки с квадратом текущего цвета (`TriggerSwatch`) рядом с китовым `Popover`.
+Workflow or tasks: label color on a card — the panel opens from a button with the current color square (`TriggerSwatch`) next to the kit `Popover`.
 
 ```tsx
 import { Pipette } from "lucide-react";
@@ -118,7 +118,7 @@ export function TaskLabelColorTrigger() {
         <Popover.Trigger asChild>
           <Button.Root mode="stroke" size="m" variant="neutral">
             <ColorPicker.TriggerSwatch />
-            Цвет метки
+            Label color
           </Button.Root>
         </Popover.Trigger>
         <Popover.Content align="start" side="bottom">
@@ -132,9 +132,9 @@ export function TaskLabelColorTrigger() {
 }
 ```
 
-### Композиция с Popover
+### Composition with Popover
 
-Выбор цвета во всплывающей панели; индикатор на кнопке обновляется при изменении цвета через область, слайдеры или пресеты.
+Color selection in a floating panel; the button indicator updates when the color changes via the area, sliders, or presets.
 
 ```tsx
 import { Pipette } from "lucide-react";
@@ -192,7 +192,7 @@ export function ColorPickerPopoverField() {
               <ColorPicker.ChannelStrip
                 pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
               />
-              <ColorPicker.SwatchPicker aria-label="Быстрые цвета">
+              <ColorPicker.SwatchPicker aria-label="Quick colors">
                 {PRESETS.map((c) => (
                   <ColorPicker.SwatchPickerItem key={c} color={c}>
                     <ColorPicker.Swatch />
@@ -208,9 +208,9 @@ export function ColorPickerPopoverField() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Дашборд: цвет сохраняется в состоянии страницы и сериализуется в API; используются `value`, `onChange` и `parseColor`.
+Dashboard: color is held in page state and serialized to the API; uses `value`, `onChange`, and `parseColor`.
 
 ```tsx
 import * as React from "react";
@@ -223,7 +223,7 @@ export function ChartSeriesColorControl() {
 
   return (
     <div>
-      <p>Серия A: {color.toString("css")}</p>
+      <p>Series A: {color.toString("css")}</p>
       <ColorPicker.Root value={color} onChange={setColor}>
         <ColorPicker.FormatProvider>
           <ColorPicker.FormatSelect />
@@ -231,7 +231,7 @@ export function ChartSeriesColorControl() {
             <ColorPicker.AreaThumb />
           </ColorPicker.Area>
           <ColorPicker.Slider channel="hue" colorSpace="hsl">
-            <ColorPicker.SliderMeta label="Оттенок" />
+            <ColorPicker.SliderMeta label="Hue" />
             <ColorPicker.SliderTrack>
               <ColorPicker.Thumb />
             </ColorPicker.SliderTrack>
@@ -246,132 +246,132 @@ export function ChartSeriesColorControl() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
 ```
 ColorPicker.Root
-├── ColorPicker.FormatProvider (нужен для FormatSelect и ChannelStrip)
+├── ColorPicker.FormatProvider (required for FormatSelect and ChannelStrip)
 │   ├── ColorPicker.FormatSelect
 │   ├── ColorPicker.Area → ColorPicker.AreaThumb
 │   ├── ColorPicker.Slider → ColorPicker.SliderMeta?, ColorPicker.SliderTrack → ColorPicker.Thumb
-│   ├── ColorPicker.ChannelStrip (pipetteIcon обязателен)
+│   ├── ColorPicker.ChannelStrip (pipetteIcon required)
 │   ├── ColorPicker.HexInput | ColorPicker.Field + Input (react-aria-components)
 │   └── ColorPicker.SwatchPicker → ColorPicker.SwatchPickerItem → ColorPicker.Swatch
-├── ColorPicker.TriggerSwatch (рядом с триггером поповера, внутри того же Root)
-└── ColorPicker.EyeDropperButton (отдельно или внутри ChannelStrip)
+├── ColorPicker.TriggerSwatch (next to popover trigger, inside the same Root)
+└── ColorPicker.EyeDropperButton (standalone or inside ChannelStrip)
 ```
 
-`parseColor` экспортируется из модуля рядом с `ColorPicker` (re-export из react-aria-components).
+`parseColor` is exported from the module alongside `ColorPicker` (re-export from react-aria-components).
 
 ## API
 
 ### ColorPicker.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| value | `string \| Color` | — | Нет | Контролируемое значение цвета |
-| defaultValue | `string \| Color` | — | Нет | Начальное значение без внешнего state |
-| onChange | `(color: Color) => void` | — | Нет | Смена цвета из любого вложенного контрола |
-| children | `ReactNode \| (props) => ReactNode` | — | Да | Разметка панели; в render-функции доступен `color` |
-| className | `string \| fn` | — | Нет | Стили корня RAC ColorPicker |
-| slot | `string \| null` | — | Нет | Слот для slotted context |
-| …rest | RAC + DOM | — | Нет | Остальные атрибуты по документации react-aria-components |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| value | `string \| Color` | — | No | Controlled color value |
+| defaultValue | `string \| Color` | — | No | Initial value without external state |
+| onChange | `(color: Color) => void` | — | No | Color change from any nested control |
+| children | `ReactNode \| (props) => ReactNode` | — | Yes | Panel markup; render function receives `color` |
+| className | `string \| fn` | — | No | Styles for the RAC ColorPicker root |
+| slot | `string \| null` | — | No | Slot for slotted context |
+| …rest | RAC + DOM | — | No | Remaining attributes per react-aria-components docs |
 
-У корня в типах нет единого `isDisabled`: отключение задаётся на отдельных частях (`Slider`, `SwatchPickerItem`, обёртка `fieldset disabled` и т.д.).
+The root types do not expose a single `isDisabled`: disable specific parts (`Slider`, `SwatchPickerItem`, a `fieldset disabled` wrapper, etc.).
 
 ### ColorPicker.FormatProvider
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `ReactNode` | — | Да | Дочерние контролы формата и полосы каналов |
-| defaultFormat | `"hsl" \| "rgb" \| "hex"` | `"hsl"` | Нет | Начальный формат для ChannelStrip / Select |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `ReactNode` | — | Yes | Child format and channel-strip controls |
+| defaultFormat | `"hsl" \| "rgb" \| "hex"` | `"hsl"` | No | Initial format for ChannelStrip / Select |
 
 ### ColorPicker.FormatSelect
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | Нет | Класс обёртки вокруг китового Select |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class on the wrapper around the kit Select |
 
-Работает только внутри `FormatProvider`.
+Only works inside `FormatProvider`.
 
 ### ColorPicker.ChannelStrip
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| pipetteIcon | `ReactNode` | — | Да | Иконка в кнопке пипетки (часто `Button.Icon`) |
-| className | `string` | — | Нет | Класс полосы |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| pipetteIcon | `ReactNode` | — | Yes | Icon in the eyedropper button (often `Button.Icon`) |
+| className | `string` | — | No | Class on the strip |
 
 ### ColorPicker.HexInput
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размер китового Input |
-| label | `ReactNode` | `"Hex"` | Нет | Подпись поля |
-| className | `string` | — | Нет | Класс `Input.Root` |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Kit Input size |
+| label | `ReactNode` | `"Hex"` | No | Field label |
+| className | `string` | — | No | `Input.Root` class |
 
 ### ColorPicker.TriggerSwatch
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | Нет | Класс квадрата превью (заливка через SVG) |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | No | Class on the preview square (fill via SVG) |
 
 ### ColorPicker.SliderMeta
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| label | `ReactNode` | — | Да | Текст слева; справа — значение через внутренний Output |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| label | `ReactNode` | — | Yes | Text on the left; value on the right via internal Output |
 
 ### ColorPicker.EyeDropperButton
 
-Почти все пропсы китовой `Button.Root`, кроме зафиксированных `variant`, `mode`, `size`. Дети — обычно `Button.Icon`. При отсутствии Web API `EyeDropper` рендерится неактивная кнопка с `aria-hidden`.
+Nearly all props from kit `Button.Root`, except fixed `variant`, `mode`, `size`. Children are usually `Button.Icon`. If the browser has no `EyeDropper` Web API, an inactive button with `aria-hidden` is rendered.
 
 ### ColorPicker.Area, AreaThumb, Slider, SliderTrack, Thumb, Output, Field, SwatchPicker, SwatchPickerItem, Swatch
 
-Обёртки над соответствующими компонентами react-aria-components со стилями кита. Ключевые пропсы:
+Wrappers around the matching react-aria-components with kit styling. Key props:
 
 - **Area:** `colorSpace`, `xChannel`, `yChannel`, `isDisabled`, `className`, …
-- **Slider:** `channel`, опционально `colorSpace`, `orientation`, `isDisabled`; на корне выставляется `data-size="m"`.
-- **SwatchPicker:** `value` / `defaultValue` / `onChange` для выбранного пресета, `layout`, `aria-label`, …
-- **SwatchPickerItem:** `color` (обязательный), `isDisabled`, …
-- **Field:** опционально `channel` и `colorSpace`; внутри — как минимум `Input` из react-aria-components.
+- **Slider:** `channel`, optional `colorSpace`, `orientation`, `isDisabled`; root sets `data-size="m"`.
+- **SwatchPicker:** `value` / `defaultValue` / `onChange` for the selected preset, `layout`, `aria-label`, …
+- **SwatchPickerItem:** `color` (required), `isDisabled`, …
+- **Field:** optional `channel` and `colorSpace`; must contain at least `Input` from react-aria-components.
 
-Полный перечень — в типах `react-aria-components` для одноимённых примитивов.
+Full lists are in react-aria-components types for the same primitives.
 
 ### parseColor(value: string): Color
 
-Разбор строки CSS / hex в объект `Color` для `useState` или для сравнения значений.
+Parses a CSS / hex string into a `Color` object for `useState` or value comparison.
 
-## Варианты
+## Variants
 
-- **Формат каналов (`FormatProvider` + `FormatSelect`):** `hsl` (оттенок, насыщенность, яркость, альфа), `rgb`, единое поле `hex`.
-- **Раскладка пресетов:** у `SwatchPicker` проп `layout`: `grid` или `stack`.
-- **Размер поля hex:** только у `HexInput` (`size` как у китового Input); слайдеры цвета в текущей реализации с фиксированным визуальным ярусом `m`.
+- **Channel format (`FormatProvider` + `FormatSelect`):** `hsl` (hue, saturation, lightness, alpha), `rgb`, single `hex` field.
+- **Preset layout:** `SwatchPicker` prop `layout`: `grid` or `stack`.
+- **Hex field size:** only on `HexInput` (`size` like kit Input); color sliders in the current implementation use a fixed visual tier `m`.
 
-## Состояния
+## States
 
-- Отдельный **пресет** недоступен: `isDisabled` на `SwatchPickerItem`.
-- Отдельный **слайдер** или **область:** `isDisabled` на `ColorPicker.Slider` / `ColorPicker.Area`.
-- **Пипетка:** при отсутствии API браузера — визуально отключённая кнопка без участия в tab-порядке смыслового выбора цвета.
-- Невалидный ввод в hex-полях: при потере фокуса или Enter значение откатывается к последнему валидному цвету из контекста.
+- A single **preset** unavailable: `isDisabled` on `SwatchPickerItem`.
+- A single **slider** or **area:** `isDisabled` on `ColorPicker.Slider` / `ColorPicker.Area`.
+- **Eyedropper:** without the browser API — visually disabled button, not in tab order for meaningful color picking.
+- Invalid hex input: on blur or Enter, value reverts to the last valid color from context.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Область и слайдеры получают роли и клавиатурную навигацию из React Aria (стрелки, Home/End, Page Up/Down по смыслу слайдера).
-- У `SwatchPicker` нужен доступное имя (`aria-label` или связанный label).
-- `TriggerSwatch` помечен `aria-hidden`: смысл выбора цвета должен быть у триггера (текст кнопки или `aria-label`).
-- Подписи полей каналов в полосе и в `HexInput` / `Field` задаются через `label`, `aria-label` или видимый текст рядом.
+- Area and sliders get roles and keyboard navigation from React Aria (arrows, Home/End, Page Up/Down per slider semantics).
+- `SwatchPicker` needs an accessible name (`aria-label` or associated label).
+- `TriggerSwatch` is marked `aria-hidden`: color-picking meaning must live on the trigger (button text or `aria-label`).
+- Channel labels in the strip and in `HexInput` / `Field` use `label`, `aria-label`, or visible adjacent text.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Корень **не** объявляет в типах общий `isDisabled` — отключайте части явно или используйте нативный `fieldset disabled` осознанно (влияет на все поля внутри).
-- `FormatSelect` и `ChannelStrip` **обязаны** жить под `FormatProvider`.
-- `EyeDropper` поддерживается не во всех браузерах; поведение кнопки уже учитывает отсутствие API.
-- Тип `Color` и `parseColor` приходят из react-aria-components; при жёсткой типизации импортируйте `Color` оттуда же.
+- The root types do **not** declare a global `isDisabled` — disable parts explicitly or use native `fieldset disabled` deliberately (affects all fields inside).
+- `FormatSelect` and `ChannelStrip` **must** live under `FormatProvider`.
+- `EyeDropper` is not supported in all browsers; the button behavior already handles a missing API.
+- `Color` and `parseColor` come from react-aria-components; for strict typing import `Color` from there too.
 
-## Связанные компоненты
+## Related components
 
-- **Popover** — компактное открытие панели от триггера с `TriggerSwatch`.
-- **Button** и **Button.Icon** — триггер и иконка пипетки на `EyeDropperButton` / в `ChannelStrip`.
-- **Input** (кит) — внутри `HexInput`; **Input** из react-aria-components — внутри `Field`.
-- **Select** (кит) — внутри реализации `FormatSelect`.
-- **Typography** — подписи секций и вспомогательный текст рядом с панелью.
+- **Popover** — compact panel open from a trigger with `TriggerSwatch`.
+- **Button** and **Button.Icon** — trigger and eyedropper icon on `EyeDropperButton` / in `ChannelStrip`.
+- **Input** (kit) — inside `HexInput`; **Input** from react-aria-components — inside `Field`.
+- **Select** (kit) — inside the `FormatSelect` implementation.
+- **Typography** — section labels and helper text next to the panel.

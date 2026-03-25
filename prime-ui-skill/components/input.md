@@ -1,32 +1,32 @@
 # Input
 
-## Что это
+## What it is
 
-Составной блок однострочного поля ввода: подпись и метаданные снаружи, внутри — обведённая строка с нативным `input`, опциональными иконками и текстовыми аффиксами.
+A composite single-line input block: label and metadata on the outside, inside—a bordered row with a native `input`, optional icons, and text affixes.
 
-## Для чего нужен
+## What it’s for
 
-- **Вход и настройки аккаунта** — почта, телефон, имя с подсказкой формата и явной связью `label` ↔ поле.
-- **Оформление заказа и доставка** — адрес, промокод, контакт курьера с пометкой «необязательно» и сообщением об ошибке сервера.
-- **Внутренние справочники и CRM** — быстрый ввод кода клиента или названия в плотной таблице, где важен компактный размер `s`.
-- **Каталог и поиск** — строка поиска с иконкой и контролируемым значением для фильтрации списка без перезагрузки.
-- **Финансы и прайсинг** — суммы с символом валюты через `InlineAffix` и ограничениями ввода (`inputMode`, `pattern`).
-- **Лид-формы и лендинги** — крупное поле `xl` с короткой подписью для мобильного первого экрана.
+- **Account sign-in and settings** — email, phone, and name with format hints and an explicit `label` ↔ field association.
+- **Checkout and delivery** — address, promo code, courier contact with an “optional” note and server error message.
+- **Internal directories and CRM** — quick entry of customer code or name in a dense table where compact `s` size matters.
+- **Catalog and search** — search field with an icon and controlled value for list filtering without a full reload.
+- **Finance and pricing** — amounts with a currency symbol via `InlineAffix` and input constraints (`inputMode`, `pattern`).
+- **Lead forms and landing pages** — large `xl` field with a short label for the mobile-first screen.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример — другой экран и смысл; API комбинируется по-разному.
+Each example is a different screen and intent; the API is combined differently.
 
-### Базовый
+### Basic
 
-Форма входа: почта с подсказкой, без лишней обвязки.
+Sign-in form: email with a hint, no extra chrome.
 
 ```tsx
 import { Input } from "prime-ui-kit";
 
 export function LoginEmailField() {
   return (
-    <Input.Root size="m" label="Электронная почта" hint="На этот адрес придёт код">
+    <Input.Root size="m" label="Email" hint="We’ll send a code to this address">
       <Input.Wrapper>
         <Input.Field type="email" name="email" autoComplete="email" placeholder="you@company.com" />
       </Input.Wrapper>
@@ -35,9 +35,9 @@ export function LoginEmailField() {
 }
 ```
 
-### С вариантами/размерами
+### Sizes / density
 
-Тот же сценарий «код товара» в двух плотностях интерфейса: компактная строка в таблице и крупное поле в карточке товара.
+The same “product code” scenario in two UI densities: a compact row in a table and a large field on the product detail card.
 
 ```tsx
 import { Input } from "prime-ui-kit";
@@ -45,12 +45,12 @@ import { Input } from "prime-ui-kit";
 export function SkuFieldComparison() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <Input.Root size="s" label="SKU (таблица)" hint="Для строки грида">
+      <Input.Root size="s" label="SKU (table)" hint="For grid rows">
         <Input.Wrapper>
           <Input.Field placeholder="ART-0000" />
         </Input.Wrapper>
       </Input.Root>
-      <Input.Root size="xl" label="SKU (карточка)" hint="Для экрана детали">
+      <Input.Root size="xl" label="SKU (card)" hint="For detail screen">
         <Input.Wrapper>
           <Input.Field placeholder="ART-0000" />
         </Input.Wrapper>
@@ -60,9 +60,9 @@ export function SkuFieldComparison() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Блок оформления подписки: префикс сайта и зона домена как блочные аффиксы, поле ввода посередине.
+Subscription checkout row: site prefix and domain zone as block affixes, input in the middle.
 
 ```tsx
 import { Input } from "prime-ui-kit";
@@ -77,11 +77,11 @@ export function WorkspaceUrlRow() {
         border: "1px solid var(--prime-sys-color-border-subtle, #e4e4e7)",
       }}
     >
-      <h3 style={{ margin: "0 0 16px", fontSize: 16 }}>Адрес рабочего пространства</h3>
-      <Input.Root size="m" label="Поддомен" hint="Только латиница и цифры">
+      <h3 style={{ margin: "0 0 16px", fontSize: 16 }}>Workspace URL</h3>
+      <Input.Root size="m" label="Subdomain" hint="Latin letters and digits only">
         <Input.Wrapper>
           <Input.Affix side="start">https://</Input.Affix>
-          <Input.Field placeholder="команда" autoComplete="off" />
+          <Input.Field placeholder="team" autoComplete="off" />
           <Input.Affix side="end">.app.example</Input.Affix>
         </Input.Wrapper>
       </Input.Root>
@@ -90,9 +90,9 @@ export function WorkspaceUrlRow() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Фильтр заявок: значение строки хранится в состоянии родителя и сбрасывается кнопкой.
+Ticket filter: the string value lives in parent state and is cleared with a button.
 
 ```tsx
 import * as React from "react";
@@ -103,122 +103,122 @@ export function SupportTicketFilter() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 400 }}>
-      <Input.Root size="m" label="Поиск по теме обращения" hint="Фильтр по введённому тексту">
+      <Input.Root size="m" label="Search by subject" hint="Filter by entered text">
         <Input.Wrapper>
           <Input.Field
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Номер или ключевые слова"
-            aria-label="Фильтр обращений"
+            placeholder="Ticket number or keywords"
+            aria-label="Filter tickets"
           />
         </Input.Wrapper>
       </Input.Root>
       <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setQ("")}>
-        Сбросить
+        Clear
       </Button.Root>
     </div>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`Input.Root`** — внешний контейнер (`div` с `data-size`), опционально строка заголовка (`label` + `optionalLabel`), провайдер контекста и `ControlSizeProvider`, затем `children` (обычно `Input.Wrapper`), затем блок мета с **`Hint.Root`** для `hint` и `error`.
-- **`Input.Wrapper`** — flex-обёртка с рамкой и фоном поля; внутри в произвольном порядке **`Input.Field`**, **`Input.Icon`**, **`Input.Affix`**, **`Input.InlineAffix`**.
-- **`Input.Field`** — нативный `<input>` с `id` из контекста, склейкой `aria-describedby` и `aria-invalid` при ошибке.
+- **`Input.Root`** — outer container (`div` with `data-size`), optional header row (`label` + `optionalLabel`), context provider and `ControlSizeProvider`, then `children` (usually `Input.Wrapper`), then meta block with **`Hint.Root`** for `hint` and `error`.
+- **`Input.Wrapper`** — flex wrapper with field border and background; inside, in any order: **`Input.Field`**, **`Input.Icon`**, **`Input.Affix`**, **`Input.InlineAffix`**.
+- **`Input.Field`** — native `<input>` with `id` from context, merged `aria-describedby`, and `aria-invalid` when there is an error.
 
-Публичный объект **`Input`** с полями **`Root`**, **`Wrapper`**, **`Field`**, **`Icon`**, **`Affix`**, **`InlineAffix`**. Дополнительно экспортируется хук **`useInputContext`** для кастомных подкомпонентов.
+The public **`Input`** object exposes **`Root`**, **`Wrapper`**, **`Field`**, **`Icon`**, **`Affix`**, **`InlineAffix`**. The **`useInputContext`** hook is also exported for custom subcomponents.
 
 ## API
 
 ### Input.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | нет | Размер контрола из токенов `--prime-sys-size-control-*`. |
-| hasError | `boolean` | `false` | нет | Ошибка: рамка и `aria-invalid` на поле; если передан `error`, становится `true` автоматически. |
-| label | `React.ReactNode` | — | нет | Подпись; рендерится как `<label htmlFor={inputId}>`. |
-| optionalLabel | `React.ReactNode` | — | нет | Вторичный текст в строке заголовка. |
-| hint | `React.ReactNode` | — | нет | Подсказка под полем. |
-| error | `React.ReactNode` | — | нет | Текст ошибки; задаёт `hasError` и id для `aria-describedby`. |
-| id | `string` | — | нет | Явный id инпута; иначе генерируется в `useFieldIds`. |
-| children | `React.ReactNode` | — | да | Тело поля (как правило `Input.Wrapper` с содержимым). |
-| className | `string` | — | нет | Класс на корневом `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Control size from `--prime-sys-size-control-*` tokens. |
+| hasError | `boolean` | `false` | no | Error state: border and `aria-invalid` on the field; if `error` is passed, becomes `true` automatically. |
+| label | `React.ReactNode` | — | no | Label; rendered as `<label htmlFor={inputId}>`. |
+| optionalLabel | `React.ReactNode` | — | no | Secondary text in the header row. |
+| hint | `React.ReactNode` | — | no | Hint below the field. |
+| error | `React.ReactNode` | — | no | Error text; sets `hasError` and id for `aria-describedby`. |
+| id | `string` | — | no | Explicit input id; otherwise generated in `useFieldIds`. |
+| children | `React.ReactNode` | — | yes | Field body (typically `Input.Wrapper` with content). |
+| className | `string` | — | no | Class on the root `div`. |
 
 ### Input.Wrapper
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | да | Содержимое рамки поля. |
-| className | `string` | — | нет | Класс на обёртке; `data-size` и `data-has-error` выставляются из контекста. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactNode` | — | yes | Content inside the field border. |
+| className | `string` | — | no | Class on the wrapper; `data-size` and `data-has-error` come from context. |
 
 ### Input.Field
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| className | `string` | — | нет | Класс на `input`. |
-| aria-describedby | `string` | — | нет | Дополняет список id из контекста (hint/error). |
-| …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">` | — | нет | Все стандартные атрибуты `input`, кроме `size` (зарезервирован под дизайн-систему). |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| className | `string` | — | no | Class on the `input`. |
+| aria-describedby | `string` | — | no | Appends to the id list from context (hint/error). |
+| …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">` | — | no | All standard `input` attributes except `size` (reserved for the design system). |
 
 ### Input.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| side | `"start" \| "end"` | — | да | Позиция иконки. |
-| children | `React.ReactNode` | — | да | Обычно иконка из набора prime-ui-kit. |
-| className | `string` | — | нет | Класс на `span` с `aria-hidden`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| side | `"start" \| "end"` | — | yes | Icon position. |
+| children | `React.ReactNode` | — | yes | Usually an icon from prime-ui-kit. |
+| className | `string` | — | no | Class on the `span` with `aria-hidden`. |
 
 ### Input.Affix
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| side | `"start" \| "end"` | — | да | Сторона блочного аффикса. |
-| children | `React.ReactNode` | — | да | Текст сегмента (префикс URL и т.п.). |
-| className | `string` | — | нет | Класс на контейнере; `aria-hidden`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| side | `"start" \| "end"` | — | yes | Side of the block affix. |
+| children | `React.ReactNode` | — | yes | Segment text (URL prefix, etc.). |
+| className | `string` | — | no | Class on the container; `aria-hidden`. |
 
 ### Input.InlineAffix
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| side | `"start" \| "end"` | — | да | Сторона инлайн-аффикса. |
-| children | `React.ReactNode` | — | да | Короткий текст (символ валюты и т.д.). |
-| className | `string` | — | нет | Класс на `span`; `aria-hidden`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| side | `"start" \| "end"` | — | yes | Side of the inline affix. |
+| children | `React.ReactNode` | — | yes | Short text (currency symbol, etc.). |
+| className | `string` | — | no | Class on the `span`; `aria-hidden`. |
 
 ### useInputContext()
 
-Возвращает объект `{ size, hasError, inputId, describedBy }` для расширений, согласованных с тем же контекстом, что использует `Input.Field`.
+Returns `{ size, hasError, inputId, describedBy }` for extensions aligned with the same context as `Input.Field`.
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` у Input нет: одно визуальное оформление рамки и типографики. Поведенческие «режимы» задаются нативным атрибутом **`type`** (`email`, `password`, `tel`, `number`, `search`, …) и связанными атрибутами (`autoComplete`, `inputMode`, `pattern`, `maxLength` и др.) на **`Input.Field`**.
+There is no separate `variant` prop on Input: one visual treatment for border and typography. Behavioral “modes” come from the native **`type`** attribute (`email`, `password`, `tel`, `number`, `search`, …) and related attributes (`autoComplete`, `inputMode`, `pattern`, `maxLength`, etc.) on **`Input.Field`**.
 
-## Состояния
+## States
 
-- **Обычное** — фокус подсвечивает рамку через `:focus-visible` на инпуте.
-- **Наведение** — обёртка меняет фон и границу, пока поле не зафокусено и не `disabled`.
-- **`disabled`** — приглушённые цвета, `cursor: not-allowed`, без hover-эффекта.
-- **`readOnly`** — визуально как обычное поле; блокировка редактирования задаётся нативно.
-- **Ошибка** — `error` или `hasError` на Root: красная рамка, отдельная тень при фокусе, `aria-invalid` на инпуте.
-- **`required`** — задаётся на `Input.Field`; визуальная звёздочка в макете при необходимости добавляется в `label` вручную.
+- **Default** — focus highlights the border via `:focus-visible` on the input.
+- **Hover** — the wrapper changes background and border while the field is not focused and not `disabled`.
+- **`disabled`** — muted colors, `cursor: not-allowed`, no hover effect.
+- **`readOnly`** — looks like a normal field; edit lock is native.
+- **Error** — `error` or `hasError` on Root: red border, separate focus shadow, `aria-invalid` on the input.
+- **`required`** — set on `Input.Field`; add a visual asterisk in the layout manually in `label` if needed.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Связка **`label`** на Root с полем через **`htmlFor` / `id`** (id генерируется или задаётся пропом `id` на Root).
-- **`hint`** и **`error`** получают стабильные id и участвуют в **`aria-describedby`** на инпуте; при необходимости можно дополнить через `aria-describedby` на `Input.Field`.
-- **`Input.Icon`** и аффиксы помечены **`aria-hidden`**, смысл должен быть в подписи, плейсхолдере или **`aria-label`** на поле.
-- Для поля без видимой подписи задайте **`aria-label`** или **`aria-labelledby`** на **`Input.Field`**.
+- **`label`** on Root is tied to the field via **`htmlFor` / `id`** (id is generated or set with the `id` prop on Root).
+- **`hint`** and **`error`** get stable ids and participate in **`aria-describedby`** on the input; extend with `aria-describedby` on `Input.Field` if needed.
+- **`Input.Icon`** and affixes use **`aria-hidden`**; meaning should be in the label, placeholder, or **`aria-label`** on the field.
+- For a field without a visible label, set **`aria-label`** or **`aria-labelledby`** on **`Input.Field`**.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Многострочный ввод и авто-рост по высоте — не этот компонент; используйте **Textarea**.
-- Маски ввода, форматирование по маске и поля с фиксированным числом ячеек — смотрите **DigitInput** или отдельную логику на стороне приложения.
-- `Input.Field` не проксирует проп `size`: для размера используйте **`Input.Root`** (`size`).
-- Кастомные внутренние элементы должны жить внутри **`Input.Wrapper`** и при необходимости читать контекст через **`useInputContext`**.
+- Multiline input and auto-growing height are not this component; use **Textarea**.
+- Input masks, masked formatting, and fixed-cell inputs — see **DigitInput** or app-level logic.
+- `Input.Field` does not forward the `size` prop: use **`Input.Root`** (`size`) for sizing.
+- Custom inner elements should live inside **`Input.Wrapper`** and read context via **`useInputContext`** when needed.
 
-## Связанные компоненты
+## Related components
 
-- **Label** — если подпись нужна отдельно от встроенного `label` на Root (нестандартная вёрстка).
-- **Hint** — используется внутри Root для `hint`/`error`; можно комбинировать с другими полями согласованно.
-- **Textarea** — многострочный ввод.
-- **Button** — отправка формы рядом с полем.
-- **DigitInput** — ввод кода из нескольких ячеек.
+- **Label** — when the label must be separate from the built-in `label` on Root (non-standard layout).
+- **Hint** — used inside Root for `hint`/`error`; can be combined with other fields consistently.
+- **Textarea** — multiline input.
+- **Button** — submit next to the field.
+- **DigitInput** — multi-cell code entry.

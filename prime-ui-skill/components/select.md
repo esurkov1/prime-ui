@@ -1,48 +1,48 @@
 # Select
 
-## Что это
+## What it is
 
-Композитный выпадающий список: кнопка-триггер с текущим значением или подсказкой и портальное меню с вариантами выбора ровно одного значения.
+A composite dropdown: a trigger button showing the current value or a hint, plus a portal menu with options to pick exactly one value.
 
-## Для чего нужен
+## When to use it
 
-- **Онбординг и анкеты** — выбрать роль, страну или категорию запроса из фиксированного набора без свободного ввода.
-- **Настройки аккаунта** — язык интерфейса, часовой пояс, единицы измерения в компактном поле рядом с другими контролами.
-- **Коммерция и логистика** — способ доставки, склад или валюта цен: в триггере удобно показать короткую подпись, в списке — развёрнутое название.
-- **Аналитика и дашборды** — один фильтр-измерение (интервал, сегмент аудитории) с явным значением после выбора.
-- **Поддержка и тикеты** — приоритет, продуктовая линия или ответственная команда в форме обращения или в диалоге назначения.
-- **Инфраструктура и операции** — зона развёртывания, очередь или окружение; длинные списки с группами и временно недоступными пунктами.
+- **Onboarding and surveys** — pick a role, country, or request category from a fixed set without free-form input.
+- **Account settings** — UI language, time zone, or units in a compact field alongside other controls.
+- **Commerce and logistics** — delivery method, warehouse, or price currency: a short label in the trigger, a fuller name in the list.
+- **Analytics and dashboards** — a single filter dimension (interval, audience segment) with a clear value after selection.
+- **Support and tickets** — priority, product line, or owning team in a case form or assignment dialog.
+- **Infrastructure and operations** — deployment region, queue, or environment; long lists with groups and temporarily unavailable items.
 
-## Юзкейсы
+## Use cases
 
-Подразделы разведены по разным экранам и задачам; в каждом — свой осмысленный пример кода.
+Subsections are split by screen and task; each includes a meaningful code example.
 
-### Базовый
+### Basic
 
-Типичная форма подписки: подсказка в триггере до выбора тарифа.
+A typical subscription form: hint in the trigger until a plan is chosen.
 
 ```tsx
 import { Select } from "prime-ui-kit";
 
 export function PlanField() {
   return (
-    <Select.Root size="m" placeholder="Выберите тариф">
+    <Select.Root size="m" placeholder="Choose a plan">
       <Select.Trigger>
         <Select.Value />
       </Select.Trigger>
       <Select.Content>
-        <Select.Item value="starter">Старт</Select.Item>
-        <Select.Item value="growth">Рост</Select.Item>
-        <Select.Item value="scale">Масштаб</Select.Item>
+        <Select.Item value="starter">Starter</Select.Item>
+        <Select.Item value="growth">Growth</Select.Item>
+        <Select.Item value="scale">Scale</Select.Item>
       </Select.Content>
     </Select.Root>
   );
 }
 ```
 
-### С размерами и начальным значением
+### Sizes and default value
 
-Панель устройства или шапка приложения: компактный контрол и заранее заданная опция.
+Device panel or app header: compact control with a preset option.
 
 ```tsx
 import { Select } from "prime-ui-kit";
@@ -50,22 +50,22 @@ import { Select } from "prime-ui-kit";
 export function ThemeCompactSelect() {
   return (
     <Select.Root size="s" defaultValue="system">
-      <Select.Trigger aria-label="Тема оформления">
+      <Select.Trigger aria-label="Theme">
         <Select.Value />
       </Select.Trigger>
       <Select.Content>
-        <Select.Item value="light">Светлая</Select.Item>
-        <Select.Item value="dark">Тёмная</Select.Item>
-        <Select.Item value="system">Как в системе</Select.Item>
+        <Select.Item value="light">Light</Select.Item>
+        <Select.Item value="dark">Dark</Select.Item>
+        <Select.Item value="system">System</Select.Item>
       </Select.Content>
     </Select.Root>
   );
 }
 ```
 
-### В контексте (форма с подписью и подсказкой)
+### In context (form with label and hint)
 
-Экран профиля: связка `Label` + селект + `Hint`. У `Label.Root` задаётся стабильный `id`, на триггер — `aria-labelledby`, потому что `id` кнопки-триггера генерируется внутри компонента.
+Profile screen: `Label` + select + `Hint`. `Label.Root` gets a stable `id`; the trigger uses `aria-labelledby` because the trigger button `id` is generated inside the component.
 
 ```tsx
 import * as React from "react";
@@ -86,29 +86,29 @@ export function TimezoneField() {
       }}
     >
       <Label.Root id={labelId} size="m">
-        Часовой пояс
+        Time zone
       </Label.Root>
       <Select.Root size="m" defaultValue="utc3">
         <Select.Trigger aria-labelledby={labelId}>
           <Select.Value />
         </Select.Trigger>
         <Select.Content>
-          <Select.Item value="utc0">UTC+0 (Лондон)</Select.Item>
-          <Select.Item value="utc3">UTC+3 (Москва)</Select.Item>
-          <Select.Item value="utc9">UTC+9 (Токио)</Select.Item>
+          <Select.Item value="utc0">UTC+0 (London)</Select.Item>
+          <Select.Item value="utc3">UTC+3 (Moscow)</Select.Item>
+          <Select.Item value="utc9">UTC+9 (Tokyo)</Select.Item>
         </Select.Content>
       </Select.Root>
       <Hint.Root size="s" variant="neutral">
-        Влияет на время напоминаний и отчётов «за сегодня».
+        Affects reminder times and “today” reports.
       </Hint.Root>
     </div>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Родитель хранит значение (синхронизация с URL, сброс фильтра, сохранение в стор).
+Parent owns the value (URL sync, filter reset, store persistence).
 
 ```tsx
 import * as React from "react";
@@ -119,25 +119,25 @@ export function IntervalToolbar() {
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-      <Select.Root value={range} onChange={setRange} size="m" placeholder="Интервал">
-        <Select.Trigger aria-label="Интервал метрик">
+      <Select.Root value={range} onChange={setRange} size="m" placeholder="Interval">
+        <Select.Trigger aria-label="Metrics interval">
           <Select.Value />
         </Select.Trigger>
         <Select.Content>
-          <Select.Item value="24h">24 часа</Select.Item>
-          <Select.Item value="7d">7 дней</Select.Item>
-          <Select.Item value="30d">30 дней</Select.Item>
+          <Select.Item value="24h">24 hours</Select.Item>
+          <Select.Item value="7d">7 days</Select.Item>
+          <Select.Item value="30d">30 days</Select.Item>
         </Select.Content>
       </Select.Root>
-      <span style={{ fontSize: "0.875rem", opacity: 0.8 }}>Активно: {range}</span>
+      <span style={{ fontSize: "0.875rem", opacity: 0.8 }}>Active: {range}</span>
     </div>
   );
 }
 ```
 
-### В модальном окне
+### Inside a modal
 
-Сценарий поддержки: выбор категории внутри диалога вместе с кнопками действий.
+Support flow: pick a category inside a dialog with action buttons.
 
 ```tsx
 import { Button } from "prime-ui-kit";
@@ -149,41 +149,41 @@ export function TicketCategoryModal() {
     <Modal.Root>
       <Modal.Trigger>
         <Button.Root size="m" variant="neutral" mode="stroke">
-          Новый тикет
+          New ticket
         </Button.Root>
       </Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay>
           <Modal.Content aria-labelledby="ticket-cat-title">
             <Modal.Header>
-              <Modal.Title id="ticket-cat-title">Категория обращения</Modal.Title>
-              <Modal.Description>Выберите тему до отправки в очередь.</Modal.Description>
+              <Modal.Title id="ticket-cat-title">Request category</Modal.Title>
+              <Modal.Description>Choose a topic before sending to the queue.</Modal.Description>
               <Modal.Close>
-                <Button.Root size="m" variant="neutral" mode="ghost" aria-label="Закрыть диалог">
-                  Закрыть
+                <Button.Root size="m" variant="neutral" mode="ghost" aria-label="Close dialog">
+                  Close
                 </Button.Root>
               </Modal.Close>
             </Modal.Header>
             <Modal.Body>
-              <Select.Root size="m" defaultValue="billing" placeholder="Категория">
-                <Select.Trigger aria-label="Категория тикета">
+              <Select.Root size="m" defaultValue="billing" placeholder="Category">
+                <Select.Trigger aria-label="Ticket category">
                   <Select.Value />
                 </Select.Trigger>
                 <Select.Content>
-                  <Select.Item value="billing">Оплата и счета</Select.Item>
-                  <Select.Item value="bug">Сбой или ошибка</Select.Item>
-                  <Select.Item value="access">Доступы и роли</Select.Item>
+                  <Select.Item value="billing">Billing and invoices</Select.Item>
+                  <Select.Item value="bug">Outage or bug</Select.Item>
+                  <Select.Item value="access">Access and roles</Select.Item>
                 </Select.Content>
               </Select.Root>
             </Modal.Body>
             <Modal.Footer>
               <Modal.Close>
                 <Button.Root size="m" variant="neutral" mode="stroke">
-                  Отмена
+                  Cancel
                 </Button.Root>
               </Modal.Close>
               <Button.Root size="m" variant="primary">
-                Отправить
+                Submit
               </Button.Root>
             </Modal.Footer>
           </Modal.Content>
@@ -194,9 +194,9 @@ export function TicketCategoryModal() {
 }
 ```
 
-### Иконки, подпись в триггере, группы и недоступный пункт
+### Icons, trigger label, groups, and disabled item
 
-Сочетание `Select.TriggerIcon` и `Select.ItemIcon`, длинная подпись в поле через `label` у пункта, секции списка и пункт «занято».
+Combines `Select.TriggerIcon` and `Select.ItemIcon`, a long field label via item `label`, list sections, and a “busy” item.
 
 ```tsx
 import { Icon } from "prime-ui-kit/icons";
@@ -204,7 +204,7 @@ import { Select } from "prime-ui-kit";
 
 export function RegionSelectRich() {
   return (
-    <Select.Root size="m" defaultValue="eur" placeholder="Валюта отчёта">
+    <Select.Root size="m" defaultValue="eur" placeholder="Report currency">
       <Select.Trigger>
         <Select.TriggerIcon>
           <Icon name="nav.layoutGrid" size="s" tone="subtle" />
@@ -213,14 +213,14 @@ export function RegionSelectRich() {
       </Select.Trigger>
       <Select.Content>
         <Select.Group>
-          <Select.GroupLabel>Основные</Select.GroupLabel>
-          <Select.Item value="rub" label="RUB — Российский рубль">
+          <Select.GroupLabel>Primary</Select.GroupLabel>
+          <Select.Item value="rub" label="RUB — Russian ruble">
             <Select.ItemIcon>
               <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
             ₽ RUB
           </Select.Item>
-          <Select.Item value="eur" label="EUR — Евро">
+          <Select.Item value="eur" label="EUR — Euro">
             <Select.ItemIcon>
               <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
@@ -229,8 +229,8 @@ export function RegionSelectRich() {
         </Select.Group>
         <Select.Separator />
         <Select.Group>
-          <Select.GroupLabel>Ограничено</Select.GroupLabel>
-          <Select.Item value="usd" disabled label="USD — Доллар США">
+          <Select.GroupLabel>Limited</Select.GroupLabel>
+          <Select.Item value="usd" disabled label="USD — US dollar">
             <Select.ItemIcon>
               <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
@@ -243,137 +243,137 @@ export function RegionSelectRich() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- `Select.Root` — значение (контролируемое или нет), открытие списка, подсветка пункта, размер, `hasError`, `disabled`, `placeholder`.
-- `Select.Trigger` — кнопка `role="combobox"`; внутри слот основного ряда и фиксированный шеврон справа.
-- `Select.Value` — текст выбранного пункта, иначе `placeholder` (стиль подсказки через data-атрибут).
-- `Select.TriggerIcon` — опциональная иконка слева от значения в триггере.
-- `Select.Content` — портальный `role="listbox"` с позиционированием относительно триггера и клавиатурной навигацией; не рендерится, пока список закрыт.
-- `Select.Item` — `role="option"`; дочерний `Select.ItemIcon` выделяется по типу и рендерится до текста.
-- `Select.Group` / `Select.GroupLabel` / `Select.Separator` — структура длинных списков.
+- `Select.Root` — value (controlled or not), list open state, item highlight, size, `hasError`, `disabled`, `placeholder`.
+- `Select.Trigger` — `role="combobox"` button; main row slot inside and a fixed chevron on the right.
+- `Select.Value` — selected item text, otherwise `placeholder` (hint styling via data attribute).
+- `Select.TriggerIcon` — optional icon to the left of the value in the trigger.
+- `Select.Content` — portal `role="listbox"` positioned relative to the trigger with keyboard navigation; not rendered while closed.
+- `Select.Item` — `role="option"`; child `Select.ItemIcon` is typed and rendered before the text.
+- `Select.Group` / `Select.GroupLabel` / `Select.Separator` — structure for long lists.
 
 ## API
 
 ### Select.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размер триггера и токены списка. |
-| value | `string` | — | Нет | Контролируемое значение. |
-| defaultValue | `string` | — | Нет | Начальное значение без `value`. |
-| onChange | `(value: string) => void` | — | Нет | Вызывается после выбора пункта. |
-| disabled | `boolean` | — | Нет | Блокирует открытие и выбор. |
-| placeholder | `string` | — | Нет | Текст при отсутствии выбора. |
-| hasError | `boolean` | `false` | Нет | Стиль ошибки на триггере. |
-| children | `React.ReactNode` | — | Да | Триггер и контент со списком. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Trigger size and list tokens. |
+| value | `string` | — | No | Controlled value. |
+| defaultValue | `string` | — | No | Initial value when `value` is not used. |
+| onChange | `(value: string) => void` | — | No | Called after an item is selected. |
+| disabled | `boolean` | — | No | Blocks opening and selection. |
+| placeholder | `string` | — | No | Text when nothing is selected. |
+| hasError | `boolean` | `false` | No | Error styling on the trigger. |
+| children | `React.ReactNode` | — | Yes | Trigger and list content. |
 
 ### Select.Trigger
 
-Наследует атрибуты `HTMLButtonElement`, кроме принудительно заданных `id`, `type` и `role`. Поддерживает `ref` (forwardRef).
+Inherits `HTMLButtonElement` attributes except forced `id`, `type`, and `role`. Supports `ref` (forwardRef).
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| children | `React.ReactNode` | — | Нет | Обычно `Select.Value` и при необходимости `Select.TriggerIcon`. |
-| className | `string` | — | Нет | Дополнительный класс. |
-| disabled | `boolean` | — | Нет | Нативное отключение; итоговое состояние учитывает `Select.Root`. |
-| ref | `React.Ref<HTMLButtonElement>` | — | Нет | Ref на элемент кнопки. |
-| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "id" \| "type" \| "role">` | — | Нет | В т.ч. `aria-label`, `aria-labelledby`, обработчики. |
+| children | `React.ReactNode` | — | No | Usually `Select.Value` and optionally `Select.TriggerIcon`. |
+| className | `string` | — | No | Extra class. |
+| disabled | `boolean` | — | No | Native disable; final state respects `Select.Root`. |
+| ref | `React.Ref<HTMLButtonElement>` | — | No | Ref to the button element. |
+| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "id" \| "type" \| "role">` | — | No | Including `aria-label`, `aria-labelledby`, handlers. |
 
 ### Select.Value
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Класс текста значения / подсказки. |
+| className | `string` | — | No | Class for value / hint text. |
 
 ### Select.TriggerIcon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| children | `React.ReactNode` | — | Нет | Содержимое слота (иконка). |
-| className | `string` | — | Нет | Класс обёртки. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Прочие атрибуты `span`. |
+| children | `React.ReactNode` | — | No | Slot content (icon). |
+| className | `string` | — | No | Wrapper class. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other `span` attributes. |
 
 ### Select.Content
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Класс портального списка. |
-| children | `React.ReactNode` | — | Да | Пункты и группы. |
+| className | `string` | — | No | Portal list class. |
+| children | `React.ReactNode` | — | Yes | Items and groups. |
 
 ### Select.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| value | `string` | — | Да | Значение опции. |
-| label | `string` | — | Нет | Подпись в триггере; иначе из текста children или `value`. |
-| disabled | `boolean` | — | Нет | Не выбирается и пропускается в клавиатурной навигации. |
-| className | `string` | — | Нет | Класс пункта. |
-| children | `React.ReactNode` | — | Да | Текст и опционально `Select.ItemIcon`. |
-| ref | `React.Ref<HTMLDivElement>` | — | Нет | Ref на корень опции. |
+| value | `string` | — | Yes | Option value. |
+| label | `string` | — | No | Label in the trigger; otherwise from children text or `value`. |
+| disabled | `boolean` | — | No | Not selectable; skipped in keyboard navigation. |
+| className | `string` | — | No | Item class. |
+| children | `React.ReactNode` | — | Yes | Text and optional `Select.ItemIcon`. |
+| ref | `React.Ref<HTMLDivElement>` | — | No | Ref on the option root. |
 
 ### Select.ItemIcon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| children | `React.ReactNode` | — | Нет | Иконка в строке пункта. |
-| className | `string` | — | Нет | Класс обёртки. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`. |
+| children | `React.ReactNode` | — | No | Icon in the item row. |
+| className | `string` | — | No | Wrapper class. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
 ### Select.Group
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Класс группы (`role="group"`). |
-| children | `React.ReactNode` | — | Нет | Заголовок и пункты. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| className | `string` | — | No | Group class (`role="group"`). |
+| children | `React.ReactNode` | — | No | Label and items. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### Select.GroupLabel
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Класс подписи. |
-| children | `React.ReactNode` | — | Нет | Текст заголовка. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Атрибуты `div`. |
+| className | `string` | — | No | Label class. |
+| children | `React.ReactNode` | — | No | Heading text. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### Select.Separator
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
+| Prop | Type | Default | Required | Description |
 |------|-----|-------------|-------------|----------|
-| className | `string` | — | Нет | Класс `hr`. |
-| …rest | `React.HTMLAttributes<HTMLHRElement>` | — | Нет | Атрибуты `hr`. |
+| className | `string` | — | No | `hr` class. |
+| …rest | `React.HTMLAttributes<HTMLHRElement>` | — | No | `hr` attributes. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет: один визуальный стиль поля. Различия задаются `size`, семантикой ошибки `hasError` и при необходимости классами на подкомпонентах.
+There is no separate `variant` prop: one visual field style. Differences come from `size`, `hasError` semantics, and optional classes on subcomponents.
 
-## Состояния
+## States
 
-- **Пустое значение** — показывается `placeholder`, у `Select.Value` выставляется признак подсказки.
-- **Выбрано** — в триггере подпись из `label` пункта или из текста children.
-- **Отключён корень** — `disabled` на `Select.Root`: триггер неактивен, список не открыть.
-- **Отключён пункт** — `disabled` на `Select.Item`: не выбирается кликом и не участвует в обходе стрелками.
-- **Ошибка** — `hasError` на `Select.Root`: акцентная обводка триггера.
-- **Открыт** — портальный listbox с фокусом и подсветкой текущего пункта.
+- **Empty value** — shows `placeholder`; `Select.Value` gets hint styling.
+- **Selected** — trigger shows the item’s `label` or children text.
+- **Root disabled** — `disabled` on `Select.Root`: inactive trigger, list cannot open.
+- **Item disabled** — `disabled` on `Select.Item`: not selectable by click, skipped by arrow keys.
+- **Error** — `hasError` on `Select.Root`: emphasized trigger outline.
+- **Open** — portal listbox with focus and current item highlight.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Триггер: `role="combobox"`, `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls` указывает на listbox.
-- Список: `role="listbox"`, `aria-labelledby` связывает с триггером; фокус при открытии переносится в панель.
-- Пункты: `role="option"`, `aria-selected`, `aria-disabled` при необходимости.
-- Клавиатура: стрелки вверх/вниз, Home/End, Enter/Space для выбора, Escape закрывает список (дополнительно обрабатывается хуками вне списка).
-- Если видимой текстовой подписи у триггера нет, задайте `aria-label` на `Select.Trigger`. Для внешнего `Label` с `htmlFor` используйте `aria-labelledby` на триггере с `id` подписи (см. юзкейс «В контексте»).
+- Trigger: `role="combobox"`, `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls` points to the listbox.
+- List: `role="listbox"`, `aria-labelledby` ties to the trigger; focus moves into the panel on open.
+- Items: `role="option"`, `aria-selected`, `aria-disabled` when needed.
+- Keyboard: Up/Down, Home/End, Enter/Space to select, Escape closes the list (also handled by hooks outside the list).
+- If the trigger has no visible text label, set `aria-label` on `Select.Trigger`. For an external `Label` with `htmlFor`, use `aria-labelledby` on the trigger with the label’s `id` (see “In context” use case).
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Выбор только **одного** значения; мультивыбор и поиск по списку не входят в компонент.
-- Значения — строки; числа и перечисления приводите к строке сами.
-- Пока список закрыт, размонтированные `Select.Item` не инициализируют подпись — до первого открытия в триггере может отображаться сырое `value`, если подпись ещё не известна.
-- Позиция списка (сверху/снизу от триггера) выбирается внутренне по доступному месту во вьюпорте; публичных пропсов `side`/`align` нет.
+- Only **single** selection; multi-select and list search are not part of this component.
+- Values are strings; coerce numbers and enums to strings yourself.
+- While closed, unmounted `Select.Item` nodes do not initialize labels — until first open the trigger may show raw `value` if the label is not yet known.
+- List position (above/below the trigger) is chosen internally from viewport space; there are no public `side` / `align` props.
 
-## Связанные компоненты
+## Related components
 
-- **Label** — подпись к полю; **Hint** — пояснение под селектом.
-- **Input** — когда нужен свободный ввод вместо фиксированного списка.
-- **Dropdown** — меню действий, а не выбор значения поля формы.
-- **Modal** / **Drawer** — обёртки для сценариев с фокусом и порталом; учитывайте вложенный портал списка.
+- **Label** — field label; **Hint** — helper text under the select.
+- **Input** — when free-form input is needed instead of a fixed list.
+- **Dropdown** — action menu, not form value selection.
+- **Modal** / **Drawer** — wrappers for focus and portal scenarios; account for the nested list portal.

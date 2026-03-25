@@ -1,24 +1,24 @@
 # Tooltip
 
-## Что это
+## What it is
 
-Составной слой всплывающей подсказки: провайдер задержки, корень с состоянием открытия, триггер из одного дочернего элемента и контент в портале с позиционированием от якоря.
+A composite tooltip layer: delay provider, root with open state, trigger with a single child, and content in a portal positioned relative to the anchor.
 
-## Для чего нужен
+## What it’s for
 
-- **Панели редактирования и формы** — пояснить назначение неочевидной кнопки, иконки без подписи или сокращённого поля без раздувания разметки.
-- **Таблицы и дашборды** — раскрыть значение метрики, статуса или заголовка колонки при наведении или фокусе с клавиатуры.
-- **Витрины и маркетинговые блоки** — коротко пояснить условия акции или ограничение по ссылке «Подробнее», не уводя на отдельную страницу сразу.
-- **Внутренние каталоги и справочники** — дать расшифровку аббревиатуры, внутреннего кода или статуса строки в списке.
-- **Онбординг и пустые состояния** — мягко подсказать следующий шаг у единичного призыва к действию, не показывая постоянный текст под каждым контролом.
+- **Edit panels and forms** — clarify the purpose of a non-obvious button, an icon without a label, or an abbreviated field without bloating the markup.
+- **Tables and dashboards** — reveal the meaning of a metric, status, or column header on hover or keyboard focus.
+- **Showcases and marketing blocks** — briefly explain promo terms or limits behind a “Learn more” link without sending users to another page immediately.
+- **Internal catalogs and directories** — expand an abbreviation, internal code, or row status in a list.
+- **Onboarding and empty states** — gently hint the next step next to a single call to action without permanent helper text under every control.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример — другой тип экрана и другой набор пропсов; импорт из пакета `prime-ui-kit`.
+Each example is a different screen type and prop set; import from the `prime-ui-kit` package.
 
-### Базовый
+### Basic
 
-Карточка настроек уведомлений: кнопка «Сохранить» с пояснением, что именно отправляется на сервер.
+Notification settings card: “Save” button with a note about what is actually sent to the server.
 
 ```tsx
 import { Button, Tooltip } from "prime-ui-kit";
@@ -29,19 +29,19 @@ export function NotificationSaveRow() {
       <Tooltip.Root>
         <Tooltip.Trigger>
           <Button.Root type="submit" variant="primary" mode="filled" size="m">
-            Сохранить
+            Save
           </Button.Root>
         </Tooltip.Trigger>
-        <Tooltip.Content>Записать выбранные каналы и частоту писем в профиль</Tooltip.Content>
+        <Tooltip.Content>Write selected channels and email frequency to the profile</Tooltip.Content>
       </Tooltip.Root>
     </Tooltip.Provider>
   );
 }
 ```
 
-### С вариантами/размерами
+### With size / side options
 
-Сетка карточек товаров: у каждой карточки иконка «избранное» без текста; подсказка компактного размера, чтобы не перекрывать соседние карточки.
+Product card grid: each card has a textless “favorite” icon; compact tooltip so it does not cover neighboring cards.
 
 ```tsx
 import { Button, Icon, Tooltip } from "prime-ui-kit";
@@ -56,7 +56,7 @@ export function WishlistIconCell() {
             variant="neutral"
             mode="ghost"
             size="m"
-            aria-label="Добавить в избранное"
+            aria-label="Add to wishlist"
           >
             <Button.Icon>
               <Icon name="nav.itemDot" size="s" tone="subtle" />
@@ -64,7 +64,7 @@ export function WishlistIconCell() {
           </Button.Root>
         </Tooltip.Trigger>
         <Tooltip.Content size="s" side="top">
-          Сохранить товар в список желаний
+          Save product to wishlist
         </Tooltip.Content>
       </Tooltip.Root>
     </Tooltip.Provider>
@@ -72,9 +72,9 @@ export function WishlistIconCell() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Боковая панель отчёта: термин в тексте сводки с фокусом с клавиатуры и подсказкой снизу, чтобы не упираться в край панели.
+Report sidebar: a term in the summary text with keyboard focus and a tooltip below so it does not hit the panel edge.
 
 ```tsx
 import { Tooltip } from "prime-ui-kit";
@@ -83,7 +83,7 @@ export function ReportSidebarGlossary() {
   return (
     <aside style={{ maxWidth: 280, padding: 16 }}>
       <p style={{ margin: 0, lineHeight: 1.5 }}>
-        Итог по{" "}
+        Total for{" "}
         <Tooltip.Provider>
           <Tooltip.Root>
             <Tooltip.Trigger>
@@ -103,20 +103,20 @@ export function ReportSidebarGlossary() {
               </button>
             </Tooltip.Trigger>
             <Tooltip.Content size="m" side="bottom">
-              Monthly recurring revenue — ежемесячный повторяющийся доход по подпискам
+              Monthly recurring revenue — recurring monthly income from subscriptions
             </Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>{" "}
-        за квартал.
+        for the quarter.
       </p>
     </aside>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Экран справки: переключатель «Показать подсказки» синхронизирован с открытием демонстрационной подсказки и с реакцией на наведение на тот же триггер.
+Help screen: “Show tooltips” toggle stays in sync with a demo tooltip opening and with hover on the same trigger.
 
 ```tsx
 import * as React from "react";
@@ -128,16 +128,16 @@ export function HelpOverlayDemo() {
   return (
     <div style={{ display: "grid", gap: 16, maxWidth: 360 }}>
       <Switch.Root size="m" checked={open} onCheckedChange={setOpen}>
-        <Switch.Label>Показывать подсказку</Switch.Label>
+        <Switch.Label>Show tooltip</Switch.Label>
       </Switch.Root>
       <Tooltip.Provider delayDuration={0}>
         <Tooltip.Root open={open} onOpenChange={setOpen}>
           <Tooltip.Trigger>
             <Button.Root type="button" variant="neutral" mode="stroke" size="m">
-              Пример триггера
+              Example trigger
             </Button.Root>
           </Tooltip.Trigger>
-          <Tooltip.Content>Текст подсказки управляется снаружи и наведением</Tooltip.Content>
+          <Tooltip.Content>Tooltip text is controlled externally and by hover</Tooltip.Content>
         </Tooltip.Root>
       </Tooltip.Provider>
     </div>
@@ -145,65 +145,65 @@ export function HelpOverlayDemo() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-`Tooltip.Provider` (опционально, выше по дереву) → `Tooltip.Root` → `Tooltip.Trigger` (ровно один `ReactElement`) + `Tooltip.Content` (портал: `div` с `role="tooltip"` и `id`, совпадающим с `aria-describedby` на триггере).
+`Tooltip.Provider` (optional, higher in the tree) → `Tooltip.Root` → `Tooltip.Trigger` (exactly one `ReactElement`) + `Tooltip.Content` (portal: `div` with `role="tooltip"` and `id` matching `aria-describedby` on the trigger).
 
 ## API
 
-Экспортируются объект `Tooltip`, типы размеров и стороны `TooltipSize`, `TooltipSide`, а также пропсы подкомпонентов: `TooltipProviderProps`, `TooltipRootProps`, `TooltipTriggerProps`, `TooltipContentProps`.
+Exports the `Tooltip` object, size and side types `TooltipSize`, `TooltipSide`, and subcomponent props: `TooltipProviderProps`, `TooltipRootProps`, `TooltipTriggerProps`, `TooltipContentProps`.
 
 ### Tooltip.Provider
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| delayDuration | number | 400 | Нет | Пауза в миллисекундах перед установкой открытого состояния после входа курсора или фокуса в триггер. |
-| children | React.ReactNode | — | Да | Область, внутри которой живут `Tooltip.Root`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| delayDuration | number | 400 | No | Milliseconds to wait before opening after pointer enters or trigger receives focus. |
+| children | React.ReactNode | — | Yes | Region where `Tooltip.Root` instances live. |
 
 ### Tooltip.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | React.ReactNode | — | Да | `Tooltip.Trigger` и `Tooltip.Content`. |
-| open | boolean | — | Нет | Контролируемое открытие. |
-| defaultOpen | boolean | false | Нет | Начальное значение без внешнего `open`. |
-| onOpenChange | (open: boolean) => void | — | Нет | Уведомление о смене видимости. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | React.ReactNode | — | Yes | `Tooltip.Trigger` and `Tooltip.Content`. |
+| open | boolean | — | No | Controlled open state. |
+| defaultOpen | boolean | false | No | Initial value without external `open`. |
+| onOpenChange | (open: boolean) => void | — | No | Visibility change callback. |
 
 ### Tooltip.Trigger
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | React.ReactElement | — | Да | Единственный элемент; к нему добавляются ref, `aria-describedby`, обработчики mouse/focus. |
-| className | string | — | Нет | Дополнительный класс (сливается с классом ребёнка). |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | React.ReactElement | — | Yes | Single element; receives ref, `aria-describedby`, mouse/focus handlers. |
+| className | string | — | No | Extra class (merged with the child’s class). |
 
 ### Tooltip.Content
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | React.ReactNode | — | Да | Содержимое подсказки; оборачивается в `ControlSizeProvider` по выбранному `size`. |
-| size | TooltipSize | m | Нет | Визуальный масштаб padding, типографики и стрелки. |
-| side | TooltipSide | top | Нет | Сторона относительно триггера; координаты ограничиваются видимой областью окна. |
-| className | string | — | Нет | Пользовательский класс на корне контента в портале. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | React.ReactNode | — | Yes | Tooltip body; wrapped in `ControlSizeProvider` for the chosen `size`. |
+| size | TooltipSize | m | No | Visual scale of padding, typography, and arrow. |
+| side | TooltipSide | top | No | Side relative to the trigger; position is clamped to the viewport. |
+| className | string | — | No | Custom class on the portal content root. |
 
-## Варианты
+## Variants
 
-Отдельного пропа вроде `variant` нет: фон, обводка и тень берутся из семантических токенов подсказки активной темы. Визуально различаются только масштабы `size` (`s`, `m`, `l`, `xl`) и положение `side` (влияет на стрелку и `data-side` для стилей).
+There is no separate `variant` prop: background, border, and shadow come from semantic tooltip tokens for the active theme. Only `size` scales (`s`, `m`, `l`, `xl`) and `side` placement differ visually (affects arrow and `data-side` for styling).
 
-## Состояния
+## States
 
-- **Закрыто** — контент не монтируется в DOM; таймер задержки сбрасывается при уходе курсора или потере фокуса.
-- **Открыто** — после задержки провайдера контент показывается в портале, позиция пересчитывается на `resize` и `scroll`.
-- **Неконтролируемый / контролируемый** — через `defaultOpen` или пару `open` + `onOpenChange`.
-- **Триггер `disabled`** — у нативной отключённой кнопки наведение обычно не приходит; подсказка не откроется без обходного приёма (обёртка, другой элемент).
+- **Closed** — content is not mounted; delay timer resets on pointer leave or blur.
+- **Open** — after the provider delay, content shows in the portal; position updates on `resize` and `scroll`.
+- **Uncontrolled / controlled** — via `defaultOpen` or `open` + `onOpenChange`.
+- **Disabled trigger** — native disabled buttons usually do not receive hover; the tooltip will not open without a workaround (wrapper, different element).
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-На триггер пробрасывается `aria-describedby`, указывающий на `id` контента с `role="tooltip"`. Открытие по `mouseenter` / `focus`, закрытие по `mouseleave` / `blur`. Для термина в тексте лучше использовать нестилизованную `button type="button"`, чтобы фокус с клавиатуры был предсказуемым. Содержимое подсказки не интерактивно (`pointer-events: none` в стилях) — не размещайте внутри кнопки и ссылки.
+The trigger gets `aria-describedby` pointing to the content `id` with `role="tooltip"`. Opens on `mouseenter` / `focus`, closes on `mouseleave` / `blur`. For inline terms, prefer an unstyled `button type="button"` so keyboard focus is predictable. Tooltip content is non-interactive (`pointer-events: none` in styles) — do not put buttons or links inside.
 
-## Ограничения и заметки
+## Limitations and notes
 
-Один триггер — один корень; для нескольких якорей нужны отдельные `Tooltip.Root`. Контент рендерится в портале и не наследует контекст DOM от триггера (кроме переданной разметки). Позиция клампится к полям окна, без переворота «умной» стороны при нехватке места — при необходимости смените `side` сами. Для сложного интерактивного слоя рассмотрите `Popover`.
+One trigger per root; multiple anchors need separate `Tooltip.Root` instances. Content renders in a portal and does not inherit DOM context from the trigger (except passed markup). Position is clamped to the window; there is no automatic flip to another side when space is tight — set `side` yourself if needed. For a richer interactive layer, consider `Popover`.
 
-## Связанные компоненты
+## Related components
 
-`Button`, `LinkButton` — типичные триггеры; `Switch` или другой контрол — для демонстрации контролируемого `open`. Для постоянной подписи у поля — `Label` и `Hint`; для открывающегося слоя с фокусом внутри — `Popover`.
+`Button`, `LinkButton` — typical triggers; `Switch` or another control — for controlled `open` demos. For a persistent field label use `Label` and `Hint`; for a layer that can hold focus inside, use `Popover`.

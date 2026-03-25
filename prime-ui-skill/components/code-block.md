@@ -1,20 +1,20 @@
 # CodeBlock
 
-## Что это
+## What it is
 
-Объект `CodeBlock` с подкомпонентом `Root`: статичное отображение фрагмента TypeScript или TSX с подсветкой синтаксиса и выбором светлой или тёмной палитры токенов.
+The `CodeBlock` object with a `Root` subcomponent: static display of a TypeScript or TSX fragment with syntax highlighting and a choice of light or dark token palettes.
 
-## Для чего нужен
+## What it’s for
 
-- В портале документации для партнёров и разработчиков показать пример запроса, типы ответа или снипет интеграции без выноса в сторонний виджет.
-- На маркетинговой странице продукта вставить короткий пример кода в светлой и тёмной колонке так, чтобы читаемость не ломалась при смене оформления секции.
-- В панели поддержки или внутреннем инструменте вывести фрагмент журнала, сгенерированного конфига или результата преобразования — с тем же визуальным языком, что и остальной интерфейс.
+- In a documentation portal for partners and developers, show a request example, response types, or an integration snippet without pulling in a third-party widget.
+- On a product marketing page, embed a short code example in light and dark columns so readability stays intact when the section styling changes.
+- In a support panel or internal tool, show a log fragment, generated config, or transformation output—with the same visual language as the rest of the UI.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Самый частый случай: один фрагмент в теле статьи, схема подсветки совпадает с темой приложения.
+The most common case: a single fragment in article body, with highlighting aligned to the app theme.
 
 ```tsx
 import { CodeBlock } from "prime-ui-kit";
@@ -32,9 +32,9 @@ export function ArticleBody({ scheme }: { scheme: "light" | "dark" }) {
 }
 ```
 
-### С вариантами/размерами
+### With variants / sizes
 
-Секция лендинга с двумя колонками: в одной светлый фон и `colorScheme="light"`, в соседней тёмная подложка и `colorScheme="dark"` — текст кода остаётся читаемым в обоих блоках.
+A landing section with two columns: one with a light background and `colorScheme="light"`, the other with a dark backdrop and `colorScheme="dark"`—code text stays readable in both blocks.
 
 ```tsx
 import { CodeBlock } from "prime-ui-kit";
@@ -55,9 +55,9 @@ export function LandingDevStrip() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Карточка описания REST-ресурса в каталоге заказов: заголовок маршрута, пояснение и пример JSON-тела ответа вложенным блоком с чуть более глубоким фоном.
+A card describing a REST resource in an orders catalog: route title, explanation, and an example JSON response body in a nested block with a slightly deeper background.
 
 ```tsx
 import { CodeBlock, Typography } from "prime-ui-kit";
@@ -75,7 +75,7 @@ export function OrderApiCard() {
         GET /v2/orders/:id
       </Typography.Root>
       <Typography.Root as="p" size="xs" tone="muted" style={{ margin: "8px 0 12px" }}>
-        Возвращает актуальный состав корзины для экрана курьера.
+        Returns the current cart contents for the courier screen.
       </Typography.Root>
       <div style={{ padding: 12, borderRadius: 8, background: "#f1f5f9", fontSize: 13 }}>
         <CodeBlock.Root code={body} colorScheme="light" />
@@ -85,9 +85,9 @@ export function OrderApiCard() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Внутренняя страница «Песочница»: пользователь переключает вкладки «Хук» и «Утилита», строка `code` приходит из состояния.
+An internal “Playground” page: the user switches “Hook” and “Utility” tabs; the `code` string comes from state.
 
 ```tsx
 import { useEffect, useState } from "react";
@@ -96,7 +96,7 @@ import { Button, CodeBlock } from "prime-ui-kit";
 const samples = [
   {
     id: "hook",
-    label: "Хук",
+    label: "Hook",
     code: `export function useDebounced<T>(value: T, ms: number) {
   const [v, setV] = useState(value);
   useEffect(() => {
@@ -108,7 +108,7 @@ const samples = [
   },
   {
     id: "util",
-    label: "Утилита",
+    label: "Utility",
     code: `export function isUuid(s: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
 }`,
@@ -140,46 +140,41 @@ export function SnippetPlayground({ scheme }: { scheme: "light" | "dark" }) {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Экспортируется объект `CodeBlock` с единственным публичным подкомпонентом `Root`. `Root` рендерит элемент `pre` и внутрь подставляет один дочерний `code` с HTML-разметкой, сгенерированной из строки `code` (см. `highlightTsxHtml` в исходниках кита).
+The kit exports a `CodeBlock` object with a single public subcomponent, `Root`. `Root` renders a `pre` element and inserts one child `code` with HTML markup generated from the `code` string (see `highlightTsxHtml` in the kit sources).
 
 ## API
 
 ### CodeBlock.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `code` | `string` | — | Да | Исходник TS/TSX; перед подсветкой к концу строки применяется `trimEnd()`. |
-| `colorScheme` | `"light" \| "dark"` | `"light"` | Нет | Какая палитра классов токенов подсветки используется (`data-theme` на `pre`). |
-| `className` | `string` | — | Нет | Дополнительный класс для `pre`. |
-| `…rest` | `Omit<React.HTMLAttributes<HTMLPreElement>, "children" \| "dangerouslySetInnerHTML">` | — | Нет | Стандартные атрибуты `pre`: `id`, `style`, `role`, ARIA, `data-*`, обработчики и т.д. Пропы `children` и `dangerouslySetInnerHTML` исключены из типа: разметка внутри задаётся только компонентом. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| `code` | `string` | — | Yes | TS/TSX source; `trimEnd()` is applied to the string before highlighting. |
+| `colorScheme` | `"light" \| "dark"` | `"light"` | No | Which token highlighting class palette is used (`data-theme` on `pre`). |
+| `className` | `string` | — | No | Extra class for `pre`. |
+| `…rest` | `Omit<React.HTMLAttributes<HTMLPreElement>, "children" \| "dangerouslySetInnerHTML">` | — | No | Standard `pre` attributes: `id`, `style`, `role`, ARIA, `data-*`, handlers, etc. `children` and `dangerouslySetInnerHTML` are omitted from the type: inner markup is owned by the component only. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет. Визуальное различие режимов задаётся только `colorScheme`: светлая и тёмная схемы сопоставлены с селекторами `.root[data-theme="light"|"dark"]` в стилях компонента.
+There is no separate `variant` prop. Visual differences between modes are driven only by `colorScheme`: light and dark map to `.root[data-theme="light"|"dark"]` selectors in the component styles.
 
-## Состояния
+## States
 
-Интерактивных состояний (`disabled`, `loading` и т.п.) нет: блок только отображает текст. Управление внешним видом — через `colorScheme`, `className`, `style` и наследуемую от родителя типографику.
+There are no interactive states (`disabled`, `loading`, etc.): the block only displays text. Appearance is controlled via `colorScheme`, `className`, `style`, and typography inherited from the parent.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-Корень — нативный `pre` с программно сформированным `code` внутри. Для скринридеров смысл фрагмента стоит пояснять контекстом вокруг или атрибутами на `pre` (`aria-label`, `aria-describedby`), переданными через `…rest`. Фокус с клавиатуры на статичный блок обычно не ставят (`tabIndex` по умолчанию не задан).
+The root is a native `pre` with programmatically built inner `code`. For screen readers, clarify the fragment with surrounding context or `pre` attributes (`aria-label`, `aria-describedby`) passed through `…rest`. Keyboard focus is usually not placed on a static block (`tabIndex` is not set by default).
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Подсветка реализована эвристикой для TS/TSX внутри кита, а не полноценным парсером языка: редкие конструкции могут отображаться без ожидаемых классов.
-- Разметка попадает в DOM через `dangerouslySetInnerHTML`: в `code` должна попадать только доверенная строка (контролируемая константа, ваш бэкенд с санитизацией и т.п.), не произвольный ввод пользователя.
-- Отдельного пропа размера нет: кегль и межстрочный интервал наследуются от стилей родителя (`font-size`, `line-height` на обёртке).
+- Highlighting is implemented with a TS/TSX heuristic inside the kit, not a full language parser: rare constructs may render without the expected classes.
+- Markup enters the DOM via `dangerouslySetInnerHTML`: only trusted strings should go into `code` (controlled constants, your backend with sanitization, etc.), not arbitrary user input.
+- There is no size prop: font size and line height inherit from parent styles (`font-size`, `line-height` on the wrapper).
 
-## Связанные компоненты
+## Related components
 
-- **Typography** — заголовки и пояснения рядом с примером кода.
-- **Button** и **Segmented control** — переключение нескольких фрагментов в контролируемом сценарии.
-- **Kbd** — сочетания клавиш в тексте подсказок рядом с кодом, без дублирования роли самого блока кода.
-</think>
-
-
-<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
-StrReplace
+- **Typography** — headings and explanations next to code examples.
+- **Button** and **Segmented control** — switching multiple fragments in a controlled scenario.
+- **Kbd** — keyboard shortcuts in hint text next to code, without duplicating the code block’s role.

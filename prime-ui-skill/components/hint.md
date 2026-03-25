@@ -1,20 +1,20 @@
 # Hint
 
-## Что это
+## What it is
 
-`Hint` — компактная строка пояснения под полем ввода: нейтральный текст, сообщение об ошибке или визуально приглушённый текст для неактивного поля, опционально с иконкой слева.
+`Hint` is a compact explanatory line under an input field: neutral text, an error message, or visually muted text for an inactive field, optionally with an icon on the left.
 
-## Для чего нужен
+## What it’s for
 
-- **Онбординг и регистрация** — пояснить правила пароля, формат телефона или требования к имени до отправки формы.
-- **Корпоративные настройки и справочники** — показать, откуда берётся значение только для чтения или почему поле недоступно текущей роли.
-- **Операционные экраны (логистика, биллинг)** — вывести лимит, единицу измерения или текст ошибки интеграции рядом с числовым полем без отдельного блока уведомлений.
+- **Onboarding and registration** — explain password rules, phone format, or name requirements before the form is submitted.
+- **Corporate settings and directories** — show where a read-only value comes from or why a field is unavailable for the current role.
+- **Operational screens (logistics, billing)** — show a limit, unit of measure, or integration error text next to a numeric field without a separate notification block.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Подсказка под одним полем без дополнительных слотов: задаётся только текст и согласованный с полем размер.
+A hint under a single field without extra slots: only text and a size aligned with the field.
 
 ```tsx
 import { Hint } from "prime-ui-kit";
@@ -24,20 +24,20 @@ export function InviteEmailField() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6, maxWidth: 320 }}>
       <Label.Root htmlFor="invite-email" size="m">
-        Email гостя
+        Guest email
       </Label.Root>
       <input id="invite-email" type="email" autoComplete="email" placeholder="name@company.com" />
       <Hint.Root size="m" variant="default">
-        Приглашение будет действительно 7 дней.
+        The invitation will be valid for 7 days.
       </Hint.Root>
     </div>
   );
 }
 ```
 
-### С вариантами и размерами
+### Variants and sizes
 
-Другой контекст — панель магазина: крупное поле (`size="l"` на подсказке в паре с полем) и явный режим ошибки при неверном промокоде; иконка усиливает узнаваемость поля.
+Another context — a store panel: a large field (`size="l"` on the hint paired with the field) and an explicit error state for an invalid promo code; the icon reinforces field recognition.
 
 ```tsx
 import { Hint } from "prime-ui-kit";
@@ -58,23 +58,23 @@ export function CheckoutPromoRow() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6, maxWidth: 400 }}>
       <Label.Root htmlFor="promo" size="l">
-        Промокод
+        Promo code
       </Label.Root>
       <input id="promo" type="text" defaultValue="SUMR-WRONG" />
       <Hint.Root size="l" variant="error">
         <Hint.Icon>
           <TagIcon />
         </Hint.Icon>
-        Код не найден или срок действия истёк. Проверьте написание.
+        Code not found or expired. Check spelling.
       </Hint.Root>
     </div>
   );
 }
 ```
 
-### В контексте (боковая панель настроек)
+### In context (settings side panel)
 
-Фрагмент колонки настроек уведомлений: лейбл, ползунок и подсказка с уточнением области действия — без отдельной «карточки» ошибки.
+A fragment of a notification settings column: label, slider, and a hint clarifying scope — without a separate “error card”.
 
 ```tsx
 import { Hint } from "prime-ui-kit";
@@ -83,14 +83,14 @@ import { Label } from "prime-ui-kit";
 export function NotificationVolumePanel() {
   return (
     <section style={{ padding: 16, maxWidth: 360, borderLeft: "1px solid #e8e8e8" }}>
-      <h3 style={{ margin: "0 0 12px", fontSize: 18 }}>Звук в браузере</h3>
+      <h3 style={{ margin: "0 0 12px", fontSize: 18 }}>Browser sound</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <Label.Root htmlFor="browser-vol" size="m">
-          Громкость
+          Volume
         </Label.Root>
         <input id="browser-vol" type="range" min={0} max={100} defaultValue={35} />
         <Hint.Root size="m" variant="default">
-          Каналы «Срочно» и «Безопасность» всегда проигрываются на полной громкости.
+          “Urgent” and “Security” channels always play at full volume.
         </Hint.Root>
       </div>
     </section>
@@ -98,9 +98,9 @@ export function NotificationVolumePanel() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Родитель хранит результат валидации и переключает `variant` и текст после отправки или при вводе.
+The parent holds validation result and switches `variant` and text after submit or while typing.
 
 ```tsx
 import { useState } from "react";
@@ -115,7 +115,7 @@ export function ProjectCodeField() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 320 }}>
       <Label.Root htmlFor="proj-code" size="m">
-        Код проекта
+        Project code
       </Label.Root>
       <input
         id="proj-code"
@@ -127,71 +127,73 @@ export function ProjectCodeField() {
         aria-invalid={variant === "error"}
       />
       <Hint.Root size="m" variant={variant}>
-        {variant === "error" ? "Минимум 3 символа, латиница и цифры." : "Будет использоваться в ссылках и API."}
+        {variant === "error"
+          ? "At least 3 characters, Latin letters and digits."
+          : "Will be used in links and the API."}
       </Hint.Root>
       <Button.Root size="s" type="button" onClick={() => setShowError(true)}>
-        Проверить
+        Validate
       </Button.Root>
     </div>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Составной объект **`Hint`** с двумя узлами:
+Composite **`Hint`** with two nodes:
 
-- **`Hint.Root`** — элемент `p` с `data-size` и `data-variant`, внутри `ControlSizeProvider` для каскада размера к иконке.
-- **`Hint.Icon`** — необязательный `span` с `aria-hidden="true"` и фиксированным квадратом под иконку; размещается как первый ребёнок или рядом с текстом внутри корня.
+- **`Hint.Root`** — a `p` element with `data-size` and `data-variant`, inside `ControlSizeProvider` so size cascades to the icon.
+- **`Hint.Icon`** — optional `span` with `aria-hidden="true"` and a fixed square for the icon; place it as the first child or next to the text inside the root.
 
 ## API
 
 ### Hint.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Номинальный размер в связке с полем; кегль подсказки на ступень меньше поля. |
-| variant | `"default" \| "error" \| "disabled"` | `"default"` | Нет | Цвет текста: вторичный контент, опасность или отключённый контент. |
-| className | `string` | — | Нет | Дополнительный класс на `p`. |
-| children | `React.ReactNode` | — | Нет | Текст; при необходимости рядом `Hint.Icon`. |
-| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | Нет | Нативные атрибуты параграфа (`id`, `role`, `aria-*` и др.). |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Nominal size paired with the field; hint type is one step smaller than the field. |
+| variant | `"default" \| "error" \| "disabled"` | `"default"` | No | Text color: secondary content, danger, or disabled content. |
+| className | `string` | — | No | Extra class on `p`. |
+| children | `React.ReactNode` | — | No | Text; optionally `Hint.Icon` alongside. |
+| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Native paragraph attributes (`id`, `role`, `aria-*`, etc.). |
 
 ### Hint.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | Да | Обычно SVG или компонент иконки. |
-| className | `string` | — | Нет | Дополнительный класс на `span`. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Прочие атрибуты обёртки. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactNode` | — | Yes | Usually an SVG or icon component. |
+| className | `string` | — | No | Extra class on `span`. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other wrapper attributes. |
 
-## Варианты
+## Variants
 
-- **`default`** — цвет вторичного текста; обычные подсказки и ограничения.
-- **`error`** — цвет опасности; сообщения валидации и сбои ввода.
-- **`disabled`** — цвет отключённого контента; согласование с неактивным полем и лейблом.
+- **`default`** — secondary text color; ordinary hints and constraints.
+- **`error`** — danger color; validation messages and input failures.
+- **`disabled`** — disabled content color; aligned with an inactive field and label.
 
-Размеры **`s` | `m` | `l` | `xl`** задают шрифт, межстрочный интервал и зазор до иконки в одном ярусе с выбранным номинальным размером поля.
+Sizes **`s` | `m` | `l` | `xl`** set font, line height, and gap to the icon on the same tier as the chosen nominal field size.
 
-## Состояния
+## States
 
-Отдельных пропсов `disabled` или `loading` у корня нет: неактивный вид задаётся **`variant="disabled"`**. Ошибка — **`variant="error"`**. Визуальное состояние поля (например `disabled` на `input`) синхронизируется смыслом с выбором варианта подсказки на стороне экрана.
+There are no separate `disabled` or `loading` props on the root: inactive appearance is **`variant="disabled"`**. Errors are **`variant="error"`**. The field’s visual state (e.g. `disabled` on `input`) should be aligned in meaning with the hint variant chosen by the screen.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Корень — параграф; текст подсказки читается в порядке документа.
-- Для связи с полем задайте **`id`** на `Hint.Root` и **`aria-describedby`** на элементе ввода с этим id.
-- Сообщение об ошибке можно дополнительно вывести с **`role="alert"`** или разместить в живой области — через `…rest` на корне, если это принято в вашем сценарии.
-- **`Hint.Icon`** помечен **`aria-hidden`**, чтобы диктор не дублировал декоративную иконку.
+- The root is a paragraph; hint text is read in document order.
+- To associate with the field, set **`id`** on `Hint.Root` and **`aria-describedby`** on the input to that id.
+- Error text can also use **`role="alert"`** or live region placement — via `…rest` on the root if that fits your flow.
+- **`Hint.Icon`** is marked **`aria-hidden`** so screen readers do not repeat a decorative icon.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Не заменяет **`Label`**: лейбл остаётся кратким именем поля, подсказка — дополнительным пояснением.
-- Не встроен в каждый контрол автоматически: в составном **`Input`** кита подсказки могут подставляться пропами самого поля — при ручной вёрстке используйте `Hint` явно.
-- Полиморфного **`asChild`** нет: корень всегда `p`.
+- Does not replace **`Label`**: the label stays the short field name; the hint is extra explanation.
+- Not wired into every control automatically: in the composite **`Input`** kit, hints may come from the field’s own props — for manual markup, use `Hint` explicitly.
+- There is no polymorphic **`asChild`**: the root is always `p`.
 
-## Связанные компоненты
+## Related components
 
-- **`Label`** — основная подпись поля и связь `htmlFor` / `id`.
-- **`Input`** — готовая композиция с опциональными `hint` и `error` на корне.
-- **`Textarea`** — тот же паттерн метаданных под многострочным вводом (если используется в продукте).
-- **`Button`** — для действий рядом с формой, инициирующих валидацию и смену `variant` подсказки.
+- **`Label`** — primary field caption and `htmlFor` / `id` linkage.
+- **`Input`** — ready-made composition with optional `hint` and `error` on the root.
+- **`Textarea`** — same metadata pattern under multiline input (if used in the product).
+- **`Button`** — actions next to the form that trigger validation and hint `variant` changes.

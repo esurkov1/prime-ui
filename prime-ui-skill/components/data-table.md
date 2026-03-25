@@ -1,25 +1,25 @@
 # DataTable
 
-## Что это
+## What it is
 
-Компонент `DataTable.Root` — таблица на нативной разметке `table` с опциональной сортировкой по колонкам, пагинацией или режимом прокрутки с догрузкой, закрепляемой шапкой и первой колонкой.
+The `DataTable.Root` component is a table built on native `table` markup with optional column sorting, pagination or scroll mode with incremental loading, a sticky header, and a sticky first column.
 
-## Для чего нужен
+## What it is for
 
-- **Склад и отгрузки** — список партий, маршрутов и окон прибытия с сортировкой по объёму и постраничным просмотром длинного реестра.
-- **Финансы и биллинг** — сводка счетов и статусов оплаты с выравниванием сумм по правому краю и визуальными метками в ячейках.
-- **Планирование и отчёты** — широкая сетка кварталов и итогов с горизонтальной прокруткой, закреплённой первой колонкой показателя и шапкой.
-- **Поддержка и контакты** — каталог обращений с кастомными ячейками (ссылки, действия) и кликом по строке для открытия карточки.
-- **Журнал активности** — длинная лента событий с бесконечной прокруткой и запросом следующих порций с сервера.
-- **Внутренние панели** — компактная таблица в узкой колонке карточки или формы, где важно занять всю ширину контейнера.
+- **Warehouse and shipping** — batches, routes, and arrival windows with sorting by volume and paginated browsing of long registers.
+- **Finance and billing** — invoice and payment status summaries with right-aligned amounts and visual markers in cells.
+- **Planning and reports** — wide quarter and totals grids with horizontal scrolling, a sticky first metric column, and header.
+- **Support and contacts** — ticket catalogs with custom cells (links, actions) and row click to open a detail card.
+- **Activity log** — long event feeds with infinite scroll and fetching the next chunks from the server.
+- **Internal panels** — compact tables in a narrow card or form column where filling the container width matters.
 
-## Юзкейсы
+## Use cases
 
-Импорт из пакета `prime-ui-kit`. Примеры разделены по смыслу экрана и набору пропсов.
+Import from the `prime-ui-kit` package. Examples are grouped by screen intent and prop sets.
 
-### Базовый
+### Basic
 
-Реестр медицинских кабинетов: четыре колонки, сортировка по названию, без внешнего состояния.
+Registry of medical rooms: four columns, sort by name, no external state.
 
 ```tsx
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
@@ -27,17 +27,17 @@ import { DataTable, type DataTableColumn } from "prime-ui-kit";
 type Room = { code: string; name: string; floor: number; seats: number };
 
 const rows: Room[] = [
-  { code: "A-12", name: "Терапия", floor: 2, seats: 3 },
-  { code: "B-04", name: "Лаборатория", floor: 1, seats: 2 },
-  { code: "C-21", name: "Рентген", floor: 3, seats: 1 },
+  { code: "A-12", name: "Therapy", floor: 2, seats: 3 },
+  { code: "B-04", name: "Lab", floor: 1, seats: 2 },
+  { code: "C-21", name: "X-ray", floor: 3, seats: 1 },
 ];
 
 const columns: DataTableColumn<Room>[] = [
-  { id: "code", header: "Код", accessor: "code", sortable: true, minWidth: "5rem" },
-  { id: "name", header: "Кабинет", accessor: "name", sortable: true, minWidth: "10rem" },
+  { id: "code", header: "Code", accessor: "code", sortable: true, minWidth: "5rem" },
+  { id: "name", header: "Room", accessor: "name", sortable: true, minWidth: "10rem" },
   {
     id: "floor",
-    header: "Этаж",
+    header: "Floor",
     accessor: "floor",
     sortable: true,
     align: "end",
@@ -45,7 +45,7 @@ const columns: DataTableColumn<Room>[] = [
   },
   {
     id: "seats",
-    header: "Мест",
+    header: "Seats",
     accessor: "seats",
     sortable: true,
     align: "end",
@@ -65,9 +65,9 @@ export function ClinicRoomsTable() {
 }
 ```
 
-### С вариантами/размерами
+### Variants / sizes
 
-Витрина курсов: размер `l`, пунктирные разделители и зебра для длинного списка слушателей.
+Course catalog: `l` size, dashed dividers, and zebra striping for a long learner list.
 
 ```tsx
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
@@ -75,11 +75,11 @@ import { DataTable, type DataTableColumn } from "prime-ui-kit";
 type Enrollee = { id: string; name: string; track: string; progress: number };
 
 const columns: DataTableColumn<Enrollee>[] = [
-  { id: "name", header: "Участник", accessor: "name", sortable: true, minWidth: "11rem" },
-  { id: "track", header: "Трек", accessor: "track", sortable: true, minWidth: "9rem" },
+  { id: "name", header: "Participant", accessor: "name", sortable: true, minWidth: "11rem" },
+  { id: "track", header: "Track", accessor: "track", sortable: true, minWidth: "9rem" },
   {
     id: "progress",
-    header: "Прогресс, %",
+    header: "Progress, %",
     accessor: "progress",
     sortable: true,
     align: "end",
@@ -103,9 +103,9 @@ export function CourseRosterTable({ rows }: { rows: Enrollee[] }) {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Боковая панель согласования договора: узкая ширина, таблица тянется на 100%, липкая шапка при прокрутке внутри панели.
+Contract approval sidebar: narrow width, table stretches to 100%, sticky header when scrolling inside the panel.
 
 ```tsx
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
@@ -113,15 +113,15 @@ import { DataTable, type DataTableColumn } from "prime-ui-kit";
 type Clause = { id: string; title: string; owner: string; risk: "low" | "med" | "high" };
 
 const columns: DataTableColumn<Clause>[] = [
-  { id: "title", header: "Пункт", accessor: "title", sortable: true, minWidth: "10rem" },
-  { id: "owner", header: "Юрист", accessor: "owner", sortable: true, minWidth: "8rem" },
+  { id: "title", header: "Clause", accessor: "title", sortable: true, minWidth: "10rem" },
+  { id: "owner", header: "Counsel", accessor: "owner", sortable: true, minWidth: "8rem" },
   {
     id: "risk",
-    header: "Риск",
+    header: "Risk",
     accessor: "risk",
     sortable: true,
     minWidth: "6rem",
-    cell: (row) => (row.risk === "high" ? "Высокий" : row.risk === "med" ? "Средний" : "Низкий"),
+    cell: (row) => (row.risk === "high" ? "High" : row.risk === "med" ? "Medium" : "Low"),
   },
 ];
 
@@ -145,9 +145,9 @@ export function ContractClausesDrawer({ rows }: { rows: Clause[] }) {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Диспетчерская такси: родитель держит сортировку по времени подачи и страницу; при смене колонки страница сбрасывается вручную.
+Taxi dispatch: parent holds sort by pickup ETA and page; when the sort column changes, the page is reset manually.
 
 ```tsx
 import * as React from "react";
@@ -156,17 +156,17 @@ import { DataTable, type DataTableColumn, type DataTableSortState } from "prime-
 type Ride = { id: string; district: string; etaMin: number; driver: string };
 
 const columns: DataTableColumn<Ride>[] = [
-  { id: "id", header: "Заказ", accessor: "id", sortable: true, minWidth: "6rem" },
-  { id: "district", header: "Район", accessor: "district", sortable: true, minWidth: "9rem" },
+  { id: "id", header: "Order", accessor: "id", sortable: true, minWidth: "6rem" },
+  { id: "district", header: "District", accessor: "district", sortable: true, minWidth: "9rem" },
   {
     id: "etaMin",
-    header: "Мин до подачи",
+    header: "Min to pickup",
     accessor: "etaMin",
     sortable: true,
     align: "end",
     minWidth: "8rem",
   },
-  { id: "driver", header: "Водитель", accessor: "driver", sortable: true, minWidth: "10rem" },
+  { id: "driver", header: "Driver", accessor: "driver", sortable: true, minWidth: "10rem" },
 ];
 
 export function TaxiDispatchTable({ rows }: { rows: Ride[] }) {
@@ -190,101 +190,101 @@ export function TaxiDispatchTable({ rows }: { rows: Ride[] }) {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`DataTable.Root`** — обёртка с `ControlSizeProvider`, `data-*` на корневом `div` (размер, разделители, шапка, липкость, подсветки, зебра).
-- **Внутри** — прокручиваемый `div.viewport` с `table`, `colgroup`, опционально `thead` с `th` (кнопка сортировки или текст), `tbody` с `tr`/`td`, внизу сентинел для `IntersectionObserver` в режиме бесконечной прокрутки.
-- **Подвал** — счётчик «Показано X–Y из Z», при классической пагинации — `Pagination.Root`, при догрузке — текст состояния.
+- **`DataTable.Root`** — wrapper with `ControlSizeProvider`, `data-*` on the root `div` (size, dividers, header, stickiness, highlights, zebra).
+- **Inside** — scrollable `div.viewport` with `table`, `colgroup`, optional `thead` with `th` (sort button or text), `tbody` with `tr`/`td`, and a bottom sentinel for `IntersectionObserver` in infinite-scroll mode.
+- **Footer** — “Showing X–Y of Z” counter; in classic pagination mode — `Pagination.Root`; with incremental loading — status text.
 
 ## API
 
 ### DataTable.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| columns | `DataTableColumn<Row>[]` | — | Да | Конфигурация колонок |
-| rows | `Row[]` | — | Да | Данные строк |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Размер строки и токены ячеек |
-| className | `string` | — | Нет | Класс корневой обёртки |
-| showHeader | `boolean` | `true` | Нет | Показывать thead |
-| stickyHeader | `boolean` | `false` | Нет | Липкая шапка |
-| stickyFirstColumn | `boolean` | `false` | Нет | Липкая первая колонка |
-| getRowKey | `(row, index) => React.Key` | индекс | Нет | Ключ строки |
-| onRowClick | `(row, index, event) => void` | — | Нет | Клик по строке |
-| loading | `boolean` | `false` | Нет | Плейсхолдер загрузки при пустом срезе |
-| loadingText | `React.ReactNode` | текст по умолчанию | Нет | Текст загрузки |
-| emptyText | `React.ReactNode` | текст по умолчанию | Нет | Текст пустого списка |
-| dividerStyle | `"standard" \| "dashed" \| "dotted" \| "none"` | `"standard"` | Нет | Стиль линий сетки |
-| sort | `DataTableSortState` | — | Нет | Контролируемая сортировка |
-| defaultSort | `DataTableSortState` | `null` | Нет | Неконтролируемая начальная сортировка |
-| onSortChange | `(sort) => void` | — | Нет | Смена сортировки |
-| page | `number` | — | Нет | Контролируемая страница |
-| defaultPage | `number` | `1` | Нет | Начальная страница |
-| onPageChange | `(page) => void` | — | Нет | Смена страницы |
-| pageSize | `number` | `10` | Нет | Размер страницы / начальный срез |
-| showPagination | `boolean` | `true` | Нет | Показывать пагинацию |
-| siblingCount | `number` | `1` | Нет | Окно номеров в Pagination |
-| paginationSize | `DataTableSize` | как у корня | Нет | Размер контролов пагинации |
-| infiniteScroll | `boolean` | `false` | Нет | Режим прокрутки с порциями |
-| initialVisibleRows | `number` | `pageSize` | Нет | Стартовое число видимых строк |
-| infiniteBatchSize | `number` | `20` | Нет | Шаг наращивания локального среза |
-| hasMore | `boolean` | `false` | Нет | Есть ли данные для `onLoadMore` |
-| loadingMore | `boolean` | `false` | Нет | Флаг подгрузки |
-| onLoadMore | `() => void \| Promise<void>` | — | Нет | Запрос следующей порции |
-| scrollHeight | `number \| string` | `360` | Нет | Высота области прокрутки |
-| highlightRowOnHover | `boolean` | `true` | Нет | Подсветка строки |
-| highlightColumnOnHover | `boolean` | `false` | Нет | Подсветка колонки |
-| striped | `boolean` | `false` | Нет | Зебра |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| columns | `DataTableColumn<Row>[]` | — | Yes | Column configuration |
+| rows | `Row[]` | — | Yes | Row data |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Row size and cell tokens |
+| className | `string` | — | No | Root wrapper class |
+| showHeader | `boolean` | `true` | No | Show thead |
+| stickyHeader | `boolean` | `false` | No | Sticky header |
+| stickyFirstColumn | `boolean` | `false` | No | Sticky first column |
+| getRowKey | `(row, index) => React.Key` | index | No | Row key |
+| onRowClick | `(row, index, event) => void` | — | No | Row click |
+| loading | `boolean` | `false` | No | Loading placeholder when the visible slice is empty |
+| loadingText | `React.ReactNode` | default text | No | Loading text |
+| emptyText | `React.ReactNode` | default text | No | Empty list text |
+| dividerStyle | `"standard" \| "dashed" \| "dotted" \| "none"` | `"standard"` | No | Grid line style |
+| sort | `DataTableSortState` | — | No | Controlled sort |
+| defaultSort | `DataTableSortState` | `null` | No | Uncontrolled initial sort |
+| onSortChange | `(sort) => void` | — | No | Sort change |
+| page | `number` | — | No | Controlled page |
+| defaultPage | `number` | `1` | No | Initial page |
+| onPageChange | `(page) => void` | — | No | Page change |
+| pageSize | `number` | `10` | No | Page size / initial slice |
+| showPagination | `boolean` | `true` | No | Show pagination |
+| siblingCount | `number` | `1` | No | Page number window in Pagination |
+| paginationSize | `DataTableSize` | same as root | No | Pagination control size |
+| infiniteScroll | `boolean` | `false` | No | Scroll mode with chunks |
+| initialVisibleRows | `number` | `pageSize` | No | Initial visible row count |
+| infiniteBatchSize | `number` | `20` | No | Step for growing the local slice |
+| hasMore | `boolean` | `false` | No | Whether more data exists for `onLoadMore` |
+| loadingMore | `boolean` | `false` | No | Loading-more flag |
+| onLoadMore | `() => void \| Promise<void>` | — | No | Request next chunk |
+| scrollHeight | `number \| string` | `360` | No | Scroll area height |
+| highlightRowOnHover | `boolean` | `true` | No | Row highlight |
+| highlightColumnOnHover | `boolean` | `false` | No | Column highlight |
+| striped | `boolean` | `false` | No | Zebra striping |
 
-### Поля колонки (`DataTableColumn<Row>`)
+### Column fields (`DataTableColumn<Row>`)
 
-| Поле | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| id | `string` | — | Да | Идентификатор колонки |
-| header | `React.ReactNode` | — | Да | Заголовок |
-| accessor | `keyof Row \| (row) => unknown` | — | Нет | Значение для ячейки и сортировки |
-| cell | `(row) => React.ReactNode` | — | Нет | Кастомная ячейка |
-| sortable | `boolean` | `false` | Нет | Сортировка по клику |
-| sortAccessor | `(row) => unknown` | — | Нет | Значение только для сортировки |
-| sortComparator | `(a, b, order) => number` | — | Нет | Свой компаратор |
-| align | `"start" \| "center" \| "end"` | `"start"` | Нет | Выравнивание |
-| width | `string` | — | Нет | Ширина col |
-| minWidth | `string` | — | Нет | Мин. ширина col |
-| onHeaderClick | `(event) => void` | — | Нет | Доп. клик по th |
-| onCellClick | `(row, event) => void` | — | Нет | Клик/клавиши по ячейке |
+| Field | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| id | `string` | — | Yes | Column id |
+| header | `React.ReactNode` | — | Yes | Header |
+| accessor | `keyof Row \| (row) => unknown` | — | No | Value for cell and sort |
+| cell | `(row) => React.ReactNode` | — | No | Custom cell |
+| sortable | `boolean` | `false` | No | Sort on click |
+| sortAccessor | `(row) => unknown` | — | No | Value used only for sorting |
+| sortComparator | `(a, b, order) => number` | — | No | Custom comparator |
+| align | `"start" \| "center" \| "end"` | `"start"` | No | Alignment |
+| width | `string` | — | No | col width |
+| minWidth | `string` | — | No | Min col width |
+| onHeaderClick | `(event) => void` | — | No | Extra click on th |
+| onCellClick | `(row, event) => void` | — | No | Click / keyboard on cell |
 
-Экспортируемые типы: `DataTableSortState`, `DataTableOrder`, `DataTableSize`, `DataTableDividerStyle`, `DataTableCellAlign`, `DataTableRootProps`, `DataTableColumn`.
+Exported types: `DataTableSortState`, `DataTableOrder`, `DataTableSize`, `DataTableDividerStyle`, `DataTableCellAlign`, `DataTableRootProps`, `DataTableColumn`.
 
-## Варианты
+## Variants
 
-- **`dividerStyle`** — `standard` (сплошная линия), `dashed`, `dotted`, `none` (без линий между ячейками).
-- **`size`** — четыре яруса `s`–`xl` для высоты строки, отступов и текста; влияет на вложенные контролы через контекст размера.
+- **`dividerStyle`** — `standard` (solid line), `dashed`, `dotted`, `none` (no lines between cells).
+- **`size`** — four tiers `s`–`xl` for row height, padding, and text; affects nested controls via size context.
 
-## Состояния
+## States
 
-- **Загрузка** — `loading` при отсутствии отображаемых строк: одна строка с `loadingText`.
-- **Пусто** — при `loading === false` и нуле строк показывается `emptyText`.
-- **Сортировка** — цикл по клику: нет → asc → desc → нет для этой колонки; индикатор стрелок в заголовке.
-- **Пагинация** — страница ограничивается диапазоном; при смене данных в обычном режиме страница сбрасывается на 1 при переключении с бесконечного режима.
-- **Бесконечная прокрутка** — сначала наращивается локальный срез до длины `rows`, затем при `hasMore` вызывается `onLoadMore`.
+- **Loading** — `loading` when there are no rows to show: one row with `loadingText`.
+- **Empty** — when `loading === false` and zero rows, `emptyText` is shown.
+- **Sort** — click cycle: none → asc → desc → none for that column; arrow indicator in the header.
+- **Pagination** — page is clamped to range; when data changes in normal mode, page resets to 1 when switching away from infinite mode.
+- **Infinite scroll** — local slice grows up to `rows.length` first, then `onLoadMore` is called when `hasMore`.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Заголовки сортируемых колонок оформлены как интерактивная область внутри `th` с `scope="col"`.
-- Ячейки с `onCellClick` получают `role="button"`, `tabIndex={0}`, обработку Enter и пробела.
-- Иконки направления сортировки помечены `aria-hidden`.
-- Таблица не добавляет роли `grid` или расширенной навигации стрелками — при необходимости сложного поведения это задаётся снаружи.
+- Sortable column headers are an interactive region inside `th` with `scope="col"`.
+- Cells with `onCellClick` get `role="button"`, `tabIndex={0}`, and Enter / Space handling.
+- Sort direction icons are marked `aria-hidden`.
+- The table does not add `grid` roles or extended arrow-key navigation — for complex behavior, configure that externally.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет встроенного изменения ширины колонок перетаскиванием, закрепления произвольной колонки (только первая) и встроенного поиска/фильтрации.
-- Оверлей загрузки поверх уже показанных строк не рисуется: `loading` влияет на вид только когда нет строк для показа.
-- Для очень больших массивов без порционной подгрузки разумно использовать `infiniteScroll` и подгрузку данных, а не десятки тысяч строк в `rows` сразу.
-- Сортировка выполняется в памяти на переданном массиве; серверная сортировка — ответственность потребителя (подставлять уже отсортированные `rows` или управлять ими снаружи).
+- No built-in column resize by drag, pinning arbitrary columns (first column only), or built-in search/filtering.
+- No loading overlay on top of already visible rows: `loading` only affects the view when there are no rows to show.
+- For very large arrays without chunked loading, prefer `infiniteScroll` and data fetching rather than tens of thousands of rows in `rows` at once.
+- Sorting runs in memory on the passed array; server-side sorting is the consumer’s responsibility (pass pre-sorted `rows` or manage them externally).
 
-## Связанные компоненты
+## Related components
 
-- **Pagination** — выводится под таблицей в обычном режиме.
-- **Badge**, **Tag** — типичное наполнение ячеек статусов и меток (наследуют размер таблицы, если не переопределён).
-- **LinkButton** — ссылки и действия внутри ячеек.
-- **ControlSizeProvider** — используется внутри корня; при вложении своих контролов можно опираться на тот же контекст размера.
+- **Pagination** — rendered below the table in normal mode.
+- **Badge**, **Tag** — typical cell content for statuses and labels (inherit table size unless overridden).
+- **LinkButton** — links and actions inside cells.
+- **ControlSizeProvider** — used inside the root; when nesting your own controls, you can rely on the same size context.

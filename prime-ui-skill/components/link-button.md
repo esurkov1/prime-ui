@@ -1,40 +1,40 @@
 # LinkButton
 
-## Что это
+## What it is
 
-Однокомпонентная ссылка (`LinkButton.Root`) с типографикой и отступами контрола, подчёркиванием при наведении и фокусе и поддержкой четырёх размеров.
+A single-component link (`LinkButton.Root`) with control typography and padding, underline on hover and focus, and four size options.
 
-## Для чего нужен
+## When to use it
 
-- **Внутренняя навигация приложения** — переходы между экранами и разделами там, где нужен именно вид «текстовой ссылки», а не залитая кнопка.
-- **Справка и юридические тексты** — встроенные ссылки в абзацах на политику конфиденциальности, инструкции или файлы для скачивания.
-- **Плотные панели и подписи к действиям** — компактные ссылки рядом с полями (размер `s`) или заметные призывы в карточках (размер `l` / `xl`) без смены визуального «варианта» — только масштаб.
+- **In-app navigation** — moving between screens and sections when you need a **text-link** look, not a filled button.
+- **Help and legal copy** — inline links in paragraphs to privacy policy, instructions, or downloadable files.
+- **Dense panels and action captions** — compact links next to fields (`s` size) or prominent calls to action in cards (`l` / `xl`) without changing a visual “variant” — only scale.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример отражает другой контекст продукта и набор пропсов.
+Each example reflects a different product context and prop set.
 
-### Базовый
+### Basic
 
-Типичная ссылка в шапке или боковом меню на главный раздел.
+A typical link in the header or sidebar to the main section.
 
 ```tsx
 import { LinkButton } from "prime-ui-kit";
 
 export function AppHeaderHome() {
   return (
-    <nav aria-label="Основное меню">
+    <nav aria-label="Main navigation">
       <LinkButton.Root href="/app" size="m">
-        На главную
+        Home
       </LinkButton.Root>
     </nav>
   );
 }
 ```
 
-### С размерами
+### With sizes
 
-Область с ограниченным местом (например нижняя панель отчёта): несколько ссылок с разным `size` для иерархии без смены компонента.
+A space-constrained area (e.g. report footer): several links with different `size` for hierarchy without swapping components.
 
 ```tsx
 import { LinkButton } from "prime-ui-kit";
@@ -43,22 +43,22 @@ export function ReportFooterLinks() {
   return (
     <footer className="report-footer">
       <LinkButton.Root href="/reports/archive" size="s">
-        Архив отчётов
+        Report archive
       </LinkButton.Root>
       <LinkButton.Root href="/reports/export" size="m">
-        Экспорт CSV
+        Export CSV
       </LinkButton.Root>
       <LinkButton.Root href="/reports/help" size="l">
-        Как читать отчёт
+        How to read the report
       </LinkButton.Root>
     </footer>
   );
 }
 ```
 
-### В контексте (карточка и пояснение)
+### In context (card and helper text)
 
-Ссылка внутри карточки настройки рядом с описанием опции — пользователь переходит к подробной инструкции.
+A link inside a settings card next to an option description — the user goes to detailed instructions.
 
 ```tsx
 import { LinkButton } from "prime-ui-kit";
@@ -68,19 +68,19 @@ export function IntegrationCard() {
     <article className="settings-card">
       <h3>Webhook</h3>
       <p>
-        URL для входящих событий. Подпись запроса настраивается в разделе безопасности.
+        URL for incoming events. Request signing is configured in the security section.
       </p>
       <LinkButton.Root href="/settings/security/webhooks" size="m">
-        Настроить подпись
+        Configure signing
       </LinkButton.Root>
     </article>
   );
 }
 ```
 
-### Внешняя ссылка и безопасность вкладки
+### External link and tab safety
 
-Документация или сайт партнёра открываются в новой вкладке; обязательно указывайте `rel` при `target="_blank"`.
+Documentation or a partner site opens in a new tab; always set `rel` when using `target="_blank"`.
 
 ```tsx
 import { LinkButton } from "prime-ui-kit";
@@ -88,7 +88,7 @@ import { LinkButton } from "prime-ui-kit";
 export function StatusPageLink() {
   return (
     <p>
-      Текущие инциденты публикуются на странице статуса:{" "}
+      Current incidents are published on the status page:{" "}
       <LinkButton.Root
         href="https://status.example.com"
         target="_blank"
@@ -102,56 +102,56 @@ export function StatusPageLink() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Плоский API: экспортируется объект `LinkButton` с единственным подкомпонентом **`LinkButton.Root`**.
+Flat API: the `LinkButton` object is exported with a single subcomponent **`LinkButton.Root`**.
 
-- При **`disabled={false}`** (по умолчанию) рендерится **`<a>`** с переданными атрибутами якоря и обёрткой **`ControlSizeProvider`** вокруг `children`.
-- При **`disabled={true}`** рендерится **`<span role="link">`** без `href`, с `aria-disabled="true"` и `tabIndex={-1}`; `children` по-прежнему внутри `ControlSizeProvider`.
+- When **`disabled={false}`** (default), an **`<a>`** is rendered with the passed anchor attributes and **`ControlSizeProvider`** wrapping `children`.
+- When **`disabled={true}`**, a **`<span role="link">`** is rendered without `href`, with `aria-disabled="true"` and `tabIndex={-1}`; `children` remain inside `ControlSizeProvider`.
 
 ## API
 
 ### LinkButton.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Высота/кегль по токенам контрола; задаёт контекст размера для вложенных иконок. |
-| `disabled` | `boolean` | `false` | Нет | Неактивная ссылка: span вместо `a`, без перехода. |
-| `children` | `React.ReactNode` | — | Нет | Содержимое ссылки (текст, иконки). |
-| `className` | `string` | — | Нет | Дополнительный класс на корневой элемент. |
-| …остальное | `React.AnchorHTMLAttributes<HTMLAnchorElement>` | — | Нет | В том числе `href`, `target`, `rel`, `download`, `onClick`, `aria-*`, `tabIndex`; на активной ссылке уходят на `<a>`. `ref` перенаправляется на корневой DOM-узел. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Height / type size from control tokens; sets size context for nested icons. |
+| `disabled` | `boolean` | `false` | No | Inactive link: `span` instead of `a`, no navigation. |
+| `children` | `React.ReactNode` | — | No | Link content (text, icons). |
+| `className` | `string` | — | No | Extra class on the root element. |
+| …rest | `React.AnchorHTMLAttributes<HTMLAnchorElement>` | — | No | Including `href`, `target`, `rel`, `download`, `onClick`, `aria-*`, `tabIndex`; on an active link they are forwarded to `<a>`. `ref` is forwarded to the root DOM node. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` или `mode` нет: визуальный стиль один — цвет текста из токенов, подчёркивание при `:hover` и `:focus-visible`. Различия внешнего вида между сценариями задаются пропом **`size`** и окружением (например родительская типографика).
+There is no separate `variant` or `mode` prop: one visual style — text color from tokens, underline on `:hover` and `:focus-visible`. Visual differences between scenarios come from the **`size`** prop and surroundings (e.g. parent typography).
 
-## Состояния
+## States
 
-| Состояние | Как задаётся | Поведение |
-|-----------|----------------|-----------|
-| Обычная ссылка | `disabled` не задан или `false`, есть осмысленный `href` | Клик и активация с клавиатуры ведут по адресу; курсор pointer. |
-| Наведение | CSS `:hover` | Акцентный цвет текста, видимое подчёркивание. |
-| Фокус с клавиатуры | `:focus-visible` | Кольцо фокуса и подчёркивание. |
-| Недоступно | `disabled={true}` | Рендер `span`, `aria-disabled`, стили «отключено» через `data-disabled`; перехода нет. |
+| State | How it is set | Behavior |
+|-------|----------------|----------|
+| Normal link | `disabled` omitted or `false`, meaningful `href` | Click and keyboard activation navigate; pointer cursor. |
+| Hover | CSS `:hover` | Accent text color, visible underline. |
+| Keyboard focus | `:focus-visible` | Focus ring and underline. |
+| Disabled | `disabled={true}` | Renders `span`, `aria-disabled`, “disabled” styles via `data-disabled`; no navigation. |
 
-Нет встроенных состояний «загрузка» или «ошибка» — для асинхронного действия без смены страницы используйте кнопку.
+There are no built-in “loading” or “error” states — for async actions without a page change, use a button.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Активная ссылка — нативный **`<a href>`**: предсказуемое поведение для скринридеров и клавиатуры (Enter по фокусу).
-- В режиме **`disabled`** семантика сохраняется через **`role="link"`** и **`aria-disabled="true"`**; фокус табом по умолчанию снят (`tabIndex={-1}`). Не используйте этот режим для ссылки, которая должна оставаться в порядке фокуса — лучше убрать элемент или объяснить причину блокировки текстом.
-- Для ссылки **только с иконкой** задайте доступное имя: **`aria-label`** или видимый текст рядом.
-- Для открытия в новой вкладке помимо **`target="_blank"`** указывайте **`rel="noopener noreferrer"`** (и при необходимости предупреждение пользователю в интерфейсе).
+- An active link is a native **`<a href>`**: predictable behavior for screen readers and keyboard (Enter when focused).
+- In **`disabled`** mode, semantics are kept via **`role="link"`** and **`aria-disabled="true"`**; tab focus is removed by default (`tabIndex={-1}`). Do not use this mode for a link that should stay in tab order — remove the element or explain the block with copy instead.
+- For an **icon-only** link, provide an accessible name: **`aria-label`** or visible text nearby.
+- For opening in a new tab, besides **`target="_blank"`**, set **`rel="noopener noreferrer"`** (and warn the user in the UI if needed).
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Компонент предназначен для **навигации** (изменение URL или якоря). Для действий в интерфейсе без перехода используйте **Button**.
-- **Полиморфного `asChild` нет**: нельзя «натянуть» стили на дочерний `Link` из роутера одной пропсой; оборачивайте маршрутный компонент стилями вручную или ведите на `href`, если роутер это поддерживает.
-- При **`disabled`** атрибут **`href`** из пропсов на DOM не попадает — не рассчитывайте на него для скринридеров в этом режиме.
-- Отдельного **`fullWidth`** нет; при необходимости растягивайте блок через **`className`** / вёрстку родителя.
+- The component is meant for **navigation** (URL or hash change). For in-app actions without navigation, use **Button**.
+- **There is no polymorphic `asChild`**: you cannot apply styles to a child router `Link` with one prop; wrap the routing component with styles manually, or use `href` if your router supports it.
+- When **`disabled`**, the **`href`** prop does not reach the DOM — do not rely on it for screen readers in that mode.
+- There is no **`fullWidth`**; stretch the block via **`className`** / parent layout if needed.
 
-## Связанные компоненты
+## Related components
 
-- **Button** — действия, отправка форм, `loading` / `disabled` без семантики ссылки; при необходимости ссылка с видом кнопки через паттерны вашего приложения.
-- **Breadcrumb** — навигационная цепочка; отдельные пункты могут визуально совпадать со ссылками.
-- **Typography** — обычный текст с инлайн-ссылками без отступов контрола; **LinkButton** даёт выравнивание и размеры как у контролов.
+- **Button** — actions, form submit, `loading` / `disabled` without link semantics; link styled as a button via your app patterns if needed.
+- **Breadcrumb** — navigation trail; individual items may look like links.
+- **Typography** — body text with inline links without control padding; **LinkButton** aligns and sizes like controls.

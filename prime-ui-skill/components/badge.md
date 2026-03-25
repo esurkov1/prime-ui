@@ -1,20 +1,20 @@
 # Badge
 
-## Что это
+## What it is
 
-Компактная несамостоятельная метка (бейдж) для подписи статуса, категории или числа, с опциональными слотами под точку и иконку.
+A compact, non-standalone label (badge) for status, category, or count, with optional slots for a dot and an icon.
 
-## Для чего нужен
+## When to use it
 
-- **Каталог и заказы:** подпись этапа доставки, тип оплаты или приоритет строки без отдельной колонки.
-- **Внутренние панели и отчёты:** роли пользователя, окружение (staging), метки фильтра рядом с заголовком.
-- **Профиль и совместная работа:** короткая метка присутствия или режима («В сети», «Занят») рядом с именем или в списке участников.
+- **Catalogs and orders:** label delivery stage, payment type, or row priority without a dedicated column.
+- **Internal dashboards and reports:** user roles, environment (staging), filter tags next to a heading.
+- **Profiles and collaboration:** short presence or mode labels (“Online”, “Busy”) next to a name or in a participant list.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Счётчик или короткая метка у заголовка вкладки или секции.
+A counter or short label next to a tab or section heading.
 
 ```tsx
 import { Badge } from "prime-ui-kit";
@@ -22,7 +22,7 @@ import { Badge } from "prime-ui-kit";
 export function TabWithCount() {
   return (
     <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      Входящие
+      Inbox
       <Badge.Root color="blue" variant="light" size="m">
         12
       </Badge.Root>
@@ -31,9 +31,9 @@ export function TabWithCount() {
 }
 ```
 
-### С вариантами и размерами
+### With variants and sizes
 
-Маркетинговый блок: разные уровни акцента для тегов темы статьи.
+Marketing block: different emphasis levels for article topic tags.
 
 ```tsx
 import { Badge } from "prime-ui-kit";
@@ -42,22 +42,22 @@ export function ArticleTopics() {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
       <Badge.Root color="purple" variant="filled" size="s">
-        Гайд
+        Guide
       </Badge.Root>
       <Badge.Root color="teal" variant="lighter" size="m">
-        Обновлено
+        Updated
       </Badge.Root>
       <Badge.Root color="orange" variant="stroke" size="m">
-        Бета
+        Beta
       </Badge.Root>
     </div>
   );
 }
 ```
 
-### В контексте карточки
+### In a card context
 
-Строка товара: цена, название и метка «В наличии» с иконкой и точкой.
+Product row: price, title, and an “In stock” label with an icon and dot.
 
 ```tsx
 import { Badge, Icon } from "prime-ui-kit";
@@ -76,24 +76,24 @@ export function ProductRow() {
       }}
     >
       <div>
-        <div style={{ fontWeight: 600 }}>Клавиатура механическая</div>
-        <div style={{ fontSize: 14, opacity: 0.7 }}>Арт. KB-204</div>
+        <div style={{ fontWeight: 600 }}>Mechanical keyboard</div>
+        <div style={{ fontSize: 14, opacity: 0.7 }}>SKU KB-204</div>
       </div>
       <Badge.Root color="green" variant="light" size="m">
         <Badge.Dot />
         <Badge.Icon>
           <Icon name="status.locked" />
         </Badge.Icon>
-        В наличии
+        In stock
       </Badge.Root>
     </article>
   );
 }
 ```
 
-### Статус присутствия
+### Presence status
 
-Индикатор с осмысленной подписью для вспомогательных технологий.
+An indicator with a meaningful label for assistive technologies.
 
 ```tsx
 import { Badge } from "prime-ui-kit";
@@ -102,17 +102,17 @@ export function PresenceRow({ name }: { name: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <span>{name}</span>
-      <Badge.Root variant="status" status="away" size="m" label={`${name}: отошёл`}>
-        Отошёл
+      <Badge.Root variant="status" status="away" size="m" label={`${name}: away`}>
+        Away
       </Badge.Root>
     </div>
   );
 }
 ```
 
-### Иконки в разных позициях
+### Icons in different positions
 
-Иконки можно размещать слева от текста, справа или использовать только иконку без текста.
+Icons can sit to the left of text, to the right, or be used alone without text.
 
 ```tsx
 import { Badge, Icon } from "prime-ui-kit";
@@ -120,7 +120,7 @@ import { Badge, Icon } from "prime-ui-kit";
 export function IconPositions() {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-      {/* Иконка слева */}
+      {/* Icon on the left */}
       <Badge.Root color="blue" variant="light" size="m">
         <Badge.Icon>
           <Icon name="field.email" />
@@ -128,7 +128,7 @@ export function IconPositions() {
         Email
       </Badge.Root>
 
-      {/* Иконка справа */}
+      {/* Icon on the right */}
       <Badge.Root color="red" variant="light" size="m">
         New
         <Badge.Icon>
@@ -136,14 +136,14 @@ export function IconPositions() {
         </Badge.Icon>
       </Badge.Root>
 
-      {/* Только иконка */}
+      {/* Icon only */}
       <Badge.Root color="sky" variant="light" size="m">
         <Badge.Icon>
           <Icon name="action.copy" />
         </Badge.Icon>
       </Badge.Root>
 
-      {/* Комбинация точки и иконки */}
+      {/* Dot and icon combined */}
       <Badge.Root color="purple" variant="stroke" size="m">
         <Badge.Dot />
         <Badge.Icon>
@@ -156,78 +156,78 @@ export function IconPositions() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Плоский составной API:
+Flat compound API:
 
-- `Badge.Root` — обёртка `div`; при `variant="status"` добавляются встроенная точка статуса и `role="status"`.
-- `Badge.Dot` — декоративная точка внутри содержимого (`span`, `aria-hidden`).
-- `Badge.Icon` — выравнивание иконки в строке с текстом (`span`).
+- `Badge.Root` — `div` wrapper; with `variant="status"`, a built-in status dot and `role="status"` are added.
+- `Badge.Dot` — decorative dot inside the content (`span`, `aria-hidden`).
+- `Badge.Icon` — aligns the icon with text in a row (`span`).
 
-Внутри `Badge.Root` дети оборачиваются в `ControlSizeProvider`, чтобы вложенные иконки могли наследовать размер.
+Children inside `Badge.Root` are wrapped in `ControlSizeProvider` so nested icons can inherit size.
 
 ## API
 
 ### Badge.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `color` | `"gray" \| "red" \| "blue" \| "green" \| "orange" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Нет | Семантический цвет; не влияет на оформление при `variant="status"`. |
-| `variant` | `"filled" \| "light" \| "lighter" \| "stroke" \| "status"` | `"light"` | Нет | Плотность фона, обводка или режим статуса с точкой. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | из `ControlSizeContext` или `"m"` | Нет | Явный размер; без пропа берётся контекст контрольной поверхности (с маппингом `xs` → `s`), иначе `"m"`. |
-| `disabled` | `boolean` | — | Нет | Приглушённый вид, `data-disabled`. |
-| `status` | `"online" \| "offline" \| "away" \| "busy"` | `"online"` | Нет | Вариант точки только для `variant="status"`. |
-| `label` | `string` | — | Нет | `aria-label` на корне при `variant="status"`. |
-| `children` | `React.ReactNode` | — | Нет | Текст, `Badge.Dot`, `Badge.Icon`, иконки. |
-| `className` | `string` | — | Нет | Дополнительный класс корня. |
-| … | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | Стандартные атрибуты и `ref` для корневого `div`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `color` | `"gray" \| "red" \| "blue" \| "green" \| "orange" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | No | Semantic color; does not affect styling when `variant="status"`. |
+| `variant` | `"filled" \| "light" \| "lighter" \| "stroke" \| "status"` | `"light"` | No | Fill density, stroke, or status mode with a dot. |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | from `ControlSizeContext` or `"m"` | No | Explicit size; without the prop, the control surface context is used (with `xs` → `s` mapping), otherwise `"m"`. |
+| `disabled` | `boolean` | — | No | Muted appearance, `data-disabled`. |
+| `status` | `"online" \| "offline" \| "away" \| "busy"` | `"online"` | No | Dot variant only for `variant="status"`. |
+| `label` | `string` | — | No | `aria-label` on the root when `variant="status"`. |
+| `children` | `React.ReactNode` | — | No | Text, `Badge.Dot`, `Badge.Icon`, icons. |
+| `className` | `string` | — | No | Extra class on the root. |
+| … | `React.HTMLAttributes<HTMLDivElement>` | — | No | Standard attributes and `ref` for the root `div`. |
 
 ### Badge.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `children` | `React.ReactNode` | — | Да | Узел иконки. |
-| `className` | `string` | — | Нет | Класс обёртки. |
-| … | `Omit<React.HTMLAttributes<HTMLDivElement>, "children">` | — | Нет | Прочие атрибуты обёртки. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `children` | `React.ReactNode` | — | Yes | Icon node. |
+| `className` | `string` | — | No | Wrapper class. |
+| … | `Omit<React.HTMLAttributes<HTMLDivElement>, "children">` | — | No | Other wrapper attributes. |
 
 ### Badge.Dot
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `className` | `string` | — | Нет | Класс точки. |
-| … | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`; узел скрыт от вспомогательных технологий. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `className` | `string` | — | No | Dot class. |
+| … | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes; node is hidden from assistive technologies. |
 
-## Варианты
+## Variants
 
-- **`filled`** — сплошная заливка по выбранному `color`, максимальный акцент.
-- **`light`** — мягкий фон и контрастный текст; стиль по умолчанию.
-- **`lighter`** — ещё светлее фон, вторичные метки на плотных экранах.
-- **`stroke`** — прозрачный фон и цветная обводка.
-- **`status`** — встроенная индикаторная точка; цвет точки задаётся `status`, текст остаётся в `children`.
+- **`filled`** — solid fill for the chosen `color`, strongest emphasis.
+- **`light`** — soft background and contrasting text; default style.
+- **`lighter`** — lighter background, secondary labels on dense screens.
+- **`stroke`** — transparent background and colored border.
+- **`status`** — built-in indicator dot; dot color comes from `status`, text stays in `children`.
 
-## Состояния
+## States
 
-- **Обычный** — по умолчанию, стили из `variant`, `color`, `size`.
-- **`disabled`** — визуальное приглушение через `data-disabled` для всех вариантов, включая `status`.
+- **Default** — default styles from `variant`, `color`, `size`.
+- **`disabled`** — visual dimming via `data-disabled` for all variants, including `status`.
 
-Отдельных состояний загрузки, ошибки или фокуса у бейджа нет: это статичная метка, не кнопка и не поле ввода.
+There are no separate loading, error, or focus states: the badge is a static label, not a button or input.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- При **`variant="status"`** на корне выставляются `role="status"` и опциональный `aria-label` из пропа `label`; нужно передавать `label`, если короткий текст внутри недостаточен для смысла (например только «Онлайн» без имени).
-- **`Badge.Dot`** помечен `aria-hidden` — не дублирует смысл текста рядом.
-- Клавиатурного управления у бейджа нет; для действий используйте кнопку или ссылку рядом или обёртку с соответствующей ролью.
+- With **`variant="status"`**, the root gets `role="status"` and an optional `aria-label` from the `label` prop; pass `label` when short inner text is not enough for meaning (e.g. only “Online” without a name).
+- **`Badge.Dot`** uses `aria-hidden` — it does not duplicate the meaning of adjacent text.
+- The badge is not keyboard-operable; for actions, use a button or link nearby, or a wrapper with the appropriate role.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Бейдж **не** заменяет кнопку, ссылку или поле; кликабельные сценарии оформляйте отдельными контролами.
-- Проп **`color`** игнорируется в оформлении при **`variant="status"`** (важен `status` для точки).
-- Размер без явного `size` зависит от **`ControlSizeProvider`** выше по дереву; вне контекста используется **`m`**.
-- **Иконки** внутри `Badge.Icon` автоматически наследуют размер от `Badge.Root` через `ControlSizeProvider` — не нужно явно указывать размер иконки, если она должна соответствовать размеру бейджа.
+- The badge **does not** replace a button, link, or field; handle clickable scenarios with separate controls.
+- The **`color`** prop is ignored for styling when **`variant="status"`** (`status` drives the dot).
+- Size without an explicit `size` depends on **`ControlSizeProvider`** higher in the tree; outside that context **`m`** is used.
+- **Icons** inside `Badge.Icon` automatically inherit size from `Badge.Root` via `ControlSizeProvider` — you do not need to set icon size explicitly when it should match the badge.
 
-## Связанные компоненты
+## Related components
 
-- **Tag** — интерактивная или съёмная метка с другим UX (закрытие, выбор).
-- **Typography** — основной текст рядом с бейджем.
-- **Button / LinkButton** — если метка должна быть действием, а не подписью.
-- **Kbd** — для отображения сочетаний клавиш, а не статусов.
+- **Tag** — interactive or removable label with different UX (dismiss, selection).
+- **Typography** — primary text next to the badge.
+- **Button / LinkButton** — when the label should be an action, not a caption.
+- **Kbd** — for keyboard shortcuts, not statuses.

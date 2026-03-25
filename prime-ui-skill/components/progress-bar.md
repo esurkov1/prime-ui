@@ -1,22 +1,22 @@
 # ProgressBar
 
-## Что это
+## What it is
 
-Горизонтальный индикатор выполнения на базе нативного элемента `progress`: доля заполнения задаётся числами `value` и `max`, опционально — подпись и размер.
+A horizontal completion indicator built on the native `progress` element: fill ratio is set with `value` and `max`, with optional label and size.
 
-## Для чего нужен
+## When to use it
 
-- **Загрузка и передача данных:** показать, сколько уже отправлено или скачано (байты, пакеты) при нестандартной шкале `max`.
-- **Многошаговые сценарии:** визуально связать пользователя с прогрессом анкеты, чек-листа или мастера настройки («шаг 2 из 5»).
-- **Фоновые операции в продуктиве:** короткий блок «идёт сбор отчёта / индексация» с понятной подписью и без перегрузки интерфейса.
+- **Data upload and transfer:** show how much has been sent or downloaded (bytes, packets) when `max` is not a standard scale.
+- **Multi-step flows:** visually tie the user to progress through a form, checklist, or setup wizard (“step 2 of 5”).
+- **Background work in the product:** a short “building report / indexing” block with a clear label and without cluttering the UI.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример рассчитан на другой тип экрана и набор пропсов.
+Each example targets a different screen type and prop set.
 
-### Базовый
+### Basic
 
-Самый частый случай: шкала до 100, без подписи.
+The most common case: scale up to 100, no label.
 
 ```tsx
 import { ProgressBar } from "prime-ui-kit";
@@ -26,9 +26,9 @@ export function CourseProgressTeaser() {
 }
 ```
 
-### С размерами и плотностью трека
+### Sizes and track density
 
-Та же логика процентов, но визуальная иерархия: компактная полоса в списке и крупная на странице статуса.
+Same percentage logic, but visual hierarchy: a compact bar in a list and a large one on a status page.
 
 ```tsx
 import { ProgressBar } from "prime-ui-kit";
@@ -37,15 +37,15 @@ export function SyncListRow() {
   return (
     <>
       <ProgressBar.Root value={18} max={100} size="s" />
-      <ProgressBar.Root value={18} max={100} size="xl" label="Синхронизация каталога" />
+      <ProgressBar.Root value={18} max={100} size="xl" label="Catalog sync" />
     </>
   );
 }
 ```
 
-### В контексте карточки
+### Inside a card
 
-Полоса между заголовком и пояснением — пользователь видит и процент, и контекст операции.
+The bar sits between the title and supporting copy so the user sees both the percentage and the operation context.
 
 ```tsx
 import { ProgressBar } from "prime-ui-kit";
@@ -55,20 +55,20 @@ export function ReportCard() {
   return (
     <section>
       <Typography.Root size="l" weight="semibold">
-        Формирование выгрузки
+        Building export
       </Typography.Root>
-      <ProgressBar.Root value={72} max={100} size="m" label="Сбор данных" />
+      <ProgressBar.Root value={72} max={100} size="m" label="Collecting data" />
       <Typography.Root size="s" tone="muted">
-        Можно закрыть вкладку: отчёт появится в разделе «Готовые файлы».
+        You can close the tab; the report will appear under “Ready files”.
       </Typography.Root>
     </section>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Значение хранится в состоянии экрана (имитация загрузки, ручной сдвиг, ответ сервера).
+The value lives in screen state (simulated upload, manual step, server response).
 
 ```tsx
 import * as React from "react";
@@ -79,59 +79,59 @@ export function ManualStepsDemo() {
 
   return (
     <>
-      <ProgressBar.Root value={value} max={100} label={`Выполнено: ${value}%`} />
+      <ProgressBar.Root value={value} max={100} label={`Done: ${value}%`} />
       <Button.Root mode="stroke" size="m" variant="neutral" onClick={() => setValue((v) => Math.min(100, v + 10))}>
-        Добавить 10%
+        Add 10%
       </Button.Root>
     </>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`ProgressBar.Root`** — корневая обёртка (`div` с `data-size`), внутри опционально **`span`** с подписью (`label`) и нативный **`<progress>`** с классом трека.
+- **`ProgressBar.Root`** — root wrapper (`div` with `data-size`), optionally a **`span`** for the label (`label`) and a native **`<progress>`** with the track class.
 
-Публичный API: объект `ProgressBar` с единственным полем **`Root`**.
+Public API: a `ProgressBar` object with a single **`Root`** field.
 
 ## API
 
 ### ProgressBar.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `value` | `number` | — | Да | Текущее значение; приводится к диапазону `[0, max]`. |
-| `max` | `number` | `100` | Нет | Верхняя граница; при `max <= 0` используется `100`. |
-| `label` | `string` | — | Нет | Текст над треком; задаёт связь `aria-labelledby` с `progress`. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Высота трека и размер шрифта подписи. |
-| `className` | `string` | — | Нет | Класс на обёртке вокруг подписи и `progress`. |
-| `ref` | `React.Ref<HTMLProgressElement>` | — | Нет | Ref на нативный `progress`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `value` | `number` | — | Yes | Current value; clamped to `[0, max]`. |
+| `max` | `number` | `100` | No | Upper bound; if `max <= 0`, `100` is used. |
+| `label` | `string` | — | No | Text above the track; sets `aria-labelledby` on `progress`. |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track height and label font size. |
+| `className` | `string` | — | No | Class on the wrapper around the label and `progress`. |
+| `ref` | `React.Ref<HTMLProgressElement>` | — | No | Ref to the native `progress`. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет: внешний вид единый для кита. Различия задаются только **`size`** и шириной родительского контейнера (трек на всю ширину обёртки).
+There is no separate `variant` prop: appearance is consistent across the kit. Differences come only from **`size`** and the parent container width (the track spans the full wrapper width).
 
-## Состояния
+## States
 
-- **Заполнение** определяется парой **`value`** / **`max`** (включая 0 и 100%).
-- **Выход за диапазон:** отрицательные значения трактуются как `0`, превышающие `max` — как `max`.
-- Пропов **`disabled`**, **`loading`**, **`error`** у компонента нет; при необходимости неактивность задаётся на уровне экрана (например, скрытие или блокировка всего блока).
+- **Fill** is defined by **`value`** / **`max`** (including 0 and 100%).
+- **Out of range:** negative values are treated as `0`, values above `max` as `max`.
+- There are no **`disabled`**, **`loading`**, or **`error`** props; if you need inactivity, handle it at the screen level (e.g. hide or disable the whole block).
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Используется нативный **`progress`**: роль **`progressbar`** и связь **`value`** / **`max`** с доступным API браузера.
-- При **`label`** подпись получает стабильный `id`, на него ссылается **`aria-labelledby`** у полосы — имя индикатора озвучивается вместе с процентом/долей, которую объявляет система.
-- Клавиатурного фокуса у самой полосы нет (не интерактив); фокус остаётся на кнопках и полях рядом.
+- Uses native **`progress`**: **`progressbar`** role and **`value`** / **`max`** wired to the browser’s accessibility API.
+- With **`label`**, the label gets a stable `id` referenced by **`aria-labelledby`** on the bar so the indicator name is announced together with the percentage/fraction the system reports.
+- The bar itself is not keyboard-focusable (non-interactive); focus stays on nearby buttons and fields.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет режима **неопределённого** прогресса в API: `value` обязателен и всегда клампится; бесконечный спиннер — другой паттерн.
-- Только **горизонтальная** ось; вертикальная полоса в компоненте не поддерживается.
-- Дополнительные HTML-атрибуты на **`progress`** не прокидываются: расширять разметку нужно обёрткой снаружи.
-- Для кругового индикатора в том же ките используется отдельный компонент **ProgressCircle**.
+- No **indeterminate** progress mode in the API: `value` is required and always clamped; an endless spinner is a different pattern.
+- **Horizontal** only; vertical bars are not supported.
+- Extra HTML attributes are not forwarded to **`progress`**; extend markup with an outer wrapper.
+- For a circular indicator in the same kit, use **ProgressCircle**.
 
-## Связанные компоненты
+## Related components
 
-- **ProgressCircle** — круговой прогресс при ограниченном месте или акценте на одном числе.
-- **Typography** — заголовки и вторичный текст вокруг полосы.
-- **Button** — действия «отмена», «пауза» или ручное изменение прогресса рядом с индикатором.
+- **ProgressCircle** — circular progress when space is tight or a single number is emphasized.
+- **Typography** — headings and secondary text around the bar.
+- **Button** — “cancel”, “pause”, or manual progress changes next to the indicator.

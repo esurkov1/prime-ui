@@ -1,20 +1,20 @@
 # Divider
 
-## Что это
+## What it is
 
-`Divider` — визуальный разделитель контента: горизонтальная или вертикальная линия, опционально с подписью или иконкой.
+`Divider` is a visual content separator: a horizontal or vertical line, optionally with a label or icon.
 
-## Для чего нужен
+## What it’s for
 
-- **Личный кабинет и платежи** — отделить блок «способ оплаты» от итогов заказа или истории транзакций без лишней «рамки».
-- **Каталог и карточка товара** — визуально разбить длинное описание, характеристики и отзывы, сохраняя единый столбец.
-- **Внутренние инструменты** — сгруппировать действия в панели (фильтр | сортировка | экспорт) вертикальными чертами между пунктами.
+- **Account and payments** — separate the “payment method” block from order totals or transaction history without an extra “frame”.
+- **Catalog and product card** — visually break up long descriptions, specs, and reviews while keeping a single column.
+- **Internal tools** — group actions in a panel (filter | sort | export) with vertical bars between items.
 
-## Юзкейсы
+## Use cases
 
-### Базовый
+### Basic
 
-Самый частый случай: горизонтальная линия между абзацами или сплошная линия без текста.
+The most common case: a horizontal line between paragraphs, or a solid line with no text.
 
 ```tsx
 import { Divider } from "prime-ui-kit";
@@ -22,19 +22,19 @@ import { Divider } from "prime-ui-kit";
 export function OrderSummary() {
   return (
     <section>
-      <p>Состав заказа: 3 позиции</p>
+      <p>Order contents: 3 items</p>
       <Divider.Root />
-      <p>Доставка: завтра, 10:00–14:00</p>
-      <Divider.Root size="m">Итого</Divider.Root>
-      <p>12 400 ₽</p>
+      <p>Delivery: tomorrow, 10:00–14:00</p>
+      <Divider.Root size="m">Total</Divider.Root>
+      <p>12,400 ₽</p>
     </section>
   );
 }
 ```
 
-### С вариантами и размерами
+### Variants and sizes
 
-Другой контекст — настройки приложения: секции с подписью в стиле `text` и компактный маркер `line-spacing` между блоками в колонке с `gap`.
+Another context — app settings: sections with a `text`-style label and a compact `line-spacing` marker between blocks in a column with `gap`.
 
 ```tsx
 import { Checkbox, Divider } from "prime-ui-kit";
@@ -43,23 +43,23 @@ export function NotificationSettings() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 360 }}>
       <Divider.Root variant="text" size="l">
-        Push-уведомления
+        Push notifications
       </Divider.Root>
       <Checkbox.Root size="m">
-        <Checkbox.Label>Новости продукта</Checkbox.Label>
+        <Checkbox.Label>Product news</Checkbox.Label>
       </Checkbox.Root>
       <Divider.Root variant="line-spacing" size="m" />
       <Checkbox.Root size="m">
-        <Checkbox.Label>Напоминания о событиях</Checkbox.Label>
+        <Checkbox.Label>Event reminders</Checkbox.Label>
       </Checkbox.Root>
     </div>
   );
 }
 ```
 
-### В контексте (карточка и панель)
+### In context (card and panel)
 
-Экран документа или статьи: узкая колонка текста и полноширинная линия по краю карточки; отдельно — панель с вертикальными разделителями.
+Document or article screen: a narrow text column and a full-width line at the card edge; separately — a panel with vertical dividers.
 
 ```tsx
 import { Divider } from "prime-ui-kit";
@@ -67,10 +67,10 @@ import { Divider } from "prime-ui-kit";
 export function ArticleCard() {
   return (
     <article style={{ maxWidth: 320, padding: 16, border: "1px solid #e5e5e5", borderRadius: 8 }}>
-      <h2 style={{ margin: "0 0 8px" }}>Черновик</h2>
-      <p style={{ margin: 0 }}>Текст превью…</p>
+      <h2 style={{ margin: "0 0 8px" }}>Draft</h2>
+      <p style={{ margin: 0 }}>Preview text…</p>
       <Divider.Root size="m" style={{ margin: "12px 0" }} />
-      <p style={{ margin: 0, fontSize: 14 }}>Обновлено сегодня</p>
+      <p style={{ margin: 0, fontSize: 14 }}>Updated today</p>
     </article>
   );
 }
@@ -78,19 +78,19 @@ export function ArticleCard() {
 export function EditorToolbar() {
   return (
     <div style={{ display: "flex", alignItems: "stretch", gap: 8, height: 40 }}>
-      <span style={{ alignSelf: "center" }}>Жирный</span>
+      <span style={{ alignSelf: "center" }}>Bold</span>
       <Divider.Root orientation="vertical" size="m" />
-      <span style={{ alignSelf: "center" }}>Курсив</span>
+      <span style={{ alignSelf: "center" }}>Italic</span>
       <Divider.Root orientation="vertical" size="m" />
-      <span style={{ alignSelf: "center" }}>Ссылка</span>
+      <span style={{ alignSelf: "center" }}>Link</span>
     </div>
   );
 }
 ```
 
-### Подпись с иконкой и декоративная линия
+### Label with icon and decorative line
 
-Раздел «Контакты» с иконкой в подписи; отдельно — линия только для сетки макета, скрытая от вспомогательных технологий.
+A “Contacts” section with an icon in the label; separately — a line used only for layout, hidden from assistive technologies.
 
 ```tsx
 import { Divider } from "prime-ui-kit";
@@ -107,7 +107,7 @@ export function ProfileContacts() {
   return (
     <>
       <Divider.Root variant="text" size="m">
-        <MailIcon /> Связаться
+        <MailIcon /> Get in touch
       </Divider.Root>
       <Divider.Root size="m" role="presentation" aria-hidden />
     </>
@@ -115,49 +115,49 @@ export function ProfileContacts() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-Плоский API: **`Divider.Root`** рендерит один `div` с псевдоэлементами `::before` и `::after` (линии). При наличии `children` внутрь попадает `span` с классом контента; для `children` включается `ControlSizeProvider` с тем же `size`, что у корня.
+Flat API: **`Divider.Root`** renders a single `div` with `::before` and `::after` pseudo-elements (the lines). When `children` are present, they go inside a `span` with the content class; for `children`, `ControlSizeProvider` is enabled with the same `size` as the root.
 
 ## API
 
 ### Divider.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| orientation | `"horizontal"` \| `"vertical"` | `"horizontal"` | Нет | Горизонтальная линия на ширину ряда или вертикальная между соседями. |
-| align | `"start"` \| `"center"` \| `"end"` | `center` для `variant="default"`, `start` для `variant="text"` | Нет | Длина отрезка линии слева/справа от подписи. |
-| variant | `"default"` \| `"line-spacing"` \| `"text"` | `"default"` | Нет | Режим оформления и участие в раскладке flex-колонки (`line-spacing`). |
-| size | `"s"` \| `"m"` \| `"l"` \| `"xl"` | `"m"` | Нет | Токены зазора, типографики подписи и размера иконки в контенте. |
-| children | `React.ReactNode` | — | Нет | Подпись, иконка+текст или отсутствует (сплошная линия). |
-| className | `string` | — | Нет | Дополнительный класс корня. |
-| role | `string` | `"separator"` | Нет | Семантика элемента; для декора часто `presentation`. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | Нет | В т.ч. `aria-*`, `data-*`, обработчики. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| orientation | `"horizontal"` \| `"vertical"` | `"horizontal"` | No | Horizontal line across the row or vertical between siblings. |
+| align | `"start"` \| `"center"` \| `"end"` | `center` for `variant="default"`, `start` for `variant="text"` | No | Length of the line segment left/right of the label. |
+| variant | `"default"` \| `"line-spacing"` \| `"text"` | `"default"` | No | Styling mode and participation in flex column layout (`line-spacing`). |
+| size | `"s"` \| `"m"` \| `"l"` \| `"xl"` | `"m"` | No | Tokens for spacing, label typography, and icon size in content. |
+| children | `React.ReactNode` | — | No | Label, icon + text, or omitted (solid line). |
+| className | `string` | — | No | Extra class on the root. |
+| role | `string` | `"separator"` | No | Element semantics; for decoration, often `presentation`. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Including `aria-*`, `data-*`, handlers. |
 
-## Варианты
+## Variants
 
-- **`default`** — линия с опциональной подписью по центру (или пустая линия на всю ширину ряда).
-- **`line-spacing`** — не растягивается в flex-колонке; ритм между блоками задаёт `gap` у родителя, сам разделитель — визуальный штрих между ними.
-- **`text`** — подпись в стиле заголовка секции (верхний регистр, приглушённый цвет); по умолчанию `align="start"`.
+- **`default`** — line with an optional centered label (or empty line full width of the row).
+- **`line-spacing`** — does not stretch in a flex column; rhythm between blocks comes from the parent’s `gap`; the divider is a visual stroke between them.
+- **`text`** — label styled like a section heading (uppercase, muted color); defaults to `align="start"`.
 
-## Состояния
+## States
 
-Интерактивных состояний (`disabled`, `loading` и т.п.) нет: компонент декоративный. Поведение можно дополнить через стандартные HTML-атрибуты корня (например `aria-hidden` вместе со сменой `role`).
+There are no interactive states (`disabled`, `loading`, etc.): the component is decorative. Behavior can be extended via standard root HTML attributes (e.g. `aria-hidden` together with a changed `role`).
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- По умолчанию **`role="separator"`**; для **`orientation="vertical"`** добавляется **`aria-orientation="vertical"`**.
-- Если линия не несёт смысла для скринридеров, задайте **`role="presentation"`** (или **`none`**) и **`aria-hidden`**, чтобы не дублировать структуру, которую уже передаёт текст рядом.
-- Вертикальный разделитель в панели не фокусируется сам по себе; фокус остаётся на соседних кнопках или ссылках.
+- By default **`role="separator"`**; for **`orientation="vertical"`**, **`aria-orientation="vertical"`** is added.
+- If the line carries no meaning for screen readers, set **`role="presentation"`** (or **`none`**) and **`aria-hidden`** so you don’t duplicate structure already conveyed by nearby text.
+- A vertical divider in a panel is not focusable by itself; focus stays on adjacent buttons or links.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Не заменяет семантические границы документа (`section`/`hr` по смыслу): при необходимости сочетайте с правильной разметкой страницы.
-- Вертикальный режим требует **ограниченной высоты** у flex-родителя (`align-items: stretch`), иначе линия не будет видна.
-- Визуальный «номинальный» размер в CSS на ступень ниже переданного `data-size` (комментарий в стилях компонента) — учитывайте при согласовании с соседними контролами.
+- Does not replace semantic document boundaries (`section` / meaningful `hr`): combine with correct page markup when needed.
+- Vertical mode needs a **bounded height** on the flex parent (`align-items: stretch`), otherwise the line won’t show.
+- The visual “nominal” size in CSS is one step below the passed `data-size` (note in component styles) — keep in mind when aligning with neighboring controls.
 
-## Связанные компоненты
+## Related components
 
-- **Typography** — основной текст рядом с подписью разделителя.
-- **Button** / **Link button** — пункты панели, между которыми ставят вертикальный `Divider`.
-- **Tabs**, **Accordion** — альтернативы, когда нужна не линия, а переключаемая структура разделов.
+- **Typography** — primary text next to the divider label.
+- **Button** / **Link button** — toolbar items separated by a vertical `Divider`.
+- **Tabs**, **Accordion** — alternatives when you need switchable section structure, not a line.

@@ -1,32 +1,32 @@
 # Sidebar
 
-## Что это
+## What it is
 
-Композитная боковая навигация: корень с контекстом состояния, опциональная узкая колонка разделов и основная панель с группами пунктов, заголовками и подвалом.
+Composite side navigation: a root with state context, an optional narrow section column, and a main panel with item groups, headings, and a footer.
 
-## Для чего нужен
+## What it’s for
 
-- **Рабочие пространства и переключение продуктов** — слева иконки CRM, биллинга и поддержки; справа список сущностей выбранного продукта без смены всего макета.
-- **Порталы документации** — сворачиваемые категории оглавления, дерево страниц и длинные списки глав с компактной панелью и отдельным слотом контента.
-- **Логистика и операционные панели** — узкая колонка «Fleet / Warehouse» и детальное меню маршрутов, ТС и заявок с счётчиками в строках.
-- **Настройки и мастер-формы** — одна колонка разделов настроек; открытость панели и режим simple/double можно вести из родителя вместе с маршрутом.
-- **Витрины и каталоги** — сайдбар в слоте навигации страницы на всю высоту рядом с фильтрами и сеткой товаров (`sidebarSlot`, компактная ширина панели).
-- **Приложения с маршрутизацией** — пункты на `NavLink` и хук `useSidebarNavTo`, чтобы не дублировать префикс раздела в каждом `to`.
+- **Workspaces and product switching** — CRM, billing, and support icons on the left; a list of entities for the selected product on the right without changing the whole layout.
+- **Documentation portals** — collapsible TOC categories, page trees, and long chapter lists with a compact panel and a separate content slot.
+- **Logistics and ops dashboards** — a narrow “Fleet / Warehouse” column and detailed menus for routes, vehicles, and tickets with row counters.
+- **Settings and wizard forms** — one column for settings sections; panel open state and simple/double mode can be driven from the parent together with routing.
+- **Storefronts and catalogs** — sidebar in the page navigation slot full height next to filters and product grids (`sidebarSlot`, compact panel width).
+- **Routed apps** — items on `NavLink` and the `useSidebarNavTo` hook so you don’t repeat the section prefix in every `to`.
 
-## Юзкейсы
+## Use cases
 
-Импорт из пакета `prime-ui-kit`. Ниже сценарии из разных областей; комбинации API не повторяют одну и ту же задачу.
+Import from the `prime-ui-kit` package. Below are scenarios from different domains; API combinations do not repeat the same task.
 
-### Базовый
+### Basic
 
-Одна панель для внутреннего инструмента команды: шапка, группа пунктов, подвал с профилем.
+One panel for an internal team tool: header, item group, footer with profile.
 
 ```tsx
 import { Avatar, Sidebar } from "prime-ui-kit";
 
 export function TeamToolNav() {
   return (
-    <Sidebar.Root size="m" variant="simple" defaultOpen aria-label="Навигация инструмента">
+    <Sidebar.Root size="m" variant="simple" defaultOpen aria-label="Tool navigation">
       <Sidebar.NavPanel>
         <Sidebar.Header>
           <Sidebar.HeaderRow>
@@ -43,17 +43,17 @@ export function TeamToolNav() {
         </Sidebar.Header>
         <Sidebar.Content>
           <Sidebar.Group>
-            <Sidebar.GroupLabel>Сервисы</Sidebar.GroupLabel>
+            <Sidebar.GroupLabel>Services</Sidebar.GroupLabel>
             <Sidebar.Menu>
               <Sidebar.MenuItem>
                 <Sidebar.MenuButton type="button" active>
-                  <Sidebar.MenuLabel>Инциденты</Sidebar.MenuLabel>
+                  <Sidebar.MenuLabel>Incidents</Sidebar.MenuLabel>
                   <Sidebar.MenuTrailing>4</Sidebar.MenuTrailing>
                 </Sidebar.MenuButton>
               </Sidebar.MenuItem>
               <Sidebar.MenuItem>
                 <Sidebar.MenuButton type="button">
-                  <Sidebar.MenuLabel>Смены</Sidebar.MenuLabel>
+                  <Sidebar.MenuLabel>Shifts</Sidebar.MenuLabel>
                 </Sidebar.MenuButton>
               </Sidebar.MenuItem>
             </Sidebar.Menu>
@@ -63,11 +63,11 @@ export function TeamToolNav() {
           <Sidebar.IdentityButton
             leading={
               <Avatar.Root size="s">
-                <Avatar.Fallback>ИП</Avatar.Fallback>
+                <Avatar.Fallback>IP</Avatar.Fallback>
               </Avatar.Root>
             }
-            title="Иван Петров"
-            subtitle="Дежурный"
+            title="Ivan Petrov"
+            subtitle="On call"
             type="button"
           />
         </Sidebar.Footer>
@@ -77,9 +77,9 @@ export function TeamToolNav() {
 }
 ```
 
-### С вариантами/размерами
+### Variants and sizes
 
-Образовательный портал: крупный размер, компактная ширина панели и сворачиваемый блок оглавления.
+Learning portal: large size, compact panel width, and a collapsible TOC block.
 
 ```tsx
 import { Sidebar } from "prime-ui-kit";
@@ -97,13 +97,13 @@ export function CourseOutlineNav() {
       open={open}
       onOpenChange={setOpen}
       responsive={false}
-      aria-label="Оглавление курса"
+      aria-label="Course outline"
     >
       <Sidebar.NavPanel>
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
-              <Sidebar.NavPanelHeading>Модуль 3</Sidebar.NavPanelHeading>
+              <Sidebar.NavPanelHeading>Module 3</Sidebar.NavPanelHeading>
             </Sidebar.HeaderMain>
             <Sidebar.ToggleButton />
           </Sidebar.HeaderRow>
@@ -115,14 +115,14 @@ export function CourseOutlineNav() {
               aria-expanded={expanded}
               onClick={() => setExpanded((v) => !v)}
             >
-              <Sidebar.NavCategoryLabel>Лекции</Sidebar.NavCategoryLabel>
+              <Sidebar.NavCategoryLabel>Lectures</Sidebar.NavCategoryLabel>
               <Sidebar.NavCategoryCount>6</Sidebar.NavCategoryCount>
             </Sidebar.NavCategoryTrigger>
             {expanded ? (
               <Sidebar.NavCategoryPanel>
                 <Sidebar.NavDocTree>
-                  <Sidebar.Text>Введение в тему</Sidebar.Text>
-                  <Sidebar.Text>Практика</Sidebar.Text>
+                  <Sidebar.Text>Introduction</Sidebar.Text>
+                  <Sidebar.Text>Practice</Sidebar.Text>
                 </Sidebar.NavDocTree>
               </Sidebar.NavCategoryPanel>
             ) : null}
@@ -134,9 +134,9 @@ export function CourseOutlineNav() {
 }
 ```
 
-### В контексте (макет страницы)
+### In context (page layout)
 
-Витрина: сайдбар в слоте навигации рядом с зоной контента, без адаптивного оверлея в этом фрейме.
+Storefront: sidebar in the navigation slot next to the content area, without a responsive overlay in this frame.
 
 ```tsx
 import { Sidebar } from "prime-ui-kit";
@@ -150,13 +150,13 @@ export function StorefrontShell() {
         sidebarSlot="page-nav"
         defaultOpen
         responsive={false}
-        aria-label="Категории витрины"
+        aria-label="Storefront categories"
       >
         <Sidebar.NavPanel>
           <Sidebar.Header>
             <Sidebar.HeaderRow>
               <Sidebar.HeaderMain>
-                <Sidebar.Text>Каталог</Sidebar.Text>
+                <Sidebar.Text>Catalog</Sidebar.Text>
               </Sidebar.HeaderMain>
               <Sidebar.ToggleButton />
             </Sidebar.HeaderRow>
@@ -165,27 +165,27 @@ export function StorefrontShell() {
             <Sidebar.Menu>
               <Sidebar.MenuItem>
                 <Sidebar.MenuButton type="button" active>
-                  <Sidebar.MenuLabel>Новинки</Sidebar.MenuLabel>
+                  <Sidebar.MenuLabel>New arrivals</Sidebar.MenuLabel>
                 </Sidebar.MenuButton>
               </Sidebar.MenuItem>
               <Sidebar.MenuItem>
                 <Sidebar.MenuLink href="/sale" active={false}>
-                  Распродажа
+                  Sale
                 </Sidebar.MenuLink>
               </Sidebar.MenuItem>
             </Sidebar.Menu>
           </Sidebar.Content>
         </Sidebar.NavPanel>
       </Sidebar.Root>
-      <main style={{ flex: 1, padding: 24 }}>Сетка товаров</main>
+      <main style={{ flex: 1, padding: 24 }}>Product grid</main>
     </div>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Админка: родитель держит открытость и режим колонок, чтобы синхронизировать с пользовательской настройкой «компактной навигации».
+Admin: parent owns open state and column mode to sync with a user “compact navigation” preference.
 
 ```tsx
 import { Sidebar } from "prime-ui-kit";
@@ -206,7 +206,7 @@ export function AdminNavControlled() {
       open={open}
       onOpenChange={setOpen}
       responsive={false}
-      aria-label="Администрирование"
+      aria-label="Administration"
     >
       {variant === "double" ? (
         <Sidebar.ContextBar
@@ -220,7 +220,7 @@ export function AdminNavControlled() {
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
-              <Sidebar.Text>Панель</Sidebar.Text>
+              <Sidebar.Text>Panel</Sidebar.Text>
             </Sidebar.HeaderMain>
             <Sidebar.ToggleButton />
           </Sidebar.HeaderRow>
@@ -233,7 +233,7 @@ export function AdminNavControlled() {
                   <Sidebar.Menu>
                     <Sidebar.MenuItem>
                       <Sidebar.MenuButton type="button" active>
-                        <Sidebar.MenuLabel>Учётные записи</Sidebar.MenuLabel>
+                        <Sidebar.MenuLabel>User accounts</Sidebar.MenuLabel>
                       </Sidebar.MenuButton>
                     </Sidebar.MenuItem>
                   </Sidebar.Menu>
@@ -244,7 +244,7 @@ export function AdminNavControlled() {
                   <Sidebar.Menu>
                     <Sidebar.MenuItem>
                       <Sidebar.MenuButton type="button" active>
-                        <Sidebar.MenuLabel>Счета</Sidebar.MenuLabel>
+                        <Sidebar.MenuLabel>Invoices</Sidebar.MenuLabel>
                       </Sidebar.MenuButton>
                     </Sidebar.MenuItem>
                   </Sidebar.Menu>
@@ -259,9 +259,9 @@ export function AdminNavControlled() {
 }
 ```
 
-### Маршруты и `useSidebarNavTo`
+### Routes and `useSidebarNavTo`
 
-SPA с React Router: двухуровневая навигация и короткие пути внутри раздела.
+SPA with React Router: two-level navigation and short paths inside a section.
 
 ```tsx
 import { Sidebar, useSidebarNavTo } from "prime-ui-kit";
@@ -275,12 +275,12 @@ function PanelRoutes() {
       <Sidebar.Menu>
         <Sidebar.MenuItem>
           <Sidebar.MenuRouterLink to={toList} end>
-            <Sidebar.MenuLabel>Все заявки</Sidebar.MenuLabel>
+            <Sidebar.MenuLabel>All tickets</Sidebar.MenuLabel>
           </Sidebar.MenuRouterLink>
         </Sidebar.MenuItem>
         <Sidebar.MenuItem>
           <Sidebar.MenuRouterLink to={toNew}>
-            <Sidebar.MenuLabel>Новая</Sidebar.MenuLabel>
+            <Sidebar.MenuLabel>New</Sidebar.MenuLabel>
           </Sidebar.MenuRouterLink>
         </Sidebar.MenuItem>
       </Sidebar.Menu>
@@ -290,7 +290,7 @@ function PanelRoutes() {
 
 export function TicketsSidebar() {
   return (
-    <Sidebar.Root variant="double" defaultActiveSection="desk" aria-label="Заявки">
+    <Sidebar.Root variant="double" defaultActiveSection="desk" aria-label="Tickets">
       <Sidebar.ContextBar
         items={[
           { id: "desk", label: "Desk", icon: <span aria-hidden>📋</span> },
@@ -304,7 +304,7 @@ export function TicketsSidebar() {
               desk: <PanelRoutes />,
               archive: (
                 <Sidebar.NavPanelBody>
-                  <Sidebar.Text>Архивные обращения</Sidebar.Text>
+                  <Sidebar.Text>Archived requests</Sidebar.Text>
                 </Sidebar.NavPanelBody>
               ),
             }}
@@ -316,161 +316,161 @@ export function TicketsSidebar() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
 ```
-Sidebar.Root (контекст + aside)
-├── Sidebar.ContextBar? (опционально при variant="double")
+Sidebar.Root (context + aside)
+├── Sidebar.ContextBar? (optional when variant="double")
 │   ├── [logo] ContextBarHeader
-│   ├── ContextBarBody → список ContextItemButton (+ Tooltip из кита при items)
+│   ├── ContextBarBody → list of ContextItemButton (+ kit Tooltip when using items)
 │   └── [footer] ContextBarFooter
 └── Sidebar.NavPanel
     ├── Sidebar.Header
     │   └── Sidebar.HeaderRow → Sidebar.HeaderMain | Sidebar.ToggleButton
     ├── Sidebar.Content
-    │   ├── Sidebar.PanelSwitch? (контент по activeSection)
+    │   ├── Sidebar.PanelSwitch? (content by activeSection)
     │   ├── Sidebar.NavCategory → Trigger, Label, Count, Panel, NavDocTree
     │   └── Sidebar.Group → GroupLabel, Menu → MenuItem → MenuButton | MenuLink | MenuRouterLink, MenuAction, MenuIcon, MenuLabel, MenuTrailing
-    └── Sidebar.Footer → IdentityButton и др.
+    └── Sidebar.Footer → IdentityButton, etc.
 ```
 
-Плавающая кнопка открытия и подложка рендерятся на `Sidebar.Root` при закрытой панели в адаптивном режиме.
+The floating open button and backdrop render on `Sidebar.Root` when the panel is closed in responsive mode.
 
 ## API
 
 ### Sidebar.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Масштаб контролов и ширин колонок. |
-| variant | `"simple" \| "double"` | из defaultVariant | Нет | Одна или две колонки. |
-| defaultVariant | `"simple" \| "double"` | `"double"` | Нет | Начальный variant. |
-| onVariantChange | `(v) => void` | — | Нет | Смена variant. |
-| activeSection | `string` | — | Нет | Активный раздел верхнего яруса. |
-| defaultActiveSection | `string` | — | Нет | Начальный раздел. |
-| onActiveSectionChange | `(section: string) => void` | — | Нет | Уведомление о выборе раздела. |
-| open | `boolean` | — | Нет | Контролируемое открытие панели. |
-| defaultOpen | `boolean` | `true` (на широком viewport при responsive) | Нет | Начальное open. |
-| onOpenChange | `(open: boolean) => void` | — | Нет | Смена open. |
-| responsive | `boolean` | `true` | Нет | Поведение при max-width 64rem. |
-| panelWidth | `"compact"` | — | Нет | Узкая панель. |
-| sidebarSlot | `"page-nav"` | — | Нет | Режим в слоте рядом с контентом. |
-| aria-label | `string` | `"Sidebar"` | Нет | Подпись aside. |
-| className | `string` | — | Нет | Доп. класс. |
-| children | `ReactNode` | — | Да | Разметка внутри корня. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Scale for controls and column widths. |
+| variant | `"simple" \| "double"` | from defaultVariant | No | One or two columns. |
+| defaultVariant | `"simple" \| "double"` | `"double"` | No | Initial variant. |
+| onVariantChange | `(v) => void` | — | No | Variant change callback. |
+| activeSection | `string` | — | No | Active top-level section. |
+| defaultActiveSection | `string` | — | No | Initial section. |
+| onActiveSectionChange | `(section: string) => void` | — | No | Section selection notification. |
+| open | `boolean` | — | No | Controlled panel open state. |
+| defaultOpen | `boolean` | `true` (on wide viewport when responsive) | No | Initial open. |
+| onOpenChange | `(open: boolean) => void` | — | No | Open state change. |
+| responsive | `boolean` | `true` | No | Behavior at max-width 64rem. |
+| panelWidth | `"compact"` | — | No | Narrow panel. |
+| sidebarSlot | `"page-nav"` | — | No | Slot mode next to page content. |
+| aria-label | `string` | `"Sidebar"` | No | Aside label. |
+| className | `string` | — | No | Extra class. |
+| children | `ReactNode` | — | Yes | Markup inside the root. |
 
 ### Sidebar.ContextBar
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| items | `SidebarContextItem[]` | — | Нет | id, label, icon; опционально tooltip, ariaLabel, disabled. |
-| activeSection | `string \| null` | из контекста | Нет | Подсветка пункта. |
-| onSelectSection | `(id: string) => void` | контекст | Нет | Выбор раздела. |
-| logo | `ReactNode` | — | Нет | Верх контекстной колонки. |
-| footer | `ReactNode` | — | Нет | Низ колонки. |
-| className, children, … | — | — | Нет | При отсутствии `items` — произвольная разметка в `nav`. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| items | `SidebarContextItem[]` | — | No | id, label, icon; optional tooltip, ariaLabel, disabled. |
+| activeSection | `string \| null` | from context | No | Item highlight. |
+| onSelectSection | `(id: string) => void` | context | No | Section selection. |
+| logo | `ReactNode` | — | No | Top of the context column. |
+| footer | `ReactNode` | — | No | Bottom of the column. |
+| className, children, … | — | — | No | Without `items` — arbitrary markup in `nav`. |
 
 ### Sidebar.ContextItemButton
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| active | `boolean` | — | Нет | data-active. |
-| asChild | `boolean` | `false` | Нет | Slot вместо button. |
-| type | `"button" \| …` | `"button"` | Нет | Тип кнопки. |
-| disabled | `boolean` | — | Нет | Блокировка. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| active | `boolean` | — | No | data-active. |
+| asChild | `boolean` | `false` | No | Slot instead of button. |
+| type | `"button" \| …` | `"button"` | No | Button type. |
+| disabled | `boolean` | — | No | Disabled state. |
 
-Остальные пропсы — как у `button` (или дочернего элемента при `asChild`).
+Other props match `button` (or the child element when `asChild`).
 
 ### Sidebar.PanelSwitch
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| sections | `Record<string, ReactNode>` | — | Нет | Карта раздел → контент. |
-| renderSection | `(activeSection) => ReactNode` | — | Нет | Приоритет над sections. |
-| fallback | `ReactNode` | `null` | Нет | Если ключ не найден. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| sections | `Record<string, ReactNode>` | — | No | Map of section → content. |
+| renderSection | `(activeSection) => ReactNode` | — | No | Takes precedence over sections. |
+| fallback | `ReactNode` | `null` | No | If key is missing. |
 
 ### Sidebar.Footer
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| variant | `"plain" \| "inset"` | `"plain"` | Нет | Вариант отступов. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| variant | `"plain" \| "inset"` | `"plain"` | No | Spacing variant. |
 
 ### Sidebar.IdentityButton
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| leading | `ReactNode` | — | Нет | Слева. |
-| title | `ReactNode` | — | Да | Основная строка. |
-| subtitle | `ReactNode` | — | Нет | Вторая строка. |
-| trailing | `ReactNode` | иконка | Нет | Справа. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| leading | `ReactNode` | — | No | Left side. |
+| title | `ReactNode` | — | Yes | Primary line. |
+| subtitle | `ReactNode` | — | No | Secondary line. |
+| trailing | `ReactNode` | icon | No | Right side. |
 
-`children` не используется; остальное — атрибуты `button`.
+`children` is unused; the rest are `button` attributes.
 
 ### Sidebar.ToggleButton
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| openLabel | `string` | «Скрыть сайдбар» | Нет | aria-label при open. |
-| closedLabel | `string` | «Открыть сайдбар» | Нет | aria-label при закрытии. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| openLabel | `string` | “Hide sidebar” | No | aria-label when open. |
+| closedLabel | `string` | “Show sidebar” | No | aria-label when closed. |
 
-Вызывает `toggleOpen` из контекста после `onClick`, если не `preventDefault`.
+Calls `toggleOpen` from context after `onClick` unless `preventDefault`.
 
 ### Sidebar.MenuButton / MenuLink / MenuRouterLink
 
-- **MenuButton** — `active`, `asChild`, `type`, `disabled` и пропсы `button`.
-- **MenuLink** — `active` и пропсы `a`.
-- **MenuRouterLink** — пропсы `NavLink` из react-router-dom (`to`, `className`, `end`, …); стили пункта меню накладываются поверх.
+- **MenuButton** — `active`, `asChild`, `type`, `disabled`, and `button` props.
+- **MenuLink** — `active` and `a` props.
+- **MenuRouterLink** — props from react-router-dom `NavLink` (`to`, `className`, `end`, …); menu item styles are layered on top.
 
 ### Sidebar.MenuAction
 
-Компактная кнопка в строке `MenuItem`; пропсы `button`.
+Compact button in a `MenuItem` row; `button` props.
 
-### Прочие обёртки
+### Other wrappers
 
-`ContextBarHeader`, `ContextBarBody`, `ContextBarFooter`, `NavPanel`, `NavPanelBody`, `NavDocTree`, `NavPanelHeading`, `NavCategory`, `NavCategoryTrigger`, `NavCategoryLabel`, `NavCategoryCount`, `NavCategoryPanel`, `Header`, `HeaderRow`, `HeaderMain`, `Content`, `Group`, `GroupLabel`, `Menu`, `MenuItem`, `MenuIcon`, `MenuLabel`, `MenuTrailing`, `Text` — семантические контейнеры с `className`, `children` и стандартными HTML-атрибутами соответствующего элемента.
+`ContextBarHeader`, `ContextBarBody`, `ContextBarFooter`, `NavPanel`, `NavPanelBody`, `NavDocTree`, `NavPanelHeading`, `NavCategory`, `NavCategoryTrigger`, `NavCategoryLabel`, `NavCategoryCount`, `NavCategoryPanel`, `Header`, `HeaderRow`, `HeaderMain`, `Content`, `Group`, `GroupLabel`, `Menu`, `MenuItem`, `MenuIcon`, `MenuLabel`, `MenuTrailing`, `Text` — semantic containers with `className`, `children`, and standard HTML attributes for the corresponding element.
 
 ### useSidebarContext()
 
-Возвращает: `size`, `variant`, `setVariant`, `activeSection`, `setActiveSection`, `open`, `setOpen`, `toggleOpen`. Должен вызываться под `Sidebar.Root`.
+Returns: `size`, `variant`, `setVariant`, `activeSection`, `setActiveSection`, `open`, `setOpen`, `toggleOpen`. Must be used under `Sidebar.Root`.
 
 ### useSidebarNavTo(pathWithinSection: string)
 
-Возвращает строку пути: при `variant === "double"` и выбранном разделе — `/{activeSection}/{path}` (слэши в аргументе нормализуются), иначе путь от корня.
+Returns a path string: when `variant === "double"` and a section is selected — `/{activeSection}/{path}` (slashes in the argument are normalized); otherwise path from the root.
 
-## Варианты
+## Variants
 
-- **variant `simple`** — только `NavPanel`; контекстная колонка скрыта (`data-collapsed` на корне для стилей).
-- **variant `double`** — `ContextBar` + `NavPanel`, между ними зазор по токенам.
-- **panelWidth `compact`** — уже основная панель.
-- **sidebarSlot `page-nav`** — отступы и высота для колонки в общем макете страницы.
-- **Footer `inset`** — визуально «вдавленный» подвал.
+- **variant `simple`** — only `NavPanel`; context column hidden (`data-collapsed` on root for styling).
+- **variant `double`** — `ContextBar` + `NavPanel`, gap between them from tokens.
+- **panelWidth `compact`** — narrower main panel.
+- **sidebarSlot `page-nav`** — padding and height for the column in the shared page layout.
+- **Footer `inset`** — visually “inset” footer.
 
-## Состояния
+## States
 
-- **open** — панель выдвинута; при `responsive` и узком окне — оверлей и фокусируемая подложка «Закрыть сайдбар».
-- **disabled** на пунктах контекста и меню — сниженная непрозрачность, блокировка клика; в `asChild` пробрасывается `aria-disabled`.
-- **active** на `MenuButton` / `MenuLink` или `aria-current` у `NavLink` — подсветка текущего пункта.
-- Плавающая кнопка на корне при закрытой панели в адаптивном сценарии.
+- **open** — panel expanded; with `responsive` and a narrow window — overlay and focusable “Close sidebar” backdrop.
+- **disabled** on context and menu items — reduced opacity, click blocked; with `asChild`, `aria-disabled` is forwarded.
+- **active** on `MenuButton` / `MenuLink` or `aria-current` on `NavLink` — current item highlight.
+- Floating button on root when panel is closed in the responsive scenario.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Корневой `aside` с настраиваемым `aria-label`.
-- Подложка закрытия при оверлее получает доступное имя и фокус только когда видима.
-- `ToggleButton` и плавающая кнопка меняют `aria-label` в зависимости от `open`.
-- `ContextBar` с `items` оборачивает пункты в `Tooltip` для подписи; задавайте `ariaLabel` у элемента, если метка отличается от иконки.
-- `MenuIcon`, `MenuTrailing` с `aria-hidden` там, где роль несёт `MenuLabel` или `aria-label` кнопки.
+- Root `aside` with configurable `aria-label`.
+- Close backdrop on overlay gets an accessible name and focus only when visible.
+- `ToggleButton` and floating button change `aria-label` based on `open`.
+- `ContextBar` with `items` wraps items in `Tooltip` for labels; set `ariaLabel` on the item when the label differs from the icon.
+- `MenuIcon`, `MenuTrailing` with `aria-hidden` where `MenuLabel` or the button `aria-label` carries the role.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Порог адаптивности завязан на **ширину окна** (`matchMedia("(max-width: 64rem)")`), а не на ширину контейнера превью.
-- `useSidebarNavTo` осмыслен в первую очередь при `variant="double"` и ненулевом `activeSection`.
-- `MenuRouterLink` требует провайдера React Router выше по дереву.
-- `onActiveSectionChange` не вызывается при сбросе активного раздела в `null` внутри контролируемого состояния.
+- Responsive threshold is tied to **window width** (`matchMedia("(max-width: 64rem)")`), not the preview container width.
+- `useSidebarNavTo` is mainly meaningful with `variant="double"` and a non-empty `activeSection`.
+- `MenuRouterLink` requires a React Router provider above in the tree.
+- `onActiveSectionChange` is not fired when the active section is reset to `null` inside controlled state.
 
-## Связанные компоненты
+## Related components
 
-- **Tooltip** — подписи к узким иконкам в `ContextBar` при использовании `items`.
-- **Dropdown** — часто оборачивает `IdentityButton` для меню пользователя или темы.
-- **Avatar** — в `IdentityButton.leading`.
-- **Button** — действия снаружи сайдбара или в шапке приложения.
-- **PageShell** — типичный потребитель `sidebarSlot="page-nav"`.
+- **Tooltip** — labels for narrow icons in `ContextBar` when using `items`.
+- **Dropdown** — often wraps `IdentityButton` for user menu or theme.
+- **Avatar** — in `IdentityButton.leading`.
+- **Button** — actions outside the sidebar or in the app header.
+- **PageShell** — typical consumer of `sidebarSlot="page-nav"`.

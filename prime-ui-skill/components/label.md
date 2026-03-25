@@ -1,22 +1,22 @@
 # Label
 
-## Что это
+## What it is
 
-Составной лейбл для элементов формы и других контролов: корневой `Label.Root` (нативный `label`) с опциональными слотами `Label.Icon`, `Label.Asterisk` и `Label.Sub`.
+A composite label for form fields and other controls: root `Label.Root` (native `label`) with optional slots `Label.Icon`, `Label.Asterisk`, and `Label.Sub`.
 
-## Для чего нужен
+## What it’s for
 
-- **Личный кабинет и профиль:** подписи к полям «Имя», «Телефон», «Адрес» с понятной связью с полем через `htmlFor` / `id`, визуальное выделение обязательных полей звёздочкой.
-- **Корпоративные заявки и договоры:** длинные формы, где рядом нужны пояснения в той же строке (валюта, единицы измерения, «необязательно») без отдельного блока ошибки или подсказки.
-- **Внутренние панели (аналитика, биллинг):** компактные фильтры и настройки отчёта, где иконка в лейбле помогает отличить поля одного типа и где важны единые размеры `s`–`xl` в сетке.
+- **Account and profile:** captions for “Name”, “Phone”, “Address” with a clear link to the field via `htmlFor` / `id`, and visual emphasis of required fields with an asterisk.
+- **Corporate requests and contracts:** long forms where inline hints are needed on the same line (currency, units, “optional”) without a separate error or hint block.
+- **Internal panels (analytics, billing):** compact filters and report settings where an icon in the label helps distinguish field types and consistent `s`–`xl` sizes matter in the grid.
 
-## Юзкейсы
+## Use cases
 
-Каждый пример самодостаточен; домены и задачи между подразделами различаются.
+Each example is self-contained; domains and tasks differ between subsections.
 
-### Базовый
+### Basic
 
-Подпись к одному полю в форме обратной связи на маркетинговом сайте: связь с полем по `id`, без слотов.
+A label for a single field on a marketing-site contact form: linked to the field by `id`, no slots.
 
 ```tsx
 import { Label } from "prime-ui-kit";
@@ -24,16 +24,16 @@ import { Label } from "prime-ui-kit";
 export function ContactEmailField() {
   return (
     <>
-      <Label.Root htmlFor="contact-email">Email для ответа</Label.Root>
+      <Label.Root htmlFor="contact-email">Reply email</Label.Root>
       <input id="contact-email" type="email" name="email" autoComplete="email" />
     </>
   );
 }
 ```
 
-### С вариантами/размерами
+### With sizes / scale
 
-Панель метрик: несколько лейблов в одной плотной сетке с разным масштабом текста (`size`), чтобы выровнять ряд с соседними контролами.
+A metrics panel: several labels in one tight grid with different text scale (`size`) to align the row with neighboring controls.
 
 ```tsx
 import { Label } from "prime-ui-kit";
@@ -42,19 +42,19 @@ export function ReportFiltersLegend() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <Label.Root size="s" htmlFor="metric-period">
-        Период выборки
+        Sample period
       </Label.Root>
       <Label.Root size="l" htmlFor="metric-granularity">
-        Детализация
+        Granularity
       </Label.Root>
     </div>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Модальное окно оформления медицинской записи: иконка в лейбле, основной текст и пояснение на второй строке — пользователь видит и название поля, и формат ввода.
+A modal for booking a medical appointment: icon in the label, primary text, and a second-line hint — the user sees both the field name and the input format.
 
 ```tsx
 import { Icon, Label } from "prime-ui-kit";
@@ -66,8 +66,8 @@ export function AppointmentModalFields() {
         <Label.Icon>
           <Icon aria-hidden name="system.settings" />
         </Label.Icon>
-        Дата и время приёма
-        <Label.Sub>местное время клиники</Label.Sub>
+        Visit date and time
+        <Label.Sub>clinic local time</Label.Sub>
       </Label.Root>
       <input id="visit-datetime" type="datetime-local" />
     </>
@@ -75,73 +75,73 @@ export function AppointmentModalFields() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`Label.Root`** — элемент `label`; внутри — `LabelSizeContext` для наследования размера.
-- Дочерние слоты (в любом порядке, как принято в разметке): **`Label.Icon`** → `span` с вложенной иконкой; **`Label.Asterisk`** → `span` с символом по умолчанию `*`; **`Label.Sub`** → `span` с дополнительным текстом; плюс текстовые узлы основного названия.
+- **`Label.Root`** — a `label` element; inside, `LabelSizeContext` propagates size to children.
+- Child slots (in any order, as in markup): **`Label.Icon`** → `span` wrapping an icon; **`Label.Asterisk`** → `span` with default character `*`; **`Label.Sub`** → `span` for secondary text; plus text nodes for the main caption.
 
 ## API
 
 ### Label.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Нет | Кегль, отступы и контекст размера для `Label.Icon`. |
-| `disabled` | `boolean` | — | Нет | Неактивный вид; `aria-disabled`, `data-disabled`. |
-| `htmlFor` | `string` | — | Нет | `id` связанного элемента управления. |
-| `className` | `string` | — | Нет | Дополнительный класс на корне. |
-| `children` | `React.ReactNode` | — | Нет | Текст и слоты `Icon`, `Asterisk`, `Sub`. |
-| …остальное | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size">` | — | Нет | Стандартные атрибуты `label` (кроме `size`). |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Type scale, spacing, and size context for `Label.Icon`. |
+| `disabled` | `boolean` | — | No | Disabled appearance; `aria-disabled`, `data-disabled`. |
+| `htmlFor` | `string` | — | No | `id` of the associated control. |
+| `className` | `string` | — | No | Extra class on the root. |
+| `children` | `React.ReactNode` | — | No | Text and `Icon`, `Asterisk`, `Sub` slots. |
+| …rest | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size">` | — | No | Standard `label` attributes (except `size`). |
 
 ### Label.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `className` | `string` | — | Нет | Дополнительный класс обёртки. |
-| `children` | `React.ReactNode` | — | Нет | Обычно компонент иконки из набора кита. |
-| …остальное | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `className` | `string` | — | No | Extra class on the wrapper. |
+| `children` | `React.ReactNode` | — | No | Usually an icon component from the kit. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
 ### Label.Asterisk
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `className` | `string` | — | Нет | Дополнительный класс. |
-| `children` | `React.ReactNode` | `"*"` | Нет | Замена символа по умолчанию. |
-| …остальное | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `className` | `string` | — | No | Extra class. |
+| `children` | `React.ReactNode` | `"*"` | No | Override the default character. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
 ### Label.Sub
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| `className` | `string` | — | Нет | Дополнительный класс. |
-| `children` | `React.ReactNode` | — | Нет | Второстепенная строка под названием. |
-| …остальное | `React.HTMLAttributes<HTMLSpanElement>` | — | Нет | Атрибуты `span`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| `className` | `string` | — | No | Extra class. |
+| `children` | `React.ReactNode` | — | No | Secondary line under the title. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` у лейбла нет. Визуальная «настройка» — через **`size`** (`s` | `m` | `l` | `xl`) и состав слотов (`Icon`, `Asterisk`, `Sub`). Цвет звёздочки задаётся стилями слота `Asterisk` (акцент опасности в теме).
+There is no separate `variant` prop. Visual tuning is via **`size`** (`s` | `m` | `l` | `xl`) and slot composition (`Icon`, `Asterisk`, `Sub`). Asterisk color comes from `Asterisk` slot styles (danger accent in the theme).
 
-## Состояния
+## States
 
-- **Обычный:** текст и слоты с основным цветом контента.
-- **`disabled`:** на `Label.Root` — `data-disabled="true"`, `aria-disabled`, цвет из токена отключённого контента.
-- **Маркер обязательности:** визуально через `Label.Asterisk`; это не состояние DOM-поля и не выставляет `required` на инпут автоматически.
+- **Default:** text and slots use the primary content color.
+- **`disabled`:** on `Label.Root` — `data-disabled="true"`, `aria-disabled`, color from the disabled-content token.
+- **Required marker:** visually via `Label.Asterisk`; this is not a DOM field state and does not set `required` on the input automatically.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Связывайте лейбл с контролом: **`htmlFor` на `Label.Root` + `id` на поле**, либо вкладывайте интерактивный элемент внутрь `label`.
-- При **`disabled`** на лейбле выставляется **`aria-disabled`**; убедитесь, что само поле тоже недоступно для ввода (`disabled`/`readOnly` на контроле), иначе расхождение между лейблом и поведением поля введёт пользователя в заблуждение.
-- Иконку в `Label.Icon` помечайте **`aria-hidden`**, если рядом есть осмысленный текст лейбла.
-- Звёздочка — чисто визуальный маркер; для скринридеров при необходимости дублируйте семантику на поле (`required`, `aria-required`) и текст ошибок через компоненты подсказок/валидации кита.
+- Link the label to the control: **`htmlFor` on `Label.Root` + `id` on the field**, or nest the interactive control inside `label`.
+- With **`disabled`** on the label, **`aria-disabled`** is set; ensure the field itself is not interactable (`disabled` / `readOnly` on the control), or the label and field behavior will mismatch and confuse users.
+- Mark the icon in `Label.Icon` with **`aria-hidden`** when meaningful label text is next to it.
+- The asterisk is a visual-only marker; for screen readers, duplicate semantics on the field when needed (`required`, `aria-required`) and surface errors via the kit’s hint / validation components.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Компонент **не** подставляет `required` на `input`/`select` и **не** заменяет текст ошибки или описания поля — для этого используйте `Hint` и валидацию формы.
-- Нет **`asChild`** и полиморфной смены корневого тега: корень всегда `label`.
-- Вложение инпута внутрь `Label.Root` возможно по HTML, но типичный паттерн кита — соседние элементы и `htmlFor`/`id`.
+- The component does **not** set `required` on `input` / `select` and does **not** replace error or description text — use `Hint` and form validation for that.
+- There is no **`asChild`** or polymorphic root: the root is always `label`.
+- Nesting an input inside `Label.Root` is valid HTML, but the typical kit pattern is siblings with `htmlFor` / `id`.
 
-## Связанные компоненты
+## Related components
 
-- **Input**, **Textarea**, **Select**, **Checkbox**, **Radio**, **Switch** — часто стоят рядом с лейблом или содержат собственный лейбл; `Label` удобен для единообразной подписи с иконкой и второй строкой.
-- **Hint** — пояснения и ошибки под полем, когда `Label.Sub` недостаточно по смыслу или нужен отдельный блок статуса.
-- **Icon** — глифы внутри `Label.Icon`.
+- **Input**, **Textarea**, **Select**, **Checkbox**, **Radio**, **Switch** — often sit next to a label or embed their own; `Label` is handy for a consistent caption with an icon and second line.
+- **Hint** — help and errors under the field when `Label.Sub` is not enough or you need a separate status block.
+- **Icon** — glyphs inside `Label.Icon`.

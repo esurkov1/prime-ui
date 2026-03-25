@@ -1,34 +1,34 @@
 # prime-ui-kit
 
-**prime-ui-kit** — UI-кит для **React 19** с упором на предсказуемый рантайм, **CSS Modules** и **дизайн-токены** в виде обычных **CSS variables** (`--prime-sys-*`). Без Tailwind в обязательном стеке, без «монолита» Radix на каждый виджет: оверлеи, выпадающие списки, фокус и позиционирование опираются на **собственные хуки и разметку**, а тяжёлые peer-зависимости сведены к узкой зоне (даты и доступность календаря).
+**prime-ui-kit** is a UI kit for **React 19** focused on a predictable runtime, **CSS Modules**, and **design tokens** as plain **CSS variables** (`--prime-sys-*`). Tailwind is not part of the required stack, and there is no Radix “monolith” on every widget: overlays, dropdowns, focus, and positioning rely on **custom hooks and markup**, while heavy peer dependencies are limited to a narrow area (dates and calendar accessibility).
 
-Репозиторий: [github.com/esurkov1/prime-ui](https://github.com/esurkov1/prime-ui). Пакет в npm: **`prime-ui-kit`**.
-
----
-
-## Зачем такой подход
-
-### Почти без зависимостей (в смысле рантайма)
-
-- **Сборка не вшивает peer-пакеты** в бандл библиотеки (`tsup` с `external` для React, React Aria, react-day-picker, date-fns) — в приложении одна версия, без дублирования.
-- **Мало прямых зависимостей пакета:** иконки (`lucide-react`), анимации уведомлений (`framer-motion`), навигационные ссылки в сайдбаре (`react-router-dom`). Ядро форм, модалок, селектов, тултипов и т.д. не тянет десятки `@radix-ui/*`.
-- **Нет Tailwind** как обязательного слоя: потребителю не нужно подключать utility-first CSS, чтобы кит выглядел согласованно — достаточно импортировать сгенерированные **токены и темы** плюс `styles.css`.
-
-### Подходит под разные «фреймворки» вокруг React
-
-Компоненты написаны на **React** — это не Vue/Svelte-виджеты. Зато кит **не привязан** к Next.js, Remix или чистому Vite: это обычные ESM-модули и CSS, которые работают в любом React-приложении, где есть поддержка **CSS Modules** (как у большинства сборщиков). Отдельно: **слой токенов** — чистый CSS; его можно использовать для визуального согласования даже вне React (например, обвязка на другом стеке с теми же переменными), а композиция остаётся в React.
-
-### Предсказуемая архитектура
-
-- **Дизайн-система из кода:** палитра, размеры контролов, семантика цветов и темы **генерируются** из TypeScript (`tokens/` → `bun run tokens:build` → `src/styles/*.css`). В компонентах — **`--prime-sys-*`**, а не разрозненные литералы.
-- **Внутренний слой** (`src/internal/`): `cx`, контексты, Portal, **Slot** (аналог паттерна `asChild` без Radix), хуки вроде `useFocusTrap`, `useScrollLock`, `usePosition`.
-- **Состояния и размеры** централизованы (`src/internal/states.ts` — например `componentSizes`: `s` | `m` | `l` | `xl`).
-- **Сложные виджеты** — composable API: `Modal.Root`, `Select.Trigger`, `Input.Field`, … с типизированным контекстом.
-- **Темы:** `data-theme="light" | "dark"` на корне или изолированном контейнере.
+Repository: [github.com/esurkov1/prime-ui](https://github.com/esurkov1/prime-ui). npm package: **`prime-ui-kit`**.
 
 ---
 
-## Архитектура репозитория
+## Why this approach
+
+### Almost dependency-free (in the runtime sense)
+
+- **The build does not bundle peer packages** into the library bundle (`tsup` with `external` for React, React Aria, react-day-picker, date-fns) — one version in the app, no duplication.
+- **Few direct package dependencies:** icons (`lucide-react`), notification animations (`framer-motion`), navigation links in the sidebar (`react-router-dom`). The core for forms, modals, selects, tooltips, etc. does not pull in dozens of `@radix-ui/*`.
+- **No Tailwind** as a required layer: consumers do not need utility-first CSS for the kit to look consistent — it is enough to import the generated **tokens and themes** plus `styles.css`.
+
+### Works with different “frameworks” around React
+
+Components are built with **React** — they are not Vue/Svelte widgets. The kit is **not tied** to Next.js, Remix, or plain Vite: these are ordinary ESM modules and CSS that work in any React app with **CSS Modules** support (as most bundlers provide). Separately: the **token layer** is plain CSS; it can be used for visual alignment even outside React (e.g. a shell on another stack with the same variables), while composition stays in React.
+
+### Predictable architecture
+
+- **Design system from code:** palette, control dimensions, color semantics, and themes are **generated** from TypeScript (`tokens/` → `bun run tokens:build` → `src/styles/*.css`). Components use **`--prime-sys-*`**, not scattered literals.
+- **Internal layer** (`src/internal/`): `cx`, contexts, Portal, **Slot** (an `asChild`-style pattern without Radix), hooks such as `useFocusTrap`, `useScrollLock`, `usePosition`.
+- **States and sizes** are centralized (`src/internal/states.ts` — e.g. `componentSizes`: `s` | `m` | `l` | `xl`).
+- **Complex widgets** use a composable API: `Modal.Root`, `Select.Trigger`, `Input.Field`, … with typed context.
+- **Themes:** `data-theme="light" | "dark"` on the root or an isolated container.
+
+---
+
+## Repository architecture
 
 ```text
 tokens/primitives.ts
@@ -41,73 +41,73 @@ src/styles/tokens.css
 src/styles/theme-light.css      (AUTO-GENERATED)
 src/styles/theme-dark.css
 
-src/components/*/*.tsx + *.module.css   — публичные компоненты
-src/internal/*                        — инфраструктура кита
-src/hooks/*                           — хуки (например поля форм)
-src/icons/*                           — обвязка иконок
-src/index.ts                          — публичный entry + globals.css
+src/components/*/*.tsx + *.module.css   — public components
+src/internal/*                        — kit infrastructure
+src/hooks/*                           — hooks (e.g. form fields)
+src/icons/*                           — icon wrappers
+src/index.ts                          — public entry + globals.css
 
-dist/                                 — ESM + типы после tsup
+dist/                                 — ESM + types after tsup
 ```
 
-**Публикация в npm** (`package.json` → `files`): `dist`, `src/styles`, `LICENSE`. Явные **`exports`**: основной entry, `prime-ui-kit/components`, отдельные пути к `styles.css`, `tokens.css`, `theme-light.css`, `theme-dark.css`.
+**npm publish** (`package.json` → `files`): `dist`, `src/styles`, `LICENSE`. Explicit **`exports`**: main entry, `prime-ui-kit/components`, separate paths to `styles.css`, `tokens.css`, `theme-light.css`, `theme-dark.css`.
 
 ---
 
-## Что входит в кит (обзор возможностей)
+## What’s in the kit (feature overview)
 
-Формы и ввод: **Input**, **Textarea**, **Checkbox**, **Radio**, **Switch**, **Select**, **Slider**, **DigitInput**, **FileUpload**, **ColorPicker**, **Hint**, **Label**, **Kbd**.
+Forms and input: **Input**, **Textarea**, **Checkbox**, **Radio**, **Switch**, **Select**, **Slider**, **DigitInput**, **FileUpload**, **ColorPicker**, **Hint**, **Label**, **Kbd**.
 
-Оверлеи и навигация по слоям: **Modal**, **Drawer**, **Popover**, **Dropdown**, **Tooltip**, **CommandMenu**.
+Overlays and layered navigation: **Modal**, **Drawer**, **Popover**, **Dropdown**, **Tooltip**, **CommandMenu**.
 
-Компоновка и продукт: **PageShell**, **PageContent**, **Sidebar**, **Breadcrumb**, **Tabs**, **Accordion**, **Stepper** (горизонтальный/вертикальный), **SegmentedControl**, **Pagination**, **DataTable**.
+Layout and product chrome: **PageShell**, **PageContent**, **Sidebar**, **Breadcrumb**, **Tabs**, **Accordion**, **Stepper** (horizontal/vertical), **SegmentedControl**, **Pagination**, **DataTable**.
 
-Обратная связь и контент: **Button**, **ButtonGroup**, **LinkButton**, **Badge**, **Banner**, **Notification** (+ провайдер/store), **ProgressBar**, **ProgressCircle**, **Typography**, **Divider**, **Tag**, **Avatar**, **CodeBlock**, **Datepicker** (с пресетами и временем).
+Feedback and content: **Button**, **ButtonGroup**, **LinkButton**, **Badge**, **Banner**, **Notification** (+ provider/store), **ProgressBar**, **ProgressCircle**, **Typography**, **Divider**, **Tag**, **Avatar**, **CodeBlock**, **Datepicker** (with presets and time).
 
-Дополнительно: **ControlSizeProvider** для согласованного размера контролов в поддереве, **ExampleFrame** (для доков/playground).
+Additionally: **ControlSizeProvider** for consistent control sizing in a subtree, **ExampleFrame** (for docs/playground).
 
-Полный список экспортов — `src/components/index.ts`. Живые примеры — `playground/` (`bun run playground:dev`).
+The full export list is in `src/components/index.ts`. Live examples are in `playground/` (`bun run playground:dev`).
 
 ---
 
-## Зависимости: честная таблица
+## Dependencies: straight talk
 
-| Слой | Пакеты |
+| Layer | Packages |
 |------|--------|
-| **Peer (обязательно в приложении)** | `react`, `react-dom`, `react-aria-components`, `react-day-picker`, `date-fns` |
-| **Идёт с китом (dependencies)** | `lucide-react`, `framer-motion`, `react-router-dom` |
+| **Peer (required in the app)** | `react`, `react-dom`, `react-aria-components`, `react-day-picker`, `date-fns` |
+| **Ships with the kit (dependencies)** | `lucide-react`, `framer-motion`, `react-router-dom` |
 
-**React Aria** и **react-day-picker** подключены там, где нужна проверенная доступность и поведение календаря; остальная интерактивность реализована локально. **React Router** нужен для ссылок в **Sidebar**; без роутера можно не использовать эти части API или обернуть приложение в `Router`.
+**React Aria** and **react-day-picker** are used where proven accessibility and calendar behavior are needed; the rest of the interactivity is implemented locally. **React Router** is required for links in **Sidebar**; without a router you can avoid those API surfaces or wrap the app in `Router`.
 
-В исходниках **нет** `@radix-ui/*`; полиморфные триггеры — через внутренний **Slot** (`src/internal/slot.tsx`).
+There is **no** `@radix-ui/*` in the source; polymorphic triggers go through the internal **Slot** (`src/internal/slot.tsx`).
 
 ---
 
-## Установка
+## Installation
 
 ```bash
 npm install prime-ui-kit
 npm install react react-dom react-aria-components react-day-picker date-fns
 ```
 
-Версии peer — см. `package.json`.
+Peer versions — see `package.json`.
 
 ---
 
-## Подключение стилей
+## Wiring up styles
 
-Рекомендуемый порядок в точке входа:
+Recommended order at the entry point:
 
 ```css
 @import "prime-ui-kit/tokens.css";
 @import "prime-ui-kit/theme-light.css";
-/* или theme-dark.css / переключение через data-theme */
+/* or theme-dark.css / switch via data-theme */
 @import "prime-ui-kit/styles.css";
 ```
 
 ---
 
-## Импорт компонентов
+## Importing components
 
 ```tsx
 import { Button, Input, Modal } from "prime-ui-kit";
@@ -117,7 +117,7 @@ import { DataTable } from "prime-ui-kit/components";
 
 ---
 
-## Примеры API
+## API examples
 
 ```tsx
 <Input.Root size="m" label="Email" id="email">
@@ -127,38 +127,38 @@ import { DataTable } from "prime-ui-kit/components";
 </Input.Root>
 
 <Button variant="primary" mode="filled" size="l">
-  Отправить
+  Submit
 </Button>
 ```
 
 ---
 
-## Разработка и проверка
+## Development and verification
 
-| Команда | Назначение |
+| Command | Purpose |
 |---------|------------|
-| `bun run verify` | lint + типы + тесты + сборка |
-| `bun run build` | токены + `tsup` |
-| `bun run tokens:build` | пересборка CSS токенов |
+| `bun run verify` | lint + types + tests + build |
+| `bun run build` | tokens + `tsup` |
+| `bun run tokens:build` | rebuild CSS tokens |
 | `bun run playground:dev` | Vite playground |
 | `bun run test` | Vitest |
 | `bun run check` / `check:fix` | Biome |
 
-Контракт для контрибьюторов — **`RULES.md`**. Материалы для ассистентов и чеклисты — каталог **`prime-ui-skill/`** (в npm-пакет не входит).
+Contributor contract — **`RULES.md`**. Assistant materials and checklists — **`prime-ui-skill/`** (not included in the npm package).
 
 ---
 
-## CI и публикация в npm
+## CI and npm publishing
 
-В GitHub Secrets нужен **`NPM_TOKEN`**.
+GitHub Secrets must include **`NPM_TOKEN`**.
 
-- На push в `main` и в PR — проверка `bun run verify`.
-- Релиз через **GitHub Release**: workflow собирает пакет и выполняет `npm publish`.
+- On push to `main` and on PRs — `bun run verify` runs.
+- Release via **GitHub Release**: the workflow builds the package and runs `npm publish`.
 
-Перед релизом обновите **`version`** в `package.json` и создайте релиз с тегом вида `v0.2.0`, совпадающим с версией пакета.
+Before a release, bump **`version`** in `package.json` and create a release with a tag like `v0.2.0` matching the package version.
 
 ---
 
-## Лицензия
+## License
 
-MIT — см. файл `LICENSE`.
+MIT — see `LICENSE`.

@@ -1,42 +1,42 @@
 # ButtonGroup
 
-## Что это
+## What it is
 
-Составной контрол из нескольких сегментов-кнопок в одной обводке: общий размер, стыковка границ и скругления только с внешних углов.
+A composite control made of several button-like segments inside one outline: shared size, shared borders, and rounded corners only on the outer corners.
 
-## Для чего нужен
+## When to use it
 
-- **Аналитика и отчёты** — переключить интервал агрегации (день / неделя / месяц) одним визуальным блоком без выпадающего списка.
-- **Редакторы и тулбары** — сгруппировать форматирование или вид (иконки и подписи) так, чтобы инструменты читались как единый блок.
-- **Оплата и тарифы** — выбрать план в строке карточки: сегменты на всю ширину колонки с явным «выбранным» состоянием.
+- **Analytics and reports** — switch aggregation interval (day / week / month) as one visual block without a dropdown.
+- **Editors and toolbars** — group formatting or view (icons and labels) so tools read as a single block.
+- **Billing and plans** — pick a plan in a card row: segments span the column width with a clear “selected” state.
 
-## Юзкейсы
+## Use cases
 
-Сценарии ниже различаются экраном и составом API; не дублируйте одну и ту же форму с другими подписями.
+The scenarios below differ by screen and API shape; do not duplicate the same pattern with different labels only.
 
-### Базовый
+### Basic
 
-Фильтр каталога: три взаимоисключающие опции «Все / В наличии / Под заказ» — пользователь видит группу как один контроль.
+Catalog filter: three mutually exclusive options “All / In stock / On order” — the user sees the group as one control.
 
 ```tsx
 import { ButtonGroup } from "prime-ui-kit";
 
 export function StockFilterStrip() {
   return (
-    <ButtonGroup.Root aria-label="Наличие товара" size="m">
-      <ButtonGroup.Item type="button">Все</ButtonGroup.Item>
+    <ButtonGroup.Root aria-label="Product availability" size="m">
+      <ButtonGroup.Item type="button">All</ButtonGroup.Item>
       <ButtonGroup.Item pressed type="button">
-        В наличии
+        In stock
       </ButtonGroup.Item>
-      <ButtonGroup.Item type="button">Под заказ</ButtonGroup.Item>
+      <ButtonGroup.Item type="button">On order</ButtonGroup.Item>
     </ButtonGroup.Root>
   );
 }
 ```
 
-### С вариантами/размерами
+### Variants and sizes
 
-Компактная панель на мобильном и просторная на десктопе: меняется только `size`; плюс вертикальный столбец для узкой колонки настроек.
+Compact panel on mobile and spacious on desktop: only `size` changes; plus a vertical stack for a narrow settings column.
 
 ```tsx
 import { ButtonGroup } from "prime-ui-kit";
@@ -44,28 +44,28 @@ import { ButtonGroup } from "prime-ui-kit";
 export function DensityPreview() {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start" }}>
-      <ButtonGroup.Root aria-label="Сортировка, размер s" size="s">
+      <ButtonGroup.Root aria-label="Sort, size s" size="s">
         <ButtonGroup.Item pressed type="button">
-          По дате
+          By date
         </ButtonGroup.Item>
-        <ButtonGroup.Item type="button">По цене</ButtonGroup.Item>
-        <ButtonGroup.Item type="button">По рейтингу</ButtonGroup.Item>
+        <ButtonGroup.Item type="button">By price</ButtonGroup.Item>
+        <ButtonGroup.Item type="button">By rating</ButtonGroup.Item>
       </ButtonGroup.Root>
-      <ButtonGroup.Root aria-label="Приоритет задач, вертикально" orientation="vertical" size="l">
+      <ButtonGroup.Root aria-label="Task priority, vertical" orientation="vertical" size="l">
         <ButtonGroup.Item pressed type="button">
-          Срочно
+          Urgent
         </ButtonGroup.Item>
-        <ButtonGroup.Item type="button">Обычно</ButtonGroup.Item>
-        <ButtonGroup.Item type="button">Низкий</ButtonGroup.Item>
+        <ButtonGroup.Item type="button">Normal</ButtonGroup.Item>
+        <ButtonGroup.Item type="button">Low</ButtonGroup.Item>
       </ButtonGroup.Root>
     </div>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Короткая форма поиска: сегменты отправляют и сбрасывают форму нативными типами кнопки.
+Short search form: segments submit and reset the form with native button types.
 
 ```tsx
 import { ButtonGroup } from "prime-ui-kit";
@@ -78,20 +78,20 @@ export function SearchMiniForm() {
       }}
       style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 320 }}
     >
-      <label htmlFor="q">Запрос</label>
+      <label htmlFor="q">Query</label>
       <input id="q" name="q" type="search" />
-      <ButtonGroup.Root aria-label="Действия поиска" size="m">
-        <ButtonGroup.Item type="submit">Найти</ButtonGroup.Item>
-        <ButtonGroup.Item type="reset">Сбросить</ButtonGroup.Item>
+      <ButtonGroup.Root aria-label="Search actions" size="m">
+        <ButtonGroup.Item type="submit">Search</ButtonGroup.Item>
+        <ButtonGroup.Item type="reset">Reset</ButtonGroup.Item>
       </ButtonGroup.Root>
     </form>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Вкладки-переключатели раздела документации: родитель хранит ключ раздела, на активном сегменте `pressed`.
+Documentation section tabs: parent holds the section key; active segment has `pressed`.
 
 ```tsx
 import * as React from "react";
@@ -103,9 +103,9 @@ export function DocsSectionSwitch() {
   const [section, setSection] = React.useState<SectionKey>("overview");
 
   return (
-    <ButtonGroup.Root aria-label="Раздел справки" size="m">
+    <ButtonGroup.Root aria-label="Help section" size="m">
       <ButtonGroup.Item pressed={section === "overview"} type="button" onClick={() => setSection("overview")}>
-        Обзор
+        Overview
       </ButtonGroup.Item>
       <ButtonGroup.Item pressed={section === "api"} type="button" onClick={() => setSection("api")}>
         API
@@ -115,83 +115,78 @@ export function DocsSectionSwitch() {
         type="button"
         onClick={() => setSection("examples")}
       >
-        Примеры
+        Examples
       </ButtonGroup.Item>
     </ButtonGroup.Root>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`ButtonGroup.Root`** — `div` с `data-size`, при вертикали — `data-orientation="vertical"`; внутри **`ButtonGroupProvider`**, **`ControlSizeProvider`** (размер наследуют вложенные контролы).
-- **`ButtonGroup.Item`** — нативная **`button`** с классом сегмента; обязан вызываться внутри корня (контекст).
-- **`ButtonGroup.Icon`** — **`span`** с `aria-hidden` для SVG внутри сегмента.
+- **`ButtonGroup.Root`** — `div` with `data-size`, and with vertical layout `data-orientation="vertical"`; wraps **`ButtonGroupProvider`**, **`ControlSizeProvider`** (nested controls inherit size).
+- **`ButtonGroup.Item`** — native **`button`** with segment class; must be used inside the root (context).
+- **`ButtonGroup.Icon`** — **`span`** with `aria-hidden` for SVG inside a segment.
 
-Публичный API: объект **`ButtonGroup`** с полями **`Root`**, **`Item`**, **`Icon`**.
+Public API: **`ButtonGroup`** object with **`Root`**, **`Item`**, **`Icon`**.
 
 ## API
 
 ### ButtonGroup.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| orientation | `"horizontal" \| "vertical"` | `"horizontal"` | нет | Направление flex-раскладки сегментов. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | нет | Высота, радиус, кегль и размер иконки из одного яруса токенов группы. |
-| children | `React.ReactNode` | — | да | Содержимое группы (обычно несколько `Item`). |
-| className | `string` | — | нет | Дополнительный класс корня. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | нет | Остальные атрибуты обёртки (`aria-label`, `role`, обработчики и т.д.). |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| orientation | `"horizontal" \| "vertical"` | `"horizontal"` | no | Flex direction for segments. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Height, radius, type size, and icon size from one token tier for the group. |
+| children | `React.ReactNode` | — | yes | Group content (usually several `Item`). |
+| className | `string` | — | no | Extra class on the root. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | no | Other wrapper attributes (`aria-label`, `role`, handlers, etc.). |
 
 ### ButtonGroup.Item
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| pressed | `boolean` | — | нет | Выбранный сегмент: `data-state="on"`; при переданном boolean — `aria-pressed`. |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | нет | Поведение в форме. |
-| disabled | `boolean` | — | нет | Блокировка клика и стиль неактивности. |
-| children | `React.ReactNode` | — | нет | Текст, `Icon` и др. |
-| className | `string` | — | нет | Дополнительный класс сегмента. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | нет | Остальные атрибуты кнопки. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| pressed | `boolean` | — | no | Selected segment: `data-state="on"`; with a boolean — `aria-pressed`. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | no | Behavior inside a form. |
+| disabled | `boolean` | — | no | Blocks click and inactive styling. |
+| children | `React.ReactNode` | — | no | Text, `Icon`, etc. |
+| className | `string` | — | no | Extra class on the segment. |
+| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | no | Other button attributes. |
 
 ### ButtonGroup.Icon
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| children | `React.ReactNode` | — | да | Обычно иконка (SVG). |
-| className | `string` | — | нет | Дополнительный класс обёртки. |
-| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | нет | Прочие атрибуты `span`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| children | `React.ReactNode` | — | yes | Usually an icon (SVG). |
+| className | `string` | — | no | Extra class on the wrapper. |
+| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | no | Other `span` attributes. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет: у группы один визуальный стиль «сегменты с общей рамкой». Различия достигаются **`size`**, **`orientation`**, **`pressed`** и **`disabled`** на сегментах.
+There is no separate `variant` prop: the group has one visual style — “segments with a shared border”. Differences come from **`size`**, **`orientation`**, **`pressed`**, and **`disabled`** on items.
 
-## Состояния
+## States
 
-- **Обычный сегмент** — без `pressed` и без `disabled`.
-- **Выбранный** — `pressed={true}`: фон и цвет текста как у активного; `aria-pressed="true"`.
-- **Не выбран при явном boolean** — `pressed={false}`: `aria-pressed="false"`.
-- **Отключённый** — `disabled`: курсор `not-allowed`, сниженная непрозрачность, hover не меняет фон.
+- **Default segment** — no `pressed` and no `disabled`.
+- **Selected** — `pressed={true}`: background and text color like active; `aria-pressed="true"`.
+- **Unselected with explicit boolean** — `pressed={false}`: `aria-pressed="false"`.
+- **Disabled** — `disabled`: `not-allowed` cursor, reduced opacity, hover does not change background.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- На **`Root`** задавайте **`aria-label`** (или **`aria-labelledby`**, если рядом видимый заголовок), чтобы группа читалась как единый переключатель или набор действий.
-- Для сегментов только с иконкой используйте **`aria-label`** на **`Item`**; **`ButtonGroup.Icon`** помечен **`aria-hidden`**, текстовой дублирующей подписи внутри иконки нет.
-- При использовании как переключателя одного значения синхронизируйте **`pressed`** с логикой и не оставляйте несколько сегментов с `pressed` без намерения.
+- On **`Root`**, set **`aria-label`** (or **`aria-labelledby`** if a visible heading is nearby) so the group is announced as one switcher or action set.
+- For icon-only segments, use **`aria-label`** on **`Item`**; **`ButtonGroup.Icon`** is **`aria-hidden`**, with no duplicate text inside the icon.
+- When used as a single-value switcher, keep **`pressed`** in sync with logic and avoid multiple `pressed` segments unless intentional.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Нет **`asChild`**: сегмент всегда рендерится как **`<button>`**.
-- Нет встроенного **`fullWidth`**: растягивание — через **`className`** на корне (например ширина контейнера) и **`flex-1`** / **`min-w-0`** на сегментах.
-- Взаимоисключающий выбор из нескольких сегментов реализует родитель (состояние + **`onClick`**); компонент не ведёт собственной «группы радио».
-- **`Item`** вне **`Root`** вызовет ошибку контекста.
+- No **`asChild`**: a segment always renders as **`<button>`**.
+- No built-in **`fullWidth`**: stretch via **`className`** on the root (e.g. container width) and **`flex-1`** / **`min-w-0`** on items.
+- Mutually exclusive choice across segments is implemented by the parent (state + **`onClick`**); the component does not manage its own “radio group”.
+- **`Item`** outside **`Root`** will throw a context error.
 
-## Связанные компоненты
+## Related components
 
-- **`Button`** — одиночное действие с вариантами заливки и режимом загрузки; не заменяет сегментированную группу.
-- **`SegmentedControl`** — если нужен паттерн переключателя с иным API и разметкой кита.
-- **`Radio`** или нативный **`radio`** — когда важна семантика «один из N» для форм и отправки значения поля.
-</think>
-
-
-<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
-StrReplace
+- **`Button`** — single action with fill variants and loading state; not a replacement for a segmented group.
+- **`SegmentedControl`** — when you need a switcher pattern with different kit API and markup.
+- **`Radio`** or native **`radio`** — when “one of N” form semantics and field submission matter.

@@ -1,37 +1,37 @@
 # Slider
 
-## Что это
+## What it is
 
-Горизонтальный ползунок на базе нативного `input type="range"` с токенами кита: опциональная текстовая подпись, размеры `s`–`xl` и настраиваемый диапазон.
+A horizontal slider built on the native `input type="range"` with kit tokens: optional text label, `s`–`xl` sizes, and a configurable range.
 
-## Для чего нужен
+## What it’s for
 
-- **Медиа-плеер и подкасты** — регулировка громкости или баланса без ввода числа с клавиатуры.
-- **Климат и «умный дом»** — выбор целевой температуры или яркости света в понятных пределах.
-- **Склад и логистика** — в интерфейсе закупок задать целевой уровень запаса в процентах с немедленной обратной связью в подписи.
-- **Редактор макетов** — грубая настройка прозрачности слоя или масштаба превью дробным шагом.
-- **Опросы и анкеты** — дискретная шкала (например шаг 25 по шкале 0–100) как альтернатива ряду радиокнопок.
-- **Настройки доступности** — скорость озвучивания или чувствительность жеста одним контролом в карточке настроек.
+- **Media players and podcasts** — adjust volume or balance without typing numbers on the keyboard.
+- **Climate and smart home** — pick target temperature or light brightness within clear bounds.
+- **Warehouse and logistics** — in procurement UIs, set a target stock level as a percentage with immediate feedback in the label.
+- **Layout editors** — coarse adjustment of layer opacity or preview scale with fractional steps.
+- **Surveys and forms** — a discrete scale (e.g. step 25 on 0–100) as an alternative to a row of radio buttons.
+- **Accessibility settings** — speech rate or gesture sensitivity in one control inside a settings card.
 
-## Юзкейсы
+## Use cases
 
-Примеры ниже различаются и предметной областью, и задействованными пропсами.
+The examples below differ in domain and which props they use.
 
-### Базовый
+### Basic
 
-Страница плеера: пользователь двигает один ползунок громкости, значение по умолчанию среднее.
+Player page: the user moves a single volume slider; default value is mid-range.
 
 ```tsx
 import { Slider } from "prime-ui-kit";
 
 export function PlayerVolumeRow() {
-  return <Slider.Root label="Громкость" defaultValue={45} min={0} max={100} step={1} />;
+  return <Slider.Root label="Volume" defaultValue={45} min={0} max={100} step={1} />;
 }
 ```
 
-### С вариантами/размерами
+### Sizes
 
-Внутренняя панель мониторинга: одинаковые ползунки порога алерта в четырёх размерах, чтобы согласовать плотность с таблицей и фильтрами.
+Internal monitoring panel: identical alert-threshold sliders in four sizes to align density with the table and filters.
 
 ```tsx
 import { Slider } from "prime-ui-kit";
@@ -39,18 +39,18 @@ import { Slider } from "prime-ui-kit";
 export function AlertThresholdDensityPreview() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 360 }}>
-      <Slider.Root size="s" label="Порог (s)" defaultValue={70} />
-      <Slider.Root size="m" label="Порог (m)" defaultValue={70} />
-      <Slider.Root size="l" label="Порог (l)" defaultValue={70} />
-      <Slider.Root size="xl" label="Порог (xl)" defaultValue={70} />
+      <Slider.Root size="s" label="Threshold (s)" defaultValue={70} />
+      <Slider.Root size="m" label="Threshold (m)" defaultValue={70} />
+      <Slider.Root size="l" label="Threshold (l)" defaultValue={70} />
+      <Slider.Root size="xl" label="Threshold (xl)" defaultValue={70} />
     </div>
   );
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Карточка бронирования зала: температура в допустимом коридоре и заблокированный пресет, пока нет прав редактирования.
+Venue booking card: temperature within an allowed band and a locked preset when the user lacks edit rights.
 
 ```tsx
 import { Slider } from "prime-ui-kit";
@@ -58,16 +58,16 @@ import { Slider } from "prime-ui-kit";
 export function VenueClimateCard({ canEdit }: { canEdit: boolean }) {
   return (
     <section style={{ padding: 20, maxWidth: 400, borderRadius: 12, border: "1px solid #e4e4e7" }}>
-      <h2 style={{ margin: "0 0 12px", fontSize: 16 }}>Климат в зале</h2>
-      <Slider.Root label="Целевая температура, °C" min={18} max={26} step={1} defaultValue={22} disabled={!canEdit} />
+      <h2 style={{ margin: "0 0 12px", fontSize: 16 }}>Room climate</h2>
+      <Slider.Root label="Target temperature, °C" min={18} max={26} step={1} defaultValue={22} disabled={!canEdit} />
     </section>
   );
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Дашборд закупок: процент целевого запаса хранится в состоянии экрана и синхронизируется с подписью под ползунком.
+Procurement dashboard: target stock percentage lives in screen state and stays in sync with the caption under the slider.
 
 ```tsx
 import * as React from "react";
@@ -78,63 +78,63 @@ export function ReorderLevelControl() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 320 }}>
-      <Slider.Root label="Целевой уровень запаса" value={pct} onChange={setPct} min={0} max={100} step={1} />
-      <span style={{ fontSize: 13, opacity: 0.75 }}>Сейчас: {pct}% от максимума полки</span>
+      <Slider.Root label="Target stock level" value={pct} onChange={setPct} min={0} max={100} step={1} />
+      <span style={{ fontSize: 13, opacity: 0.75 }}>Current: {pct}% of shelf maximum</span>
     </div>
   );
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`Slider.Root`** — контейнер `div` с `data-size`, внутри **`ControlSizeProvider`**; опционально **`label`** (`label` + `htmlFor` на `input`); дочерний **`input type="range"`** с классом трека.
+- **`Slider.Root`** — a `div` container with `data-size`, wrapping **`ControlSizeProvider`** inside; optional **`label`** (`label` + `htmlFor` on the `input`); child **`input type="range"`** with track class.
 
-Публичный API: объект **`Slider`** с единственным полем **`Root`**.
+Public API: the **`Slider`** object with a single **`Root`** field.
 
 ## API
 
 ### Slider.Root
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|--------------|--------------|----------|
-| value | `number` | — | нет | Контролируемое значение. |
-| defaultValue | `number` | `min` | нет | Начальное значение в неконтролируемом режиме; приводится к диапазону `[min, max]`. |
-| min | `number` | `0` | нет | Минимум ползунка. |
-| max | `number` | `100` | нет | Максимум ползунка. |
-| step | `number` | `1` | нет | Шаг изменения (допускаются дробные значения, напр. `0.1`). |
-| disabled | `boolean` | — | нет | Отключение ввода и визуальное приглушение. |
-| onChange | `(value: number) => void` | — | нет | Колбэк при новом значении после действия пользователя. |
-| label | `string` | — | нет | Видимая подпись над дорожкой; связывается с `input` через `id`. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | нет | Масштаб трека, бегунка и шрифта подписи. |
-| className | `string` | — | нет | Класс на корневом `div`. |
-| aria-label | `string` | — | нет | Имя для assistive tech, если нет `label`. |
+| Prop | Type | Default | Required | Description |
+|------|-----|---------|----------|-------------|
+| value | `number` | — | no | Controlled value. |
+| defaultValue | `number` | `min` | no | Initial value in uncontrolled mode; clamped to `[min, max]`. |
+| min | `number` | `0` | no | Slider minimum. |
+| max | `number` | `100` | no | Slider maximum. |
+| step | `number` | `1` | no | Step size (fractional values allowed, e.g. `0.1`). |
+| disabled | `boolean` | — | no | Disables input and dims visuals. |
+| onChange | `(value: number) => void` | — | no | Callback when the value changes after user interaction. |
+| label | `string` | — | no | Visible label above the track; linked to the `input` via `id`. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Track, thumb, and label font scale. |
+| className | `string` | — | no | Class on the root `div`. |
+| aria-label | `string` | — | no | Name for assistive tech when there is no `label`. |
 
-## Варианты
+## Variants
 
-Отдельного пропа `variant` нет: внешний вид задаётся темой (цвет акцента, фокус) и пропом **`size`**. Семантику «ошибки» или «обязательности поля» компонент не несёт — при необходимости оборачивайте в разметку формы с текстом ошибки рядом.
+There is no separate `variant` prop: appearance comes from the theme (accent color, focus) and the **`size`** prop. The component does not encode “error” or “required field” semantics — wrap it in form markup with an error message next to it when needed.
 
-## Состояния
+## States
 
-- **Активный** — значение меняется перетаскиванием, кликом по треку или клавишами на нативном `range`.
-- **`disabled`** — ввод недоступен, курсор `not-allowed`, снижена непрозрачность.
-- **Контролируемый / неконтролируемый** — через пару `value` + `onChange` или `defaultValue` (логика `useControllableState`).
+- **Active** — value changes by dragging, clicking the track, or native `range` keyboard keys.
+- **`disabled`** — input unavailable, `not-allowed` cursor, reduced opacity.
+- **Controlled / uncontrolled** — via `value` + `onChange` or `defaultValue` (`useControllableState` logic).
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Нативный **`input type="range"`** даёт ожидаемое поведение клавиатуры в браузере.
-- При **`label`** подпись связана с полем через **`htmlFor`** / **`id`**.
-- Без **`label`** задайте **`aria-label`** (или внешнюю подпись другим доступным способом), иначе имя контрола может быть пустым.
-- Видимое **`outline`** на **`focus-visible`** для клавиатурной навигации.
+- Native **`input type="range"`** provides expected keyboard behavior in the browser.
+- With **`label`**, the label is associated via **`htmlFor`** / **`id`**.
+- Without **`label`**, set **`aria-label`** (or an external label in another accessible way), or the control name may be empty.
+- Visible **`outline`** on **`focus-visible`** for keyboard navigation.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Только **горизонтальная** ось; вертикальный ползунок в API не предусмотрен.
-- Нет **`asChild`**, слотов иконок и встроенного отображения текущего значения на дорожке — число выводите рядом в разметке экрана.
-- Нет режимов **`loading`** / **`readOnly`** / **`error`** на уровне компонента: при необходимости комбинируйте с полями формы и текстами подсказок.
-- Значение **clamp** к `[min, max]` при расчёте; некорректный ввод из DOM отсекается при парсинге.
+- **Horizontal** axis only; a vertical slider is not part of the API.
+- No **`asChild`**, icon slots, or built-in current value on the track — render the number next to it in your screen markup.
+- No **`loading`** / **`readOnly`** / **`error`** modes on the component itself — combine with form fields and hint text when needed.
+- Values are **clamped** to `[min, max]`; invalid DOM input is dropped during parsing.
 
-## Связанные компоненты
+## Related components
 
-- **`Label`** — если подпись должна быть общей для группы или оформлена как в остальных полях формы.
-- **`Hint`** — пояснение к диапазону или единицам измерения под ползунком.
-- **`DigitInput`** — когда нужен точный ввод числа вместо или вместе с ползунком (в playground есть сценарии совместной компоновки).
+- **`Label`** — when the label should be shared by a group or match other form fields.
+- **`Hint`** — explanation of the range or units under the slider.
+- **`DigitInput`** — when you need precise numeric input instead of or alongside the slider (the playground has combined layout examples).

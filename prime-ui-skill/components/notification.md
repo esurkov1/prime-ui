@@ -1,25 +1,25 @@
 # Notification
 
-## Что это
+## What it is
 
-Система тостов на контексте и портале: провайдер держит очередь сообщений, хуки показывают и закрывают карточки, а `NotificationCard` можно рендерить отдельно для статичного превью.
+A toast system on context and portal: the provider holds a message queue, hooks show and dismiss cards, and `NotificationCard` can be rendered standalone for a static preview.
 
-## Для чего нужен
+## When to use it
 
-- **Кабинет пользователя и платежи** — подтверждение сохранения карты, ошибка списания или успешная оплата без перехода на отдельный экран.
-- **Редакторы и совместная работа** — кто-то оставил комментарий, документ отправлен на согласование, версия восстановлена из истории.
-- **Логистика и трекинг** — смена статуса доставки, задержка на складе, короткое сообщение без блокировки карты заказа.
-- **Интеграции и фоновые задачи** — экспорт готов, синхронизация с CRM завершилась, webhook вернул ошибку с возможностью «Повторить».
-- **Медиа и загрузки** — файл загружен, конвертация завершена, превью недоступно по правам — без модального окна.
-- **Инциденты и сессия** — потеря соединения, скорое обслуживание, принудительный выход из аккаунта на другом устройстве.
+- **User account and payments** — confirm a saved card, a charge error, or successful payment without navigating to another screen.
+- **Editors and collaboration** — someone left a comment, a document was sent for approval, a version was restored from history.
+- **Logistics and tracking** — delivery status change, warehouse delay, a short message without blocking the order card.
+- **Integrations and background jobs** — export ready, CRM sync finished, webhook returned an error with a “Retry” option.
+- **Media and uploads** — file uploaded, conversion done, preview unavailable due to permissions — without a modal.
+- **Incidents and session** — connection lost, upcoming maintenance, forced sign-out on another device.
 
-## Юзкейсы
+## Use cases
 
-Импорт из пакета `prime-ui-kit`. Примеры ниже — разные продуктовые зоны и разные части API.
+Import from the `prime-ui-kit` package. The examples below cover different product areas and different parts of the API.
 
-### Базовый
+### Basic
 
-Настройки уведомлений: после переключения канала показываем короткое подтверждение с автозакрытием.
+Notification settings: after toggling a channel, show a short confirmation with auto-dismiss.
 
 ```tsx
 import { Button, NotificationProvider, useNotifications } from "prime-ui-kit";
@@ -36,14 +36,14 @@ function SaveChannelButton() {
       onClick={() =>
         notify({
           type: "success",
-          title: "Канал обновлён",
-          description: "Письма о заказах будут приходить на новый адрес.",
+          title: "Channel updated",
+          description: "Order emails will go to the new address.",
           position: "top-right",
           size: "m",
         })
       }
     >
-      Сохранить канал
+      Save channel
     </Button.Root>
   );
 }
@@ -57,9 +57,9 @@ export function PreferencesRoot() {
 }
 ```
 
-### С вариантами/размерами
+### Variants and sizes
 
-Панель модерации контента: жёсткое предупреждение крупным размером и информационное сообщение компактным — разные `type` и `size`.
+Content moderation panel: a strong warning at large size and a compact info message — different `type` and `size`.
 
 ```tsx
 import { Button, NotificationProvider, useNotifications } from "prime-ui-kit";
@@ -76,15 +76,15 @@ export function ModerationToolbar() {
         onClick={() =>
           notify({
             type: "error",
-            title: "Публикация отклонена",
-            description: "Нарушены правила раздела «Объявления».",
+            title: "Publication rejected",
+            description: "The “Listings” section rules were violated.",
             size: "l",
             position: "top-center",
             duration: 8000,
           })
         }
       >
-        Отклонить
+        Reject
       </Button.Root>
       <Button.Root
         mode="stroke"
@@ -93,15 +93,15 @@ export function ModerationToolbar() {
         onClick={() =>
           notify({
             type: "info",
-            title: "Черновик сохранён",
-            description: "Материал останется в очереди на 7 дней.",
+            title: "Draft saved",
+            description: "The item will stay in the queue for 7 days.",
             size: "s",
             position: "top-center",
             duration: 4000,
           })
         }
       >
-        В черновики
+        Save to drafts
       </Button.Root>
     </div>
   );
@@ -116,9 +116,9 @@ export function ModerationApp() {
 }
 ```
 
-### В контексте (форма / модал / сайдбар / …)
+### In context (form / modal / sidebar / …)
 
-Боковая панель отчётов: тост с действием «Открыть папку» после генерации выгрузки; иконка и счётчик строк через `badge`.
+Reports sidebar: toast with a “Download” action after generating an export; icon and row count via `badge`.
 
 ```tsx
 import { Bell } from "lucide-react";
@@ -130,14 +130,14 @@ export function ReportsSidebar() {
   const runExport = () => {
     notify({
       type: "success",
-      title: "Отчёт за квартал",
-      description: "XLSX готов к скачиванию.",
+      title: "Quarterly report",
+      description: "XLSX is ready to download.",
       position: "bottom-right",
       size: "m",
       icon: <Bell aria-hidden style={{ width: 20, height: 20 }} />,
-      badge: "12 МБ",
+      badge: "12 MB",
       action: {
-        label: "Скачать",
+        label: "Download",
         onClick: () => {
           window.location.assign("/exports/latest-quarter.xlsx");
         },
@@ -148,7 +148,7 @@ export function ReportsSidebar() {
   return (
     <aside>
       <Button.Root mode="filled" size="m" variant="primary" onClick={runExport}>
-        Сформировать выгрузку
+        Generate export
       </Button.Root>
     </aside>
   );
@@ -163,9 +163,9 @@ export function AnalyticsShell() {
 }
 ```
 
-### Контролируемый режим
+### Controlled mode
 
-Складской терминал: оператор добавляет тосты кнопкой «Событие», а нижняя таблица читает `items` и позволяет снять любой тост с экрана по `dismiss(id)` без крестика на самой карточке.
+Warehouse terminal: the operator adds toasts with an “Event” button, and the footer table reads `items` and can dismiss any toast via `dismiss(id)` without a close button on the card itself.
 
 ```tsx
 import { Button, NotificationProvider, useNotificationStore } from "prime-ui-kit";
@@ -182,8 +182,8 @@ function WarehouseFooter() {
         onClick={() =>
           notify({
             type: "warning",
-            title: "Задержка отгрузки",
-            description: "Погрузчик занят на воротах 4.",
+            title: "Shipment delay",
+            description: "The forklift is busy at gate 4.",
             position: "bottom-left",
             size: "m",
             persistent: true,
@@ -191,9 +191,9 @@ function WarehouseFooter() {
           })
         }
       >
-        Зафиксировать событие
+        Log event
       </Button.Root>
-      <p>На экране тостов: {items.length}</p>
+      <p>Toasts on screen: {items.length}</p>
       <table>
         <tbody>
           {items.map((row) => (
@@ -201,7 +201,7 @@ function WarehouseFooter() {
               <td>{row.title}</td>
               <td>
                 <Button.Root mode="ghost" size="s" variant="neutral" onClick={() => dismiss(row.id)}>
-                  Снять с экрана
+                  Dismiss from screen
                 </Button.Root>
               </td>
             </tr>
@@ -221,96 +221,96 @@ export function WarehouseApp() {
 }
 ```
 
-## Анатомия
+## Anatomy
 
-- **`NotificationProvider`** — React Context со значением стора, дочерний портал с фиксированным viewport и зонами по позициям; внутри зон — стеки по `type`.
-- **`NotificationStack` / `NotificationStackItem`** (внутренние) — список карточек, hover разворачивает стек и ставит `paused` на таймеры.
-- **`NotificationCard`** — `article` с `role` alert или status, иконка, заголовок, опциональный `badge`, описание, ряд с `Button.Root` для `action`, кнопка закрытия, полоса прогресса (если не `persistent`).
+- **`NotificationProvider`** — React Context with store value, child portal with a fixed viewport and zones per position; inside zones, stacks per `type`.
+- **`NotificationStack` / `NotificationStackItem`** (internal) — list of cards; hover expands the stack and sets `paused` on timers.
+- **`NotificationCard`** — `article` with `role` alert or status, icon, title, optional `badge`, description, row with `Button.Root` for `action`, close button, progress bar (unless `persistent`).
 
 ## API
 
 ### NotificationProvider
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| children | React.ReactNode | — | Да | Обертка приложения (или части дерева), где вызываются хуки. |
-| position | NotificationPosition | `"top-right"` | Нет | Дефолтная зона, если в `notify` не передан `position`. |
-| max | number | `5` | Нет | Лимит карточек в одной стопке (позиция + type). |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| children | React.ReactNode | — | Yes | App wrapper (or subtree) where hooks are called. |
+| position | NotificationPosition | `"top-right"` | No | Default zone if `notify` does not pass `position`. |
+| max | number | `5` | No | Max cards in one stack (position + type). |
 
 ### notify(options)
 
-| Поле | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| type | `"success"` \| `"error"` \| `"warning"` \| `"info"` | — | Да | Семантика, иконка по умолчанию, группировка стека. |
-| title | string | — | Да | Заголовок. |
-| description | string | — | Нет | Подзаголовок. |
-| size | `"s"` \| `"m"` \| `"l"` | `"m"` | Нет | Размер карточки. |
-| position | NotificationPosition | из провайдера | Нет | Угол или центр края экрана. |
-| duration | number | `5000` | Нет | Мс до автозакрытия; при `persistent` не используется для закрытия. |
-| persistent | boolean | `false` | Нет | Не закрывать по таймеру; без полосы прогресса. |
-| icon | React.ReactNode | иконка по type | Нет | Своя иконка слева. |
-| badge | string \| number | — | Нет | Метка рядом с заголовком. |
-| closable | boolean | `true` | Нет | Показать кнопку закрытия. |
-| action | `{ label: string; onClick: () => void }` | — | Нет | Вторичное действие в теле карточки. |
+| Field | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| type | `"success"` \| `"error"` \| `"warning"` \| `"info"` | — | Yes | Semantics, default icon, stack grouping. |
+| title | string | — | Yes | Title. |
+| description | string | — | No | Subtitle. |
+| size | `"s"` \| `"m"` \| `"l"` | `"m"` | No | Card size. |
+| position | NotificationPosition | from provider | No | Corner or edge center of the screen. |
+| duration | number | `5000` | No | Ms until auto-dismiss; with `persistent`, not used for closing. |
+| persistent | boolean | `false` | No | Do not close on timer; no progress bar. |
+| icon | React.ReactNode | icon by type | No | Custom icon on the left. |
+| badge | string \| number | — | No | Label next to the title. |
+| closable | boolean | `true` | No | Show close button. |
+| action | `{ label: string; onClick: () => void }` | — | No | Secondary action in the card body. |
 
-Возвращает `string` — `id` записи для `dismiss(id)`.
+Returns `string` — record `id` for `dismiss(id)`.
 
 ### NotificationRecord
 
-Результат нормализации в сторе: все поля из `NotificationOptions` с заполненными дефолтами плюс `id` и `createdAt`.
+Normalized store result: all fields from `NotificationOptions` with defaults filled in, plus `id` and `createdAt`.
 
 ### NotificationCard
 
-| Проп | Тип | По умолчанию | Обязательный | Описание |
-|------|-----|-------------|-------------|----------|
-| item | NotificationRecord | — | Да | Данные карточки. |
-| paused | boolean | — | Да | Остановка обратного отсчёта (например стек развёрнут). |
-| onDismiss | `(id: string) => void` | — | Да | Закрытие по таймеру или кнопке. |
-| stackDepth | number | `0` | Нет | Индекс в стеке для оформления. |
-| stackExpanded | boolean | `false` | Нет | Развёрнут ли стек. |
-| className | string | — | Нет | Доп. класс на корне. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| item | NotificationRecord | — | Yes | Card data. |
+| paused | boolean | — | Yes | Pause countdown (e.g. stack expanded). |
+| onDismiss | `(id: string) => void` | — | Yes | Close via timer or button. |
+| stackDepth | number | `0` | No | Stack index for styling. |
+| stackExpanded | boolean | `false` | No | Whether the stack is expanded. |
+| className | string | — | No | Extra class on root. |
 
 ### useNotifications()
 
-| Поле | Тип | Описание |
-|------|-----|----------|
-| notify | `(options: NotificationOptions) => string` | Показать уведомление. |
-| dismiss | `(id: string) => void` | Закрыть одно. |
-| dismissAll | `() => void` | Закрыть все активные. |
+| Field | Type | Description |
+|------|------|-------------|
+| notify | `(options: NotificationOptions) => string` | Show a notification. |
+| dismiss | `(id: string) => void` | Close one. |
+| dismissAll | `() => void` | Close all active. |
 
 ### useNotificationStore()
 
-Те же методы, плюс `items: NotificationRecord[]` — активные записи без внутреннего состояния анимации закрытия.
+Same methods, plus `items: NotificationRecord[]` — active records without internal closing-animation state.
 
-## Варианты
+## Variants
 
-- **`type`**: `success`, `error`, `warning`, `info` — палитра, иконка по умолчанию и live-роль (`error` и `warning` → `alert` + `aria-live="assertive"`, иначе `status` + `polite`).
-- **`size`**: `s`, `m`, `l` — высота, типографика и размер зоны иконки из токенов карточки.
+- **`type`**: `success`, `error`, `warning`, `info` — palette, default icon, and live role (`error` and `warning` → `alert` + `aria-live="assertive"`, otherwise `status` + `polite`).
+- **`size`**: `s`, `m`, `l` — height, typography, and icon area size from card tokens.
 
-## Состояния
+## States
 
-- **Обычный тост** — таймер, полоса прогресса, закрытие по времени или крестику.
-- **Развёрнутый стек** — при наведении на стопку карточки разъезжаются, таймеры на паузе (`paused`).
-- **Persistent** — без автозакрытия и без нижней полосы; закрытие только вручную или через `dismiss` / `dismissAll`.
-- **Закрытие** — карточка помечается внутренне, проигрывается exit-анимация, затем запись удаляется из стора.
+- **Regular toast** — timer, progress bar, dismiss by time or close button.
+- **Expanded stack** — on hover, cards spread out; timers paused (`paused`).
+- **Persistent** — no auto-dismiss and no bottom bar; close only manually or via `dismiss` / `dismissAll`.
+- **Closing** — card marked internally, exit animation plays, then the record is removed from the store.
 
-## Доступность (a11y)
+## Accessibility (a11y)
 
-- Живой регион: `role="alert"` или `status` и соответствующий `aria-live`.
-- Кнопка закрытия с `aria-label="Dismiss notification"`; иконка внутри с `aria-hidden`.
-- Область стека помечена `aria-label` с указанием позиции.
-- Действие в теле карточки — обычная кнопка `Button` с видимым текстом `label`.
+- Live region: `role="alert"` or `status` and matching `aria-live`.
+- Close button with `aria-label="Dismiss notification"`; inner icon with `aria-hidden`.
+- Stack region labeled with `aria-label` including position.
+- Body action is a regular `Button` with visible `label` text.
 
-## Ограничения и заметки
+## Limitations and notes
 
-- Несколько вложенных `NotificationProvider` создадут несколько порталов с дублирующимися зонами — обычно достаточно одного на корне.
-- Стопки разделены по **позиции** и **type**: два `info` в одном углу складываются в один стек; `info` и `success` в том же углу — в две колонки стеков.
-- Параметр `max` обрезает глубину стопки; при переполнении старые в этой стопке отбрасываются.
-- `duration <= 0` отключает анимацию таймера в `useCountdown`; сценарий закрытия по времени нужно продумывать отдельно.
-- `NotificationCard` сам по себе не подключается к стору — для живых тостов используйте провайдер и `notify`.
+- Nested `NotificationProvider`s create multiple portals with duplicate zones — usually one at the root is enough.
+- Stacks are split by **position** and **type**: two `info` toasts in one corner share one stack; `info` and `success` in the same corner become two stack columns.
+- `max` caps stack depth; on overflow, older items in that stack are dropped.
+- `duration <= 0` disables timer animation in `useCountdown`; time-based closing must be handled separately.
+- `NotificationCard` is not wired to the store by itself — for live toasts use the provider and `notify`.
 
-## Связанные компоненты
+## Related components
 
-- **Button** — кнопка действия внутри карточки (`action`).
-- **Banner** — для постоянного сообщения в потоке страницы, когда тост не подходит.
-- **Modal / Drawer** — для ошибок, требующих фокуса и блокировки фона; тост не заменяет их.
+- **Button** — action button inside the card (`action`).
+- **Banner** — persistent inline page message when a toast is not appropriate.
+- **Modal / Drawer** — for errors that need focus and backdrop blocking; a toast does not replace them.
