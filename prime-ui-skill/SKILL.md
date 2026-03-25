@@ -8,7 +8,8 @@ description: >
   a kit component for a layout region; checking responsive behavior (breakpoints,
   touch targets, overlay vs inline). Includes: layout recipes (dashboard, settings,
   catalog, landing, form wizard), responsive catalog of 41 components, design tokens,
-  anti-patterns.
+  anti-patterns. Strict: no custom wrappers, reskins, or structural overrides of kit
+  components — use raw primitives, default styles/layout, and public props/API only.
 ---
 
 # prime-ui-responsive-app
@@ -28,6 +29,16 @@ Full token reference: [`references/design-tokens.md`](references/design-tokens.m
    Light and dark are supported equally.
 4. **CSS Modules + CSS variables.** Tailwind is not used in prime-ui-kit.
 5. **Control sizing via the `size` prop.** Layout does not override button or field heights.
+
+### Raw components only — no custom shells (strict)
+
+**Forbidden:** wrapping kit components in custom containers to change how they look or behave; redefining their structure, architecture, or design; overriding or replacing kit CSS (including ad-hoc `className` hacks, inline styles that mimic a different visual system, or duplicating internals with plain `div`/`span` + bespoke styles).
+
+**Required:** use **only** the **standard, raw** kit components as documented — with **default** kit styles and the **standard composition** (`Modal.Root`, `Input.Field`, `Select.Trigger`, etc.). Arrange screens with kit primitives and layout tokens; do **not** substitute “styled” clones of Button, Input, or other controls.
+
+**For customization:** use **exclusively** the **public API** — props (`size`, `variant`, `mode`, `fullWidth`, `disabled`, …), documented subcomponents/slots, `ControlSizeProvider`, theme via `data-theme`, and semantic `--prime-sys-*` on **page layout** surfaces — not on re-skinned kit internals.
+
+Violating this produces drift from the design system, breaks accessibility guarantees maintained by the kit, and makes upgrades unsafe.
 
 ### Key tokens for layout
 
@@ -278,3 +289,7 @@ Interactive elements under 44 px on mobile. Use `size="l"` for Button, Input, Se
 ### 8. Hard-coded visual values instead of tokens
 
 `background: #f3f4f7`, `gap: 16px`, `border-radius: 12px`, `z-index: 999` — all of this breaks theming and consistency. Use `--prime-sys-*` tokens. Details: [`references/design-tokens.md`](references/design-tokens.md).
+
+### 9. Custom wrappers or “reskinned” kit components
+
+Do not wrap `Button`, `Input`, `Select`, etc. in custom styled shells, replace their markup, or override their CSS to match a one-off design. If the design differs, use kit **props and composition** first; if the kit truly cannot express it, flag a **kit change** — do not fork visuals in app code. See **Mandatory rules → Raw components only** above.
