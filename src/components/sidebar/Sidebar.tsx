@@ -35,6 +35,8 @@ type SidebarContextValue = {
   open: boolean;
   setOpen: (next: boolean) => void;
   toggleOpen: () => void;
+  /** Закрыть оверлей, если он был открыт наведением к левому краю (responsive). */
+  onNavPanelMouseLeave: () => void;
 };
 
 const [SidebarProvider, useSidebarContext] = createComponentContext<SidebarContextValue>("Sidebar");
@@ -84,7 +86,8 @@ export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"aside">, "ch
   /**
    * При `responsive` и узком viewport: открывать оверлей, когда указатель оказывается
    * у левого края окна (только если устройство поддерживает hover + fine pointer).
-   * При контролируемом `open` задайте `onOpenChange`, иначе родитель не узнает о запросе открытия.
+   * Такой оверлей закрывается при уходе указателя с `Sidebar.NavPanel`.
+   * При контролируемом `open` задайте `onOpenChange`, иначе родитель не узнает о запросе открытия/закрытия.
    */
   edgeHoverOpen?: boolean;
 };
@@ -213,6 +216,12 @@ function SidebarRoot({
   }, [edgeHoverOpen]);
 
   const edgeOpenPx = 12;
+  const openViaEdgeHoverRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (open) return;
+    openViaEdgeHoverRef.current = false;
+  }, [open]);
 
   React.useEffect(() => {
     if (
@@ -227,12 +236,20 @@ function SidebarRoot({
     }
     const onMove = (event: MouseEvent) => {
       if (event.clientX <= edgeOpenPx) {
+        openViaEdgeHoverRef.current = true;
         setOpenState(true);
       }
     };
     window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
   }, [edgeHoverOpen, edgeHoverRevealEnabled, isResponsiveViewport, open, responsive, setOpenState]);
+
+  const onNavPanelMouseLeave = React.useCallback(() => {
+    if (!openViaEdgeHoverRef.current) return;
+    if (responsive !== true || !isResponsiveViewport || !open) return;
+    openViaEdgeHoverRef.current = false;
+    setOpen(false);
+  }, [isResponsiveViewport, open, responsive, setOpen]);
 
   const shouldShowInlineOverlay = responsive === true && isResponsiveViewport && open;
   const shouldShowFloatingToggle = open === false;
@@ -247,8 +264,19 @@ function SidebarRoot({
       open,
       setOpen,
       toggleOpen,
+      onNavPanelMouseLeave,
     }),
-    [activeSection, open, setActiveSection, setOpen, setVariant, size, toggleOpen, variant],
+    [
+      activeSection,
+      onNavPanelMouseLeave,
+      open,
+      setActiveSection,
+      setOpen,
+      setVariant,
+      size,
+      toggleOpen,
+      variant,
+    ],
   );
 
   return (
@@ -443,8 +471,18 @@ SidebarContextItemButton.displayName = "SidebarContextItemButton";
 
 export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav">;
 
-function SidebarNavPanel({ className, ...rest }: SidebarNavPanelProps) {
-  return <nav {...rest} className={cx(styles.navPanel, className)} />;
+function SidebarNavPanel({ className, onMouseLeave, ...rest }: SidebarNavPanelProps) {
+  const { onNavPanelMouseLeave } = useSidebarContext();
+  return (
+    <nav
+      {...rest}
+      className={cx(styles.navPanel, className)}
+      onMouseLeave={(e) => {
+        onMouseLeave?.(e);
+        onNavPanelMouseLeave();
+      }}
+    />
+  );
 }
 
 SidebarNavPanel.displayName = "SidebarNavPanel";

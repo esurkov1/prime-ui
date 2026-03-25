@@ -885,11 +885,6 @@
     opacity: 0;
     pointer-events: none;
   }
-
-  .root[data-responsive="true"] .floatingToggle {
-    top: calc(var(--prime-sys-spacing-x3) + var(--sb-control-height) / 2);
-    transform: translateY(0);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

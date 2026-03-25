@@ -121,6 +121,89 @@ describe("Sidebar", () => {
     }
   });
 
+  it("closes overlay on nav panel mouse leave after edge-open", async () => {
+    const matchMediaImpl = (query: string) => {
+      const matches =
+        (query.includes("64rem") && query.includes("max-width")) ||
+        (query.includes("hover: hover") && query.includes("pointer: fine"));
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as MediaQueryList;
+    };
+    const previousMatchMedia = window.matchMedia;
+    window.matchMedia = matchMediaImpl as typeof window.matchMedia;
+
+    try {
+      render(
+        <Sidebar.Root defaultOpen={false} responsive>
+          <Sidebar.NavPanel />
+        </Sidebar.Root>,
+      );
+
+      const root = screen.getByRole("complementary", { name: "Sidebar" });
+      await waitFor(() => {
+        window.dispatchEvent(
+          new MouseEvent("mousemove", { bubbles: true, clientX: 8, clientY: 50 }),
+        );
+        expect(root).toHaveAttribute("data-open", "true");
+      });
+
+      const nav = root.querySelector("nav");
+      expect(nav).toBeTruthy();
+      fireEvent.mouseLeave(nav as HTMLElement);
+
+      await waitFor(() => {
+        expect(root).toHaveAttribute("data-open", "false");
+      });
+    } finally {
+      window.matchMedia = previousMatchMedia;
+    }
+  });
+
+  it("does not close on nav leave when opened via floating toggle", () => {
+    const matchMediaImpl = (query: string) => {
+      const matches = query.includes("64rem") && query.includes("max-width");
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as MediaQueryList;
+    };
+    const previousMatchMedia = window.matchMedia;
+    window.matchMedia = matchMediaImpl as typeof window.matchMedia;
+
+    try {
+      render(
+        <Sidebar.Root defaultOpen={false} responsive>
+          <Sidebar.NavPanel />
+        </Sidebar.Root>,
+      );
+
+      const root = screen.getByRole("complementary", { name: "Sidebar" });
+      fireEvent.click(screen.getByRole("button", { name: "Открыть сайдбар" }));
+      expect(root).toHaveAttribute("data-open", "true");
+
+      const nav = root.querySelector("nav");
+      expect(nav).toBeTruthy();
+      fireEvent.mouseLeave(nav as HTMLElement);
+      expect(root).toHaveAttribute("data-open", "true");
+    } finally {
+      window.matchMedia = previousMatchMedia;
+    }
+  });
+
   it("shows collapsed open handle only when sidebar is closed", () => {
     const { rerender } = render(
       <Sidebar.Root open={false}>
