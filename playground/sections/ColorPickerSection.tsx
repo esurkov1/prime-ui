@@ -522,11 +522,11 @@ export default function ColorPickerSection() {
       title="Color picker"
       description={
         <>
-          Инструмент для выбора цвета: двумерная область (насыщенность и яркость в HSL), слайдеры
-          оттенка и прозрачности, палитра пресетов, ввод hex и правка каналов. Панель можно встроить
-          в страницу или открыть из кнопки с образцом текущего цвета рядом с поповером кита.
-          Состояние цвета и доступность контролов опираются на{" "}
-          <span translate="no">react-aria-components</span> (модель Color и разметка из React Aria).
+          Выбор цвета: область HSL, слайдеры, пресеты, hex и каналы. В продуктовом UI панель
+          размещают в <code>Popover.Content</code>, триггер — кнопка с{" "}
+          <code>ColorPicker.TriggerSwatch</code> (или свой индикатор); все примеры ниже так
+          устроены. Состояние и a11y — <span translate="no">react-aria-components</span> (Color,
+          React Aria).
         </>
       }
     >
@@ -534,9 +534,7 @@ export default function ColorPickerSection() {
         <div className="demoBlock">
           <h4>Размеры</h4>
           <p className="demoBlockDescription">
-            Четыре отдельных <code>ColorPicker.Root</code> с одним <code>ColorPicker.HexInput</code>
-            : проп <code>size</code> у поля ввода hex — <code>s</code>, <code>m</code>,{" "}
-            <code>l</code>, <code>xl</code> (токены китового <code>Input</code>).
+            Четыре <code>HexInput</code> с разным <code>size</code> — каждый за своим поповером.
           </p>
           <PlaygroundExampleFrame.Root
             code={hexInputSizesSource.trim()}
@@ -551,9 +549,8 @@ export default function ColorPickerSection() {
         <div className="demoBlock">
           <h4>Варианты</h4>
           <p className="demoBlockDescription">
-            Три независимых корня с <code>ColorPicker.FormatProvider</code> и разным{" "}
-            <code>defaultFormat</code>: <code>hsl</code>, <code>rgb</code>, <code>hex</code> —
-            меняется состав ячеек в <code>ChannelStrip</code> и подпись в <code>FormatSelect</code>.
+            Три формата (<code>hsl</code>, <code>rgb</code>, <code>hex</code>) — три отдельных
+            поповера с <code>FormatProvider</code>.
           </p>
           <PlaygroundExampleFrame.Root
             code={formatVariantsSource.trim()}
@@ -568,9 +565,7 @@ export default function ColorPickerSection() {
         <div className="demoBlock">
           <h4>Состояния</h4>
           <p className="demoBlockDescription">
-            Слева палитра пресетов: первый <code>SwatchPickerItem</code> с <code>isDisabled</code>.
-            Справа отдельный корень: <code>isDisabled</code> на слайдере оттенка (трек и ползунок
-            неактивны; полоса каналов остаётся доступной).
+            Два поповера: отключённый пресет в палитре и отключённый слайдер оттенка.
           </p>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
@@ -582,10 +577,8 @@ export default function ColorPickerSection() {
         <div className="demoBlock">
           <h4>Расположение панели</h4>
           <p className="demoBlockDescription">
-            Два экземпляра с <code>Popover</code>: одно содержимое открывается снизу (
-            <code>side=&quot;bottom&quot;</code>), другое — справа (
-            <code>side=&quot;right&quot;</code>
-            ); триггер с <code>ColorPicker.TriggerSwatch</code> и подписью.
+            Два экземпляра: <code>side=&quot;bottom&quot;</code> и <code>side=&quot;top&quot;</code>
+            ; триггер с <code>TriggerSwatch</code>.
           </p>
           <PlaygroundExampleFrame.Root
             code={panelPlacementSource.trim()}
@@ -600,9 +593,8 @@ export default function ColorPickerSection() {
         <div className="demoBlock">
           <h4>Контролируемый режим</h4>
           <p className="demoBlockDescription">
-            <code>value</code> и <code>onChange</code> на <code>ColorPicker.Root</code>; начальное
-            значение через <code>parseColor</code>. Состояние хранится в <code>useState</code> как{" "}
-            <code>Color</code>, строка для отладки — <code>color.toString(&quot;css&quot;)</code>.
+            <code>value</code> / <code>onChange</code>, readout снаружи поповера, панель внутри{" "}
+            <code>Popover.Content</code>.
           </p>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
@@ -614,10 +606,8 @@ export default function ColorPickerSection() {
         <div className="demoBlock">
           <h4>Композиция</h4>
           <p className="demoBlockDescription">
-            Полная панель: <code>FormatSelect</code>, <code>Area</code> с <code>AreaThumb</code>,
-            два <code>Slider</code> с <code>SliderMeta</code> (подпись и значение),{" "}
-            <code>ChannelStrip</code> с иконкой пипетки, затем <code>SwatchPicker</code> с{" "}
-            <code>SwatchPickerItem</code> и <code>Swatch</code>.
+            Полная панель в поповере: <code>FormatSelect</code>, <code>Area</code>, слайдеры,{" "}
+            <code>ChannelStrip</code>, <code>SwatchPicker</code>.
           </p>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
@@ -629,8 +619,7 @@ export default function ColorPickerSection() {
         <div className="demoBlock">
           <h4>Full width</h4>
           <p className="demoBlockDescription">
-            Карточка-превью на всю доступную ширину контейнера (классы <code>card</code> +{" "}
-            <code>fullWidthStretch</code>): удобно в формах и колонках макета.
+            Широкая <code>Popover.Content</code> и карточка <code>fullWidthStretch</code> внутри.
           </p>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
@@ -642,9 +631,8 @@ export default function ColorPickerSection() {
         <div className="demoBlock">
           <h4>Специфичные фичи</h4>
           <p className="demoBlockDescription">
-            Встроенный ColorPicker во всплывающей панели с триггером-кнопкой и цветным индикатором;
-            индикатор на кнопке обновляется в реальном времени при изменении цвета через область,
-            слайдеры или пресеты.
+            Поповер с кастомным квадратом цвета на кнопке (альтернатива <code>TriggerSwatch</code>
+            ); ниже — <code>Field</code>, пипетка и слайдер в отдельном поповере.
           </p>
           <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
@@ -652,10 +640,8 @@ export default function ColorPickerSection() {
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
           <p className="demoBlockDescription">
-            <code>ColorPicker.Field</code> с дочерним <code>Input</code> из react-aria-components
-            для ручного hex; рядом отдельная <code>EyeDropperButton</code> с{" "}
-            <code>Button.Icon</code> (в Chromium откроется системная пипетка, иначе кнопка
-            неактивна). Плюс область и слайдер с <code>SliderMeta</code>.
+            <code>Field</code> + <code>EyeDropperButton</code>, область и слайдер — всё внутри
+            поповера.
           </p>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>

@@ -99,9 +99,9 @@ Full table of all 41 components mapped to responsive layout.
 | | |
 |---|---|
 | **Purpose** | Color picker: area, sliders, presets, hex input, eyedropper. |
-| **Responsive role** | On mobile, place in a Drawer instead of inline; presets in flex-wrap. |
-| **Zones** | form, overlay, sidebar |
-| **Scenarios** | Brand/theme colors; visual editor; series color on a chart; product variant; “favorite color” field; compact panel in a Popover. |
+| **Responsive role** | **Product UI:** host the panel in `Popover` (or Modal/Drawer), not inline; on narrow viewports Drawer is fine; presets flex-wrap inside the overlay. |
+| **Zones** | form, overlay |
+| **Scenarios** | Brand/theme; chart series; variant color; editor tools — always from a trigger into Popover. |
 | **Documentation** | `../components/color-picker.md` |
 
 ## CommandMenu
@@ -129,9 +129,9 @@ Full table of all 41 components mapped to responsive layout.
 | | |
 |---|---|
 | **Purpose** | Calendar for single date or range with presets, time, and label. |
-| **Responsive role** | Popup clamps to viewport on mobile; presets move from side to bottom. |
-| **Zones** | form, content, overlay, sidebar |
-| **Scenarios** | Slot booking; report period with presets; scheduled publish; date filter; shipping window; birthday in profile. |
+| **Responsive role** | **Product UI:** put `Datepicker.Shell` inside `Popover.Content` (or Modal/Drawer); popup clamps to viewport on mobile. |
+| **Zones** | form, overlay |
+| **Scenarios** | Booking; report period; filters; profile dates — opened from field/button, not inline on the page. |
 | **Documentation** | `../components/datepicker.md` |
 
 ## DigitInput

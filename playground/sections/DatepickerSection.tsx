@@ -393,10 +393,10 @@ export default function DatepickerSection() {
       title="Datepicker"
       description={
         <>
-          Выбор одной даты или периода в календарной сетке с оформлением на токенах Prime. Есть
-          размеры, при необходимости второй столбец месяца на широкой области, полоса быстрых
-          периодов, время суток и текстовая подпись выбора. Движок сетки — react-day-picker, подписи
-          и локаль удобно задавать через date-fns.
+          Выбор одной даты или периода в календарной сетке с оформлением на токенах Prime. В
+          продуктовом UI календарь и оболочку <code>Datepicker.Shell</code> размещают внутри{" "}
+          <code>Popover.Content</code> (кнопка или поле — триггер); все примеры ниже следуют этому
+          паттерну. Движок сетки — react-day-picker, локаль и форматирование — через date-fns.
         </>
       }
     >
@@ -405,8 +405,7 @@ export default function DatepickerSection() {
           <h4>Размеры</h4>
           <p className="demoBlockDescription">
             Четыре значения <code>Datepicker.Shell</code> и <code>Datepicker.Calendar</code>{" "}
-            <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>, <code>xl</code> —
-            высота ячеек, кегль и кнопки навигации из одного яруса токенов.
+            <code>size</code> — каждое открывается своим <code>Popover</code> с кнопкой-триггером.
           </p>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
@@ -418,9 +417,8 @@ export default function DatepickerSection() {
         <div className="demoBlock">
           <h4>Варианты и режимы</h4>
           <p className="demoBlockDescription">
-            Режим <code>mode=&quot;single&quot;</code> против <code>mode=&quot;range&quot;</code>:
-            одна выбранная дата и выделенный интервал; оба примера на одном месяце для сравнения
-            сетки.
+            <code>mode=&quot;single&quot;</code> и <code>mode=&quot;range&quot;</code> — отдельные
+            поповеры с кнопками-триггерами.
           </p>
           <PlaygroundExampleFrame.Root
             code={variantsModesSource.trim()}
@@ -435,9 +433,8 @@ export default function DatepickerSection() {
         <div className="demoBlock">
           <h4>Состояния</h4>
           <p className="demoBlockDescription">
-            Сверху — недоступные дни через проп <code>disabled</code> календаря; снизу — связка дата
-            + <code>Datepicker.Time</code>: поле времени остаётся <code>disabled</code>, пока нет
-            выбранной даты.
+            Два поповера: календарь с <code>disabled</code> по дням недели и связка дата +{" "}
+            <code>Datepicker.Time</code>.
           </p>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
@@ -449,10 +446,8 @@ export default function DatepickerSection() {
         <div className="demoBlock">
           <h4>Расположение месяцев</h4>
           <p className="demoBlockDescription">
-            <code>responsiveMonths</code> и при необходимости <code>responsiveBreakpoints</code>:
-            при ширине контейнера от заданного порога показываются два месяца. Область превью с
-            классом <code>examplePreviewBleed</code>, чтобы замерить ширину так же, как в карточке
-            на всю колонку.
+            <code>responsiveMonths</code> и <code>responsiveBreakpoints</code> внутри поповера;
+            превью с <code>examplePreviewBleed</code> для ширины контейнера.
           </p>
           <PlaygroundExampleFrame.Root code={responsiveMonthsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
@@ -464,8 +459,8 @@ export default function DatepickerSection() {
         <div className="demoBlock">
           <h4>Контролируемый режим</h4>
           <p className="demoBlockDescription">
-            Состояние <code>selected</code> и <code>onSelect</code> подняты в React; выбранное
-            значение выводится через <code>Datepicker.Value</code> с форматированием date-fns.
+            Состояние в React; подпись <code>Datepicker.Value</code> внутри панели поповера; после
+            выбора даты поповер закрывается.
           </p>
           <PlaygroundExampleFrame.Root
             code={controlledValueSource.trim()}
@@ -480,9 +475,8 @@ export default function DatepickerSection() {
         <div className="demoBlock">
           <h4>Композиция</h4>
           <p className="demoBlockDescription">
-            <code>Datepicker.Shell</code> с <code>presets</code> (только одиночная дата), календарь
-            с <code>responsiveMonths</code>, блок <code>Datepicker.Time</code> и{" "}
-            <code>Datepicker.Value</code> — одно общее состояние в родителе.
+            Пресеты, календарь, время и <code>Datepicker.Value</code> в одном поповере, общее
+            состояние.
           </p>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
@@ -494,9 +488,8 @@ export default function DatepickerSection() {
         <div className="demoBlock">
           <h4>Full width</h4>
           <p className="demoBlockDescription">
-            Календарь внутри карточки на всю доступную ширину: обёртка <code>w-full</code>, у
-            поверхности превью — <code>min-w-0</code>, чтобы сетка не вылезала за границы
-            flex-контейнера.
+            Широкая <code>Popover.Content</code> и <code>Datepicker.Shell</code> с{" "}
+            <code>min-w-0</code>, чтобы сетка не ломала раскладку.
           </p>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
@@ -508,9 +501,8 @@ export default function DatepickerSection() {
         <div className="demoBlock">
           <h4>Специфичные фичи</h4>
           <p className="demoBlockDescription">
-            Встроенный календарь во всплывающей панели с триггером-кнопкой и закрытием после выбора
-            даты; отдельно — диапазон с пресетами периодов (только для{" "}
-            <code>mode=&quot;range&quot;</code>) и двумя полями времени.
+            Эталон: иконка календаря на триггере и закрытие после выбора даты; ниже — диапазон с
+            пресетами и <code>Datepicker.Time</code> в отдельном поповере.
           </p>
           <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>

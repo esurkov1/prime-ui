@@ -11,82 +11,116 @@ A composite color-picker widget in the prime-ui-kit UI: a two-channel area, chan
 - **Data and visualization:** series color on a chart, legends, and conditional highlights in reports when the value is stored in dashboard config.
 - **E-commerce and storefronts:** product personalization (variant color), aligning the shade with the product card photo.
 - **Forms and surveys:** “favorite color,” visual status or category markers with a clear color code.
-- **Overlay embedding:** a compact panel in a popover from a button with `TriggerSwatch` so the main screen stays uncluttered.
+
+## Product UI: always use Popover (or Modal / Drawer)
+
+**Do not** mount the full picker panel (`FormatProvider`, `Area`, sliders, `SwatchPicker`, etc.) **inline** in the main layout. Treat the picker as an overlay: wrap the panel in **`Popover.Content`** (or modal / drawer) and use a **trigger** — typically `Button` + **`ColorPicker.TriggerSwatch`** (and a text label). `ColorPicker.Root` wraps **both** the trigger branch and the popover content so `TriggerSwatch` and the panel share color state.
+
+`HexInput`-only flows still open from a trigger; put `HexInput` inside `Popover.Content`.
+
+The examples below follow this pattern.
 
 ## Use cases
 
-Each example targets a different product context and API combination.
-
-### Basic
-
-An inline panel on a settings page: the user sees the HSL area, hue, alpha, format switching, and presets at once.
+### Basic (full panel in Popover)
 
 ```tsx
 import { Pipette } from "lucide-react";
-import { ColorPicker } from "prime-ui-kit";
+import * as React from "react";
+
+import { Button, ColorPicker, Popover } from "prime-ui-kit";
 
 const PRESETS = ["#3b82f6", "#22c55e", "#eab308", "#ef4444"];
 
 export function BrandAccentField() {
+  const [open, setOpen] = React.useState(false);
+
   return (
     <ColorPicker.Root defaultValue="hsl(220, 90%, 56%)">
-      <ColorPicker.FormatProvider defaultFormat="hsl">
-        <ColorPicker.FormatSelect />
-        <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-          <ColorPicker.AreaThumb />
-        </ColorPicker.Area>
-        <ColorPicker.Slider channel="hue" colorSpace="hsl">
-          <ColorPicker.SliderMeta label="Hue" />
-          <ColorPicker.SliderTrack>
-            <ColorPicker.Thumb />
-          </ColorPicker.SliderTrack>
-        </ColorPicker.Slider>
-        <ColorPicker.Slider channel="alpha">
-          <ColorPicker.SliderMeta label="Opacity" />
-          <ColorPicker.SliderTrack>
-            <ColorPicker.Thumb />
-          </ColorPicker.SliderTrack>
-        </ColorPicker.Slider>
-        <ColorPicker.ChannelStrip
-          pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
-        />
-        <ColorPicker.SwatchPicker aria-label="Brand presets">
-          {PRESETS.map((c) => (
-            <ColorPicker.SwatchPickerItem key={c} color={c}>
-              <ColorPicker.Swatch />
-            </ColorPicker.SwatchPickerItem>
-          ))}
-        </ColorPicker.SwatchPicker>
-      </ColorPicker.FormatProvider>
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Trigger asChild>
+          <Button.Root mode="stroke" size="m" variant="neutral">
+            <ColorPicker.TriggerSwatch />
+            Brand accent
+          </Button.Root>
+        </Popover.Trigger>
+        <Popover.Content align="start" side="bottom">
+          <Popover.Inset padding="x2" gap="x3">
+            <ColorPicker.FormatProvider defaultFormat="hsl">
+              <ColorPicker.FormatSelect />
+              <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+                <ColorPicker.AreaThumb />
+              </ColorPicker.Area>
+              <ColorPicker.Slider channel="hue" colorSpace="hsl">
+                <ColorPicker.SliderMeta label="Hue" />
+                <ColorPicker.SliderTrack>
+                  <ColorPicker.Thumb />
+                </ColorPicker.SliderTrack>
+              </ColorPicker.Slider>
+              <ColorPicker.Slider channel="alpha">
+                <ColorPicker.SliderMeta label="Opacity" />
+                <ColorPicker.SliderTrack>
+                  <ColorPicker.Thumb />
+                </ColorPicker.SliderTrack>
+              </ColorPicker.Slider>
+              <ColorPicker.ChannelStrip
+                pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
+              />
+              <ColorPicker.SwatchPicker aria-label="Brand presets">
+                {PRESETS.map((c) => (
+                  <ColorPicker.SwatchPickerItem key={c} color={c}>
+                    <ColorPicker.Swatch />
+                  </ColorPicker.SwatchPickerItem>
+                ))}
+              </ColorPicker.SwatchPicker>
+            </ColorPicker.FormatProvider>
+          </Popover.Inset>
+        </Popover.Content>
+      </Popover.Root>
     </ColorPicker.Root>
   );
 }
 ```
 
-### Variants / sizes
-
-Marketing landing: CTA block editor with different hex field sizes for mobile and desktop (multiple roots, each with only `HexInput`).
+### Hex field sizes (each behind a trigger)
 
 ```tsx
-import { ColorPicker } from "prime-ui-kit";
+import * as React from "react";
+
+import { Button, ColorPicker, Popover } from "prime-ui-kit";
 
 export function CtaHexRow() {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "flex-end" }}>
-      <ColorPicker.Root defaultValue="#2563eb">
-        <ColorPicker.HexInput label="Button (s)" size="s" />
-      </ColorPicker.Root>
-      <ColorPicker.Root defaultValue="#2563eb">
-        <ColorPicker.HexInput label="Button (xl)" size="xl" />
-      </ColorPicker.Root>
+      {(["s", "xl"] as const).map((size) => (
+        <HexSizeTrigger key={size} size={size} />
+      ))}
     </div>
+  );
+}
+
+function HexSizeTrigger({ size }: { size: "s" | "xl" }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <ColorPicker.Root defaultValue="#2563eb">
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Trigger asChild>
+          <Button.Root mode="stroke" size="m" variant="neutral">
+            Hex ({size})
+          </Button.Root>
+        </Popover.Trigger>
+        <Popover.Content align="start" side="bottom">
+          <Popover.Inset padding="x2" gap="x3">
+            <ColorPicker.HexInput label={`Hex (${size})`} size={size} />
+          </Popover.Inset>
+        </Popover.Content>
+      </Popover.Root>
+    </ColorPicker.Root>
   );
 }
 ```
 
-### In context (popover)
-
-Workflow or tasks: label color on a card — the panel opens from a button with the current color square (`TriggerSwatch`) next to the kit `Popover`.
+### Task label color (`TriggerSwatch` + `Popover`)
 
 ```tsx
 import { Pipette } from "lucide-react";
@@ -132,9 +166,57 @@ export function TaskLabelColorTrigger() {
 }
 ```
 
-### Composition with Popover
+### Controlled color + text readout
 
-Color selection in a floating panel; the button indicator updates when the color changes via the area, sliders, or presets.
+```tsx
+import { Pipette } from "lucide-react";
+import * as React from "react";
+
+import { Button, ColorPicker, parseColor, Popover } from "prime-ui-kit";
+import type { Color } from "react-aria-components";
+
+export function ChartSeriesColorControl() {
+  const [color, setColor] = React.useState<Color>(() => parseColor("hsl(200, 80%, 50%)"));
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <div>
+      <p>Series A: {color.toString("css")}</p>
+      <ColorPicker.Root value={color} onChange={setColor}>
+        <Popover.Root open={open} onOpenChange={setOpen}>
+          <Popover.Trigger asChild>
+            <Button.Root mode="stroke" size="m" variant="neutral">
+              <ColorPicker.TriggerSwatch />
+              Edit color
+            </Button.Root>
+          </Popover.Trigger>
+          <Popover.Content align="start" side="bottom">
+            <Popover.Inset padding="x2" gap="x3">
+              <ColorPicker.FormatProvider>
+                <ColorPicker.FormatSelect />
+                <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+                  <ColorPicker.AreaThumb />
+                </ColorPicker.Area>
+                <ColorPicker.Slider channel="hue" colorSpace="hsl">
+                  <ColorPicker.SliderMeta label="Hue" />
+                  <ColorPicker.SliderTrack>
+                    <ColorPicker.Thumb />
+                  </ColorPicker.SliderTrack>
+                </ColorPicker.Slider>
+                <ColorPicker.ChannelStrip
+                  pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
+                />
+              </ColorPicker.FormatProvider>
+            </Popover.Inset>
+          </Popover.Content>
+        </Popover.Root>
+      </ColorPicker.Root>
+    </div>
+  );
+}
+```
+
+### Reference: custom swatch on the trigger button
 
 ```tsx
 import { Pipette } from "lucide-react";
@@ -148,10 +230,6 @@ const PRESETS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#14b8a6", "#3b82f6
 export function ColorPickerPopoverField() {
   const [color, setColor] = React.useState<Color | undefined>(parseColor("#3b82f6"));
   const [open, setOpen] = React.useState(false);
-
-  const handleColorChange = (newColor: Color) => {
-    setColor(newColor);
-  };
 
   const colorString = color?.toString("css") ?? "#000000";
 
@@ -174,7 +252,7 @@ export function ColorPickerPopoverField() {
       </Popover.Trigger>
       <Popover.Content align="start" side="bottom">
         <Popover.Inset padding="x2" gap="x3">
-          <ColorPicker.Root value={color} onChange={handleColorChange}>
+          <ColorPicker.Root value={color} onChange={setColor}>
             <ColorPicker.FormatProvider>
               <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
                 <ColorPicker.AreaThumb />
@@ -208,57 +286,22 @@ export function ColorPickerPopoverField() {
 }
 ```
 
-### Controlled mode
-
-Dashboard: color is held in page state and serialized to the API; uses `value`, `onChange`, and `parseColor`.
-
-```tsx
-import * as React from "react";
-import { Pipette } from "lucide-react";
-import { ColorPicker, parseColor } from "prime-ui-kit";
-import type { Color } from "react-aria-components";
-
-export function ChartSeriesColorControl() {
-  const [color, setColor] = React.useState<Color>(() => parseColor("hsl(200, 80%, 50%)"));
-
-  return (
-    <div>
-      <p>Series A: {color.toString("css")}</p>
-      <ColorPicker.Root value={color} onChange={setColor}>
-        <ColorPicker.FormatProvider>
-          <ColorPicker.FormatSelect />
-          <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-            <ColorPicker.AreaThumb />
-          </ColorPicker.Area>
-          <ColorPicker.Slider channel="hue" colorSpace="hsl">
-            <ColorPicker.SliderMeta label="Hue" />
-            <ColorPicker.SliderTrack>
-              <ColorPicker.Thumb />
-            </ColorPicker.SliderTrack>
-          </ColorPicker.Slider>
-          <ColorPicker.ChannelStrip
-            pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
-          />
-        </ColorPicker.FormatProvider>
-      </ColorPicker.Root>
-    </div>
-  );
-}
-```
-
 ## Anatomy
 
 ```
 ColorPicker.Root
-├── ColorPicker.FormatProvider (required for FormatSelect and ChannelStrip)
-│   ├── ColorPicker.FormatSelect
-│   ├── ColorPicker.Area → ColorPicker.AreaThumb
-│   ├── ColorPicker.Slider → ColorPicker.SliderMeta?, ColorPicker.SliderTrack → ColorPicker.Thumb
-│   ├── ColorPicker.ChannelStrip (pipetteIcon required)
-│   ├── ColorPicker.HexInput | ColorPicker.Field + Input (react-aria-components)
-│   └── ColorPicker.SwatchPicker → ColorPicker.SwatchPickerItem → ColorPicker.Swatch
-├── ColorPicker.TriggerSwatch (next to popover trigger, inside the same Root)
-└── ColorPicker.EyeDropperButton (standalone or inside ChannelStrip)
+├── Popover.Root (recommended in product UIs)
+│   ├── Popover.Trigger — often Button + ColorPicker.TriggerSwatch
+│   └── Popover.Content
+│       └── ColorPicker.FormatProvider (required for FormatSelect and ChannelStrip)
+│           ├── ColorPicker.FormatSelect
+│           ├── ColorPicker.Area → ColorPicker.AreaThumb
+│           ├── ColorPicker.Slider → ColorPicker.SliderMeta?, ColorPicker.SliderTrack → ColorPicker.Thumb
+│           ├── ColorPicker.ChannelStrip (pipetteIcon required)
+│           ├── ColorPicker.HexInput | ColorPicker.Field + Input (react-aria-components)
+│           └── ColorPicker.SwatchPicker → ColorPicker.SwatchPickerItem → ColorPicker.Swatch
+├── ColorPicker.TriggerSwatch (inside trigger; same Root as panel)
+└── ColorPicker.EyeDropperButton (inside panel or ChannelStrip)
 ```
 
 `parseColor` is exported from the module alongside `ColorPicker` (re-export from react-aria-components).
@@ -370,7 +413,7 @@ Parses a CSS / hex string into a `Color` object for `useState` or value comparis
 
 ## Related components
 
-- **Popover** — compact panel open from a trigger with `TriggerSwatch`.
+- **Popover** — **required** surface for product UIs: host the panel in `Popover.Content`.
 - **Button** and **Button.Icon** — trigger and eyedropper icon on `EyeDropperButton` / in `ChannelStrip`.
 - **Input** (kit) — inside `HexInput`; **Input** from react-aria-components — inside `Field`.
 - **Select** (kit) — inside the `FormatSelect` implementation.

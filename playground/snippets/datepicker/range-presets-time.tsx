@@ -3,7 +3,9 @@ import { ru } from "date-fns/locale";
 import * as React from "react";
 import type { DateRange } from "react-day-picker";
 
+import { Button } from "@/components/button/Button";
 import { Datepicker, type DatepickerPresetRange } from "@/components/datepicker/Datepicker";
+import { Popover } from "@/components/popover/Popover";
 import ExampleSurface from "../../components/ExampleSurface";
 
 function buildPresets(): DatepickerPresetRange[] {
@@ -24,32 +26,46 @@ function buildPresets(): DatepickerPresetRange[] {
 
 export default function DatepickerRangePresetsTimeSnippet() {
   const [range, setRange] = React.useState<DateRange | undefined>();
+  const [open, setOpen] = React.useState(false);
 
   return (
     <ExampleSurface>
-      <Datepicker.Shell
-        presets={<Datepicker.Presets mode="range" presets={buildPresets()} onSelect={setRange} />}
-      >
-        <Datepicker.Calendar
-          locale={ru}
-          mode="range"
-          responsiveMonths
-          selected={range}
-          onSelect={setRange}
-        />
-        <Datepicker.Time
-          mode="range"
-          from={range?.from}
-          labels={{ from: "Начало", to: "Конец" }}
-          to={range?.to}
-          onFromChange={(next) => {
-            setRange((prev) => ({ from: next, to: prev?.to }));
-          }}
-          onToChange={(next) => {
-            setRange((prev) => ({ from: prev?.from, to: next }));
-          }}
-        />
-      </Datepicker.Shell>
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Trigger asChild>
+          <Button.Root mode="stroke" size="m" variant="neutral">
+            Диапазон, пресеты и время
+          </Button.Root>
+        </Popover.Trigger>
+        <Popover.Content align="start" side="bottom">
+          <Popover.Inset padding="none">
+            <Datepicker.Shell
+              presets={
+                <Datepicker.Presets mode="range" presets={buildPresets()} onSelect={setRange} />
+              }
+            >
+              <Datepicker.Calendar
+                locale={ru}
+                mode="range"
+                responsiveMonths
+                selected={range}
+                onSelect={setRange}
+              />
+              <Datepicker.Time
+                mode="range"
+                from={range?.from}
+                labels={{ from: "Начало", to: "Конец" }}
+                to={range?.to}
+                onFromChange={(next) => {
+                  setRange((prev) => ({ from: next, to: prev?.to }));
+                }}
+                onToChange={(next) => {
+                  setRange((prev) => ({ from: prev?.from, to: next }));
+                }}
+              />
+            </Datepicker.Shell>
+          </Popover.Inset>
+        </Popover.Content>
+      </Popover.Root>
     </ExampleSurface>
   );
 }
