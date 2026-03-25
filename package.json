@@ -1,6 +1,6 @@
 {
   "name": "prime-ui-kit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "React 19 UI kit: CSS Modules, design tokens, composable components (forms, overlays, navigation, tables).",
   "keywords": [
     "react",
