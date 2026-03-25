@@ -845,14 +845,23 @@
   .root[data-responsive="true"] .navPanel {
     position: relative;
     z-index: 1;
-    width: 90vw;
-    min-width: 90vw;
-    max-width: 90vw;
+    width: var(--sb-panel-width);
+    min-width: min(var(--sb-panel-width), 100%);
+    max-width: min(100%, var(--sb-panel-width));
     height: 100dvh;
     border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
     transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
     opacity: 0;
     pointer-events: none;
+  }
+
+  /* Ширина 90% только на узких мобильных (< 640px, sm). */
+  @media (max-width: 639px) {
+    .root[data-responsive="true"] .navPanel {
+      width: 90%;
+      min-width: 90%;
+      max-width: 90%;
+    }
   }
 
   .root[data-responsive="true"][data-open="true"] .navPanel {
