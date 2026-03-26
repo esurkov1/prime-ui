@@ -19,7 +19,7 @@ description: >
 | What | Path (this repository) | After `npm install prime-ui-kit` |
 |------|--------------------------|-------------------------------------|
 | Per-component API, props, examples | `../src/components/<kebab-name>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<kebab-name>/COMPONENT.md` |
-| Design tokens, full 41-component catalog, flexbox source notes | `design-tokens.md`, `component-catalog.md`, `responsive-flexbox-sources.md` (next to `SKILL.md`) | `node_modules/prime-ui-kit/SKILL/*.md` |
+| Design tokens, full 41-component catalog | `design-tokens.md`, `component-catalog.md` (next to `SKILL.md`) | `node_modules/prime-ui-kit/SKILL/*.md` |
 
 Install as a Cursor skill by pointing the skill directory at `SKILL/` in this repository (clone or copy the whole `SKILL/` folder so `SKILL.md` and the sibling `.md` files stay together).
 
