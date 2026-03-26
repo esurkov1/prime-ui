@@ -7,7 +7,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import type { SidebarSize } from "@/internal/states";
 import styles from "./Sidebar.module.css";
 import { SidebarProvider } from "./sidebar-context";
-import { SIDEBAR_MEDIA_QUERY_NARROW } from "./sidebarLayout";
+import { SIDEBAR_MEDIA_QUERY_NARROW, SIDEBAR_MEDIA_QUERY_XS_HIDDEN } from "./sidebarLayout";
 
 export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"aside">, "children"> & {
   children: React.ReactNode;
@@ -38,6 +38,12 @@ function SidebarRoot({
     typeof window.matchMedia === "function" &&
     window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW).matches;
 
+  const initialXsHiddenViewport =
+    responsive === true &&
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(SIDEBAR_MEDIA_QUERY_XS_HIDDEN).matches;
+
   const [open, setOpenState] = useControllableState<boolean>({
     value: openProp,
     defaultValue: initialNarrowViewport ? false : defaultOpen,
@@ -64,6 +70,9 @@ function SidebarRoot({
   const [isNarrowViewport, setIsNarrowViewport] = React.useState(initialNarrowViewport);
   const previousNarrowRef = React.useRef(initialNarrowViewport);
 
+  const [isXsHiddenViewport, setIsXsHiddenViewport] = React.useState(initialXsHiddenViewport);
+  const previousXsRef = React.useRef(initialXsHiddenViewport);
+
   React.useEffect(() => {
     if (
       responsive !== true ||
@@ -87,6 +96,38 @@ function SidebarRoot({
     query.addListener(update);
     return () => query.removeListener(update);
   }, [responsive]);
+
+  React.useEffect(() => {
+    if (
+      responsive !== true ||
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
+      setIsXsHiddenViewport(false);
+      previousXsRef.current = false;
+      return;
+    }
+
+    const query = window.matchMedia(SIDEBAR_MEDIA_QUERY_XS_HIDDEN);
+    const update = () => setIsXsHiddenViewport(query.matches);
+    update();
+
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", update);
+      return () => query.removeEventListener("change", update);
+    }
+
+    query.addListener(update);
+    return () => query.removeListener(update);
+  }, [responsive]);
+
+  React.useEffect(() => {
+    if (responsive !== true) return;
+    const prev = previousXsRef.current;
+    if (prev === isXsHiddenViewport) return;
+    previousXsRef.current = isXsHiddenViewport;
+    if (isXsHiddenViewport) setOpenState(false);
+  }, [isXsHiddenViewport, responsive, setOpenState]);
 
   React.useEffect(() => {
     if (responsive !== true) return;
@@ -131,7 +172,8 @@ function SidebarRoot({
   );
 
   const shouldShowInlineOverlay = responsive === true && isNarrowViewport && open;
-  const shouldShowFloatingToggle = responsive === true && isNarrowViewport && open === false;
+  const shouldShowFloatingToggle =
+    responsive === true && isNarrowViewport && open === false && !isXsHiddenViewport;
 
   const navPanelId = React.useId();
 
@@ -164,7 +206,7 @@ function SidebarRoot({
           "sidebar-slot": sidebarSlot,
         })}
       >
-        {canEdgePeekHover && !open && isNarrowViewport ? (
+        {canEdgePeekHover && !open && isNarrowViewport && !isXsHiddenViewport ? (
           <div
             className={styles.edgePeek}
             data-sidebar-part="edge-peek"

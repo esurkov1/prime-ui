@@ -70,6 +70,18 @@ describe("Sidebar", () => {
 
   it("does not close on nav leave when opened via floating toggle", () => {
     const matchMediaImpl = (query: string) => {
+      if (query.includes("480px") && query.includes("max-width")) {
+        return {
+          matches: false,
+          media: query,
+          onchange: null,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        } as MediaQueryList;
+      }
       const matches = query.includes("64rem") && query.includes("max-width");
       return {
         matches,
@@ -107,6 +119,18 @@ describe("Sidebar", () => {
 
   it("opens from left edge hover and closes when pointer leaves nav (peek)", async () => {
     const matchMediaImpl = (query: string) => {
+      if (query.includes("480px") && query.includes("max-width")) {
+        return {
+          matches: false,
+          media: query,
+          onchange: null,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        } as MediaQueryList;
+      }
       const narrow = query.includes("64rem") && query.includes("max-width");
       const fineHover = query.includes("(hover: hover)") && query.includes("(pointer: fine)");
       const matches = narrow || fineHover;
@@ -154,8 +178,62 @@ describe("Sidebar", () => {
     }
   });
 
+  it("does not show floating toggle when viewport matches xs hidden (≤480px)", () => {
+    const matchMediaImpl = (query: string) => {
+      if (query.includes("480px") && query.includes("max-width")) {
+        return {
+          matches: true,
+          media: query,
+          onchange: null,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        } as MediaQueryList;
+      }
+      const matches = query.includes("64rem") && query.includes("max-width");
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as MediaQueryList;
+    };
+    const previousMatchMedia = window.matchMedia;
+    window.matchMedia = matchMediaImpl as typeof window.matchMedia;
+
+    try {
+      render(
+        <Sidebar.Root defaultOpen={false} responsive>
+          <Sidebar.NavPanel />
+        </Sidebar.Root>,
+      );
+
+      expect(screen.queryByRole("button", { name: "Открыть сайдбар" })).not.toBeInTheDocument();
+    } finally {
+      window.matchMedia = previousMatchMedia;
+    }
+  });
+
   it("shows collapsed open handle only when sidebar is closed on narrow viewport", () => {
     const matchMediaImpl = (query: string) => {
+      if (query.includes("480px") && query.includes("max-width")) {
+        return {
+          matches: false,
+          media: query,
+          onchange: null,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        } as MediaQueryList;
+      }
       const matches = query.includes("64rem") && query.includes("max-width");
       return {
         matches,

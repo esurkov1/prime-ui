@@ -732,6 +732,123 @@
     pointer-events: none;
   }
 
+  /*
+   * 481–640px: узкая колонка — иконка сверху, подпись снизу; подписи групп и пунктов по центру.
+   * (≤480px — без floating toggle в JS; оверлей при controlled open по-прежнему на всю ширину.)
+   */
+  @media (max-width: 640px) and (min-width: 481px) {
+    .root[data-responsive="true"] .navPanel {
+      width: min(100%, 5.75rem);
+      min-width: 4.75rem;
+      max-width: 100%;
+      padding-inline: var(--prime-sys-spacing-x1);
+    }
+
+    .root[data-responsive="true"] .headerRow {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .root[data-responsive="true"] .headerMain {
+      align-items: center;
+    }
+
+    .root[data-responsive="true"] .identityButton {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: auto;
+      padding-inline: var(--prime-sys-spacing-x1);
+    }
+
+    .root[data-responsive="true"] .identityButtonMain {
+      align-items: center;
+    }
+
+    .root[data-responsive="true"] .identityButtonTitle,
+    .root[data-responsive="true"] .identityButtonSubtitle {
+      white-space: normal;
+      text-align: center;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .root[data-responsive="true"] .group {
+      align-items: center;
+    }
+
+    .root[data-responsive="true"] .groupLabel {
+      width: 100%;
+      padding-inline: 0;
+      text-align: center;
+    }
+
+    .root[data-responsive="true"] .menuItem {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .root[data-responsive="true"] .menuButton {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--prime-sys-spacing-x1);
+      min-height: auto;
+      padding-block: var(--prime-sys-spacing-x2);
+      padding-inline: var(--prime-sys-spacing-x1);
+      text-align: center;
+    }
+
+    .root[data-responsive="true"] .menuLabel {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .root[data-responsive="true"] .menuTrailing {
+      margin-inline-start: 0;
+    }
+
+    .root[data-responsive="true"] .navPanelBody {
+      align-items: center;
+    }
+
+    .root[data-responsive="true"] .navPanelHeading {
+      width: 100%;
+      text-align: center;
+    }
+
+    .root[data-responsive="true"] .navCategory {
+      align-items: center;
+    }
+
+    .root[data-responsive="true"] .navCategoryTrigger {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--prime-sys-spacing-x1);
+      text-align: center;
+    }
+
+    .root[data-responsive="true"] .navCategoryLabel {
+      text-align: center;
+    }
+
+    .root[data-responsive="true"] .navCategoryCount {
+      display: none;
+    }
+  }
+
   /* На очень узких экранах (≤320px) — панель на всю ширину. */
   @media (max-width: 320px) {
     .root[data-responsive="true"] .navPanel {

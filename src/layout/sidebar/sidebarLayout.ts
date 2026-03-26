@@ -11,3 +11,6 @@ export const SIDEBAR_MEDIA_QUERY_NARROW = `(max-width: ${SIDEBAR_LAYOUT_BREAKPOI
 
 /** Viewport «широкий»: сайдбар в потоке сетки (вместе с `AppShell` и т.д.). */
 export const SIDEBAR_MEDIA_QUERY_INLINE = "(min-width: 64.001rem)";
+
+/** Viewport ≤480px: floating toggle и edge-peek отключены; при переходе в этот диапазон оверлей закрывается. */
+export const SIDEBAR_MEDIA_QUERY_XS_HIDDEN = "(max-width: 480px)";
