@@ -28,7 +28,7 @@ Composable surfaces for **dashboard KPIs**, **lists**, **CTA tiles**, **split me
 - **Use** **`variant="stat-trend"`** for a large KPI with period delta: **`Label`**, **`Value`**, **`Delta`** (`trend`: `up` | `down` | `neutral`).
 - **Use** **`variant="cta"`** for a call-to-action tile: **`Title`**, **`CtaBody`**, **`Actions`** (buttons / links).
 - **Use** **`variant="list"`** for activity or alerts: **`ListHeader`** (e.g. **`Title`** + link), **`List`** / **`ListItem`**.
-- **Use** **`variant="split"`** for two related metrics: **`Split`** with two **`SplitCell`** blocks (typically **`Label`** + **`Value`** each).
+- **Use** **`variant="split"`** for two related metrics: **`Split`** with two **`SplitCell`** blocks (typically **`Label`** + **`Value`** each). Optionally **`Lead`** (icon or badge) as the **first direct child**, then **`Stack`** with **`Label`** + **`Value`** — the cell lays out as a horizontal row.
 - **Use** **`variant="cover"`** for media on top: **`Cover`** (image or block), then **`Stack`** and optional **`Actions`**.
 - **Do not use** as the only focus target for navigation; wrap a [LinkButton](../link-button/COMPONENT.md) or make an inner control focusable instead of the whole card, unless you add explicit `role`/`tabIndex` and keyboard handling.
 - **Do not use** decorative icons without **`aria-hidden`** when the text repeats the meaning.
@@ -230,12 +230,18 @@ export function SplitCard() {
     <Card.Root variant="split">
       <Card.Split>
         <Card.SplitCell>
-          <Card.Label>Conversion</Card.Label>
-          <Card.Value>3.8%</Card.Value>
+          <Card.Lead>{/* icon or badge */}</Card.Lead>
+          <Card.Stack>
+            <Card.Label>Conversion</Card.Label>
+            <Card.Value>3.8%</Card.Value>
+          </Card.Stack>
         </Card.SplitCell>
         <Card.SplitCell>
-          <Card.Label>AOV</Card.Label>
-          <Card.Value>$64</Card.Value>
+          <Card.Lead>{/* icon or badge */}</Card.Lead>
+          <Card.Stack>
+            <Card.Label>AOV</Card.Label>
+            <Card.Value>$64</Card.Value>
+          </Card.Stack>
         </Card.SplitCell>
       </Card.Split>
     </Card.Root>
@@ -407,7 +413,7 @@ export function CoverCard() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | One metric column. |
+| children | `React.ReactNode` | — | No | One metric column: **`Label`** + **`Value`**, or **`Lead`** (first) + **`Stack`** with **`Label`** + **`Value`** when using an icon. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the cell `div`. |
 
 ### Card.ListHeader
