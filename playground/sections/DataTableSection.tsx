@@ -245,6 +245,14 @@ const dataTableRootApiRows: PlaygroundApiPropRow[] = [
       "Максимальная высота прокручиваемой области (px или CSS-строка) при infiniteScroll.",
   },
   {
+    prop: "fillWidth",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Растянуть таблицу на ширину viewport (как раньше). По умолчанию ширина колонок по содержимому.",
+  },
+  {
     prop: "highlightRowOnHover",
     type: "boolean",
     defaultValue: "true",
@@ -329,21 +337,21 @@ const dataTableColumnApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Трек grid: фиксированный minmax(w,w) или minmax(w, max).",
+    description: "Ширина колонки (th/td).",
   },
   {
     prop: "minWidth",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Минимум трека (по умолчанию min-content).",
+    description: "Минимальная ширина колонки (th/td).",
   },
   {
     prop: "maxWidth",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Максимум трека (по умолчанию 1fr).",
+    description: "Максимальная ширина колонки (th/td).",
   },
   {
     prop: "onHeaderClick",

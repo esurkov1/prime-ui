@@ -27,11 +27,9 @@ export type DataTableColumn<Row> = {
   sortAccessor?: (row: Row) => unknown;
   sortComparator?: (a: Row, b: Row, order: DataTableOrder) => number;
   align?: DataTableCellAlign;
-  /** Фиксированная или предпочтительная ширина трека в `grid-template-columns`. */
   width?: string;
-  /** Минимум трека (`minmax(..., …)`). */
   minWidth?: string;
-  /** Максимум трека (`minmax(..., …)`). */
+  /** Ограничение ширины колонки (например `12rem` или `min(100%, 20rem)`). */
   maxWidth?: string;
   onHeaderClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
   onCellClick?: (
@@ -71,6 +69,11 @@ export type DataTableRootProps<Row> = {
   loadingMore?: boolean;
   onLoadMore?: () => void | Promise<void>;
   scrollHeight?: number | string;
+  /**
+   * Растянуть `<table>` на 100% ширины viewport (как раньше): лишнее место делится между колонками.
+   * По умолчанию ширина таблицы по содержимому колонок (`width: max-content`).
+   */
+  fillWidth?: boolean;
   /** Подсветка строки при наведении (полупрозрачная смесь с фоном строки). */
   highlightRowOnHover?: boolean;
   /** Подсветка колонки под курсором (шапка + ячейки). */
@@ -133,18 +136,10 @@ function sortIndicator(sort: DataTableSortState, columnId: string): string {
   return sort.order;
 }
 
-/** Трек колонки для `grid-template-columns`: 100%-ширина таблицы + рост от контента (`1fr` после min). */
-function columnGridTrack<Row>(column: DataTableColumn<Row>): string {
+function columnSizeStyle<Row>(column: DataTableColumn<Row>): React.CSSProperties | undefined {
   const { width, minWidth, maxWidth } = column;
-  if (width && !minWidth && !maxWidth) {
-    return `minmax(${width}, ${width})`;
-  }
-  const min = minWidth ?? "min-content";
-  const max = maxWidth ?? "1fr";
-  if (width) {
-    return `minmax(${width}, ${max})`;
-  }
-  return `minmax(${min}, ${max})`;
+  if (!width && !minWidth && !maxWidth) return undefined;
+  return { width, minWidth, maxWidth };
 }
 
 function DataTableRoot<Row>({
@@ -178,6 +173,7 @@ function DataTableRoot<Row>({
   loadingMore = false,
   onLoadMore,
   scrollHeight = 360,
+  fillWidth = false,
   highlightRowOnHover = true,
   highlightColumnOnHover = false,
   striped = false,
@@ -334,11 +330,6 @@ function DataTableRoot<Row>({
         ? displayedRows.length
         : fromRow + displayedRows.length - 1;
 
-  const gridTemplateColumns = React.useMemo(
-    () => columns.map((column) => columnGridTrack(column)).join(" "),
-    [columns],
-  );
-
   return (
     <ControlSizeProvider value={size}>
       <div
@@ -349,6 +340,7 @@ function DataTableRoot<Row>({
           "show-header": showHeader,
           "sticky-header": stickyHeader,
           "sticky-first-column": stickyFirstColumn,
+          "table-width": fillWidth ? "fill" : "auto",
           "highlight-row": highlightRowOnHover,
           "highlight-column": highlightColumnOnHover,
           striped,
@@ -362,12 +354,11 @@ function DataTableRoot<Row>({
         >
           <table
             className={styles.table}
-            style={{ gridTemplateColumns }}
             onMouseLeave={highlightColumnOnHover ? clearHoveredColumn : undefined}
           >
             {showHeader ? (
               <thead className={styles.head}>
-                <tr>
+                <tr className={styles.headRow}>
                   {columns.map((column, columnIndex) => {
                     const align = column.align ?? "start";
                     const indicator = sortIndicator(sortState, column.id);
@@ -384,7 +375,7 @@ function DataTableRoot<Row>({
                             isFirstColumn &&
                             styles.cornerCellSticky,
                         )}
-                        data-col-index={columnIndex}
+                        style={columnSizeStyle(column)}
                         data-align={align}
                         data-sortable={isSortable ? "true" : undefined}
                         data-first-column={isFirstColumn ? "true" : undefined}
@@ -430,7 +421,7 @@ function DataTableRoot<Row>({
             <tbody className={styles.body}>
               {loading && displayedRows.length === 0 ? (
                 <tr>
-                  <td className={styles.stateCell} style={{ gridColumn: "1 / -1" }}>
+                  <td colSpan={columns.length} className={styles.stateCell}>
                     {loadingText}
                   </td>
                 </tr>
@@ -438,7 +429,7 @@ function DataTableRoot<Row>({
 
               {!loading && displayedRows.length === 0 ? (
                 <tr>
-                  <td className={styles.stateCell} style={{ gridColumn: "1 / -1" }}>
+                  <td colSpan={columns.length} className={styles.stateCell}>
                     {emptyText}
                   </td>
                 </tr>
@@ -461,8 +452,7 @@ function DataTableRoot<Row>({
                           styles.cell,
                           stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
                         )}
-                        data-col-index={columnIndex}
-                        data-row-index={index}
+                        style={columnSizeStyle(column)}
                         data-align={column.align ?? "start"}
                         data-first-column={isFirstColumn ? "true" : undefined}
                         data-column-id={column.id}

@@ -32,7 +32,13 @@ export default function DataTableFullWidthSnippet() {
         Узкий контейнер: корень таблицы тянется на 100% ширины родителя (сетка карточки, колонка
         формы).
       </p>
-      <DataTable.Root columns={columns} rows={rows} showPagination={false} pageSize={10} />
+      <DataTable.Root
+        columns={columns}
+        rows={rows}
+        showPagination={false}
+        pageSize={10}
+        fillWidth
+      />
     </div>
   );
 }

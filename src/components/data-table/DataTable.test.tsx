@@ -231,18 +231,22 @@ describe("DataTable", () => {
     expect(container.querySelectorAll('tr[data-stripe="alt"]')).toHaveLength(2);
   });
 
-  it("maps column width constraints to grid-template-columns", () => {
-    const constrained: DataTableColumn<Row>[] = [
-      { id: "name", header: "Name", accessor: "name", minWidth: "10rem", maxWidth: "20rem" },
-      { id: "score", header: "Score", accessor: "score", width: "5rem" },
+  it("applies width, minWidth and maxWidth to header and body cells", () => {
+    const sizedColumns: DataTableColumn<Row>[] = [
+      { id: "name", header: "Name", accessor: "name", width: "8rem" },
+      { id: "score", header: "Score", accessor: "score", minWidth: "4rem", maxWidth: "10rem" },
     ];
-    const { container } = render(
-      <DataTable.Root rows={rows.slice(0, 1)} columns={constrained} showPagination={false} />,
+    render(
+      <DataTable.Root rows={rows.slice(0, 1)} columns={sizedColumns} showPagination={false} />,
     );
-    const table = container.querySelector("table");
-    expect(table).toHaveStyle({
-      gridTemplateColumns: "minmax(10rem, 20rem) minmax(5rem, 5rem)",
-    });
+
+    const nameHeader = screen.getByRole("columnheader", { name: "Name" });
+    const scoreHeader = screen.getByRole("columnheader", { name: "Score" });
+    expect(nameHeader).toHaveStyle({ width: "8rem" });
+    expect(scoreHeader).toHaveStyle({ minWidth: "4rem", maxWidth: "10rem" });
+
+    const scoreCell = screen.getByRole("cell", { name: "32" });
+    expect(scoreCell).toHaveStyle({ minWidth: "4rem", maxWidth: "10rem" });
   });
 
   it("highlights column on cell mouse enter and clears on table mouse leave", () => {

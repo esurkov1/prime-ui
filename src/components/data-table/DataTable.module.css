@@ -87,28 +87,27 @@
   isolation: isolate;
 }
 
-/* Сетка на <table>: строки thead/tbody/tr с display:contents — ячейки напрямую в сетке (100% ширины, треки minmax + 1fr). */
 .table {
-  display: grid;
-  width: 100%;
-  min-width: 0;
+  /* По умолчанию ширина по содержимому колонок; растягивание на весь viewport — см. [data-table-width="fill"] */
+  width: max-content;
   border-collapse: separate;
   border-spacing: 0;
 }
 
-.table thead,
-.table tbody,
-.table tr {
-  display: contents;
+.root[data-table-width="fill"] .table {
+  width: 100%;
+  min-width: max-content;
 }
 
 .head {
   background: var(--dt-head-bg);
 }
 
+.headRow {
+  box-shadow: inset 0 var(--prime-sys-unit-neg-1px) 0 0 var(--prime-sys-color-border-subtle);
+}
+
 .headCell {
-  box-sizing: border-box;
-  min-width: 0;
   height: var(--dt-row-height);
   padding: var(--dt-cell-pad-y) var(--dt-cell-pad-x);
   font-size: var(--dt-text);
@@ -117,12 +116,6 @@
   line-height: 1.25;
   white-space: nowrap;
   vertical-align: middle;
-  border-bottom: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color-horizontal);
-}
-
-.headCell[data-col-index]:not([data-col-index="0"]) {
-  border-inline-start: var(--dt-divider-width) var(--dt-divider-style)
-    var(--dt-divider-color-vertical);
 }
 
 .headCell[data-align="start"] {
@@ -140,6 +133,11 @@
 .headCell[data-sortable="true"] {
   cursor: pointer;
   user-select: none;
+}
+
+.headCell + .headCell {
+  border-inline-start: var(--dt-divider-width) var(--dt-divider-style)
+    var(--dt-divider-color-vertical);
 }
 
 .root[data-sticky-header="true"] .headCell {
@@ -197,8 +195,6 @@
 }
 
 .cell {
-  box-sizing: border-box;
-  min-width: 0;
   height: var(--dt-row-height);
   padding: var(--dt-cell-pad-y) var(--dt-cell-pad-x);
   font-size: var(--dt-text);
@@ -219,12 +215,12 @@
   text-align: right;
 }
 
-.cell[data-col-index]:not([data-col-index="0"]) {
+.cell + .cell {
   border-inline-start: var(--dt-divider-width) var(--dt-divider-style)
     var(--dt-divider-color-vertical);
 }
 
-.cell[data-row-index]:not([data-row-index="0"]) {
+.row + .row .cell {
   border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color-horizontal);
 }
 

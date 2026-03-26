@@ -16,7 +16,7 @@
 ## Composition
 
 - **Public API** — a single compound entry: `DataTable` with `Root` (`DataTableRoot`). There are no other exported subcomponents.
-- **Structure** — `ControlSizeProvider` wraps a root `div` (data attributes for size, dividers, header visibility, stickiness, hover highlights, zebra). Inside: `ScrollContainer` viewport → `<table>` with `<colgroup>`, optional `<thead>` (`<th>` per column), `<tbody>` with rows, and an `aria-hidden` sentinel at the bottom when `infiniteScroll` is on (for `IntersectionObserver` or scroll fallback).
+- **Structure** — `ControlSizeProvider` wraps a root `div` (data attributes for size, dividers, header visibility, stickiness, table width mode, hover highlights, zebra). Inside: `ScrollContainer` viewport → `<table>`, optional `<thead>` (`<th>` per column), `<tbody>` with rows, and an `aria-hidden` sentinel at the bottom when `infiniteScroll` is on (for `IntersectionObserver` or scroll fallback).
 - **Footer** — always shows a “shown range / total” line; if not `infiniteScroll` and `showPagination` and there is more than one page, it renders `Pagination.Root`; in infinite mode it may show a short status when more rows can be revealed or loaded.
 
 ### Minimal example
@@ -82,6 +82,7 @@ export function Example() {
 | loadingMore | `boolean` | `false` | No | While an async `onLoadMore` is in progress |
 | onLoadMore | `() => void \| Promise<void>` | — | No | Fetch next chunk when local slice is exhausted |
 | scrollHeight | `number \| string` | `360` | No | Max height of the scroll viewport in infinite mode |
+| fillWidth | `boolean` | `false` | No | When `true`, table uses full viewport width (extra space is shared). Default is content-based column widths (`max-content`) |
 | highlightRowOnHover | `boolean` | `true` | No | Row hover highlight |
 | highlightColumnOnHover | `boolean` | `false` | No | Column hover highlight (header + cells) |
 | striped | `boolean` | `false` | No | Alternating row backgrounds |
@@ -98,9 +99,9 @@ export function Example() {
 | sortAccessor | `(row: Row) => unknown` | — | No | Value used for sorting (and default sort comparison) instead of `accessor` |
 | sortComparator | `(a: Row, b: Row, order: DataTableOrder) => number` | — | No | Custom comparator; when set, default primitive compare is not used |
 | align | `DataTableCellAlign` | `"start"` | No | `start`, `center`, or `end` |
-| width | `string` | — | No | Трек `grid-template-columns`: фиксированный `minmax(w, w)` или нижняя граница `minmax(w, max)` |
-| minWidth | `string` | — | No | Минимум трека (`min-content` по умолчанию) |
-| maxWidth | `string` | — | No | Верхняя граница трека (`1fr` по умолчанию — доля свободной ширины после `min`) |
+| width | `string` | — | No | Column width on `th` / `td` (CSS `width`) |
+| minWidth | `string` | — | No | Minimum column width on `th` / `td` |
+| maxWidth | `string` | — | No | Maximum column width on `th` / `td` |
 | onHeaderClick | `(event: React.MouseEvent<HTMLTableCellElement>) => void` | — | No | Fires on header click before sort handling |
 | onCellClick | `(row: Row, event: React.MouseEvent<HTMLTableCellElement> \| React.KeyboardEvent<HTMLTableCellElement>) => void` | — | No | Makes the cell focusable and keyboard-activable |
 
