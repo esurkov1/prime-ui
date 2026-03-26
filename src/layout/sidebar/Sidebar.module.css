@@ -138,12 +138,11 @@
   padding-inline: var(--sb-panel-padding-inline);
   border: 0;
   border-radius: 0;
-  /* Светлая: смесь с elevated, иначе колонка = canvas (surface-default). Тёмная: только default. */
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-surface-elevated) 60%,
-    var(--prime-sys-color-surface-default)
-  );
+  /*
+   * Светлая: accentSoft — заметная подложка и при пресетах (там default≈elevated≈белый).
+   * Тёмная: accentSoft совпадает с elevated — только surface-default, как у дропдауна не делаем.
+   */
+  background: var(--prime-sys-color-surface-accentSoft);
   box-shadow: none;
   transition: background-color var(--sb-transition-duration) var(--sb-transition-ease);
 }
