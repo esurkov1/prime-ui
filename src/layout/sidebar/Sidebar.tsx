@@ -8,7 +8,6 @@ import {
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 
-import type { ButtonRootProps } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
@@ -112,7 +111,10 @@ function SidebarText({ className, ...rest }: SidebarTextProps) {
 
 SidebarText.displayName = "SidebarText";
 
-export type SidebarToggleButtonProps = Omit<ButtonRootProps, "children" | "aria-label"> & {
+export type SidebarToggleButtonProps = Omit<
+  React.ComponentPropsWithoutRef<"button">,
+  "children" | "aria-label"
+> & {
   openLabel?: string;
   closedLabel?: string;
 };
@@ -125,30 +127,9 @@ function iconForToggle(state: SidebarLayoutMode, side: "left" | "right") {
 }
 
 const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleButtonProps>(
-  (
-    {
-      className,
-      size: _size,
-      variant: _variant,
-      mode: _mode,
-      fullWidth: _fullWidth,
-      loading: _loading,
-      asChild: _asChild,
-      openLabel = "Скрыть сайдбар",
-      closedLabel = "Открыть сайдбар",
-      ...rest
-    },
-    ref,
-  ) => {
-    const { state, toggleOpen, navPanelId, side, size: contextSize } = useSidebarContext();
+  ({ className, openLabel = "Скрыть сайдбар", closedLabel = "Открыть сайдбар", ...rest }, ref) => {
+    const { state, toggleOpen, navPanelId, side } = useSidebarContext();
     const expanded = state !== "hidden";
-    void _size;
-    void _variant;
-    void _mode;
-    void _fullWidth;
-    void _loading;
-    void _asChild;
-    void contextSize;
 
     return (
       <button
@@ -314,33 +295,12 @@ function SidebarMenuTrailing({ className, ...rest }: SidebarMenuTrailingProps) {
 
 SidebarMenuTrailing.displayName = "SidebarMenuTrailing";
 
-export type SidebarMenuActionProps = Omit<ButtonRootProps, "children"> & {
+export type SidebarMenuActionProps = React.ComponentPropsWithoutRef<"button"> & {
   children?: React.ReactNode;
 };
 
 const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
-  (
-    {
-      className,
-      children,
-      type = "button",
-      size: _size,
-      variant: _variant,
-      mode: _mode,
-      asChild: _asChild,
-      fullWidth: _fullWidth,
-      loading: _loading,
-      ...rest
-    },
-    ref,
-  ) => {
-    void _size;
-    void _variant;
-    void _mode;
-    void _asChild;
-    void _fullWidth;
-    void _loading;
-
+  ({ className, children, type = "button", ...rest }, ref) => {
     return (
       <button {...rest} ref={ref} type={type} className={cx(styles.menuAction, className)}>
         {children}
@@ -351,35 +311,13 @@ const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionP
 
 SidebarMenuAction.displayName = "SidebarMenuAction";
 
-export type SidebarMenuButtonProps = Omit<ButtonRootProps, "asChild"> & {
+export type SidebarMenuButtonProps = React.ComponentPropsWithoutRef<"button"> & {
   active?: boolean;
   asChild?: boolean;
 };
 
 const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
-  (
-    {
-      className,
-      active,
-      asChild = false,
-      disabled,
-      onClick,
-      type = "button",
-      size: _size,
-      variant: _variant,
-      mode: _mode,
-      fullWidth: _fullWidth,
-      loading: _loading,
-      ...rest
-    },
-    ref,
-  ) => {
-    void _size;
-    void _variant;
-    void _mode;
-    void _fullWidth;
-    void _loading;
-
+  ({ className, active, asChild = false, disabled, onClick, type = "button", ...rest }, ref) => {
     if (asChild) {
       return (
         <Slot
