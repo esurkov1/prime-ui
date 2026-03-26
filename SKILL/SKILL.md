@@ -18,17 +18,17 @@ description: >
 
 | What | Path (this repository) | After `npm install prime-ui-kit` |
 |------|--------------------------|-------------------------------------|
-| Per-component API, props, examples | `src/components/<kebab-name>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<kebab-name>/COMPONENT.md` |
-| Design tokens, full 41-component catalog, source annotations | `references/*.md` | `node_modules/prime-ui-kit/references/*.md` |
+| Per-component API, props, examples | `../src/components/<kebab-name>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<kebab-name>/COMPONENT.md` |
+| Design tokens, full 41-component catalog, source annotations | `../references/*.md` | `node_modules/prime-ui-kit/references/*.md` |
 
-This file (`SKILL.md`) lives at the repository root; install it as a Cursor skill by pointing the skill folder at the repo (or copy `SKILL.md` plus `references/` into your skills directory and keep paths consistent).
+This skill lives in `SKILL/SKILL.md` (sibling of `references/` at repo root). Install as a Cursor skill by pointing the skill directory at `SKILL/` and keeping `references/` one level up next to it, or symlink/copy `references/` beside `SKILL/` if you relocate only the skill folder.
 
 ---
 
 ## Visual Language & Design Tokens
 
 Any responsive layout on prime-ui-kit **must** follow the system’s visual language.
-Full token reference: [`references/design-tokens.md`](references/design-tokens.md).
+Full token reference: [`references/design-tokens.md`](../references/design-tokens.md).
 
 ### Mandatory rules
 
@@ -224,23 +224,23 @@ Use DevTools Responsive Mode to check intermediate widths.
 
 | Component | Role in responsive layout | Typical region | Documentation |
 |-----------|---------------------------|----------------|----------------|
-| Sidebar | Navigation; desktop inline → mobile Drawer | sidebar | `src/components/sidebar/COMPONENT.md` |
-| Drawer | Overlay panel; replaces modals and sidebars on mobile | overlay | `src/components/drawer/COMPONENT.md` |
-| Tabs | Content switching; scroll on mobile | content | `src/components/tabs/COMPONENT.md` |
-| DataTable | Table with horizontal scroll on mobile | content | `src/components/data-table/COMPONENT.md` |
-| Button | CTA; `size="l"` + `fullWidth` on mobile | form, footer | `src/components/button/COMPONENT.md` |
-| Input | Text field; `fullWidth` in mobile forms | form | `src/components/input/COMPONENT.md` |
-| Select | Choice; portal menu, `fullWidth` | form | `src/components/select/COMPONENT.md` |
-| Modal | Dialog; on mobile → Drawer (bottom) | overlay | `src/components/modal/COMPONENT.md` |
-| Accordion | Expand/collapse; replaces Tabs on narrow viewports | content | `src/components/accordion/COMPONENT.md` |
-| Breadcrumb | Path; auto-collapse via `maxItems` | header | `src/components/breadcrumb/COMPONENT.md` |
-| Stepper | Progress; horizontal → vertical on mobile | content | `src/components/stepper/COMPONENT.md` |
-| Pagination | Pages; compact mode on mobile | footer | `src/components/pagination/COMPONENT.md` |
-| Typography | Text; change `variant` by breakpoint or fluid | content | `src/components/typography/COMPONENT.md` |
-| SegmentedControl | Toggle; → Select when more than 4 segments on mobile | header | `src/components/segmented-control/COMPONENT.md` |
-| Notification | Toasts; fullWidth at bottom on mobile | overlay | `src/components/notification/COMPONENT.md` |
+| Sidebar | Navigation; desktop inline → mobile Drawer | sidebar | [`../src/components/sidebar/COMPONENT.md`](../src/components/sidebar/COMPONENT.md) |
+| Drawer | Overlay panel; replaces modals and sidebars on mobile | overlay | [`../src/components/drawer/COMPONENT.md`](../src/components/drawer/COMPONENT.md) |
+| Tabs | Content switching; scroll on mobile | content | [`../src/components/tabs/COMPONENT.md`](../src/components/tabs/COMPONENT.md) |
+| DataTable | Table with horizontal scroll on mobile | content | [`../src/components/data-table/COMPONENT.md`](../src/components/data-table/COMPONENT.md) |
+| Button | CTA; `size="l"` + `fullWidth` on mobile | form, footer | [`../src/components/button/COMPONENT.md`](../src/components/button/COMPONENT.md) |
+| Input | Text field; `fullWidth` in mobile forms | form | [`../src/components/input/COMPONENT.md`](../src/components/input/COMPONENT.md) |
+| Select | Choice; portal menu, `fullWidth` | form | [`../src/components/select/COMPONENT.md`](../src/components/select/COMPONENT.md) |
+| Modal | Dialog; on mobile → Drawer (bottom) | overlay | [`../src/components/modal/COMPONENT.md`](../src/components/modal/COMPONENT.md) |
+| Accordion | Expand/collapse; replaces Tabs on narrow viewports | content | [`../src/components/accordion/COMPONENT.md`](../src/components/accordion/COMPONENT.md) |
+| Breadcrumb | Path; auto-collapse via `maxItems` | header | [`../src/components/breadcrumb/COMPONENT.md`](../src/components/breadcrumb/COMPONENT.md) |
+| Stepper | Progress; horizontal → vertical on mobile | content | [`../src/components/stepper/COMPONENT.md`](../src/components/stepper/COMPONENT.md) |
+| Pagination | Pages; compact mode on mobile | footer | [`../src/components/pagination/COMPONENT.md`](../src/components/pagination/COMPONENT.md) |
+| Typography | Text; change `variant` by breakpoint or fluid | content | [`../src/components/typography/COMPONENT.md`](../src/components/typography/COMPONENT.md) |
+| SegmentedControl | Toggle; → Select when more than 4 segments on mobile | header | [`../src/components/segmented-control/COMPONENT.md`](../src/components/segmented-control/COMPONENT.md) |
+| Notification | Toasts; fullWidth at bottom on mobile | overlay | [`../src/components/notification/COMPONENT.md`](../src/components/notification/COMPONENT.md) |
 
-Full table of all 41 components: [`references/component-catalog.md`](references/component-catalog.md).
+Full table of all 41 components: [`references/component-catalog.md`](../references/component-catalog.md).
 
 ---
 
@@ -264,7 +264,7 @@ Full table of all 41 components: [`references/component-catalog.md`](references/
 | 14 | Accessible Navigation Guide 2026 — Brand Vision | https://www.brandvm.com/post/accessible-navigation-websites-ux-guide-2026 |
 | 15 | Minimum WCAG-Conformant Element Size — Smashing Magazine | https://www.smashingmagazine.com/2024/07/getting-bottom-minimum-wcag-conformant-interactive-element-size |
 
-Expanded annotations: [`references/responsive-flexbox-sources.md`](references/responsive-flexbox-sources.md).
+Expanded annotations: [`references/responsive-flexbox-sources.md`](../references/responsive-flexbox-sources.md).
 
 ---
 
@@ -300,7 +300,7 @@ Interactive elements under 44 px on mobile. Use `size="l"` for Button, Input, Se
 
 ### 8. Hard-coded visual values instead of tokens
 
-`background: #f3f4f7`, `gap: 16px`, `border-radius: 12px`, `z-index: 999` — all of this breaks theming and consistency. Use `--prime-sys-*` tokens. Details: [`references/design-tokens.md`](references/design-tokens.md).
+`background: #f3f4f7`, `gap: 16px`, `border-radius: 12px`, `z-index: 999` — all of this breaks theming and consistency. Use `--prime-sys-*` tokens. Details: [`references/design-tokens.md`](../references/design-tokens.md).
 
 ### 9. Custom wrappers or “reskinned” kit components
 
