@@ -1,0 +1,16 @@
+/* Раскладка превью textarea — токены вместо inline style в сниппетах */
+
+.compositionStack {
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+  max-width: min(100%, 28rem);
+}
+
+.fullWidthCard {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(100%, 20rem);
+  border: 1px dashed var(--prime-sys-color-border-subtle);
+  padding: var(--prime-sys-spacing-x3);
+  border-radius: var(--prime-sys-radius-m);
+}

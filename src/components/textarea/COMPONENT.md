@@ -71,7 +71,7 @@ export function ArticleLeadBlock() {
   const [lead, setLead] = React.useState("");
 
   return (
-    <section style={{ maxWidth: "36rem" }}>
+    <>
       <Typography.Root size="s" weight="semibold" as="h3">
         Lead paragraph
       </Typography.Root>
@@ -85,7 +85,7 @@ export function ArticleLeadBlock() {
         <Textarea.CharCounter current={lead.length} max={LEAD_MAX} />
         <Textarea.Hint>The {LEAD_MAX}-character limit matches the textarea maxLength.</Textarea.Hint>
       </Textarea.Root>
-    </section>
+    </>
   );
 }
 ```

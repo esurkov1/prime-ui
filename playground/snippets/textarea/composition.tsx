@@ -1,9 +1,11 @@
 import { Textarea } from "@/components/textarea/Textarea";
 import { Typography } from "@/components/typography/Typography";
 
+import styles from "./snippets.module.css";
+
 export default function TextareaCompositionSnippet() {
   return (
-    <div style={{ display: "grid", gap: "12px", maxWidth: "min(100%, 28rem)" }}>
+    <div className={styles.compositionStack}>
       <Typography.Root size="s" weight="medium" as="div">
         Комментарий к заказу
       </Typography.Root>
