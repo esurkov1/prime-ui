@@ -115,10 +115,12 @@
   align-self: stretch;
   min-width: 0;
   min-height: 0;
-  height: auto;
+  height: 100%;
+  max-height: 100%;
   width: fit-content;
   max-width: 100%;
   margin: 0;
+  overflow: hidden;
   transition: none;
   --sb-shell-gap: 0;
 }
@@ -174,6 +176,8 @@
     width: auto;
     min-width: 0;
     max-width: var(--sb-page-nav-expanded);
+    height: 100%;
+    max-height: 100%;
     overflow: hidden;
     transition:
       max-width var(--sb-transition-duration) var(--sb-transition-ease),
@@ -399,6 +403,11 @@
 @media (min-width: 64.001rem) {
   .root[data-sidebar-slot="page-nav"] .navPanel {
     opacity: 1;
+    flex: 1 1 auto;
+    align-self: stretch;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
   }
 
   .root[data-sidebar-slot="page-nav"][data-open="false"] .navPanel {
@@ -851,7 +860,7 @@
     z-index: var(--prime-sys-elevation-zIndex-modal);
     width: 100vw;
     min-width: 100vw;
-    overflow: visible;
+    overflow: hidden;
     pointer-events: none;
   }
 
@@ -882,6 +891,8 @@
     min-width: min(var(--sb-panel-width), 100%);
     max-width: min(100%, var(--sb-panel-width));
     height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
     border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
     transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
     opacity: 0;
