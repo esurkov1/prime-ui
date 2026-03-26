@@ -43,7 +43,7 @@ import { Checkbox, Divider } from "prime-ui-kit";
 
 export function NotificationSettings() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 360 }}>
+    <>
       <Divider.Root variant="text" size="l">
         Push notifications
       </Divider.Root>
@@ -54,7 +54,7 @@ export function NotificationSettings() {
       <Checkbox.Root size="m">
         <Checkbox.Label>Event reminders</Checkbox.Label>
       </Checkbox.Root>
-    </div>
+    </>
   );
 }
 ```
@@ -68,23 +68,23 @@ import { Divider } from "prime-ui-kit";
 
 export function ArticleCard() {
   return (
-    <article style={{ maxWidth: 320, padding: 16, border: "1px solid #e5e5e5", borderRadius: 8 }}>
-      <h2 style={{ margin: "0 0 8px" }}>Draft</h2>
-      <p style={{ margin: 0 }}>Preview text…</p>
-      <Divider.Root size="m" style={{ margin: "12px 0" }} />
-      <p style={{ margin: 0, fontSize: 14 }}>Updated today</p>
+    <article>
+      <h2>Draft</h2>
+      <p>Preview text…</p>
+      <Divider.Root size="m" />
+      <p>Updated today</p>
     </article>
   );
 }
 
 export function EditorToolbar() {
   return (
-    <div style={{ display: "flex", alignItems: "stretch", gap: 8, height: 40 }}>
-      <span style={{ alignSelf: "center" }}>Bold</span>
+    <div className="dividerDocToolbar">
+      <span>Bold</span>
       <Divider.Root orientation="vertical" size="m" />
-      <span style={{ alignSelf: "center" }}>Italic</span>
+      <span>Italic</span>
       <Divider.Root orientation="vertical" size="m" />
-      <span style={{ alignSelf: "center" }}>Link</span>
+      <span>Link</span>
     </div>
   );
 }

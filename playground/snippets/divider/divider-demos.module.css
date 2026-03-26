@@ -1,0 +1,455 @@
+/* Divider playground snippets — токены темы, без инлайнов в TSX */
+
+.rootStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.rootStackLoose {
+  gap: var(--prime-sys-spacing-xl);
+}
+
+.rootStackLooser {
+  gap: var(--prime-sys-spacing-2xl);
+}
+
+.maxW480 {
+  max-width: min(100%, 30rem);
+}
+
+.maxW420 {
+  max-width: min(100%, 26.25rem);
+}
+
+.maxW400 {
+  max-width: min(100%, 25rem);
+}
+
+.maxW360 {
+  max-width: min(100%, 22.5rem);
+}
+
+.maxW320 {
+  max-width: min(100%, 20rem);
+}
+
+.settingsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(100%, 30rem);
+  padding: var(--prime-sys-spacing-x4);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background-color: var(--prime-sys-color-surface-default);
+}
+
+.inset {
+  padding-left: var(--prime-sys-spacing-x2);
+}
+
+.paragraphSecondary {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.paragraphSecondaryTight {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.paragraphTertiary {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.paragraphTertiaryXs {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-2xs);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.sectionTop {
+  margin-top: var(--prime-sys-spacing-x2);
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+}
+
+.card {
+  padding: var(--prime-sys-spacing-x4);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background-color: var(--prime-sys-color-surface-default);
+}
+
+.cardHeading {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-typography-sizeScale-m);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.cardHeadingSpaced {
+  margin: 0 0 var(--prime-sys-spacing-x3);
+  font-size: var(--prime-sys-typography-sizeScale-m);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.cardLead {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.dividerVerticalMargin {
+  margin: var(--prime-sys-spacing-x3) 0;
+}
+
+.dividerVerticalMarginLoose {
+  margin: var(--prime-sys-spacing-x4) 0;
+}
+
+.lineSpacingColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.formFields {
+  margin-top: var(--prime-sys-spacing-x3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.formFieldsTopLoose {
+  margin-top: var(--prime-sys-spacing-x4);
+}
+
+.textInput {
+  box-sizing: border-box;
+  padding: var(--prime-sys-spacing-s) var(--prime-sys-spacing-m);
+  border: 1px solid var(--prime-sys-color-border-default);
+  border-radius: var(--prime-sys-shape-radius-m);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+}
+
+.textInputFull {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--prime-sys-spacing-s) var(--prime-sys-spacing-m);
+  border: 1px solid var(--prime-sys-color-border-default);
+  border-radius: var(--prime-sys-shape-radius-m);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+}
+
+.totalLine {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-l);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.toolbar {
+  display: flex;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-x2);
+  height: 2.5rem;
+  padding: 0 var(--prime-sys-spacing-x3);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-m);
+  background-color: var(--prime-sys-color-surface-default);
+  width: fit-content;
+}
+
+.toolbarWide {
+  display: flex;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-x3);
+  height: 2.75rem;
+  padding: 0 var(--prime-sys-spacing-x4);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-m);
+  background-color: var(--prime-sys-color-surface-default);
+  width: fit-content;
+}
+
+.toolbarNav {
+  display: flex;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-x2);
+  height: 2.25rem;
+  padding: 0 var(--prime-sys-spacing-x2);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-m);
+  background-color: var(--prime-sys-color-surface-default);
+  width: fit-content;
+}
+
+.toolbarButton {
+  align-self: center;
+  padding: var(--prime-sys-spacing-xs) var(--prime-sys-spacing-m);
+  border: none;
+  background: transparent;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  cursor: pointer;
+}
+
+.toolbarButtonPlain {
+  align-self: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  cursor: pointer;
+}
+
+.navLink {
+  align-self: center;
+  padding: var(--prime-sys-spacing-xs) var(--prime-sys-spacing-m);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-secondary);
+  text-decoration: none;
+}
+
+.navLinkBrand {
+  composes: navLink;
+  color: var(--prime-sys-color-content-accent);
+}
+
+.article {
+  max-width: min(100%, 22.5rem);
+  padding: var(--prime-sys-spacing-x4);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background-color: var(--prime-sys-color-surface-default);
+}
+
+.articleTitle {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-typography-sizeScale-l);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.articleBody {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metaMuted {
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.listShell {
+  max-width: min(100%, 20rem);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background-color: var(--prime-sys-color-surface-default);
+  overflow: hidden;
+}
+
+.listHeader {
+  padding: var(--prime-sys-spacing-x3) var(--prime-sys-spacing-x4);
+}
+
+.listRow {
+  padding: var(--prime-sys-spacing-x3) var(--prime-sys-spacing-x4);
+}
+
+.listItemTitle {
+  margin: 0 0 var(--prime-sys-spacing-xs);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.listItemBody {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.transactionShell {
+  max-width: min(100%, 25rem);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background-color: var(--prime-sys-color-surface-default);
+}
+
+.transactionHeader {
+  padding: var(--prime-sys-spacing-x4);
+}
+
+.transactionRow {
+  padding: var(--prime-sys-spacing-x3) var(--prime-sys-spacing-x4);
+}
+
+.transactionLine {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--prime-sys-spacing-xs);
+}
+
+.transactionLabel {
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.amountSuccess {
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  color: var(--prime-sys-color-status-success-foreground);
+}
+
+.amountDanger {
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  color: var(--prime-sys-color-content-danger);
+}
+
+.dateMuted {
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.timelineBlock {
+  margin-top: var(--prime-sys-spacing-x3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.timelineBlockSimple {
+  margin-top: var(--prime-sys-spacing-x3);
+}
+
+.fullWidthButton {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--prime-sys-spacing-m) var(--prime-sys-spacing-l);
+  border: 1px solid var(--prime-sys-color-border-default);
+  border-radius: var(--prime-sys-shape-radius-m);
+  background-color: var(--prime-sys-color-surface-default);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  cursor: pointer;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--prime-sys-spacing-x4);
+}
+
+.statLabel {
+  margin: 0 0 var(--prime-sys-spacing-xs);
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.statValue {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-3xl);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x3);
+  margin-bottom: var(--prime-sys-spacing-x3);
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--prime-sys-color-surface-accentSoft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--prime-sys-typography-sizeScale-xl);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.profileName {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-m);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.profileRole {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.specRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+}
+
+.specKey {
+  color: var(--prime-sys-color-content-muted);
+}
+
+.specVal {
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.ratingScore {
+  font-size: var(--prime-sys-typography-sizeScale-xl);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.ratingCaption {
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.productTitle {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-typography-sizeScale-l);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.locationText {
+  margin: var(--prime-sys-spacing-x3) 0 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.columnGap2 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}

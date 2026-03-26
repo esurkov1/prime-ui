@@ -1,66 +1,38 @@
 import { Divider } from "@/components/divider/Divider";
 
+import s from "./divider-demos.module.css";
+
 /** Три варианта в реальных сценариях: карточка заказа, список настроек, форма регистрации. */
 export default function DividerVariantsSnippet() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-space-6)",
-        width: "100%",
-        maxWidth: 420,
-      }}
-    >
+    <div className={`${s.rootStack} ${s.rootStackLooser} ${s.maxW420}`}>
       {/* variant="default": разделение секций в карточке заказа */}
-      <div
-        style={{
-          padding: "var(--prime-sys-space-4)",
-          border: "1px solid var(--prime-sys-color-border-subtle)",
-          borderRadius: "var(--prime-sys-radius-l)",
-          backgroundColor: "var(--prime-sys-color-surface-default)",
-        }}
-      >
-        <h3 style={{ margin: "0 0 var(--prime-sys-space-2)", fontSize: 16, fontWeight: 600 }}>
-          Заказ №12345
-        </h3>
-        <p style={{ margin: 0, fontSize: 14, color: "var(--prime-sys-color-text-secondary)" }}>
-          3 товара • Доставка завтра
-        </p>
-        <Divider.Root size="m" style={{ margin: "var(--prime-sys-space-3) 0" }} />
-        <p style={{ margin: 0, fontSize: 14, color: "var(--prime-sys-color-text-secondary)" }}>
-          Адрес: ул. Ленина, д. 10, кв. 5
-        </p>
-        <Divider.Root size="m" style={{ margin: "var(--prime-sys-space-3) 0" }}>
+      <div className={s.card}>
+        <h3 className={s.cardHeading}>Заказ №12345</h3>
+        <p className={s.cardLead}>3 товара • Доставка завтра</p>
+        <Divider.Root size="m" className={s.dividerVerticalMargin} />
+        <p className={s.cardLead}>Адрес: ул. Ленина, д. 10, кв. 5</p>
+        <Divider.Root size="m" className={s.dividerVerticalMargin}>
           Итого
         </Divider.Root>
-        <p style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>12 400 ₽</p>
+        <p className={s.totalLine}>12 400 ₽</p>
       </div>
 
       {/* variant="line-spacing": компактный список с визуальными маркерами */}
-      <div
-        style={{
-          padding: "var(--prime-sys-space-4)",
-          border: "1px solid var(--prime-sys-color-border-subtle)",
-          borderRadius: "var(--prime-sys-radius-l)",
-          backgroundColor: "var(--prime-sys-color-surface-default)",
-        }}
-      >
-        <h3 style={{ margin: "0 0 var(--prime-sys-space-3)", fontSize: 16, fontWeight: 600 }}>
-          Уведомления
-        </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--prime-sys-space-3)" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+      <div className={s.card}>
+        <h3 className={s.cardHeadingSpaced}>Уведомления</h3>
+        <div className={s.lineSpacingColumn}>
+          <label className={s.checkboxRow}>
             <input type="checkbox" defaultChecked />
             Email-рассылка
           </label>
           <Divider.Root variant="line-spacing" size="m" />
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+          <label className={s.checkboxRow}>
             <input type="checkbox" defaultChecked />
             Push-уведомления
           </label>
           <Divider.Root variant="line-spacing" size="m" />
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+          <label className={s.checkboxRow}>
             <input type="checkbox" />
             SMS-оповещения
           </label>
@@ -68,61 +40,19 @@ export default function DividerVariantsSnippet() {
       </div>
 
       {/* variant="text": заголовки секций формы */}
-      <div
-        style={{
-          padding: "var(--prime-sys-space-4)",
-          border: "1px solid var(--prime-sys-color-border-subtle)",
-          borderRadius: "var(--prime-sys-radius-l)",
-          backgroundColor: "var(--prime-sys-color-surface-default)",
-        }}
-      >
+      <div className={s.card}>
         <Divider.Root variant="text" size="m">
           Личные данные
         </Divider.Root>
-        <div
-          style={{
-            marginTop: "var(--prime-sys-space-3)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--prime-sys-space-2)",
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Имя"
-            style={{
-              padding: "8px 12px",
-              border: "1px solid var(--prime-sys-color-border-default)",
-              borderRadius: "var(--prime-sys-radius-m)",
-              fontSize: 14,
-            }}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            style={{
-              padding: "8px 12px",
-              border: "1px solid var(--prime-sys-color-border-default)",
-              borderRadius: "var(--prime-sys-radius-m)",
-              fontSize: 14,
-            }}
-          />
+        <div className={s.formFields}>
+          <input className={s.textInput} type="text" placeholder="Имя" />
+          <input className={s.textInput} type="email" placeholder="Email" />
         </div>
-        <Divider.Root variant="text" size="m" style={{ marginTop: "var(--prime-sys-space-4)" }}>
+        <Divider.Root variant="text" size="m" className={s.formFieldsTopLoose}>
           Безопасность
         </Divider.Root>
-        <div style={{ marginTop: "var(--prime-sys-space-3)" }}>
-          <input
-            type="password"
-            placeholder="Пароль"
-            style={{
-              padding: "8px 12px",
-              border: "1px solid var(--prime-sys-color-border-default)",
-              borderRadius: "var(--prime-sys-radius-m)",
-              fontSize: 14,
-              width: "100%",
-            }}
-          />
+        <div className={s.timelineBlockSimple}>
+          <input className={s.textInputFull} type="password" placeholder="Пароль" />
         </div>
       </div>
     </div>

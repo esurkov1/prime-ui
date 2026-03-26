@@ -710,6 +710,18 @@ h3 {
   min-width: 0;
 }
 
+/* Divider — COMPONENT.md: тулбар с вертикальными разделителями (глобально в playground) */
+.dividerDocToolbar {
+  display: flex;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-x2);
+  min-height: 2.5rem;
+}
+
+.dividerDocToolbar > span {
+  align-self: center;
+}
+
 @media (max-width: 732px) {
   .grid2 {
     grid-template-columns: 1fr;

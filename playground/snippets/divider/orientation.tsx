@@ -1,187 +1,52 @@
 import { Divider } from "@/components/divider/Divider";
 
+import s from "./divider-demos.module.css";
+
 /** Вертикальные разделители в реальных UI-паттернах: тулбар, навигация, панель действий. */
 export default function DividerOrientationSnippet() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-space-5)",
-        width: "100%",
-      }}
-    >
+    <div className={`${s.rootStack} ${s.rootStackLoose} ${s.maxW480}`}>
       {/* Тулбар редактора */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "stretch",
-          gap: "var(--prime-sys-space-2)",
-          height: 40,
-          padding: "0 var(--prime-sys-space-3)",
-          border: "1px solid var(--prime-sys-color-border-subtle)",
-          borderRadius: "var(--prime-sys-radius-m)",
-          backgroundColor: "var(--prime-sys-color-surface-default)",
-          width: "fit-content",
-        }}
-      >
-        <button
-          type="button"
-          style={{
-            alignSelf: "center",
-            padding: "4px 12px",
-            border: "none",
-            background: "transparent",
-            fontSize: 14,
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
-        >
+      <div className={s.toolbar}>
+        <button className={s.toolbarButton} type="button">
           Жирный
         </button>
         <Divider.Root orientation="vertical" size="m" />
-        <button
-          type="button"
-          style={{
-            alignSelf: "center",
-            padding: "4px 12px",
-            border: "none",
-            background: "transparent",
-            fontSize: 14,
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
-        >
+        <button className={s.toolbarButton} type="button">
           Курсив
         </button>
         <Divider.Root orientation="vertical" size="m" />
-        <button
-          type="button"
-          style={{
-            alignSelf: "center",
-            padding: "4px 12px",
-            border: "none",
-            background: "transparent",
-            fontSize: 14,
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
-        >
+        <button className={s.toolbarButton} type="button">
           Ссылка
         </button>
       </div>
 
       {/* Панель действий таблицы */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "stretch",
-          gap: "var(--prime-sys-space-3)",
-          height: 44,
-          padding: "0 var(--prime-sys-space-4)",
-          border: "1px solid var(--prime-sys-color-border-subtle)",
-          borderRadius: "var(--prime-sys-radius-m)",
-          backgroundColor: "var(--prime-sys-color-surface-default)",
-          width: "fit-content",
-        }}
-      >
-        <button
-          type="button"
-          style={{
-            alignSelf: "center",
-            padding: 0,
-            border: "none",
-            background: "transparent",
-            fontSize: 14,
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
-        >
+      <div className={s.toolbarWide}>
+        <button className={s.toolbarButtonPlain} type="button">
           Фильтр
         </button>
         <Divider.Root orientation="vertical" size="m" />
-        <button
-          type="button"
-          style={{
-            alignSelf: "center",
-            padding: 0,
-            border: "none",
-            background: "transparent",
-            fontSize: 14,
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
-        >
+        <button className={s.toolbarButtonPlain} type="button">
           Сортировка
         </button>
         <Divider.Root orientation="vertical" size="m" />
-        <button
-          type="button"
-          style={{
-            alignSelf: "center",
-            padding: 0,
-            border: "none",
-            background: "transparent",
-            fontSize: 14,
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
-        >
+        <button className={s.toolbarButtonPlain} type="button">
           Экспорт
         </button>
       </div>
 
       {/* Горизонтальная навигация */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "stretch",
-          gap: "var(--prime-sys-space-2)",
-          height: 36,
-          padding: "0 var(--prime-sys-space-2)",
-          border: "1px solid var(--prime-sys-color-border-subtle)",
-          borderRadius: "var(--prime-sys-radius-m)",
-          backgroundColor: "var(--prime-sys-color-surface-default)",
-          width: "fit-content",
-        }}
-      >
-        <a
-          href="#overview"
-          style={{
-            alignSelf: "center",
-            padding: "4px 12px",
-            fontSize: 14,
-            fontWeight: 500,
-            color: "var(--prime-sys-color-text-brand)",
-            textDecoration: "none",
-          }}
-        >
+      <div className={s.toolbarNav}>
+        <a className={s.navLinkBrand} href="#overview">
           Обзор
         </a>
         <Divider.Root orientation="vertical" size="s" />
-        <a
-          href="#details"
-          style={{
-            alignSelf: "center",
-            padding: "4px 12px",
-            fontSize: 14,
-            color: "var(--prime-sys-color-text-secondary)",
-            textDecoration: "none",
-          }}
-        >
+        <a className={s.navLink} href="#details">
           Детали
         </a>
         <Divider.Root orientation="vertical" size="s" />
-        <a
-          href="#settings"
-          style={{
-            alignSelf: "center",
-            padding: "4px 12px",
-            fontSize: 14,
-            color: "var(--prime-sys-color-text-secondary)",
-            textDecoration: "none",
-          }}
-        >
+        <a className={s.navLink} href="#settings">
           Настройки
         </a>
       </div>
