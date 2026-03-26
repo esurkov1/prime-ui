@@ -6,22 +6,22 @@ import {
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import DashboardCardFlatSnippet from "../snippets/dashboard-card/flat";
-import flatSource from "../snippets/dashboard-card/flat.tsx?raw";
-import DashboardCardMetricSnippet from "../snippets/dashboard-card/metric";
-import metricSource from "../snippets/dashboard-card/metric.tsx?raw";
-import DashboardCardMediaSnippet from "../snippets/dashboard-card/metric-media";
-import metricMediaSource from "../snippets/dashboard-card/metric-media.tsx?raw";
-import DashboardCardMiniSnippet from "../snippets/dashboard-card/mini";
-import miniSource from "../snippets/dashboard-card/mini.tsx?raw";
-import DashboardCardRowSnippet from "../snippets/dashboard-card/row";
-import rowSource from "../snippets/dashboard-card/row.tsx?raw";
-import DashboardCardSectionSnippet from "../snippets/dashboard-card/section";
-import sectionSource from "../snippets/dashboard-card/section.tsx?raw";
-import DashboardCardSectionContentAndChartSnippet from "../snippets/dashboard-card/section-content-and-chart";
-import sectionContentAndChartSource from "../snippets/dashboard-card/section-content-and-chart.tsx?raw";
+import CardFlatSnippet from "../snippets/card/flat";
+import flatSource from "../snippets/card/flat.tsx?raw";
+import CardMetricSnippet from "../snippets/card/metric";
+import metricSource from "../snippets/card/metric.tsx?raw";
+import CardMediaSnippet from "../snippets/card/metric-media";
+import metricMediaSource from "../snippets/card/metric-media.tsx?raw";
+import CardMiniSnippet from "../snippets/card/mini";
+import miniSource from "../snippets/card/mini.tsx?raw";
+import CardRowSnippet from "../snippets/card/row";
+import rowSource from "../snippets/card/row.tsx?raw";
+import CardSectionSnippet from "../snippets/card/section";
+import sectionSource from "../snippets/card/section.tsx?raw";
+import CardSectionContentAndChartSnippet from "../snippets/card/section-content-and-chart";
+import sectionContentAndChartSource from "../snippets/card/section-content-and-chart.tsx?raw";
 
-const dashboardCardRootApiRows: PlaygroundApiPropRow[] = [
+const cardRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "variant",
     type: '"mini" | "metric" | "metric-media" | "section"',
@@ -49,7 +49,7 @@ const dashboardCardRootApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Слоты DashboardCard.* в соответствии с variant.",
+    description: "Слоты Card.* в соответствии с variant.",
   },
   {
     prop: "…rest",
@@ -60,16 +60,16 @@ const dashboardCardRootApiRows: PlaygroundApiPropRow[] = [
   },
 ];
 
-export default function DashboardCardSection() {
+export default function CardSection() {
   return (
     <PlaygroundDocPage
-      title="DashboardCard"
-      headingId="dashboard-card-heading"
+      title="Card"
+      headingId="card-heading"
       description={
         <>
           Карточки для дашборда: компактные KPI, метрики с бейджем или иконкой, вариант с полосой
           для мини-графика или прогресса, и крупная секция под полноразмерные графики. Стили на
-          семантических токенах; графики подключаются снаружи (слоты Media и Body).
+          семантических токенах; графики подключаются снаружи (слоты Media, Body, Chart).
         </>
       }
     >
@@ -82,7 +82,7 @@ export default function DashboardCardSection() {
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={miniSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <DashboardCardMiniSnippet />
+              <CardMiniSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
@@ -96,7 +96,7 @@ export default function DashboardCardSection() {
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={metricSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <DashboardCardMetricSnippet />
+              <CardMetricSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
@@ -109,7 +109,7 @@ export default function DashboardCardSection() {
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={metricMediaSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <DashboardCardMediaSnippet />
+              <CardMediaSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
@@ -123,7 +123,7 @@ export default function DashboardCardSection() {
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={sectionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <DashboardCardSectionSnippet />
+              <CardSectionSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
@@ -139,7 +139,7 @@ export default function DashboardCardSection() {
             previewLayout="stack"
           >
             <PlaygroundExampleFrame.Stage>
-              <DashboardCardSectionContentAndChartSnippet />
+              <CardSectionContentAndChartSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
@@ -152,7 +152,7 @@ export default function DashboardCardSection() {
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={flatSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <DashboardCardFlatSnippet />
+              <CardFlatSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
@@ -165,19 +165,19 @@ export default function DashboardCardSection() {
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={rowSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <DashboardCardRowSnippet />
+              <CardRowSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
 
         <div className="demoBlock">
           <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>DashboardCard.Root</DemoApiTitle>
+          <DemoApiTitle>Card.Root</DemoApiTitle>
           <DemoDescription>
             Остальные части (<code>IconBox</code>, <code>HeaderRow</code>, <code>Media</code>,{" "}
-            <code>Body</code> и др.) — в <code>COMPONENT.md</code> компонента.
+            <code>Body</code>, <code>Chart</code> и др.) — в <code>COMPONENT.md</code> компонента.
           </DemoDescription>
-          <PlaygroundApiTable rows={dashboardCardRootApiRows} />
+          <PlaygroundApiTable rows={cardRootApiRows} />
         </div>
       </div>
     </PlaygroundDocPage>

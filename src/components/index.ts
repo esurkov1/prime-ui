@@ -68,6 +68,24 @@ export type {
 } from "./button-group/ButtonGroup";
 export { ButtonGroup } from "./button-group/ButtonGroup";
 export type {
+  CardBodyProps,
+  CardChartProps,
+  CardDescriptionProps,
+  CardHeaderRowProps,
+  CardIconBoxProps,
+  CardLabelProps,
+  CardLeadProps,
+  CardMediaProps,
+  CardRootProps,
+  CardSectionHeaderProps,
+  CardSectionTitleProps,
+  CardSectionTrailingProps,
+  CardStackProps,
+  CardValueProps,
+  CardVariant,
+} from "./card/Card";
+export { Card } from "./card/Card";
+export type {
   CheckboxErrorProps,
   CheckboxHintProps,
   CheckboxLabelProps,
@@ -102,24 +120,6 @@ export type {
   CommandMenuTagSectionProps,
 } from "./command-menu/CommandMenu";
 export { CommandMenu } from "./command-menu/CommandMenu";
-export type {
-  DashboardCardBodyProps,
-  DashboardCardChartProps,
-  DashboardCardDescriptionProps,
-  DashboardCardHeaderRowProps,
-  DashboardCardIconBoxProps,
-  DashboardCardLabelProps,
-  DashboardCardLeadProps,
-  DashboardCardMediaProps,
-  DashboardCardRootProps,
-  DashboardCardSectionHeaderProps,
-  DashboardCardSectionTitleProps,
-  DashboardCardSectionTrailingProps,
-  DashboardCardStackProps,
-  DashboardCardValueProps,
-  DashboardCardVariant,
-} from "./dashboard-card/DashboardCard";
-export { DashboardCard } from "./dashboard-card/DashboardCard";
 export type {
   DataTableCellAlign,
   DataTableColumn,

@@ -1,10 +1,10 @@
-# DashboardCard
+# Card
 
 **Проектирование по умолчанию:** для демо и экранов используйте **`variant`** и слоты как в примерах ниже; **`flat`** включайте, когда карточка должна визуально совпадать с плоским слоем страницы (без тени).
 
 ## About
 
-Composable surfaces for **dashboard KPIs** and **chart shells**: four layout presets driven by **`variant`** on **`DashboardCard.Root`**. Typography and spacing use semantic tokens (`--prime-sys-*`). The kit does not ship chart primitives — pass any chart, SVG sparkline, or [ProgressBar](../progress-bar/COMPONENT.md) into **`DashboardCard.Media`**, **`DashboardCard.Chart`** (**`section`**, edge-to-edge), or padded **`DashboardCard.Body`**.
+Composable surfaces for **dashboard KPIs** and **chart shells**: four layout presets driven by **`variant`** on **`Card.Root`**. Typography and spacing use semantic tokens (`--prime-sys-*`). The kit does not ship chart primitives — pass any chart, SVG sparkline, or [ProgressBar](../progress-bar/COMPONENT.md) into **`Card.Media`**, **`Card.Chart`** (**`section`**, edge-to-edge), or padded **`Card.Body`**.
 
 Design alignment (informative):
 
@@ -23,35 +23,35 @@ Design alignment (informative):
 
 ## Composition
 
-- **`DashboardCard.Root`** — required **`variant`**: `"mini"` \| `"metric"` \| `"metric-media"` \| `"section"`. Optional **`flat`** removes the default surface shadow (tile-like). Sets `data-variant` / `data-flat` for styling.
-- **`DashboardCard.IconBox`** — square leading area in **`mini`**: background **`status-information-background`**, radius **`size-control-m-radius`**, icon color via **`status-information-foreground`** (decorative icons: **`aria-hidden`**).
-- **`DashboardCard.Lead`** — left cluster in **`HeaderRow`** (badge from [Badge](../badge/COMPONENT.md), raw icon, or both).
-- **`DashboardCard.HeaderRow`** — top row for **`metric`** / **`metric-media`**: typically **`Lead`** + **`Value`**.
-- **`DashboardCard.Stack`** — vertical block for **`Label`** + **`Value`** in **`mini`**.
-- **`DashboardCard.Label`** — secondary line (muted).
-- **`DashboardCard.Value`** — primary metric string.
-- **`DashboardCard.Description`** — supporting line under the header row (`p`).
-- **`DashboardCard.Media`** — bottom region with top border; place charts/progress here.
-- **`DashboardCard.SectionHeader`** — bar with bottom border for **`section`**.
-- **`DashboardCard.SectionTitle`** — `h3` title.
-- **`DashboardCard.SectionTrailing`** — optional actions or icon on the right.
-- **`DashboardCard.Body`** — **`section`**: padded region for text, summaries, or tables. With **`variant="section"`**, the shell has a **minimum height**; a **single element child** can stretch inside the padded box. Override height via **`className`** on **`Root`** if needed.
-- **`DashboardCard.Chart`** — **`section`**: **no** horizontal or vertical inner padding; mount the chart library root here for **edge-to-edge** drawing under the header. Optional after **`Body`**; then **`Chart`** fills remaining height.
+- **`Card.Root`** — required **`variant`**: `"mini"` \| `"metric"` \| `"metric-media"` \| `"section"`. Optional **`flat`** removes the default surface shadow (tile-like). Sets `data-variant` / `data-flat` for styling.
+- **`Card.IconBox`** — square leading area in **`mini`**: background **`status-information-background`**, radius **`size-control-m-radius`**, icon color via **`status-information-foreground`** (decorative icons: **`aria-hidden`**).
+- **`Card.Lead`** — left cluster in **`HeaderRow`** (badge from [Badge](../badge/COMPONENT.md), raw icon, or both).
+- **`Card.HeaderRow`** — top row for **`metric`** / **`metric-media`**: typically **`Lead`** + **`Value`**.
+- **`Card.Stack`** — vertical block for **`Label`** + **`Value`** in **`mini`**.
+- **`Card.Label`** — secondary line (muted).
+- **`Card.Value`** — primary metric string.
+- **`Card.Description`** — supporting line under the header row (`p`).
+- **`Card.Media`** — bottom region with top border; place charts/progress here.
+- **`Card.SectionHeader`** — bar with bottom border for **`section`**.
+- **`Card.SectionTitle`** — `h3` title.
+- **`Card.SectionTrailing`** — optional actions or icon on the right.
+- **`Card.Body`** — **`section`**: padded region for text, summaries, or tables. With **`variant="section"`**, the shell has a **minimum height**; a **single element child** can stretch inside the padded box. Override height via **`className`** on **`Root`** if needed.
+- **`Card.Chart`** — **`section`**: **no** horizontal or vertical inner padding; mount the chart library root here for **edge-to-edge** drawing under the header. Optional after **`Body`**; then **`Chart`** fills remaining height.
 
 ### Mini example
 
 ```tsx
-import { DashboardCard } from "prime-ui-kit";
+import { Card } from "prime-ui-kit";
 
 export function MiniKpi() {
   return (
-    <DashboardCard.Root variant="mini">
-      <DashboardCard.IconBox aria-hidden>…</DashboardCard.IconBox>
-      <DashboardCard.Stack>
-        <DashboardCard.Label>Age</DashboardCard.Label>
-        <DashboardCard.Value>36 years</DashboardCard.Value>
-      </DashboardCard.Stack>
-    </DashboardCard.Root>
+    <Card.Root variant="mini">
+      <Card.IconBox aria-hidden>…</Card.IconBox>
+      <Card.Stack>
+        <Card.Label>Age</Card.Label>
+        <Card.Value>36 years</Card.Value>
+      </Card.Stack>
+    </Card.Root>
   );
 }
 ```
@@ -60,21 +60,21 @@ export function MiniKpi() {
 
 ```tsx
 import { Badge } from "prime-ui-kit";
-import { DashboardCard } from "prime-ui-kit";
+import { Card } from "prime-ui-kit";
 
 export function MetricCard() {
   return (
-    <DashboardCard.Root variant="metric">
-      <DashboardCard.HeaderRow>
-        <DashboardCard.Lead>
+    <Card.Root variant="metric">
+      <Card.HeaderRow>
+        <Card.Lead>
           <Badge.Root color="blue" variant="filled" size="s">
             CRP
           </Badge.Root>
-        </DashboardCard.Lead>
-        <DashboardCard.Value>1.8 mg/L</DashboardCard.Value>
-      </DashboardCard.HeaderRow>
-      <DashboardCard.Description>Slightly elevated</DashboardCard.Description>
-    </DashboardCard.Root>
+        </Card.Lead>
+        <Card.Value>1.8 mg/L</Card.Value>
+      </Card.HeaderRow>
+      <Card.Description>Slightly elevated</Card.Description>
+    </Card.Root>
   );
 }
 ```
@@ -82,18 +82,18 @@ export function MetricCard() {
 ### Section example (chart only)
 
 ```tsx
-import { DashboardCard } from "prime-ui-kit";
+import { Card } from "prime-ui-kit";
 
 export function ChartSection() {
   return (
-    <DashboardCard.Root variant="section">
-      <DashboardCard.SectionHeader>
-        <DashboardCard.SectionTitle>Revenue</DashboardCard.SectionTitle>
-      </DashboardCard.SectionHeader>
-      <DashboardCard.Chart>
+    <Card.Root variant="section">
+      <Card.SectionHeader>
+        <Card.SectionTitle>Revenue</Card.SectionTitle>
+      </Card.SectionHeader>
+      <Card.Chart>
         <div id="revenue-chart" />
-      </DashboardCard.Chart>
-    </DashboardCard.Root>
+      </Card.Chart>
+    </Card.Root>
   );
 }
 ```
@@ -101,21 +101,21 @@ export function ChartSection() {
 ### Section example (padded content + chart)
 
 ```tsx
-import { DashboardCard } from "prime-ui-kit";
+import { Card } from "prime-ui-kit";
 
 export function ChartSectionWithIntro() {
   return (
-    <DashboardCard.Root variant="section">
-      <DashboardCard.SectionHeader>
-        <DashboardCard.SectionTitle>Revenue</DashboardCard.SectionTitle>
-      </DashboardCard.SectionHeader>
-      <DashboardCard.Body>
+    <Card.Root variant="section">
+      <Card.SectionHeader>
+        <Card.SectionTitle>Revenue</Card.SectionTitle>
+      </Card.SectionHeader>
+      <Card.Body>
         <p>Short summary or filters.</p>
-      </DashboardCard.Body>
-      <DashboardCard.Chart>
+      </Card.Body>
+      <Card.Chart>
         <div id="revenue-chart" />
-      </DashboardCard.Chart>
-    </DashboardCard.Root>
+      </Card.Chart>
+    </Card.Root>
   );
 }
 ```
@@ -132,7 +132,7 @@ export function ChartSectionWithIntro() {
 
 ## API
 
-### DashboardCard.Root
+### Card.Root
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -142,7 +142,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Slots listed in Composition. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Native attributes on the root `div`. |
 
-### DashboardCard.IconBox
+### Card.IconBox
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -150,7 +150,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Icon node. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the wrapper `div`. |
 
-### DashboardCard.Lead
+### Card.Lead
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -158,7 +158,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Badge, icon, or group. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the wrapper `div`. |
 
-### DashboardCard.HeaderRow
+### Card.HeaderRow
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -166,7 +166,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Typically `Lead` + `Value`. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the flex row. |
 
-### DashboardCard.Stack
+### Card.Stack
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -174,7 +174,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | `Label` + `Value` for mini. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the stack `div`. |
 
-### DashboardCard.Label
+### Card.Label
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -182,7 +182,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Secondary label text. |
 | …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Attributes on the `span`. |
 
-### DashboardCard.Value
+### Card.Value
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -190,7 +190,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Primary value. |
 | …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Attributes on the `span`. |
 
-### DashboardCard.Description
+### Card.Description
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -198,7 +198,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Supporting copy. |
 | …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Attributes on the `p`. |
 
-### DashboardCard.Media
+### Card.Media
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -206,7 +206,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Chart, SVG, or progress. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the region `div`. |
 
-### DashboardCard.SectionHeader
+### Card.SectionHeader
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -214,7 +214,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Title row content. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the header `div`. |
 
-### DashboardCard.SectionTitle
+### Card.SectionTitle
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -222,7 +222,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Heading text. |
 | …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | Attributes on the `h3`. |
 
-### DashboardCard.SectionTrailing
+### Card.SectionTrailing
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -230,7 +230,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Icons or actions. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the trailing `div`. |
 
-### DashboardCard.Body
+### Card.Body
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -238,7 +238,7 @@ export function ChartSectionWithIntro() {
 | children | `React.ReactNode` | — | No | Padded **`section`** content (text, tables). One **element** child can stretch inside the padded area. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the body `div`. |
 
-### DashboardCard.Chart
+### Card.Chart
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -249,7 +249,7 @@ export function ChartSectionWithIntro() {
 ## Imports
 
 ```ts
-import { DashboardCard } from "prime-ui-kit";
+import { Card } from "prime-ui-kit";
 ```
 
 CSS for this component is included in the main bundle (`prime-ui-kit/styles.css` / `bundle.css`) when you import the library styles.

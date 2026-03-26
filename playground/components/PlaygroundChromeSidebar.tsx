@@ -126,7 +126,7 @@ function pageIcon(segment: string): React.ReactNode {
       return <UserRound {...navIconProps} />;
     case "badge":
       return <Award {...navIconProps} />;
-    case "dashboard-card":
+    case "card":
       return <LayoutDashboard {...navIconProps} />;
     case "code-block":
       return <Code2 {...navIconProps} />;
