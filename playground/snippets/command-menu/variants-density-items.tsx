@@ -4,7 +4,12 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { CommandMenu } from "@/components/command-menu/CommandMenu";
 
-import cmdStyles from "@/components/command-menu/CommandMenu.module.css";
+const inputIconStyle: React.CSSProperties = {
+  width: "var(--prime-sys-size-control-m-icon)",
+  height: "var(--prime-sys-size-control-m-icon)",
+  color: "var(--prime-sys-color-content-muted)",
+  flexShrink: 0,
+};
 
 type DensityDemo = "compact" | "comfortable";
 
@@ -42,7 +47,7 @@ export default function CommandMenuVariantsDensityItemsSnippet() {
       <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
         <CommandMenu.InputRow
           density={density}
-          leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}
+          leading={<Search style={inputIconStyle} strokeWidth={2} aria-hidden />}
         >
           <CommandMenu.Input placeholder="Поиск…" aria-label="Поиск" />
         </CommandMenu.InputRow>

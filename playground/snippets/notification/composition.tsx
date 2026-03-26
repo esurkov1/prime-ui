@@ -3,9 +3,7 @@ import { Bell } from "lucide-react";
 import { Button } from "@/components/button/Button";
 import type { NotificationRecord } from "@/components/notification/Notification";
 import { NotificationCard } from "@/components/notification/Notification";
-import notificationStyles from "@/components/notification/Notification.module.css";
 import { useNotifications } from "@/components/notification/NotificationStore";
-import { cx } from "@/internal/cx";
 
 import snippetsStyles from "./snippets.module.css";
 
@@ -20,7 +18,7 @@ const richStatic: NotificationRecord = {
   persistent: true,
   closable: true,
   createdAt: Date.now(),
-  icon: <Bell className={notificationStyles.icon} />,
+  icon: <Bell size={16} strokeWidth={2} />,
   badge: 3,
   action: {
     label: "Открыть",
@@ -32,7 +30,7 @@ export default function NotificationCompositionSnippet() {
   const { notify } = useNotifications();
 
   return (
-    <div className={cx(snippetsStyles.columnX4, snippetsStyles.maxW440)}>
+    <div className={`${snippetsStyles.columnX4} ${snippetsStyles.maxW440}`}>
       <NotificationCard
         item={richStatic}
         paused={false}
@@ -53,7 +51,7 @@ export default function NotificationCompositionSnippet() {
             position: "top-right",
             size: "l",
             duration: 5000,
-            icon: <Bell className={notificationStyles.icon} />,
+            icon: <Bell size={16} strokeWidth={2} />,
             badge: "PDF",
             action: {
               label: "Скачать",

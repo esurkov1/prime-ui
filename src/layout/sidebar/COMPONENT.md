@@ -13,6 +13,11 @@
 - Типичный порядок: **`Header`** → **`ToggleButton`** → **`Content`** → **`Footer`**.
 - В `compact` рекомендуемый UX: показывать `Tooltip` для `MenuButton`/`MenuRouterLink` (обычно `side="right"`, `delay=0`).
 
+## Visual Contract
+
+- `NavPanel` без обводки (`border: 0`), фон — близкий к `surface-default` на семантических токенах.
+- Цвет панели намеренно отличается от `Dropdown`/`Popover` (они используют `surface-elevated`), чтобы слои не сливались.
+
 ## State Model
 
 - Актуальный API состояния: **`state`**, **`defaultState`**, **`onStateChange`**.

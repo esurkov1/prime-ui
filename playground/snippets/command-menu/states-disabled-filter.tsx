@@ -4,8 +4,18 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { CommandMenu } from "@/components/command-menu/CommandMenu";
 
-import cmdStyles from "@/components/command-menu/CommandMenu.module.css";
 import { Typography } from "@/components/typography/Typography";
+
+const inputIconStyle: React.CSSProperties = {
+  width: "var(--prime-sys-size-control-m-icon)",
+  height: "var(--prime-sys-size-control-m-icon)",
+  color: "var(--prime-sys-color-content-muted)",
+  flexShrink: 0,
+};
+
+const footerMutedStyle: React.CSSProperties = {
+  background: "var(--prime-sys-color-surface-default)",
+};
 
 export default function CommandMenuStatesSnippet() {
   const [open, setOpen] = React.useState(false);
@@ -18,7 +28,7 @@ export default function CommandMenuStatesSnippet() {
 
       <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
         <CommandMenu.InputRow
-          leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}
+          leading={<Search style={inputIconStyle} strokeWidth={2} aria-hidden />}
         >
           <CommandMenu.Input placeholder="Введите «архив»…" aria-label="Фильтр команд" />
         </CommandMenu.InputRow>
@@ -46,7 +56,7 @@ export default function CommandMenuStatesSnippet() {
             </CommandMenu.Item>
           </CommandMenu.Group>
         </CommandMenu.List>
-        <CommandMenu.Footer className={cmdStyles.footerMuted}>
+        <CommandMenu.Footer style={footerMutedStyle}>
           <Typography.Root variant="body-compact" tone="muted">
             Если ни один пункт не проходит фильтр, группы скрываются; пустое состояние можно
             дорисовать под списком вручную.

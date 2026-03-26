@@ -4,9 +4,31 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { CommandMenu } from "@/components/command-menu/CommandMenu";
 
-import cmdStyles from "@/components/command-menu/CommandMenu.module.css";
+const inputIconStyle: React.CSSProperties = {
+  width: "var(--prime-sys-size-control-m-icon)",
+  height: "var(--prime-sys-size-control-m-icon)",
+  color: "var(--prime-sys-color-content-muted)",
+  flexShrink: 0,
+};
 
-import demoStyles from "./command-menu-demos.module.css";
+const footerHintsStyle: React.CSSProperties = {
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  gap: "var(--prime-sys-spacing-x3)",
+};
+
+const footerHintGroupStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "var(--prime-sys-spacing-x2)",
+};
+
+const footerHintTextStyle: React.CSSProperties = {
+  fontSize: "var(--prime-sys-size-control-s-supportText)",
+  lineHeight: "var(--prime-sys-typography-body-lineHeight)",
+  color: "var(--prime-sys-color-content-secondary)",
+};
 
 export default function CommandMenuFeaturesKeyboardSearchSnippet() {
   const [open, setOpen] = React.useState(false);
@@ -30,7 +52,7 @@ export default function CommandMenuFeaturesKeyboardSearchSnippet() {
 
       <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
         <CommandMenu.InputRow
-          leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}
+          leading={<Search style={inputIconStyle} strokeWidth={2} aria-hidden />}
         >
           <CommandMenu.Input
             placeholder="Попробуйте «аналитика» или «billing»…"
@@ -61,25 +83,25 @@ export default function CommandMenuFeaturesKeyboardSearchSnippet() {
           </CommandMenu.Group>
         </CommandMenu.List>
         <CommandMenu.Footer>
-          <div className={demoStyles.footerHints}>
-            <div className={demoStyles.footerHintGroup}>
+          <div style={footerHintsStyle}>
+            <div style={footerHintGroupStyle}>
               <CommandMenu.FooterKeyBox>
                 <ArrowUp size={14} strokeWidth={2} aria-hidden />
               </CommandMenu.FooterKeyBox>
               <CommandMenu.FooterKeyBox>
                 <ArrowDown size={14} strokeWidth={2} aria-hidden />
               </CommandMenu.FooterKeyBox>
-              <span className={cmdStyles.footerHint}>Навигация</span>
+              <span style={footerHintTextStyle}>Навигация</span>
             </div>
-            <div className={demoStyles.footerHintGroup}>
+            <div style={footerHintGroupStyle}>
               <CommandMenu.FooterKeyBox>
                 <CornerDownLeft size={14} strokeWidth={2} aria-hidden />
               </CommandMenu.FooterKeyBox>
-              <span className={cmdStyles.footerHint}>Выбрать</span>
+              <span style={footerHintTextStyle}>Выбрать</span>
             </div>
-            <div className={demoStyles.footerHintGroup}>
+            <div style={footerHintGroupStyle}>
               <CommandMenu.FooterKeyBox tone="muted">Esc</CommandMenu.FooterKeyBox>
-              <span className={cmdStyles.footerHint}>Закрыть</span>
+              <span style={footerHintTextStyle}>Закрыть</span>
             </div>
           </div>
         </CommandMenu.Footer>

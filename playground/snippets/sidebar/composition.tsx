@@ -17,8 +17,6 @@ import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Sidebar } from "@/layout";
 
-import styles from "./composition.module.css";
-
 type DemoModeId = "crm" | "traffic" | "autorpark";
 
 type DemoMode = {
@@ -50,6 +48,27 @@ const userTriggerStyle: React.CSSProperties = {
   color: "var(--prime-sys-color-content-primary)",
 };
 
+const demoRootStyle: React.CSSProperties = {
+  boxSizing: "border-box",
+  height: "24rem",
+  width: "100%",
+  maxWidth: "100%",
+  overflow: "hidden",
+};
+
+const treeRowStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "var(--prime-sys-spacing-x1)",
+  paddingBlock: "var(--prime-sys-spacing-x1)",
+  color: "var(--prime-sys-color-content-secondary)",
+};
+
+const treeIconStyle: React.CSSProperties = {
+  flexShrink: 0,
+  opacity: 0.75,
+};
+
 function FavoritesCategory() {
   const [open, setOpen] = React.useState(true);
   return (
@@ -65,16 +84,16 @@ function FavoritesCategory() {
       {open ? (
         <Sidebar.NavCategoryPanel>
           <Sidebar.NavDocTree>
-            <div className={styles.treeRow}>
-              <ChevronRight size={14} strokeWidth={2} aria-hidden className={styles.treeChevron} />
+            <div style={treeRowStyle}>
+              <ChevronRight size={14} strokeWidth={2} aria-hidden style={treeIconStyle} />
               <Sidebar.Text>Введение</Sidebar.Text>
             </div>
-            <div className={styles.treeRow}>
-              <ChevronRight size={14} strokeWidth={2} aria-hidden className={styles.treeChevron} />
+            <div style={treeRowStyle}>
+              <ChevronRight size={14} strokeWidth={2} aria-hidden style={treeIconStyle} />
               <Sidebar.Text>Установка</Sidebar.Text>
             </div>
-            <div className={styles.treeRow}>
-              <FileText size={14} strokeWidth={1.9} aria-hidden className={styles.treeIcon} />
+            <div style={treeRowStyle}>
+              <FileText size={14} strokeWidth={1.9} aria-hidden style={treeIconStyle} />
               <Sidebar.Text>API reference</Sidebar.Text>
             </div>
           </Sidebar.NavDocTree>
@@ -102,6 +121,7 @@ function ModeSwitcher({
                 background:
                   "color-mix(in srgb, var(--prime-sys-color-action-primaryBackground) 84%, transparent)",
                 color: "var(--prime-sys-color-action-primaryForeground)",
+                borderRadius: "var(--prime-sys-shape-radius-s)",
               }}
             >
               <Avatar.Fallback>{mode.avatar}</Avatar.Fallback>
@@ -199,7 +219,7 @@ export default function SidebarCompositionSnippet() {
   );
 
   return (
-    <div className={styles.demoRoot}>
+    <div style={demoRootStyle}>
       <Sidebar.Root
         size="m"
         state={state}

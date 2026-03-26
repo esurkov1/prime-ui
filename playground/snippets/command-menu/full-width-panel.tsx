@@ -4,7 +4,12 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { CommandMenu } from "@/components/command-menu/CommandMenu";
 
-import cmdStyles from "@/components/command-menu/CommandMenu.module.css";
+const inputIconStyle: React.CSSProperties = {
+  width: "var(--prime-sys-size-control-m-icon)",
+  height: "var(--prime-sys-size-control-m-icon)",
+  color: "var(--prime-sys-color-content-muted)",
+  flexShrink: 0,
+};
 
 export default function CommandMenuFullWidthSnippet() {
   const [open, setOpen] = React.useState(false);
@@ -15,13 +20,9 @@ export default function CommandMenuFullWidthSnippet() {
         Широкая панель
       </Button.Root>
 
-      <CommandMenu.Dialog
-        open={open}
-        onOpenChange={setOpen}
-        className={cmdStyles.dialogContentWide}
-      >
+      <CommandMenu.Dialog open={open} onOpenChange={setOpen} className="demoCommandMenuDialogWide">
         <CommandMenu.InputRow
-          leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}
+          leading={<Search style={inputIconStyle} strokeWidth={2} aria-hidden />}
         >
           <CommandMenu.Input placeholder="Шире обычного max-width…" aria-label="Поиск" />
         </CommandMenu.InputRow>
@@ -37,6 +38,9 @@ export default function CommandMenuFullWidthSnippet() {
           </CommandMenu.Group>
         </CommandMenu.List>
       </CommandMenu.Dialog>
+      <style>
+        {`.demoCommandMenuDialogWide{width:min(100%,var(--prime-sys-unit-43p75rem));max-width:100%;}`}
+      </style>
     </>
   );
 }

@@ -4,12 +4,28 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { CommandMenu } from "@/components/command-menu/CommandMenu";
 
-import cmdStyles from "@/components/command-menu/CommandMenu.module.css";
 import { Kbd } from "@/components/kbd/Kbd";
 import { Tag } from "@/components/tag/Tag";
 import { Typography } from "@/components/typography/Typography";
 
-import demoStyles from "./command-menu-demos.module.css";
+const inputIconStyle: React.CSSProperties = {
+  width: "var(--prime-sys-size-control-m-icon)",
+  height: "var(--prime-sys-size-control-m-icon)",
+  color: "var(--prime-sys-color-content-muted)",
+  flexShrink: 0,
+};
+
+const dialogHeaderPadStyle: React.CSSProperties = {
+  padding: "var(--prime-sys-spacing-x4) var(--prime-sys-spacing-x4) 0",
+};
+
+const dialogHeaderLeadStyle: React.CSSProperties = {
+  marginTop: "var(--prime-sys-spacing-x1)",
+};
+
+const footerMutedStyle: React.CSSProperties = {
+  background: "var(--prime-sys-color-surface-default)",
+};
 
 export default function CommandMenuCompositionSnippet() {
   const [open, setOpen] = React.useState(false);
@@ -22,7 +38,7 @@ export default function CommandMenuCompositionSnippet() {
       </Button.Root>
 
       <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="cmd-title">
-        <div className={demoStyles.dialogHeaderPad}>
+        <div style={dialogHeaderPadStyle}>
           <Typography.Root
             as="div"
             id="cmd-title"
@@ -33,17 +49,13 @@ export default function CommandMenuCompositionSnippet() {
           >
             Палитра
           </Typography.Root>
-          <Typography.Root
-            variant="body-small"
-            tone="muted"
-            className={demoStyles.dialogHeaderLead}
-          >
+          <Typography.Root variant="body-small" tone="muted" style={dialogHeaderLeadStyle}>
             Поиск по разделам и быстрые действия
           </Typography.Root>
         </div>
 
         <CommandMenu.InputRow
-          leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}
+          leading={<Search style={inputIconStyle} strokeWidth={2} aria-hidden />}
           trailing={
             <>
               <Kbd.Root aria-label="Сочетание открытия">⌘K</Kbd.Root>
@@ -110,7 +122,7 @@ export default function CommandMenuCompositionSnippet() {
           </CommandMenu.Group>
         </CommandMenu.List>
 
-        <CommandMenu.Footer className={cmdStyles.footerMuted}>
+        <CommandMenu.Footer style={footerMutedStyle}>
           <Typography.Root variant="body-compact" tone="muted">
             Стрелки и Enter — из поля поиска; группы скрываются, если в них нет видимых пунктов.
           </Typography.Root>

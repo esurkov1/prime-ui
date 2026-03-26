@@ -103,6 +103,12 @@ For every public component, **MUST** document:
   - playground
   - tests
 
+## 15. Playground Styling Contract
+
+- **MUST NOT**: import internal component CSS modules (`@/components/**.module.css`) inside playground snippets/examples.
+- **MUST**: style playground examples either via public component API or inline styles in snippet code so example code is copyable.
+- **MUST**: keep global `playground/playground.css` only for playground shell/layout and docs page styling, not for patching component internals.
+
 ## 13. Breaking Changes Policy (pre-v1)
 
 - **Allowed** if they strengthen the foundation.

@@ -71,46 +71,12 @@ import {
 } from "./PlaygroundTheme";
 
 type PlaygroundSidebarModeId = "crm" | "traffic" | "autorpark";
-type PlaygroundSidebarNavTag = "shared" | PlaygroundSidebarModeId;
 
 type PlaygroundSidebarMode = {
   id: PlaygroundSidebarModeId;
   label: string;
   subtitle: string;
   menuIcon: React.ElementType;
-  navTag: PlaygroundSidebarNavTag;
-};
-
-type PlaygroundSidebarMenuItemBase = {
-  label: string;
-  to?: string;
-  icon?: React.ReactNode;
-  onSelect?: () => void;
-  tags?: PlaygroundSidebarNavTag[];
-};
-
-type PlaygroundSidebarMenuItem = PlaygroundSidebarMenuItemBase & {
-  id: string;
-  switchByTag?: Partial<Record<PlaygroundSidebarNavTag, Partial<PlaygroundSidebarMenuItemBase>>>;
-};
-
-type PlaygroundSidebarMenuCategoryBase = {
-  label: string;
-  items: PlaygroundSidebarMenuItem[];
-  tags?: PlaygroundSidebarNavTag[];
-};
-
-type PlaygroundSidebarMenuCategory = PlaygroundSidebarMenuCategoryBase & {
-  id: string;
-  switchByTag?: Partial<
-    Record<PlaygroundSidebarNavTag, Partial<PlaygroundSidebarMenuCategoryBase>>
-  >;
-};
-
-type PlaygroundSidebarNavigationApi = {
-  sharedTag: "shared";
-  modes: PlaygroundSidebarMode[];
-  categories: PlaygroundSidebarMenuCategory[];
 };
 
 type ResolvedMenuItem = {
@@ -125,6 +91,11 @@ type ResolvedMenuCategory = {
   id: string;
   label: string;
   items: ResolvedMenuItem[];
+};
+
+type PlaygroundSidebarNavigationApi = {
+  modes: PlaygroundSidebarMode[];
+  categories: ResolvedMenuCategory[];
 };
 
 function toRoute(segment: string): string {
@@ -239,29 +210,6 @@ function pageIcon(segment: string): React.ReactNode {
   }
 }
 
-function resolveByTag<T extends object>(
-  base: T,
-  switchByTag: Partial<Record<PlaygroundSidebarNavTag, Partial<T>>> | undefined,
-  activeTags: PlaygroundSidebarNavTag[],
-): T {
-  let resolved = base;
-  for (const tag of activeTags) {
-    const patch = switchByTag?.[tag];
-    if (patch !== undefined) {
-      resolved = { ...resolved, ...patch };
-    }
-  }
-  return resolved;
-}
-
-function isVisibleForTags(
-  tags: PlaygroundSidebarNavTag[] | undefined,
-  activeTagSet: ReadonlySet<PlaygroundSidebarNavTag>,
-): boolean {
-  if (tags === undefined || tags.length === 0) return true;
-  return tags.some((tag) => activeTagSet.has(tag));
-}
-
 function buildSidebarNavigationApi(nav: PlaygroundNavModel): PlaygroundSidebarNavigationApi {
   const modes: PlaygroundSidebarMode[] = [
     {
@@ -269,223 +217,61 @@ function buildSidebarNavigationApi(nav: PlaygroundNavModel): PlaygroundSidebarNa
       label: "CRM",
       subtitle: "Продажи и pipeline",
       menuIcon: LayoutDashboard,
-      navTag: "crm",
     },
     {
       id: "traffic",
       label: "Traffic",
       subtitle: "Кампании и аналитика",
       menuIcon: Megaphone,
-      navTag: "traffic",
     },
     {
       id: "autorpark",
       label: "Autorpark",
       subtitle: "Парк и обслуживание",
       menuIcon: Car,
-      navTag: "autorpark",
     },
   ];
 
-  const sharedCategories: PlaygroundSidebarMenuCategory[] = [
+  const categories: ResolvedMenuCategory[] = [
     {
-      id: "workspace",
-      label: "Workspace",
-      tags: ["shared"],
-      switchByTag: {
-        crm: { label: "CRM Workspace" },
-        traffic: { label: "Traffic Workspace" },
-        autorpark: { label: "Autorpark Workspace" },
-      },
+      id: "intro",
+      label: "Навигация",
       items: [
         {
-          id: "workspace-home",
-          label: "Введение",
-          to: "/",
+          id: "intro-page",
+          label: nav.intro.label,
+          to: toRoute(nav.intro.segment),
           icon: <BookOpen {...navIconProps} />,
-          tags: ["shared"],
-        },
-        {
-          id: "workspace-primary",
-          label: "Сделки",
-          to: "/data-table",
-          icon: <LayoutDashboard {...navIconProps} />,
-          tags: ["shared"],
-          switchByTag: {
-            traffic: {
-              label: "Кампании",
-              to: "/progress-bar",
-              icon: <Megaphone {...navIconProps} />,
-            },
-            autorpark: {
-              label: "Автопарк",
-              to: "/card",
-              icon: <Car {...navIconProps} />,
-            },
-          },
-        },
-        {
-          id: "workspace-alerts",
-          label: "Оповещения",
-          to: "/notification",
-          icon: <Bell {...navIconProps} />,
-          tags: ["shared"],
-          switchByTag: {
-            autorpark: {
-              label: "ТО и сервис",
-              to: "/datepicker",
-              icon: <Calendar {...navIconProps} />,
-            },
-          },
         },
       ],
     },
-  ];
-
-  const crmCatalog: PlaygroundSidebarMenuCategory[] = nav.categories.map((category) => ({
-    id: `crm-${category.id}`,
-    label: category.label,
-    tags: ["crm"],
-    items: category.pages.map((page) => ({
-      id: `crm-${category.id}-${page.segment}`,
-      label: page.label,
-      to: toRoute(page.segment),
-      icon: pageIcon(page.segment),
-      tags: ["crm"],
+    ...nav.categories.map((category) => ({
+      id: category.id,
+      label: category.label,
+      items: category.pages.map((page) => ({
+        id: `${category.id}-${page.segment}`,
+        label: page.label,
+        to: toRoute(page.segment),
+        icon: pageIcon(page.segment),
+      })),
     })),
-  }));
-
-  const trafficCatalog: PlaygroundSidebarMenuCategory[] = [
-    {
-      id: "traffic-analytics",
-      label: "Аналитика трафика",
-      tags: ["traffic"],
-      items: [
-        {
-          id: "traffic-dashboard",
-          label: "Dashboard",
-          to: "/progress-circle",
-          icon: <CircleGauge {...navIconProps} />,
-          tags: ["traffic"],
-        },
-        {
-          id: "traffic-sources",
-          label: "Источники",
-          to: "/segmented-progress-bar",
-          icon: <BarChart3 {...navIconProps} />,
-          tags: ["traffic"],
-        },
-        {
-          id: "traffic-rules",
-          label: "Правила и теги",
-          to: "/tag",
-          icon: <Tag {...navIconProps} />,
-          tags: ["traffic"],
-        },
-      ],
-    },
-  ];
-
-  const autorparkCatalog: PlaygroundSidebarMenuCategory[] = [
-    {
-      id: "autorpark-fleet",
-      label: "Парк",
-      tags: ["autorpark"],
-      items: [
-        {
-          id: "autorpark-cars",
-          label: "Список авто",
-          to: "/data-table",
-          icon: <Car {...navIconProps} />,
-          tags: ["autorpark"],
-        },
-        {
-          id: "autorpark-cards",
-          label: "Карточки машин",
-          to: "/card",
-          icon: <LayoutDashboard {...navIconProps} />,
-          tags: ["autorpark"],
-        },
-        {
-          id: "autorpark-maintenance",
-          label: "План ТО",
-          to: "/datepicker",
-          icon: <Calendar {...navIconProps} />,
-          tags: ["autorpark"],
-        },
-      ],
-    },
   ];
 
   return {
-    sharedTag: "shared",
     modes,
-    categories: [...sharedCategories, ...crmCatalog, ...trafficCatalog, ...autorparkCatalog],
+    categories,
   };
 }
 
-function resolveSidebarNavigation(
-  api: PlaygroundSidebarNavigationApi,
-  modeId: PlaygroundSidebarModeId,
-): { mode: PlaygroundSidebarMode; categories: ResolvedMenuCategory[] } {
-  const mode = api.modes.find((entry) => entry.id === modeId) ?? api.modes[0];
+function resolveSidebarNavigation(api: PlaygroundSidebarNavigationApi): {
+  mode: PlaygroundSidebarMode;
+  categories: ResolvedMenuCategory[];
+} {
+  const mode = api.modes[0];
   if (mode === undefined) {
     throw new Error("[playground] sidebar mode list is empty");
   }
-
-  const activeTags: PlaygroundSidebarNavTag[] = [api.sharedTag, mode.navTag];
-  const activeTagSet = new Set(activeTags);
-
-  const categories = api.categories
-    .filter((category) => isVisibleForTags(category.tags, activeTagSet))
-    .map((category): ResolvedMenuCategory => {
-      const resolvedCategory = resolveByTag<PlaygroundSidebarMenuCategoryBase>(
-        {
-          label: category.label,
-          items: category.items,
-          tags: category.tags,
-        },
-        category.switchByTag,
-        activeTags,
-      );
-
-      const items = resolvedCategory.items
-        .map((item): ResolvedMenuItem | null => {
-          const resolvedItem = resolveByTag<PlaygroundSidebarMenuItemBase>(
-            {
-              label: item.label,
-              to: item.to,
-              icon: item.icon,
-              onSelect: item.onSelect,
-              tags: item.tags,
-            },
-            item.switchByTag,
-            activeTags,
-          );
-
-          if (!isVisibleForTags(resolvedItem.tags, activeTagSet)) {
-            return null;
-          }
-
-          return {
-            id: item.id,
-            label: resolvedItem.label,
-            to: resolvedItem.to,
-            icon: resolvedItem.icon,
-            onSelect: resolvedItem.onSelect,
-          };
-        })
-        .filter((item): item is ResolvedMenuItem => item !== null);
-
-      return {
-        id: category.id,
-        label: resolvedCategory.label,
-        items,
-      };
-    })
-    .filter((category) => category.items.length > 0);
-
-  return { mode, categories };
+  return { mode, categories: api.categories };
 }
 
 function modeMarkStyle(modeId: PlaygroundSidebarModeId): React.CSSProperties {
@@ -790,11 +576,10 @@ function PlaygroundUserMenu() {
 export function PlaygroundChromeSidebar() {
   const nav = React.useMemo(() => getPlaygroundNavModel(), []);
   const navigationApi = React.useMemo(() => buildSidebarNavigationApi(nav), [nav]);
-  const [modeId, setModeId] = React.useState<PlaygroundSidebarModeId>("crm");
 
   const { mode, categories } = React.useMemo(
-    () => resolveSidebarNavigation(navigationApi, modeId),
-    [navigationApi, modeId],
+    () => resolveSidebarNavigation(navigationApi),
+    [navigationApi],
   );
 
   return (
@@ -806,7 +591,7 @@ export function PlaygroundChromeSidebar() {
               <PlaygroundModeSwitcher
                 mode={mode}
                 modes={navigationApi.modes}
-                onModeChange={setModeId}
+                onModeChange={() => {}}
               />
             </Sidebar.HeaderMain>
           </Sidebar.HeaderRow>

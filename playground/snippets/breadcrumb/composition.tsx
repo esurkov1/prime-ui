@@ -1,12 +1,20 @@
 import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
-import styles from "@/components/breadcrumb/Breadcrumb.module.css";
 import { Icon } from "@/icons";
 
 export default function BreadcrumbCompositionSnippet() {
   return (
     <Breadcrumb.Root>
-      <Breadcrumb.Item href="/help" className={styles.itemHome} aria-label="Справка">
-        <Icon name="nav.home" tone="default" />
+      <Breadcrumb.Item href="/help" aria-label="Справка">
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            lineHeight: 0,
+          }}
+        >
+          <Icon name="nav.home" tone="default" />
+        </span>
       </Breadcrumb.Item>
       <Breadcrumb.Separator>/</Breadcrumb.Separator>
       <Breadcrumb.Item href="/help/billing">Оплата</Breadcrumb.Item>

@@ -1,10 +1,32 @@
 import { Loader2 } from "lucide-react";
+import type * as React from "react";
 
 import { FileUpload, type FileUploadSize } from "@/components/file-upload/FileUpload";
-import uploadStyles from "@/components/file-upload/FileUpload.module.css";
-import { cx } from "@/internal/cx";
 
 import styles from "./sizes.module.css";
+
+const fileNameRowStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "var(--prime-sys-spacing-x2)",
+  width: "100%",
+};
+
+const inlineStatusStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "var(--prime-sys-spacing-x1)",
+  flexShrink: 0,
+  fontSize: "var(--prime-sys-typography-support-2xs)",
+  lineHeight: "var(--prime-sys-typography-body-lineHeight)",
+};
+
+const statusIconStyle: React.CSSProperties = {
+  flexShrink: 0,
+  width: "var(--prime-sys-size-control-m-icon)",
+  height: "var(--prime-sys-size-control-m-icon)",
+};
 
 function FileItemSizeRow({ size }: { size: FileUploadSize }) {
   return (
@@ -12,12 +34,12 @@ function FileItemSizeRow({ size }: { size: FileUploadSize }) {
       <FileUpload.ItemRow>
         <FileUpload.FormatBadge format="PDF" color="red" />
         <FileUpload.ItemMain>
-          <FileUpload.ItemName className={uploadStyles.itemNameRow}>
+          <FileUpload.ItemName style={fileNameRowStyle}>
             <span>my-cv.pdf</span>
-            <span className={uploadStyles.itemInlineStatus}>
+            <span style={inlineStatusStyle}>
               <Loader2
                 aria-hidden
-                className={cx(uploadStyles.itemStatusIcon, uploadStyles.statusIconSpin)}
+                style={statusIconStyle}
                 strokeWidth={2}
                 color="var(--prime-sys-color-action-primaryBackground)"
               />
