@@ -2,7 +2,18 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## About
+## Canonical
+
+- **What:** `ButtonGroup` groups native **`<button>`** segments that share one outline, inner dividers, and corner radius only on the outer shell; **`Root`** sets **`size`** and optional **`orientation`**, wraps **`ControlSizeProvider`**.
+- **Pieces:** namespace **`ButtonGroup.Root`**, **`ButtonGroup.Item`**, **`ButtonGroup.Icon`** (decorative wrapper, **`aria-hidden`**); **`Item`** must live inside **`Root`**.
+- **Selection look:** optional **`pressed`** on **`Item`** → **`data-state="on"`** and **`aria-pressed`** when boolean; mutual exclusivity is **parent state**, not enforced by the component.
+- **Forms:** **`Item`** supports **`type="button" | "submit" | "reset"`** (default **`"button"`**).
+- **Defaults:** **`size="m"`**, **`orientation="horizontal"`**; no **`variant`** or built-in **`fullWidth`** — widen via layout/`className` on **`Root`** and items if needed.
+- **Prefer something else:** true **one-of-N** field with radio semantics → [Radio](../radio/COMPONENT.md); kit segmented control API → [SegmentedControl](../segmented-control/COMPONENT.md); single CTA → [Button](../button/COMPONENT.md).
+
+## Extended
+
+### About
 
 A row or column of native buttons that share one bordered outline: one size tier for the whole group, internal dividers, and rounded corners only on the outer edges.
 
@@ -13,7 +24,20 @@ A row or column of native buttons that share one bordered outline: one size tier
 - **Do not use** when the kit’s segmented switcher API fits better — see [SegmentedControl](../segmented-control/COMPONENT.md).
 - **Do not use** for a single standalone call to action — use [Button](../button/COMPONENT.md) instead.
 
-## Composition
+### Scenarios (examples)
+
+Copy-ready demos live under **`examples/`** (same folder as this file):
+
+| Scenario | File | Idea |
+|----------|------|------|
+| Editor toolbar | [`examples/editor-toolbar.tsx`](examples/editor-toolbar.tsx) | Icon segments + optional **`pressed`** for active format; **`aria-label`** on icon-only **`Item`**. |
+| Form footer | [`examples/form-footer.tsx`](examples/form-footer.tsx) | **`type="submit"`** / **`type="reset"`** (or **`button`**) in one group; name **`Root`** with **`aria-label`**. |
+| View switcher | [`examples/view-switcher.tsx`](examples/view-switcher.tsx) | Single choice in React state; exactly one **`pressed={true}`** at a time. |
+| Wizard actions | [`examples/wizard-actions.tsx`](examples/wizard-actions.tsx) | Step **Back** / **Next** as a horizontal group; **`disabled`** on **Back** for the first step. |
+
+Playground demos (sizes, orientation, states, composition, full-width layout) live in **`playground/snippets/button-group/`**.
+
+### Composition
 
 - **`ButtonGroup`** is a namespace object: **`Root`**, **`Item`**, **`Icon`**.
 - **`ButtonGroup.Root`** — wrapper `div` with `data-size={size}`; for `orientation="vertical"` it sets `data-orientation="vertical"`. It provides group context and **`ControlSizeProvider`**, so nested controls inherit the same size tier.
@@ -35,7 +59,7 @@ export function Example() {
 }
 ```
 
-## Rules
+### Rules
 
 - There is no `variant` prop: appearance is always the shared-outline segment style; vary **`size`**, **`orientation`**, **`pressed`**, and **`disabled`** instead.
 - **`pressed`**: when `true`, the segment gets `data-state="on"` and `aria-pressed="true"`; when `false`, you get `aria-pressed="false"`; when omitted, `aria-pressed` is not set.
@@ -45,9 +69,9 @@ export function Example() {
 - Segments always render as **`<button>`** (no `asChild`); there is no built-in **`fullWidth`** — widen the group with layout on the root and items if needed.
 - **`ButtonGroup.Item`** supports **`type="button" | "submit" | "reset"`** (default **`"button"`**) for correct form behavior.
 
-## API
+### API
 
-### ButtonGroup.Root
+#### ButtonGroup.Root
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -57,7 +81,7 @@ export function Example() {
 | className | `string` | — | no | Additional class on the root element. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | no | Other div attributes (e.g. `aria-label`, `role`, event handlers). |
 
-### ButtonGroup.Item
+#### ButtonGroup.Item
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -68,7 +92,7 @@ export function Example() {
 | className | `string` | — | no | Additional class on the button. |
 | …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | no | Other native button attributes. |
 
-### ButtonGroup.Icon
+#### ButtonGroup.Icon
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -76,8 +100,32 @@ export function Example() {
 | className | `string` | — | no | Additional class on the wrapper span. |
 | …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | no | Other span attributes (not `children`). |
 
-## Related
+### Related
 
 - [Button](../button/COMPONENT.md) — single actions, variants, loading.
 - [SegmentedControl](../segmented-control/COMPONENT.md) — alternative segmented switcher API.
 - [Radio](../radio/COMPONENT.md) — form “one of N” with radio semantics.
+
+## LLM note
+
+```yaml
+component: ButtonGroup
+exports: [ButtonGroup.Root, ButtonGroup.Item, ButtonGroup.Icon]
+defaults: { size: m, orientation: horizontal }
+behavior:
+  items_are: native button elements
+  pressed: optional boolean per Item; parent owns mutual exclusion for single-choice UX
+  no_variant: true
+  no_fullWidth_prop: true  # use layout / className on Root and Items
+forms:
+  Item_type: [button, submit, reset]
+a11y:
+  name_Root: aria-label or aria-labelledby when no visible label
+  icon_only_Item: aria-label on Item (not on Icon)
+anti_patterns:
+  - Using as native radio group for form submit semantics → Radio
+  - Single CTA → Button
+  - Prefer SegmentedControl when that composable API is a better fit
+doc_examples_dir: src/components/button-group/examples/
+playground_snippets: playground/snippets/button-group/
+```
