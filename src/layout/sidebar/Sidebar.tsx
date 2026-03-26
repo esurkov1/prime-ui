@@ -1,5 +1,4 @@
 import {
-  ChevronRight,
   ChevronsUpDown,
   PanelLeftClose,
   PanelLeftOpen,
@@ -418,19 +417,33 @@ SidebarMenuLink.displayName = "SidebarMenuLink";
 export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink>;
 
 const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRouterLinkProps>(
-  ({ className, ...rest }, ref) => (
-    <NavLink
-      ref={ref}
-      {...rest}
-      className={(navState) =>
-        cx(
-          styles.menuButton,
-          navState.isActive && styles.menuButtonActive,
-          typeof className === "function" ? className(navState) : className,
-        )
-      }
-    />
-  ),
+  ({ className, ...rest }, ref) => {
+    const { size: contextSize } = useSidebarContext();
+
+    if (typeof className === "function") {
+      return (
+        <NavLink
+          ref={ref}
+          {...rest}
+          className={(navState) =>
+            cx(styles.menuButton, navState.isActive && styles.menuButtonActive, className(navState))
+          }
+        />
+      );
+    }
+
+    return (
+      <Button.Root
+        asChild
+        size={contextSize}
+        variant="neutral"
+        mode="ghost"
+        className={cx(styles.menuButton, className)}
+      >
+        <NavLink ref={ref} {...rest} />
+      </Button.Root>
+    );
+  },
 );
 
 SidebarMenuRouterLink.displayName = "SidebarMenuRouterLink";
@@ -523,7 +536,6 @@ const SidebarNavCategoryTrigger = React.forwardRef<
 >(({ className, type = "button", children, ...rest }, ref) => (
   <button ref={ref} type={type} className={cx(styles.navCategoryTrigger, className)} {...rest}>
     {children}
-    <ChevronRight size="1em" aria-hidden="true" />
   </button>
 ));
 SidebarNavCategoryTrigger.displayName = "SidebarNavCategoryTrigger";

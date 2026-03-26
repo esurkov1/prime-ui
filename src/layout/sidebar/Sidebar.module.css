@@ -182,10 +182,35 @@
 }
 
 .menuButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-size-control-m-gap);
   justify-content: flex-start;
   width: 100%;
   min-width: 0;
+  min-height: var(--prime-sys-size-control-m-height);
+  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
+  padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
+  border: 0;
+  border-radius: var(--prime-sys-size-control-m-radius);
+  background: transparent;
+  color: var(--prime-sys-color-content-primary);
+  font-size: var(--prime-sys-size-control-m-text);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: 1.2;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
+}
+
+.menuButton:hover {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.menuButton:focus-visible {
+  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
 }
 
 .menuButtonActive,
