@@ -1,0 +1,137 @@
+/* Layout shells for COMPONENT.md examples — semantic tokens only */
+
+.shell {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(100%, 26.25rem);
+}
+
+.card {
+  composes: shell;
+  padding: var(--prime-sys-spacing-x4);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background-color: var(--prime-sys-color-surface-default);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.stackLoose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x4);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-l);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.subheading {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-m);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.body {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+}
+
+.muted {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-m);
+  overflow: hidden;
+  background-color: var(--prime-sys-color-surface-raised);
+}
+
+.listRow {
+  padding: var(--prime-sys-spacing-x3) var(--prime-sys-spacing-x4);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.listSep {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insetBody {
+  margin: 0;
+  padding-left: var(--prime-sys-spacing-x4);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.rowWithIcon {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.iconStub {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--prime-sys-shape-radius-m);
+  background-color: var(--prime-sys-color-surface-accentSoft);
+}
+
+.rowMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-xs);
+}
+
+.rowTitle {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.rowDesc {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.toolbar {
+  display: flex;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-x2);
+  min-height: 2.5rem;
+  padding: 0 var(--prime-sys-spacing-x3);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-m);
+  background-color: var(--prime-sys-color-surface-raised);
+  width: fit-content;
+}
+
+.toolbarBtn {
+  align-self: center;
+  padding: var(--prime-sys-spacing-xs) var(--prime-sys-spacing-m);
+  border: none;
+  background: transparent;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  cursor: pointer;
+}
