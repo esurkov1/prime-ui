@@ -168,10 +168,7 @@ export default function SegmentedControlSection() {
             <code>disabled</code> на <code>Root</code> — весь контроль неактивен (
             <code>aria-disabled</code> на radiogroup).
           </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={segmentedStatesSource.trim()}
-            previewLayout="stack-center"
-          >
+          <PlaygroundExampleFrame.Root code={segmentedStatesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SegmentedStatesSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -203,7 +200,7 @@ export default function SegmentedControlSection() {
           </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={segmentedCompositionSource.trim()}
-            previewLayout="stack-center"
+            previewLayout="stack"
           >
             <PlaygroundExampleFrame.Stage>
               <SegmentedCompositionSnippet />
@@ -232,10 +229,7 @@ export default function SegmentedControlSection() {
             активный пункт. На сфокусированной группе <code>role=&quot;radiogroup&quot;</code>{" "}
             стрелки влево/вправо переносят выбор (и фокус) между включёнными сегментами.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={segmentedFeaturesSource.trim()}
-            previewLayout="stack-center"
-          >
+          <PlaygroundExampleFrame.Root code={segmentedFeaturesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SegmentedFeaturesSnippet />
             </PlaygroundExampleFrame.Stage>

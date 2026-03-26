@@ -30,7 +30,10 @@ export default function SegmentedProgressBarSection() {
         <div className="demoBlock">
           <DemoSectionTitle>Размеры</DemoSectionTitle>
           <DemoDescription>Та же шкала высоты трека, что у ProgressBar.</DemoDescription>
-          <PlaygroundExampleFrame.Root code={segmentedSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root
+            code={segmentedSizesSource.trim()}
+            previewLayout="stack-center"
+          >
             <PlaygroundExampleFrame.Stage>
               <SegmentedSizesSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -40,8 +43,8 @@ export default function SegmentedProgressBarSection() {
         <div className="demoBlock">
           <DemoSectionTitle>Зазор между сегментами</DemoSectionTitle>
           <DemoDescription>
-            <code>segmentGap=&quot;hairline&quot;</code> — разделитель 1px; <code>none</code> — без
-            зазора.
+            По умолчанию <code>none</code> — сплошная полоса; <code>hairline</code> — тонкий
+            разделитель 1px между сегментами.
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={segmentedGapSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>

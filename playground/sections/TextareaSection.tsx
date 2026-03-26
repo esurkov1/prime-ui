@@ -210,7 +210,7 @@ export default function TextareaSection() {
             Четыре значения <code>size</code> — <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code>; у каждого поля своя <code>Textarea.Hint</code> с подписью размера.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <TextareaSizesSnippet />
             </PlaygroundExampleFrame.Stage>

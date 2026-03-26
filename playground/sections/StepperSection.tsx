@@ -463,7 +463,7 @@ export default function StepperSection() {
             <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же схема шагов, разный тир
             контрола и типографики.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <StepperSizesSnippet />
             </PlaygroundExampleFrame.Stage>

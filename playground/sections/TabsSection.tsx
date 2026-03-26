@@ -214,7 +214,7 @@ export default function TabsSection() {
             <code>xl</code>. В каждом — иконка и подпись в одной вкладке, остальные только с{" "}
             <code>Tabs.Label</code>.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tabsSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={tabsSizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <TabsSizesSnippet />
             </PlaygroundExampleFrame.Stage>

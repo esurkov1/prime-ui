@@ -75,7 +75,10 @@ export default function SidebarSection() {
             <code>responsive=&#123;false&#125;</code> — иначе при сужении каждый экземпляр включал
             бы оверлей одновременно.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sidebarSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root
+            code={sidebarSizesSource.trim()}
+            previewLayout="stack-center"
+          >
             <PlaygroundExampleFrame.Stage>
               <SidebarSizesSnippet />
             </PlaygroundExampleFrame.Stage>

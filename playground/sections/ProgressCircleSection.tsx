@@ -140,7 +140,7 @@ export default function ProgressCircleSection() {
           </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={progressCircleControlledSource.trim()}
-            previewLayout="stack-center"
+            previewLayout="stack"
           >
             <PlaygroundExampleFrame.Stage>
               <ProgressCircleControlledSnippet />

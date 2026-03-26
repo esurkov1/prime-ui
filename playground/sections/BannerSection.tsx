@@ -255,7 +255,7 @@ export default function BannerSection() {
             <code>status=&quot;information&quot;</code> — меняются отступы, кегль и размер иконки из
             одного яруса токенов.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <BannerSizesSnippet />
             </PlaygroundExampleFrame.Stage>

@@ -391,7 +391,10 @@ export default function DataTableSection() {
             <code>size</code>, чтобы показать наследование от <code>ControlSizeProvider</code>.
             Пагинация использует <code>paginationSize</code>, совпадающий с размером таблицы.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={dataTableSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root
+            code={dataTableSizesSource.trim()}
+            previewLayout="stack-center"
+          >
             <PlaygroundExampleFrame.Stage>
               <DataTableSizesSnippet />
             </PlaygroundExampleFrame.Stage>

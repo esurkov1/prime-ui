@@ -307,7 +307,7 @@ export default function AccordionSection() {
             <code>l</code>, <code>xl</code> — меняются кегль, иконки и отступы триггера и текста
             контента.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <AccordionSizesSnippet />
             </PlaygroundExampleFrame.Stage>

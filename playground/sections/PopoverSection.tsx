@@ -241,7 +241,7 @@ export default function PopoverSection() {
             <code>open</code> и <code>onOpenChange</code> на <code>Popover.Root</code>: состояние
             держит родитель (кнопка «Открыть извне», счётчики, шаги мастера).
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <PopoverControlledSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -254,7 +254,7 @@ export default function PopoverSection() {
             Триггер с <code>Button.Icon</code>, заголовок, текст и нативные чекбоксы внутри{" "}
             <code>Popover.Inset</code>.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <PopoverCompositionSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -267,7 +267,7 @@ export default function PopoverSection() {
             <code>sameMinWidthAsTrigger</code> — ширина панели как у триггера (не только min-width);
             удобно в узкой колонке.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <PopoverFullWidthSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -281,7 +281,7 @@ export default function PopoverSection() {
             <code>&lt;button&gt;</code> без визуала кнопки (как текстовая ссылка); к ней добавляются
             подписи доступности и переключение по клику.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={asChildSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={asChildSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <PopoverAsChildSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -294,7 +294,7 @@ export default function PopoverSection() {
             <code>trapFocus</code> для формы в панели; рядом <code>Input</code> и{" "}
             <code>Select</code> — клик по выпадающему списку не закрывает поповер как «снаружи».
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <PopoverFeaturesSnippet />
             </PlaygroundExampleFrame.Stage>

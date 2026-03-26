@@ -82,7 +82,7 @@ export default function KbdSection() {
             при необходимости можно передать <code>hidden</code>, <code>aria-hidden</code> и другие
             атрибуты через разметку.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <KbdStatesSnippet />
             </PlaygroundExampleFrame.Stage>

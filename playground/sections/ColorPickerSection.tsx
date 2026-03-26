@@ -557,10 +557,7 @@ export default function ColorPickerSection() {
             Три формата (<code>hsl</code>, <code>rgb</code>, <code>hex</code>) — три отдельных
             поповера с <code>FormatProvider</code>.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={formatVariantsSource.trim()}
-            previewLayout="stack-center"
-          >
+          <PlaygroundExampleFrame.Root code={formatVariantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ColorPickerFormatVariantsSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -572,7 +569,7 @@ export default function ColorPickerSection() {
           <DemoDescription>
             Два поповера: отключённый пресет в палитре и отключённый слайдер оттенка.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ColorPickerStatesSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -585,10 +582,7 @@ export default function ColorPickerSection() {
             Два экземпляра: <code>side=&quot;bottom&quot;</code> и <code>side=&quot;top&quot;</code>
             ; триггер с <code>TriggerSwatch</code>.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={panelPlacementSource.trim()}
-            previewLayout="stack-center"
-          >
+          <PlaygroundExampleFrame.Root code={panelPlacementSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ColorPickerPanelPlacementSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -601,7 +595,7 @@ export default function ColorPickerSection() {
             <code>value</code> / <code>onChange</code>, readout снаружи поповера, панель внутри{" "}
             <code>Popover.Content</code>.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ColorPickerControlledSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -614,7 +608,7 @@ export default function ColorPickerSection() {
             Полная панель в поповере: <code>FormatSelect</code>, <code>Area</code>, слайдеры,{" "}
             <code>ChannelStrip</code>, <code>SwatchPicker</code>.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ColorPickerCompositionSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -626,7 +620,7 @@ export default function ColorPickerSection() {
           <DemoDescription>
             Широкая <code>Popover.Content</code> и карточка <code>fullWidthStretch</code> внутри.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ColorPickerFullWidthSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -639,7 +633,7 @@ export default function ColorPickerSection() {
             Поповер с кастомным квадратом цвета на кнопке (альтернатива <code>TriggerSwatch</code>
             ); ниже — <code>Field</code>, пипетка и слайдер в отдельном поповере.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ColorPickerPopoverSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -648,7 +642,7 @@ export default function ColorPickerSection() {
             <code>Field</code> + <code>EyeDropperButton</code>, область и слайдер — всё внутри
             поповера.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ColorPickerFeaturesSnippet />
             </PlaygroundExampleFrame.Stage>

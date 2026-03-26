@@ -325,7 +325,7 @@ export default function NotificationSection() {
             <code>m</code> и <code>l</code>; остальные поля записи одинаковые, включая{" "}
             <code>persistent</code> и <code>closable=false</code>, чтобы сравнить только масштаб.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <NotificationSizesSnippet />
             </PlaygroundExampleFrame.Stage>

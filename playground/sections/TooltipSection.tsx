@@ -200,7 +200,7 @@ export default function TooltipSection() {
             мгновенного отклика в примере провайдер с <code>delayDuration=0</code>. Переключатель и
             наведение на триггер меняют одно и то же состояние.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tooltipControlledSource.trim()}>
+          <PlaygroundExampleFrame.Root code={tooltipControlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TooltipControlledSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -227,7 +227,7 @@ export default function TooltipSection() {
             <code>Tooltip.Provider</code> с <code>delayDuration=800</code> — реже мигающие подсказки
             при быстром движении курсора по плотной сетке контролов.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tooltipDelaySource.trim()}>
+          <PlaygroundExampleFrame.Root code={tooltipDelaySource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TooltipDelaySnippet />
             </PlaygroundExampleFrame.Stage>
@@ -241,7 +241,7 @@ export default function TooltipSection() {
             Ширина ограничена стилями компонента (<code>max-width</code>), длинные слова
             переносятся.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tooltipLongContentSource.trim()}>
+          <PlaygroundExampleFrame.Root code={tooltipLongContentSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TooltipLongContentSnippet />
             </PlaygroundExampleFrame.Stage>

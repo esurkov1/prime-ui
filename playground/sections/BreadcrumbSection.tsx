@@ -133,7 +133,10 @@ export default function BreadcrumbSection() {
             Четыре ряда с <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> на <code>Breadcrumb.Root</code> — общий масштаб для всей цепочки.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={breadcrumbSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root
+            code={breadcrumbSizesSource.trim()}
+            previewLayout="stack-center"
+          >
             <PlaygroundExampleFrame.Stage>
               <BreadcrumbSizesSnippet />
             </PlaygroundExampleFrame.Stage>

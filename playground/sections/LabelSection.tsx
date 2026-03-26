@@ -37,7 +37,7 @@ export default function LabelSection() {
             <code>l</code>, <code>xl</code> — для текста без иконки и для строки с{" "}
             <code>Label.Icon</code> (иконка подстраивается под тот же размер).
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={labelSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={labelSizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <LabelSizesSnippet />
             </PlaygroundExampleFrame.Stage>

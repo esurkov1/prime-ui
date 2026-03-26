@@ -219,7 +219,7 @@ export default function InputSection() {
             <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же разметка с иконкой слева,
             меняются только токены высоты и типографики.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <InputSizesSnippet />
             </PlaygroundExampleFrame.Stage>

@@ -120,7 +120,7 @@ export default function SliderSection() {
             <code>xl</code>): высота дорожки, бегунок и размер текста подписи согласованы токенами
             контрола.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <SliderSizesSnippet />
             </PlaygroundExampleFrame.Stage>

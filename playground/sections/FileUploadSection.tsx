@@ -72,7 +72,7 @@ export default function FileUploadSection() {
             <code>FormatBadge</code>, строка имени с индикатором загрузки и{" "}
             <code>ItemProgress</code> с <code>value</code>.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesUploadSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesUploadSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <FileUploadSizesSnippet />
             </PlaygroundExampleFrame.Stage>

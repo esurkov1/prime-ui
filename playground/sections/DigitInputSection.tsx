@@ -131,7 +131,7 @@ export default function DigitInputSection() {
             Строка кода хранится в состоянии родителя через <code>value</code> и{" "}
             <code>onChange</code>; подпись показывает текущее значение и счётчик символов.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DigitInputControlledSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -145,7 +145,7 @@ export default function DigitInputSection() {
             <code>Hint.Root</code>: подпись сверху, подсказка снизу, без встроенных слотов у самого
             DigitInput.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DigitInputCompositionSnippet />
             </PlaygroundExampleFrame.Stage>

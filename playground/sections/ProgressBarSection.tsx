@@ -17,7 +17,10 @@ export default function ProgressBarSection() {
           <DemoDescription>
             Ниже — интерактивное превью и вкладка с кодом этого примера.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={progressBarSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root
+            code={progressBarSizesSource.trim()}
+            previewLayout="stack-center"
+          >
             <PlaygroundExampleFrame.Stage>
               <ProgressBarSizesSnippet />
             </PlaygroundExampleFrame.Stage>

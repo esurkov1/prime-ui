@@ -40,7 +40,7 @@ export default function HintSection() {
             <code>l</code>, <code>xl</code>. Номинальный размер совпадает с размером поля;
             фактический кегль подсказки на ступень меньше (см. стили).
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={hintSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={hintSizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <HintSizesSnippet />
             </PlaygroundExampleFrame.Stage>

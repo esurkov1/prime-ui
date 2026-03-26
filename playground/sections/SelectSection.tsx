@@ -338,7 +338,7 @@ export default function SelectSection() {
             <code>l</code>, <code>xl</code> — высота триггера, кегль и отступы из одного яруса
             токенов.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <SelectSizesSnippet />
             </PlaygroundExampleFrame.Stage>

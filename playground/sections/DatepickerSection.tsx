@@ -426,10 +426,7 @@ export default function DatepickerSection() {
             <code>mode=&quot;single&quot;</code> и <code>mode=&quot;range&quot;</code> — отдельные
             поповеры с кнопками-триггерами.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={variantsModesSource.trim()}
-            previewLayout="stack-center"
-          >
+          <PlaygroundExampleFrame.Root code={variantsModesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DatepickerVariantsModesSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -468,10 +465,7 @@ export default function DatepickerSection() {
             Состояние в React; подпись <code>Datepicker.Value</code> внутри панели поповера; после
             выбора даты поповер закрывается.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={controlledValueSource.trim()}
-            previewLayout="stack-center"
-          >
+          <PlaygroundExampleFrame.Root code={controlledValueSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DatepickerControlledValueSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -484,7 +478,7 @@ export default function DatepickerSection() {
             Пресеты, календарь, время и <code>Datepicker.Value</code> в одном поповере, общее
             состояние.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DatepickerCompositionSnippet />
             </PlaygroundExampleFrame.Stage>
@@ -510,15 +504,12 @@ export default function DatepickerSection() {
             Эталон: иконка календаря на триггере и закрытие после выбора даты; ниже — диапазон с
             пресетами и <code>Datepicker.Time</code> в отдельном поповере.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DatepickerPopoverSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
-          <PlaygroundExampleFrame.Root
-            code={rangePresetsTimeSource.trim()}
-            previewLayout="stack-center"
-          >
+          <PlaygroundExampleFrame.Root code={rangePresetsTimeSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DatepickerRangePresetsTimeSnippet />
             </PlaygroundExampleFrame.Stage>

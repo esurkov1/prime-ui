@@ -106,7 +106,7 @@ export default function DividerSection() {
         <div className="demoBlock">
           <DemoSectionTitle>Размеры</DemoSectionTitle>
           <DemoDescription>Три ступени — s, m, xl — для сравнения кегля подписи.</DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <DividerSizesSnippet />
             </PlaygroundExampleFrame.Stage>

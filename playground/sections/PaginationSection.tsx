@@ -86,7 +86,10 @@ export default function PaginationSection() {
             <code>xl</code>; на длинном диапазоне видны и стрелки, и номера, и ячейка с «…» в одном
             масштабе.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={paginationSizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root
+            code={paginationSizesSource.trim()}
+            previewLayout="stack-center"
+          >
             <PlaygroundExampleFrame.Stage>
               <PaginationSizesSnippet />
             </PlaygroundExampleFrame.Stage>

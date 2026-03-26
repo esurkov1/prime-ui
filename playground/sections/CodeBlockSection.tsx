@@ -73,7 +73,7 @@ export default function CodeBlockSection() {
             и <code>line-height</code> (токены типографики), внутри один и тот же{" "}
             <code>CodeBlock.Root</code> с <code>colorScheme</code> из темы плейграунда.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <CodeBlockSizesSnippet />
             </PlaygroundExampleFrame.Stage>

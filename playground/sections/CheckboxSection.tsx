@@ -288,7 +288,7 @@ export default function CheckboxSection() {
             <code>Checkbox.Root</code> для экранных читалок; <code>name</code> и <code>value</code>{" "}
             для отправки формы.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={specificSource.trim()} previewLayout="stack-center">
+          <PlaygroundExampleFrame.Root code={specificSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CheckboxSpecificSnippet />
             </PlaygroundExampleFrame.Stage>
