@@ -153,10 +153,11 @@ export default function AppShellSection() {
           <code>data-layout-region=&quot;nav&quot;</code>) и <strong>main</strong> (
           <code>AppShell.Main</code>, <code>data-layout-region=&quot;main&quot;</code>).{" "}
           <code>AppShell.Template</code> помечает корень как{" "}
-          <code>data-layout-template=&quot;app&quot;</code>: на широком экране — зазор между
-          колонками при открытом <code>Sidebar</code> (<code>sidebarSlot=&quot;page-nav&quot;</code>
-          ); поля вьюпорта для текста — через <code>mainProps variant=&quot;page&quot;</code> или
-          свою разметку. В плейграунде — <code>PlaygroundLayout</code>.
+          <code>data-layout-template=&quot;app&quot;</code>: на широком экране — поля у колонки{" "}
+          <code>Nav</code> от края экрана и зазор между колонками при открытом <code>Sidebar</code>{" "}
+          (<code>sidebarSlot=&quot;page-nav&quot;</code>); поля текста в <code>main</code> — через{" "}
+          <code>mainProps variant=&quot;page&quot;</code> или свою разметку. В плейграунде —{" "}
+          <code>PlaygroundLayout</code>.
         </>
       }
     >
