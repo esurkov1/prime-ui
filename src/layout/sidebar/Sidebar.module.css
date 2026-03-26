@@ -1,6 +1,6 @@
 .root {
   --sb-expanded-width: 18rem;
-  --sb-compact-width: 6.75rem;
+  --sb-compact-width: 6rem;
   --sb-visible-width: var(--sb-expanded-width);
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
@@ -92,6 +92,7 @@
   display: flex;
   align-items: center;
   gap: var(--prime-sys-spacing-x2);
+  min-height: calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x2));
   min-width: 0;
 }
 
@@ -255,6 +256,7 @@
 .identityButton {
   justify-content: flex-start;
   width: 100%;
+  min-height: calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x2));
   min-width: 0;
 }
 
@@ -458,10 +460,11 @@
   .root[data-state="compact"] .navPanelHeading,
   .root[data-state="compact"] .navCategoryLabel {
     max-width: 100%;
-    text-align: left;
+    width: 100%;
+    text-align: center;
     font-size: var(--prime-sys-size-control-s-supportText);
     line-height: var(--prime-sys-typography-lineHeight-tight);
-    padding-inline: var(--prime-sys-spacing-x2);
+    padding-inline: var(--prime-sys-spacing-x1);
     padding-block: var(--prime-sys-spacing-x1);
     overflow: hidden;
     text-overflow: ellipsis;
