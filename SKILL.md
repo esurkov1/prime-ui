@@ -14,6 +14,17 @@ description: >
 
 # prime-ui-responsive-app
 
+## Documentation layout
+
+| What | Path (this repository) | After `npm install prime-ui-kit` |
+|------|--------------------------|-------------------------------------|
+| Per-component API, props, examples | `src/components/<kebab-name>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<kebab-name>/COMPONENT.md` |
+| Design tokens, full 41-component catalog, source annotations | `references/*.md` | `node_modules/prime-ui-kit/references/*.md` |
+
+This file (`SKILL.md`) lives at the repository root; install it as a Cursor skill by pointing the skill folder at the repo (or copy `SKILL.md` plus `references/` into your skills directory and keep paths consistent).
+
+---
+
 ## Visual Language & Design Tokens
 
 Any responsive layout on prime-ui-kit **must** follow the system’s visual language.
@@ -213,21 +224,21 @@ Use DevTools Responsive Mode to check intermediate widths.
 
 | Component | Role in responsive layout | Typical region | Documentation |
 |-----------|---------------------------|----------------|----------------|
-| Sidebar | Navigation; desktop inline → mobile Drawer | sidebar | `components/sidebar.md` |
-| Drawer | Overlay panel; replaces modals and sidebars on mobile | overlay | `components/drawer.md` |
-| Tabs | Content switching; scroll on mobile | content | `components/tabs.md` |
-| DataTable | Table with horizontal scroll on mobile | content | `components/data-table.md` |
-| Button | CTA; `size="l"` + `fullWidth` on mobile | form, footer | `components/button.md` |
-| Input | Text field; `fullWidth` in mobile forms | form | `components/input.md` |
-| Select | Choice; portal menu, `fullWidth` | form | `components/select.md` |
-| Modal | Dialog; on mobile → Drawer (bottom) | overlay | `components/modal.md` |
-| Accordion | Expand/collapse; replaces Tabs on narrow viewports | content | `components/accordion.md` |
-| Breadcrumb | Path; auto-collapse via `maxItems` | header | `components/breadcrumb.md` |
-| Stepper | Progress; horizontal → vertical on mobile | content | `components/stepper.md` |
-| Pagination | Pages; compact mode on mobile | footer | `components/pagination.md` |
-| Typography | Text; change `variant` by breakpoint or fluid | content | `components/typography.md` |
-| SegmentedControl | Toggle; → Select when more than 4 segments on mobile | header | `components/segmented-control.md` |
-| Notification | Toasts; fullWidth at bottom on mobile | overlay | `components/notification.md` |
+| Sidebar | Navigation; desktop inline → mobile Drawer | sidebar | `src/components/sidebar/COMPONENT.md` |
+| Drawer | Overlay panel; replaces modals and sidebars on mobile | overlay | `src/components/drawer/COMPONENT.md` |
+| Tabs | Content switching; scroll on mobile | content | `src/components/tabs/COMPONENT.md` |
+| DataTable | Table with horizontal scroll on mobile | content | `src/components/data-table/COMPONENT.md` |
+| Button | CTA; `size="l"` + `fullWidth` on mobile | form, footer | `src/components/button/COMPONENT.md` |
+| Input | Text field; `fullWidth` in mobile forms | form | `src/components/input/COMPONENT.md` |
+| Select | Choice; portal menu, `fullWidth` | form | `src/components/select/COMPONENT.md` |
+| Modal | Dialog; on mobile → Drawer (bottom) | overlay | `src/components/modal/COMPONENT.md` |
+| Accordion | Expand/collapse; replaces Tabs on narrow viewports | content | `src/components/accordion/COMPONENT.md` |
+| Breadcrumb | Path; auto-collapse via `maxItems` | header | `src/components/breadcrumb/COMPONENT.md` |
+| Stepper | Progress; horizontal → vertical on mobile | content | `src/components/stepper/COMPONENT.md` |
+| Pagination | Pages; compact mode on mobile | footer | `src/components/pagination/COMPONENT.md` |
+| Typography | Text; change `variant` by breakpoint or fluid | content | `src/components/typography/COMPONENT.md` |
+| SegmentedControl | Toggle; → Select when more than 4 segments on mobile | header | `src/components/segmented-control/COMPONENT.md` |
+| Notification | Toasts; fullWidth at bottom on mobile | overlay | `src/components/notification/COMPONENT.md` |
 
 Full table of all 41 components: [`references/component-catalog.md`](references/component-catalog.md).
 
@@ -247,7 +258,7 @@ Full table of all 41 components: [`references/component-catalog.md`](references/
 | 8 | Every Layout: Composition | https://every-layout.dev/rudiments/composition |
 | 9 | Sticky Footers — MDN | https://developer.mozilla.org/en-US/docs/Web/CSS/How_to/Layout_cookbook/Sticky_footers |
 | 10 | Equal-Height Cards with Flexbox — DEV Community | https://dev.to/jennavisions/building-responsive-equal-height-cards-with-modern-css-magic-of-flexbox-no-media-queries-2h0b |
-| 11 | Flexbox Cheatsheet — freeCodeCamp | https://www.freecodecamp.org/news/flexbox-the-ultimate-css-flex-cheatsheet |
+| 11 | Flexbox Cheatsheet — freeCodeCamp | https://www.freecodecamp.org/news/flexbox-the-ultimate-flex-cheatsheet |
 | 12 | User Interface Patterns — web.dev | https://web.dev/learn/design/ui-patterns |
 | 13 | Responsive Web Design Guide 2026 — Scrimba | https://scrimba.com/articles/responsive-web-design-a-complete-guide-2026-2/ |
 | 14 | Accessible Navigation Guide 2026 — Brand Vision | https://www.brandvm.com/post/accessible-navigation-websites-ux-guide-2026 |

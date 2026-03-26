@@ -60,6 +60,8 @@
   "files": [
     "dist",
     "src/styles",
+    "src/components/**/COMPONENT.md",
+    "references/**/*.md",
     "LICENSE"
   ],
   "publishConfig": {

@@ -14,7 +14,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Full width on narrow viewports; replaces vertical tabs on mobile. |
 | **Zones** | content, sidebar, form |
 | **Scenarios** | FAQ on a landing; account settings by group; order/shipping details; knowledge-base articles; plan descriptions; navigation in a narrow sidebar. |
-| **Documentation** | `../components/accordion.md` |
+| **Documentation** | `../src/components/accordion/COMPONENT.md` |
 
 ## Avatar
 
@@ -24,7 +24,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Scales via `size`; on mobile, show fewer items in a group. |
 | **Zones** | header, content, inline, navigation |
 | **Scenarios** | Profile in the header; chat avatar; colleague card; audit table; team on a landing; meeting participants. |
-| **Documentation** | `../components/avatar.md` |
+| **Documentation** | `../src/components/avatar/COMPONENT.md` |
 
 ## Badge
 
@@ -34,7 +34,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Always inline; on mobile you can hide text and keep only the dot or number. |
 | **Zones** | header, content, inline, form |
 | **Scenarios** | Tab counter; delivery stage; role in a panel; presence status; topic label; “in stock” on a card. |
-| **Documentation** | `../components/badge.md` |
+| **Documentation** | `../src/components/badge/COMPONENT.md` |
 
 ## Banner
 
@@ -44,7 +44,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Full width; on mobile, actions stack vertically. |
 | **Zones** | header, content, form |
 | **Scenarios** | Order status; deadline; onboarding/release; checkout hint; global incident; unsaved-settings reminder. |
-| **Documentation** | `../components/banner.md` |
+| **Documentation** | `../src/components/banner/COMPONENT.md` |
 
 ## Breadcrumb
 
@@ -54,7 +54,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile, automatically shortens the middle; keeps first and last items. |
 | **Zones** | header, content, navigation |
 | **Scenarios** | Catalog path; account: orders → detail; docs with collapse; report header; non-link level; home icon. |
-| **Documentation** | `../components/breadcrumb.md` |
+| **Documentation** | `../src/components/breadcrumb/COMPONENT.md` |
 
 ## Button
 
@@ -64,7 +64,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile use `size="l"` for touch target ≥ 44 px; `fullWidth` for block CTAs. |
 | **Zones** | header, footer, content, form, overlay, navigation |
 | **Scenarios** | Save in a panel; pay and retry; empty state “Get started”; form submit; card actions; bulk operations. |
-| **Documentation** | `../components/button.md` |
+| **Documentation** | `../src/components/button/COMPONENT.md` |
 
 ## ButtonGroup
 
@@ -74,7 +74,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Switch to `vertical` on narrow viewports; reduce `size` when space is tight. |
 | **Zones** | header, content, form, navigation |
 | **Scenarios** | Date range in analytics; formatting toolbar; plan selection; stock filter; vertical variant in a narrow column; submit/reset. |
-| **Documentation** | `../components/button-group.md` |
+| **Documentation** | `../src/components/button-group/COMPONENT.md` |
 
 ## Checkbox
 
@@ -84,7 +84,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Fixed size; on mobile increase spacing for touch area. |
 | **Zones** | form, content, sidebar |
 | **Scenarios** | Consent before payment; “select all” in a table; notification channels; privacy; “archive / mine only” filter; document approval. |
-| **Documentation** | `../components/checkbox.md` |
+| **Documentation** | `../src/components/checkbox/COMPONENT.md` |
 
 ## CodeBlock
 
@@ -94,7 +94,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Horizontal scroll on overflow; width 100% of container. |
 | **Zones** | content, inline |
 | **Scenarios** | API docs; integration examples; log/config in support; JSON request body; light/dark comparison on a landing. |
-| **Documentation** | `../components/code-block.md` |
+| **Documentation** | `../src/components/code-block/COMPONENT.md` |
 
 ## ColorPicker
 
@@ -104,7 +104,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | **Product UI:** host the panel in `Popover` (or Modal/Drawer), not inline; on narrow viewports Drawer is fine; presets flex-wrap inside the overlay. |
 | **Zones** | form, overlay |
 | **Scenarios** | Brand/theme; chart series; variant color; editor tools — always from a trigger into Popover. |
-| **Documentation** | `../components/color-picker.md` |
+| **Documentation** | `../src/components/color-picker/COMPONENT.md` |
 
 ## CommandMenu
 
@@ -114,7 +114,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile, full width; trigger via button instead of hotkey. |
 | **Zones** | overlay, navigation, header |
 | **Scenarios** | Quick jump between sections; deal actions; editor commands; order search; support with article search; media library filters. |
-| **Documentation** | `../components/command-menu.md` |
+| **Documentation** | `../src/components/command-menu/COMPONENT.md` |
 
 ## DataTable
 
@@ -124,7 +124,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Horizontal scroll with `overflow-x: auto`; sticky first column; on mobile — card layout or hide secondary columns. |
 | **Zones** | content |
 | **Scenarios** | Warehouse and shipments; invoices and payments; wide reports; tickets with custom cells; log with infinite scroll; compact table inside a card. |
-| **Documentation** | `../components/data-table.md` |
+| **Documentation** | `../src/components/data-table/COMPONENT.md` |
 
 ## Datepicker
 
@@ -134,7 +134,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | **Product UI:** put `Datepicker.Shell` inside `Popover.Content` (or Modal/Drawer); popup clamps to viewport on mobile. |
 | **Zones** | form, overlay |
 | **Scenarios** | Booking; report period; filters; profile dates — opened from field/button, not inline on the page. |
-| **Documentation** | `../components/datepicker.md` |
+| **Documentation** | `../src/components/datepicker/COMPONENT.md` |
 
 ## DigitInput
 
@@ -144,7 +144,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Larger `size` on mobile for thumb input; `inputMode="numeric"` for numeric keyboard. |
 | **Zones** | form, overlay |
 | **Scenarios** | SMS OTP; pickup code; content PIN; large cells on tablet; pairing code; email confirmation in a wizard. |
-| **Documentation** | `../components/digit-input.md` |
+| **Documentation** | `../src/components/digit-input/COMPONENT.md` |
 
 ## Divider
 
@@ -154,7 +154,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Toggle `orientation` when the container’s flex-direction changes. |
 | **Zones** | content, sidebar, form, inline |
 | **Scenarios** | Order totals; product description sections; vertical rules in a toolbar; settings sections; article card; editor panel. |
-| **Documentation** | `../components/divider.md` |
+| **Documentation** | `../src/components/divider/COMPONENT.md` |
 
 ## Drawer
 
@@ -164,7 +164,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Primary mobile pattern: replaces modals, sidebars, and nested panels; `position="bottom"` for bottom sheet. |
 | **Zones** | overlay |
 | **Scenarios** | Catalog filters on mobile; receiving on tablet; metadata on the right; bottom sheet over a map; candidate notes; invoice line drill-down. |
-| **Documentation** | `../components/drawer.md` |
+| **Documentation** | `../src/components/drawer/COMPONENT.md` |
 
 ## Dropdown
 
@@ -174,7 +174,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Auto-positioned via portal; on mobile can switch to Drawer for long lists. |
 | **Zones** | header, content, form, inline, navigation |
 | **Scenarios** | Task card actions; table row menu; profile/logout in header; short trigger; externally controlled `open`; text trigger. |
-| **Documentation** | `../components/dropdown.md` |
+| **Documentation** | `../src/components/dropdown/COMPONENT.md` |
 
 ## FileUpload
 
@@ -184,7 +184,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Zone is full width; on mobile drag-and-drop is less relevant — emphasize pick-file button. |
 | **Zones** | form, overlay, content |
 | **Scenarios** | Resume and portfolio; product photos; medical images; avatar with external button; B2B application attachments; LMS submissions. |
-| **Documentation** | `../components/file-upload.md` |
+| **Documentation** | `../src/components/file-upload/COMPONENT.md` |
 
 ## Hint
 
@@ -194,7 +194,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Width follows the field; on mobile avoid clipping error text. |
 | **Zones** | form, inline |
 | **Scenarios** | Password rules; read-only with role explanation; numeric field limit; email invite; promo error; slider hint. |
-| **Documentation** | `../components/hint.md` |
+| **Documentation** | `../src/components/hint/COMPONENT.md` |
 
 ## Input
 
@@ -204,7 +204,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | `fullWidth` by default in mobile forms; `size="l"` for touch target. |
 | **Zones** | header, form, content, sidebar |
 | **Scenarios** | Login/contacts; address and promo; SKU in table; catalog search; amounts with currency; landing lead form. |
-| **Documentation** | `../components/input.md` |
+| **Documentation** | `../src/components/input/COMPONENT.md` |
 
 ## Kbd
 
@@ -214,7 +214,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Hide on mobile (no keyboard); show only from `min-width: 1024px`. |
 | **Zones** | content, form, inline, overlay |
 | **Scenarios** | Editor menu hotkeys; shortcuts in settings; onboarding with keys; Enter next to modal button. |
-| **Documentation** | `../components/kbd.md` |
+| **Documentation** | `../src/components/kbd/COMPONENT.md` |
 
 ## Label
 
@@ -224,7 +224,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Size inherits from context; `Sub` wraps to a new line on narrow viewports. |
 | **Zones** | form |
 | **Scenarios** | Profile fields with `htmlFor`; long forms with hints; compact report filters; modal with icon and format in `Sub`. |
-| **Documentation** | `../components/label.md` |
+| **Documentation** | `../src/components/label/COMPONENT.md` |
 
 ## LinkButton
 
@@ -234,7 +234,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Inline element; on mobile increase `size` for touch target. |
 | **Zones** | header, footer, content, navigation, inline |
 | **Scenarios** | Nav item in header; footer links; policy in copy; compact links in a panel; integration from a card. |
-| **Documentation** | `../components/link-button.md` |
+| **Documentation** | `../src/components/link-button/COMPONENT.md` |
 
 ## Modal
 
@@ -244,7 +244,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile prefer Drawer (bottom) for UX; on desktop centered with max-width. |
 | **Zones** | overlay |
 | **Scenarios** | Delete confirmation; payment step; onboarding; quick record edit; media preview; terms and consents. |
-| **Documentation** | `../components/modal.md` |
+| **Documentation** | `../src/components/modal/COMPONENT.md` |
 
 ## Notification
 
@@ -254,7 +254,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile full width at bottom; on desktop fixed width in a corner. |
 | **Zones** | overlay |
 | **Scenarios** | Payment success/error; co-editing; delivery status; export ready; file upload; session lost. |
-| **Documentation** | `../components/notification.md` |
+| **Documentation** | `../src/components/notification/COMPONENT.md` |
 
 ## Pagination
 
@@ -264,7 +264,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Compact on mobile: arrows and current page only; `size="s"`. |
 | **Zones** | content, footer |
 | **Scenarios** | Product catalog; audit log; media library; multi-page lesson; API logs; compact mobile view. |
-| **Documentation** | `../components/pagination.md` |
+| **Documentation** | `../src/components/pagination/COMPONENT.md` |
 
 ## Popover
 
@@ -274,7 +274,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile switches to Drawer for heavy content; simple popover can stay. |
 | **Zones** | overlay, content, form, inline |
 | **Scenarios** | Term footnote; promo terms; mini settings form; application comment; contextual hint. |
-| **Documentation** | `../components/popover.md` |
+| **Documentation** | `../src/components/popover/COMPONENT.md` |
 
 ## ProgressBar
 
@@ -284,7 +284,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Stretches to full container width; compact `size` on mobile. |
 | **Zones** | content, form |
 | **Scenarios** | File upload; survey steps; background report build; sync jobs; “building export” card; controlled value. |
-| **Documentation** | `../components/progress-bar.md` |
+| **Documentation** | `../src/components/progress-bar/COMPONENT.md` |
 
 ## ProgressCircle
 
@@ -294,7 +294,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Fixed size; on mobile reduce via `size` to save space. |
 | **Zones** | content, inline, form |
 | **Scenarios** | Backup percent; license “month N of 12”; wizard step; groups in a panel; booking slot occupancy. |
-| **Documentation** | `../components/progress-circle.md` |
+| **Documentation** | `../src/components/progress-circle/COMPONENT.md` |
 
 ## Radio
 
@@ -304,7 +304,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Group switches from horizontal to vertical layout on mobile. |
 | **Zones** | form, content, sidebar |
 | **Scenarios** | Onboarding goal; consent with error; payment method; plan selection; delivery window; access role. |
-| **Documentation** | `../components/radio.md` |
+| **Documentation** | `../src/components/radio/COMPONENT.md` |
 
 ## SegmentedControl
 
@@ -314,7 +314,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile shrink to `size="s"` or replace with Select/Tabs when > 4 segments. |
 | **Zones** | header, content, form, navigation |
 | **Scenarios** | Chart period; catalog view (grid/list); theme/UI density; board stages; document mode; compact toggle. |
-| **Documentation** | `../components/segmented-control.md` |
+| **Documentation** | `../src/components/segmented-control/COMPONENT.md` |
 
 ## Select
 
@@ -324,7 +324,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile menu opens over content; `fullWidth` in forms; `size="l"` for touch target. |
 | **Zones** | form, header, content, sidebar |
 | **Scenarios** | Role/country in a form; language and timezone; shipping/currency; dashboard filter; ticket priority; environment in ops. |
-| **Documentation** | `../components/select.md` |
+| **Documentation** | `../src/components/select/COMPONENT.md` |
 
 ## Sidebar
 
@@ -334,7 +334,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On desktop fixed side column; on mobile collapses into Drawer or hides behind hamburger. |
 | **Zones** | sidebar, navigation |
 | **Scenarios** | Product switching; docs with TOC; fleet/warehouse logistics; settings sections; catalog with filters; routes on NavLink. |
-| **Documentation** | `../components/sidebar.md` |
+| **Documentation** | `../src/components/sidebar/COMPONENT.md` |
 
 ## Slider
 
@@ -344,7 +344,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Stretches to full container width; larger thumb on mobile via `size="l"`. |
 | **Zones** | form, content, sidebar |
 | **Scenarios** | Player volume; IoT brightness/color temp; target stock; layer opacity; discrete survey scale; TTS speed. |
-| **Documentation** | `../components/slider.md` |
+| **Documentation** | `../src/components/slider/COMPONENT.md` |
 
 ## Stepper
 
@@ -354,7 +354,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Horizontal on desktop → vertical on mobile; step text can hide, leaving numbers. |
 | **Zones** | content, form, header |
 | **Scenarios** | Onboarding; checkout stages; approval with error; editorial pipeline; clickable steps; CI/CD on a card. |
-| **Documentation** | `../components/stepper.md` |
+| **Documentation** | `../src/components/stepper/COMPONENT.md` |
 
 ## Switch
 
@@ -364,7 +364,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Fixed size; on mobile adequate touch target out of the box. |
 | **Zones** | form, content, sidebar |
 | **Scenarios** | Notification channels; contactless delivery; processing rules; reminders; size showcase; mandatory consent with error. |
-| **Documentation** | `../components/switch.md` |
+| **Documentation** | `../src/components/switch/COMPONENT.md` |
 
 ## Tabs
 
@@ -374,7 +374,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Horizontal tab scroll on mobile; on narrow viewports can replace with Accordion. |
 | **Zones** | content, navigation, sidebar |
 | **Scenarios** | Settings: profile/security/billing; dashboard; description/specs/reviews; vertical tabs; wizard steps; landing segments. |
-| **Documentation** | `../components/tabs.md` |
+| **Documentation** | `../src/components/tabs/COMPONENT.md` |
 
 ## Tag
 
@@ -384,7 +384,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Inline; tag groups in flex-wrap; on mobile increase spacing. |
 | **Zones** | content, form, inline, header |
 | **Scenarios** | Active filters as removable chips; form keywords; list labels; card tags; grouping in header; disabled tag. |
-| **Documentation** | `../components/tag.md` |
+| **Documentation** | `../src/components/tag/COMPONENT.md` |
 
 ## Textarea
 
@@ -394,7 +394,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | `fullWidth` in mobile forms; height via `rows` or auto-resize. |
 | **Zones** | form, content |
 | **Scenarios** | Note to courier; student long answer; ticket problem description; lead paragraph with limit; form validation. |
-| **Documentation** | `../components/textarea.md` |
+| **Documentation** | `../src/components/textarea/COMPONENT.md` |
 
 ## Tooltip
 
@@ -404,7 +404,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On mobile prefer Popover (tooltip without hover is poor on touch). |
 | **Zones** | overlay, form, content, inline |
 | **Scenarios** | “Save” button explanation; favorite icon; term in a summary; metric in a table; promo terms; empty-state hint. |
-| **Documentation** | `../components/tooltip.md` |
+| **Documentation** | `../src/components/tooltip/COMPONENT.md` |
 
 ## Typography
 
@@ -414,4 +414,4 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | Text size scales via `variant`; use fluid typography or change `variant` by breakpoint. |
 | **Zones** | content, header, footer, inline |
 | **Scenarios** | Landing with emphasis; secondary copy in account; course body text; dashboard metric tiles; order summary with nested emphasis. |
-| **Documentation** | `../components/typography.md` |
+| **Documentation** | `../src/components/typography/COMPONENT.md` |
