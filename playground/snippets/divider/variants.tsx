@@ -2,59 +2,56 @@ import { Divider } from "@/components/divider/Divider";
 
 import s from "./divider-demos.module.css";
 
-/** Три варианта в реальных сценариях: карточка заказа, список настроек, форма регистрации. */
+/** Один превью-блок: все варианты подписаны, фокус на самом Divider. */
 export default function DividerVariantsSnippet() {
   return (
-    <div className={`${s.rootStack} ${s.rootStackLooser} ${s.maxW420}`}>
-      {/* variant="default": разделение секций в карточке заказа */}
-      <div className={s.card}>
-        <h3 className={s.cardHeading}>Заказ №12345</h3>
-        <p className={s.cardLead}>3 товара • Доставка завтра</p>
-        <Divider.Root size="m" className={s.dividerVerticalMargin} />
-        <p className={s.cardLead}>Адрес: ул. Ленина, д. 10, кв. 5</p>
-        <Divider.Root size="m" className={s.dividerVerticalMargin}>
-          Итого
-        </Divider.Root>
-        <p className={s.totalLine}>12 400 ₽</p>
-      </div>
+    <div className={s.overviewCard}>
+      <section className={s.overviewGroup} aria-label="Пустая линия и линия с подписью">
+        <p className={s.demoHint}>Без текста — сплошная линия</p>
+        <Divider.Root size="m" />
+        <p className={s.demoHint}>Подпись по центру между линиями (default)</p>
+        <Divider.Root size="m">Итого</Divider.Root>
+      </section>
 
-      {/* variant="line-spacing": компактный список с визуальными маркерами */}
-      <div className={s.card}>
-        <h3 className={s.cardHeadingSpaced}>Уведомления</h3>
-        <div className={s.lineSpacingColumn}>
-          <label className={s.checkboxRow}>
-            <input type="checkbox" defaultChecked />
-            Email-рассылка
-          </label>
-          <Divider.Root variant="line-spacing" size="m" />
-          <label className={s.checkboxRow}>
-            <input type="checkbox" defaultChecked />
-            Push-уведомления
-          </label>
-          <Divider.Root variant="line-spacing" size="m" />
-          <label className={s.checkboxRow}>
-            <input type="checkbox" />
-            SMS-оповещения
-          </label>
-        </div>
-      </div>
-
-      {/* variant="text": заголовки секций формы */}
-      <div className={s.card}>
+      <section className={s.overviewGroup} aria-label="Заголовок секции">
+        <p className={s.demoHint}>variant=&quot;text&quot; — стиль заголовка секции</p>
         <Divider.Root variant="text" size="m">
-          Личные данные
+          Уведомления
         </Divider.Root>
-        <div className={s.formFields}>
-          <input className={s.textInput} type="text" placeholder="Имя" />
-          <input className={s.textInput} type="email" placeholder="Email" />
+      </section>
+
+      <section className={s.overviewGroup} aria-label="Между пунктами списка">
+        <p className={s.demoHint}>
+          variant=&quot;line-spacing&quot; — маркер между строками в колонке
+        </p>
+        <div className={s.overviewLineSpacingCol}>
+          <span className={s.overviewLineItem}>Пункт один</span>
+          <Divider.Root variant="line-spacing" size="m" />
+          <span className={s.overviewLineItem}>Пункт два</span>
         </div>
-        <Divider.Root variant="text" size="m" className={s.formFieldsTopLoose}>
-          Безопасность
-        </Divider.Root>
-        <div className={s.timelineBlockSimple}>
-          <input className={s.textInputFull} type="password" placeholder="Пароль" />
+      </section>
+
+      <section className={s.overviewGroup} aria-label="Вертикальный разделитель">
+        <p className={s.demoHint}>orientation=&quot;vertical&quot; — между кнопками в ряду</p>
+        <div className={s.overviewToolbar}>
+          <button className={s.overviewToolbarBtn} type="button">
+            A
+          </button>
+          <Divider.Root orientation="vertical" size="m" />
+          <button className={s.overviewToolbarBtn} type="button">
+            B
+          </button>
         </div>
-      </div>
+      </section>
+
+      <section className={s.overviewGroup} aria-label="Линия на ширину списка">
+        <p className={s.demoHint}>На всю ширину контейнера — между строками списка</p>
+        <div className={s.overviewList}>
+          <div className={s.overviewListRow}>Строка 1</div>
+          <Divider.Root size="s" />
+          <div className={s.overviewListRow}>Строка 2</div>
+        </div>
+      </section>
     </div>
   );
 }
