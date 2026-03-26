@@ -79,6 +79,7 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
   },
   ref,
 ) {
+  const transitionTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialMobile = initialMobileMatch(Boolean(responsive));
 
   const modeControlled = mode === undefined ? undefined : normalizeSidebarMode(mode);
@@ -104,6 +105,10 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
 
   const [isMobile, setIsMobile] = React.useState(initialMobile);
   const previousMobileRef = React.useRef(initialMobile);
+  const previousLayoutStateRef = React.useRef<SidebarLayoutMode>(layoutState);
+  const [transitionPhase, setTransitionPhase] = React.useState<"to-compact" | "to-expanded" | null>(
+    null,
+  );
 
   React.useEffect(() => {
     if (!responsive || typeof window === "undefined" || typeof window.matchMedia !== "function") {
@@ -139,6 +144,53 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
       setLayoutState("expanded");
     }
   }, [defaultOpen, isMobile, layoutState, responsive, setLayoutState]);
+
+  React.useEffect(() => {
+    if (isMobile) {
+      previousLayoutStateRef.current = layoutState;
+      setTransitionPhase(null);
+      if (transitionTimerRef.current !== null) {
+        clearTimeout(transitionTimerRef.current);
+        transitionTimerRef.current = null;
+      }
+      return;
+    }
+
+    const previousState = previousLayoutStateRef.current;
+    previousLayoutStateRef.current = layoutState;
+
+    const nextPhase =
+      previousState === "expanded" && layoutState === "compact"
+        ? "to-compact"
+        : previousState === "compact" && layoutState === "expanded"
+          ? "to-expanded"
+          : null;
+
+    if (transitionTimerRef.current !== null) {
+      clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = null;
+    }
+
+    if (nextPhase === null) {
+      setTransitionPhase(null);
+      return;
+    }
+
+    setTransitionPhase(nextPhase);
+    transitionTimerRef.current = setTimeout(() => {
+      setTransitionPhase(null);
+      transitionTimerRef.current = null;
+    }, 280);
+  }, [isMobile, layoutState]);
+
+  React.useEffect(
+    () => () => {
+      if (transitionTimerRef.current !== null) {
+        clearTimeout(transitionTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const setState = React.useCallback(
     (next: SidebarLayoutMode) => {
@@ -211,6 +263,8 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
           "sidebar-slot": sidebarSlot,
           "sidebar-mode": layoutState,
           "sidebar-root": true,
+          transitioning: transitionPhase ? true : undefined,
+          "transition-phase": transitionPhase ?? undefined,
         })}
       >
         <div ref={navAreaRef} className={styles.navArea}>

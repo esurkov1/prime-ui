@@ -1,6 +1,6 @@
 .root {
   --sb-expanded-width: 18rem;
-  --sb-compact-width: 6rem;
+  --sb-compact-width: 5.25rem;
   --sb-visible-width: var(--sb-expanded-width);
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
@@ -155,6 +155,7 @@
   justify-content: space-between;
   gap: var(--prime-sys-spacing-x1);
   min-width: 0;
+  min-block-size: var(--prime-sys-size-control-s-height);
 }
 
 .groupHeaderAction {
@@ -164,8 +165,13 @@
 }
 
 .groupLabel {
+  display: block;
   min-width: 0;
+  line-height: 1.2;
   padding-inline: var(--prime-sys-spacing-x1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .separator {
@@ -449,7 +455,7 @@
 
   .root[data-state="compact"] .menuButton,
   .root[data-state="compact"] .itemButton {
-    justify-content: flex-start;
+    justify-content: center;
     padding-inline: var(--prime-sys-spacing-x1);
     gap: 0;
   }
@@ -460,7 +466,7 @@
     opacity: 0;
     transform: translateX(-0.25rem);
     pointer-events: none;
-    transition-delay: 0ms, 80ms, 0ms;
+    transition-delay: 0ms, 110ms, 0ms;
   }
 
   .root[data-state="compact"] .identityButtonMain {
@@ -469,21 +475,35 @@
     opacity: 0;
     transform: translateX(-0.25rem);
     pointer-events: none;
-    transition-delay: 0ms, 80ms, 0ms;
+    transition-delay: 0ms, 110ms, 0ms;
   }
 
   .root[data-state="compact"] .identityButton {
+    justify-content: center;
+    padding-inline: var(--prime-sys-spacing-x1);
+  }
+
+  .root[data-transition-phase="to-compact"] .menuButton,
+  .root[data-transition-phase="to-compact"] .itemButton {
+    justify-content: flex-start;
+  }
+
+  .root[data-transition-phase="to-compact"] .identityButton {
     justify-content: flex-start;
     padding-inline: var(--prime-sys-spacing-x2);
   }
 
-  .root[data-state="expanded"] .menuLabel,
-  .root[data-state="expanded"] .identityButtonMain {
+  .root[data-transition-phase="to-expanded"] .menuLabel,
+  .root[data-transition-phase="to-expanded"] .identityButtonMain {
     transition-delay: 0ms, 120ms, 0ms;
   }
 
   .root[data-state="compact"] .group {
     align-items: stretch;
+  }
+
+  .root[data-state="compact"] .groupHeader {
+    justify-content: center;
   }
 
   .root[data-state="compact"] .groupLabel,
@@ -492,10 +512,7 @@
     max-width: 100%;
     width: 100%;
     text-align: center;
-    font-size: var(--prime-sys-size-control-s-supportText);
-    line-height: var(--prime-sys-typography-lineHeight-tight);
     padding-inline: var(--prime-sys-spacing-x1);
-    padding-block: var(--prime-sys-spacing-x1);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -573,7 +590,11 @@
   .navPanel,
   .floatingToggle,
   .backdrop,
-  .navCategoryTrigger > :global(svg) {
+  .navCategoryTrigger > :global(svg),
+  .menuButton,
+  .menuLabel,
+  .identityButton,
+  .identityButtonMain {
     transition: none;
   }
 }
