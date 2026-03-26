@@ -5,16 +5,9 @@ import { IconCheck, IconCircleDot, IconDownload } from "@/icons";
 /** Центр кольца — слот `children`: иконка, подпись и вспомогательный текст. */
 export default function ProgressCircleCompositionSnippet() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", justifyContent: "center" }}>
+    <div className="row rowAlignCenter rowGapMedium">
       <ProgressCircle.Root value={72} max={100} size="xl">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.25rem",
-          }}
-        >
+        <div className="previewLabeledCenter">
           <IconCircleDot size="l" />
           <Typography.Root as="span" size="s" weight="medium">
             Готово
@@ -22,14 +15,7 @@ export default function ProgressCircleCompositionSnippet() {
         </div>
       </ProgressCircle.Root>
       <ProgressCircle.Root value={33} max={80} size="l">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.125rem",
-          }}
-        >
+        <div className="previewLabeledCenter">
           <Typography.Root as="span" size="l" weight="semibold">
             33
           </Typography.Root>
@@ -39,14 +25,7 @@ export default function ProgressCircleCompositionSnippet() {
         </div>
       </ProgressCircle.Root>
       <ProgressCircle.Root value={65} max={100} size="m">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.125rem",
-          }}
-        >
+        <div className="previewLabeledCenter">
           <IconDownload size="m" />
           <Typography.Root as="span" size="xs" weight="medium">
             65%

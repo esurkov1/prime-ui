@@ -23,13 +23,13 @@ import { ProgressCircle } from "prime-ui-kit";
 
 export function BackupStatus() {
   return (
-    <section style={{ display: "flex", alignItems: "center", gap: 16 }}>
+    <section>
       <ProgressCircle.Root value={68} max={100} size="l">
         68%
       </ProgressCircle.Root>
       <div>
         <strong>Backup</strong>
-        <p style={{ margin: "4px 0 0", color: "#666" }}>About a minute left</p>
+        <p>About a minute left</p>
       </div>
     </section>
   );
@@ -45,24 +45,24 @@ import { ProgressCircle } from "prime-ui-kit";
 
 export function ClassProgressRow() {
   return (
-    <div style={{ display: "flex", gap: 24, alignItems: "flex-end" }}>
-      <div style={{ textAlign: "center" }}>
+    <div>
+      <div>
         <ProgressCircle.Root value={90} size="s">
           90%
         </ProgressCircle.Root>
-        <div style={{ fontSize: 12, marginTop: 6 }}>Group A</div>
+        <div>Group A</div>
       </div>
-      <div style={{ textAlign: "center" }}>
+      <div>
         <ProgressCircle.Root value={55} size="m">
           55%
         </ProgressCircle.Root>
-        <div style={{ fontSize: 12, marginTop: 6 }}>Group B</div>
+        <div>Group B</div>
       </div>
-      <div style={{ textAlign: "center" }}>
+      <div>
         <ProgressCircle.Root value={40} size="xl">
           40%
         </ProgressCircle.Root>
-        <div style={{ fontSize: 12, marginTop: 6 }}>Group C</div>
+        <div>Group C</div>
       </div>
     </div>
   );
@@ -81,25 +81,15 @@ export function VenueDayCard() {
   const capacity = 60;
 
   return (
-    <article
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 20,
-        padding: 16,
-        borderRadius: 12,
-        border: "1px solid #e8e8e8",
-        maxWidth: 420,
-      }}
-    >
+    <article>
       <ProgressCircle.Root value={booked} max={capacity} size="l">
-        <span style={{ fontSize: 14, fontWeight: 600 }}>
+        <span>
           {booked}/{capacity}
         </span>
       </ProgressCircle.Root>
-      <div style={{ flex: 1 }}>
-        <h3 style={{ margin: "0 0 4px" }}>Saturday, 2:00 PM</h3>
-        <p style={{ margin: 0, fontSize: 14, color: "#555" }}>North Hall — seats still available</p>
+      <div>
+        <h3>Saturday, 2:00 PM</h3>
+        <p>North Hall — seats still available</p>
       </div>
       <Button.Root size="s" type="button">
         Book
@@ -129,13 +119,11 @@ export function CatalogImportMonitor() {
   }, [done, total]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+    <div>
       <ProgressCircle.Root value={done} max={total} size="xl" label={`Imported ${done} of ${total} items`}>
-        <span style={{ fontSize: 13, fontWeight: 600 }}>{Math.round((done / total) * 100)}%</span>
+        <span>{Math.round((done / total) * 100)}%</span>
       </ProgressCircle.Root>
-      <span style={{ fontSize: 13, color: "#666" }}>
-        Processing supplier catalog…
-      </span>
+      <span>Processing supplier catalog…</span>
     </div>
   );
 }

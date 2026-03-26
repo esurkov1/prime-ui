@@ -9,13 +9,13 @@ export default function ProgressCircleControlledSnippet() {
   const [value, setValue] = React.useState(35);
 
   return (
-    <div className="previewLabeledCenter" style={{ gap: "1rem" }}>
+    <div className="previewStackColumnCenter">
       <ProgressCircle.Root value={value} max={100} size="l">
         <Typography.Root as="span" size="s" weight="medium">
           {value}%
         </Typography.Root>
       </ProgressCircle.Root>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", justifyContent: "center" }}>
+      <div className="row rowAlignCenter rowGapTight">
         <Button.Root
           mode="stroke"
           size="s"
