@@ -2,9 +2,31 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## About
+## Canonical
 
-`DigitInput` is a single OTP-style control: a horizontal row of one-character fields that merge into one digit string, with paste support and automatic focus moves between cells.
+- **Import:** `import { DigitInput } from "prime-ui-kit"`.
+- **Surface:** только **`DigitInput.Root`** — горизонтальный ряд ячеек (`<fieldset>` + несколько `<input>`).
+- **Значение:** одна строка из цифр; длина задаётся **`length`** (по умолчанию **`4`**).
+- **Размер ячеек:** **`size`**: `"s"` \| `"m"` \| `"l"` \| `"xl"` (по умолчанию **`m`**).
+- **Режимы:** контролируемый (`value` + `onChange`) или неконтролируемый (`defaultValue`); опционально **`onComplete`**, **`disabled`**, **`hasError`**, **`className`**.
+- **Подписи и ошибки:** снаружи — [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md); встроенных слотов нет.
+- **Примеры в репозитории:** [`examples/`](./examples/) (OTP, PIN, шаг верификации, ошибка, сброс при повторной отправке).
+
+## LLM note
+
+- Нормализация: в **`value` / `onChange` / paste** нецифровые символы **удаляются**, строка **обрезается** до **`length`**. Алфавитно-цифровые коды **не поддерживаются**.
+- **`onComplete(value)`** вызывается **один раз**, когда длина строки **впервые** стала **`length`**, будучи до этого **меньше**; при редактировании уже полной строки без укорочения **не** вызывается снова.
+- **Backspace** на **пустой** ячейке только **переносит фокус** назад; **не** стирает предыдущую цифру автоматически.
+- После ввода цифры фокус **переходит вперёд** (если есть следующая ячейка). **Стрелки** между ячейками **не** обрабатываются.
+- **Paste** с любой ячейки: цифры подставляются **вперёд** от индекса; нецифры отбрасываются.
+- Каждая ячейка: **`inputMode="numeric"`**, **`maxLength={1}`**, **`autoComplete="one-time-code"`** (задано в реализации).
+- Нет **`fullWidth`**, **`variant`**, портала и полиморфного корня; ошибка только через **`hasError`** → `data-has-error` на корне.
+
+## Extended
+
+### About
+
+`DigitInput` — один OTP-стиль контроль: горизонтальный ряд полей по одному символу, общая строка цифр, вставка из буфера и автоматический перенос фокуса между ячейками.
 
 - **Use** for short numeric codes (SMS/OTP, PIN, pickup codes) where one digit per box matches user expectations.
 - **Use** when you want `inputMode="numeric"`, `maxLength={1}` per cell, and `autoComplete="one-time-code"` without wiring it yourself.
@@ -14,7 +36,7 @@
 - **Do not use** for free-form numbers (amounts, phone as one field); this component is fixed-length, one digit per slot.
 - **Do not expect** arrow keys to move between cells; only typing, Backspace on an empty cell, and pointer focus apply.
 
-## Composition
+### Composition
 
 - Public API is **`DigitInput.Root` only** (`DigitInput = { Root }`). There are no inner slots (`Label`, `Icon`, etc.) on this component.
 - The root renders a native **`fieldset`** with `aria-label="Digit input"` and **`length`** separate `<input type="text">` cells (`inputMode="numeric"`, `maxLength={1}`, `autoComplete="one-time-code"`).
@@ -30,7 +52,17 @@ export function OneTimeCode() {
 }
 ```
 
-## Rules
+### Scenario-oriented examples
+
+| Сценарий | Файл |
+| -------- | ---- |
+| Вход по SMS / OTP, `length={6}`, контролируемое значение, подсказка про вставку | [`examples/otp-login.tsx`](./examples/otp-login.tsx) |
+| PIN, крупные ячейки для тача (`size="l"`) | [`examples/pin.tsx`](./examples/pin.tsx) |
+| Шаг верификации: код + кнопка «Продолжить» до заполнения | [`examples/verification-step.tsx`](./examples/verification-step.tsx) |
+| Неверный код: `hasError` и `Hint` с `variant="error"` | [`examples/error-state.tsx`](./examples/error-state.tsx) |
+| Повторная отправка кода и сброс поля через родительское состояние | [`examples/resend-and-clear.tsx`](./examples/resend-and-clear.tsx) |
+
+### Rules
 
 - **Controlled:** pass `value` and `onChange`; the live string is always normalized to digits only and truncated to `length`.
 - **Uncontrolled:** use `defaultValue` (defaults to `""`); still pass `onChange` if you need to observe updates.
