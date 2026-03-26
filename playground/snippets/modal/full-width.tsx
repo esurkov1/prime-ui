@@ -11,40 +11,38 @@ export default function ModalFullWidthSnippet() {
           Оформить заказ
         </Button.Root>
       </Modal.Trigger>
-      <Modal.Portal>
-        <Modal.Overlay>
-          <Modal.Content>
-            <Modal.Header
-              icon={<Icon name="action.upload" />}
-              title="Подтверждение"
-              description={
-                <>
-                  В подвале — вертикальный стек: у <code>Button.Root</code> задан{" "}
-                  <code>fullWidth</code>, панель задаёт ширину колонки.
-                </>
-              }
-              closeAriaLabel="Закрыть"
-            />
-            <Modal.Body>
-              <p style={{ margin: 0 }}>Проверьте состав корзины перед оплатой.</p>
-            </Modal.Body>
-            <Modal.Footer
-              style={{ display: "flex", flexDirection: "column", gap: "0.5rem", width: "100%" }}
-            >
-              <Modal.Close>
-                <Button.Root size="m" variant="primary" fullWidth>
-                  Перейти к оплате
-                </Button.Root>
-              </Modal.Close>
-              <Modal.Close>
-                <Button.Root size="m" variant="neutral" mode="stroke" fullWidth>
-                  В корзину
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Overlay>
-      </Modal.Portal>
+      <Modal.Layer>
+        <Modal.Content>
+          <Modal.Header
+            icon={<Icon name="action.upload" />}
+            title="Подтверждение"
+            description={
+              <>
+                В подвале — вертикальный стек: у <code>Button.Root</code> задан{" "}
+                <code>fullWidth</code>, панель задаёт ширину колонки.
+              </>
+            }
+            closeAriaLabel="Закрыть"
+          />
+          <Modal.Body>
+            <p style={{ margin: 0 }}>Проверьте состав корзины перед оплатой.</p>
+          </Modal.Body>
+          <Modal.Footer
+            style={{ display: "flex", flexDirection: "column", gap: "0.5rem", width: "100%" }}
+          >
+            <Modal.Close>
+              <Button.Root size="m" variant="primary" fullWidth>
+                Перейти к оплате
+              </Button.Root>
+            </Modal.Close>
+            <Modal.Close>
+              <Button.Root size="m" variant="neutral" mode="stroke" fullWidth>
+                В корзину
+              </Button.Root>
+            </Modal.Close>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal.Layer>
     </Modal.Root>
   );
 }

@@ -79,6 +79,44 @@ const modalCloseApiRows: PlaygroundApiPropRow[] = [
   },
 ];
 
+const modalLayerApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Обычно `Modal.Content`; не рендерится, пока модал закрыт.",
+  },
+  {
+    prop: "container",
+    type: "HTMLElement | null",
+    defaultValue: "document.body",
+    required: "Нет",
+    description: "Узел для createPortal (как у `Modal.Portal`).",
+  },
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Дополнительный класс подложки (как у `Modal.Overlay`).",
+  },
+  {
+    prop: "onClick",
+    type: "React.MouseEventHandler<HTMLDivElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Вызывается до логики закрытия по клику на подложку.",
+  },
+  {
+    prop: "…rest",
+    type: "React.HTMLAttributes<HTMLDivElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Прочие атрибуты div подложки.",
+  },
+];
+
 const modalPortalApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "children",
@@ -356,8 +394,8 @@ export default function ModalSection() {
         <div className="demoBlock">
           <h4>Специфичные фичи</h4>
           <p className="demoBlockDescription">
-            Проп <code>container</code> у <code>Modal.Portal</code> для монтирования в заданный
-            узел; прокрутка длинного списка через ограничение высоты на <code>Modal.Body</code> при
+            Проп <code>container</code> у <code>Modal.Layer</code> для монтирования в заданный узел;
+            прокрутка длинного списка через ограничение высоты на <code>Modal.Body</code> при
             заблокированном фоне.
           </p>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
@@ -385,15 +423,22 @@ export default function ModalSection() {
             «Готово»).
           </p>
           <PlaygroundApiTable rows={modalCloseApiRows} />
+          <h5>Modal.Layer</h5>
+          <p className="demoBlockDescription">
+            Рекомендуемая оболочка: портал + подложка одним узлом (эквивалент{" "}
+            <code>Modal.Portal</code> → <code>Modal.Overlay</code>). Дальше — обычно{" "}
+            <code>Modal.Content</code>.
+          </p>
+          <PlaygroundApiTable rows={modalLayerApiRows} />
           <h5>Modal.Portal</h5>
           <p className="demoBlockDescription">
-            Рендер содержимого в портал только при открытом модале.
+            Рендер содержимого в портал только при открытом модале (низкоуровневый шаг).
           </p>
           <PlaygroundApiTable rows={modalPortalApiRows} />
           <h5>Modal.Overlay</h5>
           <p className="demoBlockDescription">
             Полноэкранная подложка; клик по ней закрывает модал при включённом{" "}
-            <code>closeOnOverlayClick</code>.
+            <code>closeOnOverlayClick</code> (низкоуровневый шаг).
           </p>
           <PlaygroundApiTable rows={modalOverlayApiRows} />
           <h5>Modal.Content</h5>

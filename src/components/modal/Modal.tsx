@@ -141,7 +141,7 @@ function ModalPortal({ children, container }: ModalPortalProps) {
 
 export type ModalOverlayProps = React.HTMLAttributes<HTMLDivElement>;
 
-function ModalOverlay({ className, onClick, ...rest }: ModalOverlayProps) {
+function ModalOverlay({ className, onClick, children, ...rest }: ModalOverlayProps) {
   const { onClose, closeOnOverlayClick } = useModalContext();
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -159,7 +159,22 @@ function ModalOverlay({ className, onClick, ...rest }: ModalOverlayProps) {
       onClick={handleClick}
       data-testid="modal-overlay"
       {...rest}
-    />
+    >
+      {children}
+    </div>
+  );
+}
+
+// ─── Layer (Portal + Overlay) ────────────────────────────────────────────────
+
+/** Типичная оболочка: портал в `body` (или `container`) + затемнённый фон; внутрь — `Modal.Content`. */
+export type ModalLayerProps = ModalPortalProps & Omit<ModalOverlayProps, "children">;
+
+function ModalLayer({ children, container, ...overlayProps }: ModalLayerProps) {
+  return (
+    <ModalPortal container={container}>
+      <ModalOverlay {...overlayProps}>{children}</ModalOverlay>
+    </ModalPortal>
   );
 }
 
@@ -364,6 +379,7 @@ export const Modal = {
   Close: ModalClose,
   Portal: ModalPortal,
   Overlay: ModalOverlay,
+  Layer: ModalLayer,
   Content: ModalContent,
   Header: ModalHeader,
   Body: ModalBody,

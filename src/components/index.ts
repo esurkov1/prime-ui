@@ -204,6 +204,7 @@ export type {
   ModalContentProps,
   ModalFooterProps,
   ModalHeaderProps,
+  ModalLayerProps,
   ModalOverlayProps,
   ModalPortalProps,
   ModalRootProps,

@@ -191,17 +191,15 @@ function CommandMenuDialog({
       closeOnEscape={closeOnEscape}
       closeOnOverlayClick={closeOnOverlayClick}
     >
-      <Modal.Portal>
-        <Modal.Overlay className={cx(styles.dialogOverlay, overlayClassName)}>
-          <Modal.Content
-            className={cx(styles.dialogContent, styles.root, contentClassName, className)}
-            aria-labelledby={ariaLabelledBy}
-            aria-describedby={ariaDescribedBy}
-          >
-            <CommandMenuRootProvider>{children}</CommandMenuRootProvider>
-          </Modal.Content>
-        </Modal.Overlay>
-      </Modal.Portal>
+      <Modal.Layer className={cx(styles.dialogOverlay, overlayClassName)}>
+        <Modal.Content
+          className={cx(styles.dialogContent, styles.root, contentClassName, className)}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+        >
+          <CommandMenuRootProvider>{children}</CommandMenuRootProvider>
+        </Modal.Content>
+      </Modal.Layer>
     </Modal.Root>
   );
 }

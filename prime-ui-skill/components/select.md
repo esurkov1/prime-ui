@@ -154,8 +154,7 @@ export function TicketCategoryModal() {
           New ticket
         </Button.Root>
       </Modal.Trigger>
-      <Modal.Portal>
-        <Modal.Overlay>
+      <Modal.Layer>
           <Modal.Content>
             <Modal.Header
               title="Request category"
@@ -184,8 +183,7 @@ export function TicketCategoryModal() {
               </Button.Root>
             </Modal.Footer>
           </Modal.Content>
-        </Modal.Overlay>
-      </Modal.Portal>
+        </Modal.Layer>
     </Modal.Root>
   );
 }

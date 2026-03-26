@@ -19,8 +19,7 @@ function BasicModal({
       <Modal.Trigger>
         <Button.Root>Open</Button.Root>
       </Modal.Trigger>
-      <Modal.Portal>
-        <Modal.Overlay />
+      <Modal.Layer>
         <Modal.Content>
           <Modal.Header title="Test title" description="Test description" />
           <Modal.Body>
@@ -36,7 +35,7 @@ function BasicModal({
             <Button.Root>Confirm</Button.Root>
           </Modal.Footer>
         </Modal.Content>
-      </Modal.Portal>
+      </Modal.Layer>
     </Modal.Root>
   );
 }
@@ -46,11 +45,9 @@ describe("Modal (composable API)", () => {
     expect(() =>
       render(
         <Modal.Root defaultOpen>
-          <Modal.Portal>
-            <Modal.Overlay>
-              <Modal.Header title="Invalid" />
-            </Modal.Overlay>
-          </Modal.Portal>
+          <Modal.Layer>
+            <Modal.Header title="Invalid" />
+          </Modal.Layer>
         </Modal.Root>,
       ),
     ).toThrow(/must be used inside `Modal\.Content`/);
@@ -81,12 +78,11 @@ describe("Modal (composable API)", () => {
   it("uses explicit aria-labelledby and aria-describedby on Content for header ids", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Portal>
-          <Modal.Overlay />
+        <Modal.Layer>
           <Modal.Content aria-labelledby="custom-title" aria-describedby="custom-desc">
             <Modal.Header title="Custom" description="Custom desc" />
           </Modal.Content>
-        </Modal.Portal>
+        </Modal.Layer>
       </Modal.Root>,
     );
 
@@ -100,12 +96,11 @@ describe("Modal (composable API)", () => {
   it("omits aria-describedby when Header has no description", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Portal>
-          <Modal.Overlay />
+        <Modal.Layer>
           <Modal.Content>
             <Modal.Header title="Title only" />
           </Modal.Content>
-        </Modal.Portal>
+        </Modal.Layer>
       </Modal.Root>,
     );
 
@@ -188,15 +183,14 @@ describe("Modal (composable API)", () => {
   it("supports Header + Footer without Body", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Portal>
-          <Modal.Overlay />
+        <Modal.Layer>
           <Modal.Content>
             <Modal.Header title="Header footer" />
             <Modal.Footer>
               <Button.Root>Action</Button.Root>
             </Modal.Footer>
           </Modal.Content>
-        </Modal.Portal>
+        </Modal.Layer>
       </Modal.Root>,
     );
 
@@ -208,12 +202,11 @@ describe("Modal (composable API)", () => {
   it("supports Header only without Body and Footer", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Portal>
-          <Modal.Overlay />
+        <Modal.Layer>
           <Modal.Content>
             <Modal.Header title="Header only" />
           </Modal.Content>
-        </Modal.Portal>
+        </Modal.Layer>
       </Modal.Root>,
     );
 
@@ -235,14 +228,13 @@ describe("Modal (composable API)", () => {
   it("works in controlled mode", () => {
     const { rerender } = render(
       <Modal.Root open={false}>
-        <Modal.Portal>
-          <Modal.Overlay />
+        <Modal.Layer>
           <Modal.Content aria-label="Controlled modal">
             <Modal.Body>
               <p>Controlled</p>
             </Modal.Body>
           </Modal.Content>
-        </Modal.Portal>
+        </Modal.Layer>
       </Modal.Root>,
     );
 
@@ -250,14 +242,13 @@ describe("Modal (composable API)", () => {
 
     rerender(
       <Modal.Root open={true}>
-        <Modal.Portal>
-          <Modal.Overlay />
+        <Modal.Layer>
           <Modal.Content aria-label="Controlled modal">
             <Modal.Body>
               <p>Controlled</p>
             </Modal.Body>
           </Modal.Content>
-        </Modal.Portal>
+        </Modal.Layer>
       </Modal.Root>,
     );
 

@@ -35,8 +35,7 @@ export function ModalStructureExamples() {
             Header and footer only
           </Button.Root>
         </Modal.Trigger>
-        <Modal.Portal>
-          <Modal.Overlay>
+        <Modal.Layer>
             <Modal.Content>
               <Modal.Header
                 title="Confirmation without body"
@@ -53,8 +52,7 @@ export function ModalStructureExamples() {
                 </Button.Root>
               </Modal.Footer>
             </Modal.Content>
-          </Modal.Overlay>
-        </Modal.Portal>
+          </Modal.Layer>
       </Modal.Root>
 
       <Modal.Root>
@@ -63,8 +61,7 @@ export function ModalStructureExamples() {
             Header and body without footer
           </Button.Root>
         </Modal.Trigger>
-        <Modal.Portal>
-          <Modal.Overlay>
+        <Modal.Layer>
             <Modal.Content>
               <Modal.Header
                 icon={<Icon name="nav.itemDot" />}
@@ -76,8 +73,7 @@ export function ModalStructureExamples() {
                 </p>
               </Modal.Body>
             </Modal.Content>
-          </Modal.Overlay>
-        </Modal.Portal>
+          </Modal.Layer>
       </Modal.Root>
 
       <Modal.Root>
@@ -86,16 +82,14 @@ export function ModalStructureExamples() {
             Header only (full block)
           </Button.Root>
         </Modal.Trigger>
-        <Modal.Portal>
-          <Modal.Overlay>
+        <Modal.Layer>
             <Modal.Content>
               <Modal.Header
                 title="Short notice"
                 description="Full header block: title and description, no body or footer."
               />
             </Modal.Content>
-          </Modal.Overlay>
-        </Modal.Portal>
+          </Modal.Layer>
       </Modal.Root>
     </>
   );
@@ -117,8 +111,7 @@ export function DeleteDraftConfirm() {
           Delete draft
         </Button.Root>
       </Modal.Trigger>
-      <Modal.Portal>
-        <Modal.Overlay>
+      <Modal.Layer>
           <Modal.Content>
             <Modal.Header
               icon={<Icon name="status.locked" />}
@@ -138,8 +131,7 @@ export function DeleteDraftConfirm() {
               </Modal.Close>
             </Modal.Footer>
           </Modal.Content>
-        </Modal.Overlay>
-      </Modal.Portal>
+        </Modal.Layer>
     </Modal.Root>
   );
 }
@@ -155,8 +147,7 @@ import { Button, Icon, Modal } from "prime-ui-kit";
 export function KioskAnnouncement() {
   return (
     <Modal.Root defaultOpen>
-      <Modal.Portal>
-        <Modal.Overlay>
+      <Modal.Layer>
           <Modal.Content>
             <Modal.Header
               icon={<Icon name="nav.layoutGrid" />}
@@ -174,8 +165,7 @@ export function KioskAnnouncement() {
               </Modal.Close>
             </Modal.Footer>
           </Modal.Content>
-        </Modal.Overlay>
-      </Modal.Portal>
+        </Modal.Layer>
     </Modal.Root>
   );
 }
@@ -196,8 +186,7 @@ export function SupportTicketModal() {
           Contact support
         </Button.Root>
       </Modal.Trigger>
-      <Modal.Portal>
-        <Modal.Overlay>
+      <Modal.Layer>
           <Modal.Content>
             <Modal.Header
               icon={<Icon name="field.email" />}
@@ -224,8 +213,7 @@ export function SupportTicketModal() {
               </Modal.Close>
             </Modal.Footer>
           </Modal.Content>
-        </Modal.Overlay>
-      </Modal.Portal>
+        </Modal.Layer>
     </Modal.Root>
   );
 }
@@ -246,8 +234,7 @@ export function SimpleConfirmModal() {
           Save changes
         </Button.Root>
       </Modal.Trigger>
-      <Modal.Portal>
-        <Modal.Overlay>
+      <Modal.Layer>
           <Modal.Content>
             <Modal.Header
               title="Confirm action"
@@ -266,8 +253,7 @@ export function SimpleConfirmModal() {
               </Modal.Close>
             </Modal.Footer>
           </Modal.Content>
-        </Modal.Overlay>
-      </Modal.Portal>
+        </Modal.Layer>
     </Modal.Root>
   );
 }
@@ -305,8 +291,7 @@ export function WizardStepModal() {
           if (!next) setStep(1);
         }}
       >
-        <Modal.Portal>
-          <Modal.Overlay>
+        <Modal.Layer>
             <Modal.Content>
               <Modal.Header
                 icon={<Icon name="action.copy" />}
@@ -330,8 +315,7 @@ export function WizardStepModal() {
                 )}
               </Modal.Footer>
             </Modal.Content>
-          </Modal.Overlay>
-        </Modal.Portal>
+          </Modal.Layer>
       </Modal.Root>
     </>
   );
@@ -346,7 +330,7 @@ Compound `Modal` API:
 
 Typical markup:
 
-`Root` → optional `Trigger` → `Portal` → `Overlay` → `Content`.
+`Root` → optional `Trigger` → **`Layer`** → `Content` (типично). Эквивалент без сахара: `Portal` → `Overlay` → `Content`.
 
 Inside `Content`:
 
@@ -354,7 +338,7 @@ Inside `Content`:
 - `Body` — optional main content;
 - `Footer` — optional action row.
 
-`Portal` renders nothing while the modal is closed. `Overlay` is a full-viewport backdrop; `Content` is the `role="dialog"` panel with focus trap. **`Modal.Content`** generates stable `id`s for the header title and description and sets **`aria-labelledby`** / **`aria-describedby`** on the panel when **`Modal.Header`** is present (override with the same props on `Content` only if you need full control).
+**`Modal.Layer`** mounts nothing while the modal is closed; it combines a portal and a full-viewport backdrop. **`Content`** is the `role="dialog"` panel with focus trap. **`Modal.Content`** generates stable `id`s for the header title and description and sets **`aria-labelledby`** / **`aria-describedby`** on the panel when **`Modal.Header`** is present (override with the same props on `Content` only if you need full control).
 
 ## API
 
@@ -380,6 +364,18 @@ Inside `Content`:
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | `children` | `React.ReactElement<{ onClick?: …; className?: string; size?: ButtonSize }>` | — | Yes | One element (usually a footer button); click closes the modal. |
+
+### Modal.Layer
+
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| `children` | `React.ReactNode` | — | No | Usually `Modal.Content`. |
+| `container` | `HTMLElement \| null` | `document.body` | No | Portal mount node (same as `Modal.Portal`). |
+| `className` | `string` | — | No | Extra class on the backdrop (same as `Modal.Overlay`). |
+| `onClick` | `React.MouseEventHandler<HTMLDivElement>` | — | No | Runs before overlay-click close logic. |
+| … | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other backdrop `div` attributes. |
+
+Composition: **`Modal.Portal`** + **`Modal.Overlay`** in one component.
 
 ### Modal.Portal
 
@@ -457,7 +453,7 @@ There is no separate `variant` prop on the modal, and **no `size` on `Modal.Root
 
 - **No built-in `asChild`:** `Trigger` and `Close` expect **exactly one** child React element and merge `onClick` via `cloneElement`.
 - Long content: constrain **`Modal.Body`** height (or via class) and use **`overflow`** so scrolling happens inside the panel while the backdrop stays locked.
-- The **`container`** prop on **`Modal.Portal`** sets the mount node instead of `document.body` (tests, special stacking contexts); the backdrop remains `position: fixed` to the viewport unless ancestors change positioning context.
+- The **`container`** prop on **`Modal.Layer`** / **`Modal.Portal`** sets the mount node instead of `document.body` (tests, special stacking contexts); the backdrop remains `position: fixed` to the viewport unless ancestors change positioning context.
 - Full-width buttons in the panel — use **`fullWidth`** on **`Button.Root`** or footer layout; the modal has no dedicated prop for that.
 - Nested modals in one tree need extra focus and portal ordering — the component targets one dialog per `Root`.
 
