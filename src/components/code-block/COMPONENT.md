@@ -1,21 +1,43 @@
 # CodeBlock
 
-## About
+## Canonical
 
-`CodeBlock` is a static presentation component: it renders a TS or TSX source string with syntax highlighting and a light or dark token palette. The kit exposes a single part, `Root`, which outputs a `pre` whose inner `code` markup is produced by `highlightTsxHtml`.
+- **API:** `CodeBlock.Root` only. Required prop: **`code`** (string). Optional **`colorScheme`**: `"light"` (default) or `"dark"` for `data-theme` on the root `pre`.
+- **Rendering:** `pre` + inner `code` filled via **`highlightTsxHtml(code.trimEnd())`** and **`dangerouslySetInnerHTML`**. Do not pass **`children`** or **`dangerouslySetInnerHTML`** (omitted from props).
+- **Trust:** only **trusted** `code` strings (constants, vetted CMS, sanitized server output). Never pass raw user HTML/TSX here.
+- **Language:** heuristic **TS/TSX** highlighting — not a full grammar. JSON, stacks, and other text still render; token classes may be partial.
+- **Sizing:** no **`size`** prop; **`font-size`** / **`line-height`** inherit from the parent. Layout wrappers and typography tokens control rhythm.
+- **Extras:** **`className`** and native **`pre`** attributes ( **`id`**, ARIA, **`data-*`**, handlers) via **`…rest`**.
 
-- **When to use** — partner docs, marketing pages, or in-app help where you need a short snippet that matches the kit’s typography and theme.
-- **When to use** — API reference cards, integration guides, or internal tools showing request bodies, configs, or generated output you control.
-- **When to use** — pairing a snippet with surrounding copy (`Typography`, labels) where the block should stay non-interactive and read-only.
-- **When not to use** — raw or untrusted user input as `code` (markup is injected via `dangerouslySetInnerHTML`).
-- **When not to use** — languages other than TS/TSX or cases that need a full parser or line numbers, copy buttons, and tabs (add those in your app layer).
-- **When not to use** — when you need a focusable, editable code field (use an input or a dedicated editor instead).
+## Extended
 
-## Composition
+### About
 
-- The public API is the `CodeBlock` object with one subpart: **`Root`**.
-- **`Root`** renders a native **`pre`**. Highlighted content is injected as a single inner **`code`** element; do not pass `children` or `dangerouslySetInnerHTML` yourself — they are excluded from the props type.
-- Pass the source as the **`code`** string prop. Optional **`colorScheme`** selects the highlighting palette (`data-theme` on `pre`).
+`CodeBlock` is a static, read-only presentation component: it shows a source string with kit-aligned monospace and a light or dark token palette.
+
+- **Use** for partner docs, marketing, in-app help, API reference cards, integration guides, or internal tools when the snippet is **trusted** and TS/TSX-oriented highlighting is enough.
+- **Use** with surrounding copy ([Typography](../typography/COMPONENT.md), headings, captions) for documentation-style layouts.
+- **Do not use** for **untrusted** input (inner HTML is injected).
+- **Do not use** when you need another language grammar, line numbers, copy-to-clipboard, or tabs — implement those in the app layer.
+- **Do not use** for an editable or primary focus target for typing (use inputs or an editor).
+
+### Composition
+
+- Public API: **`CodeBlock`** object with **`Root`**.
+- **`Root`** renders a **`pre`**; highlighted markup is a single inner **`code`** (do not supply **`children`**).
+- Pass source as **`code`**. Optional **`colorScheme`** sets highlighting palette / **`data-theme`** on **`pre`**.
+
+### Scenarios (examples)
+
+| Scenario | Example file |
+|----------|----------------|
+| Minimal usage | [`examples/minimal.tsx`](./examples/minimal.tsx) |
+| API response preview (JSON body) | [`examples/api-response-preview.tsx`](./examples/api-response-preview.tsx) |
+| Config snippet (TS config) | [`examples/config-snippet.tsx`](./examples/config-snippet.tsx) |
+| Error stack / log | [`examples/error-stack.tsx`](./examples/error-stack.tsx) |
+| Tutorial step (copy + snippet) | [`examples/tutorial-step.tsx`](./examples/tutorial-step.tsx) |
+
+Playground demos (variants, sizes, composition, etc.): `playground/snippets/code-block/`.
 
 ### Minimal example
 
@@ -27,32 +49,40 @@ export function Example() {
 }
 ```
 
-## Rules
+### Rules
 
-- **`code`** is required. The implementation applies **`trimEnd()`** before highlighting; leading indentation in the string is preserved aside from trailing whitespace on the whole string.
-- **`colorScheme`** defaults to **`"light"`**; use **`"dark"`** when the block sits on a dark surface so token colors stay readable.
-- **Security:** inner HTML comes from **`highlightTsxHtml`**. Only pass **trusted** strings (constants, vetted CMS content, sanitized backend output).
-- **Highlighting** uses a TS/TSX-oriented heuristic in the kit, not a full language grammar — rare syntax may not get the expected classes.
-- **No built-in `size`:** font size and line height follow the parent; control rhythm with wrapper layout and typography tokens.
-- **Accessibility:** treat the block as static prose context; add **`aria-label`**, **`aria-describedby`**, or nearby headings via standard **`pre`** attributes spread from **`…rest`** when screen readers need an explicit label.
-- **Focus:** the component does not set **`tabIndex`**; make it focusable only if your UX requires it.
+- **`code`** is required. The implementation applies **`trimEnd()`** on the whole string before highlighting; per-line content is preserved except trailing whitespace at the end of the string.
+- **`colorScheme`** defaults to **`"light"`**; use **`"dark"`** on dark surfaces so tokens stay readable.
+- **Security:** HTML comes from **`highlightTsxHtml`** only as wrapped **`code`** content; treat **`code`** as trusted.
+- **Highlighting** is TS/TSX-oriented; edge syntax may not match expectations.
+- **Accessibility:** static prose; add **`aria-label`**, **`aria-describedby`**, or headings via **`…rest`** when assistive tech needs an explicit name.
+- **Focus:** no default **`tabIndex`**; add only if your UX requires a focusable static block.
 
-## API
+### API
 
-### CodeBlock.Root
+#### CodeBlock.Root
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| `code` | `string` | — | Yes | TS/TSX source; trailing whitespace is trimmed with `trimEnd()` before highlighting. |
+| `code` | `string` | — | Yes | TS/TSX-oriented source; trailing whitespace trimmed with `trimEnd()` before highlighting. |
 | `colorScheme` | `CodeBlockColorScheme` (`"light" \| "dark"`) | `"light"` | No | Token palette / `data-theme` on the root `pre`. |
 | `className` | `string` | — | No | Additional class on the root `pre`. |
-| `…rest` | `Omit<React.HTMLAttributes<HTMLPreElement>, "children" \| "dangerouslySetInnerHTML">` | — | No | Other native `pre` attributes (`id`, `style`, ARIA, `data-*`, event handlers, etc.). `children` and `dangerouslySetInnerHTML` are omitted. |
+| `…rest` | `Omit<React.HTMLAttributes<HTMLPreElement>, "children" \| "dangerouslySetInnerHTML">` | — | No | Other native `pre` attributes. `children` and `dangerouslySetInnerHTML` are omitted. |
 
-The package also exports **`CodeBlockColorScheme`** and **`CodeBlockRootProps`** for typing.
+The package also exports **`CodeBlockColorScheme`** and **`CodeBlockRootProps`**.
 
-## Related
+### Related
 
-- [Typography](../typography/COMPONENT.md) — headings and body copy around snippets.
-- [Button](../button/COMPONENT.md) — switching multiple samples from parent state.
-- [Segmented control](../segmented-control/COMPONENT.md) — compact mode or sample switching in toolbars.
-- [Kbd](../kbd/COMPONENT.md) — shortcut hints next to prose, without duplicating the code block’s role.
+- [Typography](../typography/COMPONENT.md) — headings and body around snippets.
+- [Button](../button/COMPONENT.md) — switching samples from parent state.
+- [Segmented control](../segmented-control/COMPONENT.md) — compact sample switching.
+- [Kbd](../kbd/COMPONENT.md) — shortcut hints beside prose.
+
+## Note for LLM assistants
+
+- Recommend **`CodeBlock.Root`** only; **`code`** must be a **trusted** string — flag any pattern that pipes user or CMS content without sanitization.
+- Do not suggest **`children`**, **`dangerouslySetInnerHTML`**, or wrapping the kit block to replace inner HTML.
+- Prefer **`colorScheme="dark"`** when the parent surface uses dark **`data-theme`** or dark backgrounds so contrast stays valid.
+- If the user asks for copy button, line numbers, tabs, or non-TS languages, say these are **out of kit scope** and belong in the app (or a different library).
+- For JSON-only bodies, remind that highlighting is **TS/TSX heuristic**; formatting as a template or TS-adjacent string is fine.
+- **`trimEnd()`** applies to the **entire** `code` string once, not each line.
