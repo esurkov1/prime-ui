@@ -2,291 +2,110 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-The `DataTable.Root` component is a table built on native `table` markup with optional column sorting, pagination or scroll mode with incremental loading, a sticky header, and a sticky first column.
+`DataTable.Root` renders a semantic `<table>` inside a scroll viewport, with optional client-side sorting, classic pagination or infinite-scroll slicing, sticky header and sticky first column, and a footer with row counts (and pagination or infinite-scroll hints).
 
-## What it is for
+- **Use** when you need sortable tabular data with built-in pagination or “load more while scrolling” without building table chrome from scratch.
+- **Use** when row hover / column hover highlights or zebra striping should stay consistent with kit tokens via `size` and `ControlSizeProvider`.
+- **Use** when the first column must stay visible during horizontal scroll (`stickyFirstColumn`).
+- **Do not use** when you need arbitrary column pinning, resizable columns, or spreadsheet-style keyboard grid navigation — the table does not implement those.
+- **Do not use** when sorting or filtering must run on the server only without mirroring logic in the parent — sorting is applied in memory to the `rows` you pass; supply pre-sorted data or control `sort` yourself and replace `rows` accordingly.
+- **Do not use** when you need a loading overlay on top of already rendered rows — `loading` only affects the body when there are zero rows to display.
 
-- **Warehouse and shipping** — batches, routes, and arrival windows with sorting by volume and paginated browsing of long registers.
-- **Finance and billing** — invoice and payment status summaries with right-aligned amounts and visual markers in cells.
-- **Planning and reports** — wide quarter and totals grids with horizontal scrolling, a sticky first metric column, and header.
-- **Support and contacts** — ticket catalogs with custom cells (links, actions) and row click to open a detail card.
-- **Activity log** — long event feeds with infinite scroll and fetching the next chunks from the server.
-- **Internal panels** — compact tables in a narrow card or form column where filling the container width matters.
+## Composition
 
-## Use cases
+- **Public API** — a single compound entry: `DataTable` with `Root` (`DataTableRoot`). There are no other exported subcomponents.
+- **Structure** — `ControlSizeProvider` wraps a root `div` (data attributes for size, dividers, header visibility, stickiness, hover highlights, zebra). Inside: `ScrollContainer` viewport → `<table>` with `<colgroup>`, optional `<thead>` (`<th>` per column), `<tbody>` with rows, and an `aria-hidden` sentinel at the bottom when `infiniteScroll` is on (for `IntersectionObserver` or scroll fallback).
+- **Footer** — always shows a “shown range / total” line; if not `infiniteScroll` and `showPagination` and there is more than one page, it renders `Pagination.Root`; in infinite mode it may show a short status when more rows can be revealed or loaded.
 
-Import from the `prime-ui-kit` package. Examples are grouped by screen intent and prop sets.
-
-### Basic
-
-Registry of medical rooms: four columns, sort by name, no external state.
+### Minimal example
 
 ```tsx
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
 
-type Room = { code: string; name: string; floor: number; seats: number };
+type Row = { id: string };
 
-const rows: Room[] = [
-  { code: "A-12", name: "Therapy", floor: 2, seats: 3 },
-  { code: "B-04", name: "Lab", floor: 1, seats: 2 },
-  { code: "C-21", name: "X-ray", floor: 3, seats: 1 },
-];
+const columns: DataTableColumn<Row>[] = [{ id: "id", header: "ID", accessor: "id" }];
+const rows: Row[] = [{ id: "1" }];
 
-const columns: DataTableColumn<Room>[] = [
-  { id: "code", header: "Code", accessor: "code", sortable: true, minWidth: "5rem" },
-  { id: "name", header: "Room", accessor: "name", sortable: true, minWidth: "10rem" },
-  {
-    id: "floor",
-    header: "Floor",
-    accessor: "floor",
-    sortable: true,
-    align: "end",
-    minWidth: "5rem",
-  },
-  {
-    id: "seats",
-    header: "Seats",
-    accessor: "seats",
-    sortable: true,
-    align: "end",
-    minWidth: "5rem",
-  },
-];
-
-export function ClinicRoomsTable() {
-  return (
-    <DataTable.Root
-      columns={columns}
-      rows={rows}
-      pageSize={5}
-      showPagination={rows.length > 5}
-    />
-  );
+export function Example() {
+  return <DataTable.Root columns={columns} rows={rows} />;
 }
 ```
 
-### Variants / sizes
+## Rules
 
-Course catalog: `l` size, dashed dividers, and zebra striping for a long learner list.
-
-```tsx
-import { DataTable, type DataTableColumn } from "prime-ui-kit";
-
-type Enrollee = { id: string; name: string; track: string; progress: number };
-
-const columns: DataTableColumn<Enrollee>[] = [
-  { id: "name", header: "Participant", accessor: "name", sortable: true, minWidth: "11rem" },
-  { id: "track", header: "Track", accessor: "track", sortable: true, minWidth: "9rem" },
-  {
-    id: "progress",
-    header: "Progress, %",
-    accessor: "progress",
-    sortable: true,
-    align: "end",
-    minWidth: "7rem",
-    cell: (row) => `${row.progress}%`,
-  },
-];
-
-export function CourseRosterTable({ rows }: { rows: Enrollee[] }) {
-  return (
-    <DataTable.Root
-      size="l"
-      dividerStyle="dashed"
-      striped
-      columns={columns}
-      rows={rows}
-      defaultSort={{ columnId: "progress", order: "desc" }}
-      pageSize={6}
-    />
-  );
-}
-```
-
-### In context (form / modal / sidebar / …)
-
-Contract approval sidebar: narrow width, table stretches to 100%, sticky header when scrolling inside the panel. Style the shell (`contract-clauses-panel`) in your app for width, max-height, and column flex layout.
-
-```tsx
-import { DataTable, type DataTableColumn } from "prime-ui-kit";
-
-type Clause = { id: string; title: string; owner: string; risk: "low" | "med" | "high" };
-
-const columns: DataTableColumn<Clause>[] = [
-  { id: "title", header: "Clause", accessor: "title", sortable: true, minWidth: "10rem" },
-  { id: "owner", header: "Counsel", accessor: "owner", sortable: true, minWidth: "8rem" },
-  {
-    id: "risk",
-    header: "Risk",
-    accessor: "risk",
-    sortable: true,
-    minWidth: "6rem",
-    cell: (row) => (row.risk === "high" ? "High" : row.risk === "med" ? "Medium" : "Low"),
-  },
-];
-
-export function ContractClausesDrawer({ rows }: { rows: Clause[] }) {
-  return (
-    <aside className="contract-clauses-panel">
-      <DataTable.Root
-        className="contract-clauses-table"
-        columns={columns}
-        rows={rows}
-        infiniteScroll
-        stickyHeader
-        scrollHeight={300}
-        initialVisibleRows={8}
-        infiniteBatchSize={10}
-        showPagination={false}
-        pageSize={8}
-      />
-    </aside>
-  );
-}
-```
-
-### Controlled mode
-
-Taxi dispatch: parent holds sort by pickup ETA and page; when the sort column changes, the page is reset manually.
-
-```tsx
-import * as React from "react";
-import { DataTable, type DataTableColumn, type DataTableSortState } from "prime-ui-kit";
-
-type Ride = { id: string; district: string; etaMin: number; driver: string };
-
-const columns: DataTableColumn<Ride>[] = [
-  { id: "id", header: "Order", accessor: "id", sortable: true, minWidth: "6rem" },
-  { id: "district", header: "District", accessor: "district", sortable: true, minWidth: "9rem" },
-  {
-    id: "etaMin",
-    header: "Min to pickup",
-    accessor: "etaMin",
-    sortable: true,
-    align: "end",
-    minWidth: "8rem",
-  },
-  { id: "driver", header: "Driver", accessor: "driver", sortable: true, minWidth: "10rem" },
-];
-
-export function TaxiDispatchTable({ rows }: { rows: Ride[] }) {
-  const [sort, setSort] = React.useState<DataTableSortState>({ columnId: "etaMin", order: "asc" });
-  const [page, setPage] = React.useState(1);
-
-  return (
-    <DataTable.Root
-      columns={columns}
-      rows={rows}
-      sort={sort}
-      onSortChange={(next) => {
-        setSort(next);
-        setPage(1);
-      }}
-      page={page}
-      onPageChange={setPage}
-      pageSize={4}
-    />
-  );
-}
-```
-
-## Anatomy
-
-- **`DataTable.Root`** — wrapper with `ControlSizeProvider`, `data-*` on the root `div` (size, dividers, header, stickiness, highlights, zebra).
-- **Inside** — scrollable `div.viewport` with `table`, `colgroup`, optional `thead` with `th` (sort button or text), `tbody` with `tr`/`td`, and a bottom sentinel for `IntersectionObserver` in infinite-scroll mode.
-- **Footer** — “Showing X–Y of Z” counter; in classic pagination mode — `Pagination.Root`; with incremental loading — status text.
+- Pass **`columns`** with unique **`id`** and **`header`** for every column; **`accessor`** (key or function), **`cell`**, **`sortable`**, and the rest are optional.
+- **Sort** — controlled: `sort` + `onSortChange`. Uncontrolled initial order: `defaultSort` (default `null`). Clicking a sortable header cycles **asc → desc → none** for that column; changing sort sets the page to **1** in paginated mode.
+- **Page** — controlled: `page` + `onPageChange`. Uncontrolled: `defaultPage` (default `1`). Page index is clamped when row count changes. Toggling **`infiniteScroll`** resets the visible slice; leaving infinite mode resets page to **1** via internal effect.
+- **Infinite scroll** — set `infiniteScroll`. The visible slice grows by **`infiniteBatchSize`** up to the current **`rows.length`** first; when the slice shows all local rows and **`hasMore`**, **`onLoadMore`** runs when the sentinel intersects (or on near-bottom scroll if `IntersectionObserver` is missing). **`initialVisibleRows`** defaults to **`pageSize`** when omitted.
+- **`loading`** — shows **`loadingText`** in a single spanning row only when there are no displayed rows yet; it does not dim existing rows.
+- **Empty** — when not loading and there are no rows, **`emptyText`** is shown in a spanning row.
+- **Row keys** — provide **`getRowKey`** for stable identity; otherwise React **`key`** falls back to the row **index** (fragile if row order changes).
+- **Localization** — default **`loadingText`**, **`emptyText`**, footer range text, and infinite-scroll hints are **Russian** in the implementation; override with props where needed.
+- **Accessibility** — sortable headers use an inner control pattern inside **`th`** with **`scope="col"`**; sort icons are **`aria-hidden`**. Cells with **`onCellClick`** get **`role="button"`**, **`tabIndex={0}`**, and **Enter / Space**. There is no **`grid`** role or arrow-key cell navigation.
 
 ## API
 
 ### DataTable.Root
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| columns | `DataTableColumn<Row>[]` | — | Yes | Column configuration |
-| rows | `Row[]` | — | Yes | Row data |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Row size and cell tokens |
-| className | `string` | — | No | Root wrapper class |
-| showHeader | `boolean` | `true` | No | Show thead |
-| stickyHeader | `boolean` | `false` | No | Sticky header |
-| stickyFirstColumn | `boolean` | `false` | No | Sticky first column |
-| getRowKey | `(row, index) => React.Key` | index | No | Row key |
-| onRowClick | `(row, index, event) => void` | — | No | Row click |
-| loading | `boolean` | `false` | No | Loading placeholder when the visible slice is empty |
-| loadingText | `React.ReactNode` | default text | No | Loading text |
-| emptyText | `React.ReactNode` | default text | No | Empty list text |
-| dividerStyle | `"standard" \| "dashed" \| "dotted" \| "none"` | `"standard"` | No | Grid line style |
-| sort | `DataTableSortState` | — | No | Controlled sort |
-| defaultSort | `DataTableSortState` | `null` | No | Uncontrolled initial sort |
-| onSortChange | `(sort) => void` | — | No | Sort change |
-| page | `number` | — | No | Controlled page |
-| defaultPage | `number` | `1` | No | Initial page |
-| onPageChange | `(page) => void` | — | No | Page change |
-| pageSize | `number` | `10` | No | Page size / initial slice |
-| showPagination | `boolean` | `true` | No | Show pagination |
-| siblingCount | `number` | `1` | No | Page number window in Pagination |
-| paginationSize | `DataTableSize` | same as root | No | Pagination control size |
-| infiniteScroll | `boolean` | `false` | No | Scroll mode with chunks |
-| initialVisibleRows | `number` | `pageSize` | No | Initial visible row count |
-| infiniteBatchSize | `number` | `20` | No | Step for growing the local slice |
-| hasMore | `boolean` | `false` | No | Whether more data exists for `onLoadMore` |
-| loadingMore | `boolean` | `false` | No | Loading-more flag |
-| onLoadMore | `() => void \| Promise<void>` | — | No | Request next chunk |
-| scrollHeight | `number \| string` | `360` | No | Scroll area height |
-| highlightRowOnHover | `boolean` | `true` | No | Row highlight |
-| highlightColumnOnHover | `boolean` | `false` | No | Column highlight |
-| striped | `boolean` | `false` | No | Zebra striping |
+| --- | --- | --- | --- | --- |
+| columns | `DataTableColumn<Row>[]` | — | Yes | Column definitions |
+| rows | `Row[]` | — | Yes | Data rows (sorted in memory when `sort` applies) |
+| size | `DataTableSize` | `"m"` | No | Row density; forwarded to nested `Pagination` unless `paginationSize` is set |
+| className | `string` | — | No | Class on the outer wrapper |
+| showHeader | `boolean` | `true` | No | Render `<thead>` |
+| stickyHeader | `boolean` | `false` | No | Sticky header row |
+| stickyFirstColumn | `boolean` | `false` | No | Sticky first column (and corner cell when header is sticky) |
+| getRowKey | `(row: Row, index: number) => React.Key` | — | No | Stable row key; default is index |
+| onRowClick | `(row: Row, index: number, event: React.MouseEvent<HTMLTableRowElement>) => void` | — | No | Row click handler |
+| loading | `boolean` | `false` | No | Loading state when no rows are displayed |
+| loadingText | `React.ReactNode` | `"Загрузка данных…"` | No | Message in loading state |
+| emptyText | `React.ReactNode` | `"Нет данных для отображения."` | No | Message when there are no rows |
+| dividerStyle | `DataTableDividerStyle` | `"standard"` | No | Cell border style: `standard`, `dashed`, `dotted`, `none` |
+| sort | `DataTableSortState` | — | No | Controlled sort (`null` or `{ columnId, order }`) |
+| defaultSort | `DataTableSortState` | `null` | No | Initial sort when uncontrolled |
+| onSortChange | `(sort: DataTableSortState) => void` | — | No | Sort change callback |
+| page | `number` | — | No | Controlled current page (1-based) |
+| defaultPage | `number` | `1` | No | Initial page when uncontrolled |
+| onPageChange | `(page: number) => void` | — | No | Page change callback |
+| pageSize | `number` | `10` | No | Rows per page in pagination mode; also default for `initialVisibleRows` in infinite mode |
+| showPagination | `boolean` | `true` | No | Show `Pagination` when not in infinite mode and `totalPages > 1` |
+| siblingCount | `number` | `1` | No | Page window size passed to `Pagination.Root` |
+| paginationSize | `DataTableSize` | — | No | Pagination size; defaults to root `size` |
+| infiniteScroll | `boolean` | `false` | No | Scroll viewport with growing slice / `onLoadMore` |
+| initialVisibleRows | `number` | `pageSize` | No | Initial number of rows shown in infinite mode |
+| infiniteBatchSize | `number` | `20` | No | Rows added per reach-end step before `onLoadMore` |
+| hasMore | `boolean` | `false` | No | Server has more data after current `rows` |
+| loadingMore | `boolean` | `false` | No | While an async `onLoadMore` is in progress |
+| onLoadMore | `() => void \| Promise<void>` | — | No | Fetch next chunk when local slice is exhausted |
+| scrollHeight | `number \| string` | `360` | No | Max height of the scroll viewport in infinite mode |
+| highlightRowOnHover | `boolean` | `true` | No | Row hover highlight |
+| highlightColumnOnHover | `boolean` | `false` | No | Column hover highlight (header + cells) |
+| striped | `boolean` | `false` | No | Alternating row backgrounds |
 
-### Column fields (`DataTableColumn<Row>`)
+### `DataTableColumn<Row>`
 
 | Field | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| id | `string` | — | Yes | Column id |
-| header | `React.ReactNode` | — | Yes | Header |
-| accessor | `keyof Row \| (row) => unknown` | — | No | Value for cell and sort |
-| cell | `(row) => React.ReactNode` | — | No | Custom cell |
-| sortable | `boolean` | `false` | No | Sort on click |
-| sortAccessor | `(row) => unknown` | — | No | Value used only for sorting |
-| sortComparator | `(a, b, order) => number` | — | No | Custom comparator |
-| align | `"start" \| "center" \| "end"` | `"start"` | No | Alignment |
-| width | `string` | — | No | col width |
-| minWidth | `string` | — | No | Min col width |
-| onHeaderClick | `(event) => void` | — | No | Extra click on th |
-| onCellClick | `(row, event) => void` | — | No | Click / keyboard on cell |
+| --- | --- | --- | --- | --- |
+| id | `string` | — | Yes | Column id (used for sort state and DOM data attributes) |
+| header | `React.ReactNode` | — | Yes | Header content |
+| accessor | `keyof Row \| ((row: Row) => unknown)` | — | No | Value for default cell text and sort (unless `sortAccessor` / `sortComparator` override) |
+| cell | `(row: Row) => React.ReactNode` | — | No | Custom cell render |
+| sortable | `boolean` | `false` | No | Header toggles sort on click |
+| sortAccessor | `(row: Row) => unknown` | — | No | Value used for sorting (and default sort comparison) instead of `accessor` |
+| sortComparator | `(a: Row, b: Row, order: DataTableOrder) => number` | — | No | Custom comparator; when set, default primitive compare is not used |
+| align | `DataTableCellAlign` | `"start"` | No | `start`, `center`, or `end` |
+| width | `string` | — | No | `<col>` width |
+| minWidth | `string` | — | No | `<col>` width fallback when `width` is missing |
+| onHeaderClick | `(event: React.MouseEvent<HTMLTableCellElement>) => void` | — | No | Fires on header click before sort handling |
+| onCellClick | `(row: Row, event: React.MouseEvent<HTMLTableCellElement> \| React.KeyboardEvent<HTMLTableCellElement>) => void` | — | No | Makes the cell focusable and keyboard-activable |
 
-Exported types: `DataTableSortState`, `DataTableOrder`, `DataTableSize`, `DataTableDividerStyle`, `DataTableCellAlign`, `DataTableRootProps`, `DataTableColumn`.
+Exported types: `DataTableSortState`, `DataTableOrder`, `DataTableSize`, `DataTableCellAlign`, `DataTableDividerStyle`, `DataTableRootProps`, `DataTableColumn`.
 
-## Variants
+## Related
 
-- **`dividerStyle`** — `standard` (solid line), `dashed`, `dotted`, `none` (no lines between cells).
-- **`size`** — four tiers `s`–`xl` for row height, padding, and text; affects nested controls via size context.
-
-## States
-
-- **Loading** — `loading` when there are no rows to show: one row with `loadingText`.
-- **Empty** — when `loading === false` and zero rows, `emptyText` is shown.
-- **Sort** — click cycle: none → asc → desc → none for that column; arrow indicator in the header.
-- **Pagination** — page is clamped to range; when data changes in normal mode, page resets to 1 when switching away from infinite mode.
-- **Infinite scroll** — local slice grows up to `rows.length` first, then `onLoadMore` is called when `hasMore`.
-
-## Accessibility (a11y)
-
-- Sortable column headers are an interactive region inside `th` with `scope="col"`.
-- Cells with `onCellClick` get `role="button"`, `tabIndex={0}`, and Enter / Space handling.
-- Sort direction icons are marked `aria-hidden`.
-- The table does not add `grid` roles or extended arrow-key navigation — for complex behavior, configure that externally.
-
-## Limitations and notes
-
-- No built-in column resize by drag, pinning arbitrary columns (first column only), or built-in search/filtering.
-- No loading overlay on top of already visible rows: `loading` only affects the view when there are no rows to show.
-- For very large arrays without chunked loading, prefer `infiniteScroll` and data fetching rather than tens of thousands of rows in `rows` at once.
-- Sorting runs in memory on the passed array; server-side sorting is the consumer’s responsibility (pass pre-sorted `rows` or manage them externally).
-
-## Related components
-
-- **Pagination** — rendered below the table in normal mode.
-- **Badge**, **Tag** — typical cell content for statuses and labels (inherit table size unless overridden).
-- **LinkButton** — links and actions inside cells.
-- **ControlSizeProvider** — used inside the root; when nesting your own controls, you can rely on the same size context.
+- [Pagination](../pagination/COMPONENT.md) — used under the table for page navigation.
+- [LinkButton](../link-button/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Tag](../tag/COMPONENT.md) — common cell content; they pick up size from the table’s `ControlSizeProvider` unless overridden.
