@@ -1,20 +1,22 @@
 /**
- * Единая точка для JS: ширина, на которой сайдбар переключается между колонкой (inline) и оверлеем.
- * Дублируется в CSS как `64rem` / `64.001rem` в `@media` (в медиазапросах нельзя сослаться на `var()`).
- *
- * Ориентиры: overlay drawer + modal-поведение (фокус, Escape, scroll lock), persistent nav на lg+.
+ * Единая точка для JS/CSS: mobile < 768px, desktop/tablet >= 768px.
  */
 
-/** На узком viewport (`responsive`): полностью скрыт / узкая колонка / полноэкранный оверлей. */
-export type SidebarLayoutMode = "hidden" | "compact" | "expand";
+export type SidebarLayoutMode = "hidden" | "compact" | "expanded";
 
-export const SIDEBAR_LAYOUT_BREAKPOINT_MAX = "64rem";
+/** @deprecated use `SidebarLayoutMode` */
+export type LegacySidebarLayoutMode = "hidden" | "compact" | "expand";
 
-/** Viewport «узкий»: оверлей, `responsive` переводит раскладку в sheet-подобный режим. */
+export const SIDEBAR_LAYOUT_BREAKPOINT_MAX = "47.999rem";
+
 export const SIDEBAR_MEDIA_QUERY_NARROW = `(max-width: ${SIDEBAR_LAYOUT_BREAKPOINT_MAX})`;
 
-/** Viewport «широкий»: сайдбар в потоке сетки (вместе с `AppShell` и т.д.). */
-export const SIDEBAR_MEDIA_QUERY_INLINE = "(min-width: 64.001rem)";
+export const SIDEBAR_MEDIA_QUERY_INLINE = "(min-width: 48rem)";
 
-/** Viewport ≤480px: floating toggle отключён; при переходе в этот диапазон оверлей закрывается. */
-export const SIDEBAR_MEDIA_QUERY_XS_HIDDEN = "(max-width: 480px)";
+export const SIDEBAR_MEDIA_QUERY_XS_HIDDEN = "(max-width: 29.999rem)";
+
+export function normalizeSidebarMode(
+  mode: SidebarLayoutMode | LegacySidebarLayoutMode,
+): SidebarLayoutMode {
+  return mode === "expand" ? "expanded" : mode;
+}

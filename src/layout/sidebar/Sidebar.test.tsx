@@ -70,7 +70,7 @@ describe("Sidebar", () => {
 
   it("does not close on nav leave when opened via floating toggle", () => {
     const matchMediaImpl = (query: string) => {
-      if (query.includes("480px") && query.includes("max-width")) {
+      if (query.includes("29.999rem") && query.includes("max-width")) {
         return {
           matches: false,
           media: query,
@@ -82,7 +82,7 @@ describe("Sidebar", () => {
           dispatchEvent: vi.fn(),
         } as MediaQueryList;
       }
-      const matches = query.includes("64rem") && query.includes("max-width");
+      const matches = query.includes("47.999rem") && query.includes("max-width");
       return {
         matches,
         media: query,
@@ -119,7 +119,7 @@ describe("Sidebar", () => {
 
   it("shows floating open control when fully hidden even on xs viewport (≤480px)", () => {
     const matchMediaImpl = (query: string) => {
-      if (query.includes("480px") && query.includes("max-width")) {
+      if (query.includes("29.999rem") && query.includes("max-width")) {
         return {
           matches: true,
           media: query,
@@ -131,7 +131,7 @@ describe("Sidebar", () => {
           dispatchEvent: vi.fn(),
         } as MediaQueryList;
       }
-      const matches = query.includes("64rem") && query.includes("max-width");
+      const matches = query.includes("47.999rem") && query.includes("max-width");
       return {
         matches,
         media: query,
@@ -161,7 +161,7 @@ describe("Sidebar", () => {
 
   it("shows collapsed open handle only when sidebar is closed on narrow viewport", () => {
     const matchMediaImpl = (query: string) => {
-      if (query.includes("480px") && query.includes("max-width")) {
+      if (query.includes("29.999rem") && query.includes("max-width")) {
         return {
           matches: false,
           media: query,
@@ -173,7 +173,7 @@ describe("Sidebar", () => {
           dispatchEvent: vi.fn(),
         } as MediaQueryList;
       }
-      const matches = query.includes("64rem") && query.includes("max-width");
+      const matches = query.includes("47.999rem") && query.includes("max-width");
       return {
         matches,
         media: query,

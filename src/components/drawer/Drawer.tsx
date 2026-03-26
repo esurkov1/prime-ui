@@ -18,11 +18,7 @@ import styles from "./Drawer.module.css";
 
 export type { DrawerSize };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export type DrawerSide = "left" | "right" | "bottom" | "top";
-
-// ─── Context ──────────────────────────────────────────────────────────────────
 
 type DrawerContextValue = {
   open: boolean;
@@ -35,18 +31,17 @@ type DrawerContextValue = {
 const [DrawerProvider, useDrawerContext] = createComponentContext<DrawerContextValue>("Drawer");
 
 const DrawerChromeSizeContext = React.createContext<DrawerSize | null>(null);
+const DrawerPanelContext = React.createContext(false);
 
 function useDrawerChromeSize(): DrawerSize {
   const value = React.useContext(DrawerChromeSizeContext);
   if (value === null) {
     throw new Error(
-      "[prime-ui-kit] Drawer.Header, Drawer.Title, Drawer.Body and Drawer.Footer must be used inside Drawer.Content.",
+      "[prime-ui-kit] Drawer.Header, Drawer.Title, Drawer.Content and Drawer.Footer must be used inside Drawer.Panel.",
     );
   }
   return value;
 }
-
-// ─── Root ─────────────────────────────────────────────────────────────────────
 
 export type DrawerRootProps = {
   open?: boolean;
@@ -81,8 +76,6 @@ function DrawerRoot({
   );
 }
 
-// ─── Trigger ──────────────────────────────────────────────────────────────────
-
 export type DrawerTriggerProps = {
   children: React.ReactElement<{ onClick?: React.MouseEventHandler }>;
 };
@@ -90,6 +83,7 @@ export type DrawerTriggerProps = {
 function DrawerTrigger({ children }: DrawerTriggerProps) {
   const { onOpen } = useDrawerContext();
   const child = React.Children.only(children);
+
   return React.cloneElement(child, {
     onClick: (event: React.MouseEvent) => {
       child.props.onClick?.(event);
@@ -99,8 +93,6 @@ function DrawerTrigger({ children }: DrawerTriggerProps) {
     },
   });
 }
-
-// ─── Close ────────────────────────────────────────────────────────────────────
 
 export type DrawerCloseProps = {
   children: React.ReactElement<{
@@ -123,8 +115,6 @@ function DrawerClose({ children }: DrawerCloseProps) {
   });
 }
 
-// ─── Portal ───────────────────────────────────────────────────────────────────
-
 export type DrawerPortalProps = {
   children: React.ReactNode;
   container?: HTMLElement | null;
@@ -135,8 +125,6 @@ function DrawerPortal({ children, container }: DrawerPortalProps) {
   if (!open) return null;
   return <Portal container={container}>{children}</Portal>;
 }
-
-// ─── Overlay ──────────────────────────────────────────────────────────────────
 
 export type DrawerOverlayProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -151,7 +139,7 @@ function DrawerOverlay({ className, onClick, ...rest }: DrawerOverlayProps) {
   };
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay; keyboard dismiss handled by useEscapeKey in DrawerContent
+    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay; keyboard dismiss handled by useEscapeKey in DrawerPanel
     <div
       role="presentation"
       className={cx(styles.overlay, className)}
@@ -162,9 +150,7 @@ function DrawerOverlay({ className, onClick, ...rest }: DrawerOverlayProps) {
   );
 }
 
-// ─── Content ──────────────────────────────────────────────────────────────────
-
-export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement> & {
+export type DrawerPanelProps = React.HTMLAttributes<HTMLDivElement> & {
   side?: DrawerSide;
   size?: DrawerSize;
   "aria-label"?: string;
@@ -172,7 +158,7 @@ export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement> & {
   "aria-describedby"?: string;
 };
 
-function DrawerContent({
+function DrawerPanel({
   children,
   className,
   side = "right",
@@ -181,13 +167,11 @@ function DrawerContent({
   "aria-labelledby": ariaLabelledBy,
   "aria-describedby": ariaDescribedBy,
   ...rest
-}: DrawerContentProps) {
+}: DrawerPanelProps) {
   const { open, onClose, closeOnEscape } = useDrawerContext();
-
   const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
 
   useScrollLock(open);
-
   useEscapeKey({ enabled: closeOnEscape && open, onEscape: onClose });
 
   React.useEffect(() => {
@@ -227,26 +211,26 @@ function DrawerContent({
 
   return (
     <DrawerChromeSizeContext.Provider value={size}>
-      <div
-        ref={trapRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        aria-describedby={ariaDescribedBy}
-        tabIndex={-1}
-        data-side={side}
-        className={cx(styles.content, className)}
-        {...toDataAttributes({ size })}
-        {...rest}
-      >
-        {children}
-      </div>
+      <DrawerPanelContext.Provider value>
+        <div
+          ref={trapRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+          tabIndex={-1}
+          data-side={side}
+          className={cx(styles.panel, className)}
+          {...toDataAttributes({ size })}
+          {...rest}
+        >
+          {children}
+        </div>
+      </DrawerPanelContext.Provider>
     </DrawerChromeSizeContext.Provider>
   );
 }
-
-// ─── Header ───────────────────────────────────────────────────────────────────
 
 export type DrawerHeaderProps = React.HTMLAttributes<HTMLElement> & {
   showCloseButton?: boolean;
@@ -279,8 +263,6 @@ function DrawerHeader({ children, className, showCloseButton = true, ...rest }: 
   );
 }
 
-// ─── Title ────────────────────────────────────────────────────────────────────
-
 export type DrawerTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
 
 function DrawerTitle({ children, className, ...rest }: DrawerTitleProps) {
@@ -291,19 +273,23 @@ function DrawerTitle({ children, className, ...rest }: DrawerTitleProps) {
   );
 }
 
-// ─── Body ─────────────────────────────────────────────────────────────────────
+export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement>;
+export type DrawerLegacyContentProps = DrawerPanelProps;
 
-export type DrawerBodyProps = React.HTMLAttributes<HTMLDivElement>;
+function DrawerContent(props: DrawerContentProps | DrawerLegacyContentProps) {
+  const inPanel = React.useContext(DrawerPanelContext);
 
-function DrawerBody({ children, className, ...rest }: DrawerBodyProps) {
+  if (!inPanel) {
+    return <DrawerPanel {...(props as DrawerPanelProps)} />;
+  }
+
+  const { children, className, ...rest } = props as DrawerContentProps;
   return (
-    <ScrollContainer className={cx(styles.body, className)} {...rest}>
+    <ScrollContainer className={cx(styles.content, className)} {...rest}>
       {children}
     </ScrollContainer>
   );
 }
-
-// ─── Footer ───────────────────────────────────────────────────────────────────
 
 export type DrawerFooterProps = React.HTMLAttributes<HTMLElement>;
 
@@ -317,7 +303,7 @@ function DrawerFooter({ children, className, ...rest }: DrawerFooterProps) {
   );
 }
 
-// ─── Namespace export ─────────────────────────────────────────────────────────
+const DrawerBody = DrawerContent;
 
 export const Drawer = {
   Root: DrawerRoot,
@@ -325,9 +311,10 @@ export const Drawer = {
   Close: DrawerClose,
   Portal: DrawerPortal,
   Overlay: DrawerOverlay,
+  Panel: DrawerPanel,
   Content: DrawerContent,
+  Body: DrawerBody,
   Header: DrawerHeader,
   Title: DrawerTitle,
-  Body: DrawerBody,
   Footer: DrawerFooter,
 };

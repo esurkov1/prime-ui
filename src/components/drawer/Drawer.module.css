@@ -1,33 +1,35 @@
 .overlay {
   position: fixed;
   inset: 0;
+  z-index: var(--prime-sys-elevation-zIndex-modal);
   background: var(--prime-sys-color-surface-overlay);
   backdrop-filter: blur(var(--prime-sys-unit-8px));
-  z-index: var(--prime-sys-elevation-zIndex-modal);
-  animation: fadeIn var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  animation: drawerFadeIn var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
-.content {
+.panel {
   position: fixed;
   z-index: var(--prime-sys-elevation-zIndex-modal);
-  background: var(--prime-sys-color-surface-elevated);
-  color: var(--prime-sys-color-content-primary);
-  box-shadow: var(--prime-sys-elevation-shadow-modal);
   display: flex;
   flex-direction: column;
+  min-height: 0;
   overflow: hidden;
+  background: color-mix(in srgb, var(--prime-sys-color-surface-elevated) 94%, transparent);
+  color: var(--prime-sys-color-content-primary);
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  box-shadow: var(--prime-sys-elevation-shadow-modal);
   outline: none;
 
-  /* default size m — ярус drawer + control */
   --drawer-padding-x: var(--prime-sys-size-drawer-m-paddingX);
   --drawer-padding-y: var(--prime-sys-size-drawer-m-paddingY);
   --drawer-title-gap: var(--prime-sys-size-drawer-m-titleGap);
   --drawer-header-gap: var(--prime-sys-size-drawer-m-headerGap);
   --drawer-footer-gap: var(--prime-sys-size-drawer-m-footerGap);
   --drawer-title-text: var(--prime-sys-size-drawer-m-titleText);
+  --drawer-panel-width: min(22rem, 92vw);
 }
 
-.content[data-size="s"] {
+.panel[data-size="s"] {
   --drawer-padding-x: var(--prime-sys-size-drawer-s-paddingX);
   --drawer-padding-y: var(--prime-sys-size-drawer-s-paddingY);
   --drawer-title-gap: var(--prime-sys-size-drawer-s-titleGap);
@@ -36,7 +38,7 @@
   --drawer-title-text: var(--prime-sys-size-drawer-s-titleText);
 }
 
-.content[data-size="l"] {
+.panel[data-size="l"] {
   --drawer-padding-x: var(--prime-sys-size-drawer-l-paddingX);
   --drawer-padding-y: var(--prime-sys-size-drawer-l-paddingY);
   --drawer-title-gap: var(--prime-sys-size-drawer-l-titleGap);
@@ -45,7 +47,7 @@
   --drawer-title-text: var(--prime-sys-size-drawer-l-titleText);
 }
 
-.content[data-size="xl"] {
+.panel[data-size="xl"] {
   --drawer-padding-x: var(--prime-sys-size-drawer-xl-paddingX);
   --drawer-padding-y: var(--prime-sys-size-drawer-xl-paddingY);
   --drawer-title-gap: var(--prime-sys-size-drawer-xl-titleGap);
@@ -54,38 +56,40 @@
   --drawer-title-text: var(--prime-sys-size-drawer-xl-titleText);
 }
 
-.content[data-side="right"] {
+.panel[data-side="right"] {
   top: 0;
   right: 0;
   bottom: 0;
-  width: min(var(--prime-sys-unit-28rem), 90vw);
-  animation: slideInRight var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  width: var(--drawer-panel-width);
+  border-radius: var(--prime-sys-shape-radius-l) 0 0 var(--prime-sys-shape-radius-l);
+  animation: drawerSlideRight var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
-.content[data-side="left"] {
+.panel[data-side="left"] {
   top: 0;
   left: 0;
   bottom: 0;
-  width: min(var(--prime-sys-unit-28rem), 90vw);
-  animation: slideInLeft var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  width: var(--drawer-panel-width);
+  border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
+  animation: drawerSlideLeft var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
-.content[data-side="bottom"] {
+.panel[data-side="bottom"] {
   left: 0;
   right: 0;
   bottom: 0;
-  max-height: 80vh;
-  border-radius: var(--prime-sys-shape-radius-4xl) var(--prime-sys-shape-radius-4xl) 0 0;
-  animation: slideInBottom var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  max-height: 82vh;
+  border-radius: var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0 0;
+  animation: drawerSlideBottom var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
-.content[data-side="top"] {
+.panel[data-side="top"] {
   left: 0;
   right: 0;
   top: 0;
-  max-height: 80vh;
-  border-radius: 0 0 var(--prime-sys-shape-radius-4xl) var(--prime-sys-shape-radius-4xl);
-  animation: slideInTop var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  max-height: 82vh;
+  border-radius: 0 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l);
+  animation: drawerSlideTop var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
 .header {
@@ -95,7 +99,7 @@
   gap: var(--drawer-header-gap);
   padding-inline: var(--drawer-padding-x);
   padding-block: var(--drawer-padding-y);
-  border-bottom: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   flex-shrink: 0;
 }
 
@@ -109,34 +113,35 @@
 
 .closeBtn {
   flex-shrink: 0;
-  align-self: flex-start;
 }
 
 .title {
+  margin: 0;
   font-size: var(--drawer-title-text);
   font-weight: var(--prime-sys-typography-title-weight);
-  color: var(--prime-sys-color-content-primary);
   line-height: 1.2;
+  color: var(--prime-sys-color-content-primary);
 }
 
-.body {
+.content {
   flex: 1;
-  /* Прокрутка — ScrollContainer */
+  min-height: 0;
   padding-inline: var(--drawer-padding-x);
   padding-block: var(--drawer-padding-y);
 }
 
 .footer {
-  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--drawer-footer-gap);
   padding-inline: var(--drawer-padding-x);
   padding-block: var(--drawer-padding-y);
-  display: flex;
-  gap: var(--drawer-footer-gap);
-  justify-content: flex-end;
+  border-top: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   flex-shrink: 0;
 }
 
-@keyframes fadeIn {
+@keyframes drawerFadeIn {
   from {
     opacity: 0;
   }
@@ -146,7 +151,7 @@
   }
 }
 
-@keyframes slideInRight {
+@keyframes drawerSlideRight {
   from {
     transform: translateX(100%);
   }
@@ -156,7 +161,7 @@
   }
 }
 
-@keyframes slideInLeft {
+@keyframes drawerSlideLeft {
   from {
     transform: translateX(-100%);
   }
@@ -166,7 +171,7 @@
   }
 }
 
-@keyframes slideInBottom {
+@keyframes drawerSlideBottom {
   from {
     transform: translateY(100%);
   }
@@ -176,12 +181,19 @@
   }
 }
 
-@keyframes slideInTop {
+@keyframes drawerSlideTop {
   from {
     transform: translateY(-100%);
   }
 
   to {
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .panel {
+    animation: none;
   }
 }

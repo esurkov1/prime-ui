@@ -1,109 +1,119 @@
-import { ChevronsRight, PanelLeftOpen } from "lucide-react";
+import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
 import * as React from "react";
-import { createPortal } from "react-dom";
+
+import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useOverlayModal } from "@/hooks/useOverlayModal";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { SidebarSize } from "@/internal/states";
+
 import styles from "./Sidebar.module.css";
-import { SidebarProvider } from "./sidebar-context";
+import { SidebarProvider, type SidebarSide } from "./sidebar-context";
 import {
-  type SidebarLayoutMode,
+  type LegacySidebarLayoutMode,
+  normalizeSidebarMode,
   SIDEBAR_MEDIA_QUERY_NARROW,
-  SIDEBAR_MEDIA_QUERY_XS_HIDDEN,
+  type SidebarLayoutMode,
 } from "./sidebarLayout";
 
-export type { SidebarLayoutMode };
+export type { SidebarLayoutMode, SidebarSide };
 
 export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"aside">, "children"> & {
   children: React.ReactNode;
   size?: SidebarSize;
-  /** Узкая раскладка: `hidden` | `compact` | `expand`. Имеет приоритет над `open`, если задано. */
-  mode?: SidebarLayoutMode;
-  defaultMode?: SidebarLayoutMode;
-  onModeChange?: (mode: SidebarLayoutMode) => void;
-  /** Совместимость: `false` = полностью скрыт, `true` = expand. Компактный режим только через `mode`. */
+  side?: SidebarSide;
+  state?: SidebarLayoutMode;
+  defaultState?: SidebarLayoutMode;
+  onStateChange?: (state: SidebarLayoutMode) => void;
+  /** @deprecated */
+  mode?: SidebarLayoutMode | LegacySidebarLayoutMode;
+  /** @deprecated */
+  defaultMode?: SidebarLayoutMode | LegacySidebarLayoutMode;
+  /** @deprecated */
+  onModeChange?: (state: SidebarLayoutMode) => void;
+  /** @deprecated */
   open?: boolean;
+  /** @deprecated */
   defaultOpen?: boolean;
+  /** @deprecated */
   onOpenChange?: (open: boolean) => void;
   responsive?: boolean;
-  /** Размещение в колонке навигации рядом с контентом (flex-слот). */
   sidebarSlot?: "page-nav";
 };
 
-function resolveInitialMode(
-  responsive: boolean,
-  narrow: boolean,
-  defaultOpen: boolean,
-): SidebarLayoutMode {
-  if (responsive && narrow) return "hidden";
-  return defaultOpen ? "expand" : "hidden";
+function initialMobileMatch(responsive: boolean): boolean {
+  if (!responsive) return false;
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW).matches;
 }
 
-function SidebarRoot({
-  children,
-  className,
-  size = "m",
-  mode: modeProp,
-  defaultMode,
-  open: openProp,
-  defaultOpen = true,
-  onModeChange,
-  onOpenChange,
-  responsive = true,
-  sidebarSlot,
-  "aria-label": ariaLabel = "Sidebar",
-  ...rest
-}: SidebarRootProps) {
-  const initialNarrowViewport =
-    responsive === true &&
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW).matches;
+function defaultStateFromProps(
+  responsive: boolean,
+  isMobile: boolean,
+  defaultOpen: boolean,
+): SidebarLayoutMode {
+  if (responsive && isMobile) return "hidden";
+  return defaultOpen ? "expanded" : "hidden";
+}
 
-  const initialXsHiddenViewport =
-    responsive === true &&
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia(SIDEBAR_MEDIA_QUERY_XS_HIDDEN).matches;
+const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function SidebarRoot(
+  {
+    children,
+    className,
+    size = "m",
+    side = "left",
+    state,
+    defaultState,
+    onStateChange,
+    mode,
+    defaultMode,
+    onModeChange,
+    open,
+    defaultOpen = true,
+    onOpenChange,
+    responsive = true,
+    sidebarSlot,
+    "aria-label": ariaLabel = "Sidebar",
+    ...rest
+  },
+  ref,
+) {
+  const initialMobile = initialMobileMatch(Boolean(responsive));
 
-  const modeFromOpenProp =
-    openProp === undefined ? undefined : openProp ? "expand" : "hidden";
-  const modeControlledValue = modeProp !== undefined ? modeProp : modeFromOpenProp;
+  const modeControlled = mode === undefined ? undefined : normalizeSidebarMode(mode);
+  const modeDefault = defaultMode === undefined ? undefined : normalizeSidebarMode(defaultMode);
 
-  const defaultModeResolved =
-    defaultMode ??
-    resolveInitialMode(Boolean(responsive), initialNarrowViewport, defaultOpen);
+  const controlledState =
+    state ?? modeControlled ?? (open === undefined ? undefined : open ? "expanded" : "hidden");
 
-  const [mode, setModeState] = useControllableState<SidebarLayoutMode>({
-    value: modeControlledValue,
-    defaultValue: defaultModeResolved,
+  const resolvedDefaultState =
+    defaultState ??
+    modeDefault ??
+    defaultStateFromProps(Boolean(responsive), initialMobile, Boolean(defaultOpen));
+
+  const [layoutState, setLayoutState] = useControllableState<SidebarLayoutMode>({
+    value: controlledState,
+    defaultValue: resolvedDefaultState,
     onChange: (next) => {
+      onStateChange?.(next);
       onModeChange?.(next);
       onOpenChange?.(next !== "hidden");
     },
   });
 
-  const [isNarrowViewport, setIsNarrowViewport] = React.useState(initialNarrowViewport);
-  const previousNarrowRef = React.useRef(initialNarrowViewport);
-
-  const [isXsHiddenViewport, setIsXsHiddenViewport] = React.useState(initialXsHiddenViewport);
-  const previousXsRef = React.useRef(initialXsHiddenViewport);
+  const [isMobile, setIsMobile] = React.useState(initialMobile);
+  const previousMobileRef = React.useRef(initialMobile);
 
   React.useEffect(() => {
-    if (
-      responsive !== true ||
-      typeof window === "undefined" ||
-      typeof window.matchMedia !== "function"
-    ) {
-      setIsNarrowViewport(false);
-      previousNarrowRef.current = false;
+    if (!responsive || typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      setIsMobile(false);
+      previousMobileRef.current = false;
       return;
     }
 
     const query = window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW);
-    const update = () => setIsNarrowViewport(query.matches);
+    const update = () => setIsMobile(query.matches);
     update();
 
     if (typeof query.addEventListener === "function") {
@@ -116,140 +126,91 @@ function SidebarRoot({
   }, [responsive]);
 
   React.useEffect(() => {
-    if (
-      responsive !== true ||
-      typeof window === "undefined" ||
-      typeof window.matchMedia !== "function"
-    ) {
-      setIsXsHiddenViewport(false);
-      previousXsRef.current = false;
+    const wasMobile = previousMobileRef.current;
+    if (wasMobile === isMobile || !responsive) return;
+    previousMobileRef.current = isMobile;
+
+    if (isMobile) {
+      setLayoutState("hidden");
       return;
     }
 
-    const query = window.matchMedia(SIDEBAR_MEDIA_QUERY_XS_HIDDEN);
-    const update = () => setIsXsHiddenViewport(query.matches);
-    update();
-
-    if (typeof query.addEventListener === "function") {
-      query.addEventListener("change", update);
-      return () => query.removeEventListener("change", update);
+    if (layoutState === "hidden" && defaultOpen) {
+      setLayoutState("expanded");
     }
+  }, [defaultOpen, isMobile, layoutState, responsive, setLayoutState]);
 
-    query.addListener(update);
-    return () => query.removeListener(update);
-  }, [responsive]);
-
-  React.useEffect(() => {
-    if (responsive !== true) return;
-    const prev = previousXsRef.current;
-    if (prev === isXsHiddenViewport) return;
-    previousXsRef.current = isXsHiddenViewport;
-    if (isXsHiddenViewport) setModeState("hidden");
-  }, [isXsHiddenViewport, responsive, setModeState]);
-
-  React.useEffect(() => {
-    if (responsive !== true) return;
-    const prev = previousNarrowRef.current;
-    if (prev === isNarrowViewport) return;
-    previousNarrowRef.current = isNarrowViewport;
-    setModeState(isNarrowViewport ? "hidden" : "expand");
-  }, [isNarrowViewport, responsive, setModeState]);
-
-  const setMode = React.useCallback(
+  const setState = React.useCallback(
     (next: SidebarLayoutMode) => {
-      setModeState(next);
+      setLayoutState(next);
     },
-    [setModeState],
+    [setLayoutState],
   );
 
   const setOpen = React.useCallback(
     (next: boolean) => {
-      setModeState(next ? "expand" : "hidden");
+      setLayoutState(next ? "expanded" : "hidden");
     },
-    [setModeState],
+    [setLayoutState],
   );
 
-  /** Expand → compact (не hidden); compact ↔ expand; hidden → compact. Полный hidden только при ≤480 (xs) на узком экране. */
   const toggleOpen = React.useCallback(() => {
-    setModeState((prev) => {
-      if (responsive && isNarrowViewport && isXsHiddenViewport) {
-        if (prev === "expand") return "hidden";
-        return prev === "hidden" ? "compact" : prev;
+    setLayoutState((prev) => {
+      if (isMobile) {
+        return prev === "hidden" ? "expanded" : "hidden";
       }
-      if (prev === "expand") return "compact";
-      if (prev === "compact") return "expand";
-      return "compact";
+      if (prev === "expanded") return "compact";
+      if (prev === "compact") return "expanded";
+      return "expanded";
     });
-  }, [isNarrowViewport, isXsHiddenViewport, responsive, setModeState]);
+  }, [isMobile, setLayoutState]);
 
-  const open = mode !== "hidden";
+  const openState = layoutState !== "hidden";
+  const mobileOpen = Boolean(responsive) && isMobile && openState;
 
-  const shouldShowInlineOverlay =
-    responsive === true && isNarrowViewport && mode === "expand";
-  /** Полностью скрыт — язычок на любом viewport (в т.ч. ≤480). Компакт на узком — только если не xs (иначе только hidden). */
-  const shouldShowFloatingToggle =
-    mode === "hidden" ||
-    (responsive === true &&
-      isNarrowViewport &&
-      !isXsHiddenViewport &&
-      mode === "compact");
+  const closeMobile = React.useCallback(() => {
+    setLayoutState("hidden");
+  }, [setLayoutState]);
 
-  const [floatingPortalReady, setFloatingPortalReady] = React.useState(false);
-  React.useLayoutEffect(() => {
-    setFloatingPortalReady(true);
-  }, []);
+  const navAreaRef = useOverlayModal<HTMLDivElement>(mobileOpen, closeMobile);
 
   const navPanelId = React.useId();
-
-  const dismissExpandOverlay = React.useCallback(() => {
-    if (!responsive || !isNarrowViewport) {
-      setModeState("hidden");
-      return;
-    }
-    if (isXsHiddenViewport) {
-      setModeState("hidden");
-      return;
-    }
-    setModeState("compact");
-  }, [isNarrowViewport, isXsHiddenViewport, responsive, setModeState]);
-
-  const closeOverlay = dismissExpandOverlay;
-
-  const navAreaRef = useOverlayModal<HTMLDivElement>(shouldShowInlineOverlay, closeOverlay);
-
-  const handleFloatingClick = React.useCallback(() => {
-    setModeState((prev) => {
-      if (prev === "hidden") return "compact";
-      if (prev === "compact") return "expand";
-      return prev;
-    });
-  }, [setModeState]);
 
   const contextValue = React.useMemo(
     () => ({
       size,
-      mode,
-      setMode,
-      open,
+      side,
+      state: layoutState,
+      setState,
+      mode: layoutState,
+      setMode: setState,
+      open: openState,
       setOpen,
       toggleOpen,
+      isMobile,
       navPanelId,
     }),
-    [mode, navPanelId, open, setMode, setOpen, size, toggleOpen],
+    [isMobile, layoutState, navPanelId, openState, setOpen, setState, side, size, toggleOpen],
   );
 
   return (
     <SidebarProvider value={contextValue}>
       <aside
         {...rest}
+        ref={ref}
         className={cx(styles.root, className)}
         aria-label={ariaLabel}
         {...toDataAttributes({
           size,
-          open,
+          side,
+          state: layoutState,
+          open: openState,
           responsive: responsive ? true : undefined,
+          mobile: isMobile ? true : undefined,
+          "mobile-open": mobileOpen ? true : undefined,
           "sidebar-slot": sidebarSlot,
-          "sidebar-mode": mode,
+          "sidebar-mode": layoutState,
+          "sidebar-root": true,
         })}
       >
         <div ref={navAreaRef} className={styles.navArea}>
@@ -257,38 +218,32 @@ function SidebarRoot({
             type="button"
             className={styles.backdrop}
             aria-label="Закрыть сайдбар"
-            aria-hidden={shouldShowInlineOverlay ? undefined : true}
-            tabIndex={-1}
-            onClick={dismissExpandOverlay}
+            onClick={closeMobile}
+            tabIndex={mobileOpen ? 0 : -1}
+            aria-hidden={mobileOpen ? undefined : true}
           />
           {children}
         </div>
-        {shouldShowFloatingToggle && floatingPortalReady && typeof document !== "undefined"
-          ? createPortal(
-              <button
-                type="button"
-                className={styles.floatingToggle}
-                onClick={handleFloatingClick}
-                aria-label={
-                  mode === "hidden"
-                    ? "Открыть сайдбар (компактно)"
-                    : "Развернуть сайдбар на весь экран"
-                }
-                aria-controls={navPanelId}
-              >
-                {mode === "compact" ? (
-                  <ChevronsRight size="1em" strokeWidth={2} />
-                ) : (
-                  <PanelLeftOpen size="1em" strokeWidth={2} />
-                )}
-              </button>,
-              document.body,
-            )
-          : null}
+
+        {Boolean(responsive) && isMobile && !openState ? (
+          <Button.Root
+            size={size}
+            variant="neutral"
+            mode="ghost"
+            className={styles.floatingToggle}
+            onClick={() => setLayoutState("expanded")}
+            aria-label={side === "left" ? "Открыть сайдбар" : "Открыть сайдбар справа"}
+            aria-controls={navPanelId}
+          >
+            <Button.Icon>
+              {side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />}
+            </Button.Icon>
+          </Button.Root>
+        ) : null}
       </aside>
     </SidebarProvider>
   );
-}
+});
 
 SidebarRoot.displayName = "SidebarRoot";
 

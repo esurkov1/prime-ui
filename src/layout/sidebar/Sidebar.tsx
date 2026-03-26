@@ -1,48 +1,492 @@
-import { ChevronsUpDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronsUpDown,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelRightClose,
+  PanelRightOpen,
+} from "lucide-react";
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 
+import { Button, type ButtonRootProps } from "@/components/button/Button";
+import { Divider } from "@/components/divider/Divider";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { Tooltip } from "@/components/tooltip/Tooltip";
+import { Typography } from "@/components/typography/Typography";
 import { cx } from "@/internal/cx";
 import { Slot } from "@/internal/slot";
 import type { SidebarSize } from "@/internal/states";
-import styles from "./Sidebar.module.css";
-import { SidebarRoot } from "./SidebarRoot";
-import { useSidebarContext } from "./sidebar-context";
 
-export type { SidebarRootProps } from "./SidebarRoot";
-export type { SidebarSize };
+import styles from "./Sidebar.module.css";
+import { SidebarRoot, type SidebarRootProps } from "./SidebarRoot";
+import { useSidebarContext } from "./sidebar-context";
+import type { SidebarLayoutMode } from "./sidebarLayout";
+
+export type { SidebarLayoutMode, SidebarRootProps, SidebarSize };
 export { useSidebarContext };
 
 /** @deprecated Используйте `responsive` из `Sidebar.Root`. */
 export type SidebarResponsive = boolean;
 
+function hasExplicitNavPanel(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) return false;
+    return child.type === SidebarNavPanel;
+  });
+}
+
+const SidebarComposedRoot = React.forwardRef<HTMLElement, SidebarRootProps>(
+  ({ children, ...rest }, ref) => {
+    const normalizedChildren = hasExplicitNavPanel(children) ? (
+      children
+    ) : (
+      <SidebarNavPanel>{children}</SidebarNavPanel>
+    );
+
+    return (
+      <SidebarRoot ref={ref} {...rest}>
+        {normalizedChildren}
+      </SidebarRoot>
+    );
+  },
+);
+SidebarComposedRoot.displayName = "Sidebar";
+
 export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav">;
 
-function SidebarNavPanel({
-  className,
-  onMouseLeave,
-  onPointerLeave,
-  id,
-  ...rest
-}: SidebarNavPanelProps) {
+function SidebarNavPanel({ className, id, ...rest }: SidebarNavPanelProps) {
   const { navPanelId } = useSidebarContext();
+
   return (
     <nav
       {...rest}
       id={id ?? navPanelId}
       className={cx(styles.navPanel, className)}
-      onMouseLeave={onMouseLeave}
-      onPointerLeave={onPointerLeave}
+      aria-label={rest["aria-label"] ?? "Sidebar navigation"}
     />
   );
 }
 
 SidebarNavPanel.displayName = "SidebarNavPanel";
 
-export type SidebarNavPanelBodyProps = React.ComponentPropsWithoutRef<"div">;
+export type SidebarHeaderProps = React.ComponentPropsWithoutRef<"header">;
 
-function SidebarNavPanelBody({ className, ...rest }: SidebarNavPanelBodyProps) {
-  return <div {...rest} className={cx(styles.navPanelBody, className)} />;
+function SidebarHeader({ className, ...rest }: SidebarHeaderProps) {
+  return <header {...rest} className={cx(styles.header, className)} />;
+}
+
+SidebarHeader.displayName = "SidebarHeader";
+
+export type SidebarHeaderRowProps = React.ComponentPropsWithoutRef<"div">;
+
+function SidebarHeaderRow({ className, ...rest }: SidebarHeaderRowProps) {
+  return <div {...rest} className={cx(styles.headerRow, className)} />;
+}
+
+SidebarHeaderRow.displayName = "SidebarHeaderRow";
+
+export type SidebarHeaderMainProps = React.ComponentPropsWithoutRef<"div">;
+
+function SidebarHeaderMain({ className, ...rest }: SidebarHeaderMainProps) {
+  return <div {...rest} className={cx(styles.headerMain, className)} />;
+}
+
+SidebarHeaderMain.displayName = "SidebarHeaderMain";
+
+export type SidebarContentProps = Omit<
+  React.ComponentPropsWithoutRef<typeof ScrollContainer>,
+  "as"
+>;
+
+function SidebarContent({ className, axis = "vertical", ...rest }: SidebarContentProps) {
+  return (
+    <ScrollContainer
+      {...rest}
+      axis={axis}
+      className={cx(styles.content, className)}
+      overscrollBehavior="contain"
+    />
+  );
+}
+
+SidebarContent.displayName = "SidebarContent";
+
+export type SidebarFooterProps = React.ComponentPropsWithoutRef<"footer"> & {
+  variant?: "plain" | "inset";
+};
+
+function SidebarFooter({ className, variant = "plain", ...rest }: SidebarFooterProps) {
+  return (
+    <footer
+      {...rest}
+      className={cx(styles.footer, className, variant === "inset" && styles.footerInset)}
+    />
+  );
+}
+
+SidebarFooter.displayName = "SidebarFooter";
+
+export type SidebarTextProps = React.ComponentPropsWithoutRef<"span">;
+
+function SidebarText({ className, ...rest }: SidebarTextProps) {
+  return <span {...rest} className={cx(styles.text, className)} />;
+}
+
+SidebarText.displayName = "SidebarText";
+
+export type SidebarToggleButtonProps = Omit<ButtonRootProps, "children" | "aria-label"> & {
+  openLabel?: string;
+  closedLabel?: string;
+};
+
+function iconForToggle(state: SidebarLayoutMode, side: "left" | "right") {
+  if (side === "left") {
+    return state === "hidden" ? <PanelLeftOpen size="1em" /> : <PanelLeftClose size="1em" />;
+  }
+  return state === "hidden" ? <PanelRightOpen size="1em" /> : <PanelRightClose size="1em" />;
+}
+
+const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleButtonProps>(
+  (
+    {
+      className,
+      size,
+      variant = "neutral",
+      mode = "ghost",
+      openLabel = "Скрыть сайдбар",
+      closedLabel = "Открыть сайдбар",
+      ...rest
+    },
+    ref,
+  ) => {
+    const { state, toggleOpen, navPanelId, side, size: contextSize } = useSidebarContext();
+    const expanded = state !== "hidden";
+
+    return (
+      <Button.Root
+        {...rest}
+        ref={ref}
+        size={size ?? contextSize}
+        variant={variant}
+        mode={mode}
+        className={cx(styles.toggleButton, className)}
+        aria-expanded={expanded}
+        aria-controls={navPanelId}
+        aria-label={expanded ? openLabel : closedLabel}
+        onClick={(event) => {
+          rest.onClick?.(event);
+          if (!event.defaultPrevented) {
+            toggleOpen();
+          }
+        }}
+      >
+        <Button.Icon>{iconForToggle(state, side)}</Button.Icon>
+      </Button.Root>
+    );
+  },
+);
+
+SidebarToggleButton.displayName = "SidebarToggleButton";
+
+export type SidebarIdentityButtonProps = Omit<
+  React.ComponentPropsWithoutRef<"button">,
+  "children"
+> & {
+  leading?: React.ReactNode;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
+  trailing?: React.ReactNode;
+};
+
+const SidebarIdentityButton = React.forwardRef<HTMLButtonElement, SidebarIdentityButtonProps>(
+  (
+    { className, type = "button", leading, title, subtitle, trailing, disabled, onClick, ...rest },
+    ref,
+  ) => {
+    const { size } = useSidebarContext();
+
+    return (
+      <Button.Root
+        asChild
+        size={size}
+        variant="neutral"
+        mode="ghost"
+        className={cx(styles.identityButton, className)}
+      >
+        <button
+          {...rest}
+          ref={ref}
+          type={type}
+          disabled={disabled}
+          onClick={onClick}
+          aria-label={typeof title === "string" ? title : rest["aria-label"]}
+        >
+          {leading === undefined ? null : (
+            <span className={styles.identityButtonLeading} aria-hidden="true">
+              {leading}
+            </span>
+          )}
+          <span className={styles.identityButtonMain}>
+            <span className={styles.identityButtonTitle}>{title}</span>
+            {subtitle === undefined ? null : (
+              <span className={styles.identityButtonSubtitle}>{subtitle}</span>
+            )}
+          </span>
+          <span className={styles.identityButtonTrailing} aria-hidden="true">
+            {trailing ?? <ChevronsUpDown size="1em" strokeWidth={2} />}
+          </span>
+        </button>
+      </Button.Root>
+    );
+  },
+);
+
+SidebarIdentityButton.displayName = "SidebarIdentityButton";
+
+export type SidebarGroupProps = React.ComponentPropsWithoutRef<"section"> & {
+  title?: React.ReactNode;
+  action?: React.ReactNode;
+};
+
+function SidebarGroup({ className, title, action, children, ...rest }: SidebarGroupProps) {
+  return (
+    <section {...rest} className={cx(styles.group, className)}>
+      {title !== undefined ? (
+        <div className={styles.groupHeader}>
+          <Typography.Root as="h3" variant="body-small" tone="muted" className={styles.groupLabel}>
+            {title}
+          </Typography.Root>
+          {action === undefined ? null : <div className={styles.groupHeaderAction}>{action}</div>}
+        </div>
+      ) : null}
+      {children}
+    </section>
+  );
+}
+
+SidebarGroup.displayName = "SidebarGroup";
+
+export type SidebarGroupLabelProps = React.ComponentPropsWithoutRef<"div">;
+
+function SidebarGroupLabel({ className, children, ...rest }: SidebarGroupLabelProps) {
+  return (
+    <Typography.Root
+      as="div"
+      variant="body-small"
+      tone="muted"
+      className={cx(styles.groupLabel, className)}
+      {...rest}
+    >
+      {children}
+    </Typography.Root>
+  );
+}
+
+SidebarGroupLabel.displayName = "SidebarGroupLabel";
+
+export type SidebarSeparatorProps = React.ComponentPropsWithoutRef<typeof Divider.Root>;
+
+function SidebarSeparator({ className, variant = "line-spacing", ...rest }: SidebarSeparatorProps) {
+  return <Divider.Root {...rest} variant={variant} className={cx(styles.separator, className)} />;
+}
+
+SidebarSeparator.displayName = "SidebarSeparator";
+
+export type SidebarMenuProps = React.ComponentPropsWithoutRef<"ul">;
+
+function SidebarMenu({ className, ...rest }: SidebarMenuProps) {
+  return <ul {...rest} className={cx(styles.menu, className)} />;
+}
+
+SidebarMenu.displayName = "SidebarMenu";
+
+export type SidebarMenuItemProps = React.ComponentPropsWithoutRef<"li">;
+
+function SidebarMenuItem({ className, ...rest }: SidebarMenuItemProps) {
+  return <li {...rest} className={cx(styles.menuItem, className)} />;
+}
+
+SidebarMenuItem.displayName = "SidebarMenuItem";
+
+export type SidebarMenuIconProps = React.ComponentPropsWithoutRef<"span">;
+
+function SidebarMenuIcon({ className, ...rest }: SidebarMenuIconProps) {
+  return <span {...rest} className={cx(styles.menuIcon, className)} aria-hidden="true" />;
+}
+
+SidebarMenuIcon.displayName = "SidebarMenuIcon";
+
+export type SidebarMenuLabelProps = React.ComponentPropsWithoutRef<"span">;
+
+function SidebarMenuLabel({ className, ...rest }: SidebarMenuLabelProps) {
+  return <span {...rest} className={cx(styles.menuLabel, className)} />;
+}
+
+SidebarMenuLabel.displayName = "SidebarMenuLabel";
+
+export type SidebarMenuTrailingProps = React.ComponentPropsWithoutRef<"span">;
+
+function SidebarMenuTrailing({ className, ...rest }: SidebarMenuTrailingProps) {
+  return <span {...rest} className={cx(styles.menuTrailing, className)} aria-hidden="true" />;
+}
+
+SidebarMenuTrailing.displayName = "SidebarMenuTrailing";
+
+export type SidebarMenuActionProps = Omit<ButtonRootProps, "children"> & {
+  children?: React.ReactNode;
+};
+
+const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
+  ({ className, size, variant = "neutral", mode = "ghost", children, ...rest }, ref) => {
+    const { size: contextSize } = useSidebarContext();
+
+    return (
+      <Button.Root
+        {...rest}
+        ref={ref}
+        size={size ?? contextSize}
+        variant={variant}
+        mode={mode}
+        className={cx(styles.menuAction, className)}
+      >
+        {children}
+      </Button.Root>
+    );
+  },
+);
+
+SidebarMenuAction.displayName = "SidebarMenuAction";
+
+export type SidebarMenuButtonProps = Omit<ButtonRootProps, "asChild"> & {
+  active?: boolean;
+  asChild?: boolean;
+};
+
+const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
+  (
+    { className, active, asChild = false, size, variant = "neutral", mode = "ghost", ...rest },
+    ref,
+  ) => {
+    const { size: contextSize } = useSidebarContext();
+
+    if (asChild) {
+      return (
+        <Button.Root
+          {...rest}
+          ref={ref}
+          asChild
+          size={size ?? contextSize}
+          variant={variant}
+          mode={mode}
+          className={cx(styles.menuButton, className)}
+          data-active={active ? "true" : undefined}
+        />
+      );
+    }
+
+    return (
+      <Button.Root
+        {...rest}
+        ref={ref}
+        size={size ?? contextSize}
+        variant={variant}
+        mode={mode}
+        className={cx(styles.menuButton, className)}
+        data-active={active ? "true" : undefined}
+      />
+    );
+  },
+);
+
+SidebarMenuButton.displayName = "SidebarMenuButton";
+
+export type SidebarMenuLinkProps = React.ComponentPropsWithoutRef<"a"> & {
+  active?: boolean;
+};
+
+const SidebarMenuLink = React.forwardRef<HTMLAnchorElement, SidebarMenuLinkProps>(
+  ({ active, className, ...rest }, ref) => (
+    <SidebarMenuButton asChild active={active} className={className}>
+      <a {...rest} ref={ref} />
+    </SidebarMenuButton>
+  ),
+);
+
+SidebarMenuLink.displayName = "SidebarMenuLink";
+
+export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink>;
+
+const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRouterLinkProps>(
+  ({ className, ...rest }, ref) => (
+    <NavLink
+      ref={ref}
+      {...rest}
+      className={(navState) =>
+        cx(
+          styles.menuButton,
+          navState.isActive && styles.menuButtonActive,
+          typeof className === "function" ? className(navState) : className,
+        )
+      }
+    />
+  ),
+);
+
+SidebarMenuRouterLink.displayName = "SidebarMenuRouterLink";
+
+export type SidebarItemProps = Omit<SidebarMenuButtonProps, "children"> & {
+  icon?: React.ReactNode;
+  label: React.ReactNode;
+  trailing?: React.ReactNode;
+  tooltip?: React.ReactNode | boolean;
+};
+
+const SidebarItem = React.forwardRef<HTMLButtonElement, SidebarItemProps>(
+  ({ className, icon, label, trailing, tooltip = true, active, ...rest }, ref) => {
+    const { state, isMobile, side } = useSidebarContext();
+    const compact = state === "compact" && !isMobile;
+    const showTooltip = compact && tooltip !== false;
+
+    const node = (
+      <SidebarMenuButton
+        {...rest}
+        ref={ref}
+        active={active}
+        className={cx(styles.itemButton, className)}
+      >
+        {icon === undefined ? null : <SidebarMenuIcon>{icon}</SidebarMenuIcon>}
+        <SidebarMenuLabel>{label}</SidebarMenuLabel>
+        {trailing === undefined ? null : <SidebarMenuTrailing>{trailing}</SidebarMenuTrailing>}
+      </SidebarMenuButton>
+    );
+
+    if (!showTooltip) return node;
+
+    return (
+      <Tooltip.Root>
+        <Tooltip.Trigger>{node}</Tooltip.Trigger>
+        <Tooltip.Content side={side === "left" ? "right" : "left"}>
+          {tooltip === true ? label : tooltip}
+        </Tooltip.Content>
+      </Tooltip.Root>
+    );
+  },
+);
+
+SidebarItem.displayName = "SidebarItem";
+
+export type SidebarNavPanelBodyProps = React.ComponentPropsWithoutRef<typeof ScrollContainer>;
+
+function SidebarNavPanelBody({ className, axis = "vertical", ...rest }: SidebarNavPanelBodyProps) {
+  return (
+    <ScrollContainer
+      {...rest}
+      axis={axis}
+      className={cx(styles.navPanelBody, className)}
+      overscrollBehavior="contain"
+    />
+  );
 }
 
 SidebarNavPanelBody.displayName = "SidebarNavPanelBody";
@@ -76,8 +520,11 @@ export type SidebarNavCategoryTriggerProps = React.ComponentPropsWithoutRef<"but
 const SidebarNavCategoryTrigger = React.forwardRef<
   HTMLButtonElement,
   SidebarNavCategoryTriggerProps
->(({ className, type = "button", ...rest }, ref) => (
-  <button ref={ref} type={type} className={cx(styles.navCategoryTrigger, className)} {...rest} />
+>(({ className, type = "button", children, ...rest }, ref) => (
+  <button ref={ref} type={type} className={cx(styles.navCategoryTrigger, className)} {...rest}>
+    {children}
+    <ChevronRight size="1em" aria-hidden="true" />
+  </button>
 ));
 SidebarNavCategoryTrigger.displayName = "SidebarNavCategoryTrigger";
 
@@ -105,187 +552,14 @@ function SidebarNavCategoryPanel({ className, ...rest }: SidebarNavCategoryPanel
 
 SidebarNavCategoryPanel.displayName = "SidebarNavCategoryPanel";
 
-export type SidebarHeaderProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarHeader({ className, ...rest }: SidebarHeaderProps) {
-  return <div {...rest} className={cx(styles.header, className)} />;
-}
-
-SidebarHeader.displayName = "SidebarHeader";
-
-export type SidebarHeaderRowProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarHeaderRow({ className, ...rest }: SidebarHeaderRowProps) {
-  return <div {...rest} className={cx(styles.headerRow, className)} />;
-}
-
-SidebarHeaderRow.displayName = "SidebarHeaderRow";
-
-export type SidebarHeaderMainProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarHeaderMain({ className, ...rest }: SidebarHeaderMainProps) {
-  return <div {...rest} className={cx(styles.headerMain, className)} />;
-}
-
-SidebarHeaderMain.displayName = "SidebarHeaderMain";
-
-export type SidebarContentProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarContent({ className, ...rest }: SidebarContentProps) {
-  return <div {...rest} className={cx(styles.content, className)} />;
-}
-
-SidebarContent.displayName = "SidebarContent";
-
-export type SidebarFooterProps = React.ComponentPropsWithoutRef<"div"> & {
-  variant?: "plain" | "inset";
-};
-
-function SidebarFooter({ className, variant = "plain", ...rest }: SidebarFooterProps) {
-  return (
-    <div
-      {...rest}
-      className={cx(styles.footer, className)}
-      data-variant={variant === "inset" ? "inset" : undefined}
-    />
-  );
-}
-
-SidebarFooter.displayName = "SidebarFooter";
-
-export type SidebarIdentityButtonProps = Omit<
-  React.ComponentPropsWithoutRef<"button">,
-  "children"
-> & {
-  leading?: React.ReactNode;
-  title: React.ReactNode;
-  subtitle?: React.ReactNode;
-  trailing?: React.ReactNode;
-};
-
-const SidebarIdentityButton = React.forwardRef<HTMLButtonElement, SidebarIdentityButtonProps>(
-  (
-    { className, type = "button", leading, title, subtitle, trailing, disabled, onClick, ...rest },
-    ref,
-  ) => {
-    return (
-      <button
-        {...rest}
-        ref={ref}
-        type={type}
-        disabled={disabled}
-        className={cx(styles.identityButton, className)}
-        onClick={onClick}
-      >
-        {leading === undefined ? null : (
-          <span className={styles.identityButtonLeading} aria-hidden="true">
-            {leading}
-          </span>
-        )}
-        <span className={styles.identityButtonMain}>
-          <span className={styles.identityButtonTitle}>{title}</span>
-          {subtitle === undefined ? null : (
-            <span className={styles.identityButtonSubtitle}>{subtitle}</span>
-          )}
-        </span>
-        <span className={styles.identityButtonTrailing} aria-hidden="true">
-          {trailing ?? <ChevronsUpDown size="1em" strokeWidth={2} />}
-        </span>
-      </button>
-    );
-  },
-);
-
-SidebarIdentityButton.displayName = "SidebarIdentityButton";
-
-export type SidebarToggleButtonProps = React.ComponentPropsWithoutRef<"button"> & {
-  openLabel?: string;
-  closedLabel?: string;
-};
-
-const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleButtonProps>(
-  (
-    {
-      className,
-      type = "button",
-      openLabel = "Скрыть сайдбар",
-      closedLabel = "Открыть сайдбар",
-      onClick,
-      ...rest
-    },
-    ref,
-  ) => {
-    const { mode, toggleOpen, navPanelId } = useSidebarContext();
-    const visible = mode !== "hidden";
-    return (
-      <button
-        {...rest}
-        ref={ref}
-        type={type}
-        className={cx(styles.toggleButton, className)}
-        aria-expanded={visible}
-        aria-controls={navPanelId}
-        aria-label={visible ? openLabel : closedLabel}
-        onClick={(event) => {
-          onClick?.(event);
-          if (!event.defaultPrevented) {
-            toggleOpen();
-          }
-        }}
-      >
-        {visible ? (
-          <PanelLeftClose size="1em" strokeWidth={2} />
-        ) : (
-          <PanelLeftOpen size="1em" strokeWidth={2} />
-        )}
-      </button>
-    );
-  },
-);
-
-SidebarToggleButton.displayName = "SidebarToggleButton";
-
-export type SidebarGroupProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarGroup({ className, ...rest }: SidebarGroupProps) {
-  return <div {...rest} className={cx(styles.group, className)} />;
-}
-
-SidebarGroup.displayName = "SidebarGroup";
-
-export type SidebarGroupLabelProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarGroupLabel({ className, ...rest }: SidebarGroupLabelProps) {
-  return <div {...rest} className={cx(styles.groupLabel, className)} />;
-}
-
-SidebarGroupLabel.displayName = "SidebarGroupLabel";
-
-export type SidebarMenuProps = React.ComponentPropsWithoutRef<"ul">;
-
-function SidebarMenu({ className, ...rest }: SidebarMenuProps) {
-  return <ul {...rest} className={cx(styles.menu, className)} />;
-}
-
-SidebarMenu.displayName = "SidebarMenu";
-
-export type SidebarMenuItemProps = React.ComponentPropsWithoutRef<"li">;
-
-function SidebarMenuItem({ className, ...rest }: SidebarMenuItemProps) {
-  return <li {...rest} className={cx(styles.menuItem, className)} />;
-}
-
-SidebarMenuItem.displayName = "SidebarMenuItem";
-
-export type SidebarMenuButtonProps = React.ComponentPropsWithoutRef<"button"> & {
+export type SidebarMenuSlotButtonProps = React.ComponentPropsWithoutRef<"button"> & {
   active?: boolean;
   asChild?: boolean;
 };
 
-const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
-  ({ className, type = "button", active, asChild = false, disabled, onClick, ...rest }, ref) => {
-    const cls = cx(styles.menuButton, className);
-    const dataActive = active ? "true" : undefined;
+const SidebarMenuSlotButton = React.forwardRef<HTMLButtonElement, SidebarMenuSlotButtonProps>(
+  ({ className, active, asChild = false, disabled, onClick, type = "button", ...rest }, ref) => {
+    const cls = cx(styles.menuButton, className, active && styles.menuButtonActive);
 
     if (asChild) {
       return (
@@ -293,7 +567,7 @@ const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonP
           {...rest}
           ref={ref as React.Ref<HTMLElement>}
           className={cls}
-          data-active={dataActive}
+          data-active={active ? "true" : undefined}
           aria-disabled={disabled || undefined}
           onClick={
             disabled
@@ -313,89 +587,17 @@ const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonP
         type={type}
         disabled={disabled}
         className={cls}
-        data-active={dataActive}
+        data-active={active ? "true" : undefined}
         onClick={onClick}
       />
     );
   },
 );
 
-SidebarMenuButton.displayName = "SidebarMenuButton";
+SidebarMenuSlotButton.displayName = "SidebarMenuSlotButton";
 
-export type SidebarMenuLinkProps = React.ComponentPropsWithoutRef<"a"> & {
-  active?: boolean;
-};
-
-const SidebarMenuLink = React.forwardRef<HTMLAnchorElement, SidebarMenuLinkProps>(
-  ({ active, className, ...rest }, ref) => (
-    <SidebarMenuButton asChild active={active} className={className}>
-      <a {...rest} ref={ref} />
-    </SidebarMenuButton>
-  ),
-);
-
-SidebarMenuLink.displayName = "SidebarMenuLink";
-
-export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink>;
-
-/** Пункт меню на базе React Router `NavLink` со стилями `menuButton` (активное состояние по URL). */
-const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRouterLinkProps>(
-  ({ className, ...rest }, ref) => (
-    <NavLink
-      ref={ref}
-      {...rest}
-      className={(navState) =>
-        cx(styles.menuButton, typeof className === "function" ? className(navState) : className)
-      }
-    />
-  ),
-);
-SidebarMenuRouterLink.displayName = "SidebarMenuRouterLink";
-
-export type SidebarMenuActionProps = React.ComponentPropsWithoutRef<"button">;
-
-const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
-  ({ className, type = "button", ...rest }, ref) => {
-    return <button {...rest} ref={ref} type={type} className={cx(styles.menuAction, className)} />;
-  },
-);
-
-SidebarMenuAction.displayName = "SidebarMenuAction";
-
-export type SidebarMenuIconProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarMenuIcon({ className, ...rest }: SidebarMenuIconProps) {
-  return <span {...rest} className={cx(styles.menuIcon, className)} aria-hidden="true" />;
-}
-
-SidebarMenuIcon.displayName = "SidebarMenuIcon";
-
-export type SidebarMenuLabelProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarMenuLabel({ className, ...rest }: SidebarMenuLabelProps) {
-  return <span {...rest} className={cx(styles.menuLabel, className)} />;
-}
-
-SidebarMenuLabel.displayName = "SidebarMenuLabel";
-
-export type SidebarMenuTrailingProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarMenuTrailing({ className, ...rest }: SidebarMenuTrailingProps) {
-  return <span {...rest} className={cx(styles.menuTrailing, className)} aria-hidden="true" />;
-}
-
-SidebarMenuTrailing.displayName = "SidebarMenuTrailing";
-
-export type SidebarTextProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarText({ className, ...rest }: SidebarTextProps) {
-  return <span {...rest} className={cx(styles.text, className)} />;
-}
-
-SidebarText.displayName = "SidebarText";
-
-export const Sidebar = {
-  Root: SidebarRoot,
+export const Sidebar = Object.assign(SidebarComposedRoot, {
+  Root: SidebarComposedRoot,
   NavPanel: SidebarNavPanel,
   NavPanelBody: SidebarNavPanelBody,
   NavDocTree: SidebarNavDocTree,
@@ -410,10 +612,12 @@ export const Sidebar = {
   HeaderMain: SidebarHeaderMain,
   Content: SidebarContent,
   Footer: SidebarFooter,
-  IdentityButton: SidebarIdentityButton,
   ToggleButton: SidebarToggleButton,
+  IdentityButton: SidebarIdentityButton,
   Group: SidebarGroup,
   GroupLabel: SidebarGroupLabel,
+  Separator: SidebarSeparator,
+  Item: SidebarItem,
   Menu: SidebarMenu,
   MenuItem: SidebarMenuItem,
   MenuButton: SidebarMenuButton,
@@ -423,5 +627,6 @@ export const Sidebar = {
   MenuIcon: SidebarMenuIcon,
   MenuLabel: SidebarMenuLabel,
   MenuTrailing: SidebarMenuTrailing,
+  MenuSlotButton: SidebarMenuSlotButton,
   Text: SidebarText,
-};
+});

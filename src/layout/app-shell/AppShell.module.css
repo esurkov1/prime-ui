@@ -1,9 +1,7 @@
-/*
- * Каркас приложения: Grid nav | main.
- * `AppShell.Template` → `data-layout-template="app"`: на ≥lg — поля у колонки `AppShell.Nav` (сайдбар от края экрана), `column-gap` между nav и main при открытом Sidebar (`sidebarSlot="page-nav"`). Корень без padding — `main` на всю ширину; поля текста страницы — в `AppShell.Main` (`variant="page"` / `surface`).
- * Брейкпоинт 64.001rem согласован с `layout/sidebar/sidebarLayout.ts`.
- */
 .layoutRoot {
+  --app-sidebar-expanded: 18rem;
+  --app-sidebar-compact: 4.5rem;
+
   box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(0, auto) minmax(0, 1fr);
@@ -15,16 +13,6 @@
   min-height: 0;
   padding: 0;
   background: transparent;
-}
-
-@media (min-width: 64.001rem) {
-  .layoutRoot[data-layout-template="app"] {
-    column-gap: 0;
-  }
-
-  .layoutRoot[data-layout-template="app"]:has([data-sidebar-slot="page-nav"][data-open="true"]) {
-    column-gap: var(--prime-sys-spacing-x3);
-  }
 }
 
 .layoutRoot > .layoutMain:only-child {
@@ -44,16 +32,8 @@
   max-height: 100%;
   padding: 0;
   margin: 0;
-  /* visible: не обрезать fixed/portaled chrome сайдбара (язычок); скролл/клип — у самого Sidebar */
   overflow: visible;
   background: transparent;
-}
-
-@media (min-width: 64.001rem) {
-  .layoutRoot[data-layout-template="app"] > .layoutNav {
-    padding-inline-start: var(--prime-sys-spacing-x2);
-    padding-block: var(--prime-sys-spacing-x2);
-  }
 }
 
 .layoutMain {
@@ -79,4 +59,58 @@
 .layoutMainPage {
   padding-block: var(--prime-sys-spacing-x6);
   padding-inline: var(--prime-sys-spacing-x6);
+}
+
+@media (min-width: 48rem) {
+  .layoutRoot[data-layout-template="app"] > .layoutNav {
+    padding-inline-start: var(--prime-sys-spacing-x2);
+    padding-block: var(--prime-sys-spacing-x2);
+  }
+
+  .layoutRoot[data-layout-template="app"] > .layoutMain {
+    transition: transform var(--prime-sys-motion-duration-medium)
+      var(--prime-sys-motion-easing-standard);
+    will-change: transform;
+  }
+
+  .layoutRoot[data-layout-template="app"]:has(
+      [data-sidebar-root="true"][data-state="expanded"],
+      [data-sidebar-root="true"][data-state="compact"]
+    ) {
+    column-gap: var(--prime-sys-spacing-x3);
+  }
+
+  .layoutRoot[data-layout-template="app"]:has(
+      [data-sidebar-root="true"][data-side="left"][data-state="compact"]
+    )
+    > .layoutMain {
+    transform: translateX(calc(-1 * (var(--app-sidebar-expanded) - var(--app-sidebar-compact))));
+  }
+
+  .layoutRoot[data-layout-template="app"]:has(
+      [data-sidebar-root="true"][data-side="left"][data-state="hidden"]
+    )
+    > .layoutMain {
+    transform: translateX(calc(-1 * var(--app-sidebar-expanded)));
+  }
+
+  .layoutRoot[data-layout-template="app"]:has(
+      [data-sidebar-root="true"][data-side="right"][data-state="compact"]
+    )
+    > .layoutMain {
+    transform: translateX(calc(var(--app-sidebar-expanded) - var(--app-sidebar-compact)));
+  }
+
+  .layoutRoot[data-layout-template="app"]:has(
+      [data-sidebar-root="true"][data-side="right"][data-state="hidden"]
+    )
+    > .layoutMain {
+    transform: translateX(var(--app-sidebar-expanded));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layoutRoot[data-layout-template="app"] > .layoutMain {
+    transition: none;
+  }
 }

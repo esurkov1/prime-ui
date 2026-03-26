@@ -1,154 +1,46 @@
-/*
- * `page-nav`: колонка в nav area AppShell; схлопывание — `max-width` → 0; горизонтальные поля/gap — у `AppShell.Template`.
- * Брейкпоинты `64rem` / `64.001rem` — синхронны с `sidebarLayout.ts` (в @media нельзя использовать var()).
- */
 .root {
-  --sb-panel-width: var(--prime-sys-unit-16rem);
-  --sb-compact-rail-width: 3.25rem;
-  --sb-panel-visible-width: var(--sb-panel-width);
-  --sb-nav-gap: 0;
-  --sb-shell-width: calc(var(--sb-panel-visible-width) + var(--sb-nav-gap));
-  --sb-page-inset: var(--prime-sys-spacing-x2);
+  --sb-expanded-width: 18rem;
+  --sb-compact-width: 4.5rem;
+  --sb-visible-width: var(--sb-expanded-width);
+  --sb-inline-sign: -1;
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
-  --sb-control-height: var(--prime-sys-size-control-m-height);
-  --sb-control-radius: var(--prime-sys-size-control-m-radius);
-  --sb-control-gap: var(--prime-sys-size-control-m-gap);
-  --sb-control-text: var(--prime-sys-size-control-m-text);
-  --sb-control-support-text: var(--prime-sys-size-control-s-supportText);
-  --sb-control-icon: var(--prime-sys-size-control-m-icon);
-  --sb-control-padding-x: var(--prime-sys-size-control-m-buttonPaddingX);
-  --sb-control-padding-y: var(--prime-sys-size-control-m-buttonPaddingY);
-  --sb-identity-leading-size: var(--prime-sys-size-avatar-m-size);
-  --sb-identity-title-text: var(--prime-sys-size-control-m-text);
-  --sb-identity-subtitle-text: var(--prime-sys-size-control-s-supportText);
-  /* Единый инсет для `.navPanel` (можно переопределить на `.root`). */
-  --sb-chrome-inset: var(--prime-sys-spacing-x2);
-  --sb-panel-padding-inline: var(--sb-chrome-inset);
-  --sb-panel-padding-block: var(--sb-chrome-inset);
+  --sb-padding: var(--prime-sys-spacing-x2);
+  --sb-gap: var(--prime-sys-spacing-x2);
 
+  position: relative;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
+  flex: 0 0 var(--sb-expanded-width);
+  width: var(--sb-expanded-width);
+  min-width: var(--sb-expanded-width);
   min-height: 0;
-  width: var(--sb-shell-width);
-  min-width: var(--sb-shell-width);
   height: 100%;
   overflow: visible;
-  background: transparent;
-  position: relative;
-  will-change: width;
-  transition:
-    width var(--sb-transition-duration) var(--sb-transition-ease),
-    min-width var(--sb-transition-duration) var(--sb-transition-ease),
-    margin var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
-.root[data-size="s"] {
-  --sb-control-height: var(--prime-sys-size-control-s-height);
-  --sb-control-radius: var(--prime-sys-size-control-s-radius);
-  --sb-control-gap: var(--prime-sys-size-control-s-gap);
-  --sb-control-text: var(--prime-sys-size-control-s-text);
-  --sb-control-support-text: var(--prime-sys-size-control-s-supportText);
-  --sb-control-icon: var(--prime-sys-size-control-s-icon);
-  --sb-control-padding-x: var(--prime-sys-size-control-s-buttonPaddingX);
-  --sb-control-padding-y: var(--prime-sys-size-control-s-buttonPaddingY);
-  --sb-identity-leading-size: var(--prime-sys-size-avatar-s-size);
-  --sb-identity-title-text: var(--prime-sys-size-control-s-text);
-  --sb-identity-subtitle-text: var(--prime-sys-size-control-s-supportText);
+.root[data-state="compact"] {
+  --sb-visible-width: var(--sb-compact-width);
 }
 
-.root[data-size="l"] {
-  --sb-control-height: var(--prime-sys-size-control-l-height);
-  --sb-control-radius: var(--prime-sys-size-control-l-radius);
-  --sb-control-gap: var(--prime-sys-size-control-l-gap);
-  --sb-control-text: var(--prime-sys-size-control-l-text);
-  --sb-control-support-text: var(--prime-sys-size-control-l-supportText);
-  --sb-control-icon: var(--prime-sys-size-control-l-icon);
-  --sb-control-padding-x: var(--prime-sys-size-control-l-buttonPaddingX);
-  --sb-control-padding-y: var(--prime-sys-size-control-l-buttonPaddingY);
-  --sb-identity-leading-size: var(--prime-sys-size-avatar-l-size);
-  --sb-identity-title-text: var(--prime-sys-size-control-l-text);
-  --sb-identity-subtitle-text: var(--prime-sys-size-control-m-supportText);
+.root[data-state="hidden"] {
+  --sb-visible-width: 0px;
 }
 
-.root[data-size="xl"] {
-  --sb-control-height: var(--prime-sys-size-control-xl-height);
-  --sb-control-radius: var(--prime-sys-size-control-xl-radius);
-  --sb-control-gap: var(--prime-sys-size-control-xl-gap);
-  --sb-control-text: var(--prime-sys-size-control-xl-text);
-  --sb-control-support-text: var(--prime-sys-size-control-xl-supportText);
-  --sb-control-icon: var(--prime-sys-size-control-xl-icon);
-  --sb-control-padding-x: var(--prime-sys-size-control-xl-buttonPaddingX);
-  --sb-control-padding-y: var(--prime-sys-size-control-xl-buttonPaddingY);
-  --sb-identity-leading-size: var(--prime-sys-size-avatar-xl-size);
-  --sb-identity-title-text: var(--prime-sys-size-control-xl-text);
-  --sb-identity-subtitle-text: var(--prime-sys-size-control-l-supportText);
+.root[data-side="left"] {
+  --sb-inline-sign: -1;
 }
 
-/* Внешний горизонтальный отступ/gap до main — в AppShell; здесь без margin-inline (дёрганье и асимметрия). */
-.root[data-sidebar-slot="page-nav"] {
-  flex: 0 0 auto;
-  align-self: stretch;
-  min-width: 0;
-  min-height: 0;
-  height: 100%;
-  max-height: 100%;
-  width: fit-content;
-  max-width: 100%;
-  margin: 0;
-  overflow: hidden;
-  transition: none;
-  --sb-page-nav-expanded: var(--sb-panel-width);
+.root[data-side="right"] {
+  --sb-inline-sign: 1;
 }
 
-.root[data-open="false"] {
-  --sb-nav-gap: 0;
-  --sb-panel-visible-width: 0;
-}
-
-/* Область навигации: одна колонка `.navPanel`. */
 .navArea {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  flex: 0 0 auto;
-  align-items: stretch;
-  gap: var(--sb-nav-gap);
-  width: var(--sb-shell-width);
-  min-width: var(--sb-shell-width);
+  position: relative;
+  width: 100%;
   min-height: 0;
   height: 100%;
-  overflow: hidden;
-  background: transparent;
-  position: relative;
-  will-change: width;
-  transition:
-    gap var(--sb-transition-duration) var(--sb-transition-ease),
-    width var(--sb-transition-duration) var(--sb-transition-ease),
-    min-width var(--sb-transition-duration) var(--sb-transition-ease);
-}
-
-@media (min-width: 64.001rem) {
-  .root[data-sidebar-slot="page-nav"] .navArea {
-    width: auto;
-    min-width: 0;
-    max-width: var(--sb-page-nav-expanded);
-    height: 100%;
-    max-height: 100%;
-    overflow: hidden;
-    transition:
-      max-width var(--sb-transition-duration) var(--sb-transition-ease),
-      gap var(--sb-transition-duration) var(--sb-transition-ease);
-  }
-
-  .root[data-sidebar-slot="page-nav"][data-open="false"] .navArea {
-    max-width: 0;
-  }
-
-  .root[data-sidebar-slot="page-nav"][data-sidebar-mode="compact"] {
-    --sb-page-nav-expanded: var(--sb-compact-rail-width);
-  }
+  pointer-events: auto;
 }
 
 .backdrop {
@@ -162,108 +54,50 @@
   pointer-events: none;
 }
 
-.floatingToggle {
-  position: fixed;
-  left: env(safe-area-inset-left, 0px);
-  top: calc(env(safe-area-inset-top, 0px) + var(--sb-page-inset) + var(--sb-panel-padding-block));
-  right: auto;
-  /* Портал в body: выше main/surface в grid, ниже настоящих модалок */
-  z-index: calc(var(--prime-sys-elevation-zIndex-modal) + 10);
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(var(--sb-control-icon) + var(--prime-sys-spacing-x2));
-  height: calc(var(--sb-control-icon) + var(--prime-sys-spacing-x2));
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  border-radius: 0 var(--sb-control-radius) var(--sb-control-radius) 0;
-  background: color-mix(in srgb, var(--prime-sys-color-surface-elevated) 72%, transparent);
-  color: var(--prime-sys-color-content-primary);
-  font-size: var(--sb-control-icon);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  cursor: pointer;
-  opacity: 0.5;
-  transform: none;
-  transition:
-    background-color var(--prime-sys-motion-fast) var(--sb-transition-ease),
-    border-color var(--prime-sys-motion-fast) var(--sb-transition-ease),
-    opacity var(--prime-sys-motion-fast) var(--sb-transition-ease);
-}
-
-.floatingToggle:hover {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  opacity: 1;
-}
-
-.floatingToggle:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-  opacity: 1;
-}
-
 .navPanel {
+  position: relative;
+  z-index: 1;
   box-sizing: border-box;
   display: flex;
-  flex: 0 0 auto;
   flex-direction: column;
-  align-self: stretch;
-  width: var(--sb-panel-width);
-  min-width: var(--sb-panel-width);
+  width: var(--sb-expanded-width);
+  min-width: var(--sb-expanded-width);
   min-height: 0;
-  gap: var(--prime-sys-spacing-x2);
-  overflow: hidden;
-  overflow-x: hidden;
-  padding-inline: var(--sb-panel-padding-inline);
-  padding-block: var(--sb-panel-padding-block);
+  height: 100%;
+  gap: var(--sb-gap);
+  padding: var(--sb-padding);
   border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   border-radius: var(--prime-sys-shape-radius-l);
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-surface-default) 90%,
-    var(--prime-sys-color-surface-raised)
+  background: color-mix(in srgb, var(--prime-sys-color-surface-elevated) 92%, transparent);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  transform: translateX(
+    calc((var(--sb-expanded-width) - var(--sb-visible-width)) * var(--sb-inline-sign))
   );
-  box-shadow: none;
-  opacity: 1;
-  transform: translateX(0);
   transition:
+    transform var(--sb-transition-duration) var(--sb-transition-ease),
     border-color var(--sb-transition-duration) var(--sb-transition-ease),
-    opacity var(--sb-transition-duration) var(--sb-transition-ease),
-    transform var(--sb-transition-duration) var(--sb-transition-ease);
+    box-shadow var(--sb-transition-duration) var(--sb-transition-ease);
+  will-change: transform;
 }
 
-.root[data-open="false"] .navPanel {
-  transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
-  opacity: 0;
+.root[data-side="right"] .navPanel {
+  margin-inline-start: auto;
+}
+
+.root[data-state="hidden"] .navPanel {
   pointer-events: none;
 }
 
-/* Десктоп page-nav: панель уезжает влево вместе со сжатием `.navArea` (не только clip). */
-@media (min-width: 64.001rem) {
-  .root[data-sidebar-slot="page-nav"] .navPanel {
-    opacity: 1;
-    flex: 1 1 auto;
-    align-self: stretch;
-    min-height: 0;
-    height: 100%;
-    max-height: 100%;
-  }
-
-  .root[data-sidebar-slot="page-nav"][data-open="false"] .navPanel {
-    transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
-    opacity: 1;
-    pointer-events: none;
-  }
-}
-
 .header {
+  display: flex;
   flex: 0 0 auto;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x1);
   min-width: 0;
-  padding: 0;
 }
 
 .headerRow {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: var(--prime-sys-spacing-x2);
   min-width: 0;
@@ -279,30 +113,25 @@
 
 .content {
   flex: 1 1 auto;
-  min-height: 0;
   min-width: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  min-height: 0;
   padding: 0;
 }
 
 .footer {
+  display: flex;
   flex: 0 0 auto;
-  min-width: 0;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x1);
   margin-top: auto;
-  padding: 0;
+  min-width: 0;
 }
 
-.footer[data-variant="inset"] {
-  padding: var(--prime-sys-spacing-x3);
+.footerInset {
+  padding: var(--prime-sys-spacing-x2);
   border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   border-radius: var(--prime-sys-shape-radius-m);
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-surface-elevated) 92%,
-    var(--prime-sys-color-surface-default)
-  );
+  background: color-mix(in srgb, var(--prime-sys-color-surface-default) 88%, transparent);
 }
 
 .group {
@@ -310,109 +139,78 @@
   flex-direction: column;
   gap: var(--prime-sys-spacing-x1);
   min-width: 0;
-  padding-block: 0;
 }
 
-/* Группа без подписи внутри `.content` — сохраняем вертикальный инсет как у строки с `GroupLabel`. */
-.content .group:not(:has(.groupLabel)) {
-  padding-block: var(--prime-sys-spacing-x2);
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-sys-spacing-x1);
+  min-width: 0;
 }
 
-.group + .group {
-  margin-block-start: var(--prime-sys-spacing-x2);
+.groupHeaderAction {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .groupLabel {
+  min-width: 0;
   padding-inline: var(--prime-sys-spacing-x1);
-  padding-block: var(--prime-sys-spacing-x2);
-  font-size: var(--sb-control-support-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-lineHeight-tight);
-  color: var(--prime-sys-color-content-muted);
+}
+
+.separator {
+  margin-block: var(--prime-sys-spacing-x1);
 }
 
 .menu {
   display: flex;
   flex-direction: column;
   gap: var(--prime-sys-spacing-x1);
-  min-width: 0;
+  list-style: none;
   margin: 0;
   padding: 0;
-  list-style: none;
+  min-width: 0;
 }
 
 .menuItem {
   display: flex;
-  flex-direction: row;
   align-items: stretch;
   gap: var(--prime-sys-spacing-x1);
   min-width: 0;
 }
 
 .menuButton {
-  box-sizing: border-box;
-  display: inline-flex;
-  flex: 1 1 auto;
-  flex-direction: row;
-  align-items: center;
   justify-content: flex-start;
-  gap: var(--sb-control-gap);
+  width: 100%;
   min-width: 0;
-  min-height: var(--sb-control-height);
-  padding-inline: var(--sb-control-padding-x);
-  padding-block: var(--sb-control-padding-y);
-  border: none;
-  border-radius: var(--sb-control-radius);
-  background: transparent;
-  appearance: none;
-  color: var(--prime-sys-color-content-primary);
-  font-size: var(--sb-control-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: 1.2;
-  text-align: left;
   text-decoration: none;
-  cursor: pointer;
-  transition: background-color var(--prime-sys-motion-fast) var(--sb-transition-ease);
 }
 
-.menuButton:hover {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-}
-
-.menuButton:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-}
-
+.menuButtonActive,
 .menuButton[data-active="true"],
 .menuButton[aria-current="page"] {
   background: var(--prime-sys-color-action-neutralBackgroundHover);
 }
 
-.menuButton[aria-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
+.itemButton {
+  width: 100%;
 }
 
 .menuIcon {
   display: inline-flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--sb-control-icon);
-  height: var(--sb-control-icon);
+  flex-shrink: 0;
+  width: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-icon);
   color: var(--prime-sys-color-content-secondary);
 }
 
 .menuIcon > :global(svg) {
   width: 100%;
   height: 100%;
-}
-
-.menuButton[data-active="true"] .menuIcon,
-.menuButton[aria-current="page"] .menuIcon {
-  color: var(--prime-sys-color-content-primary);
 }
 
 .menuLabel {
@@ -423,148 +221,66 @@
 }
 
 .menuTrailing {
-  display: inline-flex;
   margin-inline-start: auto;
   color: var(--prime-sys-color-content-muted);
 }
 
+.menuAction {
+  min-width: unset;
+  width: auto;
+  padding-inline: var(--prime-sys-spacing-x2);
+}
+
+.toggleButton {
+  min-width: unset;
+}
+
 .identityButton {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
+  justify-content: flex-start;
   width: 100%;
-  min-height: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
-  gap: var(--sb-control-gap);
-  padding: var(--sb-control-padding-y);
-  border: none;
-  border-radius: var(--sb-control-radius);
-  background: transparent;
-  color: var(--prime-sys-color-content-primary);
-  text-align: left;
-  cursor: pointer;
-  transition: background-color var(--prime-sys-motion-fast) var(--sb-transition-ease);
-}
-
-.identityButton:hover {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-}
-
-.identityButton:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-}
-
-.identityButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  min-width: 0;
 }
 
 .identityButtonLeading {
   display: inline-flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--sb-identity-leading-size);
-  height: var(--sb-identity-leading-size);
-  border-radius: var(--prime-sys-shape-radius-s);
-  overflow: hidden;
+  width: var(--prime-sys-size-avatar-m-size);
+  height: var(--prime-sys-size-avatar-m-size);
+  flex-shrink: 0;
 }
 
 .identityButtonMain {
   display: flex;
+  min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  min-width: 0;
   gap: var(--prime-sys-unit-2px);
 }
 
 .identityButtonTitle {
-  font-size: var(--sb-identity-title-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
+  font-size: var(--prime-sys-size-control-m-text);
   line-height: 1.2;
-  color: var(--prime-sys-color-content-primary);
-  min-width: 0;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .identityButtonSubtitle {
-  font-size: var(--sb-identity-subtitle-text);
+  font-size: var(--prime-sys-size-control-s-supportText);
   line-height: 1.2;
-  color: var(--prime-sys-color-content-secondary);
-  min-width: 0;
+  color: var(--prime-sys-color-content-muted);
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .identityButtonTrailing {
   display: inline-flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  font-size: var(--sb-control-icon);
-  line-height: 1;
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.identityButtonTrailing > :global(svg) {
-  width: 1em;
-  height: 1em;
-}
-
-.toggleButton {
-  box-sizing: border-box;
-  display: inline-flex;
   flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--sb-control-height);
-  height: var(--sb-control-height);
-  padding: 0;
-  border: none;
-  border-radius: var(--sb-control-radius);
-  background: transparent;
   color: var(--prime-sys-color-content-secondary);
-  cursor: pointer;
-  font-size: var(--sb-control-icon);
-  transition: background-color var(--prime-sys-motion-fast) var(--sb-transition-ease);
-}
-
-.toggleButton:hover {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-}
-
-.toggleButton:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-}
-
-.menuAction {
-  box-sizing: border-box;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--sb-control-height);
-  height: var(--sb-control-height);
-  padding: 0;
-  border: none;
-  border-radius: var(--sb-control-radius);
-  background: transparent;
-  color: var(--prime-sys-color-content-secondary);
-  cursor: pointer;
-  transition: background-color var(--prime-sys-motion-fast) var(--sb-transition-ease);
-}
-
-.menuAction:hover {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-}
-
-.menuAction:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
 }
 
 .text {
@@ -574,33 +290,26 @@
   white-space: nowrap;
 }
 
-/* --- Док-навигация внутри `NavPanel` (дерево категорий, стек секций) --- */
-
 .navPanelBody {
   display: flex;
-  flex-direction: column;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+  min-width: 0;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  gap: var(--prime-sys-spacing-x4);
-  padding: 0;
 }
 
-/* Дерево растягивается, чтобы прижать последующие секции (System и т.п.) ко дну. */
 .navDocTree {
   display: flex;
   flex-direction: column;
-  flex: 1 0 auto;
-  gap: var(--prime-sys-spacing-x4);
+  gap: var(--prime-sys-spacing-x2);
+  min-width: 0;
 }
 
 .navPanelHeading {
   margin: 0;
-  padding-block: var(--prime-sys-spacing-x2);
-  font-size: var(--sb-control-text);
+  font-size: var(--prime-sys-size-control-m-text);
   font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-lineHeight-tight);
   color: var(--prime-sys-color-content-primary);
 }
 
@@ -612,56 +321,45 @@
 }
 
 .navCategoryTrigger {
-  display: flex;
-  flex-direction: row;
+  display: inline-flex;
   align-items: center;
-  gap: var(--prime-sys-spacing-x2);
-  box-sizing: border-box;
+  gap: var(--prime-sys-spacing-x1);
+  min-width: 0;
   width: 100%;
-  padding-block: var(--prime-sys-spacing-x2);
-  padding-inline: var(--prime-sys-spacing-x1);
-  border: none;
-  border-radius: var(--sb-control-radius);
   margin: 0;
+  padding-block: var(--prime-sys-spacing-x1);
+  padding-inline: var(--prime-sys-spacing-x2);
+  border: 0;
+  border-radius: var(--prime-sys-size-control-m-radius);
   background: transparent;
   color: var(--prime-sys-color-content-muted);
-  font: inherit;
-  font-size: var(--sb-control-support-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-lineHeight-tight);
-  text-align: left;
-  text-decoration: none;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
 }
 
-.navCategoryTrigger:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: 2px;
+.navCategoryTrigger:hover {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
 }
 
-.navCategoryTrigger svg {
-  flex-shrink: 0;
-  color: var(--prime-sys-color-content-muted);
-  transition: transform var(--prime-sys-motion-duration-medium)
-    var(--prime-sys-motion-easing-standard);
+.navCategoryTrigger > :global(svg) {
+  margin-inline-start: auto;
+  transition: transform var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
-.navCategoryTrigger[data-expanded="true"] svg {
+.navCategoryTrigger[data-expanded="true"] > :global(svg) {
   transform: rotate(90deg);
 }
 
 .navCategoryLabel {
-  flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .navCategoryCount {
   flex-shrink: 0;
   color: var(--prime-sys-color-content-muted);
-  font-size: var(--sb-control-support-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
+  font-size: var(--prime-sys-size-control-s-supportText);
 }
 
 .navCategoryPanel {
@@ -671,282 +369,128 @@
   min-width: 0;
 }
 
-@media (max-width: 64rem) {
-  /* --- hidden: в потоке не занимает место; панель за экраном --- */
-  .root[data-responsive="true"][data-sidebar-mode="hidden"] {
-    position: relative;
-    width: 0;
-    min-width: 0;
-    block-size: 0;
-    height: 0;
-    margin-inline-start: 0;
-    margin-inline-end: 0;
-    margin-block: 0;
-  }
+.floatingToggle {
+  position: fixed;
+  z-index: calc(var(--prime-sys-elevation-zIndex-modal) + 1);
+  inset-block-start: calc(env(safe-area-inset-top, 0px) + var(--prime-sys-spacing-x2));
+  inset-inline-start: calc(env(safe-area-inset-left, 0px) + var(--prime-sys-spacing-x2));
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
 
-  /* --- compact: узкая фиксированная колонка в потоке --- */
-  .root[data-responsive="true"][data-sidebar-mode="compact"] {
-    position: relative;
-    width: var(--sb-compact-rail-width);
-    min-width: var(--sb-compact-rail-width);
-    height: 100dvh;
-    max-height: 100dvh;
-    align-self: stretch;
-    margin: 0;
-  }
-
-  /* --- expand: оверлей; aside в потоке не занимает ширину --- */
-  .root[data-responsive="true"][data-sidebar-mode="expand"] {
-    position: relative;
-    width: 0;
-    min-width: 0;
-    block-size: 0;
-    height: 0;
-    margin-inline-start: 0;
-    margin-inline-end: 0;
-    margin-block: 0;
-  }
-
-  .root[data-responsive="true"][data-sidebar-mode="hidden"] .navArea,
-  .root[data-responsive="true"][data-sidebar-mode="expand"] .navArea {
-    position: fixed;
-    inset: 0;
-    z-index: var(--prime-sys-elevation-zIndex-modal);
-    width: 100vw;
-    min-width: 100vw;
-    overflow: hidden;
-  }
-
-  .root[data-responsive="true"][data-sidebar-mode="hidden"] .navArea {
-    pointer-events: none;
-  }
-
-  .root[data-responsive="true"][data-sidebar-mode="expand"] .navArea {
-    pointer-events: auto;
-  }
-
-  .root[data-responsive="true"][data-sidebar-mode="compact"] .navArea {
-    position: relative;
-    inset: auto;
-    z-index: 1;
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    min-width: 100%;
-    height: 100%;
-    max-height: 100%;
-    overflow: hidden;
-    pointer-events: auto;
-  }
-
-  .root[data-responsive="true"][data-sidebar-mode="hidden"] .backdrop,
-  .root[data-responsive="true"][data-sidebar-mode="compact"] .backdrop {
+@media (min-width: 48rem) {
+  .root[data-state="compact"] .groupHeaderAction,
+  .root[data-state="compact"] .menuTrailing,
+  .root[data-state="compact"] .navCategoryCount,
+  .root[data-state="compact"] .identityButtonTrailing {
     display: none;
   }
 
-  .root[data-responsive="true"][data-sidebar-mode="expand"] .backdrop {
-    display: block;
-    background: rgb(0 0 0 / 58%);
-    opacity: 1;
-    pointer-events: auto;
-    transition: opacity var(--sb-transition-duration) var(--sb-transition-ease);
+  .root[data-state="compact"] .group,
+  .root[data-state="compact"] .header,
+  .root[data-state="compact"] .footer,
+  .root[data-state="compact"] .navPanelBody {
+    align-items: center;
   }
 
-  /* Оверлейные панели (hidden | expand): одна база размеров */
-  .root[data-responsive="true"][data-sidebar-mode="hidden"] .navPanel,
-  .root[data-responsive="true"][data-sidebar-mode="expand"] .navPanel {
-    position: relative;
-    z-index: 1;
-    width: min(100%, max(var(--sb-panel-width), min-content));
-    min-width: min(var(--sb-panel-width), 100%);
+  .root[data-state="compact"] .menuItem {
+    justify-content: center;
+  }
+
+  .root[data-state="compact"] .menuButton,
+  .root[data-state="compact"] .itemButton,
+  .root[data-state="compact"] .navCategoryTrigger,
+  .root[data-state="compact"] .identityButton {
+    justify-content: center;
+  }
+
+  .root[data-state="compact"] .menuLabel,
+  .root[data-state="compact"] .identityButtonMain {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .root[data-state="compact"] .groupLabel,
+  .root[data-state="compact"] .navPanelHeading,
+  .root[data-state="compact"] .navCategoryLabel {
     max-width: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    min-height: 0;
-    border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
-    transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .root[data-responsive="true"][data-sidebar-mode="compact"] .navPanel {
-    position: relative;
-    z-index: 1;
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    height: 100%;
-    max-height: 100%;
-    min-height: 0;
-    border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
-    transform: none;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .root[data-responsive="true"][data-sidebar-mode="expand"] .navPanel {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* На очень узких экранах (≤320px) — expand на всю ширину */
-  @media (max-width: 320px) {
-    .root[data-responsive="true"][data-sidebar-mode="expand"] .navPanel {
-      width: 100%;
-      min-width: 100%;
-      max-width: 100%;
-      border-radius: 0;
-    }
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
-/* Компактный rail (≥481px): иконки, подписи с … — для узкого overlay и для page-nav на десктопе */
-@media (min-width: 481px) {
-  .root[data-sidebar-mode="compact"] .navPanel {
-    padding-inline: var(--prime-sys-unit-2px);
-  }
-
-  .root[data-sidebar-mode="compact"] .headerRow {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .root[data-sidebar-mode="compact"] .headerMain {
-    align-items: center;
-  }
-
-  .root[data-sidebar-mode="compact"] .identityButton {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    min-height: auto;
-    padding-inline: var(--prime-sys-unit-2px);
-  }
-
-  .root[data-sidebar-mode="compact"] .identityButtonMain {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .root[data-sidebar-mode="compact"] .group {
-    align-items: center;
-  }
-
-  .root[data-sidebar-mode="compact"] .groupLabel {
-    width: 100%;
-    max-width: 100%;
-    padding-inline: 0;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .root[data-sidebar-mode="compact"] .menuItem {
-    justify-content: center;
-  }
-
-  .root[data-sidebar-mode="compact"] .menuButton {
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 0;
+@media (max-width: 47.999rem) {
+  .root {
+    width: 0;
     min-width: 0;
-    text-align: center;
+    flex-basis: 0;
   }
 
-  .root[data-sidebar-mode="compact"] .menuLabel {
+  .navArea {
+    position: fixed;
+    inset: 0;
+    z-index: var(--prime-sys-elevation-zIndex-modal);
+    pointer-events: none;
+  }
+
+  .root[data-mobile-open="true"] .navArea {
+    pointer-events: auto;
+  }
+
+  .backdrop {
+    display: block;
+    background: var(--prime-sys-color-surface-overlay);
+    backdrop-filter: blur(var(--prime-sys-unit-8px));
+    transition: opacity var(--sb-transition-duration) var(--sb-transition-ease);
+  }
+
+  .root[data-mobile-open="true"] .backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .navPanel {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
+    top: 0;
+    bottom: 0;
+    height: 100dvh;
+    width: min(var(--sb-expanded-width), 90vw);
+    min-width: min(var(--sb-expanded-width), 90vw);
+    max-width: 100vw;
+    transform: none;
   }
 
-  .root[data-sidebar-mode="compact"] .menuTrailing {
-    display: none;
+  .root[data-side="left"] .navPanel {
+    left: 0;
+    border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
+    transform: translateX(-100%);
   }
 
-  .root[data-sidebar-mode="compact"] .navPanelBody {
-    align-items: center;
+  .root[data-side="right"] .navPanel {
+    right: 0;
+    border-radius: var(--prime-sys-shape-radius-l) 0 0 var(--prime-sys-shape-radius-l);
+    transform: translateX(100%);
   }
 
-  .root[data-sidebar-mode="compact"] .navPanelHeading {
-    width: 100%;
-    max-width: 100%;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .root[data-sidebar-mode="compact"] .navCategory {
-    align-items: center;
-    max-width: 100%;
-  }
-
-  .root[data-sidebar-mode="compact"] .navCategoryTrigger {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: var(--prime-sys-spacing-x1);
-    max-width: 100%;
-    text-align: center;
-  }
-
-  .root[data-sidebar-mode="compact"] .navCategoryTrigger svg {
-    display: none;
-  }
-
-  .root[data-sidebar-mode="compact"] .navCategoryTrigger[data-expanded="true"] svg {
-    display: none;
-  }
-
-  .root[data-sidebar-mode="compact"] .navCategoryLabel {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: 100%;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .root[data-sidebar-mode="compact"] .navCategoryCount {
-    display: none;
+  .root[data-mobile-open="true"] .navPanel {
+    transform: translateX(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .root {
-    transition: none;
-  }
-
-  .navArea,
   .navPanel,
-  .root[data-responsive="true"] .backdrop,
-  .menuButton,
-  .menuAction,
-  .navCategoryTrigger svg {
+  .floatingToggle,
+  .backdrop,
+  .navCategoryTrigger > :global(svg) {
     transition: none;
   }
 }
