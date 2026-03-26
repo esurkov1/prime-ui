@@ -46,7 +46,7 @@ import { Input } from "prime-ui-kit";
 
 export function SkuFieldComparison() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <>
       <Input.Root size="s" label="SKU (table)" hint="For grid rows">
         <Input.Wrapper>
           <Input.Field placeholder="ART-0000" />
@@ -57,7 +57,7 @@ export function SkuFieldComparison() {
           <Input.Field placeholder="ART-0000" />
         </Input.Wrapper>
       </Input.Root>
-    </div>
+    </>
   );
 }
 ```
@@ -71,15 +71,8 @@ import { Input } from "prime-ui-kit";
 
 export function WorkspaceUrlRow() {
   return (
-    <section
-      style={{
-        maxWidth: 480,
-        padding: 20,
-        borderRadius: 12,
-        border: "1px solid var(--prime-sys-color-border-subtle, #e4e4e7)",
-      }}
-    >
-      <h3 style={{ margin: "0 0 16px", fontSize: 16 }}>Workspace URL</h3>
+    <section>
+      <h3>Workspace URL</h3>
       <Input.Root size="m" label="Subdomain" hint="Latin letters and digits only">
         <Input.Wrapper>
           <Input.Affix side="start">https://</Input.Affix>
@@ -104,7 +97,7 @@ export function SupportTicketFilter() {
   const [q, setQ] = React.useState("");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 400 }}>
+    <>
       <Input.Root size="m" label="Search by subject" hint="Filter by entered text">
         <Input.Wrapper>
           <Input.Field
@@ -118,7 +111,7 @@ export function SupportTicketFilter() {
       <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setQ("")}>
         Clear
       </Button.Root>
-    </div>
+    </>
   );
 }
 ```

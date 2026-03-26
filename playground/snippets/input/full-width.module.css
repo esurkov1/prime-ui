@@ -1,0 +1,22 @@
+.root {
+  display: grid;
+  gap: var(--prime-sys-spacing-x4);
+  width: 100%;
+  max-width: 35rem;
+  box-sizing: border-box;
+}
+
+.narrow {
+  max-width: 13.75rem;
+}
+
+.wide {
+  width: 100%;
+}
+
+.caption {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  line-height: var(--prime-sys-typography-lineHeightScale-xs);
+  opacity: 0.8;
+}
