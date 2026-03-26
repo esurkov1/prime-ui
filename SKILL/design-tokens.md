@@ -194,13 +194,14 @@ Values differ for light / dark themes (automatically via `data-theme`).
 | `base` | 10 | Base content |
 | `sticky` | 100 | Sticky header, fixed sidebar |
 | `popover` | 1000 | Popover |
-| `dropdown` | 1100 | Dropdown, Select menu |
-| `tooltip` | 1200 | Tooltip |
-| `modal` | 2000 | Modal, Drawer |
+| `dropdown` | 1200 | Dropdown, Select menu (above popover) |
+| `tooltip` | 1600 | Tooltip (above popover and dropdown) |
+| `modal` | 2000 | Modal |
+| `drawer` | 2000 | Drawer, fullscreen mobile sidebar (same numeric level as `modal`) |
 | `toast` | 3000 | Notification |
 
 **Layout rule:** for sticky header — `z-index: var(--prime-sys-elevation-zIndex-sticky)`.
-Sidebar on desktop — `base`; Drawer on mobile — `modal`. Do not invent custom z-index values.
+Sidebar on desktop — `base`; Drawer on mobile — `drawer`. Do not invent custom z-index values.
 
 ---
 

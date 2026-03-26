@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--prime-sys-elevation-zIndex-modal);
+  z-index: var(--prime-sys-elevation-zIndex-drawer);
   background: var(--prime-sys-color-surface-overlay);
   backdrop-filter: blur(var(--prime-sys-unit-8px));
   animation: drawerFadeIn var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
@@ -9,7 +9,7 @@
 
 .panel {
   position: fixed;
-  z-index: var(--prime-sys-elevation-zIndex-modal);
+  z-index: var(--prime-sys-elevation-zIndex-drawer);
   display: flex;
   flex-direction: column;
   min-height: 0;

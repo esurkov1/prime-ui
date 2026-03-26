@@ -17,6 +17,7 @@ describe("generated token styles", () => {
 
     expect(lightThemeCss).toContain("--prime-sys-typography-family-base");
     expect(lightThemeCss).toContain("--prime-sys-elevation-zIndex-modal");
+    expect(lightThemeCss).toContain("--prime-sys-elevation-zIndex-drawer");
     expect(lightThemeCss).toContain("--prime-sys-elevation-zIndex-toast");
     expect(lightThemeCss).toContain("--prime-sys-color-dataTable-dividerVertical");
     expect(lightThemeCss).toContain("--prime-sys-color-badge-pink-backgroundSoft");

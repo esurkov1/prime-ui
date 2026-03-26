@@ -456,7 +456,7 @@
 
 .floatingToggle {
   position: fixed;
-  z-index: calc(var(--prime-sys-elevation-zIndex-modal) + 1);
+  z-index: calc(var(--prime-sys-elevation-zIndex-drawer) + 1);
   inset-block-start: calc(env(safe-area-inset-top, 0px) + var(--prime-sys-spacing-x2));
   inset-inline-start: calc(env(safe-area-inset-left, 0px) + var(--prime-sys-spacing-x2));
   box-shadow: var(--prime-sys-elevation-shadow-surface);
@@ -567,7 +567,7 @@
   .navArea {
     position: fixed;
     inset: 0;
-    z-index: var(--prime-sys-elevation-zIndex-modal);
+    z-index: var(--prime-sys-elevation-zIndex-drawer);
     pointer-events: none;
   }
 

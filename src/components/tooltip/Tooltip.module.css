@@ -5,6 +5,7 @@
   flex-direction: column;
   position: fixed;
   z-index: var(--prime-sys-elevation-zIndex-tooltip);
+  isolation: isolate;
   pointer-events: none;
   border-radius: var(--prime-sys-size-tooltip-m-radius);
   padding-block: var(--prime-sys-size-tooltip-m-paddingY);

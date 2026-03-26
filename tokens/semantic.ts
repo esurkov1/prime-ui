@@ -329,14 +329,20 @@ export const semanticTokens = {
     x12: "{spaces.layout.5xl}",
     x14: "{spaces.layout.6xl}",
   },
+  /**
+   * Слои наложения: одна ось `elevation.zIndex.*` на весь кит. Потребители подставляют `--prime-sys-elevation-zIndex-*`.
+   * Порядок: base → sticky → popover → dropdown → tooltip → modal (= drawer) → toast.
+   */
   elevation: {
     zIndex: {
       base: "{zIndex.base}",
       sticky: "{zIndex.sticky}",
-      dropdown: "{zIndex.dropdown}",
       popover: "{zIndex.popover}",
+      dropdown: "{zIndex.dropdown}",
       tooltip: "{zIndex.tooltip}",
       modal: "{zIndex.modal}",
+      /** Тот же уровень, что `modal`: `Drawer`, fullscreen mobile `Sidebar`. */
+      drawer: "{zIndex.modal}",
       toast: "{zIndex.toast}",
     },
     shadow: {

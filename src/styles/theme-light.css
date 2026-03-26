@@ -99,6 +99,7 @@
   --prime-sys-elevation-shadow-surface: var(--prime-ref-shadow-s);
   --prime-sys-elevation-shadow-tooltip: 0 12px 28px rgba(15, 17, 21, 0.22), 0 4px 10px rgba(15, 17, 21, 0.16);
   --prime-sys-elevation-zIndex-base: var(--prime-ref-zIndex-base);
+  --prime-sys-elevation-zIndex-drawer: var(--prime-ref-zIndex-modal);
   --prime-sys-elevation-zIndex-dropdown: var(--prime-ref-zIndex-dropdown);
   --prime-sys-elevation-zIndex-modal: var(--prime-ref-zIndex-modal);
   --prime-sys-elevation-zIndex-popover: var(--prime-ref-zIndex-popover);

@@ -247,10 +247,10 @@
   --prime-ref-spaces-layout-xl: 1.25rem;
   --prime-ref-spaces-layout-xs: 0.25rem;
   --prime-ref-zIndex-base: 10;
-  --prime-ref-zIndex-dropdown: 1100;
+  --prime-ref-zIndex-dropdown: 1200;
   --prime-ref-zIndex-modal: 2000;
   --prime-ref-zIndex-popover: 1000;
   --prime-ref-zIndex-sticky: 100;
   --prime-ref-zIndex-toast: 3000;
-  --prime-ref-zIndex-tooltip: 1200;
+  --prime-ref-zIndex-tooltip: 1600;
 }
