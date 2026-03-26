@@ -464,7 +464,6 @@
   );
   inset-inline-end: 0;
   transform: translate(50%, -50%);
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   background: var(--prime-sys-color-surface-elevated);
   box-shadow: var(--prime-sys-elevation-shadow-surface);
   pointer-events: auto;
