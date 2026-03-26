@@ -1,5 +1,6 @@
 import { ChevronsRight, PanelLeftOpen } from "lucide-react";
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useOverlayModal } from "@/hooks/useOverlayModal";
 import { cx } from "@/internal/cx";
@@ -185,11 +186,18 @@ function SidebarRoot({
 
   const shouldShowInlineOverlay =
     responsive === true && isNarrowViewport && mode === "expand";
+  /** Полностью скрыт — язычок на любом viewport (в т.ч. ≤480). Компакт на узком — только если не xs (иначе только hidden). */
   const shouldShowFloatingToggle =
-    responsive === true &&
-    isNarrowViewport &&
-    !isXsHiddenViewport &&
-    (mode === "hidden" || mode === "compact");
+    mode === "hidden" ||
+    (responsive === true &&
+      isNarrowViewport &&
+      !isXsHiddenViewport &&
+      mode === "compact");
+
+  const [floatingPortalReady, setFloatingPortalReady] = React.useState(false);
+  React.useLayoutEffect(() => {
+    setFloatingPortalReady(true);
+  }, []);
 
   const navPanelId = React.useId();
 
@@ -255,25 +263,28 @@ function SidebarRoot({
           />
           {children}
         </div>
-        {shouldShowFloatingToggle ? (
-          <button
-            type="button"
-            className={styles.floatingToggle}
-            onClick={handleFloatingClick}
-            aria-label={
-              mode === "hidden"
-                ? "Открыть сайдбар (компактно)"
-                : "Развернуть сайдбар на весь экран"
-            }
-            aria-controls={navPanelId}
-          >
-            {mode === "compact" ? (
-              <ChevronsRight size="1em" strokeWidth={2} />
-            ) : (
-              <PanelLeftOpen size="1em" strokeWidth={2} />
-            )}
-          </button>
-        ) : null}
+        {shouldShowFloatingToggle && floatingPortalReady && typeof document !== "undefined"
+          ? createPortal(
+              <button
+                type="button"
+                className={styles.floatingToggle}
+                onClick={handleFloatingClick}
+                aria-label={
+                  mode === "hidden"
+                    ? "Открыть сайдбар (компактно)"
+                    : "Развернуть сайдбар на весь экран"
+                }
+                aria-controls={navPanelId}
+              >
+                {mode === "compact" ? (
+                  <ChevronsRight size="1em" strokeWidth={2} />
+                ) : (
+                  <PanelLeftOpen size="1em" strokeWidth={2} />
+                )}
+              </button>,
+              document.body,
+            )
+          : null}
       </aside>
     </SidebarProvider>
   );

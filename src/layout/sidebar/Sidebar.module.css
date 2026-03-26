@@ -167,7 +167,8 @@
   left: env(safe-area-inset-left, 0px);
   top: calc(env(safe-area-inset-top, 0px) + var(--sb-page-inset) + var(--sb-panel-padding-block));
   right: auto;
-  z-index: calc(var(--prime-sys-elevation-zIndex-modal) + 1);
+  /* Портал в body: выше main/surface в grid, ниже настоящих модалок */
+  z-index: calc(var(--prime-sys-elevation-zIndex-modal) + 10);
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;

@@ -117,7 +117,7 @@ describe("Sidebar", () => {
     }
   });
 
-  it("does not show floating toggle when viewport matches xs hidden (≤480px)", () => {
+  it("shows floating open control when fully hidden even on xs viewport (≤480px)", () => {
     const matchMediaImpl = (query: string) => {
       if (query.includes("480px") && query.includes("max-width")) {
         return {
@@ -153,7 +153,7 @@ describe("Sidebar", () => {
         </Sidebar.Root>,
       );
 
-      expect(screen.queryByRole("button", { name: /Открыть сайдбар/ })).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Открыть сайдбар/ })).toBeInTheDocument();
     } finally {
       window.matchMedia = previousMatchMedia;
     }
