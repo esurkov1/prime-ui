@@ -7,9 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# На main не отменяем в процессе — чтобы не оборвать publish; на PR — отменяем устаревшие прогоны.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/main') }}
 
 jobs:
   verify:
@@ -26,3 +27,44 @@ jobs:
 
       - name: Verify
         run: bun run verify
+
+  publish:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Check if version already on npm
+        id: npm_version
+        run: |
+          PKG_NAME=$(jq -r .name package.json)
+          PKG_VER=$(jq -r .version package.json)
+          if npm view "${PKG_NAME}@${PKG_VER}" version >/dev/null 2>&1; then
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+            echo "Version ${PKG_VER} of ${PKG_NAME} is already on npm; skipping publish."
+          else
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+            echo "Version ${PKG_VER} of ${PKG_NAME} is not on npm; will publish."
+          fi
+
+      - name: Publish to npm
+        if: steps.npm_version.outputs.already_published != 'true'
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
