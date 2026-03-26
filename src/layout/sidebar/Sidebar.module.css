@@ -229,6 +229,10 @@
     gap var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
+.menuButton[data-size] {
+  min-width: 0;
+}
+
 .menuButton:hover {
   background: var(--prime-sys-color-action-neutralBackgroundHover);
 }
@@ -309,6 +313,10 @@
     transform var(--sb-transition-duration) var(--sb-transition-ease),
     padding var(--sb-transition-duration) var(--sb-transition-ease),
     gap var(--sb-transition-duration) var(--sb-transition-ease);
+}
+
+.identityButton[data-size] {
+  min-width: 0;
 }
 
 .identityButtonLeading {
@@ -485,6 +493,11 @@
     );
   }
 
+  .root[data-state="compact"] .menuButton[data-size],
+  .root[data-state="compact"] .itemButton[data-size] {
+    min-width: var(--sb-control-height);
+  }
+
   .root[data-state="compact"] .menuLabel {
     max-width: 0;
     overflow: hidden;
@@ -512,6 +525,10 @@
         2
       )
     );
+  }
+
+  .root[data-state="compact"] .identityButton[data-size] {
+    min-width: var(--sb-control-height);
   }
 
   .root[data-state="compact"] .group {
