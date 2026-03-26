@@ -19,16 +19,16 @@ description: >
 | What | Path (this repository) | After `npm install prime-ui-kit` |
 |------|--------------------------|-------------------------------------|
 | Per-component API, props, examples | `../src/components/<kebab-name>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<kebab-name>/COMPONENT.md` |
-| Design tokens, full 41-component catalog, source annotations | `../references/*.md` | `node_modules/prime-ui-kit/references/*.md` |
+| Design tokens, full 41-component catalog, flexbox source notes | `design-tokens.md`, `component-catalog.md`, `responsive-flexbox-sources.md` (next to `SKILL.md`) | `node_modules/prime-ui-kit/SKILL/*.md` |
 
-This skill lives in `SKILL/SKILL.md` (sibling of `references/` at repo root). Install as a Cursor skill by pointing the skill directory at `SKILL/` and keeping `references/` one level up next to it, or symlink/copy `references/` beside `SKILL/` if you relocate only the skill folder.
+Install as a Cursor skill by pointing the skill directory at `SKILL/` in this repository (clone or copy the whole `SKILL/` folder so `SKILL.md` and the sibling `.md` files stay together).
 
 ---
 
 ## Visual Language & Design Tokens
 
 Any responsive layout on prime-ui-kit **must** follow the system’s visual language.
-Full token reference: [`references/design-tokens.md`](../references/design-tokens.md).
+Full token reference: [`design-tokens.md`](./design-tokens.md).
 
 ### Mandatory rules
 
@@ -266,7 +266,7 @@ All **41** exported kit components — `COMPONENT.md` next to the implementation
 | Tooltip | [`tooltip/COMPONENT.md`](../src/components/tooltip/COMPONENT.md) |
 | Typography | [`typography/COMPONENT.md`](../src/components/typography/COMPONENT.md) |
 
-Responsive roles, zones, and scenarios (same 41): [`references/component-catalog.md`](../references/component-catalog.md).
+Responsive roles, zones, and scenarios (same 41): [`component-catalog.md`](./component-catalog.md).
 
 ---
 
@@ -302,7 +302,7 @@ Interactive elements under 44 px on mobile. Use `size="l"` for Button, Input, Se
 
 ### 8. Hard-coded visual values instead of tokens
 
-`background: #f3f4f7`, `gap: 16px`, `border-radius: 12px`, `z-index: 999` — all of this breaks theming and consistency. Use `--prime-sys-*` tokens. Details: [`references/design-tokens.md`](../references/design-tokens.md).
+`background: #f3f4f7`, `gap: 16px`, `border-radius: 12px`, `z-index: 999` — all of this breaks theming and consistency. Use `--prime-sys-*` tokens. Details: [`design-tokens.md`](./design-tokens.md).
 
 ### 9. Custom wrappers or “reskinned” kit components
 

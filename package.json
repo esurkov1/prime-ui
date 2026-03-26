@@ -61,7 +61,7 @@
     "dist",
     "src/styles",
     "src/components/**/COMPONENT.md",
-    "references/**/*.md",
+    "SKILL/*.md",
     "LICENSE"
   ],
   "publishConfig": {
