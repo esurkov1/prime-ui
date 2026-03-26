@@ -45,7 +45,7 @@ function buildDistributionDescription(segments: SegmentedProgressSegment[], tota
 }
 
 const SegmentedProgressBarRoot = React.forwardRef<HTMLDivElement, SegmentedProgressBarRootProps>(
-  ({ segments, label, size = "m", segmentGap = "hairline", className }, ref) => {
+  ({ segments, label, size = "m", segmentGap = "none", className }, ref) => {
     const labelId = React.useId();
     const descriptionId = React.useId();
     const safe = React.useMemo(

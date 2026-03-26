@@ -8,12 +8,8 @@ const segments = [
 export default function SegmentedGapSnippet() {
   return (
     <div className="stack examplePreviewBleed">
-      <SegmentedProgressBar.Root
-        segmentGap="hairline"
-        segments={segments}
-        label="hairline (по умолчанию)"
-      />
-      <SegmentedProgressBar.Root segmentGap="none" segments={segments} label="none" />
+      <SegmentedProgressBar.Root segments={segments} label="none (по умолчанию)" />
+      <SegmentedProgressBar.Root segmentGap="hairline" segments={segments} label="hairline" />
     </div>
   );
 }

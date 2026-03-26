@@ -67,11 +67,12 @@
   gap: 0;
 }
 
+/* Скругление только у трека (overflow: hidden) — не у каждого сегмента, иначе «капсулы» и зазоры. */
 .segment {
   box-sizing: border-box;
   min-width: 0;
   height: var(--seg-progress-track-h);
-  border-radius: var(--prime-sys-shape-radius-round);
+  border-radius: 0;
   transition:
     flex-grow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
     background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);

@@ -1,6 +1,0 @@
-.heroValue {
-  font-size: var(--prime-sys-typography-sizeScale-4xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-4xl);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  letter-spacing: var(--prime-sys-typography-tracking-tight);
-}
