@@ -37,6 +37,63 @@ export function Example() {
 }
 ```
 
+### Canonical example (icon-only control)
+
+Use this as the default copy-paste shell: **`aria-label`** (or another accessible name) on the **focusable** trigger, **`Button.Icon`** + **`Icon`**, and a short **`Tooltip.Content`** (often **`size="s"`** next to a **`size="m"`** control).
+
+```tsx
+import { Button, Icon, Tooltip } from "prime-ui-kit";
+
+export function CopyLinkHint() {
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <Button.Root
+          type="button"
+          variant="neutral"
+          mode="ghost"
+          size="m"
+          aria-label="Copy link"
+        >
+          <Button.Icon>
+            <Icon name="action.copy" size="s" tone="subtle" />
+          </Button.Icon>
+        </Button.Root>
+      </Tooltip.Trigger>
+      <Tooltip.Content size="s">Copy page link to clipboard</Tooltip.Content>
+    </Tooltip.Root>
+  );
+}
+```
+
+Source of truth (stays in sync with the snippet above): `examples/canonical-icon-hint.tsx`.
+
+### Examples (source)
+
+Runnable demos live next to this file (workspace imports use `@/`; published consumers use `prime-ui-kit`):
+
+| File | Intent |
+|------|--------|
+| `examples/canonical-icon-hint.tsx` | Icon-only button, **`aria-label`**, short hint |
+| `examples/scenario-delay-provider.tsx` | **`Tooltip.Provider`** with **`delayDuration={800}`** |
+| `examples/scenario-long-content.tsx` | Long wrapped copy; **`size="m"`** |
+| `examples/scenario-side-bottom.tsx` | **`side="bottom"`** when default placement clips |
+| `examples/scenario-controlled-programmatic.tsx` | **`open`** / **`onOpenChange`** with **`delayDuration={0}`** for demos |
+
+Playground snippets (broader variants, including Russian copy): `playground/snippets/tooltip/`.
+
+### Extended usage
+
+- **Delay:** wrap a subtree in **`Tooltip.Provider`** and set **`delayDuration`** (ms). Default is **400**; use a longer value to reduce accidental flashes, or **`0`** for tests and controlled demos.
+- **Long text:** rely on the built-in **`max-width`** and **`word-break`** on the content surface; prefer shorter copy when possible—if users must read a paragraph, use inline help, **Hint**, or **Popover** instead.
+- **Placement:** set **`side`** on **`Tooltip.Content`** when **top** clips; coordinates are **viewport-clamped** (**8px** inset) but the kit does **not** auto-flip to the opposite side.
+- **Controlled:** pass **`open`** and **`onOpenChange`** on **`Tooltip.Root`**; pointer/focus on the trigger still updates the same state. Pair with **`delayDuration={0}`** when an external control should show the tooltip immediately.
+- **Disabled triggers:** native **`disabled`** elements often skip hover/focus—wrap with a focusable container or use **`aria-disabled`** + custom styling if a tooltip on a “disabled” control is required.
+
+### Note for LLMs
+
+When generating **Tooltip** markup for this library: (1) **`Tooltip.Trigger`** takes **exactly one** **`ReactElement`** child (the implementation uses **`cloneElement`**). (2) Put the **accessible name** on the trigger (**`aria-label`**, visible text, or **`aria-labelledby`**)—the tooltip supplements it; do not rely on the tooltip alone for the control’s name. (3) Do not put **links, buttons, or inputs** inside **`Tooltip.Content`** (non-interactive layer, **`pointer-events: none`**). (4) Use **one** **`Tooltip.Root`** per anchor; do not attach one root to multiple triggers. (5) For starting points, mirror **`examples/canonical-icon-hint.tsx`**, then adapt **`scenario-*.tsx`** files.
+
 ## Rules
 
 - **Uncontrolled:** omit **`open`**; optional **`defaultOpen`** (defaults to **`false`**). **Controlled:** pass **`open`** and **`onOpenChange`**; the same open state drives visibility together with hover/focus on the trigger.
