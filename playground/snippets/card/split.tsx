@@ -6,18 +6,18 @@ export default function CardSplitSnippet() {
     <Card.Root variant="split">
       <Card.Split>
         <Card.SplitCell>
-          <Card.Lead>
+          <Card.IconBox>
             <Icon name="nav.layoutGrid" />
-          </Card.Lead>
+          </Card.IconBox>
           <Card.Stack>
             <Card.Label>Конверсия</Card.Label>
             <Card.Value>3.8%</Card.Value>
           </Card.Stack>
         </Card.SplitCell>
         <Card.SplitCell>
-          <Card.Lead>
+          <Card.IconBox>
             <Icon name="field.email" />
-          </Card.Lead>
+          </Card.IconBox>
           <Card.Stack>
             <Card.Label>Средний чек</Card.Label>
             <Card.Value>₽ 2 450</Card.Value>

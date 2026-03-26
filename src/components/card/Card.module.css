@@ -399,14 +399,15 @@
   border-inline-start: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
 }
 
-/* Иконка/бейдж слева: первый прямой потомок — Lead, второй — Stack с Label + Value */
-.splitCell:has(> .lead) {
+/* Как mini: IconBox + Stack — ряд, иконка в токенизированной плитке */
+.splitCell:has(> .iconBox) {
   flex-direction: row;
-  align-items: flex-start;
-  gap: var(--prime-sys-spacing-m);
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-l);
 }
 
-.splitCell:has(> .lead) > .stack {
+.splitCell:has(> .iconBox) > .stack {
   flex: 1 1 auto;
   min-width: 0;
 }
