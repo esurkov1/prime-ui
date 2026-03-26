@@ -1,4 +1,4 @@
-/* `page-nav`: колонка в `PageShell` nav area — без внешних полей у корня; схлопывание = `max-width` → 0. */
+/* `page-nav`: колонка в nav area PageShell; схлопывание — `max-width` → 0; внешние поля — токены ниже. */
 .root {
   --sb-context-width: var(--prime-sys-unit-4rem);
   --sb-panel-width: var(--prime-sys-unit-20rem);
@@ -107,19 +107,24 @@
   --sb-panel-width: var(--prime-sys-unit-16rem);
 }
 
-/* Сайдбар в nav area `PageShell`: на всю высоту ячейки, без margin вокруг — поля только внутри `.navPanel`. */
+/* Внешние поля от края вьюпорта и до main — только токены; внутри панели — свои padding в `.navPanel`. */
 .root[data-sidebar-slot="page-nav"] {
   flex: 0 0 auto;
   align-self: stretch;
   min-width: 0;
   min-height: 0;
-  height: 100%;
-  max-height: 100%;
-  margin: 0;
+  height: auto;
+  margin-block: var(--sb-page-inset);
+  margin-inline-start: var(--sb-page-inset);
+  margin-inline-end: var(--sb-page-gap);
   --sb-shell-gap: 0;
 }
 
-/* Целевая ширина колонки (не зависит от --sb-panel-visible-width при закрытии) — для max-width transition. */
+/*
+ * Целевая ширина «раскрытого» блока для max-width transition (пока закрыт — max-width: 0).
+ * simple: одна ширина панели.
+ * double: три слагаемых (rail + панель + зазор) — одного токена нет, сумма через calc — нормальная практика.
+ */
 .root[data-sidebar-slot="page-nav"][data-variant="simple"] {
   --sb-page-nav-expanded: var(--sb-panel-width);
 }
@@ -138,11 +143,25 @@
     min-width: 0;
     max-width: var(--sb-page-nav-expanded);
     overflow: hidden;
-    transition: max-width var(--sb-transition-duration) var(--sb-transition-ease);
+    transition:
+      max-width var(--sb-transition-duration) var(--sb-transition-ease),
+      margin-inline var(--sb-transition-duration) var(--sb-transition-ease),
+      margin-block var(--sb-transition-duration) var(--sb-transition-ease);
   }
 
   .root[data-sidebar-slot="page-nav"][data-open="false"] {
     max-width: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    margin-block: var(--sb-page-inset);
+  }
+}
+
+@media (max-width: 64rem) {
+  .root[data-sidebar-slot="page-nav"][data-open="false"] {
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    margin-block: 0;
   }
 }
 
@@ -206,7 +225,7 @@
 .floatingToggle {
   position: fixed;
   left: env(safe-area-inset-left, 0px);
-  top: calc(env(safe-area-inset-top, 0px) + var(--sb-panel-padding-block));
+  top: calc(env(safe-area-inset-top, 0px) + var(--sb-page-inset) + var(--sb-panel-padding-block));
   right: auto;
   z-index: calc(var(--prime-sys-elevation-zIndex-modal) + 1);
   box-sizing: border-box;
