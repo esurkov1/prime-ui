@@ -8,7 +8,7 @@ import {
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 
-import { Button, type ButtonRootProps } from "@/components/button/Button";
+import type { ButtonRootProps } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
@@ -128,9 +128,12 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
   (
     {
       className,
-      size,
-      variant = "neutral",
-      mode = "ghost",
+      size: _size,
+      variant: _variant,
+      mode: _mode,
+      fullWidth: _fullWidth,
+      loading: _loading,
+      asChild: _asChild,
       openLabel = "Скрыть сайдбар",
       closedLabel = "Открыть сайдбар",
       ...rest
@@ -139,14 +142,19 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
   ) => {
     const { state, toggleOpen, navPanelId, side, size: contextSize } = useSidebarContext();
     const expanded = state !== "hidden";
+    void _size;
+    void _variant;
+    void _mode;
+    void _fullWidth;
+    void _loading;
+    void _asChild;
+    void contextSize;
 
     return (
-      <Button.Root
+      <button
         {...rest}
         ref={ref}
-        size={size ?? contextSize}
-        variant={variant}
-        mode={mode}
+        type={rest.type ?? "button"}
         className={cx(styles.toggleButton, className)}
         aria-expanded={expanded}
         aria-controls={navPanelId}
@@ -158,8 +166,10 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
           }
         }}
       >
-        <Button.Icon>{iconForToggle(state, side)}</Button.Icon>
-      </Button.Root>
+        <span className={styles.menuIcon} aria-hidden="true">
+          {iconForToggle(state, side)}
+        </span>
+      </button>
     );
   },
 );
@@ -181,40 +191,34 @@ const SidebarIdentityButton = React.forwardRef<HTMLButtonElement, SidebarIdentit
     { className, type = "button", leading, title, subtitle, trailing, disabled, onClick, ...rest },
     ref,
   ) => {
-    const { size } = useSidebarContext();
+    const { size: _size } = useSidebarContext();
+    void _size;
 
     return (
-      <Button.Root
-        asChild
-        size={size}
-        variant="neutral"
-        mode="ghost"
+      <button
+        {...rest}
+        ref={ref}
+        type={type}
+        disabled={disabled}
+        onClick={onClick}
         className={cx(styles.identityButton, className)}
+        aria-label={typeof title === "string" ? title : rest["aria-label"]}
       >
-        <button
-          {...rest}
-          ref={ref}
-          type={type}
-          disabled={disabled}
-          onClick={onClick}
-          aria-label={typeof title === "string" ? title : rest["aria-label"]}
-        >
-          {leading === undefined ? null : (
-            <span className={styles.identityButtonLeading} aria-hidden="true">
-              {leading}
-            </span>
+        {leading === undefined ? null : (
+          <span className={styles.identityButtonLeading} aria-hidden="true">
+            {leading}
+          </span>
+        )}
+        <span className={styles.identityButtonMain}>
+          <span className={styles.identityButtonTitle}>{title}</span>
+          {subtitle === undefined ? null : (
+            <span className={styles.identityButtonSubtitle}>{subtitle}</span>
           )}
-          <span className={styles.identityButtonMain}>
-            <span className={styles.identityButtonTitle}>{title}</span>
-            {subtitle === undefined ? null : (
-              <span className={styles.identityButtonSubtitle}>{subtitle}</span>
-            )}
-          </span>
-          <span className={styles.identityButtonTrailing} aria-hidden="true">
-            {trailing ?? <ChevronsUpDown size="1em" strokeWidth={2} />}
-          </span>
-        </button>
-      </Button.Root>
+        </span>
+        <span className={styles.identityButtonTrailing} aria-hidden="true">
+          {trailing ?? <ChevronsUpDown size="1em" strokeWidth={2} />}
+        </span>
+      </button>
     );
   },
 );
@@ -315,20 +319,32 @@ export type SidebarMenuActionProps = Omit<ButtonRootProps, "children"> & {
 };
 
 const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
-  ({ className, size, variant = "neutral", mode = "ghost", children, ...rest }, ref) => {
-    const { size: contextSize } = useSidebarContext();
+  (
+    {
+      className,
+      children,
+      type = "button",
+      size: _size,
+      variant: _variant,
+      mode: _mode,
+      asChild: _asChild,
+      fullWidth: _fullWidth,
+      loading: _loading,
+      ...rest
+    },
+    ref,
+  ) => {
+    void _size;
+    void _variant;
+    void _mode;
+    void _asChild;
+    void _fullWidth;
+    void _loading;
 
     return (
-      <Button.Root
-        {...rest}
-        ref={ref}
-        size={size ?? contextSize}
-        variant={variant}
-        mode={mode}
-        className={cx(styles.menuAction, className)}
-      >
+      <button {...rest} ref={ref} type={type} className={cx(styles.menuAction, className)}>
         {children}
-      </Button.Root>
+      </button>
     );
   },
 );
@@ -342,35 +358,56 @@ export type SidebarMenuButtonProps = Omit<ButtonRootProps, "asChild"> & {
 
 const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
   (
-    { className, active, asChild = false, size, variant = "neutral", mode = "ghost", ...rest },
+    {
+      className,
+      active,
+      asChild = false,
+      disabled,
+      onClick,
+      type = "button",
+      size: _size,
+      variant: _variant,
+      mode: _mode,
+      fullWidth: _fullWidth,
+      loading: _loading,
+      ...rest
+    },
     ref,
   ) => {
-    const { size: contextSize } = useSidebarContext();
+    void _size;
+    void _variant;
+    void _mode;
+    void _fullWidth;
+    void _loading;
 
     if (asChild) {
       return (
-        <Button.Root
+        <Slot
           {...rest}
-          ref={ref}
-          asChild
-          size={size ?? contextSize}
-          variant={variant}
-          mode={mode}
+          ref={ref as React.Ref<HTMLElement>}
           className={cx(styles.menuButton, className)}
           data-active={active ? "true" : undefined}
+          aria-disabled={disabled || undefined}
+          onClick={
+            disabled
+              ? (e: React.MouseEvent) => {
+                  e.preventDefault();
+                }
+              : onClick
+          }
         />
       );
     }
 
     return (
-      <Button.Root
+      <button
         {...rest}
         ref={ref}
-        size={size ?? contextSize}
-        variant={variant}
-        mode={mode}
+        type={type}
+        disabled={disabled}
         className={cx(styles.menuButton, className)}
         data-active={active ? "true" : undefined}
+        onClick={onClick}
       />
     );
   },
@@ -396,8 +433,6 @@ export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof N
 
 const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRouterLinkProps>(
   ({ className, ...rest }, ref) => {
-    const { size: contextSize } = useSidebarContext();
-
     if (typeof className === "function") {
       return (
         <NavLink
@@ -410,17 +445,7 @@ const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRou
       );
     }
 
-    return (
-      <Button.Root
-        asChild
-        size={contextSize}
-        variant="neutral"
-        mode="ghost"
-        className={cx(styles.menuButton, className)}
-      >
-        <NavLink ref={ref} {...rest} />
-      </Button.Root>
-    );
+    return <NavLink ref={ref} {...rest} className={cx(styles.menuButton, className)} />;
   },
 );
 
