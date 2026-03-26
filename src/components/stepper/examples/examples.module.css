@@ -1,0 +1,16 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.rail {
+  width: 100%;
+  max-width: min(100%, 36rem);
+}
