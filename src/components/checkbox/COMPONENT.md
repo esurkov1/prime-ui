@@ -2,25 +2,49 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## About
+## Canonical
+
+- **Export:** `Checkbox` namespace — **`Checkbox.Root`**, **`Checkbox.Label`**, **`Checkbox.Hint`**, **`Checkbox.Error`**.
+- **Pattern:** compound field — native **`input type="checkbox"`** (visually hidden) + decorative box; **`Checkbox.Label`** is required for the interactive row and wires **`htmlFor`** to the input id.
+- **State:** **controlled** (`checked` + `onChange`) or **uncontrolled** (`defaultChecked`); internal checked state updates before consumer **`onChange`** runs.
+- **`indeterminate`:** boolean on **`Root`** — sets DOM **`input.indeterminate`** and mixed visual; not a third form value — clear or resync in your **`onChange`** when the user toggles.
+- **Sizing:** **`size`** `s` | `m` | `l` | `xl` on **`Root`** (default **`m`**); propagates via **`ControlSizeProvider`** to label/hint typography.
+- **Validation chrome:** **`variant="error"`** on **`Root`** and/or mounted **`Checkbox.Error`** → **`aria-invalid`**, error styling; **`Checkbox.Hint`** contributes to **`aria-describedby`** when mounted.
+- **Forwarding:** **`Root`** accepts **`Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size">`** spread onto the real input — use **`name`**, **`value`**, **`required`**, **`form`**, etc. Ref on **`Root`** targets the **input** element.
+- **Not supported:** **`asChild`**, loading state, or custom checkbox markup.
+
+## Extended
+
+### About
 
 A compound checkbox: a visually hidden native `input type="checkbox"`, a decorative box with check or indeterminate mark, and optional label, hint, and error text wired to `aria-describedby` and invalid state.
 
 - **When to use** — explicit consent, terms, or other “yes/no” fields that submit with the form (`name`, `value`, `required`).
 - **When to use** — row or “select all” patterns where the parent shows **indeterminate** when only some children are checked.
-- **When to use** — independent toggles (filters, optional features) rather than one-of-many choices.
+- **When to use** — independent toggles (feature flags, optional features, settings) rather than one-of-many choices.
 - **When to use** — hint text or inline validation aligned under the label column.
 - **When not to use** — exactly one option from a set of alternatives (prefer [Radio](../radio/COMPONENT.md)).
 - **When not to use** — a single binary setting where a switch fits the product language (prefer [Switch](../switch/COMPONENT.md)).
 - **When not to use** — you need `asChild` or fully custom markup; the control is a fixed [Label](../label/COMPONENT.md) row with a hidden input and SVG.
 
-## Composition
+### Scenarios (recipes)
+
+| Scenario | Approach |
+|----------|----------|
+| **Terms acceptance** | **`required`** on **`Root`**; optional **`Checkbox.Hint`** for legal context; show **`Checkbox.Error`** or **`variant="error"`** after validation when unchecked. |
+| **Feature flags list** | One **`Checkbox.Root` per flag**; independent **controlled** booleans or a small state map; no indeterminate unless a parent “enable all” exists. |
+| **Bulk select (row / table)** | **Header** checkbox: **`checked`** when all rows selected, **`indeterminate`** when some; **`onChange`** selects or clears all row ids. **Row** checkboxes toggle one id each. |
+| **Settings panel** | Stack of **`Root` → `Label` → optional `Hint`** rows; same **`size`** across the panel for rhythm; **`disabled`** for plan-gated options. |
+
+Runnable TSX for these patterns lives under **`examples/`** in this folder (`terms-acceptance.tsx`, `feature-flags-list.tsx`, `bulk-select-rows.tsx`, `settings-panel.tsx`).
+
+### Composition
 
 - **`Checkbox.Root`** — wraps the field in a `div` with `data-size`, `data-variant`, `data-disabled`, `data-invalid`, `data-checked`, `data-indeterminate`; provides context and `ControlSizeProvider` for child parts.
 - **`Checkbox.Label`** — required for the control: hosts the native checkbox and decorative SVG, then optional text in a trailing column; sets `htmlFor` to the input id.
 - **`Checkbox.Hint`** — optional; registers hint text and contributes its id to the input’s `aria-describedby`.
 - **`Checkbox.Error`** — optional; error-styled [Hint](../hint/COMPONENT.md) and registers invalid state when mounted (with `variant="error"` on the root when you want error chrome without the slot).
-- **Order:** `Root` → `Label` (always) → `Hint` / `Error` below when needed. Public API: `Checkbox` with `Root`, `Label`, `Hint`, `Error`.
+- **Order:** `Root` → `Label` (always) → `Hint` / `Error` below when needed.
 
 ### Minimal example
 
@@ -36,16 +60,15 @@ export function Example() {
 }
 ```
 
-## Rules
+### Rules
 
-- Вертикальный ритм между **подписью и hint** задаётся самим компонентом; не вставляйте между ними лишний [Typography](../typography/COMPONENT.md) с другой ролью чтения без необходимости.
-- Support **controlled** (`checked` + `onChange`) and **uncontrolled** (`defaultChecked`); internal state updates from the change handler before your `onChange` runs.
+- Vertical rhythm between **label and hint** is owned by the component; avoid inserting extra [Typography](../typography/Typography.tsx) between them unless the design explicitly requires a different reading role.
 - **`indeterminate`** only affects visuals and the DOM `indeterminate` property; it is not a separate submitted value—clear or sync it in your handler when the user clicks.
-- Set **`aria-label`** or **`aria-labelledby`** on **`Checkbox.Root`** when **`Checkbox.Label`** has no visible text (icon-only or header “select all” cell).
-- **`aria-describedby`** on the root is merged with hint and error ids when those slots are mounted; include your own ids in `aria-describedby` if you need extra descriptors.
+- Set **`aria-label`** or **`aria-labelledby`** on **`Checkbox.Root`** (forwarded to the input via rest props) when **`Checkbox.Label`** has no visible text (icon-only or compact “select all” cell).
+- **`aria-describedby`** on **`Root`** is merged with hint and error ids when those slots are mounted; include your own ids in `aria-describedby` if you need extra descriptors.
 - **`variant="error"`** or a mounted **`Checkbox.Error`** sets `aria-invalid` and error styling; **`disabled`** disables the input and dims hint styling.
 - Focus and keyboard activation use the native checkbox; the visible focus ring targets the decorative control via `focus-visible`.
-- There is no loading or `asChild` API; **`size`** on the root does not forward to the DOM input (layout token only).
+- There is no loading or `asChild` API; **`size`** on the root does not forward as a DOM attribute on the wrapper (layout/visual token axis only).
 
 ## API
 
@@ -96,3 +119,11 @@ export function Example() {
 - [Radio](../radio/COMPONENT.md) — one-of-many choice with the same validation variants.
 - [Switch](../switch/COMPONENT.md) — binary setting with a different control pattern.
 - [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) — primitives used inside the checkbox; pair with [Input](../input/COMPONENT.md) in larger forms.
+
+## LLM note
+
+- Prefer **`Checkbox.Label`** with visible text; if the label slot is empty or icon-only, set **`aria-label`** (or **`aria-labelledby`**) via **`Checkbox.Root`** rest props so the native input has a name.
+- **`indeterminate`** is purely visual + DOM hinting — parent “select all” logic must derive **`checked`** / **`indeterminate`** from child selection state and normalize **`onChange`** (e.g. indeterminate click → select all).
+- Use **`Checkbox.Error`** or **`variant="error"`** for validation feedback; mounting **`Checkbox.Error`** registers invalid state even without **`variant`** on **`Root`**.
+- Do not substitute **Radio** or **Switch** based on “sounds nicer” — **Radio** is for mutually exclusive options; **Switch** for settings that read as on/off system toggles.
+- Keep composition order **`Root` → `Label` → `Hint`/`Error`**; refs on **`Root`** attach to the **`<input>`**, not the wrapper `div`.
