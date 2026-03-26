@@ -42,14 +42,18 @@ import { Label } from "prime-ui-kit";
 
 export function ReportFiltersLegend() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <Label.Root size="s" htmlFor="metric-period">
-        Sample period
-      </Label.Root>
-      <Label.Root size="l" htmlFor="metric-granularity">
-        Granularity
-      </Label.Root>
-    </div>
+    <>
+      <div>
+        <Label.Root size="s" htmlFor="metric-period">
+          Sample period
+        </Label.Root>
+      </div>
+      <div>
+        <Label.Root size="l" htmlFor="metric-granularity">
+          Granularity
+        </Label.Root>
+      </div>
+    </>
   );
 }
 ```
