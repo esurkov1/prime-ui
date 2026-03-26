@@ -382,15 +382,15 @@ function PlaygroundUserMenu() {
 export function PlaygroundChromeSidebar() {
   return (
     <Sidebar.Root sidebarSlot="page-nav" aria-label="Навигация playground">
-      <Sidebar.NavPanel>
+      <Sidebar.NavPanel className="playgroundSidebarPanel">
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
               <PlaygroundBrandMenu />
             </Sidebar.HeaderMain>
-            <Sidebar.ToggleButton />
           </Sidebar.HeaderRow>
         </Sidebar.Header>
+        <Sidebar.ToggleButton className="playgroundSidebarEdgeToggle" />
 
         <Sidebar.Content>
           <PlaygroundTreeMenu />
