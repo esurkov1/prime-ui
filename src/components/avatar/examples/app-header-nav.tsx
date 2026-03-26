@@ -12,19 +12,19 @@ export default function AvatarAppHeaderNavExample() {
   return (
     <header className={styles.navBar}>
       <div className={styles.navCluster}>
-        <Typography as="span" variant="heading-subsection" weight="semibold">
+        <Typography.Root as="span" variant="heading-subsection" weight="semibold">
           Prime Console
-        </Typography>
+        </Typography.Root>
         <nav className={styles.row} aria-label="Primary">
-          <LinkButton href="#overview" size="m">
+          <LinkButton.Root href="#overview" size="m">
             Overview
-          </LinkButton>
-          <LinkButton href="#projects" size="m">
+          </LinkButton.Root>
+          <LinkButton.Root href="#projects" size="m">
             Projects
-          </LinkButton>
-          <LinkButton href="#settings" size="m">
+          </LinkButton.Root>
+          <LinkButton.Root href="#settings" size="m">
             Settings
-          </LinkButton>
+          </LinkButton.Root>
         </nav>
       </div>
       <div className={styles.navUser}>
@@ -32,9 +32,9 @@ export default function AvatarAppHeaderNavExample() {
           <Avatar.Image src={portrait} alt="" />
           <Avatar.Fallback>JC</Avatar.Fallback>
         </Avatar.Root>
-        <LinkButton href="#account" size="m">
+        <LinkButton.Root href="#account" size="m">
           Account
-        </LinkButton>
+        </LinkButton.Root>
       </div>
     </header>
   );

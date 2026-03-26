@@ -31,12 +31,12 @@ export default function AvatarTeamListExample() {
             </Avatar.Fallback>
           </Avatar.Root>
           <div className={styles.listItemBody}>
-            <Typography as="span" variant="body-default" weight="medium">
+            <Typography.Root as="span" variant="body-default" weight="medium">
               {m.name}
-            </Typography>
-            <Typography as="span" variant="caption" tone="muted">
+            </Typography.Root>
+            <Typography.Root as="span" variant="caption" tone="muted">
               {m.role}
-            </Typography>
+            </Typography.Root>
           </div>
         </li>
       ))}

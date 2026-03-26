@@ -11,9 +11,9 @@ const portrait =
 export default function AvatarFallbackVariantsExample() {
   return (
     <div className={styles.stack}>
-      <Typography as="p" variant="caption" tone="muted">
+      <Typography.Root as="p" variant="caption" tone="muted">
         Same size tier; different fallback strategies
-      </Typography>
+      </Typography.Root>
       <div className={styles.row}>
         <Avatar.Root size="xl" aria-label="User with photo">
           <Avatar.Image src={portrait} alt="" />

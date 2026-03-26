@@ -43,12 +43,12 @@ export default function AvatarCommentThreadExample() {
             <Avatar.Fallback>{c.initials}</Avatar.Fallback>
           </Avatar.Root>
           <div className={styles.stack}>
-            <Typography as="span" variant="body-small" weight="semibold">
+            <Typography.Root as="span" variant="body-small" weight="semibold">
               {c.author}
-            </Typography>
-            <Typography as="p" variant="body-default" tone="muted">
+            </Typography.Root>
+            <Typography.Root as="p" variant="body-default" tone="muted">
               {c.body}
-            </Typography>
+            </Typography.Root>
           </div>
         </li>
       ))}

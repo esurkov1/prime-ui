@@ -6,7 +6,7 @@ description: >
   Flexbox for local stacks/toolbars, CSS Modules, and --prime-sys-* tokens.
   Use when laying out pages, templates, forms, navigation, or dashboards; converting desktop layouts to  
   mobile-first; picking a component for a region; validating breakpoints, touch targets, or Drawer vs inline.  
-  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 47-entry component catalog, and anti-patterns.  
+  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 47-entry component catalog, per-component `examples/*.tsx` scenarios, and anti-patterns.  
   Non-negotiable: no custom wrappers or reskins of kit components—only primitives, default styles, and the public API.
 
 # prime-ui-kit
@@ -24,12 +24,22 @@ description: >
 
 | What                            | In this repo                                     | After `npm install prime-ui-kit`                                |
 | ------------------------------- | ------------------------------------------------ | --------------------------------------------------------------- |
-| API, props, examples            | `../src/components/<kebab>/COMPONENT.md`         | `node_modules/prime-ui-kit/src/components/<kebab>/COMPONENT.md` |
+| API, props, canonical example   | `../src/components/<kebab>/COMPONENT.md`         | `node_modules/prime-ui-kit/src/components/<kebab>/COMPONENT.md` |
+| Extended scenario code (copy-paste) | `../src/components/<kebab>/examples/*.tsx`   | same path under `node_modules/prime-ui-kit/`                    |
+| Sidebar                         | `../src/layout/sidebar/COMPONENT.md` + `examples/` | same pattern under `node_modules/prime-ui-kit/src/layout/sidebar/` |
 | Tokens                          | `[design-tokens.md](./design-tokens.md)`         | `node_modules/prime-ui-kit/src/styles/` (CSS + `package.json` exports) |
 | All components + layout shells (catalog table) | `[component-catalog.md](./component-catalog.md)` | only in this repo’s `SKILL/` (not in the npm tarball)           |
 
 
 Cursor skill: copy the whole `SKILL/` directory from the GitHub repository — it is not published to npm.
+
+### How to use `COMPONENT.md` + `examples/` (agents)
+
+1. **Read order:** open `COMPONENT.md` → use the **Canonical example** (single maximal block) for the full public API in one place → follow **Extended examples** links to `./examples/<file>.tsx` for product-style compositions (dashboard, settings, checkout, etc.).
+2. **Do not** treat playground snippets as the only truth; they are minimal demos. Prefer **`examples/*.tsx`** for “finished” compositions.
+3. **Compound components** always use the documented subcomponents (`Typography.Root`, `Button.Root`, `LinkButton.Root`, `Modal.Root`, …). Never use namespace objects as JSX tags (e.g. `<Typography>` is invalid).
+4. **Layout-only CSS** in examples may use `examples.module.css` with `var(--prime-sys-*)` only — same rules as app layout.
+5. **Chunking for LLMs:** one file per scenario keeps retrieval precise; a single giant `examples.md` is **not** used.
 
 ---
 
@@ -124,5 +134,5 @@ Every exported component is documented under `../src/components/<kebab-name>/COM
 - Visuals use `--prime-sys-`* only; no bypassing the kit with custom wrappers.
 - Control sizes via props; default `size` axis is `m` unless specified otherwise.
 - Breakpoints follow layout breakage; Sidebar / Drawer accounted for below `md` / `lg` where relevant.
-- If unsure, open `COMPONENT.md` and `[component-catalog.md](./component-catalog.md)`.
+- If unsure, open `COMPONENT.md`, then matching `examples/*.tsx` for the scenario, and `[component-catalog.md](./component-catalog.md)`.
 

@@ -1,6 +1,6 @@
 # Accordion
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
 
 ## About
 
@@ -26,24 +26,77 @@ A compound disclosure pattern: each item has a header trigger and expandable bod
 - Put label text, optional **`Accordion.Icon`**, and optional **`Accordion.Arrow`** inside the trigger as needed.
 - **`Accordion.Content`** renders an outer **`section`** (ARIA region) and an inner padded block; `className` applies to the inner block; `style` is merged onto the outer node with the animation height variable.
 
-### Minimal example
+### Canonical example
 
 ```tsx
-import { Accordion } from "prime-ui-kit";
+import { Accordion, LinkButton, Typography } from "prime-ui-kit";
+import { Package, ShieldCheck, Truck } from "lucide-react";
 
 export function Example() {
   return (
-    <Accordion.Root type="single">
-      <Accordion.Item value="one">
+    <Accordion.Root type="single" size="m" layout="grouped" defaultValue="delivery" collapsible>
+      <Accordion.Item value="delivery">
         <Accordion.Header>
-          <Accordion.Trigger>Section title</Accordion.Trigger>
+          <Accordion.Trigger>
+            <Accordion.Icon as={Truck} />
+            <span>Delivery &amp; tracking</span>
+            <Accordion.Arrow />
+          </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content>Section body.</Accordion.Content>
+        <Accordion.Content>
+          <Typography.Root as="p" variant="body-default" tone="muted">
+            Orders ship within one business day. Tracking links are sent by email when the carrier
+            scans the package.
+          </Typography.Root>
+        </Accordion.Content>
+      </Accordion.Item>
+      <Accordion.Item value="returns">
+        <Accordion.Header>
+          <Accordion.Trigger>
+            <Accordion.Icon as={Package} />
+            <span>Returns</span>
+            <Accordion.Arrow />
+          </Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Content>
+          <Typography.Root as="p" variant="body-default" tone="muted">
+            Unopened items in original packaging are returnable within 30 days. Opened goods may
+            qualify for store credit—see the policy for exceptions.
+          </Typography.Root>
+        </Accordion.Content>
+      </Accordion.Item>
+      <Accordion.Item value="compliance">
+        <Accordion.Header>
+          <Accordion.Trigger>
+            <Accordion.Icon as={ShieldCheck} />
+            <span>Compliance</span>
+            <Accordion.Arrow />
+          </Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Content>
+          <Typography.Root as="p" variant="body-default" tone="muted">
+            We process card data in line with PCI DSS. For regional privacy questions, read the
+            notices linked below.
+          </Typography.Root>
+          <LinkButton.Root href="#" size="s">
+            Privacy &amp; data processing
+          </LinkButton.Root>
+        </Accordion.Content>
       </Accordion.Item>
     </Accordion.Root>
   );
 }
 ```
+
+### Extended examples
+
+- [`./examples/01-faq-marketing.tsx`](./examples/01-faq-marketing.tsx) — Marketing FAQ: single panel, grouped layout, icons and chevron on each trigger.
+- [`./examples/02-settings-panels.tsx`](./examples/02-settings-panels.tsx) — Account settings: `type="multiple"` and `layout="separate"` so several sections stay open as cards.
+- [`./examples/03-checkout-order-summary.tsx`](./examples/03-checkout-order-summary.tsx) — Checkout: custom `Accordion.Arrow` icons plus policy links in the panel body.
+- [`./examples/04-api-docs-sections.tsx`](./examples/04-api-docs-sections.tsx) — API docs: controlled `value` / `onValueChange` for syncing open section with routing or in-page navigation.
+- [`./examples/05-knowledge-base-categories.tsx`](./examples/05-knowledge-base-categories.tsx) — Support hub: `collapsible={false}` and a disabled item for plan-gated content.
+
+**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition patterns; this page keeps the contract (rules + API tables) authoritative.
 
 ## Rules
 

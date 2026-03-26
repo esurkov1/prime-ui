@@ -38,7 +38,11 @@ export default function ModalMultiFieldFormExample() {
         icon={<Icon name="nav.itemDot" tone="subtle" />}
         title="Contact support"
       >
-        <form className={styles.fieldStack} id="modal-ticket-form" onSubmit={(e) => e.preventDefault()}>
+        <form
+          className={styles.fieldStack}
+          id="modal-ticket-form"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <Input.Root label="Subject" size="m">
             <Input.Wrapper>
               <Input.Field name="subject" placeholder="Short summary" />

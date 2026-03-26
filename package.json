@@ -64,6 +64,8 @@
     "dist",
     "src/styles/*.css",
     "src/components/**/COMPONENT.md",
+    "src/components/**/examples/**",
+    "src/layout/**/examples/**",
     "LICENSE"
   ],
   "publishConfig": {

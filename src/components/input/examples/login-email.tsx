@@ -1,5 +1,5 @@
-import * as React from "react";
 import { Icon, Input } from "prime-ui-kit";
+import * as React from "react";
 
 /**
  * Вход: email с подписью, иконкой и автозаполнением.
@@ -8,7 +8,11 @@ export default function LoginEmailExample() {
   const [email, setEmail] = React.useState("");
 
   return (
-    <Input.Root size="m" label="Электронная почта" hint="Мы отправим код подтверждения на этот адрес">
+    <Input.Root
+      size="m"
+      label="Электронная почта"
+      hint="Мы отправим код подтверждения на этот адрес"
+    >
       <Input.Wrapper>
         <Input.Icon side="start">
           <Icon name="field.email" size="s" tone="subtle" />

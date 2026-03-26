@@ -1,5 +1,5 @@
-import * as React from "react";
 import { Input } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./checkout-full-width.module.css";
 
@@ -12,11 +12,7 @@ export default function CheckoutFullWidthExample() {
 
   return (
     <div className={styles.column}>
-      <Input.Root
-        size="m"
-        label="ФИО получателя"
-        hint="Как в паспорте — для доставки"
-      >
+      <Input.Root size="m" label="ФИО получателя" hint="Как в паспорте — для доставки">
         <Input.Wrapper>
           <Input.Field
             name="fullName"

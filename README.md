@@ -40,6 +40,8 @@ module_system: ESM
 styling: CSS Modules + CSS variables (--prime-sys-*)
 a11y_stack: react-aria-components (peer)
 documentation_per_component: src/components/<name>/COMPONENT.md
+component_examples_glob: src/components/<name>/examples/*.tsx
+layout_examples_glob: src/layout/<name>/examples/*.tsx
 repository: https://github.com/esurkov1/prime-ui
 typography: variant_roles  # see src/components/typography/COMPONENT.md
 ```
@@ -245,8 +247,10 @@ Type definitions ship with the package (`dist/*.d.ts`).
 
 ## Where component docs live
 
-- **In the repo / on GitHub:** each component has `src/components/<name>/COMPONENT.md` (see the table above).
-- **In the installed package:** the same files are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/<name>/COMPONENT.md`.
+- **In the repo / on GitHub:** each component has `src/components/<name>/COMPONENT.md` (see the table above). **Sidebar** uses `src/layout/sidebar/COMPONENT.md`.
+- **Canonical + extended examples:** next to each `COMPONENT.md`, the `examples/` folder holds **3–5 self-contained `.tsx` files** (and optional `examples.module.css`) with real product scenarios. `COMPONENT.md` lists them under **Extended examples**; start from the **Canonical example** in the same file for a maximal single-block overview.
+- **Why separate files (not one `examples.md`):** each file is one scenario with a clear filename — easier for humans to navigate and for LLMs to retrieve the right chunk without loading an entire mega-document.
+- **In the installed package:** `COMPONENT.md` and `examples/**` are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/button/examples/`.
 
 **AppShell**, **PageContent**, **ExampleFrame**, and **ScrollContainer** do not have a dedicated `COMPONENT.md`; refer to the linked source folders and types in the `.tsx` files.
 

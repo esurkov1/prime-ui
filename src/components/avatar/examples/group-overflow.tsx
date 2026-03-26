@@ -11,9 +11,9 @@ const portrait =
 export default function AvatarGroupOverflowExample() {
   return (
     <div className={styles.stack}>
-      <Typography as="p" variant="body-small" tone="muted">
+      <Typography.Root as="p" variant="body-small" tone="muted">
         Design review — 5 invited, 2 faces shown
-      </Typography>
+      </Typography.Root>
       <Avatar.Group.Root
         size="l"
         aria-label="Participants: two avatars visible, three more not shown"

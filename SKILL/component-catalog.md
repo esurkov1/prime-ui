@@ -2,6 +2,8 @@
 
 Full table of **47** exported UI building blocks mapped to responsive layout (43 entries with `COMPONENT.md` under `src/components/` or `src/layout/sidebar`, plus **AppShell**, **PageContent**, **ExampleFrame**, **ScrollContainer** documented via source/playground only).
 
+**Examples:** For each component with `COMPONENT.md`, see also `examples/*.tsx` (3–5 runnable scenarios per folder) — richer than playground snippets; paths in each `COMPONENT.md` under **Extended examples**.
+
 **Zone shorthand:** header, sidebar, content, footer, overlay, form, inline, navigation.
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` у компонентов с осью размера, если явно не оговорено иное.

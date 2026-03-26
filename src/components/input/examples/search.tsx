@@ -1,5 +1,5 @@
-import * as React from "react";
 import { Icon, Input } from "prime-ui-kit";
+import * as React from "react";
 
 /**
  * Поиск: контролируемое значение и иконка слева.

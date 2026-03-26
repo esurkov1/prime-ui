@@ -25,9 +25,10 @@ export default function ModalLegalConsentExample() {
         title="Terms and data processing"
       >
         <Typography.Root as="p" variant="body-default">
-          By continuing, you agree to our Terms of Service and acknowledge our Privacy Policy. We process
-          account data to provide the product, send essential notices, and improve reliability. You may
-          withdraw consent where applicable by contacting support or adjusting settings.
+          By continuing, you agree to our Terms of Service and acknowledge our Privacy Policy. We
+          process account data to provide the product, send essential notices, and improve
+          reliability. You may withdraw consent where applicable by contacting support or adjusting
+          settings.
         </Typography.Root>
       </Modal.Panel>
     </Modal.Root>
