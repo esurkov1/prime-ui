@@ -185,7 +185,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
       <Tooltip.Provider delayDuration={0}>
         <Tooltip.Root>
           <Tooltip.Trigger>{button}</Tooltip.Trigger>
-          <Tooltip.Content side={side === "left" ? "right" : "left"}>
+          <Tooltip.Content size="l" side={side === "left" ? "right" : "left"}>
             {resolvedTooltip}
           </Tooltip.Content>
         </Tooltip.Root>
@@ -436,7 +436,9 @@ const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonP
       <Tooltip.Provider delayDuration={0}>
         <Tooltip.Root>
           <Tooltip.Trigger>{inner}</Tooltip.Trigger>
-          <Tooltip.Content side={side === "left" ? "right" : "left"}>{content}</Tooltip.Content>
+          <Tooltip.Content size="l" side={side === "left" ? "right" : "left"}>
+            {content}
+          </Tooltip.Content>
         </Tooltip.Root>
       </Tooltip.Provider>
     );
@@ -495,7 +497,9 @@ const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRou
       <Tooltip.Provider delayDuration={0}>
         <Tooltip.Root>
           <Tooltip.Trigger>{link}</Tooltip.Trigger>
-          <Tooltip.Content side={side === "left" ? "right" : "left"}>{content}</Tooltip.Content>
+          <Tooltip.Content size="l" side={side === "left" ? "right" : "left"}>
+            {content}
+          </Tooltip.Content>
         </Tooltip.Root>
       </Tooltip.Provider>
     );
@@ -536,7 +540,7 @@ const SidebarItem = React.forwardRef<HTMLButtonElement, SidebarItemProps>(
         <Tooltip.Root open={showTooltip ? undefined : false}>
           <Tooltip.Trigger>{node}</Tooltip.Trigger>
           {tooltipLabel === false || tooltipLabel === undefined ? null : (
-            <Tooltip.Content side={side === "left" ? "right" : "left"}>
+            <Tooltip.Content size="l" side={side === "left" ? "right" : "left"}>
               {tooltipLabel}
             </Tooltip.Content>
           )}
