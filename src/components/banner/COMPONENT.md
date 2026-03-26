@@ -49,7 +49,7 @@ import { Banner } from "prime-ui-kit";
 
 export function PricingPromoStripes() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div className="previewBannerColumn">
       {(["s", "m", "l", "xl"] as const).map((size) => (
         <Banner.Root key={size} status="feature" variant="light" size={size}>
           <Banner.Content>

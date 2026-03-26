@@ -678,6 +678,16 @@ h3 {
   width: 100%;
 }
 
+/* Узкая колонка для демо «full width» баннера (карточка / сайдбар). */
+.previewBannerNarrowColumn {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 26.25rem;
+  padding: var(--prime-sys-spacing-x3);
+  border-radius: var(--prime-sys-shape-radius-s);
+  border: 1px dashed var(--prime-sys-color-border-default);
+}
+
 .previewBannerMatrix {
   display: grid;
   gap: 0.35rem;

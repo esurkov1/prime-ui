@@ -8,14 +8,7 @@ import { Banner } from "@/components/banner/Banner";
  */
 export default function BannerFullWidthSnippet() {
   return (
-    <div
-      style={{
-        maxWidth: 420,
-        padding: 12,
-        borderRadius: 8,
-        border: "1px dashed var(--prime-sys-color-border-default, #ccc)",
-      }}
-    >
+    <div className="previewBannerNarrowColumn">
       <Banner.Root status="warning" variant="light" size="m">
         <Banner.Content>
           <Banner.Icon as={Info} aria-hidden />
