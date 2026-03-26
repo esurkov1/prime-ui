@@ -6,6 +6,12 @@ import {
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
+import CardDesignAccentRailSnippet from "../snippets/card/design-accent-rail";
+import designAccentRailSource from "../snippets/card/design-accent-rail.tsx?raw";
+import CardDesignDualPairSnippet from "../snippets/card/design-dual-pair";
+import designDualPairSource from "../snippets/card/design-dual-pair.tsx?raw";
+import CardDesignHeroMetricSnippet from "../snippets/card/design-hero-metric";
+import designHeroMetricSource from "../snippets/card/design-hero-metric.tsx?raw";
 import CardFlatSnippet from "../snippets/card/flat";
 import flatSource from "../snippets/card/flat.tsx?raw";
 import CardMetricSnippet from "../snippets/card/metric";
@@ -67,9 +73,9 @@ export default function CardSection() {
       headingId="card-heading"
       description={
         <>
-          Карточки для дашборда: компактные KPI, тот же макет mini с полосой для спарклайна или
-          прогресса, метрики с бейджем или иконкой, крупная секция под полноразмерные графики. Стили
-          на семантических токенах; графики подключаются снаружи (слоты Media, Body, Chart).
+          Карточки для дашборда: компактные KPI, mini с полосой для спарклайна или прогресса, метрики
+          с бейджем или иконкой, секции под графики; ниже — три приёма оформления (акцент, сетка пары
+          KPI, крупная метрика) на тех же слотах и токенах <code>--prime-sys-*</code>.
         </>
       }
     >
@@ -167,6 +173,46 @@ export default function CardSection() {
           <PlaygroundExampleFrame.Root code={rowSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CardRowSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Дизайн: акцентная полоса</DemoSectionTitle>
+          <DemoDescription>
+            <code>variant=&quot;mini&quot;</code> + <code>flat</code> и свой <code>className</code>:
+            фон <code>status-success-background</code> и левая граница акцентом — для позитивных
+            KPI.
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={designAccentRailSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardDesignAccentRailSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Дизайн: пара в сетке</DemoSectionTitle>
+          <DemoDescription>
+            Две <code>mini</code> + <code>flat</code> в CSS Grid: сравнение регионов или периодов
+            без общей оболочки.
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={designDualPairSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardDesignDualPairSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Дизайн: крупное число</DemoSectionTitle>
+          <DemoDescription>
+            <code>variant=&quot;metric&quot;</code>: у <code>Value</code> свой класс — кегль{" "}
+            <code>sizeScale-4xl</code> для главной цифры на дашборде.
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={designHeroMetricSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardDesignHeroMetricSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>

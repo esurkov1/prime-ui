@@ -1,0 +1,5 @@
+/* Тёплый фон статуса + акцент слева — без правок самого Card, только className на Root. */
+.accentRail {
+  background: var(--prime-sys-color-status-success-background);
+  border-left: var(--prime-sys-spacing-x1) solid var(--prime-sys-color-status-success-backgroundEmphasis);
+}
