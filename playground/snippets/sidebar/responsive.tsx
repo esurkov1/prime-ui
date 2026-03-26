@@ -9,7 +9,6 @@ function Sample({ responsive }: { responsive: boolean }) {
   return (
     <Sidebar.Root
       size="m"
-      variant="simple"
       responsive={responsive}
       open={open}
       onOpenChange={setOpen}

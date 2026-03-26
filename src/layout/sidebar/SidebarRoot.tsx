@@ -6,19 +6,12 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { SidebarSize } from "@/internal/states";
 import styles from "./Sidebar.module.css";
-import type { SidebarVariant } from "./sidebar-context";
 import { SidebarProvider } from "./sidebar-context";
-import { SIDEBAR_MEDIA_QUERY_COMPACT, SIDEBAR_MEDIA_QUERY_NARROW } from "./sidebarLayout";
+import { SIDEBAR_MEDIA_QUERY_NARROW } from "./sidebarLayout";
 
 export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"aside">, "children"> & {
   children: React.ReactNode;
   size?: SidebarSize;
-  variant?: SidebarVariant;
-  defaultVariant?: SidebarVariant;
-  onVariantChange?: (variant: SidebarVariant) => void;
-  activeSection?: string;
-  defaultActiveSection?: string;
-  onActiveSectionChange?: (section: string) => void;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -31,12 +24,6 @@ function SidebarRoot({
   children,
   className,
   size = "m",
-  variant: variantProp,
-  defaultVariant = "double",
-  onVariantChange,
-  activeSection: activeSectionProp,
-  defaultActiveSection,
-  onActiveSectionChange,
   open: openProp,
   defaultOpen = true,
   onOpenChange,
@@ -51,31 +38,9 @@ function SidebarRoot({
     typeof window.matchMedia === "function" &&
     window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW).matches;
 
-  const initialCompactViewport =
-    responsive === true &&
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia(SIDEBAR_MEDIA_QUERY_COMPACT).matches;
-
-  const [variant, setVariantState] = useControllableState<SidebarVariant>({
-    value: variantProp,
-    defaultValue: defaultVariant,
-    onChange: onVariantChange,
-  });
-
-  const [activeSection, setActiveSection] = useControllableState<string | null>({
-    value: activeSectionProp,
-    defaultValue: defaultActiveSection ?? null,
-    onChange: (nextSection) => {
-      if (nextSection !== null) {
-        onActiveSectionChange?.(nextSection);
-      }
-    },
-  });
-
   const [open, setOpenState] = useControllableState<boolean>({
     value: openProp,
-    defaultValue: initialNarrowViewport || initialCompactViewport ? false : defaultOpen,
+    defaultValue: initialNarrowViewport ? false : defaultOpen,
     onChange: onOpenChange,
   });
 
@@ -97,7 +62,7 @@ function SidebarRoot({
   }, []);
 
   const [isNarrowViewport, setIsNarrowViewport] = React.useState(initialNarrowViewport);
-  const [isCompactViewport, setIsCompactViewport] = React.useState(initialCompactViewport);
+  const previousNarrowRef = React.useRef(initialNarrowViewport);
 
   React.useEffect(() => {
     if (
@@ -106,54 +71,31 @@ function SidebarRoot({
       typeof window.matchMedia !== "function"
     ) {
       setIsNarrowViewport(false);
-      setIsCompactViewport(false);
+      previousNarrowRef.current = false;
       return;
     }
 
-    const narrowQuery = window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW);
-    const compactQuery = window.matchMedia(SIDEBAR_MEDIA_QUERY_COMPACT);
-
-    const update = () => {
-      setIsNarrowViewport(narrowQuery.matches);
-      setIsCompactViewport(compactQuery.matches);
-    };
+    const query = window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW);
+    const update = () => setIsNarrowViewport(query.matches);
     update();
 
-    if (typeof narrowQuery.addEventListener === "function") {
-      narrowQuery.addEventListener("change", update);
-      compactQuery.addEventListener("change", update);
-      return () => {
-        narrowQuery.removeEventListener("change", update);
-        compactQuery.removeEventListener("change", update);
-      };
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", update);
+      return () => query.removeEventListener("change", update);
     }
 
-    narrowQuery.addListener(update);
-    compactQuery.addListener(update);
-    return () => {
-      narrowQuery.removeListener(update);
-      compactQuery.removeListener(update);
-    };
+    query.addListener(update);
+    return () => query.removeListener(update);
   }, [responsive]);
 
   React.useEffect(() => {
     if (responsive !== true) return;
+    const prev = previousNarrowRef.current;
+    if (prev === isNarrowViewport) return;
+    previousNarrowRef.current = isNarrowViewport;
     openedByEdgePeekRef.current = false;
-    if (isNarrowViewport) {
-      setOpenState(false);
-    } else if (isCompactViewport) {
-      setOpenState(false);
-    } else {
-      setOpenState(true);
-    }
-  }, [isNarrowViewport, isCompactViewport, responsive, setOpenState]);
-
-  const setVariant = React.useCallback(
-    (nextVariant: SidebarVariant) => {
-      setVariantState(nextVariant === "double" ? "double" : "simple");
-    },
-    [setVariantState],
-  );
+    setOpenState(!isNarrowViewport);
+  }, [isNarrowViewport, responsive, setOpenState]);
 
   const setOpen = React.useCallback(
     (next: boolean) => {
@@ -180,12 +122,8 @@ function SidebarRoot({
   }, [open, setOpenState]);
 
   const notifyNavPanelPeekLeave = React.useCallback(
-    (event: React.PointerEvent<Element> | React.MouseEvent<Element>) => {
+    (_event: React.PointerEvent<Element> | React.MouseEvent<Element>) => {
       if (!openedByEdgePeekRef.current) return;
-      const next = event.relatedTarget as Node | null;
-      if (next instanceof Element && next.closest("[data-sidebar-part='context-rail']")) {
-        return;
-      }
       openedByEdgePeekRef.current = false;
       setOpenState(false);
     },
@@ -204,28 +142,13 @@ function SidebarRoot({
   const contextValue = React.useMemo(
     () => ({
       size,
-      variant,
-      setVariant,
-      activeSection,
-      setActiveSection: (id: string) => setActiveSection(id),
       open,
       setOpen,
       toggleOpen,
       navPanelId,
       notifyNavPanelPeekLeave,
     }),
-    [
-      activeSection,
-      navPanelId,
-      notifyNavPanelPeekLeave,
-      open,
-      setActiveSection,
-      setOpen,
-      setVariant,
-      size,
-      toggleOpen,
-      variant,
-    ],
+    [navPanelId, notifyNavPanelPeekLeave, open, setOpen, size, toggleOpen],
   );
 
   return (
@@ -236,12 +159,10 @@ function SidebarRoot({
         aria-label={ariaLabel}
         {...toDataAttributes({
           size,
-          variant,
           open,
           responsive: responsive ? true : undefined,
           "sidebar-slot": sidebarSlot,
         })}
-        data-collapsed={variant === "simple" ? "true" : undefined}
       >
         {canEdgePeekHover && !open && isNarrowViewport ? (
           <div

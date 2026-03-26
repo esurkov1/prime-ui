@@ -36,7 +36,6 @@ function SidebarSizeColumn({ size }: { size: DemoSize }) {
       <div className={styles.stage}>
         <Sidebar.Root
           size={size}
-          variant="simple"
           open={open}
           onOpenChange={setOpen}
           responsive={false}

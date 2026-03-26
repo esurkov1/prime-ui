@@ -1,4 +1,4 @@
-import { ChevronRight, Ellipsis, FileText, FolderOpen, Sparkles } from "lucide-react";
+import { ChevronRight, Ellipsis, FileText, FolderOpen } from "lucide-react";
 import * as React from "react";
 import { Sidebar } from "@/layout";
 
@@ -38,11 +38,6 @@ function FavoritesCategory() {
   );
 }
 
-const contextItems = [
-  { id: "docs", label: "Docs", icon: <FolderOpen size={16} strokeWidth={1.9} /> },
-  { id: "labs", label: "Labs", icon: <Sparkles size={16} strokeWidth={1.9} /> },
-];
-
 export default function SidebarCompositionSnippet() {
   const [open, setOpen] = React.useState(true);
 
@@ -50,15 +45,11 @@ export default function SidebarCompositionSnippet() {
     <div className={styles.demoRoot}>
       <Sidebar.Root
         size="m"
-        variant="double"
-        defaultActiveSection="docs"
         open={open}
         onOpenChange={setOpen}
         responsive={false}
         aria-label="Композиция сайдбара"
       >
-        <Sidebar.ContextBar items={contextItems} />
-
         <Sidebar.NavPanel>
           <Sidebar.Header>
             <Sidebar.HeaderRow>
@@ -79,50 +70,33 @@ export default function SidebarCompositionSnippet() {
           </Sidebar.Header>
 
           <Sidebar.Content>
-            <Sidebar.PanelSwitch
-              sections={{
-                docs: (
-                  <Sidebar.NavPanelBody>
-                    <FavoritesCategory />
-                    <Sidebar.Group>
-                      <Sidebar.GroupLabel>Разделы</Sidebar.GroupLabel>
-                      <Sidebar.Menu>
-                        <Sidebar.MenuItem>
-                          <Sidebar.MenuButton type="button" active>
-                            <Sidebar.MenuIcon>
-                              <FileText size={16} strokeWidth={1.9} />
-                            </Sidebar.MenuIcon>
-                            <Sidebar.MenuLabel>Обзор</Sidebar.MenuLabel>
-                          </Sidebar.MenuButton>
-                          <Sidebar.MenuAction type="button" aria-label="Действия раздела">
-                            <Ellipsis size={16} strokeWidth={2} />
-                          </Sidebar.MenuAction>
-                        </Sidebar.MenuItem>
-                        <Sidebar.MenuItem>
-                          <Sidebar.MenuButton type="button">
-                            <Sidebar.MenuIcon>
-                              <FolderOpen size={16} strokeWidth={1.9} />
-                            </Sidebar.MenuIcon>
-                            <Sidebar.MenuLabel>Структура</Sidebar.MenuLabel>
-                          </Sidebar.MenuButton>
-                        </Sidebar.MenuItem>
-                      </Sidebar.Menu>
-                    </Sidebar.Group>
-                  </Sidebar.NavPanelBody>
-                ),
-                labs: (
-                  <Sidebar.NavPanelBody>
-                    <Sidebar.Menu>
-                      <Sidebar.MenuItem>
-                        <Sidebar.MenuButton type="button" active>
-                          <Sidebar.MenuLabel>Песочница</Sidebar.MenuLabel>
-                        </Sidebar.MenuButton>
-                      </Sidebar.MenuItem>
-                    </Sidebar.Menu>
-                  </Sidebar.NavPanelBody>
-                ),
-              }}
-            />
+            <Sidebar.NavPanelBody>
+              <FavoritesCategory />
+              <Sidebar.Group>
+                <Sidebar.GroupLabel>Разделы</Sidebar.GroupLabel>
+                <Sidebar.Menu>
+                  <Sidebar.MenuItem>
+                    <Sidebar.MenuButton type="button" active>
+                      <Sidebar.MenuIcon>
+                        <FileText size={16} strokeWidth={1.9} />
+                      </Sidebar.MenuIcon>
+                      <Sidebar.MenuLabel>Обзор</Sidebar.MenuLabel>
+                    </Sidebar.MenuButton>
+                    <Sidebar.MenuAction type="button" aria-label="Действия раздела">
+                      <Ellipsis size={16} strokeWidth={2} />
+                    </Sidebar.MenuAction>
+                  </Sidebar.MenuItem>
+                  <Sidebar.MenuItem>
+                    <Sidebar.MenuButton type="button">
+                      <Sidebar.MenuIcon>
+                        <FolderOpen size={16} strokeWidth={1.9} />
+                      </Sidebar.MenuIcon>
+                      <Sidebar.MenuLabel>Структура</Sidebar.MenuLabel>
+                    </Sidebar.MenuButton>
+                  </Sidebar.MenuItem>
+                </Sidebar.Menu>
+              </Sidebar.Group>
+            </Sidebar.NavPanelBody>
           </Sidebar.Content>
         </Sidebar.NavPanel>
       </Sidebar.Root>

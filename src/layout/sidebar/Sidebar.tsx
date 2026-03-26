@@ -2,164 +2,19 @@ import { ChevronsUpDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 
-import { Tooltip } from "@/components/tooltip/Tooltip";
 import { cx } from "@/internal/cx";
 import { Slot } from "@/internal/slot";
 import type { SidebarSize } from "@/internal/states";
 import styles from "./Sidebar.module.css";
 import { SidebarRoot } from "./SidebarRoot";
-import type { SidebarContextItem } from "./sidebar-context";
-import { useSidebarContext, useSidebarNavTo } from "./sidebar-context";
+import { useSidebarContext } from "./sidebar-context";
 
 export type { SidebarRootProps } from "./SidebarRoot";
-export type { SidebarVariant } from "./sidebar-context";
-export type { SidebarContextItem, SidebarSize };
-export { useSidebarContext, useSidebarNavTo };
+export type { SidebarSize };
+export { useSidebarContext };
 
 /** @deprecated Используйте `responsive` из `Sidebar.Root`. */
 export type SidebarResponsive = boolean;
-
-export type SidebarContextBarProps = React.ComponentPropsWithoutRef<"nav"> & {
-  items?: SidebarContextItem[];
-  activeSection?: string | null;
-  onSelectSection?: (sectionId: string) => void;
-  logo?: React.ReactNode;
-  footer?: React.ReactNode;
-};
-
-function SidebarContextBar({
-  className,
-  items,
-  activeSection: activeSectionProp,
-  onSelectSection,
-  logo,
-  footer,
-  children,
-  ...rest
-}: SidebarContextBarProps) {
-  const { activeSection, setActiveSection } = useSidebarContext();
-  const resolvedActiveSection = activeSectionProp ?? activeSection;
-  const selectSection = onSelectSection ?? setActiveSection;
-
-  React.useEffect(() => {
-    if (items === undefined || items.length === 0) return;
-    if (resolvedActiveSection !== null) return;
-    selectSection(items[0].id);
-  }, [items, resolvedActiveSection, selectSection]);
-
-  return (
-    <div className={styles.contextRail} data-sidebar-part="context-rail">
-      <nav {...rest} className={cx(styles.contextBar, className)} aria-label="Context navigation">
-        {logo === undefined ? null : <div className={styles.contextBarHeader}>{logo}</div>}
-
-        {items === undefined ? (
-          children
-        ) : (
-          <div className={styles.contextBarBody}>
-            <ul className={styles.contextList}>
-              {items.map((item) => {
-                const button = (
-                  <SidebarContextItemButton
-                    aria-label={item.ariaLabel ?? item.label}
-                    disabled={item.disabled}
-                    active={resolvedActiveSection === item.id}
-                    onClick={() => selectSection(item.id)}
-                  >
-                    <span className={styles.contextItemIcon} aria-hidden="true">
-                      {item.icon}
-                    </span>
-                  </SidebarContextItemButton>
-                );
-
-                return (
-                  <li key={item.id} className={styles.contextListItem}>
-                    <Tooltip.Root>
-                      <Tooltip.Trigger>{button}</Tooltip.Trigger>
-                      <Tooltip.Content side="right">{item.tooltip ?? item.label}</Tooltip.Content>
-                    </Tooltip.Root>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-
-        {footer === undefined ? null : <div className={styles.contextBarFooter}>{footer}</div>}
-      </nav>
-    </div>
-  );
-}
-
-SidebarContextBar.displayName = "SidebarContextBar";
-
-export type SidebarContextBarHeaderProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarContextBarHeader({ className, ...rest }: SidebarContextBarHeaderProps) {
-  return <div {...rest} className={cx(styles.contextBarHeader, className)} />;
-}
-
-SidebarContextBarHeader.displayName = "SidebarContextBarHeader";
-
-export type SidebarContextBarBodyProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarContextBarBody({ className, ...rest }: SidebarContextBarBodyProps) {
-  return <div {...rest} className={cx(styles.contextBarBody, className)} />;
-}
-
-SidebarContextBarBody.displayName = "SidebarContextBarBody";
-
-export type SidebarContextBarFooterProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarContextBarFooter({ className, ...rest }: SidebarContextBarFooterProps) {
-  return <div {...rest} className={cx(styles.contextBarFooter, className)} />;
-}
-
-SidebarContextBarFooter.displayName = "SidebarContextBarFooter";
-
-export type SidebarContextItemButtonProps = React.ComponentPropsWithoutRef<"button"> & {
-  active?: boolean;
-  asChild?: boolean;
-};
-
-const SidebarContextItemButton = React.forwardRef<HTMLButtonElement, SidebarContextItemButtonProps>(
-  ({ className, type = "button", active, asChild = false, disabled, onClick, ...rest }, ref) => {
-    const cls = cx(styles.contextItemButton, className);
-    const dataActive = active ? "true" : undefined;
-
-    if (asChild) {
-      return (
-        <Slot
-          {...rest}
-          ref={ref as React.Ref<HTMLElement>}
-          className={cls}
-          data-active={dataActive}
-          aria-disabled={disabled || undefined}
-          onClick={
-            disabled
-              ? (e: React.MouseEvent) => {
-                  e.preventDefault();
-                }
-              : onClick
-          }
-        />
-      );
-    }
-
-    return (
-      <button
-        {...rest}
-        ref={ref}
-        type={type}
-        disabled={disabled}
-        className={cls}
-        data-active={dataActive}
-        onClick={onClick}
-      />
-    );
-  },
-);
-
-SidebarContextItemButton.displayName = "SidebarContextItemButton";
 
 export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav">;
 
@@ -255,40 +110,6 @@ function SidebarNavCategoryPanel({ className, ...rest }: SidebarNavCategoryPanel
 }
 
 SidebarNavCategoryPanel.displayName = "SidebarNavCategoryPanel";
-
-export type SidebarPanelSwitchProps = React.ComponentPropsWithoutRef<"div"> & {
-  sections?: Record<string, React.ReactNode>;
-  renderSection?: (activeSection: string | null) => React.ReactNode;
-  fallback?: React.ReactNode;
-};
-
-function SidebarPanelSwitch({
-  className,
-  sections,
-  renderSection,
-  fallback = null,
-  ...rest
-}: SidebarPanelSwitchProps) {
-  const { activeSection } = useSidebarContext();
-
-  let content: React.ReactNode = fallback;
-  if (renderSection !== undefined) {
-    content = renderSection(activeSection);
-  } else if (sections !== undefined) {
-    const keys = Object.keys(sections);
-    const sectionKey =
-      activeSection !== null && sections[activeSection] !== undefined ? activeSection : keys[0];
-    content = sectionKey === undefined ? fallback : sections[sectionKey];
-  }
-
-  return (
-    <div {...rest} className={cx(styles.panelSwitch, className)}>
-      {content}
-    </div>
-  );
-}
-
-SidebarPanelSwitch.displayName = "SidebarPanelSwitch";
 
 export type SidebarHeaderProps = React.ComponentPropsWithoutRef<"div">;
 
@@ -522,13 +343,7 @@ SidebarMenuLink.displayName = "SidebarMenuLink";
 
 export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink>;
 
-/**
- * Пункт меню на базе React Router `NavLink` со стилями `menuButton` (активное состояние по URL).
- *
- * **Двухъярусная навигация (`ContextBar` + панель):** верхний ярус переключает `activeSection`
- * и контент `PanelSwitch`; в каждой ветке перечисляйте ссылки через `MenuRouterLink`. Удобно
- * комбинировать с {@link useSidebarNavTo}, чтобы не дублировать префикс раздела в каждом `to`.
- */
+/** Пункт меню на базе React Router `NavLink` со стилями `menuButton` (активное состояние по URL). */
 const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRouterLinkProps>(
   ({ className, ...rest }, ref) => (
     <NavLink
@@ -586,11 +401,6 @@ SidebarText.displayName = "SidebarText";
 
 export const Sidebar = {
   Root: SidebarRoot,
-  ContextBar: SidebarContextBar,
-  ContextBarHeader: SidebarContextBarHeader,
-  ContextBarBody: SidebarContextBarBody,
-  ContextBarFooter: SidebarContextBarFooter,
-  ContextItemButton: SidebarContextItemButton,
   NavPanel: SidebarNavPanel,
   NavPanelBody: SidebarNavPanelBody,
   NavDocTree: SidebarNavDocTree,
@@ -600,7 +410,6 @@ export const Sidebar = {
   NavCategoryLabel: SidebarNavCategoryLabel,
   NavCategoryCount: SidebarNavCategoryCount,
   NavCategoryPanel: SidebarNavCategoryPanel,
-  PanelSwitch: SidebarPanelSwitch,
   Header: SidebarHeader,
   HeaderRow: SidebarHeaderRow,
   HeaderMain: SidebarHeaderMain,

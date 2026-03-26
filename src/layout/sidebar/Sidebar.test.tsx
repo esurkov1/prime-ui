@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
-import { Sidebar, useSidebarNavTo } from "./Sidebar";
+import { Sidebar } from "./Sidebar";
 
 describe("Sidebar", () => {
   it("renders landmark with default aria-label", () => {
@@ -16,7 +16,7 @@ describe("Sidebar", () => {
     expect(screen.getByRole("complementary", { name: "Sidebar" })).toBeInTheDocument();
   });
 
-  it("uses double variant by default", () => {
+  it("does not set variant data attribute", () => {
     render(
       <Sidebar.Root>
         <Sidebar.NavPanel />
@@ -24,20 +24,8 @@ describe("Sidebar", () => {
     );
 
     const root = screen.getByRole("complementary", { name: "Sidebar" });
-    expect(root).toHaveAttribute("data-variant", "double");
+    expect(root).not.toHaveAttribute("data-variant");
     expect(root).not.toHaveAttribute("data-collapsed");
-  });
-
-  it("supports simple variant", () => {
-    render(
-      <Sidebar.Root variant="simple">
-        <Sidebar.NavPanel />
-      </Sidebar.Root>,
-    );
-
-    const root = screen.getByRole("complementary", { name: "Sidebar" });
-    expect(root).toHaveAttribute("data-variant", "simple");
-    expect(root).toHaveAttribute("data-collapsed", "true");
   });
 
   it("supports page-nav slot", () => {
@@ -222,35 +210,10 @@ describe("Sidebar", () => {
     expect(root).toHaveAttribute("data-open", "false");
   });
 
-  it("updates NavPanel content when ContextBar section changes", () => {
-    render(
-      <Sidebar.Root variant="double" defaultActiveSection="crm">
-        <Sidebar.ContextBar
-          items={[
-            { id: "crm", label: "CRM", icon: <span>c</span> },
-            { id: "fleet", label: "Автопарк", icon: <span>f</span> },
-          ]}
-        />
-        <Sidebar.NavPanel>
-          <Sidebar.PanelSwitch
-            sections={{
-              crm: <div>Сделки и контакты</div>,
-              fleet: <div>Машины и маршруты</div>,
-            }}
-          />
-        </Sidebar.NavPanel>
-      </Sidebar.Root>,
-    );
-
-    expect(screen.getByText("Сделки и контакты")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Автопарк" }));
-    expect(screen.getByText("Машины и маршруты")).toBeInTheDocument();
-  });
-
   it("MenuRouterLink marks active route and merges className", () => {
     render(
       <MemoryRouter initialEntries={["/here"]}>
-        <Sidebar.Root variant="simple">
+        <Sidebar.Root>
           <Sidebar.NavPanel>
             <Sidebar.Menu>
               <Sidebar.MenuItem>
@@ -269,25 +232,9 @@ describe("Sidebar", () => {
     expect(screen.getByRole("link", { name: "Other" })).not.toHaveAttribute("aria-current");
   });
 
-  it("useSidebarNavTo prefixes path with activeSection in double variant", () => {
-    function Probe({ path }: { path: string }) {
-      return <span data-testid="to">{useSidebarNavTo(path)}</span>;
-    }
-
-    render(
-      <Sidebar.Root variant="double" defaultActiveSection="crm">
-        <Sidebar.NavPanel>
-          <Probe path="deals" />
-        </Sidebar.NavPanel>
-      </Sidebar.Root>,
-    );
-
-    expect(screen.getByTestId("to")).toHaveTextContent("/crm/deals");
-  });
-
   it("renders menu primitives and active state", () => {
     render(
-      <Sidebar.Root variant="double">
+      <Sidebar.Root>
         <Sidebar.NavPanel>
           <Sidebar.Content>
             <Sidebar.Menu>
@@ -311,7 +258,7 @@ describe("Sidebar", () => {
 
   it("renders IdentityButton with title and subtitle", () => {
     render(
-      <Sidebar.Root variant="simple">
+      <Sidebar.Root>
         <Sidebar.NavPanel>
           <Sidebar.Header>
             <Sidebar.IdentityButton
@@ -331,7 +278,7 @@ describe("Sidebar", () => {
 
   it("MenuButton asChild renders as <a> with data-active", () => {
     render(
-      <Sidebar.Root variant="simple">
+      <Sidebar.Root>
         <Sidebar.NavPanel>
           <Sidebar.Menu>
             <Sidebar.MenuItem>
@@ -353,7 +300,7 @@ describe("Sidebar", () => {
 
   it("MenuButton asChild disabled sets aria-disabled and prevents click", () => {
     render(
-      <Sidebar.Root variant="simple">
+      <Sidebar.Root>
         <Sidebar.NavPanel>
           <Sidebar.Menu>
             <Sidebar.MenuItem>
@@ -375,7 +322,7 @@ describe("Sidebar", () => {
 
   it("MenuLink renders as <a> via MenuButton asChild", () => {
     render(
-      <Sidebar.Root variant="simple">
+      <Sidebar.Root>
         <Sidebar.NavPanel>
           <Sidebar.Menu>
             <Sidebar.MenuItem>

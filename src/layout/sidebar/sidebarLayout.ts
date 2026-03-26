@@ -11,12 +11,3 @@ export const SIDEBAR_MEDIA_QUERY_NARROW = `(max-width: ${SIDEBAR_LAYOUT_BREAKPOI
 
 /** Viewport «широкий»: сайдбар в потоке сетки (вместе с `AppShell` и т.д.). */
 export const SIDEBAR_MEDIA_QUERY_INLINE = "(min-width: 64.001rem)";
-
-/**
- * Планшетная полоса между узким оверлеем и полноширинным сайдбаром:
- * при `variant="double"` и `open=false` остаётся только ContextBar (иконки), без полного скрытия.
- * Дублируется в CSS как `80rem` в `@media`.
- */
-export const SIDEBAR_COMPACT_BREAKPOINT_MAX = "80rem";
-
-export const SIDEBAR_MEDIA_QUERY_COMPACT = `(min-width: 64.001rem) and (max-width: ${SIDEBAR_COMPACT_BREAKPOINT_MAX})`;

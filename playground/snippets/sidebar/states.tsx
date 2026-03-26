@@ -1,32 +1,19 @@
-import { Bell, CircleDot, Settings } from "lucide-react";
+import { Bell, Settings } from "lucide-react";
 import * as React from "react";
 import { Sidebar } from "@/layout";
 
 export default function SidebarStatesSnippet() {
   const [open, setOpen] = React.useState(true);
-  const contextItems = [
-    { id: "inbox", label: "Входящие", icon: <Bell size={16} strokeWidth={1.9} /> },
-    {
-      id: "archive",
-      label: "Архив",
-      icon: <CircleDot size={16} strokeWidth={1.9} />,
-      disabled: true,
-      tooltip: "Раздел временно недоступен",
-    },
-  ];
 
   return (
     <div className="playgroundSidebarDemo">
       <Sidebar.Root
         size="m"
-        variant="double"
-        defaultActiveSection="inbox"
         open={open}
         onOpenChange={setOpen}
         responsive={false}
         aria-label="Состояния навигации"
       >
-        <Sidebar.ContextBar items={contextItems} />
         <Sidebar.NavPanel>
           <Sidebar.Header>
             <Sidebar.HeaderRow>

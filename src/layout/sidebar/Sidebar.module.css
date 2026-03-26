@@ -3,18 +3,10 @@
  * Брейкпоинты `64rem` / `64.001rem` — синхронны с `sidebarLayout.ts` (в @media нельзя использовать var()).
  */
 .root {
-  --sb-context-width: var(--prime-sys-unit-4rem);
   --sb-panel-width: var(--prime-sys-unit-16rem);
   --sb-panel-visible-width: var(--sb-panel-width);
-  --sb-nav-gap-open: var(--prime-sys-spacing-x2);
   --sb-nav-gap: 0;
-  --sb-context-visible-width: 0;
-  --sb-shell-width: calc(
-    var(--sb-context-visible-width) +
-    var(--sb-panel-visible-width) +
-    var(--sb-nav-gap)
-  );
-  --sb-shell-gap: 0;
+  --sb-shell-width: calc(var(--sb-panel-visible-width) + var(--sb-nav-gap));
   --sb-page-inset: var(--prime-sys-spacing-x2);
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
@@ -29,7 +21,7 @@
   --sb-identity-leading-size: var(--prime-sys-size-avatar-m-size);
   --sb-identity-title-text: var(--prime-sys-size-control-m-text);
   --sb-identity-subtitle-text: var(--prime-sys-size-control-s-supportText);
-  /* Единый инсет для `.contextBar` и `.navPanel` (можно переопределить на `.root`). */
+  /* Единый инсет для `.navPanel` (можно переопределить на `.root`). */
   --sb-chrome-inset: var(--prime-sys-spacing-x2);
   --sb-panel-padding-inline: var(--sb-chrome-inset);
   --sb-panel-padding-block: var(--sb-chrome-inset);
@@ -51,13 +43,7 @@
     margin var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
-.root[data-variant="double"] {
-  --sb-context-visible-width: var(--sb-context-width);
-  --sb-nav-gap: var(--sb-nav-gap-open);
-}
-
 .root[data-size="s"] {
-  --sb-context-width: var(--prime-sys-unit-3p5rem);
   --sb-control-height: var(--prime-sys-size-control-s-height);
   --sb-control-radius: var(--prime-sys-size-control-s-radius);
   --sb-control-gap: var(--prime-sys-size-control-s-gap);
@@ -72,7 +58,6 @@
 }
 
 .root[data-size="l"] {
-  --sb-context-width: var(--prime-sys-unit-4p5rem);
   --sb-control-height: var(--prime-sys-size-control-l-height);
   --sb-control-radius: var(--prime-sys-size-control-l-radius);
   --sb-control-gap: var(--prime-sys-size-control-l-gap);
@@ -87,7 +72,6 @@
 }
 
 .root[data-size="xl"] {
-  --sb-context-width: var(--prime-sys-unit-4p5rem);
   --sb-control-height: var(--prime-sys-size-control-xl-height);
   --sb-control-radius: var(--prime-sys-size-control-xl-radius);
   --sb-control-gap: var(--prime-sys-size-control-xl-gap);
@@ -114,34 +98,15 @@
   margin: 0;
   overflow: hidden;
   transition: none;
-  --sb-shell-gap: 0;
-}
-
-/*
- * Целевая ширина «раскрытого» блока для max-width transition (пока закрыт — max-width: 0).
- * simple: одна ширина панели.
- * double: три слагаемых (rail + панель + зазор) — одного токена нет, сумма через calc — нормальная практика.
- */
-.root[data-sidebar-slot="page-nav"][data-variant="simple"] {
   --sb-page-nav-expanded: var(--sb-panel-width);
-}
-
-.root[data-sidebar-slot="page-nav"][data-variant="double"] {
-  --sb-page-nav-expanded: calc(
-    var(--sb-context-width) +
-    var(--sb-panel-width) +
-    var(--sb-nav-gap-open)
-  );
 }
 
 .root[data-open="false"] {
   --sb-nav-gap: 0;
-  --sb-context-visible-width: 0;
   --sb-panel-visible-width: 0;
-  --sb-shell-gap: 0;
 }
 
-/* Ряд: context rail + nav panel; `gap` — отступ между видимыми обёртками `.contextBar` и `.navPanel`. */
+/* Область навигации: одна колонка `.navPanel`. */
 .navArea {
   box-sizing: border-box;
   display: flex;
@@ -243,154 +208,6 @@
   opacity: 1;
 }
 
-.contextRail {
-  box-sizing: border-box;
-  display: flex;
-  flex-shrink: 0;
-  width: var(--sb-context-visible-width);
-  min-width: 0;
-  min-height: 0;
-  opacity: 1;
-  overflow: hidden;
-  transition:
-    width var(--sb-transition-duration) var(--sb-transition-ease),
-    opacity var(--sb-transition-duration) var(--sb-transition-ease);
-}
-
-.root[data-variant="simple"] .contextRail {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.root[data-open="false"] .contextRail {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/*
- * Планшет 64–80rem + `responsive` + `double`: при `open=false` не прячем сайдбар целиком —
- * остаётся колонка ContextBar (иконки); панель с пунктами схлопнута.
- * `simple` без rail — поведение как у полного закрытия.
- */
-@media (min-width: 64.001rem) and (max-width: 80rem) {
-  .root[data-responsive="true"][data-variant="double"][data-open="false"] {
-    --sb-context-visible-width: var(--sb-context-width);
-    --sb-panel-visible-width: 0;
-    --sb-nav-gap: 0;
-  }
-
-  .root[data-responsive="true"][data-variant="double"][data-open="false"] .contextRail {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .root[data-sidebar-slot="page-nav"][data-responsive="true"][data-variant="double"][data-open="false"]
-    .navArea {
-    max-width: var(--sb-context-width);
-  }
-}
-
-.contextBar {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  width: var(--sb-context-width);
-  min-width: var(--sb-context-width);
-  min-height: 0;
-  height: 100%;
-  border-radius: var(--prime-sys-shape-radius-l);
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-surface-default) 90%,
-    var(--prime-sys-color-surface-raised)
-  );
-  color: var(--prime-sys-color-content-primary);
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  box-shadow: none;
-  padding: var(--sb-chrome-inset);
-}
-
-.contextBarHeader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  padding-block: var(--prime-sys-spacing-x1);
-}
-
-.contextBarBody {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.contextBarFooter {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  padding-block: var(--prime-sys-spacing-x1);
-  margin-top: var(--prime-sys-spacing-x2);
-}
-
-.contextList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x1);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.contextListItem {
-  display: flex;
-}
-
-.contextItemButton {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: var(--sb-control-height);
-  border: none;
-  border-radius: var(--sb-control-radius);
-  background: transparent;
-  color: var(--prime-sys-color-content-secondary);
-  cursor: pointer;
-  transition: background-color var(--prime-sys-motion-fast) var(--sb-transition-ease);
-}
-
-.contextItemButton:hover {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-}
-
-.contextItemButton:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-}
-
-.contextItemButton[data-active="true"] {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  color: var(--prime-sys-color-content-primary);
-}
-
-.contextItemButton:disabled,
-.contextItemButton[aria-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.contextItemIcon {
-  display: inline-flex;
-  width: var(--sb-control-icon);
-  height: var(--sb-control-icon);
-  align-items: center;
-  justify-content: center;
-}
-
 .navPanel {
   box-sizing: border-box;
   display: flex;
@@ -443,15 +260,6 @@
     opacity: 1;
     pointer-events: none;
   }
-}
-
-.panelSwitch {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
 }
 
 .header {
@@ -908,10 +716,6 @@
     pointer-events: auto;
   }
 
-  .root[data-responsive="true"] .contextRail {
-    display: none;
-  }
-
   .root[data-responsive="true"] .navPanel {
     position: relative;
     z-index: 1;
@@ -956,13 +760,11 @@
     transition: none;
   }
 
-  .contextRail,
   .navArea,
   .navPanel,
   .root[data-responsive="true"] .backdrop,
   .menuButton,
   .menuAction,
-  .contextItemButton,
   .navCategoryTrigger svg {
     transition: none;
   }

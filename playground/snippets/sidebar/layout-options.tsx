@@ -9,7 +9,6 @@ function InlinePanelDemo() {
   return (
     <Sidebar.Root
       size="m"
-      variant="simple"
       open={open}
       onOpenChange={setOpen}
       responsive={false}
@@ -47,7 +46,6 @@ function PageNavSlotDemo() {
     <div className={styles.pageShell}>
       <Sidebar.Root
         size="m"
-        variant="simple"
         sidebarSlot="page-nav"
         open={open}
         onOpenChange={setOpen}

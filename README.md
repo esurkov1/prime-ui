@@ -197,7 +197,7 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Navigation & layout | **Accordion** | Expandable sections (FAQ, settings groups) with height animation. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) |
 | Navigation & layout | **Breadcrumb** | `nav` trail with links, separators, and optional ellipsis. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/breadcrumb/COMPONENT.md) |
 | Navigation & layout | **Pagination** | Page controls: prev/next, page numbers, ellipsis. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) |
-| Navigation & layout | **Sidebar** | Side navigation: panels, groups, context column, section switching. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) |
+| Navigation & layout | **Sidebar** | Side navigation: single panel, groups, menus, responsive overlay. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) |
 | Navigation & layout | **Stepper** | Multi-step flow on `<ol>` / `<li>` plus horizontal/vertical primitives. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) |
 | Navigation & layout | **Tabs** | Tablist, indicator, one visible panel at a time. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) |
 | Navigation & layout | **PageContent** | Main column: max width (`readable` / `wide`), header and body regions. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-content) |

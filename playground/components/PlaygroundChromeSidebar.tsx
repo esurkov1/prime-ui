@@ -254,7 +254,7 @@ function PlaygroundUserMenu() {
 
 export function PlaygroundChromeSidebar() {
   return (
-    <Sidebar.Root variant="simple" sidebarSlot="page-nav" aria-label="Навигация playground">
+    <Sidebar.Root sidebarSlot="page-nav" aria-label="Навигация playground">
       <Sidebar.NavPanel>
         <Sidebar.Header>
           <Sidebar.HeaderRow>

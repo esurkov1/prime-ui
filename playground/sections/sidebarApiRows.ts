@@ -47,49 +47,7 @@ export const sidebarRootApiRows: PlaygroundApiPropRow[] = [
     type: '"s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Единый масштаб сайдбара: кнопки, текст, отступы, ширины колонок.",
-  },
-  {
-    prop: "variant",
-    type: '"simple" | "double"',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Одна панель или контекстная колонка + панель (контролируемый режим).",
-  },
-  {
-    prop: "defaultVariant",
-    type: '"simple" | "double"',
-    defaultValue: '"double"',
-    required: "Нет",
-    description: "Начальный variant без внешнего variant.",
-  },
-  {
-    prop: "onVariantChange",
-    type: "(variant: SidebarVariant) => void",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Смена variant (программно или из контекста).",
-  },
-  {
-    prop: "activeSection",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Активный раздел для двухколоночного режима и useSidebarNavTo.",
-  },
-  {
-    prop: "defaultActiveSection",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Начальный раздел при неконтролируемом activeSection.",
-  },
-  {
-    prop: "onActiveSectionChange",
-    type: "(section: string) => void",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Вызывается при выборе раздела (не при сбросе в null).",
+    description: "Единый масштаб сайдбара: кнопки, текст, отступы, ширина панели.",
   },
   {
     prop: "open",
@@ -145,7 +103,7 @@ export const sidebarRootApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "ContextBar, NavPanel и прочая разметка внутри провайдера.",
+    description: "Обычно NavPanel и вложенные части.",
   },
   {
     prop: "…rest",
@@ -154,123 +112,6 @@ export const sidebarRootApiRows: PlaygroundApiPropRow[] = [
     required: "Нет",
     description: "Остальные атрибуты aside (id, role при необходимости и т.д.).",
   },
-];
-
-export const sidebarContextBarApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "items",
-    type: "SidebarContextItem[]",
-    defaultValue: "—",
-    required: "Нет",
-    description:
-      "Конфиг иконок контекстной колонки; при первом монтировании выбирается первый id, если раздел пуст.",
-  },
-  {
-    prop: "activeSection",
-    type: "string | null",
-    defaultValue: "из контекста",
-    required: "Нет",
-    description: "Переопределение активного раздела для подсветки ContextBar.",
-  },
-  {
-    prop: "onSelectSection",
-    type: "(sectionId: string) => void",
-    defaultValue: "setActiveSection из контекста",
-    required: "Нет",
-    description: "Обработчик выбора раздела вместо контекстного сеттера.",
-  },
-  {
-    prop: "logo",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Слот шапки контекстной колонки (например марка).",
-  },
-  {
-    prop: "footer",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Нижний слот контекстной колонки.",
-  },
-  ...wrapRows(htmlNav, [], "Если items не задан — произвольная разметка внутри nav."),
-];
-
-export const sidebarContextItemButtonApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "active",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Визуально выбранный пункт контекстной колонки (data-active).",
-  },
-  {
-    prop: "asChild",
-    type: "boolean",
-    defaultValue: "false",
-    required: "Нет",
-    description: "Слить стили с одним дочерним элементом (Slot) вместо button.",
-  },
-  {
-    prop: "type",
-    type: '"button" | "submit" | "reset"',
-    defaultValue: '"button"',
-    required: "Нет",
-    description: "Тип нативной кнопки; при asChild не применяется.",
-  },
-  {
-    prop: "disabled",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Отключение и aria-disabled при asChild.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный CSS-класс.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Обычно иконка раздела.",
-  },
-  {
-    prop: "…rest",
-    type: "React.ButtonHTMLAttributes<HTMLButtonElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "onClick, aria-* и прочие атрибуты кнопки (или дочернего элемента при asChild).",
-  },
-];
-
-export const sidebarPanelSwitchApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "sections",
-    type: "Record<string, React.ReactNode>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Карта раздел → контент панели; при пустом activeSection берётся первый ключ.",
-  },
-  {
-    prop: "renderSection",
-    type: "(activeSection: string | null) => React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Если задано, имеет приоритет над sections.",
-  },
-  {
-    prop: "fallback",
-    type: "React.ReactNode",
-    defaultValue: "null",
-    required: "Нет",
-    description: "Содержимое, если раздел не найден.",
-  },
-  ...wrapRows(htmlDiv, [], "Контейнер переключаемого контента."),
 ];
 
 export const sidebarFooterApiRows: PlaygroundApiPropRow[] = [
@@ -570,24 +411,6 @@ export const sidebarTextApiRows: PlaygroundApiPropRow[] = wrapRows(
   "Вторичный текст в панели.",
 );
 
-export const sidebarContextBarHeaderApiRows: PlaygroundApiPropRow[] = wrapRows(
-  htmlDiv,
-  [],
-  "Шапка контекстной колонки.",
-);
-
-export const sidebarContextBarBodyApiRows: PlaygroundApiPropRow[] = wrapRows(
-  htmlDiv,
-  [],
-  "Тело контекстной колонки.",
-);
-
-export const sidebarContextBarFooterApiRows: PlaygroundApiPropRow[] = wrapRows(
-  htmlDiv,
-  [],
-  "Подвал контекстной колонки.",
-);
-
 export const sidebarNavPanelApiRows: PlaygroundApiPropRow[] = wrapRows(
   htmlNav,
   [],
@@ -736,34 +559,6 @@ export const sidebarUseSidebarContextApiRows: PlaygroundApiPropRow[] = [
     description: "Текущий размер с Root.",
   },
   {
-    prop: "variant",
-    type: "SidebarVariant",
-    defaultValue: "—",
-    required: "—",
-    description: "simple или double.",
-  },
-  {
-    prop: "setVariant",
-    type: "(next: SidebarVariant) => void",
-    defaultValue: "—",
-    required: "—",
-    description: "Смена variant.",
-  },
-  {
-    prop: "activeSection",
-    type: "string | null",
-    defaultValue: "—",
-    required: "—",
-    description: "Выбранный раздел верхнего яруса.",
-  },
-  {
-    prop: "setActiveSection",
-    type: "(id: string) => void",
-    defaultValue: "—",
-    required: "—",
-    description: "Установить активный раздел.",
-  },
-  {
     prop: "open",
     type: "boolean",
     defaultValue: "—",
@@ -784,15 +579,11 @@ export const sidebarUseSidebarContextApiRows: PlaygroundApiPropRow[] = [
     required: "—",
     description: "Переключить open.",
   },
-];
-
-export const sidebarUseSidebarNavToApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "pathWithinSection",
+    prop: "navPanelId",
     type: "string",
     defaultValue: "—",
-    required: "Да",
-    description:
-      "Путь внутри раздела без ведущих слэшей; функция возвращает string для to: при variant double и выбранном разделе — /{section}/{path}, иначе от корня.",
+    required: "—",
+    description: "Стабильный id панели для aria-controls у кнопок открытия.",
   },
 ];

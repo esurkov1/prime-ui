@@ -16,7 +16,6 @@ export default function SidebarFullWidthSnippet() {
       <div className={styles.row}>
         <Sidebar.Root
           size="m"
-          variant="simple"
           sidebarSlot="page-nav"
           open={open}
           onOpenChange={setOpen}
