@@ -4,11 +4,13 @@ import { Button } from "@/components/button/Button";
 import { Modal } from "@/components/modal/Modal";
 import { Icon } from "@/icons";
 
+import styles from "./snippets.module.css";
+
 export default function ModalControlledSnippet() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center" }}>
+    <div className={styles.controlledRow}>
       <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
         Открыть извне
       </Button.Root>

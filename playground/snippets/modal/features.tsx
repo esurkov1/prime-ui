@@ -4,28 +4,15 @@ import { Button } from "@/components/button/Button";
 import { Modal } from "@/components/modal/Modal";
 import { Icon } from "@/icons";
 
+import styles from "./snippets.module.css";
+
 export default function ModalFeaturesSnippet() {
   const [portalHost, setPortalHost] = React.useState<HTMLDivElement | null>(null);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div
-        ref={setPortalHost}
-        style={{
-          minHeight: "8rem",
-          border: "1px dashed var(--prime-sys-color-border-default, #ccc)",
-          borderRadius: "8px",
-          padding: "0.75rem",
-          position: "relative",
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontSize: "0.875rem",
-            color: "var(--prime-sys-color-content-secondary)",
-          }}
-        >
+    <div className="stack">
+      <div ref={setPortalHost} className={styles.portalHost}>
+        <p className={styles.introText}>
           Проп <code>container</code> у <code>Modal.Panel</code>: портал монтируется сюда в DOM
           (удобно для изоляции в тестах и особых контекстов наложения).
         </p>
@@ -36,7 +23,12 @@ export default function ModalFeaturesSnippet() {
                 Портал в контейнер
               </Button.Root>
             </Modal.Trigger>
-            <Modal.Panel closeAriaLabel="Закрыть" container={portalHost} icon={<Icon name="nav.layoutGrid" />} title="Свой контейнер">
+            <Modal.Panel
+              closeAriaLabel="Закрыть"
+              container={portalHost}
+              icon={<Icon name="nav.layoutGrid" />}
+              title="Свой контейнер"
+            >
               <p>Содержимое портала — дочерний узел выделенной области выше.</p>
             </Modal.Panel>
           </Modal.Root>
@@ -82,7 +74,7 @@ export default function ModalFeaturesSnippet() {
             "Пункт списка 11: текст для проверки прокрутки внутри диалога.",
             "Пункт списка 12: текст для проверки прокрутки внутри диалога.",
           ].map((line) => (
-            <p key={line} style={{ margin: "0 0 0.5rem" }}>
+            <p key={line} className={styles.scrollListLine}>
               {line}
             </p>
           ))}

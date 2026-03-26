@@ -1,5 +1,6 @@
 import { Button } from "@/components/button/Button";
 import { Modal } from "@/components/modal/Modal";
+import { Typography } from "@/components/typography/Typography";
 import { Icon } from "@/icons";
 
 /** Кнопки в подвале с `fullWidth`: колонка действий на всю ширину панели (типично для узкой ширины). */
@@ -14,12 +15,12 @@ export default function ModalFullWidthSnippet() {
       <Modal.Panel
         description={
           <>
-            В подвале — вертикальный стек: у <code>Button.Root</code> задан <code>fullWidth</code>, панель
-            задаёт ширину колонки.
+            В подвале — вертикальный стек: у <code>Button.Root</code> задан <code>fullWidth</code>,
+            панель задаёт ширину колонки.
           </>
         }
         footer={
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", width: "100%" }}>
+          <div className="previewBannerColumn">
             <Modal.Close>
               <Button.Root size="m" variant="primary" fullWidth>
                 Перейти к оплате
@@ -35,7 +36,9 @@ export default function ModalFullWidthSnippet() {
         icon={<Icon name="action.upload" />}
         title="Подтверждение"
       >
-        <p style={{ margin: 0 }}>Проверьте состав корзины перед оплатой.</p>
+        <Typography.Root as="p" size="m">
+          Проверьте состав корзины перед оплатой.
+        </Typography.Root>
       </Modal.Panel>
     </Modal.Root>
   );

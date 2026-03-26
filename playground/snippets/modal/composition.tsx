@@ -2,20 +2,17 @@ import { Button } from "@/components/button/Button";
 import { Input } from "@/components/input/Input";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { Modal } from "@/components/modal/Modal";
+import { Typography } from "@/components/typography/Typography";
 import { Icon } from "@/icons";
+
+import styles from "./snippets.module.css";
 
 export default function ModalCompositionSnippet() {
   return (
     <>
-      <p
-        style={{
-          margin: 0,
-          fontSize: "0.875rem",
-          color: "var(--prime-sys-color-content-secondary)",
-        }}
-      >
-        Один компонент <code>Modal.Panel</code>: проп <code>title</code>, опционально <code>description</code>,{" "}
-        <code>children</code> (тело), <code>footer</code>.
+      <p className={styles.introText}>
+        Один компонент <code>Modal.Panel</code>: проп <code>title</code>, опционально{" "}
+        <code>description</code>, <code>children</code> (тело), <code>footer</code>.
       </p>
 
       <Modal.Root>
@@ -53,7 +50,9 @@ export default function ModalCompositionSnippet() {
           icon={<Icon name="nav.itemDot" />}
           title="Только информация"
         >
-          <p style={{ margin: 0 }}>Контент отделён от шапки и не прилипает к заголовку.</p>
+          <Typography.Root as="p" size="m">
+            Контент отделён от шапки и не прилипает к заголовку.
+          </Typography.Root>
         </Modal.Panel>
       </Modal.Root>
 
@@ -109,7 +108,8 @@ export default function ModalCompositionSnippet() {
         <Modal.Panel
           description={
             <>
-              <code>Modal.Trigger</code> клонирует обработчик на единственного потомка — здесь ссылка.
+              <code>Modal.Trigger</code> клонирует обработчик на единственного потомка — здесь
+              ссылка.
             </>
           }
           footer={
