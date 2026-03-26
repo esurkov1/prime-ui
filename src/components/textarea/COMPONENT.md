@@ -1,10 +1,32 @@
 # Textarea
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
 
-## About
+## Canonical
 
-A composite multiline field: native `textarea` inside a bordered `label`, optional footer for a character counter, and optional hint or error lines below wired through `aria-describedby`.
+- **Purpose:** multiline text with optional in-control **character counter**, and optional **hint** or **error** below, wired through **`aria-describedby`** on the native **`textarea`**.
+- **Skeleton vs Input:** unlike [Input](../input/COMPONENT.md) (`Root` → `Wrapper` → **`Field`**), **Textarea** uses a single **`Textarea.Root`**: an outer **`.field`** stack wraps a bordered **`label`** (the field chrome) that owns the native **`<textarea>`**—there is **no** separate `Textarea.Field` export; pass standard textarea attributes on **`Root`**.
+- **Children:** **`Textarea.CharCounter`** only as a **direct** child of **`Root`** (footer inside the chrome). **`Textarea.Hint`** / **`Textarea.Error`** as direct children **after** that chrome (siblings of the inner `label`, not wrapped around `CharCounter`).
+- **Size:** `size` ∈ `s | m | l | xl` only on **`Textarea.Root`**; the HTML **`size`** attribute is omitted from the public typing (reserved).
+- **Scenario examples (source):** [`./examples/01-support-ticket.tsx`](./examples/01-support-ticket.tsx), [`./examples/02-comment.tsx`](./examples/02-comment.tsx), [`./examples/03-controlled.tsx`](./examples/03-controlled.tsx), [`./examples/04-full-width.tsx`](./examples/04-full-width.tsx).
+
+```tsx
+import { Textarea } from "prime-ui-kit";
+
+export function Example() {
+  return (
+    <Textarea.Root placeholder="Notes" name="notes">
+      <Textarea.Hint>Optional hint below the field.</Textarea.Hint>
+    </Textarea.Root>
+  );
+}
+```
+
+## Extended
+
+### About
+
+A composite multiline field: native `textarea` inside bordered field chrome, optional footer for a character counter, and optional hint or error lines below wired through `aria-describedby`.
 
 **When to use**
 
@@ -16,25 +38,24 @@ A composite multiline field: native `textarea` inside a bordered `label`, option
 
 - Single-line values — use [Input](../input/COMPONENT.md).
 - Rich text or embedded formatting — use a dedicated editor component.
-- When the visible label must sit only above the chrome — pair [Label](../label/COMPONENT.md) with a stable `id` on `Textarea.Root` and avoid nesting a second `label`.
+- When the visible label must sit only above the chrome — pair [Label](../label/COMPONENT.md) with a stable **`id`** on **`Textarea.Root`** (see [`./examples/02-comment.tsx`](./examples/02-comment.tsx)); do not nest a second `label` around the control.
 
-## Composition
+### Composition
 
-- **`Textarea.Root`** — outer `div` (`field`) with `data-size`, `TextareaProvider`, and `ControlSizeProvider`. The native `textarea` sits inside a `label` (`htmlFor` → input id) with the bordered `control` styling; when `autoResize` is true, the textarea is wrapped so `data-value` can drive height.
+- **`Textarea.Root`** — outer `div` (`.field`) with `data-size`, `TextareaProvider`, and `ControlSizeProvider`. The native `textarea` sits inside a `label` (`htmlFor` → input id) with bordered `.control` styling; when `autoResize` is true, the textarea is wrapped so `data-value` can drive height.
 - **`Textarea.CharCounter`** — must be a **direct** child of `Root`; implementation partitions children by reference equality to `Textarea.CharCounter` and renders matching nodes in the control footer.
 - **`Textarea.Hint`** / **`Textarea.Error`** — direct children of `Root`, **not** passed as `CharCounter`; they render after the `label` and register ids merged into the textarea’s `aria-describedby`.
 
-### Minimal example
+### Extended examples
 
-```tsx
-import { Textarea } from "prime-ui-kit";
+- [`./examples/01-support-ticket.tsx`](./examples/01-support-ticket.tsx) — Support form: description with counter, hint, and `maxLength`.
+- [`./examples/02-comment.tsx`](./examples/02-comment.tsx) — Order comment: **Label** + **`Textarea.Root`** with shared **`id`**, counter, and logistics hint.
+- [`./examples/03-controlled.tsx`](./examples/03-controlled.tsx) — Controlled value in React state with **`onChange`**.
+- [`./examples/04-full-width.tsx`](./examples/04-full-width.tsx) — Filling a card column: root is already **`width: 100%`**; parent sets the track width.
 
-export function Example() {
-  return <Textarea.Root placeholder="Notes" />;
-}
-```
+**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition patterns; this page keeps the contract (rules + API tables) authoritative.
 
-## Rules
+### Rules
 
 - **Controlled vs uncontrolled:** pass **`value`** with **`onChange`** / **`onInput`** as needed for controlled text; omit **`value`** and optionally set **`defaultValue`** for uncontrolled usage.
 - **`autoResize`** defaults to **`true`**: input events update a wrapper `data-value` mirror; set **`autoResize={false}`** to rely on fixed height / native resize behavior.
@@ -45,11 +66,12 @@ export function Example() {
 - **`Textarea.CharCounter`** is only recognized as an immediate child of **`Root`**; arbitrary wrappers around it will not land in the footer.
 - Counter overflow (**`current` > `max`**) sets **`data-overflow="true"`** on the counter for styling; it does not block typing by itself (pair with **`maxLength`** if you need a hard cap).
 - The counter uses **`aria-live="polite"`** so count updates do not interrupt typing.
+- **Full width:** the `.field` root uses **`width: 100%`** and **`min-width: 0`** (same idea as Input). Place **`Textarea.Root`** inside a parent that spans the desired column or card width.
 - There is no **`asChild`** or polymorphic root — structure is fixed.
 
-## API
+### API
 
-### Textarea.Root
+#### Textarea.Root
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -68,14 +90,14 @@ export function Example() {
 | children | `React.ReactNode` | — | no | `CharCounter` in the footer; `Hint` / `Error` after the `label`. |
 | …rest | `Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size">` | — | no | Standard textarea attributes (`placeholder`, `rows`, `maxLength`, `required`, `onChange`, `name`, etc.). |
 
-### Textarea.CharCounter
+#### Textarea.CharCounter
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | current | `number` | — | yes | Current character count. |
 | max | `number` | — | yes | Displayed limit; overflow when `current > max` sets `data-overflow="true"`. |
 
-### Textarea.Hint
+#### Textarea.Hint
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -83,7 +105,7 @@ export function Example() {
 | className | `string` | — | no | Extra class on the underlying `Hint.Root`. |
 | …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Paragraph attributes; `id` comes from context. |
 
-### Textarea.Error
+#### Textarea.Error
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|

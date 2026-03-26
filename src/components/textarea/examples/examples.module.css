@@ -1,0 +1,21 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.labelBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-s);
+}
+
+.fullWidthCard {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(100%, 22rem);
+  padding: var(--prime-sys-spacing-x3);
+  border-radius: var(--prime-sys-radius-m);
+  border: 1px dashed var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-raised);
+}
