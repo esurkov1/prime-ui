@@ -47,10 +47,7 @@ export default function SidebarCompositionSnippet() {
   const [open, setOpen] = React.useState(true);
 
   return (
-    <div
-      className="playgroundSidebarDemo"
-      style={{ height: "24rem", maxWidth: "100%", overflow: "hidden" }}
-    >
+    <div className={styles.demoRoot}>
       <Sidebar.Root
         size="m"
         variant="double"

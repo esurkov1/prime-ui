@@ -138,49 +138,46 @@ export function CourseOutlineNav() {
 
 ### In context (page layout)
 
-Storefront: sidebar in the navigation slot next to the content area, without a responsive overlay in this frame.
+Storefront: sidebar in the navigation slot next to the content area, without a responsive overlay in this frame. The page shell (for example `PageShell`) places the nav slot and `<main>` in a row; here only the sidebar markup is shown.
 
 ```tsx
 import { Sidebar } from "prime-ui-kit";
 
 export function StorefrontShell() {
   return (
-    <div style={{ display: "flex", flexDirection: "row", minHeight: "100vh" }}>
-      <Sidebar.Root
-        size="m"
-        variant="simple"
-        sidebarSlot="page-nav"
-        defaultOpen
-        responsive={false}
-        aria-label="Storefront categories"
-      >
-        <Sidebar.NavPanel>
-          <Sidebar.Header>
-            <Sidebar.HeaderRow>
-              <Sidebar.HeaderMain>
-                <Sidebar.Text>Catalog</Sidebar.Text>
-              </Sidebar.HeaderMain>
-              <Sidebar.ToggleButton />
-            </Sidebar.HeaderRow>
-          </Sidebar.Header>
-          <Sidebar.Content>
-            <Sidebar.Menu>
-              <Sidebar.MenuItem>
-                <Sidebar.MenuButton type="button" active>
-                  <Sidebar.MenuLabel>New arrivals</Sidebar.MenuLabel>
-                </Sidebar.MenuButton>
-              </Sidebar.MenuItem>
-              <Sidebar.MenuItem>
-                <Sidebar.MenuLink href="/sale" active={false}>
-                  Sale
-                </Sidebar.MenuLink>
-              </Sidebar.MenuItem>
-            </Sidebar.Menu>
-          </Sidebar.Content>
-        </Sidebar.NavPanel>
-      </Sidebar.Root>
-      <main style={{ flex: 1, padding: 24 }}>Product grid</main>
-    </div>
+    <Sidebar.Root
+      size="m"
+      variant="simple"
+      sidebarSlot="page-nav"
+      defaultOpen
+      responsive={false}
+      aria-label="Storefront categories"
+    >
+      <Sidebar.NavPanel>
+        <Sidebar.Header>
+          <Sidebar.HeaderRow>
+            <Sidebar.HeaderMain>
+              <Sidebar.Text>Catalog</Sidebar.Text>
+            </Sidebar.HeaderMain>
+            <Sidebar.ToggleButton />
+          </Sidebar.HeaderRow>
+        </Sidebar.Header>
+        <Sidebar.Content>
+          <Sidebar.Menu>
+            <Sidebar.MenuItem>
+              <Sidebar.MenuButton type="button" active>
+                <Sidebar.MenuLabel>New arrivals</Sidebar.MenuLabel>
+              </Sidebar.MenuButton>
+            </Sidebar.MenuItem>
+            <Sidebar.MenuItem>
+              <Sidebar.MenuLink href="/sale" active={false}>
+                Sale
+              </Sidebar.MenuLink>
+            </Sidebar.MenuItem>
+          </Sidebar.Menu>
+        </Sidebar.Content>
+      </Sidebar.NavPanel>
+    </Sidebar.Root>
   );
 }
 ```

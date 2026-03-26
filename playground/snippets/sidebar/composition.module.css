@@ -1,3 +1,11 @@
+.demoRoot {
+  box-sizing: border-box;
+  height: 24rem;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .brandMark {
   display: inline-flex;
   width: 100%;

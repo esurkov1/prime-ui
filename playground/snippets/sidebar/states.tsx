@@ -16,10 +16,7 @@ export default function SidebarStatesSnippet() {
   ];
 
   return (
-    <div
-      className="playgroundSidebarDemo"
-      style={{ height: "22rem", maxWidth: "100%", overflow: "hidden" }}
-    >
+    <div className="playgroundSidebarDemo">
       <Sidebar.Root
         size="m"
         variant="double"
