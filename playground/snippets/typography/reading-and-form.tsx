@@ -3,33 +3,33 @@ import { Input } from "@/components/input/Input";
 import { Typography } from "@/components/typography/Typography";
 
 /**
- * Золотой сценарий: блок чтения (`Typography` + `variant`) и блок контролов (`size` у полей и кнопок).
+ * Заголовок и вводный текст — только `Typography` + `variant`; поля и действия — `Input` и `Button` (см. их COMPONENT.md).
  */
-export default function TypographyReadingAndControlSnippet() {
+export default function TypographyReadingAndFormSnippet() {
   return (
     <main className="typographyGoldenDemo">
       <Typography.Root as="h1" variant="heading-page">
         Заявка на доступ
       </Typography.Root>
       <Typography.Root as="p" variant="body-default" tone="muted">
-        Заполните форму: типографика страницы не зависит от размеров полей.
+        Заполните форму: роли текста задаются здесь, оформление полей — компонентами формы.
       </Typography.Root>
       <div className="typographyGoldenDemoForm">
-        <Input.Root label="Email" size="m">
+        <Input.Root label="Email">
           <Input.Wrapper>
             <Input.Field type="email" placeholder="you@example.com" autoComplete="email" />
           </Input.Wrapper>
         </Input.Root>
-        <Input.Root label="Комментарий" size="m" hint="Необязательно">
+        <Input.Root label="Комментарий" hint="Необязательно">
           <Input.Wrapper>
             <Input.Field placeholder="Контекст" />
           </Input.Wrapper>
         </Input.Root>
         <div className="typographyGoldenDemoActions">
-          <Button.Root type="button" size="m" variant="primary">
+          <Button.Root type="button" variant="primary">
             Отправить
           </Button.Root>
-          <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+          <Button.Root type="button" variant="neutral" mode="stroke">
             Отмена
           </Button.Root>
         </div>

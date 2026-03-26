@@ -1,6 +1,6 @@
 # Typography
 
-**Проектирование по умолчанию:** для текста страницы выбирайте **`body-default`** в `variant`, если явно не оговорено иное. Для контролов используйте их ось **`size`** (`s`–`xl`), а не `Typography`.
+**Проектирование по умолчанию:** для текста страницы выбирайте **`body-default`** в `variant`, если явно не оговорено иное.
 
 ## About
 
@@ -11,16 +11,32 @@
 - **Use** вложенные `Typography.Root` с разными `as` и `weight` внутри одного блока.
 - **Use** `as="h1"`–`as="h6"` для визуального уровня заголовка, согласованного с темой; по возможности сохраняйте логичный порядок уровней на странице.
 - **Use** `as` с landmarks (`main`, `article`, `section`, `header`, `footer`, …) при вёрстке шаблонов.
-- **Do not use** для подписей **внутри кнопок и полей**, где кегль задаёт контроль: оборачивайте `Button`/`Input` и полагайтесь на наследование (см. [Button](../button/COMPONENT.md)) или используйте [Label](../label/COMPONENT.md).
+- **Do not use** для подписи внутри **кнопки** или **поля ввода** как отдельной «типографики»: у этих компонентов свой ритм текста — положитесь на разметку [Button](../button/COMPONENT.md) / [Input](../input/COMPONENT.md) и при необходимости [Label](../label/COMPONENT.md).
 - **Do not use** `as` вместо настоящих `<button>` / `<a>` для действий и навигации.
 - **Do not use** ожидая отдельный контроль `line-height` вне роли — межстрочный интервал связан с `variant` в стилях.
 
-## Ось чтения и ось контроля
+Интерактивные компоненты (формы, кнопки и т.д.) настраиваются **своими** пропами и токенами; **`Typography`** к ним не относится и **не** задаёт их внешний вид.
 
-- **`Typography`** — **чтение**: только `variant` (роли из `tokens/semantic.ts` → `typography.role`).
-- **Инпуты, кнопки, чекбоксы и т.д.** — **контроль**: `size` `s` | `m` | `l` | `xl` и токены `--prime-sys-size-control-*`.
+## Справочное сопоставление с Material Design 3 и Polaris
 
-Не подменяйте одну ось другой: «крупная кнопка» и «крупный заголовок» задаются разными пропами и токенами.
+Ниже — **ориентировочное** соответствие ролей prime-ui-kit стилям из [Material Design 3 — Type scale](https://m3.material.io/styles/typography/type-scale-tokens) и вариантам [Polaris Text](https://polaris.shopify.com/components/typography/text), чтобы проще ориентироваться при переносе макетов. Размеры в **px** у разных систем различаются; ориентир — **уровень иерархии**, не числовое равенство.
+
+| `variant` | Близкий стиль MD3 (роль × ступень) | Близкий вариант Polaris `Text` |
+| --------- | ----------------------------------- | ------------------------------ |
+| `display` | Display Large / акцентный экран | `heading3xl` |
+| `headline` | Headline Large | `heading2xl` |
+| `heading-page` | Headline Medium | `headingXl` |
+| `heading-section` | Headline Small или Title Large | `headingLg` |
+| `heading-subsection` | Title Medium | `headingMd` |
+| `heading-group` | Title Small | `headingSm` / `headingXs` |
+| `body-large` | Body Large | `bodyLg` |
+| `body-default` | Body Medium | `bodyMd` |
+| `body-small` | Body Small | `bodySm` |
+| `body-compact` | Label Large (плотная строка) | `bodyXs` |
+| `caption` | Label Medium | `bodySm` + приглушённый `tone` (по смыслу) |
+| `caption-micro` | Label Small | самый мелкий смысловой уровень подписи |
+
+У **MD3** в каждой группе (Display, Headline, …) есть ступени **Large / Medium / Small** — при необходимости уточняйте по макету, какая ступень ближе к вашему экрану.
 
 ## Composition
 
@@ -44,24 +60,6 @@ export function Example() {
 - HTML-атрибуты (`id`, `aria-*`, …) пробрасываются через **`...rest`**.
 - Корень использует **`text-wrap: balance`** для коротких блоков; при необходимости переопределяйте снаружи.
 - Отдельных состояний disabled/loading/error нет — сочетайте с родительским UI.
-
-## Миграция с `size` (до v0.3)
-
-Публичный проп **`size`** (`2xs`…`6xl`) заменён на **`variant`**. Соответствие прежней ступени шкалы и роли:
-
-| Было `size` | Стало `variant`   |
-| ----------- | ----------------- |
-| `6xl`       | `display`         |
-| `5xl`       | `headline`        |
-| `4xl`       | `heading-page`    |
-| `3xl`       | `heading-section` |
-| `2xl`       | `heading-subsection` |
-| `xl`        | `heading-group`   |
-| `l`         | `body-large`      |
-| `m`         | `body-default`    |
-| `s`         | `body-small`      |
-| `xs`        | `body-compact`    |
-| `2xs`       | `caption`         |
 
 ## API
 

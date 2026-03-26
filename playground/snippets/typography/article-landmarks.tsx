@@ -9,7 +9,7 @@ export default function TypographyArticleLandmarksSnippet() {
           Краткий гид по осям
         </Typography.Root>
         <Typography.Root as="p" variant="body-default" tone="muted">
-          Чтение — через <code>variant</code>; контролы — через их <code>size</code> s–xl.
+          Иерархия текста страницы задаётся только <code>variant</code> и тегами.
         </Typography.Root>
       </header>
       <section aria-labelledby="section-roles">

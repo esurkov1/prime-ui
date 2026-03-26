@@ -38,7 +38,7 @@ export function Example() {
 
 ## Rules
 
-- Вертикальный ритм между **подписью и hint** задаётся токенами контрола для выбранного **`size`**; не вставляйте между ними [Typography](../typography/COMPONENT.md) с «чужим» ярусом чтения без необходимости.
+- Вертикальный ритм между **подписью и hint** задаётся самим компонентом; не вставляйте между ними лишний [Typography](../typography/COMPONENT.md) с другой ролью чтения без необходимости.
 - Support **controlled** (`checked` + `onChange`) and **uncontrolled** (`defaultChecked`); internal state updates from the change handler before your `onChange` runs.
 - **`indeterminate`** only affects visuals and the DOM `indeterminate` property; it is not a separate submitted value—clear or sync it in your handler when the user clicks.
 - Set **`aria-label`** or **`aria-labelledby`** on **`Checkbox.Root`** when **`Checkbox.Label`** has no visible text (icon-only or header “select all” cell).

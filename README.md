@@ -19,8 +19,7 @@ A **React 19** component library built with **CSS Modules**, **design tokens** a
 - [Installation](#installation)
 - [Styles and theming](#styles-and-theming)
 - [Quick start](#quick-start)
-- [Migration (Typography)](#migration-typography)
-- [Typography: reading vs control](#typography-reading-vs-control)
+- [Typography](#typography)
 - [Imports: main entry and heavy modules](#imports-main-entry-and-heavy-modules)
 - [Providers and context](#providers-and-context)
 - [Component catalog](#component-catalog)
@@ -42,8 +41,7 @@ styling: CSS Modules + CSS variables (--prime-sys-*)
 a11y_stack: react-aria-components (peer)
 documentation_per_component: src/components/<name>/COMPONENT.md
 repository: https://github.com/esurkov1/prime-ui
-default_control_size: m  # for the control size axis unless specified otherwise
-typography_axis: variant  # reading roles; not the same as control size
+typography: variant_roles  # see src/components/typography/COMPONENT.md
 ```
 
 ---
@@ -141,36 +139,9 @@ export function Example() {
 
 ---
 
-## Migration (Typography)
+## Typography
 
-**Breaking change (v0.3+):** `Typography.Root` no longer accepts **`size`** (`2xs`…`6xl`). Use **`variant`** (semantic reading roles). Mapping:
-
-| Old `size` | New `variant` |
-|------------|----------------|
-| `6xl` | `display` |
-| `5xl` | `headline` |
-| `4xl` | `heading-page` |
-| `3xl` | `heading-section` |
-| `2xl` | `heading-subsection` |
-| `xl` | `heading-group` |
-| `l` | `body-large` |
-| `m` | `body-default` |
-| `s` | `body-small` |
-| `xs` | `body-compact` |
-| `2xs` | `caption` |
-
-Full detail: [Typography COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md).
-
----
-
-## Typography: reading vs control
-
-| Axis | Prop | Token family | Use for |
-|------|------|----------------|---------|
-| **Reading** | `Typography` **`variant`** | `--prime-sys-typography-role-*` (via `typography.role` in tokens) | Page copy, headings, captions |
-| **Control** | **`size`** `s`–`xl` on inputs, buttons, etc. | `--prime-sys-size-control-*` per tier (text, height, gap, …) | Interactive controls |
-
-Primitive steps (`sizeScale` / `lineHeightScale`) remain internal; public reading API is **`variant`** only.
+Текст страницы оформляется компонентом **`Typography`** с ролями **`variant`** (токены `typography.role` → `--prime-sys-typography-role-*`). Справочное сопоставление с Material Design 3 и Polaris — в [Typography COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md).
 
 ---
 

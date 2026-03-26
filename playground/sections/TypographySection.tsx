@@ -9,8 +9,8 @@ import TypographyCompositionSnippet from "../snippets/typography/composition";
 import compositionSource from "../snippets/typography/composition.tsx?raw";
 import TypographyFullWidthSnippet from "../snippets/typography/full-width";
 import fullWidthSource from "../snippets/typography/full-width.tsx?raw";
-import TypographyReadingAndControlSnippet from "../snippets/typography/reading-and-control";
-import readingAndControlSource from "../snippets/typography/reading-and-control.tsx?raw";
+import TypographyReadingAndFormSnippet from "../snippets/typography/reading-and-form";
+import readingAndFormSource from "../snippets/typography/reading-and-form.tsx?raw";
 import TypographyStatesSnippet from "../snippets/typography/states";
 import statesSource from "../snippets/typography/states.tsx?raw";
 import TypographyVariantCatalogSnippet from "../snippets/typography/variant-catalog";
@@ -104,9 +104,9 @@ export default function TypographySection() {
       title="Typography"
       description={
         <>
-          Текст страницы задаётся семантическими ролями <code>variant</code> (ось чтения). Размеры
-          контролов (<code>s</code>–<code>xl</code>) — отдельная ось: не подменяйте ими шкалу
-          абзацев и заголовков.
+          Текст страницы — семантические роли <code>variant</code> и токены{" "}
+          <code>typography.role</code>. Поля и кнопки оформляются своими компонентами; с{" "}
+          <code>Typography</code> они не смешиваются по API.
         </>
       }
     >
@@ -139,14 +139,14 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Чтение и контроль</h4>
+          <h4>Страница и форма</h4>
           <p className="demoBlockDescription">
-            Один фрейм: заголовок и абзац — <code>variant</code>; поля и кнопки — <code>size</code>{" "}
-            контролов.
+            Один фрейм: заголовок и пояснение — <code>Typography</code>; поля и действия —{" "}
+            <code>Input</code> и <code>Button</code>.
           </p>
-          <PlaygroundExampleFrame.Root code={readingAndControlSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={readingAndFormSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <TypographyReadingAndControlSnippet />
+              <TypographyReadingAndFormSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
