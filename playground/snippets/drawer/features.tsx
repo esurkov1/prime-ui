@@ -3,28 +3,15 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { Drawer } from "@/components/drawer/Drawer";
 
+import styles from "./features.module.css";
+
 export default function DrawerFeaturesSnippet() {
   const [portalHost, setPortalHost] = React.useState<HTMLDivElement | null>(null);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div
-        ref={setPortalHost}
-        style={{
-          minHeight: "8rem",
-          border: "1px dashed var(--prime-sys-color-border-default, #ccc)",
-          borderRadius: "8px",
-          padding: "0.75rem",
-          position: "relative",
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontSize: "0.875rem",
-            color: "var(--prime-sys-color-content-secondary)",
-          }}
-        >
+    <div className="stack">
+      <div ref={setPortalHost} className={styles.portalHost}>
+        <p className={styles.portalHint}>
           Узел для <code>Drawer.Portal</code> с пропом <code>container</code>: портал монтируется в
           заданный DOM-элемент.
         </p>
@@ -71,7 +58,7 @@ export default function DrawerFeaturesSnippet() {
             <Drawer.Header>
               <Drawer.Title id="drawer-feat-scroll-title">Прокрутка внутри панели</Drawer.Title>
             </Drawer.Header>
-            <Drawer.Body style={{ maxHeight: "10rem", overflowY: "auto" }}>
+            <Drawer.Body className={styles.bodyScroll}>
               {[
                 "Пункт A: текст для проверки прокрутки при заблокированном фоне страницы.",
                 "Пункт B: текст для проверки прокрутки при заблокированном фоне страницы.",
@@ -86,7 +73,7 @@ export default function DrawerFeaturesSnippet() {
                 "Пункт K: текст для проверки прокрутки при заблокированном фоне страницы.",
                 "Пункт L: текст для проверки прокрутки при заблокированном фоне страницы.",
               ].map((line) => (
-                <p key={line} style={{ margin: "0 0 0.5rem" }}>
+                <p key={line} className={styles.scrollLine}>
                   {line}
                 </p>
               ))}

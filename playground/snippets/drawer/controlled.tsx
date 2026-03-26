@@ -7,7 +7,7 @@ export default function DrawerControlledSnippet() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center" }}>
+    <div className="previewRowWrap rowAlignCenter">
       <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
         Открыть извне
       </Button.Root>

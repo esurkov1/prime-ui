@@ -1,6 +1,8 @@
 import { Button } from "@/components/button/Button";
 import { Drawer } from "@/components/drawer/Drawer";
 
+import styles from "./full-width.module.css";
+
 /** В подвале колонка кнопок на всю ширину панели — удобно на узком drawer. */
 export default function DrawerFullWidthSnippet() {
   return (
@@ -17,13 +19,11 @@ export default function DrawerFullWidthSnippet() {
             <Drawer.Title id="drawer-fw-title">Подтвердите выбор</Drawer.Title>
           </Drawer.Header>
           <Drawer.Body>
-            <p style={{ margin: 0 }}>
+            <p className={styles.intro}>
               Ниже — вертикальный стек с <code>fullWidth</code> у кнопок.
             </p>
           </Drawer.Body>
-          <Drawer.Footer
-            style={{ display: "flex", flexDirection: "column", gap: "0.5rem", width: "100%" }}
-          >
+          <Drawer.Footer className={styles.footerStack}>
             <Drawer.Close>
               <Button.Root size="m" variant="primary" fullWidth>
                 Сохранить и применить

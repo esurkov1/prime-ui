@@ -122,7 +122,7 @@ export function CatalogFiltersDrawer() {
           <Drawer.Header>
             <Drawer.Title id="filters-title">Refine results</Drawer.Title>
           </Drawer.Header>
-          <Drawer.Body style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <Drawer.Body>
             <Input.Root label="Brand" size="m">
               <Input.Wrapper>
                 <Input.Field placeholder="Start typing…" />

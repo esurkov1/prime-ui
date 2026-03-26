@@ -1,0 +1,23 @@
+.portalHost {
+  box-sizing: border-box;
+  min-height: 8rem;
+  border: 1px dashed var(--prime-sys-color-border-default);
+  border-radius: var(--prime-sys-shape-radius-s);
+  padding: var(--prime-sys-spacing-x3);
+  position: relative;
+}
+
+.portalHint {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.bodyScroll {
+  max-height: 10rem;
+  overflow-y: auto;
+}
+
+.scrollLine {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+}
