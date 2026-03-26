@@ -536,10 +536,38 @@
 
 .floatingToggle {
   position: fixed;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sb-control-height);
+  min-width: var(--sb-control-height);
+  max-width: var(--sb-control-height);
+  min-height: var(--sb-control-height);
+  padding: 0;
+  border: 0;
+  border-radius: var(--prime-sys-size-control-m-radius);
+  background: var(--prime-sys-color-surface-elevated);
+  color: var(--prime-sys-color-content-secondary);
+  cursor: pointer;
   z-index: calc(var(--prime-sys-elevation-zIndex-drawer) + 1);
   inset-block-start: calc(env(safe-area-inset-top, 0px) + var(--prime-sys-spacing-x2));
   inset-inline-start: calc(env(safe-area-inset-left, 0px) + var(--prime-sys-spacing-x2));
   box-shadow: var(--prime-sys-elevation-shadow-surface);
+  transition:
+    background-color var(--sb-transition-duration) var(--sb-transition-ease),
+    color var(--sb-transition-duration) var(--sb-transition-ease),
+    opacity var(--sb-transition-duration) var(--sb-transition-ease);
+}
+
+.floatingToggle:hover {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.floatingToggle:focus-visible {
+  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
 }
 
 @media (min-width: 48rem) {

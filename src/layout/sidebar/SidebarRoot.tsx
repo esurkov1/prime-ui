@@ -1,7 +1,6 @@
 import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
 import * as React from "react";
 
-import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useOverlayModal } from "@/hooks/useOverlayModal";
 import { cx } from "@/internal/cx";
@@ -226,19 +225,17 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
         </div>
 
         {Boolean(responsive) && isMobile && !openState ? (
-          <Button.Root
-            size={size}
-            variant="neutral"
-            mode="ghost"
+          <button
+            type="button"
             className={styles.floatingToggle}
             onClick={() => setLayoutState("expanded")}
             aria-label={side === "left" ? "Открыть сайдбар" : "Открыть сайдбар справа"}
             aria-controls={navPanelId}
           >
-            <Button.Icon>
+            <span className={styles.menuIcon} aria-hidden="true">
               {side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />}
-            </Button.Icon>
-          </Button.Root>
+            </span>
+          </button>
         ) : null}
       </aside>
     </SidebarProvider>
