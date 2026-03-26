@@ -1,13 +1,24 @@
 .root {
   --sb-expanded-width: 18rem;
   --sb-compact-width: 5.25rem;
-  --sb-visible-width: var(--sb-expanded-width);
+  --sb-progress: 0;
+  --sb-visible-width: calc(
+    var(--sb-expanded-width) -
+    (var(--sb-expanded-width) - var(--sb-compact-width)) *
+    var(--sb-progress)
+  );
   --sb-transition-duration: var(--prime-sys-motion-duration-slow);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
   --sb-control-height: var(--prime-sys-size-control-m-height);
   --sb-floating-toggle-size: calc(var(--sb-control-height) - var(--prime-sys-unit-8px));
 
-  --sb-panel-padding-inline: var(--prime-sys-spacing-x2);
+  --sb-panel-padding-inline-expanded: var(--prime-sys-spacing-x2);
+  --sb-panel-padding-inline-compact: var(--prime-sys-spacing-x1);
+  --sb-panel-padding-inline: calc(
+    var(--sb-panel-padding-inline-expanded) +
+    (var(--sb-panel-padding-inline-compact) - var(--sb-panel-padding-inline-expanded)) *
+    var(--sb-progress)
+  );
   --sb-panel-padding-block: var(--prime-sys-spacing-x2);
   --sb-panel-gap: var(--prime-sys-spacing-x2);
 
@@ -15,18 +26,56 @@
   --sb-item-min-width: 0;
   --sb-item-max-width: 100%;
   --sb-item-offset-inline-start: 0px;
-  --sb-item-padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
-  --sb-item-gap: var(--prime-sys-size-control-m-gap);
+  --sb-item-padding-inline-expanded: var(--prime-sys-size-control-m-buttonPaddingX);
+  --sb-item-padding-inline-compact: max(
+    0px,
+    calc(
+      (
+        var(--sb-compact-width) -
+        (2 * var(--sb-panel-padding-inline-compact)) -
+        var(--prime-sys-size-control-m-icon)
+      ) /
+      2
+    )
+  );
+  --sb-item-padding-inline: calc(
+    var(--sb-item-padding-inline-expanded) +
+    (var(--sb-item-padding-inline-compact) - var(--sb-item-padding-inline-expanded)) *
+    var(--sb-progress)
+  );
+  --sb-item-gap-expanded: var(--prime-sys-size-control-m-gap);
+  --sb-item-gap-compact: var(--prime-sys-spacing-x1);
+  --sb-item-gap: calc(
+    var(--sb-item-gap-expanded) +
+    (var(--sb-item-gap-compact) - var(--sb-item-gap-expanded)) *
+    var(--sb-progress)
+  );
   --sb-item-icon-col: var(--prime-sys-size-control-m-icon);
   --sb-item-label-col: 1fr;
   --sb-item-trailing-col: auto;
-  --sb-item-label-opacity: 1;
-  --sb-item-label-shift: 0px;
-  --sb-item-label-max-width: 100%;
-  --sb-item-trailing-opacity: 1;
-  --sb-item-trailing-scale: 1;
-  --sb-item-trailing-max-width: 100%;
-  --sb-identity-main-max-width: 100%;
+  --sb-item-label-opacity: calc(1 - var(--sb-progress));
+  --sb-item-label-shift: calc(-0.125rem * var(--sb-progress));
+  --sb-item-label-max-width: calc((1 - var(--sb-progress)) * 999px);
+  --sb-item-trailing-opacity: calc(1 - var(--sb-progress));
+  --sb-item-trailing-scale: calc(1 - (0.15 * var(--sb-progress)));
+  --sb-item-trailing-max-width: calc((1 - var(--sb-progress)) * 999px);
+  --sb-identity-main-max-width: calc((1 - var(--sb-progress)) * 999px);
+  --sb-identity-padding-inline-compact: max(
+    0px,
+    calc(
+      (
+        var(--sb-compact-width) -
+        (2 * var(--sb-panel-padding-inline-compact)) -
+        var(--prime-sys-size-avatar-m-size)
+      ) /
+      2
+    )
+  );
+  --sb-identity-padding-inline: calc(
+    var(--sb-item-padding-inline-expanded) +
+    (var(--sb-identity-padding-inline-compact) - var(--sb-item-padding-inline-expanded)) *
+    var(--sb-progress)
+  );
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -36,10 +85,6 @@
   min-height: 0;
   height: 100%;
   overflow: visible;
-  transition:
-    width var(--sb-transition-duration) var(--sb-transition-ease),
-    min-width var(--sb-transition-duration) var(--sb-transition-ease),
-    flex-basis var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .root[data-size="s"] {
@@ -52,10 +97,6 @@
 
 .root[data-size="xl"] {
   --sb-control-height: var(--prime-sys-size-control-xl-height);
-}
-
-.root[data-state="compact"] {
-  --sb-visible-width: var(--sb-compact-width);
 }
 
 .root[data-state="hidden"] {
@@ -101,8 +142,7 @@
   box-shadow: var(--prime-sys-elevation-shadow-surface);
   transition:
     border-color var(--sb-transition-duration) var(--sb-transition-ease),
-    box-shadow var(--sb-transition-duration) var(--sb-transition-ease),
-    padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
+    box-shadow var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .root[data-side="right"] .navPanel {
@@ -195,7 +235,6 @@
   line-height: 1.2;
   padding-inline: var(--prime-sys-spacing-x1);
   overflow: hidden;
-  transition: padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .headingTrack {
@@ -261,8 +300,6 @@
   cursor: pointer;
   overflow: hidden;
   transition:
-    gap var(--sb-transition-duration) var(--sb-transition-ease),
-    padding-inline var(--sb-transition-duration) var(--sb-transition-ease),
     background-color var(--sb-transition-duration) var(--sb-transition-ease),
     color var(--sb-transition-duration) var(--sb-transition-ease),
     opacity var(--sb-transition-duration) var(--sb-transition-ease);
@@ -316,10 +353,6 @@
   white-space: nowrap;
   opacity: var(--sb-item-label-opacity);
   transform: translateX(var(--sb-item-label-shift));
-  transition:
-    max-width var(--sb-transition-duration) var(--sb-transition-ease),
-    opacity var(--sb-transition-duration) var(--sb-transition-ease),
-    transform var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .menuTrailing {
@@ -329,10 +362,6 @@
   color: var(--prime-sys-color-content-muted);
   opacity: var(--sb-item-trailing-opacity);
   transform: scale(var(--sb-item-trailing-scale));
-  transition:
-    max-width var(--sb-transition-duration) var(--sb-transition-ease),
-    opacity var(--sb-transition-duration) var(--sb-transition-ease),
-    transform var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .menuAction {
@@ -446,7 +475,7 @@
   max-width: 100%;
   min-height: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
   margin-inline-start: 0;
-  padding-inline: var(--sb-item-padding-inline);
+  padding-inline: var(--sb-identity-padding-inline);
   padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
   border: 0;
   border-radius: var(--prime-sys-size-control-m-radius);
@@ -456,8 +485,6 @@
   cursor: pointer;
   overflow: hidden;
   transition:
-    gap var(--sb-transition-duration) var(--sb-transition-ease),
-    padding-inline var(--sb-transition-duration) var(--sb-transition-ease),
     background-color var(--sb-transition-duration) var(--sb-transition-ease),
     color var(--sb-transition-duration) var(--sb-transition-ease),
     opacity var(--sb-transition-duration) var(--sb-transition-ease);
@@ -496,10 +523,6 @@
   gap: var(--prime-sys-unit-2px);
   opacity: var(--sb-item-label-opacity);
   transform: translateX(var(--sb-item-label-shift));
-  transition:
-    max-width var(--sb-transition-duration) var(--sb-transition-ease),
-    opacity var(--sb-transition-duration) var(--sb-transition-ease),
-    transform var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .identityButtonTitle {
@@ -529,9 +552,6 @@
   color: var(--prime-sys-color-content-secondary);
   opacity: var(--sb-item-trailing-opacity);
   transform: scale(var(--sb-item-trailing-scale));
-  transition:
-    opacity var(--sb-transition-duration) var(--sb-transition-ease),
-    transform var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .text {
@@ -568,7 +588,6 @@
   color: var(--prime-sys-color-content-primary);
   line-height: 1.2;
   overflow: hidden;
-  transition: padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .navCategory {
@@ -674,43 +693,6 @@
 }
 
 @media (min-width: 48rem) {
-  .root[data-state="compact"] {
-    --sb-panel-padding-inline: var(--prime-sys-spacing-x1);
-    --sb-item-padding-inline: max(
-      0px,
-      calc(
-        (
-          var(--sb-compact-width) -
-          (2 * var(--sb-panel-padding-inline)) -
-          var(--prime-sys-size-control-m-icon)
-        ) /
-        2
-      )
-    );
-    --sb-item-gap: var(--prime-sys-spacing-x1);
-    --sb-item-label-opacity: 0;
-    --sb-item-label-shift: -0.125rem;
-    --sb-item-label-max-width: 0px;
-    --sb-item-trailing-opacity: 0;
-    --sb-item-trailing-scale: 0.85;
-    --sb-item-trailing-max-width: 0px;
-    --sb-identity-main-max-width: 0px;
-  }
-
-  .root[data-state="compact"] .identityButton {
-    padding-inline: max(
-      0px,
-      calc(
-        (
-          var(--sb-compact-width) -
-          (2 * var(--sb-panel-padding-inline)) -
-          var(--prime-sys-size-avatar-m-size)
-        ) /
-        2
-      )
-    );
-  }
-
   .root[data-state="compact"] .identityButtonMain {
     flex: 0 1 auto;
   }
@@ -720,11 +702,6 @@
   .root[data-state="compact"] .navCategoryCount,
   .root[data-state="compact"] .identityButtonTrailing {
     pointer-events: none;
-  }
-
-  .root[data-state="compact"] .groupLabel,
-  .root[data-state="compact"] .navPanelHeading {
-    padding-inline: var(--prime-sys-spacing-x1);
   }
 
   .root[data-state="compact"] .navCategoryTrigger {

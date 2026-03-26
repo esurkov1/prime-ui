@@ -1,3 +1,4 @@
+import { animate, useMotionValue, useMotionValueEvent, useReducedMotion } from "framer-motion";
 import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
 import * as React from "react";
 import { createPortal } from "react-dom";
@@ -79,6 +80,24 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
   },
   ref,
 ) {
+  const rootRef = React.useRef<HTMLElement | null>(null);
+  const reducedMotion = useReducedMotion();
+  const compactProgress = useMotionValue(0);
+
+  const setRootRef = React.useCallback(
+    (node: HTMLElement | null) => {
+      rootRef.current = node;
+      if (typeof ref === "function") {
+        ref(node);
+        return;
+      }
+      if (ref) {
+        ref.current = node;
+      }
+    },
+    [ref],
+  );
+
   const initialMobile = initialMobileMatch(Boolean(responsive));
 
   const modeControlled = mode === undefined ? undefined : normalizeSidebarMode(mode);
@@ -169,6 +188,28 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
   const mobileOpen = Boolean(responsive) && isMobile && openState;
   const showFloatingToggle = Boolean(responsive) && isMobile && !openState;
 
+  const compactProgressTarget = !isMobile && layoutState === "compact" ? 1 : 0;
+
+  React.useEffect(() => {
+    const controls = animate(compactProgress, compactProgressTarget, {
+      duration: reducedMotion ? 0 : 0.24,
+      ease: [0.4, 0, 0.2, 1],
+    });
+    return () => controls.stop();
+  }, [compactProgress, compactProgressTarget, reducedMotion]);
+
+  React.useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (root == null) return;
+    root.style.setProperty("--sb-progress", compactProgress.get().toString());
+  }, [compactProgress]);
+
+  useMotionValueEvent(compactProgress, "change", (value) => {
+    const root = rootRef.current;
+    if (root == null) return;
+    root.style.setProperty("--sb-progress", value.toString());
+  });
+
   const [floatingPortalReady, setFloatingPortalReady] = React.useState(false);
   React.useLayoutEffect(() => {
     setFloatingPortalReady(true);
@@ -212,7 +253,7 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
     <SidebarProvider value={contextValue}>
       <aside
         {...rest}
-        ref={ref}
+        ref={setRootRef}
         className={cx(styles.root, className)}
         aria-label={ariaLabel}
         {...toDataAttributes({
