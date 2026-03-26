@@ -10,10 +10,10 @@ import CardFlatSnippet from "../snippets/card/flat";
 import flatSource from "../snippets/card/flat.tsx?raw";
 import CardMetricSnippet from "../snippets/card/metric";
 import metricSource from "../snippets/card/metric.tsx?raw";
-import CardMediaSnippet from "../snippets/card/metric-media";
-import metricMediaSource from "../snippets/card/metric-media.tsx?raw";
 import CardMiniSnippet from "../snippets/card/mini";
 import miniSource from "../snippets/card/mini.tsx?raw";
+import CardMiniMediaSnippet from "../snippets/card/mini-media";
+import miniMediaSource from "../snippets/card/mini-media.tsx?raw";
 import CardRowSnippet from "../snippets/card/row";
 import rowSource from "../snippets/card/row.tsx?raw";
 import CardSectionSnippet from "../snippets/card/section";
@@ -24,11 +24,11 @@ import sectionContentAndChartSource from "../snippets/card/section-content-and-c
 const cardRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "variant",
-    type: '"mini" | "metric" | "metric-media" | "section"',
+    type: '"mini" | "mini-media" | "metric" | "section"',
     defaultValue: "—",
     required: "Да",
     description:
-      "Макет: компактная KPI-полоса, метрика с подписью, метрика с нижним медиа-слотом, секция с заголовком и телом.",
+      "Макет: компактная KPI-полоса, та же полоса с нижним Media, метрика с подписью, секция с заголовком и телом.",
   },
   {
     prop: "flat",
@@ -67,9 +67,9 @@ export default function CardSection() {
       headingId="card-heading"
       description={
         <>
-          Карточки для дашборда: компактные KPI, метрики с бейджем или иконкой, вариант с полосой
-          для мини-графика или прогресса, и крупная секция под полноразмерные графики. Стили на
-          семантических токенах; графики подключаются снаружи (слоты Media, Body, Chart).
+          Карточки для дашборда: компактные KPI, тот же макет mini с полосой для спарклайна или
+          прогресса, метрики с бейджем или иконкой, крупная секция под полноразмерные графики. Стили
+          на семантических токенах; графики подключаются снаружи (слоты Media, Body, Chart).
         </>
       }
     >
@@ -88,6 +88,20 @@ export default function CardSection() {
         </div>
 
         <div className="demoBlock">
+          <DemoSectionTitle>Mini + media</DemoSectionTitle>
+          <DemoDescription>
+            <code>variant=&quot;mini-media&quot;</code>: как у mini — <code>IconBox</code>,{" "}
+            <code>Stack</code> с <code>Label</code> и <code>Value</code>, плюс нижний слот{" "}
+            <code>Media</code> (спарклайн, <code>ProgressBar</code>).
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={miniMediaSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardMiniMediaSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
           <DemoSectionTitle>Metric</DemoSectionTitle>
           <DemoDescription>
             <code>variant=&quot;metric&quot;</code>: верхний ряд <code>HeaderRow</code> —{" "}
@@ -97,20 +111,6 @@ export default function CardSection() {
           <PlaygroundExampleFrame.Root code={metricSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CardMetricSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Metric + media</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;metric-media&quot;</code>: как метрика, плюс <code>Media</code> —
-            здесь SVG-спарклайн и <code>ProgressBar</code>; в <code>Lead</code> — иконка и подпись,
-            как в <code>metric</code> и рядом с <code>IconBox</code> у mini.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={metricMediaSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardMediaSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>

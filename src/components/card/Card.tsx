@@ -5,8 +5,8 @@ import { toDataAttributes } from "@/internal/data-attributes";
 
 import styles from "./Card.module.css";
 
-/** Карточка для дашбордов и аналитики: мини-KPI, метрика, метрика с медиа-слотом, секция с графиком. */
-export type CardVariant = "mini" | "metric" | "metric-media" | "section";
+/** Карточка для дашбордов и аналитики: мини-KPI, мини-KPI с медиа, метрика, секция с графиком. */
+export type CardVariant = "mini" | "mini-media" | "metric" | "section";
 
 export type CardRootProps = {
   variant: CardVariant;

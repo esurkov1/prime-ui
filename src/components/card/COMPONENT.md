@@ -15,19 +15,19 @@ Design alignment (informative):
 - **Responsive dashboards (prime-ui-kit):** use CSS Grid for KPI rows (`repeat(auto-fill, minmax(...))`) and this card for cell content — see [prime-ui skill spacing/grid](https://github.com/esurkov1/prime-ui/blob/main/SKILL/SKILL.md).
 
 - **Use** **`variant="mini"`** for a compact KPI: optional **`IconBox`** + **`Stack`** with **`Label`** and **`Value`**.
+- **Use** **`variant="mini-media"`** for the same **`IconBox`** + **`Stack`** row as **`mini`**, then **`Media`** for a sparkline, ring, or thin progress strip (full width below).
 - **Use** **`variant="metric"`** for a title row: **`HeaderRow`** with **`Lead`** (badge or icon) and **`Value`**, plus **`Description`** underneath.
-- **Use** **`variant="metric-media"`** like metric, then **`Media`** for a sparkline, ring, or thin progress strip.
 - **Use** **`variant="section"`** for a titled block: **`SectionHeader`** + **`Body`** (padded copy or tables) and/or **`Chart`** (full-width chart area, no inner padding).
 - **Do not use** as the only focus target for navigation; wrap a [LinkButton](../link-button/COMPONENT.md) or make an inner control focusable instead of the whole card, unless you add explicit `role`/`tabIndex` and keyboard handling.
 - **Do not use** decorative icons without **`aria-hidden`** when the text repeats the meaning.
 
 ## Composition
 
-- **`Card.Root`** — required **`variant`**: `"mini"` \| `"metric"` \| `"metric-media"` \| `"section"`. Optional **`flat`** removes the default surface shadow (tile-like). Sets `data-variant` / `data-flat` for styling.
-- **`Card.IconBox`** — square leading area in **`mini`**: background **`status-information-background`**, radius **`size-control-m-radius`**, icon color via **`status-information-foreground`** (decorative icons: **`aria-hidden`**).
+- **`Card.Root`** — required **`variant`**: `"mini"` \| `"mini-media"` \| `"metric"` \| `"section"`. Optional **`flat`** removes the default surface shadow (tile-like). Sets `data-variant` / `data-flat` for styling.
+- **`Card.IconBox`** — square leading area in **`mini`** and **`mini-media`**: background **`status-information-background`**, radius **`size-control-m-radius`**, icon color via **`status-information-foreground`** (decorative icons: **`aria-hidden`**).
 - **`Card.Lead`** — left cluster in **`HeaderRow`** (badge from [Badge](../badge/COMPONENT.md), raw icon, or both).
-- **`Card.HeaderRow`** — top row for **`metric`** / **`metric-media`**: typically **`Lead`** + **`Value`**.
-- **`Card.Stack`** — vertical block for **`Label`** + **`Value`** in **`mini`**.
+- **`Card.HeaderRow`** — top row for **`metric`**: typically **`Lead`** + **`Value`**.
+- **`Card.Stack`** — vertical block for **`Label`** + **`Value`** in **`mini`** and **`mini-media`**.
 - **`Card.Label`** — secondary line (muted).
 - **`Card.Value`** — primary metric string.
 - **`Card.Description`** — supporting line under the header row (`p`).
@@ -51,6 +51,27 @@ export function MiniKpi() {
         <Card.Label>Age</Card.Label>
         <Card.Value>36 years</Card.Value>
       </Card.Stack>
+    </Card.Root>
+  );
+}
+```
+
+### Mini + media example
+
+```tsx
+import { Card } from "prime-ui-kit";
+
+export function MiniKpiWithSparkline() {
+  return (
+    <Card.Root variant="mini-media">
+      <Card.IconBox aria-hidden>…</Card.IconBox>
+      <Card.Stack>
+        <Card.Label>Glucose</Card.Label>
+        <Card.Value>5.4 mmol/L</Card.Value>
+      </Card.Stack>
+      <Card.Media>
+        <svg aria-hidden viewBox="0 0 120 40" />
+      </Card.Media>
     </Card.Root>
   );
 }
@@ -127,7 +148,7 @@ export function ChartSectionWithIntro() {
 - **`SectionTitle`** is an **`h3`**; ensure heading levels match the page outline (skip levels appropriately).
 - **`Description`** is a **`p`** — only one block per card unless you compose custom markup inside **`Body`** for **`section`**.
 - **`variant="section"`** sets a **minimum height** on **`Root`**. Order after **`SectionHeader`**: optional **`Body`** (inset content), optional **`Chart`** (full bleed). If both are present, **`Body`** sizes to its content and **`Chart`** takes the **remaining height**. A **single element child** in **`Chart`** (or in **`Body`** when it is the only block) stretches within that region.
-- For **`metric-media`**, keep **`Media`** height predictable so rows in a grid stay aligned, or use one column on narrow viewports.
+- For **`mini-media`**, keep **`Media`** height predictable so rows in a grid stay aligned, or use one column on narrow viewports.
 - Icons in **`IconBox`** / **`Lead`** should not be the sole carrier of meaning; pair with visible text.
 
 ## API
@@ -136,7 +157,7 @@ export function ChartSectionWithIntro() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| variant | `"mini" \| "metric" \| "metric-media" \| "section"` | — | Yes | Layout preset and padding. |
+| variant | `"mini" \| "mini-media" \| "metric" \| "section"` | — | Yes | Layout preset and padding. |
 | flat | `boolean` | `false` | No | When `true`, no drop shadow (surface still bordered). |
 | className | `string` | — | No | Extra class on the root. |
 | children | `React.ReactNode` | — | No | Slots listed in Composition. |

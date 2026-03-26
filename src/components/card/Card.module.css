@@ -22,8 +22,18 @@
   padding: var(--prime-sys-spacing-l);
 }
 
-.root[data-variant="metric"],
-.root[data-variant="metric-media"] {
+.root[data-variant="mini-media"] {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  row-gap: var(--prime-sys-spacing-m);
+  column-gap: var(--prime-sys-spacing-l);
+  padding: var(--prime-sys-spacing-l);
+}
+
+.root[data-variant="metric"] {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -136,6 +146,21 @@
   min-height: var(--prime-sys-spacing-4xl);
   padding-block-start: var(--prime-sys-spacing-s);
   border-block-start: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+.root[data-variant="mini-media"] > .iconBox {
+  flex: 0 0 auto;
+}
+
+.root[data-variant="mini-media"] > .stack {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.root[data-variant="mini-media"] > .media {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 100%;
 }
 
 .sectionHeader {
