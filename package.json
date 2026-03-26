@@ -112,7 +112,7 @@
   },
   "scripts": {
     "tokens:build": "bun run scripts/build-tokens.ts",
-    "build": "bun run tokens:build && tsup --dts-only --config tsup.dts.config.ts && bun run scripts/rm-dist.ts && bun run scripts/bundle-lib.ts && bun run scripts/copy-dts-to-dist.ts",
+    "build": "bun run tokens:build && tsup --dts-only --config tsup.dts.config.ts && bun run scripts/bundle-lib.ts",
     "dev": "bun run scripts/bundle-lib.ts --watch",
     "playground:dev": "vite playground --config playground/vite.config.ts",
     "check": "biome check .",
