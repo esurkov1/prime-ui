@@ -22,7 +22,7 @@ export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"aside">, "ch
   mode?: SidebarLayoutMode;
   defaultMode?: SidebarLayoutMode;
   onModeChange?: (mode: SidebarLayoutMode) => void;
-  /** Совместимость: `false` = hidden, `true` = expand (не compact). */
+  /** Совместимость: `false` = полностью скрыт, `true` = expand. Компактный режим только через `mode`. */
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -174,13 +174,25 @@ function SidebarRoot({
     [setModeState],
   );
 
-  /** Скрыть полностью из expand и compact; из hidden открыть compact. */
+  /**
+   * На узком responsive: из expand — в compact (полное hidden только при ≤480px или с широкого десктопа).
+   * На широком layout: как раньше — expand/compact → hidden.
+   */
   const toggleOpen = React.useCallback(() => {
     setModeState((prev) => {
-      if (prev === "expand" || prev === "compact") return "hidden";
+      if (!isNarrowViewport || !responsive) {
+        if (prev === "expand" || prev === "compact") return "hidden";
+        return "expand";
+      }
+      if (isXsHiddenViewport) {
+        if (prev === "expand") return "hidden";
+        return prev === "hidden" ? "compact" : prev;
+      }
+      if (prev === "expand") return "compact";
+      if (prev === "compact") return "expand";
       return "compact";
     });
-  }, [setModeState]);
+  }, [isNarrowViewport, isXsHiddenViewport, responsive, setModeState]);
 
   const open = mode !== "hidden";
 
@@ -194,7 +206,19 @@ function SidebarRoot({
 
   const navPanelId = React.useId();
 
-  const closeOverlay = React.useCallback(() => setMode("hidden"), [setMode]);
+  const dismissExpandOverlay = React.useCallback(() => {
+    if (!responsive || !isNarrowViewport) {
+      setModeState("hidden");
+      return;
+    }
+    if (isXsHiddenViewport) {
+      setModeState("hidden");
+      return;
+    }
+    setModeState("compact");
+  }, [isNarrowViewport, isXsHiddenViewport, responsive, setModeState]);
+
+  const closeOverlay = dismissExpandOverlay;
 
   const navAreaRef = useOverlayModal<HTMLDivElement>(shouldShowInlineOverlay, closeOverlay);
 
@@ -240,7 +264,7 @@ function SidebarRoot({
             aria-label="Закрыть сайдбар"
             aria-hidden={shouldShowInlineOverlay ? undefined : true}
             tabIndex={-1}
-            onClick={() => setMode("hidden")}
+            onClick={dismissExpandOverlay}
           />
           {children}
         </div>
