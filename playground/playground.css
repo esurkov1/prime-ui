@@ -12,55 +12,6 @@ body {
   transition: background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
-/* Корень `PageShell`: колонка на всю высоту без полей; колонки скролла без внешнего padding корня. */
-div.playgroundShellRoot {
-  box-sizing: border-box;
-  flex-direction: column;
-  padding: 0;
-  gap: 0;
-  background: var(--prime-sys-color-surface-default);
-}
-
-/* Ряд на всю высоту: у контентной страницы (main) полей нет — только зазор до колонки Nav. */
-.playgroundShellInset {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  flex: 1 1 auto;
-  align-items: stretch;
-  align-self: stretch;
-  min-width: 0;
-  min-height: 0;
-  padding: 0;
-  gap: var(--prime-sys-spacing-x3);
-}
-
-/* `PageShell.NavArea`: без видимой обёртки — только поле до края вьюпорта; flex+gap между барами задаёт `Sidebar` `.navArea`. */
-.playgroundShellNavOuter {
-  box-sizing: border-box;
-  flex: 0 0 auto;
-  align-self: stretch;
-  min-width: 0;
-  min-height: 0;
-  margin-block: var(--prime-sys-spacing-x2);
-  margin-inline-start: var(--prime-sys-spacing-x2);
-  background: transparent;
-  border: none;
-  padding: 0;
-  box-shadow: none;
-}
-
-/* Контент без подложки/карточки — поля только внутри скроллящейся колонки. */
-main#playground-main.playgroundMain {
-  scroll-behavior: auto;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  padding-block: var(--prime-sys-spacing-x6);
-  padding-inline: var(--prime-sys-spacing-x6);
-}
-
 .playgroundDocPage {
   box-sizing: border-box;
   width: 100%;

@@ -46,4 +46,17 @@ describe("PageShell", () => {
     expect(screen.getByText("sidebar")).toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveTextContent("page");
   });
+
+  it("Application sets data-prime-shell=application on root", () => {
+    render(
+      <PageShell.Application nav={<span>nav</span>}>
+        <span>c</span>
+      </PageShell.Application>,
+    );
+
+    expect(screen.getByRole("main").parentElement).toHaveAttribute(
+      "data-prime-shell",
+      "application",
+    );
+  });
 });

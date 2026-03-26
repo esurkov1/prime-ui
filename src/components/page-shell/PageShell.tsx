@@ -45,8 +45,8 @@ function PageShellNavArea({ className, children, ...rest }: PageShellNavAreaProp
 PageShellNavArea.displayName = "PageShell.NavArea";
 
 export type PageShellContentAreaProps = {
-  /** `plain` — только main + скролл; `surface` — карточка с полями (демо/админка). */
-  variant?: "plain" | "surface";
+  /** `plain` — только main + скролл; `surface` — карточка; `page` — поля страницы внутри main. */
+  variant?: "plain" | "surface" | "page";
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
@@ -62,6 +62,7 @@ const PageShellContentArea = React.forwardRef<HTMLElement, PageShellContentAreaP
         className={cx(
           styles.contentArea,
           variant === "surface" && styles.contentAreaSurface,
+          variant === "page" && styles.contentAreaPage,
           className,
         )}
         data-prime-shell="content-area"
@@ -90,7 +91,12 @@ const PageShellApplication = React.forwardRef<HTMLElement, PageShellApplicationP
     forwardedRef,
   ) {
     return (
-      <PageShellRoot fillViewport={fillViewport} className={className} {...rootRest}>
+      <PageShellRoot
+        fillViewport={fillViewport}
+        className={className}
+        {...rootRest}
+        data-prime-shell="application"
+      >
         <PageShellNavArea {...navProps}>{nav}</PageShellNavArea>
         <PageShellContentArea ref={forwardedRef} {...contentProps}>
           {children}

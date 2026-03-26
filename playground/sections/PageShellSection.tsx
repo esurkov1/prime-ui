@@ -114,11 +114,11 @@ const applicationRows: PlaygroundApiPropRow[] = [
 const contentAreaRows: PlaygroundApiPropRow[] = [
   {
     prop: "variant",
-    type: '"plain" | "surface"',
+    type: '"plain" | "surface" | "page"',
     defaultValue: '"plain"',
     required: "Нет",
     description:
-      "`plain` — только скролл и `main`; поля/подложка у контента страницы. `surface` — карточка с полями внутри колонки.",
+      "`plain` — только скролл и `main`. `surface` — карточка с полями внутри колонки. `page` — типичные поля страницы внутри `main` (доки/плейграунд).",
   },
   {
     prop: "className",
@@ -152,9 +152,13 @@ export default function PageShellSection() {
           Каркас: CSS Grid из двух колонок — <strong>nav area</strong> (<code>NavArea</code>,{" "}
           <code>data-prime-shell=&quot;nav-area&quot;</code>) и <strong>content area</strong> (
           <code>ContentArea</code> как <code>&lt;main&gt;</code>,{" "}
-          <code>data-prime-shell=&quot;content-area&quot;</code>). У shell нет gap и внутренних
-          полей; отступы задают <code>Sidebar</code> / разметка страницы. Для типичного приложения —{" "}
-          <code>PageShell.Application</code>. В плейграунде — <code>PlaygroundLayout</code>.
+          <code>data-prime-shell=&quot;content-area&quot;</code>).{" "}
+          <code>PageShell.Application</code> помечает корень как{" "}
+          <code>data-prime-shell=&quot;application&quot;</code>: на широком экране — симметричные
+          поля вьюпорта и зазор между колонками при открытом <code>Sidebar</code> (
+          <code>sidebarSlot=&quot;page-nav&quot;</code>). Поля контента — через{" "}
+          <code>ContentArea variant=&quot;page&quot;</code> или свою разметку. В плейграунде —{" "}
+          <code>PlaygroundLayout</code>.
         </>
       }
     >

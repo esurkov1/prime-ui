@@ -1,4 +1,4 @@
-/* `page-nav`: колонка в nav area PageShell; схлопывание — `max-width` → 0; внешние поля — токены ниже. */
+/* `page-nav`: колонка в nav area PageShell; схлопывание — `max-width` → 0; горизонтальные поля/gap — у `PageShell` (`data-prime-shell="application"`). */
 .root {
   --sb-context-width: var(--prime-sys-unit-4rem);
   --sb-panel-width: var(--prime-sys-unit-20rem);
@@ -13,7 +13,6 @@
   );
   --sb-shell-gap: 0;
   --sb-page-inset: var(--prime-sys-spacing-x2);
-  --sb-page-gap: var(--prime-sys-spacing-x4);
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
   --sb-control-height: var(--prime-sys-size-control-m-height);
@@ -107,7 +106,7 @@
   --sb-panel-width: var(--prime-sys-unit-16rem);
 }
 
-/* Внешние поля — только на корне aside; не анимируем (дёрганье). Схлопывание — на `.navArea`. */
+/* Внешний горизонтальный отступ/gap до main — в PageShell; здесь без margin-inline (дёрганье и асимметрия). */
 .root[data-sidebar-slot="page-nav"] {
   flex: 0 0 auto;
   align-self: stretch;
@@ -116,9 +115,7 @@
   height: auto;
   width: fit-content;
   max-width: 100%;
-  margin-block: var(--sb-page-inset);
-  margin-inline-start: var(--sb-page-inset);
-  margin-inline-end: var(--sb-page-gap);
+  margin: 0;
   transition: none;
   --sb-shell-gap: 0;
 }
@@ -140,27 +137,11 @@
   );
 }
 
-@media (max-width: 64rem) {
-  .root[data-sidebar-slot="page-nav"][data-open="false"] {
-    margin-inline-start: 0;
-    margin-inline-end: 0;
-    margin-block: 0;
-  }
-}
-
 .root[data-open="false"] {
   --sb-nav-gap: 0;
   --sb-context-visible-width: 0;
   --sb-panel-visible-width: 0;
   --sb-shell-gap: 0;
-}
-
-:global(.playgroundShellInset:has(.playgroundShellNavOuter [data-sidebar-slot="page-nav"])) {
-  gap: 0;
-}
-
-:global(.playgroundShellNavOuter:has([data-sidebar-slot="page-nav"])) {
-  margin: 0;
 }
 
 /* Ряд: context rail + nav panel; `gap` — отступ между видимыми обёртками `.contextBar` и `.navPanel`. */

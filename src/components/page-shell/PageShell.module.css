@@ -1,5 +1,7 @@
 /*
- * Две колонки: nav area | content area. Без gap/padding на shell — отступы задают Sidebar, PageContent и т.д.
+ * Две колонки: nav area | content area.
+ * `PageShell.Application` задаёт `data-prime-shell="application"`: на ≥lg — симметричные поля вьюпорта
+ * и зазор между колонками при открытом `Sidebar` (`sidebarSlot="page-nav"`). Иначе — без полей/gap.
  * Вторая колонка: minmax(0, 1fr) чтобы main не раздувал сетку (overflow → скролл внутри main).
  */
 .root {
@@ -14,6 +16,18 @@
   min-height: 0;
   padding: 0;
   background: transparent;
+}
+
+@media (min-width: 64.001rem) {
+  .root[data-prime-shell="application"] {
+    padding-inline: var(--prime-sys-spacing-x2);
+    padding-block: var(--prime-sys-spacing-x2);
+    column-gap: 0;
+  }
+
+  .root[data-prime-shell="application"]:has([data-sidebar-slot="page-nav"][data-open="true"]) {
+    column-gap: var(--prime-sys-spacing-x3);
+  }
 }
 
 /* Один ребёнок (только main без слота навигации): на всю ширину сетки. */
@@ -38,7 +52,7 @@
   background: transparent;
 }
 
-/* База: только скролл-оболочка; подложку/поля даёт страница или variant="surface". */
+/* База: только скролл-оболочка; подложку/поля — variant="surface" | "page" или своя вёрстка. */
 .contentArea {
   box-sizing: border-box;
   display: flex;
@@ -57,4 +71,10 @@
   border-radius: var(--prime-sys-shape-radius-l);
   background: var(--prime-sys-color-surface-elevated);
   box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+/* Типичная страница доков/плейграунда: поля внутри main, без подложки. */
+.contentAreaPage {
+  padding-block: var(--prime-sys-spacing-x6);
+  padding-inline: var(--prime-sys-spacing-x6);
 }

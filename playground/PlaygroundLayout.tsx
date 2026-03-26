@@ -17,12 +17,11 @@ export function PlaygroundLayout() {
   return (
     <PageShell.Application
       fillViewport
-      className="playgroundShell"
       nav={<PlaygroundChromeSidebar />}
       ref={mainRef}
       contentProps={{
         id: "playground-main",
-        className: "playgroundMain",
+        variant: "page",
         tabIndex: -1,
       }}
     >
