@@ -1,10 +1,13 @@
 # Dependencies & build
 node_modules/
 dist/
+.dts-stage/
 .tsup-dts/
 coverage/
 playground/dist/
 *.tsbuildinfo
+tokens/**/*.d.ts
+tokens/**/*.d.ts.map
 
 # Environment
 .env

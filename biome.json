@@ -12,7 +12,7 @@
       "scripts/**/*.ts",
       "tokens/**/*.ts",
       "vitest.config.ts",
-      "tsup.dts.config.ts"
+      "tsconfig.dts.json"
     ]
   },
   "linter": {

@@ -82,7 +82,6 @@
     "@vitest/coverage-v8": "^4.1.0",
     "jsdom": "latest",
     "esbuild": "^0.27.0",
-    "tsup": "latest",
     "typescript": "^5",
     "vite": "^7",
     "vitest": "latest"
@@ -112,7 +111,7 @@
   },
   "scripts": {
     "tokens:build": "bun run scripts/build-tokens.ts",
-    "build": "bun run tokens:build && tsup --dts-only --config tsup.dts.config.ts && bun run scripts/bundle-lib.ts",
+    "build": "bun run tokens:build && bun run scripts/bundle-lib.ts",
     "dev": "bun run scripts/bundle-lib.ts --watch",
     "playground:dev": "vite playground --config playground/vite.config.ts",
     "check": "biome check .",

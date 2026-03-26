@@ -1,9 +1,10 @@
 /**
- * Library JS/CSS bundle via esbuild (no tsup Rollup treeshake pass).
- * tsup’s tree-shaking step rewrites chunks and collapses CSS module default exports to `{}`.
+ * Library JS/CSS bundle via esbuild (no Rollup/treeshake pass that breaks CSS Modules).
+ * Types: `tsc --emitDeclarationOnly` → `.dts-stage`, then merged into `dist/` (see `tsconfig.dts.json`).
  */
 
-import { copyFile, mkdir, rm } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { cp, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
@@ -53,16 +54,43 @@ const buildOptions: esbuild.BuildOptions = {
   },
 };
 
+async function emitAndMergeDts(): Promise<void> {
+  const stage = resolve(root, ".dts-stage");
+  await rm(stage, { recursive: true, force: true });
+
+  const tscJs = resolve(root, "node_modules/typescript/lib/tsc.js");
+  const code = await new Promise<number>((res, rej) => {
+    const child = spawn(process.execPath, [tscJs, "-p", "tsconfig.dts.json"], {
+      cwd: root,
+      stdio: "inherit",
+    });
+    child.on("error", rej);
+    child.on("exit", (c) => res(c ?? 1));
+  });
+  if (code !== 0) {
+    throw new Error(`tsc emitDeclarationOnly failed with exit code ${code}`);
+  }
+
+  const dist = resolve(root, "dist");
+  await cp(resolve(stage, "src"), dist, { recursive: true });
+  await cp(resolve(stage, "tokens"), resolve(dist, "tokens"), { recursive: true });
+  await rm(stage, { recursive: true, force: true });
+
+  const indexDts = resolve(dist, "index.d.ts");
+  let body = await readFile(indexDts, "utf8");
+  if (body.startsWith('import "./styles/globals.css";\r\n')) {
+    body = body.slice('import "./styles/globals.css";\r\n'.length);
+  } else if (body.startsWith('import "./styles/globals.css";\n')) {
+    body = body.slice('import "./styles/globals.css";\n'.length);
+  }
+  await writeFile(indexDts, body);
+}
+
 if (watch) {
   const ctx = await esbuild.context(buildOptions);
   await ctx.watch();
   console.log("[bundle-lib] watching src for changes…");
 } else {
   await esbuild.build(buildOptions);
-  await mkdir(resolve(root, "dist/components"), { recursive: true });
-  await copyFile(resolve(root, ".tsup-dts/index.d.ts"), resolve(root, "dist/index.d.ts"));
-  await copyFile(
-    resolve(root, ".tsup-dts/components/index.d.ts"),
-    resolve(root, "dist/components/index.d.ts"),
-  );
+  await emitAndMergeDts();
 }
