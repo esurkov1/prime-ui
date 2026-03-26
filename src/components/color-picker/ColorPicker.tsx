@@ -123,7 +123,7 @@ function FormatSelect({ className }: { className?: string }) {
         <Select.Trigger aria-label="Формат значений цвета">
           <span className={selectStyles.triggerValue}>{FORMAT_SELECT_LABEL[format]}</span>
         </Select.Trigger>
-        <Select.Content className={styles.formatSelectContent}>
+        <Select.Content>
           <Select.Item label="HSL" value="hsl">
             HSL
           </Select.Item>

@@ -8,6 +8,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
 import type { SelectSize } from "@/internal/states";
 
@@ -252,6 +253,7 @@ function SelectContent({ className, children }: SelectContentProps) {
     size,
   } = useSelectContext();
 
+  const overlayPortalLayer = useOverlayPortalLayer();
   const contentRef = React.useRef<HTMLDivElement | null>(null);
   const { resolvedSide, update } = usePosition(triggerRef, contentRef, {
     side: "bottom",
@@ -325,6 +327,7 @@ function SelectContent({ className, children }: SelectContentProps) {
         aria-hidden={!isOpen}
         tabIndex={-1}
         data-react-aria-top-layer="true"
+        data-overlay-portal-layer={overlayPortalLayer}
         className={cx(styles.content, className)}
         onKeyDown={handleKeyDown}
         style={{ display: isOpen ? undefined : "none" }}

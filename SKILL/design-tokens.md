@@ -189,16 +189,17 @@ Values differ for light / dark themes (automatically via `data-theme`).
 
 ## Z-index (`--prime-sys-elevation-zIndex-*`)
 
-| Token | Value | Layer |
-|-------|----------|------|
-| `base` | 10 | Base content |
-| `sticky` | 100 | Sticky header, fixed sidebar |
-| `popover` | 1000 | Popover |
-| `dropdown` | 1200 | Dropdown, Select menu (above popover) |
-| `tooltip` | 1600 | Tooltip (above popover and dropdown) |
-| `modal` | 2000 | Modal |
-| `drawer` | 2000 | Drawer, fullscreen mobile sidebar (same numeric level as `modal`) |
-| `toast` | 3000 | Notification |
+Глобальная страница (снизу вверх): `base` (10) → `sticky` (100) → `popover` (1000) → `dropdown` (1200) → `tooltip` (1600) → **`drawer` (2000)** → **`modal` (3000)** → **`toast` (10000)**.
+
+Порталы на `document.body` внутри **Drawer** / **Modal** поднимаются по контексту `OverlayPortalLayerProvider` / `useOverlayPortalLayer` (см. экспорт кита): для слоя задаются отдельные токены `*InDrawer`, `*InModal`, `*InDrawerInModal` (например `dropdownInModal` = 3200). Оболочка **Drawer**, открытого поверх **Modal**, использует `drawerNestedShell` (3400).
+
+| Token | Value | Role |
+|-------|-------|------|
+| `drawer` | 2000 | Drawer, mobile fullscreen sidebar |
+| `modal` | 3000 | Modal overlay + dialog (above drawer) |
+| `popoverInModal` … `tooltipInDrawerInModal` | 2100–3700 | Popover / Dropdown / Tooltip по контексту слоя |
+| `drawerNestedShell` | 3400 | Drawer opened over a modal |
+| `toast` | 10000 | Notifications |
 
 **Layout rule:** for sticky header — `z-index: var(--prime-sys-elevation-zIndex-sticky)`.
 Sidebar on desktop — `base`; Drawer on mobile — `drawer`. Do not invent custom z-index values.

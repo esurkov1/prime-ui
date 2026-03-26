@@ -75,7 +75,6 @@
   flex-direction: column;
   align-items: stretch;
   position: fixed;
-  z-index: var(--prime-sys-elevation-zIndex-dropdown);
   width: max-content;
   max-width: min(var(--prime-sys-unit-20rem), 100vw);
   background: var(--prime-sys-color-surface-elevated);
@@ -86,6 +85,22 @@
   min-width: var(--dd-min-w);
   /* max-height задаётся из JS по свободному месту во вьюпорте; прокрутка — ScrollContainer */
   transform-origin: top center;
+}
+
+.content[data-overlay-portal-layer="page"] {
+  z-index: var(--prime-sys-elevation-zIndex-dropdown);
+}
+
+.content[data-overlay-portal-layer="drawer"] {
+  z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawer);
+}
+
+.content[data-overlay-portal-layer="modal"] {
+  z-index: var(--prime-sys-elevation-zIndex-dropdownInModal);
+}
+
+.content[data-overlay-portal-layer="drawerInModal"] {
+  z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawerInModal);
 }
 
 .content[data-size="s"] {

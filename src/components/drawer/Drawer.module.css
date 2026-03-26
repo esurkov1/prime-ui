@@ -7,6 +7,10 @@
   animation: drawerFadeIn var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
+.overlay[data-nested-in-modal="true"] {
+  z-index: var(--prime-sys-elevation-zIndex-drawerNestedShell);
+}
+
 .panel {
   position: fixed;
   z-index: var(--prime-sys-elevation-zIndex-drawer);
@@ -27,6 +31,10 @@
   --drawer-footer-gap: var(--prime-sys-size-drawer-m-footerGap);
   --drawer-title-text: var(--prime-sys-size-drawer-m-titleText);
   --drawer-panel-width: min(22rem, 92vw);
+}
+
+.panel[data-nested-in-modal="true"] {
+  z-index: var(--prime-sys-elevation-zIndex-drawerNestedShell);
 }
 
 .panel[data-size="s"] {

@@ -59,7 +59,6 @@
   flex-direction: column;
   align-items: stretch;
   position: fixed;
-  z-index: var(--prime-sys-elevation-zIndex-popover);
   width: max-content;
   max-width: min(var(--prime-sys-unit-24rem), 100vw);
   background: var(--prime-sys-color-surface-elevated);
@@ -73,6 +72,22 @@
   font-size: var(--po-text-size);
   line-height: 1.35;
   color: var(--prime-sys-color-content-secondary);
+}
+
+.content[data-overlay-portal-layer="page"] {
+  z-index: var(--prime-sys-elevation-zIndex-popover);
+}
+
+.content[data-overlay-portal-layer="drawer"] {
+  z-index: var(--prime-sys-elevation-zIndex-popoverInDrawer);
+}
+
+.content[data-overlay-portal-layer="modal"] {
+  z-index: var(--prime-sys-elevation-zIndex-popoverInModal);
+}
+
+.content[data-overlay-portal-layer="drawerInModal"] {
+  z-index: var(--prime-sys-elevation-zIndex-popoverInDrawerInModal);
 }
 
 .content[data-size="s"] {

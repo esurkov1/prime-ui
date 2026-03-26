@@ -341,19 +341,14 @@ export const primitiveTokens = {
     },
   },
   /**
-   * Z-index: именованные роли слоёв (не ось размеров). Интервалы между уровнями с запасом,
-   * чтобы локальные z-index внутри компонентов (группы кнопок, sticky-ячейки) не пересекали соседний глобальный слой.
+   * Z-index: именованные роли слоёв (не ось размеров). Интервалы с запасом.
    *
-   * Снизу вверх (см. компоненты в `semantic.elevation.zIndex`):
-   * - base — обычный контент, приподнятые бейджи внутри строки
-   * - sticky — прилипающие шапки/колонки (внутри таблицы — свои малые значения)
-   * - popover — `Popover` (плавающая панель без модального блока страницы)
-   * - dropdown — `Dropdown`, `Select` (лист выше popover: селект внутри поповера)
-   * - tooltip — `Tooltip` (подсказка к контролу внутри popover/dropdown; портал на `body`)
-   * - modal — `Modal` (оверлей + диалог)
-   * - toast — `Notification` (глобальные тосты поверх модалок)
+   * Глобальная страница: base → sticky → popover → dropdown → tooltip.
+   * Блокирующие оболочки: drawer (ниже) → modal (выше). Порталы на `body` внутри drawer/modal
+   * используют отдельные уровни (`*InDrawer`, `*InModal`, `*InDrawerInModal`), см. `OverlayPortalLayerContext`.
    *
-   * Drawer и мобильный fullscreen sidebar используют тот же числовой уровень, что modal (`semantic.drawer` → `modal`).
+   * Drawer внутри modal: оболочка `drawerNestedShell` выше `modal`; порталы внутри — ещё выше.
+   * Тосты — поверх всех перечисленных слоёв.
    */
   zIndex: {
     base: "10",
@@ -361,8 +356,22 @@ export const primitiveTokens = {
     popover: "1000",
     dropdown: "1200",
     tooltip: "1600",
-    modal: "2000",
-    /** Выше модалки и всплывающих слоёв — очередь тостов. */
-    toast: "3000",
+    /** `Drawer`, mobile fullscreen `Sidebar` — ниже модалки. */
+    drawer: "2000",
+    /** `Modal` (оверлей + диалог), CommandMenu — поверх drawer. */
+    modal: "3000",
+    popoverInDrawer: "2100",
+    dropdownInDrawer: "2200",
+    tooltipInDrawer: "2300",
+    popoverInModal: "3100",
+    dropdownInModal: "3200",
+    tooltipInModal: "3300",
+    /** Оверлей и панель `Drawer`, открытого поверх `Modal`. */
+    drawerNestedShell: "3400",
+    popoverInDrawerInModal: "3500",
+    dropdownInDrawerInModal: "3600",
+    tooltipInDrawerInModal: "3700",
+    /** Выше модалок и вложенных порталов — очередь тостов. */
+    toast: "10000",
   },
 } as const;

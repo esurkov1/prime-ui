@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: column;
   position: fixed;
-  z-index: var(--prime-sys-elevation-zIndex-tooltip);
   isolation: isolate;
   pointer-events: none;
   border-radius: var(--prime-sys-size-tooltip-m-radius);
@@ -21,6 +20,22 @@
   box-shadow: var(--prime-sys-elevation-shadow-tooltip);
   overflow: visible;
   animation: tooltipIn var(--prime-sys-motion-fast) var(--prime-sys-motion-standard) both;
+}
+
+.content[data-overlay-portal-layer="page"] {
+  z-index: var(--prime-sys-elevation-zIndex-tooltip);
+}
+
+.content[data-overlay-portal-layer="drawer"] {
+  z-index: var(--prime-sys-elevation-zIndex-tooltipInDrawer);
+}
+
+.content[data-overlay-portal-layer="modal"] {
+  z-index: var(--prime-sys-elevation-zIndex-tooltipInModal);
+}
+
+.content[data-overlay-portal-layer="drawerInModal"] {
+  z-index: var(--prime-sys-elevation-zIndex-tooltipInDrawerInModal);
 }
 
 .content::after {

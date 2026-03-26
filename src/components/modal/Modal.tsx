@@ -9,6 +9,7 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { OverlayPortalLayerProvider } from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
 import type { ButtonSize } from "@/internal/states";
 
@@ -271,7 +272,9 @@ function ModalContent({
         className={cx(styles.content, className)}
         {...rest}
       >
-        <ControlSizeProvider value={MODAL_SHELL_SIZE}>{children}</ControlSizeProvider>
+        <OverlayPortalLayerProvider value="modal">
+          <ControlSizeProvider value={MODAL_SHELL_SIZE}>{children}</ControlSizeProvider>
+        </OverlayPortalLayerProvider>
       </div>
     </ModalContentShellContext.Provider>
   );

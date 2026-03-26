@@ -9,6 +9,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { mergeRefs } from "@/internal/mergeRefs";
+import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
 import type { DropdownSize } from "@/internal/states";
 
@@ -117,6 +118,7 @@ function PopoverContent({
   className,
 }: PopoverContentProps) {
   const { isOpen, onClose, triggerRef, contentId, triggerId } = usePopoverContext();
+  const overlayPortalLayer = useOverlayPortalLayer();
   const contentRef = React.useRef<HTMLDivElement | null>(null);
 
   const layout = usePopoverPosition({
@@ -155,6 +157,7 @@ function PopoverContent({
           aria-modal={false}
           aria-labelledby={triggerId}
           data-react-aria-top-layer="true"
+          data-overlay-portal-layer={overlayPortalLayer}
           data-side={layout?.resolvedSide ?? side}
           data-size={size}
           className={cx(styles.content, className)}

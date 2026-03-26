@@ -330,8 +330,8 @@ export const semanticTokens = {
     x14: "{spaces.layout.6xl}",
   },
   /**
-   * Слои наложения: одна ось `elevation.zIndex.*` на весь кит. Потребители подставляют `--prime-sys-elevation-zIndex-*`.
-   * Порядок: base → sticky → popover → dropdown → tooltip → modal (= drawer) → toast.
+   * Слои наложения: `--prime-sys-elevation-zIndex-*` + контекст `OverlayPortalLayer` для порталов
+   * (popover/dropdown/tooltip внутри drawer/modal — см. `drawerInModal`, `*InModal`, `*InDrawerInModal`).
    */
   elevation: {
     zIndex: {
@@ -340,9 +340,18 @@ export const semanticTokens = {
       popover: "{zIndex.popover}",
       dropdown: "{zIndex.dropdown}",
       tooltip: "{zIndex.tooltip}",
+      drawer: "{zIndex.drawer}",
       modal: "{zIndex.modal}",
-      /** Тот же уровень, что `modal`: `Drawer`, fullscreen mobile `Sidebar`. */
-      drawer: "{zIndex.modal}",
+      popoverInDrawer: "{zIndex.popoverInDrawer}",
+      dropdownInDrawer: "{zIndex.dropdownInDrawer}",
+      tooltipInDrawer: "{zIndex.tooltipInDrawer}",
+      popoverInModal: "{zIndex.popoverInModal}",
+      dropdownInModal: "{zIndex.dropdownInModal}",
+      tooltipInModal: "{zIndex.tooltipInModal}",
+      drawerNestedShell: "{zIndex.drawerNestedShell}",
+      popoverInDrawerInModal: "{zIndex.popoverInDrawerInModal}",
+      dropdownInDrawerInModal: "{zIndex.dropdownInDrawerInModal}",
+      tooltipInDrawerInModal: "{zIndex.tooltipInDrawerInModal}",
       toast: "{zIndex.toast}",
     },
     shadow: {

@@ -5,6 +5,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
 
 import styles from "./Tooltip.module.css";
@@ -190,6 +191,7 @@ export type TooltipContentProps = {
 
 function TooltipContent({ children, size = "m", side = "top", className }: TooltipContentProps) {
   const { isOpen, triggerRef, contentId } = useTooltipRootContext();
+  const overlayPortalLayer = useOverlayPortalLayer();
   const contentRef = React.useRef<HTMLDivElement | null>(null);
   const [coords, setCoords] = React.useState<TooltipCoords | null>(null);
 
@@ -231,6 +233,7 @@ function TooltipContent({ children, size = "m", side = "top", className }: Toolt
         ref={contentRef}
         id={contentId}
         role="tooltip"
+        data-overlay-portal-layer={overlayPortalLayer}
         className={cx(styles.content, className)}
         style={positionStyle}
         {...toDataAttributes({ size, side })}

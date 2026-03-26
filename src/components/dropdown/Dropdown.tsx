@@ -10,6 +10,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { remToPx } from "@/internal/layoutPxFromPrimitives";
 import { mergeRefs } from "@/internal/mergeRefs";
+import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
 import type { DropdownSize } from "@/internal/states";
 import { primitiveTokens } from "../../../tokens/primitives";
@@ -128,6 +129,7 @@ function DropdownContent({
   className,
 }: DropdownContentProps) {
   const { isOpen, onClose, triggerRef, menuId, triggerId } = useDropdownContext();
+  const overlayPortalLayer = useOverlayPortalLayer();
   const contentRef = React.useRef<HTMLDivElement | null>(null);
 
   const layout = useDropdownPosition({
@@ -163,6 +165,7 @@ function DropdownContent({
             role="menu"
             aria-labelledby={triggerId}
             data-react-aria-top-layer="true"
+            data-overlay-portal-layer={overlayPortalLayer}
             data-side={layout?.resolvedSide ?? side}
             data-size={size}
             className={cx(styles.content, className)}

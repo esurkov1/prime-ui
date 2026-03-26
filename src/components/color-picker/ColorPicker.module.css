@@ -145,14 +145,6 @@
   flex-direction: column;
 }
 
-/*
- * ColorPicker часто используется внутри Popover (`--prime-sys-elevation-zIndex-popover`).
- * Select внутри ColorPicker использует `--prime-sys-elevation-zIndex-dropdown` — выше popover.
- */
-.formatSelectContent {
-  z-index: var(--prime-sys-elevation-zIndex-dropdown);
-}
-
 /* ---- Полоса: пипетка + сегменты каналов ---- */
 .channelStrip {
   display: flex;

@@ -1,5 +1,13 @@
 export type { ControlSizeProviderProps, ControlSurfaceSize } from "../internal/ControlSizeContext";
 export { ControlSizeProvider, useOptionalControlSize } from "../internal/ControlSizeContext";
+export type {
+  OverlayPortalLayer,
+  OverlayPortalLayerProviderProps,
+} from "../internal/OverlayPortalLayerContext";
+export {
+  OverlayPortalLayerProvider,
+  useOverlayPortalLayer,
+} from "../internal/OverlayPortalLayerContext";
 export * from "../layout";
 export type {
   AccordionArrowProps,

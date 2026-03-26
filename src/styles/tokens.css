@@ -247,10 +247,21 @@
   --prime-ref-spaces-layout-xl: 1.25rem;
   --prime-ref-spaces-layout-xs: 0.25rem;
   --prime-ref-zIndex-base: 10;
+  --prime-ref-zIndex-drawer: 2000;
+  --prime-ref-zIndex-drawerNestedShell: 3400;
   --prime-ref-zIndex-dropdown: 1200;
-  --prime-ref-zIndex-modal: 2000;
+  --prime-ref-zIndex-dropdownInDrawer: 2200;
+  --prime-ref-zIndex-dropdownInDrawerInModal: 3600;
+  --prime-ref-zIndex-dropdownInModal: 3200;
+  --prime-ref-zIndex-modal: 3000;
   --prime-ref-zIndex-popover: 1000;
+  --prime-ref-zIndex-popoverInDrawer: 2100;
+  --prime-ref-zIndex-popoverInDrawerInModal: 3500;
+  --prime-ref-zIndex-popoverInModal: 3100;
   --prime-ref-zIndex-sticky: 100;
-  --prime-ref-zIndex-toast: 3000;
+  --prime-ref-zIndex-toast: 10000;
   --prime-ref-zIndex-tooltip: 1600;
+  --prime-ref-zIndex-tooltipInDrawer: 2300;
+  --prime-ref-zIndex-tooltipInDrawerInModal: 3700;
+  --prime-ref-zIndex-tooltipInModal: 3300;
 }

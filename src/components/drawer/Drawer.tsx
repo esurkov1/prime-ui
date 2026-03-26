@@ -11,6 +11,10 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import {
+  OverlayPortalLayerProvider,
+  useOverlayPortalLayer,
+} from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
 import type { DrawerSize } from "@/internal/states";
 
@@ -130,6 +134,8 @@ export type DrawerOverlayProps = React.HTMLAttributes<HTMLDivElement>;
 
 function DrawerOverlay({ className, onClick, ...rest }: DrawerOverlayProps) {
   const { onClose, closeOnOverlayClick } = useDrawerContext();
+  const parentLayer = useOverlayPortalLayer();
+  const nestedInModal = parentLayer === "modal";
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     onClick?.(event);
@@ -145,6 +151,7 @@ function DrawerOverlay({ className, onClick, ...rest }: DrawerOverlayProps) {
       className={cx(styles.overlay, className)}
       onClick={handleClick}
       data-testid="drawer-overlay"
+      data-nested-in-modal={nestedInModal ? "true" : undefined}
       {...rest}
     />
   );
@@ -169,6 +176,9 @@ function DrawerPanel({
   ...rest
 }: DrawerPanelProps) {
   const { open, onClose, closeOnEscape } = useDrawerContext();
+  const parentLayer = useOverlayPortalLayer();
+  const nestedInModal = parentLayer === "modal";
+  const portalLayer = nestedInModal ? "drawerInModal" : "drawer";
   const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
 
   useScrollLock(open);
@@ -221,11 +231,12 @@ function DrawerPanel({
           aria-describedby={ariaDescribedBy}
           tabIndex={-1}
           data-side={side}
+          data-nested-in-modal={nestedInModal ? "true" : undefined}
           className={cx(styles.panel, className)}
           {...toDataAttributes({ size })}
           {...rest}
         >
-          {children}
+          <OverlayPortalLayerProvider value={portalLayer}>{children}</OverlayPortalLayerProvider>
         </div>
       </DrawerPanelContext.Provider>
     </DrawerChromeSizeContext.Provider>

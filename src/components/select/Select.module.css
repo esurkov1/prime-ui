@@ -218,7 +218,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--prime-sys-spacing-x1);
-  z-index: var(--prime-sys-elevation-zIndex-dropdown);
   /* Как у Dropdown: иначе width:auto у fixed растягивается под вьюпорт, offsetWidth огромный,
    * и clamp в usePosition загоняет left к var(--prime-sys-unit-8px) — список уезжает влево от триггера. */
   width: max-content;
@@ -234,6 +233,22 @@
   outline: none;
   font-family: inherit;
   color: var(--prime-sys-color-content-primary);
+}
+
+.content[data-overlay-portal-layer="page"] {
+  z-index: var(--prime-sys-elevation-zIndex-dropdown);
+}
+
+.content[data-overlay-portal-layer="drawer"] {
+  z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawer);
+}
+
+.content[data-overlay-portal-layer="modal"] {
+  z-index: var(--prime-sys-elevation-zIndex-dropdownInModal);
+}
+
+.content[data-overlay-portal-layer="drawerInModal"] {
+  z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawerInModal);
 }
 
 .content[data-size="s"] {
