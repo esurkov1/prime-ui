@@ -11,22 +11,17 @@ export default function ModalResponsiveSnippet() {
           Адаптивная ширина
         </Button.Root>
       </Modal.Trigger>
-      <Modal.Layer>
-        <Modal.Content>
-          <Modal.Header
-            icon={<Icon name="nav.home" />}
-            title="Адаптивная ширина"
-            description="При уменьшении окна браузера панель сжимается вместе с полем, не вылезая за отступы затемнения."
-            closeAriaLabel="Закрыть"
-          />
-          <Modal.Body>
-            <p>
-              Смените ширину окна: на десктопе виден верхний предел по токенам, на мобильной ширине
-              — почти вся область между боковыми отступами оверлея.
-            </p>
-          </Modal.Body>
-        </Modal.Content>
-      </Modal.Layer>
+      <Modal.Panel
+        closeAriaLabel="Закрыть"
+        description="При уменьшении окна браузера панель сжимается вместе с полем, не вылезая за отступы затемнения."
+        icon={<Icon name="nav.home" />}
+        title="Адаптивная ширина"
+      >
+        <p>
+          Смените ширину окна: на десктопе виден верхний предел по токенам, на мобильной ширине — почти вся область
+          между боковыми отступами оверлея.
+        </p>
+      </Modal.Panel>
     </Modal.Root>
   );
 }

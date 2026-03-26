@@ -198,18 +198,7 @@ export type { LabelRootProps, LabelSize } from "./label/Label";
 export { Label } from "./label/Label";
 export type { LinkButtonRootProps, LinkButtonSize } from "./link-button/LinkButton";
 export { LinkButton } from "./link-button/LinkButton";
-export type {
-  ModalBodyProps,
-  ModalCloseProps,
-  ModalContentProps,
-  ModalFooterProps,
-  ModalHeaderProps,
-  ModalLayerProps,
-  ModalOverlayProps,
-  ModalPortalProps,
-  ModalRootProps,
-  ModalTriggerProps,
-} from "./modal/Modal";
+export type { ModalCloseProps, ModalPanelProps, ModalRootProps, ModalTriggerProps } from "./modal/Modal";
 export { Modal } from "./modal/Modal";
 export type {
   NotificationAction,

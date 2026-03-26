@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
-import { Modal, type ModalRootProps } from "@/components/modal/Modal";
+import { Modal, type ModalPanelProps, type ModalRootProps } from "@/components/modal/Modal";
 import modalShellStyles from "@/components/modal/Modal.module.css";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -160,15 +160,14 @@ function CommandMenuRootProvider({ children }: { children: React.ReactNode }) {
 
 // ─── Dialog ──────────────────────────────────────────────────────────────────
 
-export type CommandMenuDialogProps = Omit<ModalRootProps, "children"> & {
-  children?: React.ReactNode;
-  overlayClassName?: string;
-  /** Дополнительный класс для панели контента (совмещается с внутренними стилями диалога). */
-  className?: string;
-  contentClassName?: string;
-  "aria-labelledby"?: string;
-  "aria-describedby"?: string;
-};
+export type CommandMenuDialogProps = Omit<ModalRootProps, "children"> &
+  Pick<
+    ModalPanelProps,
+    "children" | "className" | "overlayClassName" | "aria-labelledby" | "aria-describedby"
+  > & {
+    /** Дополнительный класс для панели (совмещается с `className` панели). */
+    contentClassName?: string;
+  };
 
 function CommandMenuDialog({
   children,
@@ -191,15 +190,14 @@ function CommandMenuDialog({
       closeOnEscape={closeOnEscape}
       closeOnOverlayClick={closeOnOverlayClick}
     >
-      <Modal.Layer className={cx(styles.dialogOverlay, overlayClassName)}>
-        <Modal.Content
-          className={cx(styles.dialogContent, styles.root, contentClassName, className)}
-          aria-labelledby={ariaLabelledBy}
-          aria-describedby={ariaDescribedBy}
-        >
-          <CommandMenuRootProvider>{children}</CommandMenuRootProvider>
-        </Modal.Content>
-      </Modal.Layer>
+      <Modal.Panel
+        aria-describedby={ariaDescribedBy}
+        aria-labelledby={ariaLabelledBy}
+        className={cx(styles.dialogContent, styles.root, contentClassName, className)}
+        overlayClassName={cx(styles.dialogOverlay, overlayClassName)}
+      >
+        <CommandMenuRootProvider>{children}</CommandMenuRootProvider>
+      </Modal.Panel>
     </Modal.Root>
   );
 }

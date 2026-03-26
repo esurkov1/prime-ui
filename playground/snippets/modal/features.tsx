@@ -26,7 +26,7 @@ export default function ModalFeaturesSnippet() {
             color: "var(--prime-sys-color-content-secondary)",
           }}
         >
-          Проп <code>container</code> у <code>Modal.Layer</code>: портал монтируется сюда в DOM
+          Проп <code>container</code> у <code>Modal.Panel</code>: портал монтируется сюда в DOM
           (удобно для изоляции в тестах и особых контекстов наложения).
         </p>
         {portalHost ? (
@@ -36,18 +36,9 @@ export default function ModalFeaturesSnippet() {
                 Портал в контейнер
               </Button.Root>
             </Modal.Trigger>
-            <Modal.Layer container={portalHost}>
-              <Modal.Content>
-                <Modal.Header
-                  icon={<Icon name="nav.layoutGrid" />}
-                  title="Свой контейнер"
-                  closeAriaLabel="Закрыть"
-                />
-                <Modal.Body>
-                  <p>Содержимое портала — дочерний узел выделенной области выше.</p>
-                </Modal.Body>
-              </Modal.Content>
-            </Modal.Layer>
+            <Modal.Panel closeAriaLabel="Закрыть" container={portalHost} icon={<Icon name="nav.layoutGrid" />} title="Свой контейнер">
+              <p>Содержимое портала — дочерний узел выделенной области выше.</p>
+            </Modal.Panel>
           </Modal.Root>
         ) : null}
       </div>
@@ -58,48 +49,44 @@ export default function ModalFeaturesSnippet() {
             Длинное содержимое с прокруткой
           </Button.Root>
         </Modal.Trigger>
-        <Modal.Layer>
-          <Modal.Content>
-            <Modal.Header
-              icon={<Icon name="nav.itemDot" />}
-              title="Прокрутка внутри панели"
-              description={
-                <>
-                  Задайте ограничение по высоте на <code>Modal.Body</code> (или свой класс), чтобы
-                  фон страницы оставался заблокированным.
-                </>
-              }
-              closeAriaLabel="Закрыть"
-            />
-            <Modal.Body style={{ maxHeight: "10rem", overflowY: "auto" }}>
-              {[
-                "Пункт списка 1: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 2: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 3: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 4: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 5: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 6: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 7: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 8: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 9: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 10: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 11: текст для проверки прокрутки внутри диалога.",
-                "Пункт списка 12: текст для проверки прокрутки внутри диалога.",
-              ].map((line) => (
-                <p key={line} style={{ margin: "0 0 0.5rem" }}>
-                  {line}
-                </p>
-              ))}
-            </Modal.Body>
-            <Modal.Footer>
-              <Modal.Close>
-                <Button.Root size="m" variant="primary">
-                  Закрыть
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Layer>
+        <Modal.Panel
+          bodyStyle={{ maxHeight: "10rem", overflowY: "auto" }}
+          closeAriaLabel="Закрыть"
+          description={
+            <>
+              Задайте ограничение по высоте на область тела через <code>bodyStyle</code> (или{" "}
+              <code>bodyClassName</code>), чтобы фон страницы оставался заблокированным.
+            </>
+          }
+          footer={
+            <Modal.Close>
+              <Button.Root size="m" variant="primary">
+                Закрыть
+              </Button.Root>
+            </Modal.Close>
+          }
+          icon={<Icon name="nav.itemDot" />}
+          title="Прокрутка внутри панели"
+        >
+          {[
+            "Пункт списка 1: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 2: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 3: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 4: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 5: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 6: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 7: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 8: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 9: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 10: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 11: текст для проверки прокрутки внутри диалога.",
+            "Пункт списка 12: текст для проверки прокрутки внутри диалога.",
+          ].map((line) => (
+            <p key={line} style={{ margin: "0 0 0.5rem" }}>
+              {line}
+            </p>
+          ))}
+        </Modal.Panel>
       </Modal.Root>
     </div>
   );

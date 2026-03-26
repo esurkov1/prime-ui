@@ -34,7 +34,7 @@
 }
 
 /*
- * Modal.Content добавляет класс .content из Modal.module.css (padding, gap, display: grid).
+ * Внутренний контент модалки добавляет класс .content из Modal.module.css (padding, gap, display: grid).
  * Специфичность выше, чем у одного `.dialogContent`, из‑за чего визуально появляется «вторая оболочка»
  * с отступом ~var(--prime-sys-unit-16px). Комбинируем с role на том же узле.
  */

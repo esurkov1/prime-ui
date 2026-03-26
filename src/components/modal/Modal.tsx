@@ -29,7 +29,7 @@ type ModalContextValue = {
 
 const [ModalProvider, useModalContext] = createComponentContext<ModalContextValue>("Modal");
 
-/** Связка `Modal.Content` ↔ `Modal.Header`: id для `h2`/`p` и регистрация шапки для `aria-*` на панели. */
+/** Внутренняя связка контента панели ↔ шапки: id для `h2`/`p` и регистрация для `aria-*` на `role="dialog"`. */
 type ModalContentShellContextValue = {
   titleId: string;
   descId: string;
@@ -41,7 +41,7 @@ const ModalContentShellContext = React.createContext<ModalContentShellContextVal
 function useModalContentShell(): ModalContentShellContextValue {
   const value = React.useContext(ModalContentShellContext);
   if (value === null) {
-    throw new Error("[prime-ui-kit] `Modal.Header` must be used inside `Modal.Content`.");
+    throw new Error("[prime-ui-kit] Modal header block must be used inside the dialog panel (internal).");
   }
   return value;
 }
@@ -126,7 +126,7 @@ function ModalClose({ children }: ModalCloseProps) {
 
 // ─── Portal ───────────────────────────────────────────────────────────────────
 
-export type ModalPortalProps = {
+type ModalPortalProps = {
   children: React.ReactNode;
   container?: HTMLElement | null;
 };
@@ -139,7 +139,7 @@ function ModalPortal({ children, container }: ModalPortalProps) {
 
 // ─── Overlay ──────────────────────────────────────────────────────────────────
 
-export type ModalOverlayProps = React.HTMLAttributes<HTMLDivElement>;
+type ModalOverlayProps = React.HTMLAttributes<HTMLDivElement>;
 
 function ModalOverlay({ className, onClick, children, ...rest }: ModalOverlayProps) {
   const { onClose, closeOnOverlayClick } = useModalContext();
@@ -167,8 +167,7 @@ function ModalOverlay({ className, onClick, children, ...rest }: ModalOverlayPro
 
 // ─── Layer (Portal + Overlay) ────────────────────────────────────────────────
 
-/** Типичная оболочка: портал в `body` (или `container`) + затемнённый фон; внутрь — `Modal.Content`. */
-export type ModalLayerProps = ModalPortalProps & Omit<ModalOverlayProps, "children">;
+type ModalLayerProps = ModalPortalProps & Omit<ModalOverlayProps, "children">;
 
 function ModalLayer({ children, container, ...overlayProps }: ModalLayerProps) {
   return (
@@ -180,7 +179,7 @@ function ModalLayer({ children, container, ...overlayProps }: ModalLayerProps) {
 
 // ─── Content ──────────────────────────────────────────────────────────────────
 
-export type ModalContentProps = React.HTMLAttributes<HTMLDivElement> & {
+type ModalContentProps = React.HTMLAttributes<HTMLDivElement> & {
   "aria-label"?: string;
   "aria-labelledby"?: string;
   "aria-describedby"?: string;
@@ -278,7 +277,7 @@ function ModalContent({
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 
-export type ModalHeaderProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
+type ModalHeaderProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
   icon?: React.ReactNode;
   /** Текст заголовка (рендерится как `h2`). */
   title: React.ReactNode;
@@ -349,7 +348,7 @@ function ModalHeader({
 
 // ─── Body ─────────────────────────────────────────────────────────────────────
 
-export type ModalBodyProps = React.HTMLAttributes<HTMLDivElement>;
+type ModalBodyProps = React.HTMLAttributes<HTMLDivElement>;
 
 function ModalBody({ children, className, ...rest }: ModalBodyProps) {
   return (
@@ -361,7 +360,7 @@ function ModalBody({ children, className, ...rest }: ModalBodyProps) {
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
-export type ModalFooterProps = React.HTMLAttributes<HTMLElement>;
+type ModalFooterProps = React.HTMLAttributes<HTMLElement>;
 
 function ModalFooter({ children, className, ...rest }: ModalFooterProps) {
   return (
@@ -371,17 +370,88 @@ function ModalFooter({ children, className, ...rest }: ModalFooterProps) {
   );
 }
 
-// ─── Namespace export ─────────────────────────────────────────────────────────
+// ─── Panel (публичная оболочка: Layer + Content + шапка/тело/подвал) ───────────
+
+export type ModalPanelProps = Omit<React.HTMLAttributes<HTMLDivElement>, "title"> & {
+  /** Узел для `createPortal` (по умолчанию `document.body`). */
+  container?: HTMLElement | null;
+  /** Класс на полноэкранной подложке. */
+  overlayClassName?: string;
+  /** Заголовок; если задан, рендерится шапка с `h2` и опционально телом с разделителем. */
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  icon?: React.ReactNode;
+  showClose?: boolean;
+  closeAriaLabel?: string;
+  /** При `title` оборачивается в зону тела; без `title` — рендерится сразу в панели (например headless-диалог). */
+  children?: React.ReactNode;
+  footer?: React.ReactNode;
+  footerClassName?: string;
+  bodyClassName?: string;
+  bodyStyle?: React.CSSProperties;
+};
+
+function ModalPanel({
+  container,
+  overlayClassName,
+  className,
+  style,
+  title,
+  description,
+  icon,
+  showClose = true,
+  closeAriaLabel = "Close",
+  children,
+  footer,
+  footerClassName,
+  bodyClassName,
+  bodyStyle,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
+  ...rest
+}: ModalPanelProps) {
+  const hasHeader = title != null && title !== "";
+
+  return (
+    <ModalLayer className={overlayClassName} container={container}>
+      <ModalContent
+        aria-describedby={ariaDescribedBy}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        className={className}
+        style={style}
+        {...rest}
+      >
+        {hasHeader ? (
+          <ModalHeader
+            closeAriaLabel={closeAriaLabel}
+            description={description}
+            icon={icon}
+            showClose={showClose}
+            title={title}
+          />
+        ) : null}
+        {children != null ? (
+          hasHeader ? (
+            <ModalBody className={bodyClassName} style={bodyStyle}>
+              {children}
+            </ModalBody>
+          ) : (
+            children
+          )
+        ) : null}
+        {footer != null ? <ModalFooter className={footerClassName}>{footer}</ModalFooter> : null}
+      </ModalContent>
+    </ModalLayer>
+  );
+}
+
+// ─── Публичный API ────────────────────────────────────────────────────────────
 
 export const Modal = {
   Root: ModalRoot,
   Trigger: ModalTrigger,
   Close: ModalClose,
-  Portal: ModalPortal,
-  Overlay: ModalOverlay,
-  Layer: ModalLayer,
-  Content: ModalContent,
-  Header: ModalHeader,
-  Body: ModalBody,
-  Footer: ModalFooter,
+  Panel: ModalPanel,
 };

@@ -604,13 +604,13 @@ export default function CommandMenuSection() {
           <PlaygroundApiTable rows={dialogApiRows} />
           <h5>CommandMenu.DialogTitle</h5>
           <p className="demoBlockDescription">
-            Заголовок диалога (разметка и стили как у <code>h2</code> в <code>Modal.Header</code>).
+            Заголовок диалога (разметка и стили как у <code>h2</code> в шапке <code>Modal.Panel</code>).
           </p>
           <PlaygroundApiTable rows={dialogTitleApiRows} />
           <h5>CommandMenu.DialogDescription</h5>
           <p className="demoBlockDescription">
-            Описание для вспомогательных технологий (стили как у текста описания в{" "}
-            <code>Modal.Header</code>
+            Описание для вспомогательных технологий (стили как у текста описания в шапке{" "}
+            <code>Modal.Panel</code>
             ).
           </p>
           <PlaygroundApiTable rows={dialogDescriptionApiRows} />

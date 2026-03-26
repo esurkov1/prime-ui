@@ -154,36 +154,33 @@ export function TicketCategoryModal() {
           New ticket
         </Button.Root>
       </Modal.Trigger>
-      <Modal.Layer>
-          <Modal.Content>
-            <Modal.Header
-              title="Request category"
-              description="Choose a topic before sending to the queue."
-            />
-            <Modal.Body>
-              <Select.Root size="m" defaultValue="billing" placeholder="Category">
-                <Select.Trigger aria-label="Ticket category">
-                  <Select.Value />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value="billing">Billing and invoices</Select.Item>
-                  <Select.Item value="bug">Outage or bug</Select.Item>
-                  <Select.Item value="access">Access and roles</Select.Item>
-                </Select.Content>
-              </Select.Root>
-            </Modal.Body>
-            <Modal.Footer>
-              <Modal.Close>
-                <Button.Root size="m" variant="neutral" mode="stroke">
-                  Cancel
-                </Button.Root>
-              </Modal.Close>
-              <Button.Root size="m" variant="primary">
-                Submit
+      <Modal.Panel
+        description="Choose a topic before sending to the queue."
+        footer={
+          <>
+            <Modal.Close>
+              <Button.Root size="m" variant="neutral" mode="stroke">
+                Cancel
               </Button.Root>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Layer>
+            </Modal.Close>
+            <Button.Root size="m" variant="primary">
+              Submit
+            </Button.Root>
+          </>
+        }
+        title="Request category"
+      >
+        <Select.Root size="m" defaultValue="billing" placeholder="Category">
+          <Select.Trigger aria-label="Ticket category">
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="billing">Billing and invoices</Select.Item>
+            <Select.Item value="bug">Outage or bug</Select.Item>
+            <Select.Item value="access">Access and roles</Select.Item>
+          </Select.Content>
+        </Select.Root>
+      </Modal.Panel>
     </Modal.Root>
   );
 }

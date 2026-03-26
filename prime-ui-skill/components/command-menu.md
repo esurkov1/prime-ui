@@ -259,7 +259,7 @@ Subcomponent tree:
 
 ### CommandMenu.DialogTitle / DialogDescription
 
-Heading and paragraph with the same typography classes as in `Modal.Header` (`h2` / description): standard HTML attributes plus `children`, `className`.
+Heading and paragraph with the same typography classes as the title area in `Modal.Panel` (`h2` / description): standard HTML attributes plus `children`, `className`.
 
 ### CommandMenu.InputRow
 

@@ -17,30 +17,25 @@ export default function ModalControlledSnippet() {
       </Button.Root>
 
       <Modal.Root open={open} onOpenChange={setOpen}>
-        <Modal.Layer>
-          <Modal.Content>
-            <Modal.Header
-              icon={<Icon name="action.copy" />}
-              title="Состояние снаружи"
-              description={
-                <>
-                  Открытие и закрытие идут через <code>open</code> и <code>onOpenChange</code>.
-                </>
-              }
-              closeAriaLabel="Закрыть"
-            />
-            <Modal.Body>
-              <p>Триггер внутри разметки не обязателен: окно управляется родителем.</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Modal.Close>
-                <Button.Root size="m" variant="primary">
-                  Готово
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Layer>
+        <Modal.Panel
+          closeAriaLabel="Закрыть"
+          description={
+            <>
+              Открытие и закрытие идут через <code>open</code> и <code>onOpenChange</code>.
+            </>
+          }
+          footer={
+            <Modal.Close>
+              <Button.Root size="m" variant="primary">
+                Готово
+              </Button.Root>
+            </Modal.Close>
+          }
+          icon={<Icon name="action.copy" />}
+          title="Состояние снаружи"
+        >
+          <p>Триггер внутри разметки не обязателен: окно управляется родителем.</p>
+        </Modal.Panel>
       </Modal.Root>
     </div>
   );

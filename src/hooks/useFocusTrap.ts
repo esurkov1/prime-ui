@@ -28,7 +28,7 @@ type UseFocusTrapOptions = {
 /**
  * Traps keyboard focus inside a container element.
  * Tab cycles forward through focusable elements, Shift+Tab cycles backward.
- * Shared by Modal.Content, Select.Content, Dropdown.
+ * Shared by Modal (panel), Select.Content, Dropdown.
  */
 export function useFocusTrap<T extends HTMLElement = HTMLElement>(
   options: UseFocusTrapOptions,

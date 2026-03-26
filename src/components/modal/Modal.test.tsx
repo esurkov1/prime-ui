@@ -5,8 +5,6 @@ import { Button } from "@/components/button/Button";
 
 import { Modal } from "./Modal";
 
-// ─── Composable API ───────────────────────────────────────────────────────────
-
 function BasicModal({
   closeOnEscape = true,
   closeOnOverlayClick = true,
@@ -19,41 +17,29 @@ function BasicModal({
       <Modal.Trigger>
         <Button.Root>Open</Button.Root>
       </Modal.Trigger>
-      <Modal.Layer>
-        <Modal.Content>
-          <Modal.Header title="Test title" description="Test description" />
-          <Modal.Body>
-            <p>Body content</p>
-            <Button.Root>Focusable inside</Button.Root>
-          </Modal.Body>
-          <Modal.Footer>
+      <Modal.Panel
+        description="Test description"
+        footer={
+          <>
             <Modal.Close>
               <Button.Root variant="neutral" mode="stroke">
                 Cancel
               </Button.Root>
             </Modal.Close>
             <Button.Root>Confirm</Button.Root>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal.Layer>
+          </>
+        }
+        title="Test title"
+      >
+        <p>Body content</p>
+        <Button.Root>Focusable inside</Button.Root>
+      </Modal.Panel>
     </Modal.Root>
   );
 }
 
-describe("Modal (composable API)", () => {
-  it("throws when Modal.Header is not inside Modal.Content", () => {
-    expect(() =>
-      render(
-        <Modal.Root defaultOpen>
-          <Modal.Layer>
-            <Modal.Header title="Invalid" />
-          </Modal.Layer>
-        </Modal.Root>,
-      ),
-    ).toThrow(/must be used inside `Modal\.Content`/);
-  });
-
-  it("renders Trigger and opens Content on click", () => {
+describe("Modal", () => {
+  it("renders Trigger and opens Panel on click", () => {
     render(<BasicModal />);
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -64,7 +50,7 @@ describe("Modal (composable API)", () => {
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
   });
 
-  it("sets aria-labelledby and aria-describedby on Content from Modal.Header", () => {
+  it("sets aria-labelledby and aria-describedby from header", () => {
     render(<BasicModal />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
@@ -75,14 +61,15 @@ describe("Modal (composable API)", () => {
     expect(modal).toHaveAttribute("aria-describedby", description.id);
   });
 
-  it("uses explicit aria-labelledby and aria-describedby on Content for header ids", () => {
+  it("uses explicit aria-labelledby and aria-describedby on Panel", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Layer>
-          <Modal.Content aria-labelledby="custom-title" aria-describedby="custom-desc">
-            <Modal.Header title="Custom" description="Custom desc" />
-          </Modal.Content>
-        </Modal.Layer>
+        <Modal.Panel
+          aria-describedby="custom-desc"
+          aria-labelledby="custom-title"
+          description="Custom desc"
+          title="Custom"
+        />
       </Modal.Root>,
     );
 
@@ -93,14 +80,10 @@ describe("Modal (composable API)", () => {
     expect(modal).toHaveAttribute("aria-describedby", "custom-desc");
   });
 
-  it("omits aria-describedby when Header has no description", () => {
+  it("omits aria-describedby when there is no description", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Layer>
-          <Modal.Content>
-            <Modal.Header title="Title only" />
-          </Modal.Content>
-        </Modal.Layer>
+        <Modal.Panel title="Title only" />
       </Modal.Root>,
     );
 
@@ -125,7 +108,7 @@ describe("Modal (composable API)", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("closes via Modal.Close in Footer (Cancel)", () => {
+  it("closes via Modal.Close in footer (Cancel)", () => {
     render(<BasicModal />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -172,7 +155,7 @@ describe("Modal (composable API)", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("renders ModalFooter", () => {
+  it("renders footer actions", () => {
     render(<BasicModal />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
@@ -180,17 +163,13 @@ describe("Modal (composable API)", () => {
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
   });
 
-  it("supports Header + Footer without Body", () => {
+  it("supports title and footer without body text", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Layer>
-          <Modal.Content>
-            <Modal.Header title="Header footer" />
-            <Modal.Footer>
-              <Button.Root>Action</Button.Root>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Layer>
+        <Modal.Panel
+          footer={<Button.Root>Action</Button.Root>}
+          title="Header footer"
+        />
       </Modal.Root>,
     );
 
@@ -199,14 +178,10 @@ describe("Modal (composable API)", () => {
     expect(screen.queryByText("Body content")).not.toBeInTheDocument();
   });
 
-  it("supports Header only without Body and Footer", () => {
+  it("supports title only", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Layer>
-          <Modal.Content>
-            <Modal.Header title="Header only" />
-          </Modal.Content>
-        </Modal.Layer>
+        <Modal.Panel title="Header only" />
       </Modal.Root>,
     );
 
@@ -225,16 +200,12 @@ describe("Modal (composable API)", () => {
     });
   });
 
-  it("works in controlled mode", () => {
+  it("works in controlled mode with aria-label only", () => {
     const { rerender } = render(
       <Modal.Root open={false}>
-        <Modal.Layer>
-          <Modal.Content aria-label="Controlled modal">
-            <Modal.Body>
-              <p>Controlled</p>
-            </Modal.Body>
-          </Modal.Content>
-        </Modal.Layer>
+        <Modal.Panel aria-label="Controlled modal">
+          <p>Controlled</p>
+        </Modal.Panel>
       </Modal.Root>,
     );
 
@@ -242,13 +213,9 @@ describe("Modal (composable API)", () => {
 
     rerender(
       <Modal.Root open={true}>
-        <Modal.Layer>
-          <Modal.Content aria-label="Controlled modal">
-            <Modal.Body>
-              <p>Controlled</p>
-            </Modal.Body>
-          </Modal.Content>
-        </Modal.Layer>
+        <Modal.Panel aria-label="Controlled modal">
+          <p>Controlled</p>
+        </Modal.Panel>
       </Modal.Root>,
     );
 

@@ -30,7 +30,7 @@ function unlockScroll() {
  * Locks body scroll when enabled. Supports multiple concurrent callers via
  * a reference-counted lock — the last caller to unmount restores scroll.
  * Compensates for scrollbar width to prevent layout shift.
- * Shared by Modal.Content, Drawer.Content.
+ * Shared by Modal (panel), Drawer.Content.
  */
 export function useScrollLock(enabled: boolean) {
   React.useEffect(() => {
