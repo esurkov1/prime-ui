@@ -2,7 +2,17 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## About
+## Canonical
+
+- **Назначение:** зона выбора файла — внешний **`label`**, скрытый **`input type="file"`**, клик по зоне открывает системный диалог; поддерживаются **drag-and-drop** и **`data-dragover`** на корне.
+- **Импорт:** `import { FileUpload } from "prime-ui-kit"`.
+- **Минимальный сценарий:** `<FileUpload.Root />` — встроенные `Icon`, `Title`, `Hint`, `BrowseLabel`.
+- **Ключевые пропы корня:** `accept`, `multiple`, `disabled`, `onFilesChange(files: File[])`, `appearance` (`"dashed"` \| `"solid"`), `size` (`"s"` \| `"m"` \| `"l"` \| `"xl"`), `inputRef` для программного `click()`.
+- **Контракт:** после каждого выбора или drop значение input **сбрасывается**, чтобы повторный выбор того же файла снова вызвал `onFilesChange`. Список файлов и загрузка на сервер — **на стороне приложения**.
+
+## Extended
+
+### About
 
 Composable UI for choosing files: a `label` wrapping a hidden `input type="file"`, optional drag-and-drop styling, and building blocks for per-file rows (badge, name/meta, progress, actions).
 
@@ -20,10 +30,19 @@ Composable UI for choosing files: a `label` wrapping a hidden `input type="file"
 - Automatic list state or remove/retry semantics inside the kit (`Item` is presentational).
 - Scenarios where a non-`label` activation pattern is required without rethinking focus and hit targets.
 
-## Composition
+### Composition
 
 - **`FileUpload.Root`** — outer `label`, hidden file `input`, `ControlSizeProvider` for descendants. Omit `children` to get the default inner layout (`Icon`, `Title`, `Hint`, `BrowseLabel`). Replace `children` with `DropBody` / `Title` / `BrowseLink` / `ActionsRow` / `Chip` / `ChipLabel` for custom copy; use `inputRef` + `click()` from `BrowseLink` or `Chip` handlers because those elements stop propagation to the `label`.
 - **File row** — `FileUpload.Item` (optional `variant`, `size`) → `ItemRow` → `FormatBadge` and `ItemMain`. Inside `ItemMain`, use `ItemTextGroup` with `ItemName` / `ItemMeta` / `ItemMetaSep`, or `ItemStack` with `ItemTryAgain` for error layouts; optional `ItemActions`. Below the row, optional `ItemProgress` (bar when `value` is set and `children` omitted) or `ItemFooter`.
+
+### Scenarios (примеры в `examples/`)
+
+| Файл | Идея |
+|------|------|
+| `examples/avatar-upload.tsx` | Одно изображение, `accept` для картинок, превью через [Avatar](../avatar/COMPONENT.md) и `URL.createObjectURL`. |
+| `examples/document-attach.tsx` | Вложения к сообщению: `multiple`, фильтр типов, строки `Item` + `FormatBadge` / мета размера. |
+| `examples/drag-area.tsx` | Кастомная зона: `appearance="solid"`, `DropBody`, `BrowseLink` + `inputRef` (как в модалках). |
+| `examples/controlled-list.tsx` | Контролируемый массив `File[]`, удаление строк и сброс списка через [Button](../button/COMPONENT.md). |
 
 ### Minimal example
 
@@ -35,7 +54,7 @@ export function Example() {
 }
 ```
 
-## Rules
+### Rules
 
 - After each change or drop, `onFilesChange` receives a `File[]`; the input’s value is cleared so selecting the same file again still fires the callback.
 - When `disabled` is set, the input is disabled, drops are ignored, and `data-disabled` is set on the `label` (`aria-disabled` is mirrored on the input).
@@ -198,3 +217,13 @@ export function Example() {
 - [Label](../label/COMPONENT.md) — pairing copy with the zone in forms.
 - [Avatar](../avatar/COMPONENT.md) — image preview next to upload actions on profile-style screens.
 - [Divider](../divider/COMPONENT.md) — separating rows in attachment lists.
+
+## LLM note
+
+- **Namespace:** `FileUpload` object; entry point for picking files is **`FileUpload.Root`** (`<label>` + hidden `<input type="file">`).
+- **Callbacks:** `onFilesChange(File[])` after native change or drop; input value reset after each emit.
+- **Drag state:** `data-dragover` on root while over; `data-disabled` when `disabled`.
+- **Nested buttons:** `BrowseLink` / `Chip` do not bubble to label — use **`inputRef`** and `inputRef.current?.click()` to open the file dialog.
+- **Presentation rows:** `FileUpload.Item` subtree (`ItemRow`, `FormatBadge`, `ItemMain`, `ItemProgress`, …) does not manage data; bind to app state yourself.
+- **Appearances:** `appearance` on Root: `dashed` (default) vs `solid` (embedded / modal-style).
+- **A11y:** `FormatBadge` and default icon wrapper are `aria-hidden`; file identity belongs in `ItemName` / visible text.
