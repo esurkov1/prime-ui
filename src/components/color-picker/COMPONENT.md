@@ -2,25 +2,39 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## About
+## Canonical
 
-A composite color picker built on **react-aria-components**: it keeps a shared `Color` value across a 2D area, channel sliders, optional preset swatches, a standalone hex field, and a channel strip with an eyedropper control.
+`ColorPicker` is a **react-aria-components** color surface: one shared `Color` flows through a 2D area, channel sliders, optional preset swatches, a kit **HexInput**, and a channel strip with an eyedropper slot. **`ColorPicker.Root`** owns state; **`FormatProvider`** is mandatory for **`FormatSelect`** and **`ChannelStrip`**. **`parseColor`** and **`onChange`** use RAC **`Color`**; persist with **`color.toString("hex")`**, **`"css"`**, or **`"hexa"`** as needed.
 
-- **When to use:** brand, theme, or accent color selection with a visual preview; editor-style fill, stroke, or text color; chart or legend colors persisted as strings or `Color`; forms where the stored value must stay a CSS-parseable color.
-- **When to use:** one shared `onChange` from many nested controls while the parent holds `value` / `parseColor` state.
-- **When to use:** combining fixed presets (`SwatchPicker`) with free adjustment (area and sliders).
-- **When not to use:** only a hex string is needed and no picker UI adds value — prefer a plain [Input](../input/COMPONENT.md) or another simple field.
-- **When not to use:** the full control surface must stay inline in a tight layout — mount the panel in an overlay ([Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md), or [Drawer](../drawer/COMPONENT.md)) instead.
-- **When not to use:** every user must rely on the system eyedropper — without the EyeDropper API the control is non-functional decoration only.
+- **Use for:** theme/accent tuning, brand palettes, variant swatches, or any form field that stores a CSS-parseable color.
+- **Do not use for:** hex-only entry with no visual benefit (prefer [Input](../input/COMPONENT.md)); full chrome always inline in dense UI (mount the panel in [Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md), or [Drawer](../drawer/COMPONENT.md)); eyedropper as the only input path (it is absent without **`window.EyeDropper`**).
 
-## Composition
+Runnable TSX scenarios live in **`examples/`** (same folder as this file): `theme-accent.tsx`, `brand-kit.tsx`, `product-variant-swatch.tsx`, `controlled-form-field.tsx`, `minimal-popover.tsx`.
 
-- **`ColorPicker.Root`** wraps everything that should share one color value (trigger + panel). Put **`ColorPicker.TriggerSwatch`** on the same root as the panel so the swatch reflects the live color.
-- **Product layouts:** place the interactive surface (area, sliders, swatches, `HexInput`, `ChannelStrip`) inside **`Popover.Content`** (or modal/drawer), with a trigger such as [Button](../button/COMPONENT.md) + `TriggerSwatch`. `HexInput`-only flows still belong under a trigger if you want a compact field.
-- **`ColorPicker.FormatProvider`** is required for **`FormatSelect`** and **`ChannelStrip`** (the strip calls into format context; without the provider it throws at runtime). `FormatSelect` renders nothing if mounted outside `FormatProvider`.
-- **Typical panel order:** `FormatProvider` → optional `FormatSelect` → `Area` with `AreaThumb` → one or more `Slider` trees (`SliderMeta` optional, then `SliderTrack` → `Thumb`) → `ChannelStrip` (`pipetteIcon` required) → optional `SwatchPicker` with `SwatchPickerItem` children each wrapping `Swatch` → optional `HexInput` or RAC **`Field`** for custom channel inputs.
-- **`EyeDropperButton`** is used inside `ChannelStrip` by default; it can also be composed separately under the same `Root` if needed.
-- **`Output`** is the RAC slider value readout; the kit wires it inside **`SliderMeta`** (label + value row).
+## Extended
+
+### About
+
+The picker composes RAC primitives with kit styling (checkerboard for transparency on tracks/swatches). **`TriggerSwatch`** mirrors the live color for button triggers but is **`aria-hidden`**—name the control via visible label text or **`aria-label`**. Sliders are fixed at visual size **`m`**; only **`HexInput`** exposes the kit **`size`** axis (**`s`**–**`xl`**).
+
+### Scenarios
+
+| Scenario | Intent | Example file |
+|----------|--------|----------------|
+| **Theme accent** | Controlled value synced to design tokens or backend; show readout + popover editor. | `examples/theme-accent.tsx` |
+| **Brand kit** | Curated swatches plus free adjustment and hex field for design-system colors. | `examples/brand-kit.tsx` |
+| **Product variant swatch** | Fast selection from discrete SKUs; optional fine tuning in the same **`Root`**. | `examples/product-variant-swatch.tsx` |
+| **Controlled form field** | Parent owns **`value`/`onChange`**; label association + popover + **`HexInput`**. | `examples/controlled-form-field.tsx` |
+
+See also **`examples/minimal-popover.tsx`** for the smallest valid **`Popover`** composition.
+
+### Composition
+
+- **`ColorPicker.Root`** wraps every control that shares one color (trigger + panel). Keep **`TriggerSwatch`** under the same **`Root`** as the panel so the preview stays in sync.
+- Put the interactive surface (area, sliders, swatches, **`HexInput`**, **`ChannelStrip`**) inside **`Popover.Content`** (or modal/drawer) in product layouts; pair with [Button](../button/COMPONENT.md) + **`TriggerSwatch`** or an accessible trigger.
+- Wrap subtree that needs format switching or the strip in **`FormatProvider`** before **`FormatSelect`**, **`ChannelStrip`**, or strip-driven cells. **`FormatSelect`** returns **`null`** outside **`FormatProvider`**.
+- Typical panel order: **`FormatProvider`** → optional **`FormatSelect`** → **`Area`** + **`AreaThumb`** → **`Slider`** trees (**`SliderMeta`** optional, then **`SliderTrack`** → **`Thumb`**) → **`ChannelStrip`** (**`pipetteIcon`** required) → optional **`SwatchPicker`** / **`SwatchPickerItem`** / **`Swatch`** → optional **`HexInput`** or RAC **`Field`**.
+- **`EyeDropperButton`** is embedded in **`ChannelStrip`**; pass **`pipetteIcon`** (e.g. [Button.Icon](../button/COMPONENT.md) + icon). Standalone use is possible under the same **`Root`** with an explicit **`aria-label`** if needed.
 
 ### Minimal example
 
@@ -38,13 +52,13 @@ export function MinimalColorField() {
           </Button.Root>
         </Popover.Trigger>
         <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
-            <ColorPicker.FormatProvider>
-              <ColorPicker.FormatSelect />
-              <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-                <ColorPicker.AreaThumb />
-              </ColorPicker.Area>
-              <ColorPicker.ChannelStrip pipetteIcon={<span aria-hidden />} />
-            </ColorPicker.FormatProvider>
+          <ColorPicker.FormatProvider>
+            <ColorPicker.FormatSelect />
+            <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+              <ColorPicker.AreaThumb />
+            </ColorPicker.Area>
+            <ColorPicker.ChannelStrip pipetteIcon={<span aria-hidden />} />
+          </ColorPicker.FormatProvider>
         </Popover.Content>
       </Popover.Root>
     </ColorPicker.Root>
@@ -52,24 +66,21 @@ export function MinimalColorField() {
 }
 ```
 
-## Rules
+### Rules
 
-- Use **controlled** mode with `value` and `onChange` when the parent owns color state; use **`defaultValue`** for uncontrolled usage. Value types follow RAC: `string | Color`; `onChange` receives a **`Color`** instance.
-- Import **`Color`** for typing from **`react-aria-components`** (or use the kit re-export type **`ColorPickerColorValue`**). Use **`parseColor`** from **`prime-ui-kit`** to turn strings into `Color` for `useState` initial values.
-- **`children`** on `Root` may be a render function; it receives **`ColorPickerRenderProps`** (`{ color }`) from RAC.
-- There is **no** single `isDisabled` on `Root` — disable **`Area`**, **`Slider`**, **`SwatchPickerItem`**, or wrap groups in a disabled **`fieldset`** when appropriate.
-- **`ChannelStrip`** must receive **`pipetteIcon`** (usually [Button.Icon](../button/COMPONENT.md) wrapping an icon). Pass **`aria-label`** on **`EyeDropperButton`** if you use it standalone (default label is Russian “Пипетка” in code).
-- If **`window.EyeDropper`** is missing, the eyedropper renders as a disabled control with **`aria-hidden`** and **`tabIndex={-1}`** — do not rely on it as the only way to set a color.
-- **`FormatProvider`** owns HSL / RGB / hex strip mode (`defaultFormat`: `"hsl"` \| `"rgb"` \| `"hex"`). **`FormatSelect`** only appears when inside that provider.
-- **`HexInput`** and strip hex editing **revert** invalid input to the last committed color on **blur** or **Enter**. Channel cells in the strip **ignore** non-numeric input on commit (no color change).
-- **`TriggerSwatch`** is **`aria-hidden`**; expose the purpose on the trigger (visible button text or `aria-label` on the control).
-- **`SwatchPicker`** needs an accessible name (**`aria-label`** or an associated label).
-- Sliders use a **fixed** visual size tier (`data-size="m"` on the kit `Slider`); only **`HexInput`** exposes the kit **`size`** axis (`s` \| `m` \| `l` \| `xl`).
-- For **`SwatchPicker`** selection semantics and layout, follow RAC props (`value` / `defaultValue` / `onChange`, `layout`, etc.).
+- **Controlled:** **`value`** + **`onChange`** when the parent owns color; **`defaultValue`** when uncontrolled. **`onChange`** receives **`Color`**.
+- Type with **`ColorPickerColorValue`** (re-export of RAC **`Color`**) or import **`Color`** from **`react-aria-components`**. Initialize **`useState`** from strings via **`parseColor`** from **`prime-ui-kit`** (**throws** on invalid strings).
+- **`children`** on **`Root`** may be a render function receiving **`ColorPickerRenderProps`** (`{ color }`).
+- There is **no** single **`isDisabled`** on **`Root`**—disable **`Area`**, **`Slider`**, **`SwatchPickerItem`**, or use a disabled **`fieldset`** where appropriate.
+- **`ChannelStrip`** must receive **`pipetteIcon`**. Without **`EyeDropper`**, the control is disabled and **`aria-hidden`**—do not rely on it alone.
+- **`FormatProvider`** sets initial strip mode via **`defaultFormat`**: **`"hsl"`** | **`"rgb"`** | **`"hex"`**.
+- **`HexInput`** and strip hex cells **revert** invalid input on blur/Enter; numeric strip cells **ignore** non-numeric commits.
+- **`SwatchPicker`** needs an accessible name (**`aria-label`** or associated label). Follow RAC for **`SwatchPicker`** / **`SwatchPickerItem`** selection props.
+- **`Area`**, **`Slider`**, **`Swatch`**, etc. use RAC prop surfaces (e.g. **`Area`**: **`colorSpace`**, **`xChannel`**, **`yChannel`**; **`Slider`**: **`channel`**, optional **`colorSpace`**, **`orientation`**, **`isDisabled`**).
 
-## API
+### API
 
-### ColorPicker.Root
+#### ColorPicker.Root
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -81,14 +92,14 @@ export function MinimalColorField() {
 | className | `string \| (values) => string` | — | No | Root element classes (RAC render props) |
 | …rest | RAC + DOM | — | No | Other **`ColorPickerRootProps`** / `AriaColorPickerProps` from react-aria-components |
 
-### ColorPicker.FormatProvider
+#### ColorPicker.FormatProvider
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `ReactNode` | — | Yes | subtree that may use `FormatSelect` and `ChannelStrip` |
+| children | `ReactNode` | — | Yes | Subtree that may use `FormatSelect` and `ChannelStrip` |
 | defaultFormat | `"hsl" \| "rgb" \| "hex"` | `"hsl"` | No | Initial format for the strip and format select |
 
-### ColorPicker.FormatSelect
+#### ColorPicker.FormatSelect
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -96,14 +107,14 @@ export function MinimalColorField() {
 
 Renders `null` when not under `FormatProvider`.
 
-### ColorPicker.ChannelStrip
+#### ColorPicker.ChannelStrip
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | pipetteIcon | `ReactNode` | — | Yes | Icon for the embedded eyedropper ([Button.Icon](../button/COMPONENT.md) + icon) |
 | className | `string` | — | No | Class on the strip container |
 
-### ColorPicker.HexInput
+#### ColorPicker.HexInput
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -111,33 +122,33 @@ Renders `null` when not under `FormatProvider`.
 | label | `ReactNode` | `"Hex"` | No | Field label |
 | className | `string` | — | No | Class on `Input.Root` |
 
-### ColorPicker.TriggerSwatch
+#### ColorPicker.TriggerSwatch
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Class on the preview square |
 
-### ColorPicker.SliderMeta
+#### ColorPicker.SliderMeta
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | label | `ReactNode` | — | Yes | Left label; current channel value on the right via `Output` |
 
-### ColorPicker.EyeDropperButton
+#### ColorPicker.EyeDropperButton
 
-Same props as **`Button.Root`** from the kit except **`variant`**, **`mode`**, and **`size`** are fixed (`neutral`, `stroke`, `m`). Forwarded ref: **`HTMLButtonElement`**. Children are usually **`Button.Icon`**.
+Same props as **`Button.Root`** except **`variant`**, **`mode`**, and **`size`** are fixed (`neutral`, `stroke`, `m`). Forwarded ref: **`HTMLButtonElement`**. Children are usually **`Button.Icon`**.
 
-### ColorPicker.Area, AreaThumb, Slider, SliderTrack, Thumb, Output, Field, SwatchPicker, SwatchPickerItem, Swatch
+#### ColorPicker.Area, AreaThumb, Slider, SliderTrack, Thumb, Output, Field, SwatchPicker, SwatchPickerItem, Swatch
 
-Styled wrappers around the matching **react-aria-components** primitives. Use their RAC prop surfaces (e.g. **`Area`**: `colorSpace`, `xChannel`, `yChannel`, `isDisabled`; **`Slider`**: `channel`, optional `colorSpace`, `orientation`, `isDisabled`; **`SwatchPicker`** / **`SwatchPickerItem`**: selection and `color` on items; **`Field`**: RAC `ColorField` props). **`Swatch`** and **`SliderTrack`** add checkerboard layering for transparency in the kit styles.
+Styled wrappers around matching **react-aria-components** primitives; use their RAC APIs. **`Swatch`** and **`SliderTrack`** add checkerboard layering for transparency in kit styles.
 
-### `parseColor(value: string): Color`
+#### `parseColor(value: string): Color`
 
-Parses a CSS color string into a **`Color`**. **Throws** if the string cannot be parsed (RAC / `@react-stately/color` behavior).
+Parses a CSS color string into **`Color`**. **Throws** if parsing fails.
 
-Exported types from this module include **`ColorPickerRootProps`**, **`ColorPickerHexInputProps`**, **`ColorPickerFormatProviderProps`**, **`ColorPickerTriggerSwatchProps`**, **`ColorValueFormat`**, **`ColorPickerRenderProps`**, and **`ColorPickerColorValue`** (alias of **`Color`**).
+Exported types: **`ColorPickerRootProps`**, **`ColorPickerHexInputProps`**, **`ColorPickerFormatProviderProps`**, **`ColorPickerTriggerSwatchProps`**, **`ColorValueFormat`**, **`ColorPickerRenderProps`**, **`ColorPickerColorValue`**.
 
-## Related
+### Related
 
 - [Popover](../popover/COMPONENT.md)
 - [Button](../button/COMPONENT.md)
@@ -147,3 +158,14 @@ Exported types from this module include **`ColorPickerRootProps`**, **`ColorPick
 - [Drawer](../drawer/COMPONENT.md)
 - [Label](../label/COMPONENT.md)
 - [Typography](../typography/COMPONENT.md)
+
+## LLM note
+
+- Always place **`FormatProvider`** above **`FormatSelect`**, **`ChannelStrip`**, or any code path that calls into strip format context—missing provider throws at runtime.
+- **`ChannelStrip`** requires **`pipetteIcon`**; use a real icon node or a minimal **`<span aria-hidden />`** only for docs/tests.
+- **`TriggerSwatch`** is **`aria-hidden`**; the trigger **Button** (or other control) must expose the purpose via visible text or **`aria-label`**.
+- Controlled integration: **`value`** can be **`string | Color`**; **`onChange`** always yields **`Color`**—serialize with **`toString(...)`** for APIs expecting strings.
+- **`parseColor`** throws on bad input; guard user paste if you cannot tolerate exceptions.
+- Dense UIs: mount the picker body in **[Popover](../popover/COMPONENT.md)** / **[Modal](../modal/COMPONENT.md)** / **[Drawer](../drawer/COMPONENT.md)**, not inline in toolbars.
+- Do not assume **`EyeDropper`** exists; provide sliders, hex, or swatches as primary input paths.
+- For copy-paste recipes, start from **`examples/minimal-popover.tsx`** or the **Minimal example** above, then add sliders, **`SwatchPicker`**, or **`HexInput`** per scenario.
