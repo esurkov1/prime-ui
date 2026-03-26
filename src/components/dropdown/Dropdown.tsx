@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
@@ -157,7 +157,7 @@ function DropdownContent({
     <Portal>
       <DropdownContentSizeContext.Provider value={size}>
         <ControlSizeProvider value={size}>
-          <div
+          <ScrollContainer
             ref={ref}
             id={menuId}
             role="menu"
@@ -170,7 +170,7 @@ function DropdownContent({
             onKeyDown={(e) => handleMenuNavigationKeyDown(e, e.currentTarget)}
           >
             {children}
-          </div>
+          </ScrollContainer>
         </ControlSizeProvider>
       </DropdownContentSizeContext.Provider>
     </Portal>

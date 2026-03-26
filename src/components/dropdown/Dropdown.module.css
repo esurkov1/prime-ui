@@ -84,8 +84,7 @@
   box-shadow: var(--prime-sys-elevation-shadow-surface), var(--prime-sys-elevation-shadow-modal);
   padding: var(--dd-pad);
   min-width: var(--dd-min-w);
-  /* max-height задаётся из JS по свободному месту во вьюпорте */
-  overflow-y: auto;
+  /* max-height задаётся из JS по свободному месту во вьюпорте; прокрутка — ScrollContainer */
   transform-origin: top center;
 }
 

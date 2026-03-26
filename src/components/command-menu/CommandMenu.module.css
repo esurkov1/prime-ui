@@ -12,9 +12,7 @@
   );
   padding-left: max(var(--prime-sys-size-control-m-buttonPaddingX), env(safe-area-inset-left, 0));
   padding-right: max(var(--prime-sys-size-control-m-buttonPaddingX), env(safe-area-inset-right, 0));
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  /* Прокрутка — ScrollContainer (классы в CommandMenuDialog overlayClassName) */
 }
 
 .dialogContent {
@@ -159,8 +157,7 @@
   flex: 1;
   min-height: 0;
   min-width: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  /* Прокрутка — ScrollContainer */
   display: flex;
   flex-direction: column;
 }

@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 
@@ -50,9 +51,16 @@ export type PageShellContentAreaProps = {
 const PageShellContentArea = React.forwardRef<HTMLElement, PageShellContentAreaProps>(
   function PageShellContentArea({ className, children, ...rest }, forwardedRef) {
     return (
-      <main ref={forwardedRef} className={cx(styles.contentArea, className)} {...rest}>
+      <ScrollContainer
+        as="main"
+        ref={forwardedRef}
+        axis="vertical"
+        overscrollBehavior="contain"
+        className={cx(styles.contentArea, className)}
+        {...rest}
+      >
         {children}
-      </main>
+      </ScrollContainer>
     );
   },
 );

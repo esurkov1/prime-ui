@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
@@ -148,7 +148,7 @@ function PopoverContent({
   return (
     <Portal>
       <ControlSizeProvider value={size}>
-        <div
+        <ScrollContainer
           ref={ref}
           id={contentId}
           role="dialog"
@@ -161,7 +161,7 @@ function PopoverContent({
           style={layout?.style}
         >
           {children}
-        </div>
+        </ScrollContainer>
       </ControlSizeProvider>
     </Portal>
   );

@@ -121,7 +121,7 @@
 
 .body {
   flex: 1;
-  overflow-y: auto;
+  /* Прокрутка — ScrollContainer */
   padding-inline: var(--drawer-padding-x);
   padding-block: var(--drawer-padding-y);
 }

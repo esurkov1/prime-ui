@@ -223,8 +223,7 @@
    * и clamp в usePosition загоняет left к var(--prime-sys-unit-8px) — список уезжает влево от триггера. */
   width: max-content;
   max-width: min(var(--prime-sys-unit-28rem), 100vw);
-  overflow-x: hidden;
-  overflow-y: auto;
+  /* Прокрутка — ScrollContainer */
   /* Основной лимит — inline maxHeight из usePosition; запас на первый кадр до RAF. */
   max-height: min(85dvh, var(--prime-sys-unit-40rem));
   padding: var(--prime-sys-spacing-x1);

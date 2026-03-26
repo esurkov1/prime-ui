@@ -3,6 +3,8 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Modal, type ModalPanelProps, type ModalRootProps } from "@/components/modal/Modal";
 import modalShellStyles from "@/components/modal/Modal.module.css";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import scrollContainerStyles from "@/components/scroll-container/ScrollContainer.module.css";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -194,7 +196,15 @@ function CommandMenuDialog({
         aria-describedby={ariaDescribedBy}
         aria-labelledby={ariaLabelledBy}
         className={cx(styles.dialogContent, styles.root, contentClassName, className)}
-        overlayClassName={cx(styles.dialogOverlay, overlayClassName)}
+        overlayClassName={cx(
+          scrollContainerStyles.root,
+          scrollContainerStyles.vertical,
+          scrollContainerStyles.flexItem,
+          scrollContainerStyles.touch,
+          scrollContainerStyles.overscrollContain,
+          styles.dialogOverlay,
+          overlayClassName,
+        )}
       >
         <CommandMenuRootProvider>{children}</CommandMenuRootProvider>
       </Modal.Panel>
@@ -355,7 +365,7 @@ const CommandMenuList = React.forwardRef<HTMLDivElement, CommandMenuListProps>(
     const { listboxId } = useCommandMenuContext();
 
     return (
-      <div
+      <ScrollContainer
         ref={ref}
         id={listboxId}
         role="listbox"
@@ -364,7 +374,7 @@ const CommandMenuList = React.forwardRef<HTMLDivElement, CommandMenuListProps>(
         {...rest}
       >
         {children}
-      </div>
+      </ScrollContainer>
     );
   },
 );

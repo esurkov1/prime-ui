@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
@@ -317,7 +317,7 @@ function SelectContent({ className, children }: SelectContentProps) {
 
   return (
     <Portal>
-      <div
+      <ScrollContainer
         ref={contentRef}
         id={listboxId}
         role="listbox"
@@ -331,7 +331,7 @@ function SelectContent({ className, children }: SelectContentProps) {
         {...toDataAttributes({ side: resolvedSide, size })}
       >
         {children}
-      </div>
+      </ScrollContainer>
     </Portal>
   );
 }

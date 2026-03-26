@@ -36,6 +36,7 @@ import PopoverSection from "./sections/PopoverSection";
 import ProgressBarSection from "./sections/ProgressBarSection";
 import ProgressCircleSection from "./sections/ProgressCircleSection";
 import RadioSection from "./sections/RadioSection";
+import ScrollContainerSection from "./sections/ScrollContainerSection";
 import SegmentedControlSection from "./sections/SegmentedControlSection";
 import SelectSection from "./sections/SelectSection";
 import SidebarSection from "./sections/SidebarSection";
@@ -144,6 +145,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     { segment: "page-shell", label: "PageShell", Page: PageShellSection },
     { segment: "page-content", label: "PageContent", Page: PageContentSection },
     { segment: "example-frame", label: "ExampleFrame", Page: ExampleFrameSection },
+    { segment: "scroll-container", label: "ScrollContainer", Page: ScrollContainerSection },
     { segment: "control-size", label: "ControlSizeProvider", Page: ControlSizeSection },
   ],
 };

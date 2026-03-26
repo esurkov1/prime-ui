@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import * as React from "react";
-
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -331,7 +331,12 @@ function DataTableRoot<Row>({
           striped,
         })}
       >
-        <div ref={scrollRef} className={styles.viewport}>
+        <ScrollContainer
+          ref={scrollRef}
+          axis="both"
+          overscrollBehavior="auto"
+          className={styles.viewport}
+        >
           <table
             className={styles.table}
             onMouseLeave={highlightColumnOnHover ? clearHoveredColumn : undefined}
@@ -472,7 +477,7 @@ function DataTableRoot<Row>({
           {infiniteScroll ? (
             <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />
           ) : null}
-        </div>
+        </ScrollContainer>
 
         <div className={styles.footer}>
           <p className={styles.meta}>

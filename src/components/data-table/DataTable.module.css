@@ -80,7 +80,7 @@
 
 .viewport {
   width: 100%;
-  overflow: auto;
+  /* Прокрутка — ScrollContainer */
   border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   border-radius: var(--prime-sys-shape-radius-l);
   background: var(--dt-row-bg);

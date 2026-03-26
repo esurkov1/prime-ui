@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Button } from "@/components/button/Button";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
@@ -296,9 +297,9 @@ export type DrawerBodyProps = React.HTMLAttributes<HTMLDivElement>;
 
 function DrawerBody({ children, className, ...rest }: DrawerBodyProps) {
   return (
-    <div className={cx(styles.body, className)} {...rest}>
+    <ScrollContainer className={cx(styles.body, className)} {...rest}>
       {children}
-    </div>
+    </ScrollContainer>
   );
 }
 

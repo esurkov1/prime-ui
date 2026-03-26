@@ -1,0 +1,34 @@
+.root {
+  box-sizing: border-box;
+}
+
+.flexItem {
+  min-height: 0;
+  min-width: 0;
+}
+
+.vertical {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.horizontal {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.both {
+  overflow: auto;
+}
+
+.touch {
+  -webkit-overflow-scrolling: touch;
+}
+
+.overscrollContain {
+  overscroll-behavior: contain;
+}
+
+.overscrollNone {
+  overscroll-behavior: none;
+}

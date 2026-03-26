@@ -68,7 +68,7 @@
   box-shadow: var(--prime-sys-elevation-shadow-surface), var(--prime-sys-elevation-shadow-modal);
   padding: var(--po-pad);
   min-width: var(--po-min-w);
-  overflow-y: auto;
+  /* Прокрутка — ScrollContainer */
   transform-origin: top center;
   font-size: var(--po-text-size);
   line-height: 1.35;
