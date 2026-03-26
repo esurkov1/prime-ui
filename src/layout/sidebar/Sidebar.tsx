@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import {
   ChevronsUpDown,
   PanelLeftClose,
@@ -223,29 +222,77 @@ export type SidebarGroupProps = React.ComponentPropsWithoutRef<"section"> & {
   action?: React.ReactNode;
 };
 
+function parseLengthToPx(value: string, baseFontSize: number): number | null {
+  const raw = value.trim().toLowerCase();
+  if (raw.length === 0) return null;
+
+  if (raw.endsWith("px")) {
+    const parsed = Number.parseFloat(raw.slice(0, -2));
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  if (raw.endsWith("rem") || raw.endsWith("em")) {
+    const parsed = Number.parseFloat(raw.slice(0, -3));
+    return Number.isFinite(parsed) ? parsed * baseFontSize : null;
+  }
+
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 function SidebarHeadingText({ children }: { children: React.ReactNode }) {
-  const { state, isMobile } = useSidebarContext();
-  const compact = state === "compact" && !isMobile;
+  const { isMobile } = useSidebarContext();
   const trackRef = React.useRef<HTMLSpanElement | null>(null);
   const textRef = React.useRef<HTMLSpanElement | null>(null);
   const [offset, setOffset] = React.useState(0);
 
   const measureOffset = React.useCallback(() => {
-    const track = trackRef.current;
-    const text = textRef.current;
-    if (track == null || text == null) return;
-
-    if (!compact) {
+    if (isMobile || typeof window === "undefined") {
       setOffset((prev) => (Math.abs(prev) < 0.5 ? prev : 0));
       return;
     }
 
+    const track = trackRef.current;
+    const text = textRef.current;
+    if (track == null || text == null) return;
+
+    const root = track.closest<HTMLElement>("[data-sidebar-root='true']");
+    if (root == null) return;
+
     const trackWidth = track.clientWidth;
     const textWidth = Math.min(text.scrollWidth, trackWidth);
-    const next = Math.max(0, (trackWidth - textWidth) / 2);
+    const centerOffset = Math.max(0, (trackWidth - textWidth) / 2);
+
+    const computed = window.getComputedStyle(root);
+    const baseFontSize = Number.parseFloat(
+      window.getComputedStyle(document.documentElement).fontSize,
+    );
+
+    const expandedWidth = parseLengthToPx(
+      computed.getPropertyValue("--sb-expanded-width"),
+      baseFontSize,
+    );
+    const compactWidth = parseLengthToPx(
+      computed.getPropertyValue("--sb-compact-width"),
+      baseFontSize,
+    );
+    const currentWidth = root.getBoundingClientRect().width;
+
+    let progress = 0;
+    if (
+      expandedWidth !== null &&
+      compactWidth !== null &&
+      expandedWidth > compactWidth &&
+      currentWidth <= expandedWidth
+    ) {
+      progress = (expandedWidth - currentWidth) / (expandedWidth - compactWidth);
+      progress = Math.max(0, Math.min(1, progress));
+    }
+
+    const next = centerOffset * progress;
 
     setOffset((prev) => (Math.abs(prev - next) < 0.5 ? prev : next));
-  }, [compact]);
+  }, [isMobile]);
 
   React.useLayoutEffect(() => {
     measureOffset();
@@ -256,6 +303,8 @@ function SidebarHeadingText({ children }: { children: React.ReactNode }) {
     const track = trackRef.current;
     const text = textRef.current;
     if (track == null || text == null) return;
+    const root = track.closest<HTMLElement>("[data-sidebar-root='true']");
+    if (root == null) return;
 
     const observer = new ResizeObserver(() => {
       measureOffset();
@@ -263,20 +312,20 @@ function SidebarHeadingText({ children }: { children: React.ReactNode }) {
 
     observer.observe(track);
     observer.observe(text);
+    observer.observe(root);
 
     return () => observer.disconnect();
   }, [measureOffset]);
 
   return (
     <span ref={trackRef} className={styles.headingTrack}>
-      <motion.span
+      <span
         ref={textRef}
-        animate={{ x: offset }}
-        transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
         className={styles.headingText}
+        style={{ transform: `translateX(${offset}px)` }}
       >
         {children}
-      </motion.span>
+      </span>
     </span>
   );
 }
