@@ -45,7 +45,7 @@ import { ButtonGroup } from "prime-ui-kit";
 
 export function DensityPreview() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start" }}>
+    <div className="flex flex-wrap items-start gap-6">
       <ButtonGroup.Root aria-label="Sort, size s" size="s">
         <ButtonGroup.Item pressed type="button">
           By date
@@ -75,10 +75,10 @@ import { ButtonGroup } from "prime-ui-kit";
 export function SearchMiniForm() {
   return (
     <form
+      className="flex max-w-xs flex-col gap-2"
       onSubmit={(e) => {
         e.preventDefault();
       }}
-      style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 320 }}
     >
       <label htmlFor="q">Query</label>
       <input id="q" name="q" type="search" />
