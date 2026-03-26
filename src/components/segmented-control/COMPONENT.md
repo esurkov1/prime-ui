@@ -34,6 +34,28 @@ export function Example() {
 }
 ```
 
+### Canonical composition (reference)
+
+For **controlled mode**, **`SegmentedControl.Icon` + text**, **icon-only segments with visually hidden labels**, and **`Typography` as an external group hint** (because **`Root` does not forward `aria-label`**), open **`examples/canonical-composition.tsx`** next to this file. Imports use **`"prime-ui-kit"`** so the same snippets work in an app after installing the package.
+
+### Example files in `examples/`
+
+| File | Scenario |
+|------|----------|
+| `canonical-composition.tsx` | Icon + text, controlled period, icon-only + visually hidden labels |
+| `view-mode.tsx` | English catalog view: List / Grid / Table |
+| `pricing-toggle.tsx` | English billing: Monthly / Annual |
+| `catalog-filters.tsx` | English compact availability filter; `size="s"` |
+
+### Note for LLMs
+
+- **Imports:** `SegmentedControl`, `Icon`, and `Typography` from **`"prime-ui-kit"`** in these examples; paths are relative to `src/components/segmented-control/examples/`.
+- **Values are strings:** map `onValueChange` to app enums with a type guard or narrow union; **`Item` does not accept `aria-label`**—accessible names come from **visible** `children` and/or **visually hidden** text inside **`Item`**.
+- **`SegmentedControl.Icon`** is **`aria-hidden`**; always pair with visible text or a visually hidden span inside the same **`Item`**.
+- **`Root`** does **not** forward **`aria-label`**, **`aria-labelledby`**, or **`style`**: use a **wrapper** and visible copy, or **`aria-labelledby`** on a wrapper that references visible page text—not on **`Root`**.
+- **Keyboard:** **ArrowLeft** / **ArrowRight** move among **enabled** items; **`disabled`** on **`Item`** is skipped; **`defaultValue=""`** leaves no selection and **`Root`** is focusable until the user picks a segment.
+- **Many options or vertical layout:** prefer [Select](../select/COMPONENT.md); **tabbed panels** → [Tabs](../tabs/COMPONENT.md).
+
 ## Rules
 
 - **Controlled:** pass **`value`** and handle changes with **`onValueChange`**. **Uncontrolled:** use **`defaultValue`** (defaults to **`""`**).
