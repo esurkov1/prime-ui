@@ -6,7 +6,6 @@
   gap: var(--prime-sys-spacing-x3);
   width: 100%;
   min-height: 0;
-  padding: var(--prime-sys-spacing-x3);
   background: transparent;
 }
 
