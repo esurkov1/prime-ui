@@ -380,7 +380,7 @@ Full table of **47** exported UI building blocks mapped to responsive layout (43
 
 | | |
 |---|---|
-| **Purpose** | Side navigation: section column, grouped items, and footer. |
+| **Purpose** | Side navigation: **NavPanel** (header/content/footer), groups and menus; **`state`** `expanded` \| `compact` \| `hidden`; in **`compact`**, menu triggers get built-in tooltips (see **COMPONENT.md**). |
 | **Responsive role** | On desktop fixed side column; on mobile collapses into Drawer or hides behind hamburger. |
 | **Zones** | sidebar, navigation |
 | **Scenarios** | Product switching; docs with TOC; fleet/warehouse logistics; settings sections; catalog with filters; routes on NavLink. |

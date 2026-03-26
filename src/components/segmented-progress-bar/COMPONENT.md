@@ -7,7 +7,7 @@
 A horizontal **stacked** bar: one segment per category, with widths proportional to each segment’s **`value`** (weight). Use semantic **`tone`** colors for status (success, warning, danger, etc.) and optional labels for tooltips and assistive-tech descriptions.
 
 - **Use** for part-to-whole breakdowns—e.g. job outcomes (errors / pending / success), survey responses, or storage by type.
-- **Use** with **`segmentGap="hairline"`** (default) when segments should read as distinct columns; use **`none`** for a continuous strip.
+- **Use** with **`segmentGap="none"`** (default) for a continuous bar; use **`segmentGap="hairline"`** when segments should read as distinct columns with a 1px separator.
 - **Use** with **`label`** when the bar needs a visible title; the **distribution** string is still exposed to screen readers via **`aria-describedby`**.
 - **Do not use** for a single continuous fraction of one task—use [ProgressBar](../progress-bar/COMPONENT.md) (native `<progress>`).
 - **Do not use** for interactive selection—use [SegmentedControl](../segmented-control/COMPONENT.md).
@@ -42,7 +42,7 @@ export function Example() {
 - **Weights** are **non-negative**; each **`value`** is clamped to **`≥ 0`**. Invalid numbers are treated as **`0`**.
 - **Segment sizes** follow **`value[i] / sum(values)`** via **`flex-grow`** on the track (not `%` width), so layout stays correct in shrink-to-fit parents (e.g. playground `stack` preview). If the sum is **`0`**, the track is empty (track background only).
 - **Percentages** in the accessibility description are **rounded** to whole numbers.
-- **`segmentGap`** defaults to **`hairline`** (1px gap, `--prime-sys-color-border-subtle` between segments); **`none`** removes the gap.
+- **`segmentGap`** defaults to **`none`** (no gap between fills). **`hairline`** задаёт **`gap: 1px`** на треке; фон трека — **`--prime-sys-color-border-subtle`**, сегменты лежат поверх (видна «линия» между заливками). При **`none`** фон трека — **`surface-accentSoft`**.
 - **`tone`** defaults to **`primary`** when omitted; allowed values: **`primary`**, **`success`**, **`warning`**, **`danger`**, **`neutral`**.
 - **`label`** on each segment is passed to **`title`** on the segment for tooltips; it also appears in the **distribution** string for assistive tech when provided.
 - The bar is **not** a single native **`progressbar`**; the track is **`role="group"`** with **`aria-label`** (no visible label) or **`aria-labelledby`** + **`aria-describedby`** (with label).
@@ -56,7 +56,7 @@ export function Example() {
 | `segments` | `SegmentedProgressSegment[]` | — | Yes | Non-negative weights; layout is proportional to the sum. |
 | `label` | `string` | — | No | Text above the track; when set, the group uses **`aria-labelledby`** and **`aria-describedby`**. |
 | `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track height and label typography (same scale as ProgressBar). |
-| `segmentGap` | `"none" \| "hairline"` | `"hairline"` | No | Gap between segment fills. |
+| `segmentGap` | `"none" \| "hairline"` | `"none"` | No | Gap between segment fills. |
 | `className` | `string` | — | No | Class on the outer wrapper. |
 | `ref` | `React.Ref<HTMLDivElement>` | — | No | Ref to the **`role="group"`** track element. |
 

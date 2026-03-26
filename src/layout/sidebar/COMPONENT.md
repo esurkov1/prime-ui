@@ -11,12 +11,12 @@
 - **`Sidebar.Root`** — обязательная обёртка (`aside`) и источник состояния `expanded | compact | hidden`.
 - **`Sidebar.NavPanel`** — контейнер панели (`nav`) с layout-частями.
 - Типичный порядок: **`Header`** → **`ToggleButton`** → **`Content`** → **`Footer`**.
-- В `compact` рекомендуемый UX: показывать `Tooltip` для `MenuButton`/`MenuRouterLink` (обычно `side="right"`, `delay=0`).
+- В **`compact`** (не mobile) для пунктов меню включены **встроенные тултипы**: оборачивают **`MenuButton`**, **`MenuRouterLink`** и **`MenuLink`** (через общий **`MenuButton`**). Текст: явный **`tooltip`** (где есть в типах), иначе **`aria-label`**, иначе текст из **`children`**. Провайдер: **`Tooltip`** справа (`side="right"`), **`delayDuration={0}`**. На mobile тултипы не показываются.
 
 ## Visual Contract
 
-- `NavPanel` без обводки (`border: 0`), фон — близкий к `surface-default` на семантических токенах.
-- Цвет панели намеренно отличается от `Dropdown`/`Popover` (они используют `surface-elevated`), чтобы слои не сливались.
+- `NavPanel` без скругления и без «рамки» вокруг всей панели (`border: 0` на самой панели). Фон: в **светлой** теме — **`color-mix(in srgb, surface-default 88%, border-subtle 12%)`**; в **тёмной** — **`surface-default`**. Грань к основному контенту — **`border-subtle`** на стороне, смотрящей в main (`border-inline-end` / `border-inline-start` в зависимости от **`side`**).
+- Трек меню визуально отделён от полотна страницы; `Dropdown`/`Popover` по-прежнему опираются на **`surface-elevated`**, чтобы слои не сливались.
 
 ## State Model
 
@@ -42,4 +42,18 @@
 
 ## API
 
-Актуальные примеры и таблицы пропсов: `playground/sections/SidebarSection.tsx` и `playground/sections/sidebarApiRows.ts`.
+Полные примеры и таблицы: `playground/sections/SidebarSection.tsx` и `playground/sections/sidebarApiRows.ts`.
+
+### `Sidebar.MenuButton` (дополнительно к нативным атрибутам `button`)
+
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| active | `boolean` | — | No | Визуально выделенный пункт. |
+| asChild | `boolean` | `false` | No | Рендер через `Slot` вместо `button`. |
+| tooltip | `React.ReactNode` | — | No | Текст тултипа в **`compact`**; если не задан — из **`aria-label`** или из текста **`children`**. Пустая строка отключает тултип. |
+
+### `Sidebar.MenuRouterLink` (наследует пропсы `NavLink`)
+
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| tooltip | `React.ReactNode` | — | No | То же, что у **`MenuButton`**: явный текст или fallback из **`aria-label`** / **`children`**. |
