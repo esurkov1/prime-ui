@@ -65,14 +65,14 @@ export function Example() {
 - **`variant`**: controlled via **`variant`** / **`onVariantChange`** or uncontrolled via **`defaultVariant`** (`"double"` by default). **`simple`** hides the context rail styling context (`data-collapsed` on root).
 - **`activeSection`**: string or uncontrolled **`defaultActiveSection`**; updates notify **`onActiveSectionChange` only when the new value is non-null** — clearing to `null` internally does not call the callback.
 - **`open`**: controlled or uncontrolled; **`defaultOpen`** defaults to **`true`**, but on the first render with **`responsive={true}`** and a viewport already under **`max-width: 64rem`**, the initial open state is **`false`** until the media query effect runs; crossing the breakpoint toggles open to match desktop vs overlay behavior.
-- When **`responsive={true}`** and the overlay is open, the backdrop is focusable with a fixed Russian **`aria-label`** (“Закрыть сайдбар”); **`ToggleButton`** and the floating control use Russian default open/closed labels (overridable via **`openLabel`** / **`closedLabel`** on **`ToggleButton`** only for that component).
+- When **`responsive={true}`** and the overlay is open: **`useFocusTrap`** + **`useScrollLock`** + **`Escape`** (как у модального drawer), backdrop только под клик (**`tabIndex={-1}`**), фокус уходит в панель. **`ToggleButton`** / плавающая кнопка: **`aria-expanded`**, **`aria-controls`** → id **`NavPanel`** (стабильный **`useId`**, можно переопределить **`id`** на **`NavPanel`**).
 - **`edgeHoverOpen`** (default **`true`**): on narrow + responsive + closed panel, if the device matches **`(hover: hover) and (pointer: fine)`**, moving the pointer within **`12px`** of the left viewport edge opens the panel; leaving **`NavPanel`** then closes it. With controlled **`open`**, wire **`onOpenChange`** so the parent stays in sync.
 - **`useSidebarContext`** must run under **`Sidebar.Root`**; use **`toggleOpen`** / **`setOpen`** from **`ToggleButton`** or custom controls consistently with controlled **`open`**.
 - **`MenuRouterLink`** requires a React Router provider; it forwards **`NavLink`** props (`to`, `end`, `className` as function or string, etc.).
 - **`useSidebarNavTo(pathWithinSection)`** trims slashes; with **`variant="double"`** and a non-empty **`activeSection`**, returns `/${activeSection}` or `/${activeSection}/${inner}`; otherwise `/${inner}` or **`"/"`** for empty paths.
 - **`ContextItemButton`** / **`MenuButton`** with **`asChild`**: pass a single child element; **`disabled`** sets **`aria-disabled`** on the slotted element and blocks clicks.
 - Put meaningful text or **`aria-label`** on **`IdentityButton`** and context items; with **`items`**, each entry uses **`ariaLabel ?? label`** on the button. Prefer **`aria-hidden`** on purely decorative **`MenuIcon`** / **`MenuTrailing`** when **`MenuLabel`** carries the name.
-- Responsive width uses **`window.matchMedia("(max-width: 64rem)")`**, not container width.
+- Переход inline/overlay: **`SIDEBAR_MEDIA_QUERY_NARROW`** из **`sidebarLayout.ts`** (в CSS те же **`64rem`** в `@media`). Не по ширине контейнера.
 
 ## API
 

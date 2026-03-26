@@ -4,13 +4,16 @@ import { NavLink } from "react-router-dom";
 
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { Slot } from "@/internal/slot";
 import type { SidebarSize } from "@/internal/states";
-
 import styles from "./Sidebar.module.css";
+import { SIDEBAR_MEDIA_QUERY_NARROW } from "./sidebarLayout";
 
 export type { SidebarSize };
 
@@ -37,6 +40,8 @@ type SidebarContextValue = {
   toggleOpen: () => void;
   /** Закрыть оверлей, если он был открыт наведением к левому краю (responsive). */
   onNavPanelMouseLeave: () => void;
+  /** Стабильный id для `NavPanel` — `aria-controls` у кнопок открытия. */
+  navPanelId: string;
 };
 
 const [SidebarProvider, useSidebarContext] = createComponentContext<SidebarContextValue>("Sidebar");
@@ -116,7 +121,7 @@ function SidebarRoot({
     responsive === true &&
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
-    window.matchMedia("(max-width: 64rem)").matches;
+    window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW).matches;
 
   const [variant, setVariantState] = useControllableState<SidebarVariant>({
     value: variantProp,
@@ -154,7 +159,7 @@ function SidebarRoot({
       return;
     }
 
-    const query = window.matchMedia("(max-width: 64rem)");
+    const query = window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW);
     const update = () => setIsResponsiveViewport(query.matches);
     update();
 
@@ -254,6 +259,19 @@ function SidebarRoot({
   const shouldShowInlineOverlay = responsive === true && isResponsiveViewport && open;
   const shouldShowFloatingToggle = open === false;
 
+  const navPanelId = React.useId();
+
+  const navAreaRef = useFocusTrap<HTMLDivElement>({
+    enabled: shouldShowInlineOverlay,
+  });
+
+  useScrollLock(shouldShowInlineOverlay);
+
+  useEscapeKey({
+    enabled: shouldShowInlineOverlay,
+    onEscape: () => setOpen(false),
+  });
+
   const contextValue = React.useMemo(
     () => ({
       size,
@@ -265,9 +283,11 @@ function SidebarRoot({
       setOpen,
       toggleOpen,
       onNavPanelMouseLeave,
+      navPanelId,
     }),
     [
       activeSection,
+      navPanelId,
       onNavPanelMouseLeave,
       open,
       setActiveSection,
@@ -295,13 +315,13 @@ function SidebarRoot({
         })}
         data-collapsed={variant === "simple" ? "true" : undefined}
       >
-        <div className={styles.navArea}>
+        <div ref={navAreaRef} className={styles.navArea}>
           <button
             type="button"
             className={styles.backdrop}
             aria-label="Закрыть сайдбар"
             aria-hidden={shouldShowInlineOverlay ? undefined : true}
-            tabIndex={shouldShowInlineOverlay ? 0 : -1}
+            tabIndex={-1}
             onClick={() => setOpen(false)}
           />
           {children}
@@ -312,6 +332,7 @@ function SidebarRoot({
             className={styles.floatingToggle}
             onClick={toggleOpen}
             aria-label={open ? "Скрыть сайдбар" : "Открыть сайдбар"}
+            aria-controls={navPanelId}
           >
             {open ? (
               <PanelLeftClose size="1em" strokeWidth={2} />
@@ -471,11 +492,12 @@ SidebarContextItemButton.displayName = "SidebarContextItemButton";
 
 export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav">;
 
-function SidebarNavPanel({ className, onMouseLeave, ...rest }: SidebarNavPanelProps) {
-  const { onNavPanelMouseLeave } = useSidebarContext();
+function SidebarNavPanel({ className, onMouseLeave, id, ...rest }: SidebarNavPanelProps) {
+  const { onNavPanelMouseLeave, navPanelId } = useSidebarContext();
   return (
     <nav
       {...rest}
+      id={id ?? navPanelId}
       className={cx(styles.navPanel, className)}
       onMouseLeave={(e) => {
         onMouseLeave?.(e);
@@ -697,13 +719,15 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
     },
     ref,
   ) => {
-    const { open, toggleOpen } = useSidebarContext();
+    const { open, toggleOpen, navPanelId } = useSidebarContext();
     return (
       <button
         {...rest}
         ref={ref}
         type={type}
         className={cx(styles.toggleButton, className)}
+        aria-expanded={open}
+        aria-controls={navPanelId}
         aria-label={open ? openLabel : closedLabel}
         onClick={(event) => {
           onClick?.(event);

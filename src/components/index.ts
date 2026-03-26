@@ -320,6 +320,11 @@ export type {
   SidebarVariant,
 } from "./sidebar/Sidebar";
 export { Sidebar, useSidebarContext, useSidebarNavTo } from "./sidebar/Sidebar";
+export {
+  SIDEBAR_LAYOUT_BREAKPOINT_MAX,
+  SIDEBAR_MEDIA_QUERY_INLINE,
+  SIDEBAR_MEDIA_QUERY_NARROW,
+} from "./sidebar/sidebarLayout";
 export type { SliderRootProps, SliderSize } from "./slider/Slider";
 export { Slider } from "./slider/Slider";
 export type {

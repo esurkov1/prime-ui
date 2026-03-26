@@ -1,4 +1,7 @@
-/* `page-nav`: колонка в nav area PageShell; схлопывание — `max-width` → 0; горизонтальные поля/gap — у `PageShell` (`data-prime-shell="application"`). */
+/*
+ * `page-nav`: колонка в nav area PageShell; схлопывание — `max-width` → 0; горизонтальные поля/gap — у `PageShell`.
+ * Брейкпоинты `64rem` / `64.001rem` — синхронны с `sidebarLayout.ts` (в @media нельзя использовать var()).
+ */
 .root {
   --sb-context-width: var(--prime-sys-unit-4rem);
   --sb-panel-width: var(--prime-sys-unit-20rem);

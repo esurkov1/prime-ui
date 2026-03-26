@@ -2,6 +2,7 @@
  * Две колонки: nav area | content area.
  * `PageShell.Application` задаёт `data-prime-shell="application"`: на ≥lg — симметричные поля вьюпорта
  * и зазор между колонками при открытом `Sidebar` (`sidebarSlot="page-nav"`). Иначе — без полей/gap.
+ * Брейкпоинт 64.001rem — тот же «широкий» режим, что и `SIDEBAR_MEDIA_QUERY_INLINE` в sidebarLayout.ts.
  * Вторая колонка: minmax(0, 1fr) чтобы main не раздувал сетку (overflow → скролл внутри main).
  */
 .root {
