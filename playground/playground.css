@@ -850,3 +850,67 @@ h3 {
   font-size: var(--prime-sys-size-control-s-supportText);
   color: var(--prime-sys-color-content-secondary);
 }
+
+.playgroundSidebarUserTrigger {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x3));
+  min-width: calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x3));
+  min-height: calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x3));
+  border: 0;
+  border-radius: var(--prime-sys-size-control-m-radius);
+  background: transparent;
+  cursor: pointer;
+  color: var(--prime-sys-color-content-primary);
+  transition: background-color var(--prime-sys-motion-duration-fast)
+    var(--prime-sys-motion-easing-standard);
+}
+
+.playgroundSidebarUserTrigger:hover {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.playgroundSidebarUserTrigger:focus-visible {
+  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
+  outline-offset: var(--prime-sys-unit-2px);
+}
+
+.playgroundSidebarModeAvatarCrm {
+  background: color-mix(in srgb, var(--prime-sys-color-action-primaryBackground) 82%, transparent);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.playgroundSidebarModeAvatarTraffic {
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-feedback-infoBackground) 82%,
+    var(--prime-sys-color-surface-default)
+  );
+  color: var(--prime-sys-color-feedback-infoForeground);
+}
+
+.playgroundSidebarModeAvatarAutorpark {
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-feedback-warningBackground) 84%,
+    var(--prime-sys-color-surface-default)
+  );
+  color: var(--prime-sys-color-feedback-warningForeground);
+}
+
+.playgroundSidebarFooterControls {
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.playgroundSidebarFooterControl {
+  display: grid;
+  gap: var(--prime-sys-spacing-x1);
+}
+
+.playgroundSidebarFooterLabel {
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+}

@@ -116,8 +116,8 @@ export default function SidebarSection() {
         <div className="demoBlock">
           <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
           <DemoDescription>
-            Снаружи задаются <code>open</code> и <code>onOpenChange</code>; кнопка над превью
-            переключает открытость.
+            Снаружи задаются <code>state</code> и <code>onStateChange</code>; кнопка над превью
+            переключает состояние панели.
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>

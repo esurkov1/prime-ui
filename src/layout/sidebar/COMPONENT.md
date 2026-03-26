@@ -1,33 +1,40 @@
 # Sidebar
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Проектирование по умолчанию:** для оси размера используйте **`size="m"`**, если отдельно не задано другое.
 
 ## About
 
-Боковая навигация: `Sidebar.Root` задаёт контекст и оболочку `aside`; `Sidebar.NavPanel` — основная колонка (шапка, прокручиваемый контент, подвал), группы, меню, doc-блоки.
-
-**When to use**
-
-- Постоянная вертикальная навигация приложения: продуктовые разделы, настройки, админка.
-- SPA: `MenuRouterLink` + React Router для активного пункта по URL.
-
-**When not to use**
-
-- Навигация, которая умещается в одну горизонтальную полосу — рассмотреть верхнее меню или drawer.
+`Sidebar` — вертикальная навигационная колонка: `Sidebar.Root` задаёт контекст и layout, `Sidebar.NavPanel` — сама панель (header/content/footer), а `Menu`/`Group`/`NavCategory` формируют структуру пунктов.
 
 ## Composition
 
-- **`Sidebar.Root`** — обязательная обёртка: `aside`, `aria-label`, `data-*` для `size`, `open`, `responsive`, опционально `sidebarSlot`. Подложка и плавающая кнопка на узком viewport при `responsive`.
-- **`Sidebar.NavPanel`** — главная колонка (`nav`).
-- Типичный порядок: **`Header`** → **`HeaderRow`** → **`HeaderMain`** и **`ToggleButton`** → **`Content`** (**`NavCategory`**, **`Group`** + **`Menu`**) → опционально **`Footer`**.
+- **`Sidebar.Root`** — обязательная обёртка (`aside`) и источник состояния `expanded | compact | hidden`.
+- **`Sidebar.NavPanel`** — контейнер панели (`nav`) с layout-частями.
+- Типичный порядок: **`Header`** → **`ToggleButton`** → **`Content`** → **`Footer`**.
+- В `compact` рекомендуемый UX: показывать `Tooltip` для `MenuButton`/`MenuRouterLink` (обычно `side="right"`, `delay=0`).
+
+## State Model
+
+- Актуальный API состояния: **`state`**, **`defaultState`**, **`onStateChange`**.
+- Legacy API (`open`, `defaultOpen`, `onOpenChange`, `mode`, `defaultMode`, `onModeChange`) оставлен для совместимости, но для нового кода используйте `state`-модель.
+- При `responsive={true}` и узком viewport панель уходит в `hidden`, появляется mobile overlay + floating open button.
+
+## Data API Pattern (для продуктового меню)
+
+Для динамического меню (режимы продукта, роли, бренды) используйте слой данных над `Sidebar`:
+
+- у режима храните **`navTag`** (например `crm | traffic | autorpark`);
+- у категорий/пунктов храните **`tags`** и опционально **`switchByTag`**;
+- на рендере фильтруйте по `tags` и накладывайте `switchByTag[activeTag]`.
+
+Это позволяет переключать не только пункты, но и сами категории без изменения JSX-структуры `Sidebar`.
 
 ## Rules
 
-- **`open`**: контролируемый или неконтролируемый; при **`responsive={true}`** и узком окне стартовое `open` может быть `false`.
-- Узкий viewport: **`SIDEBAR_MEDIA_QUERY_NARROW`** в `sidebarLayout.ts` (в CSS те же `64rem`).
-- **`ToggleButton`** / плавающая кнопка: `aria-expanded`, `aria-controls` → id **`NavPanel`**.
-- **`useSidebarContext`** — только под **`Sidebar.Root`**.
+- `ToggleButton` и floating toggle связываются с `NavPanel` через `aria-controls`.
+- `useSidebarContext` используйте только внутри `Sidebar.Root`.
+- `sidebarSlot="page-nav"` — режим встраивания в макет страницы рядом с main-контентом.
 
 ## API
 
-См. плейграунд и типы в `Sidebar.tsx` / `SidebarRoot.tsx`.
+Актуальные примеры и таблицы пропсов: `playground/sections/SidebarSection.tsx` и `playground/sections/sidebarApiRows.ts`.

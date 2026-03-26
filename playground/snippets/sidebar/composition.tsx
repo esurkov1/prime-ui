@@ -1,8 +1,39 @@
-import { ChevronRight, Ellipsis, FileText, FolderOpen } from "lucide-react";
+import {
+  Car,
+  ChevronRight,
+  Ellipsis,
+  FileText,
+  FolderOpen,
+  LayoutDashboard,
+  LogOut,
+  Megaphone,
+  Plug,
+  Settings,
+  UserRound,
+} from "lucide-react";
 import * as React from "react";
+
+import { Avatar } from "@/components/avatar/Avatar";
+import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Sidebar } from "@/layout";
 
 import styles from "./composition.module.css";
+
+type DemoModeId = "crm" | "traffic" | "autorpark";
+
+type DemoMode = {
+  id: DemoModeId;
+  label: string;
+  subtitle: string;
+  icon: React.ElementType;
+  avatar: string;
+};
+
+const MODES: DemoMode[] = [
+  { id: "crm", label: "CRM", subtitle: "Продажи", icon: LayoutDashboard, avatar: "CR" },
+  { id: "traffic", label: "Traffic", subtitle: "Кампании", icon: Megaphone, avatar: "TR" },
+  { id: "autorpark", label: "Autorpark", subtitle: "Парк", icon: Car, avatar: "AP" },
+];
 
 function FavoritesCategory() {
   const [open, setOpen] = React.useState(true);
@@ -11,7 +42,7 @@ function FavoritesCategory() {
       <Sidebar.NavCategoryTrigger
         type="button"
         aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen((value) => !value)}
       >
         <Sidebar.NavCategoryLabel>Документация</Sidebar.NavCategoryLabel>
         <Sidebar.NavCategoryCount>4</Sidebar.NavCategoryCount>
@@ -38,15 +69,123 @@ function FavoritesCategory() {
   );
 }
 
+function ModeSwitcher({
+  mode,
+  onModeChange,
+}: {
+  mode: DemoMode;
+  onModeChange: (id: DemoModeId) => void;
+}) {
+  return (
+    <Dropdown.Root>
+      <Dropdown.Trigger>
+        <Sidebar.IdentityButton
+          leading={
+            <Avatar.Root size="m" className={styles.modeAvatar}>
+              <Avatar.Fallback>{mode.avatar}</Avatar.Fallback>
+            </Avatar.Root>
+          }
+          title={mode.label}
+          subtitle={mode.subtitle}
+          type="button"
+          aria-label="Режим в примере"
+        />
+      </Dropdown.Trigger>
+      <Dropdown.Content align="start" sameMinWidthAsTrigger>
+        <Dropdown.Block>
+          <Dropdown.Group>
+            <Dropdown.GroupLabel>Режим</Dropdown.GroupLabel>
+            {MODES.map((entry) => (
+              <Dropdown.Item key={entry.id} onSelect={() => onModeChange(entry.id)}>
+                <Dropdown.ItemIcon as={entry.icon} size={16} strokeWidth={2} />
+                {entry.label}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Group>
+        </Dropdown.Block>
+      </Dropdown.Content>
+    </Dropdown.Root>
+  );
+}
+
+function HeaderUserPopover() {
+  return (
+    <Dropdown.Root>
+      <Dropdown.Trigger>
+        <button
+          type="button"
+          className={styles.userTrigger}
+          aria-label="Пользовательские настройки"
+        >
+          <Avatar.Root size="m">
+            <Avatar.Fallback>ES</Avatar.Fallback>
+          </Avatar.Root>
+        </button>
+      </Dropdown.Trigger>
+
+      <Dropdown.Content align="end" side="bottom">
+        <Dropdown.Block>
+          <Dropdown.Header>
+            <Dropdown.HeaderRow>
+              <Dropdown.HeaderLeading>
+                <Avatar.Root size="m">
+                  <Avatar.Fallback>ES</Avatar.Fallback>
+                </Avatar.Root>
+              </Dropdown.HeaderLeading>
+              <Dropdown.HeaderMain>
+                <Dropdown.HeaderTitle>Egor Surkov</Dropdown.HeaderTitle>
+                <Dropdown.HeaderDescription truncate>
+                  egor.surkov@example.com
+                </Dropdown.HeaderDescription>
+              </Dropdown.HeaderMain>
+            </Dropdown.HeaderRow>
+            <Dropdown.Separator />
+          </Dropdown.Header>
+
+          <Dropdown.Group>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={UserRound} size={16} strokeWidth={2} />
+              Профиль
+            </Dropdown.Item>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={Plug} size={16} strokeWidth={2} />
+              Интеграции
+            </Dropdown.Item>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={Settings} size={16} strokeWidth={2} />
+              Настройки
+            </Dropdown.Item>
+          </Dropdown.Group>
+        </Dropdown.Block>
+
+        <Dropdown.Separator />
+
+        <Dropdown.Block>
+          <Dropdown.Item>
+            <Dropdown.ItemIcon as={LogOut} size={16} strokeWidth={2} />
+            Выйти
+          </Dropdown.Item>
+        </Dropdown.Block>
+      </Dropdown.Content>
+    </Dropdown.Root>
+  );
+}
+
 export default function SidebarCompositionSnippet() {
-  const [open, setOpen] = React.useState(true);
+  const [state, setState] = React.useState<"expanded" | "compact" | "hidden">("expanded");
+  const [modeId, setModeId] = React.useState<DemoModeId>("crm");
+
+  const mode = React.useMemo(
+    () => MODES.find((entry) => entry.id === modeId) ?? MODES[0],
+    [modeId],
+  );
 
   return (
     <div className={styles.demoRoot}>
       <Sidebar.Root
         size="m"
-        open={open}
-        onOpenChange={setOpen}
+        state={state}
+        onStateChange={setState}
         responsive={false}
         aria-label="Композиция сайдбара"
       >
@@ -54,17 +193,9 @@ export default function SidebarCompositionSnippet() {
           <Sidebar.Header>
             <Sidebar.HeaderRow>
               <Sidebar.HeaderMain>
-                <Sidebar.IdentityButton
-                  leading={
-                    <span className={styles.brandMark} aria-hidden="true">
-                      P
-                    </span>
-                  }
-                  title="Prime UI Kit"
-                  subtitle="Playground"
-                  type="button"
-                />
+                <ModeSwitcher mode={mode} onModeChange={setModeId} />
               </Sidebar.HeaderMain>
+              <HeaderUserPopover />
               <Sidebar.ToggleButton />
             </Sidebar.HeaderRow>
           </Sidebar.Header>

@@ -6,12 +6,12 @@ import {
   Bookmark,
   BookOpen,
   Calendar,
+  Car,
   CheckSquare,
   ChevronDown,
   ChevronsDownUp,
   ChevronsLeftRight,
   ChevronsRight,
-  ChevronsUpDown,
   CircleDot,
   CircleGauge,
   CircleHelp,
@@ -36,7 +36,6 @@ import {
   MessageSquare,
   Minus,
   MousePointerClick,
-  Package,
   Palette,
   PanelLeft,
   PanelRight,
@@ -48,7 +47,6 @@ import {
   Settings,
   SlidersHorizontal,
   StretchHorizontal,
-  SunMoon,
   Table,
   Tag,
   TextCursorInput,
@@ -61,16 +59,73 @@ import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { Sidebar } from "@/layout";
+import { Select } from "@/components/select/Select";
+import { Tooltip } from "@/components/tooltip/Tooltip";
+import { Sidebar, useSidebarContext } from "@/layout";
 
-import { getPlaygroundNavModel } from "../playgroundPages";
-import { PLAYGROUND_THEME_PRESET_OPTIONS, usePlaygroundTheme } from "./PlaygroundTheme";
+import { getPlaygroundNavModel, type PlaygroundNavModel } from "../playgroundPages";
+import {
+  PLAYGROUND_THEME_PRESET_OPTIONS,
+  type PlaygroundThemePreset,
+  usePlaygroundTheme,
+} from "./PlaygroundTheme";
 
-type PlaygroundMenuItem = {
+type PlaygroundSidebarModeId = "crm" | "traffic" | "autorpark";
+type PlaygroundSidebarNavTag = "shared" | PlaygroundSidebarModeId;
+
+type PlaygroundSidebarMode = {
+  id: PlaygroundSidebarModeId;
+  label: string;
+  subtitle: string;
+  avatarFallback: string;
+  menuIcon: React.ElementType;
+  navTag: PlaygroundSidebarNavTag;
+};
+
+type PlaygroundSidebarMenuItemBase = {
   label: string;
   to?: string;
   icon?: React.ReactNode;
   onSelect?: () => void;
+  tags?: PlaygroundSidebarNavTag[];
+};
+
+type PlaygroundSidebarMenuItem = PlaygroundSidebarMenuItemBase & {
+  id: string;
+  switchByTag?: Partial<Record<PlaygroundSidebarNavTag, Partial<PlaygroundSidebarMenuItemBase>>>;
+};
+
+type PlaygroundSidebarMenuCategoryBase = {
+  label: string;
+  items: PlaygroundSidebarMenuItem[];
+  tags?: PlaygroundSidebarNavTag[];
+};
+
+type PlaygroundSidebarMenuCategory = PlaygroundSidebarMenuCategoryBase & {
+  id: string;
+  switchByTag?: Partial<
+    Record<PlaygroundSidebarNavTag, Partial<PlaygroundSidebarMenuCategoryBase>>
+  >;
+};
+
+type PlaygroundSidebarNavigationApi = {
+  sharedTag: "shared";
+  modes: PlaygroundSidebarMode[];
+  categories: PlaygroundSidebarMenuCategory[];
+};
+
+type ResolvedMenuItem = {
+  id: string;
+  label: string;
+  to?: string;
+  icon?: React.ReactNode;
+  onSelect?: () => void;
+};
+
+type ResolvedMenuCategory = {
+  id: string;
+  label: string;
+  items: ResolvedMenuItem[];
 };
 
 function toRoute(segment: string): string {
@@ -115,7 +170,7 @@ function pageIcon(segment: string): React.ReactNode {
     case "radio":
       return <CircleDot {...navIconProps} />;
     case "select":
-      return <ChevronsUpDown {...navIconProps} />;
+      return <ChevronDown {...navIconProps} />;
     case "slider":
       return <SlidersHorizontal {...navIconProps} />;
     case "switch":
@@ -185,59 +240,322 @@ function pageIcon(segment: string): React.ReactNode {
   }
 }
 
-function PlaygroundPanelRow({ item }: { item: PlaygroundMenuItem }) {
+function resolveByTag<T extends object>(
+  base: T,
+  switchByTag: Partial<Record<PlaygroundSidebarNavTag, Partial<T>>> | undefined,
+  activeTags: PlaygroundSidebarNavTag[],
+): T {
+  let resolved = base;
+  for (const tag of activeTags) {
+    const patch = switchByTag?.[tag];
+    if (patch !== undefined) {
+      resolved = { ...resolved, ...patch };
+    }
+  }
+  return resolved;
+}
+
+function isVisibleForTags(
+  tags: PlaygroundSidebarNavTag[] | undefined,
+  activeTagSet: ReadonlySet<PlaygroundSidebarNavTag>,
+): boolean {
+  if (tags === undefined || tags.length === 0) return true;
+  return tags.some((tag) => activeTagSet.has(tag));
+}
+
+function buildSidebarNavigationApi(nav: PlaygroundNavModel): PlaygroundSidebarNavigationApi {
+  const modes: PlaygroundSidebarMode[] = [
+    {
+      id: "crm",
+      label: "CRM",
+      subtitle: "Продажи и pipeline",
+      avatarFallback: "CR",
+      menuIcon: LayoutDashboard,
+      navTag: "crm",
+    },
+    {
+      id: "traffic",
+      label: "Traffic",
+      subtitle: "Кампании и аналитика",
+      avatarFallback: "TR",
+      menuIcon: Megaphone,
+      navTag: "traffic",
+    },
+    {
+      id: "autorpark",
+      label: "Autorpark",
+      subtitle: "Парк и обслуживание",
+      avatarFallback: "AP",
+      menuIcon: Car,
+      navTag: "autorpark",
+    },
+  ];
+
+  const sharedCategories: PlaygroundSidebarMenuCategory[] = [
+    {
+      id: "workspace",
+      label: "Workspace",
+      tags: ["shared"],
+      switchByTag: {
+        crm: { label: "CRM Workspace" },
+        traffic: { label: "Traffic Workspace" },
+        autorpark: { label: "Autorpark Workspace" },
+      },
+      items: [
+        {
+          id: "workspace-home",
+          label: "Введение",
+          to: "/",
+          icon: <BookOpen {...navIconProps} />,
+          tags: ["shared"],
+        },
+        {
+          id: "workspace-primary",
+          label: "Сделки",
+          to: "/data-table",
+          icon: <LayoutDashboard {...navIconProps} />,
+          tags: ["shared"],
+          switchByTag: {
+            traffic: {
+              label: "Кампании",
+              to: "/progress-bar",
+              icon: <Megaphone {...navIconProps} />,
+            },
+            autorpark: {
+              label: "Автопарк",
+              to: "/card",
+              icon: <Car {...navIconProps} />,
+            },
+          },
+        },
+        {
+          id: "workspace-alerts",
+          label: "Оповещения",
+          to: "/notification",
+          icon: <Bell {...navIconProps} />,
+          tags: ["shared"],
+          switchByTag: {
+            autorpark: {
+              label: "ТО и сервис",
+              to: "/datepicker",
+              icon: <Calendar {...navIconProps} />,
+            },
+          },
+        },
+      ],
+    },
+  ];
+
+  const crmCatalog: PlaygroundSidebarMenuCategory[] = nav.categories.map((category) => ({
+    id: `crm-${category.id}`,
+    label: category.label,
+    tags: ["crm"],
+    items: category.pages.map((page) => ({
+      id: `crm-${category.id}-${page.segment}`,
+      label: page.label,
+      to: toRoute(page.segment),
+      icon: pageIcon(page.segment),
+      tags: ["crm"],
+    })),
+  }));
+
+  const trafficCatalog: PlaygroundSidebarMenuCategory[] = [
+    {
+      id: "traffic-analytics",
+      label: "Аналитика трафика",
+      tags: ["traffic"],
+      items: [
+        {
+          id: "traffic-dashboard",
+          label: "Dashboard",
+          to: "/progress-circle",
+          icon: <CircleGauge {...navIconProps} />,
+          tags: ["traffic"],
+        },
+        {
+          id: "traffic-sources",
+          label: "Источники",
+          to: "/segmented-progress-bar",
+          icon: <BarChart3 {...navIconProps} />,
+          tags: ["traffic"],
+        },
+        {
+          id: "traffic-rules",
+          label: "Правила и теги",
+          to: "/tag",
+          icon: <Tag {...navIconProps} />,
+          tags: ["traffic"],
+        },
+      ],
+    },
+  ];
+
+  const autorparkCatalog: PlaygroundSidebarMenuCategory[] = [
+    {
+      id: "autorpark-fleet",
+      label: "Парк",
+      tags: ["autorpark"],
+      items: [
+        {
+          id: "autorpark-cars",
+          label: "Список авто",
+          to: "/data-table",
+          icon: <Car {...navIconProps} />,
+          tags: ["autorpark"],
+        },
+        {
+          id: "autorpark-cards",
+          label: "Карточки машин",
+          to: "/card",
+          icon: <LayoutDashboard {...navIconProps} />,
+          tags: ["autorpark"],
+        },
+        {
+          id: "autorpark-maintenance",
+          label: "План ТО",
+          to: "/datepicker",
+          icon: <Calendar {...navIconProps} />,
+          tags: ["autorpark"],
+        },
+      ],
+    },
+  ];
+
+  return {
+    sharedTag: "shared",
+    modes,
+    categories: [...sharedCategories, ...crmCatalog, ...trafficCatalog, ...autorparkCatalog],
+  };
+}
+
+function resolveSidebarNavigation(
+  api: PlaygroundSidebarNavigationApi,
+  modeId: PlaygroundSidebarModeId,
+): { mode: PlaygroundSidebarMode; categories: ResolvedMenuCategory[] } {
+  const mode = api.modes.find((entry) => entry.id === modeId) ?? api.modes[0];
+  if (mode === undefined) {
+    throw new Error("[playground] sidebar mode list is empty");
+  }
+
+  const activeTags: PlaygroundSidebarNavTag[] = [api.sharedTag, mode.navTag];
+  const activeTagSet = new Set(activeTags);
+
+  const categories = api.categories
+    .filter((category) => isVisibleForTags(category.tags, activeTagSet))
+    .map((category): ResolvedMenuCategory => {
+      const resolvedCategory = resolveByTag<PlaygroundSidebarMenuCategoryBase>(
+        {
+          label: category.label,
+          items: category.items,
+          tags: category.tags,
+        },
+        category.switchByTag,
+        activeTags,
+      );
+
+      const items = resolvedCategory.items
+        .map((item): ResolvedMenuItem | null => {
+          const resolvedItem = resolveByTag<PlaygroundSidebarMenuItemBase>(
+            {
+              label: item.label,
+              to: item.to,
+              icon: item.icon,
+              onSelect: item.onSelect,
+              tags: item.tags,
+            },
+            item.switchByTag,
+            activeTags,
+          );
+
+          if (!isVisibleForTags(resolvedItem.tags, activeTagSet)) {
+            return null;
+          }
+
+          return {
+            id: item.id,
+            label: resolvedItem.label,
+            to: resolvedItem.to,
+            icon: resolvedItem.icon,
+            onSelect: resolvedItem.onSelect,
+          };
+        })
+        .filter((item): item is ResolvedMenuItem => item !== null);
+
+      return {
+        id: category.id,
+        label: resolvedCategory.label,
+        items,
+      };
+    })
+    .filter((category) => category.items.length > 0);
+
+  return { mode, categories };
+}
+
+function modeAvatarClassName(modeId: PlaygroundSidebarModeId): string {
+  switch (modeId) {
+    case "crm":
+      return "playgroundSidebarModeAvatarCrm";
+    case "traffic":
+      return "playgroundSidebarModeAvatarTraffic";
+    case "autorpark":
+      return "playgroundSidebarModeAvatarAutorpark";
+  }
+}
+
+function isThemePreset(value: string): value is PlaygroundThemePreset {
+  return PLAYGROUND_THEME_PRESET_OPTIONS.some((option) => option.value === value);
+}
+
+function SidebarMenuControl({ item }: { item: ResolvedMenuItem }) {
   if (item.to !== undefined) {
     return (
-      <Sidebar.MenuItem>
-        <Sidebar.MenuRouterLink to={item.to} end={item.to === "/"}>
-          {item.icon !== undefined ? <Sidebar.MenuIcon>{item.icon}</Sidebar.MenuIcon> : null}
-          <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
-        </Sidebar.MenuRouterLink>
-      </Sidebar.MenuItem>
+      <Sidebar.MenuRouterLink to={item.to} end={item.to === "/"}>
+        {item.icon !== undefined ? <Sidebar.MenuIcon>{item.icon}</Sidebar.MenuIcon> : null}
+        <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
+      </Sidebar.MenuRouterLink>
     );
   }
 
   return (
+    <Sidebar.MenuButton type="button" onClick={item.onSelect}>
+      {item.icon !== undefined ? <Sidebar.MenuIcon>{item.icon}</Sidebar.MenuIcon> : null}
+      <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
+    </Sidebar.MenuButton>
+  );
+}
+
+function PlaygroundPanelRow({ item }: { item: ResolvedMenuItem }) {
+  const { state, isMobile } = useSidebarContext();
+  const compactTooltipEnabled = !isMobile && state === "compact";
+
+  return (
     <Sidebar.MenuItem>
-      <Sidebar.MenuButton type="button" onClick={item.onSelect}>
-        {item.icon !== undefined ? <Sidebar.MenuIcon>{item.icon}</Sidebar.MenuIcon> : null}
-        <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
-      </Sidebar.MenuButton>
+      {compactTooltipEnabled ? (
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <SidebarMenuControl item={item} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="right" size="l">
+            {item.label}
+          </Tooltip.Content>
+        </Tooltip.Root>
+      ) : (
+        <SidebarMenuControl item={item} />
+      )}
     </Sidebar.MenuItem>
   );
 }
 
-function PlaygroundTreeMenu() {
-  const nav = React.useMemo(() => getPlaygroundNavModel(), []);
-
+function PlaygroundTreeMenu({ categories }: { categories: ResolvedMenuCategory[] }) {
   return (
     <Sidebar.NavDocTree>
-      <Sidebar.Group>
-        <Sidebar.GroupLabel>Навигация</Sidebar.GroupLabel>
-        <Sidebar.Menu>
-          <PlaygroundPanelRow
-            item={{
-              label: nav.intro.label,
-              to: toRoute(nav.intro.segment),
-              icon: <BookOpen {...navIconProps} />,
-            }}
-          />
-        </Sidebar.Menu>
-      </Sidebar.Group>
-
-      {nav.categories.map((category) => (
+      {categories.map((category) => (
         <Sidebar.Group key={category.id}>
           <Sidebar.GroupLabel>{category.label}</Sidebar.GroupLabel>
           <Sidebar.Menu>
-            {category.pages.map((page) => (
-              <PlaygroundPanelRow
-                key={page.segment}
-                item={{
-                  label: page.label,
-                  to: toRoute(page.segment),
-                  icon: pageIcon(page.segment),
-                }}
-              />
+            {category.items.map((item) => (
+              <PlaygroundPanelRow key={item.id} item={item} />
             ))}
           </Sidebar.Menu>
         </Sidebar.Group>
@@ -246,57 +564,40 @@ function PlaygroundTreeMenu() {
   );
 }
 
-function PlaygroundBrandMenu() {
-  const { scheme, toggleScheme, preset, setPreset } = usePlaygroundTheme();
-  const presetIndex = PLAYGROUND_THEME_PRESET_OPTIONS.findIndex(
-    (option) => option.value === preset,
-  );
-  const presetLabel = PLAYGROUND_THEME_PRESET_OPTIONS[presetIndex]?.label ?? "Custom";
-
-  const cyclePreset = React.useCallback(() => {
-    const nextIndex =
-      presetIndex < 0 ? 0 : (presetIndex + 1) % PLAYGROUND_THEME_PRESET_OPTIONS.length;
-    const nextPreset = PLAYGROUND_THEME_PRESET_OPTIONS[nextIndex];
-    if (nextPreset !== undefined) {
-      setPreset(nextPreset.value);
-    }
-  }, [presetIndex, setPreset]);
-
+function PlaygroundModeSwitcher({
+  mode,
+  modes,
+  onModeChange,
+}: {
+  mode: PlaygroundSidebarMode;
+  modes: PlaygroundSidebarMode[];
+  onModeChange: (next: PlaygroundSidebarModeId) => void;
+}) {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
         <Sidebar.IdentityButton
           leading={
-            <span
-              className="playgroundSidebarBrandMark"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--prime-sys-color-action-primaryForeground)",
-              }}
-            >
-              <Package size="1.25em" strokeWidth={2} />
-            </span>
+            <Avatar.Root size="m" className={modeAvatarClassName(mode.id)}>
+              <Avatar.Fallback>{mode.avatarFallback}</Avatar.Fallback>
+            </Avatar.Root>
           }
-          title="Prime-UI"
-          subtitle="Reakt UI-Kit"
-          aria-label="Меню бренда и темы"
+          title={mode.label}
+          subtitle={mode.subtitle}
+          aria-label="Переключить режим навигации"
         />
       </Dropdown.Trigger>
 
       <Dropdown.Content align="start" sameMinWidthAsTrigger>
         <Dropdown.Block>
           <Dropdown.Group>
-            <Dropdown.GroupLabel>Оформление</Dropdown.GroupLabel>
-            <Dropdown.Item onSelect={toggleScheme}>
-              <Dropdown.ItemIcon as={SunMoon} size={16} strokeWidth={2} />
-              {scheme === "light" ? "Тема: Светлая" : "Тема: Тёмная"}
-            </Dropdown.Item>
-            <Dropdown.Item onSelect={cyclePreset}>
-              <Dropdown.ItemIcon as={Palette} size={16} strokeWidth={2} />
-              Бренд-тема: {presetLabel}
-            </Dropdown.Item>
+            <Dropdown.GroupLabel>Режим продукта</Dropdown.GroupLabel>
+            {modes.map((entry) => (
+              <Dropdown.Item key={entry.id} onSelect={() => onModeChange(entry.id)}>
+                <Dropdown.ItemIcon as={entry.menuIcon} size={16} strokeWidth={2} />
+                {entry.label}
+              </Dropdown.Item>
+            ))}
           </Dropdown.Group>
         </Dropdown.Block>
       </Dropdown.Content>
@@ -304,103 +605,179 @@ function PlaygroundBrandMenu() {
   );
 }
 
-function PlaygroundUserMenu() {
+function PlaygroundUserMenuContent() {
+  return (
+    <>
+      <Dropdown.Block>
+        <Dropdown.Header>
+          <Dropdown.HeaderRow>
+            <Dropdown.HeaderLeading>
+              <Avatar.Root size="m">
+                <Avatar.Fallback>ES</Avatar.Fallback>
+              </Avatar.Root>
+            </Dropdown.HeaderLeading>
+            <Dropdown.HeaderMain>
+              <Dropdown.HeaderTitle>Egor Surkov</Dropdown.HeaderTitle>
+              <Dropdown.HeaderDescription truncate>
+                egor.surkov@example.com
+              </Dropdown.HeaderDescription>
+            </Dropdown.HeaderMain>
+          </Dropdown.HeaderRow>
+          <Dropdown.Separator />
+        </Dropdown.Header>
+
+        <Dropdown.Group>
+          <Dropdown.Item>
+            <Dropdown.ItemIcon as={UserRound} size={16} strokeWidth={2} />
+            Профиль и безопасность
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <Dropdown.ItemIcon as={Plug} size={16} strokeWidth={2} />
+            Интеграции
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <Dropdown.ItemIcon as={Settings} size={16} strokeWidth={2} />
+            Настройки
+          </Dropdown.Item>
+        </Dropdown.Group>
+      </Dropdown.Block>
+
+      <Dropdown.Block>
+        <Dropdown.Group>
+          <Dropdown.GroupLabel>Поддержка</Dropdown.GroupLabel>
+          <Dropdown.Item>
+            <Dropdown.ItemIcon as={BookOpen} size={16} strokeWidth={2} />
+            Руководство
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <Dropdown.ItemIcon as={HelpCircle} size={16} strokeWidth={2} />
+            Справочный центр
+          </Dropdown.Item>
+        </Dropdown.Group>
+      </Dropdown.Block>
+
+      <Dropdown.Separator />
+
+      <Dropdown.Block>
+        <Dropdown.Item>
+          <Dropdown.ItemIcon as={LogOut} size={16} strokeWidth={2} />
+          Выйти
+        </Dropdown.Item>
+      </Dropdown.Block>
+    </>
+  );
+}
+
+function PlaygroundHeaderUserMenu() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <Sidebar.IdentityButton
-          leading={
-            <Avatar.Root size="m">
-              <Avatar.Fallback>ES</Avatar.Fallback>
-            </Avatar.Root>
-          }
-          title="Egor Surkov"
-          subtitle="Product Engineer"
+        <button
+          type="button"
+          className="playgroundSidebarUserTrigger"
           aria-label="Меню пользователя"
-        />
+        >
+          <Avatar.Root size="m">
+            <Avatar.Fallback>ES</Avatar.Fallback>
+          </Avatar.Root>
+        </button>
       </Dropdown.Trigger>
 
-      <Dropdown.Content align="start" side="top" sameMinWidthAsTrigger>
-        <Dropdown.Block>
-          <Dropdown.Header>
-            <Dropdown.HeaderRow>
-              <Dropdown.HeaderLeading>
-                <Avatar.Root size="m">
-                  <Avatar.Fallback>ES</Avatar.Fallback>
-                </Avatar.Root>
-              </Dropdown.HeaderLeading>
-              <Dropdown.HeaderMain>
-                <Dropdown.HeaderTitle>Egor Surkov</Dropdown.HeaderTitle>
-                <Dropdown.HeaderDescription truncate>
-                  egor.surkov@example.com
-                </Dropdown.HeaderDescription>
-              </Dropdown.HeaderMain>
-            </Dropdown.HeaderRow>
-            <Dropdown.Separator />
-          </Dropdown.Header>
-
-          <Dropdown.Group>
-            <Dropdown.Item>
-              <Dropdown.ItemIcon as={UserRound} size={16} strokeWidth={2} />
-              Профиль и безопасность
-            </Dropdown.Item>
-            <Dropdown.Item>
-              <Dropdown.ItemIcon as={Plug} size={16} strokeWidth={2} />
-              Интеграции
-            </Dropdown.Item>
-            <Dropdown.Item>
-              <Dropdown.ItemIcon as={Settings} size={16} strokeWidth={2} />
-              Настройки
-            </Dropdown.Item>
-          </Dropdown.Group>
-        </Dropdown.Block>
-
-        <Dropdown.Block>
-          <Dropdown.Group>
-            <Dropdown.GroupLabel>Поддержка</Dropdown.GroupLabel>
-            <Dropdown.Item>
-              <Dropdown.ItemIcon as={BookOpen} size={16} strokeWidth={2} />
-              Руководство
-            </Dropdown.Item>
-            <Dropdown.Item>
-              <Dropdown.ItemIcon as={HelpCircle} size={16} strokeWidth={2} />
-              Справочный центр
-            </Dropdown.Item>
-          </Dropdown.Group>
-        </Dropdown.Block>
-
-        <Dropdown.Separator />
-
-        <Dropdown.Block>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={LogOut} size={16} strokeWidth={2} />
-            Выйти
-          </Dropdown.Item>
-        </Dropdown.Block>
+      <Dropdown.Content align="end" side="bottom">
+        <PlaygroundUserMenuContent />
       </Dropdown.Content>
     </Dropdown.Root>
+  );
+}
+
+function PlaygroundFooterThemeSelectors() {
+  const { scheme, setScheme, preset, setPreset } = usePlaygroundTheme();
+
+  const onSchemeChange = React.useCallback(
+    (next: string) => {
+      setScheme(next === "dark" ? "dark" : "light");
+    },
+    [setScheme],
+  );
+
+  const onPresetChange = React.useCallback(
+    (next: string) => {
+      if (isThemePreset(next)) {
+        setPreset(next);
+      }
+    },
+    [setPreset],
+  );
+
+  return (
+    <div className="playgroundSidebarFooterControls">
+      <div className="playgroundSidebarFooterControl">
+        <Sidebar.Text className="playgroundSidebarFooterLabel">Тема интерфейса</Sidebar.Text>
+        <Select.Root value={scheme} onChange={onSchemeChange} size="m">
+          <Select.Trigger aria-label="Схема темы playground">
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="light">Светлая</Select.Item>
+            <Select.Item value="dark">Тёмная</Select.Item>
+          </Select.Content>
+        </Select.Root>
+      </div>
+
+      <div className="playgroundSidebarFooterControl">
+        <Sidebar.Text className="playgroundSidebarFooterLabel">Бренд-тема</Sidebar.Text>
+        <Select.Root value={preset} onChange={onPresetChange} size="m">
+          <Select.Trigger aria-label="Палитра бренд-темы playground">
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            {PLAYGROUND_THEME_PRESET_OPTIONS.map((option) => (
+              <Select.Item key={option.value} value={option.value} label={option.label}>
+                {option.label}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Root>
+      </div>
+    </div>
   );
 }
 
 export function PlaygroundChromeSidebar() {
+  const nav = React.useMemo(() => getPlaygroundNavModel(), []);
+  const navigationApi = React.useMemo(() => buildSidebarNavigationApi(nav), [nav]);
+  const [modeId, setModeId] = React.useState<PlaygroundSidebarModeId>("crm");
+
+  const { mode, categories } = React.useMemo(
+    () => resolveSidebarNavigation(navigationApi, modeId),
+    [navigationApi, modeId],
+  );
+
   return (
     <Sidebar.Root sidebarSlot="page-nav" aria-label="Навигация playground">
       <Sidebar.NavPanel>
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
-              <PlaygroundBrandMenu />
+              <PlaygroundModeSwitcher
+                mode={mode}
+                modes={navigationApi.modes}
+                onModeChange={setModeId}
+              />
             </Sidebar.HeaderMain>
+            <PlaygroundHeaderUserMenu />
           </Sidebar.HeaderRow>
         </Sidebar.Header>
         <Sidebar.ToggleButton placement="edge" />
 
-        <Sidebar.Content>
-          <PlaygroundTreeMenu />
-        </Sidebar.Content>
+        <Tooltip.Provider delayDuration={0}>
+          <Sidebar.Content>
+            <PlaygroundTreeMenu categories={categories} />
+          </Sidebar.Content>
+        </Tooltip.Provider>
 
-        <Sidebar.Footer>
-          <PlaygroundUserMenu />
+        <Sidebar.Footer variant="inset">
+          <PlaygroundFooterThemeSelectors />
         </Sidebar.Footer>
       </Sidebar.NavPanel>
     </Sidebar.Root>

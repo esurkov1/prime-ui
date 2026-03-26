@@ -6,12 +6,18 @@ import { Sidebar } from "@/layout";
 import styles from "./controlled.module.css";
 
 export default function SidebarControlledSnippet() {
-  const [open, setOpen] = React.useState(true);
+  const [state, setState] = React.useState<"expanded" | "hidden">("expanded");
+  const open = state !== "hidden";
 
   return (
     <div className={styles.wrap}>
       <div className={styles.toolbar}>
-        <Button.Root size="s" mode="stroke" type="button" onClick={() => setOpen((o) => !o)}>
+        <Button.Root
+          size="s"
+          mode="stroke"
+          type="button"
+          onClick={() => setState((prev) => (prev === "hidden" ? "expanded" : "hidden"))}
+        >
           {open ? "Скрыть" : "Показать"}
         </Button.Root>
       </div>
@@ -19,8 +25,8 @@ export default function SidebarControlledSnippet() {
       <div className={styles.stage}>
         <Sidebar.Root
           size="m"
-          open={open}
-          onOpenChange={setOpen}
+          state={state}
+          onStateChange={(next) => setState(next === "hidden" ? "hidden" : "expanded")}
           responsive={false}
           aria-label="Контролируемый сайдбар"
         >
