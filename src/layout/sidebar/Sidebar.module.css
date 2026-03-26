@@ -191,13 +191,26 @@
   display: block;
   width: 100%;
   min-width: 0;
+  min-block-size: 1.2em;
   line-height: 1.2;
-  text-align: start;
   padding-inline: var(--prime-sys-spacing-x1);
+  overflow: hidden;
+  transition: padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
+}
+
+.headingTrack {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.headingText {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition: padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .separator {
@@ -545,13 +558,12 @@
   margin: 0;
   width: 100%;
   min-width: 0;
+  min-block-size: 1.2em;
   font-size: var(--prime-sys-size-control-m-text);
   font-weight: var(--prime-sys-typography-weight-medium);
   color: var(--prime-sys-color-content-primary);
-  text-align: start;
+  line-height: 1.2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   transition: padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
@@ -798,6 +810,8 @@
   .identityButtonTrailing,
   .groupLabel,
   .navPanelHeading,
+  .headingTrack,
+  .headingText,
   .navCategoryTrigger > :global(svg) {
     transition: none;
   }

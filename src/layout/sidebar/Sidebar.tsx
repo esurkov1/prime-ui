@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import {
   ChevronsUpDown,
   PanelLeftClose,
@@ -118,8 +119,6 @@ export type SidebarToggleButtonProps = Omit<
   openLabel?: string;
   closedLabel?: string;
   placement?: "inline" | "edge";
-  /** Подсказка в режиме compact. По умолчанию — `openLabel` / `closedLabel`. `false` — отключить. */
-  tooltip?: React.ReactNode | boolean;
 };
 
 function iconForToggle(state: SidebarLayoutMode, side: "left" | "right") {
@@ -136,25 +135,14 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
       openLabel = "Скрыть сайдбар",
       closedLabel = "Открыть сайдбар",
       placement = "inline",
-      tooltip,
       ...rest
     },
     ref,
   ) => {
-    const { state, toggleOpen, navPanelId, side, isMobile } = useSidebarContext();
+    const { state, toggleOpen, navPanelId, side } = useSidebarContext();
     const expanded = state !== "hidden";
-    const compact = state === "compact" && !isMobile;
-    const resolvedTooltip =
-      tooltip === false
-        ? null
-        : tooltip !== undefined
-          ? tooltip
-          : expanded
-            ? openLabel
-            : closedLabel;
-    const showTooltip = Boolean(compact && resolvedTooltip != null);
 
-    const button = (
+    return (
       <button
         {...rest}
         ref={ref}
@@ -176,21 +164,6 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
         </span>
       </button>
     );
-
-    if (!showTooltip) {
-      return button;
-    }
-
-    return (
-      <Tooltip.Provider delayDuration={0}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>{button}</Tooltip.Trigger>
-          <Tooltip.Content size="l" side={side === "left" ? "right" : "left"}>
-            {resolvedTooltip}
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-    );
   },
 );
 
@@ -204,45 +177,15 @@ export type SidebarIdentityButtonProps = Omit<
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   trailing?: React.ReactNode;
-  /**
-   * Нативная подсказка в режиме compact (атрибут `title`), чтобы не ломать `Dropdown.Trigger` и `ref`.
-   * По умолчанию — строковый `title` и при необходимости `subtitle`. `false` — отключить.
-   */
-  tooltip?: React.ReactNode | boolean;
 };
 
 const SidebarIdentityButton = React.forwardRef<HTMLButtonElement, SidebarIdentityButtonProps>(
   (
-    {
-      className,
-      type = "button",
-      leading,
-      title,
-      subtitle,
-      trailing,
-      disabled,
-      onClick,
-      tooltip,
-      ...rest
-    },
+    { className, type = "button", leading, title, subtitle, trailing, disabled, onClick, ...rest },
     ref,
   ) => {
-    const { state, isMobile } = useSidebarContext();
-    const compact = state === "compact" && !isMobile;
-
-    let htmlTitle: string | undefined;
-    if (compact && tooltip !== false) {
-      if (typeof tooltip === "string") {
-        htmlTitle = tooltip;
-      } else if (tooltip === undefined) {
-        if (typeof title === "string") {
-          htmlTitle =
-            subtitle !== undefined && typeof subtitle === "string"
-              ? `${title} — ${subtitle}`
-              : title;
-        }
-      }
-    }
+    const { size: _size } = useSidebarContext();
+    void _size;
 
     return (
       <button
@@ -252,7 +195,6 @@ const SidebarIdentityButton = React.forwardRef<HTMLButtonElement, SidebarIdentit
         disabled={disabled}
         onClick={onClick}
         className={cx(styles.identityButton, className)}
-        title={htmlTitle}
         aria-label={typeof title === "string" ? title : rest["aria-label"]}
       >
         {leading === undefined ? null : (
@@ -281,13 +223,27 @@ export type SidebarGroupProps = React.ComponentPropsWithoutRef<"section"> & {
   action?: React.ReactNode;
 };
 
+function SidebarHeadingText({ children }: { children: React.ReactNode }) {
+  return (
+    <span className={styles.headingTrack}>
+      <motion.span
+        layout="position"
+        transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
+        className={styles.headingText}
+      >
+        {children}
+      </motion.span>
+    </span>
+  );
+}
+
 function SidebarGroup({ className, title, action, children, ...rest }: SidebarGroupProps) {
   return (
     <section {...rest} className={cx(styles.group, className)}>
       {title !== undefined ? (
         <div className={styles.groupHeader}>
           <Typography.Root as="h3" variant="body-small" tone="muted" className={styles.groupLabel}>
-            {title}
+            <SidebarHeadingText>{title}</SidebarHeadingText>
           </Typography.Root>
           {action === undefined ? null : <div className={styles.groupHeaderAction}>{action}</div>}
         </div>
@@ -310,7 +266,7 @@ function SidebarGroupLabel({ className, children, ...rest }: SidebarGroupLabelPr
       className={cx(styles.groupLabel, className)}
       {...rest}
     >
-      {children}
+      <SidebarHeadingText>{children}</SidebarHeadingText>
     </Typography.Root>
   );
 }
@@ -384,37 +340,30 @@ SidebarMenuAction.displayName = "SidebarMenuAction";
 export type SidebarMenuButtonProps = React.ComponentPropsWithoutRef<"button"> & {
   active?: boolean;
   asChild?: boolean;
-  /** Подсказка в режиме compact. `false` — отключить. */
-  tooltip?: React.ReactNode | boolean;
 };
 
 const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
-  (
-    { className, active, asChild = false, disabled, onClick, type = "button", tooltip, ...rest },
-    ref,
-  ) => {
-    const { state, isMobile, side } = useSidebarContext();
-    const compact = state === "compact" && !isMobile;
-    const showTooltip = Boolean(
-      compact && tooltip !== false && tooltip != null && tooltip !== true,
-    );
+  ({ className, active, asChild = false, disabled, onClick, type = "button", ...rest }, ref) => {
+    if (asChild) {
+      return (
+        <Slot
+          {...rest}
+          ref={ref as React.Ref<HTMLElement>}
+          className={cx(styles.menuButton, className)}
+          data-active={active ? "true" : undefined}
+          aria-disabled={disabled || undefined}
+          onClick={
+            disabled
+              ? (e: React.MouseEvent) => {
+                  e.preventDefault();
+                }
+              : onClick
+          }
+        />
+      );
+    }
 
-    const inner = asChild ? (
-      <Slot
-        {...rest}
-        ref={ref as React.Ref<HTMLElement>}
-        className={cx(styles.menuButton, className)}
-        data-active={active ? "true" : undefined}
-        aria-disabled={disabled || undefined}
-        onClick={
-          disabled
-            ? (e: React.MouseEvent) => {
-                e.preventDefault();
-              }
-            : onClick
-        }
-      />
-    ) : (
+    return (
       <button
         {...rest}
         ref={ref}
@@ -424,23 +373,6 @@ const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonP
         data-active={active ? "true" : undefined}
         onClick={onClick}
       />
-    );
-
-    if (!showTooltip) {
-      return inner;
-    }
-
-    const content = tooltip as React.ReactNode;
-
-    return (
-      <Tooltip.Provider delayDuration={0}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>{inner}</Tooltip.Trigger>
-          <Tooltip.Content size="l" side={side === "left" ? "right" : "left"}>
-            {content}
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
     );
   },
 );
@@ -461,21 +393,12 @@ const SidebarMenuLink = React.forwardRef<HTMLAnchorElement, SidebarMenuLinkProps
 
 SidebarMenuLink.displayName = "SidebarMenuLink";
 
-export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink> & {
-  /** Подсказка в режиме compact. `false` — отключить. */
-  tooltip?: React.ReactNode | boolean;
-};
+export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink>;
 
 const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRouterLinkProps>(
-  ({ className, tooltip, ...rest }, ref) => {
-    const { state, isMobile, side } = useSidebarContext();
-    const compact = state === "compact" && !isMobile;
-    const showTooltip = Boolean(
-      compact && tooltip !== false && tooltip != null && tooltip !== true,
-    );
-
-    const link =
-      typeof className === "function" ? (
+  ({ className, ...rest }, ref) => {
+    if (typeof className === "function") {
+      return (
         <NavLink
           ref={ref}
           {...rest}
@@ -483,26 +406,10 @@ const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRou
             cx(styles.menuButton, navState.isActive && styles.menuButtonActive, className(navState))
           }
         />
-      ) : (
-        <NavLink ref={ref} {...rest} className={cx(styles.menuButton, className)} />
       );
-
-    if (!showTooltip) {
-      return link;
     }
 
-    const content = tooltip as React.ReactNode;
-
-    return (
-      <Tooltip.Provider delayDuration={0}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>{link}</Tooltip.Trigger>
-          <Tooltip.Content size="l" side={side === "left" ? "right" : "left"}>
-            {content}
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-    );
+    return <NavLink ref={ref} {...rest} className={cx(styles.menuButton, className)} />;
   },
 );
 
@@ -536,16 +443,14 @@ const SidebarItem = React.forwardRef<HTMLButtonElement, SidebarItemProps>(
     );
 
     return (
-      <Tooltip.Provider delayDuration={0}>
-        <Tooltip.Root open={showTooltip ? undefined : false}>
-          <Tooltip.Trigger>{node}</Tooltip.Trigger>
-          {tooltipLabel === false || tooltipLabel === undefined ? null : (
-            <Tooltip.Content size="l" side={side === "left" ? "right" : "left"}>
-              {tooltipLabel}
-            </Tooltip.Content>
-          )}
-        </Tooltip.Root>
-      </Tooltip.Provider>
+      <Tooltip.Root open={showTooltip ? undefined : false}>
+        <Tooltip.Trigger>{node}</Tooltip.Trigger>
+        {tooltipLabel === false || tooltipLabel === undefined ? null : (
+          <Tooltip.Content side={side === "left" ? "right" : "left"}>
+            {tooltipLabel}
+          </Tooltip.Content>
+        )}
+      </Tooltip.Root>
     );
   },
 );
@@ -578,7 +483,12 @@ SidebarNavDocTree.displayName = "SidebarNavDocTree";
 export type SidebarNavPanelHeadingProps = React.ComponentPropsWithoutRef<"h2">;
 
 function SidebarNavPanelHeading({ className, ...rest }: SidebarNavPanelHeadingProps) {
-  return <h2 {...rest} className={cx(styles.navPanelHeading, className)} />;
+  const { children, ...headingRest } = rest;
+  return (
+    <h2 {...headingRest} className={cx(styles.navPanelHeading, className)}>
+      <SidebarHeadingText>{children}</SidebarHeadingText>
+    </h2>
+  );
 }
 
 SidebarNavPanelHeading.displayName = "SidebarNavPanelHeading";
