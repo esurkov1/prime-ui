@@ -189,7 +189,7 @@ function PlaygroundPanelRow({ item }: { item: PlaygroundMenuItem }) {
   if (item.to !== undefined) {
     return (
       <Sidebar.MenuItem>
-        <Sidebar.MenuRouterLink to={item.to} end={item.to === "/"}>
+        <Sidebar.MenuRouterLink to={item.to} end={item.to === "/"} tooltip={item.label}>
           {item.icon !== undefined ? <Sidebar.MenuIcon>{item.icon}</Sidebar.MenuIcon> : null}
           <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
         </Sidebar.MenuRouterLink>
@@ -199,7 +199,7 @@ function PlaygroundPanelRow({ item }: { item: PlaygroundMenuItem }) {
 
   return (
     <Sidebar.MenuItem>
-      <Sidebar.MenuButton type="button" onClick={item.onSelect}>
+      <Sidebar.MenuButton type="button" onClick={item.onSelect} tooltip={item.label}>
         {item.icon !== undefined ? <Sidebar.MenuIcon>{item.icon}</Sidebar.MenuIcon> : null}
         <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
       </Sidebar.MenuButton>
