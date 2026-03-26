@@ -507,10 +507,13 @@ h3 {
   max-width: 100%;
 }
 
-/* Текст описания — `DemoDescription` (body-default + muted); здесь только мера строки. */
+/*
+ * Описания под заголовками: раньше стояли max-width (65ch / 48rem), как у «читабельной» колонки
+ * PageContent — в плейграунде колонка уже ограничена padding’ом main; узкая мера дублировала поля.
+ */
 .demoBlockDescription {
   margin: 0;
-  max-width: 48rem;
+  max-width: 100%;
 }
 
 .playgroundDocPageTitle {
@@ -519,7 +522,107 @@ h3 {
 
 .playgroundDocPageDescription {
   margin: 0;
-  max-width: 65ch;
+  max-width: 100%;
+}
+
+/* --- Страница введения (Intro) --- */
+
+.introPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-5xl);
+  width: 100%;
+}
+
+.introPageLead {
+  margin: 0;
+  max-width: 100%;
+}
+
+.introPageSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x4);
+  width: 100%;
+}
+
+.introFeatureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr));
+  gap: var(--prime-sys-spacing-x4);
+  width: 100%;
+}
+
+.introFeatureCard {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+  padding: var(--prime-sys-spacing-x4);
+  border-radius: var(--prime-sys-shape-radius-2xl);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-raised);
+}
+
+.introFeatureCardTitle {
+  margin: 0;
+}
+
+.introFeatureCardText {
+  margin: 0;
+}
+
+.introPageList {
+  margin: 0;
+  padding-inline-start: var(--prime-sys-spacing-x5);
+  list-style-type: disc;
+  list-style-position: outside;
+  color: var(--prime-sys-color-content-primary);
+}
+
+.introPageList li {
+  margin-block-end: var(--prime-sys-spacing-x2);
+  padding-inline-start: var(--prime-sys-spacing-x1);
+}
+
+.introPageList li:last-child {
+  margin-block-end: 0;
+}
+
+.introPageCode {
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--prime-sys-spacing-x4);
+  overflow-x: auto;
+  border-radius: var(--prime-sys-shape-radius-xl);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-accentSoft);
+  color: var(--prime-sys-color-content-primary);
+  font-family: var(--prime-ref-font-family-mono);
+  font-size: var(--prime-sys-typography-sizeScale-2xs);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+}
+
+.introPageLink {
+  color: var(--prime-sys-color-content-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.introPageLink:hover {
+  color: var(--prime-sys-color-content-primary);
+}
+
+.introPageRouterLink {
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-accent);
+  text-decoration: none;
+}
+
+.introPageRouterLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .codeBlockSnippetWrap {
