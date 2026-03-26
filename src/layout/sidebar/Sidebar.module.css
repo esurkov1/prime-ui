@@ -254,7 +254,9 @@
   flex-shrink: 0;
   width: var(--prime-sys-size-control-m-icon);
   height: var(--prime-sys-size-control-m-icon);
+  margin-inline: 0;
   color: var(--prime-sys-color-content-secondary);
+  transition: margin-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .menuIcon > :global(svg) {
@@ -316,6 +318,8 @@
   width: var(--prime-sys-size-avatar-m-size);
   height: var(--prime-sys-size-avatar-m-size);
   flex-shrink: 0;
+  margin-inline: 0;
+  transition: margin-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .identityButtonMain {
@@ -470,13 +474,16 @@
 
   .root[data-state="compact"] .menuButton,
   .root[data-state="compact"] .itemButton {
-    justify-content: center;
     width: var(--sb-control-height);
     max-width: var(--sb-control-height);
     min-width: var(--sb-control-height);
     margin-inline: auto;
     padding-inline: 0;
     gap: 0;
+  }
+
+  .root[data-state="compact"] .menuIcon {
+    margin-inline: auto;
   }
 
   .root[data-state="compact"] .menuLabel {
@@ -496,7 +503,6 @@
   }
 
   .root[data-state="compact"] .identityButton {
-    justify-content: center;
     width: var(--sb-control-height);
     max-width: var(--sb-control-height);
     min-width: var(--sb-control-height);
@@ -504,12 +510,12 @@
     padding-inline: 0;
   }
 
-  .root[data-state="compact"] .group {
-    align-items: stretch;
+  .root[data-state="compact"] .identityButtonLeading {
+    margin-inline: auto;
   }
 
-  .root[data-state="compact"] .groupHeader {
-    justify-content: center;
+  .root[data-state="compact"] .group {
+    align-items: stretch;
   }
 
   .root[data-state="compact"] .groupLabel,
