@@ -24,7 +24,7 @@ import { Label } from "prime-ui-kit";
 
 export function InviteEmailField() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6, maxWidth: 320 }}>
+    <div>
       <Label.Root htmlFor="invite-email" size="m">
         Guest email
       </Label.Root>
@@ -58,7 +58,7 @@ function TagIcon() {
 
 export function CheckoutPromoRow() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6, maxWidth: 400 }}>
+    <div>
       <Label.Root htmlFor="promo" size="l">
         Promo code
       </Label.Root>
@@ -84,9 +84,9 @@ import { Label } from "prime-ui-kit";
 
 export function NotificationVolumePanel() {
   return (
-    <section style={{ padding: 16, maxWidth: 360, borderLeft: "1px solid #e8e8e8" }}>
-      <h3 style={{ margin: "0 0 12px", fontSize: 18 }}>Browser sound</h3>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <section>
+      <h3>Browser sound</h3>
+      <div>
         <Label.Root htmlFor="browser-vol" size="m">
           Volume
         </Label.Root>
@@ -115,7 +115,7 @@ export function ProjectCodeField() {
   const variant = showError && code.trim().length < 3 ? "error" : "default";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 320 }}>
+    <div>
       <Label.Root htmlFor="proj-code" size="m">
         Project code
       </Label.Root>

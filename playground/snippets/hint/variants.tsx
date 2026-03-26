@@ -3,9 +3,7 @@ import { Hint } from "@/components/hint/Hint";
 /** Три значения `variant` на размере `m` по умолчанию. */
 export default function HintVariantsSnippet() {
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "flex-start" }}
-    >
+    <div className="stack">
       <Hint.Root size="m" variant="default">
         Нейтральная подсказка или формат ввода.
       </Hint.Root>

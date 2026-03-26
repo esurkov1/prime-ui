@@ -1,0 +1,17 @@
+.fieldRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--prime-sys-spacing-xs);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.maxW20 {
+  max-width: 20rem;
+}
+
+.maxW22 {
+  max-width: 22rem;
+}

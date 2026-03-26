@@ -1,20 +1,13 @@
-import type { CSSProperties } from "react";
 import { Hint } from "@/components/hint/Hint";
 import { Label } from "@/components/label/Label";
 
-const rowStyle: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "var(--prime-sys-spacing-xs)",
-  alignItems: "flex-start",
-  maxWidth: "20rem",
-};
+import styles from "./snippets.module.css";
 
 /** Подсказки под полями в типичных состояниях экрана: обычное, ошибка, отключённое поле. */
 export default function HintFieldStatesSnippet() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-      <div style={rowStyle}>
+    <div className="stack">
+      <div className={`${styles.fieldRow} ${styles.maxW20}`}>
         <Label.Root htmlFor="hint-demo-ok" size="m">
           Название проекта
         </Label.Root>
@@ -23,7 +16,7 @@ export default function HintFieldStatesSnippet() {
           Виден всем участникам рабочей области.
         </Hint.Root>
       </div>
-      <div style={rowStyle}>
+      <div className={`${styles.fieldRow} ${styles.maxW20}`}>
         <Label.Root htmlFor="hint-demo-err" size="m">
           Код ИНН
         </Label.Root>
@@ -32,7 +25,7 @@ export default function HintFieldStatesSnippet() {
           Введите 10 или 12 цифр.
         </Hint.Root>
       </div>
-      <div style={rowStyle}>
+      <div className={`${styles.fieldRow} ${styles.maxW20}`}>
         <Label.Root htmlFor="hint-demo-dis" size="m" disabled>
           Лимит запросов
         </Label.Root>

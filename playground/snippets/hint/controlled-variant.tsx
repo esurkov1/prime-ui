@@ -7,10 +7,8 @@ export default function HintControlledVariantSnippet() {
   const [variant, setVariant] = React.useState<"default" | "error">("default");
 
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "flex-start" }}
-    >
-      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+    <div className="stack">
+      <div className="previewRowWrap">
         <Button.Root size="s" variant="neutral" mode="stroke" onClick={() => setVariant("default")}>
           Сбросить
         </Button.Root>
