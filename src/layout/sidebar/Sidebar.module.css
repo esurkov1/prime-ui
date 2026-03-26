@@ -443,9 +443,9 @@
 .toggleButton[data-placement="edge"] {
   position: absolute;
   z-index: 2;
-  width: calc(var(--sb-control-height) * 0.6);
-  min-width: calc(var(--sb-control-height) * 0.6);
-  max-width: calc(var(--sb-control-height) * 0.6);
+  width: calc(var(--sb-control-height) * 0.72);
+  min-width: calc(var(--sb-control-height) * 0.72);
+  max-width: calc(var(--sb-control-height) * 0.72);
   min-height: calc(var(--sb-control-height) * 0.6);
   padding: var(--prime-sys-size-control-s-buttonPaddingY);
   border-radius: var(--prime-sys-size-control-s-radius);
@@ -453,7 +453,8 @@
   inset-block-start: calc(
     var(--sb-panel-padding-block) +
     var(--sb-control-height) +
-    var(--prime-sys-spacing-x3)
+    var(--prime-sys-spacing-x3) +
+    var(--prime-sys-spacing-x1)
   );
   inset-inline-end: 0;
   transform: translate(50%, -50%);
@@ -461,6 +462,11 @@
   background: var(--prime-sys-color-surface-elevated);
   box-shadow: var(--prime-sys-elevation-shadow-surface);
   pointer-events: auto;
+}
+
+.toggleButton[data-placement="edge"] .menuIcon {
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
 }
 
 .root[data-side="right"] .toggleButton[data-placement="edge"] {
