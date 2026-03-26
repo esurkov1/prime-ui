@@ -35,7 +35,7 @@
   min-width: var(--sb-visible-width);
   min-height: 0;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
   transition:
     width var(--sb-transition-duration) var(--sb-transition-ease),
     min-width var(--sb-transition-duration) var(--sb-transition-ease),
@@ -60,6 +60,7 @@
 
 .root[data-state="hidden"] {
   --sb-visible-width: 0px;
+  overflow: hidden;
 }
 
 .navArea {
@@ -394,8 +395,14 @@
 .toggleButton[data-placement="edge"] {
   position: absolute;
   z-index: 2;
+  width: calc(var(--sb-control-height) * 0.6);
+  min-width: calc(var(--sb-control-height) * 0.6);
+  max-width: calc(var(--sb-control-height) * 0.6);
+  min-height: calc(var(--sb-control-height) * 0.6);
+  font-size: 0.75rem;
   inset-block-start: calc(var(--sb-panel-padding-block) + var(--sb-control-height));
-  inset-inline-end: var(--prime-sys-spacing-x1);
+  inset-inline-end: 0;
+  transform: translate(50%, -50%);
   border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   background: var(--prime-sys-color-surface-elevated);
   box-shadow: var(--prime-sys-elevation-shadow-surface);
@@ -403,7 +410,8 @@
 
 .root[data-side="right"] .toggleButton[data-placement="edge"] {
   inset-inline-end: auto;
-  inset-inline-start: var(--prime-sys-spacing-x1);
+  inset-inline-start: 0;
+  transform: translate(-50%, -50%);
 }
 
 .identityButton {
