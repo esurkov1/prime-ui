@@ -1,22 +1,42 @@
 # ProgressBar
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default `size`:** use **`m`** for the size axis unless the layout explicitly needs another tier.
 
-## About
+## Canonical
 
-A horizontal completion indicator built on the native `progress` element: fill is driven by `value` and `max`, with optional text label and `size` for track density.
+- **`ProgressBar`** — horizontal determinate meter: only **`ProgressBar.Root`** is public; it wraps a native **`<progress>`** (role **`progressbar`**) and optional **`label`**.
+- **`value`** is **required** and clamped to **`[0, max]`**; **`max`** defaults to **`100`** (if **`max <= 0`**, **`100`** is used).
+- **`size`:** **`s` | `m` | `l` | `xl`** — track height and label scale (**`ProgressBarSize`**).
+- **Not indeterminate:** the API does not omit **`value`** or set an indeterminate native state — for unknown duration, use loading patterns on controls (for example [Button](../button/COMPONENT.md) **`loading`** + **`Button.Spinner`**) or other kit feedback; see **`examples/indeterminate-busy-state.tsx`**.
+- **A11y:** with **`label`**, **`aria-labelledby`** references the label **`span`**; the bar is not focusable.
+- **No `disabled` / `loading` / `error`** on the root — hide or mute the block at screen level if needed.
 
-- **Use** for determinate tasks—uploads, downloads, or any operation where progress maps to a numeric range.
-- **Use** in multi-step flows when the user should see how far they are through a bounded sequence (steps, checklist, wizard).
-- **Use** with a `label` when the bar needs a short visible name tied to the meter for assistive tech.
-- **Do not use** for indeterminate or endless “busy” feedback; this API always requires a numeric `value` (use a spinner or another pattern instead).
-- **Do not use** for vertical or circular meters; the track is horizontal only—for a circular indicator in the kit, see Related.
-- **Do not use** expecting extra native attributes on the inner `progress`; they are not forwarded—wrap the component if you need custom markup.
+## Extended
 
-## Composition
+### About
 
-- **`ProgressBar`** is a single-part namespace: only **`ProgressBar.Root`** is public.
-- **`ProgressBar.Root`** renders a wrapper `div` with `data-size`, an optional **`label`** as a `span` with a generated `id`, and a native **`<progress>`** for the track. The bar spans the full width of its container.
+`ProgressBar` is a horizontal completion indicator for operations that map to a numeric range: file transfer, form steps, or any bounded task.
+
+- **When to use** — uploads, downloads, or sync where you can compute **`value`** and **`max`**.
+- **When to use** — multi-step flows where “step *k* of *n*” should match a single fill (**`value={k}`**, **`max={n}`**).
+- **When to use** — when a short visible name should be tied to the meter for sighted users and assistive tech (**`label`**).
+- **When not to use** — indeterminate or endless busy states without a numeric model; prefer **`Button`** **`loading`**, spinners, or other patterns.
+- **When not to use** — vertical or circular meters; for a ring indicator see [ProgressCircle](../progress-circle/COMPONENT.md).
+- **When not to use** — when you need extra native attributes on **`<progress>`** beyond what the wrapper sets; they are not forwarded — compose or wrap at the app layer if required.
+
+### Composition
+
+- **`ProgressBar.Root`** — outer **`div`** with **`data-size`**, optional **`label`** (**`<span>`** + generated **`id`**), then **`<progress>`** with **`value`**, **`max`**, and **`className`** on the track. Width follows the parent (full width of the container).
+
+### Scenarios (see `examples/`)
+
+| Scenario | Approach |
+|----------|----------|
+| Labeled meter | Set **`label`** so copy sits above the track and **`aria-labelledby`** is wired. → [`examples/labeled.tsx`](examples/labeled.tsx) |
+| Upload / download | Update **`value`** from bytes (or percent); keep filename or status in [Typography](../typography/COMPONENT.md) around the bar. → [`examples/upload-progress.tsx`](examples/upload-progress.tsx) |
+| Step progress | **`value`** = current step, **`max`** = total steps; label like “Step *k* of *n*”. → [`examples/step-progress.tsx`](examples/step-progress.tsx) |
+| Indeterminate / unknown duration | Do **not** force **`ProgressBar`** without a real **`value`**; use **`Button`** **`loading`** (and optional muted copy). → [`examples/indeterminate-busy-state.tsx`](examples/indeterminate-busy-state.tsx) |
+| Wizard / report block | Stack **Typography** + **`ProgressBar.Root`** + muted helper text. → [`examples/wizard-composition.tsx`](examples/wizard-composition.tsx) |
 
 ### Minimal example
 
@@ -28,15 +48,11 @@ export function Example() {
 }
 ```
 
-## Rules
+### Rules
 
-- **`value`** is required and clamped to **`[0, max]`**; negative values become `0`, values above `max` become `max`.
-- **`max`** defaults to **`100`**; if **`max <= 0`**, the implementation uses **`100`** as the effective maximum.
-- **`size`** defaults to **`m`**; allowed values are **`s`**, **`m`**, **`l`**, **`xl`** (`ProgressBarSize`).
-- There is no **`disabled`**, **`loading`**, or **`error`** prop—mute or hide the block at the screen level if needed.
-- Native **`progress`** exposes the **`progressbar`** role with **`value`** / **`max`** to the accessibility tree; with **`label`**, **`aria-labelledby`** points at the label element.
-- The bar is not interactive and is not keyboard-focusable; keep focus on real controls nearby.
-- “Controlled” usage is just React state passed into **`value`**; there is no separate uncontrolled mode with an internal store.
+- **Controlled usage** — pass React state into **`value`**; there is no internal uncontrolled store.
+- **Refs** — **`ref`** targets the native **`<progress>`** element.
+- **Clamping** — negative **`value`** becomes **`0`**; **`value > max`** becomes **`max`**.
 
 ## API
 
@@ -46,14 +62,23 @@ export function Example() {
 |------|------|---------|----------|-------------|
 | `value` | `number` | — | Yes | Current value; clamped to `[0, max]` after `max` is normalized. |
 | `max` | `number` | `100` | No | Upper bound; if `max <= 0`, `100` is used. |
-| `label` | `string` | — | No | Text above the track; when set, the progress element gets `aria-labelledby` referencing the label. |
+| `label` | `string` | — | No | Text above the track; `aria-labelledby` references this element when set. |
 | `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track height and label typography scale. |
 | `className` | `string` | — | No | Class on the outer wrapper around the label and `progress`. |
 | `ref` | `React.Ref<HTMLProgressElement>` | — | No | Ref to the native `progress` element. |
 
 ## Related
 
-- [SegmentedProgressBar](../segmented-progress-bar/COMPONENT.md) — stacked proportional segments (e.g. status mix) instead of a single value.
-- [ProgressCircle](../progress-circle/COMPONENT.md) — circular determinate indicator when layout calls for a ring or compact numeric emphasis.
+- [SegmentedProgressBar](../segmented-progress-bar/COMPONENT.md) — multiple proportional segments instead of one value.
+- [ProgressCircle](../progress-circle/COMPONENT.md) — circular determinate indicator.
 - [Typography](../typography/COMPONENT.md) — headings and supporting copy around a status block.
-- [Button](../button/COMPONENT.md) — cancel, pause, or actions next to the bar.
+- [Button](../button/COMPONENT.md) — cancel, pause, or **`loading`** next to long-running work.
+
+## LLM note
+
+- Export: **`import { ProgressBar } from "prime-ui-kit"`** — **`ProgressBar.Root`** only.
+- **`ProgressBarRootProps`**: **`value`** (required), **`max?`**, **`label?`**, **`size?`**, **`className?`**, **`ref?`** — no `disabled`, `loading`, or indeterminate flag.
+- **`size`** literals: **`s`**, **`m`**, **`l`**, **`xl`** — default **`m`**.
+- **`value`** is always required; do not suggest omitting **`value`** for a “loading” bar — use **Button** **`loading`** / **`Button.Spinner`** or another pattern.
+- Native **`<progress>`** is not a props bag: extra attributes are **not** forwarded from **`ProgressBar.Root`**.
+- Step flows: **`value={currentStep}`**, **`max={totalSteps}`** (not necessarily 0–100).
