@@ -337,7 +337,11 @@ export default function NotificationSection() {
           <DemoDescription>
             Четыре значения <code>type</code>: меняются цвет, иконка по умолчанию и live-роль (
             <code>alert</code> для <code>error</code> и <code>warning</code>, <code>status</code>{" "}
-            для остальных).
+            для остальных). Здесь у записей <code>persistent: true</code> — из-за этого акцентная
+            обводка и пульсирующая тень (см. <code>Notification.module.css</code> для{" "}
+            <code>[data-persistent=&quot;true&quot;]</code>
+            ). У обычного <code>notify()</code> по умолчанию <code>persistent: false</code> —
+            карточка без этого усиления, с таймером и полосой прогресса.
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>

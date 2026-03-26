@@ -48,7 +48,7 @@ function Notifier() {
 - **`notify`** returns a string **`id`**; pass it to **`dismiss`** or use **`dismissAll`** for every active toast.
 - **`useNotificationStore`** exposes the same methods plus **`items`**: `NotificationRecord[]` of non-dismissing entries only (no internal closing-animation flag).
 - Options passed to **`notify`** are merged with defaults: **`size`** `"m"`, **`position`** from the provider, **`duration`** `5000` ms, **`persistent`** `false`, **`closable`** `true`.
-- With **`persistent`**, there is no auto-dismiss, no progress bar, and duration does not drive closing; users or **`dismiss`** / **`dismissAll`** must close the card.
+- With **`persistent`**, there is no auto-dismiss, no progress bar, and duration does not drive closing; users or **`dismiss`** / **`dismissAll`** must close the card. Visually, **`persistent`** also turns on the accent-tinted **border** and (unless **`prefers-reduced-motion`**) the **`notification-glow`** shadow pulse — default **`notify()`** uses **`persistent: false`**, so live toasts look flatter unless you opt in.
 - If **`duration <= 0`**, the countdown effect does not run—time-based auto-dismiss does not occur; close via **`dismiss`** or the close button when **`closable`**.
 - Stacks are keyed by **`position`** and **`type`**; **`max`** (default `5`) caps depth per stack—older items in that stack are dropped when exceeded.
 - **`type`** `error` and **`warning`** use **`role="alert"`** and **`aria-live="assertive"`**; other types use **`role="status"`** and **`aria-live="polite"`**.
