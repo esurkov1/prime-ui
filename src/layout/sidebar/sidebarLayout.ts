@@ -4,6 +4,10 @@
  *
  * Ориентиры: overlay drawer + modal-поведение (фокус, Escape, scroll lock), persistent nav на lg+.
  */
+
+/** На узком viewport (`responsive`): полностью скрыт / узкая колонка / полноэкранный оверлей. */
+export type SidebarLayoutMode = "hidden" | "compact" | "expand";
+
 export const SIDEBAR_LAYOUT_BREAKPOINT_MAX = "64rem";
 
 /** Viewport «узкий»: оверлей, `responsive` переводит раскладку в sheet-подобный режим. */

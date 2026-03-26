@@ -39,6 +39,7 @@ export type {
   SidebarToggleButtonProps,
 } from "./sidebar/Sidebar";
 export { Sidebar, useSidebarContext } from "./sidebar/Sidebar";
+export type { SidebarLayoutMode } from "./sidebar/sidebarLayout";
 export {
   SIDEBAR_LAYOUT_BREAKPOINT_MAX,
   SIDEBAR_MEDIA_QUERY_INLINE,

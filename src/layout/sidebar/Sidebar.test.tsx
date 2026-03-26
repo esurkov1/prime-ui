@@ -105,7 +105,7 @@ describe("Sidebar", () => {
       );
 
       const root = screen.getByRole("complementary", { name: "Sidebar" });
-      fireEvent.click(screen.getByRole("button", { name: "Открыть сайдбар" }));
+      fireEvent.click(screen.getByRole("button", { name: /Открыть сайдбар/ }));
       expect(root).toHaveAttribute("data-open", "true");
 
       const nav = root.querySelector("nav");
@@ -153,7 +153,7 @@ describe("Sidebar", () => {
         </Sidebar.Root>,
       );
 
-      expect(screen.queryByRole("button", { name: "Открыть сайдбар" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /Открыть сайдбар/ })).not.toBeInTheDocument();
     } finally {
       window.matchMedia = previousMatchMedia;
     }
@@ -195,7 +195,7 @@ describe("Sidebar", () => {
         </Sidebar.Root>,
       );
 
-      expect(screen.getByRole("button", { name: "Открыть сайдбар" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Открыть сайдбар/ })).toBeInTheDocument();
 
       rerender(
         <Sidebar.Root open>
@@ -203,7 +203,7 @@ describe("Sidebar", () => {
         </Sidebar.Root>,
       );
 
-      expect(screen.queryByRole("button", { name: "Открыть сайдбар" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /Открыть сайдбар/ })).not.toBeInTheDocument();
     } finally {
       window.matchMedia = previousMatchMedia;
     }

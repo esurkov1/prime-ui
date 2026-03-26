@@ -215,16 +215,17 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
     },
     ref,
   ) => {
-    const { open, toggleOpen, navPanelId } = useSidebarContext();
+    const { mode, toggleOpen, navPanelId } = useSidebarContext();
+    const visible = mode !== "hidden";
     return (
       <button
         {...rest}
         ref={ref}
         type={type}
         className={cx(styles.toggleButton, className)}
-        aria-expanded={open}
+        aria-expanded={visible}
         aria-controls={navPanelId}
-        aria-label={open ? openLabel : closedLabel}
+        aria-label={visible ? openLabel : closedLabel}
         onClick={(event) => {
           onClick?.(event);
           if (!event.defaultPrevented) {
@@ -232,7 +233,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
           }
         }}
       >
-        {open ? (
+        {visible ? (
           <PanelLeftClose size="1em" strokeWidth={2} />
         ) : (
           <PanelLeftOpen size="1em" strokeWidth={2} />

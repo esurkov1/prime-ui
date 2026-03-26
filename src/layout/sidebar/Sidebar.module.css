@@ -4,6 +4,7 @@
  */
 .root {
   --sb-panel-width: var(--prime-sys-unit-16rem);
+  --sb-compact-rail-width: 3.25rem;
   --sb-panel-visible-width: var(--sb-panel-width);
   --sb-nav-gap: 0;
   --sb-shell-width: calc(var(--sb-panel-visible-width) + var(--sb-nav-gap));
@@ -666,7 +667,8 @@
 }
 
 @media (max-width: 64rem) {
-  .root[data-responsive="true"] {
+  /* --- hidden: в потоке не занимает место; панель за экраном --- */
+  .root[data-responsive="true"][data-sidebar-mode="hidden"] {
     position: relative;
     width: 0;
     min-width: 0;
@@ -677,36 +679,80 @@
     margin-block: 0;
   }
 
-  .root[data-responsive="true"] .navArea {
+  /* --- compact: узкая фиксированная колонка в потоке --- */
+  .root[data-responsive="true"][data-sidebar-mode="compact"] {
+    position: relative;
+    width: var(--sb-compact-rail-width);
+    min-width: var(--sb-compact-rail-width);
+    height: 100dvh;
+    max-height: 100dvh;
+    align-self: stretch;
+    margin: 0;
+  }
+
+  /* --- expand: оверлей; aside в потоке не занимает ширину --- */
+  .root[data-responsive="true"][data-sidebar-mode="expand"] {
+    position: relative;
+    width: 0;
+    min-width: 0;
+    block-size: 0;
+    height: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    margin-block: 0;
+  }
+
+  .root[data-responsive="true"][data-sidebar-mode="hidden"] .navArea,
+  .root[data-responsive="true"][data-sidebar-mode="expand"] .navArea {
     position: fixed;
     inset: 0;
     z-index: var(--prime-sys-elevation-zIndex-modal);
     width: 100vw;
     min-width: 100vw;
     overflow: hidden;
+  }
+
+  .root[data-responsive="true"][data-sidebar-mode="hidden"] .navArea {
     pointer-events: none;
   }
 
-  .root[data-responsive="true"][data-open="true"] .navArea {
+  .root[data-responsive="true"][data-sidebar-mode="expand"] .navArea {
     pointer-events: auto;
   }
 
-  .root[data-responsive="true"] .backdrop {
+  .root[data-responsive="true"][data-sidebar-mode="compact"] .navArea {
+    position: relative;
+    inset: auto;
+    z-index: 1;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+
+  .root[data-responsive="true"][data-sidebar-mode="hidden"] .backdrop,
+  .root[data-responsive="true"][data-sidebar-mode="compact"] .backdrop {
+    display: none;
+  }
+
+  .root[data-responsive="true"][data-sidebar-mode="expand"] .backdrop {
     display: block;
     background: rgb(0 0 0 / 58%);
-    opacity: 0;
+    opacity: 1;
+    pointer-events: auto;
     transition: opacity var(--sb-transition-duration) var(--sb-transition-ease);
   }
 
-  .root[data-responsive="true"][data-open="true"] .backdrop {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .root[data-responsive="true"] .navPanel {
+  /* Оверлейные панели (hidden | expand): одна база размеров */
+  .root[data-responsive="true"][data-sidebar-mode="hidden"] .navPanel,
+  .root[data-responsive="true"][data-sidebar-mode="expand"] .navPanel {
     position: relative;
     z-index: 1;
-    /* Не уже токена и не шире экрана; при широком контенте растёт до min(100%, max(...)). */
     width: min(100%, max(var(--sb-panel-width), min-content));
     min-width: min(var(--sb-panel-width), 100%);
     max-width: 100%;
@@ -719,38 +765,54 @@
     pointer-events: none;
   }
 
-  /*
-   * Узкий overlay ≥481px: подписи групп и категорий; у пунктов меню — только иконки (текст — screen-reader-only);
-   * шеврон у категорий скрыт. (≤480px — без floating toggle; оверлей при controlled open — на всю ширину.)
-   */
+  .root[data-responsive="true"][data-sidebar-mode="compact"] .navPanel {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .root[data-responsive="true"][data-sidebar-mode="expand"] .navPanel {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Компактная колонка ≥481px: только иконки у пунктов; подписи групп/категорий с …; без шеврона */
   @media (min-width: 481px) {
-    .root[data-responsive="true"] .navPanel {
-      width: min(100%, 7.5rem);
-      min-width: 5rem;
-      max-width: 100%;
-      padding-inline: var(--prime-sys-spacing-x1);
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navPanel {
+      padding-inline: var(--prime-sys-unit-2px);
     }
 
-    .root[data-responsive="true"] .headerRow {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .headerRow {
       flex-direction: column;
       align-items: center;
       text-align: center;
     }
 
-    .root[data-responsive="true"] .headerMain {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .headerMain {
       align-items: center;
     }
 
-    .root[data-responsive="true"] .identityButton {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .identityButton {
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
       min-height: auto;
-      padding-inline: var(--prime-sys-spacing-x1);
+      padding-inline: var(--prime-sys-unit-2px);
     }
 
-    .root[data-responsive="true"] .identityButtonMain {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .identityButtonMain {
       position: absolute;
       width: 1px;
       height: 1px;
@@ -763,21 +825,25 @@
       border: 0;
     }
 
-    .root[data-responsive="true"] .group {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .group {
       align-items: center;
     }
 
-    .root[data-responsive="true"] .groupLabel {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .groupLabel {
       width: 100%;
+      max-width: 100%;
       padding-inline: 0;
       text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .root[data-responsive="true"] .menuItem {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .menuItem {
       justify-content: center;
     }
 
-    .root[data-responsive="true"] .menuButton {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .menuButton {
       flex-direction: row;
       justify-content: center;
       align-items: center;
@@ -786,7 +852,7 @@
       text-align: center;
     }
 
-    .root[data-responsive="true"] .menuLabel {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .menuLabel {
       position: absolute;
       width: 1px;
       height: 1px;
@@ -799,71 +865,69 @@
       border: 0;
     }
 
-    .root[data-responsive="true"] .menuTrailing {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .menuTrailing {
       display: none;
     }
 
-    .root[data-responsive="true"] .navPanelBody {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navPanelBody {
       align-items: center;
     }
 
-    .root[data-responsive="true"] .navPanelHeading {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navPanelHeading {
       width: 100%;
+      max-width: 100%;
       text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .root[data-responsive="true"] .navCategory {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategory {
       align-items: center;
+      max-width: 100%;
     }
 
-    .root[data-responsive="true"] .navCategoryTrigger {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryTrigger {
       flex-direction: row;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       justify-content: center;
       align-items: center;
       gap: var(--prime-sys-spacing-x1);
+      max-width: 100%;
       text-align: center;
     }
 
-    .root[data-responsive="true"] .navCategoryTrigger svg {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryTrigger svg {
       display: none;
     }
 
-    .root[data-responsive="true"] .navCategoryTrigger[data-expanded="true"] svg {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryTrigger[data-expanded="true"] svg {
       display: none;
     }
 
-    .root[data-responsive="true"] .navCategoryLabel {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryLabel {
       flex: 1 1 auto;
       min-width: 0;
+      max-width: 100%;
       text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .root[data-responsive="true"] .navCategoryCount {
+    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryCount {
       display: none;
     }
   }
 
-  /* На очень узких экранах (≤320px) — панель на всю ширину. */
+  /* На очень узких экранах (≤320px) — expand на всю ширину */
   @media (max-width: 320px) {
-    .root[data-responsive="true"] .navPanel {
+    .root[data-responsive="true"][data-sidebar-mode="expand"] .navPanel {
       width: 100%;
       min-width: 100%;
       max-width: 100%;
       border-radius: 0;
     }
-  }
-
-  .root[data-responsive="true"][data-open="true"] .navPanel {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .root[data-responsive="true"][data-open="false"] .navPanel {
-    transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
-    opacity: 0;
-    pointer-events: none;
   }
 }
 
