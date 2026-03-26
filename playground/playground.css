@@ -672,13 +672,6 @@ h3 {
   gap: 0.25rem;
 }
 
-.previewAlertColumn {
-  display: grid;
-  gap: var(--prime-sys-spacing-x3);
-  width: 100%;
-  max-width: 28rem;
-}
-
 .previewBannerColumn {
   display: grid;
   gap: var(--prime-sys-spacing-x2);

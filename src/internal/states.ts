@@ -41,7 +41,6 @@ export const componentSizes = {
   divider: ["s", "m", "l", "xl"] as const,
   label: ["s", "m", "l", "xl"] as const,
   hint: ["s", "m", "l", "xl"] as const,
-  alert: ["s", "m", "l", "xl"] as const,
   banner: ["s", "m", "l", "xl"] as const,
   digitInput: ["s", "m", "l", "xl"] as const,
   kbd: ["s", "m", "l", "xl"] as const,
@@ -88,7 +87,6 @@ export type BreadcrumbSize = (typeof componentSizes.breadcrumb)[number];
 export type DividerSize = (typeof componentSizes.divider)[number];
 export type LabelSize = (typeof componentSizes.label)[number];
 export type HintSize = (typeof componentSizes.hint)[number];
-export type AlertSize = (typeof componentSizes.alert)[number];
 export type BannerSize = (typeof componentSizes.banner)[number];
 export type DigitInputSize = (typeof componentSizes.digitInput)[number];
 export type KbdSize = (typeof componentSizes.kbd)[number];
