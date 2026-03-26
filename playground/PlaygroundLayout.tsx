@@ -15,18 +15,18 @@ export function PlaygroundLayout() {
   }, [pathname]);
 
   return (
-    <PageShell.Root fillViewport className="playgroundShell">
-      <PageShell.NavArea>
-        <PlaygroundChromeSidebar />
-      </PageShell.NavArea>
-      <PageShell.ContentArea
-        ref={mainRef}
-        id="playground-main"
-        className="playgroundMain"
-        tabIndex={-1}
-      >
-        <Outlet />
-      </PageShell.ContentArea>
-    </PageShell.Root>
+    <PageShell.Application
+      fillViewport
+      className="playgroundShell"
+      nav={<PlaygroundChromeSidebar />}
+      ref={mainRef}
+      contentProps={{
+        id: "playground-main",
+        className: "playgroundMain",
+        tabIndex: -1,
+      }}
+    >
+      <Outlet />
+    </PageShell.Application>
   );
 }

@@ -230,6 +230,7 @@ export type {
 } from "./page-content/PageContent";
 export { PageContent } from "./page-content/PageContent";
 export type {
+  PageShellApplicationProps,
   PageShellContentAreaProps,
   PageShellNavAreaProps,
   PageShellRootProps,

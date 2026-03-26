@@ -12,7 +12,7 @@ describe("PageShell", () => {
       </PageShell.Root>,
     );
 
-    expect(screen.getByRole("complementary", { name: "Nav" })).toHaveTextContent("aside");
+    expect(screen.getByText("aside")).toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveTextContent("main body");
   });
 
@@ -34,5 +34,16 @@ describe("PageShell", () => {
     );
 
     expect(screen.getByRole("main").parentElement).toHaveClass("shell-custom");
+  });
+
+  it("Application composes nav slot and main", () => {
+    render(
+      <PageShell.Application nav={<span>sidebar</span>}>
+        <span>page</span>
+      </PageShell.Application>,
+    );
+
+    expect(screen.getByText("sidebar")).toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveTextContent("page");
   });
 });

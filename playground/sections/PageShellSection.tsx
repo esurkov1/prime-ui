@@ -41,7 +41,7 @@ const navAreaRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Класс на `<aside>` области навигации.",
+    description: "Класс на flex-слоте навигации (`<div>`, не landmark).",
   },
   {
     prop: "children",
@@ -52,10 +52,62 @@ const navAreaRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "…rest",
-    type: "React.HTMLAttributes<HTMLElement>",
+    type: "React.HTMLAttributes<HTMLDivElement>",
     defaultValue: "—",
     required: "Нет",
-    description: "Атрибуты нативного aside.",
+    description: "Атрибуты нативного div.",
+  },
+];
+
+const applicationRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "fillViewport",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Пробрасывается в `PageShell.Root`.",
+  },
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Класс на корневой оболочке (`PageShell.Root`).",
+  },
+  {
+    prop: "nav",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Да",
+    description: "Левая колонка: напр. `Sidebar.Root` или `nav`.",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Контент в `PageShell.ContentArea` (`<main>`).",
+  },
+  {
+    prop: "navProps",
+    type: 'Omit<PageShellNavAreaProps, "children">',
+    defaultValue: "—",
+    required: "Нет",
+    description: "Пропсы на слот навигации.",
+  },
+  {
+    prop: "contentProps",
+    type: 'Omit<PageShellContentAreaProps, "children">',
+    defaultValue: "—",
+    required: "Нет",
+    description: "Пропсы на основную колонку (ref сюда же через forwardRef на `ContentArea`).",
+  },
+  {
+    prop: "…rest",
+    type: "React.HTMLAttributes<HTMLDivElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Остальные атрибуты на `PageShell.Root` (без `children` / `ref`).",
   },
 ];
 
@@ -89,11 +141,13 @@ export default function PageShellSection() {
       title="PageShell"
       description={
         <>
-          Каркас страницы приложения: корневой контейнер и две области — боковая навигация (
-          <code>NavArea</code>) и основная колонка (<code>ContentArea</code> как{" "}
-          <code>&lt;main&gt;</code>). В этом плейграунде оболочка используется в{" "}
-          <code>PlaygroundLayout</code>. Отдельных интерактивных примеров нет: это чисто структурная
-          разметка и токены отступов из CSS Modules.
+          Каркас страницы приложения: корневой контейнер и две области — слот навигации (
+          <code>NavArea</code>, разметочный <code>&lt;div&gt;</code>) и основная колонка (
+          <code>ContentArea</code> как <code>&lt;main&gt;</code>). Для типичного приложения удобнее{" "}
+          <code>PageShell.Application</code> — один компонент: <code>nav</code> + дети в{" "}
+          <code>main</code>. В плейграунде это используется в <code>PlaygroundLayout</code>.
+          Отдельных интерактивных примеров нет: это структурная разметка и токены отступов из CSS
+          Modules.
         </>
       }
     >
@@ -102,6 +156,8 @@ export default function PageShellSection() {
           <DemoSectionTitle>API</DemoSectionTitle>
           <DemoApiTitle>PageShell.Root</DemoApiTitle>
           <PlaygroundApiTable rows={rootRows} />
+          <DemoApiTitle>PageShell.Application</DemoApiTitle>
+          <PlaygroundApiTable rows={applicationRows} />
           <DemoApiTitle>PageShell.NavArea</DemoApiTitle>
           <PlaygroundApiTable rows={navAreaRows} />
           <DemoApiTitle>PageShell.ContentArea</DemoApiTitle>
