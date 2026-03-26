@@ -28,29 +28,7 @@ export { useSidebarContext };
 /** @deprecated Используйте `responsive` из `Sidebar.Root`. */
 export type SidebarResponsive = boolean;
 
-function hasExplicitNavPanel(children: React.ReactNode): boolean {
-  return React.Children.toArray(children).some((child) => {
-    if (!React.isValidElement(child)) return false;
-    return child.type === SidebarNavPanel;
-  });
-}
-
-const SidebarComposedRoot = React.forwardRef<HTMLElement, SidebarRootProps>(
-  ({ children, ...rest }, ref) => {
-    const normalizedChildren = hasExplicitNavPanel(children) ? (
-      children
-    ) : (
-      <SidebarNavPanel>{children}</SidebarNavPanel>
-    );
-
-    return (
-      <SidebarRoot ref={ref} {...rest}>
-        {normalizedChildren}
-      </SidebarRoot>
-    );
-  },
-);
-SidebarComposedRoot.displayName = "Sidebar";
+const SidebarComposedRoot = SidebarRoot;
 
 export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav">;
 

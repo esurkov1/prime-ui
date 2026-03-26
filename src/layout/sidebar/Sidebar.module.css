@@ -2,7 +2,6 @@
   --sb-expanded-width: 18rem;
   --sb-compact-width: 10.5rem;
   --sb-visible-width: var(--sb-expanded-width);
-  --sb-inline-sign: -1;
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
   --sb-padding: var(--prime-sys-spacing-x2);
@@ -11,12 +10,16 @@
   position: relative;
   box-sizing: border-box;
   display: flex;
-  flex: 0 0 var(--sb-expanded-width);
-  width: var(--sb-expanded-width);
-  min-width: var(--sb-expanded-width);
+  flex: 0 0 var(--sb-visible-width);
+  width: var(--sb-visible-width);
+  min-width: var(--sb-visible-width);
   min-height: 0;
   height: 100%;
-  overflow: visible;
+  overflow: hidden;
+  transition:
+    width var(--sb-transition-duration) var(--sb-transition-ease),
+    min-width var(--sb-transition-duration) var(--sb-transition-ease),
+    flex-basis var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .root[data-state="compact"] {
@@ -25,14 +28,6 @@
 
 .root[data-state="hidden"] {
   --sb-visible-width: 0px;
-}
-
-.root[data-side="left"] {
-  --sb-inline-sign: -1;
-}
-
-.root[data-side="right"] {
-  --sb-inline-sign: 1;
 }
 
 .navArea {
@@ -60,8 +55,8 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: var(--sb-expanded-width);
-  min-width: var(--sb-expanded-width);
+  width: 100%;
+  min-width: 100%;
   min-height: 0;
   height: 100%;
   gap: var(--sb-gap);
@@ -70,14 +65,10 @@
   border-radius: var(--prime-sys-shape-radius-l);
   background: color-mix(in srgb, var(--prime-sys-color-surface-elevated) 92%, transparent);
   box-shadow: var(--prime-sys-elevation-shadow-surface);
-  transform: translateX(
-    calc((var(--sb-expanded-width) - var(--sb-visible-width)) * var(--sb-inline-sign))
-  );
   transition:
-    transform var(--sb-transition-duration) var(--sb-transition-ease),
     border-color var(--sb-transition-duration) var(--sb-transition-ease),
     box-shadow var(--sb-transition-duration) var(--sb-transition-ease);
-  will-change: transform;
+  will-change: auto;
 }
 
 .root[data-side="right"] .navPanel {
@@ -86,6 +77,7 @@
 
 .root[data-state="hidden"] .navPanel {
   pointer-events: none;
+  opacity: 0;
 }
 
 .header {

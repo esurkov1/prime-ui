@@ -1,7 +1,4 @@
 .layoutRoot {
-  --app-sidebar-expanded: 18rem;
-  --app-sidebar-compact: 10.5rem;
-
   box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(0, auto) minmax(0, 1fr);
@@ -67,50 +64,10 @@
     padding-block: var(--prime-sys-spacing-x2);
   }
 
-  .layoutRoot[data-layout-template="app"] > .layoutMain {
-    transition: transform var(--prime-sys-motion-duration-medium)
-      var(--prime-sys-motion-easing-standard);
-    will-change: transform;
-  }
-
   .layoutRoot[data-layout-template="app"]:has(
       [data-sidebar-root="true"][data-state="expanded"],
       [data-sidebar-root="true"][data-state="compact"]
     ) {
     column-gap: var(--prime-sys-spacing-x3);
-  }
-
-  .layoutRoot[data-layout-template="app"]:has(
-      [data-sidebar-root="true"][data-side="left"][data-state="compact"]
-    )
-    > .layoutMain {
-    transform: translateX(calc(-1 * (var(--app-sidebar-expanded) - var(--app-sidebar-compact))));
-  }
-
-  .layoutRoot[data-layout-template="app"]:has(
-      [data-sidebar-root="true"][data-side="left"][data-state="hidden"]
-    )
-    > .layoutMain {
-    transform: translateX(calc(-1 * var(--app-sidebar-expanded)));
-  }
-
-  .layoutRoot[data-layout-template="app"]:has(
-      [data-sidebar-root="true"][data-side="right"][data-state="compact"]
-    )
-    > .layoutMain {
-    transform: translateX(calc(var(--app-sidebar-expanded) - var(--app-sidebar-compact)));
-  }
-
-  .layoutRoot[data-layout-template="app"]:has(
-      [data-sidebar-root="true"][data-side="right"][data-state="hidden"]
-    )
-    > .layoutMain {
-    transform: translateX(var(--app-sidebar-expanded));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .layoutRoot[data-layout-template="app"] > .layoutMain {
-    transition: none;
   }
 }
