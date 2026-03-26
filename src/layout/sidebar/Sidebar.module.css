@@ -140,7 +140,7 @@
   border-radius: 0;
   background: color-mix(
     in srgb,
-    var(--prime-sys-color-surface-elevated) 18%,
+    var(--prime-sys-color-surface-elevated) 24%,
     var(--prime-sys-color-surface-default)
   );
   box-shadow: none;
