@@ -1,0 +1,12 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-l);
+  align-items: stretch;
+  width: 100%;
+}
+
+.row > * {
+  flex: 1 1 min(100%, 14rem);
+  min-width: 0;
+}

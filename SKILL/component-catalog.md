@@ -1,6 +1,6 @@
 # prime-ui-kit component catalog — responsive context
 
-Full table of all 41 components mapped to responsive layout.
+Full table of all 42 components mapped to responsive layout.
 
 **Zone shorthand:** header, sidebar, content, footer, overlay, form, inline, navigation.
 
@@ -125,6 +125,16 @@ Full table of all 41 components mapped to responsive layout.
 | **Zones** | content |
 | **Scenarios** | Warehouse and shipments; invoices and payments; wide reports; tickets with custom cells; log with infinite scroll; compact table inside a card. |
 | **Documentation** | `../src/components/data-table/COMPONENT.md` |
+
+## DashboardCard
+
+| | |
+|---|---|
+| **Purpose** | KPI mini/metric cards and a section shell for charts: composable slots, semantic tokens. |
+| **Responsive role** | Lay out mini/metric cards in a CSS Grid (`auto-fill`, `minmax`); section variant spans columns for charts. |
+| **Zones** | content, header (metrics row) |
+| **Scenarios** | Dashboard top row; lab/vitals metrics with optional sparkline; wrapping charts and tables in a titled section. |
+| **Documentation** | `../src/components/dashboard-card/COMPONENT.md` |
 
 ## Datepicker
 

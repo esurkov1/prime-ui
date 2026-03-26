@@ -207,6 +207,7 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Display & content | **Badge** | Compact status or count; optional presence dot variant. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) |
 | Display & content | **Banner** | In-flow announcement strip with icon, copy, and actions. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/banner/COMPONENT.md) |
 | Display & content | **CodeBlock** | TS/TSX syntax highlighting in `pre`/`code` (static presentation). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) |
+| Display & content | **DashboardCard** | Dashboard KPI tiles (mini, metric, metric+media) and section shell for charts. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/dashboard-card/COMPONENT.md) |
 | Display & content | **Divider** | Horizontal or vertical rule with optional inset label. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) |
 | Display & content | **ProgressBar** | Horizontal progress on the native `<progress>` element. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) |
 | Display & content | **ProgressCircle** | Circular progress ring (SVG + `progressbar`). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) |

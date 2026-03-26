@@ -1,0 +1,17 @@
+.spark {
+  display: block;
+  width: 100%;
+  height: var(--prime-sys-spacing-4xl);
+  color: var(--prime-sys-color-action-primaryBackground);
+}
+
+.spark path {
+  stroke: currentColor;
+}
+
+.leadText {
+  font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
+  line-height: var(--prime-sys-typography-role-bodySmall-lineHeight);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-secondary);
+}

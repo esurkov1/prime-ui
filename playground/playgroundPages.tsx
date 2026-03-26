@@ -15,6 +15,7 @@ import ColorPickerSection from "./sections/ColorPickerSection";
 import ColorSection from "./sections/ColorSection";
 import CommandMenuSection from "./sections/CommandMenuSection";
 import ControlSizeSection from "./sections/ControlSizeSection";
+import DashboardCardSection from "./sections/DashboardCardSection";
 import DataTableSection from "./sections/DataTableSection";
 import DatepickerSection from "./sections/DatepickerSection";
 import DigitInputSection from "./sections/DigitInputSection";
@@ -120,6 +121,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
   "data-display": [
     { segment: "avatar", label: "Avatar", Page: AvatarSection },
     { segment: "badge", label: "Badge", Page: BadgeSection },
+    { segment: "dashboard-card", label: "DashboardCard", Page: DashboardCardSection },
     { segment: "code-block", label: "Code Block", Page: CodeBlockSection },
     { segment: "data-table", label: "Data Table", Page: DataTableSection },
     { segment: "tag", label: "Tag", Page: TagSection },

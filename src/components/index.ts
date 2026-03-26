@@ -95,6 +95,23 @@ export type {
 } from "./command-menu/CommandMenu";
 export { CommandMenu } from "./command-menu/CommandMenu";
 export type {
+  DashboardCardBodyProps,
+  DashboardCardDescriptionProps,
+  DashboardCardHeaderRowProps,
+  DashboardCardIconBoxProps,
+  DashboardCardLabelProps,
+  DashboardCardLeadProps,
+  DashboardCardMediaProps,
+  DashboardCardRootProps,
+  DashboardCardSectionHeaderProps,
+  DashboardCardSectionTitleProps,
+  DashboardCardSectionTrailingProps,
+  DashboardCardStackProps,
+  DashboardCardValueProps,
+  DashboardCardVariant,
+} from "./dashboard-card/DashboardCard";
+export { DashboardCard } from "./dashboard-card/DashboardCard";
+export type {
   DataTableCellAlign,
   DataTableColumn,
   DataTableDividerStyle,
