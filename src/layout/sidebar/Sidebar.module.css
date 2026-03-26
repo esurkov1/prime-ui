@@ -246,6 +246,7 @@
 }
 
 .headingText {
+  --sb-heading-offset-px: 0px;
   display: inline-block;
   width: max-content;
   min-width: 0;
@@ -253,7 +254,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  will-change: transform;
+  transform: translateX(var(--sb-heading-offset-px));
 }
 
 .separator {

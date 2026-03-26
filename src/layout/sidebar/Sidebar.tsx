@@ -243,63 +243,63 @@ function SidebarHeadingText({ children }: { children: React.ReactNode }) {
   const { isMobile } = useSidebarContext();
   const trackRef = React.useRef<HTMLSpanElement | null>(null);
   const textRef = React.useRef<HTMLSpanElement | null>(null);
-  const [offset, setOffset] = React.useState(0);
+  const previousOffsetRef = React.useRef(0);
 
   const measureOffset = React.useCallback(() => {
-    if (isMobile || typeof window === "undefined") {
-      setOffset((prev) => (Math.abs(prev) < 0.5 ? prev : 0));
-      return;
-    }
-
     const track = trackRef.current;
     const text = textRef.current;
     if (track == null || text == null) return;
 
+    const applyOffset = (next: number) => {
+      const normalized = Math.abs(next) < 0.5 ? 0 : next;
+      if (Math.abs(previousOffsetRef.current - normalized) < 0.5) return;
+      previousOffsetRef.current = normalized;
+      text.style.setProperty("--sb-heading-offset-px", `${normalized}px`);
+    };
+
+    if (isMobile || typeof window === "undefined") {
+      applyOffset(0);
+      return;
+    }
+
     const root = track.closest<HTMLElement>("[data-sidebar-root='true']");
     if (root == null) return;
+
+    const computed = window.getComputedStyle(root);
+    const progressValue = Number.parseFloat(computed.getPropertyValue("--sb-progress"));
+    const progress = Number.isFinite(progressValue) ? Math.max(0, Math.min(1, progressValue)) : 0;
+
+    if (progress <= 0.001) {
+      applyOffset(0);
+      return;
+    }
 
     const trackWidth = track.clientWidth;
     const intrinsicTextWidth = text.scrollWidth;
 
-    const computed = window.getComputedStyle(root);
     const baseFontSize = Number.parseFloat(
       window.getComputedStyle(document.documentElement).fontSize,
     );
 
-    const expandedWidth = parseLengthToPx(
-      computed.getPropertyValue("--sb-expanded-width"),
-      baseFontSize,
-    );
     const compactWidth = parseLengthToPx(
       computed.getPropertyValue("--sb-compact-width"),
       baseFontSize,
     );
     const currentWidth = root.getBoundingClientRect().width;
 
-    let targetCompactOffset = 0;
-    if (compactWidth !== null && currentWidth > 0) {
-      // Project current heading track ratio to compact sidebar width to get a stable
-      // target center position and avoid mid-transition bounce.
-      const trackRatio = trackWidth / currentWidth;
-      const compactTrackWidth = compactWidth * trackRatio;
-      const compactTextWidth = Math.min(intrinsicTextWidth, compactTrackWidth);
-      targetCompactOffset = Math.max(0, (compactTrackWidth - compactTextWidth) / 2);
+    if (compactWidth === null || currentWidth <= 0) {
+      applyOffset(0);
+      return;
     }
 
-    let progress = 0;
-    if (
-      expandedWidth !== null &&
-      compactWidth !== null &&
-      expandedWidth > compactWidth &&
-      currentWidth <= expandedWidth
-    ) {
-      progress = (expandedWidth - currentWidth) / (expandedWidth - compactWidth);
-      progress = Math.max(0, Math.min(1, progress));
-    }
+    // Project current heading track ratio to compact sidebar width to get a stable
+    // compact target and avoid mid-transition bounce.
+    const trackRatio = trackWidth / currentWidth;
+    const compactTrackWidth = compactWidth * trackRatio;
+    const compactTextWidth = Math.min(intrinsicTextWidth, compactTrackWidth);
+    const targetCompactOffset = Math.max(0, (compactTrackWidth - compactTextWidth) / 2);
 
-    const next = targetCompactOffset * progress;
-
-    setOffset((prev) => (Math.abs(prev - next) < 0.5 ? prev : next));
+    applyOffset(targetCompactOffset * progress);
   }, [isMobile]);
 
   React.useLayoutEffect(() => {
@@ -311,16 +311,12 @@ function SidebarHeadingText({ children }: { children: React.ReactNode }) {
     const track = trackRef.current;
     const text = textRef.current;
     if (track == null || text == null) return;
-    const root = track.closest<HTMLElement>("[data-sidebar-root='true']");
-    if (root == null) return;
-
     const observer = new ResizeObserver(() => {
       measureOffset();
     });
 
     observer.observe(track);
     observer.observe(text);
-    observer.observe(root);
 
     return () => observer.disconnect();
   }, [measureOffset]);
@@ -330,7 +326,7 @@ function SidebarHeadingText({ children }: { children: React.ReactNode }) {
       <span
         ref={textRef}
         className={styles.headingText}
-        style={{ transform: `translateX(${offset}px)` }}
+        style={{ "--sb-heading-offset-px": "0px" } as React.CSSProperties}
       >
         {children}
       </span>
@@ -596,46 +592,10 @@ function SidebarNavCategoryPanel({ className, ...rest }: SidebarNavCategoryPanel
 
 SidebarNavCategoryPanel.displayName = "SidebarNavCategoryPanel";
 
-export type SidebarMenuSlotButtonProps = React.ComponentPropsWithoutRef<"button"> & {
-  active?: boolean;
-  asChild?: boolean;
-};
+export type SidebarMenuSlotButtonProps = SidebarMenuButtonProps;
 
 const SidebarMenuSlotButton = React.forwardRef<HTMLButtonElement, SidebarMenuSlotButtonProps>(
-  ({ className, active, asChild = false, disabled, onClick, type = "button", ...rest }, ref) => {
-    const cls = cx(styles.menuButton, className, active && styles.menuButtonActive);
-
-    if (asChild) {
-      return (
-        <Slot
-          {...rest}
-          ref={ref as React.Ref<HTMLElement>}
-          className={cls}
-          data-active={active ? "true" : undefined}
-          aria-disabled={disabled || undefined}
-          onClick={
-            disabled
-              ? (e: React.MouseEvent) => {
-                  e.preventDefault();
-                }
-              : onClick
-          }
-        />
-      );
-    }
-
-    return (
-      <button
-        {...rest}
-        ref={ref}
-        type={type}
-        disabled={disabled}
-        className={cls}
-        data-active={active ? "true" : undefined}
-        onClick={onClick}
-      />
-    );
-  },
+  (props, ref) => <SidebarMenuButton {...props} ref={ref} />,
 );
 
 SidebarMenuSlotButton.displayName = "SidebarMenuSlotButton";
