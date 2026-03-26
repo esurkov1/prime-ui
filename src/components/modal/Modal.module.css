@@ -236,12 +236,13 @@
   height: var(--prime-sys-size-control-xl-height);
 }
 
-.body {
-  display: grid;
+.body,
+.footer {
+  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
 }
 
-.header + .body {
-  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+.body {
+  display: grid;
   padding-block: var(--prime-sys-size-modal-headerPaddingBottom);
 }
 
@@ -299,11 +300,6 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-}
-
-.body + .footer,
-.header + .footer {
-  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
   padding-top: var(--prime-sys-size-modal-footerPaddingTop);
 }
 
