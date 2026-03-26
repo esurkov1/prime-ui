@@ -114,8 +114,9 @@ export default function TypographySection() {
         <div className="demoBlock">
           <h4>Варианты (роли)</h4>
           <p className="demoBlockDescription">
-            Все роли из <code>typography.role</code>: от акцентного <code>display</code> до{" "}
-            <code>caption</code>. Подписи у разделителей поясняют прежнюю привязку к ступеням шкалы.
+            Полный набор ролей из <code>typography.role</code> — от <code>display</code> до{" "}
+            <code>caption-micro</code>. Подписи у разделителей: имя <code>variant</code> и краткое
+            назначение.
           </p>
           <PlaygroundExampleFrame.Root code={variantCatalogSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>

@@ -1,7 +1,7 @@
 import { Divider } from "@/components/divider/Divider";
 import { Typography } from "@/components/typography/Typography";
 
-/** Каталог `variant`: роли чтения от `display` до `caption` (маппинг в `tokens/semantic.ts` → `typography.role`). */
+/** Каталог всех ролей `variant` из `typography.role` (`tokens/semantic.ts`). */
 export default function TypographyVariantCatalogSnippet() {
   return (
     <div className="examplePreviewBleed typographyScaleList">
@@ -10,7 +10,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          6xl · medium · tight — крупный акцент на лендинге или обложке
+          <code>display</code> · medium · tight — крупный акцент, герой экрана
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -18,7 +18,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          5xl · medium · tight
+          <code>headline</code> · medium · tight — заголовок раздела или промо
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -26,7 +26,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          4xl · medium · tight
+          <code>heading-page</code> · medium · tight — заголовок страницы
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -34,7 +34,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          3xl · medium · tight
+          <code>heading-section</code> · medium · tight — секция
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -42,7 +42,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          2xl · medium · tracking по умолчанию
+          <code>heading-subsection</code> · medium — подсекция
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -50,7 +50,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          xl · medium
+          <code>heading-group</code> · medium — группа внутри блока
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -58,7 +58,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          l · medium · tight — подзаголовок или сильный лейбл
+          <code>body-large</code> · medium · tight — акцентный абзац или лейбл
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -66,7 +66,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          m · regular — основной абзац
+          <code>body-default</code> · regular — основной текст
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -74,7 +74,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          s · regular — второстепенный текст
+          <code>body-small</code> · regular — вторичный текст
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -82,7 +82,7 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          xs · medium · wide — мелкая акцентная строка
+          <code>body-compact</code> · medium · wide — плотная акцентная строка
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
@@ -90,7 +90,15 @@ export default function TypographyVariantCatalogSnippet() {
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
-          2xs · regular — мелкий поясняющий текст
+          <code>caption</code> · regular — подписи, пояснения
+        </Divider.Root>
+      </div>
+      <div className="typographyScaleRow">
+        <Typography.Root variant="caption-micro">
+          The quick brown fox jumps over the lazy dog.
+        </Typography.Root>
+        <Divider.Root variant="text" align="start">
+          <code>caption-micro</code> · regular — минимальный кегль (метаданные, индексы)
         </Divider.Root>
       </div>
     </div>
