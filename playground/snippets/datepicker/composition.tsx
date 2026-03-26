@@ -32,29 +32,27 @@ export default function DatepickerCompositionSnippet() {
             {triggerLabel}
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <Popover.Inset padding="none">
-            <Datepicker.Shell
-              presets={
-                <Datepicker.Presets mode="single" presets={buildPresets()} onSelect={setValue} />
-              }
-              size="m"
-            >
-              <Datepicker.Calendar
-                locale={ru}
-                mode="single"
-                responsiveMonths
-                selected={value}
-                onSelect={setValue}
-              />
-              <Datepicker.Time labels={{ time: "Время слота" }} value={value} onChange={setValue} />
-              <Datepicker.Value as="p" tone="muted">
-                {value
-                  ? `Выбрано: ${format(value, "dd.MM.yyyy HH:mm", { locale: ru })}`
-                  : "Пресет, календарь и время делят одно состояние в родителе."}
-              </Datepicker.Value>
-            </Datepicker.Shell>
-          </Popover.Inset>
+        <Popover.Content align="start" insetPadding="none" side="bottom">
+          <Datepicker.Shell
+            presets={
+              <Datepicker.Presets mode="single" presets={buildPresets()} onSelect={setValue} />
+            }
+            size="m"
+          >
+            <Datepicker.Calendar
+              locale={ru}
+              mode="single"
+              responsiveMonths
+              selected={value}
+              onSelect={setValue}
+            />
+            <Datepicker.Time labels={{ time: "Время слота" }} value={value} onChange={setValue} />
+            <Datepicker.Value as="p" tone="muted">
+              {value
+                ? `Выбрано: ${format(value, "dd.MM.yyyy HH:mm", { locale: ru })}`
+                : "Пресет, календарь и время делят одно состояние в родителе."}
+            </Datepicker.Value>
+          </Datepicker.Shell>
         </Popover.Content>
       </Popover.Root>
     </ExampleSurface>

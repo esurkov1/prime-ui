@@ -98,12 +98,19 @@ function PopoverTrigger({ children, asChild: _asChild = true }: PopoverTriggerPr
 }
 PopoverTrigger.displayName = "PopoverTrigger";
 
+export type PopoverInsetPadding = "none" | "x1" | "x2" | "x3";
+export type PopoverInsetGap = "none" | "x2" | "x3" | "x4";
+
 export type PopoverContentProps = {
   align?: PositionAlign;
   side?: PositionSide;
   sameMinWidthAsTrigger?: boolean;
   size?: PopoverSize;
   trapFocus?: boolean;
+  /** Доп. отступы к `--po-pad` панели. По умолчанию без второго слоя inset. */
+  insetPadding?: PopoverInsetPadding;
+  /** Вертикальный зазор между прямыми дочерними блоками внутри панели. */
+  insetGap?: PopoverInsetGap;
   children: React.ReactNode;
   className?: string;
 };
@@ -114,6 +121,8 @@ function PopoverContent({
   sameMinWidthAsTrigger = false,
   size = "m",
   trapFocus = false,
+  insetPadding = "none",
+  insetGap = "none",
   children,
   className,
 }: PopoverContentProps) {
@@ -160,6 +169,8 @@ function PopoverContent({
           data-overlay-portal-layer={overlayPortalLayer}
           data-side={layout?.resolvedSide ?? side}
           data-size={size}
+          data-inset-padding={insetPadding}
+          data-inset-gap={insetGap}
           className={cx(styles.content, className)}
           style={layout?.style}
         >
@@ -171,40 +182,8 @@ function PopoverContent({
 }
 PopoverContent.displayName = "PopoverContent";
 
-export type PopoverInsetPadding = "none" | "x1" | "x2" | "x3";
-export type PopoverInsetGap = "none" | "x2" | "x3" | "x4";
-
-export type PopoverInsetProps = React.HTMLAttributes<HTMLDivElement> & {
-  children: React.ReactNode;
-  /** Доп. отступы от внутреннего края `Popover.Content`. По умолчанию `x2`. */
-  padding?: PopoverInsetPadding;
-  /** Вертикальный зазор между прямыми дочерними блоками. По умолчанию `x3`. */
-  gap?: PopoverInsetGap;
-};
-
-function PopoverInset({
-  children,
-  className,
-  padding = "x2",
-  gap = "x3",
-  ...rest
-}: PopoverInsetProps) {
-  return (
-    <div
-      className={cx(styles.inset, className)}
-      data-inset-gap={gap}
-      data-inset-padding={padding}
-      {...rest}
-    >
-      {children}
-    </div>
-  );
-}
-PopoverInset.displayName = "PopoverInset";
-
 export const Popover = {
   Root: PopoverRoot,
   Trigger: PopoverTrigger,
   Content: PopoverContent,
-  Inset: PopoverInset,
 };

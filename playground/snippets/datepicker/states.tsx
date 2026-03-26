@@ -24,19 +24,17 @@ export default function DatepickerStatesSnippet() {
               Календарь: выходные disabled
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" side="bottom">
-            <Popover.Inset padding="none">
-              <Datepicker.Shell>
-                <Datepicker.Calendar
-                  disabled={{ dayOfWeek: [0, 6] }}
-                  locale={ru}
-                  mode="single"
-                  month={new Date(2026, 2, 1)}
-                  selected={value}
-                  onSelect={setValue}
-                />
-              </Datepicker.Shell>
-            </Popover.Inset>
+          <Popover.Content align="start" insetPadding="none" side="bottom">
+            <Datepicker.Shell>
+              <Datepicker.Calendar
+                disabled={{ dayOfWeek: [0, 6] }}
+                locale={ru}
+                mode="single"
+                month={new Date(2026, 2, 1)}
+                selected={value}
+                onSelect={setValue}
+              />
+            </Datepicker.Shell>
           </Popover.Content>
         </Popover.Root>
       </ExampleSurface>
@@ -50,19 +48,17 @@ export default function DatepickerStatesSnippet() {
               Дата + время (time disabled до даты)
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" side="bottom">
-            <Popover.Inset padding="none">
-              <Datepicker.Shell>
-                <Datepicker.Calendar
-                  locale={ru}
-                  mode="single"
-                  month={new Date(2026, 2, 1)}
-                  selected={value}
-                  onSelect={setValue}
-                />
-                <Datepicker.Time labels={{ time: "Время" }} value={value} onChange={setValue} />
-              </Datepicker.Shell>
-            </Popover.Inset>
+          <Popover.Content align="start" insetPadding="none" side="bottom">
+            <Datepicker.Shell>
+              <Datepicker.Calendar
+                locale={ru}
+                mode="single"
+                month={new Date(2026, 2, 1)}
+                selected={value}
+                onSelect={setValue}
+              />
+              <Datepicker.Time labels={{ time: "Время" }} value={value} onChange={setValue} />
+            </Datepicker.Shell>
           </Popover.Content>
         </Popover.Root>
       </ExampleSurface>

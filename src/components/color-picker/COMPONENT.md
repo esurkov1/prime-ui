@@ -37,8 +37,7 @@ export function MinimalColorField() {
             Color
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <Popover.Inset padding="x2" gap="x3">
+        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
             <ColorPicker.FormatProvider>
               <ColorPicker.FormatSelect />
               <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
@@ -46,7 +45,6 @@ export function MinimalColorField() {
               </ColorPicker.Area>
               <ColorPicker.ChannelStrip pipetteIcon={<span aria-hidden />} />
             </ColorPicker.FormatProvider>
-          </Popover.Inset>
         </Popover.Content>
       </Popover.Root>
     </ColorPicker.Root>

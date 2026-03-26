@@ -31,19 +31,17 @@ export default function DatepickerVariantsModesSnippet() {
                 Режим single
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" side="bottom">
-              <Popover.Inset padding="none">
-                <Datepicker.Shell size="m">
-                  <Datepicker.Calendar
-                    locale={ru}
-                    mode="single"
-                    month={FIXED_MONTH}
-                    numberOfMonths={1}
-                    selected={single}
-                    onSelect={setSingle}
-                  />
-                </Datepicker.Shell>
-              </Popover.Inset>
+            <Popover.Content align="start" insetPadding="none" side="bottom">
+              <Datepicker.Shell size="m">
+                <Datepicker.Calendar
+                  locale={ru}
+                  mode="single"
+                  month={FIXED_MONTH}
+                  numberOfMonths={1}
+                  selected={single}
+                  onSelect={setSingle}
+                />
+              </Datepicker.Shell>
             </Popover.Content>
           </Popover.Root>
         </ExampleSurface>
@@ -57,19 +55,17 @@ export default function DatepickerVariantsModesSnippet() {
                 Режим range
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" side="bottom">
-              <Popover.Inset padding="none">
-                <Datepicker.Shell size="m">
-                  <Datepicker.Calendar
-                    locale={ru}
-                    mode="range"
-                    month={FIXED_MONTH}
-                    numberOfMonths={1}
-                    selected={range}
-                    onSelect={setRange}
-                  />
-                </Datepicker.Shell>
-              </Popover.Inset>
+            <Popover.Content align="start" insetPadding="none" side="bottom">
+              <Datepicker.Shell size="m">
+                <Datepicker.Calendar
+                  locale={ru}
+                  mode="range"
+                  month={FIXED_MONTH}
+                  numberOfMonths={1}
+                  selected={range}
+                  onSelect={setRange}
+                />
+              </Datepicker.Shell>
             </Popover.Content>
           </Popover.Root>
         </ExampleSurface>

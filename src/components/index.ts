@@ -272,7 +272,6 @@ export type {
   PopoverContentProps,
   PopoverInsetGap,
   PopoverInsetPadding,
-  PopoverInsetProps,
   PopoverRootProps,
   PopoverSize,
   PopoverTriggerProps,

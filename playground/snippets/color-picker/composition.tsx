@@ -32,58 +32,56 @@ export default function ColorPickerCompositionSnippet() {
             Полная панель
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <Popover.Inset padding="x2" gap="x3">
-            <ColorPicker.FormatProvider>
-              <ExampleSurface className={preview.card}>
-                <div className={preview.formatRow}>
-                  <ColorPicker.FormatSelect />
-                </div>
+        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+          <ColorPicker.FormatProvider>
+            <ExampleSurface className={preview.card}>
+              <div className={preview.formatRow}>
+                <ColorPicker.FormatSelect />
+              </div>
 
-                <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-                  <ColorPicker.AreaThumb />
-                </ColorPicker.Area>
+              <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+                <ColorPicker.AreaThumb />
+              </ColorPicker.Area>
 
-                <ColorPicker.Slider channel="hue" colorSpace="hsl">
-                  <ColorPicker.SliderMeta label="Оттенок" />
-                  <ColorPicker.SliderTrack>
-                    <ColorPicker.Thumb />
-                  </ColorPicker.SliderTrack>
-                </ColorPicker.Slider>
+              <ColorPicker.Slider channel="hue" colorSpace="hsl">
+                <ColorPicker.SliderMeta label="Оттенок" />
+                <ColorPicker.SliderTrack>
+                  <ColorPicker.Thumb />
+                </ColorPicker.SliderTrack>
+              </ColorPicker.Slider>
 
-                <ColorPicker.Slider channel="alpha">
-                  <ColorPicker.SliderMeta label="Непрозрачность" />
-                  <ColorPicker.SliderTrack>
-                    <ColorPicker.Thumb />
-                  </ColorPicker.SliderTrack>
-                </ColorPicker.Slider>
+              <ColorPicker.Slider channel="alpha">
+                <ColorPicker.SliderMeta label="Непрозрачность" />
+                <ColorPicker.SliderTrack>
+                  <ColorPicker.Thumb />
+                </ColorPicker.SliderTrack>
+              </ColorPicker.Slider>
 
-                <ColorPicker.ChannelStrip
-                  pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
-                />
+              <ColorPicker.ChannelStrip
+                pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
+              />
 
-                <hr className={preview.divider} />
+              <hr className={preview.divider} />
 
-                <Typography.Root
-                  as="p"
-                  className={preview.sectionLabel}
-                  variant="body-small"
-                  weight="medium"
-                  tone="muted"
-                >
-                  Рекомендуемые цвета
-                </Typography.Root>
+              <Typography.Root
+                as="p"
+                className={preview.sectionLabel}
+                variant="body-small"
+                weight="medium"
+                tone="muted"
+              >
+                Рекомендуемые цвета
+              </Typography.Root>
 
-                <ColorPicker.SwatchPicker aria-label="Палитра пресетов">
-                  {PRESETS.map((c) => (
-                    <ColorPicker.SwatchPickerItem key={c} color={c}>
-                      <ColorPicker.Swatch />
-                    </ColorPicker.SwatchPickerItem>
-                  ))}
-                </ColorPicker.SwatchPicker>
-              </ExampleSurface>
-            </ColorPicker.FormatProvider>
-          </Popover.Inset>
+              <ColorPicker.SwatchPicker aria-label="Палитра пресетов">
+                {PRESETS.map((c) => (
+                  <ColorPicker.SwatchPickerItem key={c} color={c}>
+                    <ColorPicker.Swatch />
+                  </ColorPicker.SwatchPickerItem>
+                ))}
+              </ColorPicker.SwatchPicker>
+            </ExampleSurface>
+          </ColorPicker.FormatProvider>
         </Popover.Content>
       </Popover.Root>
     </ColorPicker.Root>

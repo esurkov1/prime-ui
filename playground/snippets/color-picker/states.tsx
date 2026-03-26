@@ -26,18 +26,16 @@ export default function ColorPickerStatesSnippet() {
                 Палитра
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" side="bottom">
-              <Popover.Inset padding="x2" gap="x3">
-                <ColorPicker.FormatProvider>
-                  <ColorPicker.SwatchPicker aria-label="Палитра с недоступным цветом">
-                    {PRESETS.map((c, i) => (
-                      <ColorPicker.SwatchPickerItem key={c} color={c} isDisabled={i === 0}>
-                        <ColorPicker.Swatch />
-                      </ColorPicker.SwatchPickerItem>
-                    ))}
-                  </ColorPicker.SwatchPicker>
-                </ColorPicker.FormatProvider>
-              </Popover.Inset>
+            <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+              <ColorPicker.FormatProvider>
+                <ColorPicker.SwatchPicker aria-label="Палитра с недоступным цветом">
+                  {PRESETS.map((c, i) => (
+                    <ColorPicker.SwatchPickerItem key={c} color={c} isDisabled={i === 0}>
+                      <ColorPicker.Swatch />
+                    </ColorPicker.SwatchPickerItem>
+                  ))}
+                </ColorPicker.SwatchPicker>
+              </ColorPicker.FormatProvider>
             </Popover.Content>
           </Popover.Root>
         </ColorPicker.Root>
@@ -52,21 +50,19 @@ export default function ColorPickerStatesSnippet() {
                 Слайдер disabled
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" side="bottom">
-              <Popover.Inset padding="x2" gap="x3">
-                <ColorPicker.FormatProvider>
-                  <div className={preview.miniPicker}>
-                    <ColorPicker.Slider channel="hue" colorSpace="hsl" isDisabled>
-                      <ColorPicker.SliderTrack>
-                        <ColorPicker.Thumb />
-                      </ColorPicker.SliderTrack>
-                    </ColorPicker.Slider>
-                    <ColorPicker.ChannelStrip
-                      pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
-                    />
-                  </div>
-                </ColorPicker.FormatProvider>
-              </Popover.Inset>
+            <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+              <ColorPicker.FormatProvider>
+                <div className={preview.miniPicker}>
+                  <ColorPicker.Slider channel="hue" colorSpace="hsl" isDisabled>
+                    <ColorPicker.SliderTrack>
+                      <ColorPicker.Thumb />
+                    </ColorPicker.SliderTrack>
+                  </ColorPicker.Slider>
+                  <ColorPicker.ChannelStrip
+                    pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
+                  />
+                </div>
+              </ColorPicker.FormatProvider>
             </Popover.Content>
           </Popover.Root>
         </ColorPicker.Root>

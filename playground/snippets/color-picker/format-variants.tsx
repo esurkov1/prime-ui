@@ -36,17 +36,15 @@ function FormatPopover({
               Открыть ({defaultFormat.toUpperCase()})
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" side="bottom">
-            <Popover.Inset padding="x2" gap="x3">
-              <ColorPicker.FormatProvider defaultFormat={defaultFormat}>
-                <div className={preview.formatRow}>
-                  <ColorPicker.FormatSelect />
-                </div>
-                <ColorPicker.ChannelStrip
-                  pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
-                />
-              </ColorPicker.FormatProvider>
-            </Popover.Inset>
+          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+            <ColorPicker.FormatProvider defaultFormat={defaultFormat}>
+              <div className={preview.formatRow}>
+                <ColorPicker.FormatSelect />
+              </div>
+              <ColorPicker.ChannelStrip
+                pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
+              />
+            </ColorPicker.FormatProvider>
           </Popover.Content>
         </Popover.Root>
       </ColorPicker.Root>

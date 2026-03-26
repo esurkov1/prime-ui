@@ -10,14 +10,12 @@ export default function PopoverAsChildSnippet() {
           Подсказка текстом-кнопкой
         </button>
       </Popover.Trigger>
-      <Popover.Content align="start" side="bottom" size="m">
-        <Popover.Inset>
-          <p className={preview.panelTextMuted}>
-            Триггер — один произвольный элемент (здесь нативная <code>&lt;button&gt;</code> без
-            рамки, как текстовая ссылка); на него вешаются ref, <code>aria-expanded</code>,{" "}
-            <code>aria-controls</code> и клик для переключения.
-          </p>
-        </Popover.Inset>
+      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+        <p className={preview.panelTextMuted}>
+          Триггер — один произвольный элемент (здесь нативная <code>&lt;button&gt;</code> без рамки,
+          как текстовая ссылка); на него вешаются ref, <code>aria-expanded</code>,{" "}
+          <code>aria-controls</code> и клик для переключения.
+        </p>
       </Popover.Content>
     </Popover.Root>
   );

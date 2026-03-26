@@ -28,18 +28,16 @@ export default function DatepickerPopoverSnippet() {
           {label}
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" side="bottom">
-        <Popover.Inset padding="none">
-          <Datepicker.Shell>
-            <Datepicker.Calendar
-              locale={ru}
-              mode="single"
-              responsiveMonths
-              selected={value}
-              onSelect={handleSelect}
-            />
-          </Datepicker.Shell>
-        </Popover.Inset>
+      <Popover.Content align="start" insetPadding="none" side="bottom">
+        <Datepicker.Shell>
+          <Datepicker.Calendar
+            locale={ru}
+            mode="single"
+            responsiveMonths
+            selected={value}
+            onSelect={handleSelect}
+          />
+        </Datepicker.Shell>
       </Popover.Content>
     </Popover.Root>
   );

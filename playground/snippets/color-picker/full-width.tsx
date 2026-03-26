@@ -21,27 +21,31 @@ export default function ColorPickerFullWidthSnippet() {
             Панель на всю ширину
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" className="min-w-[min(100vw-2rem,28rem)]" side="bottom">
-          <Popover.Inset padding="x2" gap="x3">
-            <ColorPicker.FormatProvider>
-              <ExampleSurface className={cx(preview.card, preview.fullWidthStretch)}>
-                <div className={preview.formatRow}>
-                  <ColorPicker.FormatSelect />
-                </div>
-                <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-                  <ColorPicker.AreaThumb />
-                </ColorPicker.Area>
-                <ColorPicker.Slider channel="hue" colorSpace="hsl">
-                  <ColorPicker.SliderTrack>
-                    <ColorPicker.Thumb />
-                  </ColorPicker.SliderTrack>
-                </ColorPicker.Slider>
-                <ColorPicker.ChannelStrip
-                  pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
-                />
-              </ExampleSurface>
-            </ColorPicker.FormatProvider>
-          </Popover.Inset>
+        <Popover.Content
+          align="start"
+          className="min-w-[min(100vw-2rem,28rem)]"
+          insetGap="x3"
+          insetPadding="x2"
+          side="bottom"
+        >
+          <ColorPicker.FormatProvider>
+            <ExampleSurface className={cx(preview.card, preview.fullWidthStretch)}>
+              <div className={preview.formatRow}>
+                <ColorPicker.FormatSelect />
+              </div>
+              <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+                <ColorPicker.AreaThumb />
+              </ColorPicker.Area>
+              <ColorPicker.Slider channel="hue" colorSpace="hsl">
+                <ColorPicker.SliderTrack>
+                  <ColorPicker.Thumb />
+                </ColorPicker.SliderTrack>
+              </ColorPicker.Slider>
+              <ColorPicker.ChannelStrip
+                pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
+              />
+            </ExampleSurface>
+          </ColorPicker.FormatProvider>
         </Popover.Content>
       </Popover.Root>
     </ColorPicker.Root>

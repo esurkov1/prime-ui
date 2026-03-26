@@ -17,13 +17,18 @@ export default function PopoverFullWidthSnippet() {
             Ширина как у кнопки
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" sameMinWidthAsTrigger side="bottom" size="m">
-          <Popover.Inset>
-            <p className={preview.panelTextMuted}>
-              <code>sameMinWidthAsTrigger</code> задаёт ширину панели по триггеру (с переносом
-              текста) — удобно в узких колонках и карточках.
-            </p>
-          </Popover.Inset>
+        <Popover.Content
+          align="start"
+          insetGap="x3"
+          insetPadding="x2"
+          sameMinWidthAsTrigger
+          side="bottom"
+          size="m"
+        >
+          <p className={preview.panelTextMuted}>
+            <code>sameMinWidthAsTrigger</code> задаёт ширину панели по триггеру (с переносом текста)
+            — удобно в узких колонках и карточках.
+          </p>
         </Popover.Content>
       </Popover.Root>
     </div>

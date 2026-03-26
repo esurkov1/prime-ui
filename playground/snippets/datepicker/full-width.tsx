@@ -19,21 +19,24 @@ export default function DatepickerFullWidthSnippet() {
               Календарь на всю ширину панели
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" className="min-w-[min(100vw-2rem,36rem)]" side="bottom">
-            <Popover.Inset padding="none">
-              <Datepicker.Shell className="min-w-0">
-                <Datepicker.Calendar
-                  locale={ru}
-                  mode="single"
-                  responsiveMonths
-                  selected={value}
-                  onSelect={(d) => {
-                    setValue(d);
-                    if (d) setOpen(false);
-                  }}
-                />
-              </Datepicker.Shell>
-            </Popover.Inset>
+          <Popover.Content
+            align="start"
+            className="min-w-[min(100vw-2rem,36rem)]"
+            insetPadding="none"
+            side="bottom"
+          >
+            <Datepicker.Shell className="min-w-0">
+              <Datepicker.Calendar
+                locale={ru}
+                mode="single"
+                responsiveMonths
+                selected={value}
+                onSelect={(d) => {
+                  setValue(d);
+                  if (d) setOpen(false);
+                }}
+              />
+            </Datepicker.Shell>
           </Popover.Content>
         </Popover.Root>
       </ExampleSurface>

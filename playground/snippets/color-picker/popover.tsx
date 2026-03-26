@@ -36,40 +36,38 @@ export default function ColorPickerPopoverSnippet() {
           {colorString}
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" side="bottom">
-        <Popover.Inset padding="x2" gap="x3">
-          <ColorPicker.Root value={color} onChange={handleColorChange}>
-            <ColorPicker.FormatProvider>
-              <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-                <ColorPicker.AreaThumb />
-              </ColorPicker.Area>
+      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+        <ColorPicker.Root value={color} onChange={handleColorChange}>
+          <ColorPicker.FormatProvider>
+            <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+              <ColorPicker.AreaThumb />
+            </ColorPicker.Area>
 
-              <ColorPicker.Slider channel="hue" colorSpace="hsl">
-                <ColorPicker.SliderTrack>
-                  <ColorPicker.Thumb />
-                </ColorPicker.SliderTrack>
-              </ColorPicker.Slider>
+            <ColorPicker.Slider channel="hue" colorSpace="hsl">
+              <ColorPicker.SliderTrack>
+                <ColorPicker.Thumb />
+              </ColorPicker.SliderTrack>
+            </ColorPicker.Slider>
 
-              <ColorPicker.Slider channel="alpha">
-                <ColorPicker.SliderTrack>
-                  <ColorPicker.Thumb />
-                </ColorPicker.SliderTrack>
-              </ColorPicker.Slider>
+            <ColorPicker.Slider channel="alpha">
+              <ColorPicker.SliderTrack>
+                <ColorPicker.Thumb />
+              </ColorPicker.SliderTrack>
+            </ColorPicker.Slider>
 
-              <ColorPicker.ChannelStrip
-                pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
-              />
+            <ColorPicker.ChannelStrip
+              pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
+            />
 
-              <ColorPicker.SwatchPicker aria-label="Быстрые цвета">
-                {PRESETS.map((c) => (
-                  <ColorPicker.SwatchPickerItem key={c} color={c}>
-                    <ColorPicker.Swatch />
-                  </ColorPicker.SwatchPickerItem>
-                ))}
-              </ColorPicker.SwatchPicker>
-            </ColorPicker.FormatProvider>
-          </ColorPicker.Root>
-        </Popover.Inset>
+            <ColorPicker.SwatchPicker aria-label="Быстрые цвета">
+              {PRESETS.map((c) => (
+                <ColorPicker.SwatchPickerItem key={c} color={c}>
+                  <ColorPicker.Swatch />
+                </ColorPicker.SwatchPickerItem>
+              ))}
+            </ColorPicker.SwatchPicker>
+          </ColorPicker.FormatProvider>
+        </ColorPicker.Root>
       </Popover.Content>
     </Popover.Root>
   );

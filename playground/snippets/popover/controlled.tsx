@@ -24,16 +24,14 @@ export default function PopoverControlledSnippet() {
               Переключить триггером
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" side="bottom" size="m">
-            <Popover.Inset>
-              <p className={preview.panelTextMuted}>
-                Состояние задаётся <code>open</code> и <code>onOpenChange</code> на{" "}
-                <code>Popover.Root</code>.
-              </p>
-              <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
-                Закрыть
-              </Button.Root>
-            </Popover.Inset>
+          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+            <p className={preview.panelTextMuted}>
+              Состояние задаётся <code>open</code> и <code>onOpenChange</code> на{" "}
+              <code>Popover.Root</code>.
+            </p>
+            <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
+              Закрыть
+            </Button.Root>
           </Popover.Content>
         </Popover.Root>
       </div>

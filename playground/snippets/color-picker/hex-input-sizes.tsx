@@ -20,10 +20,8 @@ function HexSizePopover({ size }: { size: (typeof SIZES)[number] }) {
             Hex ({size})
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <Popover.Inset padding="x2" gap="x3">
-            <ColorPicker.HexInput label={`Hex (${size})`} size={size} />
-          </Popover.Inset>
+        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+          <ColorPicker.HexInput label={`Hex (${size})`} size={size} />
         </Popover.Content>
       </Popover.Root>
     </ColorPicker.Root>

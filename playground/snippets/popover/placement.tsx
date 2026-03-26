@@ -27,13 +27,11 @@ export default function PopoverPlacementSnippet() {
               {label}
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align={align} side={side} size="m">
-            <Popover.Inset padding="x2" gap="x2">
-              <p className={preview.panelTextMuted}>
-                <code>side=&quot;{side}&quot;</code>, <code>align=&quot;{align}&quot;</code>. У края
-                окна позиция может перевернуться (flip).
-              </p>
-            </Popover.Inset>
+          <Popover.Content align={align} insetGap="x2" insetPadding="x2" side={side} size="m">
+            <p className={preview.panelTextMuted}>
+              <code>side=&quot;{side}&quot;</code>, <code>align=&quot;{align}&quot;</code>. У края
+              окна позиция может перевернуться (flip).
+            </p>
           </Popover.Content>
         </Popover.Root>
       ))}

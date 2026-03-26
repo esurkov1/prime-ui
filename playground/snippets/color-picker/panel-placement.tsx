@@ -61,10 +61,14 @@ export default function ColorPickerPanelPlacementSnippet() {
               Снизу
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" className={preview.popoverPickerContent} side="bottom">
-            <Popover.Inset>
-              <Panel />
-            </Popover.Inset>
+          <Popover.Content
+            align="start"
+            className={preview.popoverPickerContent}
+            insetGap="x3"
+            insetPadding="x2"
+            side="bottom"
+          >
+            <Panel />
           </Popover.Content>
         </Popover.Root>
       </ColorPicker.Root>
@@ -82,10 +86,14 @@ export default function ColorPickerPanelPlacementSnippet() {
               Сверху
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" className={preview.popoverPickerContent} side="top">
-            <Popover.Inset>
-              <Panel />
-            </Popover.Inset>
+          <Popover.Content
+            align="start"
+            className={preview.popoverPickerContent}
+            insetGap="x3"
+            insetPadding="x2"
+            side="top"
+          >
+            <Panel />
           </Popover.Content>
         </Popover.Root>
       </ColorPicker.Root>

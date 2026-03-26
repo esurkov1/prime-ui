@@ -21,19 +21,17 @@ function DatepickerSizePopover({ size }: { size: DatepickerSize }) {
           Размер {size.toUpperCase()}
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" side="bottom">
-        <Popover.Inset padding="none">
-          <Datepicker.Shell size={size}>
-            <Datepicker.Calendar
-              locale={ru}
-              mode="single"
-              month={new Date(2026, 2, 1)}
-              selected={value}
-              size={size}
-              onSelect={setValue}
-            />
-          </Datepicker.Shell>
-        </Popover.Inset>
+      <Popover.Content align="start" insetPadding="none" side="bottom">
+        <Datepicker.Shell size={size}>
+          <Datepicker.Calendar
+            locale={ru}
+            mode="single"
+            month={new Date(2026, 2, 1)}
+            selected={value}
+            size={size}
+            onSelect={setValue}
+          />
+        </Datepicker.Shell>
       </Popover.Content>
     </Popover.Root>
   );

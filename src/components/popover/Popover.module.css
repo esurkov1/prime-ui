@@ -1,59 +1,10 @@
-.inset {
-  --po-inset-pad-block: var(--prime-sys-spacing-x2);
-  --po-inset-pad-inline: var(--prime-sys-spacing-x2);
-  --po-inset-gap: var(--prime-sys-spacing-x3);
-
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  flex-direction: column;
-  margin: 0;
-  box-sizing: border-box;
-  padding-block: var(--po-inset-pad-block);
-  padding-inline: var(--po-inset-pad-inline);
-  gap: var(--po-inset-gap);
-}
-
-.inset[data-inset-padding="none"] {
-  --po-inset-pad-block: 0;
-  --po-inset-pad-inline: 0;
-}
-
-.inset[data-inset-padding="x1"] {
-  --po-inset-pad-block: var(--prime-sys-spacing-x1);
-  --po-inset-pad-inline: var(--prime-sys-spacing-x1);
-}
-
-.inset[data-inset-padding="x2"] {
-  --po-inset-pad-block: var(--prime-sys-spacing-x2);
-  --po-inset-pad-inline: var(--prime-sys-spacing-x2);
-}
-
-.inset[data-inset-padding="x3"] {
-  --po-inset-pad-block: var(--prime-sys-spacing-x3);
-  --po-inset-pad-inline: var(--prime-sys-spacing-x3);
-}
-
-.inset[data-inset-gap="none"] {
-  --po-inset-gap: 0;
-}
-
-.inset[data-inset-gap="x2"] {
-  --po-inset-gap: var(--prime-sys-spacing-x2);
-}
-
-.inset[data-inset-gap="x3"] {
-  --po-inset-gap: var(--prime-sys-spacing-x3);
-}
-
-.inset[data-inset-gap="x4"] {
-  --po-inset-gap: var(--prime-sys-spacing-x4);
-}
-
 .content {
   --po-pad: var(--prime-sys-spacing-x3);
   --po-min-w: var(--prime-sys-unit-12rem);
   --po-text-size: var(--prime-sys-size-control-m-supportText);
+  --po-inset-pad-block: 0;
+  --po-inset-pad-inline: 0;
+  --po-inset-gap: 0;
 
   display: flex;
   flex-direction: column;
@@ -65,13 +16,53 @@
   border: none;
   border-radius: var(--prime-sys-shape-radius-l);
   box-shadow: var(--prime-sys-elevation-shadow-surface), var(--prime-sys-elevation-shadow-modal);
-  padding: var(--po-pad);
+  box-sizing: border-box;
+  margin: 0;
+  padding-block: calc(var(--po-pad) + var(--po-inset-pad-block));
+  padding-inline: calc(var(--po-pad) + var(--po-inset-pad-inline));
+  gap: var(--po-inset-gap);
   min-width: var(--po-min-w);
   /* Прокрутка — ScrollContainer */
   transform-origin: top center;
   font-size: var(--po-text-size);
   line-height: 1.35;
   color: var(--prime-sys-color-content-secondary);
+}
+
+.content[data-inset-padding="none"] {
+  --po-inset-pad-block: 0;
+  --po-inset-pad-inline: 0;
+}
+
+.content[data-inset-padding="x1"] {
+  --po-inset-pad-block: var(--prime-sys-spacing-x1);
+  --po-inset-pad-inline: var(--prime-sys-spacing-x1);
+}
+
+.content[data-inset-padding="x2"] {
+  --po-inset-pad-block: var(--prime-sys-spacing-x2);
+  --po-inset-pad-inline: var(--prime-sys-spacing-x2);
+}
+
+.content[data-inset-padding="x3"] {
+  --po-inset-pad-block: var(--prime-sys-spacing-x3);
+  --po-inset-pad-inline: var(--prime-sys-spacing-x3);
+}
+
+.content[data-inset-gap="none"] {
+  --po-inset-gap: 0;
+}
+
+.content[data-inset-gap="x2"] {
+  --po-inset-gap: var(--prime-sys-spacing-x2);
+}
+
+.content[data-inset-gap="x3"] {
+  --po-inset-gap: var(--prime-sys-spacing-x3);
+}
+
+.content[data-inset-gap="x4"] {
+  --po-inset-gap: var(--prime-sys-spacing-x4);
 }
 
 .content[data-overlay-portal-layer="page"] {

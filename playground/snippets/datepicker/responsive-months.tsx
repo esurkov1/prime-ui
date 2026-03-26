@@ -19,19 +19,17 @@ export default function DatepickerResponsiveMonthsSnippet() {
             Адаптивные месяцы (1–2 колонки)
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <Popover.Inset padding="none">
-            <Datepicker.Shell>
-              <Datepicker.Calendar
-                locale={ru}
-                mode="range"
-                responsiveBreakpoints={{ twoColumns: 500 }}
-                responsiveMonths
-                selected={range}
-                onSelect={setRange}
-              />
-            </Datepicker.Shell>
-          </Popover.Inset>
+        <Popover.Content align="start" insetPadding="none" side="bottom">
+          <Datepicker.Shell>
+            <Datepicker.Calendar
+              locale={ru}
+              mode="range"
+              responsiveBreakpoints={{ twoColumns: 500 }}
+              responsiveMonths
+              selected={range}
+              onSelect={setRange}
+            />
+          </Datepicker.Shell>
         </Popover.Content>
       </Popover.Root>
     </ExampleSurface>

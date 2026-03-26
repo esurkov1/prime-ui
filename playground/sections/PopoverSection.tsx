@@ -113,33 +113,17 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
     description: "Ловушка фокуса внутри панели при открытии (Tab циклически внутри).",
   },
   {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Содержимое панели; часто оборачивают в Popover.Inset.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный CSS-класс на контейнере панели (role=dialog).",
-  },
-];
-
-const popoverInsetApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "padding",
+    prop: "insetPadding",
     type: '"none" | "x1" | "x2" | "x3"',
-    defaultValue: '"x2"',
+    defaultValue: '"none"',
     required: "Нет",
-    description: "Внутренние отступы колонки относительно края панели (data-inset-padding).",
+    description:
+      "Дополнительный внутренний отступ к ярусу панели (--po-pad); data-inset-padding на корне панели.",
   },
   {
-    prop: "gap",
+    prop: "insetGap",
     type: '"none" | "x2" | "x3" | "x4"',
-    defaultValue: '"x3"',
+    defaultValue: '"none"',
     required: "Нет",
     description: "Вертикальный зазор между прямыми дочерними элементами (data-inset-gap).",
   },
@@ -148,21 +132,14 @@ const popoverInsetApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Колонка с контентом внутри панели.",
+    description: "Содержимое панели.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный CSS-класс на обёртке inset.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Остальные атрибуты div (id, style, data-*, aria-* и т.д.).",
+    description: "Дополнительный CSS-класс на контейнере панели (role=dialog).",
   },
 ];
 
@@ -196,9 +173,8 @@ export default function PopoverSection() {
         <div className="demoBlock">
           <DemoSectionTitle>Варианты внутренней сетки</DemoSectionTitle>
           <DemoDescription>
-            У <code>Popover.Inset</code> нет отдельного <code>variant</code>: плотность контента
-            задаётся <code>padding</code> и <code>gap</code> (включая <code>none</code> для плотного
-            макета).
+            Плотность задаётся <code>insetPadding</code> и <code>insetGap</code> на{" "}
+            <code>Popover.Content</code> (включая <code>none</code> для плотного макета).
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={insetVariantsSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
@@ -251,8 +227,8 @@ export default function PopoverSection() {
         <div className="demoBlock">
           <DemoSectionTitle>Композиция</DemoSectionTitle>
           <DemoDescription>
-            Триггер с <code>Button.Icon</code>, заголовок, текст и нативные чекбоксы внутри{" "}
-            <code>Popover.Inset</code>.
+            Триггер с <code>Button.Icon</code>, заголовок, текст и нативные чекбоксы в теле панели с{" "}
+            <code>insetPadding</code> / <code>insetGap</code>.
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
@@ -320,11 +296,6 @@ export default function PopoverSection() {
             фокуса.
           </DemoDescription>
           <PlaygroundApiTable rows={popoverContentApiRows} />
-          <DemoApiTitle>Popover.Inset</DemoApiTitle>
-          <DemoDescription>
-            Внутренняя колонка с настраиваемыми отступами и зазором между дочерними блоками.
-          </DemoDescription>
-          <PlaygroundApiTable rows={popoverInsetApiRows} />
         </div>
       </div>
     </PlaygroundDocPage>

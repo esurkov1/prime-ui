@@ -15,13 +15,11 @@ export default function PopoverSizesSnippet() {
               Размер {size}
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" side="bottom" size={size}>
-            <Popover.Inset padding="x2" gap="x2">
-              <p className={preview.panelTextMuted}>
-                Панель с <code>size=&quot;{size}&quot;</code>: отступы, минимальная ширина и кегль
-                текста из яруса контрола.
-              </p>
-            </Popover.Inset>
+          <Popover.Content align="start" insetGap="x2" insetPadding="x2" side="bottom" size={size}>
+            <p className={preview.panelTextMuted}>
+              Панель с <code>size=&quot;{size}&quot;</code>: отступы, минимальная ширина и кегль
+              текста из яруса контрола.
+            </p>
           </Popover.Content>
         </Popover.Root>
       ))}

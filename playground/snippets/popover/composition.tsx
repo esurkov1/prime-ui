@@ -17,27 +17,25 @@ export default function PopoverCompositionSnippet() {
           Фильтры отчёта
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" side="bottom" size="m">
-        <Popover.Inset>
-          <div className={preview.compositionHeader}>
-            <Filter aria-hidden className={preview.headerIcon} strokeWidth={1.75} />
-            <Typography.Root as="span" variant="body-small" weight="semibold">
-              Быстрый отбор
-            </Typography.Root>
-          </div>
-          <Typography.Root as="p" className={preview.panelTextMuted} variant="body-small">
-            Иконка на триггере, заголовок и текст внутри <code>Popover.Inset</code> с колонкой и
-            зазорами.
+      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+        <div className={preview.compositionHeader}>
+          <Filter aria-hidden className={preview.headerIcon} strokeWidth={1.75} />
+          <Typography.Root as="span" variant="body-small" weight="semibold">
+            Быстрый отбор
           </Typography.Root>
-          <div className={preview.checkboxStack}>
-            <Checkbox.Root size="m" defaultChecked>
-              <Checkbox.Label>Только активные</Checkbox.Label>
-            </Checkbox.Root>
-            <Checkbox.Root size="m">
-              <Checkbox.Label>Скрыть нулевые</Checkbox.Label>
-            </Checkbox.Root>
-          </div>
-        </Popover.Inset>
+        </div>
+        <Typography.Root as="p" className={preview.panelTextMuted} variant="body-small">
+          Иконка на триггере, заголовок и текст внутри панели с колонкой и зазорами (
+          <code>insetPadding</code>, <code>insetGap</code>).
+        </Typography.Root>
+        <div className={preview.checkboxStack}>
+          <Checkbox.Root size="m" defaultChecked>
+            <Checkbox.Label>Только активные</Checkbox.Label>
+          </Checkbox.Root>
+          <Checkbox.Root size="m">
+            <Checkbox.Label>Скрыть нулевые</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
       </Popover.Content>
     </Popover.Root>
   );

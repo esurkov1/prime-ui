@@ -17,8 +17,7 @@ A composite “anchor + portaled panel”: clicking the trigger toggles a non-mo
 
 - **`Popover.Root`** — holds open state (controlled or uncontrolled), stable ids for trigger and content, and the trigger element ref used for positioning.
 - **`Popover.Trigger`** — must wrap **exactly one** `React` element; ref, `aria-*`, and click-to-toggle are merged onto that child (`cloneElement`).
-- **`Popover.Content`** — rendered in a **portal** only when open; root is a scroll container with `role="dialog"`, positioned from the trigger via `side` / `align`, and wraps children in `ControlSizeProvider` when `size` is set.
-- **`Popover.Inset`** — optional inner column with `data-inset-padding` and vertical `data-inset-gap` between direct children; place panel body inside it when you want kit padding and spacing.
+- **`Popover.Content`** — rendered in a **portal** only when open; root is a scroll container with `role="dialog"`, positioned from the trigger via `side` / `align`, wraps children in `ControlSizeProvider` when `size` is set, and applies optional **`insetPadding`** / **`insetGap`** on the same node (`data-inset-padding`, `data-inset-gap`).
 
 ### Minimal example
 
@@ -31,8 +30,8 @@ export function Example() {
       <Popover.Trigger asChild>
         <button type="button">Open</button>
       </Popover.Trigger>
-      <Popover.Content>
-        <Popover.Inset>Panel</Popover.Inset>
+      <Popover.Content insetPadding="x2" insetGap="x3">
+        Panel
       </Popover.Content>
     </Popover.Root>
   );
@@ -50,7 +49,7 @@ export function Example() {
 - Trigger receives **`aria-expanded`**, **`aria-haspopup="dialog"`**, and **`aria-controls`** pointing at the content id; **`aria-labelledby`** on the panel references the trigger id—give the anchor a visible name or **`aria-label`** when there is no text.
 - There is no popover-level **`disabled`**; if the anchor (e.g. [Button](../button/COMPONENT.md)) is disabled, it will not open.
 - **`asChild`** exists for slot API compatibility; merging always applies to the single child—**`asChild={false}`** does not render an internal button.
-- Density: tune **`Popover.Content` `size`** for the control tier and **`Popover.Inset` `padding` / `gap`** for inner spacing; optional **`className`** on `Content` or `Inset` for further styling.
+- Density: tune **`Popover.Content` `size`** for the control tier and **`insetPadding` / `insetGap`** for inner spacing; optional **`className`** on `Content` for further styling.
 
 ## API
 
@@ -79,20 +78,10 @@ export function Example() {
 | sameMinWidthAsTrigger | `boolean` | `false` | No | Panel min width matches the trigger (`border-box`), still subject to panel max width and viewport. |
 | size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control density tier for nested controls via `ControlSizeProvider`. |
 | trapFocus | `boolean` | `false` | No | Trap focus inside the panel while open. |
+| insetPadding | `"none" \| "x1" \| "x2" \| "x3"` | `"none"` | No | Extra inset padding relative to the panel tier (`data-inset-padding`). |
+| insetGap | `"none" \| "x2" \| "x3" \| "x4"` | `"none"` | No | Vertical gap between direct children (`data-inset-gap`). |
 | className | `string` | — | No | Extra class on the panel root. |
-| children | `React.ReactNode` | — | Yes | Panel body; often wrapped in `Popover.Inset`. |
-
-### Popover.Inset
-
-Extends `React.HTMLAttributes<HTMLDivElement>`; besides the props below you can pass `id`, `style`, `data-*`, etc.
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| padding | `"none" \| "x1" \| "x2" \| "x3"` | `"x2"` | No | Inner padding (`data-inset-padding`). |
-| gap | `"none" \| "x2" \| "x3" \| "x4"` | `"x3"` | No | Vertical gap between direct children (`data-inset-gap`). |
-| className | `string` | — | No | Extra class on the wrapper. |
-| children | `React.ReactNode` | — | Yes | Content column inside the panel. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other attributes on the root `div`. |
+| children | `React.ReactNode` | — | Yes | Panel body. |
 
 ## Related
 

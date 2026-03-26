@@ -12,12 +12,10 @@ export default function PopoverStatesSnippet() {
             Старт открыт
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom" size="m">
-          <Popover.Inset>
-            <p className={preview.panelTextMuted}>
-              <code>defaultOpen</code> на корне — начальное открытие без внешнего состояния.
-            </p>
-          </Popover.Inset>
+        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+          <p className={preview.panelTextMuted}>
+            <code>defaultOpen</code> на корне — начальное открытие без внешнего состояния.
+          </p>
         </Popover.Content>
       </Popover.Root>
 
@@ -27,10 +25,8 @@ export default function PopoverStatesSnippet() {
             Триггер недоступен
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom" size="m">
-          <Popover.Inset>
-            <p className={preview.panelTextMuted}>Панель не откроется: кнопка с disabled.</p>
-          </Popover.Inset>
+        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+          <p className={preview.panelTextMuted}>Панель не откроется: кнопка с disabled.</p>
         </Popover.Content>
       </Popover.Root>
     </div>

@@ -31,26 +31,24 @@ export default function ColorPickerControlledSnippet() {
               Изменить цвет
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" side="bottom">
-            <Popover.Inset padding="x2" gap="x3">
-              <ColorPicker.FormatProvider>
-                <div className={preview.formatRow}>
-                  <ColorPicker.FormatSelect />
-                </div>
-                <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-                  <ColorPicker.AreaThumb />
-                </ColorPicker.Area>
-                <ColorPicker.Slider channel="hue" colorSpace="hsl">
-                  <ColorPicker.SliderMeta label="Оттенок" />
-                  <ColorPicker.SliderTrack>
-                    <ColorPicker.Thumb />
-                  </ColorPicker.SliderTrack>
-                </ColorPicker.Slider>
-                <ColorPicker.ChannelStrip
-                  pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
-                />
-              </ColorPicker.FormatProvider>
-            </Popover.Inset>
+          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+            <ColorPicker.FormatProvider>
+              <div className={preview.formatRow}>
+                <ColorPicker.FormatSelect />
+              </div>
+              <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+                <ColorPicker.AreaThumb />
+              </ColorPicker.Area>
+              <ColorPicker.Slider channel="hue" colorSpace="hsl">
+                <ColorPicker.SliderMeta label="Оттенок" />
+                <ColorPicker.SliderTrack>
+                  <ColorPicker.Thumb />
+                </ColorPicker.SliderTrack>
+              </ColorPicker.Slider>
+              <ColorPicker.ChannelStrip
+                pipetteIcon={<Pipette aria-hidden size={18} strokeWidth={1.75} />}
+              />
+            </ColorPicker.FormatProvider>
           </Popover.Content>
         </Popover.Root>
       </ColorPicker.Root>

@@ -36,34 +36,32 @@ export default function DatepickerRangePresetsTimeSnippet() {
             Диапазон, пресеты и время
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <Popover.Inset padding="none">
-            <Datepicker.Shell
-              presets={
-                <Datepicker.Presets mode="range" presets={buildPresets()} onSelect={setRange} />
-              }
-            >
-              <Datepicker.Calendar
-                locale={ru}
-                mode="range"
-                responsiveMonths
-                selected={range}
-                onSelect={setRange}
-              />
-              <Datepicker.Time
-                mode="range"
-                from={range?.from}
-                labels={{ from: "Начало", to: "Конец" }}
-                to={range?.to}
-                onFromChange={(next) => {
-                  setRange((prev) => ({ from: next, to: prev?.to }));
-                }}
-                onToChange={(next) => {
-                  setRange((prev) => ({ from: prev?.from, to: next }));
-                }}
-              />
-            </Datepicker.Shell>
-          </Popover.Inset>
+        <Popover.Content align="start" insetPadding="none" side="bottom">
+          <Datepicker.Shell
+            presets={
+              <Datepicker.Presets mode="range" presets={buildPresets()} onSelect={setRange} />
+            }
+          >
+            <Datepicker.Calendar
+              locale={ru}
+              mode="range"
+              responsiveMonths
+              selected={range}
+              onSelect={setRange}
+            />
+            <Datepicker.Time
+              mode="range"
+              from={range?.from}
+              labels={{ from: "Начало", to: "Конец" }}
+              to={range?.to}
+              onFromChange={(next) => {
+                setRange((prev) => ({ from: next, to: prev?.to }));
+              }}
+              onToChange={(next) => {
+                setRange((prev) => ({ from: prev?.from, to: next }));
+              }}
+            />
+          </Datepicker.Shell>
         </Popover.Content>
       </Popover.Root>
     </ExampleSurface>

@@ -21,27 +21,25 @@ export default function DatepickerControlledValueSnippet() {
             {triggerLabel}
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <Popover.Inset padding="none">
-            <Datepicker.Shell>
-              <Datepicker.Calendar
-                locale={ru}
-                mode="single"
-                month={new Date(2026, 2, 1)}
-                numberOfMonths={1}
-                selected={value}
-                onSelect={(d) => {
-                  setValue(d);
-                  if (d) setOpen(false);
-                }}
-              />
-              <Datepicker.Value as="p">
-                {value
-                  ? format(value, "d MMMM yyyy, EEEE", { locale: ru })
-                  : "Дата не выбрана — кликните по ячейке."}
-              </Datepicker.Value>
-            </Datepicker.Shell>
-          </Popover.Inset>
+        <Popover.Content align="start" insetPadding="none" side="bottom">
+          <Datepicker.Shell>
+            <Datepicker.Calendar
+              locale={ru}
+              mode="single"
+              month={new Date(2026, 2, 1)}
+              numberOfMonths={1}
+              selected={value}
+              onSelect={(d) => {
+                setValue(d);
+                if (d) setOpen(false);
+              }}
+            />
+            <Datepicker.Value as="p">
+              {value
+                ? format(value, "d MMMM yyyy, EEEE", { locale: ru })
+                : "Дата не выбрана — кликните по ячейке."}
+            </Datepicker.Value>
+          </Datepicker.Shell>
         </Popover.Content>
       </Popover.Root>
     </ExampleSurface>

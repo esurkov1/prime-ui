@@ -38,7 +38,7 @@ export function DatepickerMinimal() {
 
 ## Rules
 
-- Prefer **`Datepicker.Shell` inside [Popover](../popover/COMPONENT.md) `Content`** (often with `Popover.Inset` and `padding="none"`) opened from a trigger that shows the current value; the calendar is large and focus-heavy for inline page defaults.
+- Prefer **`Datepicker.Shell` inside [Popover](../popover/COMPONENT.md) `Content`** (often with `insetPadding="none"` on `Content`) opened from a trigger that shows the current value; the calendar is large and focus-heavy for inline page defaults.
 - **Controlled vs uncontrolled** — Drive selection with **`selected`** and **`onSelect`** from react-day-picker (and optional **`month`** / **`onMonthChange`**) when the parent must own state; otherwise rely on day-picker internal state where types allow.
 - **`responsiveMonths`** — When `true`, **`numberOfMonths` is ignored**; the kit measures the calendar viewport and switches between one and two columns using **`responsiveBreakpoints.twoColumns`** (default **500** px).
 - **Presets** — Use **`mode="single"`** or **`mode="range"`** per instance; do not mix range presets with single calendar mode in one `Presets`. The **`title`** prop exists on the type but **is not rendered** in the component.
