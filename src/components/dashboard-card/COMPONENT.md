@@ -35,7 +35,7 @@ Design alignment (informative):
 - **`DashboardCard.SectionHeader`** — bar with bottom border for **`section`**.
 - **`DashboardCard.SectionTitle`** — `h3` title.
 - **`DashboardCard.SectionTrailing`** — optional actions or icon on the right.
-- **`DashboardCard.Body`** — main content (charts, tables, custom layout).
+- **`DashboardCard.Body`** — main content (charts, tables, custom layout). With **`variant="section"`**, the shell has a **minimum height**; when **`Body`** has **exactly one element child**, it **stretches to fill** the body area (typical chart/table root). Override height via **`className`** on **`Root`** if needed.
 
 ### Mini example
 
@@ -89,7 +89,9 @@ export function ChartSection() {
       <DashboardCard.SectionHeader>
         <DashboardCard.SectionTitle>Revenue</DashboardCard.SectionTitle>
       </DashboardCard.SectionHeader>
-      <DashboardCard.Body>{/* chart */}</DashboardCard.Body>
+      <DashboardCard.Body>
+        <div id="revenue-chart" />
+      </DashboardCard.Body>
     </DashboardCard.Root>
   );
 }
@@ -101,6 +103,7 @@ export function ChartSection() {
 - Prefer **`flat`** on dense dashboards if shadows feel noisy; default shadow uses **`--prime-sys-elevation-shadow-surface`**.
 - **`SectionTitle`** is an **`h3`**; ensure heading levels match the page outline (skip levels appropriately).
 - **`Description`** is a **`p`** — only one block per card unless you compose custom markup inside **`Body`** for **`section`**.
+- **`variant="section"`** sets a **minimum height** on **`Root`** so **`Body`** can grow; a **single element child** in **`Body`** is stretched to fill the content region (mount your chart library root there). Multiple children keep normal **flex** spacing (`gap`).
 - For **`metric-media`**, keep **`Media`** height predictable so rows in a grid stay aligned, or use one column on narrow viewports.
 - Icons in **`IconBox`** / **`Lead`** should not be the sole carrier of meaning; pair with visible text.
 
@@ -209,7 +212,7 @@ export function ChartSection() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Main section content. |
+| children | `React.ReactNode` | — | No | Main section content. With **`section`**, one **element** child fills the body; text-only children are not stretched. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the body `div`. |
 
 ## Imports

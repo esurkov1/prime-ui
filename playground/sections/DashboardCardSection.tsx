@@ -116,8 +116,9 @@ export default function DashboardCardSection() {
           <DemoSectionTitle>Section</DemoSectionTitle>
           <DemoDescription>
             <code>variant=&quot;section&quot;</code>: <code>SectionHeader</code> с{" "}
-            <code>SectionTitle</code> и опциональным <code>SectionTrailing</code>, основной контент
-            в <code>Body</code>.
+            <code>SectionTitle</code> и опциональным <code>SectionTrailing</code>; в{" "}
+            <code>Body</code> один корневой узел (например контейнер графика) занимает всю область
+            тела карточки.
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={sectionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>

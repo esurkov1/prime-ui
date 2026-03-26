@@ -38,6 +38,8 @@
   gap: 0;
   padding: 0;
   overflow: hidden;
+  /* Минимальная высота оболочки: Body с flex-grow получает оставшееся место под график/таблицу. */
+  min-height: var(--prime-sys-unit-18rem);
 }
 
 .iconBox {
@@ -140,6 +142,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   gap: var(--prime-sys-spacing-m);
@@ -178,7 +181,16 @@
   flex-direction: column;
   gap: var(--prime-sys-spacing-l);
   min-width: 0;
+  min-height: 0;
   flex: 1 1 auto;
   padding: var(--prime-sys-spacing-l) var(--prime-sys-spacing-xl) var(--prime-sys-spacing-xl);
   background: var(--prime-sys-color-surface-raised);
+}
+
+/* Один корневой узел (например обёртка графика) заполняет доступную высоту Body. */
+.body > *:only-child {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-self: stretch;
+  width: 100%;
 }

@@ -1,8 +1,5 @@
 import { DashboardCard } from "@/components/dashboard-card/DashboardCard";
-import { Typography } from "@/components/typography/Typography";
 import { Icon } from "@/icons";
-
-import styles from "./section.module.css";
 
 export default function DashboardCardSectionSnippet() {
   return (
@@ -14,10 +11,7 @@ export default function DashboardCardSectionSnippet() {
         </DashboardCard.SectionTrailing>
       </DashboardCard.SectionHeader>
       <DashboardCard.Body>
-        <div className={styles.chartPlaceholder} aria-hidden="true" />
-        <Typography.Root variant="body-small" tone="muted">
-          Placeholder for a chart component — use your charting library inside Body.
-        </Typography.Root>
+        <div aria-hidden="true" />
       </DashboardCard.Body>
     </DashboardCard.Root>
   );
