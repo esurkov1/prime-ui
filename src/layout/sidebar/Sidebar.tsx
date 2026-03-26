@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 
 import { Divider } from "@/components/divider/Divider";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Typography } from "@/components/typography/Typography";
 import { cx } from "@/internal/cx";
 import { Slot } from "@/internal/slot";
@@ -437,12 +438,85 @@ SidebarMenuAction.displayName = "SidebarMenuAction";
 export type SidebarMenuButtonProps = React.ComponentPropsWithoutRef<"button"> & {
   active?: boolean;
   asChild?: boolean;
+  tooltip?: React.ReactNode;
 };
 
+function extractTextFromNode(node: unknown): string {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+  if (Array.isArray(node)) {
+    return node.map((item) => extractTextFromNode(item)).join(" ");
+  }
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return extractTextFromNode(node.props.children);
+  }
+  return "";
+}
+
+function resolveMenuTooltipContent(
+  explicitTooltip: React.ReactNode | undefined,
+  fallbackNode: unknown,
+): React.ReactNode | null {
+  if (explicitTooltip !== undefined && explicitTooltip !== null) {
+    if (typeof explicitTooltip === "string") {
+      const normalized = explicitTooltip.trim();
+      return normalized.length > 0 ? normalized : null;
+    }
+    return explicitTooltip;
+  }
+
+  const fallbackText = extractTextFromNode(fallbackNode).trim();
+  return fallbackText.length > 0 ? fallbackText : null;
+}
+
+function SidebarCompactTooltip({
+  content,
+  children,
+}: {
+  content: React.ReactNode | null;
+  children: React.ReactElement;
+}) {
+  const { state, isMobile } = useSidebarContext();
+  const shouldShowTooltip = !isMobile && state === "compact" && content !== null;
+
+  if (!shouldShowTooltip) {
+    return children;
+  }
+
+  return (
+    <Tooltip.Provider delayDuration={0}>
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <span className={styles.menuTooltipAnchor}>{children}</span>
+        </Tooltip.Trigger>
+        <Tooltip.Content side="right" size="l">
+          {content}
+        </Tooltip.Content>
+      </Tooltip.Root>
+    </Tooltip.Provider>
+  );
+}
+
 const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
-  ({ className, active, asChild = false, disabled, onClick, type = "button", ...rest }, ref) => {
+  (
+    {
+      className,
+      active,
+      asChild = false,
+      disabled,
+      onClick,
+      type = "button",
+      tooltip,
+      children,
+      ...rest
+    },
+    ref,
+  ) => {
+    const tooltipContent = resolveMenuTooltipContent(tooltip, rest["aria-label"] ?? children);
+
     if (asChild) {
-      return (
+      const element = (
         <Slot
           {...rest}
           ref={ref as React.Ref<HTMLElement>}
@@ -456,11 +530,15 @@ const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonP
                 }
               : onClick
           }
-        />
+        >
+          {children}
+        </Slot>
       );
+
+      return <SidebarCompactTooltip content={tooltipContent}>{element}</SidebarCompactTooltip>;
     }
 
-    return (
+    const element = (
       <button
         {...rest}
         ref={ref}
@@ -469,8 +547,12 @@ const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonP
         className={cx(styles.menuButton, className)}
         data-active={active ? "true" : undefined}
         onClick={onClick}
-      />
+      >
+        {children}
+      </button>
     );
+
+    return <SidebarCompactTooltip content={tooltipContent}>{element}</SidebarCompactTooltip>;
   },
 );
 
@@ -490,12 +572,16 @@ const SidebarMenuLink = React.forwardRef<HTMLAnchorElement, SidebarMenuLinkProps
 
 SidebarMenuLink.displayName = "SidebarMenuLink";
 
-export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink>;
+export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink> & {
+  tooltip?: React.ReactNode;
+};
 
 const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRouterLinkProps>(
-  ({ className, ...rest }, ref) => {
+  ({ className, tooltip, ...rest }, ref) => {
+    const tooltipContent = resolveMenuTooltipContent(tooltip, rest["aria-label"] ?? rest.children);
+
     if (typeof className === "function") {
-      return (
+      const element = (
         <NavLink
           ref={ref}
           {...rest}
@@ -504,9 +590,11 @@ const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRou
           }
         />
       );
+      return <SidebarCompactTooltip content={tooltipContent}>{element}</SidebarCompactTooltip>;
     }
 
-    return <NavLink ref={ref} {...rest} className={cx(styles.menuButton, className)} />;
+    const element = <NavLink ref={ref} {...rest} className={cx(styles.menuButton, className)} />;
+    return <SidebarCompactTooltip content={tooltipContent}>{element}</SidebarCompactTooltip>;
   },
 );
 
