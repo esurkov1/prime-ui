@@ -1,19 +1,7 @@
-import type { CSSProperties } from "react";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { Typography } from "@/components/typography/Typography";
 import { IconHouse, IconLayoutGrid, IconMoon, IconSun } from "@/icons";
-
-const srOnly: CSSProperties = {
-  position: "absolute",
-  width: "1px",
-  height: "1px",
-  padding: 0,
-  margin: "-1px",
-  overflow: "hidden",
-  clip: "rect(0, 0, 0, 0)",
-  whiteSpace: "nowrap",
-  border: 0,
-};
+import styles from "./composition.module.css";
 
 export default function SegmentedCompositionSnippet() {
   return (
@@ -46,19 +34,19 @@ export default function SegmentedCompositionSnippet() {
             <SegmentedControl.Icon>
               <IconHouse size="m" />
             </SegmentedControl.Icon>
-            <span style={srOnly}>Лента объявлений</span>
+            <span className={styles.srOnly}>Лента объявлений</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="grid">
             <SegmentedControl.Icon>
               <IconLayoutGrid size="m" />
             </SegmentedControl.Icon>
-            <span style={srOnly}>Сетка карточек</span>
+            <span className={styles.srOnly}>Сетка карточек</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="compact">
             <SegmentedControl.Icon>
               <IconSun size="m" />
             </SegmentedControl.Icon>
-            <span style={srOnly}>Компактные карточки</span>
+            <span className={styles.srOnly}>Компактные карточки</span>
           </SegmentedControl.Item>
         </SegmentedControl.Root>
       </div>

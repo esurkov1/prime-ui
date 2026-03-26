@@ -1,0 +1,29 @@
+.sizesStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.notificationAside {
+  box-sizing: border-box;
+  padding: var(--prime-sys-spacing-x5);
+  max-width: min(100%, 22.5rem);
+  border-radius: var(--prime-sys-shape-radius-m);
+  background: var(--prime-sys-color-surface-accentSoft);
+}
+
+.channelHeading {
+  margin: var(--prime-sys-spacing-m) 0 var(--prime-sys-spacing-s);
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+}
+
+.filterToolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.fileTypeCaption {
+  font-size: var(--prime-sys-typography-sizeScale-s);
+}

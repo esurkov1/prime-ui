@@ -43,10 +43,11 @@ Internal portal: the same quarter switch at four sizes to match table and filter
 
 ```tsx
 import { SegmentedControl } from "prime-ui-kit";
+import styles from "../../../playground/snippets/segmented/segmented-docs.module.css";
 
 export function QuarterPickersByDensity() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div className={styles.sizesStack}>
       {(["s", "m", "l", "xl"] as const).map((size) => (
         <SegmentedControl.Root key={size} defaultValue="q2" size={size}>
           <SegmentedControl.Item value="q1">Q1</SegmentedControl.Item>
@@ -66,16 +67,17 @@ Notifications side panel: digest time as an input field and channel choice via s
 
 ```tsx
 import { Input, SegmentedControl } from "prime-ui-kit";
+import styles from "../../../playground/snippets/segmented/segmented-docs.module.css";
 
 export function NotificationChannelPanel() {
   return (
-    <aside style={{ padding: 20, maxWidth: 360, borderRadius: 12, background: "#f4f4f5" }}>
+    <aside className={styles.notificationAside}>
       <Input.Root id="digest-time" label="Digest time" size="m">
         <Input.Wrapper>
           <Input.Field type="time" defaultValue="09:00" />
         </Input.Wrapper>
       </Input.Root>
-      <p style={{ margin: "16px 0 8px", fontSize: 13, fontWeight: 600 }}>Channel</p>
+      <p className={styles.channelHeading}>Channel</p>
       <SegmentedControl.Root defaultValue="email" size="m">
         <SegmentedControl.Item value="email">Email</SegmentedControl.Item>
         <SegmentedControl.Item value="push">Push</SegmentedControl.Item>
@@ -95,13 +97,14 @@ Media library page: parent holds selected content type and syncs it with the API
 ```tsx
 import * as React from "react";
 import { SegmentedControl } from "prime-ui-kit";
+import styles from "../../../playground/snippets/segmented/segmented-docs.module.css";
 
 export function MediaLibraryFilterBar() {
   const [kind, setKind] = React.useState<"photo" | "video" | "audio">("photo");
 
   return (
-    <header style={{ display: "flex", alignItems: "center", gap: 12 }}>
-      <span style={{ fontSize: 14 }}>File type: {kind}</span>
+    <header className={styles.filterToolbar}>
+      <span className={styles.fileTypeCaption}>File type: {kind}</span>
       <SegmentedControl.Root value={kind} onValueChange={(v) => setKind(v as typeof kind)} size="m">
         <SegmentedControl.Item value="photo">Photo</SegmentedControl.Item>
         <SegmentedControl.Item value="video">Video</SegmentedControl.Item>
