@@ -39,6 +39,11 @@
   gap: var(--prime-sys-size-control-m-gap);
 }
 
+/* Без описания — заголовок и иконка по вертикали по центру строки шапки. */
+.headerNoDescription {
+  align-items: center;
+}
+
 .title {
   line-height: 1.2;
   font-weight: var(--prime-sys-typography-title-weight);

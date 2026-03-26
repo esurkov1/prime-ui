@@ -301,23 +301,29 @@ function ModalHeader({
   const { onClose } = useModalContext();
   const { titleId, descId, registerHeader } = useModalContentShell();
 
+  const hasDescription = description != null && description !== "";
+
   React.useLayoutEffect(() => {
     registerHeader({
-      hasDescription: description != null && description !== "",
+      hasDescription,
     });
     return () => {
       registerHeader(null);
     };
-  }, [description, registerHeader]);
+  }, [hasDescription, registerHeader]);
+
 
   return (
-    <header className={cx(styles.header, className)} {...rest}>
+    <header
+      className={cx(styles.header, !hasDescription && styles.headerNoDescription, className)}
+      {...rest}
+    >
       {icon && <div className={styles.headerIcon}>{icon}</div>}
       <div className={styles.headText}>
         <h2 id={titleId} className={styles.title}>
           {title}
         </h2>
-        {description != null && description !== "" ? (
+        {hasDescription ? (
           <p id={descId} className={styles.description}>
             {description}
           </p>
