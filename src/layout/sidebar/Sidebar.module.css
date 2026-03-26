@@ -5,7 +5,7 @@
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
   --sb-control-height: var(--prime-sys-size-control-m-height);
-  --sb-floating-toggle-size: var(--prime-sys-size-control-s-height);
+  --sb-floating-toggle-size: calc(var(--sb-control-height) - var(--prime-sys-unit-8px));
 
   --sb-panel-padding-inline: var(--prime-sys-spacing-x2);
   --sb-panel-padding-block: var(--prime-sys-spacing-x2);
@@ -114,20 +114,17 @@
 }
 
 .header {
-  display: flex;
   flex: 0 0 auto;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x1);
   min-width: 0;
+  padding: 0;
 }
 
 .headerRow {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: var(--prime-sys-spacing-x2);
   min-width: 0;
-  min-height: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
-  block-size: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
 }
 
 .headerMain {
@@ -146,19 +143,21 @@
 }
 
 .footer {
-  display: flex;
   flex: 0 0 auto;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x1);
   margin-top: auto;
   min-width: 0;
+  padding: 0;
 }
 
 .footerInset {
-  padding: var(--prime-sys-spacing-x2);
+  padding: var(--prime-sys-spacing-x3);
   border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   border-radius: var(--prime-sys-shape-radius-m);
-  background: color-mix(in srgb, var(--prime-sys-color-surface-default) 88%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-surface-elevated) 92%,
+    var(--prime-sys-color-surface-default)
+  );
 }
 
 .group {

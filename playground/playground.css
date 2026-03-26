@@ -841,6 +841,33 @@ h3 {
   background: var(--prime-sys-color-action-primaryBackground);
 }
 
+.playgroundSidebarPanel {
+  position: relative;
+}
+
+.playgroundSidebarEdgeToggle {
+  position: absolute;
+  z-index: var(--prime-sys-elevation-zIndex-popover);
+  inset-block-start: calc(var(--prime-sys-spacing-x2) + var(--prime-sys-size-control-m-height));
+  inset-inline-end: 0;
+  transform: translate(50%, -50%);
+  width: var(--prime-sys-size-control-s-height);
+  min-width: var(--prime-sys-size-control-s-height);
+  max-width: var(--prime-sys-size-control-s-height);
+  min-height: var(--prime-sys-size-control-s-height);
+  padding: 0;
+  font-size: 0.875rem;
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  background: var(--prime-sys-color-surface-elevated);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+@media (max-width: 47.999rem) {
+  .playgroundSidebarEdgeToggle {
+    display: none;
+  }
+}
+
 .playgroundSidebarTitle {
   font-weight: var(--prime-sys-typography-weight-medium);
   color: var(--prime-sys-color-content-primary);
