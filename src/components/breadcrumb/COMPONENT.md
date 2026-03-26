@@ -2,138 +2,57 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-A composite breadcrumb component: a `nav` with an `ol` list, link or plain-text items for the current page, optional separators, and an ellipsis for long paths.
+A composite breadcrumb: a `nav` with an ordered list (`ol`) of segments—links via `LinkButton`, plain text, optional custom separators, and an optional ellipsis for collapsed middle segments. `Root` sets type scale and control size for links, the current segment, the ellipsis, and the default separator icon.
 
-## What it’s for
+**When to use**
 
-- **Storefront and catalog** — show the path “home → category → subcategory → product” and jump up a level quickly.
-- **Account and operational screens** — orient users in flows like “orders → order detail” without hunting through the menu.
-- **Knowledge base and docs** — long section trees with the middle of the path collapsed behind an ellipsis.
+- **Hierarchical paths** — storefront, catalog, or docs where users jump to a parent level without opening the main menu.
+- **Deep screens** — account, orders, or admin flows where the trail clarifies “where am I” (e.g. orders → order detail).
+- **Long trails** — show root, near parent, and leaf while collapsing the middle with `Ellipsis`.
 
-## Use cases
+**When not to use**
 
-Each example stands on its own; scenarios do not repeat the same task.
+- **Primary navigation** — use the main nav or sidebar for top-level IA; breadcrumbs are supplemental.
+- **Flat IA** — a single section or two levels rarely needs a trail; a page title or back control may be enough.
+- **Interactive “collapsed path”** — `Ellipsis` is static text, not a menu; build a dropdown or popover separately if users must pick hidden levels.
+- **Replacing a page title** — breadcrumbs orient; they do not substitute a clear `h1` or heading for the page.
 
-### Basic
+## Composition
 
-Typical chain: all parents are clickable, the last item is the current page.
+- **`Breadcrumb.Root`** renders `nav` (default `aria-label="Breadcrumb"`) and a single **`ol`**. Put **`Breadcrumb.Item`**, **`Breadcrumb.Separator`**, and **`Breadcrumb.Ellipsis`** only as **direct children** of that list (each part renders an `li`).
+- **Typical pattern:** `[Item] [Separator] [Item] [Separator] … [Item]`; use **`Ellipsis`** between separators when the path is long. Order is flexible, but stray non-`li` children would break list semantics—stick to these parts.
+- **`Item` with `href`** renders a **`LinkButton`**; **`Item` without `href`** renders a **`span`** (use **`current`** on the last segment for current-page styling and `aria-current="page"`).
+- **`Separator`** defaults to a chevron **`Icon`** (`nav.chevronRight`, `tone="subtle"`). Override with **`children`** (e.g. `/`) for a custom glyph or text.
+- **`Root`** provides breadcrumb **`size`** to nested parts via context and **`ControlSizeProvider`**.
+
+### Minimal example
 
 ```tsx
 import { Breadcrumb } from "prime-ui-kit";
 
-export function OrderBreadcrumb() {
+export function Example() {
   return (
     <Breadcrumb.Root>
       <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
       <Breadcrumb.Separator />
-      <Breadcrumb.Item href="/orders">Orders</Breadcrumb.Item>
-      <Breadcrumb.Separator />
-      <Breadcrumb.Item current>Order #1042</Breadcrumb.Item>
+      <Breadcrumb.Item current>Current page</Breadcrumb.Item>
     </Breadcrumb.Root>
   );
 }
 ```
 
-### Sizes
+## Rules
 
-Same navigation pattern in a compact report header: the whole block scales via `size`.
-
-```tsx
-import { Breadcrumb } from "prime-ui-kit";
-
-export function ReportHeaderBreadcrumb() {
-  return (
-    <Breadcrumb.Root size="s">
-      <Breadcrumb.Item href="/analytics">Analytics</Breadcrumb.Item>
-      <Breadcrumb.Separator />
-      <Breadcrumb.Item href="/analytics/2025">2025</Breadcrumb.Item>
-      <Breadcrumb.Separator />
-      <Breadcrumb.Item current>Q1</Breadcrumb.Item>
-    </Breadcrumb.Root>
-  );
-}
-```
-
-### In a narrow column
-
-Learning portal: middle level has no link (module title only), lesson is the current page. In a narrow column items wrap thanks to `flex-wrap` on the list.
-
-```tsx
-import { Breadcrumb } from "prime-ui-kit";
-
-export function CourseLessonBreadcrumb() {
-  return (
-    <div style={{ maxWidth: 240 }}>
-      <Breadcrumb.Root>
-        <Breadcrumb.Item href="/courses">Courses</Breadcrumb.Item>
-        <Breadcrumb.Separator />
-        <Breadcrumb.Item>Module 3</Breadcrumb.Item>
-        <Breadcrumb.Separator />
-        <Breadcrumb.Item current>Introduction</Breadcrumb.Item>
-      </Breadcrumb.Root>
-    </div>
-  );
-}
-```
-
-### Home icon and custom separator
-
-Support center: first hop is icon-only (needs `aria-label`), levels separated by a slash instead of a chevron via `children` on `Separator`. The `itemHome` class aligns the icon in the breadcrumb style module (in the kit repo — `@/components/breadcrumb/Breadcrumb.module.css`; use an equivalent class in your app).
-
-```tsx
-import { Breadcrumb, Icon } from "prime-ui-kit";
-import styles from "@/components/breadcrumb/Breadcrumb.module.css";
-
-export function HelpBreadcrumb() {
-  return (
-    <Breadcrumb.Root>
-      <Breadcrumb.Item href="/help" className={styles.itemHome} aria-label="Help">
-        <Icon name="nav.home" tone="default" />
-      </Breadcrumb.Item>
-      <Breadcrumb.Separator>/</Breadcrumb.Separator>
-      <Breadcrumb.Item href="/help/billing">Billing</Breadcrumb.Item>
-      <Breadcrumb.Separator>/</Breadcrumb.Separator>
-      <Breadcrumb.Item current>Refunds</Breadcrumb.Item>
-    </Breadcrumb.Root>
-  );
-}
-```
-
-### Long path and Ellipsis
-
-Deep catalog structure: the middle of the path is collapsed into `Ellipsis`; root, nearest parent, and leaf stay visible.
-
-```tsx
-import { Breadcrumb } from "prime-ui-kit";
-
-export function DeepCatalogBreadcrumb() {
-  return (
-    <Breadcrumb.Root>
-      <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-      <Breadcrumb.Separator />
-      <Breadcrumb.Item href="/catalog">Catalog</Breadcrumb.Item>
-      <Breadcrumb.Separator />
-      <Breadcrumb.Ellipsis />
-      <Breadcrumb.Separator />
-      <Breadcrumb.Item href="/catalog/furniture/chairs/office">Office chairs</Breadcrumb.Item>
-      <Breadcrumb.Separator />
-      <Breadcrumb.Item current>Model X</Breadcrumb.Item>
-    </Breadcrumb.Root>
-  );
-}
-```
-
-## Anatomy
-
-`Breadcrumb.Root` (`nav` → `ol`) may contain, in any order:
-
-- `Breadcrumb.Item` — `li` with `LinkButton` (if `href` is set) or `span` (otherwise; with `current` — current-page styling and `aria-current="page"`).
-- `Breadcrumb.Separator` — `li` with `aria-hidden`, between items; default is a chevron icon.
-- `Breadcrumb.Ellipsis` — `li` with an ellipsis character.
-
-`Root` provides size context (`BreadcrumbSizeContext` and `ControlSizeProvider`) for links and icons.
+- **Current page:** set **`current`** on the segment that represents the active page. **`aria-current="page"`** is applied only on the **non-link** branch (`span`); if **`href`** is set, the item is always a link and does **not** receive **`aria-current`**—for a proper current-page marker, omit **`href`** on that item and use **`current`**.
+- **No controlled “value” API** — markup is presentational; URLs and navigation are app-owned. There is no **`asChild`** on these parts.
+- **`Item` props are not an escape hatch** — only **`href`**, **`current`**, **`children`**, **`className`**, and **`aria-label`** are supported; extra **`li`** attributes are not forwarded.
+- **Icon-only first item** — set a meaningful **`aria-label`** on **`Item`** when **`href`** is set and **`children`** has no visible text.
+- **Override root label** — pass your own **`aria-label`** (or other **`nav`** attributes) via **`Root`** **`...rest`** after the documented props; defaults can be overridden per HTML merging rules.
+- **Separators** — **`aria-hidden="true"`** on **`Separator`** so assistive tech ignores decorative dividers; keep meaningful order in **`Item`** text instead.
+- **List layout** — items use flex with wrap in styles; very narrow layouts may wrap segments; do not rely on breadcrumbs as the only orientation cue on mobile if the path is long.
+- **No disabled, loading, or error props** — not part of this API.
 
 ## API
 
@@ -141,66 +60,35 @@ export function DeepCatalogBreadcrumb() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | yes | `Item`, `Separator`, and `Ellipsis` nodes inside the list |
-| className | `string` | — | no | Extra class on `nav` |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Type scale for links, current page, and ellipsis; separator and home icon size |
-| …rest | `React.HTMLAttributes<HTMLElement>` | — | no | Other `nav` attributes (e.g. your own `aria-label` instead of the default) |
+| children | `React.ReactNode` | — | yes | `Item`, `Separator`, and `Ellipsis` nodes as direct children of the inner `ol` |
+| className | `string` | — | no | Extra class on the `nav` |
+| size | `BreadcrumbSize` | `"m"` | no | Type scale for links, current text, ellipsis, and default separator icon (`"s"` \| `"m"` \| `"l"` \| `"xl"`) |
+| …rest | `React.HTMLAttributes<HTMLElement>` | — | no | Additional attributes on the `nav` (e.g. custom `aria-label`) |
 
 ### Breadcrumb.Item
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| href | `string` | — | no | If set — link; otherwise plain `span` |
-| current | `boolean` | — | no | Current page: styling and `aria-current="page"` |
-| children | `React.ReactNode` | — | no | Label or icon |
-| className | `string` | — | no | Class on `li` (e.g. `itemHome` from breadcrumb module styles for the home icon) |
-| aria-label | `string` | — | no | Required for links without visible text (icon-only) |
+| href | `string` | — | no | If set, renders `LinkButton`; otherwise renders a `span` |
+| current | `boolean` | — | no | Current page styling and `aria-current="page"` on the `span` when there is no `href` |
+| children | `React.ReactNode` | — | no | Label or custom content (e.g. icon) |
+| className | `string` | — | no | Class on the `li` |
+| aria-label | `string` | — | no | For link items without visible text (e.g. icon-only home) |
 
 ### Breadcrumb.Separator
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `React.ReactNode` | `nav.chevronRight` icon | no | Custom separator between items |
-| className | `string` | — | no | Class on `li` |
+| children | `React.ReactNode` | `Icon` `nav.chevronRight` (`tone="subtle"`) | no | Custom separator content |
+| className | `string` | — | no | Class on the `li` |
 
 ### Breadcrumb.Ellipsis
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| className | `string` | — | no | Class on `li` with the “…” character |
+| className | `string` | — | no | Class on the `li` that displays the ellipsis character |
 
-## Variants
+## Related
 
-There is no separate `variant` prop. Visual hierarchy comes from:
-
-- `size` on the root (`s` … `xl`);
-- muted link color and stronger contrast for the current page (module styles);
-- custom `children` on `Separator` (chevron, slash, text).
-
-## States
-
-- **Link** — `Item` with `href`: interactive `LinkButton`, hover/focus from the link button.
-- **Current page** — `Item` with `current` and no `href`: `span` with `aria-current="page"` and the current-item class.
-- **Inactive segment** — `Item` without `href` and without `current`: plain `span` (e.g. section title with no URL).
-
-Breadcrumbs expose no explicit `disabled`, `loading`, or `error` props.
-
-## Accessibility (a11y)
-
-- Root is `nav` with default `aria-label="Breadcrumb"`; override with root attributes if needed.
-- Path is an ordered `ol` / `li` list.
-- Current position is marked with `aria-current="page"` on the matching item.
-- Separators are hidden from the accessibility tree (`aria-hidden`).
-- For icon-only links, set a meaningful `aria-label` on `Item`.
-
-## Limitations and notes
-
-- No `asChild` mode and no built-in “controlled” state — this is presentational path markup; data and navigation are app-owned.
-- `Ellipsis` does not expand or open a menu: it is a static marker; a full collapsed path with a dropdown must be composed separately.
-- Extra attributes on `Item` (beyond those in the API) are not forwarded — extend only by changing the source or wrapping.
-
-## Related components
-
-- **LinkButton** — inside `Item` with `href` for kit-styled links.
-- **Icon** — default chevron in `Separator` and icon-only first item.
-- **Typography** — when you need a page title or section caption next to breadcrumbs.
+- [LinkButton](../link-button/COMPONENT.md) — used inside `Item` when `href` is set.
+- [Typography](../typography/COMPONENT.md) — for page titles or captions next to the trail.
