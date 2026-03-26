@@ -393,20 +393,16 @@
 
 .identityButton {
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: var(--sb-item-icon-col) minmax(0, var(--sb-item-label-col)) var(
-      --sb-item-trailing-col
-    );
+  display: inline-flex;
   align-items: center;
-  column-gap: var(--sb-item-gap);
+  gap: var(--sb-item-gap);
   width: var(--sb-item-width);
   min-width: var(--sb-item-min-width);
   max-width: var(--sb-item-max-width);
   min-height: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
-  height: 100%;
   margin-inline-start: var(--sb-item-offset-inline-start);
   padding-inline: var(--sb-item-padding-inline);
-  padding-block: 0;
+  padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
   border: 0;
   border-radius: var(--prime-sys-size-control-m-radius);
   background: transparent;
@@ -419,8 +415,7 @@
     min-width var(--sb-transition-duration) var(--sb-transition-ease),
     max-width var(--sb-transition-duration) var(--sb-transition-ease),
     margin-inline-start var(--sb-transition-duration) var(--sb-transition-ease),
-    grid-template-columns var(--sb-transition-duration) var(--sb-transition-ease),
-    column-gap var(--sb-transition-duration) var(--sb-transition-ease),
+    gap var(--sb-transition-duration) var(--sb-transition-ease),
     padding-inline var(--sb-transition-duration) var(--sb-transition-ease),
     background-color var(--sb-transition-duration) var(--sb-transition-ease),
     color var(--sb-transition-duration) var(--sb-transition-ease),
@@ -445,7 +440,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  justify-self: center;
   width: var(--prime-sys-size-avatar-m-size);
   height: var(--prime-sys-size-avatar-m-size);
   flex-shrink: 0;
@@ -453,6 +447,7 @@
 
 .identityButtonMain {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
   gap: var(--prime-sys-unit-2px);
@@ -484,8 +479,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  justify-self: end;
+  margin-inline-start: auto;
   flex-shrink: 0;
+  font-size: var(--prime-sys-size-control-m-icon);
   color: var(--prime-sys-color-content-secondary);
   opacity: var(--sb-item-trailing-opacity);
   transform: scale(var(--sb-item-trailing-scale));
@@ -614,6 +610,11 @@
     background-color var(--sb-transition-duration) var(--sb-transition-ease),
     color var(--sb-transition-duration) var(--sb-transition-ease),
     opacity var(--sb-transition-duration) var(--sb-transition-ease);
+}
+
+.floatingToggle[data-side="right"] {
+  inset-inline-start: auto;
+  inset-inline-end: calc(env(safe-area-inset-right, 0px) + var(--prime-sys-spacing-x2));
 }
 
 .floatingToggle:hover {

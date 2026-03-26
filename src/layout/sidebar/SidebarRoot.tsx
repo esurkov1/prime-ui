@@ -1,5 +1,6 @@
-import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from "lucide-react";
 import * as React from "react";
+import { createPortal } from "react-dom";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { useOverlayModal } from "@/hooks/useOverlayModal";
@@ -166,6 +167,12 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
 
   const openState = layoutState !== "hidden";
   const mobileOpen = Boolean(responsive) && isMobile && openState;
+  const showFloatingToggle = isMobile ? !openState : true;
+
+  const [floatingPortalReady, setFloatingPortalReady] = React.useState(false);
+  React.useLayoutEffect(() => {
+    setFloatingPortalReady(true);
+  }, []);
 
   const closeMobile = React.useCallback(() => {
     setLayoutState("hidden");
@@ -174,6 +181,38 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
   const navAreaRef = useOverlayModal<HTMLDivElement>(mobileOpen, closeMobile);
 
   const navPanelId = React.useId();
+
+  const floatingToggleLabel = React.useMemo(() => {
+    if (isMobile) {
+      return side === "left" ? "Открыть сайдбар" : "Открыть сайдбар справа";
+    }
+
+    if (layoutState === "expanded") {
+      return side === "left" ? "Свернуть сайдбар" : "Свернуть сайдбар справа";
+    }
+
+    return side === "left" ? "Развернуть сайдбар" : "Развернуть сайдбар справа";
+  }, [isMobile, layoutState, side]);
+
+  const floatingToggleIcon = React.useMemo(() => {
+    if (isMobile || layoutState === "hidden") {
+      return side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />;
+    }
+
+    if (layoutState === "expanded") {
+      return side === "left" ? <PanelLeftClose size="1em" /> : <PanelRightClose size="1em" />;
+    }
+
+    return side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />;
+  }, [isMobile, layoutState, side]);
+
+  const onFloatingToggleClick = React.useCallback(() => {
+    if (isMobile) {
+      setLayoutState("expanded");
+      return;
+    }
+    toggleOpen();
+  }, [isMobile, setLayoutState, toggleOpen]);
 
   const contextValue = React.useMemo(
     () => ({
@@ -224,19 +263,23 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
           {children}
         </div>
 
-        {Boolean(responsive) && isMobile && !openState ? (
-          <button
-            type="button"
-            className={styles.floatingToggle}
-            onClick={() => setLayoutState("expanded")}
-            aria-label={side === "left" ? "Открыть сайдбар" : "Открыть сайдбар справа"}
-            aria-controls={navPanelId}
-          >
-            <span className={styles.menuIcon} aria-hidden="true">
-              {side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />}
-            </span>
-          </button>
-        ) : null}
+        {showFloatingToggle && floatingPortalReady && typeof document !== "undefined"
+          ? createPortal(
+              <button
+                type="button"
+                className={styles.floatingToggle}
+                onClick={onFloatingToggleClick}
+                aria-label={floatingToggleLabel}
+                aria-controls={navPanelId}
+                data-side={side}
+              >
+                <span className={styles.menuIcon} aria-hidden="true">
+                  {floatingToggleIcon}
+                </span>
+              </button>,
+              document.body,
+            )
+          : null}
       </aside>
     </SidebarProvider>
   );
