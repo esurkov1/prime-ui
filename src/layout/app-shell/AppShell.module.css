@@ -1,6 +1,6 @@
 .layoutRoot {
   --app-sidebar-expanded: 18rem;
-  --app-sidebar-compact: 4.5rem;
+  --app-sidebar-compact: 10.5rem;
 
   box-sizing: border-box;
   display: grid;

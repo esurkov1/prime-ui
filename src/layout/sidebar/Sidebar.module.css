@@ -1,6 +1,6 @@
 .root {
   --sb-expanded-width: 18rem;
-  --sb-compact-width: 4.5rem;
+  --sb-compact-width: 10.5rem;
   --sb-visible-width: var(--sb-expanded-width);
   --sb-inline-sign: -1;
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
@@ -410,22 +410,18 @@
     display: none;
   }
 
-  .root[data-state="compact"] .group,
-  .root[data-state="compact"] .header,
-  .root[data-state="compact"] .footer,
-  .root[data-state="compact"] .navPanelBody {
-    align-items: center;
+  .root[data-state="compact"] .navPanel {
+    padding-inline: var(--prime-sys-spacing-x1);
   }
 
-  .root[data-state="compact"] .menuItem {
-    justify-content: center;
+  .root[data-state="compact"] .menu {
+    gap: var(--prime-sys-spacing-x1);
   }
 
   .root[data-state="compact"] .menuButton,
-  .root[data-state="compact"] .itemButton,
-  .root[data-state="compact"] .navCategoryTrigger,
-  .root[data-state="compact"] .identityButton {
-    justify-content: center;
+  .root[data-state="compact"] .itemButton {
+    justify-content: flex-start;
+    padding-inline: var(--prime-sys-spacing-x2);
   }
 
   .root[data-state="compact"] .menuLabel,
@@ -442,14 +438,32 @@
     border: 0;
   }
 
+  .root[data-state="compact"] .identityButton {
+    justify-content: center;
+    padding-inline: var(--prime-sys-spacing-x1);
+  }
+
+  .root[data-state="compact"] .group {
+    align-items: stretch;
+  }
+
   .root[data-state="compact"] .groupLabel,
   .root[data-state="compact"] .navPanelHeading,
   .root[data-state="compact"] .navCategoryLabel {
     max-width: 100%;
-    text-align: center;
+    text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .root[data-state="compact"] .navCategoryTrigger {
+    justify-content: flex-start;
+    padding-inline: var(--prime-sys-spacing-x2);
+  }
+
+  .root[data-state="compact"] .navCategoryTrigger > :global(svg) {
+    display: none;
   }
 }
 
