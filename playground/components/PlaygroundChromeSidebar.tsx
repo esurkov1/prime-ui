@@ -1,21 +1,65 @@
 import {
+  AlignLeft,
+  Award,
+  Bell,
+  Bookmark,
   BookOpen,
+  Calendar,
+  CheckSquare,
+  ChevronDown,
+  ChevronsDownUp,
+  ChevronsLeftRight,
+  ChevronsRight,
+  ChevronsUpDown,
+  CircleDot,
+  CircleGauge,
+  CircleHelp,
+  Code2,
+  Command,
   FileText,
+  Frame,
+  Hash,
   HelpCircle,
+  Info,
+  Keyboard,
+  Layers,
+  LayoutDashboard,
   LayoutGrid,
+  LayoutList,
+  LayoutTemplate,
+  Link2,
+  ListOrdered,
   LogOut,
+  Maximize2,
+  Megaphone,
+  MessageSquare,
+  Minus,
+  MousePointerClick,
+  Package,
   Palette,
+  PanelLeft,
+  PanelRight,
+  PanelTop,
+  Pipette,
+  Plug,
+  Ruler,
+  ScrollText,
   Settings,
   SlidersHorizontal,
+  StretchHorizontal,
   SunMoon,
+  Table,
+  Tag,
+  TextCursorInput,
+  ToggleLeft,
+  Type,
+  Upload,
   UserRound,
-  Wrench,
 } from "lucide-react";
 import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { Icon } from "@/icons";
 import { Sidebar } from "@/layout";
 
 import { getPlaygroundNavModel } from "../playgroundPages";
@@ -32,12 +76,110 @@ function toRoute(segment: string): string {
   return segment === "" ? "/" : `/${segment}`;
 }
 
-function categoryIcon(label: string): React.ReactNode {
-  const normalized = label.trim().toLowerCase();
-  if (normalized.includes("foundation")) return <LayoutGrid size={16} strokeWidth={2} />;
-  if (normalized.includes("action")) return <Wrench size={16} strokeWidth={2} />;
-  if (normalized.includes("form")) return <SlidersHorizontal size={16} strokeWidth={2} />;
-  return <FileText size={16} strokeWidth={2} />;
+const navIconProps = { size: 16, strokeWidth: 2 as const };
+
+/** Иконка пункта по маршруту — соответствует смыслу раздела, а не только категории. */
+function pageIcon(segment: string): React.ReactNode {
+  switch (segment) {
+    case "color":
+      return <Palette {...navIconProps} />;
+    case "typography":
+      return <Type {...navIconProps} />;
+    case "kbd":
+      return <Keyboard {...navIconProps} />;
+    case "divider":
+      return <Minus {...navIconProps} />;
+    case "buttons":
+      return <MousePointerClick {...navIconProps} />;
+    case "button-group":
+      return <Layers {...navIconProps} />;
+    case "link-button":
+      return <Link2 {...navIconProps} />;
+    case "checkbox":
+      return <CheckSquare {...navIconProps} />;
+    case "color-picker":
+      return <Pipette {...navIconProps} />;
+    case "datepicker":
+      return <Calendar {...navIconProps} />;
+    case "digit-input":
+      return <Hash {...navIconProps} />;
+    case "file-upload":
+      return <Upload {...navIconProps} />;
+    case "hint":
+      return <Info {...navIconProps} />;
+    case "input":
+      return <TextCursorInput {...navIconProps} />;
+    case "label":
+      return <Bookmark {...navIconProps} />;
+    case "radio":
+      return <CircleDot {...navIconProps} />;
+    case "select":
+      return <ChevronsUpDown {...navIconProps} />;
+    case "slider":
+      return <SlidersHorizontal {...navIconProps} />;
+    case "switch":
+      return <ToggleLeft {...navIconProps} />;
+    case "textarea":
+      return <AlignLeft {...navIconProps} />;
+    case "avatar":
+      return <UserRound {...navIconProps} />;
+    case "badge":
+      return <Award {...navIconProps} />;
+    case "dashboard-card":
+      return <LayoutDashboard {...navIconProps} />;
+    case "code-block":
+      return <Code2 {...navIconProps} />;
+    case "data-table":
+      return <Table {...navIconProps} />;
+    case "tag":
+      return <Tag {...navIconProps} />;
+    case "banner":
+      return <Megaphone {...navIconProps} />;
+    case "notification":
+      return <Bell {...navIconProps} />;
+    case "progress-bar":
+      return <StretchHorizontal {...navIconProps} />;
+    case "progress-circle":
+      return <CircleGauge {...navIconProps} />;
+    case "accordion":
+      return <ChevronsDownUp {...navIconProps} />;
+    case "app-shell":
+      return <LayoutTemplate {...navIconProps} />;
+    case "page-content":
+      return <PanelTop {...navIconProps} />;
+    case "scroll-container":
+      return <ScrollText {...navIconProps} />;
+    case "sidebar":
+      return <PanelLeft {...navIconProps} />;
+    case "breadcrumb":
+      return <ChevronsRight {...navIconProps} />;
+    case "pagination":
+      return <ChevronsLeftRight {...navIconProps} />;
+    case "segmented-control":
+      return <LayoutGrid {...navIconProps} />;
+    case "stepper":
+      return <ListOrdered {...navIconProps} />;
+    case "tabs":
+      return <LayoutList {...navIconProps} />;
+    case "command-menu":
+      return <Command {...navIconProps} />;
+    case "drawer":
+      return <PanelRight {...navIconProps} />;
+    case "dropdown":
+      return <ChevronDown {...navIconProps} />;
+    case "modal":
+      return <Maximize2 {...navIconProps} />;
+    case "popover":
+      return <MessageSquare {...navIconProps} />;
+    case "tooltip":
+      return <CircleHelp {...navIconProps} />;
+    case "control-size":
+      return <Ruler {...navIconProps} />;
+    case "example-frame":
+      return <Frame {...navIconProps} />;
+    default:
+      return <FileText {...navIconProps} />;
+  }
 }
 
 function PlaygroundPanelRow({ item }: { item: PlaygroundMenuItem }) {
@@ -74,7 +216,7 @@ function PlaygroundTreeMenu() {
             item={{
               label: nav.intro.label,
               to: toRoute(nav.intro.segment),
-              icon: <BookOpen size={16} strokeWidth={2} />,
+              icon: <BookOpen {...navIconProps} />,
             }}
           />
         </Sidebar.Menu>
@@ -90,7 +232,7 @@ function PlaygroundTreeMenu() {
                 item={{
                   label: page.label,
                   to: toRoute(page.segment),
-                  icon: categoryIcon(category.label),
+                  icon: pageIcon(page.segment),
                 }}
               />
             ))}
@@ -131,7 +273,7 @@ function PlaygroundBrandMenu() {
                 color: "var(--prime-sys-color-action-primaryForeground)",
               }}
             >
-              <Icon name="nav.layoutGrid" size="m" />
+              <Package size="1.25em" strokeWidth={2} />
             </span>
           }
           title="Prime-UI"
@@ -200,7 +342,7 @@ function PlaygroundUserMenu() {
               Профиль и безопасность
             </Dropdown.Item>
             <Dropdown.Item>
-              <Dropdown.ItemIcon as={LayoutGrid} size={16} strokeWidth={2} />
+              <Dropdown.ItemIcon as={Plug} size={16} strokeWidth={2} />
               Интеграции
             </Dropdown.Item>
             <Dropdown.Item>
