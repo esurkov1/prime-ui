@@ -2,186 +2,97 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-A compound on/off toggle: a hidden native input with `role="switch"`, a visible track with a thumb, and slots for label, hint, and error text.
+A compound on/off control: a native `input type="checkbox"` with `role="switch"`, a visual track and thumb, and optional slots for label text, hint, and error wired through `aria-describedby` and invalid state.
 
-## When to use it
+- **When to use** — binary settings (notifications, feature flags, consent) where the UI should read as on/off rather than a small checkbox in a list.
+- **When to use** — forms that need `name`, `value`, or `required` on the underlying input together with hint or error copy under the label column.
+- **When to use** — a single independent toggle per row; state is obvious from the thumb position and `aria-checked`.
+- **When not to use** — picking exactly one option from mutually exclusive alternatives (prefer [Radio](../radio/COMPONENT.md)).
+- **When not to use** — lists with partial selection or an **indeterminate** state (prefer [Checkbox](../checkbox/COMPONENT.md)).
+- **When not to use** — you need `asChild` or fully custom markup; the structure is fixed to `Switch.*` parts and [Label](../label/COMPONENT.md) / [Hint](../hint/COMPONENT.md) primitives.
 
-- **Account and notifications** — quickly enable or disable a channel (email, push, SMS) without a separate “Save” button on every row.
-- **Marketplace and delivery** — toggle an order option (leave at door, contactless) where the meaning is binary, not a pick from a list.
-- **Internal tools** — turn on a ticket-handling rule or auto-summary for the team; state is obvious at a glance.
+## Composition
 
-## Use cases
+- **`Switch.Root`** — field wrapper `div` with `data-size`, `data-variant`, `data-disabled`, `data-invalid`, `data-checked`, `data-readonly`; provides context and **`ControlSizeProvider`** for child parts. Renders **`children` only** (no shortcut that replaces **`Switch.Label`**).
+- **`Switch.Label`** — **`Label.Root`** row: the native switch **`input`**, the decorative **`track`**, and optional label copy; **`htmlFor`** / **`size`** come from context; **`ref`** on **`Root`** is forwarded to this **`input`**.
+- **`Switch.Hint`** — optional; registers hint text and contributes its id to **`aria-describedby`**; uses a dimmed hint variant when the field is **`disabled`**.
+- **`Switch.Error`** — optional; error-styled **[Hint](../hint/COMPONENT.md)** and registers invalid state when mounted (with **`variant="error"`** on **`Root`** when you want error chrome without the slot).
+- **Order:** **`Root`** → **`Label`** (required for the control to exist) → **`Hint`** / **`Error`** below when needed. Public API: **`Switch`** with **`Root`**, **`Label`**, **`Hint`**, **`Error`**.
 
-Each example is a different screen type and prop set; you should not copy one pattern with only different labels.
-
-### Basic
-
-Course flow: the student turns on deadline reminders — one switch and a short label.
+### Minimal example
 
 ```tsx
 import { Switch } from "prime-ui-kit";
 
-export function CourseReminderRow() {
+export function Example() {
   return (
-    <Switch.Root defaultChecked name="deadlineReminders">
+    <Switch.Root defaultChecked name="reminders">
       <Switch.Label>Deadline reminders</Switch.Label>
-      <Switch.Hint>Email two days before and on the deadline</Switch.Hint>
     </Switch.Root>
   );
 }
 ```
 
-### Sizes / variants
+## Rules
 
-Warehouse monitoring panel: the same switches in four sizes to match density with the table and filters.
-
-```tsx
-import { Switch } from "prime-ui-kit";
-
-export function WarehouseDensityPreview() {
-  return (
-    <div className="previewRowWrap rowAlignCenter">
-      <Switch.Root size="s" defaultChecked>
-        <Switch.Label>Auto write-off</Switch.Label>
-      </Switch.Root>
-      <Switch.Root size="m" defaultChecked>
-        <Switch.Label>Auto write-off</Switch.Label>
-      </Switch.Root>
-      <Switch.Root size="l" defaultChecked>
-        <Switch.Label>Auto write-off</Switch.Label>
-      </Switch.Root>
-      <Switch.Root size="xl" defaultChecked>
-        <Switch.Label>Auto write-off</Switch.Label>
-      </Switch.Root>
-    </div>
-  );
-}
-```
-
-### In context (form / modal / sidebar / …)
-
-Pre-payment confirmation: strict consent requirement — validation error text via `Switch.Error`.
-
-```tsx
-import { Switch } from "prime-ui-kit";
-
-export function CheckoutConsentField() {
-  return (
-    <section className="demoBlock previewBannerNarrowColumn">
-      <h4>Terms</h4>
-      <Switch.Root variant="error">
-        <Switch.Label>I accept the offer terms and data policy</Switch.Label>
-        <Switch.Error>You must agree to continue to payment</Switch.Error>
-      </Switch.Root>
-    </section>
-  );
-}
-```
-
-### Controlled mode
-
-Smart home panel: parent holds lamp state and syncs it with the API response after a delay.
-
-```tsx
-import * as React from "react";
-import { Switch } from "prime-ui-kit";
-
-export function LivingRoomLightSwitch() {
-  const [on, setOn] = React.useState(false);
-
-  return (
-    <Switch.Root checked={on} onCheckedChange={setOn}>
-      <Switch.Label>Living room light: {on ? "on" : "off"}</Switch.Label>
-    </Switch.Root>
-  );
-}
-```
-
-## Anatomy
-
-- **`Switch.Root`** — context provider and field wrapper (`div` with `data-size`, `data-variant`, `data-checked`, `data-disabled`, `data-invalid`, `data-readonly`); wraps **`ControlSizeProvider`**.
-- **`Switch.Label`** — **`Label.Root`** with a “switch + text” column: native **`input type="checkbox"`** with **`role="switch"`**, visual **`span.track`**, and optional copy in **`span.text`**.
-- **`Switch.Hint`** and **`Switch.Error`** — wrappers over **`Hint.Root`** with fixed `id`s linked via **`aria-describedby`**; **`Switch.Error`** registers an error in context (affects `aria-invalid` together with `variant="error"`).
-
-Public API: **`Switch`** object with **`Root`**, **`Label`**, **`Hint`**, **`Error`**.
+- **Controlled:** pass **`checked`** with **`onCheckedChange`**. **Uncontrolled:** use **`defaultChecked`** (defaults to **`false`**). User toggles run through the internal change handler; **`onChange`** on **`Root`** is not the switch API—use **`onCheckedChange`** only.
+- **`readOnly`** calls **`preventDefault`** in the change handler so the value does not change on click; **`aria-readonly`** is set on the input.
+- **`variant="error"`** or a mounted **`Switch.Error`** sets **`invalid`** in context, **`aria-invalid`** on the input, and error styling; **`disabled`** disables the input and adjusts hint styling.
+- **`aria-describedby`** on **`Root`** is merged with hint and error ids when those slots are mounted; add your own ids in **`aria-describedby`** if you need extra descriptors.
+- **`Switch.Label`** with no visible **`children`** leaves only the track; set an accessible name with **`aria-label`** or **`aria-labelledby`** on **`Root`** (or ensure context from nearby text).
+- The public props type includes **`label?: React.ReactNode`**, but **`Root`** does not render it as **`Switch.Label`**—always compose **`Switch.Label`** (and optional **`Hint`** / **`Error`**) as **`children`**.
+- Keyboard and role follow the native checkbox pattern with **`role="switch"`** and **`aria-checked`**; focus visibility uses **`focus-visible`** on the track.
+- There is no **indeterminate** or **loading** state; **`size`** on **`Root`** drives layout tokens, not a DOM **`size`** attribute on the input.
 
 ## API
 
 ### Switch.Root
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Track and thumb sizes from switch system tokens. |
-| variant | `"default" \| "error"` | `"default"` | no | Field-level error semantics; combines with presence of `Switch.Error`. |
+|------|------|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Track and thumb scale from switch tokens. |
+| variant | `"default" \| "error"` | `"default"` | no | Error styling; **`invalid`** is also true when **`Switch.Error`** is mounted. |
 | checked | `boolean` | — | no | Controlled on state. |
-| defaultChecked | `boolean` | `false` | no | Uncontrolled initial value. |
-| onCheckedChange | `(checked: boolean) => void` | — | no | Value change after user interaction. |
-| disabled | `boolean` | — | no | Disabled; `data-disabled` on root. |
-| readOnly | `boolean` | — | no | Visible state without change on click; `aria-readonly`. |
-| label | `React.ReactNode` | — | no | Label without child elements; equivalent to a single `Switch.Label` when `children` are omitted. |
-| children | `React.ReactNode` | — | no | Composition of `Label` / `Hint` / `Error`; takes precedence over `label`. |
-| id | `string` | from `useId()` | no | Links label and input. |
-| className | `string` | — | no | Class on the field root `div`. |
-| aria-describedby | `string` | — | no | Extra descriptions; hint and error ids are appended. |
-| …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" \| "size" \| "checked" \| "defaultChecked" \| "onChange">` | — | no | Including `name`, `value`, `required`, `autoFocus`, `aria-*`; `onChange` is not used — only `onCheckedChange`. |
+| defaultChecked | `boolean` | `false` | no | Initial on state when uncontrolled. |
+| onCheckedChange | `(checked: boolean) => void` | — | no | Called after the checked value changes from user input. |
+| disabled | `boolean` | — | no | Disables the input; **`data-disabled`** on the field root. |
+| readOnly | `boolean` | — | no | Prevents toggling; **`data-readonly`** and **`aria-readonly`**. |
+| label | `React.ReactNode` | — | no | Present on the type only; not used to render **`Switch.Label`**—compose **`Switch.Label`** as a child instead. |
+| id | `string` | auto (`useId`) | no | Stable input id; paired with **`Switch.Label`** via **`htmlFor`**. |
+| className | `string` | — | no | Class on the field wrapper **`div`**. |
+| aria-describedby | `string` | — | no | Combined with hint and error ids when those slots exist. |
+| children | `React.ReactNode` | — | no | Typically **`Switch.Label`** and optional **`Switch.Hint`** / **`Switch.Error`**. |
+| ref | `React.Ref<HTMLInputElement>` | — | no | Ref to the native **`input`**. |
+| …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" \| "size" \| "checked" \| "defaultChecked" \| "onChange">` | — | no | Other native attributes forwarded to the **`input`** (e.g. **`name`**, **`value`**, **`required`**, **`autoFocus`**, **`aria-*`**). **`type`** is always **`checkbox`**. |
 
 ### Switch.Label
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| children | `React.ReactNode` | — | no | Text to the right of the switch; without children only the track remains (rare — set a name via `aria-label` on Root). |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | no | Text beside the switch; omit only when an accessible name is provided elsewhere. |
 | className | `string` | — | no | Class on the label row. |
-| …rest | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "htmlFor" \| "size">` | — | no | Passed to `Label.Root`; `htmlFor` and `size` come from context. |
+| …rest | `Omit<React.HTMLAttributes<HTMLLabelElement>, "htmlFor" \| "size">` | — | no | Other label attributes; **`htmlFor`** and **`size`** are managed internally. |
 
 ### Switch.Hint
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| children | `React.ReactNode` | — | yes | Hint text. |
-| className | `string` | — | no | Class on the slot with margin under the text column. |
-| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Attributes on `Hint` root; `id` is fixed. |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | yes | Supplementary text below the label. |
+| className | `string` | — | no | Class on the hint slot. |
+| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Paragraph attributes; **`id`** is managed internally. |
 
 ### Switch.Error
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| children | `React.ReactNode` | — | yes | Error text. |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | yes | Error message text. |
 | className | `string` | — | no | Class on the error block. |
-| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Attributes on `Hint` root with error variant. |
+| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Paragraph attributes; **`id`** is managed internally. |
 
-## Variants
+## Related
 
-- **`default`** — neutral track border; when on, filled with accent color.
-- **`error`** — error-colored border and `aria-invalid` on the input (same as when **`Switch.Error`** is present).
-
-## States
-
-- **On / off** — `checked` / `defaultChecked` and thumb position; `aria-checked` stays in sync with DOM `checked`.
-- **Disabled** — `disabled`: click does not change value; hint uses `disabled` variant on `Hint`.
-- **Read-only** — `readOnly`: `preventDefault` in handler; user cannot change value.
-- **Error** — `variant="error"` and/or child **`Switch.Error`**: `aria-invalid`, red track border.
-
-There is no **loading** or **indeterminate** state for the switch.
-
-## Accessibility (a11y)
-
-- **`switch`** role, **`aria-checked`**, keyboard same as checkbox (including **Space** when focused).
-- Focus visible via **`focus-visible`** on the track (focus ring).
-- **`aria-describedby`** merges external description, **`Switch.Hint`**, and **`Switch.Error`**.
-- **`readOnly`** sets **`aria-readonly`**.
-
-## Limitations and notes
-
-- No **`asChild`**: markup is fixed by **`Switch.*`** components.
-- This is **not** a **`Checkbox`** replacement for lists with partial selection and **`indeterminate`**.
-- For one choice among mutually exclusive options use **`Radio`**, not independent switches.
-- **`label`** on **`Root`** is handy for a single line of text; **`children`** are needed when you also need **`Hint`** or **`Error`**.
-
-## Related components
-
-- **Checkbox** — flags and partial selection in groups.
-- **Radio** — one selected option from a set.
-- **Label** and **Hint** — same primitives inside the switch for consistent typography.
-- **Input** — when you need free-form value, not a binary flag.
+- [Checkbox](../checkbox/COMPONENT.md) — groups, **indeterminate**, and checkbox semantics.
+- [Radio](../radio/COMPONENT.md) — one selected option from a set.
+- [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) — primitives inside the switch; pair with [Input](../input/COMPONENT.md) in larger forms.

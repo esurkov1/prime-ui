@@ -2,154 +2,48 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-A compositional set for file selection: a zone built on a `label` with a hidden `input type="file"`, drag-and-drop support, and separate markup blocks for lists of uploaded files with a format badge and progress.
+Composable UI for choosing files: a `label` wrapping a hidden `input type="file"`, optional drag-and-drop styling, and building blocks for per-file rows (badge, name/meta, progress, actions).
 
-## What it’s for
+**When to use**
 
-- **Hiring and applicants** — uploading résumés and portfolios as PDFs/images with a clear “drag or choose” zone.
-- **E-commerce and marketplaces** — product photos, certificates, and video reviews: `accept` filter, multi-select, and a list of names before sending to the server.
-- **Medical and lab portals** — uploading scans and reports with status cards (in progress / done / error) and a retry button.
-- **User profile** — a round or compact zone for an avatar plus an external button that opens the same `input` via `inputRef`.
-- **B2B and tenders** — attachments to applications in a controlled list: multiple files, clearing, and app-side size validation.
-- **Education and LMS** — student submissions: file type limits and a disabled zone after the deadline via `disabled`.
+- A visible drop zone plus native picker, with `accept`, `multiple`, and optional `disabled`.
+- Drag-and-drop and click on the same target, with `onFilesChange` to feed app or server logic.
+- Lists of uploads styled as cards with `FormatBadge`, typography slots, and optional `ItemProgress`.
+- Dense modal layouts using `DropBody`, `Title`, `BrowseLink`, `ActionsRow`, and `Chip`, often with `inputRef` to open the dialog from nested controls.
 
-## Use cases
+**When not to use**
 
-Import from the `prime-ui-kit` package. Examples cover different products and screens.
+- A headless file field with no shared drop-zone affordance (use a plain `input` or minimal markup).
+- Built-in upload, scanning, or storage integration (only UI and `File[]` callbacks).
+- Automatic list state or remove/retry semantics inside the kit (`Item` is presentational).
+- Scenarios where a non-`label` activation pattern is required without rethinking focus and hit targets.
 
-### Basic
+## Composition
 
-Job application page: one zone; the selected file is shown as text below the zone.
+- **`FileUpload.Root`** — outer `label`, hidden file `input`, `ControlSizeProvider` for descendants. Omit `children` to get the default inner layout (`Icon`, `Title`, `Hint`, `BrowseLabel`). Replace `children` with `DropBody` / `Title` / `BrowseLink` / `ActionsRow` / `Chip` / `ChipLabel` for custom copy; use `inputRef` + `click()` from `BrowseLink` or `Chip` handlers because those elements stop propagation to the `label`.
+- **File row** — `FileUpload.Item` (optional `variant`, `size`) → `ItemRow` → `FormatBadge` and `ItemMain`. Inside `ItemMain`, use `ItemTextGroup` with `ItemName` / `ItemMeta` / `ItemMetaSep`, or `ItemStack` with `ItemTryAgain` for error layouts; optional `ItemActions`. Below the row, optional `ItemProgress` (bar when `value` is set and `children` omitted) or `ItemFooter`.
 
-```tsx
-import * as React from "react";
-import { FileUpload } from "prime-ui-kit";
-
-export function JobApplyUpload() {
-  const [files, setFiles] = React.useState<File[]>([]);
-
-  return (
-    <>
-      <FileUpload.Root
-        accept=".pdf,application/pdf"
-        onFilesChange={(next) => {
-          setFiles(next);
-        }}
-      />
-      {files[0] ? <p>Attached: {files[0].name}</p> : null}
-    </>
-  );
-}
-```
-
-### Variants and sizes
-
-Supplier dashboard: a zone in a card with a solid border and larger size; next to it, a file card in an error state.
+### Minimal example
 
 ```tsx
 import { FileUpload } from "prime-ui-kit";
 
-export function SupplierInvoiceUpload() {
-  return (
-    <>
-      <FileUpload.Root size="l" appearance="solid" multiple />
-      <FileUpload.Item variant="error" size="l">
-        <FileUpload.ItemRow>
-          <FileUpload.FormatBadge format="XLSX" color="green" />
-          <FileUpload.ItemMain>
-            <FileUpload.ItemName>invoice_wrong_currency.xlsx</FileUpload.ItemName>
-            <FileUpload.ItemMeta>
-              <span>Invalid format for the “Amount” column</span>
-            </FileUpload.ItemMeta>
-          </FileUpload.ItemMain>
-        </FileUpload.ItemRow>
-      </FileUpload.Item>
-    </>
-  );
+export function Example() {
+  return <FileUpload.Root />;
 }
 ```
 
-### In context (form / modal / sidebar / …)
+## Rules
 
-Import modal: a `DropBody` column, muted title, a “browse” link, and source chips sharing one `inputRef`.
-
-```tsx
-import * as React from "react";
-import { FileUpload } from "prime-ui-kit";
-
-export function ImportModalDropzone() {
-  const inputRef = React.useRef<HTMLInputElement>(null);
-
-  return (
-    <section>
-      <h2>Import spreadsheet</h2>
-      <FileUpload.Root inputRef={inputRef} appearance="solid" size="m" multiple>
-        <FileUpload.DropBody>
-          <FileUpload.Title tone="muted">
-            Drag a file here or{" "}
-            <FileUpload.BrowseLink type="button" onClick={() => inputRef.current?.click()}>
-              choose from disk
-            </FileUpload.BrowseLink>
-          </FileUpload.Title>
-          <FileUpload.ActionsRow>
-            <FileUpload.Chip type="button" onClick={() => inputRef.current?.click()}>
-              <FileUpload.ChipLabel>Local disk</FileUpload.ChipLabel>
-            </FileUpload.Chip>
-            <FileUpload.Chip type="button">
-              <FileUpload.ChipLabel>Network folder</FileUpload.ChipLabel>
-            </FileUpload.Chip>
-          </FileUpload.ActionsRow>
-        </FileUpload.DropBody>
-      </FileUpload.Root>
-    </section>
-  );
-}
-```
-
-### Controlled mode
-
-Support ticket attachments panel: multiple files, a list of names, and a clear button.
-
-```tsx
-import * as React from "react";
-import { Button, FileUpload } from "prime-ui-kit";
-
-export function SupportTicketAttachments() {
-  const [files, setFiles] = React.useState<File[]>([]);
-
-  return (
-    <>
-      <FileUpload.Root
-        multiple
-        accept="image/*,.pdf,application/pdf"
-        onFilesChange={(next) => {
-          setFiles((prev) => [...prev, ...next]);
-        }}
-      />
-      {files.length > 0 ? (
-        <ul>
-          {files.map((f) => (
-            <li key={`${f.name}-${f.lastModified}`}>{f.name}</li>
-          ))}
-        </ul>
-      ) : null}
-      {files.length > 0 ? (
-        <Button.Root type="button" size="s" variant="neutral" mode="stroke" onClick={() => setFiles([])}>
-          Remove attachments
-        </Button.Root>
-      ) : null}
-    </>
-  );
-}
-```
-
-## Anatomy
-
-**Selection zone:** `FileUpload.Root` (renders `label` + hidden `input`) → by default, inside `ControlSizeProvider`, built-in `Icon`, `Title`, `Hint`, `BrowseLabel`, or custom `children` (`DropBody`, `Title`, `BrowseLink`, `ActionsRow`, `Chip`, …).
-
-**File card:** `FileUpload.Item` → `ItemRow` → `FormatBadge` + `ItemMain` (often `ItemTextGroup` with `ItemName` and `ItemMeta`, or `ItemStack` with an error and `ItemTryAgain`) + optionally `ItemActions`; below the row — `ItemProgress` or `ItemFooter`.
+- After each change or drop, `onFilesChange` receives a `File[]`; the input’s value is cleared so selecting the same file again still fires the callback.
+- When `disabled` is set, the input is disabled, drops are ignored, and `data-disabled` is set on the `label` (`aria-disabled` is mirrored on the input).
+- While a drag hovers the zone, the root `label` has `data-dragover` for styling.
+- `BrowseLink` and `Chip` call `preventDefault` and `stopPropagation` on click — they do not open the picker unless you call `inputRef.current?.click()`.
+- `FileUpload.Icon` and `FileUpload.FormatBadge` set `aria-hidden`; expose file meaning in visible text (e.g. `ItemName` / `ItemMeta`).
+- `ItemProgress` renders `ProgressBar.Root` when `value` is defined and `children` are omitted; with no `value` and no `children`, only the empty wrapper is present.
+- `DropBody` uses `pointer-events: none` on the wrapper so nested controls must remain interactive via nested `pointer-events` (as in the module styles).
 
 ## API
 
@@ -157,41 +51,41 @@ export function SupportTicketAttachments() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Tokens for the zone, text, Browse chip, and Hint context. |
-| appearance | `"dashed" \| "solid"` | `"dashed"` | No | Dashed or solid border and a field-like background. |
-| inputRef | `React.Ref<HTMLInputElement>` | — | No | Access to the hidden input for programmatic `click()`. |
+| size | `FileUploadSize` (`"s" \| "m" \| "l" \| "xl"`) | `"m"` | No | Tokens for the zone, built-in icon, and hint context. |
+| appearance | `FileUploadAppearance` (`"dashed" \| "solid"`) | `"dashed"` | No | Dashed vs solid border and field-like background. |
+| inputRef | `React.Ref<HTMLInputElement>` | — | No | Ref to the hidden input (e.g. programmatic `click()`). |
 | accept | `string` | — | No | Native `accept`. |
 | multiple | `boolean` | — | No | Multi-select in the file dialog. |
-| disabled | `boolean` | — | No | Disables selection and drop; sets `aria-disabled` on the input. |
-| onFilesChange | `(files: File[]) => void` | — | No | After change or drop; the input value is reset. |
-| children | `React.ReactNode` | — | No | Custom zone markup. |
+| disabled | `boolean` | — | No | Disables input and drops. |
+| onFilesChange | `(files: File[]) => void` | — | No | Called after picker change or drop. |
+| children | `React.ReactNode` | — | No | Replaces the default drop-zone body. |
 | className | `string` | — | No | Class on the `label`. |
-| …rest | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "children">` | — | No | `htmlFor`, `id`, ARIA, etc. |
+| …rest | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "children">` | — | No | `id`, `htmlFor`, ARIA, and other label attributes. |
 
 ### FileUpload.Icon
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Wrapper class. |
-| children | `React.ReactNode` | — | No | Usually an icon from the kit. |
-| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | No | Root with `aria-hidden`. |
+| children | `React.ReactNode` | — | No | Icon or other content. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Passed to `span` (`aria-hidden` is set on the component). |
 
 ### FileUpload.Title
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| tone | `"default" \| "muted"` | `"default"` | No | Title text color. |
-| className | `string` | — | No | Paragraph class. |
-| children | `React.ReactNode` | — | No | Text. |
-| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Other `p` attributes. |
+| tone | `"default" \| "muted"` | `"default"` | No | Text emphasis. |
+| className | `string` | — | No | Class on the `p`. |
+| children | `React.ReactNode` | — | No | Title text. |
+| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Other paragraph attributes. |
 
 ### FileUpload.Hint
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| className | `string` | — | No | Class. |
-| children | `React.ReactNode` | — | No | Hint (rendered via `Hint.Root`). |
-| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Size comes from the root zone context. |
+| className | `string` | — | No | Class passed to `Hint.Root`. |
+| children | `React.ReactNode` | — | No | Hint content. |
+| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Forwarded into `Hint.Root`; size follows `Root` context. |
 
 ### FileUpload.BrowseLabel
 
@@ -199,15 +93,15 @@ export function SupportTicketAttachments() {
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | `span` class. |
 | children | `React.ReactNode` | — | No | Browse chip label. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other `span` attributes. |
 
 ### FileUpload.BrowseLink
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Click does not bubble to the `label`. |
-| className | `string` | — | No | Button class. |
-| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | No | Often opens the dialog via `inputRef`. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Button `type`. |
+| className | `string` | — | No | Class on the `button`. |
+| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | No | Invoked after `preventDefault` / `stopPropagation`. |
 | children | `React.ReactNode` | — | No | Link text. |
 | …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | Other button attributes. |
 
@@ -215,8 +109,8 @@ export function SupportTicketAttachments() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| className | `string` | — | No | Column class. |
-| children | `React.ReactNode` | — | No | Text and chips. |
+| className | `string` | — | No | Column wrapper class. |
+| children | `React.ReactNode` | — | No | Custom layout. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### FileUpload.ActionsRow
@@ -224,24 +118,24 @@ export function SupportTicketAttachments() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Row class. |
-| children | `React.ReactNode` | — | No | `Chip` and others. |
+| children | `React.ReactNode` | — | No | Chips or other actions. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
 ### FileUpload.Chip
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Does not open the dialog without a handler. |
-| className | `string` | — | No | Button class. |
-| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | No | Stops bubbling to the `label`. |
-| children | `React.ReactNode` | — | No | Icon and `ChipLabel`. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | Other attributes. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Button `type`. |
+| className | `string` | — | No | Class on the `button`. |
+| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | No | Invoked after `preventDefault` / `stopPropagation`. |
+| children | `React.ReactNode` | — | No | Chip contents (e.g. icon + `ChipLabel`). |
+| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | Other button attributes. |
 
 ### FileUpload.ChipLabel
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| className | `string` | — | No | Class. |
+| className | `string` | — | No | Class on the `span`. |
 | children | `React.ReactNode` | — | No | Chip text. |
 | …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
 
@@ -249,22 +143,20 @@ export function SupportTicketAttachments() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| format | `string` | — | Yes | Extension string; shortened and uppercased in the UI. |
-| color | `FileUploadFormatBadgeColor` | `"gray"` | No | Badge palette. |
-| className | `string` | — | No | Extra class. |
+| format | `string` | — | Yes | Source string; trimmed, truncated, and uppercased for display. |
+| color | `FileUploadFormatBadgeColor` | `"gray"` | No | Badge palette (`gray`, `red`, `blue`, `green`, `orange`, `purple`, `sky`, `yellow`). |
+| className | `string` | — | No | Extra class on the `span`. |
 
 ### FileUpload.Item
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| variant | `"default" \| "error"` | `"default"` | No | Default or error card. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Card and typography sizing. |
+| variant | `FileUploadItemVariant` (`"default" \| "error"`) | `"default"` | No | Card emphasis. |
+| size | `FileUploadSize` | `"m"` | No | Card and inline scale. |
 | className | `string` | — | No | Container class. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
 
-### Card and row slots (`ItemRow`, `ItemMain`, `ItemStack`, `ItemTextGroup`, `ItemName`, `ItemMeta`, `ItemActions`, `ItemFooter`)
-
-For each listed component, the contract is the same:
+### FileUpload.ItemRow, ItemMain, ItemStack, ItemTextGroup, ItemName, ItemMeta, ItemActions, ItemFooter
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -277,62 +169,32 @@ For each listed component, the contract is the same:
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | `span` class. |
-| children | `React.ReactNode` | — | No | Ignored in markup; shows “·”. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Node with `aria-hidden`. |
+| children | `React.ReactNode` | — | No | Avoid relying on `children`; the glyph is fixed. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Passed to `span` (`aria-hidden`). |
 
 ### FileUpload.ItemTryAgain
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Button type. |
-| className | `string` | — | No | Class. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Button `type`. |
+| className | `string` | — | No | Class on the `button`. |
 | children | `React.ReactNode` | — | No | Label. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | Other attributes. |
+| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | Other button attributes. |
 
 ### FileUpload.ItemProgress
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| value | `number` | — | No | If set without `children` — renders `ProgressBar.Root`. |
-| max | `number` | — | No | Progress maximum. |
+| value | `number` | — | No | When set and `children` omitted, renders `ProgressBar.Root`. |
+| max | `number` | — | No | Progress maximum (passed to `ProgressBar.Root`). |
 | className | `string` | — | No | Wrapper class. |
 | children | `React.ReactNode` | — | No | Custom indicator instead of the bar. |
 
-## Variants
+## Related
 
-- **`appearance` on Root:** `dashed` — typical dashed zone; `solid` — solid border and background closer to an input field, handy inside cards and modals.
-- **`variant` on Item:** `default` — neutral card; `error` — emphasized border and background for upload failure or rejected file.
-- **`size`:** shared `s`–`xl` scale for the zone and the card; buttons next to the card should match the same size.
-- **`FormatBadge.color`:** `gray`, `red`, `blue`, `green`, `orange`, `purple`, `sky`, `yellow` — visual grouping of file types.
-- **`Title.tone`:** `muted` for secondary text in dense layouts.
-
-## States
-
-- **Default zone** — clicking empty area opens the dialog; hover and focus change outline and shadow.
-- **Dragging** — while a file is over the zone, `data-dragover` is set on the `label` (highlighted border and background).
-- **`disabled`** — `not-allowed` cursor, reduced opacity; drop is ignored.
-- **Card** — loading / success / error in markup and icons is up to the app; `ItemProgress` is optional; for errors use `variant="error"` and `ItemTryAgain`.
-
-## Accessibility (a11y)
-
-- The zone is clickable via `label` + hidden `input`; keyboard focus shows a visible ring on the zone (`focus-within`).
-- The hidden field gets `aria-disabled` when `disabled`.
-- `BrowseLink` and `Chip` stop propagation so the dialog does not open twice without an explicit `onClick`.
-- Mark `FormatBadge` and decorative icons in examples with `aria-hidden` if status is duplicated in text in `ItemName`.
-- Icons in `FileUpload.Icon` are wrapped with `aria-hidden` by default — meaning must come from adjacent text.
-
-## Limitations and notes
-
-- No built-in server upload, virus scanning, or cloud connectors — only UI and `onFilesChange` / native file picking.
-- Picking the same file again still fires `onFilesChange` because the input value is cleared after selection.
-- “Cloud” chips in demos are visual placeholders; real storage integration must be wired separately.
-- File list and removing items are the app’s responsibility; `Item` cards do not hold file state.
-- For a settings row without a visible zone, a hidden `input` and buttons are enough — the `FileUpload` block may be unnecessary; the docs show a nearby pattern with `Avatar` for context.
-
-## Related components
-
-- **Button** — external `inputRef.click()`, clearing the list, actions in `ItemActions`.
-- **Hint** — used inside `FileUpload.Hint` with size from context.
-- **ProgressBar** — rendered inside `ItemProgress` when `value` is passed without custom `children`.
-- **Avatar** — image preview in settings lists next to upload actions.
-- **Divider** — separators between list rows in profile layouts.
+- [Button](../button/COMPONENT.md) — actions that call `inputRef.current?.click()`, clear lists, or sit in `ItemActions`.
+- [Hint](../hint/COMPONENT.md) — underlying primitive for `FileUpload.Hint`.
+- [ProgressBar](../progress-bar/COMPONENT.md) — used inside `ItemProgress` when `value` is provided without custom `children`.
+- [Label](../label/COMPONENT.md) — pairing copy with the zone in forms.
+- [Avatar](../avatar/COMPONENT.md) — image preview next to upload actions on profile-style screens.
+- [Divider](../divider/COMPONENT.md) — separating rows in attachment lists.
