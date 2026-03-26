@@ -52,7 +52,7 @@ const dividerRootApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description:
-      "Подпись или разметка с иконкой; без children — сплошная линия (пустой разделитель).",
+      "Подпись или разметка с иконкой; без children — сплошная линия. У Icon внутри не задаётся size-класс — габариты из токена разделителя (`--prime-divider-icon`).",
   },
   {
     prop: "className",

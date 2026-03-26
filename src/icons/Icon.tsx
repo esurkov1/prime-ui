@@ -3,6 +3,7 @@ import * as React from "react";
 
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import { DividerContentContext } from "@/internal/DividerContentContext";
 
 import styles from "./Icon.module.css";
 
@@ -29,7 +30,9 @@ function createIcon(IconGlyph: IconComponent) {
   const WrappedIcon = React.forwardRef<SVGSVGElement, BaseIconProps>(
     ({ className, size: sizeProp, tone = "default", strokeWidth = 1.9, style, ...rest }, ref) => {
       const controlSize = useOptionalControlSize();
-      const size = (sizeProp ?? controlSize ?? "m") as IconResolvedSize;
+      const insideDividerContent = React.useContext(DividerContentContext);
+      const resolvedSize = (sizeProp ?? controlSize ?? "m") as IconResolvedSize;
+      const sizeClass = insideDividerContent ? undefined : SIZE_CLASS[resolvedSize];
 
       const toneClassName =
         tone === "default"
@@ -43,7 +46,7 @@ function createIcon(IconGlyph: IconComponent) {
       return (
         <IconGlyph
           ref={ref}
-          className={cx(styles.root, SIZE_CLASS[size], toneClassName, className)}
+          className={cx(styles.root, sizeClass, toneClassName, className)}
           style={style}
           strokeWidth={strokeWidth}
           aria-hidden="true"

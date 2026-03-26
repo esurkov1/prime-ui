@@ -118,7 +118,9 @@
   padding-inline: var(--prime-divider-inline-pad);
 }
 
-.root .content :where(svg) {
+/* Icon внутри не ставит size-класс — только эти правила (и --prime-divider-* от data-size). */
+.root[data-size] .content svg {
+  box-sizing: border-box;
   width: var(--prime-divider-icon);
   height: var(--prime-divider-icon);
   flex-shrink: 0;

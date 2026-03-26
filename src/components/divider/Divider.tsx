@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import { DividerContentContext } from "@/internal/DividerContentContext";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { DividerSize } from "@/internal/states";
 
@@ -51,7 +52,9 @@ const DividerRoot = React.forwardRef<HTMLDivElement, DividerRootProps>(
       >
         {children != null ? (
           <ControlSizeProvider value={size}>
-            <span className={styles.content}>{children}</span>
+            <DividerContentContext.Provider value>
+              <span className={styles.content}>{children}</span>
+            </DividerContentContext.Provider>
           </ControlSizeProvider>
         ) : null}
       </div>

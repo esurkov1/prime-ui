@@ -23,6 +23,7 @@
 ## Composition
 
 - Single public part: **`Divider.Root`** — a `div` root with line segments from `::before` / `::after`; optional **`children`** render inside a **`span`** (content slot) wrapped in **`ControlSizeProvider`** so nested controls inherit the same `size`.
+- **`Icon`** in the content slot does not apply its own `size` classes — width/height come from **`--prime-divider-icon`** on the root (`data-size`), so the glyph matches the divider tier.
 - No required child order beyond placing **`Divider.Root`** where the separator should appear in the layout.
 
 ### Minimal example
@@ -55,7 +56,7 @@ export function Example() {
 | align | `"start"` \| `"center"` \| `"end"` | `center` for `variant="default"` or `"line-spacing"`; `start` for `variant="text"` | No | How the line segments balance around the label. |
 | variant | `"default"` \| `"line-spacing"` \| `"text"` | `"default"` | No | Visual mode and flex participation (`line-spacing` for gap-driven stacks). |
 | size | `"s"` \| `"m"` \| `"l"` \| `"xl"` | `"m"` | No | Spacing, label typography, and nested control size context. |
-| children | `React.ReactNode` | — | No | Label, icon + text, or omit for a solid line. |
+| children | `React.ReactNode` | — | No | Label, icon + text, or omit for a solid line. Nested **`Icon`** follows divider icon tokens, not `Icon` `size`. |
 | className | `string` | — | No | Additional class on the root element. |
 | role | `string` | `"separator"` | No | ARIA role; use `presentation` / `none` for decorative lines. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `aria-*`, `data-*`, event handlers, and other div props. |

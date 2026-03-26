@@ -9,14 +9,14 @@ export default function DividerCompositionSnippet() {
     <div className={s.compositionCard}>
       <p className={s.demoHint}>Иконка и текст внутри одного разделителя</p>
       <Divider.Root variant="text" size="m">
-        <Icon name="field.email" size="s" />
+        <Icon name="field.email" />
         Контакты
       </Divider.Root>
       <p className={s.compositionBody}>user@example.com</p>
 
-      <Divider.Root size="m" className={s.compositionDividerFollow}>
-        <Icon name="nav.layoutGrid" size="s" />
-        Параметры
+      <Divider.Root size="xl" className={s.compositionDividerFollow}>
+        <Icon name="nav.layoutGrid" />
+        Параметры (Divider size=&quot;xl&quot;)
       </Divider.Root>
       <p className={s.compositionBody}>Значение A · Значение B</p>
     </div>
