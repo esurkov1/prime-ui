@@ -1,0 +1,58 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.body {
+  margin: 0;
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.settingsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-l);
+  align-items: flex-start;
+}
+
+.settingsContent {
+  flex: 1 1 0;
+  min-width: min(100%, 20rem);
+}
+
+.surface {
+  width: 100%;
+  max-width: min(100%, 36rem);
+  padding: var(--prime-sys-spacing-m);
+  border-radius: var(--prime-sys-shape-radius-m);
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+.fullWidthRoot {
+  width: 100%;
+  min-width: 0;
+}
+
+.fullWidthList {
+  width: 100%;
+  min-width: 0;
+}
+
+.flexTab {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+}
+
+.narrowShell {
+  width: 100%;
+  max-width: 12rem;
+  min-width: 0;
+}
+
+.controlledCaption {
+  margin: var(--prime-sys-spacing-s) 0 0;
+  color: var(--prime-sys-color-content-muted);
+  font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
+}

@@ -1,43 +1,70 @@
 # Tabs
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
 
 ## About
 
 Compound tabs: a `tablist` of triggers, an animated indicator, and one visible `tabpanel` at a time. Values on `Tabs.Tab` and `Tabs.Panel` must align so the active pair matches.
 
-- **Use** to switch sections on a single view (settings areas, product details blocks, dashboard sub-views) without route changes.
-- **Use** controlled `value` / `onValueChange` when the active tab must follow URL, store, or wizard step.
-- **Use** `orientation="vertical"` for a sidebar-style tab rail next to content.
-- **Do not use** for primary page-to-page navigation; prefer links and routes (see [Breadcrumb](../breadcrumb/COMPONENT.md) for hierarchy).
-- **Do not use** for two to four lightweight mutually exclusive options without rich panels; consider [SegmentedControl](../segmented-control/COMPONENT.md).
-- **Do not use** expecting inactive panel subtrees to stay mounted; hidden panels are not rendered (see Rules).
+**When to use**
+
+- Switching sections on one view (settings areas, product detail blocks, dashboard sub-views) without a full route change.
+- Controlled `value` / `onValueChange` when the active tab must follow the URL, client store, or a wizard step.
+- `orientation="vertical"` for a sidebar-style rail next to the main panel (see settings layout recipes in the kit).
+
+**When not to use**
+
+- Primary navigation between top-level pages — prefer links and routes (see [Breadcrumb](../breadcrumb/COMPONENT.md) for hierarchy).
+- Two to four lightweight mutually exclusive options without rich panels — consider [SegmentedControl](../segmented-control/COMPONENT.md).
+- Expecting inactive panel subtrees to stay mounted — hidden panels are not rendered (see Rules).
 
 ## Composition
 
-- **`Tabs.Root`** — context wrapper (`div` with `data-orientation`, `data-size`). Put **`Tabs.List`** and **`Tabs.Panel`** nodes as direct structure; order in the tree is list first, then panels (typical reading order).
-- **`Tabs.List`** — `role="tablist"` with `aria-orientation`, keyboard handling, internal indicator, and **`ControlSizeProvider`** for descendants. Children should be **`Tabs.Tab`** triggers only.
-- **`Tabs.Tab`** — `role="tab"` / `button type="button"`. Optional **`Tabs.Icon`** (before label) and **`Tabs.Label`** for text; `value` must match a **`Tabs.Panel`** `value`.
+- **`Tabs.Root`** — context wrapper (`div` with `data-orientation`, `data-size`). Place **`Tabs.List`** and **`Tabs.Panel`** in tree order (list first, then panels) for a typical reading order; panels may sit inside a layout wrapper as long as they remain under the same root.
+- **`Tabs.List`** — `role="tablist"` with `aria-orientation`, keyboard handling, indicator, and **`ControlSizeProvider`**. Children should be **`Tabs.Tab`** triggers only.
+- **`Tabs.Tab`** — `role="tab"` / `button type="button"`. Optional **`Tabs.Icon`** and **`Tabs.Label`**; `value` must match a **`Tabs.Panel`** `value`.
 - **`Tabs.Panel`** — `role="tabpanel"`; renders **only** when its `value` equals the root’s active value.
 
-### Minimal example
+### Canonical example
 
 ```tsx
-import { Tabs } from "prime-ui-kit";
+import { Tabs, Typography } from "prime-ui-kit";
 
 export function Example() {
   return (
-    <Tabs.Root defaultValue="a">
+    <Tabs.Root defaultValue="general" size="m">
       <Tabs.List>
-        <Tabs.Tab value="a">
-          <Tabs.Label>Tab</Tabs.Label>
+        <Tabs.Tab value="general">
+          <Tabs.Label>General</Tabs.Label>
+        </Tabs.Tab>
+        <Tabs.Tab value="privacy">
+          <Tabs.Label>Privacy</Tabs.Label>
         </Tabs.Tab>
       </Tabs.List>
-      <Tabs.Panel value="a">Panel content</Tabs.Panel>
+      <Tabs.Panel value="general">
+        <Typography.Root as="p" variant="body-default" tone="muted">
+          Workspace name, locale, and default landing behavior.
+        </Typography.Root>
+      </Tabs.Panel>
+      <Tabs.Panel value="privacy">
+        <Typography.Root as="p" variant="body-default" tone="muted">
+          Data retention, export, and who can see activity in this project.
+        </Typography.Root>
+      </Tabs.Panel>
     </Tabs.Root>
   );
 }
 ```
+
+### Extended examples
+
+- [`./examples/01-settings-vertical-rail.tsx`](./examples/01-settings-vertical-rail.tsx) — Settings: vertical tab rail with profile, security, and billing panels.
+- [`./examples/02-dashboard-subviews.tsx`](./examples/02-dashboard-subviews.tsx) — Dashboard: horizontal tabs with equal-width triggers across a card (`flex` on each tab).
+- [`./examples/03-tab-triggers-with-icons.tsx`](./examples/03-tab-triggers-with-icons.tsx) — Icon + label triggers using the kit **`Icon`** inside **`Tabs.Icon`**.
+- [`./examples/04-long-labels-narrow.tsx`](./examples/04-long-labels-narrow.tsx) — Long English labels in a narrow container; ellipsis on **`Tabs.Label`**.
+- [`./examples/05-controlled-active-tab.tsx`](./examples/05-controlled-active-tab.tsx) — Controlled `value` / `onValueChange` (e.g. sync with `?tab=` or store).
+
+**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and layout patterns; this page keeps the contract (rules + API tables) authoritative.
 
 ## Rules
 
@@ -50,7 +77,7 @@ export function Example() {
 - **Inactive panels:** `Tabs.Panel` returns `null` when inactive—avoid putting expensive trees in panels without app-level lazy loading or conditional data fetching.
 - **No `asChild`:** each tab is always a `<button>`; there is no built-in URL synchronization.
 - **Pairs:** for every panel `value` you expose, provide a corresponding tab (and vice versa) so the tab/panel relationship stays consistent for assistive tech.
-- **Layout:** full-width or custom layout is achieved with `className` and your own flex/grid CSS on the root, list, or tabs—there is no dedicated “full width” prop.
+- **Layout:** full-width or custom layout uses `className` and your own flex/grid CSS on the root, list, or tabs—there is no dedicated `fullWidth` prop on `Tabs`.
 
 ## API
 
