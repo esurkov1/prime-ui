@@ -14,6 +14,8 @@ import SelectFeaturesSnippet from "../snippets/select/features";
 import featuresSource from "../snippets/select/features.tsx?raw";
 import SelectFullWidthSnippet from "../snippets/select/full-width";
 import fullWidthSource from "../snippets/select/full-width.tsx?raw";
+import SelectNativeSnippet from "../snippets/select/native";
+import nativeSource from "../snippets/select/native.tsx?raw";
 import SelectSizesSnippet from "../snippets/select/sizes";
 import sizesSource from "../snippets/select/sizes.tsx?raw";
 import SelectStatesSnippet from "../snippets/select/states";
@@ -70,6 +72,14 @@ const selectRootApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "false",
     required: "Нет",
     description: "Визуальная ошибка валидации: обводка триггера (data-has-error).",
+  },
+  {
+    prop: "native",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Нативный `<select>` с option/optgroup из дерева Item/Group; без триггера и портального listbox.",
   },
   {
     prop: "children",
@@ -313,10 +323,10 @@ export default function SelectSection() {
       title="Select"
       description={
         <>
-          Выпадающий список для выбора одного значения из нескольких вариантов. Триггер показывает
-          текущий выбор или подсказку; список открывается поверх страницы, поддерживает клавиатуру и
-          группировку пунктов. Подходит для форм, фильтров и настроек, где важен компактный ввод без
-          свободного текста.
+          Выпадающий список для выбора одного значения из нескольких вариантов. По умолчанию —
+          комбобокс: триггер с подсказкой и портальный список с клавиатурой и группами. Параметр{" "}
+          <code>native</code> переключает на нативный <code>&lt;select&gt;</code> с теми же{" "}
+          <code>Select.Item</code>. Подходит для форм, фильтров и настроек без свободного текста.
         </>
       }
     >
@@ -384,6 +394,21 @@ export default function SelectSection() {
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SelectFullWidthSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Нативный select</DemoSectionTitle>
+          <DemoDescription>
+            <code>Select.Root native</code> — нативный <code>&lt;select&gt;</code> с теми же
+            токенами размера; пункты из <code>Select.Item</code> (можно обернуть в{" "}
+            <code>Select.Content</code>
+            ).
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={nativeSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <SelectNativeSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>

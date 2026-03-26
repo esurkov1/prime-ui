@@ -330,7 +330,7 @@ Full table of all 42 components mapped to responsive layout.
 
 | | |
 |---|---|
-| **Purpose** | Dropdown: trigger with value and portal menu. |
+| **Purpose** | Single choice: custom combobox (default) or native `<select>` with **`native`**. |
 | **Responsive role** | On mobile menu opens over content; `fullWidth` in forms; `size="l"` for touch target. |
 | **Zones** | form, header, content, sidebar |
 | **Scenarios** | Role/country in a form; language and timezone; shipping/currency; dashboard filter; ticket priority; environment in ops. |

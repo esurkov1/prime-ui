@@ -48,10 +48,24 @@ export type SelectRootProps = {
   disabled?: boolean;
   placeholder?: string;
   hasError?: boolean;
+  /**
+   * When `true`, renders a native `<select>` (options from `Select.Item` / groups in the tree).
+   * Default `false` — custom combobox with portaled listbox.
+   */
+  native?: boolean;
   children: React.ReactNode;
 };
 
-function SelectRoot({
+function SelectRoot(props: SelectRootProps) {
+  const { native = false, ...rest } = props;
+  if (native) {
+    return <SelectNativeRoot {...rest} />;
+  }
+  return <SelectComboboxRoot {...rest} />;
+}
+SelectRoot.displayName = "SelectRoot";
+
+function SelectComboboxRoot({
   size = "m",
   value,
   defaultValue,
@@ -60,7 +74,7 @@ function SelectRoot({
   placeholder,
   hasError = false,
   children,
-}: SelectRootProps) {
+}: Omit<SelectRootProps, "native">) {
   const handleChange = React.useCallback(
     (v: string | undefined) => {
       if (v !== undefined) onChange?.(v);
@@ -130,7 +144,7 @@ function SelectRoot({
     </SelectProvider>
   );
 }
-SelectRoot.displayName = "SelectRoot";
+SelectComboboxRoot.displayName = "SelectComboboxRoot";
 
 // ─── SelectTrigger ────────────────────────────────────────────────────────────
 
@@ -487,6 +501,169 @@ function SelectSeparator({ className, ...rest }: SelectSeparatorProps) {
   return <hr className={cx(styles.separator, className)} {...rest} />;
 }
 SelectSeparator.displayName = "SelectSeparator";
+
+// ─── Native <select> (Select.Root native) ───────────────────────────────────
+
+type NativeOptionsWalkResult = {
+  nodes: React.ReactNode[];
+  firstEnabledValue: string | undefined;
+};
+
+function extractPlainTextFromNode(node: React.ReactNode): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractPlainTextFromNode).join("");
+  if (React.isValidElement(node)) {
+    const p = node.props as { children?: React.ReactNode };
+    if (p != null && typeof p === "object" && "children" in p) {
+      return extractPlainTextFromNode(p.children);
+    }
+  }
+  return "";
+}
+
+function renderNativeOptionElement(
+  el: React.ReactElement<SelectItemProps>,
+  keyIndex: number,
+): React.ReactNode {
+  const { value, label, disabled, children } = el.props;
+  const { rest } = partitionSelectItemChildren(children);
+  const resolvedLabel =
+    label ??
+    selectItemTextFromRest(rest) ??
+    (typeof children === "string" ? children : undefined) ??
+    value;
+  return (
+    <option key={`prime-select-native-opt-${keyIndex}`} value={value} disabled={disabled}>
+      {resolvedLabel}
+    </option>
+  );
+}
+
+function walkNativeOptions(node: React.ReactNode): NativeOptionsWalkResult {
+  const nodes: React.ReactNode[] = [];
+  let firstEnabledValue: string | undefined;
+  let keyIndex = 0;
+
+  const visit = (n: React.ReactNode) => {
+    React.Children.forEach(n, (child) => {
+      if (child == null || child === false) return;
+      if (!React.isValidElement(child)) return;
+      if (child.type === React.Fragment) {
+        visit((child.props as { children?: React.ReactNode }).children);
+        return;
+      }
+      if (child.type === SelectItem) {
+        const p = child.props as SelectItemProps;
+        if (!p.disabled && firstEnabledValue === undefined) {
+          firstEnabledValue = p.value;
+        }
+        nodes.push(
+          renderNativeOptionElement(child as React.ReactElement<SelectItemProps>, keyIndex),
+        );
+        keyIndex += 1;
+        return;
+      }
+      if (child.type === SelectGroup) {
+        const ogKey = keyIndex;
+        let groupLabel = "";
+        const groupNodes: React.ReactNode[] = [];
+        React.Children.forEach((child.props as { children?: React.ReactNode }).children, (gc) => {
+          if (!React.isValidElement(gc)) return;
+          if (gc.type === SelectGroupLabel) {
+            groupLabel = extractPlainTextFromNode(
+              (gc.props as { children?: React.ReactNode }).children,
+            );
+          } else if (gc.type === SelectItem) {
+            const gp = gc.props as SelectItemProps;
+            if (!gp.disabled && firstEnabledValue === undefined) {
+              firstEnabledValue = gp.value;
+            }
+            groupNodes.push(
+              renderNativeOptionElement(gc as React.ReactElement<SelectItemProps>, keyIndex),
+            );
+            keyIndex += 1;
+          }
+        });
+        nodes.push(
+          <optgroup key={`prime-select-native-og-${ogKey}`} label={groupLabel || "\u00A0"}>
+            {groupNodes}
+          </optgroup>,
+        );
+        return;
+      }
+      if (child.type === SelectSeparator) {
+        return;
+      }
+      const wrapProps = child.props as { children?: React.ReactNode };
+      if (wrapProps.children != null) {
+        visit(wrapProps.children);
+      }
+    });
+  };
+
+  visit(node);
+  return { nodes, firstEnabledValue };
+}
+
+type SelectNativeRootProps = Omit<SelectRootProps, "native">;
+
+function SelectNativeRoot({
+  size = "m",
+  value,
+  defaultValue,
+  onChange,
+  disabled,
+  placeholder,
+  hasError = false,
+  children,
+}: SelectNativeRootProps) {
+  const handleChange = React.useCallback(
+    (v: string | undefined) => {
+      if (v !== undefined) onChange?.(v);
+    },
+    [onChange],
+  );
+
+  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>({
+    value,
+    defaultValue,
+    onChange: handleChange,
+  });
+
+  const { nodes: optionNodes, firstEnabledValue } = React.useMemo(
+    () => walkNativeOptions(children),
+    [children],
+  );
+
+  const hasPlaceholder = placeholder != null && placeholder !== "";
+  const selectValue =
+    selectedValue === undefined ? (hasPlaceholder ? "" : (firstEnabledValue ?? "")) : selectedValue;
+
+  const handleNativeChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const v = e.target.value;
+      setSelectedValue(v === "" ? undefined : v);
+    },
+    [setSelectedValue],
+  );
+
+  return (
+    <ControlSizeProvider value={size}>
+      <select
+        className={styles.nativeSelect}
+        disabled={disabled}
+        value={selectValue}
+        onChange={handleNativeChange}
+        {...toDataAttributes({ size, "has-error": hasError })}
+      >
+        {hasPlaceholder ? <option value="">{placeholder}</option> : null}
+        {optionNodes}
+      </select>
+    </ControlSizeProvider>
+  );
+}
+SelectNativeRoot.displayName = "SelectNativeRoot";
 
 // ─── Namespace export ─────────────────────────────────────────────────────────
 

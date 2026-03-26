@@ -4,7 +4,7 @@
 
 ## About
 
-A single-select combobox: a trigger shows the current choice or a placeholder, and a portaled listbox lets the user pick one string value from predefined options.
+A single-select field: by default (**`native`** `false`) it is a combobox — a trigger shows the current choice or a placeholder, and a portaled listbox lets the user pick one string value from predefined options. With **`native`** `true`, **`Select.Root`** renders a native **`<select>`** with **`<option>`** / **`<optgroup>`** built from the same **`Select.Item`** (and optional **`Select.Group`**) tree.
 
 - **Use** for forms, settings, and filters where exactly one option must be chosen from a closed set (role, country, theme, interval, and similar fields).
 - **Use** when a compact trigger label is enough and the full list should open on demand with keyboard support.
@@ -15,10 +15,10 @@ A single-select combobox: a trigger shows the current choice or a placeholder, a
 
 ## Composition
 
-- **`Select.Root`** — owns value (controlled or uncontrolled), open state, highlight, `size`, `hasError`, `disabled`, and `placeholder`. Wrap everything else.
-- **`Select.Trigger`** — the combobox `button` (fixed chevron on the right). Put **`Select.Value`** inside; optionally **`Select.TriggerIcon`** before **`Select.Value`**.
-- **`Select.Value`** — displays the selected item label, otherwise falls back to the raw value or **`placeholder`** (hint styling when empty).
-- **`Select.Content`** — portaled **`role="listbox"`**; rendered in the tree always but hidden when closed. Place **`Select.Item`** rows (and optional groups/separators) inside. Must come after the trigger in the document for a predictable structure.
+- **`Select.Root`** — owns value (controlled or uncontrolled), `size`, `hasError`, `disabled`, **`placeholder`**, and **`native`**. When **`native`** is `false`, it also owns open state and highlight. Wrap everything else.
+- **`Select.Trigger`** — (non-**`native`** only) the combobox `button` (fixed chevron on the right). Put **`Select.Value`** inside; optionally **`Select.TriggerIcon`** before **`Select.Value`**.
+- **`Select.Value`** — (non-**`native`** only) displays the selected item label, otherwise falls back to the raw value or **`placeholder`** (hint styling when empty).
+- **`Select.Content`** — when **`native`** is `false`: portaled **`role="listbox"`**; rendered in the tree always but hidden when closed. Place **`Select.Item`** rows (and optional groups/separators) inside. Must come after the trigger in the document for a predictable structure. When **`native`** is `true`, **`Select.Content`** is optional as a structural wrapper; only **`Select.Item`** (and groups) contribute to the DOM **`<select>`**.
 - **`Select.Item`** — one option per row; optional **`Select.ItemIcon`** children are recognized by component type and rendered before the text. Use **`label`** when the trigger should show different text than the row content.
 - **`Select.Group`** / **`Select.GroupLabel`** / **`Select.Separator`** — optional structure inside **`Select.Content`**.
 
@@ -42,8 +42,26 @@ export function Example() {
 }
 ```
 
+### Native `<select>` (`native`)
+
+```tsx
+import { Select } from "prime-ui-kit";
+
+export function NativeExample() {
+  return (
+    <Select.Root native size="m" placeholder="Choose">
+      <Select.Item value="a">Option A</Select.Item>
+      <Select.Item value="b">Option B</Select.Item>
+    </Select.Root>
+  );
+}
+```
+
+You can wrap items in **`Select.Content`** for parity with the composable tree; behavior is the same.
+
 ## Rules
 
+- **`native`** — default **`false`**. **`true`**: one **`<select>`** with kit styling; **`Select.Trigger`**, **`Select.Value`**, **`Select.Content`** portal, and listbox keyboard behavior are not used (the platform handles the dropdown). Options are collected by walking **`children`** for **`Select.Item`** (and **`Select.Group`** / **`Select.GroupLabel`** → **`<optgroup>`**; **`Select.Separator`** is skipped). **`placeholder`** adds a first **`<option value="">`**; do not use **`value=""`** on an **`Select.Item`** if you rely on that placeholder. **`Select.ItemIcon`** / **`Select.TriggerIcon`** are not represented in the native control.
 - **Controlled:** set **`value`** and **`onChange`** together. **Uncontrolled:** use **`defaultValue`** (or neither for an empty initial value). Values are always **`string`**; map numbers or enums to strings yourself.
 - **`onChange`** runs only when the value changes to a defined string (same contract as internal controllable state).
 - **`disabled`** on **`Select.Root`** prevents opening the list and selecting; the trigger is inactive.
@@ -68,7 +86,8 @@ export function Example() {
 | disabled | `boolean` | — | No | Disables the trigger and selection |
 | placeholder | `string` | — | No | Shown in the trigger when no value is selected |
 | hasError | `boolean` | `false` | No | Error styling on the trigger |
-| children | `React.ReactNode` | — | Yes | Typically **`Select.Trigger`** and **`Select.Content`** |
+| native | `boolean` | `false` | No | **`true`**: native **`<select>`**; **`false`**: combobox + portaled listbox |
+| children | `React.ReactNode` | — | Yes | Typically **`Select.Trigger`** and **`Select.Content`** (non-**`native`**); **`Select.Item`** tree (**`native`**) |
 
 ### Select.Trigger
 

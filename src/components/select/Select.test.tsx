@@ -355,3 +355,32 @@ describe("Select (composable)", () => {
     });
   });
 });
+
+describe("Select (native)", () => {
+  it("renders a native select instead of button listbox", () => {
+    const { container } = render(
+      <Select.Root native placeholder="Pick">
+        <Select.Content>
+          <Select.Item value="one">One</Select.Item>
+          <Select.Item value="two">Two</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    expect(container.querySelector("select")).toBeInTheDocument();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("fires onChange when native select value changes", () => {
+    const onChange = vi.fn();
+    render(
+      <Select.Root native placeholder="Pick" onChange={onChange}>
+        <Select.Content>
+          <Select.Item value="a">A</Select.Item>
+          <Select.Item value="b">B</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "b" } });
+    expect(onChange).toHaveBeenCalledWith("b");
+  });
+});
