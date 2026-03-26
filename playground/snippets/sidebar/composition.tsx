@@ -35,6 +35,21 @@ const MODES: DemoMode[] = [
   { id: "autorpark", label: "Autorpark", subtitle: "Парк", icon: Car, avatar: "AP" },
 ];
 
+const userTriggerStyle: React.CSSProperties = {
+  boxSizing: "border-box",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x3))",
+  minWidth: "calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x3))",
+  minHeight: "calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x3))",
+  border: 0,
+  borderRadius: "var(--prime-sys-size-control-m-radius)",
+  background: "transparent",
+  cursor: "pointer",
+  color: "var(--prime-sys-color-content-primary)",
+};
+
 function FavoritesCategory() {
   const [open, setOpen] = React.useState(true);
   return (
@@ -81,7 +96,14 @@ function ModeSwitcher({
       <Dropdown.Trigger>
         <Sidebar.IdentityButton
           leading={
-            <Avatar.Root size="m" className={styles.modeAvatar}>
+            <Avatar.Root
+              size="m"
+              style={{
+                background:
+                  "color-mix(in srgb, var(--prime-sys-color-action-primaryBackground) 84%, transparent)",
+                color: "var(--prime-sys-color-action-primaryForeground)",
+              }}
+            >
               <Avatar.Fallback>{mode.avatar}</Avatar.Fallback>
             </Avatar.Root>
           }
@@ -112,11 +134,7 @@ function HeaderUserPopover() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <button
-          type="button"
-          className={styles.userTrigger}
-          aria-label="Пользовательские настройки"
-        >
+        <button type="button" style={userTriggerStyle} aria-label="Пользовательские настройки">
           <Avatar.Root size="m">
             <Avatar.Fallback>ES</Avatar.Fallback>
           </Avatar.Root>

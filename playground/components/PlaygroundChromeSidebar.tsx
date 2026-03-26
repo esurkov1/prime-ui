@@ -77,7 +77,6 @@ type PlaygroundSidebarMode = {
   id: PlaygroundSidebarModeId;
   label: string;
   subtitle: string;
-  avatarFallback: string;
   menuIcon: React.ElementType;
   navTag: PlaygroundSidebarNavTag;
 };
@@ -269,7 +268,6 @@ function buildSidebarNavigationApi(nav: PlaygroundNavModel): PlaygroundSidebarNa
       id: "crm",
       label: "CRM",
       subtitle: "Продажи и pipeline",
-      avatarFallback: "CR",
       menuIcon: LayoutDashboard,
       navTag: "crm",
     },
@@ -277,7 +275,6 @@ function buildSidebarNavigationApi(nav: PlaygroundNavModel): PlaygroundSidebarNa
       id: "traffic",
       label: "Traffic",
       subtitle: "Кампании и аналитика",
-      avatarFallback: "TR",
       menuIcon: Megaphone,
       navTag: "traffic",
     },
@@ -285,7 +282,6 @@ function buildSidebarNavigationApi(nav: PlaygroundNavModel): PlaygroundSidebarNa
       id: "autorpark",
       label: "Autorpark",
       subtitle: "Парк и обслуживание",
-      avatarFallback: "AP",
       menuIcon: Car,
       navTag: "autorpark",
     },
@@ -492,14 +488,26 @@ function resolveSidebarNavigation(
   return { mode, categories };
 }
 
-function modeAvatarClassName(modeId: PlaygroundSidebarModeId): string {
+function modeMarkStyle(modeId: PlaygroundSidebarModeId): React.CSSProperties {
   switch (modeId) {
     case "crm":
-      return "playgroundSidebarModeAvatarCrm";
+      return {
+        background:
+          "color-mix(in srgb, var(--prime-sys-color-action-primaryBackground) 82%, transparent)",
+        color: "var(--prime-sys-color-action-primaryForeground)",
+      };
     case "traffic":
-      return "playgroundSidebarModeAvatarTraffic";
+      return {
+        background:
+          "color-mix(in srgb, var(--prime-sys-color-feedback-infoBackground) 82%, var(--prime-sys-color-surface-default))",
+        color: "var(--prime-sys-color-feedback-infoForeground)",
+      };
     case "autorpark":
-      return "playgroundSidebarModeAvatarAutorpark";
+      return {
+        background:
+          "color-mix(in srgb, var(--prime-sys-color-feedback-warningBackground) 84%, var(--prime-sys-color-surface-default))",
+        color: "var(--prime-sys-color-feedback-warningForeground)",
+      };
   }
 }
 
@@ -573,14 +581,27 @@ function PlaygroundModeSwitcher({
   modes: PlaygroundSidebarMode[];
   onModeChange: (next: PlaygroundSidebarModeId) => void;
 }) {
+  const ModeIcon = mode.menuIcon;
+
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
         <Sidebar.IdentityButton
           leading={
-            <Avatar.Root size="m" className={modeAvatarClassName(mode.id)}>
-              <Avatar.Fallback>{mode.avatarFallback}</Avatar.Fallback>
-            </Avatar.Root>
+            <span
+              aria-hidden="true"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "2rem",
+                height: "2rem",
+                borderRadius: "var(--prime-sys-shape-radius-s)",
+                ...modeMarkStyle(mode.id),
+              }}
+            >
+              <ModeIcon size={16} strokeWidth={2} />
+            </span>
           }
           title={mode.label}
           subtitle={mode.subtitle}
@@ -605,92 +626,7 @@ function PlaygroundModeSwitcher({
   );
 }
 
-function PlaygroundUserMenuContent() {
-  return (
-    <>
-      <Dropdown.Block>
-        <Dropdown.Header>
-          <Dropdown.HeaderRow>
-            <Dropdown.HeaderLeading>
-              <Avatar.Root size="m">
-                <Avatar.Fallback>ES</Avatar.Fallback>
-              </Avatar.Root>
-            </Dropdown.HeaderLeading>
-            <Dropdown.HeaderMain>
-              <Dropdown.HeaderTitle>Egor Surkov</Dropdown.HeaderTitle>
-              <Dropdown.HeaderDescription truncate>
-                egor.surkov@example.com
-              </Dropdown.HeaderDescription>
-            </Dropdown.HeaderMain>
-          </Dropdown.HeaderRow>
-          <Dropdown.Separator />
-        </Dropdown.Header>
-
-        <Dropdown.Group>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={UserRound} size={16} strokeWidth={2} />
-            Профиль и безопасность
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Plug} size={16} strokeWidth={2} />
-            Интеграции
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Settings} size={16} strokeWidth={2} />
-            Настройки
-          </Dropdown.Item>
-        </Dropdown.Group>
-      </Dropdown.Block>
-
-      <Dropdown.Block>
-        <Dropdown.Group>
-          <Dropdown.GroupLabel>Поддержка</Dropdown.GroupLabel>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={BookOpen} size={16} strokeWidth={2} />
-            Руководство
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={HelpCircle} size={16} strokeWidth={2} />
-            Справочный центр
-          </Dropdown.Item>
-        </Dropdown.Group>
-      </Dropdown.Block>
-
-      <Dropdown.Separator />
-
-      <Dropdown.Block>
-        <Dropdown.Item>
-          <Dropdown.ItemIcon as={LogOut} size={16} strokeWidth={2} />
-          Выйти
-        </Dropdown.Item>
-      </Dropdown.Block>
-    </>
-  );
-}
-
-function PlaygroundHeaderUserMenu() {
-  return (
-    <Dropdown.Root>
-      <Dropdown.Trigger>
-        <button
-          type="button"
-          className="playgroundSidebarUserTrigger"
-          aria-label="Меню пользователя"
-        >
-          <Avatar.Root size="m">
-            <Avatar.Fallback>ES</Avatar.Fallback>
-          </Avatar.Root>
-        </button>
-      </Dropdown.Trigger>
-
-      <Dropdown.Content align="end" side="bottom">
-        <PlaygroundUserMenuContent />
-      </Dropdown.Content>
-    </Dropdown.Root>
-  );
-}
-
-function PlaygroundFooterThemeSelectors() {
+function PlaygroundUserMenu() {
   const { scheme, setScheme, preset, setPreset } = usePlaygroundTheme();
 
   const onSchemeChange = React.useCallback(
@@ -710,36 +646,144 @@ function PlaygroundFooterThemeSelectors() {
   );
 
   return (
-    <div className="playgroundSidebarFooterControls">
-      <div className="playgroundSidebarFooterControl">
-        <Sidebar.Text className="playgroundSidebarFooterLabel">Тема интерфейса</Sidebar.Text>
-        <Select.Root value={scheme} onChange={onSchemeChange} size="m">
-          <Select.Trigger aria-label="Схема темы playground">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content>
-            <Select.Item value="light">Светлая</Select.Item>
-            <Select.Item value="dark">Тёмная</Select.Item>
-          </Select.Content>
-        </Select.Root>
-      </div>
+    <Dropdown.Root>
+      <Dropdown.Trigger>
+        <Sidebar.IdentityButton
+          leading={
+            <Avatar.Root size="m">
+              <Avatar.Fallback>ES</Avatar.Fallback>
+            </Avatar.Root>
+          }
+          title="Egor Surkov"
+          subtitle="Product Engineer"
+          aria-label="Меню пользователя"
+        />
+      </Dropdown.Trigger>
 
-      <div className="playgroundSidebarFooterControl">
-        <Sidebar.Text className="playgroundSidebarFooterLabel">Бренд-тема</Sidebar.Text>
-        <Select.Root value={preset} onChange={onPresetChange} size="m">
-          <Select.Trigger aria-label="Палитра бренд-темы playground">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content>
-            {PLAYGROUND_THEME_PRESET_OPTIONS.map((option) => (
-              <Select.Item key={option.value} value={option.value} label={option.label}>
-                {option.label}
-              </Select.Item>
-            ))}
-          </Select.Content>
-        </Select.Root>
-      </div>
-    </div>
+      <Dropdown.Content align="start" side="top" sameMinWidthAsTrigger>
+        <Dropdown.Block>
+          <Dropdown.Header>
+            <Dropdown.HeaderRow>
+              <Dropdown.HeaderLeading>
+                <Avatar.Root size="m">
+                  <Avatar.Fallback>ES</Avatar.Fallback>
+                </Avatar.Root>
+              </Dropdown.HeaderLeading>
+              <Dropdown.HeaderMain>
+                <Dropdown.HeaderTitle>Egor Surkov</Dropdown.HeaderTitle>
+                <Dropdown.HeaderDescription truncate>
+                  egor.surkov@example.com
+                </Dropdown.HeaderDescription>
+              </Dropdown.HeaderMain>
+            </Dropdown.HeaderRow>
+            <Dropdown.Separator />
+          </Dropdown.Header>
+
+          <Dropdown.Group>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={UserRound} size={16} strokeWidth={2} />
+              Профиль и безопасность
+            </Dropdown.Item>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={Plug} size={16} strokeWidth={2} />
+              Интеграции
+            </Dropdown.Item>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={Settings} size={16} strokeWidth={2} />
+              Настройки
+            </Dropdown.Item>
+          </Dropdown.Group>
+        </Dropdown.Block>
+
+        <Dropdown.Block>
+          <Dropdown.Group>
+            <Dropdown.GroupLabel>Поддержка</Dropdown.GroupLabel>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={BookOpen} size={16} strokeWidth={2} />
+              Руководство
+            </Dropdown.Item>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={HelpCircle} size={16} strokeWidth={2} />
+              Справочный центр
+            </Dropdown.Item>
+          </Dropdown.Group>
+        </Dropdown.Block>
+
+        <Dropdown.Block>
+          <Dropdown.Group>
+            <Dropdown.GroupLabel>Оформление</Dropdown.GroupLabel>
+            <div
+              style={{
+                display: "grid",
+                gap: "var(--prime-sys-spacing-x3)",
+              }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gap: "var(--prime-sys-spacing-x1)",
+                }}
+              >
+                <Sidebar.Text
+                  style={{
+                    fontSize: "var(--prime-sys-size-control-s-supportText)",
+                    color: "var(--prime-sys-color-content-secondary)",
+                  }}
+                >
+                  Тема интерфейса
+                </Sidebar.Text>
+                <Select.Root value={scheme} onChange={onSchemeChange} size="m">
+                  <Select.Trigger aria-label="Схема темы playground">
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content>
+                    <Select.Item value="light">Светлая</Select.Item>
+                    <Select.Item value="dark">Тёмная</Select.Item>
+                  </Select.Content>
+                </Select.Root>
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: "var(--prime-sys-spacing-x1)",
+                }}
+              >
+                <Sidebar.Text
+                  style={{
+                    fontSize: "var(--prime-sys-size-control-s-supportText)",
+                    color: "var(--prime-sys-color-content-secondary)",
+                  }}
+                >
+                  Бренд-тема
+                </Sidebar.Text>
+                <Select.Root value={preset} onChange={onPresetChange} size="m">
+                  <Select.Trigger aria-label="Палитра бренд-темы playground">
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content>
+                    {PLAYGROUND_THEME_PRESET_OPTIONS.map((option) => (
+                      <Select.Item key={option.value} value={option.value} label={option.label}>
+                        {option.label}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Root>
+              </div>
+            </div>
+          </Dropdown.Group>
+        </Dropdown.Block>
+
+        <Dropdown.Separator />
+
+        <Dropdown.Block>
+          <Dropdown.Item>
+            <Dropdown.ItemIcon as={LogOut} size={16} strokeWidth={2} />
+            Выйти
+          </Dropdown.Item>
+        </Dropdown.Block>
+      </Dropdown.Content>
+    </Dropdown.Root>
   );
 }
 
@@ -765,7 +809,6 @@ export function PlaygroundChromeSidebar() {
                 onModeChange={setModeId}
               />
             </Sidebar.HeaderMain>
-            <PlaygroundHeaderUserMenu />
           </Sidebar.HeaderRow>
         </Sidebar.Header>
         <Sidebar.ToggleButton placement="edge" />
@@ -776,8 +819,8 @@ export function PlaygroundChromeSidebar() {
           </Sidebar.Content>
         </Tooltip.Provider>
 
-        <Sidebar.Footer variant="inset">
-          <PlaygroundFooterThemeSelectors />
+        <Sidebar.Footer>
+          <PlaygroundUserMenu />
         </Sidebar.Footer>
       </Sidebar.NavPanel>
     </Sidebar.Root>
