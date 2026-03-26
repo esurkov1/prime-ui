@@ -414,9 +414,11 @@
   .root[data-state="compact"] .itemButton {
     justify-content: flex-start;
     padding-inline: var(--prime-sys-spacing-x2);
+    transition:
+      background-color var(--prime-sys-motion-duration-fast) var(--prime-sys-motion-easing-standard),
+      padding var(--prime-sys-motion-duration-fast) var(--prime-sys-motion-easing-standard);
   }
 
-  .root[data-state="compact"] .menuLabel,
   .root[data-state="compact"] .identityButtonMain {
     position: absolute;
     width: 1px;
@@ -444,6 +446,10 @@
   .root[data-state="compact"] .navCategoryLabel {
     max-width: 100%;
     text-align: left;
+    font-size: var(--prime-sys-size-control-s-supportText);
+    line-height: var(--prime-sys-typography-lineHeight-tight);
+    padding-inline: var(--prime-sys-spacing-x2);
+    padding-block: var(--prime-sys-spacing-x1);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

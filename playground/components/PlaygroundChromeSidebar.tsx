@@ -1,12 +1,15 @@
 import {
   BookOpen,
+  FileText,
   HelpCircle,
   LayoutGrid,
   LogOut,
   Palette,
   Settings,
+  SlidersHorizontal,
   SunMoon,
   UserRound,
+  Wrench,
 } from "lucide-react";
 import * as React from "react";
 
@@ -27,6 +30,14 @@ type PlaygroundMenuItem = {
 
 function toRoute(segment: string): string {
   return segment === "" ? "/" : `/${segment}`;
+}
+
+function categoryIcon(label: string): React.ReactNode {
+  const normalized = label.trim().toLowerCase();
+  if (normalized.includes("foundation")) return <LayoutGrid size={16} strokeWidth={2} />;
+  if (normalized.includes("action")) return <Wrench size={16} strokeWidth={2} />;
+  if (normalized.includes("form")) return <SlidersHorizontal size={16} strokeWidth={2} />;
+  return <FileText size={16} strokeWidth={2} />;
 }
 
 function PlaygroundPanelRow({ item }: { item: PlaygroundMenuItem }) {
@@ -53,65 +64,39 @@ function PlaygroundPanelRow({ item }: { item: PlaygroundMenuItem }) {
 
 function PlaygroundTreeMenu() {
   const nav = React.useMemo(() => getPlaygroundNavModel(), []);
-  const [open, setOpen] = React.useState<Record<string, boolean>>(() =>
-    Object.fromEntries(nav.categories.map((category) => [category.id, true])),
-  );
-
-  const toggle = React.useCallback((categoryId: string) => {
-    setOpen((state) => ({ ...state, [categoryId]: !state[categoryId] }));
-  }, []);
 
   return (
     <Sidebar.NavDocTree>
       <Sidebar.Group>
+        <Sidebar.GroupLabel>Навигация</Sidebar.GroupLabel>
         <Sidebar.Menu>
           <PlaygroundPanelRow
             item={{
               label: nav.intro.label,
               to: toRoute(nav.intro.segment),
-              icon: <Icon name="nav.itemDot" size="m" />,
+              icon: <BookOpen size={16} strokeWidth={2} />,
             }}
           />
         </Sidebar.Menu>
       </Sidebar.Group>
 
-      {nav.categories.map((category) => {
-        const isOpen = open[category.id] ?? true;
-        const panelId = `playground-nav-panel-${category.id}`;
-
-        return (
-          <Sidebar.NavCategory key={category.id}>
-            <Sidebar.NavCategoryTrigger
-              type="button"
-              data-expanded={isOpen ? "true" : undefined}
-              aria-expanded={isOpen}
-              aria-controls={panelId}
-              onClick={() => toggle(category.id)}
-            >
-              <Sidebar.NavCategoryLabel>{category.label}</Sidebar.NavCategoryLabel>
-              <Sidebar.NavCategoryCount>{category.pages.length}</Sidebar.NavCategoryCount>
-              <Icon name="nav.chevronRight" size="s" />
-            </Sidebar.NavCategoryTrigger>
-
-            {isOpen ? (
-              <Sidebar.NavCategoryPanel id={panelId}>
-                <Sidebar.Menu>
-                  {category.pages.map((page) => (
-                    <PlaygroundPanelRow
-                      key={page.segment}
-                      item={{
-                        label: page.label,
-                        to: toRoute(page.segment),
-                        icon: <Icon name="nav.itemDot" size="m" />,
-                      }}
-                    />
-                  ))}
-                </Sidebar.Menu>
-              </Sidebar.NavCategoryPanel>
-            ) : null}
-          </Sidebar.NavCategory>
-        );
-      })}
+      {nav.categories.map((category) => (
+        <Sidebar.Group key={category.id}>
+          <Sidebar.GroupLabel>{category.label}</Sidebar.GroupLabel>
+          <Sidebar.Menu>
+            {category.pages.map((page) => (
+              <PlaygroundPanelRow
+                key={page.segment}
+                item={{
+                  label: page.label,
+                  to: toRoute(page.segment),
+                  icon: categoryIcon(category.label),
+                }}
+              />
+            ))}
+          </Sidebar.Menu>
+        </Sidebar.Group>
+      ))}
     </Sidebar.NavDocTree>
   );
 }
