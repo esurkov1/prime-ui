@@ -48,7 +48,9 @@ export type {
 } from "./sidebar/Sidebar";
 export { Sidebar, useSidebarContext, useSidebarNavTo } from "./sidebar/Sidebar";
 export {
+  SIDEBAR_COMPACT_BREAKPOINT_MAX,
   SIDEBAR_LAYOUT_BREAKPOINT_MAX,
+  SIDEBAR_MEDIA_QUERY_COMPACT,
   SIDEBAR_MEDIA_QUERY_INLINE,
   SIDEBAR_MEDIA_QUERY_NARROW,
 } from "./sidebar/sidebarLayout";

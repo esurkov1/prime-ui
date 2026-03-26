@@ -267,6 +267,29 @@
   pointer-events: none;
 }
 
+/*
+ * Планшет 64–80rem + `responsive` + `double`: при `open=false` не прячем сайдбар целиком —
+ * остаётся колонка ContextBar (иконки); панель с пунктами схлопнута.
+ * `simple` без rail — поведение как у полного закрытия.
+ */
+@media (min-width: 64.001rem) and (max-width: 80rem) {
+  .root[data-responsive="true"][data-variant="double"][data-open="false"] {
+    --sb-context-visible-width: var(--sb-context-width);
+    --sb-panel-visible-width: 0;
+    --sb-nav-gap: 0;
+  }
+
+  .root[data-responsive="true"][data-variant="double"][data-open="false"] .contextRail {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .root[data-sidebar-slot="page-nav"][data-responsive="true"][data-variant="double"][data-open="false"]
+    .navArea {
+    max-width: var(--sb-context-width);
+  }
+}
+
 .contextBar {
   box-sizing: border-box;
   display: flex;

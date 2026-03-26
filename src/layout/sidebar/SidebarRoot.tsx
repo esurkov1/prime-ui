@@ -8,7 +8,7 @@ import type { SidebarSize } from "@/internal/states";
 import styles from "./Sidebar.module.css";
 import type { SidebarVariant } from "./sidebar-context";
 import { SidebarProvider } from "./sidebar-context";
-import { SIDEBAR_MEDIA_QUERY_NARROW } from "./sidebarLayout";
+import { SIDEBAR_MEDIA_QUERY_COMPACT, SIDEBAR_MEDIA_QUERY_NARROW } from "./sidebarLayout";
 
 export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"aside">, "children"> & {
   children: React.ReactNode;
@@ -45,11 +45,17 @@ function SidebarRoot({
   "aria-label": ariaLabel = "Sidebar",
   ...rest
 }: SidebarRootProps) {
-  const initialResponsiveViewport =
+  const initialNarrowViewport =
     responsive === true &&
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
     window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW).matches;
+
+  const initialCompactViewport =
+    responsive === true &&
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(SIDEBAR_MEDIA_QUERY_COMPACT).matches;
 
   const [variant, setVariantState] = useControllableState<SidebarVariant>({
     value: variantProp,
@@ -69,7 +75,7 @@ function SidebarRoot({
 
   const [open, setOpenState] = useControllableState<boolean>({
     value: openProp,
-    defaultValue: initialResponsiveViewport ? false : defaultOpen,
+    defaultValue: initialNarrowViewport || initialCompactViewport ? false : defaultOpen,
     onChange: onOpenChange,
   });
 
@@ -90,8 +96,8 @@ function SidebarRoot({
     return () => mq.removeListener(update);
   }, []);
 
-  const [isResponsiveViewport, setIsResponsiveViewport] = React.useState(initialResponsiveViewport);
-  const previousResponsiveViewportRef = React.useRef(initialResponsiveViewport);
+  const [isNarrowViewport, setIsNarrowViewport] = React.useState(initialNarrowViewport);
+  const [isCompactViewport, setIsCompactViewport] = React.useState(initialCompactViewport);
 
   React.useEffect(() => {
     if (
@@ -99,32 +105,48 @@ function SidebarRoot({
       typeof window === "undefined" ||
       typeof window.matchMedia !== "function"
     ) {
-      setIsResponsiveViewport(false);
-      previousResponsiveViewportRef.current = false;
+      setIsNarrowViewport(false);
+      setIsCompactViewport(false);
       return;
     }
 
-    const query = window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW);
-    const update = () => setIsResponsiveViewport(query.matches);
+    const narrowQuery = window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW);
+    const compactQuery = window.matchMedia(SIDEBAR_MEDIA_QUERY_COMPACT);
+
+    const update = () => {
+      setIsNarrowViewport(narrowQuery.matches);
+      setIsCompactViewport(compactQuery.matches);
+    };
     update();
 
-    if (typeof query.addEventListener === "function") {
-      query.addEventListener("change", update);
-      return () => query.removeEventListener("change", update);
+    if (typeof narrowQuery.addEventListener === "function") {
+      narrowQuery.addEventListener("change", update);
+      compactQuery.addEventListener("change", update);
+      return () => {
+        narrowQuery.removeEventListener("change", update);
+        compactQuery.removeEventListener("change", update);
+      };
     }
 
-    query.addListener(update);
-    return () => query.removeListener(update);
+    narrowQuery.addListener(update);
+    compactQuery.addListener(update);
+    return () => {
+      narrowQuery.removeListener(update);
+      compactQuery.removeListener(update);
+    };
   }, [responsive]);
 
   React.useEffect(() => {
     if (responsive !== true) return;
-    const prev = previousResponsiveViewportRef.current;
-    if (prev === isResponsiveViewport) return;
-    previousResponsiveViewportRef.current = isResponsiveViewport;
     openedByEdgePeekRef.current = false;
-    setOpenState(!isResponsiveViewport);
-  }, [isResponsiveViewport, responsive, setOpenState]);
+    if (isNarrowViewport) {
+      setOpenState(false);
+    } else if (isCompactViewport) {
+      setOpenState(false);
+    } else {
+      setOpenState(true);
+    }
+  }, [isNarrowViewport, isCompactViewport, responsive, setOpenState]);
 
   const setVariant = React.useCallback(
     (nextVariant: SidebarVariant) => {
@@ -170,8 +192,8 @@ function SidebarRoot({
     [setOpenState],
   );
 
-  const shouldShowInlineOverlay = responsive === true && isResponsiveViewport && open;
-  const shouldShowFloatingToggle = open === false;
+  const shouldShowInlineOverlay = responsive === true && isNarrowViewport && open;
+  const shouldShowFloatingToggle = responsive === true && isNarrowViewport && open === false;
 
   const navPanelId = React.useId();
 
@@ -221,7 +243,7 @@ function SidebarRoot({
         })}
         data-collapsed={variant === "simple" ? "true" : undefined}
       >
-        {canEdgePeekHover && !open ? (
+        {canEdgePeekHover && !open && isNarrowViewport ? (
           <div
             className={styles.edgePeek}
             data-sidebar-part="edge-peek"

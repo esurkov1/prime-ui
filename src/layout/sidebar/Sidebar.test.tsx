@@ -166,22 +166,42 @@ describe("Sidebar", () => {
     }
   });
 
-  it("shows collapsed open handle only when sidebar is closed", () => {
-    const { rerender } = render(
-      <Sidebar.Root open={false}>
-        <Sidebar.NavPanel />
-      </Sidebar.Root>,
-    );
+  it("shows collapsed open handle only when sidebar is closed on narrow viewport", () => {
+    const matchMediaImpl = (query: string) => {
+      const matches = query.includes("64rem") && query.includes("max-width");
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as MediaQueryList;
+    };
+    const previousMatchMedia = window.matchMedia;
+    window.matchMedia = matchMediaImpl as typeof window.matchMedia;
 
-    expect(screen.getByRole("button", { name: "Открыть сайдбар" })).toBeInTheDocument();
+    try {
+      const { rerender } = render(
+        <Sidebar.Root open={false}>
+          <Sidebar.NavPanel />
+        </Sidebar.Root>,
+      );
 
-    rerender(
-      <Sidebar.Root open>
-        <Sidebar.NavPanel />
-      </Sidebar.Root>,
-    );
+      expect(screen.getByRole("button", { name: "Открыть сайдбар" })).toBeInTheDocument();
 
-    expect(screen.queryByRole("button", { name: "Открыть сайдбар" })).not.toBeInTheDocument();
+      rerender(
+        <Sidebar.Root open>
+          <Sidebar.NavPanel />
+        </Sidebar.Root>,
+      );
+
+      expect(screen.queryByRole("button", { name: "Открыть сайдбар" })).not.toBeInTheDocument();
+    } finally {
+      window.matchMedia = previousMatchMedia;
+    }
   });
 
   it("ToggleButton toggles open state", () => {
