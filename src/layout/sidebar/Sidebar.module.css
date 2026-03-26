@@ -140,7 +140,7 @@
   border-radius: 0;
   background: color-mix(
     in srgb,
-    var(--prime-sys-color-surface-elevated) 31%,
+    var(--prime-sys-color-surface-elevated) 60%,
     var(--prime-sys-color-surface-default)
   );
   box-shadow: none;
@@ -280,6 +280,12 @@
 .menuItem {
   display: flex;
   align-items: stretch;
+  min-width: 0;
+}
+
+.menuTooltipAnchor {
+  display: block;
+  width: 100%;
   min-width: 0;
 }
 
@@ -467,6 +473,15 @@
 .toggleButton[data-placement="edge"] .menuIcon {
   width: var(--prime-sys-size-control-s-icon);
   height: var(--prime-sys-size-control-s-icon);
+}
+
+.root:not([data-state="hidden"]) .toggleButton[data-placement="edge"]:not(:disabled) {
+  opacity: 0.5;
+}
+
+.root:not([data-state="hidden"]) .toggleButton[data-placement="edge"]:not(:disabled):hover,
+.root:not([data-state="hidden"]) .toggleButton[data-placement="edge"]:not(:disabled):focus-visible {
+  opacity: 1;
 }
 
 .root[data-side="right"] .toggleButton[data-placement="edge"] {
