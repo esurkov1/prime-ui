@@ -1,5 +1,7 @@
 # ButtonGroup
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite control made of several button-like segments inside one outline: shared size, shared borders, and rounded corners only on the outer corners.

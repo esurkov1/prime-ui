@@ -1,5 +1,7 @@
 # Button
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A compound action control: root button (`Button.Root`), optional icon (`Button.Icon`), and loading indicator (`Button.Spinner`), aligned in size through context.

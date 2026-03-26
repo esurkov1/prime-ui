@@ -1,5 +1,7 @@
 # Breadcrumb
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite breadcrumb component: a `nav` with an `ol` list, link or plain-text items for the current page, optional separators, and an ellipsis for long paths.

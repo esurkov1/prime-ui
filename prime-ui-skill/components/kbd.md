@@ -1,5 +1,7 @@
 # Kbd
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 The `Kbd.Root` component is styled markup for indicating a key or a step in a keyboard shortcut in the UI (rendered as a `kbd` element).

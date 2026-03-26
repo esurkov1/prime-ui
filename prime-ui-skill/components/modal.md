@@ -1,5 +1,7 @@
 # Modal
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A modal dialog over the page: a panel in a portal with a dimmed backdrop, scroll locking, and focus trapped inside the dialog until it closes.

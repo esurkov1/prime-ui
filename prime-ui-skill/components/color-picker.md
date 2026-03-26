@@ -1,5 +1,7 @@
 # ColorPicker
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite color-picker widget in the prime-ui-kit UI: a two-channel area, channel sliders, a preset palette, hex input, and a channel strip with an eyedropper; color state stays in sync via **react-aria-components** primitives (`Color` model, markup and a11y from React Aria).

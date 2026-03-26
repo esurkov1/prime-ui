@@ -1,5 +1,7 @@
 # Input
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite single-line input block: label and metadata on the outside, inside—a bordered row with a native `input`, optional icons, and text affixes.

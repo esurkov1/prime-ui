@@ -1,5 +1,7 @@
 # Pagination
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 Single-component navigation for paged lists: “previous” and “next” arrows, clickable page numbers, and a shortened row with an ellipsis when there are many pages.

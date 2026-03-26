@@ -1,5 +1,7 @@
 # Radio
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite “radio button” control: a field wrapper, label with native `input type="radio"`, and optional hint and error message.

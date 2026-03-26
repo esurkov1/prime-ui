@@ -1,5 +1,7 @@
 # Banner
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite announcement strip: a root grid with a central text block and an optional close button; inside — slots for an icon, title, description, and a row of actions.

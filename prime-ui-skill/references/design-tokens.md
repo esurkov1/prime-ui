@@ -4,6 +4,8 @@ Full map of the token system for use in responsive layouts.
 All visual values come **only** from the semantic layer (`--prime-sys-*`).
 Direct references to primitives (`--prime-ref-*`) in components are **forbidden** (RULES.md, section 3).
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай размер **`m`** для оси `size` у компонентов, если явно не оговорено иное.
+
 ---
 
 ## Architecture

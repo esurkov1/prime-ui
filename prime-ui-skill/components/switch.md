@@ -1,5 +1,7 @@
 # Switch
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A compound on/off toggle: a hidden native input with `role="switch"`, a visible track with a thumb, and slots for label, hint, and error text.

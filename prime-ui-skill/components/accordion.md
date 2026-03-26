@@ -1,5 +1,7 @@
 # Accordion
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A set of nested parts (`Root`, `Item`, `Header`, `Trigger`, `Content`, plus `Icon` and `Arrow` slots) that shows a list of sections: clicking the trigger expands the associated content with a height animation.

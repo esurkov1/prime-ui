@@ -1,5 +1,7 @@
 # Textarea
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite multiline input: the text field, an optional character counter in the footer, hint and error slots with automatic linkage via `aria-describedby`.

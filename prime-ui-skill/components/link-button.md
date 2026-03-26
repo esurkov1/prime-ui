@@ -1,5 +1,7 @@
 # LinkButton
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A single-component link (`LinkButton.Root`) with control typography and padding, underline on hover and focus, and four size options.

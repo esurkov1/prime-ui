@@ -1,5 +1,7 @@
 # Avatar
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite circular avatar component: photo (`Avatar.Image`), fallback layer (`Avatar.Fallback`), and optional overlapping group (`Avatar.Group`).

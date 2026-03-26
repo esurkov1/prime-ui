@@ -1,5 +1,7 @@
 # Checkbox
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A compound “checkbox” control: a hidden native `input type="checkbox"`, a visible square with a checkmark or an indeterminate dash, a label, and optional hint and error.

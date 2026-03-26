@@ -1,5 +1,7 @@
 # Divider
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 `Divider` is a visual content separator: a horizontal or vertical line, optionally with a label or icon.

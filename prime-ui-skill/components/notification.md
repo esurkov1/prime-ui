@@ -1,5 +1,7 @@
 # Notification
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A toast system on context and portal: the provider holds a message queue, hooks show and dismiss cards, and `NotificationCard` can be rendered standalone for a static preview.

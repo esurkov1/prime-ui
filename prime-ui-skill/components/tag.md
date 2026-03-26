@@ -1,5 +1,7 @@
 # Tag
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A compact label (chip): text, an optional icon, and an optional remove control. A compound component with a root element (`Tag.Root`) and an icon slot (`Tag.Icon`), sized consistently via context.

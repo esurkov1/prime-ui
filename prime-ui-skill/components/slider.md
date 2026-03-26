@@ -1,5 +1,7 @@
 # Slider
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A horizontal slider built on the native `input type="range"` with kit tokens: optional text label, `s`–`xl` sizes, and a configurable range.

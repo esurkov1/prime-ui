@@ -1,5 +1,7 @@
 # FileUpload
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A compositional set for file selection: a zone built on a `label` with a hidden `input type="file"`, drag-and-drop support, and separate markup blocks for lists of uploaded files with a format badge and progress.

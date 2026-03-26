@@ -48,6 +48,7 @@ If a rule is marked **MUST**, violating it blocks merge.
 - **MUST**: `size`/`variant` values rely on a shared vocabulary, not ad hoc strings.
 - **MUST**: do not mix visual mode, state, and business logic in a single prop.
 - **SHOULD**: use native HTML attributes where possible.
+- **MUST** (design, docs, playground, LLM prompts): при проектировании экранов и примеров **изначально** выбирается размер **`m`** для любой оси `size` (или значение по умолчанию компонента, если оно равно `m`), если явно не оговорено иное.
 
 ## 7. DOM and Data-Attributes Contract
 

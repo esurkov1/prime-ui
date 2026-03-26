@@ -4,6 +4,8 @@ React 19 component library: **CSS Modules**, **design tokens** as CSS variables 
 
 **[npm](https://www.npmjs.com/package/prime-ui-kit)** · **[Repository & issues](https://github.com/esurkov1/prime-ui)**
 
+**Проектирование:** при разработке макетов и примеров по умолчанию задавай **`m`** для оси `size` у всех компонентов, где она есть, если не требуется другой размер.
+
 ---
 
 ## Requirements

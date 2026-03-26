@@ -2,6 +2,8 @@
 
 Fifteen resources for building adaptive layouts with Flexbox, with a mobile-first emphasis.
 
+**Проектирование по умолчанию:** при макетах на prime-ui-kit изначально задавай **`m`** для `size` у компонентов кита (где есть ось размера), если явно не оговорено иное.
+
 ---
 
 ## 1. A Complete Guide to CSS Flexbox — CSS-Tricks

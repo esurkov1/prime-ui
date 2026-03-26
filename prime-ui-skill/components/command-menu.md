@@ -1,5 +1,7 @@
 # CommandMenu
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite “command palette” component: a modal with a search field and a list of actions, where items filter as you type and can be chosen with the keyboard or the mouse.

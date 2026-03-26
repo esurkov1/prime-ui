@@ -1,5 +1,7 @@
 # Select
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite dropdown: a trigger button showing the current value or a hint, plus a portal menu with options to pick exactly one value.

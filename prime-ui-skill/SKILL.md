@@ -29,6 +29,7 @@ Full token reference: [`references/design-tokens.md`](references/design-tokens.m
    Light and dark are supported equally.
 4. **CSS Modules + CSS variables.** Tailwind is not used in prime-ui-kit.
 5. **Control sizing via the `size` prop.** Layout does not override button or field heights.
+6. **Default size when designing.** When planning screens, wireframes, and examples, **always start with `m`** for every component that exposes a `size` (or control-size) axis — unless the scenario explicitly requires `s`, `l`, or `xl`. This applies to prompts, skills, and documentation: **`m` is the baseline**, not an afterthought.
 
 ### Raw components only — no custom shells (strict)
 

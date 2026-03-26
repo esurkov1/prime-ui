@@ -1,5 +1,7 @@
 # Stepper
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A set of components for displaying a multi-step process: a high-level `Stepper` on a semantic list and primitive `HorizontalStepper` / `VerticalStepper` with manual `state` on each step.

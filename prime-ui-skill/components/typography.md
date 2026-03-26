@@ -1,5 +1,7 @@
 # Typography
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A set of styles for a paragraph, line, or text block with a fixed size scale and optional axes: weight, tracking, italic, and muted color.

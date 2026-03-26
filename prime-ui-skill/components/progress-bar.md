@@ -1,5 +1,7 @@
 # ProgressBar
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A horizontal completion indicator built on the native `progress` element: fill ratio is set with `value` and `max`, with optional label and size.

@@ -1,5 +1,7 @@
 # Popover
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite block of “anchor + portal panel”: clicking the trigger opens a dialog panel with arbitrary content next to it, positioned at the viewport edge and dismissible via Escape or an outside click.

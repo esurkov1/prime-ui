@@ -4,6 +4,8 @@ Full table of all 41 components mapped to responsive layout.
 
 **Zone shorthand:** header, sidebar, content, footer, overlay, form, inline, navigation.
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` у компонентов с осью размера, если явно не оговорено иное.
+
 ## Accordion
 
 | | |

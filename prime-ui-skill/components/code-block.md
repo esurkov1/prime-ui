@@ -1,5 +1,7 @@
 # CodeBlock
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 The `CodeBlock` object with a `Root` subcomponent: static display of a TypeScript or TSX fragment with syntax highlighting and a choice of light or dark token palettes.

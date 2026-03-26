@@ -1,5 +1,7 @@
 # DataTable
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 The `DataTable.Root` component is a table built on native `table` markup with optional column sorting, pagination or scroll mode with incremental loading, a sticky header, and a sticky first column.

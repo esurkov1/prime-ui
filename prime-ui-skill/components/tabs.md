@@ -1,5 +1,7 @@
 # Tabs
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A compound set for tabs: a list of switches, content panels, and slots for icon and label, with one active tab at a time.

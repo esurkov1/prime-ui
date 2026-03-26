@@ -1,5 +1,7 @@
 # Sidebar
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 Composite side navigation: a root with state context, an optional narrow section column, and a main panel with item groups, headings, and a footer.

@@ -1,5 +1,7 @@
 # DigitInput
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A group of separate input fields, each holding exactly one digit, with shared logic to assemble the string, arrow-key focus navigation, and support for pasting a code from the clipboard.

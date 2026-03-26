@@ -1,5 +1,7 @@
 # ProgressCircle
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 `ProgressCircle` is a circular completion indicator: an SVG ring with `progressbar` role and optional centered content.

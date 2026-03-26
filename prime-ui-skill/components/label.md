@@ -1,5 +1,7 @@
 # Label
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite label for form fields and other controls: root `Label.Root` (native `label`) with optional slots `Label.Icon`, `Label.Asterisk`, and `Label.Sub`.

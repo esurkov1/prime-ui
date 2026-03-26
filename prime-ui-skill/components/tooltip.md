@@ -1,5 +1,7 @@
 # Tooltip
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A composite tooltip layer: delay provider, root with open state, trigger with a single child, and content in a portal positioned relative to the anchor.

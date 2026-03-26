@@ -1,5 +1,7 @@
 # Datepicker
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A set of pieces for calendar date or range selection: day grid, size-context shell, quick presets, time of day, and a text caption; the grid is built on react-day-picker with prime-ui-kit styling, and locale plus date formatting integrate cleanly via date-fns.

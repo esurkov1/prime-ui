@@ -1,5 +1,7 @@
 # Badge
 
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+
 ## What it is
 
 A compact, non-standalone label (badge) for status, category, or count, with optional slots for a dot and an icon.
