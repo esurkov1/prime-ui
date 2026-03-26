@@ -107,16 +107,19 @@
   --sb-panel-width: var(--prime-sys-unit-16rem);
 }
 
-/* Внешние поля от края вьюпорта и до main — только токены; внутри панели — свои padding в `.navPanel`. */
+/* Внешние поля — только на корне aside; не анимируем (дёрганье). Схлопывание — на `.navArea`. */
 .root[data-sidebar-slot="page-nav"] {
   flex: 0 0 auto;
   align-self: stretch;
   min-width: 0;
   min-height: 0;
   height: auto;
+  width: fit-content;
+  max-width: 100%;
   margin-block: var(--sb-page-inset);
   margin-inline-start: var(--sb-page-inset);
   margin-inline-end: var(--sb-page-gap);
+  transition: none;
   --sb-shell-gap: 0;
 }
 
@@ -135,26 +138,6 @@
     var(--sb-panel-width) +
     var(--sb-nav-gap-open)
   );
-}
-
-@media (min-width: 64.001rem) {
-  .root[data-sidebar-slot="page-nav"] {
-    width: auto;
-    min-width: 0;
-    max-width: var(--sb-page-nav-expanded);
-    overflow: hidden;
-    transition:
-      max-width var(--sb-transition-duration) var(--sb-transition-ease),
-      margin-inline var(--sb-transition-duration) var(--sb-transition-ease),
-      margin-block var(--sb-transition-duration) var(--sb-transition-ease);
-  }
-
-  .root[data-sidebar-slot="page-nav"][data-open="false"] {
-    max-width: 0;
-    margin-inline-start: 0;
-    margin-inline-end: 0;
-    margin-block: var(--sb-page-inset);
-  }
 }
 
 @media (max-width: 64rem) {
@@ -204,10 +187,17 @@
 
 @media (min-width: 64.001rem) {
   .root[data-sidebar-slot="page-nav"] .navArea {
-    width: 100%;
+    width: auto;
     min-width: 0;
-    max-width: 100%;
-    transition: gap var(--sb-transition-duration) var(--sb-transition-ease);
+    max-width: var(--sb-page-nav-expanded);
+    overflow: hidden;
+    transition:
+      max-width var(--sb-transition-duration) var(--sb-transition-ease),
+      gap var(--sb-transition-duration) var(--sb-transition-ease);
+  }
+
+  .root[data-sidebar-slot="page-nav"][data-open="false"] .navArea {
+    max-width: 0;
   }
 }
 
@@ -421,15 +411,14 @@
   pointer-events: none;
 }
 
-/* `page-nav` на широком экране: только сжатие колонки (overflow), без slide — иначе дублирование с анимацией ширины. */
+/* Десктоп page-nav: панель уезжает влево вместе со сжатием `.navArea` (не только clip). */
 @media (min-width: 64.001rem) {
   .root[data-sidebar-slot="page-nav"] .navPanel {
-    transform: none;
     opacity: 1;
   }
 
   .root[data-sidebar-slot="page-nav"][data-open="false"] .navPanel {
-    transform: none;
+    transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
     opacity: 1;
     pointer-events: none;
   }
