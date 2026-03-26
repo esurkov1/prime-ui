@@ -19,17 +19,31 @@ describe("DashboardCard", () => {
     expect(screen.getByText("36 years")).toBeInTheDocument();
   });
 
-  it("renders section variant with title and body", () => {
+  it("renders section variant with title and chart region", () => {
     render(
       <DashboardCard.Root variant="section" data-testid="section-card">
         <DashboardCard.SectionHeader>
           <DashboardCard.SectionTitle>Revenue</DashboardCard.SectionTitle>
         </DashboardCard.SectionHeader>
-        <DashboardCard.Body>Chart</DashboardCard.Body>
+        <DashboardCard.Chart>Chart</DashboardCard.Chart>
       </DashboardCard.Root>,
     );
     expect(screen.getByTestId("section-card")).toHaveAttribute("data-variant", "section");
     expect(screen.getByRole("heading", { name: "Revenue" })).toBeInTheDocument();
     expect(screen.getByText("Chart")).toBeInTheDocument();
+  });
+
+  it("renders section variant with padded body and chart", () => {
+    render(
+      <DashboardCard.Root variant="section" data-testid="section-card">
+        <DashboardCard.SectionHeader>
+          <DashboardCard.SectionTitle>Revenue</DashboardCard.SectionTitle>
+        </DashboardCard.SectionHeader>
+        <DashboardCard.Body>Intro</DashboardCard.Body>
+        <DashboardCard.Chart>Plot</DashboardCard.Chart>
+      </DashboardCard.Root>,
+    );
+    expect(screen.getByText("Intro")).toBeInTheDocument();
+    expect(screen.getByText("Plot")).toBeInTheDocument();
   });
 });

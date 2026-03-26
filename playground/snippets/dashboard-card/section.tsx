@@ -10,9 +10,9 @@ export default function DashboardCardSectionSnippet() {
           <Icon name="nav.layoutGrid" />
         </DashboardCard.SectionTrailing>
       </DashboardCard.SectionHeader>
-      <DashboardCard.Body>
+      <DashboardCard.Chart>
         <div aria-hidden="true" />
-      </DashboardCard.Body>
+      </DashboardCard.Chart>
     </DashboardCard.Root>
   );
 }

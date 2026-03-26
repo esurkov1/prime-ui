@@ -104,6 +104,7 @@ export type {
 export { CommandMenu } from "./command-menu/CommandMenu";
 export type {
   DashboardCardBodyProps,
+  DashboardCardChartProps,
   DashboardCardDescriptionProps,
   DashboardCardHeaderRowProps,
   DashboardCardIconBoxProps,

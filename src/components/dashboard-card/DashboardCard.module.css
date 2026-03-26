@@ -175,6 +175,7 @@
   height: var(--prime-sys-size-control-m-icon);
 }
 
+/* Текст, таблицы, сводки — с полями по краям. */
 .body {
   box-sizing: border-box;
   display: flex;
@@ -187,10 +188,46 @@
   background: var(--prime-sys-color-surface-raised);
 }
 
-/* Один корневой узел (например обёртка графика) заполняет доступную высоту Body. */
 .body > *:only-child {
   flex: 1 1 auto;
   min-height: 0;
   align-self: stretch;
   width: 100%;
+}
+
+/* График edge-to-edge под заголовком секции (без внутренних полей). */
+.chart {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 0;
+  background: var(--prime-sys-color-surface-raised);
+}
+
+.chart > *:only-child {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-self: stretch;
+  width: 100%;
+}
+
+/* --- variant section: распределение высоты между Body и Chart --- */
+
+.root[data-variant="section"] > .sectionHeader + .body:last-child,
+.root[data-variant="section"] > .sectionHeader + .chart:last-child {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.root[data-variant="section"] > .sectionHeader + .body:not(:last-child) {
+  flex: 0 1 auto;
+}
+
+.root[data-variant="section"] > .body + .chart {
+  flex: 1 1 auto;
+  min-height: 0;
 }

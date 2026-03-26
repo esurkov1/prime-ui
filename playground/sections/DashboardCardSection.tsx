@@ -18,6 +18,8 @@ import DashboardCardRowSnippet from "../snippets/dashboard-card/row";
 import rowSource from "../snippets/dashboard-card/row.tsx?raw";
 import DashboardCardSectionSnippet from "../snippets/dashboard-card/section";
 import sectionSource from "../snippets/dashboard-card/section.tsx?raw";
+import DashboardCardSectionContentAndChartSnippet from "../snippets/dashboard-card/section-content-and-chart";
+import sectionContentAndChartSource from "../snippets/dashboard-card/section-content-and-chart.tsx?raw";
 
 const dashboardCardRootApiRows: PlaygroundApiPropRow[] = [
   {
@@ -115,14 +117,29 @@ export default function DashboardCardSection() {
         <div className="demoBlock">
           <DemoSectionTitle>Section</DemoSectionTitle>
           <DemoDescription>
-            <code>variant=&quot;section&quot;</code>: <code>SectionHeader</code> с{" "}
-            <code>SectionTitle</code> и опциональным <code>SectionTrailing</code>; в{" "}
-            <code>Body</code> один корневой узел (например контейнер графика) занимает всю область
-            тела карточки.
+            <code>variant=&quot;section&quot;</code>: <code>SectionHeader</code> и область{" "}
+            <code>Chart</code> без внутренних полей — корень библиотеки графиков на всю ширину и
+            высоту под заголовком.
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={sectionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DashboardCardSectionSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Section: контент и график</DemoSectionTitle>
+          <DemoDescription>
+            <code>Body</code> — текст или таблица с отступами; ниже <code>Chart</code> — график без
+            полей, занимает оставшуюся высоту.
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root
+            code={sectionContentAndChartSource.trim()}
+            previewLayout="stack"
+          >
+            <PlaygroundExampleFrame.Stage>
+              <DashboardCardSectionContentAndChartSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>

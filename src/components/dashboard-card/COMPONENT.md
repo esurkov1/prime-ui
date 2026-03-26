@@ -4,7 +4,7 @@
 
 ## About
 
-Composable surfaces for **dashboard KPIs** and **chart shells**: four layout presets driven by **`variant`** on **`DashboardCard.Root`**. Typography and spacing use semantic tokens (`--prime-sys-*`). The kit does not ship chart primitives — pass any chart, SVG sparkline, or [ProgressBar](../progress-bar/COMPONENT.md) into **`DashboardCard.Media`** or **`DashboardCard.Body`**.
+Composable surfaces for **dashboard KPIs** and **chart shells**: four layout presets driven by **`variant`** on **`DashboardCard.Root`**. Typography and spacing use semantic tokens (`--prime-sys-*`). The kit does not ship chart primitives — pass any chart, SVG sparkline, or [ProgressBar](../progress-bar/COMPONENT.md) into **`DashboardCard.Media`**, **`DashboardCard.Chart`** (**`section`**, edge-to-edge), or padded **`DashboardCard.Body`**.
 
 Design alignment (informative):
 
@@ -17,7 +17,7 @@ Design alignment (informative):
 - **Use** **`variant="mini"`** for a compact KPI: optional **`IconBox`** + **`Stack`** with **`Label`** and **`Value`**.
 - **Use** **`variant="metric"`** for a title row: **`HeaderRow`** with **`Lead`** (badge or icon) and **`Value`**, plus **`Description`** underneath.
 - **Use** **`variant="metric-media"`** like metric, then **`Media`** for a sparkline, ring, or thin progress strip.
-- **Use** **`variant="section"`** for a titled block around a full chart or table: **`SectionHeader`** (`SectionTitle`, optional **`SectionTrailing`**) + **`Body`**.
+- **Use** **`variant="section"`** for a titled block: **`SectionHeader`** + **`Body`** (padded copy or tables) and/or **`Chart`** (full-width chart area, no inner padding).
 - **Do not use** as the only focus target for navigation; wrap a [LinkButton](../link-button/COMPONENT.md) or make an inner control focusable instead of the whole card, unless you add explicit `role`/`tabIndex` and keyboard handling.
 - **Do not use** decorative icons without **`aria-hidden`** when the text repeats the meaning.
 
@@ -35,7 +35,8 @@ Design alignment (informative):
 - **`DashboardCard.SectionHeader`** — bar with bottom border for **`section`**.
 - **`DashboardCard.SectionTitle`** — `h3` title.
 - **`DashboardCard.SectionTrailing`** — optional actions or icon on the right.
-- **`DashboardCard.Body`** — main content (charts, tables, custom layout). With **`variant="section"`**, the shell has a **minimum height**; when **`Body`** has **exactly one element child**, it **stretches to fill** the body area (typical chart/table root). Override height via **`className`** on **`Root`** if needed.
+- **`DashboardCard.Body`** — **`section`**: padded region for text, summaries, or tables. With **`variant="section"`**, the shell has a **minimum height**; a **single element child** can stretch inside the padded box. Override height via **`className`** on **`Root`** if needed.
+- **`DashboardCard.Chart`** — **`section`**: **no** horizontal or vertical inner padding; mount the chart library root here for **edge-to-edge** drawing under the header. Optional after **`Body`**; then **`Chart`** fills remaining height.
 
 ### Mini example
 
@@ -78,7 +79,7 @@ export function MetricCard() {
 }
 ```
 
-### Section example
+### Section example (chart only)
 
 ```tsx
 import { DashboardCard } from "prime-ui-kit";
@@ -89,9 +90,31 @@ export function ChartSection() {
       <DashboardCard.SectionHeader>
         <DashboardCard.SectionTitle>Revenue</DashboardCard.SectionTitle>
       </DashboardCard.SectionHeader>
-      <DashboardCard.Body>
+      <DashboardCard.Chart>
         <div id="revenue-chart" />
+      </DashboardCard.Chart>
+    </DashboardCard.Root>
+  );
+}
+```
+
+### Section example (padded content + chart)
+
+```tsx
+import { DashboardCard } from "prime-ui-kit";
+
+export function ChartSectionWithIntro() {
+  return (
+    <DashboardCard.Root variant="section">
+      <DashboardCard.SectionHeader>
+        <DashboardCard.SectionTitle>Revenue</DashboardCard.SectionTitle>
+      </DashboardCard.SectionHeader>
+      <DashboardCard.Body>
+        <p>Short summary or filters.</p>
       </DashboardCard.Body>
+      <DashboardCard.Chart>
+        <div id="revenue-chart" />
+      </DashboardCard.Chart>
     </DashboardCard.Root>
   );
 }
@@ -103,7 +126,7 @@ export function ChartSection() {
 - Prefer **`flat`** on dense dashboards if shadows feel noisy; default shadow uses **`--prime-sys-elevation-shadow-surface`**.
 - **`SectionTitle`** is an **`h3`**; ensure heading levels match the page outline (skip levels appropriately).
 - **`Description`** is a **`p`** — only one block per card unless you compose custom markup inside **`Body`** for **`section`**.
-- **`variant="section"`** sets a **minimum height** on **`Root`** so **`Body`** can grow; a **single element child** in **`Body`** is stretched to fill the content region (mount your chart library root there). Multiple children keep normal **flex** spacing (`gap`).
+- **`variant="section"`** sets a **minimum height** on **`Root`**. Order after **`SectionHeader`**: optional **`Body`** (inset content), optional **`Chart`** (full bleed). If both are present, **`Body`** sizes to its content and **`Chart`** takes the **remaining height**. A **single element child** in **`Chart`** (or in **`Body`** when it is the only block) stretches within that region.
 - For **`metric-media`**, keep **`Media`** height predictable so rows in a grid stay aligned, or use one column on narrow viewports.
 - Icons in **`IconBox`** / **`Lead`** should not be the sole carrier of meaning; pair with visible text.
 
@@ -212,8 +235,16 @@ export function ChartSection() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Main section content. With **`section`**, one **element** child fills the body; text-only children are not stretched. |
+| children | `React.ReactNode` | — | No | Padded **`section`** content (text, tables). One **element** child can stretch inside the padded area. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the body `div`. |
+
+### DashboardCard.Chart
+
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Extra class. |
+| children | `React.ReactNode` | — | No | **`section`** chart root; **no** inner padding (edge-to-edge). |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the chart region `div`. |
 
 ## Imports
 

@@ -218,6 +218,20 @@ function DashboardCardBody({ className, children, ...rest }: DashboardCardBodyPr
 }
 DashboardCardBody.displayName = "DashboardCardBody";
 
+export type DashboardCardChartProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function DashboardCardChart({ className, children, ...rest }: DashboardCardChartProps) {
+  return (
+    <div className={cx(styles.chart, className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+DashboardCardChart.displayName = "DashboardCardChart";
+
 export const DashboardCard = {
   Root: DashboardCardRoot,
   IconBox: DashboardCardIconBox,
@@ -232,4 +246,5 @@ export const DashboardCard = {
   SectionTitle: DashboardCardSectionTitle,
   SectionTrailing: DashboardCardSectionTrailing,
   Body: DashboardCardBody,
+  Chart: DashboardCardChart,
 };
