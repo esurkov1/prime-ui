@@ -26,6 +26,7 @@
   --sb-item-trailing-opacity: 1;
   --sb-item-trailing-scale: 1;
   --sb-item-trailing-max-width: 100%;
+  --sb-identity-main-max-width: 100%;
 
   --sb-group-label-align: start;
 
@@ -118,6 +119,7 @@
 
 .header {
   flex: 0 0 auto;
+  width: 100%;
   min-width: 0;
   padding: 0;
 }
@@ -140,6 +142,7 @@
 
 .content {
   flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
   min-height: 0;
   padding: 0;
@@ -147,6 +150,7 @@
 
 .footer {
   flex: 0 0 auto;
+  width: 100%;
   margin-top: auto;
   min-width: 0;
   padding: 0;
@@ -222,11 +226,11 @@
   display: flex;
   align-items: center;
   gap: var(--sb-item-gap);
-  width: var(--sb-item-width);
-  min-width: var(--sb-item-min-width);
-  max-width: var(--sb-item-max-width);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: var(--sb-control-height);
-  margin-inline-start: var(--sb-item-offset-inline-start);
+  margin-inline-start: 0;
   padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
   padding-inline: var(--sb-item-padding-inline);
   border: 0;
@@ -241,7 +245,6 @@
   cursor: pointer;
   overflow: hidden;
   transition:
-    margin-inline-start var(--sb-transition-duration) var(--sb-transition-ease),
     gap var(--sb-transition-duration) var(--sb-transition-ease),
     padding-inline var(--sb-transition-duration) var(--sb-transition-ease),
     background-color var(--sb-transition-duration) var(--sb-transition-ease),
@@ -270,7 +273,7 @@
 }
 
 .itemButton {
-  width: var(--sb-item-width);
+  width: 100%;
 }
 
 .menuIcon {
@@ -402,7 +405,7 @@
   inset-block-start: calc(
     var(--sb-panel-padding-block) +
     var(--sb-control-height) +
-    var(--prime-sys-spacing-x1)
+    var(--prime-sys-spacing-x2)
   );
   inset-inline-end: 0;
   transform: translate(50%, -50%);
@@ -422,11 +425,11 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sb-item-gap);
-  width: var(--sb-item-width);
-  min-width: var(--sb-item-min-width);
-  max-width: var(--sb-item-max-width);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
-  margin-inline-start: var(--sb-item-offset-inline-start);
+  margin-inline-start: 0;
   padding-inline: var(--sb-item-padding-inline);
   padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
   border: 0;
@@ -437,10 +440,6 @@
   cursor: pointer;
   overflow: hidden;
   transition:
-    width var(--sb-transition-duration) var(--sb-transition-ease),
-    min-width var(--sb-transition-duration) var(--sb-transition-ease),
-    max-width var(--sb-transition-duration) var(--sb-transition-ease),
-    margin-inline-start var(--sb-transition-duration) var(--sb-transition-ease),
     gap var(--sb-transition-duration) var(--sb-transition-ease),
     padding-inline var(--sb-transition-duration) var(--sb-transition-ease),
     background-color var(--sb-transition-duration) var(--sb-transition-ease),
@@ -476,10 +475,13 @@
   flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
+  max-width: var(--sb-identity-main-max-width);
+  overflow: hidden;
   gap: var(--prime-sys-unit-2px);
   opacity: var(--sb-item-label-opacity);
   transform: translateX(var(--sb-item-label-shift));
   transition:
+    max-width var(--sb-transition-duration) var(--sb-transition-ease),
     opacity var(--sb-transition-duration) var(--sb-transition-ease),
     transform var(--sb-transition-duration) var(--sb-transition-ease);
 }
@@ -656,26 +658,30 @@
 @media (min-width: 48rem) {
   .root[data-state="compact"] {
     --sb-panel-padding-inline: var(--prime-sys-spacing-x1);
-    --sb-item-width: var(--sb-control-height);
-    --sb-item-min-width: var(--sb-control-height);
-    --sb-item-max-width: var(--sb-control-height);
-    --sb-item-offset-inline-start: calc((100% - var(--sb-control-height)) / 2);
-    --sb-item-padding-inline: 0px;
-    --sb-item-gap: 0px;
-    --sb-item-icon-col: 1fr;
-    --sb-item-label-col: 0fr;
-    --sb-item-trailing-col: 0px;
+    --sb-item-padding-inline: var(--prime-sys-spacing-x1);
+    --sb-item-gap: var(--prime-sys-spacing-x1);
     --sb-item-label-opacity: 0;
-    --sb-item-label-shift: -0.25rem;
+    --sb-item-label-shift: -0.125rem;
     --sb-item-label-max-width: 0px;
     --sb-item-trailing-opacity: 0;
     --sb-item-trailing-scale: 0.85;
     --sb-item-trailing-max-width: 0px;
+    --sb-identity-main-max-width: 0px;
     --sb-group-label-align: center;
   }
 
-  .root[data-state="compact"] .menuIcon {
+  .root[data-state="compact"] .menuButton,
+  .root[data-state="compact"] .identityButton {
+    justify-content: center;
+  }
+
+  .root[data-state="compact"] .menuIcon,
+  .root[data-state="compact"] .identityButtonLeading {
     margin-inline: auto;
+  }
+
+  .root[data-state="compact"] .identityButtonMain {
+    flex: 0 1 auto;
   }
 
   .root[data-state="compact"] .groupHeaderAction,

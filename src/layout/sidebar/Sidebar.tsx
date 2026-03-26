@@ -412,6 +412,7 @@ const SidebarItem = React.forwardRef<HTMLButtonElement, SidebarItemProps>(
     const { state, isMobile, side } = useSidebarContext();
     const compact = state === "compact" && !isMobile;
     const showTooltip = compact && tooltip !== false;
+    const tooltipLabel = tooltip === true ? label : tooltip;
 
     const node = (
       <SidebarMenuButton
@@ -426,14 +427,14 @@ const SidebarItem = React.forwardRef<HTMLButtonElement, SidebarItemProps>(
       </SidebarMenuButton>
     );
 
-    if (!showTooltip) return node;
-
     return (
-      <Tooltip.Root>
+      <Tooltip.Root open={showTooltip ? undefined : false}>
         <Tooltip.Trigger>{node}</Tooltip.Trigger>
-        <Tooltip.Content side={side === "left" ? "right" : "left"}>
-          {tooltip === true ? label : tooltip}
-        </Tooltip.Content>
+        {tooltipLabel === false || tooltipLabel === undefined ? null : (
+          <Tooltip.Content side={side === "left" ? "right" : "left"}>
+            {tooltipLabel}
+          </Tooltip.Content>
+        )}
       </Tooltip.Root>
     );
   },
