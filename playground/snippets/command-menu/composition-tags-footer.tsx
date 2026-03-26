@@ -19,7 +19,7 @@ export default function CommandMenuCompositionSnippet() {
         Полная композиция
       </Button.Root>
 
-      <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l" aria-labelledby="cmd-title">
+      <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="cmd-title">
         <div style={{ padding: "var(--prime-sys-spacing-x4) var(--prime-sys-spacing-x4) 0" }}>
           <Typography.Root
             as="div"

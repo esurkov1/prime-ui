@@ -18,7 +18,6 @@ export default function CommandMenuFullWidthSnippet() {
       <CommandMenu.Dialog
         open={open}
         onOpenChange={setOpen}
-        size="l"
         className={cmdStyles.dialogContentWide}
       >
         <CommandMenu.InputRow

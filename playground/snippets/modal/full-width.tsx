@@ -5,7 +5,7 @@ import { Icon } from "@/icons";
 /** Кнопки в подвале с `fullWidth`: колонка действий на всю ширину панели (типично для узкой ширины). */
 export default function ModalFullWidthSnippet() {
   return (
-    <Modal.Root size="m">
+    <Modal.Root>
       <Modal.Trigger>
         <Button.Root size="m" variant="neutral" mode="stroke">
           Оформить заказ

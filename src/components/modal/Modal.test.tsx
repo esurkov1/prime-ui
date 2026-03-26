@@ -75,44 +75,6 @@ describe("Modal (composable API)", () => {
     expect(screen.getByRole("button", { name: "Close modal" })).toHaveAttribute("data-size", "m");
   });
 
-  it("sets data-size on dialog and overlay from Modal.Root size", () => {
-    render(
-      <Modal.Root size="l" defaultOpen>
-        <Modal.Portal>
-          <Modal.Overlay />
-          <Modal.Content aria-label="Sized modal">
-            <Modal.Body>
-              <p>Content</p>
-            </Modal.Body>
-          </Modal.Content>
-        </Modal.Portal>
-      </Modal.Root>,
-    );
-
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-size", "l");
-    expect(screen.getByTestId("modal-overlay")).toHaveAttribute("data-size", "l");
-  });
-
-  it("matches shell size s on header close button when Root size is s", () => {
-    render(
-      <Modal.Root size="s" defaultOpen>
-        <Modal.Portal>
-          <Modal.Overlay />
-          <Modal.Content aria-labelledby="t">
-            <Modal.Header>
-              <Modal.Title id="t">T</Modal.Title>
-              <Modal.Close>
-                <Button.Root aria-label="Close modal">X</Button.Root>
-              </Modal.Close>
-            </Modal.Header>
-          </Modal.Content>
-        </Modal.Portal>
-      </Modal.Root>,
-    );
-
-    expect(screen.getByRole("button", { name: "Close modal" })).toHaveAttribute("data-size", "s");
-  });
-
   it("closes via Modal.Close button inside Header", () => {
     render(<BasicModal />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));

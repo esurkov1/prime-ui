@@ -5,8 +5,6 @@ import { Modal, type ModalRootProps } from "@/components/modal/Modal";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { ModalSize } from "@/internal/states";
-
 import styles from "./CommandMenu.module.css";
 
 // ─── Filtering & item registry ───────────────────────────────────────────────
@@ -176,7 +174,6 @@ function CommandMenuDialog({
   overlayClassName,
   className,
   contentClassName,
-  size = "l",
   open,
   defaultOpen,
   onOpenChange,
@@ -192,7 +189,6 @@ function CommandMenuDialog({
       onOpenChange={onOpenChange}
       closeOnEscape={closeOnEscape}
       closeOnOverlayClick={closeOnOverlayClick}
-      size={size as ModalSize}
     >
       <Modal.Portal>
         <Modal.Overlay className={cx(styles.dialogOverlay, overlayClassName)}>
@@ -597,5 +593,3 @@ export const CommandMenu = {
   Footer: CommandMenuFooter,
   FooterKeyBox: CommandMenuFooterKeyBox,
 };
-
-export type { ModalSize as CommandMenuDialogSize };

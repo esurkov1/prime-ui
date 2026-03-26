@@ -40,7 +40,6 @@ export const componentSizes = {
   breadcrumb: ["s", "m", "l", "xl"] as const,
   divider: ["s", "m", "l", "xl"] as const,
   label: ["s", "m", "l", "xl"] as const,
-  modal: ["s", "m", "l", "xl"] as const,
   hint: ["s", "m", "l", "xl"] as const,
   alert: ["s", "m", "l", "xl"] as const,
   banner: ["s", "m", "l", "xl"] as const,
@@ -88,7 +87,6 @@ export type LinkButtonSize = (typeof componentSizes.linkButton)[number];
 export type BreadcrumbSize = (typeof componentSizes.breadcrumb)[number];
 export type DividerSize = (typeof componentSizes.divider)[number];
 export type LabelSize = (typeof componentSizes.label)[number];
-export type ModalSize = (typeof componentSizes.modal)[number];
 export type HintSize = (typeof componentSizes.hint)[number];
 export type AlertSize = (typeof componentSizes.alert)[number];
 export type BannerSize = (typeof componentSizes.banner)[number];

@@ -12,7 +12,7 @@ function TestPalette({
   onOpenChange?: (v: boolean) => void;
 }) {
   return (
-    <CommandMenu.Dialog open={open} onOpenChange={onOpenChange} size="l">
+    <CommandMenu.Dialog open={open} onOpenChange={onOpenChange}>
       <CommandMenu.Input placeholder="Поиск" aria-label="Поиск команд" />
       <CommandMenu.List>
         <CommandMenu.Group heading="Тест">

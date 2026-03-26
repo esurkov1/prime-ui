@@ -37,7 +37,7 @@ export function CommandPaletteBasic() {
         Commands
       </Button.Root>
 
-      <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l" aria-labelledby="cmd-basic-title">
+      <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="cmd-basic-title">
         <CommandMenu.DialogTitle id="cmd-basic-title" style={{ margin: "1rem 1rem 0", fontSize: "1.125rem" }}>
           Application commands
         </CommandMenu.DialogTitle>
@@ -72,9 +72,9 @@ export function CommandPaletteBasic() {
 }
 ```
 
-### Variants / sizes
+### Variants / density
 
-Another context—tuning density for a directory UI: search row height and list row type size are independent of the overall modal scale.
+Another context—tuning density for a directory UI: search row height and list row type size are independent of each other.
 
 ```tsx
 import { Search } from "lucide-react";
@@ -85,7 +85,7 @@ export function CommandPaletteDensityAndItems() {
   const [open, setOpen] = React.useState(true);
 
   return (
-    <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="m">
+    <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
       <CommandMenu.InputRow
         density="comfortable"
         leading={<Search size={18} strokeWidth={2} aria-hidden />}
@@ -121,7 +121,7 @@ export function WorkspaceSettingsCommandPalette() {
   const [scopes, setScopes] = React.useState(["Projects", "People"]);
 
   return (
-    <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l" aria-labelledby="ws-cmd-title">
+    <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="ws-cmd-title">
       <div style={{ padding: "1rem 1rem 0" }}>
         <Typography.Root as="div" id="ws-cmd-title" role="heading" aria-level={2} size="l" weight="semibold">
           Workspace
@@ -205,7 +205,6 @@ export function ControlledCommandPalette() {
           setOpen(v);
           if (!v) setQuery("");
         }}
-        size="l"
       >
         <CommandMenu.InputRow leading={<Search size={18} strokeWidth={2} aria-hidden />}>
           <CommandMenu.Input
@@ -251,7 +250,6 @@ Subcomponent tree:
 | onOpenChange | (open: boolean) => void | — | No | Open state change |
 | closeOnEscape | boolean | true | No | Close on Escape |
 | closeOnOverlayClick | boolean | true | No | Close on overlay click |
-| size | "s" \| "m" \| "l" \| "xl" | "l" | No | Modal scale |
 | overlayClassName | string | — | No | Overlay class |
 | className | string | — | No | Content panel class (width modifiers from the CSS module) |
 | contentClassName | string | — | No | Extra panel class |
@@ -331,7 +329,6 @@ Bottom bar: `div` attributes, including the `footerMuted` class from the CSS mod
 
 ## Variants
 
-- **Dialog size** `Dialog size`: `s` | `m` | `l` | `xl` — affects typography and the `ControlSizeProvider` cascade inside the modal.
 - **Search row density** `InputRow density`: `compact` or `comfortable`.
 - **Item size** `Item size`: `s` or `m`.
 - **Key hint tone** `FooterKeyBox tone`: `default` (outlined badge) or `muted` (light fill on a dark footer).

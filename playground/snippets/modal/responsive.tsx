@@ -5,7 +5,7 @@ import { Icon } from "@/icons";
 /** Ширина панели в стилях: min(100%, максимум для выбранного size) — на узком экране занимает доступную ширину с отступами оверлея. */
 export default function ModalResponsiveSnippet() {
   return (
-    <Modal.Root size="l">
+    <Modal.Root>
       <Modal.Trigger>
         <Button.Root size="m" variant="neutral" mode="stroke">
           Широкая панель (l)

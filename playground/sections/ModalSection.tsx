@@ -11,8 +11,6 @@ import ModalFullWidthSnippet from "../snippets/modal/full-width";
 import fullWidthSource from "../snippets/modal/full-width.tsx?raw";
 import ModalResponsiveSnippet from "../snippets/modal/responsive";
 import responsiveSource from "../snippets/modal/responsive.tsx?raw";
-import ModalSizesSnippet from "../snippets/modal/sizes";
-import sizesSource from "../snippets/modal/sizes.tsx?raw";
 import ModalStatesSnippet from "../snippets/modal/states";
 import statesSource from "../snippets/modal/states.tsx?raw";
 
@@ -53,13 +51,6 @@ const modalRootApiRows: PlaygroundApiPropRow[] = [
     description: "Закрытие по клику на подложку (только если target — сам оверлей).",
   },
   {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: '"m"',
-    required: "Нет",
-    description: "Масштаб панели, отступов оверлея и ярус ControlSizeProvider внутри Content.",
-  },
-  {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
@@ -85,7 +76,7 @@ const modalCloseApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Да",
     description:
-      "Ровно один дочерний элемент; по клику закрывает модал. В шапке для Button.Root без size подставляется размер оболочки.",
+      "Ровно один дочерний элемент; по клику закрывает модал. В шапке для Button.Root без size подставляется размер m.",
   },
 ];
 
@@ -126,7 +117,7 @@ const modalOverlayApiRows: PlaygroundApiPropRow[] = [
     type: "React.HTMLAttributes<HTMLDivElement>",
     defaultValue: "—",
     required: "Нет",
-    description: 'role="presentation", data-size от контекста; остальные атрибуты div.',
+    description: 'role="presentation"; остальные атрибуты div.',
   },
 ];
 
@@ -164,7 +155,7 @@ const modalContentApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Шапка, тело, подвал; внутри включается ControlSizeProvider.",
+    description: "Шапка, тело, подвал; внутри включается ControlSizeProvider (размер m).",
   },
   {
     prop: "…rest",
@@ -333,21 +324,6 @@ export default function ModalSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
-            Четыре значения <code>size</code> на <code>Modal.Root</code> (<code>s</code>,{" "}
-            <code>m</code>, <code>l</code>, <code>xl</code>): ширина панели, отступы оверлея, сетка
-            шапки и размер кнопки закрытия в <code>Modal.Header</code> без собственного{" "}
-            <code>size</code>.
-          </p>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="row">
-            <PlaygroundExampleFrame.Stage>
-              <ModalSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
           <h4>Состояния</h4>
           <p className="demoBlockDescription">
             По умолчанию закрытие по Escape и клику на подложку; с{" "}
@@ -392,9 +368,8 @@ export default function ModalSection() {
         <div className="demoBlock">
           <h4>Адаптивная ширина</h4>
           <p className="demoBlockDescription">
-            Ширина панели задаётся стилями как <code>min(100%, …)</code> для каждого{" "}
-            <code>size</code>: на узком экране панель заполняет доступную ширину между отступами
-            оверлея.
+            Ширина панели задаётся стилями как <code>min(100%, …)</code>: на узком экране панель
+            заполняет доступную ширину между отступами оверлея.
           </p>
           <PlaygroundExampleFrame.Root code={responsiveSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
@@ -421,7 +396,7 @@ export default function ModalSection() {
           <h4>API</h4>
           <h5>Modal.Root</h5>
           <p className="demoBlockDescription">
-            Контекст открытости, политика закрытия и масштаб оболочки для вложенных частей.
+            Контекст открытости и политика закрытия для вложенных частей.
           </p>
           <PlaygroundApiTable rows={modalRootApiRows} />
           <h5>Modal.Trigger</h5>

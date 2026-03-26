@@ -39,7 +39,7 @@ export default function CommandMenuVariantsDensityItemsSnippet() {
         </Button.Root>
       </div>
 
-      <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l">
+      <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
         <CommandMenu.InputRow
           density={density}
           leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}

@@ -1,6 +1,6 @@
 # Modal
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` у контролов (где есть ось размера), если явно не оговорено иное. У **`Modal`** фиксированный масштаб оболочки **`m`** — отдельного `size` на `Modal.Root` нет.
 
 ## What it is
 
@@ -175,16 +175,16 @@ export function DeleteDraftConfirm() {
 }
 ```
 
-### Sizes / variants
+### Large announcement
 
-Public announcement on a kiosk: large shell `size="xl"` for distance and a prominent title.
+Public announcement on a kiosk: prominent title and body; use typography and buttons as needed (modal shell is fixed scale `m`).
 
 ```tsx
 import { Button, Icon, Modal } from "prime-ui-kit";
 
 export function KioskAnnouncement() {
   return (
-    <Modal.Root size="xl" defaultOpen>
+    <Modal.Root defaultOpen>
       <Modal.Portal>
         <Modal.Overlay>
           <Modal.Content aria-labelledby="kiosk-title">
@@ -226,7 +226,7 @@ import { Button, Icon, Input, Modal } from "prime-ui-kit";
 
 export function SupportTicketModal() {
   return (
-    <Modal.Root size="m">
+    <Modal.Root>
       <Modal.Trigger>
         <Button.Root size="m" variant="neutral" mode="stroke">
           Contact support
@@ -424,7 +424,6 @@ Inside `Content`:
 | `onOpenChange` | `(open: boolean) => void` | — | No | Open state changes (trigger, dismiss, programmatic). |
 | `closeOnEscape` | `boolean` | `true` | No | Close on Escape while the dialog is open. |
 | `closeOnOverlayClick` | `boolean` | `true` | No | Close when the click target is the overlay itself. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Panel scale, overlay padding, and `ControlSizeProvider` tier inside `Content`. |
 | `children` | `React.ReactNode` | — | No | Trigger, portal, and the rest of the tree. |
 
 ### Modal.Trigger
@@ -437,7 +436,7 @@ Inside `Content`:
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| `children` | `React.ReactElement<{ onClick?: …; className?: string; size?: ButtonSize }>` | — | Yes | One element; click closes the modal. Inside `Header`, `Button.Root` without `size` gets the shell size. |
+| `children` | `React.ReactElement<{ onClick?: …; className?: string; size?: ButtonSize }>` | — | Yes | One element; click closes the modal. Inside `Header`, `Button.Root` without `size` gets size **`m`**. |
 
 ### Modal.Portal
 
@@ -452,7 +451,7 @@ Inside `Content`:
 |------|------|---------|----------|-------------|
 | `className` | `string` | — | No | Extra class on the backdrop. |
 | `onClick` | `React.MouseEventHandler<HTMLDivElement>` | — | No | Runs before overlay-click close logic. |
-| … | `React.HTMLAttributes<HTMLDivElement>` | — | No | `role="presentation"`, `data-size` from context; other root `div` attributes. |
+| … | `React.HTMLAttributes<HTMLDivElement>` | — | No | `role="presentation"`; other root `div` attributes. |
 
 ### Modal.Content
 
@@ -508,7 +507,7 @@ Inside `Content`:
 
 ## Variants
 
-There is no separate `variant` prop on the modal: visual scale comes from **`size` on `Modal.Root`** (`s`, `m`, `l`, `xl`) — panel width, backdrop padding, header grid, and close button size in the header (when `Button` inside `Modal.Close` has no own `size`). Button semantics (primary, neutral, error) come from `Button` components inside the modal.
+There is no separate `variant` prop on the modal, and **no `size` on `Modal.Root`**: the shell is a single fixed scale (`m`) — panel width, backdrop padding, header layout, and default close button size in the header (when `Button` inside `Modal.Close` has no own `size`). Button semantics (primary, neutral, error) come from `Button` components inside the modal.
 
 ## States
 
@@ -527,7 +526,7 @@ There is no separate `variant` prop on the modal: visual scale comes from **`siz
 ## Limitations and notes
 
 - **No built-in `asChild`:** `Trigger` and `Close` expect **exactly one** child React element and merge `onClick` via `cloneElement`.
-- In **`Modal.Close`** inside **`Modal.Header`**, for a child with `displayName === "ButtonRoot"` without `size`, the shell size is applied; outside the header this injection does not happen.
+- In **`Modal.Close`** inside **`Modal.Header`**, for a child with `displayName === "ButtonRoot"` without `size`, size **`m`** is applied; outside the header this injection does not happen.
 - Long content: constrain **`Modal.Body`** height (or via class) and use **`overflow`** so scrolling happens inside the panel while the backdrop stays locked.
 - The **`container`** prop on **`Modal.Portal`** sets the mount node instead of `document.body` (tests, special stacking contexts); the backdrop remains `position: fixed` to the viewport unless ancestors change positioning context.
 - Full-width buttons in the panel — use **`fullWidth`** on **`Button.Root`** or footer layout; the modal has no dedicated prop for that.

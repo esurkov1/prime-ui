@@ -26,7 +26,7 @@ export default function CommandMenuFeaturesKeyboardSearchSnippet() {
         Открыть (или ⌘K / Ctrl+K)
       </Button.Root>
 
-      <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l">
+      <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
         <CommandMenu.InputRow
           leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}
         >

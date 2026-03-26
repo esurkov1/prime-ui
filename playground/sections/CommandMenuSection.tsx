@@ -6,8 +6,6 @@ import CommandMenuCompositionSnippet from "../snippets/command-menu/composition-
 import compositionSource from "../snippets/command-menu/composition-tags-footer.tsx?raw";
 import CommandMenuControlledSnippet from "../snippets/command-menu/controlled-open-search";
 import controlledSource from "../snippets/command-menu/controlled-open-search.tsx?raw";
-import CommandMenuDialogSizesSnippet from "../snippets/command-menu/dialog-sizes";
-import dialogSizesSource from "../snippets/command-menu/dialog-sizes.tsx?raw";
 import CommandMenuFeaturesSnippet from "../snippets/command-menu/features-keyboard-search";
 import featuresSource from "../snippets/command-menu/features-keyboard-search.tsx?raw";
 import CommandMenuFullWidthSnippet from "../snippets/command-menu/full-width-panel";
@@ -54,13 +52,6 @@ const dialogApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "true",
     required: "Нет",
     description: "Закрытие по клику на подложку.",
-  },
-  {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: '"l"',
-    required: "Нет",
-    description: "Масштаб оболочки модального окна и каскада размеров контролов.",
   },
   {
     prop: "overlayClassName",
@@ -511,19 +502,6 @@ export default function CommandMenuSection() {
       }
     >
       <div className="demoExamples">
-        <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
-            Проп <code>size</code> у <code>CommandMenu.Dialog</code>: <code>s</code>, <code>m</code>
-            , <code>l</code>, <code>xl</code> — масштаб модальной оболочки и вложенных контролов.
-          </p>
-          <PlaygroundExampleFrame.Root code={dialogSizesSource.trim()} previewLayout="row">
-            <PlaygroundExampleFrame.Stage>
-              <CommandMenuDialogSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
         <div className="demoBlock">
           <h4>Варианты</h4>
           <p className="demoBlockDescription">

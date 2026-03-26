@@ -28,7 +28,6 @@ export default function CommandMenuControlledSnippet() {
           setOpen(next);
           if (!next) setQuery("");
         }}
-        size="l"
       >
         <CommandMenu.InputRow
           leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}

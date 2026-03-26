@@ -16,7 +16,7 @@ export default function CommandMenuStatesSnippet() {
         Состояния пунктов
       </Button.Root>
 
-      <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l">
+      <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
         <CommandMenu.InputRow
           leading={<Search className={cmdStyles.inputIcon} strokeWidth={2} aria-hidden />}
         >

@@ -1,5 +1,5 @@
 /* Палитра команд: панель сверху экрана */
-.dialogOverlay[data-size] {
+.dialogOverlay {
   /* Перебиваем Modal overlay (grid + place-items: center), иначе панель не сжимается по ширине вьюпорта (min-width: auto у grid-item). */
   display: flex;
   flex-direction: column;
@@ -34,17 +34,16 @@
 }
 
 /*
- * Modal.Content всегда добавляет класс .content из Modal.module.css с правилами
- * `.content[data-size]` (padding, gap, display: grid). У них специфичность выше,
- * чем у одного `.dialogContent`, из‑за чего визуально появляется «вторая оболочка»
- * с отступом ~var(--prime-sys-unit-16px). Комбинируем с role и data-size на том же узле.
+ * Modal.Content добавляет класс .content из Modal.module.css (padding, gap, display: grid).
+ * Специфичность выше, чем у одного `.dialogContent`, из‑за чего визуально появляется «вторая оболочка»
+ * с отступом ~var(--prime-sys-unit-16px). Комбинируем с role на том же узле.
  */
-.dialogContent[role="dialog"][data-size] {
+.dialogContent[role="dialog"] {
   padding: 0;
   gap: 0;
   display: flex;
   flex-direction: column;
-  /* Перебиваем width/border-radius из Modal `.content[data-size]` (та же проблема специфичности). */
+  /* Перебиваем width/border-radius из Modal `.content` (та же проблема специфичности). */
   box-sizing: border-box;
   min-width: 0;
   max-width: 100%;
@@ -58,7 +57,7 @@
   max-width: 100%;
 }
 
-.dialogContent.dialogContentNarrow[role="dialog"][data-size] {
+.dialogContent.dialogContentNarrow[role="dialog"] {
   max-width: 100%;
   width: min(100%, var(--prime-sys-unit-39p5rem));
 }
@@ -68,30 +67,30 @@
   max-width: 100%;
 }
 
-.dialogContent.dialogContentWide[role="dialog"][data-size] {
+.dialogContent.dialogContentWide[role="dialog"] {
   max-width: 100%;
   width: min(100%, var(--prime-sys-unit-43p75rem));
 }
 
 /* Компактная высота панели */
-.dialogContent.dialogContentTight[role="dialog"][data-size] {
+.dialogContent.dialogContentTight[role="dialog"] {
   max-height: min(88vh, var(--prime-sys-unit-27p5rem));
 }
 
 @media (min-width: var(--prime-sys-unit-768px)) {
-  .dialogContent.dialogContentTight[role="dialog"][data-size] {
+  .dialogContent.dialogContentTight[role="dialog"] {
     height: var(--prime-sys-unit-27p5rem);
     max-height: min(88vh, var(--prime-sys-unit-27p5rem));
   }
 }
 
 /* Split: фиксированная высота на широких вьюпортах */
-.dialogContent.dialogContentSplitMd[role="dialog"][data-size] {
+.dialogContent.dialogContentSplitMd[role="dialog"] {
   overflow: hidden;
 }
 
 @media (min-width: var(--prime-sys-unit-768px)) {
-  .dialogContent.dialogContentSplitMd[role="dialog"][data-size] {
+  .dialogContent.dialogContentSplitMd[role="dialog"] {
     height: var(--prime-sys-unit-27p5rem);
     max-height: min(88vh, var(--prime-sys-unit-27p5rem));
   }

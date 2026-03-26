@@ -7,13 +7,15 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import { toDataAttributes } from "@/internal/data-attributes";
 import { Portal } from "@/internal/Portal";
-import type { ButtonSize, ModalSize } from "@/internal/states";
+import type { ButtonSize } from "@/internal/states";
 
 import styles from "./Modal.module.css";
 
 // ─── Context ─────────────────────────────────────────────────────────────────
+
+/** Единый масштаб оболочки модалки и каскада `ControlSizeProvider` (кнопка закрытия в шапке без своего `size`). */
+const MODAL_SHELL_SIZE = "m" as const satisfies ButtonSize;
 
 type ModalContextValue = {
   open: boolean;
@@ -21,7 +23,6 @@ type ModalContextValue = {
   onClose: () => void;
   closeOnEscape: boolean;
   closeOnOverlayClick: boolean;
-  shellSize: ModalSize;
 };
 
 const [ModalProvider, useModalContext] = createComponentContext<ModalContextValue>("Modal");
@@ -47,8 +48,6 @@ export type ModalRootProps = {
   onOpenChange?: (open: boolean) => void;
   closeOnEscape?: boolean;
   closeOnOverlayClick?: boolean;
-  /** Масштаб оболочки (панель, отступы, типографика шапки) и ярус для каскада `ControlSizeProvider`. По умолчанию `m`. */
-  size?: ModalSize;
   children?: React.ReactNode;
 };
 
@@ -58,7 +57,6 @@ function ModalRoot({
   onOpenChange,
   closeOnEscape = true,
   closeOnOverlayClick = true,
-  size = "m",
   children,
 }: ModalRootProps) {
   const [isOpen, setIsOpen] = useControllableState({
@@ -71,9 +69,7 @@ function ModalRoot({
   const onClose = React.useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
-    <ModalProvider
-      value={{ open: isOpen, onOpen, onClose, closeOnEscape, closeOnOverlayClick, shellSize: size }}
-    >
+    <ModalProvider value={{ open: isOpen, onOpen, onClose, closeOnEscape, closeOnOverlayClick }}>
       {children}
     </ModalProvider>
   );
@@ -109,13 +105,13 @@ export type ModalCloseProps = {
 };
 
 function ModalClose({ children }: ModalCloseProps) {
-  const { onClose, shellSize } = useModalContext();
+  const { onClose } = useModalContext();
   const insideHeader = React.useContext(ModalHeaderContext);
   const child = React.Children.only(children);
 
   const headerCloseSize: Partial<{ size: ButtonSize }> =
     insideHeader && isButtonRootElement(child) && child.props.size === undefined
-      ? { size: shellSize }
+      ? { size: MODAL_SHELL_SIZE }
       : {};
 
   return React.cloneElement(child, {
@@ -148,7 +144,7 @@ function ModalPortal({ children, container }: ModalPortalProps) {
 export type ModalOverlayProps = React.HTMLAttributes<HTMLDivElement>;
 
 function ModalOverlay({ className, onClick, ...rest }: ModalOverlayProps) {
-  const { onClose, closeOnOverlayClick, shellSize } = useModalContext();
+  const { onClose, closeOnOverlayClick } = useModalContext();
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     onClick?.(event);
@@ -164,7 +160,6 @@ function ModalOverlay({ className, onClick, ...rest }: ModalOverlayProps) {
       className={cx(styles.overlay, className)}
       onClick={handleClick}
       data-testid="modal-overlay"
-      {...toDataAttributes({ size: shellSize })}
       {...rest}
     />
   );
@@ -186,7 +181,7 @@ function ModalContent({
   "aria-describedby": ariaDescribedBy,
   ...rest
 }: ModalContentProps) {
-  const { open, onClose, closeOnEscape, shellSize } = useModalContext();
+  const { open, onClose, closeOnEscape } = useModalContext();
 
   const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
 
@@ -239,10 +234,9 @@ function ModalContent({
       aria-describedby={ariaDescribedBy}
       tabIndex={-1}
       className={cx(styles.content, className)}
-      {...toDataAttributes({ size: shellSize })}
       {...rest}
     >
-      <ControlSizeProvider value={shellSize}>{children}</ControlSizeProvider>
+      <ControlSizeProvider value={MODAL_SHELL_SIZE}>{children}</ControlSizeProvider>
     </div>
   );
 }
@@ -327,5 +321,3 @@ export const Modal = {
   Body: ModalBody,
   Footer: ModalFooter,
 };
-
-export type { ModalSize };

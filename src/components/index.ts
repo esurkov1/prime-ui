@@ -79,7 +79,6 @@ export type {
 export { ColorPicker, parseColor } from "./color-picker/ColorPicker";
 export type {
   CommandMenuDialogProps,
-  CommandMenuDialogSize,
   CommandMenuFooterKeyBoxProps,
   CommandMenuFooterProps,
   CommandMenuGroupProps,
@@ -209,7 +208,6 @@ export type {
   ModalOverlayProps,
   ModalPortalProps,
   ModalRootProps,
-  ModalSize,
   ModalTitleProps,
   ModalTriggerProps,
 } from "./modal/Modal";

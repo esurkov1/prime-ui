@@ -13,7 +13,7 @@ export default function CommandMenuItemIconAsSnippet() {
         ItemIcon с разным тегом
       </Button.Root>
 
-      <CommandMenu.Dialog open={open} onOpenChange={setOpen} size="l">
+      <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
         <CommandMenu.InputRow>
           <CommandMenu.Input placeholder="Иконки как SVG-компоненты…" aria-label="Поиск" />
         </CommandMenu.InputRow>
