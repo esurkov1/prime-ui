@@ -1,12 +1,11 @@
 .root {
-  --prime-button-font-size: var(--prime-sys-size-control-m-text);
   position: relative;
   border: var(--prime-sys-border-width-control) solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--prime-sys-size-control-m-gap);
-  font-size: var(--prime-button-font-size);
+  font-size: var(--prime-sys-size-control-m-text);
   font-weight: var(--prime-sys-typography-weight-medium);
   line-height: 1;
   white-space: nowrap;
@@ -28,7 +27,6 @@
 
 .root[data-size="m"] {
   --prime-icon-size: var(--prime-sys-size-control-m-icon);
-  --prime-button-font-size: var(--prime-sys-size-control-m-text);
   height: var(--prime-sys-size-control-m-height);
   /* Не ниже высоты (icon-only), но не сужать ниже текста при flex-shrink. */
   min-width: max(var(--prime-sys-size-control-m-height), min-content);
@@ -40,7 +38,7 @@
 
 .root[data-size="s"] {
   --prime-icon-size: var(--prime-sys-size-control-s-icon);
-  --prime-button-font-size: var(--prime-sys-size-control-s-text);
+  font-size: var(--prime-sys-size-control-s-text);
   height: var(--prime-sys-size-control-s-height);
   min-width: max(var(--prime-sys-size-control-s-height), min-content);
   border-radius: var(--prime-sys-size-control-s-radius);
@@ -51,7 +49,7 @@
 
 .root[data-size="l"] {
   --prime-icon-size: var(--prime-sys-size-control-l-icon);
-  --prime-button-font-size: var(--prime-sys-size-control-l-text);
+  font-size: var(--prime-sys-size-control-l-text);
   height: var(--prime-sys-size-control-l-height);
   min-width: max(var(--prime-sys-size-control-l-height), min-content);
   border-radius: var(--prime-sys-size-control-l-radius);
@@ -62,13 +60,20 @@
 
 .root[data-size="xl"] {
   --prime-icon-size: var(--prime-sys-size-control-xl-icon);
-  --prime-button-font-size: var(--prime-sys-size-control-xl-text);
+  font-size: var(--prime-sys-size-control-xl-text);
   height: var(--prime-sys-size-control-xl-height);
   min-width: max(var(--prime-sys-size-control-xl-height), min-content);
   border-radius: var(--prime-sys-size-control-xl-radius);
   gap: var(--prime-sys-size-control-xl-gap);
   padding-inline: var(--prime-sys-size-control-xl-buttonPaddingX);
   padding-block: var(--prime-sys-size-control-xl-buttonPaddingY);
+}
+
+/* Подпись наследует кегль контрола от корня: вложенный Typography с собственным data-size не перебивает размер */
+.root[data-size] :is(p, span, div)[data-size] {
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
 }
 
 .root:focus-visible {
