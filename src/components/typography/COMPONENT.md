@@ -1,30 +1,31 @@
 # Typography
 
-**Проектирование по умолчанию:** для текста страницы выбирайте **`body-default`** в `variant`, если явно не оговорено иное.
+**Default choice for page copy:** start from **`body-default`** in `variant` unless the scenario clearly needs another reading role.
 
 ## About
 
-Стилизованный текст с **семантическими ролями чтения** (`variant`), привязанными к `typography.role` в токенах, и опциональными осями: `weight`, `tracking`, курсив и приглушённый `tone`. Рендерится как выбранный HTML-тег (`as`).
+Styled text with **semantic reading roles** (`variant`) wired to `typography.role` in tokens, plus optional axes: `weight`, `tracking`, italic, and `tone` for secondary color. Renders as the HTML tag you pick with **`as`**.
 
-- **Use** для основного текста, подзаголовков по смыслу ролей, подписей и метрик там, где нужны токены кита, а не произвольный `font-size`.
-- **Use** `tone="muted"` для вторичных пояснений и юридических строк.
-- **Use** вложенные `Typography.Root` с разными `as` и `weight` внутри одного блока.
-- **Use** `as="h1"`–`as="h6"` для визуального уровня заголовка, согласованного с темой; по возможности сохраняйте логичный порядок уровней на странице.
-- **Use** `as` с landmarks (`main`, `article`, `section`, `header`, `footer`, …) при вёрстке шаблонов.
-- **Do not use** для подписи внутри **кнопки** или **поля ввода** как отдельной «типографики»: у этих компонентов свой ритм текста — положитесь на разметку [Button](../button/COMPONENT.md) / [Input](../input/COMPONENT.md) и при необходимости [Label](../label/COMPONENT.md).
-- **Do not use** `as` вместо настоящих `<button>` / `<a>` для действий и навигации.
-- **Do not use** ожидая отдельный контроль `line-height` вне роли — межстрочный интервал связан с `variant` в стилях.
+**When to use**
 
-Интерактивные компоненты (формы, кнопки и т.д.) настраиваются **своими** пропами и токенами; **`Typography`** к ним не относится и **не** задаёт их внешний вид.
+- Body copy, headings, captions, and metrics where you want kit tokens instead of ad-hoc `font-size`.
+- `tone="muted"` for secondary explanations, hints, and legal lines.
+- Nested **`Typography.Root`** nodes with different `as` / `weight` inside one block (see `./examples/05-inline-emphasis.tsx`).
+- `as="h1"`–`as="h6"` for heading levels that match the theme; keep a sensible outline order on the page.
+- `as` values that are landmarks (`main`, `article`, `section`, `header`, `footer`, …) when you need both semantics and typography on the same node — otherwise wrap landmarks in normal elements and put **`Typography.Root`** inside.
 
-## Справочное сопоставление: MD3, Apple (SF), Polaris
+**When not to use**
 
-Ниже — **ориентировочное** соответствие ролей prime-ui-kit стилям из [Material Design 3 — Type scale](https://m3.material.io/styles/typography/type-scale-tokens), уровням текста [Apple — Typography](https://developer.apple.com/design/human-interface-guidelines/typography) (SF Pro) и вариантам [Polaris Text](https://polaris.shopify.com/components/typography/text). У разных систем **разные pt/px**; ориентир — **уровень иерархии**, не побитовое совпадение.
+- As a substitute for **button** or **link** chrome — use [Button](../button/COMPONENT.md) / [LinkButton](../link-button/COMPONENT.md).
+- Expecting a separate `line-height` control per instance — line height is part of the role in CSS.
+- Interactive controls (fields, switches, etc.) still use their own components and sizes; **Typography** does not restyle them.
 
-**Кегль в теме:** каждая роль ссылается на ступени `typography.sizeScale` / `lineHeightScale` → примитивы `font.size.*` / `font.lineHeight.*`. Ниже — **приблизительный размер шрифта** при `1rem = 16px` на `:root` (округление).
+## Reference mapping: MD3, Apple (SF), Polaris
 
-| `variant` | Примитив кегля | ≈ px @16 | Близкий стиль MD3 | Близкий уровень Apple (SF) | Polaris `Text` |
-| --------- | ---------------- | -------- | ----------------- | --------------------------- | -------------- |
+Rough **hierarchy** alignment only — not pixel-perfect parity. Font size column assumes **`1rem = 16px`** on `:root` (rounded).
+
+| `variant` | Token step | ≈ px @16 | Close MD3 | Close Apple (SF) | Polaris `Text` |
+| --------- | ---------- | -------- | --------- | ---------------- | -------------- |
 | `display` | `9xl` | 57 | Display Large | Large Title | `heading3xl` |
 | `headline` | `6xl` | 32 | Headline Large | Title 1 | `heading2xl` |
 | `heading-page` | `4xl` | 28 | Headline Medium | Title 2 | `headingXl` |
@@ -34,34 +35,56 @@
 | `body-large` | `s` | 16 | Body Large | Body / Callout | `bodyLg` |
 | `body-default` | `xs` | 14 | Body Medium | Subheadline | `bodyMd` |
 | `body-small` | `2xs` | 12 | Body Small | Footnote | `bodySm` |
-| `body-compact` | кегль `xs`, межстрочный `2xs` | 14, плотнее | Label Large (плотная строка) | — | `bodyXs` |
-| `caption` | `2xs` | 12 | Label Medium | Caption 1 | `bodySm` (по смыслу + `tone`) |
-| `caption-micro` | `labelMicro` | 11 | Label Small | Caption 2 | самый мелкий смысловой уровень |
+| `body-compact` | `xs` size, tighter line | 14 | Label Large (dense) | — | `bodyXs` |
+| `caption` | `2xs` | 12 | Label Medium | Caption 1 | `bodySm` (with `tone`) |
+| `caption-micro` | `labelMicro` | 11 | Label Small | Caption 2 | smallest semantic step |
 
-Ступени **`7xl`**, **`8xl`** в шкале есть (как у MD3 Display Medium / Small по размеру), но **в роли `typography.role` не задействованы** — при необходимости используйте их через токены напрямую, не через `Typography`.
+Steps **`7xl`** / **`8xl`** exist in the scale but are **not** wired to `typography.role` — use tokens directly if you need them, not **`Typography`**.
 
 ## Composition
 
-- Одна часть: **`Typography.Root`**. Текст или инлайн-разметка в **`children`**.
-- **`as`** задаёт элемент по умолчанию **`p`**; допустимы абзац, инлайн, блок, **заголовки `h1`–`h6`**, **`small`**, **`blockquote`**, а также **landmarks**: `article`, `section`, `header`, `footer`, `aside`, `nav`, `main`.
+- Single primitive: **`Typography.Root`**. Put text or inline markup in **`children`**.
+- **`as`** defaults to **`p`**; allowed: paragraph, inline, block, **`h1`–`h6`**, **`small`**, **`blockquote`**, landmarks (`article`, `section`, `header`, `footer`, `aside`, `nav`, `main`).
 
-### Minimal example
+### Canonical example
 
 ```tsx
 import { Typography } from "prime-ui-kit";
 
 export function Example() {
-  return <Typography.Root variant="body-default">Hello</Typography.Root>;
+  return (
+    <>
+      <Typography.Root as="h1" variant="heading-page">
+        Release notes
+      </Typography.Root>
+      <Typography.Root as="p" variant="body-default" tone="muted">
+        Summary of changes for the current shipping cycle.
+      </Typography.Root>
+      <Typography.Root as="p" variant="body-default">
+        Copy uses reading roles; controls use their own size scale — keep both axes explicit in layouts.
+      </Typography.Root>
+    </>
+  );
 }
 ```
 
+### Extended examples
+
+- [`./examples/01-article.tsx`](./examples/01-article.tsx) — Article sections, block quote, and footer attribution.
+- [`./examples/02-form-labels-contrast.tsx`](./examples/02-form-labels-contrast.tsx) — **`Input`** slots with **`Typography.Root`** for label, optional tag, and hint contrast.
+- [`./examples/03-marketing-hero.tsx`](./examples/03-marketing-hero.tsx) — Hero eyebrow, display title, and supporting lines.
+- [`./examples/04-reading-scale.tsx`](./examples/04-reading-scale.tsx) — Full **`variant`** ladder with English sample strings.
+- [`./examples/05-inline-emphasis.tsx`](./examples/05-inline-emphasis.tsx) — Nested spans: **`weight`**, **`tracking`**, **`tone`** on **`body-default`**.
+
+**LLM note:** Prefer the runnable files under **`./examples/*.tsx`** for full scenarios and prop combinations; this page keeps the contract (rules + API tables) authoritative.
+
 ## Rules
 
-- **`variant` обязателен**; лишние **`data-*`** для значений по умолчанию не выставляются (`weight="regular"`, `tracking="normal"`, `tone="default"`, без курсива).
-- В DOM на корне: **`data-variant`** (кебаб-кейс, например `heading-page`).
-- HTML-атрибуты (`id`, `aria-*`, …) пробрасываются через **`...rest`**.
-- Корень использует **`text-wrap: balance`** для коротких блоков; при необходимости переопределяйте снаружи.
-- Отдельных состояний disabled/loading/error нет — сочетайте с родительским UI.
+- **`variant` is required**; default-looking props omit extra **`data-*`** (`weight="regular"`, `tracking="normal"`, `tone="default"`, no italic).
+- DOM: **`data-variant`** uses kebab-case (e.g. `heading-page`).
+- Standard HTML attributes (`id`, `aria-*`, …) pass through **`...rest`**.
+- Root uses **`text-wrap: balance`** on short blocks; override from a parent if needed.
+- No built-in disabled / loading / error states — combine with surrounding UI.
 
 ## API
 
@@ -69,21 +92,22 @@ export function Example() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| as | см. `TypographyAs` | `"p"` | No | HTML-элемент-обёртка |
-| variant | см. `TypographyVariant` | — | Yes | Семантическая роль чтения |
-| weight | `"regular"` \| `"medium"` \| `"semibold"` | `"regular"` | No | Начертание |
-| tracking | `"normal"` \| `"tight"` \| `"tighter"` \| `"wide"` | `"normal"` | No | Межбуквенное расстояние |
-| italic | `boolean` | `false` | No | Курсив |
-| tone | `"default"` \| `"muted"` | `"default"` | No | Основной или вторичный цвет текста |
-| children | `React.ReactNode` | — | No | Контент |
-| className | `string` | — | No | Дополнительный класс |
-| ref | `React.Ref<HTMLElement>` | — | No | Ref на узел |
-| …rest | `React.HTMLAttributes<HTMLElement>` | — | No | Прочие атрибуты элемента |
+| as | see `TypographyAs` | `"p"` | No | HTML element |
+| variant | see `TypographyVariant` | — | Yes | Reading role |
+| weight | `"regular"` \| `"medium"` \| `"semibold"` | `"regular"` | No | Font weight |
+| tracking | `"normal"` \| `"tight"` \| `"tighter"` \| `"wide"` | `"normal"` | No | Letter spacing |
+| italic | `boolean` | `false` | No | Italic |
+| tone | `"default"` \| `"muted"` | `"default"` | No | Primary vs secondary text color |
+| children | `React.ReactNode` | — | No | Content |
+| className | `string` | — | No | Extra class |
+| ref | `React.Ref<HTMLElement>` | — | No | Element ref |
+| …rest | `React.HTMLAttributes<HTMLElement>` | — | No | Other element props |
 
 ## Related
 
 - [Label](../label/COMPONENT.md)
 - [Hint](../hint/COMPONENT.md)
+- [Input](../input/COMPONENT.md)
 - [LinkButton](../link-button/COMPONENT.md)
 - [Banner](../banner/COMPONENT.md)
 - [Notification](../notification/COMPONENT.md)
