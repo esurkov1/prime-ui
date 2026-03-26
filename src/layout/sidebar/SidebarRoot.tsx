@@ -186,7 +186,6 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
 
   const openState = layoutState !== "hidden";
   const mobileOpen = Boolean(responsive) && isMobile && openState;
-  const showFloatingToggle = Boolean(responsive) && isMobile && !openState;
 
   const compactProgressTarget = !isMobile && layoutState === "compact" ? 1 : 0;
 
@@ -211,9 +210,37 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
   });
 
   const [floatingPortalReady, setFloatingPortalReady] = React.useState(false);
+  const [hasEdgeToggle, setHasEdgeToggle] = React.useState<boolean | null>(null);
+
+  React.useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (root == null) {
+      setHasEdgeToggle(null);
+      return;
+    }
+
+    const sync = () => {
+      setHasEdgeToggle(root.querySelector("button[data-placement='edge']") !== null);
+    };
+
+    sync();
+
+    const observer = new MutationObserver(sync);
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-placement"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
   React.useLayoutEffect(() => {
     setFloatingPortalReady(true);
   }, []);
+
+  const showFloatingToggle =
+    Boolean(responsive) && isMobile && !openState && hasEdgeToggle === false;
 
   const closeMobile = React.useCallback(() => {
     setLayoutState("hidden");

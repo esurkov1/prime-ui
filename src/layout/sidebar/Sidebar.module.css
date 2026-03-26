@@ -138,7 +138,11 @@
   padding-inline: var(--sb-panel-padding-inline);
   border: 0;
   border-radius: 0;
-  background: var(--prime-sys-color-surface-default);
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-surface-elevated) 65%,
+    var(--prime-sys-color-surface-default)
+  );
   box-shadow: none;
   transition: background-color var(--sb-transition-duration) var(--sb-transition-ease);
 }
@@ -449,13 +453,14 @@
   inset-block-start: calc(
     var(--sb-panel-padding-block) +
     var(--sb-control-height) +
-    var(--prime-sys-spacing-x2)
+    var(--prime-sys-spacing-x3)
   );
   inset-inline-end: 0;
   transform: translate(50%, -50%);
   border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   background: var(--prime-sys-color-surface-elevated);
   box-shadow: var(--prime-sys-elevation-shadow-surface);
+  pointer-events: auto;
 }
 
 .root[data-side="right"] .toggleButton[data-placement="edge"] {
@@ -756,6 +761,11 @@
     transition:
       transform var(--sb-transition-duration) var(--sb-transition-ease),
       background-color var(--sb-transition-duration) var(--sb-transition-ease);
+  }
+
+  .root[data-state="hidden"] .navPanel {
+    opacity: 1;
+    pointer-events: none;
   }
 
   .root[data-side="left"] .navPanel {
