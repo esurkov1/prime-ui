@@ -2,357 +2,166 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-A composite “command palette” component: a modal with a search field and a list of actions, where items filter as you type and can be chosen with the keyboard or the mouse.
+A modal command palette: search field plus a filterable list of actions. Typing narrows visible options; users pick with pointer or keyboard while focus stays on the combobox input.
 
-## What it’s for
+**When to use**
 
-- **Enterprise web app:** jump between sections (reports, settings, billing) without opening the full menu.
-- **CRM or operator desktop:** one shortcut opens actions for the current deal or ticket.
-- **Editor or content studio:** “create”, “export”, “preview” in one searchable list.
-- **Support:** pull knowledge-base articles and canned replies from keywords in the search box.
-- **E‑commerce or account area:** find orders and sections by number, status, or human-readable label.
-- **Media library or catalog:** narrow filter tags under the search plus commands like “open playlist”, “share” without a separate filter page.
+- **Dense navigation** — jump to sections, records, or actions without opening full menus (dashboards, CRM, admin).
+- **Power-user flows** — one surface for “go to…” and “do…” when labels map cleanly to filter strings and `keywords`.
+- **Keyboard-first desktops** — pair with your own global shortcut; arrow keys, Home, End, and Enter are handled from the search field.
+- **Grouped actions** — optional section headings and optional tag row under the search for scope chips.
 
-## Use cases
+**When not to use**
 
-Each example targets a different product screen and a different set of props.
+- **Multi-select or bulk pick** — only one active option; no built-in multi-value selection.
+- **Server-only search without a client list** — filtering is synchronous over registered items; huge lists need virtualization or a different pattern.
+- **Non-modal pickers** — use [Dropdown](../dropdown/COMPONENT.md) or [Select](../select/COMPONENT.md) for inline single choice.
+- **Built-in “no results” UX** — empty matches hide groups/items; you supply messaging or empty state markup yourself.
 
-### Basic
+## Composition
 
-Typical flow: a button opens the palette, the search field filters items by `value` and `keywords`, selecting an item closes the dialog.
+- **`CommandMenu.Dialog`** wraps content in [Modal](../modal/COMPONENT.md) (`role="dialog"`) and mounts **`CommandMenuRootProvider`**: search string, active option, and item registry live here. Open state is controlled (`open` / `onOpenChange`) or uncontrolled (`defaultOpen`).
+- **Recommended top order:** optional **`DialogTitle`** / **`DialogDescription`** (same typography shell as modal headings) → **`InputRow`** (optional slots **`leading`** / **`trailing`**) → **`Input`** → optional **`TagSection`** → **`TagSectionLabel`** / **`TagRow`** → **`List`** → optional **`Footer`** (optional **`FooterKeyBox`** for key hints).
+- **`List`** is the **`listbox`** (`id` wired to the input’s **`aria-controls`**). **`Group`** wraps **`Item`** nodes; groups with no visible items get **`hidden`**. **`Item`** registers for filtering and keyboard activation; put **`ItemIcon`** and label text inside **`Item`**.
+- **`Input`** may sit directly under **`Dialog`** without **`InputRow`** (valid markup); **`InputRow`** is the styled search row when you need leading/trailing slots or density.
 
-```tsx
-import { FileText, Search, Settings } from "lucide-react";
-import * as React from "react";
-import { Button, CommandMenu } from "prime-ui-kit";
-
-export function CommandPaletteBasic() {
-  const [open, setOpen] = React.useState(false);
-
-  return (
-    <>
-      <Button.Root size="m" variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
-        Commands
-      </Button.Root>
-
-      <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="cmd-basic-title">
-        <CommandMenu.DialogTitle id="cmd-basic-title">Application commands</CommandMenu.DialogTitle>
-        <CommandMenu.InputRow leading={<Search size={18} strokeWidth={2} aria-hidden />}>
-          <CommandMenu.Input placeholder="Command or search…" aria-label="Search commands" />
-        </CommandMenu.InputRow>
-        <CommandMenu.List>
-          <CommandMenu.Group heading="File">
-            <CommandMenu.Item
-              value="new document"
-              keywords="create new doc"
-              onSelect={() => setOpen(false)}
-            >
-              <CommandMenu.ItemIcon as={FileText} strokeWidth={2} />
-              New document
-            </CommandMenu.Item>
-          </CommandMenu.Group>
-          <CommandMenu.Group heading="Application">
-            <CommandMenu.Item
-              value="settings"
-              keywords="settings preferences"
-              onSelect={() => setOpen(false)}
-            >
-              <CommandMenu.ItemIcon as={Settings} strokeWidth={2} />
-              Settings
-            </CommandMenu.Item>
-          </CommandMenu.Group>
-        </CommandMenu.List>
-      </CommandMenu.Dialog>
-    </>
-  );
-}
-```
-
-### Variants / density
-
-Another context—tuning density for a directory UI: search row height and list row type size are independent of each other.
+### Minimal example
 
 ```tsx
-import { Search } from "lucide-react";
 import * as React from "react";
 import { CommandMenu } from "prime-ui-kit";
 
-export function CommandPaletteDensityAndItems() {
-  const [open, setOpen] = React.useState(true);
-
+export function Example() {
+  const [open, setOpen] = React.useState(false);
   return (
     <CommandMenu.Dialog open={open} onOpenChange={setOpen}>
-      <CommandMenu.InputRow
-        density="comfortable"
-        leading={<Search size={18} strokeWidth={2} aria-hidden />}
-      >
-        <CommandMenu.Input placeholder="Counterparty directory…" aria-label="Search" />
+      <CommandMenu.InputRow>
+        <CommandMenu.Input placeholder="Search" aria-label="Search commands" />
       </CommandMenu.InputRow>
       <CommandMenu.List>
-        <CommandMenu.Group heading="Legal entities">
-          <CommandMenu.Item value="Daisy LLC" size="m" onSelect={() => setOpen(false)}>
-            Daisy LLC
-          </CommandMenu.Item>
-          <CommandMenu.Item value="Sole proprietor Ivanov" size="s" onSelect={() => setOpen(false)}>
-            Sole proprietor Ivanov
-          </CommandMenu.Item>
-        </CommandMenu.Group>
+        <CommandMenu.Item value="action" onSelect={() => setOpen(false)}>
+          Action
+        </CommandMenu.Item>
       </CommandMenu.List>
     </CommandMenu.Dialog>
   );
 }
 ```
 
-### In context (form / modal / sidebar / …)
+## Rules
 
-A workspace settings screen: title and description at the top, removable search-scope tags under the search field, footer with keyboard hints. Uses `Tag`, `Kbd`, and `Button` from the same kit.
-
-```tsx
-import { Search, X } from "lucide-react";
-import * as React from "react";
-import { Button, CommandMenu, Kbd, Tag, Typography } from "prime-ui-kit";
-
-export function WorkspaceSettingsCommandPalette() {
-  const [open, setOpen] = React.useState(true);
-  const [scopes, setScopes] = React.useState(["Projects", "People"]);
-
-  return (
-    <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="ws-cmd-title">
-      <CommandMenu.DialogTitle id="ws-cmd-title">Workspace</CommandMenu.DialogTitle>
-      <CommandMenu.DialogDescription>Search objects and quick actions</CommandMenu.DialogDescription>
-
-      <CommandMenu.InputRow
-        leading={<Search size={18} strokeWidth={2} aria-hidden />}
-        trailing={
-          <>
-            <Kbd.Root aria-label="Open command palette">⌘K</Kbd.Root>
-            <Button.Root size="m" variant="neutral" mode="ghost" aria-label="Close" onClick={() => setOpen(false)}>
-              <Button.Icon>
-                <X size={18} strokeWidth={2} aria-hidden />
-              </Button.Icon>
-            </Button.Root>
-          </>
-        }
-      >
-        <CommandMenu.Input placeholder="Where to go…" aria-label="Search" />
-      </CommandMenu.InputRow>
-
-      <CommandMenu.TagSection>
-        <CommandMenu.TagSectionLabel>
-          <Typography.Root size="xs" tone="muted">
-            Scope
-          </Typography.Root>
-        </CommandMenu.TagSectionLabel>
-        <CommandMenu.TagRow>
-          {scopes.map((s) => (
-            <Tag.Root key={s} size="m" onRemove={() => setScopes((p) => p.filter((x) => x !== s))}>
-              {s}
-            </Tag.Root>
-          ))}
-        </CommandMenu.TagRow>
-      </CommandMenu.TagSection>
-
-      <CommandMenu.List>
-        <CommandMenu.Group heading="Actions">
-          <CommandMenu.Item value="invite" onSelect={() => setOpen(false)}>
-            Invite member
-          </CommandMenu.Item>
-        </CommandMenu.Group>
-      </CommandMenu.List>
-
-      <CommandMenu.Footer>
-        <Typography.Root size="xs" tone="muted">
-          Arrow keys and Enter work from the search field.
-        </Typography.Root>
-      </CommandMenu.Footer>
-    </CommandMenu.Dialog>
-  );
-}
-```
-
-### Controlled mode
-
-Integration with a router or analytics: open state and search query live in the parent; the query resets when the dialog closes.
-
-```tsx
-import { Search } from "lucide-react";
-import * as React from "react";
-import { CommandMenu, Typography } from "prime-ui-kit";
-
-export function ControlledCommandPalette() {
-  const [open, setOpen] = React.useState(false);
-  const [query, setQuery] = React.useState("");
-
-  return (
-    <>
-      <Typography.Root size="s" tone="muted">
-        Query: “{query || "—"}”
-      </Typography.Root>
-
-      <CommandMenu.Dialog
-        open={open}
-        onOpenChange={(v) => {
-          setOpen(v);
-          if (!v) setQuery("");
-        }}
-      >
-        <CommandMenu.InputRow leading={<Search size={18} strokeWidth={2} aria-hidden />}>
-          <CommandMenu.Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Synchronized input…"
-            aria-label="Search"
-          />
-        </CommandMenu.InputRow>
-        <CommandMenu.List>
-          <CommandMenu.Group heading="Reset">
-            <CommandMenu.Item value="clear" onSelect={() => setQuery("")}>
-              Clear search
-            </CommandMenu.Item>
-          </CommandMenu.Group>
-        </CommandMenu.List>
-      </CommandMenu.Dialog>
-    </>
-  );
-}
-```
-
-## Anatomy
-
-Subcomponent tree:
-
-`CommandMenu.Dialog` → internal state provider → child nodes:
-
-- optional `DialogTitle` / `DialogDescription` (exports align with `Modal`);
-- `InputRow` → `Input`;
-- optional `TagSection` → `TagSectionLabel`, `TagRow`;
-- `List` → `Group` → `Item` (with `ItemIcon` and text inside);
-- optional `Footer` → `FooterKeyBox` and text.
+- **Open state:** **`open`** + **`onOpenChange`** for controlled mode; **`defaultOpen`** (defaults to `false` via `Modal.Root`) for uncontrolled. Escape and overlay click close according to **`closeOnEscape`** and **`closeOnOverlayClick`** (both default `true`).
+- **Search state:** **`Input`** is uncontrolled by default (internal `search` drives filtering). Pass **`value`** / **`onChange`** for controlled input; when **`value`** is set, internal state tracks it via an effect. **`type`** is always **`search`**; **`size`** is not a valid prop on **`Input`**.
+- **Remount reset:** when the dialog content tree mounts, search and active item reset and the input is focused on the next animation frame—do not assume text persists across unmount.
+- **Filtering:** matches run against normalized **`value`** and **`keywords`** together; **`disabled`** items are excluded from matches and keyboard order. **`Item`** **`value`** is required.
+- **Selection:** Enter activates the active option; click and pointer move on an enabled, visible item updates the active option and can fire **`onSelect`**. **`Item`** renders **`type="button"`**; do not rely on **`type`** override.
+- **Panel styling:** **`className`** and **`contentClassName`** merge onto the dialog panel; width/height helpers (e.g. `dialogContentWide`, `dialogContentNarrow`, `dialogContentTight`) live in the component CSS module—import those classes in your app if you need them.
+- **Accessibility:** set **`aria-labelledby`** (and **`DialogTitle`** with a matching **`id`**) or an appropriate **`aria-label`** on the dialog surface; **`Input`** exposes **`role="combobox"`**, **`aria-controls`**, and **`aria-activedescendant`**; **`List`** is **`listbox`**, **`Item`** is **`option`** with **`aria-selected`**. Modal focus trap and scroll lock follow [Modal](../modal/COMPONENT.md) behavior.
+- **FooterKeyBox** wraps [Badge](../badge/COMPONENT.md) (`size="s"`, `color="gray"`); **`tone="muted"`** maps to badge variant **`lighter`**, default maps to **`stroke`**.
 
 ## API
 
 ### CommandMenu.Dialog
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| open | boolean | — | No | Controlled open state |
-| defaultOpen | boolean | false | No | Initial open state |
-| onOpenChange | (open: boolean) => void | — | No | Open state change |
-| closeOnEscape | boolean | true | No | Close on Escape |
-| closeOnOverlayClick | boolean | true | No | Close on overlay click |
-| overlayClassName | string | — | No | Overlay class |
-| className | string | — | No | Content panel class (width modifiers from the CSS module) |
-| contentClassName | string | — | No | Extra panel class |
-| aria-labelledby | string | — | No | Reference to title |
-| aria-describedby | string | — | No | Reference to description |
-| children | React.ReactNode | — | No | Palette markup |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | no | Palette markup (provider runs inside the panel) |
+| open | `boolean` | — | no | Controlled open state |
+| defaultOpen | `boolean` | `false` | no | Initial open when uncontrolled |
+| onOpenChange | `(open: boolean) => void` | — | no | Open state change callback |
+| closeOnEscape | `boolean` | `true` | no | Close when Escape is pressed |
+| closeOnOverlayClick | `boolean` | `true` | no | Close when the overlay is clicked |
+| overlayClassName | `string` | — | no | Overlay wrapper class |
+| className | `string` | — | no | Panel class (merged with internal dialog layout) |
+| contentClassName | `string` | — | no | Additional panel class merged before `className` |
+| aria-labelledby | `string` | — | no | IDs of labelling element(s) |
+| aria-describedby | `string` | — | no | IDs of description element(s) |
 
-### CommandMenu.DialogTitle / DialogDescription
+### CommandMenu.DialogTitle / CommandMenu.DialogDescription
 
-Heading and paragraph with the same typography classes as the title area in `Modal.Panel` (`h2` / description): standard HTML attributes plus `children`, `className`.
+| Part | Element | Notes |
+|------|---------|--------|
+| DialogTitle | `h2` | `React.HTMLAttributes<HTMLHeadingElement>` and `className`; same title class stack as modal shell |
+| DialogDescription | `p` | `React.HTMLAttributes<HTMLParagraphElement>` and `className`; same description class stack as modal shell |
 
 ### CommandMenu.InputRow
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| leading | React.ReactNode | — | No | Left slot |
-| trailing | React.ReactNode | — | No | Right slot |
-| density | "compact" \| "comfortable" | "compact" | No | Input row height |
-| children | React.ReactNode | — | No | Usually `Input` |
-| className | string | — | No | Wrapper class |
-| …rest | HTMLAttributes\<div\> | — | No | Other div attributes |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | no | Typically **`Input`** |
+| leading | `React.ReactNode` | — | no | Start slot |
+| trailing | `React.ReactNode` | — | no | End slot |
+| density | `"compact" \| "comfortable"` | `"compact"` | no | Search row vertical padding |
+| className | `string` | — | no | Wrapper class |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | no | Forwarded to the row `div` |
 
 ### CommandMenu.Input
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| value | string, etc. | — | No | Controlled search string |
-| onChange | ChangeEventHandler | — | No | Text input |
-| …rest | InputHTMLAttributes (without size, type) | — | No | `type` is fixed to `search`; arrow keys, Home, End, and Enter are handled internally |
+|------|------|---------|----------|-------------|
+| value | `string` (and other input value types) | — | no | Controlled value; when set, filters sync from this value |
+| onChange | `React.ChangeEventHandler<HTMLInputElement>` | — | no | Standard change handler; internal state updates when uncontrolled |
+| className | `string` | — | no | Input class |
+| …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" \| "type">` | — | no | Other attributes except `size` and `type` (`type` is fixed to `search`) |
 
 ### CommandMenu.List
 
-Container with `role="listbox"`: `children`, `className`, standard `div` attributes.
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | no | Groups and/or items |
+| className | `string` | — | no | List surface class |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | no | Passed through to the scroll container root (`role="listbox"`, stable `id` for `aria-controls`) |
 
 ### CommandMenu.Group
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| heading | React.ReactNode | — | No | Section heading |
-| children | React.ReactNode | — | No | Items |
-| …rest | HTMLAttributes\<div\> | — | No | Hidden when there are no visible items |
+|------|------|---------|----------|-------------|
+| heading | `React.ReactNode` | — | no | Section label (string vs node pick different heading wrappers) |
+| children | `React.ReactNode` | — | no | **`Item`** elements |
+| className | `string` | — | no | Group container class |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | no | Forwarded to the group `div`; container is **`hidden`** when no visible items belong to the group |
 
 ### CommandMenu.Item
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| value | string | — | Yes | String used for filtering; `""` is always visible |
-| keywords | string | "" | No | Extra search terms |
-| size | "s" \| "m" | "s" | No | Row size |
-| onSelect | () => void | — | No | Selection callback |
-| disabled | boolean | — | No | Excluded from filtering and keyboard nav |
-| …rest | ButtonHTMLAttributes (without type) | — | No | `type` is always `button` |
+|------|------|---------|----------|-------------|
+| value | `string` | — | yes | Text participating in filter matching |
+| keywords | `string` | `""` | no | Extra space for matching (not shown as the label) |
+| size | `CommandMenuItemSize` (`"s"` \| `"m"`) | `"s"` | no | Row density / type scale |
+| onSelect | `() => void` | — | no | Called when the item is chosen (click or keyboard activate) |
+| disabled | `boolean` | — | no | Excluded from filtering, visibility, and activation |
+| className | `string` | — | no | Button class |
+| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "onSelect">` | — | no | Other button props; `type` is always `button` |
 
 ### CommandMenu.ItemIcon
 
-| Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| as | ElementType | "span" | No | Root element or icon component |
-| className | string | — | No | Class |
-| …rest | props for `as` | — | No | Forwarded to the chosen element |
+Polymorphic icon slot: `as` (element type, default `"span"`), `className`, and remaining props forwarded to the chosen component (see `CommandMenuItemIconProps`).
 
 ### CommandMenu.TagSection / TagSectionLabel / TagRow
 
-Semantic wrappers for the block under the search field: `div` attributes and `children`.
+`React.HTMLAttributes<HTMLDivElement>` with `className` and `children` for the optional block between search and list.
 
 ### CommandMenu.Footer
 
-Bottom bar: `div` attributes, including the `footerMuted` class from the CSS module for a subdued background.
+`React.HTMLAttributes<HTMLDivElement>` with `className` and `children`; base styles from the module (e.g. footer layout tokens). Optional module classes such as `footerMuted` apply via `className` when you import the stylesheet.
 
 ### CommandMenu.FooterKeyBox
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| tone | "default" \| "muted" | "default" | No | Badge variant (outline / lighter) |
-| children | React.ReactNode | — | No | Icon or key label |
-| …rest | HTMLAttributes\<div\> (without color) | — | No | Everything else on the Badge root |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | no | Key cap or icon (rendered inside `Badge.Icon`) |
+| tone | `"default" \| "muted"` | `"default"` | no | Badge visual variant (`stroke` vs `lighter`) |
+| className | `string` | — | no | Extra class on the badge root |
+| …rest | `Omit<React.HTMLAttributes<HTMLDivElement>, "color">` | — | no | Additional attributes except `color` |
 
-## Variants
+## Related
 
-- **Search row density** `InputRow density`: `compact` or `comfortable`.
-- **Item size** `Item size`: `s` or `m`.
-- **Key hint tone** `FooterKeyBox tone`: `default` (outlined badge) or `muted` (light fill on a dark footer).
-- **Panel width:** classes from `CommandMenu.module.css` (e.g. `dialogContentWide`) via `className` on `Dialog`.
-
-## States
-
-- **Modal open:** controlled (`open` / `onOpenChange`) or uncontrolled (`defaultOpen`).
-- **Filtering:** typing in `Input` shrinks the list; items with `disabled` are skipped; `value=""` is never filtered out by the query.
-- **Active item:** highlight and `aria-activedescendant` on the search field; groups with no visible items are hidden (`hidden`).
-- **Selection:** click or Enter calls `onSelect` on the active item.
-
-## Accessibility (a11y)
-
-- Search field: `role="combobox"`, `aria-controls` points at `List`, `aria-activedescendant` at the option id.
-- List: `role="listbox"`.
-- Item: `role="option"`, `aria-selected`.
-- Provide a visible or visually hidden `DialogTitle` and, if needed, `aria-labelledby` on `Dialog`.
-- Keyboard navigation from the input: Up/Down, Home, End, Enter (Escape is handled by the modal).
-
-## Limitations and notes
-
-- No built-in “no results” screen—when there are no matches, groups hide; add your own empty state below the list.
-- Single active item; multi-select is not supported.
-- Filtering is synchronous and client-side; large lists may need virtualization or external server-side search.
-- Global shortcuts (e.g. ⌘K) are not built in—attach a listener on `document` in your app.
-
-## Related components
-
-- **Modal** — dialog foundation.
-- **Badge** — used inside `FooterKeyBox`.
-- **Button**, **LinkButton** — triggers and footer links.
-- **Tag** — often paired with `TagSection` / `TagRow`.
-- **Kbd** — shortcut display next to the search field.
-- **Typography** — titles and captions around the palette.
+- [Modal](../modal/COMPONENT.md) — dialog shell, focus trap, portal
+- [Badge](../badge/COMPONENT.md) — used inside **`FooterKeyBox`**
+- [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md) — triggers and links outside the palette
+- [Tag](../tag/COMPONENT.md) — common companion for **`TagRow`**
+- [Kbd](../kbd/COMPONENT.md) — shortcut hints in **`InputRow`** trailing slot
+- [Typography](../typography/COMPONENT.md) — titles, hints, footer copy
+- [Dropdown](../dropdown/COMPONENT.md), [Select](../select/COMPONENT.md) — non-modal single-choice lists
