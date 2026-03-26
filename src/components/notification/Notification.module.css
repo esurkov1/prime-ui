@@ -186,6 +186,16 @@
   height: var(--prime-sys-size-control-m-icon);
 }
 
+.card[data-size="s"] .icon {
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
+}
+
+.card[data-size="l"] .icon {
+  width: var(--prime-sys-size-control-l-icon);
+  height: var(--prime-sys-size-control-l-icon);
+}
+
 .content {
   min-width: 0;
   display: grid;

@@ -284,7 +284,7 @@
   --fu-item-main-gap: var(--prime-sys-spacing-x1);
   --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
   --fu-item-stack-gap: var(--prime-sys-spacing-x2);
-  --fu-item-name-font: var(--prime-sys-typography-control-m);
+  --fu-item-name-font: var(--prime-sys-size-control-m-text);
   --fu-item-meta-font: var(--prime-sys-typography-support-2xs);
   --fu-item-badge: var(--prime-sys-unit-2p5rem);
   --fu-item-badge-radius: var(--prime-sys-shape-radius-m);

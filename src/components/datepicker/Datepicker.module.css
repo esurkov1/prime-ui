@@ -49,6 +49,7 @@
   --dp-control-gap: var(--prime-sys-size-control-s-gap);
   --dp-control-text: var(--prime-sys-size-control-s-text);
   --dp-support-text: var(--prime-sys-size-control-s-supportText);
+  --rdp-day_button-border-radius: var(--prime-sys-size-control-s-radius);
   --dp-shell-gap: var(--prime-sys-spacing-x3);
   --dp-month-gap: var(--prime-sys-spacing-x3);
   --dp-header-pad-x: var(--prime-sys-spacing-x2);
@@ -61,6 +62,7 @@
   --dp-control-gap: var(--prime-sys-size-control-l-gap);
   --dp-control-text: var(--prime-sys-size-control-l-text);
   --dp-support-text: var(--prime-sys-size-control-l-supportText);
+  --rdp-day_button-border-radius: var(--prime-sys-size-control-l-radius);
   --dp-shell-gap: var(--prime-sys-spacing-x5);
   --dp-month-gap: var(--prime-sys-spacing-x5);
   --dp-header-pad-x: var(--prime-sys-spacing-x3);
@@ -73,6 +75,7 @@
   --dp-control-gap: var(--prime-sys-size-control-xl-gap);
   --dp-control-text: var(--prime-sys-size-control-xl-text);
   --dp-support-text: var(--prime-sys-size-control-xl-supportText);
+  --rdp-day_button-border-radius: var(--prime-sys-size-control-xl-radius);
   --dp-shell-gap: var(--prime-sys-spacing-x6);
   --dp-month-gap: var(--prime-sys-spacing-x6);
   --dp-header-pad-x: var(--prime-sys-spacing-x3);

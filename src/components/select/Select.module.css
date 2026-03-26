@@ -22,7 +22,7 @@
   border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
   background: var(--prime-sys-color-field-bg);
   color: var(--prime-sys-color-field-text);
-  font-size: var(--prime-sys-typography-control-m);
+  font-size: var(--prime-sys-size-control-m-text);
   line-height: var(--prime-sys-typography-body-lineHeight);
   font-family: inherit;
   box-shadow: var(--prime-sys-elevation-shadow-surface);
@@ -42,7 +42,7 @@
   --select-chevron-slot: var(--prime-sys-size-control-s-icon);
   height: var(--prime-sys-size-control-s-height);
   border-radius: var(--prime-sys-size-control-s-radius);
-  font-size: var(--prime-sys-typography-support-2xs);
+  font-size: var(--prime-sys-size-control-s-text);
 }
 
 .trigger[data-size="m"] {
@@ -50,7 +50,7 @@
   --select-chevron-slot: var(--prime-sys-size-control-m-icon);
   height: var(--prime-sys-size-control-m-height);
   border-radius: var(--prime-sys-size-control-m-radius);
-  font-size: var(--prime-sys-typography-control-s);
+  font-size: var(--prime-sys-size-control-m-text);
 }
 
 .trigger[data-size="l"] {
@@ -60,7 +60,7 @@
   --select-chevron-slot: var(--prime-sys-size-control-l-icon);
   height: var(--prime-sys-size-control-l-height);
   border-radius: var(--prime-sys-size-control-l-radius);
-  font-size: var(--prime-sys-typography-control-m);
+  font-size: var(--prime-sys-size-control-l-text);
 }
 
 .trigger[data-size="xl"] {
@@ -70,7 +70,7 @@
   --select-chevron-slot: var(--prime-sys-size-control-xl-icon);
   height: var(--prime-sys-size-control-xl-height);
   border-radius: var(--prime-sys-size-control-xl-radius);
-  font-size: var(--prime-sys-typography-control-l);
+  font-size: var(--prime-sys-size-control-xl-text);
 }
 
 .triggerMain {

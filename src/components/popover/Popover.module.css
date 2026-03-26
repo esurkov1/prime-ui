@@ -90,7 +90,7 @@
 .content[data-size="xl"] {
   --po-pad: var(--prime-sys-spacing-x4);
   --po-min-w: var(--prime-sys-unit-16rem);
-  --po-text-size: var(--prime-sys-size-control-xl-text);
+  --po-text-size: var(--prime-sys-size-control-xl-supportText);
 }
 
 :global([data-theme="dark"]) .content {
