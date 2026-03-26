@@ -13,12 +13,14 @@ import CodeBlockSection from "./sections/CodeBlockSection";
 import ColorPickerSection from "./sections/ColorPickerSection";
 import ColorSection from "./sections/ColorSection";
 import CommandMenuSection from "./sections/CommandMenuSection";
+import ControlSizeSection from "./sections/ControlSizeSection";
 import DataTableSection from "./sections/DataTableSection";
 import DatepickerSection from "./sections/DatepickerSection";
 import DigitInputSection from "./sections/DigitInputSection";
 import DividerSection from "./sections/DividerSection";
 import DrawerSection from "./sections/DrawerSection";
 import DropdownSection from "./sections/DropdownSection";
+import ExampleFrameSection from "./sections/ExampleFrameSection";
 import FileUploadSection from "./sections/FileUploadSection";
 import HintSection from "./sections/HintSection";
 import InputSection from "./sections/InputSection";
@@ -27,6 +29,8 @@ import LabelSection from "./sections/LabelSection";
 import LinkButtonSection from "./sections/LinkButtonSection";
 import ModalSection from "./sections/ModalSection";
 import NotificationSection from "./sections/NotificationSection";
+import PageContentSection from "./sections/PageContentSection";
+import PageShellSection from "./sections/PageShellSection";
 import PaginationSection from "./sections/PaginationSection";
 import PopoverSection from "./sections/PopoverSection";
 import ProgressBarSection from "./sections/ProgressBarSection";
@@ -53,7 +57,8 @@ export type PlaygroundCategoryId =
   | "feedback"
   | "layout"
   | "navigation"
-  | "overlays";
+  | "overlays"
+  | "auxiliary";
 
 export type PlaygroundCategoryMeta = { id: PlaygroundCategoryId; label: string };
 
@@ -66,6 +71,7 @@ export const PLAYGROUND_NAV_CATEGORIES: PlaygroundCategoryMeta[] = [
   { id: "layout", label: "Layout" },
   { id: "navigation", label: "Navigation" },
   { id: "overlays", label: "Overlays" },
+  { id: "auxiliary", label: "Вспомогательные компоненты" },
 ];
 
 type PageDef = { segment: string; label: string; Page: ComponentType };
@@ -133,6 +139,12 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     { segment: "dropdown", label: "Dropdown", Page: DropdownSection },
     { segment: "modal", label: "Modal", Page: ModalSection },
     { segment: "popover", label: "Popover", Page: PopoverSection },
+  ],
+  auxiliary: [
+    { segment: "page-shell", label: "PageShell", Page: PageShellSection },
+    { segment: "page-content", label: "PageContent", Page: PageContentSection },
+    { segment: "example-frame", label: "ExampleFrame", Page: ExampleFrameSection },
+    { segment: "control-size", label: "ControlSizeProvider", Page: ControlSizeSection },
   ],
 };
 
