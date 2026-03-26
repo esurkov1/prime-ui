@@ -2,191 +2,79 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-A compound action control: root button (`Button.Root`), optional icon (`Button.Icon`), and loading indicator (`Button.Spinner`), aligned in size through context.
+Compound control for actions: a root that renders a native `<button>` (or merges props into one child with `asChild`), plus optional icon and loading indicator parts that share size via context.
 
-## What it’s for
+- **When to use** — primary, secondary, or destructive actions in forms, toolbars, dialogs, and empty states; submit/reset in forms; triggers that must look like a button.
+- **When to use** — async actions where you control `loading` and optionally show `Button.Spinner` next to the label.
+- **When to use** — full-width actions in narrow layouts via `fullWidth`.
+- **When not to use** — navigation that should be a plain link semantically (consider [Link button](../link-button/COMPONENT.md) or `asChild` with a link).
+- **When not to use** — binary on/off or multi-option selection (use [Switch](../switch/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Segmented control](../segmented-control/COMPONENT.md), etc.).
+- **When not to use** — grouping several related buttons without shared chrome (see [Button group](../button-group/COMPONENT.md) for layout).
 
-- **Internal tools and panels** — confirm saving a draft, open a modal, run a bulk operation on table rows.
-- **Checkout or subscription flows** — proceed to payment, retry after a network error, cancel checkout without mixing in plain text links.
-- **Onboarding and empty states** — one prominent “Get started” or “Create your first project” button when the screen has little other UI.
+## Composition
 
-## Use cases
+- **`Button.Root`** — required wrapper. Provides size to children via `ControlSizeProvider` (including in `asChild` mode). Place all other parts inside it.
+- **`Button.Icon`** — optional; wraps the icon in a `span` with `aria-hidden="true"`. Use for decorative icons next to text.
+- **`Button.Spinner`** — optional; renders nothing unless the nearest `Button.Root` has `loading={true}`. Place it inside `Button.Root` alongside label text (order is up to you; keep a visible name for assistive tech).
 
-### Basic
-
-A typical primary button in a screen header or action block.
-
-```tsx
-import { Button } from "prime-ui-kit";
-
-export function SaveToolbar() {
-  return (
-    <Button.Root variant="primary" mode="filled" size="m" type="button">
-      Save
-    </Button.Root>
-  );
-}
-```
-
-### Variants and sizes
-
-Media library card: main action is larger; secondary actions are neutral and outlined.
+### Minimal example
 
 ```tsx
 import { Button } from "prime-ui-kit";
 
-export function AssetCardActions() {
-  return (
-    <div className="row rowAlignCenter">
-      <Button.Root variant="primary" mode="filled" size="l">
-        Download original
-      </Button.Root>
-      <Button.Root variant="neutral" mode="stroke" size="m">
-        Share
-      </Button.Root>
-      <Button.Root variant="neutral" mode="ghost" size="s">
-        Details
-      </Button.Root>
-    </div>
-  );
+export function Example() {
+  return <Button.Root>Save</Button.Root>;
 }
 ```
 
-### In context (form)
+## Rules
 
-Search bar: submit and reset via native button types, full-width column layout.
-
-```tsx
-import { Button } from "prime-ui-kit";
-
-export function CatalogSearchForm() {
-  return (
-    <form
-      className="stack"
-      onSubmit={(e) => {
-        e.preventDefault();
-      }}
-    >
-      <input name="q" placeholder="Name or SKU" />
-      <Button.Root type="submit" variant="primary" mode="filled" size="m" fullWidth>
-        Search
-      </Button.Root>
-      <Button.Root type="reset" variant="neutral" mode="stroke" size="m" fullWidth>
-        Reset filters
-      </Button.Root>
-    </form>
-  );
-}
-```
-
-### Controlled loading
-
-Long-running request: parent holds `loading`; the button is blocked and shows a spinner.
-
-```tsx
-import { useState } from "react";
-import { Button } from "prime-ui-kit";
-
-export function PublishDraftButton() {
-  const [loading, setLoading] = useState(false);
-
-  async function handlePublish() {
-    setLoading(true);
-    try {
-      await fetch("/api/publish", { method: "POST" });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <Button.Root
-      variant="primary"
-      mode="filled"
-      size="m"
-      loading={loading}
-      onClick={handlePublish}
-      type="button"
-    >
-      <Button.Spinner />
-      {loading ? "Publishing…" : "Publish"}
-    </Button.Root>
-  );
-}
-```
-
-## Anatomy
-
-- **`Button.Root`** — a `<button>` element or a single child when `asChild` (via slot); wraps children in `ControlSizeProvider` (except in `asChild` mode, where size is set on the slot).
-- **`Button.Icon`** — `<span aria-hidden>` for the icon; visual size from control size tokens.
-- **`Button.Spinner`** — indicator in the markup; shown only when `loading === true` on the nearest `Button.Root` (context).
+- `loading` is controlled only by the `loading` prop on `Button.Root`; there is no internal async state. When `loading` or `disabled` is true, the native button is disabled and clicks do not run.
+- With `asChild`, pass exactly one React element child. `type` is not forwarded; `disabled`/`loading` become `aria-disabled`, blocked `onClick`, and styles—native `disabled` is not set on non-button elements.
+- The `asChild` child must accept `className`, `aria-*`, `data-*`, and event props merged from the root.
+- `Button.Spinner` reads context from the closest `Button.Root`; if `loading` is false, it renders nothing. It uses `aria-hidden="true"`—do not rely on it alone for a progress announcement; keep button text or `aria-label` meaningful while loading.
+- For icon-only buttons, set a clear `aria-label` or `aria-labelledby` on `Button.Root`.
+- `variant` sets color role (`primary`, `neutral`, `error`); `mode` sets visual weight (`filled`, `stroke`, `lighter`, `ghost`, `fancy`).
+- Native `type` defaults to `"button"`; use `"submit"` / `"reset"` explicitly in forms when needed.
 
 ## API
 
 ### Button.Root
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
+|------|------|---------|----------|-------------|
 | variant | `"primary" \| "neutral" \| "error"` | `"primary"` | No | Color semantics. |
-| mode | `"filled" \| "stroke" \| "lighter" \| "ghost" \| "fancy"` | `"filled"` | No | Fill, stroke, or accent **fancy**. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Unified height, radius, text, and icon scale. |
-| fullWidth | `boolean` | — | No | Button spans container width (`data-full-width`). |
-| loading | `boolean` | `false` | No | Blocks click, sets `aria-busy`, context for `Button.Spinner`. |
-| asChild | `boolean` | `false` | No | Merge props with the only child instead of rendering `<button>`. |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | For native button; with `asChild`, not forwarded to the child. |
-| disabled | `boolean` | — | No | Inactive state; with `loading`, clicks are blocked. |
-| className | `string` | — | No | Extra class on the root. |
-| children | `React.ReactNode` | — | No | Text, `Button.Icon`, `Button.Spinner`, etc. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` (without `size`) | — | No | `onClick`, `aria-*`, `data-*`, and other button attributes. |
+| mode | `"filled" \| "stroke" \| "lighter" \| "ghost" \| "fancy"` | `"filled"` | No | Visual weight / style. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Height, radius, text, and icon scale. |
+| fullWidth | `boolean` | — | No | Full-width layout (`data-full-width`). |
+| loading | `boolean` | `false` | No | Disables interaction, sets `aria-busy`, exposes loading to `Button.Spinner`. |
+| asChild | `boolean` | `false` | No | Merge props into the single child instead of rendering `<button>`. |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Native button type; not forwarded when `asChild` is true. |
+| disabled | `boolean` | — | No | Inactive state; combined with `loading` for effective disabled behavior. |
+| className | `string` | — | No | Additional class on the root. |
+| children | `React.ReactNode` | — | No | Label, `Button.Icon`, `Button.Spinner`, etc. |
+| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | No | Other button attributes (`onClick`, `aria-*`, `data-*`, etc.); `size` is the component size prop, not the HTML attribute. |
 
 ### Button.Icon
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
+|------|------|---------|----------|-------------|
 | children | `React.ReactNode` | — | Yes | Icon node. |
-| className | `string` | — | No | Extra class on `span`. |
-| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | No | Other `span` attributes (root has `aria-hidden`). |
+| className | `string` | — | No | Additional class on the `span`. |
+| …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | No | Other `span` attributes; root sets `aria-hidden="true"`. |
 
 ### Button.Spinner
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| className | `string` | — | No | Extra class on the indicator. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | If root `loading` is false, nothing is rendered. |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Additional class on the indicator. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other `span` attributes; not rendered when root `loading` is false. |
 
-## Variants
+## Related
 
-- **primary** — main positive action.
-- **neutral** — secondary or neutral (cancel, “back”, filters).
-- **error** — destructive or error-related (delete, cancel subscription).
-
-**filled**, **stroke**, **lighter**, and **ghost** set visual weight; **fancy** is a separate accent style on the same API.
-
-## States
-
-- **Default** — interactive, without `disabled` or `loading`.
-- **disabled** — native disabled button (`disabled` on `<button>`); clicks do not fire.
-- **loading** — behaves like disabled for interaction, sets `aria-busy`; `Button.Spinner` in the tree shows when present.
-- **asChild + disabled/loading** — native `disabled` is not set on links; `aria-disabled`, `onClick` blocking, and styles handle the state.
-
-## Accessibility (a11y)
-
-- Root is a native button with Tab focus; for `type="submit"` / `reset`, respect form hierarchy and one clear submit per step where appropriate.
-- Icon-only: set a meaningful `aria-label` (or a linked visible label) on `Button.Root`; `Button.Icon` is hidden from assistive tech (`aria-hidden`).
-- While loading, keep a clear name (text or `aria-label`) so the button is not unnamed.
-- With `asChild`, the child must accept `className`, ARIA, and handlers; a link remains focusable as a link.
-
-## Limitations and notes
-
-- Not a toggle or tab-like control; for toggles see `Switch`, `Checkbox`, `SegmentedControl`, etc.
-- `Button.Spinner` does not replace a textual description of progress — combine it with a label or `aria-busy` plus visible status.
-- `asChild` allows exactly one child; `type` is not forwarded in that mode.
-
-## Related components
-
-- **LinkButton** — when you need link styling, not a button.
-- **ButtonGroup** — group several buttons with shared size and dividers.
-- **Modal**, **Drawer** — open triggers are often `Button.Root` or `asChild` on a custom anchor.
-- **Input**, **Label**, **Hint** — in forms, submit and reset sit next to inputs.
+- [Link button](../link-button/COMPONENT.md) — link-styled control when the action is navigation.
+- [Button group](../button-group/COMPONENT.md) — grouped actions with shared sizing and dividers.
+- [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md) — common consumers for open/close triggers.
+- [Input](../input/COMPONENT.md), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) — form fields alongside submit/reset buttons.
