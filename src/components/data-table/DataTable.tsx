@@ -27,11 +27,11 @@ export type DataTableColumn<Row> = {
   sortAccessor?: (row: Row) => unknown;
   sortComparator?: (a: Row, b: Row, order: DataTableOrder) => number;
   align?: DataTableCellAlign;
-  /** Задаётся на `<col>` (CSS `width`). */
+  /** Фиксированная или предпочтительная ширина трека в `grid-template-columns`. */
   width?: string;
-  /** Минимальная ширина колонки (`min-width` на `<col>`). */
+  /** Минимум трека (`minmax(..., …)`). */
   minWidth?: string;
-  /** Максимальная ширина колонки (`max-width` на `<col>`). */
+  /** Максимум трека (`minmax(..., …)`). */
   maxWidth?: string;
   onHeaderClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
   onCellClick?: (
@@ -133,14 +133,18 @@ function sortIndicator(sort: DataTableSortState, columnId: string): string {
   return sort.order;
 }
 
-function columnColStyle<Row>(column: DataTableColumn<Row>): React.CSSProperties | undefined {
+/** Трек колонки для `grid-template-columns`: 100%-ширина таблицы + рост от контента (`1fr` после min). */
+function columnGridTrack<Row>(column: DataTableColumn<Row>): string {
   const { width, minWidth, maxWidth } = column;
-  if (!width && !minWidth && !maxWidth) return undefined;
-  return {
-    ...(width ? { width } : {}),
-    ...(minWidth ? { minWidth } : {}),
-    ...(maxWidth ? { maxWidth } : {}),
-  };
+  if (width && !minWidth && !maxWidth) {
+    return `minmax(${width}, ${width})`;
+  }
+  const min = minWidth ?? "min-content";
+  const max = maxWidth ?? "1fr";
+  if (width) {
+    return `minmax(${width}, ${max})`;
+  }
+  return `minmax(${min}, ${max})`;
 }
 
 function DataTableRoot<Row>({
@@ -330,6 +334,11 @@ function DataTableRoot<Row>({
         ? displayedRows.length
         : fromRow + displayedRows.length - 1;
 
+  const gridTemplateColumns = React.useMemo(
+    () => columns.map((column) => columnGridTrack(column)).join(" "),
+    [columns],
+  );
+
   return (
     <ControlSizeProvider value={size}>
       <div
@@ -353,17 +362,12 @@ function DataTableRoot<Row>({
         >
           <table
             className={styles.table}
+            style={{ gridTemplateColumns }}
             onMouseLeave={highlightColumnOnHover ? clearHoveredColumn : undefined}
           >
-            <colgroup>
-              {columns.map((column) => (
-                <col key={column.id} style={columnColStyle(column)} />
-              ))}
-            </colgroup>
-
             {showHeader ? (
               <thead className={styles.head}>
-                <tr className={styles.headRow}>
+                <tr>
                   {columns.map((column, columnIndex) => {
                     const align = column.align ?? "start";
                     const indicator = sortIndicator(sortState, column.id);
@@ -380,6 +384,7 @@ function DataTableRoot<Row>({
                             isFirstColumn &&
                             styles.cornerCellSticky,
                         )}
+                        data-col-index={columnIndex}
                         data-align={align}
                         data-sortable={isSortable ? "true" : undefined}
                         data-first-column={isFirstColumn ? "true" : undefined}
@@ -425,7 +430,7 @@ function DataTableRoot<Row>({
             <tbody className={styles.body}>
               {loading && displayedRows.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className={styles.stateCell}>
+                  <td className={styles.stateCell} style={{ gridColumn: "1 / -1" }}>
                     {loadingText}
                   </td>
                 </tr>
@@ -433,7 +438,7 @@ function DataTableRoot<Row>({
 
               {!loading && displayedRows.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className={styles.stateCell}>
+                  <td className={styles.stateCell} style={{ gridColumn: "1 / -1" }}>
                     {emptyText}
                   </td>
                 </tr>
@@ -456,6 +461,8 @@ function DataTableRoot<Row>({
                           styles.cell,
                           stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
                         )}
+                        data-col-index={columnIndex}
+                        data-row-index={index}
                         data-align={column.align ?? "start"}
                         data-first-column={isFirstColumn ? "true" : undefined}
                         data-column-id={column.id}

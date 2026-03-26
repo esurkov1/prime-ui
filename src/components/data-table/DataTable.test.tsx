@@ -231,7 +231,7 @@ describe("DataTable", () => {
     expect(container.querySelectorAll('tr[data-stripe="alt"]')).toHaveLength(2);
   });
 
-  it("applies width, minWidth and maxWidth on col elements", () => {
+  it("maps column width constraints to grid-template-columns", () => {
     const constrained: DataTableColumn<Row>[] = [
       { id: "name", header: "Name", accessor: "name", minWidth: "10rem", maxWidth: "20rem" },
       { id: "score", header: "Score", accessor: "score", width: "5rem" },
@@ -239,10 +239,10 @@ describe("DataTable", () => {
     const { container } = render(
       <DataTable.Root rows={rows.slice(0, 1)} columns={constrained} showPagination={false} />,
     );
-    const cols = container.querySelectorAll("col");
-    expect(cols).toHaveLength(2);
-    expect(cols[0]).toHaveStyle({ minWidth: "10rem", maxWidth: "20rem" });
-    expect(cols[1]).toHaveStyle({ width: "5rem" });
+    const table = container.querySelector("table");
+    expect(table).toHaveStyle({
+      gridTemplateColumns: "minmax(10rem, 20rem) minmax(5rem, 5rem)",
+    });
   });
 
   it("highlights column on cell mouse enter and clears on table mouse leave", () => {
