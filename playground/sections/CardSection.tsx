@@ -6,14 +6,14 @@ import {
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import CardDesignAccentRailSnippet from "../snippets/card/design-accent-rail";
-import designAccentRailSource from "../snippets/card/design-accent-rail.tsx?raw";
-import CardDesignDualPairSnippet from "../snippets/card/design-dual-pair";
-import designDualPairSource from "../snippets/card/design-dual-pair.tsx?raw";
-import CardDesignHeroMetricSnippet from "../snippets/card/design-hero-metric";
-import designHeroMetricSource from "../snippets/card/design-hero-metric.tsx?raw";
+import CardCoverSnippet from "../snippets/card/cover";
+import coverSource from "../snippets/card/cover.tsx?raw";
+import CardCtaSnippet from "../snippets/card/cta";
+import ctaSource from "../snippets/card/cta.tsx?raw";
 import CardFlatSnippet from "../snippets/card/flat";
 import flatSource from "../snippets/card/flat.tsx?raw";
+import CardListSnippet from "../snippets/card/list";
+import listSource from "../snippets/card/list.tsx?raw";
 import CardMetricSnippet from "../snippets/card/metric";
 import metricSource from "../snippets/card/metric.tsx?raw";
 import CardMiniSnippet from "../snippets/card/mini";
@@ -26,15 +26,19 @@ import CardSectionSnippet from "../snippets/card/section";
 import sectionSource from "../snippets/card/section.tsx?raw";
 import CardSectionContentAndChartSnippet from "../snippets/card/section-content-and-chart";
 import sectionContentAndChartSource from "../snippets/card/section-content-and-chart.tsx?raw";
+import CardSplitSnippet from "../snippets/card/split";
+import splitSource from "../snippets/card/split.tsx?raw";
+import CardStatTrendSnippet from "../snippets/card/stat-trend";
+import statTrendSource from "../snippets/card/stat-trend.tsx?raw";
 
 const cardRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "variant",
-    type: '"mini" | "mini-media" | "metric" | "section"',
+    type: '"mini" | "mini-media" | "metric" | "section" | "stat-trend" | "cta" | "list" | "split" | "cover"',
     defaultValue: "—",
     required: "Да",
     description:
-      "Макет: компактная KPI-полоса, та же полоса с нижним Media, метрика с подписью, секция с заголовком и телом.",
+      "Макет: KPI, mini+media, metric, section, KPI+дельта (stat-trend), CTA, список (list), две метрики (split), обложка+cover.",
   },
   {
     prop: "flat",
@@ -73,9 +77,9 @@ export default function CardSection() {
       headingId="card-heading"
       description={
         <>
-          Карточки для дашборда: компактные KPI, mini с полосой для спарклайна или прогресса, метрики
-          с бейджем или иконкой, секции под графики; ниже — три приёма оформления (акцент, сетка пары
-          KPI, крупная метрика) на тех же слотах и токенах <code>--prime-sys-*</code>.
+          Карточки для дашборда: KPI, тренды, CTA, списки событий, split-метрики, обложки и секции с
+          графиками. Стили на семантических токенах; графики подключаются снаружи (слоты Media,
+          Body, Chart).
         </>
       }
     >
@@ -117,6 +121,71 @@ export default function CardSection() {
           <PlaygroundExampleFrame.Root code={metricSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CardMetricSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Stat + trend</DemoSectionTitle>
+          <DemoDescription>
+            <code>variant=&quot;stat-trend&quot;</code>: крупное значение и <code>Delta</code> с{" "}
+            <code>trend</code> (рост / падение / нейтрально).
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={statTrendSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardStatTrendSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>CTA</DemoSectionTitle>
+          <DemoDescription>
+            <code>variant=&quot;cta&quot;</code>: <code>Title</code>, <code>CtaBody</code>, внизу{" "}
+            <code>Actions</code> (кнопки и ссылки).
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={ctaSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardCtaSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>List</DemoSectionTitle>
+          <DemoDescription>
+            <code>variant=&quot;list&quot;</code>: <code>ListHeader</code> и <code>List</code> из{" "}
+            <code>ListItem</code> — лента событий или алерты.
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={listSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardListSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Split</DemoSectionTitle>
+          <DemoDescription>
+            <code>variant=&quot;split&quot;</code>: <code>Split</code> с двумя{" "}
+            <code>SplitCell</code> — две связанные метрики в одной плитке.
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={splitSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardSplitSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Cover</DemoSectionTitle>
+          <DemoDescription>
+            <code>variant=&quot;cover&quot;</code>: верхний слот <code>Cover</code> (медиа или
+            градиент), затем <code>Stack</code> и <code>Actions</code>.
+          </DemoDescription>
+          <PlaygroundExampleFrame.Root code={coverSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Stage>
+              <CardCoverSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
@@ -173,46 +242,6 @@ export default function CardSection() {
           <PlaygroundExampleFrame.Root code={rowSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CardRowSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Дизайн: акцентная полоса</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;mini&quot;</code> + <code>flat</code> и свой <code>className</code>:
-            фон <code>status-success-background</code> и левая граница акцентом — для позитивных
-            KPI.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={designAccentRailSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardDesignAccentRailSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Дизайн: пара в сетке</DemoSectionTitle>
-          <DemoDescription>
-            Две <code>mini</code> + <code>flat</code> в CSS Grid: сравнение регионов или периодов
-            без общей оболочки.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={designDualPairSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardDesignDualPairSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Дизайн: крупное число</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;metric&quot;</code>: у <code>Value</code> свой класс — кегль{" "}
-            <code>sizeScale-4xl</code> для главной цифры на дашборде.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={designHeroMetricSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardDesignHeroMetricSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>

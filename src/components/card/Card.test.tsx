@@ -33,6 +33,18 @@ describe("Card", () => {
     expect(screen.getByText("Chart")).toBeInTheDocument();
   });
 
+  it("renders stat-trend variant with delta trend", () => {
+    render(
+      <Card.Root variant="stat-trend" data-testid="stat-card">
+        <Card.Label>MRR</Card.Label>
+        <Card.Value>120k</Card.Value>
+        <Card.Delta trend="up">+5%</Card.Delta>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("stat-card")).toHaveAttribute("data-variant", "stat-trend");
+    expect(screen.getByText("+5%")).toHaveAttribute("data-trend", "up");
+  });
+
   it("renders section variant with padded body and chart", () => {
     render(
       <Card.Root variant="section" data-testid="section-card">

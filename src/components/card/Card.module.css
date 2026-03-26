@@ -256,3 +256,183 @@
   flex: 1 1 auto;
   min-height: 0;
 }
+
+/* --- stat-trend: крупная метрика + дельта периода --- */
+
+.root[data-variant="stat-trend"] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-s);
+  padding: var(--prime-sys-spacing-l);
+}
+
+.root[data-variant="stat-trend"] .value {
+  font-size: var(--prime-sys-typography-sizeScale-3xl);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xl);
+  font-weight: var(--prime-sys-typography-weight-semibold);
+  letter-spacing: -0.02em;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--prime-sys-size-control-m-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+  font-weight: var(--prime-sys-typography-title-weight);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.delta {
+  font-size: var(--prime-sys-size-control-m-supportText);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.delta[data-trend="up"] {
+  color: var(--prime-sys-color-status-success-foreground);
+}
+
+.delta[data-trend="down"] {
+  color: var(--prime-sys-color-content-danger);
+}
+
+.delta[data-trend="neutral"] {
+  color: var(--prime-sys-color-content-secondary);
+}
+
+/* --- cta: заголовок, текст, действия внизу (как base tile + CTA) --- */
+
+.root[data-variant="cta"] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-m);
+  padding: var(--prime-sys-spacing-l);
+}
+
+.ctaBody {
+  font-size: var(--prime-sys-size-control-m-supportText);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-m);
+  width: 100%;
+  min-width: 0;
+  padding-top: var(--prime-sys-spacing-m);
+  border-top: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+/* --- list: заголовок + список строк (лента активности / алерты) --- */
+
+.root[data-variant="list"] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.listHeader {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-sys-spacing-m);
+  padding: var(--prime-sys-spacing-l);
+  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.listItem {
+  padding: var(--prime-sys-spacing-m) var(--prime-sys-spacing-l);
+  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  font-size: var(--prime-sys-size-control-m-supportText);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}
+
+/* --- split: две метрики в одной плитке --- */
+
+.root[data-variant="split"] {
+  padding: var(--prime-sys-spacing-l);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.splitCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-xs);
+  min-width: 0;
+  padding-inline: var(--prime-sys-spacing-m);
+}
+
+.splitCell:first-child {
+  padding-inline-start: 0;
+}
+
+.splitCell:last-child {
+  padding-inline-end: 0;
+  border-inline-start: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
+/* --- cover: медиа сверху + контент (как Card.Meta + cover в Ant Design) --- */
+
+.root[data-variant="cover"] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.cover {
+  display: block;
+  width: 100%;
+  min-height: var(--prime-sys-unit-8rem);
+  max-height: var(--prime-sys-unit-12rem);
+  overflow: hidden;
+  background: var(--prime-sys-color-surface-default);
+}
+
+.cover > * {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: var(--prime-sys-unit-8rem);
+  object-fit: cover;
+}
+
+.root[data-variant="cover"] > .stack {
+  padding: var(--prime-sys-spacing-l);
+  padding-top: var(--prime-sys-spacing-m);
+  gap: var(--prime-sys-spacing-xs);
+}
+
+.root[data-variant="cover"] > .actions {
+  padding: var(--prime-sys-spacing-m) var(--prime-sys-spacing-l) var(--prime-sys-spacing-l);
+}

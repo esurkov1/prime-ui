@@ -5,8 +5,17 @@ import { toDataAttributes } from "@/internal/data-attributes";
 
 import styles from "./Card.module.css";
 
-/** Карточка для дашбордов и аналитики: мини-KPI, мини-KPI с медиа, метрика, секция с графиком. */
-export type CardVariant = "mini" | "mini-media" | "metric" | "section";
+/** Карточки дашборда: KPI, списки, CTA, split, cover и секции с графиками. */
+export type CardVariant =
+  | "mini"
+  | "mini-media"
+  | "metric"
+  | "section"
+  | "stat-trend"
+  | "cta"
+  | "list"
+  | "split"
+  | "cover";
 
 export type CardRootProps = {
   variant: CardVariant;
@@ -148,6 +157,158 @@ function CardMedia({ className, children, ...rest }: CardMediaProps) {
 }
 CardMedia.displayName = "CardMedia";
 
+export type CardTitleProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLHeadingElement>;
+
+function CardTitle({ className, children, ...rest }: CardTitleProps) {
+  return (
+    <h3 className={cx(styles.title, className)} {...rest}>
+      {children}
+    </h3>
+  );
+}
+CardTitle.displayName = "CardTitle";
+
+export type CardDeltaProps = {
+  /** Подкраска тренда: рост / падение / нейтрально. */
+  trend?: "up" | "down" | "neutral";
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLSpanElement>;
+
+function CardDelta({ className, trend, children, ...rest }: CardDeltaProps) {
+  return (
+    <span
+      className={cx(styles.delta, className)}
+      {...(trend != null ? { "data-trend": trend } : {})}
+      {...rest}
+    >
+      {children}
+    </span>
+  );
+}
+CardDelta.displayName = "CardDelta";
+
+export type CardActionsProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function CardActions({ className, children, ...rest }: CardActionsProps) {
+  return (
+    <div className={cx(styles.actions, className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+CardActions.displayName = "CardActions";
+
+export type CardCtaBodyProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function CardCtaBody({ className, children, ...rest }: CardCtaBodyProps) {
+  return (
+    <div className={cx(styles.ctaBody, className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+CardCtaBody.displayName = "CardCtaBody";
+
+export type CardCoverProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function CardCover({ className, children, ...rest }: CardCoverProps) {
+  return (
+    <div className={cx(styles.cover, className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+CardCover.displayName = "CardCover";
+
+export type CardSplitProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function CardSplit({ className, children, ...rest }: CardSplitProps) {
+  return (
+    <div className={cx(styles.split, className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+CardSplit.displayName = "CardSplit";
+
+export type CardSplitCellProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function CardSplitCell({ className, children, ...rest }: CardSplitCellProps) {
+  return (
+    <div className={cx(styles.splitCell, className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+CardSplitCell.displayName = "CardSplitCell";
+
+export type CardListHeaderProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function CardListHeader({ className, children, ...rest }: CardListHeaderProps) {
+  return (
+    <div className={cx(styles.listHeader, className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+CardListHeader.displayName = "CardListHeader";
+
+export type CardListProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLUListElement>;
+
+const CardList = React.forwardRef<HTMLUListElement, CardListProps>(function CardList(
+  { className, children, ...rest },
+  forwardedRef,
+) {
+  return (
+    <ul ref={forwardedRef} className={cx(styles.list, className)} {...rest}>
+      {children}
+    </ul>
+  );
+});
+CardList.displayName = "CardList";
+
+export type CardListItemProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLLIElement>;
+
+const CardListItem = React.forwardRef<HTMLLIElement, CardListItemProps>(function CardListItem(
+  { className, children, ...rest },
+  forwardedRef,
+) {
+  return (
+    <li ref={forwardedRef} className={cx(styles.listItem, className)} {...rest}>
+      {children}
+    </li>
+  );
+});
+CardListItem.displayName = "CardListItem";
+
 export type CardSectionHeaderProps = {
   className?: string;
   children?: React.ReactNode;
@@ -228,6 +389,16 @@ export const Card = {
   Value: CardValue,
   Description: CardDescription,
   Media: CardMedia,
+  Title: CardTitle,
+  Delta: CardDelta,
+  Actions: CardActions,
+  CtaBody: CardCtaBody,
+  Cover: CardCover,
+  Split: CardSplit,
+  SplitCell: CardSplitCell,
+  ListHeader: CardListHeader,
+  List: CardList,
+  ListItem: CardListItem,
   SectionHeader: CardSectionHeader,
   SectionTitle: CardSectionTitle,
   SectionTrailing: CardSectionTrailing,
