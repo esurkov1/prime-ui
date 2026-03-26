@@ -329,14 +329,21 @@ const dataTableColumnApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Ширина колонки в colgroup.",
+    description: "CSS width на <col> (фиксированная или предпочтительная ширина).",
   },
   {
     prop: "minWidth",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Минимальная ширина колонки в colgroup.",
+    description: "CSS min-width на <col>.",
+  },
+  {
+    prop: "maxWidth",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "CSS max-width на <col>.",
   },
   {
     prop: "onHeaderClick",

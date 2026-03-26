@@ -98,8 +98,9 @@ export function Example() {
 | sortAccessor | `(row: Row) => unknown` | — | No | Value used for sorting (and default sort comparison) instead of `accessor` |
 | sortComparator | `(a: Row, b: Row, order: DataTableOrder) => number` | — | No | Custom comparator; when set, default primitive compare is not used |
 | align | `DataTableCellAlign` | `"start"` | No | `start`, `center`, or `end` |
-| width | `string` | — | No | `<col>` width |
-| minWidth | `string` | — | No | `<col>` width fallback when `width` is missing |
+| width | `string` | — | No | CSS `width` on `<col>` (fixed or preferred width) |
+| minWidth | `string` | — | No | CSS `min-width` on `<col>` |
+| maxWidth | `string` | — | No | CSS `max-width` on `<col>` |
 | onHeaderClick | `(event: React.MouseEvent<HTMLTableCellElement>) => void` | — | No | Fires on header click before sort handling |
 | onCellClick | `(row: Row, event: React.MouseEvent<HTMLTableCellElement> \| React.KeyboardEvent<HTMLTableCellElement>) => void` | — | No | Makes the cell focusable and keyboard-activable |
 

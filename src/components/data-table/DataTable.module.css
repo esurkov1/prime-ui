@@ -88,8 +88,8 @@
 }
 
 .table {
-  width: 100%;
-  min-width: max-content;
+  /* max-content: колонки по контенту; width: 100% на таблице равномерно раздавал бы лишнюю ширину. */
+  width: max-content;
   border-collapse: separate;
   border-spacing: 0;
 }

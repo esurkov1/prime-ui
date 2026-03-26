@@ -231,6 +231,20 @@ describe("DataTable", () => {
     expect(container.querySelectorAll('tr[data-stripe="alt"]')).toHaveLength(2);
   });
 
+  it("applies width, minWidth and maxWidth on col elements", () => {
+    const constrained: DataTableColumn<Row>[] = [
+      { id: "name", header: "Name", accessor: "name", minWidth: "10rem", maxWidth: "20rem" },
+      { id: "score", header: "Score", accessor: "score", width: "5rem" },
+    ];
+    const { container } = render(
+      <DataTable.Root rows={rows.slice(0, 1)} columns={constrained} showPagination={false} />,
+    );
+    const cols = container.querySelectorAll("col");
+    expect(cols).toHaveLength(2);
+    expect(cols[0]).toHaveStyle({ minWidth: "10rem", maxWidth: "20rem" });
+    expect(cols[1]).toHaveStyle({ width: "5rem" });
+  });
+
   it("highlights column on cell mouse enter and clears on table mouse leave", () => {
     const { container } = render(
       <DataTable.Root rows={rows.slice(0, 2)} columns={columns} highlightColumnOnHover />,

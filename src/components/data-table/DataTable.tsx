@@ -27,8 +27,12 @@ export type DataTableColumn<Row> = {
   sortAccessor?: (row: Row) => unknown;
   sortComparator?: (a: Row, b: Row, order: DataTableOrder) => number;
   align?: DataTableCellAlign;
+  /** Задаётся на `<col>` (CSS `width`). */
   width?: string;
+  /** Минимальная ширина колонки (`min-width` на `<col>`). */
   minWidth?: string;
+  /** Максимальная ширина колонки (`max-width` на `<col>`). */
+  maxWidth?: string;
   onHeaderClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
   onCellClick?: (
     row: Row,
@@ -127,6 +131,16 @@ function nextOrder(current: DataTableSortState, columnId: string): DataTableSort
 function sortIndicator(sort: DataTableSortState, columnId: string): string {
   if (!sort || sort.columnId !== columnId) return "none";
   return sort.order;
+}
+
+function columnColStyle<Row>(column: DataTableColumn<Row>): React.CSSProperties | undefined {
+  const { width, minWidth, maxWidth } = column;
+  if (!width && !minWidth && !maxWidth) return undefined;
+  return {
+    ...(width ? { width } : {}),
+    ...(minWidth ? { minWidth } : {}),
+    ...(maxWidth ? { maxWidth } : {}),
+  };
 }
 
 function DataTableRoot<Row>({
@@ -343,7 +357,7 @@ function DataTableRoot<Row>({
           >
             <colgroup>
               {columns.map((column) => (
-                <col key={column.id} width={column.width ?? column.minWidth} />
+                <col key={column.id} style={columnColStyle(column)} />
               ))}
             </colgroup>
 
