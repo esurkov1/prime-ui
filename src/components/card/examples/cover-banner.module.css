@@ -1,0 +1,8 @@
+.banner {
+  min-height: var(--prime-sys-unit-8rem);
+  background: linear-gradient(
+    135deg,
+    var(--prime-sys-color-status-information-background) 0%,
+    var(--prime-sys-color-surface-raised) 100%
+  );
+}
