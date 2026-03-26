@@ -1,6 +1,8 @@
 import { Button } from "@/components/button/Button";
 import { useNotifications } from "@/components/notification/NotificationStore";
 
+import snippetsStyles from "./snippets.module.css";
+
 export default function NotificationFeaturesSnippet() {
   const { notify, dismissAll } = useNotifications();
 
@@ -22,15 +24,8 @@ export default function NotificationFeaturesSnippet() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x3)",
-        alignItems: "flex-start",
-      }}
-    >
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--prime-sys-spacing-x2)" }}>
+    <div className={snippetsStyles.columnStartX3}>
+      <div className="previewRowWrap">
         <Button.Root type="button" variant="neutral" mode="stroke" onClick={runStackDemo}>
           Запустить стек из 6 тостов
         </Button.Root>
@@ -38,7 +33,7 @@ export default function NotificationFeaturesSnippet() {
           dismissAll()
         </Button.Root>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--prime-sys-spacing-x2)" }}>
+      <div className="previewRowWrap">
         <Button.Root
           type="button"
           size="s"

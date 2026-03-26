@@ -5,6 +5,9 @@ import type { NotificationRecord } from "@/components/notification/Notification"
 import { NotificationCard } from "@/components/notification/Notification";
 import notificationStyles from "@/components/notification/Notification.module.css";
 import { useNotifications } from "@/components/notification/NotificationStore";
+import { cx } from "@/internal/cx";
+
+import snippetsStyles from "./snippets.module.css";
 
 const richStatic: NotificationRecord = {
   id: "demo-composition-static",
@@ -29,15 +32,7 @@ export default function NotificationCompositionSnippet() {
   const { notify } = useNotifications();
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x4)",
-        width: "100%",
-        maxWidth: 440,
-      }}
-    >
+    <div className={cx(snippetsStyles.columnX4, snippetsStyles.maxW440)}>
       <NotificationCard
         item={richStatic}
         paused={false}

@@ -1,0 +1,54 @@
+/* Раскладка превью notification — токены вместо inline style в сниппетах */
+
+.columnX3 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+  width: 100%;
+}
+
+.columnX4 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x4);
+  width: 100%;
+}
+
+.columnStartX3 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+  align-items: flex-start;
+}
+
+.maxW420 {
+  max-width: 26.25rem;
+}
+
+.maxW440 {
+  max-width: 27.5rem;
+}
+
+.maxW480 {
+  max-width: 30rem;
+}
+
+.positionsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+  max-width: 32.5rem;
+}
+
+.storeList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.codeId {
+  font-size: 0.85em;
+}

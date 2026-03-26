@@ -3,22 +3,17 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { useNotificationStore } from "@/components/notification/NotificationStore";
 import { Typography } from "@/components/typography/Typography";
+import { cx } from "@/internal/cx";
+
+import snippetsStyles from "./snippets.module.css";
 
 export default function NotificationControlledSnippet() {
   const { items, notify, dismiss } = useNotificationStore();
   const [added, setAdded] = React.useState(0);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x3)",
-        width: "100%",
-        maxWidth: 480,
-      }}
-    >
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--prime-sys-spacing-x2)" }}>
+    <div className={cx(snippetsStyles.columnX3, snippetsStyles.maxW480)}>
+      <div className="previewRowWrap">
         <Button.Root
           type="button"
           size="s"
@@ -45,18 +40,10 @@ export default function NotificationControlledSnippet() {
         Активных записей в сторе: {items.length}
       </Typography.Root>
       {items.length > 0 ? (
-        <ul
-          style={{
-            margin: 0,
-            paddingLeft: "1.25rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--prime-sys-spacing-x2)",
-          }}
-        >
+        <ul className={snippetsStyles.storeList}>
           {items.map((item) => (
             <li key={item.id}>
-              <code style={{ fontSize: "0.85em" }}>{item.id}</code>
+              <code className={snippetsStyles.codeId}>{item.id}</code>
               {" — "}
               <Button.Root
                 type="button"

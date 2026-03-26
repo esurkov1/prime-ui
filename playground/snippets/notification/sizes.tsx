@@ -1,5 +1,8 @@
 import type { NotificationRecord } from "@/components/notification/Notification";
 import { NotificationCard } from "@/components/notification/Notification";
+import { cx } from "@/internal/cx";
+
+import snippetsStyles from "./snippets.module.css";
 
 function demoItem(
   overrides: Partial<NotificationRecord> & Pick<NotificationRecord, "id" | "size">,
@@ -23,15 +26,7 @@ export default function NotificationSizesSnippet() {
   );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x3)",
-        width: "100%",
-        maxWidth: 420,
-      }}
-    >
+    <div className={cx(snippetsStyles.columnX3, snippetsStyles.maxW420)}>
       {sizes.map((item) => (
         <NotificationCard
           key={item.id}

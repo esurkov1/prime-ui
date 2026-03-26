@@ -1,5 +1,8 @@
 import type { NotificationRecord, NotificationType } from "@/components/notification/Notification";
 import { NotificationCard } from "@/components/notification/Notification";
+import { cx } from "@/internal/cx";
+
+import snippetsStyles from "./snippets.module.css";
 
 const copy: Record<NotificationType, { title: string; description: string }> = {
   success: { title: "Сохранено", description: "Изменения записаны в профиль." },
@@ -30,15 +33,7 @@ export default function NotificationVariantsSnippet() {
   });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x3)",
-        width: "100%",
-        maxWidth: 440,
-      }}
-    >
+    <div className={cx(snippetsStyles.columnX3, snippetsStyles.maxW440)}>
       {types.map((item) => (
         <NotificationCard
           key={item.id}

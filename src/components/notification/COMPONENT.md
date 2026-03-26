@@ -70,7 +70,7 @@ export function ModerationToolbar() {
   const { notify } = useNotifications();
 
   return (
-    <div style={{ display: "flex", gap: 8 }}>
+    <div>
       <Button.Root
         mode="filled"
         size="m"
@@ -88,6 +88,7 @@ export function ModerationToolbar() {
       >
         Reject
       </Button.Root>
+      {" "}
       <Button.Root
         mode="stroke"
         size="m"
@@ -136,7 +137,7 @@ export function ReportsSidebar() {
       description: "XLSX is ready to download.",
       position: "bottom-right",
       size: "m",
-      icon: <Bell aria-hidden style={{ width: 20, height: 20 }} />,
+      icon: <Bell aria-hidden size={20} />,
       badge: "12 MB",
       action: {
         label: "Download",

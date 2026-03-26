@@ -2,6 +2,8 @@ import { Button } from "@/components/button/Button";
 import type { NotificationPosition } from "@/components/notification/Notification";
 import { useNotifications } from "@/components/notification/NotificationStore";
 
+import snippetsStyles from "./snippets.module.css";
+
 const positions: NotificationPosition[] = [
   "top-left",
   "top-center",
@@ -15,15 +17,7 @@ export default function NotificationPositionsSnippet() {
   const { notify } = useNotifications();
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-        gap: "var(--prime-sys-spacing-x2)",
-        width: "100%",
-        maxWidth: 520,
-      }}
-    >
+    <div className={snippetsStyles.positionsGrid}>
       {positions.map((position) => (
         <Button.Root
           key={position}
