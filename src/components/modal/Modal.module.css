@@ -301,7 +301,8 @@
   justify-content: flex-end;
 }
 
-.body + .footer {
+.body + .footer,
+.header + .footer {
   border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
   padding-top: var(--prime-sys-size-modal-footerPaddingTop);
 }
