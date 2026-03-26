@@ -1,0 +1,31 @@
+.fieldsetPlain {
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.legend {
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  font-weight: 600;
+  margin-bottom: var(--prime-sys-spacing-x2);
+}
+
+.columnTight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.selectionMeta {
+  margin: var(--prime-sys-spacing-x3) 0 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.helperBelowLegend {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  max-width: 40rem;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
