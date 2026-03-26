@@ -187,6 +187,10 @@ export const semanticTokens = {
       "4xl": "{font.size.4xl}",
       "5xl": "{font.size.5xl}",
       "6xl": "{font.size.6xl}",
+      "7xl": "{font.size.7xl}",
+      "8xl": "{font.size.8xl}",
+      "9xl": "{font.size.9xl}",
+      labelMicro: "{font.size.labelMicro}",
     },
     lineHeightScale: {
       "3xs": "{font.lineHeight.3xs}",
@@ -201,6 +205,10 @@ export const semanticTokens = {
       "4xl": "{font.lineHeight.4xl}",
       "5xl": "{font.lineHeight.5xl}",
       "6xl": "{font.lineHeight.6xl}",
+      "7xl": "{font.lineHeight.7xl}",
+      "8xl": "{font.lineHeight.8xl}",
+      "9xl": "{font.lineHeight.9xl}",
+      labelMicro: "{font.lineHeight.labelMicro}",
     },
     tracking: {
       tighter: "{font.letterSpacing.tighter}",
@@ -210,57 +218,72 @@ export const semanticTokens = {
       wider: "{font.letterSpacing.wider}",
     },
     /**
-     * Семантические роли чтения (Typography `variant`): каждая ссылается на пару
-     * `sizeScale` / `lineHeightScale` — единственный источник правды для маппинга variant→кегль.
+     * Семантические роли чтения (Typography `variant`): пары `fontSize` / `lineHeight` согласованы
+     * по смыслу с [Material Design 3 type scale](https://m3.material.io/styles/typography/type-scale-tokens)
+     * (Display / Headline / Title / Body / Label), [Polaris Text](https://polaris.shopify.com/components/typography/text)
+     * и уровнями текста [Apple HIG — Typography](https://developer.apple.com/design/human-interface-guidelines/typography)
+     * (Large Title … Caption). Кегли — в `font.size.*`; ниже — ссылки на ступени `sizeScale`.
      */
     role: {
+      /** MD3 Display Large (57/45); Polaris `heading3xl`; Apple Large Title */
       display: {
+        fontSize: "{typography.sizeScale.9xl}",
+        lineHeight: "{typography.lineHeightScale.9xl}",
+      },
+      /** MD3 Headline Large (32/40); Polaris `heading2xl`; Apple Title 1 */
+      headline: {
         fontSize: "{typography.sizeScale.6xl}",
         lineHeight: "{typography.lineHeightScale.6xl}",
       },
-      headline: {
-        fontSize: "{typography.sizeScale.5xl}",
-        lineHeight: "{typography.lineHeightScale.5xl}",
-      },
+      /** MD3 Headline Medium (28/36); Polaris `headingXl`; Apple Title 2 */
       headingPage: {
         fontSize: "{typography.sizeScale.4xl}",
         lineHeight: "{typography.lineHeightScale.4xl}",
       },
+      /** MD3 Headline Small (24/32); Polaris `headingLg`; Apple Title 3 */
       headingSection: {
-        fontSize: "{typography.sizeScale.3xl}",
-        lineHeight: "{typography.lineHeightScale.3xl}",
-      },
-      headingSubsection: {
         fontSize: "{typography.sizeScale.2xl}",
         lineHeight: "{typography.lineHeightScale.2xl}",
       },
-      headingGroup: {
+      /** MD3 Title Large (22/28); Polaris `headingMd`; Apple Headline */
+      headingSubsection: {
         fontSize: "{typography.sizeScale.xl}",
         lineHeight: "{typography.lineHeightScale.xl}",
       },
-      bodyLarge: {
-        fontSize: "{typography.sizeScale.l}",
-        lineHeight: "{typography.lineHeightScale.l}",
-      },
-      bodyDefault: {
-        fontSize: "{typography.sizeScale.m}",
-        lineHeight: "{typography.lineHeightScale.m}",
-      },
-      bodySmall: {
-        fontSize: "{typography.sizeScale.s}",
-        lineHeight: "{typography.lineHeightScale.s}",
-      },
-      bodyCompact: {
+      /** MD3 Title Small (14/20); Polaris `headingSm` / `headingXs`; Apple Subheadline / Footnote */
+      headingGroup: {
         fontSize: "{typography.sizeScale.xs}",
         lineHeight: "{typography.lineHeightScale.xs}",
       },
+      /** MD3 Body Large (~16px); Polaris bodyLg; Apple Body / Callout */
+      bodyLarge: {
+        fontSize: "{typography.sizeScale.s}",
+        lineHeight: "{typography.lineHeightScale.s}",
+      },
+      /** MD3 Body Medium (~14px); Polaris bodyMd; Apple Subheadline / Footnote */
+      bodyDefault: {
+        fontSize: "{typography.sizeScale.xs}",
+        lineHeight: "{typography.lineHeightScale.xs}",
+      },
+      /** MD3 Body Small (~12px); Polaris bodySm; Apple Footnote */
+      bodySmall: {
+        fontSize: "{typography.sizeScale.2xs}",
+        lineHeight: "{typography.lineHeightScale.2xs}",
+      },
+      /** MD3 Label Large (14/20): кегль как у Body Medium, межстрочный плотнее (`2xs`), чем у `body-default` */
+      bodyCompact: {
+        fontSize: "{typography.sizeScale.xs}",
+        lineHeight: "{typography.lineHeightScale.2xs}",
+      },
+      /** MD3 Label Medium (~12px); Apple Caption1 */
       caption: {
         fontSize: "{typography.sizeScale.2xs}",
         lineHeight: "{typography.lineHeightScale.2xs}",
       },
+      /** MD3 Label Small (~11px); Apple Caption2 */
       captionMicro: {
-        fontSize: "{typography.sizeScale.3xs}",
-        lineHeight: "{typography.lineHeightScale.3xs}",
+        fontSize: "{typography.sizeScale.labelMicro}",
+        lineHeight: "{typography.lineHeightScale.labelMicro}",
       },
     },
   },

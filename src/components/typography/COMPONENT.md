@@ -17,26 +17,28 @@
 
 Интерактивные компоненты (формы, кнопки и т.д.) настраиваются **своими** пропами и токенами; **`Typography`** к ним не относится и **не** задаёт их внешний вид.
 
-## Справочное сопоставление с Material Design 3 и Polaris
+## Справочное сопоставление: MD3, Apple (SF), Polaris
 
-Ниже — **ориентировочное** соответствие ролей prime-ui-kit стилям из [Material Design 3 — Type scale](https://m3.material.io/styles/typography/type-scale-tokens) и вариантам [Polaris Text](https://polaris.shopify.com/components/typography/text), чтобы проще ориентироваться при переносе макетов. Размеры в **px** у разных систем различаются; ориентир — **уровень иерархии**, не числовое равенство.
+Ниже — **ориентировочное** соответствие ролей prime-ui-kit стилям из [Material Design 3 — Type scale](https://m3.material.io/styles/typography/type-scale-tokens), уровням текста [Apple — Typography](https://developer.apple.com/design/human-interface-guidelines/typography) (SF Pro) и вариантам [Polaris Text](https://polaris.shopify.com/components/typography/text). У разных систем **разные pt/px**; ориентир — **уровень иерархии**, не побитовое совпадение.
 
-| `variant` | Близкий стиль MD3 (роль × ступень) | Близкий вариант Polaris `Text` |
-| --------- | ----------------------------------- | ------------------------------ |
-| `display` | Display Large / акцентный экран | `heading3xl` |
-| `headline` | Headline Large | `heading2xl` |
-| `heading-page` | Headline Medium | `headingXl` |
-| `heading-section` | Headline Small или Title Large | `headingLg` |
-| `heading-subsection` | Title Medium | `headingMd` |
-| `heading-group` | Title Small | `headingSm` / `headingXs` |
-| `body-large` | Body Large | `bodyLg` |
-| `body-default` | Body Medium | `bodyMd` |
-| `body-small` | Body Small | `bodySm` |
-| `body-compact` | Label Large (плотная строка) | `bodyXs` |
-| `caption` | Label Medium | `bodySm` + приглушённый `tone` (по смыслу) |
-| `caption-micro` | Label Small | самый мелкий смысловой уровень подписи |
+**Кегль в теме:** каждая роль ссылается на ступени `typography.sizeScale` / `lineHeightScale` → примитивы `font.size.*` / `font.lineHeight.*`. Ниже — **приблизительный размер шрифта** при `1rem = 16px` на `:root` (округление).
 
-У **MD3** в каждой группе (Display, Headline, …) есть ступени **Large / Medium / Small** — при необходимости уточняйте по макету, какая ступень ближе к вашему экрану.
+| `variant` | Примитив кегля | ≈ px @16 | Близкий стиль MD3 | Близкий уровень Apple (SF) | Polaris `Text` |
+| --------- | ---------------- | -------- | ----------------- | --------------------------- | -------------- |
+| `display` | `9xl` | 57 | Display Large | Large Title | `heading3xl` |
+| `headline` | `6xl` | 32 | Headline Large | Title 1 | `heading2xl` |
+| `heading-page` | `4xl` | 28 | Headline Medium | Title 2 | `headingXl` |
+| `heading-section` | `2xl` | 24 | Headline Small | Title 3 | `headingLg` |
+| `heading-subsection` | `xl` | 22 | Title Large | Headline | `headingMd` |
+| `heading-group` | `xs` | 14 | Title Small | Subheadline / Footnote | `headingSm`, `headingXs` |
+| `body-large` | `s` | 16 | Body Large | Body / Callout | `bodyLg` |
+| `body-default` | `xs` | 14 | Body Medium | Subheadline | `bodyMd` |
+| `body-small` | `2xs` | 12 | Body Small | Footnote | `bodySm` |
+| `body-compact` | кегль `xs`, межстрочный `2xs` | 14, плотнее | Label Large (плотная строка) | — | `bodyXs` |
+| `caption` | `2xs` | 12 | Label Medium | Caption 1 | `bodySm` (по смыслу + `tone`) |
+| `caption-micro` | `labelMicro` | 11 | Label Small | Caption 2 | самый мелкий смысловой уровень |
+
+Ступени **`7xl`**, **`8xl`** в шкале есть (как у MD3 Display Medium / Small по размеру), но **в роли `typography.role` не задействованы** — при необходимости используйте их через токены напрямую, не через `Typography`.
 
 ## Composition
 

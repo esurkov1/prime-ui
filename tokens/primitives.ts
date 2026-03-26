@@ -257,7 +257,10 @@ export const primitiveTokens = {
       base: '"Roboto Flex", "Roboto", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       mono: '"Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
     },
-    /** Кегль: ось `3xs`→`6xl`, шаг **+0.125rem** (дроби n/8 rem). */
+    /**
+     * Кегль: ось `3xs`→`6xl` (+0.125rem), плюс **7xl–9xl** под [MD3 type scale](https://m3.material.io/styles/typography/type-scale-tokens)
+     * (Display) и **labelMicro** (11px — Label Small).
+     */
     size: {
       "3xs": "0.625rem",
       "2xs": "0.75rem",
@@ -271,8 +274,12 @@ export const primitiveTokens = {
       "4xl": "1.75rem",
       "5xl": "1.875rem",
       "6xl": "2rem",
+      "7xl": "2.25rem",
+      "8xl": "2.8125rem",
+      "9xl": "3.5625rem",
+      labelMicro: "0.6875rem",
     },
-    /** Межстрочный интервал под шкалу `font.size.*`: шаг **+0.125rem** от `3xs`. */
+    /** Межстрочный интервал под шкалу `font.size.*`. */
     lineHeight: {
       "3xs": "0.875rem",
       "2xs": "1rem",
@@ -286,6 +293,10 @@ export const primitiveTokens = {
       "4xl": "2rem",
       "5xl": "2.125rem",
       "6xl": "2.25rem",
+      "7xl": "2.5rem",
+      "8xl": "3.125rem",
+      "9xl": "4rem",
+      labelMicro: "1rem",
     },
     /** Начертания (числовые веса шрифта). */
     weight: {

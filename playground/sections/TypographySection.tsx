@@ -105,7 +105,8 @@ export default function TypographySection() {
       description={
         <>
           Текст страницы — семантические роли <code>variant</code> и токены{" "}
-          <code>typography.role</code>. Поля и кнопки оформляются своими компонентами; с{" "}
+          <code>typography.role</code> (кегли согласованы со шкалой MD3; ориентиры Apple SF и
+          Polaris — в <code>COMPONENT.md</code>). Поля и кнопки оформляются своими компонентами; с{" "}
           <code>Typography</code> они не смешиваются по API.
         </>
       }

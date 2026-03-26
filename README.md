@@ -141,7 +141,7 @@ export function Example() {
 
 ## Typography
 
-Текст страницы оформляется компонентом **`Typography`** с ролями **`variant`** (токены `typography.role` → `--prime-sys-typography-role-*`). Справочное сопоставление с Material Design 3 и Polaris — в [Typography COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md).
+Текст страницы оформляется компонентом **`Typography`** с ролями **`variant`**: каждая роль задаёт пару кегль/межстрочный интервал из темы (`typography.role` → `--prime-sys-typography-role-*`). Примитивы `font.size.*` согласованы со [шкалой MD3](https://m3.material.io/styles/typography/type-scale-tokens); роли выстроены по смыслу рядом с **MD3**, **Apple SF** и **Polaris** — таблица соответствий и примерных **rem/px** при корне 16px — в [Typography COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md).
 
 ---
 
