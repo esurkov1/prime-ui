@@ -139,10 +139,14 @@
   border: 0;
   border-radius: 0;
   /*
-   * Светлая: accentSoft — заметная подложка и при пресетах (там default≈elevated≈белый).
-   * Тёмная: accentSoft совпадает с elevated — только surface-default, как у дропдауна не делаем.
+   * Светлая: default + border-subtle — не accentSoft/neutralHover (в теме это тот же gray-100).
+   * Грань к контенту — даже когда default≈elevated (пресеты). Тёмная: только default.
    */
-  background: var(--prime-sys-color-surface-accentSoft);
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-surface-default) 88%,
+    var(--prime-sys-color-border-subtle) 12%
+  );
   box-shadow: none;
   transition: background-color var(--sb-transition-duration) var(--sb-transition-ease);
 }
@@ -151,8 +155,13 @@
   background: var(--prime-sys-color-surface-default);
 }
 
+.root[data-side="left"] .navPanel {
+  border-inline-end: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+}
+
 .root[data-side="right"] .navPanel {
   margin-inline-start: auto;
+  border-inline-start: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
 }
 
 .root[data-state="hidden"] .navPanel {
