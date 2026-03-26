@@ -20,12 +20,12 @@ import CardMiniSnippet from "../snippets/card/mini";
 import miniSource from "../snippets/card/mini.tsx?raw";
 import CardMiniMediaSnippet from "../snippets/card/mini-media";
 import miniMediaSource from "../snippets/card/mini-media.tsx?raw";
+import CardPanelSnippet from "../snippets/card/panel";
+import panelSource from "../snippets/card/panel.tsx?raw";
+import CardPanelContentChartSnippet from "../snippets/card/panel-content-chart";
+import panelContentChartSource from "../snippets/card/panel-content-chart.tsx?raw";
 import CardRowSnippet from "../snippets/card/row";
 import rowSource from "../snippets/card/row.tsx?raw";
-import CardSectionSnippet from "../snippets/card/section";
-import sectionSource from "../snippets/card/section.tsx?raw";
-import CardSectionContentAndChartSnippet from "../snippets/card/section-content-and-chart";
-import sectionContentAndChartSource from "../snippets/card/section-content-and-chart.tsx?raw";
 import CardSplitSnippet from "../snippets/card/split";
 import splitSource from "../snippets/card/split.tsx?raw";
 import CardStatTrendSnippet from "../snippets/card/stat-trend";
@@ -34,11 +34,11 @@ import statTrendSource from "../snippets/card/stat-trend.tsx?raw";
 const cardRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "variant",
-    type: '"mini" | "mini-media" | "metric" | "section" | "stat-trend" | "cta" | "list" | "split" | "cover"',
+    type: '"mini" | "mini-media" | "metric" | "panel" | "stat-trend" | "cta" | "list" | "split" | "cover"',
     defaultValue: "—",
     required: "Да",
     description:
-      "Макет: KPI, mini+media, metric, section, KPI+дельта (stat-trend), CTA, список (list), две метрики (split), обложка+cover.",
+      "Макет: KPI, mini+media, metric, panel (заголовок + график), KPI+дельта (stat-trend), CTA, список (list), две метрики (split), обложка+cover.",
   },
   {
     prop: "flat",
@@ -191,31 +191,29 @@ export default function CardSection() {
         </div>
 
         <div className="demoBlock">
-          <DemoSectionTitle>Section</DemoSectionTitle>
+          <DemoSectionTitle>Панель (график)</DemoSectionTitle>
           <DemoDescription>
-            <code>variant=&quot;section&quot;</code>: <code>SectionHeader</code> и область{" "}
+            <code>variant=&quot;panel&quot;</code>: <code>SectionHeader</code> и область{" "}
             <code>Chart</code> без внутренних полей — корень библиотеки графиков на всю ширину и
             высоту под заголовком.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sectionSource.trim()} previewLayout="stack">
+          <PlaygroundExampleFrame.Root code={panelSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <CardSectionSnippet />
+              <CardPanelSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>
 
         <div className="demoBlock">
-          <DemoSectionTitle>Section: контент и график</DemoSectionTitle>
+          <DemoSectionTitle>Панель: текст и график</DemoSectionTitle>
           <DemoDescription>
-            <code>Body</code> — текст или таблица с отступами; ниже <code>Chart</code> — график без
-            полей, занимает оставшуюся высоту.
+            Тот же <code>variant=&quot;panel&quot;</code>: сверху <code>Body</code> — текст или
+            таблица с отступами; ниже <code>Chart</code> — график без полей, занимает оставшуюся
+            высоту.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={sectionContentAndChartSource.trim()}
-            previewLayout="stack"
-          >
+          <PlaygroundExampleFrame.Root code={panelContentChartSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <CardSectionContentAndChartSnippet />
+              <CardPanelContentChartSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
         </div>

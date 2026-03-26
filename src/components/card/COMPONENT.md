@@ -4,7 +4,7 @@
 
 ## About
 
-Composable surfaces for **dashboard KPIs**, **lists**, **CTA tiles**, **split metrics**, **media headers**, and **chart shells**: layout presets driven by **`variant`** on **`Card.Root`**. Typography and spacing use semantic tokens (`--prime-sys-*`). The kit does not ship chart primitives — pass any chart, SVG sparkline, or [ProgressBar](../progress-bar/COMPONENT.md) into **`Card.Media`**, **`Card.Chart`** (**`section`**, edge-to-edge), padded **`Card.Body`**, or **`Card.Cover`**.
+Composable surfaces for **dashboard KPIs**, **lists**, **CTA tiles**, **split metrics**, **media headers**, and **chart shells**: layout presets driven by **`variant`** on **`Card.Root`**. Typography and spacing use semantic tokens (`--prime-sys-*`). The kit does not ship chart primitives — pass any chart, SVG sparkline, or [ProgressBar](../progress-bar/COMPONENT.md) into **`Card.Media`**, **`Card.Chart`** (**`panel`**, edge-to-edge), padded **`Card.Body`**, or **`Card.Cover`**.
 
 **Ссылки на паттерны карточек и дашбордов (для ориентира по типам плиток):**
 
@@ -24,7 +24,7 @@ Composable surfaces for **dashboard KPIs**, **lists**, **CTA tiles**, **split me
 - **Use** **`variant="mini"`** for a compact KPI: optional **`IconBox`** + **`Stack`** with **`Label`** and **`Value`**.
 - **Use** **`variant="mini-media"`** for the same **`IconBox`** + **`Stack`** row as **`mini`**, then **`Media`** for a sparkline, ring, or thin progress strip (full width below).
 - **Use** **`variant="metric"`** for a title row: **`HeaderRow`** with **`Lead`** (badge or icon) and **`Value`**, plus **`Description`** underneath.
-- **Use** **`variant="section"`** for a titled block: **`SectionHeader`** + **`Body`** (padded copy or tables) and/or **`Chart`** (full-width chart area, no inner padding).
+- **Use** **`variant="panel"`** for a titled block: **`SectionHeader`** + **`Body`** (padded copy or tables) and/or **`Chart`** (full-width chart area, no inner padding).
 - **Use** **`variant="stat-trend"`** for a large KPI with period delta: **`Label`**, **`Value`**, **`Delta`** (`trend`: `up` | `down` | `neutral`).
 - **Use** **`variant="cta"`** for a call-to-action tile: **`Title`**, **`CtaBody`**, **`Actions`** (buttons / links).
 - **Use** **`variant="list"`** for activity or alerts: **`ListHeader`** (e.g. **`Title`** + link), **`List`** / **`ListItem`**.
@@ -35,7 +35,7 @@ Composable surfaces for **dashboard KPIs**, **lists**, **CTA tiles**, **split me
 
 ## Composition
 
-- **`Card.Root`** — required **`variant`**: `"mini"` \| `"mini-media"` \| `"metric"` \| `"section"` \| `"stat-trend"` \| `"cta"` \| `"list"` \| `"split"` \| `"cover"`. Optional **`flat`** removes the default surface shadow (tile-like). Sets `data-variant` / `data-flat` for styling.
+- **`Card.Root`** — required **`variant`**: `"mini"` \| `"mini-media"` \| `"metric"` \| `"panel"` \| `"stat-trend"` \| `"cta"` \| `"list"` \| `"split"` \| `"cover"`. Optional **`flat`** removes the default surface shadow (tile-like). Sets `data-variant` / `data-flat` for styling.
 - **`Card.IconBox`** — square leading area in **`mini`** and **`mini-media`**: background **`status-information-background`**, radius **`size-control-m-radius`**, icon color via **`status-information-foreground`** (decorative icons: **`aria-hidden`**).
 - **`Card.Lead`** — left cluster in **`HeaderRow`** (badge from [Badge](../badge/COMPONENT.md), raw icon, or both).
 - **`Card.HeaderRow`** — top row for **`metric`**: typically **`Lead`** + **`Value`**.
@@ -44,11 +44,11 @@ Composable surfaces for **dashboard KPIs**, **lists**, **CTA tiles**, **split me
 - **`Card.Value`** — primary metric string.
 - **`Card.Description`** — supporting line under the header row (`p`).
 - **`Card.Media`** — bottom region with top border; place charts/progress here.
-- **`Card.SectionHeader`** — bar with bottom border for **`section`**.
+- **`Card.SectionHeader`** — bar with bottom border for **`panel`**.
 - **`Card.SectionTitle`** — `h3` title.
 - **`Card.SectionTrailing`** — optional actions or icon on the right.
-- **`Card.Body`** — **`section`**: padded region for text, summaries, or tables. With **`variant="section"`**, the shell has a **minimum height**; a **single element child** can stretch inside the padded box. Override height via **`className`** on **`Root`** if needed.
-- **`Card.Chart`** — **`section`**: **no** horizontal or vertical inner padding; mount the chart library root here for **edge-to-edge** drawing under the header. Optional after **`Body`**; then **`Chart`** fills remaining height.
+- **`Card.Body`** — **`panel`**: padded region for text, summaries, or tables. With **`variant="panel"`**, the shell has a **minimum height**; a **single element child** can stretch inside the padded box. Override height via **`className`** on **`Root`** if needed.
+- **`Card.Chart`** — **`panel`**: **no** horizontal or vertical inner padding; mount the chart library root here for **edge-to-edge** drawing under the header. Optional after **`Body`**; then **`Chart`** fills remaining height.
 - **`Card.Title`** — **`h3`** with **`title`** styles; use in **`cta`**, **`list`** header, **`cover`** stack.
 - **`Card.Delta`** — supporting line for **`stat-trend`**; optional **`trend`** sets `data-trend` for color (`up` \| `down` \| `neutral`).
 - **`Card.CtaBody`** — body copy in **`cta`**.
@@ -120,14 +120,14 @@ export function MetricCard() {
 }
 ```
 
-### Section example (chart only)
+### Panel example (chart only)
 
 ```tsx
 import { Card } from "prime-ui-kit";
 
 export function ChartSection() {
   return (
-    <Card.Root variant="section">
+    <Card.Root variant="panel">
       <Card.SectionHeader>
         <Card.SectionTitle>Revenue</Card.SectionTitle>
       </Card.SectionHeader>
@@ -139,14 +139,14 @@ export function ChartSection() {
 }
 ```
 
-### Section example (padded content + chart)
+### Panel example (padded content + chart)
 
 ```tsx
 import { Card } from "prime-ui-kit";
 
 export function ChartSectionWithIntro() {
   return (
-    <Card.Root variant="section">
+    <Card.Root variant="panel">
       <Card.SectionHeader>
         <Card.SectionTitle>Revenue</Card.SectionTitle>
       </Card.SectionHeader>
@@ -269,8 +269,8 @@ export function CoverCard() {
 - Typography follows the **control `m` tier** (`--prime-sys-size-control-m-text` for values and section titles, `--prime-sys-size-control-m-supportText` for labels and descriptions), aligned with [Label](../label/COMPONENT.md) / [Input](../input/COMPONENT.md) defaults — not reading `headingSection` / `headingSubsection` roles, so KPI copy stays visually consistent with form density.
 - Prefer **`flat`** on dense dashboards if shadows feel noisy; default shadow uses **`--prime-sys-elevation-shadow-surface`**.
 - **`SectionTitle`** is an **`h3`**; ensure heading levels match the page outline (skip levels appropriately).
-- **`Description`** is a **`p`** — only one block per card unless you compose custom markup inside **`Body`** for **`section`**.
-- **`variant="section"`** sets a **minimum height** on **`Root`**. Order after **`SectionHeader`**: optional **`Body`** (inset content), optional **`Chart`** (full bleed). If both are present, **`Body`** sizes to its content and **`Chart`** takes the **remaining height**. A **single element child** in **`Chart`** (or in **`Body`** when it is the only block) stretches within that region.
+- **`Description`** is a **`p`** — only one block per card unless you compose custom markup inside **`Body`** for **`panel`**.
+- **`variant="panel"`** sets a **minimum height** on **`Root`**. Order after **`SectionHeader`**: optional **`Body`** (inset content), optional **`Chart`** (full bleed). If both are present, **`Body`** sizes to its content and **`Chart`** takes the **remaining height**. A **single element child** in **`Chart`** (or in **`Body`** when it is the only block) stretches within that region.
 - For **`mini-media`**, keep **`Media`** height predictable so rows in a grid stay aligned, or use one column on narrow viewports.
 - Icons in **`IconBox`** / **`Lead`** should not be the sole carrier of meaning; pair with visible text.
 - **`Title`** is an **`h3`** (like **`SectionTitle`**); avoid duplicate heading levels on the same screen.
@@ -283,7 +283,7 @@ export function CoverCard() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| variant | `"mini" \| "mini-media" \| "metric" \| "section" \| "stat-trend" \| "cta" \| "list" \| "split" \| "cover"` | — | Yes | Layout preset and padding. |
+| variant | `"mini" \| "mini-media" \| "metric" \| "panel" \| "stat-trend" \| "cta" \| "list" \| "split" \| "cover"` | — | Yes | Layout preset and padding. |
 | flat | `boolean` | `false` | No | When `true`, no drop shadow (surface still bordered). |
 | className | `string` | — | No | Extra class on the root. |
 | children | `React.ReactNode` | — | No | Slots listed in Composition. |
@@ -463,7 +463,7 @@ export function CoverCard() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Padded **`section`** content (text, tables). One **element** child can stretch inside the padded area. |
+| children | `React.ReactNode` | — | No | Padded **`panel`** content (text, tables). One **element** child can stretch inside the padded area. |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the body `div`. |
 
 ### Card.Chart
@@ -471,7 +471,7 @@ export function CoverCard() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | **`section`** chart root; **no** inner padding (edge-to-edge). |
+| children | `React.ReactNode` | — | No | **`panel`** chart root; **no** inner padding (edge-to-edge). |
 | …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the chart region `div`. |
 
 ## Imports

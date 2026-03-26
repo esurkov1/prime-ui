@@ -41,7 +41,7 @@
   padding: var(--prime-sys-spacing-l);
 }
 
-.root[data-variant="section"] {
+.root[data-variant="panel"] {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -240,19 +240,19 @@
   width: 100%;
 }
 
-/* --- variant section: распределение высоты между Body и Chart --- */
+/* --- variant panel: распределение высоты между Body и Chart --- */
 
-.root[data-variant="section"] > .sectionHeader + .body:last-child,
-.root[data-variant="section"] > .sectionHeader + .chart:last-child {
+.root[data-variant="panel"] > .sectionHeader + .body:last-child,
+.root[data-variant="panel"] > .sectionHeader + .chart:last-child {
   flex: 1 1 auto;
   min-height: 0;
 }
 
-.root[data-variant="section"] > .sectionHeader + .body:not(:last-child) {
+.root[data-variant="panel"] > .sectionHeader + .body:not(:last-child) {
   flex: 0 1 auto;
 }
 
-.root[data-variant="section"] > .body + .chart {
+.root[data-variant="panel"] > .body + .chart {
   flex: 1 1 auto;
   min-height: 0;
 }

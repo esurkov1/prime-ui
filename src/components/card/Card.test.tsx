@@ -19,16 +19,16 @@ describe("Card", () => {
     expect(screen.getByText("36 years")).toBeInTheDocument();
   });
 
-  it("renders section variant with title and chart region", () => {
+  it("renders panel variant with title and chart region", () => {
     render(
-      <Card.Root variant="section" data-testid="section-card">
+      <Card.Root variant="panel" data-testid="panel-card">
         <Card.SectionHeader>
           <Card.SectionTitle>Revenue</Card.SectionTitle>
         </Card.SectionHeader>
         <Card.Chart>Chart</Card.Chart>
       </Card.Root>,
     );
-    expect(screen.getByTestId("section-card")).toHaveAttribute("data-variant", "section");
+    expect(screen.getByTestId("panel-card")).toHaveAttribute("data-variant", "panel");
     expect(screen.getByRole("heading", { name: "Revenue" })).toBeInTheDocument();
     expect(screen.getByText("Chart")).toBeInTheDocument();
   });
@@ -45,9 +45,9 @@ describe("Card", () => {
     expect(screen.getByText("+5%")).toHaveAttribute("data-trend", "up");
   });
 
-  it("renders section variant with padded body and chart", () => {
+  it("renders panel variant with padded body and chart", () => {
     render(
-      <Card.Root variant="section" data-testid="section-card">
+      <Card.Root variant="panel" data-testid="panel-card">
         <Card.SectionHeader>
           <Card.SectionTitle>Revenue</Card.SectionTitle>
         </Card.SectionHeader>

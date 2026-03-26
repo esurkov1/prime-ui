@@ -2,9 +2,9 @@ import { Card } from "@/components/card/Card";
 import { Typography } from "@/components/typography/Typography";
 import { Icon } from "@/icons";
 
-export default function CardSectionContentAndChartSnippet() {
+export default function CardPanelContentChartSnippet() {
   return (
-    <Card.Root variant="section">
+    <Card.Root variant="panel">
       <Card.SectionHeader>
         <Card.SectionTitle>Revenue</Card.SectionTitle>
         <Card.SectionTrailing>

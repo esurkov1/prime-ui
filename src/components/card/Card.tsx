@@ -10,7 +10,7 @@ export type CardVariant =
   | "mini"
   | "mini-media"
   | "metric"
-  | "section"
+  | "panel"
   | "stat-trend"
   | "cta"
   | "list"

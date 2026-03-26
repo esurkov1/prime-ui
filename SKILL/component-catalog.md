@@ -130,8 +130,8 @@ Full table of all 43 components mapped to responsive layout.
 
 | | |
 |---|---|
-| **Purpose** | KPI mini/metric cards and a section shell for charts: composable slots, semantic tokens. |
-| **Responsive role** | Lay out mini/metric cards in a CSS Grid (`auto-fill`, `minmax`); section variant spans columns for charts. |
+| **Purpose** | KPI mini/metric cards and a **panel** shell for charts: composable slots, semantic tokens. |
+| **Responsive role** | Lay out mini/metric cards in a CSS Grid (`auto-fill`, `minmax`); **panel** variant spans columns for charts. |
 | **Zones** | content, header (metrics row) |
 | **Scenarios** | Dashboard top row; lab/vitals metrics with optional sparkline; wrapping charts and tables in a titled section. |
 | **Documentation** | `../src/components/card/COMPONENT.md` |
