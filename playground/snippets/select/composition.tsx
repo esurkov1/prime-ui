@@ -1,9 +1,11 @@
 import { Select } from "@/components/select/Select";
 import { Icon } from "@/icons";
 
+import styles from "./select-snippets.module.css";
+
 export default function SelectCompositionSnippet() {
   return (
-    <div className="stack" style={{ alignItems: "stretch", maxWidth: "22rem" }}>
+    <div className={`stack ${styles.stackNarrow}`}>
       <Select.Root size="m" defaultValue="eur" placeholder="Валюта отчёта">
         <Select.Trigger>
           <Select.TriggerIcon>

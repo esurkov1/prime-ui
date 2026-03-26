@@ -1,8 +1,10 @@
 import { Select } from "@/components/select/Select";
 
+import styles from "./select-snippets.module.css";
+
 export default function SelectSizesSnippet() {
   return (
-    <div className="stack" style={{ alignItems: "stretch", maxWidth: "22rem" }}>
+    <div className={`stack ${styles.stackNarrow}`}>
       <Select.Root size="s" placeholder="Размер s">
         <Select.Trigger>
           <Select.Value />

@@ -2,11 +2,13 @@ import * as React from "react";
 
 import { Select } from "@/components/select/Select";
 
+import styles from "./select-snippets.module.css";
+
 export default function SelectControlledSnippet() {
   const [tier, setTier] = React.useState("pro");
 
   return (
-    <div className="stack" style={{ alignItems: "stretch", maxWidth: "22rem" }}>
+    <div className={`stack ${styles.stackNarrow}`}>
       <Select.Root size="m" value={tier} onChange={setTier} placeholder="Тариф">
         <Select.Trigger aria-label="Тариф подписки">
           <Select.Value />

@@ -79,14 +79,7 @@ export function TimezoneField() {
   const labelId = React.useId();
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.35rem",
-        maxWidth: "20rem",
-      }}
-    >
+    <div className="stack">
       <Label.Root id={labelId} size="m">
         Time zone
       </Label.Root>
@@ -114,13 +107,13 @@ Parent owns the value (URL sync, filter reset, store persistence).
 
 ```tsx
 import * as React from "react";
-import { Select } from "prime-ui-kit";
+import { Select, Typography } from "prime-ui-kit";
 
 export function IntervalToolbar() {
   const [range, setRange] = React.useState("7d");
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+    <div className="previewRowWrap rowAlignCenter">
       <Select.Root value={range} onChange={setRange} size="m" placeholder="Interval">
         <Select.Trigger aria-label="Metrics interval">
           <Select.Value />
@@ -131,7 +124,9 @@ export function IntervalToolbar() {
           <Select.Item value="30d">30 days</Select.Item>
         </Select.Content>
       </Select.Root>
-      <span style={{ fontSize: "0.875rem", opacity: 0.8 }}>Active: {range}</span>
+      <Typography.Root as="span" size="xs" tone="muted">
+        Active: {range}
+      </Typography.Root>
     </div>
   );
 }
