@@ -1,39 +1,55 @@
 # Slider
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
 
 ## About
 
-Horizontal range control built on the native `input type="range"`, with optional text label and kit sizing (`s`–`xl`).
+A horizontal range control built on the native `input type="range"`, with optional text label and kit sizing (`s`–`xl`).
 
-- **Use** when the user should pick a number along a continuous or stepped interval (volume, brightness, percentages, temperature bands) and dragging the track is appropriate.
-- **Use** when native range keyboard and pointer behavior is sufficient and you want minimal custom logic.
-- **Do not use** for vertical sliders; the implementation is horizontal only.
-- **Do not use** when you need a value thumb label, icons, or other slots on the track—compose with surrounding layout and text.
-- **Do not use** expecting built-in error, required, loading, or read-only modes; handle those with form primitives and hints around the control.
-- **Do not use** when a small set of fixed choices fits radio or segmented controls better than a continuous range.
+**When to use**
+
+- Picking a number along a continuous or stepped interval: volume, brightness, percentages, temperature bands, or filter caps (for example a maximum price).
+- When native range keyboard and pointer behavior is enough and you want minimal custom logic.
+
+**When not to use**
+
+- Vertical sliders — the implementation is horizontal only.
+- When you need thumb labels, icons, or other slots on the track — compose with surrounding layout and text.
+- Built-in error, required, loading, or read-only modes — use form primitives and hints around the control.
+- A small set of fixed choices — prefer radio or segmented controls instead of a continuous range.
 
 ## Composition
 
-- **`Slider`** is a single-part API: **`Slider.Root`** wraps **`ControlSizeProvider`**, an optional **`label`** (`label` + `htmlFor` linked to the input), and one **`input type="range"`** styled as the track.
+- **`Slider`** is a single-part API: **`Slider.Root`** wraps **`ControlSizeProvider`**, an optional **`label`** (linked to the input with `htmlFor` / `id`), and one styled **`input type="range"`**.
 - The root `div` carries **`data-size`** from **`size`**; there are no other exported subcomponents.
 
-### Minimal example
+### Canonical example
 
 ```tsx
 import { Slider } from "prime-ui-kit";
 
 export function Example() {
-  return <Slider.Root />;
+  return (
+    <Slider.Root label="Output level" min={0} max={100} step={1} defaultValue={50} size="m" />
+  );
 }
 ```
 
+### Extended examples
+
+- [`./examples/01-volume.tsx`](./examples/01-volume.tsx) — Volume on a 0–100 scale with helper copy under the track.
+- [`./examples/02-price-range.tsx`](./examples/02-price-range.tsx) — Stepped “maximum price” filter with a `Hint` for how results update.
+- [`./examples/03-controlled.tsx`](./examples/03-controlled.tsx) — Controlled `value` / `onChange` with a live numeric readout.
+- [`./examples/04-disabled.tsx`](./examples/04-disabled.tsx) — Disabled preset until a parent feature is available.
+
+**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition with `Typography` / `Hint`; this page keeps the contract (rules + API tables) authoritative.
+
 ## Rules
 
-- **Controlled:** pass **`value`** and **`onChange`**; **uncontrolled:** pass **`defaultValue`** (or omit both value props—effective initial value is **`min`**, clamped to **`[min, max]`**).
+- **Controlled:** pass **`value`** and **`onChange`**. **Uncontrolled:** pass **`defaultValue`**, or omit both value props — the effective initial value is **`min`**, clamped to **`[min, max]`**.
 - **`min`**, **`max`**, and **`step`** default to **`0`**, **`100`**, and **`1`**; fractional **`step`** values are allowed.
-- Displayed value is **clamped** to **`[min, max]`**; if the browser emits a non-numeric value, the update is ignored.
-- With **`label`**, the visible label is associated with the input via **`id`** / **`htmlFor`**. Without **`label`**, set **`aria-label`** (or an external accessible name), or assistive technologies may not get a proper name.
+- Displayed value is **clamped** to **`[min, max]`**; non-numeric input updates are ignored.
+- With **`label`**, the visible label is associated via **`id`** / **`htmlFor`**. Without **`label`**, set **`aria-label`** (or an external accessible name) so assistive technologies get a proper name.
 - **`disabled`** sets the native **`disabled`** state on the range input.
 - There is no **`asChild`** or portal behavior; focus and **`focus-visible`** styling follow the native control and theme.
 

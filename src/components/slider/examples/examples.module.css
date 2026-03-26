@@ -1,0 +1,17 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.muted {
+  margin: 0;
+  color: var(--prime-sys-color-content-secondary);
+}
