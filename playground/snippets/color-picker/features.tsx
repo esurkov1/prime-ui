@@ -6,7 +6,6 @@ import { Button } from "@/components/button/Button";
 import { ColorPicker } from "@/components/color-picker/ColorPicker";
 import { Popover } from "@/components/popover/Popover";
 import { Typography } from "@/components/typography/Typography";
-import ExampleSurface from "../../components/ExampleSurface";
 
 import preview from "./preview.module.css";
 
@@ -24,7 +23,7 @@ export default function ColorPickerFeaturesSnippet() {
         </Popover.Trigger>
         <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
           <ColorPicker.FormatProvider>
-            <ExampleSurface className={preview.card}>
+            <div className={preview.fieldPopoverPanel}>
               <Typography.Root
                 as="p"
                 className={preview.sectionLabel}
@@ -59,7 +58,7 @@ export default function ColorPickerFeaturesSnippet() {
                   <ColorPicker.Thumb />
                 </ColorPicker.SliderTrack>
               </ColorPicker.Slider>
-            </ExampleSurface>
+            </div>
           </ColorPicker.FormatProvider>
         </Popover.Content>
       </Popover.Root>
