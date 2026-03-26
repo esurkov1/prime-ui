@@ -1,0 +1,72 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.rowStretch {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-l);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--prime-sys-spacing-m);
+  min-width: 0;
+}
+
+.listItemBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x1);
+  min-width: 0;
+}
+
+.navBar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-sys-spacing-m);
+  padding: var(--prime-sys-spacing-m) var(--prime-sys-spacing-l);
+  border-radius: var(--prime-sys-shape-radius-m);
+  background: var(--prime-sys-color-surface-raised);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+}
+
+.navCluster {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-l);
+}
+
+.navUser {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--prime-sys-spacing-s);
+}

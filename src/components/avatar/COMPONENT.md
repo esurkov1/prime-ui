@@ -20,20 +20,72 @@ Circular avatar with an optional photo (`Avatar.Image`), a fallback layer (`Avat
 - **`Avatar.Group.Root`** — horizontal flex row; passes its **`size`** into child **`Avatar.Root`** and **`Avatar.Group.Overflow`** that omit their own **`size`** (including through **`React.Fragment`** children).
 - **`Avatar.Group.Overflow`** — cell matching avatar dimensions for text such as `+3`.
 
-### Minimal example
+### Canonical example
+
+Один фрагмент разметки: одиночный аватар (**`Image`** + **`Fallback`**), группа с **`Overflow`**, плюс **`Fallback`** с иконкой и подписи через **[Typography](../typography/COMPONENT.md)**. Импорт только из **`prime-ui-kit`**.
 
 ```tsx
-import { Avatar } from "prime-ui-kit";
+import { Avatar, Icon, Typography } from "prime-ui-kit";
 
-export function Example() {
+const sampleSrc =
+  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=128&h=128&fit=crop";
+
+export function CanonicalAvatarDemo() {
   return (
-    <Avatar.Root>
-      <Avatar.Image src="/avatar.png" alt="" />
-      <Avatar.Fallback>AB</Avatar.Fallback>
-    </Avatar.Root>
+    <>
+      <Typography as="p" variant="body-small" tone="muted">
+        Profile cell
+      </Typography>
+      <Avatar.Root size="l" aria-label="Jamie Chen, online">
+        <Avatar.Image src={sampleSrc} alt="" />
+        <Avatar.Fallback>JC</Avatar.Fallback>
+      </Avatar.Root>
+
+      <Typography as="p" variant="body-small" tone="muted">
+        Overlapping group + overflow
+      </Typography>
+      <Avatar.Group.Root size="m" aria-label="Reviewers: three faces, two not shown">
+        <Avatar.Root>
+          <Avatar.Image src={sampleSrc} alt="" />
+          <Avatar.Fallback>A</Avatar.Fallback>
+        </Avatar.Root>
+        <Avatar.Root>
+          <Avatar.Fallback>B</Avatar.Fallback>
+        </Avatar.Root>
+        <Avatar.Root>
+          <Avatar.Fallback>C</Avatar.Fallback>
+        </Avatar.Root>
+        <Avatar.Group.Overflow aria-label="Two additional reviewers">+2</Avatar.Group.Overflow>
+      </Avatar.Group.Root>
+
+      <Typography as="p" variant="body-small" tone="muted">
+        Icon-only fallback
+      </Typography>
+      <Avatar.Root size="m" aria-label="Invitee, no photo yet">
+        <Avatar.Fallback>
+          <Icon name="field.email" size="l" tone="subtle" />
+        </Avatar.Fallback>
+      </Avatar.Root>
+    </>
   );
 }
 ```
+
+### Extended examples
+
+Готовые сценарии с раскладкой на **`--prime-sys-`* (см. [`examples/examples.module.css`](./examples/examples.module.css)):
+
+| Файл | Сценарий |
+|------|----------|
+| [`examples/team-list.tsx`](./examples/team-list.tsx) | Список команды: аватар + имя + роль |
+| [`examples/comment-thread.tsx`](./examples/comment-thread.tsx) | Ветка комментариев с аватаром у каждого сообщения |
+| [`examples/app-header-nav.tsx`](./examples/app-header-nav.tsx) | Шапка: навигация **[LinkButton](../link-button/COMPONENT.md)** и блок «аккаунт» с аватаром |
+| [`examples/group-overflow.tsx`](./examples/group-overflow.tsx) | **`Avatar.Group`** с **`Overflow`** (`+N`) |
+| [`examples/fallback-variants.tsx`](./examples/fallback-variants.tsx) | Фото, инициалы и иконка в **`Fallback`** в одном ряду |
+
+### Note for LLMs
+
+При генерации экранов опирайся на публичный API выше и на **исходники** в `src/components/avatar/examples/*.tsx`: там полные импорты **`prime-ui-kit`**, типичная композиция с **[Typography](../typography/COMPONENT.md)** / **[LinkButton](../link-button/COMPONENT.md)** / **`Icon`** (экспорт пакета) и семантическая вёрстка без обхода стилей кита. Не дублируй длинные листинги в ответе — укажи путь к файлу примера.
 
 ## Rules
 

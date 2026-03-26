@@ -1,0 +1,41 @@
+import { Avatar, LinkButton, Typography } from "prime-ui-kit";
+
+import styles from "./examples.module.css";
+
+const portrait =
+  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=128&h=128&fit=crop";
+
+/**
+ * App chrome: product title, nav links, and a signed-in identity cluster (avatar + account link).
+ */
+export default function AvatarAppHeaderNavExample() {
+  return (
+    <header className={styles.navBar}>
+      <div className={styles.navCluster}>
+        <Typography as="span" variant="heading-subsection" weight="semibold">
+          Prime Console
+        </Typography>
+        <nav className={styles.row} aria-label="Primary">
+          <LinkButton href="#overview" size="m">
+            Overview
+          </LinkButton>
+          <LinkButton href="#projects" size="m">
+            Projects
+          </LinkButton>
+          <LinkButton href="#settings" size="m">
+            Settings
+          </LinkButton>
+        </nav>
+      </div>
+      <div className={styles.navUser}>
+        <Avatar.Root size="m" aria-label="Signed in as Jamie Chen">
+          <Avatar.Image src={portrait} alt="" />
+          <Avatar.Fallback>JC</Avatar.Fallback>
+        </Avatar.Root>
+        <LinkButton href="#account" size="m">
+          Account
+        </LinkButton>
+      </div>
+    </header>
+  );
+}
