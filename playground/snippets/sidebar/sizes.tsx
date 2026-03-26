@@ -24,12 +24,7 @@ const avatarSizeBySidebar: Record<DemoSize, AvatarSize> = {
 };
 
 function SidebarSizeColumn({ size }: { size: DemoSize }) {
-  const [open, setOpen] = React.useState(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
-      return true;
-    }
-    return !window.matchMedia("(max-width: 64rem)").matches;
-  });
+  const [open, setOpen] = React.useState(true);
   const iconSize = iconSizeBySidebar[size];
 
   return (
@@ -44,7 +39,7 @@ function SidebarSizeColumn({ size }: { size: DemoSize }) {
           variant="simple"
           open={open}
           onOpenChange={setOpen}
-          responsive
+          responsive={false}
           aria-label={`Sidebar ${size}`}
         >
           <Sidebar.NavPanel>

@@ -84,7 +84,9 @@ export default function SidebarSection() {
           <DemoDescription>
             Четыре значения <code>size</code> на <code>Sidebar.Root</code> (<code>s</code>,{" "}
             <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же простая панель, чтобы
-            сравнить высоту контролов, кегль и ширину колонки.
+            сравнить высоту контролов, кегль и ширину колонки. Здесь{" "}
+            <code>responsive=&#123;false&#125;</code> — иначе при сужении окна каждый экземпляр
+            включал бы полноэкранный оверлей и подложку одновременно.
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={sidebarSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
