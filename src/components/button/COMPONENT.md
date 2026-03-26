@@ -39,7 +39,7 @@ import { Button } from "prime-ui-kit";
 
 export function AssetCardActions() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
+    <div className="row rowAlignCenter">
       <Button.Root variant="primary" mode="filled" size="l">
         Download original
       </Button.Root>
@@ -64,10 +64,10 @@ import { Button } from "prime-ui-kit";
 export function CatalogSearchForm() {
   return (
     <form
+      className="stack"
       onSubmit={(e) => {
         e.preventDefault();
       }}
-      style={{ display: "grid", gap: "0.75rem", maxWidth: 320 }}
     >
       <input name="q" placeholder="Name or SKU" />
       <Button.Root type="submit" variant="primary" mode="filled" size="m" fullWidth>
