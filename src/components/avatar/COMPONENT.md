@@ -48,7 +48,7 @@ const team: { name: string; src: string; size: AvatarSize }[] = [
 
 export function TeamRow() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+    <div className="previewRowWrap rowAlignCenter">
       {team.map((m) => (
         <Avatar.Root key={m.name} size={m.size} aria-label={m.name}>
           <Avatar.Image src={m.src} alt="" />
