@@ -2,7 +2,7 @@
   --sb-expanded-width: 18rem;
   --sb-compact-width: 5.25rem;
   --sb-visible-width: var(--sb-expanded-width);
-  --sb-transition-duration: var(--prime-sys-motion-duration-medium);
+  --sb-transition-duration: var(--prime-sys-motion-duration-slow);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
   --sb-control-height: var(--prime-sys-size-control-m-height);
   --sb-floating-toggle-size: calc(var(--sb-control-height) - var(--prime-sys-unit-8px));
@@ -22,8 +22,10 @@
   --sb-item-trailing-col: auto;
   --sb-item-label-opacity: 1;
   --sb-item-label-shift: 0px;
+  --sb-item-label-max-width: 100%;
   --sb-item-trailing-opacity: 1;
   --sb-item-trailing-scale: 1;
+  --sb-item-trailing-max-width: 100%;
 
   --sb-group-label-align: start;
 
@@ -192,9 +194,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition:
-    text-align var(--sb-transition-duration) var(--sb-transition-ease),
-    padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
+  transition: padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .separator {
@@ -219,12 +219,9 @@
 
 .menuButton {
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: var(--sb-item-icon-col) minmax(0, var(--sb-item-label-col)) var(
-      --sb-item-trailing-col
-    );
+  display: flex;
   align-items: center;
-  column-gap: var(--sb-item-gap);
+  gap: var(--sb-item-gap);
   width: var(--sb-item-width);
   min-width: var(--sb-item-min-width);
   max-width: var(--sb-item-max-width);
@@ -244,12 +241,8 @@
   cursor: pointer;
   overflow: hidden;
   transition:
-    width var(--sb-transition-duration) var(--sb-transition-ease),
-    min-width var(--sb-transition-duration) var(--sb-transition-ease),
-    max-width var(--sb-transition-duration) var(--sb-transition-ease),
     margin-inline-start var(--sb-transition-duration) var(--sb-transition-ease),
-    grid-template-columns var(--sb-transition-duration) var(--sb-transition-ease),
-    column-gap var(--sb-transition-duration) var(--sb-transition-ease),
+    gap var(--sb-transition-duration) var(--sb-transition-ease),
     padding-inline var(--sb-transition-duration) var(--sb-transition-ease),
     background-color var(--sb-transition-duration) var(--sb-transition-ease),
     color var(--sb-transition-duration) var(--sb-transition-ease),
@@ -284,7 +277,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  justify-self: center;
   width: var(--prime-sys-size-control-m-icon);
   height: var(--prime-sys-size-control-m-icon);
   flex-shrink: 0;
@@ -297,24 +289,29 @@
 }
 
 .menuLabel {
+  flex: 1 1 auto;
   min-width: 0;
-  max-width: 100%;
+  max-width: var(--sb-item-label-max-width);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   opacity: var(--sb-item-label-opacity);
   transform: translateX(var(--sb-item-label-shift));
   transition:
+    max-width var(--sb-transition-duration) var(--sb-transition-ease),
     opacity var(--sb-transition-duration) var(--sb-transition-ease),
     transform var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .menuTrailing {
-  justify-self: end;
+  margin-inline-start: auto;
+  max-width: var(--sb-item-trailing-max-width);
+  overflow: hidden;
   color: var(--prime-sys-color-content-muted);
   opacity: var(--sb-item-trailing-opacity);
   transform: scale(var(--sb-item-trailing-scale));
   transition:
+    max-width var(--sb-transition-duration) var(--sb-transition-ease),
     opacity var(--sb-transition-duration) var(--sb-transition-ease),
     transform var(--sb-transition-duration) var(--sb-transition-ease);
 }
@@ -399,8 +396,14 @@
   min-width: calc(var(--sb-control-height) * 0.6);
   max-width: calc(var(--sb-control-height) * 0.6);
   min-height: calc(var(--sb-control-height) * 0.6);
-  font-size: 0.75rem;
-  inset-block-start: calc(var(--sb-panel-padding-block) + var(--sb-control-height));
+  padding: var(--prime-sys-size-control-s-buttonPaddingY);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  font-size: var(--prime-sys-size-control-s-icon);
+  inset-block-start: calc(
+    var(--sb-panel-padding-block) +
+    var(--sb-control-height) +
+    var(--prime-sys-spacing-x1)
+  );
   inset-inline-end: 0;
   transform: translate(50%, -50%);
   border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
@@ -664,9 +667,15 @@
     --sb-item-trailing-col: 0px;
     --sb-item-label-opacity: 0;
     --sb-item-label-shift: -0.25rem;
+    --sb-item-label-max-width: 0px;
     --sb-item-trailing-opacity: 0;
     --sb-item-trailing-scale: 0.85;
+    --sb-item-trailing-max-width: 0px;
     --sb-group-label-align: center;
+  }
+
+  .root[data-state="compact"] .menuIcon {
+    margin-inline: auto;
   }
 
   .root[data-state="compact"] .groupHeaderAction,
