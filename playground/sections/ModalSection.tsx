@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import ModalCompositionSnippet from "../snippets/modal/composition";
@@ -221,12 +226,12 @@ export default function ModalSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Структура и композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Структура и композиция</DemoSectionTitle>
+          <DemoDescription>
             Публичный API: <code>Modal.Root</code> → <code>Modal.Panel</code> с пропами{" "}
             <code>title</code>, <code>description</code>, <code>children</code>, <code>footer</code>
             . Ниже — варианты: только шапка+футер, шапка+текст, только шапка, форма, юртекст.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ModalCompositionSnippet />
@@ -235,13 +240,13 @@ export default function ModalSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             По умолчанию закрытие по Escape и клику на подложку; с{" "}
             <code>closeOnEscape=&#123;false&#125;</code> и{" "}
             <code>closeOnOverlayClick=&#123;false&#125;</code> — только явные кнопки (например
             опасное действие или пошаговый сценарий).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <ModalStatesSnippet />
@@ -250,11 +255,11 @@ export default function ModalSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Пара <code>open</code> и <code>onOpenChange</code>: открытие и закрытие с кнопок вне
             модала, синхронизация с маршрутом или стором; <code>Modal.Trigger</code> не обязателен.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <ModalControlledSnippet />
@@ -263,12 +268,12 @@ export default function ModalSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             В <code>footer</code> — вертикальный стек: у <code>Button.Root</code> включён{" "}
             <code>fullWidth</code>, чтобы кнопки занимали всю ширину колонки панели (удобно на узком
             макете).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <ModalFullWidthSnippet />
@@ -277,12 +282,12 @@ export default function ModalSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>container</code> у <code>Modal.Panel</code> для монтирования в заданный узел;
             прокрутка длинного списка — через <code>bodyStyle</code> (например maxHeight) при
             заблокированном фоне.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ModalFeaturesSnippet />
@@ -291,31 +296,31 @@ export default function ModalSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Modal.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Modal.Root</DemoApiTitle>
+          <DemoDescription>
             Контекст открытости и политика закрытия для вложенных частей.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={modalRootApiRows} />
-          <h5>Modal.Trigger</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Modal.Trigger</DemoApiTitle>
+          <DemoDescription>
             Открывает модал по клику, не отменяя существующий <code>onClick</code> потомка.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={modalTriggerApiRows} />
-          <h5>Modal.Close</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Modal.Close</DemoApiTitle>
+          <DemoDescription>
             Оборачивает кнопку действия, которая должна закрыть модал (чаще в подвале: «Отмена»,
             «Готово»).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={modalCloseApiRows} />
-          <h5>Modal.Panel</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Modal.Panel</DemoApiTitle>
+          <DemoDescription>
             Единственная оболочка панели: портал, подложка, белая карточка, фокус-ловушка, Escape,
             скролл-лок, шапка/тело/подвал из пропсов. Ширина панели по умолчанию ограничена
             вьюпортом в стилях (<code>min(100%, …)</code>) — отдельного режима «адаптивной ширины»
             не нужно. Без <code>title</code> — только <code>children</code> (например Command Menu с{" "}
             <code>aria-labelledby</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={modalPanelApiRows} />
         </div>
       </div>

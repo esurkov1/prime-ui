@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import AvatarCompositionSnippet from "../snippets/avatar/composition";
@@ -184,11 +189,11 @@ export default function AvatarSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Все значения <code>size</code> подряд: одна и та же разметка <code>Image</code> +{" "}
             <code>Fallback</code> с подписью размера.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={avatarSizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <AvatarSizesSnippet />
@@ -197,13 +202,13 @@ export default function AvatarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Без <code>Avatar.Image</code> контекст остаётся в <code>idle</code> — виден только
             fallback. С валидным <code>src</code> после загрузки статус <code>loaded</code>, у{" "}
             <code>Avatar.Fallback</code> выставляется <code>aria-hidden</code>. Неверный URL даёт{" "}
             <code>error</code> и снова показывает fallback.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={avatarStatesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <AvatarStatesSnippet />
@@ -212,13 +217,13 @@ export default function AvatarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Расположение в группе</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Расположение в группе</DemoSectionTitle>
+          <DemoDescription>
             <code>Avatar.Group.Root</code> выстраивает детей в горизонтальный ряд с отрицательным
             отступом, чтобы круги частично перекрывались; общий <code>size</code> группы
             подставляется дочерним <code>Avatar.Root</code>, если у них нет своего <code>size</code>
             .
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={avatarGroupThreeSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AvatarGroupThreeSnippet />
@@ -227,12 +232,12 @@ export default function AvatarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Смена изображения снаружи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Смена изображения снаружи</DemoSectionTitle>
+          <DemoDescription>
             Родитель держит <code>src</code> в состоянии (например выбран другой пользователь в
             списке). Внутри компонента изображение монтируется с ключом по <code>src</code>, поэтому
             цикл загрузки начинается заново при каждой смене URL.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={avatarSrcFromStateSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AvatarSrcFromStateSnippet />
@@ -241,12 +246,12 @@ export default function AvatarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция слотов</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция слотов</DemoSectionTitle>
+          <DemoDescription>
             Пара <code>Avatar.Image</code> + текстовый <code>Avatar.Fallback</code> и отдельно
             аватар только с <code>Fallback</code>, куда передана иконка из набора <code>icons</code>{" "}
             кита.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={avatarCompositionSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <AvatarCompositionSnippet />
@@ -255,12 +260,12 @@ export default function AvatarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Переполнение группы</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Переполнение группы</DemoSectionTitle>
+          <DemoDescription>
             Последний элемент — <code>Avatar.Group.Overflow</code>: тот же диаметр, что у аватаров
             группы, для подписи вроде <code>+3</code>. На контейнер группы удобно повесить{" "}
             <code>aria-label</code> с пояснением состава.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={avatarGroupOverflowSource.trim()}
             previewLayout="stack"
@@ -272,36 +277,36 @@ export default function AvatarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Avatar.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Avatar.Root</DemoApiTitle>
+          <DemoDescription>
             Обёртка-круг: задаёт размер, фон и контекст статуса изображения для дочерних{" "}
             <code>Image</code> и <code>Fallback</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={avatarRootApiRows} />
-          <h5>Avatar.Image</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Avatar.Image</DemoApiTitle>
+          <DemoDescription>
             Картинка на весь круг; управляет статусом загрузки в контексте через <code>onLoad</code>{" "}
             и <code>onError</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={avatarImageApiRows} />
-          <h5>Avatar.Fallback</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Avatar.Fallback</DemoApiTitle>
+          <DemoDescription>
             Запасной слой под изображением; остаётся видимым, пока картинка не в состоянии{" "}
             <code>loaded</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={avatarFallbackApiRows} />
-          <h5>Avatar.Group.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Avatar.Group.Root</DemoApiTitle>
+          <DemoDescription>
             Контейнер для нескольких <code>Avatar.Root</code> и опционально одной ячейки{" "}
             <code>Overflow</code>; пробрасывает <code>size</code> вложенным аватарам без
             собственного размера.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={avatarGroupRootApiRows} />
-          <h5>Avatar.Group.Overflow</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Avatar.Group.Overflow</DemoApiTitle>
+          <DemoDescription>
             Круглая ячейка того же размера, что аватары в группе, для текста переполнения.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={avatarGroupOverflowApiRows} />
         </div>
       </div>

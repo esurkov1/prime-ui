@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import DrawerCompositionSnippet from "../snippets/drawer/composition";
@@ -305,13 +310,13 @@ export default function DrawerSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code> на <code>Drawer.Content</code> (<code>s</code>,{" "}
             <code>m</code>, <code>l</code>, <code>xl</code>): отступы панели, зазоры шапки и
             подвала, кегль заголовка и размер встроенной кнопки закрытия в{" "}
             <code>Drawer.Header</code> берутся из одного яруса.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <DrawerSizesSnippet />
@@ -320,12 +325,12 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты и сторона выезда</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты и сторона выезда</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>side</code> на <code>Drawer.Content</code>: панель справа (по умолчанию),
             слева, снизу или сверху. Для нижнего и верхнего листа в стилях задан предел высоты и
             скругление у края экрана.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSidesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <DrawerVariantsSidesSnippet />
@@ -334,13 +339,13 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Слева: <code>closeOnEscape=&#123;false&#125;</code> и{" "}
             <code>closeOnOverlayClick=&#123;false&#125;</code> на <code>Drawer.Root</code> —
             закрытие только явными кнопками. Справа: <code>showCloseButton=&#123;false&#125;</code>{" "}
             на <code>Drawer.Header</code> — без крестика в шапке, выход через подвал или программно.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <DrawerStatesSnippet />
@@ -349,11 +354,11 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Пара <code>open</code> и <code>onOpenChange</code>: открытие и закрытие с кнопок вне
             панели, синхронизация с маршрутом или стором; <code>Drawer.Trigger</code> не обязателен.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <DrawerControlledSnippet />
@@ -362,12 +367,12 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>Drawer.Header</code> с заголовком, поле <code>Input</code> в{" "}
             <code>Drawer.Body</code>, действия в <code>Drawer.Footer</code>; закрытие отмены через{" "}
             <code>Drawer.Close</code> вокруг кнопки.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <DrawerCompositionSnippet />
@@ -376,11 +381,11 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             В <code>Drawer.Footer</code> вертикальный стек: у <code>Button.Root</code> включён{" "}
             <code>fullWidth</code>, чтобы кнопки занимали всю ширину колонки панели.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <DrawerFullWidthSnippet />
@@ -389,11 +394,11 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Адаптивная ширина</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Адаптивная ширина</DemoSectionTitle>
+          <DemoDescription>
             Боковая панель не шире <code>90vw</code>; у листов сверху/снизу ограничена высота —
             длинный текст уходит в прокрутку в <code>Drawer.Body</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={responsiveSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <DrawerResponsiveSnippet />
@@ -402,12 +407,12 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Триггер на ссылке</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Триггер на ссылке</DemoSectionTitle>
+          <DemoDescription>
             <code>Drawer.Trigger</code> с единственным потомком-<code>LinkButton</code>: открытие по
             клику без отдельного пропа <code>asChild</code> (слияние через <code>cloneElement</code>
             ).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={triggerLinkSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <DrawerTriggerLinkSnippet />
@@ -416,12 +421,12 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>container</code> у <code>Drawer.Portal</code>; подпись диалога только через{" "}
             <code>aria-label</code> на <code>Drawer.Content</code>; прокрутка длинного списка в{" "}
             <code>Drawer.Body</code> при заблокированном фоне.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DrawerFeaturesSnippet />
@@ -430,54 +435,52 @@ export default function DrawerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Drawer.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Drawer.Root</DemoApiTitle>
+          <DemoDescription>
             Контекст открытости и политика закрытия по Escape и клику на подложку.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={drawerRootApiRows} />
-          <h5>Drawer.Trigger</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Drawer.Trigger</DemoApiTitle>
+          <DemoDescription>
             Открывает панель по клику, не отменяя существующий <code>onClick</code> потомка.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={drawerTriggerApiRows} />
-          <h5>Drawer.Close</h5>
-          <p className="demoBlockDescription">Закрывает панель по клику на обёрнутый элемент.</p>
+          <DemoApiTitle>Drawer.Close</DemoApiTitle>
+          <DemoDescription>Закрывает панель по клику на обёрнутый элемент.</DemoDescription>
           <PlaygroundApiTable rows={drawerCloseApiRows} />
-          <h5>Drawer.Portal</h5>
-          <p className="demoBlockDescription">
-            Рендер содержимого в портал только при открытом drawer.
-          </p>
+          <DemoApiTitle>Drawer.Portal</DemoApiTitle>
+          <DemoDescription>Рендер содержимого в портал только при открытом drawer.</DemoDescription>
           <PlaygroundApiTable rows={drawerPortalApiRows} />
-          <h5>Drawer.Overlay</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Drawer.Overlay</DemoApiTitle>
+          <DemoDescription>
             Полноэкранная подложка; клик по ней закрывает панель при включённом{" "}
             <code>closeOnOverlayClick</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={drawerOverlayApiRows} />
-          <h5>Drawer.Content</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Drawer.Content</DemoApiTitle>
+          <DemoDescription>
             Панель-диалог: фокус-ловушка, блокировка скролла, скрытие остальной страницы для
             вспомогательных технологий.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={drawerContentApiRows} />
-          <h5>Drawer.Header</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Drawer.Header</DemoApiTitle>
+          <DemoDescription>
             Шапка с колонкой заголовка и опциональной встроенной кнопкой закрытия.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={drawerHeaderApiRows} />
-          <h5>Drawer.Title</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Drawer.Title</DemoApiTitle>
+          <DemoDescription>
             Заголовок уровня <code>h2</code> с типографикой панели.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={drawerTitleApiRows} />
-          <h5>Drawer.Body</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Drawer.Body</DemoApiTitle>
+          <DemoDescription>
             Основная область контента с прокруткой при переполнении.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={drawerBodyApiRows} />
-          <h5>Drawer.Footer</h5>
-          <p className="demoBlockDescription">Нижняя зона для кнопок действий.</p>
+          <DemoApiTitle>Drawer.Footer</DemoApiTitle>
+          <DemoDescription>Нижняя зона для кнопок действий.</DemoDescription>
           <PlaygroundApiTable rows={drawerFooterApiRows} />
         </div>
       </div>

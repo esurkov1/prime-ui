@@ -1,3 +1,4 @@
+import { DemoDescription, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import RefColorPalette from "../snippets/color/palette";
@@ -20,10 +21,10 @@ export default function ColorSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Semantic (system)</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Semantic (system)</DemoSectionTitle>
+          <DemoDescription>
             Ниже — интерактивное превью и вкладка с кодом этого примера.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={semanticSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SemanticColorSwatches />
@@ -32,10 +33,10 @@ export default function ColorSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Primitives (reference palette)</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Primitives (reference palette)</DemoSectionTitle>
+          <DemoDescription>
             Ниже — интерактивное превью и вкладка с кодом этого примера.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={paletteSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <RefColorPalette />

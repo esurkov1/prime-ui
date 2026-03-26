@@ -1,7 +1,11 @@
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-
 import LinkButtonCompositionSnippet from "../snippets/link-button/composition";
 import linkButtonCompositionSource from "../snippets/link-button/composition.tsx?raw";
 import LinkButtonExternalLinkSnippet from "../snippets/link-button/external-link";
@@ -74,11 +78,11 @@ export default function LinkButtonSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Ряд ссылок с пропом <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> — одна визуальная линия, разная плотность текста и отступов.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={linkButtonSizesSource.trim()}
             previewLayout="stack-center"
@@ -90,11 +94,11 @@ export default function LinkButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Обычная ссылка с <code>href</code> и вариант с <code>disabled</code>: без навигации,
             внешний вид «приглушённый» через <code>data-disabled</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={linkButtonStatesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <LinkButtonStatesSnippet />
@@ -103,11 +107,11 @@ export default function LinkButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция с иконками</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция с иконками</DemoSectionTitle>
+          <DemoDescription>
             Произвольные дочерние узлы: компонент <code>Icon</code> подхватывает размер из контекста
             корня; для ссылки только с иконкой задайте <code>aria-label</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={linkButtonCompositionSource.trim()}
             previewLayout="row"
@@ -119,12 +123,12 @@ export default function LinkButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Внешняя ссылка</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Внешняя ссылка</DemoSectionTitle>
+          <DemoDescription>
             Атрибуты <code>target</code> и <code>rel</code> из стандартного API{" "}
             <code>&lt;a&gt;</code> — для открытия в новой вкладке укажите{" "}
             <code>rel=&quot;noopener noreferrer&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={linkButtonExternalLinkSource.trim()}
             previewLayout="stack"
@@ -136,13 +140,13 @@ export default function LinkButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>LinkButton.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>LinkButton.Root</DemoApiTitle>
+          <DemoDescription>
             Корневой узел: интерактивный <code>&lt;a&gt;</code> или недоступный{" "}
             <code>&lt;span role=&quot;link&quot;&gt;</code> при <code>disabled</code>. Стили и
             data-атрибуты размера — из модуля компонента.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={linkButtonRootApiRows} />
         </div>
       </div>

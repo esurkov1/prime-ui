@@ -495,20 +495,10 @@ h3 {
   width: 100%;
 }
 
-.demoBlock > h4 {
-  margin: 0;
-  font-size: var(--prime-sys-typography-sizeScale-m);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  color: var(--prime-sys-color-content-primary);
-  line-height: var(--prime-sys-typography-lineHeightScale-m);
-}
-
+/* Заголовки блоков — через Typography (`DemoSectionTitle` / `DemoApiTitle`); кегль из `typography.role`. */
+.demoBlock > h4,
 .demoBlock > h5 {
   margin: 0;
-  font-size: var(--prime-sys-typography-sizeScale-s);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  color: var(--prime-sys-color-content-primary);
-  line-height: var(--prime-sys-typography-lineHeightScale-s);
 }
 
 .demoBlock > :not(h4):not(h5):not(.demoBlockDescription) {
@@ -517,12 +507,19 @@ h3 {
   max-width: 100%;
 }
 
+/* Текст описания — `DemoDescription` (body-default + muted); здесь только мера строки. */
 .demoBlockDescription {
   margin: 0;
   max-width: 48rem;
-  font-size: var(--prime-sys-typography-sizeScale-s);
-  line-height: var(--prime-sys-typography-lineHeightScale-s);
-  color: var(--prime-sys-color-content-secondary);
+}
+
+.playgroundDocPageTitle {
+  margin: 0;
+}
+
+.playgroundDocPageDescription {
+  margin: 0;
+  max-width: 65ch;
 }
 
 .codeBlockSnippetWrap {

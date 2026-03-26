@@ -1,4 +1,9 @@
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import KbdCompositionSnippet from "../snippets/kbd/composition";
@@ -57,11 +62,11 @@ export default function KbdSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Ряд <code>Kbd.Root</code> с явным <code>size</code>: <code>s</code>, <code>m</code>,{" "}
             <code>l</code>, <code>xl</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <KbdSizesSnippet />
@@ -70,13 +75,13 @@ export default function KbdSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Отдельных пропов вроде <code>disabled</code> нет: это не кнопка, а подсказка по клавише.
             Ниже — обычный элемент и вариант с <code>title</code> (нативная всплывающая подсказка);
             при необходимости можно передать <code>hidden</code>, <code>aria-hidden</code> и другие
             атрибуты через разметку.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <KbdStatesSnippet />
@@ -85,13 +90,13 @@ export default function KbdSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Несколько <code>Kbd.Root</code> в одной строке для сочетания (между ними — обычный текст
             или <code>span</code> с <code>aria-hidden</code>). Во втором ряду — иконка{" "}
             <code>Icon</code> и подпись внутри одного <code>Kbd.Root</code> при{" "}
             <code>size="m"</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <KbdCompositionSnippet />
@@ -100,13 +105,13 @@ export default function KbdSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Наследование размера из контекста</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Наследование размера из контекста</DemoSectionTitle>
+          <DemoDescription>
             Если <code>size</code> не задан, используется ближайший <code>ControlSizeProvider</code>{" "}
             (типично внутри поля, кнопки или блока формы). Явный <code>size</code> на{" "}
             <code>Kbd.Root</code> перекрывает контекст. Значение контекста <code>xs</code>{" "}
             приводится к размеру клавиши <code>s</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={inheritSizeSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <KbdInheritSizeSnippet />
@@ -115,12 +120,12 @@ export default function KbdSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Kbd.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Kbd.Root</DemoApiTitle>
+          <DemoDescription>
             Семантический элемент <code>kbd</code> с оформлением кита; дочерним элементам доступен
             контекст размера для иконок.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={[...kbdRootApiRows]} />
         </div>
       </div>

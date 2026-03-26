@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import DigitInputCompositionSnippet from "../snippets/digit-input/composition";
@@ -94,12 +99,12 @@ export default function DigitInputSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре ряда с <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code>; одинаковая длина <code>length=4</code> и заполненное{" "}
             <code>defaultValue</code> для сравнения масштаба.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <DigitInputSizesSnippet />
@@ -108,11 +113,11 @@ export default function DigitInputSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Без флагов, затем <code>hasError</code> (красная обводка) и <code>disabled</code> (все
             инпуты неактивны).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DigitInputStatesSnippet />
@@ -121,11 +126,11 @@ export default function DigitInputSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Строка кода хранится в состоянии родителя через <code>value</code> и{" "}
             <code>onChange</code>; подпись показывает текущее значение и счётчик символов.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <DigitInputControlledSnippet />
@@ -134,12 +139,12 @@ export default function DigitInputSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             В форме рядом ставятся <code>Label.Root</code>, <code>DigitInput.Root</code> и{" "}
             <code>Hint.Root</code>: подпись сверху, подсказка снизу, без встроенных слотов у самого
             DigitInput.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <DigitInputCompositionSnippet />
@@ -148,13 +153,13 @@ export default function DigitInputSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Разная <code>length</code> и <code>defaultValue</code> в неконтролируемом режиме;{" "}
             <code>onComplete</code> после ввода последней цифры. Ввод с клавиатуры переводит фокус
             вперёд; пустая ячейка и Backspace возвращают фокус назад; вставка из буфера распределяет
             цифры по ячейкам (небуквенные символы отбрасываются).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DigitInputFeaturesSnippet />
@@ -163,12 +168,12 @@ export default function DigitInputSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>DigitInput.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>DigitInput.Root</DemoApiTitle>
+          <DemoDescription>
             Группа ячеек: корень — <code>fieldset</code> с <code>aria-label</code>; внутри — по
             одному <code>input</code> на цифру, без дополнительных подкомпонентов в публичном API.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={digitInputRootApiRows} />
         </div>
       </div>

@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import CheckboxCompositionSnippet from "../snippets/checkbox/composition";
@@ -195,11 +200,11 @@ export default function CheckboxSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> — высота квадрата, зазор до текста и кегль подписи согласованы токенами.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <CheckboxSizesSnippet />
@@ -208,12 +213,12 @@ export default function CheckboxSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>variant</code>: <code>default</code> и <code>error</code> (красная обводка
             квадрата). Сообщение через <code>Checkbox.Error</code> тоже переводит поле в invalid —
             см. блок «Композиция».
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CheckboxVariantsSnippet />
@@ -222,11 +227,11 @@ export default function CheckboxSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Не отмечен / отмечен, <code>indeterminate</code>, нативный <code>required</code> на
             input, <code>disabled</code> в обычном и отмеченном виде.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CheckboxStatesSnippet />
@@ -235,12 +240,12 @@ export default function CheckboxSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             <code>checked</code> и <code>onChange</code> для полностью управляемого флага; отдельно
             можно держать <code>indeterminate</code> из состояния родителя (типично для «выбрать
             все» в таблице).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CheckboxControlledSnippet />
@@ -249,13 +254,13 @@ export default function CheckboxSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Слоты <code>Checkbox.Label</code>, <code>Checkbox.Hint</code> и{" "}
             <code>Checkbox.Error</code>: подсказка, только ошибка (без{" "}
             <code>variant=&quot;error&quot;</code> на корне) и полный набор с вариантом ошибки на
             корне.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CheckboxCompositionSnippet />
@@ -264,11 +269,11 @@ export default function CheckboxSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>На ширину контейнера</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>На ширину контейнера</DemoSectionTitle>
+          <DemoDescription>
             Корень поля уже <code>width: 100%</code>: в узкой колонке (карточка, сайдбар) подпись
             переносится во второй столбец сетки, подсказка остаётся выровненной под текст.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <CheckboxFullWidthSnippet />
@@ -277,12 +282,12 @@ export default function CheckboxSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Пустой <code>Checkbox.Label</code> с обязательным <code>aria-label</code> на{" "}
             <code>Checkbox.Root</code> для экранных читалок; <code>name</code> и <code>value</code>{" "}
             для отправки формы.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={specificSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <CheckboxSpecificSnippet />
@@ -291,29 +296,29 @@ export default function CheckboxSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Checkbox.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Checkbox.Root</DemoApiTitle>
+          <DemoDescription>
             Обёртка поля и провайдер контекста: размер, вариант, состояние checked/indeterminate и
             ссылки на слоты hint/error.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={checkboxRootApiRows} />
-          <h5>Checkbox.Label</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Checkbox.Label</DemoApiTitle>
+          <DemoDescription>
             Подпись и кликабельная область: связь <code>htmlFor</code> с input, сетка «квадрат +
             текст», рендер нативного <code>input type=&quot;checkbox&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={checkboxLabelApiRows} />
-          <h5>Checkbox.Hint</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Checkbox.Hint</DemoApiTitle>
+          <DemoDescription>
             Вторичный текст под подписью; регистрируется в контексте для{" "}
             <code>aria-describedby</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={checkboxHintApiRows} />
-          <h5>Checkbox.Error</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Checkbox.Error</DemoApiTitle>
+          <DemoDescription>
             Сообщение об ошибке визуально как Hint с вариантом error; включает invalid у всего поля.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={checkboxErrorApiRows} />
         </div>
       </div>

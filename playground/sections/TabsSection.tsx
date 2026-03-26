@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import TabsControlledSnippet from "../snippets/tabs/controlled";
@@ -203,12 +208,12 @@ export default function TabsSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре ряда с <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code>. В каждом — иконка и подпись в одной вкладке, остальные только с{" "}
             <code>Tabs.Label</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tabsSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TabsSizesSnippet />
@@ -217,12 +222,12 @@ export default function TabsSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Обычные вкладки и <code>disabled</code> на <code>Tabs.Tab</code>: пункт не нажимается,
             не получает фокус в цикле стрелок, панель для него недоступна, пока вкладка неактивна по
             смыслу данных.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={tabsHorizontalDisabledSource.trim()}
             previewLayout="stack"
@@ -234,12 +239,12 @@ export default function TabsSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Ориентация</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Ориентация</DemoSectionTitle>
+          <DemoDescription>
             <code>orientation=&quot;vertical&quot;</code>: список слева, полоса-индикатор справа у
             активной строки, стрелки вверх/вниз на клавиатуре. Горизонтальный список — значение по
             умолчанию (см. блоки выше).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tabsVerticalSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TabsVerticalSnippet />
@@ -248,12 +253,12 @@ export default function TabsSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Пара <code>value</code> и <code>onValueChange</code> на <code>Tabs.Root</code>: активная
             вкладка хранится в состоянии родителя (синхронизация с маршрутом, фильтром, шагом
             мастера).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tabsControlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TabsControlledSnippet />
@@ -262,12 +267,12 @@ export default function TabsSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Несколько <code>Tabs.Icon</code> в одном триггере (слева и справа от{" "}
             <code>Tabs.Label</code>), в третьей вкладке — две иконки подряд; первая иконка при
             выборе вкладки подсвечивается акцентным цветом.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tabsWithIconsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TabsWithIconsSnippet />
@@ -276,12 +281,12 @@ export default function TabsSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Отдельного пропа нет: корень и <code>Tabs.List</code> получают <code>className</code> с{" "}
             <code>w-full</code> / <code>min-w-0</code>, у <code>Tabs.Tab</code> —{" "}
             <code>flex-1</code>, чтобы триггеры делили ширину карточки или колонки.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tabsFullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TabsFullWidthSnippet />
@@ -290,11 +295,11 @@ export default function TabsSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Длинный текст в <code>Tabs.Label</code> в узком контейнере: обрезка с многоточием без
             переноса всего ряда вкладок на вторую строку.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tabsLongLabelsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TabsLongLabelsSnippet />
@@ -303,39 +308,39 @@ export default function TabsSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Tabs.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Tabs.Root</DemoApiTitle>
+          <DemoDescription>
             Обёртка с контекстом: хранит активный <code>value</code>, размер и ориентацию для списка
             и панелей.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tabsRootApiRows} />
-          <h5>Tabs.List</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Tabs.List</DemoApiTitle>
+          <DemoDescription>
             Контейнер <code>role=&quot;tablist&quot;</code> с клавиатурной навигацией и плавающим
             индикатором под активной вкладкой.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tabsListApiRows} />
-          <h5>Tabs.Tab</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Tabs.Tab</DemoApiTitle>
+          <DemoDescription>
             Кнопка <code>role=&quot;tab&quot;</code>, связанная с панелью через общий{" "}
             <code>value</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tabsTabApiRows} />
-          <h5>Tabs.Icon</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Tabs.Icon</DemoApiTitle>
+          <DemoDescription>
             Слот иконки в триггере; размер задаётся токенами от <code>size</code> у корня.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tabsIconApiRows} />
-          <h5>Tabs.Label</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Tabs.Label</DemoApiTitle>
+          <DemoDescription>
             Подпись вкладки с предсказуемым кеглем и поведением при нехватке места.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tabsLabelApiRows} />
-          <h5>Tabs.Panel</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Tabs.Panel</DemoApiTitle>
+          <DemoDescription>
             <code>role=&quot;tabpanel&quot;</code>; неактивные панели не монтируются в DOM.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tabsPanelApiRows} />
         </div>
       </div>

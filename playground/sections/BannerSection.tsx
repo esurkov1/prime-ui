@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import BannerCompositionSnippet from "../snippets/banner/composition";
@@ -243,13 +248,13 @@ export default function BannerSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> при <code>variant=&quot;light&quot;</code> и{" "}
             <code>status=&quot;information&quot;</code> — меняются отступы, кегль и размер иконки из
             одного яруса токенов.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BannerSizesSnippet />
@@ -258,11 +263,11 @@ export default function BannerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>variant</code>: <code>filled</code>, <code>light</code>, <code>lighter</code>
             , <code>stroke</code> на одном статусе <code>information</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BannerVariantsSnippet />
@@ -271,13 +276,13 @@ export default function BannerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния (семантика)</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния (семантика)</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>status</code>: <code>information</code>, <code>warning</code>,{" "}
             <code>error</code>, <code>success</code>, <code>feature</code> при{" "}
             <code>variant=&quot;light&quot;</code>; иконки из набора, согласованного со смыслом
             полосы.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statusesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BannerStatusesSnippet />
@@ -286,12 +291,12 @@ export default function BannerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Показ и скрытие целиком из состояния React: при скрытии рендерится кнопка «Показать
             объявление», внутри баннера — действие «Скрыть» без обязательного <code>onDismiss</code>{" "}
             на корне.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BannerControlledSnippet />
@@ -300,12 +305,12 @@ export default function BannerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Слоты <code>Banner.Icon</code> с <code>as=&#123;…&#125;</code>, заголовок, описание и{" "}
             <code>Banner.Actions</code> с <code>LinkButton</code> и <code>Button</code>; размер{" "}
             <code>l</code>, <code>variant=&quot;stroke&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BannerCompositionSnippet />
@@ -314,11 +319,11 @@ export default function BannerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Корень баннера по умолчанию на всю ширину родителя — в примере узкая рамка имитирует
             колонку карточки или сайдбара.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BannerFullWidthSnippet />
@@ -327,12 +332,12 @@ export default function BannerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Закрытие: onDismiss и CloseButton</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Закрытие: onDismiss и CloseButton</DemoSectionTitle>
+          <DemoDescription>
             Автоподстановка кнопки при одном <code>onDismiss</code>; отдельный{" "}
             <code>Banner.CloseButton</code> без <code>onDismiss</code>; оба варианта вместе — без
             дубля второй кнопки (в дереве уже есть CloseButton).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={dismissPatternsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BannerDismissPatternsSnippet />
@@ -341,42 +346,38 @@ export default function BannerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Banner.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Banner.Root</DemoApiTitle>
+          <DemoDescription>
             Обёртка полосы: вариант, статус, размер, опциональное закрытие и контекст размера для
             вложенной кнопки.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={bannerRootApiRows} />
-          <h5>Banner.Content</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Banner.Content</DemoApiTitle>
+          <DemoDescription>
             Центральная колонка сетки: иконка, тексты и блок действий.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={bannerContentApiRows} />
-          <h5>Banner.Icon</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Banner.Icon</DemoApiTitle>
+          <DemoDescription>
             Обёртка иконки с полиморфным <code>as</code>; размеры берутся от <code>size</code>{" "}
             корня.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={bannerIconApiRows} />
-          <h5>Banner.Title</h5>
-          <p className="demoBlockDescription">
-            Заголовок в одну строку или с переносом в flex-группе.
-          </p>
+          <DemoApiTitle>Banner.Title</DemoApiTitle>
+          <DemoDescription>Заголовок в одну строку или с переносом в flex-группе.</DemoDescription>
           <PlaygroundApiTable rows={bannerTitleApiRows} />
-          <h5>Banner.Description</h5>
-          <p className="demoBlockDescription">Вторичный текст с чуть пониженной непрозрачностью.</p>
+          <DemoApiTitle>Banner.Description</DemoApiTitle>
+          <DemoDescription>Вторичный текст с чуть пониженной непрозрачностью.</DemoDescription>
           <PlaygroundApiTable rows={bannerDescriptionApiRows} />
-          <h5>Banner.Actions</h5>
-          <p className="demoBlockDescription">
-            Горизонтальный ряд кнопок и ссылок рядом с текстом.
-          </p>
+          <DemoApiTitle>Banner.Actions</DemoApiTitle>
+          <DemoDescription>Горизонтальный ряд кнопок и ссылок рядом с текстом.</DemoDescription>
           <PlaygroundApiTable rows={bannerActionsApiRows} />
-          <h5>Banner.CloseButton</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Banner.CloseButton</DemoApiTitle>
+          <DemoDescription>
             Кнопка на базе <code>Button.Root</code> (ghost neutral); размер синхронизирован с
             размером баннера.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={bannerCloseButtonApiRows} />
         </div>
       </div>

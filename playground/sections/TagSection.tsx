@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import TagBasicSnippet from "../snippets/tag/basic";
@@ -89,12 +94,12 @@ export default function TagSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Ряд <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>, <code>xl</code> —
             высота, радиус, кегль и размер иконки берутся из одного яруса системных токенов
             контролов.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tagSizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <TagSizesSnippet />
@@ -103,11 +108,11 @@ export default function TagSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Обычный, с кнопкой удаления (<code>onRemove</code>) и <code>disabled</code>. Отключённое
             состояние блокирует кнопку удаления и выставляет <code>aria-disabled</code> на корне.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tagStatesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TagStatesSnippet />
@@ -116,12 +121,12 @@ export default function TagSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Иконка через <code>Tag.Icon</code> перед текстом, только текст или текст с кнопкой
             удаления. Размер иконки автоматически согласован с <code>size</code> корня через
             контекст.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tagCompositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TagCompositionSnippet />
@@ -130,11 +135,11 @@ export default function TagSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Базовый пример</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Базовый пример</DemoSectionTitle>
+          <DemoDescription>
             Статичные метки без иконки и без <code>onRemove</code> — типично для технологий проекта
             или категорий товара.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tagBasicSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TagBasicSnippet />
@@ -143,11 +148,11 @@ export default function TagSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Удаляемые теги</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Удаляемые теги</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>onRemove</code> добавляет справа кнопку с крестиком; подпись для скринридеров
             фиксирована (<code>aria-label=&quot;Remove&quot;</code> в разметке компонента).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tagRemovableSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TagRemovableSnippet />
@@ -156,10 +161,10 @@ export default function TagSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Tag.Root</h5>
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Tag.Root</DemoApiTitle>
           <PlaygroundApiTable rows={tagRootApiRows} />
-          <h5>Tag.Icon</h5>
+          <DemoApiTitle>Tag.Icon</DemoApiTitle>
           <PlaygroundApiTable rows={tagIconApiRows} />
         </div>
       </div>

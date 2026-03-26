@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import SegmentedCompositionSnippet from "../snippets/segmented/composition";
@@ -141,11 +146,11 @@ export default function SegmentedControlSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре ряда с <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> — одинаковые подписи сегментов, меняются высота, отступы и кегль.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={segmentedSizesSource.trim()}
             previewLayout="stack-center"
@@ -157,12 +162,12 @@ export default function SegmentedControlSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Рабочая группа; затем <code>disabled</code> на одном <code>Item</code>; затем{" "}
             <code>disabled</code> на <code>Root</code> — весь контроль неактивен (
             <code>aria-disabled</code> на radiogroup).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={segmentedStatesSource.trim()}
             previewLayout="stack-center"
@@ -174,11 +179,11 @@ export default function SegmentedControlSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Состояние выбора хранится в React: <code>value</code> и <code>onValueChange</code> на{" "}
             <code>Root</code> (без <code>defaultValue</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={segmentedControlledSource.trim()}
             previewLayout="stack"
@@ -190,12 +195,12 @@ export default function SegmentedControlSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>SegmentedControl.Icon</code> рядом с текстом; отдельный ряд «только иконки» —
             внутри сегмента остаётся скрытый текст, чтобы у кнопки было доступное имя (иконка с{" "}
             <code>aria-hidden</code> не озвучивается).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={segmentedCompositionSource.trim()}
             previewLayout="stack-center"
@@ -207,12 +212,12 @@ export default function SegmentedControlSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Корень по умолчанию сужается по содержимому (<code>width: fit-content</code>); через{" "}
             <code>className</code> задаётся <code>width: 100%</code> в узком контейнере — колонки
             сетки делят ширину поровну.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={segmentedFullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SegmentedFullWidthSnippet />
@@ -221,12 +226,12 @@ export default function SegmentedControlSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Два, три и четыре сегмента в одной сетке; плавающий индикатор подстраивается под
             активный пункт. На сфокусированной группе <code>role=&quot;radiogroup&quot;</code>{" "}
             стрелки влево/вправо переносят выбор (и фокус) между включёнными сегментами.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={segmentedFeaturesSource.trim()}
             previewLayout="stack-center"
@@ -238,24 +243,24 @@ export default function SegmentedControlSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>SegmentedControl.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>SegmentedControl.Root</DemoApiTitle>
+          <DemoDescription>
             Контейнер <code>radiogroup</code>: хранит выбранное значение, раздаёт контекст
             сегментам, обрабатывает клавиши-стрелки и позиционирует визуальный индикатор.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={segmentedRootApiRows} />
-          <h5>SegmentedControl.Item</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>SegmentedControl.Item</DemoApiTitle>
+          <DemoDescription>
             Один сегмент как <code>button</code> с <code>role=&quot;radio&quot;</code>, связанный с
             группой через контекст.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={segmentedItemApiRows} />
-          <h5>SegmentedControl.Icon</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>SegmentedControl.Icon</DemoApiTitle>
+          <DemoDescription>
             Выравнивает иконку по строке сегмента; размер SVG задаётся стилями от{" "}
             <code>data-size</code> корня.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={segmentedIconApiRows} />
         </div>
       </div>

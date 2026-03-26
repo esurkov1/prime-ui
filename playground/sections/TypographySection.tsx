@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import TypographyArticleLandmarksSnippet from "../snippets/typography/article-landmarks";
@@ -113,12 +118,12 @@ export default function TypographySection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Варианты (роли)</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты (роли)</DemoSectionTitle>
+          <DemoDescription>
             Полный набор ролей из <code>typography.role</code> — от <code>display</code> до{" "}
             <code>caption-micro</code>. Подписи у разделителей: имя <code>variant</code> и краткое
             назначение.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantCatalogSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TypographyVariantCatalogSnippet />
@@ -127,11 +132,11 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Статья и цитата</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Статья и цитата</DemoSectionTitle>
+          <DemoDescription>
             Landmarks (<code>article</code>, <code>section</code>, <code>header</code>), заголовки{" "}
             <code>h1</code>–<code>h2</code> и <code>blockquote</code> с <code>Typography</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={articleLandmarksSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TypographyArticleLandmarksSnippet />
@@ -140,11 +145,11 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Страница и форма</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Страница и форма</DemoSectionTitle>
+          <DemoDescription>
             Один фрейм: заголовок и пояснение — <code>Typography</code>; поля и действия —{" "}
             <code>Input</code> и <code>Button</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={readingAndFormSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TypographyReadingAndFormSnippet />
@@ -153,11 +158,11 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты начертания</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты начертания</DemoSectionTitle>
+          <DemoDescription>
             На одном <code>variant=&quot;body-default&quot;</code>: <code>weight</code>, крайние{" "}
             <code>tracking</code> и <code>tone=&quot;muted&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TypographyVariantsSnippet />
@@ -166,11 +171,11 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Интерактивных состояний у текста нет; показан курсив <code>italic</code> при том же{" "}
             <code>variant</code> и <code>weight</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TypographyStatesSnippet />
@@ -179,11 +184,11 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Вложенные <code>Typography.Root</code> с разными <code>as</code> и <code>weight</code>,
             плюс ссылка внутри родительского блока.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TypographyCompositionSnippet />
@@ -192,11 +197,11 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Два контейнера разной ширины: одинаковые <code>variant</code> и <code>tone</code> для
             подписи и основного текста.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TypographyFullWidthSnippet />
@@ -205,11 +210,11 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Тег as</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Тег as</DemoSectionTitle>
+          <DemoDescription>
             <code>as=&quot;p&quot;</code>, <code>as=&quot;div&quot;</code> и вложенный{" "}
             <code>as=&quot;span&quot;</code> внутри абзаца.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={asPropSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <TypographyAsPropSnippet />
@@ -218,13 +223,13 @@ export default function TypographySection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Typography.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Typography.Root</DemoApiTitle>
+          <DemoDescription>
             Стилизованный текст с обязательным <code>variant</code> и опциональными осями
             оформления; в DOM — <code>data-variant</code> (и прочие <code>data-*</code> по правилам
             кита).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={typographyRootApiRows} />
         </div>
       </div>

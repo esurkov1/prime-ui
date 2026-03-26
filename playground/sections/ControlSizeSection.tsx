@@ -1,5 +1,10 @@
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const providerRows: PlaygroundApiPropRow[] = [
@@ -38,15 +43,15 @@ export default function ControlSizeSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>ControlSizeProvider</h5>
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>ControlSizeProvider</DemoApiTitle>
           <PlaygroundApiTable rows={providerRows} />
-          <h5>useOptionalControlSize()</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>useOptionalControlSize()</DemoApiTitle>
+          <DemoDescription>
             Параметров нет. Возвращает <code>ControlSurfaceSize | undefined</code>: размер из
             ближайшего <code>ControlSizeProvider</code> или <code>undefined</code> вне провайдера.
             Используется в <code>Icon</code> и согласованных контролах.
-          </p>
+          </DemoDescription>
         </div>
       </div>
     </PlaygroundDocPage>

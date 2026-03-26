@@ -1,5 +1,6 @@
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const rootRows: PlaygroundApiPropRow[] = [
@@ -98,12 +99,12 @@ export default function PageShellSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>PageShell.Root</h5>
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>PageShell.Root</DemoApiTitle>
           <PlaygroundApiTable rows={rootRows} />
-          <h5>PageShell.NavArea</h5>
+          <DemoApiTitle>PageShell.NavArea</DemoApiTitle>
           <PlaygroundApiTable rows={navAreaRows} />
-          <h5>PageShell.ContentArea</h5>
+          <DemoApiTitle>PageShell.ContentArea</DemoApiTitle>
           <PlaygroundApiTable rows={contentAreaRows} />
         </div>
       </div>

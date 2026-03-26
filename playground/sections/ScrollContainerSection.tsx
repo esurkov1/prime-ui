@@ -1,5 +1,6 @@
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const rootRows: PlaygroundApiPropRow[] = [
@@ -78,8 +79,8 @@ export default function ScrollContainerSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>ScrollContainer</h5>
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>ScrollContainer</DemoApiTitle>
           <PlaygroundApiTable rows={rootRows} />
         </div>
       </div>

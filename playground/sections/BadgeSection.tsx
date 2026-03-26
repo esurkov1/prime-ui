@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import BadgeContextSizeSnippet from "../snippets/badge/context-size";
@@ -138,12 +143,12 @@ export default function BadgeSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Явный проп <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> при <code>variant=&quot;light&quot;</code> и{" "}
             <code>color=&quot;gray&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={badgeSizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <BadgeSizesSnippet />
@@ -152,13 +157,13 @@ export default function BadgeSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>variant</code>: <code>filled</code>, <code>light</code>, <code>lighter</code>
             , <code>stroke</code> с одним <code>color</code>; отдельно{" "}
             <code>variant=&quot;status&quot;</code> с <code>status</code> и подписями для экранных
             читалок через <code>label</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={badgeVariantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BadgeVariantsSnippet />
@@ -167,11 +172,11 @@ export default function BadgeSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>disabled</code>: приглушение на <code>filled</code>, <code>stroke</code> и{" "}
             <code>status</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={badgeDisabledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BadgeDisabledSnippet />
@@ -180,11 +185,11 @@ export default function BadgeSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>Badge.Dot</code> — маркер перед текстом; <code>Badge.Icon</code> — иконка в строке
             метки (проп <code>children</code> обязателен).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={badgeDotIconSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BadgeDotIconSnippet />
@@ -193,12 +198,12 @@ export default function BadgeSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Иконки</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Иконки</DemoSectionTitle>
+          <DemoDescription>
             Примеры <code>Badge</code> с иконками: иконка слева от текста, иконка справа, только
             иконка без текста, комбинация с <code>Badge.Dot</code>. Иконки автоматически
             масштабируются в зависимости от размера бейджа.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={badgeIconsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BadgeIconsSnippet />
@@ -207,11 +212,11 @@ export default function BadgeSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Семантические цвета</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Семантические цвета</DemoSectionTitle>
+          <DemoDescription>
             Все значения <code>color</code> на одном <code>variant=&quot;light&quot;</code> и
             размере <code>m</code> — чтобы сравнить палитру подписей.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={badgeSemanticColorsSource.trim()}
             previewLayout="stack"
@@ -223,12 +228,12 @@ export default function BadgeSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Размер из контекста</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размер из контекста</DemoSectionTitle>
+          <DemoDescription>
             Без <code>size</code> на <code>Badge.Root</code> используется ближайший{" "}
             <code>ControlSizeProvider</code>: размер контрольной поверхности маппится как у полей
             ввода; значение <code>xs</code> с контекста даёт визуальный размер <code>s</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={badgeContextSizeSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BadgeContextSizeSnippet />
@@ -237,25 +242,25 @@ export default function BadgeSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Badge.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Badge.Root</DemoApiTitle>
+          <DemoDescription>
             Корневой контейнер метки; выставляет <code>data-*</code> для стилей и оборачивает детей
             в <code>ControlSizeProvider</code> для согласованных вложенных иконок.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={badgeRootApiRows} />
 
-          <h5>Badge.Icon</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Badge.Icon</DemoApiTitle>
+          <DemoDescription>
             Выравнивает иконку в ряду с текстом бейджа; дочерний элемент обязателен.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={badgeIconApiRows} />
 
-          <h5>Badge.Dot</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Badge.Dot</DemoApiTitle>
+          <DemoDescription>
             Декоративная круглая отметка внутри метки (не путать с точкой варианта{" "}
             <code>status</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={badgeDotApiRows} />
         </div>
       </div>

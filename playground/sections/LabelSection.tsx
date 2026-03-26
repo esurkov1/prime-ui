@@ -1,4 +1,9 @@
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import LabelCompositionSnippet from "../snippets/label/composition";
@@ -26,12 +31,12 @@ export default function LabelSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>size</code> на <code>Label.Root</code>: <code>s</code>, <code>m</code>,{" "}
             <code>l</code>, <code>xl</code> — для текста без иконки и для строки с{" "}
             <code>Label.Icon</code> (иконка подстраивается под тот же размер).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={labelSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <LabelSizesSnippet />
@@ -40,13 +45,13 @@ export default function LabelSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Обычный лейбл с <code>htmlFor</code>, затем <code>disabled</code> (приглушённый цвет и{" "}
             <code>aria-disabled</code>), затем маркер обязательности через{" "}
             <code>Label.Asterisk</code> (отдельный слот, не путать с HTML-атрибутом{" "}
             <code>required</code> на инпуте).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={labelStatesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <LabelStatesSnippet />
@@ -55,11 +60,11 @@ export default function LabelSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция с иконкой</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция с иконкой</DemoSectionTitle>
+          <DemoDescription>
             Слот <code>Label.Icon</code> оборачивает глиф; контекст размера передаётся внутрь для
             согласованной типографики и иконки.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <LabelCompositionSnippet />
@@ -68,11 +73,11 @@ export default function LabelSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Дополнительная строка (Sub)</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Дополнительная строка (Sub)</DemoSectionTitle>
+          <DemoDescription>
             <code>Label.Sub</code> — вспомогательный текст под основным названием (единицы,
             контекст, уточнение без отдельного блока подсказки).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={labelSubLineSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <LabelSubLineSnippet />
@@ -81,11 +86,11 @@ export default function LabelSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Обязательность и необязательность</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Обязательность и необязательность</DemoSectionTitle>
+          <DemoDescription>
             Сочетание <code>Label.Asterisk</code> для обязательного поля и подписи в{" "}
             <code>Label.Sub</code> для необязательного — типичная пара в одной форме.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={mixedRequiredOptionalSource.trim()}
             previewLayout="stack"
@@ -97,12 +102,12 @@ export default function LabelSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Label.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Label.Root</DemoApiTitle>
+          <DemoDescription>
             Корневой <code>&lt;label&gt;</code>: размер, неактивность и контекст для дочерних
             слотов.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable
             rows={[
               {
@@ -150,11 +155,11 @@ export default function LabelSection() {
               },
             ]}
           />
-          <h5>Label.Icon</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Label.Icon</DemoApiTitle>
+          <DemoDescription>
             Обёртка для иконки рядом с текстом; размер иконки согласуется с <code>size</code> у{" "}
             <code>Label.Root</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable
             rows={[
               {
@@ -180,10 +185,10 @@ export default function LabelSection() {
               },
             ]}
           />
-          <h5>Label.Asterisk</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Label.Asterisk</DemoApiTitle>
+          <DemoDescription>
             Маркер обязательного поля; по умолчанию символ «*», стиль акцентного цвета.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable
             rows={[
               {
@@ -209,10 +214,10 @@ export default function LabelSection() {
               },
             ]}
           />
-          <h5>Label.Sub</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Label.Sub</DemoApiTitle>
+          <DemoDescription>
             Второстепенная строка под основным названием поля (мельче и вторичный цвет).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable
             rows={[
               {

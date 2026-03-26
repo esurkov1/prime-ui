@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import ButtonAsChildSnippet from "../snippets/button/as-child";
@@ -154,12 +159,12 @@ export default function ButtonSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Ряд кнопок <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> при <code>variant=&quot;primary&quot;</code> и{" "}
             <code>mode=&quot;filled&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <ButtonSizesSnippet />
@@ -168,13 +173,13 @@ export default function ButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты и режимы</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты и режимы</DemoSectionTitle>
+          <DemoDescription>
             Сетка сочетаний <code>variant</code> (<code>primary</code>, <code>neutral</code>,{" "}
             <code>error</code>) и <code>mode</code> (<code>filled</code>, <code>stroke</code>,{" "}
             <code>lighter</code>, <code>ghost</code>), плюс акцентный ряд{" "}
             <code>mode=&quot;fancy&quot;</code> на размере <code>m</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsModesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonVariantsModesSnippet />
@@ -183,11 +188,11 @@ export default function ButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Обычная, <code>disabled</code> и <code>loading</code> со вложенным{" "}
             <code>Button.Spinner</code> (индикатор виден только при <code>loading</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <ButtonStatesSnippet />
@@ -196,11 +201,11 @@ export default function ButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>loading</code> задаётся из состояния родителя (имитация запроса по клику);
             текст подписи можно менять вместе с флагом.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <ButtonControlledSnippet />
@@ -209,12 +214,12 @@ export default function ButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>Button.Icon</code> слева и справа от текста; отдельные кнопки только с иконкой — с
             обязательной доступной подписью через <code>aria-label</code> на{" "}
             <code>Button.Root</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonCompositionSnippet />
@@ -223,10 +228,10 @@ export default function ButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             <code>fullWidth</code>: кнопка на всю ширину колонки (карточка, форма, нижняя панель).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonFullWidthSnippet />
@@ -235,13 +240,13 @@ export default function ButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>asChild</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>asChild</DemoSectionTitle>
+          <DemoDescription>
             <code>asChild</code>: стили и поведение кнопки передаются одному дочернему элементу
             (например <code>&lt;a href&gt;</code>). При <code>disabled</code> или{" "}
             <code>loading</code> — <code>aria-disabled</code> и блокировка перехода без нативного{" "}
             <code>disabled</code> на ссылке.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={asChildSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonAsChildSnippet />
@@ -250,12 +255,12 @@ export default function ButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Нативная форма: <code>type=&quot;submit&quot;</code> и{" "}
             <code>type=&quot;reset&quot;</code> вместе с <code>fullWidth</code> — типичный блок
             поиска или короткой анкеты.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={formTypesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonFormTypesSnippet />
@@ -264,24 +269,24 @@ export default function ButtonSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Button.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Button.Root</DemoApiTitle>
+          <DemoDescription>
             Корневая кнопка или слот для одного дочернего элемента при <code>asChild</code>; задаёт
             вариант, режим, размер и общий контекст для спиннера.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={buttonRootApiRows} />
-          <h5>Button.Icon</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Button.Icon</DemoApiTitle>
+          <DemoDescription>
             Обёртка для иконки с выравниванием по строке кнопки; помечена <code>aria-hidden</code>,
             так как смысл должен дублироваться текстом или <code>aria-label</code> на корне.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={buttonIconApiRows} />
-          <h5>Button.Spinner</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Button.Spinner</DemoApiTitle>
+          <DemoDescription>
             Индикатор ожидания: рендерится только если у ближайшего <code>Button.Root</code>{" "}
             <code>loading=true</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={buttonSpinnerApiRows} />
         </div>
       </div>

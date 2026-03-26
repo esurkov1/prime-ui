@@ -1,7 +1,11 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-
 import BreadcrumbCompositionSnippet from "../snippets/breadcrumb/composition";
 import breadcrumbCompositionSource from "../snippets/breadcrumb/composition.tsx?raw";
 import BreadcrumbFullWidthSnippet from "../snippets/breadcrumb/full-width";
@@ -124,11 +128,11 @@ export default function BreadcrumbSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре ряда с <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> на <code>Breadcrumb.Root</code> — общий масштаб для всей цепочки.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={breadcrumbSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BreadcrumbSizesSnippet />
@@ -137,12 +141,12 @@ export default function BreadcrumbSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Сверху: промежуточные пункты с <code>href</code>, финал с <code>current</code> (текущая
             страница). Снизу: средний сегмент без <code>href</code> — обычный текст в{" "}
             <code>span</code>, не ссылка.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={breadcrumbStatesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <BreadcrumbStatesSnippet />
@@ -151,12 +155,12 @@ export default function BreadcrumbSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Первый пункт только с иконкой: класс <code>itemHome</code> из стилей крошек и
             обязательный <code>aria-label</code> на <code>Item</code>. Разделители заменены на
             символ через <code>children</code> у <code>Separator</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={breadcrumbCompositionSource.trim()}
             previewLayout="stack"
@@ -168,11 +172,11 @@ export default function BreadcrumbSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width / responsive</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width / responsive</DemoSectionTitle>
+          <DemoDescription>
             Список внутри корня — <code>flex</code> с <code>flex-wrap</code>: в узком контейнере
             длинные подписи переносятся на следующую строку без обрезки.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={breadcrumbFullWidthSource.trim()}
             previewLayout="stack"
@@ -184,11 +188,11 @@ export default function BreadcrumbSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Схлопывание середины пути через <code>Breadcrumb.Ellipsis</code> между разделителями —
             удобно для глубокой вложенности каталога или документации.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={breadcrumbLongEllipsisSource.trim()}
             previewLayout="stack"
@@ -200,29 +204,29 @@ export default function BreadcrumbSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Breadcrumb.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Breadcrumb.Root</DemoApiTitle>
+          <DemoDescription>
             Обёртка-<code>nav</code> с подписью для скринридеров, список-<code>ol</code> и контекст
             размера для дочерних частей.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={breadcrumbRootApiRows} />
-          <h5>Breadcrumb.Item</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Breadcrumb.Item</DemoApiTitle>
+          <DemoDescription>
             Элемент списка: ссылка через внутренний <code>LinkButton</code> или текстовый{" "}
             <code>span</code> для текущей страницы и необязательных «заголовков» без перехода.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={breadcrumbItemApiRows} />
-          <h5>Breadcrumb.Separator</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Breadcrumb.Separator</DemoApiTitle>
+          <DemoDescription>
             Служебный пункт между сегментами: по умолчанию иконка-шеврон, скрыт от вспомогательных
             технологий через <code>aria-hidden</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={breadcrumbSeparatorApiRows} />
-          <h5>Breadcrumb.Ellipsis</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Breadcrumb.Ellipsis</DemoApiTitle>
+          <DemoDescription>
             Визуальный маркер пропущенных уровней вложенности (символ «…» внутри <code>li</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={breadcrumbEllipsisApiRows} />
         </div>
       </div>

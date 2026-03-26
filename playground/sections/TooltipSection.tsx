@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import TooltipCompositionSnippet from "../snippets/tooltip/composition";
@@ -130,11 +135,11 @@ export default function TooltipSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>size</code> на <code>Tooltip.Content</code>: ряд <code>s</code>,{" "}
             <code>m</code>, <code>l</code>, <code>xl</code> при одном и том же триггере.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={tooltipSizesSource.trim()}
             previewLayout="stack-center"
@@ -146,12 +151,12 @@ export default function TooltipSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты оформления</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты оформления</DemoSectionTitle>
+          <DemoDescription>
             Отдельного пропа <code>variant</code> нет: внешний вид задаётся токенами темы. Ниже —
             одна и та же подсказка на разных фонах интерфейса (<code>surface-default</code> и{" "}
             <code>surface-raised</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tooltipSurfacesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <TooltipSurfacesSnippet />
@@ -160,13 +165,13 @@ export default function TooltipSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Обычный триггер открывает подсказку по hover и focus; у нативной <code>disabled</code>{" "}
             кнопки наведение не срабатывает — для пояснения к недоступному действию используйте
             текст рядом или обёртку. Для сокращений и терминов удобна кнопка без визуального
             оформления (нативный фокус и клавиатура).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tooltipStatesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <TooltipStatesSnippet />
@@ -175,12 +180,12 @@ export default function TooltipSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Расположение</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Расположение</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>side</code> на <code>Tooltip.Content</code>: <code>top</code>,{" "}
             <code>bottom</code>, <code>left</code>, <code>right</code>; стрелка и позиция
             подстраиваются под выбранную сторону.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tooltipSideSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <TooltipSideSnippet />
@@ -189,12 +194,12 @@ export default function TooltipSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             <code>open</code> и <code>onOpenChange</code> на <code>Tooltip.Root</code>; для
             мгновенного отклика в примере провайдер с <code>delayDuration=0</code>. Переключатель и
             наведение на триггер меняют одно и то же состояние.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tooltipControlledSource.trim()}>
             <PlaygroundExampleFrame.Stage>
               <TooltipControlledSnippet />
@@ -203,12 +208,12 @@ export default function TooltipSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Триггер — любой одиночный элемент (ссылка, кнопка только с иконкой); в контенте —
             типографика и вложенная разметка. У иконки задайте доступное имя через{" "}
             <code>aria-label</code> на кнопке.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tooltipCompositionSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <TooltipCompositionSnippet />
@@ -217,11 +222,11 @@ export default function TooltipSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Задержка провайдера</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Задержка провайдера</DemoSectionTitle>
+          <DemoDescription>
             <code>Tooltip.Provider</code> с <code>delayDuration=800</code> — реже мигающие подсказки
             при быстром движении курсора по плотной сетке контролов.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tooltipDelaySource.trim()}>
             <PlaygroundExampleFrame.Stage>
               <TooltipDelaySnippet />
@@ -230,12 +235,12 @@ export default function TooltipSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Длинный текст</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Длинный текст</DemoSectionTitle>
+          <DemoDescription>
             Многострочный текст в <code>Tooltip.Content</code> с <code>size=&quot;m&quot;</code>.
             Ширина ограничена стилями компонента (<code>max-width</code>), длинные слова
             переносятся.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={tooltipLongContentSource.trim()}>
             <PlaygroundExampleFrame.Stage>
               <TooltipLongContentSnippet />
@@ -244,29 +249,29 @@ export default function TooltipSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Tooltip.Provider</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Tooltip.Provider</DemoApiTitle>
+          <DemoDescription>
             Задаёт задержку появления для всех вложенных <code>Tooltip.Root</code> на этом участке
             дерева.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tooltipProviderApiRows} />
-          <h5>Tooltip.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Tooltip.Root</DemoApiTitle>
+          <DemoDescription>
             Хранит открытие/закрытие, ссылку на триггер и стабильный <code>id</code> для связи с
             контентом.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tooltipRootApiRows} />
-          <h5>Tooltip.Trigger</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Tooltip.Trigger</DemoApiTitle>
+          <DemoDescription>
             Клонирует единственного ребёнка и вешает обработчики показа и снятия подсказки.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tooltipTriggerApiRows} />
-          <h5>Tooltip.Content</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Tooltip.Content</DemoApiTitle>
+          <DemoDescription>
             Портальный слой с подсказкой, позиционирование от триггера и обновление при скролле и
             ресайзе.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={tooltipContentApiRows} />
         </div>
       </div>

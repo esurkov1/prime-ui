@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import ButtonGroupCompositionSnippet from "../snippets/button-group/composition";
@@ -138,11 +143,11 @@ export default function ButtonGroupSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре ряда с <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> — у каждого своя группа из трёх сегментов.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <ButtonGroupSizesSnippet />
@@ -151,12 +156,12 @@ export default function ButtonGroupSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Обычный сегмент; выбранный — через <code>pressed</code> (
             <code>data-state=&quot;on&quot;</code> и <code>aria-pressed</code>); отдельно показан{" "}
             <code>disabled</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <ButtonGroupStatesSnippet />
@@ -165,12 +170,12 @@ export default function ButtonGroupSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Ориентация</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Ориентация</DemoSectionTitle>
+          <DemoDescription>
             По умолчанию <code>orientation=&quot;horizontal&quot;</code>; колонка —{" "}
             <code>orientation=&quot;vertical&quot;</code> (скругления и стыковка бордеров
             пересчитываются стилями).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={orientationSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonGroupOrientationSnippet />
@@ -179,11 +184,11 @@ export default function ButtonGroupSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Какой сегмент активен, решает состояние React: на выбранном элементе{" "}
             <code>pressed=&#123;true&#125;</code>, переключение через <code>onClick</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <ButtonGroupControlledSnippet />
@@ -192,11 +197,11 @@ export default function ButtonGroupSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>ButtonGroup.Icon</code> выравнивает SVG по токенам размера; для сегментов только с
             иконкой нужна подпись через <code>aria-label</code> на <code>Item</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonGroupCompositionSnippet />
@@ -205,12 +210,12 @@ export default function ButtonGroupSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Отдельного пропа нет: на <code>Root</code> — класс ширины контейнера (например{" "}
             <code>w-full</code>), на сегментах — <code>flex-1</code>, чтобы поделить строку в
             карточке или панели.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonGroupFullWidthSnippet />
@@ -219,12 +224,12 @@ export default function ButtonGroupSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Сегменты остаются нативными <code>&lt;button&gt;</code>: в форме можно сочетать{" "}
             <code>type=&quot;submit&quot;</code> и <code>type=&quot;reset&quot;</code> в одной
             группе.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={formFeaturesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ButtonGroupFormFeaturesSnippet />
@@ -233,23 +238,23 @@ export default function ButtonGroupSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>ButtonGroup.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>ButtonGroup.Root</DemoApiTitle>
+          <DemoDescription>
             Обёртка группы: задаёт ориентацию, размер, контекст для сегментов и иконок, прокидывает
             размер в <code>ControlSizeProvider</code> для дочерних контролов.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={buttonGroupRootApiRows} />
-          <h5>ButtonGroup.Item</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>ButtonGroup.Item</DemoApiTitle>
+          <DemoDescription>
             Один сегмент — кнопка с общей стилизацией группы; должен находиться внутри{" "}
             <code>Root</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={buttonGroupItemApiRows} />
-          <h5>ButtonGroup.Icon</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>ButtonGroup.Icon</DemoApiTitle>
+          <DemoDescription>
             Слот под иконку внутри сегмента; рендерит <code>span</code> с <code>aria-hidden</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={buttonGroupIconApiRows} />
         </div>
       </div>

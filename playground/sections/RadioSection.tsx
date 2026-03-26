@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import RadioCompositionSnippet from "../snippets/radio/composition";
@@ -164,12 +169,12 @@ export default function RadioSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code> — <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code> — при <code>variant=&quot;default&quot;</code>; у каждого пункта своё{" "}
             <code>name</code>, чтобы превью не мешало другим блокам.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <RadioSizesSnippet />
@@ -178,12 +183,12 @@ export default function RadioSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             <code>variant=&quot;default&quot;</code> с <code>Radio.Hint</code> и{" "}
             <code>variant=&quot;error&quot;</code> с <code>Radio.Error</code>: ошибка подсвечивает
             обводку маркера и выставляет <code>aria-invalid</code> на input.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <RadioVariantsSnippet />
@@ -192,11 +197,11 @@ export default function RadioSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Выбрано и не выбрано, <code>disabled</code> (вкл./выкл.), плюс строка с{" "}
             <code>Radio.Hint</code> для связи по <code>aria-describedby</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <RadioStatesSnippet />
@@ -205,12 +210,12 @@ export default function RadioSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Состояние в родителе: у каждого пункта одинаковый <code>name</code>,{" "}
             <code>checked</code> привязан к значению в <code>useState</code>, в{" "}
             <code>onChange</code> обновляем состояние при <code>e.currentTarget.checked</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <RadioControlledSnippet />
@@ -219,11 +224,11 @@ export default function RadioSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Группа из двух пунктов с подписью и <code>Radio.Hint</code> под каждым — типичный блок
             выбора способа оплаты.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <RadioCompositionSnippet />
@@ -232,11 +237,11 @@ export default function RadioSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Корень поля тянется на ширину контейнера (<code>width: 100%</code> у обёртки): в узкой
             колонке подпись занимает оставшееся место в сетке label.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <RadioFullWidthSnippet />
@@ -245,12 +250,12 @@ export default function RadioSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Нативная форма: общий <code>name</code>, <code>fieldset</code>/<code>legend</code>,{" "}
             <code>required</code> на пунктах и чтение выбранного значения через{" "}
             <code>FormData</code> при отправке.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={formGroupSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <RadioFormGroupSnippet />
@@ -259,29 +264,29 @@ export default function RadioSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Radio.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Radio.Root</DemoApiTitle>
+          <DemoDescription>
             Обёртка поля и провайдер контекста: размер, вариант, связь hint/error с input через id.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={radioRootApiRows} />
-          <h5>Radio.Label</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Radio.Label</DemoApiTitle>
+          <DemoDescription>
             Подпись и визуальный маркер: рендерит <code>Label.Root</code>, нативный{" "}
             <code>type=&quot;radio&quot;</code> и SVG-кольца.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={radioLabelApiRows} />
-          <h5>Radio.Hint</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Radio.Hint</DemoApiTitle>
+          <DemoDescription>
             Вторичный текст под пунктом; регистрируется в контексте для{" "}
             <code>aria-describedby</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={radioHintApiRows} />
-          <h5>Radio.Error</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Radio.Error</DemoApiTitle>
+          <DemoDescription>
             Сообщение об ошибке (через <code>Hint.Root</code> с вариантом error); влияет на{" "}
             <code>aria-invalid</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={radioErrorApiRows} />
         </div>
       </div>

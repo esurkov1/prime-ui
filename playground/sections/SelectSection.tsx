@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import SelectCompositionSnippet from "../snippets/select/composition";
@@ -317,12 +322,12 @@ export default function SelectSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code> на корне: <code>s</code>, <code>m</code>,{" "}
             <code>l</code>, <code>xl</code> — высота триггера, кегль и отступы из одного яруса
             токенов.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SelectSizesSnippet />
@@ -331,11 +336,11 @@ export default function SelectSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Подсказка без выбора, <code>defaultValue</code>, отключённый корень{" "}
             <code>disabled</code> и ошибка <code>hasError</code> на <code>Select.Root</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SelectStatesSnippet />
@@ -344,11 +349,11 @@ export default function SelectSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Пара <code>value</code> и <code>onChange</code> на <code>Select.Root</code>: выбранное
             значение хранится в состоянии родителя и отображается под полем.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SelectControlledSnippet />
@@ -357,12 +362,12 @@ export default function SelectSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>Select.TriggerIcon</code> и <code>Select.ItemIcon</code>; у пунктов задан{" "}
             <code>label</code> — в триггере длинная подпись, в списке остаётся короткая разметка
             (например код валюты).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SelectCompositionSnippet />
@@ -371,11 +376,11 @@ export default function SelectSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Триггер по умолчанию тянется на ширину контейнера (<code>width: 100%</code> в стилях) —
             в узкой колонке список остаётся по содержимому с ограничением по вьюпорту.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SelectFullWidthSnippet />
@@ -384,12 +389,12 @@ export default function SelectSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             <code>Select.Group</code>, <code>Select.GroupLabel</code>, <code>Select.Separator</code>
             , отключённый пункт, длинный список с прокруткой; панель позиционируется у края экрана и
             переворачивается при нехватке места (внутренняя логика позиционирования).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SelectFeaturesSnippet />
@@ -398,47 +403,47 @@ export default function SelectSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Select.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Select.Root</DemoApiTitle>
+          <DemoDescription>
             Хранит выбранное значение, открытие списка, подсветку пункта и размер для дерева.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={selectRootApiRows} />
-          <h5>Select.Trigger</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Select.Trigger</DemoApiTitle>
+          <DemoDescription>
             Кнопка-combobox: открывает и закрывает список, связана с listbox по aria-controls.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={selectTriggerApiRows} />
-          <h5>Select.Value</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Select.Value</DemoApiTitle>
+          <DemoDescription>
             Отображает подпись выбранного пункта, иначе placeholder с визуальным стилем подсказки.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={selectValueApiRows} />
-          <h5>Select.TriggerIcon</h5>
-          <p className="demoBlockDescription">Слот иконки слева от значения в триггере.</p>
+          <DemoApiTitle>Select.TriggerIcon</DemoApiTitle>
+          <DemoDescription>Слот иконки слева от значения в триггере.</DemoDescription>
           <PlaygroundApiTable rows={selectTriggerIconApiRows} />
-          <h5>Select.Content</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Select.Content</DemoApiTitle>
+          <DemoDescription>
             Портальный listbox с фокусом и клавиатурной навигацией; не рендерится, пока список
             закрыт.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={selectContentApiRows} />
-          <h5>Select.Item</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Select.Item</DemoApiTitle>
+          <DemoDescription>
             Опция списка; сообщает подпись корню для отображения в триггере.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={selectItemApiRows} />
-          <h5>Select.ItemIcon</h5>
-          <p className="demoBlockDescription">Иконка в строке пункта (до текста).</p>
+          <DemoApiTitle>Select.ItemIcon</DemoApiTitle>
+          <DemoDescription>Иконка в строке пункта (до текста).</DemoDescription>
           <PlaygroundApiTable rows={selectItemIconApiRows} />
-          <h5>Select.Group</h5>
-          <p className="demoBlockDescription">Секция пунктов с role=&quot;group&quot;.</p>
+          <DemoApiTitle>Select.Group</DemoApiTitle>
+          <DemoDescription>Секция пунктов с role=&quot;group&quot;.</DemoDescription>
           <PlaygroundApiTable rows={selectGroupApiRows} />
-          <h5>Select.GroupLabel</h5>
-          <p className="demoBlockDescription">Заголовок секции внутри списка.</p>
+          <DemoApiTitle>Select.GroupLabel</DemoApiTitle>
+          <DemoDescription>Заголовок секции внутри списка.</DemoDescription>
           <PlaygroundApiTable rows={selectGroupLabelApiRows} />
-          <h5>Select.Separator</h5>
-          <p className="demoBlockDescription">Визуальный разрыв между группами.</p>
+          <DemoApiTitle>Select.Separator</DemoApiTitle>
+          <DemoDescription>Визуальный разрыв между группами.</DemoDescription>
           <PlaygroundApiTable rows={selectSeparatorApiRows} />
         </div>
       </div>

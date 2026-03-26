@@ -1,6 +1,7 @@
 import type * as React from "react";
 
 import { PageContent } from "@/components/page-content/PageContent";
+import { Typography } from "@/components/typography/Typography";
 import { cx } from "@/internal/cx";
 
 export type PlaygroundDocPageProps = {
@@ -30,9 +31,25 @@ export function PlaygroundDocPage({
       {...(headingId != null ? { "aria-labelledby": headingId } : {})}
     >
       <PageContent.Header>
-        <PageContent.Title id={headingId}>{title}</PageContent.Title>
+        <Typography.Root
+          as="h1"
+          variant="heading-page"
+          weight="semibold"
+          tracking="tight"
+          className="playgroundDocPageTitle"
+          {...(headingId != null ? { id: headingId } : {})}
+        >
+          {title}
+        </Typography.Root>
         {description != null ? (
-          <PageContent.Description>{description}</PageContent.Description>
+          <Typography.Root
+            as="p"
+            variant="body-default"
+            tone="muted"
+            className="playgroundDocPageDescription"
+          >
+            {description}
+          </Typography.Root>
         ) : null}
       </PageContent.Header>
       {children != null ? <PageContent.Body>{children}</PageContent.Body> : null}

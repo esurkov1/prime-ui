@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import AccordionCompositionSnippet from "../snippets/accordion/composition";
@@ -296,12 +301,12 @@ export default function AccordionSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code> на корне: <code>s</code>, <code>m</code>,{" "}
             <code>l</code>, <code>xl</code> — меняются кегль, иконки и отступы триггера и текста
             контента.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AccordionSizesSnippet />
@@ -310,12 +315,12 @@ export default function AccordionSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты и режимы</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты и режимы</DemoSectionTitle>
+          <DemoDescription>
             Визуальная раскладка <code>layout</code> (<code>grouped</code> / <code>separate</code>)
             и поведение <code>type</code> (<code>single</code> / <code>multiple</code>); для
             нескольких открытых секций — <code>defaultValue</code> как массив строк.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsLayoutTypeSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AccordionVariantsLayoutTypeSnippet />
@@ -324,12 +329,12 @@ export default function AccordionSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Отключённый пункт (<code>Accordion.Item disabled</code>), стартовое раскрытие (
             <code>defaultValue</code>) и режим без полного сворачивания в <code>single</code> (
             <code>collapsible={"{false}"}</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AccordionStatesSnippet />
@@ -338,12 +343,12 @@ export default function AccordionSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Пара <code>value</code> + <code>onValueChange</code> при{" "}
             <code>type=&quot;single&quot;</code>: родитель синхронизирует открытый пункт с боковыми
             кнопками или маршрутом.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AccordionControlledSnippet />
@@ -352,11 +357,11 @@ export default function AccordionSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>Accordion.Icon</code> с компонентом иконки через <code>as={"{Icon}"}</code>, текст
             в <code>span</code>, справа <code>Accordion.Arrow</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AccordionCompositionSnippet />
@@ -365,11 +370,11 @@ export default function AccordionSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Корень на всю ширину колонки превью (без класса с <code>max-width</code> демо): типично
             для боковой панели или широкого блока на странице.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AccordionFullWidthSnippet />
@@ -378,11 +383,11 @@ export default function AccordionSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Полиморфная иконка</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Полиморфная иконка</DemoSectionTitle>
+          <DemoDescription>
             <code>Accordion.Icon</code> с <code>as=&quot;span&quot;</code> и произвольной разметкой
             внутри вместо передачи одного компонента в <code>as</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={iconAsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AccordionIconAsSnippet />
@@ -391,11 +396,11 @@ export default function AccordionSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             <code>Accordion.Arrow</code>: смена набора иконок через <code>openIcon</code> и{" "}
             <code>closeIcon</code> (плюс/минус) рядом с вариантом по умолчанию.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresArrowSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <AccordionFeaturesArrowSnippet />
@@ -404,37 +409,37 @@ export default function AccordionSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Accordion.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Accordion.Root</DemoApiTitle>
+          <DemoDescription>
             Контейнер списка: режим single/multiple, контролируемость, размер и групповая раскладка.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={accordionRootApiRows} />
-          <h5>Accordion.Item</h5>
-          <p className="demoBlockDescription">Один раскрываемый блок с уникальным value.</p>
+          <DemoApiTitle>Accordion.Item</DemoApiTitle>
+          <DemoDescription>Один раскрываемый блок с уникальным value.</DemoDescription>
           <PlaygroundApiTable rows={accordionItemApiRows} />
-          <h5>Accordion.Header</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Accordion.Header</DemoApiTitle>
+          <DemoDescription>
             Семантический заголовок пункта (фиксированный уровень h3 в разметке).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={accordionHeaderApiRows} />
-          <h5>Accordion.Trigger</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Accordion.Trigger</DemoApiTitle>
+          <DemoDescription>
             Кнопка раскрытия: связывает aria-controls и aria-expanded с контентом.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={accordionTriggerApiRows} />
-          <h5>Accordion.Icon</h5>
-          <p className="demoBlockDescription">Слот иконки слева от подписи триггера.</p>
+          <DemoApiTitle>Accordion.Icon</DemoApiTitle>
+          <DemoDescription>Слот иконки слева от подписи триггера.</DemoDescription>
           <PlaygroundApiTable rows={accordionIconApiRows} />
-          <h5>Accordion.Arrow</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Accordion.Arrow</DemoApiTitle>
+          <DemoDescription>
             Индикатор справа: шеврон по умолчанию или пара кастомных иконок.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={accordionArrowApiRows} />
-          <h5>Accordion.Content</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Accordion.Content</DemoApiTitle>
+          <DemoDescription>
             Область с анимацией высоты; внешний узел — section с aria-связью с триггером.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={accordionContentApiRows} />
         </div>
       </div>

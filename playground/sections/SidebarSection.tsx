@@ -1,4 +1,9 @@
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import SidebarAsChildSnippet from "../snippets/sidebar/as-child";
@@ -75,12 +80,12 @@ export default function SidebarSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code> на <code>Sidebar.Root</code> (<code>s</code>,{" "}
             <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же простая панель, чтобы
             сравнить высоту контролов, кегль и ширину колонки.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sidebarSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SidebarSizesSnippet />
@@ -89,12 +94,12 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             <code>variant=&quot;simple&quot;</code> — только <code>NavPanel</code>.{" "}
             <code>variant=&quot;double&quot;</code> — рядом <code>ContextBar</code> (переключение
             разделов) и панель с <code>PanelSwitch</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SidebarVariantsSnippet />
@@ -103,11 +108,11 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Пункт контекстной колонки с <code>disabled</code> и подсказкой, отключённый{" "}
             <code>MenuButton</code>, футер с <code>Footer variant=&quot;inset&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <div className="examplePreviewBleed">
@@ -118,12 +123,12 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Расположение в макете</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Расположение в макете</DemoSectionTitle>
+          <DemoDescription>
             <code>panelWidth=&quot;compact&quot;</code> сужает панель;{" "}
             <code>sidebarSlot=&quot;page-nav&quot;</code> задаёт отступы и высоту для колонки рядом
             с контентом (как в каркасе страницы).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={layoutOptionsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SidebarLayoutOptionsSnippet />
@@ -132,12 +137,12 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Снаружи задаются <code>open</code>, <code>onOpenChange</code>, <code>variant</code>,{" "}
             <code>onVariantChange</code> и при двойном режиме <code>activeSection</code> /{" "}
             <code>onActiveSectionChange</code>; кнопки над превью переключают эти значения.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SidebarControlledSnippet />
@@ -146,12 +151,12 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>IdentityButton</code> в шапке, сворачиваемая <code>NavCategory</code> с{" "}
             <code>NavDocTree</code>, группы <code>Group</code> / <code>Menu</code>, вторичная кнопка{" "}
             <code>MenuAction</code> в строке пункта, <code>PanelSwitch</code> по разделам.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <div className="examplePreviewBleed">
@@ -162,12 +167,12 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>На всю ширину слота</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>На всю ширину слота</DemoSectionTitle>
+          <DemoDescription>
             Родитель на всю ширину превью; <code>className</code> и{" "}
             <code>sidebarSlot=&quot;page-nav&quot;</code> помогают вписать сайдбар в гибкий ряд с
             основной колонкой.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SidebarFullWidthSnippet />
@@ -176,13 +181,13 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Адаптивное поведение</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Адаптивное поведение</DemoSectionTitle>
+          <DemoDescription>
             Порог привязан к ширине окна <code>(max-width: 64rem)</code>. При{" "}
             <code>responsive=&#123;false&#125;</code> автоматическое скрытие и оверлей отключаются;
             при <code>true</code> (по умолчанию) на узком окне панель уезжает, остаётся подложка и
             кнопка открытия.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={responsiveSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SidebarResponsiveSnippet />
@@ -191,11 +196,11 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>asChild</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>asChild</DemoSectionTitle>
+          <DemoDescription>
             <code>ContextItemButton asChild</code> с нативной <code>button</code> и{" "}
             <code>MenuButton asChild</code> с внешней ссылкой: стили остаются на дочернем элементе.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={asChildSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SidebarAsChildSnippet />
@@ -204,12 +209,12 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Пути с префиксом раздела</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Пути с префиксом раздела</DemoSectionTitle>
+          <DemoDescription>
             Хук <code>useSidebarNavTo</code> и <code>MenuRouterLink</code> внутри{" "}
             <code>MemoryRouter</code>: при активном разделе контекстной колонки путь собирается как{" "}
             <code>{"/{section}/…"}</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={navToSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SidebarNavToSnippet />
@@ -218,169 +223,163 @@ export default function SidebarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
+          <DemoSectionTitle>API</DemoSectionTitle>
 
-          <h5>Sidebar.Root</h5>
-          <p className="demoBlockDescription">Корень: контекст, размеры, открытость, адаптив.</p>
+          <DemoApiTitle>Sidebar.Root</DemoApiTitle>
+          <DemoDescription>Корень: контекст, размеры, открытость, адаптив.</DemoDescription>
           <PlaygroundApiTable rows={sidebarRootApiRows} />
 
-          <h5>Sidebar.ContextBar</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Sidebar.ContextBar</DemoApiTitle>
+          <DemoDescription>
             Узкая колонка разделов; с <code>items</code> подключаются подсказки и автоселект первого
             раздела.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={sidebarContextBarApiRows} />
 
-          <h5>Sidebar.ContextBarHeader</h5>
-          <p className="demoBlockDescription">Область логотипа над списком контекста.</p>
+          <DemoApiTitle>Sidebar.ContextBarHeader</DemoApiTitle>
+          <DemoDescription>Область логотипа над списком контекста.</DemoDescription>
           <PlaygroundApiTable rows={sidebarContextBarHeaderApiRows} />
 
-          <h5>Sidebar.ContextBarBody</h5>
-          <p className="demoBlockDescription">Тело списка при ручной разметке контекста.</p>
+          <DemoApiTitle>Sidebar.ContextBarBody</DemoApiTitle>
+          <DemoDescription>Тело списка при ручной разметке контекста.</DemoDescription>
           <PlaygroundApiTable rows={sidebarContextBarBodyApiRows} />
 
-          <h5>Sidebar.ContextBarFooter</h5>
-          <p className="demoBlockDescription">Низ контекстной колонки.</p>
+          <DemoApiTitle>Sidebar.ContextBarFooter</DemoApiTitle>
+          <DemoDescription>Низ контекстной колонки.</DemoDescription>
           <PlaygroundApiTable rows={sidebarContextBarFooterApiRows} />
 
-          <h5>Sidebar.ContextItemButton</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Sidebar.ContextItemButton</DemoApiTitle>
+          <DemoDescription>
             Кнопка пункта контекстной колонки; поддерживает asChild.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={sidebarContextItemButtonApiRows} />
 
-          <h5>Sidebar.NavPanel</h5>
-          <p className="demoBlockDescription">Основная панель навигации.</p>
+          <DemoApiTitle>Sidebar.NavPanel</DemoApiTitle>
+          <DemoDescription>Основная панель навигации.</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavPanelApiRows} />
 
-          <h5>Sidebar.NavPanelBody</h5>
-          <p className="demoBlockDescription">Прокручиваемое содержимое панели.</p>
+          <DemoApiTitle>Sidebar.NavPanelBody</DemoApiTitle>
+          <DemoDescription>Прокручиваемое содержимое панели.</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavPanelBodyApiRows} />
 
-          <h5>Sidebar.NavDocTree</h5>
-          <p className="demoBlockDescription">Контейнер для дерева документации или оглавления.</p>
+          <DemoApiTitle>Sidebar.NavDocTree</DemoApiTitle>
+          <DemoDescription>Контейнер для дерева документации или оглавления.</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavDocTreeApiRows} />
 
-          <h5>Sidebar.NavPanelHeading</h5>
-          <p className="demoBlockDescription">Заголовок уровня панели.</p>
+          <DemoApiTitle>Sidebar.NavPanelHeading</DemoApiTitle>
+          <DemoDescription>Заголовок уровня панели.</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavPanelHeadingApiRows} />
 
-          <h5>Sidebar.NavCategory</h5>
-          <p className="demoBlockDescription">Группа с раскрываемым блоком (состояние снаружи).</p>
+          <DemoApiTitle>Sidebar.NavCategory</DemoApiTitle>
+          <DemoDescription>Группа с раскрываемым блоком (состояние снаружи).</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavCategoryApiRows} />
 
-          <h5>Sidebar.NavCategoryTrigger</h5>
-          <p className="demoBlockDescription">Кнопка раскрытия группы.</p>
+          <DemoApiTitle>Sidebar.NavCategoryTrigger</DemoApiTitle>
+          <DemoDescription>Кнопка раскрытия группы.</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavCategoryTriggerApiRows} />
 
-          <h5>Sidebar.NavCategoryLabel</h5>
-          <p className="demoBlockDescription">Подпись группы.</p>
+          <DemoApiTitle>Sidebar.NavCategoryLabel</DemoApiTitle>
+          <DemoDescription>Подпись группы.</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavCategoryLabelApiRows} />
 
-          <h5>Sidebar.NavCategoryCount</h5>
-          <p className="demoBlockDescription">Счётчик в строке группы.</p>
+          <DemoApiTitle>Sidebar.NavCategoryCount</DemoApiTitle>
+          <DemoDescription>Счётчик в строке группы.</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavCategoryCountApiRows} />
 
-          <h5>Sidebar.NavCategoryPanel</h5>
-          <p className="demoBlockDescription">Содержимое раскрытой группы.</p>
+          <DemoApiTitle>Sidebar.NavCategoryPanel</DemoApiTitle>
+          <DemoDescription>Содержимое раскрытой группы.</DemoDescription>
           <PlaygroundApiTable rows={sidebarNavCategoryPanelApiRows} />
 
-          <h5>Sidebar.PanelSwitch</h5>
-          <p className="demoBlockDescription">Переключение контента панели по активному разделу.</p>
+          <DemoApiTitle>Sidebar.PanelSwitch</DemoApiTitle>
+          <DemoDescription>Переключение контента панели по активному разделу.</DemoDescription>
           <PlaygroundApiTable rows={sidebarPanelSwitchApiRows} />
 
-          <h5>Sidebar.Header</h5>
-          <p className="demoBlockDescription">Верхняя зона панели.</p>
+          <DemoApiTitle>Sidebar.Header</DemoApiTitle>
+          <DemoDescription>Верхняя зона панели.</DemoDescription>
           <PlaygroundApiTable rows={sidebarHeaderApiRows} />
 
-          <h5>Sidebar.HeaderRow</h5>
-          <p className="demoBlockDescription">Строка шапки: основной блок и переключатель.</p>
+          <DemoApiTitle>Sidebar.HeaderRow</DemoApiTitle>
+          <DemoDescription>Строка шапки: основной блок и переключатель.</DemoDescription>
           <PlaygroundApiTable rows={sidebarHeaderRowApiRows} />
 
-          <h5>Sidebar.HeaderMain</h5>
-          <p className="demoBlockDescription">Левая часть шапки (логотип, селектор).</p>
+          <DemoApiTitle>Sidebar.HeaderMain</DemoApiTitle>
+          <DemoDescription>Левая часть шапки (логотип, селектор).</DemoDescription>
           <PlaygroundApiTable rows={sidebarHeaderMainApiRows} />
 
-          <h5>Sidebar.Content</h5>
-          <p className="demoBlockDescription">Средняя часть между шапкой и подвалом.</p>
+          <DemoApiTitle>Sidebar.Content</DemoApiTitle>
+          <DemoDescription>Средняя часть между шапкой и подвалом.</DemoDescription>
           <PlaygroundApiTable rows={sidebarContentApiRows} />
 
-          <h5>Sidebar.Footer</h5>
-          <p className="demoBlockDescription">
-            Подвал панели; вариант inset для внутренних отступов.
-          </p>
+          <DemoApiTitle>Sidebar.Footer</DemoApiTitle>
+          <DemoDescription>Подвал панели; вариант inset для внутренних отступов.</DemoDescription>
           <PlaygroundApiTable rows={sidebarFooterApiRows} />
 
-          <h5>Sidebar.IdentityButton</h5>
-          <p className="demoBlockDescription">Карточка рабочей области или пользователя.</p>
+          <DemoApiTitle>Sidebar.IdentityButton</DemoApiTitle>
+          <DemoDescription>Карточка рабочей области или пользователя.</DemoDescription>
           <PlaygroundApiTable rows={sidebarIdentityButtonApiRows} />
 
-          <h5>Sidebar.ToggleButton</h5>
-          <p className="demoBlockDescription">Сворачивание и разворачивание панели из контекста.</p>
+          <DemoApiTitle>Sidebar.ToggleButton</DemoApiTitle>
+          <DemoDescription>Сворачивание и разворачивание панели из контекста.</DemoDescription>
           <PlaygroundApiTable rows={sidebarToggleButtonApiRows} />
 
-          <h5>Sidebar.Group</h5>
-          <p className="demoBlockDescription">Секция меню с подписью.</p>
+          <DemoApiTitle>Sidebar.Group</DemoApiTitle>
+          <DemoDescription>Секция меню с подписью.</DemoDescription>
           <PlaygroundApiTable rows={sidebarGroupApiRows} />
 
-          <h5>Sidebar.GroupLabel</h5>
-          <p className="demoBlockDescription">Заголовок секции пунктов.</p>
+          <DemoApiTitle>Sidebar.GroupLabel</DemoApiTitle>
+          <DemoDescription>Заголовок секции пунктов.</DemoDescription>
           <PlaygroundApiTable rows={sidebarGroupLabelApiRows} />
 
-          <h5>Sidebar.Menu</h5>
-          <p className="demoBlockDescription">Список пунктов навигации.</p>
+          <DemoApiTitle>Sidebar.Menu</DemoApiTitle>
+          <DemoDescription>Список пунктов навигации.</DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuApiRows} />
 
-          <h5>Sidebar.MenuItem</h5>
-          <p className="demoBlockDescription">
-            Элемент списка: кнопка ссылки и опционально действие.
-          </p>
+          <DemoApiTitle>Sidebar.MenuItem</DemoApiTitle>
+          <DemoDescription>Элемент списка: кнопка ссылки и опционально действие.</DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuItemApiRows} />
 
-          <h5>Sidebar.MenuButton</h5>
-          <p className="demoBlockDescription">Интерактивный пункт; поддерживает asChild.</p>
+          <DemoApiTitle>Sidebar.MenuButton</DemoApiTitle>
+          <DemoDescription>Интерактивный пункт; поддерживает asChild.</DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuButtonApiRows} />
 
-          <h5>Sidebar.MenuLink</h5>
-          <p className="demoBlockDescription">Обычная ссылка с тем же видом, что у кнопки меню.</p>
+          <DemoApiTitle>Sidebar.MenuLink</DemoApiTitle>
+          <DemoDescription>Обычная ссылка с тем же видом, что у кнопки меню.</DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuLinkApiRows} />
 
-          <h5>Sidebar.MenuRouterLink</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Sidebar.MenuRouterLink</DemoApiTitle>
+          <DemoDescription>
             Пункт на базе <code>NavLink</code> (react-router); активность по URL.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuRouterLinkApiRows} />
 
-          <h5>Sidebar.MenuAction</h5>
-          <p className="demoBlockDescription">Компактная кнопка в строке пункта (меню «ещё»).</p>
+          <DemoApiTitle>Sidebar.MenuAction</DemoApiTitle>
+          <DemoDescription>Компактная кнопка в строке пункта (меню «ещё»).</DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuActionApiRows} />
 
-          <h5>Sidebar.MenuIcon</h5>
-          <p className="demoBlockDescription">Слот иконки слева в пункте.</p>
+          <DemoApiTitle>Sidebar.MenuIcon</DemoApiTitle>
+          <DemoDescription>Слот иконки слева в пункте.</DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuIconApiRows} />
 
-          <h5>Sidebar.MenuLabel</h5>
-          <p className="demoBlockDescription">Текст пункта.</p>
+          <DemoApiTitle>Sidebar.MenuLabel</DemoApiTitle>
+          <DemoDescription>Текст пункта.</DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuLabelApiRows} />
 
-          <h5>Sidebar.MenuTrailing</h5>
-          <p className="demoBlockDescription">Хвост строки (счётчик, бейдж).</p>
+          <DemoApiTitle>Sidebar.MenuTrailing</DemoApiTitle>
+          <DemoDescription>Хвост строки (счётчик, бейдж).</DemoDescription>
           <PlaygroundApiTable rows={sidebarMenuTrailingApiRows} />
 
-          <h5>Sidebar.Text</h5>
-          <p className="demoBlockDescription">Вторичный текст внутри панели.</p>
+          <DemoApiTitle>Sidebar.Text</DemoApiTitle>
+          <DemoDescription>Вторичный текст внутри панели.</DemoDescription>
           <PlaygroundApiTable rows={sidebarTextApiRows} />
 
-          <h5>useSidebarContext</h5>
-          <p className="demoBlockDescription">
-            Доступ к состоянию сайдбара внутри дерева под Root.
-          </p>
+          <DemoApiTitle>useSidebarContext</DemoApiTitle>
+          <DemoDescription>Доступ к состоянию сайдбара внутри дерева под Root.</DemoDescription>
           <PlaygroundApiTable rows={sidebarUseSidebarContextApiRows} />
 
-          <h5>useSidebarNavTo</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>useSidebarNavTo</DemoApiTitle>
+          <DemoDescription>
             Сборка пути для вложенных маршрутов при <code>variant=&quot;double&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={sidebarUseSidebarNavToApiRows} />
         </div>
       </div>

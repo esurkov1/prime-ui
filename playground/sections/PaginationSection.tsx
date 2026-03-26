@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import PaginationControlledSnippet from "../snippets/pagination/controlled";
@@ -75,12 +80,12 @@ export default function PaginationSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code> — <code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code>; на длинном диапазоне видны и стрелки, и номера, и ячейка с «…» в одном
             масштабе.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={paginationSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <PaginationSizesSnippet />
@@ -89,12 +94,12 @@ export default function PaginationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Диапазон номеров</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Диапазон номеров</DemoSectionTitle>
+          <DemoDescription>
             При не больше семи страницах показываются все номера подряд; при большем — края (1 и
             последняя) и «окно» вокруг текущей с «…». Отдельного пропа нет: поведение задаёт{" "}
             <code>totalPages</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={paginationRangeModesSource.trim()}
             previewLayout="stack"
@@ -106,12 +111,12 @@ export default function PaginationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             На первой странице отключена кнопка «назад», на последней — «вперёд»; при{" "}
             <code>totalPages=1</code> неактивны обе. Текущая страница помечается{" "}
             <code>aria-current=&quot;page&quot;</code> и визуально выделяется.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={paginationStatesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <PaginationStatesSnippet />
@@ -120,12 +125,12 @@ export default function PaginationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Компонент только контролируемый: нужны <code>page</code> и <code>onPageChange</code>.
             Состояние живёт у родителя; можно синхронизировать его с таблицей, запросом или другими
             кнопками.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={paginationControlledSource.trim()}
             previewLayout="stack"
@@ -137,12 +142,12 @@ export default function PaginationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Растянуть блок на ширину колонки или панели — обёртка с <code>width: 100%</code> и
             выравниванием (например подпись слева, пагинация справа). У <code>Pagination.Root</code>{" "}
             отдельного пропа ширины нет.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={paginationFullWidthSource.trim()}
             previewLayout="stack"
@@ -154,12 +159,12 @@ export default function PaginationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             <code>siblingCount</code> сужает или расширяет окно номеров вокруг активной страницы.
             При <code>totalPages</code> меньше 1 возвращается <code>null</code> (не рендерится
             разметка навигации).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={paginationFeaturesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <PaginationFeaturesSnippet />
@@ -168,12 +173,12 @@ export default function PaginationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Pagination.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Pagination.Root</DemoApiTitle>
+          <DemoDescription>
             Обертка-навигация с кнопками страниц и стрелками; внутри используются{" "}
             <code>Button.Root</code> и иконки направления.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={paginationRootApiRows} />
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { DemoDescription, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import ProgressBarLabelSnippet from "../snippets/progress/bar-label";
@@ -12,10 +13,10 @@ export default function ProgressBarSection() {
     <PlaygroundDocPage title="ProgressBar">
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Ниже — интерактивное превью и вкладка с кодом этого примера.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={progressBarSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ProgressBarSizesSnippet />
@@ -24,10 +25,10 @@ export default function ProgressBarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Values</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Values</DemoSectionTitle>
+          <DemoDescription>
             Ниже — интерактивное превью и вкладка с кодом этого примера.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={progressBarValuesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ProgressBarValuesSnippet />
@@ -36,10 +37,10 @@ export default function ProgressBarSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>With label</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>With label</DemoSectionTitle>
+          <DemoDescription>
             Ниже — интерактивное превью и вкладка с кодом этого примера.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={progressBarLabelSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <ProgressBarLabelSnippet />

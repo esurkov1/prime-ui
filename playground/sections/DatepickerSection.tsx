@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import DatepickerCompositionSnippet from "../snippets/datepicker/composition";
@@ -403,11 +408,11 @@ export default function DatepickerSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>Datepicker.Shell</code> и <code>Datepicker.Calendar</code>{" "}
             <code>size</code> — каждое открывается своим <code>Popover</code> с кнопкой-триггером.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <DatepickerSizesSnippet />
@@ -416,11 +421,11 @@ export default function DatepickerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты и режимы</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты и режимы</DemoSectionTitle>
+          <DemoDescription>
             <code>mode=&quot;single&quot;</code> и <code>mode=&quot;range&quot;</code> — отдельные
             поповеры с кнопками-триггерами.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={variantsModesSource.trim()}
             previewLayout="stack-center"
@@ -432,11 +437,11 @@ export default function DatepickerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Два поповера: календарь с <code>disabled</code> по дням недели и связка дата +{" "}
             <code>Datepicker.Time</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DatepickerStatesSnippet />
@@ -445,11 +450,11 @@ export default function DatepickerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Расположение месяцев</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Расположение месяцев</DemoSectionTitle>
+          <DemoDescription>
             <code>responsiveMonths</code> и <code>responsiveBreakpoints</code> внутри поповера;
             превью с <code>examplePreviewBleed</code> для ширины контейнера.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={responsiveMonthsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DatepickerResponsiveMonthsSnippet />
@@ -458,11 +463,11 @@ export default function DatepickerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Состояние в React; подпись <code>Datepicker.Value</code> внутри панели поповера; после
             выбора даты поповер закрывается.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={controlledValueSource.trim()}
             previewLayout="stack-center"
@@ -474,11 +479,11 @@ export default function DatepickerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Пресеты, календарь, время и <code>Datepicker.Value</code> в одном поповере, общее
             состояние.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <DatepickerCompositionSnippet />
@@ -487,11 +492,11 @@ export default function DatepickerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Широкая <code>Popover.Content</code> и <code>Datepicker.Shell</code> с{" "}
             <code>min-w-0</code>, чтобы сетка не ломала раскладку.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DatepickerFullWidthSnippet />
@@ -500,11 +505,11 @@ export default function DatepickerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Эталон: иконка календаря на триггере и закрытие после выбора даты; ниже — диапазон с
             пресетами и <code>Datepicker.Time</code> в отдельном поповере.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack-center">
             <PlaygroundExampleFrame.Stage>
               <DatepickerPopoverSnippet />
@@ -521,51 +526,51 @@ export default function DatepickerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Datepicker.Calendar</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Datepicker.Calendar</DemoApiTitle>
+          <DemoDescription>
             Сетка дней на базе react-day-picker с классами и размерами Prime; опционально адаптивное
             число месяцев.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={calendarApiRows} />
 
-          <h5>Datepicker.Shell</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Datepicker.Shell</DemoApiTitle>
+          <DemoDescription>
             Общий контекст размера и месяца для дочерних частей; опциональная нижняя полоса
             пресетов.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={shellApiRows} />
 
-          <h5>Datepicker.Presets</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Datepicker.Presets</DemoApiTitle>
+          <DemoDescription>
             Горизонтальная группа кнопок быстрого выбора; для диапазона переключает{" "}
             <code>DateRange</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={presetsApiRows} />
 
-          <h5>Datepicker.Time</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Datepicker.Time</DemoApiTitle>
+          <DemoDescription>
             Одно или два поля <code>type=&quot;time&quot;</code> на базе Input; время вшивается в
             выбранные даты.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={timeApiRows} />
 
-          <h5>Datepicker.Value</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Datepicker.Value</DemoApiTitle>
+          <DemoDescription>
             Текстовая подпись с типографикой кита; размер текста выводится из контекста датпикера.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={valueApiRows} />
 
-          <h5>formatTimeInputValue</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>formatTimeInputValue</DemoApiTitle>
+          <DemoDescription>
             Утилита для синхронизации <code>Date</code> с нативным полем времени.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={utilFormatTimeApiRows} />
 
-          <h5>mergeTimeIntoDate</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>mergeTimeIntoDate</DemoApiTitle>
+          <DemoDescription>
             Утилита для применения строки времени к существующей дате.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={utilMergeTimeApiRows} />
         </div>
       </div>

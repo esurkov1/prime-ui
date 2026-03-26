@@ -1,4 +1,9 @@
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import HintA11yDescribedbySnippet from "../snippets/hint/a11y-describedby";
@@ -29,12 +34,12 @@ export default function HintSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code> на корне: <code>s</code>, <code>m</code>,{" "}
             <code>l</code>, <code>xl</code>. Номинальный размер совпадает с размером поля;
             фактический кегль подсказки на ступень меньше (см. стили).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={hintSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <HintSizesSnippet />
@@ -43,12 +48,12 @@ export default function HintSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             Проп <code>variant</code>: <code>default</code> (вторичный цвет текста),{" "}
             <code>error</code> (акцент опасности), <code>disabled</code> (цвет отключённого
             контента).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={hintVariantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <HintVariantsSnippet />
@@ -57,11 +62,11 @@ export default function HintSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Те же варианты в типичной верстке «лейбл — поле — подсказка»: обычное поле, невалидное
             значение и отключённый ввод с согласованным <code>Label</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={hintFieldStatesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <HintFieldStatesSnippet />
@@ -70,12 +75,12 @@ export default function HintSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Текст и семантика подсказки меняются из состояния родителя: здесь переключается только{" "}
             <code>variant</code> между <code>default</code> и <code>error</code> после действий
             пользователя.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={hintControlledVariantSource.trim()}
             previewLayout="stack"
@@ -87,11 +92,11 @@ export default function HintSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция с иконкой</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция с иконкой</DemoSectionTitle>
+          <DemoDescription>
             Дочерний слот <code>Hint.Icon</code> оборачивает SVG; размер иконки берётся из контекста
             размера корня.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={hintCompositionIconSource.trim()}
             previewLayout="stack"
@@ -103,11 +108,11 @@ export default function HintSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Связь с полем для вспомогательных технологий</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Связь с полем для вспомогательных технологий</DemoSectionTitle>
+          <DemoDescription>
             Уникальный <code>id</code> на <code>Hint.Root</code> и <code>aria-describedby</code> на
             элементе ввода — экранные дикторы озвучивают подсказку вместе с полем.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root
             code={hintA11yDescribedbySource.trim()}
             previewLayout="stack"
@@ -119,13 +124,13 @@ export default function HintSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Hint.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Hint.Root</DemoApiTitle>
+          <DemoDescription>
             Корень подсказки: рендерится как <code>&lt;p&gt;</code>, задаёт <code>data-size</code> и{" "}
             <code>data-variant</code> для стилей и оборачивает детей в{" "}
             <code>ControlSizeProvider</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable
             rows={[
               {
@@ -168,11 +173,11 @@ export default function HintSection() {
               },
             ]}
           />
-          <h5>Hint.Icon</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>Hint.Icon</DemoApiTitle>
+          <DemoDescription>
             Слот для иконки слева от текста: <code>span</code> с фиксированным квадратом под размер
             из контекста и <code>aria-hidden</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable
             rows={[
               {

@@ -1,7 +1,11 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-
 import CommandMenuCompositionSnippet from "../snippets/command-menu/composition-tags-footer";
 import compositionSource from "../snippets/command-menu/composition-tags-footer.tsx?raw";
 import CommandMenuControlledSnippet from "../snippets/command-menu/controlled-open-search";
@@ -503,11 +507,11 @@ export default function CommandMenuSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             <code>InputRow density</code> (<code>compact</code> / <code>comfortable</code>) и размер
             строк списка <code>Item size</code> (<code>s</code> / <code>m</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <CommandMenuVariantsSnippet />
@@ -516,12 +520,12 @@ export default function CommandMenuSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Неактивный пункт (<code>disabled</code> — не попадает в навигацию), пункт с пустым{" "}
             <code>value</code> (всегда остаётся в выдаче), подсказка про пустой список после
             фильтра.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <CommandMenuStatesSnippet />
@@ -530,11 +534,11 @@ export default function CommandMenuSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             <code>Dialog open</code> / <code>onOpenChange</code> и контролируемое поле{" "}
             <code>Input value</code> с синхронизацией строки поиска снаружи.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <CommandMenuControlledSnippet />
@@ -543,12 +547,12 @@ export default function CommandMenuSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Заголовок над панелью, слоты <code>InputRow</code> (иконка, <code>Kbd</code>, кнопка
             закрытия), секция <code>TagSection</code> с тегами, группы с <code>ItemIcon</code>,
             текстовый <code>Footer</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <CommandMenuCompositionSnippet />
@@ -557,11 +561,11 @@ export default function CommandMenuSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Узел панели расширяется классом из CSS-модуля (<code>dialogContentWide</code>) через{" "}
             <code>className</code> на <code>Dialog</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <CommandMenuFullWidthSnippet />
@@ -570,11 +574,11 @@ export default function CommandMenuSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Полиморфная разметка</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Полиморфная разметка</DemoSectionTitle>
+          <DemoDescription>
             <code>CommandMenu.ItemIcon</code> с пропом <code>as</code>: SVG-компонент или нативный{" "}
             <code>span</code> с текстовой меткой.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={itemIconAsSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <CommandMenuItemIconAsSnippet />
@@ -583,11 +587,11 @@ export default function CommandMenuSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Глобальное сочетание ⌘K / Ctrl+K, фильтрация по <code>keywords</code>, подсказки в{" "}
             <code>FooterKeyBox</code> (навигация, выбор, закрытие).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="row">
             <PlaygroundExampleFrame.Stage>
               <CommandMenuFeaturesSnippet />
@@ -596,65 +600,65 @@ export default function CommandMenuSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>CommandMenu.Dialog</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>CommandMenu.Dialog</DemoApiTitle>
+          <DemoDescription>
             Корень палитры: модальное окно, внутри провайдер состояния поиска и списка.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={dialogApiRows} />
-          <h5>CommandMenu.DialogTitle</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>CommandMenu.DialogTitle</DemoApiTitle>
+          <DemoDescription>
             Заголовок диалога (разметка и стили как у <code>h2</code> в шапке{" "}
             <code>Modal.Panel</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={dialogTitleApiRows} />
-          <h5>CommandMenu.DialogDescription</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>CommandMenu.DialogDescription</DemoApiTitle>
+          <DemoDescription>
             Описание для вспомогательных технологий (стили как у текста описания в шапке{" "}
             <code>Modal.Panel</code>
             ).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={dialogDescriptionApiRows} />
-          <h5>CommandMenu.InputRow</h5>
-          <p className="demoBlockDescription">Горизонтальная строка: слоты и поле поиска.</p>
+          <DemoApiTitle>CommandMenu.InputRow</DemoApiTitle>
+          <DemoDescription>Горизонтальная строка: слоты и поле поиска.</DemoDescription>
           <PlaygroundApiTable rows={inputRowApiRows} />
-          <h5>CommandMenu.Input</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>CommandMenu.Input</DemoApiTitle>
+          <DemoDescription>
             Поле поиска с ролью combobox, связь со списком и обработка стрелок или Enter.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={inputApiRows} />
-          <h5>CommandMenu.List</h5>
-          <p className="demoBlockDescription">Контейнер listbox для групп и пунктов.</p>
+          <DemoApiTitle>CommandMenu.List</DemoApiTitle>
+          <DemoDescription>Контейнер listbox для групп и пунктов.</DemoDescription>
           <PlaygroundApiTable rows={listApiRows} />
-          <h5>CommandMenu.Group</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>CommandMenu.Group</DemoApiTitle>
+          <DemoDescription>
             Секция с опциональным заголовком; скрывается, если внутри нет видимых пунктов.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={groupApiRows} />
-          <h5>CommandMenu.Item</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>CommandMenu.Item</DemoApiTitle>
+          <DemoDescription>
             Кнопка-опция: участвует в фильтрации, фокусе клавиатуры и выборе.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={itemApiRows} />
-          <h5>CommandMenu.ItemIcon</h5>
-          <p className="demoBlockDescription">Слот иконки с выбором корневого элемента.</p>
+          <DemoApiTitle>CommandMenu.ItemIcon</DemoApiTitle>
+          <DemoDescription>Слот иконки с выбором корневого элемента.</DemoDescription>
           <PlaygroundApiTable rows={itemIconApiRows} />
-          <h5>CommandMenu.TagSection</h5>
-          <p className="demoBlockDescription">Блок под строкой поиска для фильтров-тегов.</p>
+          <DemoApiTitle>CommandMenu.TagSection</DemoApiTitle>
+          <DemoDescription>Блок под строкой поиска для фильтров-тегов.</DemoDescription>
           <PlaygroundApiTable rows={tagSectionApiRows} />
-          <h5>CommandMenu.TagSectionLabel</h5>
-          <p className="demoBlockDescription">Подпись над рядом тегов.</p>
+          <DemoApiTitle>CommandMenu.TagSectionLabel</DemoApiTitle>
+          <DemoDescription>Подпись над рядом тегов.</DemoDescription>
           <PlaygroundApiTable rows={tagSectionLabelApiRows} />
-          <h5>CommandMenu.TagRow</h5>
-          <p className="demoBlockDescription">Горизонтальный ряд для чипов или тегов.</p>
+          <DemoApiTitle>CommandMenu.TagRow</DemoApiTitle>
+          <DemoDescription>Горизонтальный ряд для чипов или тегов.</DemoDescription>
           <PlaygroundApiTable rows={tagRowApiRows} />
-          <h5>CommandMenu.Footer</h5>
-          <p className="demoBlockDescription">Нижняя зона подсказок и ссылок.</p>
+          <DemoApiTitle>CommandMenu.Footer</DemoApiTitle>
+          <DemoDescription>Нижняя зона подсказок и ссылок.</DemoDescription>
           <PlaygroundApiTable rows={footerApiRows} />
-          <h5>CommandMenu.FooterKeyBox</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>CommandMenu.FooterKeyBox</DemoApiTitle>
+          <DemoDescription>
             Компактный бейдж для обозначения клавиш (обёртка над <code>Badge</code>).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={footerKeyBoxApiRows} />
         </div>
       </div>

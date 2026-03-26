@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import SliderCompositionSnippet from "../snippets/slider/composition";
@@ -109,12 +114,12 @@ export default function SliderSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>size</code> (<code>s</code>, <code>m</code>, <code>l</code>,{" "}
             <code>xl</code>): высота дорожки, бегунок и размер текста подписи согласованы токенами
             контрола.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SliderSizesSnippet />
@@ -123,11 +128,11 @@ export default function SliderSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Обычное состояние и <code>disabled</code>: ползунок не принимает ввод, курсор
             «запрещён».
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SliderStatesSnippet />
@@ -136,11 +141,11 @@ export default function SliderSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Пара <code>value</code> + <code>onChange</code>: значение хранится в React-состоянии;
             подпись рядом показывает текущий процент.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SliderControlledSnippet />
@@ -149,11 +154,11 @@ export default function SliderSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Встроенная подпись через <code>label</code> или ползунок без текста с обязательным для
             смысла <code>aria-label</code> (дробный шаг для «прозрачности»).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SliderCompositionSnippet />
@@ -162,11 +167,11 @@ export default function SliderSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Корень на всю ширину контейнера — в узкой карточке дорожка растягивается вместе с
             колонкой.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SliderFullWidthSnippet />
@@ -175,11 +180,11 @@ export default function SliderSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Свой диапазон и дискретность: <code>min</code>/<code>max</code>/<code>step</code> —
             целые градусы и крупный шаг по процентам.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SliderFeaturesSnippet />
@@ -188,12 +193,12 @@ export default function SliderSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Slider.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Slider.Root</DemoApiTitle>
+          <DemoDescription>
             Обёртка с опциональной подписью и нативным <code>input type=&quot;range&quot;</code>.
             Внутри <code>ControlSizeProvider</code> для согласованности с соседними контролами.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={sliderRootApiRows} />
         </div>
       </div>

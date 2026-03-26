@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import DividerCompositionSnippet from "../snippets/divider/composition";
@@ -94,11 +99,11 @@ export default function DividerSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Четыре размера <code>s</code>–<code>xl</code> в контексте иерархии секций настроек:
             крупные заголовки для основных разделов, компактные — для вложенных блоков и метаданных.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DividerSizesSnippet />
@@ -107,12 +112,12 @@ export default function DividerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             Три варианта в реальных сценариях: <code>default</code> в карточке заказа для разделения
             секций и итоговой суммы, <code>line-spacing</code> между элементами списка настроек,{" "}
             <code>text</code> как заголовки секций формы регистрации.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DividerVariantsSnippet />
@@ -121,12 +126,12 @@ export default function DividerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Ориентация</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Ориентация</DemoSectionTitle>
+          <DemoDescription>
             Вертикальные разделители в типичных UI-паттернах: тулбар текстового редактора с
             группировкой действий форматирования, панель управления таблицей с фильтрами и
             экспортом, горизонтальная навигация с разделением пунктов меню.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={orientationSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DividerOrientationSnippet />
@@ -135,12 +140,12 @@ export default function DividerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Разделители с иконками в контексте: профиль пользователя с секциями контактов и
             местоположения, карточка продукта с характеристиками и рейтингом. Размер иконок
             автоматически согласуется с <code>size</code> корня.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DividerCompositionSnippet />
@@ -149,12 +154,12 @@ export default function DividerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Полноширинные разделители в реальных компонентах: карточка статьи с метаданными, виджет
             уведомлений со списком событий, история финансовых транзакций. Линия автоматически
             занимает всю ширину контейнера.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DividerFullWidthSnippet />
@@ -163,13 +168,13 @@ export default function DividerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Выравнивание и декоративная линия</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Выравнивание и декоративная линия</DemoSectionTitle>
+          <DemoDescription>
             Выравнивание в реальных сценариях: временная шкала с{" "}
             <code>align=&quot;start&quot;</code> для дат, форма входа с{" "}
             <code>align=&quot;center&quot;</code> для разделителя «или», статистика с декоративной
             линией (<code>role=&quot;presentation&quot;</code>) для визуального разделения метрик.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <DividerFeaturesSnippet />
@@ -178,12 +183,12 @@ export default function DividerSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>Divider.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>Divider.Root</DemoApiTitle>
+          <DemoDescription>
             Единственный публичный узел: контейнер с псевдоэлементами-линиями и опциональным{" "}
             <code>span</code> для children.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={dividerRootApiRows} />
         </div>
       </div>

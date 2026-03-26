@@ -1,5 +1,6 @@
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const rootRows: PlaygroundApiPropRow[] = [
@@ -134,10 +135,10 @@ export default function ExampleFrameSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>ExampleFrame.Root</h5>
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>ExampleFrame.Root</DemoApiTitle>
           <PlaygroundApiTable rows={rootRows} />
-          <h5>ExampleFrame.Stage</h5>
+          <DemoApiTitle>ExampleFrame.Stage</DemoApiTitle>
           <PlaygroundApiTable rows={stageRows} />
         </div>
       </div>

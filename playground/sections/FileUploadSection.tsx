@@ -1,4 +1,9 @@
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import FileUploadAvatarRowsSnippet from "../snippets/file-upload/avatar-rows";
@@ -60,13 +65,13 @@ export default function FileUploadSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Сетка <code>FileUpload.Root</code> и ряд карточек <code>FileUpload.Item</code> с{" "}
             <code>size</code> <code>s</code> → <code>xl</code>; внутри карточки —{" "}
             <code>FormatBadge</code>, строка имени с индикатором загрузки и{" "}
             <code>ItemProgress</code> с <code>value</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesUploadSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadSizesSnippet />
@@ -75,11 +80,11 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты</DemoSectionTitle>
+          <DemoDescription>
             У корня — <code>appearance=&quot;dashed&quot;</code> и <code>&quot;solid&quot;</code>; у
             карточки — <code>variant=&quot;default&quot;</code> и <code>&quot;error&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadVariantsSnippet />
@@ -88,12 +93,12 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Активная и <code>disabled</code> зона; карточки с прогрессом, успехом и ошибкой (
             <code>ItemTryAgain</code>). Подсветка при перетаскивании файла на зону —{" "}
             <code>data-dragover</code> на корне (проверьте в браузере).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadStatesSnippet />
@@ -102,11 +107,11 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый режим</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+          <DemoDescription>
             Список выбранных файлов в состоянии React: <code>onFilesChange</code>,{" "}
             <code>multiple</code>, <code>accept</code>; сброс списка отдельной кнопкой.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadControlledSnippet />
@@ -115,12 +120,12 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             <code>DropBody</code> с <code>Title tone=&quot;muted&quot;</code> и{" "}
             <code>BrowseLink</code>, ряд <code>Chip</code> / <code>ChipLabel</code>;{" "}
             <code>inputRef</code> для программного открытия диалога с кнопок-источников.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadCompositionSnippet />
@@ -129,11 +134,11 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Full width</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Full width</DemoSectionTitle>
+          <DemoDescription>
             Зона растягивается на ширину родителя (<code>width: 100%</code> у <code>Root</code>) —
             типично для формы в колонке.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadFullWidthSnippet />
@@ -142,11 +147,11 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи: свой контент и accept</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи: свой контент и accept</DemoSectionTitle>
+          <DemoDescription>
             Замена стандартного тела зоны через <code>children</code> и ограничение типов файлов{" "}
             <code>accept=&quot;image/*&quot;</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={customChildrenSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadCustomChildrenSnippet />
@@ -155,11 +160,11 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи: круглая зона</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи: круглая зона</DemoSectionTitle>
+          <DemoDescription>
             Круглый контейнер через CSS, <code>DropBody</code>, общий <code>inputRef</code> с
             внешней кнопкой «Загрузить фото».
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={circleModalSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadCircleModalSnippet />
@@ -168,11 +173,11 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи: список с аватаром</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи: список с аватаром</DemoSectionTitle>
+          <DemoDescription>
             Строка настроек профиля рядом с <code>Avatar</code> и кнопками — без отдельной зоны
             FileUpload (кнопки можно связать с общим <code>inputRef</code> в продукте).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={avatarRowsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <FileUploadAvatarRowsSnippet />
@@ -181,94 +186,92 @@ export default function FileUploadSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>FileUpload.Root</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>FileUpload.Root</DemoApiTitle>
+          <DemoDescription>
             Интерактивная зона на базе <code>label</code>, скрытый{" "}
             <code>input type=&quot;file&quot;</code>, drag-and-drop и контекст размера для вложенных
             слотов.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={fileUploadRootApiRows} />
-          <h5>FileUpload.Icon</h5>
-          <p className="demoBlockDescription">Центрированная обёртка для иконки в зоне.</p>
+          <DemoApiTitle>FileUpload.Icon</DemoApiTitle>
+          <DemoDescription>Центрированная обёртка для иконки в зоне.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadIconApiRows} />
-          <h5>FileUpload.Title</h5>
-          <p className="demoBlockDescription">Заголовок блока текста в зоне.</p>
+          <DemoApiTitle>FileUpload.Title</DemoApiTitle>
+          <DemoDescription>Заголовок блока текста в зоне.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadTitleApiRows} />
-          <h5>FileUpload.Hint</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>FileUpload.Hint</DemoApiTitle>
+          <DemoDescription>
             Вторичная подсказка через <code>Hint.Root</code> с размером из контекста.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={fileUploadHintApiRows} />
-          <h5>FileUpload.BrowseLabel</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>FileUpload.BrowseLabel</DemoApiTitle>
+          <DemoDescription>
             Стилизованная подпись «Browse» (pointer-events: none на зоне).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={fileUploadBrowseLabelApiRows} />
-          <h5>FileUpload.BrowseLink</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>FileUpload.BrowseLink</DemoApiTitle>
+          <DemoDescription>
             Кнопка-ссылка в тексте; клик не всплывает к <code>label</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={fileUploadBrowseLinkApiRows} />
-          <h5>FileUpload.DropBody</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>FileUpload.DropBody</DemoApiTitle>
+          <DemoDescription>
             Колонка для модальных композиций; ослабляет pointer-events на зоне.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={fileUploadDropBodyApiRows} />
-          <h5>FileUpload.ActionsRow</h5>
-          <p className="demoBlockDescription">Горизонтальный ряд чипов-источников.</p>
+          <DemoApiTitle>FileUpload.ActionsRow</DemoApiTitle>
+          <DemoDescription>Горизонтальный ряд чипов-источников.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadActionsRowApiRows} />
-          <h5>FileUpload.Chip</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>FileUpload.Chip</DemoApiTitle>
+          <DemoDescription>
             Кнопка-источник; останавливает всплытие, не открывает диалог сама по себе.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={fileUploadChipApiRows} />
-          <h5>FileUpload.ChipLabel</h5>
-          <p className="demoBlockDescription">Текстовая часть чипа.</p>
+          <DemoApiTitle>FileUpload.ChipLabel</DemoApiTitle>
+          <DemoDescription>Текстовая часть чипа.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadChipLabelApiRows} />
-          <h5>FileUpload.FormatBadge</h5>
-          <p className="demoBlockDescription">Бейдж расширения файла на карточке.</p>
+          <DemoApiTitle>FileUpload.FormatBadge</DemoApiTitle>
+          <DemoDescription>Бейдж расширения файла на карточке.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadFormatBadgeApiRows} />
-          <h5>FileUpload.Item</h5>
-          <p className="demoBlockDescription">Карточка одного файла в списке.</p>
+          <DemoApiTitle>FileUpload.Item</DemoApiTitle>
+          <DemoDescription>Карточка одного файла в списке.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemApiRows} />
-          <h5>FileUpload.ItemRow</h5>
-          <p className="demoBlockDescription">
-            Горизонтальный ряд: бейдж, основной блок, действия.
-          </p>
+          <DemoApiTitle>FileUpload.ItemRow</DemoApiTitle>
+          <DemoDescription>Горизонтальный ряд: бейдж, основной блок, действия.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemRowApiRows} />
-          <h5>FileUpload.ItemMain</h5>
-          <p className="demoBlockDescription">Правая колонка с текстом и метаданными.</p>
+          <DemoApiTitle>FileUpload.ItemMain</DemoApiTitle>
+          <DemoDescription>Правая колонка с текстом и метаданными.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemMainApiRows} />
-          <h5>FileUpload.ItemStack</h5>
-          <p className="demoBlockDescription">Вертикальный стек для ошибки и «Try again».</p>
+          <DemoApiTitle>FileUpload.ItemStack</DemoApiTitle>
+          <DemoDescription>Вертикальный стек для ошибки и «Try again».</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemStackApiRows} />
-          <h5>FileUpload.ItemTextGroup</h5>
-          <p className="demoBlockDescription">Группа имени и мета-строки.</p>
+          <DemoApiTitle>FileUpload.ItemTextGroup</DemoApiTitle>
+          <DemoDescription>Группа имени и мета-строки.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemTextGroupApiRows} />
-          <h5>FileUpload.ItemTryAgain</h5>
-          <p className="demoBlockDescription">Кнопка повторной загрузки.</p>
+          <DemoApiTitle>FileUpload.ItemTryAgain</DemoApiTitle>
+          <DemoDescription>Кнопка повторной загрузки.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemTryAgainApiRows} />
-          <h5>FileUpload.ItemName</h5>
-          <p className="demoBlockDescription">Строка имени файла и статуса.</p>
+          <DemoApiTitle>FileUpload.ItemName</DemoApiTitle>
+          <DemoDescription>Строка имени файла и статуса.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemNameApiRows} />
-          <h5>FileUpload.ItemMeta</h5>
-          <p className="demoBlockDescription">Вторичная строка (размер, прогресс в КБ).</p>
+          <DemoApiTitle>FileUpload.ItemMeta</DemoApiTitle>
+          <DemoDescription>Вторичная строка (размер, прогресс в КБ).</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemMetaApiRows} />
-          <h5>FileUpload.ItemMetaSep</h5>
-          <p className="demoBlockDescription">Разделитель «·» между частями меты.</p>
+          <DemoApiTitle>FileUpload.ItemMetaSep</DemoApiTitle>
+          <DemoDescription>Разделитель «·» между частями меты.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemMetaSepApiRows} />
-          <h5>FileUpload.ItemActions</h5>
-          <p className="demoBlockDescription">Область кнопок справа в ряду.</p>
+          <DemoApiTitle>FileUpload.ItemActions</DemoApiTitle>
+          <DemoDescription>Область кнопок справа в ряду.</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemActionsApiRows} />
-          <h5>FileUpload.ItemFooter</h5>
-          <p className="demoBlockDescription">Нижняя зона под рядом (доп. действия).</p>
+          <DemoApiTitle>FileUpload.ItemFooter</DemoApiTitle>
+          <DemoDescription>Нижняя зона под рядом (доп. действия).</DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemFooterApiRows} />
-          <h5>FileUpload.ItemProgress</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>FileUpload.ItemProgress</DemoApiTitle>
+          <DemoDescription>
             Обёртка прогресса; по умолчанию <code>ProgressBar.Root</code> при переданном{" "}
             <code>value</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={fileUploadItemProgressApiRows} />
         </div>
       </div>

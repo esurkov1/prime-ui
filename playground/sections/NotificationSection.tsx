@@ -1,4 +1,9 @@
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import NotificationCompositionSnippet from "../snippets/notification/composition";
@@ -314,12 +319,12 @@ export default function NotificationSection() {
     >
       <div className="demoExamples">
         <div className="demoBlock">
-          <h4>Размеры</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>
             Три статичные <code>NotificationCard</code> с <code>size</code> <code>s</code>,{" "}
             <code>m</code> и <code>l</code>; остальные поля записи одинаковые, включая{" "}
             <code>persistent</code> и <code>closable=false</code>, чтобы сравнить только масштаб.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <NotificationSizesSnippet />
@@ -328,12 +333,12 @@ export default function NotificationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Варианты (type)</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Варианты (type)</DemoSectionTitle>
+          <DemoDescription>
             Четыре значения <code>type</code>: меняются цвет, иконка по умолчанию и live-роль (
             <code>alert</code> для <code>error</code> и <code>warning</code>, <code>status</code>{" "}
             для остальных).
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <NotificationVariantsSnippet />
@@ -342,12 +347,12 @@ export default function NotificationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Состояния</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Состояния</DemoSectionTitle>
+          <DemoDescription>
             Статично: <code>persistent</code> (без полосы таймера) и <code>closable=false</code>{" "}
             (без крестика). Кнопки вызывают <code>notify</code> с коротким <code>duration</code> и с
             подсказкой про паузу при наведении на стек.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <NotificationStatesSnippet />
@@ -356,11 +361,11 @@ export default function NotificationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Позиции</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Позиции</DemoSectionTitle>
+          <DemoDescription>
             Шесть значений <code>NotificationPosition</code>: каждая кнопка шлёт тост в свой угол
             или в центр края через проп <code>position</code> в <code>notify</code>.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={positionsSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <NotificationPositionsSnippet />
@@ -369,11 +374,11 @@ export default function NotificationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Контролируемый доступ к очереди</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Контролируемый доступ к очереди</DemoSectionTitle>
+          <DemoDescription>
             <code>useNotificationStore()</code>: чтение <code>items</code>, добавление через{" "}
             <code>notify</code> и точечное <code>dismiss(id)</code> по строкам списка.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <NotificationControlledSnippet />
@@ -382,12 +387,12 @@ export default function NotificationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Композиция</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Композиция</DemoSectionTitle>
+          <DemoDescription>
             Слоты <code>icon</code>, <code>badge</code>, <code>description</code> и{" "}
             <code>action</code>; на статичной карточке — колокол из lucide-react с классом размера
             из стилей кита.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <NotificationCompositionSnippet />
@@ -396,13 +401,13 @@ export default function NotificationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Специфичные фичи</h4>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+          <DemoDescription>
             Стек из нескольких тостов одного <code>type</code> и <code>position</code>, раздвижение
             по hover,
             <code>dismissAll</code>, а также разная <code>duration</code> для быстрых и длинных
             сообщений.
-          </p>
+          </DemoDescription>
           <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <NotificationFeaturesSnippet />
@@ -411,45 +416,45 @@ export default function NotificationSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>API</h4>
-          <h5>NotificationProvider</h5>
-          <p className="demoBlockDescription">
+          <DemoSectionTitle>API</DemoSectionTitle>
+          <DemoApiTitle>NotificationProvider</DemoApiTitle>
+          <DemoDescription>
             Корневой контекст и портал с зонами уведомлений; без него хуки бросают ошибку.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={notificationProviderApiRows} />
 
-          <h5>notify(options)</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>notify(options)</DemoApiTitle>
+          <DemoDescription>
             Поля объекта опций; необязательные при отсутствии подставляются из провайдера или
             дефолтов.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={notifyOptionsApiRows} />
 
-          <h5>NotificationRecord</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>NotificationRecord</DemoApiTitle>
+          <DemoDescription>
             Форма элемента в <code>items</code> после нормализации внутри провайдера (все поля ниже
             заданы).
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={notificationRecordApiRows} />
 
-          <h5>NotificationCard</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>NotificationCard</DemoApiTitle>
+          <DemoDescription>
             Карточка для кастомного рендера или превью; в приложении чаще используется только
             провайдер.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={notificationCardApiRows} />
 
-          <h5>useNotifications()</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>useNotifications()</DemoApiTitle>
+          <DemoDescription>
             Удобное API без подписки на список: только методы показа и закрытия.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={useNotificationsApiRows} />
 
-          <h5>useNotificationStore()</h5>
-          <p className="demoBlockDescription">
+          <DemoApiTitle>useNotificationStore()</DemoApiTitle>
+          <DemoDescription>
             Полный стор с массивом <code>items</code> для отображения счётчиков, отладки или
             синхронизации с UI.
-          </p>
+          </DemoDescription>
           <PlaygroundApiTable rows={useNotificationStoreApiRows} />
         </div>
       </div>
