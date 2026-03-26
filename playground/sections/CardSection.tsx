@@ -105,7 +105,8 @@ export default function CardSection() {
           <DemoSectionTitle>Metric + media</DemoSectionTitle>
           <DemoDescription>
             <code>variant=&quot;metric-media&quot;</code>: как метрика, плюс <code>Media</code> —
-            здесь SVG-спарклайн и <code>ProgressBar</code>.
+            здесь SVG-спарклайн и <code>ProgressBar</code>; в <code>Lead</code> — иконка и подпись,
+            как в <code>metric</code> и рядом с <code>IconBox</code> у mini.
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={metricMediaSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>

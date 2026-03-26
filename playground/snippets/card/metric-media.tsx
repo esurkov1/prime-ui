@@ -1,5 +1,6 @@
 import { Card } from "@/components/card/Card";
 import { ProgressBar } from "@/components/progress-bar/ProgressBar";
+import { Icon } from "@/icons";
 
 import mediaStyles from "./metric-media.module.css";
 import stackStyles from "./variants-stack.module.css";
@@ -28,7 +29,10 @@ export default function CardMetricMediaSnippet() {
       <Card.Root variant="metric-media">
         <Card.HeaderRow>
           <Card.Lead>
-            <span className={mediaStyles.leadText}>Glucose</span>
+            <div className={mediaStyles.leadRow}>
+              <Icon name="nav.itemDot" size="s" tone="subtle" />
+              <span className={mediaStyles.leadText}>Glucose</span>
+            </div>
           </Card.Lead>
           <Card.Value>5.4 mmol/L</Card.Value>
         </Card.HeaderRow>
@@ -41,7 +45,10 @@ export default function CardMetricMediaSnippet() {
       <Card.Root variant="metric-media">
         <Card.HeaderRow>
           <Card.Lead>
-            <span className={mediaStyles.leadText}>Quota</span>
+            <div className={mediaStyles.leadRow}>
+              <Icon name="nav.layoutGrid" size="s" tone="subtle" />
+              <span className={mediaStyles.leadText}>Quota</span>
+            </div>
           </Card.Lead>
           <Card.Value>72%</Card.Value>
         </Card.HeaderRow>

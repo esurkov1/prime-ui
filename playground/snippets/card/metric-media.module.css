@@ -9,6 +9,15 @@
   stroke: currentColor;
 }
 
+.leadRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  min-width: 0;
+}
+
 .leadText {
   font-size: var(--prime-sys-size-control-m-supportText);
   line-height: var(--prime-sys-typography-lineHeightScale-2xs);
