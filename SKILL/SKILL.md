@@ -6,7 +6,7 @@ description: >
   Flexbox for local stacks/toolbars, CSS Modules, and --prime-sys-* tokens.
   Use when laying out pages, templates, forms, navigation, or dashboards; converting desktop layouts to  
   mobile-first; picking a component for a region; validating breakpoints, touch targets, or Drawer vs inline.  
-  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 43-component catalog, and anti-patterns.  
+  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 47-entry component catalog, and anti-patterns.  
   Non-negotiable: no custom wrappers or reskins of kit components—only primitives, default styles, and the public API.
 
 # prime-ui-kit
@@ -26,7 +26,7 @@ description: >
 | ------------------------------- | ------------------------------------------------ | --------------------------------------------------------------- |
 | API, props, examples            | `../src/components/<kebab>/COMPONENT.md`         | `node_modules/prime-ui-kit/src/components/<kebab>/COMPONENT.md` |
 | Tokens                          | `[design-tokens.md](./design-tokens.md)`         | `node_modules/prime-ui-kit/src/styles/` (CSS + `package.json` exports) |
-| All 43 components, layout roles | `[component-catalog.md](./component-catalog.md)` | only in this repo’s `SKILL/` (not in the npm tarball)           |
+| All components + layout shells (catalog table) | `[component-catalog.md](./component-catalog.md)` | only in this repo’s `SKILL/` (not in the npm tarball)           |
 
 
 Cursor skill: copy the whole `SKILL/` directory from the GitHub repository — it is not published to npm.
@@ -85,7 +85,7 @@ Full reference: `[design-tokens.md](./design-tokens.md)`.
 
 ## Recipes (compact)
 
-**Dashboard:** Sidebar + header (Breadcrumb, Avatar, CommandMenu) + content (Tabs, DataTable, ProgressBar, Badge). At `≥ lg` — двухколоночный каркас (часто `AppShell`, CSS Grid); below `lg` stack and move the sidebar to a Drawer; scroll Tabs; below `md` use a horizontally scrolling table with a pinned column; below `sm` use a vertical Stepper if needed.
+**Dashboard:** Sidebar + header (Breadcrumb, Avatar, CommandMenu) + content (Tabs, DataTable, ProgressBar, Badge). **Card:** `mini` / `mini-media` / `metric` / `panel` (график), плюс `stat-trend`, `cta`, `list`, `split`, `cover` — см. `COMPONENT.md`. At `≥ lg` — двухколоночный каркас (часто `AppShell`, CSS Grid); below `lg` stack and move the sidebar to a Drawer; scroll Tabs; below `md` use a horizontally scrolling table with a pinned column; below `sm` use a vertical Stepper if needed.
 
 **Settings:** side section nav + form (Label, Input, Select, Switch, Textarea, Button). At `≥ md` — две колонки (grid/flex row); below `md` turn the sidebar into Tabs or Accordion; fields `fullWidth`; form footer — ButtonGroup, `justify-end`; below `sm` buttons `fullWidth`.
 
@@ -95,7 +95,7 @@ Full reference: `[design-tokens.md](./design-tokens.md)`.
 
 **Form wizard:** Stepper (horizontal at `≥ md`, vertical otherwise) + step column with `max-width` ~600px; actions `space-between`; on mobile the step can live in Modal or Drawer; ProgressBar under progress; below `sm` buttons `fullWidth`, larger DigitInput.
 
-Per-component details live in each `COMPONENT.md`; the 42-component overview is in `[component-catalog.md](./component-catalog.md)`.
+Per-component details live in each `COMPONENT.md` where present; the full overview (including **AppShell**, **PageContent**, **ExampleFrame**, **ScrollContainer** without a separate COMPONENT.md) is in `[component-catalog.md](./component-catalog.md)`.
 
 ---
 

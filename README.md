@@ -167,7 +167,7 @@ import { DataTable } from "prime-ui-kit/components";
 
 ## Component catalog
 
-Descriptions are short summaries from the **About** section in each `COMPONENT.md`. Full API, parts, and examples are in the linked files.
+Descriptions are short summaries from the **About** section in each `COMPONENT.md` (where it exists). Full API, parts, and examples are in the linked files. **AppShell**, **PageContent**, **ExampleFrame**, and **ScrollContainer** ship without a dedicated `COMPONENT.md` — use the linked source folders.
 
 Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/main/src/components/`
 
@@ -202,12 +202,14 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Navigation & layout | **Tabs** | Tablist, indicator, one visible panel at a time. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) |
 | Navigation & layout | **PageContent** | Main column: max width (`readable` / `wide`), header and body regions. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-content) |
 | Navigation & layout | **AppShell** | Application shell: grid root, nav slot, main region, optional full viewport. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/layout/app-shell) |
+| Navigation & layout | **ScrollContainer** | Scrollable region with horizontal or vertical axis (overflow wrapper). | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/scroll-container) |
 | Data | **DataTable** | Table with scroll, sorting, pagination or infinite scroll, sticky regions. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) |
 | Display & content | **Avatar** | Circular avatar: image, fallback, group with overflow cell. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) |
 | Display & content | **Badge** | Compact status or count; optional presence dot variant. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) |
 | Display & content | **Banner** | In-flow announcement strip with icon, copy, and actions. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/banner/COMPONENT.md) |
 | Display & content | **CodeBlock** | TS/TSX syntax highlighting in `pre`/`code` (static presentation). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) |
-| Display & content | **Card** | Dashboard KPI tiles (mini, metric, metric+media) and panel shell for charts. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/card/COMPONENT.md) |
+| Display & content | **ExampleFrame** | Preview stage + code layout for playgrounds and internal docs. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/example-frame) |
+| Display & content | **Card** | Dashboard tiles: `mini`, `mini-media`, `metric`, `panel`, `stat-trend`, `cta`, `list`, `split`, `cover`. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/card/COMPONENT.md) |
 | Display & content | **Divider** | Horizontal or vertical rule with optional inset label. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) |
 | Display & content | **ProgressBar** | Horizontal progress on the native `<progress>` element. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) |
 | Display & content | **SegmentedProgressBar** | Stacked horizontal segments with proportional weights and semantic tones. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-progress-bar/COMPONENT.md) |
@@ -246,7 +248,7 @@ Type definitions ship with the package (`dist/*.d.ts`).
 - **In the repo / on GitHub:** each component has `src/components/<name>/COMPONENT.md` (see the table above).
 - **In the installed package:** the same files are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/<name>/COMPONENT.md`.
 
-**AppShell** does not have a dedicated `COMPONENT.md`; refer to types under `src/layout/app-shell`. **PageContent** — under `page-content`.
+**AppShell**, **PageContent**, **ExampleFrame**, and **ScrollContainer** do not have a dedicated `COMPONENT.md`; refer to the linked source folders and types in the `.tsx` files.
 
 ---
 

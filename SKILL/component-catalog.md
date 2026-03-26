@@ -1,6 +1,6 @@
 # prime-ui-kit component catalog — responsive context
 
-Full table of all 43 components mapped to responsive layout.
+Full table of **47** exported UI building blocks mapped to responsive layout (43 entries with `COMPONENT.md` under `src/components/` or `src/layout/sidebar`, plus **AppShell**, **PageContent**, **ExampleFrame**, **ScrollContainer** documented via source/playground only).
 
 **Zone shorthand:** header, sidebar, content, footer, overlay, form, inline, navigation.
 
@@ -130,10 +130,10 @@ Full table of all 43 components mapped to responsive layout.
 
 | | |
 |---|---|
-| **Purpose** | KPI mini/metric cards and a **panel** shell for charts: composable slots, semantic tokens. |
-| **Responsive role** | Lay out mini/metric cards in a CSS Grid (`auto-fill`, `minmax`); **panel** variant spans columns for charts. |
+| **Purpose** | Dashboard tiles: **`mini`**, **`mini-media`**, **`metric`**, **`panel`** (header + body/chart), **`stat-trend`**, **`cta`**, **`list`**, **`split`**, **`cover`** — composable slots, semantic tokens. |
+| **Responsive role** | KPI rows in CSS Grid (`auto-fill`, `minmax`); **`panel`** / **`cover`** often span multiple columns; keep **`mini-media`** heights aligned in a row. |
 | **Zones** | content, header (metrics row) |
-| **Scenarios** | Dashboard top row; lab/vitals metrics with optional sparkline; wrapping charts and tables in a titled section. |
+| **Scenarios** | KPI strip; sparkline strip; KPI + delta; CTA export tile; activity list; two metrics in one tile; media hero + actions; titled chart panel. |
 | **Documentation** | `../src/components/card/COMPONENT.md` |
 
 ## Datepicker
@@ -185,6 +185,16 @@ Full table of all 43 components mapped to responsive layout.
 | **Zones** | header, content, form, inline, navigation |
 | **Scenarios** | Task card actions; table row menu; profile/logout in header; short trigger; externally controlled `open`; text trigger. |
 | **Documentation** | `../src/components/dropdown/COMPONENT.md` |
+
+## ExampleFrame
+
+| | |
+|---|---|
+| **Purpose** | Docs/playground frame: preview stage, optional viewport, layout for code + demo. |
+| **Responsive role** | `previewLayout` stack vs row; constrained width for component previews. |
+| **Zones** | content, inline |
+| **Scenarios** | Design-system gallery; responsive snippets next to source. |
+| **Documentation** | `../src/components/example-frame/ExampleFrame.tsx` (no separate COMPONENT.md) |
 
 ## FileUpload
 
@@ -266,6 +276,16 @@ Full table of all 43 components mapped to responsive layout.
 | **Scenarios** | Payment success/error; co-editing; delivery status; export ready; file upload; session lost. |
 | **Documentation** | `../src/components/notification/COMPONENT.md` |
 
+## PageContent
+
+| | |
+|---|---|
+| **Purpose** | Main column shell: max-width (`readable` / `wide`), header and body regions. |
+| **Responsive role** | Centers content; limits measure for long text on large screens. |
+| **Zones** | content |
+| **Scenarios** | Settings page body; article layout; legal copy; dashboard main column. |
+| **Documentation** | `../src/components/page-content/PageContent.tsx` (no separate COMPONENT.md) |
+
 ## Pagination
 
 | | |
@@ -326,6 +346,16 @@ Full table of all 43 components mapped to responsive layout.
 | **Scenarios** | Onboarding goal; consent with error; payment method; plan selection; delivery window; access role. |
 | **Documentation** | `../src/components/radio/COMPONENT.md` |
 
+## ScrollContainer
+
+| | |
+|---|---|
+| **Purpose** | Scrollable region with horizontal or vertical axis; optional overflow affordances. |
+| **Responsive role** | Horizontal scroll for tab/toolbar overflow; vertical lists inside fixed-height panels. |
+| **Zones** | content, navigation, sidebar |
+| **Scenarios** | DataTable horizontal scroll wrapper; chip row; nav overflow. |
+| **Documentation** | `../src/components/scroll-container/ScrollContainer.tsx` (no separate COMPONENT.md) |
+
 ## SegmentedControl
 
 | | |
@@ -356,6 +386,16 @@ Full table of all 43 components mapped to responsive layout.
 | **Scenarios** | Product switching; docs with TOC; fleet/warehouse logistics; settings sections; catalog with filters; routes on NavLink. |
 | **Documentation** | `../src/layout/sidebar/COMPONENT.md` |
 
+## AppShell
+
+| | |
+|---|---|
+| **Purpose** | Application layout root: grid template for nav + main, optional full viewport height. |
+| **Responsive role** | `minmax(0, 1fr)` on main track; pair with **Sidebar** / **Drawer** for narrow breakpoints. |
+| **Zones** | layout, navigation |
+| **Scenarios** | App dashboard; admin shell; docs with sidebar slot. |
+| **Documentation** | `../src/layout/app-shell/AppShell.tsx` (no separate COMPONENT.md) |
+
 ## Slider
 
 | | |
@@ -370,7 +410,7 @@ Full table of all 43 components mapped to responsive layout.
 
 | | |
 |---|---|
-| **Purpose** | Multi-step flow: horizontal or vertical stepper. |
+| **Purpose** | Multi-step flow: **`Stepper`** / **`VerticalStepper`** / **`HorizontalStepper`** primitives. |
 | **Responsive role** | Horizontal on desktop → vertical on mobile; step text can hide, leaving numbers. |
 | **Zones** | content, form, header |
 | **Scenarios** | Onboarding; checkout stages; approval with error; editorial pipeline; clickable steps; CI/CD on a card. |
