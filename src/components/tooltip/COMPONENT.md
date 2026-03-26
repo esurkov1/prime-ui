@@ -2,201 +2,86 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-A composite tooltip layer: delay provider, root with open state, trigger with a single child, and content in a portal positioned relative to the anchor.
+A composite tooltip: optional delay provider, root with open state, trigger that wraps a single element, and content rendered in a portal and positioned relative to the trigger.
 
-## What it’s for
+- **Use** to clarify icon-only controls, abbreviated labels, dense table cells, or non-obvious metrics on hover or keyboard focus.
+- **Use** when the extra text is short and supplementary; keep the trigger’s visible label or `aria-label` as the primary affordance where possible.
+- **Do not use** for long explanations or content that should stay visible without hover—prefer inline help, a hint, or a dedicated panel.
+- **Do not use** for interactive content inside the layer (links, buttons, inputs); tooltip content is non-interactive and uses `pointer-events: none` in styles.
+- **Do not use** one root for multiple anchors—each trigger needs its own `Tooltip.Root` (or separate instances).
+- **Do not rely** on tooltips opening for natively `disabled` controls; disabled elements often do not receive hover/focus—wrap or use a different focusable pattern if a tooltip is required.
 
-- **Edit panels and forms** — clarify the purpose of a non-obvious button, an icon without a label, or an abbreviated field without bloating the markup.
-- **Tables and dashboards** — reveal the meaning of a metric, status, or column header on hover or keyboard focus.
-- **Showcases and marketing blocks** — briefly explain promo terms or limits behind a “Learn more” link without sending users to another page immediately.
-- **Internal catalogs and directories** — expand an abbreviation, internal code, or row status in a list.
-- **Onboarding and empty states** — gently hint the next step next to a single call to action without permanent helper text under every control.
+## Composition
 
-## Use cases
+- **`Tooltip.Provider`** (optional) — wraps a subtree to share **`delayDuration`** (default **400** ms) for nested **`Tooltip.Root`** instances. Omit it when the default delay is fine.
+- **`Tooltip.Root`** — holds open state (controlled or uncontrolled). Children must include **`Tooltip.Trigger`** and **`Tooltip.Content`** (order in the tree is conventional; both participate via context).
+- **`Tooltip.Trigger`** — accepts **exactly one** **`React.ReactElement`** child. The implementation **`cloneElement`s** it: merges **`ref`**, **`className`**, **`aria-describedby`**, and pointer/focus handlers. The child must forward refs and accept standard DOM props.
+- **`Tooltip.Content`** — tooltip body; rendered through **`Portal`** as a **`div`** with **`role="tooltip"`** and **`id`** matching the trigger’s **`aria-describedby`**. Sets **`data-size`** and **`data-side`** for styling (including the arrow). Wraps children in **`ControlSizeProvider`** for the chosen **`size`**.
 
-Each example is a different screen type and prop set; import from the `prime-ui-kit` package.
-
-### Basic
-
-Notification settings card: “Save” button with a note about what is actually sent to the server.
-
-```tsx
-import { Button, Tooltip } from "prime-ui-kit";
-
-export function NotificationSaveRow() {
-  return (
-    <Tooltip.Provider>
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <Button.Root type="submit" variant="primary" mode="filled" size="m">
-            Save
-          </Button.Root>
-        </Tooltip.Trigger>
-        <Tooltip.Content>Write selected channels and email frequency to the profile</Tooltip.Content>
-      </Tooltip.Root>
-    </Tooltip.Provider>
-  );
-}
-```
-
-### With size / side options
-
-Product card grid: each card has a textless “favorite” icon; compact tooltip so it does not cover neighboring cards.
-
-```tsx
-import { Button, Icon, Tooltip } from "prime-ui-kit";
-
-export function WishlistIconCell() {
-  return (
-    <Tooltip.Provider delayDuration={250}>
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <Button.Root
-            type="button"
-            variant="neutral"
-            mode="ghost"
-            size="m"
-            aria-label="Add to wishlist"
-          >
-            <Button.Icon>
-              <Icon name="nav.itemDot" size="s" tone="subtle" />
-            </Button.Icon>
-          </Button.Root>
-        </Tooltip.Trigger>
-        <Tooltip.Content size="s" side="top">
-          Save product to wishlist
-        </Tooltip.Content>
-      </Tooltip.Root>
-    </Tooltip.Provider>
-  );
-}
-```
-
-### In context (form / modal / sidebar / …)
-
-Report sidebar: a term in the summary text with keyboard focus and a tooltip below so it does not hit the panel edge.
+### Minimal example
 
 ```tsx
 import { Tooltip } from "prime-ui-kit";
-import styles from "../../../playground/snippets/tooltip/snippets.module.css";
 
-export function ReportSidebarGlossary() {
+export function Example() {
   return (
-    <aside className={styles.reportAside}>
-      <p className={styles.reportParagraph}>
-        Total for{" "}
-        <Tooltip.Provider>
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <button type="button" className={styles.inlineHelpTrigger}>
-                MRR
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Content size="m" side="bottom">
-              Monthly recurring revenue — recurring monthly income from subscriptions
-            </Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>{" "}
-        for the quarter.
-      </p>
-    </aside>
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <button type="button">Hover</button>
+      </Tooltip.Trigger>
+      <Tooltip.Content>Help text</Tooltip.Content>
+    </Tooltip.Root>
   );
 }
 ```
 
-### Controlled mode
+## Rules
 
-Help screen: “Show tooltips” toggle stays in sync with a demo tooltip opening and with hover on the same trigger.
-
-```tsx
-import * as React from "react";
-import { Button, Switch, Tooltip } from "prime-ui-kit";
-import styles from "../../../playground/snippets/tooltip/snippets.module.css";
-
-export function HelpOverlayDemo() {
-  const [open, setOpen] = React.useState(false);
-
-  return (
-    <div className={styles.controlledStack}>
-      <Switch.Root size="m" checked={open} onCheckedChange={setOpen}>
-        <Switch.Label>Show tooltip</Switch.Label>
-      </Switch.Root>
-      <Tooltip.Provider delayDuration={0}>
-        <Tooltip.Root open={open} onOpenChange={setOpen}>
-          <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="stroke" size="m">
-              Example trigger
-            </Button.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content>Tooltip text is controlled externally and by hover</Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-    </div>
-  );
-}
-```
-
-## Anatomy
-
-`Tooltip.Provider` (optional, higher in the tree) → `Tooltip.Root` → `Tooltip.Trigger` (exactly one `ReactElement`) + `Tooltip.Content` (portal: `div` with `role="tooltip"` and `id` matching `aria-describedby` on the trigger).
+- **Uncontrolled:** omit **`open`**; optional **`defaultOpen`** (defaults to **`false`**). **Controlled:** pass **`open`** and **`onOpenChange`**; the same open state drives visibility together with hover/focus on the trigger.
+- Opening is **delayed** by **`Tooltip.Provider`**’s **`delayDuration`** after **`mouseenter`** or **`focus`**; leaving or **blur** clears the timer and closes. Cleanup runs on unmount.
+- **Position:** **`side`** is **`top`** \| **`bottom`** \| **`left`** \| **`right`** (default **`top`**). Coordinates are **clamped** to the viewport (**8px** inset); there is **no automatic flip** to the opposite side when space is tight—choose **`side`** explicitly if needed.
+- **Accessibility:** trigger gets **`aria-describedby`** pointing at the content **`id`**; content uses **`role="tooltip"`**. For inline glossary-style terms, prefer **`button type="button"`** as the trigger so keyboard focus is predictable.
+- **Portal:** content does not sit in the trigger’s DOM subtree; it won’t inherit layout/CSS from ancestors of the trigger (only what you pass as children and classes on **`Tooltip.Content`**).
+- **`Tooltip.Content`** defaults **`size`** to **`m`** and **`side`** to **`top`**; visual scale and arrow follow **`data-size`** / **`data-side`** and theme tokens—there is no separate **`variant`** prop.
 
 ## API
 
-Exports the `Tooltip` object, size and side types `TooltipSize`, `TooltipSide`, and subcomponent props: `TooltipProviderProps`, `TooltipRootProps`, `TooltipTriggerProps`, `TooltipContentProps`.
+The package exports the **`Tooltip`** namespace object and types **`TooltipSize`**, **`TooltipSide`**, **`TooltipProviderProps`**, **`TooltipRootProps`**, **`TooltipTriggerProps`**, **`TooltipContentProps`**.
 
 ### Tooltip.Provider
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| delayDuration | number | 400 | No | Milliseconds to wait before opening after pointer enters or trigger receives focus. |
-| children | React.ReactNode | — | Yes | Region where `Tooltip.Root` instances live. |
+|------|------|---------|----------|-------------|
+| delayDuration | `number` | `400` | No | Milliseconds to wait before opening after pointer enters or the trigger receives focus |
+| children | `React.ReactNode` | — | Yes | Subtree whose tooltips use this delay |
 
 ### Tooltip.Root
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| children | React.ReactNode | — | Yes | `Tooltip.Trigger` and `Tooltip.Content`. |
-| open | boolean | — | No | Controlled open state. |
-| defaultOpen | boolean | false | No | Initial value without external `open`. |
-| onOpenChange | (open: boolean) => void | — | No | Visibility change callback. |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | Yes | Typically `Tooltip.Trigger` and `Tooltip.Content` |
+| open | `boolean` | — | No | Controlled open state |
+| defaultOpen | `boolean` | `false` | No | Initial open state when uncontrolled |
+| onOpenChange | `(open: boolean) => void` | — | No | Called when open state changes |
 
 ### Tooltip.Trigger
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| children | React.ReactElement | — | Yes | Single element; receives ref, `aria-describedby`, mouse/focus handlers. |
-| className | string | — | No | Extra class (merged with the child’s class). |
+|------|------|---------|----------|-------------|
+| children | `React.ReactElement` | — | Yes | Single element; receives ref, `aria-describedby`, and open/close handlers |
+| className | `string` | — | No | Merged with the child’s `className` via `cx()` |
 
 ### Tooltip.Content
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| children | React.ReactNode | — | Yes | Tooltip body; wrapped in `ControlSizeProvider` for the chosen `size`. |
-| size | TooltipSize | m | No | Visual scale of padding, typography, and arrow. |
-| side | TooltipSide | top | No | Side relative to the trigger; position is clamped to the viewport. |
-| className | string | — | No | Custom class on the portal content root. |
+|------|------|---------|----------|-------------|
+| children | `React.ReactNode` | — | Yes | Tooltip body; wrapped in `ControlSizeProvider` for nested controls that read control size |
+| size | `TooltipSize` (`"s"` \| `"m"` \| `"l"` \| `"xl"`) | `"m"` | No | Padding, typography, and arrow scale |
+| side | `TooltipSide` (`"top"` \| `"bottom"` \| `"left"` \| `"right"`) | `"top"` | No | Placement relative to the trigger before viewport clamping |
+| className | `string` | — | No | Additional class on the portal root |
 
-## Variants
+## Related
 
-There is no separate `variant` prop: background, border, and shadow come from semantic tooltip tokens for the active theme. Only `size` scales (`s`, `m`, `l`, `xl`) and `side` placement differ visually (affects arrow and `data-side` for styling).
-
-## States
-
-- **Closed** — content is not mounted; delay timer resets on pointer leave or blur.
-- **Open** — after the provider delay, content shows in the portal; position updates on `resize` and `scroll`.
-- **Uncontrolled / controlled** — via `defaultOpen` or `open` + `onOpenChange`.
-- **Disabled trigger** — native disabled buttons usually do not receive hover; the tooltip will not open without a workaround (wrapper, different element).
-
-## Accessibility (a11y)
-
-The trigger gets `aria-describedby` pointing to the content `id` with `role="tooltip"`. Opens on `mouseenter` / `focus`, closes on `mouseleave` / `blur`. For inline terms, prefer an unstyled `button type="button"` so keyboard focus is predictable. Tooltip content is non-interactive (`pointer-events: none` in styles) — do not put buttons or links inside.
-
-## Limitations and notes
-
-One trigger per root; multiple anchors need separate `Tooltip.Root` instances. Content renders in a portal and does not inherit DOM context from the trigger (except passed markup). Position is clamped to the window; there is no automatic flip to another side when space is tight — set `side` yourself if needed. For a richer interactive layer, consider `Popover`.
-
-## Related components
-
-`Button`, `LinkButton` — typical triggers; `Switch` or another control — for controlled `open` demos. For a persistent field label use `Label` and `Hint`; for a layer that can hold focus inside, use `Popover`.
+[Button](../button/COMPONENT.md) — typical focusable trigger; [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) — persistent field labeling and helper text; [Popover](../popover/COMPONENT.md) — focusable, interactive overlay content.
