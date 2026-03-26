@@ -25,20 +25,14 @@ function SidebarNavPanel({
   id,
   ...rest
 }: SidebarNavPanelProps) {
-  const { navPanelId, notifyNavPanelPeekLeave } = useSidebarContext();
+  const { navPanelId } = useSidebarContext();
   return (
     <nav
       {...rest}
       id={id ?? navPanelId}
       className={cx(styles.navPanel, className)}
-      onMouseLeave={(e) => {
-        onMouseLeave?.(e);
-        notifyNavPanelPeekLeave(e);
-      }}
-      onPointerLeave={(e) => {
-        onPointerLeave?.(e);
-        notifyNavPanelPeekLeave(e);
-      }}
+      onMouseLeave={onMouseLeave}
+      onPointerLeave={onPointerLeave}
     />
   );
 }

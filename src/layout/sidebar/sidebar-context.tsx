@@ -10,11 +10,6 @@ export type SidebarContextValue = {
   toggleOpen: () => void;
   /** Стабильный id для `NavPanel` — `aria-controls` у кнопок открытия. */
   navPanelId: string;
-  /**
-   * Уход с `NavPanel`: при открытии «с края» (peek) закрывает сайдбар;
-   * явное открытие кнопкой не закрывается по уходу.
-   */
-  notifyNavPanelPeekLeave: (event: React.PointerEvent<Element> | React.MouseEvent<Element>) => void;
 };
 
 const [SidebarProvider, useSidebarContext] = createComponentContext<SidebarContextValue>("Sidebar");

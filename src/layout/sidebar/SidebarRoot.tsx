@@ -50,23 +50,6 @@ function SidebarRoot({
     onChange: onOpenChange,
   });
 
-  /** Открытие с левого края (peek): при уходе с `NavPanel` закрываем; явный toggle — «закреплённое» открытие. */
-  const openedByEdgePeekRef = React.useRef(false);
-
-  const [canEdgePeekHover, setCanEdgePeekHover] = React.useState(false);
-  React.useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const update = () => setCanEdgePeekHover(mq.matches);
-    update();
-    if (typeof mq.addEventListener === "function") {
-      mq.addEventListener("change", update);
-      return () => mq.removeEventListener("change", update);
-    }
-    mq.addListener(update);
-    return () => mq.removeListener(update);
-  }, []);
-
   const [isNarrowViewport, setIsNarrowViewport] = React.useState(initialNarrowViewport);
   const previousNarrowRef = React.useRef(initialNarrowViewport);
 
@@ -134,42 +117,19 @@ function SidebarRoot({
     const prev = previousNarrowRef.current;
     if (prev === isNarrowViewport) return;
     previousNarrowRef.current = isNarrowViewport;
-    openedByEdgePeekRef.current = false;
     setOpenState(!isNarrowViewport);
   }, [isNarrowViewport, responsive, setOpenState]);
 
   const setOpen = React.useCallback(
     (next: boolean) => {
-      if (!next) {
-        openedByEdgePeekRef.current = false;
-      }
       setOpenState(next);
     },
     [setOpenState],
   );
 
   const toggleOpen = React.useCallback(() => {
-    setOpenState((prev) => {
-      const next = !prev;
-      openedByEdgePeekRef.current = false;
-      return next;
-    });
+    setOpenState((prev) => !prev);
   }, [setOpenState]);
-
-  const handleEdgePeekEnter = React.useCallback(() => {
-    if (open) return;
-    openedByEdgePeekRef.current = true;
-    setOpenState(true);
-  }, [open, setOpenState]);
-
-  const notifyNavPanelPeekLeave = React.useCallback(
-    (_event: React.PointerEvent<Element> | React.MouseEvent<Element>) => {
-      if (!openedByEdgePeekRef.current) return;
-      openedByEdgePeekRef.current = false;
-      setOpenState(false);
-    },
-    [setOpenState],
-  );
 
   const shouldShowInlineOverlay = responsive === true && isNarrowViewport && open;
   const shouldShowFloatingToggle =
@@ -188,9 +148,8 @@ function SidebarRoot({
       setOpen,
       toggleOpen,
       navPanelId,
-      notifyNavPanelPeekLeave,
     }),
-    [navPanelId, notifyNavPanelPeekLeave, open, setOpen, size, toggleOpen],
+    [navPanelId, open, setOpen, size, toggleOpen],
   );
 
   return (
@@ -206,14 +165,6 @@ function SidebarRoot({
           "sidebar-slot": sidebarSlot,
         })}
       >
-        {canEdgePeekHover && !open && isNarrowViewport && !isXsHiddenViewport ? (
-          <div
-            className={styles.edgePeek}
-            data-sidebar-part="edge-peek"
-            aria-hidden
-            onPointerEnter={handleEdgePeekEnter}
-          />
-        ) : null}
         <div ref={navAreaRef} className={styles.navArea}>
           <button
             type="button"
