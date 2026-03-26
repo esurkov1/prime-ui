@@ -1,13 +1,11 @@
-import { Card, ProgressCircle, Typography } from "prime-ui-kit";
+import { Card, Icon, ProgressCircle, Typography } from "prime-ui-kit";
 
 /** KPI tile with a ring in `Card.Media` — typical dashboard density. */
 export default function DashboardRingExample() {
   return (
     <Card.Root variant="mini-media">
       <Card.IconBox aria-hidden>
-        <Typography.Root as="span" variant="body-small" weight="semibold">
-          Q
-        </Typography.Root>
+        <Icon name="nav.layoutGrid" aria-hidden />
       </Card.IconBox>
       <Card.Stack>
         <Card.Label>Quarter target</Card.Label>

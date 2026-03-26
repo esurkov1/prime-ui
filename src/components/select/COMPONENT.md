@@ -1,43 +1,60 @@
 # Select
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
 
 ## About
 
 A single-select field: by default (**`native`** `false`) it is a combobox — a trigger shows the current choice or a placeholder, and a portaled listbox lets the user pick one string value from predefined options. With **`native`** `true`, **`Select.Root`** renders a native **`<select>`** with **`<option>`** / **`<optgroup>`** built from the same **`Select.Item`** (and optional **`Select.Group`**) tree.
 
-- **Use** for forms, settings, and filters where exactly one option must be chosen from a closed set (role, country, theme, interval, and similar fields).
-- **Use** when a compact trigger label is enough and the full list should open on demand with keyboard support.
-- **Use** optional `Select.Group`, `Select.GroupLabel`, and `Select.Separator` to structure long option lists.
-- **Do not use** for multi-select, inline search, or async loading of options; this primitive is single-choice only with static item children.
-- **Do not use** when the user must type arbitrary text; use an input-style control instead.
-- **Do not use** for command or action menus; use [Dropdown](../dropdown/COMPONENT.md) when choices are actions, not a single form value.
+**When to use**
+
+- Forms, settings, and filters where exactly one option must be chosen from a closed set (role, country, theme, interval, and similar fields).
+- Flows where a compact trigger is enough and the full list should open on demand with keyboard support.
+- Long option lists structured with **`Select.Group`**, **`Select.GroupLabel`**, and **`Select.Separator`**.
+
+**When not to use**
+
+- Multi-select, inline search, or async loading of options — this primitive is single-choice only with static item children.
+- Arbitrary free text — use an input-style control instead.
+- Command or action menus — use [Dropdown](../dropdown/COMPONENT.md) when choices are actions, not a single form value.
 
 ## Composition
 
 - **`Select.Root`** — owns value (controlled or uncontrolled), `size`, `hasError`, `disabled`, **`placeholder`**, and **`native`**. When **`native`** is `false`, it also owns open state and highlight. Wrap everything else.
-- **`Select.Trigger`** — (non-**`native`** only) the combobox `button` (fixed chevron on the right). Put **`Select.Value`** inside; optionally **`Select.TriggerIcon`** before **`Select.Value`**.
+- **`Select.Trigger`** — (non-**`native`** only) the combobox `button` (fixed chevron on the right). Put **`Select.Value`** inside; optionally **`Select.TriggerIcon`** before **`Select.Value`**. The implementation sets the trigger **`id`**; you cannot override it — associate an external [Label](../label/COMPONENT.md) with **`aria-labelledby`** pointing at the label’s **`id`**.
 - **`Select.Value`** — (non-**`native`** only) displays the selected item label, otherwise falls back to the raw value or **`placeholder`** (hint styling when empty).
 - **`Select.Content`** — when **`native`** is `false`: portaled **`role="listbox"`**; rendered in the tree always but hidden when closed. Place **`Select.Item`** rows (and optional groups/separators) inside. Must come after the trigger in the document for a predictable structure. When **`native`** is `true`, **`Select.Content`** is optional as a structural wrapper; only **`Select.Item`** (and groups) contribute to the DOM **`<select>`**.
 - **`Select.Item`** — one option per row; optional **`Select.ItemIcon`** children are recognized by component type and rendered before the text. Use **`label`** when the trigger should show different text than the row content.
 - **`Select.Group`** / **`Select.GroupLabel`** / **`Select.Separator`** — optional structure inside **`Select.Content`**.
 
-### Minimal example
+### Canonical example
 
 ```tsx
-import { Select } from "prime-ui-kit";
+import * as React from "react";
+import { Label, Select, Typography } from "prime-ui-kit";
 
 export function Example() {
+  const labelId = React.useId();
+
   return (
-    <Select.Root size="m" placeholder="Choose">
-      <Select.Trigger>
-        <Select.Value />
-      </Select.Trigger>
-      <Select.Content>
-        <Select.Item value="a">Option A</Select.Item>
-        <Select.Item value="b">Option B</Select.Item>
-      </Select.Content>
-    </Select.Root>
+    <div>
+      <Label.Root id={labelId} size="m">
+        Department
+      </Label.Root>
+      <Select.Root size="m" placeholder="Choose">
+        <Select.Trigger aria-labelledby={labelId}>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="eng">Engineering</Select.Item>
+          <Select.Item value="design">Design</Select.Item>
+          <Select.Item value="sales">Sales</Select.Item>
+        </Select.Content>
+      </Select.Root>
+      <Typography.Root as="p" variant="caption" tone="muted">
+        Used for routing internal requests only.
+      </Typography.Root>
+    </div>
   );
 }
 ```
@@ -59,6 +76,15 @@ export function NativeExample() {
 
 You can wrap items in **`Select.Content`** for parity with the composable tree; behavior is the same.
 
+### Extended examples
+
+- [`./examples/01-country.tsx`](./examples/01-country.tsx) — Country or region field with **`Label.Root`**, combobox, and helper copy (**`Typography.Root`**).
+- [`./examples/02-controlled.tsx`](./examples/02-controlled.tsx) — Controlled **`value`** / **`onChange`** with subscription tier options.
+- [`./examples/03-groups.tsx`](./examples/03-groups.tsx) — **`Select.Group`**, **`Select.GroupLabel`**, and **`Select.Separator`** for regional time zones.
+- [`./examples/04-full-width-form.tsx`](./examples/04-full-width-form.tsx) — Form column where the trigger spans the track (**`width: 100%`** via kit styles on the trigger; width the parent column).
+
+**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition patterns; this page keeps the contract (rules + API tables) authoritative.
+
 ## Rules
 
 - **`native`** — default **`false`**. **`true`**: one **`<select>`** with kit styling; **`Select.Trigger`**, **`Select.Value`**, **`Select.Content`** portal, and listbox keyboard behavior are not used (the platform handles the dropdown). Options are collected by walking **`children`** for **`Select.Item`** (and **`Select.Group`** / **`Select.GroupLabel`** → **`<optgroup>`**; **`Select.Separator`** is skipped). **`placeholder`** adds a first **`<option value="">`**; do not use **`value=""`** on an **`Select.Item`** if you rely on that placeholder. **`Select.ItemIcon`** / **`Select.TriggerIcon`** are not represented in the native control.
@@ -67,6 +93,7 @@ You can wrap items in **`Select.Content`** for parity with the composable tree; 
 - **`disabled`** on **`Select.Root`** prevents opening the list and selecting; the trigger is inactive.
 - **`disabled`** on **`Select.Item`** skips that option for pointer selection and for arrow-key navigation among enabled options only.
 - **`hasError`** on **`Select.Root`** applies error styling to the trigger; there is no separate **`variant`** prop.
+- **Width:** there is no **`fullWidth`** prop on **`Select.Root`**. The combobox trigger uses **`width: 100%`** — constrain or stretch the field with the parent layout (form column, grid cell, flex item).
 - **`Select.Content`** uses **`Portal`**, which attaches after the first client layout effect; until option nodes mount, **`selectedLabel`** may be unset and **`Select.Value`** can briefly show the raw **`value`** instead of an item’s **`label`**—effects on **`Select.Item`** then call **`onInitLabel`** to align the trigger text.
 - **`Select.Content`** is portaled; on open the listbox receives focus, **`useOutsideClick`** and **Escape** close it. Arrow **Up**/**Down**, **Home**/**End** move highlight; **Enter** or **Space** selects the highlighted enabled item; **Escape** closes from the listbox handler as well.
 - **`Select.Trigger`** is **`role="combobox"`** with **`aria-expanded`**, **`aria-haspopup="listbox"`**, and **`aria-controls`** pointing at the listbox **`id`**. Items expose **`role="option"`**, **`aria-selected`**, and **`aria-disabled`** when disabled.
