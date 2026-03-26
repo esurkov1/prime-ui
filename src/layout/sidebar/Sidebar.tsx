@@ -260,8 +260,7 @@ function SidebarHeadingText({ children }: { children: React.ReactNode }) {
     if (root == null) return;
 
     const trackWidth = track.clientWidth;
-    const textWidth = Math.min(text.scrollWidth, trackWidth);
-    const centerOffset = Math.max(0, (trackWidth - textWidth) / 2);
+    const intrinsicTextWidth = text.scrollWidth;
 
     const computed = window.getComputedStyle(root);
     const baseFontSize = Number.parseFloat(
@@ -278,6 +277,16 @@ function SidebarHeadingText({ children }: { children: React.ReactNode }) {
     );
     const currentWidth = root.getBoundingClientRect().width;
 
+    let targetCompactOffset = 0;
+    if (compactWidth !== null && currentWidth > 0) {
+      // Project current heading track ratio to compact sidebar width to get a stable
+      // target center position and avoid mid-transition bounce.
+      const trackRatio = trackWidth / currentWidth;
+      const compactTrackWidth = compactWidth * trackRatio;
+      const compactTextWidth = Math.min(intrinsicTextWidth, compactTrackWidth);
+      targetCompactOffset = Math.max(0, (compactTrackWidth - compactTextWidth) / 2);
+    }
+
     let progress = 0;
     if (
       expandedWidth !== null &&
@@ -289,7 +298,7 @@ function SidebarHeadingText({ children }: { children: React.ReactNode }) {
       progress = Math.max(0, Math.min(1, progress));
     }
 
-    const next = centerOffset * progress;
+    const next = targetCompactOffset * progress;
 
     setOffset((prev) => (Math.abs(prev - next) < 0.5 ? prev : next));
   }, [isMobile]);
