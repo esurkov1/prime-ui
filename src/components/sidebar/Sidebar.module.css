@@ -1,16 +1,12 @@
-/* Плавное открытие/закрытие inline-сайдбара (десктоп): интерполяция длин. Без — переменные переключаются скачком. */
-@property --sb-panel-visible-width {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --sb-context-visible-width {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
+/*
+ * Inline `page-nav` (колонка рядом с main в PageShell) — консенсус по UX/архитектуре:
+ * — основной контент: `minmax(0, 1fr)` / не даём main «выпирать» (web.dev patterns, MDN minmax, ishadeed);
+ * — коллапс колонки: интерполируемый `max-width` + `overflow: hidden` (стабильнее @property+var в Safari/Fx);
+ * — узкий вьюпорт: drawer/overlay отдельно (MD Material navigation drawer, Radix/shadcn Sheet паттерн);
+ * — без двойной анимации: не смешивать translate панели и ширину колонки на десктопе.
+ * Ссылки: web.dev/patterns/layout, developer.mozilla.org/CSS/grid-template-columns,
+ * every-layout.dev/layouts/sidebar, css-tricks.com/complete-guide-grid, m3.material.io/components/navigation-drawer
+ */
 .root {
   --sb-context-width: var(--prime-sys-unit-4rem);
   --sb-panel-width: var(--prime-sys-unit-20rem);
@@ -59,18 +55,6 @@
     width var(--sb-transition-duration) var(--sb-transition-ease),
     min-width var(--sb-transition-duration) var(--sb-transition-ease),
     margin var(--sb-transition-duration) var(--sb-transition-ease);
-}
-
-/* Десктоп: анимируем ширину колонки через custom properties (рядом с main в `PageShell`). */
-@media (min-width: 64.001rem) {
-  .root {
-    transition:
-      --sb-panel-visible-width var(--sb-transition-duration) var(--sb-transition-ease),
-      --sb-context-visible-width var(--sb-transition-duration) var(--sb-transition-ease),
-      width var(--sb-transition-duration) var(--sb-transition-ease),
-      min-width var(--sb-transition-duration) var(--sb-transition-ease),
-      margin var(--sb-transition-duration) var(--sb-transition-ease);
-  }
 }
 
 .root[data-variant="double"] {
@@ -145,11 +129,47 @@
   --sb-shell-gap: var(--sb-page-gap);
 }
 
-/* Ширину задаёт `--sb-shell-width` (анимируется на десктопе); не форсим `width: 0`, иначе скачок. */
-.root[data-sidebar-slot="page-nav"][data-open="false"] {
-  margin-inline-start: 0;
-  margin-inline-end: 0;
-  margin-block: 0;
+/* Целевая ширина колонки (не зависит от --sb-panel-visible-width при закрытии) — для max-width transition. */
+.root[data-sidebar-slot="page-nav"][data-variant="simple"] {
+  --sb-page-nav-expanded: var(--sb-panel-width);
+}
+
+.root[data-sidebar-slot="page-nav"][data-variant="double"] {
+  --sb-page-nav-expanded: calc(
+    var(--sb-context-width) +
+    var(--sb-panel-width) +
+    var(--sb-nav-gap-open)
+  );
+}
+
+/* Десктоп: схлопывание колонки через max-width; контент режется overflow, без «разъезда» к краям. */
+@media (min-width: 64.001rem) {
+  .root[data-sidebar-slot="page-nav"] {
+    width: auto;
+    min-width: 0;
+    max-width: var(--sb-page-nav-expanded);
+    overflow: hidden;
+    transition:
+      max-width var(--sb-transition-duration) var(--sb-transition-ease),
+      margin-inline var(--sb-transition-duration) var(--sb-transition-ease),
+      margin-block var(--sb-transition-duration) var(--sb-transition-ease);
+  }
+
+  .root[data-sidebar-slot="page-nav"][data-open="false"] {
+    max-width: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    margin-block: var(--sb-page-inset);
+  }
+}
+
+/* Overlay / узкий вьюпорт: внешние поля обнуляем (панель fixed). */
+@media (max-width: 64rem) {
+  .root[data-sidebar-slot="page-nav"][data-open="false"] {
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    margin-block: 0;
+  }
 }
 
 .root[data-open="false"] {
@@ -187,6 +207,15 @@
     gap var(--sb-transition-duration) var(--sb-transition-ease),
     width var(--sb-transition-duration) var(--sb-transition-ease),
     min-width var(--sb-transition-duration) var(--sb-transition-ease);
+}
+
+@media (min-width: 64.001rem) {
+  .root[data-sidebar-slot="page-nav"] .navArea {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    transition: gap var(--sb-transition-duration) var(--sb-transition-ease);
+  }
 }
 
 .backdrop {
