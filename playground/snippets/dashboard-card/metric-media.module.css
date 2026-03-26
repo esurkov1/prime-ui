@@ -10,8 +10,8 @@
 }
 
 .leadText {
-  font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
-  line-height: var(--prime-sys-typography-role-bodySmall-lineHeight);
+  font-size: var(--prime-sys-size-control-m-supportText);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
   font-weight: var(--prime-sys-typography-weight-medium);
   color: var(--prime-sys-color-content-secondary);
 }

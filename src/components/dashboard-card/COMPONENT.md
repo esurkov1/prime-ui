@@ -97,6 +97,7 @@ export function ChartSection() {
 
 ## Rules
 
+- Typography follows the **control `m` tier** (`--prime-sys-size-control-m-text` for values and section titles, `--prime-sys-size-control-m-supportText` for labels and descriptions), aligned with [Label](../label/COMPONENT.md) / [Input](../input/COMPONENT.md) defaults — not reading `headingSection` / `headingSubsection` roles, so KPI copy stays visually consistent with form density.
 - Prefer **`flat`** on dense dashboards if shadows feel noisy; default shadow uses **`--prime-sys-elevation-shadow-surface`**.
 - **`SectionTitle`** is an **`h3`**; ensure heading levels match the page outline (skip levels appropriately).
 - **`Description`** is a **`p`** — only one block per card unless you compose custom markup inside **`Body`** for **`section`**.

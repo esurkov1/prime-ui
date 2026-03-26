@@ -97,15 +97,15 @@
 }
 
 .label {
-  font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
-  line-height: var(--prime-sys-typography-role-bodySmall-lineHeight);
+  font-size: var(--prime-sys-size-control-m-supportText);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
   font-weight: var(--prime-sys-typography-weight-regular);
   color: var(--prime-sys-color-content-secondary);
 }
 
 .value {
-  font-size: var(--prime-sys-typography-role-headingSubsection-fontSize);
-  line-height: var(--prime-sys-typography-role-headingSubsection-lineHeight);
+  font-size: var(--prime-sys-size-control-m-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
   font-weight: var(--prime-sys-typography-weight-semibold);
   color: var(--prime-sys-color-content-primary);
 }
@@ -115,15 +115,10 @@
   text-align: end;
 }
 
-.root[data-variant="mini"] .value {
-  font-size: var(--prime-sys-typography-role-headingSection-fontSize);
-  line-height: var(--prime-sys-typography-role-headingSection-lineHeight);
-}
-
 .description {
   margin: 0;
-  font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
-  line-height: var(--prime-sys-typography-role-bodySmall-lineHeight);
+  font-size: var(--prime-sys-size-control-m-supportText);
+  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
   font-weight: var(--prime-sys-typography-weight-regular);
   color: var(--prime-sys-color-content-secondary);
 }
@@ -156,9 +151,9 @@
   margin: 0;
   min-width: 0;
   flex: 1 1 auto;
-  font-size: var(--prime-sys-typography-role-headingSubsection-fontSize);
-  line-height: var(--prime-sys-typography-role-headingSubsection-lineHeight);
-  font-weight: var(--prime-sys-typography-weight-semibold);
+  font-size: var(--prime-sys-size-control-m-text);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+  font-weight: var(--prime-sys-typography-title-weight);
   color: var(--prime-sys-color-content-primary);
 }
 
