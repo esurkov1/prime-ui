@@ -1,6 +1,6 @@
 .root {
   --sb-expanded-width: 18rem;
-  --sb-compact-width: 10.5rem;
+  --sb-compact-width: 6.75rem;
   --sb-visible-width: var(--sb-expanded-width);
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
@@ -412,11 +412,24 @@
 
   .root[data-state="compact"] .menuButton,
   .root[data-state="compact"] .itemButton {
-    justify-content: flex-start;
-    padding-inline: var(--prime-sys-spacing-x2);
+    justify-content: center;
+    padding-inline: var(--prime-sys-spacing-x1);
     transition:
       background-color var(--prime-sys-motion-duration-fast) var(--prime-sys-motion-easing-standard),
       padding var(--prime-sys-motion-duration-fast) var(--prime-sys-motion-easing-standard);
+  }
+
+  .root[data-state="compact"] .menuLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
   .root[data-state="compact"] .identityButtonMain {
@@ -456,7 +469,7 @@
   }
 
   .root[data-state="compact"] .navCategoryTrigger {
-    justify-content: flex-start;
+    justify-content: center;
     padding-inline: var(--prime-sys-spacing-x2);
   }
 
