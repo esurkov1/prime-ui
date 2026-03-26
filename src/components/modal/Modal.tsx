@@ -41,7 +41,9 @@ const ModalContentShellContext = React.createContext<ModalContentShellContextVal
 function useModalContentShell(): ModalContentShellContextValue {
   const value = React.useContext(ModalContentShellContext);
   if (value === null) {
-    throw new Error("[prime-ui-kit] Modal header block must be used inside the dialog panel (internal).");
+    throw new Error(
+      "[prime-ui-kit] Modal header block must be used inside the dialog panel (internal).",
+    );
   }
   return value;
 }
@@ -311,7 +313,6 @@ function ModalHeader({
       registerHeader(null);
     };
   }, [hasDescription, registerHeader]);
-
 
   return (
     <header

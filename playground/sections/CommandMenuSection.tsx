@@ -604,7 +604,8 @@ export default function CommandMenuSection() {
           <PlaygroundApiTable rows={dialogApiRows} />
           <h5>CommandMenu.DialogTitle</h5>
           <p className="demoBlockDescription">
-            Заголовок диалога (разметка и стили как у <code>h2</code> в шапке <code>Modal.Panel</code>).
+            Заголовок диалога (разметка и стили как у <code>h2</code> в шапке{" "}
+            <code>Modal.Panel</code>).
           </p>
           <PlaygroundApiTable rows={dialogTitleApiRows} />
           <h5>CommandMenu.DialogDescription</h5>

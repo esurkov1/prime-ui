@@ -224,8 +224,8 @@ export default function ModalSection() {
           <h4>Структура и композиция</h4>
           <p className="demoBlockDescription">
             Публичный API: <code>Modal.Root</code> → <code>Modal.Panel</code> с пропами{" "}
-            <code>title</code>, <code>description</code>, <code>children</code>, <code>footer</code>.
-            Ниже — варианты: только шапка+футер, шапка+текст, только шапка, форма, юртекст.
+            <code>title</code>, <code>description</code>, <code>children</code>, <code>footer</code>
+            . Ниже — варианты: только шапка+футер, шапка+текст, только шапка, форма, юртекст.
           </p>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
@@ -311,9 +311,9 @@ export default function ModalSection() {
           <h5>Modal.Panel</h5>
           <p className="demoBlockDescription">
             Единственная оболочка панели: портал, подложка, белая карточка, фокус-ловушка, Escape,
-            скролл-лок, шапка/тело/подвал из пропсов. Ширина панели по умолчанию ограничена вьюпортом
-            в стилях (<code>min(100%, …)</code>) — отдельного режима «адаптивной ширины» не нужно. Без{" "}
-            <code>title</code> — только <code>children</code> (например Command Menu с{" "}
+            скролл-лок, шапка/тело/подвал из пропсов. Ширина панели по умолчанию ограничена
+            вьюпортом в стилях (<code>min(100%, …)</code>) — отдельного режима «адаптивной ширины»
+            не нужно. Без <code>title</code> — только <code>children</code> (например Command Menu с{" "}
             <code>aria-labelledby</code>).
           </p>
           <PlaygroundApiTable rows={modalPanelApiRows} />

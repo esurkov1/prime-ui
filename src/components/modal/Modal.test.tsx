@@ -166,10 +166,7 @@ describe("Modal", () => {
   it("supports title and footer without body text", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Panel
-          footer={<Button.Root>Action</Button.Root>}
-          title="Header footer"
-        />
+        <Modal.Panel footer={<Button.Root>Action</Button.Root>} title="Header footer" />
       </Modal.Root>,
     );
 
