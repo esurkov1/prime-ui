@@ -73,6 +73,23 @@ function SidebarRoot({
     onChange: onOpenChange,
   });
 
+  /** Открытие с левого края (peek): при уходе с `NavPanel` закрываем; явный toggle — «закреплённое» открытие. */
+  const openedByEdgePeekRef = React.useRef(false);
+
+  const [canEdgePeekHover, setCanEdgePeekHover] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setCanEdgePeekHover(mq.matches);
+    update();
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", update);
+      return () => mq.removeEventListener("change", update);
+    }
+    mq.addListener(update);
+    return () => mq.removeListener(update);
+  }, []);
+
   const [isResponsiveViewport, setIsResponsiveViewport] = React.useState(initialResponsiveViewport);
   const previousResponsiveViewportRef = React.useRef(initialResponsiveViewport);
 
@@ -105,6 +122,7 @@ function SidebarRoot({
     const prev = previousResponsiveViewportRef.current;
     if (prev === isResponsiveViewport) return;
     previousResponsiveViewportRef.current = isResponsiveViewport;
+    openedByEdgePeekRef.current = false;
     setOpenState(!isResponsiveViewport);
   }, [isResponsiveViewport, responsive, setOpenState]);
 
@@ -117,14 +135,40 @@ function SidebarRoot({
 
   const setOpen = React.useCallback(
     (next: boolean) => {
+      if (!next) {
+        openedByEdgePeekRef.current = false;
+      }
       setOpenState(next);
     },
     [setOpenState],
   );
 
   const toggleOpen = React.useCallback(() => {
-    setOpenState((prev) => !prev);
+    setOpenState((prev) => {
+      const next = !prev;
+      openedByEdgePeekRef.current = false;
+      return next;
+    });
   }, [setOpenState]);
+
+  const handleEdgePeekEnter = React.useCallback(() => {
+    if (open) return;
+    openedByEdgePeekRef.current = true;
+    setOpenState(true);
+  }, [open, setOpenState]);
+
+  const notifyNavPanelPeekLeave = React.useCallback(
+    (event: React.PointerEvent<Element> | React.MouseEvent<Element>) => {
+      if (!openedByEdgePeekRef.current) return;
+      const next = event.relatedTarget as Node | null;
+      if (next instanceof Element && next.closest("[data-sidebar-part='context-rail']")) {
+        return;
+      }
+      openedByEdgePeekRef.current = false;
+      setOpenState(false);
+    },
+    [setOpenState],
+  );
 
   const shouldShowInlineOverlay = responsive === true && isResponsiveViewport && open;
   const shouldShowFloatingToggle = open === false;
@@ -146,10 +190,12 @@ function SidebarRoot({
       setOpen,
       toggleOpen,
       navPanelId,
+      notifyNavPanelPeekLeave,
     }),
     [
       activeSection,
       navPanelId,
+      notifyNavPanelPeekLeave,
       open,
       setActiveSection,
       setOpen,
@@ -175,6 +221,14 @@ function SidebarRoot({
         })}
         data-collapsed={variant === "simple" ? "true" : undefined}
       >
+        {canEdgePeekHover && !open ? (
+          <div
+            className={styles.edgePeek}
+            data-sidebar-part="edge-peek"
+            aria-hidden
+            onPointerEnter={handleEdgePeekEnter}
+          />
+        ) : null}
         <div ref={navAreaRef} className={styles.navArea}>
           <button
             type="button"

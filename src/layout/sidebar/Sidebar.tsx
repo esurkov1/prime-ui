@@ -48,7 +48,7 @@ function SidebarContextBar({
   }, [items, resolvedActiveSection, selectSection]);
 
   return (
-    <div className={styles.contextRail}>
+    <div className={styles.contextRail} data-sidebar-part="context-rail">
       <nav {...rest} className={cx(styles.contextBar, className)} aria-label="Context navigation">
         {logo === undefined ? null : <div className={styles.contextBarHeader}>{logo}</div>}
 
@@ -163,14 +163,27 @@ SidebarContextItemButton.displayName = "SidebarContextItemButton";
 
 export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav">;
 
-function SidebarNavPanel({ className, onMouseLeave, id, ...rest }: SidebarNavPanelProps) {
-  const { navPanelId } = useSidebarContext();
+function SidebarNavPanel({
+  className,
+  onMouseLeave,
+  onPointerLeave,
+  id,
+  ...rest
+}: SidebarNavPanelProps) {
+  const { navPanelId, notifyNavPanelPeekLeave } = useSidebarContext();
   return (
     <nav
       {...rest}
       id={id ?? navPanelId}
       className={cx(styles.navPanel, className)}
-      onMouseLeave={onMouseLeave}
+      onMouseLeave={(e) => {
+        onMouseLeave?.(e);
+        notifyNavPanelPeekLeave(e);
+      }}
+      onPointerLeave={(e) => {
+        onPointerLeave?.(e);
+        notifyNavPanelPeekLeave(e);
+      }}
     />
   );
 }

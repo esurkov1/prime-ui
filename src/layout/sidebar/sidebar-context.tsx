@@ -1,3 +1,4 @@
+import type * as React from "react";
 import type { ReactNode } from "react";
 
 import { createComponentContext } from "@/internal/context";
@@ -25,6 +26,11 @@ export type SidebarContextValue = {
   toggleOpen: () => void;
   /** Стабильный id для `NavPanel` — `aria-controls` у кнопок открытия. */
   navPanelId: string;
+  /**
+   * Уход с `NavPanel`: при открытии «с края» (peek) закрывает сайдбар;
+   * не закрывает при переходе на `ContextBar` (двухъярусный вариант).
+   */
+  notifyNavPanelPeekLeave: (event: React.PointerEvent<Element> | React.MouseEvent<Element>) => void;
 };
 
 const [SidebarProvider, useSidebarContext] = createComponentContext<SidebarContextValue>("Sidebar");

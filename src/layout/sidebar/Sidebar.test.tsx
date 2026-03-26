@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
@@ -112,6 +112,55 @@ describe("Sidebar", () => {
       expect(nav).toBeTruthy();
       fireEvent.mouseLeave(nav as HTMLElement);
       expect(root).toHaveAttribute("data-open", "true");
+    } finally {
+      window.matchMedia = previousMatchMedia;
+    }
+  });
+
+  it("opens from left edge hover and closes when pointer leaves nav (peek)", async () => {
+    const matchMediaImpl = (query: string) => {
+      const narrow = query.includes("64rem") && query.includes("max-width");
+      const fineHover = query.includes("(hover: hover)") && query.includes("(pointer: fine)");
+      const matches = narrow || fineHover;
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as MediaQueryList;
+    };
+    const previousMatchMedia = window.matchMedia;
+    window.matchMedia = matchMediaImpl as typeof window.matchMedia;
+
+    try {
+      render(
+        <Sidebar.Root defaultOpen={false} responsive>
+          <Sidebar.NavPanel />
+        </Sidebar.Root>,
+      );
+
+      const root = screen.getByRole("complementary", { name: "Sidebar" });
+      const edge = await waitFor(() => {
+        const el = root.querySelector("[data-sidebar-part='edge-peek']");
+        expect(el).toBeTruthy();
+        return el as HTMLElement;
+      });
+
+      fireEvent.pointerEnter(edge);
+      await waitFor(() => {
+        expect(root).toHaveAttribute("data-open", "true");
+      });
+
+      const nav = root.querySelector("nav");
+      expect(nav).toBeTruthy();
+      fireEvent.pointerLeave(nav as HTMLElement);
+      await waitFor(() => {
+        expect(root).toHaveAttribute("data-open", "false");
+      });
     } finally {
       window.matchMedia = previousMatchMedia;
     }
