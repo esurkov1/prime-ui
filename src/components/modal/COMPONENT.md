@@ -15,7 +15,7 @@ Centered overlay dialog with a portal, backdrop, focus trap, scroll lock, and op
 - **`Modal.Root`** — holds open state (controlled via **`open`** / **`onOpenChange`** or uncontrolled via **`defaultOpen`**), and options **`closeOnEscape`** / **`closeOnOverlayClick`**. Renders **`children`** only (no DOM wrapper).
 - **`Modal.Trigger`** — optional; **`React.Children.only`**: pass **exactly one** React element; its **`onClick`** is merged to call **`onOpen`** when the event is not **`defaultPrevented`**.
 - **`Modal.Panel`** — when open: **`createPortal`** (default container `document.body`), fullscreen **`role="presentation"`** overlay, then **`role="dialog"`** with **`aria-modal="true"`**. If **`title`** is set, renders an internal header (**`h2`**, optional description, optional built-in close icon button), wraps **`children`** in an internal body, and optional **`footer`**. Without **`title`**, **`children`** render directly inside the dialog surface—supply **`aria-label`** or **`aria-labelledby`** (and **`aria-describedby`** when needed).
-- **`Modal.Close`** — same single-child contract as **`Trigger`**; merges **`onClick`** to **`onClose`** when not **`defaultPrevented`**. Typical placement: a control inside **`footer`**.
+- **`Modal.Close`** — same single-child contract as **`Trigger`**; merges **`onClick`** to **`onClose`** when not **`defaultPrevented`**. Typical placement: a control inside **`footer`** (for example **Cancel** or **Save** when saving should dismiss the dialog).
 - **Order:** **`Modal.Root`** → **`Modal.Trigger`** (if any) and **`Modal.Panel`** as siblings (or only **`Modal.Panel`** in controlled flows).
 
 ### Minimal example
@@ -36,6 +36,77 @@ export function Example() {
   );
 }
 ```
+
+### Canonical example (full shell)
+
+Use this when you want the complete header row (**`title`**, **`description`**, **`icon`**), a form field in the body, and a **`footer`** where at least one control is wrapped in **`Modal.Close`** (here: **Cancel**). The header still shows the built-in icon close button by default (`showClose`).
+
+```tsx
+import { Button, Icon, Input, Modal } from "prime-ui-kit";
+
+export function InviteTeammateModal() {
+  return (
+    <Modal.Root>
+      <Modal.Trigger>
+        <Button.Root size="m" variant="neutral" mode="stroke">
+          Open workspace invite
+        </Button.Root>
+      </Modal.Trigger>
+      <Modal.Panel
+        title="Invite teammate"
+        description="We will send one invitation email. The recipient can accept or decline."
+        icon={<Icon name="field.email" tone="subtle" />}
+        footer={
+          <>
+            <Modal.Close>
+              <Button.Root size="m" variant="neutral" mode="stroke">
+                Cancel
+              </Button.Root>
+            </Modal.Close>
+            <Button.Root size="m" variant="primary" type="button">
+              Send invite
+            </Button.Root>
+          </>
+        }
+      >
+        <Input.Root label="Email address" size="m" hint="Work email preferred">
+          <Input.Wrapper>
+            <Input.Field autoComplete="email" placeholder="name@company.com" type="email" />
+          </Input.Wrapper>
+        </Input.Root>
+      </Modal.Panel>
+    </Modal.Root>
+  );
+}
+```
+
+Source of truth (stays in sync with the snippet above): `examples/canonical-maximal.tsx`.
+
+### Examples (source)
+
+Runnable demos live next to this file (workspace imports use `@/`; published consumers use `prime-ui-kit`):
+
+| File | Intent |
+|------|--------|
+| `examples/canonical-maximal.tsx` | Full shell: title, description, icon, one field, footer with **`Modal.Close`** + primary |
+| `examples/scenario-confirm-delete.tsx` | Destructive confirmation; **`variant="error"`** on primary action |
+| `examples/scenario-edit-entity.tsx` | Rename / edit field; **Save** wrapped in **`Modal.Close`** to dismiss after save |
+| `examples/scenario-legal-consent.tsx` | Terms-style copy; **`closeOnOverlayClick={false}`**; single **I agree** closes via **`Modal.Close`** |
+| `examples/scenario-multi-field-form.tsx` | **`Input`**, **`Select`**, **`Textarea`** in the body; submit button uses **`form`** |
+
+Playground composition demos (Russian copy, broader variants): `playground/snippets/modal/composition.tsx`.
+
+### Extended usage
+
+- **Controlled dialogs:** omit **`Modal.Trigger`**; pass **`open`** and **`onOpenChange`** to **`Modal.Root`**. Keep **`Modal.Panel`** as a sibling; it portals only when **`open`** is true.
+- **Dismiss on primary action:** wrap the confirming button in **`Modal.Close`** when the action should close the dialog immediately (see **edit entity** example). If you must await an API call, keep the dialog open until success, then call **`onOpenChange(false)`** from the parent.
+- **Consent / wizard steps:** set **`closeOnOverlayClick={false}`** (and optionally **`closeOnEscape={false}`**) when accidental dismiss would lose legal or multi-step state; still provide an explicit **`Modal.Close`** (or header close) path where appropriate.
+- **Long body content:** constrain scroll to the body via **`bodyStyle`** / **`bodyClassName`** (see `playground/snippets/modal/features.tsx`); overlay scroll lock remains active.
+- **Headless dialog surface:** omit **`title`** on **`Modal.Panel`** and supply **`aria-label`** or **`aria-labelledby`** / **`aria-describedby`** yourself; inner body wrapper is not used, so **`bodyClassName`** / **`bodyStyle`** do not apply.
+
+### Note for LLMs
+
+When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and **`Modal.Close`** each require **exactly one** child element—no fragments or multiple nodes. (2) Prefer **`Modal.Panel`** with **`title`** (and usually **`description`**) so **`aria-labelledby`** / **`aria-describedby`** are wired automatically. (3) Put **Cancel** / **Dismiss** in **`footer`** inside **`Modal.Close`** unless the design relies only on the header icon. (4) Do not wrap kit components to restyle them; use **`size`**, **`variant`**, **`mode`**, and documented props only. (5) For copy-paste starting points, mirror **`examples/canonical-maximal.tsx`** first, then adapt from the scenario files.
 
 ## Rules
 
