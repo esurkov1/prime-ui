@@ -34,13 +34,10 @@ export type PageShellNavAreaProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-/**
- * Слот слева в ряду `PageShell.Root` (flex). Семантический `aside` задаёт сам `Sidebar.Root`
- * или ваш блок навигации — иначе получается вложенный `<aside>` в `<aside>`.
- */
+/** Первая колонка сетки: nav area — без полей; отступы у `Sidebar` / своей навигации. */
 function PageShellNavArea({ className, children, ...rest }: PageShellNavAreaProps) {
   return (
-    <div className={cx(styles.navArea, className)} {...rest}>
+    <div className={cx(styles.navArea, className)} data-prime-shell="nav-area" {...rest}>
       {children}
     </div>
   );
@@ -48,19 +45,26 @@ function PageShellNavArea({ className, children, ...rest }: PageShellNavAreaProp
 PageShellNavArea.displayName = "PageShell.NavArea";
 
 export type PageShellContentAreaProps = {
+  /** `plain` — только main + скролл; `surface` — карточка с полями (демо/админка). */
+  variant?: "plain" | "surface";
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
 
 const PageShellContentArea = React.forwardRef<HTMLElement, PageShellContentAreaProps>(
-  function PageShellContentArea({ className, children, ...rest }, forwardedRef) {
+  function PageShellContentArea({ variant = "plain", className, children, ...rest }, forwardedRef) {
     return (
       <ScrollContainer
         as="main"
         ref={forwardedRef}
         axis="vertical"
         overscrollBehavior="contain"
-        className={cx(styles.contentArea, className)}
+        className={cx(
+          styles.contentArea,
+          variant === "surface" && styles.contentAreaSurface,
+          className,
+        )}
+        data-prime-shell="content-area"
         {...rest}
       >
         {children}

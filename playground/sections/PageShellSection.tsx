@@ -113,6 +113,14 @@ const applicationRows: PlaygroundApiPropRow[] = [
 
 const contentAreaRows: PlaygroundApiPropRow[] = [
   {
+    prop: "variant",
+    type: '"plain" | "surface"',
+    defaultValue: '"plain"',
+    required: "Нет",
+    description:
+      "`plain` — только скролл и `main`; поля/подложка у контента страницы. `surface` — карточка с полями внутри колонки.",
+  },
+  {
     prop: "className",
     type: "string",
     defaultValue: "—",
@@ -141,13 +149,12 @@ export default function PageShellSection() {
       title="PageShell"
       description={
         <>
-          Каркас страницы приложения: корневой контейнер и две области — слот навигации (
-          <code>NavArea</code>, разметочный <code>&lt;div&gt;</code>) и основная колонка (
-          <code>ContentArea</code> как <code>&lt;main&gt;</code>). Для типичного приложения удобнее{" "}
-          <code>PageShell.Application</code> — один компонент: <code>nav</code> + дети в{" "}
-          <code>main</code>. В плейграунде это используется в <code>PlaygroundLayout</code>.
-          Отдельных интерактивных примеров нет: это структурная разметка и токены отступов из CSS
-          Modules.
+          Каркас: CSS Grid из двух колонок — <strong>nav area</strong> (<code>NavArea</code>,{" "}
+          <code>data-prime-shell=&quot;nav-area&quot;</code>) и <strong>content area</strong> (
+          <code>ContentArea</code> как <code>&lt;main&gt;</code>,{" "}
+          <code>data-prime-shell=&quot;content-area&quot;</code>). У shell нет gap и внутренних
+          полей; отступы задают <code>Sidebar</code> / разметка страницы. Для типичного приложения —{" "}
+          <code>PageShell.Application</code>. В плейграунде — <code>PlaygroundLayout</code>.
         </>
       }
     >

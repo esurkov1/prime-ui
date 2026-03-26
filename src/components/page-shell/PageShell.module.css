@@ -1,15 +1,18 @@
+/*
+ * Две колонки: nav area | content area. Без gap/padding на shell — отступы задают Sidebar, PageContent и т.д.
+ * Вторая колонка: minmax(0, 1fr) чтобы main не раздувал сетку (overflow → скролл внутри main).
+ */
 .root {
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
   align-items: stretch;
-  /* Зазор между nav и main задаёт сам сайдбар (`margin-inline-end` в `Sidebar` при `sidebarSlot="page-nav"`),
-     иначе при `open=false` колонка 0px, но `gap` остаётся — контент визуально смещён вправо. */
   column-gap: 0;
   row-gap: 0;
   width: 100%;
   min-height: 0;
+  padding: 0;
   background: transparent;
 }
 
@@ -29,9 +32,13 @@
   min-width: 0;
   min-height: 0;
   max-height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
   background: transparent;
 }
 
+/* База: только скролл-оболочка; подложку/поля даёт страница или variant="surface". */
 .contentArea {
   box-sizing: border-box;
   display: flex;
@@ -39,6 +46,12 @@
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+.contentAreaSurface {
   padding: var(--prime-sys-spacing-x5);
   border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
   border-radius: var(--prime-sys-shape-radius-l);
