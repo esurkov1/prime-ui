@@ -24,7 +24,7 @@ Each code snippet targets a different screen type; prop combinations are not dup
 The most common case: explain a term on a button click in article text (visually like a footnote).
 
 ```tsx
-import { Button, Popover } from "prime-ui-kit";
+import { Button, Popover, Typography } from "prime-ui-kit";
 
 export function GlossaryTerm() {
   return (
@@ -36,9 +36,9 @@ export function GlossaryTerm() {
       </Popover.Trigger>
       <Popover.Content align="start" side="bottom" size="m">
         <Popover.Inset>
-          <p style={{ margin: 0, maxWidth: "18rem" }}>
+          <Typography.Root as="p" size="s">
             Service level agreement: target response and recovery time for incidents.
-          </p>
+          </Typography.Root>
         </Popover.Inset>
       </Popover.Content>
     </Popover.Root>
@@ -81,24 +81,24 @@ export function PromoHint() {
 Notifications screen: compact alert delivery channel selection in a panel by the toggle.
 
 ```tsx
-import { Button, Checkbox, Popover, Switch, Typography } from "prime-ui-kit";
+import { Button, Checkbox, LinkButton, Popover, Switch, Typography } from "prime-ui-kit";
 
 export function AlertChannelRow() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+    <div className="row rowAlignCenter rowGapMedium">
       <Switch.Root defaultChecked size="m" />
       <Typography.Root as="span" size="m">
         Push notifications
       </Typography.Root>
       <Popover.Root>
         <Popover.Trigger asChild>
-          <Button.Root mode="ghost" size="m" variant="neutral" style={{ fontSize: "0.875rem", textDecoration: "underline" }}>
+          <LinkButton.Root href="#" size="m" onClick={(e) => e.preventDefault()}>
             Configure
-          </Button.Root>
+          </LinkButton.Root>
         </Popover.Trigger>
         <Popover.Content align="end" side="bottom" size="m" sameMinWidthAsTrigger>
           <Popover.Inset>
-            <Typography.Root as="p" size="s" style={{ margin: "0 0 0.5rem" }}>
+            <Typography.Root as="p" size="s" weight="semibold">
               Channels
             </Typography.Root>
             <Checkbox.Root defaultChecked size="m">
@@ -127,11 +127,11 @@ export function BookingStep() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "flex-start" }}>
+    <div className="previewBannerColumn">
       <Typography.Root as="p" size="s">
         Step 2 · {open ? "Pick a slot in the panel" : "No slot selected"}
       </Typography.Root>
-      <div style={{ display: "flex", gap: "0.5rem" }}>
+      <div className="row rowAlignCenter rowGapTight">
         <Button.Root mode="stroke" size="m" variant="neutral" onClick={() => setOpen(true)}>
           Open slots
         </Button.Root>
@@ -143,7 +143,7 @@ export function BookingStep() {
           </Popover.Trigger>
           <Popover.Content align="start" side="bottom" size="m">
             <Popover.Inset>
-              <Typography.Root as="p" size="s" style={{ margin: "0 0 0.5rem" }}>
+              <Typography.Root as="p" size="s" weight="medium">
                 Available today
               </Typography.Root>
               <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
@@ -175,10 +175,10 @@ export function CanvasToolMenu() {
       </Popover.Trigger>
       <Popover.Content align="end" side="top" size="s">
         <Popover.Inset padding="x2" gap="x2">
-          <Button.Root mode="ghost" size="s" variant="neutral" style={{ display: "block", width: "100%", textAlign: "left" }}>
+          <Button.Root fullWidth mode="ghost" size="s" variant="neutral">
             Duplicate
           </Button.Root>
-          <Button.Root mode="ghost" size="s" variant="neutral" style={{ display: "block", width: "100%", textAlign: "left" }}>
+          <Button.Root fullWidth mode="ghost" size="s" variant="neutral">
             Group
           </Button.Root>
         </Popover.Inset>
@@ -225,7 +225,7 @@ export function AccessRequestPopover() {
               <Select.Item value="editor">Editor</Select.Item>
             </Select.Content>
           </Select.Root>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+          <div className="row rowAlignCenter rowGapTight">
             <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
               Cancel
             </Button.Root>
