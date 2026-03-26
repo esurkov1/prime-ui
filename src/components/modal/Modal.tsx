@@ -1,9 +1,11 @@
 import * as React from "react";
 
+import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -26,19 +28,6 @@ type ModalContextValue = {
 };
 
 const [ModalProvider, useModalContext] = createComponentContext<ModalContextValue>("Modal");
-
-const ModalHeaderContext = React.createContext(false);
-
-function isButtonRootElement(
-  child: React.ReactElement,
-): child is React.ReactElement<{ size?: ButtonSize }> {
-  return (
-    typeof child.type === "object" &&
-    child.type !== null &&
-    "displayName" in child.type &&
-    (child.type as { displayName?: string }).displayName === "ButtonRoot"
-  );
-}
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
@@ -106,23 +95,15 @@ export type ModalCloseProps = {
 
 function ModalClose({ children }: ModalCloseProps) {
   const { onClose } = useModalContext();
-  const insideHeader = React.useContext(ModalHeaderContext);
   const child = React.Children.only(children);
 
-  const headerCloseSize: Partial<{ size: ButtonSize }> =
-    insideHeader && isButtonRootElement(child) && child.props.size === undefined
-      ? { size: MODAL_SHELL_SIZE }
-      : {};
-
   return React.cloneElement(child, {
-    ...headerCloseSize,
     onClick: (event: React.MouseEvent) => {
       child.props.onClick?.(event);
       if (!event.defaultPrevented) {
         onClose();
       }
     },
-    className: cx(child.props.className, insideHeader ? styles.closeBtn : undefined),
   });
 }
 
@@ -253,8 +234,10 @@ export type ModalHeaderProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> 
   description?: React.ReactNode;
   /** `id` для описания; для `aria-describedby` на `Modal.Content` передайте то же значение. */
   descriptionId?: string;
-  /** Обычно `Modal.Close` с кнопкой закрытия. */
-  children?: React.ReactNode;
+  /** Показать встроенную кнопку закрытия в шапке (иконка). */
+  showClose?: boolean;
+  /** Подпись для встроенной кнопки закрытия (`aria-label`). */
+  closeAriaLabel?: string;
 };
 
 function ModalHeader({
@@ -263,10 +246,12 @@ function ModalHeader({
   titleId: titleIdProp,
   description,
   descriptionId: descriptionIdProp,
-  children,
+  showClose = true,
+  closeAriaLabel = "Close",
   className,
   ...rest
 }: ModalHeaderProps) {
+  const { onClose } = useModalContext();
   const genTitleId = React.useId();
   const genDescId = React.useId();
   const titleId = titleIdProp ?? genTitleId;
@@ -274,22 +259,38 @@ function ModalHeader({
     description != null && description !== "" ? (descriptionIdProp ?? genDescId) : undefined;
 
   return (
-    <ModalHeaderContext.Provider value={true}>
-      <header className={cx(styles.header, className)} {...rest}>
-        {icon && <div className={styles.headerIcon}>{icon}</div>}
-        <div className={styles.headText}>
-          <h2 id={titleId} className={styles.title}>
-            {title}
-          </h2>
-          {description != null && description !== "" ? (
-            <p id={descriptionId} className={styles.description}>
-              {description}
-            </p>
-          ) : null}
-          {children}
-        </div>
-      </header>
-    </ModalHeaderContext.Provider>
+    <header className={cx(styles.header, className)} {...rest}>
+      {icon && <div className={styles.headerIcon}>{icon}</div>}
+      <div className={styles.headText}>
+        <h2 id={titleId} className={styles.title}>
+          {title}
+        </h2>
+        {description != null && description !== "" ? (
+          <p id={descriptionId} className={styles.description}>
+            {description}
+          </p>
+        ) : null}
+        {showClose ? (
+          <Button.Root
+            type="button"
+            variant="neutral"
+            mode="ghost"
+            size={MODAL_SHELL_SIZE}
+            aria-label={closeAriaLabel}
+            className={styles.closeBtn}
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+              if (!event.defaultPrevented) {
+                onClose();
+              }
+            }}
+          >
+            <Button.Icon>
+              <Icon name="action.close" tone="subtle" />
+            </Button.Icon>
+          </Button.Root>
+        ) : null}
+      </div>
+    </header>
   );
 }
 

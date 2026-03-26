@@ -43,15 +43,8 @@ export default function ModalFeaturesSnippet() {
                     icon={<Icon name="nav.layoutGrid" />}
                     titleId="modal-feat-portal-title"
                     title="Свой контейнер"
-                  >
-                    <Modal.Close>
-                      <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                        <Button.Icon>
-                          <Icon name="action.close" tone="subtle" />
-                        </Button.Icon>
-                      </Button.Root>
-                    </Modal.Close>
-                  </Modal.Header>
+                    closeAriaLabel="Закрыть"
+                  />
                   <Modal.Body>
                     <p>Содержимое портала — дочерний узел выделенной области выше.</p>
                   </Modal.Body>
@@ -81,15 +74,8 @@ export default function ModalFeaturesSnippet() {
                     фон страницы оставался заблокированным.
                   </>
                 }
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                closeAriaLabel="Закрыть"
+              />
               <Modal.Body style={{ maxHeight: "10rem", overflowY: "auto" }}>
                 {[
                   "Пункт списка 1: текст для проверки прокрутки внутри диалога.",

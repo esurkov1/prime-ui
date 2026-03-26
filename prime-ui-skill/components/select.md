@@ -161,13 +161,7 @@ export function TicketCategoryModal() {
               titleId="ticket-cat-title"
               title="Request category"
               description="Choose a topic before sending to the queue."
-            >
-              <Modal.Close>
-                <Button.Root size="m" variant="neutral" mode="ghost" aria-label="Close dialog">
-                  Close
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Header>
+            />
             <Modal.Body>
               <Select.Root size="m" defaultValue="billing" placeholder="Category">
                 <Select.Trigger aria-label="Ticket category">

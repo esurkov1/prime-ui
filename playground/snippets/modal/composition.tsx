@@ -31,15 +31,8 @@ export default function ModalCompositionSnippet() {
                 titleId="modal-comp-header-footer-title"
                 title="Подтверждение без контента"
                 description="Когда нужен только заголовок и действия."
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                closeAriaLabel="Закрыть"
+              />
               <Modal.Footer>
                 <Modal.Close>
                   <Button.Root size="m" variant="neutral" mode="stroke">
@@ -69,15 +62,8 @@ export default function ModalCompositionSnippet() {
                 titleId="modal-comp-header-body-title"
                 title="Только информация"
                 description="Футер не нужен, если нет явных действий."
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                closeAriaLabel="Закрыть"
+              />
               <Modal.Body>
                 <p style={{ margin: 0 }}>Контент отделён от шапки и не прилипает к заголовку.</p>
               </Modal.Body>
@@ -99,15 +85,8 @@ export default function ModalCompositionSnippet() {
                 titleId="modal-comp-header-only-title"
                 title="Короткое уведомление"
                 description="Полный блок шапки: заголовок и описание, без контента и футера."
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                closeAriaLabel="Закрыть"
+              />
             </Modal.Content>
           </Modal.Overlay>
         </Modal.Portal>
@@ -127,15 +106,8 @@ export default function ModalCompositionSnippet() {
                 titleId="modal-comp-form-title"
                 title="Контакт получателя"
                 description="Заполните поле перед сохранением маршрута."
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                closeAriaLabel="Закрыть"
+              />
               <Modal.Body>
                 <Input.Root label="Телефон курьера" size="m" hint="Формат: +7 и далее цифры">
                   <Input.Wrapper>
@@ -176,15 +148,8 @@ export default function ModalCompositionSnippet() {
                     ссылка.
                   </>
                 }
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                closeAriaLabel="Закрыть"
+              />
               <Modal.Body>
                 <p>Краткий текст политики: данные используются только для оказания услуги.</p>
               </Modal.Body>

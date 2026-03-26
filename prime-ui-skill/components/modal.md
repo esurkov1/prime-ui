@@ -21,7 +21,7 @@ Import from the `prime-ui-kit` package. Examples are grouped by screen intent an
 
 ### Structure and short combinations
 
-Recommended `Modal.Content` structure: required `Modal.Header` (fixed header layout: `title`, optional `description`, optional `icon`, optional `Modal.Close`), optional `Modal.Body` and `Modal.Footer`.
+Recommended `Modal.Content` structure: required `Modal.Header` (fixed header layout: `title`, optional `description`, optional `icon`, built-in header close via `showClose`), optional `Modal.Body` and `Modal.Footer`.
 
 ```tsx
 import { Button, Icon, Modal } from "prime-ui-kit";
@@ -42,15 +42,7 @@ export function ModalStructureExamples() {
                 titleId="m-struct-header-footer-title"
                 title="Confirmation without body"
                 description="Suits a short question with an explicit choice."
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Close">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+              />
               <Modal.Footer>
                 <Modal.Close>
                   <Button.Root size="m" variant="neutral" mode="stroke">
@@ -79,15 +71,7 @@ export function ModalStructureExamples() {
                 icon={<Icon name="nav.itemDot" />}
                 titleId="m-struct-header-body-title"
                 title="Information dialog"
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Close">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+              />
               <Modal.Body>
                 <p style={{ margin: 0 }}>
                   A footer is optional when there is no separate action button row.
@@ -111,15 +95,7 @@ export function ModalStructureExamples() {
                 titleId="m-struct-header-only-title"
                 title="Short notice"
                 description="Full header block: title and description, no body or footer."
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Close">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+              />
             </Modal.Content>
           </Modal.Overlay>
         </Modal.Portal>
@@ -153,15 +129,7 @@ export function DeleteDraftConfirm() {
               descriptionId="del-draft-desc"
               title="Delete draft?"
               description="This cannot be undone. Only this document will be affected."
-            >
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="ghost" aria-label="Close">
-                  <Button.Icon>
-                    <Icon name="action.close" tone="subtle" />
-                  </Button.Icon>
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Header>
+            />
             <Modal.Footer>
               <Modal.Close>
                 <Button.Root size="m" variant="neutral" mode="stroke">
@@ -200,15 +168,7 @@ export function KioskAnnouncement() {
               titleId="kiosk-title"
               title="Short hours today"
               description="Cashiers close at 4:00 PM. Thanks for your understanding."
-            >
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="ghost" aria-label="Close">
-                  <Button.Icon>
-                    <Icon name="action.close" tone="subtle" />
-                  </Button.Icon>
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Header>
+            />
             <Modal.Body>
               <p style={{ margin: 0 }}>Planned equipment work will finish before we open tomorrow.</p>
             </Modal.Body>
@@ -250,15 +210,7 @@ export function SupportTicketModal() {
               titleId="ticket-title"
               title="New request"
               description="Briefly describe the issue — we will reply to the email on your profile."
-            >
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="ghost" aria-label="Close">
-                  <Button.Icon>
-                    <Icon name="action.close" tone="subtle" />
-                  </Button.Icon>
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Header>
+            />
             <Modal.Body>
               <Input.Root label="Subject" size="m">
                 <Input.Wrapper>
@@ -308,15 +260,7 @@ export function SimpleConfirmModal() {
               titleId="simple-title"
               title="Confirm action"
               description="Changes will apply to all selected items."
-            >
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="ghost" aria-label="Close">
-                  <Button.Icon>
-                    <Icon name="action.close" tone="subtle" />
-                  </Button.Icon>
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Header>
+            />
             <Modal.Footer>
               <Modal.Close>
                 <Button.Root size="m" variant="neutral" mode="stroke">
@@ -377,15 +321,7 @@ export function WizardStepModal() {
                 titleId={`wiz-${step}-title`}
                 title={`Step ${step} of 2`}
                 description={step === 1 ? "Verify your contact details." : "Confirm to finish."}
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Close">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+              />
               <Modal.Body>
                 {step === 1 ? <p style={{ margin: 0 }}>Profile data looks good.</p> : <p style={{ margin: 0 }}>Settings will be saved.</p>}
               </Modal.Body>
@@ -423,7 +359,7 @@ Typical markup:
 
 Inside `Content`:
 
-- `Header` — fixed layout: `title` (`h2`), optional `description` (`p`), optional `icon`, optional `Close` with a button;
+- `Header` — fixed layout: `title` (`h2`), optional `description` (`p`), optional `icon`, built-in icon close (`showClose`, `closeAriaLabel`);
 - `Body` — optional main content;
 - `Footer` — optional action row.
 
@@ -452,7 +388,7 @@ Inside `Content`:
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| `children` | `React.ReactElement<{ onClick?: …; className?: string; size?: ButtonSize }>` | — | Yes | One element; click closes the modal. Inside `Header`, `Button.Root` without `size` gets size **`m`**. |
+| `children` | `React.ReactElement<{ onClick?: …; className?: string; size?: ButtonSize }>` | — | Yes | One element (usually a footer button); click closes the modal. |
 
 ### Modal.Portal
 
@@ -489,7 +425,8 @@ Inside `Content`:
 | `description` | `React.ReactNode` | — | No | Secondary text (renders as `<p>`). |
 | `descriptionId` | `string` | auto (`useId`) | No | `id` on the `<p>`; pass the same value as `aria-describedby` on `Content` when needed. |
 | `icon` | `React.ReactNode` | — | No | Icon to the left of the text column. |
-| `children` | `React.ReactNode` | — | No | Usually `Modal.Close` with a button. |
+| `showClose` | `boolean` | `true` | No | Show the built-in header close (icon button). |
+| `closeAriaLabel` | `string` | `"Close"` | No | `aria-label` for the built-in header close button. |
 | `className` | `string` | — | No | Extra class on `<header>`. |
 | … | `Omit<React.HTMLAttributes<HTMLElement>, "title">` | — | No | Root `<header>`. |
 
@@ -511,7 +448,7 @@ Inside `Content`:
 
 ## Variants
 
-There is no separate `variant` prop on the modal, and **no `size` on `Modal.Root`**: the shell is a single fixed scale (`m`) — panel width, backdrop padding, header layout, and default close button size in the header (when `Button` inside `Modal.Close` has no own `size`). Button semantics (primary, neutral, error) come from `Button` components inside the modal.
+There is no separate `variant` prop on the modal, and **no `size` on `Modal.Root`**: the shell is a single fixed scale (`m`) — panel width, backdrop padding, header layout, and a built-in header close control (`showClose`). Button semantics (primary, neutral, error) come from `Button` components inside the modal (typically in the footer).
 
 ## States
 
@@ -525,12 +462,11 @@ There is no separate `variant` prop on the modal, and **no `size` on `Modal.Root
 - Panel uses `role="dialog"` and `aria-modal="true"`. Set **`aria-labelledby`** to the **`titleId`** used on `Modal.Header` (or rely on auto-generated ids and avoid duplicate labelling), and **`aria-describedby`** to **`descriptionId`** when you expose description; if there is no visible title, use **`aria-label`** on `Content`.
 - **Escape** closes the dialog unless `closeOnEscape` is disabled.
 - Focus stays inside `Content` while the modal is open.
-- The header close control needs an accessible name (`aria-label` or visible text).
+- The built-in header close uses **`closeAriaLabel`** (default `"Close"`); override with `closeAriaLabel` when you localize the UI.
 
 ## Limitations and notes
 
 - **No built-in `asChild`:** `Trigger` and `Close` expect **exactly one** child React element and merge `onClick` via `cloneElement`.
-- In **`Modal.Close`** inside **`Modal.Header`**, for a child with `displayName === "ButtonRoot"` without `size`, size **`m`** is applied; outside the header this injection does not happen.
 - Long content: constrain **`Modal.Body`** height (or via class) and use **`overflow`** so scrolling happens inside the panel while the backdrop stays locked.
 - The **`container`** prop on **`Modal.Portal`** sets the mount node instead of `document.body` (tests, special stacking contexts); the backdrop remains `position: fixed` to the viewport unless ancestors change positioning context.
 - Full-width buttons in the panel — use **`fullWidth`** on **`Button.Root`** or footer layout; the modal has no dedicated prop for that.

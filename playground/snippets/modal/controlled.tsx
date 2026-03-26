@@ -29,15 +29,8 @@ export default function ModalControlledSnippet() {
                     Открытие и закрытие идут через <code>open</code> и <code>onOpenChange</code>.
                   </>
                 }
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                closeAriaLabel="Закрыть"
+              />
               <Modal.Body>
                 <p>Триггер внутри разметки не обязателен: окно управляется родителем.</p>
               </Modal.Body>

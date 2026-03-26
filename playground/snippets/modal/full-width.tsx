@@ -24,15 +24,8 @@ export default function ModalFullWidthSnippet() {
                   <code>fullWidth</code>, панель задаёт ширину колонки.
                 </>
               }
-            >
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                  <Button.Icon>
-                    <Icon name="action.close" tone="subtle" />
-                  </Button.Icon>
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Header>
+              closeAriaLabel="Закрыть"
+            />
             <Modal.Body>
               <p style={{ margin: 0 }}>Проверьте состав корзины перед оплатой.</p>
             </Modal.Body>

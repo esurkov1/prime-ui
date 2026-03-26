@@ -27,11 +27,7 @@ function BasicModal({
             descriptionId="dlg-desc"
             title="Test title"
             description="Test description"
-          >
-            <Modal.Close>
-              <Button.Root aria-label="Close modal">X</Button.Root>
-            </Modal.Close>
-          </Modal.Header>
+          />
           <Modal.Body>
             <p>Body content</p>
             <Button.Root>Focusable inside</Button.Root>
@@ -71,19 +67,19 @@ describe("Modal (composable API)", () => {
     expect(modal).toHaveAttribute("aria-describedby", "dlg-desc");
   });
 
-  it("uses modal shell size for Button.Root close control inside Header when size is omitted", () => {
+  it("uses modal shell size on built-in header close button", () => {
     render(<BasicModal />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
-    expect(screen.getByRole("button", { name: "Close modal" })).toHaveAttribute("data-size", "m");
+    expect(screen.getByRole("button", { name: "Close" })).toHaveAttribute("data-size", "m");
   });
 
-  it("closes via Modal.Close button inside Header", () => {
+  it("closes via built-in header close button", () => {
     render(<BasicModal />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Close modal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
@@ -184,7 +180,7 @@ describe("Modal (composable API)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
     await waitFor(() => {
-      const closeBtn = screen.getByRole("button", { name: "Close modal" });
+      const closeBtn = screen.getByRole("button", { name: "Close" });
       expect(document.activeElement).toBe(closeBtn);
     });
   });

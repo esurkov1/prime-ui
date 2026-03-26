@@ -19,15 +19,8 @@ export default function ModalResponsiveSnippet() {
               titleId="modal-responsive-title"
               title="Адаптивная ширина"
               description="При уменьшении окна браузера панель сжимается вместе с полем, не вылезая за отступы затемнения."
-            >
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                  <Button.Icon>
-                    <Icon name="action.close" tone="subtle" />
-                  </Button.Icon>
-                </Button.Root>
-              </Modal.Close>
-            </Modal.Header>
+              closeAriaLabel="Закрыть"
+            />
             <Modal.Body>
               <p>
                 Смените ширину окна: на десктопе виден верхний предел по токенам, на мобильной

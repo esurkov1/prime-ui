@@ -75,8 +75,7 @@ const modalCloseApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactElement<{ onClick?: …; className?: string; size?: ButtonSize }>",
     defaultValue: "—",
     required: "Да",
-    description:
-      "Ровно один дочерний элемент; по клику закрывает модал. В шапке для Button.Root без size подставляется размер m.",
+    description: "Ровно один дочерний элемент (обычно кнопка в подвале); по клику закрывает модал.",
   },
 ];
 
@@ -204,11 +203,18 @@ const modalHeaderApiRows: PlaygroundApiPropRow[] = [
     description: "Иконка слева от текстовой колонки.",
   },
   {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
+    prop: "showClose",
+    type: "boolean",
+    defaultValue: "true",
     required: "Нет",
-    description: "Обычно `Modal.Close`; контекст для кнопки закрытия в шапке.",
+    description: "Показать встроенную кнопку закрытия (иконка) в шапке.",
+  },
+  {
+    prop: "closeAriaLabel",
+    type: "string",
+    defaultValue: '"Close"',
+    required: "Нет",
+    description: "`aria-label` встроенной кнопки закрытия.",
   },
   {
     prop: "className",
@@ -387,8 +393,8 @@ export default function ModalSection() {
           <PlaygroundApiTable rows={modalTriggerApiRows} />
           <h5>Modal.Close</h5>
           <p className="demoBlockDescription">
-            Закрывает модал по клику; внутри <code>Modal.Header</code> выравнивает{" "}
-            <code>Button.Root</code> по размеру оболочки.
+            Оборачивает кнопку действия, которая должна закрыть модал (чаще в подвале: «Отмена»,
+            «Готово»).
           </p>
           <PlaygroundApiTable rows={modalCloseApiRows} />
           <h5>Modal.Portal</h5>
@@ -411,7 +417,7 @@ export default function ModalSection() {
           <h5>Modal.Header</h5>
           <p className="demoBlockDescription">
             Единая шапка: заголовок и опциональное описание с фиксированной вёрсткой; опциональная
-            иконка; контекст для <code>Modal.Close</code>.
+            иконка; по умолчанию встроенная кнопка закрытия (<code>showClose</code>).
           </p>
           <PlaygroundApiTable rows={modalHeaderApiRows} />
           <h5>Modal.Body</h5>

@@ -19,15 +19,8 @@ export default function ModalStatesSnippet() {
                 titleId="modal-state-default-title"
                 title="Стандартное поведение"
                 description="Закрытие по Escape и по клику на затемнённый фон (если клик не на панели)."
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                closeAriaLabel="Закрыть"
+              />
               <Modal.Body>
                 <p>Попробуйте Escape и клик по области вне белой панели.</p>
               </Modal.Body>
@@ -58,15 +51,8 @@ export default function ModalStatesSnippet() {
                     <code>closeOnOverlayClick=&#123;false&#125;</code> — выход только через кнопки.
                   </>
                 }
-              >
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
-                    <Button.Icon>
-                      <Icon name="action.close" tone="subtle" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Modal.Close>
-              </Modal.Header>
+                showClose={false}
+              />
               <Modal.Body>
                 <p>Escape и клик по фону не закроют окно.</p>
               </Modal.Body>
