@@ -10,7 +10,6 @@ import { NavLink } from "react-router-dom";
 
 import { Divider } from "@/components/divider/Divider";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
-import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Typography } from "@/components/typography/Typography";
 import { cx } from "@/internal/cx";
 import { Slot } from "@/internal/slot";
@@ -517,48 +516,6 @@ const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRou
 
 SidebarMenuRouterLink.displayName = "SidebarMenuRouterLink";
 
-export type SidebarItemProps = Omit<SidebarMenuButtonProps, "children"> & {
-  icon?: React.ReactNode;
-  label: React.ReactNode;
-  trailing?: React.ReactNode;
-  tooltip?: React.ReactNode | boolean;
-};
-
-const SidebarItem = React.forwardRef<HTMLButtonElement, SidebarItemProps>(
-  ({ className, icon, label, trailing, tooltip = true, active, ...rest }, ref) => {
-    const { state, isMobile, side } = useSidebarContext();
-    const compact = state === "compact" && !isMobile;
-    const showTooltip = compact && tooltip !== false;
-    const tooltipLabel = tooltip === true ? label : tooltip;
-
-    const node = (
-      <SidebarMenuButton
-        {...rest}
-        ref={ref}
-        active={active}
-        className={cx(styles.itemButton, className)}
-      >
-        {icon === undefined ? null : <SidebarMenuIcon>{icon}</SidebarMenuIcon>}
-        <SidebarMenuLabel>{label}</SidebarMenuLabel>
-        {trailing === undefined ? null : <SidebarMenuTrailing>{trailing}</SidebarMenuTrailing>}
-      </SidebarMenuButton>
-    );
-
-    return (
-      <Tooltip.Root open={showTooltip ? undefined : false}>
-        <Tooltip.Trigger>{node}</Tooltip.Trigger>
-        {tooltipLabel === false || tooltipLabel === undefined ? null : (
-          <Tooltip.Content side={side === "left" ? "right" : "left"}>
-            {tooltipLabel}
-          </Tooltip.Content>
-        )}
-      </Tooltip.Root>
-    );
-  },
-);
-
-SidebarItem.displayName = "SidebarItem";
-
 export type SidebarNavPanelBodyProps = React.ComponentPropsWithoutRef<typeof ScrollContainer>;
 
 function SidebarNavPanelBody({ className, axis = "vertical", ...rest }: SidebarNavPanelBodyProps) {
@@ -704,7 +661,6 @@ export const Sidebar = Object.assign(SidebarComposedRoot, {
   Group: SidebarGroup,
   GroupLabel: SidebarGroupLabel,
   Separator: SidebarSeparator,
-  Item: SidebarItem,
   Menu: SidebarMenu,
   MenuItem: SidebarMenuItem,
   MenuButton: SidebarMenuButton,

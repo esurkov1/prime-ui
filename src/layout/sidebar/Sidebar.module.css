@@ -325,10 +325,6 @@
   background: var(--prime-sys-color-action-neutralBackgroundHover);
 }
 
-.itemButton {
-  width: 100%;
-}
-
 .menuIcon {
   display: inline-flex;
   align-items: center;
