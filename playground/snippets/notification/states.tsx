@@ -90,6 +90,25 @@ export default function NotificationStatesSnippet() {
         >
           Тост для проверки паузы
         </Button.Root>
+        <Button.Root
+          type="button"
+          size="s"
+          variant="neutral"
+          mode="stroke"
+          onClick={() =>
+            notify({
+              type: "success",
+              title: "Сохранено",
+              description: "Тот же вид, что у статичных «Вариантов»: persistent — акцент и пульс.",
+              persistent: true,
+              closable: true,
+              position: "top-right",
+              size: "m",
+            })
+          }
+        >
+          notify + persistent
+        </Button.Root>
       </div>
     </div>
   );

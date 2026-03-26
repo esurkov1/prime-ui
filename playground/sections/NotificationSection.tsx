@@ -354,8 +354,9 @@ export default function NotificationSection() {
           <DemoSectionTitle>Состояния</DemoSectionTitle>
           <DemoDescription>
             Статично: <code>persistent</code> (без полосы таймера) и <code>closable=false</code>{" "}
-            (без крестика). Кнопки вызывают <code>notify</code> с коротким <code>duration</code> и с
-            подсказкой про паузу при наведении на стек.
+            (без крестика). Кнопки вызывают <code>notify</code>: короткий таймер, пауза при
+            наведении на стек — и отдельно <code>notify</code> с <code>persistent: true</code>{" "}
+            (акцентная обводка и пульс, как в блоке «Варианты»).
           </DemoDescription>
           <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
