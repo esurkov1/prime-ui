@@ -2,236 +2,117 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-A composite announcement strip: a root grid with a central text block and an optional close button; inside — slots for an icon, title, description, and a row of actions.
+An in-flow announcement strip: a root grid with a central content column and an optional dismiss control on the right. Use `status` and `variant` for semantic color and density; optional slots cover icon, title, description, and actions.
 
-## What it’s for
+- **Use** for persistent page- or section-level messages (policy, incident, feature, validation summary) where the user should read the text in context.
+- **Use** when you need optional actions (`Banner.Actions`) or dismiss without leaving the page.
+- **Use** `size` to align spacing and typography with surrounding controls (`ControlSizeProvider` context applies to `Banner.CloseButton`).
+- **Do not use** for transient overlay feedback; prefer [Notification](../notification/COMPONENT.md) or similar patterns.
+- **Do not use** as a substitute for [Modal](../modal/COMPONENT.md) or [Drawer](../drawer/COMPONENT.md) when the user must complete a blocking task.
+- **Do not use** decorative icons without `aria-hidden` (or an accessible name) when the icon is not redundant with the title.
 
-- **Logistics and order status** — one prominent row above tracking: delivery delayed, order picked, or awaiting payment, with a “Learn more” action without opening a modal.
-- **Approvals and internal panels** — warning about a document approval deadline or a blocked stage, with `warning` or `error` semantics and the ability to hide the strip after reading.
-- **Onboarding and releases** — short message about a new feature (`feature`) or UI change, with a lighter background variant and a link in the actions.
-- **Forms and checkout** — unobtrusive hint before submit (policy, shipping, regional limits) with `stroke` or `lighter`, not competing with inputs.
-- **Technical incidents** — global strip about an API outage or maintenance (`information` / `error`), full width of the content area and explicit dismiss for repeat visits.
+## Composition
 
-## Use cases
+- `Banner.Root` is the outer `div` and size provider; pass `variant`, `status`, `size`, and optionally `onDismiss`.
+- Put primary copy inside `Banner.Content`. Typical order: `Banner.Icon` (optional), `Banner.Title`, `Banner.Description` (optional), `Banner.Actions` (optional).
+- `Banner.CloseButton` must be a **direct child** of `Banner.Root` (a sibling of `Banner.Content`, not nested inside `Content`). The implementation only scans **direct** children to decide whether to inject a default close button when `onDismiss` is set; a close control placed only inside `Banner.Content` does not suppress injection.
+- If `onDismiss` is provided and no direct child is `Banner.CloseButton`, the root appends a default close button that calls `onDismiss`.
 
-Each example is a different screen type and prop set; import from the `prime-ui-kit` package.
-
-### Basic
-
-Profile settings page: neutral reminder to save changes before leaving, without actions and without dismiss.
+### Minimal example
 
 ```tsx
-import { User } from "lucide-react";
 import { Banner } from "prime-ui-kit";
 
-export function ProfileSettingsHint() {
+export function Example() {
   return (
-    <Banner.Root status="information" variant="lighter" size="m">
+    <Banner.Root>
       <Banner.Content>
-        <Banner.Icon as={User} aria-hidden />
-        <Banner.Title>Draft not saved</Banner.Title>
-        <Banner.Description>Unsaved fields will be lost if you switch to another tab.</Banner.Description>
+        <Banner.Title>Title</Banner.Title>
       </Banner.Content>
     </Banner.Root>
   );
 }
 ```
 
-### Variants / sizes
+## Rules
 
-Pricing page: the same promo copy in four sizes to align with the plan card grid.
-
-```tsx
-import { Sparkles } from "lucide-react";
-import { Banner } from "prime-ui-kit";
-
-export function PricingPromoStripes() {
-  return (
-    <div className="previewBannerColumn">
-      {(["s", "m", "l", "xl"] as const).map((size) => (
-        <Banner.Root key={size} status="feature" variant="light" size={size}>
-          <Banner.Content>
-            <Banner.Icon as={Sparkles} aria-hidden />
-            <Banner.Title>40% off your first month</Banner.Title>
-            <Banner.Description>Valid for new workspaces until the end of the quarter.</Banner.Description>
-          </Banner.Content>
-        </Banner.Root>
-      ))}
-    </div>
-  );
-}
-```
-
-### In context (form / modal / sidebar / …)
-
-Table import modal: parse error at the top of the dialog, with “Download template” and dismissing the strip after fixing.
-
-```tsx
-import { AlertCircle } from "lucide-react";
-import { Banner, Button } from "prime-ui-kit";
-
-export function ImportModalErrorBanner({ onDismiss }: { onDismiss: () => void }) {
-  return (
-    <Banner.Root status="error" variant="filled" size="m" onDismiss={onDismiss}>
-      <Banner.Content>
-        <Banner.Icon as={AlertCircle} aria-hidden />
-        <Banner.Title>Could not read the file</Banner.Title>
-        <Banner.Description>Check UTF-8 encoding and that columns “Code” and “Quantity” are present.</Banner.Description>
-        <Banner.Actions>
-          <Button.Root size="s" type="button" variant="neutral" mode="ghost">
-            Download template
-          </Button.Root>
-        </Banner.Actions>
-      </Banner.Content>
-    </Banner.Root>
-  );
-}
-```
-
-### Controlled mode
-
-Monitoring dashboard: strip about degraded metric accuracy only until the operator clicks “Got it”; visibility is held in the parent.
-
-```tsx
-import * as React from "react";
-import { Activity } from "lucide-react";
-import { Banner, Button } from "prime-ui-kit";
-
-export function MetricsDegradedBanner() {
-  const [visible, setVisible] = React.useState(true);
-
-  if (!visible) {
-    return (
-      <Button.Root size="s" type="button" variant="neutral" onClick={() => setVisible(true)}>
-        Show metrics notice
-      </Button.Root>
-    );
-  }
-
-  return (
-    <Banner.Root status="warning" variant="stroke" size="m">
-      <Banner.Content>
-        <Banner.Icon as={Activity} aria-hidden />
-        <Banner.Title>Aggregation delay 5–10 minutes</Banner.Title>
-        <Banner.Description>Data for the latest interval may still be loading; alerts operate normally.</Banner.Description>
-        <Banner.Actions>
-          <Button.Root size="s" type="button" variant="primary" onClick={() => setVisible(false)}>
-            Got it
-          </Button.Root>
-        </Banner.Actions>
-      </Banner.Content>
-    </Banner.Root>
-  );
-}
-```
-
-## Anatomy
-
-`Banner.Root` → size provider for nested controls.
-
-Inside the root, typically:
-
-- `Banner.Content` → `Banner.Icon` + `Banner.Title` + `Banner.Description` + optional `Banner.Actions`
-- optional `Banner.CloseButton` as a sibling of `Banner.Content` (right-hand grid column)
-
-If `onDismiss` is passed and there is no `Banner.CloseButton` in the tree, a close button is added automatically.
+- There is no `open` / `visible` prop: mount or unmount the root (or hide it with parent state) to show or hide the strip.
+- `variant` defaults to `filled`; `status` to `information`; `size` to `m`. `stroke` uses a neutral surface with a status-colored bottom accent bar.
+- Decorative icons: pass `aria-hidden` on the underlying SVG/component when the title already conveys the message.
+- For a meaningful page-level region, set `role="region"` and `aria-label` or `aria-labelledby` on `Banner.Root` via standard HTML attributes.
+- The auto-injected dismiss control uses `aria-label="Dismiss"`; set an explicit `aria-label` (or equivalent) on a custom `Banner.CloseButton` in the product language.
+- `Banner.Title` and `Banner.Description` render as `span` elements; keep markup intentional if you nest interactive elements.
+- `Banner.Icon` is driven by the `as` prop (not `asChild` on the root).
 
 ## API
 
 ### Banner.Root
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| variant | `"filled" \| "light" \| "lighter" \| "stroke"` | `"filled"` | No | Background density and accent style (`stroke` adds a colored bottom bar). |
-| status | `"information" \| "warning" \| "error" \| "success" \| "feature"` | `"information"` | No | Palette semantics and typical message meaning. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Scale for spacing, text, and icon; provides context for `Banner.CloseButton`. |
-| onDismiss | `() => void` | — | No | When set and no child `Banner.CloseButton`, renders a close button with `aria-label` “Dismiss”. |
-| className | `string` | — | No | Extra class on the root. |
-| children | `React.ReactNode` | — | No | Content and, if needed, an explicit close button. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other attributes on the root `div`. |
+|------|------|---------|----------|-------------|
+| variant | `"filled" \| "light" \| "lighter" \| "stroke"` | `"filled"` | No | Background density and accent treatment (`stroke` adds a status-colored bottom bar). |
+| status | `"information" \| "warning" \| "error" \| "success" \| "feature"` | `"information"` | No | Semantic palette for the strip. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Spacing and type scale; feeds `Banner.CloseButton` via control-size context. |
+| onDismiss | `() => void` | — | No | When set and no direct `Banner.CloseButton` child exists, renders a default close button that invokes this callback. |
+| className | `string` | — | No | Additional class on the root `div`. |
+| children | `React.ReactNode` | — | No | Typically `Banner.Content` and optionally `Banner.CloseButton`. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Native attributes on the root `div` (e.g. `id`, `role`, ARIA). |
 
 ### Banner.Content
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| className | `string` | — | No | Class for the central column flex container. |
-| children | `React.ReactNode` | — | No | Icon, title, description, actions. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the inner `div`. |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Additional class on the content column `div`. |
+| children | `React.ReactNode` | — | No | Icon, title, description, and/or actions. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Native attributes on the inner `div`. |
 
 ### Banner.Icon
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| as | `React.ElementType` | `"div"` | No | Element or icon component (often an SVG component with `aria-hidden`). |
-| className | `string` | — | No | Extra class on the wrapper. |
-| children | `React.ReactNode` | — | No | Content when `as="div"` or with a custom wrapper. |
-| …rest | props of `T` without `as` and `className` | — | No | Forwarded to the chosen element. |
+|------|------|---------|----------|-------------|
+| as | `React.ElementType` | `"div"` | No | Element or component to render (often an icon component). |
+| className | `string` | — | No | Additional class on the wrapper. |
+| children | `React.ReactNode` | — | No | Content when using the default element or a custom wrapper. |
+| …rest | props of `T` without `as` and `className` | — | No | Forwarded to the element chosen by `as`. |
 
 ### Banner.Title
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| className | `string` | — | No | Class for the title `span`. |
-| children | `React.ReactNode` | — | No | Title text. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Additional class on the `span`. |
+| children | `React.ReactNode` | — | No | Primary heading text. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Native `span` attributes. |
 
 ### Banner.Description
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| className | `string` | — | No | Class for the description `span`. |
-| children | `React.ReactNode` | — | No | Secondary text. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Additional class on the `span`. |
+| children | `React.ReactNode` | — | No | Supporting text. |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Native `span` attributes. |
 
 ### Banner.Actions
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| className | `string` | — | No | Class for the button row container. |
-| children | `React.ReactNode` | — | No | `Button`, `LinkButton`, etc. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `div` attributes. |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Additional class on the actions row `div`. |
+| children | `React.ReactNode` | — | No | Action controls (e.g. `Button`, `LinkButton`). |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Native attributes on the row `div`. |
 
 ### Banner.CloseButton
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Native button `type`. |
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Defaults to a cross icon in `Button.Icon`. |
-| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | No | Including `onClick`, `aria-label`, `disabled`; button size comes from banner context. |
+|------|------|---------|----------|-------------|
+| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Native `button` type. |
+| className | `string` | — | No | Additional class on the button. |
+| children | `React.ReactNode` | — | No | Button content; defaults to a cross icon when omitted. |
+| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | No | Other button props; `size` is derived from banner context. |
 
-## Variants
+## Related
 
-- **filled** — saturated status background and high-contrast text; maximum prominence.
-- **light** — soft background from the status palette and status-colored text; balanced default.
-- **lighter** — status background blended with the page surface; calm reminder.
-- **stroke** — neutral surface, accent is a colored bottom line and status-colored icon.
-
-## States
-
-Semantics are driven by the **`status`** prop: tokens for background, text, and accent are chosen per type. The root has no separate `disabled` or `loading` props.
-
-**Dismissal:** either **`onDismiss`** (and if there is no custom `Banner.CloseButton`, the default one is added), or only **`Banner.CloseButton`** with its own `onClick`, or both — then the automatic button is **not** duplicated if `Banner.CloseButton` already exists among descendants.
-
-## Accessibility (a11y)
-
-- Root is a `div`; set **`role="region"`** and **`aria-label` / `aria-labelledby`** when the strip is a meaningful landmark.
-- Icons in `Banner.Icon` are usually decorative: **`aria-hidden`** on the icon component.
-- The auto-inserted close button uses **`aria-label="Dismiss"`**; for a custom button, set a clear **`aria-label`** in the UI language.
-- `Banner.Title` and `Banner.Description` are `span`s; long text wraps via the content flex layout.
-
-## Limitations and notes
-
-- No built-in **`open` / `visible`**: show/hide via conditional render or parent state.
-- **`Banner.Icon`** uses the **`as`** prop, not `asChild` on the root.
-- The grid expects **one** central content group and **one** dismiss zone on the right; multi-column layouts are better composed outside.
-- Title and description are inline `span`s; for rich formatting, nest allowed markup deliberately.
-
-## Related components
-
-- **Button** — actions in `Banner.Actions`; `Banner.CloseButton` is built on `Button.Root` (ghost neutral).
-- **LinkButton** — secondary navigation in the strip without faking a `button`.
-- **Typography** — captions and hints next to the banner outside the slot (e.g. after dismissal).
-- **Notification** — for a toast or transient overlay instead of an in-flow strip.
+- [Button](../button/COMPONENT.md) — actions inside `Banner.Actions`; `Banner.CloseButton` wraps `Button.Root` (ghost neutral).
+- [LinkButton](../link-button/COMPONENT.md) — text-style navigation actions in the strip.
+- [Typography](../typography/COMPONENT.md) — surrounding captions or body copy outside the banner slots.
+- [Notification](../notification/COMPONENT.md) — transient or stacked overlay messages instead of an in-flow strip.
