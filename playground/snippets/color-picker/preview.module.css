@@ -6,26 +6,11 @@
   gap: var(--prime-sys-spacing-x3);
 }
 
-/* То же визуально, что ExampleSurface + .card, но один узел внутри Popover */
-.fieldPopoverPanel {
-  display: flex;
+/* Ширина панели в сниппете «Field + пипетка» — без вложенной «карточки» */
+.featuresPopoverWidth {
   width: 19.5rem;
   max-width: 100%;
   min-width: 0;
-  overflow: hidden;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x3);
-  padding: var(--prime-sys-spacing-x4);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
-  border-radius: var(--prime-sys-shape-radius-l);
-  background: linear-gradient(
-      to bottom,
-      var(--prime-sys-color-surface-elevated),
-      var(--prime-sys-color-surface-raised)
-    )
-    padding-box;
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  box-sizing: border-box;
 }
 
 .sectionLabel {

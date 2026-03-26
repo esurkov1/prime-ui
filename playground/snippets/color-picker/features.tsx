@@ -21,44 +21,47 @@ export default function ColorPickerFeaturesSnippet() {
             Field + пипетка
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+        <Popover.Content
+          align="start"
+          className={preview.featuresPopoverWidth}
+          insetGap="x3"
+          insetPadding="x2"
+          side="bottom"
+        >
           <ColorPicker.FormatProvider>
-            <div className={preview.fieldPopoverPanel}>
-              <Typography.Root
-                as="p"
-                className={preview.sectionLabel}
-                variant="body-small"
-                weight="medium"
-                tone="muted"
+            <Typography.Root
+              as="p"
+              className={preview.sectionLabel}
+              variant="body-small"
+              weight="medium"
+              tone="muted"
+            >
+              Поле цвета (ColorField и встроенный Input из react-aria-components): ввод hex вручную
+            </Typography.Root>
+            <div className={preview.fieldRow}>
+              <ColorPicker.Field
+                aria-label="Шестнадцатеричный код цвета"
+                className={preview.fieldGrow}
               >
-                Поле цвета (ColorField и встроенный Input из react-aria-components): ввод hex
-                вручную
-              </Typography.Root>
-              <div className={preview.fieldRow}>
-                <ColorPicker.Field
-                  aria-label="Шестнадцатеричный код цвета"
-                  className={preview.fieldGrow}
-                >
-                  <RacInput />
-                </ColorPicker.Field>
-                <ColorPicker.EyeDropperButton aria-label="Пипетка">
-                  <Button.Icon>
-                    <Pipette aria-hidden size={18} strokeWidth={1.75} />
-                  </Button.Icon>
-                </ColorPicker.EyeDropperButton>
-              </div>
-
-              <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-                <ColorPicker.AreaThumb />
-              </ColorPicker.Area>
-
-              <ColorPicker.Slider channel="hue" colorSpace="hsl">
-                <ColorPicker.SliderMeta label="Оттенок, °" />
-                <ColorPicker.SliderTrack>
-                  <ColorPicker.Thumb />
-                </ColorPicker.SliderTrack>
-              </ColorPicker.Slider>
+                <RacInput />
+              </ColorPicker.Field>
+              <ColorPicker.EyeDropperButton aria-label="Пипетка">
+                <Button.Icon>
+                  <Pipette aria-hidden size={18} strokeWidth={1.75} />
+                </Button.Icon>
+              </ColorPicker.EyeDropperButton>
             </div>
+
+            <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+              <ColorPicker.AreaThumb />
+            </ColorPicker.Area>
+
+            <ColorPicker.Slider channel="hue" colorSpace="hsl">
+              <ColorPicker.SliderMeta label="Оттенок, °" />
+              <ColorPicker.SliderTrack>
+                <ColorPicker.Thumb />
+              </ColorPicker.SliderTrack>
+            </ColorPicker.Slider>
           </ColorPicker.FormatProvider>
         </Popover.Content>
       </Popover.Root>
