@@ -14,7 +14,7 @@ type Pane = "preview" | "code";
 export type ExampleFrameViewport = "desktop" | "tablet" | "mobile";
 type ColorScheme = "light" | "dark";
 
-/** Раскладка содержимого превью — чтобы в сниппетах не оборачивать компоненты в div.stack/row. */
+/** Раскладка содержимого превью (на узле `.previewInner`). */
 export type ExampleFramePreviewLayout =
   | "default"
   | "stack"
@@ -60,10 +60,7 @@ export type ExampleFrameRootProps = {
   showThemeToggle?: boolean;
   /** Вызывается после успешного копирования `code` в буфер. */
   onCopy?: () => void;
-  /**
-   * Как выстроить детей внутри превью. По умолчанию — по центру (один блок).
-   * Для списков из нескольких компонентов используйте `stack` / `stack-center` / `row`.
-   */
+  /** Как выстроить детей внутри превью. По умолчанию — по центру по обеим осям. */
   previewLayout?: ExampleFramePreviewLayout;
   /**
    * Синхронизация с глобальным бренд-пресетом (например playground: `data-theme-preset` на `html`).
@@ -157,24 +154,6 @@ function ExampleFrameRoot({
     previewChildren = children;
   }
 
-  const wrapStackPreviewLines = previewLayout === "stack" || previewLayout === "stack-narrow";
-  /* Fragment в сниппетах — один ребёнок у Root; toArray разворачивает его, иначе все поля
-   * попадают в один .previewStackLine с flex-direction: row. */
-  const previewCanvasBody = wrapStackPreviewLines
-    ? React.Children.toArray(previewChildren).map((child, index) => {
-        if (child == null) return child;
-        if (!React.isValidElement(child)) return child;
-        return (
-          <div
-            key={child.key ?? `prime-preview-row-${String(index)}`}
-            className={styles.previewStackLine}
-          >
-            {child}
-          </div>
-        );
-      })
-    : previewChildren;
-
   return (
     <ExampleFrameProvider value={ctxValue}>
       <div className={cx(styles.root, className)}>
@@ -184,14 +163,13 @@ function ExampleFrameRoot({
             <div className={styles.previewViewport} data-viewport={viewport}>
               <div
                 className={styles.previewInner}
+                data-preview-layout={previewLayout}
                 data-theme={colorScheme}
                 {...(themePreset != null && themePreset !== ""
                   ? { "data-theme-preset": themePreset }
                   : {})}
               >
-                <div className={styles.previewCanvas} data-preview-layout={previewLayout}>
-                  {previewCanvasBody}
-                </div>
+                {previewChildren}
               </div>
             </div>
           </div>

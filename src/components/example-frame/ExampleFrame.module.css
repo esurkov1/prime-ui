@@ -131,7 +131,9 @@
 .previewInner {
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   min-width: 0;
   max-width: 100%;
   min-height: var(--prime-sys-unit-10rem);
@@ -143,121 +145,77 @@
   overflow: hidden;
 }
 
-/*
- * Без align-self: center дочерний канвас получает stretch по умолчанию и на всю ширину
- * внутренней области — при width: fit-content у контролов (SegmentedControl и т.д.) блок
- * визуально «прилипает» к логическому start, хотя внутри канваса стоит align-items: center.
- */
 .previewInner > * {
-  align-self: center;
-  margin-inline: auto;
-  min-width: 0;
-  max-width: 100%;
-}
-
-/* fullWidth в превью: иначе канвас остаётся fit-content + align-self:center и не даёт ширины дочерним 100%. */
-.previewInner > .previewCanvas:global(:has([data-full-width="true"])) {
-  align-self: stretch;
-  width: 100%;
-  margin-inline: 0;
-}
-
-.previewCanvas {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  min-width: 0;
-  max-width: 100%;
-}
-
-/* dense-stack: скролл и плотная колонка на всю ширину. stack / stack-narrow — по ширине контента. */
-.previewCanvas[data-preview-layout="dense-stack"] {
-  width: 100%;
-}
-
-/* По ширине содержимого, не шире области превью. */
-.previewCanvas[data-preview-layout="default"],
-.previewCanvas[data-preview-layout="stack-center"],
-.previewCanvas[data-preview-layout="row"],
-.previewCanvas[data-preview-layout="row-start"],
-.previewCanvas[data-preview-layout="row-wrap"] {
-  width: fit-content;
-  max-width: 100%;
-  margin-inline: auto;
-}
-
-/* Раскладка превью: без лишних обёрток в сниппетах (колонка / ряд). */
-.previewCanvas[data-preview-layout="stack"] {
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--prime-sys-spacing-x4);
-  width: fit-content;
-  max-width: 100%;
-  margin-inline: auto;
-}
-
-.previewCanvas[data-preview-layout="stack"]:global(:has([data-full-width="true"])),
-.previewCanvas[data-preview-layout="stack-narrow"]:global(:has([data-full-width="true"])) {
-  width: 100%;
-  align-items: stretch;
-  margin-inline: 0;
-}
-
-/*
- * Строка превью для stack / stack-narrow: колонка, чтобы сниппет из одного компонента
- * с Fragment внутри (Input sizes, Textarea sizes…) не оказывался в одном flex-row.
- * Ширина по содержимому (не одна общая полоса на весь превью); max-width 100% — не вылезать за карточку.
- * Узкий лимит на весь блок — previewLayout="stack-narrow" на .previewCanvas.
- */
-.previewStackLine {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--prime-sys-spacing-x4);
-  box-sizing: border-box;
-  width: fit-content;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.previewStackLine:global(:has(.examplePreviewBleed)) {
-  width: 100%;
-  max-width: none;
-}
-
-.previewStackLine:global(:has(table)) {
-  width: 100%;
-  max-width: none;
-}
-
-/* fullWidth у Button: строка на ширину канваса + stretch — иначе align-items:center сжимает flex-item по контенту. */
-.previewStackLine:global(:has([data-full-width="true"])) {
-  width: 100%;
-  max-width: 100%;
-  align-items: stretch;
-}
-
-.previewCanvas[data-preview-layout="stack-narrow"] .previewStackLine {
-  max-width: 100%;
-}
-
-.previewStackLine > * {
   flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
 }
 
-.previewCanvas[data-preview-layout="stack-center"] {
+/* fullWidth в превью: растягиваем область, чтобы дочерние 100% имели ширину. */
+.previewInner:global(:has([data-full-width="true"])) {
+  align-items: stretch;
+}
+
+/* По ширине содержимого, не шире области превью. */
+.previewInner[data-preview-layout="default"],
+.previewInner[data-preview-layout="stack-center"],
+.previewInner[data-preview-layout="row"],
+.previewInner[data-preview-layout="row-start"],
+.previewInner[data-preview-layout="row-wrap"] {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+/* Раскладка превью: колонка с зазорами (сниппеты с Fragment из нескольких контролов). */
+.previewInner[data-preview-layout="stack"] {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--prime-sys-spacing-x4);
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.previewInner[data-preview-layout="stack"]:global(:has([data-full-width="true"])),
+.previewInner[data-preview-layout="stack-narrow"]:global(:has([data-full-width="true"])),
+.previewInner[data-preview-layout="stack"]:global(:has(.examplePreviewBleed)),
+.previewInner[data-preview-layout="stack-narrow"]:global(:has(.examplePreviewBleed)) {
+  width: 100%;
+  align-items: stretch;
+  margin-inline: 0;
+}
+
+.previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),
+.previewInner[data-preview-layout="stack-narrow"] > *:global(:has([data-full-width="true"])) {
+  align-self: stretch;
+  width: 100%;
+  max-width: 100%;
+}
+
+.previewInner[data-preview-layout="stack"] > *:global(:has(.examplePreviewBleed)),
+.previewInner[data-preview-layout="stack-narrow"] > *:global(:has(.examplePreviewBleed)) {
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+}
+
+.previewInner[data-preview-layout="stack"] > *:global(:has(table)),
+.previewInner[data-preview-layout="stack-narrow"] > *:global(:has(table)) {
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+}
+
+.previewInner[data-preview-layout="stack-center"] {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: var(--prime-sys-spacing-x3);
 }
 
-.previewCanvas[data-preview-layout="row"] {
+.previewInner[data-preview-layout="row"] {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
@@ -266,7 +224,7 @@
   padding-block: clamp(var(--prime-sys-unit-1p5rem), 4vh, var(--prime-sys-unit-3rem));
 }
 
-.previewCanvas[data-preview-layout="row-start"] {
+.previewInner[data-preview-layout="row-start"] {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -275,7 +233,7 @@
   padding-block: clamp(var(--prime-sys-unit-1rem), 3vh, var(--prime-sys-unit-2rem));
 }
 
-.previewCanvas[data-preview-layout="row-wrap"] {
+.previewInner[data-preview-layout="row-wrap"] {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -283,7 +241,7 @@
   gap: var(--prime-sys-spacing-x2);
 }
 
-.previewCanvas[data-preview-layout="stack-narrow"] {
+.previewInner[data-preview-layout="stack-narrow"] {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
@@ -294,7 +252,7 @@
   margin-inline: auto;
 }
 
-.previewCanvas[data-preview-layout="dense-stack"] {
+.previewInner[data-preview-layout="dense-stack"] {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
