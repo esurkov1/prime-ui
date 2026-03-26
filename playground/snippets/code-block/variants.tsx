@@ -1,4 +1,7 @@
 import { CodeBlock } from "@/components/code-block/CodeBlock";
+import { cx } from "@/internal/cx";
+
+import styles from "./code-block-demos.module.css";
 
 const SAMPLE = `import { streamTokens } from "./ai";
 
@@ -14,42 +17,16 @@ export async function handleChat(req: Request) {
 /** Две схемы подсветки рядом: светлая и тёмная (проп colorScheme), один и тот же исходник. */
 export default function CodeBlockVariantsSnippet() {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 16rem), 1fr))",
-        gap: "var(--prime-sys-spacing-m)",
-        width: "100%",
-        maxWidth: "min(100%, 48rem)",
-      }}
-    >
+    <div className={styles.variantsGrid}>
       <div>
-        <p style={{ margin: "0 0 var(--prime-sys-spacing-x1)", fontSize: 13, opacity: 0.85 }}>
-          colorScheme=&quot;light&quot;
-        </p>
-        <div
-          style={{
-            padding: "var(--prime-sys-spacing-x2)",
-            borderRadius: "var(--prime-sys-radius-m)",
-            border: "1px solid var(--prime-sys-color-border-muted)",
-            background: "var(--prime-sys-color-surface-default)",
-          }}
-        >
+        <p className={styles.demoCaption}>colorScheme=&quot;light&quot;</p>
+        <div className={styles.codeDemoPanel}>
           <CodeBlock.Root code={SAMPLE} colorScheme="light" />
         </div>
       </div>
       <div>
-        <p style={{ margin: "0 0 var(--prime-sys-spacing-x1)", fontSize: 13, opacity: 0.85 }}>
-          colorScheme=&quot;dark&quot;
-        </p>
-        <div
-          style={{
-            padding: "var(--prime-sys-spacing-x2)",
-            borderRadius: "var(--prime-sys-radius-m)",
-            border: "1px solid var(--prime-sys-color-border-muted)",
-            background: "var(--prime-sys-color-surface-accentSoft)",
-          }}
-        >
+        <p className={styles.demoCaption}>colorScheme=&quot;dark&quot;</p>
+        <div className={cx(styles.codeDemoPanel, styles.codeDemoPanelOnAccent)}>
           <CodeBlock.Root code={SAMPLE} colorScheme="dark" />
         </div>
       </div>

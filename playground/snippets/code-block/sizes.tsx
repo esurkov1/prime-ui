@@ -2,6 +2,8 @@ import { CodeBlock } from "@/components/code-block/CodeBlock";
 
 import { usePlaygroundTheme } from "../../components/PlaygroundTheme";
 
+import styles from "./code-block-demos.module.css";
+
 const SAMPLE = `type Status = "idle" | "busy";
 const retry = 3;
 `;
@@ -33,22 +35,11 @@ const scales: { label: string; fontSize: string; lineHeight: string }[] = [
 export default function CodeBlockSizesSnippet() {
   const { scheme } = usePlaygroundTheme();
   return (
-    <div className="sizesStack" style={{ alignItems: "stretch", maxWidth: "min(100%, 36rem)" }}>
+    <div className={styles.sizesDemoStack}>
       {scales.map(({ label, fontSize, lineHeight }) => (
         <div key={label}>
-          <p style={{ margin: "0 0 var(--prime-sys-spacing-x1)", fontSize: 13, opacity: 0.85 }}>
-            {label}
-          </p>
-          <div
-            style={{
-              fontSize,
-              lineHeight,
-              padding: "var(--prime-sys-spacing-x1) var(--prime-sys-spacing-x2)",
-              borderRadius: "var(--prime-sys-radius-m)",
-              border: "1px solid var(--prime-sys-color-border-muted)",
-              background: "var(--prime-sys-color-surface-raised)",
-            }}
-          >
+          <p className={styles.demoCaption}>{label}</p>
+          <div className={styles.codeDemoScaleBox} style={{ fontSize, lineHeight }}>
             <CodeBlock.Root code={SAMPLE} colorScheme={scheme} />
           </div>
         </div>

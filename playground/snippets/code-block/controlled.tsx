@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/code-block/CodeBlock";
 
 import { usePlaygroundTheme } from "../../components/PlaygroundTheme";
 
+import styles from "./code-block-demos.module.css";
+
 const SNIPPETS: [string, string][] = [
   [
     "Утилита",
@@ -31,10 +33,8 @@ export default function CodeBlockControlledSnippet() {
   const [label, code] = SNIPPETS[index] ?? SNIPPETS[0];
 
   return (
-    <div
-      style={{ display: "grid", gap: "var(--prime-sys-spacing-m)", maxWidth: "min(100%, 32rem)" }}
-    >
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--prime-sys-spacing-x2)" }}>
+    <div className={styles.controlledRoot}>
+      <div className="previewRowWrap">
         {SNIPPETS.map(([title], i) => (
           <Button.Root
             key={title}
@@ -48,19 +48,10 @@ export default function CodeBlockControlledSnippet() {
           </Button.Root>
         ))}
       </div>
-      <p style={{ margin: 0, fontSize: 13, opacity: 0.85 }}>
+      <p className={styles.controlledMeta}>
         Активный фрагмент: <strong>{label}</strong> (проп <code>code</code> из состояния).
       </p>
-      <div
-        style={{
-          padding: "var(--prime-sys-spacing-x2)",
-          borderRadius: "var(--prime-sys-radius-m)",
-          border: "1px solid var(--prime-sys-color-border-muted)",
-          background: "var(--prime-sys-color-surface-raised)",
-          fontSize: "var(--prime-sys-typography-control-s)",
-          lineHeight: "var(--prime-sys-typography-lineHeight-normal)",
-        }}
-      >
+      <div className={styles.controlledCodeWrap}>
         <CodeBlock.Root code={code} colorScheme={scheme} />
       </div>
     </div>

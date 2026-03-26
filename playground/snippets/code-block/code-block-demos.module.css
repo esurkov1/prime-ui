@@ -1,0 +1,114 @@
+.demoCaption {
+  margin: 0 0 var(--prime-sys-spacing-x1);
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  line-height: var(--prime-sys-typography-lineHeightScale-xs);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.variantsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--prime-sys-spacing-m);
+  width: 100%;
+  max-width: min(100%, 48rem);
+}
+
+.codeDemoPanel {
+  box-sizing: border-box;
+  padding: var(--prime-sys-spacing-x2);
+  border-radius: var(--prime-sys-radius-m);
+  border: 1px solid var(--prime-sys-color-border-muted);
+  background: var(--prime-sys-color-surface-default);
+}
+
+.codeDemoPanelOnAccent {
+  background: var(--prime-sys-color-surface-accentSoft);
+}
+
+.controlledRoot {
+  display: grid;
+  gap: var(--prime-sys-spacing-m);
+  max-width: min(100%, 32rem);
+}
+
+.controlledMeta {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.controlledCodeWrap {
+  box-sizing: border-box;
+  padding: var(--prime-sys-spacing-x2);
+  border-radius: var(--prime-sys-radius-m);
+  border: 1px solid var(--prime-sys-color-border-muted);
+  background: var(--prime-sys-color-surface-raised);
+  font-size: var(--prime-sys-typography-control-s);
+  line-height: var(--prime-sys-typography-lineHeight-normal);
+}
+
+.sizesDemoStack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-sys-spacing-m);
+  width: 100%;
+  max-width: min(100%, 36rem);
+}
+
+.codeDemoScaleBox {
+  box-sizing: border-box;
+  padding: var(--prime-sys-spacing-x1) var(--prime-sys-spacing-x2);
+  border-radius: var(--prime-sys-radius-m);
+  border: 1px solid var(--prime-sys-color-border-muted);
+  background: var(--prime-sys-color-surface-raised);
+}
+
+.featuresNarrow {
+  max-width: min(100%, 28rem);
+}
+
+.featuresPre {
+  box-sizing: border-box;
+  padding: var(--prime-sys-spacing-x2);
+  border-radius: var(--prime-sys-radius-m);
+  border: 1px dashed var(--prime-sys-color-border-strong);
+  background: var(--prime-sys-color-surface-accentSoft);
+  font-size: var(--prime-sys-typography-control-s);
+  line-height: var(--prime-sys-typography-lineHeight-normal);
+}
+
+.fwNarrow {
+  width: 100%;
+  max-width: min(100%, 20rem);
+}
+
+.fwScrollWrap {
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--prime-sys-radius-m);
+  border: 1px solid var(--prime-sys-color-border-muted);
+  background: var(--prime-sys-color-surface-raised);
+  padding: var(--prime-sys-spacing-x2);
+}
+
+.docCard {
+  box-sizing: border-box;
+  max-width: min(100%, 28rem);
+  padding: var(--prime-sys-spacing-x3);
+  border-radius: var(--prime-sys-radius-l);
+  border: 1px solid var(--prime-sys-color-border-muted);
+  background: var(--prime-sys-color-surface-raised);
+  display: grid;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.codeDemoNested {
+  font-size: var(--prime-sys-typography-control-s);
+  line-height: var(--prime-sys-typography-lineHeight-normal);
+  padding: var(--prime-sys-spacing-x2);
+  border-radius: var(--prime-sys-radius-m);
+  background: var(--prime-sys-color-surface-accentSoft);
+}

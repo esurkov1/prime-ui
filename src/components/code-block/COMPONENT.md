@@ -36,7 +36,7 @@ export function ArticleBody({ scheme }: { scheme: "light" | "dark" }) {
 
 ### With variants / sizes
 
-A landing section with two columns: one with a light background and `colorScheme="light"`, the other with a dark backdrop and `colorScheme="dark"`—code text stays readable in both blocks.
+A landing section with two surfaces: `colorScheme="light"` on a light background and `colorScheme="dark"` on a dark backdrop (place blocks in a grid or columns with your layout CSS)—code text stays readable in both blocks.
 
 ```tsx
 import { CodeBlock } from "prime-ui-kit";
@@ -45,11 +45,13 @@ const curl = `curl -sS https://api.store.example/health | jq .status`;
 
 export function LandingDevStrip() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-      <section style={{ padding: 16, background: "#f8fafc" }}>
+    <div>
+      <section>
+        <h3>Light surface</h3>
         <CodeBlock.Root code={curl} colorScheme="light" />
       </section>
-      <section style={{ padding: 16, background: "#0f172a" }}>
+      <section>
+        <h3>Dark surface</h3>
         <CodeBlock.Root code={curl} colorScheme="dark" />
       </section>
     </div>
@@ -72,14 +74,14 @@ const body = `{
 
 export function OrderApiCard() {
   return (
-    <article style={{ padding: 20, borderRadius: 12, border: "1px solid #e2e8f0" }}>
+    <article>
       <Typography.Root as="div" size="s" weight="semibold">
         GET /v2/orders/:id
       </Typography.Root>
-      <Typography.Root as="p" size="xs" tone="muted" style={{ margin: "8px 0 12px" }}>
+      <Typography.Root as="p" size="xs" tone="muted">
         Returns the current cart contents for the courier screen.
       </Typography.Root>
-      <div style={{ padding: 12, borderRadius: 8, background: "#f1f5f9", fontSize: 13 }}>
+      <div>
         <CodeBlock.Root code={body} colorScheme="light" />
       </div>
     </article>
@@ -122,7 +124,7 @@ export function SnippetPlayground({ scheme }: { scheme: "light" | "dark" }) {
   const active = samples[i];
   return (
     <div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+      <div>
         {samples.map((s, idx) => (
           <Button.Root
             key={s.id}
