@@ -1,23 +1,42 @@
 # Notification
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default `size`:** use **`m`** for the notification card size unless the surface explicitly needs **`s`** or **`l`**.
 
-## About
+## Canonical
 
-Toast notifications: `NotificationProvider` keeps a queue, hooks expose `notify` / `dismiss` / `dismissAll`, and cards render in a portal with stacked groups per corner and semantic type.
+- **`NotificationProvider`** — wraps the tree that calls hooks; mounts a **portal** with fixed **zones** per viewport corner/edge. Each **`notify`** item is grouped by **`position`** and **`type`** into separate stacks (**`max`** per stack, default **`5`**).
+- **`useNotifications`** — **`notify`**, **`dismiss`**, **`dismissAll`** only; throws outside the provider.
+- **`useNotificationStore`** — same methods plus **`items`** (**`NotificationRecord[]`**, active only, no exit-animation rows).
+- **`NotificationCard`** — **`article`** with live region semantics, icon, title, optional badge/description/**`action`** (neutral stroke **`Button.Root`**), optional close, progress track unless **`persistent`**.
+- **Stacks** — Framer Motion list; hover expands stack and **pauses** countdowns until collapse. **`error`** / **`warning`** → **`role="alert"`**, **`aria-live="assertive"`**; **`success`** / **`info`** → **`status`**, **`polite`**.
 
-- **Use** for short, non-blocking feedback after actions (save, send, background job finished) when you do not need to trap focus.
-- **Use** when the message should appear above the page chrome and auto-dismiss or offer a single secondary action.
-- **Use** `useNotificationStore` when the UI must read `items` (e.g. custom lists or bulk dismiss).
-- **Use** `NotificationCard` alone only for static previews or fully custom wiring; live toasts go through the provider and `notify`.
-- **Do not use** for errors that require a blocking decision, long forms, or primary workflow inside the toast—prefer [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md), or [Banner](../banner/COMPONENT.md).
-- **Do not use** multiple nested `NotificationProvider`s unless you intentionally want several portals and duplicate zones.
+## Extended
 
-## Composition
+### About
 
-- **`NotificationProvider`** — wraps the tree that calls hooks; provides context and mounts a **portal** with a fixed viewport. Each screen **position** gets a **zone**; inside a zone, notifications are split into **stacks by `type`** (`success`, `error`, `warning`, `info`).
-- **`NotificationStack` / `NotificationStackItem`** (internal) — ordered list with Framer Motion; hovering expands the stack and sets **`paused`** on cards so countdown timers stop until collapse.
-- **`NotificationCard`** — root is an `article` with a live region role, leading icon, title row (optional **badge**), optional description, optional **action** (`Button.Root`), optional close control, and a progress track unless **`persistent`**.
+Toast notifications for short, non-blocking feedback after actions (save, send, job finished) when focus must not be trapped.
+
+- **When to use** — confirmations or lightweight errors that do not need a blocking dialog.
+- **When to use** — one optional secondary **`action`** (e.g. undo, open detail) alongside auto-dismiss.
+- **When to use** — **`useNotificationStore`** when the UI must reflect **`items`** (counters, bulk dismiss, custom chrome).
+- **When not to use** — blocking decisions, long forms, or primary workflow inside the toast; prefer [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md), or [Banner](../banner/COMPONENT.md).
+- **When not to use** — multiple nested **`NotificationProvider`**s unless you intentionally want several portals.
+
+### Composition
+
+- **`NotificationProvider`** → context + **`NotificationToaster`** (portal, zones, **`NotificationStack`** per **`position`** + **`type`**).
+- **`NotificationStack` / `NotificationStackItem`** (internal) — ordered list; peek/collapse behavior and **`paused`** passed to **`NotificationCard`**.
+- **`NotificationCard`** — public for static previews or fully custom wiring; live toasts should use **`notify`**.
+
+### Scenarios (see `examples/`)
+
+| Scenario | Approach |
+|----------|----------|
+| Toast queue / stack cap | Same **`position`** + **`type`** share one stack; **`max`** drops oldest; stagger **`notify`** with timeouts. Hover expands stack and pauses timers. → [`examples/toast-queue.tsx`](examples/toast-queue.tsx) |
+| Positions | Set **`NotificationProvider`** default **`position`** or pass **`position`** per **`notify`**. Six anchors: **`top-*`** / **`bottom-*`** × **`left` \| `center` \| `right`**. → [`examples/positions.tsx`](examples/positions.tsx) |
+| Action button | **`action: { label, onClick }`** — rendered as kit **`Button.Root`** (neutral stroke). → [`examples/action-toast.tsx`](examples/action-toast.tsx) |
+| Error / success semantics | **`type: "error"`** / **`"warning"`** vs **`"success"`** / **`"info"`** — icons, grouping, and live-region assertiveness differ. → [`examples/error-success.tsx`](examples/error-success.tsx) |
+| Reading the store | **`useNotificationStore`** — **`items`**, **`notify`**, **`dismiss`**, **`dismissAll`** for UI tied to queue length. → [`examples/notification-store.tsx`](examples/notification-store.tsx) |
 
 ### Minimal example
 
@@ -42,11 +61,11 @@ function Notifier() {
 }
 ```
 
-## Rules
+### Rules
 
 - Call **`useNotifications`** or **`useNotificationStore`** only under **`NotificationProvider`**; both hooks throw if context is missing.
 - **`notify`** returns a string **`id`**; pass it to **`dismiss`** or use **`dismissAll`** for every active toast.
-- **`useNotificationStore`** exposes the same methods plus **`items`**: `NotificationRecord[]` of non-dismissing entries only (no internal closing-animation flag).
+- **`useNotificationStore`** exposes the same methods plus **`items`**: **`NotificationRecord[]`** of non-dismissing entries only (no internal closing-animation flag).
 - Options passed to **`notify`** are merged with defaults: **`size`** `"m"`, **`position`** from the provider, **`duration`** `5000` ms, **`persistent`** `false`, **`closable`** `true`.
 - With **`persistent`**, there is no auto-dismiss, no progress bar, and duration does not drive closing; users or **`dismiss`** / **`dismissAll`** must close the card. Visually, **`persistent`** also turns on the accent-tinted **border** and (unless **`prefers-reduced-motion`**) the **`notification-glow`** shadow pulse — default **`notify()`** uses **`persistent: false`**, so live toasts look flatter unless you opt in.
 - If **`duration <= 0`**, the countdown effect does not run—time-based auto-dismiss does not occur; close via **`dismiss`** or the close button when **`closable`**.
@@ -118,3 +137,14 @@ Same **`notify`**, **`dismiss`**, and **`dismissAll`** as above, plus **`items`*
 - [Button](../button/COMPONENT.md)
 - [Drawer](../drawer/COMPONENT.md)
 - [Modal](../modal/COMPONENT.md)
+
+## LLM note
+
+- Imports: **`NotificationProvider`**, **`useNotifications`**, **`useNotificationStore`**, **`NotificationCard`**, types **`NotificationOptions`**, **`NotificationRecord`**, **`NotificationPosition`**, **`NotificationType`**, **`NotificationSize`**, **`NotificationAction`** from **`"prime-ui-kit"`**.
+- **`notify`** requires **`type`** and **`title`**; optional **`description`**, **`size`**, **`position`**, **`duration`**, **`persistent`**, **`icon`**, **`badge`**, **`closable`**, **`action`**.
+- **`action`** is not a React node — it is **`{ label: string; onClick: () => void }`**; the kit renders **`Button.Root`** (neutral stroke) inside the card.
+- Stack key = **`position` + `type`**; **`max`** applies per stack, not globally.
+- **`persistent: true`** removes the progress bar and auto-dismiss; closing is manual or via **`dismiss`** / **`dismissAll`**.
+- **`duration <= 0`** disables timer-based dismissal (still closable if **`closable`**).
+- Do not nest **`NotificationProvider`** without a reason; one app root is typical.
+- For static **`NotificationCard`**, build a full **`NotificationRecord`** (including **`id`**, **`position`**, **`size`**, **`duration`**, **`persistent`**, **`closable`**, **`createdAt`**) and wire **`onDismiss`** yourself.
