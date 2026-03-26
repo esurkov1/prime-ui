@@ -220,51 +220,53 @@ Use DevTools Responsive Mode to check intermediate widths.
 
 ## Component Quick-Reference
 
-15 key components for responsive layouts:
+All **41** exported kit components — `COMPONENT.md` next to the implementation (props, composition, examples):
 
-| Component | Role in responsive layout | Typical region | Documentation |
-|-----------|---------------------------|----------------|----------------|
-| Sidebar | Navigation; desktop inline → mobile Drawer | sidebar | [`../src/components/sidebar/COMPONENT.md`](../src/components/sidebar/COMPONENT.md) |
-| Drawer | Overlay panel; replaces modals and sidebars on mobile | overlay | [`../src/components/drawer/COMPONENT.md`](../src/components/drawer/COMPONENT.md) |
-| Tabs | Content switching; scroll on mobile | content | [`../src/components/tabs/COMPONENT.md`](../src/components/tabs/COMPONENT.md) |
-| DataTable | Table with horizontal scroll on mobile | content | [`../src/components/data-table/COMPONENT.md`](../src/components/data-table/COMPONENT.md) |
-| Button | CTA; `size="l"` + `fullWidth` on mobile | form, footer | [`../src/components/button/COMPONENT.md`](../src/components/button/COMPONENT.md) |
-| Input | Text field; `fullWidth` in mobile forms | form | [`../src/components/input/COMPONENT.md`](../src/components/input/COMPONENT.md) |
-| Select | Choice; portal menu, `fullWidth` | form | [`../src/components/select/COMPONENT.md`](../src/components/select/COMPONENT.md) |
-| Modal | Dialog; on mobile → Drawer (bottom) | overlay | [`../src/components/modal/COMPONENT.md`](../src/components/modal/COMPONENT.md) |
-| Accordion | Expand/collapse; replaces Tabs on narrow viewports | content | [`../src/components/accordion/COMPONENT.md`](../src/components/accordion/COMPONENT.md) |
-| Breadcrumb | Path; auto-collapse via `maxItems` | header | [`../src/components/breadcrumb/COMPONENT.md`](../src/components/breadcrumb/COMPONENT.md) |
-| Stepper | Progress; horizontal → vertical on mobile | content | [`../src/components/stepper/COMPONENT.md`](../src/components/stepper/COMPONENT.md) |
-| Pagination | Pages; compact mode on mobile | footer | [`../src/components/pagination/COMPONENT.md`](../src/components/pagination/COMPONENT.md) |
-| Typography | Text; change `variant` by breakpoint or fluid | content | [`../src/components/typography/COMPONENT.md`](../src/components/typography/COMPONENT.md) |
-| SegmentedControl | Toggle; → Select when more than 4 segments on mobile | header | [`../src/components/segmented-control/COMPONENT.md`](../src/components/segmented-control/COMPONENT.md) |
-| Notification | Toasts; fullWidth at bottom on mobile | overlay | [`../src/components/notification/COMPONENT.md`](../src/components/notification/COMPONENT.md) |
+| Component | Documentation |
+|-----------|----------------|
+| Accordion | [`accordion/COMPONENT.md`](../src/components/accordion/COMPONENT.md) |
+| Avatar | [`avatar/COMPONENT.md`](../src/components/avatar/COMPONENT.md) |
+| Badge | [`badge/COMPONENT.md`](../src/components/badge/COMPONENT.md) |
+| Banner | [`banner/COMPONENT.md`](../src/components/banner/COMPONENT.md) |
+| Breadcrumb | [`breadcrumb/COMPONENT.md`](../src/components/breadcrumb/COMPONENT.md) |
+| Button | [`button/COMPONENT.md`](../src/components/button/COMPONENT.md) |
+| ButtonGroup | [`button-group/COMPONENT.md`](../src/components/button-group/COMPONENT.md) |
+| Checkbox | [`checkbox/COMPONENT.md`](../src/components/checkbox/COMPONENT.md) |
+| CodeBlock | [`code-block/COMPONENT.md`](../src/components/code-block/COMPONENT.md) |
+| ColorPicker | [`color-picker/COMPONENT.md`](../src/components/color-picker/COMPONENT.md) |
+| CommandMenu | [`command-menu/COMPONENT.md`](../src/components/command-menu/COMPONENT.md) |
+| DataTable | [`data-table/COMPONENT.md`](../src/components/data-table/COMPONENT.md) |
+| Datepicker | [`datepicker/COMPONENT.md`](../src/components/datepicker/COMPONENT.md) |
+| DigitInput | [`digit-input/COMPONENT.md`](../src/components/digit-input/COMPONENT.md) |
+| Divider | [`divider/COMPONENT.md`](../src/components/divider/COMPONENT.md) |
+| Drawer | [`drawer/COMPONENT.md`](../src/components/drawer/COMPONENT.md) |
+| Dropdown | [`dropdown/COMPONENT.md`](../src/components/dropdown/COMPONENT.md) |
+| FileUpload | [`file-upload/COMPONENT.md`](../src/components/file-upload/COMPONENT.md) |
+| Hint | [`hint/COMPONENT.md`](../src/components/hint/COMPONENT.md) |
+| Input | [`input/COMPONENT.md`](../src/components/input/COMPONENT.md) |
+| Kbd | [`kbd/COMPONENT.md`](../src/components/kbd/COMPONENT.md) |
+| Label | [`label/COMPONENT.md`](../src/components/label/COMPONENT.md) |
+| LinkButton | [`link-button/COMPONENT.md`](../src/components/link-button/COMPONENT.md) |
+| Modal | [`modal/COMPONENT.md`](../src/components/modal/COMPONENT.md) |
+| Notification | [`notification/COMPONENT.md`](../src/components/notification/COMPONENT.md) |
+| Pagination | [`pagination/COMPONENT.md`](../src/components/pagination/COMPONENT.md) |
+| Popover | [`popover/COMPONENT.md`](../src/components/popover/COMPONENT.md) |
+| ProgressBar | [`progress-bar/COMPONENT.md`](../src/components/progress-bar/COMPONENT.md) |
+| ProgressCircle | [`progress-circle/COMPONENT.md`](../src/components/progress-circle/COMPONENT.md) |
+| Radio | [`radio/COMPONENT.md`](../src/components/radio/COMPONENT.md) |
+| SegmentedControl | [`segmented-control/COMPONENT.md`](../src/components/segmented-control/COMPONENT.md) |
+| Select | [`select/COMPONENT.md`](../src/components/select/COMPONENT.md) |
+| Sidebar | [`sidebar/COMPONENT.md`](../src/components/sidebar/COMPONENT.md) |
+| Slider | [`slider/COMPONENT.md`](../src/components/slider/COMPONENT.md) |
+| Stepper | [`stepper/COMPONENT.md`](../src/components/stepper/COMPONENT.md) |
+| Switch | [`switch/COMPONENT.md`](../src/components/switch/COMPONENT.md) |
+| Tabs | [`tabs/COMPONENT.md`](../src/components/tabs/COMPONENT.md) |
+| Tag | [`tag/COMPONENT.md`](../src/components/tag/COMPONENT.md) |
+| Textarea | [`textarea/COMPONENT.md`](../src/components/textarea/COMPONENT.md) |
+| Tooltip | [`tooltip/COMPONENT.md`](../src/components/tooltip/COMPONENT.md) |
+| Typography | [`typography/COMPONENT.md`](../src/components/typography/COMPONENT.md) |
 
-Full table of all 41 components: [`references/component-catalog.md`](../references/component-catalog.md).
-
----
-
-## Sources
-
-| # | Title | URL |
-|---|---------|-----|
-| 1 | A Complete Guide to CSS Flexbox — CSS-Tricks | https://css-tricks.com/snippets/css/a-guide-to-flexbox/ |
-| 2 | Learn Responsive Design — web.dev | https://web.dev/learn/design/ |
-| 3 | Responsive Web Design Basics — web.dev | https://web.dev/responsive-web-design-basics |
-| 4 | Solved by Flexbox: Holy Grail — Philip Walton | https://philipwalton.github.io/solved-by-flexbox/demos/holy-grail/ |
-| 5 | Modern Fluid Typography Using CSS Clamp — Smashing Magazine | https://www.smashingmagazine.com/2022/01/modern-fluid-typography-css-clamp/ |
-| 6 | Accessible Target Sizes Cheatsheet — Smashing Magazine | https://www.smashingmagazine.com/2023/04/accessible-tap-target-sizes-rage-taps-clicks/ |
-| 7 | Every Layout: The Sidebar | https://every-layout.dev/layouts/sidebar/ |
-| 8 | Every Layout: Composition | https://every-layout.dev/rudiments/composition |
-| 9 | Sticky Footers — MDN | https://developer.mozilla.org/en-US/docs/Web/CSS/How_to/Layout_cookbook/Sticky_footers |
-| 10 | Equal-Height Cards with Flexbox — DEV Community | https://dev.to/jennavisions/building-responsive-equal-height-cards-with-modern-css-magic-of-flexbox-no-media-queries-2h0b |
-| 11 | Flexbox Cheatsheet — freeCodeCamp | https://www.freecodecamp.org/news/flexbox-the-ultimate-flex-cheatsheet |
-| 12 | User Interface Patterns — web.dev | https://web.dev/learn/design/ui-patterns |
-| 13 | Responsive Web Design Guide 2026 — Scrimba | https://scrimba.com/articles/responsive-web-design-a-complete-guide-2026-2/ |
-| 14 | Accessible Navigation Guide 2026 — Brand Vision | https://www.brandvm.com/post/accessible-navigation-websites-ux-guide-2026 |
-| 15 | Minimum WCAG-Conformant Element Size — Smashing Magazine | https://www.smashingmagazine.com/2024/07/getting-bottom-minimum-wcag-conformant-interactive-element-size |
-
-Expanded annotations: [`references/responsive-flexbox-sources.md`](../references/responsive-flexbox-sources.md).
+Responsive roles, zones, and scenarios (same 41): [`references/component-catalog.md`](../references/component-catalog.md).
 
 ---
 
