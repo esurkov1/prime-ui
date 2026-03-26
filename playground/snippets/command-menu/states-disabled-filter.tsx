@@ -46,17 +46,12 @@ export default function CommandMenuStatesSnippet() {
             </CommandMenu.Item>
           </CommandMenu.Group>
         </CommandMenu.List>
-        <div
-          style={{
-            padding: "var(--prime-sys-spacing-x3) var(--prime-sys-size-control-m-buttonPaddingX)",
-            borderTop: "1px solid var(--prime-sys-color-border-subtle)",
-          }}
-        >
+        <CommandMenu.Footer className={cmdStyles.footerMuted}>
           <Typography.Root size="xs" tone="muted">
             Если ни один пункт не проходит фильтр, группы скрываются; пустое состояние можно
             дорисовать под списком вручную.
           </Typography.Root>
-        </div>
+        </CommandMenu.Footer>
       </CommandMenu.Dialog>
     </>
   );

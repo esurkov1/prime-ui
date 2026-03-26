@@ -13,7 +13,7 @@ export default function CommandMenuControlledSnippet() {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--prime-sys-spacing-x2)" }}>
+      <div className="typographyScaleRow">
         <Typography.Root size="s" tone="muted">
           Снаружи: «{query || "…"}»
         </Typography.Root>

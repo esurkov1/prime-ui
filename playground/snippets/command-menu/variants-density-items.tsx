@@ -14,7 +14,7 @@ export default function CommandMenuVariantsDensityItemsSnippet() {
 
   return (
     <>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--prime-sys-spacing-x2)" }}>
+      <div className="previewRowWrap">
         <Button.Root
           size="m"
           variant="neutral"

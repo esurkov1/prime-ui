@@ -38,9 +38,7 @@ export function CommandPaletteBasic() {
       </Button.Root>
 
       <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="cmd-basic-title">
-        <CommandMenu.DialogTitle id="cmd-basic-title" style={{ margin: "1rem 1rem 0", fontSize: "1.125rem" }}>
-          Application commands
-        </CommandMenu.DialogTitle>
+        <CommandMenu.DialogTitle id="cmd-basic-title">Application commands</CommandMenu.DialogTitle>
         <CommandMenu.InputRow leading={<Search size={18} strokeWidth={2} aria-hidden />}>
           <CommandMenu.Input placeholder="Command or search…" aria-label="Search commands" />
         </CommandMenu.InputRow>
@@ -122,14 +120,8 @@ export function WorkspaceSettingsCommandPalette() {
 
   return (
     <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="ws-cmd-title">
-      <div style={{ padding: "1rem 1rem 0" }}>
-        <Typography.Root as="div" id="ws-cmd-title" role="heading" aria-level={2} size="l" weight="semibold">
-          Workspace
-        </Typography.Root>
-        <Typography.Root size="s" tone="muted">
-          Search objects and quick actions
-        </Typography.Root>
-      </div>
+      <CommandMenu.DialogTitle id="ws-cmd-title">Workspace</CommandMenu.DialogTitle>
+      <CommandMenu.DialogDescription>Search objects and quick actions</CommandMenu.DialogDescription>
 
       <CommandMenu.InputRow
         leading={<Search size={18} strokeWidth={2} aria-hidden />}
@@ -147,13 +139,13 @@ export function WorkspaceSettingsCommandPalette() {
         <CommandMenu.Input placeholder="Where to go…" aria-label="Search" />
       </CommandMenu.InputRow>
 
-      <CommandMenu.TagSection style={{ padding: "0.75rem 1rem" }}>
+      <CommandMenu.TagSection>
         <CommandMenu.TagSectionLabel>
           <Typography.Root size="xs" tone="muted">
             Scope
           </Typography.Root>
         </CommandMenu.TagSectionLabel>
-        <CommandMenu.TagRow style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+        <CommandMenu.TagRow>
           {scopes.map((s) => (
             <Tag.Root key={s} size="m" onRemove={() => setScopes((p) => p.filter((x) => x !== s))}>
               {s}
@@ -170,7 +162,7 @@ export function WorkspaceSettingsCommandPalette() {
         </CommandMenu.Group>
       </CommandMenu.List>
 
-      <CommandMenu.Footer style={{ padding: "0.75rem 1rem", borderTop: "1px solid var(--prime-sys-color-border-subtle, #e4e4e7)" }}>
+      <CommandMenu.Footer>
         <Typography.Root size="xs" tone="muted">
           Arrow keys and Enter work from the search field.
         </Typography.Root>

@@ -1,0 +1,20 @@
+.dialogHeaderPad {
+  padding: var(--prime-sys-spacing-x4) var(--prime-sys-spacing-x4) 0;
+}
+
+.dialogHeaderLead {
+  margin-top: var(--prime-sys-spacing-x1);
+}
+
+.footerHints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.footerHintGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+}

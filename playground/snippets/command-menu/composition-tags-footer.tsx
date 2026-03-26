@@ -9,6 +9,8 @@ import { Kbd } from "@/components/kbd/Kbd";
 import { Tag } from "@/components/tag/Tag";
 import { Typography } from "@/components/typography/Typography";
 
+import demoStyles from "./command-menu-demos.module.css";
+
 export default function CommandMenuCompositionSnippet() {
   const [open, setOpen] = React.useState(false);
   const [scopes, setScopes] = React.useState(["Документы", "Команды"]);
@@ -20,7 +22,7 @@ export default function CommandMenuCompositionSnippet() {
       </Button.Root>
 
       <CommandMenu.Dialog open={open} onOpenChange={setOpen} aria-labelledby="cmd-title">
-        <div style={{ padding: "var(--prime-sys-spacing-x4) var(--prime-sys-spacing-x4) 0" }}>
+        <div className={demoStyles.dialogHeaderPad}>
           <Typography.Root
             as="div"
             id="cmd-title"
@@ -31,11 +33,7 @@ export default function CommandMenuCompositionSnippet() {
           >
             Палитра
           </Typography.Root>
-          <Typography.Root
-            size="s"
-            tone="muted"
-            style={{ marginTop: "var(--prime-sys-spacing-x1)" }}
-          >
+          <Typography.Root size="s" tone="muted" className={demoStyles.dialogHeaderLead}>
             Поиск по разделам и быстрые действия
           </Typography.Root>
         </div>
@@ -62,20 +60,13 @@ export default function CommandMenuCompositionSnippet() {
           <CommandMenu.Input placeholder="Куда перейти…" aria-label="Поиск" />
         </CommandMenu.InputRow>
 
-        <CommandMenu.TagSection
-          style={{
-            paddingInline: "var(--prime-sys-size-control-m-buttonPaddingX)",
-            paddingBlock: "var(--prime-sys-spacing-x3)",
-          }}
-        >
+        <CommandMenu.TagSection>
           <CommandMenu.TagSectionLabel>
             <Typography.Root size="xs" tone="muted">
               Область поиска
             </Typography.Root>
           </CommandMenu.TagSectionLabel>
-          <CommandMenu.TagRow
-            style={{ display: "flex", flexWrap: "wrap", gap: "var(--prime-sys-spacing-x2)" }}
-          >
+          <CommandMenu.TagRow>
             {scopes.map((s) => (
               <Tag.Root
                 key={s}

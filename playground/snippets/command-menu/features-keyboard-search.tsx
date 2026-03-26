@@ -6,6 +6,8 @@ import { CommandMenu } from "@/components/command-menu/CommandMenu";
 
 import cmdStyles from "@/components/command-menu/CommandMenu.module.css";
 
+import demoStyles from "./command-menu-demos.module.css";
+
 export default function CommandMenuFeaturesKeyboardSearchSnippet() {
   const [open, setOpen] = React.useState(false);
 
@@ -59,12 +61,8 @@ export default function CommandMenuFeaturesKeyboardSearchSnippet() {
           </CommandMenu.Group>
         </CommandMenu.List>
         <CommandMenu.Footer>
-          <div
-            style={{ display: "flex", gap: "var(--prime-sys-spacing-x3)", alignItems: "center" }}
-          >
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "var(--prime-sys-spacing-x2)" }}
-            >
+          <div className={demoStyles.footerHints}>
+            <div className={demoStyles.footerHintGroup}>
               <CommandMenu.FooterKeyBox>
                 <ArrowUp size={14} strokeWidth={2} aria-hidden />
               </CommandMenu.FooterKeyBox>
@@ -73,17 +71,13 @@ export default function CommandMenuFeaturesKeyboardSearchSnippet() {
               </CommandMenu.FooterKeyBox>
               <span className={cmdStyles.footerHint}>Навигация</span>
             </div>
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "var(--prime-sys-spacing-x2)" }}
-            >
+            <div className={demoStyles.footerHintGroup}>
               <CommandMenu.FooterKeyBox>
                 <CornerDownLeft size={14} strokeWidth={2} aria-hidden />
               </CommandMenu.FooterKeyBox>
               <span className={cmdStyles.footerHint}>Выбрать</span>
             </div>
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "var(--prime-sys-spacing-x2)" }}
-            >
+            <div className={demoStyles.footerHintGroup}>
               <CommandMenu.FooterKeyBox tone="muted">Esc</CommandMenu.FooterKeyBox>
               <span className={cmdStyles.footerHint}>Закрыть</span>
             </div>
