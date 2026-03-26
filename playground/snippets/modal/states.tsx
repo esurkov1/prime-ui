@@ -13,10 +13,9 @@ export default function ModalStatesSnippet() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-state-default-title">
+            <Modal.Content>
               <Modal.Header
                 icon={<Icon name="field.email" />}
-                titleId="modal-state-default-title"
                 title="Стандартное поведение"
                 description="Закрытие по Escape и по клику на затемнённый фон (если клик не на панели)."
                 closeAriaLabel="Закрыть"
@@ -40,10 +39,9 @@ export default function ModalStatesSnippet() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-state-strict-title">
+            <Modal.Content>
               <Modal.Header
                 icon={<Icon name="status.locked" />}
-                titleId="modal-state-strict-title"
                 title="Жёсткий режим"
                 description={
                   <>

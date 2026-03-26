@@ -21,13 +21,8 @@ function BasicModal({
       </Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay />
-        <Modal.Content aria-labelledby="dlg-title" aria-describedby="dlg-desc">
-          <Modal.Header
-            titleId="dlg-title"
-            descriptionId="dlg-desc"
-            title="Test title"
-            description="Test description"
-          />
+        <Modal.Content>
+          <Modal.Header title="Test title" description="Test description" />
           <Modal.Body>
             <p>Body content</p>
             <Button.Root>Focusable inside</Button.Root>
@@ -47,6 +42,20 @@ function BasicModal({
 }
 
 describe("Modal (composable API)", () => {
+  it("throws when Modal.Header is not inside Modal.Content", () => {
+    expect(() =>
+      render(
+        <Modal.Root defaultOpen>
+          <Modal.Portal>
+            <Modal.Overlay>
+              <Modal.Header title="Invalid" />
+            </Modal.Overlay>
+          </Modal.Portal>
+        </Modal.Root>,
+      ),
+    ).toThrow(/must be used inside `Modal\.Content`/);
+  });
+
   it("renders Trigger and opens Content on click", () => {
     render(<BasicModal />);
 
@@ -58,13 +67,51 @@ describe("Modal (composable API)", () => {
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
   });
 
-  it("sets aria-labelledby and aria-describedby on Content", () => {
+  it("sets aria-labelledby and aria-describedby on Content from Modal.Header", () => {
     render(<BasicModal />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
     const modal = screen.getByRole("dialog");
-    expect(modal).toHaveAttribute("aria-labelledby", "dlg-title");
-    expect(modal).toHaveAttribute("aria-describedby", "dlg-desc");
+    const heading = screen.getByRole("heading", { name: "Test title" });
+    const description = screen.getByText("Test description");
+    expect(modal).toHaveAttribute("aria-labelledby", heading.id);
+    expect(modal).toHaveAttribute("aria-describedby", description.id);
+  });
+
+  it("uses explicit aria-labelledby and aria-describedby on Content for header ids", () => {
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Portal>
+          <Modal.Overlay />
+          <Modal.Content aria-labelledby="custom-title" aria-describedby="custom-desc">
+            <Modal.Header title="Custom" description="Custom desc" />
+          </Modal.Content>
+        </Modal.Portal>
+      </Modal.Root>,
+    );
+
+    const modal = screen.getByRole("dialog");
+    expect(screen.getByRole("heading", { name: "Custom" })).toHaveAttribute("id", "custom-title");
+    expect(screen.getByText("Custom desc")).toHaveAttribute("id", "custom-desc");
+    expect(modal).toHaveAttribute("aria-labelledby", "custom-title");
+    expect(modal).toHaveAttribute("aria-describedby", "custom-desc");
+  });
+
+  it("omits aria-describedby when Header has no description", () => {
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Portal>
+          <Modal.Overlay />
+          <Modal.Content>
+            <Modal.Header title="Title only" />
+          </Modal.Content>
+        </Modal.Portal>
+      </Modal.Root>,
+    );
+
+    const modal = screen.getByRole("dialog");
+    expect(modal).toHaveAttribute("aria-labelledby", screen.getByRole("heading").id);
+    expect(modal).not.toHaveAttribute("aria-describedby");
   });
 
   it("uses modal shell size on built-in header close button", () => {
@@ -143,8 +190,8 @@ describe("Modal (composable API)", () => {
       <Modal.Root defaultOpen>
         <Modal.Portal>
           <Modal.Overlay />
-          <Modal.Content aria-labelledby="hf-title">
-            <Modal.Header titleId="hf-title" title="Header footer" />
+          <Modal.Content>
+            <Modal.Header title="Header footer" />
             <Modal.Footer>
               <Button.Root>Action</Button.Root>
             </Modal.Footer>
@@ -163,8 +210,8 @@ describe("Modal (composable API)", () => {
       <Modal.Root defaultOpen>
         <Modal.Portal>
           <Modal.Overlay />
-          <Modal.Content aria-labelledby="header-only-title">
-            <Modal.Header titleId="header-only-title" title="Header only" />
+          <Modal.Content>
+            <Modal.Header title="Header only" />
           </Modal.Content>
         </Modal.Portal>
       </Modal.Root>,

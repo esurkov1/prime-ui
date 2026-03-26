@@ -19,10 +19,9 @@ export default function ModalControlledSnippet() {
       <Modal.Root open={open} onOpenChange={setOpen}>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-controlled-title">
+            <Modal.Content>
               <Modal.Header
                 icon={<Icon name="action.copy" />}
-                titleId="modal-controlled-title"
                 title="Состояние снаружи"
                 description={
                   <>

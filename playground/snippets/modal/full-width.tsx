@@ -13,10 +13,9 @@ export default function ModalFullWidthSnippet() {
       </Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay>
-          <Modal.Content aria-labelledby="modal-fw-title">
+          <Modal.Content>
             <Modal.Header
               icon={<Icon name="action.upload" />}
-              titleId="modal-fw-title"
               title="Подтверждение"
               description={
                 <>

@@ -133,14 +133,16 @@ const modalContentApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "id заголовка шапки (тот же, что titleId на Modal.Header).",
+    description:
+      "Переопределение id для имени диалога; иначе задаётся автоматически по `Modal.Header` (тот же id на `h2`).",
   },
   {
     prop: "aria-describedby",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "id описания в шапке (тот же, что descriptionId на Modal.Header).",
+    description:
+      "Переопределение id для описания; иначе при наличии `description` в шапке связывается автоматически.",
   },
   {
     prop: "className",
@@ -175,25 +177,11 @@ const modalHeaderApiRows: PlaygroundApiPropRow[] = [
     description: "Заголовок (внутри фиксированной вёрстки — `h2`).",
   },
   {
-    prop: "titleId",
-    type: "string",
-    defaultValue: "авто (useId)",
-    required: "Нет",
-    description: "id для `h2`; для `aria-labelledby` на Content задайте то же значение.",
-  },
-  {
     prop: "description",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
     description: "Подзаголовок (`p` под заголовком).",
-  },
-  {
-    prop: "descriptionId",
-    type: "string",
-    defaultValue: "авто (useId)",
-    required: "Нет",
-    description: "id для описания; для `aria-describedby` на Content — то же значение.",
   },
   {
     prop: "icon",
@@ -411,7 +399,9 @@ export default function ModalSection() {
           <h5>Modal.Content</h5>
           <p className="demoBlockDescription">
             Панель диалога: фокус-ловушка, блокировка скролла, скрытие остальной страницы для
-            вспомогательных технологий.
+            вспомогательных технологий. Вместе с <code>Modal.Header</code> автоматически выставляет{" "}
+            <code>aria-labelledby</code> и при необходимости <code>aria-describedby</code> (можно
+            переопределить пропами на <code>Content</code>).
           </p>
           <PlaygroundApiTable rows={modalContentApiRows} />
           <h5>Modal.Header</h5>

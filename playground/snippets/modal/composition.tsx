@@ -26,9 +26,8 @@ export default function ModalCompositionSnippet() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-comp-header-footer-title">
+            <Modal.Content>
               <Modal.Header
-                titleId="modal-comp-header-footer-title"
                 title="Подтверждение без контента"
                 description="Когда нужен только заголовок и действия."
                 closeAriaLabel="Закрыть"
@@ -56,10 +55,9 @@ export default function ModalCompositionSnippet() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-comp-header-body-title">
+            <Modal.Content>
               <Modal.Header
                 icon={<Icon name="nav.itemDot" />}
-                titleId="modal-comp-header-body-title"
                 title="Только информация"
                 description="Футер не нужен, если нет явных действий."
                 closeAriaLabel="Закрыть"
@@ -80,9 +78,8 @@ export default function ModalCompositionSnippet() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-comp-header-only-title">
+            <Modal.Content>
               <Modal.Header
-                titleId="modal-comp-header-only-title"
                 title="Короткое уведомление"
                 description="Полный блок шапки: заголовок и описание, без контента и футера."
                 closeAriaLabel="Закрыть"
@@ -100,10 +97,9 @@ export default function ModalCompositionSnippet() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-comp-form-title">
+            <Modal.Content>
               <Modal.Header
                 icon={<Icon name="field.email" />}
-                titleId="modal-comp-form-title"
                 title="Контакт получателя"
                 description="Заполните поле перед сохранением маршрута."
                 closeAriaLabel="Закрыть"
@@ -138,9 +134,8 @@ export default function ModalCompositionSnippet() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-comp-legal-title">
+            <Modal.Content>
               <Modal.Header
-                titleId="modal-comp-legal-title"
                 title="Согласие на обработку данных"
                 description={
                   <>

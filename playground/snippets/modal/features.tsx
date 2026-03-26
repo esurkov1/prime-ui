@@ -38,10 +38,9 @@ export default function ModalFeaturesSnippet() {
             </Modal.Trigger>
             <Modal.Portal container={portalHost}>
               <Modal.Overlay>
-                <Modal.Content aria-labelledby="modal-feat-portal-title">
+                <Modal.Content>
                   <Modal.Header
                     icon={<Icon name="nav.layoutGrid" />}
-                    titleId="modal-feat-portal-title"
                     title="Свой контейнер"
                     closeAriaLabel="Закрыть"
                   />
@@ -63,10 +62,9 @@ export default function ModalFeaturesSnippet() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="modal-feat-scroll-title">
+            <Modal.Content>
               <Modal.Header
                 icon={<Icon name="nav.itemDot" />}
-                titleId="modal-feat-scroll-title"
                 title="Прокрутка внутри панели"
                 description={
                   <>

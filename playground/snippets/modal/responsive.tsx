@@ -13,10 +13,9 @@ export default function ModalResponsiveSnippet() {
       </Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay>
-          <Modal.Content aria-labelledby="modal-responsive-title">
+          <Modal.Content>
             <Modal.Header
               icon={<Icon name="nav.home" />}
-              titleId="modal-responsive-title"
               title="Адаптивная ширина"
               description="При уменьшении окна браузера панель сжимается вместе с полем, не вылезая за отступы затемнения."
               closeAriaLabel="Закрыть"

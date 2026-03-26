@@ -29,6 +29,23 @@ type ModalContextValue = {
 
 const [ModalProvider, useModalContext] = createComponentContext<ModalContextValue>("Modal");
 
+/** Связка `Modal.Content` ↔ `Modal.Header`: id для `h2`/`p` и регистрация шапки для `aria-*` на панели. */
+type ModalContentShellContextValue = {
+  titleId: string;
+  descId: string;
+  registerHeader: (state: { hasDescription: boolean } | null) => void;
+};
+
+const ModalContentShellContext = React.createContext<ModalContentShellContextValue | null>(null);
+
+function useModalContentShell(): ModalContentShellContextValue {
+  const value = React.useContext(ModalContentShellContext);
+  if (value === null) {
+    throw new Error("[prime-ui-kit] `Modal.Header` must be used inside `Modal.Content`.");
+  }
+  return value;
+}
+
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export type ModalRootProps = {
@@ -158,11 +175,31 @@ function ModalContent({
   children,
   className,
   "aria-label": ariaLabel,
-  "aria-labelledby": ariaLabelledBy,
-  "aria-describedby": ariaDescribedBy,
+  "aria-labelledby": ariaLabelledByProp,
+  "aria-describedby": ariaDescribedByProp,
   ...rest
 }: ModalContentProps) {
   const { open, onClose, closeOnEscape } = useModalContext();
+
+  const internalTitleId = React.useId();
+  const internalDescId = React.useId();
+  const titleId = ariaLabelledByProp ?? internalTitleId;
+  const descId = ariaDescribedByProp ?? internalDescId;
+
+  const [headerState, setHeaderState] = React.useState<{ hasDescription: boolean } | null>(null);
+  const registerHeader = React.useCallback((state: { hasDescription: boolean } | null) => {
+    setHeaderState(state);
+  }, []);
+
+  const shellValue = React.useMemo<ModalContentShellContextValue>(
+    () => ({ titleId, descId, registerHeader }),
+    [titleId, descId, registerHeader],
+  );
+
+  const ariaLabelledByResolved =
+    ariaLabelledByProp ?? (ariaLabel ? undefined : headerState != null ? titleId : undefined);
+  const ariaDescribedByResolved =
+    ariaDescribedByProp ?? (headerState?.hasDescription ? descId : undefined);
 
   const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
 
@@ -206,19 +243,21 @@ function ModalContent({
   }, [open, trapRef]);
 
   return (
-    <div
-      ref={trapRef}
-      role="dialog"
-      aria-modal="true"
-      aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledBy}
-      aria-describedby={ariaDescribedBy}
-      tabIndex={-1}
-      className={cx(styles.content, className)}
-      {...rest}
-    >
-      <ControlSizeProvider value={MODAL_SHELL_SIZE}>{children}</ControlSizeProvider>
-    </div>
+    <ModalContentShellContext.Provider value={shellValue}>
+      <div
+        ref={trapRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledByResolved}
+        aria-describedby={ariaDescribedByResolved}
+        tabIndex={-1}
+        className={cx(styles.content, className)}
+        {...rest}
+      >
+        <ControlSizeProvider value={MODAL_SHELL_SIZE}>{children}</ControlSizeProvider>
+      </div>
+    </ModalContentShellContext.Provider>
   );
 }
 
@@ -228,12 +267,8 @@ export type ModalHeaderProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> 
   icon?: React.ReactNode;
   /** Текст заголовка (рендерится как `h2`). */
   title: React.ReactNode;
-  /** `id` для `h2`; для `aria-labelledby` на `Modal.Content` передайте то же значение. */
-  titleId?: string;
   /** Подзаголовок под заголовком (рендерится как `p`). */
   description?: React.ReactNode;
-  /** `id` для описания; для `aria-describedby` на `Modal.Content` передайте то же значение. */
-  descriptionId?: string;
   /** Показать встроенную кнопку закрытия в шапке (иконка). */
   showClose?: boolean;
   /** Подпись для встроенной кнопки закрытия (`aria-label`). */
@@ -243,20 +278,23 @@ export type ModalHeaderProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> 
 function ModalHeader({
   icon,
   title,
-  titleId: titleIdProp,
   description,
-  descriptionId: descriptionIdProp,
   showClose = true,
   closeAriaLabel = "Close",
   className,
   ...rest
 }: ModalHeaderProps) {
   const { onClose } = useModalContext();
-  const genTitleId = React.useId();
-  const genDescId = React.useId();
-  const titleId = titleIdProp ?? genTitleId;
-  const descriptionId =
-    description != null && description !== "" ? (descriptionIdProp ?? genDescId) : undefined;
+  const { titleId, descId, registerHeader } = useModalContentShell();
+
+  React.useLayoutEffect(() => {
+    registerHeader({
+      hasDescription: description != null && description !== "",
+    });
+    return () => {
+      registerHeader(null);
+    };
+  }, [description, registerHeader]);
 
   return (
     <header className={cx(styles.header, className)} {...rest}>
@@ -266,7 +304,7 @@ function ModalHeader({
           {title}
         </h2>
         {description != null && description !== "" ? (
-          <p id={descriptionId} className={styles.description}>
+          <p id={descId} className={styles.description}>
             {description}
           </p>
         ) : null}

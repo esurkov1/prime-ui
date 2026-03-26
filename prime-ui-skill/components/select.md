@@ -156,9 +156,8 @@ export function TicketCategoryModal() {
       </Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay>
-          <Modal.Content aria-labelledby="ticket-cat-title">
+          <Modal.Content>
             <Modal.Header
-              titleId="ticket-cat-title"
               title="Request category"
               description="Choose a topic before sending to the queue."
             />

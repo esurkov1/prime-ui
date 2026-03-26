@@ -37,9 +37,8 @@ export function ModalStructureExamples() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="m-struct-header-footer-title">
+            <Modal.Content>
               <Modal.Header
-                titleId="m-struct-header-footer-title"
                 title="Confirmation without body"
                 description="Suits a short question with an explicit choice."
               />
@@ -66,10 +65,9 @@ export function ModalStructureExamples() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="m-struct-header-body-title">
+            <Modal.Content>
               <Modal.Header
                 icon={<Icon name="nav.itemDot" />}
-                titleId="m-struct-header-body-title"
                 title="Information dialog"
               />
               <Modal.Body>
@@ -90,9 +88,8 @@ export function ModalStructureExamples() {
         </Modal.Trigger>
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby="m-struct-header-only-title">
+            <Modal.Content>
               <Modal.Header
-                titleId="m-struct-header-only-title"
                 title="Short notice"
                 description="Full header block: title and description, no body or footer."
               />
@@ -122,11 +119,9 @@ export function DeleteDraftConfirm() {
       </Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay>
-          <Modal.Content aria-labelledby="del-draft-title" aria-describedby="del-draft-desc">
+          <Modal.Content>
             <Modal.Header
               icon={<Icon name="status.locked" />}
-              titleId="del-draft-title"
-              descriptionId="del-draft-desc"
               title="Delete draft?"
               description="This cannot be undone. Only this document will be affected."
             />
@@ -162,10 +157,9 @@ export function KioskAnnouncement() {
     <Modal.Root defaultOpen>
       <Modal.Portal>
         <Modal.Overlay>
-          <Modal.Content aria-labelledby="kiosk-title">
+          <Modal.Content>
             <Modal.Header
               icon={<Icon name="nav.layoutGrid" />}
-              titleId="kiosk-title"
               title="Short hours today"
               description="Cashiers close at 4:00 PM. Thanks for your understanding."
             />
@@ -204,10 +198,9 @@ export function SupportTicketModal() {
       </Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay>
-          <Modal.Content aria-labelledby="ticket-title">
+          <Modal.Content>
             <Modal.Header
               icon={<Icon name="field.email" />}
-              titleId="ticket-title"
               title="New request"
               description="Briefly describe the issue — we will reply to the email on your profile."
             />
@@ -255,9 +248,8 @@ export function SimpleConfirmModal() {
       </Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay>
-          <Modal.Content aria-labelledby="simple-title">
+          <Modal.Content>
             <Modal.Header
-              titleId="simple-title"
               title="Confirm action"
               description="Changes will apply to all selected items."
             />
@@ -315,10 +307,9 @@ export function WizardStepModal() {
       >
         <Modal.Portal>
           <Modal.Overlay>
-            <Modal.Content aria-labelledby={`wiz-${step}-title`}>
+            <Modal.Content>
               <Modal.Header
                 icon={<Icon name="action.copy" />}
-                titleId={`wiz-${step}-title`}
                 title={`Step ${step} of 2`}
                 description={step === 1 ? "Verify your contact details." : "Confirm to finish."}
               />
@@ -363,7 +354,7 @@ Inside `Content`:
 - `Body` — optional main content;
 - `Footer` — optional action row.
 
-`Portal` renders nothing while the modal is closed. `Overlay` is a full-viewport backdrop; `Content` is the `role="dialog"` panel with focus trap.
+`Portal` renders nothing while the modal is closed. `Overlay` is a full-viewport backdrop; `Content` is the `role="dialog"` panel with focus trap. **`Modal.Content`** generates stable `id`s for the header title and description and sets **`aria-labelledby`** / **`aria-describedby`** on the panel when **`Modal.Header`** is present (override with the same props on `Content` only if you need full control).
 
 ## API
 
@@ -410,8 +401,8 @@ Inside `Content`:
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | `aria-label` | `string` | — | No | Dialog name without a visible title (follow a11y guidance). |
-| `aria-labelledby` | `string` | — | No | `id` of the title (`titleId` on `Modal.Header`). |
-| `aria-describedby` | `string` | — | No | `id` of the description (`descriptionId` on `Modal.Header`). |
+| `aria-labelledby` | `string` | — | No | Overrides the automatic link to the header `<h2>` `id` (otherwise set for you when `Modal.Header` is used). |
+| `aria-describedby` | `string` | — | No | Overrides the automatic link to the header description `<p>` `id` when `description` is set. |
 | `className` | `string` | — | No | Panel class. |
 | `children` | `React.ReactNode` | — | No | Header, body, footer; wraps `ControlSizeProvider`. |
 | … | `React.HTMLAttributes<HTMLDivElement>` | — | No | `role="dialog"`, `aria-modal`, `tabIndex={-1}`, focus trap, scroll lock, Escape via context. |
@@ -421,9 +412,7 @@ Inside `Content`:
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | `title` | `React.ReactNode` | — | Yes | Heading text (renders as `<h2>`). |
-| `titleId` | `string` | auto (`useId`) | No | `id` on the `<h2>`; pass the same value as `aria-labelledby` on `Content` when labelling the dialog. |
 | `description` | `React.ReactNode` | — | No | Secondary text (renders as `<p>`). |
-| `descriptionId` | `string` | auto (`useId`) | No | `id` on the `<p>`; pass the same value as `aria-describedby` on `Content` when needed. |
 | `icon` | `React.ReactNode` | — | No | Icon to the left of the text column. |
 | `showClose` | `boolean` | `true` | No | Show the built-in header close (icon button). |
 | `closeAriaLabel` | `string` | `"Close"` | No | `aria-label` for the built-in header close button. |
@@ -459,7 +448,7 @@ There is no separate `variant` prop on the modal, and **no `size` on `Modal.Root
 
 ## Accessibility (a11y)
 
-- Panel uses `role="dialog"` and `aria-modal="true"`. Set **`aria-labelledby`** to the **`titleId`** used on `Modal.Header` (or rely on auto-generated ids and avoid duplicate labelling), and **`aria-describedby`** to **`descriptionId`** when you expose description; if there is no visible title, use **`aria-label`** on `Content`.
+- Panel uses `role="dialog"` and `aria-modal="true"`. With **`Modal.Header`**, **`aria-labelledby`** / **`aria-describedby`** on the panel are wired automatically; use **`aria-label`** on `Content` only when there is no header title (or override the `aria-*` props on `Content` for special cases).
 - **Escape** closes the dialog unless `closeOnEscape` is disabled.
 - Focus stays inside `Content` while the modal is open.
 - The built-in header close uses **`closeAriaLabel`** (default `"Close"`); override with `closeAriaLabel` when you localize the UI.
