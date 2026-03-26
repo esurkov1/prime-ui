@@ -1,12 +1,18 @@
 .root {
   box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   align-items: stretch;
   gap: var(--prime-sys-spacing-x3);
   width: 100%;
   min-height: 0;
   background: transparent;
+}
+
+/* Один ребёнок (только main без слота навигации): на всю ширину сетки. */
+.root > .contentArea:only-child {
+  grid-column: 1 / -1;
 }
 
 .root[data-fill-viewport="true"] {
@@ -17,9 +23,6 @@
 
 .navArea {
   box-sizing: border-box;
-  display: flex;
-  flex: 0 0 auto;
-  align-self: stretch;
   min-width: 0;
   min-height: 0;
   max-height: 100%;

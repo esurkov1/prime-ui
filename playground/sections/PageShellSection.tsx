@@ -41,7 +41,7 @@ const navAreaRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Класс на flex-слоте навигации (`<div>`, не landmark).",
+    description: "Класс на слоте навигации в сетке (`<div>`, не landmark).",
   },
   {
     prop: "children",

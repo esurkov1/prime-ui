@@ -2,7 +2,8 @@
 
 ## name: prime-ui-kit  
 description: >  
-  Builds responsive, mobile-first screens with prime-ui-kit: Flexbox, CSS Modules, and --prime-sys-* tokens.  
+  Builds responsive, mobile-first screens with prime-ui-kit: CSS Grid for page/shell layouts and grids,
+  Flexbox for local stacks/toolbars, CSS Modules, and --prime-sys-* tokens.
   Use when laying out pages, templates, forms, navigation, or dashboards; converting desktop layouts to  
   mobile-first; picking a component for a region; validating breakpoints, touch targets, or Drawer vs inline.  
   Includes recipes (dashboard, settings, catalog, landing, form wizard), a 41-component catalog, and anti-patterns.  
@@ -72,22 +73,23 @@ Full reference: `[design-tokens.md](./design-tokens.md)`.
 
 ## Layout principles
 
-- **Mobile-first:** start with `flex-direction: column`; switch to a row at `@media (min-width: …)`.
+- **Mobile-first:** start with a single column (`grid-template-columns: 1fr` or `flex-direction: column`); expand to several columns at `@media (min-width: …)`.
 - **Breakpoints:** `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 — place them where the layout breaks, not by device name.
-- **Flex:** sidebar + content — `flex-wrap`, sidebar `flex: 0 0 280px`, content `flex: 1 1 0%`; holy grail — body column `min-height: 100vh`, middle `flex: 1` + flex row; card grid — `flex-wrap` + token `gap` + `min-width` for reflow; sticky footer — main `flex: 1 0 auto`, footer `flex-shrink: 0`.
+- **CSS Grid (предпочтительно для каркаса и сеток):** страница приложения (`PageShell`) — `grid-template-columns: auto minmax(0, 1fr)` (навигация + колонка с `minmax(0, 1fr)` чтобы не ломалось переполнение); карточные сетки — `display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, …), 1fr)); gap: var(--prime-sys-spacing-*)`; при необходимости `grid-template-areas` для слотов header / main / footer.
+- **Flexbox (локально):** ряды кнопок, выравнивание в тулбаре, вертикальный стек внутри карточки/формы, «хвост» sticky footer внутри колонки — там, где не нужна двумерная сетка.
 - **Spacing:** `gap` / `padding` / `margin` only from `--prime-sys-spacing-`*; for fluid spacing use e.g. `clamp(var(--prime-sys-spacing-s), 2vw, var(--prime-sys-spacing-xl))` — avoid mixing literals and tokens in one rule without good reason.
 - **Touch:** minimum 44×44 px (WCAG 2.5.5); on mobile use Button / Input / Select at `size="l"`; pad Checkbox / Radio / Switch hit areas; LinkButton at least `m`.
-- **Navigation:** desktop — fixed Sidebar with `flex-shrink: 0`; below `md` — Sidebar in a left Drawer; Breadcrumb with `maxItems`; Tabs horizontal scroll or Accordion; CommandMenu reachable from a button on all widths.
+- **Navigation:** desktop — Sidebar в колонке `auto` (или фиксированный `minmax`); below `md` — Sidebar in a left Drawer; Breadcrumb with `maxItems`; Tabs horizontal scroll or Accordion; CommandMenu reachable from a button on all widths.
 
 ---
 
 ## Recipes (compact)
 
-**Dashboard:** Sidebar + header (Breadcrumb, Avatar, CommandMenu) + content (Tabs, DataTable, ProgressBar, Badge). At `≥ lg` use a row; below `lg` stack and move the sidebar to a Drawer; scroll Tabs; below `md` use a horizontally scrolling table with a pinned column; below `sm` use a vertical Stepper if needed.
+**Dashboard:** Sidebar + header (Breadcrumb, Avatar, CommandMenu) + content (Tabs, DataTable, ProgressBar, Badge). At `≥ lg` — двухколоночный каркас (часто `PageShell`, CSS Grid); below `lg` stack and move the sidebar to a Drawer; scroll Tabs; below `md` use a horizontally scrolling table with a pinned column; below `sm` use a vertical Stepper if needed.
 
-**Settings:** side section nav + form (Label, Input, Select, Switch, Textarea, Button). At `≥ md` use a row; below `md` turn the sidebar into Tabs or Accordion; fields `fullWidth`; form footer — ButtonGroup, `justify-end`; below `sm` buttons `fullWidth`.
+**Settings:** side section nav + form (Label, Input, Select, Switch, Textarea, Button). At `≥ md` — две колонки (grid/flex row); below `md` turn the sidebar into Tabs or Accordion; fields `fullWidth`; form footer — ButtonGroup, `justify-end`; below `sm` buttons `fullWidth`.
 
-**Catalog:** search + SegmentedControl + filters + card grid. Filters `flex: 0 0 260px` at `≥ md`; below `md` filters in a bottom Drawer; below `sm` single column; many segments — use Select on narrow widths; Pagination in compact mode.
+**Catalog:** search + SegmentedControl + filters + card grid. Filters в боковой колонке (`minmax` / фикс. ширина) at `≥ md`; карточки — CSS Grid (`repeat(auto-fill, minmax(…))`); below `md` filters in a bottom Drawer; below `sm` single column; many segments — use Select on narrow widths; Pagination in compact mode.
 
 **Landing:** sections as a column with `max-width` and centering; Hero stacks below `md`, text + media in a row at `≥ md`; FAQ — Accordion; below `md` nav in a Drawer; CTA — ButtonGroup, vertical on narrow widths.
 
@@ -107,7 +109,7 @@ Every exported component is documented under `../src/components/<kebab-name>/COM
 
 1. `100vw` instead of `100%` — scrollbar width causes horizontal overflow.
 2. `height: 100vh` on mobile without accounting for Safari’s dynamic chrome — prefer `min-height: 100dvh` or a fallback with `-webkit-fill-available`.
-3. Sidebar without `flex-shrink: 0` / `flex: 0 0 <width>` — it shrinks when main content overflows.
+3. Sidebar column without `minmax(0, 1fr)` on the main track / `grid-template-columns` without `minmax` on the fluid column — main content can overflow instead of scrolling; в flex-режиме — без `flex-shrink: 0` / `flex: 0 0 <width>` боковая колонка сжимается.
 4. Wide tables without a scroll wrapper — use DataTable (`overflow-x`, pinned column).
 5. Centered Modal on mobile for long flows — prefer a bottom Drawer below `md`.
 6. Small tap targets on mobile — see Touch above.
