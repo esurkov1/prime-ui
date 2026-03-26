@@ -40,7 +40,7 @@ export function Example() {
 ## Rules
 
 - **Weights** are **non-negative**; each **`value`** is clamped to **`≥ 0`**. Invalid numbers are treated as **`0`**.
-- **Widths** are proportional to the **sum** of all weights: segment `i` has width **`value[i] / sum(values)`**. If the sum is **`0`**, the track is empty (track background only).
+- **Segment sizes** follow **`value[i] / sum(values)`** via **`flex-grow`** on the track (not `%` width), so layout stays correct in shrink-to-fit parents (e.g. playground `stack` preview). If the sum is **`0`**, the track is empty (track background only).
 - **Percentages** in the accessibility description are **rounded** to whole numbers.
 - **`segmentGap`** defaults to **`hairline`** (1px gap, `--prime-sys-color-border-subtle` between segments); **`none`** removes the gap.
 - **`tone`** defaults to **`primary`** when omitted; allowed values: **`primary`**, **`success`**, **`warning`**, **`danger`**, **`neutral`**.

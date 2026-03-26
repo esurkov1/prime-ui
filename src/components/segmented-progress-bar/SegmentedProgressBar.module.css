@@ -68,12 +68,12 @@
 }
 
 .segment {
-  flex-shrink: 0;
+  box-sizing: border-box;
   min-width: 0;
   height: var(--seg-progress-track-h);
   border-radius: var(--prime-sys-shape-radius-round);
   transition:
-    width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    flex-grow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
     background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 

@@ -79,13 +79,13 @@ const SegmentedProgressBarRoot = React.forwardRef<HTMLDivElement, SegmentedProgr
         <div ref={ref} className={styles.track} role="group" {...trackA11y}>
           {total > 0
             ? safe.map((seg, i) => {
-                const pct = (seg.value / total) * 100;
+                /* flex-grow по весу — не зависит от разрешения % ширины при shrink-to-fit родителе (playground stack). */
                 return (
                   <div
                     // biome-ignore lint/suspicious/noArrayIndexKey: segments are presentational bars in source order; no reorder/dnd
                     key={i}
                     className={styles.segment}
-                    style={{ width: `${pct}%` }}
+                    style={{ flex: `${seg.value} 1 0%` }}
                     {...toDataAttributes({ tone: seg.tone ?? "primary" })}
                     title={seg.label}
                   />

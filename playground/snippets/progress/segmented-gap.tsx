@@ -7,7 +7,7 @@ const segments = [
 
 export default function SegmentedGapSnippet() {
   return (
-    <div className="stack">
+    <div className="stack examplePreviewBleed">
       <SegmentedProgressBar.Root
         segmentGap="hairline"
         segments={segments}

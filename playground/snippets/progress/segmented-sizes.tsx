@@ -8,7 +8,7 @@ const segments = [
 
 export default function SegmentedSizesSnippet() {
   return (
-    <div className="stack">
+    <div className="stack examplePreviewBleed">
       <SegmentedProgressBar.Root size="s" segments={segments} />
       <SegmentedProgressBar.Root size="m" segments={segments} />
       <SegmentedProgressBar.Root size="l" segments={segments} />
