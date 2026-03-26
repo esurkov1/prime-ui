@@ -9,6 +9,8 @@ import {
 } from "@/components/color-picker/ColorPicker";
 import { Popover } from "@/components/popover/Popover";
 
+import preview from "./preview.module.css";
+
 const PRESETS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#14b8a6", "#3b82f6", "#8b5cf6"];
 
 export default function ColorPickerPopoverSnippet() {
@@ -28,14 +30,8 @@ export default function ColorPickerPopoverSnippet() {
       <Popover.Trigger asChild>
         <Button.Root mode="stroke" size="m" variant="neutral">
           <span
-            style={{
-              display: "inline-block",
-              width: "1rem",
-              height: "1rem",
-              borderRadius: "var(--prime-sys-radius-s)",
-              backgroundColor: colorString,
-              border: "1px solid var(--prime-sys-color-border-primary)",
-            }}
+            className={preview.triggerColorReadoutSwatch}
+            style={{ backgroundColor: colorString }}
           />
           {colorString}
         </Button.Root>

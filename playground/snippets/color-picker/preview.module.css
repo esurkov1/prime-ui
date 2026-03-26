@@ -139,3 +139,14 @@
   flex: 1;
   min-width: 0;
 }
+
+/* Кастомный квадрат цвета на триггере (заливка задаётся из JS). */
+.triggerColorReadoutSwatch {
+  box-sizing: border-box;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--prime-sys-shape-radius-s);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-primary);
+}

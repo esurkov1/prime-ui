@@ -91,9 +91,11 @@ import * as React from "react";
 
 import { Button, ColorPicker, Popover } from "prime-ui-kit";
 
+import preview from "./preview.module.css";
+
 export function CtaHexRow() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "flex-end" }}>
+    <div className={preview.sizesRow}>
       {(["s", "xl"] as const).map((size) => (
         <HexSizeTrigger key={size} size={size} />
       ))}
@@ -227,6 +229,8 @@ import * as React from "react";
 import { Button, ColorPicker, parseColor, Popover } from "prime-ui-kit";
 import type { Color } from "react-aria-components";
 
+import preview from "./preview.module.css";
+
 const PRESETS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#14b8a6", "#3b82f6", "#8b5cf6"];
 
 export function ColorPickerPopoverField() {
@@ -239,16 +243,7 @@ export function ColorPickerPopoverField() {
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
         <Button.Root mode="stroke" size="m" variant="neutral">
-          <span
-            style={{
-              display: "inline-block",
-              width: "1rem",
-              height: "1rem",
-              borderRadius: "var(--prime-sys-radius-s)",
-              backgroundColor: colorString,
-              border: "1px solid var(--prime-sys-color-border-primary)",
-            }}
-          />
+          <span className={preview.triggerColorReadoutSwatch} style={{ backgroundColor: colorString }} />
           {colorString}
         </Button.Root>
       </Popover.Trigger>
