@@ -1,3 +1,16 @@
+/* Плавное открытие/закрытие inline-сайдбара (десктоп): интерполяция длин. Без — переменные переключаются скачком. */
+@property --sb-panel-visible-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --sb-context-visible-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 .root {
   --sb-context-width: var(--prime-sys-unit-4rem);
   --sb-panel-width: var(--prime-sys-unit-20rem);
@@ -46,6 +59,18 @@
     width var(--sb-transition-duration) var(--sb-transition-ease),
     min-width var(--sb-transition-duration) var(--sb-transition-ease),
     margin var(--sb-transition-duration) var(--sb-transition-ease);
+}
+
+/* Десктоп: анимируем ширину колонки через custom properties (рядом с main в `PageShell`). */
+@media (min-width: 64.001rem) {
+  .root {
+    transition:
+      --sb-panel-visible-width var(--sb-transition-duration) var(--sb-transition-ease),
+      --sb-context-visible-width var(--sb-transition-duration) var(--sb-transition-ease),
+      width var(--sb-transition-duration) var(--sb-transition-ease),
+      min-width var(--sb-transition-duration) var(--sb-transition-ease),
+      margin var(--sb-transition-duration) var(--sb-transition-ease);
+  }
 }
 
 .root[data-variant="double"] {
@@ -120,9 +145,8 @@
   --sb-shell-gap: var(--sb-page-gap);
 }
 
+/* Ширину задаёт `--sb-shell-width` (анимируется на десктопе); не форсим `width: 0`, иначе скачок. */
 .root[data-sidebar-slot="page-nav"][data-open="false"] {
-  width: 0;
-  min-width: 0;
   margin-inline-start: 0;
   margin-inline-end: 0;
   margin-block: 0;
@@ -373,6 +397,20 @@
   transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
   opacity: 0;
   pointer-events: none;
+}
+
+/* `page-nav` на широком экране: только сжатие колонки (overflow), без slide — иначе дублирование с анимацией ширины. */
+@media (min-width: 64.001rem) {
+  .root[data-sidebar-slot="page-nav"] .navPanel {
+    transform: none;
+    opacity: 1;
+  }
+
+  .root[data-sidebar-slot="page-nav"][data-open="false"] .navPanel {
+    transform: none;
+    opacity: 1;
+    pointer-events: none;
+  }
 }
 
 .panelSwitch {
@@ -888,6 +926,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+
   .contextRail,
   .navArea,
   .navPanel,
