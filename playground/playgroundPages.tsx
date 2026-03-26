@@ -49,17 +49,29 @@ import TextareaSection from "./sections/TextareaSection";
 import TooltipSection from "./sections/TooltipSection";
 import TypographySection from "./sections/TypographySection";
 
-/** Категории сайдбара — как в каталоге дизайн-системы (Foundations → Overlays). */
+/**
+ * Категории сайдбара playground: одна ось на категорию, без пересечений.
+ *
+ * - **foundations** — токены, типографика и базовые визуальные примитивы (не сценарий экрана).
+ * - **actions** — явное действие по клику/активации (кнопки и ссылка-кнопка).
+ * - **form** — ввод и выбор значения в форме (включая контролы с оверлеем-панелью, например Color Picker).
+ * - **data-display** — статичное представление данных и меток (таблица, бейдж, тег, код; без индикаторов процесса).
+ * - **feedback** — сообщения системы и ход процесса (уведомления, баннеры, прогресс).
+ * - **layout** — каркас страницы, области, прокрутка, вертикальная секционность (accordion).
+ * - **navigation** — перемещение по местам, шагам и представлениям контента (вкладки, сегменты, крошки, пагинация).
+ * - **overlays** — плавающие слои и порталы поверх страницы (включая Tooltip).
+ * - **infrastructure** — контекст размеров и демо-обвязка, не пользовательский UI продукта.
+ */
 export type PlaygroundCategoryId =
   | "foundations"
   | "actions"
   | "form"
-  | "displaying-data"
+  | "data-display"
   | "feedback"
   | "layout"
   | "navigation"
   | "overlays"
-  | "auxiliary";
+  | "infrastructure";
 
 export type PlaygroundCategoryMeta = { id: PlaygroundCategoryId; label: string };
 
@@ -67,21 +79,23 @@ export const PLAYGROUND_NAV_CATEGORIES: PlaygroundCategoryMeta[] = [
   { id: "foundations", label: "Foundations" },
   { id: "actions", label: "Actions" },
   { id: "form", label: "Form" },
-  { id: "displaying-data", label: "Displaying Data" },
+  { id: "data-display", label: "Data display" },
   { id: "feedback", label: "Feedback" },
   { id: "layout", label: "Layout" },
   { id: "navigation", label: "Navigation" },
   { id: "overlays", label: "Overlays" },
-  { id: "auxiliary", label: "Вспомогательные компоненты" },
+  { id: "infrastructure", label: "Infrastructure" },
 ];
 
 type PageDef = { segment: string; label: string; Page: ComponentType };
 
-/** Порядок внутри секции совпадает с вашим списком; отсутствующие компоненты не добавляем в меню. */
+/** Порядок внутри категории — по смыслу (группы полей, затем алфавит где уместно). */
 const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
   foundations: [
     { segment: "color", label: "Color", Page: ColorSection },
     { segment: "typography", label: "Typography", Page: TypographySection },
+    { segment: "kbd", label: "Kbd", Page: KbdSection },
+    { segment: "divider", label: "Divider", Page: DividerSection },
   ],
   actions: [
     { segment: "buttons", label: "Button", Page: ButtonSection },
@@ -103,36 +117,32 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     { segment: "switch", label: "Switch", Page: SwitchSection },
     { segment: "textarea", label: "Textarea", Page: TextareaSection },
   ],
-  "displaying-data": [
-    /* Avatar Group / Compact — примеры на странице Avatar */
+  "data-display": [
     { segment: "avatar", label: "Avatar", Page: AvatarSection },
     { segment: "badge", label: "Badge", Page: BadgeSection },
-    { segment: "banner", label: "Banner", Page: BannerSection },
     { segment: "code-block", label: "Code Block", Page: CodeBlockSection },
     { segment: "data-table", label: "Data Table", Page: DataTableSection },
-    { segment: "divider", label: "Divider", Page: DividerSection },
-    { segment: "kbd", label: "Kbd", Page: KbdSection },
-    { segment: "progress-bar", label: "Progress Bar", Page: ProgressBarSection },
-    { segment: "progress-circle", label: "Progress Circle", Page: ProgressCircleSection },
-    /* Rating — компонента нет; Status Badge — варианты Badge */
     { segment: "tag", label: "Tag", Page: TagSection },
   ],
   feedback: [
+    { segment: "banner", label: "Banner", Page: BannerSection },
     { segment: "notification", label: "Notification", Page: NotificationSection },
-    { segment: "tooltip", label: "Tooltip", Page: TooltipSection },
+    { segment: "progress-bar", label: "Progress Bar", Page: ProgressBarSection },
+    { segment: "progress-circle", label: "Progress Circle", Page: ProgressCircleSection },
   ],
   layout: [
     { segment: "accordion", label: "Accordion", Page: AccordionSection },
-    { segment: "breadcrumb", label: "Breadcrumb", Page: BreadcrumbSection },
-    { segment: "segmented-control", label: "Segmented Control", Page: SegmentedControlSection },
-    { segment: "tabs", label: "Tab Menu", Page: TabsSection },
-    /* Sidebar — не в вашем списке, но есть в ките */
+    { segment: "app-shell", label: "AppShell", Page: AppShellSection },
+    { segment: "page-content", label: "PageContent", Page: PageContentSection },
+    { segment: "scroll-container", label: "ScrollContainer", Page: ScrollContainerSection },
     { segment: "sidebar", label: "Sidebar", Page: SidebarSection },
   ],
   navigation: [
-    /* Dot Stepper — отдельного компонента нет */
-    { segment: "stepper", label: "Stepper", Page: StepperSection },
+    { segment: "breadcrumb", label: "Breadcrumb", Page: BreadcrumbSection },
     { segment: "pagination", label: "Pagination", Page: PaginationSection },
+    { segment: "segmented-control", label: "Segmented Control", Page: SegmentedControlSection },
+    { segment: "stepper", label: "Stepper", Page: StepperSection },
+    { segment: "tabs", label: "Tab Menu", Page: TabsSection },
   ],
   overlays: [
     { segment: "command-menu", label: "Command Menu", Page: CommandMenuSection },
@@ -140,13 +150,11 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     { segment: "dropdown", label: "Dropdown", Page: DropdownSection },
     { segment: "modal", label: "Modal", Page: ModalSection },
     { segment: "popover", label: "Popover", Page: PopoverSection },
+    { segment: "tooltip", label: "Tooltip", Page: TooltipSection },
   ],
-  auxiliary: [
-    { segment: "app-shell", label: "AppShell", Page: AppShellSection },
-    { segment: "page-content", label: "PageContent", Page: PageContentSection },
-    { segment: "example-frame", label: "ExampleFrame", Page: ExampleFrameSection },
-    { segment: "scroll-container", label: "ScrollContainer", Page: ScrollContainerSection },
+  infrastructure: [
     { segment: "control-size", label: "ControlSizeProvider", Page: ControlSizeSection },
+    { segment: "example-frame", label: "ExampleFrame", Page: ExampleFrameSection },
   ],
 };
 
