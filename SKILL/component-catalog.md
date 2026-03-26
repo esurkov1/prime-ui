@@ -1,6 +1,6 @@
 # prime-ui-kit component catalog — responsive context
 
-Full table of all 42 components mapped to responsive layout.
+Full table of all 43 components mapped to responsive layout.
 
 **Zone shorthand:** header, sidebar, content, footer, overlay, form, inline, navigation.
 
@@ -295,6 +295,16 @@ Full table of all 42 components mapped to responsive layout.
 | **Zones** | content, form |
 | **Scenarios** | File upload; survey steps; background report build; sync jobs; “building export” card; controlled value. |
 | **Documentation** | `../src/components/progress-bar/COMPONENT.md` |
+
+## SegmentedProgressBar
+
+| | |
+|---|---|
+| **Purpose** | Horizontal stacked segments with proportional weights and semantic tones (status mix, survey breakdown). |
+| **Responsive role** | Full width like ProgressBar; use compact `size` on narrow viewports. |
+| **Zones** | content, form, inline |
+| **Scenarios** | Batch job outcomes; CI/test split; storage by category; support ticket mix; legend + bar in dashboards. |
+| **Documentation** | `../src/components/segmented-progress-bar/COMPONENT.md` |
 
 ## ProgressCircle
 

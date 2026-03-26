@@ -1,60 +1,80 @@
+/* Высота трека — как у ProgressBar (Slider control-height). */
 .root {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--segmented-progress-root-gap);
+  gap: var(--seg-progress-root-gap);
   width: 100%;
 }
 
 .root[data-size="s"] {
-  --segmented-progress-root-gap: var(--prime-sys-size-control-s-gap);
-  --segmented-progress-track-h: var(--prime-sys-spacing-xs);
-  --segmented-progress-caption-size: var(--prime-sys-size-control-s-text);
+  --seg-progress-root-gap: var(--prime-sys-size-control-s-gap);
+  --seg-progress-track-h: var(--prime-sys-spacing-xs);
+  --seg-progress-label-size: var(--prime-sys-size-control-s-text);
 }
 
 .root[data-size="m"] {
-  --segmented-progress-root-gap: var(--prime-sys-size-control-m-gap);
-  --segmented-progress-track-h: var(--prime-sys-spacing-xs);
-  --segmented-progress-caption-size: var(--prime-sys-size-control-m-text);
+  --seg-progress-root-gap: var(--prime-sys-size-control-m-gap);
+  --seg-progress-track-h: var(--prime-sys-spacing-xs);
+  --seg-progress-label-size: var(--prime-sys-size-control-m-text);
 }
 
 .root[data-size="l"] {
-  --segmented-progress-root-gap: var(--prime-sys-size-control-l-gap);
-  --segmented-progress-track-h: var(--prime-sys-spacing-s);
-  --segmented-progress-caption-size: var(--prime-sys-size-control-l-text);
+  --seg-progress-root-gap: var(--prime-sys-size-control-l-gap);
+  --seg-progress-track-h: var(--prime-sys-spacing-s);
+  --seg-progress-label-size: var(--prime-sys-size-control-l-text);
 }
 
 .root[data-size="xl"] {
-  --segmented-progress-root-gap: var(--prime-sys-size-control-xl-gap);
-  --segmented-progress-track-h: var(--prime-sys-spacing-s);
-  --segmented-progress-caption-size: var(--prime-sys-size-control-xl-text);
+  --seg-progress-root-gap: var(--prime-sys-size-control-xl-gap);
+  --seg-progress-track-h: var(--prime-sys-spacing-s);
+  --seg-progress-label-size: var(--prime-sys-size-control-xl-text);
 }
 
-.caption {
-  font-size: var(--segmented-progress-caption-size);
+.label {
+  font-size: var(--seg-progress-label-size);
   color: var(--prime-sys-color-content-primary);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .track {
   display: flex;
+  flex-direction: row;
   width: 100%;
-  min-height: var(--segmented-progress-track-h);
+  min-height: var(--seg-progress-track-h);
   border-radius: var(--prime-sys-shape-radius-round);
   overflow: hidden;
-  gap: var(--prime-sys-unit-1px);
   background: var(--prime-sys-color-surface-accentSoft);
 }
 
-.empty {
-  flex: 1 1 auto;
-  min-height: var(--segmented-progress-track-h);
-  background: var(--prime-sys-color-surface-accentSoft);
+.root[data-segment-gap="hairline"] .track {
+  gap: 1px;
+  background: var(--prime-sys-color-border-subtle);
+}
+
+.root[data-segment-gap="none"] .track {
+  gap: 0;
 }
 
 .segment {
-  flex: 1 1 0;
+  flex-shrink: 0;
   min-width: 0;
-  min-height: var(--segmented-progress-track-h);
-  transition: flex-grow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  height: var(--seg-progress-track-h);
+  border-radius: var(--prime-sys-shape-radius-round);
+  transition:
+    width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
 .segment[data-tone="primary"] {
@@ -70,18 +90,9 @@
 }
 
 .segment[data-tone="danger"] {
-  background: var(--prime-sys-color-status-error-backgroundEmphasis);
+  background: var(--prime-sys-color-action-errorBackground);
 }
 
 .segment[data-tone="neutral"] {
-  background: var(--prime-sys-color-surface-raised);
-  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
-}
-
-.segment[data-tone="pending"] {
-  background: var(--prime-sys-color-status-away-backgroundEmphasis);
-}
-
-.segment[data-tone="info"] {
-  background: var(--prime-sys-color-status-information-backgroundEmphasis);
+  background: var(--prime-sys-color-surface-accentSoft);
 }

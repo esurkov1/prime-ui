@@ -4,30 +4,33 @@
 
 ## About
 
-A full-width horizontal bar split into colored segments whose widths are proportional to **non-negative** numeric **values** (shares of the total). Use for dashboards and status summaries where several categories add up to one whole (for example error / pending / success counts).
+A horizontal **stacked** bar: one segment per category, with widths proportional to each segment’s **`value`** (weight). Use semantic **`tone`** colors for status (success, warning, danger, etc.) and optional labels for tooltips and assistive-tech descriptions.
 
-- **Use** when you need to show a **composition** (parts of 100%) with distinct semantic colors.
-- **Use** with **`label`** for a visible title and optional **`ariaLabel`** for a precise screen-reader name.
-- **Do not use** for a single scalar completion value — use **ProgressBar** or **ProgressCircle** instead.
-- **Do not use** when segments are not parts of one total; the component always normalizes by the **sum of segment values**.
+- **Use** for part-to-whole breakdowns—e.g. job outcomes (errors / pending / success), survey responses, or storage by type.
+- **Use** with **`segmentGap="hairline"`** (default) when segments should read as distinct columns; use **`none`** for a continuous strip.
+- **Use** with **`label`** when the bar needs a visible title; the **distribution** string is still exposed to screen readers via **`aria-describedby`**.
+- **Do not use** for a single continuous fraction of one task—use [ProgressBar](../progress-bar/COMPONENT.md) (native `<progress>`).
+- **Do not use** for interactive selection—use [SegmentedControl](../segmented-control/COMPONENT.md).
+- **Do not use** for discrete steps—use [Stepper](../stepper/COMPONENT.md).
 
 ## Composition
 
-- **`SegmentedProgressBar`** exposes only **`SegmentedProgressBar.Root`**.
-- The root wraps an optional caption and a **`role="img"`** track (graphic summary) with **`aria-label`**. Segments are **flex** items with **`flex-grow`** equal to their **value**, so proportions match the data without manual percentages.
+- **`SegmentedProgressBar`** is a single-part namespace: only **`SegmentedProgressBar.Root`** is public.
+- **`SegmentedProgressBar.Root`** renders a wrapper `div` with `data-size` and `data-segment-gap`, an optional **`label`**, a visually hidden **`<span>`** with the distribution text when **`label`** is set, and a **`role="group"`** track containing one **`div`** per segment.
 
 ### Minimal example
 
 ```tsx
 import { SegmentedProgressBar } from "prime-ui-kit";
 
-export function RunSummary() {
+export function Example() {
   return (
     <SegmentedProgressBar.Root
       segments={[
         { value: 30, label: "Errors", tone: "danger" },
-        { value: 25, label: "Waiting", tone: "pending" },
-        { value: 45, label: "Success", tone: "success" },
+        { value: 25, label: "Pending", tone: "warning" },
+        { value: 35, label: "Success", tone: "success" },
+        { value: 10, label: "Other", tone: "neutral" },
       ]}
     />
   );
@@ -36,12 +39,13 @@ export function RunSummary() {
 
 ## Rules
 
-- **Values** must be **≥ 0**; negative values are treated as **0**.
-- **Proportions** are **value / sum(values)**. The scale is arbitrary (e.g. `3, 2, 5` is the same as `30, 20, 50`).
-- Segments with **value 0** are omitted from the bar.
-- If the **sum is 0**, the track shows an **empty** state and **`aria-label`** is **`No data`** (optionally prefixed by **`label`**).
-- **`tone`** defaults to **`primary`** when omitted.
-- **`aria-label`** on the group defaults to a comma-separated list of **`label` + rounded percentage** per segment, or **`Segment {n}`** if **`label`** is missing. Override with **`ariaLabel`** for i18n or richer copy.
+- **Weights** are **non-negative**; each **`value`** is clamped to **`≥ 0`**. Invalid numbers are treated as **`0`**.
+- **Widths** are proportional to the **sum** of all weights: segment `i` has width **`value[i] / sum(values)`**. If the sum is **`0`**, the track is empty (track background only).
+- **Percentages** in the accessibility description are **rounded** to whole numbers.
+- **`segmentGap`** defaults to **`hairline`** (1px gap, `--prime-sys-color-border-subtle` between segments); **`none`** removes the gap.
+- **`tone`** defaults to **`primary`** when omitted; allowed values: **`primary`**, **`success`**, **`warning`**, **`danger`**, **`neutral`**.
+- **`label`** on each segment is passed to **`title`** on the segment for tooltips; it also appears in the **distribution** string for assistive tech when provided.
+- The bar is **not** a single native **`progressbar`**; the track is **`role="group"`** with **`aria-label`** (no visible label) or **`aria-labelledby`** + **`aria-describedby`** (with label).
 
 ## API
 
@@ -49,36 +53,23 @@ export function RunSummary() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| `segments` | `SegmentedProgressSegment[]` | — | Yes | Items with **`value`**, optional **`label`** and **`tone`**. |
-| `label` | `string` | — | No | Visible caption above the track; also prepended to the default **`aria-label`**. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track height and caption typography (aligned with **ProgressBar**). |
-| `ariaLabel` | `string` | — | No | Accessible name for the **`role="img"`** track; overrides auto-generated text. |
+| `segments` | `SegmentedProgressSegment[]` | — | Yes | Non-negative weights; layout is proportional to the sum. |
+| `label` | `string` | — | No | Text above the track; when set, the group uses **`aria-labelledby`** and **`aria-describedby`**. |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track height and label typography (same scale as ProgressBar). |
+| `segmentGap` | `"none" \| "hairline"` | `"hairline"` | No | Gap between segment fills. |
 | `className` | `string` | — | No | Class on the outer wrapper. |
-| `ref` | `React.Ref<HTMLDivElement>` | — | No | Ref to the outer wrapper. |
+| `ref` | `React.Ref<HTMLDivElement>` | — | No | Ref to the **`role="group"`** track element. |
 
 ### SegmentedProgressSegment
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `value` | `number` | Yes | Weight; must be non-negative for inclusion. |
-| `label` | `string` | No | Legend text and default **a11y** segment name. |
-| `tone` | `SegmentedProgressTone` | No | Palette token for the segment fill. |
-| `id` | `string` | No | Unique **React** `key` when **`label` + `value` + `tone`** repeat across segments. |
-
-### SegmentedProgressTone
-
-| Value | Visual role |
-|-------|-------------|
-| `primary` | Primary action fill (`--prime-sys-color-action-primaryBackground`). |
-| `success` | Success emphasis. |
-| `warning` | Warning emphasis. |
-| `danger` | Error emphasis. |
-| `neutral` | Raised surface + subtle border. |
-| `pending` | “Away” / waiting emphasis (yellow family). |
-| `info` | Information emphasis (blue family). |
+| `value` | `number` | Yes | Weight **`≥ 0`**; contributes to proportion. |
+| `label` | `string` | No | Tooltip and assistive-tech segment label. |
+| `tone` | `"primary" \| "success" \| "warning" \| "danger" \| "neutral"` | No | Default **`primary`**. |
 
 ## Related
 
-- [ProgressBar](../progress-bar/COMPONENT.md) — single determinate scalar on **`<progress>`**.
-- [ProgressCircle](../progress-circle/COMPONENT.md) — circular scalar indicator.
-- [Typography](../typography/COMPONENT.md) — titles and legends beside the bar.
+- [ProgressBar](../progress-bar/COMPONENT.md) — single determinate progress on `<progress>`.
+- [ProgressCircle](../progress-circle/COMPONENT.md) — circular fraction.
+- [Typography](../typography/COMPONENT.md) — headings and legends beside the bar.

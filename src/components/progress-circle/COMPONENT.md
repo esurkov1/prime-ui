@@ -58,5 +58,6 @@ export function Example() {
 ## Related
 
 - [ProgressBar](../progress-bar/COMPONENT.md) — linear fraction of a maximum when a horizontal bar fits better.
+- [SegmentedProgressBar](../segmented-progress-bar/COMPONENT.md) — multiple proportional segments on one track.
 - [Typography](../typography/COMPONENT.md) — captions and units beside or around the ring.
 - [Button](../button/COMPONENT.md) — cancel, retry, or other actions next to a long-running task.

@@ -1,6 +1,7 @@
 import {
   AlignLeft,
   Award,
+  BarChart3,
   Bell,
   Bookmark,
   BookOpen,
@@ -40,7 +41,6 @@ import {
   PanelLeft,
   PanelRight,
   PanelTop,
-  PieChart,
   Pipette,
   Plug,
   Ruler,
@@ -140,10 +140,10 @@ function pageIcon(segment: string): React.ReactNode {
       return <Bell {...navIconProps} />;
     case "progress-bar":
       return <StretchHorizontal {...navIconProps} />;
+    case "segmented-progress-bar":
+      return <BarChart3 {...navIconProps} />;
     case "progress-circle":
       return <CircleGauge {...navIconProps} />;
-    case "segmented-progress-bar":
-      return <PieChart {...navIconProps} />;
     case "accordion":
       return <ChevronsDownUp {...navIconProps} />;
     case "app-shell":
@@ -189,7 +189,7 @@ function PlaygroundPanelRow({ item }: { item: PlaygroundMenuItem }) {
   if (item.to !== undefined) {
     return (
       <Sidebar.MenuItem>
-        <Sidebar.MenuRouterLink to={item.to} end={item.to === "/"} tooltip={item.label}>
+        <Sidebar.MenuRouterLink to={item.to} end={item.to === "/"}>
           {item.icon !== undefined ? <Sidebar.MenuIcon>{item.icon}</Sidebar.MenuIcon> : null}
           <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
         </Sidebar.MenuRouterLink>
@@ -199,7 +199,7 @@ function PlaygroundPanelRow({ item }: { item: PlaygroundMenuItem }) {
 
   return (
     <Sidebar.MenuItem>
-      <Sidebar.MenuButton type="button" onClick={item.onSelect} tooltip={item.label}>
+      <Sidebar.MenuButton type="button" onClick={item.onSelect}>
         {item.icon !== undefined ? <Sidebar.MenuIcon>{item.icon}</Sidebar.MenuIcon> : null}
         <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
       </Sidebar.MenuButton>

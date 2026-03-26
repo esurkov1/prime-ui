@@ -287,7 +287,7 @@ export { SegmentedControl } from "./segmented-control/SegmentedControl";
 export type {
   SegmentedProgressBarRootProps,
   SegmentedProgressSegment,
-  SegmentedProgressTone,
+  SegmentedProgressSegmentTone,
 } from "./segmented-progress-bar/SegmentedProgressBar";
 export { SegmentedProgressBar } from "./segmented-progress-bar/SegmentedProgressBar";
 export type {

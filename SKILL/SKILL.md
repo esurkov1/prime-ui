@@ -6,7 +6,7 @@ description: >
   Flexbox for local stacks/toolbars, CSS Modules, and --prime-sys-* tokens.
   Use when laying out pages, templates, forms, navigation, or dashboards; converting desktop layouts to  
   mobile-first; picking a component for a region; validating breakpoints, touch targets, or Drawer vs inline.  
-  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 42-component catalog, and anti-patterns.  
+  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 43-component catalog, and anti-patterns.  
   Non-negotiable: no custom wrappers or reskins of kit components—only primitives, default styles, and the public API.
 
 # prime-ui-kit
@@ -26,7 +26,7 @@ description: >
 | ------------------------------- | ------------------------------------------------ | --------------------------------------------------------------- |
 | API, props, examples            | `../src/components/<kebab>/COMPONENT.md`         | `node_modules/prime-ui-kit/src/components/<kebab>/COMPONENT.md` |
 | Tokens                          | `[design-tokens.md](./design-tokens.md)`         | `node_modules/prime-ui-kit/src/styles/` (CSS + `package.json` exports) |
-| All 42 components, layout roles | `[component-catalog.md](./component-catalog.md)` | only in this repo’s `SKILL/` (not in the npm tarball)           |
+| All 43 components, layout roles | `[component-catalog.md](./component-catalog.md)` | only in this repo’s `SKILL/` (not in the npm tarball)           |
 
 
 Cursor skill: copy the whole `SKILL/` directory from the GitHub repository — it is not published to npm.

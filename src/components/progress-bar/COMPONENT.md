@@ -53,6 +53,7 @@ export function Example() {
 
 ## Related
 
+- [SegmentedProgressBar](../segmented-progress-bar/COMPONENT.md) — stacked proportional segments (e.g. status mix) instead of a single value.
 - [ProgressCircle](../progress-circle/COMPONENT.md) — circular determinate indicator when layout calls for a ring or compact numeric emphasis.
 - [Typography](../typography/COMPONENT.md) — headings and supporting copy around a status block.
 - [Button](../button/COMPONENT.md) — cancel, pause, or actions next to the bar.

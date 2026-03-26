@@ -1,80 +1,35 @@
-import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import {
-  DemoApiTitle,
-  DemoDescription,
-  DemoSectionTitle,
-} from "../components/PlaygroundDemoTypography";
+import { DemoDescription, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
 import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import SegmentedCompositionSnippet from "../snippets/progress/segmented-composition";
-import segmentedCompositionSource from "../snippets/progress/segmented-composition.tsx?raw";
+import SegmentedDistributionSnippet from "../snippets/progress/segmented-distribution";
+import segmentedDistributionSource from "../snippets/progress/segmented-distribution.tsx?raw";
+import SegmentedGapSnippet from "../snippets/progress/segmented-gap";
+import segmentedGapSource from "../snippets/progress/segmented-gap.tsx?raw";
 import SegmentedSizesSnippet from "../snippets/progress/segmented-sizes";
 import segmentedSizesSource from "../snippets/progress/segmented-sizes.tsx?raw";
 
-const segmentedProgressBarRootApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "segments",
-    type: "SegmentedProgressSegment[]",
-    defaultValue: "—",
-    required: "Да",
-    description:
-      "Массив сегментов: value (вес ≥ 0), опционально label и tone; доли считаются от суммы value.",
-  },
-  {
-    prop: "label",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Подпись над полосой; добавляется к автоматическому aria-label группы.",
-  },
-  {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: '"m"',
-    required: "Нет",
-    description: "Высота трека и кегль подписи (как у ProgressBar).",
-  },
-  {
-    prop: "ariaLabel",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: 'Имя для role="img"; перекрывает строку по умолчанию из сегментов.',
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на внешней обёртке.",
-  },
-  {
-    prop: "ref",
-    type: "React.Ref<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Ref на корневой div.",
-  },
-];
-
 export default function SegmentedProgressBarSection() {
   return (
-    <PlaygroundDocPage
-      title="SegmentedProgressBar"
-      description={
-        <>
-          Горизонтальная полоса из цветных сегментов: ширина сегментов пропорциональна значениям{" "}
-          <code>value</code> (сумма может быть любой — отображаются доли). Для одного числа
-          завершения используйте <code>ProgressBar</code> или <code>ProgressCircle</code>.
-        </>
-      }
-    >
+    <PlaygroundDocPage title="SegmentedProgressBar">
       <div className="demoExamples">
         <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoSectionTitle>Распределение</DemoSectionTitle>
           <DemoDescription>
-            Одинаковые доли при <code>s</code>–<code>xl</code>: меняется только высота трека.
+            Веса сегментов задают доли от суммы — как проценты, если сумма 100.
           </DemoDescription>
+          <PlaygroundExampleFrame.Root
+            code={segmentedDistributionSource.trim()}
+            previewLayout="stack"
+          >
+            <PlaygroundExampleFrame.Stage>
+              <SegmentedDistributionSnippet />
+            </PlaygroundExampleFrame.Stage>
+          </PlaygroundExampleFrame.Root>
+        </div>
+
+        <div className="demoBlock">
+          <DemoSectionTitle>Размеры</DemoSectionTitle>
+          <DemoDescription>Та же шкала высоты трека, что у ProgressBar.</DemoDescription>
           <PlaygroundExampleFrame.Root code={segmentedSizesSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
               <SegmentedSizesSnippet />
@@ -83,24 +38,16 @@ export default function SegmentedProgressBarSection() {
         </div>
 
         <div className="demoBlock">
-          <DemoSectionTitle>Состав и тона</DemoSectionTitle>
+          <DemoSectionTitle>Зазор между сегментами</DemoSectionTitle>
           <DemoDescription>
-            Пример 30% / 25% / 35% / 10% с подписью и семантическими тонами <code>danger</code>,{" "}
-            <code>pending</code>, <code>success</code>, <code>neutral</code>.
+            <code>segmentGap=&quot;hairline&quot;</code> — разделитель 1px; <code>none</code> — без
+            зазора.
           </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={segmentedCompositionSource.trim()}
-            previewLayout="stack"
-          >
+          <PlaygroundExampleFrame.Root code={segmentedGapSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
-              <SegmentedCompositionSnippet />
+              <SegmentedGapSnippet />
             </PlaygroundExampleFrame.Stage>
           </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoApiTitle>SegmentedProgressBar.Root</DemoApiTitle>
-          <PlaygroundApiTable rows={segmentedProgressBarRootApiRows} />
         </div>
       </div>
     </PlaygroundDocPage>

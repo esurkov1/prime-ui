@@ -8,82 +8,86 @@ import styles from "./SegmentedProgressBar.module.css";
 
 export type { ProgressBarSize };
 
-/** Семантические тона сегментов — цвета из `--prime-sys-color-status-*` и action. */
-export type SegmentedProgressTone =
-  | "primary"
-  | "success"
-  | "warning"
-  | "danger"
-  | "neutral"
-  | "pending"
-  | "info";
+export type SegmentedProgressSegmentTone = "primary" | "success" | "warning" | "danger" | "neutral";
 
 export type SegmentedProgressSegment = {
-  /** Вклад в сумму; пропорции считаются от суммы всех неотрицательных значений. */
+  /** Non-negative weight; segments are sized proportionally to the sum of all weights. */
   value: number;
-  /** Подпись в легенде и в `aria-label` (если не задан свой `ariaLabel` на корне). */
   label?: string;
-  tone?: SegmentedProgressTone;
-  /** Стабильный ключ React при дублирующихся label/value/tone. */
-  id?: string;
+  tone?: SegmentedProgressSegmentTone;
 };
 
 export type SegmentedProgressBarRootProps = {
   segments: SegmentedProgressSegment[];
-  /** Подпись над полосой. */
   label?: string;
   size?: ProgressBarSize;
-  /**
-   * Имя для `role="img"` (сводка распределения) и вспомогательных технологий.
-   * Если не задано, собирается из сегментов с подписями и округлённых процентов.
-   */
-  ariaLabel?: string;
+  /** Visual gap between segments; `hairline` draws a 1px separator using the track background. */
+  segmentGap?: "none" | "hairline";
   className?: string;
 };
 
-function nonNegative(n: number): number {
+function clampNonNegative(n: number): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
-function sumValues(segments: SegmentedProgressSegment[]): number {
-  return segments.reduce((acc, s) => acc + nonNegative(s.value), 0);
-}
-
-function buildDefaultAriaLabel(segments: SegmentedProgressSegment[], total: number): string {
-  const parts: string[] = [];
-  segments.forEach((seg, index) => {
-    const v = nonNegative(seg.value);
-    if (v <= 0) return;
-    const pct = total > 0 ? Math.round((v / total) * 100) : 0;
-    const name = seg.label?.trim() || `Segment ${index + 1}`;
-    parts.push(`${name} ${pct}%`);
+function buildDistributionDescription(segments: SegmentedProgressSegment[], total: number): string {
+  if (segments.length === 0) {
+    return "No segments";
+  }
+  if (total <= 0) {
+    return "All segments empty";
+  }
+  const parts = segments.map((s) => {
+    const pct = Math.round((clampNonNegative(s.value) / total) * 100);
+    return s.label ? `${s.label}: ${pct}%` : `${pct}%`;
   });
-  return parts.length > 0 ? parts.join(", ") : "Empty";
+  return parts.join(", ");
 }
 
 const SegmentedProgressBarRoot = React.forwardRef<HTMLDivElement, SegmentedProgressBarRootProps>(
-  ({ segments, label, size = "m", ariaLabel, className }, ref) => {
-    const total = sumValues(segments);
-    const breakdown = total > 0 ? buildDefaultAriaLabel(segments, total) : "No data";
-    const resolvedAria = ariaLabel ?? (label ? `${label}. ${breakdown}` : breakdown);
+  ({ segments, label, size = "m", segmentGap = "hairline", className }, ref) => {
+    const labelId = React.useId();
+    const descriptionId = React.useId();
+    const safe = React.useMemo(
+      () => segments.map((s) => ({ ...s, value: clampNonNegative(s.value) })),
+      [segments],
+    );
+    const total = React.useMemo(() => safe.reduce((acc, s) => acc + s.value, 0), [safe]);
+
+    const distributionText = buildDistributionDescription(safe, total);
+
+    const trackA11y = label
+      ? { "aria-labelledby": labelId, "aria-describedby": descriptionId }
+      : { "aria-label": distributionText };
 
     return (
-      <div ref={ref} className={cx(styles.root, className)} {...toDataAttributes({ size })}>
-        {label ? <span className={styles.caption}>{label}</span> : null}
-        <div className={styles.track} role="img" aria-label={resolvedAria}>
-          {total <= 0 ? <div className={styles.empty} aria-hidden="true" /> : null}
+      <div
+        className={cx(styles.root, className)}
+        {...toDataAttributes({ size, "segment-gap": segmentGap })}
+      >
+        {label ? (
+          <span className={styles.label} id={labelId}>
+            {label}
+          </span>
+        ) : null}
+        {label ? (
+          <span id={descriptionId} className={styles.visuallyHidden}>
+            {distributionText}
+          </span>
+        ) : null}
+        {/* biome-ignore lint/a11y/useSemanticElements: distribution track is not a form fieldset; role="group" matches WAI-ARIA grouping */}
+        <div ref={ref} className={styles.track} role="group" {...trackA11y}>
           {total > 0
-            ? segments.map((seg) => {
-                const v = nonNegative(seg.value);
-                if (v <= 0) return null;
-                const tone: SegmentedProgressTone = seg.tone ?? "primary";
-                const segmentKey = seg.id ?? `${seg.label ?? "segment"}-${v}-${tone}`;
+            ? safe.map((seg, i) => {
+                const pct = (seg.value / total) * 100;
                 return (
                   <div
-                    key={segmentKey}
+                    // biome-ignore lint/suspicious/noArrayIndexKey: segments are presentational bars in source order; no reorder/dnd
+                    key={i}
                     className={styles.segment}
-                    style={{ flexGrow: v }}
-                    {...toDataAttributes({ tone })}
+                    style={{ width: `${pct}%` }}
+                    {...toDataAttributes({ tone: seg.tone ?? "primary" })}
+                    title={seg.label}
                   />
                 );
               })
