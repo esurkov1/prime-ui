@@ -4,9 +4,11 @@ import { Button } from "@/components/button/Button";
 import { Label } from "@/components/label/Label";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 
+import styles from "./snippets.module.css";
+
 function TooltipDemoItem({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: "grid", gap: "var(--prime-sys-spacing-s)", justifyItems: "center" }}>
+    <div className={styles.demoItem}>
       <Label.Root size="s">{label}</Label.Root>
       {children}
     </div>

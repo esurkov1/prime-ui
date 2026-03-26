@@ -1,28 +1,27 @@
-import type * as React from "react";
+import type { ReactNode } from "react";
 
 import { Button } from "@/components/button/Button";
 import { Label } from "@/components/label/Label";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { cx } from "@/internal/cx";
+
+import styles from "./snippets.module.css";
 
 function Panel({
   label,
-  style,
+  variant,
   children,
 }: {
   label: string;
-  style: React.CSSProperties;
-  children: React.ReactNode;
+  variant: "default" | "raised";
+  children: ReactNode;
 }) {
   return (
     <div
-      style={{
-        display: "grid",
-        gap: "var(--prime-sys-spacing-m)",
-        justifyItems: "center",
-        padding: "var(--prime-sys-spacing-l)",
-        borderRadius: "var(--prime-sys-radius-m)",
-        ...style,
-      }}
+      className={cx(
+        styles.surfacePanel,
+        variant === "default" ? styles.surfaceDefault : styles.surfaceRaised,
+      )}
     >
       <Label.Root size="s">{label}</Label.Root>
       {children}
@@ -33,18 +32,8 @@ function Panel({
 /** Один визуальный стиль подсказки на разных фонах интерфейса (токены темы). */
 export default function TooltipSurfacesSnippet() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "var(--prime-sys-spacing-m)",
-        alignItems: "stretch",
-      }}
-    >
-      <Panel
-        label="Фон surface-default"
-        style={{ background: "var(--prime-sys-color-surface-default)" }}
-      >
+    <div className={styles.rowWrapMStretch}>
+      <Panel label="Фон surface-default" variant="default">
         <Tooltip.Provider delayDuration={200}>
           <Tooltip.Root>
             <Tooltip.Trigger>
@@ -56,13 +45,7 @@ export default function TooltipSurfacesSnippet() {
           </Tooltip.Root>
         </Tooltip.Provider>
       </Panel>
-      <Panel
-        label="Фон surface-raised"
-        style={{
-          background: "var(--prime-sys-color-surface-raised)",
-          boxShadow: "var(--prime-sys-elevation-shadow-surface)",
-        }}
-      >
+      <Panel label="Фон surface-raised" variant="raised">
         <Tooltip.Provider delayDuration={200}>
           <Tooltip.Root>
             <Tooltip.Trigger>

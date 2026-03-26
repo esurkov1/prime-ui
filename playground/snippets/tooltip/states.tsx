@@ -4,9 +4,11 @@ import { Button } from "@/components/button/Button";
 import { Label } from "@/components/label/Label";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 
+import styles from "./snippets.module.css";
+
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: "grid", gap: "var(--prime-sys-spacing-s)", justifyItems: "center" }}>
+    <div className={styles.demoItem}>
       <Label.Root size="s">{label}</Label.Root>
       {children}
     </div>
@@ -15,14 +17,7 @@ function Block({ label, children }: { label: string; children: React.ReactNode }
 
 export default function TooltipStatesSnippet() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "var(--prime-sys-spacing-xl)",
-        justifyContent: "center",
-      }}
-    >
+    <div className={styles.rowWrapXlJustifyCenter}>
       <Block label="Обычная кнопка — hover и фокус">
         <Tooltip.Provider delayDuration={200}>
           <Tooltip.Root>
@@ -53,20 +48,7 @@ export default function TooltipStatesSnippet() {
         <Tooltip.Provider delayDuration={200}>
           <Tooltip.Root>
             <Tooltip.Trigger>
-              <button
-                type="button"
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  border: "none",
-                  background: "none",
-                  font: "inherit",
-                  color: "inherit",
-                  cursor: "help",
-                  textDecoration: "underline dotted",
-                  textUnderlineOffset: 2,
-                }}
-              >
+              <button type="button" className={styles.inlineHelpTrigger}>
                 Сокращение KPI
               </button>
             </Tooltip.Trigger>

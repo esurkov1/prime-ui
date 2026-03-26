@@ -80,27 +80,17 @@ Report sidebar: a term in the summary text with keyboard focus and a tooltip bel
 
 ```tsx
 import { Tooltip } from "prime-ui-kit";
+import styles from "../../../playground/snippets/tooltip/snippets.module.css";
 
 export function ReportSidebarGlossary() {
   return (
-    <aside style={{ maxWidth: 280, padding: 16 }}>
-      <p style={{ margin: 0, lineHeight: 1.5 }}>
+    <aside className={styles.reportAside}>
+      <p className={styles.reportParagraph}>
         Total for{" "}
         <Tooltip.Provider>
           <Tooltip.Root>
             <Tooltip.Trigger>
-              <button
-                type="button"
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  border: "none",
-                  background: "none",
-                  font: "inherit",
-                  cursor: "help",
-                  textDecoration: "underline dotted",
-                }}
-              >
+              <button type="button" className={styles.inlineHelpTrigger}>
                 MRR
               </button>
             </Tooltip.Trigger>
@@ -123,12 +113,13 @@ Help screen: “Show tooltips” toggle stays in sync with a demo tooltip openin
 ```tsx
 import * as React from "react";
 import { Button, Switch, Tooltip } from "prime-ui-kit";
+import styles from "../../../playground/snippets/tooltip/snippets.module.css";
 
 export function HelpOverlayDemo() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div style={{ display: "grid", gap: 16, maxWidth: 360 }}>
+    <div className={styles.controlledStack}>
       <Switch.Root size="m" checked={open} onCheckedChange={setOpen}>
         <Switch.Label>Show tooltip</Switch.Label>
       </Switch.Root>

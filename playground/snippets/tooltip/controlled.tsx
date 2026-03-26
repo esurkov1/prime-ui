@@ -4,11 +4,13 @@ import { Button } from "@/components/button/Button";
 import { Switch } from "@/components/switch/Switch";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 
+import styles from "./snippets.module.css";
+
 export default function TooltipControlledSnippet() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div style={{ display: "grid", gap: "var(--prime-sys-spacing-l)", maxWidth: 360 }}>
+    <div className={styles.controlledStack}>
       <Switch.Root size="m" checked={open} onCheckedChange={setOpen}>
         <Switch.Label>Подсказка открыта программно</Switch.Label>
         <Switch.Hint>

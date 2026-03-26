@@ -4,16 +4,11 @@ import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Typography } from "@/components/typography/Typography";
 import { Icon } from "@/icons";
 
+import styles from "./snippets.module.css";
+
 export default function TooltipCompositionSnippet() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "var(--prime-sys-spacing-xl)",
-        alignItems: "center",
-      }}
-    >
+    <div className={styles.rowWrapXlCenter}>
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
@@ -22,7 +17,7 @@ export default function TooltipCompositionSnippet() {
             </LinkButton.Root>
           </Tooltip.Trigger>
           <Tooltip.Content size="m">
-            <Typography.Root size="s" as="p" style={{ margin: 0 }}>
+            <Typography.Root size="s" as="p" className={styles.tooltipContentP}>
               Скидка действует до конца месяца при заказе от 3000 ₽.
             </Typography.Root>
           </Tooltip.Content>

@@ -1,0 +1,79 @@
+/* Раскладка сниппетов tooltip и примеров в COMPONENT.md — токены вместо inline style */
+
+.demoItem {
+  display: grid;
+  gap: var(--prime-sys-spacing-s);
+  justify-items: center;
+}
+
+.rowWrapXlCenter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-xl);
+  align-items: center;
+}
+
+.rowWrapXlJustifyCenter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-xl);
+  justify-content: center;
+}
+
+.rowWrapMStretch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-m);
+  align-items: stretch;
+}
+
+.controlledStack {
+  display: grid;
+  gap: var(--prime-sys-spacing-l);
+  max-width: 22.5rem;
+}
+
+.surfacePanel {
+  display: grid;
+  gap: var(--prime-sys-spacing-m);
+  justify-items: center;
+  padding: var(--prime-sys-spacing-l);
+  border-radius: var(--prime-sys-radius-m);
+}
+
+.surfaceDefault {
+  background: var(--prime-sys-color-surface-default);
+}
+
+.surfaceRaised {
+  background: var(--prime-sys-color-surface-raised);
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+}
+
+.inlineHelpTrigger {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.tooltipContentP {
+  margin: 0;
+}
+
+/* COMPONENT.md — боковая колонка отчёта */
+.reportAside {
+  box-sizing: border-box;
+  max-width: 17.5rem;
+  padding: var(--prime-sys-spacing-m);
+}
+
+.reportParagraph {
+  margin: 0;
+  line-height: 1.5;
+}
