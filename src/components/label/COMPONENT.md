@@ -2,152 +2,93 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-A composite label for form fields and other controls: root `Label.Root` (native `label`) with optional slots `Label.Icon`, `Label.Asterisk`, and `Label.Sub`.
+Composite caption for form fields: `Label.Root` is a native `label` with optional slots `Label.Icon`, `Label.Asterisk`, and `Label.Sub` for icon, required marker, and secondary text.
 
-## What it’s for
+- **Use** to associate visible text with a control via `htmlFor` / `id` or by nesting the control inside the root.
+- **Use** when you want a consistent type scale (`size`) and optional icon or second-line hint in one label row.
+- **Use** `Label.Asterisk` for a visual required marker next to the caption.
+- **Do not use** as a replacement for field validation messages or long help copy; pair with [Hint](../hint/COMPONENT.md) or similar when you need status or errors below the field.
+- **Do not use** expecting the label to set `required` on inputs; that remains on the control.
+- **Do not use** `Label` as a non-label wrapper; the root is always a `label` element (no polymorphic `asChild`).
 
-- **Account and profile:** captions for “Name”, “Phone”, “Address” with a clear link to the field via `htmlFor` / `id`, and visual emphasis of required fields with an asterisk.
-- **Corporate requests and contracts:** long forms where inline hints are needed on the same line (currency, units, “optional”) without a separate error or hint block.
-- **Internal panels (analytics, billing):** compact filters and report settings where an icon in the label helps distinguish field types and consistent `s`–`xl` sizes matter in the grid.
+## Composition
 
-## Use cases
+- **`Label.Root`** — `<label>`; sets `data-size` (from `size`, default `m`) and `data-disabled` when `disabled`. Wraps children in `LabelSizeContext` so slots inherit the same size.
+- **`Label.Icon`** — `<span>` before or beside the main text; forwards label size to children via `ControlSizeProvider` (e.g. for kit `Icon` sizing).
+- **`Label.Asterisk`** — `<span>` for the required marker; default child text is `*` if `children` is omitted.
+- **`Label.Sub`** — `<span>` for secondary line or hint text on the same label.
+- Slot order in markup is flexible; keep reading order sensible for screen readers (e.g. icon, title, asterisk, sub).
 
-Each example is self-contained; domains and tasks differ between subsections.
-
-### Basic
-
-A label for a single field on a marketing-site contact form: linked to the field by `id`, no slots.
-
-```tsx
-import { Label } from "prime-ui-kit";
-
-export function ContactEmailField() {
-  return (
-    <>
-      <Label.Root htmlFor="contact-email">Reply email</Label.Root>
-      <input id="contact-email" type="email" name="email" autoComplete="email" />
-    </>
-  );
-}
-```
-
-### With sizes / scale
-
-A metrics panel: several labels in one tight grid with different text scale (`size`) to align the row with neighboring controls.
+### Minimal example
 
 ```tsx
 import { Label } from "prime-ui-kit";
 
-export function ReportFiltersLegend() {
+export function Example() {
   return (
     <>
-      <div>
-        <Label.Root size="s" htmlFor="metric-period">
-          Sample period
-        </Label.Root>
-      </div>
-      <div>
-        <Label.Root size="l" htmlFor="metric-granularity">
-          Granularity
-        </Label.Root>
-      </div>
+      <Label.Root htmlFor="field-id">Caption</Label.Root>
+      <input id="field-id" />
     </>
   );
 }
 ```
 
-### In context (form / modal / sidebar / …)
+## Rules
 
-A modal for booking a medical appointment: icon in the label, primary text, and a second-line hint — the user sees both the field name and the input format.
-
-```tsx
-import { Icon, Label } from "prime-ui-kit";
-
-export function AppointmentModalFields() {
-  return (
-    <>
-      <Label.Root size="m" htmlFor="visit-datetime">
-        <Label.Icon>
-          <Icon aria-hidden name="system.settings" />
-        </Label.Icon>
-        Visit date and time
-        <Label.Sub>clinic local time</Label.Sub>
-      </Label.Root>
-      <input id="visit-datetime" type="datetime-local" />
-    </>
-  );
-}
-```
-
-## Anatomy
-
-- **`Label.Root`** — a `label` element; inside, `LabelSizeContext` propagates size to children.
-- Child slots (in any order, as in markup): **`Label.Icon`** → `span` wrapping an icon; **`Label.Asterisk`** → `span` with default character `*`; **`Label.Sub`** → `span` for secondary text; plus text nodes for the main caption.
+- **Association:** set **`htmlFor` on `Label.Root`** to match the control’s **`id`**, or place the interactive control inside **`Label.Root`** so the caption is programmatically linked.
+- **`disabled` on `Label.Root`:** sets **`aria-disabled`** and **`data-disabled`** for muted styling; keep the actual field non-interactive (`disabled`, `readOnly`, etc.) or behavior will not match the label-only state.
+- **`Label.Icon`:** when the icon is decorative and the visible label text is sufficient, mark the icon **`aria-hidden`**.
+- **`Label.Asterisk`** is visual-only; expose required state on the control with **`required`** / **`aria-required`** and errors via hint or validation UI as needed.
+- There is no separate **`variant`** prop; appearance follows **`size`** and slot composition (asterisk uses danger-accent styling from the theme).
+- The root does **not** implement **`asChild`**; it is always a **`label`**.
+- Nesting an input inside **`Label.Root`** is valid HTML; the common kit pattern is sibling **`Label.Root`** + control with **`htmlFor`** / **`id`**.
 
 ## API
 
 ### Label.Root
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Type scale, spacing, and size context for `Label.Icon`. |
-| `disabled` | `boolean` | — | No | Disabled appearance; `aria-disabled`, `data-disabled`. |
-| `htmlFor` | `string` | — | No | `id` of the associated control. |
-| `className` | `string` | — | No | Extra class on the root. |
-| `children` | `React.ReactNode` | — | No | Text and `Icon`, `Asterisk`, `Sub` slots. |
-| …rest | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size">` | — | No | Standard `label` attributes (except `size`). |
+|------|------|---------|----------|-------------|
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Type scale, spacing, and size context for nested slots (e.g. `Label.Icon`) |
+| disabled | `boolean` | — | No | Disabled look; sets `aria-disabled` and `data-disabled` |
+| htmlFor | `string` | — | No | `id` of the associated control |
+| className | `string` | — | No | Additional class on the root |
+| children | `React.ReactNode` | — | No | Text and `Label.Icon`, `Label.Asterisk`, `Label.Sub` |
+| …rest | `Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size">` | — | No | Other native `label` attributes (`size` is reserved for the design-system prop) |
 
 ### Label.Icon
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| `className` | `string` | — | No | Extra class on the wrapper. |
-| `children` | `React.ReactNode` | — | No | Usually an icon component from the kit. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Additional class on the wrapper |
+| children | `React.ReactNode` | — | No | Typically an icon; receives control size from label context |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other `span` attributes |
 
 ### Label.Asterisk
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| `className` | `string` | — | No | Extra class. |
-| `children` | `React.ReactNode` | `"*"` | No | Override the default character. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Additional class on the wrapper |
+| children | `React.ReactNode` | `"*"` | No | Overrides the default asterisk character when provided |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other `span` attributes |
 
 ### Label.Sub
 
 | Prop | Type | Default | Required | Description |
-|------|-----|---------|----------|-------------|
-| `className` | `string` | — | No | Extra class. |
-| `children` | `React.ReactNode` | — | No | Secondary line under the title. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | `span` attributes. |
+|------|------|---------|----------|-------------|
+| className | `string` | — | No | Additional class on the wrapper |
+| children | `React.ReactNode` | — | No | Secondary line under the main caption |
+| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other `span` attributes |
 
-## Variants
+## Related
 
-There is no separate `variant` prop. Visual tuning is via **`size`** (`s` | `m` | `l` | `xl`) and slot composition (`Icon`, `Asterisk`, `Sub`). Asterisk color comes from `Asterisk` slot styles (danger accent in the theme).
-
-## States
-
-- **Default:** text and slots use the primary content color.
-- **`disabled`:** on `Label.Root` — `data-disabled="true"`, `aria-disabled`, color from the disabled-content token.
-- **Required marker:** visually via `Label.Asterisk`; this is not a DOM field state and does not set `required` on the input automatically.
-
-## Accessibility (a11y)
-
-- Link the label to the control: **`htmlFor` on `Label.Root` + `id` on the field**, or nest the interactive control inside `label`.
-- With **`disabled`** on the label, **`aria-disabled`** is set; ensure the field itself is not interactable (`disabled` / `readOnly` on the control), or the label and field behavior will mismatch and confuse users.
-- Mark the icon in `Label.Icon` with **`aria-hidden`** when meaningful label text is next to it.
-- The asterisk is a visual-only marker; for screen readers, duplicate semantics on the field when needed (`required`, `aria-required`) and surface errors via the kit’s hint / validation components.
-
-## Limitations and notes
-
-- The component does **not** set `required` on `input` / `select` and does **not** replace error or description text — use `Hint` and form validation for that.
-- There is no **`asChild`** or polymorphic root: the root is always `label`.
-- Nesting an input inside `Label.Root` is valid HTML, but the typical kit pattern is siblings with `htmlFor` / `id`.
-
-## Related components
-
-- **Input**, **Textarea**, **Select**, **Checkbox**, **Radio**, **Switch** — often sit next to a label or embed their own; `Label` is handy for a consistent caption with an icon and second line.
-- **Hint** — help and errors under the field when `Label.Sub` is not enough or you need a separate status block.
-- **Icon** — glyphs inside `Label.Icon`.
+- [Input](../input/COMPONENT.md)
+- [Textarea](../textarea/COMPONENT.md)
+- [Select](../select/COMPONENT.md)
+- [Checkbox](../checkbox/COMPONENT.md)
+- [Radio](../radio/COMPONENT.md)
+- [Switch](../switch/COMPONENT.md)
+- [Hint](../hint/COMPONENT.md)
