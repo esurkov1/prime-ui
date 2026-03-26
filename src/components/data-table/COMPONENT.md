@@ -18,6 +18,7 @@
 - **Public API** — a single compound entry: `DataTable` with `Root` (`DataTableRoot`). There are no other exported subcomponents.
 - **Structure** — `ControlSizeProvider` wraps a root `div` (data attributes for size, dividers, header visibility, stickiness, table width mode, hover highlights, zebra). Inside: `ScrollContainer` viewport → `<table>`, optional `<thead>` (`<th>` per column), `<tbody>` with rows, and an `aria-hidden` sentinel at the bottom when `infiniteScroll` is on (for `IntersectionObserver` or scroll fallback).
 - **Footer** — always shows a “shown range / total” line; if not `infiniteScroll` and `showPagination` and there is more than one page, it renders `Pagination.Root`; in infinite mode it may show a short status when more rows can be revealed or loaded.
+- **Reference examples** — longer patterns (full column set, controlled sort/page, row selection with `Checkbox`, infinite `onLoadMore`, sticky header and first column) live under [`examples/`](./examples/) as copy-ready `tsx` modules that import from `"prime-ui-kit"`.
 
 ### Minimal example
 
