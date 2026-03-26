@@ -6,6 +6,7 @@
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
   --sb-padding: var(--prime-sys-spacing-x2);
   --sb-gap: var(--prime-sys-spacing-x2);
+  --sb-control-height: var(--prime-sys-size-control-m-height);
 
   position: relative;
   box-sizing: border-box;
@@ -20,6 +21,18 @@
     width var(--sb-transition-duration) var(--sb-transition-ease),
     min-width var(--sb-transition-duration) var(--sb-transition-ease),
     flex-basis var(--sb-transition-duration) var(--sb-transition-ease);
+}
+
+.root[data-size="s"] {
+  --sb-control-height: var(--prime-sys-size-control-s-height);
+}
+
+.root[data-size="l"] {
+  --sb-control-height: var(--prime-sys-size-control-l-height);
+}
+
+.root[data-size="xl"] {
+  --sb-control-height: var(--prime-sys-size-control-xl-height);
 }
 
 .root[data-state="compact"] {
@@ -67,7 +80,8 @@
   box-shadow: var(--prime-sys-elevation-shadow-surface);
   transition:
     border-color var(--sb-transition-duration) var(--sb-transition-ease),
-    box-shadow var(--sb-transition-duration) var(--sb-transition-ease);
+    box-shadow var(--sb-transition-duration) var(--sb-transition-ease),
+    padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
   will-change: auto;
 }
 
@@ -92,7 +106,8 @@
   display: flex;
   align-items: center;
   gap: var(--prime-sys-spacing-x2);
-  min-height: calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x2));
+  min-height: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
+  block-size: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
   min-width: 0;
 }
 
@@ -195,6 +210,10 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
+  transition:
+    background-color var(--prime-sys-motion-duration-fast) var(--prime-sys-motion-easing-standard),
+    padding var(--prime-sys-motion-duration-medium) var(--prime-sys-motion-easing-standard),
+    gap var(--prime-sys-motion-duration-medium) var(--prime-sys-motion-easing-standard);
 }
 
 .menuButton:hover {
@@ -232,10 +251,18 @@
 }
 
 .menuLabel {
+  display: inline-block;
   min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    max-width var(--prime-sys-motion-duration-medium) var(--prime-sys-motion-easing-standard),
+    opacity var(--prime-sys-motion-duration-medium) var(--prime-sys-motion-easing-standard),
+    transform var(--prime-sys-motion-duration-medium) var(--prime-sys-motion-easing-standard);
 }
 
 .menuTrailing {
@@ -256,7 +283,8 @@
 .identityButton {
   justify-content: flex-start;
   width: 100%;
-  min-height: calc(var(--prime-sys-size-control-m-height) + var(--prime-sys-spacing-x2));
+  min-height: calc(var(--sb-control-height) + var(--prime-sys-spacing-x2));
+  height: 100%;
   min-width: 0;
 }
 
@@ -272,9 +300,16 @@
 .identityButtonMain {
   display: flex;
   min-width: 0;
+  max-width: 100%;
   flex: 1 1 auto;
   flex-direction: column;
   gap: var(--prime-sys-unit-2px);
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    max-width var(--prime-sys-motion-duration-medium) var(--prime-sys-motion-easing-standard),
+    opacity var(--prime-sys-motion-duration-medium) var(--prime-sys-motion-easing-standard),
+    transform var(--prime-sys-motion-duration-medium) var(--prime-sys-motion-easing-standard);
 }
 
 .identityButtonTitle {
@@ -414,42 +449,37 @@
 
   .root[data-state="compact"] .menuButton,
   .root[data-state="compact"] .itemButton {
-    justify-content: center;
+    justify-content: flex-start;
     padding-inline: var(--prime-sys-spacing-x1);
-    transition:
-      background-color var(--prime-sys-motion-duration-fast) var(--prime-sys-motion-easing-standard),
-      padding var(--prime-sys-motion-duration-fast) var(--prime-sys-motion-easing-standard);
+    gap: 0;
   }
 
   .root[data-state="compact"] .menuLabel {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
+    max-width: 0;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
+    opacity: 0;
+    transform: translateX(-0.25rem);
+    pointer-events: none;
+    transition-delay: 0ms, 80ms, 0ms;
   }
 
   .root[data-state="compact"] .identityButtonMain {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
+    max-width: 0;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
+    opacity: 0;
+    transform: translateX(-0.25rem);
+    pointer-events: none;
+    transition-delay: 0ms, 80ms, 0ms;
   }
 
   .root[data-state="compact"] .identityButton {
-    justify-content: center;
-    padding-inline: var(--prime-sys-spacing-x1);
+    justify-content: flex-start;
+    padding-inline: var(--prime-sys-spacing-x2);
+  }
+
+  .root[data-state="expanded"] .menuLabel,
+  .root[data-state="expanded"] .identityButtonMain {
+    transition-delay: 0ms, 120ms, 0ms;
   }
 
   .root[data-state="compact"] .group {
