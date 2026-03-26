@@ -9,8 +9,6 @@ import ModalFeaturesSnippet from "../snippets/modal/features";
 import featuresSource from "../snippets/modal/features.tsx?raw";
 import ModalFullWidthSnippet from "../snippets/modal/full-width";
 import fullWidthSource from "../snippets/modal/full-width.tsx?raw";
-import ModalResponsiveSnippet from "../snippets/modal/responsive";
-import responsiveSource from "../snippets/modal/responsive.tsx?raw";
 import ModalStatesSnippet from "../snippets/modal/states";
 import statesSource from "../snippets/modal/states.tsx?raw";
 
@@ -279,19 +277,6 @@ export default function ModalSection() {
         </div>
 
         <div className="demoBlock">
-          <h4>Адаптивная ширина</h4>
-          <p className="demoBlockDescription">
-            Ширина панели задаётся стилями как <code>min(100%, …)</code>: на узком экране панель
-            заполняет доступную ширину между отступами оверлея.
-          </p>
-          <PlaygroundExampleFrame.Root code={responsiveSource.trim()} previewLayout="row">
-            <PlaygroundExampleFrame.Stage>
-              <ModalResponsiveSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
           <h4>Специфичные фичи</h4>
           <p className="demoBlockDescription">
             Проп <code>container</code> у <code>Modal.Panel</code> для монтирования в заданный узел;
@@ -326,8 +311,10 @@ export default function ModalSection() {
           <h5>Modal.Panel</h5>
           <p className="demoBlockDescription">
             Единственная оболочка панели: портал, подложка, белая карточка, фокус-ловушка, Escape,
-            скролл-лок, шапка/тело/подвал из пропсов. Без <code>title</code> — только{" "}
-            <code>children</code> (например Command Menu с <code>aria-labelledby</code>).
+            скролл-лок, шапка/тело/подвал из пропсов. Ширина панели по умолчанию ограничена вьюпортом
+            в стилях (<code>min(100%, …)</code>) — отдельного режима «адаптивной ширины» не нужно. Без{" "}
+            <code>title</code> — только <code>children</code> (например Command Menu с{" "}
+            <code>aria-labelledby</code>).
           </p>
           <PlaygroundApiTable rows={modalPanelApiRows} />
         </div>
