@@ -5,6 +5,7 @@
   --sb-transition-duration: var(--prime-sys-motion-duration-medium);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
   --sb-control-height: var(--prime-sys-size-control-m-height);
+  --sb-floating-toggle-size: var(--prime-sys-size-control-s-height);
 
   --sb-panel-padding-inline: var(--prime-sys-spacing-x2);
   --sb-panel-padding-block: var(--prime-sys-spacing-x2);
@@ -595,17 +596,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--sb-control-height);
-  min-width: var(--sb-control-height);
-  max-width: var(--sb-control-height);
-  min-height: var(--sb-control-height);
+  width: var(--sb-floating-toggle-size);
+  min-width: var(--sb-floating-toggle-size);
+  max-width: var(--sb-floating-toggle-size);
+  min-height: var(--sb-floating-toggle-size);
   padding: 0;
   border: 0;
   border-radius: var(--prime-sys-size-control-m-radius);
   background: var(--prime-sys-color-surface-elevated);
   color: var(--prime-sys-color-content-secondary);
   cursor: pointer;
-  z-index: calc(var(--prime-sys-elevation-zIndex-drawer) + 1);
+  z-index: var(--prime-sys-elevation-zIndex-drawerNestedShell);
+  font-size: 0.875rem;
   inset-block-start: calc(env(safe-area-inset-top, 0px) + var(--prime-sys-spacing-x2));
   inset-inline-start: calc(env(safe-area-inset-left, 0px) + var(--prime-sys-spacing-x2));
   box-shadow: var(--prime-sys-elevation-shadow-surface);
