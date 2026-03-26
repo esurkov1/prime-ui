@@ -30,8 +30,6 @@
   --sb-heading-left: 0%;
   --sb-heading-translate-x: 0%;
 
-  --sb-group-label-align: start;
-
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -201,7 +199,7 @@
   min-width: 0;
   max-width: 100%;
   line-height: 1.2;
-  text-align: var(--sb-group-label-align);
+  text-align: left;
   padding-inline: var(--prime-sys-spacing-x1);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -564,7 +562,7 @@
   font-size: var(--prime-sys-size-control-m-text);
   font-weight: var(--prime-sys-typography-weight-medium);
   color: var(--prime-sys-color-content-primary);
-  text-align: var(--sb-group-label-align);
+  text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -698,7 +696,6 @@
     --sb-item-trailing-scale: 0.85;
     --sb-item-trailing-max-width: 0px;
     --sb-identity-main-max-width: 0px;
-    --sb-group-label-align: center;
     --sb-heading-left: 50%;
     --sb-heading-translate-x: -50%;
   }
