@@ -178,8 +178,8 @@
 
 .floatingToggle {
   position: fixed;
-  left: 0;
-  top: 50%;
+  left: env(safe-area-inset-left, 0px);
+  top: calc(env(safe-area-inset-top, 0px) + var(--sb-page-inset) + var(--sb-panel-padding-block));
   right: auto;
   z-index: calc(var(--prime-sys-elevation-zIndex-modal) + 1);
   box-sizing: border-box;
@@ -196,7 +196,7 @@
   box-shadow: var(--prime-sys-elevation-shadow-surface);
   cursor: pointer;
   opacity: 0.5;
-  transform: translateY(-50%);
+  transform: none;
   transition:
     background-color var(--prime-sys-motion-fast) var(--sb-transition-ease),
     border-color var(--prime-sys-motion-fast) var(--sb-transition-ease),

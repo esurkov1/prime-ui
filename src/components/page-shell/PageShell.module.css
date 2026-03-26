@@ -4,7 +4,10 @@
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
   align-items: stretch;
-  gap: var(--prime-sys-spacing-x3);
+  /* Зазор между nav и main задаёт сам сайдбар (`margin-inline-end` в `Sidebar` при `sidebarSlot="page-nav"`),
+     иначе при `open=false` колонка 0px, но `gap` остаётся — контент визуально смещён вправо. */
+  column-gap: 0;
+  row-gap: 0;
   width: 100%;
   min-height: 0;
   background: transparent;
