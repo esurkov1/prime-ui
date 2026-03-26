@@ -23,7 +23,7 @@ import { Tag } from "prime-ui-kit";
 
 export function ProjectTechStack() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <div className="previewRowWrap">
       <Tag.Root>React</Tag.Root>
       <Tag.Root>TypeScript</Tag.Root>
       <Tag.Root>prime-ui-kit</Tag.Root>
@@ -41,7 +41,7 @@ import { Tag } from "prime-ui-kit";
 
 export function FilterTags() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+    <div className="previewRowWrap rowAlignCenter">
       <Tag.Root size="l">Active filter</Tag.Root>
       <Tag.Root size="m">Medium tag</Tag.Root>
       <Tag.Root size="s">Small tag</Tag.Root>
@@ -62,7 +62,7 @@ export function RecipientList() {
   const [recipients, setRecipients] = React.useState(["alice@example.com", "bob@example.com"]);
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <div className="previewRowWrap">
       {recipients.map((email) => (
         <Tag.Root
           key={email}
@@ -86,7 +86,7 @@ import { Icon } from "prime-ui-kit";
 
 export function TagsWithIcons() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <div className="previewRowWrap">
       <Tag.Root>
         <Tag.Icon>
           <Icon name="status.locked" />
