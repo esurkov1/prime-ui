@@ -1,0 +1,25 @@
+.captionSpacer {
+  margin-bottom: var(--prime-sys-spacing-m);
+}
+
+.controlledMeta {
+  font-size: var(--prime-sys-typography-sizeScale-s);
+}
+
+.iconFill {
+  width: 100%;
+  height: 100%;
+}
+
+.projectContextSection {
+  box-sizing: border-box;
+  max-width: min(100%, 35rem);
+  padding: var(--prime-sys-spacing-m);
+  border-radius: var(--prime-sys-shape-radius-m);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+}
+
+.projectContextTitle {
+  margin: 0 0 var(--prime-sys-spacing-x3);
+  font-size: var(--prime-sys-typography-sizeScale-m);
+}

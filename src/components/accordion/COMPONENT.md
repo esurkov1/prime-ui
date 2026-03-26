@@ -100,11 +100,12 @@ Nested block on a project card: several legal and financial sections open at onc
 
 ```tsx
 import { Accordion } from "prime-ui-kit";
+import styles from "../../../playground/snippets/accordion/accordion-demos.module.css";
 
 export function ProjectLegalAccordion() {
   return (
-    <section style={{ maxWidth: 560, padding: 16, borderRadius: 12, border: "1px solid var(--prime-sys-color-border-subtle, #e4e4e7)" }}>
-      <h2 style={{ margin: "0 0 12px", fontSize: "1.125rem" }}>Project “Northern warehouse”</h2>
+    <section className={styles.projectContextSection}>
+      <h2 className={styles.projectContextTitle}>Project “Northern warehouse”</h2>
       <Accordion.Root type="multiple" size="m" defaultValue={["scope", "budget"]} layout="grouped">
         <Accordion.Item value="scope">
           <Accordion.Header>
@@ -151,8 +152,8 @@ export function DispatchControlledAccordion() {
   const [panel, setPanel] = React.useState<string>("fleet");
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <div className="stack">
+      <div className="previewRowWrap rowAlignCenter">
         <Button.Root mode="stroke" size="m" variant="neutral" onClick={() => setPanel("fleet")}>
           Fleet
         </Button.Root>

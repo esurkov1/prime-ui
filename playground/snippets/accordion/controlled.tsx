@@ -1,23 +1,18 @@
 import * as React from "react";
 import { Accordion } from "@/components/accordion/Accordion";
 
+import styles from "./accordion-demos.module.css";
+
 export default function AccordionControlledSnippet() {
   const [open, setOpen] = React.useState<string>("");
 
   return (
     <div className="stack">
-      <p className="previewCaption" style={{ margin: 0 }}>
+      <p className="previewCaption">
         Состояние в родителе: <code>value</code> и <code>onValueChange</code> для{" "}
         <code>type=&quot;single&quot;</code>.
       </p>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "var(--prime-sys-spacing-m)",
-          alignItems: "center",
-        }}
-      >
+      <div className="previewRowWrap rowAlignCenter">
         <button type="button" onClick={() => setOpen("")}>
           Свернуть всё
         </button>
@@ -27,7 +22,7 @@ export default function AccordionControlledSnippet() {
         <button type="button" onClick={() => setOpen("returns")}>
           Открыть «Возвраты»
         </button>
-        <span style={{ fontSize: "var(--prime-sys-typography-sizeScale-s)" }}>
+        <span className={styles.controlledMeta}>
           Сейчас: <strong>{open ? open : "ничего"}</strong>
         </span>
       </div>

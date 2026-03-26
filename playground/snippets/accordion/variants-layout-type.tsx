@@ -1,5 +1,7 @@
 import { Accordion } from "@/components/accordion/Accordion";
 
+import styles from "./accordion-demos.module.css";
+
 function SettingsItems() {
   return (
     <>
@@ -30,7 +32,7 @@ export default function AccordionVariantsLayoutTypeSnippet() {
     <div className="stack">
       <div className="grid2">
         <div>
-          <p className="previewCaption" style={{ marginBottom: "var(--prime-sys-spacing-m)" }}>
+          <p className={`previewCaption ${styles.captionSpacer}`}>
             <code>layout=&quot;grouped&quot;</code> (по умолчанию) — единая рамка, пункты без
             зазоров.
           </p>
@@ -39,7 +41,7 @@ export default function AccordionVariantsLayoutTypeSnippet() {
           </Accordion.Root>
         </div>
         <div>
-          <p className="previewCaption" style={{ marginBottom: "var(--prime-sys-spacing-m)" }}>
+          <p className={`previewCaption ${styles.captionSpacer}`}>
             <code>layout=&quot;separate&quot;</code> — отдельные карточки с отступами.
           </p>
           <Accordion.Root
@@ -55,7 +57,7 @@ export default function AccordionVariantsLayoutTypeSnippet() {
       </div>
 
       <div>
-        <p className="previewCaption" style={{ marginBottom: "var(--prime-sys-spacing-m)" }}>
+        <p className={`previewCaption ${styles.captionSpacer}`}>
           <code>type=&quot;multiple&quot;</code> — можно держать открытыми несколько разделов сразу
           (<code>defaultValue</code> как массив).
         </p>

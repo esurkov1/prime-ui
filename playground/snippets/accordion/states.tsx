@@ -1,10 +1,12 @@
 import { Accordion } from "@/components/accordion/Accordion";
 
+import styles from "./accordion-demos.module.css";
+
 export default function AccordionStatesSnippet() {
   return (
     <div className="stack">
       <div>
-        <p className="previewCaption" style={{ marginBottom: "var(--prime-sys-spacing-m)" }}>
+        <p className={`previewCaption ${styles.captionSpacer}`}>
           Пункт с <code>disabled</code> на <code>Accordion.Item</code> не раскрывается и визуально
           приглушён.
         </p>
@@ -40,7 +42,7 @@ export default function AccordionStatesSnippet() {
       </div>
 
       <div>
-        <p className="previewCaption" style={{ marginBottom: "var(--prime-sys-spacing-m)" }}>
+        <p className={`previewCaption ${styles.captionSpacer}`}>
           Стартовое раскрытие через <code>defaultValue</code> (неконтролируемый режим).
         </p>
         <Accordion.Root type="single" size="m" defaultValue="open-first" className="accordionDemo">
@@ -66,7 +68,7 @@ export default function AccordionStatesSnippet() {
       </div>
 
       <div>
-        <p className="previewCaption" style={{ marginBottom: "var(--prime-sys-spacing-m)" }}>
+        <p className={`previewCaption ${styles.captionSpacer}`}>
           <code>collapsible={"{false}"}</code> в режиме <code>single</code> — открытый пункт нельзя
           закрыть повторным нажатием (всегда остаётся один открытый).
         </p>

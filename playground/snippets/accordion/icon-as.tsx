@@ -1,6 +1,8 @@
 import { Package } from "lucide-react";
 import { Accordion } from "@/components/accordion/Accordion";
 
+import styles from "./accordion-demos.module.css";
+
 export default function AccordionIconAsSnippet() {
   return (
     <Accordion.Root type="single" size="m" className="accordionDemo" defaultValue="sku">
@@ -8,7 +10,7 @@ export default function AccordionIconAsSnippet() {
         <Accordion.Header>
           <Accordion.Trigger>
             <Accordion.Icon as="span" aria-hidden>
-              <Package strokeWidth={1.75} style={{ width: "100%", height: "100%" }} />
+              <Package strokeWidth={1.75} className={styles.iconFill} />
             </Accordion.Icon>
             <span>Состав заказа</span>
             <Accordion.Arrow />
@@ -23,7 +25,7 @@ export default function AccordionIconAsSnippet() {
         <Accordion.Header>
           <Accordion.Trigger>
             <Accordion.Icon as="span" aria-hidden>
-              <Package strokeWidth={1.75} style={{ width: "100%", height: "100%" }} />
+              <Package strokeWidth={1.75} className={styles.iconFill} />
             </Accordion.Icon>
             <span>Отслеживание</span>
             <Accordion.Arrow />
