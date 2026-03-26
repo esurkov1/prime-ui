@@ -13,6 +13,37 @@ Composite pieces for picking a calendar date or range: a size-aware shell, a day
 - **When not to use** — always-visible full calendars as default page chrome; open the shell from a trigger in [Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md), or [Drawer](../drawer/COMPONENT.md).
 - **When not to use** — month- or year-only picking without days (use a slimmer control or native inputs).
 
+## Canonical
+
+- **Exports** — `Datepicker` (`Shell`, `Calendar`, `Presets`, `Time`, `Value`), `formatTimeInputValue`, `mergeTimeIntoDate`, and types including **`DateRange`** (re-exported from react-day-picker).
+- **Hierarchy** — `Datepicker.Shell` is the panel root; **`Datepicker.Calendar` must be inside `Shell`** (directly or nested) so `size` context resolves.
+- **Selection** — `Calendar` forwards **react-day-picker** `DayPicker` props: `mode="single"` or `mode="range"`, `selected`, `onSelect`, `disabled`, `locale`, etc.
+- **Presets** — Pass `Datepicker.Presets` as **`Shell`’s `presets` prop**; `Presets` **`mode`** (`"single"` | `"range"`) must match the calendar **`mode`**.
+- **Layout** — `Calendar` supports **`responsiveMonths`** (ignores `numberOfMonths` when `true`) and **`responsiveBreakpoints.twoColumns`** (default **500** px). Default **`weekStartsOn`** is **1** (Monday).
+- **Popover** — Typical pattern: `Datepicker.Shell` inside **`Popover.Content`** with **`insetPadding="none"`**.
+- **Presets `title`** — Typed on `Datepicker.Presets` but **not rendered** in the UI.
+- **Time** — `Datepicker.Time` keeps `input type="time"` **disabled** until the anchor date exists (`value`, or `from` / `to` in range mode).
+
+## Extended
+
+- **Booking (stay + time)** — Use **`mode="range"`** on both `Calendar` and `Presets`, optional **`Datepicker.Time`** with **`mode="range"`** for check-in/check-out times. Presets can encode “tonight”, multi-night spans, or month windows. Reference implementation: **`examples/booking.tsx`** (`BookingDateRangeExample`).
+- **Birthdate** — **`mode="single"`**; disable future days with react-day-picker **`disabled`** (for example `date >= startOfTomorrow()` from date-fns). Show a human-readable line with **`Datepicker.Value`**. Open the month near a sensible default (for example year **2000**) when no value yet. Reference: **`examples/birthdate.tsx`** (`BirthdateSingleExample`).
+- **Range (reports / filters)** — **`mode="range"`** with **`numberOfMonths={2}`** or **`responsiveMonths`** for width-driven columns; presets for “this month / last month / last N days”. Reference: **`examples/range-report.tsx`** (`ReportRangeExample`).
+- **Full-width form field** — **`Button.Root fullWidth`** as **`Popover.Trigger`**; widen **`Popover.Content`** (for example `min-w-[min(100vw-2rem,36rem)]` when your app uses Tailwind) and **`Datepicker.Shell className="min-w-0"`** so **`responsiveMonths`** measures correctly. Reference: **`examples/full-width-form.tsx`** (`FullWidthFormDateExample`).
+
+Repository **`.tsx` examples** under **`examples/`** are type-checked with the library build; copy them into your app and wire your own spacing/theme (see [Label](../label/COMPONENT.md) for the label primitive).
+
+## LLM note
+
+- Always compose **`Datepicker.Shell` → `Datepicker.Calendar`** at minimum; never use **`Calendar` without `Shell`** in real UIs if you rely on **`size`** context (default **`m`** on `Shell`).
+- For overlays, default to **[Popover](../popover/COMPONENT.md)** with **`insetPadding="none"`** on content unless the design system specifies otherwise.
+- **Controlled state:** bind **`selected`** and **`onSelect`** from react-day-picker; for range, state type is **`DateRange | undefined`**.
+- **Do not** mix **`Presets` `mode="range"`** with **`Calendar` `mode="single"`** (or the reverse) in one shell.
+- **Do not** invent a **`title`** UI for **`Datepicker.Presets`** — it is not implemented.
+- Pass **`locale`** from **date-fns** (`import { ru } from "date-fns/locale"`) into **`Calendar`** for localized month/weekday labels.
+- Month navigation **`aria-label`** strings on the kit nav buttons are **English**; override via **`Calendar` `components`** if the product language must match.
+- **Utilities:** use **`formatTimeInputValue`** / **`mergeTimeIntoDate`** only when integrating custom time inputs; **`Datepicker.Time`** already uses them.
+
 ## Composition
 
 - **`Datepicker.Shell`** — Root wrapper: sets `DatepickerSize` context, owns `requestedMonth` / `requestMonth` for syncing the grid month when presets fire. Optional **`presets`** renders a bottom row after **`children`**.
@@ -132,6 +163,7 @@ export function DatepickerMinimal() {
 - [Button](../button/COMPONENT.md)
 - [ButtonGroup](../button-group/COMPONENT.md)
 - [Input](../input/COMPONENT.md)
+- [Label](../label/COMPONENT.md)
 - [Typography](../typography/COMPONENT.md)
 - [Modal](../modal/COMPONENT.md)
 - [Drawer](../drawer/COMPONENT.md)
