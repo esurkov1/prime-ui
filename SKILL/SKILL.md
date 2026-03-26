@@ -1,119 +1,119 @@
 ---
 name: prime-ui-responsive-app
 description: >
-  Строит адаптивные mobile-first экраны на prime-ui-kit: Flexbox, CSS Modules, токены --prime-sys-*.
-  Использовать при вёрстке страниц, шаблонов, форм, навигации, дашбордов; при переводе desktop-макета
-  в mobile-first; при выборе компонента региона; при проверке брейкпоинтов, touch targets, Drawer vs inline.
-  Включает рецепты (дашборд, настройки, каталог, лендинг, мастер формы), каталог из 41 компонента, антипаттерны.
-  Негласуемо: без кастомных оболочек и перекраски kit-компонентов — только примитивы, дефолтные стили и публичный API.
+  Builds responsive, mobile-first screens with prime-ui-kit: Flexbox, CSS Modules, and --prime-sys-* tokens.
+  Use when laying out pages, templates, forms, navigation, or dashboards; converting desktop layouts to
+  mobile-first; picking a component for a region; validating breakpoints, touch targets, or Drawer vs inline.
+  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 41-component catalog, and anti-patterns.
+  Non-negotiable: no custom wrappers or reskins of kit components—only primitives, default styles, and the public API.
 ---
 
 # prime-ui-responsive-app
 
-**Роль агента:** внедрять UI строго через документированные компоненты prime-ui-kit и семантические токены; не «улучшать» внешний вид обёртками и переопределением стилей kit.
+**Agent role:** implement UI strictly through documented prime-ui-kit components and semantic tokens; do not “improve” appearance with wrappers or overrides of kit styles.
 
-## Когда применять
+## When to use
 
-- Верстка/рефакторинг layout под разные ширины, touch, overlay.
-- Вопросы «чем закрыть регион», «как сложить сетку/сайдбар/футер» в экосистеме kit.
-- Проверка соответствия дизайн-системе (токены, размеры, доступность).
+- Layout or reflow across viewports, touch, and overlays.
+- Questions like what to use for a region, or how to structure grid / sidebar / footer within the kit.
+- Checking design-system compliance (tokens, sizing, accessibility).
 
-## Документация (где смотреть)
+## Where to read docs
 
-| Что | В репозитории | После `npm install prime-ui-kit` |
-|-----|----------------|-----------------------------------|
-| API, props, примеры компонента | `../src/components/<kebab>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<kebab>/COMPONENT.md` |
-| Токены | [`design-tokens.md`](./design-tokens.md) | `node_modules/prime-ui-kit/SKILL/design-tokens.md` |
-| Все 41 компонент, роли в layout | [`component-catalog.md`](./component-catalog.md) | рядом с `SKILL.md` в пакете |
+| What | In this repo | After `npm install prime-ui-kit` |
+|------|----------------|-------------------------------------|
+| API, props, examples | `../src/components/<kebab>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<kebab>/COMPONENT.md` |
+| Tokens | [`design-tokens.md`](./design-tokens.md) | `node_modules/prime-ui-kit/SKILL/design-tokens.md` |
+| All 41 components, layout roles | [`component-catalog.md`](./component-catalog.md) | next to `SKILL.md` in the package |
 
-Установка skill в Cursor: каталог `SKILL/` целиком (чтобы `SKILL.md`, `design-tokens.md`, `component-catalog.md` остались рядом).
+Installing as a Cursor skill: use the whole `SKILL/` directory so `SKILL.md`, `design-tokens.md`, and `component-catalog.md` stay together.
 
 ---
 
-## Негласуемые правила
+## Non-negotiable rules
 
-1. **Только семантические токены** — цвет, отступы, радиусы, тени, z-index, motion из `--prime-sys-*`. В layout не использовать сырые `--prime-ref-*`.
-2. **Без литералов визуала** — не hex, не «голые» px для spacing/radius/shadow/z-index в стилях layout.
-3. **Тема через `data-theme`** — компонент не зашивает light/dark; роли семантические.
-4. **CSS Modules + переменные** — в kit нет Tailwind.
-5. **Размер контролов через `size`** — высоты кнопок/полей layout не переопределяет.
-6. **Базовый размер `m`** — для любого компонента с осью `size`, если сценарий не требует иного явно.
+1. **Semantic tokens only** — color, spacing, radii, shadows, z-index, and motion come from `--prime-sys-*`. Do not use raw `--prime-ref-*` in layout.
+2. **No visual literals** — no hex colors or bare px for spacing, radius, shadow, or z-index in layout styles.
+3. **Theming via `data-theme`** — components do not hard-code light/dark; roles stay semantic.
+4. **CSS Modules + variables** — Tailwind is not part of prime-ui-kit.
+5. **Control sizing via `size`** — layout does not override button or field heights.
+6. **Default size `m`** — for any component with a `size` axis unless the scenario explicitly needs another value.
 
-### Сырой kit, без кастомных оболочек
+### Raw kit only — no custom shells
 
-| Запрещено | Обязательно |
-|-----------|-------------|
-| Оборачивать kit-компоненты, чтобы изменить вид/поведение; подменять разметку; переопределять CSS kit (ad-hoc `className`, inline «чужая» система, клоны на `div`/`span`) | Только стандартная композиция и **публичный API**: props (`size`, `variant`, `mode`, `fullWidth`, …), документированные субкомпоненты, `ControlSizeProvider`, `data-theme`, `--prime-sys-*` на **поверхностях страницы**, не на «перекрашенных» внутренностях |
+| Do not | Do |
+|--------|-----|
+| Wrap kit components to change look or behavior; swap markup; override kit CSS (ad-hoc `className`, inline styles from another system, `div`/`span` clones) | Use standard composition and the **public API** only: props (`size`, `variant`, `mode`, `fullWidth`, …), documented subcomponents, `ControlSizeProvider`, `data-theme`, and `--prime-sys-*` on **page-level surfaces**—not on “reskinned” internals |
 
-Нарушение: дрейф от DS, потеря a11y-гарантий, небезопасные апгрейды.
+Breaking this drifts from the design system, weakens accessibility guarantees, and makes upgrades unsafe.
 
-### Шпаргалка по токенам (layout)
+### Token cheat sheet (layout)
 
-| Категория | Префикс | Примеры |
-|-----------|---------|---------|
-| Фон | `--prime-sys-color-surface-*` | default, raised, overlay |
-| Текст | `--prime-sys-color-content-*` | primary, secondary, muted |
-| Бордер | `--prime-sys-color-border-*` | separator, subtle, strong |
-| Отступы | `--prime-sys-spacing-*` | s, l, 2xl, 4xl |
-| Радиусы | `--prime-sys-shape-radius-*` | m, 4xl |
-| Тени | `--prime-sys-elevation-shadow-*` | surface, modal |
+| Category | Prefix | Examples |
+|----------|--------|----------|
+| Background | `--prime-sys-color-surface-*` | default, raised, overlay |
+| Text | `--prime-sys-color-content-*` | primary, secondary, muted |
+| Border | `--prime-sys-color-border-*` | separator, subtle, strong |
+| Spacing | `--prime-sys-spacing-*` | s, l, 2xl, 4xl |
+| Radii | `--prime-sys-shape-radius-*` | m, 4xl |
+| Shadows | `--prime-sys-elevation-shadow-*` | surface, modal |
 | Z-index | `--prime-sys-elevation-zIndex-*` | sticky, modal |
 | Motion | `--prime-sys-motion-*` | duration-fast, easing-standard |
 
-Полный справочник: [`design-tokens.md`](./design-tokens.md).
+Full reference: [`design-tokens.md`](./design-tokens.md).
 
 ---
 
-## Принципы вёрстки
+## Layout principles
 
-- **Mobile-first:** сначала `flex-direction: column`, строка через `@media (min-width: …)`.
-- **Брейкпоинты:** `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 — ставить там, где ломается сетка, а не по названию устройства.
-- **Flex:** сайдбар + контент — `flex-wrap`, сайдбар `flex: 0 0 280px`, контент `flex: 1 1 0%`; holy grail — колонка body `min-height: 100vh`, середина `flex: 1` + flex-ряд; сетка карточек — `flex-wrap` + `gap` из токенов + `min-width` для reflow; липкий футер — main `flex: 1 0 auto`, footer `flex-shrink: 0`.
-- **Отступы:** `gap`/`padding`/`margin` только из `--prime-sys-spacing-*`; при необходимости fluid: `clamp(var(--prime-sys-spacing-s), 2vw, var(--prime-sys-spacing-xl))` — без смешения литералов и токенов в одном правиле без нужды.
-- **Touch:** минимум 44×44 px (WCAG 2.5.5); на мобиле Button/Input/Select — `size="l"`; Checkbox/Radio/Switch — увеличить клик-зону; LinkButton ≥ `m`.
-- **Навигация:** desktop — фиксированный Sidebar `flex-shrink: 0`; `< md` — Sidebar в Drawer слева; Breadcrumb с `maxItems`; Tabs — скролл или Accordion; CommandMenu доступен с кнопки на всех ширинах.
-
----
-
-## Рецепты (сжато)
-
-**Дашборд:** Sidebar + Header (Breadcrumb, Avatar, CommandMenu) + контент (Tabs, DataTable, ProgressBar, Badge). `≥ lg` — row; `< lg` — колонка, сайдбар в Drawer; Tabs скролл; `< md` — таблица с горизонтальным скроллом и закреплённой колонкой; `< sm` — Stepper вертикально при необходимости.
-
-**Настройки:** боковая навигация секций + форма (Label, Input, Select, Switch, Textarea, Button). `≥ md` — row; `< md` — сайдбар в Tabs/Accordion; поля `fullWidth`; футер формы — ButtonGroup, `justify-end`; `< sm` — кнопки `fullWidth`.
-
-**Каталог:** поиск + SegmentedControl + фильтры + сетка карточек. Фильтры `flex: 0 0 260px` при `≥ md`; `< md` — фильтры в Drawer снизу; `< sm` — одна колонка; много сегментов — на узкой ширине заменить на Select; Pagination — компактный режим.
-
-**Лендинг:** секции колонкой, `max-width` + центрирование; Hero `< md` колонкой, `≥ md` — текст + медиа в ряд; FAQ — Accordion; `< md` — нав в Drawer; CTA — ButtonGroup, на узкой ширине вертикально.
-
-**Мастер формы:** Stepper (`≥ md` горизонтально, иначе вертикально) + шаг колонкой с `max-width` ~600px; действия `space-between`; на мобиле шаг может быть в Modal/Drawer; ProgressBar под прогрессом; `< sm` — кнопки `fullWidth`, DigitInput крупнее.
-
-Детали компонентов — в соответствующих `COMPONENT.md`; сводка по 41 компоненту — [`component-catalog.md`](./component-catalog.md).
+- **Mobile-first:** start with `flex-direction: column`; switch to a row at `@media (min-width: …)`.
+- **Breakpoints:** `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 — place them where the layout breaks, not by device name.
+- **Flex:** sidebar + content — `flex-wrap`, sidebar `flex: 0 0 280px`, content `flex: 1 1 0%`; holy grail — body column `min-height: 100vh`, middle `flex: 1` + flex row; card grid — `flex-wrap` + token `gap` + `min-width` for reflow; sticky footer — main `flex: 1 0 auto`, footer `flex-shrink: 0`.
+- **Spacing:** `gap` / `padding` / `margin` only from `--prime-sys-spacing-*`; for fluid spacing use e.g. `clamp(var(--prime-sys-spacing-s), 2vw, var(--prime-sys-spacing-xl))` — avoid mixing literals and tokens in one rule without good reason.
+- **Touch:** minimum 44×44 px (WCAG 2.5.5); on mobile use Button / Input / Select at `size="l"`; pad Checkbox / Radio / Switch hit areas; LinkButton at least `m`.
+- **Navigation:** desktop — fixed Sidebar with `flex-shrink: 0`; below `md` — Sidebar in a left Drawer; Breadcrumb with `maxItems`; Tabs horizontal scroll or Accordion; CommandMenu reachable from a button on all widths.
 
 ---
 
-## Каталог компонентов
+## Recipes (compact)
 
-Все экспортируемые компоненты документированы в `../src/components/<kebab-name>/COMPONENT.md`. Полный перечень и сценарии — [`component-catalog.md`](./component-catalog.md) (длинные таблицы не дублировать — progressive disclosure).
+**Dashboard:** Sidebar + header (Breadcrumb, Avatar, CommandMenu) + content (Tabs, DataTable, ProgressBar, Badge). At `≥ lg` use a row; below `lg` stack and move the sidebar to a Drawer; scroll Tabs; below `md` use a horizontally scrolling table with a pinned column; below `sm` use a vertical Stepper if needed.
 
----
+**Settings:** side section nav + form (Label, Input, Select, Switch, Textarea, Button). At `≥ md` use a row; below `md` turn the sidebar into Tabs or Accordion; fields `fullWidth`; form footer — ButtonGroup, `justify-end`; below `sm` buttons `fullWidth`.
 
-## Антипаттерны
+**Catalog:** search + SegmentedControl + filters + card grid. Filters `flex: 0 0 260px` at `≥ md`; below `md` filters in a bottom Drawer; below `sm` single column; many segments — use Select on narrow widths; Pagination in compact mode.
 
-1. `100vw` вместо `100%` — лишняя ширина скроллбара → горизонтальный overflow.
-2. `height: 100vh` на мобиле без учёта динамической панели Safari — предпочтительно `min-height: 100dvh` или fallback + `-webkit-fill-available`.
-3. Sidebar без `flex-shrink: 0` / без `flex: 0 0 <width>` — сжимается при переполнении контента.
-4. Широкие таблицы без обёртки скролла — использовать DataTable (overflow-x, закрепление колонки).
-5. Modal по центру на мобиле для длинных форм — предпочесть Drawer снизу (`< md`).
-6. Мелкие зоны тапа на мобиле — см. Touch выше.
-7. Фиксированные px на flex-элементах без адаптации — `flex-basis` + min/max или `%`/`clamp`.
-8. Любые хардкоды `#…`, `gap: 16px`, `z-index: 999` и т.д. вместо `--prime-sys-*`.
-9. Кастомные обёртки и «ресурфейсы» kit-компонентов — см. раздел «Сырой kit».
+**Landing:** sections as a column with `max-width` and centering; Hero stacks below `md`, text + media in a row at `≥ md`; FAQ — Accordion; below `md` nav in a Drawer; CTA — ButtonGroup, vertical on narrow widths.
+
+**Form wizard:** Stepper (horizontal at `≥ md`, vertical otherwise) + step column with `max-width` ~600px; actions `space-between`; on mobile the step can live in Modal or Drawer; ProgressBar under progress; below `sm` buttons `fullWidth`, larger DigitInput.
+
+Per-component details live in each `COMPONENT.md`; the 41-component overview is in [`component-catalog.md`](./component-catalog.md).
 
 ---
 
-## Чеклист перед ответом пользователю
+## Component catalog
 
-- [ ] Токены только `--prime-sys-*` на визуале; нет обхода kit через кастомные оболочки.
-- [ ] Размеры контролов через props; по умолчанию ось `size` = `m`, если не оговорено иначе.
-- [ ] Брейкпоинты по ломке сетки; Sidebar/Drawer учтены для `< md` / `< lg` где уместно.
-- [ ] При сомнении — открыть `COMPONENT.md` и [`component-catalog.md`](./component-catalog.md).
+Every exported component is documented under `../src/components/<kebab-name>/COMPONENT.md`. Full list and scenarios: [`component-catalog.md`](./component-catalog.md) — do not duplicate long tables here (progressive disclosure).
+
+---
+
+## Anti-patterns
+
+1. `100vw` instead of `100%` — scrollbar width causes horizontal overflow.
+2. `height: 100vh` on mobile without accounting for Safari’s dynamic chrome — prefer `min-height: 100dvh` or a fallback with `-webkit-fill-available`.
+3. Sidebar without `flex-shrink: 0` / `flex: 0 0 <width>` — it shrinks when main content overflows.
+4. Wide tables without a scroll wrapper — use DataTable (`overflow-x`, pinned column).
+5. Centered Modal on mobile for long flows — prefer a bottom Drawer below `md`.
+6. Small tap targets on mobile — see Touch above.
+7. Fixed px on flex items with no adaptation — use `flex-basis` + min/max or `%` / `clamp`.
+8. Hard-coded `#…`, `gap: 16px`, `z-index: 999`, etc. instead of `--prime-sys-*`.
+9. Custom wrappers and reskins — see **Raw kit only** above.
+
+---
+
+## Checklist before answering the user
+
+- [ ] Visuals use `--prime-sys-*` only; no bypassing the kit with custom wrappers.
+- [ ] Control sizes via props; default `size` axis is `m` unless specified otherwise.
+- [ ] Breakpoints follow layout breakage; Sidebar / Drawer accounted for below `md` / `lg` where relevant.
+- [ ] If unsure, open `COMPONENT.md` and [`component-catalog.md`](./component-catalog.md).
