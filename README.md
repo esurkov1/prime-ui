@@ -250,7 +250,7 @@ Type definitions ship with the package (`dist/*.d.ts`).
 - **In the repo / on GitHub:** each component has `src/components/<name>/COMPONENT.md` (see the table above). **Sidebar** uses `src/layout/sidebar/COMPONENT.md`.
 - **Canonical + extended examples:** next to each `COMPONENT.md`, the `examples/` folder holds **3–5 self-contained `.tsx` files** (and optional `examples.module.css`) with real product scenarios. `COMPONENT.md` lists them under **Extended examples**; start from the **Canonical example** in the same file for a maximal single-block overview.
 - **Why separate files (not one `examples.md`):** each file is one scenario with a clear filename — easier for humans to navigate and for LLMs to retrieve the right chunk without loading an entire mega-document.
-- **In the installed package:** `COMPONENT.md` and `examples/**` are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/button/examples/`.
+- **In the installed package:** `COMPONENT.md` and `examples/**` are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/button/examples/` and `node_modules/prime-ui-kit/src/layout/sidebar/COMPONENT.md`.
 
 **AppShell**, **PageContent**, **ExampleFrame**, and **ScrollContainer** do not have a dedicated `COMPONENT.md`; refer to the linked source folders and types in the `.tsx` files.
 
