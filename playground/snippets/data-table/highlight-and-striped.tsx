@@ -1,6 +1,8 @@
 import * as React from "react";
 import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
 
+import styles from "./data-table-demos.module.css";
+
 type Row = { id: string; product: string; qty: number; price: number };
 
 const rows: Row[] = [
@@ -30,26 +32,9 @@ export default function DataTableHighlightAndStripedSnippet() {
 
   return (
     <div className="examplePreviewBleed">
-      <fieldset
-        style={{
-          margin: 0,
-          marginBottom: "1rem",
-          padding: "0.75rem 1rem",
-          border: "1px solid var(--prime-sys-color-border-subtle)",
-          borderRadius: "var(--prime-sys-shape-radius-m)",
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "1rem 1.5rem",
-        }}
-      >
-        <legend
-          style={{ padding: "0 0.35rem", fontSize: "var(--prime-sys-typography-support-xs)" }}
-        >
-          Опции таблицы
-        </legend>
-        <label
-          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}
-        >
+      <fieldset className={styles.optionsFieldset}>
+        <legend className={styles.optionsLegend}>Опции таблицы</legend>
+        <label className={styles.optionLabel}>
           <input
             type="checkbox"
             checked={highlightRowOnHover}
@@ -57,9 +42,7 @@ export default function DataTableHighlightAndStripedSnippet() {
           />
           Подсветка строки при наведении
         </label>
-        <label
-          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}
-        >
+        <label className={styles.optionLabel}>
           <input
             type="checkbox"
             checked={highlightColumnOnHover}
@@ -67,9 +50,7 @@ export default function DataTableHighlightAndStripedSnippet() {
           />
           Подсветка колонки при наведении
         </label>
-        <label
-          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}
-        >
+        <label className={styles.optionLabel}>
           <input type="checkbox" checked={striped} onChange={(e) => setStriped(e.target.checked)} />
           Чередование строк (зебра)
         </label>

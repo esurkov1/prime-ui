@@ -1,5 +1,7 @@
 import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
 
+import styles from "./data-table-demos.module.css";
+
 type Row = { id: string; label: string };
 
 const columns: DataTableColumn<Row>[] = [
@@ -9,18 +11,9 @@ const columns: DataTableColumn<Row>[] = [
 
 export default function DataTableStatesSnippet() {
   return (
-    <div
-      className="examplePreviewBleed"
-      style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-    >
+    <div className={`examplePreviewBleed ${styles.statesStack}`}>
       <div>
-        <p
-          style={{
-            margin: "0 0 0.5rem",
-            fontSize: "var(--prime-sys-size-control-s-supportText)",
-            color: "var(--prime-sys-color-content-secondary)",
-          }}
-        >
+        <p className={styles.leadTight}>
           <code>loading</code> при пустом наборе строк: одна строка с <code>loadingText</code>.
         </p>
         <DataTable.Root
@@ -33,13 +26,7 @@ export default function DataTableStatesSnippet() {
         />
       </div>
       <div>
-        <p
-          style={{
-            margin: "0 0 0.5rem",
-            fontSize: "var(--prime-sys-size-control-s-supportText)",
-            color: "var(--prime-sys-color-content-secondary)",
-          }}
-        >
+        <p className={styles.leadTight}>
           Пустой список: <code>emptyText</code> вместо строк данных.
         </p>
         <DataTable.Root

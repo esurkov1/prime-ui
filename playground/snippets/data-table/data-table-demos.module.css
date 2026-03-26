@@ -1,0 +1,63 @@
+/* Общие утилиты демо data-table (playground). */
+
+.narrowCard {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 28rem;
+  padding: var(--prime-sys-spacing-x3);
+  border-radius: var(--prime-sys-shape-radius-m);
+  border: 1px dashed var(--prime-sys-color-border-subtle);
+}
+
+.lead {
+  margin: 0 0 var(--prime-sys-spacing-x3);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.leadTight {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.statesStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x6);
+  width: 100%;
+}
+
+.inlineIconRow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.inlineIconRowTight {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x1);
+}
+
+.optionsFieldset {
+  margin: 0 0 var(--prime-sys-spacing-x4);
+  padding: var(--prime-sys-spacing-x3) var(--prime-sys-spacing-x4);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-m);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x4) var(--prime-sys-spacing-x6);
+}
+
+.optionsLegend {
+  padding: 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-typography-support-xs);
+}
+
+.optionLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x3);
+  cursor: pointer;
+}

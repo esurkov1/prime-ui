@@ -1,5 +1,7 @@
 import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
 
+import styles from "./data-table-demos.module.css";
+
 type Row = { id: string; task: string; hours: number };
 
 const rows: Row[] = [
@@ -25,23 +27,8 @@ const columns: DataTableColumn<Row>[] = [
 
 export default function DataTableFullWidthSnippet() {
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "28rem",
-        padding: "var(--prime-sys-spacing-x3)",
-        borderRadius: "var(--prime-sys-shape-radius-m)",
-        border: "1px dashed var(--prime-sys-color-border-subtle)",
-        boxSizing: "border-box",
-      }}
-    >
-      <p
-        style={{
-          margin: "0 0 0.75rem",
-          fontSize: "var(--prime-sys-size-control-s-supportText)",
-          color: "var(--prime-sys-color-content-secondary)",
-        }}
-      >
+    <div className={styles.narrowCard}>
+      <p className={styles.lead}>
         Узкий контейнер: корень таблицы тянется на 100% ширины родителя (сетка карточки, колонка
         формы).
       </p>

@@ -107,7 +107,7 @@ export function CourseRosterTable({ rows }: { rows: Enrollee[] }) {
 
 ### In context (form / modal / sidebar / …)
 
-Contract approval sidebar: narrow width, table stretches to 100%, sticky header when scrolling inside the panel.
+Contract approval sidebar: narrow width, table stretches to 100%, sticky header when scrolling inside the panel. Style the shell (`contract-clauses-panel`) in your app for width, max-height, and column flex layout.
 
 ```tsx
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
@@ -129,7 +129,7 @@ const columns: DataTableColumn<Clause>[] = [
 
 export function ContractClausesDrawer({ rows }: { rows: Clause[] }) {
   return (
-    <aside style={{ width: 360, maxHeight: 420, display: "flex", flexDirection: "column" }}>
+    <aside className="contract-clauses-panel">
       <DataTable.Root
         className="contract-clauses-table"
         columns={columns}

@@ -4,6 +4,8 @@ import * as React from "react";
 import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
 import { LinkButton } from "@/components/link-button/LinkButton";
 
+import styles from "./data-table-demos.module.css";
+
 type ContactRow = {
   id: string;
   name: string;
@@ -21,7 +23,7 @@ const columns: DataTableColumn<ContactRow>[] = [
   {
     id: "name",
     header: (
-      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+      <span className={styles.inlineIconRow}>
         <Mail size={14} strokeWidth={2} aria-hidden />
         Контакт
       </span>
@@ -60,7 +62,7 @@ const columns: DataTableColumn<ContactRow>[] = [
       window.open(`mailto:${row.email}`, "_blank", "noopener,noreferrer");
     },
     cell: () => (
-      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+      <span className={styles.inlineIconRowTight}>
         <ExternalLink size={14} strokeWidth={2} aria-hidden />
         Написать
       </span>
@@ -73,13 +75,7 @@ export default function DataTableCompositionSnippet() {
 
   return (
     <div className="examplePreviewBleed">
-      <p
-        style={{
-          margin: "0 0 0.75rem",
-          fontSize: "var(--prime-sys-size-control-s-supportText)",
-          color: "var(--prime-sys-color-content-secondary)",
-        }}
-      >
+      <p className={styles.lead}>
         {last ? `Последний клик по строке: ${last}` : "Клик по строке обновляет подпись ниже."}
       </p>
       <DataTable.Root
