@@ -2,17 +2,14 @@ import * as React from "react";
 
 import { Switch } from "@/components/switch/Switch";
 
+import styles from "./snippets.module.css";
+
 export default function SwitchFormFeaturesSnippet() {
   const [message, setMessage] = React.useState<string | null>(null);
 
   return (
     <form
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x3)",
-        maxWidth: "24rem",
-      }}
+      className={styles.form}
       onSubmit={(e) => {
         e.preventDefault();
         const data = new FormData(e.currentTarget);
@@ -25,17 +22,10 @@ export default function SwitchFormFeaturesSnippet() {
       <Switch.Root name="digest" required>
         <Switch.Label>Еженедельный дайджест (обязательно)</Switch.Label>
       </Switch.Root>
-      <button
-        type="submit"
-        style={{
-          alignSelf: "flex-start",
-          padding: "var(--prime-sys-spacing-x2) var(--prime-sys-spacing-x3)",
-          borderRadius: "var(--prime-sys-shape-radius-m)",
-        }}
-      >
+      <button type="submit" className={styles.formSubmit}>
         Отправить
       </button>
-      {message != null ? <p style={{ margin: 0, fontSize: "0.875rem" }}>{message}</p> : null}
+      {message != null ? <p className={styles.formMessage}>{message}</p> : null}
     </form>
   );
 }

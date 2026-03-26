@@ -42,7 +42,7 @@ import { Switch } from "prime-ui-kit";
 
 export function WarehouseDensityPreview() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
+    <div className="previewRowWrap rowAlignCenter">
       <Switch.Root size="s" defaultChecked>
         <Switch.Label>Auto write-off</Switch.Label>
       </Switch.Root>
@@ -69,8 +69,8 @@ import { Switch } from "prime-ui-kit";
 
 export function CheckoutConsentField() {
   return (
-    <section style={{ padding: 20, maxWidth: 400, borderRadius: 12, border: "1px solid #e4e4e7" }}>
-      <h2 style={{ margin: "0 0 12px", fontSize: 16 }}>Terms</h2>
+    <section className="demoBlock previewBannerNarrowColumn">
+      <h4>Terms</h4>
       <Switch.Root variant="error">
         <Switch.Label>I accept the offer terms and data policy</Switch.Label>
         <Switch.Error>You must agree to continue to payment</Switch.Error>

@@ -1,0 +1,29 @@
+/* Раскладка превью switch — токены вместо inline style в сниппетах */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x3);
+  max-width: 24rem;
+}
+
+.formSubmit {
+  align-self: flex-start;
+  padding: var(--prime-sys-spacing-x2) var(--prime-sys-spacing-x3);
+  border-radius: var(--prime-sys-shape-radius-m);
+}
+
+.formMessage {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+}
+
+.fullWidthCard {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 22rem;
+  padding: var(--prime-sys-spacing-x3);
+  border: 1px solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-m);
+}
