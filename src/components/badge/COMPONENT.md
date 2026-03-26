@@ -1,34 +1,57 @@
 # Badge
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default sizing:** When designing screens or samples, prefer **`size="m"`** unless the scenario explicitly needs another value.
 
 ## About
 
 A compact, non-interactive label for status, category, or counts. Optional `Badge.Dot` and `Badge.Icon` slots align a decorative dot or an icon with text; `variant="status"` adds a built-in presence dot and live-region semantics.
 
-- **When to use:** surface short metadata next to headings, table rows, or list items (stage, environment, stock, role).
-- **When to use:** show presence or mode with `variant="status"` when short visible copy fits the layout; use `label` when screen readers need more than `children` alone (see Rules).
-- **When to use:** pair a semantic `color` and `variant` (`filled`, `light`, `lighter`, `stroke`) with density and emphasis needs on dashboards and catalogs.
-- **When to use:** combine `Badge.Icon` with text or icon-only content when the icon should inherit badge sizing from `ControlSizeProvider`.
-- **When not to use:** as the primary control for a click or navigation — use [Button](../button/COMPONENT.md) or [LinkButton](../link-button/COMPONENT.md) instead.
-- **When not to use:** for removable or selectable tags — use [Tag](../tag/COMPONENT.md).
-- **When not to use:** for keyboard shortcut glyphs — use [Kbd](../kbd/COMPONENT.md).
+- **Use** for short metadata next to headings, table rows, or list items (stage, environment, stock, role).
+- **Use** `variant="status"` for presence when visible copy fits; pass **`label`** when assistive tech needs more than `children` alone (see Rules).
+- **Use** semantic **`color`** with **`variant`** (`filled`, `light`, `lighter`, `stroke`) for emphasis on dashboards and catalogs.
+- **Use** **`Badge.Icon`** when the icon should inherit badge sizing from the surrounding `ControlSizeProvider` (root provides it for children).
+- **Do not use** as the primary control for clicks or navigation — use [Button](../button/COMPONENT.md) or [LinkButton](../link-button/COMPONENT.md).
+- **Do not use** for removable or selectable tags — use [Tag](../tag/COMPONENT.md).
+- **Do not use** for keyboard shortcut glyphs — use [Kbd](../kbd/COMPONENT.md).
 
 ## Composition
 
 - **`Badge.Root`** — root `div`; wraps `children` in `ControlSizeProvider` so nested icons can inherit control size. With **`variant="status"`**, renders a built-in status dot (`aria-hidden`), sets `role="status"`, optional `aria-label` from `label`, and ignores `color` for styling (dot color follows `status`).
-- **`Badge.Dot`** — optional decorative dot inside the label (`span`, `aria-hidden`); use with non-status variants when you need a manual indicator next to text or icons.
-- **`Badge.Icon`** — optional `span` wrapper for an icon node; place it before or after text, or use it alone for icon-only badges. Order of `Dot`, `Icon`, and text is up to layout needs.
+- **`Badge.Dot`** — optional decorative dot (`span`, `aria-hidden`); use with non-status variants when you need a manual indicator next to text or icons.
+- **`Badge.Icon`** — optional `span` wrapper for an icon node; place it before or after text, or use it alone for icon-only badges.
 
-### Minimal example
+## Examples
+
+### Canonical
+
+Source of truth: [`examples/canonical.tsx`](./examples/canonical.tsx).
 
 ```tsx
 import { Badge } from "prime-ui-kit";
 
-export function Example() {
+export default function BadgeCanonicalExample() {
   return <Badge.Root>New</Badge.Root>;
 }
 ```
+
+### Extended (copy from repo)
+
+| File | Scenario |
+|------|----------|
+| [`examples/status-presence.tsx`](./examples/status-presence.tsx) | Presence: `variant="status"`, `status`, `label` |
+| [`examples/ecommerce-inventory.tsx`](./examples/ecommerce-inventory.tsx) | Stock, promo, secure checkout with `Badge.Icon` |
+| [`examples/inbox-labels.tsx`](./examples/inbox-labels.tsx) | Priority, unread, channel type, `Badge.Dot` |
+| [`examples/admin-tags.tsx`](./examples/admin-tags.tsx) | Environment, access, feature-flag labels |
+
+Playground snippets under `playground/snippets/badge/` mirror matrix demos (sizes, variants, colors, disabled, context); prefer **`examples/*.tsx`** for product-shaped English samples and **`import { … } from "prime-ui-kit"`** only.
+
+## Note for LLM consumers
+
+- **Imports:** In consumer code and doc samples, import **`Badge`** (and **`Icon`** when needed) from **`"prime-ui-kit"`** only — not from `@/components/...`.
+- **Status mode:** When **`variant="status"`**, set **`label`** if visible **`children`** do not carry enough meaning alone (e.g. generic “Away” without whose presence). The built-in dot is **`aria-hidden`**; do not use it as the only state signal.
+- **Tag vs Badge:** **Badge** is read-only metadata; **Tag** is for removable/filter chips — see [Tag](../tag/COMPONENT.md).
+- **Sizing:** Omit **`size`** to follow the nearest **`ControlSizeProvider`**; otherwise default effective size is **`m`** (context **`xs`** maps to badge **`s`**).
+- **Colors:** **`color`** is ignored for styling when **`variant="status"`**; use **`status`** for the dot.
 
 ## Rules
 
