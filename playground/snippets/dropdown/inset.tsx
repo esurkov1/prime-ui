@@ -1,5 +1,8 @@
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { Typography } from "@/components/typography/Typography";
+
+import styles from "./dropdown-snippets.module.css";
 
 /** `Dropdown.Inset`: внутренние поля и вертикальный зазор между прямыми дочерними блоками (`padding`, `gap`). */
 export default function DropdownInsetSnippet() {
@@ -13,7 +16,9 @@ export default function DropdownInsetSnippet() {
         </Dropdown.Trigger>
         <Dropdown.Content>
           <Dropdown.Inset>
-            <div style={{ fontSize: "0.75rem", opacity: 0.85 }}>Короткая заметка над списком.</div>
+            <Typography.Root as="div" size="xs" tone="muted">
+              Короткая заметка над списком.
+            </Typography.Root>
             <Dropdown.Item>Первый пункт</Dropdown.Item>
             <Dropdown.Item>Второй пункт</Dropdown.Item>
           </Dropdown.Inset>
@@ -28,9 +33,9 @@ export default function DropdownInsetSnippet() {
         </Dropdown.Trigger>
         <Dropdown.Content>
           <Dropdown.Inset padding="none" gap="x2">
-            <div style={{ fontSize: "0.75rem", padding: "0 0.5rem", opacity: 0.85 }}>
+            <Typography.Root as="div" size="xs" tone="muted" className={styles.insetNoteTight}>
               Без внешнего inset-padding, меньший gap.
-            </div>
+            </Typography.Root>
             <Dropdown.Item>Действие A</Dropdown.Item>
             <Dropdown.Item>Действие B</Dropdown.Item>
           </Dropdown.Inset>

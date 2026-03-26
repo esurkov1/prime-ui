@@ -1,5 +1,7 @@
 import { Dropdown } from "@/components/dropdown/Dropdown";
 
+import styles from "./dropdown-snippets.module.css";
+
 /**
  * Триггер сливается с единственным дочерним элементом: на ссылку навешиваются aria-expanded,
  * aria-controls и открытие по клику (обработчик объединяется с вашим onClick).
@@ -10,7 +12,7 @@ export default function DropdownAsChildSnippet() {
       <Dropdown.Trigger>
         <a
           href="/playground"
-          style={{ textDecoration: "underline", cursor: "pointer" }}
+          className={styles.linkTrigger}
           onClick={(e) => {
             e.preventDefault();
           }}

@@ -1,0 +1,24 @@
+/* Сниппеты Dropdown: только var(--prime-sys-*), без инлайнов. */
+
+.sizeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.linkTrigger {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.iconTriggerMin {
+  min-width: calc(
+    var(--prime-sys-spacing-4xl) + var(--prime-sys-spacing-3xl) + var(--prime-sys-spacing-m) +
+      var(--prime-sys-spacing-xs)
+  );
+}
+
+.insetNoteTight {
+  padding-inline: var(--prime-sys-spacing-x2);
+}

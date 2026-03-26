@@ -580,6 +580,21 @@ h3 {
   gap: var(--prime-sys-spacing-x1);
 }
 
+/* Dropdown: примеры в COMPONENT.md (классы из playground при копировании в демо). */
+.dropdownDocPayoutToolbar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-sys-spacing-l);
+  width: 100%;
+  max-width: calc(var(--prime-sys-unit-1rem) * 36);
+}
+
+.dropdownDocPayoutText {
+  min-width: 0;
+}
+
 .previewCaption.previewCaptionTopTight {
   margin-top: var(--prime-sys-spacing-s);
 }

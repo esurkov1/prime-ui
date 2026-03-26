@@ -82,16 +82,8 @@ import { Button, Dropdown, Typography } from "prime-ui-kit";
 
 export function PayoutRowToolbar() {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: "1rem",
-        maxWidth: "36rem",
-      }}
-    >
-      <div style={{ minWidth: 0 }}>
+    <div className="dropdownDocPayoutToolbar">
+      <div className="dropdownDocPayoutText">
         <Typography.Root size="m" weight="medium">
           Payout 12 Apr 2025
         </Typography.Root>
@@ -126,13 +118,13 @@ Monitoring dashboard: parent holds the open flag to show a hint next to the filt
 
 ```tsx
 import * as React from "react";
-import { Button, Dropdown } from "prime-ui-kit";
+import { Button, Dropdown, Typography } from "prime-ui-kit";
 
 export function FilterMenuWithHint() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+    <div className="row rowAlignCenter rowGapMedium">
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger>
           <Button.Root size="m" variant="neutral" mode="stroke">
@@ -145,9 +137,9 @@ export function FilterMenuWithHint() {
           <Dropdown.Item onSelect={() => setOpen(false)}>30 days</Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
-      <span style={{ fontSize: "0.875rem", opacity: 0.8 }}>
+      <Typography.Root as="span" size="s" tone="muted">
         Menu {open ? "open — you can highlight an onboarding step" : "closed"}
-      </span>
+      </Typography.Root>
     </div>
   );
 }

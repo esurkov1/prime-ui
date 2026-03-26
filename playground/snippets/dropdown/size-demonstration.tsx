@@ -2,10 +2,12 @@ import { Settings, User } from "lucide-react";
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 
+import styles from "./dropdown-snippets.module.css";
+
 /** Демонстрация всех аспектов размеров: отступы, шрифты, иконки, высота пунктов. */
 export default function DropdownSizeDemonstrationSnippet() {
   return (
-    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "flex-start" }}>
+    <div className={styles.sizeRow}>
       <Dropdown.Root>
         <Dropdown.Trigger>
           <Button.Root size="s" variant="neutral" mode="stroke">

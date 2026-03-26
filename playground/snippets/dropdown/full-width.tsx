@@ -1,6 +1,8 @@
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 
+import styles from "./dropdown-snippets.module.css";
+
 /** `sameMinWidthAsTrigger`: минимальная ширина панели не меньше ширины триггера — длинные подписи не сжимают меню. */
 export default function DropdownFullWidthSnippet() {
   return (
@@ -11,7 +13,7 @@ export default function DropdownFullWidthSnippet() {
           variant="neutral"
           mode="stroke"
           aria-label="Действия со строкой"
-          style={{ minWidth: "5.5rem" }}
+          className={styles.iconTriggerMin}
         >
           ⋮
         </Button.Root>
