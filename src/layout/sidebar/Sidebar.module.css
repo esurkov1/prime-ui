@@ -138,10 +138,18 @@
   padding-inline: var(--sb-panel-padding-inline);
   border: 0;
   border-radius: 0;
-  /* Базовый хром: default, не elevated как у Dropdown/Popover. */
-  background: var(--prime-sys-color-surface-default);
+  /* Светлая: смесь с elevated, иначе колонка = canvas (surface-default). Тёмная: только default. */
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-surface-elevated) 60%,
+    var(--prime-sys-color-surface-default)
+  );
   box-shadow: none;
   transition: background-color var(--sb-transition-duration) var(--sb-transition-ease);
+}
+
+:root[data-theme="dark"] .navPanel {
+  background: var(--prime-sys-color-surface-default);
 }
 
 .root[data-side="right"] .navPanel {
