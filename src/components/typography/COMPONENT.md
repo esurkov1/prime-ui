@@ -70,9 +70,7 @@ export function OrderSummary() {
         4,250 ₽
       </Typography.Root>
       .{" "}
-      <a href="/orders/9012" style={{ color: "inherit" }}>
-        View details
-      </a>
+      <a href="/orders/9012">View details</a>
     </Typography.Root>
   );
 }

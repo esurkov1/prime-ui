@@ -1,5 +1,7 @@
 import { Typography } from "@/components/typography/Typography";
 
+import styles from "./snippets.module.css";
+
 /** Вложенная разметка внутри одного `Typography.Root`: выделения и ссылка сохраняют общую шкалу и межстрочный интервал размера `m`. */
 export default function TypographyCompositionSnippet() {
   return (
@@ -14,7 +16,7 @@ export default function TypographyCompositionSnippet() {
           12 400 ₽
         </Typography.Root>
         , доставка до{" "}
-        <a href="#playground-typography-composition" style={{ color: "inherit" }}>
+        <a href="#playground-typography-composition" className={styles.inlineLinkInherit}>
           уточнить адрес
         </a>
         . Подробности — в разделе «История покупок».

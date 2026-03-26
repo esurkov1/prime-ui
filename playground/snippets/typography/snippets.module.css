@@ -1,0 +1,20 @@
+.fullWidthColumns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-l);
+}
+
+.fullWidthNarrow {
+  flex: 1 1 12.5rem;
+  min-width: 0;
+  max-width: 17.5rem;
+}
+
+.fullWidthWide {
+  flex: 2 1 20rem;
+  min-width: 0;
+}
+
+.inlineLinkInherit {
+  color: inherit;
+}
