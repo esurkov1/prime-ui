@@ -1,10 +1,12 @@
 import { ProgressBar } from "@/components/progress-bar/ProgressBar";
 import { Typography } from "@/components/typography/Typography";
 
+import styles from "./bar-snippets.module.css";
+
 /** Полоса рядом с заголовком и поясняющим текстом — как блок в мастере или отчёте. */
 export default function ProgressBarCompositionSnippet() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--prime-sys-spacing-s)" }}>
+    <div className={styles.compositionCard}>
       <Typography.Root size="l" weight="semibold">
         Создание отчёта
       </Typography.Root>
