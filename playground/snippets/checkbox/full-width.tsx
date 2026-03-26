@@ -1,16 +1,10 @@
 import { Checkbox } from "@/components/checkbox/Checkbox";
 
+import styles from "./full-width.module.css";
+
 export default function CheckboxFullWidthSnippet() {
   return (
-    <div
-      style={{
-        maxWidth: 280,
-        padding: 16,
-        borderRadius: 8,
-        border: "1px solid var(--prime-sys-color-border-subtle)",
-        boxSizing: "border-box",
-      }}
-    >
+    <div className={styles.narrowCard}>
       <Checkbox.Root size="m">
         <Checkbox.Label>
           Я согласен с условиями использования сервиса и политикой конфиденциальности

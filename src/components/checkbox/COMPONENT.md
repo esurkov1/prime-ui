@@ -43,13 +43,13 @@ import { Checkbox } from "prime-ui-kit";
 
 export function CatalogDensityConsent() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <>
       {(["s", "m", "l", "xl"] as const).map((size) => (
         <Checkbox.Root key={size} size={size} name={`compact-${size}`}>
           <Checkbox.Label>Compact product list mode (size {size})</Checkbox.Label>
         </Checkbox.Root>
       ))}
-    </div>
+    </>
   );
 }
 ```
@@ -65,7 +65,7 @@ export function NewsletterSidebarBlock() {
   const showError = true;
 
   return (
-    <aside style={{ maxWidth: 320, padding: 16, borderRadius: 8, background: "var(--prime-sys-color-surface-raised, #f4f4f5)" }}>
+    <aside style={{ maxWidth: 320 }}>
       <Checkbox.Root size="m" variant={showError ? "error" : "default"} name="digest">
         <Checkbox.Label>Weekly digest of new products and discounts</Checkbox.Label>
         <Checkbox.Hint>No more than one email per week; one-click unsubscribe at the bottom of each message.</Checkbox.Hint>
