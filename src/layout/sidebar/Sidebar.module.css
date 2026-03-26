@@ -199,18 +199,22 @@
 }
 
 .headingTrack {
+  position: relative;
   display: block;
   width: 100%;
   min-width: 0;
+  overflow: hidden;
 }
 
 .headingText {
-  display: block;
+  display: inline-block;
+  width: max-content;
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  will-change: transform;
 }
 
 .separator {
@@ -720,7 +724,6 @@
 
   .root[data-state="compact"] .groupLabel,
   .root[data-state="compact"] .navPanelHeading {
-    text-align: center;
     padding-inline: var(--prime-sys-spacing-x1);
   }
 

@@ -224,10 +224,54 @@ export type SidebarGroupProps = React.ComponentPropsWithoutRef<"section"> & {
 };
 
 function SidebarHeadingText({ children }: { children: React.ReactNode }) {
+  const { state, isMobile } = useSidebarContext();
+  const compact = state === "compact" && !isMobile;
+  const trackRef = React.useRef<HTMLSpanElement | null>(null);
+  const textRef = React.useRef<HTMLSpanElement | null>(null);
+  const [offset, setOffset] = React.useState(0);
+
+  const measureOffset = React.useCallback(() => {
+    const track = trackRef.current;
+    const text = textRef.current;
+    if (track == null || text == null) return;
+
+    if (!compact) {
+      setOffset((prev) => (Math.abs(prev) < 0.5 ? prev : 0));
+      return;
+    }
+
+    const trackWidth = track.clientWidth;
+    const textWidth = Math.min(text.scrollWidth, trackWidth);
+    const next = Math.max(0, (trackWidth - textWidth) / 2);
+
+    setOffset((prev) => (Math.abs(prev - next) < 0.5 ? prev : next));
+  }, [compact]);
+
+  React.useLayoutEffect(() => {
+    measureOffset();
+  }, [measureOffset]);
+
+  React.useLayoutEffect(() => {
+    if (typeof window === "undefined") return;
+    const track = trackRef.current;
+    const text = textRef.current;
+    if (track == null || text == null) return;
+
+    const observer = new ResizeObserver(() => {
+      measureOffset();
+    });
+
+    observer.observe(track);
+    observer.observe(text);
+
+    return () => observer.disconnect();
+  }, [measureOffset]);
+
   return (
-    <span className={styles.headingTrack}>
+    <span ref={trackRef} className={styles.headingTrack}>
       <motion.span
-        layout="position"
+        ref={textRef}
+        animate={{ x: offset }}
         transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
         className={styles.headingText}
       >
