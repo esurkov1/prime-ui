@@ -145,6 +145,10 @@
   .root[data-sidebar-slot="page-nav"][data-open="false"] .navArea {
     max-width: 0;
   }
+
+  .root[data-sidebar-slot="page-nav"][data-sidebar-mode="compact"] {
+    --sb-page-nav-expanded: var(--sb-compact-rail-width);
+  }
 }
 
 .backdrop {
@@ -787,139 +791,6 @@
     pointer-events: auto;
   }
 
-  /* Компактная колонка ≥481px: только иконки у пунктов; подписи групп/категорий с …; без шеврона */
-  @media (min-width: 481px) {
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navPanel {
-      padding-inline: var(--prime-sys-unit-2px);
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .headerRow {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .headerMain {
-      align-items: center;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .identityButton {
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      min-height: auto;
-      padding-inline: var(--prime-sys-unit-2px);
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .identityButtonMain {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      clip-path: inset(50%);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .group {
-      align-items: center;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .groupLabel {
-      width: 100%;
-      max-width: 100%;
-      padding-inline: 0;
-      text-align: center;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .menuItem {
-      justify-content: center;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .menuButton {
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      gap: 0;
-      min-width: 0;
-      text-align: center;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .menuLabel {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      clip-path: inset(50%);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .menuTrailing {
-      display: none;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navPanelBody {
-      align-items: center;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navPanelHeading {
-      width: 100%;
-      max-width: 100%;
-      text-align: center;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategory {
-      align-items: center;
-      max-width: 100%;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryTrigger {
-      flex-direction: row;
-      flex-wrap: nowrap;
-      justify-content: center;
-      align-items: center;
-      gap: var(--prime-sys-spacing-x1);
-      max-width: 100%;
-      text-align: center;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryTrigger svg {
-      display: none;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryTrigger[data-expanded="true"] svg {
-      display: none;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryLabel {
-      flex: 1 1 auto;
-      min-width: 0;
-      max-width: 100%;
-      text-align: center;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .root[data-responsive="true"][data-sidebar-mode="compact"] .navCategoryCount {
-      display: none;
-    }
-  }
-
   /* На очень узких экранах (≤320px) — expand на всю ширину */
   @media (max-width: 320px) {
     .root[data-responsive="true"][data-sidebar-mode="expand"] .navPanel {
@@ -928,6 +799,139 @@
       max-width: 100%;
       border-radius: 0;
     }
+  }
+}
+
+/* Компактный rail (≥481px): иконки, подписи с … — для узкого overlay и для page-nav на десктопе */
+@media (min-width: 481px) {
+  .root[data-sidebar-mode="compact"] .navPanel {
+    padding-inline: var(--prime-sys-unit-2px);
+  }
+
+  .root[data-sidebar-mode="compact"] .headerRow {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .root[data-sidebar-mode="compact"] .headerMain {
+    align-items: center;
+  }
+
+  .root[data-sidebar-mode="compact"] .identityButton {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: auto;
+    padding-inline: var(--prime-sys-unit-2px);
+  }
+
+  .root[data-sidebar-mode="compact"] .identityButtonMain {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .root[data-sidebar-mode="compact"] .group {
+    align-items: center;
+  }
+
+  .root[data-sidebar-mode="compact"] .groupLabel {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 0;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .root[data-sidebar-mode="compact"] .menuItem {
+    justify-content: center;
+  }
+
+  .root[data-sidebar-mode="compact"] .menuButton {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .root[data-sidebar-mode="compact"] .menuLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .root[data-sidebar-mode="compact"] .menuTrailing {
+    display: none;
+  }
+
+  .root[data-sidebar-mode="compact"] .navPanelBody {
+    align-items: center;
+  }
+
+  .root[data-sidebar-mode="compact"] .navPanelHeading {
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .root[data-sidebar-mode="compact"] .navCategory {
+    align-items: center;
+    max-width: 100%;
+  }
+
+  .root[data-sidebar-mode="compact"] .navCategoryTrigger {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--prime-sys-spacing-x1);
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .root[data-sidebar-mode="compact"] .navCategoryTrigger svg {
+    display: none;
+  }
+
+  .root[data-sidebar-mode="compact"] .navCategoryTrigger[data-expanded="true"] svg {
+    display: none;
+  }
+
+  .root[data-sidebar-mode="compact"] .navCategoryLabel {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .root[data-sidebar-mode="compact"] .navCategoryCount {
+    display: none;
   }
 }
 

@@ -154,12 +154,6 @@ function SidebarRoot({
     setModeState(isNarrowViewport ? "hidden" : "expand");
   }, [isNarrowViewport, responsive, setModeState]);
 
-  React.useEffect(() => {
-    if (!isNarrowViewport && mode === "compact") {
-      setModeState("expand");
-    }
-  }, [isNarrowViewport, mode, setModeState]);
-
   const setMode = React.useCallback(
     (next: SidebarLayoutMode) => {
       setModeState(next);
@@ -174,17 +168,10 @@ function SidebarRoot({
     [setModeState],
   );
 
-  /**
-   * На узком responsive: из expand — в compact (полное hidden только при ≤480px или с широкого десктопа).
-   * На широком layout: как раньше — expand/compact → hidden.
-   */
+  /** Expand → compact (не hidden); compact ↔ expand; hidden → compact. Полный hidden только при ≤480 (xs) на узком экране. */
   const toggleOpen = React.useCallback(() => {
     setModeState((prev) => {
-      if (!isNarrowViewport || !responsive) {
-        if (prev === "expand" || prev === "compact") return "hidden";
-        return "expand";
-      }
-      if (isXsHiddenViewport) {
+      if (responsive && isNarrowViewport && isXsHiddenViewport) {
         if (prev === "expand") return "hidden";
         return prev === "hidden" ? "compact" : prev;
       }
@@ -254,7 +241,7 @@ function SidebarRoot({
           open,
           responsive: responsive ? true : undefined,
           "sidebar-slot": sidebarSlot,
-          "sidebar-mode": responsive && isNarrowViewport ? mode : undefined,
+          "sidebar-mode": mode,
         })}
       >
         <div ref={navAreaRef} className={styles.navArea}>

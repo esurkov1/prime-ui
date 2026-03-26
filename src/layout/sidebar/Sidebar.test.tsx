@@ -224,7 +224,8 @@ describe("Sidebar", () => {
     expect(root).toHaveAttribute("data-open", "true");
 
     fireEvent.click(screen.getByRole("button", { name: "Скрыть сайдбар" }));
-    expect(root).toHaveAttribute("data-open", "false");
+    expect(root).toHaveAttribute("data-open", "true");
+    expect(root).toHaveAttribute("data-sidebar-mode", "compact");
   });
 
   it("MenuRouterLink marks active route and merges className", () => {
