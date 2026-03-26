@@ -1,24 +1,45 @@
 # ProgressCircle
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default `size`:** use **`m`** for the size axis unless the layout explicitly needs another tier.
 
-## About
+## Canonical
 
-Circular progress indicator: an SVG ring with `progressbar` semantics and optional centered content inside the ring.
+- **`ProgressCircle`** — circular fraction of a known maximum: **`ProgressCircle.Root`** only (`inline-flex` root, SVG ring + optional centered **`children`**).
+- **Semantics:** SVG has **`role="progressbar"`** with **`aria-valuenow`**, **`aria-valuemin={0}`**, **`aria-valuemax`** (effective max after clamping / safe fallback).
+- **`value`** (required) and **`max`** (default **`100`**) — progress is **fully controlled**; **`value`** is clamped to **`[0, max]`**; if **`max <= 0`**, the scale falls back to **`100`** internally.
+- **`label`** — optional accessible name on the SVG (**`aria-label`**); use when the center has no text or the visible center text does not describe the bar.
+- **`size`:** **`s` | `m` | `l` | `xl`** — diameter and stroke from **`progressCircle`** primitives.
+- **`children`** — optional centered slot (short number, percent, icon); omit for a ring-only indicator (then set **`label`** for a11y).
+- **No indeterminate mode**, no **`disabled` / `loading` / `error`** props — reflect those in surrounding UI or by freezing **`value`**.
+- **Not** a focusable control; **not** polymorphic (**no `asChild`**).
 
-- **Use** when you need a compact fraction of a known maximum (percent, steps, seats vs capacity) in a round layout.
-- **Use** with **`max`** when the scale is not 0–100 (e.g. 12 months, 60 seats).
-- **Use** **`children`** for a short label or number in the center when it should match the visual focus of the ring.
-- **Do not use** for indeterminate or endless loading without a numeric fraction; there is no indeterminate mode in the API.
-- **Do not use** as the primary focus target or form control; the SVG is informational and not keyboard-focusable.
-- **Do not use** expecting a polymorphic root or `asChild`; the implementation is a fixed wrapper with SVG plus optional inner slot.
+## Extended
 
-## Composition
+### About
 
-- **`ProgressCircle`** exposes **`Root`** only (`ProgressCircle.Root`).
-- **`ProgressCircle.Root`** — root `div` (`inline-flex`), sets **`data-size`** and a CSS variable for the inner slot size.
-- **SVG** — **`role="progressbar"`** with track and fill circles; fill length follows **`value`** / **`max`**.
-- **Optional `children`** — when present, rendered in an inner container centered over the ring; omit when the ring alone is enough.
+Circular progress: an SVG ring showing **`value` / `max`**, with optional content inside the ring.
+
+- **When to use** — compact share of a known total (percent, steps, seats, quota) where a round indicator reads better than a bar.
+- **When to use** — with **`max`** when the scale is not 0–100 (months in a plan, steps in a wizard, large numeric caps).
+- **When to use** — **`children`** for the focal number or short label in the middle of the ring.
+- **When not to use** — indeterminate or endless spinners without a numeric fraction (no built-in indeterminate API).
+- **When not to use** — as the primary interactive target; pair with [Button](../button/COMPONENT.md) or links for actions.
+- **When not to use** — when a horizontal bar is clearer; see [ProgressBar](../progress-bar/COMPONENT.md).
+
+### Composition
+
+- **`ProgressCircle.Root`** — root **`div`** with **`data-size`**, inner size CSS variable, SVG (**`progressbar`**), then optional **`children`** wrapper centered over the ring.
+- Order: pass **`value`** / **`max`** / **`size`** / **`label`** on **`Root`**; put visual center content in **`children`** when needed.
+
+### Scenarios (see `examples/`)
+
+| Scenario | Approach |
+|----------|----------|
+| Dashboard ring | Put **`ProgressCircle.Root`** in a KPI surface (e.g. [Card](../card/COMPONENT.md) **`mini-media`** **`Card.Media`**) with **`children`** for the headline fraction. → [`examples/dashboard-ring.tsx`](examples/dashboard-ring.tsx) |
+| Accessible name | Set **`label`** when the ring has no suitable visible text in the center (compact tiles, icon-only rows). → [`examples/a11y-label.tsx`](examples/a11y-label.tsx) |
+| Composition | Use **`children`** for **`Typography`**, icons, or **`value/max`** copy; keep the center concise. → [`examples/composition.tsx`](examples/composition.tsx) |
+| Non‑100 scale | Same visual fill for different **`max`** values (percent, steps, large totals). → [`examples/max-scale.tsx`](examples/max-scale.tsx) |
+| Controlled value | Drive **`value`** from parent state (polling, upload simulation). → [`examples/controlled.tsx`](examples/controlled.tsx) |
 
 ### Minimal example
 
@@ -30,16 +51,14 @@ export function Example() {
 }
 ```
 
-## Rules
+### Rules
 
-- Progress is **always driven by props**: pass **`value`** on each render; there is no internal stored progress state.
-- **`value`** is clamped to **`[0, max]`**; negative values become `0`, values above **`max`** become **`max`**.
-- If **`max <= 0`**, the implementation uses **`100`** as the scale to avoid division by zero.
-- Set **`label`** when the SVG needs an accessible name and the center has no suitable visible text (it maps to **`aria-label`** on the SVG).
-- The SVG exposes **`aria-valuenow`**, **`aria-valuemin={0}`**, and **`aria-valuemax`** equal to the effective maximum.
-- There are no **`disabled`**, **`loading`**, or **`error`** props; reflect those with surrounding UI or by freezing **`value`** updates.
-- Root is **`inline-flex`** and does not stretch to full width; place it inside your own flex or grid layout when aligning with other content.
-- One visual style only; scale appearance with **`size`** (`s`–`xl` from progress-circle primitives).
+- Progress is **always prop-driven** — no internal stored progress.
+- **`value`** clamped to **`[0, max]`**; negatives → **`0`**, above **`max`** → **`max`**.
+- If **`max <= 0`**, internal scale uses **`100`** to avoid division by zero.
+- **`label`** maps to **`aria-label`** on the SVG; prefer visible **`children`** text that describes the bar when it fully names the task.
+- Root is **`inline-flex`** — align inside your own flex or grid row when pairing with captions.
+- One visual style; scale with **`size`** only.
 
 ## API
 
@@ -49,7 +68,7 @@ export function Example() {
 |------|------|---------|----------|-------------|
 | value | `number` | — | Yes | Current value; clamped to `[0, max]` |
 | max | `number` | `100` | No | Upper bound; if `max <= 0`, `100` is used |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Diameter and stroke width from `progressCircle` primitives |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Diameter and stroke from `progressCircle` primitives |
 | label | `string` | — | No | Accessible name for the SVG (`aria-label`) |
 | children | `React.ReactNode` | — | No | Centered content inside the ring |
 | className | `string` | — | No | Extra class on the root `div` |
@@ -57,7 +76,18 @@ export function Example() {
 
 ## Related
 
-- [ProgressBar](../progress-bar/COMPONENT.md) — linear fraction of a maximum when a horizontal bar fits better.
-- [SegmentedProgressBar](../segmented-progress-bar/COMPONENT.md) — multiple proportional segments on one track.
-- [Typography](../typography/COMPONENT.md) — captions and units beside or around the ring.
-- [Button](../button/COMPONENT.md) — cancel, retry, or other actions next to a long-running task.
+- [ProgressBar](../progress-bar/COMPONENT.md) — linear fraction when a horizontal bar fits better.
+- [SegmentedProgressBar](../segmented-progress-bar/COMPONENT.md) — multiple segments on one track.
+- [Card](../card/COMPONENT.md) — KPI tiles; **`mini-media`** **`Card.Media`** for rings or thin progress.
+- [Typography](../typography/COMPONENT.md) — captions and units beside or under the ring.
+
+## LLM note
+
+- Export: **`import { ProgressCircle } from "prime-ui-kit"`** — **`ProgressCircle.Root`** only (object namespace).
+- **`ProgressCircleRootProps`**: **`value`** (required), **`max?`** (default 100), **`size?`** (default **`m`**), **`label?`**, **`children?`**, **`className?`**, **`ref`** → **`HTMLDivElement`**.
+- **`size`** literals: **`s`**, **`m`**, **`l`**, **`xl`**.
+- SVG: **`role="progressbar"`**, **`aria-valuenow`**, **`aria-valuemin={0}`**, **`aria-valuemax`** = effective max; **`aria-label`** from **`label`** when provided.
+- **No** indeterminate, **no** `disabled`/`loading`/`error` props — control **`value`** and surrounding UI instead.
+- **No** `asChild` / polymorphic root — fixed **`div`** + SVG + optional inner **`div`** for **`children`**.
+- When the center is empty or non-descriptive, require **`label`** for an accessible name.
+- Prefer [ProgressBar](../progress-bar/COMPONENT.md) for linear indeterminate or strip layouts unless the design specifically needs a ring.
