@@ -70,8 +70,8 @@ export type DataTableRootProps<Row> = {
   onLoadMore?: () => void | Promise<void>;
   scrollHeight?: number | string;
   /**
-   * Растянуть `<table>` на 100% ширины viewport (как раньше): лишнее место делится между колонками.
-   * По умолчанию ширина таблицы по содержимому колонок (`width: max-content`).
+   * Растянуть `<table>` на 100% ширины контейнера: лишнее место делится между колонками.
+   * При `false` ширина таблицы по содержимому колонок (`width: max-content`).
    */
   fillWidth?: boolean;
   /** Подсветка строки при наведении (полупрозрачная смесь с фоном строки). */
@@ -173,7 +173,7 @@ function DataTableRoot<Row>({
   loadingMore = false,
   onLoadMore,
   scrollHeight = 360,
-  fillWidth = false,
+  fillWidth = true,
   highlightRowOnHover = true,
   highlightColumnOnHover = false,
   striped = false,

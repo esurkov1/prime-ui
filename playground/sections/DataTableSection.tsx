@@ -247,10 +247,10 @@ const dataTableRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "fillWidth",
     type: "boolean",
-    defaultValue: "false",
+    defaultValue: "true",
     required: "Нет",
     description:
-      "Растянуть таблицу на ширину viewport (как раньше). По умолчанию ширина колонок по содержимому.",
+      "Растянуть таблицу на ширину контейнера. При false — ширина только по содержимому колонок (max-content).",
   },
   {
     prop: "highlightRowOnHover",

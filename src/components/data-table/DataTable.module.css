@@ -88,7 +88,7 @@
 }
 
 .table {
-  /* По умолчанию ширина по содержимому колонок; растягивание на весь viewport — см. [data-table-width="fill"] */
+  /* Узкая таблица по содержимому — data-table-width="auto"; по умолчанию fill — см. [data-table-width="fill"] */
   width: max-content;
   border-collapse: separate;
   border-spacing: 0;

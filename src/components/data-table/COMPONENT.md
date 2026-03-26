@@ -82,7 +82,7 @@ export function Example() {
 | loadingMore | `boolean` | `false` | No | While an async `onLoadMore` is in progress |
 | onLoadMore | `() => void \| Promise<void>` | — | No | Fetch next chunk when local slice is exhausted |
 | scrollHeight | `number \| string` | `360` | No | Max height of the scroll viewport in infinite mode |
-| fillWidth | `boolean` | `false` | No | When `true`, table uses full viewport width (extra space is shared). Default is content-based column widths (`max-content`) |
+| fillWidth | `boolean` | `true` | No | When `true`, table uses full container width (extra space is shared). When `false`, table width follows column content (`max-content`) |
 | highlightRowOnHover | `boolean` | `true` | No | Row hover highlight |
 | highlightColumnOnHover | `boolean` | `false` | No | Column hover highlight (header + cells) |
 | striped | `boolean` | `false` | No | Alternating row backgrounds |
