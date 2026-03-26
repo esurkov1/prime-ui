@@ -138,11 +138,8 @@
   padding-inline: var(--sb-panel-padding-inline);
   border: 0;
   border-radius: 0;
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-surface-elevated) 60%,
-    var(--prime-sys-color-surface-default)
-  );
+  /* Базовый хром: default, не elevated как у Dropdown/Popover. */
+  background: var(--prime-sys-color-surface-default);
   box-shadow: none;
   transition: background-color var(--sb-transition-duration) var(--sb-transition-ease);
 }
