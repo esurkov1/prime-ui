@@ -97,6 +97,8 @@
 .root[data-table-width="fill"] .table {
   width: 100%;
   min-width: max-content;
+  /* colgroup + фиксированная раскладка: лишняя ширина делится между колонками пропорционально grow / width */
+  table-layout: fixed;
 }
 
 .head {

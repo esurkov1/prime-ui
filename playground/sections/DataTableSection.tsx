@@ -354,6 +354,14 @@ const dataTableColumnApiRows: PlaygroundApiPropRow[] = [
     description: "Максимальная ширина колонки (th/td).",
   },
   {
+    prop: "grow",
+    type: "number",
+    defaultValue: "1",
+    required: "Нет",
+    description:
+      "При fillWidth и без width: доля ширины между колонками. Если у колонки задан width, grow для остальных не считается — свободное место делится поровну.",
+  },
+  {
     prop: "onHeaderClick",
     type: "(event: React.MouseEvent<HTMLTableCellElement>) => void",
     defaultValue: "—",
