@@ -13,6 +13,8 @@ export default defineConfig({
     },
   },
   test: {
+    /** Тяжёлый jsdom + много файлов: без лимита на машинах с большим числом CPU воркеры иногда не успевают стартовать (Vitest: «Timeout waiting for worker to respond»), отдельные тесты падают по testTimeout. */
+    maxWorkers: 4,
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
