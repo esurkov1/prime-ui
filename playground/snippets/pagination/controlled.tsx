@@ -4,6 +4,8 @@ import { Button } from "@/components/button/Button";
 import { Pagination } from "@/components/pagination/Pagination";
 import ExampleSurface from "../../components/ExampleSurface";
 
+import styles from "./controlled.module.css";
+
 const TOTAL = 12;
 
 /** Номер страницы хранится в родителе: пагинация и кнопки меняют одно и то же состояние. */
@@ -19,14 +21,7 @@ export default function PaginationControlledSnippet() {
       <ExampleSurface>
         <Pagination.Root page={page} totalPages={TOTAL} onPageChange={setPage} />
       </ExampleSurface>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "var(--prime-sys-spacing-x2)",
-          marginTop: "var(--prime-sys-spacing-x3)",
-        }}
-      >
+      <div className={styles.actions}>
         <Button.Root
           size="s"
           variant="neutral"

@@ -67,6 +67,7 @@ Orders table footer: summary “showing N–M” on the left, full-width paginat
 ```tsx
 import * as React from "react";
 import { Pagination } from "prime-ui-kit";
+import styles from "./full-width.module.css";
 
 export function OrdersFooterBar() {
   const [page, setPage] = React.useState(2);
@@ -77,17 +78,8 @@ export function OrdersFooterBar() {
   const to = Math.min(page * pageSize, totalItems);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 16,
-        flexWrap: "wrap",
-      }}
-    >
-      <span style={{ fontSize: 14, opacity: 0.8 }}>
+    <div className={styles.toolbar}>
+      <span className={styles.meta}>
         Showing {from}–{to} of {totalItems}
       </span>
       <Pagination.Root page={page} totalPages={totalPages} onPageChange={setPage} />
