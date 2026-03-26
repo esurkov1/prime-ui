@@ -2,162 +2,45 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-Composite side navigation: a root with state context, an optional narrow section column, and a main panel with item groups, headings, and a footer.
+Compound side navigation: `Sidebar.Root` provides context and an `aside` shell; optional `Sidebar.ContextBar` for a second column in `variant="double"`; `Sidebar.NavPanel` holds header, scrollable content, and optional footer with menus, groups, doc-style blocks, and `PanelSwitch` keyed by `activeSection`.
 
-## What it’s for
+**When to use**
 
-- **Workspaces and product switching** — CRM, billing, and support icons on the left; a list of entities for the selected product on the right without changing the whole layout.
-- **Documentation portals** — collapsible TOC categories, page trees, and long chapter lists with a compact panel and a separate content slot.
-- **Logistics and ops dashboards** — a narrow “Fleet / Warehouse” column and detailed menus for routes, vehicles, and tickets with row counters.
-- **Settings and wizard forms** — one column for settings sections; panel open state and simple/double mode can be driven from the parent together with routing.
-- **Storefronts and catalogs** — sidebar in the page navigation slot full height next to filters and product grids (`sidebarSlot`, compact panel width).
-- **Routed apps** — items on `NavLink` and the `useSidebarNavTo` hook so you don’t repeat the section prefix in every `to`.
+- App shells with persistent vertical navigation: product areas, settings, admin, support tools.
+- Two-level IA: icon or compact rail (`ContextBar`) plus a detail panel (`NavPanel`) driven by `activeSection` and `PanelSwitch`.
+- Responsive layouts where the panel collapses to an overlay below `64rem` with a floating reopen control.
+- SPA routes: combine `MenuRouterLink` with `useSidebarNavTo` to prefix panel paths by the active section in `double` mode.
 
-## Use cases
+**When not to use**
 
-Import from the `prime-ui-kit` package. Below are scenarios from different domains; API combinations do not repeat the same task.
+- Primary navigation that fits a single horizontal bar without a persistent column — consider top nav or a drawer.
+- Deep trees that need virtualized lists or drag-and-drop reordering — compose with dedicated tree or data components.
+- When React Router is unavailable and you need `MenuRouterLink` — use `MenuLink` / `MenuButton` instead.
 
-### Basic
+## Composition
 
-One panel for an internal team tool: header, item group, footer with profile.
+- **`Sidebar.Root`** — required wrapper: `aside`, `aria-label`, `data-*` for `size`, `variant`, `open`, `responsive`, optional `panelWidth` / `sidebarSlot`. Renders a focusable backdrop and optional floating toggle when `responsive` and the panel is closed on a narrow viewport.
+- **`Sidebar.ContextBar`** — optional; meaningful for **`variant="double"`**. With **`items`**, builds a `nav` with tooltips and optional `logo` / `footer` slots; without **`items`**, **`children`** fill the `nav`. When **`items`** is non-empty and no section is active yet, the first item is auto-selected.
+- **`Sidebar.NavPanel`** — main column (`nav`); forwards **`onMouseLeave`** and calls context **`onNavPanelMouseLeave`** (closes edge-hover overlay when applicable).
+- Typical **`NavPanel`** order: **`Header`** → **`HeaderRow`** → **`HeaderMain`** (title, identity, or `NavPanelHeading`) and **`ToggleButton`** → **`Content`** ( **`PanelSwitch`**, **`NavCategory`**, **`Group`** + **`Menu`** ) → optional **`Footer`** with **`IdentityButton`** or similar.
+- **`PanelSwitch`** — renders one branch from **`sections`** or **`renderSection(activeSection)`** based on context **`activeSection`** (falls back to the first key in **`sections`** when the current key is missing).
+- **`Menu`** is a **`ul`**; each row is **`MenuItem`** wrapping **`MenuButton`**, **`MenuLink`**, or **`MenuRouterLink`**; optional **`MenuIcon`**, **`MenuLabel`**, **`MenuTrailing`**, compact **`MenuAction`**.
 
-```tsx
-import { Avatar, Sidebar } from "prime-ui-kit";
-
-export function TeamToolNav() {
-  return (
-    <Sidebar.Root size="m" variant="simple" defaultOpen aria-label="Tool navigation">
-      <Sidebar.NavPanel>
-        <Sidebar.Header>
-          <Sidebar.HeaderRow>
-            <Sidebar.HeaderMain>
-              <Sidebar.IdentityButton
-                leading={<span aria-hidden="true">Δ</span>}
-                title="Delta Ops"
-                subtitle="Internal"
-                type="button"
-              />
-            </Sidebar.HeaderMain>
-            <Sidebar.ToggleButton />
-          </Sidebar.HeaderRow>
-        </Sidebar.Header>
-        <Sidebar.Content>
-          <Sidebar.Group>
-            <Sidebar.GroupLabel>Services</Sidebar.GroupLabel>
-            <Sidebar.Menu>
-              <Sidebar.MenuItem>
-                <Sidebar.MenuButton type="button" active>
-                  <Sidebar.MenuLabel>Incidents</Sidebar.MenuLabel>
-                  <Sidebar.MenuTrailing>4</Sidebar.MenuTrailing>
-                </Sidebar.MenuButton>
-              </Sidebar.MenuItem>
-              <Sidebar.MenuItem>
-                <Sidebar.MenuButton type="button">
-                  <Sidebar.MenuLabel>Shifts</Sidebar.MenuLabel>
-                </Sidebar.MenuButton>
-              </Sidebar.MenuItem>
-            </Sidebar.Menu>
-          </Sidebar.Group>
-        </Sidebar.Content>
-        <Sidebar.Footer>
-          <Sidebar.IdentityButton
-            leading={
-              <Avatar.Root size="s">
-                <Avatar.Fallback>IP</Avatar.Fallback>
-              </Avatar.Root>
-            }
-            title="Ivan Petrov"
-            subtitle="On call"
-            type="button"
-          />
-        </Sidebar.Footer>
-      </Sidebar.NavPanel>
-    </Sidebar.Root>
-  );
-}
-```
-
-### Variants and sizes
-
-Learning portal: large size, compact panel width, and a collapsible TOC block.
-
-```tsx
-import { Sidebar } from "prime-ui-kit";
-import { useState } from "react";
-
-export function CourseOutlineNav() {
-  const [open, setOpen] = useState(true);
-  const [expanded, setExpanded] = useState(true);
-
-  return (
-    <Sidebar.Root
-      size="l"
-      variant="simple"
-      panelWidth="compact"
-      open={open}
-      onOpenChange={setOpen}
-      responsive={false}
-      aria-label="Course outline"
-    >
-      <Sidebar.NavPanel>
-        <Sidebar.Header>
-          <Sidebar.HeaderRow>
-            <Sidebar.HeaderMain>
-              <Sidebar.NavPanelHeading>Module 3</Sidebar.NavPanelHeading>
-            </Sidebar.HeaderMain>
-            <Sidebar.ToggleButton />
-          </Sidebar.HeaderRow>
-        </Sidebar.Header>
-        <Sidebar.Content>
-          <Sidebar.NavCategory>
-            <Sidebar.NavCategoryTrigger
-              type="button"
-              aria-expanded={expanded}
-              onClick={() => setExpanded((v) => !v)}
-            >
-              <Sidebar.NavCategoryLabel>Lectures</Sidebar.NavCategoryLabel>
-              <Sidebar.NavCategoryCount>6</Sidebar.NavCategoryCount>
-            </Sidebar.NavCategoryTrigger>
-            {expanded ? (
-              <Sidebar.NavCategoryPanel>
-                <Sidebar.NavDocTree>
-                  <Sidebar.Text>Introduction</Sidebar.Text>
-                  <Sidebar.Text>Practice</Sidebar.Text>
-                </Sidebar.NavDocTree>
-              </Sidebar.NavCategoryPanel>
-            ) : null}
-          </Sidebar.NavCategory>
-        </Sidebar.Content>
-      </Sidebar.NavPanel>
-    </Sidebar.Root>
-  );
-}
-```
-
-### In context (page layout)
-
-Storefront: sidebar in the navigation slot next to the content area, without a responsive overlay in this frame. The page shell (for example `PageShell`) places the nav slot and `<main>` in a row; here only the sidebar markup is shown.
+### Minimal example
 
 ```tsx
 import { Sidebar } from "prime-ui-kit";
 
-export function StorefrontShell() {
+export function Example() {
   return (
-    <Sidebar.Root
-      size="m"
-      variant="simple"
-      sidebarSlot="page-nav"
-      defaultOpen
-      responsive={false}
-      aria-label="Storefront categories"
-    >
+    <Sidebar.Root aria-label="Application" defaultOpen>
       <Sidebar.NavPanel>
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
-              <Sidebar.Text>Catalog</Sidebar.Text>
+              <Sidebar.Text>App</Sidebar.Text>
             </Sidebar.HeaderMain>
             <Sidebar.ToggleButton />
           </Sidebar.HeaderRow>
@@ -165,14 +48,9 @@ export function StorefrontShell() {
         <Sidebar.Content>
           <Sidebar.Menu>
             <Sidebar.MenuItem>
-              <Sidebar.MenuButton type="button" active>
-                <Sidebar.MenuLabel>New arrivals</Sidebar.MenuLabel>
+              <Sidebar.MenuButton type="button">
+                <Sidebar.MenuLabel>Home</Sidebar.MenuLabel>
               </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-            <Sidebar.MenuItem>
-              <Sidebar.MenuLink href="/sale" active={false}>
-                Sale
-              </Sidebar.MenuLink>
             </Sidebar.MenuItem>
           </Sidebar.Menu>
         </Sidebar.Content>
@@ -182,158 +60,19 @@ export function StorefrontShell() {
 }
 ```
 
-### Controlled mode
+## Rules
 
-Admin: parent owns open state and column mode to sync with a user “compact navigation” preference.
-
-```tsx
-import { Sidebar } from "prime-ui-kit";
-import { useState } from "react";
-
-export function AdminNavControlled() {
-  const [open, setOpen] = useState(true);
-  const [variant, setVariant] = useState<"simple" | "double">("double");
-  const [section, setSection] = useState("users");
-
-  return (
-    <Sidebar.Root
-      size="m"
-      variant={variant}
-      onVariantChange={setVariant}
-      activeSection={section}
-      onActiveSectionChange={setSection}
-      open={open}
-      onOpenChange={setOpen}
-      responsive={false}
-      aria-label="Administration"
-    >
-      {variant === "double" ? (
-        <Sidebar.ContextBar
-          items={[
-            { id: "users", label: "Users", icon: <span aria-hidden>👤</span> },
-            { id: "billing", label: "Billing", icon: <span aria-hidden>💳</span> },
-          ]}
-        />
-      ) : null}
-      <Sidebar.NavPanel>
-        <Sidebar.Header>
-          <Sidebar.HeaderRow>
-            <Sidebar.HeaderMain>
-              <Sidebar.Text>Panel</Sidebar.Text>
-            </Sidebar.HeaderMain>
-            <Sidebar.ToggleButton />
-          </Sidebar.HeaderRow>
-        </Sidebar.Header>
-        <Sidebar.Content>
-          <Sidebar.PanelSwitch
-            sections={{
-              users: (
-                <Sidebar.NavPanelBody>
-                  <Sidebar.Menu>
-                    <Sidebar.MenuItem>
-                      <Sidebar.MenuButton type="button" active>
-                        <Sidebar.MenuLabel>User accounts</Sidebar.MenuLabel>
-                      </Sidebar.MenuButton>
-                    </Sidebar.MenuItem>
-                  </Sidebar.Menu>
-                </Sidebar.NavPanelBody>
-              ),
-              billing: (
-                <Sidebar.NavPanelBody>
-                  <Sidebar.Menu>
-                    <Sidebar.MenuItem>
-                      <Sidebar.MenuButton type="button" active>
-                        <Sidebar.MenuLabel>Invoices</Sidebar.MenuLabel>
-                      </Sidebar.MenuButton>
-                    </Sidebar.MenuItem>
-                  </Sidebar.Menu>
-                </Sidebar.NavPanelBody>
-              ),
-            }}
-          />
-        </Sidebar.Content>
-      </Sidebar.NavPanel>
-    </Sidebar.Root>
-  );
-}
-```
-
-### Routes and `useSidebarNavTo`
-
-SPA with React Router: two-level navigation and short paths inside a section.
-
-```tsx
-import { Sidebar, useSidebarNavTo } from "prime-ui-kit";
-
-function PanelRoutes() {
-  const toList = useSidebarNavTo("list");
-  const toNew = useSidebarNavTo("new");
-
-  return (
-    <Sidebar.NavPanelBody>
-      <Sidebar.Menu>
-        <Sidebar.MenuItem>
-          <Sidebar.MenuRouterLink to={toList} end>
-            <Sidebar.MenuLabel>All tickets</Sidebar.MenuLabel>
-          </Sidebar.MenuRouterLink>
-        </Sidebar.MenuItem>
-        <Sidebar.MenuItem>
-          <Sidebar.MenuRouterLink to={toNew}>
-            <Sidebar.MenuLabel>New</Sidebar.MenuLabel>
-          </Sidebar.MenuRouterLink>
-        </Sidebar.MenuItem>
-      </Sidebar.Menu>
-    </Sidebar.NavPanelBody>
-  );
-}
-
-export function TicketsSidebar() {
-  return (
-    <Sidebar.Root variant="double" defaultActiveSection="desk" aria-label="Tickets">
-      <Sidebar.ContextBar
-        items={[
-          { id: "desk", label: "Desk", icon: <span aria-hidden>📋</span> },
-          { id: "archive", label: "Archive", icon: <span aria-hidden>🗄</span> },
-        ]}
-      />
-      <Sidebar.NavPanel>
-        <Sidebar.Content>
-          <Sidebar.PanelSwitch
-            sections={{
-              desk: <PanelRoutes />,
-              archive: (
-                <Sidebar.NavPanelBody>
-                  <Sidebar.Text>Archived requests</Sidebar.Text>
-                </Sidebar.NavPanelBody>
-              ),
-            }}
-          />
-        </Sidebar.Content>
-      </Sidebar.NavPanel>
-    </Sidebar.Root>
-  );
-}
-```
-
-## Anatomy
-
-```
-Sidebar.Root (context + aside)
-├── Sidebar.ContextBar? (optional when variant="double")
-│   ├── [logo] ContextBarHeader
-│   ├── ContextBarBody → list of ContextItemButton (+ kit Tooltip when using items)
-│   └── [footer] ContextBarFooter
-└── Sidebar.NavPanel
-    ├── Sidebar.Header
-    │   └── Sidebar.HeaderRow → Sidebar.HeaderMain | Sidebar.ToggleButton
-    ├── Sidebar.Content
-    │   ├── Sidebar.PanelSwitch? (content by activeSection)
-    │   ├── Sidebar.NavCategory → Trigger, Label, Count, Panel, NavDocTree
-    │   └── Sidebar.Group → GroupLabel, Menu → MenuItem → MenuButton | MenuLink | MenuRouterLink, MenuAction, MenuIcon, MenuLabel, MenuTrailing
-    └── Sidebar.Footer → IdentityButton, etc.
-```
-
-The floating open button and backdrop render on `Sidebar.Root` when the panel is closed in responsive mode.
+- **`variant`**: controlled via **`variant`** / **`onVariantChange`** or uncontrolled via **`defaultVariant`** (`"double"` by default). **`simple`** hides the context rail styling context (`data-collapsed` on root).
+- **`activeSection`**: string or uncontrolled **`defaultActiveSection`**; updates notify **`onActiveSectionChange` only when the new value is non-null** — clearing to `null` internally does not call the callback.
+- **`open`**: controlled or uncontrolled; **`defaultOpen`** defaults to **`true`**, but on the first render with **`responsive={true}`** and a viewport already under **`max-width: 64rem`**, the initial open state is **`false`** until the media query effect runs; crossing the breakpoint toggles open to match desktop vs overlay behavior.
+- When **`responsive={true}`** and the overlay is open, the backdrop is focusable with a fixed Russian **`aria-label`** (“Закрыть сайдбар”); **`ToggleButton`** and the floating control use Russian default open/closed labels (overridable via **`openLabel`** / **`closedLabel`** on **`ToggleButton`** only for that component).
+- **`edgeHoverOpen`** (default **`true`**): on narrow + responsive + closed panel, if the device matches **`(hover: hover) and (pointer: fine)`**, moving the pointer within **`12px`** of the left viewport edge opens the panel; leaving **`NavPanel`** then closes it. With controlled **`open`**, wire **`onOpenChange`** so the parent stays in sync.
+- **`useSidebarContext`** must run under **`Sidebar.Root`**; use **`toggleOpen`** / **`setOpen`** from **`ToggleButton`** or custom controls consistently with controlled **`open`**.
+- **`MenuRouterLink`** requires a React Router provider; it forwards **`NavLink`** props (`to`, `end`, `className` as function or string, etc.).
+- **`useSidebarNavTo(pathWithinSection)`** trims slashes; with **`variant="double"`** and a non-empty **`activeSection`**, returns `/${activeSection}` or `/${activeSection}/${inner}`; otherwise `/${inner}` or **`"/"`** for empty paths.
+- **`ContextItemButton`** / **`MenuButton`** with **`asChild`**: pass a single child element; **`disabled`** sets **`aria-disabled`** on the slotted element and blocks clicks.
+- Put meaningful text or **`aria-label`** on **`IdentityButton`** and context items; with **`items`**, each entry uses **`ariaLabel ?? label`** on the button. Prefer **`aria-hidden`** on purely decorative **`MenuIcon`** / **`MenuTrailing`** when **`MenuLabel`** carries the name.
+- Responsive width uses **`window.matchMedia("(max-width: 64rem)")`**, not container width.
 
 ## API
 
@@ -342,134 +81,145 @@ The floating open button and backdrop render on `Sidebar.Root` when the panel is
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Scale for controls and column widths. |
-| variant | `"simple" \| "double"` | from defaultVariant | No | One or two columns. |
-| defaultVariant | `"simple" \| "double"` | `"double"` | No | Initial variant. |
-| onVariantChange | `(v) => void` | — | No | Variant change callback. |
-| activeSection | `string` | — | No | Active top-level section. |
-| defaultActiveSection | `string` | — | No | Initial section. |
-| onActiveSectionChange | `(section: string) => void` | — | No | Section selection notification. |
+| variant | `"simple" \| "double"` | — | No | Controlled column mode. |
+| defaultVariant | `"simple" \| "double"` | `"double"` | No | Initial variant when uncontrolled. |
+| onVariantChange | `(variant: "simple" \| "double") => void` | — | No | Variant change callback. |
+| activeSection | `string` | — | No | Controlled top-level section id. |
+| defaultActiveSection | `string` | — | No | Initial section when uncontrolled. |
+| onActiveSectionChange | `(section: string) => void` | — | No | Fired only when the section changes to a **non-null** value. |
 | open | `boolean` | — | No | Controlled panel open state. |
-| defaultOpen | `boolean` | `true` (on wide viewport when responsive) | No | Initial open. |
-| onOpenChange | `(open: boolean) => void` | — | No | Open state change. |
-| responsive | `boolean` | `true` | No | Behavior at max-width 64rem. |
-| panelWidth | `"compact"` | — | No | Narrow panel. |
-| sidebarSlot | `"page-nav"` | — | No | Slot mode next to page content. |
-| aria-label | `string` | `"Sidebar"` | No | Aside label. |
-| className | `string` | — | No | Extra class. |
-| children | `ReactNode` | — | Yes | Markup inside the root. |
+| defaultOpen | `boolean` | `true` | No | Initial open when uncontrolled (see Rules for narrow first paint). |
+| onOpenChange | `(open: boolean) => void` | — | No | Open state callback. |
+| responsive | `boolean` | `true` | No | Overlay + floating toggle below `64rem` when `true`. |
+| edgeHoverOpen | `boolean` | `true` | No | Edge hover reveal on narrow responsive viewports (fine pointer + hover). |
+| panelWidth | `"compact"` | — | No | Narrow nav panel (`data-panel-width`). |
+| sidebarSlot | `"page-nav"` | — | No | Layout slot for page shell column (`data-sidebar-slot`). |
+| aria-label | `string` | `"Sidebar"` | No | Accessible name on the `aside`. |
+| className | `string` | — | No | Root class. |
+| children | `React.ReactNode` | — | Yes | `ContextBar`, `NavPanel`, and other parts. |
+| …rest | `Omit<React.ComponentPropsWithoutRef<"aside">, "children" \| "aria-label">` | — | No | Native `aside` attributes. |
 
 ### Sidebar.ContextBar
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| items | `SidebarContextItem[]` | — | No | id, label, icon; optional tooltip, ariaLabel, disabled. |
-| activeSection | `string \| null` | from context | No | Item highlight. |
-| onSelectSection | `(id: string) => void` | context | No | Section selection. |
-| logo | `ReactNode` | — | No | Top of the context column. |
-| footer | `ReactNode` | — | No | Bottom of the column. |
-| className, children, … | — | — | No | Without `items` — arbitrary markup in `nav`. |
+| items | `SidebarContextItem[]` | — | No | `id`, `label`, `icon`; optional `tooltip`, `ariaLabel`, `disabled`. |
+| activeSection | `string \| null` | from context | No | Highlights the matching item. |
+| onSelectSection | `(sectionId: string) => void` | context setter | No | Section selection handler. |
+| logo | `React.ReactNode` | — | No | Slot above the item list. |
+| footer | `React.ReactNode` | — | No | Slot below the list. |
+| className | `string` | — | No | Class on the inner `nav`. |
+| children | `React.ReactNode` | — | No | Custom content when `items` is omitted. |
+| …rest | `React.ComponentPropsWithoutRef<"nav">` (minus the above) | — | No | Passed to `nav`; implementation sets **`aria-label="Context navigation"`** after `rest` (not overridable via props). |
 
 ### Sidebar.ContextItemButton
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| active | `boolean` | — | No | data-active. |
-| asChild | `boolean` | `false` | No | Slot instead of button. |
-| type | `"button" \| …` | `"button"` | No | Button type. |
-| disabled | `boolean` | — | No | Disabled state. |
-
-Other props match `button` (or the child element when `asChild`).
+| active | `boolean` | — | No | Sets `data-active`. |
+| asChild | `boolean` | `false` | No | Merge props into the child element via `Slot`. |
+| type | `React.ButtonHTMLAttributes<"button">["type"]` | `"button"` | No | Ignored when `asChild` is `true`. |
+| disabled | `boolean` | — | No | Disables the button or blocks slotted clicks. |
+| className | `string` | — | No | Button class. |
+| children | `React.ReactNode` | — | No | Typically an icon. |
+| …rest | `React.ComponentPropsWithoutRef<"button">` (minus the above) | — | No | Other button attributes. |
 
 ### Sidebar.PanelSwitch
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| sections | `Record<string, ReactNode>` | — | No | Map of section → content. |
-| renderSection | `(activeSection) => ReactNode` | — | No | Takes precedence over sections. |
-| fallback | `ReactNode` | `null` | No | If key is missing. |
+| sections | `Record<string, React.ReactNode>` | — | No | Map of section id → panel body; first key used if `activeSection` missing. |
+| renderSection | `(activeSection: string \| null) => React.ReactNode` | — | No | If set, overrides `sections`. |
+| fallback | `React.ReactNode` | `null` | No | Shown when nothing resolves. |
+| className | `string` | — | No | Wrapper class. |
+| children | `React.ReactNode` | — | No | Not used for switching; prefer `sections` / `renderSection`. |
+| …rest | `React.ComponentPropsWithoutRef<"div">` | — | No | Wrapper `div` attributes. |
 
 ### Sidebar.Footer
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| variant | `"plain" \| "inset"` | `"plain"` | No | Spacing variant. |
+| variant | `"plain" \| "inset"` | `"plain"` | No | `inset` sets `data-variant="inset"`. |
+| className | `string` | — | No | Footer class. |
+| children | `React.ReactNode` | — | No | Footer content. |
+| …rest | `React.ComponentPropsWithoutRef<"div">` | — | No | Other `div` attributes. |
 
 ### Sidebar.IdentityButton
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| leading | `ReactNode` | — | No | Left side. |
-| title | `ReactNode` | — | Yes | Primary line. |
-| subtitle | `ReactNode` | — | No | Secondary line. |
-| trailing | `ReactNode` | icon | No | Right side. |
-
-`children` is unused; the rest are `button` attributes.
+| leading | `React.ReactNode` | — | No | Start slot (`aria-hidden` wrapper). |
+| title | `React.ReactNode` | — | Yes | Primary line. |
+| subtitle | `React.ReactNode` | — | No | Secondary line. |
+| trailing | `React.ReactNode` | chevron icon | No | End slot; default `ChevronsUpDown` icon. |
+| type | `React.ButtonHTMLAttributes<"button">["type"]` | `"button"` | No | Button type. |
+| className | `string` | — | No | Button class. |
+| disabled | `boolean` | — | No | Disables the button. |
+| …rest | `Omit<React.ComponentPropsWithoutRef<"button">, "children">` (minus the above) | — | No | Other button props; `children` is not used. |
 
 ### Sidebar.ToggleButton
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| openLabel | `string` | “Hide sidebar” | No | aria-label when open. |
-| closedLabel | `string` | “Show sidebar” | No | aria-label when closed. |
+| openLabel | `string` | `"Скрыть сайдбар"` | No | `aria-label` when open. |
+| closedLabel | `string` | `"Открыть сайдбар"` | No | `aria-label` when closed. |
+| type | `React.ButtonHTMLAttributes<"button">["type"]` | `"button"` | No | Button type. |
+| className | `string` | — | No | Button class. |
+| onClick | `React.MouseEventHandler<HTMLButtonElement>` | — | No | Runs before `toggleOpen` unless `defaultPrevented`. |
+| …rest | `React.ComponentPropsWithoutRef<"button">` (minus the above) | — | No | Other button attributes. |
 
-Calls `toggleOpen` from context after `onClick` unless `preventDefault`.
+### Sidebar.MenuButton
 
-### Sidebar.MenuButton / MenuLink / MenuRouterLink
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| active | `boolean` | — | No | `data-active` on the menu control. |
+| asChild | `boolean` | `false` | No | Slot into a child element. |
+| type | `React.ButtonHTMLAttributes<"button">["type"]` | `"button"` | No | Native button type when not `asChild`. |
+| disabled | `boolean` | — | No | Disables the button or slotted control. |
+| className | `string` | — | No | Control class. |
+| children | `React.ReactNode` | — | No | Label and adornments. |
+| …rest | `React.ComponentPropsWithoutRef<"button">` (minus the above) | — | No | Other button props. |
 
-- **MenuButton** — `active`, `asChild`, `type`, `disabled`, and `button` props.
-- **MenuLink** — `active` and `a` props.
-- **MenuRouterLink** — props from react-router-dom `NavLink` (`to`, `className`, `end`, …); menu item styles are layered on top.
+### Sidebar.MenuLink
+
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| active | `boolean` | — | No | Passed through `MenuButton asChild`. |
+| className | `string` | — | No | Anchor class. |
+| children | `React.ReactNode` | — | No | Link content. |
+| …rest | `React.ComponentPropsWithoutRef<"a">` (minus `className` where merged) | — | No | Native anchor attributes. |
+
+### Sidebar.MenuRouterLink
+
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| className | Same as React Router `NavLink` `className` | — | No | Composed with kit `menuButton` styles via `cx`. |
+| …rest | `React.ComponentPropsWithoutRef<typeof NavLink>` | — | No | e.g. `to`, `end`, `replace`, `viewTransition`. |
 
 ### Sidebar.MenuAction
 
-Compact button in a `MenuItem` row; `button` props.
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| type | `React.ButtonHTMLAttributes<"button">["type"]` | `"button"` | No | Compact row action button. |
+| className | `string` | — | No | Button class. |
+| children | `React.ReactNode` | — | No | Icon or text. |
+| …rest | `React.ComponentPropsWithoutRef<"button">` | — | No | Other button attributes. |
 
-### Other wrappers
+### Layout and text primitives
 
-`ContextBarHeader`, `ContextBarBody`, `ContextBarFooter`, `NavPanel`, `NavPanelBody`, `NavDocTree`, `NavPanelHeading`, `NavCategory`, `NavCategoryTrigger`, `NavCategoryLabel`, `NavCategoryCount`, `NavCategoryPanel`, `Header`, `HeaderRow`, `HeaderMain`, `Content`, `Group`, `GroupLabel`, `Menu`, `MenuItem`, `MenuIcon`, `MenuLabel`, `MenuTrailing`, `Text` — semantic containers with `className`, `children`, and standard HTML attributes for the corresponding element.
+`Sidebar.ContextBarHeader`, `ContextBarBody`, `ContextBarFooter`, `NavPanel`, `NavPanelBody`, `NavDocTree`, `NavPanelHeading`, `NavCategory`, `NavCategoryTrigger`, `NavCategoryLabel`, `NavCategoryCount`, `NavCategoryPanel`, `Header`, `HeaderRow`, `HeaderMain`, `Content`, `Group`, `GroupLabel`, `Menu`, `MenuItem`, `MenuIcon`, `MenuLabel`, `MenuTrailing`, `Text` — thin wrappers around the native element (`div`, `nav`, `h2`, `ul`, `li`, `span`, `button` where applicable) with kit classes; accept **`className`**, **`children`**, and **`…rest`** matching that element’s props (`NavPanel` also wires **`onMouseLeave`** as described above). **`MenuIcon`**, **`MenuTrailing`**, and **`IdentityButton`** leading use **`aria-hidden`** where implemented.
 
 ### useSidebarContext()
 
-Returns: `size`, `variant`, `setVariant`, `activeSection`, `setActiveSection`, `open`, `setOpen`, `toggleOpen`. Must be used under `Sidebar.Root`.
+Returns **`{ size, variant, setVariant, activeSection, setActiveSection, open, setOpen, toggleOpen, onNavPanelMouseLeave }`**. Throws if used outside **`Sidebar.Root`**.
 
 ### useSidebarNavTo(pathWithinSection: string)
 
-Returns a path string: when `variant === "double"` and a section is selected — `/{activeSection}/{path}` (slashes in the argument are normalized); otherwise path from the root.
+Returns a **`string`** path for panel links; see Rules.
 
-## Variants
+## Related
 
-- **variant `simple`** — only `NavPanel`; context column hidden (`data-collapsed` on root for styling).
-- **variant `double`** — `ContextBar` + `NavPanel`, gap between them from tokens.
-- **panelWidth `compact`** — narrower main panel.
-- **sidebarSlot `page-nav`** — padding and height for the column in the shared page layout.
-- **Footer `inset`** — visually “inset” footer.
-
-## States
-
-- **open** — panel expanded; with `responsive` and a narrow window — overlay and focusable “Close sidebar” backdrop.
-- **disabled** on context and menu items — reduced opacity, click blocked; with `asChild`, `aria-disabled` is forwarded.
-- **active** on `MenuButton` / `MenuLink` or `aria-current` on `NavLink` — current item highlight.
-- Floating button on root when panel is closed in the responsive scenario.
-
-## Accessibility (a11y)
-
-- Root `aside` with configurable `aria-label`.
-- Close backdrop on overlay gets an accessible name and focus only when visible.
-- `ToggleButton` and floating button change `aria-label` based on `open`.
-- `ContextBar` with `items` wraps items in `Tooltip` for labels; set `ariaLabel` on the item when the label differs from the icon.
-- `MenuIcon`, `MenuTrailing` with `aria-hidden` where `MenuLabel` or the button `aria-label` carries the role.
-
-## Limitations and notes
-
-- Responsive threshold is tied to **window width** (`matchMedia("(max-width: 64rem)")`), not the preview container width.
-- `useSidebarNavTo` is mainly meaningful with `variant="double"` and a non-empty `activeSection`.
-- `MenuRouterLink` requires a React Router provider above in the tree.
-- `onActiveSectionChange` is not fired when the active section is reset to `null` inside controlled state.
-
-## Related components
-
-- **Tooltip** — labels for narrow icons in `ContextBar` when using `items`.
-- **Dropdown** — often wraps `IdentityButton` for user menu or theme.
-- **Avatar** — in `IdentityButton.leading`.
-- **Button** — actions outside the sidebar or in the app header.
-- **PageShell** — typical consumer of `sidebarSlot="page-nav"`.
+- [Tooltip](../tooltip/COMPONENT.md) — used around `ContextBar` items for labels.
+- [Dropdown](../dropdown/COMPONENT.md) — often wraps `IdentityButton` for account menus.
+- [Avatar](../avatar/COMPONENT.md) — typical `IdentityButton.leading` content.
+- [Button](../button/COMPONENT.md) — actions outside the sidebar or in the app chrome.
