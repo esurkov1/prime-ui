@@ -27,6 +27,8 @@
   --sb-item-trailing-scale: 1;
   --sb-item-trailing-max-width: 100%;
   --sb-identity-main-max-width: 100%;
+  --sb-heading-left: 0%;
+  --sb-heading-translate-x: 0%;
 
   --sb-group-label-align: start;
 
@@ -192,14 +194,22 @@
 
 .groupLabel {
   display: block;
+  position: relative;
+  left: var(--sb-heading-left);
+  transform: translateX(var(--sb-heading-translate-x));
+  width: max-content;
   min-width: 0;
+  max-width: 100%;
   line-height: 1.2;
   text-align: var(--sb-group-label-align);
   padding-inline: var(--prime-sys-spacing-x1);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition: padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
+  transition:
+    left var(--sb-transition-duration) var(--sb-transition-ease),
+    transform var(--sb-transition-duration) var(--sb-transition-ease),
+    padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .separator {
@@ -545,7 +555,12 @@
 
 .navPanelHeading {
   margin: 0;
+  position: relative;
+  left: var(--sb-heading-left);
+  transform: translateX(var(--sb-heading-translate-x));
+  width: max-content;
   min-width: 0;
+  max-width: 100%;
   font-size: var(--prime-sys-size-control-m-text);
   font-weight: var(--prime-sys-typography-weight-medium);
   color: var(--prime-sys-color-content-primary);
@@ -553,6 +568,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition:
+    left var(--sb-transition-duration) var(--sb-transition-ease),
+    transform var(--sb-transition-duration) var(--sb-transition-ease),
+    padding-inline var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
 .navCategory {
@@ -680,6 +699,8 @@
     --sb-item-trailing-max-width: 0px;
     --sb-identity-main-max-width: 0px;
     --sb-group-label-align: center;
+    --sb-heading-left: 50%;
+    --sb-heading-translate-x: -50%;
   }
 
   .root[data-state="compact"] .identityButton {
@@ -708,9 +729,7 @@
   }
 
   .root[data-state="compact"] .groupLabel,
-  .root[data-state="compact"] .navPanelHeading,
-  .root[data-state="compact"] .navCategoryLabel {
-    text-align: center;
+  .root[data-state="compact"] .navPanelHeading {
     padding-inline: var(--prime-sys-spacing-x1);
   }
 
