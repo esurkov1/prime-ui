@@ -117,6 +117,7 @@ export type SidebarToggleButtonProps = Omit<
 > & {
   openLabel?: string;
   closedLabel?: string;
+  placement?: "inline" | "edge";
 };
 
 function iconForToggle(state: SidebarLayoutMode, side: "left" | "right") {
@@ -127,7 +128,16 @@ function iconForToggle(state: SidebarLayoutMode, side: "left" | "right") {
 }
 
 const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleButtonProps>(
-  ({ className, openLabel = "Скрыть сайдбар", closedLabel = "Открыть сайдбар", ...rest }, ref) => {
+  (
+    {
+      className,
+      openLabel = "Скрыть сайдбар",
+      closedLabel = "Открыть сайдбар",
+      placement = "inline",
+      ...rest
+    },
+    ref,
+  ) => {
     const { state, toggleOpen, navPanelId, side } = useSidebarContext();
     const expanded = state !== "hidden";
 
@@ -140,6 +150,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
         aria-expanded={expanded}
         aria-controls={navPanelId}
         aria-label={expanded ? openLabel : closedLabel}
+        data-placement={placement}
         onClick={(event) => {
           rest.onClick?.(event);
           if (!event.defaultPrevented) {

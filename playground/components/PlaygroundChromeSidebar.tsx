@@ -390,6 +390,7 @@ export function PlaygroundChromeSidebar() {
             </Sidebar.HeaderMain>
           </Sidebar.HeaderRow>
         </Sidebar.Header>
+        <Sidebar.ToggleButton placement="edge" />
 
         <Sidebar.Content>
           <PlaygroundTreeMenu />

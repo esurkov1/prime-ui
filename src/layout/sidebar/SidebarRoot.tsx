@@ -1,4 +1,4 @@
-import { PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
 import * as React from "react";
 import { createPortal } from "react-dom";
 
@@ -167,7 +167,7 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
 
   const openState = layoutState !== "hidden";
   const mobileOpen = Boolean(responsive) && isMobile && openState;
-  const showFloatingToggle = isMobile ? !openState : true;
+  const showFloatingToggle = Boolean(responsive) && isMobile && !openState;
 
   const [floatingPortalReady, setFloatingPortalReady] = React.useState(false);
   React.useLayoutEffect(() => {
@@ -182,37 +182,14 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
 
   const navPanelId = React.useId();
 
-  const floatingToggleLabel = React.useMemo(() => {
-    if (isMobile) {
-      return side === "left" ? "Открыть сайдбар" : "Открыть сайдбар справа";
-    }
+  const floatingToggleLabel = side === "left" ? "Открыть сайдбар" : "Открыть сайдбар справа";
 
-    if (layoutState === "expanded") {
-      return side === "left" ? "Свернуть сайдбар" : "Свернуть сайдбар справа";
-    }
-
-    return side === "left" ? "Развернуть сайдбар" : "Развернуть сайдбар справа";
-  }, [isMobile, layoutState, side]);
-
-  const floatingToggleIcon = React.useMemo(() => {
-    if (isMobile || layoutState === "hidden") {
-      return side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />;
-    }
-
-    if (layoutState === "expanded") {
-      return side === "left" ? <PanelLeftClose size="1em" /> : <PanelRightClose size="1em" />;
-    }
-
-    return side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />;
-  }, [isMobile, layoutState, side]);
+  const floatingToggleIcon =
+    side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />;
 
   const onFloatingToggleClick = React.useCallback(() => {
-    if (isMobile) {
-      setLayoutState("expanded");
-      return;
-    }
-    toggleOpen();
-  }, [isMobile, setLayoutState, toggleOpen]);
+    setLayoutState("expanded");
+  }, [setLayoutState]);
 
   const contextValue = React.useMemo(
     () => ({
