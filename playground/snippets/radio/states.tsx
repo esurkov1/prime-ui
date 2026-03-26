@@ -2,7 +2,7 @@ import { Radio } from "@/components/radio/Radio";
 
 export default function RadioStatesSnippet() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div className="stack">
       <Radio.Root name="radio-st-off" value="u" size="m">
         <Radio.Label>Не выбрано</Radio.Label>
       </Radio.Root>

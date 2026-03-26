@@ -1,11 +1,13 @@
 import * as React from "react";
 import { Radio } from "@/components/radio/Radio";
 
+import styles from "./radio-snippets.module.css";
+
 export default function RadioControlledSnippet() {
   const [plan, setPlan] = React.useState("pro");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div className="stack">
       <Radio.Root
         name="radio-controlled-plan"
         value="basic"
@@ -39,7 +41,7 @@ export default function RadioControlledSnippet() {
       >
         <Radio.Label>Корпоративный</Radio.Label>
       </Radio.Root>
-      <p style={{ margin: 0, fontSize: 13, opacity: 0.85 }}>Выбрано: {plan}</p>
+      <p className={styles.mutedLine}>Выбрано: {plan}</p>
     </div>
   );
 }

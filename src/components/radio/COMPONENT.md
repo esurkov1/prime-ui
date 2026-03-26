@@ -25,9 +25,9 @@ import { Radio } from "prime-ui-kit";
 
 export function OnboardingGoalStep() {
   return (
-    <fieldset style={{ border: "none", padding: 0, margin: 0 }}>
-      <legend style={{ fontWeight: 600, marginBottom: 12 }}>What do you want to do first?</legend>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <fieldset>
+      <legend>What do you want to do first?</legend>
+      <div className="stack">
         <Radio.Root name="goal" value="tasks" defaultChecked size="m">
           <Radio.Label>Manage team tasks</Radio.Label>
         </Radio.Root>
@@ -52,7 +52,7 @@ import { Radio } from "prime-ui-kit";
 
 export function ConsentSidebar() {
   return (
-    <aside style={{ maxWidth: 320 }}>
+    <aside className="previewBannerNarrowColumn">
       <Radio.Root name="consent" value="yes" defaultChecked size="s">
         <Radio.Label>I agree to the policy</Radio.Label>
         <Radio.Hint>You can change this in your profile before signing the agreement.</Radio.Hint>
@@ -75,9 +75,9 @@ import { Radio } from "prime-ui-kit";
 
 export function CheckoutPaymentCard() {
   return (
-    <section style={{ padding: 16, borderRadius: 12, border: "1px solid #e4e4e7" }}>
-      <h3 style={{ margin: "0 0 16px", fontSize: 16 }}>Payment</h3>
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <section className="previewBannerNarrowColumn">
+      <h3>Payment</h3>
+      <div className="stack">
         <Radio.Root name="pay" value="card" defaultChecked size="m">
           <Radio.Label>Card online</Radio.Label>
           <Radio.Hint>3-D Secure when required.</Radio.Hint>
@@ -104,7 +104,7 @@ export function PageVisibilityControl() {
   const [visibility, setVisibility] = React.useState<"public" | "staff" | "private">("staff");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div className="stack">
       <Radio.Root
         name="visibility"
         value="public"

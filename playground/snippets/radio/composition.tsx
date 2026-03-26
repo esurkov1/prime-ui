@@ -2,7 +2,7 @@ import { Radio } from "@/components/radio/Radio";
 
 export default function RadioCompositionSnippet() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div className="stack">
       <Radio.Root name="radio-comp-pay" value="card" defaultChecked size="m">
         <Radio.Label>Банковская карта</Radio.Label>
         <Radio.Hint>Списание сразу после подтверждения заказа.</Radio.Hint>
