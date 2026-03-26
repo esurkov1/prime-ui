@@ -31,17 +31,15 @@ export function JobApplyUpload() {
   const [files, setFiles] = React.useState<File[]>([]);
 
   return (
-    <div style={{ maxWidth: 480 }}>
+    <>
       <FileUpload.Root
         accept=".pdf,application/pdf"
         onFilesChange={(next) => {
           setFiles(next);
         }}
       />
-      {files[0] ? (
-        <p style={{ marginTop: 12, fontSize: 14 }}>Attached: {files[0].name}</p>
-      ) : null}
-    </div>
+      {files[0] ? <p>Attached: {files[0].name}</p> : null}
+    </>
   );
 }
 ```
@@ -55,7 +53,7 @@ import { FileUpload } from "prime-ui-kit";
 
 export function SupplierInvoiceUpload() {
   return (
-    <div style={{ display: "grid", gap: 24, maxWidth: 520 }}>
+    <>
       <FileUpload.Root size="l" appearance="solid" multiple />
       <FileUpload.Item variant="error" size="l">
         <FileUpload.ItemRow>
@@ -68,7 +66,7 @@ export function SupplierInvoiceUpload() {
           </FileUpload.ItemMain>
         </FileUpload.ItemRow>
       </FileUpload.Item>
-    </div>
+    </>
   );
 }
 ```
@@ -85,8 +83,8 @@ export function ImportModalDropzone() {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <section style={{ padding: 24, borderRadius: 12, background: "var(--prime-sys-color-surface-elevated, #fff)", maxWidth: 400 }}>
-      <h2 style={{ margin: "0 0 16px", fontSize: 18 }}>Import spreadsheet</h2>
+    <section>
+      <h2>Import spreadsheet</h2>
       <FileUpload.Root inputRef={inputRef} appearance="solid" size="m" multiple>
         <FileUpload.DropBody>
           <FileUpload.Title tone="muted">
@@ -122,7 +120,7 @@ export function SupportTicketAttachments() {
   const [files, setFiles] = React.useState<File[]>([]);
 
   return (
-    <div style={{ display: "grid", gap: 12, maxWidth: 440 }}>
+    <>
       <FileUpload.Root
         multiple
         accept="image/*,.pdf,application/pdf"
@@ -131,7 +129,7 @@ export function SupportTicketAttachments() {
         }}
       />
       {files.length > 0 ? (
-        <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14 }}>
+        <ul>
           {files.map((f) => (
             <li key={`${f.name}-${f.lastModified}`}>{f.name}</li>
           ))}
@@ -142,7 +140,7 @@ export function SupportTicketAttachments() {
           Remove attachments
         </Button.Root>
       ) : null}
-    </div>
+    </>
   );
 }
 ```
