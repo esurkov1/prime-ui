@@ -4,23 +4,22 @@ import { Sidebar } from "@/layout";
 
 import styles from "./layout-options.module.css";
 
-function CompactPanelDemo() {
+function InlinePanelDemo() {
   const [open, setOpen] = React.useState(true);
   return (
     <Sidebar.Root
       size="m"
       variant="simple"
-      panelWidth="compact"
       open={open}
       onOpenChange={setOpen}
       responsive={false}
-      aria-label="Компактная ширина панели"
+      aria-label="Панель в потоке"
     >
       <Sidebar.NavPanel>
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
-              <Sidebar.Text>Компакт</Sidebar.Text>
+              <Sidebar.Text>В потоке</Sidebar.Text>
             </Sidebar.HeaderMain>
             <Sidebar.ToggleButton />
           </Sidebar.HeaderRow>
@@ -88,10 +87,11 @@ export default function SidebarLayoutOptionsSnippet() {
     <div className={styles.root}>
       <div className={styles.column}>
         <p className={styles.caption}>
-          <code>panelWidth=&quot;compact&quot;</code> — уже панель (<code>--sb-panel-width</code>).
+          Без <code>sidebarSlot</code>: панель в потоке, ширина по токену{" "}
+          <code>--sb-panel-width</code>.
         </p>
         <div className={styles.stage}>
-          <CompactPanelDemo />
+          <InlinePanelDemo />
         </div>
       </div>
       <div className={styles.column}>

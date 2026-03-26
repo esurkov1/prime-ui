@@ -12,8 +12,8 @@ import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { Sidebar } from "@/layout";
 import { Icon } from "@/icons";
+import { Sidebar } from "@/layout";
 
 import { getPlaygroundNavModel } from "../playgroundPages";
 import { PLAYGROUND_THEME_PRESET_OPTIONS, usePlaygroundTheme } from "./PlaygroundTheme";
@@ -254,12 +254,7 @@ function PlaygroundUserMenu() {
 
 export function PlaygroundChromeSidebar() {
   return (
-    <Sidebar.Root
-      variant="simple"
-      panelWidth="compact"
-      sidebarSlot="page-nav"
-      aria-label="Навигация playground"
-    >
+    <Sidebar.Root variant="simple" sidebarSlot="page-nav" aria-label="Навигация playground">
       <Sidebar.NavPanel>
         <Sidebar.Header>
           <Sidebar.HeaderRow>

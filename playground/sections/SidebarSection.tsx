@@ -125,7 +125,6 @@ export default function SidebarSection() {
         <div className="demoBlock">
           <DemoSectionTitle>Расположение в макете</DemoSectionTitle>
           <DemoDescription>
-            <code>panelWidth=&quot;compact&quot;</code> сужает панель;{" "}
             <code>sidebarSlot=&quot;page-nav&quot;</code> задаёт отступы и высоту для колонки рядом
             с контентом (как в каркасе страницы).
           </DemoDescription>

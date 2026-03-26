@@ -21,9 +21,9 @@ Compound side navigation: `Sidebar.Root` provides context and an `aside` shell; 
 
 ## Composition
 
-- **`Sidebar.Root`** — required wrapper: `aside`, `aria-label`, `data-*` for `size`, `variant`, `open`, `responsive`, optional `panelWidth` / `sidebarSlot`. Renders a focusable backdrop and optional floating toggle when `responsive` and the panel is closed on a narrow viewport.
+- **`Sidebar.Root`** — required wrapper: `aside`, `aria-label`, `data-*` for `size`, `variant`, `open`, `responsive`, optional `sidebarSlot`. Renders a focusable backdrop and optional floating toggle when `responsive` and the panel is closed on a narrow viewport.
 - **`Sidebar.ContextBar`** — optional; meaningful for **`variant="double"`**. With **`items`**, builds a `nav` with tooltips and optional `logo` / `footer` slots; without **`items`**, **`children`** fill the `nav`. When **`items`** is non-empty and no section is active yet, the first item is auto-selected.
-- **`Sidebar.NavPanel`** — main column (`nav`); forwards **`onMouseLeave`** and calls context **`onNavPanelMouseLeave`** (closes edge-hover overlay when applicable).
+- **`Sidebar.NavPanel`** — main column (`nav`); пробрасывает **`onMouseLeave`** как у обычного элемента (без авто-закрытия по уходу курсора).
 - Typical **`NavPanel`** order: **`Header`** → **`HeaderRow`** → **`HeaderMain`** (title, identity, or `NavPanelHeading`) and **`ToggleButton`** → **`Content`** ( **`PanelSwitch`**, **`NavCategory`**, **`Group`** + **`Menu`** ) → optional **`Footer`** with **`IdentityButton`** or similar.
 - **`PanelSwitch`** — renders one branch from **`sections`** or **`renderSection(activeSection)`** based on context **`activeSection`** (falls back to the first key in **`sections`** when the current key is missing).
 - **`Menu`** is a **`ul`**; each row is **`MenuItem`** wrapping **`MenuButton`**, **`MenuLink`**, or **`MenuRouterLink`**; optional **`MenuIcon`**, **`MenuLabel`**, **`MenuTrailing`**, compact **`MenuAction`**.
@@ -65,8 +65,8 @@ export function Example() {
 - **`variant`**: controlled via **`variant`** / **`onVariantChange`** or uncontrolled via **`defaultVariant`** (`"double"` by default). **`simple`** hides the context rail styling context (`data-collapsed` on root).
 - **`activeSection`**: string or uncontrolled **`defaultActiveSection`**; updates notify **`onActiveSectionChange` only when the new value is non-null** — clearing to `null` internally does not call the callback.
 - **`open`**: controlled or uncontrolled; **`defaultOpen`** defaults to **`true`**, but on the first render with **`responsive={true}`** and a viewport already under **`max-width: 64rem`**, the initial open state is **`false`** until the media query effect runs; crossing the breakpoint toggles open to match desktop vs overlay behavior.
-- When **`responsive={true}`** and the overlay is open: **`useFocusTrap`** + **`useScrollLock`** + **`Escape`** (как у модального drawer), backdrop только под клик (**`tabIndex={-1}`**), фокус уходит в панель. **`ToggleButton`** / плавающая кнопка: **`aria-expanded`**, **`aria-controls`** → id **`NavPanel`** (стабильный **`useId`**, можно переопределить **`id`** на **`NavPanel`**).
-- **`edgeHoverOpen`** (default **`true`**): on narrow + responsive + closed panel, if the device matches **`(hover: hover) and (pointer: fine)`**, moving the pointer within **`12px`** of the left viewport edge opens the panel; leaving **`NavPanel`** then closes it. With controlled **`open`**, wire **`onOpenChange`** so the parent stays in sync.
+- When **`responsive={true}`** and the overlay is open: общий хук **`useOverlayModal`** (ловушка фокуса + блокировка прокрутки документа + **`Escape`**) — тот же класс поведения, что у **`Drawer.Content`**. Подложка только под клик (**`tabIndex={-1}`**). Открытие только кнопкой (плавающая / **`ToggleButton`**), без «реакции на край экрана».
+- **`ToggleButton`** / плавающая кнопка: **`aria-expanded`**, **`aria-controls`** → id **`NavPanel`** (стабильный **`useId`**, можно переопределить **`id`** на **`NavPanel`**).
 - **`useSidebarContext`** must run under **`Sidebar.Root`**; use **`toggleOpen`** / **`setOpen`** from **`ToggleButton`** or custom controls consistently with controlled **`open`**.
 - **`MenuRouterLink`** requires a React Router provider; it forwards **`NavLink`** props (`to`, `end`, `className` as function or string, etc.).
 - **`useSidebarNavTo(pathWithinSection)`** trims slashes; with **`variant="double"`** and a non-empty **`activeSection`**, returns `/${activeSection}` or `/${activeSection}/${inner}`; otherwise `/${inner}` or **`"/"`** for empty paths.
@@ -80,7 +80,7 @@ export function Example() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Scale for controls and column widths. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Масштаб контролов и контекстной колонки (`ContextBar`); ширина панели навигации задаётся токеном `--sb-panel-width` на корне (одинакова для всех размеров). |
 | variant | `"simple" \| "double"` | — | No | Controlled column mode. |
 | defaultVariant | `"simple" \| "double"` | `"double"` | No | Initial variant when uncontrolled. |
 | onVariantChange | `(variant: "simple" \| "double") => void` | — | No | Variant change callback. |
@@ -91,8 +91,6 @@ export function Example() {
 | defaultOpen | `boolean` | `true` | No | Initial open when uncontrolled (see Rules for narrow first paint). |
 | onOpenChange | `(open: boolean) => void` | — | No | Open state callback. |
 | responsive | `boolean` | `true` | No | Overlay + floating toggle below `64rem` when `true`. |
-| edgeHoverOpen | `boolean` | `true` | No | Edge hover reveal on narrow responsive viewports (fine pointer + hover). |
-| panelWidth | `"compact"` | — | No | Narrow nav panel (`data-panel-width`). |
 | sidebarSlot | `"page-nav"` | — | No | Layout slot for page shell column (`data-sidebar-slot`). |
 | aria-label | `string` | `"Sidebar"` | No | Accessible name on the `aside`. |
 | className | `string` | — | No | Root class. |
@@ -211,7 +209,7 @@ export function Example() {
 
 ### useSidebarContext()
 
-Returns **`{ size, variant, setVariant, activeSection, setActiveSection, open, setOpen, toggleOpen, onNavPanelMouseLeave }`**. Throws if used outside **`Sidebar.Root`**.
+Returns **`{ size, variant, setVariant, activeSection, setActiveSection, open, setOpen, toggleOpen, navPanelId }`**. Throws if used outside **`Sidebar.Root`**.
 
 ### useSidebarNavTo(pathWithinSection: string)
 

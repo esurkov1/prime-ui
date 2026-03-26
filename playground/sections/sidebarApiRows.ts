@@ -120,13 +120,6 @@ export const sidebarRootApiRows: PlaygroundApiPropRow[] = [
     description: "При true — поведение для max-width 64rem: оверлей и плавающая кнопка.",
   },
   {
-    prop: "panelWidth",
-    type: '"compact"',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Узкая панель: data-panel-width и --sb-panel-width.",
-  },
-  {
     prop: "sidebarSlot",
     type: '"page-nav"',
     defaultValue: "—",

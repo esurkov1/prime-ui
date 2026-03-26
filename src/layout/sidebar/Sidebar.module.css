@@ -4,7 +4,7 @@
  */
 .root {
   --sb-context-width: var(--prime-sys-unit-4rem);
-  --sb-panel-width: var(--prime-sys-unit-20rem);
+  --sb-panel-width: var(--prime-sys-unit-16rem);
   --sb-panel-visible-width: var(--sb-panel-width);
   --sb-nav-gap-open: var(--prime-sys-spacing-x2);
   --sb-nav-gap: 0;
@@ -58,7 +58,6 @@
 
 .root[data-size="s"] {
   --sb-context-width: var(--prime-sys-unit-3p5rem);
-  --sb-panel-width: var(--prime-sys-unit-18rem);
   --sb-control-height: var(--prime-sys-size-control-s-height);
   --sb-control-radius: var(--prime-sys-size-control-s-radius);
   --sb-control-gap: var(--prime-sys-size-control-s-gap);
@@ -74,7 +73,6 @@
 
 .root[data-size="l"] {
   --sb-context-width: var(--prime-sys-unit-4p5rem);
-  --sb-panel-width: var(--prime-sys-unit-22rem);
   --sb-control-height: var(--prime-sys-size-control-l-height);
   --sb-control-radius: var(--prime-sys-size-control-l-radius);
   --sb-control-gap: var(--prime-sys-size-control-l-gap);
@@ -90,7 +88,6 @@
 
 .root[data-size="xl"] {
   --sb-context-width: var(--prime-sys-unit-4p5rem);
-  --sb-panel-width: var(--prime-sys-unit-24rem);
   --sb-control-height: var(--prime-sys-size-control-xl-height);
   --sb-control-radius: var(--prime-sys-size-control-xl-radius);
   --sb-control-gap: var(--prime-sys-size-control-xl-gap);
@@ -102,11 +99,6 @@
   --sb-identity-leading-size: var(--prime-sys-size-avatar-xl-size);
   --sb-identity-title-text: var(--prime-sys-size-control-xl-text);
   --sb-identity-subtitle-text: var(--prime-sys-size-control-l-supportText);
-}
-
-/* Узкая панель (док-плейграунд и плотные макеты). */
-.root[data-panel-width="compact"] {
-  --sb-panel-width: var(--prime-sys-unit-16rem);
 }
 
 /* Внешний горизонтальный отступ/gap до main — в AppShell; здесь без margin-inline (дёрганье и асимметрия). */
@@ -887,9 +879,10 @@
   .root[data-responsive="true"] .navPanel {
     position: relative;
     z-index: 1;
-    width: var(--sb-panel-width);
+    /* Не уже токена и не шире экрана; при широком контенте растёт до min(100%, max(...)). */
+    width: min(100%, max(var(--sb-panel-width), min-content));
     min-width: min(var(--sb-panel-width), 100%);
-    max-width: min(100%, var(--sb-panel-width));
+    max-width: 100%;
     height: 100dvh;
     max-height: 100dvh;
     min-height: 0;
@@ -897,15 +890,6 @@
     transform: translateX(calc(-100% - var(--prime-sys-spacing-x2)));
     opacity: 0;
     pointer-events: none;
-  }
-
-  /* Ширина 90% только на узких мобильных (< 640px, sm). */
-  @media (max-width: 639px) {
-    .root[data-responsive="true"] .navPanel {
-      width: 90%;
-      min-width: 90%;
-      max-width: 90%;
-    }
   }
 
   /* На очень узких экранах (≤320px) — панель на всю ширину. */
