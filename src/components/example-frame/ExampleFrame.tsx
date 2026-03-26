@@ -14,7 +14,7 @@ type Pane = "preview" | "code";
 export type ExampleFrameViewport = "desktop" | "tablet" | "mobile";
 type ColorScheme = "light" | "dark";
 
-/** Раскладка содержимого превью (на узле `.previewInner`). */
+/** Раскладка содержимого превью — чтобы в сниппетах не оборачивать компоненты в div.stack/row. */
 export type ExampleFramePreviewLayout =
   | "default"
   | "stack"
@@ -60,7 +60,10 @@ export type ExampleFrameRootProps = {
   showThemeToggle?: boolean;
   /** Вызывается после успешного копирования `code` в буфер. */
   onCopy?: () => void;
-  /** Как выстроить детей внутри превью. По умолчанию — по центру по обеим осям. */
+  /**
+   * Как выстроить детей внутри превью. По умолчанию — по центру (один блок).
+   * Для списков из нескольких компонентов используйте `stack` / `stack-center` / `row`.
+   */
   previewLayout?: ExampleFramePreviewLayout;
   /**
    * Синхронизация с глобальным бренд-пресетом (например playground: `data-theme-preset` на `html`).

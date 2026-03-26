@@ -128,12 +128,14 @@
   max-width: var(--prime-sys-unit-24p375rem);
 }
 
+/* Область превью на всю ширину вьюпорта; контент — через flex + data-preview-layout */
 .previewInner {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
   min-height: var(--prime-sys-unit-10rem);
@@ -145,37 +147,30 @@
   overflow: hidden;
 }
 
+/*
+ * Без align-self: center дочерние элементы получают stretch по умолчанию — при width: fit-content у контролов
+ * блок визуально «прилипает» к логическому start.
+ */
 .previewInner > * {
-  flex: 0 1 auto;
+  align-self: center;
+  margin-inline: auto;
   min-width: 0;
   max-width: 100%;
 }
 
-/* fullWidth в превью: растягиваем область, чтобы дочерние 100% имели ширину. */
-.previewInner:global(:has([data-full-width="true"])) {
-  align-items: stretch;
+/* fullWidth в превью: растягиваем прямого ребёнка, содержащего fullWidth */
+.previewInner > *:global(:has([data-full-width="true"])) {
+  align-self: stretch;
+  width: 100%;
+  margin-inline: 0;
 }
 
-/* По ширине содержимого, не шире области превью. */
-.previewInner[data-preview-layout="default"],
-.previewInner[data-preview-layout="stack-center"],
-.previewInner[data-preview-layout="row"],
-.previewInner[data-preview-layout="row-start"],
-.previewInner[data-preview-layout="row-wrap"] {
-  width: fit-content;
-  max-width: 100%;
-  margin-inline: auto;
-}
-
-/* Раскладка превью: колонка с зазорами (сниппеты с Fragment из нескольких контролов). */
+/* Раскладка превью: без лишних обёрток в сниппетах (колонка / ряд). */
 .previewInner[data-preview-layout="stack"] {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: var(--prime-sys-spacing-x4);
-  width: fit-content;
-  max-width: 100%;
-  margin-inline: auto;
 }
 
 .previewInner[data-preview-layout="stack"]:global(:has([data-full-width="true"])),
@@ -185,27 +180,6 @@
   width: 100%;
   align-items: stretch;
   margin-inline: 0;
-}
-
-.previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),
-.previewInner[data-preview-layout="stack-narrow"] > *:global(:has([data-full-width="true"])) {
-  align-self: stretch;
-  width: 100%;
-  max-width: 100%;
-}
-
-.previewInner[data-preview-layout="stack"] > *:global(:has(.examplePreviewBleed)),
-.previewInner[data-preview-layout="stack-narrow"] > *:global(:has(.examplePreviewBleed)) {
-  width: 100%;
-  max-width: none;
-  align-self: stretch;
-}
-
-.previewInner[data-preview-layout="stack"] > *:global(:has(table)),
-.previewInner[data-preview-layout="stack-narrow"] > *:global(:has(table)) {
-  width: 100%;
-  max-width: none;
-  align-self: stretch;
 }
 
 .previewInner[data-preview-layout="stack-center"] {
@@ -247,7 +221,6 @@
   justify-content: flex-start;
   gap: var(--prime-sys-spacing-x3);
   box-sizing: border-box;
-  width: fit-content;
   max-width: min(100%, var(--prime-sys-unit-28rem));
   margin-inline: auto;
 }
@@ -262,6 +235,28 @@
   width: 100%;
   overflow: auto;
   padding-right: var(--prime-sys-unit-0p25rem);
+}
+
+.previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),
+.previewInner[data-preview-layout="stack-narrow"] > *:global(:has([data-full-width="true"])),
+.previewInner[data-preview-layout="stack"] > *:global(:has(.examplePreviewBleed)),
+.previewInner[data-preview-layout="stack-narrow"] > *:global(:has(.examplePreviewBleed)),
+.previewInner[data-preview-layout="stack"] > *:global(:has(table)),
+.previewInner[data-preview-layout="stack-narrow"] > *:global(:has(table)) {
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+}
+
+.previewInner[data-preview-layout="stack-narrow"] > * {
+  max-width: 100%;
+}
+
+.previewInner[data-preview-layout="stack"] > *,
+.previewInner[data-preview-layout="stack-narrow"] > * {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .previewInner[data-theme="dark"] {
