@@ -2,7 +2,31 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## About
+## Canonical
+
+- **Назначение:** однострочное поле с опциональной подписью, обводкой вокруг нативного `input`, слотами для иконок и аффиксов; подсказка и ошибка снизу через **Hint**.
+- **Скелет:** `Input.Root` → `Input.Wrapper` → `Input.Field` (плюс при необходимости `Input.Icon` / `Input.Affix` / `Input.InlineAffix` в нужном порядке внутри обёртки).
+- **Размер:** только на **`Input.Root`**: `size` ∈ `s | m | l | xl`, по умолчанию **`m`**. На **`Input.Field`** атрибут HTML **`size` не передаётся** (зарезервирован системой).
+- **Состояние ввода:** контролируемый режим — `value` / `onChange` на **`Input.Field`**. Подпись, `hint`, `error`, `optionalLabel` — на **`Input.Root`**.
+- **Примеры сценариев:** каталог `examples/` — [login email](./examples/login-email.tsx), [search](./examples/search.tsx), [password + hint](./examples/password-with-hint.tsx), [checkout full-width column](./examples/checkout-full-width.tsx).
+
+```tsx
+import { Input } from "prime-ui-kit";
+
+export function Example() {
+  return (
+    <Input.Root label="Поле">
+      <Input.Wrapper>
+        <Input.Field placeholder="Значение" />
+      </Input.Wrapper>
+    </Input.Root>
+  );
+}
+```
+
+## Extended
+
+### About
 
 A composite single-line text field: optional label row outside the control, a bordered wrapper around the native `input`, and optional icons or text affixes inside the row. Hint and error text render below via the shared Hint primitive.
 
@@ -18,30 +42,14 @@ A composite single-line text field: optional label row outside the control, a bo
 - Fixed-length codes split into cells or heavy masking — use [DigitInput](../digit-input/COMPONENT.md) or app-level logic.
 - When the label must be fully decoupled from the field chrome — consider [Label](../label/COMPONENT.md) plus a minimal field pattern instead of `label` on Root.
 
-## Composition
+### Composition
 
 - **`Input.Root`** — outer `div` with `data-size`, context provider, and `ControlSizeProvider`. Optional header: `label` (`htmlFor` → input id) and `optionalLabel`. Children (usually **`Input.Wrapper`**) sit between header and meta. If `hint` or `error` is set, a meta block renders **`Hint.Root`** rows for each.
 - **`Input.Wrapper`** — flex row with field border and background; `data-size` and `data-has-error` come from context. Place **`Input.Field`**, **`Input.Icon`**, **`Input.Affix`**, and **`Input.InlineAffix`** inside in the order your layout needs.
 - **`Input.Field`** — the actual `<input>`; receives `id`, merged `aria-describedby`, and `aria-invalid` from context.
 - **`Input` namespace** — `Root`, `Wrapper`, `Field`, `Icon`, `Affix`, `InlineAffix`. **`useInputContext`** is exported for custom inner pieces that must align with the same size and ids.
 
-### Minimal example
-
-```tsx
-import { Input } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <Input.Root>
-      <Input.Wrapper>
-        <Input.Field />
-      </Input.Wrapper>
-    </Input.Root>
-  );
-}
-```
-
-## Rules
+### Rules
 
 - Use **`Input.Root`** `size` for control sizing; **`Input.Field`** omits the HTML `size` attribute (it is stripped from props) — do not rely on passing `size` to the native input.
 - Passing **`error`** on Root sets **`hasError`** internally for visuals and `aria-invalid`; you may set **`hasError`** alone for validation without message text.
@@ -50,10 +58,11 @@ export function Example() {
 - **`Input.Icon`**, **`Input.Affix`**, and **`Input.InlineAffix`** are **`aria-hidden`**; do not rely on them for the accessible name. You may append ids to **`aria-describedby`** on **`Input.Field`**; values merge with hint/error ids from context.
 - Set **`id`** on Root when you need a stable input id (e.g. tests or external `htmlFor`). Otherwise an id is generated in **`useFieldIds`**.
 - There is no separate **`variant`** prop: visual error state comes from **`error`** / **`hasError`**. Behavioral differences use native attributes on **`Input.Field`** (`type`, `autoComplete`, `inputMode`, `pattern`, `maxLength`, `disabled`, `readOnly`, **`required`**, etc.).
+- **Full width:** root already uses **`width: 100%`** and **`min-width: 0`**. To fill a card or form column, place **`Input.Root`** inside a parent that spans the desired width (see **`examples/checkout-full-width.tsx`**).
 
-## API
+### API
 
-### Input.Root
+#### Input.Root
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -67,14 +76,14 @@ export function Example() {
 | children | `React.ReactNode` | — | yes | Field body (typically `Input.Wrapper` with content). |
 | className | `string` | — | no | Class on the root element. |
 
-### Input.Wrapper
+#### Input.Wrapper
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | children | `React.ReactNode` | — | yes | Content inside the field border. |
 | className | `string` | — | no | Extra class; `data-size` and `data-has-error` come from context. |
 
-### Input.Field
+#### Input.Field
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -82,7 +91,7 @@ export function Example() {
 | aria-describedby | `string` | — | no | Appended to the id list from context (hint/error). |
 | …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">` | — | no | Standard `input` attributes except `size` (reserved for the design system). |
 
-### Input.Icon
+#### Input.Icon
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -90,7 +99,7 @@ export function Example() {
 | children | `React.ReactNode` | — | yes | Usually an icon component from the kit. |
 | className | `string` | — | no | Class on the wrapping `span`. |
 
-### Input.Affix
+#### Input.Affix
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -98,7 +107,7 @@ export function Example() {
 | children | `React.ReactNode` | — | yes | Static text segment (e.g. URL prefix). |
 | className | `string` | — | no | Class on the container. |
 
-### Input.InlineAffix
+#### Input.InlineAffix
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
@@ -106,14 +115,25 @@ export function Example() {
 | children | `React.ReactNode` | — | yes | Short text (e.g. currency symbol). |
 | className | `string` | — | no | Class on the `span`. |
 
-### useInputContext()
+#### useInputContext()
 
 Returns `{ size, hasError, inputId, describedBy }` for building custom subcomponents that stay consistent with **`Input.Field`**.
 
-## Related
+### Related
 
 - [Label](../label/COMPONENT.md)
 - [Hint](../hint/COMPONENT.md)
 - [Textarea](../textarea/COMPONENT.md)
 - [Button](../button/COMPONENT.md)
 - [DigitInput](../digit-input/COMPONENT.md)
+
+## LLM note
+
+- **Обязательная иерархия:** `Input.Root` → `Input.Wrapper` → `Input.Field`. Не подменять разметку кастомными обёртками ради внешнего вида — только публичный API и слоты.
+- **`size`:** только `Input.Root`. Не прокидывать `size` в `Input.Field` (тип его исключает).
+- **Ошибка:** `error` на Root задаёт текст и включает invalid-стили; `hasError` без `error` — только состояние без текста.
+- **Доступность:** имя поля — `label` на Root или `aria-label` / `aria-labelledby` на `Input.Field`. Иконки и аффиксы не озвучиваются (`aria-hidden`).
+- **Контроль:** состояние строки — на `Input.Field` (`value`, `onChange`, `defaultValue`).
+- **Ширина:** отдельного пропа `fullWidth` нет; корень растягивается по ширине родителя — задавай ширину контейнеру формы/карточки.
+- **Сценарии из репозитория:** `examples/login-email.tsx`, `examples/search.tsx`, `examples/password-with-hint.tsx`, `examples/checkout-full-width.tsx`; в playground — `playground/snippets/input/*`.
+- **Playground:** размеры, состояния, композиция, full-width — `playground/snippets/input/sizes.tsx`, `states.tsx`, `composition.tsx`, `full-width.tsx`, `features.tsx`, `controlled.tsx`.
