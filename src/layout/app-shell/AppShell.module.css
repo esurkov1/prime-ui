@@ -1,6 +1,6 @@
 /*
  * Каркас приложения: Grid nav | main.
- * `AppShell.Template` → `data-layout-template="app"`: на ≥lg — padding вьюпорта и column-gap при открытом Sidebar (`sidebarSlot="page-nav"`).
+ * `AppShell.Template` → `data-layout-template="app"`: на ≥lg — `column-gap` между nav и main при открытом Sidebar (`sidebarSlot="page-nav"`). Поля вьюпорта не задаём на корне — иначе область прокрутки `main` визуально «обрезается» до края экрана; отступы страницы — в `AppShell.Main` (`variant="page"` / `surface`).
  * Брейкпоинт 64.001rem согласован с `layout/sidebar/sidebarLayout.ts`.
  */
 .layoutRoot {
@@ -19,8 +19,6 @@
 
 @media (min-width: 64.001rem) {
   .layoutRoot[data-layout-template="app"] {
-    padding-inline: var(--prime-sys-spacing-x2);
-    padding-block: var(--prime-sys-spacing-x2);
     column-gap: 0;
   }
 
