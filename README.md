@@ -183,7 +183,7 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Forms & input | **Label** | Field caption: icon, required asterisk, secondary text. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) |
 | Forms & input | **Radio** | Radio group with label, hint, and error wiring. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/radio/COMPONENT.md) |
 | Forms & input | **SegmentedControl** | Horizontal `radiogroup` with segments and a sliding indicator. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-control/COMPONENT.md) |
-| Forms & input | **Select** | Single-select combobox with a portaled listbox. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) |
+| Forms & input | **Select** | Single-select: custom combobox (default) or native `<select>` via **`native`**. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) |
 | Forms & input | **Slider** | Horizontal `input type="range"` with kit sizing. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/slider/COMPONENT.md) |
 | Forms & input | **Switch** | On/off control with label and metadata slots. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/switch/COMPONENT.md) |
 | Forms & input | **Textarea** | Multiline field, character counter, hints and errors. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) |
@@ -211,6 +211,7 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Display & content | **Divider** | Horizontal or vertical rule with optional inset label. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) |
 | Display & content | **ProgressBar** | Horizontal progress on the native `<progress>` element. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) |
 | Display & content | **ProgressCircle** | Circular progress ring (SVG + `progressbar`). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) |
+| Display & content | **SegmentedProgressBar** | Multi-segment horizontal bar: shares of a total with semantic tones. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-progress-bar/COMPONENT.md) |
 | Display & content | **Tag** | Chip with optional icon, trailing dismiss when `onRemove` is set. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag/COMPONENT.md) |
 | Display & content | **Typography** | Reading text via semantic **`variant`** (roles), weight, tracking, muted tone. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md) |
 | Actions & feedback | **Button** | Action control: `asChild`, icon, loading spinner. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/button/COMPONENT.md) |

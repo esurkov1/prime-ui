@@ -1,0 +1,87 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--segmented-progress-root-gap);
+  width: 100%;
+}
+
+.root[data-size="s"] {
+  --segmented-progress-root-gap: var(--prime-sys-size-control-s-gap);
+  --segmented-progress-track-h: var(--prime-sys-spacing-xs);
+  --segmented-progress-caption-size: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="m"] {
+  --segmented-progress-root-gap: var(--prime-sys-size-control-m-gap);
+  --segmented-progress-track-h: var(--prime-sys-spacing-xs);
+  --segmented-progress-caption-size: var(--prime-sys-size-control-m-text);
+}
+
+.root[data-size="l"] {
+  --segmented-progress-root-gap: var(--prime-sys-size-control-l-gap);
+  --segmented-progress-track-h: var(--prime-sys-spacing-s);
+  --segmented-progress-caption-size: var(--prime-sys-size-control-l-text);
+}
+
+.root[data-size="xl"] {
+  --segmented-progress-root-gap: var(--prime-sys-size-control-xl-gap);
+  --segmented-progress-track-h: var(--prime-sys-spacing-s);
+  --segmented-progress-caption-size: var(--prime-sys-size-control-xl-text);
+}
+
+.caption {
+  font-size: var(--segmented-progress-caption-size);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.track {
+  display: flex;
+  width: 100%;
+  min-height: var(--segmented-progress-track-h);
+  border-radius: var(--prime-sys-shape-radius-round);
+  overflow: hidden;
+  gap: var(--prime-sys-unit-1px);
+  background: var(--prime-sys-color-surface-accentSoft);
+}
+
+.empty {
+  flex: 1 1 auto;
+  min-height: var(--segmented-progress-track-h);
+  background: var(--prime-sys-color-surface-accentSoft);
+}
+
+.segment {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: var(--segmented-progress-track-h);
+  transition: flex-grow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.segment[data-tone="primary"] {
+  background: var(--prime-sys-color-action-primaryBackground);
+}
+
+.segment[data-tone="success"] {
+  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+}
+
+.segment[data-tone="warning"] {
+  background: var(--prime-sys-color-status-warning-backgroundEmphasis);
+}
+
+.segment[data-tone="danger"] {
+  background: var(--prime-sys-color-status-error-backgroundEmphasis);
+}
+
+.segment[data-tone="neutral"] {
+  background: var(--prime-sys-color-surface-raised);
+  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
+}
+
+.segment[data-tone="pending"] {
+  background: var(--prime-sys-color-status-away-backgroundEmphasis);
+}
+
+.segment[data-tone="info"] {
+  background: var(--prime-sys-color-status-information-backgroundEmphasis);
+}

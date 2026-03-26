@@ -40,6 +40,7 @@ import {
   PanelLeft,
   PanelRight,
   PanelTop,
+  PieChart,
   Pipette,
   Plug,
   Ruler,
@@ -141,6 +142,8 @@ function pageIcon(segment: string): React.ReactNode {
       return <StretchHorizontal {...navIconProps} />;
     case "progress-circle":
       return <CircleGauge {...navIconProps} />;
+    case "segmented-progress-bar":
+      return <PieChart {...navIconProps} />;
     case "accordion":
       return <ChevronsDownUp {...navIconProps} />;
     case "app-shell":

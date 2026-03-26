@@ -36,6 +36,7 @@ import PaginationSection from "./sections/PaginationSection";
 import PopoverSection from "./sections/PopoverSection";
 import ProgressBarSection from "./sections/ProgressBarSection";
 import ProgressCircleSection from "./sections/ProgressCircleSection";
+import SegmentedProgressBarSection from "./sections/SegmentedProgressBarSection";
 import RadioSection from "./sections/RadioSection";
 import ScrollContainerSection from "./sections/ScrollContainerSection";
 import SegmentedControlSection from "./sections/SegmentedControlSection";
@@ -131,6 +132,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     { segment: "notification", label: "Notification", Page: NotificationSection },
     { segment: "progress-bar", label: "Progress Bar", Page: ProgressBarSection },
     { segment: "progress-circle", label: "Progress Circle", Page: ProgressCircleSection },
+    { segment: "segmented-progress-bar", label: "Segmented Progress Bar", Page: SegmentedProgressBarSection },
   ],
   layout: [
     { segment: "accordion", label: "Accordion", Page: AccordionSection },
