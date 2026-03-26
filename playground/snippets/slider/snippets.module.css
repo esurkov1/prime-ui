@@ -1,0 +1,17 @@
+/* Раскладка превью slider — токены вместо inline style в сниппетах */
+
+.controlledColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+  max-width: 20rem;
+  box-sizing: border-box;
+}
+
+.valueHint {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-xs);
+  line-height: var(--prime-sys-typography-lineHeightScale-xs);
+  color: var(--prime-sys-color-content-secondary);
+}

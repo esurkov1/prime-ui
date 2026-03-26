@@ -40,12 +40,12 @@ import { Slider } from "prime-ui-kit";
 
 export function AlertThresholdDensityPreview() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 360 }}>
+    <>
       <Slider.Root size="s" label="Threshold (s)" defaultValue={70} />
       <Slider.Root size="m" label="Threshold (m)" defaultValue={70} />
       <Slider.Root size="l" label="Threshold (l)" defaultValue={70} />
       <Slider.Root size="xl" label="Threshold (xl)" defaultValue={70} />
-    </div>
+    </>
   );
 }
 ```
@@ -59,8 +59,8 @@ import { Slider } from "prime-ui-kit";
 
 export function VenueClimateCard({ canEdit }: { canEdit: boolean }) {
   return (
-    <section style={{ padding: 20, maxWidth: 400, borderRadius: 12, border: "1px solid #e4e4e7" }}>
-      <h2 style={{ margin: "0 0 12px", fontSize: 16 }}>Room climate</h2>
+    <section>
+      <h2>Room climate</h2>
       <Slider.Root label="Target temperature, °C" min={18} max={26} step={1} defaultValue={22} disabled={!canEdit} />
     </section>
   );
@@ -79,10 +79,10 @@ export function ReorderLevelControl() {
   const [pct, setPct] = React.useState(55);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 320 }}>
+    <>
       <Slider.Root label="Target stock level" value={pct} onChange={setPct} min={0} max={100} step={1} />
-      <span style={{ fontSize: 13, opacity: 0.75 }}>Current: {pct}% of shelf maximum</span>
-    </div>
+      <span>Current: {pct}% of shelf maximum</span>
+    </>
   );
 }
 ```
