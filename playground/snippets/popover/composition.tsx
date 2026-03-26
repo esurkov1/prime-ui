@@ -21,11 +21,11 @@ export default function PopoverCompositionSnippet() {
         <Popover.Inset>
           <div className={preview.compositionHeader}>
             <Filter aria-hidden className={preview.headerIcon} strokeWidth={1.75} />
-            <Typography.Root as="span" size="s" weight="semibold">
+            <Typography.Root as="span" variant="body-small" weight="semibold">
               Быстрый отбор
             </Typography.Root>
           </div>
-          <Typography.Root as="p" className={preview.panelTextMuted} size="s">
+          <Typography.Root as="p" className={preview.panelTextMuted} variant="body-small">
             Иконка на триггере, заголовок и текст внутри <code>Popover.Inset</code> с колонкой и
             зазорами.
           </Typography.Root>

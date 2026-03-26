@@ -5,7 +5,7 @@ export default function SegmentedStatesSnippet() {
   return (
     <>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Обычный выбор
         </Typography.Root>
         <SegmentedControl.Root defaultValue="day" size="m">
@@ -15,7 +15,7 @@ export default function SegmentedStatesSnippet() {
         </SegmentedControl.Root>
       </div>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Один сегмент disabled
         </Typography.Root>
         <SegmentedControl.Root defaultValue="active" size="m">
@@ -27,7 +27,7 @@ export default function SegmentedStatesSnippet() {
         </SegmentedControl.Root>
       </div>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Весь контроль disabled
         </Typography.Root>
         <SegmentedControl.Root defaultValue="day" disabled size="m">

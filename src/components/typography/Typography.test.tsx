@@ -4,17 +4,17 @@ import { describe, expect, it } from "vitest";
 import { Typography } from "./Typography";
 
 describe("Typography", () => {
-  it("renders paragraph with size data attribute", () => {
-    render(<Typography.Root size="5xl">Fox</Typography.Root>);
+  it("renders paragraph with variant data attribute", () => {
+    render(<Typography.Root variant="headline">Fox</Typography.Root>);
 
     const el = screen.getByText("Fox");
     expect(el.tagName).toBe("P");
-    expect(el).toHaveAttribute("data-size", "5xl");
+    expect(el).toHaveAttribute("data-variant", "headline");
   });
 
   it("sets weight and tracking when not default", () => {
     render(
-      <Typography.Root size="s" weight="semibold" tracking="tight">
+      <Typography.Root variant="body-small" weight="semibold" tracking="tight">
         Text
       </Typography.Root>,
     );
@@ -25,7 +25,7 @@ describe("Typography", () => {
   });
 
   it("omits data-weight and data-tracking for defaults", () => {
-    render(<Typography.Root size="m">Body</Typography.Root>);
+    render(<Typography.Root variant="body-default">Body</Typography.Root>);
 
     const el = screen.getByText("Body");
     expect(el).not.toHaveAttribute("data-weight");
@@ -34,7 +34,7 @@ describe("Typography", () => {
 
   it("sets data-italic when italic", () => {
     render(
-      <Typography.Root size="s" weight="medium" italic>
+      <Typography.Root variant="body-small" weight="medium" italic>
         Slant
       </Typography.Root>,
     );
@@ -44,7 +44,7 @@ describe("Typography", () => {
 
   it("renders as span and sets muted tone", () => {
     render(
-      <Typography.Root as="span" size="xs" tone="muted">
+      <Typography.Root as="span" variant="body-compact" tone="muted">
         Label
       </Typography.Root>,
     );

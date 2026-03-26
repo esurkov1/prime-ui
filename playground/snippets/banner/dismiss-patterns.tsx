@@ -25,7 +25,7 @@ export default function BannerDismissPatternsSnippet() {
           </Banner.Content>
         </Banner.Root>
       ) : (
-        <Typography.Root size="s" tone="muted">
+        <Typography.Root variant="body-small" tone="muted">
           Автоматическая кнопка закрытия скрыла баннер.
         </Typography.Root>
       )}
@@ -43,7 +43,7 @@ export default function BannerDismissPatternsSnippet() {
           />
         </Banner.Root>
       ) : (
-        <Typography.Root size="s" tone="muted">
+        <Typography.Root variant="body-small" tone="muted">
           Закрыто вручную через Banner.CloseButton.
         </Typography.Root>
       )}
@@ -61,7 +61,7 @@ export default function BannerDismissPatternsSnippet() {
           />
         </Banner.Root>
       ) : (
-        <Typography.Root size="s" tone="muted">
+        <Typography.Root variant="body-small" tone="muted">
           Закрыто по клику на единственную кнопку: автоматическая не подставлялась, так как
           CloseButton уже в дереве.
         </Typography.Root>

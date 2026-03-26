@@ -6,7 +6,7 @@ export default function TypographyStatesSnippet() {
   return (
     <div className="examplePreviewBleed typographyScaleList">
       <div className="typographyScaleRow">
-        <Typography.Root size="m" weight="medium">
+        <Typography.Root variant="body-default" weight="medium">
           Заголовок карточки без курсива — обычный акцент.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -14,7 +14,7 @@ export default function TypographyStatesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="m" weight="medium" italic>
+        <Typography.Root variant="body-default" weight="medium" italic>
           Тот же размер и вес с курсивом — цитата или название научной работы.
         </Typography.Root>
         <Divider.Root variant="text" align="start">

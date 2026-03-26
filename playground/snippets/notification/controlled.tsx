@@ -36,7 +36,7 @@ export default function NotificationControlledSnippet() {
           Добавить в очередь
         </Button.Root>
       </div>
-      <Typography.Root size="s" tone="muted">
+      <Typography.Root variant="body-small" tone="muted">
         Активных записей в сторе: {items.length}
       </Typography.Root>
       {items.length > 0 ? (

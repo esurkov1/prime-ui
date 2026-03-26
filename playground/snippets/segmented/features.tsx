@@ -5,7 +5,7 @@ export default function SegmentedFeaturesSnippet() {
   return (
     <>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Два сегмента
         </Typography.Root>
         <SegmentedControl.Root defaultValue="all" size="m">
@@ -14,7 +14,7 @@ export default function SegmentedFeaturesSnippet() {
         </SegmentedControl.Root>
       </div>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Три сегмента
         </Typography.Root>
         <SegmentedControl.Root defaultValue="day" size="m">
@@ -24,7 +24,7 @@ export default function SegmentedFeaturesSnippet() {
         </SegmentedControl.Root>
       </div>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Четыре сегмента
         </Typography.Root>
         <SegmentedControl.Root defaultValue="q1" size="m">

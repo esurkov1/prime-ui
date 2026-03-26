@@ -17,7 +17,7 @@ export default function TooltipCompositionSnippet() {
             </LinkButton.Root>
           </Tooltip.Trigger>
           <Tooltip.Content size="m">
-            <Typography.Root size="s" as="p" className={styles.tooltipContentP}>
+            <Typography.Root variant="body-small" as="p" className={styles.tooltipContentP}>
               Скидка действует до конца месяца при заказе от 3000 ₽.
             </Typography.Root>
           </Tooltip.Content>

@@ -18,10 +18,10 @@ export default function CodeBlockCompositionSnippet() {
   const { scheme } = usePlaygroundTheme();
   return (
     <div className={styles.docCard}>
-      <Typography.Root size="s" weight="semibold" as="div">
+      <Typography.Root variant="body-small" weight="semibold" as="div">
         Тело ответа: GET /orders/:id
       </Typography.Root>
-      <Typography.Root size="xs" tone="muted" as="p">
+      <Typography.Root variant="body-compact" tone="muted" as="p">
         Пример успешного ответа для интеграции склада.
       </Typography.Root>
       <div className={styles.codeDemoNested}>

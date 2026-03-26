@@ -21,7 +21,7 @@ export default function DropdownControlledSnippet() {
           <Dropdown.Item onSelect={() => setOpen(false)}>Шаг 3</Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
-      <Typography.Root as="span" size="s" tone="muted">
+      <Typography.Root as="span" variant="body-small" tone="muted">
         Меню {open ? "открыто" : "закрыто"}
       </Typography.Root>
     </div>

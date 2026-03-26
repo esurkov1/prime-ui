@@ -50,7 +50,7 @@ export default function ModalCompositionSnippet() {
           icon={<Icon name="nav.itemDot" />}
           title="Только информация"
         >
-          <Typography.Root as="p" size="m">
+          <Typography.Root as="p" variant="body-default">
             Контент отделён от шапки и не прилипает к заголовку.
           </Typography.Root>
         </Modal.Panel>

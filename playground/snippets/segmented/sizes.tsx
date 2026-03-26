@@ -5,7 +5,7 @@ export default function SegmentedSizesSnippet() {
   return (
     <>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           SegmentedControl s
         </Typography.Root>
         <SegmentedControl.Root defaultValue="day" size="s">
@@ -15,7 +15,7 @@ export default function SegmentedSizesSnippet() {
         </SegmentedControl.Root>
       </div>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           SegmentedControl m
         </Typography.Root>
         <SegmentedControl.Root defaultValue="day" size="m">
@@ -25,7 +25,7 @@ export default function SegmentedSizesSnippet() {
         </SegmentedControl.Root>
       </div>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           SegmentedControl l
         </Typography.Root>
         <SegmentedControl.Root defaultValue="day" size="l">
@@ -35,7 +35,7 @@ export default function SegmentedSizesSnippet() {
         </SegmentedControl.Root>
       </div>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           SegmentedControl xl
         </Typography.Root>
         <SegmentedControl.Root defaultValue="day" size="xl">

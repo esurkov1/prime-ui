@@ -7,7 +7,7 @@ export default function SegmentedCompositionSnippet() {
   return (
     <>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Иконка и текст
         </Typography.Root>
         <SegmentedControl.Root defaultValue="light" size="m">
@@ -26,7 +26,7 @@ export default function SegmentedCompositionSnippet() {
         </SegmentedControl.Root>
       </div>
       <div className="row rowAlignCenter rowGapMedium">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Только иконки + скрытый текст для доступного имени
         </Typography.Root>
         <SegmentedControl.Root defaultValue="grid" size="m">

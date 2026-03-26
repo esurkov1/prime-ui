@@ -367,9 +367,9 @@ export * from "./tooltip/Tooltip";
 export type {
   TypographyAs,
   TypographyRootProps,
-  TypographySize,
   TypographyTone,
   TypographyTracking,
+  TypographyVariant,
   TypographyWeight,
 } from "./typography/Typography";
 export { Typography } from "./typography/Typography";

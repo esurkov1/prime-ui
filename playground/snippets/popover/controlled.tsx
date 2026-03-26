@@ -11,7 +11,7 @@ export default function PopoverControlledSnippet() {
 
   return (
     <div className={preview.controlledRow}>
-      <Typography.Root as="p" className={preview.stateLine} size="s" weight="medium">
+      <Typography.Root as="p" className={preview.stateLine} variant="body-small" weight="medium">
         Панель {open ? "открыта" : "закрыта"}
       </Typography.Root>
       <div className={preview.sizesRow}>

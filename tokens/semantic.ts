@@ -209,6 +209,60 @@ export const semanticTokens = {
       wide: "{font.letterSpacing.wide}",
       wider: "{font.letterSpacing.wider}",
     },
+    /**
+     * Семантические роли чтения (Typography `variant`): каждая ссылается на пару
+     * `sizeScale` / `lineHeightScale` — единственный источник правды для маппинга variant→кегль.
+     */
+    role: {
+      display: {
+        fontSize: "{typography.sizeScale.6xl}",
+        lineHeight: "{typography.lineHeightScale.6xl}",
+      },
+      headline: {
+        fontSize: "{typography.sizeScale.5xl}",
+        lineHeight: "{typography.lineHeightScale.5xl}",
+      },
+      headingPage: {
+        fontSize: "{typography.sizeScale.4xl}",
+        lineHeight: "{typography.lineHeightScale.4xl}",
+      },
+      headingSection: {
+        fontSize: "{typography.sizeScale.3xl}",
+        lineHeight: "{typography.lineHeightScale.3xl}",
+      },
+      headingSubsection: {
+        fontSize: "{typography.sizeScale.2xl}",
+        lineHeight: "{typography.lineHeightScale.2xl}",
+      },
+      headingGroup: {
+        fontSize: "{typography.sizeScale.xl}",
+        lineHeight: "{typography.lineHeightScale.xl}",
+      },
+      bodyLarge: {
+        fontSize: "{typography.sizeScale.l}",
+        lineHeight: "{typography.lineHeightScale.l}",
+      },
+      bodyDefault: {
+        fontSize: "{typography.sizeScale.m}",
+        lineHeight: "{typography.lineHeightScale.m}",
+      },
+      bodySmall: {
+        fontSize: "{typography.sizeScale.s}",
+        lineHeight: "{typography.lineHeightScale.s}",
+      },
+      bodyCompact: {
+        fontSize: "{typography.sizeScale.xs}",
+        lineHeight: "{typography.lineHeightScale.xs}",
+      },
+      caption: {
+        fontSize: "{typography.sizeScale.2xs}",
+        lineHeight: "{typography.lineHeightScale.2xs}",
+      },
+      captionMicro: {
+        fontSize: "{typography.sizeScale.3xs}",
+        lineHeight: "{typography.lineHeightScale.3xs}",
+      },
+    },
   },
   shape: {
     radius: {

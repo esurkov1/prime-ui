@@ -111,9 +111,9 @@ export function DatepickerMinimal() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | from context | No | Picker scale; mapped internally to [Typography](../typography/COMPONENT.md) `size`. |
-| tone | `Typography` tone | `muted` | No | Passed to `Typography.Root`. |
-| as, weight, tracking, italic, children, className, … | `Omit<TypographyRootProps, "size">` | — | No | Same as `Typography.Root` except `size` is the picker scale above. |
+| size | `"s" \| "m" \| "l" \| "xl"` | from context | No | Масштаб пикера; внутри маппится на [Typography](../typography/COMPONENT.md) `variant`. |
+| tone | `Typography` tone | `muted` | No | Передаётся в `Typography.Root`. |
+| as, weight, tracking, italic, children, className, … | `Omit<TypographyRootProps, "variant">` | — | No | Как у `Typography.Root`, но кегль задаётся через `size` пикера (см. выше). |
 
 ### Utilities
 

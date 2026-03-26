@@ -11,7 +11,7 @@ export default function ProgressCircleControlledSnippet() {
   return (
     <div className="previewStackColumnCenter">
       <ProgressCircle.Root value={value} max={100} size="l">
-        <Typography.Root as="span" size="s" weight="medium">
+        <Typography.Root as="span" variant="body-small" weight="medium">
           {value}%
         </Typography.Root>
       </ProgressCircle.Root>

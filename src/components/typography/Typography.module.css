@@ -35,57 +35,62 @@
   letter-spacing: var(--prime-sys-typography-tracking-wide);
 }
 
-.root[data-size="2xs"] {
-  font-size: var(--prime-sys-typography-sizeScale-2xs);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+.root[data-variant="display"] {
+  font-size: var(--prime-sys-typography-role-display-fontSize);
+  line-height: var(--prime-sys-typography-role-display-lineHeight);
 }
 
-.root[data-size="xs"] {
-  font-size: var(--prime-sys-typography-sizeScale-xs);
-  line-height: var(--prime-sys-typography-lineHeightScale-xs);
+.root[data-variant="headline"] {
+  font-size: var(--prime-sys-typography-role-headline-fontSize);
+  line-height: var(--prime-sys-typography-role-headline-lineHeight);
 }
 
-.root[data-size="s"] {
-  font-size: var(--prime-sys-typography-sizeScale-s);
-  line-height: var(--prime-sys-typography-lineHeightScale-s);
+.root[data-variant="heading-page"] {
+  font-size: var(--prime-sys-typography-role-headingPage-fontSize);
+  line-height: var(--prime-sys-typography-role-headingPage-lineHeight);
 }
 
-.root[data-size="m"] {
-  font-size: var(--prime-sys-typography-sizeScale-m);
-  line-height: var(--prime-sys-typography-lineHeightScale-m);
+.root[data-variant="heading-section"] {
+  font-size: var(--prime-sys-typography-role-headingSection-fontSize);
+  line-height: var(--prime-sys-typography-role-headingSection-lineHeight);
 }
 
-.root[data-size="l"] {
-  font-size: var(--prime-sys-typography-sizeScale-l);
-  line-height: var(--prime-sys-typography-lineHeightScale-l);
+.root[data-variant="heading-subsection"] {
+  font-size: var(--prime-sys-typography-role-headingSubsection-fontSize);
+  line-height: var(--prime-sys-typography-role-headingSubsection-lineHeight);
 }
 
-.root[data-size="xl"] {
-  font-size: var(--prime-sys-typography-sizeScale-xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-xl);
+.root[data-variant="heading-group"] {
+  font-size: var(--prime-sys-typography-role-headingGroup-fontSize);
+  line-height: var(--prime-sys-typography-role-headingGroup-lineHeight);
 }
 
-.root[data-size="2xl"] {
-  font-size: var(--prime-sys-typography-sizeScale-2xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xl);
+.root[data-variant="body-large"] {
+  font-size: var(--prime-sys-typography-role-bodyLarge-fontSize);
+  line-height: var(--prime-sys-typography-role-bodyLarge-lineHeight);
 }
 
-.root[data-size="3xl"] {
-  font-size: var(--prime-sys-typography-sizeScale-3xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-3xl);
+.root[data-variant="body-default"] {
+  font-size: var(--prime-sys-typography-role-bodyDefault-fontSize);
+  line-height: var(--prime-sys-typography-role-bodyDefault-lineHeight);
 }
 
-.root[data-size="4xl"] {
-  font-size: var(--prime-sys-typography-sizeScale-4xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-4xl);
+.root[data-variant="body-small"] {
+  font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
+  line-height: var(--prime-sys-typography-role-bodySmall-lineHeight);
 }
 
-.root[data-size="5xl"] {
-  font-size: var(--prime-sys-typography-sizeScale-5xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-5xl);
+.root[data-variant="body-compact"] {
+  font-size: var(--prime-sys-typography-role-bodyCompact-fontSize);
+  line-height: var(--prime-sys-typography-role-bodyCompact-lineHeight);
 }
 
-.root[data-size="6xl"] {
-  font-size: var(--prime-sys-typography-sizeScale-6xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-6xl);
+.root[data-variant="caption"] {
+  font-size: var(--prime-sys-typography-role-caption-fontSize);
+  line-height: var(--prime-sys-typography-role-caption-lineHeight);
+}
+
+.root[data-variant="caption-micro"] {
+  font-size: var(--prime-sys-typography-role-captionMicro-fontSize);
+  line-height: var(--prime-sys-typography-role-captionMicro-lineHeight);
 }

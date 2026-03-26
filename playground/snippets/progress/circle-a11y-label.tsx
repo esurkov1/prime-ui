@@ -16,7 +16,7 @@ export default function ProgressCircleA11yLabelSnippet() {
       />
       <div className="row rowAlignCenter rowGapTight">
         <ProgressCircle.Root value={4} max={12} size="s" label="Месяц 4 из 12 в подписке" />
-        <Typography.Root as="span" size="s">
+        <Typography.Root as="span" variant="body-small">
           Подписка · месяц 4 из 12
         </Typography.Root>
       </div>

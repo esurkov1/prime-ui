@@ -20,7 +20,12 @@ function FormatPopover({
 
   return (
     <div className={preview.formatColumn}>
-      <Typography.Root as="p" className={preview.formatColumnTitle} size="s" weight="medium">
+      <Typography.Root
+        as="p"
+        className={preview.formatColumnTitle}
+        variant="body-small"
+        weight="medium"
+      >
         {title}
       </Typography.Root>
       <ColorPicker.Root defaultValue="hsl(200, 75%, 52%)">

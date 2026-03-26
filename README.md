@@ -19,6 +19,8 @@ A **React 19** component library built with **CSS Modules**, **design tokens** a
 - [Installation](#installation)
 - [Styles and theming](#styles-and-theming)
 - [Quick start](#quick-start)
+- [Migration (Typography)](#migration-typography)
+- [Typography: reading vs control](#typography-reading-vs-control)
 - [Imports: main entry and heavy modules](#imports-main-entry-and-heavy-modules)
 - [Providers and context](#providers-and-context)
 - [Component catalog](#component-catalog)
@@ -40,7 +42,8 @@ styling: CSS Modules + CSS variables (--prime-sys-*)
 a11y_stack: react-aria-components (peer)
 documentation_per_component: src/components/<name>/COMPONENT.md
 repository: https://github.com/esurkov1/prime-ui
-default_control_size: m  # for the size axis unless specified otherwise
+default_control_size: m  # for the control size axis unless specified otherwise
+typography_axis: variant  # reading roles; not the same as control size
 ```
 
 ---
@@ -138,6 +141,39 @@ export function Example() {
 
 ---
 
+## Migration (Typography)
+
+**Breaking change (v0.3+):** `Typography.Root` no longer accepts **`size`** (`2xs`…`6xl`). Use **`variant`** (semantic reading roles). Mapping:
+
+| Old `size` | New `variant` |
+|------------|----------------|
+| `6xl` | `display` |
+| `5xl` | `headline` |
+| `4xl` | `heading-page` |
+| `3xl` | `heading-section` |
+| `2xl` | `heading-subsection` |
+| `xl` | `heading-group` |
+| `l` | `body-large` |
+| `m` | `body-default` |
+| `s` | `body-small` |
+| `xs` | `body-compact` |
+| `2xs` | `caption` |
+
+Full detail: [Typography COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md).
+
+---
+
+## Typography: reading vs control
+
+| Axis | Prop | Token family | Use for |
+|------|------|----------------|---------|
+| **Reading** | `Typography` **`variant`** | `--prime-sys-typography-role-*` (via `typography.role` in tokens) | Page copy, headings, captions |
+| **Control** | **`size`** `s`–`xl` on inputs, buttons, etc. | `--prime-sys-size-control-*` per tier (text, height, gap, …) | Interactive controls |
+
+Primitive steps (`sizeScale` / `lineHeightScale`) remain internal; public reading API is **`variant`** only.
+
+---
+
 ## Imports: main entry and heavy modules
 
 - **`prime-ui-kit`** — main entry; use for most apps.
@@ -204,7 +240,7 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Display & content | **ProgressBar** | Horizontal progress on the native `<progress>` element. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) |
 | Display & content | **ProgressCircle** | Circular progress ring (SVG + `progressbar`). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) |
 | Display & content | **Tag** | Chip with optional icon, trailing dismiss when `onRemove` is set. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag/COMPONENT.md) |
-| Display & content | **Typography** | Text primitive with size scale, weight, tracking, muted tone. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md) |
+| Display & content | **Typography** | Reading text via semantic **`variant`** (roles), weight, tracking, muted tone. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md) |
 | Actions & feedback | **Button** | Action control: `asChild`, icon, loading spinner. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/button/COMPONENT.md) |
 | Actions & feedback | **ButtonGroup** | Button row sharing one outline and internal dividers. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/button-group/COMPONENT.md) |
 | Actions & feedback | **LinkButton** | Text-style link with control padding and underline on hover/focus. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/link-button/COMPONENT.md) |

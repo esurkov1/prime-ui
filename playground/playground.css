@@ -725,6 +725,37 @@ h3 {
   min-width: 0;
 }
 
+.typographyArticleDemo {
+  display: grid;
+  gap: var(--prime-sys-spacing-x4);
+  max-width: 40rem;
+  text-align: start;
+}
+
+.typographyArticleDemo blockquote {
+  margin: 0;
+  padding-inline-start: var(--prime-sys-spacing-x3);
+  border-inline-start: 3px solid var(--prime-sys-color-border-subtle);
+}
+
+.typographyGoldenDemo {
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+  max-width: 22rem;
+  text-align: start;
+}
+
+.typographyGoldenDemoForm {
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.typographyGoldenDemoActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x2);
+}
+
 /* Divider — COMPONENT.md: тулбар с вертикальными разделителями (глобально в playground) */
 .dividerDocToolbar {
   display: flex;

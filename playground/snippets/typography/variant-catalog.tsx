@@ -1,12 +1,12 @@
 import { Divider } from "@/components/divider/Divider";
 import { Typography } from "@/components/typography/Typography";
 
-/** Все шаги `size`: от `6xl` до `2xs`. Подписи у разделителей — подсказка по применению, не замена семантических заголовков страницы. */
-export default function TypographySizesSnippet() {
+/** Каталог `variant`: роли чтения от `display` до `caption` (маппинг в `tokens/semantic.ts` → `typography.role`). */
+export default function TypographyVariantCatalogSnippet() {
   return (
     <div className="examplePreviewBleed typographyScaleList">
       <div className="typographyScaleRow">
-        <Typography.Root size="6xl" weight="medium" tracking="tight">
+        <Typography.Root variant="display" weight="medium" tracking="tight">
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -14,7 +14,7 @@ export default function TypographySizesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="5xl" weight="medium" tracking="tight">
+        <Typography.Root variant="headline" weight="medium" tracking="tight">
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -22,7 +22,7 @@ export default function TypographySizesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="4xl" weight="medium" tracking="tight">
+        <Typography.Root variant="heading-page" weight="medium" tracking="tight">
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -30,7 +30,7 @@ export default function TypographySizesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="3xl" weight="medium" tracking="tight">
+        <Typography.Root variant="heading-section" weight="medium" tracking="tight">
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -38,7 +38,7 @@ export default function TypographySizesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="2xl" weight="medium">
+        <Typography.Root variant="heading-subsection" weight="medium">
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -46,7 +46,7 @@ export default function TypographySizesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="xl" weight="medium">
+        <Typography.Root variant="heading-group" weight="medium">
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -54,7 +54,7 @@ export default function TypographySizesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="l" weight="medium" tracking="tight">
+        <Typography.Root variant="body-large" weight="medium" tracking="tight">
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -62,19 +62,23 @@ export default function TypographySizesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="m">The quick brown fox jumps over the lazy dog.</Typography.Root>
+        <Typography.Root variant="body-default">
+          The quick brown fox jumps over the lazy dog.
+        </Typography.Root>
         <Divider.Root variant="text" align="start">
           m · regular — основной абзац
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="s">The quick brown fox jumps over the lazy dog.</Typography.Root>
+        <Typography.Root variant="body-small">
+          The quick brown fox jumps over the lazy dog.
+        </Typography.Root>
         <Divider.Root variant="text" align="start">
           s · regular — второстепенный текст
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="xs" weight="medium" tracking="wide">
+        <Typography.Root variant="body-compact" weight="medium" tracking="wide">
           The quick brown fox jumps over the lazy dog.
         </Typography.Root>
         <Divider.Root variant="text" align="start">
@@ -82,7 +86,9 @@ export default function TypographySizesSnippet() {
         </Divider.Root>
       </div>
       <div className="typographyScaleRow">
-        <Typography.Root size="2xs">The quick brown fox jumps over the lazy dog.</Typography.Root>
+        <Typography.Root variant="caption">
+          The quick brown fox jumps over the lazy dog.
+        </Typography.Root>
         <Divider.Root variant="text" align="start">
           2xs · regular — мелкий поясняющий текст
         </Divider.Root>

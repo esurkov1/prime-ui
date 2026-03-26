@@ -29,7 +29,7 @@ export default function ColorPickerFeaturesSnippet() {
                 <Typography.Root
                   as="p"
                   className={preview.sectionLabel}
-                  size="s"
+                  variant="body-small"
                   weight="medium"
                   tone="muted"
                 >

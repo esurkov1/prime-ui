@@ -69,8 +69,28 @@
   padding-block: var(--prime-sys-size-control-xl-buttonPaddingY);
 }
 
-/* Подпись наследует кегль контрола от корня: вложенный Typography с собственным data-size не перебивает размер */
-.root[data-size] :is(p, span, div)[data-size] {
+/* Подпись наследует кегль контрола от корня: вложенный Typography с собственным data-variant не перебивает размер */
+.root[data-size]
+:is(
+  p,
+  span,
+  div,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  small,
+  blockquote,
+  article,
+  section,
+  header,
+  footer,
+  aside,
+  nav,
+  main
+)[data-variant] {
   font-size: inherit;
   line-height: inherit;
   font-weight: inherit;

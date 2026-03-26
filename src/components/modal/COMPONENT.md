@@ -39,6 +39,7 @@ export function Example() {
 
 ## Rules
 
+- **Shell tokens:** overlay padding, panel padding, gaps between header/body/footer, and max width use **`--prime-sys-size-modal-*`** (semantic `size.modal` in `tokens/semantic.ts`). Title/description text tiers may still follow control typography tokens where the chrome matches **`size`** `m`.
 - **Controlled:** omit **`Modal.Trigger`** and drive **`open`** / **`onOpenChange`** on **`Modal.Root`**; **`Modal.Panel`** still portals when **`open`** is true.
 - **Uncontrolled:** use **`defaultOpen`** or rely on **`Modal.Trigger`**; **`onOpenChange`** fires for any transition.
 - **`Modal.Trigger`** and **`Modal.Close`** require **exactly one** child element (**`cloneElement`**); fragments or multiple nodes are invalid.

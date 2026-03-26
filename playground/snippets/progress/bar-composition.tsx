@@ -7,11 +7,11 @@ import styles from "./bar-snippets.module.css";
 export default function ProgressBarCompositionSnippet() {
   return (
     <div className={styles.compositionCard}>
-      <Typography.Root size="l" weight="semibold">
+      <Typography.Root variant="body-large" weight="semibold">
         Создание отчёта
       </Typography.Root>
       <ProgressBar.Root value={72} max={100} size="m" label="Сбор данных" />
-      <Typography.Root size="s" tone="muted">
+      <Typography.Root variant="body-small" tone="muted">
         Обычно до пяти минут; можно вернуться к списку задач.
       </Typography.Root>
     </div>

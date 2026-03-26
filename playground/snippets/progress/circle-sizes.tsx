@@ -6,7 +6,7 @@ export default function ProgressCircleSizesSnippet() {
   return (
     <>
       <div className="previewLabeledCenter">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Размер s
         </Typography.Root>
         <ProgressCircle.Root value={50} size="s">
@@ -14,7 +14,7 @@ export default function ProgressCircleSizesSnippet() {
         </ProgressCircle.Root>
       </div>
       <div className="previewLabeledCenter">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Размер m
         </Typography.Root>
         <ProgressCircle.Root value={50} size="m">
@@ -22,7 +22,7 @@ export default function ProgressCircleSizesSnippet() {
         </ProgressCircle.Root>
       </div>
       <div className="previewLabeledCenter">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Размер l
         </Typography.Root>
         <ProgressCircle.Root value={50} size="l">
@@ -30,7 +30,7 @@ export default function ProgressCircleSizesSnippet() {
         </ProgressCircle.Root>
       </div>
       <div className="previewLabeledCenter">
-        <Typography.Root as="span" size="xs" tone="muted">
+        <Typography.Root as="span" variant="body-compact" tone="muted">
           Размер xl
         </Typography.Root>
         <ProgressCircle.Root value={50} size="xl">

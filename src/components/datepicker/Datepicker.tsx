@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/button/Button";
 import { ButtonGroup } from "@/components/button-group/ButtonGroup";
 import { Input } from "@/components/input/Input";
-import type { TypographyRootProps, TypographySize } from "@/components/typography/Typography";
+import type { TypographyRootProps, TypographyVariant } from "@/components/typography/Typography";
 import { Typography } from "@/components/typography/Typography";
 import { type ResponsiveMonthsBreakpoints, useResponsiveMonths } from "@/hooks/useResponsiveMonths";
 import { cx } from "@/internal/cx";
@@ -46,14 +46,14 @@ const DatepickerMonthContext = React.createContext<DatepickerMonthContextValue |
 DatepickerMonthContext.displayName = "DatepickerMonthContext";
 
 /**
- * Маппинг размера пикера → размер шрифта Typography для `Datepicker.Value`.
- * Используем шкалу support-text, чтобы подпись выглядела как caption.
+ * Маппинг размера пикера → семантический `variant` Typography для `Datepicker.Value`.
+ * Визуально близко к прежней шкале caption/body-compact.
  */
-const VALUE_TYPOGRAPHY_SIZE_BY_PICKER_SIZE: Record<DatepickerSize, TypographySize> = {
-  s: "2xs",
-  m: "xs",
-  l: "s",
-  xl: "m",
+const VALUE_TYPOGRAPHY_VARIANT_BY_PICKER_SIZE: Record<DatepickerSize, TypographyVariant> = {
+  s: "caption-micro",
+  m: "body-compact",
+  l: "body-small",
+  xl: "body-default",
 };
 
 function pad2(n: number): string {
@@ -488,7 +488,7 @@ function Time(props: DatepickerTimeProps) {
 
 Time.displayName = "Datepicker.Time";
 
-export type DatepickerValueProps = Omit<TypographyRootProps, "size"> & {
+export type DatepickerValueProps = Omit<TypographyRootProps, "variant"> & {
   size?: DatepickerSize;
 };
 
@@ -499,7 +499,7 @@ function Value({ className, size: sizeProp, tone = "muted", ...rest }: Datepicke
     <Typography.Root
       {...rest}
       className={cx(styles.valueText, className)}
-      size={VALUE_TYPOGRAPHY_SIZE_BY_PICKER_SIZE[size]}
+      variant={VALUE_TYPOGRAPHY_VARIANT_BY_PICKER_SIZE[size]}
       tone={tone}
     />
   );

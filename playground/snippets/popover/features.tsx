@@ -21,10 +21,10 @@ export default function PopoverFeaturesSnippet() {
       </Popover.Trigger>
       <Popover.Content align="start" className={preview.formPanel} sameMinWidthAsTrigger trapFocus>
         <Popover.Inset>
-          <Typography.Root as="p" size="s" weight="medium">
+          <Typography.Root as="p" variant="body-small" weight="medium">
             Короткая форма
           </Typography.Root>
-          <Typography.Root as="p" className={preview.panelTextMuted} size="s">
+          <Typography.Root as="p" className={preview.panelTextMuted} variant="body-small">
             <code>trapFocus</code> удерживает Tab внутри панели; выпадающий список не воспринимается
             как «клик снаружи» поповера, поэтому панель не закрывается при работе с выбором
             значения.

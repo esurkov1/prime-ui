@@ -47,7 +47,7 @@ export default function CommandMenuStatesSnippet() {
           </CommandMenu.Group>
         </CommandMenu.List>
         <CommandMenu.Footer className={cmdStyles.footerMuted}>
-          <Typography.Root size="xs" tone="muted">
+          <Typography.Root variant="body-compact" tone="muted">
             Если ни один пункт не проходит фильтр, группы скрываются; пустое состояние можно
             дорисовать под списком вручную.
           </Typography.Root>

@@ -299,7 +299,8 @@ const valueApiRows: PlaygroundApiPropRow[] = [
     type: '"s" | "m" | "l" | "xl"',
     defaultValue: "из Shell или «m»",
     required: "Нет",
-    description: "Маппится на кегль Typography (caption), а не на сырой TypographySize.",
+    description:
+      "Маппится на семантический variant Typography (роли caption / body), а не на ось size контролов.",
   },
   {
     prop: "as",

@@ -28,12 +28,16 @@ export default function CommandMenuCompositionSnippet() {
             id="cmd-title"
             role="heading"
             aria-level={2}
-            size="l"
+            variant="body-large"
             weight="semibold"
           >
             Палитра
           </Typography.Root>
-          <Typography.Root size="s" tone="muted" className={demoStyles.dialogHeaderLead}>
+          <Typography.Root
+            variant="body-small"
+            tone="muted"
+            className={demoStyles.dialogHeaderLead}
+          >
             Поиск по разделам и быстрые действия
           </Typography.Root>
         </div>
@@ -62,7 +66,7 @@ export default function CommandMenuCompositionSnippet() {
 
         <CommandMenu.TagSection>
           <CommandMenu.TagSectionLabel>
-            <Typography.Root size="xs" tone="muted">
+            <Typography.Root variant="body-compact" tone="muted">
               Область поиска
             </Typography.Root>
           </CommandMenu.TagSectionLabel>
@@ -107,7 +111,7 @@ export default function CommandMenuCompositionSnippet() {
         </CommandMenu.List>
 
         <CommandMenu.Footer className={cmdStyles.footerMuted}>
-          <Typography.Root size="xs" tone="muted">
+          <Typography.Root variant="body-compact" tone="muted">
             Стрелки и Enter — из поля поиска; группы скрываются, если в них нет видимых пунктов.
           </Typography.Root>
         </CommandMenu.Footer>

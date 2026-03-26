@@ -15,7 +15,12 @@ export default function ColorPickerControlledSnippet() {
 
   return (
     <ExampleSurface className={preview.card}>
-      <Typography.Root as="p" className={preview.controlledReadout} size="s" tone="muted">
+      <Typography.Root
+        as="p"
+        className={preview.controlledReadout}
+        variant="body-small"
+        tone="muted"
+      >
         Текущее значение (CSS): <code className={preview.monoCode}>{color.toString("css")}</code>
       </Typography.Root>
       <ColorPicker.Root value={color} onChange={setColor}>

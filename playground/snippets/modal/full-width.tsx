@@ -36,7 +36,7 @@ export default function ModalFullWidthSnippet() {
         icon={<Icon name="action.upload" />}
         title="Подтверждение"
       >
-        <Typography.Root as="p" size="m">
+        <Typography.Root as="p" variant="body-default">
           Проверьте состав корзины перед оплатой.
         </Typography.Root>
       </Modal.Panel>

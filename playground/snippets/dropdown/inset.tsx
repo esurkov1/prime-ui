@@ -16,7 +16,7 @@ export default function DropdownInsetSnippet() {
         </Dropdown.Trigger>
         <Dropdown.Content>
           <Dropdown.Inset>
-            <Typography.Root as="div" size="xs" tone="muted">
+            <Typography.Root as="div" variant="body-compact" tone="muted">
               Короткая заметка над списком.
             </Typography.Root>
             <Dropdown.Item>Первый пункт</Dropdown.Item>
@@ -33,7 +33,12 @@ export default function DropdownInsetSnippet() {
         </Dropdown.Trigger>
         <Dropdown.Content>
           <Dropdown.Inset padding="none" gap="x2">
-            <Typography.Root as="div" size="xs" tone="muted" className={styles.insetNoteTight}>
+            <Typography.Root
+              as="div"
+              variant="body-compact"
+              tone="muted"
+              className={styles.insetNoteTight}
+            >
               Без внешнего inset-padding, меньший gap.
             </Typography.Root>
             <Dropdown.Item>Действие A</Dropdown.Item>

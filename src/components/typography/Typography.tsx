@@ -5,18 +5,20 @@ import { toDataAttributes } from "@/internal/data-attributes";
 
 import styles from "./Typography.module.css";
 
-export type TypographySize =
-  | "2xs"
-  | "xs"
-  | "s"
-  | "m"
-  | "l"
-  | "xl"
-  | "2xl"
-  | "3xl"
-  | "4xl"
-  | "5xl"
-  | "6xl";
+/** Семантические роли чтения; соответствуют `typography.role` в `tokens/semantic.ts`. */
+export type TypographyVariant =
+  | "display"
+  | "headline"
+  | "heading-page"
+  | "heading-section"
+  | "heading-subsection"
+  | "heading-group"
+  | "body-large"
+  | "body-default"
+  | "body-small"
+  | "body-compact"
+  | "caption"
+  | "caption-micro";
 
 export type TypographyWeight = "regular" | "medium" | "semibold";
 
@@ -24,11 +26,29 @@ export type TypographyTracking = "normal" | "tight" | "tighter" | "wide";
 
 export type TypographyTone = "default" | "muted";
 
-export type TypographyAs = "p" | "span" | "div";
+export type TypographyAs =
+  | "p"
+  | "span"
+  | "div"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5"
+  | "h6"
+  | "small"
+  | "blockquote"
+  | "article"
+  | "section"
+  | "header"
+  | "footer"
+  | "aside"
+  | "nav"
+  | "main";
 
 export type TypographyRootProps = {
   as?: TypographyAs;
-  size: TypographySize;
+  variant: TypographyVariant;
   weight?: TypographyWeight;
   tracking?: TypographyTracking;
   italic?: boolean;
@@ -41,7 +61,7 @@ const TypographyRoot = React.forwardRef<HTMLElement, TypographyRootProps>(
   (
     {
       as: Tag = "p",
-      size,
+      variant,
       weight = "regular",
       tracking = "normal",
       italic = false,
@@ -58,7 +78,7 @@ const TypographyRoot = React.forwardRef<HTMLElement, TypographyRootProps>(
         className={cx(styles.root, className)}
         {...rest}
         {...toDataAttributes({
-          size,
+          variant,
           weight: weight === "regular" ? undefined : weight,
           tracking: tracking === "normal" ? undefined : tracking,
           tone: tone === "default" ? undefined : tone,

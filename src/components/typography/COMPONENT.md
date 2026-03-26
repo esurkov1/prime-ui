@@ -1,22 +1,31 @@
 # Typography
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Проектирование по умолчанию:** для текста страницы выбирайте **`body-default`** в `variant`, если явно не оговорено иное. Для контролов используйте их ось **`size`** (`s`–`xl`), а не `Typography`.
 
 ## About
 
-Styled text primitive with a fixed size scale and optional axes: weight, tracking, italic, and muted tone. Renders as a native `p`, `span`, or `div`.
+Стилизованный текст с **семантическими ролями чтения** (`variant`), привязанными к `typography.role` в токенах, и опциональными осями: `weight`, `tracking`, курсив и приглушённый `tone`. Рендерится как выбранный HTML-тег (`as`).
 
-- **Use** for body copy, captions, metrics, and inline emphasis where you want kit typography tokens instead of ad hoc font sizes.
-- **Use** `tone="muted"` for secondary explanations and legal or helper-style lines at any step of the size scale.
-- **Use** nested `Typography.Root` instances with different `as` values when you need mixed weight or tracking inside one paragraph.
-- **Do not use** for page or section headings; `Typography` does not expose `h1`–`h6`—use native heading elements or another pattern for document outline.
-- **Do not use** `as` to stand in for buttons or links; wrap real `<button>` / `<a>` elements and style their labels with typography or dedicated components.
-- **Do not use** expecting a separate line-height control; line height is tied to `size` in the component styles.
+- **Use** для основного текста, подзаголовков по смыслу ролей, подписей и метрик там, где нужны токены кита, а не произвольный `font-size`.
+- **Use** `tone="muted"` для вторичных пояснений и юридических строк.
+- **Use** вложенные `Typography.Root` с разными `as` и `weight` внутри одного блока.
+- **Use** `as="h1"`–`as="h6"` для визуального уровня заголовка, согласованного с темой; по возможности сохраняйте логичный порядок уровней на странице.
+- **Use** `as` с landmarks (`main`, `article`, `section`, `header`, `footer`, …) при вёрстке шаблонов.
+- **Do not use** для подписей **внутри кнопок и полей**, где кегль задаёт контроль: оборачивайте `Button`/`Input` и полагайтесь на наследование (см. [Button](../button/COMPONENT.md)) или используйте [Label](../label/COMPONENT.md).
+- **Do not use** `as` вместо настоящих `<button>` / `<a>` для действий и навигации.
+- **Do not use** ожидая отдельный контроль `line-height` вне роли — межстрочный интервал связан с `variant` в стилях.
+
+## Ось чтения и ось контроля
+
+- **`Typography`** — **чтение**: только `variant` (роли из `tokens/semantic.ts` → `typography.role`).
+- **Инпуты, кнопки, чекбоксы и т.д.** — **контроль**: `size` `s` | `m` | `l` | `xl` и токены `--prime-sys-size-control-*`.
+
+Не подменяйте одну ось другой: «крупная кнопка» и «крупный заголовок» задаются разными пропами и токенами.
 
 ## Composition
 
-- Single part: **`Typography.Root`**. No provider or child slots—put text or inline elements in **`children`**.
-- Optional **`as`** chooses the host element (`p` by default); valid values are **`p`**, **`span`**, and **`div`** only—pick one that matches valid HTML nesting (e.g. avoid `p` inside `p`).
+- Одна часть: **`Typography.Root`**. Текст или инлайн-разметка в **`children`**.
+- **`as`** задаёт элемент по умолчанию **`p`**; допустимы абзац, инлайн, блок, **заголовки `h1`–`h6`**, **`small`**, **`blockquote`**, а также **landmarks**: `article`, `section`, `header`, `footer`, `aside`, `nav`, `main`.
 
 ### Minimal example
 
@@ -24,17 +33,35 @@ Styled text primitive with a fixed size scale and optional axes: weight, trackin
 import { Typography } from "prime-ui-kit";
 
 export function Example() {
-  return <Typography.Root size="m">Hello</Typography.Root>;
+  return <Typography.Root variant="body-default">Hello</Typography.Root>;
 }
 ```
 
 ## Rules
 
-- **`size` is required**; there is no internal state—props are applied on each render.
-- Default styling omits redundant **`data-*`** attributes: `weight="regular"`, `tracking="normal"`, `tone="default"`, and non-italic omit their corresponding data attributes in the DOM.
-- Pass **`id`**, **`aria-*`**, and other HTML attributes through **`...rest`** to the rendered element when you need labels or live regions.
-- The root applies **`text-wrap: balance`** for short blocks; override wrapping via **`className`** or layout outside the component if needed.
-- There are no disabled, loading, or error variants; pair with parent UI states as needed.
+- **`variant` обязателен**; лишние **`data-*`** для значений по умолчанию не выставляются (`weight="regular"`, `tracking="normal"`, `tone="default"`, без курсива).
+- В DOM на корне: **`data-variant`** (кебаб-кейс, например `heading-page`).
+- HTML-атрибуты (`id`, `aria-*`, …) пробрасываются через **`...rest`**.
+- Корень использует **`text-wrap: balance`** для коротких блоков; при необходимости переопределяйте снаружи.
+- Отдельных состояний disabled/loading/error нет — сочетайте с родительским UI.
+
+## Миграция с `size` (до v0.3)
+
+Публичный проп **`size`** (`2xs`…`6xl`) заменён на **`variant`**. Соответствие прежней ступени шкалы и роли:
+
+| Было `size` | Стало `variant`   |
+| ----------- | ----------------- |
+| `6xl`       | `display`         |
+| `5xl`       | `headline`        |
+| `4xl`       | `heading-page`    |
+| `3xl`       | `heading-section` |
+| `2xl`       | `heading-subsection` |
+| `xl`        | `heading-group`   |
+| `l`         | `body-large`      |
+| `m`         | `body-default`    |
+| `s`         | `body-small`      |
+| `xs`        | `body-compact`    |
+| `2xs`       | `caption`         |
 
 ## API
 
@@ -42,16 +69,16 @@ export function Example() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| as | `"p" \| "span" \| "div"` | `"p"` | No | Host element |
-| size | `"2xs" \| "xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl" \| "3xl" \| "4xl" \| "5xl" \| "6xl"` | — | Yes | Font size and line-height scale |
-| weight | `"regular" \| "medium" \| "semibold"` | `"regular"` | No | Font weight |
-| tracking | `"normal" \| "tight" \| "tighter" \| "wide"` | `"normal"` | No | Letter spacing |
-| italic | `boolean` | `false` | No | Italic style |
-| tone | `"default" \| "muted"` | `"default"` | No | Primary or secondary text color |
-| children | `React.ReactNode` | — | No | Content |
-| className | `string` | — | No | Additional class on the root |
-| ref | `React.Ref<HTMLElement>` | — | No | Ref to the host element |
-| …rest | `React.HTMLAttributes<HTMLElement>` | — | No | Other attributes on the host element |
+| as | см. `TypographyAs` | `"p"` | No | HTML-элемент-обёртка |
+| variant | см. `TypographyVariant` | — | Yes | Семантическая роль чтения |
+| weight | `"regular"` \| `"medium"` \| `"semibold"` | `"regular"` | No | Начертание |
+| tracking | `"normal"` \| `"tight"` \| `"tighter"` \| `"wide"` | `"normal"` | No | Межбуквенное расстояние |
+| italic | `boolean` | `false` | No | Курсив |
+| tone | `"default"` \| `"muted"` | `"default"` | No | Основной или вторичный цвет текста |
+| children | `React.ReactNode` | — | No | Контент |
+| className | `string` | — | No | Дополнительный класс |
+| ref | `React.Ref<HTMLElement>` | — | No | Ref на узел |
+| …rest | `React.HTMLAttributes<HTMLElement>` | — | No | Прочие атрибуты элемента |
 
 ## Related
 

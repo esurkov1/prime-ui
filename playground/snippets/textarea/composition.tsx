@@ -6,7 +6,7 @@ import styles from "./snippets.module.css";
 export default function TextareaCompositionSnippet() {
   return (
     <div className={styles.compositionStack}>
-      <Typography.Root size="s" weight="medium" as="div">
+      <Typography.Root variant="body-small" weight="medium" as="div">
         Комментарий к заказу
       </Typography.Root>
       <Textarea.Root size="m" placeholder="Уточните адрес или время доставки">

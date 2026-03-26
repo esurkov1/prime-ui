@@ -7,8 +7,8 @@
   display: grid;
   place-items: center;
   animation: fadeIn var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
-  padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
+  padding-inline: var(--prime-sys-size-modal-overlayPaddingX);
+  padding-block: var(--prime-sys-size-modal-overlayPaddingY);
 }
 
 .content {
@@ -20,10 +20,10 @@
   outline: none;
   animation: scaleIn var(--prime-sys-motion-slow) var(--prime-sys-motion-standard);
   width: min(100%, var(--prime-sys-size-modal-maxWidth));
-  border-radius: var(--prime-ref-radius-2xl);
-  padding-inline: var(--prime-sys-spacing-l);
-  padding-block: var(--prime-sys-spacing-l);
-  gap: var(--prime-sys-size-control-m-gap);
+  border-radius: var(--prime-sys-size-modal-radius);
+  padding-inline: var(--prime-sys-size-modal-paddingX);
+  padding-block: var(--prime-sys-size-modal-paddingY);
+  gap: var(--prime-sys-size-modal-contentGap);
 }
 
 .header,
@@ -36,7 +36,7 @@
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: var(--prime-sys-size-control-m-gap);
+  gap: var(--prime-sys-size-modal-headerGap);
 }
 
 /* Без описания — заголовок и иконка по вертикали по центру строки шапки. */
@@ -57,8 +57,8 @@
 
 .headText {
   display: grid;
-  gap: var(--prime-sys-spacing-xs);
-  padding-right: var(--prime-sys-size-control-m-height);
+  gap: var(--prime-sys-size-modal-titleGap);
+  padding-right: var(--prime-sys-size-modal-headTextPaddingRight);
 }
 
 .headerIcon {
@@ -69,8 +69,8 @@
   border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
   color: var(--prime-sys-color-content-secondary);
   flex: 0 0 auto;
-  width: var(--prime-sys-size-control-m-height);
-  height: var(--prime-sys-size-control-m-height);
+  width: var(--prime-sys-size-modal-headerIconSize);
+  height: var(--prime-sys-size-modal-headerIconSize);
   border-radius: var(--prime-sys-size-control-m-radius);
 }
 
@@ -99,7 +99,7 @@
 .body {
   display: grid;
   padding-block: var(--prime-sys-size-modal-headerPaddingBottom);
-  gap: var(--prime-sys-size-control-m-gap);
+  gap: var(--prime-sys-size-modal-bodyGap);
   font-size: var(--prime-sys-size-control-m-text);
 }
 
@@ -138,7 +138,7 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   padding-top: var(--prime-sys-size-modal-footerPaddingTop);
-  gap: var(--prime-sys-size-control-m-gap);
+  gap: var(--prime-sys-size-modal-footerGap);
 }
 
 .footer > * {

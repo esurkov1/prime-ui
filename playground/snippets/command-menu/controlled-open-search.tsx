@@ -14,7 +14,7 @@ export default function CommandMenuControlledSnippet() {
   return (
     <>
       <div className="typographyScaleRow">
-        <Typography.Root size="s" tone="muted">
+        <Typography.Root variant="body-small" tone="muted">
           Снаружи: «{query || "…"}»
         </Typography.Root>
         <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
