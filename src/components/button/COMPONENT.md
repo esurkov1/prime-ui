@@ -6,18 +6,18 @@
 
 Compound control for actions: a root that renders a native `<button>` (or merges props into one child with `asChild`), plus optional icon and loading indicator parts that share size via context.
 
-- **When to use** — primary, secondary, or destructive actions in forms, toolbars, dialogs, and empty states; submit/reset in forms; triggers that must look like a button.
-- **When to use** — async actions where you control `loading` and optionally show `Button.Spinner` next to the label.
-- **When to use** — full-width actions in narrow layouts via `fullWidth`.
-- **When not to use** — navigation that should be a plain link semantically (consider [Link button](../link-button/COMPONENT.md) or `asChild` with a link).
-- **When not to use** — binary on/off or multi-option selection (use [Switch](../switch/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Segmented control](../segmented-control/COMPONENT.md), etc.).
-- **When not to use** — grouping several related buttons without shared chrome (see [Button group](../button-group/COMPONENT.md) for layout).
+- **Use** for primary, secondary, or destructive actions in forms, toolbars, dialogs, and empty states; submit/reset in forms; triggers that must look like a button.
+- **Use** for async actions where you set `loading` on `Button.Root` and optionally render `Button.Spinner` next to the label.
+- **Use** for full-width actions in narrow layouts via `fullWidth`.
+- **Do not use** for navigation that should be a plain link semantically (consider [Link button](../link-button/COMPONENT.md) or `asChild` with a link).
+- **Do not use** for binary on/off or multi-option selection (use [Switch](../switch/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Segmented control](../segmented-control/COMPONENT.md), etc.).
+- **Do not use** when several related buttons need shared chrome and spacing (see [Button group](../button-group/COMPONENT.md)).
 
 ## Composition
 
-- **`Button.Root`** — required wrapper. Provides size to children via `ControlSizeProvider` (including in `asChild` mode). Place all other parts inside it.
+- **`Button.Root`** — required wrapper. Provides size to descendants via `ControlSizeProvider` (including in `asChild` mode). Place all other parts inside it.
 - **`Button.Icon`** — optional; wraps the icon in a `span` with `aria-hidden="true"`. Use for decorative icons next to text.
-- **`Button.Spinner`** — optional; renders nothing unless the nearest `Button.Root` has `loading={true}`. Place it inside `Button.Root` alongside label text (order is up to you; keep a visible name for assistive tech).
+- **`Button.Spinner`** — optional; renders nothing unless the nearest `Button.Root` has `loading={true}`. Place it inside `Button.Root` with visible text or a clear `aria-label`; order relative to the label is up to you.
 
 ### Minimal example
 
@@ -29,15 +29,36 @@ export function Example() {
 }
 ```
 
+### Canonical composition (reference)
+
+For **icon + label**, **several `variant` / `mode` pairs**, and **`loading` with `Button.Spinner`**, open **`examples/canonical-composition.tsx`** next to this file. Imports use **`"prime-ui-kit"`** so the same snippets work in an app after installing the package.
+
+### Example files in `examples/`
+
+| File | Scenario |
+|------|----------|
+| `canonical-composition.tsx` | Icon + text, variant/mode mix, loading + spinner |
+| `form-submit-row.tsx` | English form footer: cancel vs submit, async loading |
+| `destructive-confirm.tsx` | English confirm dialog: `error` + `Modal` |
+| `toolbar.tsx` | English editor-style toolbar: ghost row + primary action |
+| `marketing-cta.tsx` | English CTA column: `fancy` + `fullWidth` |
+
+### Note for LLMs
+
+- **Imports:** `Button` (and `Icon`, `Modal` where needed) from **`"prime-ui-kit"`** in these examples; paths are relative to `src/components/button/examples/`.
+- **`loading`** is **controlled** on `Button.Root` only; there is no internal async state. When `loading` or `disabled` is true, the native `<button>` is disabled.
+- **`Button.Spinner`** only appears when `loading` is true; keep button text or `aria-label` meaningful while loading (`aria-busy` is set on the root).
+- **Forms:** default `type` is **`"button"`**; use **`"submit"`** / **`"reset"`** explicitly when the control lives in a `<form>`.
+- **Destructive actions:** use **`variant="error"`**; pair **filled** confirm with **stroke/lighter** or neutral cancel for hierarchy.
+- **`asChild`:** exactly one element child; `disabled`/`loading` map to `aria-disabled` and blocked clicks, not native `disabled` on non-button hosts.
+
 ## Rules
 
-- `loading` is controlled only by the `loading` prop on `Button.Root`; there is no internal async state. When `loading` or `disabled` is true, the native button is disabled and clicks do not run.
+- `loading` is controlled only by the `loading` prop on `Button.Root`; there is no internal async state. When `loading` or `disabled` is true, the native `<button>` is disabled and `onClick` does not run.
 - With `asChild`, pass exactly one React element child. `type` is not forwarded; `disabled`/`loading` become `aria-disabled`, blocked `onClick`, and styles—native `disabled` is not set on non-button elements.
 - The `asChild` child must accept `className`, `aria-*`, `data-*`, and event props merged from the root.
-- `Button.Spinner` reads context from the closest `Button.Root`; if `loading` is false, it renders nothing. It uses `aria-hidden="true"`—do not rely on it alone for a progress announcement; keep button text or `aria-label` meaningful while loading.
 - For icon-only buttons, set a clear `aria-label` or `aria-labelledby` on `Button.Root`.
 - `variant` sets color role (`primary`, `neutral`, `error`); `mode` sets visual weight (`filled`, `stroke`, `lighter`, `ghost`, `fancy`).
-- Native `type` defaults to `"button"`; use `"submit"` / `"reset"` explicitly in forms when needed.
 
 ## API
 
@@ -76,5 +97,5 @@ export function Example() {
 
 - [Link button](../link-button/COMPONENT.md) — link-styled control when the action is navigation.
 - [Button group](../button-group/COMPONENT.md) — grouped actions with shared sizing and dividers.
-- [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md) — common consumers for open/close triggers.
+- [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md) — common hosts for triggers and dialog footers.
 - [Input](../input/COMPONENT.md), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) — form fields alongside submit/reset buttons.
