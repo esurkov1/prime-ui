@@ -1,0 +1,56 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.stackDense {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-s);
+}
+
+.settingsGroup {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-l);
+  max-width: 28rem;
+}
+
+.legend {
+  padding: 0;
+  margin: 0 0 var(--prime-sys-spacing-s);
+  font-size: var(--prime-sys-typography-sizeScale-m);
+  line-height: var(--prime-sys-typography-lineHeightScale-m);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.muted {
+  margin: 0;
+  color: var(--prime-sys-color-content-secondary);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+  max-width: 24rem;
+}
+
+.formSubmit {
+  align-self: flex-start;
+  padding: var(--prime-sys-spacing-s) var(--prime-sys-spacing-m);
+  border-radius: var(--prime-sys-shape-radius-m);
+}
+
+.formMessage {
+  margin: 0;
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  line-height: var(--prime-sys-typography-lineHeightScale-s);
+}

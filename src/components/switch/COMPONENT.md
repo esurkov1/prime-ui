@@ -1,17 +1,17 @@
 # Switch
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Default `size`:** `m` on the size axis unless the scenario explicitly needs another value.
 
 ## About
 
 A compound on/off control: a native `input type="checkbox"` with `role="switch"`, a visual track and thumb, and optional slots for label text, hint, and error wired through `aria-describedby` and invalid state.
 
-- **When to use** — binary settings (notifications, feature flags, consent) where the UI should read as on/off rather than a small checkbox in a list.
-- **When to use** — forms that need `name`, `value`, or `required` on the underlying input together with hint or error copy under the label column.
-- **When to use** — a single independent toggle per row; state is obvious from the thumb position and `aria-checked`.
-- **When not to use** — picking exactly one option from mutually exclusive alternatives (prefer [Radio](../radio/COMPONENT.md)).
-- **When not to use** — lists with partial selection or an **indeterminate** state (prefer [Checkbox](../checkbox/COMPONENT.md)).
-- **When not to use** — you need `asChild` or fully custom markup; the structure is fixed to `Switch.*` parts and [Label](../label/COMPONENT.md) / [Hint](../hint/COMPONENT.md) primitives.
+- **Use** for binary settings (notifications, feature flags, billing options, consent) where the UI should read as on/off rather than a small checkbox in a list.
+- **Use** when forms need `name`, `value`, or `required` on the underlying input together with hint or error copy under the label column.
+- **Use** for a single independent toggle per row; state is obvious from the thumb position and `aria-checked`.
+- **Do not use** for picking exactly one option from mutually exclusive alternatives (prefer [Radio](../radio/COMPONENT.md)).
+- **Do not use** for lists with partial selection or an **indeterminate** state (prefer [Checkbox](../checkbox/COMPONENT.md)).
+- **Do not use** when you need `asChild` or fully custom markup; the structure is fixed to `Switch.*` parts and [Label](../label/COMPONENT.md) / [Hint](../hint/COMPONENT.md) primitives.
 
 ## Composition
 
@@ -35,16 +35,62 @@ export function Example() {
 }
 ```
 
+### Canonical example (full shell)
+
+Use this when you want label text, a hint under the text column, and default **`size="m"`**. Always compose **`Switch.Label`** (and optional **`Switch.Hint`**) as **`children`** of **`Switch.Root`** — the **`label`** prop on **`Root`** is not rendered.
+
+```tsx
+import { Switch } from "prime-ui-kit";
+
+export function ProductUpdatesSwitch() {
+  return (
+    <Switch.Root size="m" defaultChecked name="product_updates">
+      <Switch.Label>Product updates</Switch.Label>
+      <Switch.Hint>
+        At most one email per week. You can change this anytime in notification settings.
+      </Switch.Hint>
+    </Switch.Root>
+  );
+}
+```
+
+Source of truth (stays in sync with the snippet above): `examples/canonical-maximal.tsx`.
+
+### Examples (source)
+
+Runnable demos live next to this file (workspace imports use `@/`; published consumers use `prime-ui-kit`):
+
+| File | Intent |
+|------|--------|
+| `examples/canonical-maximal.tsx` | Full shell: **`Switch.Label`** + **`Switch.Hint`**, **`size="m"`** |
+| `examples/scenario-settings-toggle.tsx` | Settings: several independent toggles in a **`fieldset`** |
+| `examples/scenario-feature-flag.tsx` | Controlled flag: **`checked`** / **`onCheckedChange`** + rollout copy |
+| `examples/scenario-billing-annual.tsx` | Billing: annual vs monthly as one switch with dynamic hint |
+| `examples/scenario-form-consent.tsx` | Form: **`name`**, **`required`**, **`FormData`** on submit |
+
+Playground composition demos (broader states and Russian copy): `playground/snippets/switch/`.
+
+### Extended usage
+
+- **Controlled:** pass **`checked`** with **`onCheckedChange`**. **Uncontrolled:** use **`defaultChecked`** (defaults to **`false`**). Do not rely on **`onChange`** on **`Root`** for the boolean API — use **`onCheckedChange`**.
+- **`readOnly`** blocks toggling via **`preventDefault`** in the internal handler; **`aria-readonly`** is set on the input.
+- **Invalid / error:** mount **`Switch.Error`** and/or set **`variant="error"`** on **`Root`**; **`aria-invalid`** and error styling follow context.
+- **`aria-describedby`** on **`Root`** merges with hint and error ids when those slots are mounted; append your own ids on **`Root`** if you need extra descriptors.
+- **`Switch.Label`** with no visible **`children`** leaves only the track — supply **`aria-label`** / **`aria-labelledby`** on **`Root`** (or nearby visible text) for an accessible name.
+- **Grouping settings:** prefer a **`fieldset`** + **`legend`** over **`role="group"`** when several switches belong to one preference block.
+- There is no **indeterminate** or **loading** state; keyboard and focus use the native switch pattern with **`focus-visible`** on the track.
+
+### Note for LLMs
+
+When generating **Switch** markup for this library: (1) Always include **`Switch.Label`** as a **child** of **`Switch.Root`** — **`Root`** does not render the **`label`** prop. (2) Use **`onCheckedChange`**, not **`onChange`**, for controlled on/off updates. (3) For controlled mode, pair **`checked`** with **`onCheckedChange`**; for forms, forward **`name`**, **`required`**, and other input attributes on **`Root`** (they go to the native **`input`**). (4) Order parts **`Root`** → **`Label`** → optional **`Hint`** / **`Error`**. (5) Do not wrap kit parts to restyle them; use **`size`**, **`variant`**, and documented props only. (6) Start from **`examples/canonical-maximal.tsx`**, then adapt **`scenario-*.tsx`** files for settings, feature flags, billing, and forms.
+
 ## Rules
 
-- **Controlled:** pass **`checked`** with **`onCheckedChange`**. **Uncontrolled:** use **`defaultChecked`** (defaults to **`false`**). User toggles run through the internal change handler; **`onChange`** on **`Root`** is not the switch API—use **`onCheckedChange`** only.
-- **`readOnly`** calls **`preventDefault`** in the change handler so the value does not change on click; **`aria-readonly`** is set on the input.
-- **`variant="error"`** or a mounted **`Switch.Error`** sets **`invalid`** in context, **`aria-invalid`** on the input, and error styling; **`disabled`** disables the input and adjusts hint styling.
-- **`aria-describedby`** on **`Root`** is merged with hint and error ids when those slots are mounted; add your own ids in **`aria-describedby`** if you need extra descriptors.
-- **`Switch.Label`** with no visible **`children`** leaves only the track; set an accessible name with **`aria-label`** or **`aria-labelledby`** on **`Root`** (or ensure context from nearby text).
-- The public props type includes **`label?: React.ReactNode`**, but **`Root`** does not render it as **`Switch.Label`**—always compose **`Switch.Label`** (and optional **`Hint`** / **`Error`**) as **`children`**.
-- Keyboard and role follow the native checkbox pattern with **`role="switch"`** and **`aria-checked`**; focus visibility uses **`focus-visible`** on the track.
-- There is no **indeterminate** or **loading** state; **`size`** on **`Root`** drives layout tokens, not a DOM **`size`** attribute on the input.
+- **Controlled:** **`checked`** + **`onCheckedChange`**. **Uncontrolled:** **`defaultChecked`**.
+- **`readOnly`** prevents value changes on user interaction; **`aria-readonly`** is set.
+- **`variant="error"`** or mounted **`Switch.Error`** sets **`invalid`**, **`aria-invalid`**, and error styling; **`disabled`** disables the input and adjusts hint styling.
+- The public props type includes **`label?: React.ReactNode`**, but **`Root`** does not render it — compose **`Switch.Label`** as **`children`**.
+- **`size`** on **`Root`** drives layout tokens only; it is not a DOM **`size`** attribute on the **`input`**.
 
 ## API
 
