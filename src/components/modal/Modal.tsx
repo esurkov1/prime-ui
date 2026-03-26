@@ -243,42 +243,53 @@ function ModalContent({
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 
-export type ModalHeaderProps = React.HTMLAttributes<HTMLElement> & {
+export type ModalHeaderProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
   icon?: React.ReactNode;
+  /** Текст заголовка (рендерится как `h2`). */
+  title: React.ReactNode;
+  /** `id` для `h2`; для `aria-labelledby` на `Modal.Content` передайте то же значение. */
+  titleId?: string;
+  /** Подзаголовок под заголовком (рендерится как `p`). */
+  description?: React.ReactNode;
+  /** `id` для описания; для `aria-describedby` на `Modal.Content` передайте то же значение. */
+  descriptionId?: string;
+  /** Обычно `Modal.Close` с кнопкой закрытия. */
+  children?: React.ReactNode;
 };
 
-function ModalHeader({ children, className, icon, ...rest }: ModalHeaderProps) {
+function ModalHeader({
+  icon,
+  title,
+  titleId: titleIdProp,
+  description,
+  descriptionId: descriptionIdProp,
+  children,
+  className,
+  ...rest
+}: ModalHeaderProps) {
+  const genTitleId = React.useId();
+  const genDescId = React.useId();
+  const titleId = titleIdProp ?? genTitleId;
+  const descriptionId =
+    description != null && description !== "" ? (descriptionIdProp ?? genDescId) : undefined;
+
   return (
     <ModalHeaderContext.Provider value={true}>
       <header className={cx(styles.header, className)} {...rest}>
         {icon && <div className={styles.headerIcon}>{icon}</div>}
-        <div className={styles.headText}>{children}</div>
+        <div className={styles.headText}>
+          <h2 id={titleId} className={styles.title}>
+            {title}
+          </h2>
+          {description != null && description !== "" ? (
+            <p id={descriptionId} className={styles.description}>
+              {description}
+            </p>
+          ) : null}
+          {children}
+        </div>
       </header>
     </ModalHeaderContext.Provider>
-  );
-}
-
-// ─── Title ────────────────────────────────────────────────────────────────────
-
-export type ModalTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
-
-function ModalTitle({ children, className, ...rest }: ModalTitleProps) {
-  return (
-    <h2 className={cx(styles.title, className)} {...rest}>
-      {children}
-    </h2>
-  );
-}
-
-// ─── Description ─────────────────────────────────────────────────────────────
-
-export type ModalDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
-
-function ModalDescription({ children, className, ...rest }: ModalDescriptionProps) {
-  return (
-    <p className={cx(styles.description, className)} {...rest}>
-      {children}
-    </p>
   );
 }
 
@@ -316,8 +327,6 @@ export const Modal = {
   Overlay: ModalOverlay,
   Content: ModalContent,
   Header: ModalHeader,
-  Title: ModalTitle,
-  Description: ModalDescription,
   Body: ModalBody,
   Footer: ModalFooter,
 };

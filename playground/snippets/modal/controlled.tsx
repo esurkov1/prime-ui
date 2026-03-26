@@ -20,11 +20,16 @@ export default function ModalControlledSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-controlled-title">
-              <Modal.Header icon={<Icon name="action.copy" />}>
-                <Modal.Title id="modal-controlled-title">Состояние снаружи</Modal.Title>
-                <Modal.Description>
-                  Открытие и закрытие идут через <code>open</code> и <code>onOpenChange</code>.
-                </Modal.Description>
+              <Modal.Header
+                icon={<Icon name="action.copy" />}
+                titleId="modal-controlled-title"
+                title="Состояние снаружи"
+                description={
+                  <>
+                    Открытие и закрытие идут через <code>open</code> и <code>onOpenChange</code>.
+                  </>
+                }
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>

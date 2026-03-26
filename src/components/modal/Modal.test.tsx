@@ -22,9 +22,12 @@ function BasicModal({
       <Modal.Portal>
         <Modal.Overlay />
         <Modal.Content aria-labelledby="dlg-title" aria-describedby="dlg-desc">
-          <Modal.Header>
-            <Modal.Title id="dlg-title">Test title</Modal.Title>
-            <Modal.Description id="dlg-desc">Test description</Modal.Description>
+          <Modal.Header
+            titleId="dlg-title"
+            descriptionId="dlg-desc"
+            title="Test title"
+            description="Test description"
+          >
             <Modal.Close>
               <Button.Root aria-label="Close modal">X</Button.Root>
             </Modal.Close>
@@ -145,9 +148,7 @@ describe("Modal (composable API)", () => {
         <Modal.Portal>
           <Modal.Overlay />
           <Modal.Content aria-labelledby="hf-title">
-            <Modal.Header>
-              <Modal.Title id="hf-title">Header footer</Modal.Title>
-            </Modal.Header>
+            <Modal.Header titleId="hf-title" title="Header footer" />
             <Modal.Footer>
               <Button.Root>Action</Button.Root>
             </Modal.Footer>
@@ -167,9 +168,7 @@ describe("Modal (composable API)", () => {
         <Modal.Portal>
           <Modal.Overlay />
           <Modal.Content aria-labelledby="header-only-title">
-            <Modal.Header>
-              <Modal.Title id="header-only-title">Header only</Modal.Title>
-            </Modal.Header>
+            <Modal.Header titleId="header-only-title" title="Header only" />
           </Modal.Content>
         </Modal.Portal>
       </Modal.Root>,

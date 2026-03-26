@@ -14,12 +14,17 @@ export default function ModalFullWidthSnippet() {
       <Modal.Portal>
         <Modal.Overlay>
           <Modal.Content aria-labelledby="modal-fw-title">
-            <Modal.Header icon={<Icon name="action.upload" />}>
-              <Modal.Title id="modal-fw-title">Подтверждение</Modal.Title>
-              <Modal.Description>
-                В подвале — вертикальный стек: у <code>Button.Root</code> задан{" "}
-                <code>fullWidth</code>, панель задаёт ширину колонки.
-              </Modal.Description>
+            <Modal.Header
+              icon={<Icon name="action.upload" />}
+              titleId="modal-fw-title"
+              title="Подтверждение"
+              description={
+                <>
+                  В подвале — вертикальный стек: у <code>Button.Root</code> задан{" "}
+                  <code>fullWidth</code>, панель задаёт ширину колонки.
+                </>
+              }
+            >
               <Modal.Close>
                 <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                   <Button.Icon>

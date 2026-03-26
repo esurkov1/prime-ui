@@ -21,7 +21,7 @@ Import from the `prime-ui-kit` package. Examples are grouped by screen intent an
 
 ### Structure and short combinations
 
-Recommended `Modal.Content` structure: required `Modal.Header`, optional `Modal.Body` and `Modal.Footer`.
+Recommended `Modal.Content` structure: required `Modal.Header` (fixed header layout: `title`, optional `description`, optional `icon`, optional `Modal.Close`), optional `Modal.Body` and `Modal.Footer`.
 
 ```tsx
 import { Button, Icon, Modal } from "prime-ui-kit";
@@ -38,9 +38,11 @@ export function ModalStructureExamples() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="m-struct-header-footer-title">
-              <Modal.Header>
-                <Modal.Title id="m-struct-header-footer-title">Confirmation without body</Modal.Title>
-                <Modal.Description>Suits a short question with an explicit choice.</Modal.Description>
+              <Modal.Header
+                titleId="m-struct-header-footer-title"
+                title="Confirmation without body"
+                description="Suits a short question with an explicit choice."
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Close">
                     <Button.Icon>
@@ -73,8 +75,11 @@ export function ModalStructureExamples() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="m-struct-header-body-title">
-              <Modal.Header icon={<Icon name="nav.itemDot" />}>
-                <Modal.Title id="m-struct-header-body-title">Information dialog</Modal.Title>
+              <Modal.Header
+                icon={<Icon name="nav.itemDot" />}
+                titleId="m-struct-header-body-title"
+                title="Information dialog"
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Close">
                     <Button.Icon>
@@ -102,11 +107,11 @@ export function ModalStructureExamples() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="m-struct-header-only-title">
-              <Modal.Header>
-                <Modal.Title id="m-struct-header-only-title">Short notice</Modal.Title>
-                <Modal.Description>
-                  Full header block: title and description, no body or footer.
-                </Modal.Description>
+              <Modal.Header
+                titleId="m-struct-header-only-title"
+                title="Short notice"
+                description="Full header block: title and description, no body or footer."
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Close">
                     <Button.Icon>
@@ -142,11 +147,13 @@ export function DeleteDraftConfirm() {
       <Modal.Portal>
         <Modal.Overlay>
           <Modal.Content aria-labelledby="del-draft-title" aria-describedby="del-draft-desc">
-            <Modal.Header icon={<Icon name="status.locked" />}>
-              <Modal.Title id="del-draft-title">Delete draft?</Modal.Title>
-              <Modal.Description id="del-draft-desc">
-                This cannot be undone. Only this document will be affected.
-              </Modal.Description>
+            <Modal.Header
+              icon={<Icon name="status.locked" />}
+              titleId="del-draft-title"
+              descriptionId="del-draft-desc"
+              title="Delete draft?"
+              description="This cannot be undone. Only this document will be affected."
+            >
               <Modal.Close>
                 <Button.Root variant="neutral" mode="ghost" aria-label="Close">
                   <Button.Icon>
@@ -188,9 +195,12 @@ export function KioskAnnouncement() {
       <Modal.Portal>
         <Modal.Overlay>
           <Modal.Content aria-labelledby="kiosk-title">
-            <Modal.Header icon={<Icon name="nav.layoutGrid" />}>
-              <Modal.Title id="kiosk-title">Short hours today</Modal.Title>
-              <Modal.Description>Cashiers close at 4:00 PM. Thanks for your understanding.</Modal.Description>
+            <Modal.Header
+              icon={<Icon name="nav.layoutGrid" />}
+              titleId="kiosk-title"
+              title="Short hours today"
+              description="Cashiers close at 4:00 PM. Thanks for your understanding."
+            >
               <Modal.Close>
                 <Button.Root variant="neutral" mode="ghost" aria-label="Close">
                   <Button.Icon>
@@ -235,9 +245,12 @@ export function SupportTicketModal() {
       <Modal.Portal>
         <Modal.Overlay>
           <Modal.Content aria-labelledby="ticket-title">
-            <Modal.Header icon={<Icon name="field.email" />}>
-              <Modal.Title id="ticket-title">New request</Modal.Title>
-              <Modal.Description>Briefly describe the issue — we will reply to the email on your profile.</Modal.Description>
+            <Modal.Header
+              icon={<Icon name="field.email" />}
+              titleId="ticket-title"
+              title="New request"
+              description="Briefly describe the issue — we will reply to the email on your profile."
+            >
               <Modal.Close>
                 <Button.Root variant="neutral" mode="ghost" aria-label="Close">
                   <Button.Icon>
@@ -291,9 +304,11 @@ export function SimpleConfirmModal() {
       <Modal.Portal>
         <Modal.Overlay>
           <Modal.Content aria-labelledby="simple-title">
-            <Modal.Header>
-              <Modal.Title id="simple-title">Confirm action</Modal.Title>
-              <Modal.Description>Changes will apply to all selected items.</Modal.Description>
+            <Modal.Header
+              titleId="simple-title"
+              title="Confirm action"
+              description="Changes will apply to all selected items."
+            >
               <Modal.Close>
                 <Button.Root variant="neutral" mode="ghost" aria-label="Close">
                   <Button.Icon>
@@ -357,11 +372,12 @@ export function WizardStepModal() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby={`wiz-${step}-title`}>
-              <Modal.Header icon={<Icon name="action.copy" />}>
-                <Modal.Title id={`wiz-${step}-title`}>Step {step} of 2</Modal.Title>
-                <Modal.Description>
-                  {step === 1 ? "Verify your contact details." : "Confirm to finish."}
-                </Modal.Description>
+              <Modal.Header
+                icon={<Icon name="action.copy" />}
+                titleId={`wiz-${step}-title`}
+                title={`Step ${step} of 2`}
+                description={step === 1 ? "Verify your contact details." : "Confirm to finish."}
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Close">
                     <Button.Icon>
@@ -407,7 +423,7 @@ Typical markup:
 
 Inside `Content`:
 
-- `Header` (optional `icon`) → `Title`, `Description`, `Close` with a button;
+- `Header` — fixed layout: `title` (`h2`), optional `description` (`p`), optional `icon`, optional `Close` with a button;
 - `Body` — optional main content;
 - `Footer` — optional action row.
 
@@ -458,8 +474,8 @@ Inside `Content`:
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | `aria-label` | `string` | — | No | Dialog name without a visible title (follow a11y guidance). |
-| `aria-labelledby` | `string` | — | No | `id` of the labeling element (often `Modal.Title`). |
-| `aria-describedby` | `string` | — | No | `id` of the description (often `Modal.Description`). |
+| `aria-labelledby` | `string` | — | No | `id` of the title (`titleId` on `Modal.Header`). |
+| `aria-describedby` | `string` | — | No | `id` of the description (`descriptionId` on `Modal.Header`). |
 | `className` | `string` | — | No | Panel class. |
 | `children` | `React.ReactNode` | — | No | Header, body, footer; wraps `ControlSizeProvider`. |
 | … | `React.HTMLAttributes<HTMLDivElement>` | — | No | `role="dialog"`, `aria-modal`, `tabIndex={-1}`, focus trap, scroll lock, Escape via context. |
@@ -468,26 +484,14 @@ Inside `Content`:
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
+| `title` | `React.ReactNode` | — | Yes | Heading text (renders as `<h2>`). |
+| `titleId` | `string` | auto (`useId`) | No | `id` on the `<h2>`; pass the same value as `aria-labelledby` on `Content` when labelling the dialog. |
+| `description` | `React.ReactNode` | — | No | Secondary text (renders as `<p>`). |
+| `descriptionId` | `string` | auto (`useId`) | No | `id` on the `<p>`; pass the same value as `aria-describedby` on `Content` when needed. |
 | `icon` | `React.ReactNode` | — | No | Icon to the left of the text column. |
-| `className` | `string` | — | No | `header` class. |
-| `children` | `React.ReactNode` | — | No | Usually title, description, `Close`. |
-| … | `React.HTMLAttributes<HTMLElement>` | — | No | Root `<header>`. |
-
-### Modal.Title
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `className` | `string` | — | No | Title class. |
-| `children` | `React.ReactNode` | — | No | Text; set `id` for `aria-labelledby` on `Content`. |
-| … | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | Renders `<h2>`. |
-
-### Modal.Description
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `className` | `string` | — | No | Description class. |
-| `children` | `React.ReactNode` | — | No | Secondary text under the title. |
-| … | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Renders `<p>`. |
+| `children` | `React.ReactNode` | — | No | Usually `Modal.Close` with a button. |
+| `className` | `string` | — | No | Extra class on `<header>`. |
+| … | `Omit<React.HTMLAttributes<HTMLElement>, "title">` | — | No | Root `<header>`. |
 
 ### Modal.Body
 
@@ -518,7 +522,7 @@ There is no separate `variant` prop on the modal, and **no `size` on `Modal.Root
 
 ## Accessibility (a11y)
 
-- Panel uses `role="dialog"` and `aria-modal="true"`. Set **`aria-labelledby`** (to `Modal.Title` `id`) and **`aria-describedby`** when needed; if there is no visible title, use **`aria-label`** on `Content`.
+- Panel uses `role="dialog"` and `aria-modal="true"`. Set **`aria-labelledby`** to the **`titleId`** used on `Modal.Header` (or rely on auto-generated ids and avoid duplicate labelling), and **`aria-describedby`** to **`descriptionId`** when you expose description; if there is no visible title, use **`aria-label`** on `Content`.
 - **Escape** closes the dialog unless `closeOnEscape` is disabled.
 - Focus stays inside `Content` while the modal is open.
 - The header close control needs an accessible name (`aria-label` or visible text).

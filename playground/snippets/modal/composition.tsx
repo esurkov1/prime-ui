@@ -27,11 +27,11 @@ export default function ModalCompositionSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-comp-header-footer-title">
-              <Modal.Header>
-                <Modal.Title id="modal-comp-header-footer-title">
-                  Подтверждение без контента
-                </Modal.Title>
-                <Modal.Description>Когда нужен только заголовок и действия.</Modal.Description>
+              <Modal.Header
+                titleId="modal-comp-header-footer-title"
+                title="Подтверждение без контента"
+                description="Когда нужен только заголовок и действия."
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>
@@ -64,9 +64,12 @@ export default function ModalCompositionSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-comp-header-body-title">
-              <Modal.Header icon={<Icon name="nav.itemDot" />}>
-                <Modal.Title id="modal-comp-header-body-title">Только информация</Modal.Title>
-                <Modal.Description>Футер не нужен, если нет явных действий.</Modal.Description>
+              <Modal.Header
+                icon={<Icon name="nav.itemDot" />}
+                titleId="modal-comp-header-body-title"
+                title="Только информация"
+                description="Футер не нужен, если нет явных действий."
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>
@@ -92,11 +95,11 @@ export default function ModalCompositionSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-comp-header-only-title">
-              <Modal.Header>
-                <Modal.Title id="modal-comp-header-only-title">Короткое уведомление</Modal.Title>
-                <Modal.Description>
-                  Полный блок шапки: заголовок и описание, без контента и футера.
-                </Modal.Description>
+              <Modal.Header
+                titleId="modal-comp-header-only-title"
+                title="Короткое уведомление"
+                description="Полный блок шапки: заголовок и описание, без контента и футера."
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>
@@ -119,9 +122,12 @@ export default function ModalCompositionSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-comp-form-title">
-              <Modal.Header icon={<Icon name="field.email" />}>
-                <Modal.Title id="modal-comp-form-title">Контакт получателя</Modal.Title>
-                <Modal.Description>Заполните поле перед сохранением маршрута.</Modal.Description>
+              <Modal.Header
+                icon={<Icon name="field.email" />}
+                titleId="modal-comp-form-title"
+                title="Контакт получателя"
+                description="Заполните поле перед сохранением маршрута."
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>
@@ -161,12 +167,16 @@ export default function ModalCompositionSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-comp-legal-title">
-              <Modal.Header>
-                <Modal.Title id="modal-comp-legal-title">Согласие на обработку данных</Modal.Title>
-                <Modal.Description>
-                  <code>Modal.Trigger</code> клонирует обработчик на единственного потомка — здесь
-                  ссылка.
-                </Modal.Description>
+              <Modal.Header
+                titleId="modal-comp-legal-title"
+                title="Согласие на обработку данных"
+                description={
+                  <>
+                    <code>Modal.Trigger</code> клонирует обработчик на единственного потомка — здесь
+                    ссылка.
+                  </>
+                }
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>

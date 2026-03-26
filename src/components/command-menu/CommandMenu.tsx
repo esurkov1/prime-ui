@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Modal, type ModalRootProps } from "@/components/modal/Modal";
+import modalShellStyles from "@/components/modal/Modal.module.css";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -205,8 +206,16 @@ function CommandMenuDialog({
   );
 }
 
-const CommandMenuDialogTitle = Modal.Title;
-const CommandMenuDialogDescription = Modal.Description;
+function CommandMenuDialogTitle({ className, ...rest }: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <h2 className={cx(modalShellStyles.title, className)} {...rest} />;
+}
+
+function CommandMenuDialogDescription({
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return <p className={cx(modalShellStyles.description, className)} {...rest} />;
+}
 
 // ─── Input row + input ───────────────────────────────────────────────────────
 

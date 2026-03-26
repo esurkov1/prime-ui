@@ -202,13 +202,11 @@ export type {
   ModalBodyProps,
   ModalCloseProps,
   ModalContentProps,
-  ModalDescriptionProps,
   ModalFooterProps,
   ModalHeaderProps,
   ModalOverlayProps,
   ModalPortalProps,
   ModalRootProps,
-  ModalTitleProps,
   ModalTriggerProps,
 } from "./modal/Modal";
 export { Modal } from "./modal/Modal";

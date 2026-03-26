@@ -134,14 +134,14 @@ const modalContentApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "id элемента с названием (часто Modal.Title).",
+    description: "id заголовка шапки (тот же, что titleId на Modal.Header).",
   },
   {
     prop: "aria-describedby",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "id элемента с описанием (часто Modal.Description).",
+    description: "id описания в шапке (тот же, что descriptionId на Modal.Header).",
   },
   {
     prop: "className",
@@ -169,11 +169,46 @@ const modalContentApiRows: PlaygroundApiPropRow[] = [
 
 const modalHeaderApiRows: PlaygroundApiPropRow[] = [
   {
+    prop: "title",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Да",
+    description: "Заголовок (внутри фиксированной вёрстки — `h2`).",
+  },
+  {
+    prop: "titleId",
+    type: "string",
+    defaultValue: "авто (useId)",
+    required: "Нет",
+    description: "id для `h2`; для `aria-labelledby` на Content задайте то же значение.",
+  },
+  {
+    prop: "description",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Подзаголовок (`p` под заголовком).",
+  },
+  {
+    prop: "descriptionId",
+    type: "string",
+    defaultValue: "авто (useId)",
+    required: "Нет",
+    description: "id для описания; для `aria-describedby` на Content — то же значение.",
+  },
+  {
     prop: "icon",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Слот иконки слева от текстовой колонки заголовка.",
+    description: "Иконка слева от текстовой колонки.",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Обычно `Modal.Close`; контекст для кнопки закрытия в шапке.",
   },
   {
     prop: "className",
@@ -183,66 +218,11 @@ const modalHeaderApiRows: PlaygroundApiPropRow[] = [
     description: "Дополнительный класс header.",
   },
   {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Обычно Title, Description, Close; контекст для Modal.Close в шапке.",
-  },
-  {
     prop: "…rest",
-    type: "React.HTMLAttributes<HTMLElement>",
+    type: 'Omit<React.HTMLAttributes<HTMLElement>, "title">',
     defaultValue: "—",
     required: "Нет",
     description: "Корень <header>.",
-  },
-];
-
-const modalTitleApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный класс заголовка.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Текст названия; задайте id для aria-labelledby на Content.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLHeadingElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Рендерится как <h2>.",
-  },
-];
-
-const modalDescriptionApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный класс описания.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Вторичный текст под заголовком.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLParagraphElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Рендерится как <p>.",
   },
 ];
 
@@ -311,10 +291,11 @@ export default function ModalSection() {
         <div className="demoBlock">
           <h4>Структура и композиция</h4>
           <p className="demoBlockDescription">
-            Базовый контракт панели: <code>Modal.Header</code> + опциональные{" "}
-            <code>Modal.Body</code> и <code>Modal.Footer</code>. В примере в начале собраны
-            комбинации: только шапка, шапка+футер (без контента), шапка+контент (без футера), а
-            затем полная композиция с полем и действиями.
+            Базовый контракт панели: <code>Modal.Header</code> (заголовок и при необходимости
+            описание в одном компоненте) + опциональные <code>Modal.Body</code> и{" "}
+            <code>Modal.Footer</code>. В примере в начале собраны комбинации: только шапка,
+            шапка+футер (без контента), шапка+контент (без футера), а затем полная композиция с
+            полем и действиями.
           </p>
           <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
             <PlaygroundExampleFrame.Stage>
@@ -429,17 +410,10 @@ export default function ModalSection() {
           <PlaygroundApiTable rows={modalContentApiRows} />
           <h5>Modal.Header</h5>
           <p className="demoBlockDescription">
-            Шапка с опциональной иконкой и текстовой колонкой; задаёт контекст для кнопки закрытия.
+            Единая шапка: заголовок и опциональное описание с фиксированной вёрсткой; опциональная
+            иконка; контекст для <code>Modal.Close</code>.
           </p>
           <PlaygroundApiTable rows={modalHeaderApiRows} />
-          <h5>Modal.Title</h5>
-          <p className="demoBlockDescription">
-            Заголовок уровня <code>h2</code> с типографикой модала.
-          </p>
-          <PlaygroundApiTable rows={modalTitleApiRows} />
-          <h5>Modal.Description</h5>
-          <p className="demoBlockDescription">Вторичный текст под заголовком.</p>
-          <PlaygroundApiTable rows={modalDescriptionApiRows} />
           <h5>Modal.Body</h5>
           <p className="demoBlockDescription">Основная область контента.</p>
           <PlaygroundApiTable rows={modalBodyApiRows} />

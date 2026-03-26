@@ -39,8 +39,11 @@ export default function ModalFeaturesSnippet() {
             <Modal.Portal container={portalHost}>
               <Modal.Overlay>
                 <Modal.Content aria-labelledby="modal-feat-portal-title">
-                  <Modal.Header icon={<Icon name="nav.layoutGrid" />}>
-                    <Modal.Title id="modal-feat-portal-title">Свой контейнер</Modal.Title>
+                  <Modal.Header
+                    icon={<Icon name="nav.layoutGrid" />}
+                    titleId="modal-feat-portal-title"
+                    title="Свой контейнер"
+                  >
                     <Modal.Close>
                       <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                         <Button.Icon>
@@ -68,12 +71,17 @@ export default function ModalFeaturesSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-feat-scroll-title">
-              <Modal.Header icon={<Icon name="nav.itemDot" />}>
-                <Modal.Title id="modal-feat-scroll-title">Прокрутка внутри панели</Modal.Title>
-                <Modal.Description>
-                  Задайте ограничение по высоте на <code>Modal.Body</code> (или свой класс), чтобы
-                  фон страницы оставался заблокированным.
-                </Modal.Description>
+              <Modal.Header
+                icon={<Icon name="nav.itemDot" />}
+                titleId="modal-feat-scroll-title"
+                title="Прокрутка внутри панели"
+                description={
+                  <>
+                    Задайте ограничение по высоте на <code>Modal.Body</code> (или свой класс), чтобы
+                    фон страницы оставался заблокированным.
+                  </>
+                }
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>

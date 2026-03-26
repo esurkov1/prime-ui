@@ -14,11 +14,12 @@ export default function ModalStatesSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-state-default-title">
-              <Modal.Header icon={<Icon name="field.email" />}>
-                <Modal.Title id="modal-state-default-title">Стандартное поведение</Modal.Title>
-                <Modal.Description>
-                  Закрытие по Escape и по клику на затемнённый фон (если клик не на панели).
-                </Modal.Description>
+              <Modal.Header
+                icon={<Icon name="field.email" />}
+                titleId="modal-state-default-title"
+                title="Стандартное поведение"
+                description="Закрытие по Escape и по клику на затемнённый фон (если клик не на панели)."
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>
@@ -47,12 +48,17 @@ export default function ModalStatesSnippet() {
         <Modal.Portal>
           <Modal.Overlay>
             <Modal.Content aria-labelledby="modal-state-strict-title">
-              <Modal.Header icon={<Icon name="status.locked" />}>
-                <Modal.Title id="modal-state-strict-title">Жёсткий режим</Modal.Title>
-                <Modal.Description>
-                  <code>closeOnEscape=&#123;false&#125;</code> и{" "}
-                  <code>closeOnOverlayClick=&#123;false&#125;</code> — выход только через кнопки.
-                </Modal.Description>
+              <Modal.Header
+                icon={<Icon name="status.locked" />}
+                titleId="modal-state-strict-title"
+                title="Жёсткий режим"
+                description={
+                  <>
+                    <code>closeOnEscape=&#123;false&#125;</code> и{" "}
+                    <code>closeOnOverlayClick=&#123;false&#125;</code> — выход только через кнопки.
+                  </>
+                }
+              >
                 <Modal.Close>
                   <Button.Root variant="neutral" mode="ghost" aria-label="Закрыть">
                     <Button.Icon>

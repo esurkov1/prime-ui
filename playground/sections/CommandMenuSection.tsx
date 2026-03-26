@@ -104,7 +104,7 @@ const dialogTitleApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Текст заголовка; совместим с Modal.Title.",
+    description: "Текст заголовка (те же стили, что у заголовка в Modal).",
   },
   {
     prop: "className",
@@ -604,12 +604,14 @@ export default function CommandMenuSection() {
           <PlaygroundApiTable rows={dialogApiRows} />
           <h5>CommandMenu.DialogTitle</h5>
           <p className="demoBlockDescription">
-            Заголовок диалога (тот же компонент, что <code>Modal.Title</code>).
+            Заголовок диалога (разметка и стили как у <code>h2</code> в <code>Modal.Header</code>).
           </p>
           <PlaygroundApiTable rows={dialogTitleApiRows} />
           <h5>CommandMenu.DialogDescription</h5>
           <p className="demoBlockDescription">
-            Описание для вспомогательных технологий (<code>Modal.Description</code>).
+            Описание для вспомогательных технологий (стили как у текста описания в{" "}
+            <code>Modal.Header</code>
+            ).
           </p>
           <PlaygroundApiTable rows={dialogDescriptionApiRows} />
           <h5>CommandMenu.InputRow</h5>
