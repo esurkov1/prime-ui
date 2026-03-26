@@ -1,10 +1,12 @@
 import { Badge } from "@/components/badge/Badge";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 
+import styles from "./snippets.module.css";
+
 /** Без явного size бейдж берёт размер из ControlSizeContext (как рядом с кнопкой или полем). */
 export default function BadgeContextSizeSnippet() {
   return (
-    <div className="stack" style={{ gap: "12px", alignItems: "flex-start" }}>
+    <div className={styles.stackAlignStart}>
       <ControlSizeProvider value="s">
         <Badge.Root variant="light" color="gray">
           Контекст s

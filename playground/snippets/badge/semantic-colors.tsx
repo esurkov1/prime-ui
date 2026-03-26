@@ -3,7 +3,7 @@ import { Badge } from "@/components/badge/Badge";
 /** Все значения color на variant light — для подписей к статусам и тегам. */
 export default function BadgeSemanticColorsSnippet() {
   return (
-    <div className="row rowGapTight" style={{ flexWrap: "wrap" }}>
+    <div className="row rowGapTight">
       <Badge.Root color="gray" variant="light" size="m">
         gray
       </Badge.Root>

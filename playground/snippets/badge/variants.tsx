@@ -1,10 +1,12 @@
 import { Badge } from "@/components/badge/Badge";
 
+import styles from "./snippets.module.css";
+
 /** Все значения variant и ряд значений status на одном экране. */
 export default function BadgeVariantsSnippet() {
   return (
-    <div className="stack" style={{ gap: "12px", alignItems: "flex-start" }}>
-      <div className="row rowGapTight" style={{ flexWrap: "wrap" }}>
+    <div className={styles.stackAlignStart}>
+      <div className="row rowGapTight">
         <Badge.Root color="blue" variant="filled" size="m">
           filled
         </Badge.Root>
@@ -18,7 +20,7 @@ export default function BadgeVariantsSnippet() {
           stroke
         </Badge.Root>
       </div>
-      <div className="row rowGapTight" style={{ flexWrap: "wrap" }}>
+      <div className="row rowGapTight">
         <Badge.Root variant="status" status="online" label="Пользователь в сети" size="m">
           В сети
         </Badge.Root>

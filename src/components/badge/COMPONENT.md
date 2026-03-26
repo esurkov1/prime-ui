@@ -23,7 +23,7 @@ import { Badge } from "prime-ui-kit";
 
 export function TabWithCount() {
   return (
-    <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <h2 className="previewRowWrap rowAlignCenter">
       Inbox
       <Badge.Root color="blue" variant="light" size="m">
         12
@@ -42,7 +42,7 @@ import { Badge } from "prime-ui-kit";
 
 export function ArticleTopics() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <div className="previewRowWrap">
       <Badge.Root color="purple" variant="filled" size="s">
         Guide
       </Badge.Root>
@@ -62,24 +62,18 @@ export function ArticleTopics() {
 Product row: price, title, and an “In stock” label with an icon and dot.
 
 ```tsx
-import { Badge, Icon } from "prime-ui-kit";
+import { Badge, Icon, Typography } from "prime-ui-kit";
 
 export function ProductRow() {
   return (
-    <article
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 16,
-        padding: 12,
-        borderRadius: 8,
-        border: "1px solid var(--border-subtle, #e5e5e5)",
-      }}
-    >
+    <article className="previewRowWrap rowAlignCenter">
       <div>
-        <div style={{ fontWeight: 600 }}>Mechanical keyboard</div>
-        <div style={{ fontSize: 14, opacity: 0.7 }}>SKU KB-204</div>
+        <Typography.Root as="div" size="m" weight="semibold">
+          Mechanical keyboard
+        </Typography.Root>
+        <Typography.Root as="div" size="s" tone="muted">
+          SKU KB-204
+        </Typography.Root>
       </div>
       <Badge.Root color="green" variant="light" size="m">
         <Badge.Dot />
@@ -102,7 +96,7 @@ import { Badge } from "prime-ui-kit";
 
 export function PresenceRow({ name }: { name: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <div className="previewRowWrap rowAlignCenter">
       <span>{name}</span>
       <Badge.Root variant="status" status="away" size="m" label={`${name}: away`}>
         Away
@@ -121,7 +115,7 @@ import { Badge, Icon } from "prime-ui-kit";
 
 export function IconPositions() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <div className="previewRowWrap">
       {/* Icon on the left */}
       <Badge.Root color="blue" variant="light" size="m">
         <Badge.Icon>

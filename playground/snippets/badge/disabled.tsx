@@ -2,7 +2,7 @@ import { Badge } from "@/components/badge/Badge";
 
 export default function BadgeDisabledSnippet() {
   return (
-    <div className="row rowGapTight" style={{ flexWrap: "wrap" }}>
+    <div className="row rowGapTight">
       <Badge.Root disabled color="red" variant="filled" size="m">
         filled
       </Badge.Root>
