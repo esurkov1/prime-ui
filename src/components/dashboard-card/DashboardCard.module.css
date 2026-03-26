@@ -48,7 +48,6 @@
   box-sizing: border-box;
   width: calc(var(--prime-sys-size-control-m-icon) + var(--prime-sys-spacing-m) * 2);
   height: calc(var(--prime-sys-size-control-m-icon) + var(--prime-sys-spacing-m) * 2);
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-status-information-border);
   border-radius: var(--prime-sys-size-control-m-radius);
   background: var(--prime-sys-color-status-information-background);
   color: var(--prime-sys-color-status-information-foreground);

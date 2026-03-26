@@ -24,7 +24,7 @@ Design alignment (informative):
 ## Composition
 
 - **`DashboardCard.Root`** — required **`variant`**: `"mini"` \| `"metric"` \| `"metric-media"` \| `"section"`. Optional **`flat`** removes the default surface shadow (tile-like). Sets `data-variant` / `data-flat` for styling.
-- **`DashboardCard.IconBox`** — square leading area in **`mini`**: background **`status-information-background`**, border **`status-information-border`**, radius **`size-control-m-radius`**, icon color via **`status-information-foreground`** (decorative icons: **`aria-hidden`**).
+- **`DashboardCard.IconBox`** — square leading area in **`mini`**: background **`status-information-background`**, radius **`size-control-m-radius`**, icon color via **`status-information-foreground`** (decorative icons: **`aria-hidden`**).
 - **`DashboardCard.Lead`** — left cluster in **`HeaderRow`** (badge from [Badge](../badge/COMPONENT.md), raw icon, or both).
 - **`DashboardCard.HeaderRow`** — top row for **`metric`** / **`metric-media`**: typically **`Lead`** + **`Value`**.
 - **`DashboardCard.Stack`** — vertical block for **`Label`** + **`Value`** in **`mini`**.
