@@ -2,7 +2,19 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## About
+## Canonical
+
+- **Namespace:** `CommandMenu` from `prime-ui-kit` — `Dialog`, `DialogTitle`, `DialogDescription`, `InputRow`, `Input`, `List`, `Group`, `Item`, `ItemIcon`, `TagSection` (+ `TagSectionLabel`, `TagRow`), `Footer`, `FooterKeyBox`.
+- **Shell:** `CommandMenu.Dialog` = [Modal](../modal/COMPONENT.md) + internal provider; controlled via **`open`** / **`onOpenChange`** (or **`defaultOpen`**).
+- **Tree:** `Dialog` → optional title/description → **`InputRow`** (optional `leading` / `trailing`, `density`) → **`Input`** → optional tag block → **`List`** → optional **`Footer`**. **`Item`** must live under **`List`** (inside **`Group`** recommended).
+- **Filtering:** case-insensitive match on **`Item`** **`value`** + **`keywords`**; empty query shows all non-disabled items. **`disabled`** items are **dropped from the visible list and keyboard order** (not grayed in-place).
+- **Input:** uncontrolled by default; **`value`** / **`onChange`** for controlled. **`type`** is fixed to `search`. From the combobox: ArrowUp/Down, Home, End, Enter (activate), Escape closes via Modal.
+- **Remount:** opening a fresh dialog subtree resets search, active id, and focuses the input on the next frame.
+- **Examples (TSX):** [`examples/app-palette.tsx`](./examples/app-palette.tsx), [`examples/file-search.tsx`](./examples/file-search.tsx), [`examples/quick-actions.tsx`](./examples/quick-actions.tsx), [`examples/disabled-items.tsx`](./examples/disabled-items.tsx).
+
+## Extended
+
+### About
 
 A modal command palette: search field plus a filterable list of actions. Typing narrows visible options; users pick with pointer or keyboard while focus stays on the combobox input.
 
@@ -19,8 +31,9 @@ A modal command palette: search field plus a filterable list of actions. Typing 
 - **Server-only search without a client list** — filtering is synchronous over registered items; huge lists need virtualization or a different pattern.
 - **Non-modal pickers** — use [Dropdown](../dropdown/COMPONENT.md) or [Select](../select/COMPONENT.md) for inline single choice.
 - **Built-in “no results” UX** — empty matches hide groups/items; you supply messaging or empty state markup yourself.
+- **Visible but non-clickable rows** — `disabled` removes items from the palette entirely; render a normal **`Item`** with explanation, or omit it, if you need a “locked” hint.
 
-## Composition
+### Composition
 
 - **`CommandMenu.Dialog`** wraps content in [Modal](../modal/COMPONENT.md) (`role="dialog"`) and mounts **`CommandMenuRootProvider`**: search string, active option, and item registry live here. Open state is controlled (`open` / `onOpenChange`) or uncontrolled (`defaultOpen`).
 - **Recommended top order:** optional **`DialogTitle`** / **`DialogDescription`** (same typography shell as modal headings) → **`InputRow`** (optional slots **`leading`** / **`trailing`**) → **`Input`** → optional **`TagSection`** → **`TagSectionLabel`** / **`TagRow`** → **`List`** → optional **`Footer`** (optional **`FooterKeyBox`** for key hints).
@@ -50,12 +63,23 @@ export function Example() {
 }
 ```
 
-## Rules
+### Scenario examples (source)
+
+| File | Scenario |
+|------|----------|
+| [examples/app-palette.tsx](./examples/app-palette.tsx) | Global app palette (pages + settings), ⌘K, footer key hints |
+| [examples/file-search.tsx](./examples/file-search.tsx) | File list: **`value`** / **`keywords`** for paths and tokens, **`ItemIcon`** |
+| [examples/quick-actions.tsx](./examples/quick-actions.tsx) | Contextual quick actions (clipboard, people) in groups |
+| [examples/disabled-items.tsx](./examples/disabled-items.tsx) | **`disabled`** excludes items from the list (not inactive rows) |
+
+Playground mirrors: `playground/snippets/command-menu/*`.
+
+### Rules
 
 - **Open state:** **`open`** + **`onOpenChange`** for controlled mode; **`defaultOpen`** (defaults to `false` via `Modal.Root`) for uncontrolled. Escape and overlay click close according to **`closeOnEscape`** and **`closeOnOverlayClick`** (both default `true`).
 - **Search state:** **`Input`** is uncontrolled by default (internal `search` drives filtering). Pass **`value`** / **`onChange`** for controlled input; when **`value`** is set, internal state tracks it via an effect. **`type`** is always **`search`**; **`size`** is not a valid prop on **`Input`**.
 - **Remount reset:** when the dialog content tree mounts, search and active item reset and the input is focused on the next animation frame—do not assume text persists across unmount.
-- **Filtering:** matches run against normalized **`value`** and **`keywords`** together; **`disabled`** items are excluded from matches and keyboard order. **`Item`** **`value`** is required.
+- **Filtering:** matches run against normalized **`value`** and **`keywords`** together. **`disabled`** items are **not** included in **`visibleIds`** (they do not appear in the listbox and cannot be focused via keyboard). **`Item`** **`value`** is required (use empty string only when you intentionally want a row always visible for any query—see Rules in code comments in snippets).
 - **Selection:** Enter activates the active option; click and pointer move on an enabled, visible item updates the active option and can fire **`onSelect`**. **`Item`** renders **`type="button"`**; do not rely on **`type`** override.
 - **Panel styling:** **`className`** and **`contentClassName`** merge onto the dialog panel; width/height helpers (e.g. `dialogContentWide`, `dialogContentNarrow`, `dialogContentTight`) live in the component CSS module—import those classes in your app if you need them.
 - **Accessibility:** set **`aria-labelledby`** (and **`DialogTitle`** with a matching **`id`**) or an appropriate **`aria-label`** on the dialog surface; **`Input`** exposes **`role="combobox"`**, **`aria-controls`**, and **`aria-activedescendant`**; **`List`** is **`listbox`**, **`Item`** is **`option`** with **`aria-selected`**. Modal focus trap and scroll lock follow [Modal](../modal/COMPONENT.md) behavior.
@@ -131,7 +155,7 @@ export function Example() {
 | keywords | `string` | `""` | no | Extra space for matching (not shown as the label) |
 | size | `CommandMenuItemSize` (`"s"` \| `"m"`) | `"s"` | no | Row density / type scale |
 | onSelect | `() => void` | — | no | Called when the item is chosen (click or keyboard activate) |
-| disabled | `boolean` | — | no | Excluded from filtering, visibility, and activation |
+| disabled | `boolean` | — | no | Excluded from the visible list and activation (not shown as a dimmed option) |
 | className | `string` | — | no | Button class |
 | …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "onSelect">` | — | no | Other button props; `type` is always `button` |
 
@@ -165,3 +189,7 @@ Polymorphic icon slot: `as` (element type, default `"span"`), `className`, and r
 - [Kbd](../kbd/COMPONENT.md) — shortcut hints in **`InputRow`** trailing slot
 - [Typography](../typography/COMPONENT.md) — titles, hints, footer copy
 - [Dropdown](../dropdown/COMPONENT.md), [Select](../select/COMPONENT.md) — non-modal single-choice lists
+
+## LLM note
+
+When generating or refactoring CommandMenu usage: import **`CommandMenu`** from **`prime-ui-kit`** only; do not reimplement modal, listbox, or filter logic. Always pass **`open`** / **`onOpenChange`** (or **`defaultOpen`**) on **`Dialog`**, put **`Input`** inside **`InputRow`** for standard chrome, and give **`Input`** an **`aria-label`** (or associated label). Every **`Item`** needs a **`value`** string; add **`keywords`** for synonyms and path segments. Do not set **`disabled`** expecting a visible inactive row—those entries are removed from the palette; use conditional JSX or a non-**`Item`** hint if the UX must mention unavailable actions. For global palettes, document **`aria-labelledby`** + **`DialogTitle`** **`id`**. Prefer the four **`examples/*.tsx`** files as structural templates (app routes, file picker, actions, disabled semantics).
