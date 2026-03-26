@@ -5,31 +5,31 @@
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-Библиотека **React 19** UI-компонентов: **CSS Modules**, **дизайн-токены** как CSS-переменные (`--prime-sys-*`), **композиционный API** (`Modal.Root`, `Input.Field`, `Select.Trigger`, …). Работает с **Vite**, **Next.js**, **Remix** и любым бандлером с поддержкой CSS Modules. Доступность ориентирована на **react-aria-components** там, где это уместно.
+A **React 19** component library built with **CSS Modules**, **design tokens** as CSS variables (`--prime-sys-*`), and a **composable API** (`Modal.Root`, `Input.Field`, `Select.Trigger`, …). Works with **Vite**, **Next.js**, **Remix**, or any bundler that supports CSS Modules. Accessibility follows **react-aria-components** where it fits.
 
-**Каналы:** [npm](https://www.npmjs.com/package/prime-ui-kit) · [Репозиторий и issues](https://github.com/esurkov1/prime-ui/issues)
+**Links:** [npm](https://www.npmjs.com/package/prime-ui-kit) · [Repository & issues](https://github.com/esurkov1/prime-ui/issues)
 
 ---
 
-## Содержание
+## Table of contents
 
-- [Метаданные (для инструментов и LLM)](#метаданные-для-инструментов-и-llm)
-- [Ключевые возможности](#ключевые-возможности)
-- [Требования](#требования)
-- [Установка](#установка)
-- [Стили и темы](#стили-и-темы)
-- [Быстрый старт](#быстрый-старт)
-- [Импорты: основной вход и «тяжёлые» модули](#импорты-основной-вход-и-тяжёлые-модули)
-- [Провайдеры и контекст](#провайдеры-и-контекст)
-- [Каталог компонентов](#каталог-компонентов)
-- [Экспорты пакета (`package.json` / `exports`)](#экспорты-пакета-packagejson--exports)
+- [Metadata (for tooling and LLMs)](#metadata-for-tooling-and-llms)
+- [Key features](#key-features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Styles and theming](#styles-and-theming)
+- [Quick start](#quick-start)
+- [Imports: main entry and heavy modules](#imports-main-entry-and-heavy-modules)
+- [Providers and context](#providers-and-context)
+- [Component catalog](#component-catalog)
+- [Package exports (`package.json` / `exports`)](#package-exports-packagejson--exports)
 - [TypeScript](#typescript)
-- [Где лежит документация компонентов](#где-лежит-документация-компонентов)
-- [Лицензия](#лицензия)
+- [Where component docs live](#where-component-docs-live)
+- [License](#license)
 
 ---
 
-## Метаданные (для инструментов и LLM)
+## Metadata (for tooling and LLMs)
 
 ```yaml
 name: prime-ui-kit
@@ -40,38 +40,38 @@ styling: CSS Modules + CSS variables (--prime-sys-*)
 a11y_stack: react-aria-components (peer)
 documentation_per_component: src/components/<name>/COMPONENT.md
 repository: https://github.com/esurkov1/prime-ui
-default_control_size: m  # для оси size, если не оговорено иное
+default_control_size: m  # for the size axis unless specified otherwise
 ```
 
 ---
 
-## Ключевые возможности
+## Key features
 
-- **Токены и темы** — семантические переменные, светлая и тёмная тема через `data-theme`.
-- **Композиция** — паттерн подкомпонентов (`Root`, `Field`, `Trigger`, …) вместо монолитных пропов.
-- **Формы** — поля, выборы, переключатели, загрузка файлов, цвет, OTP-поле, слайдеры.
-- **Оверлеи** — модальные окна, drawer, popover, меню, тултипы, command palette.
-- **Навигация и раскладка** — sidebar, хлебные крошки, вкладки, аккордеон, степпер, пагинация, оболочка страницы.
-- **Данные** — таблица с сортировкой, пагинацией и бесконечной прокруткой.
-- **Типы** — публикуемые `.d.ts` вместе с пакетом.
-- **Уведомления** — очередь тостов через `NotificationProvider` и `useNotifications()`.
+- **Tokens & themes** — semantic variables, light and dark themes via `data-theme`.
+- **Composition** — subcomponent pattern (`Root`, `Field`, `Trigger`, …) instead of monolithic prop blobs.
+- **Forms** — inputs, selects, toggles, file upload, color, OTP-style fields, sliders.
+- **Overlays** — modals, drawers, popovers, menus, tooltips, command palette.
+- **Navigation & layout** — sidebar, breadcrumbs, tabs, accordion, stepper, pagination, page shell.
+- **Data** — table with sorting, pagination, or infinite scroll.
+- **Types** — published `.d.ts` alongside the package.
+- **Notifications** — toast queue via `NotificationProvider` and `useNotifications()`.
 
 ---
 
-## Требования
+## Requirements
 
-| Зависимость | Версия |
-|-------------|--------|
+| Dependency | Version |
+|------------|---------|
 | `react` / `react-dom` | ^19.0.0 |
 | `react-aria-components` | ^1.16.0 |
 | `react-day-picker` | ^9.14.0 |
 | `date-fns` | ^4.0.0 |
 
-Пакет подтягивает **lucide-react**, **framer-motion** и **react-router-dom** (иконки, анимация уведомлений, навигация в **Sidebar**). Для **Sidebar** с пунктами маршрутизации подключите роутер (например `BrowserRouter`).
+The package bundles **lucide-react**, **framer-motion**, and **react-router-dom** (icons, notification motion, and **Sidebar** routing). Use a router (e.g. `BrowserRouter`) if **Sidebar** renders navigation items.
 
 ---
 
-## Установка
+## Installation
 
 ```bash
 npm install prime-ui-kit react react-dom react-aria-components react-day-picker date-fns
@@ -87,21 +87,21 @@ bun add prime-ui-kit react react-dom react-aria-components react-day-picker date
 
 ---
 
-## Стили и темы
+## Styles and theming
 
-Подключите **глобальные стили** (шрифты, reset, токены, обе темы) и **собранный CSS компонентов** (результат CSS Modules из публикации):
+Import **global styles** (fonts, reset, tokens, both themes) and the **bundled component CSS** (CSS Modules output from the published build):
 
 ```css
 @import "prime-ui-kit/styles.css";
 @import "prime-ui-kit/bundle.css";
 ```
 
-- **`styles.css`** — загрузка шрифтов Google Fonts, CSS reset, дизайн-токены, светлая и тёмная темы.
-- **`bundle.css`** — правила классов, согласованные с JS-бандлом (`Button`, `Input`, …).
+- **`styles.css`** — Google Fonts, CSS reset, design tokens, light and dark themes.
+- **`bundle.css`** — class rules that match the JS bundle (`Button`, `Input`, …).
 
-**Светлая / тёмная тема:** задайте `data-theme="light"` или `data-theme="dark"` на `<html>`, корне лейаута или обёртке.
+**Light / dark:** set `data-theme="light"` or `data-theme="dark"` on `<html>`, a layout root, or any wrapper.
 
-Тонкая настройка (свой reset, одна тема):
+Fine-grained imports (custom reset, single theme):
 
 ```css
 @import "prime-ui-kit/tokens.css";
@@ -110,11 +110,11 @@ bun add prime-ui-kit react react-dom react-aria-components react-day-picker date
 @import "prime-ui-kit/bundle.css";
 ```
 
-Если используете только **`prime-ui-kit/components`**, замените `bundle.css` на **`prime-ui-kit/components.css`**.
+If you only use **`prime-ui-kit/components`**, swap `bundle.css` for **`prime-ui-kit/components.css`**.
 
 ---
 
-## Быстрый старт
+## Quick start
 
 ```tsx
 import { Button, Input, Modal } from "prime-ui-kit";
@@ -138,10 +138,10 @@ export function Example() {
 
 ---
 
-## Импорты: основной вход и «тяжёлые» модули
+## Imports: main entry and heavy modules
 
-- **`prime-ui-kit`** — основной вход; подходит для большинства сценариев.
-- **`prime-ui-kit/components`** — точка входа для tree-shaking «тяжёлых» модулей (например `DataTable`).
+- **`prime-ui-kit`** — main entry; use for most apps.
+- **`prime-ui-kit/components`** — alternate entry for tree-shaking heavier modules (e.g. `DataTable`).
 
 ```tsx
 import { DataTable } from "prime-ui-kit/components";
@@ -149,98 +149,98 @@ import { DataTable } from "prime-ui-kit/components";
 
 ---
 
-## Провайдеры и контекст
+## Providers and context
 
-| API | Назначение |
-|-----|------------|
-| **`NotificationProvider`** + **`useNotifications()`** | Очередь тостов: `notify`, `dismiss`, `dismissAll`. Обёрните приложение или поддерево. |
-| **`ControlSizeProvider`** | Значение по умолчанию для оси **`s` \| `m` \| `l` \| `xl`** у контролов внутри поддерева. |
-
----
-
-## Каталог компонентов
-
-Описание — краткая выжимка из раздела **About** в `COMPONENT.md`. Полное API, составные части и примеры — по ссылке.
-
-База URL документации в репозитории: `https://github.com/esurkov1/prime-ui/blob/main/src/components/`
-
-| Категория | Компонент | Описание | Документация |
-|-----------|-----------|----------|--------------|
-| Формы и ввод | **Checkbox** | Чекбокс с оформлением, подписью, подсказкой и ошибкой. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/checkbox/COMPONENT.md) |
-| Формы и ввод | **ColorPicker** | Выбор цвета: плоскость, слайдеры каналов, swatches, hex, пипетка (react-aria). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-picker/COMPONENT.md) |
-| Формы и ввод | **DigitInput** | OTP-стиль: ячейки на один символ, вставка и переход фокуса. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/digit-input/COMPONENT.md) |
-| Формы и ввод | **FileUpload** | Выбор файлов: скрытый `input`, drag-and-drop, строки файлов с прогрессом. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/file-upload/COMPONENT.md) |
-| Формы и ввод | **Hint** | Вспомогательный или статусный текст под полем с опциональной иконкой. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/hint/COMPONENT.md) |
-| Формы и ввод | **Input** | Однострочное поле с обёрткой, аффиксами и подсказками/ошибкой. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/input/COMPONENT.md) |
-| Формы и ввод | **Kbd** | Отображение сочетаний клавиш (`kbd`) в стиле UI. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/kbd/COMPONENT.md) |
-| Формы и ввод | **Label** | Подпись к полю: иконка, звёздочка обязательности, вторичный текст. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) |
-| Формы и ввод | **Radio** | Группа радиокнопок с подписью, подсказкой и ошибкой. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/radio/COMPONENT.md) |
-| Формы и ввод | **SegmentedControl** | Горизонтальный `radiogroup` с сегментами и индикатором выбора. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-control/COMPONENT.md) |
-| Формы и ввод | **Select** | Одиночный выбор из списка (комбобокс + listbox в портале). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) |
-| Формы и ввод | **Slider** | Горизонтальный `input type="range"` в масштабе кита. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/slider/COMPONENT.md) |
-| Формы и ввод | **Switch** | Переключатель вкл/выкл с подписью и метаданными. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/switch/COMPONENT.md) |
-| Формы и ввод | **Textarea** | Многострочное поле, счётчик символов, подсказки и ошибки. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) |
-| Дата и время | **Datepicker** | Календарь, диапазоны, пресеты, опционально время (react-day-picker + date-fns). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/datepicker/COMPONENT.md) |
-| Оверлеи | **CommandMenu** | Модальная палитра команд: поиск и выбор из списка с клавиатуры. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/command-menu/COMPONENT.md) |
-| Оверлеи | **Drawer** | Боковая панель в портале с блокировкой прокрутки и фокусом. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) |
-| Оверлеи | **Dropdown** | Меню действий с триггером и порталом (`role="menu"`). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/dropdown/COMPONENT.md) |
-| Оверлеи | **Modal** | Центрированный диалог с бэкдропом, ловушкой фокуса и опциональным chrome. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/modal/COMPONENT.md) |
-| Оверлеи | **Popover** | Якорь + панель в портале, не модальный диалог рядом с триггером. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/popover/COMPONENT.md) |
-| Оверлеи | **Tooltip** | Подсказка с задержкой, триггер и контент в портале. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tooltip/COMPONENT.md) |
-| Навигация и раскладка | **Accordion** | Раскрывающиеся секции (FAQ, группы настроек) с анимацией высоты. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) |
-| Навигация и раскладка | **Breadcrumb** | «Хлебные крошки»: `nav`, ссылки, разделители, многоточие. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/breadcrumb/COMPONENT.md) |
-| Навигация и раскладка | **Pagination** | Переход по страницам: prev/next, номера, ellipsis. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) |
-| Навигация и раскладка | **Sidebar** | Боковая навигация: панели, группы, контекстная колонка, переключение секций. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/sidebar/COMPONENT.md) |
-| Навигация и раскладка | **Stepper** | Пошаговый процесс на `<ol>` / `<li>` и примитивы горизонтальный/вертикальный. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) |
-| Навигация и раскладка | **Tabs** | Вкладки: список триггеров, индикатор, одна видимая панель. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) |
-| Навигация и раскладка | **PageContent** | Контентная колонка: ограничение ширины (`readable` / `wide`), заголовок и тело. | [Исходники](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-content) |
-| Навигация и раскладка | **PageShell** | Оболочка страницы: корень, зона навигации, зона контента, опционально на весь viewport. | [Исходники](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-shell) |
-| Данные | **DataTable** | Таблица с прокруткой, сортировкой, пагинацией или infinite scroll, sticky. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) |
-| Отображение и контент | **Avatar** | Круглый аватар: изображение, fallback, группа с overflow. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) |
-| Отображение и контент | **Badge** | Компактный статус или метка; вариант с точкой присутствия. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) |
-| Отображение и контент | **Banner** | Встроенная полоса объявления с иконкой, текстом и действиями. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/banner/COMPONENT.md) |
-| Отображение и контент | **CodeBlock** | Подсветка TS/TSX в `pre`/`code` (статическая презентация кода). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) |
-| Отображение и контент | **Divider** | Горизонтальный или вертикальный разделитель с опциональной подписью. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) |
-| Отображение и контент | **ProgressBar** | Горизонтальный прогресс на нативном `<progress>`. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) |
-| Отображение и контент | **ProgressCircle** | Кольцевой индикатор прогресса (SVG + `progressbar`). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) |
-| Отображение и контент | **Tag** | Чип: иконка, текст, кнопка снятия при `onRemove`. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag/COMPONENT.md) |
-| Отображение и контент | **Typography** | Текст с масштабом размеров, весом, трекингом, muted. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md) |
-| Действия и обратная связь | **Button** | Кнопка действия: `asChild`, иконка, спиннер загрузки. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/button/COMPONENT.md) |
-| Действия и обратная связь | **ButtonGroup** | Группа кнопок в общей обводке с разделителями. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/button-group/COMPONENT.md) |
-| Действия и обратная связь | **LinkButton** | Текстовая ссылка-кнопка с отступами и подчёркиванием при hover/focus. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/link-button/COMPONENT.md) |
-| Действия и обратная связь | **Notification** | Тосты: провайдер, очередь, позиции, типы сообщений. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/notification/COMPONENT.md) |
+| API | Purpose |
+|-----|---------|
+| **`NotificationProvider`** + **`useNotifications()`** | Toast queue: `notify`, `dismiss`, `dismissAll`. Wrap your app or a subtree. |
+| **`ControlSizeProvider`** | Default **`s` \| `m` \| `l` \| `xl`** for controls inside the subtree. |
 
 ---
 
-## Экспорты пакета (`package.json` / `exports`)
+## Component catalog
 
-| Путь | Назначение |
-|------|------------|
-| `prime-ui-kit` | Основной JS/TS API. |
-| `prime-ui-kit/components` | Альтернативный вход для tree-shaking тяжёлых частей. |
-| `prime-ui-kit/styles.css` | Глобальные стили (шрифты, reset, токены, темы). |
-| `prime-ui-kit/tokens.css` | Только токены. |
-| `prime-ui-kit/theme-light.css` / `theme-dark.css` | Отдельные темы. |
-| `prime-ui-kit/bundle.css` | CSS, согласованный с основным бандлом. |
-| `prime-ui-kit/components.css` | CSS для входа `components`. |
+Descriptions are short summaries from the **About** section in each `COMPONENT.md`. Full API, parts, and examples are in the linked files.
+
+Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/main/src/components/`
+
+| Category | Component | Description | Docs |
+|----------|-----------|-------------|------|
+| Forms & input | **Checkbox** | Checkbox with chrome, label, hint, and error text. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/checkbox/COMPONENT.md) |
+| Forms & input | **ColorPicker** | Color selection: 2D area, channel sliders, swatches, hex, eyedropper (react-aria). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-picker/COMPONENT.md) |
+| Forms & input | **DigitInput** | OTP-style one-character cells with paste and focus handoff. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/digit-input/COMPONENT.md) |
+| Forms & input | **FileUpload** | File picking: hidden `input`, drag-and-drop, per-file rows with progress. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/file-upload/COMPONENT.md) |
+| Forms & input | **Hint** | Helper or status line under a field, optional leading icon. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/hint/COMPONENT.md) |
+| Forms & input | **Input** | Single-line field with wrapper, affixes, and hint/error lines. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/input/COMPONENT.md) |
+| Forms & input | **Kbd** | Keyboard shortcuts styled as UI chrome (`kbd`). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/kbd/COMPONENT.md) |
+| Forms & input | **Label** | Field caption: icon, required asterisk, secondary text. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) |
+| Forms & input | **Radio** | Radio group with label, hint, and error wiring. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/radio/COMPONENT.md) |
+| Forms & input | **SegmentedControl** | Horizontal `radiogroup` with segments and a sliding indicator. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-control/COMPONENT.md) |
+| Forms & input | **Select** | Single-select combobox with a portaled listbox. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) |
+| Forms & input | **Slider** | Horizontal `input type="range"` with kit sizing. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/slider/COMPONENT.md) |
+| Forms & input | **Switch** | On/off control with label and metadata slots. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/switch/COMPONENT.md) |
+| Forms & input | **Textarea** | Multiline field, character counter, hints and errors. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) |
+| Date & time | **Datepicker** | Calendar, ranges, presets, optional time (react-day-picker + date-fns). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/datepicker/COMPONENT.md) |
+| Overlays | **CommandMenu** | Modal command palette: search and pick from the list with the keyboard. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/command-menu/COMPONENT.md) |
+| Overlays | **Drawer** | Side sheet in a portal with scroll lock and focus management. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) |
+| Overlays | **Dropdown** | Action menu with trigger and portaled panel (`role="menu"`). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/dropdown/COMPONENT.md) |
+| Overlays | **Modal** | Centered dialog with backdrop, focus trap, optional built-in chrome. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/modal/COMPONENT.md) |
+| Overlays | **Popover** | Anchor + portaled panel; non-modal surface next to the trigger. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/popover/COMPONENT.md) |
+| Overlays | **Tooltip** | Delayed hint; trigger and content in a portal. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tooltip/COMPONENT.md) |
+| Navigation & layout | **Accordion** | Expandable sections (FAQ, settings groups) with height animation. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) |
+| Navigation & layout | **Breadcrumb** | `nav` trail with links, separators, and optional ellipsis. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/breadcrumb/COMPONENT.md) |
+| Navigation & layout | **Pagination** | Page controls: prev/next, page numbers, ellipsis. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) |
+| Navigation & layout | **Sidebar** | Side navigation: panels, groups, context column, section switching. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/sidebar/COMPONENT.md) |
+| Navigation & layout | **Stepper** | Multi-step flow on `<ol>` / `<li>` plus horizontal/vertical primitives. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) |
+| Navigation & layout | **Tabs** | Tablist, indicator, one visible panel at a time. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) |
+| Navigation & layout | **PageContent** | Main column: max width (`readable` / `wide`), header and body regions. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-content) |
+| Navigation & layout | **PageShell** | Page shell: root, nav area, content area, optional full viewport. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-shell) |
+| Data | **DataTable** | Table with scroll, sorting, pagination or infinite scroll, sticky regions. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) |
+| Display & content | **Avatar** | Circular avatar: image, fallback, group with overflow cell. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) |
+| Display & content | **Badge** | Compact status or count; optional presence dot variant. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) |
+| Display & content | **Banner** | In-flow announcement strip with icon, copy, and actions. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/banner/COMPONENT.md) |
+| Display & content | **CodeBlock** | TS/TSX syntax highlighting in `pre`/`code` (static presentation). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) |
+| Display & content | **Divider** | Horizontal or vertical rule with optional inset label. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) |
+| Display & content | **ProgressBar** | Horizontal progress on the native `<progress>` element. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) |
+| Display & content | **ProgressCircle** | Circular progress ring (SVG + `progressbar`). | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) |
+| Display & content | **Tag** | Chip with optional icon, trailing dismiss when `onRemove` is set. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag/COMPONENT.md) |
+| Display & content | **Typography** | Text primitive with size scale, weight, tracking, muted tone. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md) |
+| Actions & feedback | **Button** | Action control: `asChild`, icon, loading spinner. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/button/COMPONENT.md) |
+| Actions & feedback | **ButtonGroup** | Button row sharing one outline and internal dividers. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/button-group/COMPONENT.md) |
+| Actions & feedback | **LinkButton** | Text-style link with control padding and underline on hover/focus. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/link-button/COMPONENT.md) |
+| Actions & feedback | **Notification** | Toasts: provider, queue, positions, semantic types. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/notification/COMPONENT.md) |
+
+---
+
+## Package exports (`package.json` / `exports`)
+
+| Path | Purpose |
+|------|---------|
+| `prime-ui-kit` | Main JS/TS API. |
+| `prime-ui-kit/components` | Alternate entry for tree-shaking heavier chunks. |
+| `prime-ui-kit/styles.css` | Global styles (fonts, reset, tokens, themes). |
+| `prime-ui-kit/tokens.css` | Tokens only. |
+| `prime-ui-kit/theme-light.css` / `theme-dark.css` | Individual theme files. |
+| `prime-ui-kit/bundle.css` | CSS aligned with the main bundle. |
+| `prime-ui-kit/components.css` | CSS for the `components` entry. |
 
 ---
 
 ## TypeScript
 
-Определения типов публикуются вместе с пакетом (`dist/*.d.ts`).
+Type definitions ship with the package (`dist/*.d.ts`).
 
 ---
 
-## Где лежит документация компонентов
+## Where component docs live
 
-- **В репозитории и на GitHub:** для каждого компонента с таблицы выше — файл `src/components/<имя>/COMPONENT.md`.
-- **В установленном пакете:** те же файлы входят в публикацию (`package.json` → `files`), путь вида `node_modules/prime-ui-kit/src/components/<имя>/COMPONENT.md`.
+- **In the repo / on GitHub:** each component has `src/components/<name>/COMPONENT.md` (see the table above).
+- **In the installed package:** the same files are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/<name>/COMPONENT.md`.
 
-Для **PageShell** и **PageContent** отдельного `COMPONENT.md` нет; ориентируйтесь на типы и реализацию в каталогах `page-shell` и `page-content`.
+**PageShell** and **PageContent** do not have a dedicated `COMPONENT.md`; refer to types and implementation under `page-shell` and `page-content`.
 
 ---
 
-## Лицензия
+## License
 
-MIT — см. файл [`LICENSE`](https://github.com/esurkov1/prime-ui/blob/main/LICENSE) в репозитории и в npm-пакете.
+MIT — see [`LICENSE`](https://github.com/esurkov1/prime-ui/blob/main/LICENSE) in the repo and in the npm package.
