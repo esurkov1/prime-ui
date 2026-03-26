@@ -1,14 +1,14 @@
 ---
-name: prime-ui-responsive-app
-description: >
-  Builds responsive, mobile-first screens with prime-ui-kit: Flexbox, CSS Modules, and --prime-sys-* tokens.
-  Use when laying out pages, templates, forms, navigation, or dashboards; converting desktop layouts to
-  mobile-first; picking a component for a region; validating breakpoints, touch targets, or Drawer vs inline.
-  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 41-component catalog, and anti-patterns.
-  Non-negotiable: no custom wrappers or reskins of kit components—only primitives, default styles, and the public API.
----
 
-# prime-ui-responsive-app
+## name: prime-ui-kit  
+description: >  
+  Builds responsive, mobile-first screens with prime-ui-kit: Flexbox, CSS Modules, and --prime-sys-* tokens.  
+  Use when laying out pages, templates, forms, navigation, or dashboards; converting desktop layouts to  
+  mobile-first; picking a component for a region; validating breakpoints, touch targets, or Drawer vs inline.  
+  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 41-component catalog, and anti-patterns.  
+  Non-negotiable: no custom wrappers or reskins of kit components—only primitives, default styles, and the public API.
+
+# prime-ui-kit
 
 **Agent role:** implement UI strictly through documented prime-ui-kit components and semantic tokens; do not “improve” appearance with wrappers or overrides of kit styles.
 
@@ -20,19 +20,21 @@ description: >
 
 ## Where to read docs
 
-| What | In this repo | After `npm install prime-ui-kit` |
-|------|----------------|-------------------------------------|
-| API, props, examples | `../src/components/<kebab>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<kebab>/COMPONENT.md` |
-| Tokens | [`design-tokens.md`](./design-tokens.md) | `node_modules/prime-ui-kit/SKILL/design-tokens.md` |
-| All 41 components, layout roles | [`component-catalog.md`](./component-catalog.md) | next to `SKILL.md` in the package |
 
-Installing as a Cursor skill: use the whole `SKILL/` directory so `SKILL.md`, `design-tokens.md`, and `component-catalog.md` stay together.
+| What                            | In this repo                                     | After `npm install prime-ui-kit`                                |
+| ------------------------------- | ------------------------------------------------ | --------------------------------------------------------------- |
+| API, props, examples            | `../src/components/<kebab>/COMPONENT.md`         | `node_modules/prime-ui-kit/src/components/<kebab>/COMPONENT.md` |
+| Tokens                          | `[design-tokens.md](./design-tokens.md)`         | `node_modules/prime-ui-kit/src/styles/` (CSS + `package.json` exports) |
+| All 41 components, layout roles | `[component-catalog.md](./component-catalog.md)` | only in this repo’s `SKILL/` (not in the npm tarball)           |
+
+
+Cursor skill: copy the whole `SKILL/` directory from the GitHub repository — it is not published to npm.
 
 ---
 
 ## Non-negotiable rules
 
-1. **Semantic tokens only** — color, spacing, radii, shadows, z-index, and motion come from `--prime-sys-*`. Do not use raw `--prime-ref-*` in layout.
+1. **Semantic tokens only** — color, spacing, radii, shadows, z-index, and motion come from `--prime-sys-`*. Do not use raw `--prime-ref-*` in layout.
 2. **No visual literals** — no hex colors or bare px for spacing, radius, shadow, or z-index in layout styles.
 3. **Theming via `data-theme`** — components do not hard-code light/dark; roles stay semantic.
 4. **CSS Modules + variables** — Tailwind is not part of prime-ui-kit.
@@ -41,26 +43,30 @@ Installing as a Cursor skill: use the whole `SKILL/` directory so `SKILL.md`, `d
 
 ### Raw kit only — no custom shells
 
-| Do not | Do |
-|--------|-----|
-| Wrap kit components to change look or behavior; swap markup; override kit CSS (ad-hoc `className`, inline styles from another system, `div`/`span` clones) | Use standard composition and the **public API** only: props (`size`, `variant`, `mode`, `fullWidth`, …), documented subcomponents, `ControlSizeProvider`, `data-theme`, and `--prime-sys-*` on **page-level surfaces**—not on “reskinned” internals |
+
+| Do not                                                                                                                                                     | Do                                                                                                                                                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wrap kit components to change look or behavior; swap markup; override kit CSS (ad-hoc `className`, inline styles from another system, `div`/`span` clones) | Use standard composition and the **public API** only: props (`size`, `variant`, `mode`, `fullWidth`, …), documented subcomponents, `ControlSizeProvider`, `data-theme`, and `--prime-sys-`* on **page-level surfaces**—not on “reskinned” internals |
+
 
 Breaking this drifts from the design system, weakens accessibility guarantees, and makes upgrades unsafe.
 
 ### Token cheat sheet (layout)
 
-| Category | Prefix | Examples |
-|----------|--------|----------|
-| Background | `--prime-sys-color-surface-*` | default, raised, overlay |
-| Text | `--prime-sys-color-content-*` | primary, secondary, muted |
-| Border | `--prime-sys-color-border-*` | separator, subtle, strong |
-| Spacing | `--prime-sys-spacing-*` | s, l, 2xl, 4xl |
-| Radii | `--prime-sys-shape-radius-*` | m, 4xl |
-| Shadows | `--prime-sys-elevation-shadow-*` | surface, modal |
-| Z-index | `--prime-sys-elevation-zIndex-*` | sticky, modal |
-| Motion | `--prime-sys-motion-*` | duration-fast, easing-standard |
 
-Full reference: [`design-tokens.md`](./design-tokens.md).
+| Category   | Prefix                           | Examples                       |
+| ---------- | -------------------------------- | ------------------------------ |
+| Background | `--prime-sys-color-surface-`*    | default, raised, overlay       |
+| Text       | `--prime-sys-color-content-*`    | primary, secondary, muted      |
+| Border     | `--prime-sys-color-border-*`     | separator, subtle, strong      |
+| Spacing    | `--prime-sys-spacing-*`          | s, l, 2xl, 4xl                 |
+| Radii      | `--prime-sys-shape-radius-*`     | m, 4xl                         |
+| Shadows    | `--prime-sys-elevation-shadow-*` | surface, modal                 |
+| Z-index    | `--prime-sys-elevation-zIndex-*` | sticky, modal                  |
+| Motion     | `--prime-sys-motion-*`           | duration-fast, easing-standard |
+
+
+Full reference: `[design-tokens.md](./design-tokens.md)`.
 
 ---
 
@@ -69,7 +75,7 @@ Full reference: [`design-tokens.md`](./design-tokens.md).
 - **Mobile-first:** start with `flex-direction: column`; switch to a row at `@media (min-width: …)`.
 - **Breakpoints:** `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 — place them where the layout breaks, not by device name.
 - **Flex:** sidebar + content — `flex-wrap`, sidebar `flex: 0 0 280px`, content `flex: 1 1 0%`; holy grail — body column `min-height: 100vh`, middle `flex: 1` + flex row; card grid — `flex-wrap` + token `gap` + `min-width` for reflow; sticky footer — main `flex: 1 0 auto`, footer `flex-shrink: 0`.
-- **Spacing:** `gap` / `padding` / `margin` only from `--prime-sys-spacing-*`; for fluid spacing use e.g. `clamp(var(--prime-sys-spacing-s), 2vw, var(--prime-sys-spacing-xl))` — avoid mixing literals and tokens in one rule without good reason.
+- **Spacing:** `gap` / `padding` / `margin` only from `--prime-sys-spacing-`*; for fluid spacing use e.g. `clamp(var(--prime-sys-spacing-s), 2vw, var(--prime-sys-spacing-xl))` — avoid mixing literals and tokens in one rule without good reason.
 - **Touch:** minimum 44×44 px (WCAG 2.5.5); on mobile use Button / Input / Select at `size="l"`; pad Checkbox / Radio / Switch hit areas; LinkButton at least `m`.
 - **Navigation:** desktop — fixed Sidebar with `flex-shrink: 0`; below `md` — Sidebar in a left Drawer; Breadcrumb with `maxItems`; Tabs horizontal scroll or Accordion; CommandMenu reachable from a button on all widths.
 
@@ -87,13 +93,13 @@ Full reference: [`design-tokens.md`](./design-tokens.md).
 
 **Form wizard:** Stepper (horizontal at `≥ md`, vertical otherwise) + step column with `max-width` ~600px; actions `space-between`; on mobile the step can live in Modal or Drawer; ProgressBar under progress; below `sm` buttons `fullWidth`, larger DigitInput.
 
-Per-component details live in each `COMPONENT.md`; the 41-component overview is in [`component-catalog.md`](./component-catalog.md).
+Per-component details live in each `COMPONENT.md`; the 41-component overview is in `[component-catalog.md](./component-catalog.md)`.
 
 ---
 
 ## Component catalog
 
-Every exported component is documented under `../src/components/<kebab-name>/COMPONENT.md`. Full list and scenarios: [`component-catalog.md`](./component-catalog.md) — do not duplicate long tables here (progressive disclosure).
+Every exported component is documented under `../src/components/<kebab-name>/COMPONENT.md`. Full list and scenarios: `[component-catalog.md](./component-catalog.md)` — do not duplicate long tables here (progressive disclosure).
 
 ---
 
@@ -106,14 +112,15 @@ Every exported component is documented under `../src/components/<kebab-name>/COM
 5. Centered Modal on mobile for long flows — prefer a bottom Drawer below `md`.
 6. Small tap targets on mobile — see Touch above.
 7. Fixed px on flex items with no adaptation — use `flex-basis` + min/max or `%` / `clamp`.
-8. Hard-coded `#…`, `gap: 16px`, `z-index: 999`, etc. instead of `--prime-sys-*`.
+8. Hard-coded `#…`, `gap: 16px`, `z-index: 999`, etc. instead of `--prime-sys-`*.
 9. Custom wrappers and reskins — see **Raw kit only** above.
 
 ---
 
 ## Checklist before answering the user
 
-- [ ] Visuals use `--prime-sys-*` only; no bypassing the kit with custom wrappers.
-- [ ] Control sizes via props; default `size` axis is `m` unless specified otherwise.
-- [ ] Breakpoints follow layout breakage; Sidebar / Drawer accounted for below `md` / `lg` where relevant.
-- [ ] If unsure, open `COMPONENT.md` and [`component-catalog.md`](./component-catalog.md).
+- Visuals use `--prime-sys-`* only; no bypassing the kit with custom wrappers.
+- Control sizes via props; default `size` axis is `m` unless specified otherwise.
+- Breakpoints follow layout breakage; Sidebar / Drawer accounted for below `md` / `lg` where relevant.
+- If unsure, open `COMPONENT.md` and `[component-catalog.md](./component-catalog.md)`.
+

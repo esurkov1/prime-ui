@@ -2,6 +2,9 @@
   "name": "prime-ui-kit",
   "version": "0.2.5",
   "description": "React 19 UI kit: CSS Modules, semantic design tokens (--prime-sys-*), composable components — forms, modals, selects, tables, navigation, overlays. TypeScript, ESM, a11y-oriented.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "keywords": [
     "a11y",
     "accessible",
@@ -59,9 +62,8 @@
   "homepage": "https://github.com/esurkov1/prime-ui#readme",
   "files": [
     "dist",
-    "src/styles",
+    "src/styles/*.css",
     "src/components/**/COMPONENT.md",
-    "SKILL/*.md",
     "LICENSE"
   ],
   "publishConfig": {
@@ -110,8 +112,10 @@
     "./components.css": "./dist/components/index.css"
   },
   "scripts": {
+    "clean": "rm -rf dist .dts-stage coverage playground/dist",
     "tokens:build": "bun run scripts/build-tokens.ts",
     "build": "bun run tokens:build && bun run scripts/bundle-lib.ts",
+    "prepublishOnly": "bun run clean && bun run build",
     "dev": "bun run scripts/bundle-lib.ts --watch",
     "playground:dev": "vite playground --config playground/vite.config.ts",
     "check": "biome check .",

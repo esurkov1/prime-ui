@@ -2,7 +2,6 @@
 node_modules/
 dist/
 .dts-stage/
-.tsup-dts/
 coverage/
 playground/dist/
 *.tsbuildinfo
