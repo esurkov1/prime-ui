@@ -97,8 +97,7 @@
 .root[data-table-width="fill"] .table {
   width: 100%;
   min-width: max-content;
-  /* colgroup + фиксированная раскладка: лишняя ширина делится между колонками пропорционально grow / width */
-  table-layout: fixed;
+  /* table-layout: auto (по умолчанию) — движок считает ширины по содержимому и min/max ячеек и распределяет лишнюю ширину */
 }
 
 .head {

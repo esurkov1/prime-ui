@@ -250,7 +250,7 @@ const dataTableRootApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "true",
     required: "Нет",
     description:
-      "Растянуть таблицу на ширину контейнера. При false — ширина только по содержимому колонок (max-content).",
+      "Растянуть таблицу на ширину контейнера; лишнее место распределяет браузер по правилам table-layout: auto (содержимое и width/minWidth/maxWidth колонок). При false — ширина только по содержимому (max-content).",
   },
   {
     prop: "highlightRowOnHover",
@@ -352,14 +352,6 @@ const dataTableColumnApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description: "Максимальная ширина колонки (th/td).",
-  },
-  {
-    prop: "grow",
-    type: "number",
-    defaultValue: "1",
-    required: "Нет",
-    description:
-      "При fillWidth и без width: доля ширины между колонками. Если у колонки задан width, grow для остальных не считается — свободное место делится поровну.",
   },
   {
     prop: "onHeaderClick",

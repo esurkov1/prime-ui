@@ -82,7 +82,7 @@ export function Example() {
 | loadingMore | `boolean` | `false` | No | While an async `onLoadMore` is in progress |
 | onLoadMore | `() => void \| Promise<void>` | — | No | Fetch next chunk when local slice is exhausted |
 | scrollHeight | `number \| string` | `360` | No | Max height of the scroll viewport in infinite mode |
-| fillWidth | `boolean` | `true` | No | When `true`, table uses full container width (extra space is shared). When `false`, table width follows column content (`max-content`) |
+| fillWidth | `boolean` | `true` | No | When `true`, table is full container width; extra space is distributed by the browser’s automatic table layout (`table-layout: auto`) from cell content and `width` / `minWidth` / `maxWidth`. When `false`, table width follows content (`max-content`) |
 | highlightRowOnHover | `boolean` | `true` | No | Row hover highlight |
 | highlightColumnOnHover | `boolean` | `false` | No | Column hover highlight (header + cells) |
 | striped | `boolean` | `false` | No | Alternating row backgrounds |
@@ -102,7 +102,6 @@ export function Example() {
 | width | `string` | — | No | Column width on `th` / `td` (CSS `width`) |
 | minWidth | `string` | — | No | Minimum column width on `th` / `td` |
 | maxWidth | `string` | — | No | Maximum column width on `th` / `td` |
-| grow | `number` | `1` | No | When `fillWidth` and no column `width`: share of extra width (proportional). If any column has `width`, columns without `width` split the remainder equally |
 | onHeaderClick | `(event: React.MouseEvent<HTMLTableCellElement>) => void` | — | No | Fires on header click before sort handling |
 | onCellClick | `(row: Row, event: React.MouseEvent<HTMLTableCellElement> \| React.KeyboardEvent<HTMLTableCellElement>) => void` | — | No | Makes the cell focusable and keyboard-activable |
 

@@ -31,12 +31,6 @@ export type DataTableColumn<Row> = {
   minWidth?: string;
   /** Ограничение ширины колонки (например `12rem` или `min(100%, 20rem)`). */
   maxWidth?: string;
-  /**
-   * Доля ширины при `fillWidth`: лишнее место делится пропорционально `grow` (по умолчанию `1`).
-   * Не используется, если задан `width`. Если у любой колонки задан `width`, колонки без `width`
-   * делят оставшееся место поровну.
-   */
-  grow?: number;
   onHeaderClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
   onCellClick?: (
     row: Row,
@@ -76,8 +70,9 @@ export type DataTableRootProps<Row> = {
   onLoadMore?: () => void | Promise<void>;
   scrollHeight?: number | string;
   /**
-   * Растянуть `<table>` на 100% ширины контейнера: лишнее место делится между колонками.
-   * При `false` ширина таблицы по содержимому колонок (`width: max-content`).
+   * Растянуть `<table>` на 100% ширины контейнера. Лишняя ширина распределяется движком таблицы
+   * (`table-layout: auto`) по правилам браузера — с опорой на содержимое и `width` / `minWidth` / `maxWidth` колонок.
+   * При `false` ширина таблицы по содержимому (`width: max-content`).
    */
   fillWidth?: boolean;
   /** Подсветка строки при наведении (полупрозрачная смесь с фоном строки). */
@@ -146,34 +141,6 @@ function columnSizeStyle<Row>(column: DataTableColumn<Row>): React.CSSProperties
   const { width, minWidth, maxWidth } = column;
   if (!width && !minWidth && !maxWidth) return undefined;
   return { width, minWidth, maxWidth };
-}
-
-function columnGroupStyles<Row>(
-  columns: DataTableColumn<Row>[],
-  fillWidth: boolean,
-): React.CSSProperties[] | null {
-  if (!fillWidth || columns.length === 0) return null;
-
-  const hasAnyWidth = columns.some((c) => c.width);
-
-  const base = (column: DataTableColumn<Row>): React.CSSProperties => ({
-    ...(column.minWidth ? { minWidth: column.minWidth } : {}),
-    ...(column.maxWidth ? { maxWidth: column.maxWidth } : {}),
-  });
-
-  if (hasAnyWidth) {
-    return columns.map((column) =>
-      column.width ? { ...base(column), width: column.width } : base(column),
-    );
-  }
-
-  const totalGrow = columns.reduce((sum, c) => sum + (c.grow ?? 1), 0);
-  const safeTotal = totalGrow > 0 ? totalGrow : 1;
-
-  return columns.map((column) => ({
-    ...base(column),
-    width: `${((column.grow ?? 1) / safeTotal) * 100}%`,
-  }));
 }
 
 function DataTableRoot<Row>({
@@ -309,11 +276,6 @@ function DataTableRoot<Row>({
     return sortedRows.slice(from, to);
   }, [infiniteScroll, safePage, safePageSize, sortedRows, visibleRowCount]);
 
-  const colgroupStyles = React.useMemo(
-    () => columnGroupStyles(columns, fillWidth),
-    [columns, fillWidth],
-  );
-
   const hasInternalMore = infiniteScroll && displayedRows.length < totalRows;
   const canRequestMore = infiniteScroll && Boolean(onLoadMore) && hasMore && !loadingMore;
 
@@ -395,13 +357,6 @@ function DataTableRoot<Row>({
             className={styles.table}
             onMouseLeave={highlightColumnOnHover ? clearHoveredColumn : undefined}
           >
-            {colgroupStyles ? (
-              <colgroup>
-                {columns.map((column, columnIndex) => (
-                  <col key={column.id} style={colgroupStyles[columnIndex]} />
-                ))}
-              </colgroup>
-            ) : null}
             {showHeader ? (
               <thead className={styles.head}>
                 <tr className={styles.headRow}>

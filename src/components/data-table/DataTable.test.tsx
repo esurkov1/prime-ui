@@ -231,28 +231,9 @@ describe("DataTable", () => {
     expect(container.querySelectorAll('tr[data-stripe="alt"]')).toHaveLength(2);
   });
 
-  it("applies proportional col widths from grow when fillWidth and no column width", () => {
-    const growColumns: DataTableColumn<Row>[] = [
-      { id: "name", header: "Name", accessor: "name", grow: 1 },
-      { id: "score", header: "Score", accessor: "score", grow: 3 },
-    ];
+  it("does not use colgroup; column widths follow automatic table layout", () => {
     const { container } = render(
-      <DataTable.Root rows={rows.slice(0, 1)} columns={growColumns} showPagination={false} />,
-    );
-    const cols = container.querySelectorAll("colgroup col");
-    expect(cols).toHaveLength(2);
-    expect(cols[0]).toHaveStyle({ width: "25%" });
-    expect(cols[1]).toHaveStyle({ width: "75%" });
-  });
-
-  it("does not render colgroup when fillWidth is false", () => {
-    const { container } = render(
-      <DataTable.Root
-        rows={rows.slice(0, 1)}
-        columns={columns}
-        showPagination={false}
-        fillWidth={false}
-      />,
+      <DataTable.Root rows={rows.slice(0, 1)} columns={columns} showPagination={false} />,
     );
     expect(container.querySelector("colgroup")).toBeNull();
   });
