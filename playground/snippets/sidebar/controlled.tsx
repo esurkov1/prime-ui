@@ -1,7 +1,7 @@
 import { FolderOpen, Layers, Sparkles } from "lucide-react";
 import * as React from "react";
 import { Button } from "@/components/button/Button";
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import { Sidebar } from "@/layout";
 
 import styles from "./controlled.module.css";
 

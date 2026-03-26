@@ -1,6 +1,6 @@
 import { Building2, Truck } from "lucide-react";
 import * as React from "react";
-import { Sidebar, useSidebarNavTo } from "@/components/sidebar/Sidebar";
+import { Sidebar, useSidebarNavTo } from "@/layout";
 
 import styles from "./nav-to.module.css";
 

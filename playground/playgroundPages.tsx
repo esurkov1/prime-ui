@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 
 import IntroPage from "./pages/IntroPage";
 import AccordionSection from "./sections/AccordionSection";
+import AppShellSection from "./sections/AppShellSection";
 import AvatarSection from "./sections/AvatarSection";
 import BadgeSection from "./sections/BadgeSection";
 import BannerSection from "./sections/BannerSection";
@@ -30,7 +31,6 @@ import LinkButtonSection from "./sections/LinkButtonSection";
 import ModalSection from "./sections/ModalSection";
 import NotificationSection from "./sections/NotificationSection";
 import PageContentSection from "./sections/PageContentSection";
-import PageShellSection from "./sections/PageShellSection";
 import PaginationSection from "./sections/PaginationSection";
 import PopoverSection from "./sections/PopoverSection";
 import ProgressBarSection from "./sections/ProgressBarSection";
@@ -142,7 +142,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     { segment: "popover", label: "Popover", Page: PopoverSection },
   ],
   auxiliary: [
-    { segment: "page-shell", label: "PageShell", Page: PageShellSection },
+    { segment: "app-shell", label: "AppShell", Page: AppShellSection },
     { segment: "page-content", label: "PageContent", Page: PageContentSection },
     { segment: "example-frame", label: "ExampleFrame", Page: ExampleFrameSection },
     { segment: "scroll-container", label: "ScrollContainer", Page: ScrollContainerSection },

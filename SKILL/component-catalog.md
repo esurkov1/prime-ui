@@ -334,7 +334,7 @@ Full table of all 41 components mapped to responsive layout.
 | **Responsive role** | On desktop fixed side column; on mobile collapses into Drawer or hides behind hamburger. |
 | **Zones** | sidebar, navigation |
 | **Scenarios** | Product switching; docs with TOC; fleet/warehouse logistics; settings sections; catalog with filters; routes on NavLink. |
-| **Documentation** | `../src/components/sidebar/COMPONENT.md` |
+| **Documentation** | `../src/layout/sidebar/COMPONENT.md` |
 
 ## Slider
 

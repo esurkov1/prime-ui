@@ -24,7 +24,7 @@ const rootRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Обычно `PageShell.NavArea` + `PageShell.ContentArea`.",
+    description: "Обычно `AppShell.Nav` + `AppShell.Main`.",
   },
   {
     prop: "…rest",
@@ -35,7 +35,7 @@ const rootRows: PlaygroundApiPropRow[] = [
   },
 ];
 
-const navAreaRows: PlaygroundApiPropRow[] = [
+const navRows: PlaygroundApiPropRow[] = [
   {
     prop: "className",
     type: "string",
@@ -59,20 +59,20 @@ const navAreaRows: PlaygroundApiPropRow[] = [
   },
 ];
 
-const applicationRows: PlaygroundApiPropRow[] = [
+const templateRows: PlaygroundApiPropRow[] = [
   {
     prop: "fillViewport",
     type: "boolean",
     defaultValue: "false",
     required: "Нет",
-    description: "Пробрасывается в `PageShell.Root`.",
+    description: "Пробрасывается в `AppShell.Root`.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Класс на корневой оболочке (`PageShell.Root`).",
+    description: "Класс на корневой оболочке (`AppShell.Root`).",
   },
   {
     prop: "nav",
@@ -86,32 +86,32 @@ const applicationRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Контент в `PageShell.ContentArea` (`<main>`).",
+    description: "Контент в `AppShell.Main` (`<main>`).",
   },
   {
     prop: "navProps",
-    type: 'Omit<PageShellNavAreaProps, "children">',
+    type: 'Omit<AppShellNavProps, "children">',
     defaultValue: "—",
     required: "Нет",
     description: "Пропсы на слот навигации.",
   },
   {
-    prop: "contentProps",
-    type: 'Omit<PageShellContentAreaProps, "children">',
+    prop: "mainProps",
+    type: 'Omit<AppShellMainProps, "children">',
     defaultValue: "—",
     required: "Нет",
-    description: "Пропсы на основную колонку (ref сюда же через forwardRef на `ContentArea`).",
+    description: "Пропсы на основную колонку (ref сюда же через forwardRef на `Main`).",
   },
   {
     prop: "…rest",
     type: "React.HTMLAttributes<HTMLDivElement>",
     defaultValue: "—",
     required: "Нет",
-    description: "Остальные атрибуты на `PageShell.Root` (без `children` / `ref`).",
+    description: "Остальные атрибуты на `AppShell.Root` (без `children` / `ref`).",
   },
 ];
 
-const contentAreaRows: PlaygroundApiPropRow[] = [
+const mainRows: PlaygroundApiPropRow[] = [
   {
     prop: "variant",
     type: '"plain" | "surface" | "page"',
@@ -143,21 +143,20 @@ const contentAreaRows: PlaygroundApiPropRow[] = [
   },
 ];
 
-export default function PageShellSection() {
+export default function AppShellSection() {
   return (
     <PlaygroundDocPage
-      title="PageShell"
+      title="AppShell"
       description={
         <>
-          Каркас: CSS Grid из двух колонок — <strong>nav area</strong> (<code>NavArea</code>,{" "}
-          <code>data-prime-shell=&quot;nav-area&quot;</code>) и <strong>content area</strong> (
-          <code>ContentArea</code> как <code>&lt;main&gt;</code>,{" "}
-          <code>data-prime-shell=&quot;content-area&quot;</code>).{" "}
-          <code>PageShell.Application</code> помечает корень как{" "}
-          <code>data-prime-shell=&quot;application&quot;</code>: на широком экране — симметричные
-          поля вьюпорта и зазор между колонками при открытом <code>Sidebar</code> (
+          Каркас: CSS Grid — <strong>nav</strong> (<code>AppShell.Nav</code>,{" "}
+          <code>data-layout-region=&quot;nav&quot;</code>) и <strong>main</strong> (
+          <code>AppShell.Main</code>, <code>data-layout-region=&quot;main&quot;</code>).{" "}
+          <code>AppShell.Template</code> помечает корень как{" "}
+          <code>data-layout-template=&quot;app&quot;</code>: на широком экране — симметричные поля
+          вьюпорта и зазор между колонками при открытом <code>Sidebar</code> (
           <code>sidebarSlot=&quot;page-nav&quot;</code>). Поля контента — через{" "}
-          <code>ContentArea variant=&quot;page&quot;</code> или свою разметку. В плейграунде —{" "}
+          <code>mainProps variant=&quot;page&quot;</code> или свою разметку. В плейграунде —{" "}
           <code>PlaygroundLayout</code>.
         </>
       }
@@ -165,14 +164,14 @@ export default function PageShellSection() {
       <div className="demoExamples">
         <div className="demoBlock">
           <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>PageShell.Root</DemoApiTitle>
+          <DemoApiTitle>AppShell.Root</DemoApiTitle>
           <PlaygroundApiTable rows={rootRows} />
-          <DemoApiTitle>PageShell.Application</DemoApiTitle>
-          <PlaygroundApiTable rows={applicationRows} />
-          <DemoApiTitle>PageShell.NavArea</DemoApiTitle>
-          <PlaygroundApiTable rows={navAreaRows} />
-          <DemoApiTitle>PageShell.ContentArea</DemoApiTitle>
-          <PlaygroundApiTable rows={contentAreaRows} />
+          <DemoApiTitle>AppShell.Template</DemoApiTitle>
+          <PlaygroundApiTable rows={templateRows} />
+          <DemoApiTitle>AppShell.Nav</DemoApiTitle>
+          <PlaygroundApiTable rows={navRows} />
+          <DemoApiTitle>AppShell.Main</DemoApiTitle>
+          <PlaygroundApiTable rows={mainRows} />
         </div>
       </div>
     </PlaygroundDocPage>

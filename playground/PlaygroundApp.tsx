@@ -21,6 +21,7 @@ export function PlaygroundApp() {
           <Routes>
             <Route path="/" element={<PlaygroundLayout />}>
               <Route index element={<IntroPage />} />
+              <Route path="page-shell" element={<Navigate to="/app-shell" replace />} />
               {restPages.map(({ segment, Page }) => (
                 <Route key={segment} path={segment} element={<Page />} />
               ))}

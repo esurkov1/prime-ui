@@ -1,6 +1,6 @@
 import { FolderOpen, LayoutGrid, Search } from "lucide-react";
 import * as React from "react";
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import { Sidebar } from "@/layout";
 
 import styles from "./variants.module.css";
 

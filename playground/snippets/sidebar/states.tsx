@@ -1,6 +1,6 @@
 import { Bell, CircleDot, Settings } from "lucide-react";
 import * as React from "react";
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import { Sidebar } from "@/layout";
 
 export default function SidebarStatesSnippet() {
   const [open, setOpen] = React.useState(true);

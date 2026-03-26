@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
-import { PageShell } from "@/components/page-shell/PageShell";
+import { AppShell } from "@/layout";
 
 import { PlaygroundChromeSidebar } from "./components/PlaygroundChromeSidebar";
 
@@ -15,17 +15,17 @@ export function PlaygroundLayout() {
   }, [pathname]);
 
   return (
-    <PageShell.Application
+    <AppShell.Template
       fillViewport
       nav={<PlaygroundChromeSidebar />}
       ref={mainRef}
-      contentProps={{
+      mainProps={{
         id: "playground-main",
         variant: "page",
         tabIndex: -1,
       }}
     >
       <Outlet />
-    </PageShell.Application>
+    </AppShell.Template>
   );
 }

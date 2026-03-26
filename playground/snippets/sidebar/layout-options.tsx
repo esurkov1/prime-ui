@@ -1,6 +1,6 @@
 import { BookOpen, Library } from "lucide-react";
 import * as React from "react";
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import { Sidebar } from "@/layout";
 
 import styles from "./layout-options.module.css";
 
@@ -97,7 +97,7 @@ export default function SidebarLayoutOptionsSnippet() {
       <div className={styles.column}>
         <p className={styles.caption}>
           <code>sidebarSlot=&quot;page-nav&quot;</code> — растяжение в ряду с контентом (как у{" "}
-          <code>PageShell</code>).
+          <code>AppShell</code>).
         </p>
         <div className={styles.stageWide}>
           <PageNavSlotDemo />

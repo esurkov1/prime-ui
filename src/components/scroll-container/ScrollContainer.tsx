@@ -8,7 +8,7 @@ export type ScrollContainerAxis = "vertical" | "horizontal" | "both";
 
 export type ScrollContainerProps = {
   /**
-   * Корневой элемент. По умолчанию `div`; для `PageShell.ContentArea` используйте `main`.
+   * Корневой элемент. По умолчанию `div`; для `AppShell.Main` используйте `main`.
    */
   as?: "div" | "main" | "aside" | "section" | "nav" | "article";
   /** Ось прокрутки. По умолчанию вертикальная. */

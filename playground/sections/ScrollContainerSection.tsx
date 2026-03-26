@@ -71,7 +71,7 @@ export default function ScrollContainerSection() {
       description={
         <>
           Обёртка с едиными правилами прокрутки: ось, overscroll, touch и flex-item. Используется
-          внутри <code>PageShell.ContentArea</code>, панелей Dropdown/Select/Popover, теле Drawer,
+          внутри <code>AppShell.Main</code>, панелей Dropdown/Select/Popover, теле Drawer,
           вьюпорте DataTable, списке Command Menu и оверлее Command Menu. Отдельных превью в разделе
           примеров нет — это инфраструктурный узел.
         </>

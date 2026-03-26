@@ -1,6 +1,6 @@
 import { ChevronRight, Ellipsis, FileText, FolderOpen, Sparkles } from "lucide-react";
 import * as React from "react";
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import { Sidebar } from "@/layout";
 
 import styles from "./composition.module.css";
 

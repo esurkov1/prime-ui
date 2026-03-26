@@ -1,5 +1,5 @@
 /*
- * `page-nav`: колонка в nav area PageShell; схлопывание — `max-width` → 0; горизонтальные поля/gap — у `PageShell`.
+ * `page-nav`: колонка в nav area AppShell; схлопывание — `max-width` → 0; горизонтальные поля/gap — у `AppShell.Template`.
  * Брейкпоинты `64rem` / `64.001rem` — синхронны с `sidebarLayout.ts` (в @media нельзя использовать var()).
  */
 .root {
@@ -109,7 +109,7 @@
   --sb-panel-width: var(--prime-sys-unit-16rem);
 }
 
-/* Внешний горизонтальный отступ/gap до main — в PageShell; здесь без margin-inline (дёрганье и асимметрия). */
+/* Внешний горизонтальный отступ/gap до main — в AppShell; здесь без margin-inline (дёрганье и асимметрия). */
 .root[data-sidebar-slot="page-nav"] {
   flex: 0 0 auto;
   align-self: stretch;

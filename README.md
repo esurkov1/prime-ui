@@ -197,11 +197,11 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Navigation & layout | **Accordion** | Expandable sections (FAQ, settings groups) with height animation. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) |
 | Navigation & layout | **Breadcrumb** | `nav` trail with links, separators, and optional ellipsis. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/breadcrumb/COMPONENT.md) |
 | Navigation & layout | **Pagination** | Page controls: prev/next, page numbers, ellipsis. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) |
-| Navigation & layout | **Sidebar** | Side navigation: panels, groups, context column, section switching. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/sidebar/COMPONENT.md) |
+| Navigation & layout | **Sidebar** | Side navigation: panels, groups, context column, section switching. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) |
 | Navigation & layout | **Stepper** | Multi-step flow on `<ol>` / `<li>` plus horizontal/vertical primitives. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) |
 | Navigation & layout | **Tabs** | Tablist, indicator, one visible panel at a time. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) |
 | Navigation & layout | **PageContent** | Main column: max width (`readable` / `wide`), header and body regions. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-content) |
-| Navigation & layout | **PageShell** | Page shell: root, nav area, content area, optional full viewport. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-shell) |
+| Navigation & layout | **AppShell** | Application shell: grid root, nav slot, main region, optional full viewport. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/layout/app-shell) |
 | Data | **DataTable** | Table with scroll, sorting, pagination or infinite scroll, sticky regions. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) |
 | Display & content | **Avatar** | Circular avatar: image, fallback, group with overflow cell. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) |
 | Display & content | **Badge** | Compact status or count; optional presence dot variant. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) |
@@ -244,7 +244,7 @@ Type definitions ship with the package (`dist/*.d.ts`).
 - **In the repo / on GitHub:** each component has `src/components/<name>/COMPONENT.md` (see the table above).
 - **In the installed package:** the same files are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/<name>/COMPONENT.md`.
 
-**PageShell** and **PageContent** do not have a dedicated `COMPONENT.md`; refer to types and implementation under `page-shell` and `page-content`.
+**AppShell** does not have a dedicated `COMPONENT.md`; refer to types under `src/layout/app-shell`. **PageContent** — under `page-content`.
 
 ---
 

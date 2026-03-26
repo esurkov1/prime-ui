@@ -12,7 +12,7 @@ import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import { Sidebar } from "@/layout";
 import { Icon } from "@/icons";
 
 import { getPlaygroundNavModel } from "../playgroundPages";

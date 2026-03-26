@@ -1,5 +1,6 @@
 export type { ControlSizeProviderProps, ControlSurfaceSize } from "../internal/ControlSizeContext";
 export { ControlSizeProvider, useOptionalControlSize } from "../internal/ControlSizeContext";
+export * from "../layout";
 export type {
   AccordionArrowProps,
   AccordionContentProps,
@@ -229,13 +230,6 @@ export type {
   PageContentTitleProps,
 } from "./page-content/PageContent";
 export { PageContent } from "./page-content/PageContent";
-export type {
-  PageShellApplicationProps,
-  PageShellContentAreaProps,
-  PageShellNavAreaProps,
-  PageShellRootProps,
-} from "./page-shell/PageShell";
-export { PageShell } from "./page-shell/PageShell";
 export type { PaginationRootProps, PaginationSize } from "./pagination/Pagination";
 export { Pagination } from "./pagination/Pagination";
 export type {
@@ -278,53 +272,6 @@ export type {
   SelectValueProps,
 } from "./select/Select";
 export { Select } from "./select/Select";
-export type {
-  SidebarContentProps,
-  SidebarContextBarBodyProps,
-  SidebarContextBarFooterProps,
-  SidebarContextBarHeaderProps,
-  SidebarContextBarProps,
-  SidebarContextItem,
-  SidebarContextItemButtonProps,
-  SidebarFooterProps,
-  SidebarGroupLabelProps,
-  SidebarGroupProps,
-  SidebarHeaderMainProps,
-  SidebarHeaderProps,
-  SidebarHeaderRowProps,
-  SidebarIdentityButtonProps,
-  SidebarMenuActionProps,
-  SidebarMenuButtonProps,
-  SidebarMenuIconProps,
-  SidebarMenuItemProps,
-  SidebarMenuLabelProps,
-  SidebarMenuLinkProps,
-  SidebarMenuProps,
-  SidebarMenuRouterLinkProps,
-  SidebarMenuTrailingProps,
-  SidebarNavCategoryCountProps,
-  SidebarNavCategoryLabelProps,
-  SidebarNavCategoryPanelProps,
-  SidebarNavCategoryProps,
-  SidebarNavCategoryTriggerProps,
-  SidebarNavDocTreeProps,
-  SidebarNavPanelBodyProps,
-  SidebarNavPanelHeadingProps,
-  SidebarNavPanelProps,
-  SidebarPanelSwitchProps,
-  SidebarResponsive,
-  SidebarRootProps,
-  SidebarSize,
-  SidebarTextProps,
-  SidebarToggleButtonProps,
-  SidebarVariant,
-} from "./sidebar/Sidebar";
-export { Sidebar, useSidebarContext, useSidebarNavTo } from "./sidebar/Sidebar";
-export {
-  SIDEBAR_LAYOUT_BREAKPOINT_MAX,
-  SIDEBAR_MEDIA_QUERY_INLINE,
-  SIDEBAR_MEDIA_QUERY_NARROW,
-} from "./sidebar/sidebarLayout";
 export type { SliderRootProps, SliderSize } from "./slider/Slider";
 export { Slider } from "./slider/Slider";
 export type {

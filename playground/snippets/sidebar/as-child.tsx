@@ -1,6 +1,6 @@
 import { ExternalLink, Hexagon } from "lucide-react";
 import * as React from "react";
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import { Sidebar } from "@/layout";
 
 import styles from "./as-child.module.css";
 

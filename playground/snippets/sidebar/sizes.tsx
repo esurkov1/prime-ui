@@ -2,8 +2,8 @@ import { CircleDot, FolderOpen, Search } from "lucide-react";
 import * as React from "react";
 import type { AvatarSize } from "@/components/avatar/Avatar";
 import { Avatar } from "@/components/avatar/Avatar";
-import type { SidebarSize } from "@/components/sidebar/Sidebar";
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import type { SidebarSize } from "@/layout";
+import { Sidebar } from "@/layout";
 
 import styles from "./sizes.module.css";
 

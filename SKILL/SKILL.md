@@ -75,7 +75,7 @@ Full reference: `[design-tokens.md](./design-tokens.md)`.
 
 - **Mobile-first:** start with a single column (`grid-template-columns: 1fr` or `flex-direction: column`); expand to several columns at `@media (min-width: …)`.
 - **Breakpoints:** `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 — place them where the layout breaks, not by device name.
-- **CSS Grid (предпочтительно для каркаса и сеток):** страница приложения (`PageShell`) — `grid-template-columns: auto minmax(0, 1fr)` (навигация + колонка с `minmax(0, 1fr)` чтобы не ломалось переполнение); карточные сетки — `display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, …), 1fr)); gap: var(--prime-sys-spacing-*)`; при необходимости `grid-template-areas` для слотов header / main / footer.
+- **CSS Grid (предпочтительно для каркаса и сеток):** страница приложения (`AppShell`) — `grid-template-columns: auto minmax(0, 1fr)` (навигация + колонка с `minmax(0, 1fr)` чтобы не ломалось переполнение); карточные сетки — `display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, …), 1fr)); gap: var(--prime-sys-spacing-*)`; при необходимости `grid-template-areas` для слотов header / main / footer.
 - **Flexbox (локально):** ряды кнопок, выравнивание в тулбаре, вертикальный стек внутри карточки/формы, «хвост» sticky footer внутри колонки — там, где не нужна двумерная сетка.
 - **Spacing:** `gap` / `padding` / `margin` only from `--prime-sys-spacing-`*; for fluid spacing use e.g. `clamp(var(--prime-sys-spacing-s), 2vw, var(--prime-sys-spacing-xl))` — avoid mixing literals and tokens in one rule without good reason.
 - **Touch:** minimum 44×44 px (WCAG 2.5.5); on mobile use Button / Input / Select at `size="l"`; pad Checkbox / Radio / Switch hit areas; LinkButton at least `m`.
@@ -85,7 +85,7 @@ Full reference: `[design-tokens.md](./design-tokens.md)`.
 
 ## Recipes (compact)
 
-**Dashboard:** Sidebar + header (Breadcrumb, Avatar, CommandMenu) + content (Tabs, DataTable, ProgressBar, Badge). At `≥ lg` — двухколоночный каркас (часто `PageShell`, CSS Grid); below `lg` stack and move the sidebar to a Drawer; scroll Tabs; below `md` use a horizontally scrolling table with a pinned column; below `sm` use a vertical Stepper if needed.
+**Dashboard:** Sidebar + header (Breadcrumb, Avatar, CommandMenu) + content (Tabs, DataTable, ProgressBar, Badge). At `≥ lg` — двухколоночный каркас (часто `AppShell`, CSS Grid); below `lg` stack and move the sidebar to a Drawer; scroll Tabs; below `md` use a horizontally scrolling table with a pinned column; below `sm` use a vertical Stepper if needed.
 
 **Settings:** side section nav + form (Label, Input, Select, Switch, Textarea, Button). At `≥ md` — две колонки (grid/flex row); below `md` turn the sidebar into Tabs or Accordion; fields `fullWidth`; form footer — ButtonGroup, `justify-end`; below `sm` buttons `fullWidth`.
 
