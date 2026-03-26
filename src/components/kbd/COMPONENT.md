@@ -2,105 +2,40 @@
 
 **Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
 
-## What it is
+## About
 
-The `Kbd.Root` component is styled markup for indicating a key or a step in a keyboard shortcut in the UI (rendered as a `kbd` element).
+`Kbd` is a single-part primitive: `Kbd.Root` renders a semantic `kbd` with kit styling so key names and shortcut fragments read as UI chrome, not body copy.
 
-## What it’s for
+- **When to use** — show hotkeys next to menu items, toolbar actions, or command labels in dense app chrome.
+- **When to use** — mark one or a few keys inside helper text, field hints, or modal footers where the shortcut is part of the instruction.
+- **When to use** — pair with the same `size` tier as nearby controls so typography and nested icons stay aligned with [Input](../input/COMPONENT.md), [Button](../button/COMPONENT.md), or other sized surfaces.
+- **When not to use** — as the only actionable control; shortcuts still need a real [Button](../button/COMPONENT.md), [Link button](../link-button/COMPONENT.md), or focusable target.
+- **When not to use** — when you need the element to listen for or mirror actual keyboard input; this component is display-only.
+- **When not to use** — for long prose or documentation pages where plain text or a code font is clearer than chip-style keys.
 
-- In text editors, task trackers, and IDE-like screens, show hotkeys next to menu items and actions without repeating long wording on every line.
-- In settings forms and admin cards, briefly label shortcuts for “Save”, “Cancel”, or “Submit” so users see them in the same visual language as other controls.
-- In step-by-step onboarding or a product tour, highlight one or two keys in hint text so they read as UI elements, not plain paragraph text.
+## Composition
 
-## Use cases
+- **`Kbd`** exports **`Root` only** — a flat API with no nested parts or ordering rules beyond wrapping the key label (text, icons, or mixed `ReactNode`) inside **`Kbd.Root`**.
+- **`Root`** renders a native **`kbd`**, applies `data-size`, and wraps **`children`** in **`ControlSizeProvider`** so nested **`Icon`** (and similar) pick up the same control-size context.
 
-### Basic
-
-A single key in a hint for an action (e.g. closing a dialog):
-
-```tsx
-import { Kbd } from "prime-ui-kit";
-
-export function CloseHint() {
-  return (
-    <p>
-      Press <Kbd.Root>Esc</Kbd.Root> to close the window.
-    </p>
-  );
-}
-```
-
-### With variants / sizes
-
-A shortcuts table in the “Help” section of a web analytics app: different sizes for a dense grid and for emphasis in a block heading.
+### Minimal example
 
 ```tsx
 import { Kbd } from "prime-ui-kit";
 
-export function AnalyticsShortcutsLegend() {
-  return (
-    <ul>
-      <li>
-        Refresh report: <Kbd.Root size="s">R</Kbd.Root>
-      </li>
-      <li>
-        Export: <Kbd.Root size="l">Ctrl</Kbd.Root> + <Kbd.Root size="l">E</Kbd.Root>
-      </li>
-    </ul>
-  );
+export function Example() {
+  return <Kbd.Root>Esc</Kbd.Root>;
 }
 ```
 
-### In context (form / modal / sidebar / …)
+## Rules
 
-Footer of a confirmation modal in e-commerce: action text with a compact shortcut for power users.
-
-```tsx
-import { Button, Kbd } from "prime-ui-kit";
-
-export function CheckoutConfirmFooter() {
-  return (
-    <div>
-      <Button.Root type="submit" variant="primary" mode="filled" size="m">
-        Pay
-      </Button.Root>
-      <span>
-        or <Kbd.Root size="m">Enter</Kbd.Root>
-      </span>
-    </div>
-  );
-}
-```
-
-### Size inherited from context
-
-A hint inside a search field in a parts catalog: key size matches the input without repeating `size` on every `Kbd`.
-
-```tsx
-import { Input, Kbd } from "prime-ui-kit";
-
-export function PartsSearchField() {
-  return (
-    <Input.Root
-      size="l"
-      label="Search"
-      hint={
-        <>
-          Quick focus: <Kbd.Root>/</Kbd.Root>
-        </>
-      }
-    >
-      <Input.Wrapper>
-        <Input.Field placeholder="Part number or name" />
-      </Input.Wrapper>
-    </Input.Root>
-  );
-}
-```
-
-## Anatomy
-
-Flat structure: the `Kbd` object exports a single subcomponent, `Root`. `Root` renders `kbd` and wraps `children` in `ControlSizeProvider` so nested icons inherit scale.
+- **Sizing:** optional **`size`** is **`"s"` \| `"m"` \| `"l"` \| `"xl"`** (`KbdSize`). If omitted, the effective size comes from the nearest ancestor **`ControlSizeProvider`** (via **`useOptionalControlSize`**), mapped with **`controlSurfaceToInputSize`** — **`"xs"`** on the control surface becomes **`"s"`** on the `kbd`. If there is no context, the fallback is **`"m"`**.
+- **Presentation only:** the component does not handle key events, focus management, or OS shortcut state; it only displays a label.
+- **Semantics:** there is no **`asChild`** or element polymorphism — the root is always **`kbd`**.
+- **Accessibility:** semantic **`kbd`** helps assistive tech distinguish key labels from surrounding text. For chord hints, prefer several **`Kbd.Root`** instances with short separators (**`+`**, “or”) **outside** the keys, or mark decorative separators with **`aria-hidden`**, so they are not announced as part of each key. Use **`title`** (or visible copy) when the shortcut needs extra explanation; do not rely on surface color alone for meaning.
+- **Platform copy:** glyphs such as **⌘** vs **Ctrl** are a product/i18n choice; the kit does not normalize platform key names.
+- **Styling:** one built-in look (raised surface, border, light shadow). Further changes go through **`className`** or project styles, not a separate **`variant`** prop.
 
 ## API
 
@@ -108,27 +43,17 @@ Flat structure: the `Kbd` object exports a single subcomponent, `Root`. `Root` r
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| `size` | `"s" \| "m" \| "l" \| "xl"` | context or `"m"` | No | Nominal size; without the prop, taken from `ControlSizeProvider`, otherwise `"m"`; `xs` context maps to size `s`. |
-| `className` | `string` | — | No | Extra class for `kbd`. |
-| `children` | `React.ReactNode` | — | Yes | Text, icons, or mixed content. |
-| `…rest` | `Omit<React.HTMLAttributes<HTMLElement>, "size">` | — | No | Including `title`, `hidden`, ARIA, and `data-*`. |
+| size | `KbdSize` (`"s" \| "m" \| "l" \| "xl"`) | from context or `"m"` | No | Nominal size; without the prop, taken from `ControlSizeProvider` if present, otherwise `"m"`; `xs` context maps to `s`. |
+| children | `React.ReactNode` | — | Yes | Key label, icons, or mixed content. |
+| className | `string` | — | No | Additional class on the `kbd`. |
+| …rest | `Omit<React.HTMLAttributes<HTMLElement>, "size">` | — | No | Native attributes (`title`, `hidden`, `aria-*`, `data-*`, etc.). |
 
-## Variants
+## Related
 
-There is no separate `variant` prop: the component has one visual style (raised-surface background, thin border, light shadow). Further styling is only via `className` and project tokens/styles.
-
-## States
-
-There are no built-in states like `disabled` or `loading`: the element does not perform an action by itself. Behavior and accessibility are configured with markup attributes (`title`, `hidden`, `aria-hidden`, etc.) passed to `Root`.
-
-## Accessibility (a11y)
-
-Semantic `kbd` helps assistive technologies distinguish key labels from normal text. For multi-key shortcuts, split into several `Kbd.Root` instances and keep short separators (`+`, “or”) outside `kbd` or with `aria-hidden` so decorative characters are not announced twice. `title` is appropriate for semantic hints about the shortcut. Do not rely on chip color as the only carrier of meaning.
-
-## Limitations and notes
-
-The component does not handle key events or sync with the OS—it only displays a label. It does not replace a button or link. Labels like “⌘” are platform-dependent—copy and step breakdown are product decisions. `Kbd` has no polymorphic `asChild`: the root is always `kbd`.
-
-## Related components
-
-Often seen nearby: **Button**, **Link button**—the action the shortcut refers to; **Input**, **Textarea**, **Select**—controls whose hints include `Kbd`; **Tooltip**—a popover with longer copy where keys can be repeated with `Kbd`; **Command menu**—command lists that show shortcuts.
+- [Button](../button/COMPONENT.md) — primary action a shortcut often refers to.
+- [Link button](../link-button/COMPONENT.md) — text-style actions that may show a key hint beside the label.
+- [Input](../input/COMPONENT.md) — fields whose `hint` or label area can include `Kbd`.
+- [Textarea](../textarea/COMPONENT.md) — multiline fields with the same hint pattern where applicable.
+- [Select](../select/COMPONENT.md) — triggers and lists that may document shortcuts.
+- [Tooltip](../tooltip/COMPONENT.md) — longer explanations that can repeat keys with `Kbd`.
+- [Command menu](../command-menu/COMPONENT.md) — lists that commonly show per-item shortcuts.
