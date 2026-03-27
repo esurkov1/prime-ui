@@ -17,18 +17,22 @@
   --dd-header-pad-block: var(--prime-sys-spacing-x3);
   --dd-header-desc-font: var(--prime-sys-size-control-s-supportText);
   --dd-separator-stack-pad: var(--prime-sys-spacing-x2);
+  /* Как у Popover `.popoverScroll`: те же поля и масштаб `--dd-pad` по `data-size`. */
+  --po-inset-extra: 0px;
 
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   position: fixed;
   width: max-content;
   max-width: min(var(--prime-sys-unit-20rem), 100vw);
+  margin: 0;
   background: var(--prime-sys-color-surface-elevated);
   border: none;
   border-radius: var(--prime-sys-shape-radius-l);
   box-shadow: var(--prime-sys-elevation-shadow-surface), var(--prime-sys-elevation-shadow-modal);
-  padding: var(--dd-pad);
+  padding: calc(var(--dd-pad) + var(--po-inset-extra));
   min-width: var(--dd-min-w);
   /* max-height задаётся из JS по свободному месту во вьюпорте; прокрутка — ScrollContainer */
   transform-origin: top center;
@@ -314,8 +318,9 @@
   );
 }
 
+/* Вертикальный шаг между прямыми детьми — как `gap` у Popover (`--po-inset-gap` = `--dd-pad`); пары пунктов меню сбрасываются ниже. */
 .content > * + * {
-  margin-top: var(--prime-sys-spacing-x1);
+  margin-top: var(--dd-pad);
 }
 
 .content > .item + .item {
