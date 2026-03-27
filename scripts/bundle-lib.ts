@@ -32,7 +32,8 @@ const buildOptions: esbuild.BuildOptions = {
   logLevel: "info",
   loader: {
     ".aac": "file",
-    ".css": "file",
+    // `file` treats the import as removable; `css` keeps globals and @import chain in the bundle.
+    ".css": "css",
     ".eot": "file",
     ".flac": "file",
     ".gif": "file",
