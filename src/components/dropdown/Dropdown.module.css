@@ -1,6 +1,6 @@
 .content {
   --dropdown-separator-mix: 40%;
-  --dd-pad: var(--prime-sys-spacing-x4);
+  --dd-pad: var(--prime-sys-spacing-x3);
   --dd-min-w: var(--prime-sys-unit-11rem);
   --dd-item-gap: var(--prime-sys-size-control-m-gap);
   --dd-item-height: var(--prime-sys-size-control-m-height);
@@ -51,7 +51,7 @@
 }
 
 .content[data-size="s"] {
-  --dd-pad: var(--prime-sys-spacing-x3);
+  --dd-pad: calc((var(--prime-sys-spacing-x2) + var(--prime-sys-spacing-x3)) / 2);
   --dd-min-w: var(--prime-sys-unit-9p5rem);
   --dd-item-gap: var(--prime-sys-size-control-s-gap);
   --dd-item-height: var(--prime-sys-size-control-s-height);
@@ -69,7 +69,7 @@
 }
 
 .content[data-size="l"] {
-  --dd-pad: var(--prime-sys-spacing-x5);
+  --dd-pad: var(--prime-sys-spacing-x4);
   --dd-min-w: var(--prime-sys-unit-12p5rem);
   --dd-item-gap: var(--prime-sys-size-control-l-gap);
   --dd-item-height: var(--prime-sys-size-control-l-height);
@@ -88,7 +88,7 @@
 }
 
 .content[data-size="xl"] {
-  --dd-pad: var(--prime-sys-spacing-x6);
+  --dd-pad: var(--prime-sys-spacing-x5);
   --dd-min-w: var(--prime-sys-unit-14rem);
   --dd-item-gap: var(--prime-sys-size-control-xl-gap);
   --dd-item-height: var(--prime-sys-size-control-xl-height);
