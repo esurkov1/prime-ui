@@ -23,7 +23,7 @@
 - **`Sidebar.NavPanel`** — panel container (`nav`). По умолчанию рендерит **встроенную** кнопку сворачивания на грани панели (**`data-placement="edge"`**); отключить можно только **`showToggle={false}`** (редкие случаи). Не дублируйте переключатель вручную.
 - Типичный порядок: **`Header`** (часто **`IdentityButton`** или **`Text`**) → **`Content`** (часто **`NavPanelBody`** + **`Menu`**) → **`Footer`** (часто **`IdentityButton`**).
 - In **`compact`** on non-mobile viewports, **MenuButton** / **MenuRouterLink** / **MenuLink** can show **tooltips** ( **`Tooltip`**, `side="right"`, `delayDuration={0}` ). On mobile, tooltips are suppressed.
-- Встроенная кнопка и плавающая кнопка открытия (на узком окне, пока панель скрыта) используют **`aria-controls`** с id **`NavPanel`**.
+- Единственная **edge**-кнопка использует **`aria-controls`** с id панели навигации.
 
 ### Canonical example
 
@@ -123,7 +123,7 @@ For dynamic menus (modes, roles, brands), keep a data layer above the JSX: e.g. 
 | state | `SidebarLayoutMode` | — | No | Controlled layout state. |
 | defaultState | `SidebarLayoutMode` | see below | No | Initial state; with **`responsive`**, narrow viewports start **hidden**. |
 | onStateChange | `(state: SidebarLayoutMode) => void` | — | No | Fires on layout changes. |
-| responsive | `boolean` | `true` | No | When **true**, narrow viewports use drawer + backdrop; the same edge toggle opens the panel when it is closed. |
+| responsive | `boolean` | `true` | No | When **true**, narrow viewports use drawer + backdrop; the edge toggle stays on the panel edge and moves with the sliding panel. |
 | sidebarSlot | `"page-nav"` | — | No | Page nav embedding; sets **`data-sidebar-slot`**. |
 | aria-label | `string` | `"Sidebar"` | No | Name for the **`aside`** landmark. |
 | open, defaultOpen, onOpenChange | — | — | No | **Deprecated;** maps to hidden vs expanded. |
