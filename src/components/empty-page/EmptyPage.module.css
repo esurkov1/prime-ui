@@ -16,14 +16,15 @@
   min-height: 0;
 }
 
+/* Как у иконки в шапке Modal (`headerIcon`): подложка + `currentColor` на глифе; красный — семантика status-error. */
 .iconWrap {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  border-radius: var(--prime-sys-shape-radius-full);
-  background: var(--prime-sys-color-surface-raised);
-  color: var(--prime-sys-color-content-muted);
+  box-sizing: border-box;
+  background: var(--prime-sys-color-status-error-background);
+  color: var(--prime-sys-color-status-error-foreground);
 }
 
 .iconWrap svg {
@@ -63,6 +64,7 @@
 .root[data-size="s"] .iconWrap {
   width: calc(var(--prime-sys-size-control-s-icon) * 2 + var(--prime-sys-spacing-m));
   height: calc(var(--prime-sys-size-control-s-icon) * 2 + var(--prime-sys-spacing-m));
+  border-radius: var(--prime-sys-size-control-s-radius);
 }
 
 .root[data-size="s"] .iconWrap svg {
@@ -92,6 +94,7 @@
 .root[data-size="m"] .iconWrap {
   width: calc(var(--prime-sys-size-control-m-icon) * 2 + var(--prime-sys-spacing-m));
   height: calc(var(--prime-sys-size-control-m-icon) * 2 + var(--prime-sys-spacing-m));
+  border-radius: var(--prime-sys-size-control-m-radius);
 }
 
 .root[data-size="m"] .iconWrap svg {
@@ -121,6 +124,7 @@
 .root[data-size="l"] .iconWrap {
   width: calc(var(--prime-sys-size-control-l-icon) * 2 + var(--prime-sys-spacing-m));
   height: calc(var(--prime-sys-size-control-l-icon) * 2 + var(--prime-sys-spacing-m));
+  border-radius: var(--prime-sys-size-control-l-radius);
 }
 
 .root[data-size="l"] .iconWrap svg {
@@ -150,6 +154,7 @@
 .root[data-size="xl"] .iconWrap {
   width: calc(var(--prime-sys-size-control-xl-icon) * 2 + var(--prime-sys-spacing-l));
   height: calc(var(--prime-sys-size-control-xl-icon) * 2 + var(--prime-sys-spacing-l));
+  border-radius: var(--prime-sys-size-control-xl-radius);
 }
 
 .root[data-size="xl"] .iconWrap svg {

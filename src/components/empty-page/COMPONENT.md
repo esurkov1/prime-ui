@@ -11,7 +11,7 @@
 ## Composition
 
 - **`EmptyPage.Root`** — колонка по центру, **`text-align: center`**; **`size`**, **`layout`** через `data-*`.
-- **`EmptyPage.Icon`** — круглая подложка под иконку (передайте **`lucide-react`** или **`Icon`** из кита с **`aria-hidden`** на обёртке или глифе).
+- **`EmptyPage.Icon`** — подложка под глиф в духе иконки шапки [**`Modal.Panel`**](../modal/COMPONENT.md) (`headerIcon`): скругление **`--prime-sys-size-control-*-radius`**, фон **`--prime-sys-color-status-error-background`**, цвет глифа **`--prime-sys-color-status-error-foreground`** (не «сырой» красный). Внутрь — **`lucide-react`** или **`Icon`** с **`aria-hidden`**.
 - **`EmptyPage.Title`** — **`h2`**; связывайте с **`aria-labelledby`** на корне.
 - **`EmptyPage.Description`** — **`p`**, вторичный цвет контента.
 - **`EmptyPage.Actions`** — **`flex`**-ряд с **`gap`** по размеру; внутри — **`Button`**, **`ButtonGroup`**, **`LinkButton`**.
