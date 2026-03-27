@@ -1,4 +1,5 @@
 export type {
+  AppShellMainInsetProps,
   AppShellMainProps,
   AppShellNavProps,
   AppShellRootProps,

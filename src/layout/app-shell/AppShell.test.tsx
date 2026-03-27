@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
 import { AppShell } from "./AppShell";
@@ -38,9 +39,11 @@ describe("AppShell", () => {
 
   it("Template composes nav slot and main", () => {
     render(
-      <AppShell.Template nav={<span>sidebar</span>}>
-        <span>page</span>
-      </AppShell.Template>,
+      <MemoryRouter>
+        <AppShell.Template nav={<span>sidebar</span>}>
+          <span>page</span>
+        </AppShell.Template>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("sidebar")).toBeInTheDocument();
@@ -49,11 +52,25 @@ describe("AppShell", () => {
 
   it("Template sets data-layout-template=app on root", () => {
     render(
-      <AppShell.Template nav={<span>nav</span>}>
-        <span>c</span>
-      </AppShell.Template>,
+      <MemoryRouter>
+        <AppShell.Template nav={<span>nav</span>}>
+          <span>c</span>
+        </AppShell.Template>
+      </MemoryRouter>,
     );
 
     expect(screen.getByRole("main").parentElement).toHaveAttribute("data-layout-template", "app");
+  });
+
+  it("Template wraps route children in MainInset with data-app-shell-main-inset", () => {
+    render(
+      <MemoryRouter>
+        <AppShell.Template nav={<span>nav</span>}>
+          <span>inset-body</span>
+        </AppShell.Template>
+      </MemoryRouter>,
+    );
+
+    expect(document.querySelector("[data-app-shell-main-inset]")).toHaveTextContent("inset-body");
   });
 });

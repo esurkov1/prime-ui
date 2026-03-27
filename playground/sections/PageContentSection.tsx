@@ -42,7 +42,7 @@ const sectionRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description:
-      "Класс на `<section>` (регион страницы без внешних полей — удобно внутри `main`, когда поля уже у обёртки).",
+      "Класс на `<section>` (регион без полей к краю колонки — поля задаёт `AppShell.MainInset` в `AppShell.Template`).",
   },
   {
     prop: "children",
@@ -116,7 +116,7 @@ const descriptionRows: PlaygroundApiPropRow[] = [
     defaultValue: '"readable"',
     required: "Нет",
     description:
-      "`readable` — узкая мера (~65ch); `full` — на всю ширину родителя (когда колонка уже с полями от обёртки или `PageContent.Root`).",
+      "`readable` — узкая мера (~65ch); `full` — на всю ширину родителя (когда колонку уже inset’ит `AppShell.MainInset` или задан `PageContent.Root` с `maxWidth`).",
   },
   {
     prop: "className",
@@ -174,12 +174,13 @@ export default function PageContentSection() {
           {
             <>
               Семантическая разметка контентной колонки: <code>PageContent.Section</code> (регион
-              страницы без внешних полей, если отступы уже даёт обёртка или{" "}
-              <code>PageContent.Root</code>), <code>PageContent.Root</code> (полная страница с
-              полями и при необходимости <code>maxWidth</code>), <code>Title</code> →{" "}
-              <code>&lt;h1&gt;</code>, <code>Description</code> с{" "}
-              <code>measure=&quot;readable&quot; | &quot;full&quot;</code>, <code>Body</code>. В
-              плейграунде внешние поля колонки задаёт обёртка в <code>PlaygroundLayout</code>.
+              страницы без собственных внешних полей к краю колонки), <code>PageContent.Root</code> (
+              <code>maxWidth</code> и структура шапки/тела; краевые поля колонки даёт{" "}
+              <code>AppShell.MainInset</code> внутри <code>AppShell.Template</code>),{" "}
+              <code>Title</code> → <code>&lt;h1&gt;</code>, <code>Description</code> с{" "}
+              <code>measure=&quot;readable&quot; | &quot;full&quot;</code>, <code>Body</code>. Поля
+              у контентной колонки — в ките (<code>AppShell.Template</code>), без дублирующей
+              обёртки в плейграунде.
             </>
           }
         </PageContent.Description>

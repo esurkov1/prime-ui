@@ -86,7 +86,7 @@ const templateRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Контент в `AppShell.Main` (`<main>`).",
+    description: "Контент внутри `AppShell.MainInset` внутри `<main>`.",
   },
   {
     prop: "navProps",
@@ -124,7 +124,8 @@ const mainRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Основной контент страницы.",
+    description:
+      "Дочерние узлы внутри `<main>`; в `Template` здесь `MainInset` и служебный сброс прокрутки.",
   },
   {
     prop: "…rest",
@@ -132,6 +133,30 @@ const mainRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description: "Атрибуты нативного main, включая `ref` (forwardRef).",
+  },
+];
+
+const mainInsetRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Дополнительный класс; поля колонки — токены кита (`x6` по осям).",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Контент маршрута (в `Template` — то, что передают в `Template`).",
+  },
+  {
+    prop: "…rest",
+    type: "React.HTMLAttributes<HTMLDivElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Атрибуты нативного `div`, включая `ref` (forwardRef).",
   },
 ];
 
@@ -147,12 +172,12 @@ export default function AppShellSection() {
               <code>data-layout-region=&quot;nav&quot;</code>) и <strong>main</strong> (
               <code>AppShell.Main</code>, <code>data-layout-region=&quot;main&quot;</code>).{" "}
               <code>AppShell.Template</code> помечает корень как{" "}
-              <code>data-layout-template=&quot;app&quot;</code>: на широком экране — поля у колонки{" "}
-              <code>Nav</code> от края экрана и зазор между колонками при открытом{" "}
-              <code>Sidebar</code> (<code>sidebarSlot=&quot;page-nav&quot;</code>). Поля контентной
-              колонки задаются в приложении (например обёртка с <code>padding</code> внутри{" "}
-              <code>main</code>, <code>PageContent.Root</code> и т.д.). В плейграунде —{" "}
-              <code>PlaygroundLayout</code>.
+              <code>data-layout-template=&quot;app&quot;</code>: на широком экране — зазор между
+              колонками при открытом <code>Sidebar</code> (
+              <code>sidebarSlot=&quot;page-nav&quot;</code>
+              ). Контентная колонка всегда оборачивается в <code>AppShell.MainInset</code> с полями{" "}
+              <code>--prime-sys-spacing-x6</code>; отдельную обёртку с теми же полями в приложении
+              не добавляют. См. <code>src/layout/app-shell/COMPONENT.md</code>.
             </>
           }
         </PageContent.Description>
@@ -169,6 +194,8 @@ export default function AppShellSection() {
             <PlaygroundApiTable rows={navRows} />
             <DemoApiTitle>AppShell.Main</DemoApiTitle>
             <PlaygroundApiTable rows={mainRows} />
+            <DemoApiTitle>AppShell.MainInset</DemoApiTitle>
+            <PlaygroundApiTable rows={mainInsetRows} />
           </div>
         </div>
       </PageContent.Body>

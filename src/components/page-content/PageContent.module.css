@@ -5,12 +5,12 @@
   min-width: 0;
 }
 
+/* Внешние поля колонки даёт `AppShell.Template` → `AppShell.MainInset`; здесь только max-width и внутренняя сетка. */
 .root {
   box-sizing: border-box;
   width: 100%;
   margin: 0 auto;
-  padding-block: var(--prime-sys-spacing-5xl);
-  padding-inline: var(--prime-sys-spacing-4xl);
+  padding: 0;
 }
 
 .root[data-max-width="readable"] {

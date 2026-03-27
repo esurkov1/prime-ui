@@ -27,6 +27,11 @@ alwaysApply: false
 - **Иконки**: предпочтительно `--prime-sys-size-control-*-icon` (или общий компонент `Icon` с размером, привязанным к этим токенам). Литералы в `px`/`rem` для иконок в новых компонентах избегать.
 - После правок семантики запускать **`bun run tokens:build`** в корне репозитория; файлы `src/styles/theme-*.css` с пометкой AUTO-GENERATED не править руками.
 
+## Лейаут приложения (потребители кита)
+
+- **`AppShell.Template`** задаёт единственный канон полей контентной колонки (**`AppShell.MainInset`**, `x6`). Повторные обёртки с теми же отступами и произвольные «поля страницы» не добавляют.
+- **`PageContent.Root`** не дублирует краевые поля колонки; с **`AppShell.Template`** используют **`PageContent.Section`** или **`PageContent.Root`** только для структуры и `maxWidth`. См. **`src/layout/app-shell/COMPONENT.md`** и **`src/components/page-content/COMPONENT.md`**.
+
 ## Playground
 
 - Структура как у **`playground/sections/ButtonSection.tsx`**: у секции **один** `<h2>` и вводный абзац при необходимости; **каждый пример** — блок **`demoBlock` → `<h3>` → отдельный `PlaygroundExampleFrame.Root`** со своим `?raw` исходником.

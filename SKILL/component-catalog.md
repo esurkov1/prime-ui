@@ -282,7 +282,7 @@ Full table of **47** exported UI building blocks mapped to responsive layout (44
 
 | | |
 |---|---|
-| **Purpose** | Main column shell: max-width (`readable` / `wide`), header and body regions. |
+| **Purpose** | Main column structure: optional `maxWidth` (`readable` / `wide`), header and body; **no** duplicate edge padding — `AppShell.MainInset` (inside `AppShell.Template`) owns the column gutters. |
 | **Responsive role** | Centers content; limits measure for long text on large screens. |
 | **Zones** | content |
 | **Scenarios** | Settings page body; article layout; legal copy; dashboard main column. |
@@ -392,11 +392,11 @@ Full table of **47** exported UI building blocks mapped to responsive layout (44
 
 | | |
 |---|---|
-| **Purpose** | Application layout root: grid template for nav + main, optional full viewport height. |
+| **Purpose** | Application layout root: grid `nav` + scrollable `main`; **`AppShell.Template`** always wraps route content in **`AppShell.MainInset`** (canonical `x6` padding) and scroll-resets `main` on route change when inside React Router. |
 | **Responsive role** | `minmax(0, 1fr)` on main track; pair with **Sidebar** / **Drawer** for narrow breakpoints. |
 | **Zones** | layout, navigation |
 | **Scenarios** | App dashboard; admin shell; docs with sidebar slot. |
-| **Documentation** | `../src/layout/app-shell/AppShell.tsx` (no separate COMPONENT.md) |
+| **Documentation** | `../src/layout/app-shell/COMPONENT.md` |
 
 ## Slider
 

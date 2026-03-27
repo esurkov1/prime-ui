@@ -2,27 +2,27 @@
 
 ## About
 
-Semantic **page column** primitives: **`PageContent.Section`** (a **`<section>`** page region without its own outer padding), **`PageContent.Root`** (full padded column with optional **`maxWidth`**), **`PageContent.Title`** → **`<h1>`**, **`PageContent.Description`** with **`measure`**, and **`PageContent.Body`**. Typography uses kit tokens.
+Семантические примитивы **контентной колонки**: **`PageContent.Section`** (регион страницы **`<section>`** без собственных внешних полей), **`PageContent.Root`** (обёртка страницы с опциональным **`maxWidth`**, **без** дублирующих полей к краю колонки), **`PageContent.Title`** → **`<h1>`**, **`PageContent.Description`** с **`measure`**, **`PageContent.Body`**. Типографика — токены кита.
 
-- **Use `PageContent.Section`** when a parent already applies outer padding (e.g. an inset wrapper inside **`AppShell.Main`**, or the same pattern as playground routes) — without wrapping in **`Root`**.
-- **Use `PageContent.Root`** when you need that outer padding and optional **`maxWidth`** (`full` | `readable` | `wide`; default **`full`**).
-- **Use `Description` `measure="full"`** when the parent column is already inset; default **`measure="readable"`** keeps the lead ~65ch for reading.
+- **В приложении с `AppShell.Template`** внешние поля колонки задаёт **`AppShell.MainInset`** (встроен в шаблон). Тогда для маршрута чаще берут **`PageContent.Section`** + **`Header`** / **`Body`**, либо **`PageContent.Root`** только ради **`maxWidth`**, без ожидания «второго» слоя полей.
+- **`PageContent.Root`** — когда нужен **`maxWidth`** (`full` | `readable` | `wide`; по умолчанию **`full`**) и структура шапки/тела; краевые поля **не** входят в корень — их даёт **`MainInset`**.
+- **`Description`** с **`measure="full"`**, если ширину уже ограничивает родитель; по умолчанию **`measure="readable"`** — узкая мера лида ~65ch.
 
 ## Composition
 
-- **`PageContent.Root`** — outer wrapper: padding + optional max-width (`data-max-width`).
-- **`PageContent.Section`** — **`<section>`** without extra outer padding; pair with **`aria-labelledby`** pointing at **`PageContent.Title`** `id`.
-- **`PageContent.Header`** — stacks title + description with spacing.
-- **`PageContent.Title`** — **`<h1>`** (one per route).
-- **`PageContent.Description`** — **`<p>`** lead; **`measure`** controls max width.
-- **`PageContent.Body`** — main blocks below the header (demos, forms, tables).
+- **`PageContent.Root`** — внешняя обёртка: **`maxWidth`** через `data-max-width` (кроме `full`), **padding по краям колонки — 0** (поля у **`AppShell.MainInset`**).
+- **`PageContent.Section`** — **`<section>`**; сочетайте с **`aria-labelledby`** на заголовок **`PageContent.Title`**.
+- **`PageContent.Header`** — заголовок + описание с отступами.
+- **`PageContent.Title`** — **`<h1>`** (один на вью).
+- **`PageContent.Description`** — лид **`<p>`**; **`measure`** — ширина текста.
+- **`PageContent.Body`** — блоки под шапкой.
 
-### Canonical example (inside an inset content column)
+### Canonical example (маршрут внутри `AppShell.Template`)
 
 ```tsx
 import { PageContent } from "prime-ui-kit";
 
-export function DocRouteBody() {
+export function SettingsPage() {
   return (
     <PageContent.Section aria-labelledby="page-heading">
       <PageContent.Header>
@@ -31,18 +31,18 @@ export function DocRouteBody() {
           Manage your workspace profile and notifications.
         </PageContent.Description>
       </PageContent.Header>
-      <PageContent.Body>{/* page blocks */}</PageContent.Body>
+      <PageContent.Body>{/* блоки страницы */}</PageContent.Body>
     </PageContent.Section>
   );
 }
 ```
 
-### Canonical example (standalone column)
+### Canonical example (узкая колонка + `maxWidth`)
 
 ```tsx
 import { PageContent } from "prime-ui-kit";
 
-export function StandalonePage() {
+export function AccountPage() {
   return (
     <PageContent.Root maxWidth="readable">
       <PageContent.Header>
@@ -57,13 +57,13 @@ export function StandalonePage() {
 
 ### Playground
 
-Live demo and API tables: **`playground/sections/PageContentSection.tsx`** — **`Section`** → **`Header`** (**`Title`**, **`Description measure="full"`**) → **`Body`**. There is no **`playground/snippets/page-content/`** tree; the section is the single demo surface.
+Живые примеры и таблицы API: **`playground/sections/PageContentSection.tsx`**.
 
 ## Rules
 
-- Prefer **one** `h1` per view — **`PageContent.Title`**.
-- Do not nest **`PageContent.Root`** inside a region that already applies the same outer padding unless you intentionally want double padding; use **`Section`** instead.
-- **`Description`** defaults to a readable measure; use **`measure="full"`** when the layout already constrains width.
+- На вью — **один** `h1` через **`PageContent.Title`**.
+- **Не** вкладывайте **`PageContent.Root`** в область, где уже есть тот же слой полей, что у **`AppShell.MainInset`** — у корня **нет** своих краевых полей; при необходимости используйте **`Section`**.
+- **`Description`**: по умолчанию узкая мера; **`measure="full"`**, когда колонка уже ограничена снаружи.
 
 ## API
 
@@ -71,53 +71,53 @@ Live demo and API tables: **`playground/sections/PageContentSection.tsx`** — *
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| maxWidth | `full` \| `readable` \| `wide` | `full` | No | Limits the content column; drives `data-max-width` when not `full`. |
-| className | `string` | — | No | Class on the root wrapper. |
-| children | `React.ReactNode` | — | No | Header, body, nested sections. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Native `div` attributes, including `ref` (`forwardRef`). |
+| maxWidth | `full` \| `readable` \| `wide` | `full` | No | Ограничение ширины контентной колонки; `data-max-width`, кроме `full`. |
+| className | `string` | — | No | Класс на корневой обёртке. |
+| children | `React.ReactNode` | — | No | Шапка, тело, секции. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | В т.ч. `ref` (`forwardRef`). |
 
 ### PageContent.Section
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on **`<section>`** (page region without outer padding—use when an inset wrapper or **`PageContent.Root`** already provides margins). |
-| children | `React.ReactNode` | — | No | Usually **`Header`** + **`Body`** (playground routes follow this). |
-| …rest | `React.HTMLAttributes<HTMLElement>` | — | No | Native **`<section>`** attributes, including `ref` (`forwardRef`). |
+| className | `string` | — | No | Класс на **`<section>`**. |
+| children | `React.ReactNode` | — | No | Обычно **`Header`** + **`Body`**. |
+| …rest | `React.HTMLAttributes<HTMLElement>` | — | No | В т.ч. `ref` (`forwardRef`). |
 
 ### PageContent.Header
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the header block (title + description). |
-| children | `React.ReactNode` | — | No | Usually **`PageContent.Title`** and **`PageContent.Description`** (`measure` as needed). |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Native `div` attributes. |
+| className | `string` | — | No | Класс на блоке шапки. |
+| children | `React.ReactNode` | — | No | **`Title`**, **`Description`**. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Атрибуты `div`. |
 
 ### PageContent.Title
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on **`<h1>`**. |
-| children | `React.ReactNode` | — | No | Page heading. |
-| …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | Native **`h1`** attributes, including `ref` (`forwardRef`). |
+| className | `string` | — | No | Класс на **`<h1>`**. |
+| children | `React.ReactNode` | — | No | Заголовок страницы. |
+| …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | В т.ч. `ref` (`forwardRef`). |
 
 ### PageContent.Description
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| measure | `readable` \| `full` | `readable` | No | `readable` — ~65ch; `full` — parent width (e.g. when the content column is already inset). |
-| className | `string` | — | No | Class on the lead **`<p>`**. |
-| children | `React.ReactNode` | — | No | Intro text under the title. |
-| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Native **`p`** attributes, including `ref` (`forwardRef`). |
+| measure | `readable` \| `full` | `readable` | No | `readable` — ~65ch; `full` — ширина родителя. |
+| className | `string` | — | No | Класс на **`<p>`**. |
+| children | `React.ReactNode` | — | No | Вводный текст. |
+| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | В т.ч. `ref` (`forwardRef`). |
 
 ### PageContent.Body
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the main content wrapper below the header. |
-| children | `React.ReactNode` | — | No | Page content under the header. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Native `div` attributes. |
+| className | `string` | — | No | Класс на обёртке контента под шапкой. |
+| children | `React.ReactNode` | — | No | Основное содержимое. |
+| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Атрибуты `div`. |
 
 ## Related
 
-- [Typography](../typography/COMPONENT.md) — inline roles elsewhere on the page.
-- [AppShell](../../layout/app-shell/AppShell.tsx) — grid shell (`nav` + **`main`**); page padding is app-level (e.g. **`PageContent.Root`** or a wrapper inside **`main`**).
+- [Typography](../typography/COMPONENT.md) — роли текста на странице.
+- [AppShell](../../layout/app-shell/COMPONENT.md) — сетка и **`MainInset`**.

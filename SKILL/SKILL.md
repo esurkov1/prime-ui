@@ -33,6 +33,11 @@ description: >
 
 Cursor skill: copy the whole `SKILL/` directory from the GitHub repository — it is not published to npm.
 
+### Application layout (canonical)
+
+- **`AppShell.Template`** + **`Sidebar`** in `nav` + **`Outlet`** (or page children) in **`main`**: edge padding for the content column is **only** from **`AppShell.MainInset`** inside the kit — do not add a second inset wrapper or ad‑hoc page margins.
+- **`PageContent.Section`** or **`PageContent.Root`** for page structure; avoid duplicating outer padding that **`MainInset`** already applies.
+
 ### How to use `COMPONENT.md` + `examples/` (agents)
 
 1. **Read order:** open `COMPONENT.md` → use the **Canonical example** (single maximal block) for the full public API in one place → follow **Extended examples** links to `./examples/<file>.tsx` for product-style compositions (dashboard, settings, checkout, etc.).
@@ -105,7 +110,7 @@ Full reference: `[design-tokens.md](./design-tokens.md)`.
 
 **Form wizard:** Stepper (horizontal at `≥ md`, vertical otherwise) + step column with `max-width` ~600px; actions `space-between`; on mobile the step can live in Modal or Drawer; ProgressBar under progress; below `sm` buttons `fullWidth`, larger DigitInput.
 
-Per-component details live in each `COMPONENT.md` where present; the full overview (including **AppShell**, **ExampleFrame**, **ScrollContainer** without a separate COMPONENT.md) is in `[component-catalog.md](./component-catalog.md)`.
+Per-component details live in each `COMPONENT.md` where present; the full overview (including **ExampleFrame**, **ScrollContainer** without a separate COMPONENT.md) is in `[component-catalog.md](./component-catalog.md)` — **AppShell** has `[../src/layout/app-shell/COMPONENT.md](../src/layout/app-shell/COMPONENT.md)`.
 
 ---
 
