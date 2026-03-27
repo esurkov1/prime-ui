@@ -54,6 +54,7 @@ export const componentSizes = {
   sidebar: ["s", "m", "l", "xl"] as const,
   drawer: ["s", "m", "l", "xl"] as const,
   dataTable: ["s", "m", "l", "xl"] as const,
+  emptyPage: ["s", "m", "l", "xl"] as const,
 } as const;
 
 export const buttonModes = ["filled", "stroke", "lighter", "ghost", "fancy"] as const;
@@ -100,4 +101,5 @@ export type ProgressBarSize = (typeof componentSizes.progressBar)[number];
 export type SidebarSize = (typeof componentSizes.sidebar)[number];
 export type DrawerSize = (typeof componentSizes.drawer)[number];
 export type DataTableSize = (typeof componentSizes.dataTable)[number];
+export type EmptyPageSize = (typeof componentSizes.emptyPage)[number];
 export type ButtonMode = (typeof buttonModes)[number];

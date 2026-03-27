@@ -124,4 +124,5 @@ export function AccountPage() {
 ## Related
 
 - [Typography](../typography/COMPONENT.md) — роли текста на странице.
+- [EmptyPage](../empty-page/COMPONENT.md) — пустое состояние списка или области данных (**`h2`**, не дублирует **`PageContent.Title`**).
 - [AppShell](../../layout/app-shell/COMPONENT.md) — сетка и **`Main`**.

@@ -22,6 +22,7 @@ import {
   Hash,
   HelpCircle,
   Info,
+  Inbox,
   Keyboard,
   Layers,
   LayoutDashboard,
@@ -181,6 +182,8 @@ function pageIcon(segment: string): React.ReactNode {
       return wrapPlaygroundNavIcon(<LayoutTemplate {...navIconProps} />);
     case "page-content":
       return wrapPlaygroundNavIcon(<PanelTop {...navIconProps} />);
+    case "empty-page":
+      return wrapPlaygroundNavIcon(<Inbox {...navIconProps} />);
     case "scroll-container":
       return wrapPlaygroundNavIcon(<ScrollText {...navIconProps} />);
     case "sidebar":

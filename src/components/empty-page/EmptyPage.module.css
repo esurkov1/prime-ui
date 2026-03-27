@@ -1,0 +1,170 @@
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+.root[data-layout="fill"] {
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-height: 0;
+}
+
+.iconWrap {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--prime-sys-shape-radius-full);
+  background: var(--prime-sys-color-surface-raised);
+  color: var(--prime-sys-color-content-muted);
+}
+
+.iconWrap svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  max-width: min(100%, var(--prime-sys-unit-40rem));
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: 1.25;
+  color: var(--prime-sys-color-content-primary);
+}
+
+.description {
+  margin: 0;
+  max-width: min(100%, var(--prime-sys-unit-40rem));
+  line-height: 1.45;
+  color: var(--prime-sys-color-content-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+/* size s */
+.root[data-size="s"] {
+  gap: var(--prime-sys-size-control-s-gap);
+  padding-block: var(--prime-sys-spacing-xl);
+  padding-inline: var(--prime-sys-spacing-m);
+}
+
+.root[data-size="s"] .iconWrap {
+  width: calc(var(--prime-sys-size-control-s-icon) * 2 + var(--prime-sys-spacing-m));
+  height: calc(var(--prime-sys-size-control-s-icon) * 2 + var(--prime-sys-spacing-m));
+}
+
+.root[data-size="s"] .iconWrap svg {
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
+}
+
+.root[data-size="s"] .title {
+  font-size: var(--prime-sys-size-control-s-text);
+}
+
+.root[data-size="s"] .description {
+  font-size: var(--prime-sys-size-control-s-supportText);
+}
+
+.root[data-size="s"] .actions {
+  gap: var(--prime-sys-size-control-s-gap);
+}
+
+/* size m */
+.root[data-size="m"] {
+  gap: var(--prime-sys-size-control-m-gap);
+  padding-block: var(--prime-sys-spacing-2xl);
+  padding-inline: var(--prime-sys-spacing-l);
+}
+
+.root[data-size="m"] .iconWrap {
+  width: calc(var(--prime-sys-size-control-m-icon) * 2 + var(--prime-sys-spacing-m));
+  height: calc(var(--prime-sys-size-control-m-icon) * 2 + var(--prime-sys-spacing-m));
+}
+
+.root[data-size="m"] .iconWrap svg {
+  width: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-icon);
+}
+
+.root[data-size="m"] .title {
+  font-size: var(--prime-sys-size-control-m-text);
+}
+
+.root[data-size="m"] .description {
+  font-size: var(--prime-sys-size-control-m-supportText);
+}
+
+.root[data-size="m"] .actions {
+  gap: var(--prime-sys-size-control-m-gap);
+}
+
+/* size l */
+.root[data-size="l"] {
+  gap: var(--prime-sys-size-control-l-gap);
+  padding-block: var(--prime-sys-spacing-3xl);
+  padding-inline: var(--prime-sys-spacing-xl);
+}
+
+.root[data-size="l"] .iconWrap {
+  width: calc(var(--prime-sys-size-control-l-icon) * 2 + var(--prime-sys-spacing-m));
+  height: calc(var(--prime-sys-size-control-l-icon) * 2 + var(--prime-sys-spacing-m));
+}
+
+.root[data-size="l"] .iconWrap svg {
+  width: var(--prime-sys-size-control-l-icon);
+  height: var(--prime-sys-size-control-l-icon);
+}
+
+.root[data-size="l"] .title {
+  font-size: var(--prime-sys-size-control-l-text);
+}
+
+.root[data-size="l"] .description {
+  font-size: var(--prime-sys-size-control-l-supportText);
+}
+
+.root[data-size="l"] .actions {
+  gap: var(--prime-sys-size-control-l-gap);
+}
+
+/* size xl */
+.root[data-size="xl"] {
+  gap: var(--prime-sys-size-control-xl-gap);
+  padding-block: var(--prime-sys-spacing-4xl);
+  padding-inline: var(--prime-sys-spacing-2xl);
+}
+
+.root[data-size="xl"] .iconWrap {
+  width: calc(var(--prime-sys-size-control-xl-icon) * 2 + var(--prime-sys-spacing-l));
+  height: calc(var(--prime-sys-size-control-xl-icon) * 2 + var(--prime-sys-spacing-l));
+}
+
+.root[data-size="xl"] .iconWrap svg {
+  width: var(--prime-sys-size-control-xl-icon);
+  height: var(--prime-sys-size-control-xl-icon);
+}
+
+.root[data-size="xl"] .title {
+  font-size: var(--prime-sys-size-control-xl-text);
+}
+
+.root[data-size="xl"] .description {
+  font-size: var(--prime-sys-size-control-xl-supportText);
+}
+
+.root[data-size="xl"] .actions {
+  gap: var(--prime-sys-size-control-xl-gap);
+}

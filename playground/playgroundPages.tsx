@@ -21,6 +21,7 @@ import DatepickerSection from "./sections/DatepickerSection";
 import DigitInputSection from "./sections/DigitInputSection";
 import DividerSection from "./sections/DividerSection";
 import DrawerSection from "./sections/DrawerSection";
+import EmptyPageSection from "./sections/EmptyPageSection";
 import DropdownSection from "./sections/DropdownSection";
 import ExampleFrameSection from "./sections/ExampleFrameSection";
 import FileUploadSection from "./sections/FileUploadSection";
@@ -142,6 +143,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     { segment: "accordion", label: "Accordion", Page: AccordionSection },
     { segment: "app-shell", label: "AppShell", Page: AppShellSection },
     { segment: "page-content", label: "PageContent", Page: PageContentSection },
+    { segment: "empty-page", label: "EmptyPage", Page: EmptyPageSection },
     { segment: "scroll-container", label: "ScrollContainer", Page: ScrollContainerSection },
     { segment: "sidebar", label: "Sidebar", Page: SidebarSection },
   ],

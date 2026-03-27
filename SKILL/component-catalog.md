@@ -1,6 +1,6 @@
 # prime-ui-kit component catalog — responsive context
 
-Full table of **47** UI building blocks (responsive zones + scenarios). **45** have a dedicated `COMPONENT.md` under `src/components/*` or `src/layout/*` (**AppShell** — `src/layout/app-shell/COMPONENT.md`; **Sidebar** — `src/layout/sidebar/COMPONENT.md`). **ExampleFrame** and **ScrollContainer** remain documented from source + playground (no separate `COMPONENT.md`).
+Full table of **48** UI building blocks (responsive zones + scenarios). **46** have a dedicated `COMPONENT.md` under `src/components/*` or `src/layout/*` (**AppShell** — `src/layout/app-shell/COMPONENT.md`; **Sidebar** — `src/layout/sidebar/COMPONENT.md`). **ExampleFrame** and **ScrollContainer** remain documented from source + playground (no separate `COMPONENT.md`).
 
 **Examples:** For each component with `COMPONENT.md`, see also `examples/*.tsx` (3–5 runnable scenarios per folder) — richer than playground snippets; paths in each `COMPONENT.md` under **Extended examples**.
 
@@ -157,6 +157,16 @@ Full table of **47** UI building blocks (responsive zones + scenarios). **45** h
 | **Zones** | form, overlay |
 | **Scenarios** | SMS OTP; pickup code; content PIN; large cells on tablet; pairing code; email confirmation in a wizard. |
 | **Documentation** | `../src/components/digit-input/COMPONENT.md` |
+
+## EmptyPage
+
+| | |
+|---|---|
+| **Purpose** | Centered empty state: icon slot, **`h2`** title, description, actions row; optional **`layout="fill"`** for table/card body regions. |
+| **Responsive role** | Scales via **`size`** (`s`–`xl`); touch-friendly actions via inherited **`ControlSizeProvider`**. |
+| **Zones** | content, inline |
+| **Scenarios** | No search results; empty catalog; cleared filters; first-time list before data; placeholder inside a bordered table area. |
+| **Documentation** | `../src/components/empty-page/COMPONENT.md` |
 
 ## Divider
 

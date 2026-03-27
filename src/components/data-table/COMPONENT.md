@@ -12,6 +12,7 @@
 - **Do not use** when you need arbitrary column pinning, resizable columns, or spreadsheet-style keyboard grid navigation — the table does not implement those.
 - **Do not use** when sorting or filtering must run on the server only without mirroring logic in the parent — sorting is applied in memory to the `rows` you pass; supply pre-sorted data or control `sort` yourself and replace `rows` accordingly.
 - **Do not use** when you need a loading overlay on top of already rendered rows — `loading` only affects the body when there are zero rows to display.
+- **Empty state:** for a **plain** message in the table body use **`emptyText`**. For an **illustrated** empty state (icon, **`h2`**, actions) render [`EmptyPage`](../empty-page/COMPONENT.md) in the surrounding layout or conditionally **instead of** the table when `rows.length === 0` and not `loading`.
 
 ## Composition
 
@@ -135,4 +136,5 @@ Exported types: `DataTableSortState`, `DataTableOrder`, `DataTableSize`, `DataTa
 ## Related
 
 - [Pagination](../pagination/COMPONENT.md) — used under the table for page navigation.
+- [EmptyPage](../empty-page/COMPONENT.md) — rich empty state (icon, title, CTA) outside or instead of `emptyText`.
 - [LinkButton](../link-button/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Tag](../tag/COMPONENT.md) — common cell content; they pick up size from the table’s `ControlSizeProvider` unless overridden.

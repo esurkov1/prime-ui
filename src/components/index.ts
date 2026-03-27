@@ -158,6 +158,16 @@ export type { DigitInputRootProps, DigitInputSize } from "./digit-input/DigitInp
 export { DigitInput } from "./digit-input/DigitInput";
 export type { DividerRootProps, DividerSize, DividerVariant } from "./divider/Divider";
 export { Divider } from "./divider/Divider";
+export type {
+  EmptyPageActionsProps,
+  EmptyPageDescriptionProps,
+  EmptyPageIconProps,
+  EmptyPageLayout,
+  EmptyPageRootProps,
+  EmptyPageSize,
+  EmptyPageTitleProps,
+} from "./empty-page/EmptyPage";
+export { EmptyPage } from "./empty-page/EmptyPage";
 export * from "./drawer/Drawer";
 export type {
   DropdownBlockProps,

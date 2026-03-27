@@ -6,7 +6,7 @@ description: >
   Flexbox for local stacks/toolbars, CSS Modules, and --prime-sys-* tokens.
   Use when laying out pages, templates, forms, navigation, or dashboards; converting desktop layouts to  
   mobile-first; picking a component for a region; validating breakpoints, touch targets, or Drawer vs inline.  
-  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 47-entry component catalog, per-component `examples/*.tsx` scenarios, and anti-patterns.  
+  Includes recipes (dashboard, settings, catalog, landing, form wizard), a 48-entry component catalog, per-component `examples/*.tsx` scenarios, and anti-patterns.  
   Non-negotiable: no custom wrappers or reskins of kit components—only primitives, default styles, and the public API.
 
 # prime-ui-kit

@@ -1,0 +1,25 @@
+/* Раскладка для runnable-примеров EmptyPage (зеркало playground/snippets/empty-page/*.module.css). */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-2xl);
+  width: 100%;
+}
+
+.tableRegion {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--prime-sys-unit-18rem);
+  max-width: 100%;
+  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  border-radius: var(--prime-sys-shape-radius-l);
+  background: var(--prime-sys-color-surface-default);
+}
+
+.lead {
+  margin: 0 0 var(--prime-sys-spacing-m);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  color: var(--prime-sys-color-content-secondary);
+}
