@@ -349,6 +349,13 @@
   outline-offset: var(--prime-sys-unit-2px);
 }
 
+.menuButtonActive:focus-visible,
+.menuButton[data-active="true"]:focus-visible,
+.menuButton[aria-current="page"]:focus-visible {
+  outline: none;
+  box-shadow: var(--prime-sys-elevation-shadow-primaryFocus);
+}
+
 .menuButton:disabled {
   opacity: 0.56;
   cursor: not-allowed;
@@ -357,7 +364,14 @@
 .menuButtonActive,
 .menuButton[data-active="true"],
 .menuButton[aria-current="page"] {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  background: var(--prime-sys-color-action-primaryBackground);
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.menuButtonActive:hover:not(:disabled),
+.menuButton[data-active="true"]:hover:not(:disabled),
+.menuButton[aria-current="page"]:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-primaryBackgroundHover);
 }
 
 .menuIcon {
@@ -393,6 +407,19 @@
   color: var(--prime-sys-color-content-muted);
   opacity: var(--sb-item-trailing-opacity);
   transform: scale(var(--sb-item-trailing-scale));
+}
+
+.menuButtonActive .menuIcon,
+.menuButton[data-active="true"] .menuIcon,
+.menuButton[aria-current="page"] .menuIcon {
+  color: var(--prime-sys-color-action-primaryForeground);
+}
+
+.menuButtonActive .menuTrailing,
+.menuButton[data-active="true"] .menuTrailing,
+.menuButton[aria-current="page"] .menuTrailing {
+  color: var(--prime-sys-color-action-primaryForeground);
+  opacity: 0.72;
 }
 
 .menuAction {
