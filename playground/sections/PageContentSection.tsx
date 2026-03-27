@@ -174,8 +174,8 @@ export default function PageContentSection() {
           {
             <>
               Семантическая разметка контентной колонки: <code>PageContent.Section</code> (регион
-              страницы без собственных внешних полей к краю колонки), <code>PageContent.Root</code> (
-              <code>maxWidth</code> и структура шапки/тела; краевые поля колонки даёт{" "}
+              страницы без собственных внешних полей к краю колонки), <code>PageContent.Root</code>{" "}
+              (<code>maxWidth</code> и структура шапки/тела; краевые поля колонки даёт{" "}
               <code>AppShell.MainInset</code> внутри <code>AppShell.Template</code>),{" "}
               <code>Title</code> → <code>&lt;h1&gt;</code>, <code>Description</code> с{" "}
               <code>measure=&quot;readable&quot; | &quot;full&quot;</code>, <code>Body</code>. Поля
