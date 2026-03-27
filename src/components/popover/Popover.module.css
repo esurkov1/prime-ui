@@ -1,39 +1,118 @@
-/* Внешний узел — ScrollContainer: прокрутка и позиция. Внутренний — .popoverPanel: поля и «хром» панели (отступы не смешиваются с .root скролла). */
+/* Как у Dropdown `.content`: один ScrollContainer — фон, скругление, тени, padding, прокрутка (без второго слоя под «хром»). */
 .popoverScroll {
-  --po-pad: var(--prime-sys-spacing-x2);
+  --dropdown-separator-mix: 40%;
+  --dd-pad: var(--prime-sys-spacing-x2);
+  --dd-min-w: var(--prime-sys-unit-11rem);
+  --dd-item-gap: var(--prime-sys-size-control-m-gap);
+  --dd-item-height: var(--prime-sys-size-control-m-height);
+  --dd-item-pad-x: var(--prime-sys-size-control-m-buttonPaddingX);
+  --dd-item-radius: var(--prime-sys-size-control-m-radius);
+  --dd-item-text: var(--prime-sys-size-control-m-text);
+  --dd-icon-size: var(--prime-sys-size-control-m-icon);
+  --dd-group-label-font: var(--prime-sys-size-control-s-supportText);
+  --dd-group-label-pt: var(--prime-sys-spacing-x2);
+  --dd-group-label-px: var(--prime-sys-spacing-x3);
+  --dd-group-label-pb: var(--prime-sys-spacing-x1);
+  --dd-header-gap: var(--prime-sys-spacing-x3);
+  --dd-header-pad-inline: var(--prime-sys-spacing-x2);
+  --dd-header-pad-block: var(--prime-sys-spacing-x3);
+  --dd-header-desc-font: var(--prime-sys-size-control-s-supportText);
+  --dd-separator-stack-pad: var(--prime-sys-spacing-x2);
   --po-inset-extra: 0px;
   --po-inset-gap: 0;
-  --po-text-size: var(--prime-sys-size-control-m-supportText);
 
   display: flex;
   flex-direction: column;
   align-items: stretch;
   position: fixed;
-  box-sizing: border-box;
   width: max-content;
   max-width: min(var(--prime-sys-unit-20rem), 100vw);
-  min-width: 0;
-  margin: 0;
-  transform-origin: top center;
-}
-
-.popoverPanel {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--po-inset-gap);
-  min-width: 0;
-  width: max-content;
-  max-width: min(var(--prime-sys-unit-20rem), 100vw);
-  padding: calc(var(--po-pad) + var(--po-inset-extra));
   background: var(--prime-sys-color-surface-elevated);
   border: none;
   border-radius: var(--prime-sys-shape-radius-l);
   box-shadow: var(--prime-sys-elevation-shadow-surface), var(--prime-sys-elevation-shadow-modal);
-  font-size: var(--po-text-size);
-  line-height: 1.35;
-  color: var(--prime-sys-color-content-secondary);
+  padding: calc(var(--dd-pad) + var(--po-inset-extra));
+  min-width: var(--dd-min-w);
+  box-sizing: border-box;
+  margin: 0;
+  transform-origin: top center;
+  gap: var(--po-inset-gap);
+  font-size: var(--dd-item-text);
+  line-height: 1.25;
+  color: var(--prime-sys-color-content-primary);
+}
+
+.popoverScroll[data-overlay-portal-layer="page"] {
+  z-index: var(--prime-sys-elevation-zIndex-popover);
+}
+
+.popoverScroll[data-overlay-portal-layer="drawer"] {
+  z-index: var(--prime-sys-elevation-zIndex-popoverInDrawer);
+}
+
+.popoverScroll[data-overlay-portal-layer="modal"] {
+  z-index: var(--prime-sys-elevation-zIndex-popoverInModal);
+}
+
+.popoverScroll[data-overlay-portal-layer="drawerInModal"] {
+  z-index: var(--prime-sys-elevation-zIndex-popoverInDrawerInModal);
+}
+
+.popoverScroll[data-size="s"] {
+  --dd-pad: var(--prime-sys-spacing-x2);
+  --dd-min-w: var(--prime-sys-unit-9p5rem);
+  --dd-item-gap: var(--prime-sys-size-control-s-gap);
+  --dd-item-height: var(--prime-sys-size-control-s-height);
+  --dd-item-pad-x: var(--prime-sys-size-control-s-buttonPaddingX);
+  --dd-item-radius: var(--prime-sys-size-control-s-radius);
+  --dd-item-text: var(--prime-sys-size-control-s-text);
+  --dd-icon-size: var(--prime-sys-size-control-s-icon);
+  --dd-group-label-font: var(--prime-sys-size-control-s-supportText);
+  --dd-group-label-pt: var(--prime-sys-spacing-x1);
+  --dd-group-label-px: var(--prime-sys-spacing-x2);
+  --dd-group-label-pb: var(--prime-sys-spacing-x1);
+  --dd-header-gap: var(--prime-sys-spacing-x2);
+  --dd-header-pad-inline: var(--prime-sys-spacing-x2);
+  --dd-header-pad-block: var(--prime-sys-spacing-x3);
+}
+
+.popoverScroll[data-size="l"] {
+  --dd-pad: var(--prime-sys-spacing-x3);
+  --dd-min-w: var(--prime-sys-unit-12p5rem);
+  --dd-item-gap: var(--prime-sys-size-control-l-gap);
+  --dd-item-height: var(--prime-sys-size-control-l-height);
+  --dd-item-pad-x: var(--prime-sys-size-control-l-buttonPaddingX);
+  --dd-item-radius: var(--prime-sys-size-control-l-radius);
+  --dd-item-text: var(--prime-sys-size-control-l-text);
+  --dd-icon-size: var(--prime-sys-size-control-l-icon);
+  --dd-group-label-font: var(--prime-sys-size-control-l-supportText);
+  --dd-group-label-pt: var(--prime-sys-spacing-x2);
+  --dd-group-label-px: var(--prime-sys-spacing-x4);
+  --dd-group-label-pb: var(--prime-sys-spacing-x2);
+  --dd-header-desc-font: var(--prime-sys-size-control-m-supportText);
+  --dd-header-pad-inline: var(--prime-sys-spacing-x3);
+  --dd-header-pad-block: var(--prime-sys-spacing-x4);
+  --dd-separator-stack-pad: var(--prime-sys-spacing-x3);
+}
+
+.popoverScroll[data-size="xl"] {
+  --dd-pad: var(--prime-sys-spacing-x4);
+  --dd-min-w: var(--prime-sys-unit-14rem);
+  --dd-item-gap: var(--prime-sys-size-control-xl-gap);
+  --dd-item-height: var(--prime-sys-size-control-xl-height);
+  --dd-item-pad-x: var(--prime-sys-size-control-xl-buttonPaddingX);
+  --dd-item-radius: var(--prime-sys-size-control-xl-radius);
+  --dd-item-text: var(--prime-sys-size-control-xl-text);
+  --dd-icon-size: var(--prime-sys-size-control-xl-icon);
+  --dd-group-label-font: var(--prime-sys-size-control-xl-supportText);
+  --dd-group-label-pt: var(--prime-sys-spacing-x3);
+  --dd-group-label-px: var(--prime-sys-spacing-x4);
+  --dd-group-label-pb: var(--prime-sys-spacing-x2);
+  --dd-header-gap: var(--prime-sys-spacing-x3);
+  --dd-header-desc-font: var(--prime-sys-size-control-xl-supportText);
+  --dd-header-pad-inline: var(--prime-sys-spacing-x3);
+  --dd-header-pad-block: var(--prime-sys-spacing-x4);
+  --dd-separator-stack-pad: var(--prime-sys-spacing-x3);
 }
 
 .popoverScroll[data-inset-padding="none"] {
@@ -68,39 +147,7 @@
   --po-inset-gap: var(--prime-sys-spacing-x4);
 }
 
-.popoverScroll[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-sys-elevation-zIndex-popover);
-}
-
-.popoverScroll[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-sys-elevation-zIndex-popoverInDrawer);
-}
-
-.popoverScroll[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-sys-elevation-zIndex-popoverInModal);
-}
-
-.popoverScroll[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-sys-elevation-zIndex-popoverInDrawerInModal);
-}
-
-/* Ярус размера: поля панели и кегль — разные между s / m / l / xl */
-.popoverScroll[data-size="s"] {
-  --po-pad: var(--prime-sys-spacing-x1);
-  --po-text-size: var(--prime-sys-size-control-s-supportText);
-}
-
-.popoverScroll[data-size="l"] {
-  --po-pad: var(--prime-sys-spacing-x3);
-  --po-text-size: var(--prime-sys-size-control-l-supportText);
-}
-
-.popoverScroll[data-size="xl"] {
-  --po-pad: var(--prime-sys-spacing-x4);
-  --po-text-size: var(--prime-sys-size-control-xl-supportText);
-}
-
-:global([data-theme="dark"]) .popoverPanel {
+:global([data-theme="dark"]) .popoverScroll {
   background: var(--prime-sys-color-surface-raised);
 }
 

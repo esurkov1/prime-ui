@@ -107,7 +107,7 @@ export type PopoverContentProps = {
   sameMinWidthAsTrigger?: boolean;
   size?: PopoverSize;
   trapFocus?: boolean;
-  /** Доп. отступы к `--po-pad` панели. По умолчанию без второго слоя inset. */
+  /** Дополнение к внутренним полям как у Dropdown (`padding` = `--dd-pad` + inset). */
   insetPadding?: PopoverInsetPadding;
   /** Вертикальный зазор между прямыми дочерними блоками внутри панели. */
   insetGap?: PopoverInsetGap;
@@ -174,7 +174,7 @@ function PopoverContent({
           className={cx(styles.popoverScroll, className)}
           style={layout?.style}
         >
-          <div className={styles.popoverPanel}>{children}</div>
+          {children}
         </ScrollContainer>
       </ControlSizeProvider>
     </Portal>

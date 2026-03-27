@@ -118,7 +118,7 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
     defaultValue: '"none"',
     required: "Нет",
     description:
-      "Дополнительный внутренний отступ к ярусу панели (--po-pad); data-inset-padding на корне панели.",
+      "Дополнительный внутренний отступ к полям как у Dropdown (--dd-pad); data-inset-padding на корне панели.",
   },
   {
     prop: "insetGap",
