@@ -56,6 +56,7 @@ import {
   UserRound,
 } from "lucide-react";
 import * as React from "react";
+import { useLocation } from "react-router-dom";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
@@ -578,7 +579,10 @@ function PlaygroundUserMenu() {
   );
 }
 
+const PLAYGROUND_SIDEBAR_NAV_SCROLL_ID = "playground-sidebar-nav-scroll";
+
 export function PlaygroundChromeSidebar() {
+  const { pathname } = useLocation();
   const nav = React.useMemo(() => getPlaygroundNavModel(), []);
   const navigationApi = React.useMemo(() => buildSidebarNavigationApi(nav), [nav]);
 
@@ -586,6 +590,14 @@ export function PlaygroundChromeSidebar() {
     () => resolveSidebarNavigation(navigationApi),
     [navigationApi],
   );
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: прокрутка к активному пункту при смене маршрута и при первом монтировании
+  React.useLayoutEffect(() => {
+    const scrollRoot = document.getElementById(PLAYGROUND_SIDEBAR_NAV_SCROLL_ID);
+    if (scrollRoot === null) return;
+    const active = scrollRoot.querySelector<HTMLElement>("a[aria-current='page']");
+    active?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [pathname]);
 
   return (
     <Sidebar.Root sidebarSlot="page-nav" aria-label="Навигация playground">
@@ -603,7 +615,7 @@ export function PlaygroundChromeSidebar() {
         </Sidebar.Header>
 
         <Tooltip.Provider delayDuration={0}>
-          <Sidebar.Content>
+          <Sidebar.Content id={PLAYGROUND_SIDEBAR_NAV_SCROLL_ID}>
             <PlaygroundTreeMenu categories={categories} />
           </Sidebar.Content>
         </Tooltip.Provider>
