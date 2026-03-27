@@ -56,7 +56,7 @@ import { Stepper } from "prime-ui-kit";
 
 export function Example() {
   return (
-    <Stepper.Root size="m" orientation="vertical">
+    <Stepper.Root orientation="vertical">
       <Stepper.Step type="button">
         <Stepper.Indicator />
         <Stepper.Content title="Account" description="Sign in or create a profile" />

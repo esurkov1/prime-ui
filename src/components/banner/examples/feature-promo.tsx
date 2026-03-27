@@ -10,7 +10,6 @@ export default function FeaturePromoExample() {
       role="region"
       status="feature"
       variant="lighter"
-      size="m"
       onDismiss={() => {
         /* product: persist dismissal (localStorage / profile flag) */
       }}

@@ -11,7 +11,7 @@ export default function StepperExampleCheckoutHorizontal() {
 
   return (
     <div className={styles.stack}>
-      <Stepper.Root orientation="horizontal" currentStep={step} size="m" className={styles.rail}>
+      <Stepper.Root orientation="horizontal" currentStep={step} className={styles.rail}>
         <Stepper.Step type="button" onClick={() => setStep(0)}>
           <Stepper.Indicator />
           <Stepper.Content title="Cart" description="Review items" />

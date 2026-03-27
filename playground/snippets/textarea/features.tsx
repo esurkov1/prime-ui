@@ -14,15 +14,11 @@ export default function TextareaFeaturesSnippet() {
 
   return (
     <>
-      <Textarea.Root
-        size="m"
-        placeholder="Несколько строк — высота растёт (autoResize по умолчанию)"
-      >
+      <Textarea.Root placeholder="Несколько строк — высота растёт (autoResize по умолчанию)">
         <Textarea.Hint>Режим роста по содержимому через разметку и data-value.</Textarea.Hint>
       </Textarea.Root>
       <div className="previewBlockSpacer">
         <Textarea.Root
-          size="m"
           autoResize={false}
           placeholder="Фиксированная высота, угол resize у браузера"
         >
@@ -31,7 +27,6 @@ export default function TextareaFeaturesSnippet() {
       </div>
       <div className="previewBlockSpacer">
         <Textarea.Root
-          size="m"
           placeholder="Счётчик символов в подвале поля"
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -40,18 +35,13 @@ export default function TextareaFeaturesSnippet() {
         </Textarea.Root>
       </div>
       <div className="previewBlockSpacer">
-        <Textarea.Root
-          size="m"
-          value={overflowValue}
-          onChange={(e) => setOverflowValue(e.target.value)}
-        >
+        <Textarea.Root value={overflowValue} onChange={(e) => setOverflowValue(e.target.value)}>
           <Textarea.CharCounter current={overflowValue.length} max={overflowMax} />
           <Textarea.Hint>При current &gt; max включается data-overflow на счётчике.</Textarea.Hint>
         </Textarea.Root>
       </div>
       <div className="previewBlockSpacer">
         <Textarea.Root
-          size="m"
           placeholder={`Не больше ${nativeLimit} символов`}
           value={limited}
           maxLength={nativeLimit}

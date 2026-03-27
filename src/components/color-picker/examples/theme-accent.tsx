@@ -14,17 +14,12 @@ export function ThemeAccentExample() {
       <ColorPicker.Root value={color} onChange={setColor}>
         <Popover.Root onOpenChange={setOpen} open={open}>
           <Popover.Trigger asChild>
-            <Button.Root
-              aria-label="Choose theme accent color"
-              mode="stroke"
-              size="m"
-              variant="neutral"
-            >
+            <Button.Root aria-label="Choose theme accent color" mode="stroke" variant="neutral">
               <ColorPicker.TriggerSwatch />
               Accent
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+          <Popover.Content align="start" side="bottom">
             <ColorPicker.FormatProvider>
               <ColorPicker.FormatSelect />
               <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">

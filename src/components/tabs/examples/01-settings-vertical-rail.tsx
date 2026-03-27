@@ -8,12 +8,7 @@ import styles from "./examples.module.css";
  */
 export default function TabsExampleSettingsVerticalRail() {
   return (
-    <Tabs.Root
-      defaultValue="profile"
-      orientation="vertical"
-      size="m"
-      className={styles.settingsRow}
-    >
+    <Tabs.Root defaultValue="profile" orientation="vertical" className={styles.settingsRow}>
       <Tabs.List>
         <Tabs.Tab value="profile">
           <Tabs.Label>Profile</Tabs.Label>

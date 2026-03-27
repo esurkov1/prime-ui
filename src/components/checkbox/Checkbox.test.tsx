@@ -205,7 +205,7 @@ describe("Checkbox", () => {
 
   it("sets data-size attribute for m size", () => {
     render(
-      <Checkbox.Root size="m">
+      <Checkbox.Root>
         <Checkbox.Label>Small</Checkbox.Label>
       </Checkbox.Root>,
     );

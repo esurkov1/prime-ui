@@ -9,7 +9,7 @@ import styles from "./examples.module.css";
 export default function StepperExampleCheckoutStepError() {
   return (
     <div className={styles.stack}>
-      <Stepper.Root orientation="horizontal" currentStep={2} size="m" className={styles.rail}>
+      <Stepper.Root orientation="horizontal" currentStep={2} className={styles.rail}>
         <Stepper.Step type="button">
           <Stepper.Indicator />
           <Stepper.Content title="Cart" />

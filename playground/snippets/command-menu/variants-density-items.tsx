@@ -21,7 +21,6 @@ export default function CommandMenuVariantsDensityItemsSnippet() {
     <>
       <div className="previewRowWrap">
         <Button.Root
-          size="m"
           variant="neutral"
           mode="stroke"
           onClick={() => {
@@ -32,7 +31,6 @@ export default function CommandMenuVariantsDensityItemsSnippet() {
           Плотность compact
         </Button.Root>
         <Button.Root
-          size="m"
           variant="neutral"
           mode="stroke"
           onClick={() => {
@@ -61,10 +59,10 @@ export default function CommandMenuVariantsDensityItemsSnippet() {
             </CommandMenu.Item>
           </CommandMenu.Group>
           <CommandMenu.Group heading={`Пункты size="m"`}>
-            <CommandMenu.Item value="высокая строка" size="m" onSelect={() => setOpen(false)}>
+            <CommandMenu.Item value="высокая строка" onSelect={() => setOpen(false)}>
               Повышенная строка списка
             </CommandMenu.Item>
-            <CommandMenu.Item value="ещё один m" size="m" onSelect={() => setOpen(false)}>
+            <CommandMenu.Item value="ещё один m" onSelect={() => setOpen(false)}>
               Ещё один пункт размера m
             </CommandMenu.Item>
           </CommandMenu.Group>

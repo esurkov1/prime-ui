@@ -10,7 +10,6 @@ export default function SidebarAsChildSnippet() {
   return (
     <div className={styles.stage}>
       <Sidebar.Root
-        size="m"
         open={open}
         onOpenChange={setOpen}
         responsive={false}

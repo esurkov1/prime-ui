@@ -18,7 +18,7 @@ export default function DividerInsetStackExample() {
           </div>
         </div>
 
-        <Divider.Root size="m" />
+        <Divider.Root />
 
         <div className={s.rowWithIcon}>
           <span className={s.iconStub} aria-hidden />

@@ -46,7 +46,7 @@ export default function CommandMenuFeaturesKeyboardSearchSnippet() {
 
   return (
     <>
-      <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
+      <Button.Root variant="primary" onClick={() => setOpen(true)}>
         Открыть (или ⌘K / Ctrl+K)
       </Button.Root>
 

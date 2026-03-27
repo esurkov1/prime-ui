@@ -15,7 +15,6 @@ export default function AccordionExampleApiDocsSections() {
   return (
     <Accordion.Root
       type="single"
-      size="m"
       layout="grouped"
       value={open}
       onValueChange={(next) => {

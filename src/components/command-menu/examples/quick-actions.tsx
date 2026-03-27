@@ -19,7 +19,7 @@ export default function CommandMenuExampleQuickActions() {
 
   return (
     <>
-      <Button.Root size="m" variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
+      <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
         Quick actions
       </Button.Root>
 

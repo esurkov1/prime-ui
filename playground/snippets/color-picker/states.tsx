@@ -21,12 +21,12 @@ export default function ColorPickerStatesSnippet() {
         <ColorPicker.Root defaultValue="#22c55e">
           <Popover.Root open={openSwatch} onOpenChange={setOpenSwatch}>
             <Popover.Trigger asChild>
-              <Button.Root mode="stroke" size="m" variant="neutral">
+              <Button.Root mode="stroke" variant="neutral">
                 <ColorPicker.TriggerSwatch className={preview.popoverTriggerSwatch} />
                 Палитра
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+            <Popover.Content align="start" side="bottom">
               <ColorPicker.FormatProvider>
                 <ColorPicker.SwatchPicker aria-label="Палитра с недоступным цветом">
                   {PRESETS.map((c, i) => (
@@ -45,12 +45,12 @@ export default function ColorPickerStatesSnippet() {
         <ColorPicker.Root defaultValue="hsl(200, 75%, 52%)">
           <Popover.Root open={openSlider} onOpenChange={setOpenSlider}>
             <Popover.Trigger asChild>
-              <Button.Root mode="stroke" size="m" variant="neutral">
+              <Button.Root mode="stroke" variant="neutral">
                 <ColorPicker.TriggerSwatch className={preview.popoverTriggerSwatch} />
                 Слайдер disabled
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+            <Popover.Content align="start" side="bottom">
               <ColorPicker.FormatProvider>
                 <div className={preview.miniPicker}>
                   <ColorPicker.Slider channel="hue" colorSpace="hsl" isDisabled>

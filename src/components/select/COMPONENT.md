@@ -38,10 +38,10 @@ export function Example() {
 
   return (
     <div>
-      <Label.Root id={labelId} size="m">
+      <Label.Root id={labelId}>
         Department
       </Label.Root>
-      <Select.Root size="m" placeholder="Choose">
+      <Select.Root placeholder="Choose">
         <Select.Trigger aria-labelledby={labelId}>
           <Select.Value />
         </Select.Trigger>
@@ -66,7 +66,7 @@ import { Select } from "prime-ui-kit";
 
 export function NativeExample() {
   return (
-    <Select.Root native size="m" placeholder="Choose">
+    <Select.Root native placeholder="Choose">
       <Select.Item value="a">Option A</Select.Item>
       <Select.Item value="b">Option B</Select.Item>
     </Select.Root>

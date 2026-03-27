@@ -16,7 +16,6 @@ export default function ProgressBarStepProgressExample() {
         value={currentStep}
         max={totalSteps}
         label={`Step ${currentStep} of ${totalSteps}`}
-        size="m"
       />
     </div>
   );

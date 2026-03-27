@@ -9,7 +9,7 @@ export default function ProgressBarWizardCompositionExample() {
       <Typography.Root variant="body-large" weight="semibold">
         Generating report
       </Typography.Root>
-      <ProgressBar.Root value={72} max={100} label="Collecting data" size="m" />
+      <ProgressBar.Root value={72} max={100} label="Collecting data" />
       <Typography.Root variant="body-small" tone="muted">
         Usually under five minutes; you can return to the task list.
       </Typography.Root>

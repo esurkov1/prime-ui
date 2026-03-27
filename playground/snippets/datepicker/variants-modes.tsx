@@ -27,12 +27,12 @@ export default function DatepickerVariantsModesSnippet() {
         <ExampleSurface>
           <Popover.Root open={openSingle} onOpenChange={setOpenSingle}>
             <Popover.Trigger asChild>
-              <Button.Root mode="stroke" size="m" variant="neutral">
+              <Button.Root mode="stroke" variant="neutral">
                 Режим single
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" insetPadding="none" side="bottom">
-              <Datepicker.Shell size="m">
+            <Popover.Content align="start" side="bottom">
+              <Datepicker.Shell>
                 <Datepicker.Calendar
                   locale={ru}
                   mode="single"
@@ -51,12 +51,12 @@ export default function DatepickerVariantsModesSnippet() {
         <ExampleSurface>
           <Popover.Root open={openRange} onOpenChange={setOpenRange}>
             <Popover.Trigger asChild>
-              <Button.Root mode="stroke" size="m" variant="neutral">
+              <Button.Root mode="stroke" variant="neutral">
                 Режим range
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" insetPadding="none" side="bottom">
-              <Datepicker.Shell size="m">
+            <Popover.Content align="start" side="bottom">
+              <Datepicker.Shell>
                 <Datepicker.Calendar
                   locale={ru}
                   mode="range"

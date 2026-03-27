@@ -31,7 +31,6 @@ export default function CommandMenuExampleVariantsDensityItems() {
     <>
       <div style={triggerRowStyle}>
         <Button.Root
-          size="m"
           variant="neutral"
           mode="stroke"
           onClick={() => {
@@ -42,7 +41,6 @@ export default function CommandMenuExampleVariantsDensityItems() {
           Compact density
         </Button.Root>
         <Button.Root
-          size="m"
           variant="neutral"
           mode="stroke"
           onClick={() => {
@@ -71,10 +69,10 @@ export default function CommandMenuExampleVariantsDensityItems() {
             </CommandMenu.Item>
           </CommandMenu.Group>
           <CommandMenu.Group heading='Items size="m"'>
-            <CommandMenu.Item value="tall row" size="m" onSelect={() => setOpen(false)}>
+            <CommandMenu.Item value="tall row" onSelect={() => setOpen(false)}>
               Taller list row
             </CommandMenu.Item>
-            <CommandMenu.Item value="another m" size="m" onSelect={() => setOpen(false)}>
+            <CommandMenu.Item value="another m" onSelect={() => setOpen(false)}>
               Another size m item
             </CommandMenu.Item>
           </CommandMenu.Group>

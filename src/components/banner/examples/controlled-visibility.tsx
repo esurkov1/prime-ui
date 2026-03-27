@@ -14,7 +14,7 @@ export default function BannerControlledVisibilityExample() {
         </Button.Root>
       ) : null}
       {visible ? (
-        <Banner.Root size="m" status="feature" variant="lighter">
+        <Banner.Root status="feature" variant="lighter">
           <Banner.Content>
             <Banner.Icon as={Info} aria-hidden />
             <Banner.Title>Controlled visibility</Banner.Title>

@@ -18,7 +18,7 @@ function DrawerBySide({ side }: { side: DrawerSide }) {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           {label}
         </Button.Root>
       </Drawer.Trigger>

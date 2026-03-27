@@ -11,7 +11,7 @@ export default function SizeLadderExample() {
   return (
     <>
       <SegmentedProgressBar.Root size="s" segments={segments} />
-      <SegmentedProgressBar.Root size="m" segments={segments} />
+      <SegmentedProgressBar.Root segments={segments} />
       <SegmentedProgressBar.Root size="l" segments={segments} />
       <SegmentedProgressBar.Root size="xl" segments={segments} />
     </>

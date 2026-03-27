@@ -10,7 +10,7 @@ import styles from "./examples.module.css";
  */
 export default function AccordionExampleCheckoutOrderSummary() {
   return (
-    <Accordion.Root type="single" size="m" layout="grouped" defaultValue="totals">
+    <Accordion.Root type="single" layout="grouped" defaultValue="totals">
       <Accordion.Item value="totals">
         <Accordion.Header>
           <Accordion.Trigger>

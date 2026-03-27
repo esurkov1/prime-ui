@@ -5,7 +5,7 @@ import styles from "./accordion-demos.module.css";
 
 export default function AccordionIconAsSnippet() {
   return (
-    <Accordion.Root type="single" size="m" className="accordionDemo" defaultValue="sku">
+    <Accordion.Root type="single" className="accordionDemo" defaultValue="sku">
       <Accordion.Item value="sku">
         <Accordion.Header>
           <Accordion.Trigger>

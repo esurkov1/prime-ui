@@ -20,16 +20,11 @@ export default function PlacementExample() {
       {demos.map(({ label, side, align }) => (
         <Popover.Root key={label}>
           <Popover.Trigger asChild>
-            <Button.Root
-              className={styles.placementTrigger}
-              mode="stroke"
-              size="m"
-              variant="neutral"
-            >
+            <Button.Root className={styles.placementTrigger} mode="stroke" variant="neutral">
               {label}
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align={align} insetGap="x2" insetPadding="x2" side={side} size="m">
+          <Popover.Content align={align} side={side}>
             <Typography.Root as="p" variant="body-small">
               <code>side=&quot;{side}&quot;</code>, <code>align=&quot;{align}&quot;</code>. Near the
               viewport edge the panel may flip to stay on screen.

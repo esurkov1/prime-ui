@@ -38,7 +38,6 @@ export default function ViewModeExample() {
           onValueChange={(v) => {
             if (isCatalogView(v)) setView(v);
           }}
-          size="m"
         >
           <SegmentedControl.Item value="list">List</SegmentedControl.Item>
           <SegmentedControl.Item value="grid">Grid</SegmentedControl.Item>

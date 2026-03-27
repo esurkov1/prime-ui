@@ -10,7 +10,7 @@ export default function SegmentedStatesExample() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Default
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="day" size="m">
+        <SegmentedControl.Root defaultValue="day">
           <SegmentedControl.Item value="day">Day</SegmentedControl.Item>
           <SegmentedControl.Item value="week">Week</SegmentedControl.Item>
           <SegmentedControl.Item value="month">Month</SegmentedControl.Item>
@@ -20,7 +20,7 @@ export default function SegmentedStatesExample() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           One segment disabled
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="active" size="m">
+        <SegmentedControl.Root defaultValue="active">
           <SegmentedControl.Item value="active">Active</SegmentedControl.Item>
           <SegmentedControl.Item value="paused" disabled>
             Paused
@@ -32,7 +32,7 @@ export default function SegmentedStatesExample() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Entire control disabled
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="day" disabled size="m">
+        <SegmentedControl.Root defaultValue="day" disabled>
           <SegmentedControl.Item value="day">Day</SegmentedControl.Item>
           <SegmentedControl.Item value="week">Week</SegmentedControl.Item>
           <SegmentedControl.Item value="month">Month</SegmentedControl.Item>

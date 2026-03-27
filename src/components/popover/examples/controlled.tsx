@@ -15,21 +15,21 @@ export default function PopoverControlledExample() {
         Panel is {open ? "open" : "closed"}
       </Typography.Root>
       <div className={styles.sizesRow}>
-        <Button.Root mode="stroke" size="m" variant="neutral" onClick={() => setOpen(true)}>
+        <Button.Root mode="stroke" variant="neutral" onClick={() => setOpen(true)}>
           Open from outside
         </Button.Root>
         <Popover.Root open={open} onOpenChange={setOpen}>
           <Popover.Trigger asChild>
-            <Button.Root mode="filled" size="m" variant="primary">
+            <Button.Root mode="filled" variant="primary">
               Toggle with trigger
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+          <Popover.Content align="start" side="bottom">
             <p className={styles.panelTextMuted}>
               State is driven by <code>open</code> and <code>onOpenChange</code> on{" "}
               <code>Popover.Root</code>.
             </p>
-            <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
+            <Button.Root mode="ghost" variant="neutral" onClick={() => setOpen(false)}>
               Close
             </Button.Root>
           </Popover.Content>

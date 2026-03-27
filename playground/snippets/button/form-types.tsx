@@ -10,15 +10,15 @@ export default function ButtonFormTypesSnippet() {
         e.preventDefault();
       }}
     >
-      <Input.Root size="m">
+      <Input.Root>
         <Input.Wrapper>
           <Input.Field name="query" placeholder="Запрос" />
         </Input.Wrapper>
       </Input.Root>
-      <Button.Root type="submit" variant="primary" mode="filled" size="m" fullWidth>
+      <Button.Root type="submit" variant="primary" mode="filled" fullWidth>
         Найти
       </Button.Root>
-      <Button.Root type="reset" variant="neutral" mode="stroke" size="m" fullWidth>
+      <Button.Root type="reset" variant="neutral" mode="stroke" fullWidth>
         Очистить
       </Button.Root>
     </form>

@@ -18,7 +18,7 @@ export default function StepperExampleHorizontalPrimitive() {
   const [active, setActive] = React.useState(0);
 
   return (
-    <HorizontalStepper.Root size="m" className={styles.rail}>
+    <HorizontalStepper.Root className={styles.rail}>
       {STEPS.map((label, idx) => (
         <React.Fragment key={label}>
           {idx > 0 ? <HorizontalStepper.SeparatorIcon /> : null}

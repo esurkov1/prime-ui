@@ -13,7 +13,7 @@ export default function HintControlledVariantExample() {
       <Button.Root size="s" variant="error" mode="lighter" onClick={() => setVariant("error")}>
         Show error
       </Button.Root>
-      <Hint.Root size="m" variant={variant}>
+      <Hint.Root variant={variant}>
         {variant === "error"
           ? "Fill the field before saving the draft."
           : "You can save the draft without required fields."}

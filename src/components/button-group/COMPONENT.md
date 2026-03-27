@@ -62,7 +62,7 @@ import { ButtonGroup } from "prime-ui-kit";
 
 export function Example() {
   return (
-    <ButtonGroup.Root aria-label="Options" size="m">
+    <ButtonGroup.Root aria-label="Options">
       <ButtonGroup.Item type="button">One</ButtonGroup.Item>
       <ButtonGroup.Item type="button">Two</ButtonGroup.Item>
     </ButtonGroup.Root>

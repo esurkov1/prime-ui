@@ -7,7 +7,6 @@ export default function TextareaControlledSnippet() {
 
   return (
     <Textarea.Root
-      size="m"
       value={notes}
       onChange={(e) => setNotes(e.target.value)}
       placeholder="Введите текст…"

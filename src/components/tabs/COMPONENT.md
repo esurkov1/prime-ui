@@ -32,7 +32,7 @@ import { Tabs, Typography } from "prime-ui-kit";
 
 export function Example() {
   return (
-    <Tabs.Root defaultValue="general" size="m">
+    <Tabs.Root defaultValue="general">
       <Tabs.List>
         <Tabs.Tab value="general">
           <Tabs.Label>General</Tabs.Label>

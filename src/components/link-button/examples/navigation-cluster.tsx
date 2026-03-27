@@ -4,21 +4,13 @@ import { LinkButton } from "prime-ui-kit";
 export default function LinkButtonNavigationClusterExample() {
   return (
     <nav aria-label="Product sections">
-      <LinkButton.Root href="/product/overview" size="m">
-        Overview
-      </LinkButton.Root>
+      <LinkButton.Root href="/product/overview">Overview</LinkButton.Root>
       <span aria-hidden> · </span>
-      <LinkButton.Root href="/product/pricing" size="m">
-        Pricing
-      </LinkButton.Root>
+      <LinkButton.Root href="/product/pricing">Pricing</LinkButton.Root>
       <span aria-hidden> · </span>
-      <LinkButton.Root href="/product/security" size="m">
-        Security
-      </LinkButton.Root>
+      <LinkButton.Root href="/product/security">Security</LinkButton.Root>
       <span aria-hidden> · </span>
-      <LinkButton.Root href="/product/changelog" size="m">
-        Changelog
-      </LinkButton.Root>
+      <LinkButton.Root href="/product/changelog">Changelog</LinkButton.Root>
     </nav>
   );
 }

@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function SelectPatternStatesExample() {
   return (
     <div className={`${styles.stack} ${styles.stackNarrow}`}>
-      <Select.Root size="m" placeholder="Placeholder only">
+      <Select.Root placeholder="Placeholder only">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -15,7 +15,7 @@ export default function SelectPatternStatesExample() {
           <Select.Item value="b">Option B</Select.Item>
         </Select.Content>
       </Select.Root>
-      <Select.Root size="m" defaultValue="b" placeholder="With default value">
+      <Select.Root defaultValue="b" placeholder="With default value">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -24,7 +24,7 @@ export default function SelectPatternStatesExample() {
           <Select.Item value="b">Option B</Select.Item>
         </Select.Content>
       </Select.Root>
-      <Select.Root size="m" defaultValue="on" disabled placeholder="Disabled">
+      <Select.Root defaultValue="on" disabled placeholder="Disabled">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -33,7 +33,7 @@ export default function SelectPatternStatesExample() {
           <Select.Item value="on">On</Select.Item>
         </Select.Content>
       </Select.Root>
-      <Select.Root size="m" hasError placeholder="Validation error">
+      <Select.Root hasError placeholder="Validation error">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>

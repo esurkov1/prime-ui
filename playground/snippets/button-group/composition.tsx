@@ -10,7 +10,7 @@ export default function ButtonGroupCompositionSnippet() {
   return (
     <>
       <div className="row">
-        <ButtonGroup.Root aria-label="Формат текста" size="m">
+        <ButtonGroup.Root aria-label="Формат текста">
           <ButtonGroup.Item
             aria-expanded={open}
             aria-haspopup="listbox"

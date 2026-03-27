@@ -26,7 +26,7 @@ export function FileUploadFullWidthExample() {
       >
         Родитель на всю колонку: зона тянется вместе с формой или панелью.
       </p>
-      <FileUpload.Root size="m" appearance="solid" />
+      <FileUpload.Root appearance="solid" />
     </div>
   );
 }

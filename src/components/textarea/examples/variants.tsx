@@ -4,10 +4,10 @@ import { Textarea } from "prime-ui-kit";
 export default function TextareaVariantsExample() {
   return (
     <>
-      <Textarea.Root size="m" variant="default" placeholder="Default variant">
+      <Textarea.Root variant="default" placeholder="Default variant">
         <Textarea.Hint>Helper text below the field</Textarea.Hint>
       </Textarea.Root>
-      <Textarea.Root size="m" variant="error" placeholder="Validation error">
+      <Textarea.Root variant="error" placeholder="Validation error">
         <Textarea.Error>Description is required</Textarea.Error>
       </Textarea.Root>
     </>

@@ -19,11 +19,11 @@ export default function ToolbarHintsExample() {
   return (
     <div role="toolbar" aria-label="Formatting" style={toolbar}>
       <div style={hintCluster}>
-        <Button.Root size="m">Bold</Button.Root>
+        <Button.Root>Bold</Button.Root>
         <Kbd.Root size="s">⌘B</Kbd.Root>
       </div>
       <div style={hintCluster}>
-        <Button.Root size="m">Italic</Button.Root>
+        <Button.Root>Italic</Button.Root>
         <Kbd.Root size="s">⌘I</Kbd.Root>
       </div>
     </div>

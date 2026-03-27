@@ -11,7 +11,7 @@ export default function TooltipControlledSnippet() {
 
   return (
     <div className={styles.controlledStack}>
-      <Switch.Root size="m" checked={open} onCheckedChange={setOpen}>
+      <Switch.Root checked={open} onCheckedChange={setOpen}>
         <Switch.Label>Подсказка открыта программно</Switch.Label>
         <Switch.Hint>
           Состояние синхронизируется с <code>open</code> и <code>onOpenChange</code> на{" "}
@@ -21,7 +21,7 @@ export default function TooltipControlledSnippet() {
       <Tooltip.Provider delayDuration={0}>
         <Tooltip.Root open={open} onOpenChange={setOpen}>
           <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+            <Button.Root type="button" variant="neutral" mode="stroke">
               Триггер
             </Button.Root>
           </Tooltip.Trigger>

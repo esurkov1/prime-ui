@@ -9,7 +9,7 @@ export default function SelectControlledSnippet() {
 
   return (
     <div className={`stack ${styles.stackNarrow}`}>
-      <Select.Root size="m" value={tier} onChange={setTier} placeholder="Тариф">
+      <Select.Root value={tier} onChange={setTier} placeholder="Тариф">
         <Select.Trigger aria-label="Тариф подписки">
           <Select.Value />
         </Select.Trigger>

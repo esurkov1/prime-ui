@@ -8,7 +8,6 @@ function InlinePanelDemo() {
   const [open, setOpen] = React.useState(true);
   return (
     <Sidebar.Root
-      size="m"
       open={open}
       onOpenChange={setOpen}
       responsive={false}
@@ -57,7 +56,6 @@ function PageNavSlotDemo() {
   return (
     <div className={styles.pageShell}>
       <Sidebar.Root
-        size="m"
         sidebarSlot="page-nav"
         open={open}
         onOpenChange={setOpen}

@@ -8,7 +8,7 @@ export default function SegmentedStatesSnippet() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Обычный выбор
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="day" size="m">
+        <SegmentedControl.Root defaultValue="day">
           <SegmentedControl.Item value="day">День</SegmentedControl.Item>
           <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
           <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
@@ -18,7 +18,7 @@ export default function SegmentedStatesSnippet() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Один сегмент disabled
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="active" size="m">
+        <SegmentedControl.Root defaultValue="active">
           <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
           <SegmentedControl.Item value="paused" disabled>
             На паузе
@@ -30,7 +30,7 @@ export default function SegmentedStatesSnippet() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Весь контроль disabled
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="day" disabled size="m">
+        <SegmentedControl.Root defaultValue="day" disabled>
           <SegmentedControl.Item value="day">День</SegmentedControl.Item>
           <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
           <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>

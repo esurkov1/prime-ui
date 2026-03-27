@@ -13,7 +13,7 @@ export default function ProgressBarUploadExample() {
       <Typography.Root variant="body-small" tone="muted">
         quarterly-report.pdf
       </Typography.Root>
-      <ProgressBar.Root value={loaded} max={total} label={`Upload progress: ${loaded}%`} size="m" />
+      <ProgressBar.Root value={loaded} max={total} label={`Upload progress: ${loaded}%`} />
       <div className={s.actions}>
         <button type="button" onClick={() => setLoaded((n) => Math.max(0, n - 20))}>
           −20%

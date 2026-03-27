@@ -7,9 +7,7 @@ import styles from "./snippets.module.css";
 export default function HintA11yDescribedbySnippet() {
   return (
     <div className={`${styles.fieldRow} ${styles.maxW22}`}>
-      <Label.Root htmlFor="hint-a11y-volume" size="m">
-        Громкость уведомлений
-      </Label.Root>
+      <Label.Root htmlFor="hint-a11y-volume">Громкость уведомлений</Label.Root>
       <input
         id="hint-a11y-volume"
         type="range"
@@ -18,7 +16,7 @@ export default function HintA11yDescribedbySnippet() {
         defaultValue={40}
         aria-describedby="hint-a11y-volume-help"
       />
-      <Hint.Root id="hint-a11y-volume-help" size="m" variant="default">
+      <Hint.Root id="hint-a11y-volume-help" variant="default">
         Не влияет на звонки и будильник в мобильном приложении.
       </Hint.Root>
     </div>

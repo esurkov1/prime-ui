@@ -49,7 +49,7 @@ export default function CommandMenuExampleAppPalette() {
 
   return (
     <>
-      <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
+      <Button.Root variant="primary" onClick={() => setOpen(true)}>
         Open palette (⌘K / Ctrl+K)
       </Button.Root>
 

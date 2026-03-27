@@ -8,7 +8,7 @@ export default function DrawerFullWidthSnippet() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Действия на всю ширину
         </Button.Root>
       </Drawer.Trigger>
@@ -25,12 +25,12 @@ export default function DrawerFullWidthSnippet() {
           </Drawer.Body>
           <Drawer.Footer className={styles.footerStack}>
             <Drawer.Close>
-              <Button.Root size="m" variant="primary" fullWidth>
+              <Button.Root variant="primary" fullWidth>
                 Сохранить и применить
               </Button.Root>
             </Drawer.Close>
             <Drawer.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke" fullWidth>
+              <Button.Root variant="neutral" mode="stroke" fullWidth>
                 Вернуться
               </Button.Root>
             </Drawer.Close>

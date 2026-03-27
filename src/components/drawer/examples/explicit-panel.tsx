@@ -10,13 +10,13 @@ export default function DrawerExampleExplicitPanel() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+        <Button.Root type="button" variant="neutral" mode="stroke">
           Open explicit panel
         </Button.Root>
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay />
-        <Drawer.Panel side="right" size="m" aria-labelledby="drawer-explicit-title">
+        <Drawer.Panel side="right" aria-labelledby="drawer-explicit-title">
           <Drawer.Header>
             <Drawer.Title id="drawer-explicit-title">Details</Drawer.Title>
           </Drawer.Header>
@@ -28,7 +28,7 @@ export default function DrawerExampleExplicitPanel() {
           </Drawer.Content>
           <Drawer.Footer>
             <Drawer.Close>
-              <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+              <Button.Root type="button" variant="neutral" mode="stroke">
                 Close
               </Button.Root>
             </Drawer.Close>

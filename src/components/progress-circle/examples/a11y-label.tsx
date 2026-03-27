@@ -15,7 +15,7 @@ export default function A11yLabelExample() {
         alignItems: "center",
       }}
     >
-      <ProgressCircle.Root value={62} max={100} size="m" label="Data sync, 62 percent complete" />
+      <ProgressCircle.Root value={62} max={100} label="Data sync, 62 percent complete" />
       <div
         style={{
           display: "flex",

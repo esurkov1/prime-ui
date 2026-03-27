@@ -13,7 +13,6 @@ export default function PlanPickerExample() {
         <Radio.Root
           name="plan-example"
           value="starter"
-          size="m"
           checked={plan === "starter"}
           onChange={(e) => {
             if (e.currentTarget.checked) setPlan("starter");
@@ -25,7 +24,6 @@ export default function PlanPickerExample() {
         <Radio.Root
           name="plan-example"
           value="growth"
-          size="m"
           checked={plan === "growth"}
           onChange={(e) => {
             if (e.currentTarget.checked) setPlan("growth");
@@ -37,7 +35,6 @@ export default function PlanPickerExample() {
         <Radio.Root
           name="plan-example"
           value="scale"
-          size="m"
           checked={plan === "scale"}
           onChange={(e) => {
             if (e.currentTarget.checked) setPlan("scale");

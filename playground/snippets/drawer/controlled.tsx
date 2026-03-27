@@ -8,10 +8,10 @@ export default function DrawerControlledSnippet() {
 
   return (
     <div className="previewRowWrap rowAlignCenter">
-      <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
+      <Button.Root variant="primary" onClick={() => setOpen(true)}>
         Открыть извне
       </Button.Root>
-      <Button.Root size="m" mode="stroke" variant="neutral" onClick={() => setOpen(false)}>
+      <Button.Root mode="stroke" variant="neutral" onClick={() => setOpen(false)}>
         Закрыть извне
       </Button.Root>
 
@@ -30,9 +30,7 @@ export default function DrawerControlledSnippet() {
             </Drawer.Body>
             <Drawer.Footer>
               <Drawer.Close>
-                <Button.Root size="m" variant="primary">
-                  Готово
-                </Button.Root>
+                <Button.Root variant="primary">Готово</Button.Root>
               </Drawer.Close>
             </Drawer.Footer>
           </Drawer.Content>

@@ -6,15 +6,13 @@ export default function ErrorHintExample() {
 
   return (
     <>
-      <Label.Root htmlFor="hint-example-error" size="m">
-        Tax ID
-      </Label.Root>
-      <Input.Root size="m" id="hint-example-error" hasError>
+      <Label.Root htmlFor="hint-example-error">Tax ID</Label.Root>
+      <Input.Root id="hint-example-error" hasError>
         <Input.Wrapper>
           <Input.Field type="text" defaultValue="12" aria-describedby={hintId} />
         </Input.Wrapper>
       </Input.Root>
-      <Hint.Root id={hintId} size="m" variant="error" role="alert">
+      <Hint.Root id={hintId} variant="error" role="alert">
         Enter 10 or 12 digits.
       </Hint.Root>
     </>

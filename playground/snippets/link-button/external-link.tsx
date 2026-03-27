@@ -5,12 +5,7 @@ export default function LinkButtonExternalLinkSnippet() {
   return (
     <p>
       Документация в отдельной вкладке:{" "}
-      <LinkButton.Root
-        href="https://example.com/docs"
-        target="_blank"
-        rel="noopener noreferrer"
-        size="m"
-      >
+      <LinkButton.Root href="https://example.com/docs" target="_blank" rel="noopener noreferrer">
         Открыть справку
       </LinkButton.Root>
     </p>

@@ -31,12 +31,12 @@ function FormatPopover({
       <ColorPicker.Root defaultValue="hsl(200, 75%, 52%)">
         <Popover.Root open={open} onOpenChange={setOpen}>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" variant="neutral">
+            <Button.Root mode="stroke" variant="neutral">
               <ColorPicker.TriggerSwatch className={preview.popoverTriggerSwatch} />
               Открыть ({defaultFormat.toUpperCase()})
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+          <Popover.Content align="start" side="bottom">
             <ColorPicker.FormatProvider defaultFormat={defaultFormat}>
               <div className={preview.formatRow}>
                 <ColorPicker.FormatSelect />

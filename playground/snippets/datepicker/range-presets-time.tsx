@@ -32,11 +32,11 @@ export default function DatepickerRangePresetsTimeSnippet() {
     <ExampleSurface>
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
+          <Button.Root mode="stroke" variant="neutral">
             Диапазон, пресеты и время
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" insetPadding="none" side="bottom">
+        <Popover.Content align="start" side="bottom">
           <Datepicker.Shell
             presets={
               <Datepicker.Presets mode="range" presets={buildPresets()} onSelect={setRange} />

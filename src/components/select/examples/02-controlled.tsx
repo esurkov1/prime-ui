@@ -13,10 +13,8 @@ export default function SelectExampleControlled() {
   return (
     <div className={styles.stack}>
       <div className={styles.field}>
-        <Label.Root id={tierLabelId} size="m">
-          Subscription tier
-        </Label.Root>
-        <Select.Root size="m" value={tier} onChange={setTier} placeholder="Choose a tier">
+        <Label.Root id={tierLabelId}>Subscription tier</Label.Root>
+        <Select.Root value={tier} onChange={setTier} placeholder="Choose a tier">
           <Select.Trigger aria-labelledby={tierLabelId}>
             <Select.Value />
           </Select.Trigger>

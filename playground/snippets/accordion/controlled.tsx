@@ -28,7 +28,6 @@ export default function AccordionControlledSnippet() {
       </div>
       <Accordion.Root
         type="single"
-        size="m"
         value={open}
         onValueChange={(next) => {
           if (typeof next === "string") setOpen(next);

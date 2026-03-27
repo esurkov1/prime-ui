@@ -65,7 +65,7 @@ export function CanonicalAvatarDemo() {
       </Typography>
       <Avatar.Root aria-label="Invitee, no photo yet">
         <Avatar.Fallback>
-          <Icon surface="none" name="field.email" size="l" tone="subtle" />
+          <Icon name="field.email" size="l" tone="subtle" />
         </Avatar.Fallback>
       </Avatar.Root>
     </>

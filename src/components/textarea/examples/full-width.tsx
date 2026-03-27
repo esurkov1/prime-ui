@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function TextareaFullWidthExample() {
   return (
     <div className={styles.fullWidthCard}>
-      <Textarea.Root size="m" placeholder="Field spans the card column width">
+      <Textarea.Root placeholder="Field spans the card column width">
         <Textarea.Hint>Parent sets width; the control root uses width: 100%.</Textarea.Hint>
       </Textarea.Root>
     </div>

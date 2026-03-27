@@ -33,7 +33,7 @@ export default function CommandMenuCompositionSnippet() {
 
   return (
     <>
-      <Button.Root size="m" variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
+      <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
         Полная композиция
       </Button.Root>
 
@@ -60,7 +60,6 @@ export default function CommandMenuCompositionSnippet() {
             <>
               <Kbd.Root aria-label="Сочетание открытия">⌘K</Kbd.Root>
               <Button.Root
-                size="m"
                 variant="neutral"
                 mode="ghost"
                 aria-label="Закрыть"
@@ -84,11 +83,7 @@ export default function CommandMenuCompositionSnippet() {
           </CommandMenu.TagSectionLabel>
           <CommandMenu.TagRow>
             {scopes.map((s) => (
-              <Tag.Root
-                key={s}
-                size="m"
-                onRemove={() => setScopes((p) => p.filter((x) => x !== s))}
-              >
+              <Tag.Root key={s} onRemove={() => setScopes((p) => p.filter((x) => x !== s))}>
                 {s}
               </Tag.Root>
             ))}

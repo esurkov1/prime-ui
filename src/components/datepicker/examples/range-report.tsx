@@ -30,11 +30,11 @@ export function ReportRangeExample() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button.Root mode="stroke" size="m" variant="neutral">
+        <Button.Root mode="stroke" variant="neutral">
           Report period
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" insetPadding="none" side="bottom">
+      <Popover.Content align="start" side="bottom">
         <Datepicker.Shell
           presets={
             <Datepicker.Presets mode="range" presets={reportPresets()} onSelect={setRange} />

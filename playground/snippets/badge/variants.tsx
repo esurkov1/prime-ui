@@ -7,30 +7,30 @@ export default function BadgeVariantsSnippet() {
   return (
     <div className={styles.stackAlignStart}>
       <div className="row rowGapTight">
-        <Badge.Root color="blue" variant="filled" size="m">
+        <Badge.Root color="blue" variant="filled">
           filled
         </Badge.Root>
-        <Badge.Root color="blue" variant="light" size="m">
+        <Badge.Root color="blue" variant="light">
           light
         </Badge.Root>
-        <Badge.Root color="blue" variant="lighter" size="m">
+        <Badge.Root color="blue" variant="lighter">
           lighter
         </Badge.Root>
-        <Badge.Root color="blue" variant="stroke" size="m">
+        <Badge.Root color="blue" variant="stroke">
           stroke
         </Badge.Root>
       </div>
       <div className="row rowGapTight">
-        <Badge.Root variant="status" status="online" label="Пользователь в сети" size="m">
+        <Badge.Root variant="status" status="online" label="Пользователь в сети">
           В сети
         </Badge.Root>
-        <Badge.Root variant="status" status="offline" label="Не в сети" size="m">
+        <Badge.Root variant="status" status="offline" label="Не в сети">
           Не в сети
         </Badge.Root>
-        <Badge.Root variant="status" status="away" label="Отошёл" size="m">
+        <Badge.Root variant="status" status="away" label="Отошёл">
           Отошёл
         </Badge.Root>
-        <Badge.Root variant="status" status="busy" label="Занят" size="m">
+        <Badge.Root variant="status" status="busy" label="Занят">
           Занят
         </Badge.Root>
       </div>

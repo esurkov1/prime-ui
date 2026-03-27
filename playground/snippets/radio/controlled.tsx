@@ -15,7 +15,6 @@ export default function RadioControlledSnippet() {
         onChange={(e) => {
           if (e.currentTarget.checked) setPlan("basic");
         }}
-        size="m"
       >
         <Radio.Label>Тариф Basic</Radio.Label>
       </Radio.Root>
@@ -26,7 +25,6 @@ export default function RadioControlledSnippet() {
         onChange={(e) => {
           if (e.currentTarget.checked) setPlan("pro");
         }}
-        size="m"
       >
         <Radio.Label>Тариф Pro</Radio.Label>
       </Radio.Root>
@@ -37,7 +35,6 @@ export default function RadioControlledSnippet() {
         onChange={(e) => {
           if (e.currentTarget.checked) setPlan("corp");
         }}
-        size="m"
       >
         <Radio.Label>Корпоративный</Radio.Label>
       </Radio.Root>

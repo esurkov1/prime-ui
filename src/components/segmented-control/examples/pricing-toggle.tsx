@@ -27,7 +27,6 @@ export default function PricingToggleExample() {
         onValueChange={(v) => {
           if (isBillingCycle(v)) setCycle(v);
         }}
-        size="m"
       >
         <SegmentedControl.Item value="monthly">Monthly</SegmentedControl.Item>
         <SegmentedControl.Item value="annual">Annual</SegmentedControl.Item>

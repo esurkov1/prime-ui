@@ -9,7 +9,7 @@ export default function SwitchControlledExample() {
 
   return (
     <div className={styles.stackDense}>
-      <Switch.Root size="m" checked={on} onCheckedChange={setOn}>
+      <Switch.Root checked={on} onCheckedChange={setOn}>
         <Switch.Label>Рассылка: {on ? "включена" : "выключена"}</Switch.Label>
         <Switch.Hint>Состояние задаётся снаружи через checked и onCheckedChange</Switch.Hint>
       </Switch.Root>

@@ -10,7 +10,7 @@ export default function AccordionStatesSnippet() {
           Пункт с <code>disabled</code> на <code>Accordion.Item</code> не раскрывается и визуально
           приглушён.
         </p>
-        <Accordion.Root type="single" size="m" className="accordionDemo">
+        <Accordion.Root type="single" className="accordionDemo">
           <Accordion.Item value="a">
             <Accordion.Header>
               <Accordion.Trigger>
@@ -45,7 +45,7 @@ export default function AccordionStatesSnippet() {
         <p className={`previewCaption ${styles.captionSpacer}`}>
           Стартовое раскрытие через <code>defaultValue</code> (неконтролируемый режим).
         </p>
-        <Accordion.Root type="single" size="m" defaultValue="open-first" className="accordionDemo">
+        <Accordion.Root type="single" defaultValue="open-first" className="accordionDemo">
           <Accordion.Item value="open-first">
             <Accordion.Header>
               <Accordion.Trigger>
@@ -75,7 +75,6 @@ export default function AccordionStatesSnippet() {
         <Accordion.Root
           type="single"
           collapsible={false}
-          size="m"
           defaultValue="always"
           className="accordionDemo"
         >

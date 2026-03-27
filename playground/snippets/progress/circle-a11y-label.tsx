@@ -8,12 +8,7 @@ import { Typography } from "@/components/typography/Typography";
 export default function ProgressCircleA11yLabelSnippet() {
   return (
     <div className="row rowAlignCenter rowGapMedium">
-      <ProgressCircle.Root
-        value={62}
-        max={100}
-        size="m"
-        label="Синхронизация данных, 62 процента"
-      />
+      <ProgressCircle.Root value={62} max={100} label="Синхронизация данных, 62 процента" />
       <div className="row rowAlignCenter rowGapTight">
         <ProgressCircle.Root value={4} max={12} size="s" label="Месяц 4 из 12 в подписке" />
         <Typography.Root as="span" variant="body-small">

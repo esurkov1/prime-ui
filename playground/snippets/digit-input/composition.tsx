@@ -6,9 +6,9 @@ import { Label } from "@/components/label/Label";
 export default function DigitInputCompositionSnippet() {
   return (
     <div className="previewLabeledCenter">
-      <Label.Root size="m">Код из сообщения</Label.Root>
-      <DigitInput.Root length={4} size="m" />
-      <Hint.Root size="m" variant="default">
+      <Label.Root>Код из сообщения</Label.Root>
+      <DigitInput.Root length={4} />
+      <Hint.Root variant="default">
         Вставьте код из буфера: цифры распределятся по ячейкам с текущей позиции.
       </Hint.Root>
     </div>

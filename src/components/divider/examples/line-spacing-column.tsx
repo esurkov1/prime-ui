@@ -10,14 +10,14 @@ export default function DividerLineSpacingColumnExample() {
   return (
     <div className={`${s.shell} ${s.stack}`}>
       <p className={s.body}>First block in a column with gap-driven spacing.</p>
-      <Divider.Root variant="line-spacing" size="m" />
+      <Divider.Root variant="line-spacing" />
       <p className={s.body}>Second block — the divider is only a marker between siblings.</p>
-      <Divider.Root variant="line-spacing" size="m" />
+      <Divider.Root variant="line-spacing" />
       <div className={s.toolbar}>
         <button className={s.toolbarBtn} type="button">
           One
         </button>
-        <Divider.Root orientation="vertical" size="m" />
+        <Divider.Root orientation="vertical" />
         <button className={s.toolbarBtn} type="button">
           Two
         </button>

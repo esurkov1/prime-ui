@@ -10,16 +10,16 @@ export default function SegmentedCompositionSnippet() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Иконка и текст
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="light" size="m">
+        <SegmentedControl.Root defaultValue="light">
           <SegmentedControl.Item value="light">
             <SegmentedControl.Icon>
-              <IconSun size="m" />
+              <IconSun />
             </SegmentedControl.Icon>
             Светлая
           </SegmentedControl.Item>
           <SegmentedControl.Item value="dark">
             <SegmentedControl.Icon>
-              <IconMoon size="m" />
+              <IconMoon />
             </SegmentedControl.Icon>
             Тёмная
           </SegmentedControl.Item>
@@ -29,22 +29,22 @@ export default function SegmentedCompositionSnippet() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Только иконки + скрытый текст для доступного имени
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="grid" size="m">
+        <SegmentedControl.Root defaultValue="grid">
           <SegmentedControl.Item value="feed">
             <SegmentedControl.Icon>
-              <IconHouse size="m" />
+              <IconHouse />
             </SegmentedControl.Icon>
             <span className={styles.srOnly}>Лента объявлений</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="grid">
             <SegmentedControl.Icon>
-              <IconLayoutGrid size="m" />
+              <IconLayoutGrid />
             </SegmentedControl.Icon>
             <span className={styles.srOnly}>Сетка карточек</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="compact">
             <SegmentedControl.Icon>
-              <IconSun size="m" />
+              <IconSun />
             </SegmentedControl.Icon>
             <span className={styles.srOnly}>Компактные карточки</span>
           </SegmentedControl.Item>

@@ -55,7 +55,7 @@ export function InviteTeammateModal() {
       <Modal.Panel
         title="Invite teammate"
         description="We will send one invitation email. The recipient can accept or decline."
-        icon={<Icon surface="raised" name="field.email" tone="subtle" />}
+        icon={<Icon name="field.email" tone="subtle" />}
         footer={
           <>
             <Modal.Close>

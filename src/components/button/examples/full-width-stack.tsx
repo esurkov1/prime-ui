@@ -12,10 +12,10 @@ export default function FullWidthStackExample() {
         gap: "var(--prime-sys-spacing-m)",
       }}
     >
-      <Button.Root variant="primary" mode="filled" size="m" fullWidth>
+      <Button.Root variant="primary" mode="filled" fullWidth>
         Button full width primary
       </Button.Root>
-      <Button.Root variant="neutral" mode="stroke" size="m" fullWidth>
+      <Button.Root variant="neutral" mode="stroke" fullWidth>
         Button full width neutral stroke
       </Button.Root>
     </div>

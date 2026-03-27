@@ -10,12 +10,7 @@ import styles from "./examples.module.css";
  */
 export default function AccordionExampleSettingsPanels() {
   return (
-    <Accordion.Root
-      type="multiple"
-      size="m"
-      layout="separate"
-      defaultValue={["profile", "notifications"]}
-    >
+    <Accordion.Root type="multiple" layout="separate" defaultValue={["profile", "notifications"]}>
       <Accordion.Item value="profile">
         <Accordion.Header>
           <Accordion.Trigger>

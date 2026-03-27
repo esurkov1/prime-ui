@@ -6,12 +6,12 @@ export function MinimalPopoverExample() {
     <ColorPicker.Root defaultValue="#3b82f6">
       <Popover.Root>
         <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
+          <Button.Root mode="stroke" variant="neutral">
             <ColorPicker.TriggerSwatch />
             Color
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+        <Popover.Content align="start" side="bottom">
           <ColorPicker.FormatProvider>
             <ColorPicker.FormatSelect />
             <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">

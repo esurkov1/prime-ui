@@ -6,7 +6,7 @@ import { ButtonGroup } from "prime-ui-kit";
 export default function FullWidthExample() {
   return (
     <div className="w-full max-w-md">
-      <ButtonGroup.Root aria-label="Plan tier" className="w-full" size="m">
+      <ButtonGroup.Root aria-label="Plan tier" className="w-full">
         <ButtonGroup.Item className="min-w-0 flex-1" type="button">
           Basic
         </ButtonGroup.Item>

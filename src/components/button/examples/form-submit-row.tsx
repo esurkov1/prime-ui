@@ -21,10 +21,10 @@ export default function FormSubmitRowExample() {
         justifyContent: "flex-end",
       }}
     >
-      <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+      <Button.Root type="button" variant="neutral" mode="stroke">
         Cancel
       </Button.Root>
-      <Button.Root type="submit" variant="primary" mode="filled" size="m" loading={loading}>
+      <Button.Root type="submit" variant="primary" mode="filled" loading={loading}>
         <Button.Spinner />
         Save changes
       </Button.Root>

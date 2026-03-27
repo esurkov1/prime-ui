@@ -8,7 +8,7 @@ import styles from "./examples.module.css";
 export default function SwitchCanonicalMaximal() {
   return (
     <div className={styles.stackDense}>
-      <Switch.Root size="m" defaultChecked name="product_updates">
+      <Switch.Root defaultChecked name="product_updates">
         <Switch.Label>Product updates</Switch.Label>
         <Switch.Hint>
           At most one email per week. You can change this anytime in notification settings.

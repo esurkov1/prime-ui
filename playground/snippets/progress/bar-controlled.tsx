@@ -10,7 +10,7 @@ export default function ProgressBarControlledSnippet() {
 
   return (
     <>
-      <ProgressBar.Root value={value} max={100} label={`Готово: ${value}%`} size="m" />
+      <ProgressBar.Root value={value} max={100} label={`Готово: ${value}%`} />
       <div className={styles.controlledActions}>
         <button type="button" onClick={() => setValue((v) => Math.max(0, v - 15))}>
           −15

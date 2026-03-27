@@ -12,7 +12,7 @@ export default function TagExampleRemovable() {
       {withRemove ? (
         <Tag.Root onRemove={() => setWithRemove(false)}>Dismiss me</Tag.Root>
       ) : (
-        <Button.Root variant="neutral" mode="stroke" size="m" onClick={() => setWithRemove(true)}>
+        <Button.Root variant="neutral" mode="stroke" onClick={() => setWithRemove(true)}>
           Show tag again
         </Button.Root>
       )}

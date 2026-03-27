@@ -19,11 +19,11 @@ export default function TooltipLongContentExample() {
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+            <Button.Root type="button" variant="neutral" mode="stroke">
               Details
             </Button.Root>
           </Tooltip.Trigger>
-          <Tooltip.Content size="m">
+          <Tooltip.Content>
             Password must be at least 12 characters and include upper and lower case letters and
             numbers. Do not reuse passwords from other services.
           </Tooltip.Content>

@@ -27,9 +27,7 @@ export default function DrawerTriggerLinkSnippet() {
           </Drawer.Body>
           <Drawer.Footer>
             <Drawer.Close>
-              <Button.Root size="m" variant="primary">
-                Понятно
-              </Button.Root>
+              <Button.Root variant="primary">Понятно</Button.Root>
             </Drawer.Close>
           </Drawer.Footer>
         </Drawer.Content>

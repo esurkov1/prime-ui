@@ -28,7 +28,7 @@ export default function ColorPickerPopoverSnippet() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button.Root mode="stroke" size="m" variant="neutral">
+        <Button.Root mode="stroke" variant="neutral">
           <span
             className={preview.triggerColorReadoutSwatch}
             style={{ backgroundColor: colorString }}
@@ -36,7 +36,7 @@ export default function ColorPickerPopoverSnippet() {
           {colorString}
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+      <Popover.Content align="start" side="bottom">
         <ColorPicker.Root value={color} onChange={handleColorChange}>
           <ColorPicker.FormatProvider>
             <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">

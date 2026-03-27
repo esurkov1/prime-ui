@@ -6,10 +6,8 @@ export default function FieldHelpExample() {
 
   return (
     <>
-      <Label.Root htmlFor="hint-example-field-help" size="m">
-        Project name
-      </Label.Root>
-      <Input.Root size="m" id="hint-example-field-help">
+      <Label.Root htmlFor="hint-example-field-help">Project name</Label.Root>
+      <Input.Root id="hint-example-field-help">
         <Input.Wrapper>
           <Input.Field
             type="text"
@@ -19,7 +17,7 @@ export default function FieldHelpExample() {
           />
         </Input.Wrapper>
       </Input.Root>
-      <Hint.Root id={hintId} size="m" variant="default">
+      <Hint.Root id={hintId} variant="default">
         Visible to everyone in this workspace.
       </Hint.Root>
     </>

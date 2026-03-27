@@ -9,10 +9,8 @@ export default function SuccessConfirmationExample() {
 
   return (
     <>
-      <Label.Root htmlFor="hint-example-success" size="m">
-        API token
-      </Label.Root>
-      <Input.Root size="m" id="hint-example-success">
+      <Label.Root htmlFor="hint-example-success">API token</Label.Root>
+      <Input.Root id="hint-example-success">
         <Input.Wrapper>
           <Input.Field
             type="text"
@@ -22,7 +20,7 @@ export default function SuccessConfirmationExample() {
           />
         </Input.Wrapper>
       </Input.Root>
-      <Hint.Root id={hintId} size="m" variant="default">
+      <Hint.Root id={hintId} variant="default">
         Token saved. Rotate it from settings anytime.
       </Hint.Root>
     </>

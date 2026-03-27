@@ -55,7 +55,7 @@ export function CopyLinkHint() {
           aria-label="Copy link"
         >
           <Button.Icon>
-            <Icon surface="none" name="action.copy" size="s" tone="subtle" />
+            <Icon name="action.copy" size="s" tone="subtle" />
           </Button.Icon>
         </Button.Root>
       </Tooltip.Trigger>

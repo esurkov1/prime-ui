@@ -12,22 +12,22 @@ const row: CSSProperties = {
 export default function BadgeAdminTagsExample() {
   return (
     <div style={row}>
-      <Badge.Root color="orange" variant="filled" size="m">
+      <Badge.Root color="orange" variant="filled">
         Staging
       </Badge.Root>
-      <Badge.Root color="green" variant="light" size="m">
+      <Badge.Root color="green" variant="light">
         Production
       </Badge.Root>
-      <Badge.Root color="gray" variant="stroke" size="m">
+      <Badge.Root color="gray" variant="stroke">
         Internal
       </Badge.Root>
-      <Badge.Root color="blue" variant="lighter" size="m">
+      <Badge.Root color="blue" variant="lighter">
         Beta
       </Badge.Root>
-      <Badge.Root color="purple" variant="filled" size="m">
+      <Badge.Root color="purple" variant="filled">
         Owner
       </Badge.Root>
-      <Badge.Root color="yellow" variant="light" size="m">
+      <Badge.Root color="yellow" variant="light">
         Feature flag: new billing
       </Badge.Root>
     </div>

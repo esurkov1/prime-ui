@@ -12,14 +12,10 @@ export default function DividerSectionBreaksExample() {
           <p className={s.muted}>Profile and security</p>
         </header>
 
-        <Divider.Root variant="text" size="m">
-          General
-        </Divider.Root>
+        <Divider.Root variant="text">General</Divider.Root>
         <p className={s.body}>Name, email, and language preferences apply across all workspaces.</p>
 
-        <Divider.Root variant="text" size="m">
-          Notifications
-        </Divider.Root>
+        <Divider.Root variant="text">Notifications</Divider.Root>
         <p className={s.body}>Choose channels for product updates and billing alerts.</p>
       </div>
     </article>

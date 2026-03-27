@@ -16,12 +16,12 @@ export function ProductVariantSwatchExample() {
     <ColorPicker.Root defaultValue={VARIANTS[0]?.color ?? "#000000"}>
       <Popover.Root onOpenChange={setOpen} open={open}>
         <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
+          <Button.Root mode="stroke" variant="neutral">
             <ColorPicker.TriggerSwatch />
             Color
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+        <Popover.Content align="start" side="bottom">
           <ColorPicker.FormatProvider defaultFormat="hex">
             <ColorPicker.SwatchPicker aria-label="Product color">
               {VARIANTS.map((v) => (

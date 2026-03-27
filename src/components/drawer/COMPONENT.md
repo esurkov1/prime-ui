@@ -31,7 +31,7 @@ export function DrawerMinimal() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+        <Button.Root type="button" variant="neutral" mode="stroke">
           Open
         </Button.Root>
       </Drawer.Trigger>

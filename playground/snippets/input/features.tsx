@@ -5,7 +5,6 @@ export default function InputFeaturesSnippet() {
     <>
       <Input.Root
         id="delivery-phone"
-        size="m"
         label="Телефон для курьера"
         optionalLabel="по желанию"
         hint="Стабильный id на Root — удобно для тестов и связки с внешними подсказками."
@@ -15,7 +14,6 @@ export default function InputFeaturesSnippet() {
         </Input.Wrapper>
       </Input.Root>
       <Input.Root
-        size="m"
         label="Промокод"
         hint="Одновременно hint и error: при ошибке визуально включается hasError."
         error="Промокод недействителен или срок истёк"

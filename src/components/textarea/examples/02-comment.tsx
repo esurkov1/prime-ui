@@ -14,14 +14,13 @@ export default function TextareaExampleComment() {
 
   return (
     <div className={styles.labelBlock}>
-      <Label.Root htmlFor={FIELD_ID} size="m">
+      <Label.Root htmlFor={FIELD_ID}>
         Comment for the courier
         <Label.Sub>Optional — visible to logistics until the order ships.</Label.Sub>
       </Label.Root>
       <Textarea.Root
         id={FIELD_ID}
         name="courierComment"
-        size="m"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         maxLength={MAX}

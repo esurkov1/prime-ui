@@ -16,7 +16,6 @@ export default function TextareaExampleSupportTicket() {
       <Textarea.Root
         id="support-description"
         name="description"
-        size="m"
         value={text}
         onChange={(e) => setText(e.target.value)}
         maxLength={MAX}

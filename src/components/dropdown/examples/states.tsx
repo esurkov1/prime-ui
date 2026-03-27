@@ -6,7 +6,7 @@ export default function DropdownStatesExample() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+        <Button.Root type="button" variant="neutral" mode="stroke">
           Доступ к отчёту
         </Button.Root>
       </Dropdown.Trigger>

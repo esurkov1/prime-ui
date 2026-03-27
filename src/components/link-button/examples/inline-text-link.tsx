@@ -5,10 +5,8 @@ export default function LinkButtonInlineTextLinkExample() {
   return (
     <p>
       Need more detail? See{" "}
-      <LinkButton.Root href="/docs/billing" size="m">
-        billing documentation
-      </LinkButton.Root>{" "}
-      for proration rules.
+      <LinkButton.Root href="/docs/billing">billing documentation</LinkButton.Root> for proration
+      rules.
     </p>
   );
 }

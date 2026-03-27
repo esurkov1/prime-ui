@@ -9,7 +9,6 @@ export default function DropdownFullWidthSnippet() {
     <Dropdown.Root>
       <Dropdown.Trigger>
         <Button.Root
-          size="m"
           variant="neutral"
           mode="stroke"
           aria-label="Действия со строкой"

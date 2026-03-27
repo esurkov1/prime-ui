@@ -12,13 +12,13 @@ export default function DrawerExampleMobileNavSheet() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+        <Button.Root type="button" variant="neutral" mode="stroke">
           Menu
         </Button.Root>
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay />
-        <Drawer.Content side="bottom" size="m" aria-labelledby="drawer-nav-title">
+        <Drawer.Content side="bottom" aria-labelledby="drawer-nav-title">
           <Drawer.Header>
             <Drawer.Title id="drawer-nav-title">Navigate</Drawer.Title>
           </Drawer.Header>
@@ -26,7 +26,7 @@ export default function DrawerExampleMobileNavSheet() {
             <nav className={styles.nav} aria-label="Primary">
               {items.map((label) => (
                 <Drawer.Close key={label}>
-                  <Button.Root type="button" size="m" variant="neutral" mode="ghost" fullWidth>
+                  <Button.Root type="button" variant="neutral" mode="ghost" fullWidth>
                     {label}
                   </Button.Root>
                 </Drawer.Close>

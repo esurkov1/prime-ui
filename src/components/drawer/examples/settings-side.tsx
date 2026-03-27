@@ -11,24 +11,24 @@ export default function DrawerExampleSettingsSide() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+        <Button.Root type="button" variant="neutral" mode="stroke">
           Workspace settings
         </Button.Root>
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay />
-        <Drawer.Content side="right" size="m" aria-labelledby="drawer-settings-title">
+        <Drawer.Content side="right" aria-labelledby="drawer-settings-title">
           <Drawer.Header>
             <Drawer.Title id="drawer-settings-title">Workspace</Drawer.Title>
           </Drawer.Header>
           <Drawer.Body>
             <div className={styles.settingsStack}>
-              <Input.Root label="Workspace name" size="m">
+              <Input.Root label="Workspace name">
                 <Input.Wrapper>
                   <Input.Field defaultValue="Acme Design" />
                 </Input.Wrapper>
               </Input.Root>
-              <Input.Root label="Default timezone" size="m" hint="Used for scheduled reports.">
+              <Input.Root label="Default timezone" hint="Used for scheduled reports.">
                 <Input.Wrapper>
                   <Input.Field defaultValue="Europe/Berlin" />
                 </Input.Wrapper>
@@ -37,12 +37,12 @@ export default function DrawerExampleSettingsSide() {
           </Drawer.Body>
           <Drawer.Footer className={styles.footerActions}>
             <Drawer.Close>
-              <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+              <Button.Root type="button" variant="neutral" mode="stroke">
                 Cancel
               </Button.Root>
             </Drawer.Close>
             <Drawer.Close>
-              <Button.Root type="button" size="m" variant="primary">
+              <Button.Root type="button" variant="primary">
                 Save changes
               </Button.Root>
             </Drawer.Close>

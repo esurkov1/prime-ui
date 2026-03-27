@@ -25,7 +25,7 @@ export default function CommandMenuExampleDisabledItems() {
 
   return (
     <>
-      <Button.Root size="m" variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
+      <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
         Disabled items behavior
       </Button.Root>
 

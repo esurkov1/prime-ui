@@ -34,11 +34,11 @@ export default function FileUploadStatesSnippet() {
       <div className={styles.zones}>
         <div>
           <p className={styles.zoneLabel}>Обычная зона</p>
-          <FileUpload.Root size="m" />
+          <FileUpload.Root />
         </div>
         <div>
           <p className={styles.zoneLabel}>Отключённая зона</p>
-          <FileUpload.Root size="m" disabled />
+          <FileUpload.Root disabled />
         </div>
       </div>
 

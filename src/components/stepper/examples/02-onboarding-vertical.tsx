@@ -12,7 +12,7 @@ export default function StepperExampleOnboardingVertical() {
 
   return (
     <div className={styles.stack}>
-      <Stepper.Root currentStep={step} orientation="vertical" size="m" className={styles.rail}>
+      <Stepper.Root currentStep={step} orientation="vertical" className={styles.rail}>
         <Stepper.Step type="button" onClick={() => setStep(0)}>
           <Stepper.Indicator />
           <Stepper.Content title="Welcome" description="Product tour and goals" />

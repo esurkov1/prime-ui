@@ -14,7 +14,6 @@ export function SettingsPanelExample() {
       <Checkbox.Root
         name="notify_desktop"
         value="on"
-        size="m"
         checked={desktopNotify}
         onChange={(e) => setDesktopNotify(e.target.checked)}
       >
@@ -24,21 +23,19 @@ export function SettingsPanelExample() {
       <Checkbox.Root
         name="sound"
         value="on"
-        size="m"
         checked={sound}
         onChange={(e) => setSound(e.target.checked)}
       >
         <Checkbox.Label>Sound effects</Checkbox.Label>
         <Checkbox.Hint>Short UI sounds for sends and errors.</Checkbox.Hint>
       </Checkbox.Root>
-      <Checkbox.Root name="sso" value="on" size="m" disabled>
+      <Checkbox.Root name="sso" value="on" disabled>
         <Checkbox.Label>SSO / SAML (Enterprise)</Checkbox.Label>
         <Checkbox.Hint>Contact sales to enable single sign-on.</Checkbox.Hint>
       </Checkbox.Root>
       <Checkbox.Root
         name="digest"
         value="on"
-        size="m"
         checked={weeklyDigest}
         onChange={(e) => setWeeklyDigest(e.target.checked)}
       >

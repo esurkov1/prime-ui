@@ -36,7 +36,6 @@ function ActionToastDemo() {
           type="button"
           variant="primary"
           mode="filled"
-          size="m"
           onClick={() =>
             notify({
               type: "info",
@@ -58,7 +57,6 @@ function ActionToastDemo() {
         </Button.Root>
         <LinkButton.Root
           href="#"
-          size="m"
           onClick={(event) => {
             event.preventDefault();
             notify({

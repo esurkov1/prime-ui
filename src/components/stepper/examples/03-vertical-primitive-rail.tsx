@@ -18,7 +18,7 @@ export default function StepperExampleVerticalPrimitiveRail() {
   const [active, setActive] = React.useState(1);
 
   return (
-    <VerticalStepper.Root size="m" className={styles.rail}>
+    <VerticalStepper.Root className={styles.rail}>
       {STEPS.map((label, idx) => (
         <VerticalStepper.Item
           key={label}

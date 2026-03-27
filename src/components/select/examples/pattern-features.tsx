@@ -5,7 +5,7 @@ const ZONES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "K"] as const;
 /** Groups, labels, separator, disabled item, long scrollable list; mirrors `playground/snippets/select/features.tsx`. */
 export default function SelectPatternFeaturesExample() {
   return (
-    <Select.Root size="m" placeholder="Zones and groups">
+    <Select.Root placeholder="Zones and groups">
       <Select.Trigger>
         <Select.Value />
       </Select.Trigger>

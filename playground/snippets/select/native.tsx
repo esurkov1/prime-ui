@@ -2,7 +2,7 @@ import { Select } from "@/components/select/Select";
 
 export default function SelectNativeSnippet() {
   return (
-    <Select.Root native size="m" placeholder="Режим">
+    <Select.Root native placeholder="Режим">
       <Select.Content>
         <Select.Item value="auto">Авто</Select.Item>
         <Select.Item value="light">Светлая тема</Select.Item>

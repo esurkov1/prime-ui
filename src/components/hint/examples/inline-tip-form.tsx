@@ -7,10 +7,8 @@ export default function InlineTipFormExample() {
 
   return (
     <>
-      <Label.Root htmlFor="hint-example-form-email" size="m">
-        Billing email
-      </Label.Root>
-      <Input.Root size="m" id="hint-example-form-email">
+      <Label.Root htmlFor="hint-example-form-email">Billing email</Label.Root>
+      <Input.Root id="hint-example-form-email">
         <Input.Wrapper>
           <Input.Field
             type="email"
@@ -19,14 +17,12 @@ export default function InlineTipFormExample() {
           />
         </Input.Wrapper>
       </Input.Root>
-      <Hint.Root id={emailHintId} size="m" variant="default">
+      <Hint.Root id={emailHintId} variant="default">
         Invoices and receipts go here; not the same as your login email.
       </Hint.Root>
 
-      <Label.Root htmlFor="hint-example-form-budget" size="m">
-        Monthly budget
-      </Label.Root>
-      <Input.Root size="m" id="hint-example-form-budget">
+      <Label.Root htmlFor="hint-example-form-budget">Monthly budget</Label.Root>
+      <Input.Root id="hint-example-form-budget">
         <Input.Wrapper>
           <Input.Field
             type="text"
@@ -36,7 +32,7 @@ export default function InlineTipFormExample() {
           />
         </Input.Wrapper>
       </Input.Root>
-      <Hint.Root id={budgetHintId} size="m" variant="disabled">
+      <Hint.Root id={budgetHintId} variant="disabled">
         Optional — leave empty to use the workspace default.
       </Hint.Root>
     </>

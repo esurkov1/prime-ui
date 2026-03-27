@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function SelectPatternFullWidthExample() {
   return (
     <div className={styles.fullWidthShell}>
-      <Select.Root size="m" defaultValue="ship" placeholder="Shipping method">
+      <Select.Root defaultValue="ship" placeholder="Shipping method">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>

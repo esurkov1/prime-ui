@@ -7,15 +7,9 @@ export default function ResendAndClearExample() {
 
   return (
     <>
-      <Label.Root size="m">Код</Label.Root>
-      <DigitInput.Root length={4} size="m" value={code} onChange={setCode} />
-      <Button.Root
-        mode="stroke"
-        size="m"
-        type="button"
-        variant="neutral"
-        onClick={() => setCode("")}
-      >
+      <Label.Root>Код</Label.Root>
+      <DigitInput.Root length={4} value={code} onChange={setCode} />
+      <Button.Root mode="stroke" type="button" variant="neutral" onClick={() => setCode("")}>
         Отправить снова
       </Button.Root>
     </>

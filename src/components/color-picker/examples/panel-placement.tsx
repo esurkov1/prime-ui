@@ -39,12 +39,12 @@ export function PanelPlacementExample() {
       <ColorPicker.Root defaultValue="hsl(265, 80%, 55%)">
         <Popover.Root>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" variant="neutral">
+            <Button.Root mode="stroke" variant="neutral">
               <ColorPicker.TriggerSwatch />
               Bottom
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+          <Popover.Content align="start" side="bottom">
             <Panel />
           </Popover.Content>
         </Popover.Root>
@@ -53,12 +53,12 @@ export function PanelPlacementExample() {
       <ColorPicker.Root defaultValue="hsl(200, 70%, 48%)">
         <Popover.Root>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" variant="neutral">
+            <Button.Root mode="stroke" variant="neutral">
               <ColorPicker.TriggerSwatch />
               Top
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="top">
+          <Popover.Content align="start" side="top">
             <Panel />
           </Popover.Content>
         </Popover.Root>

@@ -24,7 +24,6 @@ export default function SidebarControlledSnippet() {
 
       <div className={styles.stage}>
         <Sidebar.Root
-          size="m"
           state={state}
           onStateChange={(next) => setState(next === "hidden" ? "hidden" : "expanded")}
           responsive={false}

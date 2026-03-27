@@ -17,11 +17,11 @@ export function BirthdateSingleExample() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button.Root mode="stroke" size="m" variant="neutral">
+        <Button.Root mode="stroke" variant="neutral">
           {triggerLabel}
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" insetPadding="none" side="bottom">
+      <Popover.Content align="start" side="bottom">
         <Datepicker.Shell>
           <Datepicker.Calendar
             disabled={(date) => date >= startOfTomorrow()}

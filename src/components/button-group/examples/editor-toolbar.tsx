@@ -10,7 +10,7 @@ export default function EditorToolbarExample() {
   const [marks, setMarks] = React.useState({ bold: true, italic: false, underline: false });
 
   return (
-    <ButtonGroup.Root aria-label="Text formatting" size="m">
+    <ButtonGroup.Root aria-label="Text formatting">
       <ButtonGroup.Item
         aria-label="Bold"
         pressed={marks.bold}

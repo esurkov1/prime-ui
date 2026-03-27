@@ -12,7 +12,7 @@ export default function CheckoutFullWidthExample() {
 
   return (
     <div className={styles.column}>
-      <Input.Root size="m" label="ФИО получателя" hint="Как в паспорте — для доставки">
+      <Input.Root label="ФИО получателя" hint="Как в паспорте — для доставки">
         <Input.Wrapper>
           <Input.Field
             name="fullName"
@@ -23,7 +23,7 @@ export default function CheckoutFullWidthExample() {
           />
         </Input.Wrapper>
       </Input.Root>
-      <Input.Root size="m" label="Адрес доставки" optionalLabel="квартира, подъезд">
+      <Input.Root label="Адрес доставки" optionalLabel="квартира, подъезд">
         <Input.Wrapper>
           <Input.Field
             name="address"

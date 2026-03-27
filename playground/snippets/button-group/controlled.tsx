@@ -9,7 +9,7 @@ export default function ButtonGroupControlledSnippet() {
   const [period, setPeriod] = React.useState<Period>("week");
 
   return (
-    <ButtonGroup.Root aria-label="Интервал отчёта" size="m">
+    <ButtonGroup.Root aria-label="Интервал отчёта">
       <ButtonGroup.Item pressed={period === "day"} type="button" onClick={() => setPeriod("day")}>
         День
       </ButtonGroup.Item>

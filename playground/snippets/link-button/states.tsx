@@ -4,10 +4,8 @@ import { LinkButton } from "@/components/link-button/LinkButton";
 export default function LinkButtonStatesSnippet() {
   return (
     <div className="row rowAlignCenter rowGapMedium">
-      <LinkButton.Root href="#" size="m">
-        Активная ссылка
-      </LinkButton.Root>
-      <LinkButton.Root href="#" size="m" disabled>
+      <LinkButton.Root href="#">Активная ссылка</LinkButton.Root>
+      <LinkButton.Root href="#" disabled>
         Недоступная ссылка
       </LinkButton.Root>
     </div>

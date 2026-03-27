@@ -24,9 +24,9 @@ export default function ProgressCircleCompositionSnippet() {
           </Typography.Root>
         </div>
       </ProgressCircle.Root>
-      <ProgressCircle.Root value={65} max={100} size="m">
+      <ProgressCircle.Root value={65} max={100}>
         <div className="previewLabeledCenter">
-          <IconDownload size="m" />
+          <IconDownload />
           <Typography.Root as="span" variant="body-compact" weight="medium">
             65%
           </Typography.Root>

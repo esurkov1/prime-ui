@@ -17,12 +17,7 @@ export default function TagExampleControlled() {
         </Tag.Root>
       ))}
       {active.length === 0 ? (
-        <Button.Root
-          variant="neutral"
-          mode="stroke"
-          size="m"
-          onClick={() => setActive([...INITIAL])}
-        >
+        <Button.Root variant="neutral" mode="stroke" onClick={() => setActive([...INITIAL])}>
           Reset filters
         </Button.Root>
       ) : null}

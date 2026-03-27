@@ -30,7 +30,7 @@ import { Slider } from "prime-ui-kit";
 
 export function Example() {
   return (
-    <Slider.Root label="Output level" min={0} max={100} step={1} defaultValue={50} size="m" />
+    <Slider.Root label="Output level" min={0} max={100} step={1} defaultValue={50} />
   );
 }
 ```

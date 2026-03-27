@@ -32,7 +32,7 @@ export default function CommandMenuExampleControlledOpenSearch() {
         <Typography.Root variant="body-small" tone="muted">
           External query: «{query || "…"}»
         </Typography.Root>
-        <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
+        <Button.Root variant="primary" onClick={() => setOpen(true)}>
           Open with external search string
         </Button.Root>
       </div>

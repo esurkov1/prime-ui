@@ -15,12 +15,7 @@ export default function TagControlledSnippet() {
         </Tag.Root>
       ))}
       {active.length === 0 ? (
-        <Button.Root
-          variant="neutral"
-          mode="stroke"
-          size="m"
-          onClick={() => setActive([...INITIAL])}
-        >
+        <Button.Root variant="neutral" mode="stroke" onClick={() => setActive([...INITIAL])}>
           Сбросить фильтры
         </Button.Root>
       ) : null}

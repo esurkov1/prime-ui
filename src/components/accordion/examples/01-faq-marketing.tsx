@@ -9,7 +9,7 @@ import styles from "./examples.module.css";
  */
 export default function AccordionExampleFaqMarketing() {
   return (
-    <Accordion.Root type="single" size="m" layout="grouped" defaultValue="shipping">
+    <Accordion.Root type="single" layout="grouped" defaultValue="shipping">
       <Accordion.Item value="shipping">
         <Accordion.Header>
           <Accordion.Trigger>

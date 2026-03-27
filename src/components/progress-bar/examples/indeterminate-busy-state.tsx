@@ -12,7 +12,7 @@ export default function ProgressBarIndeterminateBusyExample() {
       <Typography.Root variant="body-small" tone="muted">
         Preparing your workspace…
       </Typography.Root>
-      <Button.Root type="button" loading variant="neutral" mode="stroke" size="m">
+      <Button.Root type="button" loading variant="neutral" mode="stroke">
         <Button.Spinner />
         Please wait
       </Button.Root>

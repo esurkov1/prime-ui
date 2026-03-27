@@ -67,4 +67,4 @@ export const Icon = React.forwardRef<SVGSVGElement, NamedIconProps>(({ name, ...
 
 Icon.displayName = "Icon";
 
-export type { BaseIconProps, IconSize, IconSurface, IconTone } from "./Icon";
+export type { BaseIconProps, IconSize, IconTone } from "./Icon";

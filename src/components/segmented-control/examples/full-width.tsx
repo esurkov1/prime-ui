@@ -6,7 +6,7 @@ import styles from "./segmented-examples.module.css";
 export default function SegmentedFullWidthExample() {
   return (
     <div className={styles.fullWidthShelf}>
-      <SegmentedControl.Root defaultValue="day" size="m" className={styles.fullWidthRoot}>
+      <SegmentedControl.Root defaultValue="day" className={styles.fullWidthRoot}>
         <SegmentedControl.Item value="day">Day</SegmentedControl.Item>
         <SegmentedControl.Item value="week">Week</SegmentedControl.Item>
         <SegmentedControl.Item value="month">Month</SegmentedControl.Item>

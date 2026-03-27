@@ -15,13 +15,13 @@ export default function DrawerExampleCartPreview() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+        <Button.Root type="button" variant="neutral" mode="stroke">
           Cart (3)
         </Button.Root>
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay />
-        <Drawer.Content side="right" size="m" aria-labelledby="drawer-cart-title">
+        <Drawer.Content side="right" aria-labelledby="drawer-cart-title">
           <Drawer.Header>
             <Drawer.Title id="drawer-cart-title">Your cart</Drawer.Title>
           </Drawer.Header>
@@ -38,12 +38,12 @@ export default function DrawerExampleCartPreview() {
           </Drawer.Body>
           <Drawer.Footer className={styles.footerActions}>
             <Drawer.Close>
-              <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+              <Button.Root type="button" variant="neutral" mode="stroke">
                 View cart
               </Button.Root>
             </Drawer.Close>
             <Drawer.Close>
-              <Button.Root type="button" size="m" variant="primary">
+              <Button.Root type="button" variant="primary">
                 Checkout
               </Button.Root>
             </Drawer.Close>

@@ -9,7 +9,7 @@ export default function FileUploadFullWidthSnippet() {
         Родитель на всю колонку: у <code>Root</code> уже <code>width: 100%</code> — зона тянется
         вместе с формой или панелью.
       </p>
-      <FileUpload.Root size="m" appearance="solid" />
+      <FileUpload.Root appearance="solid" />
     </div>
   );
 }

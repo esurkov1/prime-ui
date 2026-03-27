@@ -19,13 +19,13 @@ export default function RadioFormGroupSnippet() {
       <fieldset className={styles.fieldsetPlain}>
         <legend className={styles.legend}>Окно доставки</legend>
         <div className={styles.columnTight}>
-          <Radio.Root name="slot" value="morning" defaultChecked size="m" required>
+          <Radio.Root name="slot" value="morning" defaultChecked required>
             <Radio.Label>09:00–12:00</Radio.Label>
           </Radio.Root>
-          <Radio.Root name="slot" value="afternoon" size="m" required>
+          <Radio.Root name="slot" value="afternoon" required>
             <Radio.Label>12:00–16:00</Radio.Label>
           </Radio.Root>
-          <Radio.Root name="slot" value="evening" size="m" required>
+          <Radio.Root name="slot" value="evening" required>
             <Radio.Label>16:00–20:00</Radio.Label>
           </Radio.Root>
         </div>

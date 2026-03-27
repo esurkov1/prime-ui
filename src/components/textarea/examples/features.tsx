@@ -17,20 +17,16 @@ export default function TextareaFeaturesExample() {
 
   return (
     <>
-      <Textarea.Root
-        size="m"
-        placeholder="Multiple lines — height grows with content (autoResize default)"
-      >
+      <Textarea.Root placeholder="Multiple lines — height grows with content (autoResize default)">
         <Textarea.Hint>Height follows content via wrapper `data-value`.</Textarea.Hint>
       </Textarea.Root>
       <div className={styles.blockSpacer}>
-        <Textarea.Root size="m" autoResize={false} placeholder="Fixed height; native resize handle">
+        <Textarea.Root autoResize={false} placeholder="Fixed height; native resize handle">
           <Textarea.Hint>autoResize=false</Textarea.Hint>
         </Textarea.Root>
       </div>
       <div className={styles.blockSpacer}>
         <Textarea.Root
-          size="m"
           placeholder="Character counter in the field footer"
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -39,18 +35,13 @@ export default function TextareaFeaturesExample() {
         </Textarea.Root>
       </div>
       <div className={styles.blockSpacer}>
-        <Textarea.Root
-          size="m"
-          value={overflowValue}
-          onChange={(e) => setOverflowValue(e.target.value)}
-        >
+        <Textarea.Root value={overflowValue} onChange={(e) => setOverflowValue(e.target.value)}>
           <Textarea.CharCounter current={overflowValue.length} max={overflowMax} />
           <Textarea.Hint>When current &gt; max, the counter gets data-overflow.</Textarea.Hint>
         </Textarea.Root>
       </div>
       <div className={styles.blockSpacer}>
         <Textarea.Root
-          size="m"
           placeholder={`Up to ${nativeLimit} characters`}
           value={limited}
           maxLength={nativeLimit}

@@ -11,12 +11,7 @@ export default function SwitchScenarioFeatureFlag() {
 
   return (
     <div className={styles.stackDense}>
-      <Switch.Root
-        size="m"
-        checked={enabled}
-        onCheckedChange={setEnabled}
-        name="flag_new_dashboard"
-      >
+      <Switch.Root checked={enabled} onCheckedChange={setEnabled} name="flag_new_dashboard">
         <Switch.Label>New dashboard experience</Switch.Label>
         <Switch.Hint>
           Applies to this workspace only. Users may need to refresh after toggling.

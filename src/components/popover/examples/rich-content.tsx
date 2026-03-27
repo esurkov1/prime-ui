@@ -7,16 +7,16 @@ export default function RichContentExample() {
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <Button.Root mode="ghost" size="m" variant="neutral">
+        <Button.Root mode="ghost" variant="neutral">
           Release notes
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+      <Popover.Content align="start" side="bottom">
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--prime-sys-spacing-x2)" }}>
-          <Badge.Root color="green" size="m" variant="light">
+          <Badge.Root color="green" variant="light">
             Stable
           </Badge.Root>
-          <Badge.Root color="blue" size="m" variant="stroke">
+          <Badge.Root color="blue" variant="stroke">
             v2.4
           </Badge.Root>
         </div>
@@ -27,10 +27,8 @@ export default function RichContentExample() {
           Command menu now respects nested Select listboxes without closing the panel on outside
           detection.
         </Typography.Root>
-        <Divider.Root size="m" variant="text">
-          Heads-up
-        </Divider.Root>
-        <Hint.Root size="m" variant="default">
+        <Divider.Root variant="text">Heads-up</Divider.Root>
+        <Hint.Root variant="default">
           Prefer Modal when the flow must block the page or trap focus by default.
         </Hint.Root>
       </Popover.Content>

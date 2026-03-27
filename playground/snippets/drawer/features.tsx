@@ -18,7 +18,7 @@ export default function DrawerFeaturesSnippet() {
         {portalHost ? (
           <Drawer.Root>
             <Drawer.Trigger>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Портал в контейнер
               </Button.Root>
             </Drawer.Trigger>
@@ -35,9 +35,7 @@ export default function DrawerFeaturesSnippet() {
                 </Drawer.Body>
                 <Drawer.Footer>
                   <Drawer.Close>
-                    <Button.Root size="m" variant="primary">
-                      Закрыть
-                    </Button.Root>
+                    <Button.Root variant="primary">Закрыть</Button.Root>
                   </Drawer.Close>
                 </Drawer.Footer>
               </Drawer.Content>
@@ -48,7 +46,7 @@ export default function DrawerFeaturesSnippet() {
 
       <Drawer.Root>
         <Drawer.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Длинное содержимое с прокруткой
           </Button.Root>
         </Drawer.Trigger>
@@ -80,9 +78,7 @@ export default function DrawerFeaturesSnippet() {
             </Drawer.Body>
             <Drawer.Footer>
               <Drawer.Close>
-                <Button.Root size="m" variant="primary">
-                  Закрыть
-                </Button.Root>
+                <Button.Root variant="primary">Закрыть</Button.Root>
               </Drawer.Close>
             </Drawer.Footer>
           </Drawer.Content>

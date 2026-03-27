@@ -23,7 +23,7 @@ export default function CommandMenuControlledSnippet() {
         <Typography.Root variant="body-small" tone="muted">
           Снаружи: «{query || "…"}»
         </Typography.Root>
-        <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
+        <Button.Root variant="primary" onClick={() => setOpen(true)}>
           Открыть с внешней строкой
         </Button.Root>
       </div>

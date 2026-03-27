@@ -22,11 +22,11 @@ export default function TooltipLongContentSnippet() {
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+            <Button.Root type="button" variant="neutral" mode="stroke">
               Подробнее
             </Button.Root>
           </Tooltip.Trigger>
-          <Tooltip.Content size="m">
+          <Tooltip.Content>
             Пароль должен быть не короче 12 символов, содержать буквы разного регистра и цифры. Не
             используйте пароли от других сервисов.
           </Tooltip.Content>

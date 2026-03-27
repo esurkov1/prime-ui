@@ -43,7 +43,7 @@ export default function CompositionExample() {
           </Typography.Root>
         </div>
       </ProgressCircle.Root>
-      <ProgressCircle.Root value={65} max={100} size="m">
+      <ProgressCircle.Root value={65} max={100}>
         <div
           style={{
             display: "flex",
@@ -52,7 +52,7 @@ export default function CompositionExample() {
             gap: "var(--prime-sys-spacing-xs)",
           }}
         >
-          <IconDownload size="m" aria-hidden />
+          <IconDownload aria-hidden />
           <Typography.Root as="span" variant="body-compact" weight="medium">
             65%
           </Typography.Root>

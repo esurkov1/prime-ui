@@ -11,15 +11,15 @@ export default function NotificationChannelExample() {
         Choose one primary channel for account and login notices.
       </p>
       <div className={styles.columnTight}>
-        <Radio.Root name="security-alert-example" value="email" defaultChecked size="m">
+        <Radio.Root name="security-alert-example" value="email" defaultChecked>
           <Radio.Label>Email</Radio.Label>
           <Radio.Hint>Sent to your verified address immediately.</Radio.Hint>
         </Radio.Root>
-        <Radio.Root name="security-alert-example" value="sms" size="m">
+        <Radio.Root name="security-alert-example" value="sms">
           <Radio.Label>SMS</Radio.Label>
           <Radio.Hint>Requires a phone number on file.</Radio.Hint>
         </Radio.Root>
-        <Radio.Root name="security-alert-example" value="app" size="m">
+        <Radio.Root name="security-alert-example" value="app">
           <Radio.Label>Mobile app only</Radio.Label>
           <Radio.Hint>No email or SMS; push when the app is installed.</Radio.Hint>
         </Radio.Root>

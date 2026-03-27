@@ -9,7 +9,7 @@ import { Banner } from "@/components/banner/Banner";
 export default function BannerFullWidthSnippet() {
   return (
     <div className="previewBannerNarrowColumn">
-      <Banner.Root status="warning" variant="light" size="m">
+      <Banner.Root status="warning" variant="light">
         <Banner.Content>
           <Banner.Icon as={Info} aria-hidden />
           <Banner.Title>Узкая колонка</Banner.Title>

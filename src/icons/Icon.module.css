@@ -46,16 +46,3 @@
 .toneDanger {
   color: var(--prime-sys-color-content-danger);
 }
-
-/* Непрозрачная подложка для демо/доков: иконка читается на любом фоне превью. */
-.surfaceRaised {
-  box-sizing: border-box;
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  padding: var(--prime-sys-spacing-x1);
-  border-radius: var(--prime-sys-shape-radius-m);
-  background: var(--prime-sys-color-surface-raised);
-  border: 1px solid var(--prime-sys-color-border-subtle);
-}

@@ -5,7 +5,7 @@ import styles from "./full-width.module.css";
 export default function CheckboxFullWidthSnippet() {
   return (
     <div className={styles.narrowCard}>
-      <Checkbox.Root size="m">
+      <Checkbox.Root>
         <Checkbox.Label>
           Я согласен с условиями использования сервиса и политикой конфиденциальности
         </Checkbox.Label>

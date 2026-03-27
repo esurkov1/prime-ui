@@ -26,12 +26,12 @@ export default function ColorPickerControlledSnippet() {
       <ColorPicker.Root value={color} onChange={setColor}>
         <Popover.Root open={open} onOpenChange={setOpen}>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" variant="neutral">
+            <Button.Root mode="stroke" variant="neutral">
               <ColorPicker.TriggerSwatch className={preview.popoverTriggerSwatch} />
               Изменить цвет
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+          <Popover.Content align="start" side="bottom">
             <ColorPicker.FormatProvider>
               <div className={preview.formatRow}>
                 <ColorPicker.FormatSelect />

@@ -18,16 +18,11 @@ export default function PopoverPlacementSnippet() {
       {demos.map(({ label, side, align }) => (
         <Popover.Root key={label}>
           <Popover.Trigger asChild>
-            <Button.Root
-              className={preview.placementTrigger}
-              mode="stroke"
-              size="m"
-              variant="neutral"
-            >
+            <Button.Root className={preview.placementTrigger} mode="stroke" variant="neutral">
               {label}
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align={align} insetGap="x2" insetPadding="x2" side={side} size="m">
+          <Popover.Content align={align} side={side}>
             <p className={preview.panelTextMuted}>
               <code>side=&quot;{side}&quot;</code>, <code>align=&quot;{align}&quot;</code>. У края
               окна позиция может перевернуться (flip).

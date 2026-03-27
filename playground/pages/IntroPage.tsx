@@ -326,7 +326,7 @@ export default function IntroPage() {
 export function Example() {
   return (
     <>
-      <Input.Root size="m" label="Email" id="email">
+      <Input.Root label="Email" id="email">
         <Input.Wrapper>
           <Input.Field type="email" placeholder="you@example.com" />
         </Input.Wrapper>

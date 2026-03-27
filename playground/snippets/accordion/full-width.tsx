@@ -2,7 +2,7 @@ import { Accordion } from "@/components/accordion/Accordion";
 
 export default function AccordionFullWidthSnippet() {
   return (
-    <Accordion.Root type="single" size="m" defaultValue="block" className="examplePreviewBleed">
+    <Accordion.Root type="single" defaultValue="block" className="examplePreviewBleed">
       <Accordion.Item value="block">
         <Accordion.Header>
           <Accordion.Trigger>

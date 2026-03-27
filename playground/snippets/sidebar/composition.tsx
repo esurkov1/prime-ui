@@ -116,7 +116,6 @@ function ModeSwitcher({
         <Sidebar.IdentityButton
           leading={
             <Avatar.Root
-              size="m"
               style={{
                 background:
                   "color-mix(in srgb, var(--prime-sys-color-action-primaryBackground) 84%, transparent)",
@@ -155,7 +154,7 @@ function HeaderUserPopover() {
     <Dropdown.Root>
       <Dropdown.Trigger>
         <button type="button" style={userTriggerStyle} aria-label="Пользовательские настройки">
-          <Avatar.Root size="m">
+          <Avatar.Root>
             <Avatar.Fallback>ES</Avatar.Fallback>
           </Avatar.Root>
         </button>
@@ -166,7 +165,7 @@ function HeaderUserPopover() {
           <Dropdown.Header>
             <Dropdown.HeaderRow>
               <Dropdown.HeaderLeading>
-                <Avatar.Root size="m">
+                <Avatar.Root>
                   <Avatar.Fallback>ES</Avatar.Fallback>
                 </Avatar.Root>
               </Dropdown.HeaderLeading>
@@ -221,7 +220,6 @@ export default function SidebarCompositionSnippet() {
   return (
     <div style={demoRootStyle}>
       <Sidebar.Root
-        size="m"
         state={state}
         onStateChange={setState}
         responsive={false}

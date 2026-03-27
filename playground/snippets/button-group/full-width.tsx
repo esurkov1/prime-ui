@@ -7,7 +7,7 @@ import { ButtonGroup } from "@/components/button-group/ButtonGroup";
 export default function ButtonGroupFullWidthSnippet() {
   return (
     <div className="w-full max-w-md">
-      <ButtonGroup.Root aria-label="Тариф" className="w-full" size="m">
+      <ButtonGroup.Root aria-label="Тариф" className="w-full">
         <ButtonGroup.Item className="min-w-0 flex-1" type="button">
           Базовый
         </ButtonGroup.Item>

@@ -30,11 +30,7 @@ describe("LinkButton", () => {
   });
 
   it("applies size data attributes", () => {
-    const { rerender } = render(
-      <LinkButton.Root href="/s" size="m">
-        S
-      </LinkButton.Root>,
-    );
+    const { rerender } = render(<LinkButton.Root href="/s">S</LinkButton.Root>);
     expect(screen.getByRole("link", { name: "S" })).toHaveAttribute("data-size", "m");
 
     rerender(

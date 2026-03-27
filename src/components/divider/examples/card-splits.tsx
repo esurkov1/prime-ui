@@ -12,14 +12,14 @@ export default function DividerCardSplitsExample() {
           <p className={s.muted}>Ships in 2–3 business days</p>
         </div>
 
-        <Divider.Root size="m" />
+        <Divider.Root />
 
         <p className={s.body}>
           Subtotal, shipping, and tax are estimated until checkout. You can edit the cart before
           paying.
         </p>
 
-        <Divider.Root size="m">Total</Divider.Root>
+        <Divider.Root>Total</Divider.Root>
         <p className={s.body}>$128.00 USD</p>
       </div>
     </section>

@@ -20,11 +20,11 @@ export default function DatepickerStatesSnippet() {
         </p>
         <Popover.Root open={openDisabled} onOpenChange={setOpenDisabled}>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" variant="neutral">
+            <Button.Root mode="stroke" variant="neutral">
               Календарь: выходные disabled
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetPadding="none" side="bottom">
+          <Popover.Content align="start" side="bottom">
             <Datepicker.Shell>
               <Datepicker.Calendar
                 disabled={{ dayOfWeek: [0, 6] }}
@@ -44,11 +44,11 @@ export default function DatepickerStatesSnippet() {
         </p>
         <Popover.Root open={openTime} onOpenChange={setOpenTime}>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" variant="neutral">
+            <Button.Root mode="stroke" variant="neutral">
               Дата + время (time disabled до даты)
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetPadding="none" side="bottom">
+          <Popover.Content align="start" side="bottom">
             <Datepicker.Shell>
               <Datepicker.Calendar
                 locale={ru}

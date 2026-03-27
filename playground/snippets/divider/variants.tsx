@@ -8,16 +8,14 @@ export default function DividerVariantsSnippet() {
     <div className={s.overviewCard}>
       <section className={s.overviewGroup} aria-label="Пустая линия и линия с подписью">
         <p className={s.demoHint}>Без текста — сплошная линия</p>
-        <Divider.Root size="m" />
+        <Divider.Root />
         <p className={s.demoHint}>Подпись по центру между линиями (default)</p>
-        <Divider.Root size="m">Итого</Divider.Root>
+        <Divider.Root>Итого</Divider.Root>
       </section>
 
       <section className={s.overviewGroup} aria-label="Заголовок секции">
         <p className={s.demoHint}>variant=&quot;text&quot; — стиль заголовка секции</p>
-        <Divider.Root variant="text" size="m">
-          Уведомления
-        </Divider.Root>
+        <Divider.Root variant="text">Уведомления</Divider.Root>
       </section>
 
       <section className={s.overviewGroup} aria-label="Между пунктами списка">
@@ -26,7 +24,7 @@ export default function DividerVariantsSnippet() {
         </p>
         <div className={s.overviewLineSpacingCol}>
           <span className={s.overviewLineItem}>Пункт один</span>
-          <Divider.Root variant="line-spacing" size="m" />
+          <Divider.Root variant="line-spacing" />
           <span className={s.overviewLineItem}>Пункт два</span>
         </div>
       </section>
@@ -37,7 +35,7 @@ export default function DividerVariantsSnippet() {
           <button className={s.overviewToolbarBtn} type="button">
             A
           </button>
-          <Divider.Root orientation="vertical" size="m" />
+          <Divider.Root orientation="vertical" />
           <button className={s.overviewToolbarBtn} type="button">
             B
           </button>

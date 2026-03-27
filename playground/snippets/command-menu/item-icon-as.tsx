@@ -9,7 +9,7 @@ export default function CommandMenuItemIconAsSnippet() {
 
   return (
     <>
-      <Button.Root size="m" variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
+      <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
         ItemIcon с разным тегом
       </Button.Root>
 

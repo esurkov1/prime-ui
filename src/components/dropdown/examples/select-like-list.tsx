@@ -15,7 +15,7 @@ export default function DropdownSelectLikeListExample() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+        <Button.Root type="button" variant="neutral" mode="stroke">
           Пространство: {workspace}
         </Button.Root>
       </Dropdown.Trigger>

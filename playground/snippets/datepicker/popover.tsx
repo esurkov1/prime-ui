@@ -21,14 +21,14 @@ export default function DatepickerPopoverSnippet() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button.Root mode="stroke" size="m" variant="neutral">
+        <Button.Root mode="stroke" variant="neutral">
           <Button.Icon>
             <CalendarDays aria-hidden strokeWidth={1.75} />
           </Button.Icon>
           {label}
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" insetPadding="none" side="bottom">
+      <Popover.Content align="start" side="bottom">
         <Datepicker.Shell>
           <Datepicker.Calendar
             locale={ru}

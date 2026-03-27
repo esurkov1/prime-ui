@@ -7,7 +7,6 @@ export default function TextareaControlledExample() {
 
   return (
     <Textarea.Root
-      size="m"
       value={notes}
       onChange={(e) => setNotes(e.target.value)}
       placeholder="Type here…"

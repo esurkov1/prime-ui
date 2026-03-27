@@ -22,7 +22,6 @@ export default function AvatarSrcFromStateSnippet() {
       </Avatar.Root>
       <Button.Root
         mode="ghost"
-        size="m"
         type="button"
         onClick={() => setIndex((i) => (i + 1) % sources.length)}
       >

@@ -11,7 +11,7 @@ export default function SelectPatternControlledExample() {
 
   return (
     <div className={`${styles.stack} ${styles.stackNarrow}`}>
-      <Select.Root size="m" value={tier} onChange={setTier} placeholder="Tier">
+      <Select.Root value={tier} onChange={setTier} placeholder="Tier">
         <Select.Trigger aria-label="Subscription tier">
           <Select.Value />
         </Select.Trigger>

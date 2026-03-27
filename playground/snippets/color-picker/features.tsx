@@ -16,18 +16,12 @@ export default function ColorPickerFeaturesSnippet() {
     <ColorPicker.Root defaultValue="hsl(340, 82%, 52%)">
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
+          <Button.Root mode="stroke" variant="neutral">
             <ColorPicker.TriggerSwatch className={preview.popoverTriggerSwatch} />
             Field + пипетка
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content
-          align="start"
-          className={preview.featuresPopoverWidth}
-          insetGap="x3"
-          insetPadding="x2"
-          side="bottom"
-        >
+        <Popover.Content align="start" className={preview.featuresPopoverWidth} side="bottom">
           <ColorPicker.FormatProvider>
             <Typography.Root
               as="p"

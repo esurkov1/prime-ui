@@ -8,23 +8,11 @@ export default function PopoverFullWidthSnippet() {
     <div className={preview.narrowColumn}>
       <Popover.Root>
         <Popover.Trigger asChild>
-          <Button.Root
-            className={preview.fullWidthTrigger}
-            mode="stroke"
-            size="m"
-            variant="neutral"
-          >
+          <Button.Root className={preview.fullWidthTrigger} mode="stroke" variant="neutral">
             Ширина как у кнопки
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content
-          align="start"
-          insetGap="x3"
-          insetPadding="x2"
-          sameMinWidthAsTrigger
-          side="bottom"
-          size="m"
-        >
+        <Popover.Content align="start" sameMinWidthAsTrigger side="bottom">
           <p className={preview.panelTextMuted}>
             <code>sameMinWidthAsTrigger</code> задаёт ширину панели по триггеру (с переносом текста)
             — удобно в узких колонках и карточках.

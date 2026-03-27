@@ -30,7 +30,7 @@ A compact chip-style label: optional leading icon (`Tag.Icon`), optional removab
 import { Tag } from "prime-ui-kit";
 
 export function Example() {
-  return <Tag.Root size="m">Design systems</Tag.Root>;
+  return <Tag.Root>Design systems</Tag.Root>;
 }
 ```
 

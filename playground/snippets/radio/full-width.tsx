@@ -7,10 +7,10 @@ export default function RadioFullWidthSnippet() {
     <div className="previewBannerNarrowColumn">
       <p className={styles.blockTitle}>Способ связи</p>
       <div className="stack">
-        <Radio.Root name="radio-fw-contact" value="phone" defaultChecked size="m">
+        <Radio.Root name="radio-fw-contact" value="phone" defaultChecked>
           <Radio.Label>Звонок в рабочее время</Radio.Label>
         </Radio.Root>
-        <Radio.Root name="radio-fw-contact" value="chat" size="m">
+        <Radio.Root name="radio-fw-contact" value="chat">
           <Radio.Label>Чат в приложении</Radio.Label>
         </Radio.Root>
       </div>

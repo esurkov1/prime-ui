@@ -10,7 +10,7 @@ export default function WizardActionsExample() {
   const [step, setStep] = React.useState(0);
 
   return (
-    <ButtonGroup.Root aria-label="Wizard navigation" size="m">
+    <ButtonGroup.Root aria-label="Wizard navigation">
       <ButtonGroup.Item
         disabled={step === 0}
         type="button"

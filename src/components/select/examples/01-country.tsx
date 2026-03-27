@@ -16,10 +16,8 @@ export default function SelectExampleCountry() {
         Select a country for tax and delivery estimates.
       </Typography.Root>
       <div className={styles.field}>
-        <Label.Root id={countryLabelId} size="m">
-          Country or region
-        </Label.Root>
-        <Select.Root size="m" defaultValue="us" placeholder="Choose a country">
+        <Label.Root id={countryLabelId}>Country or region</Label.Root>
+        <Select.Root defaultValue="us" placeholder="Choose a country">
           <Select.Trigger aria-labelledby={countryLabelId}>
             <Select.Value />
           </Select.Trigger>

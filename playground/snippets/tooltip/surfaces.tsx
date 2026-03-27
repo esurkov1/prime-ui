@@ -37,7 +37,7 @@ export default function TooltipSurfacesSnippet() {
         <Tooltip.Provider delayDuration={200}>
           <Tooltip.Root>
             <Tooltip.Trigger>
-              <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+              <Button.Root type="button" variant="neutral" mode="stroke">
                 Наведите
               </Button.Root>
             </Tooltip.Trigger>
@@ -49,7 +49,7 @@ export default function TooltipSurfacesSnippet() {
         <Tooltip.Provider delayDuration={200}>
           <Tooltip.Root>
             <Tooltip.Trigger>
-              <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+              <Button.Root type="button" variant="neutral" mode="stroke">
                 Наведите
               </Button.Root>
             </Tooltip.Trigger>

@@ -550,7 +550,6 @@ const EyeDropperButton = React.forwardRef<
         className={cx(styles.eyeDropperSquare, className)}
         disabled
         mode="stroke"
-        size="m"
         tabIndex={-1}
         type={type}
         variant="neutral"
@@ -568,7 +567,6 @@ const EyeDropperButton = React.forwardRef<
       aria-label={ariaLabel ?? "Пипетка"}
       className={cx(styles.eyeDropperSquare, className)}
       mode="stroke"
-      size="m"
       variant="neutral"
       onClick={(e) => {
         onClick?.(e);

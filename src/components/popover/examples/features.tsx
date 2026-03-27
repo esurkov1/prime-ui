@@ -13,18 +13,11 @@ export default function PopoverFeaturesExample() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button.Root className={styles.triggerWide} mode="stroke" size="m" variant="neutral">
+        <Button.Root className={styles.triggerWide} mode="stroke" variant="neutral">
           Access request
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content
-        align="start"
-        className={styles.formPanel}
-        insetGap="x3"
-        insetPadding="x2"
-        sameMinWidthAsTrigger
-        trapFocus
-      >
+      <Popover.Content align="start" className={styles.formPanel} sameMinWidthAsTrigger trapFocus>
         <Typography.Root as="p" variant="body-small" weight="medium">
           Short form
         </Typography.Root>
@@ -32,7 +25,7 @@ export default function PopoverFeaturesExample() {
           <code>trapFocus</code> keeps Tab inside the panel; opening the Select listbox does not
           count as an outside click, so the popover stays open.
         </Typography.Root>
-        <Input.Root label="Comment" size="m">
+        <Input.Root label="Comment">
           <Input.Wrapper>
             <Input.Field
               placeholder="Why access is needed"
@@ -41,7 +34,7 @@ export default function PopoverFeaturesExample() {
             />
           </Input.Wrapper>
         </Input.Root>
-        <Select.Root placeholder="Role" size="m">
+        <Select.Root placeholder="Role">
           <Select.Trigger>
             <Select.Value />
           </Select.Trigger>
@@ -52,10 +45,10 @@ export default function PopoverFeaturesExample() {
           </Select.Content>
         </Select.Root>
         <div className={styles.actionsRow}>
-          <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
+          <Button.Root mode="ghost" variant="neutral" onClick={() => setOpen(false)}>
             Cancel
           </Button.Root>
-          <Button.Root mode="filled" size="m" variant="primary" onClick={() => setOpen(false)}>
+          <Button.Root mode="filled" variant="primary" onClick={() => setOpen(false)}>
             Submit
           </Button.Root>
         </div>

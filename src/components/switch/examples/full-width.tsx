@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function SwitchFullWidthExample() {
   return (
     <div className={styles.fullWidthCard}>
-      <Switch.Root size="m" defaultChecked>
+      <Switch.Root defaultChecked>
         <Switch.Label>Растягивается на ширину карточки</Switch.Label>
         <Switch.Hint>Корень поля занимает 100% ширины контейнера</Switch.Hint>
       </Switch.Root>

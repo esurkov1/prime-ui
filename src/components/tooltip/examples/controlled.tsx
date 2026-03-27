@@ -9,7 +9,7 @@ export default function TooltipControlledExample() {
 
   return (
     <div className={styles.controlledStack}>
-      <Switch.Root size="m" checked={open} onCheckedChange={setOpen}>
+      <Switch.Root checked={open} onCheckedChange={setOpen}>
         <Switch.Label>Tooltip open (programmatic)</Switch.Label>
         <Switch.Hint>
           State stays in sync with <code>open</code> and <code>onOpenChange</code> on{" "}
@@ -19,7 +19,7 @@ export default function TooltipControlledExample() {
       <Tooltip.Provider delayDuration={0}>
         <Tooltip.Root open={open} onOpenChange={setOpen}>
           <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+            <Button.Root type="button" variant="neutral" mode="stroke">
               Trigger
             </Button.Root>
           </Tooltip.Trigger>

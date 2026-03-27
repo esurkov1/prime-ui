@@ -26,7 +26,7 @@ export default function TagExampleFilterChips() {
       <legend className={styles.legend}>Active filters</legend>
       <div className={styles.chipRow}>
         {FILTER_IDS.filter((id) => applied.has(id)).map((id) => (
-          <Tag.Root key={id} size="m" onRemove={() => remove(id)}>
+          <Tag.Root key={id} onRemove={() => remove(id)}>
             {id}
           </Tag.Root>
         ))}

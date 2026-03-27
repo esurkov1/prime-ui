@@ -7,10 +7,10 @@ export default function ProgressBarFullWidthSnippet() {
   return (
     <div className={styles.fullWidthCompare}>
       <div className={styles.fullWidthNarrow}>
-        <ProgressBar.Root value={55} label="Контейнер 200px" size="m" />
+        <ProgressBar.Root value={55} label="Контейнер 200px" />
       </div>
       <div className={styles.fullWidthFlexible}>
-        <ProgressBar.Root value={55} label="Гибкий контейнер" size="m" />
+        <ProgressBar.Root value={55} label="Гибкий контейнер" />
       </div>
     </div>
   );

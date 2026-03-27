@@ -15,18 +15,11 @@ export default function PopoverFeaturesSnippet() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button.Root className={preview.triggerWide} mode="stroke" size="m" variant="neutral">
+        <Button.Root className={preview.triggerWide} mode="stroke" variant="neutral">
           Заявка на доступ
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content
-        align="start"
-        className={preview.formPanel}
-        insetGap="x3"
-        insetPadding="x2"
-        sameMinWidthAsTrigger
-        trapFocus
-      >
+      <Popover.Content align="start" className={preview.formPanel} sameMinWidthAsTrigger trapFocus>
         <Typography.Root as="p" variant="body-small" weight="medium">
           Короткая форма
         </Typography.Root>
@@ -34,7 +27,7 @@ export default function PopoverFeaturesSnippet() {
           <code>trapFocus</code> удерживает Tab внутри панели; выпадающий список не воспринимается
           как «клик снаружи» поповера, поэтому панель не закрывается при работе с выбором значения.
         </Typography.Root>
-        <Input.Root label="Комментарий" size="m">
+        <Input.Root label="Комментарий">
           <Input.Wrapper>
             <Input.Field
               placeholder="Зачем нужен доступ"
@@ -43,7 +36,7 @@ export default function PopoverFeaturesSnippet() {
             />
           </Input.Wrapper>
         </Input.Root>
-        <Select.Root placeholder="Роль" size="m">
+        <Select.Root placeholder="Роль">
           <Select.Trigger>
             <Select.Value />
           </Select.Trigger>
@@ -54,10 +47,10 @@ export default function PopoverFeaturesSnippet() {
           </Select.Content>
         </Select.Root>
         <div className={preview.actionsRow}>
-          <Button.Root mode="ghost" size="m" variant="neutral" onClick={() => setOpen(false)}>
+          <Button.Root mode="ghost" variant="neutral" onClick={() => setOpen(false)}>
             Отмена
           </Button.Root>
-          <Button.Root mode="filled" size="m" variant="primary" onClick={() => setOpen(false)}>
+          <Button.Root mode="filled" variant="primary" onClick={() => setOpen(false)}>
             Отправить
           </Button.Root>
         </div>

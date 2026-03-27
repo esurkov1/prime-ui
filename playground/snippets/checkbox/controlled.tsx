@@ -8,14 +8,10 @@ export default function CheckboxControlledSnippet() {
 
   return (
     <>
-      <Checkbox.Root size="m" checked={checked} onChange={(e) => setChecked(e.target.checked)}>
+      <Checkbox.Root checked={checked} onChange={(e) => setChecked(e.target.checked)}>
         <Checkbox.Label>Контролируемый флаг: {checked ? "включено" : "выключено"}</Checkbox.Label>
       </Checkbox.Root>
-      <Checkbox.Root
-        size="m"
-        indeterminate={indeterminate}
-        onChange={() => setIndeterminate(false)}
-      >
+      <Checkbox.Root indeterminate={indeterminate} onChange={() => setIndeterminate(false)}>
         <Checkbox.Label>
           Контролируемый indeterminate: {indeterminate ? "да (частичный выбор)" : "нет"}
         </Checkbox.Label>

@@ -11,37 +11,37 @@ export default function DrawerExampleFiltersPanel() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+        <Button.Root type="button" variant="neutral" mode="stroke">
           Filters
         </Button.Root>
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay />
-        <Drawer.Content side="left" size="m" aria-labelledby="drawer-filters-title">
+        <Drawer.Content side="left" aria-labelledby="drawer-filters-title">
           <Drawer.Header>
             <Drawer.Title id="drawer-filters-title">Filters</Drawer.Title>
           </Drawer.Header>
           <Drawer.Body>
             <div className={styles.filterStack}>
-              <Checkbox.Root size="m" defaultChecked>
+              <Checkbox.Root defaultChecked>
                 <Checkbox.Label>In stock only</Checkbox.Label>
               </Checkbox.Root>
-              <Checkbox.Root size="m">
+              <Checkbox.Root>
                 <Checkbox.Label>On sale</Checkbox.Label>
               </Checkbox.Root>
-              <Checkbox.Root size="m">
+              <Checkbox.Root>
                 <Checkbox.Label>Ships today</Checkbox.Label>
               </Checkbox.Root>
             </div>
           </Drawer.Body>
           <Drawer.Footer className={styles.footerActions}>
             <Drawer.Close>
-              <Button.Root type="button" size="m" variant="neutral" mode="stroke">
+              <Button.Root type="button" variant="neutral" mode="stroke">
                 Reset
               </Button.Root>
             </Drawer.Close>
             <Drawer.Close>
-              <Button.Root type="button" size="m" variant="primary">
+              <Button.Root type="button" variant="primary">
                 Apply
               </Button.Root>
             </Drawer.Close>

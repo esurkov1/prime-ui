@@ -22,7 +22,7 @@ export default function TooltipStatesSnippet() {
         <Tooltip.Provider delayDuration={200}>
           <Tooltip.Root>
             <Tooltip.Trigger>
-              <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+              <Button.Root type="button" variant="neutral" mode="stroke">
                 Сохранить
               </Button.Root>
             </Tooltip.Trigger>
@@ -34,7 +34,7 @@ export default function TooltipStatesSnippet() {
         <Tooltip.Provider delayDuration={200}>
           <Tooltip.Root>
             <Tooltip.Trigger>
-              <Button.Root type="button" variant="neutral" mode="stroke" size="m" disabled>
+              <Button.Root type="button" variant="neutral" mode="stroke" disabled>
                 Недоступно
               </Button.Root>
             </Tooltip.Trigger>

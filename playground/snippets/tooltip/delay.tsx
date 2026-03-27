@@ -21,7 +21,7 @@ export default function TooltipDelaySnippet() {
       <Tooltip.Provider delayDuration={800}>
         <Tooltip.Root>
           <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="stroke" size="m">
+            <Button.Root type="button" variant="neutral" mode="stroke">
               Hover me slowly
             </Button.Root>
           </Tooltip.Trigger>

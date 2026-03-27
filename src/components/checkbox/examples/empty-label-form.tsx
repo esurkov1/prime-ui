@@ -7,11 +7,10 @@ import { Checkbox } from "prime-ui-kit";
 export function EmptyLabelFormExample() {
   return (
     <>
-      <Checkbox.Root size="m" aria-label="Receive digest by email (no visible label)">
+      <Checkbox.Root aria-label="Receive digest by email (no visible label)">
         <Checkbox.Label />
       </Checkbox.Root>
       <Checkbox.Root
-        size="m"
         name="newsletter"
         value="weekly"
         defaultChecked

@@ -32,7 +32,6 @@ export function BulkSelectRowsExample() {
   return (
     <>
       <Checkbox.Root
-        size="m"
         checked={allSelected}
         indeterminate={headerIndeterminate}
         onChange={(e) => toggleAll(e.target.checked)}
@@ -42,7 +41,6 @@ export function BulkSelectRowsExample() {
       {ROW_IDS.map((id) => (
         <Checkbox.Root
           key={id}
-          size="m"
           checked={selected.has(id)}
           onChange={(e) => toggleRow(id, e.target.checked)}
         >

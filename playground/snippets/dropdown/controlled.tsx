@@ -11,7 +11,7 @@ export default function DropdownControlledSnippet() {
     <div className="row rowAlignCenter rowGapMedium">
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Шаг 2 из 4
           </Button.Root>
         </Dropdown.Trigger>

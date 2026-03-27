@@ -17,10 +17,8 @@ export default function SelectExampleFullWidthForm() {
         Delivery details
       </Typography.Root>
       <div className={styles.fieldFullBleed}>
-        <Label.Root id={nameLabelId} size="m">
-          Full name
-        </Label.Root>
-        <Select.Root size="m" placeholder="How should we address the package?">
+        <Label.Root id={nameLabelId}>Full name</Label.Root>
+        <Select.Root placeholder="How should we address the package?">
           <Select.Trigger aria-labelledby={nameLabelId}>
             <Select.Value />
           </Select.Trigger>
@@ -32,10 +30,8 @@ export default function SelectExampleFullWidthForm() {
         </Select.Root>
       </div>
       <div className={styles.fieldFullBleed}>
-        <Label.Root id={methodLabelId} size="m">
-          Shipping method
-        </Label.Root>
-        <Select.Root size="m" defaultValue="standard" placeholder="Choose shipping">
+        <Label.Root id={methodLabelId}>Shipping method</Label.Root>
+        <Select.Root defaultValue="standard" placeholder="Choose shipping">
           <Select.Trigger aria-labelledby={methodLabelId}>
             <Select.Value />
           </Select.Trigger>

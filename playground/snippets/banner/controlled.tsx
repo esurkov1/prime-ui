@@ -16,7 +16,7 @@ export default function BannerControlledSnippet() {
         </Button.Root>
       ) : null}
       {visible ? (
-        <Banner.Root status="feature" variant="lighter" size="m">
+        <Banner.Root status="feature" variant="lighter">
           <Banner.Content>
             <Banner.Icon as={Info} aria-hidden />
             <Banner.Title>Контролируемое отображение</Banner.Title>

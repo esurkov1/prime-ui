@@ -5,12 +5,7 @@ export default function LinkButtonExternalExample() {
   return (
     <p>
       Documentation in a separate tab:{" "}
-      <LinkButton.Root
-        href="https://example.com/docs"
-        target="_blank"
-        rel="noopener noreferrer"
-        size="m"
-      >
+      <LinkButton.Root href="https://example.com/docs" target="_blank" rel="noopener noreferrer">
         Open help
       </LinkButton.Root>
     </p>

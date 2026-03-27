@@ -15,11 +15,11 @@ export default function DatepickerResponsiveMonthsSnippet() {
     <ExampleSurface className="examplePreviewBleed">
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
+          <Button.Root mode="stroke" variant="neutral">
             Адаптивные месяцы (1–2 колонки)
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" insetPadding="none" side="bottom">
+        <Popover.Content align="start" side="bottom">
           <Datepicker.Shell>
             <Datepicker.Calendar
               locale={ru}

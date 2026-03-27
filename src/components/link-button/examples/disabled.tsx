@@ -8,10 +8,8 @@ import { LinkButton } from "prime-ui-kit";
 export default function LinkButtonDisabledExample() {
   return (
     <div>
-      <LinkButton.Root href="/available" size="m">
-        Available route
-      </LinkButton.Root>
-      <LinkButton.Root href="/ignored-when-disabled" size="m" disabled>
+      <LinkButton.Root href="/available">Available route</LinkButton.Root>
+      <LinkButton.Root href="/ignored-when-disabled" disabled>
         Coming soon
       </LinkButton.Root>
     </div>

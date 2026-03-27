@@ -11,7 +11,6 @@ export default function DropdownActionsMenuExample() {
           type="button"
           variant="neutral"
           mode="stroke"
-          size="m"
           aria-label="Действия с документом"
         >
           ⋯

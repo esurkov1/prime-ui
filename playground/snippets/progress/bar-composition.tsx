@@ -10,7 +10,7 @@ export default function ProgressBarCompositionSnippet() {
       <Typography.Root variant="body-large" weight="semibold">
         Создание отчёта
       </Typography.Root>
-      <ProgressBar.Root value={72} max={100} size="m" label="Сбор данных" />
+      <ProgressBar.Root value={72} max={100} label="Сбор данных" />
       <Typography.Root variant="body-small" tone="muted">
         Обычно до пяти минут; можно вернуться к списку задач.
       </Typography.Root>

@@ -10,7 +10,7 @@ export default function ViewSwitcherExample() {
   const [mode, setMode] = React.useState<ViewMode>("list");
 
   return (
-    <ButtonGroup.Root aria-label="View layout" size="m">
+    <ButtonGroup.Root aria-label="View layout">
       <ButtonGroup.Item pressed={mode === "list"} type="button" onClick={() => setMode("list")}>
         List
       </ButtonGroup.Item>

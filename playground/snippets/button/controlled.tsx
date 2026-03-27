@@ -11,7 +11,7 @@ export default function ButtonControlledSnippet() {
   }
 
   return (
-    <Button.Root variant="primary" mode="filled" size="m" loading={loading} onClick={handleClick}>
+    <Button.Root variant="primary" mode="filled" loading={loading} onClick={handleClick}>
       <Button.Spinner />
       {loading ? "Сохранение…" : "Сохранить"}
     </Button.Root>

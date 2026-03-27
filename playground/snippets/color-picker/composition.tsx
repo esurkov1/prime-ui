@@ -27,12 +27,12 @@ export default function ColorPickerCompositionSnippet() {
     <ColorPicker.Root defaultValue="hsl(220, 90%, 56%)">
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
+          <Button.Root mode="stroke" variant="neutral">
             <ColorPicker.TriggerSwatch className={preview.popoverTriggerSwatch} />
             Полная панель
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+        <Popover.Content align="start" side="bottom">
           <ColorPicker.FormatProvider>
             <ExampleSurface className={preview.card}>
               <div className={preview.formatRow}>

@@ -8,15 +8,15 @@ export default function ShippingMethodExample() {
     <fieldset className={styles.fieldsetPlain}>
       <legend className={styles.legend}>Shipping method</legend>
       <div className={styles.columnTight}>
-        <Radio.Root name="shipping-example" value="standard" defaultChecked size="m">
+        <Radio.Root name="shipping-example" value="standard" defaultChecked>
           <Radio.Label>Standard (5–7 business days)</Radio.Label>
           <Radio.Hint>Free on orders over $50.</Radio.Hint>
         </Radio.Root>
-        <Radio.Root name="shipping-example" value="express" size="m">
+        <Radio.Root name="shipping-example" value="express">
           <Radio.Label>Express (2 business days)</Radio.Label>
           <Radio.Hint>Flat rate; tracking included.</Radio.Hint>
         </Radio.Root>
-        <Radio.Root name="shipping-example" value="pickup" size="m">
+        <Radio.Root name="shipping-example" value="pickup">
           <Radio.Label>Pick up in store</Radio.Label>
           <Radio.Hint>Ready next day at your selected location.</Radio.Hint>
         </Radio.Root>

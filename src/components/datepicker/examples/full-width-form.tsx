@@ -23,21 +23,14 @@ export function FullWidthFormDateExample() {
 
   return (
     <div style={fieldStack}>
-      <Label.Root htmlFor="fw-date-trigger" size="m">
-        Дата визита
-      </Label.Root>
+      <Label.Root htmlFor="fw-date-trigger">Дата визита</Label.Root>
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button.Root fullWidth id="fw-date-trigger" mode="stroke" size="m" variant="neutral">
+          <Button.Root fullWidth id="fw-date-trigger" mode="stroke" variant="neutral">
             {triggerText}
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content
-          align="start"
-          className="min-w-[min(100vw-2rem,36rem)]"
-          insetPadding="none"
-          side="bottom"
-        >
+        <Popover.Content align="start" className="min-w-[min(100vw-2rem,36rem)]" side="bottom">
           <Datepicker.Shell className="min-w-0">
             <Datepicker.Calendar
               locale={ru}

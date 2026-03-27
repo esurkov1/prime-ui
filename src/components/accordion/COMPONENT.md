@@ -40,7 +40,7 @@ import { Package, ShieldCheck, Truck } from "lucide-react";
 
 export function Example() {
   return (
-    <Accordion.Root type="single" size="m" layout="grouped" defaultValue="delivery" collapsible>
+    <Accordion.Root type="single" layout="grouped" defaultValue="delivery" collapsible>
       <Accordion.Item value="delivery">
         <Accordion.Header>
           <Accordion.Trigger>

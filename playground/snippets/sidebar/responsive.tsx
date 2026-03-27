@@ -8,7 +8,6 @@ function Sample({ responsive }: { responsive: boolean }) {
   const [open, setOpen] = React.useState(true);
   return (
     <Sidebar.Root
-      size="m"
       responsive={responsive}
       open={open}
       onOpenChange={setOpen}

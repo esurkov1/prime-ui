@@ -9,7 +9,7 @@ export default function DropdownCompositionSnippet() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Меню пользователя
         </Button.Root>
       </Dropdown.Trigger>

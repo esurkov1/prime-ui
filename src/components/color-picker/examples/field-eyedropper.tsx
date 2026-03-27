@@ -11,12 +11,12 @@ export function FieldEyedropperExample() {
     <ColorPicker.Root defaultValue="hsl(340, 82%, 52%)">
       <Popover.Root onOpenChange={setOpen} open={open}>
         <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
+          <Button.Root mode="stroke" variant="neutral">
             <ColorPicker.TriggerSwatch />
             Field + eyedropper
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+        <Popover.Content align="start" side="bottom">
           <div style={{ width: "19.5rem", maxWidth: "100%", minWidth: 0 }}>
             <ColorPicker.FormatProvider>
               <Typography.Root as="p" tone="muted" variant="body-small" weight="medium">

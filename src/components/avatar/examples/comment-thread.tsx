@@ -38,7 +38,7 @@ export default function AvatarCommentThreadExample() {
     <ul className={styles.list} aria-label="Discussion">
       {comments.map((c) => (
         <li key={c.id} className={styles.rowStretch}>
-          <Avatar.Root size="m" aria-label={c.author}>
+          <Avatar.Root aria-label={c.author}>
             {c.src ? <Avatar.Image src={c.src} alt="" /> : null}
             <Avatar.Fallback>{c.initials}</Avatar.Fallback>
           </Avatar.Root>

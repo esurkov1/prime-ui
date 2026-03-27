@@ -18,12 +18,12 @@ export function StatesExample() {
         <ColorPicker.Root defaultValue="#22c55e">
           <Popover.Root onOpenChange={setOpenSwatch} open={openSwatch}>
             <Popover.Trigger asChild>
-              <Button.Root mode="stroke" size="m" variant="neutral">
+              <Button.Root mode="stroke" variant="neutral">
                 <ColorPicker.TriggerSwatch />
                 Palette
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+            <Popover.Content align="start" side="bottom">
               <ColorPicker.FormatProvider>
                 <ColorPicker.SwatchPicker aria-label="Palette with one disabled swatch">
                   {PRESETS.map((c, i) => (
@@ -44,12 +44,12 @@ export function StatesExample() {
         <ColorPicker.Root defaultValue="hsl(200, 75%, 52%)">
           <Popover.Root onOpenChange={setOpenSlider} open={openSlider}>
             <Popover.Trigger asChild>
-              <Button.Root mode="stroke" size="m" variant="neutral">
+              <Button.Root mode="stroke" variant="neutral">
                 <ColorPicker.TriggerSwatch />
                 Disabled slider
               </Button.Root>
             </Popover.Trigger>
-            <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+            <Popover.Content align="start" side="bottom">
               <ColorPicker.FormatProvider>
                 <div
                   style={{

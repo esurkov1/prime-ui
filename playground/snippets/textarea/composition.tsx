@@ -9,11 +9,11 @@ export default function TextareaCompositionSnippet() {
       <Typography.Root variant="body-small" weight="medium" as="div">
         Комментарий к заказу
       </Typography.Root>
-      <Textarea.Root size="m" placeholder="Уточните адрес или время доставки">
+      <Textarea.Root placeholder="Уточните адрес или время доставки">
         <Textarea.CharCounter current={0} max={240} />
         <Textarea.Hint>Текст увидит служба логистики до отгрузки.</Textarea.Hint>
       </Textarea.Root>
-      <Textarea.Root size="m" variant="error" placeholder="Опишите причину возврата">
+      <Textarea.Root variant="error" placeholder="Опишите причину возврата">
         <Textarea.Error>Без описания заявку не отправить</Textarea.Error>
       </Textarea.Root>
     </div>

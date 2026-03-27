@@ -4,16 +4,16 @@ import { Textarea } from "prime-ui-kit";
 export default function TextareaStatesExample() {
   return (
     <>
-      <Textarea.Root size="m" placeholder="With hint">
+      <Textarea.Root placeholder="With hint">
         <Textarea.Hint>Default state</Textarea.Hint>
       </Textarea.Root>
-      <Textarea.Root size="m" placeholder="Not editable" disabled>
+      <Textarea.Root placeholder="Not editable" disabled>
         <Textarea.Hint>disabled</Textarea.Hint>
       </Textarea.Root>
-      <Textarea.Root size="m" defaultValue="Read only copy" readOnly>
+      <Textarea.Root defaultValue="Read only copy" readOnly>
         <Textarea.Hint>readOnly</Textarea.Hint>
       </Textarea.Root>
-      <Textarea.Root size="m" required placeholder="Required field" />
+      <Textarea.Root required placeholder="Required field" />
     </>
   );
 }

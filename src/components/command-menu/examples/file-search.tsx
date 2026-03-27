@@ -49,7 +49,7 @@ export default function CommandMenuExampleFileSearch() {
 
   return (
     <>
-      <Button.Root size="m" variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
+      <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
         Search files
       </Button.Root>
 

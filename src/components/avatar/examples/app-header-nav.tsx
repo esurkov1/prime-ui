@@ -16,25 +16,17 @@ export default function AvatarAppHeaderNavExample() {
           Prime Console
         </Typography.Root>
         <nav className={styles.row} aria-label="Primary">
-          <LinkButton.Root href="#overview" size="m">
-            Overview
-          </LinkButton.Root>
-          <LinkButton.Root href="#projects" size="m">
-            Projects
-          </LinkButton.Root>
-          <LinkButton.Root href="#settings" size="m">
-            Settings
-          </LinkButton.Root>
+          <LinkButton.Root href="#overview">Overview</LinkButton.Root>
+          <LinkButton.Root href="#projects">Projects</LinkButton.Root>
+          <LinkButton.Root href="#settings">Settings</LinkButton.Root>
         </nav>
       </div>
       <div className={styles.navUser}>
-        <Avatar.Root size="m" aria-label="Signed in as Jamie Chen">
+        <Avatar.Root aria-label="Signed in as Jamie Chen">
           <Avatar.Image src={portrait} alt="" />
           <Avatar.Fallback>JC</Avatar.Fallback>
         </Avatar.Root>
-        <LinkButton.Root href="#account" size="m">
-          Account
-        </LinkButton.Root>
+        <LinkButton.Root href="#account">Account</LinkButton.Root>
       </div>
     </header>
   );

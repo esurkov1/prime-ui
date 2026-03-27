@@ -10,18 +10,11 @@ export default function PopoverFullWidthExample() {
     <div className={styles.narrowColumn}>
       <Popover.Root>
         <Popover.Trigger asChild>
-          <Button.Root className={styles.fullWidthTrigger} mode="stroke" size="m" variant="neutral">
+          <Button.Root className={styles.fullWidthTrigger} mode="stroke" variant="neutral">
             Match trigger width
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content
-          align="start"
-          insetGap="x3"
-          insetPadding="x2"
-          sameMinWidthAsTrigger
-          side="bottom"
-          size="m"
-        >
+        <Popover.Content align="start" sameMinWidthAsTrigger side="bottom">
           <p className={styles.panelTextMuted}>
             <code>sameMinWidthAsTrigger</code> sets panel <code>width</code> and{" "}
             <code>minWidth</code> to the anchor — text wraps, still capped by panel max width and

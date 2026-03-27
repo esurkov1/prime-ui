@@ -11,12 +11,12 @@ export function BrandKitExample() {
     <ColorPicker.Root defaultValue="#1d4ed8">
       <Popover.Root onOpenChange={setOpen} open={open}>
         <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
+          <Button.Root mode="stroke" variant="neutral">
             <ColorPicker.TriggerSwatch />
             Brand color
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+        <Popover.Content align="start" side="bottom">
           <ColorPicker.FormatProvider>
             <ColorPicker.FormatSelect />
             <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
@@ -39,7 +39,7 @@ export function BrandKitExample() {
                 </ColorPicker.SwatchPickerItem>
               ))}
             </ColorPicker.SwatchPicker>
-            <ColorPicker.HexInput label="Hex" size="m" />
+            <ColorPicker.HexInput label="Hex" />
           </ColorPicker.FormatProvider>
         </Popover.Content>
       </Popover.Root>

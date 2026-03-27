@@ -10,7 +10,6 @@ export default function CookieConsentRowExample() {
       role="region"
       status="information"
       variant="lighter"
-      size="m"
       onDismiss={() => {
         /* product: defer / snooze — follow local privacy rules */
       }}

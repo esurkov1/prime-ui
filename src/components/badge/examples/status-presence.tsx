@@ -15,16 +15,16 @@ const row: CSSProperties = {
 export default function BadgeStatusPresenceExample() {
   return (
     <div style={row}>
-      <Badge.Root variant="status" status="online" label="Alex Morgan is online" size="m">
+      <Badge.Root variant="status" status="online" label="Alex Morgan is online">
         Online
       </Badge.Root>
-      <Badge.Root variant="status" status="offline" label="Alex Morgan is offline" size="m">
+      <Badge.Root variant="status" status="offline" label="Alex Morgan is offline">
         Offline
       </Badge.Root>
-      <Badge.Root variant="status" status="away" label="Alex Morgan is away" size="m">
+      <Badge.Root variant="status" status="away" label="Alex Morgan is away">
         Away
       </Badge.Root>
-      <Badge.Root variant="status" status="busy" label="Alex Morgan is busy" size="m">
+      <Badge.Root variant="status" status="busy" label="Alex Morgan is busy">
         Busy
       </Badge.Root>
     </div>

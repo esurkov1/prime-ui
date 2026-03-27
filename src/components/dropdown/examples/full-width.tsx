@@ -10,7 +10,6 @@ export default function DropdownFullWidthExample() {
       <Dropdown.Trigger>
         <Button.Root
           type="button"
-          size="m"
           variant="neutral"
           mode="stroke"
           aria-label="Действия со строкой"

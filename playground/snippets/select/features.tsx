@@ -4,7 +4,7 @@ const ZONES = ["А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "К"] as co
 
 export default function SelectFeaturesSnippet() {
   return (
-    <Select.Root size="m" placeholder="Зона и группы">
+    <Select.Root placeholder="Зона и группы">
       <Select.Trigger>
         <Select.Value />
       </Select.Trigger>

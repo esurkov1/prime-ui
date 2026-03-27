@@ -23,7 +23,7 @@ export default function TagExampleRemovableSelectedValues() {
       <legend className={styles.legend}>Required skills</legend>
       <div className={styles.chipRow}>
         {skills.map((label) => (
-          <Tag.Root key={label} size="m" onRemove={() => removeSkill(label)}>
+          <Tag.Root key={label} onRemove={() => removeSkill(label)}>
             {label}
           </Tag.Root>
         ))}

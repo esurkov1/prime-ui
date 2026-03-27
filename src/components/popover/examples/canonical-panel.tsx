@@ -7,11 +7,11 @@ export default function CanonicalPanelExample() {
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <Button.Root mode="stroke" size="m" variant="neutral">
+        <Button.Root mode="stroke" variant="neutral">
           View details
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+      <Popover.Content align="start" side="bottom">
         <Typography.Root as="p" variant="body-small" weight="semibold">
           Shipping estimate
         </Typography.Root>

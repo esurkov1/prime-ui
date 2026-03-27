@@ -36,7 +36,7 @@ export default function AccordionVariantsLayoutTypeSnippet() {
             <code>layout=&quot;grouped&quot;</code> (по умолчанию) — единая рамка, пункты без
             зазоров.
           </p>
-          <Accordion.Root type="single" size="m" defaultValue="one" className="accordionDemo">
+          <Accordion.Root type="single" defaultValue="one" className="accordionDemo">
             <SettingsItems />
           </Accordion.Root>
         </div>
@@ -46,7 +46,6 @@ export default function AccordionVariantsLayoutTypeSnippet() {
           </p>
           <Accordion.Root
             type="single"
-            size="m"
             layout="separate"
             defaultValue="one"
             className="accordionDemo"
@@ -61,12 +60,7 @@ export default function AccordionVariantsLayoutTypeSnippet() {
           <code>type=&quot;multiple&quot;</code> — можно держать открытыми несколько разделов сразу
           (<code>defaultValue</code> как массив).
         </p>
-        <Accordion.Root
-          type="multiple"
-          size="m"
-          defaultValue={["doc", "ship"]}
-          className="accordionDemo"
-        >
+        <Accordion.Root type="multiple" defaultValue={["doc", "ship"]} className="accordionDemo">
           <Accordion.Item value="doc">
             <Accordion.Header>
               <Accordion.Trigger>

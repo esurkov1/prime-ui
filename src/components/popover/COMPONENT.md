@@ -30,7 +30,7 @@ export function Example() {
       <Popover.Trigger asChild>
         <Button.Root type="button">Open</Button.Root>
       </Popover.Trigger>
-      <Popover.Content insetPadding="x2" insetGap="x3">
+      <Popover.Content>
         Panel
       </Popover.Content>
     </Popover.Root>

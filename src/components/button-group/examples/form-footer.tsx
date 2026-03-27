@@ -10,7 +10,7 @@ export default function FormFooterExample() {
         e.preventDefault();
       }}
     >
-      <ButtonGroup.Root aria-label="Save or reset draft" size="m">
+      <ButtonGroup.Root aria-label="Save or reset draft">
         <ButtonGroup.Item type="submit">Save</ButtonGroup.Item>
         <ButtonGroup.Item type="reset">Reset</ButtonGroup.Item>
       </ButtonGroup.Root>

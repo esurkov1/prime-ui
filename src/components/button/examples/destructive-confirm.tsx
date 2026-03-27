@@ -10,7 +10,7 @@ export default function DestructiveConfirmExample() {
   return (
     <Modal.Root open={open} onOpenChange={setOpen}>
       <Modal.Trigger>
-        <Button.Root variant="error" mode="stroke" size="m">
+        <Button.Root variant="error" mode="stroke">
           Delete project
         </Button.Root>
       </Modal.Trigger>
@@ -19,11 +19,11 @@ export default function DestructiveConfirmExample() {
         footer={
           <>
             <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke" size="m">
+              <Button.Root variant="neutral" mode="stroke">
                 Cancel
               </Button.Root>
             </Modal.Close>
-            <Button.Root variant="error" mode="filled" size="m" onClick={() => setOpen(false)}>
+            <Button.Root variant="error" mode="filled" onClick={() => setOpen(false)}>
               Delete
             </Button.Root>
           </>

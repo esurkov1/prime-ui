@@ -19,31 +19,16 @@ const SIZE_CLASS: Record<IconResolvedSize, string> = {
   xl: styles.sizeXl,
 };
 
-export type IconSurface = "none" | "raised";
-
 type BaseIconProps = Omit<LucideProps, "size" | "color"> & {
   size?: IconSize;
   tone?: IconTone;
-  /** Подложка под глиф в примерах и доках; внутри слотов кнопки/бейджа/поля — `none`. */
-  surface?: IconSurface;
 };
 
 type IconComponent = React.ComponentType<LucideProps>;
 
 function createIcon(IconGlyph: IconComponent) {
   const WrappedIcon = React.forwardRef<SVGSVGElement, BaseIconProps>(
-    (
-      {
-        className,
-        size: sizeProp,
-        tone = "default",
-        strokeWidth = 1.9,
-        style,
-        surface = "none",
-        ...rest
-      },
-      ref,
-    ) => {
+    ({ className, size: sizeProp, tone = "default", strokeWidth = 1.9, style, ...rest }, ref) => {
       const controlSize = useOptionalControlSize();
       const insideDividerContent = React.useContext(DividerContentContext);
       const resolvedSize = (sizeProp ?? controlSize ?? "m") as IconResolvedSize;
@@ -58,7 +43,7 @@ function createIcon(IconGlyph: IconComponent) {
               ? styles.toneAccent
               : styles.toneDanger;
 
-      const glyph = (
+      return (
         <IconGlyph
           ref={ref}
           className={cx(styles.root, sizeClass, toneClassName, className)}
@@ -68,11 +53,6 @@ function createIcon(IconGlyph: IconComponent) {
           {...rest}
         />
       );
-
-      if (surface === "raised") {
-        return <span className={styles.surfaceRaised}>{glyph}</span>;
-      }
-      return glyph;
     },
   );
 

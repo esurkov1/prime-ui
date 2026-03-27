@@ -10,18 +10,11 @@ export default function FormInPopoverExample() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button.Root mode="stroke" size="m" variant="neutral">
+        <Button.Root mode="stroke" variant="neutral">
           Quick edit
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content
-        align="start"
-        insetGap="x3"
-        insetPadding="x2"
-        side="bottom"
-        size="m"
-        trapFocus
-      >
+      <Popover.Content align="start" side="bottom" trapFocus>
         <form
           style={{ width: "min(22rem, 100vw)" }}
           onSubmit={(e) => {
@@ -40,12 +33,12 @@ export default function FormInPopoverExample() {
               marginTop: "var(--prime-sys-spacing-x2)",
             }}
           >
-            <Input.Root label="Display name" size="m">
+            <Input.Root label="Display name">
               <Input.Wrapper>
                 <Input.Field autoComplete="organization" name="displayName" type="text" />
               </Input.Wrapper>
             </Input.Root>
-            <Input.Root label="Slug" hint="Lowercase, no spaces." size="m">
+            <Input.Root label="Slug" hint="Lowercase, no spaces.">
               <Input.Wrapper>
                 <Input.Field name="slug" type="text" />
               </Input.Wrapper>
@@ -61,14 +54,13 @@ export default function FormInPopoverExample() {
           >
             <Button.Root
               mode="stroke"
-              size="m"
               type="button"
               variant="neutral"
               onClick={() => setOpen(false)}
             >
               Cancel
             </Button.Root>
-            <Button.Root size="m" type="submit" variant="primary">
+            <Button.Root type="submit" variant="primary">
               Save
             </Button.Root>
           </div>

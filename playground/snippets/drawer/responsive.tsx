@@ -6,7 +6,7 @@ export default function DrawerResponsiveSnippet() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root size="m" variant="neutral" mode="ghost">
+        <Button.Root variant="neutral" mode="ghost">
           Как ведёт себя ширина
         </Button.Root>
       </Drawer.Trigger>

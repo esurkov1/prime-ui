@@ -30,7 +30,6 @@ export function FeatureFlagsListExample() {
           key={f.id}
           name={`flag_${f.id}`}
           value="on"
-          size="m"
           checked={flags[f.id]}
           onChange={(e) => setFlag(f.id, e.target.checked)}
         >

@@ -3,7 +3,7 @@ import { Accordion } from "@/components/accordion/Accordion";
 
 export default function AccordionCompositionSnippet() {
   return (
-    <Accordion.Root type="single" size="m" className="accordionDemo" defaultValue="a">
+    <Accordion.Root type="single" className="accordionDemo" defaultValue="a">
       <Accordion.Item value="a">
         <Accordion.Header>
           <Accordion.Trigger>

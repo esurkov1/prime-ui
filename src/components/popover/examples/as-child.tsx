@@ -13,7 +13,7 @@ export default function PopoverAsChildExample() {
           Text button trigger
         </button>
       </Popover.Trigger>
-      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+      <Popover.Content align="start" side="bottom">
         <p className={styles.panelTextMuted}>
           One arbitrary element as the anchor; the kit merges <code>ref</code>,{" "}
           <code>aria-expanded</code>, <code>aria-controls</code>, and the click toggle handler.

@@ -7,9 +7,9 @@ export default function OtpLoginExample() {
 
   return (
     <>
-      <Label.Root size="m">Код из SMS</Label.Root>
-      <DigitInput.Root length={6} size="m" value={code} onChange={setCode} />
-      <Hint.Root size="m" variant="default">
+      <Label.Root>Код из SMS</Label.Root>
+      <DigitInput.Root length={6} value={code} onChange={setCode} />
+      <Hint.Root variant="default">
         Вставьте код из сообщения — цифры заполнят ячейки с текущей позиции.
       </Hint.Root>
     </>

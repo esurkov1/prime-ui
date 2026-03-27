@@ -19,7 +19,7 @@ export default function ButtonGroupFormFeaturesSnippet() {
         name="q"
         type="search"
       />
-      <ButtonGroup.Root aria-label="Отправить или сбросить поиск" size="m">
+      <ButtonGroup.Root aria-label="Отправить или сбросить поиск">
         <ButtonGroup.Item type="submit">Найти</ButtonGroup.Item>
         <ButtonGroup.Item type="reset">Сбросить</ButtonGroup.Item>
       </ButtonGroup.Root>

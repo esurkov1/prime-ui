@@ -33,7 +33,7 @@ export function RevenuePanelCard() {
       <Card.SectionHeader>
         <Card.SectionTitle>Revenue</Card.SectionTitle>
         <Card.SectionTrailing>
-          <Icon surface="raised" name="nav.layoutGrid" aria-hidden />
+          <Icon name="nav.layoutGrid" aria-hidden />
         </Card.SectionTrailing>
       </Card.SectionHeader>
       <Card.Body>

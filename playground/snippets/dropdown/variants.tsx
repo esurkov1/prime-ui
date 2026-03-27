@@ -6,7 +6,7 @@ export default function DropdownVariantsSnippet() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <Button.Root size="m" variant="neutral" mode="lighter">
+        <Button.Root variant="neutral" mode="lighter">
           Документ
         </Button.Root>
       </Dropdown.Trigger>

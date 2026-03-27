@@ -6,7 +6,7 @@ export default function DropdownStatesSnippet() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Доступ к отчёту
         </Button.Root>
       </Dropdown.Trigger>

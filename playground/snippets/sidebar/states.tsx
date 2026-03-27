@@ -8,7 +8,6 @@ export default function SidebarStatesSnippet() {
   return (
     <div className="playgroundSidebarDemo">
       <Sidebar.Root
-        size="m"
         open={open}
         onOpenChange={setOpen}
         responsive={false}

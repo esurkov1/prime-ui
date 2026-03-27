@@ -11,8 +11,8 @@ export default function FileUploadVariantsSnippet() {
           в карточки.
         </p>
         <div className={styles.roots}>
-          <FileUpload.Root size="m" appearance="dashed" />
-          <FileUpload.Root size="m" appearance="solid" />
+          <FileUpload.Root appearance="dashed" />
+          <FileUpload.Root appearance="solid" />
         </div>
       </div>
       <div>

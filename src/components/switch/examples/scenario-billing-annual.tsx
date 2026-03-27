@@ -14,7 +14,7 @@ export default function SwitchScenarioBillingAnnual() {
       <Typography.Root as="p" variant="body-default" className={styles.muted}>
         Choose how you are billed. Annual includes two months free on the Pro plan.
       </Typography.Root>
-      <Switch.Root size="m" checked={annual} onCheckedChange={setAnnual} name="billing_cycle">
+      <Switch.Root checked={annual} onCheckedChange={setAnnual} name="billing_cycle">
         <Switch.Label>Bill annually</Switch.Label>
         <Switch.Hint>
           {annual

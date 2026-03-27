@@ -9,7 +9,7 @@ Text-style **navigation** control: **`LinkButton.Root`** only — control typogr
 ```tsx
 import { LinkButton } from "prime-ui-kit";
 
-<LinkButton.Root href="/settings" size="m">
+<LinkButton.Root href="/settings">
   Settings
 </LinkButton.Root>
 ```

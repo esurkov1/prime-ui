@@ -5,7 +5,7 @@ import styles from "./select-snippets.module.css";
 export default function SelectStatesSnippet() {
   return (
     <div className={`stack ${styles.stackNarrow}`}>
-      <Select.Root size="m" placeholder="Только подсказка">
+      <Select.Root placeholder="Только подсказка">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -14,7 +14,7 @@ export default function SelectStatesSnippet() {
           <Select.Item value="b">Вариант B</Select.Item>
         </Select.Content>
       </Select.Root>
-      <Select.Root size="m" defaultValue="b" placeholder="С начальным значением">
+      <Select.Root defaultValue="b" placeholder="С начальным значением">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -23,7 +23,7 @@ export default function SelectStatesSnippet() {
           <Select.Item value="b">Вариант B</Select.Item>
         </Select.Content>
       </Select.Root>
-      <Select.Root size="m" defaultValue="on" disabled placeholder="Отключён">
+      <Select.Root defaultValue="on" disabled placeholder="Отключён">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -32,7 +32,7 @@ export default function SelectStatesSnippet() {
           <Select.Item value="on">Вкл</Select.Item>
         </Select.Content>
       </Select.Root>
-      <Select.Root size="m" hasError placeholder="Ошибка валидации">
+      <Select.Root hasError placeholder="Ошибка валидации">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>

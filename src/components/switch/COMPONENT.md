@@ -44,7 +44,7 @@ import { Switch } from "prime-ui-kit";
 
 export function ProductUpdatesSwitch() {
   return (
-    <Switch.Root size="m" defaultChecked name="product_updates">
+    <Switch.Root defaultChecked name="product_updates">
       <Switch.Label>Product updates</Switch.Label>
       <Switch.Hint>
         At most one email per week. You can change this anytime in notification settings.

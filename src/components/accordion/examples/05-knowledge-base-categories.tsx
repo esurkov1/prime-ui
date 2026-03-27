@@ -10,13 +10,7 @@ import styles from "./examples.module.css";
  */
 export default function AccordionExampleKnowledgeBaseCategories() {
   return (
-    <Accordion.Root
-      type="single"
-      size="m"
-      layout="separate"
-      defaultValue="basics"
-      collapsible={false}
-    >
+    <Accordion.Root type="single" layout="separate" defaultValue="basics" collapsible={false}>
       <Accordion.Item value="basics">
         <Accordion.Header>
           <Accordion.Trigger>

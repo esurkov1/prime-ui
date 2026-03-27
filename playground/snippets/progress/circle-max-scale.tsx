@@ -9,7 +9,7 @@ export default function ProgressCircleMaxScaleSnippet() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           45 из 100
         </Typography.Root>
-        <ProgressCircle.Root value={45} max={100} size="m">
+        <ProgressCircle.Root value={45} max={100}>
           45%
         </ProgressCircle.Root>
       </div>
@@ -17,7 +17,7 @@ export default function ProgressCircleMaxScaleSnippet() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           3 из 5 шагов
         </Typography.Root>
-        <ProgressCircle.Root value={3} max={5} size="m">
+        <ProgressCircle.Root value={3} max={5}>
           3/5
         </ProgressCircle.Root>
       </div>
@@ -25,7 +25,7 @@ export default function ProgressCircleMaxScaleSnippet() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           750 из 1000
         </Typography.Root>
-        <ProgressCircle.Root value={750} max={1000} size="m">
+        <ProgressCircle.Root value={750} max={1000}>
           75%
         </ProgressCircle.Root>
       </div>

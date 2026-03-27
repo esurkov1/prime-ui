@@ -11,10 +11,8 @@ export default function SelectExampleGroups() {
 
   return (
     <div className={styles.field}>
-      <Label.Root id={timezoneLabelId} size="m">
-        Time zone
-      </Label.Root>
-      <Select.Root size="m" defaultValue="utc" placeholder="Select time zone">
+      <Label.Root id={timezoneLabelId}>Time zone</Label.Root>
+      <Select.Root defaultValue="utc" placeholder="Select time zone">
         <Select.Trigger aria-labelledby={timezoneLabelId}>
           <Select.Value />
         </Select.Trigger>

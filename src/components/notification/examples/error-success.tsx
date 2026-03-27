@@ -30,7 +30,6 @@ function ErrorSuccessDemo() {
           type="button"
           variant="error"
           mode="lighter"
-          size="m"
           onClick={() =>
             notify({
               type: "error",
@@ -45,7 +44,6 @@ function ErrorSuccessDemo() {
           type="button"
           variant="primary"
           mode="filled"
-          size="m"
           onClick={() =>
             notify({
               type: "success",

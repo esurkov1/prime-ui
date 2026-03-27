@@ -36,7 +36,7 @@ describe("Label", () => {
     render(
       <Label.Root size="s">
         <Label.Icon>
-          <Icon surface="none" data-testid="label-icon" name="nav.home" />
+          <Icon data-testid="label-icon" name="nav.home" />
         </Label.Icon>
       </Label.Root>,
     );

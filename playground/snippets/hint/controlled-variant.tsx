@@ -16,7 +16,7 @@ export default function HintControlledVariantSnippet() {
           Показать ошибку
         </Button.Root>
       </div>
-      <Hint.Root size="m" variant={variant}>
+      <Hint.Root variant={variant}>
         {variant === "error"
           ? "Заполните поле перед сохранением черновика."
           : "Черновик можно сохранить без обязательных полей."}

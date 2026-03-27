@@ -8,18 +8,16 @@ export function ControlledFormFieldExample() {
 
   return (
     <div>
-      <Label.Root htmlFor="product-color-trigger" size="m">
-        Product color
-      </Label.Root>
+      <Label.Root htmlFor="product-color-trigger">Product color</Label.Root>
       <ColorPicker.Root onChange={setColor} value={color}>
         <Popover.Root onOpenChange={setOpen} open={open}>
           <Popover.Trigger asChild>
-            <Button.Root id="product-color-trigger" mode="stroke" size="m" variant="neutral">
+            <Button.Root id="product-color-trigger" mode="stroke" variant="neutral">
               <ColorPicker.TriggerSwatch />
               Pick
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
+          <Popover.Content align="start" side="bottom">
             <ColorPicker.FormatProvider>
               <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
                 <ColorPicker.AreaThumb />
@@ -33,7 +31,7 @@ export function ControlledFormFieldExample() {
             </ColorPicker.FormatProvider>
           </Popover.Content>
         </Popover.Root>
-        <ColorPicker.HexInput label="Hex value" size="m" />
+        <ColorPicker.HexInput label="Hex value" />
       </ColorPicker.Root>
     </div>
   );
