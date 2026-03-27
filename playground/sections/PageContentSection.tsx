@@ -175,10 +175,9 @@ export default function PageContentSection() {
             <>
               Семантическая разметка контентной колонки: <code>PageContent.Section</code> (регион
               страницы без внешних полей, если отступы уже даёт обёртка или{" "}
-              <code>PageContent.Root</code>),{" "}
-              <code>PageContent.Root</code> (полная страница с полями и при необходимости{" "}
-              <code>maxWidth</code>), <code>Title</code> → <code>&lt;h1&gt;</code>,{" "}
-              <code>Description</code> с{" "}
+              <code>PageContent.Root</code>), <code>PageContent.Root</code> (полная страница с
+              полями и при необходимости <code>maxWidth</code>), <code>Title</code> →{" "}
+              <code>&lt;h1&gt;</code>, <code>Description</code> с{" "}
               <code>measure=&quot;readable&quot; | &quot;full&quot;</code>, <code>Body</code>. В
               плейграунде внешние поля колонки задаёт обёртка в <code>PlaygroundLayout</code>.
             </>
