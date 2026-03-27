@@ -7,7 +7,7 @@ export default function CardPanelSnippet() {
       <Card.SectionHeader>
         <Card.SectionTitle>Revenue trend</Card.SectionTitle>
         <Card.SectionTrailing>
-          <Icon name="nav.layoutGrid" />
+          <Icon surface="none" name="nav.layoutGrid" />
         </Card.SectionTrailing>
       </Card.SectionHeader>
       <Card.Chart>

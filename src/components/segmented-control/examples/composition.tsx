@@ -10,16 +10,16 @@ export default function SegmentedCompositionExample() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Icon and label
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="light" size="m">
+        <SegmentedControl.Root defaultValue="light">
           <SegmentedControl.Item value="light">
             <SegmentedControl.Icon>
-              <Icon name="theme.light" size="m" />
+              <Icon surface="none" name="theme.light" />
             </SegmentedControl.Icon>
             Light
           </SegmentedControl.Item>
           <SegmentedControl.Item value="dark">
             <SegmentedControl.Icon>
-              <Icon name="theme.dark" size="m" />
+              <Icon surface="none" name="theme.dark" />
             </SegmentedControl.Icon>
             Dark
           </SegmentedControl.Item>
@@ -29,22 +29,22 @@ export default function SegmentedCompositionExample() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Icon-only + visually hidden text
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="grid" size="m">
+        <SegmentedControl.Root defaultValue="grid">
           <SegmentedControl.Item value="feed">
             <SegmentedControl.Icon>
-              <Icon name="nav.home" size="m" />
+              <Icon surface="none" name="nav.home" />
             </SegmentedControl.Icon>
             <span className={styles.visuallyHidden}>Feed</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="grid">
             <SegmentedControl.Icon>
-              <Icon name="nav.layoutGrid" size="m" />
+              <Icon surface="none" name="nav.layoutGrid" />
             </SegmentedControl.Icon>
             <span className={styles.visuallyHidden}>Grid</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="compact">
             <SegmentedControl.Icon>
-              <Icon name="theme.light" size="m" />
+              <Icon surface="none" name="theme.light" />
             </SegmentedControl.Icon>
             <span className={styles.visuallyHidden}>Compact</span>
           </SegmentedControl.Item>

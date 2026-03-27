@@ -8,7 +8,7 @@ export default function ModalPatternFullWidthFooterExample() {
   return (
     <Modal.Root>
       <Modal.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Checkout
         </Button.Root>
       </Modal.Trigger>
@@ -23,18 +23,18 @@ export default function ModalPatternFullWidthFooterExample() {
             }}
           >
             <Modal.Close>
-              <Button.Root size="m" variant="primary" fullWidth>
+              <Button.Root variant="primary" fullWidth>
                 Pay now
               </Button.Root>
             </Modal.Close>
             <Modal.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke" fullWidth>
+              <Button.Root variant="neutral" mode="stroke" fullWidth>
                 Back to cart
               </Button.Root>
             </Modal.Close>
           </div>
         }
-        icon={<Icon name="action.upload" />}
+        icon={<Icon surface="raised" name="action.upload" />}
         title="Confirm order"
       >
         <Typography.Root as="p" variant="body-default">

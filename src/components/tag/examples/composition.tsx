@@ -8,7 +8,7 @@ export default function TagExampleComposition() {
     <div className={styles.chipRow}>
       <Tag.Root>
         <Tag.Icon>
-          <Icon name="field.email" />
+          <Icon surface="none" name="field.email" />
         </Tag.Icon>
         <span>Newsletter</span>
       </Tag.Root>

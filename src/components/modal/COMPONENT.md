@@ -48,28 +48,28 @@ export function InviteTeammateModal() {
   return (
     <Modal.Root>
       <Modal.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Open workspace invite
         </Button.Root>
       </Modal.Trigger>
       <Modal.Panel
         title="Invite teammate"
         description="We will send one invitation email. The recipient can accept or decline."
-        icon={<Icon name="field.email" tone="subtle" />}
+        icon={<Icon surface="raised" name="field.email" tone="subtle" />}
         footer={
           <>
             <Modal.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Cancel
               </Button.Root>
             </Modal.Close>
-            <Button.Root size="m" variant="primary" type="button">
+            <Button.Root variant="primary" type="button">
               Send invite
             </Button.Root>
           </>
         }
       >
-        <Input.Root label="Email address" size="m" hint="Work email preferred">
+        <Input.Root label="Email address" hint="Work email preferred">
           <Input.Wrapper>
             <Input.Field autoComplete="email" placeholder="name@company.com" type="email" />
           </Input.Wrapper>

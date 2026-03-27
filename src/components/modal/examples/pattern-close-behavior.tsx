@@ -8,14 +8,14 @@ export default function ModalPatternCloseBehaviorExample() {
     <>
       <Modal.Root>
         <Modal.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Standard dismiss
           </Button.Root>
         </Modal.Trigger>
         <Modal.Panel
           closeAriaLabel="Close"
           description="Escape and a direct backdrop click close the dialog (click target must be the overlay)."
-          icon={<Icon name="field.email" />}
+          icon={<Icon surface="raised" name="field.email" />}
           title="Default behavior"
         >
           <p>Try Escape and clicking the dimmed area outside the panel.</p>
@@ -24,9 +24,9 @@ export default function ModalPatternCloseBehaviorExample() {
 
       <Modal.Root closeOnEscape={false} closeOnOverlayClick={false}>
         <Modal.Trigger>
-          <Button.Root size="m" variant="error" mode="lighter">
+          <Button.Root variant="error" mode="lighter">
             <Button.Icon>
-              <Icon name="status.locked" />
+              <Icon surface="raised" name="status.locked" />
             </Button.Icon>
             Explicit actions only
           </Button.Root>
@@ -35,12 +35,12 @@ export default function ModalPatternCloseBehaviorExample() {
           description="With both flags false, only buttons dismiss the dialog."
           footer={
             <Modal.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 OK
               </Button.Root>
             </Modal.Close>
           }
-          icon={<Icon name="status.locked" />}
+          icon={<Icon surface="raised" name="status.locked" />}
           showClose={false}
           title="Strict mode"
         >

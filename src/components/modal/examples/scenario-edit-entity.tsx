@@ -12,7 +12,7 @@ export default function ModalEditEntityExample() {
   return (
     <Modal.Root>
       <Modal.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Rename account
         </Button.Root>
       </Modal.Trigger>
@@ -21,21 +21,21 @@ export default function ModalEditEntityExample() {
         footer={
           <>
             <Modal.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Cancel
               </Button.Root>
             </Modal.Close>
             <Modal.Close>
-              <Button.Root size="m" variant="primary" type="button">
+              <Button.Root variant="primary" type="button">
                 Save changes
               </Button.Root>
             </Modal.Close>
           </>
         }
-        icon={<Icon name="nav.layoutGrid" tone="subtle" />}
+        icon={<Icon surface="raised" name="nav.layoutGrid" tone="subtle" />}
         title="Edit account name"
       >
-        <Input.Root label="Account name" size="m">
+        <Input.Root label="Account name">
           <Input.Wrapper>
             <Input.Field
               onChange={(e) => setName(e.target.value)}

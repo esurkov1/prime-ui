@@ -8,7 +8,7 @@ export default function CardPanelContentChartSnippet() {
       <Card.SectionHeader>
         <Card.SectionTitle>Revenue</Card.SectionTitle>
         <Card.SectionTrailing>
-          <Icon name="nav.layoutGrid" />
+          <Icon surface="none" name="nav.layoutGrid" />
         </Card.SectionTrailing>
       </Card.SectionHeader>
       <Card.Body>

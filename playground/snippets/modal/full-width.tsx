@@ -8,7 +8,7 @@ export default function ModalFullWidthSnippet() {
   return (
     <Modal.Root>
       <Modal.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Оформить заказ
         </Button.Root>
       </Modal.Trigger>
@@ -22,18 +22,18 @@ export default function ModalFullWidthSnippet() {
         footer={
           <div className="previewBannerColumn">
             <Modal.Close>
-              <Button.Root size="m" variant="primary" fullWidth>
+              <Button.Root variant="primary" fullWidth>
                 Перейти к оплате
               </Button.Root>
             </Modal.Close>
             <Modal.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke" fullWidth>
+              <Button.Root variant="neutral" mode="stroke" fullWidth>
                 В корзину
               </Button.Root>
             </Modal.Close>
           </div>
         }
-        icon={<Icon name="action.upload" />}
+        icon={<Icon surface="raised" name="action.upload" />}
         title="Подтверждение"
       >
         <Typography.Root as="p" variant="body-default">

@@ -7,7 +7,7 @@ export default function CardSplitSnippet() {
       <Card.Split>
         <Card.SplitCell>
           <Card.IconBox>
-            <Icon name="nav.layoutGrid" />
+            <Icon surface="none" name="nav.layoutGrid" />
           </Card.IconBox>
           <Card.Stack>
             <Card.Label>Конверсия</Card.Label>
@@ -16,7 +16,7 @@ export default function CardSplitSnippet() {
         </Card.SplitCell>
         <Card.SplitCell>
           <Card.IconBox>
-            <Icon name="field.email" />
+            <Icon surface="none" name="field.email" />
           </Card.IconBox>
           <Card.Stack>
             <Card.Label>Средний чек</Card.Label>

@@ -5,7 +5,7 @@ export default function DashboardRingExample() {
   return (
     <Card.Root variant="mini-media">
       <Card.IconBox aria-hidden>
-        <Icon name="nav.layoutGrid" aria-hidden />
+        <Icon surface="raised" name="nav.layoutGrid" aria-hidden />
       </Card.IconBox>
       <Card.Stack>
         <Card.Label>Quarter target</Card.Label>
@@ -19,12 +19,7 @@ export default function DashboardRingExample() {
             paddingBlock: "var(--prime-sys-spacing-s)",
           }}
         >
-          <ProgressCircle.Root
-            value={68}
-            max={100}
-            size="m"
-            label="Quarter target, 68 percent complete"
-          >
+          <ProgressCircle.Root value={68} max={100} label="Quarter target, 68 percent complete">
             <Typography.Root as="span" variant="body-small" weight="medium">
               68%
             </Typography.Root>

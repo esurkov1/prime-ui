@@ -12,22 +12,22 @@ const row: CSSProperties = {
 export default function BadgeInboxLabelsExample() {
   return (
     <div style={row}>
-      <Badge.Root color="red" variant="filled" size="m">
+      <Badge.Root color="red" variant="filled">
         Urgent
       </Badge.Root>
-      <Badge.Root color="blue" variant="light" size="m">
+      <Badge.Root color="blue" variant="light">
         Unread
       </Badge.Root>
-      <Badge.Root color="gray" variant="stroke" size="m">
+      <Badge.Root color="gray" variant="stroke">
         Archived
       </Badge.Root>
-      <Badge.Root color="sky" variant="lighter" size="m">
+      <Badge.Root color="sky" variant="lighter">
         <Badge.Icon>
-          <Icon name="field.email" />
+          <Icon surface="none" name="field.email" />
         </Badge.Icon>
         Newsletter
       </Badge.Root>
-      <Badge.Root color="purple" variant="light" size="m">
+      <Badge.Root color="purple" variant="light">
         <Badge.Dot />
         VIP list
       </Badge.Root>

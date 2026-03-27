@@ -7,80 +7,80 @@ export default function BadgeIconsSnippet() {
       <div className="row">
         <Badge.Root color="blue" variant="light" size="s">
           <Badge.Icon>
-            <Icon name="field.email" />
+            <Icon surface="none" name="field.email" />
           </Badge.Icon>
           Email
         </Badge.Root>
-        <Badge.Root color="blue" variant="light" size="m">
+        <Badge.Root color="blue" variant="light">
           <Badge.Icon>
-            <Icon name="field.email" />
+            <Icon surface="none" name="field.email" />
           </Badge.Icon>
           Email
         </Badge.Root>
         <Badge.Root color="blue" variant="light" size="l">
           <Badge.Icon>
-            <Icon name="field.email" />
+            <Icon surface="none" name="field.email" />
           </Badge.Icon>
           Email
         </Badge.Root>
         <Badge.Root color="blue" variant="light" size="xl">
           <Badge.Icon>
-            <Icon name="field.email" />
+            <Icon surface="none" name="field.email" />
           </Badge.Icon>
           Email
         </Badge.Root>
       </div>
 
       <div className="row">
-        <Badge.Root color="green" variant="filled" size="m">
+        <Badge.Root color="green" variant="filled">
           <Badge.Icon>
-            <Icon name="status.locked" />
+            <Icon surface="none" name="status.locked" />
           </Badge.Icon>
           Secured
         </Badge.Root>
-        <Badge.Root color="purple" variant="stroke" size="m">
+        <Badge.Root color="purple" variant="stroke">
           <Badge.Icon>
-            <Icon name="action.upload" />
+            <Icon surface="none" name="action.upload" />
           </Badge.Icon>
           Upload
         </Badge.Root>
-        <Badge.Root color="orange" variant="lighter" size="m">
+        <Badge.Root color="orange" variant="lighter">
           <Badge.Icon>
-            <Icon name="nav.home" />
+            <Icon surface="none" name="nav.home" />
           </Badge.Icon>
           Home
         </Badge.Root>
       </div>
 
       <div className="row">
-        <Badge.Root color="sky" variant="light" size="m">
+        <Badge.Root color="sky" variant="light">
           <Badge.Icon>
-            <Icon name="action.copy" />
+            <Icon surface="none" name="action.copy" />
           </Badge.Icon>
         </Badge.Root>
-        <Badge.Root color="teal" variant="light" size="m">
+        <Badge.Root color="teal" variant="light">
           <Badge.Icon>
-            <Icon name="nav.layoutGrid" />
+            <Icon surface="none" name="nav.layoutGrid" />
           </Badge.Icon>
         </Badge.Root>
-        <Badge.Root color="pink" variant="filled" size="m">
+        <Badge.Root color="pink" variant="filled">
           <Badge.Icon>
-            <Icon name="theme.light" />
+            <Icon surface="none" name="theme.light" />
           </Badge.Icon>
         </Badge.Root>
       </div>
 
       <div className="row">
-        <Badge.Root color="red" variant="light" size="m">
+        <Badge.Root color="red" variant="light">
           New
           <Badge.Icon>
-            <Icon name="nav.chevronRight" />
+            <Icon surface="none" name="nav.chevronRight" />
           </Badge.Icon>
         </Badge.Root>
-        <Badge.Root color="purple" variant="stroke" size="m">
+        <Badge.Root color="purple" variant="stroke">
           <Badge.Dot />
           <Badge.Icon>
-            <Icon name="status.locked" />
+            <Icon surface="none" name="status.locked" />
           </Badge.Icon>
           Protected
         </Badge.Root>

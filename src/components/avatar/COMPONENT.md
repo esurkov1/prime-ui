@@ -46,7 +46,7 @@ export function CanonicalAvatarDemo() {
       <Typography as="p" variant="body-small" tone="muted">
         Overlapping group + overflow
       </Typography>
-      <Avatar.Group.Root size="m" aria-label="Reviewers: three faces, two not shown">
+      <Avatar.Group.Root aria-label="Reviewers: three faces, two not shown">
         <Avatar.Root>
           <Avatar.Image src={sampleSrc} alt="" />
           <Avatar.Fallback>A</Avatar.Fallback>
@@ -63,9 +63,9 @@ export function CanonicalAvatarDemo() {
       <Typography as="p" variant="body-small" tone="muted">
         Icon-only fallback
       </Typography>
-      <Avatar.Root size="m" aria-label="Invitee, no photo yet">
+      <Avatar.Root aria-label="Invitee, no photo yet">
         <Avatar.Fallback>
-          <Icon name="field.email" size="l" tone="subtle" />
+          <Icon surface="none" name="field.email" size="l" tone="subtle" />
         </Avatar.Fallback>
       </Avatar.Root>
     </>

@@ -21,23 +21,23 @@ export default function CanonicalCompositionExample() {
           alignItems: "center",
         }}
       >
-        <Button.Root variant="primary" mode="filled" size="m">
+        <Button.Root variant="primary" mode="filled">
           <Button.Icon>
-            <Icon name="action.copy" size="s" />
+            <Icon surface="none" name="action.copy" size="s" />
           </Button.Icon>
           Copy link
         </Button.Root>
-        <Button.Root variant="neutral" mode="stroke" size="m">
+        <Button.Root variant="neutral" mode="stroke">
           <Button.Icon>
-            <Icon name="field.email" size="s" tone="subtle" />
+            <Icon surface="none" name="field.email" size="s" tone="subtle" />
           </Button.Icon>
           Contact sales
         </Button.Root>
-        <Button.Root variant="error" mode="lighter" size="m">
+        <Button.Root variant="error" mode="lighter">
           Remove from list
         </Button.Root>
       </div>
-      <Button.Root variant="primary" mode="filled" size="m" loading>
+      <Button.Root variant="primary" mode="filled" loading>
         <Button.Spinner />
         Saving…
       </Button.Root>

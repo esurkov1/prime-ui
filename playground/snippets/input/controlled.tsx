@@ -7,13 +7,12 @@ export default function InputControlledSnippet() {
 
   return (
     <Input.Root
-      size="m"
       label="Поиск по каталогу"
       hint={query ? `Сейчас в поле: «${query}»` : "Значение хранится в useState родителя"}
     >
       <Input.Wrapper>
         <Input.Icon side="start">
-          <Icon name="nav.layoutGrid" size="s" tone="subtle" />
+          <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
         </Input.Icon>
         <Input.Field
           placeholder="Название или артикул"

@@ -7,14 +7,14 @@ export default function ModalStatesSnippet() {
     <>
       <Modal.Root>
         <Modal.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Обычное закрытие
           </Button.Root>
         </Modal.Trigger>
         <Modal.Panel
           closeAriaLabel="Закрыть"
           description="Закрытие по Escape и по клику на затемнённый фон (если клик не на панели)."
-          icon={<Icon name="field.email" />}
+          icon={<Icon surface="raised" name="field.email" />}
           title="Стандартное поведение"
         >
           <p>Попробуйте Escape и клик по области вне белой панели.</p>
@@ -23,9 +23,9 @@ export default function ModalStatesSnippet() {
 
       <Modal.Root closeOnEscape={false} closeOnOverlayClick={false}>
         <Modal.Trigger>
-          <Button.Root size="m" variant="error" mode="lighter">
+          <Button.Root variant="error" mode="lighter">
             <Button.Icon>
-              <Icon name="status.locked" />
+              <Icon surface="raised" name="status.locked" />
             </Button.Icon>
             Только явные действия
           </Button.Root>
@@ -39,12 +39,12 @@ export default function ModalStatesSnippet() {
           }
           footer={
             <Modal.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Понятно
               </Button.Root>
             </Modal.Close>
           }
-          icon={<Icon name="status.locked" />}
+          icon={<Icon surface="raised" name="status.locked" />}
           showClose={false}
           title="Жёсткий режим"
         >

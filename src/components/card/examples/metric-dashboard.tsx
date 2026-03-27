@@ -45,7 +45,7 @@ export function MetricDashboardExample() {
 
       <Card.Root variant="mini-media">
         <Card.IconBox aria-hidden>
-          <Icon name="nav.layoutGrid" aria-hidden />
+          <Icon surface="none" name="nav.layoutGrid" aria-hidden />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>Sessions</Card.Label>

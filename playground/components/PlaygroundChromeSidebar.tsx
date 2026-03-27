@@ -61,6 +61,7 @@ import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Select } from "@/components/select/Select";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import iconSurfaceStyles from "@/icons/Icon.module.css";
 import { Sidebar, useSidebarContext } from "@/layout";
 
 import { getPlaygroundNavModel, type PlaygroundNavModel } from "../playgroundPages";
@@ -104,109 +105,113 @@ function toRoute(segment: string): string {
 
 const navIconProps = { size: 16, strokeWidth: 2 as const };
 
+function wrapPlaygroundNavIcon(node: React.ReactNode) {
+  return <span className={iconSurfaceStyles.surfaceRaised}>{node}</span>;
+}
+
 /** Иконка пункта по маршруту — соответствует смыслу раздела, а не только категории. */
 function pageIcon(segment: string): React.ReactNode {
   switch (segment) {
     case "color":
-      return <Palette {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Palette {...navIconProps} />);
     case "typography":
-      return <Type {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Type {...navIconProps} />);
     case "kbd":
-      return <Keyboard {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Keyboard {...navIconProps} />);
     case "divider":
-      return <Minus {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Minus {...navIconProps} />);
     case "buttons":
-      return <MousePointerClick {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<MousePointerClick {...navIconProps} />);
     case "button-group":
-      return <Layers {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Layers {...navIconProps} />);
     case "link-button":
-      return <Link2 {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Link2 {...navIconProps} />);
     case "checkbox":
-      return <CheckSquare {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<CheckSquare {...navIconProps} />);
     case "color-picker":
-      return <Pipette {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Pipette {...navIconProps} />);
     case "datepicker":
-      return <Calendar {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Calendar {...navIconProps} />);
     case "digit-input":
-      return <Hash {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Hash {...navIconProps} />);
     case "file-upload":
-      return <Upload {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Upload {...navIconProps} />);
     case "hint":
-      return <Info {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Info {...navIconProps} />);
     case "input":
-      return <TextCursorInput {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<TextCursorInput {...navIconProps} />);
     case "label":
-      return <Bookmark {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Bookmark {...navIconProps} />);
     case "radio":
-      return <CircleDot {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<CircleDot {...navIconProps} />);
     case "select":
-      return <ChevronDown {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<ChevronDown {...navIconProps} />);
     case "slider":
-      return <SlidersHorizontal {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<SlidersHorizontal {...navIconProps} />);
     case "switch":
-      return <ToggleLeft {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<ToggleLeft {...navIconProps} />);
     case "textarea":
-      return <AlignLeft {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<AlignLeft {...navIconProps} />);
     case "avatar":
-      return <UserRound {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<UserRound {...navIconProps} />);
     case "badge":
-      return <Award {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Award {...navIconProps} />);
     case "card":
-      return <LayoutDashboard {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<LayoutDashboard {...navIconProps} />);
     case "code-block":
-      return <Code2 {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Code2 {...navIconProps} />);
     case "data-table":
-      return <Table {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Table {...navIconProps} />);
     case "tag":
-      return <Tag {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Tag {...navIconProps} />);
     case "banner":
-      return <Megaphone {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Megaphone {...navIconProps} />);
     case "notification":
-      return <Bell {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Bell {...navIconProps} />);
     case "progress-bar":
-      return <StretchHorizontal {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<StretchHorizontal {...navIconProps} />);
     case "segmented-progress-bar":
-      return <BarChart3 {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<BarChart3 {...navIconProps} />);
     case "progress-circle":
-      return <CircleGauge {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<CircleGauge {...navIconProps} />);
     case "accordion":
-      return <ChevronsDownUp {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<ChevronsDownUp {...navIconProps} />);
     case "app-shell":
-      return <LayoutTemplate {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<LayoutTemplate {...navIconProps} />);
     case "page-content":
-      return <PanelTop {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<PanelTop {...navIconProps} />);
     case "scroll-container":
-      return <ScrollText {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<ScrollText {...navIconProps} />);
     case "sidebar":
-      return <PanelLeft {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<PanelLeft {...navIconProps} />);
     case "breadcrumb":
-      return <ChevronsRight {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<ChevronsRight {...navIconProps} />);
     case "pagination":
-      return <ChevronsLeftRight {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<ChevronsLeftRight {...navIconProps} />);
     case "segmented-control":
-      return <LayoutGrid {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<LayoutGrid {...navIconProps} />);
     case "stepper":
-      return <ListOrdered {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<ListOrdered {...navIconProps} />);
     case "tabs":
-      return <LayoutList {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<LayoutList {...navIconProps} />);
     case "command-menu":
-      return <Command {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Command {...navIconProps} />);
     case "drawer":
-      return <PanelRight {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<PanelRight {...navIconProps} />);
     case "dropdown":
-      return <ChevronDown {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<ChevronDown {...navIconProps} />);
     case "modal":
-      return <Maximize2 {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Maximize2 {...navIconProps} />);
     case "popover":
-      return <MessageSquare {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<MessageSquare {...navIconProps} />);
     case "tooltip":
-      return <CircleHelp {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<CircleHelp {...navIconProps} />);
     case "control-size":
-      return <Ruler {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Ruler {...navIconProps} />);
     case "example-frame":
-      return <Frame {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<Frame {...navIconProps} />);
     default:
-      return <FileText {...navIconProps} />;
+      return wrapPlaygroundNavIcon(<FileText {...navIconProps} />);
   }
 }
 
@@ -436,7 +441,7 @@ function PlaygroundUserMenu() {
       <Dropdown.Trigger>
         <Sidebar.IdentityButton
           leading={
-            <Avatar.Root size="m">
+            <Avatar.Root>
               <Avatar.Fallback>ES</Avatar.Fallback>
             </Avatar.Root>
           }
@@ -451,7 +456,7 @@ function PlaygroundUserMenu() {
           <Dropdown.Header>
             <Dropdown.HeaderRow>
               <Dropdown.HeaderLeading>
-                <Avatar.Root size="m">
+                <Avatar.Root>
                   <Avatar.Fallback>ES</Avatar.Fallback>
                 </Avatar.Root>
               </Dropdown.HeaderLeading>
@@ -518,7 +523,7 @@ function PlaygroundUserMenu() {
                 >
                   Тема интерфейса
                 </Sidebar.Text>
-                <Select.Root value={scheme} onChange={onSchemeChange} size="m">
+                <Select.Root value={scheme} onChange={onSchemeChange}>
                   <Select.Trigger aria-label="Схема темы playground">
                     <Select.Value />
                   </Select.Trigger>
@@ -543,7 +548,7 @@ function PlaygroundUserMenu() {
                 >
                   Бренд-тема
                 </Sidebar.Text>
-                <Select.Root value={preset} onChange={onPresetChange} size="m">
+                <Select.Root value={preset} onChange={onPresetChange}>
                   <Select.Trigger aria-label="Палитра бренд-темы playground">
                     <Select.Value />
                   </Select.Trigger>

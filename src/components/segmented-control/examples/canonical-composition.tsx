@@ -18,22 +18,22 @@ export default function CanonicalCompositionExample() {
         alignItems: "flex-start",
       }}
     >
-      <SegmentedControl.Root defaultValue="light" size="m">
+      <SegmentedControl.Root defaultValue="light">
         <SegmentedControl.Item value="light">
           <SegmentedControl.Icon>
-            <Icon name="theme.light" size="m" />
+            <Icon surface="none" name="theme.light" />
           </SegmentedControl.Icon>
           Light
         </SegmentedControl.Item>
         <SegmentedControl.Item value="dark">
           <SegmentedControl.Icon>
-            <Icon name="theme.dark" size="m" />
+            <Icon surface="none" name="theme.dark" />
           </SegmentedControl.Icon>
           Dark
         </SegmentedControl.Item>
       </SegmentedControl.Root>
 
-      <SegmentedControl.Root value={period} onValueChange={setPeriod} size="m">
+      <SegmentedControl.Root value={period} onValueChange={setPeriod}>
         <SegmentedControl.Item value="day">Day</SegmentedControl.Item>
         <SegmentedControl.Item value="week">Week</SegmentedControl.Item>
         <SegmentedControl.Item value="month">Month</SegmentedControl.Item>
@@ -50,16 +50,16 @@ export default function CanonicalCompositionExample() {
         <Typography.Root as="span" variant="body-compact" tone="muted">
           Layout preview
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="grid" size="m">
+        <SegmentedControl.Root defaultValue="grid">
           <SegmentedControl.Item value="feed">
             <SegmentedControl.Icon>
-              <Icon name="nav.home" size="m" />
+              <Icon surface="none" name="nav.home" />
             </SegmentedControl.Icon>
             <span className={styles.visuallyHidden}>Feed</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="grid">
             <SegmentedControl.Icon>
-              <Icon name="nav.layoutGrid" size="m" />
+              <Icon surface="none" name="nav.layoutGrid" />
             </SegmentedControl.Icon>
             <span className={styles.visuallyHidden}>Grid</span>
           </SegmentedControl.Item>

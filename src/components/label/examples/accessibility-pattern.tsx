@@ -9,7 +9,7 @@ export function AccessibilityPatternExample() {
     <>
       <Label.Root htmlFor="example-label-a11y-email" id="example-label-a11y-email-label">
         <Label.Icon>
-          <Icon aria-hidden name="field.email" />
+          <Icon surface="none" aria-hidden name="field.email" />
         </Label.Icon>
         Billing contact email
         <Label.Asterisk />

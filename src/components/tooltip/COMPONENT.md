@@ -52,11 +52,10 @@ export function CopyLinkHint() {
           type="button"
           variant="neutral"
           mode="ghost"
-          size="m"
           aria-label="Copy link"
         >
           <Button.Icon>
-            <Icon name="action.copy" size="s" tone="subtle" />
+            <Icon surface="none" name="action.copy" size="s" tone="subtle" />
           </Button.Icon>
         </Button.Root>
       </Tooltip.Trigger>

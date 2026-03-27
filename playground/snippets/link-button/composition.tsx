@@ -5,16 +5,16 @@ import { Icon } from "@/icons";
 export default function LinkButtonCompositionSnippet() {
   return (
     <div className="row rowAlignCenter rowGapMedium">
-      <LinkButton.Root href="#" size="m">
-        <Icon name="field.email" size="s" />
+      <LinkButton.Root href="#">
+        <Icon surface="none" name="field.email" size="s" />
         Ссылка с иконкой слева
       </LinkButton.Root>
-      <LinkButton.Root href="#" size="m">
+      <LinkButton.Root href="#">
         Иконка справа
-        <Icon name="action.close" size="s" />
+        <Icon surface="none" name="action.close" size="s" />
       </LinkButton.Root>
-      <LinkButton.Root href="#" size="m" aria-label="Открыть профиль">
-        <Icon name="field.email" size="s" />
+      <LinkButton.Root href="#" aria-label="Открыть профиль">
+        <Icon surface="none" name="field.email" size="s" />
       </LinkButton.Root>
     </div>
   );

@@ -8,14 +8,10 @@ export default function LoginEmailExample() {
   const [email, setEmail] = React.useState("");
 
   return (
-    <Input.Root
-      size="m"
-      label="Электронная почта"
-      hint="Мы отправим код подтверждения на этот адрес"
-    >
+    <Input.Root label="Электронная почта" hint="Мы отправим код подтверждения на этот адрес">
       <Input.Wrapper>
         <Input.Icon side="start">
-          <Icon name="field.email" size="s" tone="subtle" />
+          <Icon surface="none" name="field.email" size="s" tone="subtle" />
         </Input.Icon>
         <Input.Field
           type="email"

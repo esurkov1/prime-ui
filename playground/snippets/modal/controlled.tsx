@@ -11,10 +11,10 @@ export default function ModalControlledSnippet() {
 
   return (
     <div className={styles.controlledRow}>
-      <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
+      <Button.Root variant="primary" onClick={() => setOpen(true)}>
         Открыть извне
       </Button.Root>
-      <Button.Root size="m" mode="stroke" variant="neutral" onClick={() => setOpen(false)}>
+      <Button.Root mode="stroke" variant="neutral" onClick={() => setOpen(false)}>
         Закрыть извне
       </Button.Root>
 
@@ -28,12 +28,10 @@ export default function ModalControlledSnippet() {
           }
           footer={
             <Modal.Close>
-              <Button.Root size="m" variant="primary">
-                Готово
-              </Button.Root>
+              <Button.Root variant="primary">Готово</Button.Root>
             </Modal.Close>
           }
-          icon={<Icon name="action.copy" />}
+          icon={<Icon surface="raised" name="action.copy" />}
           title="Состояние снаружи"
         >
           <p>Триггер внутри разметки не обязателен: окно управляется родителем.</p>

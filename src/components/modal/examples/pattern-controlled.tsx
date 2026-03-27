@@ -10,10 +10,10 @@ export default function ModalPatternControlledExample() {
 
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--prime-sys-spacing-x2)" }}>
-      <Button.Root size="m" variant="primary" onClick={() => setOpen(true)}>
+      <Button.Root variant="primary" onClick={() => setOpen(true)}>
         Open from outside
       </Button.Root>
-      <Button.Root size="m" mode="stroke" variant="neutral" onClick={() => setOpen(false)}>
+      <Button.Root mode="stroke" variant="neutral" onClick={() => setOpen(false)}>
         Close from outside
       </Button.Root>
 
@@ -23,12 +23,10 @@ export default function ModalPatternControlledExample() {
           description="Open and close are driven by `open` and `onOpenChange` on the root."
           footer={
             <Modal.Close>
-              <Button.Root size="m" variant="primary">
-                Done
-              </Button.Root>
+              <Button.Root variant="primary">Done</Button.Root>
             </Modal.Close>
           }
-          icon={<Icon name="action.copy" />}
+          icon={<Icon surface="raised" name="action.copy" />}
           title="Externally controlled"
         >
           <p>No in-tree trigger is required: the parent owns visibility.</p>

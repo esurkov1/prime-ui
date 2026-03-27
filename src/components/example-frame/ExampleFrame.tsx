@@ -245,9 +245,9 @@ function ExampleFrameToolbar() {
             >
               <Button.Icon>
                 {ctx.colorScheme === "light" ? (
-                  <Icon name="theme.dark" size="s" tone="subtle" />
+                  <Icon surface="none" name="theme.dark" size="s" tone="subtle" />
                 ) : (
-                  <Icon name="theme.light" size="s" tone="subtle" />
+                  <Icon surface="none" name="theme.light" size="s" tone="subtle" />
                 )}
               </Button.Icon>
             </Button.Root>
@@ -261,7 +261,7 @@ function ExampleFrameToolbar() {
             aria-label={copyLabel}
           >
             <Button.Icon>
-              <Icon name="action.copy" size="s" tone="subtle" />
+              <Icon surface="none" name="action.copy" size="s" tone="subtle" />
             </Button.Icon>
           </Button.Root>
         </div>

@@ -22,7 +22,7 @@ export default function CardMetricSnippet() {
       <Card.Root variant="metric">
         <Card.HeaderRow>
           <Card.Lead>
-            <Icon name="field.email" />
+            <Icon surface="raised" name="field.email" />
           </Card.Lead>
           <Card.Value>98.2%</Card.Value>
         </Card.HeaderRow>

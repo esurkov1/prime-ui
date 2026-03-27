@@ -36,14 +36,14 @@ export default function ModalPatternPortalAndScrollExample() {
         {portalHost ? (
           <Modal.Root>
             <Modal.Trigger>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Portal into host
               </Button.Root>
             </Modal.Trigger>
             <Modal.Panel
               closeAriaLabel="Close"
               container={portalHost}
-              icon={<Icon name="nav.layoutGrid" />}
+              icon={<Icon surface="raised" name="nav.layoutGrid" />}
               title="Custom container"
             >
               <p>Portal content is attached under the host element above.</p>
@@ -54,7 +54,7 @@ export default function ModalPatternPortalAndScrollExample() {
 
       <Modal.Root>
         <Modal.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Long body (scroll)
           </Button.Root>
         </Modal.Trigger>
@@ -64,12 +64,10 @@ export default function ModalPatternPortalAndScrollExample() {
           description="Cap the body height with `bodyStyle` (or `bodyClassName`) so only the panel scrolls."
           footer={
             <Modal.Close>
-              <Button.Root size="m" variant="primary">
-                Close
-              </Button.Root>
+              <Button.Root variant="primary">Close</Button.Root>
             </Modal.Close>
           }
-          icon={<Icon name="nav.itemDot" />}
+          icon={<Icon surface="raised" name="nav.itemDot" />}
           title="Scroll inside panel"
         >
           {longLines.map((line) => (

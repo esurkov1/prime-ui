@@ -28,7 +28,7 @@ export function FileUploadDragAreaExample() {
       >
         <FileUpload.DropBody>
           <FileUpload.Icon>
-            <Icon name="action.upload" size="l" tone="subtle" />
+            <Icon surface="none" name="action.upload" size="l" tone="subtle" />
           </FileUpload.Icon>
           <FileUpload.Title tone="muted">
             Перетащите файлы сюда или{" "}

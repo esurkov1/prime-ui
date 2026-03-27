@@ -6,13 +6,13 @@ export default function TagWithIconSnippet() {
     <div className="row rowGapTight">
       <Tag.Root>
         <Tag.Icon>
-          <Icon name="status.locked" />
+          <Icon surface="none" name="status.locked" />
         </Tag.Icon>
         <span>Secured</span>
       </Tag.Root>
       <Tag.Root>
         <Tag.Icon>
-          <Icon name="field.email" />
+          <Icon surface="none" name="field.email" />
         </Tag.Icon>
         <span>Newsletter</span>
       </Tag.Root>

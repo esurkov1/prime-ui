@@ -29,7 +29,7 @@ export default function FileUploadCircleModalSnippet() {
             >
               <FileUpload.DropBody className={styles.dropBody}>
                 <FileUpload.Icon>
-                  <Icon name="action.upload" size="l" tone="subtle" />
+                  <Icon surface="none" name="action.upload" size="l" tone="subtle" />
                 </FileUpload.Icon>
                 <FileUpload.Title tone="muted" className={styles.dropTitle}>
                   Drag and drop your images here
@@ -40,21 +40,16 @@ export default function FileUploadCircleModalSnippet() {
           <Divider.Root variant="text" align="center">
             or
           </Divider.Root>
-          <Button.Root
-            variant="neutral"
-            mode="lighter"
-            size="m"
-            onClick={() => inputRef.current?.click()}
-          >
+          <Button.Root variant="neutral" mode="lighter" onClick={() => inputRef.current?.click()}>
             Upload a photo
           </Button.Root>
         </div>
       </div>
       <footer className={styles.footer}>
-        <Button.Root size="m" variant="neutral" mode="stroke" className={styles.footerBtn}>
+        <Button.Root variant="neutral" mode="stroke" className={styles.footerBtn}>
           Cancel
         </Button.Root>
-        <Button.Root size="m" variant="primary" className={styles.footerBtn}>
+        <Button.Root variant="primary" className={styles.footerBtn}>
           Apply changes
         </Button.Root>
       </footer>

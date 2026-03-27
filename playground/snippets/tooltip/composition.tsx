@@ -12,11 +12,11 @@ export default function TooltipCompositionSnippet() {
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
-            <LinkButton.Root href="#" size="m" onClick={(e) => e.preventDefault()}>
+            <LinkButton.Root href="#" onClick={(e) => e.preventDefault()}>
               Условия акции
             </LinkButton.Root>
           </Tooltip.Trigger>
-          <Tooltip.Content size="m">
+          <Tooltip.Content>
             <Typography.Root variant="body-small" as="p" className={styles.tooltipContentP}>
               Скидка действует до конца месяца при заказе от 3000 ₽.
             </Typography.Root>
@@ -31,11 +31,10 @@ export default function TooltipCompositionSnippet() {
               type="button"
               variant="neutral"
               mode="ghost"
-              size="m"
               aria-label="Копировать ссылку"
             >
               <Button.Icon>
-                <Icon name="action.copy" size="s" tone="subtle" />
+                <Icon surface="none" name="action.copy" size="s" tone="subtle" />
               </Button.Icon>
             </Button.Root>
           </Tooltip.Trigger>

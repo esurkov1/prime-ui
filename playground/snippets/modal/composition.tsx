@@ -17,7 +17,7 @@ export default function ModalCompositionSnippet() {
 
       <Modal.Root>
         <Modal.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Только шапка и футер
           </Button.Root>
         </Modal.Trigger>
@@ -26,13 +26,11 @@ export default function ModalCompositionSnippet() {
           footer={
             <>
               <Modal.Close>
-                <Button.Root size="m" variant="neutral" mode="stroke">
+                <Button.Root variant="neutral" mode="stroke">
                   Отмена
                 </Button.Root>
               </Modal.Close>
-              <Button.Root size="m" variant="primary">
-                Подтвердить
-              </Button.Root>
+              <Button.Root variant="primary">Подтвердить</Button.Root>
             </>
           }
           title="Подтверждение без контента"
@@ -41,13 +39,13 @@ export default function ModalCompositionSnippet() {
 
       <Modal.Root>
         <Modal.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Шапка и контент без футера
           </Button.Root>
         </Modal.Trigger>
         <Modal.Panel
           description="Футер не нужен, если нет явных действий."
-          icon={<Icon name="nav.itemDot" />}
+          icon={<Icon surface="raised" name="nav.itemDot" />}
           title="Только информация"
         >
           <Typography.Root as="p" variant="body-default">
@@ -58,7 +56,7 @@ export default function ModalCompositionSnippet() {
 
       <Modal.Root>
         <Modal.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Только шапка (полный блок)
           </Button.Root>
         </Modal.Trigger>
@@ -70,7 +68,7 @@ export default function ModalCompositionSnippet() {
 
       <Modal.Root>
         <Modal.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Черновик доставки
           </Button.Root>
         </Modal.Trigger>
@@ -79,19 +77,17 @@ export default function ModalCompositionSnippet() {
           footer={
             <>
               <Modal.Close>
-                <Button.Root size="m" variant="neutral" mode="stroke">
+                <Button.Root variant="neutral" mode="stroke">
                   Отмена
                 </Button.Root>
               </Modal.Close>
-              <Button.Root size="m" variant="primary">
-                Сохранить
-              </Button.Root>
+              <Button.Root variant="primary">Сохранить</Button.Root>
             </>
           }
-          icon={<Icon name="field.email" />}
+          icon={<Icon surface="raised" name="field.email" />}
           title="Контакт получателя"
         >
-          <Input.Root label="Телефон курьера" size="m" hint="Формат: +7 и далее цифры">
+          <Input.Root label="Телефон курьера" hint="Формат: +7 и далее цифры">
             <Input.Wrapper>
               <Input.Field placeholder="+7 900 000-00-00" type="tel" />
             </Input.Wrapper>
@@ -114,9 +110,7 @@ export default function ModalCompositionSnippet() {
           }
           footer={
             <Modal.Close>
-              <Button.Root size="m" variant="primary">
-                Принимаю
-              </Button.Root>
+              <Button.Root variant="primary">Принимаю</Button.Root>
             </Modal.Close>
           }
           title="Согласие на обработку данных"

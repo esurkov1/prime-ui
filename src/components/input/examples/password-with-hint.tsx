@@ -8,7 +8,7 @@ export default function PasswordWithHintExample() {
   const [password, setPassword] = React.useState("");
 
   return (
-    <Input.Root size="m" label="Пароль" hint="Не менее 8 символов, буквы и цифры">
+    <Input.Root label="Пароль" hint="Не менее 8 символов, буквы и цифры">
       <Input.Wrapper>
         <Input.Field
           type="password"
@@ -20,7 +20,7 @@ export default function PasswordWithHintExample() {
           required
         />
         <Input.Icon side="end">
-          <Icon name="status.locked" size="s" tone="subtle" />
+          <Icon surface="none" name="status.locked" size="s" tone="subtle" />
         </Input.Icon>
       </Input.Wrapper>
     </Input.Root>

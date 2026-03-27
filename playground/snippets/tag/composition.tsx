@@ -6,7 +6,7 @@ export default function TagCompositionSnippet() {
     <div className="row rowGapTight rowAlignCenter">
       <Tag.Root>
         <Tag.Icon>
-          <Icon name="field.email" />
+          <Icon surface="none" name="field.email" />
         </Tag.Icon>
         <span>Рассылка</span>
       </Tag.Root>

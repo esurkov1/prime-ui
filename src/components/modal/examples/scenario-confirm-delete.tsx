@@ -8,7 +8,7 @@ export default function ModalConfirmDeleteExample() {
   return (
     <Modal.Root>
       <Modal.Trigger>
-        <Button.Root size="m" variant="error" mode="stroke">
+        <Button.Root variant="error" mode="stroke">
           Delete project
         </Button.Root>
       </Modal.Trigger>
@@ -17,16 +17,16 @@ export default function ModalConfirmDeleteExample() {
         footer={
           <>
             <Modal.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Cancel
               </Button.Root>
             </Modal.Close>
-            <Button.Root size="m" variant="error" type="button">
+            <Button.Root variant="error" type="button">
               Delete permanently
             </Button.Root>
           </>
         }
-        icon={<Icon name="action.close" tone="subtle" />}
+        icon={<Icon surface="raised" name="action.close" tone="subtle" />}
         title="Delete “Northwind rollout”?"
       >
         <Typography.Root as="p" variant="body-default">

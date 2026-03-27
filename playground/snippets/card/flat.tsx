@@ -8,7 +8,7 @@ export default function CardFlatSnippet() {
     <div className={styles.row}>
       <Card.Root variant="mini">
         <Card.IconBox>
-          <Icon name="field.email" />
+          <Icon surface="none" name="field.email" />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>Default (shadow)</Card.Label>
@@ -17,7 +17,7 @@ export default function CardFlatSnippet() {
       </Card.Root>
       <Card.Root variant="mini" flat>
         <Card.IconBox>
-          <Icon name="field.email" />
+          <Icon surface="none" name="field.email" />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>flat</Card.Label>

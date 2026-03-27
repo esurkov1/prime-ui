@@ -9,9 +9,9 @@ function StrictDrawer() {
   return (
     <Drawer.Root closeOnEscape={false} closeOnOverlayClick={false}>
       <Drawer.Trigger>
-        <Button.Root size="m" variant="error" mode="lighter">
+        <Button.Root variant="error" mode="lighter">
           <Button.Icon>
-            <Icon name="status.locked" />
+            <Icon surface="raised" name="status.locked" />
           </Button.Icon>
           Строгий режим
         </Button.Root>
@@ -30,13 +30,11 @@ function StrictDrawer() {
           </Drawer.Body>
           <Drawer.Footer>
             <Drawer.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Отмена
               </Button.Root>
             </Drawer.Close>
-            <Button.Root size="m" variant="primary">
-              Продолжить
-            </Button.Root>
+            <Button.Root variant="primary">Продолжить</Button.Root>
           </Drawer.Footer>
         </Drawer.Content>
       </Drawer.Portal>
@@ -49,7 +47,7 @@ function NoHeaderCloseDrawer() {
   return (
     <Drawer.Root>
       <Drawer.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Без крестика в шапке
         </Button.Root>
       </Drawer.Trigger>
@@ -67,9 +65,7 @@ function NoHeaderCloseDrawer() {
           </Drawer.Body>
           <Drawer.Footer>
             <Drawer.Close>
-              <Button.Root size="m" variant="primary">
-                Закрыть
-              </Button.Root>
+              <Button.Root variant="primary">Закрыть</Button.Root>
             </Drawer.Close>
           </Drawer.Footer>
         </Drawer.Content>

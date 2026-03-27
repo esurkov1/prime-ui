@@ -13,7 +13,7 @@ export default function BreadcrumbCompositionSnippet() {
             lineHeight: 0,
           }}
         >
-          <Icon name="nav.home" tone="default" />
+          <Icon surface="raised" name="nav.home" tone="default" />
         </span>
       </Breadcrumb.Item>
       <Breadcrumb.Separator>/</Breadcrumb.Separator>

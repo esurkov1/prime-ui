@@ -4,9 +4,9 @@ import { Icon, Label } from "prime-ui-kit";
 export function WithIconExample() {
   return (
     <>
-      <Label.Root size="m" htmlFor="example-label-icon-upload">
+      <Label.Root htmlFor="example-label-icon-upload">
         <Label.Icon>
-          <Icon aria-hidden name="action.upload" />
+          <Icon surface="none" aria-hidden name="action.upload" />
         </Label.Icon>
         Attachment
       </Label.Root>

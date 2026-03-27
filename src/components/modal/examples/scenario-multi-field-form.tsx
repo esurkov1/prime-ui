@@ -17,7 +17,7 @@ export default function ModalMultiFieldFormExample() {
   return (
     <Modal.Root>
       <Modal.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           New support ticket
         </Button.Root>
       </Modal.Trigger>
@@ -26,16 +26,16 @@ export default function ModalMultiFieldFormExample() {
         footer={
           <>
             <Modal.Close>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Cancel
               </Button.Root>
             </Modal.Close>
-            <Button.Root size="m" variant="primary" type="submit" form="modal-ticket-form">
+            <Button.Root variant="primary" type="submit" form="modal-ticket-form">
               Submit ticket
             </Button.Root>
           </>
         }
-        icon={<Icon name="nav.itemDot" tone="subtle" />}
+        icon={<Icon surface="raised" name="nav.itemDot" tone="subtle" />}
         title="Contact support"
       >
         <form
@@ -43,12 +43,12 @@ export default function ModalMultiFieldFormExample() {
           id="modal-ticket-form"
           onSubmit={(e) => e.preventDefault()}
         >
-          <Input.Root label="Subject" size="m">
+          <Input.Root label="Subject">
             <Input.Wrapper>
               <Input.Field name="subject" placeholder="Short summary" />
             </Input.Wrapper>
           </Input.Root>
-          <Select.Root placeholder="Area" size="m">
+          <Select.Root placeholder="Area">
             <Select.Trigger>
               <Select.Value />
             </Select.Trigger>
@@ -59,14 +59,8 @@ export default function ModalMultiFieldFormExample() {
             </Select.Content>
           </Select.Root>
           <div className={styles.labeledControl}>
-            <Label.Root htmlFor={messageId} size="m">
-              Message
-            </Label.Root>
-            <Textarea.Root
-              id={messageId}
-              placeholder="Steps, expected result, actual result"
-              size="m"
-            />
+            <Label.Root htmlFor={messageId}>Message</Label.Root>
+            <Textarea.Root id={messageId} placeholder="Steps, expected result, actual result" />
           </div>
         </form>
       </Modal.Panel>

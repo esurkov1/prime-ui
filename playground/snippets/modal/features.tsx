@@ -19,14 +19,14 @@ export default function ModalFeaturesSnippet() {
         {portalHost ? (
           <Modal.Root>
             <Modal.Trigger>
-              <Button.Root size="m" variant="neutral" mode="stroke">
+              <Button.Root variant="neutral" mode="stroke">
                 Портал в контейнер
               </Button.Root>
             </Modal.Trigger>
             <Modal.Panel
               closeAriaLabel="Закрыть"
               container={portalHost}
-              icon={<Icon name="nav.layoutGrid" />}
+              icon={<Icon surface="raised" name="nav.layoutGrid" />}
               title="Свой контейнер"
             >
               <p>Содержимое портала — дочерний узел выделенной области выше.</p>
@@ -37,7 +37,7 @@ export default function ModalFeaturesSnippet() {
 
       <Modal.Root>
         <Modal.Trigger>
-          <Button.Root size="m" variant="neutral" mode="stroke">
+          <Button.Root variant="neutral" mode="stroke">
             Длинное содержимое с прокруткой
           </Button.Root>
         </Modal.Trigger>
@@ -52,12 +52,10 @@ export default function ModalFeaturesSnippet() {
           }
           footer={
             <Modal.Close>
-              <Button.Root size="m" variant="primary">
-                Закрыть
-              </Button.Root>
+              <Button.Root variant="primary">Закрыть</Button.Root>
             </Modal.Close>
           }
-          icon={<Icon name="nav.itemDot" />}
+          icon={<Icon surface="raised" name="nav.itemDot" />}
           title="Прокрутка внутри панели"
         >
           {[

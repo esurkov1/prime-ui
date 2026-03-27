@@ -9,11 +9,11 @@ export default function TooltipCompositionExample() {
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
-            <LinkButton.Root href="#" size="m" onClick={(e) => e.preventDefault()}>
+            <LinkButton.Root href="#" onClick={(e) => e.preventDefault()}>
               Promotion terms
             </LinkButton.Root>
           </Tooltip.Trigger>
-          <Tooltip.Content size="m">
+          <Tooltip.Content>
             <Typography.Root variant="body-small" as="p" className={styles.tooltipContentP}>
               Discount applies through month-end on orders over $100.
             </Typography.Root>
@@ -24,15 +24,9 @@ export default function TooltipCompositionExample() {
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
-            <Button.Root
-              type="button"
-              variant="neutral"
-              mode="ghost"
-              size="m"
-              aria-label="Copy link"
-            >
+            <Button.Root type="button" variant="neutral" mode="ghost" aria-label="Copy link">
               <Button.Icon>
-                <Icon name="action.copy" size="s" tone="subtle" />
+                <Icon surface="none" name="action.copy" size="s" tone="subtle" />
               </Button.Icon>
             </Button.Root>
           </Tooltip.Trigger>

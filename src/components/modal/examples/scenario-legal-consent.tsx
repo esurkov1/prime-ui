@@ -8,7 +8,7 @@ export default function ModalLegalConsentExample() {
   return (
     <Modal.Root closeOnOverlayClick={false}>
       <Modal.Trigger>
-        <Button.Root size="m" variant="neutral" mode="stroke">
+        <Button.Root variant="neutral" mode="stroke">
           Review terms
         </Button.Root>
       </Modal.Trigger>
@@ -16,12 +16,12 @@ export default function ModalLegalConsentExample() {
         description="Please read the following before continuing to use the service."
         footer={
           <Modal.Close>
-            <Button.Root size="m" variant="primary" type="button">
+            <Button.Root variant="primary" type="button">
               I agree
             </Button.Root>
           </Modal.Close>
         }
-        icon={<Icon name="status.locked" tone="subtle" />}
+        icon={<Icon surface="raised" name="status.locked" tone="subtle" />}
         title="Terms and data processing"
       >
         <Typography.Root as="p" variant="body-default">
