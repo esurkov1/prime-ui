@@ -33,6 +33,10 @@
   background: transparent;
 }
 
+/**
+ * Прокручиваемая колонка контента: канон полей к краю колонки (`x6`) встроен сюда — отдельная обёртка не нужна.
+ * Маркер для отладки: `data-app-shell-main-padded`.
+ */
 .layoutMain {
   box-sizing: border-box;
   display: flex;
@@ -40,21 +44,8 @@
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  padding: 0;
   margin: 0;
   background: transparent;
-}
-
-/**
- * Единственный канон полей контентной колонки внутри `<main>` (как playground `PlaygroundLayout`).
- * Не дублировать такие же поля вручную и не оборачивать маршрут вторым инсетом.
- */
-.layoutMainInset {
-  box-sizing: border-box;
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-  width: 100%;
   padding-block: var(--prime-sys-spacing-x6);
   padding-inline: var(--prime-sys-spacing-x6);
 }

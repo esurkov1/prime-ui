@@ -4,13 +4,17 @@
 
 Семантические примитивы **контентной колонки**: **`PageContent.Section`** (регион страницы **`<section>`** без собственных внешних полей), **`PageContent.Root`** (обёртка страницы с опциональным **`maxWidth`**, **без** дублирующих полей к краю колонки), **`PageContent.Title`** → **`<h1>`**, **`PageContent.Description`** с **`measure`**, **`PageContent.Body`**. Типографика — токены кита.
 
-- **В приложении с `AppShell.Template`** внешние поля колонки задаёт **`AppShell.MainInset`** (встроен в шаблон). Тогда для маршрута чаще берут **`PageContent.Section`** + **`Header`** / **`Body`**, либо **`PageContent.Root`** только ради **`maxWidth`**, без ожидания «второго» слоя полей.
-- **`PageContent.Root`** — когда нужен **`maxWidth`** (`full` | `readable` | `wide`; по умолчанию **`full`**) и структура шапки/тела; краевые поля **не** входят в корень — их даёт **`MainInset`**.
+- **С `AppShell.Template`** краевые поля колонки задаёт **`AppShell.Main`**. Для маршрута чаще берут **`PageContent.Section`** + **`Header`** / **`Body`**, либо **`PageContent.Root`** только ради **`maxWidth`**, без второго слоя полей.
+- **`PageContent.Root`** — когда нужен **`maxWidth`** (`full` | `readable` | `wide`; по умолчанию **`full`**) и структура шапки/тела; краевые поля **не** входят в корень — их даёт **`AppShell.Main`**.
 - **`Description`** с **`measure="full"`**, если ширину уже ограничивает родитель; по умолчанию **`measure="readable"`** — узкая мера лида ~65ch.
+
+### Краевые поля колонки
+
+Они **не** задаются **`PageContent`**: их даёт **`AppShell.Main`**. Если контент «прилип» к краю экрана, проверьте шелл и стили — см. [AppShell](../../layout/app-shell/COMPONENT.md).
 
 ## Composition
 
-- **`PageContent.Root`** — внешняя обёртка: **`maxWidth`** через `data-max-width` (кроме `full`), **padding по краям колонки — 0** (поля у **`AppShell.MainInset`**).
+- **`PageContent.Root`** — внешняя обёртка: **`maxWidth`** через `data-max-width` (кроме `full`), **padding по краям колонки — 0** (поля у **`AppShell.Main`**).
 - **`PageContent.Section`** — **`<section>`**; сочетайте с **`aria-labelledby`** на заголовок **`PageContent.Title`**.
 - **`PageContent.Header`** — заголовок + описание с отступами.
 - **`PageContent.Title`** — **`<h1>`** (один на вью).
@@ -62,7 +66,7 @@ export function AccountPage() {
 ## Rules
 
 - На вью — **один** `h1` через **`PageContent.Title`**.
-- **Не** вкладывайте **`PageContent.Root`** в область, где уже есть тот же слой полей, что у **`AppShell.MainInset`** — у корня **нет** своих краевых полей; при необходимости используйте **`Section`**.
+- **Не** вкладывайте **`PageContent.Root`** так, чтобы дублировать краевые поля, которые уже даёт **`AppShell.Main`**.
 - **`Description`**: по умолчанию узкая мера; **`measure="full"`**, когда колонка уже ограничена снаружи.
 
 ## API
@@ -120,4 +124,4 @@ export function AccountPage() {
 ## Related
 
 - [Typography](../typography/COMPONENT.md) — роли текста на странице.
-- [AppShell](../../layout/app-shell/COMPONENT.md) — сетка и **`MainInset`**.
+- [AppShell](../../layout/app-shell/COMPONENT.md) — сетка и **`Main`**.

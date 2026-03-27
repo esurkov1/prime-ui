@@ -25,6 +25,7 @@ A **React 19** component library built with **CSS Modules**, **design tokens** a
 - [Component catalog](#component-catalog)
 - [Package exports (`package.json` / `exports`)](#package-exports-packagejson--exports)
 - [TypeScript](#typescript)
+- [Application shell layout](#application-shell-layout)
 - [Where component docs live](#where-component-docs-live)
 - [License](#license)
 
@@ -203,7 +204,7 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Navigation & layout | **Stepper** | Multi-step flow on `<ol>` / `<li>` plus horizontal/vertical primitives. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) |
 | Navigation & layout | **Tabs** | Tablist, indicator, one visible panel at a time. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) |
 | Navigation & layout | **PageContent** | Main column: `Section` or `Root`, title, description (`measure`), body. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) |
-| Navigation & layout | **AppShell** | Application shell: grid root, nav slot, main region, optional full viewport. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/layout/app-shell) |
+| Navigation & layout | **AppShell** | Application shell: grid root, nav slot, scrollable **`main`** with page gutters (`x6`) on **`Main`**. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) |
 | Navigation & layout | **ScrollContainer** | Scrollable region with horizontal or vertical axis (overflow wrapper). | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/scroll-container) |
 | Data | **DataTable** | Table with scroll, sorting, pagination or infinite scroll, sticky regions. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) |
 | Display & content | **Avatar** | Circular avatar: image, fallback, group with overflow cell. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) |
@@ -252,7 +253,15 @@ Type definitions ship with the package (`dist/*.d.ts`).
 - **Why separate files (not one `examples.md`):** each file is one scenario with a clear filename — easier for humans to navigate and for LLMs to retrieve the right chunk without loading an entire mega-document.
 - **In the installed package:** `COMPONENT.md` and `examples/**` are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/button/examples/` and `node_modules/prime-ui-kit/src/layout/sidebar/COMPONENT.md`.
 
-**AppShell**, **ExampleFrame**, and **ScrollContainer** do not have a dedicated `COMPONENT.md`; refer to the linked source folders and types in the `.tsx` files.
+**ExampleFrame** and **ScrollContainer** do not have a dedicated `COMPONENT.md`; refer to the linked source folders and types in the `.tsx` files.
+
+---
+
+## Application shell layout
+
+Use **`AppShell.Template`** so routes render inside **`AppShell.Main`**, which applies canonical **`--prime-sys-spacing-x6`** padding (no extra wrapper). **`PageContent.Root`** does **not** add edge padding; pair **`PageContent`** with the shell. Import **`prime-ui-kit/styles.css`** and **`prime-ui-kit/bundle.css`** so layout CSS applies.
+
+**Full diagram, token table, and troubleshooting** (“margins disappeared”): [src/layout/app-shell/COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md).
 
 ---
 

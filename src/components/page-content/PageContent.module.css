@@ -5,7 +5,7 @@
   min-width: 0;
 }
 
-/* Внешние поля колонки даёт `AppShell.Template` → `AppShell.MainInset`; здесь только max-width и внутренняя сетка. */
+/* Внешние поля колонки даёт `AppShell.Main` (в составе `AppShell.Template`); здесь только max-width и внутренняя сетка. */
 .root {
   box-sizing: border-box;
   width: 100%;

@@ -72,19 +72,17 @@ export default function SidebarExampleAppShellNav() {
           </Sidebar.Root>
         }
       >
-        <div className={styles.exampleMainInset}>
-          <Typography.Root
-            as="p"
-            variant="body-default"
-            tone="muted"
-            className={styles.mainPlaceholder}
-          >
-            Main scrolls inside <span className={styles.code}>AppShell.Main</span>; the sidebar
-            stays in the nav column. Use{" "}
-            <span className={styles.code}>sidebarSlot=&quot;page-nav&quot;</span> so spacing and
-            grid behavior match the app template.
-          </Typography.Root>
-        </div>
+        <Typography.Root
+          as="p"
+          variant="body-default"
+          tone="muted"
+          className={styles.mainPlaceholder}
+        >
+          Main scrolls inside <span className={styles.code}>AppShell.Main</span> (page gutters are
+          on <span className={styles.code}>main</span>); the sidebar stays in the nav column. Use{" "}
+          <span className={styles.code}>sidebarSlot=&quot;page-nav&quot;</span> so spacing and grid
+          behavior match the app template.
+        </Typography.Root>
       </AppShell.Template>
     </div>
   );

@@ -21,16 +21,6 @@
   min-height: 0;
 }
 
-/* Поля колонки контента (раньше `mainProps.variant="page"` на `AppShell.Main`). */
-.exampleMainInset {
-  box-sizing: border-box;
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  padding-block: var(--prime-sys-spacing-x6);
-  padding-inline: var(--prime-sys-spacing-x6);
-}
-
 .mainPlaceholder {
   box-sizing: border-box;
   margin: 0;

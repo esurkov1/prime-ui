@@ -2,19 +2,68 @@
 
 ## About
 
-Каркас приложения: **сетка** `nav` + **`main`** (прокручиваемая колонка). **`AppShell.Template`** — каноничный способ собрать оболочку: он задаёт **`data-layout-template="app"`** (зазор у колонки nav при открытом **Sidebar** с `sidebarSlot="page-nav"`), **всегда** оборачивает дочерние маршруты в **`AppShell.MainInset`** с едиными полями контентной колонки (**`--prime-sys-spacing-x6`** по вертикали и горизонтали — тот же формат, что в playground до выделения в кит), и при монтировании **внутри React Router** сбрасывает прокрутку **`main`** на смене пути.
+Каркас приложения: **сетка** `nav` + **`main`** (прокручиваемая колонка). Поля контентной колонки (**`--prime-sys-spacing-x6`** по вертикали и горизонтали) **встроены в `AppShell.Main`** — отдельной обёртки нет.
 
-**Не** добавляйте второй слой с теми же полями вокруг страницы: используйте **`PageContent.Section`** или **`PageContent.Root`** (без дублирующих внешних отступов у корня — их даёт **`MainInset`**).
+**`AppShell.Template`** — рекомендуемая сборка: **`Root`** + **`Nav`** + **`Main`**, дети шаблона рендерятся **прямо внутри** `<main>`, плюс при монтировании **внутри React Router** сбрасывается прокрутка **`main`** при смене пути.
+
+**Не** дублируйте те же поля вокруг страницы: внутри **`main`** используйте **`PageContent.Section`** или **`PageContent.Root`** (у **`PageContent`** краевых полей к колонке нет — их даёт **`Main`**).
+
+---
+
+## Схема слоёв и отступов
+
+Внешние поля у контента в правой колонке задаёт **сам** элемент **`AppShell.Main`** (класс **`layoutMain`** в сборке; в DOM — **`data-app-shell-main-padded`** для проверки в DevTools).
+
+### Дерево регионов
+
+```
+┌─ AppShell.Root ───────────────────────────────────────────── fillViewport → высота вьюпорта, без padding
+│    data-layout-template="app" (у Template)
+│
+├── AppShell.Nav          data-layout-region="nav"            padding: 0 у оболочки; внутренние отступы — у Sidebar
+│    └── …
+│
+└── AppShell.Main         <main> ScrollContainer, прокрутка по вертикали
+     data-layout-region="main"
+     data-app-shell-main-padded=""
+     padding-block / padding-inline = var(--prime-sys-spacing-x6)   ← канон полей колонки
+     └── маршруты: <Outlet /> / страницы / PageContent.*
+```
+
+### Зазор между колонками
+
+На **`min-width: 48rem`**, если **`data-layout-template="app"`** и сайдбар **`expanded`** или **`compact`**, между **`Nav`** и **`Main`** — **`column-gap: var(--prime-sys-spacing-x3)`** (разделитель колонок, не замена полей внутри `main`).
+
+### Сводка по токенам
+
+| Участок | Токен / правило |
+|--------|------------------|
+| Поля контента внутри `main` | `--prime-sys-spacing-x6` (block + inline) |
+| Зазор nav ↔ main (широкий экран + открытый sidebar) | `--prime-sys-spacing-x3` |
+| Корень сетки, слот `nav` | `padding: 0` у оболочек; поля `main` — см. выше |
+
+### Диаграмма (Mermaid)
+
+```mermaid
+flowchart TB
+  subgraph Root["AppShell.Root"]
+    Nav["AppShell.Nav"]
+    Main["AppShell.Main\nx6 padding + scroll"]
+  end
+  Nav --- Main
+  Main --> Page["Страница / Outlet / PageContent"]
+```
+
+---
 
 ## Composition
 
-- **`AppShell.Root`** — корневая сетка; опционально **`fillViewport`** (типично для фиксированной высоты вьюпорта и прокрутки только в **`main`**).
+- **`AppShell.Root`** — корневая сетка; опционально **`fillViewport`**.
 - **`AppShell.Nav`** — слот навигации (**`data-layout-region="nav"`**).
-- **`AppShell.Main`** — основная колонка (**`<main>`**, **`ScrollContainer`**, **`data-layout-region="main"`**).
-- **`AppShell.MainInset`** — **единый** внутренний отступ контентной колонки; в **`Template`** уже вложен в **`Main`**. Используйте отдельно только в особых маршрутах без **`Template`** (например **`AppShell.Root`** + один **`Main`** + **`MainInset`** без боковой колонки — корень сетки растянет **`main`** на всю ширину).
-- **`AppShell.Template`** — **`Root`** + **`Nav`** + **`Main`**, внутри **`Main`** — **`MainInset`** (дети шаблона) + сброс прокрутки при смене **`pathname`** (только если предок — React Router).
+- **`AppShell.Main`** — **`<main>`** с каноническими полями колонки и прокруткой (**`data-layout-region="main"`**).
+- **`AppShell.Template`** — **`Root`** + **`Nav`** + **`Main`**, дети — **прямые** дочерние узлы **`main`** + сброс прокрутки при смене **`pathname`** (если предок — React Router).
 
-### Canonical example (приложение с сайдбаром)
+### Пример (сайдбар + маршруты)
 
 ```tsx
 import { AppShell, Sidebar } from "prime-ui-kit";
@@ -29,27 +78,36 @@ export function AppLayout() {
 }
 ```
 
-### Canonical example (одна колонка без `nav`, те же поля)
+### Пример (одна колонка, без `nav`)
 
 ```tsx
 import { AppShell } from "prime-ui-kit";
 
-export function FullWidthMainRoute() {
+export function FullWidthMain() {
   return (
     <AppShell.Root fillViewport>
-      <AppShell.Main>
-        <AppShell.MainInset>{/* страница */}</AppShell.MainInset>
-      </AppShell.Main>
+      <AppShell.Main>{/* страница — поля уже на main */}</AppShell.Main>
     </AppShell.Root>
   );
 }
 ```
 
+---
+
+## Почему «пропали отступы»
+
+1. **Не подключены стили пакета** — **`prime-ui-kit/styles.css`** и **`prime-ui-kit/bundle.css`** (или эквивалент).
+2. **Маршруты не внутри `AppShell.Template`** — **`Outlet`** должен быть ребёнком **`Template`** (или контент внутри **`AppShell.Main`** при ручной сборке).
+3. **Ожидание полей от `PageContent.Root`** — краевые поля задаёт **`Main`**, не **`PageContent`**.
+4. **Редкий full-bleed в `main`** — при необходимости обнулите поля через **`className`** на **`AppShell.Main`** (осознанно, точечно).
+
+---
+
 ## Rules
 
-- Обертка-приложения с **`AppShell.Template`** должна находиться **внутри** **`BrowserRouter`** / **`MemoryRouter`**, чтобы сброс прокрутки работал; в тестах без роутера сброс не подключается (это нормально).
-- **`ref`**, переданный в **`AppShell.Template`**, по-прежнему вешается на элемент **`main`** (как на **`AppShell.Main`**).
-- Не дублируйте классы/обёртки с теми же отступами, что у **`MainInset`**, и не задавайте произвольные «поля страницы» литералами — один источник правды в ките.
+- **`AppShell.Template`** внутри **`BrowserRouter`** / **`MemoryRouter`** — для сброса прокрутки.
+- **`ref`** на **`Template`** вешается на **`<main>`** (`AppShell.Main`).
+- Не дублируйте обёртки с полями **`x6`** вокруг страницы.
 
 ## API
 
@@ -69,22 +127,14 @@ export function FullWidthMainRoute() {
 | fillViewport | `boolean` | — | No | Пробрасывается в `Root`. |
 | className | `string` | — | No | Класс на `Root`. |
 | nav | `React.ReactNode` | — | **Yes** | Левая колонка (напр. `Sidebar.Root`). |
-| children | `React.ReactNode` | — | No | Контент внутри `MainInset` внутри `main`. |
+| children | `React.ReactNode` | — | No | Контент внутри `<main>` (прямые дети). |
 | navProps | `Omit<AppShellNavProps, "children">` | — | No | Пропсы на слот навигации. |
 | mainProps | `Omit<AppShellMainProps, "children">` | — | No | Пропсы на `main` (напр. `id`, `tabIndex`). |
-| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | Остальное на `Root` (без `children` / без `ref` на типе — `ref` на `main`). |
-
-### AppShell.MainInset
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Доп. класс; поля заданы модулем кита. |
-| children | `React.ReactNode` | — | No | Содержимое колонки. |
-| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | В т.ч. `ref` (`forwardRef`). |
+| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | Остальное на `Root`. |
 
 `AppShell.Nav` и `AppShell.Main` — см. исходные типы в **`AppShell.tsx`**.
 
 ## Related
 
-- [PageContent](../../components/page-content/COMPONENT.md) — секции и корень страницы внутри инсета.
-- [Sidebar](../sidebar/COMPONENT.md) — навигация в слоте `nav`.
+- [PageContent](../../components/page-content/COMPONENT.md)
+- [Sidebar](../sidebar/COMPONENT.md)

@@ -63,6 +63,7 @@ const AppShellMain = React.forwardRef<HTMLElement, AppShellMainProps>(function A
       overscrollBehavior="contain"
       className={cx(styles.layoutMain, className)}
       data-layout-region="main"
+      data-app-shell-main-padded=""
       {...rest}
     >
       {children}
@@ -70,27 +71,6 @@ const AppShellMain = React.forwardRef<HTMLElement, AppShellMainProps>(function A
   );
 });
 AppShellMain.displayName = "AppShell.Main";
-
-export type AppShellMainInsetProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-const AppShellMainInset = React.forwardRef<HTMLDivElement, AppShellMainInsetProps>(
-  function AppShellMainInset({ className, children, ...rest }, forwardedRef) {
-    return (
-      <div
-        ref={forwardedRef}
-        className={cx(styles.layoutMainInset, className)}
-        data-app-shell-main-inset=""
-        {...rest}
-      >
-        {children}
-      </div>
-    );
-  },
-);
-AppShellMainInset.displayName = "AppShell.MainInset";
 
 function AppShellMainRouteScrollReset({
   mainRef,
@@ -133,7 +113,7 @@ const AppShellTemplate = React.forwardRef<HTMLElement, AppShellTemplateProps>(
       >
         <AppShellNav {...navProps}>{nav}</AppShellNav>
         <AppShellMain ref={setMainRef} {...mainProps}>
-          <AppShellMainInset>{children}</AppShellMainInset>
+          {children}
           {inRouter ? <AppShellMainRouteScrollReset mainRef={mainElementRef} /> : null}
         </AppShellMain>
       </AppShellRoot>
@@ -146,6 +126,5 @@ export const AppShell = {
   Root: AppShellRoot,
   Nav: AppShellNav,
   Main: AppShellMain,
-  MainInset: AppShellMainInset,
   Template: AppShellTemplate,
 };

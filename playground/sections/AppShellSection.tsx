@@ -86,7 +86,7 @@ const templateRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Контент внутри `AppShell.MainInset` внутри `<main>`.",
+    description: "Контент как прямые дети `<main>` (`AppShell.Main` уже задаёт поля `x6`).",
   },
   {
     prop: "navProps",
@@ -125,7 +125,7 @@ const mainRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description:
-      "Дочерние узлы внутри `<main>`; в `Template` здесь `MainInset` и служебный сброс прокрутки.",
+      "Дочерние узлы внутри `<main>`; поля колонки на самом `main`; в `Template` дополнительно сброс прокрутки при смене маршрута.",
   },
   {
     prop: "…rest",
@@ -133,30 +133,6 @@ const mainRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description: "Атрибуты нативного main, включая `ref` (forwardRef).",
-  },
-];
-
-const mainInsetRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный класс; поля колонки — токены кита (`x6` по осям).",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Контент маршрута (в `Template` — то, что передают в `Template`).",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Атрибуты нативного `div`, включая `ref` (forwardRef).",
   },
 ];
 
@@ -175,9 +151,9 @@ export default function AppShellSection() {
               <code>data-layout-template=&quot;app&quot;</code>: на широком экране — зазор между
               колонками при открытом <code>Sidebar</code> (
               <code>sidebarSlot=&quot;page-nav&quot;</code>
-              ). Контентная колонка всегда оборачивается в <code>AppShell.MainInset</code> с полями{" "}
-              <code>--prime-sys-spacing-x6</code>; отдельную обёртку с теми же полями в приложении
-              не добавляют. См. <code>src/layout/app-shell/COMPONENT.md</code>.
+              ). Поля контентной колонки заданы на <code>AppShell.Main</code> (
+              <code>--prime-sys-spacing-x6</code>); отдельную обёртку с теми же полями не добавляют.
+              См. <code>src/layout/app-shell/COMPONENT.md</code>.
             </>
           }
         </PageContent.Description>
@@ -194,8 +170,6 @@ export default function AppShellSection() {
             <PlaygroundApiTable rows={navRows} />
             <DemoApiTitle>AppShell.Main</DemoApiTitle>
             <PlaygroundApiTable rows={mainRows} />
-            <DemoApiTitle>AppShell.MainInset</DemoApiTitle>
-            <PlaygroundApiTable rows={mainInsetRows} />
           </div>
         </div>
       </PageContent.Body>

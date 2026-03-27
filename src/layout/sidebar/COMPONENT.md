@@ -8,7 +8,7 @@
 
 **When to use**
 
-- Persistent app navigation beside main content, including **`AppShell.Template`** nav slot with **`sidebarSlot="page-nav"`** (контентная колонка получает поля из **`AppShell.MainInset`** внутри шаблона — не дублировать).
+- Persistent app navigation beside main content, including **`AppShell.Template`** nav slot with **`sidebarSlot="page-nav"`** (поля контентной колонки на **`AppShell.Main`** — не дублировать).
 - Desktop width toggle (expanded vs icon rail) with optional tooltips in **`compact`**.
 - Mobile drawer behavior when **`responsive={true}`** (default): overlay, backdrop; **edge**-кнопка **`Sidebar.ToggleButton`** на границе панели и смещается вместе с ней (в т.ч. при закрытии drawer).
 

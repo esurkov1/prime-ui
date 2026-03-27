@@ -1,6 +1,6 @@
 # prime-ui-kit component catalog — responsive context
 
-Full table of **47** exported UI building blocks mapped to responsive layout (44 entries with `COMPONENT.md` under `src/components/` or `src/layout/sidebar`, plus **AppShell**, **ExampleFrame**, **ScrollContainer** documented via source/playground only).
+Full table of **47** UI building blocks (responsive zones + scenarios). **45** have a dedicated `COMPONENT.md` under `src/components/*` or `src/layout/*` (**AppShell** — `src/layout/app-shell/COMPONENT.md`; **Sidebar** — `src/layout/sidebar/COMPONENT.md`). **ExampleFrame** and **ScrollContainer** remain documented from source + playground (no separate `COMPONENT.md`).
 
 **Examples:** For each component with `COMPONENT.md`, see also `examples/*.tsx` (3–5 runnable scenarios per folder) — richer than playground snippets; paths in each `COMPONENT.md` under **Extended examples**.
 
@@ -282,7 +282,7 @@ Full table of **47** exported UI building blocks mapped to responsive layout (44
 
 | | |
 |---|---|
-| **Purpose** | Main column structure: optional `maxWidth` (`readable` / `wide`), header and body; **no** duplicate edge padding — `AppShell.MainInset` (inside `AppShell.Template`) owns the column gutters. |
+| **Purpose** | Main column structure: optional `maxWidth` (`readable` / `wide`), header and body; **no** duplicate edge padding — `AppShell.Main` (with `AppShell.Template`) owns the column gutters. |
 | **Responsive role** | Centers content; limits measure for long text on large screens. |
 | **Zones** | content |
 | **Scenarios** | Settings page body; article layout; legal copy; dashboard main column. |
@@ -392,7 +392,7 @@ Full table of **47** exported UI building blocks mapped to responsive layout (44
 
 | | |
 |---|---|
-| **Purpose** | Application layout root: grid `nav` + scrollable `main`; **`AppShell.Template`** always wraps route content in **`AppShell.MainInset`** (canonical `x6` padding) and scroll-resets `main` on route change when inside React Router. |
+| **Purpose** | Application layout root: grid `nav` + scrollable **`main`** with canonical `x6` padding on **`main`**; **`AppShell.Template`** renders route children directly inside **`main`** and scroll-resets `main` on route change when inside React Router. |
 | **Responsive role** | `minmax(0, 1fr)` on main track; pair with **Sidebar** / **Drawer** for narrow breakpoints. |
 | **Zones** | layout, navigation |
 | **Scenarios** | App dashboard; admin shell; docs with sidebar slot. |
@@ -477,3 +477,18 @@ Full table of **47** exported UI building blocks mapped to responsive layout (44
 | **Zones** | content, header, footer, inline |
 | **Scenarios** | Landing with emphasis; secondary copy in account; course body text; dashboard metric tiles; order summary with nested emphasis. |
 | **Documentation** | `../src/components/typography/COMPONENT.md` |
+
+---
+
+## Package exports not listed above
+
+These ship from `prime-ui-kit` but are **infrastructure**, not separate “components” in this table:
+
+| Export area | Role | Where to read |
+|---------------|------|----------------|
+| **`icons`** | Re-exported icon set for use with controls and chrome. | `src/icons/` |
+| **`ControlSizeProvider`**, **`useOptionalControlSize`** | Default control size context for subtrees. | `src/internal/ControlSizeContext.tsx` |
+| **`OverlayPortalLayerProvider`**, **`useOverlayPortalLayer`** | Z-index / stacking for nested overlays. | `src/internal/OverlayPortalLayerContext.tsx` |
+| **`componentSizes`** and related | Size scale for documentation and validation. | `src/internal/states.ts` (re-exported from main entry) |
+
+**Notification** in the table covers **`NotificationCard`** and the toast API; **`NotificationProvider`** / **`useNotifications`** are documented in the same [notification COMPONENT.md](../src/components/notification/COMPONENT.md).

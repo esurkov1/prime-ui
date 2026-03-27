@@ -35,8 +35,8 @@ Cursor skill: copy the whole `SKILL/` directory from the GitHub repository — i
 
 ### Application layout (canonical)
 
-- **`AppShell.Template`** + **`Sidebar`** in `nav` + **`Outlet`** (or page children) in **`main`**: edge padding for the content column is **only** from **`AppShell.MainInset`** inside the kit — do not add a second inset wrapper or ad‑hoc page margins.
-- **`PageContent.Section`** or **`PageContent.Root`** for page structure; avoid duplicating outer padding that **`MainInset`** already applies.
+- **`AppShell.Template`** + **`Sidebar`** in `nav` + **`Outlet`** (or page children) in **`main`**: edge padding for the content column is **only** on **`AppShell.Main`** — do not add a second wrapper with the same margins or ad‑hoc page margins.
+- **`PageContent.Section`** or **`PageContent.Root`** for page structure; avoid duplicating outer padding that **`AppShell.Main`** already applies.
 
 ### How to use `COMPONENT.md` + `examples/` (agents)
 

@@ -62,15 +62,17 @@ describe("AppShell", () => {
     expect(screen.getByRole("main").parentElement).toHaveAttribute("data-layout-template", "app");
   });
 
-  it("Template wraps route children in MainInset with data-app-shell-main-inset", () => {
+  it("Main marks padded column with data-app-shell-main-padded and renders route children directly", () => {
     render(
       <MemoryRouter>
         <AppShell.Template nav={<span>nav</span>}>
-          <span>inset-body</span>
+          <span>body</span>
         </AppShell.Template>
       </MemoryRouter>,
     );
 
-    expect(document.querySelector("[data-app-shell-main-inset]")).toHaveTextContent("inset-body");
+    const main = screen.getByRole("main");
+    expect(main).toHaveAttribute("data-app-shell-main-padded");
+    expect(main).toHaveTextContent("body");
   });
 });

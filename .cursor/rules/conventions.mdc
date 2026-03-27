@@ -29,7 +29,7 @@ alwaysApply: false
 
 ## Лейаут приложения (потребители кита)
 
-- **`AppShell.Template`** задаёт единственный канон полей контентной колонки (**`AppShell.MainInset`**, `x6`). Повторные обёртки с теми же отступами и произвольные «поля страницы» не добавляют.
+- **`AppShell.Template`** + **`AppShell.Main`** задают единственный канон полей контентной колонки (`x6` на `main`). Повторные обёртки с теми же отступами и произвольные «поля страницы» не добавляют.
 - **`PageContent.Root`** не дублирует краевые поля колонки; с **`AppShell.Template`** используют **`PageContent.Section`** или **`PageContent.Root`** только для структуры и `maxWidth`. См. **`src/layout/app-shell/COMPONENT.md`** и **`src/components/page-content/COMPONENT.md`**.
 
 ## Playground
