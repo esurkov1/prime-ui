@@ -1,110 +1,114 @@
-.content {
-  /* Поля по `data-size` (`--po-pad`); без min-width — ширина от контента (`width: max-content`), как у типичного popover. */
+/* Внешний узел — ScrollContainer: прокрутка и позиция. Внутренний — .popoverPanel: поля и «хром» панели (отступы не смешиваются с .root скролла). */
+.popoverScroll {
   --po-pad: var(--prime-sys-spacing-x2);
-  --po-text-size: var(--prime-sys-size-control-m-supportText);
-  --po-inset-pad-block: 0;
-  --po-inset-pad-inline: 0;
+  --po-inset-extra: 0px;
   --po-inset-gap: 0;
+  --po-text-size: var(--prime-sys-size-control-m-supportText);
 
   display: flex;
   flex-direction: column;
   align-items: stretch;
   position: fixed;
+  box-sizing: border-box;
   width: max-content;
   max-width: min(var(--prime-sys-unit-20rem), 100vw);
+  min-width: 0;
+  margin: 0;
+  transform-origin: top center;
+}
+
+.popoverPanel {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--po-inset-gap);
+  min-width: 0;
+  width: max-content;
+  max-width: min(var(--prime-sys-unit-20rem), 100vw);
+  padding: calc(var(--po-pad) + var(--po-inset-extra));
   background: var(--prime-sys-color-surface-elevated);
   border: none;
   border-radius: var(--prime-sys-shape-radius-l);
   box-shadow: var(--prime-sys-elevation-shadow-surface), var(--prime-sys-elevation-shadow-modal);
-  box-sizing: border-box;
-  margin: 0;
-  padding-block: calc(var(--po-pad) + var(--po-inset-pad-block));
-  padding-inline: calc(var(--po-pad) + var(--po-inset-pad-inline));
-  gap: var(--po-inset-gap);
-  min-width: 0;
-  /* Прокрутка — ScrollContainer */
-  transform-origin: top center;
   font-size: var(--po-text-size);
   line-height: 1.35;
   color: var(--prime-sys-color-content-secondary);
 }
 
-.content[data-inset-padding="none"] {
-  --po-inset-pad-block: 0;
-  --po-inset-pad-inline: 0;
+.popoverScroll[data-inset-padding="none"] {
+  --po-inset-extra: 0px;
 }
 
-.content[data-inset-padding="x1"] {
-  --po-inset-pad-block: var(--prime-sys-spacing-x1);
-  --po-inset-pad-inline: var(--prime-sys-spacing-x1);
+.popoverScroll[data-inset-padding="x1"] {
+  --po-inset-extra: var(--prime-sys-spacing-x1);
 }
 
-.content[data-inset-padding="x2"] {
-  --po-inset-pad-block: var(--prime-sys-spacing-x2);
-  --po-inset-pad-inline: var(--prime-sys-spacing-x2);
+.popoverScroll[data-inset-padding="x2"] {
+  --po-inset-extra: var(--prime-sys-spacing-x2);
 }
 
-.content[data-inset-padding="x3"] {
-  --po-inset-pad-block: var(--prime-sys-spacing-x3);
-  --po-inset-pad-inline: var(--prime-sys-spacing-x3);
+.popoverScroll[data-inset-padding="x3"] {
+  --po-inset-extra: var(--prime-sys-spacing-x3);
 }
 
-.content[data-inset-gap="none"] {
+.popoverScroll[data-inset-gap="none"] {
   --po-inset-gap: 0;
 }
 
-.content[data-inset-gap="x2"] {
+.popoverScroll[data-inset-gap="x2"] {
   --po-inset-gap: var(--prime-sys-spacing-x2);
 }
 
-.content[data-inset-gap="x3"] {
+.popoverScroll[data-inset-gap="x3"] {
   --po-inset-gap: var(--prime-sys-spacing-x3);
 }
 
-.content[data-inset-gap="x4"] {
+.popoverScroll[data-inset-gap="x4"] {
   --po-inset-gap: var(--prime-sys-spacing-x4);
 }
 
-.content[data-overlay-portal-layer="page"] {
+.popoverScroll[data-overlay-portal-layer="page"] {
   z-index: var(--prime-sys-elevation-zIndex-popover);
 }
 
-.content[data-overlay-portal-layer="drawer"] {
+.popoverScroll[data-overlay-portal-layer="drawer"] {
   z-index: var(--prime-sys-elevation-zIndex-popoverInDrawer);
 }
 
-.content[data-overlay-portal-layer="modal"] {
+.popoverScroll[data-overlay-portal-layer="modal"] {
   z-index: var(--prime-sys-elevation-zIndex-popoverInModal);
 }
 
-.content[data-overlay-portal-layer="drawerInModal"] {
+.popoverScroll[data-overlay-portal-layer="drawerInModal"] {
   z-index: var(--prime-sys-elevation-zIndex-popoverInDrawerInModal);
 }
 
-.content[data-size="s"] {
-  --po-pad: var(--prime-sys-spacing-x2);
+/* Ярус размера: поля панели и кегль — разные между s / m / l / xl */
+.popoverScroll[data-size="s"] {
+  --po-pad: var(--prime-sys-spacing-x1);
   --po-text-size: var(--prime-sys-size-control-s-supportText);
 }
 
-.content[data-size="l"] {
+.popoverScroll[data-size="l"] {
   --po-pad: var(--prime-sys-spacing-x3);
   --po-text-size: var(--prime-sys-size-control-l-supportText);
 }
 
-.content[data-size="xl"] {
+.popoverScroll[data-size="xl"] {
   --po-pad: var(--prime-sys-spacing-x4);
   --po-text-size: var(--prime-sys-size-control-xl-supportText);
 }
 
-:global([data-theme="dark"]) .content {
+:global([data-theme="dark"]) .popoverPanel {
   background: var(--prime-sys-color-surface-raised);
 }
 
-.content[data-side="bottom"] {
+.popoverScroll[data-side="bottom"] {
   animation: popoverInBottom var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
 }
 
-.content[data-side="top"] {
+.popoverScroll[data-side="top"] {
   transform-origin: bottom center;
   animation: popoverInTop var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
 }
@@ -132,8 +136,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .content[data-side="bottom"],
-  .content[data-side="top"] {
+  .popoverScroll[data-side="bottom"],
+  .popoverScroll[data-side="top"] {
     animation: none;
   }
 }

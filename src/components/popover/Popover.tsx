@@ -171,10 +171,10 @@ function PopoverContent({
           data-size={size}
           data-inset-padding={insetPadding}
           data-inset-gap={insetGap}
-          className={cx(styles.content, className)}
+          className={cx(styles.popoverScroll, className)}
           style={layout?.style}
         >
-          {children}
+          <div className={styles.popoverPanel}>{children}</div>
         </ScrollContainer>
       </ControlSizeProvider>
     </Portal>
