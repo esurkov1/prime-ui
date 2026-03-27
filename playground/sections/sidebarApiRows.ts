@@ -83,7 +83,7 @@ export const sidebarRootApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "true",
     required: "Нет",
     description:
-      "При true — узкий viewport: drawer, backdrop, edge-кнопка у края при закрытой панели.",
+      "При true — узкий viewport: drawer и backdrop; edge-кнопка на грани панели, двигается с ней.",
   },
   {
     prop: "sidebarSlot",

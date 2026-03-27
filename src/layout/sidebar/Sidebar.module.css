@@ -121,7 +121,7 @@
   pointer-events: none;
 }
 
-/* Внешняя оболочка: edge ToggleButton не внутри слоя с transform (мобильный drawer). */
+/* Внешняя оболочка; edge ToggleButton внутри .navPanelSurface — едет вместе с панелью (transform). */
 .navPanel {
   position: relative;
   z-index: 1;
@@ -176,11 +176,6 @@
 
 .root[data-side="right"] .navPanelSurface {
   border-inline-start: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-}
-
-.root[data-state="hidden"] .navPanelSurface {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .header {
@@ -759,23 +754,12 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    height: 100dvh;
-    transform: none;
-    overflow: visible;
-  }
-
-  /* Открытый drawer: панель на всю ширину полосы. */
-  .root[data-mobile-open="true"] .navPanel {
     width: min(var(--sb-expanded-width), 90vw);
     min-width: min(var(--sb-expanded-width), 90vw);
     max-width: 100vw;
-  }
-
-  /* Закрытый drawer: ширина 0 — ручка остаётся у края экрана (overflow: visible). */
-  .root:not([data-mobile-open="true"]) .navPanel {
-    width: 0;
-    min-width: 0;
-    max-width: none;
+    height: 100dvh;
+    transform: none;
+    overflow: visible;
   }
 
   .navPanelSurface {
@@ -809,19 +793,6 @@
 
   .root[data-mobile-open="true"] .navPanelSurface {
     transform: translateX(0);
-  }
-
-  /* Закрытый drawer: единственная edge-кнопка — у края экрана (не у внутренней грани полосы). */
-  .root[data-side="left"]:not([data-mobile-open="true"]) .toggleButton[data-placement="edge"] {
-    inset-inline-end: auto;
-    inset-inline-start: 0;
-    transform: translate(-50%, -50%);
-  }
-
-  .root[data-side="right"]:not([data-mobile-open="true"]) .toggleButton[data-placement="edge"] {
-    inset-inline-start: auto;
-    inset-inline-end: 0;
-    transform: translate(50%, -50%);
   }
 }
 

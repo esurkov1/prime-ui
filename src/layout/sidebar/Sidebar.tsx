@@ -107,8 +107,10 @@ function SidebarNavPanel({
       className={cx(styles.navPanel, className)}
       aria-label={rest["aria-label"] ?? "Sidebar navigation"}
     >
-      <div className={styles.navPanelSurface}>{children}</div>
-      {showToggle ? <SidebarToggleButton placement="edge" /> : null}
+      <div className={styles.navPanelSurface}>
+        {children}
+        {showToggle ? <SidebarToggleButton placement="edge" /> : null}
+      </div>
     </nav>
   );
 }
