@@ -44,14 +44,12 @@ function AppShellNav({ className, children, ...rest }: AppShellNavProps) {
 AppShellNav.displayName = "AppShell.Nav";
 
 export type AppShellMainProps = {
-  /** `plain` — только main; `surface` — карточка; `page` — поля страницы. */
-  variant?: "plain" | "surface" | "page";
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
 
 const AppShellMain = React.forwardRef<HTMLElement, AppShellMainProps>(function AppShellMain(
-  { variant = "plain", className, children, ...rest },
+  { className, children, ...rest },
   forwardedRef,
 ) {
   return (
@@ -60,12 +58,7 @@ const AppShellMain = React.forwardRef<HTMLElement, AppShellMainProps>(function A
       ref={forwardedRef}
       axis="vertical"
       overscrollBehavior="contain"
-      className={cx(
-        styles.layoutMain,
-        variant === "surface" && styles.layoutMainSurface,
-        variant === "page" && styles.layoutMainPage,
-        className,
-      )}
+      className={cx(styles.layoutMain, className)}
       data-layout-region="main"
       {...rest}
     >

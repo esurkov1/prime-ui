@@ -113,14 +113,6 @@ const templateRows: PlaygroundApiPropRow[] = [
 
 const mainRows: PlaygroundApiPropRow[] = [
   {
-    prop: "variant",
-    type: '"plain" | "surface" | "page"',
-    defaultValue: '"plain"',
-    required: "Нет",
-    description:
-      "`plain` — только скролл и `main`. `surface` — карточка с полями внутри колонки. `page` — типичные поля страницы внутри `main` (доки/плейграунд).",
-  },
-  {
     prop: "className",
     type: "string",
     defaultValue: "—",
@@ -157,9 +149,10 @@ export default function AppShellSection() {
               <code>AppShell.Template</code> помечает корень как{" "}
               <code>data-layout-template=&quot;app&quot;</code>: на широком экране — поля у колонки{" "}
               <code>Nav</code> от края экрана и зазор между колонками при открытом{" "}
-              <code>Sidebar</code> (<code>sidebarSlot=&quot;page-nav&quot;</code>); поля текста в{" "}
-              <code>main</code> — через <code>mainProps variant=&quot;page&quot;</code> или свою
-              разметку. В плейграунде — <code>PlaygroundLayout</code>.
+              <code>Sidebar</code> (<code>sidebarSlot=&quot;page-nav&quot;</code>). Поля контентной
+              колонки задаются в приложении (например обёртка с <code>padding</code> внутри{" "}
+              <code>main</code>, <code>PageContent.Root</code> и т.д.). В плейграунде —{" "}
+              <code>PlaygroundLayout</code>.
             </>
           }
         </PageContent.Description>

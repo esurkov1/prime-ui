@@ -1,0 +1,8 @@
+/* Бывшие поля `AppShell.Main` с `variant="page"` — теперь задаются в приложении/плейграунде, не в ките. */
+.playgroundMainInset {
+  box-sizing: border-box;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding-block: var(--prime-sys-spacing-x6);
+  padding-inline: var(--prime-sys-spacing-x6);
+}

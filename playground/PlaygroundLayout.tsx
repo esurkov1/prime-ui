@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AppShell } from "@/layout";
 
 import { PlaygroundChromeSidebar } from "./components/PlaygroundChromeSidebar";
+import styles from "./PlaygroundLayout.module.css";
 
 export function PlaygroundLayout() {
   const { pathname } = useLocation();
@@ -21,11 +22,12 @@ export function PlaygroundLayout() {
       ref={mainRef}
       mainProps={{
         id: "playground-main",
-        variant: "page",
         tabIndex: -1,
       }}
     >
-      <Outlet />
+      <div className={styles.playgroundMainInset}>
+        <Outlet />
+      </div>
     </AppShell.Template>
   );
 }

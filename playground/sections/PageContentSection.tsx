@@ -42,7 +42,7 @@ const sectionRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description:
-      "Класс на `<section>` (регион страницы без внешних полей — удобно внутри `main` с padding).",
+      "Класс на `<section>` (регион страницы без внешних полей — удобно внутри `main`, когда поля уже у обёртки).",
   },
   {
     prop: "children",
@@ -116,7 +116,7 @@ const descriptionRows: PlaygroundApiPropRow[] = [
     defaultValue: '"readable"',
     required: "Нет",
     description:
-      "`readable` — узкая мера (~65ch); `full` — на всю ширину родителя (например, когда поля уже у `AppShell.Main`).",
+      "`readable` — узкая мера (~65ch); `full` — на всю ширину родителя (когда колонка уже с полями от обёртки или `PageContent.Root`).",
   },
   {
     prop: "className",
@@ -174,12 +174,13 @@ export default function PageContentSection() {
           {
             <>
               Семантическая разметка контентной колонки: <code>PageContent.Section</code> (регион
-              страницы без внешних полей, если отступы уже даёт <code>AppShell.Main</code>),{" "}
+              страницы без внешних полей, если отступы уже даёт обёртка или{" "}
+              <code>PageContent.Root</code>),{" "}
               <code>PageContent.Root</code> (полная страница с полями и при необходимости{" "}
               <code>maxWidth</code>), <code>Title</code> → <code>&lt;h1&gt;</code>,{" "}
               <code>Description</code> с{" "}
-              <code>measure=&quot;readable&quot; | &quot;full&quot;</code>, <code>Body</code>.
-              Маршруты плейграунда используют тот же паттерн без отдельной обёртки.
+              <code>measure=&quot;readable&quot; | &quot;full&quot;</code>, <code>Body</code>. В
+              плейграунде внешние поля колонки задаёт обёртка в <code>PlaygroundLayout</code>.
             </>
           }
         </PageContent.Description>
