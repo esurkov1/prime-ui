@@ -43,7 +43,7 @@ export default function ModalPatternPortalAndScrollExample() {
             <Modal.Panel
               closeAriaLabel="Close"
               container={portalHost}
-              icon={<Icon surface="raised" name="nav.layoutGrid" />}
+              icon={<Icon name="nav.layoutGrid" />}
               title="Custom container"
             >
               <p>Portal content is attached under the host element above.</p>
@@ -67,7 +67,7 @@ export default function ModalPatternPortalAndScrollExample() {
               <Button.Root variant="primary">Close</Button.Root>
             </Modal.Close>
           }
-          icon={<Icon surface="raised" name="nav.itemDot" />}
+          icon={<Icon name="nav.itemDot" />}
           title="Scroll inside panel"
         >
           {longLines.map((line) => (

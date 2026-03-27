@@ -21,13 +21,13 @@ export default function CanonicalCompositionExample() {
       <SegmentedControl.Root defaultValue="light">
         <SegmentedControl.Item value="light">
           <SegmentedControl.Icon>
-            <Icon surface="none" name="theme.light" />
+            <Icon name="theme.light" />
           </SegmentedControl.Icon>
           Light
         </SegmentedControl.Item>
         <SegmentedControl.Item value="dark">
           <SegmentedControl.Icon>
-            <Icon surface="none" name="theme.dark" />
+            <Icon name="theme.dark" />
           </SegmentedControl.Icon>
           Dark
         </SegmentedControl.Item>
@@ -53,13 +53,13 @@ export default function CanonicalCompositionExample() {
         <SegmentedControl.Root defaultValue="grid">
           <SegmentedControl.Item value="feed">
             <SegmentedControl.Icon>
-              <Icon surface="none" name="nav.home" />
+              <Icon name="nav.home" />
             </SegmentedControl.Icon>
             <span className={styles.visuallyHidden}>Feed</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="grid">
             <SegmentedControl.Icon>
-              <Icon surface="none" name="nav.layoutGrid" />
+              <Icon name="nav.layoutGrid" />
             </SegmentedControl.Icon>
             <span className={styles.visuallyHidden}>Grid</span>
           </SegmentedControl.Item>

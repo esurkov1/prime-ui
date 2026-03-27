@@ -7,7 +7,7 @@ export default function InputCompositionSnippet() {
       <Input.Root hint="Иконка слева: Input.Icon side=&quot;start&quot;">
         <Input.Wrapper>
           <Input.Icon side="start">
-            <Icon surface="none" name="field.email" size="s" tone="subtle" />
+            <Icon name="field.email" size="s" tone="subtle" />
           </Input.Icon>
           <Input.Field placeholder="Электронная почта" type="email" />
         </Input.Wrapper>
@@ -16,7 +16,7 @@ export default function InputCompositionSnippet() {
         <Input.Wrapper>
           <Input.Field placeholder="Пароль" type="password" />
           <Input.Icon side="end">
-            <Icon surface="none" name="status.locked" size="s" tone="subtle" />
+            <Icon name="status.locked" size="s" tone="subtle" />
           </Input.Icon>
         </Input.Wrapper>
       </Input.Root>

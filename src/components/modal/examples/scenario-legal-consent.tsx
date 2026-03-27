@@ -21,7 +21,7 @@ export default function ModalLegalConsentExample() {
             </Button.Root>
           </Modal.Close>
         }
-        icon={<Icon surface="raised" name="status.locked" tone="subtle" />}
+        icon={<Icon name="status.locked" tone="subtle" />}
         title="Terms and data processing"
       >
         <Typography.Root as="p" variant="body-default">

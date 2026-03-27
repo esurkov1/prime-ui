@@ -20,7 +20,7 @@ export default function PasswordWithHintExample() {
           required
         />
         <Input.Icon side="end">
-          <Icon surface="none" name="status.locked" size="s" tone="subtle" />
+          <Icon name="status.locked" size="s" tone="subtle" />
         </Input.Icon>
       </Input.Wrapper>
     </Input.Root>

@@ -27,7 +27,7 @@ export function MediaMiniExample() {
     <div className={layoutStyles.grid}>
       <Card.Root variant="mini-media">
         <Card.IconBox aria-hidden>
-          <Icon surface="none" name="field.email" aria-hidden />
+          <Icon name="field.email" aria-hidden />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>Glucose</Card.Label>
@@ -40,7 +40,7 @@ export function MediaMiniExample() {
 
       <Card.Root variant="mini-media">
         <Card.IconBox aria-hidden>
-          <Icon surface="none" name="nav.layoutGrid" aria-hidden />
+          <Icon name="nav.layoutGrid" aria-hidden />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>API usage</Card.Label>

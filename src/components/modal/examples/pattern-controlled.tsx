@@ -26,7 +26,7 @@ export default function ModalPatternControlledExample() {
               <Button.Root variant="primary">Done</Button.Root>
             </Modal.Close>
           }
-          icon={<Icon surface="raised" name="action.copy" />}
+          icon={<Icon name="action.copy" />}
           title="Externally controlled"
         >
           <p>No in-tree trigger is required: the parent owns visibility.</p>

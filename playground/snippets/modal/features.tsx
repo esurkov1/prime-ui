@@ -26,7 +26,7 @@ export default function ModalFeaturesSnippet() {
             <Modal.Panel
               closeAriaLabel="Закрыть"
               container={portalHost}
-              icon={<Icon surface="raised" name="nav.layoutGrid" />}
+              icon={<Icon name="nav.layoutGrid" />}
               title="Свой контейнер"
             >
               <p>Содержимое портала — дочерний узел выделенной области выше.</p>
@@ -55,7 +55,7 @@ export default function ModalFeaturesSnippet() {
               <Button.Root variant="primary">Закрыть</Button.Root>
             </Modal.Close>
           }
-          icon={<Icon surface="raised" name="nav.itemDot" />}
+          icon={<Icon name="nav.itemDot" />}
           title="Прокрутка внутри панели"
         >
           {[

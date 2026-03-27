@@ -5,7 +5,7 @@ export default function HintWithIconExample() {
   return (
     <Hint.Root variant="default">
       <Hint.Icon>
-        <Icon surface="none" name="field.email" tone="subtle" />
+        <Icon name="field.email" tone="subtle" />
       </Hint.Icon>
       We will send a confirmation code to this address.
     </Hint.Root>

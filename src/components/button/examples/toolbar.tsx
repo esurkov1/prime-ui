@@ -23,13 +23,13 @@ export default function ToolbarExample() {
       </Button.Root>
       <Button.Root variant="neutral" mode="ghost" aria-label="Insert link">
         <Button.Icon>
-          <Icon surface="none" name="field.email" size="s" tone="subtle" />
+          <Icon name="field.email" size="s" tone="subtle" />
         </Button.Icon>
       </Button.Root>
       <span style={{ flex: 1, minWidth: "var(--prime-sys-spacing-m)" }} aria-hidden />
       <Button.Root variant="primary" mode="filled">
         <Button.Icon>
-          <Icon surface="none" name="action.upload" size="s" />
+          <Icon name="action.upload" size="s" />
         </Button.Icon>
         Publish
       </Button.Root>

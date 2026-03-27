@@ -28,7 +28,7 @@ export default function CardMiniMediaSnippet() {
     <div className={stackStyles.stack}>
       <Card.Root variant="mini-media">
         <Card.IconBox>
-          <Icon surface="none" name="field.email" />
+          <Icon name="field.email" />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>Glucose</Card.Label>
@@ -41,7 +41,7 @@ export default function CardMiniMediaSnippet() {
 
       <Card.Root variant="mini-media">
         <Card.IconBox>
-          <Icon surface="none" name="nav.layoutGrid" />
+          <Icon name="nav.layoutGrid" />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>API usage</Card.Label>

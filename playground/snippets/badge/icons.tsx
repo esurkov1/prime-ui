@@ -7,25 +7,25 @@ export default function BadgeIconsSnippet() {
       <div className="row">
         <Badge.Root color="blue" variant="light" size="s">
           <Badge.Icon>
-            <Icon surface="none" name="field.email" />
+            <Icon name="field.email" />
           </Badge.Icon>
           Email
         </Badge.Root>
         <Badge.Root color="blue" variant="light">
           <Badge.Icon>
-            <Icon surface="none" name="field.email" />
+            <Icon name="field.email" />
           </Badge.Icon>
           Email
         </Badge.Root>
         <Badge.Root color="blue" variant="light" size="l">
           <Badge.Icon>
-            <Icon surface="none" name="field.email" />
+            <Icon name="field.email" />
           </Badge.Icon>
           Email
         </Badge.Root>
         <Badge.Root color="blue" variant="light" size="xl">
           <Badge.Icon>
-            <Icon surface="none" name="field.email" />
+            <Icon name="field.email" />
           </Badge.Icon>
           Email
         </Badge.Root>
@@ -34,19 +34,19 @@ export default function BadgeIconsSnippet() {
       <div className="row">
         <Badge.Root color="green" variant="filled">
           <Badge.Icon>
-            <Icon surface="none" name="status.locked" />
+            <Icon name="status.locked" />
           </Badge.Icon>
           Secured
         </Badge.Root>
         <Badge.Root color="purple" variant="stroke">
           <Badge.Icon>
-            <Icon surface="none" name="action.upload" />
+            <Icon name="action.upload" />
           </Badge.Icon>
           Upload
         </Badge.Root>
         <Badge.Root color="orange" variant="lighter">
           <Badge.Icon>
-            <Icon surface="none" name="nav.home" />
+            <Icon name="nav.home" />
           </Badge.Icon>
           Home
         </Badge.Root>
@@ -55,17 +55,17 @@ export default function BadgeIconsSnippet() {
       <div className="row">
         <Badge.Root color="sky" variant="light">
           <Badge.Icon>
-            <Icon surface="none" name="action.copy" />
+            <Icon name="action.copy" />
           </Badge.Icon>
         </Badge.Root>
         <Badge.Root color="teal" variant="light">
           <Badge.Icon>
-            <Icon surface="none" name="nav.layoutGrid" />
+            <Icon name="nav.layoutGrid" />
           </Badge.Icon>
         </Badge.Root>
         <Badge.Root color="pink" variant="filled">
           <Badge.Icon>
-            <Icon surface="none" name="theme.light" />
+            <Icon name="theme.light" />
           </Badge.Icon>
         </Badge.Root>
       </div>
@@ -74,13 +74,13 @@ export default function BadgeIconsSnippet() {
         <Badge.Root color="red" variant="light">
           New
           <Badge.Icon>
-            <Icon surface="none" name="nav.chevronRight" />
+            <Icon name="nav.chevronRight" />
           </Badge.Icon>
         </Badge.Root>
         <Badge.Root color="purple" variant="stroke">
           <Badge.Dot />
           <Badge.Icon>
-            <Icon surface="none" name="status.locked" />
+            <Icon name="status.locked" />
           </Badge.Icon>
           Protected
         </Badge.Root>

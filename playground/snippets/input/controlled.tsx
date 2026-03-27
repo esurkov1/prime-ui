@@ -12,7 +12,7 @@ export default function InputControlledSnippet() {
     >
       <Input.Wrapper>
         <Input.Icon side="start">
-          <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+          <Icon name="nav.layoutGrid" size="s" tone="subtle" />
         </Input.Icon>
         <Input.Field
           placeholder="Название или артикул"

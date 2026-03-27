@@ -10,25 +10,25 @@ export function LabelSizesExample() {
       <Label.Root size="xl">Label xl</Label.Root>
       <Label.Root size="s">
         <Label.Icon>
-          <Icon surface="none" aria-hidden name="nav.home" />
+          <Icon aria-hidden name="nav.home" />
         </Label.Icon>
         Label s
       </Label.Root>
       <Label.Root size="m">
         <Label.Icon>
-          <Icon surface="none" aria-hidden name="nav.home" />
+          <Icon aria-hidden name="nav.home" />
         </Label.Icon>
         Label m
       </Label.Root>
       <Label.Root size="l">
         <Label.Icon>
-          <Icon surface="none" aria-hidden name="nav.home" />
+          <Icon aria-hidden name="nav.home" />
         </Label.Icon>
         Label l
       </Label.Root>
       <Label.Root size="xl">
         <Label.Icon>
-          <Icon surface="none" aria-hidden name="nav.home" />
+          <Icon aria-hidden name="nav.home" />
         </Label.Icon>
         Label xl
       </Label.Root>

@@ -29,7 +29,7 @@ export default function FileUploadCircleModalSnippet() {
             >
               <FileUpload.DropBody className={styles.dropBody}>
                 <FileUpload.Icon>
-                  <Icon surface="none" name="action.upload" size="l" tone="subtle" />
+                  <Icon name="action.upload" size="l" tone="subtle" />
                 </FileUpload.Icon>
                 <FileUpload.Title tone="muted" className={styles.dropTitle}>
                   Drag and drop your images here

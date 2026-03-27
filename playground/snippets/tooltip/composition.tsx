@@ -34,7 +34,7 @@ export default function TooltipCompositionSnippet() {
               aria-label="Копировать ссылку"
             >
               <Button.Icon>
-                <Icon surface="none" name="action.copy" size="s" tone="subtle" />
+                <Icon name="action.copy" size="s" tone="subtle" />
               </Button.Icon>
             </Button.Root>
           </Tooltip.Trigger>

@@ -5,7 +5,7 @@ export default function DashboardRingExample() {
   return (
     <Card.Root variant="mini-media">
       <Card.IconBox aria-hidden>
-        <Icon surface="raised" name="nav.layoutGrid" aria-hidden />
+        <Icon name="nav.layoutGrid" aria-hidden />
       </Card.IconBox>
       <Card.Stack>
         <Card.Label>Quarter target</Card.Label>

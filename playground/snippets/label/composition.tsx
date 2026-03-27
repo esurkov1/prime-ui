@@ -6,7 +6,7 @@ export default function LabelCompositionSnippet() {
   return (
     <Label.Root htmlFor="demo-label-comp">
       <Label.Icon>
-        <Icon surface="none" aria-hidden name="field.email" />
+        <Icon aria-hidden name="field.email" />
       </Label.Icon>
       Контактный email
     </Label.Root>

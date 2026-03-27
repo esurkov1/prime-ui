@@ -12,7 +12,7 @@ export default function KbdCompositionSnippet() {
       </div>
       <div className="row rowAlignCenter rowGapKbd">
         <Kbd.Root>
-          <Icon surface="raised" name="action.close" aria-hidden />
+          <Icon name="action.close" aria-hidden />
           <span>Esc</span>
         </Kbd.Root>
       </div>

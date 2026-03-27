@@ -9,26 +9,26 @@ export default function SelectCompositionSnippet() {
       <Select.Root defaultValue="eur" placeholder="Валюта отчёта">
         <Select.Trigger>
           <Select.TriggerIcon>
-            <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+            <Icon name="nav.layoutGrid" size="s" tone="subtle" />
           </Select.TriggerIcon>
           <Select.Value />
         </Select.Trigger>
         <Select.Content>
           <Select.Item value="rub" label="RUB — Российский рубль">
             <Select.ItemIcon>
-              <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+              <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
             ₽ RUB
           </Select.Item>
           <Select.Item value="eur" label="EUR — Евро">
             <Select.ItemIcon>
-              <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+              <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
             € EUR
           </Select.Item>
           <Select.Item value="usd" label="USD — Доллар США">
             <Select.ItemIcon>
-              <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+              <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
             $ USD
           </Select.Item>

@@ -29,7 +29,7 @@ export default function ModalCanonicalMaximalExample() {
             </Button.Root>
           </>
         }
-        icon={<Icon surface="raised" name="field.email" tone="subtle" />}
+        icon={<Icon name="field.email" tone="subtle" />}
         title="Invite teammate"
       >
         <Input.Root label="Email address" hint="Work email preferred">

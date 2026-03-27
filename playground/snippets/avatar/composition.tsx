@@ -14,7 +14,7 @@ export default function AvatarCompositionSnippet() {
       </Avatar.Root>
       <Avatar.Root size="xl">
         <Avatar.Fallback>
-          <Icon surface="none" name="field.email" size="xl" tone="subtle" />
+          <Icon name="field.email" size="xl" tone="subtle" />
         </Avatar.Fallback>
       </Avatar.Root>
     </div>

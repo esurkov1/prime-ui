@@ -5,7 +5,7 @@ export function MiniKpiExample() {
   return (
     <Card.Root variant="mini">
       <Card.IconBox aria-hidden>
-        <Icon surface="none" name="field.email" aria-hidden />
+        <Icon name="field.email" aria-hidden />
       </Card.IconBox>
       <Card.Stack>
         <Card.Label>Active sessions</Card.Label>

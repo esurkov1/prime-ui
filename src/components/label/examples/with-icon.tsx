@@ -6,7 +6,7 @@ export function WithIconExample() {
     <>
       <Label.Root htmlFor="example-label-icon-upload">
         <Label.Icon>
-          <Icon surface="none" aria-hidden name="action.upload" />
+          <Icon aria-hidden name="action.upload" />
         </Label.Icon>
         Attachment
       </Label.Root>

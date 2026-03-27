@@ -23,38 +23,38 @@ export default function IconCompositionExample() {
       <div style={rowStyle}>
         <Button.Root variant="primary" mode="filled">
           <Button.Icon>
-            <Icon surface="none" name="field.email" size="s" />
+            <Icon name="field.email" size="s" />
           </Button.Icon>
           Button primary icon left
         </Button.Root>
         <Button.Root variant="primary" mode="filled">
           Button primary icon right
           <Button.Icon>
-            <Icon surface="none" name="action.close" size="s" />
+            <Icon name="action.close" size="s" />
           </Button.Icon>
         </Button.Root>
         <Button.Root variant="primary" mode="filled" aria-label="Button primary icon only">
           <Button.Icon>
-            <Icon surface="none" name="action.close" size="s" />
+            <Icon name="action.close" size="s" />
           </Button.Icon>
         </Button.Root>
       </div>
       <div style={rowStyle}>
         <Button.Root variant="neutral" mode="stroke">
           <Button.Icon>
-            <Icon surface="none" name="field.email" size="s" tone="subtle" />
+            <Icon name="field.email" size="s" tone="subtle" />
           </Button.Icon>
           Button icon left
         </Button.Root>
         <Button.Root variant="neutral" mode="stroke">
           Button icon right
           <Button.Icon>
-            <Icon surface="none" name="action.close" size="s" tone="subtle" />
+            <Icon name="action.close" size="s" tone="subtle" />
           </Button.Icon>
         </Button.Root>
         <Button.Root variant="neutral" mode="stroke" aria-label="Button icon only">
           <Button.Icon>
-            <Icon surface="none" name="action.close" size="s" tone="subtle" />
+            <Icon name="action.close" size="s" tone="subtle" />
           </Button.Icon>
         </Button.Root>
       </div>

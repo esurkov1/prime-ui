@@ -23,13 +23,13 @@ export default function CanonicalCompositionExample() {
       >
         <Button.Root variant="primary" mode="filled">
           <Button.Icon>
-            <Icon surface="none" name="action.copy" size="s" />
+            <Icon name="action.copy" size="s" />
           </Button.Icon>
           Copy link
         </Button.Root>
         <Button.Root variant="neutral" mode="stroke">
           <Button.Icon>
-            <Icon surface="none" name="field.email" size="s" tone="subtle" />
+            <Icon name="field.email" size="s" tone="subtle" />
           </Button.Icon>
           Contact sales
         </Button.Root>

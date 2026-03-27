@@ -31,7 +31,7 @@ export default function ModalControlledSnippet() {
               <Button.Root variant="primary">Готово</Button.Root>
             </Modal.Close>
           }
-          icon={<Icon surface="raised" name="action.copy" />}
+          icon={<Icon name="action.copy" />}
           title="Состояние снаружи"
         >
           <p>Триггер внутри разметки не обязателен: окно управляется родителем.</p>

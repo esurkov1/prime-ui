@@ -14,7 +14,7 @@ export default function SearchExample() {
     >
       <Input.Wrapper>
         <Input.Icon side="start">
-          <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+          <Icon name="nav.layoutGrid" size="s" tone="subtle" />
         </Input.Icon>
         <Input.Field
           type="search"

@@ -10,26 +10,26 @@ export default function SelectPatternCompositionExample() {
       <Select.Root defaultValue="eur" placeholder="Report currency">
         <Select.Trigger>
           <Select.TriggerIcon>
-            <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+            <Icon name="nav.layoutGrid" size="s" tone="subtle" />
           </Select.TriggerIcon>
           <Select.Value />
         </Select.Trigger>
         <Select.Content>
           <Select.Item value="rub" label="RUB — Russian ruble">
             <Select.ItemIcon>
-              <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+              <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
             ₽ RUB
           </Select.Item>
           <Select.Item value="eur" label="EUR — Euro">
             <Select.ItemIcon>
-              <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+              <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
             € EUR
           </Select.Item>
           <Select.Item value="usd" label="USD — US dollar">
             <Select.ItemIcon>
-              <Icon surface="none" name="nav.layoutGrid" size="s" tone="subtle" />
+              <Icon name="nav.layoutGrid" size="s" tone="subtle" />
             </Select.ItemIcon>
             $ USD
           </Select.Item>

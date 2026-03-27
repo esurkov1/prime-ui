@@ -18,7 +18,7 @@ export default function MarketingCtaExample() {
       <Button.Root variant="neutral" mode="stroke" size="l" fullWidth>
         Compare plans
         <Button.Icon>
-          <Icon surface="none" name="nav.chevronRight" size="s" tone="subtle" />
+          <Icon name="nav.chevronRight" size="s" tone="subtle" />
         </Button.Icon>
       </Button.Root>
     </div>

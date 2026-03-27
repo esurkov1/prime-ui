@@ -34,7 +34,7 @@ export default function ModalPatternFullWidthFooterExample() {
             </Modal.Close>
           </div>
         }
-        icon={<Icon surface="raised" name="action.upload" />}
+        icon={<Icon name="action.upload" />}
         title="Confirm order"
       >
         <Typography.Root as="p" variant="body-default">

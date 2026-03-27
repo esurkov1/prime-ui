@@ -9,7 +9,7 @@ export default function DrawerCompositionSnippet() {
       <Drawer.Trigger>
         <Button.Root>
           <Button.Icon>
-            <Icon surface="raised" name="field.email" />
+            <Icon name="field.email" />
           </Button.Icon>
           Быстрый ответ
         </Button.Root>

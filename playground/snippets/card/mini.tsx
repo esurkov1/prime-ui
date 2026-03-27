@@ -5,7 +5,7 @@ export default function CardMiniSnippet() {
   return (
     <Card.Root variant="mini">
       <Card.IconBox>
-        <Icon surface="none" name="field.email" />
+        <Icon name="field.email" />
       </Card.IconBox>
       <Card.Stack>
         <Card.Label>Active sessions</Card.Label>

@@ -6,7 +6,7 @@ export default function HintCompositionIconSnippet() {
   return (
     <Hint.Root>
       <Hint.Icon>
-        <Icon surface="none" name="field.email" tone="subtle" />
+        <Icon name="field.email" tone="subtle" />
       </Hint.Icon>
       На этот адрес придёт код подтверждения.
     </Hint.Root>

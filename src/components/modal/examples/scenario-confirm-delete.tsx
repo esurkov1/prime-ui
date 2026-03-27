@@ -26,7 +26,7 @@ export default function ModalConfirmDeleteExample() {
             </Button.Root>
           </>
         }
-        icon={<Icon surface="raised" name="action.close" tone="subtle" />}
+        icon={<Icon name="action.close" tone="subtle" />}
         title="Delete “Northwind rollout”?"
       >
         <Typography.Root as="p" variant="body-default">

@@ -11,7 +11,7 @@ export default function LoginEmailExample() {
     <Input.Root label="Электронная почта" hint="Мы отправим код подтверждения на этот адрес">
       <Input.Wrapper>
         <Input.Icon side="start">
-          <Icon surface="none" name="field.email" size="s" tone="subtle" />
+          <Icon name="field.email" size="s" tone="subtle" />
         </Input.Icon>
         <Input.Field
           type="email"

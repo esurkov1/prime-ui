@@ -35,7 +35,7 @@ export default function ModalMultiFieldFormExample() {
             </Button.Root>
           </>
         }
-        icon={<Icon surface="raised" name="nav.itemDot" tone="subtle" />}
+        icon={<Icon name="nav.itemDot" tone="subtle" />}
         title="Contact support"
       >
         <form

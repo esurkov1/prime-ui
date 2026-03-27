@@ -12,7 +12,7 @@ function TabsSizeGroup({ size }: { size: TabsSize }) {
         <Tabs.List>
           <Tabs.Tab value="a">
             <Tabs.Icon>
-              <Icon surface="none" name="nav.layoutGrid" tone="subtle" />
+              <Icon name="nav.layoutGrid" tone="subtle" />
             </Tabs.Icon>
             <Tabs.Label>Alpha</Tabs.Label>
           </Tabs.Tab>

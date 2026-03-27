@@ -13,32 +13,32 @@ export default function TabsExampleTriggersWithIcons() {
       <Tabs.List>
         <Tabs.Tab value="overview">
           <Tabs.Icon>
-            <Icon surface="none" name="nav.layoutGrid" tone="subtle" />
+            <Icon name="nav.layoutGrid" tone="subtle" />
           </Tabs.Icon>
           <Tabs.Label>Overview</Tabs.Label>
           <Tabs.Icon>
-            <Icon surface="none" name="nav.chevronRight" tone="subtle" />
+            <Icon name="nav.chevronRight" tone="subtle" />
           </Tabs.Icon>
         </Tabs.Tab>
         <Tabs.Tab value="dashboard">
           <Tabs.Icon>
-            <Icon surface="none" name="nav.layoutGrid" tone="subtle" />
+            <Icon name="nav.layoutGrid" tone="subtle" />
           </Tabs.Icon>
           <Tabs.Label>Dashboard</Tabs.Label>
           <Tabs.Icon>
-            <Icon surface="none" name="nav.chevronRight" tone="subtle" />
+            <Icon name="nav.chevronRight" tone="subtle" />
           </Tabs.Icon>
         </Tabs.Tab>
         <Tabs.Tab value="settings">
           <Tabs.Icon>
-            <Icon surface="none" name="nav.layoutGrid" tone="subtle" />
+            <Icon name="nav.layoutGrid" tone="subtle" />
           </Tabs.Icon>
           <Tabs.Icon>
-            <Icon surface="none" name="field.email" tone="subtle" />
+            <Icon name="field.email" tone="subtle" />
           </Tabs.Icon>
           <Tabs.Label>Settings</Tabs.Label>
           <Tabs.Icon>
-            <Icon surface="none" name="nav.chevronRight" tone="subtle" />
+            <Icon name="nav.chevronRight" tone="subtle" />
           </Tabs.Icon>
         </Tabs.Tab>
       </Tabs.List>

@@ -24,7 +24,7 @@ export default function AvatarFallbackVariantsExample() {
         </Avatar.Root>
         <Avatar.Root size="xl" aria-label="Placeholder account">
           <Avatar.Fallback>
-            <Icon surface="none" name="field.email" size="xl" tone="subtle" />
+            <Icon name="field.email" size="xl" tone="subtle" />
           </Avatar.Fallback>
         </Avatar.Root>
       </div>

@@ -11,7 +11,7 @@ function StrictDrawer() {
       <Drawer.Trigger>
         <Button.Root variant="error" mode="lighter">
           <Button.Icon>
-            <Icon surface="raised" name="status.locked" />
+            <Icon name="status.locked" />
           </Button.Icon>
           Строгий режим
         </Button.Root>

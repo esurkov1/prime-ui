@@ -12,15 +12,15 @@ export default function LinkButtonCompositionExample() {
   return (
     <div style={rowStyle}>
       <LinkButton.Root href="#">
-        <Icon surface="none" name="field.email" size="s" />
+        <Icon name="field.email" size="s" />
         Link with icon on the left
       </LinkButton.Root>
       <LinkButton.Root href="#">
         Icon on the right
-        <Icon surface="none" name="action.close" size="s" />
+        <Icon name="action.close" size="s" />
       </LinkButton.Root>
       <LinkButton.Root href="#" aria-label="Open profile">
-        <Icon surface="none" name="field.email" size="s" />
+        <Icon name="field.email" size="s" />
       </LinkButton.Root>
     </div>
   );

@@ -26,7 +26,7 @@ export default function BadgeEcommerceInventoryExample() {
       </Badge.Root>
       <Badge.Root color="teal" variant="filled">
         <Badge.Icon>
-          <Icon surface="none" name="status.locked" />
+          <Icon name="status.locked" />
         </Badge.Icon>
         Secure checkout
       </Badge.Root>

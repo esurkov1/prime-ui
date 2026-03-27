@@ -12,7 +12,7 @@ export default function TagExampleStatusMetadata() {
       <div className={styles.chipRow}>
         <Tag.Root>
           <Tag.Icon>
-            <Icon surface="none" name="status.locked" aria-hidden />
+            <Icon name="status.locked" aria-hidden />
           </Tag.Icon>
           <span>Production</span>
         </Tag.Root>

@@ -25,7 +25,7 @@ export default function KbdCompositionChordIconExample() {
       </div>
       <div style={row}>
         <Kbd.Root>
-          <Icon surface="raised" name="action.close" aria-hidden />
+          <Icon name="action.close" aria-hidden />
           <span>Esc</span>
         </Kbd.Root>
       </div>

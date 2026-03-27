@@ -7,7 +7,7 @@ export function SplitLayoutExample() {
       <Card.Split>
         <Card.SplitCell>
           <Card.IconBox aria-hidden>
-            <Icon surface="none" name="nav.layoutGrid" aria-hidden />
+            <Icon name="nav.layoutGrid" aria-hidden />
           </Card.IconBox>
           <Card.Stack>
             <Card.Label>Conversion</Card.Label>
@@ -16,7 +16,7 @@ export function SplitLayoutExample() {
         </Card.SplitCell>
         <Card.SplitCell>
           <Card.IconBox aria-hidden>
-            <Icon surface="none" name="field.email" aria-hidden />
+            <Icon name="field.email" aria-hidden />
           </Card.IconBox>
           <Card.Stack>
             <Card.Label>Average order value</Card.Label>

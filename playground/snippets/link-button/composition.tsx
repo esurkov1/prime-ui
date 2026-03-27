@@ -6,15 +6,15 @@ export default function LinkButtonCompositionSnippet() {
   return (
     <div className="row rowAlignCenter rowGapMedium">
       <LinkButton.Root href="#">
-        <Icon surface="none" name="field.email" size="s" />
+        <Icon name="field.email" size="s" />
         Ссылка с иконкой слева
       </LinkButton.Root>
       <LinkButton.Root href="#">
         Иконка справа
-        <Icon surface="none" name="action.close" size="s" />
+        <Icon name="action.close" size="s" />
       </LinkButton.Root>
       <LinkButton.Root href="#" aria-label="Открыть профиль">
-        <Icon surface="none" name="field.email" size="s" />
+        <Icon name="field.email" size="s" />
       </LinkButton.Root>
     </div>
   );

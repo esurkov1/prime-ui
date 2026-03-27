@@ -45,7 +45,7 @@ export default function ModalCompositionSnippet() {
         </Modal.Trigger>
         <Modal.Panel
           description="Футер не нужен, если нет явных действий."
-          icon={<Icon surface="raised" name="nav.itemDot" />}
+          icon={<Icon name="nav.itemDot" />}
           title="Только информация"
         >
           <Typography.Root as="p" variant="body-default">
@@ -84,7 +84,7 @@ export default function ModalCompositionSnippet() {
               <Button.Root variant="primary">Сохранить</Button.Root>
             </>
           }
-          icon={<Icon surface="raised" name="field.email" />}
+          icon={<Icon name="field.email" />}
           title="Контакт получателя"
         >
           <Input.Root label="Телефон курьера" hint="Формат: +7 и далее цифры">

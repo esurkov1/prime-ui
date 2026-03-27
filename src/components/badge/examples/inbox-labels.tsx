@@ -23,7 +23,7 @@ export default function BadgeInboxLabelsExample() {
       </Badge.Root>
       <Badge.Root color="sky" variant="lighter">
         <Badge.Icon>
-          <Icon surface="none" name="field.email" />
+          <Icon name="field.email" />
         </Badge.Icon>
         Newsletter
       </Badge.Root>

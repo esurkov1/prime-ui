@@ -17,7 +17,7 @@ export default function ButtonAsChildSnippet() {
         <Button.Root asChild variant="neutral" mode="stroke">
           <a href="/next-step">
             <Button.Icon>
-              <Icon surface="none" name="nav.chevronRight" size="s" tone="subtle" />
+              <Icon name="nav.chevronRight" size="s" tone="subtle" />
             </Button.Icon>
             Далее
           </a>

@@ -10,7 +10,7 @@ export default function BadgeDotIconSnippet() {
       </Badge.Root>
       <Badge.Root color="purple" variant="stroke">
         <Badge.Icon>
-          <Icon surface="none" name="status.locked" />
+          <Icon name="status.locked" />
         </Badge.Icon>
         Secured
       </Badge.Root>

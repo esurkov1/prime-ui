@@ -32,7 +32,7 @@ export default function ModalEditEntityExample() {
             </Modal.Close>
           </>
         }
-        icon={<Icon surface="raised" name="nav.layoutGrid" tone="subtle" />}
+        icon={<Icon name="nav.layoutGrid" tone="subtle" />}
         title="Edit account name"
       >
         <Input.Root label="Account name">

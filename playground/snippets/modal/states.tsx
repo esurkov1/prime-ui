@@ -14,7 +14,7 @@ export default function ModalStatesSnippet() {
         <Modal.Panel
           closeAriaLabel="Закрыть"
           description="Закрытие по Escape и по клику на затемнённый фон (если клик не на панели)."
-          icon={<Icon surface="raised" name="field.email" />}
+          icon={<Icon name="field.email" />}
           title="Стандартное поведение"
         >
           <p>Попробуйте Escape и клик по области вне белой панели.</p>
@@ -25,7 +25,7 @@ export default function ModalStatesSnippet() {
         <Modal.Trigger>
           <Button.Root variant="error" mode="lighter">
             <Button.Icon>
-              <Icon surface="raised" name="status.locked" />
+              <Icon name="status.locked" />
             </Button.Icon>
             Только явные действия
           </Button.Root>
@@ -44,7 +44,7 @@ export default function ModalStatesSnippet() {
               </Button.Root>
             </Modal.Close>
           }
-          icon={<Icon surface="raised" name="status.locked" />}
+          icon={<Icon name="status.locked" />}
           showClose={false}
           title="Жёсткий режим"
         >
