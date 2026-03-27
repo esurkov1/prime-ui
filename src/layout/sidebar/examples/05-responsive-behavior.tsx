@@ -5,7 +5,7 @@ import styles from "./examples.module.css";
 
 /**
  * Responsive mode (default `responsive={true}`): below the narrow breakpoint the panel becomes a drawer
- * with backdrop and optional floating open control. Constants such as `SIDEBAR_MEDIA_QUERY_NARROW` match
+ * with backdrop; the same edge toggle opens the panel when closed. Constants such as `SIDEBAR_MEDIA_QUERY_NARROW` match
  * the kit implementation (single source of truth for JS and CSS).
  */
 export default function SidebarExampleResponsiveBehavior() {

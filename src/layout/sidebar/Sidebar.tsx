@@ -98,9 +98,7 @@ function SidebarNavPanel({
   children,
   ...rest
 }: SidebarNavPanelProps) {
-  const { navPanelId, isMobile, state } = useSidebarContext();
-  /** На узком окне закрытая панель уезжает за край — edge-кнопка внутри nav недоступна; открытие даёт плавающая кнопка в `SidebarRoot` без дублирования aria. */
-  const showEdgeToggle = showToggle && !(isMobile && state === "hidden");
+  const { navPanelId } = useSidebarContext();
 
   return (
     <nav
@@ -109,8 +107,8 @@ function SidebarNavPanel({
       className={cx(styles.navPanel, className)}
       aria-label={rest["aria-label"] ?? "Sidebar navigation"}
     >
-      {children}
-      {showEdgeToggle ? <SidebarToggleButton placement="edge" /> : null}
+      <div className={styles.navPanelSurface}>{children}</div>
+      {showToggle ? <SidebarToggleButton placement="edge" /> : null}
     </nav>
   );
 }

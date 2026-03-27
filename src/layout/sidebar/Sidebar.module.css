@@ -10,8 +10,6 @@
   --sb-transition-duration: var(--prime-sys-motion-duration-slow);
   --sb-transition-ease: var(--prime-sys-motion-easing-standard);
   --sb-control-height: var(--prime-sys-size-control-m-height);
-  --sb-floating-toggle-size: calc(var(--sb-control-height) - var(--prime-sys-unit-8px));
-
   --sb-panel-padding-inline-expanded: var(--prime-sys-spacing-x2);
   --sb-panel-padding-inline-compact: var(--prime-sys-spacing-x1);
   --sb-panel-padding-inline: calc(
@@ -123,6 +121,7 @@
   pointer-events: none;
 }
 
+/* Внешняя оболочка: edge ToggleButton не внутри слоя с transform (мобильный drawer). */
 .navPanel {
   position: relative;
   z-index: 1;
@@ -133,6 +132,18 @@
   min-width: 100%;
   min-height: 0;
   height: 100%;
+}
+
+.navPanelSurface {
+  position: relative;
+  z-index: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 100%;
+  min-height: 0;
+  width: 100%;
   gap: var(--sb-panel-gap);
   padding-block: var(--sb-panel-padding-block);
   padding-inline: var(--sb-panel-padding-inline);
@@ -151,20 +162,23 @@
   transition: background-color var(--sb-transition-duration) var(--sb-transition-ease);
 }
 
-:root[data-theme="dark"] .navPanel {
+:root[data-theme="dark"] .navPanelSurface {
   background: var(--prime-sys-color-surface-default);
 }
 
-.root[data-side="left"] .navPanel {
+.root[data-side="left"] .navPanelSurface {
   border-inline-end: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
 }
 
 .root[data-side="right"] .navPanel {
   margin-inline-start: auto;
+}
+
+.root[data-side="right"] .navPanelSurface {
   border-inline-start: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
 }
 
-.root[data-state="hidden"] .navPanel {
+.root[data-state="hidden"] .navPanelSurface {
   opacity: 0;
   pointer-events: none;
 }
@@ -461,7 +475,7 @@
 
 .toggleButton[data-placement="edge"] {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   width: calc(var(--sb-control-height) * 0.72);
   min-width: calc(var(--sb-control-height) * 0.72);
   max-width: calc(var(--sb-control-height) * 0.72);
@@ -479,6 +493,7 @@
   transform: translate(50%, -50%);
   background: var(--prime-sys-color-surface-elevated);
   box-shadow: var(--prime-sys-elevation-shadow-surface);
+  /* Родитель .navArea может иметь pointer-events: none — кнопка остаётся кликабельной. */
   pointer-events: auto;
 }
 
@@ -687,48 +702,6 @@
   gap: var(--prime-sys-spacing-x1);
 }
 
-.floatingToggle {
-  position: fixed;
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--sb-floating-toggle-size);
-  min-width: var(--sb-floating-toggle-size);
-  max-width: var(--sb-floating-toggle-size);
-  min-height: var(--sb-floating-toggle-size);
-  padding: 0;
-  border: 0;
-  border-radius: var(--prime-sys-size-control-m-radius);
-  background: var(--prime-sys-color-surface-elevated);
-  color: var(--prime-sys-color-content-secondary);
-  cursor: pointer;
-  z-index: var(--prime-sys-elevation-zIndex-drawerNestedShell);
-  font-size: 0.875rem;
-  inset-block-start: calc(env(safe-area-inset-top, 0px) + var(--prime-sys-spacing-x2));
-  inset-inline-start: calc(env(safe-area-inset-left, 0px) + var(--prime-sys-spacing-x2));
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  transition:
-    background-color var(--sb-transition-duration) var(--sb-transition-ease),
-    color var(--sb-transition-duration) var(--sb-transition-ease),
-    opacity var(--sb-transition-duration) var(--sb-transition-ease);
-}
-
-.floatingToggle[data-side="right"] {
-  inset-inline-start: auto;
-  inset-inline-end: calc(env(safe-area-inset-right, 0px) + var(--prime-sys-spacing-x2));
-}
-
-.floatingToggle:hover {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  color: var(--prime-sys-color-content-primary);
-}
-
-.floatingToggle:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-}
-
 @media (min-width: 48rem) {
   .root[data-state="compact"] .identityButtonMain {
     flex: 0 1 auto;
@@ -786,42 +759,76 @@
     position: absolute;
     top: 0;
     bottom: 0;
+    height: 100dvh;
+    transform: none;
+    overflow: visible;
+  }
+
+  /* Открытый drawer: панель на всю ширину полосы. */
+  .root[data-mobile-open="true"] .navPanel {
     width: min(var(--sb-expanded-width), 90vw);
     min-width: min(var(--sb-expanded-width), 90vw);
     max-width: 100vw;
-    height: 100dvh;
-    transform: none;
+  }
+
+  /* Закрытый drawer: ширина 0 — ручка остаётся у края экрана (overflow: visible). */
+  .root:not([data-mobile-open="true"]) .navPanel {
+    width: 0;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .navPanelSurface {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
     transition:
       transform var(--sb-transition-duration) var(--sb-transition-ease),
       background-color var(--sb-transition-duration) var(--sb-transition-ease);
   }
 
-  .root[data-state="hidden"] .navPanel {
-    opacity: 1;
-    pointer-events: none;
-  }
-
   .root[data-side="left"] .navPanel {
     left: 0;
     border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
-    transform: translateX(-100%);
   }
 
   .root[data-side="right"] .navPanel {
     right: 0;
     border-radius: var(--prime-sys-shape-radius-l) 0 0 var(--prime-sys-shape-radius-l);
+  }
+
+  .root[data-side="left"] .navPanelSurface {
+    transform: translateX(-100%);
+  }
+
+  .root[data-side="right"] .navPanelSurface {
     transform: translateX(100%);
   }
 
-  .root[data-mobile-open="true"] .navPanel {
+  .root[data-mobile-open="true"] .navPanelSurface {
     transform: translateX(0);
+  }
+
+  /* Закрытый drawer: единственная edge-кнопка — у края экрана (не у внутренней грани полосы). */
+  .root[data-side="left"]:not([data-mobile-open="true"]) .toggleButton[data-placement="edge"] {
+    inset-inline-end: auto;
+    inset-inline-start: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  .root[data-side="right"]:not([data-mobile-open="true"]) .toggleButton[data-placement="edge"] {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    transform: translate(50%, -50%);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .root,
   .navPanel,
-  .floatingToggle,
+  .navPanelSurface,
   .backdrop,
   .menuButton,
   .menuLabel,

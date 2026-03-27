@@ -82,7 +82,8 @@ export const sidebarRootApiRows: PlaygroundApiPropRow[] = [
     type: "boolean",
     defaultValue: "true",
     required: "Нет",
-    description: "При true — поведение для max-width 64rem: оверлей и плавающая кнопка.",
+    description:
+      "При true — узкий viewport: drawer, backdrop, edge-кнопка у края при закрытой панели.",
   },
   {
     prop: "sidebarSlot",

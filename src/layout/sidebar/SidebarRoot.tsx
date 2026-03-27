@@ -1,7 +1,5 @@
 import { animate, useMotionValue, useMotionValueEvent, useReducedMotion } from "framer-motion";
-import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
 import * as React from "react";
-import { createPortal } from "react-dom";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { useOverlayModal } from "@/hooks/useOverlayModal";
@@ -209,15 +207,6 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
     root.style.setProperty("--sb-progress", value.toString());
   });
 
-  const [floatingPortalReady, setFloatingPortalReady] = React.useState(false);
-
-  React.useLayoutEffect(() => {
-    setFloatingPortalReady(true);
-  }, []);
-
-  /** На узком окне закрытая панель уезжает за край — плавающая кнопка нужна даже при встроенной edge-кнопке в разметке. */
-  const showFloatingToggle = Boolean(responsive) && isMobile && !openState;
-
   const closeMobile = React.useCallback(() => {
     setLayoutState("hidden");
   }, [setLayoutState]);
@@ -225,15 +214,6 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
   const navAreaRef = useOverlayModal<HTMLDivElement>(mobileOpen, closeMobile);
 
   const navPanelId = React.useId();
-
-  const floatingToggleLabel = side === "left" ? "Открыть сайдбар" : "Открыть сайдбар справа";
-
-  const floatingToggleIcon =
-    side === "left" ? <PanelLeftOpen size="1em" /> : <PanelRightOpen size="1em" />;
-
-  const onFloatingToggleClick = React.useCallback(() => {
-    setLayoutState("expanded");
-  }, [setLayoutState]);
 
   const contextValue = React.useMemo(
     () => ({
@@ -283,24 +263,6 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
           />
           {children}
         </div>
-
-        {showFloatingToggle && floatingPortalReady && typeof document !== "undefined"
-          ? createPortal(
-              <button
-                type="button"
-                className={styles.floatingToggle}
-                onClick={onFloatingToggleClick}
-                aria-label={floatingToggleLabel}
-                aria-controls={navPanelId}
-                data-side={side}
-              >
-                <span className={styles.menuIcon} aria-hidden="true">
-                  {floatingToggleIcon}
-                </span>
-              </button>,
-              document.body,
-            )
-          : null}
       </aside>
     </SidebarProvider>
   );

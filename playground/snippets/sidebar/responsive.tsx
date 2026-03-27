@@ -67,7 +67,7 @@ export default function SidebarResponsiveSnippet() {
       <div className={styles.column}>
         <p className={styles.caption}>
           <code>responsive=&#123;true&#125;</code> (значение по умолчанию) — на узком окне панель
-          скрывается за край, появляются затемнение и плавающая кнопка открытия.
+          скрывается за край, появляются затемнение; та же edge-кнопка остаётся у края экрана.
         </p>
         <div className={styles.stage}>
           <Sample responsive />

@@ -68,7 +68,7 @@ describe("Sidebar", () => {
     expect(root).toHaveAttribute("data-responsive", "true");
   });
 
-  it("does not close on nav leave when opened via floating toggle", () => {
+  it("does not close on nav leave when opened via edge toggle", () => {
     const matchMediaImpl = (query: string) => {
       if (query.includes("29.999rem") && query.includes("max-width")) {
         return {
@@ -117,7 +117,7 @@ describe("Sidebar", () => {
     }
   });
 
-  it("shows floating open control when fully hidden even on xs viewport (≤480px)", () => {
+  it("shows edge open control when fully hidden even on xs viewport (≤480px)", () => {
     const matchMediaImpl = (query: string) => {
       if (query.includes("29.999rem") && query.includes("max-width")) {
         return {

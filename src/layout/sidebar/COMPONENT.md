@@ -10,7 +10,7 @@
 
 - Persistent app navigation beside main content, including **`AppShell.Template`** nav slot with **`sidebarSlot="page-nav"`**.
 - Desktop width toggle (expanded vs icon rail) with optional tooltips in **`compact`**.
-- Mobile drawer behavior when **`responsive={true}`** (default): overlay, backdrop, floating open control on narrow viewports when the panel is closed.
+- Mobile drawer behavior when **`responsive={true}`** (default): overlay, backdrop; при закрытой панели та же **edge**-кнопка **`Sidebar.ToggleButton`** остаётся у края экрана.
 
 **When not to use**
 
@@ -123,7 +123,7 @@ For dynamic menus (modes, roles, brands), keep a data layer above the JSX: e.g. 
 | state | `SidebarLayoutMode` | — | No | Controlled layout state. |
 | defaultState | `SidebarLayoutMode` | see below | No | Initial state; with **`responsive`**, narrow viewports start **hidden**. |
 | onStateChange | `(state: SidebarLayoutMode) => void` | — | No | Fires on layout changes. |
-| responsive | `boolean` | `true` | No | When **true**, narrow viewports use drawer + backdrop + floating open when the panel is closed. |
+| responsive | `boolean` | `true` | No | When **true**, narrow viewports use drawer + backdrop; the same edge toggle opens the panel when it is closed. |
 | sidebarSlot | `"page-nav"` | — | No | Page nav embedding; sets **`data-sidebar-slot`**. |
 | aria-label | `string` | `"Sidebar"` | No | Name for the **`aside`** landmark. |
 | open, defaultOpen, onOpenChange | — | — | No | **Deprecated;** maps to hidden vs expanded. |
