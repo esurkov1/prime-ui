@@ -164,8 +164,8 @@ export default function PopoverSection() {
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
               Проп <code>size</code> на <code>Popover.Content</code>: ряд <code>s</code>,{" "}
-              <code>m</code>, <code>l</code>, <code>xl</code> — разные отступы панели, минимальная
-              ширина и кегль вспомогательного текста.
+              <code>m</code>, <code>l</code>, <code>xl</code> — отступы панели и кегль текста по
+              ярусу контрола; вложенные контролы получают размер через провайдер.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="row">
               <PlaygroundExampleFrame.Stage>
@@ -231,8 +231,8 @@ export default function PopoverSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
-              Триггер с <code>Button.Icon</code>, заголовок, текст и нативные чекбоксы в теле панели
-              с <code>insetPadding</code> / <code>insetGap</code>.
+              Триггер с <code>Button.Icon</code>, заголовок, текст и нативные чекбоксы; поля панели
+              задаёт <code>size</code> на <code>Popover.Content</code>.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>

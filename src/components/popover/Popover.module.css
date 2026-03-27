@@ -1,7 +1,6 @@
 .content {
-  /* Канон полей панели — как у `Dropdown.Content` (`--dd-pad`, `--dd-min-w`, max-width). */
+  /* Поля по `data-size` (`--po-pad`); без min-width — ширина от контента (`width: max-content`), как у типичного popover. */
   --po-pad: var(--prime-sys-spacing-x2);
-  --po-min-w: var(--prime-sys-unit-11rem);
   --po-text-size: var(--prime-sys-size-control-m-supportText);
   --po-inset-pad-block: 0;
   --po-inset-pad-inline: 0;
@@ -22,7 +21,7 @@
   padding-block: calc(var(--po-pad) + var(--po-inset-pad-block));
   padding-inline: calc(var(--po-pad) + var(--po-inset-pad-inline));
   gap: var(--po-inset-gap);
-  min-width: var(--po-min-w);
+  min-width: 0;
   /* Прокрутка — ScrollContainer */
   transform-origin: top center;
   font-size: var(--po-text-size);
@@ -84,19 +83,16 @@
 
 .content[data-size="s"] {
   --po-pad: var(--prime-sys-spacing-x2);
-  --po-min-w: var(--prime-sys-unit-9p5rem);
   --po-text-size: var(--prime-sys-size-control-s-supportText);
 }
 
 .content[data-size="l"] {
   --po-pad: var(--prime-sys-spacing-x3);
-  --po-min-w: var(--prime-sys-unit-12p5rem);
   --po-text-size: var(--prime-sys-size-control-l-supportText);
 }
 
 .content[data-size="xl"] {
   --po-pad: var(--prime-sys-spacing-x4);
-  --po-min-w: var(--prime-sys-unit-14rem);
   --po-text-size: var(--prime-sys-size-control-xl-supportText);
 }
 

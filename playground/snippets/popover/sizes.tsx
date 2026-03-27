@@ -11,14 +11,14 @@ export default function PopoverSizesSnippet() {
       {sizes.map((size) => (
         <Popover.Root key={size}>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" variant="neutral">
+            <Button.Root mode="stroke" variant="neutral">
               Размер {size}
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x2" insetPadding="x2" side="bottom" size={size}>
+          <Popover.Content align="start" side="bottom" size={size}>
             <p className={preview.panelTextMuted}>
-              Панель с <code>size=&quot;{size}&quot;</code>: отступы, минимальная ширина и кегль
-              текста из яруса контрола.
+              Панель с <code>size=&quot;{size}&quot;</code>: поля панели и кегль текста из яруса
+              контрола (<code>ControlSizeProvider</code> для вложенных контролов).
             </p>
           </Popover.Content>
         </Popover.Root>

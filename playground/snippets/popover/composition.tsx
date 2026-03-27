@@ -10,14 +10,14 @@ export default function PopoverCompositionSnippet() {
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <Button.Root mode="stroke" size="m" variant="neutral">
+        <Button.Root mode="stroke" variant="neutral">
           <Button.Icon>
             <SlidersHorizontal aria-hidden strokeWidth={1.75} />
           </Button.Icon>
           Фильтры отчёта
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
+      <Popover.Content align="start" side="bottom">
         <div className={preview.compositionHeader}>
           <Filter aria-hidden className={preview.headerIcon} strokeWidth={1.75} />
           <Typography.Root as="span" variant="body-small" weight="semibold">
@@ -25,14 +25,14 @@ export default function PopoverCompositionSnippet() {
           </Typography.Root>
         </div>
         <Typography.Root as="p" className={preview.panelTextMuted} variant="body-small">
-          Иконка на триггере, заголовок и текст внутри панели с колонкой и зазорами (
-          <code>insetPadding</code>, <code>insetGap</code>).
+          Иконка на триггере, заголовок и колонка с чекбоксами; поля панели задаёт ярус{" "}
+          <code>size</code> на <code>Popover.Content</code>.
         </Typography.Root>
         <div className={preview.checkboxStack}>
-          <Checkbox.Root size="m" defaultChecked>
+          <Checkbox.Root defaultChecked>
             <Checkbox.Label>Только активные</Checkbox.Label>
           </Checkbox.Root>
-          <Checkbox.Root size="m">
+          <Checkbox.Root>
             <Checkbox.Label>Скрыть нулевые</Checkbox.Label>
           </Checkbox.Root>
         </div>

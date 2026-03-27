@@ -5,7 +5,7 @@ import styles from "./popover-examples.module.css";
 const sizes = ["s", "m", "l", "xl"] as const;
 
 /**
- * Content `size` tier: padding, min width, and helper text scale (`ControlSizeProvider`).
+ * Content `size` tier: panel padding, type scale, and `ControlSizeProvider` for nested controls.
  */
 export default function PopoverSizesExample() {
   return (
@@ -13,14 +13,14 @@ export default function PopoverSizesExample() {
       {sizes.map((size) => (
         <Popover.Root key={size}>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" variant="neutral">
+            <Button.Root mode="stroke" variant="neutral">
               Size {size}
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" insetGap="x2" insetPadding="x2" side="bottom" size={size}>
+          <Popover.Content align="start" side="bottom" size={size}>
             <p className={styles.panelTextMuted}>
-              Panel with <code>size=&quot;{size}&quot;</code>: padding, min width, and type scale
-              from the control tier.
+              Panel with <code>size=&quot;{size}&quot;</code>: padding and type scale from the
+              control tier; nested controls use <code>ControlSizeProvider</code>.
             </p>
           </Popover.Content>
         </Popover.Root>
