@@ -1,6 +1,7 @@
 .content {
-  --po-pad: var(--prime-sys-spacing-x3);
-  --po-min-w: var(--prime-sys-unit-12rem);
+  /* Канон полей панели — как у `Dropdown.Content` (`--dd-pad`, `--dd-min-w`, max-width). */
+  --po-pad: var(--prime-sys-spacing-x2);
+  --po-min-w: var(--prime-sys-unit-11rem);
   --po-text-size: var(--prime-sys-size-control-m-supportText);
   --po-inset-pad-block: 0;
   --po-inset-pad-inline: 0;
@@ -11,7 +12,7 @@
   align-items: stretch;
   position: fixed;
   width: max-content;
-  max-width: min(var(--prime-sys-unit-24rem), 100vw);
+  max-width: min(var(--prime-sys-unit-20rem), 100vw);
   background: var(--prime-sys-color-surface-elevated);
   border: none;
   border-radius: var(--prime-sys-shape-radius-l);
@@ -83,19 +84,19 @@
 
 .content[data-size="s"] {
   --po-pad: var(--prime-sys-spacing-x2);
-  --po-min-w: var(--prime-sys-unit-10rem);
+  --po-min-w: var(--prime-sys-unit-9p5rem);
   --po-text-size: var(--prime-sys-size-control-s-supportText);
 }
 
 .content[data-size="l"] {
   --po-pad: var(--prime-sys-spacing-x3);
-  --po-min-w: var(--prime-sys-unit-14rem);
+  --po-min-w: var(--prime-sys-unit-12p5rem);
   --po-text-size: var(--prime-sys-size-control-l-supportText);
 }
 
 .content[data-size="xl"] {
   --po-pad: var(--prime-sys-spacing-x4);
-  --po-min-w: var(--prime-sys-unit-16rem);
+  --po-min-w: var(--prime-sys-unit-14rem);
   --po-text-size: var(--prime-sys-size-control-xl-supportText);
 }
 
