@@ -14,8 +14,6 @@ import DropdownControlledSnippet from "../snippets/dropdown/controlled";
 import controlledSource from "../snippets/dropdown/controlled.tsx?raw";
 import DropdownFullWidthSnippet from "../snippets/dropdown/full-width";
 import fullWidthSource from "../snippets/dropdown/full-width.tsx?raw";
-import DropdownInsetSnippet from "../snippets/dropdown/inset";
-import insetSource from "../snippets/dropdown/inset.tsx?raw";
 import DropdownPlacementSnippet from "../snippets/dropdown/placement";
 import placementSource from "../snippets/dropdown/placement.tsx?raw";
 import DropdownSizesSnippet from "../snippets/dropdown/sizes";
@@ -139,45 +137,7 @@ const dropdownContentApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Содержимое меню: Inset, Block, Group, Item, Separator и т.д.",
-  },
-];
-
-const dropdownInsetApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "padding",
-    type: '"none" | "x1" | "x2" | "x3"',
-    defaultValue: '"x2"',
-    required: "Нет",
-    description: "Внутренние поля от края Dropdown.Content.",
-  },
-  {
-    prop: "gap",
-    type: '"none" | "x2" | "x3" | "x4"',
-    defaultValue: '"x3"',
-    required: "Нет",
-    description: "Вертикальный зазор между прямыми дочерними узлами.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный CSS-класс.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Вложенные блоки и пункты.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Остальные атрибуты контейнера inset.",
+    description: "Содержимое меню: Block, Group, Item, Separator и т.д.",
   },
 ];
 
@@ -503,20 +463,6 @@ export default function DropdownSection() {
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              <code>Dropdown.Inset</code> — внутренние поля от края панели и вертикальный шаг между
-              прямыми дочерними узлами через <code>padding</code> и <code>gap</code> (текст над
-              списком, плотный режим без лишних полей).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={insetSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <DropdownInsetSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Dropdown.Root</DemoApiTitle>
             <DemoDescription>
@@ -538,12 +484,6 @@ export default function DropdownSection() {
               относительно триггера.
             </DemoDescription>
             <PlaygroundApiTable rows={dropdownContentApiRows} />
-
-            <DemoApiTitle>Dropdown.Inset</DemoApiTitle>
-            <DemoDescription>
-              Внутренние поля и вертикальный ритм между прямыми дочерними узлами внутри контента.
-            </DemoDescription>
-            <PlaygroundApiTable rows={dropdownInsetApiRows} />
 
             <DemoApiTitle>Dropdown.Block</DemoApiTitle>
             <DemoDescription>Секция внутри панели для группировки шапки и списка.</DemoDescription>

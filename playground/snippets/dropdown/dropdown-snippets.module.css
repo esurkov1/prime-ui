@@ -18,7 +18,3 @@
       var(--prime-sys-spacing-xs)
   );
 }
-
-.insetNoteTight {
-  padding-inline: var(--prime-sys-spacing-x2);
-}

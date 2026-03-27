@@ -6,7 +6,7 @@
 
 **What:** `Dropdown` is a **portaled action menu** (`role="menu"`): one trigger toggles a floating list of **`menuitem`** rows. **`Dropdown.Trigger`** clones **exactly one** child element and merges **`aria-expanded`**, **`aria-haspopup="menu"`**, **`aria-controls`**, **`id`**, ref, and toggle **`onClick`**. **`Dropdown.Content`** renders **only when open**, applies focus trap, Escape/outside close, and arrow-key roving focus among items.
 
-**Parts:** `Root` → `Trigger` + `Content`. Inside `Content`: optional `Inset`, `Block`, `Header` (+ `HeaderRow`, `HeaderLeading`, `HeaderMain`, `HeaderTitle`, `HeaderDescription`, `HeaderTrailing`), `Group` + `GroupLabel`, `Separator`, `Item` (+ `ItemIcon`).
+**Parts:** `Root` → `Trigger` + `Content`. Inside `Content`: `Block`, `Header` (+ `HeaderRow`, `HeaderLeading`, `HeaderMain`, `HeaderTitle`, `HeaderDescription`, `HeaderTrailing`), `Group` + `GroupLabel`, `Separator`, `Item` (+ `ItemIcon`).
 
 **State:** Uncontrolled: **`defaultOpen`** on `Root`. Controlled: **`open`** + **`onOpenChange`**. **`Item.onSelect`** runs on activation, then the menu closes unless **`disabled`**.
 
@@ -26,7 +26,6 @@
 | [`playground/snippets/dropdown/composition.tsx`](../../../playground/snippets/dropdown/composition.tsx) | **`Block`**, header slots, **`GroupLabel`**, **`ItemIcon`**, nested trailing **Button** |
 | [`playground/snippets/dropdown/full-width.tsx`](../../../playground/snippets/dropdown/full-width.tsx) | **`sameMinWidthAsTrigger`** with narrow trigger |
 | [`playground/snippets/dropdown/as-child.tsx`](../../../playground/snippets/dropdown/as-child.tsx) | **`Trigger`** merges props into a single child (e.g. link) |
-| [`playground/snippets/dropdown/inset.tsx`](../../../playground/snippets/dropdown/inset.tsx) | **`Inset`** **`padding`** / **`gap`** variants |
 
 **Package `examples/`** (same folder as this file; `@/` imports in-repo, **`prime-ui-kit`** for consumers):
 
@@ -40,9 +39,8 @@
 | [`examples/composition.tsx`](examples/composition.tsx) | `composition.tsx` | Same as playground composition |
 | [`examples/full-width.tsx`](examples/full-width.tsx) | `full-width.tsx` | Same as playground full-width |
 | [`examples/as-child.tsx`](examples/as-child.tsx) | `as-child.tsx` | Same as playground as-child |
-| [`examples/inset.tsx`](examples/inset.tsx) | `inset.tsx` | Same as playground inset |
 | [`examples/actions-menu.tsx`](examples/actions-menu.tsx) | — | Icon-only trigger, row icons, separator, **`destructive`** |
-| [`examples/account-menu.tsx`](examples/account-menu.tsx) | — | Header + avatar, **`Inset`**, **`sameMinWidthAsTrigger`**, sign out |
+| [`examples/account-menu.tsx`](examples/account-menu.tsx) | — | Header + avatar, **`sameMinWidthAsTrigger`**, sign out |
 | [`examples/select-like-list.tsx`](examples/select-like-list.tsx) | — | Trigger shows choice; still **`role="menu"`** (not **Select**) |
 
 Shared layout tokens for some examples: [`examples/dropdown-examples.module.css`](examples/dropdown-examples.module.css) (mirrors [`playground/snippets/dropdown/dropdown-snippets.module.css`](../../../playground/snippets/dropdown/dropdown-snippets.module.css)).
@@ -89,8 +87,7 @@ A composite **action menu**: the trigger toggles a portaled panel with commands,
 
 - **`Dropdown.Root`** wraps everything and owns open state (controlled or uncontrolled).
 - **`Dropdown.Trigger`** must wrap **exactly one** React element; refs, `id`, `aria-*`, and toggle `onClick` are merged into that child.
-- **`Dropdown.Content`** renders **only when open** (portal + `role="menu"`). Put **`Dropdown.Inset`** or direct **`Dropdown.Block`** / **`Dropdown.Group`** / **`Dropdown.Item`** children inside it.
-- **`Dropdown.Inset`** optional wrapper: padding and vertical gap between **direct** children.
+- **`Dropdown.Content`** renders **only when open** (portal + `role="menu"`). Put **`Dropdown.Block`** / **`Dropdown.Group`** / **`Dropdown.Item`** children inside it.
 - **`Dropdown.Block`** — generic section; **`Dropdown.Header`** and **`HeaderRow`**, **`HeaderLeading`**, **`HeaderMain`**, **`HeaderTitle`**, **`HeaderDescription`**, **`HeaderTrailing`** compose a header area inside the panel.
 - **`Dropdown.Item`** — actionable row (`role="menuitem"`); may include **`Dropdown.ItemIcon`** before text.
 - **`Dropdown.Group`** + **`Dropdown.GroupLabel`** label a set of items; **`Dropdown.Separator`** is an `hr` between blocks.
@@ -135,17 +132,7 @@ A composite **action menu**: the trigger toggles a portaled panel with commands,
 | sameMinWidthAsTrigger | `boolean` | `false` | No | Panel minimum width is not less than the trigger width. |
 | size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Tier for panel metrics, rows, group labels, and default icon size. |
 | className | `string` | — | No | Extra class on the portaled menu container. |
-| children | `React.ReactNode` | — | Yes | Menu body: inset, blocks, groups, items, etc. |
-
-#### Dropdown.Inset
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| padding | `"none" \| "x1" \| "x2" \| "x3"` | `"x2"` | No | Inner padding from the content edge. |
-| gap | `"none" \| "x2" \| "x3" \| "x4"` | `"x3"` | No | Vertical gap between direct children. |
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | Yes | Nested blocks and items. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other `div` attributes. |
+| children | `React.ReactNode` | — | Yes | Menu body: blocks, groups, items, etc. |
 
 #### Dropdown.Block
 

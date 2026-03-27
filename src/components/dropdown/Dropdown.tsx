@@ -353,42 +353,10 @@ function DropdownHeaderTrailing({
 }
 DropdownHeaderTrailing.displayName = "DropdownHeaderTrailing";
 
-export type DropdownInsetPadding = "none" | "x1" | "x2" | "x3";
-export type DropdownInsetGap = "none" | "x2" | "x3" | "x4";
-
-export type DropdownInsetProps = React.HTMLAttributes<HTMLDivElement> & {
-  children: React.ReactNode;
-  /** Доп. отступы от внутреннего края `Dropdown.Content`. По умолчанию `x2`. */
-  padding?: DropdownInsetPadding;
-  /** Вертикальный зазор между прямыми дочерними блоками. По умолчанию `x3`. */
-  gap?: DropdownInsetGap;
-};
-
-function DropdownInset({
-  children,
-  className,
-  padding = "x2",
-  gap = "x3",
-  ...rest
-}: DropdownInsetProps) {
-  return (
-    <div
-      className={cx(styles.inset, className)}
-      data-inset-gap={gap}
-      data-inset-padding={padding}
-      {...rest}
-    >
-      {children}
-    </div>
-  );
-}
-DropdownInset.displayName = "DropdownInset";
-
 export const Dropdown = {
   Root: DropdownRoot,
   Trigger: DropdownTrigger,
   Content: DropdownContent,
-  Inset: DropdownInset,
   Block: DropdownBlock,
   Header: DropdownHeader,
   HeaderRow: DropdownHeaderRow,
