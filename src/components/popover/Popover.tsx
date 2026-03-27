@@ -99,7 +99,7 @@ function PopoverTrigger({ children, asChild: _asChild = true }: PopoverTriggerPr
 PopoverTrigger.displayName = "PopoverTrigger";
 
 export type PopoverInsetPadding = "none" | "x1" | "x2" | "x3";
-export type PopoverInsetGap = "none" | "x2" | "x3" | "x4";
+export type PopoverInsetGap = "none" | "pad" | "x2" | "x3" | "x4";
 
 export type PopoverContentProps = {
   align?: PositionAlign;
@@ -109,7 +109,7 @@ export type PopoverContentProps = {
   trapFocus?: boolean;
   /** Дополнение к внутренним полям как у Dropdown (`padding` = `--dd-pad` + inset). */
   insetPadding?: PopoverInsetPadding;
-  /** Вертикальный зазор между прямыми дочерними блоками внутри панели. */
+  /** Вертикальный зазор между прямыми дочерними блоками; `pad` = как у внутренних полей (`--dd-pad`). */
   insetGap?: PopoverInsetGap;
   children: React.ReactNode;
   className?: string;
@@ -122,7 +122,7 @@ function PopoverContent({
   size = "m",
   trapFocus = false,
   insetPadding = "none",
-  insetGap = "none",
+  insetGap = "pad",
   children,
   className,
 }: PopoverContentProps) {

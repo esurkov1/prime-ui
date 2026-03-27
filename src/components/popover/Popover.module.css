@@ -19,7 +19,7 @@
   --dd-header-desc-font: var(--prime-sys-size-control-s-supportText);
   --dd-separator-stack-pad: var(--prime-sys-spacing-x2);
   --po-inset-extra: 0px;
-  --po-inset-gap: 0;
+  --po-inset-gap: var(--dd-pad);
 
   display: flex;
   flex-direction: column;

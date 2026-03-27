@@ -122,10 +122,11 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "insetGap",
-    type: '"none" | "x2" | "x3" | "x4"',
-    defaultValue: '"none"',
+    type: '"none" | "pad" | "x2" | "x3" | "x4"',
+    defaultValue: '"pad"',
     required: "Нет",
-    description: "Вертикальный зазор между прямыми дочерними элементами (data-inset-gap).",
+    description:
+      "Вертикальный зазор между прямыми дочерними элементами; pad совпадает с полями панели (--dd-pad).",
   },
   {
     prop: "children",
