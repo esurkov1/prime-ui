@@ -18,9 +18,13 @@ function InlinePanelDemo() {
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
-              <Sidebar.Text>В потоке</Sidebar.Text>
+              <Sidebar.IdentityButton
+                leading={<span aria-hidden="true">◇</span>}
+                title="В потоке"
+                subtitle="Без слота"
+                type="button"
+              />
             </Sidebar.HeaderMain>
-            <Sidebar.ToggleButton />
           </Sidebar.HeaderRow>
         </Sidebar.Header>
         <Sidebar.Content>
@@ -35,6 +39,14 @@ function InlinePanelDemo() {
             </Sidebar.MenuItem>
           </Sidebar.Menu>
         </Sidebar.Content>
+        <Sidebar.Footer>
+          <Sidebar.IdentityButton
+            leading={<span aria-hidden="true">↓</span>}
+            title="Низ панели"
+            subtitle="Пример"
+            type="button"
+          />
+        </Sidebar.Footer>
       </Sidebar.NavPanel>
     </Sidebar.Root>
   );
@@ -56,9 +68,13 @@ function PageNavSlotDemo() {
           <Sidebar.Header>
             <Sidebar.HeaderRow>
               <Sidebar.HeaderMain>
-                <Sidebar.Text>Навигация</Sidebar.Text>
+                <Sidebar.IdentityButton
+                  leading={<span aria-hidden="true">▣</span>}
+                  title="Навигация"
+                  subtitle="page-nav"
+                  type="button"
+                />
               </Sidebar.HeaderMain>
-              <Sidebar.ToggleButton />
             </Sidebar.HeaderRow>
           </Sidebar.Header>
           <Sidebar.Content>
@@ -73,6 +89,14 @@ function PageNavSlotDemo() {
               </Sidebar.MenuItem>
             </Sidebar.Menu>
           </Sidebar.Content>
+          <Sidebar.Footer>
+            <Sidebar.IdentityButton
+              leading={<span aria-hidden="true">◆</span>}
+              title="Слот страницы"
+              subtitle="Рядом с main"
+              type="button"
+            />
+          </Sidebar.Footer>
         </Sidebar.NavPanel>
       </Sidebar.Root>
       <main className={styles.main}>Область контента рядом со слотом</main>

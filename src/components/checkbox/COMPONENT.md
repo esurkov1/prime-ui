@@ -19,24 +19,34 @@
 
 A compound checkbox: a visually hidden native `input type="checkbox"`, a decorative box with check or indeterminate mark, and optional label, hint, and error text wired to `aria-describedby` and invalid state.
 
-- **When to use** — explicit consent, terms, or other “yes/no” fields that submit with the form (`name`, `value`, `required`).
-- **When to use** — row or “select all” patterns where the parent shows **indeterminate** when only some children are checked.
-- **When to use** — independent toggles (feature flags, optional features, settings) rather than one-of-many choices.
-- **When to use** — hint text or inline validation aligned under the label column.
-- **When not to use** — exactly one option from a set of alternatives (prefer [Radio](../radio/COMPONENT.md)).
-- **When not to use** — a single binary setting where a switch fits the product language (prefer [Switch](../switch/COMPONENT.md)).
-- **When not to use** — you need `asChild` or fully custom markup; the control is a fixed [Label](../label/COMPONENT.md) row with a hidden input and SVG.
+- **When to use** — explicit consent, terms, or other “yes/no” fields that submit with the form (`name`, `value`, `required`); row or “select all” patterns where the parent shows **indeterminate** when only some children are checked; independent toggles (feature flags, optional features, settings) rather than one-of-many choices; hint text or inline validation aligned under the label column.
+- **When not to use** — exactly one option from a set of alternatives (prefer [Radio](../radio/COMPONENT.md)); a single binary setting where a switch fits the product language (prefer [Switch](../switch/COMPONENT.md)); you need `asChild` or fully custom markup; the control is a fixed [Label](../label/COMPONENT.md) row with a hidden input and SVG.
+
+### Playground snippets
+
+Demos match **`playground/sections/CheckboxSection.tsx`** (order and intent). Sources use `@/` imports under **`playground/snippets/checkbox/`**:
+
+| Block | File | What it shows |
+|-------|------|----------------|
+| **Sizes** | [`sizes.tsx`](../../../playground/snippets/checkbox/sizes.tsx) | **`size`** **`s`**, **`m`**, **`l`**, **`xl`** — box, gap, and label scale from control tokens. |
+| **Variants** | [`variants.tsx`](../../../playground/snippets/checkbox/variants.tsx) | **`variant="default"`** vs **`variant="error"`**; mounting **`Checkbox.Error`** also drives invalid (see **Composition** + recipes). |
+| **States** | [`states.tsx`](../../../playground/snippets/checkbox/states.tsx) | Unchecked, **`defaultChecked`**, **`indeterminate`**, native **`required`**, **`disabled`** (off and on). |
+| **Controlled** | [`controlled.tsx`](../../../playground/snippets/checkbox/controlled.tsx) | **`checked`** + **`onChange`**; **`indeterminate`** from parent state cleared on user change (table “select all” pattern). |
+| **Composition** | [`composition.tsx`](../../../playground/snippets/checkbox/composition.tsx) | **`Hint`** only; **`Error`** without **`variant="error"`** on root; full **`Hint`** + **`Error`** with **`variant="error"`**. |
+| **Full width** | [`full-width.tsx`](../../../playground/snippets/checkbox/full-width.tsx) (+ [`full-width.module.css`](../../../playground/snippets/checkbox/full-width.module.css)) | Narrow container: field root is **`width: 100%`**; long label wraps in the text column; hint aligned under label. |
+| **Specific** | [`specific.tsx`](../../../playground/snippets/checkbox/specific.tsx) | Empty **`Checkbox.Label`** with **`aria-label`** on **`Root`**; **`name`** / **`value`** / **`defaultChecked`** for form submit. |
 
 ### Scenarios (recipes)
 
 | Scenario | Approach |
 |----------|----------|
-| **Terms acceptance** | **`required`** on **`Root`**; optional **`Checkbox.Hint`** for legal context; show **`Checkbox.Error`** or **`variant="error"`** after validation when unchecked. |
-| **Feature flags list** | One **`Checkbox.Root` per flag**; independent **controlled** booleans or a small state map; no indeterminate unless a parent “enable all” exists. |
-| **Bulk select (row / table)** | **Header** checkbox: **`checked`** when all rows selected, **`indeterminate`** when some; **`onChange`** selects or clears all row ids. **Row** checkboxes toggle one id each. |
-| **Settings panel** | Stack of **`Root` → `Label` → optional `Hint`** rows; same **`size`** across the panel for rhythm; **`disabled`** for plan-gated options. |
+| **Terms acceptance** | **`required`** on **`Root`**; optional **`Checkbox.Hint`** for legal context; show **`Checkbox.Error`** or **`variant="error"`** after validation when unchecked. → [`examples/terms-acceptance.tsx`](examples/terms-acceptance.tsx) |
+| **Feature flags list** | One **`Checkbox.Root` per flag**; independent **controlled** booleans or a small state map; no indeterminate unless a parent “enable all” exists. → [`examples/feature-flags-list.tsx`](examples/feature-flags-list.tsx) |
+| **Bulk select (row / table)** | **Header** checkbox: **`checked`** when all rows selected, **`indeterminate`** when some; **`onChange`** selects or clears all row ids. **Row** checkboxes toggle one id each. → [`examples/bulk-select-rows.tsx`](examples/bulk-select-rows.tsx) |
+| **Settings panel** | Stack of **`Root` → `Label` → optional `Hint`** rows; same **`size`** across the panel for rhythm; **`disabled`** for plan-gated options. → [`examples/settings-panel.tsx`](examples/settings-panel.tsx) |
+| **Empty label + form attrs** | Icon-only / compact cell: **`aria-label`** (or **`aria-labelledby`**) on **`Root`**; optional **`name`** / **`value`** for submission. → [`examples/empty-label-form.tsx`](examples/empty-label-form.tsx) |
 
-Runnable TSX for these patterns lives under **`examples/`** in this folder (`terms-acceptance.tsx`, `feature-flags-list.tsx`, `bulk-select-rows.tsx`, `settings-panel.tsx`).
+Runnable recipe examples use **`prime-ui-kit`** imports under **`examples/`**. Snippet-level demos (internal imports) are listed in **Playground snippets** above.
 
 ### Composition
 

@@ -1,5 +1,7 @@
 import { Button, Popover, Typography } from "prime-ui-kit";
 
+import styles from "./popover-examples.module.css";
+
 type Demo = { label: string; side: "top" | "bottom"; align: "start" | "center" | "end" };
 
 const demos: Demo[] = [
@@ -10,22 +12,20 @@ const demos: Demo[] = [
 ];
 
 /**
- * Preferred side and alignment; the kit may flip at the viewport edge.
+ * Preferred `side` and `align`; the kit may flip at the viewport edge.
  */
 export default function PlacementExample() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "var(--prime-sys-spacing-x3)",
-        alignItems: "flex-start",
-      }}
-    >
+    <div className={styles.placementGrid}>
       {demos.map(({ label, side, align }) => (
         <Popover.Root key={label}>
           <Popover.Trigger asChild>
-            <Button.Root mode="stroke" size="m" style={{ minWidth: "10rem" }} variant="neutral">
+            <Button.Root
+              className={styles.placementTrigger}
+              mode="stroke"
+              size="m"
+              variant="neutral"
+            >
               {label}
             </Button.Root>
           </Popover.Trigger>

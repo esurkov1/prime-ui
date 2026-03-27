@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import DividerCompositionSnippet from "../snippets/divider/composition";
 import compositionSource from "../snippets/divider/composition.tsx?raw";
@@ -79,63 +79,68 @@ const dividerRootApiRows: PlaygroundApiPropRow[] = [
 
 export default function DividerSection() {
   return (
-    <PlaygroundDocPage
-      title="Divider"
-      description={
-        <>
-          Линия и подпись между блоками: <code>default</code>, <code>line-spacing</code>,{" "}
-          <code>text</code>, размеры <code>s</code>–<code>xl</code>. У каждого примера внизу есть
-          короткая подсказка — на неё и смотрите. Роль по умолчанию <code>separator</code>.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты</DemoSectionTitle>
-          <DemoDescription>
-            Один блок: пустая линия, подпись по центру, заголовок секции, маркер между строками,
-            вертикальный разделитель, линия в списке.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <DividerVariantsSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Divider</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Линия и подпись между блоками: <code>default</code>, <code>line-spacing</code>,{" "}
+              <code>text</code>, размеры <code>s</code>–<code>xl</code>. У каждого примера внизу
+              есть короткая подсказка — на неё и смотрите. Роль по умолчанию <code>separator</code>.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты</DemoSectionTitle>
+            <DemoDescription>
+              Один блок: пустая линия, подпись по центру, заголовок секции, маркер между строками,
+              вертикальный разделитель, линия в списке.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <DividerVariantsSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>Три ступени — s, m, xl — для сравнения кегля подписи.</DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
-            <PlaygroundExampleFrame.Stage>
-              <DividerSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>Три ступени — s, m, xl — для сравнения кегля подписи.</DemoDescription>
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <DividerSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Иконка и текст</DemoSectionTitle>
-          <DemoDescription>
-            Внутри разделителя иконка и подпись выравниваются в ряд с отступом <code>gap</code> из
-            токенов размера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <DividerCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Иконка и текст</DemoSectionTitle>
+            <DemoDescription>
+              Внутри разделителя иконка и подпись выравниваются в ряд с отступом <code>gap</code> из
+              токенов размера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <DividerCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Divider.Root</DemoApiTitle>
-          <DemoDescription>
-            Единственный публичный узел: контейнер с псевдоэлементами-линиями и опциональным{" "}
-            <code>span</code> для children.
-          </DemoDescription>
-          <PlaygroundApiTable rows={dividerRootApiRows} />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Divider.Root</DemoApiTitle>
+            <DemoDescription>
+              Единственный публичный узел: контейнер с псевдоэлементами-линиями и опциональным{" "}
+              <code>span</code> для children.
+            </DemoDescription>
+            <PlaygroundApiTable rows={dividerRootApiRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

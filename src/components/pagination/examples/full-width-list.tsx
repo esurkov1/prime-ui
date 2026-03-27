@@ -1,7 +1,7 @@
 import { Pagination } from "prime-ui-kit";
 import * as React from "react";
 
-/** Full-width bar: meta on the left, Pagination.Root on the right (parent layout). */
+/** Full-width bar: meta on the left, Pagination.Root on the right (parent layout). Parity with `playground/snippets/pagination/full-width.tsx` (English copy). */
 export default function FullWidthListExample() {
   const [page, setPage] = React.useState(2);
   const totalPages = 21;

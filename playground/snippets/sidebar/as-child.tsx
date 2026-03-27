@@ -20,9 +20,13 @@ export default function SidebarAsChildSnippet() {
           <Sidebar.Header>
             <Sidebar.HeaderRow>
               <Sidebar.HeaderMain>
-                <Sidebar.Text>MenuButton asChild</Sidebar.Text>
+                <Sidebar.IdentityButton
+                  leading={<span aria-hidden="true">M</span>}
+                  title="MenuButton asChild"
+                  subtitle="Полиморфизм"
+                  type="button"
+                />
               </Sidebar.HeaderMain>
-              <Sidebar.ToggleButton />
             </Sidebar.HeaderRow>
           </Sidebar.Header>
           <Sidebar.Content>
@@ -46,6 +50,14 @@ export default function SidebarAsChildSnippet() {
               </Sidebar.Menu>
             </Sidebar.NavPanelBody>
           </Sidebar.Content>
+          <Sidebar.Footer>
+            <Sidebar.IdentityButton
+              leading={<span aria-hidden="true">↗</span>}
+              title="Внешние ссылки"
+              subtitle="Пример"
+              type="button"
+            />
+          </Sidebar.Footer>
         </Sidebar.NavPanel>
       </Sidebar.Root>
     </div>

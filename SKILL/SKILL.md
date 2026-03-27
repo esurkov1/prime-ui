@@ -105,7 +105,7 @@ Full reference: `[design-tokens.md](./design-tokens.md)`.
 
 **Form wizard:** Stepper (horizontal at `≥ md`, vertical otherwise) + step column with `max-width` ~600px; actions `space-between`; on mobile the step can live in Modal or Drawer; ProgressBar under progress; below `sm` buttons `fullWidth`, larger DigitInput.
 
-Per-component details live in each `COMPONENT.md` where present; the full overview (including **AppShell**, **PageContent**, **ExampleFrame**, **ScrollContainer** without a separate COMPONENT.md) is in `[component-catalog.md](./component-catalog.md)`.
+Per-component details live in each `COMPONENT.md` where present; the full overview (including **AppShell**, **ExampleFrame**, **ScrollContainer** without a separate COMPONENT.md) is in `[component-catalog.md](./component-catalog.md)`.
 
 ---
 

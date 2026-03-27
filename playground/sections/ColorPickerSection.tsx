@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import ColorPickerCompositionSnippet from "../snippets/color-picker/composition";
 import compositionSource from "../snippets/color-picker/composition.tsx?raw";
@@ -523,259 +523,265 @@ const swatchApiRows: PlaygroundApiPropRow[] = [
 
 export default function ColorPickerSection() {
   return (
-    <PlaygroundDocPage
-      title="Color picker"
-      description={
-        <>
-          Выбор цвета: область HSL, слайдеры, пресеты, hex и каналы. В продуктовом UI панель
-          размещают в <code>Popover.Content</code>, триггер — кнопка с{" "}
-          <code>ColorPicker.TriggerSwatch</code> (или свой индикатор); все примеры ниже так
-          устроены. Состояние и a11y — <span translate="no">react-aria-components</span> (Color,
-          React Aria).
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Четыре <code>HexInput</code> с разным <code>size</code> — каждый за своим поповером.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={hexInputSizesSource.trim()}
-            previewLayout="stack-center"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerHexInputSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Color picker</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Выбор цвета: область HSL, слайдеры, пресеты, hex и каналы. В продуктовом UI панель
+              размещают в <code>Popover.Content</code>, триггер — кнопка с{" "}
+              <code>ColorPicker.TriggerSwatch</code> (или свой индикатор); все примеры ниже так
+              устроены. Состояние и a11y — <span translate="no">react-aria-components</span> (Color,
+              React Aria).
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Четыре <code>HexInput</code> с разным <code>size</code> — каждый за своим поповером.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={hexInputSizesSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerHexInputSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты</DemoSectionTitle>
+            <DemoDescription>
+              Три формата (<code>hsl</code>, <code>rgb</code>, <code>hex</code>) — три отдельных
+              поповера с <code>FormatProvider</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={formatVariantsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerFormatVariantsSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Два поповера: отключённый пресет в палитре и отключённый слайдер оттенка.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Расположение панели</DemoSectionTitle>
+            <DemoDescription>
+              Два экземпляра: <code>side=&quot;bottom&quot;</code> и{" "}
+              <code>side=&quot;top&quot;</code>; триггер с <code>TriggerSwatch</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={panelPlacementSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerPanelPlacementSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoDescription>
+              <code>value</code> / <code>onChange</code>, readout снаружи поповера, панель внутри{" "}
+              <code>Popover.Content</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerControlledSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Полная панель в поповере: <code>FormatSelect</code>, <code>Area</code>, слайдеры,{" "}
+              <code>ChannelStrip</code>, <code>SwatchPicker</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoDescription>
+              Широкая <code>Popover.Content</code> и карточка <code>fullWidthStretch</code> внутри.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerFullWidthSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+            <DemoDescription>
+              Поповер с кастомным квадратом цвета на кнопке (альтернатива <code>TriggerSwatch</code>
+              ); ниже — <code>Field</code>, пипетка и слайдер в отдельном поповере.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerPopoverSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+            <DemoDescription>
+              <code>Field</code> + <code>EyeDropperButton</code>, область и слайдер — всё внутри
+              поповера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ColorPickerFeaturesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>ColorPicker.Root</DemoApiTitle>
+            <DemoDescription>
+              Общее состояние цвета для всех вложенных частей; прокидывает контекст React Aria
+              ColorPicker.
+            </DemoDescription>
+            <PlaygroundApiTable rows={colorPickerRootApiRows} />
+
+            <DemoApiTitle>ColorPicker.FormatProvider</DemoApiTitle>
+            <DemoDescription>
+              Локальный контекст формата (HSL / RGB / Hex) для FormatSelect и ChannelStrip.
+            </DemoDescription>
+            <PlaygroundApiTable rows={formatProviderApiRows} />
+
+            <DemoApiTitle>ColorPicker.FormatSelect</DemoApiTitle>
+            <DemoDescription>
+              Выпадающий список китового Select для переключения формата каналов.
+            </DemoDescription>
+            <PlaygroundApiTable rows={formatSelectApiRows} />
+
+            <DemoApiTitle>ColorPicker.ChannelStrip</DemoApiTitle>
+            <DemoDescription>
+              Полоса: кнопка пипетки и поля каналов или hex в зависимости от формата.
+            </DemoDescription>
+            <PlaygroundApiTable rows={channelStripApiRows} />
+
+            <DemoApiTitle>ColorPicker.HexInput</DemoApiTitle>
+            <DemoDescription>
+              Однострочный ввод hex через китовый Input с синхронизацией из контекста цвета.
+            </DemoDescription>
+            <PlaygroundApiTable rows={hexInputApiRows} />
+
+            <DemoApiTitle>ColorPicker.TriggerSwatch</DemoApiTitle>
+            <DemoDescription>
+              Квадрат предпросмотра текущего цвета для кнопки-триггера (без inline style, заливка в
+              SVG).
+            </DemoDescription>
+            <PlaygroundApiTable rows={triggerSwatchApiRows} />
+
+            <DemoApiTitle>ColorPicker.Field</DemoApiTitle>
+            <DemoDescription>
+              Обёртка RAC ColorField со стилями кита; внутрь — как минимум Input из
+              react-aria-components.
+            </DemoDescription>
+            <PlaygroundApiTable rows={racFieldApiRows} />
+
+            <DemoApiTitle>ColorPicker.Area</DemoApiTitle>
+            <DemoDescription>
+              Двумерная палитра по двум каналам выбранного пространства.
+            </DemoDescription>
+            <PlaygroundApiTable rows={racAreaApiRows} />
+
+            <DemoApiTitle>ColorPicker.AreaThumb</DemoApiTitle>
+            <DemoDescription>Маркер положения внутри области.</DemoDescription>
+            <PlaygroundApiTable rows={racAreaThumbApiRows} />
+
+            <DemoApiTitle>ColorPicker.Slider</DemoApiTitle>
+            <DemoDescription>
+              Слайдер одного канала; на корне выставляется <code>data-size=&quot;m&quot;</code> под
+              стили кита.
+            </DemoDescription>
+            <PlaygroundApiTable rows={racColorSliderApiRows} />
+
+            <DemoApiTitle>ColorPicker.SliderMeta</DemoApiTitle>
+            <DemoDescription>Строка «подпись + значение» над треком слайдера.</DemoDescription>
+            <PlaygroundApiTable rows={sliderMetaApiRows} />
+
+            <DemoApiTitle>ColorPicker.SliderTrack</DemoApiTitle>
+            <DemoDescription>
+              Градиентный трек; для альфы подмешивается шахматный фон.
+            </DemoDescription>
+            <PlaygroundApiTable rows={racSliderTrackApiRows} />
+
+            <DemoApiTitle>ColorPicker.Thumb</DemoApiTitle>
+            <DemoDescription>Ползунок на треке цветового слайдера.</DemoDescription>
+            <PlaygroundApiTable rows={racSliderThumbApiRows} />
+
+            <DemoApiTitle>ColorPicker.Output</DemoApiTitle>
+            <DemoDescription>
+              Числовой вывод значения слайдера (используется внутри SliderMeta).
+            </DemoDescription>
+            <PlaygroundApiTable rows={racOutputApiRows} />
+
+            <DemoApiTitle>ColorPicker.SwatchPicker</DemoApiTitle>
+            <DemoDescription>Группа пресетов с выбором одного цвета.</DemoDescription>
+            <PlaygroundApiTable rows={swatchPickerApiRows} />
+
+            <DemoApiTitle>ColorPicker.SwatchPickerItem</DemoApiTitle>
+            <DemoDescription>Один пресет в группе.</DemoDescription>
+            <PlaygroundApiTable rows={swatchPickerItemApiRows} />
+
+            <DemoApiTitle>ColorPicker.Swatch</DemoApiTitle>
+            <DemoDescription>Визуальный квадрат цвета внутри элемента пресета.</DemoDescription>
+            <PlaygroundApiTable rows={swatchApiRows} />
+
+            <DemoApiTitle>ColorPicker.EyeDropperButton</DemoApiTitle>
+            <DemoDescription>
+              Кнопка захвата цвета с экрана через Web API EyeDropper (где доступно).
+            </DemoDescription>
+            <PlaygroundApiTable rows={eyeDropperButtonApiRows} />
+
+            <DemoApiTitle>parseColor (экспорт модуля)</DemoApiTitle>
+            <DemoDescription>
+              Функция разбора строки CSS / hex в объект <code>Color</code> (re-export из
+              react-aria-components); используется в контролируемом режиме и при коммите полей
+              ввода.
+            </DemoDescription>
+            <PlaygroundApiTable
+              rows={[
+                {
+                  prop: "value",
+                  type: "string",
+                  defaultValue: "—",
+                  required: "Да",
+                  description: "Строка цвета для разбора (например «#0f0», «rgb(0,255,0)»).",
+                },
+                {
+                  prop: "возврат",
+                  type: "Color",
+                  defaultValue: "—",
+                  required: "—",
+                  description: "Объект цвета для передачи в value / setColor.",
+                },
+              ]}
+            />
+          </div>
         </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты</DemoSectionTitle>
-          <DemoDescription>
-            Три формата (<code>hsl</code>, <code>rgb</code>, <code>hex</code>) — три отдельных
-            поповера с <code>FormatProvider</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={formatVariantsSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerFormatVariantsSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Два поповера: отключённый пресет в палитре и отключённый слайдер оттенка.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Расположение панели</DemoSectionTitle>
-          <DemoDescription>
-            Два экземпляра: <code>side=&quot;bottom&quot;</code> и <code>side=&quot;top&quot;</code>
-            ; триггер с <code>TriggerSwatch</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={panelPlacementSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerPanelPlacementSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-          <DemoDescription>
-            <code>value</code> / <code>onChange</code>, readout снаружи поповера, панель внутри{" "}
-            <code>Popover.Content</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerControlledSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция</DemoSectionTitle>
-          <DemoDescription>
-            Полная панель в поповере: <code>FormatSelect</code>, <code>Area</code>, слайдеры,{" "}
-            <code>ChannelStrip</code>, <code>SwatchPicker</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Full width</DemoSectionTitle>
-          <DemoDescription>
-            Широкая <code>Popover.Content</code> и карточка <code>fullWidthStretch</code> внутри.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerFullWidthSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-          <DemoDescription>
-            Поповер с кастомным квадратом цвета на кнопке (альтернатива <code>TriggerSwatch</code>
-            ); ниже — <code>Field</code>, пипетка и слайдер в отдельном поповере.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerPopoverSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-          <DemoDescription>
-            <code>Field</code> + <code>EyeDropperButton</code>, область и слайдер — всё внутри
-            поповера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ColorPickerFeaturesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>ColorPicker.Root</DemoApiTitle>
-          <DemoDescription>
-            Общее состояние цвета для всех вложенных частей; прокидывает контекст React Aria
-            ColorPicker.
-          </DemoDescription>
-          <PlaygroundApiTable rows={colorPickerRootApiRows} />
-
-          <DemoApiTitle>ColorPicker.FormatProvider</DemoApiTitle>
-          <DemoDescription>
-            Локальный контекст формата (HSL / RGB / Hex) для FormatSelect и ChannelStrip.
-          </DemoDescription>
-          <PlaygroundApiTable rows={formatProviderApiRows} />
-
-          <DemoApiTitle>ColorPicker.FormatSelect</DemoApiTitle>
-          <DemoDescription>
-            Выпадающий список китового Select для переключения формата каналов.
-          </DemoDescription>
-          <PlaygroundApiTable rows={formatSelectApiRows} />
-
-          <DemoApiTitle>ColorPicker.ChannelStrip</DemoApiTitle>
-          <DemoDescription>
-            Полоса: кнопка пипетки и поля каналов или hex в зависимости от формата.
-          </DemoDescription>
-          <PlaygroundApiTable rows={channelStripApiRows} />
-
-          <DemoApiTitle>ColorPicker.HexInput</DemoApiTitle>
-          <DemoDescription>
-            Однострочный ввод hex через китовый Input с синхронизацией из контекста цвета.
-          </DemoDescription>
-          <PlaygroundApiTable rows={hexInputApiRows} />
-
-          <DemoApiTitle>ColorPicker.TriggerSwatch</DemoApiTitle>
-          <DemoDescription>
-            Квадрат предпросмотра текущего цвета для кнопки-триггера (без inline style, заливка в
-            SVG).
-          </DemoDescription>
-          <PlaygroundApiTable rows={triggerSwatchApiRows} />
-
-          <DemoApiTitle>ColorPicker.Field</DemoApiTitle>
-          <DemoDescription>
-            Обёртка RAC ColorField со стилями кита; внутрь — как минимум Input из
-            react-aria-components.
-          </DemoDescription>
-          <PlaygroundApiTable rows={racFieldApiRows} />
-
-          <DemoApiTitle>ColorPicker.Area</DemoApiTitle>
-          <DemoDescription>
-            Двумерная палитра по двум каналам выбранного пространства.
-          </DemoDescription>
-          <PlaygroundApiTable rows={racAreaApiRows} />
-
-          <DemoApiTitle>ColorPicker.AreaThumb</DemoApiTitle>
-          <DemoDescription>Маркер положения внутри области.</DemoDescription>
-          <PlaygroundApiTable rows={racAreaThumbApiRows} />
-
-          <DemoApiTitle>ColorPicker.Slider</DemoApiTitle>
-          <DemoDescription>
-            Слайдер одного канала; на корне выставляется <code>data-size=&quot;m&quot;</code> под
-            стили кита.
-          </DemoDescription>
-          <PlaygroundApiTable rows={racColorSliderApiRows} />
-
-          <DemoApiTitle>ColorPicker.SliderMeta</DemoApiTitle>
-          <DemoDescription>Строка «подпись + значение» над треком слайдера.</DemoDescription>
-          <PlaygroundApiTable rows={sliderMetaApiRows} />
-
-          <DemoApiTitle>ColorPicker.SliderTrack</DemoApiTitle>
-          <DemoDescription>
-            Градиентный трек; для альфы подмешивается шахматный фон.
-          </DemoDescription>
-          <PlaygroundApiTable rows={racSliderTrackApiRows} />
-
-          <DemoApiTitle>ColorPicker.Thumb</DemoApiTitle>
-          <DemoDescription>Ползунок на треке цветового слайдера.</DemoDescription>
-          <PlaygroundApiTable rows={racSliderThumbApiRows} />
-
-          <DemoApiTitle>ColorPicker.Output</DemoApiTitle>
-          <DemoDescription>
-            Числовой вывод значения слайдера (используется внутри SliderMeta).
-          </DemoDescription>
-          <PlaygroundApiTable rows={racOutputApiRows} />
-
-          <DemoApiTitle>ColorPicker.SwatchPicker</DemoApiTitle>
-          <DemoDescription>Группа пресетов с выбором одного цвета.</DemoDescription>
-          <PlaygroundApiTable rows={swatchPickerApiRows} />
-
-          <DemoApiTitle>ColorPicker.SwatchPickerItem</DemoApiTitle>
-          <DemoDescription>Один пресет в группе.</DemoDescription>
-          <PlaygroundApiTable rows={swatchPickerItemApiRows} />
-
-          <DemoApiTitle>ColorPicker.Swatch</DemoApiTitle>
-          <DemoDescription>Визуальный квадрат цвета внутри элемента пресета.</DemoDescription>
-          <PlaygroundApiTable rows={swatchApiRows} />
-
-          <DemoApiTitle>ColorPicker.EyeDropperButton</DemoApiTitle>
-          <DemoDescription>
-            Кнопка захвата цвета с экрана через Web API EyeDropper (где доступно).
-          </DemoDescription>
-          <PlaygroundApiTable rows={eyeDropperButtonApiRows} />
-
-          <DemoApiTitle>parseColor (экспорт модуля)</DemoApiTitle>
-          <DemoDescription>
-            Функция разбора строки CSS / hex в объект <code>Color</code> (re-export из
-            react-aria-components); используется в контролируемом режиме и при коммите полей ввода.
-          </DemoDescription>
-          <PlaygroundApiTable
-            rows={[
-              {
-                prop: "value",
-                type: "string",
-                defaultValue: "—",
-                required: "Да",
-                description: "Строка цвета для разбора (например «#0f0», «rgb(0,255,0)»).",
-              },
-              {
-                prop: "возврат",
-                type: "Color",
-                defaultValue: "—",
-                required: "—",
-                description: "Объект цвета для передачи в value / setColor.",
-              },
-            ]}
-          />
-        </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

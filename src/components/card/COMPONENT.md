@@ -50,19 +50,39 @@ export function RevenuePanelCard() {
 }
 ```
 
+## Playground snippets
+
+Live demos use these files (same order as the **Card** section in the playground):
+
+| Scenario | Snippet | Notes |
+|----------|---------|-------|
+| Mini | [`mini.tsx`](../../../playground/snippets/card/mini.tsx) | `variant="mini"`: **`IconBox`** + **`Stack`** (**`Label`**, **`Value`**) |
+| Mini + media | [`mini-media.tsx`](../../../playground/snippets/card/mini-media.tsx) | `variant="mini-media"`: same as mini + bottom **`Media`** |
+| Metric | [`metric.tsx`](../../../playground/snippets/card/metric.tsx) | `variant="metric"`: **`HeaderRow`** (**`Lead`**, **`Value`**) + **`Description`** |
+| Stat + trend | [`stat-trend.tsx`](../../../playground/snippets/card/stat-trend.tsx) | `variant="stat-trend"`: **`Value`** + **`Delta`** (`trend`) |
+| CTA | [`cta.tsx`](../../../playground/snippets/card/cta.tsx) | `variant="cta"`: **`Title`**, **`CtaBody`**, **`Actions`** |
+| List | [`list.tsx`](../../../playground/snippets/card/list.tsx) | `variant="list"`: **`ListHeader`**, **`List`** / **`ListItem`** |
+| Split | [`split.tsx`](../../../playground/snippets/card/split.tsx) | `variant="split"`: **`Split`** with two **`SplitCell`** blocks |
+| Cover | [`cover.tsx`](../../../playground/snippets/card/cover.tsx) | `variant="cover"`: **`Cover`**, **`Stack`**, **`Actions`** |
+| Panel (chart only) | [`panel.tsx`](../../../playground/snippets/card/panel.tsx) | `variant="panel"`: **`SectionHeader`** + edge-to-edge **`Chart`** |
+| Panel (body + chart) | [`panel-content-chart.tsx`](../../../playground/snippets/card/panel-content-chart.tsx) | same **`panel`**: **`Body`** + **`Chart`** |
+| Flat surface | [`flat.tsx`](../../../playground/snippets/card/flat.tsx) | **`flat`** prop: shadow vs no shadow on **`mini`** |
+| KPI grid | [`row.tsx`](../../../playground/snippets/card/row.tsx) | several mini cards in playground `introFeatureGrid` |
+
+Supporting CSS modules in that folder: `flat.module.css`, `mini-media.module.css`, `variants-stack.module.css`.
+
 ## Extended examples
 
-Copy-oriented scenarios (English copy) live next to this file:
+Copy-oriented scenarios (English copy, `prime-ui-kit` imports) live next to this file. For single-variant demos, see **Playground snippets** above.
 
 | File | Scenario |
 |------|----------|
+| [examples/mini-kpi.tsx](./examples/mini-kpi.tsx) | **`mini`**: компактный KPI с иконкой |
 | [examples/metric-dashboard.tsx](./examples/metric-dashboard.tsx) | KPI row: **`stat-trend`**, **`metric`**, **`mini-media`** |
 | [examples/list-card.tsx](./examples/list-card.tsx) | Activity list with header link |
 | [examples/media-mini.tsx](./examples/media-mini.tsx) | **`mini-media`**: sparkline and **`ProgressBar`** |
 | [examples/split-layout.tsx](./examples/split-layout.tsx) | **`split`**: two metrics in one tile |
 | [examples/cta-cover.tsx](./examples/cta-cover.tsx) | **`cta`** tile and **`cover`** with gradient banner |
-
-Playground: more live variants under `playground/snippets/card/` (e.g. **`flat`**, **`row`**, **`stat-trend`**, chart-only panel).
 
 ## Composition
 

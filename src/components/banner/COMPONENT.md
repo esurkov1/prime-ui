@@ -29,7 +29,30 @@ export function Example() {
 | `Banner.Actions` | Buttons / `LinkButton` |
 | `Banner.CloseButton` | **Direct child of `Banner.Root`** (sibling of `Banner.Content`), not nested inside `Content` |
 
-**Scenario examples (English):** [`examples/billing-alert.tsx`](examples/billing-alert.tsx) · [`examples/maintenance.tsx`](examples/maintenance.tsx) · [`examples/cookie-consent-row.tsx`](examples/cookie-consent-row.tsx) · [`examples/feature-promo.tsx`](examples/feature-promo.tsx)
+### Playground snippets
+
+Order matches [`playground/sections/BannerSection.tsx`](../../../playground/sections/BannerSection.tsx). Snippets import from `@/components/banner/Banner`; consumers use **`import { … } from "prime-ui-kit"`**.
+
+| File | Scenario |
+|------|----------|
+| `playground/snippets/banner/sizes.tsx` | `size` `s`–`xl` with `variant="light"` and `status="information"`. |
+| `playground/snippets/banner/variants.tsx` | `variant` `filled`, `light`, `lighter`, `stroke` at `status="information"`. |
+| `playground/snippets/banner/statuses.tsx` | `status` `information`, `warning`, `error`, `success`, `feature` at `variant="light"`. |
+| `playground/snippets/banner/controlled.tsx` | Visibility from React state: hide removes the root; external button shows again (no root `onDismiss` required). |
+| `playground/snippets/banner/composition.tsx` | Slots: `Banner.Icon` with `as`, title, description, `Banner.Actions` (`LinkButton`, `Button`); `size="l"`, `variant="stroke"`. |
+| `playground/snippets/banner/full-width.tsx` | Root fills parent width; narrow wrapper illustrates a card column or sidebar. |
+| `playground/snippets/banner/dismiss-patterns.tsx` | `onDismiss` only (auto close) · `Banner.CloseButton` only · both without duplicate injected control. |
+
+### Scenario examples (English)
+
+| File | Scenario |
+|------|----------|
+| [`examples/billing-alert.tsx`](examples/billing-alert.tsx) | Billing failure: `error` + `filled`, `onDismiss`, actions, `role="region"`. |
+| [`examples/maintenance.tsx`](examples/maintenance.tsx) | Downtime: `warning` + `stroke`, actions, region label. |
+| [`examples/cookie-consent-row.tsx`](examples/cookie-consent-row.tsx) | Consent: `information` + `lighter`, `onDismiss`, actions. |
+| [`examples/feature-promo.tsx`](examples/feature-promo.tsx) | Promo: `feature` + `lighter`, `onDismiss`, actions. |
+| [`examples/controlled-visibility.tsx`](examples/controlled-visibility.tsx) | Controlled show/hide by conditional render (mirrors `controlled.tsx` snippet). |
+| [`examples/dismiss-close-button.tsx`](examples/dismiss-close-button.tsx) | `Banner.CloseButton` as direct root child without `onDismiss` (mirrors manual-dismiss branch of `dismiss-patterns.tsx`). |
 
 ---
 
@@ -126,6 +149,10 @@ An in-flow announcement strip: a root grid with a central content column and an 
 | className | `string` | — | No | Additional class on the button. |
 | children | `React.ReactNode` | — | No | Button content; defaults to a cross icon when omitted. |
 | …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | No | Other button props; `size` is derived from banner context. |
+
+### Playground alignment
+
+Matrix demos (`sizes`, `variants`, `statuses`, `controlled`, `composition`, `full-width`, `dismiss-patterns`) are maintained next to [`BannerSection.tsx`](../../../playground/sections/BannerSection.tsx); keep this doc table and snippet filenames in sync when the playground order or scenarios change.
 
 ### Related
 

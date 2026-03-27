@@ -34,8 +34,19 @@ Copy-ready demos live under **`examples/`** (same folder as this file):
 | Form footer | [`examples/form-footer.tsx`](examples/form-footer.tsx) | **`type="submit"`** / **`type="reset"`** (or **`button`**) in one group; name **`Root`** with **`aria-label`**. |
 | View switcher | [`examples/view-switcher.tsx`](examples/view-switcher.tsx) | Single choice in React state; exactly one **`pressed={true}`** at a time. |
 | Wizard actions | [`examples/wizard-actions.tsx`](examples/wizard-actions.tsx) | Step **Back** / **Next** as a horizontal group; **`disabled`** on **Back** for the first step. |
+| Full width | [`examples/full-width.tsx`](examples/full-width.tsx) | **`Root`** `className` for container width (e.g. **`w-full`**); **`flex-1`** / **`min-w-0`** on **`Item`** to split the row (no built-in **`fullWidth`** prop). |
 
-Playground demos (sizes, orientation, states, composition, full-width layout) live in **`playground/snippets/button-group/`**.
+Playground demos match `playground/sections/ButtonGroupSection.tsx` (order and `?raw` sources):
+
+| Snippet | File | Idea |
+|---------|------|------|
+| Sizes | [`playground/snippets/button-group/sizes.tsx`](../../../playground/snippets/button-group/sizes.tsx) | Four rows **`s`**, **`m`**, **`l`**, **`xl`**; each row is a real three-segment group. |
+| States | [`states.tsx`](../../../playground/snippets/button-group/states.tsx) | Default, **`pressed`**, **`disabled`** in one group. |
+| Orientation | [`orientation.tsx`](../../../playground/snippets/button-group/orientation.tsx) | Default horizontal vs **`orientation="vertical"`**. |
+| Controlled | [`controlled.tsx`](../../../playground/snippets/button-group/controlled.tsx) | Parent state; exactly one **`pressed={true}`** at a time (**day** / **week** / **month**). |
+| Composition | [`composition.tsx`](../../../playground/snippets/button-group/composition.tsx) | **`ButtonGroup.Icon`**, **`aria-label`** on icon-only **`Item`**, text + chevron, two toolbar rows. |
+| Full width | [`full-width.tsx`](../../../playground/snippets/button-group/full-width.tsx) | **`Root`** **`className="w-full"`**; items **`className="min-w-0 flex-1"`** inside a bounded container. |
+| Form features | [`form-features.tsx`](../../../playground/snippets/button-group/form-features.tsx) | Form with **`type="submit"`** and **`type="reset"`** segments. |
 
 ### Composition
 
@@ -128,4 +139,5 @@ anti_patterns:
   - Prefer SegmentedControl when that composable API is a better fit
 doc_examples_dir: src/components/button-group/examples/
 playground_snippets: playground/snippets/button-group/
+playground_snippet_files: [sizes, states, orientation, controlled, composition, full-width, form-features]
 ```

@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import HintA11yDescribedbySnippet from "../snippets/hint/a11y-describedby";
 import hintA11yDescribedbySource from "../snippets/hint/a11y-describedby.tsx?raw";
@@ -21,190 +21,195 @@ import hintVariantsSource from "../snippets/hint/variants.tsx?raw";
 
 export default function HintSection() {
   return (
-    <PlaygroundDocPage
-      title="Hint"
-      description={
-        <>
-          Второстепенный текст под полем ввода: пояснение формата, ограничение или сообщение об
-          ошибке. Размер <code>size</code> задаёт кегль относительно поля; <code>variant</code>{" "}
-          переключает нейтральный, ошибочный и «приглушённый» вид. Рядом с текстом можно поставить
-          иконку через <code>Hint.Icon</code>.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Четыре значения <code>size</code> на корне: <code>s</code>, <code>m</code>,{" "}
-            <code>l</code>, <code>xl</code>. Номинальный размер совпадает с размером поля;
-            фактический кегль подсказки на ступень меньше (см. стили).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={hintSizesSource.trim()} previewLayout="stack-center">
-            <PlaygroundExampleFrame.Stage>
-              <HintSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Hint</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Второстепенный текст под полем ввода: пояснение формата, ограничение или сообщение об
+              ошибке. Размер <code>size</code> задаёт кегль относительно поля; <code>variant</code>{" "}
+              переключает нейтральный, ошибочный и «приглушённый» вид. Рядом с текстом можно
+              поставить иконку через <code>Hint.Icon</code>.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Четыре значения <code>size</code> на корне: <code>s</code>, <code>m</code>,{" "}
+              <code>l</code>, <code>xl</code>. Номинальный размер совпадает с размером поля;
+              фактический кегль подсказки на ступень меньше (см. стили).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={hintSizesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <HintSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты</DemoSectionTitle>
-          <DemoDescription>
-            Проп <code>variant</code>: <code>default</code> (вторичный цвет текста),{" "}
-            <code>error</code> (акцент опасности), <code>disabled</code> (цвет отключённого
-            контента).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={hintVariantsSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <HintVariantsSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты</DemoSectionTitle>
+            <DemoDescription>
+              Проп <code>variant</code>: <code>default</code> (вторичный цвет текста),{" "}
+              <code>error</code> (акцент опасности), <code>disabled</code> (цвет отключённого
+              контента).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={hintVariantsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <HintVariantsSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Те же варианты в типичной верстке «лейбл — поле — подсказка»: обычное поле, невалидное
-            значение и отключённый ввод с согласованным <code>Label</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={hintFieldStatesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <HintFieldStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Те же варианты в типичной верстке «лейбл — поле — подсказка»: обычное поле, невалидное
+              значение и отключённый ввод с согласованным <code>Label</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={hintFieldStatesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <HintFieldStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-          <DemoDescription>
-            Текст и семантика подсказки меняются из состояния родителя: здесь переключается только{" "}
-            <code>variant</code> между <code>default</code> и <code>error</code> после действий
-            пользователя.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={hintControlledVariantSource.trim()}
-            previewLayout="stack"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <HintControlledVariantSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoDescription>
+              Текст и семантика подсказки меняются из состояния родителя: здесь переключается только{" "}
+              <code>variant</code> между <code>default</code> и <code>error</code> после действий
+              пользователя.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={hintControlledVariantSource.trim()}
+              previewLayout="stack"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <HintControlledVariantSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция с иконкой</DemoSectionTitle>
-          <DemoDescription>
-            Дочерний слот <code>Hint.Icon</code> оборачивает SVG; размер иконки берётся из контекста
-            размера корня.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={hintCompositionIconSource.trim()}
-            previewLayout="stack"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <HintCompositionIconSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция с иконкой</DemoSectionTitle>
+            <DemoDescription>
+              Дочерний слот <code>Hint.Icon</code> оборачивает SVG; размер иконки берётся из
+              контекста размера корня.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={hintCompositionIconSource.trim()}
+              previewLayout="stack"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <HintCompositionIconSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Связь с полем для вспомогательных технологий</DemoSectionTitle>
-          <DemoDescription>
-            Уникальный <code>id</code> на <code>Hint.Root</code> и <code>aria-describedby</code> на
-            элементе ввода — экранные дикторы озвучивают подсказку вместе с полем.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={hintA11yDescribedbySource.trim()}
-            previewLayout="stack"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <HintA11yDescribedbySnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Связь с полем для вспомогательных технологий</DemoSectionTitle>
+            <DemoDescription>
+              Уникальный <code>id</code> на <code>Hint.Root</code> и <code>aria-describedby</code>{" "}
+              на элементе ввода — экранные дикторы озвучивают подсказку вместе с полем.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={hintA11yDescribedbySource.trim()}
+              previewLayout="stack"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <HintA11yDescribedbySnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Hint.Root</DemoApiTitle>
-          <DemoDescription>
-            Корень подсказки: рендерится как <code>&lt;p&gt;</code>, задаёт <code>data-size</code> и{" "}
-            <code>data-variant</code> для стилей и оборачивает детей в{" "}
-            <code>ControlSizeProvider</code>.
-          </DemoDescription>
-          <PlaygroundApiTable
-            rows={[
-              {
-                prop: "size",
-                type: '"s" | "m" | "l" | "xl"',
-                defaultValue: '"m"',
-                required: "Нет",
-                description:
-                  "Номинальный размер в паре с полем; кегль и отступы подсказки из согласованного яруса.",
-              },
-              {
-                prop: "variant",
-                type: '"default" | "error" | "disabled"',
-                defaultValue: '"default"',
-                required: "Нет",
-                description:
-                  "Визуальный режим: обычный текст, ошибка или стиль отключённого контента.",
-              },
-              {
-                prop: "className",
-                type: "string",
-                defaultValue: "—",
-                required: "Нет",
-                description: "Дополнительный CSS-класс на корне.",
-              },
-              {
-                prop: "children",
-                type: "React.ReactNode",
-                defaultValue: "—",
-                required: "Нет",
-                description: "Текст подсказки; при необходимости соседствует с Hint.Icon.",
-              },
-              {
-                prop: "…rest",
-                type: "React.HTMLAttributes<HTMLParagraphElement>",
-                defaultValue: "—",
-                required: "Нет",
-                description:
-                  "Остальные атрибуты нативного параграфа: id, role, aria-*, data-* и т.д.",
-              },
-            ]}
-          />
-          <DemoApiTitle>Hint.Icon</DemoApiTitle>
-          <DemoDescription>
-            Слот для иконки слева от текста: <code>span</code> с фиксированным квадратом под размер
-            из контекста и <code>aria-hidden</code>.
-          </DemoDescription>
-          <PlaygroundApiTable
-            rows={[
-              {
-                prop: "children",
-                type: "React.ReactNode",
-                defaultValue: "—",
-                required: "Да",
-                description: "Содержимое (обычно SVG из набора иконок).",
-              },
-              {
-                prop: "className",
-                type: "string",
-                defaultValue: "—",
-                required: "Нет",
-                description: "Дополнительный CSS-класс обёртки.",
-              },
-              {
-                prop: "…rest",
-                type: "React.HTMLAttributes<HTMLSpanElement>",
-                defaultValue: "—",
-                required: "Нет",
-                description: "Прочие атрибуты span (кроме дублирования aria-hidden на корне).",
-              },
-            ]}
-          />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Hint.Root</DemoApiTitle>
+            <DemoDescription>
+              Корень подсказки: рендерится как <code>&lt;p&gt;</code>, задаёт <code>data-size</code>{" "}
+              и <code>data-variant</code> для стилей и оборачивает детей в{" "}
+              <code>ControlSizeProvider</code>.
+            </DemoDescription>
+            <PlaygroundApiTable
+              rows={[
+                {
+                  prop: "size",
+                  type: '"s" | "m" | "l" | "xl"',
+                  defaultValue: '"m"',
+                  required: "Нет",
+                  description:
+                    "Номинальный размер в паре с полем; кегль и отступы подсказки из согласованного яруса.",
+                },
+                {
+                  prop: "variant",
+                  type: '"default" | "error" | "disabled"',
+                  defaultValue: '"default"',
+                  required: "Нет",
+                  description:
+                    "Визуальный режим: обычный текст, ошибка или стиль отключённого контента.",
+                },
+                {
+                  prop: "className",
+                  type: "string",
+                  defaultValue: "—",
+                  required: "Нет",
+                  description: "Дополнительный CSS-класс на корне.",
+                },
+                {
+                  prop: "children",
+                  type: "React.ReactNode",
+                  defaultValue: "—",
+                  required: "Нет",
+                  description: "Текст подсказки; при необходимости соседствует с Hint.Icon.",
+                },
+                {
+                  prop: "…rest",
+                  type: "React.HTMLAttributes<HTMLParagraphElement>",
+                  defaultValue: "—",
+                  required: "Нет",
+                  description:
+                    "Остальные атрибуты нативного параграфа: id, role, aria-*, data-* и т.д.",
+                },
+              ]}
+            />
+            <DemoApiTitle>Hint.Icon</DemoApiTitle>
+            <DemoDescription>
+              Слот для иконки слева от текста: <code>span</code> с фиксированным квадратом под
+              размер из контекста и <code>aria-hidden</code>.
+            </DemoDescription>
+            <PlaygroundApiTable
+              rows={[
+                {
+                  prop: "children",
+                  type: "React.ReactNode",
+                  defaultValue: "—",
+                  required: "Да",
+                  description: "Содержимое (обычно SVG из набора иконок).",
+                },
+                {
+                  prop: "className",
+                  type: "string",
+                  defaultValue: "—",
+                  required: "Нет",
+                  description: "Дополнительный CSS-класс обёртки.",
+                },
+                {
+                  prop: "…rest",
+                  type: "React.HTMLAttributes<HTMLSpanElement>",
+                  defaultValue: "—",
+                  required: "Нет",
+                  description: "Прочие атрибуты span (кроме дублирования aria-hidden на корне).",
+                },
+              ]}
+            />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

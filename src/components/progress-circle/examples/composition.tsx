@@ -1,6 +1,6 @@
 import { IconCheck, IconCircleDot, IconDownload, ProgressCircle, Typography } from "prime-ui-kit";
 
-/** Center slot: icon, short label, and numeric breakdowns. */
+/** Center slot: icon, short label, and numeric breakdowns (playground: `snippets/progress/circle-composition.tsx`). */
 export default function CompositionExample() {
   return (
     <div
@@ -58,7 +58,7 @@ export default function CompositionExample() {
           </Typography.Root>
         </div>
       </ProgressCircle.Root>
-      <ProgressCircle.Root value={100} max={100} size="s" label="Task complete">
+      <ProgressCircle.Root value={100} max={100} size="s">
         <IconCheck size="s" aria-hidden />
       </ProgressCircle.Root>
     </div>

@@ -1,6 +1,6 @@
 import { ProgressCircle, Typography } from "prime-ui-kit";
 
-/** Same fill ratio with different `max` scales (percent, steps, large quotas). */
+/** Same fill ratio with different `max` scales (percent, steps, large quotas) (playground: `snippets/progress/circle-max-scale.tsx`). */
 export default function MaxScaleExample() {
   return (
     <div

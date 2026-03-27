@@ -34,14 +34,29 @@ export function Example() {
 }
 ```
 
-### Extended examples
+### Scenarios (playground + `examples/`)
 
-- [`./examples/01-filter-chips.tsx`](./examples/01-filter-chips.tsx) — Catalog filters: applied facets as removable chips backed by a `Set` in state.
-- [`./examples/02-removable-selected-values.tsx`](./examples/02-removable-selected-values.tsx) — Selected skills: removable tags inside `fieldset` / `legend` so each “Remove” control has group context.
-- [`./examples/03-status-metadata.tsx`](./examples/03-status-metadata.tsx) — Status / release metadata: read-only chips with `Tag.Icon` + text, no `onRemove`.
-- [`./examples/04-tag-sizes.tsx`](./examples/04-tag-sizes.tsx) — Size ladder `s` through `xl` in one row.
+Live demos use **`playground/snippets/tag/*.tsx`** (see **`playground/sections/TagSection.tsx`**). The table lists the same scenarios with package-oriented copies under **`examples/`** (aligned with those snippets; playground uses `@/` imports and shared `playground.css` layout classes).
 
-**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition patterns; this page keeps the contract (rules + API tables) authoritative.
+| Scenario | Snippet | Package example |
+|----------|---------|-----------------|
+| Sizes | [`playground/snippets/tag/sizes.tsx`](../../../playground/snippets/tag/sizes.tsx) | [`examples/sizes.tsx`](./examples/sizes.tsx) |
+| States | [`playground/snippets/tag/states.tsx`](../../../playground/snippets/tag/states.tsx) | [`examples/states.tsx`](./examples/states.tsx) |
+| Composition | [`playground/snippets/tag/composition.tsx`](../../../playground/snippets/tag/composition.tsx) | [`examples/composition.tsx`](./examples/composition.tsx) |
+| Basic | [`playground/snippets/tag/basic.tsx`](../../../playground/snippets/tag/basic.tsx) | [`examples/basic.tsx`](./examples/basic.tsx) |
+| Removable (dismiss + restore) | [`playground/snippets/tag/removable.tsx`](../../../playground/snippets/tag/removable.tsx) | [`examples/removable.tsx`](./examples/removable.tsx) |
+| With icon | [`playground/snippets/tag/with-icon.tsx`](../../../playground/snippets/tag/with-icon.tsx) | [`examples/with-icon.tsx`](./examples/with-icon.tsx) |
+| Controlled list | [`playground/snippets/tag/controlled.tsx`](../../../playground/snippets/tag/controlled.tsx) | [`examples/controlled.tsx`](./examples/controlled.tsx) |
+| Disabled | [`playground/snippets/tag/disabled.tsx`](../../../playground/snippets/tag/disabled.tsx) | [`examples/disabled.tsx`](./examples/disabled.tsx) |
+| Context `size` | [`playground/snippets/tag/context-size.tsx`](../../../playground/snippets/tag/context-size.tsx) | [`examples/context-size.tsx`](./examples/context-size.tsx) |
+
+**Additional extended examples** (richer layout / copy, same building blocks):
+
+- [`./examples/01-filter-chips.tsx`](./examples/01-filter-chips.tsx) — Catalog filters: applied facets as removable chips backed by a `Set` in state (`fieldset` + `legend`).
+- [`./examples/02-removable-selected-values.tsx`](./examples/02-removable-selected-values.tsx) — Selected skills: removable tags in a named group for remove-button context.
+- [`./examples/03-status-metadata.tsx`](./examples/03-status-metadata.tsx) — Release-style metadata: read-only chips with `Tag.Icon` + text, no `onRemove`.
+
+**LLM note:** Prefer reading runnable files under `./examples/*.tsx` and matching `playground/snippets/tag/*.tsx` for prop combinations; this page keeps the contract (rules + API tables) authoritative.
 
 ## Rules
 

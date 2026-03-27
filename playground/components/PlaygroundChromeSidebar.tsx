@@ -596,7 +596,6 @@ export function PlaygroundChromeSidebar() {
             </Sidebar.HeaderMain>
           </Sidebar.HeaderRow>
         </Sidebar.Header>
-        <Sidebar.ToggleButton placement="edge" />
 
         <Tooltip.Provider delayDuration={0}>
           <Sidebar.Content>

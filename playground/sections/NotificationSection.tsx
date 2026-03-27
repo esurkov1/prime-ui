@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import NotificationCompositionSnippet from "../snippets/notification/composition";
 import compositionSource from "../snippets/notification/composition.tsx?raw";
@@ -305,164 +305,169 @@ const useNotificationStoreApiRows: PlaygroundApiPropRow[] = [
 
 export default function NotificationSection() {
   return (
-    <PlaygroundDocPage
-      title="Notification"
-      description={
-        <>
-          Всплывающие сообщения поверх интерфейса: оберните приложение в{" "}
-          <code>NotificationProvider</code>, вызывайте <code>notify()</code> из экранов и хелперов.
-          Есть шесть позиций, размеры <code>s</code> / <code>m</code> / <code>l</code>, таймер с
-          полосой прогресса, пауза при наведении на стек, отдельные стопки по типу сообщения и
-          опциональная кнопка действия.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Три статичные <code>NotificationCard</code> с <code>size</code> <code>s</code>,{" "}
-            <code>m</code> и <code>l</code>; остальные поля записи одинаковые, включая{" "}
-            <code>persistent</code> и <code>closable=false</code>, чтобы сравнить только масштаб.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
-            <PlaygroundExampleFrame.Stage>
-              <NotificationSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Notification</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Всплывающие сообщения поверх интерфейса: оберните приложение в{" "}
+              <code>NotificationProvider</code>, вызывайте <code>notify()</code> из экранов и
+              хелперов. Есть шесть позиций, размеры <code>s</code> / <code>m</code> / <code>l</code>
+              , таймер с полосой прогресса, пауза при наведении на стек, отдельные стопки по типу
+              сообщения и опциональная кнопка действия.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Три статичные <code>NotificationCard</code> с <code>size</code> <code>s</code>,{" "}
+              <code>m</code> и <code>l</code>; остальные поля записи одинаковые, включая{" "}
+              <code>persistent</code> и <code>closable=false</code>, чтобы сравнить только масштаб.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <NotificationSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты (type)</DemoSectionTitle>
+            <DemoDescription>
+              Четыре значения <code>type</code>: меняются цвет, иконка по умолчанию и live-роль (
+              <code>alert</code> для <code>error</code> и <code>warning</code>, <code>status</code>{" "}
+              для остальных). Здесь у записей <code>persistent: true</code> — из-за этого акцентная
+              обводка и пульсирующая тень (см. <code>Notification.module.css</code> для{" "}
+              <code>[data-persistent=&quot;true&quot;]</code>
+              ). У обычного <code>notify()</code> по умолчанию <code>persistent: false</code> —
+              карточка без этого усиления, с таймером и полосой прогресса.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <NotificationVariantsSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Статично: <code>persistent</code> (без полосы таймера) и <code>closable=false</code>{" "}
+              (без крестика). Кнопки вызывают <code>notify</code>: короткий таймер, пауза при
+              наведении на стек — и отдельно <code>notify</code> с <code>persistent: true</code>{" "}
+              (акцентная обводка и пульс, как в блоке «Варианты»).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <NotificationStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Позиции</DemoSectionTitle>
+            <DemoDescription>
+              Шесть значений <code>NotificationPosition</code>: каждая кнопка шлёт тост в свой угол
+              или в центр края через проп <code>position</code> в <code>notify</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={positionsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <NotificationPositionsSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый доступ к очереди</DemoSectionTitle>
+            <DemoDescription>
+              <code>useNotificationStore()</code>: чтение <code>items</code>, добавление через{" "}
+              <code>notify</code> и точечное <code>dismiss(id)</code> по строкам списка.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <NotificationControlledSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Слоты <code>icon</code>, <code>badge</code>, <code>description</code> и{" "}
+              <code>action</code>; на статичной карточке — колокол из lucide-react с классом размера
+              из стилей кита.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <NotificationCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+            <DemoDescription>
+              Стек из нескольких тостов одного <code>type</code> и <code>position</code>,
+              раздвижение по hover,
+              <code>dismissAll</code>, а также разная <code>duration</code> для быстрых и длинных
+              сообщений.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <NotificationFeaturesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>NotificationProvider</DemoApiTitle>
+            <DemoDescription>
+              Корневой контекст и портал с зонами уведомлений; без него хуки бросают ошибку.
+            </DemoDescription>
+            <PlaygroundApiTable rows={notificationProviderApiRows} />
+
+            <DemoApiTitle>notify(options)</DemoApiTitle>
+            <DemoDescription>
+              Поля объекта опций; необязательные при отсутствии подставляются из провайдера или
+              дефолтов.
+            </DemoDescription>
+            <PlaygroundApiTable rows={notifyOptionsApiRows} />
+
+            <DemoApiTitle>NotificationRecord</DemoApiTitle>
+            <DemoDescription>
+              Форма элемента в <code>items</code> после нормализации внутри провайдера (все поля
+              ниже заданы).
+            </DemoDescription>
+            <PlaygroundApiTable rows={notificationRecordApiRows} />
+
+            <DemoApiTitle>NotificationCard</DemoApiTitle>
+            <DemoDescription>
+              Карточка для кастомного рендера или превью; в приложении чаще используется только
+              провайдер.
+            </DemoDescription>
+            <PlaygroundApiTable rows={notificationCardApiRows} />
+
+            <DemoApiTitle>useNotifications()</DemoApiTitle>
+            <DemoDescription>
+              Удобное API без подписки на список: только методы показа и закрытия.
+            </DemoDescription>
+            <PlaygroundApiTable rows={useNotificationsApiRows} />
+
+            <DemoApiTitle>useNotificationStore()</DemoApiTitle>
+            <DemoDescription>
+              Полный стор с массивом <code>items</code> для отображения счётчиков, отладки или
+              синхронизации с UI.
+            </DemoDescription>
+            <PlaygroundApiTable rows={useNotificationStoreApiRows} />
+          </div>
         </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты (type)</DemoSectionTitle>
-          <DemoDescription>
-            Четыре значения <code>type</code>: меняются цвет, иконка по умолчанию и live-роль (
-            <code>alert</code> для <code>error</code> и <code>warning</code>, <code>status</code>{" "}
-            для остальных). Здесь у записей <code>persistent: true</code> — из-за этого акцентная
-            обводка и пульсирующая тень (см. <code>Notification.module.css</code> для{" "}
-            <code>[data-persistent=&quot;true&quot;]</code>
-            ). У обычного <code>notify()</code> по умолчанию <code>persistent: false</code> —
-            карточка без этого усиления, с таймером и полосой прогресса.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <NotificationVariantsSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Статично: <code>persistent</code> (без полосы таймера) и <code>closable=false</code>{" "}
-            (без крестика). Кнопки вызывают <code>notify</code>: короткий таймер, пауза при
-            наведении на стек — и отдельно <code>notify</code> с <code>persistent: true</code>{" "}
-            (акцентная обводка и пульс, как в блоке «Варианты»).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <NotificationStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Позиции</DemoSectionTitle>
-          <DemoDescription>
-            Шесть значений <code>NotificationPosition</code>: каждая кнопка шлёт тост в свой угол
-            или в центр края через проп <code>position</code> в <code>notify</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={positionsSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <NotificationPositionsSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Контролируемый доступ к очереди</DemoSectionTitle>
-          <DemoDescription>
-            <code>useNotificationStore()</code>: чтение <code>items</code>, добавление через{" "}
-            <code>notify</code> и точечное <code>dismiss(id)</code> по строкам списка.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <NotificationControlledSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция</DemoSectionTitle>
-          <DemoDescription>
-            Слоты <code>icon</code>, <code>badge</code>, <code>description</code> и{" "}
-            <code>action</code>; на статичной карточке — колокол из lucide-react с классом размера
-            из стилей кита.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <NotificationCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-          <DemoDescription>
-            Стек из нескольких тостов одного <code>type</code> и <code>position</code>, раздвижение
-            по hover,
-            <code>dismissAll</code>, а также разная <code>duration</code> для быстрых и длинных
-            сообщений.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <NotificationFeaturesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>NotificationProvider</DemoApiTitle>
-          <DemoDescription>
-            Корневой контекст и портал с зонами уведомлений; без него хуки бросают ошибку.
-          </DemoDescription>
-          <PlaygroundApiTable rows={notificationProviderApiRows} />
-
-          <DemoApiTitle>notify(options)</DemoApiTitle>
-          <DemoDescription>
-            Поля объекта опций; необязательные при отсутствии подставляются из провайдера или
-            дефолтов.
-          </DemoDescription>
-          <PlaygroundApiTable rows={notifyOptionsApiRows} />
-
-          <DemoApiTitle>NotificationRecord</DemoApiTitle>
-          <DemoDescription>
-            Форма элемента в <code>items</code> после нормализации внутри провайдера (все поля ниже
-            заданы).
-          </DemoDescription>
-          <PlaygroundApiTable rows={notificationRecordApiRows} />
-
-          <DemoApiTitle>NotificationCard</DemoApiTitle>
-          <DemoDescription>
-            Карточка для кастомного рендера или превью; в приложении чаще используется только
-            провайдер.
-          </DemoDescription>
-          <PlaygroundApiTable rows={notificationCardApiRows} />
-
-          <DemoApiTitle>useNotifications()</DemoApiTitle>
-          <DemoDescription>
-            Удобное API без подписки на список: только методы показа и закрытия.
-          </DemoDescription>
-          <PlaygroundApiTable rows={useNotificationsApiRows} />
-
-          <DemoApiTitle>useNotificationStore()</DemoApiTitle>
-          <DemoDescription>
-            Полный стор с массивом <code>items</code> для отображения счётчиков, отладки или
-            синхронизации с UI.
-          </DemoDescription>
-          <PlaygroundApiTable rows={useNotificationStoreApiRows} />
-        </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

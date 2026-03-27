@@ -1,3 +1,4 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -5,7 +6,6 @@ import {
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const providerRows: PlaygroundApiPropRow[] = [
   {
@@ -27,33 +27,38 @@ const providerRows: PlaygroundApiPropRow[] = [
 
 export default function ControlSizeSection() {
   return (
-    <PlaygroundDocPage
-      title="ControlSizeProvider"
-      description={
-        <>
-          React-контекст размера контрольной поверхности: передаёт номинальный размер (
-          <code>xs</code>–<code>xl</code>) вниз по дереву, чтобы дочерние элементы (в частности{" "}
-          <code>Icon</code> без явного <code>size</code>) наследовали ритм поля или кнопки. Хук{" "}
-          <code>useOptionalControlSize</code> читает значение. Для Badge/Tag/Kbd значение{" "}
-          <code>xs</code> с контекста приводится к визуальному <code>s</code>. Отдельного раздела с
-          превью в плейграунде нет — контекст проявляется внутри других компонентов (см. например
-          Kbd, документацию по наследованию размера).
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>ControlSizeProvider</DemoApiTitle>
-          <PlaygroundApiTable rows={providerRows} />
-          <DemoApiTitle>useOptionalControlSize()</DemoApiTitle>
-          <DemoDescription>
-            Параметров нет. Возвращает <code>ControlSurfaceSize | undefined</code>: размер из
-            ближайшего <code>ControlSizeProvider</code> или <code>undefined</code> вне провайдера.
-            Используется в <code>Icon</code> и согласованных контролах.
-          </DemoDescription>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>ControlSizeProvider</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              React-контекст размера контрольной поверхности: передаёт номинальный размер (
+              <code>xs</code>–<code>xl</code>) вниз по дереву, чтобы дочерние элементы (в частности{" "}
+              <code>Icon</code> без явного <code>size</code>) наследовали ритм поля или кнопки. Хук{" "}
+              <code>useOptionalControlSize</code> читает значение. Для Badge/Tag/Kbd значение{" "}
+              <code>xs</code> с контекста приводится к визуальному <code>s</code>. Отдельного
+              раздела с превью в плейграунде нет — контекст проявляется внутри других компонентов
+              (см. например Kbd, документацию по наследованию размера).
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>ControlSizeProvider</DemoApiTitle>
+            <PlaygroundApiTable rows={providerRows} />
+            <DemoApiTitle>useOptionalControlSize()</DemoApiTitle>
+            <DemoDescription>
+              Параметров нет. Возвращает <code>ControlSurfaceSize | undefined</code>: размер из
+              ближайшего <code>ControlSizeProvider</code> или <code>undefined</code> вне провайдера.
+              Используется в <code>Icon</code> и согласованных контролах.
+            </DemoDescription>
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

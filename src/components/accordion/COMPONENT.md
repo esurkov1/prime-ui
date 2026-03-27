@@ -28,8 +28,14 @@ A compound disclosure pattern: each item has a header trigger and expandable bod
 
 ### Canonical example
 
+Single open section at a time, **`layout="grouped"`** (one frame), **`Accordion.Icon as={LucideIcon}`** plus **`Accordion.Arrow`** on each trigger, and rich body copy with a **`LinkButton`**. For **`size`** steps, **`type="multiple"`** / **`layout="separate"`**, disabled and **`collapsible={false}`**, controlled **`value`**, **`Accordion.Arrow`** with **`openIcon` / `closeIcon`**, **`Accordion.Icon as="span"`**, and full-bleed width in preview, see the runnable **`./examples/*.tsx`** files and the playground snippets listed below (full source in those files—avoid duplicating long demos here).
+
+**Imports:** in this repo use the **`@/…`** paths shown; published apps import the same components from **`prime-ui-kit`**.
+
 ```tsx
-import { Accordion, LinkButton, Typography } from "prime-ui-kit";
+import { Accordion } from "@/components/accordion/Accordion";
+import { LinkButton } from "@/components/link-button/LinkButton";
+import { Typography } from "@/components/typography/Typography";
 import { Package, ShieldCheck, Truck } from "lucide-react";
 
 export function Example() {
@@ -88,15 +94,32 @@ export function Example() {
 }
 ```
 
-### Extended examples
+### Examples (source)
 
-- [`./examples/01-faq-marketing.tsx`](./examples/01-faq-marketing.tsx) — Marketing FAQ: single panel, grouped layout, icons and chevron on each trigger.
-- [`./examples/02-settings-panels.tsx`](./examples/02-settings-panels.tsx) — Account settings: `type="multiple"` and `layout="separate"` so several sections stay open as cards.
-- [`./examples/03-checkout-order-summary.tsx`](./examples/03-checkout-order-summary.tsx) — Checkout: custom `Accordion.Arrow` icons plus policy links in the panel body.
-- [`./examples/04-api-docs-sections.tsx`](./examples/04-api-docs-sections.tsx) — API docs: controlled `value` / `onValueChange` for syncing open section with routing or in-page navigation.
-- [`./examples/05-knowledge-base-categories.tsx`](./examples/05-knowledge-base-categories.tsx) — Support hub: `collapsible={false}` and a disabled item for plan-gated content.
+| File | Intent |
+|------|--------|
+| [`./examples/01-faq-marketing.tsx`](./examples/01-faq-marketing.tsx) | FAQ: `type="single"`, `layout="grouped"`, **`Accordion.Icon as={Icon}`** + default chevron (**aligns with** `playground/snippets/accordion/composition.tsx`). |
+| [`./examples/02-settings-panels.tsx`](./examples/02-settings-panels.tsx) | Settings: **`type="multiple"`**, **`layout="separate"`**, **`defaultValue`** as string array (**aligns with** `playground/snippets/accordion/variants-layout-type.tsx`). |
+| [`./examples/03-checkout-order-summary.tsx`](./examples/03-checkout-order-summary.tsx) | Checkout: **`Accordion.Arrow openIcon` / `closeIcon`** (plus default chevron on another item) and links in the body (**aligns with** `playground/snippets/accordion/features-arrow.tsx`). |
+| [`./examples/04-api-docs-sections.tsx`](./examples/04-api-docs-sections.tsx) | Controlled **`value`** + **`onValueChange`** with `type="single"` (**aligns with** `playground/snippets/accordion/controlled.tsx`). |
+| [`./examples/05-knowledge-base-categories.tsx`](./examples/05-knowledge-base-categories.tsx) | **`collapsible={false}`**, **`Accordion.Item disabled`**, **`defaultValue`** (**aligns with** `playground/snippets/accordion/states.tsx`). |
 
-**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition patterns; this page keeps the contract (rules + API tables) authoritative.
+### Playground snippets
+
+Demos wired from [`playground/sections/AccordionSection.tsx`](../../../playground/sections/AccordionSection.tsx) (Russian copy; same public API as this doc):
+
+| Snippet | Intent |
+|---------|--------|
+| [`playground/snippets/accordion/sizes.tsx`](../../../playground/snippets/accordion/sizes.tsx) | **`size`**: `s` / `m` / `l` / `xl` ladder. |
+| [`playground/snippets/accordion/variants-layout-type.tsx`](../../../playground/snippets/accordion/variants-layout-type.tsx) | **`layout`** `grouped` vs `separate`; **`type="multiple"`** with array **`defaultValue`**. |
+| [`playground/snippets/accordion/states.tsx`](../../../playground/snippets/accordion/states.tsx) | **`disabled`**, initial **`defaultValue`**, **`collapsible={false}`** in `single`. |
+| [`playground/snippets/accordion/controlled.tsx`](../../../playground/snippets/accordion/controlled.tsx) | External buttons + **`value` / `onValueChange`**. |
+| [`playground/snippets/accordion/composition.tsx`](../../../playground/snippets/accordion/composition.tsx) | Trigger row: **`Accordion.Icon as={Icon}`**, label in **`span`**, **`Accordion.Arrow`**. |
+| [`playground/snippets/accordion/full-width.tsx`](../../../playground/snippets/accordion/full-width.tsx) | Root fills preview column (**`examplePreviewBleed`** in playground). |
+| [`playground/snippets/accordion/icon-as.tsx`](../../../playground/snippets/accordion/icon-as.tsx) | **`Accordion.Icon as="span"`** with arbitrary child markup (e.g. Lucide as child). |
+| [`playground/snippets/accordion/features-arrow.tsx`](../../../playground/snippets/accordion/features-arrow.tsx) | **`openIcon` / `closeIcon`** vs default rotating chevron. |
+
+**LLM note:** Prefer reading **`./examples/*.tsx`** and the **`playground/snippets/accordion/*.tsx`** files for full markup and prop combinations; this page keeps the contract (rules + API tables) authoritative.
 
 ## Rules
 

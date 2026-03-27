@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import CardCoverSnippet from "../snippets/card/cover";
 import coverSource from "../snippets/card/cover.tsx?raw";
@@ -72,188 +72,195 @@ const cardRootApiRows: PlaygroundApiPropRow[] = [
 
 export default function CardSection() {
   return (
-    <PlaygroundDocPage
-      title="Card"
-      headingId="card-heading"
-      description={
-        <>
-          Карточки для дашборда: KPI, тренды, CTA, списки событий, split-метрики, обложки и секции с
-          графиками. Стили на семантических токенах; графики подключаются снаружи (слоты Media,
-          Body, Chart).
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Mini</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;mini&quot;</code>: <code>IconBox</code> + вертикальный{" "}
-            <code>Stack</code> с <code>Label</code> и <code>Value</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={miniSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardMiniSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section aria-labelledby="card-heading">
+      <PageContent.Header>
+        <PageContent.Title id="card-heading">Card</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Карточки для дашборда: KPI, тренды, CTA, списки событий, split-метрики, обложки и
+              секции с графиками. Стили на семантических токенах; графики подключаются снаружи
+              (слоты Media, Body, Chart).
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Mini</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;mini&quot;</code>: <code>IconBox</code> + вертикальный{" "}
+              <code>Stack</code> с <code>Label</code> и <code>Value</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={miniSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardMiniSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Mini + media</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;mini-media&quot;</code>: как у mini — <code>IconBox</code>,{" "}
-            <code>Stack</code> с <code>Label</code> и <code>Value</code>, плюс нижний слот{" "}
-            <code>Media</code> (спарклайн, <code>ProgressBar</code>).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={miniMediaSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardMiniMediaSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Mini + media</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;mini-media&quot;</code>: как у mini — <code>IconBox</code>,{" "}
+              <code>Stack</code> с <code>Label</code> и <code>Value</code>, плюс нижний слот{" "}
+              <code>Media</code> (спарклайн, <code>ProgressBar</code>).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={miniMediaSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardMiniMediaSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Metric</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;metric&quot;</code>: верхний ряд <code>HeaderRow</code> —{" "}
-            <code>Lead</code> (бейдж или иконка) и <code>Value</code>, ниже <code>Description</code>
-            .
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={metricSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardMetricSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Metric</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;metric&quot;</code>: верхний ряд <code>HeaderRow</code> —{" "}
+              <code>Lead</code> (бейдж или иконка) и <code>Value</code>, ниже{" "}
+              <code>Description</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={metricSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardMetricSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Stat + trend</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;stat-trend&quot;</code>: крупное значение и <code>Delta</code> с{" "}
-            <code>trend</code> (рост / падение / нейтрально).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statTrendSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardStatTrendSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Stat + trend</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;stat-trend&quot;</code>: крупное значение и <code>Delta</code> с{" "}
+              <code>trend</code> (рост / падение / нейтрально).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statTrendSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardStatTrendSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>CTA</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;cta&quot;</code>: <code>Title</code>, <code>CtaBody</code>, внизу{" "}
-            <code>Actions</code> (кнопки и ссылки).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={ctaSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardCtaSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>CTA</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;cta&quot;</code>: <code>Title</code>, <code>CtaBody</code>, внизу{" "}
+              <code>Actions</code> (кнопки и ссылки).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={ctaSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardCtaSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>List</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;list&quot;</code>: <code>ListHeader</code> и <code>List</code> из{" "}
-            <code>ListItem</code> — лента событий или алерты.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={listSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardListSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>List</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;list&quot;</code>: <code>ListHeader</code> и <code>List</code> из{" "}
+              <code>ListItem</code> — лента событий или алерты.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={listSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardListSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Split</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;split&quot;</code>: <code>Split</code> с двумя{" "}
-            <code>SplitCell</code> — две связанные метрики в одной плитке.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={splitSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardSplitSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Split</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;split&quot;</code>: <code>Split</code> с двумя{" "}
+              <code>SplitCell</code> — две связанные метрики в одной плитке.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={splitSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardSplitSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Cover</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;cover&quot;</code>: верхний слот <code>Cover</code> (медиа или
-            градиент), затем <code>Stack</code> и <code>Actions</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={coverSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardCoverSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Cover</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;cover&quot;</code>: верхний слот <code>Cover</code> (медиа или
+              градиент), затем <code>Stack</code> и <code>Actions</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={coverSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardCoverSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Панель (график)</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;panel&quot;</code>: <code>SectionHeader</code> и область{" "}
-            <code>Chart</code> без внутренних полей — корень библиотеки графиков на всю ширину и
-            высоту под заголовком.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={panelSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardPanelSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Панель (график)</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;panel&quot;</code>: <code>SectionHeader</code> и область{" "}
+              <code>Chart</code> без внутренних полей — корень библиотеки графиков на всю ширину и
+              высоту под заголовком.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={panelSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardPanelSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Панель: текст и график</DemoSectionTitle>
-          <DemoDescription>
-            Тот же <code>variant=&quot;panel&quot;</code>: сверху <code>Body</code> — текст или
-            таблица с отступами; ниже <code>Chart</code> — график без полей, занимает оставшуюся
-            высоту.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={panelContentChartSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardPanelContentChartSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Панель: текст и график</DemoSectionTitle>
+            <DemoDescription>
+              Тот же <code>variant=&quot;panel&quot;</code>: сверху <code>Body</code> — текст или
+              таблица с отступами; ниже <code>Chart</code> — график без полей, занимает оставшуюся
+              высоту.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={panelContentChartSource.trim()}
+              previewLayout="stack"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <CardPanelContentChartSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Плоская поверхность</DemoSectionTitle>
-          <DemoDescription>
-            Проп <code>flat</code> убирает тень — удобно для плотных сеток, когда достаточно
-            бордера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={flatSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardFlatSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Плоская поверхность</DemoSectionTitle>
+            <DemoDescription>
+              Проп <code>flat</code> убирает тень — удобно для плотных сеток, когда достаточно
+              бордера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={flatSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardFlatSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Сетка KPI</DemoSectionTitle>
-          <DemoDescription>
-            Пример с классом <code>introFeatureGrid</code> из плейграунда: несколько mini-карточек в
-            адаптивной сетке.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={rowSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <CardRowSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Сетка KPI</DemoSectionTitle>
+            <DemoDescription>
+              Пример с классом <code>introFeatureGrid</code> из плейграунда: несколько mini-карточек
+              в адаптивной сетке.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={rowSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CardRowSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Card.Root</DemoApiTitle>
-          <DemoDescription>
-            Остальные части (<code>IconBox</code>, <code>HeaderRow</code>, <code>Media</code>,{" "}
-            <code>Body</code>, <code>Chart</code> и др.) — в <code>COMPONENT.md</code> компонента.
-          </DemoDescription>
-          <PlaygroundApiTable rows={cardRootApiRows} />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Card.Root</DemoApiTitle>
+            <DemoDescription>
+              Остальные части (<code>IconBox</code>, <code>HeaderRow</code>, <code>Media</code>,{" "}
+              <code>Body</code>, <code>Chart</code> и др.) — в <code>COMPONENT.md</code> компонента.
+            </DemoDescription>
+            <PlaygroundApiTable rows={cardRootApiRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

@@ -17,9 +17,12 @@ export default function SidebarExampleRouterNavigation() {
             <Sidebar.Header>
               <Sidebar.HeaderRow>
                 <Sidebar.HeaderMain>
-                  <Sidebar.Text>Docs</Sidebar.Text>
+                  <Sidebar.IdentityButton
+                    leading={<span aria-hidden="true">D</span>}
+                    title="Docs"
+                    subtitle="Router example"
+                  />
                 </Sidebar.HeaderMain>
-                <Sidebar.ToggleButton />
               </Sidebar.HeaderRow>
             </Sidebar.Header>
             <Sidebar.Content>
@@ -42,6 +45,13 @@ export default function SidebarExampleRouterNavigation() {
                 </Sidebar.MenuItem>
               </Sidebar.Menu>
             </Sidebar.Content>
+            <Sidebar.Footer>
+              <Sidebar.IdentityButton
+                leading={<span aria-hidden="true">R</span>}
+                title="Routes"
+                subtitle="MemoryRouter"
+              />
+            </Sidebar.Footer>
           </Sidebar.NavPanel>
         </Sidebar.Root>
         <div className={styles.mainPlaceholder} style={{ flex: "1 1 auto", minWidth: 0 }}>

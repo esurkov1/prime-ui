@@ -212,11 +212,7 @@ describe("Sidebar", () => {
   it("ToggleButton toggles open state", () => {
     render(
       <Sidebar.Root responsive={false}>
-        <Sidebar.NavPanel>
-          <Sidebar.Header>
-            <Sidebar.ToggleButton />
-          </Sidebar.Header>
-        </Sidebar.NavPanel>
+        <Sidebar.NavPanel />
       </Sidebar.Root>,
     );
 

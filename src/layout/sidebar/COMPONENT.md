@@ -10,7 +10,7 @@
 
 - Persistent app navigation beside main content, including **`AppShell.Template`** nav slot with **`sidebarSlot="page-nav"`**.
 - Desktop width toggle (expanded vs icon rail) with optional tooltips in **`compact`**.
-- Mobile drawer behavior when **`responsive={true}`** (default): overlay, backdrop, floating open control when inline toggle is absent.
+- Mobile drawer behavior when **`responsive={true}`** (default): overlay, backdrop, floating open control on narrow viewports when the panel is closed.
 
 **When not to use**
 
@@ -19,11 +19,11 @@
 
 ## Composition
 
-- **`Sidebar.Root`** — required wrapper (`aside`); exposes state, **`useSidebarContext`** values, and responsive / mobile behavior.
-- **`Sidebar.NavPanel`** — panel container (`nav`); wire **`ToggleButton`** and landmarks consistently.
-- Typical order: **`Header`** → **`ToggleButton`** (in **`HeaderRow`**) → **`Content`** (often **`NavPanelBody`** + **`Menu`**) → optional **`Footer`**.
+- **`Sidebar.Root`** — required wrapper (`aside`); exposes state, **`useSidebarContext`** values, and responsive / mobile behavior. Режим панели задаётся здесь: **`state`**, **`defaultState`**, **`onStateChange`** (или legacy **`open`** / **`onOpenChange`**).
+- **`Sidebar.NavPanel`** — panel container (`nav`). По умолчанию рендерит **встроенную** кнопку сворачивания на грани панели (**`data-placement="edge"`**); отключить можно только **`showToggle={false}`** (редкие случаи). Не дублируйте переключатель вручную.
+- Типичный порядок: **`Header`** (часто **`IdentityButton`** или **`Text`**) → **`Content`** (часто **`NavPanelBody`** + **`Menu`**) → **`Footer`** (часто **`IdentityButton`**).
 - In **`compact`** on non-mobile viewports, **MenuButton** / **MenuRouterLink** / **MenuLink** can show **tooltips** ( **`Tooltip`**, `side="right"`, `delayDuration={0}` ). On mobile, tooltips are suppressed.
-- **`ToggleButton`** and the floating mobile opener use **`aria-controls`** pointing at the **`NavPanel`** id.
+- Встроенная кнопка и плавающая кнопка открытия (на узком окне, пока панель скрыта) используют **`aria-controls`** с id **`NavPanel`**.
 
 ### Canonical example
 
@@ -38,9 +38,12 @@ export function Example() {
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
-              <Sidebar.Text>Acme</Sidebar.Text>
+              <Sidebar.IdentityButton
+                leading={<span aria-hidden="true">A</span>}
+                title="Acme"
+                subtitle="Workspace"
+              />
             </Sidebar.HeaderMain>
-            <Sidebar.ToggleButton />
           </Sidebar.HeaderRow>
         </Sidebar.Header>
         <Sidebar.Content>
@@ -63,6 +66,13 @@ export function Example() {
             </Sidebar.MenuItem>
           </Sidebar.Menu>
         </Sidebar.Content>
+        <Sidebar.Footer>
+          <Sidebar.IdentityButton
+            leading={<span aria-hidden="true">●</span>}
+            title="Account"
+            subtitle="Signed in"
+          />
+        </Sidebar.Footer>
       </Sidebar.NavPanel>
     </Sidebar.Root>
   );
@@ -72,7 +82,7 @@ export function Example() {
 ### Extended examples
 
 - [`./examples/01-app-shell-nav.tsx`](./examples/01-app-shell-nav.tsx) — **`AppShell.Template`** with **`sidebarSlot="page-nav"`** and a simple menu.
-- [`./examples/02-collapsible-desktop.tsx`](./examples/02-collapsible-desktop.tsx) — **`responsive={false}`**: header toggle cycles **expanded** / **compact** and tooltips on icon rail.
+- [`./examples/02-collapsible-desktop.tsx`](./examples/02-collapsible-desktop.tsx) — **`responsive={false}`**: edge control cycles **expanded** / **compact** and tooltips on icon rail.
 - [`./examples/03-controlled-state.tsx`](./examples/03-controlled-state.tsx) — controlled **`state`** / **`onStateChange`** with an external control.
 - [`./examples/04-router-navigation.tsx`](./examples/04-router-navigation.tsx) — **`MemoryRouter`** and **`Sidebar.MenuRouterLink`** next to **`Routes`**.
 - [`./examples/05-responsive-behavior.tsx`](./examples/05-responsive-behavior.tsx) — default **`responsive`**: narrow breakpoint note and **`SIDEBAR_MEDIA_QUERY_NARROW`**.
@@ -89,7 +99,7 @@ export function Example() {
 - Prefer **`state`**, **`defaultState`**, **`onStateChange`** with **`SidebarLayoutMode`**: **`"hidden"`** | **`"compact"`** | **`"expanded"`**.
 - Legacy **`open`**, **`defaultOpen`**, **`onOpenChange`**, **`mode`**, **`defaultMode`**, **`onModeChange`** remain for compatibility; new code should use the **`state`** model.
 - With **`responsive={true}`**, viewports matching **`SIDEBAR_MEDIA_QUERY_NARROW`** (`max-width: 47.999rem`, i.e. below **`48rem`**) treat the panel as a drawer: **`hidden`** shows overlay affordances; crossing the breakpoint resets open/closed behavior per **`SidebarRoot`** logic.
-- **`ToggleButton`**: on mobile, toggles **hidden** ↔ **expanded**; on desktop, **expanded** ↔ **compact** (and from **hidden** back to **expanded**).
+- Встроенная кнопка на грани: на мобильном — **hidden** ↔ **expanded**; на десктопе — **expanded** ↔ **compact** (и из **hidden** обратно в **expanded**).
 
 ## Data pattern (product menus)
 
@@ -113,13 +123,21 @@ For dynamic menus (modes, roles, brands), keep a data layer above the JSX: e.g. 
 | state | `SidebarLayoutMode` | — | No | Controlled layout state. |
 | defaultState | `SidebarLayoutMode` | see below | No | Initial state; with **`responsive`**, narrow viewports start **hidden**. |
 | onStateChange | `(state: SidebarLayoutMode) => void` | — | No | Fires on layout changes. |
-| responsive | `boolean` | `true` | No | When **true**, narrow viewports use drawer + backdrop (+ floating opener if no edge toggle). |
+| responsive | `boolean` | `true` | No | When **true**, narrow viewports use drawer + backdrop + floating open when the panel is closed. |
 | sidebarSlot | `"page-nav"` | — | No | Page nav embedding; sets **`data-sidebar-slot`**. |
 | aria-label | `string` | `"Sidebar"` | No | Name for the **`aside`** landmark. |
 | open, defaultOpen, onOpenChange | — | — | No | **Deprecated;** maps to hidden vs expanded. |
 | mode, defaultMode, onModeChange | — | — | No | **Deprecated;** use **state** / **onStateChange**. |
 
 Also accepts **`className`** and native **`aside`** attributes via **`…rest`**.
+
+### `Sidebar.NavPanel`
+
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| showToggle | `boolean` | `true` | No | Встроенная кнопка на грани (`placement="edge"`). Переключение состояния — через **`Sidebar.Root`** или **`useSidebarContext`**. |
+
+Также нативные атрибуты **`nav`** и **`children`**.
 
 ### `Sidebar.MenuButton` (in addition to native `button` props)
 
@@ -136,3 +154,7 @@ Also accepts **`className`** and native **`aside`** attributes via **`…rest`**
 | tooltip | `React.ReactNode` | — | No | Same behavior as **`MenuButton`**. |
 
 Requires a React Router provider. Use a **function** **`className`** so the implementation can apply **`isActive`**-aware styles.
+
+### `Sidebar.ToggleButton` (опционально)
+
+Экспортируется для редкого **`placement="inline"`** или тестов. В типичном приложении кнопка на грани уже в **`NavPanel`** — не дублируйте в разметке.

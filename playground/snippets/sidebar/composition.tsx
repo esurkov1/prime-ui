@@ -234,7 +234,6 @@ export default function SidebarCompositionSnippet() {
                 <ModeSwitcher mode={mode} onModeChange={setModeId} />
               </Sidebar.HeaderMain>
               <HeaderUserPopover />
-              <Sidebar.ToggleButton />
             </Sidebar.HeaderRow>
           </Sidebar.Header>
 
@@ -267,6 +266,15 @@ export default function SidebarCompositionSnippet() {
               </Sidebar.Group>
             </Sidebar.NavPanelBody>
           </Sidebar.Content>
+
+          <Sidebar.Footer>
+            <Sidebar.IdentityButton
+              leading={<span aria-hidden="true">⌘</span>}
+              title="Подвал примера"
+              subtitle="Identity внизу"
+              type="button"
+            />
+          </Sidebar.Footer>
         </Sidebar.NavPanel>
       </Sidebar.Root>
     </div>

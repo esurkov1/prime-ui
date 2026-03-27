@@ -18,9 +18,13 @@ function Sample({ responsive }: { responsive: boolean }) {
         <Sidebar.Header>
           <Sidebar.HeaderRow>
             <Sidebar.HeaderMain>
-              <Sidebar.Text>Ящик</Sidebar.Text>
+              <Sidebar.IdentityButton
+                leading={<span aria-hidden="true">I</span>}
+                title="Ящик"
+                subtitle="Почта"
+                type="button"
+              />
             </Sidebar.HeaderMain>
-            <Sidebar.ToggleButton />
           </Sidebar.HeaderRow>
         </Sidebar.Header>
         <Sidebar.Content>
@@ -35,6 +39,14 @@ function Sample({ responsive }: { responsive: boolean }) {
             </Sidebar.MenuItem>
           </Sidebar.Menu>
         </Sidebar.Content>
+        <Sidebar.Footer>
+          <Sidebar.IdentityButton
+            leading={<span aria-hidden="true">●</span>}
+            title="Статус"
+            subtitle="Синхронизация"
+            type="button"
+          />
+        </Sidebar.Footer>
       </Sidebar.NavPanel>
     </Sidebar.Root>
   );

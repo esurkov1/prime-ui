@@ -23,6 +23,7 @@ export default function SearchExample() {
           placeholder="Название или артикул"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          aria-label="Поиск по каталогу"
         />
       </Input.Wrapper>
     </Input.Root>

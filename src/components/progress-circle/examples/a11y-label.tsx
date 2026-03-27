@@ -3,6 +3,7 @@ import { ProgressCircle, Typography } from "prime-ui-kit";
 /**
  * No text in the ring: the accessible name comes from `label` (`aria-label` on the SVG).
  * Pair with visible copy beside the ring when the UI needs a readable caption.
+ * Playground: `snippets/progress/circle-a11y-label.tsx`.
  */
 export default function A11yLabelExample() {
   return (

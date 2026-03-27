@@ -27,9 +27,13 @@ export default function SidebarFullWidthSnippet() {
             <Sidebar.Header>
               <Sidebar.HeaderRow>
                 <Sidebar.HeaderMain>
-                  <Sidebar.Text>Каталог</Sidebar.Text>
+                  <Sidebar.IdentityButton
+                    leading={<span aria-hidden="true">K</span>}
+                    title="Каталог"
+                    subtitle="На всю ширину слота"
+                    type="button"
+                  />
                 </Sidebar.HeaderMain>
-                <Sidebar.ToggleButton />
               </Sidebar.HeaderRow>
             </Sidebar.Header>
             <Sidebar.Content>
@@ -44,6 +48,14 @@ export default function SidebarFullWidthSnippet() {
                 </Sidebar.MenuItem>
               </Sidebar.Menu>
             </Sidebar.Content>
+            <Sidebar.Footer>
+              <Sidebar.IdentityButton
+                leading={<span aria-hidden="true">▭</span>}
+                title="Контент справа"
+                subtitle="Сетка рядом"
+                type="button"
+              />
+            </Sidebar.Footer>
           </Sidebar.NavPanel>
         </Sidebar.Root>
         <div className={styles.content}>Основной контент</div>

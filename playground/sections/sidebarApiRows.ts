@@ -193,6 +193,14 @@ export const sidebarIdentityButtonApiRows: PlaygroundApiPropRow[] = [
 
 export const sidebarToggleButtonApiRows: PlaygroundApiPropRow[] = [
   {
+    prop: "placement",
+    type: '"inline" | "edge"',
+    defaultValue: '"inline"',
+    required: "Нет",
+    description:
+      "В `NavPanel` кнопка уже встроена как `edge`. Компонент нужен для редкого `inline` или кастомного экземпляра.",
+  },
+  {
     prop: "openLabel",
     type: "string",
     defaultValue: '"Скрыть сайдбар"',
@@ -420,7 +428,16 @@ export const sidebarTextApiRows: PlaygroundApiPropRow[] = wrapRows(
 
 export const sidebarNavPanelApiRows: PlaygroundApiPropRow[] = wrapRows(
   htmlNav,
-  [],
+  [
+    {
+      prop: "showToggle",
+      type: "boolean",
+      defaultValue: "true",
+      required: "Нет",
+      description:
+        'Встроенная кнопка на грани (`data-placement="edge"`). Состояние — через `Sidebar.Root` или `useSidebarContext`.',
+    },
+  ],
   "Основная панель навигации (nav).",
 );
 
@@ -506,7 +523,7 @@ export const sidebarHeaderApiRows: PlaygroundApiPropRow[] = wrapRows(
 export const sidebarHeaderRowApiRows: PlaygroundApiPropRow[] = wrapRows(
   htmlDiv,
   [],
-  "Строка: основной блок + ToggleButton.",
+  "Строка шапки: основной блок и опционально дополнительные действия (переключатель встроен в NavPanel).",
 );
 
 export const sidebarHeaderMainApiRows: PlaygroundApiPropRow[] = wrapRows(

@@ -169,7 +169,7 @@ import { DataTable } from "prime-ui-kit/components";
 
 ## Component catalog
 
-Descriptions are short summaries from the **About** section in each `COMPONENT.md` (where it exists). Full API, parts, and examples are in the linked files. **AppShell**, **PageContent**, **ExampleFrame**, and **ScrollContainer** ship without a dedicated `COMPONENT.md` — use the linked source folders.
+Descriptions are short summaries from the **About** section in each `COMPONENT.md` (where it exists). Full API, parts, and examples are in the linked files. **AppShell**, **ExampleFrame**, and **ScrollContainer** ship without a dedicated `COMPONENT.md` — use the linked source folders.
 
 Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/main/src/components/`
 
@@ -202,7 +202,7 @@ Documentation base URL in the repo: `https://github.com/esurkov1/prime-ui/blob/m
 | Navigation & layout | **Sidebar** | Side navigation: single panel, groups, menus, responsive overlay. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) |
 | Navigation & layout | **Stepper** | Multi-step flow on `<ol>` / `<li>` plus horizontal/vertical primitives. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) |
 | Navigation & layout | **Tabs** | Tablist, indicator, one visible panel at a time. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) |
-| Navigation & layout | **PageContent** | Main column: max width (`readable` / `wide`), header and body regions. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/page-content) |
+| Navigation & layout | **PageContent** | Main column: `Section` or `Root`, title, description (`measure`), body. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) |
 | Navigation & layout | **AppShell** | Application shell: grid root, nav slot, main region, optional full viewport. | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/layout/app-shell) |
 | Navigation & layout | **ScrollContainer** | Scrollable region with horizontal or vertical axis (overflow wrapper). | [Source](https://github.com/esurkov1/prime-ui/tree/main/src/components/scroll-container) |
 | Data | **DataTable** | Table with scroll, sorting, pagination or infinite scroll, sticky regions. | [COMPONENT.md](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) |
@@ -252,7 +252,7 @@ Type definitions ship with the package (`dist/*.d.ts`).
 - **Why separate files (not one `examples.md`):** each file is one scenario with a clear filename — easier for humans to navigate and for LLMs to retrieve the right chunk without loading an entire mega-document.
 - **In the installed package:** `COMPONENT.md` and `examples/**` are published (`package.json` → `files`), e.g. `node_modules/prime-ui-kit/src/components/button/examples/` and `node_modules/prime-ui-kit/src/layout/sidebar/COMPONENT.md`.
 
-**AppShell**, **PageContent**, **ExampleFrame**, and **ScrollContainer** do not have a dedicated `COMPONENT.md`; refer to the linked source folders and types in the `.tsx` files.
+**AppShell**, **ExampleFrame**, and **ScrollContainer** do not have a dedicated `COMPONENT.md`; refer to the linked source folders and types in the `.tsx` files.
 
 ---
 

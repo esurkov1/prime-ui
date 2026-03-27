@@ -4,6 +4,7 @@
 
 ## Canonical
 
+- **Playground demos** mirror **`playground/snippets/progress/circle-*.tsx`** (`circle-sizes`, `circle-max-scale`, `circle-states`, `circle-controlled`, `circle-composition`, `circle-a11y-label`); package **`examples/`** follow the same scenarios.
 - **`ProgressCircle`** — circular fraction of a known maximum: **`ProgressCircle.Root`** only (`inline-flex` root, SVG ring + optional centered **`children`**).
 - **Semantics:** SVG has **`role="progressbar"`** with **`aria-valuenow`**, **`aria-valuemin={0}`**, **`aria-valuemax`** (effective max after clamping / safe fallback).
 - **`value`** (required) and **`max`** (default **`100`**) — progress is **fully controlled**; **`value`** is clamped to **`[0, max]`**; if **`max <= 0`**, the scale falls back to **`100`** internally.
@@ -31,15 +32,17 @@ Circular progress: an SVG ring showing **`value` / `max`**, with optional conten
 - **`ProgressCircle.Root`** — root **`div`** with **`data-size`**, inner size CSS variable, SVG (**`progressbar`**), then optional **`children`** wrapper centered over the ring.
 - Order: pass **`value`** / **`max`** / **`size`** / **`label`** on **`Root`**; put visual center content in **`children`** when needed.
 
-### Scenarios (see `examples/`)
+### Scenarios (see `examples/`; playground: `playground/snippets/progress/circle-*.tsx`)
 
 | Scenario | Approach |
 |----------|----------|
-| Dashboard ring | Put **`ProgressCircle.Root`** in a KPI surface (e.g. [Card](../card/COMPONENT.md) **`mini-media`** **`Card.Media`**) with **`children`** for the headline fraction. → [`examples/dashboard-ring.tsx`](examples/dashboard-ring.tsx) |
-| Accessible name | Set **`label`** when the ring has no suitable visible text in the center (compact tiles, icon-only rows). → [`examples/a11y-label.tsx`](examples/a11y-label.tsx) |
-| Composition | Use **`children`** for **`Typography`**, icons, or **`value/max`** copy; keep the center concise. → [`examples/composition.tsx`](examples/composition.tsx) |
-| Non‑100 scale | Same visual fill for different **`max`** values (percent, steps, large totals). → [`examples/max-scale.tsx`](examples/max-scale.tsx) |
+| Sizes | Same **`value`** across **`size`** **`s`–`xl`** (diameter and stroke from **`progressCircle`**). → [`examples/sizes.tsx`](examples/sizes.tsx) |
+| Non‑100 scale | Same arc fraction for different **`max`** (percent, steps, large totals). → [`examples/max-scale.tsx`](examples/max-scale.tsx) |
+| Value clamping | Empty, partial, full ring; out-of-range **`value`** clamps to **`0`** and **`max`**. → [`examples/states.tsx`](examples/states.tsx) |
 | Controlled value | Drive **`value`** from parent state (polling, upload simulation). → [`examples/controlled.tsx`](examples/controlled.tsx) |
+| Composition | **`children`** for **`Typography`**, icons, short numeric copy. → [`examples/composition.tsx`](examples/composition.tsx) |
+| Accessible name | Set **`label`** when the center has no descriptive text ( **`aria-label`** on SVG). → [`examples/a11y-label.tsx`](examples/a11y-label.tsx) |
+| Dashboard KPI (extra) | Ring inside [Card](../card/COMPONENT.md) **`mini-media`** **`Card.Media`** — no dedicated circle snippet. → [`examples/dashboard-ring.tsx`](examples/dashboard-ring.tsx) |
 
 ### Minimal example
 
@@ -83,6 +86,7 @@ export function Example() {
 
 ## LLM note
 
+- **Playground circle snippets:** `circle-sizes`, `circle-max-scale`, `circle-states`, `circle-controlled`, `circle-composition`, `circle-a11y-label` under **`playground/snippets/progress/`** — keep **`COMPONENT.md`** and **`examples/`** aligned with them.
 - Export: **`import { ProgressCircle } from "prime-ui-kit"`** — **`ProgressCircle.Root`** only (object namespace).
 - **`ProgressCircleRootProps`**: **`value`** (required), **`max?`** (default 100), **`size?`** (default **`m`**), **`label?`**, **`children?`**, **`className?`**, **`ref`** → **`HTMLDivElement`**.
 - **`size`** literals: **`s`**, **`m`**, **`l`**, **`xl`**.

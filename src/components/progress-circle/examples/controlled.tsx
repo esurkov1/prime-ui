@@ -1,7 +1,7 @@
 import { Button, ProgressCircle, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-/** Parent-owned `value` — typical for polling, uploads, or simulations. */
+/** Parent-owned `value` — typical for polling, uploads, or simulations (playground: `snippets/progress/circle-controlled.tsx`). */
 export default function ControlledExample() {
   const [value, setValue] = React.useState(35);
 
@@ -14,12 +14,7 @@ export default function ControlledExample() {
         gap: "var(--prime-sys-spacing-l)",
       }}
     >
-      <ProgressCircle.Root
-        value={value}
-        max={100}
-        size="l"
-        label={`Upload progress, ${value} percent`}
-      >
+      <ProgressCircle.Root value={value} max={100} size="l">
         <Typography.Root as="span" variant="body-small" weight="medium">
           {value}%
         </Typography.Root>

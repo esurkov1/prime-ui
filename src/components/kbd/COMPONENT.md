@@ -17,7 +17,7 @@ export function Example() {
 }
 ```
 
-Готовые сценарии — в **`examples/`** (ряд «действие — шорткат», легенда документации, подсказки у тулбара, аккорды из нескольких клавиш, встроенная подсказка в тексте). Подробности — в **Extended**.
+Секция Kbd в плейграунде (`playground/sections/KbdSection.tsx`) рендерит сниппеты из **`playground/snippets/kbd/*.tsx`**. Файлы в **`examples/`** с пометкой parity повторяют те же сценарии с импортом **`"prime-ui-kit"`** для копирования в приложение. Остальные примеры — продуктовые сценарии. Подробности — в **Extended**.
 
 ## Extended
 
@@ -36,6 +36,10 @@ export function Example() {
 
 | Файл | Сценарий |
 |------|----------|
+| [`examples/sizes-ladder.tsx`](examples/sizes-ladder.tsx) | Ряд **`Kbd.Root`** с **`size`** `s`–`xl` (`snippets/kbd/sizes.tsx`). |
+| [`examples/states-title.tsx`](examples/states-title.tsx) | Без отдельных пропов состояния; **`title`** для нативной подсказки (`snippets/kbd/states.tsx`). |
+| [`examples/composition-chord-icon.tsx`](examples/composition-chord-icon.tsx) | Аккорд **`⌘` + `K`** и ряд с **`Icon`** внутри одного **`Kbd.Root`** (`snippets/kbd/composition.tsx`). |
+| [`examples/context-inherit-size.tsx`](examples/context-inherit-size.tsx) | Размер без пропа из **`ControlSizeProvider`**, **`xs`→`s`**, явный **`size`** перекрывает контекст (`snippets/kbd/inherit-size.tsx`). |
 | [`examples/shortcut-row.tsx`](examples/shortcut-row.tsx) | Строка списка/меню: подпись действия и шорткат справа. |
 | [`examples/docs-legend.tsx`](examples/docs-legend.tsx) | Легенда в документации: сетка «действие → комбинация». |
 | [`examples/toolbar-hints.tsx`](examples/toolbar-hints.tsx) | Тулбар: кнопка и рядом компактная подсказка-клавиши. |
@@ -84,4 +88,4 @@ export function Example() {
 - Аккорд: **не** клади строку `"⌘+K"` в один **`Kbd.Root`**, если нужна семантика «отдельные клавиши» — делай **`Kbd.Root` на каждую клавишу**, плюс **`span aria-hidden`** между ними для **`+`**.
 - Размер без пропа: **`useOptionalControlSize`** → **`controlSurfaceToInputSize`**; **`xs`** контекста → эффективный **`s`** на компоненте.
 - Не подменяй кнопку или ссылку одним **`Kbd`**; не ожидай событий клавиатуры от этого компонента.
-- Сценарии копирования: смотри **`src/components/kbd/examples/*.tsx`**.
+- Сценарии копирования: **`playground/snippets/kbd/*.tsx`** (демо) и зеркала в **`src/components/kbd/examples/*.tsx`** (импорт **`"prime-ui-kit"`**); parity-файлы названы в таблице выше.

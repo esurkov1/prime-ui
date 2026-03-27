@@ -46,12 +46,24 @@ export function Example() {
 | Scenario | File |
 |----------|------|
 | Minimal trail | [`examples/canonical.tsx`](./examples/canonical.tsx) |
+| Four `size` rows (`s`–`xl` on `Root`) | [`examples/sizes.tsx`](./examples/sizes.tsx) |
+| Links + `current`; middle segment without `href` | [`examples/states.tsx`](./examples/states.tsx) |
+| Icon-only first `Item` (`aria-label`) + custom `Separator` | [`examples/composition.tsx`](./examples/composition.tsx) |
+| Narrow container; trail wraps (`flex-wrap`) | [`examples/full-width.tsx`](./examples/full-width.tsx) |
+| Long path + `Ellipsis` | [`examples/long-path-ellipsis.tsx`](./examples/long-path-ellipsis.tsx) |
 | Deep docs path | [`examples/deep-documentation.tsx`](./examples/deep-documentation.tsx) |
 | E‑commerce PDP | [`examples/ecommerce-product.tsx`](./examples/ecommerce-product.tsx) |
 | SaaS settings hierarchy | [`examples/saas-settings.tsx`](./examples/saas-settings.tsx) |
-| Long path + ellipsis | [`examples/long-path-ellipsis.tsx`](./examples/long-path-ellipsis.tsx) |
 
-Playground demos (app alias `@/…`): `playground/snippets/breadcrumb/` — sizes, states, composition (icon home + custom separator), narrow container, long ellipsis.
+**Playground snippets** (app alias `@/…`, same scenarios as the rows above where noted)
+
+| File | Coverage |
+|------|----------|
+| [`playground/snippets/breadcrumb/sizes.tsx`](../../../playground/snippets/breadcrumb/sizes.tsx) | `size` `s`–`xl` |
+| [`playground/snippets/breadcrumb/states.tsx`](../../../playground/snippets/breadcrumb/states.tsx) | Links + `current`; `Item` without `href` |
+| [`playground/snippets/breadcrumb/composition.tsx`](../../../playground/snippets/breadcrumb/composition.tsx) | Home icon + `/` separators |
+| [`playground/snippets/breadcrumb/full-width.tsx`](../../../playground/snippets/breadcrumb/full-width.tsx) | Narrow box; long labels wrap |
+| [`playground/snippets/breadcrumb/long-ellipsis.tsx`](../../../playground/snippets/breadcrumb/long-ellipsis.tsx) | Same trail shape as `long-path-ellipsis.tsx` (Russian copy in playground) |
 
 ---
 
@@ -124,4 +136,4 @@ Playground demos (app alias `@/…`): `playground/snippets/breadcrumb/` — size
 - Mark the active route with **`current`** and **no `href`** on that **`Item`**; otherwise **`aria-current="page"`** will not apply.
 - Collapsing the path is **manual**: insert **`Breadcrumb.Ellipsis`** between **`Separator`** nodes; it is **not** a menu and does not expose hidden links to assistive tech.
 - Icon-only links require **`aria-label`** on **`Item`**.
-- For copy-paste recipes, prefer the five files under **`src/components/breadcrumb/examples/`**; for interactive kit demos see **`playground/snippets/breadcrumb/`**.
+- For copy-paste recipes, prefer the files under **`src/components/breadcrumb/examples/`** (including **`sizes`**, **`states`**, **`composition`**, **`full-width`** aligned with playground); for interactive kit demos see **`playground/snippets/breadcrumb/`**.

@@ -1,5 +1,6 @@
 import { CreditCard, Package, Truck } from "lucide-react";
-import { Accordion, Typography } from "prime-ui-kit";
+import { Accordion } from "@/components/accordion/Accordion";
+import { Typography } from "@/components/typography/Typography";
 
 import styles from "./examples.module.css";
 

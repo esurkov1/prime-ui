@@ -4,6 +4,17 @@
   gap: var(--prime-sys-spacing-s);
 }
 
+.stackNarrow {
+  width: 100%;
+  max-width: calc(var(--prime-sys-unit-1rem) * 22);
+}
+
+.fullWidthShell {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--prime-sys-unit-1rem) * 20);
+}
+
 .field {
   display: flex;
   flex-direction: column;

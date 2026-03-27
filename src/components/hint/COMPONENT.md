@@ -30,15 +30,27 @@
 - **`Hint.Icon`** — optional; render as the first child of **`Hint.Root`** when you need a decorative icon before the text.
 - Order: **`Hint.Root`** contains optional **`Hint.Icon`** then text (or mixed **`ReactNode`**); no other named parts.
 
-### Scenarios (see `examples/`)
+### Examples (source)
 
-| Scenario | Approach |
-|----------|----------|
-| Field help | **`variant="default"`**, same **`size`** as the control, **`id`** + **`aria-describedby`**. → [`examples/field-help.tsx`](examples/field-help.tsx) |
-| Error hint | **`variant="error"`**, invalid input **`aria-invalid`**, consider **`role="alert"`** if the message must interrupt. → [`examples/error-hint.tsx`](examples/error-hint.tsx) |
-| Success / confirmation | Only **`default`** / **`error`** / **`disabled`** exist; use **`default`** for neutral “saved / verified” copy under the field. → [`examples/success-confirmation.tsx`](examples/success-confirmation.tsx) |
-| Inline tip in a form | Stack **Label** + **Input** + **Hint** per row; optional **Hint.Icon** for scanability. → [`examples/inline-tip-form.tsx`](examples/inline-tip-form.tsx) |
-| Icon + text | **`Hint.Icon`** first, then string or nodes; meaning must not rely on the icon alone. → [`examples/with-icon.tsx`](examples/with-icon.tsx) |
+Runnable files next to this doc use **`import { … } from "prime-ui-kit"`**. Playground demos (`playground/snippets/hint/*.tsx`, Russian copy, `@/` imports, `playground/snippets/hint/snippets.module.css` for field layout) follow the same scenarios; keep them in sync when changing behavior.
+
+| Playground snippet | Example | Intent |
+|--------------------|---------|--------|
+| `playground/snippets/hint/sizes.tsx` | [`examples/sizes.tsx`](examples/sizes.tsx) | Ladder **`s` → `xl`** on **`Hint.Root`** |
+| `playground/snippets/hint/variants.tsx` | [`examples/variants.tsx`](examples/variants.tsx) | **`default`**, **`error`**, **`disabled`** on **`size="m"`** |
+| `playground/snippets/hint/field-states.tsx` | [`examples/field-states.tsx`](examples/field-states.tsx) | **Label** + **Input** + **Hint** for OK / error / disabled rows |
+| `playground/snippets/hint/controlled-variant.tsx` | [`examples/controlled-variant.tsx`](examples/controlled-variant.tsx) | Parent state toggles **`variant`** (and copy) |
+| `playground/snippets/hint/composition-icon.tsx` | [`examples/with-icon.tsx`](examples/with-icon.tsx) | **`Hint.Icon`** + text (**`aria-hidden`** icon) |
+| `playground/snippets/hint/a11y-describedby.tsx` | [`examples/a11y-describedby.tsx`](examples/a11y-describedby.tsx) | **`id`** on hint + **`aria-describedby`** on control |
+
+### More examples (**Input**-centric)
+
+| File | Intent |
+|------|--------|
+| [`examples/field-help.tsx`](examples/field-help.tsx) | Neutral helper with **`Input.Root`**, **`aria-describedby`** |
+| [`examples/error-hint.tsx`](examples/error-hint.tsx) | **`hasError`**, **`variant="error"`**, optional **`role="alert"`** |
+| [`examples/success-confirmation.tsx`](examples/success-confirmation.tsx) | No **`success`** variant — **`default`** copy for “saved / verified” |
+| [`examples/inline-tip-form.tsx`](examples/inline-tip-form.tsx) | Two stacked fields with hints |
 
 ### Minimal example
 

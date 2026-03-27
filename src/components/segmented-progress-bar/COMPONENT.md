@@ -28,15 +28,29 @@
 
 - **`SegmentedProgressBar.Root`** — outer wrapper with **`data-size`**, **`data-segment-gap`**, optional visible **`label`**, optional visually hidden distribution **`span`** (when **`label`** is set), and a **`role="group"`** track with one **`div`** per segment (presentational fills).
 
-### Scenarios (see `examples/`)
+### Playground (`playground/sections/SegmentedProgressBarSection.tsx`)
 
-| Scenario | Approach |
-|----------|----------|
-| Multi-phase rollout | Weight segments by cohort or phase (e.g. internal / beta / GA); use **`tone`** to distinguish states. → [`examples/multi-phase-rollout.tsx`](examples/multi-phase-rollout.tsx) |
-| Distribution / breakdown | **`label`** for the chart title; **`label`** on each segment for tooltips and the spoken distribution string. → [`examples/distribution-breakdown.tsx`](examples/distribution-breakdown.tsx) |
-| Gaps between segments | Default **`segmentGap="none"`**; **`hairline`** for visible separators without changing weights. → [`examples/segment-gaps.tsx`](examples/segment-gaps.tsx) |
-| Size ladder | **`size="s" | "m" | "l" | "xl"`** — same tokens scale as ProgressBar. → [`examples/size-ladder.tsx`](examples/size-ladder.tsx) |
-| Category mix (storage-style) | Multiple **`tone`** values for categories that are not “good/bad”, e.g. content types. → [`examples/storage-mix.tsx`](examples/storage-mix.tsx) |
+The section renders snippets from **`playground/snippets/progress/`** (segmented bar demos only):
+
+| Demo (section) | Snippet | What it shows |
+|----------------|---------|----------------|
+| Распределение | [`segmented-distribution.tsx`](../../../playground/snippets/progress/segmented-distribution.tsx) | Weights as shares of the sum (like percentages when the total is 100); visible **`label`** and per-segment **`label`** / **`tone`** (Russian copy in the snippet; **`previewLayout="stack"`**). |
+| Размеры | [`segmented-sizes.tsx`](../../../playground/snippets/progress/segmented-sizes.tsx) | **`size`** **`s`**, **`m`**, **`l`**, **`xl`** with the same weights (**`previewLayout="stack-center"`**). |
+| Зазор между сегментами | [`segmented-gap.tsx`](../../../playground/snippets/progress/segmented-gap.tsx) | Default **`segmentGap="none"`** vs **`hairline`** (1px separators); **`previewLayout="stack"`**. |
+
+`playground/snippets/segmented/*` is for **SegmentedControl**, not this component.
+
+### Example files in `examples/`
+
+Imports use **`"prime-ui-kit"`** so the same patterns work in an app. **`distribution-breakdown`**, **`size-ladder`**, and **`segment-gaps`** mirror the three playground frames above (same structure; English labels and copy where the snippets use Russian).
+
+| File | Scenario |
+|------|----------|
+| [`distribution-breakdown.tsx`](examples/distribution-breakdown.tsx) | **`label`** + weighted segments + **`tone`** (`snippets/progress/segmented-distribution.tsx`). |
+| [`size-ladder.tsx`](examples/size-ladder.tsx) | **`size`** ladder **`s`–`xl`** (`snippets/progress/segmented-sizes.tsx`; snippet wraps rows in **`stack`** + **`examplePreviewBleed`** for the playground). |
+| [`segment-gaps.tsx`](examples/segment-gaps.tsx) | **`segmentGap`** **`none`** vs **`hairline`** (`snippets/progress/segmented-gap.tsx`). |
+| [`multi-phase-rollout.tsx`](examples/multi-phase-rollout.tsx) | Phase mix (internal / beta / GA) with distinct **`tone`** values — not mounted in the section; extra recipe. |
+| [`storage-mix.tsx`](examples/storage-mix.tsx) | Category-style breakdown with **`hairline`** — not mounted in the section; extra recipe. |
 
 ### Minimal example
 
@@ -94,6 +108,7 @@ export function Example() {
 
 ## LLM note
 
+- Playground source of truth for live demos: **`playground/sections/SegmentedProgressBarSection.tsx`** → **`playground/snippets/progress/segmented-{distribution,sizes,gap}.tsx`** (not **`snippets/segmented/`**, which is SegmentedControl).
 - Export: **`import { SegmentedProgressBar } from "prime-ui-kit"`** — public surface is **`SegmentedProgressBar.Root`** only (namespace object).
 - **`SegmentedProgressBarRootProps`:** **`segments`** (required), **`label?`**, **`size?`**, **`segmentGap?`**, **`className?`**; **`ref`** → track **`div`** (**`role="group"`**).
 - **`SegmentedProgressSegment`:** **`value`** (number), **`label?`**, **`tone?`** — **`tone`** literals: **`primary`**, **`success`**, **`warning`**, **`danger`**, **`neutral`**.

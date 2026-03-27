@@ -56,19 +56,31 @@ export function ProductUpdatesSwitch() {
 
 Source of truth (stays in sync with the snippet above): `examples/canonical-maximal.tsx`.
 
-### Examples (source)
+### Scenarios (`playground/snippets/switch/` + `examples/`)
 
-Runnable demos live next to this file (workspace imports use `@/`; published consumers use `prime-ui-kit`):
+Playground UI: **`playground/sections/SwitchSection.tsx`** — blocks **Размеры** and **Состояния** with `sizes.tsx` and `states.tsx` (`?raw` source tabs). Every snippet under **`playground/snippets/switch/`** has a package-oriented twin next to this file (import **`prime-ui-kit`**, same structure and copy unless noted). Workspace snippets use `@/components/switch/Switch`.
+
+| Snippet | Package example |
+|---------|-----------------|
+| [`sizes.tsx`](../../../playground/snippets/switch/sizes.tsx) | [`examples/sizes.tsx`](examples/sizes.tsx) — **`s`–`xl`**, **`defaultChecked`** |
+| [`states.tsx`](../../../playground/snippets/switch/states.tsx) | [`examples/states.tsx`](examples/states.tsx) — off/on, **`disabled`**, **`readOnly`**, **`variant="error"`** + **`Switch.Error`** |
+| [`variants.tsx`](../../../playground/snippets/switch/variants.tsx) | [`examples/variants.tsx`](examples/variants.tsx) — **`default`** vs **`error`** |
+| [`controlled.tsx`](../../../playground/snippets/switch/controlled.tsx) | [`examples/controlled.tsx`](examples/controlled.tsx) — **`checked`** / **`onCheckedChange`** |
+| [`composition.tsx`](../../../playground/snippets/switch/composition.tsx) | [`examples/composition.tsx`](examples/composition.tsx) — пустой **`Switch.Label`** + **`aria-label`** на **`Root`**; второй ряд — **`Label`** + **`Hint`** |
+| [`full-width.tsx`](../../../playground/snippets/switch/full-width.tsx) | [`examples/full-width.tsx`](examples/full-width.tsx) — обёртка-карточка **`width: 100%`** (`examples.module.css` → **`fullWidthCard`**) |
+| [`form-features.tsx`](../../../playground/snippets/switch/form-features.tsx) | [`examples/form-features.tsx`](examples/form-features.tsx) — **`name`**, **`defaultChecked`**, **`required`**, **`FormData`** on submit |
+
+Shared layout tokens for **`full-width`** / **`form-features`** in the playground: `playground/snippets/switch/snippets.module.css`.
+
+### Additional examples (narratives)
 
 | File | Intent |
 |------|--------|
-| `examples/canonical-maximal.tsx` | Full shell: **`Switch.Label`** + **`Switch.Hint`**, **`size="m"`** |
+| `examples/canonical-maximal.tsx` | Full shell: **`Switch.Label`** + **`Switch.Hint`**, **`size="m"`** (English) |
 | `examples/scenario-settings-toggle.tsx` | Settings: several independent toggles in a **`fieldset`** |
 | `examples/scenario-feature-flag.tsx` | Controlled flag: **`checked`** / **`onCheckedChange`** + rollout copy |
 | `examples/scenario-billing-annual.tsx` | Billing: annual vs monthly as one switch with dynamic hint |
 | `examples/scenario-form-consent.tsx` | Form: **`name`**, **`required`**, **`FormData`** on submit |
-
-Playground composition demos (broader states and Russian copy): `playground/snippets/switch/`.
 
 ### Extended usage
 
@@ -82,7 +94,7 @@ Playground composition demos (broader states and Russian copy): `playground/snip
 
 ### Note for LLMs
 
-When generating **Switch** markup for this library: (1) Always include **`Switch.Label`** as a **child** of **`Switch.Root`** — **`Root`** does not render the **`label`** prop. (2) Use **`onCheckedChange`**, not **`onChange`**, for controlled on/off updates. (3) For controlled mode, pair **`checked`** with **`onCheckedChange`**; for forms, forward **`name`**, **`required`**, and other input attributes on **`Root`** (they go to the native **`input`**). (4) Order parts **`Root`** → **`Label`** → optional **`Hint`** / **`Error`**. (5) Do not wrap kit parts to restyle them; use **`size`**, **`variant`**, and documented props only. (6) Start from **`examples/canonical-maximal.tsx`**, then adapt **`scenario-*.tsx`** files for settings, feature flags, billing, and forms.
+When generating **Switch** markup for this library: (1) Always include **`Switch.Label`** as a **child** of **`Switch.Root`** — the **`label?: React.ReactNode`** prop on **`Root`** is **not** rendered and must not replace **`Switch.Label`** (it may end up forwarded to the native **`input`** if passed). (2) Use **`onCheckedChange`**, not **`onChange`**, for controlled on/off updates. (3) For controlled mode, pair **`checked`** with **`onCheckedChange`**; for forms, forward **`name`**, **`required`**, and other input attributes on **`Root`** (they go to the native **`input`**). (4) Order parts **`Root`** → **`Label`** → optional **`Hint`** / **`Error`**. (5) Do not wrap kit parts to restyle them; use **`size`**, **`variant`**, and documented props only. (6) Start from **`examples/canonical-maximal.tsx`** or the **`sizes`** / **`states`** snippet twins; use **`scenario-*.tsx`** for longer narratives.
 
 ## Rules
 

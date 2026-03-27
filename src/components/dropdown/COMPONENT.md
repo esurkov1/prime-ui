@@ -12,14 +12,40 @@
 
 **Position:** **`Content.align`**: `start` | `center` | `end`. **`Content.side`**: `bottom` | `top` (may flip). **`sameMinWidthAsTrigger`** widens the panel to at least the trigger width. Resolved side is on **`data-side`** on the menu node.
 
-**Runnable examples (this package):**
+**Runnable examples**
 
-| File | Scenario |
-|------|----------|
-| [`examples/actions-menu.tsx`](examples/actions-menu.tsx) | Icon trigger, icons in rows, separator, **`destructive`** |
-| [`examples/account-menu.tsx`](examples/account-menu.tsx) | Header + avatar, **`Inset`**, **`sameMinWidthAsTrigger`**, sign out |
-| [`examples/select-like-list.tsx`](examples/select-like-list.tsx) | Trigger label reflects choice; still menu semantics (not **Select**) |
-| [`examples/placement-demo.tsx`](examples/placement-demo.tsx) | **`align`** and **`side`** |
+**Playground snippets** (order matches [`playground/sections/DropdownSection.tsx`](../../../playground/sections/DropdownSection.tsx); keep **`examples/`** in sync when changing these):
+
+| Snippet | Scenario |
+|---------|----------|
+| [`playground/snippets/dropdown/sizes.tsx`](../../../playground/snippets/dropdown/sizes.tsx) | **`Content.size`** s–xl: panel, rows, group label, default **`ItemIcon`** size |
+| [`playground/snippets/dropdown/variants.tsx`](../../../playground/snippets/dropdown/variants.tsx) | Plain rows and **`Item.destructive`** |
+| [`playground/snippets/dropdown/states.tsx`](../../../playground/snippets/dropdown/states.tsx) | **`Item.disabled`** (no activation / no close) |
+| [`playground/snippets/dropdown/placement.tsx`](../../../playground/snippets/dropdown/placement.tsx) | **`align`** start/center/end and **`side`** top |
+| [`playground/snippets/dropdown/controlled.tsx`](../../../playground/snippets/dropdown/controlled.tsx) | **`open`** / **`onOpenChange`** on **`Root`** |
+| [`playground/snippets/dropdown/composition.tsx`](../../../playground/snippets/dropdown/composition.tsx) | **`Block`**, header slots, **`GroupLabel`**, **`ItemIcon`**, nested trailing **Button** |
+| [`playground/snippets/dropdown/full-width.tsx`](../../../playground/snippets/dropdown/full-width.tsx) | **`sameMinWidthAsTrigger`** with narrow trigger |
+| [`playground/snippets/dropdown/as-child.tsx`](../../../playground/snippets/dropdown/as-child.tsx) | **`Trigger`** merges props into a single child (e.g. link) |
+| [`playground/snippets/dropdown/inset.tsx`](../../../playground/snippets/dropdown/inset.tsx) | **`Inset`** **`padding`** / **`gap`** variants |
+
+**Package `examples/`** (same folder as this file; `@/` imports in-repo, **`prime-ui-kit`** for consumers):
+
+| File | Mirrors snippet | Scenario |
+|------|-----------------|----------|
+| [`examples/sizes.tsx`](examples/sizes.tsx) | `sizes.tsx` | Same as playground sizes |
+| [`examples/variants.tsx`](examples/variants.tsx) | `variants.tsx` | Same as playground variants |
+| [`examples/states.tsx`](examples/states.tsx) | `states.tsx` | Same as playground states |
+| [`examples/placement-demo.tsx`](examples/placement-demo.tsx) | `placement.tsx` | Same as playground placement |
+| [`examples/controlled.tsx`](examples/controlled.tsx) | `controlled.tsx` | Same as playground controlled |
+| [`examples/composition.tsx`](examples/composition.tsx) | `composition.tsx` | Same as playground composition |
+| [`examples/full-width.tsx`](examples/full-width.tsx) | `full-width.tsx` | Same as playground full-width |
+| [`examples/as-child.tsx`](examples/as-child.tsx) | `as-child.tsx` | Same as playground as-child |
+| [`examples/inset.tsx`](examples/inset.tsx) | `inset.tsx` | Same as playground inset |
+| [`examples/actions-menu.tsx`](examples/actions-menu.tsx) | — | Icon-only trigger, row icons, separator, **`destructive`** |
+| [`examples/account-menu.tsx`](examples/account-menu.tsx) | — | Header + avatar, **`Inset`**, **`sameMinWidthAsTrigger`**, sign out |
+| [`examples/select-like-list.tsx`](examples/select-like-list.tsx) | — | Trigger shows choice; still **`role="menu"`** (not **Select**) |
+
+Shared layout tokens for some examples: [`examples/dropdown-examples.module.css`](examples/dropdown-examples.module.css) (mirrors [`playground/snippets/dropdown/dropdown-snippets.module.css`](../../../playground/snippets/dropdown/dropdown-snippets.module.css)).
 
 **Minimal import:**
 
@@ -42,8 +68,6 @@ export function Example() {
   );
 }
 ```
-
-Playground mirrors: `playground/snippets/dropdown/` (`composition`, `placement`, `controlled`, …).
 
 ---
 

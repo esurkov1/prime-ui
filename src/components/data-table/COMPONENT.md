@@ -18,7 +18,31 @@
 - **Public API** — a single compound entry: `DataTable` with `Root` (`DataTableRoot`). There are no other exported subcomponents.
 - **Structure** — `ControlSizeProvider` wraps a root `div` (data attributes for size, dividers, header visibility, stickiness, table width mode, hover highlights, zebra). Inside: `ScrollContainer` viewport → `<table>`, optional `<thead>` (`<th>` per column), `<tbody>` with rows, and an `aria-hidden` sentinel at the bottom when `infiniteScroll` is on (for `IntersectionObserver` or scroll fallback).
 - **Footer** — always shows a “shown range / total” line; if not `infiniteScroll` and `showPagination` and there is more than one page, it renders `Pagination.Root`; in infinite mode it may show a short status when more rows can be revealed or loaded.
-- **Reference examples** — longer patterns (full column set, controlled sort/page, row selection with `Checkbox`, infinite `onLoadMore`, sticky header and first column) live under [`examples/`](./examples/) as copy-ready `tsx` modules that import from `"prime-ui-kit"`.
+
+### Playground snippets
+
+Demos match **`playground/sections/DataTableSection.tsx`** (order and intent). Snippets under **`playground/snippets/data-table/`** use `@/` imports; runnable twins under **`examples/`** use **`prime-ui-kit`** (shared layout tokens in [`examples/examples-demos.module.css`](./examples/examples-demos.module.css) where needed).
+
+| Block | Snippet | Runnable example |
+| --- | --- | --- |
+| **Sizes** | [`sizes.tsx`](../../../playground/snippets/data-table/sizes.tsx) | [`examples/sizes.tsx`](./examples/sizes.tsx) — `size` `s`–`xl`; `Tag` / `Badge` inherit `ControlSizeProvider`; `paginationSize` follows table `size`. |
+| **Divider styles** | [`divider-styles.tsx`](../../../playground/snippets/data-table/divider-styles.tsx) | [`examples/divider-styles.tsx`](./examples/divider-styles.tsx) — `dividerStyle` `standard` / `dashed` / `dotted` / `none`. |
+| **States** | [`states.tsx`](../../../playground/snippets/data-table/states.tsx) | [`examples/states.tsx`](./examples/states.tsx) — `loading` + `loadingText` vs `emptyText`. |
+| **Sticky + headers** | [`sticky-and-headers.tsx`](../../../playground/snippets/data-table/sticky-and-headers.tsx) | [`examples/sticky-and-headers.tsx`](./examples/sticky-and-headers.tsx) — `showHeader`, `stickyHeader`, `stickyFirstColumn` with `infiniteScroll` + `scrollHeight`. |
+| **Controlled** | [`controlled.tsx`](../../../playground/snippets/data-table/controlled.tsx) | [`examples/controlled-sort-and-page.tsx`](./examples/controlled-sort-and-page.tsx) — `sort` / `onSortChange` / `page` / `onPageChange` (parent resets page on sort). |
+| **Composition** | [`composition.tsx`](../../../playground/snippets/data-table/composition.tsx) | [`examples/composition.tsx`](./examples/composition.tsx) — rich `header` / `cell`, `getRowKey`, `onRowClick`, `onCellClick` (+ keyboard). |
+| **Full width** | [`full-width.tsx`](../../../playground/snippets/data-table/full-width.tsx) | [`examples/full-width.tsx`](./examples/full-width.tsx) — narrow parent; default `fillWidth`. |
+| **Highlight + striped** | [`highlight-and-striped.tsx`](../../../playground/snippets/data-table/highlight-and-striped.tsx) | [`examples/highlight-and-striped.tsx`](./examples/highlight-and-striped.tsx) — toggles for `highlightRowOnHover`, `highlightColumnOnHover`, `striped`. |
+| **Infinite scroll** | [`infinite-scroll.tsx`](../../../playground/snippets/data-table/infinite-scroll.tsx) | [`examples/infinite-scroll-load-more.tsx`](./examples/infinite-scroll-load-more.tsx) — `infiniteScroll`, `hasMore`, `loadingMore`, `onLoadMore`, `scrollHeight` (snippet uses a larger generated dataset; same props). |
+| **Sort + pagination (uncontrolled)** | [`sorting-pagination.tsx`](../../../playground/snippets/data-table/sorting-pagination.tsx) | [`examples/sorting-pagination.tsx`](./examples/sorting-pagination.tsx) — `defaultSort` and built-in `Pagination`. |
+
+### Extra recipes (`examples/`)
+
+| Recipe | File | Notes |
+| --- | --- | --- |
+| Sticky header + first column (compact) | [`sticky-header-first-column.tsx`](./examples/sticky-header-first-column.tsx) | Russian copy; one combined sticky demo (subset of the snippet tour above). |
+| Orders + row open affordance | [`canonical-orders.tsx`](./examples/canonical-orders.tsx) | `defaultSort`, `pageSize`, `onRowClick`, `Tag` / `Badge` cells. |
+| Row selection with `Checkbox` | [`row-selection.tsx`](./examples/row-selection.tsx) | No built-in multi-select; header + row checkboxes in column definitions. |
 
 ### Minimal example
 

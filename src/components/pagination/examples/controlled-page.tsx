@@ -3,7 +3,7 @@ import * as React from "react";
 
 const TOTAL = 12;
 
-/** Page index lives in parent state; Pagination.Root and buttons share the same setter. */
+/** Page index lives in parent state; Pagination.Root and buttons share the same setter. Parity with `playground/snippets/pagination/controlled.tsx` (English copy). */
 export default function ControlledPageExample() {
   const [page, setPage] = React.useState(4);
 

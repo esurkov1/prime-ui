@@ -36,20 +36,33 @@ export function Example() {
 
 ### Canonical composition (reference)
 
-For **controlled mode**, **`SegmentedControl.Icon` + text**, **icon-only segments with visually hidden labels**, and **`Typography` as an external group hint** (because **`Root` does not forward `aria-label`**), open **`examples/canonical-composition.tsx`** next to this file. Imports use **`"prime-ui-kit"`** so the same snippets work in an app after installing the package.
+For a **single file** that combines **controlled mode**, **`SegmentedControl.Icon` + text**, **icon-only segments with visually hidden labels**, and layout notes (remember **`Root` does not forward `aria-label`**), see **`examples/canonical-composition.tsx`**. Imports use **`"prime-ui-kit"`** so the same patterns work in an app after installing the package.
+
+The **playground** (`playground/sections/SegmentedControlSection.tsx`) renders the same scenarios as **`playground/snippets/segmented/*.tsx`** (internal `@/` imports). The **`examples/`** files below mirror those snippets with **`"prime-ui-kit"`** imports.
 
 ### Example files in `examples/`
 
+| File | Scenario (aligned with `playground/snippets/segmented/`) |
+|------|----------|
+| `sizes.tsx` | All four **`size`** values `s`–`xl` with identical segment labels |
+| `states.tsx` | Default group; **`disabled`** on one **`Item`**; **`disabled`** on **`Root`** |
+| `controlled.tsx` | **`value`** + **`onValueChange`** (no **`defaultValue`**) |
+| `composition.tsx` | **`Icon`** + label text; icon-only rows with visually hidden text in **`Item`** |
+| `full-width.tsx` | Narrow container; **`className`** overrides root **`width: fit-content`** so segments share width |
+| `features.tsx` | Two, three, and four segments; keyboard (**ArrowLeft** / **ArrowRight** on the group) |
+
+Additional English product-style recipes:
+
 | File | Scenario |
 |------|----------|
-| `canonical-composition.tsx` | Icon + text, controlled period, icon-only + visually hidden labels |
-| `view-mode.tsx` | English catalog view: List / Grid / Table |
-| `pricing-toggle.tsx` | English billing: Monthly / Annual |
-| `catalog-filters.tsx` | English compact availability filter; `size="s"` |
+| `canonical-composition.tsx` | Combined: icons, controlled period, icon-only (superset demo) |
+| `view-mode.tsx` | Catalog view: List / Grid / Table |
+| `pricing-toggle.tsx` | Billing: Monthly / Annual |
+| `catalog-filters.tsx` | Compact availability filter; **`size="s"`** |
 
 ### Note for LLMs
 
-- **Imports:** `SegmentedControl`, `Icon`, and `Typography` from **`"prime-ui-kit"`** in these examples; paths are relative to `src/components/segmented-control/examples/`.
+- **Imports:** `SegmentedControl`, `Icon`, and `Typography` from **`"prime-ui-kit"`** in **`examples/`**; paths are relative to `src/components/segmented-control/examples/`. Playground snippets use **`@/…`** but should stay behavior-identical to these files.
 - **Values are strings:** map `onValueChange` to app enums with a type guard or narrow union; **`Item` does not accept `aria-label`**—accessible names come from **visible** `children` and/or **visually hidden** text inside **`Item`**.
 - **`SegmentedControl.Icon`** is **`aria-hidden`**; always pair with visible text or a visually hidden span inside the same **`Item`**.
 - **`Root`** does **not** forward **`aria-label`**, **`aria-labelledby`**, or **`style`**: use a **wrapper** and visible copy, or **`aria-labelledby`** on a wrapper that references visible page text—not on **`Root`**.
@@ -81,7 +94,7 @@ For **controlled mode**, **`SegmentedControl.Icon` + text**, **icon-only segment
 | disabled | `boolean` | `false` | No | Disables the entire group |
 | size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Segment dimensions and typography |
 | children | `React.ReactNode` | — | Yes | `Item` nodes (and their content) |
-| className | `string` | — | No | Extra class on the container |
+| className | `string` | — | No | Extra class on the container (e.g. full-width override when the default **`width: fit-content`** is too narrow—see **`examples/full-width.tsx`**) |
 
 ### SegmentedControl.Item
 

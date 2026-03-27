@@ -18,9 +18,13 @@ export default function SidebarStatesSnippet() {
           <Sidebar.Header>
             <Sidebar.HeaderRow>
               <Sidebar.HeaderMain>
-                <Sidebar.Text>Почтовый ящик</Sidebar.Text>
+                <Sidebar.IdentityButton
+                  leading={<span aria-hidden="true">✉</span>}
+                  title="Почтовый ящик"
+                  subtitle="Входящие"
+                  type="button"
+                />
               </Sidebar.HeaderMain>
-              <Sidebar.ToggleButton />
             </Sidebar.HeaderRow>
           </Sidebar.Header>
           <Sidebar.Content>

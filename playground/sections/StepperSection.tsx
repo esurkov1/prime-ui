@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import StepperCompositionSnippet from "../snippets/stepper/composition";
 import compositionSource from "../snippets/stepper/composition.tsx?raw";
@@ -445,214 +445,219 @@ const verticalStepperItemIndicatorApiRows: PlaygroundApiPropRow[] = [
 
 export default function StepperSection() {
   return (
-    <PlaygroundDocPage
-      title="Stepper"
-      description={
-        <>
-          Показывает этапы процесса: что уже сделано, где вы сейчас и что осталось. Есть готовый
-          вариант с номером шага из кода и отдельные «примитивы» для полного контроля разметки и
-          состояния каждой кнопки.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Четыре значения <code>size</code> на <code>Stepper.Root</code> (<code>s</code>,{" "}
-            <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же схема шагов, разный тир
-            контрола и типографики.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
-            <PlaygroundExampleFrame.Stage>
-              <StepperSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Stepper</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Показывает этапы процесса: что уже сделано, где вы сейчас и что осталось. Есть готовый
+              вариант с номером шага из кода и отдельные «примитивы» для полного контроля разметки и
+              состояния каждой кнопки.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Четыре значения <code>size</code> на <code>Stepper.Root</code> (<code>s</code>,{" "}
+              <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же схема шагов, разный тир
+              контрола и типографики.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <StepperSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты API</DemoSectionTitle>
+            <DemoDescription>
+              Примитивы <code>HorizontalStepper</code> и <code>VerticalStepper</code>: вы сами
+              выставляете <code>state</code> у каждого <code>Item</code>, без{" "}
+              <code>currentStep</code> и семантического <code>&lt;ol&gt;</code>. Подходит для
+              кастомной навигации и данных с сервера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={lowLevelApiSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <StepperLowLevelApiSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Отключённый шаг (<code>disabled</code>) и ошибка на шаге через{" "}
+              <code>status=&quot;error&quot;</code> с кастомным содержимым <code>Indicator</code>{" "}
+              (например восклицательный знак).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <StepperStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Ориентация</DemoSectionTitle>
+            <DemoDescription>
+              Проп <code>orientation</code> у <code>Stepper.Root</code>: горизонтальная цепочка с{" "}
+              <code>SeparatorIcon</code> между кнопками и вертикальный список со стрелкой{" "}
+              <code>Stepper.Arrow</code> у активного шага.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={orientationSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <StepperOrientationSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoDescription>
+              <code>currentStep</code> хранится в React-состоянии родителя; кнопки «Назад» и «Далее»
+              сдвигают индекс, клик по шагу ведёт к его индексу.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <StepperControlledSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Свой символ в <code>Indicator</code>, рядом с подписью — сторонняя иконка (здесь{" "}
+              <code>IconMail</code>) и стандартный <code>Content</code> с заголовком и описанием.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <StepperCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoDescription>
+              Горизонтальный степпер внутри широкой карточки:{" "}
+              <code>className=&quot;w-full&quot;</code> на корне и обёртка на всю ширину превью.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <StepperFullWidthSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Полиморфные иконки (as)</DemoSectionTitle>
+            <DemoDescription>
+              У примитивов разделитель и стрелка принимают <code>as</code> — можно подставить другой
+              компонент иконки из набора пакета вместо шеврона по умолчанию.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={polymorphicAsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <StepperPolymorphicAsSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+            <DemoDescription>
+              Псевдонимы <code>Stepper.Item</code> и <code>Stepper.ItemIndicator</code>, явный{" "}
+              <code>index</code> для отображаемого номера и <code>SeparatorIcon</code> как отдельные
+              пункты списка между шагами в горизонтальном режиме.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <StepperFeaturesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Stepper.Root</DemoApiTitle>
+            <DemoDescription>
+              Семантический список шагов и контекст размера, активного индекса и ориентации.
+            </DemoDescription>
+            <PlaygroundApiTable rows={stepperRootApiRows} />
+
+            <DemoApiTitle>Stepper.Step (Stepper.Item)</DemoApiTitle>
+            <DemoDescription>
+              Кнопка внутри пункта <code>&lt;li&gt;</code>; <code>Item</code> — то же API.
+            </DemoDescription>
+            <PlaygroundApiTable rows={stepperStepApiRows} />
+
+            <DemoApiTitle>Stepper.Indicator (Stepper.ItemIndicator)</DemoApiTitle>
+            <DemoDescription>
+              Круглый индикатор с номером или галочкой; <code>ItemIndicator</code> — псевдоним.
+            </DemoDescription>
+            <PlaygroundApiTable rows={stepperIndicatorApiRows} />
+
+            <DemoApiTitle>Stepper.Content</DemoApiTitle>
+            <DemoDescription>Заголовок и необязательное описание шага.</DemoDescription>
+            <PlaygroundApiTable rows={stepperContentApiRows} />
+
+            <DemoApiTitle>Stepper.SeparatorIcon</DemoApiTitle>
+            <DemoDescription>
+              Разделитель-шеврон между горизонтальными шагами (рендерится отдельным{" "}
+              <code>&lt;li&gt;</code>).
+            </DemoDescription>
+            <PlaygroundApiTable rows={stepperSeparatorApiRows} />
+
+            <DemoApiTitle>Stepper.Arrow</DemoApiTitle>
+            <DemoDescription>
+              Стрелка у вертикального шага; делегирует в <code>VerticalStepper.Arrow</code>.
+            </DemoDescription>
+            <PlaygroundApiTable rows={stepperArrowApiRows} />
+
+            <DemoApiTitle>HorizontalStepper.Root</DemoApiTitle>
+            <DemoDescription>Контейнер горизонтальной полосы без списка шагов.</DemoDescription>
+            <PlaygroundApiTable rows={horizontalStepperRootApiRows} />
+
+            <DemoApiTitle>HorizontalStepper.SeparatorIcon</DemoApiTitle>
+            <DemoDescription>Иконка между соседними горизонтальными кнопками.</DemoDescription>
+            <PlaygroundApiTable rows={horizontalStepperSeparatorApiRows} />
+
+            <DemoApiTitle>HorizontalStepper.Item</DemoApiTitle>
+            <DemoDescription>
+              Кнопка шага с явным визуальным <code>state</code>.
+            </DemoDescription>
+            <PlaygroundApiTable rows={horizontalStepperItemApiRows} />
+
+            <DemoApiTitle>HorizontalStepper.ItemIndicator</DemoApiTitle>
+            <DemoDescription>Индикатор внутри горизонтального Item.</DemoDescription>
+            <PlaygroundApiTable rows={horizontalStepperItemIndicatorApiRows} />
+
+            <DemoApiTitle>VerticalStepper.Root</DemoApiTitle>
+            <DemoDescription>Контейнер вертикальной колонки шагов.</DemoDescription>
+            <PlaygroundApiTable rows={verticalStepperRootApiRows} />
+
+            <DemoApiTitle>VerticalStepper.Arrow</DemoApiTitle>
+            <DemoDescription>
+              Иконка-стрелка справа от активной строки (или кастомная через <code>as</code>).
+            </DemoDescription>
+            <PlaygroundApiTable rows={verticalStepperArrowApiRows} />
+
+            <DemoApiTitle>VerticalStepper.Item</DemoApiTitle>
+            <DemoDescription>Кнопка одного вертикального шага.</DemoDescription>
+            <PlaygroundApiTable rows={verticalStepperItemApiRows} />
+
+            <DemoApiTitle>VerticalStepper.ItemIndicator</DemoApiTitle>
+            <DemoDescription>Круглый индикатор в вертикальном Item.</DemoDescription>
+            <PlaygroundApiTable rows={verticalStepperItemIndicatorApiRows} />
+          </div>
         </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты API</DemoSectionTitle>
-          <DemoDescription>
-            Примитивы <code>HorizontalStepper</code> и <code>VerticalStepper</code>: вы сами
-            выставляете <code>state</code> у каждого <code>Item</code>, без <code>currentStep</code>{" "}
-            и семантического <code>&lt;ol&gt;</code>. Подходит для кастомной навигации и данных с
-            сервера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={lowLevelApiSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <StepperLowLevelApiSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Отключённый шаг (<code>disabled</code>) и ошибка на шаге через{" "}
-            <code>status=&quot;error&quot;</code> с кастомным содержимым <code>Indicator</code>{" "}
-            (например восклицательный знак).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <StepperStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Ориентация</DemoSectionTitle>
-          <DemoDescription>
-            Проп <code>orientation</code> у <code>Stepper.Root</code>: горизонтальная цепочка с{" "}
-            <code>SeparatorIcon</code> между кнопками и вертикальный список со стрелкой{" "}
-            <code>Stepper.Arrow</code> у активного шага.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={orientationSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <StepperOrientationSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-          <DemoDescription>
-            <code>currentStep</code> хранится в React-состоянии родителя; кнопки «Назад» и «Далее»
-            сдвигают индекс, клик по шагу ведёт к его индексу.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <StepperControlledSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция</DemoSectionTitle>
-          <DemoDescription>
-            Свой символ в <code>Indicator</code>, рядом с подписью — сторонняя иконка (здесь{" "}
-            <code>IconMail</code>) и стандартный <code>Content</code> с заголовком и описанием.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <StepperCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Full width</DemoSectionTitle>
-          <DemoDescription>
-            Горизонтальный степпер внутри широкой карточки:{" "}
-            <code>className=&quot;w-full&quot;</code> на корне и обёртка на всю ширину превью.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <StepperFullWidthSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Полиморфные иконки (as)</DemoSectionTitle>
-          <DemoDescription>
-            У примитивов разделитель и стрелка принимают <code>as</code> — можно подставить другой
-            компонент иконки из набора пакета вместо шеврона по умолчанию.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={polymorphicAsSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <StepperPolymorphicAsSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-          <DemoDescription>
-            Псевдонимы <code>Stepper.Item</code> и <code>Stepper.ItemIndicator</code>, явный{" "}
-            <code>index</code> для отображаемого номера и <code>SeparatorIcon</code> как отдельные
-            пункты списка между шагами в горизонтальном режиме.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <StepperFeaturesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Stepper.Root</DemoApiTitle>
-          <DemoDescription>
-            Семантический список шагов и контекст размера, активного индекса и ориентации.
-          </DemoDescription>
-          <PlaygroundApiTable rows={stepperRootApiRows} />
-
-          <DemoApiTitle>Stepper.Step (Stepper.Item)</DemoApiTitle>
-          <DemoDescription>
-            Кнопка внутри пункта <code>&lt;li&gt;</code>; <code>Item</code> — то же API.
-          </DemoDescription>
-          <PlaygroundApiTable rows={stepperStepApiRows} />
-
-          <DemoApiTitle>Stepper.Indicator (Stepper.ItemIndicator)</DemoApiTitle>
-          <DemoDescription>
-            Круглый индикатор с номером или галочкой; <code>ItemIndicator</code> — псевдоним.
-          </DemoDescription>
-          <PlaygroundApiTable rows={stepperIndicatorApiRows} />
-
-          <DemoApiTitle>Stepper.Content</DemoApiTitle>
-          <DemoDescription>Заголовок и необязательное описание шага.</DemoDescription>
-          <PlaygroundApiTable rows={stepperContentApiRows} />
-
-          <DemoApiTitle>Stepper.SeparatorIcon</DemoApiTitle>
-          <DemoDescription>
-            Разделитель-шеврон между горизонтальными шагами (рендерится отдельным{" "}
-            <code>&lt;li&gt;</code>).
-          </DemoDescription>
-          <PlaygroundApiTable rows={stepperSeparatorApiRows} />
-
-          <DemoApiTitle>Stepper.Arrow</DemoApiTitle>
-          <DemoDescription>
-            Стрелка у вертикального шага; делегирует в <code>VerticalStepper.Arrow</code>.
-          </DemoDescription>
-          <PlaygroundApiTable rows={stepperArrowApiRows} />
-
-          <DemoApiTitle>HorizontalStepper.Root</DemoApiTitle>
-          <DemoDescription>Контейнер горизонтальной полосы без списка шагов.</DemoDescription>
-          <PlaygroundApiTable rows={horizontalStepperRootApiRows} />
-
-          <DemoApiTitle>HorizontalStepper.SeparatorIcon</DemoApiTitle>
-          <DemoDescription>Иконка между соседними горизонтальными кнопками.</DemoDescription>
-          <PlaygroundApiTable rows={horizontalStepperSeparatorApiRows} />
-
-          <DemoApiTitle>HorizontalStepper.Item</DemoApiTitle>
-          <DemoDescription>
-            Кнопка шага с явным визуальным <code>state</code>.
-          </DemoDescription>
-          <PlaygroundApiTable rows={horizontalStepperItemApiRows} />
-
-          <DemoApiTitle>HorizontalStepper.ItemIndicator</DemoApiTitle>
-          <DemoDescription>Индикатор внутри горизонтального Item.</DemoDescription>
-          <PlaygroundApiTable rows={horizontalStepperItemIndicatorApiRows} />
-
-          <DemoApiTitle>VerticalStepper.Root</DemoApiTitle>
-          <DemoDescription>Контейнер вертикальной колонки шагов.</DemoDescription>
-          <PlaygroundApiTable rows={verticalStepperRootApiRows} />
-
-          <DemoApiTitle>VerticalStepper.Arrow</DemoApiTitle>
-          <DemoDescription>
-            Иконка-стрелка справа от активной строки (или кастомная через <code>as</code>).
-          </DemoDescription>
-          <PlaygroundApiTable rows={verticalStepperArrowApiRows} />
-
-          <DemoApiTitle>VerticalStepper.Item</DemoApiTitle>
-          <DemoDescription>Кнопка одного вертикального шага.</DemoDescription>
-          <PlaygroundApiTable rows={verticalStepperItemApiRows} />
-
-          <DemoApiTitle>VerticalStepper.ItemIndicator</DemoApiTitle>
-          <DemoDescription>Круглый индикатор в вертикальном Item.</DemoDescription>
-          <PlaygroundApiTable rows={verticalStepperItemIndicatorApiRows} />
-        </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

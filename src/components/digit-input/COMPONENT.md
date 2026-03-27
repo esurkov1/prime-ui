@@ -10,7 +10,8 @@
 - **Размер ячеек:** **`size`**: `"s"` \| `"m"` \| `"l"` \| `"xl"` (по умолчанию **`m`**).
 - **Режимы:** контролируемый (`value` + `onChange`) или неконтролируемый (`defaultValue`); опционально **`onComplete`**, **`disabled`**, **`hasError`**, **`className`**.
 - **Подписи и ошибки:** снаружи — [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md); встроенных слотов нет.
-- **Примеры в репозитории:** [`examples/`](./examples/) (OTP, PIN, шаг верификации, ошибка, сброс при повторной отправке).
+- **Playground:** секция **`playground/sections/DigitInputSection.tsx`**; исходники демо — **`playground/snippets/digit-input/*.tsx`** (импорты **`@/`**). Сниппеты **`playground/snippets/slider-digit/`** относятся к **Slider** с режимом «цифры», а не к **DigitInput**.
+- **Примеры для копирования:** [`examples/`](./examples/) — продуктовые сценарии и зеркала сниппетов с импортом **`prime-ui-kit`**.
 
 ## Extended
 
@@ -25,6 +26,18 @@
 - **Do not use** when a single full-width numeric field is enough — prefer [Input](../input/COMPONENT.md) or app-level masking.
 - **Do not use** for free-form numbers (amounts, phone as one field); this component is fixed-length, one digit per slot.
 - **Do not expect** arrow keys to move between cells; only typing, Backspace on an empty cell, and pointer focus apply.
+
+### Playground snippets
+
+Демо совпадают по порядку и смыслу с **`playground/sections/DigitInputSection.tsx`**. В сниппетах — импорты **`@/`**; зеркальные рецепты с **`prime-ui-kit`** — в **`examples/`** (та же разметка и пропы, раскладка через простой column flex и токены отступов).
+
+| Блок | Сниппет | Зеркало в `examples/` |
+| ---- | ------- | ---------------------- |
+| **Размеры** | [`sizes.tsx`](../../../playground/snippets/digit-input/sizes.tsx) | [`sizes.tsx`](./examples/sizes.tsx) — **`size`** **`s`**, **`m`**, **`l`**, **`xl`** при **`length={4}`** и одинаковом **`defaultValue`** для сравнения масштаба. |
+| **Состояния** | [`states.tsx`](../../../playground/snippets/digit-input/states.tsx) | [`states.tsx`](./examples/states.tsx) — без флагов, **`hasError`**, **`disabled`**. |
+| **Контролируемый режим** | [`controlled.tsx`](../../../playground/snippets/digit-input/controlled.tsx) | [`controlled.tsx`](./examples/controlled.tsx) — **`value`** + **`onChange`**, подпись со строкой и счётчиком **`(n/4)`**. |
+| **Композиция** | [`composition.tsx`](../../../playground/snippets/digit-input/composition.tsx) | [`composition.tsx`](./examples/composition.tsx) — **[Label](../label/COMPONENT.md)** + **DigitInput** + **[Hint](../hint/COMPONENT.md)** без слотов на корне. |
+| **Специфичные фичи** | [`features.tsx`](../../../playground/snippets/digit-input/features.tsx) | [`features.tsx`](./examples/features.tsx) — разные **`length`** / **`defaultValue`**, демо **`onComplete`** после последней цифры. |
 
 ### Composition
 
@@ -42,7 +55,9 @@ export function OneTimeCode() {
 }
 ```
 
-### Scenario-oriented examples
+### Scenarios (recipes)
+
+Продуктовые сценарии (импорт **`prime-ui-kit`**). Для построчного соответствия демо плейграунда см. **Playground snippets** выше.
 
 | Сценарий | Файл |
 | -------- | ---- |
@@ -66,6 +81,7 @@ export function OneTimeCode() {
 
 ## LLM note
 
+- Для разметки и комбинаций пропов сначала смотри **`playground/snippets/digit-input/*.tsx`** и зеркала **`examples/sizes.tsx`**, **`states.tsx`**, **`controlled.tsx`**, **`composition.tsx`**, **`features.tsx`**.
 - Нормализация: в **`value` / `onChange` / paste** нецифровые символы **удаляются**, строка **обрезается** до **`length`**. Алфавитно-цифровые коды **не поддерживаются**.
 - **`onComplete(value)`** вызывается **один раз**, когда длина строки **впервые** стала **`length`**, будучи до этого **меньше**; при редактировании уже полной строки без укорочения **не** вызывается снова.
 - **Backspace** на **пустой** ячейке только **переносит фокус** назад; **не** стирает предыдущую цифру автоматически.

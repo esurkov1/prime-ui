@@ -29,10 +29,78 @@ export type SidebarResponsive = boolean;
 
 const SidebarComposedRoot = SidebarRoot;
 
-export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav">;
+export type SidebarToggleButtonProps = Omit<
+  React.ComponentPropsWithoutRef<"button">,
+  "children" | "aria-label"
+> & {
+  openLabel?: string;
+  closedLabel?: string;
+  placement?: "inline" | "edge";
+};
 
-function SidebarNavPanel({ className, id, ...rest }: SidebarNavPanelProps) {
-  const { navPanelId } = useSidebarContext();
+function iconForToggle(state: SidebarLayoutMode, side: "left" | "right") {
+  if (side === "left") {
+    return state === "hidden" ? <PanelLeftOpen size="1em" /> : <PanelLeftClose size="1em" />;
+  }
+  return state === "hidden" ? <PanelRightOpen size="1em" /> : <PanelRightClose size="1em" />;
+}
+
+const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleButtonProps>(
+  (
+    {
+      className,
+      openLabel = "Скрыть сайдбар",
+      closedLabel = "Открыть сайдбар",
+      placement = "inline",
+      ...rest
+    },
+    ref,
+  ) => {
+    const { state, toggleOpen, navPanelId, side } = useSidebarContext();
+    const expanded = state !== "hidden";
+
+    return (
+      <button
+        {...rest}
+        ref={ref}
+        type={rest.type ?? "button"}
+        className={cx(styles.toggleButton, className)}
+        aria-expanded={expanded}
+        aria-controls={navPanelId}
+        aria-label={expanded ? openLabel : closedLabel}
+        data-placement={placement}
+        onClick={(event) => {
+          rest.onClick?.(event);
+          if (!event.defaultPrevented) {
+            toggleOpen();
+          }
+        }}
+      >
+        <span className={styles.menuIcon} aria-hidden="true">
+          {iconForToggle(state, side)}
+        </span>
+      </button>
+    );
+  },
+);
+
+SidebarToggleButton.displayName = "SidebarToggleButton";
+
+export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav"> & {
+  /** По умолчанию рендерится встроенная кнопка сворачивания на грани панели (`placement="edge"`). Состояние — через `Sidebar.Root` (`state` / `onStateChange`) или `useSidebarContext`. */
+  showToggle?: boolean;
+};
+
+function SidebarNavPanel({
+  className,
+  id,
+  showToggle = true,
+  children,
+  ...rest
+}: SidebarNavPanelProps) {
+  const { navPanelId, isMobile, state } = useSidebarContext();
+  /** На узком окне закрытая панель уезжает за край — edge-кнопка внутри nav недоступна; открытие даёт плавающая кнопка в `SidebarRoot` без дублирования aria. */
+  const showEdgeToggle = showToggle && !(isMobile && state === "hidden");
 
   return (
     <nav
@@ -40,7 +108,10 @@ function SidebarNavPanel({ className, id, ...rest }: SidebarNavPanelProps) {
       id={id ?? navPanelId}
       className={cx(styles.navPanel, className)}
       aria-label={rest["aria-label"] ?? "Sidebar navigation"}
-    />
+    >
+      {children}
+      {showEdgeToggle ? <SidebarToggleButton placement="edge" /> : null}
+    </nav>
   );
 }
 
@@ -110,63 +181,6 @@ function SidebarText({ className, ...rest }: SidebarTextProps) {
 }
 
 SidebarText.displayName = "SidebarText";
-
-export type SidebarToggleButtonProps = Omit<
-  React.ComponentPropsWithoutRef<"button">,
-  "children" | "aria-label"
-> & {
-  openLabel?: string;
-  closedLabel?: string;
-  placement?: "inline" | "edge";
-};
-
-function iconForToggle(state: SidebarLayoutMode, side: "left" | "right") {
-  if (side === "left") {
-    return state === "hidden" ? <PanelLeftOpen size="1em" /> : <PanelLeftClose size="1em" />;
-  }
-  return state === "hidden" ? <PanelRightOpen size="1em" /> : <PanelRightClose size="1em" />;
-}
-
-const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleButtonProps>(
-  (
-    {
-      className,
-      openLabel = "Скрыть сайдбар",
-      closedLabel = "Открыть сайдбар",
-      placement = "inline",
-      ...rest
-    },
-    ref,
-  ) => {
-    const { state, toggleOpen, navPanelId, side } = useSidebarContext();
-    const expanded = state !== "hidden";
-
-    return (
-      <button
-        {...rest}
-        ref={ref}
-        type={rest.type ?? "button"}
-        className={cx(styles.toggleButton, className)}
-        aria-expanded={expanded}
-        aria-controls={navPanelId}
-        aria-label={expanded ? openLabel : closedLabel}
-        data-placement={placement}
-        onClick={(event) => {
-          rest.onClick?.(event);
-          if (!event.defaultPrevented) {
-            toggleOpen();
-          }
-        }}
-      >
-        <span className={styles.menuIcon} aria-hidden="true">
-          {iconForToggle(state, side)}
-        </span>
-      </button>
-    );
-  },
-);
-
-SidebarToggleButton.displayName = "SidebarToggleButton";
 
 export type SidebarIdentityButtonProps = Omit<
   React.ComponentPropsWithoutRef<"button">,

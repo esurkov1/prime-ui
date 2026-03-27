@@ -32,6 +32,22 @@ const PageContentRoot = React.forwardRef<HTMLDivElement, PageContentRootProps>(
 );
 PageContentRoot.displayName = "PageContent.Root";
 
+export type PageContentSectionProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLElement>;
+
+const PageContentSection = React.forwardRef<HTMLElement, PageContentSectionProps>(
+  function PageContentSection({ className, children, ...rest }, forwardedRef) {
+    return (
+      <section ref={forwardedRef} className={cx(styles.section, className)} {...rest}>
+        {children}
+      </section>
+    );
+  },
+);
+PageContentSection.displayName = "PageContent.Section";
+
 export type PageContentHeaderProps = {
   className?: string;
   children?: React.ReactNode;
@@ -62,15 +78,29 @@ const PageContentTitle = React.forwardRef<HTMLHeadingElement, PageContentTitlePr
 );
 PageContentTitle.displayName = "PageContent.Title";
 
+export type PageContentDescriptionMeasure = "readable" | "full";
+
 export type PageContentDescriptionProps = {
+  /** `readable` — max ~65ch; `full` — use full width of the parent (e.g. inside an already padded `main`). */
+  measure?: PageContentDescriptionMeasure;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLParagraphElement>;
 
 const PageContentDescription = React.forwardRef<HTMLParagraphElement, PageContentDescriptionProps>(
-  function PageContentDescription({ className, children, ...rest }, forwardedRef) {
+  function PageContentDescription(
+    { className, children, measure = "readable", ...rest },
+    forwardedRef,
+  ) {
     return (
-      <p ref={forwardedRef} className={cx(styles.description, className)} {...rest}>
+      <p
+        ref={forwardedRef}
+        className={cx(styles.description, className)}
+        {...rest}
+        {...toDataAttributes({
+          measure: measure === "full" ? "full" : undefined,
+        })}
+      >
         {children}
       </p>
     );
@@ -94,6 +124,7 @@ PageContentBody.displayName = "PageContent.Body";
 
 export const PageContent = {
   Root: PageContentRoot,
+  Section: PageContentSection,
   Header: PageContentHeader,
   Title: PageContentTitle,
   Description: PageContentDescription,

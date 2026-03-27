@@ -43,7 +43,21 @@ export default function BadgeCanonicalExample() {
 | [`examples/inbox-labels.tsx`](./examples/inbox-labels.tsx) | Priority, unread, channel type, `Badge.Dot` |
 | [`examples/admin-tags.tsx`](./examples/admin-tags.tsx) | Environment, access, feature-flag labels |
 
-Playground snippets under `playground/snippets/badge/` mirror matrix demos (sizes, variants, colors, disabled, context); prefer **`examples/*.tsx`** for product-shaped English samples and **`import { … } from "prime-ui-kit"`** only.
+### Playground snippets
+
+Order matches [`playground/sections/BadgeSection.tsx`](../../../playground/sections/BadgeSection.tsx). Snippets import from `@/components/badge/Badge` in-repo; consumers use **`import { Badge } from "prime-ui-kit"`**.
+
+| File | Scenario |
+|------|----------|
+| `playground/snippets/badge/sizes.tsx` | Explicit `size` `s`–`xl` with `variant="light"` and `color="gray"`. |
+| `playground/snippets/badge/variants.tsx` | `filled`, `light`, `lighter`, `stroke` on one `color`; `variant="status"` with `status` and `label`. |
+| `playground/snippets/badge/disabled.tsx` | `disabled` on `filled`, `stroke`, and `status`. |
+| `playground/snippets/badge/dot-icon.tsx` | `Badge.Dot` before text; `Badge.Icon` with text. |
+| `playground/snippets/badge/icons.tsx` | Icon left, variants/sizes, icon-only row, icon right, `Badge.Dot` + `Badge.Icon`. |
+| `playground/snippets/badge/semantic-colors.tsx` | Every `color` on `variant="light"` and `size="m"`. |
+| `playground/snippets/badge/context-size.tsx` | No `size` on root: `ControlSizeProvider`; context `xs` maps to badge visual `s`. |
+
+Prefer **`examples/*.tsx`** for product-shaped English samples.
 
 ## Note for LLM consumers
 

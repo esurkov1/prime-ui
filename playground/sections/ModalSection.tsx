@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import ModalCompositionSnippet from "../snippets/modal/composition";
 import compositionSource from "../snippets/modal/composition.tsx?raw";
@@ -213,117 +213,123 @@ const modalPanelApiRows: PlaygroundApiPropRow[] = [
 
 export default function ModalSection() {
   return (
-    <PlaygroundDocPage
-      headingId="modal-heading"
-      title="Modal"
-      description={
-        <>
-          Окно поверх страницы для важного текста, подтверждений и коротких форм. Открывается по
-          клику на триггер или из кода, блокирует прокрутку фона и удерживает фокус внутри панели,
-          пока пользователь не закроет диалог.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Структура и композиция</DemoSectionTitle>
-          <DemoDescription>
-            Публичный API: <code>Modal.Root</code> → <code>Modal.Panel</code> с пропами{" "}
-            <code>title</code>, <code>description</code>, <code>children</code>, <code>footer</code>
-            . Ниже — варианты: только шапка+футер, шапка+текст, только шапка, форма, юртекст.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ModalCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section aria-labelledby="modal-heading">
+      <PageContent.Header>
+        <PageContent.Title id="modal-heading">Modal</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Окно поверх страницы для важного текста, подтверждений и коротких форм. Открывается по
+              клику на триггер или из кода, блокирует прокрутку фона и удерживает фокус внутри
+              панели, пока пользователь не закроет диалог.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Структура и композиция</DemoSectionTitle>
+            <DemoDescription>
+              Публичный API: <code>Modal.Root</code> → <code>Modal.Panel</code> с пропами{" "}
+              <code>title</code>, <code>description</code>, <code>children</code>,{" "}
+              <code>footer</code>. Ниже — варианты: только шапка+футер, шапка+текст, только шапка,
+              форма, юртекст.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ModalCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            По умолчанию закрытие по Escape и клику на подложку; с{" "}
-            <code>closeOnEscape=&#123;false&#125;</code> и{" "}
-            <code>closeOnOverlayClick=&#123;false&#125;</code> — только явные кнопки (например
-            опасное действие или пошаговый сценарий).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
-            <PlaygroundExampleFrame.Stage>
-              <ModalStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              По умолчанию закрытие по Escape и клику на подложку; с{" "}
+              <code>closeOnEscape=&#123;false&#125;</code> и{" "}
+              <code>closeOnOverlayClick=&#123;false&#125;</code> — только явные кнопки (например
+              опасное действие или пошаговый сценарий).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
+              <PlaygroundExampleFrame.Stage>
+                <ModalStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-          <DemoDescription>
-            Пара <code>open</code> и <code>onOpenChange</code>: открытие и закрытие с кнопок вне
-            модала, синхронизация с маршрутом или стором; <code>Modal.Trigger</code> не обязателен.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
-            <PlaygroundExampleFrame.Stage>
-              <ModalControlledSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoDescription>
+              Пара <code>open</code> и <code>onOpenChange</code>: открытие и закрытие с кнопок вне
+              модала, синхронизация с маршрутом или стором; <code>Modal.Trigger</code> не
+              обязателен.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
+              <PlaygroundExampleFrame.Stage>
+                <ModalControlledSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Full width</DemoSectionTitle>
-          <DemoDescription>
-            В <code>footer</code> — вертикальный стек: у <code>Button.Root</code> включён{" "}
-            <code>fullWidth</code>, чтобы кнопки занимали всю ширину колонки панели (удобно на узком
-            макете).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="row">
-            <PlaygroundExampleFrame.Stage>
-              <ModalFullWidthSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoDescription>
+              В <code>footer</code> — вертикальный стек: у <code>Button.Root</code> включён{" "}
+              <code>fullWidth</code>, чтобы кнопки занимали всю ширину колонки панели (удобно на
+              узком макете).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="row">
+              <PlaygroundExampleFrame.Stage>
+                <ModalFullWidthSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-          <DemoDescription>
-            Проп <code>container</code> у <code>Modal.Panel</code> для монтирования в заданный узел;
-            прокрутка длинного списка — через <code>bodyStyle</code> (например maxHeight) при
-            заблокированном фоне.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ModalFeaturesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+            <DemoDescription>
+              Проп <code>container</code> у <code>Modal.Panel</code> для монтирования в заданный
+              узел; прокрутка длинного списка — через <code>bodyStyle</code> (например maxHeight)
+              при заблокированном фоне.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ModalFeaturesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Modal.Root</DemoApiTitle>
-          <DemoDescription>
-            Контекст открытости и политика закрытия для вложенных частей.
-          </DemoDescription>
-          <PlaygroundApiTable rows={modalRootApiRows} />
-          <DemoApiTitle>Modal.Trigger</DemoApiTitle>
-          <DemoDescription>
-            Открывает модал по клику, не отменяя существующий <code>onClick</code> потомка.
-          </DemoDescription>
-          <PlaygroundApiTable rows={modalTriggerApiRows} />
-          <DemoApiTitle>Modal.Close</DemoApiTitle>
-          <DemoDescription>
-            Оборачивает кнопку действия, которая должна закрыть модал (чаще в подвале: «Отмена»,
-            «Готово»).
-          </DemoDescription>
-          <PlaygroundApiTable rows={modalCloseApiRows} />
-          <DemoApiTitle>Modal.Panel</DemoApiTitle>
-          <DemoDescription>
-            Единственная оболочка панели: портал, подложка, белая карточка, фокус-ловушка, Escape,
-            скролл-лок, шапка/тело/подвал из пропсов. Ширина панели по умолчанию ограничена
-            вьюпортом в стилях (<code>min(100%, …)</code>) — отдельного режима «адаптивной ширины»
-            не нужно. Без <code>title</code> — только <code>children</code> (например Command Menu с{" "}
-            <code>aria-labelledby</code>).
-          </DemoDescription>
-          <PlaygroundApiTable rows={modalPanelApiRows} />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Modal.Root</DemoApiTitle>
+            <DemoDescription>
+              Контекст открытости и политика закрытия для вложенных частей.
+            </DemoDescription>
+            <PlaygroundApiTable rows={modalRootApiRows} />
+            <DemoApiTitle>Modal.Trigger</DemoApiTitle>
+            <DemoDescription>
+              Открывает модал по клику, не отменяя существующий <code>onClick</code> потомка.
+            </DemoDescription>
+            <PlaygroundApiTable rows={modalTriggerApiRows} />
+            <DemoApiTitle>Modal.Close</DemoApiTitle>
+            <DemoDescription>
+              Оборачивает кнопку действия, которая должна закрыть модал (чаще в подвале: «Отмена»,
+              «Готово»).
+            </DemoDescription>
+            <PlaygroundApiTable rows={modalCloseApiRows} />
+            <DemoApiTitle>Modal.Panel</DemoApiTitle>
+            <DemoDescription>
+              Единственная оболочка панели: портал, подложка, белая карточка, фокус-ловушка, Escape,
+              скролл-лок, шапка/тело/подвал из пропсов. Ширина панели по умолчанию ограничена
+              вьюпортом в стилях (<code>min(100%, …)</code>) — отдельного режима «адаптивной ширины»
+              не нужно. Без <code>title</code> — только <code>children</code> (например Command Menu
+              с <code>aria-labelledby</code>).
+            </DemoDescription>
+            <PlaygroundApiTable rows={modalPanelApiRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

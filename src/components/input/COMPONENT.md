@@ -8,7 +8,8 @@
 - **Скелет:** `Input.Root` → `Input.Wrapper` → `Input.Field` (плюс при необходимости `Input.Icon` / `Input.Affix` / `Input.InlineAffix` в нужном порядке внутри обёртки).
 - **Размер:** только на **`Input.Root`**: `size` ∈ `s | m | l | xl`, по умолчанию **`m`**. На **`Input.Field`** атрибут HTML **`size` не передаётся** (зарезервирован системой).
 - **Состояние ввода:** контролируемый режим — `value` / `onChange` на **`Input.Field`**. Подпись, `hint`, `error`, `optionalLabel` — на **`Input.Root`**.
-- **Примеры сценариев:** каталог `examples/` — [login email](./examples/login-email.tsx), [search](./examples/search.tsx), [password + hint](./examples/password-with-hint.tsx), [checkout full-width column](./examples/checkout-full-width.tsx).
+- **Playground** (`playground/snippets/input/`, порядок как в `playground/sections/InputSection.tsx`): [sizes](../../../playground/snippets/input/sizes.tsx) — ряд `size` `s`–`xl` с иконкой; [states](../../../playground/snippets/input/states.tsx) — `hint`, `disabled`, `readOnly`, `required`, `error`; [controlled](../../../playground/snippets/input/controlled.tsx) — `value`/`onChange` на `Input.Field` и `aria-label`; [composition](../../../playground/snippets/input/composition.tsx) — `Icon`, `Affix`, `InlineAffix`; [full-width](../../../playground/snippets/input/full-width.tsx) — узкая колонка и блок на всю ширину (стили [full-width.module.css](../../../playground/snippets/input/full-width.module.css)); [features](../../../playground/snippets/input/features.tsx) — явный `id`, `optionalLabel`, одновременно `hint` и `error`.
+- **Примеры пакета** (`examples/`): [login email](./examples/login-email.tsx), [search](./examples/search.tsx), [password + hint](./examples/password-with-hint.tsx), [checkout full-width](./examples/checkout-full-width.tsx), [affix URL и сумма](./examples/affix-url-and-amount.tsx).
 
 ```tsx
 import { Input } from "prime-ui-kit";
@@ -135,5 +136,5 @@ Returns `{ size, hasError, inputId, describedBy }` for building custom subcompon
 - **Доступность:** имя поля — `label` на Root или `aria-label` / `aria-labelledby` на `Input.Field`. Иконки и аффиксы не озвучиваются (`aria-hidden`).
 - **Контроль:** состояние строки — на `Input.Field` (`value`, `onChange`, `defaultValue`).
 - **Ширина:** отдельного пропа `fullWidth` нет; корень растягивается по ширине родителя — задавай ширину контейнеру формы/карточки.
-- **Сценарии из репозитория:** `examples/login-email.tsx`, `examples/search.tsx`, `examples/password-with-hint.tsx`, `examples/checkout-full-width.tsx`; в playground — `playground/snippets/input/*`.
-- **Playground:** размеры, состояния, композиция, full-width — `playground/snippets/input/sizes.tsx`, `states.tsx`, `composition.tsx`, `full-width.tsx`, `features.tsx`, `controlled.tsx`.
+- **Сценарии из репозитория:** `examples/login-email.tsx`, `examples/search.tsx`, `examples/password-with-hint.tsx`, `examples/checkout-full-width.tsx`, `examples/affix-url-and-amount.tsx`.
+- **Playground (порядок секции Input):** `playground/snippets/input/sizes.tsx` → `states.tsx` → `controlled.tsx` → `composition.tsx` → `full-width.tsx` (+ `full-width.module.css`) → `features.tsx`.

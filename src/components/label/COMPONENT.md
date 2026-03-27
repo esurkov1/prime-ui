@@ -8,7 +8,8 @@
 - **Associate** the caption with a control: **`htmlFor`** on **`Label.Root`** = control **`id`**, or nest the control inside **`Label.Root`**.
 - **Required:** **`Label.Asterisk`** is visual only; set **`required`** / **`aria-required`** on the control. Optional fields often use **`Label.Sub`** (e.g. “optional”).
 - **Defaults:** **`size="m"`** on **`Label.Root`**; **`disabled`** sets **`aria-disabled`** + muted styles (mirror real control state).
-- **Examples (source):** [`examples/required-field.tsx`](examples/required-field.tsx), [`examples/optional-field.tsx`](examples/optional-field.tsx), [`examples/grouped-labels.tsx`](examples/grouped-labels.tsx), [`examples/accessibility-pattern.tsx`](examples/accessibility-pattern.tsx), [`examples/with-icon.tsx`](examples/with-icon.tsx).
+- **Playground:** [`playground/sections/LabelSection.tsx`](../../../playground/sections/LabelSection.tsx) renders snippets from [`playground/snippets/label/`](../../../playground/snippets/label/).
+- **Package examples** (import **`"prime-ui-kit"`**): see the table under [Example files in `examples/`](#example-files-in-examples); each row maps a snippet to a twin under [`examples/`](examples/).
 
 ## LLM note
 
@@ -57,6 +58,30 @@ export function Example() {
 }
 ```
 
+### Example files in `examples/`
+
+| File | Scenario |
+|------|----------|
+| [`sizes.tsx`](examples/sizes.tsx) | `size` `s`–`xl`, text-only and with `Label.Icon` ([`snippets/label/sizes.tsx`](../../../playground/snippets/label/sizes.tsx)) |
+| [`states.tsx`](examples/states.tsx) | Default, `disabled`, `Label.Asterisk` ([`snippets/label/states.tsx`](../../../playground/snippets/label/states.tsx)) |
+| [`with-icon.tsx`](examples/with-icon.tsx) | `Label.Icon` + `htmlFor`; same composition pattern as [`snippets/label/composition.tsx`](../../../playground/snippets/label/composition.tsx) (snippet uses `field.email` / Russian copy) |
+| [`sub-line.tsx`](examples/sub-line.tsx) | `Label.Sub` for a short secondary line ([`snippets/label/sub-line.tsx`](../../../playground/snippets/label/sub-line.tsx)) |
+| [`mixed-required-optional.tsx`](examples/mixed-required-optional.tsx) | `Label.Asterisk` vs `Label.Sub` “optional” ([`snippets/label/mixed-required-optional.tsx`](../../../playground/snippets/label/mixed-required-optional.tsx)) |
+| [`required-field.tsx`](examples/required-field.tsx) | Required marker + `required` on the control |
+| [`optional-field.tsx`](examples/optional-field.tsx) | `Label.Sub` “optional” + sibling input |
+| [`grouped-labels.tsx`](examples/grouped-labels.tsx) | `fieldset` / `legend` + per-field labels |
+| [`accessibility-pattern.tsx`](examples/accessibility-pattern.tsx) | `htmlFor`/`id`, decorative icon, `required`, short `Label.Sub` vs long copy → [Hint](../hint/COMPONENT.md) |
+
+### Playground snippets (repo paths)
+
+| Snippet | Intent |
+|---------|--------|
+| [`sizes.tsx`](../../../playground/snippets/label/sizes.tsx) | Scale `s`–`xl` with and without icon |
+| [`states.tsx`](../../../playground/snippets/label/states.tsx) | Linked label, disabled look, asterisk |
+| [`composition.tsx`](../../../playground/snippets/label/composition.tsx) | Icon slot + caption + `htmlFor` |
+| [`sub-line.tsx`](../../../playground/snippets/label/sub-line.tsx) | `Label.Sub` units / context |
+| [`mixed-required-optional.tsx`](../../../playground/snippets/label/mixed-required-optional.tsx) | Required vs optional in one form row |
+
 ### Rules
 
 - **Association:** set **`htmlFor` on `Label.Root`** to match the control’s **`id`**, or place the interactive control inside **`Label.Root`** so the caption is programmatically linked.
@@ -68,14 +93,19 @@ export function Example() {
 - Nesting an input inside **`Label.Root`** is valid HTML; the common kit pattern is sibling **`Label.Root`** + control with **`htmlFor`** / **`id`**.
 - **Grouped fields:** use **`fieldset`** / **`legend`** (or `role="group"` with an accessible name) for the section; each control in the group still gets its own **`Label.Root`** and unique **`id`** unless the control is nested inside its label.
 
-### Scenarios (see `examples/`)
+### Scenarios (see `examples/` and playground snippets)
 
 | Scenario | Intent |
 |----------|--------|
-| Required field | `Label.Asterisk` + **`required`** on the control |
-| Optional field | `Label.Sub` for “optional” (or similar); no asterisk |
-| Grouped labels | `fieldset` + `legend` + per-field `Label.Root` + `htmlFor` / `id` |
-| Accessibility | Association, decorative icon hidden, required on control, short sub-line vs Hint |
+| Sizes | `size` ladder with optional `Label.Icon` — [`examples/sizes.tsx`](examples/sizes.tsx), [`snippets/label/sizes.tsx`](../../../playground/snippets/label/sizes.tsx) |
+| States | Default, `disabled`, asterisk-only marker — [`examples/states.tsx`](examples/states.tsx), [`snippets/label/states.tsx`](../../../playground/snippets/label/states.tsx) |
+| Icon composition | `Label.Icon` + text — [`examples/with-icon.tsx`](examples/with-icon.tsx), [`snippets/label/composition.tsx`](../../../playground/snippets/label/composition.tsx) |
+| Sub line | Short second line in the label — [`examples/sub-line.tsx`](examples/sub-line.tsx), [`snippets/label/sub-line.tsx`](../../../playground/snippets/label/sub-line.tsx) |
+| Mixed required / optional | Asterisk row + optional row — [`examples/mixed-required-optional.tsx`](examples/mixed-required-optional.tsx), [`snippets/label/mixed-required-optional.tsx`](../../../playground/snippets/label/mixed-required-optional.tsx) |
+| Required field | `Label.Asterisk` + **`required`** on the control — [`examples/required-field.tsx`](examples/required-field.tsx) |
+| Optional field | `Label.Sub` for “optional” (or similar); no asterisk — [`examples/optional-field.tsx`](examples/optional-field.tsx) |
+| Grouped labels | `fieldset` + `legend` + per-field `Label.Root` + `htmlFor` / `id` — [`examples/grouped-labels.tsx`](examples/grouped-labels.tsx) |
+| Accessibility | Association, decorative icon hidden, required on control, short sub-line vs [Hint](../hint/COMPONENT.md) — [`examples/accessibility-pattern.tsx`](examples/accessibility-pattern.tsx) |
 
 ### API
 

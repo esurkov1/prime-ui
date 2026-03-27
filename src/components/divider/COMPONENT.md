@@ -52,7 +52,11 @@ export function Example() {
 
 Shared layout tokens for the examples: [`examples/divider-examples.module.css`](examples/divider-examples.module.css).
 
-Playground snippets (broader overview): `playground/snippets/divider/` (`variants.tsx`, `sizes.tsx`, `composition.tsx`).
+Playground snippets (same demos as `playground/sections/DividerSection.tsx`):
+
+- **`variants.tsx`** — empty horizontal line; **`default`** with centered label; **`variant="text"`**; **`line-spacing`** between rows in a column; **`orientation="vertical"`** between toolbar-style buttons; full-width line between list rows (**`size="s"`**).
+- **`sizes.tsx`** — **`variant="text"`** at **`size`** **`s`**, **`m`**, and **`xl`** (three steps to compare label scale and spacing).
+- **`composition.tsx`** — **`Icon`** + label inside **`variant="text"`** **`size="m"`**; second divider at **`size="xl"`** with icon + label.
 
 ### Rules
 
@@ -95,4 +99,4 @@ Playground snippets (broader overview): `playground/snippets/divider/` (`variant
 - **Vertical:** requires ancestor **`align-items: stretch`** (or explicit height) so `::before`/`::after` flex segments fill the row.
 - **Children:** toggles inner **`span`** and **`ControlSizeProvider`**; **`Icon`** ignores its own **`size`** when inside divider content.
 - **a11y:** default **`separator`** is announced; for decorative list lines between items, mirror **`examples/list-separators.tsx`**: **`ul`/`li`**, separator **`li`** with **`aria-hidden`**, **`Divider.Root`** with **`role="presentation"`**.
-- **Playground alignment:** `playground/snippets/divider/variants.tsx` shows default vs `text` vs `line-spacing` vs vertical in one frame.
+- **Playground alignment:** `variants.tsx` is one frame (empty line, `default` label, `text`, `line-spacing` column, vertical toolbar, list-row separator); `sizes.tsx` is `text` at **s / m / xl**; `composition.tsx` is icon + text at **m** and **xl**.

@@ -1,6 +1,6 @@
 # prime-ui-kit component catalog — responsive context
 
-Full table of **47** exported UI building blocks mapped to responsive layout (43 entries with `COMPONENT.md` under `src/components/` or `src/layout/sidebar`, plus **AppShell**, **PageContent**, **ExampleFrame**, **ScrollContainer** documented via source/playground only).
+Full table of **47** exported UI building blocks mapped to responsive layout (44 entries with `COMPONENT.md` under `src/components/` or `src/layout/sidebar`, plus **AppShell**, **ExampleFrame**, **ScrollContainer** documented via source/playground only).
 
 **Examples:** For each component with `COMPONENT.md`, see also `examples/*.tsx` (3–5 runnable scenarios per folder) — richer than playground snippets; paths in each `COMPONENT.md` under **Extended examples**.
 
@@ -286,7 +286,7 @@ Full table of **47** exported UI building blocks mapped to responsive layout (43
 | **Responsive role** | Centers content; limits measure for long text on large screens. |
 | **Zones** | content |
 | **Scenarios** | Settings page body; article layout; legal copy; dashboard main column. |
-| **Documentation** | `../src/components/page-content/PageContent.tsx` (no separate COMPONENT.md) |
+| **Documentation** | `../src/components/page-content/COMPONENT.md` |
 
 ## Pagination
 

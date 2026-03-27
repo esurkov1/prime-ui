@@ -10,7 +10,7 @@ Styled text with **semantic reading roles** (`variant`) wired to `typography.rol
 
 - Body copy, headings, captions, and metrics where you want kit tokens instead of ad-hoc `font-size`.
 - `tone="muted"` for secondary explanations, hints, and legal lines.
-- Nested **`Typography.Root`** nodes with different `as` / `weight` inside one block (see `./examples/05-inline-emphasis.tsx`).
+- Nested **`Typography.Root`** nodes with different `as` / `weight` inside one block (see `./examples/composition.tsx`, `./examples/05-inline-emphasis.tsx`).
 - `as="h1"`–`as="h6"` for heading levels that match the theme; keep a sensible outline order on the page.
 - `as` values that are landmarks (`main`, `article`, `section`, `header`, `footer`, …) when you need both semantics and typography on the same node — otherwise wrap landmarks in normal elements and put **`Typography.Root`** inside.
 
@@ -68,15 +68,29 @@ export function Example() {
 }
 ```
 
-### Extended examples
+### Playground-aligned examples
 
-- [`./examples/01-article.tsx`](./examples/01-article.tsx) — Article sections, block quote, and footer attribution.
-- [`./examples/02-form-labels-contrast.tsx`](./examples/02-form-labels-contrast.tsx) — **`Input`** slots with **`Typography.Root`** for label, optional tag, and hint contrast.
-- [`./examples/03-marketing-hero.tsx`](./examples/03-marketing-hero.tsx) — Hero eyebrow, display title, and supporting lines.
-- [`./examples/04-reading-scale.tsx`](./examples/04-reading-scale.tsx) — Full **`variant`** ladder with English sample strings.
-- [`./examples/05-inline-emphasis.tsx`](./examples/05-inline-emphasis.tsx) — Nested spans: **`weight`**, **`tracking`**, **`tone`** on **`body-default`**.
+Order matches **`playground/sections/TypographySection.tsx`** and the runnable snippets in **`playground/snippets/typography/`**; the same scenarios ship under **`./examples/`** for `prime-ui-kit` consumers (import from **`prime-ui-kit`**).
 
-**LLM note:** Prefer the runnable files under **`./examples/*.tsx`** for full scenarios and prop combinations; this page keeps the contract (rules + API tables) authoritative.
+| Playground snippet | Package example |
+| --- | --- |
+| [`variant-catalog.tsx`](../../../playground/snippets/typography/variant-catalog.tsx) | [`./examples/variant-catalog.tsx`](./examples/variant-catalog.tsx) |
+| [`article-landmarks.tsx`](../../../playground/snippets/typography/article-landmarks.tsx) | [`./examples/01-article.tsx`](./examples/01-article.tsx) (same structure; English copy) |
+| [`reading-and-form.tsx`](../../../playground/snippets/typography/reading-and-form.tsx) | [`./examples/reading-and-form.tsx`](./examples/reading-and-form.tsx) |
+| [`variants.tsx`](../../../playground/snippets/typography/variants.tsx) | [`./examples/variants.tsx`](./examples/variants.tsx) |
+| [`states.tsx`](../../../playground/snippets/typography/states.tsx) | [`./examples/states.tsx`](./examples/states.tsx) |
+| [`composition.tsx`](../../../playground/snippets/typography/composition.tsx) | [`./examples/composition.tsx`](./examples/composition.tsx) |
+| [`full-width.tsx`](../../../playground/snippets/typography/full-width.tsx) | [`./examples/full-width.tsx`](./examples/full-width.tsx) |
+| [`as-prop.tsx`](../../../playground/snippets/typography/as-prop.tsx) | [`./examples/as-prop.tsx`](./examples/as-prop.tsx) |
+
+### Additional examples
+
+- [`./examples/02-form-labels-contrast.tsx`](./examples/02-form-labels-contrast.tsx) — **`Input`** label / optional / hint slots built with **`Typography.Root`** (richer than the playground form frame).
+- [`./examples/03-marketing-hero.tsx`](./examples/03-marketing-hero.tsx) — Hero stack: caption, display, headline, muted body.
+- [`./examples/04-reading-scale.tsx`](./examples/04-reading-scale.tsx) — Compact English ladder of every **`variant`** (no **`Divider`** captions; use **`variant-catalog`** for the full labeled catalog).
+- [`./examples/05-inline-emphasis.tsx`](./examples/05-inline-emphasis.tsx) — Nested spans on **`body-default`** (English; playground **`composition`** adds a link and `as="div"` wrapper).
+
+**LLM note:** Use **`./examples/*.tsx`** for copy-paste scenarios; **`playground/snippets/typography/*.tsx`** stay the source shown in the dev playground (`?raw`). This page keeps the contract (rules + API tables) authoritative.
 
 ## Rules
 

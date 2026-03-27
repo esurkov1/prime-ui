@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import TextareaCompositionSnippet from "../snippets/textarea/composition";
 import compositionSource from "../snippets/textarea/composition.tsx?raw";
@@ -193,138 +193,143 @@ const textareaErrorApiRows: PlaygroundApiPropRow[] = [
 
 export default function TextareaSection() {
   return (
-    <PlaygroundDocPage
-      title="Textarea"
-      description={
-        <>
-          Многострочное поле для отзывов, описаний и длинных ответов. Можно задать размер, показать
-          подсказку или текст ошибки, ограничить длину и вывести счётчик символов. По умолчанию
-          высота подстраивается под текст без скриптового измерения.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Четыре значения <code>size</code> — <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-            <code>xl</code>; у каждого поля своя <code>Textarea.Hint</code> с подписью размера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
-            <PlaygroundExampleFrame.Stage>
-              <TextareaSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Textarea</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Многострочное поле для отзывов, описаний и длинных ответов. Можно задать размер,
+              показать подсказку или текст ошибки, ограничить длину и вывести счётчик символов. По
+              умолчанию высота подстраивается под текст без скриптового измерения.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Четыре значения <code>size</code> — <code>s</code>, <code>m</code>, <code>l</code>,{" "}
+              <code>xl</code>; у каждого поля своя <code>Textarea.Hint</code> с подписью размера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты</DemoSectionTitle>
-          <DemoDescription>
-            <code>variant=&quot;default&quot;</code> и <code>variant=&quot;error&quot;</code> с
-            парным <code>Textarea.Error</code>; ошибка подключает <code>aria-describedby</code> и
-            инвалидность.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TextareaVariantsSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты</DemoSectionTitle>
+            <DemoDescription>
+              <code>variant=&quot;default&quot;</code> и <code>variant=&quot;error&quot;</code> с
+              парным <code>Textarea.Error</code>; ошибка подключает <code>aria-describedby</code> и
+              инвалидность.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaVariantsSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Обычное поле с подсказкой, <code>disabled</code>, <code>readOnly</code> и нативный{" "}
-            <code>required</code> (атрибут на textarea).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TextareaStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Обычное поле с подсказкой, <code>disabled</code>, <code>readOnly</code> и нативный{" "}
+              <code>required</code> (атрибут на textarea).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-          <DemoDescription>
-            <code>value</code> и <code>onChange</code> у родителя; длина текста выводится в{" "}
-            <code>Textarea.Hint</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TextareaControlledSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoDescription>
+              <code>value</code> и <code>onChange</code> у родителя; длина текста выводится в{" "}
+              <code>Textarea.Hint</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaControlledSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция</DemoSectionTitle>
-          <DemoDescription>
-            Заголовок секции через <code>Typography</code>, поле со счётчиком и подсказкой, отдельно
-            — поле с <code>Textarea.Error</code> (корень сам оборачивает textarea в{" "}
-            <code>label</code>).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TextareaCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Заголовок секции через <code>Typography</code>, поле со счётчиком и подсказкой,
+              отдельно — поле с <code>Textarea.Error</code> (корень сам оборачивает textarea в{" "}
+              <code>label</code>).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Full width</DemoSectionTitle>
-          <DemoDescription>
-            Поле тянется на ширину родителя (<code>width: 100%</code> у корня); узкий контейнер
-            имитирует колонку карточки или боковую панель.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TextareaFullWidthSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoDescription>
+              Поле тянется на ширину родителя (<code>width: 100%</code> у корня); узкий контейнер
+              имитирует колонку карточки или боковую панель.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaFullWidthSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-          <DemoDescription>
-            <code>autoResize</code> по умолчанию и отключение, <code>Textarea.CharCounter</code> с
-            обычным и переполненным лимитом, связка <code>maxLength</code> со счётчиком.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TextareaFeaturesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+            <DemoDescription>
+              <code>autoResize</code> по умолчанию и отключение, <code>Textarea.CharCounter</code> с
+              обычным и переполненным лимитом, связка <code>maxLength</code> со счётчиком.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaFeaturesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Textarea.Root</DemoApiTitle>
-          <DemoDescription>
-            Обёртка поля: контекст для Hint/Error, опциональный подвал для счётчика, нативный{" "}
-            <code>textarea</code> внутри <code>label</code>.
-          </DemoDescription>
-          <PlaygroundApiTable rows={textareaRootApiRows} />
-          <DemoApiTitle>Textarea.CharCounter</DemoApiTitle>
-          <DemoDescription>
-            Счётчик «текущий/максимум» в подвале; при превышении max помечается{" "}
-            <code>data-overflow</code>, живой регион <code>aria-live=&quot;polite&quot;</code>.
-          </DemoDescription>
-          <PlaygroundApiTable rows={textareaCharCounterApiRows} />
-          <DemoApiTitle>Textarea.Hint</DemoApiTitle>
-          <DemoDescription>
-            Вспомогательный текст под полем; связывается с textarea через{" "}
-            <code>aria-describedby</code>.
-          </DemoDescription>
-          <PlaygroundApiTable rows={textareaHintApiRows} />
-          <DemoApiTitle>Textarea.Error</DemoApiTitle>
-          <DemoDescription>
-            Сообщение об ошибке; влияет на <code>aria-invalid</code> и стиль поля вместе с{" "}
-            <code>variant</code>.
-          </DemoDescription>
-          <PlaygroundApiTable rows={textareaErrorApiRows} />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Textarea.Root</DemoApiTitle>
+            <DemoDescription>
+              Обёртка поля: контекст для Hint/Error, опциональный подвал для счётчика, нативный{" "}
+              <code>textarea</code> внутри <code>label</code>.
+            </DemoDescription>
+            <PlaygroundApiTable rows={textareaRootApiRows} />
+            <DemoApiTitle>Textarea.CharCounter</DemoApiTitle>
+            <DemoDescription>
+              Счётчик «текущий/максимум» в подвале; при превышении max помечается{" "}
+              <code>data-overflow</code>, живой регион <code>aria-live=&quot;polite&quot;</code>.
+            </DemoDescription>
+            <PlaygroundApiTable rows={textareaCharCounterApiRows} />
+            <DemoApiTitle>Textarea.Hint</DemoApiTitle>
+            <DemoDescription>
+              Вспомогательный текст под полем; связывается с textarea через{" "}
+              <code>aria-describedby</code>.
+            </DemoDescription>
+            <PlaygroundApiTable rows={textareaHintApiRows} />
+            <DemoApiTitle>Textarea.Error</DemoApiTitle>
+            <DemoDescription>
+              Сообщение об ошибке; влияет на <code>aria-invalid</code> и стиль поля вместе с{" "}
+              <code>variant</code>.
+            </DemoDescription>
+            <PlaygroundApiTable rows={textareaErrorApiRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

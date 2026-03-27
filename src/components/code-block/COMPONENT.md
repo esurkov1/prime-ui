@@ -27,17 +27,31 @@
 - **`Root`** renders a **`pre`**; highlighted markup is a single inner **`code`** (do not supply **`children`**).
 - Pass source as **`code`**. Optional **`colorScheme`** sets highlighting palette / **`data-theme`** on **`pre`**.
 
-### Scenarios (examples)
+### Scenarios (playground)
 
-| Scenario | Example file |
-|----------|----------------|
-| Minimal usage | [`examples/minimal.tsx`](./examples/minimal.tsx) |
-| API response preview (JSON body) | [`examples/api-response-preview.tsx`](./examples/api-response-preview.tsx) |
-| Config snippet (TS config) | [`examples/config-snippet.tsx`](./examples/config-snippet.tsx) |
-| Error stack / log | [`examples/error-stack.tsx`](./examples/error-stack.tsx) |
-| Tutorial step (copy + snippet) | [`examples/tutorial-step.tsx`](./examples/tutorial-step.tsx) |
+Same order as `playground/sections/CodeBlockSection.tsx`. Snippets use the `@/` alias and may use `usePlaygroundTheme` for `colorScheme`.
 
-Playground demos (variants, sizes, composition, etc.): `playground/snippets/code-block/`.
+| Scenario | Snippet |
+|----------|---------|
+| Sizes — wrapper `font-size` / `line-height`; no `size` prop | [`sizes.tsx`](../../../playground/snippets/code-block/sizes.tsx) |
+| Variants — `colorScheme` light and dark side by side | [`variants.tsx`](../../../playground/snippets/code-block/variants.tsx) |
+| Controlled — `code` from parent state; switch between snippets | [`controlled.tsx`](../../../playground/snippets/code-block/controlled.tsx) |
+| Composition — documentation-style card (Typography + code) | [`composition.tsx`](../../../playground/snippets/code-block/composition.tsx) |
+| Full width — narrow column, `codeBlockFullBleed`, horizontal scroll | [`full-width.tsx`](../../../playground/snippets/code-block/full-width.tsx) |
+| Features — `id`, `aria-label`, `data-*`, trailing spaces + `trimEnd` | [`features.tsx`](../../../playground/snippets/code-block/features.tsx) |
+
+### Package examples (`examples/`)
+
+Recipes import **`prime-ui-kit`** (no playground path alias).
+
+| Scenario | File |
+|----------|------|
+| Minimal usage | [`minimal.tsx`](./examples/minimal.tsx) |
+| Controlled — `code` из состояния (рецепт на `ButtonGroup`) | [`controlled.tsx`](./examples/controlled.tsx) |
+| API response preview (JSON body) | [`api-response-preview.tsx`](./examples/api-response-preview.tsx) |
+| Config snippet (TS config) | [`config-snippet.tsx`](./examples/config-snippet.tsx) |
+| Error stack / log | [`error-stack.tsx`](./examples/error-stack.tsx) |
+| Tutorial step (copy + snippet) | [`tutorial-step.tsx`](./examples/tutorial-step.tsx) |
 
 ### Minimal example
 
@@ -74,8 +88,9 @@ The package also exports **`CodeBlockColorScheme`** and **`CodeBlockRootProps`**
 ### Related
 
 - [Typography](../typography/COMPONENT.md) — headings and body around snippets.
-- [Button](../button/COMPONENT.md) — switching samples from parent state.
-- [Segmented control](../segmented-control/COMPONENT.md) — compact sample switching.
+- [Button](../button/COMPONENT.md) — switching the active snippet from parent state (playground `controlled.tsx`).
+- [ButtonGroup](../button-group/COMPONENT.md) — segmented control for switching `code` ([`examples/controlled.tsx`](./examples/controlled.tsx)).
+- [Segmented control](../segmented-control/COMPONENT.md) — compact scenario switching.
 - [Kbd](../kbd/COMPONENT.md) — shortcut hints beside prose.
 
 ## Note for LLM assistants

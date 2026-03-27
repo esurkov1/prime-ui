@@ -10,3 +10,32 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+/* Layout helpers aligned with playground/snippets/segmented demos */
+.demoRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.demoStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-m);
+}
+
+.fullWidthShelf {
+  width: min(100%, 22rem);
+}
+
+/* Higher specificity than SegmentedControl `.root` (`width: fit-content`) without `!important`. */
+.fullWidthShelf .fullWidthRoot {
+  width: 100%;
+}
+
+.demoCaption {
+  margin-top: var(--prime-sys-spacing-s);
+  font-size: var(--prime-sys-typography-sizeScale-s);
+  color: var(--prime-sys-color-content-muted);
+}

@@ -8,7 +8,7 @@
 - **Skeleton vs Input:** unlike [Input](../input/COMPONENT.md) (`Root` → `Wrapper` → **`Field`**), **Textarea** uses a single **`Textarea.Root`**: an outer **`.field`** stack wraps a bordered **`label`** (the field chrome) that owns the native **`<textarea>`**—there is **no** separate `Textarea.Field` export; pass standard textarea attributes on **`Root`**.
 - **Children:** **`Textarea.CharCounter`** only as a **direct** child of **`Root`** (footer inside the chrome). **`Textarea.Hint`** / **`Textarea.Error`** as direct children **after** that chrome (siblings of the inner `label`, not wrapped around `CharCounter`).
 - **Size:** `size` ∈ `s | m | l | xl` only on **`Textarea.Root`**; the HTML **`size`** attribute is omitted from the public typing (reserved).
-- **Scenario examples (source):** [`./examples/01-support-ticket.tsx`](./examples/01-support-ticket.tsx), [`./examples/02-comment.tsx`](./examples/02-comment.tsx), [`./examples/03-controlled.tsx`](./examples/03-controlled.tsx), [`./examples/04-full-width.tsx`](./examples/04-full-width.tsx).
+- **Scenario grid:** see [**Scenarios (playground + `examples/`)**](#scenarios-playground--examples) below — order matches **`playground/sections/TextareaSection.tsx`** and **`playground/snippets/textarea/*.tsx`**.
 
 ```tsx
 import { Textarea } from "prime-ui-kit";
@@ -46,12 +46,24 @@ A composite multiline field: native `textarea` inside bordered field chrome, opt
 - **`Textarea.CharCounter`** — must be a **direct** child of `Root`; implementation partitions children by reference equality to `Textarea.CharCounter` and renders matching nodes in the control footer.
 - **`Textarea.Hint`** / **`Textarea.Error`** — direct children of `Root`, **not** passed as `CharCounter`; they render after the `label` and register ids merged into the textarea’s `aria-describedby`.
 
-### Extended examples
+### Scenarios (playground + `examples/`)
 
-- [`./examples/01-support-ticket.tsx`](./examples/01-support-ticket.tsx) — Support form: description with counter, hint, and `maxLength`.
+Live demos use **`playground/snippets/textarea/*.tsx`** (see **`playground/sections/TextareaSection.tsx`**). The table lists the same scenarios with package-oriented copies under **`examples/`** (aligned with those snippets; order matches the playground section).
+
+| Scenario | What it shows | `examples/` |
+|----------|---------------|-------------|
+| Sizes | Four **`size`** values (`s`–`xl`), each field with a **`Textarea.Hint`** naming the tier. | [`examples/sizes.tsx`](examples/sizes.tsx) |
+| Variants | **`variant="default"`** vs **`variant="error"`** with **`Textarea.Error`** (`aria-describedby`, invalid styling). | [`examples/variants.tsx`](examples/variants.tsx) |
+| States | Hint, **`disabled`**, **`readOnly`**, and native **`required`** on the textarea. | [`examples/states.tsx`](examples/states.tsx) |
+| Controlled | Parent **`value`** / **`onChange`**; live length in **`Textarea.Hint`**. | [`examples/controlled.tsx`](examples/controlled.tsx) |
+| Composition | **`Typography`** section title, counter + hint, second root with **`Textarea.Error`**. | [`examples/composition.tsx`](examples/composition.tsx) |
+| Full width | Narrow card-style parent; root spans the track (**`width: 100%`**, **`min-width: 0`** on `.field`). | [`examples/full-width.tsx`](examples/full-width.tsx) |
+| Features | Default **`autoResize`**, **`autoResize={false}`**, **`CharCounter`**, **`data-overflow`**, **`maxLength`** + counter. | [`examples/features.tsx`](examples/features.tsx) |
+
+### Additional narrative examples
+
+- [`./examples/01-support-ticket.tsx`](./examples/01-support-ticket.tsx) — Support form: long description with counter, hint, and **`maxLength`** cap.
 - [`./examples/02-comment.tsx`](./examples/02-comment.tsx) — Order comment: **Label** + **`Textarea.Root`** with shared **`id`**, counter, and logistics hint.
-- [`./examples/03-controlled.tsx`](./examples/03-controlled.tsx) — Controlled value in React state with **`onChange`**.
-- [`./examples/04-full-width.tsx`](./examples/04-full-width.tsx) — Filling a card column: root is already **`width: 100%`**; parent sets the track width.
 
 **LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition patterns; this page keeps the contract (rules + API tables) authoritative.
 
@@ -78,8 +90,8 @@ A composite multiline field: native `textarea` inside bordered field chrome, opt
 | variant | `"default" \| "error"` | `"default"` | no | Visual invalid emphasis; combines with `aria-invalid` and `Textarea.Error` registration. |
 | size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Control scale (padding, type, min height). |
 | autoResize | `boolean` | `true` | no | When true, height follows content via wrapper `data-value`; when false, no auto-grow wrapper. |
-| id | `string` | from `useId()` | no | Stable id for the textarea; `label` uses `htmlFor` pointing here. |
-| className | `string` | — | no | Class on the bordered `label` (`control`). |
+| id | `string` | `useId()` | no | Stable id for the textarea; outer `label` uses `htmlFor` pointing here. |
+| className | `string` | — | no | Extra class on the visible field shell: bordered **`label`** (`.control`) with state **`data-*`** attributes. |
 | disabled | `boolean` | — | no | Native disabled state. |
 | readOnly | `boolean` | — | no | Native read-only state. |
 | value | `string` | — | no | Controlled value. |
@@ -88,7 +100,7 @@ A composite multiline field: native `textarea` inside bordered field chrome, opt
 | aria-describedby | `string` | — | no | Merged with hint/error ids when those parts mount. |
 | aria-invalid | `Booleanish` | from variant / error | no | Explicit invalidity over heuristics. |
 | children | `React.ReactNode` | — | no | `CharCounter` in the footer; `Hint` / `Error` after the `label`. |
-| …rest | `Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size">` | — | no | Standard textarea attributes (`placeholder`, `rows`, `maxLength`, `required`, `onChange`, `name`, etc.). |
+| …rest | `Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size">` | — | no | Standard textarea attributes (`placeholder`, `rows`, `maxLength`, `required`, `onChange`, `onInput`, `name`, `autoComplete`, etc.). |
 
 #### Textarea.CharCounter
 

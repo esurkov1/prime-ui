@@ -35,14 +35,22 @@ export function Example() {
 }
 ```
 
-### Extended examples
+### Playground-aligned examples
 
-- [`./examples/01-volume.tsx`](./examples/01-volume.tsx) — Volume on a 0–100 scale with helper copy under the track.
-- [`./examples/02-price-range.tsx`](./examples/02-price-range.tsx) — Stepped “maximum price” filter with a `Hint` for how results update.
-- [`./examples/03-controlled.tsx`](./examples/03-controlled.tsx) — Controlled `value` / `onChange` with a live numeric readout.
-- [`./examples/04-disabled.tsx`](./examples/04-disabled.tsx) — Disabled preset until a parent feature is available.
+**`playground/sections/SliderSection.tsx`** and **`playground/snippets/slider/`** define the demo order and code shown in the playground (Russian UI copy in snippets). Matching runnable package examples (imports from **`"prime-ui-kit"`**) live next to this file:
 
-**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition with `Typography` / `Hint`; this page keeps the contract (rules + API tables) authoritative.
+| Playground block | Snippet | Example file |
+|------------------|---------|--------------|
+| Sizes | `sizes.tsx` | `sizes.tsx` |
+| States | `states.tsx` | `states.tsx` |
+| Controlled | `controlled.tsx` | `controlled.tsx` |
+| Composition | `composition.tsx` | `composition.tsx` |
+| Full width | `full-width.tsx` | `full-width.tsx` |
+| Features (range / step) | `features.tsx` | `features.tsx` |
+
+Shared layout for controlled and full-width demos: **`examples/examples.module.css`**.
+
+**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios and prop combinations; this page keeps the contract (rules + API tables) authoritative.
 
 ## Rules
 
@@ -59,17 +67,17 @@ export function Example() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| value | `number` | — | No | Controlled value |
-| defaultValue | `number` | — | No | Initial value when uncontrolled; if omitted, the internal initial value is `min` (clamped to `[min, max]`) |
-| min | `number` | `0` | No | Minimum value |
-| max | `number` | `100` | No | Maximum value |
+| value | `number` | — | No | Controlled value; use with **`onChange`** for external state |
+| defaultValue | `number` | — | No | Initial value when uncontrolled; clamped to **`[min, max]`**; if omitted, the internal initial value is **`min`** |
+| min | `number` | `0` | No | Minimum for the native `type="range"` |
+| max | `number` | `100` | No | Maximum for the native `type="range"` |
 | step | `number` | `1` | No | Step increment (may be fractional) |
-| disabled | `boolean` | — | No | Disables the range input |
-| onChange | `(value: number) => void` | — | No | Called when the value updates |
-| label | `string` | — | No | Visible label above the track; wires `htmlFor` / `id` on the input |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track, thumb, and label scale |
-| className | `string` | — | No | Class on the root `div` |
-| aria-label | `string` | — | No | Accessible name when there is no `label` |
+| disabled | `boolean` | — | No | Blocks input and lowers track opacity |
+| onChange | `(value: number) => void` | — | No | Fires when the value changes after user input (pointer, touch, or native range keys) |
+| label | `string` | — | No | Text above the track; creates an associated **`label`** with **`htmlFor`** on the input |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track height, thumb, and label type scale from one control token tier |
+| className | `string` | — | No | Extra class on the root container |
+| aria-label | `string` | — | No | Accessible name when there is no visible **`label`** |
 
 ## Related
 

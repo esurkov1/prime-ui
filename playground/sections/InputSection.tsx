@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import InputCompositionSnippet from "../snippets/input/composition";
 import compositionSource from "../snippets/input/composition.tsx?raw";
@@ -201,148 +201,154 @@ const inputInlineAffixApiRows: PlaygroundApiPropRow[] = [
 
 export default function InputSection() {
   return (
-    <PlaygroundDocPage
-      title="Input"
-      description={
-        <>
-          Однострочное поле ввода с единым оформлением: подпись и подсказка сверху и снизу, внутри —
-          рамка с текстом, иконками и текстовыми аффиксами. Подходит для почты, поиска, сумм и
-          коротких кодов; многострочный ввод — отдельный компонент Textarea.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Четыре значения <code>size</code> на <code>Input.Root</code> (<code>s</code>,{" "}
-            <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же разметка с иконкой слева,
-            меняются только токены высоты и типографики.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
-            <PlaygroundExampleFrame.Stage>
-              <InputSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Input</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Однострочное поле ввода с единым оформлением: подпись и подсказка сверху и снизу,
+              внутри — рамка с текстом, иконками и текстовыми аффиксами. Подходит для почты, поиска,
+              сумм и коротких кодов; многострочный ввод — отдельный компонент Textarea.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Четыре значения <code>size</code> на <code>Input.Root</code> (<code>s</code>,{" "}
+              <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же разметка с иконкой
+              слева, меняются только токены высоты и типографики.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <InputSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Обычное поле с <code>hint</code>, <code>disabled</code> и <code>readOnly</code> на{" "}
+              <code>Input.Field</code>, обязательность через <code>required</code>, ошибка через{" "}
+              <code>error</code> на Root (или <code>hasError</code>) — на инпут уходит{" "}
+              <code>aria-invalid</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <InputStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoDescription>
+              Значение и обработчик на <code>Input.Field</code> (<code>value</code>,{" "}
+              <code>onChange</code>): родитель владеет строкой поиска; подпись поля продублирована в{" "}
+              <code>aria-label</code> для скринридеров.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <InputControlledSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Слоты <code>Input.Icon</code> (<code>side</code>), <code>Input.Affix</code>{" "}
+              (выделенные края) и <code>Input.InlineAffix</code> (символ в строке) внутри{" "}
+              <code>Input.Wrapper</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <InputCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoDescription>
+              Корень поля тянется на ширину родителя (<code>width: 100%</code> у Root): сравнение
+              узкой колонки и блока на всю ширину превью.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <InputFullWidthSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+            <DemoDescription>
+              Явный <code>id</code> на Root для стабильных тестов и связки с подсказками; связка{" "}
+              <code>label</code> + <code>optionalLabel</code>; одновременно <code>hint</code> и{" "}
+              <code>error</code> (ошибка включает визуальное состояние ошибки).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <InputFeaturesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Input.Root</DemoApiTitle>
+            <DemoDescription>
+              Блок поля: размер, подписи, подсказка и ошибка, контекст для Wrapper и Field.
+            </DemoDescription>
+            <PlaygroundApiTable rows={inputRootApiRows} />
+
+            <DemoApiTitle>Input.Wrapper</DemoApiTitle>
+            <DemoDescription>
+              Рамка вокруг нативного input и декоративных слотов; наследует размер и флаг ошибки из
+              контекста.
+            </DemoDescription>
+            <PlaygroundApiTable rows={inputWrapperApiRows} />
+
+            <DemoApiTitle>Input.Field</DemoApiTitle>
+            <DemoDescription>
+              Нативный <code>input</code> с id, aria-связями и <code>aria-invalid</code> из
+              контекста.
+            </DemoDescription>
+            <PlaygroundApiTable rows={inputFieldApiRows} />
+
+            <DemoApiTitle>Input.Icon</DemoApiTitle>
+            <DemoDescription>
+              Декоративная иконка слева или справа; не озвучивается (<code>aria-hidden</code>).
+            </DemoDescription>
+            <PlaygroundApiTable rows={inputIconApiRows} />
+
+            <DemoApiTitle>Input.Affix</DemoApiTitle>
+            <DemoDescription>
+              Текстовый блок-аффикс с фоном по краю поля (префикс URL, зона домена).
+            </DemoDescription>
+            <PlaygroundApiTable rows={inputAffixApiRows} />
+
+            <DemoApiTitle>Input.InlineAffix</DemoApiTitle>
+            <DemoDescription>
+              Компактный аффикс в одной строке с вводом (валюта, единицы).
+            </DemoDescription>
+            <PlaygroundApiTable rows={inputInlineAffixApiRows} />
+
+            <DemoApiTitle>useInputContext</DemoApiTitle>
+            <DemoDescription>
+              Публичный хук для продвинутой композиции: возвращает{" "}
+              <code>{`{ size, hasError, inputId, describedBy }`}</code> — те же значения, что
+              получает <code>Input.Field</code> из провайдера.
+            </DemoDescription>
+          </div>
         </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Обычное поле с <code>hint</code>, <code>disabled</code> и <code>readOnly</code> на{" "}
-            <code>Input.Field</code>, обязательность через <code>required</code>, ошибка через{" "}
-            <code>error</code> на Root (или <code>hasError</code>) — на инпут уходит{" "}
-            <code>aria-invalid</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <InputStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-          <DemoDescription>
-            Значение и обработчик на <code>Input.Field</code> (<code>value</code>,{" "}
-            <code>onChange</code>): родитель владеет строкой поиска; подпись поля продублирована в{" "}
-            <code>aria-label</code> для скринридеров.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <InputControlledSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция</DemoSectionTitle>
-          <DemoDescription>
-            Слоты <code>Input.Icon</code> (<code>side</code>), <code>Input.Affix</code> (выделенные
-            края) и <code>Input.InlineAffix</code> (символ в строке) внутри{" "}
-            <code>Input.Wrapper</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <InputCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Full width</DemoSectionTitle>
-          <DemoDescription>
-            Корень поля тянется на ширину родителя (<code>width: 100%</code> у Root): сравнение
-            узкой колонки и блока на всю ширину превью.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <InputFullWidthSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-          <DemoDescription>
-            Явный <code>id</code> на Root для стабильных тестов и связки с подсказками; связка{" "}
-            <code>label</code> + <code>optionalLabel</code>; одновременно <code>hint</code> и{" "}
-            <code>error</code> (ошибка включает визуальное состояние ошибки).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <InputFeaturesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
-
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Input.Root</DemoApiTitle>
-          <DemoDescription>
-            Блок поля: размер, подписи, подсказка и ошибка, контекст для Wrapper и Field.
-          </DemoDescription>
-          <PlaygroundApiTable rows={inputRootApiRows} />
-
-          <DemoApiTitle>Input.Wrapper</DemoApiTitle>
-          <DemoDescription>
-            Рамка вокруг нативного input и декоративных слотов; наследует размер и флаг ошибки из
-            контекста.
-          </DemoDescription>
-          <PlaygroundApiTable rows={inputWrapperApiRows} />
-
-          <DemoApiTitle>Input.Field</DemoApiTitle>
-          <DemoDescription>
-            Нативный <code>input</code> с id, aria-связями и <code>aria-invalid</code> из контекста.
-          </DemoDescription>
-          <PlaygroundApiTable rows={inputFieldApiRows} />
-
-          <DemoApiTitle>Input.Icon</DemoApiTitle>
-          <DemoDescription>
-            Декоративная иконка слева или справа; не озвучивается (<code>aria-hidden</code>).
-          </DemoDescription>
-          <PlaygroundApiTable rows={inputIconApiRows} />
-
-          <DemoApiTitle>Input.Affix</DemoApiTitle>
-          <DemoDescription>
-            Текстовый блок-аффикс с фоном по краю поля (префикс URL, зона домена).
-          </DemoDescription>
-          <PlaygroundApiTable rows={inputAffixApiRows} />
-
-          <DemoApiTitle>Input.InlineAffix</DemoApiTitle>
-          <DemoDescription>
-            Компактный аффикс в одной строке с вводом (валюта, единицы).
-          </DemoDescription>
-          <PlaygroundApiTable rows={inputInlineAffixApiRows} />
-
-          <DemoApiTitle>useInputContext</DemoApiTitle>
-          <DemoDescription>
-            Публичный хук для продвинутой композиции: возвращает{" "}
-            <code>{`{ size, hasError, inputId, describedBy }`}</code> — те же значения, что получает{" "}
-            <code>Input.Field</code> из провайдера.
-          </DemoDescription>
-        </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

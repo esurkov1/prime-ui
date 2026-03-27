@@ -1,3 +1,10 @@
+/* Semantic page region inside a padded main (e.g. AppShell); no outer padding — shell provides it. */
+.section {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
 .root {
   box-sizing: border-box;
   width: 100%;
@@ -42,6 +49,11 @@
   font-size: var(--prime-sys-typography-sizeScale-s);
   line-height: var(--prime-sys-typography-lineHeightScale-s);
   font-weight: var(--prime-sys-typography-weight-regular);
+}
+
+/* When the main column is already inset (e.g. AppShell main `variant="page"`), avoid a second measure column. */
+.description[data-measure="full"] {
+  max-width: none;
 }
 
 .body {

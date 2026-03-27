@@ -28,15 +28,32 @@ Chunked navigation for lists and tables: chevron previous/next, numbered pages, 
 - **`Pagination.Root`** — the only public part. Renders the **`nav`** row; **`className`** merges onto that **`nav`** only.
 - Full-width or “meta left / pager right” layouts are parent responsibility (flex or grid around **`Pagination.Root`**)—there is no **`fullWidth`** prop on **`Pagination`**.
 
+### Playground snippets
+
+Demos match **`playground/sections/PaginationSection.tsx`** (order and intent). Sources use **`@/`** under **`playground/snippets/pagination/`**; section descriptions and some labels are Russian in the playground UI.
+
+| Playground block | Snippet | Intent |
+|------------------|---------|--------|
+| Размеры | [`sizes.tsx`](../../../playground/snippets/pagination/sizes.tsx) (+ [`sizes.module.css`](../../../playground/snippets/pagination/sizes.module.css)) | **`size`** **`s`–`xl`**, long range (**`totalPages={20}`**), local state per row |
+| Диапазон номеров | [`range-modes.tsx`](../../../playground/snippets/pagination/range-modes.tsx) (+ [`rows.module.css`](../../../playground/snippets/pagination/rows.module.css)) | All indices when **`totalPages ≤ 7`** vs ellipsis row when larger |
+| Состояния | [`states.tsx`](../../../playground/snippets/pagination/states.tsx) | First / last / single-page arrow **`disabled`** semantics |
+| Контролируемый режим | [`controlled.tsx`](../../../playground/snippets/pagination/controlled.tsx) (+ [`controlled.module.css`](../../../playground/snippets/pagination/controlled.module.css)) | Shared **`page`** with external jump buttons |
+| Full width | [`full-width.tsx`](../../../playground/snippets/pagination/full-width.tsx) (+ [`full-width.module.css`](../../../playground/snippets/pagination/full-width.module.css)) | Flex toolbar: meta left, pager right (no **`fullWidth`** prop) |
+| Специфичные фичи | [`features.tsx`](../../../playground/snippets/pagination/features.tsx) | **`siblingCount`** **`0`** / **`2`**; **`totalPages=0`** → **`null`** |
+
 ### Scenarios (see `examples/`)
 
 | Scenario | Approach |
 |----------|----------|
+| Size ladder | Same as playground **Размеры**; package copy in English. → [`examples/sizes.tsx`](examples/sizes.tsx) |
+| Range modes | Same as playground **Диапазон номеров**. → [`examples/range-modes.tsx`](examples/range-modes.tsx) |
+| Disabled arrows / single page | Same as playground **Состояния**. → [`examples/states.tsx`](examples/states.tsx) |
+| Sibling window + empty data | Same as playground **Специфичные фичи** (`siblingCount`, `totalPages=0`). → [`examples/features.tsx`](examples/features.tsx) |
 | Table footer | Pair a range summary with **`Pagination.Root`** in a footer row; keep **`page`** in sync with fetched rows. → [`examples/table-footer.tsx`](examples/table-footer.tsx) |
 | Compact toolbar | Set **`size="s"`** for denser toolbars or mobile-adjacent rows. → [`examples/compact.tsx`](examples/compact.tsx) |
 | Full-width list bar | **`display: flex`**, **`justify-content: space-between`**, **`flex-wrap`**: meta text + pager. → [`examples/full-width-list.tsx`](examples/full-width-list.tsx) |
 | Controlled page index | Store **`page`** in React state (or router); update from **`onPageChange`** and any other controls (e.g. jump to first/last). → [`examples/controlled-page.tsx`](examples/controlled-page.tsx) |
-| Canonical wiring | Minimal **`Pagination.Root`** with required props; reference for imports and props. → [`examples/canonical-composition.tsx`](examples/canonical-composition.tsx) |
+| Canonical wiring | Minimal **`Pagination.Root`** with required props; short row + long row with **`siblingCount`**. → [`examples/canonical-composition.tsx`](examples/canonical-composition.tsx) |
 
 ### Minimal example
 
@@ -58,11 +75,15 @@ For **default wiring**, **long ranges**, and **`siblingCount`**, open **`example
 
 | File | Scenario |
 |------|----------|
-| `canonical-composition.tsx` | Required props, default size, long range + `siblingCount` |
-| `table-footer.tsx` | English table footer: row range + pager |
-| `compact.tsx` | English compact row: `size="s"` |
-| `full-width-list.tsx` | English full-width bar: summary + pager |
-| `controlled-page.tsx` | English controlled state + jump buttons |
+| `sizes.tsx` | **`size`** ladder + long range (mirror [`sizes.tsx`](../../../playground/snippets/pagination/sizes.tsx)) |
+| `range-modes.tsx` | Short vs long `totalPages` (mirror [`range-modes.tsx`](../../../playground/snippets/pagination/range-modes.tsx)) |
+| `states.tsx` | First / last / single page (mirror [`states.tsx`](../../../playground/snippets/pagination/states.tsx)) |
+| `controlled-page.tsx` | Controlled `page` + jump buttons (mirror [`controlled.tsx`](../../../playground/snippets/pagination/controlled.tsx)) |
+| `full-width-list.tsx` | Full-width bar (mirror [`full-width.tsx`](../../../playground/snippets/pagination/full-width.tsx)) |
+| `features.tsx` | `siblingCount` and `totalPages=0` (mirror [`features.tsx`](../../../playground/snippets/pagination/features.tsx)) |
+| `canonical-composition.tsx` | Required props, default size, short row + long row with `siblingCount` |
+| `table-footer.tsx` | Table footer: row range + pager |
+| `compact.tsx` | Compact row: `size="s"` |
 
 ### Rules
 
@@ -92,6 +113,7 @@ For **default wiring**, **long ranges**, and **`siblingCount`**, open **`example
 
 ## LLM note
 
+- **Playground:** demos and order — **`playground/sections/PaginationSection.tsx`** + **`playground/snippets/pagination/*.tsx`**; **`examples/`** files in the table above mirror those snippets with **`prime-ui-kit`** imports where noted.
 - **Imports:** **`import { Pagination } from "prime-ui-kit"`** — use **`Pagination.Root`** only; there is no flat **`Pagination`** element.
 - **Props:** **`page`**, **`totalPages`**, **`onPageChange`** required; optional **`siblingCount`**, **`size`**, **`className`**.
 - **`size`** literals: **`s`**, **`m`**, **`l`**, **`xl`** — default **`m`**; maps to **`data-size`** on the root **`nav`**.

@@ -3,45 +3,58 @@ import { Icon, Tabs, Typography } from "prime-ui-kit";
 import styles from "./examples.module.css";
 
 /**
- * Icon + label in each trigger; keep a visible `Tabs.Label` (or equivalent text) so the tab name is
- * not only conveyed by the glyph.
+ * Multiple `Tabs.Icon` slots per trigger (left/right of `Tabs.Label`) and two icons in one tab —
+ * matches `playground/snippets/tabs/with-icons.tsx`. Keep a visible `Tabs.Label` for the accessible
+ * name.
  */
 export default function TabsExampleTriggersWithIcons() {
   return (
-    <Tabs.Root defaultValue="inbox">
+    <Tabs.Root defaultValue="overview">
       <Tabs.List>
-        <Tabs.Tab value="inbox">
-          <Tabs.Icon>
-            <Icon name="field.email" tone="subtle" />
-          </Tabs.Icon>
-          <Tabs.Label>Inbox</Tabs.Label>
-        </Tabs.Tab>
-        <Tabs.Tab value="library">
+        <Tabs.Tab value="overview">
           <Tabs.Icon>
             <Icon name="nav.layoutGrid" tone="subtle" />
           </Tabs.Icon>
-          <Tabs.Label>Library</Tabs.Label>
-        </Tabs.Tab>
-        <Tabs.Tab value="vault">
+          <Tabs.Label>Overview</Tabs.Label>
           <Tabs.Icon>
-            <Icon name="status.locked" tone="subtle" />
+            <Icon name="nav.chevronRight" tone="subtle" />
           </Tabs.Icon>
-          <Tabs.Label>Vault</Tabs.Label>
+        </Tabs.Tab>
+        <Tabs.Tab value="dashboard">
+          <Tabs.Icon>
+            <Icon name="nav.layoutGrid" tone="subtle" />
+          </Tabs.Icon>
+          <Tabs.Label>Dashboard</Tabs.Label>
+          <Tabs.Icon>
+            <Icon name="nav.chevronRight" tone="subtle" />
+          </Tabs.Icon>
+        </Tabs.Tab>
+        <Tabs.Tab value="settings">
+          <Tabs.Icon>
+            <Icon name="nav.layoutGrid" tone="subtle" />
+          </Tabs.Icon>
+          <Tabs.Icon>
+            <Icon name="field.email" tone="subtle" />
+          </Tabs.Icon>
+          <Tabs.Label>Settings</Tabs.Label>
+          <Tabs.Icon>
+            <Icon name="nav.chevronRight" tone="subtle" />
+          </Tabs.Icon>
         </Tabs.Tab>
       </Tabs.List>
-      <Tabs.Panel value="inbox">
+      <Tabs.Panel value="overview">
         <Typography.Root as="p" variant="body-default" className={styles.body}>
-          Messages and mentions for the signed-in user.
+          Overview content.
         </Typography.Root>
       </Tabs.Panel>
-      <Tabs.Panel value="library">
+      <Tabs.Panel value="dashboard">
         <Typography.Root as="p" variant="body-default" className={styles.body}>
-          Collections and grids of assets linked to this project.
+          Dashboard content.
         </Typography.Root>
       </Tabs.Panel>
-      <Tabs.Panel value="vault">
+      <Tabs.Panel value="settings">
         <Typography.Root as="p" variant="body-default" className={styles.body}>
-          Restricted credentials and secrets with stricter access rules.
+          Settings content.
         </Typography.Root>
       </Tabs.Panel>
     </Tabs.Root>

@@ -35,14 +35,34 @@ Composable UI for choosing files: a `label` wrapping a hidden `input type="file"
 - **`FileUpload.Root`** — outer `label`, hidden file `input`, `ControlSizeProvider` for descendants. Omit `children` to get the default inner layout (`Icon`, `Title`, `Hint`, `BrowseLabel`). Replace `children` with `DropBody` / `Title` / `BrowseLink` / `ActionsRow` / `Chip` / `ChipLabel` for custom copy; use `inputRef` + `click()` from `BrowseLink` or `Chip` handlers because those elements stop propagation to the `label`.
 - **File row** — `FileUpload.Item` (optional `variant`, `size`) → `ItemRow` → `FormatBadge` and `ItemMain`. Inside `ItemMain`, use `ItemTextGroup` with `ItemName` / `ItemMeta` / `ItemMetaSep`, or `ItemStack` with `ItemTryAgain` for error layouts; optional `ItemActions`. Below the row, optional `ItemProgress` (bar when `value` is set and `children` omitted) or `ItemFooter`.
 
-### Scenarios (примеры в `examples/`)
+### Playground snippets
 
-| Файл | Идея |
-|------|------|
-| `examples/avatar-upload.tsx` | Одно изображение, `accept` для картинок, превью через [Avatar](../avatar/COMPONENT.md) и `URL.createObjectURL`. |
-| `examples/document-attach.tsx` | Вложения к сообщению: `multiple`, фильтр типов, строки `Item` + `FormatBadge` / мета размера. |
-| `examples/drag-area.tsx` | Кастомная зона: `appearance="solid"`, `DropBody`, `BrowseLink` + `inputRef` (как в модалках). |
-| `examples/controlled-list.tsx` | Контролируемый массив `File[]`, удаление строк и сброс списка через [Button](../button/COMPONENT.md). |
+Демо совпадают по порядку и смыслу с **`playground/sections/FileUploadSection.tsx`**. Исходники с импортами **`@/`** лежат в **`playground/snippets/file-upload/`**:
+
+| Блок | Файл | Содержание |
+|------|------|------------|
+| **Размеры** | [`sizes.tsx`](../../../playground/snippets/file-upload/sizes.tsx) (+ [`sizes.module.css`](../../../playground/snippets/file-upload/sizes.module.css)) | Сетка **`FileUpload.Root`** с **`size`** `s`–`xl` и такие же **`FileUpload.Item`** с **`FormatBadge`**, индикатором в **`ItemName`**, **`ItemProgress`** с **`value`**. |
+| **Варианты** | [`variants.tsx`](../../../playground/snippets/file-upload/variants.tsx) (+ [`variants.module.css`](../../../playground/snippets/file-upload/variants.module.css)) | У корня **`appearance`** **`dashed`** / **`solid`**; у карточки **`variant`** **`default`** / **`error`**. |
+| **Состояния** | [`states.tsx`](../../../playground/snippets/file-upload/states.tsx) (+ [`states.module.css`](../../../playground/snippets/file-upload/states.module.css)) | Обычная и **`disabled`** зона; карточки с прогрессом, успехом и ошибкой (**`ItemStack`** + **`ItemTryAgain`**). Подсветка при перетаскивании — **`data-dragover`** на **`Root`**. |
+| **Контролируемый режим** | [`controlled.tsx`](../../../playground/snippets/file-upload/controlled.tsx) | **`onFilesChange`**, **`multiple`**, **`accept`**; список имён и сброс через [Button](../button/COMPONENT.md). |
+| **Композиция** | [`composition.tsx`](../../../playground/snippets/file-upload/composition.tsx) (+ [`composition.module.css`](../../../playground/snippets/file-upload/composition.module.css)) | **`DropBody`**, **`Title tone="muted"`**, **`BrowseLink`**, **`ActionsRow`** / **`Chip`** / **`ChipLabel`**, общий **`inputRef`** для программного **`click()`**. |
+| **Full width** | [`full-width.tsx`](../../../playground/snippets/file-upload/full-width.tsx) (+ [`full-width.module.css`](../../../playground/snippets/file-upload/full-width.module.css)) | **`Root`** на всю ширину родителя (колонка формы). |
+| **Свой контент и accept** | [`custom-children.tsx`](../../../playground/snippets/file-upload/custom-children.tsx) (+ [`custom-children.module.css`](../../../playground/snippets/file-upload/custom-children.module.css)) | Замена тела зоны через **`children`**, **`accept="image/*"`**. |
+| **Круглая зона** | [`circle-modal.tsx`](../../../playground/snippets/file-upload/circle-modal.tsx) (+ [`circle-modal.module.css`](../../../playground/snippets/file-upload/circle-modal.module.css)) | Круглый контейнер (CSS), **`DropBody`**, внешняя кнопка загрузки с тем же **`inputRef`**. |
+| **Список с аватаром** | [`avatar-rows.tsx`](../../../playground/snippets/file-upload/avatar-rows.tsx) | Макет строки профиля (**`Avatar`**, кнопки). **`FileUpload` в сниппете не рендерится** — в приложении при необходимости свяжите кнопки с общим **`inputRef`**. |
+
+### Scenarios (recipes)
+
+Готовые рецепты с импортом **`prime-ui-kit`** — **`examples/*.tsx`**. Лестницы размеров/состояний и разметка модалок — в **Playground snippets** выше.
+
+| Файл | Идея | Связь со сниппетами |
+|------|------|---------------------|
+| [`examples/controlled-list.tsx`](examples/controlled-list.tsx) | Контролируемый список с **`Item`**, удаление по строке, очистка всего. | Расширяет [`controlled.tsx`](../../../playground/snippets/file-upload/controlled.tsx) карточками и действиями. |
+| [`examples/drag-area.tsx`](examples/drag-area.tsx) | **`DropBody`**, **`BrowseLink`**, **`inputRef`**, счётчик последнего выбора. | Упрощённая композиция рядом с [`composition.tsx`](../../../playground/snippets/file-upload/composition.tsx) (без **`ActionsRow`** / **`Chip`**). |
+| [`examples/document-attach.tsx`](examples/document-attach.tsx) | Вложения: **`multiple`**, фильтр типов, список **`Item`**. | Тематически близко к композиции и контролируемому режиму; визуальные паттерны карточек см. **Размеры** / **Состояния** в плейграунде. |
+| [`examples/avatar-upload.tsx`](examples/avatar-upload.tsx) | Одно изображение, превью [Avatar](../avatar/COMPONENT.md), **`URL.createObjectURL`**. | См. [`circle-modal.tsx`](../../../playground/snippets/file-upload/circle-modal.tsx) для круглой зоны и внешней кнопки. |
+| [`examples/full-width.tsx`](examples/full-width.tsx) | Колонка формы: зона на всю ширину родителя. | Зеркало [`full-width.tsx`](../../../playground/snippets/file-upload/full-width.tsx) для потребителей пакета. |
+| [`examples/custom-children.tsx`](examples/custom-children.tsx) | **`children`** вместо дефолтного тела, **`accept`** для изображений. | Зеркало [`custom-children.tsx`](../../../playground/snippets/file-upload/custom-children.tsx) для потребителей пакета. |
 
 ### Minimal example
 
@@ -227,3 +247,4 @@ export function Example() {
 - **Presentation rows:** `FileUpload.Item` subtree (`ItemRow`, `FormatBadge`, `ItemMain`, `ItemProgress`, …) does not manage data; bind to app state yourself.
 - **Appearances:** `appearance` on Root: `dashed` (default) vs `solid` (embedded / modal-style).
 - **A11y:** `FormatBadge` and default icon wrapper are `aria-hidden`; file identity belongs in `ItemName` / visible text.
+- **Playground vs recipes:** полная сетка демо и порядок блоков — **`playground/snippets/file-upload/*.tsx`** и **`FileUploadSection.tsx`**; копипаст под продукт — **`examples/*.tsx`** (см. таблицы **Playground snippets** и **Scenarios (recipes)**).

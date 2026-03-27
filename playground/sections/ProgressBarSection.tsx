@@ -1,5 +1,5 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { DemoDescription, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import ProgressBarLabelSnippet from "../snippets/progress/bar-label";
 import progressBarLabelSource from "../snippets/progress/bar-label.tsx?raw";
@@ -10,47 +10,55 @@ import progressBarValuesSource from "../snippets/progress/bar-values.tsx?raw";
 
 export default function ProgressBarSection() {
   return (
-    <PlaygroundDocPage title="ProgressBar">
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Ниже — интерактивное превью и вкладка с кодом этого примера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={progressBarSizesSource.trim()}
-            previewLayout="stack-center"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <ProgressBarSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>ProgressBar</PageContent.Title>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Ниже — интерактивное превью и вкладка с кодом этого примера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={progressBarSizesSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ProgressBarSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Values</DemoSectionTitle>
-          <DemoDescription>
-            Ниже — интерактивное превью и вкладка с кодом этого примера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={progressBarValuesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ProgressBarValuesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Values</DemoSectionTitle>
+            <DemoDescription>
+              Ниже — интерактивное превью и вкладка с кодом этого примера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={progressBarValuesSource.trim()}
+              previewLayout="stack"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ProgressBarValuesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>With label</DemoSectionTitle>
-          <DemoDescription>
-            Ниже — интерактивное превью и вкладка с кодом этого примера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={progressBarLabelSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <ProgressBarLabelSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
+          <div className="demoBlock">
+            <DemoSectionTitle>With label</DemoSectionTitle>
+            <DemoDescription>
+              Ниже — интерактивное превью и вкладка с кодом этого примера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={progressBarLabelSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ProgressBarLabelSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

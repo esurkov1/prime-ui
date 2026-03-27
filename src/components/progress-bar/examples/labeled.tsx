@@ -1,6 +1,6 @@
 import { ProgressBar } from "prime-ui-kit";
 
-/** Visible label above the track; the native `progress` gets `aria-labelledby` for the same text. */
+/** Visible label above the track; `aria-labelledby` references the label (playground: `snippets/progress/bar-label.tsx`). */
 export default function ProgressBarLabeledExample() {
-  return <ProgressBar.Root value={60} max={100} label="Profile completion" size="m" />;
+  return <ProgressBar.Root value={60} label="Profile completion" />;
 }

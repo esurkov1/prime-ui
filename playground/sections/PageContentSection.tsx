@@ -1,7 +1,7 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const rootRows: PlaygroundApiPropRow[] = [
   {
@@ -35,6 +35,31 @@ const rootRows: PlaygroundApiPropRow[] = [
   },
 ];
 
+const sectionRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Класс на `<section>` (регион страницы без внешних полей — удобно внутри `main` с padding).",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Обычно `Header` + `Body` (как на маршрутах плейграунда).",
+  },
+  {
+    prop: "…rest",
+    type: "React.HTMLAttributes<HTMLElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Атрибуты нативного `section`, включая `ref` (forwardRef).",
+  },
+];
+
 const headerRows: PlaygroundApiPropRow[] = [
   {
     prop: "className",
@@ -48,7 +73,8 @@ const headerRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Обычно `PageContent.Title` и `PageContent.Description`.",
+    description:
+      "Обычно `PageContent.Title` и `PageContent.Description` (`measure` при необходимости).",
   },
   {
     prop: "…rest",
@@ -84,6 +110,14 @@ const titleRows: PlaygroundApiPropRow[] = [
 ];
 
 const descriptionRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "measure",
+    type: '"readable" | "full"',
+    defaultValue: '"readable"',
+    required: "Нет",
+    description:
+      "`readable` — узкая мера (~65ch); `full` — на всю ширину родителя (например, когда поля уже у `AppShell.Main`).",
+  },
   {
     prop: "className",
     type: "string",
@@ -133,34 +167,42 @@ const bodyRows: PlaygroundApiPropRow[] = [
 
 export default function PageContentSection() {
   return (
-    <PlaygroundDocPage
-      title="PageContent"
-      description={
-        <>
-          Семантическая разметка и типографика контентной колонки: заголовок страницы (
-          <code>Title</code> → <code>&lt;h1&gt;</code>), описание, тело. Компонент{" "}
-          <code>PlaygroundDocPage</code> в этом репозитории собирает шапку из{" "}
-          <code>PageContent.Header</code> / <code>Body</code> без дублирования внешних отступов
-          main. Отдельных превью в разделе примеров нет — это вспомогательный layout для экранов и
-          документации.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>PageContent.Root</DemoApiTitle>
-          <PlaygroundApiTable rows={rootRows} />
-          <DemoApiTitle>PageContent.Header</DemoApiTitle>
-          <PlaygroundApiTable rows={headerRows} />
-          <DemoApiTitle>PageContent.Title</DemoApiTitle>
-          <PlaygroundApiTable rows={titleRows} />
-          <DemoApiTitle>PageContent.Description</DemoApiTitle>
-          <PlaygroundApiTable rows={descriptionRows} />
-          <DemoApiTitle>PageContent.Body</DemoApiTitle>
-          <PlaygroundApiTable rows={bodyRows} />
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>PageContent</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Семантическая разметка контентной колонки: <code>PageContent.Section</code> (регион
+              страницы без внешних полей, если отступы уже даёт <code>AppShell.Main</code>),{" "}
+              <code>PageContent.Root</code> (полная страница с полями и при необходимости{" "}
+              <code>maxWidth</code>), <code>Title</code> → <code>&lt;h1&gt;</code>,{" "}
+              <code>Description</code> с{" "}
+              <code>measure=&quot;readable&quot; | &quot;full&quot;</code>, <code>Body</code>.
+              Маршруты плейграунда используют тот же паттерн без отдельной обёртки.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>PageContent.Root</DemoApiTitle>
+            <PlaygroundApiTable rows={rootRows} />
+            <DemoApiTitle>PageContent.Section</DemoApiTitle>
+            <PlaygroundApiTable rows={sectionRows} />
+            <DemoApiTitle>PageContent.Header</DemoApiTitle>
+            <PlaygroundApiTable rows={headerRows} />
+            <DemoApiTitle>PageContent.Title</DemoApiTitle>
+            <PlaygroundApiTable rows={titleRows} />
+            <DemoApiTitle>PageContent.Description</DemoApiTitle>
+            <PlaygroundApiTable rows={descriptionRows} />
+            <DemoApiTitle>PageContent.Body</DemoApiTitle>
+            <PlaygroundApiTable rows={bodyRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

@@ -28,15 +28,21 @@ Toast notifications for short, non-blocking feedback after actions (save, send, 
 - **`NotificationStack` / `NotificationStackItem`** (internal) — ordered list; peek/collapse behavior and **`paused`** passed to **`NotificationCard`**.
 - **`NotificationCard`** — public for static previews or fully custom wiring; live toasts should use **`notify`**.
 
-### Scenarios (see `examples/`)
+### Scenarios (playground + `examples/`)
+
+Live demos in the playground use **`playground/snippets/notification/*.tsx`** (see **`playground/sections/NotificationSection.tsx`**). The table below lists the same scenarios with package-oriented copies under **`examples/`** (aligned 1:1 with those snippets).
 
 | Scenario | Approach |
 |----------|----------|
-| Toast queue / stack cap | Same **`position`** + **`type`** share one stack; **`max`** drops oldest; stagger **`notify`** with timeouts. Hover expands stack and pauses timers. → [`examples/toast-queue.tsx`](examples/toast-queue.tsx) |
-| Positions | Set **`NotificationProvider`** default **`position`** or pass **`position`** per **`notify`**. Six anchors: **`top-*`** / **`bottom-*`** × **`left` \| `center` \| `right`**. → [`examples/positions.tsx`](examples/positions.tsx) |
-| Action button | **`action: { label, onClick }`** — rendered as kit **`Button.Root`** (neutral stroke). → [`examples/action-toast.tsx`](examples/action-toast.tsx) |
-| Error / success semantics | **`type: "error"`** / **`"warning"`** vs **`"success"`** / **`"info"`** — icons, grouping, and live-region assertiveness differ. → [`examples/error-success.tsx`](examples/error-success.tsx) |
-| Reading the store | **`useNotificationStore`** — **`items`**, **`notify`**, **`dismiss`**, **`dismissAll`** for UI tied to queue length. → [`examples/notification-store.tsx`](examples/notification-store.tsx) |
+| Sizes | Static **`NotificationCard`** row for **`s`** / **`m`** / **`l`** with **`persistent`** and **`closable: false`** so only scale differs. → [`examples/sizes.tsx`](examples/sizes.tsx) |
+| Variants (`type`) | Four **`type`** values on static cards; **`persistent: true`** shows accent border and glow pulse (default live **`notify()`** is **`persistent: false`**). → [`examples/variants.tsx`](examples/variants.tsx) |
+| States | Static **`persistent`** vs **`closable: false`**, plus buttons for timed toast, hover-pause stack, and **`notify`** with **`persistent`**. → [`examples/states.tsx`](examples/states.tsx) |
+| Positions | Six **`NotificationPosition`** values; **`position`** in **`notify`** options. → [`examples/positions.tsx`](examples/positions.tsx) |
+| Controlled store | **`useNotificationStore()`** — **`items`**, **`notify`**, **`dismiss(id)`** per row. → [`examples/controlled.tsx`](examples/controlled.tsx) |
+| Composition | **`icon`**, **`badge`**, **`description`**, **`action`**; static card plus live **`notify`** (e.g. lucide **`Bell`**). → [`examples/composition.tsx`](examples/composition.tsx) |
+| Stack / timing | Burst stack (**`max`** per stack), hover expand + pause, **`dismissAll`**, short vs long **`duration`**. → [`examples/features.tsx`](examples/features.tsx) |
+
+**Additional examples:** interactive **`type`** buttons → [`examples/error-success.tsx`](examples/error-success.tsx); **`action`** + **`LinkButton`** trigger → [`examples/action-toast.tsx`](examples/action-toast.tsx). Deprecated aliases: [`examples/toast-queue.tsx`](examples/toast-queue.tsx) → **`features`**, [`examples/notification-store.tsx`](examples/notification-store.tsx) → **`controlled`**.
 
 ### Minimal example
 

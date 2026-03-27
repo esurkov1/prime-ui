@@ -55,7 +55,6 @@ function SidebarSizeColumn({ size }: { size: DemoSize }) {
                     subtitle="Reakt UI-Kit"
                   />
                 </Sidebar.HeaderMain>
-                <Sidebar.ToggleButton />
               </Sidebar.HeaderRow>
             </Sidebar.Header>
 

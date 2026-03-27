@@ -259,10 +259,12 @@ export {
 } from "./notification/NotificationStore";
 export type {
   PageContentBodyProps,
+  PageContentDescriptionMeasure,
   PageContentDescriptionProps,
   PageContentHeaderProps,
   PageContentMaxWidth,
   PageContentRootProps,
+  PageContentSectionProps,
   PageContentTitleProps,
 } from "./page-content/PageContent";
 export { PageContent } from "./page-content/PageContent";

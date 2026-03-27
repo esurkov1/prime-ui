@@ -23,7 +23,7 @@ A single-select field: by default (**`native`** `false`) it is a combobox — a 
 - **`Select.Root`** — owns value (controlled or uncontrolled), `size`, `hasError`, `disabled`, **`placeholder`**, and **`native`**. When **`native`** is `false`, it also owns open state and highlight. Wrap everything else.
 - **`Select.Trigger`** — (non-**`native`** only) the combobox `button` (fixed chevron on the right). Put **`Select.Value`** inside; optionally **`Select.TriggerIcon`** before **`Select.Value`**. The implementation sets the trigger **`id`**; you cannot override it — associate an external [Label](../label/COMPONENT.md) with **`aria-labelledby`** pointing at the label’s **`id`**.
 - **`Select.Value`** — (non-**`native`** only) displays the selected item label, otherwise falls back to the raw value or **`placeholder`** (hint styling when empty).
-- **`Select.Content`** — when **`native`** is `false`: portaled **`role="listbox"`**; rendered in the tree always but hidden when closed. Place **`Select.Item`** rows (and optional groups/separators) inside. Must come after the trigger in the document for a predictable structure. When **`native`** is `true`, **`Select.Content`** is optional as a structural wrapper; only **`Select.Item`** (and groups) contribute to the DOM **`<select>`**.
+- **`Select.Content`** — when **`native`** is `false`: portaled **`role="listbox"`** with **`display: none`** while closed (nodes stay mounted). Place **`Select.Item`** rows (and optional groups/separators) inside. Must come after the trigger in the document for a predictable structure. When **`native`** is `true`, **`Select.Content`** is optional as a structural wrapper; only **`Select.Item`** (and groups) contribute to the DOM **`<select>`**.
 - **`Select.Item`** — one option per row; optional **`Select.ItemIcon`** children are recognized by component type and rendered before the text. Use **`label`** when the trigger should show different text than the row content.
 - **`Select.Group`** / **`Select.GroupLabel`** / **`Select.Separator`** — optional structure inside **`Select.Content`**.
 
@@ -76,14 +76,44 @@ export function NativeExample() {
 
 You can wrap items in **`Select.Content`** for parity with the composable tree; behavior is the same.
 
-### Extended examples
+### Playground snippets (live demos)
 
-- [`./examples/01-country.tsx`](./examples/01-country.tsx) — Country or region field with **`Label.Root`**, combobox, and helper copy (**`Typography.Root`**).
-- [`./examples/02-controlled.tsx`](./examples/02-controlled.tsx) — Controlled **`value`** / **`onChange`** with subscription tier options.
-- [`./examples/03-groups.tsx`](./examples/03-groups.tsx) — **`Select.Group`**, **`Select.GroupLabel`**, and **`Select.Separator`** for regional time zones.
-- [`./examples/04-full-width-form.tsx`](./examples/04-full-width-form.tsx) — Form column where the trigger spans the track (**`width: 100%`** via kit styles on the trigger; width the parent column).
+These files power **`playground/sections/SelectSection.tsx`** (Russian copy in the playground UI). Order matches the section.
 
-**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition patterns; this page keeps the contract (rules + API tables) authoritative.
+| File | Intent |
+|------|--------|
+| `playground/snippets/select/sizes.tsx` | Four **`size`** values **`s`–`xl`** in one column |
+| `playground/snippets/select/states.tsx` | Placeholder only, **`defaultValue`**, root **`disabled`**, **`hasError`** |
+| `playground/snippets/select/controlled.tsx` | **`value`** / **`onChange`** with caption showing parent state |
+| `playground/snippets/select/composition.tsx` | **`Select.TriggerIcon`**, **`Select.ItemIcon`**, item **`label`** vs short row text |
+| `playground/snippets/select/full-width.tsx` | Trigger fills a narrow shell (**`width: 100%`** from kit styles) |
+| `playground/snippets/select/native.tsx` | **`Select.Root`** **`native`** with optional **`Select.Content`** wrapper |
+| `playground/snippets/select/features.tsx` | **`Group`** / **`GroupLabel`** / **`Separator`**, disabled item, long list + scroll |
+
+### Examples next to this file
+
+Runnable examples use **`@/`** in the workspace; published consumers import **`prime-ui-kit`**. **`pattern-*`** files mirror the playground snippets above in English (same APIs).
+
+| File | Intent |
+|------|--------|
+| `examples/pattern-sizes.tsx` | **`sizes.tsx`** snippet |
+| `examples/pattern-states.tsx` | **`states.tsx`** snippet |
+| `examples/pattern-controlled.tsx` | **`controlled.tsx`** snippet |
+| `examples/pattern-composition.tsx` | **`composition.tsx`** snippet |
+| `examples/pattern-full-width.tsx` | **`full-width.tsx`** snippet |
+| `examples/pattern-native.tsx` | **`native.tsx`** snippet |
+| `examples/pattern-features.tsx` | **`features.tsx`** snippet |
+
+### Additional scenarios
+
+| File | Intent |
+|------|--------|
+| [`./examples/01-country.tsx`](./examples/01-country.tsx) | Visible **`Label.Root`** + **`aria-labelledby`** on **`Select.Trigger`** and helper copy |
+| [`./examples/02-controlled.tsx`](./examples/02-controlled.tsx) | Controlled **`value`** / **`onChange`** with **`Label.Root`** (same tier options as **`pattern-controlled.tsx`**) |
+| [`./examples/03-groups.tsx`](./examples/03-groups.tsx) | Time zones with **`Select.Group`**, **`Select.GroupLabel`**, **`Select.Separator`** |
+| [`./examples/04-full-width-form.tsx`](./examples/04-full-width-form.tsx) | Multi-field form column; triggers span the track |
+
+**LLM note:** Prefer **`pattern-*`** and `playground/snippets/select/*.tsx` for parity with live demos; use **`01`–`04`** for labeled forms and richer scenarios. This page keeps the contract (rules + API tables) authoritative.
 
 ## Rules
 
@@ -106,7 +136,7 @@ You can wrap items in **`Select.Content`** for parity with the composable tree; 
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Trigger and list sizing tokens |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Token tier: trigger height, type scale, padding, icon sizes in trigger and list |
 | value | `string` | — | No | Controlled selected value |
 | defaultValue | `string` | — | No | Initial value when uncontrolled |
 | onChange | `(value: string) => void` | — | No | Fires after a new value is selected |
@@ -147,7 +177,7 @@ You can wrap items in **`Select.Content`** for parity with the composable tree; 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | className | `string` | — | No | Class on the portaled listbox container |
-| children | `React.ReactNode` | — | Yes | Items, groups, and separators |
+| children | `React.ReactNode` | — | Yes | Items, groups, and separators (listbox portal stays mounted; hidden while closed) |
 
 ### Select.Item
 

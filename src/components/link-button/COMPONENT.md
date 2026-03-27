@@ -18,7 +18,35 @@ import { LinkButton } from "prime-ui-kit";
 |--------|------|
 | `LinkButton.Root` | `<a>` with anchor props, or `<span role="link">` when `disabled` |
 
-**Runnable scenarios** (source copies under `examples/`): [inline text in a paragraph](examples/inline-text-link.tsx), [external tab](examples/external.tsx), [footer legal row](examples/footer-legal.tsx), [nav cluster](examples/navigation-cluster.tsx), [disabled](examples/disabled.tsx).
+### Playground demos
+
+Порядок и смысл совпадают с **`playground/sections/LinkButtonSection.tsx`**. Исходники с импортами **`@/`** — в **`playground/snippets/link-button/`**:
+
+| Блок в секции | Сниппет | Содержание |
+|---------------|---------|------------|
+| Размеры | [`sizes.tsx`](../../../playground/snippets/link-button/sizes.tsx) | **`size`** **`s`**–**`xl`**, подписи **LinkButton s** … **xl** |
+| Состояния | [`states.tsx`](../../../playground/snippets/link-button/states.tsx) | Активная с **`href`** и **`disabled`** (span, без перехода) |
+| Композиция с иконками | [`composition.tsx`](../../../playground/snippets/link-button/composition.tsx) | **`Icon`** слева/справа, только иконка + **`aria-label`** |
+| Внешняя ссылка | [`external-link.tsx`](../../../playground/snippets/link-button/external-link.tsx) | **`target="_blank"`** и **`rel="noopener noreferrer"`** |
+
+### Примеры в `examples/`
+
+Импорт **`"prime-ui-kit"`** — для копипаста в приложение. Зеркала сниппетов (та же структура и сценарий):
+
+| Файл | Сниппет playground |
+|------|-------------------|
+| [`sizes.tsx`](examples/sizes.tsx) | [`sizes.tsx`](../../../playground/snippets/link-button/sizes.tsx) |
+| [`disabled.tsx`](examples/disabled.tsx) | [`states.tsx`](../../../playground/snippets/link-button/states.tsx) |
+| [`composition.tsx`](examples/composition.tsx) | [`composition.tsx`](../../../playground/snippets/link-button/composition.tsx) |
+| [`external.tsx`](examples/external.tsx) | [`external-link.tsx`](../../../playground/snippets/link-button/external-link.tsx) |
+
+Дополнительные сценарии (отдельного фрейма в playground нет):
+
+| Файл | Сценарий |
+|------|----------|
+| [`inline-text-link.tsx`](examples/inline-text-link.tsx) | Встроенная ссылка в абзаце, **`size="m"`** |
+| [`footer-legal.tsx`](examples/footer-legal.tsx) | Плотный ряд legal, **`size="s"`** |
+| [`navigation-cluster.tsx`](examples/navigation-cluster.tsx) | Горизонтальная навигация с разделителями |
 
 ## Extended
 
@@ -40,7 +68,7 @@ import { LinkButton } from "prime-ui-kit";
 ### Rules
 
 - **`size`** defaults to **`m`**; valid values are **`"s"`**, **`"m"`**, **`"l"`**, **`"xl"`** (control token tier).
-- With **`disabled={true}`**, **`...rest`** from **`React.AnchorHTMLAttributes`** is **not** applied — the root is a **`span`**, so **`href`**, **`target`**, **`onClick`**, and similar props have **no effect** on the output; do not rely on them for accessibility or behavior in that mode.
+- With **`disabled={true}`**, anchor props (including **`href`**, **`target`**, **`onClick`**) are **not** applied — the root is a **`span`**; do not rely on them for accessibility or behavior in that mode.
 - Active link: native **`<a>`** with your **`href`**; keyboard **Enter** activates like a normal link.
 - Disabled presentation: **`role="link"`**, **`aria-disabled="true"`**, **`tabIndex={-1}`** — not in tab order by default; avoid if the item should remain focusable as a link.
 - For **icon-only** links, provide a name (**`aria-label`** or visible text).
@@ -59,7 +87,8 @@ import { LinkButton } from "prime-ui-kit";
 | disabled | `boolean` | `false` | No | Renders `span` with `role="link"` instead of `a`; no navigation. |
 | children | `React.ReactNode` | — | No | Link content (text, icons, etc.). |
 | className | `string` | — | No | Additional class on the root element. |
-| …rest | `React.AnchorHTMLAttributes<HTMLAnchorElement>` | — | No | Forwarded to `<a>` only when `disabled` is false (e.g. `href`, `target`, `rel`, `download`, `onClick`, `aria-*`, `tabIndex`). |
+| href | `string` | — | No | Navigation target on the active `<a>`; ignored when `disabled` (no `href` on the span). |
+| …anchorProps | `React.AnchorHTMLAttributes<HTMLAnchorElement>` | — | No | Other anchor attributes forwarded to `<a>` only when `disabled` is false (`target`, `rel`, `download`, `onClick`, `aria-*`, `tabIndex`, etc.); `ref` targets `<a>` or the disabled `<span>`. |
 
 ### Related
 
@@ -76,4 +105,4 @@ import { LinkButton } from "prime-ui-kit";
 - **Router:** No **`asChild`** — wrap router **`Link`** by styling it separately or use plain **`<a href>`** from the kit; do not invent a polymorphic API.
 - **Density:** Footer and legal rows → often **`size="s"`**; primary in-sentence link in body copy → usually **`m`** unless the surrounding control tier dictates otherwise.
 - **Icons:** Children can include **`Icon`**; size context flows from **`LinkButton.Root`** — keep icon tier consistent with **`size`** on the root.
-- **Verification:** Cross-check behavior with `examples/*.tsx` and playground `playground/snippets/link-button/`.
+- **Verification:** Таблицы **Playground demos** и **Примеры в `examples/`** выше; исходники сниппетов — `playground/snippets/link-button/*.tsx`.

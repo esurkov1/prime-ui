@@ -4,6 +4,18 @@
   gap: var(--prime-sys-spacing-m);
 }
 
+.compositionStack {
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+  max-width: min(100%, 28rem);
+}
+
+.blockSpacer {
+  margin-top: var(--prime-sys-spacing-l);
+  width: 100%;
+  min-width: 0;
+}
+
 .labelBlock {
   display: flex;
   flex-direction: column;

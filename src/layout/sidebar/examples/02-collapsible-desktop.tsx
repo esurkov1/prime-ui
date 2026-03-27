@@ -4,8 +4,8 @@ import { Sidebar, Typography } from "prime-ui-kit";
 import styles from "./examples.module.css";
 
 /**
- * Desktop collapse: `ToggleButton` cycles expanded → compact → expanded (not the mobile overlay).
- * With `responsive={false}`, narrow viewports keep the inline rail instead of the drawer pattern.
+ * Desktop collapse: встроенная кнопка на грани переключает expanded ↔ compact (не оверлей мобильного режима).
+ * С `responsive={false}` узкое окно сохраняет инлайн-рейл.
  */
 export default function SidebarExampleCollapsibleDesktop() {
   return (
@@ -20,9 +20,12 @@ export default function SidebarExampleCollapsibleDesktop() {
           <Sidebar.Header>
             <Sidebar.HeaderRow>
               <Sidebar.HeaderMain>
-                <Sidebar.Text>Workspace</Sidebar.Text>
+                <Sidebar.IdentityButton
+                  leading={<span aria-hidden="true">W</span>}
+                  title="Workspace"
+                  subtitle="Team"
+                />
               </Sidebar.HeaderMain>
-              <Sidebar.ToggleButton />
             </Sidebar.HeaderRow>
           </Sidebar.Header>
           <Sidebar.Content>
@@ -33,7 +36,7 @@ export default function SidebarExampleCollapsibleDesktop() {
                 tone="muted"
                 className={styles.mainPlaceholder}
               >
-                Use the header control to switch width. In{" "}
+                Use the edge control to switch width. In{" "}
                 <span className={styles.code}>compact</span>, menu rows show icons; tooltips appear
                 on the right for icon-only targets (desktop only).
               </Typography.Root>
@@ -57,6 +60,13 @@ export default function SidebarExampleCollapsibleDesktop() {
               </Sidebar.Menu>
             </Sidebar.NavPanelBody>
           </Sidebar.Content>
+          <Sidebar.Footer>
+            <Sidebar.IdentityButton
+              leading={<span aria-hidden="true">U</span>}
+              title="You"
+              subtitle="Online"
+            />
+          </Sidebar.Footer>
         </Sidebar.NavPanel>
       </Sidebar.Root>
     </div>

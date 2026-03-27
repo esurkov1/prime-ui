@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import TypographyArticleLandmarksSnippet from "../snippets/typography/article-landmarks";
 import articleLandmarksSource from "../snippets/typography/article-landmarks.tsx?raw";
@@ -105,134 +105,139 @@ const typographyRootApiRows: PlaygroundApiPropRow[] = [
 
 export default function TypographySection() {
   return (
-    <PlaygroundDocPage
-      title="Typography"
-      description={
-        <>
-          Текст страницы — семантические роли <code>variant</code> и токены{" "}
-          <code>typography.role</code> (кегли согласованы со шкалой MD3; ориентиры Apple SF и
-          Polaris — в <code>COMPONENT.md</code>). Поля и кнопки оформляются своими компонентами; с{" "}
-          <code>Typography</code> они не смешиваются по API.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты (роли)</DemoSectionTitle>
-          <DemoDescription>
-            Полный набор ролей из <code>typography.role</code> — от <code>display</code> до{" "}
-            <code>caption-micro</code>. Подписи у разделителей: имя <code>variant</code> и краткое
-            назначение.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={variantCatalogSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TypographyVariantCatalogSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Typography</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Текст страницы — семантические роли <code>variant</code> и токены{" "}
+              <code>typography.role</code> (кегли согласованы со шкалой MD3; ориентиры Apple SF и
+              Polaris — в <code>COMPONENT.md</code>). Поля и кнопки оформляются своими компонентами;
+              с <code>Typography</code> они не смешиваются по API.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты (роли)</DemoSectionTitle>
+            <DemoDescription>
+              Полный набор ролей из <code>typography.role</code> — от <code>display</code> до{" "}
+              <code>caption-micro</code>. Подписи у разделителей: имя <code>variant</code> и краткое
+              назначение.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={variantCatalogSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TypographyVariantCatalogSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Статья и цитата</DemoSectionTitle>
-          <DemoDescription>
-            Landmarks (<code>article</code>, <code>section</code>, <code>header</code>), заголовки{" "}
-            <code>h1</code>–<code>h2</code> и <code>blockquote</code> с <code>Typography</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={articleLandmarksSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TypographyArticleLandmarksSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Статья и цитата</DemoSectionTitle>
+            <DemoDescription>
+              Landmarks (<code>article</code>, <code>section</code>, <code>header</code>), заголовки{" "}
+              <code>h1</code>–<code>h2</code> и <code>blockquote</code> с <code>Typography</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={articleLandmarksSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TypographyArticleLandmarksSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Страница и форма</DemoSectionTitle>
-          <DemoDescription>
-            Один фрейм: заголовок и пояснение — <code>Typography</code>; поля и действия —{" "}
-            <code>Input</code> и <code>Button</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={readingAndFormSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TypographyReadingAndFormSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Страница и форма</DemoSectionTitle>
+            <DemoDescription>
+              Один фрейм: заголовок и пояснение — <code>Typography</code>; поля и действия —{" "}
+              <code>Input</code> и <code>Button</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={readingAndFormSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TypographyReadingAndFormSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты начертания</DemoSectionTitle>
-          <DemoDescription>
-            На одном <code>variant=&quot;body-default&quot;</code>: <code>weight</code>, крайние{" "}
-            <code>tracking</code> и <code>tone=&quot;muted&quot;</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TypographyVariantsSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты начертания</DemoSectionTitle>
+            <DemoDescription>
+              На одном <code>variant=&quot;body-default&quot;</code>: <code>weight</code>, крайние{" "}
+              <code>tracking</code> и <code>tone=&quot;muted&quot;</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TypographyVariantsSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Интерактивных состояний у текста нет; показан курсив <code>italic</code> при том же{" "}
-            <code>variant</code> и <code>weight</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TypographyStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Интерактивных состояний у текста нет; показан курсив <code>italic</code> при том же{" "}
+              <code>variant</code> и <code>weight</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TypographyStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция</DemoSectionTitle>
-          <DemoDescription>
-            Вложенные <code>Typography.Root</code> с разными <code>as</code> и <code>weight</code>,
-            плюс ссылка внутри родительского блока.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TypographyCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Вложенные <code>Typography.Root</code> с разными <code>as</code> и <code>weight</code>
+              , плюс ссылка внутри родительского блока.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TypographyCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Full width</DemoSectionTitle>
-          <DemoDescription>
-            Два контейнера разной ширины: одинаковые <code>variant</code> и <code>tone</code> для
-            подписи и основного текста.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TypographyFullWidthSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoDescription>
+              Два контейнера разной ширины: одинаковые <code>variant</code> и <code>tone</code> для
+              подписи и основного текста.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TypographyFullWidthSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Тег as</DemoSectionTitle>
-          <DemoDescription>
-            <code>as=&quot;p&quot;</code>, <code>as=&quot;div&quot;</code> и вложенный{" "}
-            <code>as=&quot;span&quot;</code> внутри абзаца.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={asPropSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TypographyAsPropSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Тег as</DemoSectionTitle>
+            <DemoDescription>
+              <code>as=&quot;p&quot;</code>, <code>as=&quot;div&quot;</code> и вложенный{" "}
+              <code>as=&quot;span&quot;</code> внутри абзаца.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={asPropSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TypographyAsPropSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Typography.Root</DemoApiTitle>
-          <DemoDescription>
-            Стилизованный текст с обязательным <code>variant</code> и опциональными осями
-            оформления; в DOM — <code>data-variant</code> (и прочие <code>data-*</code> по правилам
-            кита).
-          </DemoDescription>
-          <PlaygroundApiTable rows={typographyRootApiRows} />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Typography.Root</DemoApiTitle>
+            <DemoDescription>
+              Стилизованный текст с обязательным <code>variant</code> и опциональными осями
+              оформления; в DOM — <code>data-variant</code> (и прочие <code>data-*</code> по
+              правилам кита).
+            </DemoDescription>
+            <PlaygroundApiTable rows={typographyRootApiRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

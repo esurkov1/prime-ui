@@ -17,8 +17,8 @@ const footerStyle: React.CSSProperties = {
 };
 
 /**
- * Items with `disabled` are omitted from the filtered list and keyboard order (not shown as gray rows).
- * Use conditional rendering instead if you need a visible “locked” row.
+ * Disabled items, empty `value` (always visible in results), and notes on empty filter UX.
+ * `disabled` rows are omitted from the list and keyboard order — not grayed in place.
  */
 export default function CommandMenuExampleDisabledItems() {
   const [open, setOpen] = React.useState(false);
@@ -48,6 +48,9 @@ export default function CommandMenuExampleDisabledItems() {
             >
               Publish
             </CommandMenu.Item>
+            <CommandMenu.Item value="" keywords="" onSelect={() => setOpen(false)}>
+              Always visible — empty value ignores the filter query
+            </CommandMenu.Item>
           </CommandMenu.Group>
           {/* `disabled` items are excluded from visible options — this row never appears in the listbox */}
           <CommandMenu.Group heading="Hidden when disabled">
@@ -64,7 +67,8 @@ export default function CommandMenuExampleDisabledItems() {
         <CommandMenu.Footer style={footerStyle}>
           <Typography.Root variant="body-compact" tone="muted">
             Searching “delete” finds no option: the dangerous action is disabled and removed from
-            the palette, not listed as inactive.
+            the palette, not listed as inactive. If nothing matches, groups collapse — add your own
+            empty state below the list if needed.
           </Typography.Root>
         </CommandMenu.Footer>
       </CommandMenu.Dialog>

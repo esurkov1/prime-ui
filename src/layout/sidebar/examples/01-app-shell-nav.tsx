@@ -5,6 +5,7 @@ import styles from "./examples.module.css";
 
 /**
  * Primary app layout: `AppShell.Template` nav slot holds `Sidebar` with `sidebarSlot="page-nav"`.
+ * `NavPanel` включает встроенную кнопку на грани (`data-placement="edge"`); режим — через `Sidebar.Root`.
  */
 export default function SidebarExampleAppShellNav() {
   return (
@@ -24,9 +25,12 @@ export default function SidebarExampleAppShellNav() {
               <Sidebar.Header>
                 <Sidebar.HeaderRow>
                   <Sidebar.HeaderMain>
-                    <Sidebar.Text>Acme Console</Sidebar.Text>
+                    <Sidebar.IdentityButton
+                      leading={<span aria-hidden="true">A</span>}
+                      title="Acme Console"
+                      subtitle="Production workspace"
+                    />
                   </Sidebar.HeaderMain>
-                  <Sidebar.ToggleButton />
                 </Sidebar.HeaderRow>
               </Sidebar.Header>
               <Sidebar.Content>
@@ -57,6 +61,13 @@ export default function SidebarExampleAppShellNav() {
                   </Sidebar.MenuItem>
                 </Sidebar.Menu>
               </Sidebar.Content>
+              <Sidebar.Footer>
+                <Sidebar.IdentityButton
+                  leading={<span aria-hidden="true">●</span>}
+                  title="Signed in"
+                  subtitle="user@acme.dev"
+                />
+              </Sidebar.Footer>
             </Sidebar.NavPanel>
           </Sidebar.Root>
         }

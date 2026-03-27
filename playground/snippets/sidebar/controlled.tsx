@@ -34,9 +34,13 @@ export default function SidebarControlledSnippet() {
             <Sidebar.Header>
               <Sidebar.HeaderRow>
                 <Sidebar.HeaderMain>
-                  <Sidebar.Text>Панель</Sidebar.Text>
+                  <Sidebar.IdentityButton
+                    leading={<span aria-hidden="true">P</span>}
+                    title="Панель"
+                    subtitle="Контролируемая"
+                    type="button"
+                  />
                 </Sidebar.HeaderMain>
-                <Sidebar.ToggleButton />
               </Sidebar.HeaderRow>
             </Sidebar.Header>
             <Sidebar.Content>
@@ -61,6 +65,14 @@ export default function SidebarControlledSnippet() {
                 </Sidebar.Menu>
               </Sidebar.NavPanelBody>
             </Sidebar.Content>
+            <Sidebar.Footer>
+              <Sidebar.IdentityButton
+                leading={<span aria-hidden="true">API</span>}
+                title="Состояние"
+                subtitle="state / onStateChange"
+                type="button"
+              />
+            </Sidebar.Footer>
           </Sidebar.NavPanel>
         </Sidebar.Root>
       </div>

@@ -5,7 +5,7 @@ import * as React from "react";
 import styles from "./examples.module.css";
 
 /**
- * Controlled rail: parent owns `state` / `onStateChange` (here limited to expanded vs hidden for clarity).
+ * Контролируемый режим: родитель задаёт `state` / `onStateChange`; кнопка на грани панели вызывает то же переключение через контекст.
  */
 export default function SidebarExampleControlledState() {
   const [state, setState] = React.useState<SidebarLayoutMode>("expanded");
@@ -37,9 +37,12 @@ export default function SidebarExampleControlledState() {
             <Sidebar.Header>
               <Sidebar.HeaderRow>
                 <Sidebar.HeaderMain>
-                  <Sidebar.Text>Panel</Sidebar.Text>
+                  <Sidebar.IdentityButton
+                    leading={<span aria-hidden="true">P</span>}
+                    title="Panel"
+                    subtitle="Controlled"
+                  />
                 </Sidebar.HeaderMain>
-                <Sidebar.ToggleButton />
               </Sidebar.HeaderRow>
             </Sidebar.Header>
             <Sidebar.Content>
@@ -64,6 +67,13 @@ export default function SidebarExampleControlledState() {
                 </Sidebar.Menu>
               </Sidebar.NavPanelBody>
             </Sidebar.Content>
+            <Sidebar.Footer>
+              <Sidebar.IdentityButton
+                leading={<span aria-hidden="true">●</span>}
+                title="API"
+                subtitle="state / onStateChange"
+              />
+            </Sidebar.Footer>
           </Sidebar.NavPanel>
         </Sidebar.Root>
       </div>

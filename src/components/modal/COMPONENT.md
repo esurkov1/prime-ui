@@ -80,21 +80,35 @@ export function InviteTeammateModal() {
 }
 ```
 
-Source of truth (stays in sync with the snippet above): `examples/canonical-maximal.tsx`.
+Source of truth (stays in sync with the block above): `examples/canonical-maximal.tsx`.
 
-### Examples (source)
+### Playground snippets (live demos)
 
-Runnable demos live next to this file (workspace imports use `@/`; published consumers use `prime-ui-kit`):
+These files power **`playground/sections/ModalSection.tsx`** (Russian copy in UI strings). Order matches the section.
+
+| File | Intent |
+|------|--------|
+| `playground/snippets/modal/composition.tsx` | Several **`Modal.Root`** demos: header-only, header+body, form, **`LinkButton`** trigger, legal-style copy |
+| `playground/snippets/modal/states.tsx` | Default Escape/overlay dismiss vs **`closeOnEscape={false}`** **`closeOnOverlayClick={false}`** + **`showClose={false}`** |
+| `playground/snippets/modal/controlled.tsx` | **`open`** / **`onOpenChange`** without **`Modal.Trigger`** |
+| `playground/snippets/modal/full-width.tsx` | Footer stack with **`Button.Root`** **`fullWidth`** (uses playground **`previewBannerColumn`**) |
+| `playground/snippets/modal/features.tsx` | **`container`** portal host + long body with **`bodyStyle`** scroll |
+
+### Examples next to this file
+
+Runnable examples use `@/` in the workspace; published consumers import **`prime-ui-kit`**. **`pattern-*`** files mirror the playground snippets above in English (same APIs).
 
 | File | Intent |
 |------|--------|
 | `examples/canonical-maximal.tsx` | Full shell: title, description, icon, one field, footer with **`Modal.Close`** + primary |
+| `examples/pattern-controlled.tsx` | Controlled open state (pairs with **`controlled.tsx`** snippet) |
+| `examples/pattern-close-behavior.tsx` | Default vs strict dismiss (pairs with **`states.tsx`** snippet) |
+| `examples/pattern-full-width-footer.tsx` | Full-width footer actions (pairs with **`full-width.tsx`** snippet) |
+| `examples/pattern-portal-and-scroll.tsx` | **`container`** + **`bodyStyle`** scroll (pairs with **`features.tsx`** snippet) |
 | `examples/scenario-confirm-delete.tsx` | Destructive confirmation; **`variant="error"`** on primary action |
 | `examples/scenario-edit-entity.tsx` | Rename / edit field; **Save** wrapped in **`Modal.Close`** to dismiss after save |
 | `examples/scenario-legal-consent.tsx` | Terms-style copy; **`closeOnOverlayClick={false}`**; single **I agree** closes via **`Modal.Close`** |
 | `examples/scenario-multi-field-form.tsx` | **`Input`**, **`Select`**, **`Textarea`** in the body; submit button uses **`form`** |
-
-Playground composition demos (Russian copy, broader variants): `playground/snippets/modal/composition.tsx`.
 
 ### Extended usage
 
@@ -106,7 +120,7 @@ Playground composition demos (Russian copy, broader variants): `playground/snipp
 
 ### Note for LLMs
 
-When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and **`Modal.Close`** each require **exactly one** child element—no fragments or multiple nodes. (2) Prefer **`Modal.Panel`** with **`title`** (and usually **`description`**) so **`aria-labelledby`** / **`aria-describedby`** are wired automatically. (3) Put **Cancel** / **Dismiss** in **`footer`** inside **`Modal.Close`** unless the design relies only on the header icon. (4) Do not wrap kit components to restyle them; use **`size`**, **`variant`**, **`mode`**, and documented props only. (5) For copy-paste starting points, mirror **`examples/canonical-maximal.tsx`** first, then adapt from the scenario files.
+When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and **`Modal.Close`** each require **exactly one** child element—no fragments or multiple nodes. (2) Prefer **`Modal.Panel`** with **`title`** (and usually **`description`**) so **`aria-labelledby`** / **`aria-describedby`** are wired automatically. (3) Put **Cancel** / **Dismiss** in **`footer`** inside **`Modal.Close`** unless the design relies only on the header icon. (4) Do not wrap kit components to restyle them; use **`size`**, **`variant`**, **`mode`**, and documented props only. (5) For copy-paste starting points, mirror **`examples/canonical-maximal.tsx`** first, then **`examples/pattern-*`** or scenario files; playground **`playground/snippets/modal/*.tsx`** are the live-demo source of truth.
 
 ## Rules
 
@@ -157,7 +171,7 @@ When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and *
 | closeAriaLabel | `string` | `"Close"` | No | `aria-label` for the header close control |
 | children | `React.ReactNode` | — | No | Main content; wrapped in internal body when `title` is set |
 | footer | `React.ReactNode` | — | No | Rendered in an internal `footer` |
-| container | `HTMLElement \| null` | — | No | Portal container; default `document.body` |
+| container | `HTMLElement \| null` | `document.body` | No | Portal mount node |
 | overlayClassName | `string` | — | No | Class on the fullscreen backdrop |
 | footerClassName | `string` | — | No | Class on the `footer` element |
 | bodyClassName | `string` | — | No | Class on the internal body when `title` is set |

@@ -12,11 +12,6 @@ body {
   transition: background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
-.playgroundDocPage {
-  box-sizing: border-box;
-  width: 100%;
-}
-
 .playgroundContextLogo {
   box-sizing: border-box;
   display: grid;
@@ -463,15 +458,6 @@ h3 {
  * PageContent — в плейграунде колонка уже ограничена padding’ом main; узкая мера дублировала поля.
  */
 .demoBlockDescription {
-  margin: 0;
-  max-width: 100%;
-}
-
-.playgroundDocPageTitle {
-  margin: 0;
-}
-
-.playgroundDocPageDescription {
   margin: 0;
   max-width: 100%;
 }

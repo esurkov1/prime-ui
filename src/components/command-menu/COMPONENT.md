@@ -10,7 +10,7 @@
 - **Filtering:** case-insensitive match on **`Item`** **`value`** + **`keywords`**; empty query shows all non-disabled items. **`disabled`** items are **dropped from the visible list and keyboard order** (not grayed in-place).
 - **Input:** uncontrolled by default; **`value`** / **`onChange`** for controlled. **`type`** is fixed to `search`. From the combobox: ArrowUp/Down, Home, End, Enter (activate), Escape closes via Modal.
 - **Remount:** opening a fresh dialog subtree resets search, active id, and focuses the input on the next frame.
-- **Examples (TSX):** [`examples/app-palette.tsx`](./examples/app-palette.tsx), [`examples/file-search.tsx`](./examples/file-search.tsx), [`examples/quick-actions.tsx`](./examples/quick-actions.tsx), [`examples/disabled-items.tsx`](./examples/disabled-items.tsx).
+- **Demos:** playground snippets in **`playground/snippets/command-menu/`** (order matches **`playground/sections/CommandMenuSection.tsx`**); package recipes in **`examples/`** (see **Playground snippets** + **Package examples** below).
 
 ## Extended
 
@@ -63,16 +63,35 @@ export function Example() {
 }
 ```
 
-### Scenario examples (source)
+### Playground snippets
 
-| File | Scenario |
-|------|----------|
-| [examples/app-palette.tsx](./examples/app-palette.tsx) | Global app palette (pages + settings), ⌘K, footer key hints |
-| [examples/file-search.tsx](./examples/file-search.tsx) | File list: **`value`** / **`keywords`** for paths and tokens, **`ItemIcon`** |
-| [examples/quick-actions.tsx](./examples/quick-actions.tsx) | Contextual quick actions (clipboard, people) in groups |
-| [examples/disabled-items.tsx](./examples/disabled-items.tsx) | **`disabled`** excludes items from the list (not inactive rows) |
+Same order as **`playground/sections/CommandMenuSection.tsx`**. Sources use `@/` under **`playground/snippets/command-menu/`**:
 
-Playground mirrors: `playground/snippets/command-menu/*`.
+| Block | File | What it shows |
+|-------|------|----------------|
+| **Варианты** | [`variants-density-items.tsx`](../../../playground/snippets/command-menu/variants-density-items.tsx) | **`InputRow`** **`density`** (`compact` / `comfortable`) and **`Item`** **`size`** (`s` / `m`). |
+| **Состояния** | [`states-disabled-filter.tsx`](../../../playground/snippets/command-menu/states-disabled-filter.tsx) | **`disabled`** (excluded from navigation), empty **`value`** (always in results), footer note on empty filter. |
+| **Контролируемый режим** | [`controlled-open-search.tsx`](../../../playground/snippets/command-menu/controlled-open-search.tsx) | **`Dialog`** **`open`** / **`onOpenChange`** and controlled **`Input`** **`value`** / **`onChange`**. |
+| **Композиция** | [`composition-tags-footer.tsx`](../../../playground/snippets/command-menu/composition-tags-footer.tsx) | Custom title, **`InputRow`** **`leading`** / **`trailing`** (**`Kbd`**, close), **`TagSection`**, **`ItemIcon`**, **`Footer`**. |
+| **Full width** | [`full-width-panel.tsx`](../../../playground/snippets/command-menu/full-width-panel.tsx) | Wider panel via **`className`** on **`Dialog`** (playground: demo class; apps: e.g. **`dialogContentWide`** from **`CommandMenu.module.css`**). |
+| **Полиморфная разметка** | [`item-icon-as.tsx`](../../../playground/snippets/command-menu/item-icon-as.tsx) | **`ItemIcon`** **`as`** — SVG component or **`span`**. |
+| **Специфичные фичи** | [`features-keyboard-search.tsx`](../../../playground/snippets/command-menu/features-keyboard-search.tsx) | Global ⌘K / Ctrl+K, **`keywords`**, **`FooterKeyBox`** hints. |
+
+### Package examples (`examples/`)
+
+Runnable recipes use **`@/`** imports in-repo (consumers: **`prime-ui-kit`**). Aligned with the playground blocks above where noted.
+
+| Playground block | File |
+|------------------|------|
+| Варианты | [`variants-density-items.tsx`](./examples/variants-density-items.tsx) |
+| Состояния | [`disabled-items.tsx`](./examples/disabled-items.tsx) |
+| Контролируемый режим | [`controlled-open-search.tsx`](./examples/controlled-open-search.tsx) |
+| Композиция | [`composition-tags-footer.tsx`](./examples/composition-tags-footer.tsx) |
+| Full width | [`full-width-panel.tsx`](./examples/full-width-panel.tsx) |
+| Полиморфная разметка | [`item-icon-as.tsx`](./examples/item-icon-as.tsx) |
+| Специфичные фичи | [`app-palette.tsx`](./examples/app-palette.tsx) |
+| (extra) File list + **`keywords`** | [`file-search.tsx`](./examples/file-search.tsx) |
+| (extra) Grouped quick actions | [`quick-actions.tsx`](./examples/quick-actions.tsx) |
 
 ### Rules
 
@@ -125,7 +144,7 @@ Playground mirrors: `playground/snippets/command-menu/*`.
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| value | `string` (and other input value types) | — | no | Controlled value; when set, filters sync from this value |
+| value | `string \| number \| readonly string[]` | — | no | Controlled value; when set, filters sync from this value |
 | onChange | `React.ChangeEventHandler<HTMLInputElement>` | — | no | Standard change handler; internal state updates when uncontrolled |
 | className | `string` | — | no | Input class |
 | …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" \| "type">` | — | no | Other attributes except `size` and `type` (`type` is fixed to `search`) |
@@ -192,4 +211,4 @@ Polymorphic icon slot: `as` (element type, default `"span"`), `className`, and r
 
 ## LLM note
 
-When generating or refactoring CommandMenu usage: import **`CommandMenu`** from **`prime-ui-kit`** only; do not reimplement modal, listbox, or filter logic. Always pass **`open`** / **`onOpenChange`** (or **`defaultOpen`**) on **`Dialog`**, put **`Input`** inside **`InputRow`** for standard chrome, and give **`Input`** an **`aria-label`** (or associated label). Every **`Item`** needs a **`value`** string; add **`keywords`** for synonyms and path segments. Do not set **`disabled`** expecting a visible inactive row—those entries are removed from the palette; use conditional JSX or a non-**`Item`** hint if the UX must mention unavailable actions. For global palettes, document **`aria-labelledby`** + **`DialogTitle`** **`id`**. Prefer the four **`examples/*.tsx`** files as structural templates (app routes, file picker, actions, disabled semantics).
+When generating or refactoring CommandMenu usage: import **`CommandMenu`** from **`prime-ui-kit`** only; do not reimplement modal, listbox, or filter logic. Always pass **`open`** / **`onOpenChange`** (or **`defaultOpen`**) on **`Dialog`**, put **`Input`** inside **`InputRow`** for standard chrome, and give **`Input`** an **`aria-label`** (or associated label). Every **`Item`** needs a **`value`** string (use **`""`** only when the row must stay visible for any query); add **`keywords`** for synonyms and path segments. Do not set **`disabled`** expecting a visible inactive row—those entries are removed from the palette; use conditional JSX or a non-**`Item`** hint if the UX must mention unavailable actions. For global palettes, document **`aria-labelledby`** + **`DialogTitle`** **`id`**. Mirror **`playground/snippets/command-menu/*`** and **`examples/*.tsx`** for density, controlled search, composition, wide panel, **`ItemIcon`**, keyboard shortcut + footer, file search, quick actions, and disabled / empty-value behavior.

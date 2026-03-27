@@ -1,6 +1,6 @@
 import { Card, Icon, ProgressCircle, Typography } from "prime-ui-kit";
 
-/** KPI tile with a ring in `Card.Media` — typical dashboard density. */
+/** KPI tile with a ring in `Card.Media` — extended pattern; no matching `circle-*` playground snippet. */
 export default function DashboardRingExample() {
   return (
     <Card.Root variant="mini-media">

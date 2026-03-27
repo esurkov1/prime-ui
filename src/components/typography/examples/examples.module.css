@@ -28,3 +28,68 @@
   flex-direction: column;
   gap: var(--prime-sys-spacing-m);
 }
+
+/* Layout parity with playground/snippets/typography (PlaygroundExampleFrame preview). */
+.typographyScaleList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x4);
+}
+
+.typographyScaleRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.articleLandmarks {
+  display: grid;
+  gap: var(--prime-sys-spacing-x4);
+  max-width: 40rem;
+  text-align: start;
+}
+
+.articleLandmarks blockquote {
+  margin: 0;
+  padding-inline-start: var(--prime-sys-spacing-x3);
+  border-inline-start: 3px solid var(--prime-sys-color-border-subtle);
+}
+
+.readingAndForm {
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+  max-width: 22rem;
+  text-align: start;
+}
+
+.readingAndFormFields {
+  display: grid;
+  gap: var(--prime-sys-spacing-x3);
+}
+
+.readingAndFormActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x2);
+}
+
+.fullWidthColumns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-l);
+}
+
+.fullWidthNarrow {
+  flex: 1 1 12.5rem;
+  min-width: 0;
+  max-width: 17.5rem;
+}
+
+.fullWidthWide {
+  flex: 2 1 20rem;
+  min-width: 0;
+}
+
+.inlineLinkInherit {
+  color: inherit;
+}

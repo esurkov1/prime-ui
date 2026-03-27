@@ -1,5 +1,7 @@
 import { Minus, Plus } from "lucide-react";
-import { Accordion, LinkButton, Typography } from "prime-ui-kit";
+import { Accordion } from "@/components/accordion/Accordion";
+import { LinkButton } from "@/components/link-button/LinkButton";
+import { Typography } from "@/components/typography/Typography";
 
 import styles from "./examples.module.css";
 

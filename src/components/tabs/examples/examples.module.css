@@ -56,3 +56,24 @@
   color: var(--prime-sys-color-content-muted);
   font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
 }
+
+.sizesRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x6);
+  align-items: stretch;
+  width: 100%;
+}
+
+.sizesGroup {
+  width: 100%;
+  min-width: 0;
+}
+
+.sizesLabel {
+  margin: 0 0 var(--prime-sys-spacing-x2);
+  font-size: var(--prime-sys-size-control-s-supportText);
+  font-weight: var(--prime-sys-typography-weight-medium);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-sys-color-content-secondary);
+}

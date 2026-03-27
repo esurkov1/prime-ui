@@ -14,17 +14,20 @@ export default function SidebarExampleResponsiveBehavior() {
       <Typography.Root as="p" variant="body-small" tone="muted" className={styles.note}>
         Narrow viewport matches <span className={styles.code}>{SIDEBAR_MEDIA_QUERY_NARROW}</span>{" "}
         (under <span className={styles.code}>48rem</span>). Resize the preview to see overlay
-        behavior; at wider widths the rail stays inline and{" "}
-        <span className={styles.code}>ToggleButton</span> cycles expanded and compact.
+        behavior; at wider widths the rail stays inline and the built-in edge control cycles
+        expanded and compact.
       </Typography.Root>
       <Sidebar.Root size="m" aria-label="Responsive sidebar">
         <Sidebar.NavPanel>
           <Sidebar.Header>
             <Sidebar.HeaderRow>
               <Sidebar.HeaderMain>
-                <Sidebar.Text>Inbox</Sidebar.Text>
+                <Sidebar.IdentityButton
+                  leading={<span aria-hidden="true">I</span>}
+                  title="Inbox"
+                  subtitle="Responsive"
+                />
               </Sidebar.HeaderMain>
-              <Sidebar.ToggleButton />
             </Sidebar.HeaderRow>
           </Sidebar.Header>
           <Sidebar.Content>
@@ -39,6 +42,13 @@ export default function SidebarExampleResponsiveBehavior() {
               </Sidebar.MenuItem>
             </Sidebar.Menu>
           </Sidebar.Content>
+          <Sidebar.Footer>
+            <Sidebar.IdentityButton
+              leading={<span aria-hidden="true">◇</span>}
+              title="Status"
+              subtitle="Adaptive layout"
+            />
+          </Sidebar.Footer>
         </Sidebar.NavPanel>
       </Sidebar.Root>
     </div>

@@ -33,15 +33,20 @@ export function Example() {
 
 For **icon + label**, **several `variant` / `mode` pairs**, and **`loading` with `Button.Spinner`**, open **`examples/canonical-composition.tsx`** next to this file. Imports use **`"prime-ui-kit"`** so the same snippets work in an app after installing the package.
 
+The playground Button section (`playground/sections/ButtonSection.tsx`) renders snippets from `playground/snippets/button/*.tsx`. The examples **`sizes-ladder`**, **`icon-composition`**, and **`full-width-stack`** mirror the **Размеры**, **Композиция**, and **Full width** demos there (same structure and labels; app-ready imports).
+
 ### Example files in `examples/`
 
 | File | Scenario |
 |------|----------|
+| `sizes-ladder.tsx` | `size` `s`–`xl` at `variant="primary"` `mode="filled"` (playground: `snippets/button/sizes.tsx`) |
+| `icon-composition.tsx` | `Button.Icon` left/right and icon-only with `aria-label`; primary filled + neutral stroke rows (`snippets/button/composition.tsx`) |
+| `full-width-stack.tsx` | `fullWidth` primary filled and neutral stroke at `m` (`snippets/button/full-width.tsx`) |
 | `canonical-composition.tsx` | Icon + text, variant/mode mix, loading + spinner |
 | `form-submit-row.tsx` | English form footer: cancel vs submit, async loading |
 | `destructive-confirm.tsx` | English confirm dialog: `error` + `Modal` |
 | `toolbar.tsx` | English editor-style toolbar: ghost row + primary action |
-| `marketing-cta.tsx` | English CTA column: `fancy` + `fullWidth` |
+| `marketing-cta.tsx` | English CTA column: `fancy` + `xl` / `l` with `fullWidth` (marketing emphasis; see also `full-width-stack.tsx`) |
 
 ### Note for LLMs
 

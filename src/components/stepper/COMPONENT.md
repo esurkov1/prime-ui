@@ -29,6 +29,26 @@ Multi-step progress UI on a semantic ordered list (`<ol>` / `<li>`) for **`Stepp
 - **`HorizontalStepper.Root`** — non-semantic **`div`** rail; children: **`SeparatorIcon`** and **`Item`** buttons, each with **`ItemIndicator`** inside.
 - **`VerticalStepper.Root`** — non-semantic **`div`** column; children: **`Item`** rows with **`ItemIndicator`**, label text, and optional **`Arrow`**.
 
+### Scenarios (playground + `examples/`)
+
+Live demos use **`playground/snippets/stepper/*.tsx`** (see **`playground/sections/StepperSection.tsx`**). The table lists the same scenarios with package-oriented copies under **`examples/`** (aligned 1:1 with those snippets; order matches the playground section).
+
+| Scenario | What it shows | `examples/` |
+|----------|---------------|-------------|
+| Sizes | Four **`size`** values on **`Stepper.Root`** (`s`–`xl`), same three steps per row. | [`examples/sizes.tsx`](examples/sizes.tsx) |
+| Low-level API | **`HorizontalStepper`** and **`VerticalStepper`** with explicit per-row **`state`** (no **`currentStep`** / semantic **`<ol>`**). | [`examples/low-level-api.tsx`](examples/low-level-api.tsx) |
+| States | **`disabled`** step and **`status="error"`** with custom **`Indicator`** content. | [`examples/states.tsx`](examples/states.tsx) |
+| Orientation | **`orientation="horizontal"`** with **`SeparatorIcon`**; vertical default with **`Stepper.Arrow`** on steps. | [`examples/orientation.tsx`](examples/orientation.tsx) |
+| Controlled | Parent **`currentStep`** plus **Back** / **Next** **`Button`** actions. | [`examples/controlled.tsx`](examples/controlled.tsx) |
+| Composition | Custom **`Indicator`**, **`Content`**, and an extra icon beside the label (**`IconMail`**). | [`examples/composition.tsx`](examples/composition.tsx) |
+| Full width | Horizontal rail spanning a wide card; root **`className`** spreads steps (**`width: 100%`**, **`justify-content: space-between`**). | [`examples/full-width.tsx`](examples/full-width.tsx) |
+| Polymorphic **`as`** | **`HorizontalStepper.SeparatorIcon`** and **`VerticalStepper.Arrow`** with **`as={IconHouse}`** / **`as={IconMail}`**. | [`examples/polymorphic-as.tsx`](examples/polymorphic-as.tsx) |
+| Features | **`Stepper.Item`** / **`ItemIndicator`** aliases, explicit **`index`**, **`SeparatorIcon`** as separate list items. | [`examples/features.tsx`](examples/features.tsx) |
+
+**Additional narrative examples** (not duplicated as snippet files): checkout horizontal rail → [`examples/01-checkout-horizontal.tsx`](examples/01-checkout-horizontal.tsx); onboarding + back/next → [`examples/02-onboarding-vertical.tsx`](examples/02-onboarding-vertical.tsx); vertical primitive rail → [`examples/03-vertical-primitive-rail.tsx`](examples/03-vertical-primitive-rail.tsx); error step + **`currentStep`** on payment → [`examples/04-checkout-step-error.tsx`](examples/04-checkout-step-error.tsx); horizontal primitive only → [`examples/05-horizontal-primitive.tsx`](examples/05-horizontal-primitive.tsx).
+
+**LLM note:** Prefer `./examples/*.tsx` for runnable scenarios; this page keeps rules and API tables authoritative.
+
 ### Canonical example
 
 ```tsx
@@ -56,16 +76,6 @@ export function Example() {
 }
 ```
 
-### Extended examples
-
-- [`./examples/01-checkout-horizontal.tsx`](./examples/01-checkout-horizontal.tsx) — Checkout: **`orientation="horizontal"`**, **`Stepper.SeparatorIcon`** between steps, controlled index on click.
-- [`./examples/02-onboarding-vertical.tsx`](./examples/02-onboarding-vertical.tsx) — Onboarding: vertical semantic **`Stepper`**, **`Stepper.Arrow`**, external **Back** / **Next** buttons.
-- [`./examples/03-vertical-primitive-rail.tsx`](./examples/03-vertical-primitive-rail.tsx) — Vertical rail: **`VerticalStepper`** with app-owned **`state`** per row.
-- [`./examples/04-checkout-step-error.tsx`](./examples/04-checkout-step-error.tsx) — Checkout: **`status="error"`** on a middle step while **`currentStep`** points at payment.
-- [`./examples/05-horizontal-primitive.tsx`](./examples/05-horizontal-primitive.tsx) — Horizontal primitive: **`HorizontalStepper`** + **`SeparatorIcon`**, explicit **`state`**.
-
-**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and composition patterns; this page keeps the contract (rules + API tables) authoritative.
-
 ## Rules
 
 - **`Stepper.Root`**: **`currentStep`** defaults to **`0`**; indices before it are **`completed`**, the equal index is **`active`**, after are **`pending`**. Override any step with **`status`** on **`Stepper.Step`** (e.g. **`error`**).
@@ -88,7 +98,7 @@ Exported types include **`StepStatus`**, **`StepperOrientation`**, **`StepperSiz
 | currentStep | `number` | `0` | No | Active step index for default statuses |
 | size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control tier for the subtree |
 | children | `React.ReactNode` | — | Yes | Steps and optional **`SeparatorIcon`** |
-| className | `string` | — | No | Class on **`<ol>`** |
+| className | `string` | — | No | Class on **`<ol>`** (e.g. full-width horizontal rail: **`width: 100%`** and **`justify-content: space-between`** to override the default centered flex layout) |
 
 ### Stepper.Step (Stepper.Item)
 

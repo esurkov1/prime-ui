@@ -40,57 +40,46 @@ export function Example() {
 
 ### Canonical panel (reference)
 
-Typical English recipe: stroke **`Button.Root`** trigger, **`insetPadding` / `insetGap`**, and short body copy. Source of truth (stays in sync with the snippet mindset below): **`examples/canonical-panel.tsx`**.
+Short English recipe (stroke trigger, **`insetPadding` / `insetGap`**, body copy): **`examples/canonical-panel.tsx`**.
 
-```tsx
-import { Button, Popover, Typography } from "prime-ui-kit";
+### Playground-aligned examples
 
-export function ShippingEstimatePopover() {
-  return (
-    <Popover.Root>
-      <Popover.Trigger asChild>
-        <Button.Root mode="stroke" size="m" variant="neutral">
-          View details
-        </Button.Root>
-      </Popover.Trigger>
-      <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom" size="m">
-        <Typography.Root as="p" variant="body-small" weight="semibold">
-          Shipping estimate
-        </Typography.Root>
-        <Typography.Root as="p" variant="body-small">
-          Arrives Tuesday–Thursday for metro addresses. Rural routes may add one business day.
-        </Typography.Root>
-      </Popover.Content>
-    </Popover.Root>
-  );
-}
-```
+**`playground/sections/PopoverSection.tsx`** and **`playground/snippets/popover/`** define the demo order and code shown in the playground (Russian UI copy). Matching runnable package examples (imports from **`"prime-ui-kit"`**) live next to this file:
 
-### Example files in `examples/`
+| Playground block | Snippet | Example file |
+|------------------|---------|--------------|
+| Sizes | `sizes.tsx` | `sizes.tsx` |
+| Inset variants | `inset-variants.tsx` | `inset-variants.tsx` |
+| States | `states.tsx` | `states.tsx` |
+| Placement | `placement.tsx` | `placement.tsx` |
+| Controlled | `controlled.tsx` | `controlled.tsx` |
+| Composition | `composition.tsx` | `composition.tsx` |
+| Full width (trigger) | `full-width.tsx` | `full-width.tsx` |
+| Custom trigger | `as-child.tsx` | `as-child.tsx` |
+| Focus + nested Select | `features.tsx` | `features.tsx` |
 
-Runnable demos live next to this file. Imports use **`"prime-ui-kit"`** so the same snippets work in an app after installing the package.
+Shared layout for these examples: **`examples/popover-examples.module.css`**.
+
+### Additional examples in `examples/`
 
 | File | Intent |
 |------|--------|
-| `canonical-panel.tsx` | Default composition: stroke trigger, inset spacing, short copy |
+| `canonical-panel.tsx` | Default English composition: stroke trigger, inset spacing, short copy |
 | `date-trigger.tsx` | Date-style trigger label; native **`type="date"`** field; **`trapFocus`** |
 | `rich-content.tsx` | Badges, **`Divider`**, **`Hint`** — denser non-modal panel |
-| `placement.tsx` | **`side`** and **`align`** grid; flip behavior called out in copy |
 | `form-in-popover.tsx` | Controlled root, small form, **`trapFocus`**, submit closes |
-
-Broader Russian demos and layout variants: **`playground/snippets/popover/`** (for example `composition.tsx`, `placement.tsx`, `controlled.tsx`).
 
 ### Extended usage
 
 - **Controlled popovers:** pass **`open`** and **`onOpenChange`** on **`Popover.Root`**; keep **`Popover.Trigger`** and **`Popover.Content`** as siblings. Close from inside the panel by calling the same setter or relying on outside click / Escape.
-- **Forms and focus:** set **`trapFocus={true}`** on **`Popover.Content`** when several controls should keep Tab cycles inside the panel (see **`examples/form-in-popover.tsx`** and **`examples/date-trigger.tsx`**).
-- **Match trigger width:** use **`sameMinWidthAsTrigger`** when the panel should align visually with a full-width or fixed-width anchor (still bounded by max width and viewport).
-- **Nested Select:** portaled Select listbox clicks owned by the panel are not treated as outside closes (see `isPortaledSelectListboxOwnedByContainer` in implementation).
+- **Forms and focus:** set **`trapFocus={true}`** on **`Popover.Content`** when several controls should keep Tab cycles inside the panel (see **`examples/form-in-popover.tsx`**, **`examples/date-trigger.tsx`**, and **`examples/features.tsx`**).
+- **Match trigger width:** use **`sameMinWidthAsTrigger`** when the panel should match the trigger’s **`width`** and **`minWidth`** (`border-box`, text wraps; still bounded by panel max width and viewport). See **`examples/full-width.tsx`**.
+- **Nested Select:** portaled Select listbox clicks owned by the panel are not treated as outside closes (see `isPortaledSelectListboxOwnedByContainer` in implementation; **`examples/features.tsx`**).
 - **Density:** tune **`size`** on **`Popover.Content`** for nested controls and **`insetPadding` / `insetGap`** for internal vertical rhythm; optional **`className`** on **`Content`** for scoped layout hooks.
 
 ### Note for LLMs
 
-When generating **Popover** markup for this library: (1) **`Popover.Trigger`** accepts **exactly one** child element—no fragments or multiple nodes. (2) Prefer **`Button.Root`**, **`LinkButton.Root`**, or another kit control as the trigger so sizing and focus styles stay on the design-system tier. (3) Only **`side="top"`** and **`side="bottom"`** are valid; do not assume left/right anchoring. (4) For copy-paste starting points, mirror **`examples/canonical-panel.tsx`**, then adapt **`date-trigger.tsx`**, **`rich-content.tsx`**, **`placement.tsx`**, or **`form-in-popover.tsx`**. (5) Do not wrap kit components to restyle them; use **`size`**, **`variant`**, **`mode`**, **`insetPadding`**, **`insetGap`**, and documented props only.
+When generating **Popover** markup for this library: (1) **`Popover.Trigger`** accepts **exactly one** child element—no fragments or multiple nodes. (2) Prefer **`Button.Root`**, **`LinkButton.Root`**, or another kit control as the trigger so sizing and focus styles stay on the design-system tier. (3) Only **`side="top"`** and **`side="bottom"`** are valid; do not assume left/right anchoring. (4) Align scenarios with **`playground/snippets/popover/`** and the matching **`examples/*.tsx`** files in the table above; add **`canonical-panel.tsx`**, **`date-trigger.tsx`**, **`rich-content.tsx`**, or **`form-in-popover.tsx`** when you need those extra recipes. (5) Do not wrap kit components to restyle them; use **`size`**, **`variant`**, **`mode`**, **`insetPadding`**, **`insetGap`**, and documented props only.
 
 ## Rules
 
@@ -129,7 +118,7 @@ When generating **Popover** markup for this library: (1) **`Popover.Trigger`** a
 |------|------|---------|----------|-------------|
 | align | `"start" \| "center" \| "end"` | `"start"` | No | Horizontal alignment of the panel relative to the trigger. |
 | side | `"bottom" \| "top"` | `"bottom"` | No | Preferred side; layout may flip at the viewport edge. |
-| sameMinWidthAsTrigger | `boolean` | `false` | No | Panel min width matches the trigger (`border-box`), still subject to panel max width and viewport. |
+| sameMinWidthAsTrigger | `boolean` | `false` | No | When `true`, panel `width` and `minWidth` match the trigger (`border-box`); text wraps; still subject to panel max width and viewport. |
 | size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control density tier for nested controls via `ControlSizeProvider`. |
 | trapFocus | `boolean` | `false` | No | Trap focus inside the panel while open. |
 | insetPadding | `"none" \| "x1" \| "x2" \| "x3"` | `"none"` | No | Extra inset padding relative to the panel tier (`data-inset-padding`). |

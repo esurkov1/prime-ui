@@ -1,7 +1,7 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const rootRows: PlaygroundApiPropRow[] = [
   {
@@ -121,27 +121,32 @@ const stageRows: PlaygroundApiPropRow[] = [
 
 export default function ExampleFrameSection() {
   return (
-    <PlaygroundDocPage
-      title="ExampleFrame"
-      description={
-        <>
-          Фрейм «превью + код» для документации и демо: тулбар с переключением вкладок, выбором
-          ширины устройства и копированием исходника. В плейграунде обёртка{" "}
-          <code>PlaygroundExampleFrame</code> строится поверх этого API. В каталоге основных
-          компонентов отдельной страницы с живыми примерами нет — это вспомогательный блок для
-          показа кода рядом с UI.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>ExampleFrame.Root</DemoApiTitle>
-          <PlaygroundApiTable rows={rootRows} />
-          <DemoApiTitle>ExampleFrame.Stage</DemoApiTitle>
-          <PlaygroundApiTable rows={stageRows} />
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>ExampleFrame</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Фрейм «превью + код» для документации и демо: тулбар с переключением вкладок, выбором
+              ширины устройства и копированием исходника. В плейграунде обёртка{" "}
+              <code>PlaygroundExampleFrame</code> строится поверх этого API. В каталоге основных
+              компонентов отдельной страницы с живыми примерами нет — это вспомогательный блок для
+              показа кода рядом с UI.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>ExampleFrame.Root</DemoApiTitle>
+            <PlaygroundApiTable rows={rootRows} />
+            <DemoApiTitle>ExampleFrame.Stage</DemoApiTitle>
+            <PlaygroundApiTable rows={stageRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

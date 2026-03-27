@@ -48,4 +48,22 @@ describe("PageContent", () => {
 
     expect(container.firstChild).not.toHaveAttribute("data-max-width");
   });
+
+  it("renders Section as semantic region", () => {
+    render(
+      <PageContent.Section aria-label="Doc">
+        <PageContent.Header>
+          <PageContent.Title>Doc</PageContent.Title>
+        </PageContent.Header>
+      </PageContent.Section>,
+    );
+
+    expect(document.querySelector("section")).toHaveAttribute("aria-label", "Doc");
+  });
+
+  it("sets data-measure on Description when measure is full", () => {
+    render(<PageContent.Description measure="full">Wide lead</PageContent.Description>);
+
+    expect(screen.getByText("Wide lead")).toHaveAttribute("data-measure", "full");
+  });
 });

@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import SliderCompositionSnippet from "../snippets/slider/composition";
 import compositionSource from "../snippets/slider/composition.tsx?raw";
@@ -102,106 +102,111 @@ const sliderRootApiRows: PlaygroundApiPropRow[] = [
 
 export default function SliderSection() {
   return (
-    <PlaygroundDocPage
-      title="Slider"
-      description={
-        <>
-          Ползунок для выбора числа в диапазоне: громкость, проценты, температура. Можно задать
-          минимум, максимум и шаг, подключить подпись или управлять значением из состояния родителя.
-          Работает как нативный элемент диапазона с оформлением кита.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Четыре значения <code>size</code> (<code>s</code>, <code>m</code>, <code>l</code>,{" "}
-            <code>xl</code>): высота дорожки, бегунок и размер текста подписи согласованы токенами
-            контрола.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
-            <PlaygroundExampleFrame.Stage>
-              <SliderSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Slider</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Ползунок для выбора числа в диапазоне: громкость, проценты, температура. Можно задать
+              минимум, максимум и шаг, подключить подпись или управлять значением из состояния
+              родителя. Работает как нативный элемент диапазона с оформлением кита.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Четыре значения <code>size</code> (<code>s</code>, <code>m</code>, <code>l</code>,{" "}
+              <code>xl</code>): высота дорожки, бегунок и размер текста подписи согласованы токенами
+              контрола.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <SliderSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Обычное состояние и <code>disabled</code>: ползунок не принимает ввод, курсор
-            «запрещён».
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <SliderStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Обычное состояние и <code>disabled</code>: ползунок не принимает ввод, курсор
+              «запрещён».
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SliderStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-          <DemoDescription>
-            Пара <code>value</code> + <code>onChange</code>: значение хранится в React-состоянии;
-            подпись рядом показывает текущий процент.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <SliderControlledSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoDescription>
+              Пара <code>value</code> + <code>onChange</code>: значение хранится в React-состоянии;
+              подпись рядом показывает текущий процент.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SliderControlledSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция</DemoSectionTitle>
-          <DemoDescription>
-            Встроенная подпись через <code>label</code> или ползунок без текста с обязательным для
-            смысла <code>aria-label</code> (дробный шаг для «прозрачности»).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <SliderCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Встроенная подпись через <code>label</code> или ползунок без текста с обязательным для
+              смысла <code>aria-label</code> (дробный шаг для «прозрачности»).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SliderCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Full width</DemoSectionTitle>
-          <DemoDescription>
-            Корень на всю ширину контейнера — в узкой карточке дорожка растягивается вместе с
-            колонкой.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <SliderFullWidthSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoDescription>
+              Корень на всю ширину контейнера — в узкой карточке дорожка растягивается вместе с
+              колонкой.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SliderFullWidthSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-          <DemoDescription>
-            Свой диапазон и дискретность: <code>min</code>/<code>max</code>/<code>step</code> —
-            целые градусы и крупный шаг по процентам.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <SliderFeaturesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+            <DemoDescription>
+              Свой диапазон и дискретность: <code>min</code>/<code>max</code>/<code>step</code> —
+              целые градусы и крупный шаг по процентам.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SliderFeaturesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Slider.Root</DemoApiTitle>
-          <DemoDescription>
-            Обёртка с опциональной подписью и нативным <code>input type=&quot;range&quot;</code>.
-            Внутри <code>ControlSizeProvider</code> для согласованности с соседними контролами.
-          </DemoDescription>
-          <PlaygroundApiTable rows={sliderRootApiRows} />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Slider.Root</DemoApiTitle>
+            <DemoDescription>
+              Обёртка с опциональной подписью и нативным <code>input type=&quot;range&quot;</code>.
+              Внутри <code>ControlSizeProvider</code> для согласованности с соседними контролами.
+            </DemoDescription>
+            <PlaygroundApiTable rows={sliderRootApiRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

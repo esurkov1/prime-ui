@@ -1,5 +1,6 @@
 import { Bell, Lock, User } from "lucide-react";
-import { Accordion, Typography } from "prime-ui-kit";
+import { Accordion } from "@/components/accordion/Accordion";
+import { Typography } from "@/components/typography/Typography";
 
 import styles from "./examples.module.css";
 

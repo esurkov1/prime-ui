@@ -68,19 +68,24 @@ export function CopyLinkHint() {
 
 Source of truth (stays in sync with the snippet above): `examples/canonical-icon-hint.tsx`.
 
-### Examples (source)
+The **playground** (`playground/sections/TooltipSection.tsx`) renders the same scenarios as **`playground/snippets/tooltip/*.tsx`** (internal `@/` imports). **`examples/`** below mirrors those snippets with **`"prime-ui-kit"`** imports; playground copy may differ (e.g. Russian labels) but structure and props match.
 
-Runnable demos live next to this file (workspace imports use `@/`; published consumers use `prime-ui-kit`):
+### Example files in `examples/`
 
-| File | Intent |
-|------|--------|
-| `examples/canonical-icon-hint.tsx` | Icon-only button, **`aria-label`**, short hint |
-| `examples/scenario-delay-provider.tsx` | **`Tooltip.Provider`** with **`delayDuration={800}`** |
-| `examples/scenario-long-content.tsx` | Long wrapped copy; **`size="m"`** |
-| `examples/scenario-side-bottom.tsx` | **`side="bottom"`** when default placement clips |
-| `examples/scenario-controlled-programmatic.tsx` | **`open`** / **`onOpenChange`** with **`delayDuration={0}`** for demos |
+| File | Scenario (aligned with `playground/snippets/tooltip/`) |
+|------|----------|
+| `sizes.tsx` | Four **`Tooltip.Content`** sizes **`s`–`xl`** on the same trigger pattern |
+| `surfaces.tsx` | Same tooltip on **`surface-default`** vs **`surface-raised`** panels |
+| `states.tsx` | Default trigger; native **`disabled`** (tooltip does not open); glossary-style **`button`** trigger |
+| `side.tsx` | **`side`** **`top`** \| **`bottom`** \| **`left`** \| **`right`** |
+| `controlled.tsx` | **`open`** / **`onOpenChange`** with **`Tooltip.Provider`** **`delayDuration={0}`** and **`Switch`** |
+| `composition.tsx` | **`LinkButton`** + **`Typography`** in content; icon-only **`Button`** with **`aria-label`** |
+| `delay.tsx` | **`Tooltip.Provider`** **`delayDuration={800}`** |
+| `long-content.tsx` | Multi-line copy; **`size="m"`**; theme **`max-width`** / wrapping |
 
-Playground snippets (broader variants, including Russian copy): `playground/snippets/tooltip/`.
+| File | Extra recipe |
+|------|----------|
+| `canonical-icon-hint.tsx` | Minimal icon-only shell: **`aria-label`**, **`size="s"`** hint |
 
 ### Extended usage
 
@@ -92,7 +97,7 @@ Playground snippets (broader variants, including Russian copy): `playground/snip
 
 ### Note for LLMs
 
-When generating **Tooltip** markup for this library: (1) **`Tooltip.Trigger`** takes **exactly one** **`ReactElement`** child (the implementation uses **`cloneElement`**). (2) Put the **accessible name** on the trigger (**`aria-label`**, visible text, or **`aria-labelledby`**)—the tooltip supplements it; do not rely on the tooltip alone for the control’s name. (3) Do not put **links, buttons, or inputs** inside **`Tooltip.Content`** (non-interactive layer, **`pointer-events: none`**). (4) Use **one** **`Tooltip.Root`** per anchor; do not attach one root to multiple triggers. (5) For starting points, mirror **`examples/canonical-icon-hint.tsx`**, then adapt **`scenario-*.tsx`** files.
+When generating **Tooltip** markup for this library: (1) **`Tooltip.Trigger`** takes **exactly one** **`ReactElement`** child (the implementation uses **`cloneElement`**). (2) Put the **accessible name** on the trigger (**`aria-label`**, visible text, or **`aria-labelledby`**)—the tooltip supplements it; do not rely on the tooltip alone for the control’s name. (3) Do not put **links, buttons, or inputs** inside **`Tooltip.Content`** (non-interactive layer, **`pointer-events: none`**). (4) Use **one** **`Tooltip.Root`** per anchor; do not attach one root to multiple triggers. (5) For starting points, mirror **`examples/canonical-icon-hint.tsx`**, then adapt the named files in **`examples/`** (same scenarios as **`playground/snippets/tooltip/`**).
 
 ## Rules
 

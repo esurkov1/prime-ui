@@ -9,7 +9,7 @@
 - **Use for:** theme/accent tuning, brand palettes, variant swatches, or any form field that stores a CSS-parseable color.
 - **Do not use for:** hex-only entry with no visual benefit (prefer [Input](../input/COMPONENT.md)); full chrome always inline in dense UI (mount the panel in [Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md), or [Drawer](../drawer/COMPONENT.md)); eyedropper as the only input path (it is absent without **`window.EyeDropper`**).
 
-Runnable TSX scenarios live in **`examples/`** (same folder as this file): `theme-accent.tsx`, `brand-kit.tsx`, `product-variant-swatch.tsx`, `controlled-form-field.tsx`, `minimal-popover.tsx`.
+Runnable TSX: **playground** snippets in [`playground/snippets/color-picker/`](../../../playground/snippets/color-picker/) (order matches `playground/sections/ColorPickerSection.tsx`); **package** recipes in [`examples/`](./examples/) importing **`prime-ui-kit`**.
 
 ## Extended
 
@@ -17,16 +17,40 @@ Runnable TSX scenarios live in **`examples/`** (same folder as this file): `them
 
 The picker composes RAC primitives with kit styling (checkerboard for transparency on tracks/swatches). **`TriggerSwatch`** mirrors the live color for button triggers but is **`aria-hidden`**—name the control via visible label text or **`aria-label`**. Sliders are fixed at visual size **`m`**; only **`HexInput`** exposes the kit **`size`** axis (**`s`**–**`xl`**).
 
-### Scenarios
+### Scenarios (playground)
 
-| Scenario | Intent | Example file |
-|----------|--------|----------------|
-| **Theme accent** | Controlled value synced to design tokens or backend; show readout + popover editor. | `examples/theme-accent.tsx` |
-| **Brand kit** | Curated swatches plus free adjustment and hex field for design-system colors. | `examples/brand-kit.tsx` |
-| **Product variant swatch** | Fast selection from discrete SKUs; optional fine tuning in the same **`Root`**. | `examples/product-variant-swatch.tsx` |
-| **Controlled form field** | Parent owns **`value`/`onChange`**; label association + popover + **`HexInput`**. | `examples/controlled-form-field.tsx` |
+Same order as `playground/sections/ColorPickerSection.tsx`. Snippets use the `@/` alias.
 
-See also **`examples/minimal-popover.tsx`** for the smallest valid **`Popover`** composition.
+| Scenario | Snippet |
+|----------|---------|
+| Hex input sizes — four **`HexInput`** values (**`s`**–**`xl`**), each behind its own popover | [`hex-input-sizes.tsx`](../../../playground/snippets/color-picker/hex-input-sizes.tsx) |
+| Format variants — three popovers with **`FormatProvider`** **`defaultFormat`** **`hsl` / `rgb` / `hex`** | [`format-variants.tsx`](../../../playground/snippets/color-picker/format-variants.tsx) |
+| States — disabled **`SwatchPickerItem`** and disabled hue **`Slider`** | [`states.tsx`](../../../playground/snippets/color-picker/states.tsx) |
+| Panel placement — same panel with **`Popover.Content`** **`side="bottom"`** vs **`"top"`** | [`panel-placement.tsx`](../../../playground/snippets/color-picker/panel-placement.tsx) |
+| Controlled — **`value`** / **`onChange`**, CSS readout outside the popover | [`controlled.tsx`](../../../playground/snippets/color-picker/controlled.tsx) |
+| Composition — full panel: **`FormatSelect`**, area, sliders (incl. alpha), **`ChannelStrip`**, **`SwatchPicker`** | [`composition.tsx`](../../../playground/snippets/color-picker/composition.tsx) |
+| Full width — wide **`Popover.Content`** and inner surface stretched | [`full-width.tsx`](../../../playground/snippets/color-picker/full-width.tsx) |
+| Custom trigger readout — color square + CSS string on the button; **`ColorPicker.Root`** inside **`Popover.Content`** | [`popover.tsx`](../../../playground/snippets/color-picker/popover.tsx) |
+| Field + eyedropper — **`Field`** + **`EyeDropperButton`**, area, hue slider | [`features.tsx`](../../../playground/snippets/color-picker/features.tsx) |
+
+### Package examples (`examples/`)
+
+Recipes import **`prime-ui-kit`** (no playground `@/` alias). Several mirror a playground snippet; thematic recipes cover product-shaped use cases.
+
+| Scenario | File |
+|----------|------|
+| Minimal valid popover + **`FormatProvider`** skeleton | [`minimal-popover.tsx`](./examples/minimal-popover.tsx) |
+| Controlled accent + readout (aligned with playground **Controlled**) | [`theme-accent.tsx`](./examples/theme-accent.tsx) |
+| Form label, popover pick, **`HexInput`** beside the trigger | [`controlled-form-field.tsx`](./examples/controlled-form-field.tsx) |
+| Brand presets, area, sliders, strip, **`HexInput`** (close to **Composition**; no separate alpha slider) | [`brand-kit.tsx`](./examples/brand-kit.tsx) |
+| Product variant swatches + fine tune | [`product-variant-swatch.tsx`](./examples/product-variant-swatch.tsx) |
+| Hex **`size`** ladder | [`hex-input-sizes.tsx`](./examples/hex-input-sizes.tsx) |
+| **`defaultFormat`** HSL / RGB / hex | [`format-variants.tsx`](./examples/format-variants.tsx) |
+| Disabled swatch and disabled slider | [`states.tsx`](./examples/states.tsx) |
+| **`Popover.Content`** **`side`** bottom vs top | [`panel-placement.tsx`](./examples/panel-placement.tsx) |
+| Wide popover + stretched inner column | [`full-width.tsx`](./examples/full-width.tsx) |
+| Custom swatch on trigger + **`Root`** in content (playground **popover**) | [`readout-trigger.tsx`](./examples/readout-trigger.tsx) |
+| **`Field`** + **`EyeDropperButton`** + area + slider (playground **features**); uses **`react-aria-components`** **`Input`** | [`field-eyedropper.tsx`](./examples/field-eyedropper.tsx) |
 
 ### Composition
 
@@ -168,4 +192,4 @@ Exported types: **`ColorPickerRootProps`**, **`ColorPickerHexInputProps`**, **`C
 - **`parseColor`** throws on bad input; guard user paste if you cannot tolerate exceptions.
 - Dense UIs: mount the picker body in **[Popover](../popover/COMPONENT.md)** / **[Modal](../modal/COMPONENT.md)** / **[Drawer](../drawer/COMPONENT.md)**, not inline in toolbars.
 - Do not assume **`EyeDropper`** exists; provide sliders, hex, or swatches as primary input paths.
-- For copy-paste recipes, start from **`examples/minimal-popover.tsx`** or the **Minimal example** above, then add sliders, **`SwatchPicker`**, or **`HexInput`** per scenario.
+- For copy-paste recipes, start from **`examples/minimal-popover.tsx`** or the **Minimal example** above; match **Scenarios (playground)** via the linked snippets or the **Package examples** table.

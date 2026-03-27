@@ -1,6 +1,7 @@
 import { BookOpen, Code2, Webhook } from "lucide-react";
-import { Accordion, Typography } from "prime-ui-kit";
 import * as React from "react";
+import { Accordion } from "@/components/accordion/Accordion";
+import { Typography } from "@/components/typography/Typography";
 
 import styles from "./examples.module.css";
 
@@ -17,7 +18,9 @@ export default function AccordionExampleApiDocsSections() {
       size="m"
       layout="grouped"
       value={open}
-      onValueChange={(value) => setOpen(typeof value === "string" ? value : (value[0] ?? ""))}
+      onValueChange={(next) => {
+        if (typeof next === "string") setOpen(next);
+      }}
     >
       <Accordion.Item value="auth">
         <Accordion.Header>

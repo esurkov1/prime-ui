@@ -56,15 +56,21 @@ export function Example() {
 }
 ```
 
-### Extended examples
+### Scenarios (playground + `examples/`)
 
-- [`./examples/01-settings-vertical-rail.tsx`](./examples/01-settings-vertical-rail.tsx) — Settings: vertical tab rail with profile, security, and billing panels.
-- [`./examples/02-dashboard-subviews.tsx`](./examples/02-dashboard-subviews.tsx) — Dashboard: horizontal tabs with equal-width triggers across a card (`flex` on each tab).
-- [`./examples/03-tab-triggers-with-icons.tsx`](./examples/03-tab-triggers-with-icons.tsx) — Icon + label triggers using the kit **`Icon`** inside **`Tabs.Icon`**.
-- [`./examples/04-long-labels-narrow.tsx`](./examples/04-long-labels-narrow.tsx) — Long English labels in a narrow container; ellipsis on **`Tabs.Label`**.
-- [`./examples/05-controlled-active-tab.tsx`](./examples/05-controlled-active-tab.tsx) — Controlled `value` / `onValueChange` (e.g. sync with `?tab=` or store).
+Live demos use **`playground/snippets/tabs/*.tsx`** (see **`playground/sections/TabsSection.tsx`**). The same scenarios have package-oriented copies under **`examples/`** (aligned with those snippets).
 
-**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios, prop combinations, and layout patterns; this page keeps the contract (rules + API tables) authoritative.
+| Scenario | Notes | Example |
+|----------|--------|---------|
+| Sizes | Four rows: `size` **`s`** / **`m`** / **`l`** / **`xl`**. First tab: **`Tabs.Icon`** + **`Tabs.Label`**; others **`Tabs.Label`** only. | [`./examples/06-sizes-s-m-l-xl.tsx`](./examples/06-sizes-s-m-l-xl.tsx) |
+| States | One **`Tabs.Tab`** with **`disabled`** — no click, skipped in arrow-key cycle. | [`./examples/07-horizontal-disabled.tsx`](./examples/07-horizontal-disabled.tsx) |
+| Orientation | **`orientation="vertical"`** — list beside panels; vertical arrow keys. | [`./examples/01-settings-vertical-rail.tsx`](./examples/01-settings-vertical-rail.tsx) |
+| Controlled | **`value`** + **`onValueChange`** on **`Tabs.Root`** (URL, store, wizard step). | [`./examples/05-controlled-active-tab.tsx`](./examples/05-controlled-active-tab.tsx) |
+| Composition | Several **`Tabs.Icon`** slots per trigger (left/right of **`Tabs.Label`**) and two icons in one tab. | [`./examples/03-tab-triggers-with-icons.tsx`](./examples/03-tab-triggers-with-icons.tsx) |
+| Full width | No **`fullWidth`** prop: **`className`** on root / **`Tabs.List`** / **`Tabs.Tab`** (`w-full`, **`flex-1`**, **`min-w-0`**) so triggers share width. | [`./examples/02-dashboard-subviews.tsx`](./examples/02-dashboard-subviews.tsx) |
+| Long labels | Narrow container; **`Tabs.Label`** truncates with ellipsis without wrapping the whole tab row. | [`./examples/04-long-labels-narrow.tsx`](./examples/04-long-labels-narrow.tsx) |
+
+**LLM note:** Prefer reading `./examples/*.tsx` for runnable scenarios; this page keeps rules + API tables authoritative.
 
 ## Rules
 
@@ -85,35 +91,35 @@ export function Example() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| value | `string` | — | No | Active tab id (controlled) |
-| defaultValue | `string` | `""` | No | Initial active tab when uncontrolled |
-| onValueChange | `(value: string) => void` | — | No | Called when the active tab changes |
-| orientation | `"horizontal" \| "vertical"` | `"horizontal"` | No | Tab list axis and arrow-key mapping |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Trigger and panel typography scale |
-| children | `React.ReactNode` | — | Yes | `Tabs.List` and `Tabs.Panel` (and related structure) |
-| className | `string` | — | No | Class on the root `div` |
+| value | `string` | — | No | Active tab in controlled mode; must match **`value`** on one **`Tabs.Tab`**. |
+| defaultValue | `string` | `""` | No | Initial tab when uncontrolled (omit **`value`**). |
+| onValueChange | `(value: string) => void` | — | No | Fired when the user or keyboard changes the tab. |
+| orientation | `"horizontal" \| "vertical"` | `"horizontal"` | No | Tab list axis and arrow-key direction (**Left/Right** vs **Up/Down**). |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Trigger height, type scale, padding, and icon size from one control token tier. |
+| children | `React.ReactNode` | — | Yes | **`Tabs.List`**, **`Tabs.Tab`**, **`Tabs.Panel`**, and layout wrappers under the same root. |
+| className | `string` | — | No | Extra class on the root wrapper (e.g. **`w-full`** on a card). |
 
 ### Tabs.List
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | Yes | Typically `Tabs.Tab` elements |
-| className | `string` | — | No | Class on the tablist container |
+| children | `React.ReactNode` | — | Yes | **`Tabs.Tab`** triggers; the active indicator is rendered inside the list. |
+| className | `string` | — | No | Class on **`role="tablist"`** (e.g. stretch to full width). |
 
 ### Tabs.Tab
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| value | `string` | — | Yes | Id matching the associated `Tabs.Panel` |
-| disabled | `boolean` | `false` | No | Non-interactive; skipped in keyboard roving |
-| children | `React.ReactNode` | — | Yes | Trigger content (e.g. `Tabs.Icon`, `Tabs.Label`) |
-| className | `string` | — | No | Class on the `button` |
+| value | `string` | — | Yes | Unique id; must match the associated **`Tabs.Panel`** **`value`**. |
+| disabled | `boolean` | `false` | No | Not selectable; omitted from arrow-key focus order. |
+| children | `React.ReactNode` | — | Yes | Button contents: **`Tabs.Icon`**, **`Tabs.Label`**, or custom markup. |
+| className | `string` | — | No | Class on the trigger (e.g. **`flex-1`**, **`min-w-0`** for full-width rows). |
 
 ### Tabs.Icon
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | Yes | Icon glyph |
+| children | `React.ReactNode` | — | Yes | Icon (e.g. kit **`Icon`**); wrapper uses **`aria-hidden`**. |
 | className | `string` | — | No | Class on the `span` |
 | …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | No | Other span attributes |
 
@@ -121,7 +127,7 @@ export function Example() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | Yes | Label text |
+| children | `React.ReactNode` | — | Yes | Tab label text; can ellipsis when space is tight. |
 | className | `string` | — | No | Class on the `span` |
 | …rest | `Omit<React.HTMLAttributes<HTMLSpanElement>, "children">` | — | No | Other span attributes |
 
@@ -129,8 +135,8 @@ export function Example() {
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| value | `string` | — | Yes | Must match the active `Tabs.Tab` `value` to render |
-| children | `React.ReactNode` | — | Yes | Panel body |
+| value | `string` | — | Yes | Must match the active **`Tabs.Tab`**; otherwise the panel is not rendered (**`null`**). |
+| children | `React.ReactNode` | — | Yes | **`role="tabpanel"`** body below (or beside) the list. |
 | className | `string` | — | No | Class on the panel `div` |
 
 ## Related

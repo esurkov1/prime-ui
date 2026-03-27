@@ -1,7 +1,7 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const rootRows: PlaygroundApiPropRow[] = [
   {
@@ -145,35 +145,40 @@ const mainRows: PlaygroundApiPropRow[] = [
 
 export default function AppShellSection() {
   return (
-    <PlaygroundDocPage
-      title="AppShell"
-      description={
-        <>
-          Каркас: CSS Grid — <strong>nav</strong> (<code>AppShell.Nav</code>,{" "}
-          <code>data-layout-region=&quot;nav&quot;</code>) и <strong>main</strong> (
-          <code>AppShell.Main</code>, <code>data-layout-region=&quot;main&quot;</code>).{" "}
-          <code>AppShell.Template</code> помечает корень как{" "}
-          <code>data-layout-template=&quot;app&quot;</code>: на широком экране — поля у колонки{" "}
-          <code>Nav</code> от края экрана и зазор между колонками при открытом <code>Sidebar</code>{" "}
-          (<code>sidebarSlot=&quot;page-nav&quot;</code>); поля текста в <code>main</code> — через{" "}
-          <code>mainProps variant=&quot;page&quot;</code> или свою разметку. В плейграунде —{" "}
-          <code>PlaygroundLayout</code>.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>AppShell.Root</DemoApiTitle>
-          <PlaygroundApiTable rows={rootRows} />
-          <DemoApiTitle>AppShell.Template</DemoApiTitle>
-          <PlaygroundApiTable rows={templateRows} />
-          <DemoApiTitle>AppShell.Nav</DemoApiTitle>
-          <PlaygroundApiTable rows={navRows} />
-          <DemoApiTitle>AppShell.Main</DemoApiTitle>
-          <PlaygroundApiTable rows={mainRows} />
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>AppShell</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Каркас: CSS Grid — <strong>nav</strong> (<code>AppShell.Nav</code>,{" "}
+              <code>data-layout-region=&quot;nav&quot;</code>) и <strong>main</strong> (
+              <code>AppShell.Main</code>, <code>data-layout-region=&quot;main&quot;</code>).{" "}
+              <code>AppShell.Template</code> помечает корень как{" "}
+              <code>data-layout-template=&quot;app&quot;</code>: на широком экране — поля у колонки{" "}
+              <code>Nav</code> от края экрана и зазор между колонками при открытом{" "}
+              <code>Sidebar</code> (<code>sidebarSlot=&quot;page-nav&quot;</code>); поля текста в{" "}
+              <code>main</code> — через <code>mainProps variant=&quot;page&quot;</code> или свою
+              разметку. В плейграунде — <code>PlaygroundLayout</code>.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>AppShell.Root</DemoApiTitle>
+            <PlaygroundApiTable rows={rootRows} />
+            <DemoApiTitle>AppShell.Template</DemoApiTitle>
+            <PlaygroundApiTable rows={templateRows} />
+            <DemoApiTitle>AppShell.Nav</DemoApiTitle>
+            <PlaygroundApiTable rows={navRows} />
+            <DemoApiTitle>AppShell.Main</DemoApiTitle>
+            <PlaygroundApiTable rows={mainRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

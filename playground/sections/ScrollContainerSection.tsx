@@ -1,7 +1,7 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 
 const rootRows: PlaygroundApiPropRow[] = [
   {
@@ -66,24 +66,29 @@ const rootRows: PlaygroundApiPropRow[] = [
 
 export default function ScrollContainerSection() {
   return (
-    <PlaygroundDocPage
-      title="ScrollContainer"
-      description={
-        <>
-          Обёртка с едиными правилами прокрутки: ось, overscroll, touch и flex-item. Используется
-          внутри <code>AppShell.Main</code>, панелей Dropdown/Select/Popover, теле Drawer, вьюпорте
-          DataTable, списке Command Menu и оверлее Command Menu. Отдельных превью в разделе примеров
-          нет — это инфраструктурный узел.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>ScrollContainer</DemoApiTitle>
-          <PlaygroundApiTable rows={rootRows} />
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>ScrollContainer</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Обёртка с едиными правилами прокрутки: ось, overscroll, touch и flex-item.
+              Используется внутри <code>AppShell.Main</code>, панелей Dropdown/Select/Popover, теле
+              Drawer, вьюпорте DataTable, списке Command Menu и оверлее Command Menu. Отдельных
+              превью в разделе примеров нет — это инфраструктурный узел.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>ScrollContainer</DemoApiTitle>
+            <PlaygroundApiTable rows={rootRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

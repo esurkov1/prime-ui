@@ -26,15 +26,38 @@ Composite pieces for picking a calendar date or range: a size-aware shell, a day
 
 ## Extended
 
-- **Booking (stay + time)** — Use **`mode="range"`** on both `Calendar` and `Presets`, optional **`Datepicker.Time`** with **`mode="range"`** for check-in/check-out times. Presets can encode “tonight”, multi-night spans, or month windows. Reference implementation: **`examples/booking.tsx`** (`BookingDateRangeExample`).
-- **Birthdate** — **`mode="single"`**; disable future days with react-day-picker **`disabled`** (for example `date >= startOfTomorrow()` from date-fns). Show a human-readable line with **`Datepicker.Value`**. Open the month near a sensible default (for example year **2000**) when no value yet. Reference: **`examples/birthdate.tsx`** (`BirthdateSingleExample`).
-- **Range (reports / filters)** — **`mode="range"`** with **`numberOfMonths={2}`** or **`responsiveMonths`** for width-driven columns; presets for “this month / last month / last N days”. Reference: **`examples/range-report.tsx`** (`ReportRangeExample`).
-- **Full-width form field** — **`Button.Root fullWidth`** as **`Popover.Trigger`**; widen **`Popover.Content`** (for example `min-w-[min(100vw-2rem,36rem)]` when your app uses Tailwind) and **`Datepicker.Shell className="min-w-0"`** so **`responsiveMonths`** measures correctly. Reference: **`examples/full-width-form.tsx`** (`FullWidthFormDateExample`).
+### Playground snippets
 
-Repository **`.tsx` examples** under **`examples/`** are type-checked with the library build; copy them into your app and wire your own spacing/theme (see [Label](../label/COMPONENT.md) for the label primitive).
+Demos match **`playground/sections/DatepickerSection.tsx`** (order and intent). Sources use `@/` imports under **`playground/snippets/datepicker/`**:
+
+| Block | File | What it shows |
+|-------|------|----------------|
+| **Sizes** | [`sizes.tsx`](../../../playground/snippets/datepicker/sizes.tsx) (+ [`sizes.module.css`](../../../playground/snippets/datepicker/sizes.module.css)) | Four **`Datepicker.Shell`** / **`Calendar`** **`size`** values (**`s`**–**`xl`**), each in its own **`Popover`**. |
+| **Variants and modes** | [`variants-modes.tsx`](../../../playground/snippets/datepicker/variants-modes.tsx) (+ [`sizes.module.css`](../../../playground/snippets/datepicker/sizes.module.css)) | **`mode="single"`** vs **`mode="range"`** with separate triggers. |
+| **States** | [`states.tsx`](../../../playground/snippets/datepicker/states.tsx) | **`disabled`** by day of week; **`Calendar`** + **`Datepicker.Time`** (time inputs disabled until a date exists). |
+| **Responsive months** | [`responsive-months.tsx`](../../../playground/snippets/datepicker/responsive-months.tsx) | **`responsiveMonths`**, **`responsiveBreakpoints`**; preview uses **`examplePreviewBleed`** for container width. |
+| **Controlled value** | [`controlled-value.tsx`](../../../playground/snippets/datepicker/controlled-value.tsx) | Controlled **`selected`** / **`onSelect`**; **`Datepicker.Value`**; popover closes after a date is chosen. |
+| **Composition** | [`composition.tsx`](../../../playground/snippets/datepicker/composition.tsx) | **`Shell`** **`presets`**, **`Calendar`**, **`Time`**, **`Value`** in one panel; shared parent state. |
+| **Full width** | [`full-width.tsx`](../../../playground/snippets/datepicker/full-width.tsx) | Wide **`Popover.Content`** and **`Datepicker.Shell className="min-w-0"`** with **`responsiveMonths`**. |
+| **Trigger with icon** | [`popover.tsx`](../../../playground/snippets/datepicker/popover.tsx) | Calendar icon on **`Popover.Trigger`**; close after single-date select. |
+| **Range presets + time** | [`range-presets-time.tsx`](../../../playground/snippets/datepicker/range-presets-time.tsx) | **`mode="range"`** on **`Calendar`** and **`Presets`**; **`Datepicker.Time`** with **`mode="range"`**. |
+
+### Scenarios (recipes)
+
+Runnable **`prime-ui-kit`** examples under **`examples/`** (type-checked with the library build). Copy into your app and wire spacing/theme (see [Label](../label/COMPONENT.md) for the label primitive).
+
+| Scenario | File |
+|----------|------|
+| **Booking (stay + time)** — **`mode="range"`** on **`Calendar`** and **`Presets`**, **`Datepicker.Time`** **`mode="range"`**; presets for short stays and windows | [`booking.tsx`](./examples/booking.tsx) (`BookingDateRangeExample`) |
+| **Birthdate** — **`mode="single"`**, **`disabled`** for future days, **`Datepicker.Value`**, default month near a sensible year when empty | [`birthdate.tsx`](./examples/birthdate.tsx) (`BirthdateSingleExample`) |
+| **Range (reports / filters)** — **`numberOfMonths={2}`** or **`responsiveMonths`**; presets such as this month / last month / last N days | [`range-report.tsx`](./examples/range-report.tsx) (`ReportRangeExample`) |
+| **Full-width form field** — **`Button.Root fullWidth`** as **`Popover.Trigger`**; wide **`Popover.Content`** and **`Shell className="min-w-0"`** | [`full-width-form.tsx`](./examples/full-width-form.tsx) (`FullWidthFormDateExample`) |
+
+Snippet-level demos (internal **`@/`** imports) are listed in **Playground snippets** above.
 
 ## LLM note
 
+- Playground order and copy mirror **`playground/sections/DatepickerSection.tsx`**; runnable snippet sources live in **`playground/snippets/datepicker/`**.
 - Always compose **`Datepicker.Shell` → `Datepicker.Calendar`** at minimum; never use **`Calendar` without `Shell`** in real UIs if you rely on **`size`** context (default **`m`** on `Shell`).
 - For overlays, default to **[Popover](../popover/COMPONENT.md)** with **`insetPadding="none"`** on content unless the design system specifies otherwise.
 - **Controlled state:** bind **`selected`** and **`onSelect`** from react-day-picker; for range, state type is **`DateRange | undefined`**.

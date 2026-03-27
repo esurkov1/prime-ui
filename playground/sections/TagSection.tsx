@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import TagBasicSnippet from "../snippets/tag/basic";
 import tagBasicSource from "../snippets/tag/basic.tsx?raw";
@@ -82,92 +82,99 @@ const tagIconApiRows: PlaygroundApiPropRow[] = [
 
 export default function TagSection() {
   return (
-    <PlaygroundDocPage
-      title="Tag"
-      description={
-        <>
-          Компактная метка (чип) для фильтров, выбранных значений и метаданных. Поддерживает иконку
-          слева от текста и опциональную кнопку удаления справа. Размер согласован с осью размеров
-          контролов через <code>ControlSizeProvider</code>.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Ряд <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>, <code>xl</code> —
-            высота, радиус, кегль и размер иконки берутся из одного яруса системных токенов
-            контролов.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tagSizesSource.trim()} previewLayout="stack-center">
-            <PlaygroundExampleFrame.Stage>
-              <TagSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>Tag</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Компактная метка (чип) для фильтров, выбранных значений и метаданных. Поддерживает
+              иконку слева от текста и опциональную кнопку удаления справа. Размер согласован с осью
+              размеров контролов через <code>ControlSizeProvider</code>.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Ряд <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>, <code>xl</code>{" "}
+              — высота, радиус, кегль и размер иконки берутся из одного яруса системных токенов
+              контролов.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={tagSizesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <TagSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния</DemoSectionTitle>
-          <DemoDescription>
-            Обычный, с кнопкой удаления (<code>onRemove</code>) и <code>disabled</code>. Отключённое
-            состояние блокирует кнопку удаления и выставляет <code>aria-disabled</code> на корне.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tagStatesSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TagStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoDescription>
+              Обычный, с кнопкой удаления (<code>onRemove</code>) и <code>disabled</code>.
+              Отключённое состояние блокирует кнопку удаления и выставляет{" "}
+              <code>aria-disabled</code> на корне.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={tagStatesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TagStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция</DemoSectionTitle>
-          <DemoDescription>
-            Иконка через <code>Tag.Icon</code> перед текстом, только текст или текст с кнопкой
-            удаления. Размер иконки автоматически согласован с <code>size</code> корня через
-            контекст.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tagCompositionSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TagCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Иконка через <code>Tag.Icon</code> перед текстом, только текст или текст с кнопкой
+              удаления. Размер иконки автоматически согласован с <code>size</code> корня через
+              контекст.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={tagCompositionSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TagCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Базовый пример</DemoSectionTitle>
-          <DemoDescription>
-            Статичные метки без иконки и без <code>onRemove</code> — типично для технологий проекта
-            или категорий товара.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tagBasicSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TagBasicSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Базовый пример</DemoSectionTitle>
+            <DemoDescription>
+              Статичные метки без иконки и без <code>onRemove</code> — типично для технологий
+              проекта или категорий товара.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={tagBasicSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TagBasicSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Удаляемые теги</DemoSectionTitle>
-          <DemoDescription>
-            Проп <code>onRemove</code> добавляет справа кнопку с крестиком; подпись для скринридеров
-            фиксирована (<code>aria-label=&quot;Remove&quot;</code> в разметке компонента).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root code={tagRemovableSource.trim()} previewLayout="stack">
-            <PlaygroundExampleFrame.Stage>
-              <TagRemovableSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Удаляемые теги</DemoSectionTitle>
+            <DemoDescription>
+              Проп <code>onRemove</code> добавляет справа кнопку с крестиком; подпись для
+              скринридеров фиксирована (<code>aria-label=&quot;Remove&quot;</code> в разметке
+              компонента).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={tagRemovableSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TagRemovableSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>Tag.Root</DemoApiTitle>
-          <PlaygroundApiTable rows={tagRootApiRows} />
-          <DemoApiTitle>Tag.Icon</DemoApiTitle>
-          <PlaygroundApiTable rows={tagIconApiRows} />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Tag.Root</DemoApiTitle>
+            <PlaygroundApiTable rows={tagRootApiRows} />
+            <DemoApiTitle>Tag.Icon</DemoApiTitle>
+            <PlaygroundApiTable rows={tagIconApiRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

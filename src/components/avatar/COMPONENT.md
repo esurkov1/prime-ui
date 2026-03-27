@@ -24,6 +24,8 @@ Circular avatar with an optional photo (`Avatar.Image`), a fallback layer (`Avat
 
 Один фрагмент разметки: одиночный аватар (**`Image`** + **`Fallback`**), группа с **`Overflow`**, плюс **`Fallback`** с иконкой и подписи через **[Typography](../typography/COMPONENT.md)**. Импорт только из **`prime-ui-kit`**.
 
+Те же идеи, что в плейграунде (**`playground/sections/AvatarSection.tsx`** + **`playground/snippets/avatar/*.tsx`**): полная шкала **`size`** (`s`–`6xl`), три статуса картинки (**`idle`** / **`loaded`** / **`error`**), группа из трёх, смена **`src`** из состояния родителя, пара **Image + Fallback** и **Fallback** с **`Icon`**, группа с **`Avatar.Group.Overflow`**. В монорепозитории см. **`examples/sizes.tsx`**, **`states.tsx`**, **`group-three.tsx`**, **`src-from-state.tsx`** (импорты **`@/`**); **`fallback-variants.tsx`** и **`group-overflow.tsx`** закрывают композицию и переполнение.
+
 ```tsx
 import { Avatar, Icon, Typography } from "prime-ui-kit";
 
@@ -77,15 +79,21 @@ export function CanonicalAvatarDemo() {
 
 | Файл | Сценарий |
 |------|----------|
+| [`examples/sizes.tsx`](./examples/sizes.tsx) | Все значения **`size`** подряд (`s`–`6xl`), как [`playground/snippets/avatar/sizes.tsx`](../../../playground/snippets/avatar/sizes.tsx) |
+| [`examples/states.tsx`](./examples/states.tsx) | Без **`Image`** / успешная загрузка / неверный URL, как [`states.tsx`](../../../playground/snippets/avatar/states.tsx) |
+| [`examples/group-three.tsx`](./examples/group-three.tsx) | **`Avatar.Group.Root`** из трёх **`Avatar.Root`**, как [`group-three.tsx`](../../../playground/snippets/avatar/group-three.tsx) |
+| [`examples/src-from-state.tsx`](./examples/src-from-state.tsx) | Родитель меняет **`src`** (сброс загрузки по URL), как [`src-from-state.tsx`](../../../playground/snippets/avatar/src-from-state.tsx) |
+| [`examples/fallback-variants.tsx`](./examples/fallback-variants.tsx) | Фото, инициалы и иконка в **`Fallback`** (см. также [`composition.tsx`](../../../playground/snippets/avatar/composition.tsx)) |
+| [`examples/group-overflow.tsx`](./examples/group-overflow.tsx) | Два лица + **`Avatar.Group.Overflow`**, как [`group-overflow.tsx`](../../../playground/snippets/avatar/group-overflow.tsx) |
 | [`examples/team-list.tsx`](./examples/team-list.tsx) | Список команды: аватар + имя + роль |
 | [`examples/comment-thread.tsx`](./examples/comment-thread.tsx) | Ветка комментариев с аватаром у каждого сообщения |
 | [`examples/app-header-nav.tsx`](./examples/app-header-nav.tsx) | Шапка: навигация **[LinkButton](../link-button/COMPONENT.md)** и блок «аккаунт» с аватаром |
-| [`examples/group-overflow.tsx`](./examples/group-overflow.tsx) | **`Avatar.Group`** с **`Overflow`** (`+N`) |
-| [`examples/fallback-variants.tsx`](./examples/fallback-variants.tsx) | Фото, инициалы и иконка в **`Fallback`** в одном ряду |
+
+Файлы **`sizes`**, **`states`**, **`group-three`**, **`src-from-state`** используют импорты **`@/`** для сборки внутри репозитория; остальные примеры — из **`"prime-ui-kit"`** для копирования в приложение-потребитель.
 
 ### Note for LLMs
 
-При генерации экранов опирайся на публичный API выше и на **исходники** в `src/components/avatar/examples/*.tsx`: там полные импорты **`prime-ui-kit`**, типичная композиция с **[Typography](../typography/COMPONENT.md)** / **[LinkButton](../link-button/COMPONENT.md)** / **`Icon`** (экспорт пакета) и семантическая вёрстка без обхода стилей кита. Не дублируй длинные листинги в ответе — укажи путь к файлу примера.
+При генерации экранов опирайся на публичный API выше и на **исходники** в `src/components/avatar/examples/*.tsx`. Сценарии из таблицы выше **согласованы** с **`playground/snippets/avatar/*.tsx`** (размеры, состояния, группа, смена **`src`**, композиция слотов, переполнение). Для продуктовых экранов копируй примеры с **`prime-ui-kit`**; в самом ките правь зеркала с **`@/`**. Не дублируй длинные листинги в ответе — укажи путь к файлу примера или сниппета.
 
 ## Rules
 

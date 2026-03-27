@@ -1,10 +1,10 @@
+import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
-import { PlaygroundDocPage } from "../components/PlaygroundDocPage";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 import ProgressCircleA11yLabelSnippet from "../snippets/progress/circle-a11y-label";
 import progressCircleA11yLabelSource from "../snippets/progress/circle-a11y-label.tsx?raw";
@@ -73,122 +73,128 @@ const progressCircleRootApiRows: PlaygroundApiPropRow[] = [
 
 export default function ProgressCircleSection() {
   return (
-    <PlaygroundDocPage
-      title="ProgressCircle"
-      description={
-        <>
-          Круговой индикатор прогресса: кольцо на SVG с ролью <code>progressbar</code>, размеры{" "}
-          <code>s</code>–<code>xl</code>, настраиваемая шкала через <code>max</code> и опциональный
-          центр через <code>children</code> или скрытая подпись через <code>label</code>.
-        </>
-      }
-    >
-      <div className="demoExamples">
-        <div className="demoBlock">
-          <DemoSectionTitle>Размеры</DemoSectionTitle>
-          <DemoDescription>
-            Одинаковое заполнение (<code>value=50</code>) при разных <code>size</code>: меняются
-            диаметр и толщина обводки.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={progressCircleSizesSource.trim()}
-            previewLayout="stack-center"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <ProgressCircleSizesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+    <PageContent.Section>
+      <PageContent.Header>
+        <PageContent.Title>ProgressCircle</PageContent.Title>
+        <PageContent.Description measure="full">
+          {
+            <>
+              Круговой индикатор прогресса: кольцо на SVG с ролью <code>progressbar</code>, размеры{" "}
+              <code>s</code>–<code>xl</code>, настраиваемая шкала через <code>max</code> и
+              опциональный центр через <code>children</code> или скрытая подпись через{" "}
+              <code>label</code>.
+            </>
+          }
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              Одинаковое заполнение (<code>value=50</code>) при разных <code>size</code>: меняются
+              диаметр и толщина обводки.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={progressCircleSizesSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ProgressCircleSizesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Варианты шкалы</DemoSectionTitle>
-          <DemoDescription>
-            Одна и та же доля дуги при разных <code>max</code>: проценты, счётчик шагов, крупная
-            числовая шкала.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={progressCircleMaxScaleSource.trim()}
-            previewLayout="row"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <ProgressCircleMaxScaleSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Варианты шкалы</DemoSectionTitle>
+            <DemoDescription>
+              Одна и та же доля дуги при разных <code>max</code>: проценты, счётчик шагов, крупная
+              числовая шкала.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={progressCircleMaxScaleSource.trim()}
+              previewLayout="row"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ProgressCircleMaxScaleSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Состояния значения</DemoSectionTitle>
-          <DemoDescription>
-            Пустое, частичное и полное кольцо; отрицательные и завышенные <code>value</code>{" "}
-            усекаются до <code>0</code> и <code>max</code>.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={progressCircleStatesSource.trim()}
-            previewLayout="stack"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <ProgressCircleStatesSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния значения</DemoSectionTitle>
+            <DemoDescription>
+              Пустое, частичное и полное кольцо; отрицательные и завышенные <code>value</code>{" "}
+              усекаются до <code>0</code> и <code>max</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={progressCircleStatesSource.trim()}
+              previewLayout="stack"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ProgressCircleStatesSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Значение из состояния</DemoSectionTitle>
-          <DemoDescription>
-            Прогресс задаётся снаружи (<code>value</code> из <code>useState</code>); кнопки меняют
-            число так же, как при опросе API или таймера.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={progressCircleControlledSource.trim()}
-            previewLayout="stack"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <ProgressCircleControlledSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Значение из состояния</DemoSectionTitle>
+            <DemoDescription>
+              Прогресс задаётся снаружи (<code>value</code> из <code>useState</code>); кнопки меняют
+              число так же, как при опросе API или таймера.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={progressCircleControlledSource.trim()}
+              previewLayout="stack"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ProgressCircleControlledSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Композиция центра</DemoSectionTitle>
-          <DemoDescription>
-            В <code>children</code> можно собрать иконку, заголовок и второстепенный текст — контент
-            центрируется поверх кольца.
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={progressCircleCompositionSource.trim()}
-            previewLayout="row"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <ProgressCircleCompositionSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция центра</DemoSectionTitle>
+            <DemoDescription>
+              В <code>children</code> можно собрать иконку, заголовок и второстепенный текст —
+              контент центрируется поверх кольца.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={progressCircleCompositionSource.trim()}
+              previewLayout="row"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ProgressCircleCompositionSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>Имя без текста в центре</DemoSectionTitle>
-          <DemoDescription>
-            Кольцо без <code>children</code>: смысл для вспомогательных технологий задаётся{" "}
-            <code>label</code> (попадает в <code>aria-label</code> SVG).
-          </DemoDescription>
-          <PlaygroundExampleFrame.Root
-            code={progressCircleA11yLabelSource.trim()}
-            previewLayout="stack"
-          >
-            <PlaygroundExampleFrame.Stage>
-              <ProgressCircleA11yLabelSnippet />
-            </PlaygroundExampleFrame.Stage>
-          </PlaygroundExampleFrame.Root>
-        </div>
+          <div className="demoBlock">
+            <DemoSectionTitle>Имя без текста в центре</DemoSectionTitle>
+            <DemoDescription>
+              Кольцо без <code>children</code>: смысл для вспомогательных технологий задаётся{" "}
+              <code>label</code> (попадает в <code>aria-label</code> SVG).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={progressCircleA11yLabelSource.trim()}
+              previewLayout="stack"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ProgressCircleA11yLabelSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
 
-        <div className="demoBlock">
-          <DemoSectionTitle>API</DemoSectionTitle>
-          <DemoApiTitle>ProgressCircle.Root</DemoApiTitle>
-          <DemoDescription>
-            Единственный публичный узел: SVG-дуга и опциональный слот по центру.
-          </DemoDescription>
-          <PlaygroundApiTable rows={progressCircleRootApiRows} />
+          <div className="demoBlock">
+            <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>ProgressCircle.Root</DemoApiTitle>
+            <DemoDescription>
+              Единственный публичный узел: SVG-дуга и опциональный слот по центру.
+            </DemoDescription>
+            <PlaygroundApiTable rows={progressCircleRootApiRows} />
+          </div>
         </div>
-      </div>
-    </PlaygroundDocPage>
+      </PageContent.Body>
+    </PageContent.Section>
   );
 }

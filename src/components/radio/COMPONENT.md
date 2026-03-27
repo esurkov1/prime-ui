@@ -4,7 +4,7 @@
 
 ## Canonical
 
-- **`Radio`** — compound choice control: **`Radio.Root`** (field wrapper, `data-size`, `data-variant`, `data-disabled`, `data-invalid`), **`Radio.Label`** (native `input type="radio"` + marker + optional text), optional **`Radio.Hint`** and **`Radio.Error`** (wired into `aria-describedby` and invalid styling).
+- **`Radio`** — compound choice control: **`Radio.Root`** (field wrapper `.field`, `data-size`, `data-variant`, `data-disabled`, `data-invalid`), **`Radio.Label`** (native `input type="radio"` + marker + optional text), optional **`Radio.Hint`** and **`Radio.Error`** (wired into `aria-describedby` and invalid styling).
 - **`variant`:** **`default`** or **`error`** on **`Radio.Root`**; mounting **`Radio.Error`** also drives invalid / `aria-invalid` for that instance.
 - **`size`:** **`s` | `m` | `l` | `xl`** on **`Radio.Root`** — marker, label, and hint/error scale via context (`ControlSizeProvider`).
 - **Groups:** several **`Radio.Root`** nodes share the same **`name`** (and optionally **`value` / `checked` / `onChange`**) — there is **no** separate **`RadioGroup`**; behavior is native HTML or your controlled state.
@@ -17,23 +17,27 @@
 
 A compound radio field: wrapper, label row with a native radio and decorative rings, plus optional hint and error text aligned under the label column.
 
-- **When to use** — exactly one choice from a set of mutually exclusive options that submit with the form (`name`, `value`, `required`).
-- **When to use** — options that should behave as one native radio group (same **`name`** on each **`Radio.Root`**).
-- **When to use** — short helper or validation copy tied to a single option via **`Radio.Hint`** / **`Radio.Error`**.
+- **When to use** — exactly one choice from mutually exclusive options that submit with the form (`name`, `value`, `required`); native group semantics with the same **`name`** on each **`Radio.Root`**; short helper or validation copy per option via **`Radio.Hint`** / **`Radio.Error`**.
 - **When not to use** — multiple independent toggles or “select many” (prefer [Checkbox](../checkbox/COMPONENT.md)).
 - **When not to use** — a single binary on/off where a switch fits the product language (prefer [Switch](../switch/COMPONENT.md)).
 - **When not to use** — a compact segmented bar of modes in one control (prefer [Segmented control](../segmented-control/COMPONENT.md)).
 - **When not to use** — fully custom markup or `asChild`; the marker and label row are fixed by the implementation.
 
-### Composition
+### Playground snippets
 
-- **`Radio.Root`** — provides context (`inputId`, hint/error ids, `describedBy`, hint/error registration) and wraps children in a **`div`**.
-- **`Radio.Label`** — [Label](../label/COMPONENT.md) with **`htmlFor`** tied to the input; contains the **`input`**, SVG marker, and optional **`children`** text.
-- **`Radio.Hint`** — optional; registers so its id is merged into **`aria-describedby`**; uses the disabled hint variant when the root is **`disabled`**.
-- **`Radio.Error`** — optional; error-styled **`Hint.Root`** and registers invalid state (same effect as **`variant="error"`** on the root for styling).
-- **Order:** **`Radio.Root`** → **`Radio.Label`** → **`Radio.Hint`** and/or **`Radio.Error`** when needed. Public API: **`Radio.Root`**, **`Radio.Label`**, **`Radio.Hint`**, **`Radio.Error`**.
+Demos match **`playground/sections/RadioSection.tsx`** (order and intent). Sources use `@/` imports under **`playground/snippets/radio/`**:
 
-### Scenarios (see `examples/`)
+| Block | File | What it shows |
+|-------|------|----------------|
+| **Sizes** | [`sizes.tsx`](../../../playground/snippets/radio/sizes.tsx) | **`size`** **`s`**, **`m`**, **`l`**, **`xl`** at **`variant="default"`**; separate **`name`** per row so previews do not clash. |
+| **Variants** | [`variants.tsx`](../../../playground/snippets/radio/variants.tsx) | **`variant="default"`** with **`Radio.Hint`** vs **`variant="error"`** with **`Radio.Error`** and **`aria-invalid`**. |
+| **States** | [`states.tsx`](../../../playground/snippets/radio/states.tsx) | Unchecked, selected, **`disabled`** (off/on), row with **`Radio.Hint`** and **`aria-describedby`**. |
+| **Controlled** | [`controlled.tsx`](../../../playground/snippets/radio/controlled.tsx) (+ [`radio-snippets.module.css`](../../../playground/snippets/radio/radio-snippets.module.css)) | Same **`name`**, **`checked`** + **`onChange`** with **`e.currentTarget.checked`**; summary line. |
+| **Composition** | [`composition.tsx`](../../../playground/snippets/radio/composition.tsx) | Two options, shared **`name`**, **`Radio.Hint`** under each (payment-style block). |
+| **Full width** | [`full-width.tsx`](../../../playground/snippets/radio/full-width.tsx) (+ [`radio-snippets.module.css`](../../../playground/snippets/radio/radio-snippets.module.css)) | Narrow column (`previewBannerNarrowColumn` in playground): root stretches **`width: 100%`**, label uses remaining space. |
+| **Specific** | [`form-group.tsx`](../../../playground/snippets/radio/form-group.tsx) (+ [`radio-snippets.module.css`](../../../playground/snippets/radio/radio-snippets.module.css)) | **`fieldset`** / **`legend`**, **`required`**, **`FormData`** on submit. |
+
+### Scenarios (recipes)
 
 | Scenario | Approach |
 |----------|----------|
@@ -41,6 +45,16 @@ A compound radio field: wrapper, label row with a native radio and decorative ri
 | Plan picker | Controlled group: **`checked`** + **`onChange`**, same **`name`**, optional summary line. → [`examples/plan-picker.tsx`](examples/plan-picker.tsx) |
 | Settings group | Themed or preference block; **`disabled`** on tier-gated options. → [`examples/settings-group.tsx`](examples/settings-group.tsx) |
 | Single primary channel | One-notice policy (email vs SMS vs app); still radios, not checkboxes. → [`examples/notification-channel.tsx`](examples/notification-channel.tsx) |
+
+Runnable recipe examples use **`prime-ui-kit`** imports under **`examples/`**. Snippet-level demos (internal `@/` imports) are listed in **Playground snippets** above.
+
+### Composition
+
+- **`Radio.Root`** — provides context (`inputId`, hint/error ids, `describedBy`, hint/error registration) and wraps children in a **`div`** with class **`field`**.
+- **`Radio.Label`** — [Label](../label/COMPONENT.md) with **`htmlFor`** tied to the input; contains the **`input`**, SVG marker, and optional **`children`** text.
+- **`Radio.Hint`** — optional; registers so its id is merged into **`aria-describedby`**; uses the disabled hint variant when the root is **`disabled`**.
+- **`Radio.Error`** — optional; error-styled **`Hint.Root`** and registers invalid state (same effect as **`variant="error"`** on the root for styling).
+- **Order:** **`Radio.Root`** → **`Radio.Label`** → **`Radio.Hint`** and/or **`Radio.Error`** when needed. Public API: **`Radio.Root`**, **`Radio.Label`**, **`Radio.Hint`**, **`Radio.Error`**.
 
 ### Minimal example
 
@@ -71,11 +85,11 @@ export function Example() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | variant | `"default" \| "error"` | `"default"` | no | Error styling and `data-invalid` when `error` or when `Radio.Error` is mounted. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Marker, typography, and hint/error scale. |
+| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Marker, typography, and hint/error scale from one control token tier. |
 | id | `string` | auto (`useId`) | no | Input id; paired with `Radio.Label` via `htmlFor`. |
-| className | `string` | — | no | Class on the field wrapper `div`. |
-| disabled | `boolean` | — | no | Disables the input and label row. |
-| aria-describedby | `string` | — | no | Combined with hint and error ids when those slots exist. |
+| className | `string` | — | no | Class on the field wrapper (`.field` around Label, Hint, Error slots). |
+| disabled | `boolean` | — | no | Disables the input and label row; stays in sync with label visuals. |
+| aria-describedby | `string` | — | no | Combined with hint and error ids when `Radio.Hint` / `Radio.Error` mount. |
 | children | `React.ReactNode` | — | no | Typically `Label`, optional `Hint` / `Error`. |
 | ref | `React.Ref<HTMLInputElement>` | — | no | Ref to the native radio input. |
 | …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" \| "size">` | — | no | Other native attributes on the `input` (e.g. `name`, `value`, `checked`, `defaultChecked`, `onChange`, `required`, `readOnly`, `form`). `type` is always `radio`. |
@@ -85,7 +99,7 @@ export function Example() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | children | `React.ReactNode` | — | no | Label text beside the marker; omit only if an accessible name is set on the root input via remaining root props (e.g. `aria-label`). |
-| className | `string` | — | no | Class on the label row. |
+| className | `string` | — | no | Class on the label row (`Label.Root`). |
 | …rest | `Omit<React.HTMLAttributes<HTMLLabelElement>, "htmlFor" \| "size">` | — | no | Other label attributes; `htmlFor` and `size` come from context. |
 
 ### Radio.Hint
@@ -93,14 +107,14 @@ export function Example() {
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | children | `React.ReactNode` | — | yes | Supplementary text below the label. |
-| className | `string` | — | no | Additional class on the hint slot. |
-| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Paragraph attributes; `id` is managed internally. |
+| className | `string` | — | no | Additional class on the hint slot (offset under the marker column). |
+| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Paragraph attributes; `id` is managed internally for `aria-describedby`. |
 
 ### Radio.Error
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | yes | Error message text. |
+| children | `React.ReactNode` | — | yes | Error message text; registers invalid context (`aria-invalid` on input). |
 | className | `string` | — | no | Additional class on the error slot. |
 | …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Paragraph attributes; `id` is managed internally for `aria-describedby`. |
 
@@ -120,4 +134,4 @@ export function Example() {
 - Grouping: repeat **`Radio.Root`** with the same **`name`**; for controlled mode, set **`checked`/`onChange`** (or **`defaultChecked`**) consistently across the group.
 - Do not invent a **`Radio.Group`** wrapper — it is not part of the API.
 - Per-root context: **`Radio.Error`** / **`variant="error"`** affect **that** instance’s input **`aria-invalid`** and wrapper **`data-invalid`**; for a whole-group message, either mirror **`variant="error"`** on each root in the group or add separate page-level copy as required by your form pattern.
-- Examples under **`src/components/radio/examples/`** import **`"prime-ui-kit"`** so they match consumer apps after **`npm install prime-ui-kit`**.
+- **Playground demos** live under **`playground/snippets/radio/`** and are wired from **`playground/sections/RadioSection.tsx`**. **Recipes** under **`src/components/radio/examples/`** import **`prime-ui-kit`** for copy-paste after **`npm install prime-ui-kit`**.

@@ -28,15 +28,31 @@
 
 - **`ProgressBar.Root`** — outer **`div`** with **`data-size`**, optional **`label`** (**`<span>`** + generated **`id`**), then **`<progress>`** with **`value`**, **`max`**, and **`className`** on the track. Width follows the parent (full width of the container).
 
-### Scenarios (see `examples/`)
+### Playground (`playground/sections/ProgressBarSection.tsx`)
 
-| Scenario | Approach |
-|----------|----------|
-| Labeled meter | Set **`label`** so copy sits above the track and **`aria-labelledby`** is wired. → [`examples/labeled.tsx`](examples/labeled.tsx) |
-| Upload / download | Update **`value`** from bytes (or percent); keep filename or status in [Typography](../typography/COMPONENT.md) around the bar. → [`examples/upload-progress.tsx`](examples/upload-progress.tsx) |
-| Step progress | **`value`** = current step, **`max`** = total steps; label like “Step *k* of *n*”. → [`examples/step-progress.tsx`](examples/step-progress.tsx) |
-| Indeterminate / unknown duration | Do **not** force **`ProgressBar`** without a real **`value`**; use **`Button`** **`loading`** (and optional muted copy). → [`examples/indeterminate-busy-state.tsx`](examples/indeterminate-busy-state.tsx) |
-| Wizard / report block | Stack **Typography** + **`ProgressBar.Root`** + muted helper text. → [`examples/wizard-composition.tsx`](examples/wizard-composition.tsx) |
+The section renders snippets from **`playground/snippets/progress/`** (bar demos only):
+
+| Demo (section) | Snippet | What it shows |
+|----------------|---------|----------------|
+| Размеры | [`bar-sizes.tsx`](../../../playground/snippets/progress/bar-sizes.tsx) | **`size`** **`s`**, **`m`**, **`l`**, **`xl`**, each with a **`label`** (track height and label scale from control-size tokens). |
+| Values | [`bar-values.tsx`](../../../playground/snippets/progress/bar-values.tsx) | **`value`** **`0`**, **`25`**, **`75`**, **`100`** without **`label`**. |
+| With label | [`bar-label.tsx`](../../../playground/snippets/progress/bar-label.tsx) | **`value={60}`**, **`label="Profile completion"`** (same English copy as the snippet; section preview matches this structure). |
+
+Other bar-only snippets in the same folder (**`bar-full-width`**, **`bar-states`**, **`bar-controlled`**, **`bar-composition`**) are not mounted in **`ProgressBarSection`**; they follow the same **`@/components/progress-bar`** import style for local dev.
+
+### Example files in `examples/`
+
+Imports use **`"prime-ui-kit"`** so the same patterns work in an app. **`sizes`**, **`values`**, and **`labeled`** mirror the three playground frames above (same structure; English labels in **`sizes`** where the snippet uses Russian).
+
+| File | Scenario |
+|------|----------|
+| [`sizes.tsx`](examples/sizes.tsx) | **`size`** ladder **`s`–`xl`** with labels (`snippets/progress/bar-sizes.tsx`). |
+| [`values.tsx`](examples/values.tsx) | **`value`** 0 / 25 / 75 / 100, no **`label`** (`snippets/progress/bar-values.tsx`). |
+| [`labeled.tsx`](examples/labeled.tsx) | **`label`** + **`aria-labelledby`** wiring (`snippets/progress/bar-label.tsx`). |
+| [`upload-progress.tsx`](examples/upload-progress.tsx) | Controlled **`value`** from progress percent; filename and actions in surrounding copy. |
+| [`step-progress.tsx`](examples/step-progress.tsx) | **`value`** / **`max`** as step *k* of *n*. |
+| [`indeterminate-busy-state.tsx`](examples/indeterminate-busy-state.tsx) | Unknown duration: **`Button`** **`loading`**, not an indeterminate **`ProgressBar`**. |
+| [`wizard-composition.tsx`](examples/wizard-composition.tsx) | **Typography** + bar + muted helper (aligned with **`bar-composition.tsx`** idea; app-ready English). |
 
 ### Minimal example
 
@@ -82,3 +98,4 @@ export function Example() {
 - **`value`** is always required; do not suggest omitting **`value`** for a “loading” bar — use **Button** **`loading`** / **`Button.Spinner`** or another pattern.
 - Native **`<progress>`** is not a props bag: extra attributes are **not** forwarded from **`ProgressBar.Root`**.
 - Step flows: **`value={currentStep}`**, **`max={totalSteps}`** (not necessarily 0–100).
+- Playground bar frames: **`playground/sections/ProgressBarSection.tsx`** uses **`bar-sizes`**, **`bar-values`**, **`bar-label`**; **`examples/sizes`**, **`examples/values`**, **`examples/labeled`** mirror those three for **`prime-ui-kit`** consumers.
