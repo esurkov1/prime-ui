@@ -338,7 +338,7 @@
 }
 
 .content > .block + .block {
-  margin-top: var(--prime-sys-spacing-x4);
+  margin-top: var(--dd-pad);
 }
 
 .content > .block + .separator {
