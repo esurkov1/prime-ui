@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Select } from "./Select";
@@ -201,16 +202,114 @@ describe("Select (composable)", () => {
     expect(onChange).toHaveBeenCalledWith("two");
   });
 
-  it("controlled: value prop controls displayed label", () => {
+  it("controlled: value prop controls displayed label", async () => {
     const onChange = vi.fn();
     render(<BasicSelect value="two" onChange={onChange} />);
 
-    // Needs item to register its label — open and close to register
-    fireEvent.click(screen.getByRole("combobox"));
-    expect(screen.getByRole("listbox")).toBeInTheDocument();
-    // After items register, label "Two" appears in trigger
-    const options = screen.getAllByRole("option");
-    expect(options).toHaveLength(3);
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toHaveTextContent("Two");
+    });
+  });
+
+  it("controlled: external value change does not keep stale item label (e.g. __none__ → id)", async () => {
+    const noop = vi.fn();
+    const { rerender } = render(
+      <Select.Root value="__none__" onChange={noop} placeholder="Pick">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="__none__">—</Select.Item>
+          <Select.Item value="one">One</Select.Item>
+          <Select.Item value="two">Two</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toHaveTextContent("—");
+    });
+
+    rerender(
+      <Select.Root value="two" onChange={noop} placeholder="Pick">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="__none__">—</Select.Item>
+          <Select.Item value="one">One</Select.Item>
+          <Select.Item value="two">Two</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toHaveTextContent("Two");
+    });
+    expect(screen.getByRole("combobox")).not.toHaveTextContent("—");
+  });
+
+  it("controlled: rapid external value changes resolve to final label", async () => {
+    const noop = vi.fn();
+    const { rerender } = render(
+      <Select.Root value="one" onChange={noop} placeholder="Pick">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="one">One</Select.Item>
+          <Select.Item value="two">Two</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+
+    rerender(
+      <Select.Root value="two" onChange={noop} placeholder="Pick">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="one">One</Select.Item>
+          <Select.Item value="two">Two</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    rerender(
+      <Select.Root value="one" onChange={noop} placeholder="Pick">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="one">One</Select.Item>
+          <Select.Item value="two">Two</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toHaveTextContent("One");
+    });
+  });
+
+  it("controlled: label tracks value under StrictMode", async () => {
+    const noop = vi.fn();
+    render(
+      <React.StrictMode>
+        <Select.Root value="two" onChange={noop} placeholder="Pick">
+          <Select.Trigger>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="__none__">—</Select.Item>
+            <Select.Item value="two">Two</Select.Item>
+          </Select.Content>
+        </Select.Root>
+      </React.StrictMode>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toHaveTextContent("Two");
+    });
   });
 
   it("defaultValue sets initial selection", () => {

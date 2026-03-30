@@ -17,12 +17,15 @@ import { handleSelectListboxKeyDown, queryEnabledSelectOptions } from "./selectL
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 
+type SelectedLabelBinding = { value: string; label: string };
+
 type SelectContextValue = {
   size: SelectSize;
   hasError: boolean;
   isOpen: boolean;
   selectedValue: string | undefined;
-  selectedLabel: string | undefined;
+  /** Label shown in trigger; only applies while `binding.value === selectedValue` (avoids stale label on controlled value changes). */
+  selectedLabelBinding: SelectedLabelBinding | undefined;
   onSelect: (value: string, label: string) => void;
   onClose: () => void;
   onOpen: () => void;
@@ -88,7 +91,9 @@ function SelectComboboxRoot({
     onChange: handleChange,
   });
 
-  const [selectedLabel, setSelectedLabel] = React.useState<string | undefined>(undefined);
+  const [selectedLabelBinding, setSelectedLabelBinding] = React.useState<
+    SelectedLabelBinding | undefined
+  >(undefined);
   const [isOpen, setIsOpen] = React.useState(false);
   const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
 
@@ -103,14 +108,14 @@ function SelectComboboxRoot({
 
   const onInitLabel = React.useCallback((val: string, label: string) => {
     if (val === selectedValueRef.current) {
-      setSelectedLabel(label);
+      setSelectedLabelBinding({ value: val, label });
     }
   }, []);
 
   const onSelect = React.useCallback(
     (val: string, label: string) => {
       setSelectedValue(val);
-      setSelectedLabel(label);
+      setSelectedLabelBinding({ value: val, label });
       setIsOpen(false);
     },
     [setSelectedValue],
@@ -126,7 +131,7 @@ function SelectComboboxRoot({
         hasError,
         isOpen,
         selectedValue,
-        selectedLabel,
+        selectedLabelBinding,
         onSelect,
         onClose,
         onOpen,
@@ -219,9 +224,12 @@ export type SelectValueProps = {
 };
 
 function SelectValue({ className }: SelectValueProps) {
-  const { selectedLabel, selectedValue, placeholder } = useSelectContext();
-  /* Пока список закрыт, Option не смонтированы — onInitLabel не вызывается; показываем value */
-  const display = selectedLabel ?? selectedValue ?? placeholder;
+  const { selectedLabelBinding, selectedValue, placeholder } = useSelectContext();
+  /* Подпись из items валидна только для текущего value; иначе — raw value или placeholder до onInitLabel */
+  const display =
+    selectedLabelBinding && selectedLabelBinding.value === selectedValue
+      ? selectedLabelBinding.label
+      : (selectedValue ?? placeholder);
   return (
     <span
       className={cx(styles.triggerValue, className)}
@@ -419,9 +427,11 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
       (typeof children === "string" ? children : undefined) ??
       value;
 
+    // Controlled selection can change without this item's props changing — re-register label for the current value.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: selectedValue intentionally forces re-run for external value updates
     React.useEffect(() => {
       onInitLabel(value, resolvedLabel);
-    }, [value, resolvedLabel, onInitLabel]);
+    }, [value, resolvedLabel, onInitLabel, selectedValue]);
 
     const handleClick = () => {
       if (!disabled) onSelect(value, resolvedLabel);
