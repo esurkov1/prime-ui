@@ -9,12 +9,14 @@ import type { SidebarSize } from "@/internal/states";
 
 import styles from "./Sidebar.module.css";
 import { SidebarProvider, type SidebarSide } from "./sidebar-context";
+import { readStoredDesktopMode, writeStoredDesktopMode } from "./sidebarDesktopStorage";
 import {
   type LegacySidebarLayoutMode,
   normalizeSidebarMode,
   SIDEBAR_MEDIA_QUERY_NARROW,
   type SidebarLayoutMode,
 } from "./sidebarLayout";
+import { useSidebarNarrowViewport } from "./useSidebarNarrowViewport";
 
 export type { SidebarLayoutMode, SidebarSide };
 
@@ -39,21 +41,42 @@ export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"aside">, "ch
   onOpenChange?: (open: boolean) => void;
   responsive?: boolean;
   sidebarSlot?: "page-nav";
+  /**
+   * Ключ `localStorage`: запоминаются только режимы рабочего стола `expanded` / `compact`.
+   * На узком вьюпорте drawer при загрузке всегда закрыт; при возврате на широкий экран подставляется сохранённый режим.
+   */
+  persistStateKey?: string;
 };
 
-function initialMobileMatch(responsive: boolean): boolean {
-  if (!responsive) return false;
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
-  return window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW).matches;
-}
+function computeInitialLayoutState(args: {
+  responsive: boolean;
+  defaultOpen: boolean;
+  persistStateKey: string | undefined;
+  defaultState: SidebarLayoutMode | undefined;
+  modeDefault: SidebarLayoutMode | undefined;
+}): SidebarLayoutMode {
+  const isNarrow =
+    args.responsive &&
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW).matches;
 
-function defaultStateFromProps(
-  responsive: boolean,
-  isMobile: boolean,
-  defaultOpen: boolean,
-): SidebarLayoutMode {
-  if (responsive && isMobile) return "hidden";
-  return defaultOpen ? "expanded" : "hidden";
+  if (args.defaultState !== undefined) {
+    const normalized = normalizeSidebarMode(args.defaultState);
+    if (args.responsive && isNarrow) return "hidden";
+    return normalized;
+  }
+  if (args.modeDefault !== undefined) {
+    const normalized = normalizeSidebarMode(args.modeDefault);
+    if (args.responsive && isNarrow) return "hidden";
+    return normalized;
+  }
+  if (args.responsive && isNarrow) return "hidden";
+  if (args.persistStateKey && typeof window !== "undefined") {
+    const stored = readStoredDesktopMode(args.persistStateKey);
+    if (stored) return stored;
+  }
+  return args.defaultOpen ? "expanded" : "hidden";
 }
 
 const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function SidebarRoot(
@@ -72,6 +95,7 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
     defaultOpen = true,
     onOpenChange,
     responsive = true,
+    persistStateKey,
     sidebarSlot,
     "aria-label": ariaLabel = "Sidebar",
     ...rest
@@ -96,18 +120,24 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
     [ref],
   );
 
-  const initialMobile = initialMobileMatch(Boolean(responsive));
-
   const modeControlled = mode === undefined ? undefined : normalizeSidebarMode(mode);
   const modeDefault = defaultMode === undefined ? undefined : normalizeSidebarMode(defaultMode);
 
   const controlledState =
     state ?? modeControlled ?? (open === undefined ? undefined : open ? "expanded" : "hidden");
 
-  const resolvedDefaultState =
-    defaultState ??
-    modeDefault ??
-    defaultStateFromProps(Boolean(responsive), initialMobile, Boolean(defaultOpen));
+  const initialLayoutDefaultRef = React.useRef<SidebarLayoutMode | null>(null);
+  if (initialLayoutDefaultRef.current === null) {
+    initialLayoutDefaultRef.current = computeInitialLayoutState({
+      responsive: Boolean(responsive),
+      defaultOpen: Boolean(defaultOpen),
+      persistStateKey,
+      defaultState,
+      modeDefault,
+    });
+  }
+
+  const resolvedDefaultState = initialLayoutDefaultRef.current;
 
   const [layoutState, setLayoutState] = useControllableState<SidebarLayoutMode>({
     value: controlledState,
@@ -119,28 +149,8 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
     },
   });
 
-  const [isMobile, setIsMobile] = React.useState(initialMobile);
-  const previousMobileRef = React.useRef(initialMobile);
-
-  React.useEffect(() => {
-    if (!responsive || typeof window === "undefined" || typeof window.matchMedia !== "function") {
-      setIsMobile(false);
-      previousMobileRef.current = false;
-      return;
-    }
-
-    const query = window.matchMedia(SIDEBAR_MEDIA_QUERY_NARROW);
-    const update = () => setIsMobile(query.matches);
-    update();
-
-    if (typeof query.addEventListener === "function") {
-      query.addEventListener("change", update);
-      return () => query.removeEventListener("change", update);
-    }
-
-    query.addListener(update);
-    return () => query.removeListener(update);
-  }, [responsive]);
+  const isMobile = useSidebarNarrowViewport(Boolean(responsive));
+  const previousMobileRef = React.useRef(isMobile);
 
   React.useEffect(() => {
     const wasMobile = previousMobileRef.current;
@@ -152,10 +162,24 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
       return;
     }
 
+    const stored = persistStateKey ? readStoredDesktopMode(persistStateKey) : null;
+    if (stored === "expanded" || stored === "compact") {
+      setLayoutState(stored);
+      return;
+    }
+
     if (layoutState === "hidden" && defaultOpen) {
       setLayoutState("expanded");
     }
-  }, [defaultOpen, isMobile, layoutState, responsive, setLayoutState]);
+  }, [defaultOpen, isMobile, layoutState, persistStateKey, responsive, setLayoutState]);
+
+  React.useEffect(() => {
+    if (!persistStateKey || controlledState !== undefined) return;
+    if (isMobile) return;
+    if (layoutState === "expanded" || layoutState === "compact") {
+      writeStoredDesktopMode(persistStateKey, layoutState);
+    }
+  }, [controlledState, isMobile, layoutState, persistStateKey]);
 
   const setState = React.useCallback(
     (next: SidebarLayoutMode) => {

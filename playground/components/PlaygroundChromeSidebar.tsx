@@ -603,7 +603,11 @@ export function PlaygroundChromeSidebar() {
   }, [pathname]);
 
   return (
-    <Sidebar.Root sidebarSlot="page-nav" aria-label="Навигация playground">
+    <Sidebar.Root
+      persistStateKey="prime-ui-kit-playground-sidebar"
+      sidebarSlot="page-nav"
+      aria-label="Навигация playground"
+    >
       <Sidebar.NavPanel>
         <Sidebar.Header>
           <Sidebar.HeaderRow>
