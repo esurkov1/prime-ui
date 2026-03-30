@@ -1,185 +1,125 @@
 # Drawer
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
-
 ## About
 
-A slide-over panel rendered in a portal with a backdrop: page scroll is locked, focus stays inside the dialog until it closes, and siblings of the portal root on `document.body` are marked inert and `aria-hidden` while open.
+`Drawer` — модальная боковая панель поверх страницы.
 
-- **Use** for secondary detail, filters, forms, or actions tied to a screen edge (left/right/top/bottom) without leaving the current view.
-- **Use** for bottom or top sheets when the main canvas (for example a map) should stay partly visible.
-- **Use** for the same modal-style contract as a dialog (focus trap, blocked background) but with an edge-attached panel instead of a centered box.
-- **Do not use** for short confirmations or compact prompts; prefer a centered [Modal](../modal/COMPONENT.md).
-- **Do not use** for inline expandable regions; use disclosure or a non-modal sidebar if you should not block the whole page.
-- **Do not use** for full page changes driven only by the URL; the kit does not wire routing—control `open` / `onOpenChange` from the app.
+Что делает компонент при `open=true`:
+- рендерится в `Portal`;
+- блокирует скролл страницы;
+- закрывается по `Escape`;
+- закрывается по клику на overlay;
+- показывает шапку (иконка, заголовок, подзаголовок), scroll-body и опциональный footer;
+- воспроизводит анимации `slide-in` / `slide-out`.
 
-## Composition
+Используйте `Drawer` для вторичных сценариев: фильтры, быстрые формы, детали сущности, action-панели.
 
-- **`Drawer.Root`** — holds open state, `closeOnEscape`, and `closeOnOverlayClick`; wraps everything else.
-- **`Drawer.Trigger`** (optional) — exactly one child element; opens on click unless the child’s `onClick` calls `preventDefault`.
-- **`Drawer.Portal`** — renders nothing when closed; when open, portals children (default container `document.body` via the internal `Portal`).
-- **`Drawer.Overlay`** and the panel surface should be **siblings** inside **`Drawer.Portal`** (backdrop is not a wrapper around the panel). List **`Drawer.Overlay`** before the panel so it stacks under the dialog when `z-index` ties.
-- **Panel surface:** at the portal root, **`Drawer.Content`** renders the full dialog shell (`role="dialog"`, focus trap, scroll lock, inert siblings, chrome size for header/footer). For a split where only the middle scrolls, use **`Drawer.Panel`** as the shell and nest **`Drawer.Content`** for the body region — see **`examples/explicit-panel.tsx`**.
-- **`Drawer.Header`** → **`Drawer.Title`**, **`Drawer.Body`**, **`Drawer.Footer`** — all **must** be nested inside the panel surface (**`Drawer.Content`** at root or **`Drawer.Panel`**). **`Drawer.Close`** wraps a single control that should close the drawer (often a button in the footer or custom actions).
+## Breaking Change
 
-### Minimal example
+Старый compound API удалён полностью.
+
+Удалены:
+- `Drawer.Root`
+- `Drawer.Trigger`
+- `Drawer.Portal`
+- `Drawer.Overlay`
+- `Drawer.Content`
+- `Drawer.Body`
+- `Drawer.Header`
+- `Drawer.Title`
+- `Drawer.Footer`
+- `Drawer.Close`
+
+Новый API: один компонент `Drawer`.
+
+## Minimal Example
 
 ```tsx
+import * as React from "react";
 import { Button, Drawer } from "prime-ui-kit";
 
 export function DrawerMinimal() {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Drawer.Root>
-      <Drawer.Trigger>
-        <Button.Root type="button" variant="neutral" mode="stroke">
-          Open
-        </Button.Root>
-      </Drawer.Trigger>
-      <Drawer.Portal>
-        <Drawer.Overlay />
-        <Drawer.Content aria-labelledby="drawer-min-title">
-          <Drawer.Header>
-            <Drawer.Title id="drawer-min-title">Panel</Drawer.Title>
-          </Drawer.Header>
-          <Drawer.Body>
-            <p>Content</p>
-          </Drawer.Body>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+    <>
+      <Button.Root type="button" onClick={() => setOpen(true)}>
+        Open drawer
+      </Button.Root>
+
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        title="Edit workspace"
+        description="Update settings and save changes"
+        footer={
+          <>
+            <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(false)}>
+              Cancel
+            </Button.Root>
+            <Button.Root variant="primary" onClick={() => setOpen(false)}>
+              Save
+            </Button.Root>
+          </>
+        }
+      >
+        <p>Body content</p>
+      </Drawer>
+    </>
   );
 }
 ```
 
-### Playground snippets (source of truth)
+## API
 
-Runnable demos and copy-paste references: `playground/snippets/drawer/*.tsx` (Russian copy in UI; workspace imports use `@/`).
+### Drawer
 
-| File | Intent |
-|------|--------|
-| `sizes.tsx` | Ladder **`size`** `s`–`xl` on **`Drawer.Content`**; padding, title tier, header close button, and footer controls share one control tier. |
-| `variants-sides.tsx` | **`side`** `right` (default), `left`, `bottom`, `top`; top/bottom sheets use capped height (~**`80vh`** in styles) and scroll in **`Drawer.Body`**. |
-| `states.tsx` | **`closeOnEscape={false}`** and **`closeOnOverlayClick={false}`** for dismiss only via actions; **`showCloseButton={false}`** on **`Drawer.Header`**. |
-| `controlled.tsx` | **`open`** / **`onOpenChange`** on **`Drawer.Root`** without **`Drawer.Trigger`**. |
-| `composition.tsx` | Header, **`Input`** in **`Drawer.Body`**, footer with **`Drawer.Close`** on cancel. |
-| `full-width.tsx` | Vertical stack in **`Drawer.Footer`** with **`Button.Root`** **`fullWidth`**. |
-| `responsive.tsx` | Side width cap **`min(28rem, 90vw)`**; long copy scrolls in **`Drawer.Body`**. |
-| `trigger-link.tsx` | **`Drawer.Trigger`** with a single **`LinkButton`** child; opening merges with existing **`onClick`** (e.g. **`preventDefault`** on **`href`**). |
-| `features.tsx` | **`Drawer.Portal`** **`container`**, **`aria-label`** on **`Drawer.Content`** without a visible title row, long list scroll inside **`Drawer.Body`**. |
-
-### Examples (`examples/`)
-
-English scenario starters next to this file (workspace **`@/`**; published **`prime-ui-kit`**):
-
-| File | Intent |
-|------|--------|
-| `examples/filters-panel.tsx` | Leading-edge filters; scroll criteria, **Apply** / **Reset** in footer. |
-| `examples/cart-preview.tsx` | Trailing-edge cart preview; line items scroll; checkout in footer. |
-| `examples/settings-side.tsx` | Trailing-edge settings; form fields share drawer **`size`** with chrome. |
-| `examples/mobile-nav-sheet.tsx` | Bottom sheet nav; rows wrapped in **`Drawer.Close`**. |
-| `examples/explicit-panel.tsx` | **`Drawer.Panel`** shell with inner **`Drawer.Content`** as scroll body only. |
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| `open` | `boolean` | — | Yes | Контролируемое состояние открытия. |
+| `onOpenChange` | `(open: boolean) => void` | — | Yes | Вызывается при закрытии/открытии (Esc, overlay, крестик, внешние действия). |
+| `title` | `React.ReactNode` | — | Yes | Заголовок в шапке. |
+| `description` | `React.ReactNode` | — | No | Подзаголовок в шапке. |
+| `icon` | `React.ReactNode` | — | No | Иконка слева в шапке. |
+| `children` | `React.ReactNode` | — | Yes | Контент body внутри `ScrollContainer`. |
+| `footer` | `React.ReactNode` | — | No | Контент футера (обычно кнопки `Cancel` / `Save`). |
+| `side` | `'left' \| 'right'` | `'right'` | No | Сторона выезда панели. |
+| `className` | `string` | — | No | Дополнительный класс панели. |
+| `overlayClassName` | `string` | — | No | Дополнительный класс overlay. |
 
 ## Rules
 
-- **Controlled vs uncontrolled:** pass `open` and `onOpenChange` for controlled mode; otherwise use `defaultOpen` on `Drawer.Root`. Omit `Drawer.Trigger` when you open/close from parent state only.
-- **Closing:** Escape and overlay click update open state by default (and invoke **`onOpenChange`** when controlled). Disable with `closeOnEscape={false}` and/or `closeOnOverlayClick={false}` on `Drawer.Root` for explicit-dismiss-only flows. Escape is handled while the panel is open (same layer as the dialog focus trap). Backdrop close runs only when the click target is the overlay element itself (not bubbled from children).
-- **`Drawer.Trigger` / `Drawer.Close`:** each expects **exactly one** React child that accepts an `onClick` handler; the kit merges its handler with yours and respects `preventDefault`.
-- **Accessible name:** set `aria-labelledby` on the panel to the `id` of `Drawer.Title`, or `aria-label` when there is no visible title.
-- **Header close control:** `showCloseButton={false}` on `Drawer.Header` removes the built-in ghost button (`aria-label` is `"Close drawer"` in code when shown).
-- **Sizing:** `size` on the panel (`Drawer.Content` at root or `Drawer.Panel`) is `s` | `m` | `l` | `xl` (default `m`); it drives padding, title scale, and control sizing in chrome via `ControlSizeProvider`. Side panels cap width in CSS (**`min(28rem, 90vw)`**); top/bottom sheets cap height (~**`80vh`**), not separate width/height props.
-- **Portal:** `Drawer.Portal` renders `null` while closed, so portal subtree is unmounted when not open.
+- Компонент только контролируемый: состояние хранится в родителе (`open`, `onOpenChange`).
+- `side` поддерживает только `left` и `right`.
+- Шапка всегда содержит кнопку закрытия (крестик) справа.
+- Footer опционален: если `footer` не передан, нижняя зона не рендерится.
+- Для доступности `aria-labelledby`/`aria-describedby` формируются автоматически из `title`/`description`.
 
-## API
+## Playground snippets
 
-### Drawer.Root
+Source of truth: `playground/snippets/drawer/*.tsx`.
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `open` | `boolean` | — | No | Controlled open state. |
-| `defaultOpen` | `boolean` | `false` | No | Initial open state when uncontrolled. |
-| `onOpenChange` | `(open: boolean) => void` | — | No | Called when open state changes (trigger, dismiss, programmatic). |
-| `closeOnEscape` | `boolean` | `true` | No | Close on Escape while the panel is open. |
-| `closeOnOverlayClick` | `boolean` | `true` | No | Close when the overlay receives a direct click. |
-| `children` | `React.ReactNode` | — | Yes | Tree: trigger, portal, etc. |
+| File | Intent |
+|------|--------|
+| `controlled.tsx` | Базовый контролируемый сценарий `open` / `onOpenChange`. |
+| `composition.tsx` | Форма в body + действия в footer. |
+| `variants-sides.tsx` | Сравнение `side='left'` и `side='right'`. |
+| `states.tsx` | Варианты с footer и без footer. |
+| `full-width.tsx` | Вертикальный стек `fullWidth` кнопок в footer. |
+| `responsive.tsx` | Поведение ширины панели (`min(28rem, 90vw)`). |
+| `trigger-link.tsx` | Открытие из `LinkButton` через внешний `setOpen(true)`. |
+| `features.tsx` | Длинный scroll-body и шапка с иконкой/description. |
+| `sizes.tsx` | Паттерны расположения и действий для левой/правой панели. |
 
-### Drawer.Trigger
+## Examples (`examples/`)
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `children` | `React.ReactElement<{ onClick?: React.MouseEventHandler }>` | — | Yes | Single child; click opens unless default prevented. |
-
-### Drawer.Close
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `children` | `React.ReactElement<{ onClick?: React.MouseEventHandler; className?: string }>` | — | Yes | Single child; click runs your `onClick` then closes unless default prevented. |
-
-### Drawer.Portal
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `children` | `React.ReactNode` | — | No | Portaled subtree; not mounted when closed. |
-| `container` | `HTMLElement \| null` | `document.body` | No | DOM node for `createPortal` (falls back when `null`/omitted per `Portal` implementation). |
-
-### Drawer.Overlay
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `className` | `string` | — | No | Extra class on the backdrop. |
-| `onClick` | `React.MouseEventHandler<HTMLDivElement>` | — | No | Fires before overlay dismiss logic. |
-| … | `React.HTMLAttributes<HTMLDivElement>` | — | No | `role="presentation"`; remaining attributes on the backdrop `div`. |
-
-### Drawer.Content
-
-When used as the **direct** child of **`Drawer.Portal`** (after **`Drawer.Overlay`**), renders the dialog panel. When nested **inside** an existing panel, renders the scrollable body region only (see **`examples/explicit-panel.tsx`**).
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `side` | `"left" \| "right" \| "bottom" \| "top"` | `"right"` | No | Edge from which the panel enters. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Chrome and spacing tier for header/footer controls (`ControlSizeProvider`). |
-| `aria-label` | `string` | — | No | Accessible name when no visible title. |
-| `aria-labelledby` | `string` | — | No | `id` of the visible title element. |
-| `aria-describedby` | `string` | — | No | `id` of auxiliary description content. |
-| `className` | `string` | — | No | Class on the panel or inner body root. |
-| `children` | `React.ReactNode` | — | No | Shell slots (header, body, footer) when panel root; scroll content when nested. |
-| … | `React.HTMLAttributes<HTMLDivElement>` | — | No | Panel: `role="dialog"`, `aria-modal`, `tabIndex={-1}`, focus trap, scroll lock, inert siblings. |
-
-### Drawer.Panel
-
-Same props as **`Drawer.Content`** when **`Drawer.Content`** is the portal-root panel. Use **`Drawer.Panel`** for explicit shell + inner **`Drawer.Content`** body scrolling — **`examples/explicit-panel.tsx`**.
-
-### Drawer.Header
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `showCloseButton` | `boolean` | `true` | No | Built-in ghost close control (neutral) on the right. |
-| `className` | `string` | — | No | Class on the `<header>`. |
-| `children` | `React.ReactNode` | — | No | Usually **`Drawer.Title`**; area left of the close control. |
-| … | `React.HTMLAttributes<HTMLElement>` | — | No | Native `<header>` attributes. |
-
-### Drawer.Title
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `className` | `string` | — | No | Class on the `<h2>`. |
-| `children` | `React.ReactNode` | — | No | Title text; set `id` for `aria-labelledby` on the panel. |
-| … | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | Renders `<h2>`. |
-
-### Drawer.Body
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `className` | `string` | — | No | Class on the scroll container root. |
-| `children` | `React.ReactNode` | — | No | Main content; vertical scroll when overflowing. |
-| … | `React.HTMLAttributes<HTMLDivElement>` | — | No | Scrollable body via `ScrollContainer`. |
-
-### Drawer.Footer
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `className` | `string` | — | No | Class on the `<footer>`. |
-| `children` | `React.ReactNode` | — | No | Action row; controls use **`ControlSizeProvider`** from panel **`size`**. |
-| … | `React.HTMLAttributes<HTMLElement>` | — | No | Renders `<footer>`. |
+| File | Intent |
+|------|--------|
+| `examples/filters-panel.tsx` | Левая панель фильтров с действиями Apply/Reset. |
+| `examples/cart-preview.tsx` | Правая панель корзины с checkout-действиями. |
+| `examples/settings-side.tsx` | Правая панель настроек формы. |
+| `examples/mobile-nav-sheet.tsx` | Навигационные действия с закрытием по клику на пункт. |
+| `examples/explicit-panel.tsx` | Канонический сценарий новой шапки/body/footer. |
 
 ## Related
 
