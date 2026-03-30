@@ -104,7 +104,6 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
 ) {
   const rootRef = React.useRef<HTMLElement | null>(null);
   const reducedMotion = useReducedMotion();
-  const compactProgress = useMotionValue(0);
 
   const setRootRef = React.useCallback(
     (node: HTMLElement | null) => {
@@ -139,6 +138,14 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
 
   const resolvedDefaultState = initialLayoutDefaultRef.current;
 
+  const initialLayoutForProgress = controlledState ?? resolvedDefaultState;
+
+  const isMobile = useSidebarNarrowViewport(Boolean(responsive));
+
+  const compactProgressInitial = !isMobile && initialLayoutForProgress === "compact" ? 1 : 0;
+
+  const compactProgress = useMotionValue(compactProgressInitial);
+
   const [layoutState, setLayoutState] = useControllableState<SidebarLayoutMode>({
     value: controlledState,
     defaultValue: resolvedDefaultState,
@@ -149,7 +156,6 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
     },
   });
 
-  const isMobile = useSidebarNarrowViewport(Boolean(responsive));
   const previousMobileRef = React.useRef(isMobile);
 
   React.useEffect(() => {
@@ -212,6 +218,9 @@ const SidebarRoot = React.forwardRef<HTMLElement, SidebarRootProps>(function Sid
   const compactProgressTarget = !isMobile && layoutState === "compact" ? 1 : 0;
 
   React.useEffect(() => {
+    if (compactProgress.get() === compactProgressTarget) {
+      return;
+    }
     const controls = animate(compactProgress, compactProgressTarget, {
       duration: reducedMotion ? 0 : 0.24,
       ease: [0.4, 0, 0.2, 1],
