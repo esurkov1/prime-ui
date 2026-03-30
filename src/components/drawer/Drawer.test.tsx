@@ -1,55 +1,42 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import * as React from "react";
+import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
 
 import { Drawer } from "./Drawer";
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
+function ControlledDrawer({ side = "right" as const }: { side?: "left" | "right" }) {
+  const [open, setOpen] = React.useState(false);
 
-function BasicDrawer({
-  closeOnEscape = true,
-  closeOnOverlayClick = true,
-  side = "right" as const,
-}: {
-  closeOnEscape?: boolean;
-  closeOnOverlayClick?: boolean;
-  side?: "left" | "right" | "bottom" | "top";
-}) {
   return (
-    <Drawer.Root closeOnEscape={closeOnEscape} closeOnOverlayClick={closeOnOverlayClick}>
-      <Drawer.Trigger>
-        <Button.Root>Open</Button.Root>
-      </Drawer.Trigger>
-      <Drawer.Portal>
-        <Drawer.Overlay />
-        <Drawer.Content side={side} aria-labelledby="drw-title">
-          <Drawer.Header>
-            <Drawer.Title id="drw-title">Drawer title</Drawer.Title>
-          </Drawer.Header>
-          <Drawer.Body>
-            <p>Body content</p>
-            <Button.Root>Focusable inside</Button.Root>
-          </Drawer.Body>
-          <Drawer.Footer>
-            <Drawer.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Cancel
-              </Button.Root>
-            </Drawer.Close>
+    <>
+      <Button.Root onClick={() => setOpen(true)}>Open</Button.Root>
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        title="Drawer title"
+        description="Drawer description"
+        side={side}
+        footer={
+          <>
+            <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(false)}>
+              Cancel
+            </Button.Root>
             <Button.Root>Confirm</Button.Root>
-          </Drawer.Footer>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+          </>
+        }
+      >
+        <p>Body content</p>
+        <Button.Root>Focusable inside</Button.Root>
+      </Drawer>
+    </>
   );
 }
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
-
 describe("Drawer", () => {
-  it("renders Trigger and opens Content on click", () => {
-    render(<BasicDrawer />);
+  it("opens on external state change", () => {
+    render(<ControlledDrawer />);
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
@@ -59,204 +46,87 @@ describe("Drawer", () => {
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
   });
 
-  it("closes via Drawer.Close button in Footer", () => {
-    render(<BasicDrawer />);
+  it("closes by close button in header", async () => {
+    render(<ControlledDrawer />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("closes via built-in close button in Header", () => {
-    render(<BasicDrawer />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Close drawer" }));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("closes on Escape key by default", () => {
-    render(<BasicDrawer />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    fireEvent.keyDown(document, { key: "Escape" });
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("does not close on Escape when closeOnEscape=false", () => {
-    render(<BasicDrawer closeOnEscape={false} />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    fireEvent.keyDown(document, { key: "Escape" });
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-  });
-
-  it("closes on overlay click by default", () => {
-    render(<BasicDrawer />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    const overlay = screen.getByTestId("drawer-overlay");
-    fireEvent.click(overlay);
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("does not close on overlay click when closeOnOverlayClick=false", () => {
-    render(<BasicDrawer closeOnOverlayClick={false} />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    const overlay = screen.getByTestId("drawer-overlay");
-    fireEvent.click(overlay);
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-  });
-
-  it("moves focus to first focusable element on open (focus trap)", async () => {
-    render(<BasicDrawer />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
     await waitFor(() => {
-      const closeBtn = screen.getByRole("button", { name: "Close drawer" });
-      expect(document.activeElement).toBe(closeBtn);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });
 
-  it("locks body scroll when open", () => {
-    render(<BasicDrawer />);
+  it("closes by Escape", async () => {
+    render(<ControlledDrawer />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
-    expect(document.body.style.overflow).toBe("hidden");
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
   });
 
-  it("restores body scroll after closing", () => {
-    render(<BasicDrawer />);
+  it("closes by overlay click", async () => {
+    render(<ControlledDrawer />);
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+
+    fireEvent.click(screen.getByTestId("drawer-overlay"));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
+  it("marks dialog as focus-trap container", () => {
+    render(<ControlledDrawer />);
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+
+    expect(screen.getByRole("dialog")).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("locks and restores body scroll", async () => {
+    render(<ControlledDrawer />);
+
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     expect(document.body.style.overflow).toBe("hidden");
 
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(document.body.style.overflow).toBe("");
+
+    await waitFor(() => {
+      expect(document.body.style.overflow).toBe("");
+    });
   });
 
-  it("sets data-size='m' on Content by default", () => {
-    render(<BasicDrawer />);
+  it("renders title, description and footer", () => {
+    render(<ControlledDrawer />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-size", "m");
+    expect(screen.getByText("Drawer title")).toBeInTheDocument();
+    expect(screen.getByText("Drawer description")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Confirm" })).toBeInTheDocument();
   });
 
-  it("sets data-size from Content size prop", () => {
-    render(
-      <Drawer.Root>
-        <Drawer.Trigger>
-          <Button.Root>Open</Button.Root>
-        </Drawer.Trigger>
-        <Drawer.Portal>
-          <Drawer.Overlay />
-          <Drawer.Content size="xl" aria-label="Sized drawer">
-            <Drawer.Body>
-              <p>Sized</p>
-            </Drawer.Body>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>,
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-size", "xl");
-  });
-
-  it("matches close button size to Content size", () => {
-    render(
-      <Drawer.Root>
-        <Drawer.Trigger>
-          <Button.Root>Open</Button.Root>
-        </Drawer.Trigger>
-        <Drawer.Portal>
-          <Drawer.Overlay />
-          <Drawer.Content size="s" aria-labelledby="drw-sz">
-            <Drawer.Header>
-              <Drawer.Title id="drw-sz">T</Drawer.Title>
-            </Drawer.Header>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>,
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    expect(screen.getByRole("button", { name: "Close drawer" })).toHaveAttribute("data-size", "s");
-  });
-
-  it("sets data-side='right' by default", () => {
-    render(<BasicDrawer />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "right");
-  });
-
-  it("sets data-side='left'", () => {
-    render(<BasicDrawer side="left" />);
+  it("supports side left", () => {
+    render(<ControlledDrawer side="left" />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
     expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "left");
   });
 
-  it("sets data-side='bottom'", () => {
-    render(<BasicDrawer side="bottom" />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+  it("notifies onOpenChange(false) from overlay", () => {
+    const onOpenChange = vi.fn();
 
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "bottom");
-  });
-
-  it("sets data-side='top'", () => {
-    render(<BasicDrawer side="top" />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "top");
-  });
-
-  it("renders DrawerHeader, DrawerBody and DrawerFooter", () => {
-    render(<BasicDrawer />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    expect(screen.getByText("Drawer title")).toBeInTheDocument();
-    expect(screen.getByText("Body content")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Confirm" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
-  });
-
-  it("works in controlled mode", () => {
-    const { rerender } = render(
-      <Drawer.Root open={false}>
-        <Drawer.Portal>
-          <Drawer.Overlay />
-          <Drawer.Content aria-label="Controlled drawer">
-            <Drawer.Body>
-              <p>Controlled</p>
-            </Drawer.Body>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>,
+    render(
+      <Drawer open={true} onOpenChange={onOpenChange} title="Title">
+        <p>Body</p>
+      </Drawer>,
     );
 
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("drawer-overlay"));
 
-    rerender(
-      <Drawer.Root open={true}>
-        <Drawer.Portal>
-          <Drawer.Overlay />
-          <Drawer.Content aria-label="Controlled drawer">
-            <Drawer.Body>
-              <p>Controlled</p>
-            </Drawer.Body>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>,
-    );
-
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

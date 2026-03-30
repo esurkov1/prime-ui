@@ -1,42 +1,35 @@
+import * as React from "react";
+
 import { Button } from "@/components/button/Button";
 import { Drawer, type DrawerSide } from "@/components/drawer/Drawer";
+import { Icon } from "@/icons";
 
 import styles from "./sizes.module.css";
 
-const sides: DrawerSide[] = ["right", "left", "bottom", "top"];
+const sides: DrawerSide[] = ["right", "left"];
 
 function DrawerBySide({ side }: { side: DrawerSide }) {
-  const label =
-    side === "right"
-      ? "Справа"
-      : side === "left"
-        ? "Слева"
-        : side === "bottom"
-          ? "Снизу"
-          : "Сверху";
+  const [open, setOpen] = React.useState(false);
+  const label = side === "right" ? "Справа" : "Слева";
 
   return (
-    <Drawer.Root>
-      <Drawer.Trigger>
-        <Button.Root variant="neutral" mode="stroke">
-          {label}
-        </Button.Root>
-      </Drawer.Trigger>
-      <Drawer.Portal>
-        <Drawer.Overlay />
-        <Drawer.Content side={side} aria-labelledby={`drawer-side-${side}-title`}>
-          <Drawer.Header>
-            <Drawer.Title id={`drawer-side-${side}-title`}>Сторона: {label}</Drawer.Title>
-          </Drawer.Header>
-          <Drawer.Body>
-            <p>
-              Проп <code>side</code> задаёт, от какого края экрана выезжает панель. У нижнего и
-              верхнего листа высота ограничена (до 80vh), тело со скроллом при переполнении.
-            </p>
-          </Drawer.Body>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+    <>
+      <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
+        {label}
+      </Button.Root>
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        side={side}
+        title={`Сторона: ${label}`}
+        description="slide-in/slide-out от выбранного края"
+        icon={<Icon name="nav.layoutGrid" tone="subtle" />}
+      >
+        <p>
+          Проп <code>side</code> задаёт сторону выезда панели: left или right.
+        </p>
+      </Drawer>
+    </>
   );
 }
 

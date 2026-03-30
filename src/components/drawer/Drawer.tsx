@@ -2,13 +2,10 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
-import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
-import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import {
@@ -16,173 +13,69 @@ import {
   useOverlayPortalLayer,
 } from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
-import type { DrawerSize } from "@/internal/states";
 
 import styles from "./Drawer.module.css";
 
-export type { DrawerSize };
+const DRAWER_CLOSE_ANIMATION_MS = 220;
 
-export type DrawerSide = "left" | "right" | "bottom" | "top";
+export type DrawerSide = "left" | "right";
 
-type DrawerContextValue = {
+export type DrawerProps = {
   open: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-  closeOnEscape: boolean;
-  closeOnOverlayClick: boolean;
-};
-
-const [DrawerProvider, useDrawerContext] = createComponentContext<DrawerContextValue>("Drawer");
-
-const DrawerChromeSizeContext = React.createContext<DrawerSize | null>(null);
-const DrawerPanelContext = React.createContext(false);
-
-function useDrawerChromeSize(): DrawerSize {
-  const value = React.useContext(DrawerChromeSizeContext);
-  if (value === null) {
-    throw new Error(
-      "[prime-ui-kit] Drawer.Header, Drawer.Title, Drawer.Content and Drawer.Footer must be used inside Drawer.Panel.",
-    );
-  }
-  return value;
-}
-
-export type DrawerRootProps = {
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  closeOnEscape?: boolean;
-  closeOnOverlayClick?: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  icon?: React.ReactNode;
   children: React.ReactNode;
-};
-
-function DrawerRoot({
-  open,
-  defaultOpen = false,
-  onOpenChange,
-  closeOnEscape = true,
-  closeOnOverlayClick = true,
-  children,
-}: DrawerRootProps) {
-  const [isOpen, setIsOpen] = useControllableState({
-    value: open,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
-
-  const onOpen = React.useCallback(() => setIsOpen(true), [setIsOpen]);
-  const onClose = React.useCallback(() => setIsOpen(false), [setIsOpen]);
-
-  return (
-    <DrawerProvider value={{ open: isOpen, onOpen, onClose, closeOnEscape, closeOnOverlayClick }}>
-      {children}
-    </DrawerProvider>
-  );
-}
-
-export type DrawerTriggerProps = {
-  children: React.ReactElement<{ onClick?: React.MouseEventHandler }>;
-};
-
-function DrawerTrigger({ children }: DrawerTriggerProps) {
-  const { onOpen } = useDrawerContext();
-  const child = React.Children.only(children);
-
-  return React.cloneElement(child, {
-    onClick: (event: React.MouseEvent) => {
-      child.props.onClick?.(event);
-      if (!event.defaultPrevented) {
-        onOpen();
-      }
-    },
-  });
-}
-
-export type DrawerCloseProps = {
-  children: React.ReactElement<{
-    onClick?: React.MouseEventHandler;
-    className?: string;
-  }>;
-};
-
-function DrawerClose({ children }: DrawerCloseProps) {
-  const { onClose } = useDrawerContext();
-  const child = React.Children.only(children);
-
-  return React.cloneElement(child, {
-    onClick: (event: React.MouseEvent) => {
-      child.props.onClick?.(event);
-      if (!event.defaultPrevented) {
-        onClose();
-      }
-    },
-  });
-}
-
-export type DrawerPortalProps = {
-  children: React.ReactNode;
-  container?: HTMLElement | null;
-};
-
-function DrawerPortal({ children, container }: DrawerPortalProps) {
-  const { open } = useDrawerContext();
-  if (!open) return null;
-  return <Portal container={container}>{children}</Portal>;
-}
-
-export type DrawerOverlayProps = React.HTMLAttributes<HTMLDivElement>;
-
-function DrawerOverlay({ className, onClick, ...rest }: DrawerOverlayProps) {
-  const { onClose, closeOnOverlayClick } = useDrawerContext();
-  const parentLayer = useOverlayPortalLayer();
-  const nestedInModal = parentLayer === "modal";
-
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    onClick?.(event);
-    if (!event.defaultPrevented && closeOnOverlayClick && event.target === event.currentTarget) {
-      onClose();
-    }
-  };
-
-  return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay; keyboard dismiss handled by useEscapeKey in DrawerPanel
-    <div
-      role="presentation"
-      className={cx(styles.overlay, className)}
-      onClick={handleClick}
-      data-testid="drawer-overlay"
-      data-nested-in-modal={nestedInModal ? "true" : undefined}
-      {...rest}
-    />
-  );
-}
-
-export type DrawerPanelProps = React.HTMLAttributes<HTMLDivElement> & {
+  footer?: React.ReactNode;
   side?: DrawerSide;
-  size?: DrawerSize;
-  "aria-label"?: string;
-  "aria-labelledby"?: string;
-  "aria-describedby"?: string;
+  className?: string;
+  overlayClassName?: string;
 };
 
-function DrawerPanel({
+export function Drawer({
+  open,
+  onOpenChange,
+  title,
+  description,
+  icon,
   children,
-  className,
+  footer,
   side = "right",
-  size = "m",
-  "aria-label": ariaLabel,
-  "aria-labelledby": ariaLabelledBy,
-  "aria-describedby": ariaDescribedBy,
-  ...rest
-}: DrawerPanelProps) {
-  const { open, onClose, closeOnEscape } = useDrawerContext();
+  className,
+  overlayClassName,
+}: DrawerProps) {
+  const [isMounted, setIsMounted] = React.useState(open);
+  const [isClosing, setIsClosing] = React.useState(false);
+
+  React.useEffect(() => {
+    if (open) {
+      setIsMounted(true);
+      setIsClosing(false);
+      return;
+    }
+
+    if (!isMounted) {
+      return;
+    }
+
+    setIsClosing(true);
+    const timeoutId = window.setTimeout(() => {
+      setIsMounted(false);
+      setIsClosing(false);
+    }, DRAWER_CLOSE_ANIMATION_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [open, isMounted]);
+
+  const state = open && !isClosing ? "open" : "closing";
   const parentLayer = useOverlayPortalLayer();
   const nestedInModal = parentLayer === "modal";
   const portalLayer = nestedInModal ? "drawerInModal" : "drawer";
-  const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
 
+  const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
   useScrollLock(open);
-  useEscapeKey({ enabled: closeOnEscape && open, onEscape: onClose });
+  useEscapeKey({ enabled: open, onEscape: () => onOpenChange(false) });
 
   React.useEffect(() => {
     if (!open) return;
@@ -219,113 +112,79 @@ function DrawerPanel({
     };
   }, [open, trapRef]);
 
-  return (
-    <DrawerChromeSizeContext.Provider value={size}>
-      <DrawerPanelContext.Provider value>
-        <div
-          ref={trapRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledBy}
-          aria-describedby={ariaDescribedBy}
-          tabIndex={-1}
-          data-side={side}
-          data-nested-in-modal={nestedInModal ? "true" : undefined}
-          className={cx(styles.panel, className)}
-          {...toDataAttributes({ size })}
-          {...rest}
-        >
-          <OverlayPortalLayerProvider value={portalLayer}>{children}</OverlayPortalLayerProvider>
-        </div>
-      </DrawerPanelContext.Provider>
-    </DrawerChromeSizeContext.Provider>
-  );
-}
+  const generatedId = React.useId();
+  const titleId = `${generatedId}-title`;
+  const descriptionId = `${generatedId}-description`;
+  const hasDescription = description != null && description !== "";
 
-export type DrawerHeaderProps = React.HTMLAttributes<HTMLElement> & {
-  showCloseButton?: boolean;
-};
+  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget && open) {
+      onOpenChange(false);
+    }
+  };
 
-function DrawerHeader({ children, className, showCloseButton = true, ...rest }: DrawerHeaderProps) {
-  const { onClose } = useDrawerContext();
-  const chromeSize = useDrawerChromeSize();
-
-  return (
-    <header className={cx(styles.header, className)} {...rest}>
-      <ControlSizeProvider value={chromeSize}>
-        <div className={styles.headerContent}>{children}</div>
-      </ControlSizeProvider>
-      {showCloseButton && (
-        <Button.Root
-          size={chromeSize}
-          variant="neutral"
-          mode="ghost"
-          className={styles.closeBtn}
-          onClick={onClose}
-          aria-label="Close drawer"
-        >
-          <Button.Icon>
-            <Icon name="action.close" tone="subtle" />
-          </Button.Icon>
-        </Button.Root>
-      )}
-    </header>
-  );
-}
-
-export type DrawerTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
-
-function DrawerTitle({ children, className, ...rest }: DrawerTitleProps) {
-  return (
-    <h2 className={cx(styles.title, className)} {...rest}>
-      {children}
-    </h2>
-  );
-}
-
-export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement>;
-export type DrawerLegacyContentProps = DrawerPanelProps;
-
-function DrawerContent(props: DrawerContentProps | DrawerLegacyContentProps) {
-  const inPanel = React.useContext(DrawerPanelContext);
-
-  if (!inPanel) {
-    return <DrawerPanel {...(props as DrawerPanelProps)} />;
+  if (!isMounted) {
+    return null;
   }
 
-  const { children, className, ...rest } = props as DrawerContentProps;
   return (
-    <ScrollContainer className={cx(styles.content, className)} {...rest}>
-      {children}
-    </ScrollContainer>
+    <Portal>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay; keyboard dismiss is handled separately */}
+      <div
+        role="presentation"
+        className={cx(styles.overlay, overlayClassName)}
+        data-testid="drawer-overlay"
+        onClick={handleOverlayClick}
+        {...toDataAttributes({ state })}
+        data-nested-in-modal={nestedInModal ? "true" : undefined}
+      />
+
+      <div
+        ref={trapRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={hasDescription ? descriptionId : undefined}
+        tabIndex={-1}
+        className={cx(styles.panel, className)}
+        data-nested-in-modal={nestedInModal ? "true" : undefined}
+        {...toDataAttributes({ side, state })}
+      >
+        <OverlayPortalLayerProvider value={portalLayer}>
+          <header className={styles.header}>
+            <div className={styles.headerMain}>
+              {icon ? <span className={styles.icon}>{icon}</span> : null}
+              <div className={styles.titleBlock}>
+                <h2 id={titleId} className={styles.title}>
+                  {title}
+                </h2>
+                {hasDescription ? (
+                  <p id={descriptionId} className={styles.description}>
+                    {description}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+
+            <Button.Root
+              type="button"
+              variant="neutral"
+              mode="ghost"
+              className={styles.closeButton}
+              aria-label="Close drawer"
+              onClick={() => onOpenChange(false)}
+            >
+              <Button.Icon>
+                <Icon name="action.close" tone="subtle" />
+              </Button.Icon>
+            </Button.Root>
+          </header>
+
+          <ScrollContainer className={styles.body}>{children}</ScrollContainer>
+
+          {footer ? <footer className={styles.footer}>{footer}</footer> : null}
+        </OverlayPortalLayerProvider>
+      </div>
+    </Portal>
   );
 }
-
-export type DrawerFooterProps = React.HTMLAttributes<HTMLElement>;
-
-function DrawerFooter({ children, className, ...rest }: DrawerFooterProps) {
-  const chromeSize = useDrawerChromeSize();
-
-  return (
-    <footer className={cx(styles.footer, className)} {...rest}>
-      <ControlSizeProvider value={chromeSize}>{children}</ControlSizeProvider>
-    </footer>
-  );
-}
-
-const DrawerBody = DrawerContent;
-
-export const Drawer = {
-  Root: DrawerRoot,
-  Trigger: DrawerTrigger,
-  Close: DrawerClose,
-  Portal: DrawerPortal,
-  Overlay: DrawerOverlay,
-  Panel: DrawerPanel,
-  Content: DrawerContent,
-  Body: DrawerBody,
-  Header: DrawerHeader,
-  Title: DrawerTitle,
-  Footer: DrawerFooter,
-};

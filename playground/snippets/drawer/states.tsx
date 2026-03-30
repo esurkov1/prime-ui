@@ -1,84 +1,63 @@
+import * as React from "react";
+
 import { Button } from "@/components/button/Button";
 import { Drawer } from "@/components/drawer/Drawer";
 import { Icon } from "@/icons";
 
 import styles from "./sizes.module.css";
 
-/** Закрытие только явным действием: без Escape и клика по подложке. */
-function StrictDrawer() {
+function BasicStateDrawer() {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Drawer.Root closeOnEscape={false} closeOnOverlayClick={false}>
-      <Drawer.Trigger>
-        <Button.Root variant="error" mode="lighter">
-          <Button.Icon>
-            <Icon name="status.locked" />
-          </Button.Icon>
-          Строгий режим
-        </Button.Root>
-      </Drawer.Trigger>
-      <Drawer.Portal>
-        <Drawer.Overlay />
-        <Drawer.Content side="right" aria-labelledby="drawer-state-strict-title">
-          <Drawer.Header>
-            <Drawer.Title id="drawer-state-strict-title">Нужно подтвердить</Drawer.Title>
-          </Drawer.Header>
-          <Drawer.Body>
-            <p>
-              Для этого сценария заданы <code>closeOnEscape=&#123;false&#125;</code> и{" "}
-              <code>closeOnOverlayClick=&#123;false&#125;</code> на <code>Drawer.Root</code>.
-            </p>
-          </Drawer.Body>
-          <Drawer.Footer>
-            <Drawer.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Отмена
-              </Button.Root>
-            </Drawer.Close>
-            <Button.Root variant="primary">Продолжить</Button.Root>
-          </Drawer.Footer>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+    <>
+      <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
+        Базовое состояние
+      </Button.Root>
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        title="Закрытие по overlay и Escape"
+        description="Поведение встроено в компонент"
+        icon={<Icon name="nav.layoutGrid" tone="subtle" />}
+        footer={
+          <Button.Root variant="primary" onClick={() => setOpen(false)}>
+            Закрыть
+          </Button.Root>
+        }
+      >
+        <p>Drawer закрывается по Esc, клику по подложке и кнопке в шапке.</p>
+      </Drawer>
+    </>
   );
 }
 
-/** Шапка без кнопки закрытия — выход только через подвал или программно. */
-function NoHeaderCloseDrawer() {
+function FooterlessStateDrawer() {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Drawer.Root>
-      <Drawer.Trigger>
-        <Button.Root variant="neutral" mode="stroke">
-          Без крестика в шапке
-        </Button.Root>
-      </Drawer.Trigger>
-      <Drawer.Portal>
-        <Drawer.Overlay />
-        <Drawer.Content side="right" aria-labelledby="drawer-state-nox-title">
-          <Drawer.Header showCloseButton={false}>
-            <Drawer.Title id="drawer-state-nox-title">Кастомное закрытие</Drawer.Title>
-          </Drawer.Header>
-          <Drawer.Body>
-            <p>
-              У <code>Drawer.Header</code> отключён стандартный крестик через{" "}
-              <code>showCloseButton=&#123;false&#125;</code>.
-            </p>
-          </Drawer.Body>
-          <Drawer.Footer>
-            <Drawer.Close>
-              <Button.Root variant="primary">Закрыть</Button.Root>
-            </Drawer.Close>
-          </Drawer.Footer>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+    <>
+      <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(true)}>
+        Без footer
+      </Button.Root>
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        title="Минимальный сценарий"
+        description="Только контент и системная кнопка закрытия"
+        icon={<Icon name="nav.home" tone="subtle" />}
+      >
+        <p>Если не передать footer, панель рендерится без нижней зоны действий.</p>
+      </Drawer>
+    </>
   );
 }
 
 export default function DrawerStatesSnippet() {
   return (
     <div className={styles.row}>
-      <StrictDrawer />
-      <NoHeaderCloseDrawer />
+      <BasicStateDrawer />
+      <FooterlessStateDrawer />
     </div>
   );
 }

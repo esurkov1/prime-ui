@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { Drawer } from "@/components/drawer/Drawer";
+import { Icon } from "@/icons";
 
 export default function DrawerControlledSnippet() {
   const [open, setOpen] = React.useState(false);
@@ -15,27 +16,21 @@ export default function DrawerControlledSnippet() {
         Закрыть извне
       </Button.Root>
 
-      <Drawer.Root open={open} onOpenChange={setOpen}>
-        <Drawer.Portal>
-          <Drawer.Overlay />
-          <Drawer.Content side="right" aria-labelledby="drawer-controlled-title">
-            <Drawer.Header>
-              <Drawer.Title id="drawer-controlled-title">Внешнее состояние</Drawer.Title>
-            </Drawer.Header>
-            <Drawer.Body>
-              <p>
-                Пара <code>open</code> и <code>onOpenChange</code> на <code>Drawer.Root</code>:{" "}
-                <code>Drawer.Trigger</code> не обязателен.
-              </p>
-            </Drawer.Body>
-            <Drawer.Footer>
-              <Drawer.Close>
-                <Button.Root variant="primary">Готово</Button.Root>
-              </Drawer.Close>
-            </Drawer.Footer>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        title="Внешнее состояние"
+        description="open / onOpenChange управляют открытием"
+        icon={<Icon name="nav.layoutGrid" tone="subtle" />}
+        side="right"
+        footer={
+          <Button.Root variant="primary" onClick={() => setOpen(false)}>
+            Готово
+          </Button.Root>
+        }
+      >
+        <p>Компонент полностью контролируемый: состояние живёт в родителе.</p>
+      </Drawer>
     </div>
   );
 }

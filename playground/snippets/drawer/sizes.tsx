@@ -1,42 +1,47 @@
+import * as React from "react";
+
 import { Button } from "@/components/button/Button";
-import { Drawer, type DrawerSize } from "@/components/drawer/Drawer";
+import { Drawer, type DrawerSide } from "@/components/drawer/Drawer";
+import { Icon } from "@/icons";
 
 import styles from "./sizes.module.css";
 
-function DrawerSizeDemo({ size }: { size: DrawerSize }) {
+function DrawerSideDemo({ side }: { side: DrawerSide }) {
+  const [open, setOpen] = React.useState(false);
+  const label = side === "left" ? "Слева" : "Справа";
+
   return (
-    <Drawer.Root>
-      <Drawer.Trigger>
-        <Button.Root size="m">Open ({size})</Button.Root>
-      </Drawer.Trigger>
-      <Drawer.Portal>
-        <Drawer.Overlay />
-        <Drawer.Content size={size} aria-labelledby={`drawer-sizes-title-${size}`}>
-          <Drawer.Header>
-            <Drawer.Title id={`drawer-sizes-title-${size}`}>Размер {size}</Drawer.Title>
-          </Drawer.Header>
-          <Drawer.Body>
-            <p>Отступы, заголовок и кнопка закрытия используют один ярус control {size}.</p>
-          </Drawer.Body>
-          <Drawer.Footer>
-            <Button.Root variant="neutral" mode="stroke">
+    <>
+      <Button.Root size="m" onClick={() => setOpen(true)}>
+        Open ({label})
+      </Button.Root>
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        side={side}
+        title={`Панель ${label.toLowerCase()}`}
+        description="Единый layout шапки, body и footer"
+        icon={<Icon name="nav.layoutGrid" tone="subtle" />}
+        footer={
+          <>
+            <Button.Root variant="neutral" mode="stroke" onClick={() => setOpen(false)}>
               Вторичная
             </Button.Root>
-            <Button.Root>Основная</Button.Root>
-          </Drawer.Footer>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+            <Button.Root onClick={() => setOpen(false)}>Основная</Button.Root>
+          </>
+        }
+      >
+        <p>Содержимое в ScrollContainer. Анимация закрытия проигрывается перед размонтированием.</p>
+      </Drawer>
+    </>
   );
 }
 
 export default function DrawerSizesSnippet() {
   return (
     <div className={styles.row}>
-      <DrawerSizeDemo size="s" />
-      <DrawerSizeDemo size="m" />
-      <DrawerSizeDemo size="l" />
-      <DrawerSizeDemo size="xl" />
+      <DrawerSideDemo side="left" />
+      <DrawerSideDemo side="right" />
     </div>
   );
 }
