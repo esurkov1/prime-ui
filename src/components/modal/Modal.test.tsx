@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
 
@@ -195,6 +195,173 @@ describe("Modal", () => {
       const closeBtn = screen.getByRole("button", { name: "Close" });
       expect(document.activeElement).toBe(closeBtn);
     });
+  });
+
+  it("triggers footer primary button on Enter when focus is not on primary", () => {
+    const onConfirm = vi.fn();
+    render(
+      <Modal.Root>
+        <Modal.Trigger>
+          <Button.Root>Open</Button.Root>
+        </Modal.Trigger>
+        <Modal.Panel
+          footer={
+            <>
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+              <Button.Root type="button" onClick={onConfirm}>
+                Confirm
+              </Button.Root>
+            </>
+          }
+          title="Confirm action"
+        >
+          <p>Body</p>
+        </Modal.Panel>
+      </Modal.Root>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    screen.getByRole("button", { name: "Cancel" }).focus();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), { key: "Enter" });
+
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not trigger primary on Enter when confirmOnEnter is false", () => {
+    const onConfirm = vi.fn();
+    render(
+      <Modal.Root confirmOnEnter={false}>
+        <Modal.Trigger>
+          <Button.Root>Open</Button.Root>
+        </Modal.Trigger>
+        <Modal.Panel
+          footer={
+            <>
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+              <Button.Root type="button" onClick={onConfirm}>
+                Confirm
+              </Button.Root>
+            </>
+          }
+          title="T"
+        >
+          <p>Body</p>
+        </Modal.Panel>
+      </Modal.Root>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    screen.getByRole("button", { name: "Cancel" }).focus();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), { key: "Enter" });
+
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it("calls onEnterConfirm instead of default primary click", () => {
+    const onCustom = vi.fn();
+    const onConfirm = vi.fn();
+    render(
+      <Modal.Root onEnterConfirm={onCustom}>
+        <Modal.Trigger>
+          <Button.Root>Open</Button.Root>
+        </Modal.Trigger>
+        <Modal.Panel
+          footer={
+            <>
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+              <Button.Root type="button" onClick={onConfirm}>
+                Confirm
+              </Button.Root>
+            </>
+          }
+          title="T"
+        >
+          <p>Body</p>
+        </Modal.Panel>
+      </Modal.Root>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    screen.getByRole("button", { name: "Cancel" }).focus();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), { key: "Enter" });
+
+    expect(onCustom).toHaveBeenCalledTimes(1);
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it("uses Modal.PrimaryAction as Enter target over last footer button", () => {
+    const onPrimary = vi.fn();
+    const onSecondary = vi.fn();
+    render(
+      <Modal.Root>
+        <Modal.Trigger>
+          <Button.Root>Open</Button.Root>
+        </Modal.Trigger>
+        <Modal.Panel
+          footer={
+            <>
+              <Modal.PrimaryAction>
+                <Button.Root type="button" onClick={onPrimary}>
+                  Primary first
+                </Button.Root>
+              </Modal.PrimaryAction>
+              <Button.Root type="button" onClick={onSecondary}>
+                Last in DOM
+              </Button.Root>
+            </>
+          }
+          title="Order"
+        >
+          <p>Body</p>
+        </Modal.Panel>
+      </Modal.Root>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    screen.getByRole("button", { name: "Last in DOM" }).focus();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Last in DOM" }), { key: "Enter" });
+
+    expect(onPrimary).toHaveBeenCalledTimes(1);
+    expect(onSecondary).not.toHaveBeenCalled();
+  });
+
+  it("does not fire Enter confirm from textarea", () => {
+    const onConfirm = vi.fn();
+    render(
+      <Modal.Root>
+        <Modal.Trigger>
+          <Button.Root>Open</Button.Root>
+        </Modal.Trigger>
+        <Modal.Panel
+          footer={
+            <Button.Root type="button" onClick={onConfirm}>
+              OK
+            </Button.Root>
+          }
+          title="Form"
+        >
+          <textarea data-testid="ta" defaultValue="line" />
+        </Modal.Panel>
+      </Modal.Root>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    screen.getByTestId("ta").focus();
+    fireEvent.keyDown(screen.getByTestId("ta"), { key: "Enter" });
+
+    expect(onConfirm).not.toHaveBeenCalled();
   });
 
   it("works in controlled mode with aria-label only", () => {

@@ -245,6 +245,7 @@ export { LinkButton } from "./link-button/LinkButton";
 export type {
   ModalCloseProps,
   ModalPanelProps,
+  ModalPrimaryActionProps,
   ModalRootProps,
   ModalTriggerProps,
 } from "./modal/Modal";

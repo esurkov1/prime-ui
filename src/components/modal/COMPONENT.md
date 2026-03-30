@@ -12,10 +12,11 @@ Centered overlay dialog with a portal, backdrop, focus trap, scroll lock, and op
 
 ## Composition
 
-- **`Modal.Root`** — holds open state (controlled via **`open`** / **`onOpenChange`** or uncontrolled via **`defaultOpen`**), and options **`closeOnEscape`** / **`closeOnOverlayClick`**. Renders **`children`** only (no DOM wrapper).
+- **`Modal.Root`** — holds open state (controlled via **`open`** / **`onOpenChange`** or uncontrolled via **`defaultOpen`**), and options **`closeOnEscape`** / **`closeOnOverlayClick`**, **`confirmOnEnter`** / **`onEnterConfirm`** (подтверждение по Enter). Renders **`children`** only (no DOM wrapper).
 - **`Modal.Trigger`** — optional; **`React.Children.only`**: pass **exactly one** React element; its **`onClick`** is merged to call **`onOpen`** when the event is not **`defaultPrevented`**.
 - **`Modal.Panel`** — when open: **`createPortal`** (default container `document.body`), fullscreen **`role="presentation"`** overlay, then **`role="dialog"`** with **`aria-modal="true"`**. If **`title`** is set, renders an internal header (**`h2`**, optional description, optional built-in close icon button), wraps **`children`** in an internal body, and optional **`footer`**. Without **`title`**, **`children`** render directly inside the dialog surface—supply **`aria-label`** or **`aria-labelledby`** (and **`aria-describedby`** when needed).
 - **`Modal.Close`** — same single-child contract as **`Trigger`**; merges **`onClick`** to **`onClose`** when not **`defaultPrevented`**. Typical placement: a control inside **`footer`** (for example **Cancel** or **Save** when saving should dismiss the dialog).
+- **`Modal.PrimaryAction`** — optional; **`React.Children.only`**: оборачивает кнопку подтверждения, чтобы по **Enter** вызывалось именно она (если не задано, берётся последняя не disabled кнопка в **`footer`**).
 - **Order:** **`Modal.Root`** → **`Modal.Trigger`** (if any) and **`Modal.Panel`** as siblings (or only **`Modal.Panel`** in controlled flows).
 
 ### Minimal example
@@ -116,6 +117,7 @@ Runnable examples use `@/` in the workspace; published consumers import **`prime
 - **Dismiss on primary action:** wrap the confirming button in **`Modal.Close`** when the action should close the dialog immediately (see **edit entity** example). If you must await an API call, keep the dialog open until success, then call **`onOpenChange(false)`** from the parent.
 - **Consent / wizard steps:** set **`closeOnOverlayClick={false}`** (and optionally **`closeOnEscape={false}`**) when accidental dismiss would lose legal or multi-step state; still provide an explicit **`Modal.Close`** (or header close) path where appropriate.
 - **Long body content:** constrain scroll to the body via **`bodyStyle`** / **`bodyClassName`** (see `playground/snippets/modal/features.tsx`); overlay scroll lock remains active.
+- **Enter to confirm:** при **`confirmOnEnter={true}`** (по умолчанию) **Enter** внутри диалога имитирует нажатие основной кнопки: последняя кнопка в **`footer`**, либо та, что обёрнута в **`Modal.PrimaryAction`**. В шапке (**`header`**) нативное поведение **Enter** на кнопке закрытия сохраняется; в **`textarea`** / **`select`** и ряде типов **`input`** подтверждение по Enter не срабатывает. Полностью своё поведение — **`onEnterConfirm`** на **`Modal.Root`**; отключить — **`confirmOnEnter={false}`**.
 - **Headless dialog surface:** omit **`title`** on **`Modal.Panel`** and supply **`aria-label`** or **`aria-labelledby`** / **`aria-describedby`** yourself; inner body wrapper is not used, so **`bodyClassName`** / **`bodyStyle`** do not apply.
 
 ### Note for LLMs
@@ -146,6 +148,8 @@ When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and *
 | onOpenChange | `(open: boolean) => void` | — | No | Fires when open state changes |
 | closeOnEscape | `boolean` | `true` | No | Whether Escape closes the dialog |
 | closeOnOverlayClick | `boolean` | `true` | No | Whether a direct backdrop click closes |
+| confirmOnEnter | `boolean` | `true` | No | Whether Enter triggers the default confirmation action (primary button) |
+| onEnterConfirm | `(event: KeyboardEvent) => void` | — | No | Replaces default Enter confirmation; call `event.preventDefault()` if needed to suppress native control behavior |
 | children | `React.ReactNode` | — | No | e.g. `Modal.Trigger` and `Modal.Panel` |
 
 ### Modal.Trigger
@@ -159,6 +163,12 @@ When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and *
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
 | children | `React.ReactElement<{ onClick?: React.MouseEventHandler; className?: string; size?: "s" \| "m" \| "l" \| "xl" }>` | — | Yes | Single element whose `onClick` is composed with close |
+
+### Modal.PrimaryAction
+
+| Prop | Type | Default | Required | Description |
+|------|------|---------|----------|-------------|
+| children | `React.ReactElement<{ ref?: React.Ref<HTMLElement>; onClick?: React.MouseEventHandler; … }>` | — | Yes | Single element (usually `Button.Root`) registered as the Enter confirmation target |
 
 ### Modal.Panel
 
