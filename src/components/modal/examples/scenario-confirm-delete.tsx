@@ -15,16 +15,20 @@ export default function ModalConfirmDeleteExample() {
       <Modal.Panel
         description="This removes the project, its boards, and history. Connected integrations will stop receiving events."
         footer={
-          <>
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Cancel
+          <Modal.Footer
+            primary={
+              <Button.Root variant="error" type="button">
+                Delete permanently
               </Button.Root>
-            </Modal.Close>
-            <Button.Root variant="error" type="button">
-              Delete permanently
-            </Button.Root>
-          </>
+            }
+            secondary={
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+            }
+          />
         }
         icon={<Icon name="action.close" tone="subtle" />}
         title="Delete “Northwind rollout”?"

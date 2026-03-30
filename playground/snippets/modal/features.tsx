@@ -51,9 +51,13 @@ export default function ModalFeaturesSnippet() {
             </>
           }
           footer={
-            <Modal.Close>
-              <Button.Root variant="primary">Закрыть</Button.Root>
-            </Modal.Close>
+            <Modal.Footer
+              primary={
+                <Modal.Close>
+                  <Button.Root variant="primary">Закрыть</Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           icon={<Icon name="nav.itemDot" />}
           title="Прокрутка внутри панели"

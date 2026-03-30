@@ -24,14 +24,16 @@ export default function ModalCompositionSnippet() {
         <Modal.Panel
           description="Когда нужен только заголовок и действия."
           footer={
-            <>
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="stroke">
-                  Отмена
-                </Button.Root>
-              </Modal.Close>
-              <Button.Root variant="primary">Подтвердить</Button.Root>
-            </>
+            <Modal.Footer
+              primary={<Button.Root variant="primary">Подтвердить</Button.Root>}
+              secondary={
+                <Modal.Close>
+                  <Button.Root variant="neutral" mode="stroke">
+                    Отмена
+                  </Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           title="Подтверждение без контента"
         />
@@ -75,14 +77,16 @@ export default function ModalCompositionSnippet() {
         <Modal.Panel
           description="Заполните поле перед сохранением маршрута."
           footer={
-            <>
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="stroke">
-                  Отмена
-                </Button.Root>
-              </Modal.Close>
-              <Button.Root variant="primary">Сохранить</Button.Root>
-            </>
+            <Modal.Footer
+              primary={<Button.Root variant="primary">Сохранить</Button.Root>}
+              secondary={
+                <Modal.Close>
+                  <Button.Root variant="neutral" mode="stroke">
+                    Отмена
+                  </Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           icon={<Icon name="field.email" />}
           title="Контакт получателя"
@@ -109,9 +113,13 @@ export default function ModalCompositionSnippet() {
             </>
           }
           footer={
-            <Modal.Close>
-              <Button.Root variant="primary">Принимаю</Button.Root>
-            </Modal.Close>
+            <Modal.Footer
+              primary={
+                <Modal.Close>
+                  <Button.Root variant="primary">Принимаю</Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           title="Согласие на обработку данных"
         >

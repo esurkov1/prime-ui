@@ -24,16 +24,20 @@ export default function ModalMultiFieldFormExample() {
       <Modal.Panel
         description="Include enough detail for our team to reproduce or route the issue."
         footer={
-          <>
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Cancel
+          <Modal.Footer
+            primary={
+              <Button.Root variant="primary" type="submit" form="modal-ticket-form">
+                Submit ticket
               </Button.Root>
-            </Modal.Close>
-            <Button.Root variant="primary" type="submit" form="modal-ticket-form">
-              Submit ticket
-            </Button.Root>
-          </>
+            }
+            secondary={
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+            }
+          />
         }
         icon={<Icon name="nav.itemDot" tone="subtle" />}
         title="Contact support"

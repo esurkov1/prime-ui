@@ -19,18 +19,22 @@ export default function ModalEditEntityExample() {
       <Modal.Panel
         description="The new name appears on invoices and in the member directory."
         footer={
-          <>
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Cancel
-              </Button.Root>
-            </Modal.Close>
-            <Modal.Close>
-              <Button.Root variant="primary" type="button">
-                Save changes
-              </Button.Root>
-            </Modal.Close>
-          </>
+          <Modal.Footer
+            primary={
+              <Modal.Close>
+                <Button.Root variant="primary" type="button">
+                  Save changes
+                </Button.Root>
+              </Modal.Close>
+            }
+            secondary={
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+            }
+          />
         }
         icon={<Icon name="nav.layoutGrid" tone="subtle" />}
         title="Edit account name"

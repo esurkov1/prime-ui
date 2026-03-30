@@ -27,9 +27,13 @@ export default function ModalControlledSnippet() {
             </>
           }
           footer={
-            <Modal.Close>
-              <Button.Root variant="primary">Готово</Button.Root>
-            </Modal.Close>
+            <Modal.Footer
+              primary={
+                <Modal.Close>
+                  <Button.Root variant="primary">Готово</Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           icon={<Icon name="action.copy" />}
           title="Состояние снаружи"

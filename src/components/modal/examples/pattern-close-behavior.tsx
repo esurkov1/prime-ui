@@ -34,11 +34,15 @@ export default function ModalPatternCloseBehaviorExample() {
         <Modal.Panel
           description="With both flags false, only buttons dismiss the dialog."
           footer={
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                OK
-              </Button.Root>
-            </Modal.Close>
+            <Modal.Footer
+              primary={
+                <Modal.Close>
+                  <Button.Root variant="neutral" mode="stroke">
+                    OK
+                  </Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           icon={<Icon name="status.locked" />}
           showClose={false}

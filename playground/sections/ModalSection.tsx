@@ -54,6 +54,20 @@ const modalRootApiRows: PlaygroundApiPropRow[] = [
     description: "Закрытие по клику на подложку (только если target — сам оверлей).",
   },
   {
+    prop: "confirmOnEnter",
+    type: "boolean",
+    defaultValue: "true",
+    required: "Нет",
+    description: "Enter имитирует клик по `Modal.Footer` `primary` (см. также `onEnterConfirm`).",
+  },
+  {
+    prop: "onEnterConfirm",
+    type: "(event: KeyboardEvent) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Свой обработчик вместо программного клика по primary.",
+  },
+  {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
@@ -130,14 +144,14 @@ const modalPanelApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Нижняя зона (кнопки); часто с `Modal.Close`.",
+    description: "Нижняя зона; предпочтительно `Modal.Footer` (`secondary` / `extra` / `primary`).",
   },
   {
     prop: "footerClassName",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Класс на `<footer>`.",
+    description: "Класс на `<footer>` (сливается с `Modal.Footer`, если `footer` — он).",
   },
   {
     prop: "bodyClassName",

@@ -15,11 +15,15 @@ export default function ModalLegalConsentExample() {
       <Modal.Panel
         description="Please read the following before continuing to use the service."
         footer={
-          <Modal.Close>
-            <Button.Root variant="primary" type="button">
-              I agree
-            </Button.Root>
-          </Modal.Close>
+          <Modal.Footer
+            primary={
+              <Modal.Close>
+                <Button.Root variant="primary" type="button">
+                  I agree
+                </Button.Root>
+              </Modal.Close>
+            }
+          />
         }
         icon={<Icon name="status.locked" tone="subtle" />}
         title="Terms and data processing"

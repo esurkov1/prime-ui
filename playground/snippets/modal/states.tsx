@@ -38,11 +38,15 @@ export default function ModalStatesSnippet() {
             </>
           }
           footer={
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Понятно
-              </Button.Root>
-            </Modal.Close>
+            <Modal.Footer
+              primary={
+                <Modal.Close>
+                  <Button.Root variant="neutral" mode="stroke">
+                    Понятно
+                  </Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           icon={<Icon name="status.locked" />}
           showClose={false}

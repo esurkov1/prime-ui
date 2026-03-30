@@ -20,14 +20,16 @@ function BasicModal({
       <Modal.Panel
         description="Test description"
         footer={
-          <>
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Cancel
-              </Button.Root>
-            </Modal.Close>
-            <Button.Root>Confirm</Button.Root>
-          </>
+          <Modal.Footer
+            primary={<Button.Root>Confirm</Button.Root>}
+            secondary={
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+            }
+          />
         }
         title="Test title"
       >
@@ -166,7 +168,10 @@ describe("Modal", () => {
   it("supports title and footer without body text", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Panel footer={<Button.Root>Action</Button.Root>} title="Header footer" />
+        <Modal.Panel
+          footer={<Modal.Footer primary={<Button.Root>Action</Button.Root>} />}
+          title="Header footer"
+        />
       </Modal.Root>,
     );
 
@@ -206,16 +211,20 @@ describe("Modal", () => {
         </Modal.Trigger>
         <Modal.Panel
           footer={
-            <>
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="stroke">
-                  Cancel
+            <Modal.Footer
+              primary={
+                <Button.Root type="button" onClick={onConfirm}>
+                  Confirm
                 </Button.Root>
-              </Modal.Close>
-              <Button.Root type="button" onClick={onConfirm}>
-                Confirm
-              </Button.Root>
-            </>
+              }
+              secondary={
+                <Modal.Close>
+                  <Button.Root variant="neutral" mode="stroke">
+                    Cancel
+                  </Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           title="Confirm action"
         >
@@ -240,16 +249,20 @@ describe("Modal", () => {
         </Modal.Trigger>
         <Modal.Panel
           footer={
-            <>
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="stroke">
-                  Cancel
+            <Modal.Footer
+              primary={
+                <Button.Root type="button" onClick={onConfirm}>
+                  Confirm
                 </Button.Root>
-              </Modal.Close>
-              <Button.Root type="button" onClick={onConfirm}>
-                Confirm
-              </Button.Root>
-            </>
+              }
+              secondary={
+                <Modal.Close>
+                  <Button.Root variant="neutral" mode="stroke">
+                    Cancel
+                  </Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           title="T"
         >
@@ -275,16 +288,20 @@ describe("Modal", () => {
         </Modal.Trigger>
         <Modal.Panel
           footer={
-            <>
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="stroke">
-                  Cancel
+            <Modal.Footer
+              primary={
+                <Button.Root type="button" onClick={onConfirm}>
+                  Confirm
                 </Button.Root>
-              </Modal.Close>
-              <Button.Root type="button" onClick={onConfirm}>
-                Confirm
-              </Button.Root>
-            </>
+              }
+              secondary={
+                <Modal.Close>
+                  <Button.Root variant="neutral" mode="stroke">
+                    Cancel
+                  </Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           title="T"
         >
@@ -301,9 +318,9 @@ describe("Modal", () => {
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
-  it("uses Modal.PrimaryAction as Enter target over last footer button", () => {
-    const onPrimary = vi.fn();
-    const onSecondary = vi.fn();
+  it("Enter targets Modal.Footer primary when extra buttons are focused", () => {
+    const onConfirm = vi.fn();
+    const onDetails = vi.fn();
     render(
       <Modal.Root>
         <Modal.Trigger>
@@ -311,16 +328,28 @@ describe("Modal", () => {
         </Modal.Trigger>
         <Modal.Panel
           footer={
-            <>
-              <Modal.PrimaryAction>
-                <Button.Root type="button" onClick={onPrimary}>
-                  Primary first
+            <Modal.Footer
+              extra={
+                <>
+                  <Button.Root type="button">Help</Button.Root>
+                  <Button.Root type="button" onClick={onDetails}>
+                    Details
+                  </Button.Root>
+                </>
+              }
+              primary={
+                <Button.Root type="button" onClick={onConfirm}>
+                  Confirm
                 </Button.Root>
-              </Modal.PrimaryAction>
-              <Button.Root type="button" onClick={onSecondary}>
-                Last in DOM
-              </Button.Root>
-            </>
+              }
+              secondary={
+                <Modal.Close>
+                  <Button.Root variant="neutral" mode="stroke">
+                    Cancel
+                  </Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           title="Order"
         >
@@ -330,11 +359,11 @@ describe("Modal", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    screen.getByRole("button", { name: "Last in DOM" }).focus();
-    fireEvent.keyDown(screen.getByRole("button", { name: "Last in DOM" }), { key: "Enter" });
+    screen.getByRole("button", { name: "Details" }).focus();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Details" }), { key: "Enter" });
 
-    expect(onPrimary).toHaveBeenCalledTimes(1);
-    expect(onSecondary).not.toHaveBeenCalled();
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    expect(onDetails).not.toHaveBeenCalled();
   });
 
   it("does not fire Enter confirm from textarea", () => {
@@ -346,9 +375,13 @@ describe("Modal", () => {
         </Modal.Trigger>
         <Modal.Panel
           footer={
-            <Button.Root type="button" onClick={onConfirm}>
-              OK
-            </Button.Root>
+            <Modal.Footer
+              primary={
+                <Button.Root type="button" onClick={onConfirm}>
+                  OK
+                </Button.Root>
+              }
+            />
           }
           title="Form"
         >

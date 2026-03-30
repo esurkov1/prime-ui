@@ -15,8 +15,8 @@ Centered overlay dialog with a portal, backdrop, focus trap, scroll lock, and op
 - **`Modal.Root`** — holds open state (controlled via **`open`** / **`onOpenChange`** or uncontrolled via **`defaultOpen`**), and options **`closeOnEscape`** / **`closeOnOverlayClick`**, **`confirmOnEnter`** / **`onEnterConfirm`** (подтверждение по Enter). Renders **`children`** only (no DOM wrapper).
 - **`Modal.Trigger`** — optional; **`React.Children.only`**: pass **exactly one** React element; its **`onClick`** is merged to call **`onOpen`** when the event is not **`defaultPrevented`**.
 - **`Modal.Panel`** — when open: **`createPortal`** (default container `document.body`), fullscreen **`role="presentation"`** overlay, then **`role="dialog"`** with **`aria-modal="true"`**. If **`title`** is set, renders an internal header (**`h2`**, optional description, optional built-in close icon button), wraps **`children`** in an internal body, and optional **`footer`**. Without **`title`**, **`children`** render directly inside the dialog surface—supply **`aria-label`** or **`aria-labelledby`** (and **`aria-describedby`** when needed).
-- **`Modal.Close`** — same single-child contract as **`Trigger`**; merges **`onClick`** to **`onClose`** when not **`defaultPrevented`**. Typical placement: a control inside **`footer`** (for example **Cancel** or **Save** when saving should dismiss the dialog).
-- **`Modal.PrimaryAction`** — optional; **`React.Children.only`**: оборачивает кнопку подтверждения, чтобы по **Enter** вызывалось именно она (если не задано, берётся последняя не disabled кнопка в **`footer`**).
+- **`Modal.Close`** — same single-child contract as **`Trigger`**; merges **`onClick`** and **`ref`** to the child so **`Modal.Footer`** **`primary`** can register the DOM node for Enter. Typical placement: a control inside **`Modal.Footer`** (for example **Cancel** or **Save** when saving should dismiss the dialog).
+- **`Modal.Footer`** — **`footer`** prop on **`Modal.Panel`**: предпочтительно **`Modal.Footer`** со слотами **`secondary`** (отмена, слева/раньше в разметке), **`extra`** (дополнительные кнопки между отменой и подтверждением), **`primary`** (основное действие и цель **Enter** при **`confirmOnEnter`**). Порядок в DOM: **`secondary` → `extra` → `primary`** (в LTR с **`justify-content: flex-end`** основная кнопка справа). **`primary`** — один **`React.ReactElement`** (например **`Button.Root`** или **`Modal.Close`** с кнопкой). Произвольная разметка без **`Modal.Footer`** — допустима как **`footer`**, но подтверждение по Enter к целевой кнопке не привязывается.
 - **Order:** **`Modal.Root`** → **`Modal.Trigger`** (if any) and **`Modal.Panel`** as siblings (or only **`Modal.Panel`** in controlled flows).
 
 ### Minimal example
@@ -40,7 +40,7 @@ export function Example() {
 
 ### Canonical example (full shell)
 
-Use this when you want the complete header row (**`title`**, **`description`**, **`icon`**), a form field in the body, and a **`footer`** where at least one control is wrapped in **`Modal.Close`** (here: **Cancel**). The header still shows the built-in icon close button by default (`showClose`).
+Use this when you want the complete header row (**`title`**, **`description`**, **`icon`**), a form field in the body, and a **`Modal.Footer`** with **`secondary`** (**Cancel** via **`Modal.Close`**) and **`primary`**. The header still shows the built-in icon close button by default (`showClose`).
 
 ```tsx
 import { Button, Icon, Input, Modal } from "prime-ui-kit";
@@ -58,16 +58,20 @@ export function InviteTeammateModal() {
         description="We will send one invitation email. The recipient can accept or decline."
         icon={<Icon name="field.email" tone="subtle" />}
         footer={
-          <>
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Cancel
+          <Modal.Footer
+            primary={
+              <Button.Root variant="primary" type="button">
+                Send invite
               </Button.Root>
-            </Modal.Close>
-            <Button.Root variant="primary" type="button">
-              Send invite
-            </Button.Root>
-          </>
+            }
+            secondary={
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+            }
+          />
         }
       >
         <Input.Root label="Email address" hint="Work email preferred">
@@ -117,12 +121,12 @@ Runnable examples use `@/` in the workspace; published consumers import **`prime
 - **Dismiss on primary action:** wrap the confirming button in **`Modal.Close`** when the action should close the dialog immediately (see **edit entity** example). If you must await an API call, keep the dialog open until success, then call **`onOpenChange(false)`** from the parent.
 - **Consent / wizard steps:** set **`closeOnOverlayClick={false}`** (and optionally **`closeOnEscape={false}`**) when accidental dismiss would lose legal or multi-step state; still provide an explicit **`Modal.Close`** (or header close) path where appropriate.
 - **Long body content:** constrain scroll to the body via **`bodyStyle`** / **`bodyClassName`** (see `playground/snippets/modal/features.tsx`); overlay scroll lock remains active.
-- **Enter to confirm:** при **`confirmOnEnter={true}`** (по умолчанию) **Enter** внутри диалога имитирует нажатие основной кнопки: последняя кнопка в **`footer`**, либо та, что обёрнута в **`Modal.PrimaryAction`**. В шапке (**`header`**) нативное поведение **Enter** на кнопке закрытия сохраняется; в **`textarea`** / **`select`** и ряде типов **`input`** подтверждение по Enter не срабатывает. Полностью своё поведение — **`onEnterConfirm`** на **`Modal.Root`**; отключить — **`confirmOnEnter={false}`**.
+- **Enter to confirm:** при **`confirmOnEnter={true}`** (по умолчанию) **Enter** внутри диалога имитирует **`click()`** по элементу из слота **`Modal.Footer`** **`primary`** (логика в **`useModalKeyboard`** вместе с Escape). В шапке (**`header`**) нативное поведение **Enter** на кнопке закрытия сохраняется; в **`textarea`** / **`select`** и ряде типов **`input`** подтверждение по Enter не срабатывает. Полностью своё поведение — **`onEnterConfirm`** на **`Modal.Root`**; отключить — **`confirmOnEnter={false}`**.
 - **Headless dialog surface:** omit **`title`** on **`Modal.Panel`** and supply **`aria-label`** or **`aria-labelledby`** / **`aria-describedby`** yourself; inner body wrapper is not used, so **`bodyClassName`** / **`bodyStyle`** do not apply.
 
 ### Note for LLMs
 
-When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and **`Modal.Close`** each require **exactly one** child element—no fragments or multiple nodes. (2) Prefer **`Modal.Panel`** with **`title`** (and usually **`description`**) so **`aria-labelledby`** / **`aria-describedby`** are wired automatically. (3) Put **Cancel** / **Dismiss** in **`footer`** inside **`Modal.Close`** unless the design relies only on the header icon. (4) Do not wrap kit components to restyle them; use **`size`**, **`variant`**, **`mode`**, and documented props only. (5) For copy-paste starting points, mirror **`examples/canonical-maximal.tsx`** first, then **`examples/pattern-*`** or scenario files; playground **`playground/snippets/modal/*.tsx`** are the live-demo source of truth.
+When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and **`Modal.Close`** each require **exactly one** child element—no fragments or multiple nodes. (2) Prefer **`Modal.Panel`** with **`title`** (and usually **`description`**) so **`aria-labelledby`** / **`aria-describedby`** are wired automatically. (3) Use **`Modal.Footer`** with **`secondary`** (**`Modal.Close`** + cancel) and **`primary`** (main action) unless the design relies only on the header icon. (4) Do not wrap kit components to restyle them; use **`size`**, **`variant`**, **`mode`**, and documented props only. (5) For copy-paste starting points, mirror **`examples/canonical-maximal.tsx`** first, then **`examples/pattern-*`** or scenario files; playground **`playground/snippets/modal/*.tsx`** are the live-demo source of truth.
 
 ## Rules
 
@@ -135,7 +139,7 @@ When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and *
 - **Focus:** focus is trapped inside the dialog while open; initial focus follows browser / trap behavior—ensure a focusable control or manage focus if the first paint is static text only.
 - **`showClose`** (default **`true`** when a header is shown) controls the header icon button; **`closeAriaLabel`** defaults to **`"Close"`**.
 - **`container`** on **`Modal.Panel`** overrides the portal target (for tests or custom stacking); default is **`document.body`**.
-- **`overlayClassName`**, **`footerClassName`**, **`bodyClassName`**, and **`bodyStyle`** target the overlay, **`<footer>`**, and body wrapper respectively; without **`title`**, **`bodyClassName`** / **`bodyStyle`** do not apply (no inner body wrapper).
+- **`overlayClassName`**, **`footerClassName`**, **`bodyClassName`**, and **`bodyStyle`** target the overlay, the **`footer`** element (merged into **`Modal.Footer`** when **`footer`** is **`Modal.Footer`**, else a wrapper **`<footer>`** for arbitrary content), and body wrapper respectively; without **`title`**, **`bodyClassName`** / **`bodyStyle`** do not apply (no inner body wrapper).
 
 ## API
 
@@ -162,13 +166,17 @@ When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and *
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `React.ReactElement<{ onClick?: React.MouseEventHandler; className?: string; size?: "s" \| "m" \| "l" \| "xl" }>` | — | Yes | Single element whose `onClick` is composed with close |
+| children | `React.ReactElement<{ onClick?: React.MouseEventHandler; ref?: React.Ref<HTMLElement>; className?: string; size?: "s" \| "m" \| "l" \| "xl" }>` | — | Yes | Single element whose `onClick` and `ref` are composed with close |
 
-### Modal.PrimaryAction
+### Modal.Footer
 
 | Prop | Type | Default | Required | Description |
 |------|------|---------|----------|-------------|
-| children | `React.ReactElement<{ ref?: React.Ref<HTMLElement>; onClick?: React.MouseEventHandler; … }>` | — | Yes | Single element (usually `Button.Root`) registered as the Enter confirmation target |
+| primary | `React.ReactElement` (e.g. `Button.Root`) | — | No | Main action; target for Enter when `confirmOnEnter` and no `onEnterConfirm` |
+| secondary | `React.ReactNode` | — | No | Usually cancel / `Modal.Close` |
+| extra | `React.ReactNode` | — | No | Additional buttons between `secondary` and `primary` |
+| className | `string` | — | No | Class on the `<footer>` |
+| …rest | `Omit<React.HTMLAttributes<HTMLElement>, "children">` | — | No | Other attributes on `<footer>` |
 
 ### Modal.Panel
 
@@ -180,10 +188,10 @@ When generating **Modal** markup for this library: (1) **`Modal.Trigger`** and *
 | showClose | `boolean` | `true` | No | Header close icon button when `title` is set |
 | closeAriaLabel | `string` | `"Close"` | No | `aria-label` for the header close control |
 | children | `React.ReactNode` | — | No | Main content; wrapped in internal body when `title` is set |
-| footer | `React.ReactNode` | — | No | Rendered in an internal `footer` |
+| footer | `React.ReactNode` | — | No | Prefer **`Modal.Footer`**; arbitrary nodes are wrapped in **`<footer>`** without Enter binding |
 | container | `HTMLElement \| null` | `document.body` | No | Portal mount node |
 | overlayClassName | `string` | — | No | Class on the fullscreen backdrop |
-| footerClassName | `string` | — | No | Class on the `footer` element |
+| footerClassName | `string` | — | No | Merged into **`Modal.Footer`** `className` when **`footer`** is **`Modal.Footer`**; else on wrapper **`<footer>`** |
 | bodyClassName | `string` | — | No | Class on the internal body when `title` is set |
 | bodyStyle | `React.CSSProperties` | — | No | Inline style on the internal body when `title` is set |
 | aria-label | `string` | — | No | Dialog name when there is no `title`-driven label |

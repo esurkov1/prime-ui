@@ -63,9 +63,13 @@ export default function ModalPatternPortalAndScrollExample() {
           closeAriaLabel="Close"
           description="Cap the body height with `bodyStyle` (or `bodyClassName`) so only the panel scrolls."
           footer={
-            <Modal.Close>
-              <Button.Root variant="primary">Close</Button.Root>
-            </Modal.Close>
+            <Modal.Footer
+              primary={
+                <Modal.Close>
+                  <Button.Root variant="primary">Close</Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           icon={<Icon name="nav.itemDot" />}
           title="Scroll inside panel"

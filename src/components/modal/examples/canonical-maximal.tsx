@@ -18,16 +18,20 @@ export default function ModalCanonicalMaximalExample() {
       <Modal.Panel
         description="We will send one invitation email. The recipient can accept or decline."
         footer={
-          <>
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Cancel
+          <Modal.Footer
+            primary={
+              <Button.Root variant="primary" type="button">
+                Send invite
               </Button.Root>
-            </Modal.Close>
-            <Button.Root variant="primary" type="button">
-              Send invite
-            </Button.Root>
-          </>
+            }
+            secondary={
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+            }
+          />
         }
         icon={<Icon name="field.email" tone="subtle" />}
         title="Invite teammate"

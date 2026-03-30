@@ -17,16 +17,20 @@ export default function DestructiveConfirmExample() {
       <Modal.Panel
         title="Delete this project?"
         footer={
-          <>
-            <Modal.Close>
-              <Button.Root variant="neutral" mode="stroke">
-                Cancel
+          <Modal.Footer
+            primary={
+              <Button.Root variant="error" mode="filled" onClick={() => setOpen(false)}>
+                Delete
               </Button.Root>
-            </Modal.Close>
-            <Button.Root variant="error" mode="filled" onClick={() => setOpen(false)}>
-              Delete
-            </Button.Root>
-          </>
+            }
+            secondary={
+              <Modal.Close>
+                <Button.Root variant="neutral" mode="stroke">
+                  Cancel
+                </Button.Root>
+              </Modal.Close>
+            }
+          />
         }
       >
         <p style={{ margin: 0 }}>This permanently removes the project and its data.</p>

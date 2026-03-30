@@ -244,8 +244,8 @@ export type { LinkButtonRootProps, LinkButtonSize } from "./link-button/LinkButt
 export { LinkButton } from "./link-button/LinkButton";
 export type {
   ModalCloseProps,
+  ModalFooterProps,
   ModalPanelProps,
-  ModalPrimaryActionProps,
   ModalRootProps,
   ModalTriggerProps,
 } from "./modal/Modal";

@@ -2,8 +2,8 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { useModalKeyboard } from "@/hooks/useModalKeyboard";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -15,47 +15,6 @@ import { Portal } from "@/internal/Portal";
 import type { ButtonSize } from "@/internal/states";
 
 import styles from "./Modal.module.css";
-
-function shouldBlockEnterConfirm(target: EventTarget | null): boolean {
-  if (!target || !(target instanceof HTMLElement)) {
-    return false;
-  }
-  const el = target;
-  if (el.isContentEditable) {
-    return true;
-  }
-  if (el.closest('[contenteditable="true"]')) {
-    return true;
-  }
-  const tag = el.tagName;
-  if (tag === "TEXTAREA") {
-    return true;
-  }
-  if (tag === "SELECT") {
-    return true;
-  }
-  if (tag === "INPUT") {
-    const { type } = el as HTMLInputElement;
-    return (
-      type === "checkbox" ||
-      type === "radio" ||
-      type === "file" ||
-      type === "button" ||
-      type === "submit" ||
-      type === "reset"
-    );
-  }
-  return false;
-}
-
-function resolveDefaultPrimaryButton(dialogRoot: HTMLElement): HTMLElement | null {
-  const footer = dialogRoot.querySelector("[data-prime-modal-footer]");
-  if (!footer) {
-    return null;
-  }
-  const buttons = Array.from(footer.querySelectorAll<HTMLButtonElement>("button:not([disabled])"));
-  return buttons.length > 0 ? (buttons[buttons.length - 1] ?? null) : null;
-}
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 
@@ -70,8 +29,7 @@ type ModalContextValue = {
   closeOnOverlayClick: boolean;
   confirmOnEnter: boolean;
   onEnterConfirm?: (event: KeyboardEvent) => void;
-  primaryActionEl: HTMLElement | null;
-  setPrimaryActionEl: (el: HTMLElement | null) => void;
+  primaryActionRef: React.MutableRefObject<HTMLElement | null>;
 };
 
 const [ModalProvider, useModalContext] = createComponentContext<ModalContextValue>("Modal");
@@ -104,12 +62,11 @@ export type ModalRootProps = {
   closeOnEscape?: boolean;
   closeOnOverlayClick?: boolean;
   /**
-   * Если `true`, клавиша Enter в открытой модалке вызывает действие подтверждения (см. `Modal.PrimaryAction` и последнюю кнопку в `footer`).
-   * Отключите для форм, где Enter должен вести себя иначе.
+   * Если `true`, Enter вызывает `click()` по кнопке из `Modal.Footer` **`primary`** (или **`onEnterConfirm`**).
    */
   confirmOnEnter?: boolean;
   /**
-   * Заменяет стандартное подтверждение по Enter: вызывается вместо программного `click()` по целевой кнопке.
+   * Заменяет стандартное подтверждение по Enter: вызывается вместо программного `click()` по **`primary`**.
    * При необходимости подавить нативное поведение элемента под фокусом вызовите `event.preventDefault()`.
    */
   onEnterConfirm?: (event: KeyboardEvent) => void;
@@ -132,7 +89,7 @@ function ModalRoot({
     onChange: onOpenChange,
   });
 
-  const [primaryActionEl, setPrimaryActionEl] = React.useState<HTMLElement | null>(null);
+  const primaryActionRef = React.useRef<HTMLElement | null>(null);
 
   const onOpen = React.useCallback(() => setIsOpen(true), [setIsOpen]);
   const onClose = React.useCallback(() => setIsOpen(false), [setIsOpen]);
@@ -147,8 +104,7 @@ function ModalRoot({
         closeOnOverlayClick,
         confirmOnEnter,
         onEnterConfirm,
-        primaryActionEl,
-        setPrimaryActionEl,
+        primaryActionRef,
       }}
     >
       {children}
@@ -182,14 +138,21 @@ export type ModalCloseProps = {
     onClick?: React.MouseEventHandler;
     className?: string;
     size?: ButtonSize;
+    ref?: React.Ref<HTMLElement>;
   }>;
 };
 
-function ModalClose({ children }: ModalCloseProps) {
+const ModalClose = React.forwardRef<HTMLElement, ModalCloseProps>(function ModalClose(
+  { children },
+  forwardedRef,
+) {
   const { onClose } = useModalContext();
   const child = React.Children.only(children);
+  const childRef = (child as React.ReactElement & { ref?: React.Ref<HTMLElement> }).ref;
+  const mergedRef = mergeRefs(childRef, forwardedRef);
 
   return React.cloneElement(child, {
+    ref: mergedRef,
     onClick: (event: React.MouseEvent) => {
       child.props.onClick?.(event);
       if (!event.defaultPrevented) {
@@ -197,25 +160,52 @@ function ModalClose({ children }: ModalCloseProps) {
       }
     },
   });
-}
+});
 
-export type ModalPrimaryActionProps = {
+// ─── Footer (публичный слот: secondary → extra → primary) ────────────────────
+
+export type ModalFooterProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
+  /** Основное действие (Enter при `confirmOnEnter`); один элемент, например `Button.Root`. */
+  primary?: React.ReactElement<{
+    ref?: React.Ref<HTMLElement>;
+    onClick?: React.MouseEventHandler;
+    className?: string;
+    size?: ButtonSize;
+  }>;
+  /** Обычно отмена / закрытие (`Modal.Close` + кнопка). */
+  secondary?: React.ReactNode;
+  /** Дополнительные кнопки между `secondary` и `primary` (несколько кнопок — фрагмент). */
+  extra?: React.ReactNode;
+};
+
+function FooterPrimarySlot({
+  children,
+}: {
   children: React.ReactElement<{
     ref?: React.Ref<HTMLElement>;
     onClick?: React.MouseEventHandler;
     className?: string;
     size?: ButtonSize;
   }>;
-};
-
-/** Помечает кнопку подтверждения для Enter; если не используется, берётся последняя не disabled кнопка в `footer` панели. */
-function ModalPrimaryAction({ children }: ModalPrimaryActionProps) {
-  const { setPrimaryActionEl } = useModalContext();
+}) {
+  const { primaryActionRef } = useModalContext();
   const child = React.Children.only(children);
   const childRef = (child as React.ReactElement & { ref?: React.Ref<HTMLElement> }).ref;
-  const mergedRef = mergeRefs(childRef, setPrimaryActionEl);
+  const mergedRef = mergeRefs(childRef, (node: HTMLElement | null) => {
+    primaryActionRef.current = node;
+  });
 
   return React.cloneElement(child, { ref: mergedRef });
+}
+
+function ModalFooter({ primary, secondary, extra, className, ...rest }: ModalFooterProps) {
+  return (
+    <footer className={cx(styles.footer, className)} data-prime-modal-footer="" {...rest}>
+      {secondary}
+      {extra}
+      {primary != null ? <FooterPrimarySlot>{primary}</FooterPrimarySlot> : null}
+    </footer>
+  );
 }
 
 // ─── Portal ───────────────────────────────────────────────────────────────────
@@ -246,7 +236,7 @@ function ModalOverlay({ className, onClick, children, ...rest }: ModalOverlayPro
   };
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay; keyboard dismiss handled by useEscapeKey in ModalContent
+    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay; keyboard handled by useModalKeyboard in ModalContent
     <div
       role="presentation"
       className={cx(styles.overlay, className)}
@@ -287,7 +277,7 @@ function ModalContent({
   "aria-describedby": ariaDescribedByProp,
   ...rest
 }: ModalContentProps) {
-  const { open, onClose, closeOnEscape, confirmOnEnter, onEnterConfirm, primaryActionEl } =
+  const { open, onClose, closeOnEscape, confirmOnEnter, onEnterConfirm, primaryActionRef } =
     useModalContext();
 
   const internalTitleId = React.useId();
@@ -314,58 +304,15 @@ function ModalContent({
 
   useScrollLock(open);
 
-  useEscapeKey({ enabled: closeOnEscape && open, onEscape: onClose });
-
-  React.useEffect(() => {
-    if (!open || !confirmOnEnter) {
-      return;
-    }
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Enter" || event.repeat) {
-        return;
-      }
-
-      const container = trapRef.current;
-      if (!container) {
-        return;
-      }
-
-      const active = document.activeElement;
-      if (!active || !container.contains(active)) {
-        return;
-      }
-
-      const header = container.querySelector("header");
-      if (header && event.target instanceof Node && header.contains(event.target)) {
-        return;
-      }
-
-      if (shouldBlockEnterConfirm(event.target)) {
-        return;
-      }
-
-      if (onEnterConfirm) {
-        onEnterConfirm(event);
-        return;
-      }
-
-      const primary = primaryActionEl ?? resolveDefaultPrimaryButton(container);
-      if (!primary) {
-        return;
-      }
-
-      if (active === primary) {
-        return;
-      }
-
-      event.preventDefault();
-      primary.click();
-    };
-
-    document.addEventListener("keydown", onKeyDown, true);
-    return () => document.removeEventListener("keydown", onKeyDown, true);
-  }, [open, confirmOnEnter, onEnterConfirm, primaryActionEl, trapRef]);
+  useModalKeyboard({
+    open,
+    trapRef,
+    closeOnEscape,
+    onClose,
+    confirmOnEnter,
+    onEnterConfirm,
+    primaryRef: primaryActionRef,
+  });
 
   React.useEffect(() => {
     if (!open) return;
@@ -511,18 +458,6 @@ function ModalBody({ children, className, ...rest }: ModalBodyProps) {
   );
 }
 
-// ─── Footer ───────────────────────────────────────────────────────────────────
-
-type ModalFooterProps = React.HTMLAttributes<HTMLElement>;
-
-function ModalFooter({ children, className, ...rest }: ModalFooterProps) {
-  return (
-    <footer className={cx(styles.footer, className)} data-prime-modal-footer="" {...rest}>
-      {children}
-    </footer>
-  );
-}
-
 // ─── Panel (публичная оболочка: Layer + Content + шапка/тело/подвал) ───────────
 
 export type ModalPanelProps = Omit<React.HTMLAttributes<HTMLDivElement>, "title"> & {
@@ -538,6 +473,7 @@ export type ModalPanelProps = Omit<React.HTMLAttributes<HTMLDivElement>, "title"
   closeAriaLabel?: string;
   /** При `title` оборачивается в зону тела; без `title` — рендерится сразу в панели (например headless-диалог). */
   children?: React.ReactNode;
+  /** Предпочтительно `Modal.Footer` со слотами `secondary` / `extra` / `primary` для явного действия по Enter. */
   footer?: React.ReactNode;
   footerClassName?: string;
   bodyClassName?: string;
@@ -565,6 +501,17 @@ function ModalPanel({
   ...rest
 }: ModalPanelProps) {
   const hasHeader = title != null && title !== "";
+
+  const footerNode =
+    footer != null ? (
+      React.isValidElement(footer) && footer.type === ModalFooter ? (
+        React.cloneElement(footer as React.ReactElement<ModalFooterProps>, {
+          className: cx((footer.props as ModalFooterProps).className, footerClassName),
+        })
+      ) : (
+        <footer className={cx(styles.footer, footerClassName)}>{footer}</footer>
+      )
+    ) : null;
 
   return (
     <ModalLayer className={overlayClassName} container={container}>
@@ -594,7 +541,7 @@ function ModalPanel({
             children
           )
         ) : null}
-        {footer != null ? <ModalFooter className={footerClassName}>{footer}</ModalFooter> : null}
+        {footerNode}
       </ModalContent>
     </ModalLayer>
   );
@@ -606,6 +553,6 @@ export const Modal = {
   Root: ModalRoot,
   Trigger: ModalTrigger,
   Close: ModalClose,
-  PrimaryAction: ModalPrimaryAction,
+  Footer: ModalFooter,
   Panel: ModalPanel,
 };

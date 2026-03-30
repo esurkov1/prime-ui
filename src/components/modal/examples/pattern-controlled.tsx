@@ -22,9 +22,13 @@ export default function ModalPatternControlledExample() {
           closeAriaLabel="Close"
           description="Open and close are driven by `open` and `onOpenChange` on the root."
           footer={
-            <Modal.Close>
-              <Button.Root variant="primary">Done</Button.Root>
-            </Modal.Close>
+            <Modal.Footer
+              primary={
+                <Modal.Close>
+                  <Button.Root variant="primary">Done</Button.Root>
+                </Modal.Close>
+              }
+            />
           }
           icon={<Icon name="action.copy" />}
           title="Externally controlled"
