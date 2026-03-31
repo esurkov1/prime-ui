@@ -220,7 +220,13 @@ function TagOptionManagePopover({
         stackAboveDropdown
         className={styles.managePopoverSurface}
       >
-        <div className={styles.managePopoverShell}>
+        <fieldset
+          className={styles.managePopoverShell}
+          onKeyDown={(e) => {
+            /* Иначе клавиши всплывают к listbox (портал в body, но предок в React — ScrollContainer) и переключают выбор */
+            e.stopPropagation();
+          }}
+        >
           <Input.Root size="s">
             <Input.Wrapper>
               <Input.Field
@@ -303,7 +309,7 @@ function TagOptionManagePopover({
               );
             })}
           </div>
-        </div>
+        </fieldset>
       </Popover.Content>
     </Popover.Root>
   );
