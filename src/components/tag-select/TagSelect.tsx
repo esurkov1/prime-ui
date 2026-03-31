@@ -291,8 +291,8 @@ export function TagSelectRoot({
   const chips = normalizeList(selected, options, defaultTagColor);
   /** Пустое поле (нет тегов и нет текста ввода) — нужна минимальная высота как у инпута; иначе высота по контенту, без «второй строки». */
   const isEmpty = selected.length === 0 && inputTrim.length === 0;
-  /** Нет фокуса и нет черновика — инпут не резервирует вторую строку (см. `.inputCollapsed`). */
-  const inputCollapsed = !inputFocused && inputTrim.length === 0;
+  /** Сворачивать инпут только если уже есть теги и фильтр пуст (пустое поле без тегов — инпут с плейсхолдером на всю ширину). */
+  const inputCollapsed = !inputFocused && inputTrim.length === 0 && selected.length > 0;
 
   const focusInput = () => {
     inputRef.current?.focus();

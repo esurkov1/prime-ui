@@ -125,6 +125,8 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ts-gap);
+  box-sizing: border-box;
+  width: 100%;
   min-width: 0;
 }
 

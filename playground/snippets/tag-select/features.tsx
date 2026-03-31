@@ -3,10 +3,10 @@ import * as React from "react";
 import { TagSelect } from "@/components/tag-select/TagSelect";
 
 export default function TagSelectFeaturesSnippet() {
-  const [value, setValue] = React.useState<string[]>(["telegram"]);
+  const [value, setValue] = React.useState<string[]>([]);
 
   return (
-    <div style={{ maxWidth: "22rem" }}>
+    <div style={{ width: "100%", maxWidth: "22rem" }}>
       <TagSelect.Root
         options={[
           { value: "telegram", label: "telegram", color: "blue" },
