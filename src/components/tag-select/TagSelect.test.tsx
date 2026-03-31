@@ -125,7 +125,7 @@ describe("TagSelect", () => {
     expect(screen.queryByRole("option", { name: "Alpha" })).not.toBeInTheDocument();
   });
 
-  it("при optionManagement не скрывает выбранные: при всех выбранных тегах список не пустой и есть ⋯", () => {
+  it("при optionManagement при всех выбранных тегах панель не открывается; после снятия тега — снова есть ⋯", () => {
     render(
       <BasicTagSelect
         defaultValue={["a", "b"]}
@@ -135,10 +135,13 @@ describe("TagSelect", () => {
         }}
       />,
     );
-    fireEvent.focus(screen.getByRole("combobox"));
+    const input = screen.getByRole("combobox");
+    fireEvent.focus(input);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Remove Alpha/i }));
+    fireEvent.focus(input);
     expect(screen.getByRole("listbox")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Edit tag Alpha/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Edit tag Beta/i })).toBeInTheDocument();
   });
 
   it("вызывает onDelete из меню (опция видна, пока не выбрана в поле)", () => {

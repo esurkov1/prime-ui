@@ -99,7 +99,7 @@ Live demo: **`playground/sections/TagSelectSection.tsx`** — snippet **`playgro
 - **`size`** follows the same **`Select`** control tier as **`Select.Root`**; nested **`Badge`** chips inherit size via **`ControlSizeProvider`**.
 - **`onCreated`** is only invoked when a **new** value is added through creatable flow (Create row or Enter), not when selecting an existing **`options`** row.
 - **`hasPanelContent`** gates the dropdown: if there are no list rows and no create row, the panel closes.
-- **List rows vs chips:** options already in **`value`** are never duplicated in the primary list (add-to-selection rows). With **`optionManagement`**, if the primary list is empty but the search still matches only **already selected** tags (e.g. all tags selected), a second block of **management-only** rows appears so ⋯ remains available — those rows are marked with **`data-management-only`**.
+- **List rows vs chips:** options already in **`value`** are omitted from the listbox (add-to-selection rows only). If nothing is left to add and there is no creatable row, the panel does **not** open on focus (e.g. all catalog tags already on the record) — open again after typing (filter / create) or removing a chip so at least one option can be added again. **`optionManagement`** ⋯ is available on rows **when** those options appear in the list (not while the panel is forced empty).
 - Removing the last chip with empty input: **Backspace** removes the last selected value.
 - Name the control with **`aria-label`** or **`aria-labelledby`** when there is no visible [Label](../label/COMPONENT.md).
 
