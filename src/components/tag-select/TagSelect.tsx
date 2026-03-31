@@ -134,19 +134,16 @@ function shouldShowCreate(
   return !exists;
 }
 
-/** Значения из creatable, ещё не пришедшие в `options` от родителя — остаются в списке после снятия чипа. */
+/**
+ * Опции из `props.options` + созданные через creatable (полные строки справочника в состоянии,
+ * без localStorage — до обновления страницы или пока родитель не подставит то же в `options`).
+ */
 function mergeOptionsWithCreated(
   options: TagSelectOption[],
-  createdValues: readonly string[],
-  defaultTagColor: BadgeColor,
+  created: readonly TagSelectOption[],
 ): TagSelectOption[] {
   const existing = new Set(options.map((o) => o.value));
-  const extra: TagSelectOption[] = [];
-  for (const v of createdValues) {
-    if (!existing.has(v)) {
-      extra.push({ value: v, label: v, color: defaultTagColor });
-    }
-  }
+  const extra = created.filter((c) => !existing.has(c.value));
   return extra.length === 0 ? options : [...options, ...extra];
 }
 
@@ -367,8 +364,8 @@ export function TagSelectRoot({
   const [open, setOpen] = React.useState(false);
   const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
   const [manageOpenValue, setManageOpenValue] = React.useState<string | null>(null);
-  /** Созданные через creatable `value`, пока родитель не добавил их в `options` */
-  const [createdOptionValues, setCreatedOptionValues] = React.useState<string[]>([]);
+  /** Созданные через creatable (как обычные опции: label, color, редактирование в меню ⋯) */
+  const [createdOptions, setCreatedOptions] = React.useState<TagSelectOption[]>([]);
 
   const triggerRef = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -386,9 +383,17 @@ export function TagSelectRoot({
 
   const inputTrim = inputValue.trim();
   const mergedOptions = React.useMemo(
-    () => mergeOptionsWithCreated(options, createdOptionValues, defaultTagColor),
-    [options, createdOptionValues, defaultTagColor],
+    () => mergeOptionsWithCreated(options, createdOptions),
+    [options, createdOptions],
   );
+
+  /** Когда родитель добавил тот же `value` в `options`, убираем дубликат из локального списка. */
+  React.useEffect(() => {
+    setCreatedOptions((prev) => {
+      const next = prev.filter((c) => !options.some((o) => o.value === c.value));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [options]);
   const filtered = React.useMemo(
     () => optionsForList(mergedOptions, inputValue, selected),
     [mergedOptions, inputValue, selected],
@@ -399,13 +404,30 @@ export function TagSelectRoot({
     if (!optionManagement) return undefined;
     return {
       ...optionManagement,
+      onUpdate: (value: string, updates: { label?: string; color?: BadgeColor }) => {
+        const inProps = options.some((o) => o.value === value);
+        if (!inProps) {
+          setCreatedOptions((prev) =>
+            prev.map((o) =>
+              o.value === value
+                ? {
+                    ...o,
+                    ...(updates.label !== undefined ? { label: updates.label } : {}),
+                    ...(updates.color !== undefined ? { color: updates.color } : {}),
+                  }
+                : o,
+            ),
+          );
+        }
+        optionManagement.onUpdate(value, updates);
+      },
       onDelete: (value: string) => {
         setSelected((prev) => prev.filter((x) => x !== value));
-        setCreatedOptionValues((prev) => prev.filter((x) => x !== value));
+        setCreatedOptions((prev) => prev.filter((o) => o.value !== value));
         optionManagement.onDelete(value);
       },
     };
-  }, [optionManagement, setSelected]);
+  }, [optionManagement, options, setSelected]);
 
   /** Панель только если есть опции в списке или строка создания (после ввода). */
   const hasPanelContent = filtered.length > 0 || showCreate;
@@ -519,14 +541,19 @@ export function TagSelectRoot({
           onCreated?.(v);
           return [...prev, v];
         });
-        setCreatedOptionValues((prev) => (prev.includes(v) ? prev : [...prev, v]));
+        setCreatedOptions((prev) => {
+          if (prev.some((o) => o.value === v) || options.some((o) => o.value === v)) {
+            return prev;
+          }
+          return [...prev, { value: v, label: v, color: defaultTagColor }];
+        });
         setInputValue("");
         return;
       }
       toggleValue(rawValue);
       setInputValue("");
     },
-    [inputTrim, onCreated, setSelected, toggleValue],
+    [defaultTagColor, inputTrim, onCreated, options, setSelected, toggleValue],
   );
 
   const getItems = React.useCallback(() => queryEnabledSelectOptions(listboxRef.current), []);
@@ -693,11 +720,7 @@ export function TagSelectRoot({
               const next = e.target.value;
               setInputValue(next);
               const nextTrim = next.trim();
-              const nextMerged = mergeOptionsWithCreated(
-                options,
-                createdOptionValues,
-                defaultTagColor,
-              );
+              const nextMerged = mergeOptionsWithCreated(options, createdOptions);
               const nextFiltered = optionsForList(nextMerged, next, selected);
               const nextShowCreate = shouldShowCreate(creatable, nextTrim, selected, nextMerged);
               if (nextFiltered.length > 0 || nextShowCreate) {

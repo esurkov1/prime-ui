@@ -23,8 +23,19 @@ export default function TagSelectFeaturesSnippet() {
         creatable
         optionManagement={{
           onUpdate: (tagValue, updates) => {
-            setOptions((prev) =>
-              prev.map((o) =>
+            setOptions((prev) => {
+              const i = prev.findIndex((o) => o.value === tagValue);
+              if (i === -1) {
+                return [
+                  ...prev,
+                  {
+                    value: tagValue,
+                    label: updates.label ?? tagValue,
+                    color: updates.color ?? "gray",
+                  },
+                ];
+              }
+              return prev.map((o) =>
                 o.value === tagValue
                   ? {
                       ...o,
@@ -32,8 +43,8 @@ export default function TagSelectFeaturesSnippet() {
                       ...(updates.color !== undefined ? { color: updates.color } : {}),
                     }
                   : o,
-              ),
-            );
+              );
+            });
           },
           onDelete: (tagValue) => {
             setOptions((prev) => prev.filter((o) => o.value !== tagValue));
