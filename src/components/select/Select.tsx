@@ -600,7 +600,7 @@ function SelectContent({ className, children }: SelectContentProps) {
 }
 SelectContent.displayName = "SelectContent";
 
-// ─── SelectItemIcon (объявлен до SelectItem — partition по child.type) ───────
+// ─── SelectItemIcon (объявлен до SelectItem — partition по типу + маркеру) ────
 
 export type SelectItemIconProps = React.HTMLAttributes<HTMLSpanElement>;
 
@@ -612,6 +612,19 @@ function SelectItemIcon({ className, children, ...rest }: SelectItemIconProps) {
   );
 }
 SelectItemIcon.displayName = "SelectItemIcon";
+/** Не только `child.type === SelectItemIcon`: при двух копиях модуля в бандле ссылки разные — иконка попадала в `itemText` и схлопывался `gap`. */
+const SELECT_ITEM_ICON_MARKER = "__primeSelectItemIcon" as const;
+Object.assign(SelectItemIcon, { [SELECT_ITEM_ICON_MARKER]: true });
+
+function isSelectItemIconType(type: unknown): boolean {
+  if (type === SelectItemIcon) return true;
+  if (typeof type === "function") {
+    const fn = type as unknown as Record<string, unknown>;
+    if (fn[SELECT_ITEM_ICON_MARKER] === true) return true;
+    if (fn.displayName === "SelectItemIcon") return true;
+  }
+  return false;
+}
 
 function selectItemTextFromRest(rest: React.ReactNode[]): string | undefined {
   const parts: string[] = [];
@@ -629,7 +642,7 @@ function partitionSelectItemChildren(children: React.ReactNode) {
   const rest: React.ReactNode[] = [];
 
   React.Children.forEach(children, (child) => {
-    if (React.isValidElement(child) && child.type === SelectItemIcon) {
+    if (React.isValidElement(child) && isSelectItemIconType(child.type)) {
       icons.push(child);
     } else if (child != null && child !== false) {
       rest.push(child);
