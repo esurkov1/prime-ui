@@ -33,6 +33,8 @@ export type TagSelectRootProps = {
   onValueChange?: (next: string[]) => void;
   /** Разрешить ввод нового значения, если его нет в списке. */
   creatable?: boolean;
+  /** Только для creatable: значение добавлено через Create / Enter, не выбрано из `options` (сохранение в БД и т.п.). */
+  onCreated?: (value: string) => void;
   /** Цвет чипа для созданных вручную значений (если нет в `options`). */
   defaultTagColor?: BadgeColor;
   /** Текст над списком. */
@@ -105,6 +107,7 @@ export function TagSelectRoot({
   defaultValue = [],
   onValueChange,
   creatable = false,
+  onCreated,
   defaultTagColor = "gray",
   hint = "Select an option or create one",
   createActionLabel = "Create",
@@ -213,14 +216,18 @@ export function TagSelectRoot({
       if (rawValue === CREATE_VALUE) {
         const v = inputTrim;
         if (v.length === 0) return;
-        setSelected((prev) => (prev.includes(v) ? prev : [...prev, v]));
+        setSelected((prev) => {
+          if (prev.includes(v)) return prev;
+          onCreated?.(v);
+          return [...prev, v];
+        });
         setInputValue("");
         return;
       }
       toggleValue(rawValue);
       setInputValue("");
     },
-    [inputTrim, setSelected, toggleValue],
+    [inputTrim, onCreated, setSelected, toggleValue],
   );
 
   const getItems = React.useCallback(() => queryEnabledSelectOptions(listboxRef.current), []);
@@ -298,6 +305,20 @@ export function TagSelectRoot({
     inputRef.current?.focus();
   };
 
+  const handleInputBlur = React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    const next = e.relatedTarget;
+    if (next instanceof Node && triggerRef.current?.contains(next)) {
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      if (triggerRef.current?.contains(document.activeElement)) {
+        return;
+      }
+      setInputFocused(false);
+      setInputValue("");
+    });
+  }, []);
+
   return (
     <ControlSizeProvider value={size}>
       {/* Составной контрол: единственная таб-остановка — input[role=combobox]; клик по полю ведёт к фокусу ввода. */}
@@ -330,6 +351,9 @@ export function TagSelectRoot({
                   className={styles.chipRemove}
                   aria-label={`Remove ${c.label}`}
                   disabled={disabled}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelected((prev) => prev.filter((x) => x !== c.value));
@@ -383,10 +407,7 @@ export function TagSelectRoot({
               setInputFocused(true);
               if (!disabled && hasPanelContent) setOpen(true);
             }}
-            onBlur={() => {
-              setInputFocused(false);
-              setInputValue("");
-            }}
+            onBlur={handleInputBlur}
           />
         </div>
 

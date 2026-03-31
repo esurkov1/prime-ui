@@ -39,6 +39,14 @@ const tagSelectRootApiRows: PlaygroundApiPropRow[] = [
     description: "Разрешить добавление значения, которого нет в options (строка Create в списке).",
   },
   {
+    prop: "onCreated",
+    type: "(value: string) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Только при creatable: значение добавлено через Create / Enter, не выбрано из списка (например сохранение нового тега в БД).",
+  },
+  {
     prop: "defaultTagColor",
     type: "BadgeColor",
     defaultValue: '"gray"',

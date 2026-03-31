@@ -67,4 +67,21 @@ describe("TagSelect", () => {
     fireEvent.click(screen.getByRole("option", { name: "Beta" }));
     expect(onValueChange).toHaveBeenCalledWith(["b"]);
   });
+
+  it("вызывает onCreated только при создании через creatable", () => {
+    const onCreated = vi.fn();
+    render(<BasicTagSelect creatable onCreated={onCreated} />);
+    const input = screen.getByRole("combobox");
+    fireEvent.change(input, { target: { value: "newtag" } });
+    fireEvent.click(screen.getByRole("option", { name: /newtag/i }));
+    expect(onCreated).toHaveBeenCalledWith("newtag");
+  });
+
+  it("снимает тег по крестику при фокусе в поле ввода", () => {
+    render(<BasicTagSelect defaultValue={["a"]} />);
+    const input = screen.getByRole("combobox");
+    fireEvent.focus(input);
+    fireEvent.click(screen.getByRole("button", { name: /Remove Alpha/i }));
+    expect(screen.queryByRole("button", { name: /Remove Alpha/i })).not.toBeInTheDocument();
+  });
 });
