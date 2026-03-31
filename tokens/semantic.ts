@@ -444,7 +444,7 @@ export const semanticTokens = {
       maxWidth: "30rem",
       paddingX: "{spacing.xl}",
       paddingY: "{spacing.xl}",
-      titleGap: "{spacing.s}",
+      titleGap: "{spacing.x1}",
       contentGap: "{spacing.l}",
       headerGap: "{spacing.m}",
       headerPaddingBottom: "{spacing.l}",

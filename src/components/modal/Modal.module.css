@@ -45,19 +45,26 @@
 }
 
 .title {
+  margin: 0;
   line-height: 1.2;
   font-weight: var(--prime-sys-typography-title-weight);
   font-size: var(--prime-sys-size-control-m-text);
 }
 
 .description {
+  margin: 0;
   color: var(--prime-sys-color-content-secondary);
-  font-size: var(--prime-sys-size-control-m-supportText);
+  font-size: var(--prime-sys-size-control-s-text);
+  line-height: 1.4;
 }
 
+/* Как `.titleBlock` в Drawer: только заголовок + дескриптор, без лишнего шага сетки. */
 .headText {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--prime-sys-size-modal-titleGap);
+  min-width: 0;
   padding-right: var(--prime-sys-size-modal-headTextPaddingRight);
 }
 

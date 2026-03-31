@@ -294,7 +294,7 @@
   --prime-sys-size-modal-paddingX: var(--prime-sys-spacing-xl);
   --prime-sys-size-modal-paddingY: var(--prime-sys-spacing-xl);
   --prime-sys-size-modal-radius: var(--prime-sys-shape-radius-4xl);
-  --prime-sys-size-modal-titleGap: var(--prime-sys-spacing-s);
+  --prime-sys-size-modal-titleGap: var(--prime-sys-spacing-x1);
   --prime-sys-size-switch-l-thumb: var(--prime-ref-icon-m);
   --prime-sys-size-switch-l-trackHeight: 1.25rem;
   --prime-sys-size-switch-l-trackWidth: 2.25rem;
