@@ -1,7 +1,13 @@
 .field {
   --prime-textarea-body-size: var(--prime-sys-size-control-m-text);
   --prime-textarea-line-height: var(--prime-sys-typography-body-lineHeight);
+  /* Токен minHeight — высота всего .control (border-box с padding). Внутри — вычитаем вертикальный padding. */
   --prime-textarea-min-height: var(--prime-sys-size-textarea-m-minHeight);
+  --prime-textarea-inner-min-height: calc(
+    var(--prime-sys-size-textarea-m-minHeight) -
+    2 *
+    var(--prime-sys-size-textarea-m-paddingX)
+  );
   --prime-textarea-stack-gap: var(--prime-sys-size-control-m-gap);
   box-sizing: border-box;
   width: 100%;
@@ -13,18 +19,33 @@
 .field[data-size="s"] {
   --prime-textarea-body-size: var(--prime-sys-size-control-s-text);
   --prime-textarea-min-height: var(--prime-sys-size-textarea-s-minHeight);
+  --prime-textarea-inner-min-height: calc(
+    var(--prime-sys-size-textarea-s-minHeight) -
+    2 *
+    var(--prime-sys-size-textarea-s-paddingX)
+  );
   --prime-textarea-stack-gap: var(--prime-sys-size-control-s-gap);
 }
 
 .field[data-size="l"] {
   --prime-textarea-body-size: var(--prime-sys-size-control-l-text);
   --prime-textarea-min-height: var(--prime-sys-size-textarea-l-minHeight);
+  --prime-textarea-inner-min-height: calc(
+    var(--prime-sys-size-textarea-l-minHeight) -
+    2 *
+    var(--prime-sys-size-textarea-l-paddingX)
+  );
   --prime-textarea-stack-gap: var(--prime-sys-size-control-l-gap);
 }
 
 .field[data-size="xl"] {
   --prime-textarea-body-size: var(--prime-sys-size-control-xl-text);
   --prime-textarea-min-height: var(--prime-sys-size-textarea-xl-minHeight);
+  --prime-textarea-inner-min-height: calc(
+    var(--prime-sys-size-textarea-xl-minHeight) -
+    2 *
+    var(--prime-sys-size-textarea-xl-paddingX)
+  );
   --prime-textarea-stack-gap: var(--prime-sys-size-control-xl-gap);
 }
 
@@ -139,7 +160,7 @@
   grid-area: 1 / 1 / 2 / 2;
   font: inherit;
   min-width: 0;
-  min-height: var(--prime-textarea-min-height);
+  min-height: var(--prime-textarea-inner-min-height);
   /* padding/border must match .textarea exactly */
   padding: 0;
   border: 0;
@@ -183,7 +204,7 @@
 
 .textarea:not(.textareaAutoResize) {
   flex: 1 1 auto;
-  min-height: var(--prime-textarea-min-height);
+  min-height: var(--prime-textarea-inner-min-height);
 }
 
 .textarea:disabled {
