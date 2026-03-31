@@ -225,14 +225,6 @@
 /* ─── Content (dropdown) ─────────────────────────────────────────────────── */
 
 .content {
-  --select-item-min-height: var(--prime-sys-size-control-m-height);
-  --select-item-text: var(--prime-sys-typography-control-s);
-  --select-item-pad-x: var(--prime-sys-size-control-m-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-m-icon);
-  /* Один `gap` на ряду пункта: между всеми слотами (иконки, текст, слот галочки). */
-  --select-item-gap: var(--prime-sys-size-control-m-gap);
-  --select-item-radius: var(--prime-sys-size-control-m-radius);
-
   display: flex;
   flex-direction: column;
   gap: var(--prime-sys-spacing-x1);
@@ -253,6 +245,11 @@
   color: var(--prime-sys-color-content-primary);
 }
 
+/* Закрытый listbox остаётся в DOM для onInitLabel → подпись в триггере; не перехватывать клики по странице. */
+.content[aria-hidden="true"] {
+  pointer-events: none;
+}
+
 .content[data-overlay-portal-layer="page"] {
   z-index: var(--prime-sys-elevation-zIndex-dropdown);
 }
@@ -269,45 +266,22 @@
   z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawerInModal);
 }
 
-.content[data-size="s"] {
-  --select-item-min-height: var(--prime-sys-size-control-s-height);
-  --select-item-text: var(--prime-sys-typography-support-2xs);
-  --select-item-pad-x: var(--prime-sys-size-control-s-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-s-icon);
-  --select-item-gap: var(--prime-sys-size-control-s-gap);
-  --select-item-radius: var(--prime-sys-size-control-s-radius);
-}
+/*
+ * Токены ряда пункта задаём на самом `.item` (+ `data-size`), а не только на `.content`:
+ * иначе при портале в `body` и клиентской навигации в dev возможна потеря наследования
+ * `--select-item-*` → `gap`/`padding-inline` становятся невалидными и схлопываются в 0.
+ */
 
-.content[data-size="m"] {
+/* ─── Item ───────────────────────────────────────────────────────────────── */
+
+.item {
   --select-item-min-height: var(--prime-sys-size-control-m-height);
   --select-item-text: var(--prime-sys-typography-control-s);
   --select-item-pad-x: var(--prime-sys-size-control-m-inputPaddingX);
   --select-item-icon-size: var(--prime-sys-size-control-m-icon);
   --select-item-gap: var(--prime-sys-size-control-m-gap);
   --select-item-radius: var(--prime-sys-size-control-m-radius);
-}
 
-.content[data-size="l"] {
-  --select-item-min-height: var(--prime-sys-size-control-l-height);
-  --select-item-text: var(--prime-sys-typography-control-m);
-  --select-item-pad-x: var(--prime-sys-size-control-l-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-l-icon);
-  --select-item-gap: var(--prime-sys-size-control-l-gap);
-  --select-item-radius: var(--prime-sys-size-control-l-radius);
-}
-
-.content[data-size="xl"] {
-  --select-item-min-height: var(--prime-sys-size-control-xl-height);
-  --select-item-text: var(--prime-sys-typography-control-l);
-  --select-item-pad-x: var(--prime-sys-size-control-xl-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-xl-icon);
-  --select-item-gap: var(--prime-sys-size-control-xl-gap);
-  --select-item-radius: var(--prime-sys-size-control-xl-radius);
-}
-
-/* ─── Item ───────────────────────────────────────────────────────────────── */
-
-.item {
   display: flex;
   align-items: center;
   gap: var(--select-item-gap);
@@ -326,6 +300,42 @@
   transition: background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
   outline: none;
   user-select: none;
+}
+
+.item[data-size="s"] {
+  --select-item-min-height: var(--prime-sys-size-control-s-height);
+  --select-item-text: var(--prime-sys-typography-support-2xs);
+  --select-item-pad-x: var(--prime-sys-size-control-s-inputPaddingX);
+  --select-item-icon-size: var(--prime-sys-size-control-s-icon);
+  --select-item-gap: var(--prime-sys-size-control-s-gap);
+  --select-item-radius: var(--prime-sys-size-control-s-radius);
+}
+
+.item[data-size="m"] {
+  --select-item-min-height: var(--prime-sys-size-control-m-height);
+  --select-item-text: var(--prime-sys-typography-control-s);
+  --select-item-pad-x: var(--prime-sys-size-control-m-inputPaddingX);
+  --select-item-icon-size: var(--prime-sys-size-control-m-icon);
+  --select-item-gap: var(--prime-sys-size-control-m-gap);
+  --select-item-radius: var(--prime-sys-size-control-m-radius);
+}
+
+.item[data-size="l"] {
+  --select-item-min-height: var(--prime-sys-size-control-l-height);
+  --select-item-text: var(--prime-sys-typography-control-m);
+  --select-item-pad-x: var(--prime-sys-size-control-l-inputPaddingX);
+  --select-item-icon-size: var(--prime-sys-size-control-l-icon);
+  --select-item-gap: var(--prime-sys-size-control-l-gap);
+  --select-item-radius: var(--prime-sys-size-control-l-radius);
+}
+
+.item[data-size="xl"] {
+  --select-item-min-height: var(--prime-sys-size-control-xl-height);
+  --select-item-text: var(--prime-sys-typography-control-l);
+  --select-item-pad-x: var(--prime-sys-size-control-xl-inputPaddingX);
+  --select-item-icon-size: var(--prime-sys-size-control-xl-icon);
+  --select-item-gap: var(--prime-sys-size-control-xl-gap);
+  --select-item-radius: var(--prime-sys-size-control-xl-radius);
 }
 
 .item:hover,
@@ -407,11 +417,27 @@
 .groupLabel {
   display: flex;
   align-items: center;
-  padding-inline: var(--select-item-pad-x);
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
   padding-block: var(--prime-sys-spacing-x1);
   font-size: var(--prime-sys-typography-support-2xs);
   color: var(--prime-sys-color-content-muted);
   font-weight: var(--prime-sys-typography-weight-medium);
+}
+
+.groupLabel[data-size="s"] {
+  padding-inline: var(--prime-sys-size-control-s-inputPaddingX);
+}
+
+.groupLabel[data-size="m"] {
+  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+}
+
+.groupLabel[data-size="l"] {
+  padding-inline: var(--prime-sys-size-control-l-inputPaddingX);
+}
+
+.groupLabel[data-size="xl"] {
+  padding-inline: var(--prime-sys-size-control-xl-inputPaddingX);
 }
 
 /* ─── Separator ──────────────────────────────────────────────────────────── */
