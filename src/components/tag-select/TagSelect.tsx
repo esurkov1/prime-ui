@@ -139,7 +139,6 @@ type TagOptionManagePopoverProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultTagColor: BadgeColor;
-  size: SelectSize;
   management: TagSelectOptionManagement;
   disabled: boolean;
 };
@@ -149,7 +148,6 @@ function TagOptionManagePopover({
   open,
   onOpenChange,
   defaultTagColor,
-  size,
   management,
   disabled,
 }: TagOptionManagePopoverProps) {
@@ -216,102 +214,95 @@ function TagOptionManagePopover({
         side="bottom"
         align="end"
         trapFocus={false}
-        insetPadding="x2"
-        insetGap="x2"
-        size={size}
+        insetPadding="none"
+        insetGap="none"
+        size="s"
         stackAboveDropdown
+        className={styles.managePopoverSurface}
       >
-        <Input.Root size="s">
-          <Input.Wrapper>
-            <Input.Field
-              ref={inputRef}
-              value={draftLabel}
-              onChange={(e) => setDraftLabel(e.target.value)}
-              onBlur={commitLabel}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  commitLabel();
-                  inputRef.current?.blur();
-                }
-              }}
-              aria-label="Tag name"
-            />
-          </Input.Wrapper>
-        </Input.Root>
-        <Button.Root
-          type="button"
-          variant="error"
-          mode="ghost"
-          size="s"
-          className={styles.manageDelete}
-          onClick={() => {
-            management.onDelete(option.value);
-            onOpenChange(false);
-          }}
-        >
-          {/* biome-ignore lint/a11y/noSvgWithoutTitle: декоративная иконка у кнопки с текстом */}
-          <svg className={styles.manageDeleteIcon} viewBox="0 0 16 16" fill="none" aria-hidden>
-            <path
-              d="M4 4h8M6 4V3h4v1m2 0v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4h10zM6 7v4M10 7v4"
-              stroke="currentColor"
-              strokeWidth="1.25"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          {deleteLabel}
-        </Button.Root>
-        <hr className={styles.manageSeparator} />
-        <Typography.Root
-          as="div"
-          variant="body-small"
-          tone="muted"
-          className={styles.manageColorsHeading}
-        >
-          {colorsSectionLabel}
-        </Typography.Root>
-        <div className={styles.manageColorList}>
-          {TAG_COLOR_CHOICES.map((row) => {
-            const selected = resolvedColor === row.color;
-            return (
-              <button
-                key={`${row.label}-${row.color}`}
-                type="button"
-                className={styles.manageColorRow}
-                onClick={() => {
-                  management.onUpdate(option.value, { color: row.color });
+        <div className={styles.managePopoverShell}>
+          <Input.Root size="s">
+            <Input.Wrapper>
+              <Input.Field
+                ref={inputRef}
+                value={draftLabel}
+                onChange={(e) => setDraftLabel(e.target.value)}
+                onBlur={commitLabel}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitLabel();
+                    inputRef.current?.blur();
+                  }
                 }}
-              >
-                <Badge.Root
-                  color={row.color}
-                  variant="filled"
-                  size="s"
-                  className={styles.manageColorSwatch}
+                aria-label="Tag name"
+              />
+            </Input.Wrapper>
+          </Input.Root>
+          <Button.Root
+            type="button"
+            variant="error"
+            mode="ghost"
+            size="s"
+            className={styles.manageDelete}
+            onClick={() => {
+              management.onDelete(option.value);
+              onOpenChange(false);
+            }}
+          >
+            {/* biome-ignore lint/a11y/noSvgWithoutTitle: декоративная иконка у кнопки с текстом */}
+            <svg className={styles.manageDeleteIcon} viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path
+                d="M4 4h8M6 4V3h4v1m2 0v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4h10zM6 7v4M10 7v4"
+                stroke="currentColor"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {deleteLabel}
+          </Button.Root>
+          <hr className={styles.manageSeparator} />
+          <span className={styles.manageColorsHeading}>{colorsSectionLabel}</span>
+          <div className={styles.manageColorList}>
+            {TAG_COLOR_CHOICES.map((row) => {
+              const selected = resolvedColor === row.color;
+              return (
+                <button
+                  key={`${row.label}-${row.color}`}
+                  type="button"
+                  className={styles.manageColorRow}
+                  onClick={() => {
+                    management.onUpdate(option.value, { color: row.color });
+                  }}
                 >
-                  {"\u00a0"}
-                </Badge.Root>
-                <span className={styles.manageColorLabel}>{row.label}</span>
-                {selected ? (
-                  <>
-                    {/* biome-ignore lint/a11y/noSvgWithoutTitle: декоративная галочка, строка — кнопка */}
-                    <svg className={styles.manageCheck} viewBox="0 0 16 16" aria-hidden>
-                      <path
-                        d="M3 8l3 3 7-7"
-                        stroke="currentColor"
-                        strokeWidth="1.75"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </>
-                ) : (
-                  <span className={styles.manageCheckPlaceholder} aria-hidden />
-                )}
-              </button>
-            );
-          })}
+                  <span
+                    className={styles.manageColorSwatch}
+                    aria-hidden
+                    {...toDataAttributes({ color: row.color })}
+                  />
+                  <span className={styles.manageColorLabel}>{row.label}</span>
+                  {selected ? (
+                    <>
+                      {/* biome-ignore lint/a11y/noSvgWithoutTitle: декоративная галочка, строка — кнопка */}
+                      <svg className={styles.manageCheck} viewBox="0 0 16 16" aria-hidden>
+                        <path
+                          d="M3 8l3 3 7-7"
+                          stroke="currentColor"
+                          strokeWidth="1.75"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </>
+                  ) : (
+                    <span className={styles.manageCheckPlaceholder} aria-hidden />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </Popover.Content>
     </Popover.Root>
@@ -786,7 +777,6 @@ export function TagSelectRoot({
                       open={manageOpenValue === o.value}
                       onOpenChange={(next) => setManageOpenValue(next ? o.value : null)}
                       defaultTagColor={defaultTagColor}
-                      size={size}
                       management={resolvedOptionManagement}
                       disabled={disabled}
                     />

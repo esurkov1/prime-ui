@@ -400,9 +400,25 @@
 }
 
 /* Поповер редактирования тега */
+.managePopoverSurface[data-size="s"] {
+  /* Узже стандартного Popover s: меньше внешний padding, без лишнего gap на корне */
+  --dd-pad: var(--prime-sys-spacing-x2);
+  min-width: min(var(--prime-sys-unit-9p5rem), 100vw);
+}
+
+.managePopoverShell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-x1);
+  min-width: 0;
+  font-size: var(--prime-sys-size-control-s-text);
+  line-height: var(--prime-sys-typography-body-lineHeight);
+}
+
 .manageDelete {
   justify-content: flex-start;
   width: 100%;
+  font-size: inherit;
 }
 
 .manageDeleteIcon {
@@ -415,13 +431,17 @@
 .manageSeparator {
   width: 100%;
   height: var(--prime-sys-border-width-control);
-  margin-block: var(--prime-sys-spacing-x1);
+  margin: 0;
   border: none;
   background: var(--prime-sys-color-border-separator);
 }
 
 .manageColorsHeading {
-  padding-block: 0 var(--prime-sys-spacing-x1);
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: var(--prime-sys-typography-weight-regular);
+  color: var(--prime-sys-color-content-muted);
 }
 
 .manageColorList {
@@ -429,7 +449,7 @@
   flex-direction: column;
   gap: 0;
   min-width: 0;
-  max-height: min(14rem, 50vh);
+  max-height: min(12rem, 45vh);
   overflow-y: auto;
 }
 
@@ -440,14 +460,15 @@
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding-block: var(--prime-sys-spacing-x2);
-  padding-inline: var(--prime-sys-spacing-x2);
+  padding-block: var(--prime-sys-spacing-x1);
+  padding-inline: var(--prime-sys-spacing-x1);
   border: none;
   border-radius: var(--prime-sys-shape-radius-s);
   cursor: pointer;
   background: none;
   text-align: left;
-  font: inherit;
+  font-size: inherit;
+  line-height: var(--prime-sys-typography-body-lineHeight);
   color: inherit;
   transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
 }
@@ -456,26 +477,71 @@
   background: var(--prime-sys-color-action-neutralBackgroundHover);
 }
 
+/* Квадрат цвета: те же семантические фоны, что у Badge filled, без лишней высоты */
 .manageColorSwatch {
   flex-shrink: 0;
-  width: var(--prime-sys-unit-1p25rem);
-  min-width: var(--prime-sys-unit-1p25rem);
+  display: block;
+  box-sizing: border-box;
+  width: var(--prime-sys-unit-0p75rem);
+  height: var(--prime-sys-unit-0p75rem);
+  border-radius: var(--prime-sys-shape-radius-s);
+}
+
+.manageColorSwatch[data-color="gray"] {
+  background: var(--prime-sys-color-badge-grayFilled-background);
+}
+
+.manageColorSwatch[data-color="red"] {
+  background: var(--prime-sys-color-status-error-backgroundEmphasis);
+}
+
+.manageColorSwatch[data-color="blue"] {
+  background: var(--prime-sys-color-status-information-backgroundEmphasis);
+}
+
+.manageColorSwatch[data-color="green"] {
+  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+}
+
+.manageColorSwatch[data-color="orange"] {
+  background: var(--prime-sys-color-status-warning-backgroundEmphasis);
+}
+
+.manageColorSwatch[data-color="yellow"] {
+  background: var(--prime-sys-color-status-away-backgroundEmphasis);
+}
+
+.manageColorSwatch[data-color="purple"] {
+  background: var(--prime-sys-color-status-feature-backgroundEmphasis);
+}
+
+.manageColorSwatch[data-color="sky"] {
+  background: var(--prime-sys-color-status-verified-backgroundEmphasis);
+}
+
+.manageColorSwatch[data-color="pink"] {
+  background: var(--prime-sys-color-badge-pink-backgroundEmphasis);
+}
+
+.manageColorSwatch[data-color="teal"] {
+  background: var(--prime-sys-color-badge-teal-backgroundEmphasis);
 }
 
 .manageColorLabel {
   flex: 1 1 auto;
   min-width: 0;
+  font-size: inherit;
 }
 
 .manageCheck {
   flex-shrink: 0;
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
+  width: var(--prime-sys-unit-0p75rem);
+  height: var(--prime-sys-unit-0p75rem);
   color: var(--prime-sys-color-content-primary);
 }
 
 .manageCheckPlaceholder {
   flex-shrink: 0;
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
+  width: var(--prime-sys-unit-0p75rem);
+  height: var(--prime-sys-unit-0p75rem);
 }
