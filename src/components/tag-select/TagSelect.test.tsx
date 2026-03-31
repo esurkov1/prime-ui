@@ -50,9 +50,14 @@ describe("TagSelect", () => {
   it("в режиме creatable показывает строку создания для нового текста", () => {
     render(<BasicTagSelect creatable />);
     const input = screen.getByRole("combobox");
-    fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "новый" } });
     expect(screen.getByRole("option", { name: /новый/i })).toBeInTheDocument();
+  });
+
+  it("не открывает список при фокусе если нечего выбирать и нет creatable", () => {
+    render(<BasicTagSelect defaultValue={["a", "b"]} />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 
   it("вызывает onValueChange при выборе", () => {

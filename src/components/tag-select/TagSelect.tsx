@@ -151,6 +151,9 @@ export function TagSelectRoot({
   );
   const showCreate = shouldShowCreate(creatable, inputTrim, selected, options);
 
+  /** Панель только если есть опции в списке или строка создания (после ввода). */
+  const hasPanelContent = filtered.length > 0 || showCreate;
+
   const flatOptionValues = React.useMemo(() => {
     const v: string[] = [];
     if (showCreate) v.push(CREATE_VALUE);
@@ -181,6 +184,11 @@ export function TagSelectRoot({
     );
   }, [open, flatOptionValues]);
 
+  React.useEffect(() => {
+    if (!open) return;
+    if (!hasPanelContent) setOpen(false);
+  }, [open, hasPanelContent]);
+
   useEscapeKey({ enabled: open, onEscape: () => setOpen(false) });
   useOutsideClick({
     refs: [triggerRef, listboxRef],
@@ -207,7 +215,6 @@ export function TagSelectRoot({
         if (v.length === 0) return;
         setSelected((prev) => (prev.includes(v) ? prev : [...prev, v]));
         setInputValue("");
-        setOpen(true);
         return;
       }
       toggleValue(rawValue);
@@ -251,7 +258,7 @@ export function TagSelectRoot({
       if (!open) {
         if (e.key === "ArrowDown" || e.key === "ArrowUp") {
           e.preventDefault();
-          setOpen(true);
+          if (filtered.length > 0 || showCreate) setOpen(true);
         }
         return;
       }
@@ -302,7 +309,7 @@ export function TagSelectRoot({
         onClick={() => {
           if (!disabled) {
             focusInput();
-            setOpen(true);
+            if (hasPanelContent) setOpen(true);
           }
         }}
         {...toDataAttributes({
@@ -360,13 +367,21 @@ export function TagSelectRoot({
             className={cx(styles.input, inputCollapsed && styles.inputCollapsed)}
             value={inputValue}
             onChange={(e) => {
-              setInputValue(e.target.value);
-              if (!open) setOpen(true);
+              const next = e.target.value;
+              setInputValue(next);
+              const nextTrim = next.trim();
+              const nextFiltered = optionsForList(options, next, selected);
+              const nextShowCreate = shouldShowCreate(creatable, nextTrim, selected, options);
+              if (nextFiltered.length > 0 || nextShowCreate) {
+                setOpen(true);
+              } else {
+                setOpen(false);
+              }
             }}
             onKeyDown={onInputKeyDown}
             onFocus={() => {
               setInputFocused(true);
-              if (!disabled) setOpen(true);
+              if (!disabled && hasPanelContent) setOpen(true);
             }}
             onBlur={() => {
               setInputFocused(false);
