@@ -390,7 +390,6 @@ export function TagSelectRoot({
               </Typography.Root>
             </div>
           ) : null}
-          {hint ? <hr className={styles.separator} /> : null}
 
           {showCreate ? (
             <button

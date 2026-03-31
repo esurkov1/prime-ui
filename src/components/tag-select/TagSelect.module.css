@@ -217,7 +217,7 @@
   transform: rotate(225deg) translateY(-10%);
 }
 
-/* Панель списка: разделитель как у Dropdown между подсказкой и пунктами */
+/* Панель списка */
 .panelInner {
   display: flex;
   flex-direction: column;
@@ -228,14 +228,6 @@
 .hint {
   padding-inline: var(--prime-sys-spacing-x3);
   padding-block: var(--prime-sys-spacing-x2) var(--prime-sys-spacing-x1);
-}
-
-.separator {
-  margin: 0;
-  border: none;
-  height: var(--prime-sys-unit-1px);
-  background: var(--prime-sys-color-border-subtle);
-  flex-shrink: 0;
 }
 
 .optionRow {
