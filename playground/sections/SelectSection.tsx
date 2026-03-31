@@ -18,8 +18,6 @@ import SelectMultipleSnippet from "../snippets/select/multiple";
 import multipleSource from "../snippets/select/multiple.tsx?raw";
 import SelectNativeSnippet from "../snippets/select/native";
 import nativeSource from "../snippets/select/native.tsx?raw";
-import SelectNativeMultipleSnippet from "../snippets/select/native-multiple";
-import nativeMultipleSource from "../snippets/select/native-multiple.tsx?raw";
 import SelectSizesSnippet from "../snippets/select/sizes";
 import sizesSource from "../snippets/select/sizes.tsx?raw";
 import SelectStatesSnippet from "../snippets/select/states";
@@ -90,8 +88,7 @@ const selectRootApiRows: PlaygroundApiPropRow[] = [
     type: "boolean",
     defaultValue: "false",
     required: "Нет",
-    description:
-      "Мультивыбор: `value`/`onChange` — массивы; в комбобоксе список остаётся открытым при выборе; с `native` — `<select multiple>`.",
+    description: "Мультивыбор: `value`/`onChange` — массивы; список остаётся открытым при выборе.",
   },
   {
     prop: "children",
@@ -441,20 +438,6 @@ export default function SelectSection() {
             <PlaygroundExampleFrame.Root code={multipleSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
                 <SelectMultipleSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Мультиселект (нативный)</DemoSectionTitle>
-            <DemoDescription>
-              <code>Select.Root native multiple</code> — нативный{" "}
-              <code>&lt;select multiple&gt;</code> с теми же <code>Select.Item</code> (выбор
-              нескольких значений по правилам ОС).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={nativeMultipleSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <SelectNativeMultipleSnippet />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
