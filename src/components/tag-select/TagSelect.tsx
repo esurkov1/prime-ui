@@ -42,6 +42,7 @@ export type TagSelectRootProps = {
   disabled?: boolean;
   placeholder?: string;
   hasError?: boolean;
+  /** Как у `Select`: одна ось для поля (`data-size` на контроле) и панели списка; `Badge` без своего `size` берёт размер из этого контекста. */
   size?: SelectSize;
   id?: string;
   className?: string;
@@ -308,12 +309,7 @@ export function TagSelectRoot({
         <div className={styles.chips}>
           {chips.map((c) => (
             <span key={c.value} className={styles.chip}>
-              <Badge.Root
-                color={c.color}
-                variant="filled"
-                size="s"
-                className={styles.chipBadgeRoot}
-              >
+              <Badge.Root color={c.color} variant="filled" className={styles.chipBadge}>
                 <span className={styles.chipLabel}>{c.label}</span>
                 <button
                   type="button"
@@ -413,7 +409,7 @@ export function TagSelectRoot({
               onClick={() => handleSelectFromList(CREATE_VALUE)}
             >
               <span className={styles.createLabel}>{createActionLabel}</span>
-              <Badge.Root color={defaultTagColor} variant="filled" size="s">
+              <Badge.Root color={defaultTagColor} variant="filled">
                 {inputTrim}
               </Badge.Root>
             </button>
@@ -437,7 +433,7 @@ export function TagSelectRoot({
               onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
               onClick={() => !o.disabled && handleSelectFromList(o.value)}
             >
-              <Badge.Root color={o.color ?? defaultTagColor} variant="filled" size="s">
+              <Badge.Root color={o.color ?? defaultTagColor} variant="filled">
                 {o.label}
               </Badge.Root>
             </button>

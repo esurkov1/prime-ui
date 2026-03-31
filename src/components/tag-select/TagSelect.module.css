@@ -117,7 +117,8 @@
   max-width: 100%;
 }
 
-.chipBadgeRoot {
+/* Только обрезка длинной подписи в flex-ряду; токены бейджа не трогаем. */
+.chipBadge {
   max-width: 100%;
   min-width: 0;
 }
@@ -133,10 +134,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--prime-sys-unit-1p25rem);
-  height: var(--prime-sys-unit-1p25rem);
   margin: 0;
-  margin-inline-start: calc(var(--prime-sys-size-badge-s-gap) * -0.25);
   padding: 0;
   border: none;
   border-radius: var(--prime-sys-shape-radius-s);
@@ -144,9 +142,7 @@
   color: inherit;
   opacity: 0.8;
   cursor: pointer;
-  transition:
-    opacity var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
-    background-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  transition: opacity var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
 }
 
 .chipRemove:hover:not(:disabled) {
