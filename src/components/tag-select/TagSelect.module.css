@@ -1,0 +1,308 @@
+/* Поле: те же токены, что у Select `.trigger`, но многострочно + перенос чипов. */
+
+.control {
+  --ts-pad-x: var(--prime-sys-size-control-m-inputPaddingX);
+  --ts-pad-y: var(--prime-sys-size-control-m-inputPaddingY);
+  --ts-gap: var(--prime-sys-size-control-m-gap);
+  --ts-chevron: var(--prime-sys-size-control-m-icon);
+
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--ts-gap);
+  width: 100%;
+  min-width: 0;
+  min-height: var(--prime-sys-size-control-m-height);
+  padding-inline-start: var(--ts-pad-x);
+  padding-inline-end: calc(var(--ts-pad-x) + var(--ts-chevron) + var(--ts-gap));
+  padding-block: var(--ts-pad-y);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  background: var(--prime-sys-color-field-bg);
+  color: var(--prime-sys-color-field-text);
+  font-size: var(--prime-sys-size-control-m-text);
+  font-family: inherit;
+  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  cursor: text;
+  text-align: left;
+  outline: none;
+  transition:
+    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.control[data-size="s"] {
+  --ts-pad-x: var(--prime-sys-size-control-s-inputPaddingX);
+  --ts-pad-y: var(--prime-sys-size-control-s-inputPaddingY);
+  --ts-gap: var(--prime-sys-size-control-s-gap);
+  --ts-chevron: var(--prime-sys-size-control-s-icon);
+  min-height: var(--prime-sys-size-control-s-height);
+  border-radius: var(--prime-sys-size-control-s-radius);
+  font-size: var(--prime-sys-size-control-s-text);
+}
+
+.control[data-size="m"] {
+  --ts-gap: var(--prime-sys-size-control-m-gap);
+  --ts-chevron: var(--prime-sys-size-control-m-icon);
+  min-height: var(--prime-sys-size-control-m-height);
+  border-radius: var(--prime-sys-size-control-m-radius);
+  font-size: var(--prime-sys-size-control-m-text);
+}
+
+.control[data-size="l"] {
+  --ts-pad-x: var(--prime-sys-size-control-l-inputPaddingX);
+  --ts-pad-y: var(--prime-sys-size-control-l-inputPaddingY);
+  --ts-gap: var(--prime-sys-size-control-l-gap);
+  --ts-chevron: var(--prime-sys-size-control-l-icon);
+  min-height: var(--prime-sys-size-control-l-height);
+  border-radius: var(--prime-sys-size-control-l-radius);
+  font-size: var(--prime-sys-size-control-l-text);
+}
+
+.control[data-size="xl"] {
+  --ts-pad-x: var(--prime-sys-size-control-xl-inputPaddingX);
+  --ts-pad-y: var(--prime-sys-size-control-xl-inputPaddingY);
+  --ts-gap: var(--prime-sys-size-control-xl-gap);
+  --ts-chevron: var(--prime-sys-size-control-xl-icon);
+  min-height: var(--prime-sys-size-control-xl-height);
+  border-radius: var(--prime-sys-size-control-xl-radius);
+  font-size: var(--prime-sys-size-control-xl-text);
+}
+
+.control:hover:not([data-disabled="true"]) {
+  border-color: var(--prime-sys-color-field-borderHover);
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-action-neutralBackgroundHover) 90%,
+    var(--prime-sys-color-field-text) 10%
+  );
+  box-shadow: none;
+}
+
+.control:focus-within:not([data-disabled="true"]) {
+  border-color: var(--prime-sys-color-field-borderFocus);
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.control[data-has-error="true"] {
+  border-color: var(--prime-sys-color-field-borderError);
+}
+
+.control[data-has-error="true"]:focus-within {
+  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+}
+
+.control[data-disabled="true"] {
+  background: var(--prime-sys-color-surface-accentSoft);
+  border-color: transparent;
+  box-shadow: none;
+  cursor: not-allowed;
+  color: var(--prime-sys-color-content-disabled);
+}
+
+.chips {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ts-gap);
+  min-width: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x1);
+  max-width: 100%;
+}
+
+.chipBadge {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chipBadge > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chipRemove {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-sys-unit-1p25rem);
+  height: var(--prime-sys-unit-1p25rem);
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--prime-sys-shape-radius-s);
+  background: transparent;
+  color: var(--prime-sys-color-content-secondary);
+  cursor: pointer;
+  transition: color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.chipRemove:hover:not(:disabled) {
+  color: var(--prime-sys-color-content-primary);
+}
+
+.chipRemove:focus-visible {
+  outline: none;
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.chipRemove:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.removeIcon {
+  display: block;
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+.input {
+  flex: 1 1 4rem;
+  min-width: 2rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: var(--prime-sys-typography-body-lineHeight);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--prime-sys-color-field-placeholder);
+}
+
+.control[data-disabled="true"] .input::placeholder {
+  color: var(--prime-sys-color-content-disabled);
+}
+
+.chevronSlot {
+  position: absolute;
+  top: 50%;
+  right: var(--ts-pad-x);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ts-chevron);
+  min-width: var(--ts-chevron);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.chevron {
+  display: block;
+  flex-shrink: 0;
+  width: var(--prime-sys-unit-0p45rem);
+  height: var(--prime-sys-unit-0p45rem);
+  border-right: var(--prime-sys-unit-1p5px) solid currentColor;
+  border-bottom: var(--prime-sys-unit-1p5px) solid currentColor;
+  transform: rotate(45deg) translateY(-10%);
+  opacity: 0.6;
+  transition:
+    transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
+    opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+}
+
+.control[data-open="true"] .chevron {
+  transform: rotate(225deg) translateY(-10%);
+}
+
+/* Панель списка: разделитель как у Dropdown между подсказкой и пунктами */
+.panelInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.hint {
+  padding-inline: var(--prime-sys-spacing-x3);
+  padding-block: var(--prime-sys-spacing-x2) var(--prime-sys-spacing-x1);
+}
+
+.separator {
+  margin: 0;
+  border: none;
+  height: var(--prime-sys-unit-1px);
+  background: var(--prime-sys-color-border-subtle);
+  flex-shrink: 0;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+  min-width: 0;
+  cursor: pointer;
+  border: none;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  padding-inline: var(--prime-sys-spacing-x3);
+  padding-block: var(--prime-sys-spacing-x2);
+  border-radius: var(--prime-sys-shape-radius-m);
+  transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.optionRow:hover:not([data-disabled="true"]) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.optionRow[data-highlighted="true"]:not([data-disabled="true"]) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.optionRow[data-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.optionRow[data-selected="true"] {
+  background: color-mix(
+    in srgb,
+    var(--prime-sys-color-action-neutralBackgroundHover) 65%,
+    transparent
+  );
+}
+
+.createRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+  min-width: 0;
+  cursor: pointer;
+  border: none;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  padding-inline: var(--prime-sys-spacing-x3);
+  padding-block: var(--prime-sys-spacing-x2);
+  border-radius: var(--prime-sys-shape-radius-m);
+  transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.createRow:hover:not([data-disabled="true"]),
+.createRow[data-highlighted="true"]:not([data-disabled="true"]) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.createLabel {
+  color: var(--prime-sys-color-content-secondary);
+  font-weight: var(--prime-sys-typography-weight-medium);
+}

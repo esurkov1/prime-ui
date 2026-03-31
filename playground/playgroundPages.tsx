@@ -48,6 +48,7 @@ import StepperSection from "./sections/StepperSection";
 import SwitchSection from "./sections/SwitchSection";
 import TabsSection from "./sections/TabsSection";
 import TagSection from "./sections/TagSection";
+import TagSelectSection from "./sections/TagSelectSection";
 import TextareaSection from "./sections/TextareaSection";
 import TooltipSection from "./sections/TooltipSection";
 import TypographySection from "./sections/TypographySection";
@@ -116,6 +117,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     { segment: "label", label: "Label", Page: LabelSection },
     { segment: "radio", label: "Radio", Page: RadioSection },
     { segment: "select", label: "Select", Page: SelectSection },
+    { segment: "tag-select", label: "Tag select", Page: TagSelectSection },
     { segment: "slider", label: "Slider", Page: SliderSection },
     { segment: "switch", label: "Switch", Page: SwitchSection },
     { segment: "textarea", label: "Textarea", Page: TextareaSection },
