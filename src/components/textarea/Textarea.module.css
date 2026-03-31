@@ -67,26 +67,23 @@
     background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
 }
 
+/* min-height только у зеркала ::after (inner); дублирование здесь + flex:1 давало лишнюю полосу снизу */
 .control[data-size="s"] {
-  min-height: var(--prime-sys-size-textarea-s-minHeight);
   border-radius: var(--prime-sys-size-textarea-s-radius);
   padding: var(--prime-sys-size-textarea-s-paddingX);
 }
 
 .control[data-size="m"] {
-  min-height: var(--prime-sys-size-textarea-m-minHeight);
   border-radius: var(--prime-sys-size-textarea-m-radius);
   padding: var(--prime-sys-size-textarea-m-paddingX);
 }
 
 .control[data-size="l"] {
-  min-height: var(--prime-sys-size-textarea-l-minHeight);
   border-radius: var(--prime-sys-size-textarea-l-radius);
   padding: var(--prime-sys-size-textarea-l-paddingX);
 }
 
 .control[data-size="xl"] {
-  min-height: var(--prime-sys-size-textarea-xl-minHeight);
   border-radius: var(--prime-sys-size-textarea-xl-radius);
   padding: var(--prime-sys-size-textarea-xl-paddingX);
 }
@@ -117,16 +114,14 @@
 }
 
 .controlStack {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
 .textareaRegion {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -145,8 +140,7 @@
 
 .autoResize {
   display: grid;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
   min-width: 0;
   width: 100%;
 }
@@ -158,7 +152,13 @@
   word-break: break-word;
   visibility: hidden;
   grid-area: 1 / 1 / 2 / 2;
-  font: inherit;
+  /* Должны совпадать с .textarea — иначе высота зеркала ≠ высоте текста и растёт «пол» снизу */
+  font-family: inherit;
+  font-size: var(--prime-textarea-body-size);
+  font-weight: inherit;
+  font-style: inherit;
+  line-height: var(--prime-textarea-line-height);
+  letter-spacing: inherit;
   min-width: 0;
   min-height: var(--prime-textarea-inner-min-height);
   /* padding/border must match .textarea exactly */
