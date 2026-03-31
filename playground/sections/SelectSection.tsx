@@ -14,8 +14,12 @@ import SelectFeaturesSnippet from "../snippets/select/features";
 import featuresSource from "../snippets/select/features.tsx?raw";
 import SelectFullWidthSnippet from "../snippets/select/full-width";
 import fullWidthSource from "../snippets/select/full-width.tsx?raw";
+import SelectMultipleSnippet from "../snippets/select/multiple";
+import multipleSource from "../snippets/select/multiple.tsx?raw";
 import SelectNativeSnippet from "../snippets/select/native";
 import nativeSource from "../snippets/select/native.tsx?raw";
+import SelectNativeMultipleSnippet from "../snippets/select/native-multiple";
+import nativeMultipleSource from "../snippets/select/native-multiple.tsx?raw";
 import SelectSizesSnippet from "../snippets/select/sizes";
 import sizesSource from "../snippets/select/sizes.tsx?raw";
 import SelectStatesSnippet from "../snippets/select/states";
@@ -32,25 +36,25 @@ const selectRootApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "value",
-    type: "string",
+    type: "string | string[]",
     defaultValue: "—",
     required: "Нет",
     description:
-      "Выбранное значение в контролируемом режиме (должно совпадать с value у одного из Item).",
+      "Одиночный выбор: `string`. При `multiple`: массив `value` выбранных Item (порядок — порядок выбора).",
   },
   {
     prop: "defaultValue",
-    type: "string",
+    type: "string | string[]",
     defaultValue: "—",
     required: "Нет",
-    description: "Начальное значение, если не передан value.",
+    description: "Начальное значение, если не передан value (для `multiple` — массив).",
   },
   {
     prop: "onChange",
-    type: "(value: string) => void",
+    type: "(value: string) => void | (value: string[]) => void",
     defaultValue: "—",
     required: "Нет",
-    description: "Вызывается после выбора пункта; в колбэк передаётся value выбранного Item.",
+    description: "После выбора пункта: строка или массив строк в зависимости от `multiple`.",
   },
   {
     prop: "disabled",
@@ -80,6 +84,14 @@ const selectRootApiRows: PlaygroundApiPropRow[] = [
     required: "Нет",
     description:
       "Нативный `<select>` с option/optgroup из дерева Item/Group; без триггера и портального listbox.",
+  },
+  {
+    prop: "multiple",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Мультивыбор: `value`/`onChange` — массивы; в комбобоксе список остаётся открытым при выборе; с `native` — `<select multiple>`.",
   },
   {
     prop: "children",
@@ -325,8 +337,9 @@ export default function SelectSection() {
         <PageContent.Description measure="full">
           {
             <>
-              Выпадающий список для выбора одного значения из нескольких вариантов. По умолчанию —
-              комбобокс: триггер с подсказкой и портальный список с клавиатурой и группами. Параметр{" "}
+              Выпадающий список: одиночный или множественный выбор из закрытого набора. По умолчанию
+              — комбобокс: триггер с подсказкой и портальный список с клавиатурой и группами.{" "}
+              <code>multiple</code> включает мультиселект (значения — массив строк). Параметр{" "}
               <code>native</code> переключает на нативный <code>&lt;select&gt;</code> с теми же{" "}
               <code>Select.Item</code>. Подходит для форм, фильтров и настроек без свободного
               текста.
@@ -414,6 +427,34 @@ export default function SelectSection() {
             <PlaygroundExampleFrame.Root code={nativeSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
                 <SelectNativeSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Мультиселект (комбобокс)</DemoSectionTitle>
+            <DemoDescription>
+              <code>Select.Root multiple</code>: <code>value</code> и <code>onChange</code> с
+              массивом строк; пункты переключаются кликом или клавиатурой; список не закрывается
+              после выбора; в триггере подписи через запятую.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={multipleSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SelectMultipleSnippet />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Мультиселект (нативный)</DemoSectionTitle>
+            <DemoDescription>
+              <code>Select.Root native multiple</code> — нативный{" "}
+              <code>&lt;select multiple&gt;</code> с теми же <code>Select.Item</code> (выбор
+              нескольких значений по правилам ОС).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={nativeMultipleSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SelectNativeMultipleSnippet />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
