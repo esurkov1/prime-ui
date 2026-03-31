@@ -15,7 +15,10 @@ export default function TextareaFeaturesSnippet() {
   return (
     <>
       <Textarea.Root placeholder="Несколько строк — высота растёт (autoResize по умолчанию)">
-        <Textarea.Hint>Режим роста по содержимому через разметку и data-value.</Textarea.Hint>
+        <Textarea.Hint>
+          Рост по содержимому через `data-value`; минимальная высота соответствует токену без
+          двойного учёта padding.
+        </Textarea.Hint>
       </Textarea.Root>
       <div className="previewBlockSpacer">
         <Textarea.Root

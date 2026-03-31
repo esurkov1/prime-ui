@@ -18,7 +18,10 @@ export default function TextareaFeaturesExample() {
   return (
     <>
       <Textarea.Root placeholder="Multiple lines — height grows with content (autoResize default)">
-        <Textarea.Hint>Height follows content via wrapper `data-value`.</Textarea.Hint>
+        <Textarea.Hint>
+          Height follows content via wrapper `data-value`; min height matches the shell token
+          without double-counting padding.
+        </Textarea.Hint>
       </Textarea.Root>
       <div className={styles.blockSpacer}>
         <Textarea.Root autoResize={false} placeholder="Fixed height; native resize handle">

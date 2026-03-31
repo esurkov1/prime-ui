@@ -71,6 +71,7 @@ Live demos use **`playground/snippets/textarea/*.tsx`** (see **`playground/secti
 
 - **Controlled vs uncontrolled:** pass **`value`** with **`onChange`** / **`onInput`** as needed for controlled text; omit **`value`** and optionally set **`defaultValue`** for uncontrolled usage.
 - **`autoResize`** defaults to **`true`**: input events update a wrapper `data-value` mirror; set **`autoResize={false}`** to rely on fixed height / native resize behavior.
+- **Min height:** tokens set the **bordered shell** minimum (`box-sizing: border-box`, padding included). The auto-resize mirror uses an **inner** minimum (`token − 2×padding`) so vertical padding is not applied twice — empty fields do not show an oversized blank band below the caret.
 - **`variant="error"`** or mounting **`Textarea.Error`** sets invalid styling; **`aria-invalid`** defaults from that unless overridden.
 - **`aria-describedby`** you pass is **merged** with auto-added hint and error ids (your ids first, then hint and error when those parts mount).
 - **`disabled`** / **`readOnly`** on `Root` flow to the native textarea; **`Textarea.Hint`** switches to a disabled visual variant when either is true.
