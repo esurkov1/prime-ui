@@ -1,5 +1,8 @@
 import * as React from "react";
 import { Badge, type BadgeColor } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
+import { Input } from "@/components/input/Input";
+import { Popover } from "@/components/popover/Popover";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Typography } from "@/components/typography/Typography";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -26,6 +29,33 @@ export type TagSelectOption = {
 
 const CREATE_VALUE = "__prime_tag_select_create__";
 
+/** Палитра цветов чипа (как в Notion): по одному варианту на каждый `BadgeColor`). */
+const TAG_COLOR_CHOICES: { color: BadgeColor; label: string }[] = [
+  { color: "gray", label: "Default" },
+  { color: "red", label: "Red" },
+  { color: "orange", label: "Orange" },
+  { color: "yellow", label: "Yellow" },
+  { color: "green", label: "Green" },
+  { color: "blue", label: "Blue" },
+  { color: "purple", label: "Purple" },
+  { color: "pink", label: "Pink" },
+  { color: "sky", label: "Sky" },
+  { color: "teal", label: "Teal" },
+];
+
+export type TagSelectOptionManagement = {
+  /** Обновить подпись и/или цвет; `value` опции не меняется. */
+  onUpdate: (value: string, updates: { label?: string; color?: BadgeColor }) => void;
+  /** Удалить тег из справочника; выбранное значение с `value` снимается автоматически. */
+  onDelete: (value: string) => void;
+  /** Подпись секции палитры (по умолчанию «Colors»). */
+  colorsSectionLabel?: string;
+  /** Подпись кнопки удаления (по умолчанию «Delete»). */
+  deleteLabel?: string;
+  /** `aria-label` кнопки меню «⋯» (по умолчанию «Edit tag» + подпись тега). */
+  editMenuAriaLabelPrefix?: string;
+};
+
 export type TagSelectRootProps = {
   /** Доступные теги (значение + подпись + цвет Badge `filled`). */
   options: TagSelectOption[];
@@ -47,6 +77,8 @@ export type TagSelectRootProps = {
   hasError?: boolean;
   /** Как у `Select`: одна ось для поля (`data-size` на контроле) и панели списка; `Badge` без своего `size` берёт размер из этого контекста. */
   size?: SelectSize;
+  /** Редактирование опций в списке: имя, цвет, удаление (меню «⋯» у строки). */
+  optionManagement?: TagSelectOptionManagement;
   id?: string;
   className?: string;
   "aria-label"?: string;
@@ -102,6 +134,189 @@ function shouldShowCreate(
   return !exists;
 }
 
+type TagOptionManagePopoverProps = {
+  option: TagSelectOption;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultTagColor: BadgeColor;
+  size: SelectSize;
+  management: TagSelectOptionManagement;
+  disabled: boolean;
+};
+
+function TagOptionManagePopover({
+  option,
+  open,
+  onOpenChange,
+  defaultTagColor,
+  size,
+  management,
+  disabled,
+}: TagOptionManagePopoverProps) {
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const resolvedColor = option.color ?? defaultTagColor;
+  const [draftLabel, setDraftLabel] = React.useState(option.label);
+
+  React.useEffect(() => {
+    if (open) {
+      setDraftLabel(option.label);
+    }
+  }, [open, option.label]);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const id = requestAnimationFrame(() => inputRef.current?.focus());
+    return () => cancelAnimationFrame(id);
+  }, [open]);
+
+  const commitLabel = () => {
+    const next = draftLabel.trim();
+    if (next.length > 0 && next !== option.label) {
+      management.onUpdate(option.value, { label: next });
+    }
+    if (next.length === 0) {
+      setDraftLabel(option.label);
+    }
+  };
+
+  const colorsSectionLabel = management.colorsSectionLabel ?? "Colors";
+  const deleteLabel = management.deleteLabel ?? "Delete";
+  const menuPrefix = management.editMenuAriaLabelPrefix ?? "Edit tag";
+
+  return (
+    <Popover.Root open={open} onOpenChange={onOpenChange}>
+      <Popover.Trigger asChild>
+        <button
+          type="button"
+          className={styles.optionMenuTrigger}
+          aria-label={`${menuPrefix} ${option.label}`}
+          disabled={disabled}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          {/* biome-ignore lint/a11y/noSvgWithoutTitle: декоративная иконка, имя — у кнопки */}
+          <svg
+            className={styles.optionMenuDots}
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            aria-hidden
+          >
+            <circle cx="4" cy="8" r="1.5" />
+            <circle cx="8" cy="8" r="1.5" />
+            <circle cx="12" cy="8" r="1.5" />
+          </svg>
+        </button>
+      </Popover.Trigger>
+      <Popover.Content
+        side="bottom"
+        align="end"
+        trapFocus={false}
+        insetPadding="x2"
+        insetGap="x2"
+        size={size}
+      >
+        <Input.Root size="s">
+          <Input.Wrapper>
+            <Input.Field
+              ref={inputRef}
+              value={draftLabel}
+              onChange={(e) => setDraftLabel(e.target.value)}
+              onBlur={commitLabel}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  commitLabel();
+                  inputRef.current?.blur();
+                }
+              }}
+              aria-label="Tag name"
+            />
+          </Input.Wrapper>
+        </Input.Root>
+        <Button.Root
+          type="button"
+          variant="error"
+          mode="ghost"
+          size="s"
+          className={styles.manageDelete}
+          onClick={() => {
+            management.onDelete(option.value);
+            onOpenChange(false);
+          }}
+        >
+          {/* biome-ignore lint/a11y/noSvgWithoutTitle: декоративная иконка у кнопки с текстом */}
+          <svg className={styles.manageDeleteIcon} viewBox="0 0 16 16" fill="none" aria-hidden>
+            <path
+              d="M4 4h8M6 4V3h4v1m2 0v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4h10zM6 7v4M10 7v4"
+              stroke="currentColor"
+              strokeWidth="1.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          {deleteLabel}
+        </Button.Root>
+        <hr className={styles.manageSeparator} />
+        <Typography.Root
+          as="div"
+          variant="body-small"
+          tone="muted"
+          className={styles.manageColorsHeading}
+        >
+          {colorsSectionLabel}
+        </Typography.Root>
+        <div className={styles.manageColorList}>
+          {TAG_COLOR_CHOICES.map((row) => {
+            const selected = resolvedColor === row.color;
+            return (
+              <button
+                key={`${row.label}-${row.color}`}
+                type="button"
+                className={styles.manageColorRow}
+                onClick={() => {
+                  management.onUpdate(option.value, { color: row.color });
+                }}
+              >
+                <Badge.Root
+                  color={row.color}
+                  variant="filled"
+                  size="s"
+                  className={styles.manageColorSwatch}
+                >
+                  {"\u00a0"}
+                </Badge.Root>
+                <span className={styles.manageColorLabel}>{row.label}</span>
+                {selected ? (
+                  <>
+                    {/* biome-ignore lint/a11y/noSvgWithoutTitle: декоративная галочка, строка — кнопка */}
+                    <svg className={styles.manageCheck} viewBox="0 0 16 16" aria-hidden>
+                      <path
+                        d="M3 8l3 3 7-7"
+                        stroke="currentColor"
+                        strokeWidth="1.75"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </>
+                ) : (
+                  <span className={styles.manageCheckPlaceholder} aria-hidden />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </Popover.Content>
+    </Popover.Root>
+  );
+}
+
 export function TagSelectRoot({
   options,
   value: valueProp,
@@ -116,6 +331,7 @@ export function TagSelectRoot({
   placeholder = "",
   hasError = false,
   size = "m",
+  optionManagement,
   id: idProp,
   className,
   "aria-label": ariaLabel,
@@ -136,6 +352,7 @@ export function TagSelectRoot({
   const [inputFocused, setInputFocused] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
+  const [manageOpenValue, setManageOpenValue] = React.useState<string | null>(null);
 
   const triggerRef = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -157,6 +374,17 @@ export function TagSelectRoot({
     [options, inputValue, selected],
   );
   const showCreate = shouldShowCreate(creatable, inputTrim, selected, options);
+
+  const resolvedOptionManagement = React.useMemo(() => {
+    if (!optionManagement) return undefined;
+    return {
+      ...optionManagement,
+      onDelete: (value: string) => {
+        setSelected((prev) => prev.filter((x) => x !== value));
+        optionManagement.onDelete(value);
+      },
+    };
+  }, [optionManagement, setSelected]);
 
   /** Панель только если есть опции в списке или строка создания (после ввода). */
   const hasPanelContent = filtered.length > 0 || showCreate;
@@ -231,11 +459,21 @@ export function TagSelectRoot({
     if (!hasPanelContent) setOpen(false);
   }, [open, hasPanelContent]);
 
-  useEscapeKey({ enabled: open, onEscape: () => setOpen(false) });
+  React.useEffect(() => {
+    if (!open) setManageOpenValue(null);
+  }, [open]);
+
+  useEscapeKey({ enabled: open && manageOpenValue === null, onEscape: () => setOpen(false) });
   useOutsideClick({
     refs: [triggerRef, listboxRef],
     enabled: open,
     onOutsideClick: () => setOpen(false),
+    shouldSuppressOutsideClick: (target) => {
+      if (!(target instanceof Element)) return false;
+      const dialog = target.closest('[role="dialog"][data-react-aria-top-layer="true"]');
+      if (!dialog) return false;
+      return dialog !== listboxRef.current;
+    },
   });
 
   const toggleValue = React.useCallback(
@@ -511,32 +749,75 @@ export function TagSelectRoot({
             </button>
           ) : null}
 
-          {filtered.map((o) => (
-            <button
-              key={o.value}
-              type="button"
-              role="option"
-              aria-selected={false}
-              disabled={o.disabled}
-              className={styles.optionRow}
-              {...toDataAttributes({
-                value: o.value,
-                label: o.label,
-                highlighted: highlightedValue === o.value,
-                selected: false,
-                disabled: Boolean(o.disabled),
-              })}
-              onMouseDown={(e) => {
-                if (!o.disabled) e.preventDefault();
-              }}
-              onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
-              onClick={() => !o.disabled && handleSelectFromList(o.value)}
-            >
-              <Badge.Root color={o.color ?? defaultTagColor} variant="filled">
-                {o.label}
-              </Badge.Root>
-            </button>
-          ))}
+          {resolvedOptionManagement
+            ? filtered.map((o) => (
+                <div
+                  key={o.value}
+                  role="option"
+                  tabIndex={-1}
+                  aria-selected={false}
+                  className={styles.optionRowWrap}
+                  {...toDataAttributes({
+                    value: o.value,
+                    label: o.label,
+                    highlighted: highlightedValue === o.value,
+                    selected: false,
+                    disabled: Boolean(o.disabled),
+                  })}
+                  onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
+                >
+                  <button
+                    type="button"
+                    className={styles.optionRowSelect}
+                    disabled={o.disabled}
+                    onMouseDown={(e) => {
+                      if (!o.disabled) e.preventDefault();
+                    }}
+                    onClick={() => !o.disabled && handleSelectFromList(o.value)}
+                  >
+                    <Badge.Root color={o.color ?? defaultTagColor} variant="filled">
+                      {o.label}
+                    </Badge.Root>
+                  </button>
+                  {!o.disabled ? (
+                    <TagOptionManagePopover
+                      option={o}
+                      open={manageOpenValue === o.value}
+                      onOpenChange={(next) => setManageOpenValue(next ? o.value : null)}
+                      defaultTagColor={defaultTagColor}
+                      size={size}
+                      management={resolvedOptionManagement}
+                      disabled={disabled}
+                    />
+                  ) : null}
+                </div>
+              ))
+            : filtered.map((o) => (
+                <button
+                  key={o.value}
+                  type="button"
+                  role="option"
+                  aria-selected={false}
+                  disabled={o.disabled}
+                  className={styles.optionRow}
+                  {...toDataAttributes({
+                    value: o.value,
+                    label: o.label,
+                    highlighted: highlightedValue === o.value,
+                    selected: false,
+                    disabled: Boolean(o.disabled),
+                  })}
+                  onMouseDown={(e) => {
+                    if (!o.disabled) e.preventDefault();
+                  }}
+                  onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
+                  onClick={() => !o.disabled && handleSelectFromList(o.value)}
+                >
+                  <Badge.Root color={o.color ?? defaultTagColor} variant="filled">
+                    {o.label}
+                  </Badge.Root>
+                </button>
+              ))}
         </ScrollContainer>
       </Portal>
     </ControlSizeProvider>

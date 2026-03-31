@@ -319,3 +319,165 @@
 .createLabel {
   flex-shrink: 0;
 }
+
+/* Строка списка с меню «⋯» (optionManagement) */
+.optionRowWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x1);
+  width: 100%;
+  min-width: 0;
+  padding-inline: var(--prime-sys-spacing-x3);
+  padding-block: var(--prime-sys-spacing-x2);
+  border-radius: var(--prime-sys-shape-radius-m);
+  transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.optionRowWrap:hover:not([data-disabled="true"]) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.optionRowWrap[data-highlighted="true"]:not([data-disabled="true"]) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.optionRowSelect {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.optionRowSelect:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.optionMenuTrigger {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--prime-sys-size-control-m-height);
+  min-height: var(--prime-sys-size-control-m-height);
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--prime-sys-shape-radius-s);
+  background: transparent;
+  color: var(--prime-sys-color-content-secondary);
+  cursor: pointer;
+  transition:
+    background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
+    color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.optionMenuTrigger:hover:not(:disabled) {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.optionMenuTrigger:focus-visible {
+  outline: none;
+  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+}
+
+.optionMenuTrigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.optionMenuDots {
+  display: block;
+  width: var(--prime-sys-size-control-m-icon);
+  height: var(--prime-sys-size-control-m-icon);
+}
+
+/* Поповер редактирования тега */
+.manageDelete {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.manageDeleteIcon {
+  display: block;
+  flex-shrink: 0;
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
+}
+
+.manageSeparator {
+  width: 100%;
+  height: var(--prime-sys-border-width-control);
+  margin-block: var(--prime-sys-spacing-x1);
+  border: none;
+  background: var(--prime-sys-color-border-separator);
+}
+
+.manageColorsHeading {
+  padding-block: 0 var(--prime-sys-spacing-x1);
+}
+
+.manageColorList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  max-height: min(14rem, 50vh);
+  overflow-y: auto;
+}
+
+.manageColorRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-sys-spacing-x2);
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding-block: var(--prime-sys-spacing-x2);
+  padding-inline: var(--prime-sys-spacing-x2);
+  border: none;
+  border-radius: var(--prime-sys-shape-radius-s);
+  cursor: pointer;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+}
+
+.manageColorRow:hover {
+  background: var(--prime-sys-color-action-neutralBackgroundHover);
+}
+
+.manageColorSwatch {
+  flex-shrink: 0;
+  width: var(--prime-sys-unit-1p25rem);
+  min-width: var(--prime-sys-unit-1p25rem);
+}
+
+.manageColorLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.manageCheck {
+  flex-shrink: 0;
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
+  color: var(--prime-sys-color-content-primary);
+}
+
+.manageCheckPlaceholder {
+  flex-shrink: 0;
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
+}

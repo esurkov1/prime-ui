@@ -19,7 +19,7 @@ A multi-select field: selected values appear as removable chips (styled like [Ta
 
 ## Composition
 
-- **`TagSelect.Root`** — owns **`options`**, **`value`** / **`defaultValue`**, **`onValueChange`**, **`creatable`**, **`onCreated`**, **`placeholder`**, **`hint`**, **`size`** (same [`Select`](../select) size axis as **`Select.Root`**), **`disabled`**, **`hasError`**, **`aria-label`** / **`aria-labelledby`**. Renders the chip row + input, a portaled listbox when open, and optional **`ScrollContainer`** for the option list.
+- **`TagSelect.Root`** — owns **`options`**, **`value`** / **`defaultValue`**, **`onValueChange`**, **`creatable`**, **`onCreated`**, **`optionManagement`** (опционально: меню «⋯» у строки — переименование, палитра цветов, удаление из справочника), **`placeholder`**, **`hint`**, **`size`** (same [`Select`](../select) size axis as **`Select.Root`**), **`disabled`**, **`hasError`**, **`aria-label`** / **`aria-labelledby`**. Renders the chip row + input, a portaled listbox when open, and optional **`ScrollContainer`** for the option list.
 
 ### Canonical example
 
@@ -86,6 +86,7 @@ Live demo: **`playground/sections/TagSelectSection.tsx`** — snippet **`playgro
 | placeholder | `string` | `""` | No | Input placeholder |
 | hasError | `boolean` | `false` | No | Error styling |
 | size | `SelectSize` | `"m"` | No | Same size axis as **`Select.Root`** |
+| optionManagement | `TagSelectOptionManagement` | — | No | Меню редактирования опции в списке (⋯): **`onUpdate`**, **`onDelete`**, опционально подписи |
 | id | `string` | — | No | Root id (listbox and input ids are derived) |
 | className | `string` | — | No | Extra class on the root |
 | aria-label | `string` | — | No | Accessible name |
@@ -99,6 +100,16 @@ Live demo: **`playground/sections/TagSelectSection.tsx`** — snippet **`playgro
 | label | `string` | Yes | Chip and list row text |
 | color | `BadgeColor` | No | **`Badge`** **`filled`** color in the list |
 | disabled | `boolean` | No | Option not selectable |
+
+### TagSelectOptionManagement
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| onUpdate | `(value: string, updates: { label?: string; color?: BadgeColor }) => void` | Yes | Обновить подпись и/или цвет; **`value`** опции не меняется |
+| onDelete | `(value: string) => void` | Yes | Удалить опцию из справочника; выбранные значения с этим **`value`** снимаются |
+| colorsSectionLabel | `string` | No | Заголовок блока цветов (по умолчанию «Colors») |
+| deleteLabel | `string` | No | Подпись кнопки удаления (по умолчанию «Delete») |
+| editMenuAriaLabelPrefix | `string` | No | Префикс **`aria-label`** кнопки ⋯ (по умолчанию «Edit tag») |
 
 ## Related
 

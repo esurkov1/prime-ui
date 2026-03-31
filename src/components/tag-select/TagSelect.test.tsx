@@ -84,4 +84,34 @@ describe("TagSelect", () => {
     fireEvent.click(screen.getByRole("button", { name: /Remove Alpha/i }));
     expect(screen.queryByRole("button", { name: /Remove Alpha/i })).not.toBeInTheDocument();
   });
+
+  it("при optionManagement показывает кнопку меню у опции", () => {
+    render(
+      <BasicTagSelect
+        optionManagement={{
+          onUpdate: vi.fn(),
+          onDelete: vi.fn(),
+        }}
+      />,
+    );
+    fireEvent.focus(screen.getByRole("combobox"));
+    expect(screen.getByRole("button", { name: /Edit tag Alpha/i })).toBeInTheDocument();
+  });
+
+  it("вызывает onDelete из меню (опция видна, пока не выбрана в поле)", () => {
+    const onDelete = vi.fn();
+    render(
+      <BasicTagSelect
+        defaultValue={["b"]}
+        optionManagement={{
+          onUpdate: vi.fn(),
+          onDelete,
+        }}
+      />,
+    );
+    fireEvent.focus(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("button", { name: /Edit tag Alpha/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Delete$/i }));
+    expect(onDelete).toHaveBeenCalledWith("a");
+  });
 });

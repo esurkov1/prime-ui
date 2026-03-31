@@ -360,7 +360,11 @@ export type {
 export { Switch } from "./switch/Switch";
 export * from "./tabs/Tabs";
 export * from "./tag/Tag";
-export type { TagSelectOption, TagSelectRootProps } from "./tag-select/TagSelect";
+export type {
+  TagSelectOption,
+  TagSelectOptionManagement,
+  TagSelectRootProps,
+} from "./tag-select/TagSelect";
 export { TagSelect } from "./tag-select/TagSelect";
 export type {
   TextareaCharCounterProps,
