@@ -238,7 +238,7 @@ function TagOptionManagePopover({
                   if (e.key === "Enter") {
                     e.preventDefault();
                     commitLabel();
-                    inputRef.current?.blur();
+                    onOpenChange(false);
                   }
                 }}
                 aria-label="Tag name"

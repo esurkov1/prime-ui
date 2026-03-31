@@ -441,7 +441,8 @@
 
 .manageColorsHeading {
   margin: 0;
-  padding: 0;
+  padding-block: 0;
+  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
   font-size: inherit;
   font-weight: var(--prime-sys-typography-weight-regular);
   color: var(--prime-sys-color-content-muted);
@@ -464,7 +465,7 @@
   min-width: 0;
   margin: 0;
   padding-block: var(--prime-sys-spacing-x1);
-  padding-inline: var(--prime-sys-spacing-x1);
+  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
   border: none;
   border-radius: var(--prime-sys-shape-radius-s);
   cursor: pointer;
