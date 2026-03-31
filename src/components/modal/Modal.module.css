@@ -72,7 +72,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--prime-sys-color-surface-raised);
+  /* `raised` в светлой теме совпадает с `elevated` у панели — фон не виден; `default` даёт контраст к поднятой поверхности. */
+  background: var(--prime-sys-color-surface-default);
   color: var(--prime-sys-color-content-secondary);
   flex: 0 0 auto;
   width: var(--prime-sys-size-modal-headerIconSize);
