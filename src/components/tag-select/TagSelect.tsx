@@ -134,6 +134,22 @@ function shouldShowCreate(
   return !exists;
 }
 
+/** Значения из creatable, ещё не пришедшие в `options` от родителя — остаются в списке после снятия чипа. */
+function mergeOptionsWithCreated(
+  options: TagSelectOption[],
+  createdValues: readonly string[],
+  defaultTagColor: BadgeColor,
+): TagSelectOption[] {
+  const existing = new Set(options.map((o) => o.value));
+  const extra: TagSelectOption[] = [];
+  for (const v of createdValues) {
+    if (!existing.has(v)) {
+      extra.push({ value: v, label: v, color: defaultTagColor });
+    }
+  }
+  return extra.length === 0 ? options : [...options, ...extra];
+}
+
 type TagOptionManagePopoverProps = {
   option: TagSelectOption;
   open: boolean;
@@ -351,6 +367,8 @@ export function TagSelectRoot({
   const [open, setOpen] = React.useState(false);
   const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
   const [manageOpenValue, setManageOpenValue] = React.useState<string | null>(null);
+  /** Созданные через creatable `value`, пока родитель не добавил их в `options` */
+  const [createdOptionValues, setCreatedOptionValues] = React.useState<string[]>([]);
 
   const triggerRef = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -367,11 +385,15 @@ export function TagSelectRoot({
   updateRef.current = update;
 
   const inputTrim = inputValue.trim();
-  const filtered = React.useMemo(
-    () => optionsForList(options, inputValue, selected),
-    [options, inputValue, selected],
+  const mergedOptions = React.useMemo(
+    () => mergeOptionsWithCreated(options, createdOptionValues, defaultTagColor),
+    [options, createdOptionValues, defaultTagColor],
   );
-  const showCreate = shouldShowCreate(creatable, inputTrim, selected, options);
+  const filtered = React.useMemo(
+    () => optionsForList(mergedOptions, inputValue, selected),
+    [mergedOptions, inputValue, selected],
+  );
+  const showCreate = shouldShowCreate(creatable, inputTrim, selected, mergedOptions);
 
   const resolvedOptionManagement = React.useMemo(() => {
     if (!optionManagement) return undefined;
@@ -379,6 +401,7 @@ export function TagSelectRoot({
       ...optionManagement,
       onDelete: (value: string) => {
         setSelected((prev) => prev.filter((x) => x !== value));
+        setCreatedOptionValues((prev) => prev.filter((x) => x !== value));
         optionManagement.onDelete(value);
       },
     };
@@ -496,6 +519,7 @@ export function TagSelectRoot({
           onCreated?.(v);
           return [...prev, v];
         });
+        setCreatedOptionValues((prev) => (prev.includes(v) ? prev : [...prev, v]));
         setInputValue("");
         return;
       }
@@ -552,7 +576,7 @@ export function TagSelectRoot({
         if (hv === CREATE_VALUE) {
           handleSelectFromList(CREATE_VALUE);
         } else if (hv) {
-          const o = options.find((x) => x.value === hv);
+          const o = mergedOptions.find((x) => x.value === hv);
           if (o && !o.disabled) {
             handleSelectFromList(o.value);
           }
@@ -570,7 +594,7 @@ export function TagSelectRoot({
     }
   };
 
-  const chips = normalizeList(selected, options, defaultTagColor);
+  const chips = normalizeList(selected, mergedOptions, defaultTagColor);
   /** Пустое поле (нет тегов и нет текста ввода) — нужна минимальная высота как у инпута; иначе высота по контенту, без «второй строки». */
   const isEmpty = selected.length === 0 && inputTrim.length === 0;
   /** Сворачивать инпут только если уже есть теги и фильтр пуст (пустое поле без тегов — инпут с плейсхолдером на всю ширину). */
@@ -669,8 +693,13 @@ export function TagSelectRoot({
               const next = e.target.value;
               setInputValue(next);
               const nextTrim = next.trim();
-              const nextFiltered = optionsForList(options, next, selected);
-              const nextShowCreate = shouldShowCreate(creatable, nextTrim, selected, options);
+              const nextMerged = mergeOptionsWithCreated(
+                options,
+                createdOptionValues,
+                defaultTagColor,
+              );
+              const nextFiltered = optionsForList(nextMerged, next, selected);
+              const nextShowCreate = shouldShowCreate(creatable, nextTrim, selected, nextMerged);
               if (nextFiltered.length > 0 || nextShowCreate) {
                 setOpen(true);
               } else {

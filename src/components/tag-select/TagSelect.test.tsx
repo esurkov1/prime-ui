@@ -54,6 +54,18 @@ describe("TagSelect", () => {
     expect(screen.getByRole("option", { name: /новый/i })).toBeInTheDocument();
   });
 
+  it("после creatable снятие чипа оставляет значение в списке опций", () => {
+    render(<BasicTagSelect creatable />);
+    const input = screen.getByRole("combobox");
+    fireEvent.change(input, { target: { value: "новый" } });
+    fireEvent.click(screen.getByRole("option", { name: /новый/i }));
+    expect(screen.getByRole("button", { name: /Remove новый/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Remove новый/i }));
+    expect(screen.queryByRole("button", { name: /Remove новый/i })).not.toBeInTheDocument();
+    fireEvent.focus(input);
+    expect(screen.getByRole("option", { name: "новый" })).toBeInTheDocument();
+  });
+
   it("не открывает список при фокусе если нечего выбирать и нет creatable", () => {
     render(<BasicTagSelect defaultValue={["a", "b"]} />);
     fireEvent.focus(screen.getByRole("combobox"));
