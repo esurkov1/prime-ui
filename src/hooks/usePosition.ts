@@ -150,11 +150,16 @@ export function usePosition(
       const content = contentRef.current;
       if (!content) return;
 
-      content.style.position = pos.position;
-      content.style.top = `${pos.top}px`;
-      content.style.left = `${pos.left}px`;
-      content.style.minWidth = pos.minWidth !== undefined ? `${pos.minWidth}px` : "";
-      content.style.maxHeight = pos.maxHeight !== undefined ? `${pos.maxHeight}px` : "";
+      const nextTop = `${pos.top}px`;
+      const nextLeft = `${pos.left}px`;
+      const nextMinW = pos.minWidth !== undefined ? `${pos.minWidth}px` : "";
+      const nextMaxH = pos.maxHeight !== undefined ? `${pos.maxHeight}px` : "";
+      /* Без лишних присвоений — меньше layout thrashing при повторных update() с теми же числами. */
+      if (content.style.position !== pos.position) content.style.position = pos.position;
+      if (content.style.top !== nextTop) content.style.top = nextTop;
+      if (content.style.left !== nextLeft) content.style.left = nextLeft;
+      if (content.style.minWidth !== nextMinW) content.style.minWidth = nextMinW;
+      if (content.style.maxHeight !== nextMaxH) content.style.maxHeight = nextMaxH;
     },
     [contentRef],
   );
@@ -175,7 +180,7 @@ export function usePosition(
       { preferredSide, align, offset, viewportPad, flip, matchTriggerMinWidth },
     );
 
-    setResolvedSide(pos.resolvedSide);
+    setResolvedSide((prev) => (pos.resolvedSide === prev ? prev : pos.resolvedSide));
     applyPositionStyle({
       position: "fixed",
       top: pos.top,

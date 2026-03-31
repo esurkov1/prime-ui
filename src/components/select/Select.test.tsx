@@ -455,6 +455,65 @@ describe("Select (composable)", () => {
   });
 });
 
+describe("Select (multiple combobox)", () => {
+  function MultiSelect({
+    value,
+    onChange,
+    defaultValue,
+  }: {
+    value?: string[];
+    defaultValue?: string[];
+    onChange?: (v: string[]) => void;
+  }) {
+    return (
+      <Select.Root
+        multiple
+        value={value}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        placeholder="Pick"
+      >
+        <Select.Trigger aria-label="Multi">
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="one">One</Select.Item>
+          <Select.Item value="two">Two</Select.Item>
+          <Select.Item value="three">Three</Select.Item>
+        </Select.Content>
+      </Select.Root>
+    );
+  }
+
+  it("listbox has aria-multiselectable when multiple", () => {
+    render(<MultiSelect defaultValue={["one"]} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    expect(screen.getByRole("listbox")).toHaveAttribute("aria-multiselectable", "true");
+  });
+
+  it("selects and toggles items without closing list", () => {
+    const onChange = vi.fn();
+    const { rerender } = render(<MultiSelect value={[]} onChange={onChange} />);
+
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("option", { name: "One" }));
+    expect(onChange).toHaveBeenCalledWith(["one"]);
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+
+    rerender(<MultiSelect value={["one"]} onChange={onChange} />);
+    fireEvent.click(screen.getByRole("option", { name: "One" }));
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+
+  it("shows comma-separated labels in trigger", async () => {
+    render(<MultiSelect defaultValue={["one", "two"]} />);
+    const trigger = screen.getByRole("combobox");
+    await waitFor(() => {
+      expect(trigger).toHaveTextContent("One, Two");
+    });
+  });
+});
+
 describe("Select (native)", () => {
   it("renders a native select instead of button listbox", () => {
     const { container } = render(

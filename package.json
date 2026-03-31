@@ -1,6 +1,6 @@
 {
   "name": "prime-ui-kit",
-  "version": "0.7.5",
+  "version": "0.7.7",
   "description": "React 19 UI kit: CSS Modules, semantic design tokens (--prime-sys-*), composable components — forms, modals, selects, tables, navigation, overlays. TypeScript, ESM, a11y-oriented.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

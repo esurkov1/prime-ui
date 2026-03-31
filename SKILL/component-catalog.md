@@ -382,10 +382,10 @@ Full table of **49** UI building blocks (responsive zones + scenarios). **47** h
 
 | | |
 |---|---|
-| **Purpose** | Single choice: custom combobox (default) or native `<select>` with **`native`**. |
-| **Responsive role** | On mobile menu opens over content; `fullWidth` in forms; `size="l"` for touch target. |
+| **Purpose** | Single or multiple choice: combobox (default), **`multiple`** for `string[]`, or native `<select>` with **`native`**. |
+| **Responsive role** | On mobile menu opens over content; `fullWidth` in forms; `size="l"` for touch target. Open listbox follows the trigger on scroll (same idea as Dropdown/Popover). |
 | **Zones** | form, header, content, sidebar |
-| **Scenarios** | Role/country in a form; language and timezone; shipping/currency; dashboard filter; ticket priority; environment in ops. |
+| **Scenarios** | Role/country; language/timezone; shipping/currency; filters; ticket priority; multi-select departments or tags (combobox **`multiple`**); chip + creatable UX → **Tag select**. |
 | **Documentation** | `../src/components/select/COMPONENT.md` |
 
 ## Sidebar
