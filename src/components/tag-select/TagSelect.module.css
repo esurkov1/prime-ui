@@ -14,7 +14,6 @@
   gap: var(--ts-gap);
   width: 100%;
   min-width: 0;
-  min-height: var(--prime-sys-size-control-m-height);
   padding-inline-start: var(--ts-pad-x);
   padding-inline-end: calc(var(--ts-pad-x) + var(--ts-chevron) + var(--ts-gap));
   padding-block: var(--ts-pad-y);
@@ -39,7 +38,6 @@
   --ts-pad-y: var(--prime-sys-size-control-s-inputPaddingY);
   --ts-gap: var(--prime-sys-size-control-s-gap);
   --ts-chevron: var(--prime-sys-size-control-s-icon);
-  min-height: var(--prime-sys-size-control-s-height);
   border-radius: var(--prime-sys-size-control-s-radius);
   font-size: var(--prime-sys-size-control-s-text);
 }
@@ -47,7 +45,6 @@
 .control[data-size="m"] {
   --ts-gap: var(--prime-sys-size-control-m-gap);
   --ts-chevron: var(--prime-sys-size-control-m-icon);
-  min-height: var(--prime-sys-size-control-m-height);
   border-radius: var(--prime-sys-size-control-m-radius);
   font-size: var(--prime-sys-size-control-m-text);
 }
@@ -57,7 +54,6 @@
   --ts-pad-y: var(--prime-sys-size-control-l-inputPaddingY);
   --ts-gap: var(--prime-sys-size-control-l-gap);
   --ts-chevron: var(--prime-sys-size-control-l-icon);
-  min-height: var(--prime-sys-size-control-l-height);
   border-radius: var(--prime-sys-size-control-l-radius);
   font-size: var(--prime-sys-size-control-l-text);
 }
@@ -67,9 +63,29 @@
   --ts-pad-y: var(--prime-sys-size-control-xl-inputPaddingY);
   --ts-gap: var(--prime-sys-size-control-xl-gap);
   --ts-chevron: var(--prime-sys-size-control-xl-icon);
-  min-height: var(--prime-sys-size-control-xl-height);
   border-radius: var(--prime-sys-size-control-xl-radius);
   font-size: var(--prime-sys-size-control-xl-text);
+}
+
+/* Минимальная высота как у однострочного поля только когда нет тегов и нет ввода; иначе высота по строкам чипов. */
+.control[data-empty="true"] {
+  min-height: var(--prime-sys-size-control-m-height);
+}
+
+.control[data-empty="true"][data-size="s"] {
+  min-height: var(--prime-sys-size-control-s-height);
+}
+
+.control[data-empty="true"][data-size="m"] {
+  min-height: var(--prime-sys-size-control-m-height);
+}
+
+.control[data-empty="true"][data-size="l"] {
+  min-height: var(--prime-sys-size-control-l-height);
+}
+
+.control[data-empty="true"][data-size="xl"] {
+  min-height: var(--prime-sys-size-control-xl-height);
 }
 
 .control:hover:not([data-disabled="true"]) {

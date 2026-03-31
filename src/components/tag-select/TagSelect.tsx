@@ -280,6 +280,8 @@ export function TagSelectRoot({
   };
 
   const chips = normalizeList(selected, options, defaultTagColor);
+  /** Пустое поле (нет тегов и нет текста ввода) — нужна минимальная высота как у инпута; иначе высота по контенту, без «второй строки». */
+  const isEmpty = selected.length === 0 && inputTrim.length === 0;
 
   const focusInput = () => {
     inputRef.current?.focus();
@@ -302,6 +304,7 @@ export function TagSelectRoot({
         {...toDataAttributes({
           size,
           open,
+          empty: isEmpty ? true : undefined,
           disabled: disabled ? true : undefined,
           "has-error": hasError ? true : undefined,
         })}
