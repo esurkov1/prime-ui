@@ -194,6 +194,19 @@
   outline: none;
 }
 
+/* Без фокуса и без текста — не занимает вторую строку в flex-wrap. */
+.inputCollapsed {
+  flex: 0 1 0;
+  min-width: 0;
+  width: 0;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  line-height: 0;
+  font-size: 0;
+}
+
 .input::placeholder {
   color: var(--prime-sys-color-field-placeholder);
 }
@@ -302,6 +315,5 @@
 }
 
 .createLabel {
-  color: var(--prime-sys-color-content-secondary);
-  font-weight: var(--prime-sys-typography-weight-medium);
+  flex-shrink: 0;
 }

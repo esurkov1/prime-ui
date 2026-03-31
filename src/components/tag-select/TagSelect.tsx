@@ -129,6 +129,7 @@ export function TagSelectRoot({
   });
 
   const [inputValue, setInputValue] = React.useState("");
+  const [inputFocused, setInputFocused] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
 
@@ -210,6 +211,7 @@ export function TagSelectRoot({
         return;
       }
       toggleValue(rawValue);
+      setInputValue("");
     },
     [inputTrim, setSelected, toggleValue],
   );
@@ -282,6 +284,8 @@ export function TagSelectRoot({
   const chips = normalizeList(selected, options, defaultTagColor);
   /** Пустое поле (нет тегов и нет текста ввода) — нужна минимальная высота как у инпута; иначе высота по контенту, без «второй строки». */
   const isEmpty = selected.length === 0 && inputTrim.length === 0;
+  /** Нет фокуса и нет черновика — инпут не резервирует вторую строку (см. `.inputCollapsed`). */
+  const inputCollapsed = !inputFocused && inputTrim.length === 0;
 
   const focusInput = () => {
     inputRef.current?.focus();
@@ -353,7 +357,7 @@ export function TagSelectRoot({
             aria-labelledby={ariaLabelledBy}
             disabled={disabled}
             placeholder={selected.length === 0 ? placeholder : undefined}
-            className={styles.input}
+            className={cx(styles.input, inputCollapsed && styles.inputCollapsed)}
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
@@ -361,7 +365,12 @@ export function TagSelectRoot({
             }}
             onKeyDown={onInputKeyDown}
             onFocus={() => {
+              setInputFocused(true);
               if (!disabled) setOpen(true);
+            }}
+            onBlur={() => {
+              setInputFocused(false);
+              setInputValue("");
             }}
           />
         </div>
@@ -407,10 +416,20 @@ export function TagSelectRoot({
                 highlighted: highlightedValue === CREATE_VALUE,
                 disabled: false,
               })}
+              onMouseDown={(e) => {
+                e.preventDefault();
+              }}
               onMouseEnter={() => setHighlightedValue(CREATE_VALUE)}
               onClick={() => handleSelectFromList(CREATE_VALUE)}
             >
-              <span className={styles.createLabel}>{createActionLabel}</span>
+              <Typography.Root
+                as="span"
+                variant="caption-micro"
+                tone="muted"
+                className={styles.createLabel}
+              >
+                {createActionLabel}
+              </Typography.Root>
               <Badge.Root color={defaultTagColor} variant="filled">
                 {inputTrim}
               </Badge.Root>
@@ -432,6 +451,9 @@ export function TagSelectRoot({
                 selected: false,
                 disabled: Boolean(o.disabled),
               })}
+              onMouseDown={(e) => {
+                if (!o.disabled) e.preventDefault();
+              }}
               onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
               onClick={() => !o.disabled && handleSelectFromList(o.value)}
             >
