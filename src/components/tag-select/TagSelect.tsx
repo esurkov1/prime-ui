@@ -11,6 +11,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
+import { getScrollContainers } from "@/internal/scrollAncestors";
 import type { SelectSize } from "@/internal/states";
 import selectStyles from "../select/Select.module.css";
 import { handleSelectListboxKeyDown, queryEnabledSelectOptions } from "../select/selectListbox";
@@ -147,6 +148,9 @@ export function TagSelectRoot({
     align: "start",
   });
 
+  const updateRef = React.useRef(update);
+  updateRef.current = update;
+
   const inputTrim = inputValue.trim();
   const filtered = React.useMemo(
     () => optionsForList(options, inputValue, selected),
@@ -168,10 +172,45 @@ export function TagSelectRoot({
 
   React.useLayoutEffect(() => {
     if (!open) return;
-    update();
-    const raf = requestAnimationFrame(() => update());
+    updateRef.current();
+    const raf = requestAnimationFrame(() => updateRef.current());
     return () => cancelAnimationFrame(raf);
-  }, [open, update]);
+  }, [open]);
+
+  React.useEffect(() => {
+    if (!open) return;
+
+    let rafCoalesce = 0;
+    const schedule = () => {
+      cancelAnimationFrame(rafCoalesce);
+      rafCoalesce = requestAnimationFrame(() => updateRef.current());
+    };
+
+    window.addEventListener("resize", schedule);
+    const scrollTargets = getScrollContainers(triggerRef.current);
+    for (const t of scrollTargets) {
+      t.addEventListener("scroll", schedule, { passive: true });
+    }
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", schedule);
+
+    const panel = listboxRef.current;
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && panel) {
+      ro = new ResizeObserver(schedule);
+      ro.observe(panel);
+    }
+
+    return () => {
+      cancelAnimationFrame(rafCoalesce);
+      window.removeEventListener("resize", schedule);
+      for (const t of scrollTargets) {
+        t.removeEventListener("scroll", schedule);
+      }
+      vv?.removeEventListener("resize", schedule);
+      ro?.disconnect();
+    };
+  }, [open]);
 
   React.useEffect(() => {
     if (!open) {

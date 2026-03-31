@@ -10,6 +10,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import { Portal } from "@/internal/Portal";
+import { getScrollContainers } from "@/internal/scrollAncestors";
 import type { SelectSize } from "@/internal/states";
 
 import styles from "./Select.module.css";
@@ -523,21 +524,41 @@ function SelectContent({ className, children }: SelectContentProps) {
     bootstrap();
   }, [isOpen, setHighlightedValue]);
 
+  /* Как у Dropdown/Popover: пересчёт fixed при scroll предков триггера, resize, смене размера панели. */
   React.useEffect(() => {
     if (!isOpen) return;
 
-    const reposition = () => {
-      requestAnimationFrame(() => updateRef.current());
+    let rafCoalesce = 0;
+    const schedule = () => {
+      cancelAnimationFrame(rafCoalesce);
+      rafCoalesce = requestAnimationFrame(() => updateRef.current());
     };
 
-    window.addEventListener("resize", reposition);
+    window.addEventListener("resize", schedule);
+    const scrollTargets = getScrollContainers(triggerRef.current);
+    for (const t of scrollTargets) {
+      t.addEventListener("scroll", schedule, { passive: true });
+    }
     const vv = window.visualViewport;
-    vv?.addEventListener("resize", reposition);
+    vv?.addEventListener("resize", schedule);
+
+    const panel = contentRef.current;
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && panel) {
+      ro = new ResizeObserver(schedule);
+      ro.observe(panel);
+    }
+
     return () => {
-      window.removeEventListener("resize", reposition);
-      vv?.removeEventListener("resize", reposition);
+      cancelAnimationFrame(rafCoalesce);
+      window.removeEventListener("resize", schedule);
+      for (const t of scrollTargets) {
+        t.removeEventListener("scroll", schedule);
+      }
+      vv?.removeEventListener("resize", schedule);
+      ro?.disconnect();
     };
-  }, [isOpen]);
+  }, [isOpen, triggerRef]);
 
   useEscapeKey({ enabled: isOpen, onEscape: onClose });
   useOutsideClick({ refs: [triggerRef, contentRef], enabled: isOpen, onOutsideClick: onClose });
