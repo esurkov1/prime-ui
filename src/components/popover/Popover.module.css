@@ -58,6 +58,23 @@
   z-index: var(--prime-sys-elevation-zIndex-popoverInDrawerInModal);
 }
 
+/* Поверх listbox/dropdown того же слоя (иначе dropdown 1200 > popover 1000 на page). Уровни как у tooltip. */
+.popoverScroll[data-overlay-portal-layer="page"][data-overlay-stack="above-dropdown"] {
+  z-index: var(--prime-sys-elevation-zIndex-tooltip);
+}
+
+.popoverScroll[data-overlay-portal-layer="drawer"][data-overlay-stack="above-dropdown"] {
+  z-index: var(--prime-sys-elevation-zIndex-tooltipInDrawer);
+}
+
+.popoverScroll[data-overlay-portal-layer="modal"][data-overlay-stack="above-dropdown"] {
+  z-index: var(--prime-sys-elevation-zIndex-tooltipInModal);
+}
+
+.popoverScroll[data-overlay-portal-layer="drawerInModal"][data-overlay-stack="above-dropdown"] {
+  z-index: var(--prime-sys-elevation-zIndex-tooltipInDrawerInModal);
+}
+
 .popoverScroll[data-size="s"] {
   --dd-pad: calc((var(--prime-sys-spacing-x2) + var(--prime-sys-spacing-x3)) / 2);
   --dd-min-w: var(--prime-sys-unit-9p5rem);

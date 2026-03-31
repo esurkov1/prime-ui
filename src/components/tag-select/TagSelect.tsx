@@ -219,6 +219,7 @@ function TagOptionManagePopover({
         insetPadding="x2"
         insetGap="x2"
         size={size}
+        stackAboveDropdown
       >
         <Input.Root size="s">
           <Input.Wrapper>

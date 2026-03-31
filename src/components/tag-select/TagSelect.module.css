@@ -366,10 +366,8 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  min-width: var(--prime-sys-size-control-m-height);
-  min-height: var(--prime-sys-size-control-m-height);
   margin: 0;
-  padding: 0;
+  padding: var(--prime-sys-spacing-x1);
   border: none;
   border-radius: var(--prime-sys-shape-radius-s);
   background: transparent;
@@ -397,8 +395,8 @@
 
 .optionMenuDots {
   display: block;
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
+  width: var(--prime-sys-size-control-s-icon);
+  height: var(--prime-sys-size-control-s-icon);
 }
 
 /* Поповер редактирования тега */

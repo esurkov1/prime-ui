@@ -111,6 +111,11 @@ export type PopoverContentProps = {
   insetPadding?: PopoverInsetPadding;
   /** Вертикальный зазор между прямыми дочерними блоками; `pad` = как у внутренних полей (`--dd-pad`). */
   insetGap?: PopoverInsetGap;
+  /**
+   * Поднять панель над выпадающим списком того же слоя (dropdown 1200 > popover 1000).
+   * Используйте, если триггер внутри Select/TagSelect listbox или другого dropdown.
+   */
+  stackAboveDropdown?: boolean;
   children: React.ReactNode;
   className?: string;
 };
@@ -123,6 +128,7 @@ function PopoverContent({
   trapFocus = false,
   insetPadding = "none",
   insetGap = "pad",
+  stackAboveDropdown = false,
   children,
   className,
 }: PopoverContentProps) {
@@ -167,6 +173,7 @@ function PopoverContent({
           aria-labelledby={triggerId}
           data-react-aria-top-layer="true"
           data-overlay-portal-layer={overlayPortalLayer}
+          data-overlay-stack={stackAboveDropdown ? "above-dropdown" : undefined}
           data-side={layout?.resolvedSide ?? side}
           data-size={size}
           data-inset-padding={insetPadding}
