@@ -110,6 +110,37 @@ describe("TagSelect", () => {
     expect(screen.getByRole("button", { name: /Edit tag Alpha/i })).toBeInTheDocument();
   });
 
+  it("при optionManagement не дублирует уже выбранные в основном списке (только строки для добавления)", () => {
+    render(
+      <BasicTagSelect
+        defaultValue={["a"]}
+        optionManagement={{
+          onUpdate: vi.fn(),
+          onDelete: vi.fn(),
+        }}
+      />,
+    );
+    fireEvent.focus(screen.getByRole("combobox"));
+    expect(screen.getByRole("option", { name: "Beta" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Alpha" })).not.toBeInTheDocument();
+  });
+
+  it("при optionManagement не скрывает выбранные: при всех выбранных тегах список не пустой и есть ⋯", () => {
+    render(
+      <BasicTagSelect
+        defaultValue={["a", "b"]}
+        optionManagement={{
+          onUpdate: vi.fn(),
+          onDelete: vi.fn(),
+        }}
+      />,
+    );
+    fireEvent.focus(screen.getByRole("combobox"));
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Edit tag Alpha/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Edit tag Beta/i })).toBeInTheDocument();
+  });
+
   it("вызывает onDelete из меню (опция видна, пока не выбрана в поле)", () => {
     const onDelete = vi.fn();
     render(

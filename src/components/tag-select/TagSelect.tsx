@@ -109,13 +109,30 @@ function filterOptions(options: TagSelectOption[], query: string): TagSelectOpti
   });
 }
 
-/** Опции для выпадающего списка: без уже выбранных значений. */
-function optionsForList(
+/** Строки для добавления в value: совпадение по поиску, без уже выбранных (чипы не дублируем). */
+function optionsForPickList(
   options: TagSelectOption[],
   query: string,
   selected: string[],
 ): TagSelectOption[] {
   return filterOptions(options, query).filter((o) => !selected.includes(o.value));
+}
+
+/**
+ * Только при `optionManagement`: если после исключения выбранных нечего добавить, но по поиску есть
+ * совпадения среди уже выбранных — показываем эти строки для ⋯ (редактирование справочника), без дубля с «новыми» строками выше.
+ */
+function optionsForManagementWhenPickEmpty(
+  options: TagSelectOption[],
+  query: string,
+  selected: string[],
+  optionManagementEnabled: boolean,
+): TagSelectOption[] {
+  if (!optionManagementEnabled) return [];
+  const matched = filterOptions(options, query);
+  const pick = matched.filter((o) => !selected.includes(o.value));
+  if (pick.length > 0) return [];
+  return matched.filter((o) => selected.includes(o.value));
 }
 
 function shouldShowCreate(
@@ -394,9 +411,20 @@ export function TagSelectRoot({
       return next.length === prev.length ? prev : next;
     });
   }, [options]);
-  const filtered = React.useMemo(
-    () => optionsForList(mergedOptions, inputValue, selected),
+  const optionManagementEnabled = Boolean(optionManagement);
+  const filteredForPick = React.useMemo(
+    () => optionsForPickList(mergedOptions, inputValue, selected),
     [mergedOptions, inputValue, selected],
+  );
+  const managementOnlyOptions = React.useMemo(
+    () =>
+      optionsForManagementWhenPickEmpty(
+        mergedOptions,
+        inputValue,
+        selected,
+        optionManagementEnabled,
+      ),
+    [mergedOptions, inputValue, selected, optionManagementEnabled],
   );
   const showCreate = shouldShowCreate(creatable, inputTrim, selected, mergedOptions);
 
@@ -430,16 +458,20 @@ export function TagSelectRoot({
   }, [optionManagement, options, setSelected]);
 
   /** Панель только если есть опции в списке или строка создания (после ввода). */
-  const hasPanelContent = filtered.length > 0 || showCreate;
+  const hasPanelContent =
+    filteredForPick.length > 0 || managementOnlyOptions.length > 0 || showCreate;
 
   const flatOptionValues = React.useMemo(() => {
     const v: string[] = [];
     if (showCreate) v.push(CREATE_VALUE);
-    for (const o of filtered) {
+    for (const o of filteredForPick) {
+      if (!o.disabled) v.push(o.value);
+    }
+    for (const o of managementOnlyOptions) {
       if (!o.disabled) v.push(o.value);
     }
     return v;
-  }, [filtered, showCreate]);
+  }, [filteredForPick, managementOnlyOptions, showCreate]);
 
   React.useLayoutEffect(() => {
     if (!open) return;
@@ -591,7 +623,9 @@ export function TagSelectRoot({
       if (!open) {
         if (e.key === "ArrowDown" || e.key === "ArrowUp") {
           e.preventDefault();
-          if (filtered.length > 0 || showCreate) setOpen(true);
+          if (filteredForPick.length > 0 || managementOnlyOptions.length > 0 || showCreate) {
+            setOpen(true);
+          }
         }
         return;
       }
@@ -721,9 +755,15 @@ export function TagSelectRoot({
               setInputValue(next);
               const nextTrim = next.trim();
               const nextMerged = mergeOptionsWithCreated(options, createdOptions);
-              const nextFiltered = optionsForList(nextMerged, next, selected);
+              const nextPick = optionsForPickList(nextMerged, next, selected);
+              const nextMgmt = optionsForManagementWhenPickEmpty(
+                nextMerged,
+                next,
+                selected,
+                optionManagementEnabled,
+              );
               const nextShowCreate = shouldShowCreate(creatable, nextTrim, selected, nextMerged);
-              if (nextFiltered.length > 0 || nextShowCreate) {
+              if (nextPick.length > 0 || nextMgmt.length > 0 || nextShowCreate) {
                 setOpen(true);
               } else {
                 setOpen(false);
@@ -799,10 +839,11 @@ export function TagSelectRoot({
             </button>
           ) : null}
 
-          {resolvedOptionManagement
-            ? filtered.map((o) => (
+          {resolvedOptionManagement ? (
+            <>
+              {filteredForPick.map((o) => (
                 <div
-                  key={o.value}
+                  key={`pick-${o.value}`}
                   role="option"
                   tabIndex={-1}
                   aria-selected={false}
@@ -840,33 +881,78 @@ export function TagSelectRoot({
                     />
                   ) : null}
                 </div>
-              ))
-            : filtered.map((o) => (
-                <button
-                  key={o.value}
-                  type="button"
+              ))}
+              {managementOnlyOptions.map((o) => (
+                <div
+                  key={`manage-${o.value}`}
                   role="option"
-                  aria-selected={false}
-                  disabled={o.disabled}
-                  className={styles.optionRow}
+                  tabIndex={-1}
+                  aria-selected
+                  className={styles.optionRowWrap}
+                  data-management-only
                   {...toDataAttributes({
                     value: o.value,
                     label: o.label,
                     highlighted: highlightedValue === o.value,
-                    selected: false,
+                    selected: true,
                     disabled: Boolean(o.disabled),
                   })}
-                  onMouseDown={(e) => {
-                    if (!o.disabled) e.preventDefault();
-                  }}
                   onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
-                  onClick={() => !o.disabled && handleSelectFromList(o.value)}
                 >
-                  <Badge.Root color={o.color ?? defaultTagColor} variant="filled">
-                    {o.label}
-                  </Badge.Root>
-                </button>
+                  <button
+                    type="button"
+                    className={styles.optionRowSelect}
+                    disabled={o.disabled}
+                    onMouseDown={(e) => {
+                      if (!o.disabled) e.preventDefault();
+                    }}
+                    onClick={() => !o.disabled && handleSelectFromList(o.value)}
+                  >
+                    <Badge.Root color={o.color ?? defaultTagColor} variant="filled">
+                      {o.label}
+                    </Badge.Root>
+                  </button>
+                  {!o.disabled ? (
+                    <TagOptionManagePopover
+                      option={o}
+                      open={manageOpenValue === o.value}
+                      onOpenChange={(next) => setManageOpenValue(next ? o.value : null)}
+                      defaultTagColor={defaultTagColor}
+                      management={resolvedOptionManagement}
+                      disabled={disabled}
+                    />
+                  ) : null}
+                </div>
               ))}
+            </>
+          ) : (
+            filteredForPick.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                role="option"
+                aria-selected={false}
+                disabled={o.disabled}
+                className={styles.optionRow}
+                {...toDataAttributes({
+                  value: o.value,
+                  label: o.label,
+                  highlighted: highlightedValue === o.value,
+                  selected: false,
+                  disabled: Boolean(o.disabled),
+                })}
+                onMouseDown={(e) => {
+                  if (!o.disabled) e.preventDefault();
+                }}
+                onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
+                onClick={() => !o.disabled && handleSelectFromList(o.value)}
+              >
+                <Badge.Root color={o.color ?? defaultTagColor} variant="filled">
+                  {o.label}
+                </Badge.Root>
+              </button>
+            ))
+          )}
         </ScrollContainer>
       </Portal>
     </ControlSizeProvider>
