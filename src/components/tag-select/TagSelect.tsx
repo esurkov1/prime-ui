@@ -73,6 +73,15 @@ function filterOptions(options: TagSelectOption[], query: string): TagSelectOpti
   });
 }
 
+/** Опции для выпадающего списка: без уже выбранных значений. */
+function optionsForList(
+  options: TagSelectOption[],
+  query: string,
+  selected: string[],
+): TagSelectOption[] {
+  return filterOptions(options, query).filter((o) => !selected.includes(o.value));
+}
+
 function shouldShowCreate(
   creatable: boolean,
   inputTrim: string,
@@ -134,7 +143,10 @@ export function TagSelectRoot({
   });
 
   const inputTrim = inputValue.trim();
-  const filtered = React.useMemo(() => filterOptions(options, inputValue), [options, inputValue]);
+  const filtered = React.useMemo(
+    () => optionsForList(options, inputValue, selected),
+    [options, inputValue, selected],
+  );
   const showCreate = shouldShowCreate(creatable, inputTrim, selected, options);
 
   const flatOptionValues = React.useMemo(() => {
@@ -296,35 +308,38 @@ export function TagSelectRoot({
         <div className={styles.chips}>
           {chips.map((c) => (
             <span key={c.value} className={styles.chip}>
-              <span className={styles.chipBadge}>
-                <Badge.Root color={c.color} variant="filled" size="s">
-                  {c.label}
-                </Badge.Root>
-              </span>
-              <button
-                type="button"
-                className={styles.chipRemove}
-                aria-label={`Remove ${c.label}`}
-                disabled={disabled}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelected((prev) => prev.filter((x) => x !== c.value));
-                }}
+              <Badge.Root
+                color={c.color}
+                variant="filled"
+                size="m"
+                className={styles.chipBadgeRoot}
               >
-                <svg
-                  className={styles.removeIcon}
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  aria-hidden="true"
+                <span className={styles.chipLabel}>{c.label}</span>
+                <button
+                  type="button"
+                  className={styles.chipRemove}
+                  aria-label={`Remove ${c.label}`}
+                  disabled={disabled}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelected((prev) => prev.filter((x) => x !== c.value));
+                  }}
                 >
-                  <path
-                    d="M2 2l8 8M10 2l-8 8"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    className={styles.removeIcon}
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M2 2l8 8M10 2l-8 8"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              </Badge.Root>
             </span>
           ))}
           <input
@@ -398,38 +413,35 @@ export function TagSelectRoot({
               onClick={() => handleSelectFromList(CREATE_VALUE)}
             >
               <span className={styles.createLabel}>{createActionLabel}</span>
-              <Badge.Root color={defaultTagColor} variant="filled" size="s">
+              <Badge.Root color={defaultTagColor} variant="filled" size="m">
                 {inputTrim}
               </Badge.Root>
             </button>
           ) : null}
 
-          {filtered.map((o) => {
-            const isSel = selected.includes(o.value);
-            return (
-              <button
-                key={o.value}
-                type="button"
-                role="option"
-                aria-selected={isSel}
-                disabled={o.disabled}
-                className={styles.optionRow}
-                {...toDataAttributes({
-                  value: o.value,
-                  label: o.label,
-                  highlighted: highlightedValue === o.value,
-                  selected: isSel,
-                  disabled: Boolean(o.disabled),
-                })}
-                onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
-                onClick={() => !o.disabled && handleSelectFromList(o.value)}
-              >
-                <Badge.Root color={o.color ?? defaultTagColor} variant="filled" size="s">
-                  {o.label}
-                </Badge.Root>
-              </button>
-            );
-          })}
+          {filtered.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              role="option"
+              aria-selected={false}
+              disabled={o.disabled}
+              className={styles.optionRow}
+              {...toDataAttributes({
+                value: o.value,
+                label: o.label,
+                highlighted: highlightedValue === o.value,
+                selected: false,
+                disabled: Boolean(o.disabled),
+              })}
+              onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
+              onClick={() => !o.disabled && handleSelectFromList(o.value)}
+            >
+              <Badge.Root color={o.color ?? defaultTagColor} variant="filled" size="m">
+                {o.label}
+              </Badge.Root>
+            </button>
+          ))}
         </ScrollContainer>
       </Portal>
     </ControlSizeProvider>

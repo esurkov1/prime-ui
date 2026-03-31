@@ -114,17 +114,16 @@
 
 .chip {
   display: inline-flex;
-  align-items: center;
-  gap: var(--prime-sys-spacing-x1);
   max-width: 100%;
 }
 
-.chipBadge {
+.chipBadgeRoot {
+  max-width: 100%;
   min-width: 0;
-  max-width: 100%;
 }
 
-.chipBadge > * {
+.chipLabel {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -137,17 +136,21 @@
   width: var(--prime-sys-unit-1p25rem);
   height: var(--prime-sys-unit-1p25rem);
   margin: 0;
+  margin-inline-start: calc(var(--prime-sys-size-badge-m-gap) * -0.25);
   padding: 0;
   border: none;
   border-radius: var(--prime-sys-shape-radius-s);
   background: transparent;
-  color: var(--prime-sys-color-content-secondary);
+  color: inherit;
+  opacity: 0.8;
   cursor: pointer;
-  transition: color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  transition:
+    opacity var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
+    background-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
 }
 
 .chipRemove:hover:not(:disabled) {
-  color: var(--prime-sys-color-content-primary);
+  opacity: 1;
 }
 
 .chipRemove:focus-visible {
@@ -268,14 +271,6 @@
 .optionRow[data-disabled="true"] {
   opacity: 0.45;
   cursor: not-allowed;
-}
-
-.optionRow[data-selected="true"] {
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-action-neutralBackgroundHover) 65%,
-    transparent
-  );
 }
 
 .createRow {
