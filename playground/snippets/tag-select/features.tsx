@@ -4,10 +4,10 @@ import type { TagSelectOption } from "@/components/tag-select/TagSelect";
 import { TagSelect } from "@/components/tag-select/TagSelect";
 
 const initialOptions: TagSelectOption[] = [
-  { value: "telegram", label: "telegram", color: "blue" },
-  { value: "whatsapp", label: "whatsapp", color: "green" },
-  { value: "facebook", label: "facebook", color: "purple" },
-  { value: "viber", label: "viber", color: "pink" },
+  { value: "telegram", label: "Telegram", color: "blue" },
+  { value: "whatsapp", label: "WhatsApp", color: "green" },
+  { value: "facebook", label: "Facebook", color: "purple" },
+  { value: "viber", label: "Viber", color: "pink" },
 ];
 
 export default function TagSelectFeaturesSnippet() {

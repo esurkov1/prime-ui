@@ -23,24 +23,59 @@ A multi-select field: selected values appear as removable chips (styled like [Ta
 
 ### Canonical example
 
+Controlled **`options`**, **`creatable`**, and **`optionManagement`**: keep **`options`** in React state; in **`onUpdate`**, append a row when **`tagValue`** is not found (covers tags created in-session before the parent list includes them).
+
 ```tsx
 import * as React from "react";
+import type { TagSelectOption } from "prime-ui-kit";
 import { TagSelect } from "prime-ui-kit";
 
+const initialOptions: TagSelectOption[] = [
+  { value: "telegram", label: "Telegram", color: "blue" },
+  { value: "whatsapp", label: "WhatsApp", color: "green" },
+];
+
 export function Example() {
-  const [value, setValue] = React.useState<string[]>(["eng"]);
+  const [value, setValue] = React.useState<string[]>([]);
+  const [options, setOptions] = React.useState<TagSelectOption[]>(initialOptions);
 
   return (
     <TagSelect.Root
-      options={[
-        { value: "eng", label: "Engineering", color: "blue" },
-        { value: "design", label: "Design", color: "purple" },
-        { value: "sales", label: "Sales", color: "green" },
-      ]}
+      options={options}
       value={value}
       onValueChange={setValue}
-      placeholder="Add team…"
-      aria-label="Teams"
+      creatable
+      optionManagement={{
+        onUpdate: (tagValue, updates) => {
+          setOptions((prev) => {
+            const i = prev.findIndex((o) => o.value === tagValue);
+            if (i === -1) {
+              return [
+                ...prev,
+                {
+                  value: tagValue,
+                  label: updates.label ?? tagValue,
+                  color: updates.color ?? "gray",
+                },
+              ];
+            }
+            return prev.map((o) =>
+              o.value === tagValue
+                ? {
+                    ...o,
+                    ...(updates.label !== undefined ? { label: updates.label } : {}),
+                    ...(updates.color !== undefined ? { color: updates.color } : {}),
+                  }
+                : o,
+            );
+          });
+        },
+        onDelete: (tagValue) => {
+          setOptions((prev) => prev.filter((o) => o.value !== tagValue));
+        },
+      }}
+      placeholder="Channel…"
+      aria-label="Contact channels"
     />
   );
 }
@@ -50,12 +85,12 @@ export function Example() {
 
 | File | Intent |
 |------|--------|
-| [`examples/pattern-canonical.tsx`](./examples/pattern-canonical.tsx) | Controlled multi-select from **`options`** (`prime-ui-kit` import). |
-| [`examples/pattern-features.tsx`](./examples/pattern-features.tsx) | **`creatable`** + filter; mirrors [`playground/snippets/tag-select/features.tsx`](../../../playground/snippets/tag-select/features.tsx). |
+| [`examples/pattern-canonical.tsx`](./examples/pattern-canonical.tsx) | Full stack: **`creatable`**, **`optionManagement`** (⋯), controlled **`options`**; **`prime-ui-kit`** import. |
+| [`examples/pattern-features.tsx`](./examples/pattern-features.tsx) | Same as canonical with **`@/`** imports; mirrors [`playground/snippets/tag-select/features.tsx`](../../../playground/snippets/tag-select/features.tsx). |
 
 ### Playground
 
-Live demo: **`playground/sections/TagSelectSection.tsx`** — snippet **`playground/snippets/tag-select/features.tsx`**.
+Live demo: **`playground/sections/TagSelectSection.tsx`** — snippet **`playground/snippets/tag-select/features.tsx`** (same behavior as the canonical example).
 
 **LLM note:** Prefer runnable files under **`./examples/*.tsx`** for prop combinations; this page keeps the contract (rules + API) authoritative.
 

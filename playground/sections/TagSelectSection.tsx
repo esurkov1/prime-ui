@@ -39,6 +39,14 @@ const tagSelectRootApiRows: PlaygroundApiPropRow[] = [
     description: "Разрешить добавление значения, которого нет в options (строка Create в списке).",
   },
   {
+    prop: "optionManagement",
+    type: "TagSelectOptionManagement",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Меню «⋯» в списке: onUpdate (label/color), onDelete; при creatable в onUpdate добавляйте опцию, если value ещё нет в options.",
+  },
+  {
     prop: "onCreated",
     type: "(value: string) => void",
     defaultValue: "—",
@@ -82,11 +90,13 @@ export default function TagSelectSection() {
       <PageContent.Body>
         <div className="demoExamples">
           <div className="demoBlock">
-            <DemoSectionTitle>Мультивыбор и создание</DemoSectionTitle>
+            <DemoSectionTitle>Полный сценарий</DemoSectionTitle>
             <DemoDescription>
-              Цвета опций задаются через <code>color</code> у <code>options</code>. При{" "}
-              <code>creatable</code> ввод несуществующего значения показывает строку Create с превью
-              тега.
+              Фильтр по вводу, <code>creatable</code> (Create / Enter), цвета через{" "}
+              <code>color</code> у <code>options</code>. Меню «⋯» у строки: переименование, палитра,
+              удаление из справочника; <code>onUpdate</code> дополняет список, если тега ещё нет в{" "}
+              <code>options</code> (в т.ч. только что созданный). Состояние в памяти до обновления
+              страницы, без localStorage.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
