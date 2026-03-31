@@ -1,0 +1,14 @@
+.stackNarrow {
+  width: 100%;
+  max-width: calc(var(--prime-sys-unit-1rem) * 22);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-sys-spacing-s);
+}
+
+.caption {
+  margin: 0;
+}

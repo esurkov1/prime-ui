@@ -1,6 +1,6 @@
 # prime-ui-kit component catalog — responsive context
 
-Full table of **48** UI building blocks (responsive zones + scenarios). **46** have a dedicated `COMPONENT.md` under `src/components/*` or `src/layout/*` (**AppShell** — `src/layout/app-shell/COMPONENT.md`; **Sidebar** — `src/layout/sidebar/COMPONENT.md`). **ExampleFrame** and **ScrollContainer** remain documented from source + playground (no separate `COMPONENT.md`).
+Full table of **49** UI building blocks (responsive zones + scenarios). **47** have a dedicated `COMPONENT.md` under `src/components/*` or `src/layout/*` (**AppShell** — `src/layout/app-shell/COMPONENT.md`; **Sidebar** — `src/layout/sidebar/COMPONENT.md`). **ExampleFrame** and **ScrollContainer** remain documented from source + playground (no separate `COMPONENT.md`).
 
 **Examples:** For each component with `COMPONENT.md`, see also `examples/*.tsx` (3–5 runnable scenarios per folder) — richer than playground snippets; paths in each `COMPONENT.md` under **Extended examples**.
 
@@ -457,6 +457,16 @@ Full table of **48** UI building blocks (responsive zones + scenarios). **46** h
 | **Zones** | content, form, inline, header |
 | **Scenarios** | Active filters as removable chips; form keywords; list labels; card tags; grouping in header; disabled tag. |
 | **Documentation** | `../src/components/tag/COMPONENT.md` |
+
+## Tag select
+
+| | |
+|---|---|
+| **Purpose** | Multi-select with chips: filter **`options`**, optional **`creatable`** values and **`onCreated`**. |
+| **Responsive role** | Same as **Select**-tier controls; full width in forms; touch-friendly chip remove. |
+| **Zones** | form, content, header, sidebar |
+| **Scenarios** | Contact channels; team/skills; labels; facets with ad-hoc tags. |
+| **Documentation** | `../src/components/tag-select/COMPONENT.md` |
 
 ## Textarea
 
