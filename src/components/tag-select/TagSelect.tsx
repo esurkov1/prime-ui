@@ -424,7 +424,7 @@ export function TagSelectRoot({
             >
               <Typography.Root
                 as="span"
-                variant="caption-micro"
+                variant="body-small"
                 tone="muted"
                 className={styles.createLabel}
               >
