@@ -311,7 +311,7 @@ export function TagSelectRoot({
               <Badge.Root
                 color={c.color}
                 variant="filled"
-                size="m"
+                size="s"
                 className={styles.chipBadgeRoot}
               >
                 <span className={styles.chipLabel}>{c.label}</span>
@@ -413,7 +413,7 @@ export function TagSelectRoot({
               onClick={() => handleSelectFromList(CREATE_VALUE)}
             >
               <span className={styles.createLabel}>{createActionLabel}</span>
-              <Badge.Root color={defaultTagColor} variant="filled" size="m">
+              <Badge.Root color={defaultTagColor} variant="filled" size="s">
                 {inputTrim}
               </Badge.Root>
             </button>
@@ -437,7 +437,7 @@ export function TagSelectRoot({
               onMouseEnter={() => !o.disabled && setHighlightedValue(o.value)}
               onClick={() => !o.disabled && handleSelectFromList(o.value)}
             >
-              <Badge.Root color={o.color ?? defaultTagColor} variant="filled" size="m">
+              <Badge.Root color={o.color ?? defaultTagColor} variant="filled" size="s">
                 {o.label}
               </Badge.Root>
             </button>

@@ -136,7 +136,7 @@
   width: var(--prime-sys-unit-1p25rem);
   height: var(--prime-sys-unit-1p25rem);
   margin: 0;
-  margin-inline-start: calc(var(--prime-sys-size-badge-m-gap) * -0.25);
+  margin-inline-start: calc(var(--prime-sys-size-badge-s-gap) * -0.25);
   padding: 0;
   border: none;
   border-radius: var(--prime-sys-shape-radius-s);
