@@ -116,15 +116,19 @@ export const semanticTokens = {
       grayFilled: {
         background: "{color.gray.600}",
       },
+      /** Серый `light`: тонированная заливка, видна и на поле, и на elevated-панели. */
+      graySoft: {
+        background: "{color.gray.100}",
+      },
       pink: {
-        backgroundSoft: "{color.pink.50}",
-        foregroundOnSoft: "{color.pink.700}",
+        backgroundSoft: "{color.pink.100}",
+        foregroundOnSoft: "{color.pink.800}",
         backgroundEmphasis: "{color.pink.500}",
         border: "{color.pink.300}",
       },
       teal: {
-        backgroundSoft: "{color.teal.50}",
-        foregroundOnSoft: "{color.teal.700}",
+        backgroundSoft: "{color.teal.100}",
+        foregroundOnSoft: "{color.teal.800}",
         backgroundEmphasis: "{color.teal.500}",
         border: "{color.teal.300}",
       },
@@ -671,7 +675,7 @@ export const semanticTokens = {
         text: "{size.control.xs.text}",
         iconSize: "{size.control.xs.icon}",
         gap: "{size.control.xs.gap}",
-        radius: "{size.control.xs.radius}",
+        radius: "{radius.2xs}",
       },
       m: {
         paddingX: "{size.control.s.buttonPaddingX}",
@@ -679,7 +683,7 @@ export const semanticTokens = {
         text: "{size.control.s.text}",
         iconSize: "{size.control.s.icon}",
         gap: "{size.control.s.gap}",
-        radius: "{size.control.s.radius}",
+        radius: "{radius.2xs}",
       },
       l: {
         paddingX: "{size.control.m.buttonPaddingX}",
@@ -687,7 +691,7 @@ export const semanticTokens = {
         text: "{size.control.m.text}",
         iconSize: "{size.control.m.icon}",
         gap: "{size.control.m.gap}",
-        radius: "{size.control.m.radius}",
+        radius: "{radius.2xs}",
       },
       xl: {
         paddingX: "{size.control.l.buttonPaddingX}",
@@ -695,7 +699,7 @@ export const semanticTokens = {
         text: "{size.control.l.text}",
         iconSize: "{size.control.l.icon}",
         gap: "{size.control.l.gap}",
-        radius: "{size.control.l.radius}",
+        radius: "{radius.xs}",
       },
     },
     /** Ярус `s` на ступень ниже: совпадает с `size.control.xs`. */

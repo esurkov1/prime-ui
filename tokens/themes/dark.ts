@@ -118,15 +118,18 @@ export const darkThemeOverrides = {
       grayFilled: {
         background: "{color.gray.500}",
       },
+      graySoft: {
+        background: "color-mix(in srgb, var(--prime-ref-color-gray-400) 18%, transparent)",
+      },
       pink: {
-        backgroundSoft: "{color.pink.950}",
-        foregroundOnSoft: "{color.pink.200}",
+        backgroundSoft: "color-mix(in srgb, var(--prime-ref-color-pink-500) 16%, transparent)",
+        foregroundOnSoft: "{color.pink.300}",
         backgroundEmphasis: "{color.pink.500}",
         border: "{color.pink.800}",
       },
       teal: {
-        backgroundSoft: "{color.teal.950}",
-        foregroundOnSoft: "{color.teal.200}",
+        backgroundSoft: "color-mix(in srgb, var(--prime-ref-color-teal-500) 16%, transparent)",
+        foregroundOnSoft: "{color.teal.300}",
         backgroundEmphasis: "{color.teal.500}",
         border: "{color.teal.800}",
       },

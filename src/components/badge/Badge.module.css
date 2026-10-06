@@ -39,7 +39,7 @@
 
 /* gray */
 .root[data-color="gray"][data-variant="light"] {
-  background: var(--prime-sys-color-surface-accentSoft);
+  background: var(--prime-sys-color-badge-graySoft-background);
   color: var(--prime-sys-color-content-primary);
 }
 
