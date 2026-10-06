@@ -70,7 +70,7 @@
   position: absolute;
   z-index: 0;
   pointer-events: none;
-  background: var(--prime-sys-color-action-primaryBackground);
+  background: var(--prime-sys-color-accent-base);
   opacity: 0;
   transition:
     transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
@@ -167,7 +167,7 @@
 
 /* У активной вкладки первая иконка — primary, остальные слоты остаются subtle. */
 .tab[aria-selected="true"] .icon:first-of-type :global(svg) {
-  color: var(--prime-sys-color-action-primaryBackground);
+  color: var(--prime-sys-color-accent-base);
 }
 
 .tab:hover {

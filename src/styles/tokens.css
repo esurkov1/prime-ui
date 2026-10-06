@@ -38,6 +38,8 @@
   --prime-ref-color-green-800: #166534;
   --prime-ref-color-green-900: #14532d;
   --prime-ref-color-green-950: #052e16;
+  --prime-ref-color-lavender-300: #aab4f5;
+  --prime-ref-color-lavender-600: #4f5bd5;
   --prime-ref-color-orange-100: #ffedd5;
   --prime-ref-color-orange-200: #fed7aa;
   --prime-ref-color-orange-300: #fdba74;
@@ -185,6 +187,7 @@
   --prime-ref-progressCircle-xl-strokeWidth: 6;
   --prime-ref-radius-0: 0;
   --prime-ref-radius-2xl: 16px;
+  --prime-ref-radius-2xs: 6px;
   --prime-ref-radius-3xl: 20px;
   --prime-ref-radius-4xl: 24px;
   --prime-ref-radius-5xl: 32px;

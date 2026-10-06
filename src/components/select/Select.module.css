@@ -25,7 +25,6 @@
   font-size: var(--prime-sys-size-control-m-text);
   line-height: var(--prime-sys-typography-body-lineHeight);
   font-family: inherit;
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
   cursor: pointer;
   text-align: left;
   outline: none;
@@ -83,16 +82,6 @@
 
 .trigger:hover {
   border-color: var(--prime-sys-color-field-borderHover);
-  /*
-   * В dark `action-neutralBackgroundHover` совпадает с `surface-elevated` у Dropdown/меню —
-   * ховер неотличим от фона. Смешивание с `field-text` даёт стабильный контраст в обеих темах.
-   */
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-action-neutralBackgroundHover) 90%,
-    var(--prime-sys-color-field-text) 10%
-  );
-  box-shadow: none;
 }
 
 .trigger:focus-visible {
@@ -340,11 +329,7 @@
 
 .item:hover,
 .item[data-highlighted="true"] {
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-action-neutralBackgroundHover) 90%,
-    var(--prime-sys-color-field-text) 10%
-  );
+  background: var(--prime-sys-color-accent-soft);
 }
 
 .item[data-disabled="true"] {

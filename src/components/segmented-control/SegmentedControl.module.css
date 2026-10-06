@@ -11,7 +11,9 @@
   max-width: 100%;
   box-sizing: border-box;
   padding: var(--prime-seg-pad);
-  background: var(--prime-sys-color-surface-accentSoft);
+  /* Трек — цвет поля ввода с тонкой обводкой (как у полей формы). */
+  background: var(--prime-sys-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
   border-radius: var(--prime-seg-radius);
 }
 
@@ -37,6 +39,7 @@
   --prime-seg-item-pad-x: var(--prime-sys-spacing-x3);
   --prime-seg-item-pad-y: var(--prime-sys-spacing-x3);
   --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p125rem);
+  --prime-seg-indicator-radius: var(--prime-sys-size-control-xs-radius);
 }
 
 .root[data-size="l"] {
@@ -48,6 +51,7 @@
   --prime-seg-item-pad-x: var(--prime-sys-unit-1p25rem);
   --prime-seg-item-pad-y: var(--prime-sys-unit-1p25rem);
   --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p15rem);
+  --prime-seg-indicator-radius: var(--prime-sys-size-control-xs-radius);
 }
 
 .root[data-size="xl"] {
@@ -76,7 +80,7 @@
   font-size: var(--prime-seg-text);
   font-family: inherit;
   font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-muted);
+  color: var(--prime-sys-color-content-secondary);
   background: transparent;
   border: none;
   border-radius: var(--prime-seg-radius);
@@ -94,21 +98,12 @@
 }
 
 .item:not([data-disabled="true"]):not([aria-checked="true"]):hover {
-  color: var(--prime-sys-color-content-secondary);
+  color: var(--prime-sys-color-content-primary);
 }
 
 .item:focus-visible {
   outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
   outline-offset: var(--prime-sys-unit-2px);
-}
-
-/* Тёмная тема: неактивные — text-disabled, hover — muted. */
-[data-theme="dark"] .item:not([aria-checked="true"]):not([data-disabled="true"]) {
-  color: var(--prime-sys-color-content-disabled);
-}
-
-[data-theme="dark"] .item:not([data-disabled="true"]):not([aria-checked="true"]):hover {
-  color: var(--prime-sys-color-content-muted);
 }
 
 .item[data-disabled="true"] {
@@ -133,10 +128,7 @@
 
 /* ─── Floating indicator (geometry from TS + inset-block / inset-inline) ─ */
 
-/*
- * Пилюля светлее/выше трека: elevated поверх accentSoft (light) / default (dark),
- * иначе в light трек и индикатор сливались (оба gray.100).
- */
+/* Пилюля — elevated поверх трека-поля, с тенью и обводкой border-strong. */
 .indicator {
   position: absolute;
   left: 0;
@@ -146,15 +138,9 @@
   background: var(--prime-sys-color-surface-elevated);
   box-shadow:
     var(--prime-sys-elevation-shadow-surface),
-    0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
+    inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-strong);
   transition: none;
   pointer-events: none;
-}
-
-/* Тёмная тема: трек — surface-default; пилюля — elevated + тонкая обводка для отрыва от рельса. */
-:root[data-theme="dark"] .root,
-[data-theme="dark"] .root {
-  background: var(--prime-sys-color-surface-default);
 }
 
 .root[data-animate="true"] .indicator {

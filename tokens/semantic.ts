@@ -18,7 +18,7 @@ export const semanticTokens = {
       muted: "{color.gray.500}",
       disabled: "{color.gray.400}",
       inverse: "{color.white}",
-      accent: "{color.gray.800}",
+      accent: "{color.lavender.600}",
       danger: "{color.red.800}",
     },
     border: {
@@ -34,50 +34,55 @@ export const semanticTokens = {
     },
     status: {
       information: {
-        background: "{color.blue.50}",
+        background: "{color.blue.100}",
         backgroundEmphasis: "{color.blue.600}",
-        foreground: "{color.blue.900}",
+        foreground: "{color.blue.800}",
         border: "{color.blue.200}",
       },
       warning: {
-        background: "{color.orange.50}",
+        background: "{color.orange.100}",
         backgroundEmphasis: "{color.orange.600}",
-        foreground: "{color.orange.900}",
+        foreground: "{color.orange.800}",
         border: "{color.orange.200}",
       },
       success: {
-        background: "{color.green.50}",
+        background: "{color.green.100}",
         backgroundEmphasis: "{color.green.600}",
-        foreground: "{color.green.900}",
+        foreground: "{color.green.800}",
         border: "{color.green.200}",
       },
       away: {
-        background: "{color.yellow.50}",
+        background: "{color.yellow.100}",
         backgroundEmphasis: "{color.yellow.600}",
-        foreground: "{color.yellow.900}",
+        foreground: "{color.yellow.800}",
         border: "{color.yellow.200}",
       },
       feature: {
-        background: "{color.purple.50}",
+        background: "{color.purple.100}",
         backgroundEmphasis: "{color.purple.600}",
-        foreground: "{color.purple.900}",
+        foreground: "{color.purple.800}",
         border: "{color.purple.200}",
       },
       verified: {
-        background: "{color.sky.50}",
+        background: "{color.sky.100}",
         backgroundEmphasis: "{color.sky.600}",
-        foreground: "{color.sky.900}",
+        foreground: "{color.sky.800}",
         border: "{color.sky.200}",
       },
       error: {
-        background: "{color.red.50}",
+        background: "{color.red.100}",
         backgroundEmphasis: "{color.red.600}",
-        foreground: "{color.red.900}",
+        foreground: "{color.red.800}",
         border: "{color.red.200}",
       },
     },
+    /** Акцент: фокус, выделенные элементы, ссылки, индикатор активной вкладки. */
+    accent: {
+      base: "{color.lavender.600}",
+      soft: "rgba(79, 91, 213, 0.10)",
+    },
     focus: {
-      ring: "{color.gray.950}",
+      ring: "{color.lavender.600}",
     },
     action: {
       primaryBackground: "{color.gray.950}",
@@ -96,9 +101,9 @@ export const semanticTokens = {
       bg: "{color.gray.50}",
       text: "{color.gray.950}",
       placeholder: "{color.gray.400}",
-      border: "{color.gray.200}",
+      border: "transparent",
       borderHover: "{color.gray.300}",
-      borderFocus: "{color.gray.800}",
+      borderFocus: "{color.lavender.600}",
       borderError: "{color.red.500}",
     },
     tooltip: {
@@ -404,7 +409,7 @@ export const semanticTokens = {
       },
       m: {
         height: "{size.m}",
-        radius: "{radius.m}",
+        radius: "{radius.s}",
         icon: "{icon.m}",
         gap: "{spaces.control.spacing.m}",
         buttonPaddingX: "{spaces.control.button.m}",
@@ -570,7 +575,7 @@ export const semanticTokens = {
         dotSize: "{spaces.layout.xs}",
         iconSize: "{size.control.xs.icon}",
         gap: "{size.control.xs.gap}",
-        radius: "{size.control.xs.radius}",
+        radius: "{radius.2xs}",
       },
       m: {
         paddingX: "{size.control.s.buttonPaddingX}",
@@ -579,7 +584,7 @@ export const semanticTokens = {
         dotSize: "{spaces.layout.s}",
         iconSize: "{size.control.s.icon}",
         gap: "{size.control.s.gap}",
-        radius: "{size.control.s.radius}",
+        radius: "{radius.2xs}",
       },
       l: {
         paddingX: "{size.control.m.buttonPaddingX}",
@@ -588,7 +593,7 @@ export const semanticTokens = {
         dotSize: "{spaces.layout.m}",
         iconSize: "{size.control.m.icon}",
         gap: "{size.control.m.gap}",
-        radius: "{size.control.m.radius}",
+        radius: "{radius.2xs}",
       },
       xl: {
         paddingX: "{size.control.l.buttonPaddingX}",
@@ -597,7 +602,7 @@ export const semanticTokens = {
         dotSize: "{spaces.layout.l}",
         iconSize: "{size.control.l.icon}",
         gap: "{size.control.l.gap}",
-        radius: "{size.control.l.radius}",
+        radius: "{radius.xs}",
       },
     },
     avatar: {

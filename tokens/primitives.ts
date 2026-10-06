@@ -26,6 +26,11 @@ export const primitiveTokens = {
       alpha16: "rgba(112, 124, 142, 0.16)",
       alpha24: "rgba(112, 124, 142, 0.24)",
     },
+    /** Акцент (лавандовый): фокус, выделение, ссылки, активные вкладки. */
+    lavender: {
+      300: "#aab4f5",
+      600: "#4f5bd5",
+    },
     /** Палитра red: шкала 50–950 (ориентир — Tailwind v3). */
     red: {
       50: "#fef2f2",
@@ -225,6 +230,7 @@ export const primitiveTokens = {
   /** Скругления: ось `xs`→`6xl` + `circle`; контролы — xs…xl, крупные поверхности — 3xl…6xl. */
   radius: {
     0: "0",
+    "2xs": "6px",
     xs: "8px",
     s: "10px",
     m: "11px",

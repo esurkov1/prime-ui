@@ -61,7 +61,6 @@
   background: var(--prime-sys-color-field-bg);
   color: var(--prime-sys-color-field-text);
   border-radius: var(--prime-sys-size-control-m-radius);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
   transition:
     border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
     box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
@@ -71,8 +70,6 @@
 /* Hover — fires on wrapper hover, disabled + focus excluded */
 .wrapper:hover:not(:has(input:focus-visible)):not(:has(input:disabled)) {
   border-color: var(--prime-sys-color-field-borderHover);
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  box-shadow: none;
 }
 
 /* Focus ring via :has */

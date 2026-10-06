@@ -23,7 +23,6 @@
   color: var(--prime-sys-color-field-text);
   font-size: var(--prime-sys-size-control-m-text);
   font-family: inherit;
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
   cursor: text;
   text-align: left;
   outline: none;
@@ -90,12 +89,6 @@
 
 .control:hover:not([data-disabled="true"]) {
   border-color: var(--prime-sys-color-field-borderHover);
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-action-neutralBackgroundHover) 90%,
-    var(--prime-sys-color-field-text) 10%
-  );
-  box-shadow: none;
 }
 
 .control:focus-within:not([data-disabled="true"]) {
