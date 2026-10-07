@@ -429,6 +429,7 @@ export type {
 } from "./thumbnail/Thumbnail";
 export { Thumbnail } from "./thumbnail/Thumbnail";
 export type {
+  TimelineGapMetaProps,
   TimelineGapProps,
   TimelineGroupProps,
   TimelineItemProps,

@@ -184,7 +184,10 @@ describe("Timeline", () => {
     const { container } = render(
       <Timeline.Root>
         <Timeline.Group label="История работ">
-          <Timeline.Gap trailing="сейчас">Без обслуживания 26 дней · 300 км</Timeline.Gap>
+          <Timeline.Gap>
+            Без обслуживания 26 дней · 300 км
+            <Timeline.GapMeta>сейчас</Timeline.GapMeta>
+          </Timeline.Gap>
           <Timeline.Item>
             <Timeline.Title>ТО: замена масла</Timeline.Title>
           </Timeline.Item>
