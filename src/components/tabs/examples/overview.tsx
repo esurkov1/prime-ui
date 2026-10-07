@@ -1,27 +1,27 @@
-/** Horizontal tabs: text over a hairline with a 2px accent bar under the active label that slides on change. Use to switch between panels of one screen. */
+/** Sections of one screen; the accent bar slides to the active tab — `defaultValue`. */
 import { Tabs, Typography } from "prime-ui-kit";
 
-const panels = [
+const SECTIONS = [
   { value: "overview", label: "Обзор", text: "Сводка по магазину за выбранный период." },
   { value: "orders", label: "Заказы", text: "Последние заказы и их статусы." },
   { value: "reviews", label: "Отзывы", text: "Новые отзывы покупателей." },
-  { value: "settings", label: "Настройки магазина", text: "Название, валюта и способы доставки." },
+  { value: "settings", label: "Настройки", text: "Название, валюта и способы доставки." },
 ];
 
-export default function TabsHorizontalExample() {
+export default function TabsOverviewExample() {
   return (
     <Tabs.Root defaultValue="overview">
       <Tabs.List aria-label="Магазин">
-        {panels.map((p) => (
-          <Tabs.Trigger key={p.value} value={p.value}>
-            {p.label}
-          </Tabs.Trigger>
+        {SECTIONS.map((section) => (
+          <Tabs.Item key={section.value} value={section.value}>
+            {section.label}
+          </Tabs.Item>
         ))}
       </Tabs.List>
-      {panels.map((p) => (
-        <Tabs.Panel key={p.value} value={p.value}>
+      {SECTIONS.map((section) => (
+        <Tabs.Panel key={section.value} value={section.value}>
           <Typography.Root variant="body-m" tone="secondary">
-            {p.text}
+            {section.text}
           </Typography.Root>
         </Tabs.Panel>
       ))}

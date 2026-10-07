@@ -1,10 +1,7 @@
-/** Two-line tabs: `Tabs.Label` + `Tabs.Count` on the first line, `Tabs.Description` with a `<strong>` value on the second. Use for dashboard sections that need a summary per tab. */
+/** A label and a counter on the first line, a summary on the second — `Tabs.Count`, `Tabs.Description`. */
 import { type PaletteColor, Tabs, Typography } from "prime-ui-kit";
-import { useState } from "react";
 
-import styles from "./examples.module.css";
-
-const sections: {
+const SECTIONS: {
   value: string;
   title: string;
   count: number;
@@ -33,31 +30,27 @@ const sections: {
 ];
 
 export default function TabsTwoLineExample() {
-  const [value, setValue] = useState("new");
-
   return (
-    <div className={styles.fleet}>
-      <Tabs.Root value={value} onValueChange={setValue}>
-        <Tabs.List aria-label="Заказы">
-          {sections.map((s) => (
-            <Tabs.Trigger key={s.value} value={s.value}>
-              <Tabs.Label>{s.title}</Tabs.Label>
-              <Tabs.Count color={s.color}>{s.count}</Tabs.Count>
-              <Tabs.Description>
-                <strong>{s.strong}</strong>
-                {s.rest}
-              </Tabs.Description>
-            </Tabs.Trigger>
-          ))}
-        </Tabs.List>
-        {sections.map((s) => (
-          <Tabs.Panel key={s.value} value={s.value}>
-            <Typography.Root variant="body-m" tone="secondary">
-              {s.title}: {s.count} заказов.
-            </Typography.Root>
-          </Tabs.Panel>
+    <Tabs.Root defaultValue="new">
+      <Tabs.List aria-label="Заказы">
+        {SECTIONS.map((section) => (
+          <Tabs.Item key={section.value} value={section.value}>
+            <Tabs.Label>{section.title}</Tabs.Label>
+            <Tabs.Count color={section.color}>{section.count}</Tabs.Count>
+            <Tabs.Description>
+              <strong>{section.strong}</strong>
+              {section.rest}
+            </Tabs.Description>
+          </Tabs.Item>
         ))}
-      </Tabs.Root>
-    </div>
+      </Tabs.List>
+      {SECTIONS.map((section) => (
+        <Tabs.Panel key={section.value} value={section.value}>
+          <Typography.Root variant="body-m" tone="secondary">
+            {section.title}: {section.count} заказов.
+          </Typography.Root>
+        </Tabs.Panel>
+      ))}
+    </Tabs.Root>
   );
 }

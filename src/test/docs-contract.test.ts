@@ -69,7 +69,6 @@ const NOT_CONVERTED = new Set([
   "smart-filter",
   "stepper",
   "switch",
-  "tabs",
   "tag-select",
   "textarea",
   "thumbnail",

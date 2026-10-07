@@ -1,30 +1,25 @@
-/** Tabs at every size tier next to a Button of the same size; the tab height equals the control height. Use to align tabs with toolbar controls. */
-import { Button, type ControlSize, Tabs, Typography } from "prime-ui-kit";
+/** Every size tier; the tab height equals the control height of the same tier — `size`. */
+import { Tabs, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function TabsSizesExample() {
   return (
-    <div className={styles.sizes}>
-      {sizes.map((size) => (
-        <div key={size} className={styles.sizeRow}>
-          <Typography.Root as="span" variant="code" tone="muted" className={styles.caption}>
+    <>
+      {SIZES.map((size) => (
+        <div key={size}>
+          <Typography.Root as="span" variant="caption" tone="muted">
             {size}
           </Typography.Root>
           <Tabs.Root size={size} defaultValue="all">
-            <Tabs.List aria-label={`Заявки, ${size}`}>
-              <Tabs.Trigger value="all">Все</Tabs.Trigger>
-              <Tabs.Trigger value="active">Активные</Tabs.Trigger>
-              <Tabs.Trigger value="archive">Архив</Tabs.Trigger>
+            <Tabs.List aria-label="Заявки">
+              <Tabs.Item value="all">Все</Tabs.Item>
+              <Tabs.Item value="active">Активные</Tabs.Item>
+              <Tabs.Item value="archive">Архив</Tabs.Item>
             </Tabs.List>
           </Tabs.Root>
-          <Button.Root variant="outline" tone="neutral" size={size}>
-            Фильтр
-          </Button.Root>
         </div>
       ))}
-    </div>
+    </>
   );
 }

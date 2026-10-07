@@ -1,13 +1,15 @@
 import * as React from "react";
 
-import { Badge } from "@/components/badge/Badge";
 import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { rovingIndex } from "@/internal/rovingFocus";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 
+import { Badge } from "../badge/Badge";
+import { ScrollContainer } from "../scroll-container/ScrollContainer";
 import styles from "./Tabs.module.css";
 
 type TabsContextValue = {
@@ -20,31 +22,22 @@ type TabsContextValue = {
 
 const [TabsProvider, useTabsContext] = createComponentContext<TabsContextValue>("Tabs");
 
-/** Ids of the trigger's text parts, used to keep the description out of the accessible name. */
-type TriggerContextValue = { triggerId: string };
+/** Id of the item, used to keep the description out of the accessible name. */
+const ItemIdContext = React.createContext<string | null>(null);
 
-const TriggerContext = React.createContext<TriggerContextValue | null>(null);
-
-function tabId(rootId: string, value: string) {
-  return `prime-ui-kit-tab-${rootId}-${value}`;
-}
-
-function panelId(rootId: string, value: string) {
-  return `prime-ui-kit-panel-${rootId}-${value}`;
-}
+const tabId = (rootId: string, value: string) => `prime-ui-kit-tab-${rootId}-${value}`;
+const panelId = (rootId: string, value: string) => `prime-ui-kit-panel-${rootId}-${value}`;
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-export type TabsRootProps = {
+export type TabsRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue"> & {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
   /** Default `horizontal`. A vertical list stacks above the panel in containers narrower than 600px. */
   orientation?: "horizontal" | "vertical";
   size?: ControlSize;
-  children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue" | "children">;
+};
 
 function TabsRoot({
   value,
@@ -57,7 +50,6 @@ function TabsRoot({
   ...rest
 }: TabsRootProps) {
   const rootId = React.useId();
-
   const [activeValue, setActiveValue] = useControllableState({
     value,
     defaultValue,
@@ -76,108 +68,80 @@ function TabsRoot({
         className={cx(styles.root, className)}
         {...toDataAttributes({ orientation, size })}
       >
+        {/* The root is the size container for the vertical → row switch; the layout sits inside. */}
         <div className={styles.layout}>{children}</div>
       </div>
     </TabsProvider>
   );
 }
-TabsRoot.displayName = "TabsRoot";
+TabsRoot.displayName = "Tabs.Root";
 
 // ─── List ─────────────────────────────────────────────────────────────────────
 
-export type TabsListProps = {
-  children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
+export type TabsListProps = React.HTMLAttributes<HTMLDivElement>;
 
 type IndicatorRect = { left: number; top: number; width: number; height: number };
 
 const EMPTY_RECT: IndicatorRect = { left: 0, top: 0, width: 0, height: 0 };
 
+const sameRect = (a: IndicatorRect, b: IndicatorRect) =>
+  a.left === b.left && a.top === b.top && a.width === b.width && a.height === b.height;
+
 function TabsList({ children, className, ...rest }: TabsListProps) {
   const { orientation, activeValue, onSelect, size } = useTabsContext();
-  const listRef = React.useRef<HTMLDivElement>(null);
+  const listRef = React.useRef<HTMLElement>(null);
   const [indicator, setIndicator] = React.useState<IndicatorRect>(EMPTY_RECT);
-  const [overflow, setOverflow] = React.useState({ start: false, end: false });
-
-  const updateOverflow = React.useCallback(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const maxScroll = list.scrollWidth - list.clientWidth;
-    const start = list.scrollLeft > 1;
-    const end = maxScroll - list.scrollLeft > 1;
-    setOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
-  }, []);
-
-  const updateIndicator = React.useCallback(() => {
-    const list = listRef.current;
-    if (!list) return;
-    updateOverflow();
-    const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-    let next = EMPTY_RECT;
-    if (active) {
-      next = {
-        left: active.offsetLeft,
-        top: active.offsetTop,
-        width: active.offsetWidth,
-        height: active.offsetHeight,
-      };
-      // The underline bar spans the trigger's content box so it lines up with the text.
-      if (orientation === "horizontal") {
-        const style = getComputedStyle(active);
-        const padStart = Number.parseFloat(style.paddingLeft) || 0;
-        const padEnd = Number.parseFloat(style.paddingRight) || 0;
-        next = { ...next, left: next.left + padStart, width: next.width - padStart - padEnd };
-      }
-    }
-    setIndicator((prev) =>
-      prev.left === next.left &&
-      prev.top === next.top &&
-      prev.width === next.width &&
-      prev.height === next.height
-        ? prev
-        : next,
-    );
-  }, [updateOverflow, orientation]);
+  const isBar = orientation === "horizontal";
 
   React.useLayoutEffect(() => {
     const list = listRef.current;
     if (!list) return;
 
-    updateIndicator();
+    const update = () => {
+      const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+      let next = EMPTY_RECT;
+      if (active) {
+        next = {
+          left: active.offsetLeft,
+          top: active.offsetTop,
+          width: active.offsetWidth,
+          height: active.offsetHeight,
+        };
+        // The underline bar spans the item's content box so it lines up with the text.
+        if (isBar) {
+          const style = getComputedStyle(active);
+          const padStart = Number.parseFloat(style.paddingLeft) || 0;
+          const padEnd = Number.parseFloat(style.paddingRight) || 0;
+          next = { ...next, left: next.left + padStart, width: next.width - padStart - padEnd };
+        }
+      }
+      setIndicator((prev) => (sameRect(prev, next) ? prev : next));
+    };
 
-    const mo = new MutationObserver(updateIndicator);
-    mo.observe(list, {
+    update();
+    const mutations = new MutationObserver(update);
+    mutations.observe(list, {
       subtree: true,
       childList: true,
       characterData: true,
       attributes: true,
       attributeFilter: ["aria-selected", "data-disabled"],
     });
-
-    let ro: ResizeObserver | undefined;
-    if (typeof ResizeObserver !== "undefined") {
-      ro = new ResizeObserver(updateIndicator);
-      ro.observe(list);
-    }
-
+    const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+    resize?.observe(list);
     return () => {
-      mo.disconnect();
-      ro?.disconnect();
+      mutations.disconnect();
+      resize?.disconnect();
     };
-  }, [updateIndicator]);
+  }, [isBar]);
 
   // Keep the active tab visible inside a scrolling list.
   React.useEffect(() => {
     const list = listRef.current;
-    if (!list || !activeValue) return;
+    if (!list || !activeValue || list.scrollWidth <= list.clientWidth) return;
     const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-    if (!active || typeof active.scrollIntoView !== "function") return;
-    if (list.scrollWidth <= list.clientWidth) return;
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (typeof active?.scrollIntoView !== "function") return;
+    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     active.scrollIntoView({
       block: "nearest",
       inline: "nearest",
@@ -185,57 +149,37 @@ function TabsList({ children, className, ...rest }: TabsListProps) {
     });
   }, [activeValue]);
 
-  // Horizontal: a bar on the list edge under the text. Vertical: a pill behind the active item.
-  const isBar = orientation === "horizontal";
-  const hasIndicator = indicator.width > 0 && indicator.height > 0;
-
-  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     const tabs = Array.from(
       event.currentTarget.querySelectorAll<HTMLButtonElement>(
         '[role="tab"]:not([data-disabled="true"])',
       ),
     );
-    if (tabs.length === 0) return;
-
-    const currentIndex = tabs.findIndex((tab) => tab.dataset.value === activeValue);
-    // A vertical list may be shown as a horizontal row on narrow containers: accept both axes.
-    const prevKeys = orientation === "horizontal" ? ["ArrowLeft"] : ["ArrowUp", "ArrowLeft"];
-    const nextKeys = orientation === "horizontal" ? ["ArrowRight"] : ["ArrowDown", "ArrowRight"];
-
-    let target: HTMLButtonElement | undefined;
-    if (nextKeys.includes(event.key)) {
-      target = tabs[(currentIndex + 1) % tabs.length];
-    } else if (prevKeys.includes(event.key)) {
-      target = tabs[(currentIndex - 1 + tabs.length) % tabs.length];
-    } else if (event.key === "Home") {
-      target = tabs[0];
-    } else if (event.key === "End") {
-      target = tabs[tabs.length - 1];
-    }
-
-    if (target) {
-      event.preventDefault();
-      onSelect(target.dataset.value ?? "");
-      target.focus();
-    }
+    const current = tabs.findIndex((tab) => tab.dataset.value === activeValue);
+    // A vertical list turns into a row on narrow containers: it accepts both axes.
+    const next = rovingIndex(event.key, current, tabs.length, isBar ? "horizontal" : "both");
+    if (next === null) return;
+    event.preventDefault();
+    onSelect(tabs[next].dataset.value ?? "");
+    tabs[next].focus();
   }
 
+  const hasIndicator = indicator.width > 0 && indicator.height > 0;
+
   return (
-    <div
+    <ScrollContainer
       {...rest}
       ref={listRef}
+      axis="horizontal"
+      fade
+      scrollbar="hidden"
       role="tablist"
       aria-orientation={orientation}
       className={cx(styles.list, className)}
-      {...toDataAttributes({
-        indicator: isBar ? "bar" : "pill",
-        "overflow-start": overflow.start || undefined,
-        "overflow-end": overflow.end || undefined,
-      })}
+      data-indicator={isBar ? "bar" : "pill"}
       onKeyDown={handleKeyDown}
-      onScroll={updateOverflow}
     >
-      {/* First in DOM order so it always paints below the triggers. */}
+      {/* First in DOM order so it always paints below the items. */}
       <div
         className={cx(styles.indicator, isBar ? styles.indicatorBar : styles.indicatorPill)}
         style={
@@ -248,29 +192,28 @@ function TabsList({ children, className, ...rest }: TabsListProps) {
               }
         }
         aria-hidden="true"
-        data-visible={hasIndicator ? "true" : "false"}
+        data-visible={hasIndicator}
       />
       <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-    </div>
+    </ScrollContainer>
   );
 }
-TabsList.displayName = "TabsList";
+TabsList.displayName = "Tabs.List";
 
-// ─── Trigger ──────────────────────────────────────────────────────────────────
+// ─── Item ─────────────────────────────────────────────────────────────────────
 
-export type TabsTriggerProps = {
+export type TabsItemProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "value" | "type" | "role" | "onClick"
+> & {
   value: string;
   disabled?: boolean;
   /**
    * Plain text, or parts: `Tabs.Icon`, `Tabs.Label`, `Tabs.Count`, `Tabs.Description`.
-   * A `Tabs.Description` makes the trigger two-line and becomes its accessible description.
+   * A `Tabs.Description` makes the item two-line and becomes its accessible description.
    */
   children: React.ReactNode;
-  className?: string;
-} & Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "value" | "children" | "type" | "role" | "onClick"
->;
+};
 
 function hasChildOfType(children: React.ReactNode, type: React.ElementType): boolean {
   return React.Children.toArray(children).some(
@@ -281,29 +224,25 @@ function hasChildOfType(children: React.ReactNode, type: React.ElementType): boo
 /** Plain text children become a `Tabs.Label` so they get truncation and a stable bold width. */
 function wrapText(children: React.ReactNode): React.ReactNode {
   return React.Children.map(children, (child) =>
-    typeof child === "string" || typeof child === "number" ? (
-      String(child).trim() === "" ? (
-        child
-      ) : (
-        <TabsLabel>{child}</TabsLabel>
-      )
+    (typeof child === "string" || typeof child === "number") && String(child).trim() !== "" ? (
+      <TabsLabel>{child}</TabsLabel>
     ) : (
       child
     ),
   );
 }
 
-function TabsTrigger({ value, disabled = false, children, className, ...rest }: TabsTriggerProps) {
+function TabsItem({ value, disabled = false, children, className, ...rest }: TabsItemProps) {
   const { activeValue, onSelect, rootId } = useTabsContext();
   const isSelected = activeValue === value;
   const id = tabId(rootId, value);
   const twoLine = hasChildOfType(children, TabsDescription);
   const hasCount = hasChildOfType(children, TabsCount);
-  const triggerContext = React.useMemo(() => ({ triggerId: id }), [id]);
 
   return (
     <button
       {...rest}
+      type="button"
       role="tab"
       id={id}
       aria-selected={isSelected}
@@ -320,20 +259,18 @@ function TabsTrigger({ value, disabled = false, children, className, ...rest }: 
       disabled={disabled}
       className={cx(styles.tab, className)}
       onClick={() => onSelect(value)}
-      type="button"
     >
-      <TriggerContext.Provider value={triggerContext}>{wrapText(children)}</TriggerContext.Provider>
+      <ItemIdContext.Provider value={id}>{wrapText(children)}</ItemIdContext.Provider>
     </button>
   );
 }
-TabsTrigger.displayName = "TabsTrigger";
+TabsItem.displayName = "Tabs.Item";
 
-// ─── Trigger parts ────────────────────────────────────────────────────────────
+// ─── Item parts ───────────────────────────────────────────────────────────────
 
-export type TabsIconProps = {
+export type TabsIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+};
 
 function TabsIcon({ children, className, ...rest }: TabsIconProps) {
   return (
@@ -342,23 +279,22 @@ function TabsIcon({ children, className, ...rest }: TabsIconProps) {
     </span>
   );
 }
-TabsIcon.displayName = "TabsIcon";
+TabsIcon.displayName = "Tabs.Icon";
 
-export type TabsLabelProps = {
+export type TabsLabelProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+};
 
 /**
- * Trigger title; truncates with an ellipsis in a constrained row. Text labels reserve the width of
+ * Item title; truncates with an ellipsis in a constrained row. Text labels reserve the width of
  * the medium weight, so the row does not shift when a tab becomes active.
  */
 function TabsLabel({ children, className, ...rest }: TabsLabelProps) {
-  const trigger = React.useContext(TriggerContext);
+  const itemId = React.useContext(ItemIdContext);
   const text = typeof children === "string" || typeof children === "number" ? String(children) : "";
   return (
     <span
-      id={trigger ? `${trigger.triggerId}-label` : undefined}
+      id={itemId ? `${itemId}-label` : undefined}
       className={cx(styles.label, className)}
       data-text={text || undefined}
       {...rest}
@@ -367,7 +303,7 @@ function TabsLabel({ children, className, ...rest }: TabsLabelProps) {
     </span>
   );
 }
-TabsLabel.displayName = "TabsLabel";
+TabsLabel.displayName = "Tabs.Label";
 
 export type TabsCountProps = {
   /** Badge hue. Default `gray`. */
@@ -378,10 +314,10 @@ export type TabsCountProps = {
 
 /** Counter next to the label: a soft badge one tier below the tabs size. */
 function TabsCount({ color = "gray", children, className }: TabsCountProps) {
-  const trigger = React.useContext(TriggerContext);
+  const itemId = React.useContext(ItemIdContext);
   return (
     <Badge.Root
-      id={trigger ? `${trigger.triggerId}-count` : undefined}
+      id={itemId ? `${itemId}-count` : undefined}
       color={color}
       className={cx(styles.count, className)}
     >
@@ -389,19 +325,18 @@ function TabsCount({ color = "gray", children, className }: TabsCountProps) {
     </Badge.Root>
   );
 }
-TabsCount.displayName = "TabsCount";
+TabsCount.displayName = "Tabs.Count";
 
-export type TabsDescriptionProps = {
+export type TabsDescriptionProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /** Muted second line; wrap a key value in `<strong>` to emphasize it. */
   children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+};
 
 function TabsDescription({ children, className, ...rest }: TabsDescriptionProps) {
-  const trigger = React.useContext(TriggerContext);
+  const itemId = React.useContext(ItemIdContext);
   return (
     <span
-      id={trigger ? `${trigger.triggerId}-description` : undefined}
+      id={itemId ? `${itemId}-description` : undefined}
       className={cx(styles.description, className)}
       {...rest}
     >
@@ -409,15 +344,13 @@ function TabsDescription({ children, className, ...rest }: TabsDescriptionProps)
     </span>
   );
 }
-TabsDescription.displayName = "TabsDescription";
+TabsDescription.displayName = "Tabs.Description";
 
 // ─── Panel ────────────────────────────────────────────────────────────────────
 
-export type TabsPanelProps = {
+export type TabsPanelProps = React.HTMLAttributes<HTMLDivElement> & {
   value: string;
-  children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
+};
 
 function TabsPanel({ value, children, className, ...rest }: TabsPanelProps) {
   const { activeValue, rootId } = useTabsContext();
@@ -437,12 +370,12 @@ function TabsPanel({ value, children, className, ...rest }: TabsPanelProps) {
     </div>
   );
 }
-TabsPanel.displayName = "TabsPanel";
+TabsPanel.displayName = "Tabs.Panel";
 
 export const Tabs = {
   Root: TabsRoot,
   List: TabsList,
-  Trigger: TabsTrigger,
+  Item: TabsItem,
   Icon: TabsIcon,
   Label: TabsLabel,
   Count: TabsCount,
