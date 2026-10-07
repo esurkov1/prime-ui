@@ -1,13 +1,12 @@
-/* Golos Text: interface face with full Cyrillic; JetBrains Mono: code and IDs. */
-@import url("https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
-@import "./reset.css";
+/* Base layer of `prime-ui-kit/bundle.css`: tokens, both themes and the rules every component relies
+   on (focus ring, reduced motion, theme switching). No fonts and no reset — those are opt-in
+   (`fonts.css`, `reset.css`) — and no root font size, so the user's browser setting stays in charge. */
 @import "./tokens.css";
 @import "./theme-light.css";
 @import "./theme-dark.css";
 
 :root {
   font-family: var(--prime-font-family-sans);
-  font-size: 16px;
   color: var(--prime-color-text-primary);
   background: var(--prime-color-bg-canvas);
   text-rendering: optimizeLegibility;

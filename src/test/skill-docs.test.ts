@@ -156,3 +156,19 @@ describe("SKILL links", () => {
     expect(howTo.trimStart().split("\n")[0]).toContain("(cheatsheet.md)");
   });
 });
+
+describe("Setup docs", () => {
+  const exportsMap = JSON.parse(read("package.json")).exports as Record<string, string>;
+  const setupDocs = ["README.md", ...skillDocs, "playground/pages/IntroPage.tsx"];
+
+  it.each(setupDocs)("%s names only exported package entries", (doc) => {
+    const entries = [...read(doc).matchAll(/prime-ui-kit\/([a-z-]+\.css)/g)].map((m) => m[1]);
+    expect(entries.filter((entry) => !(`./${entry}` in exportsMap))).toEqual([]);
+  });
+
+  it("the setup snippets import bundle.css, the one stylesheet components need", () => {
+    for (const doc of ["README.md", "SKILL/SKILL.md", "SKILL/cheatsheet.md"]) {
+      expect(read(doc), doc).toContain('import "prime-ui-kit/bundle.css";');
+    }
+  });
+});

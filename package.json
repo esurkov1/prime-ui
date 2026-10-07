@@ -67,20 +67,20 @@
   "devDependencies": {
     "date-fns": "^4.1.0",
     "react-aria-components": "^1.16.0",
-    "@biomejs/biome": "latest",
-    "@testing-library/jest-dom": "latest",
-    "@testing-library/react": "latest",
-    "@testing-library/user-event": "latest",
+    "react-router-dom": "^7.13.1",
+    "@biomejs/biome": "^2.4.8",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^25.5.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5",
-    "@vitest/coverage-v8": "^4.1.0",
-    "jsdom": "latest",
+    "jsdom": "^29.0.1",
     "esbuild": "^0.27.0",
     "typescript": "^5",
     "vite": "^7",
-    "vitest": "latest"
+    "vitest": "^4.1.0"
   },
   "peerDependencies": {
     "date-fns": "^4.0.0",
@@ -93,25 +93,19 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./components": {
-      "types": "./dist/components/index.d.ts",
-      "default": "./dist/components/index.js"
-    },
-    "./styles.css": "./src/styles/globals.css",
+    "./bundle.css": "./dist/index.css",
+    "./fonts.css": "./src/styles/fonts.css",
+    "./reset.css": "./src/styles/reset.css",
     "./tokens.css": "./src/styles/tokens.css",
     "./theme-light.css": "./src/styles/theme-light.css",
-    "./theme-dark.css": "./src/styles/theme-dark.css",
-    "./bundle.css": "./dist/index.css",
-    "./components.css": "./dist/components/index.css"
+    "./theme-dark.css": "./src/styles/theme-dark.css"
   },
   "scripts": {
-    "clean": "rm -rf dist .dts-stage coverage playground/dist",
+    "clean": "rm -rf dist .dts-stage playground/dist",
     "tokens:build": "bun run scripts/build-tokens.ts",
     "docs:build": "bun run scripts/build-docs.ts",
-    "verify:docs": "bun run docs:build && git diff --exit-code -- 'src/**/COMPONENT.md'",
     "build": "bun run tokens:build && bun run scripts/bundle-lib.ts",
     "prepublishOnly": "bun run clean && bun run build",
-    "dev": "bun run scripts/bundle-lib.ts --watch",
     "playground:dev": "vite playground --config playground/vite.config.ts",
     "check": "biome check .",
     "check:ci": "biome ci .",
@@ -119,8 +113,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "bun run check:ci && bun run typecheck && bun run test && bun run build",
-    "verify:quick": "bun run check:ci && bun run typecheck && bun run test",
+    "verify": "bun run check:ci && bun run typecheck && bun run test && bun run verify:tokens && bun run build",
     "verify:tokens": "bun run tokens:build && git diff --exit-code -- src/styles/tokens.css src/styles/theme-light.css src/styles/theme-dark.css"
   },
   "sideEffects": [
@@ -128,7 +121,6 @@
   ],
   "type": "module",
   "dependencies": {
-    "lucide-react": "^0.577.0",
-    "react-router-dom": "^7.13.1"
+    "lucide-react": "^0.577.0"
   }
 }

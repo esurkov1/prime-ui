@@ -1,3 +1,5 @@
+/* Opt-in (`prime-ui-kit/reset.css`): a minimal document reset for a new app. Components do not need
+   it — they set their own box sizing — so an app with its own reset can skip this file. */
 *,
 *::before,
 *::after {

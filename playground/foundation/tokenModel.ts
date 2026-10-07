@@ -80,7 +80,7 @@ export function refLabel(value: string | undefined): string {
   return value;
 }
 
-/** Root font size is 16px in `globals.css`; rem tokens are shown in px for reading. */
+/** rem tokens are shown in px at the browser default root size (16px) for reading. */
 export function toPx(value: string): number | null {
   const v = value.trim();
   if (v === "0") return 0;

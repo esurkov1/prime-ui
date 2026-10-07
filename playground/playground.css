@@ -1,3 +1,5 @@
+@import "../src/styles/fonts.css";
+@import "../src/styles/reset.css";
 @import "../src/styles/globals.css";
 
 /*
@@ -119,8 +121,10 @@ body {
 /* Mobile header bar (menu + page title + search), rendered only on narrow viewports. */
 .playgroundMobileBar {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: var(--prime-space-2);
+  min-width: 0;
 }
 
 .playgroundMobileTitle {
