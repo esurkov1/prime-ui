@@ -14,6 +14,11 @@
     var(--prime-shadow-raised);
 }
 
+/* A window tall enough for a full rail: header, groups, footer and the account. */
+.stageTall {
+  height: calc(var(--prime-space-24) * 6);
+}
+
 /* A window that hugs its rail (size comparison). */
 .stageAuto {
   height: auto;
@@ -26,6 +31,15 @@
   min-width: 0;
   padding: var(--prime-space-4);
   background: var(--prime-color-bg-surface);
+}
+
+/* The product mark inside `Sidebar.BrandLogo`: an accent tile with a glyph. */
+.logo {
+  display: grid;
+  place-items: center;
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
 }
 
 .sizes {
