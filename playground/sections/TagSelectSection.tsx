@@ -4,7 +4,7 @@ import { ComponentPage, type ComponentPageConfig } from "../components/Component
 
 export const page: ComponentPageConfig = {
   dir: "tag-select",
-  title: "Tag select",
+  title: "TagSelect",
   kind: "field",
   description:
     "Поле нескольких значений в виде цветных тегов: выбор из списка, фильтр набором, создание новых. В покое одна строка, в фокусе — все теги.",
