@@ -52,6 +52,11 @@ export const page: ComponentPageConfig = {
         "Значением владеет родитель: кнопка подставляет набор тегов, счётчик следует за ними — `value`, `onValueChange`.",
     },
     {
+      slot: "controlled-open",
+      description:
+        "Списком владеет родитель: кнопка открывает его из кода, Escape или нажатие снаружи закрывают — `open`, `onOpenChange`.",
+    },
+    {
       slot: "in-form",
       description:
         "Форма новой задачи: обязательные метки проверяются при отправке, ошибка встаёт на место подсказки — `required`, `error`, `creatable`.",
