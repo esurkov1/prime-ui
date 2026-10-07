@@ -124,6 +124,8 @@ built-in states. For a card or region that is loading its data: keep the real la
 `aria-busy="true"` on the Card or region, put a `Spinner` (with `aria-hidden="true"`, since the region
 already says it is busy) where the content will appear, and show the error in place (DataTable `error`,
 a `Banner` for the page, `EmptyPage` with `EmptyPage.Icon tone="danger"` and a retry for a region).
+Wrap the region's content in `Crossfade state={status}` so loading → data → empty → error cross-fade
+and the height glides instead of jumping; DataTable's body already does this.
 Never draw your own spinners or shimmer blocks. See [patterns/screen-states.tsx](patterns/screen-states.tsx).
 
 ## Secondary actions

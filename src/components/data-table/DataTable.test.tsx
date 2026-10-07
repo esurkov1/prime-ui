@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Badge } from "@/components/badge/Badge";
 import { Kbd } from "@/components/kbd/Kbd";
 import { CSS_PX_SUFFIX, DATA_TABLE_INFINITE_ROOT_MARGIN } from "@/internal/runtimeUnits";
+import swapMotion from "@/internal/swapMotion.module.css";
 
 import { DataTable, type DataTableColumn } from "./DataTable";
 
@@ -306,6 +307,27 @@ describe("DataTable", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Загрузка данных…");
     expect(container.querySelectorAll('tbody tr[data-skeleton="true"]')).toHaveLength(3);
     expect(container.querySelector("table")).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("fades the body in on a state swap, never on the first render or a re-sort", () => {
+    const body = (container: HTMLElement) =>
+      container.querySelector("table:not([aria-hidden]) > tbody") as HTMLElement;
+    const { container, rerender } = render(
+      <DataTable rows={[]} columns={columns} loading loadingRows={3} />,
+    );
+    expect(body(container)).not.toHaveClass(swapMotion.swapIn);
+
+    rerender(<DataTable rows={rows} columns={columns} getRowKey={(row) => row.id} />);
+    const loaded = body(container);
+    expect(loaded).toHaveClass(swapMotion.swapIn);
+
+    // Same state (rows → rows): the body is not remounted, so nothing replays.
+    fireEvent.click(screen.getByRole("button", { name: "Name" }));
+    expect(body(container)).toBe(loaded);
+
+    rerender(<DataTable rows={[]} columns={columns} error="Не удалось загрузить" />);
+    expect(body(container)).not.toBe(loaded);
+    expect(body(container)).toHaveClass(swapMotion.swapIn);
   });
 
   it("renders error state instead of rows", () => {
