@@ -1,74 +1,70 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import type * as React from "react";
 
+import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
+import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize } from "@/internal/states";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Pagination.module.css";
 
-function buildPageRange(page: number, total: number, siblings: number): Array<number | "..."> {
+/** Page numbers around `page` with `"…"` gaps; first and last are always shown. */
+function pageRange(page: number, total: number, siblings: number): Array<number | "…"> {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-
   const left = Math.max(2, page - siblings);
   const right = Math.min(total - 1, page + siblings);
-
-  const showLeftEllipsis = left > 2;
-  const showRightEllipsis = right < total - 1;
-
-  const pages: Array<number | "..."> = [1];
-  if (showLeftEllipsis) pages.push("...");
+  const pages: Array<number | "…"> = [1];
+  if (left > 2) pages.push("…");
   for (let i = left; i <= right; i++) pages.push(i);
-  if (showRightEllipsis) pages.push("...");
+  if (right < total - 1) pages.push("…");
   pages.push(total);
-
   return pages;
 }
 
-/** Тексты для ассистивных технологий; по умолчанию на русском. */
+/** System strings; `{page}` is replaced. */
 export type PaginationLabels = {
-  /** `aria-label` навигации. */
+  /** `aria-label` of the `<nav>`. */
   nav: string;
   previous: string;
   next: string;
-  /** `aria-label` кнопки номера страницы. */
-  page: (page: number) => string;
-  /** Скрытый предлог между текущей и общей страницей в компактном виде («3 из 12»). */
+  /** `aria-label` of a page button. */
+  page: string;
+  /** Hidden word between the current and the total page in the compact view («3 из 12»). */
   of: string;
 };
 
-const DEFAULT_PAGINATION_LABELS: PaginationLabels = {
+const DEFAULT_LABELS: PaginationLabels = {
   nav: "Навигация по страницам",
   previous: "Предыдущая страница",
   next: "Следующая страница",
-  page: (page) => `Страница ${page}`,
+  page: "Страница {page}",
   of: "из",
 };
 
-export type PaginationRootProps = {
+export type PaginationProps = Omit<
+  React.HTMLAttributes<HTMLElement>,
+  "defaultValue" | "onChange"
+> & {
+  ref?: React.Ref<HTMLElement>;
   /** Current page (1-based), controlled. */
   value?: number;
-  /** Initial page when uncontrolled. Default `1`. */
   defaultValue?: number;
   onValueChange?: (page: number) => void;
   totalPages: number;
-  /** Pages shown on each side of the current one before an ellipsis. Default `1`. */
+  /** Pages on each side of the current one before an ellipsis. */
   siblingCount?: number;
-  /** Ярус контролов: высота кнопок = `--prime-control-<size>-height`. */
   size?: ControlSize;
   /**
-   * Компактный режим: стрелки + «текущая / всего» вместо ряда номеров.
-   * `"auto"` растягивает навигацию на ширину родителя и включает компактный вид на узкой ширине
-   * (container query).
+   * Arrows + «current / total» instead of page numbers. `"auto"` fills the parent and switches to
+   * the compact view when the container is narrow.
    */
   compact?: boolean | "auto";
-  /** Тексты для скринридеров (частично). */
   labels?: Partial<PaginationLabels>;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLElement>, "defaultValue" | "onChange">;
+};
 
-function PaginationRoot({
+export function Pagination({
   value,
   defaultValue = 1,
   onValueChange,
@@ -76,91 +72,90 @@ function PaginationRoot({
   siblingCount = 1,
   size = "m",
   compact = false,
-  labels,
+  labels: labelsProp,
   className,
   ...rest
-}: PaginationRootProps) {
+}: PaginationProps) {
   const [page, setPage] = useControllableState({ value, defaultValue, onChange: onValueChange });
+  if (totalPages < 1) return null;
 
-  if (totalPages < 1) {
-    return null;
-  }
-
-  const safePage = Math.min(Math.max(1, page), totalPages);
-  const onPageChange = (next: number) => {
-    if (next !== safePage) setPage(next);
+  const labels = { ...DEFAULT_LABELS, ...labelsProp };
+  const current = Math.min(Math.max(1, page), totalPages);
+  const go = (next: number) => {
+    if (next !== current) setPage(next);
   };
-  const pages = buildPageRange(safePage, totalPages, siblingCount);
-  const compactMode = compact === "auto" ? "auto" : compact ? "true" : "false";
-  const text = { ...DEFAULT_PAGINATION_LABELS, ...labels };
+  const mode = compact === "auto" ? "auto" : compact ? "true" : "false";
 
   return (
     <nav
       {...rest}
-      aria-label={text.nav}
+      aria-label={labels.nav}
       className={cx(styles.root, className)}
-      {...toDataAttributes({ size, compact: compactMode })}
+      {...toDataAttributes({ size, compact: mode })}
     >
       <div className={styles.list}>
-        <button
-          type="button"
-          className={styles.button}
-          disabled={safePage <= 1}
-          onClick={() => onPageChange(safePage - 1)}
-          aria-label={text.previous}
+        <Button.Root
+          variant="ghost"
+          tone="neutral"
+          size={size}
+          disabled={current <= 1}
+          onClick={() => go(current - 1)}
+          aria-label={labels.previous}
         >
-          <ChevronLeft className={styles.icon} strokeWidth={2} aria-hidden="true" />
-        </button>
+          <Button.Icon>
+            <Icon name="nav.chevronLeft" />
+          </Button.Icon>
+        </Button.Root>
 
-        {compactMode !== "true"
-          ? pages.map((p, i) =>
-              p === "..." ? (
+        {mode !== "true"
+          ? pageRange(current, totalPages, siblingCount).map((item, i, all) =>
+              item === "…" ? (
                 <span
-                  key={`ellipsis-after-${pages[i - 1]}-before-${pages[i + 1]}`}
+                  key={`gap-${all[i - 1]}`}
                   className={cx(styles.ellipsis, styles.pageItem)}
                   aria-hidden="true"
                 >
                   …
                 </span>
               ) : (
-                <button
-                  key={p}
-                  type="button"
-                  className={cx(styles.button, styles.pageItem)}
-                  data-current={p === safePage ? "true" : undefined}
-                  onClick={() => onPageChange(p)}
-                  aria-current={p === safePage ? "page" : undefined}
-                  aria-label={text.page(p)}
+                <Button.Root
+                  key={item}
+                  variant="ghost"
+                  tone="neutral"
+                  size={size}
+                  className={cx(styles.page, styles.pageItem)}
+                  onClick={() => go(item)}
+                  aria-current={item === current ? "page" : undefined}
+                  aria-label={labels.page.replace("{page}", String(item))}
                 >
-                  {p}
-                </button>
+                  {item}
+                </Button.Root>
               ),
             )
           : null}
 
-        {compactMode !== "false" ? (
+        {mode !== "false" ? (
           <span className={styles.summary}>
-            <span className={styles.summaryCurrent}>{safePage}</span>
+            <span className={styles.summaryCurrent}>{current}</span>
             <span aria-hidden="true">/</span>
-            <span className={styles.srOnly}>{text.of}</span>
+            <VisuallyHidden>{labels.of}</VisuallyHidden>
             <span>{totalPages}</span>
           </span>
         ) : null}
 
-        <button
-          type="button"
-          className={styles.button}
-          disabled={safePage >= totalPages}
-          onClick={() => onPageChange(safePage + 1)}
-          aria-label={text.next}
+        <Button.Root
+          variant="ghost"
+          tone="neutral"
+          size={size}
+          disabled={current >= totalPages}
+          onClick={() => go(current + 1)}
+          aria-label={labels.next}
         >
-          <ChevronRight className={styles.icon} strokeWidth={2} aria-hidden="true" />
-        </button>
+          <Button.Icon>
+            <Icon name="nav.chevronRight" />
+          </Button.Icon>
+        </Button.Root>
       </div>
     </nav>
   );
 }
-
-PaginationRoot.displayName = "PaginationRoot";
-
-export const Pagination = { Root: PaginationRoot };

@@ -1,26 +1,18 @@
-/** Pagination at every size tier next to a Button of the same size; heights match (28–48). Use to align the pager with neighbouring controls. */
-import { Button, type ControlSize, Pagination, Typography } from "prime-ui-kit";
-import * as React from "react";
+/** Every size tier; buttons are as high as Button and Input of the same tier, 28 to 48 px — `size`. */
+import { Pagination, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function PaginationSizesExample() {
-  const [page, setPage] = React.useState(4);
-
   return (
-    <div className={styles.sizeGrid}>
-      {sizes.map((size) => (
-        <React.Fragment key={size}>
+    <div>
+      {SIZES.map((size) => (
+        <div key={size}>
+          <Pagination size={size} totalPages={12} defaultValue={4} />
           <Typography.Root as="span" variant="caption" tone="muted">
             {size}
           </Typography.Root>
-          <Pagination.Root size={size} value={page} totalPages={12} onValueChange={setPage} />
-          <Button.Root variant="outline" tone="neutral" size={size}>
-            Кнопка {size}
-          </Button.Root>
-        </React.Fragment>
+        </div>
       ))}
     </div>
   );

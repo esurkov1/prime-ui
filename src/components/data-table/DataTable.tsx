@@ -1266,7 +1266,7 @@ function DataTableRoot<Row>({
             ) : null}
 
             {showPaginationControl ? (
-              <Pagination.Root
+              <Pagination
                 className={styles.pagination}
                 value={safePage}
                 totalPages={totalPages}

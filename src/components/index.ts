@@ -347,10 +347,7 @@ export type {
   PageContentTitleProps,
 } from "./page-content/PageContent";
 export { PageContent } from "./page-content/PageContent";
-export type {
-  PaginationLabels,
-  PaginationRootProps,
-} from "./pagination/Pagination";
+export type { PaginationLabels, PaginationProps } from "./pagination/Pagination";
 export { Pagination } from "./pagination/Pagination";
 export type {
   PopoverActionsProps,
