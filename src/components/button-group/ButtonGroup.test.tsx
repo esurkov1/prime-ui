@@ -1,9 +1,30 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { ButtonGroup } from "./ButtonGroup";
 
 describe("ButtonGroup", () => {
+  it("moves focus with Tab, skips disabled segments and presses with Enter / Space", async () => {
+    const user = userEvent.setup();
+    const onExport = vi.fn();
+    render(
+      <ButtonGroup.Root aria-label="Экспорт">
+        <ButtonGroup.Item onClick={onExport}>CSV</ButtonGroup.Item>
+        <ButtonGroup.Item disabled>Excel</ButtonGroup.Item>
+        <ButtonGroup.Item onClick={onExport}>PDF</ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+
+    await user.tab();
+    expect(screen.getByRole("button", { name: "CSV" })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "PDF" })).toHaveFocus();
+    await user.keyboard(" ");
+    expect(onExport).toHaveBeenCalledTimes(2);
+  });
+
   it("renders items", () => {
     render(
       <ButtonGroup.Root>

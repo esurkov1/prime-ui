@@ -34,7 +34,6 @@ const NOT_CONVERTED = new Set([
   "badge",
   "banner",
   "breadcrumb",
-  "button-group",
   "card",
   "checkbox",
   "code-block",
