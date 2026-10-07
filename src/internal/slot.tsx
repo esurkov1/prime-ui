@@ -67,7 +67,8 @@ export const Slot = React.forwardRef<HTMLElement, SlotProps>(({ children, ...slo
   }
 
   const child = children as React.ReactElement<AnyProps>;
-  const childRef = (child as unknown as { ref?: React.Ref<unknown> }).ref ?? null;
+  // React 19: a ref is a regular prop; reading `element.ref` is removed and logs an error.
+  const childRef = (child.props.ref as React.Ref<unknown> | undefined) ?? null;
   const composedRef =
     ref != null || childRef != null
       ? mergeRefs<unknown>(ref as React.Ref<unknown> | undefined, childRef ?? undefined)
