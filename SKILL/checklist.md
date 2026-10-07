@@ -2,6 +2,12 @@
 
 Answer every item yes or no. Any «no» is fixed before handing over.
 
+## Composition
+- [ ] The screen starts from the closest pattern in [composition.md](composition.md) (list, detail,
+      settings, form in Drawer / Modal, dashboard, states) and keeps its skeleton.
+- [ ] One `PageContent.Header` with title, one-line description and actions; blocks in `PageContent.Body`.
+- [ ] Cards only for standalone blocks; no card around a table, a single field or the whole page.
+
 ## Grid and spacing
 - [ ] Every spacing, size and gap in my CSS is a `--prime-space-*` (or another `--prime-*`) token on the 4px grid.
 - [ ] Spacing is `gap` on the parent; no margins on children; no outer padding duplicating `AppShell.Main` / `PageContent.Body`.
@@ -15,7 +21,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] Controls inside table cells are one tier below the table; no CSS sets table row or cell heights.
 
 ## Text
-- [ ] Every text goes through a kit component or `Typography.Root` with a role; no custom font sizes/weights.
+- [ ] Every text goes through a kit component or `Typography` with a role; no custom font sizes/weights.
 - [ ] One page title (`PageContent.Title`, `<h1>`); headings descend without skipping levels
       (`Card.SectionTitle as="h2"` directly under the page title).
 - [ ] Secondary text uses `tone="secondary"`/`"muted"`; numbers in tables and prices are tabular.

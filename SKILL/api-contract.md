@@ -16,20 +16,24 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 
 | Concept | API | Notes |
 |---|---|---|
-| Size | `size` | Default `m`. Avatar adds `2xl`; Modal/Drawer use a width subset. |
+| Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; Modal/Drawer `Content` takes `size` for its width. `Button.Root`, `Input.Root`, `Icon` and `Checkbox.Indicator` without `size` take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`). |
 | Treatment | `variant` | `solid · soft · outline · ghost`; structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
 | Meaning | `tone` | Button: `accent \| neutral \| danger`. Destructive is `danger`, never `error`. |
-| Decoration | `color` | Badge, Avatar, Thumbnail, field badges, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `FileUpload.FormatBadge`, `Timeline.Item`, TagSelect options. |
-| Validation | `invalid`, `hint`, `error` | A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |
-| Value | `value` / `defaultValue` / `onValueChange(value)` | Select, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, Radio.Group, DigitInput, Pagination. |
-| Text value | native `value` / `onChange` + `onValueChange(string)` | Input, Textarea. |
+| Decoration | `color` | Badge, Avatar, Thumbnail, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `FileUpload.FormatBadge`, `Timeline.Item`, TagSelect options. |
+| Validation | `invalid`, `hint`, `error` | Props, never parts. A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |
+| Value | `value` / `defaultValue` / `onValueChange(value)` | Select, NativeSelect, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, Radio.Group, DigitInput, Pagination, SmartFilter, ColorPicker, ColorSwatches. |
+| Text value | native `value` / `onChange` + `onValueChange(string)` | Input (`Input.Field`), Textarea. |
+| Other state | `x` / `defaultX` / `onXChange(x)` | DataTable `sort`, `page`, `selected`, `expanded`; SmartFilter `search`; Sidebar `mode`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch. |
-| Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure. |
-| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | One pair for every overlay. Today: both on Modal, Drawer, CommandMenu.Dialog; `closeOnOutsideClick` on Popover and Dropdown — check the component's `COMPONENT.md` API. Turn off for destructive confirms. |
-| Flags | `disabled`, `readOnly`, `required`, `loading`, `fullWidth` | Same names everywhere. |
+| Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure (Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu, Select, Sidebar off-canvas). |
+| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay: Modal, Drawer, CommandMenu, Popover, Dropdown. Turn outside click off for destructive confirms; turn Escape off while a request runs. |
+| Selection mode | `multiple` | One vs many (Select, Accordion) — never `type`. `mode` only for structurally different values (Datepicker `single \| range`). |
+| Status words | `selected`, `current`, `pressed` | `current` marks a navigation location (`Sidebar.Item`, `Breadcrumb.Item`, `Timeline.Item`) and sets `aria-current`; `pressed` a toggle button. |
+| Flags | `disabled`, `readOnly`, `required`, `optional`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing` (default `true`) | Fields only; `false` only where focus is obvious otherwise. |
-| System strings | `labels?: Partial<XLabels>` | aria labels, counters, default texts; Russian defaults. Visible content goes in children. |
-| Structure | `X.Root` + `X.Part` | Single export for leaf components. |
+| System strings | `labels?: Partial<XLabels>` | aria labels, counters, default texts; Russian defaults; values as `{token}` templates. Visible content goes in children or props. |
+| Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Pagination`, `DataTable`, `ExampleFrame`. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`). |
+| Icons in parts | `X.Icon`, `X.ItemIcon` | `Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`, `Dropdown.ItemIcon`… — never an `icon` prop on a component. Only data arrays (`notify()`, `options`) carry `icon: ReactNode`. |
 | DOM state | `data-size`, `data-variant`, `data-tone`, `data-color`, `data-invalid`, `data-disabled`, `data-loading`, `data-state` | Style your wrappers from these, not from class names of kit internals. |
 
 ## Controlled vs uncontrolled
@@ -54,10 +58,12 @@ export function PeriodFilter() {
 
 ## Forms
 
-- Input, Textarea, Select, TagSelect, Datepicker take `label`, `hint`, `error`, `required`, `optional`
-  the same way. The label row, hint row and spacing are built in — never put a `Label` or `Hint` next to
-  an `Input.Root` that has `label`. Checkbox, Switch, Radio carry their own `Label`/`Hint`/`Error`
-  parts; fields without a frame are listed below.
+- Every field has its frame built in: `label`, `hint`, `error`, `required`, `optional` on Input,
+  Textarea, Select, NativeSelect, TagSelect, Datepicker, DigitInput, FileUpload, ColorSwatches and
+  `Radio.Group` (ColorPicker: `label`, `hint`, `error`; Slider: `label`). The label row, hint row and
+  spacing come with it — never put a `Label` or `Hint` next to a field that has `label`.
+- Checkbox, Switch and Radio: the root renders the `<label>` with the input; the visible text is the
+  `X.Label` part; `hint` and `error` are props of `X.Root` (`Radio.Root` takes `hint`).
 - `required` → red `*` after the label + native `required`. `optional` → muted «необязательно».
 - Placeholder is an example (`name@company.ru`), never the label.
 - Units and prefixes in affixes are hidden from screen readers — put the meaning into the label or hint
@@ -67,28 +73,27 @@ export function PeriodFilter() {
 - Show `error` after the user leaves the field or on submit, not while typing the first character.
 - Submit flow: `<form noValidate onSubmit>` → validate all fields → set each field's `error` → focus the
   first invalid field → keep the submit Button `loading` while the request runs and disable the fields
-  → map server field errors (e.g. «уже занят») to that field's `error`, other failures to a
-  Notification → on success a Notification and navigate/reset.
+  (a `<fieldset disabled>` does it for a group) → map server field errors (e.g. «уже занят») to that
+  field's `error`, other failures to a Notification → on success a Notification and navigate/reset.
 - Fields stack with `gap: var(--prime-space-5)`; actions sit at the end, primary last, gap 8.
-- Use a real `<form>` with `onSubmit`; the submit button is `<Button.Root type="submit">`.
+- Use a real `<form>` with `onSubmit`; the submit button is `<Button.Root type="submit">`. A submit
+  button outside the form (Modal / Drawer footer) points at it with `form={formId}`.
 - A form inside a Card: wrap the whole `Card.Root` in the `<form>` (Card parts are styled as direct
   children of Root — never put a wrapper between `Card.Root` and `Card.Body` / `Card.Actions`).
 - Fields side by side in a grid row: `align-items: start`. Input and Textarea have `reserveSupportRow`
   to keep bottoms aligned when only one shows an error; other fields do not.
-- Fields without a built-in frame (DigitInput, FileUpload, ColorPicker, Radio.Group, your own control):
-  put `Label.Root` (with `id`; `htmlFor` when the control is a native input) above, the control, then
-  `Hint.Root` (`invalid` for the error) below, in a grid with `--prime-control-m-label-gap` /
-  `--prime-control-m-hint-gap`. The control must reference the label: `aria-labelledby={labelId}`
-  (Radio.Group, FileUpload.Root, DigitInput) — a `Label.Root` nothing points at is decoration. When the
-  card holds only that group, `aria-labelledby` may point at the `Card.SectionTitle`.
-  FileUpload.Root is itself a `<label>` — keep `Label.Root` as a sibling above it, never around it.
+- Your own control without a frame: `Label` (with `id`; `htmlFor` when the control is a native input)
+  above, the control, then `Hint` (`invalid` for the error) below, in a grid with
+  `--prime-control-m-label-gap` / `--prime-control-m-hint-gap`; the control references the label with
+  `aria-labelledby`.
 
 ```tsx
 import { Button, Input, Select } from "prime-ui-kit";
+import styles from "./InviteForm.module.css";
 
 export function InviteForm() {
   return (
-    <form onSubmit={(event) => event.preventDefault()}>
+    <form className={styles.form} noValidate onSubmit={(event) => event.preventDefault()}>
       <Input.Root label="Email" required error="Введите email в формате name@company.ru">
         <Input.Wrapper>
           <Input.Field type="email" name="email" placeholder="name@company.ru" />
@@ -109,15 +114,17 @@ export function InviteForm() {
 }
 ```
 
-(Lay the form out with a local CSS class: `display: grid; gap: var(--prime-space-5)`.)
+(`.form { display: grid; gap: var(--prime-space-5); }`.) A full create form with groups, validation,
+loading and a toast: [patterns/form-drawer.tsx](patterns/form-drawer.tsx).
 
 ## Loading without DataTable
 
 The kit has no skeleton component. DataTable (`loading`), Select (`loading`) and Button (`loading`) have
-built-in states. For a form or page that is loading its data: render the real layout, disable the
-fields, set `aria-busy="true"` on the Card or region, put a `Spinner` (with `aria-hidden="true"`,
-since the region already says it is busy) where the content will appear, and show `EmptyPage` with a
-retry action if the load fails. Never draw your own spinners or shimmer blocks.
+built-in states. For a card or region that is loading its data: keep the real layout, set
+`aria-busy="true"` on the Card or region, put a `Spinner` (with `aria-hidden="true"`, since the region
+already says it is busy) where the content will appear, and show the error in place (DataTable `error`,
+a `Banner` for the page, `EmptyPage` with `EmptyPage.Icon tone="danger"` and a retry for a region).
+Never draw your own spinners or shimmer blocks. See [patterns/screen-states.tsx](patterns/screen-states.tsx).
 
 ## Secondary actions
 
@@ -126,25 +133,29 @@ retry action if the load fails. Never draw your own spinners or shimmer blocks.
 - One label per action per screen («Отмена» to leave, «Отменить изменения» to revert, «Сбросить
   фильтры»), and the same action keeps the same variant in the header, toolbars and menus. If «Отмена»
   would clash with the action itself («Отменить заказ»), use an unambiguous label («Не отменять»).
-- A control that navigates is a link: `LinkButton.Root href`, `Button.Root asChild` with `<a>` /
-  router `Link`, `Sidebar.Item href` or `asChild`. Never `onClick={() => location.assign(…)}`.
+- A control that navigates is a link: `LinkButton href`, `Button.Root asChild` with `<a>` / router
+  `Link`, `Sidebar.Item href` or `asChild`. Never `onClick={() => location.assign(…)}`.
 
 ## Destructive actions
 
 `tone="danger"`. A standalone trigger that opens a confirm (danger zone) is `variant="outline"`; inside
-a bar of other actions (DataTable bulk bar, card actions) it is `soft`; an inline remove in a media or
-file row is `ghost`; the confirming button in the Modal is `solid`. The confirm Modal always sets `closeOnOutsideClick={false}`; while the request runs it also
-sets `closeOnEscape={false}` and disables Cancel.
+a bar of other actions (DataTable bulk bar, card actions) it is `soft`; in a Dropdown it is the last item
+with `tone="danger"`; an inline remove in a media or file row is `ghost`; the confirming button in the
+Modal is `solid`. The confirm Modal always sets `closeOnOutsideClick={false}`; while the request runs it
+also sets `closeOnEscape={false}`, hides the close button (`Modal.Header showClose={false}`) and disables
+Cancel.
 
 ## Providers and helpers
 
 | Export | Use |
 |---|---|
 | `applyTheme(scheme, element?)` | switch `data-theme` without a transition flash |
-| `NotificationProvider`, `useNotifications()` | toasts; provider once at the app root |
+| `NotificationProvider`, `useNotifications()` | toasts; provider once at the app root, `notify({ tone, title, description, action })` |
 | `Tooltip.Provider` | shared delay for many tooltips |
 | `ControlSizeProvider` | set one `size` for a whole region (dense toolbar, compact form) |
 | `OverlayPortalLayerProvider` | portal target for overlays inside a custom layer |
+| `useSidebar()` | Sidebar state for custom parts inside `Sidebar.Root` |
+| `matchesSmartFilter`, `resolveSmartFilterValues` | apply a SmartFilter value to your rows |
 | `Icon`, `Icon*` | kit icon set — see Icons below |
 
 ## Icons
@@ -153,20 +164,23 @@ sets `closeOnEscape={false}` and disables Cancel.
 - `nav.*`: `chevronDown`, `chevronLeft`, `chevronRight`, `chevronUp`, `home`, `itemDot`, `layoutGrid`,
   `sidebarCollapse`, `sidebarExpand`;
 - `action.*`: `add`, `check`, `close`, `copy`, `delete`, `download`, `drag`, `externalLink`,
-  `eyedropper`, `filter`, `more`, `remove`, `search`, `upload`;
+  `eyedropper`, `filter`, `more`, `remove`, `search`, `send`, `settings`, `upload`;
 - `field.*`: `calendar`, `email`, `password.hide`, `password.show`;
+- `object.*`: `document`, `package`, `users`;
 - `sort.*`: `ascending`, `descending`, `none`;
 - `status.*`: `danger`, `info`, `locked`, `success`, `warning`;
 - `theme.*`: `dark`, `light`; `view.*`: `code`, `preview`; `viewport.*`: `desktop`, `mobile`, `tablet`.
 
-Each glyph is also a named component (`IconAdd`, `IconCalendar`, `IconCheck`, `IconChevronDown`, …,
-`IconSearch`, `IconWarning`). Everything else: `lucide-react` (add it to the app's dependencies). Icon-only buttons need `aria-label`; decorative
-icons inside kit slots (`Button.Icon`, `Input.Icon`, `Sidebar.Item icon`) are hidden automatically.
+Each glyph is also a named component (`IconAdd`, `IconCalendar`, `IconCheck`, `IconChevronDown`,
+`IconDocument`, `IconPackage`, `IconSearch`, `IconSend`, `IconSettings`, `IconUsers`, `IconWarning`, …).
+Everything else: `lucide-react` (add it to the app's dependencies). Icon-only buttons need `aria-label`;
+decorative icons inside kit slots (`Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`) are hidden
+automatically.
 
 ## Styling your own wrappers
 
 CSS Modules + tokens. Never override kit internals (`.root button { … }`), never pass `style`.
 `className` on a kit part is for placement only (grid area, width, flex, `align-self`, `display` to hide
-a part at a breakpoint) — not for color,
-padding, radius or the gap inside a kit container. The only exceptions are the ones a component's
-`COMPONENT.md` documents (e.g. the round avatar drop zone of FileUpload).
+a part at a breakpoint) — not for color, padding, radius or the gap inside a kit container. The only
+exceptions are the ones a component's `COMPONENT.md` documents (e.g. the round avatar drop zone of
+FileUpload).

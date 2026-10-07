@@ -1,0 +1,41 @@
+/* Screen states: the layout keeps its shape in every state, only the content of a region changes. */
+
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-20) * 4)), 1fr));
+  align-items: stretch;
+  gap: var(--prime-space-4);
+}
+
+/* The spinner takes the place of the content, so the card does not jump when data arrives. */
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: calc(var(--prime-space-16) * 2);
+}
+
+/* The card stretches to its neighbour's height: rows stay at the top. */
+.accounts {
+  display: grid;
+  align-content: start;
+  gap: var(--prime-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account {
+  display: grid;
+  gap: var(--prime-space-1);
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A section without a card: heading 16 above the table. */
+.region {
+  display: grid;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}

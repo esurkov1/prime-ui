@@ -1,22 +1,26 @@
 # Screen recipes
 
-Every screen sits in one frame: `AppShell.Root` with Nav / Header / Main (nav rail + content panel) → `PageContent`
-(header + body). `AppShell.Main` carries the page gutters and `PageContent.Body` spaces its blocks 40
-apart, so your code adds **no outer padding and no margins**. Your CSS only lays out the inside of a
-block (grids, rows) with `gap` on `--prime-space-*`.
+Every screen sits in one frame: `AppShell.Root` with Nav / Header / Main (nav rail on the canvas +
+content panel on the surface) → `PageContent` (header + body). `AppShell.Main` carries the page gutters
+and `PageContent.Body` spaces its blocks 40 apart, so your code adds **no outer padding and no
+margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
+
+The page recipes are whole, working screens in [patterns/](patterns/) — start from the closest one
+(table below) and keep its skeleton. The rules behind them are in [composition.md](composition.md).
 
 ## App frame (once per app)
 
-Every `Sidebar.Item` gets an `icon` (in compact mode only icons remain) and is a link: `href`, or
-`asChild` with the router's `NavLink`; `active` marks the current page (`aria-current="page"`). Below 768px the Sidebar becomes
-an off-canvas panel — the app must render a menu button that opens it, otherwise navigation is
-unreachable on phones. Put it into `AppShell.Header` and hide the whole header from 768px up (hiding
-only its content would leave an empty sticky bar). That needs the compound form instead of
+Every `Sidebar.Item` gets a `Sidebar.ItemIcon` (in compact mode only icons remain) and is a link:
+`href`, or `asChild` with the router's `NavLink`; `current` marks the current page (`aria-current`), a
+router link sets it itself. Counters go in `Sidebar.ItemCount`. Below 768px the Sidebar becomes an
+off-canvas panel — the app must render a menu button that opens it, otherwise navigation is unreachable
+on phones. Put it into `AppShell.Header` and hide the whole header from 768px up (hiding only its
+content would leave an empty sticky bar). That needs the compound form instead of
 `AppShell.Template`; hiding a kit part with `display` is placement, which `className` may do.
 
 ```tsx
 import { LayoutDashboard, Menu, Settings, ShoppingCart, Users } from "lucide-react";
-import { AppShell, Button, NotificationProvider, Sidebar } from "prime-ui-kit";
+import { AppShell, Button, NotificationProvider, Sidebar, Typography } from "prime-ui-kit";
 import { type ReactNode, useState } from "react";
 import styles from "./AppLayout.module.css";
 
@@ -27,25 +31,42 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <AppShell.Root fillViewport>
         <AppShell.Nav>
           <Sidebar.Root open={menuOpen} onOpenChange={setMenuOpen}>
-            <Sidebar.Header>Магазин</Sidebar.Header>
+            <Sidebar.Header>
+              <Typography as="span" variant="title-s">
+                Магазин
+              </Typography>
+              <Sidebar.Toggle variant="edge" />
+            </Sidebar.Header>
             <Sidebar.Content>
               <Sidebar.Group label="Продажи">
-                <Sidebar.Item icon={<LayoutDashboard />} href="/" active>
+                <Sidebar.Item href="/" current>
+                  <Sidebar.ItemIcon>
+                    <LayoutDashboard />
+                  </Sidebar.ItemIcon>
                   Обзор
                 </Sidebar.Item>
-                <Sidebar.Item icon={<ShoppingCart />} href="/orders" badge={12}>
+                <Sidebar.Item href="/orders">
+                  <Sidebar.ItemIcon>
+                    <ShoppingCart />
+                  </Sidebar.ItemIcon>
                   Заказы
+                  <Sidebar.ItemCount>12</Sidebar.ItemCount>
                 </Sidebar.Item>
-                <Sidebar.Item icon={<Users />} href="/clients">
+                <Sidebar.Item href="/clients">
+                  <Sidebar.ItemIcon>
+                    <Users />
+                  </Sidebar.ItemIcon>
                   Клиенты
                 </Sidebar.Item>
               </Sidebar.Group>
             </Sidebar.Content>
             <Sidebar.Footer>
-              <Sidebar.Item icon={<Settings />} href="/settings">
-              Настройки
-            </Sidebar.Item>
-              <Sidebar.Toggle />
+              <Sidebar.Item href="/settings">
+                <Sidebar.ItemIcon>
+                  <Settings />
+                </Sidebar.ItemIcon>
+                Настройки
+              </Sidebar.Item>
             </Sidebar.Footer>
           </Sidebar.Root>
         </AppShell.Nav>
@@ -86,372 +107,57 @@ With React Router put `<Outlet />` as the child and pass `NavLink` through `Side
 
 ## Page wrapper
 
-- App pages with actions (dashboard, list, detail): `PageContent.Section` — full width of the panel.
-- Single-column forms and settings: `PageContent.Root maxWidth="readable"` — a form column wider than
-  ~65ch is hard to scan.
-- Long reading text: `PageContent.Root maxWidth="readable"`.
+- App pages with actions (dashboard, list, detail): `PageContent.Section` — the full width of the panel.
+- Settings and long forms: `PageContent.Root maxWidth="wide"` with a heading column + panel per section
+  ([patterns/settings-page.tsx](patterns/settings-page.tsx)), or `maxWidth="readable"` for a single
+  narrow column of fields.
+- Long reading text (terms, help): `PageContent.Root maxWidth="readable"`.
 
-## Dashboard
+## Which pattern to start from
 
-Rhythm: header → KPI row (cards 16 apart) → panels grid (16 apart). Blocks 40 apart come from
-`PageContent.Body`.
+| Screen | Pattern | Skeleton and rhythm |
+|---|---|---|
+| List of orders / invoices / clients | [list-page.tsx](patterns/list-page.tsx) | header (1 primary) → DataTable with SmartFilter in `toolbar`, pages, `empty` |
+| One record (order, invoice, deal) | [detail-page.tsx](patterns/detail-page.tsx) | Breadcrumb + title + status → main column (sections) + side column (Cards: facts, Timeline); 24 between columns |
+| Settings | [settings-page.tsx](patterns/settings-page.tsx) | sections 40 apart: heading column + panel Card; form saves by its own button, Switches apply at once, danger zone last |
+| Create / edit without leaving the page | [form-drawer.tsx](patterns/form-drawer.tsx) | Drawer: groups 32 apart, fields 20, footer outside the form with `form={id}` |
+| Overview / dashboard | [dashboard.tsx](patterns/dashboard.tsx) | period switch in actions → KPI row (16) → panels grid (16) → short table section |
+| Loading, empty, error | [screen-states.tsx](patterns/screen-states.tsx) | Banner for the page, `error` / `loading` in place, EmptyPage for a first run |
 
-```tsx
-import { Button, Card, PageContent } from "prime-ui-kit";
-import styles from "./Dashboard.module.css";
+A short form (≤ 4 fields: rename, invite, confirm with a reason) belongs in a `Modal` with the same
+form rules: `Modal.Body` holds the `<form id>`, `Modal.Footer` holds Cancel + submit with `form={id}`
+(see `src/components/modal/examples/in-form.tsx`).
 
-export function Dashboard() {
-  return (
-    <PageContent.Section>
-      <PageContent.Header>
-        <PageContent.Title>Обзор</PageContent.Title>
-        <PageContent.Description>Продажи и заказы за октябрь.</PageContent.Description>
-        <PageContent.Actions>
-          <Button.Root variant="soft" tone="neutral">
-            Экспорт
-          </Button.Root>
-        </PageContent.Actions>
-      </PageContent.Header>
-      <PageContent.Body>
-        <div className={styles.kpis}>
-          <Card.Root variant="stat-trend">
-            <Card.Label>Выручка</Card.Label>
-            <Card.Value>₽ 4,2 млн</Card.Value>
-            <Card.Delta tone="success">+18%</Card.Delta>
-          </Card.Root>
-          <Card.Root variant="stat-trend">
-            <Card.Label>Заказы</Card.Label>
-            <Card.Value>1 248</Card.Value>
-            <Card.Delta tone="neutral">0%</Card.Delta>
-          </Card.Root>
-        </div>
-        <div className={styles.panels}>
-          <Card.Root variant="panel">
-            <Card.SectionHeader>
-              <Card.SectionTitle as="h2">Продажи по дням</Card.SectionTitle>
-            </Card.SectionHeader>
-            <Card.Chart>{/* chart */}</Card.Chart>
-          </Card.Root>
-        </div>
-      </PageContent.Body>
-    </PageContent.Section>
-  );
-}
-```
-
-```css
-/* Dashboard.module.css */
-.kpis,
-.panels {
-  display: grid;
-  gap: var(--prime-space-4);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr));
-}
-
-.panels {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 6)), 1fr));
-}
-```
-
-## List with a table and filters
-
-Rhythm: header with one primary action → DataTable (toolbar inside it, 8 between filters). Loading,
-empty and error go through DataTable props. Full toolbar code: [composition.md](composition.md#filter-bar-above-a-table).
-
-```tsx
-import { Button, DataTable, type DataTableColumn, PageContent } from "prime-ui-kit";
-
-type Client = { id: string; name: string; city: string };
-
-const columns: DataTableColumn<Client>[] = [
-  { id: "name", header: "Клиент", accessor: "name", sortable: true },
-  { id: "city", header: "Город", accessor: "city" },
-];
-
-export function ClientsPage({ rows, loading }: { rows: Client[]; loading: boolean }) {
-  return (
-    <PageContent.Section>
-      <PageContent.Header>
-        <PageContent.Title>Клиенты</PageContent.Title>
-        <PageContent.Actions>
-          <Button.Root>Добавить клиента</Button.Root>
-        </PageContent.Actions>
-      </PageContent.Header>
-      <PageContent.Body>
-        <DataTable.Root
-          columns={columns}
-          rows={rows}
-          getRowKey={(row) => row.id}
-          loading={loading}
-          selectable
-          empty="Клиентов по этим фильтрам нет"
-        />
-      </PageContent.Body>
-    </PageContent.Section>
-  );
-}
-```
-
-## Settings
-
-Rhythm: header → one panel Card per group (40 apart — `PageContent.Body` does it) → inside a card
-fields 20 apart, switches 20 apart → card actions at the bottom (primary last). Readable width. A form
-in a card wraps the whole `Card.Root` in `<form>`. A danger zone is the last card; its trigger is
-`variant="outline" tone="danger"` and opens a confirm Modal.
-
-```tsx
-import { Button, Card, Input, PageContent, Switch } from "prime-ui-kit";
-import styles from "./Settings.module.css";
-
-export function SettingsPage() {
-  return (
-    <PageContent.Root maxWidth="readable">
-      <PageContent.Header>
-        <PageContent.Title>Настройки</PageContent.Title>
-      </PageContent.Header>
-      <PageContent.Body>
-        <Card.Root variant="panel">
-          <Card.SectionHeader>
-            <Card.SectionTitle as="h2">Профиль компании</Card.SectionTitle>
-          </Card.SectionHeader>
-          <Card.Body>
-            <div className={styles.fields}>
-              <Input.Root label="Название">
-                <Input.Wrapper>
-                  <Input.Field defaultValue="ООО «Ромашка»" />
-                </Input.Wrapper>
-              </Input.Root>
-              <Input.Root label="Сайт" optional>
-                <Input.Wrapper>
-                  <Input.InlineAffix side="start">https://</Input.InlineAffix>
-                  <Input.Field placeholder="romashka.ru" />
-                </Input.Wrapper>
-              </Input.Root>
-            </div>
-          </Card.Body>
-          <Card.Actions>
-            <Button.Root>Сохранить</Button.Root>
-          </Card.Actions>
-        </Card.Root>
-        <Card.Root variant="panel">
-          <Card.SectionHeader>
-            <Card.SectionTitle as="h2">Уведомления</Card.SectionTitle>
-          </Card.SectionHeader>
-          <Card.Body>
-            <Switch.Root defaultChecked>
-              <Switch.Label>Письма о заказах</Switch.Label>
-            </Switch.Root>
-          </Card.Body>
-        </Card.Root>
-      </PageContent.Body>
-    </PageContent.Root>
-  );
-}
-```
-
-```css
-/* Settings.module.css */
-.fields {
-  display: grid;
-  gap: var(--prime-space-5);
-}
-```
-
-## Create form
-
-Rhythm: fields 20 apart, related fields in a 2-column grid on wide screens, group → group 32, actions
-row at the end (8 apart, primary last — also when the row stacks on a phone). Optional group headings on
-a bare page: `Typography.Root as="h2" variant="title-m"` (inside a Card: `title-s`), 16 above their
-fields. A short form (≤ 4 fields)
-belongs in a Modal; a long one on a page (`PageContent.Root maxWidth="readable"`) or in a Drawer.
-
-```tsx
-import { Button, Datepicker, Input, Select, Textarea } from "prime-ui-kit";
-import styles from "./CreateProject.module.css";
-
-export function CreateProjectForm() {
-  return (
-    <form className={styles.form} onSubmit={(event) => event.preventDefault()}>
-      <div className={styles.group}>
-        <Input.Root label="Название проекта" required>
-          <Input.Wrapper>
-            <Input.Field name="name" />
-          </Input.Wrapper>
-        </Input.Root>
-        <div className={styles.columns}>
-          <Select.Root label="Ответственный" placeholder="Выберите сотрудника">
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="anna">Анна Климова</Select.Item>
-            </Select.Content>
-          </Select.Root>
-          <Datepicker.Root mode="single" label="Срок" />
-        </div>
-        <Textarea.Root label="Описание" optional />
-      </div>
-      <div className={styles.actions}>
-        <Button.Root variant="ghost" tone="neutral">
-          Отмена
-        </Button.Root>
-        <Button.Root type="submit">Создать проект</Button.Root>
-      </div>
-    </form>
-  );
-}
-```
-
-```css
-/* CreateProject.module.css */
-.form {
-  display: grid;
-  gap: var(--prime-space-8);
-}
-
-.group {
-  display: grid;
-  gap: var(--prime-space-5);
-}
-
-.columns {
-  display: grid;
-  gap: var(--prime-space-5);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr));
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--prime-space-2);
-}
-```
-
-### Multi-step form
+## Multi-step form
 
 `Stepper.Root` (controlled `value`) above one Card that shows the current step's fields; actions
-«Назад» (`variant="soft" tone="neutral"`) and «Далее» / «Готово» at the bottom of the card. Mark a step
-with errors via the step `status`. See `src/components/stepper/examples/wizard.tsx`.
-
-## Detail page
-
-Rhythm: Breadcrumb above the header → header with status Badge and actions → main column of panel Cards
-plus a side column (Timeline of events). Two columns from 1024px, one below.
-
-```tsx
-import { Badge, Breadcrumb, Button, Card, PageContent, Timeline } from "prime-ui-kit";
-import styles from "./OrderPage.module.css";
-
-export function OrderPage() {
-  return (
-    <PageContent.Section>
-      <Breadcrumb.Root>
-        <Breadcrumb.Item href="/orders">Заказы</Breadcrumb.Item>
-        <Breadcrumb.Separator />
-        <Breadcrumb.Item current>№ 48 213</Breadcrumb.Item>
-      </Breadcrumb.Root>
-      <PageContent.Header>
-        <PageContent.Title>Заказ № 48 213</PageContent.Title>
-        <PageContent.Description>
-          <Badge.Root color="green">Оплачен</Badge.Root>
-        </PageContent.Description>
-        <PageContent.Actions>
-          <Button.Root variant="soft" tone="danger">
-            Отменить
-          </Button.Root>
-          <Button.Root>Отправить</Button.Root>
-        </PageContent.Actions>
-      </PageContent.Header>
-      <PageContent.Body>
-        <div className={styles.columns}>
-          <Card.Root variant="panel">
-            <Card.SectionHeader>
-              <Card.SectionTitle as="h2">Состав заказа</Card.SectionTitle>
-            </Card.SectionHeader>
-            <Card.Body>…</Card.Body>
-          </Card.Root>
-          <Card.Root variant="panel">
-            <Card.SectionHeader>
-              <Card.SectionTitle as="h2">История</Card.SectionTitle>
-            </Card.SectionHeader>
-            <Card.Body>
-              <Timeline.Root>
-                <Timeline.Item tone="success">
-                  <Timeline.Title>Оплата получена</Timeline.Title>
-                  <Timeline.Meta>07.10.26</Timeline.Meta>
-                </Timeline.Item>
-              </Timeline.Root>
-            </Card.Body>
-          </Card.Root>
-        </div>
-      </PageContent.Body>
-    </PageContent.Section>
-  );
-}
-```
-
-```css
-/* OrderPage.module.css */
-.columns {
-  display: grid;
-  gap: var(--prime-space-4);
-}
-
-@media (min-width: 1024px) {
-  .columns {
-    grid-template-columns: 2fr 1fr;
-    align-items: start;
-  }
-}
-```
-
-## Empty state (first run)
-
-The whole region has no data yet: EmptyPage with one action. Filtered tables use DataTable `empty`
-instead. (`layout="fill"` only centers inside a flex column with a height — not inside `PageContent.Body`.)
-
-```tsx
-import { Button, EmptyPage, PageContent } from "prime-ui-kit";
-
-export function NoProjects() {
-  return (
-    <PageContent.Section>
-      <PageContent.Header>
-        <PageContent.Title>Проекты</PageContent.Title>
-      </PageContent.Header>
-      <PageContent.Body>
-        <EmptyPage.Root aria-labelledby="no-projects">
-          <EmptyPage.Title id="no-projects">Проектов пока нет</EmptyPage.Title>
-          <EmptyPage.Description>Создайте первый проект, чтобы пригласить команду.</EmptyPage.Description>
-          <EmptyPage.Actions>
-            <Button.Root>Создать проект</Button.Root>
-          </EmptyPage.Actions>
-        </EmptyPage.Root>
-      </PageContent.Body>
-    </PageContent.Section>
-  );
-}
-```
+«Назад» (`variant="soft" tone="neutral"`) and «Далее» / «Готово» at the bottom of the card
+(`Card.Actions`). Mark a failed step with `Stepper.Item status="danger"`. See
+`src/components/stepper/examples/controlled.tsx` and `states.tsx`.
 
 ## Auth (sign in, code)
 
-No AppShell. A single Card centered on the canvas, width ≈ 400 (`calc(var(--prime-space-10) * 10)`), fields 20
-apart, one full-width primary button, secondary links as LinkButton. Code step: `DigitInput.Root`.
+No AppShell. `LoginForm` is the whole card: logo, title, provider buttons, the form and the footer link;
+center it on the canvas. Code step: `DigitInput` inside `LoginForm.Form`. Scenarios for sign-up, password
+reset and code confirmation are in `src/components/login-form/examples/`.
 
 ```tsx
-import { Button, Card, Input, LinkButton, Typography } from "prime-ui-kit";
+import { Button, Icon, Input, LinkButton, LoginForm } from "prime-ui-kit";
 import styles from "./SignIn.module.css";
 
 export function SignIn() {
   return (
     <main className={styles.page}>
-      <Card.Root variant="panel" className={styles.card}>
-        <Card.Body>
-          <form className={styles.form} onSubmit={(event) => event.preventDefault()}>
-            <Typography.Root as="h1" variant="heading-s">
-              Вход
-            </Typography.Root>
+      <LoginForm.Root align="center">
+        <LoginForm.Header>
+          <LoginForm.Logo>
+            <Icon name="object.package" />
+          </LoginForm.Logo>
+          <LoginForm.Title>Вход</LoginForm.Title>
+          <LoginForm.Description>Отправим код на рабочую почту</LoginForm.Description>
+        </LoginForm.Header>
+        <LoginForm.Body>
+          <LoginForm.Form onSubmit={(event) => event.preventDefault()}>
             <Input.Root label="Email" required>
               <Input.Wrapper>
                 <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
@@ -460,10 +166,12 @@ export function SignIn() {
             <Button.Root type="submit" fullWidth>
               Получить код
             </Button.Root>
-            <LinkButton.Root href="/signup">Создать аккаунт</LinkButton.Root>
-          </form>
-        </Card.Body>
-      </Card.Root>
+          </LoginForm.Form>
+          <LoginForm.Footer>
+            Нет аккаунта? <LinkButton href="/signup">Зарегистрироваться</LinkButton>
+          </LoginForm.Footer>
+        </LoginForm.Body>
+      </LoginForm.Root>
     </main>
   );
 }
@@ -477,14 +185,5 @@ export function SignIn() {
   min-height: 100dvh;
   padding: var(--prime-space-4);
   background: var(--prime-color-bg-canvas);
-}
-
-.card {
-  width: min(100%, calc(var(--prime-space-10) * 10));
-}
-
-.form {
-  display: grid;
-  gap: var(--prime-space-5);
 }
 ```

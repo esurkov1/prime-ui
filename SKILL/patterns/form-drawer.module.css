@@ -1,0 +1,30 @@
+/* Form in a Drawer: group → group 32, heading → its fields 16, field → field 20. */
+
+.form {
+  display: grid;
+  gap: var(--prime-space-8);
+}
+
+/* A fieldset groups related fields (and disables them while saving); no frame of its own. */
+.group {
+  display: grid;
+  gap: var(--prime-space-4);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fields {
+  display: grid;
+  gap: var(--prime-space-5);
+  min-width: 0;
+}
+
+/* Two short fields side by side when the panel is wide enough; tops aligned. */
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 3)), 1fr));
+  align-items: start;
+  gap: var(--prime-space-5);
+}

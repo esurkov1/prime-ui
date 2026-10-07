@@ -1,0 +1,19 @@
+/* List page: layout inside table cells and the toolbar only; the page rhythm comes from PageContent. */
+
+/* The filter takes the whole toolbar row, so its search stretches. */
+.filter {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Client cell: avatar, then the name over the tax id. On a phone the table scrolls sideways. */
+.client {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  white-space: nowrap;
+}
+
+.clientText {
+  display: grid;
+}

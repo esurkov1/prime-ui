@@ -1,0 +1,64 @@
+/* Dashboard: blocks 40 apart come from PageContent.Body; tiles inside a block 16 apart. */
+
+/* KPI row: as many ~14rem tiles as fit, one column on a phone. */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-14) * 4)), 1fr));
+  gap: var(--prime-space-4);
+}
+
+/* Panels: two columns from ~40rem of width. */
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-20) * 4)), 1fr));
+  align-items: start;
+  gap: var(--prime-space-4);
+}
+
+/* Bars inside a panel: 20 apart, like fields. */
+.bars {
+  display: grid;
+  gap: var(--prime-space-5);
+}
+
+.legend {
+  display: grid;
+  gap: var(--prime-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* A section without a card: heading row 16 above the table. */
+.recent {
+  display: grid;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.recentHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-space-2) var(--prime-space-4);
+}
+
+.client {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+}

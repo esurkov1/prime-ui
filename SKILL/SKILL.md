@@ -11,8 +11,22 @@ description: >
 
 # prime-ui-kit
 
-You build screens only from kit components and `--prime-*` tokens. Every visually repeated element is one
-component. If the kit lacks something, compose it from kit parts (see [composition.md](composition.md)).
+You build screens only from kit components and `--prime-*` tokens, on the kit's own page skeleton.
+Every visually repeated element is one component. The goal: a screen that looks as if the kit's author
+polished it for weeks — one rhythm, one size, one primary action, fill instead of lines, a state for
+every region.
+
+## How to use this skill
+
+1. **Choose** — [choosing.md](choosing.md): the category by task, then the component, then the pairs
+   that are easy to confuse.
+2. **Read the component** — [components.md](components.md) links each `COMPONENT.md` (API, variants,
+   states, a11y, mistakes) and its `examples/`. Never guess a prop; copy structure from an example.
+3. **Compose the screen** — [composition.md](composition.md): skeleton, rhythm, hierarchy, surfaces,
+   actions, forms, tables, feedback, overlays, narrow screens. Start from the closest working screen in
+   [patterns/](patterns/) and keep its skeleton.
+4. **Check** — [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md). Fix every «no», then hand
+   over.
 
 ## Where things are
 
@@ -24,19 +38,19 @@ repository; in a consumer project the same files are under `node_modules/prime-u
 | Component reference | `../src/components/<dir>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<dir>/COMPONENT.md` |
 | Copyable scenarios | `../src/components/<dir>/examples/*.tsx` | `node_modules/prime-ui-kit/src/components/<dir>/examples/*.tsx` |
 | AppShell, Sidebar | `../src/layout/<dir>/…` | `node_modules/prime-ui-kit/src/layout/<dir>/…` |
-
-Read the component's `COMPONENT.md` before using it; copy structure from its `examples/`. Never guess props.
+| Whole screens | `patterns/*.tsx` (this folder) | copied with this skill |
 
 ## Files of this skill
 
 | File | Read when |
 |---|---|
-| [foundations.md](foundations.md) | always — grid, proximity scale, sizes, surfaces, type |
-| [api-contract.md](api-contract.md) | writing JSX — prop names, controlled state, forms |
-| [components.md](components.md) | finding a component and its docs |
 | [choosing.md](choosing.md) | unsure which component fits |
-| [composition.md](composition.md) | the kit has no ready component |
-| [layouts.md](layouts.md) | starting a screen — skeletons for typical pages |
+| [components.md](components.md) | finding a component and its docs |
+| [composition.md](composition.md) | building any screen — the rules of assembly, and what to do when the kit lacks a component |
+| [patterns/](patterns/) | starting a screen — list, detail, settings, form in Drawer, dashboard, states |
+| [layouts.md](layouts.md) | the app frame (once per app), page wrappers, which pattern to start from, auth |
+| [foundations.md](foundations.md) | always — grid, proximity scale, sizes, surfaces, type, tone and color |
+| [api-contract.md](api-contract.md) | writing JSX — prop names, controlled state, forms, icons |
 | [anti-slop.md](anti-slop.md) | before and after writing — what never to do |
 | [checklist.md](checklist.md) | before handing the screen over |
 
@@ -60,35 +74,30 @@ Icons: the kit exports a small set (`Icon name="…"`, `IconSearch`, … — lis
 [api-contract.md](api-contract.md#icons)). For any other icon add `lucide-react` to the app's own
 dependencies and import from it; use the same icon library everywhere.
 
-## How to build a screen
-
-1. **Structure.** Pick the recipe in [layouts.md](layouts.md): `AppShell.Root` + `Sidebar` +
-   `PageContent`. Write the regions first: header (title, description, page actions), then blocks.
-2. **Components.** For each block choose the category, then the component ([choosing.md](choosing.md)).
-   Open its `COMPONENT.md`, copy the closest file from `examples/`.
-3. **Rhythm.** Apply the proximity scale ([foundations.md](foundations.md) §2): label→field 4–8,
-   field→field 20, group→group 32, section→section 40–48. Spacing via `gap` on the parent, never margins.
-4. **States.** Every data block has loading, empty and error; every field has hint/error; every action
-   has disabled/loading. Wire them with the props the component already has.
-5. **Check.** Walk [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md). Fix, then hand over.
-
 ## Ten rules
 
 1. Kit component first. A `div` that looks like a Card, Badge, Divider or Kbd is a bug.
 2. Tokens only: `--prime-space-*`, `--prime-color-*`, `--prime-radius-*`, `--prime-text-*`. No raw px,
    rem, hex, no `--prime-ref-*`, no inline `style`.
-3. Depth from fill, not lines: card on canvas, field inside card. No borders to separate blocks.
-4. One size per row. Default `m` everywhere; change size for the whole row, not one control.
-5. Air is hierarchy: tighter inside a group, wider between groups, widest between sections.
+3. Depth from fill, not lines: Card on the panel, field inside the Card. No borders to separate blocks,
+   no card around a table, no card in a card.
+4. One size per row. Default `m` everywhere (omit `size`); change the tier for a whole region.
+5. Air is hierarchy: tighter inside a group, wider between groups, widest between sections — spacing via
+   `gap` on the parent, never margins.
 6. One primary action per area. The rest are `soft`/`ghost`/`outline` with `tone="neutral"`.
 7. Labels above fields, always. Placeholder is an example value, never the label.
-8. Text through `Typography.Root` roles (`heading-m` page title, `title-s` card title, `body-m` text,
-   `caption` meta). No custom font sizes.
-9. Overlays (Modal, Drawer, Popover, Dropdown, Tooltip, Select) come from the kit — never hand-made.
+8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;
+   the page title is `PageContent.Title`). No custom font sizes.
+9. Overlays (Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu, Select) come from the kit — never
+   hand-made.
 10. No decoration: no emoji, no icons that do not carry meaning, no explanatory text nobody asked for.
 
 ## Component structure
 
-Compound components are used through parts: `Button.Root`, `Modal.Root > Modal.Content > Modal.Body`.
-The namespace itself is not a component: `<Button>` is invalid, `<Button.Root>` is right. Leaf utilities
-(`DataTable.Root` with column config, `Datepicker.Root`, `TagSelect.Root`) take data as props.
+Components with parts are used through them: `Button.Root` + `Button.Icon`,
+`Modal.Root > Modal.Content > Modal.Body`; the namespace itself is not a component (`<Button>` is
+invalid, `<Button.Root>` is right). Leaves without parts are single exports: `<Typography>`, `<Kbd>`,
+`<Divider>`, `<Spinner>`, `<LinkButton>`, `<NativeSelect>`, `<DigitInput>`, `<Slider>`, `<TagSelect>`,
+`<ColorSwatches>`, `<CodeBlock>`, `<ProgressBar>`, `<ProgressCircle>`, `<Pagination>`. Data-driven
+components take data as props: `DataTable` (`columns`, `rows`), `TagSelect` (`options`), `SmartFilter`
+(`fields`), `ProgressBar` (`segments`).

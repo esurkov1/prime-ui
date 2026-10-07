@@ -10,6 +10,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(rootDir, "src"),
+      // Composition patterns (SKILL/patterns) import the kit by its package name.
+      "prime-ui-kit": path.resolve(rootDir, "src/index.ts"),
     },
   },
   test: {
