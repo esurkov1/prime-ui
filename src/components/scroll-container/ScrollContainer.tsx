@@ -52,13 +52,24 @@ function useEdgeOverflow(
       const end = max - position > 1;
       setOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
     };
+    // Scroll and resize can fire many times per frame (a sidebar collapsing resizes every region
+    // beside it): measure at most once per frame.
+    let frame = 0;
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    };
     update();
-    node.addEventListener("scroll", update, { passive: true });
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+    node.addEventListener("scroll", schedule, { passive: true });
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
     observer?.observe(node);
     for (const child of Array.from(node.children)) observer?.observe(child);
     return () => {
-      node.removeEventListener("scroll", update);
+      cancelAnimationFrame(frame);
+      node.removeEventListener("scroll", schedule);
       observer?.disconnect();
     };
   }, [ref, enabled, horizontal]);

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it } from "vitest";
 
@@ -26,7 +26,7 @@ describe("ScrollContainer", () => {
     expect(ref.current).toHaveAttribute("tabindex", "0");
   });
 
-  it("marks the hidden edges while fade is on", () => {
+  it("marks the hidden edges while fade is on (measured once per frame)", async () => {
     render(
       <ScrollContainer fade data-testid="scroll">
         items
@@ -41,18 +41,18 @@ describe("ScrollContainer", () => {
     Object.defineProperty(node, "clientHeight", { configurable: true, value: 100 });
     node.scrollTop = 0;
     fireEvent.scroll(node);
+    await waitFor(() => expect(node).toHaveAttribute("data-overflow-end", "true"));
     expect(node).not.toHaveAttribute("data-overflow-start");
-    expect(node).toHaveAttribute("data-overflow-end", "true");
 
     node.scrollTop = 100;
     fireEvent.scroll(node);
-    expect(node).toHaveAttribute("data-overflow-start", "true");
+    await waitFor(() => expect(node).toHaveAttribute("data-overflow-start", "true"));
     expect(node).toHaveAttribute("data-overflow-end", "true");
 
     node.scrollTop = 200;
     fireEvent.scroll(node);
+    await waitFor(() => expect(node).not.toHaveAttribute("data-overflow-end"));
     expect(node).toHaveAttribute("data-overflow-start", "true");
-    expect(node).not.toHaveAttribute("data-overflow-end");
   });
 
   it("fades along the horizontal axis for axis=horizontal and sets nothing without fade", () => {

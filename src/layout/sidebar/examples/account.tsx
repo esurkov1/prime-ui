@@ -7,6 +7,17 @@ export default function SidebarAccountExample() {
   return (
     <div className={styles.stage}>
       <Sidebar.Root offCanvas="never">
+        <Sidebar.Header>
+          <Sidebar.Brand href="#home" description="Отдел продаж">
+            <Sidebar.BrandLogo>
+              <span className={styles.logo}>
+                <Icon name="nav.layoutGrid" />
+              </span>
+            </Sidebar.BrandLogo>
+            Прайм CRM
+          </Sidebar.Brand>
+          <Sidebar.Toggle variant="header" />
+        </Sidebar.Header>
         <Sidebar.Content>
           <Sidebar.Item current>
             <Sidebar.ItemIcon>
@@ -43,7 +54,6 @@ export default function SidebarAccountExample() {
             </Sidebar.ItemIcon>
             Пригласить команду
           </Sidebar.Item>
-          <Sidebar.Toggle />
           <Dropdown.Root>
             <Dropdown.Trigger>
               <Sidebar.Account description="anna@company.ru">

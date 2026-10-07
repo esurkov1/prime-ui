@@ -1,5 +1,8 @@
 import * as React from "react";
 
+/** Quiet time after the last container resize before the widths are measured again. */
+const RESIZE_SETTLE_MS = 120;
+
 /**
  * Stable column widths. The browser sizes columns by the rows on screen, so searching, filtering,
  * paging or opening a row would make every column jump. Once real rows are laid out, the widths
@@ -70,15 +73,24 @@ export function useFrozenColumns(
     const root = rootRef.current;
     if (!root || typeof ResizeObserver === "undefined") return;
     let lastWidth = root.getBoundingClientRect().width;
-    const observer = new ResizeObserver(() => {
-      const width = root.getBoundingClientRect().width;
+    let settle: ReturnType<typeof setTimeout> | undefined;
+    // While the container width animates (a sidebar collapsing) the fixed layout already follows
+    // it; widths are measured again once, after the width has settled — not on every frame.
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? lastWidth;
       if (Math.abs(width - lastWidth) < 1) return;
       lastWidth = width;
-      unfreeze();
-      freeze();
+      clearTimeout(settle);
+      settle = setTimeout(() => {
+        unfreeze();
+        freeze();
+      }, RESIZE_SETTLE_MS);
     });
     observer.observe(root);
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(settle);
+      observer.disconnect();
+    };
   }, []);
 
   // After every render: freeze once real rows are laid out; widen a column whose content no longer
