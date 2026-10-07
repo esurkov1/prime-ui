@@ -278,7 +278,9 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 - Collapsible group: heading 28 high with the chevron (14) at its end, aligned with the item trail; items start 4 below.
 - Sub-list: a 1px `border-default` guide line on the parent icon's centre; every child branches off it with an 8 elbow and a 6 bend; child labels line up with the parent label.
 - Trail (count, key hint, trailing icon) sits at the row end; a row action (one tier down) appears there on hover / focus and the trail moves aside.
-- Footer: items 4 apart; the account (item height + 12, avatar of the tier) is set 8 apart below them.
+- Footer: items 4 apart; the account (item height + 12) is set 8 apart below them. Its avatar is one
+  step above the item icon (xs·s 20, m·l 24, xl 32), centred on the icon axis, and the name starts
+  exactly where item labels start.
 - Compact flyout: the kit Popover (flush) to the right, aligned with the parent row; the parent's name heads it on the same line, the children follow on the guide line; current child is a `fill-subtle-active` wash.
 - Motion: on collapse labels fade out fast before the rail narrows; on expand they fade in after a short delay, once the rail is wide. Group headings fold to zero height in compact mode. Disclosures animate height through a grid track (open base · enter, close fast · exit), chevrons rotate (base), the header toggle moves and scales with the rail (base); all durations are tokens and collapse under reduced motion.
 - Off-canvas panel width: min(sidebar width, 100% − `--prime-space-12`).

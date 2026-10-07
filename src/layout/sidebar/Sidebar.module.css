@@ -27,9 +27,10 @@
   --sb-line-height: var(--prime-control-m-line-height);
   --sb-radius: var(--prime-control-m-radius);
   --sb-gap: var(--prime-control-m-gap);
-  /* Inline actions are one tier down; the account avatar fits the compact rail. */
+  /* Inline actions are one tier down; the account avatar is one step above the icon, with air
+     around it in the compact rail. */
   --sb-action-h: var(--prime-control-s-height);
-  --sb-avatar: var(--prime-avatar-m);
+  --sb-avatar: var(--prime-avatar-s);
 
   --sb-compact: var(--prime-layout-sidebar-collapsed-width);
   --sb-pad: var(--prime-space-2);
@@ -59,7 +60,7 @@
   --sb-radius: var(--prime-control-s-radius);
   --sb-gap: var(--prime-control-s-gap);
   --sb-action-h: var(--prime-control-xs-height);
-  --sb-avatar: var(--prime-avatar-s);
+  --sb-avatar: var(--prime-avatar-xs);
 }
 
 .root[data-size="l"],
@@ -71,7 +72,7 @@
   --sb-radius: var(--prime-control-l-radius);
   --sb-gap: var(--prime-control-l-gap);
   --sb-action-h: var(--prime-control-m-height);
-  --sb-avatar: var(--prime-avatar-m);
+  --sb-avatar: var(--prime-avatar-s);
 }
 
 .root[data-size="xl"],
@@ -83,7 +84,7 @@
   --sb-radius: var(--prime-control-xl-radius);
   --sb-gap: var(--prime-control-xl-gap);
   --sb-action-h: var(--prime-control-l-height);
-  --sb-avatar: var(--prime-avatar-l);
+  --sb-avatar: var(--prime-avatar-m);
 }
 
 .root {
@@ -745,7 +746,9 @@
   display: flex;
   flex: none;
   align-items: center;
-  gap: var(--sb-gap);
+  /* The avatar is wider than an icon and centred on the same axis; the gap gives that back, so the
+     name starts exactly where the item labels start. */
+  gap: max(0px, calc(var(--sb-gap) - (var(--sb-avatar) - var(--sb-icon)) / 2));
   width: 100%;
   min-width: 0;
   min-height: calc(var(--sb-h) + var(--prime-space-3));
