@@ -16,6 +16,7 @@ import {
   SCENARIOS,
   SLOT_IDS,
   type SlotId,
+  slotLayout,
   slotOrder,
 } from "../../playground/pageStandard";
 import { applyApiToDoc, type ComponentApi } from "../../scripts/docs/componentApi";
@@ -169,9 +170,13 @@ describe("docs contract", () => {
 
       for (const m of source.matchAll(/(?:from|import) "([^"]+)"/g)) {
         const spec = m[1];
-        const ok = ALLOWED_IMPORTS.test(spec) || /^\.\/[\w-]+\.module\.css$/.test(spec);
+        const ok = ALLOWED_IMPORTS.test(spec) || spec === "./examples.module.css";
         expect(ok, `${file} imports "${spec}"`).toBe(true);
       }
+      expect(source, `${file}: React as \`import * as React from "react"\``).not.toMatch(
+        /^import (?!\* as React from "react";).* from "react";$/m,
+      );
+      expect(source, `${file}: size "m" is the default — omit it`).not.toMatch(/\bsize="m"/);
 
       expect(jsdocOf(source), `${file}: one-line English JSDoc ending with "."`).toMatch(
         /^[^Ѐ-ӿ]+\.$/,
@@ -263,6 +268,17 @@ describe("docs contract", () => {
           conflicts,
           `PROP_SLOTS require slots a ${page.kind} page does not allow — add them to KIND_SLOTS.${page.kind} in playground/pageStandard.ts or pick another kind`,
         ).toEqual([]);
+      });
+
+      it("matrix examples bring no CSS: the preview layout lines the cells up", () => {
+        for (const example of page.examples) {
+          const slot = "slot" in example ? example.slot : null;
+          if (slotLayout(page.kind, slot) !== "matrix") continue;
+          const file = `${rel}/examples/${exampleFile(example)}.tsx`;
+          expect(read(file), `${file}: matrix example imports CSS`).not.toContain(
+            "examples.module.css",
+          );
+        }
       });
 
       it("example descriptions name the same props as the example JSDoc", () => {
