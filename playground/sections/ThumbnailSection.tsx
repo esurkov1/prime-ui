@@ -7,6 +7,8 @@ import InTableExample from "@/components/thumbnail/examples/in-table";
 import inTableSource from "@/components/thumbnail/examples/in-table.tsx?raw";
 import RatiosExample from "@/components/thumbnail/examples/ratios";
 import ratiosSource from "@/components/thumbnail/examples/ratios.tsx?raw";
+import RingExample from "@/components/thumbnail/examples/ring";
+import ringSource from "@/components/thumbnail/examples/ring.tsx?raw";
 import SizesExample from "@/components/thumbnail/examples/sizes";
 import sizesSource from "@/components/thumbnail/examples/sizes.tsx?raw";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
@@ -53,6 +55,14 @@ const rootApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description: "Ширина контейнера, высота из ratio — обложки карточек и галереи.",
+  },
+  {
+    prop: "ring",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Тонкое внутреннее кольцо по краю — для фото на белом фоне на светлой поверхности.",
   },
   {
     prop: "…rest",
@@ -183,6 +193,19 @@ export default function ThumbnailSection() {
             code={fallbackSource}
           >
             <FallbackExample />
+          </Demo>
+          <Demo
+            title="Обводка"
+            description={
+              <>
+                По умолчанию обводки нет — превью отделяет заливка. <code>ring</code> добавляет
+                тонкое внутреннее кольцо для фото на белом фоне, край которых иначе теряется на
+                светлой поверхности.
+              </>
+            }
+            code={ringSource}
+          >
+            <RingExample />
           </Demo>
           <Demo
             title="Обложки в карточках"

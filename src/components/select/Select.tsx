@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { Thumbnail, type ThumbnailRootProps } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
@@ -656,7 +657,7 @@ export type SelectValueProps = {
   className?: string;
   /**
    * Single mode: renders the selected option in the trigger, e.g. with the same
-   * `Select.ItemMedia` / `Select.ItemText` / `Select.ItemDescription` parts as the row.
+   * `Thumbnail.Root` / `Select.ItemText` / `Select.ItemDescription` parts as the row.
    * Not called while empty (the placeholder shows) and ignored in `multiple` mode.
    */
   children?: (item: SelectValueItem) => React.ReactNode;
@@ -693,7 +694,7 @@ function SelectValue({ className, children }: SelectValueProps) {
         className={cx(styles.triggerValue, className)}
         {...toDataAttributes({ rich: parts.rich || undefined })}
       >
-        {parts.media}
+        {renderMedia(parts.media, ctx.size)}
         <span className={styles.valueBody}>{parts.body}</span>
       </span>
     );
@@ -747,27 +748,21 @@ SelectBadge.displayName = "Select.Badge";
 
 // ─── Rich option parts (row and trigger) ──────────────────────────────────────
 
-export type SelectItemMediaProps = {
-  /** Palette hue of the tile (soft fill + hue text for an icon). Without it — a neutral fill. */
-  color?: PaletteColor;
-  /** An icon or an `<img>` (covers the tile). */
-  children: React.ReactNode;
-  className?: string;
-};
+/** Thumbnail tier for a Select tier: the media of a rich row stays inside the row height. */
+const MEDIA_SIZE: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "s", l: "s", xl: "m" };
 
-/** Leading thumbnail tile of a rich option; the option grows to two lines. */
-function SelectItemMedia({ color, children, className }: SelectItemMediaProps) {
-  return (
-    <span
-      className={cx(styles.itemMedia, className)}
-      aria-hidden="true"
-      {...toDataAttributes({ color })}
-    >
-      {children}
-    </span>
+/** A `Thumbnail.Root` as the leading media of a rich option: sized to the tier unless it sets `size`. */
+function renderMedia(media: React.ReactNode[], size: ControlSize): React.ReactNode[] {
+  return media.map((node) =>
+    React.isValidElement<ThumbnailRootProps>(node)
+      ? React.cloneElement(node, {
+          size: node.props.size ?? MEDIA_SIZE[size],
+          className: cx(styles.itemMedia, node.props.className),
+          "aria-hidden": true,
+        } as Partial<ThumbnailRootProps>)
+      : node,
   );
 }
-SelectItemMedia.displayName = "Select.ItemMedia";
 
 export type SelectItemTextProps = {
   children: React.ReactNode;
@@ -836,7 +831,7 @@ function partitionRichChildren(children: React.ReactNode): RichParts {
           visit(props.children);
           return;
         }
-        if (child.type === SelectItemMedia) {
+        if (child.type === Thumbnail.Root) {
           parts.media.push(child);
           parts.rich = true;
           return;
@@ -1313,7 +1308,7 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
             key: icon.key ?? `prime-select-item-icon-${String(index)}`,
           }),
         )}
-        {parts.media}
+        {renderMedia(parts.media, size)}
         <span className={styles.itemText}>{parts.body}</span>
         {parts.meta}
         {multiple ? null : (
@@ -1572,7 +1567,6 @@ export const Select = {
   Content: SelectContent,
   Item: SelectItem,
   ItemIcon: SelectItemIcon,
-  ItemMedia: SelectItemMedia,
   ItemText: SelectItemText,
   ItemDescription: SelectItemDescription,
   ItemMeta: SelectItemMeta,

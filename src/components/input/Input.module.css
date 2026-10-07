@@ -329,29 +329,41 @@
   background: var(--prime-color-fill-strong);
 }
 
-/* ---- Trailing action (clear) ---- */
+/*
+ * ---- Trailing action (clear): a segment ----
+ * Full field height, flush with the end edge; the icon is centred with padX on both sides, so the
+ * icon → edge distance stays padX (foundation §6) while the whole segment is the hit area and takes
+ * the hover wash. The usual field gap stays before it, so the wash never touches the text. The
+ * field drops its end padding.
+ */
+.wrapper:has(> .action) {
+  padding-inline-end: 0;
+}
+
 .action {
   order: 4;
   flex-shrink: 0;
   display: inline-flex;
+  align-self: stretch;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  /* Icon-sized hit circle: sits padX from the edge and padX from the text (foundation §6). */
-  width: var(--prime-input-icon);
-  height: var(--prime-input-icon);
+  width: calc(var(--prime-input-icon) + 2 * var(--prime-input-padding-x));
   margin: 0;
-  margin-inline-start: calc(var(--prime-input-padding-x) - var(--prime-input-gap));
   padding: 0;
   border: 0;
-  border-radius: var(--prime-radius-full);
+  border-radius: 0;
   background: transparent;
   color: var(--prime-color-text-muted);
   cursor: pointer;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* An end affix section follows: the segment is no longer at the edge, keep the end padding. */
+.wrapper:has(> .action):has(> .affix[data-side="end"]) .action {
+  margin-inline-end: 0;
 }
 
 .action > svg {
@@ -367,12 +379,11 @@
 
 .action:active {
   background: var(--prime-color-fill-subtle-active);
-  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .action:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: 0;
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
 .action:disabled,

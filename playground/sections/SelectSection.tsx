@@ -1,4 +1,6 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import SelectClearableExample from "@/components/select/examples/clearable";
+import clearableSource from "@/components/select/examples/clearable.tsx?raw";
 import SelectControlledExample from "@/components/select/examples/controlled";
 import controlledSource from "@/components/select/examples/controlled.tsx?raw";
 import SelectInFormExample from "@/components/select/examples/in-form";
@@ -233,7 +235,7 @@ const selectValueApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description:
-      "Только одиночный выбор: рисует выбранный пункт в триггере (ItemMedia / ItemText / ItemDescription). Не вызывается без значения.",
+      "Только одиночный выбор: рисует выбранный пункт в триггере (Thumbnail / ItemText / ItemDescription). Не вызывается без значения.",
   },
 ];
 
@@ -263,12 +265,12 @@ const selectBadgeApiRows: PlaygroundApiPropRow[] = [
 
 const selectRichPartsApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "Select.ItemMedia",
-    type: "color?: PaletteColor, children, className",
-    defaultValue: "—",
+    prop: "Thumbnail.Root",
+    type: "ThumbnailRootProps",
+    defaultValue: "размер по ярусу Select",
     required: "Нет",
     description:
-      "Плитка слева: иконка или <img>; color — мягкая заливка палитры. Делает пункт двухстрочным.",
+      "Превью слева (иконка в Thumbnail.Fallback или Thumbnail.Image). Без своего size берёт размер под ярус Select (m → s). Делает пункт двухстрочным.",
   },
   {
     prop: "Select.ItemText",
@@ -536,6 +538,20 @@ export default function SelectSection() {
           </div>
 
           <div className="demoBlock">
+            <DemoSectionTitle>Очистка значения</DemoSectionTitle>
+            <DemoDescription>
+              <code>clearable</code> добавляет перед шевроном сегмент очистки на всю высоту поля:
+              вся зона кликабельна и подсвечивается целиком. С клавиатуры значение очищают Delete
+              или Backspace на триггере.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={clearableSource.trim()} previewLayout="stack-narrow">
+              <PlaygroundExampleFrame.Stage>
+                <SelectClearableExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
             <DemoSectionTitle>Поиск, группы и длинный список</DemoSectionTitle>
             <DemoDescription>
               <code>Select.Content searchable</code>: поле поиска сверху панели (плейсхолдер —{" "}
@@ -570,8 +586,8 @@ export default function SelectSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Богатые пункты</DemoSectionTitle>
             <DemoDescription>
-              <code>Select.ItemMedia</code> — плитка с иконкой или картинкой (<code>color</code>{" "}
-              палитры), <code>Select.ItemText</code> и <code>Select.ItemDescription</code> — две
+              <code>Thumbnail</code> — превью с иконкой или картинкой (размер подбирается под ярус
+              Select), <code>Select.ItemText</code> и <code>Select.ItemDescription</code> — две
               строки, <code>Select.ItemMeta</code> — значение справа перед галочкой. Пункт и триггер
               растут до двух строк с отступами яруса; триггер рисует выбранный пункт через функцию в{" "}
               <code>Select.Value</code>. Typeahead — по названию, поиск — по названию и описанию.

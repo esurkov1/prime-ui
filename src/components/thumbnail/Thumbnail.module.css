@@ -1,8 +1,8 @@
 /*
  * Thumbnail — an object preview at a fixed aspect ratio. Height = `--prime-thumbnail-<tier>-height`
  * (24 · 32 · 40 · 48 · 64), width = height × ratio; `fullWidth` flips it: width = container, height
- * from the ratio. Radius steps with the tier. A faint inner ring keeps white images visible on any
- * surface. Fallback: palette soft fill + icon in the palette text color.
+ * from the ratio. Radius steps with the tier. No outline by default (depth from fill); `ring` adds a
+ * faint inner ring for photos with a white background on a light surface. Fallback: palette soft fill + icon in the palette text color.
  */
 
 .root {
@@ -29,7 +29,7 @@
   user-select: none;
 }
 
-.root::after {
+.root[data-ring="true"]::after {
   content: "";
   position: absolute;
   inset: 0;

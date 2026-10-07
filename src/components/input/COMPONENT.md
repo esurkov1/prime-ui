@@ -32,7 +32,7 @@ Input.Root            label row, field body, support row; provides size / invali
    ├─ Input.InlineAffix    muted text next to the value (start | end)
    ├─ Input.Field          native <input>
    ├─ Input.Badge          soft palette badge at the trailing edge
-   └─ Input.ClearButton    trailing clear action
+   └─ Input.ClearButton    trailing clear action: a full-height segment at the end edge
 Input.Counter         goes into Input.Root `counter` (support row, right side)
 ```
 The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · badge · end icon · clear button · end affix. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
@@ -111,7 +111,7 @@ No ref (renders a `<div>`). Does not forward native props.
 |---|---|---|---|
 | `onClick` | `MouseEventHandler<HTMLButtonElement>` | — | Clear the value here. Afterwards focus returns to the input unless `event.preventDefault()` was called. |
 
-Renders `type="button"`, `aria-label={labels.clear}`, `aria-controls` = input id, close icon. Render it only when the field has a value.
+Renders `type="button"`, `aria-label={labels.clear}`, `aria-controls` = input id, close icon. Render it only when the field has a value. It is a **segment**: full field height, flush with the end edge, `icon + 2 × padX` wide with the icon centred (padX to the edge), after the usual field gap so its wash never touches the text; the whole segment is the hit area and takes a `fill-subtle` wash on hover, the inset focus ring on focus. The field drops its end padding while the button is shown.
 
 ### Input.Counter
 | Prop | Type | Default | Description |
@@ -214,6 +214,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [states.tsx](examples/states.tsx) | Empty, filled, disabled, read-only, error with text, `invalid` only | Checking all states |
 | [surfaces.tsx](examples/surfaces.tsx) | A plain field whose fill follows the surface | Fields on canvas vs inside cards/overlays |
 | [controlled.tsx](examples/controlled.tsx) | Controlled value, `Input.ClearButton`, `Input.Counter` with an error over the limit | Search and length-limited text |
+| [clear-button.tsx](examples/clear-button.tsx) | `Input.ClearButton` in sizes s, m, l with a value typed: the full-height clear segment | Search and filter fields |
 | [search-without-focus-ring.tsx](examples/search-without-focus-ring.tsx) | `focusRing={false}` search field | A single search field where focus is obvious |
 | [icons-and-affixes.tsx](examples/icons-and-affixes.tsx) | `Input.Icon`, `Input.Affix` on both sides, `Input.InlineAffix` | E-mail, URL, amount fields |
 | [with-badge.tsx](examples/with-badge.tsx) | `Input.Badge`, `Select.Badge`, `Datepicker.Badge` with palette colors | Marking a value as verified / new / missing |

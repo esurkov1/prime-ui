@@ -103,7 +103,8 @@ Generic over `Row`. No ref forwarding, no `asChild`, no native prop spreading (o
 | `sortable` | `boolean` | — | Header becomes a sort button with `aria-sort`. |
 | `sortAccessor` | `(row: Row) => unknown` | — | Value used for sorting instead of `accessor`. |
 | `sortComparator` | `(a: Row, b: Row, order: DataTableOrder) => number` | — | Custom comparison. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` (`"end"` when `numeric`) | Cell and header alignment. |
+| `align` | `"start" \| "center" \| "end"` | `"start"` (`"end"` when `numeric`) | Cell alignment. Headers do not follow it (see `headerAlign`). |
+| `headerAlign` | `"start" \| "center" \| "end"` | `"start"` | Header alignment. Every header starts at the start edge by default, also over numeric columns, with the sort indicator at the end edge. |
 | `numeric` | `boolean` | — | `tabular-nums`, no wrapping, end alignment unless `align` is set. |
 | `truncate` | `boolean` | — | One line with ellipsis; width from `maxWidth` (or `width`); string values get a `title`. |
 | `grow` | `boolean` | — | The column takes the free width and wraps its text (descriptions, comments); the table then fills its container instead of growing to its content width. |
@@ -123,6 +124,8 @@ Generic over `Row`. No ref forwarding, no `asChild`, no native prop spreading (o
 | `m` | Rows from 44, head 36 (13/20 head text), cells 14/20, cell padding 12 × 6 | Most tables | yes |
 | `l` | Rows from 52, head 40, text 16/24, cell padding 12 × 8 | Spacious lists, large avatars | |
 | `xl` | Rows from 52, head 48, text 16/24, cell padding 16 × 6 | Large touch-friendly tables | |
+
+Column widths come from the content (automatic table layout) and then hold still: once rows are laid out the widths are frozen, so searching, filtering, paging and opening sub-rows do not move the columns (collapsed sub-rows are measured in advance, hidden). A column widens when new content no longer fits, never narrows; the widths are measured again when the column set or the container width changes. `grow` columns keep taking the free width.
 
 Row height is a minimum, not a fixed value. Cells carry vertical padding = (row height − control one
 tier down) / 2, so a single line of text or a cell control one tier down (in an `m` table: an `s`
@@ -146,6 +149,8 @@ The head is the control height of the tier with text one step smaller (muted, we
 | `start` | Text at the start | Text columns | yes (non-numeric) |
 | `center` | Centered | Short symmetric values (icons, flags, hours) | |
 | `end` | At the end | Numbers, money (set automatically by `numeric`) | yes (`numeric`) |
+
+Headers keep `start` whatever the cell alignment: the header row reads as one line of labels, and the sort indicator sits at the end edge, above end-aligned numbers. Set `headerAlign` only for a deliberate exception.
 
 ### Visual flags
 | Flag | Looks like when on | Use when | Default |
@@ -178,7 +183,7 @@ One primary action per toolbar (`soft` / `solid`), others `outline` or `ghost`; 
 | loading (with rows) / loading more | `loading`, `loadingMore` | `aria-busy`; footer `labels.loadingMore` |
 | empty | no rows and not loading | Centered muted body-s text (`empty` or `labels.empty`) |
 | error | `error` | Body replaced by `role="alert"` message in `danger-text`; range and infinite-scroll status hidden, Pagination still shows when `rows` exceed `pageSize` |
-| sorted | `sort` / `defaultSort` | `aria-sort` on the header, `data-sortable`, `data-sorted`. One sort icon per sortable column, always at the end edge of the head cell for every `align`: unsorted ⇅ in `text-disabled`, hover `text-muted`, sorted ↑ / ↓ in `text-secondary` — never accent |
+| sorted | `sort` / `defaultSort` | `aria-sort` on the header, `data-sortable`, `data-sorted`. One sort icon per sortable column, always at the end edge of the head cell for every `headerAlign`: unsorted ⇅ in `text-disabled`, hover `text-muted`, sorted ↑ / ↓ in `text-secondary` — never accent |
 | selected | `selected` / `defaultSelected` | `aria-selected` on rows, `accent-soft` fill; polite «Выбрано: N» |
 | expanded | `expanded` / `defaultExpanded` | `data-expanded` on the parent row (one step darker, first cell weight 500); toggle `aria-expanded` |
 | hover | pointer | Row / column wash per highlight flags |

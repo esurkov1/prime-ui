@@ -21,7 +21,7 @@ import { Thumbnail } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Thumbnail.Root          frame: height of the tier, width from `ratio`, radius, faint inner ring, palette fill
+Thumbnail.Root          frame: height of the tier, width from `ratio`, radius, palette fill (no outline; `ring` adds one)
 ├─ Thumbnail.Image      <img>, covers the frame; fades in when loaded, hidden on error
 └─ Thumbnail.Fallback   palette fill + centered icon or short label; visible without an image, while loading, on error
 ```
@@ -37,6 +37,7 @@ Thumbnail.Root          frame: height of the tier, width from `ratio`, radius, f
 | `color` | `PaletteColor` | `"gray"` | Hue of the fallback fill and icon / label. |
 | `variant` | `"soft" \| "solid"` | `"soft"` | `soft`: `palette-<hue>-soft` fill, `palette-<hue>-text` icon. `solid`: `palette-<hue>-solid` fill, `palette-<hue>-solid-fg` icon. |
 | `fullWidth` | `boolean` | — | Width = container, height from `ratio` (card covers, galleries); fallback icon 32. |
+| `ring` | `boolean` | `false` | A faint inner ring around the frame (`fill-subtle-active`), for photos with a white background on a light surface. No outline otherwise. |
 | `className` | `string` | — | Extra class (placement only). |
 | `children` | `ReactNode` | — | `Thumbnail.Image` and / or `Thumbnail.Fallback`. |
 
@@ -120,13 +121,13 @@ The thumbnail leads the row; the object's name next to it is the main text. Do n
 | loaded | image `load` | `data-status="loaded"`, image fades in over the Fallback; Fallback `aria-hidden` |
 | error | image `error` | `data-status="error"`, img hidden, Fallback visible |
 
-Root data attributes: `data-size`, `data-ratio`, `data-color`, `data-variant`, `data-full-width`. Image: `data-status`, `data-fit`.
+Root data attributes: `data-size`, `data-ratio`, `data-color`, `data-variant`, `data-full-width`, `data-ring`. Image: `data-status`, `data-fit`.
 
 ## Layout & spacing
 - Thumbnail + text in a row: flex, `align-items: center`, gap `--prime-space-3`; the text column `min-width: 0` with `truncate`.
 - In a table the row grows to fit the thumbnail (row height is a minimum) — never shrink the thumbnail to the row.
 - Card covers: `fullWidth` inside the card body; gap `--prime-space-3` to the title.
-- A faint inner ring keeps white images visible on light surfaces; no border needed.
+- No outline by default: the fill separates the preview. Add `ring` only for photos with a white background on a light surface, where the edge would vanish.
 
 ## Accessibility
 - Decorative next to a name: keep `alt=""` (default) and mark fallback icons `aria-hidden`.
@@ -141,6 +142,7 @@ Root data attributes: `data-size`, `data-ratio`, `data-color`, `data-variant`, `
 | [ratios.tsx](examples/ratios.tsx) | All five ratios at one height | Choosing a ratio |
 | [sizes.tsx](examples/sizes.tsx) | Five tiers, 24–64 | Matching the row |
 | [fallback.tsx](examples/fallback.tsx) | Icon, label and a failing image | Missing or broken pictures |
+| [ring.tsx](examples/ring.tsx) | Default without an outline vs `ring` on a white-background photo | Photos that would vanish on a light surface |
 | [card-grid.tsx](examples/card-grid.tsx) | `fullWidth` 16:9 covers in a card grid | Catalogs, galleries |
 
 ```tsx

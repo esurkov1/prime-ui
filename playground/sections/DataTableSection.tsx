@@ -209,7 +209,18 @@ const columnApiRows: PlaygroundApiPropRow[] = [
     "false / — / —",
     "Сортировка колонки.",
   ),
-  api("align", '"start" | "center" | "end"', '"start"', "Выравнивание (у `numeric` — `end`)."),
+  api(
+    "align",
+    '"start" | "center" | "end"',
+    '"start"',
+    "Выравнивание ячеек (у `numeric` — `end`).",
+  ),
+  api(
+    "headerAlign",
+    '"start" | "center" | "end"',
+    '"start"',
+    "Выравнивание заголовка; не зависит от `align`, стрелка сортировки у правого края.",
+  ),
   api("width / minWidth / maxWidth", "string", "—", "Размеры колонки."),
   api(
     "onHeaderClick / onCellClick",

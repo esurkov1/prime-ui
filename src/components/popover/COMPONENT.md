@@ -75,6 +75,7 @@ No ref. Rendered in a portal while open and during its exit animation.
 | `insetPadding` | `"none" \| "x1" \| "x2" \| "x3"` | `"none"` | Extra padding on top of the tier padding: +4 · +8 · +12. |
 | `insetGap` | `"none" \| "pad" \| "x2" \| "x3" \| "x4"` | `"pad"` | Gap between direct children: tier gap, or 0 · 8 · 12 · 16. |
 | `stackAboveDropdown` | `boolean` | `false` | Raise the panel above a dropdown / listbox of the same layer (trigger inside a Select, TagSelect or Dropdown panel). |
+| `flush` | `boolean` | `false` | No inner padding and no gap: rows reach the panel edges (lists with full-width dividers, filter panels). The content lays out its own spacing and uses inset focus rings. |
 | `className` | `string` | — | Extra class on the panel (e.g. a fixed width). |
 | `children` | `ReactNode` | — (required) | Panel content. |
 
@@ -125,6 +126,7 @@ Title uses the tier text size with title weight; Description uses the tier label
 | `sameMinWidthAsTrigger` | Panel as wide as the trigger | Full-width triggers in narrow columns | `false` |
 | `trapFocus` | Focus moves into the panel | Forms inside the panel | `false` |
 | `stackAboveDropdown` | Higher z-index on the same layer | Popover opened from inside a listbox | `false` |
+| `flush` | No padding, no gap; dividers run edge to edge | Panels of full-width rows ([SmartFilter](../smart-filter/COMPONENT.md)) | `false` |
 
 **Combinations** — panel `size` = trigger `size` = sizes of the buttons in Actions. Forms: `trapFocus` + Header + Actions. Destructive confirm: Actions with ghost neutral «Отмена» and solid `tone="danger"` primary.
 
@@ -132,7 +134,7 @@ Title uses the tier text size with title weight; Description uses the tier label
 
 ## States
 - Closed / open: uncontrolled by default; `open` + `onOpenChange` for controlled. There is no `disabled` on Popover: a disabled trigger simply never opens it.
-- Panel DOM: `data-state="open" | "closed"`, `data-side` (resolved), `data-size`, `data-inset-padding`, `data-inset-gap`, `data-overlay-portal-layer`, `data-overlay-stack="above-dropdown"` (with `stackAboveDropdown`).
+- Panel DOM: `data-state="open" | "closed"`, `data-side` (resolved), `data-size`, `data-inset-padding`, `data-inset-gap`, `data-flush` (with `flush`), `data-overlay-portal-layer`, `data-overlay-stack="above-dropdown"` (with `stackAboveDropdown`).
 - Trigger DOM: `data-state="open" | "closed"`, `aria-expanded`.
 
 ## Layout & spacing
@@ -160,6 +162,7 @@ Title uses the tier text size with title weight; Description uses the tier label
 | [full-width.tsx](examples/full-width.tsx) | `sameMinWidthAsTrigger` | Narrow columns |
 | [as-child.tsx](examples/as-child.tsx) | Text-link button as the trigger | Inline explanations |
 | [features.tsx](examples/features.tsx) | Invite form with `trapFocus` and a nested Select | Short forms |
+| [flush-list.tsx](examples/flush-list.tsx) | `flush` notification list with edge-to-edge Dividers | Panels of full-width rows |
 
 ```tsx
 import { Button, Popover } from "prime-ui-kit";

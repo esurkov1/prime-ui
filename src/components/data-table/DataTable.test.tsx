@@ -257,11 +257,15 @@ describe("DataTable", () => {
     expect(container.querySelectorAll('tr[data-stripe="alt"]')).toHaveLength(2);
   });
 
-  it("does not use colgroup; column widths follow automatic table layout", () => {
+  it("stays in automatic table layout until the columns are laid out", () => {
     const { container } = render(
       <DataTable.Root rows={rows.slice(0, 1)} columns={columns} showPagination={false} />,
     );
-    expect(container.querySelector("colgroup")).toBeNull();
+    // jsdom lays nothing out: widths come from the browser's automatic layout, nothing is frozen.
+    expect((container.querySelector("table") as HTMLTableElement).style.tableLayout).toBe("");
+    for (const col of container.querySelectorAll<HTMLTableColElement>("colgroup col")) {
+      expect(col.style.width).toBe("");
+    }
   });
 
   it("applies width, minWidth and maxWidth to header and body cells", () => {
@@ -371,6 +375,21 @@ describe("DataTable", () => {
     expect(scoreCell).toHaveAttribute("data-align", "end");
     expect(scoreCell).toHaveAttribute("data-numeric", "true");
     expect(screen.getByRole("cell", { name: "1" })).toHaveAttribute("data-align", "center");
+  });
+
+  it("starts every header at the start edge unless headerAlign is set", () => {
+    const numericColumns: DataTableColumn<Row>[] = [
+      { id: "score", header: "Score", accessor: "score", numeric: true, sortable: true },
+      { id: "id", header: "Id", accessor: "id", numeric: true, headerAlign: "end" },
+    ];
+    render(
+      <DataTable.Root rows={rows.slice(0, 1)} columns={numericColumns} showPagination={false} />,
+    );
+    expect(screen.getByRole("columnheader", { name: "Score" })).toHaveAttribute(
+      "data-align",
+      "start",
+    );
+    expect(screen.getByRole("columnheader", { name: "Id" })).toHaveAttribute("data-align", "end");
   });
 
   it("truncates long text and exposes it in title", () => {
@@ -561,7 +580,9 @@ describe("DataTable CSS contract", () => {
           onRowClick={onRowClick}
         />,
       );
-      expect(screen.queryByText("Выплата")).toBeNull();
+      // Collapsed sub-rows exist only in the hidden measuring body (column widths), not as rows.
+      expect(screen.queryByRole("cell", { name: "Выплата" })).toBeNull();
+      expect(screen.getByText("Выплата").closest("tbody")).toHaveAttribute("aria-hidden", "true");
       // Only rows with children get a toggle.
       expect(screen.getAllByRole("button", { name: /Развернуть/ })).toHaveLength(1);
       const toggle = screen.getByRole("button", { name: "Развернуть: Денис" });
@@ -577,7 +598,7 @@ describe("DataTable CSS contract", () => {
       expect(collapse.getAttribute("aria-controls")?.split(" ")).toContain(child.id);
       expect(screen.getByText("Денис").closest("tr")).toHaveAttribute("data-expanded", "true");
       await user.click(collapse);
-      expect(screen.queryByText("Выплата")).toBeNull();
+      expect(screen.queryByRole("cell", { name: "Выплата" })).toBeNull();
     });
 
     it("marks rows newly added to the data for the enter animation, not the first fill", () => {
@@ -669,5 +690,43 @@ describe("DataTable CSS contract", () => {
       />,
     );
     expect(screen.queryByText(/Показано/)).toBeNull();
+  });
+
+  it("freezes column widths once rows are laid out and keeps them for fewer rows", () => {
+    let width = 120;
+    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({
+          width,
+          height: 20,
+          top: 0,
+          left: 0,
+          right: width,
+          bottom: 20,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        }) as DOMRect,
+    );
+    const cols: DataTableColumn<Row>[] = [{ id: "name", header: "Name", accessor: "name" }];
+    const { container, rerender } = render(
+      <DataTable.Root rows={rows} columns={cols} showPagination={false} pageSize={rows.length} />,
+    );
+    const table = container.querySelector("table") as HTMLTableElement;
+    const col = container.querySelector("colgroup col") as HTMLTableColElement;
+    expect(table.style.tableLayout).toBe("fixed");
+    expect(col.style.width).toBe("120px");
+    // A search narrows the rows: the column keeps its width.
+    width = 60;
+    rerender(
+      <DataTable.Root
+        rows={rows.slice(0, 1)}
+        columns={cols}
+        showPagination={false}
+        pageSize={rows.length}
+      />,
+    );
+    expect(col.style.width).toBe("120px");
+    spy.mockRestore();
   });
 });

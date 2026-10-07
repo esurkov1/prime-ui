@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+
 import { Select } from "./Select";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -814,7 +816,9 @@ function RichSelect({ defaultValue }: { defaultValue?: string }) {
             const v = VEHICLES.find((x) => x.value === value);
             return (
               <>
-                <Select.ItemMedia color="green">M</Select.ItemMedia>
+                <Thumbnail.Root color="green" data-testid="trigger-media">
+                  <Thumbnail.Fallback>M</Thumbnail.Fallback>
+                </Thumbnail.Root>
                 <Select.ItemText>{label}</Select.ItemText>
                 <Select.ItemDescription>{`${v?.kind} · ${v?.price}`}</Select.ItemDescription>
               </>
@@ -826,7 +830,9 @@ function RichSelect({ defaultValue }: { defaultValue?: string }) {
       <Select.Content searchable>
         {VEHICLES.map((v) => (
           <Select.Item key={v.value} value={v.value}>
-            <Select.ItemMedia color="blue">M</Select.ItemMedia>
+            <Thumbnail.Root color="blue" ratio="4:3">
+              <Thumbnail.Fallback>M</Thumbnail.Fallback>
+            </Thumbnail.Root>
             <Select.ItemText>{v.title}</Select.ItemText>
             <Select.ItemDescription>{v.kind}</Select.ItemDescription>
             <Select.ItemMeta>{v.price}</Select.ItemMeta>
@@ -838,6 +844,15 @@ function RichSelect({ defaultValue }: { defaultValue?: string }) {
 }
 
 describe("Select rich options", () => {
+  it("a Thumbnail is the leading media, sized to the tier unless it sets its own size", () => {
+    render(<RichSelect defaultValue="adv160" />);
+    const media = screen.getByTestId("trigger-media");
+    expect(media).toHaveAttribute("data-size", "s");
+    expect(media).toHaveAttribute("aria-hidden", "true");
+    const option = screen.getByRole("option", { name: /Honda ADV 160/, hidden: true });
+    expect(option.querySelector('[data-ratio="4:3"]')).toHaveAttribute("data-size", "s");
+  });
+
   it("rich item: title is the label, two-line layout, meta before the check", () => {
     render(<RichSelect defaultValue="adv160" />);
     const option = screen.getByRole("option", { name: /Honda ADV 160/, hidden: true });

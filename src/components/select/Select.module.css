@@ -21,9 +21,6 @@
   --sel-choice: var(--prime-control-s-choice);
   --sel-desc-size: var(--prime-text-body-s-size);
   --sel-desc-lh: var(--prime-text-body-s-line-height);
-  --sel-media-h: var(--prime-space-7);
-  --sel-media-w: var(--prime-space-10);
-  --sel-media-radius: var(--prime-radius-s);
 }
 
 [data-size="xs"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
@@ -38,9 +35,6 @@
   --sel-choice: var(--prime-control-xs-choice);
   --sel-desc-size: var(--prime-text-caption-size);
   --sel-desc-lh: var(--prime-text-caption-line-height);
-  --sel-media-h: var(--prime-space-5);
-  --sel-media-w: var(--prime-space-7);
-  --sel-media-radius: var(--prime-radius-xs);
 }
 
 [data-size="s"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
@@ -55,9 +49,6 @@
   --sel-choice: var(--prime-control-xs-choice);
   --sel-desc-size: var(--prime-text-caption-size);
   --sel-desc-lh: var(--prime-text-caption-line-height);
-  --sel-media-h: var(--prime-space-6);
-  --sel-media-w: var(--prime-space-8);
-  --sel-media-radius: var(--prime-radius-xs);
 }
 
 [data-size="l"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
@@ -72,9 +63,6 @@
   --sel-choice: var(--prime-control-m-choice);
   --sel-desc-size: var(--prime-text-body-s-size);
   --sel-desc-lh: var(--prime-text-body-s-line-height);
-  --sel-media-h: var(--prime-space-8);
-  --sel-media-w: var(--prime-space-12);
-  --sel-media-radius: var(--prime-radius-m);
 }
 
 [data-size="xl"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
@@ -89,9 +77,6 @@
   --sel-choice: var(--prime-control-l-choice);
   --sel-desc-size: var(--prime-text-body-s-size);
   --sel-desc-lh: var(--prime-text-body-s-line-height);
-  --sel-media-h: var(--prime-space-10);
-  --sel-media-w: var(--prime-space-14);
-  --sel-media-radius: var(--prime-radius-m);
 }
 
 .spinner {
@@ -287,15 +272,28 @@
   color: var(--prime-color-text-disabled);
 }
 
+/*
+ * Clear: a full-height segment before the chevron, with the trigger's usual gap on both sides, so
+ * its hover wash touches neither the value nor the chevron. The icon sits half a padX inside it.
+ */
 .triggerClear {
-  border-radius: var(--prime-radius-xs);
+  align-self: stretch;
+  width: calc(var(--sel-icon) + var(--sel-px));
+  height: auto;
   cursor: pointer;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .triggerClear:hover {
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-primary);
+}
+
+.triggerClear svg {
+  width: var(--sel-icon);
+  height: var(--sel-icon);
 }
 
 /* ─── Native <select> ─────────────────────────────────────────────────────── */
@@ -573,80 +571,9 @@
   white-space: nowrap;
 }
 
+/* Thumbnail.Root as the leading media of a rich row: placement only, the look is the Thumbnail's. */
 .itemMedia {
-  display: inline-flex;
   flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--sel-media-w);
-  height: var(--sel-media-h);
-  overflow: hidden;
-  border-radius: var(--sel-media-radius);
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-secondary);
-}
-
-.itemMedia > svg {
-  display: block;
-  width: var(--sel-icon);
-  height: var(--sel-icon);
-}
-
-.itemMedia > img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.itemMedia[data-color="gray"] {
-  background: var(--prime-color-palette-gray-soft);
-  color: var(--prime-color-palette-gray-text);
-}
-
-.itemMedia[data-color="blue"] {
-  background: var(--prime-color-palette-blue-soft);
-  color: var(--prime-color-palette-blue-text);
-}
-
-.itemMedia[data-color="green"] {
-  background: var(--prime-color-palette-green-soft);
-  color: var(--prime-color-palette-green-text);
-}
-
-.itemMedia[data-color="orange"] {
-  background: var(--prime-color-palette-orange-soft);
-  color: var(--prime-color-palette-orange-text);
-}
-
-.itemMedia[data-color="red"] {
-  background: var(--prime-color-palette-red-soft);
-  color: var(--prime-color-palette-red-text);
-}
-
-.itemMedia[data-color="yellow"] {
-  background: var(--prime-color-palette-yellow-soft);
-  color: var(--prime-color-palette-yellow-text);
-}
-
-.itemMedia[data-color="purple"] {
-  background: var(--prime-color-palette-purple-soft);
-  color: var(--prime-color-palette-purple-text);
-}
-
-.itemMedia[data-color="sky"] {
-  background: var(--prime-color-palette-sky-soft);
-  color: var(--prime-color-palette-sky-text);
-}
-
-.itemMedia[data-color="pink"] {
-  background: var(--prime-color-palette-pink-soft);
-  color: var(--prime-color-palette-pink-text);
-}
-
-.itemMedia[data-color="teal"] {
-  background: var(--prime-color-palette-teal-soft);
-  color: var(--prime-color-palette-teal-text);
 }
 
 .trigger:disabled :is(.itemDescription, .itemMeta),

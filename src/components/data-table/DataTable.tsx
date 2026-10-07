@@ -26,6 +26,11 @@ export type DataTableColumn<Row> = {
   sortAccessor?: (row: Row) => unknown;
   sortComparator?: (a: Row, b: Row, order: DataTableOrder) => number;
   align?: CellAlign;
+  /**
+   * Header alignment, independent of `align`: headers start at the start edge so every header lines
+   * up, with the sort indicator at the end edge.
+   */
+  headerAlign?: CellAlign;
   width?: string;
   minWidth?: string;
   /** Ограничение ширины колонки (например `12rem` или `min(100%, 20rem)`). */
@@ -490,9 +495,21 @@ function DataTableRoot<Row>({
     return sortedRows.slice(from, to);
   }, [infiniteScroll, safePage, safePageSize, sortedRows, visibleRowCount]);
 
-  /** Rendered rows in order: page rows plus the sub-rows of expanded rows. */
-  const flatRows = React.useMemo(() => {
+  /**
+   * Rendered rows in order: page rows plus the sub-rows of expanded rows. `measureRows` are the
+   * sub-rows of collapsed rows: drawn collapsed so the columns are already as wide as they will be
+   * once a row opens.
+   */
+  const { flatRows, measureRows } = React.useMemo(() => {
     const out: FlatRow<Row>[] = [];
+    const measure: { row: Row; key: React.Key; depth: number }[] = [];
+    const collect = (list: Row[], depth: number, parentKey: React.Key) => {
+      list.forEach((row, i) => {
+        const key = keyOf(row, i, parentKey);
+        measure.push({ row, key, depth });
+        collect(childrenOf(row), depth + 1, key);
+      });
+    };
     const visit = (
       list: Row[],
       depth: number,
@@ -519,12 +536,14 @@ function DataTableRoot<Row>({
         });
         if (isExpanded && children.length > 0) {
           visit(children, depth + 1, key, parentAnimate || lastExpandedKey === key, 0);
+        } else if (expandEnabled && children.length > 0) {
+          collect(children, depth + 1, key);
         }
       });
     };
     const pageOffset = infiniteScroll ? 0 : (safePage - 1) * safePageSize;
     visit(displayedRows, 0, null, false, pageOffset);
-    return out;
+    return { flatRows: out, measureRows: measure };
   }, [
     addedKeys,
     childrenOf,
@@ -575,6 +594,64 @@ function DataTableRoot<Row>({
   const ignoreChangeRef = React.useRef(false);
   const dragCleanupRef = React.useRef<(() => void) | null>(null);
   const tableRef = React.useRef<HTMLTableElement | null>(null);
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+
+  /*
+   * Stable column widths. The browser sizes columns by the rows on screen, so searching, filtering,
+   * paging or opening a row would make every column jump. Once real rows are laid out, the widths
+   * are frozen into the colgroup (`table-layout: fixed`); later renders keep them. They are measured
+   * again (never narrower than before) when content stops fitting, and from scratch when the column
+   * set or the container width changes. `grow` columns keep taking the free width.
+   */
+  const frozenWidths = React.useRef<number[] | null>(null);
+  const columnsKey = columns.map((column) => column.id).join("\u0000");
+  const unfreezeColumns = React.useCallback(() => {
+    frozenWidths.current = null;
+    const table = tableRef.current;
+    if (!table) return;
+    table.style.tableLayout = "";
+    for (const col of table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col")) {
+      col.style.width = "";
+    }
+  }, []);
+  const freezeColumns = React.useCallback(() => {
+    const table = tableRef.current;
+    const lead = table?.tHead?.rows[0] ?? table?.tBodies[0]?.rows[0];
+    if (!table || !lead) return;
+    const cols = [...table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col")];
+    if (cols.length !== lead.cells.length) return;
+    const previous = frozenWidths.current;
+    // Measure the natural layout of what is on screen now.
+    table.style.tableLayout = "";
+    for (const col of cols) col.style.width = "";
+    const measured = [...lead.cells].map((cell) => cell.getBoundingClientRect().width);
+    // Not laid out (hidden, or a test DOM): nothing to freeze.
+    if (measured.every((width) => width === 0)) return;
+    const widths = measured.map((width, index) => Math.max(width, previous?.[index] ?? 0));
+    cols.forEach((col, index) => {
+      if (col.dataset.grow !== "true") col.style.width = `${widths[index]}px`;
+    });
+    table.style.tableLayout = "fixed";
+    frozenWidths.current = widths;
+  }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new column set starts from scratch.
+  React.useLayoutEffect(() => {
+    unfreezeColumns();
+  }, [columnsKey, unfreezeColumns]);
+  React.useEffect(() => {
+    const root = rootRef.current;
+    if (!root || typeof ResizeObserver === "undefined") return;
+    let lastWidth = root.getBoundingClientRect().width;
+    const observer = new ResizeObserver(() => {
+      const width = root.getBoundingClientRect().width;
+      if (Math.abs(width - lastWidth) < 1) return;
+      lastWidth = width;
+      unfreezeColumns();
+      freezeColumns();
+    });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [unfreezeColumns, freezeColumns]);
 
   React.useEffect(() => () => dragCleanupRef.current?.(), []);
 
@@ -756,11 +833,29 @@ function DataTableRoot<Row>({
     !hasError && infiniteScroll && (hasInternalMore || loadingMore || canRequestMore);
   const showFooter = showRangeMeta || showPaginationControl || showInfiniteMeta;
   const bodyRows = hasError ? [] : flatRows;
+
+  // After every render: freeze widths once real rows are laid out; widen a column whose content
+  // no longer fits (a longer value, a deeper row). Loading, empty and error states keep the widths.
+  React.useLayoutEffect(() => {
+    const table = tableRef.current;
+    if (!table || hasError || showSkeleton || displayedRows.length === 0) return;
+    if (!frozenWidths.current) {
+      freezeColumns();
+      return;
+    }
+    for (const cell of table.querySelectorAll<HTMLTableCellElement>(":scope > tbody > tr > td")) {
+      if (cell.scrollWidth > cell.clientWidth + 1) {
+        freezeColumns();
+        return;
+      }
+    }
+  });
   const skeletonCount = Math.max(1, loadingRows ?? Math.min(safePageSize, SKELETON_DEFAULT_ROWS));
 
   return (
     <ControlSizeProvider value={size}>
       <div
+        ref={rootRef}
         className={cx(styles.root, className)}
         {...toDataAttributes({
           size,
@@ -793,6 +888,13 @@ function DataTableRoot<Row>({
             aria-busy={loading || loadingMore ? true : undefined}
             onMouseLeave={highlightColumnOnHover ? clearHoveredColumn : undefined}
           >
+            <colgroup>
+              {selectable ? <col /> : null}
+              {expandEnabled ? <col /> : null}
+              {columns.map((column) => (
+                <col key={column.id} data-grow={column.grow ? "true" : undefined} />
+              ))}
+            </colgroup>
             {showHeader ? (
               <thead className={styles.head}>
                 <tr className={styles.headRow}>
@@ -830,7 +932,7 @@ function DataTableRoot<Row>({
                     />
                   ) : null}
                   {columns.map((column, columnIndex) => {
-                    const align = columnAlign(column);
+                    const align = column.headerAlign ?? "start";
                     const indicator = sortIndicator(sortState, column.id);
                     const isSortable = Boolean(column.sortable);
                     const isFirstColumn = columnIndex === 0;
@@ -1098,6 +1200,46 @@ function DataTableRoot<Row>({
                 );
               })}
             </tbody>
+
+            {measureRows.length > 0 && !hasError ? (
+              <tbody className={styles.measureBody} aria-hidden="true" inert>
+                {measureRows.map(({ row, key, depth }) => (
+                  <tr
+                    key={`measure-${String(key)}`}
+                    className={styles.row}
+                    style={{ "--dt-depth": depth } as React.CSSProperties}
+                    data-depth={depth}
+                  >
+                    {selectable ? <td className={cx(styles.cell, styles.selectCell)} /> : null}
+                    {expandEnabled ? <td className={cx(styles.cell, styles.toggleCell)} /> : null}
+                    {columns.map((column, columnIndex) => {
+                      const content = renderColumnCell(row, column);
+                      return (
+                        <td
+                          key={column.id}
+                          className={styles.cell}
+                          style={columnSizeStyle(column)}
+                          data-align={columnAlign(column)}
+                          data-numeric={column.numeric ? "true" : undefined}
+                          data-first-column={columnIndex === 0 ? "true" : undefined}
+                        >
+                          {column.truncate ? (
+                            <span
+                              className={styles.truncate}
+                              style={{ maxWidth: column.maxWidth ?? column.width }}
+                            >
+                              {content}
+                            </span>
+                          ) : (
+                            content
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            ) : null}
           </table>
 
           {infiniteScroll ? (

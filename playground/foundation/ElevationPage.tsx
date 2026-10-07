@@ -70,7 +70,7 @@ function LayerStack() {
   return (
     <div className={s.layerStage} aria-hidden>
       <LayerTag>bg.canvas</LayerTag>
-      <Card.Root className={s.layerCard}>
+      <Card.Root variant="cta" className={s.layerCard}>
         <LayerTag>bg.surface · shadow.raised</LayerTag>
         <StaticField value="Квартальный отчёт" />
         <StaticField value="Маркетинг" />

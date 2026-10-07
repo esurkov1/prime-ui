@@ -268,4 +268,18 @@ describe("Popover — overlay contract", () => {
     fireEvent.pointerDown(document.body);
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it("flush marks the panel for edge-to-edge content", () => {
+    render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>
+          <button type="button">Open</button>
+        </Popover.Trigger>
+        <Popover.Content flush>
+          <div>Rows</div>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-flush", "true");
+  });
 });

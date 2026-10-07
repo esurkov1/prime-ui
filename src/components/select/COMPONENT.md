@@ -36,7 +36,7 @@ Select.Root                     field frame: label · control · hint/error; val
    │  ├─ Select.GroupLabel      group heading
    │  └─ Select.Item            role="option"
    │     ├─ Select.ItemIcon     icon before the text (optional)
-   │     ├─ Select.ItemMedia    thumbnail tile (optional, makes the row two-line)
+   │     ├─ Thumbnail.Root      leading preview (optional, makes the row two-line; sized to the tier)
    │     ├─ Select.ItemText     title (optional; plain text children also work)
    │     ├─ Select.ItemDescription  muted second line (optional)
    │     └─ Select.ItemMeta     trailing meta before the check (optional)
@@ -90,7 +90,7 @@ Ref: `forwardRef` → `HTMLButtonElement`.
 ### Select.Value
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `(item: { value: string; label: string }) => ReactNode` | — | Single mode only: renders the selected option (e.g. `ItemMedia` + `ItemText` + `ItemDescription`); not called while empty. |
+| `children` | `(item: { value: string; label: string }) => ReactNode` | — | Single mode only: renders the selected option (e.g. `Thumbnail.Root` + `ItemText` + `ItemDescription`); not called while empty. |
 | `className` | `string` | — | Class on the value `<span>`. |
 
 With `multiple`, the labels of selected options are joined with `", "`.
@@ -137,12 +137,8 @@ Ref: `forwardRef` → `HTMLDivElement`. No other native props.
 
 + native `<span>` props.
 
-### Select.ItemMedia
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | — | Tile hue (soft fill + hue icon); without it a neutral fill. |
-| `children` | `ReactNode` | — (required) | An icon or an `<img>` (covers the tile). |
-| `className` | `string` | — | Class on the tile. |
+### Leading media: Thumbnail.Root
+The preview of a rich option is a [Thumbnail](../thumbnail/COMPONENT.md) placed as a direct child of `Select.Item` (or of the `Select.Value` render result): an icon in `Thumbnail.Fallback`, a picture in `Thumbnail.Image`, the hue in `color`, the shape in `ratio`. Without its own `size` it takes the Thumbnail tier that fits the row: Select `xs`/`s` → `xs`, `m`/`l` → `s`, `xl` → `m`. It is decorative (`aria-hidden`); the text of the option names it.
 
 ### Select.ItemText · Select.ItemDescription · Select.ItemMeta
 | Prop | Type | Default | Description |
@@ -158,7 +154,7 @@ Ref: `forwardRef` → `HTMLDivElement`. No other native props.
 | `Select.Separator` | native `<hr>` props | Hairline between groups. |
 
 ## Variants
-No `variant`/`tone`. Axes: `size`, mode (`multiple`, `native`), visual flags (`clearable`, `loading`, `searchable`), `color` (Badge, ItemMedia), rich option layout.
+No `variant`/`tone`. Axes: `size`, mode (`multiple`, `native`), visual flags (`clearable`, `loading`, `searchable`), `color` (Badge), rich option layout.
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -179,22 +175,21 @@ No `variant`/`tone`. Axes: `size`, mode (`multiple`, `native`), visual flags (`c
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `clearable` | × before the chevron while a value is set | the field is optional and can be reset | `false` |
+| `clearable` | × before the chevron while a value is set: a full-height segment (`icon + padX` wide, the trigger gap to the value and to the chevron) that takes a hover wash as a whole | the field is optional and can be reset | `false` |
 | `loading` | spinner instead of the chevron, «Загрузка…» row in the panel | options load asynchronously | `false` |
 | `searchable` (Content) | search row with a hairline at the top of the panel | more than ~10 options | `false` |
 
-### color (Select.Badge, Select.ItemMedia)
+### color (Select.Badge)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `gray` | neutral soft fill (Badge uses `fill-strong` so it reads on the field) | neutral status | Badge default |
 | `blue` · `green` · `orange` · `red` · `yellow` · `purple` · `sky` · `pink` · `teal` | soft fill of the hue, hue text/icon | categorising options or showing a status | |
-| none (ItemMedia) | neutral tile | thumbnails / images | ItemMedia default |
 
 ### Rich option layout
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | plain | one line of text, check on the right | most lists | yes |
-| rich (`ItemMedia` or `ItemDescription`) | two lines with a tile on the left (`data-rich`); trigger grows the same way via a `Select.Value` function | products, people, vehicles | |
+| rich (`Thumbnail.Root` or `ItemDescription`) | two lines with a Thumbnail on the left (`data-rich`); trigger grows the same way via a `Select.Value` function | products, people, vehicles | |
 
 **Combinations**
 - `multiple` + `native` → allowed (system multi list) but rare; prefer combobox `multiple` or TagSelect.
@@ -245,9 +240,10 @@ Controlled: `value` + `onValueChange`, `open` + `onOpenChange`. Uncontrolled: `d
 |---|---|---|
 | [sizes.tsx](examples/sizes.tsx) | All size tiers | Aligning with other controls |
 | [states.tsx](examples/states.tsx) | Placeholder, selected, clearable, loading, error, disabled, empty list | Reference for every state |
+| [clearable.tsx](examples/clearable.tsx) | `clearable` in sizes s, m, l with a value selected: the full-height clear segment before the chevron | Optional fields that can be reset |
 | [search-groups.tsx](examples/search-groups.tsx) | `searchable`, `keywords`, groups, separator, disabled option | Long lists |
 | [multiple.tsx](examples/multiple.tsx) | Controlled `multiple` | A few values from a short list |
-| [rich-options.tsx](examples/rich-options.tsx) | ItemMedia (colours), ItemText, ItemDescription, ItemMeta, `Select.Value` render function | Options with thumbnails and meta |
+| [rich-options.tsx](examples/rich-options.tsx) | Thumbnail (colours, 4:3), ItemText, ItemDescription, ItemMeta, `Select.Value` render function | Options with thumbnails and meta |
 | [in-form.tsx](examples/in-form.tsx) | Card form: `required`, `hint`, `optional`, groups, `TriggerIcon`, item `label` | Selects inside forms |
 | [controlled.tsx](examples/controlled.tsx) | `value` + `onValueChange`, `aria-label` on trigger | Selection drives other UI; surfaces |
 | [native.tsx](examples/native.tsx) | `native` with label and hint | OS picker on mobile |
@@ -279,7 +275,8 @@ export function RoleSelect() {
 - `error` text plus `invalid` → `error` alone is enough.
 - `clearable` / `searchable` with `native` → not supported; use the combobox mode.
 - Expecting `name` to submit the combobox value → only `native` has `name`; submit from state.
-- Rich parts wrapped in a custom component → `ItemMedia` / `ItemText` / `ItemDescription` / `ItemMeta` must be direct children (fragments are fine).
+- Rich parts wrapped in a custom component → `Thumbnail.Root` / `ItemText` / `ItemDescription` / `ItemMeta` must be direct children (fragments are fine).
+- A hand-made image or icon tile in an option → use `Thumbnail.Root`.
 
 ## Related
 [TagSelect](../tag-select/COMPONENT.md) · [Radio](../radio/COMPONENT.md) · [SegmentedControl](../segmented-control/COMPONENT.md) · [Dropdown](../dropdown/COMPONENT.md) · [Input](../input/COMPONENT.md) · [Datepicker](../datepicker/COMPONENT.md)

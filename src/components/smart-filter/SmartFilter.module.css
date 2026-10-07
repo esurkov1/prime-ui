@@ -22,9 +22,15 @@
   min-width: 0;
 }
 
-/* As wide as the toolbar it hangs from, not capped at the popover's default width. */
-.panel.panel {
-  max-width: var(--float-max-w, 100vw);
+/*
+ * The panel is a flush Popover: every section is a full-width row and Dividers between them run
+ * edge to edge. Each row carries the side padding itself.
+ */
+
+/* The text search row: a muted band; the button inside keeps a focus-space inset. */
+.queryRow {
+  padding: var(--prime-space-1);
+  background: var(--prime-color-fill-subtle);
 }
 
 /* The key goes to the end; the label keeps to the start. */
@@ -37,6 +43,12 @@
   grid-template-columns: var(--prime-space-24) minmax(0, 1fr);
   align-items: baseline;
   gap: var(--prime-space-4);
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+.note {
+  margin: 0;
+  padding: var(--prime-space-3) var(--prime-space-4);
 }
 
 .values {
@@ -55,8 +67,10 @@
   display: flex;
   align-items: center;
   gap: var(--prime-space-3);
+  padding: var(--prime-space-2) var(--prime-space-4);
 }
 
+/* The hint takes the row; the counter and Reset sit at the end. */
 .hint {
   flex: 1;
   min-width: 0;

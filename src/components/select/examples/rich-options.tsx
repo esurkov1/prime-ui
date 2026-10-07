@@ -1,6 +1,6 @@
-/** Rich options with ItemMedia, ItemText, ItemDescription and ItemMeta, and the trigger rendering the selected option via a Select.Value function. Use it when options need a thumbnail, a second line or a price. */
+/** Rich options with a Thumbnail, ItemText, ItemDescription and ItemMeta, and the trigger rendering the selected option via a Select.Value function. Use it when options need a thumbnail, a second line or a price. */
 import { Bike } from "lucide-react";
-import { type PaletteColor, Select } from "prime-ui-kit";
+import { type PaletteColor, Select, Thumbnail } from "prime-ui-kit";
 
 type Vehicle = {
   value: string;
@@ -69,9 +69,11 @@ export default function SelectRichOptionsExample() {
             if (!v) return value;
             return (
               <>
-                <Select.ItemMedia color={v.color}>
-                  <Bike />
-                </Select.ItemMedia>
+                <Thumbnail.Root ratio="4:3" color={v.color}>
+                  <Thumbnail.Fallback>
+                    <Bike />
+                  </Thumbnail.Fallback>
+                </Thumbnail.Root>
                 <Select.ItemText>{v.title}</Select.ItemText>
                 <Select.ItemDescription>
                   {v.kind} · {v.price}
@@ -84,9 +86,11 @@ export default function SelectRichOptionsExample() {
       <Select.Content searchable>
         {vehicles.map((v) => (
           <Select.Item key={v.value} value={v.value}>
-            <Select.ItemMedia color={v.color}>
-              <Bike />
-            </Select.ItemMedia>
+            <Thumbnail.Root ratio="4:3" color={v.color}>
+              <Thumbnail.Fallback>
+                <Bike />
+              </Thumbnail.Fallback>
+            </Thumbnail.Root>
             <Select.ItemText>{v.title}</Select.ItemText>
             <Select.ItemDescription>{v.kind}</Select.ItemDescription>
             <Select.ItemMeta>{v.price}</Select.ItemMeta>

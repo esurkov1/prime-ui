@@ -1,5 +1,7 @@
 import InputAnatomyExample from "@/components/input/examples/anatomy";
 import anatomySource from "@/components/input/examples/anatomy.tsx?raw";
+import InputClearButtonExample from "@/components/input/examples/clear-button";
+import clearButtonSource from "@/components/input/examples/clear-button.tsx?raw";
 import InputControlAlignmentExample from "@/components/input/examples/control-alignment";
 import alignRowSource from "@/components/input/examples/control-alignment.tsx?raw";
 import InputControlledExample from "@/components/input/examples/controlled";
@@ -413,6 +415,24 @@ export default function InputSection() {
             >
               <PlaygroundExampleFrame.Stage>
                 <InputControlledExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Кнопка очистки</DemoSectionTitle>
+            <DemoDescription>
+              <code>Input.ClearButton</code> — сегмент на всю высоту поля у правого края: вся правая
+              часть кликабельна и подсвечивается целиком, иконка стоит на отступе поля от текста и
+              от края. Показывайте её, только пока в поле есть значение; после клика фокус
+              возвращается в поле.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={clearButtonSource.trim()}
+              previewLayout="stack-narrow"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <InputClearButtonExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>

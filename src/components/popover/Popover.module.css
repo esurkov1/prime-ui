@@ -184,3 +184,10 @@
     align-items: stretch;
   }
 }
+
+/* Flush: rows reach the panel edges; the content owns its spacing. */
+.popoverScroll[data-flush="true"] {
+  --po-pad: 0px;
+  --po-inset-extra: 0px;
+  --po-gap: 0px;
+}

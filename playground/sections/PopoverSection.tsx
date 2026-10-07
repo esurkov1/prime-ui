@@ -7,6 +7,8 @@ import PopoverControlledExample from "@/components/popover/examples/controlled";
 import controlledSource from "@/components/popover/examples/controlled.tsx?raw";
 import PopoverFeaturesExample from "@/components/popover/examples/features";
 import featuresSource from "@/components/popover/examples/features.tsx?raw";
+import PopoverFlushListExample from "@/components/popover/examples/flush-list";
+import flushListSource from "@/components/popover/examples/flush-list.tsx?raw";
 import PopoverFullWidthExample from "@/components/popover/examples/full-width";
 import fullWidthSource from "@/components/popover/examples/full-width.tsx?raw";
 import PopoverInsetVariantsExample from "@/components/popover/examples/inset-variants";
@@ -135,6 +137,13 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
     required: "Нет",
     description:
       "Поднять панель над выпадающим списком того же слоя — если триггер внутри Select/TagSelect или Dropdown.",
+  },
+  {
+    prop: "flush",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Без внутренних полей и зазора: строки и разделители доходят до краёв панели.",
   },
   {
     prop: "children",
@@ -329,6 +338,19 @@ export default function PopoverSection() {
             <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
                 <PopoverFeaturesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Строки на всю ширину</DemoSectionTitle>
+            <DemoDescription>
+              <code>flush</code> убирает внутренние поля и зазор панели: строки доходят до краёв, а{" "}
+              <code>Divider</code> между ними идёт от края до края. Отступы задаёт каждая строка.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={flushListSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <PopoverFlushListExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>

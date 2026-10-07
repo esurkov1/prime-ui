@@ -53,4 +53,11 @@ describe("Thumbnail", () => {
     );
     expect(screen.getByRole("img", { name: "Логотип" })).toHaveAttribute("data-fit", "contain");
   });
+
+  it("has no outline by default; ring adds one", () => {
+    const { rerender, container } = render(<Thumbnail.Root aria-label="t" />);
+    expect(container.firstElementChild).not.toHaveAttribute("data-ring");
+    rerender(<Thumbnail.Root aria-label="t" ring />);
+    expect(container.firstElementChild).toHaveAttribute("data-ring", "true");
+  });
 });

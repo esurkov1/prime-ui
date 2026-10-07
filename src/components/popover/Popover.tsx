@@ -154,6 +154,11 @@ export type PopoverContentProps = {
    * Используйте, если триггер внутри Select/TagSelect listbox или другого dropdown.
    */
   stackAboveDropdown?: boolean;
+  /**
+   * No inner padding and no gap: rows reach the panel edges (lists with full-width dividers, filter
+   * panels). The content lays out its own spacing and uses inset focus rings.
+   */
+  flush?: boolean;
   children: React.ReactNode;
   className?: string;
 };
@@ -167,6 +172,7 @@ function PopoverContent({
   insetPadding = "none",
   insetGap = "pad",
   stackAboveDropdown = false,
+  flush = false,
   children,
   className,
 }: PopoverContentProps) {
@@ -240,6 +246,7 @@ function PopoverContent({
             data-size={size}
             data-inset-padding={insetPadding}
             data-inset-gap={insetGap}
+            data-flush={flush || undefined}
             className={cx(styles.popoverScroll, overlayMotion.floating, className)}
             style={layout?.style}
             onAnimationEnd={presence.onExitEnd}

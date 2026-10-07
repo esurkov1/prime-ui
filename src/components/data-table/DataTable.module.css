@@ -421,6 +421,11 @@
   padding-inline-start: calc(var(--dt-pad-x) + var(--dt-depth) * var(--dt-indent));
 }
 
+/* Sub-rows of collapsed rows: laid out for the column widths, never shown or reachable. */
+.measureBody > .row {
+  visibility: collapse;
+}
+
 .truncate {
   display: block;
   min-width: 0;
@@ -445,10 +450,6 @@
 /* Expanded parent: one opaque step off the table fill, so its group reads as one. */
 .row[data-expanded="true"] {
   --dt-cell-bg: var(--dt-step);
-}
-
-.row[data-expanded="true"] > .cell[data-first-column="true"] {
-  font-weight: var(--prime-font-weight-medium);
 }
 
 /* Rows mounted by an expand, or newly added to the data, fade in while settling by space-1.

@@ -393,7 +393,6 @@ export type {
   SelectGroupProps,
   SelectItemDescriptionProps,
   SelectItemIconProps,
-  SelectItemMediaProps,
   SelectItemMetaProps,
   SelectItemProps,
   SelectItemTextProps,

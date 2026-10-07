@@ -304,7 +304,7 @@ function SmartFilterToolbar({ className }: SmartFilterToolbarProps) {
         </div>
       </Popover.Anchor>
       {hasFilters && (
-        <Popover.Content sameMinWidthAsTrigger size={size} className={styles.panel}>
+        <Popover.Content sameMinWidthAsTrigger flush size={size}>
           <Panel />
         </Popover.Content>
       )}
@@ -370,73 +370,82 @@ function Panel() {
     setSelection(field.key, toggleSelectionMode(selection, option, mode));
   };
 
-  return (
-    <>
-      <Popover.Title className={styles.srOnly}>{labels.filter}</Popover.Title>
-      {query && (
-        <Button.Root
-          variant="soft"
-          tone="neutral"
-          size={SMALLER[size]}
-          fullWidth
-          className={styles.query}
-          onClick={() => setOpen(false)}
-        >
-          <Button.Icon>
-            <Icon name="action.search" />
-          </Button.Icon>
-          {fill(labels.searchText, { query })}
-          <Kbd.Root className={styles.queryKey}>↵</Kbd.Root>
-        </Button.Root>
-      )}
-      {visible.map(({ field, selection, options }, index) => {
-        const collapsible = !query && options.length > collapsedLimit && !expanded.has(field.key);
-        const shown = collapsible ? options.slice(0, collapsedLimit) : options;
-        const all = field.options.map((o) => o.value);
-        return (
-          <React.Fragment key={field.key}>
-            {index > 0 && <Divider.Root role="presentation" />}
-            <div className={styles.row} data-field={field.key}>
-              <Typography.Root as="span" variant="body-s" tone="secondary">
-                {field.label}
-              </Typography.Root>
-              <div className={styles.values}>
-                {shown.map((option) => (
-                  <ValueToggle
-                    key={option.value}
-                    option={option}
-                    size={size}
-                    mode={selectionModeOf(selection, option.value)}
-                    canHide={
-                      field.finite === false || canExcludeValue(selection, option.value, all)
-                    }
-                    query={query}
-                    onMode={(mode) => setMode(field, option.value, mode)}
-                  />
-                ))}
-                {collapsible && (
-                  <Badge.Root
-                    size={size}
-                    variant="outline"
-                    onPress={() => setExpanded((prev) => new Set(prev).add(field.key))}
-                  >
-                    {fill(labels.more, { count: options.length - collapsedLimit })}
-                    <Badge.Icon>
-                      <ChevronDown />
-                    </Badge.Icon>
-                  </Badge.Root>
-                )}
-              </div>
-            </div>
-          </React.Fragment>
-        );
-      })}
-      {empty.length > 0 && (
-        <Typography.Root as="p" variant="caption" tone="muted">
+  const sections: { key: string; node: React.ReactNode }[] = [];
+  if (query) {
+    sections.push({
+      key: "query",
+      node: (
+        <div className={styles.queryRow}>
+          <Button.Root
+            variant="ghost"
+            tone="neutral"
+            size={size}
+            fullWidth
+            onClick={() => setOpen(false)}
+          >
+            <Button.Icon>
+              <Icon name="action.search" />
+            </Button.Icon>
+            {fill(labels.searchText, { query })}
+            <Kbd.Root className={styles.queryKey}>↵</Kbd.Root>
+          </Button.Root>
+        </div>
+      ),
+    });
+  }
+  for (const { field, selection, options } of visible) {
+    const collapsible = !query && options.length > collapsedLimit && !expanded.has(field.key);
+    const shown = collapsible ? options.slice(0, collapsedLimit) : options;
+    const all = field.options.map((o) => o.value);
+    sections.push({
+      key: `field:${field.key}`,
+      node: (
+        <div className={styles.row} data-field={field.key}>
+          <Typography.Root as="span" variant="body-s" tone="secondary">
+            {field.label}
+          </Typography.Root>
+          <div className={styles.values}>
+            {shown.map((option) => (
+              <ValueToggle
+                key={option.value}
+                option={option}
+                size={size}
+                mode={selectionModeOf(selection, option.value)}
+                canHide={field.finite === false || canExcludeValue(selection, option.value, all)}
+                query={query}
+                onMode={(mode) => setMode(field, option.value, mode)}
+              />
+            ))}
+            {collapsible && (
+              <Badge.Root
+                size={size}
+                variant="outline"
+                onPress={() => setExpanded((prev) => new Set(prev).add(field.key))}
+              >
+                {fill(labels.more, { count: options.length - collapsedLimit })}
+                <Badge.Icon>
+                  <ChevronDown />
+                </Badge.Icon>
+              </Badge.Root>
+            )}
+          </div>
+        </div>
+      ),
+    });
+  }
+  if (empty.length > 0) {
+    sections.push({
+      key: "empty",
+      node: (
+        <Typography.Root as="p" variant="caption" tone="muted" className={styles.note}>
           {fill(labels.noMatches, { fields: empty.join(", ") })}
         </Typography.Root>
-      )}
-      <Divider.Root role="presentation" />
+      ),
+    });
+  }
+  sections.push({
+    key: "footer",
+    node: (
       <div className={styles.footer}>
         <Typography.Root as="span" variant="caption" tone="muted" className={styles.hint}>
           {labels.hint}
@@ -450,6 +459,18 @@ function Panel() {
           </Button.Root>
         )}
       </div>
+    ),
+  });
+
+  return (
+    <>
+      <Popover.Title className={styles.srOnly}>{labels.filter}</Popover.Title>
+      {sections.map((section, index) => (
+        <React.Fragment key={section.key}>
+          {index > 0 && <Divider.Root role="presentation" />}
+          {section.node}
+        </React.Fragment>
+      ))}
     </>
   );
 }

@@ -24,11 +24,11 @@ import { SmartFilter, matchesSmartFilter, resolveSmartFilterValues } from "prime
 ```
 SmartFilter.Root                  state + context, no panel of its own (flex column)
 ├─ SmartFilter.Toolbar            [Filter button (count Badge)] [search Input] — the anchor of the panel
-│  └─ panel (Popover.Content)     portaled, as wide as the toolbar
-│     ├─ query row                Button «Искать «text»» + Kbd ↵, while typing
-│     ├─ field rows               Typography label · value Badges with «−» Badge.Action (· «Ещё N» Badge), Divider between
-│     ├─ no-matches note          Typography caption, while typing
-│     └─ footer                   Divider · hint · count · Reset Button
+│  └─ panel (Popover.Content flush) portaled, as wide as the toolbar; sections split by edge-to-edge Dividers
+│     ├─ query row                muted band: ghost Button «Искать «text»» + Kbd ↵, while typing
+│     ├─ field rows               Typography label · value Badges with «−» Badge.Action (· «Ещё N» Badge)
+│     ├─ no-matches row           Typography caption, while typing
+│     └─ footer                   hint · count · Reset Button
 └─ SmartFilter.Chips              applied filters as Badge ×N · add / clear all Buttons (nothing without filters)
 ```
 Everything is built from kit components (Button, Badge, Input, Icon, Popover, Divider, Typography, Kbd, Badge with `onRemove`, `onPress` and `Badge.Action`); the component's own CSS only lays them out. The toolbar and the chips are separate parts so a page can put them in different places (the toolbar in a header strip, the chips under it). The panel opens on the filter button and when the search gets focus.
@@ -119,7 +119,7 @@ Values and applied filters are `Badge`s of the root `size` (badge tiers sit belo
 | no filters | No count on the button, no `Chips`. |
 
 ## Layout & spacing
-- The panel is as wide as the toolbar and aligned to its start; it keeps the popover's own padding and gap, rows are separated by `Divider`; field label column `--prime-space-24`, label and values on one baseline.
+- The panel is a `flush` Popover as wide as the toolbar and aligned to its start. Every section (query band, field rows, no-matches row, footer) is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`; footer `--prime-space-2` × `--prime-space-4`), and `Divider`s between them run edge to edge. Field label column `--prime-space-24`, label and values on one baseline.
 - Values wrap with `--prime-space-2` gaps; chips wrap the same way with "Сбросить все" pushed to the end.
 - The root is a flex column (`--prime-space-3`): `Toolbar` then `Chips`. The parts only need to be inside `Root`, not direct children: put the toolbar in a header strip and the chips in another container if the page asks for it.
 

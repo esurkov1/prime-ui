@@ -31,6 +31,8 @@ export type ThumbnailRootProps = {
   variant?: "soft" | "solid";
   /** Fills the container width (cards, galleries); the height follows `ratio`. */
   fullWidth?: boolean;
+  /** A faint inner ring around the frame, for photos with a white background on a light surface. */
+  ring?: boolean;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -46,6 +48,7 @@ const ThumbnailRoot = React.forwardRef<HTMLDivElement, ThumbnailRootProps>(
       color = "gray",
       variant = "soft",
       fullWidth,
+      ring = false,
       className,
       children,
       ...rest
@@ -66,6 +69,7 @@ const ThumbnailRoot = React.forwardRef<HTMLDivElement, ThumbnailRootProps>(
             color,
             variant,
             "full-width": fullWidth || undefined,
+            ring: ring || undefined,
           })}
           {...rest}
         >

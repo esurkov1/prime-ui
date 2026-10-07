@@ -62,3 +62,26 @@
   flex-direction: column;
   gap: var(--prime-control-m-label-gap);
 }
+
+/* flush-list: the panel has no padding; every row brings its own. */
+.flushPanel {
+  width: calc(var(--prime-panel-min-width) * 1.5);
+}
+
+.flushHead {
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+.flushRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+.flushFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--prime-space-1);
+}

@@ -459,7 +459,14 @@
   min-height: 18rem;
   padding: var(--prime-space-6);
   padding-inline-end: calc(36% + var(--prime-space-6));
+  overflow: hidden;
+  border-radius: var(--prime-radius-l);
   background: var(--prime-color-bg-canvas);
+  /* A canvas plane again inside the panel: restore the canvas context, so the kit Card on it is a
+     raised surface, not a sunken tile (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-bg-surface);
+  --prime-color-card-bg: var(--prime-color-bg-surface);
+  --prime-card-shadow: var(--prime-shadow-raised);
 }
 
 .layerStage > .layerTag {
@@ -472,10 +479,8 @@
   min-width: 0;
 }
 
-/* A kit Card: only its place in the stage and the rhythm inside. */
+/* A kit Card: only its place in the stage. */
 .layerCard {
-  display: grid;
-  gap: var(--prime-space-3);
   margin-block-start: var(--prime-space-4);
 }
 
