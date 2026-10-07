@@ -34,7 +34,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### ColorSwatches
-No ref. The field frame (label → swatches → hint | error) around a `role="radiogroup"` of swatch buttons with a roving tab stop.
+`ref` → `HTMLDivElement` (the field frame). The field frame (label → swatches → hint | error) around a `role="radiogroup"` of swatch buttons with a roving tab stop.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -57,7 +57,7 @@ No ref. The field frame (label → swatches → hint | error) around a `role="ra
 | `aria-labelledby` | `string` | — | Names the group by an outside element. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `labels` | `Partial<ColorSwatchesLabels>` | — | Built-in strings, see Labels. |
-| `className` | `string` | — | Class on the outer field `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
 
 ## Variants
 

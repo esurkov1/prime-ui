@@ -76,7 +76,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `className` and the other button attributes. |
 
 ### Accordion.Icon
-No ref. Decorative leading icon (`aria-hidden`) of the trigger; the content then lines up with the label.
+`ref` → `HTMLSpanElement`. Decorative leading icon (`aria-hidden`) of the trigger; the content then lines up with the label.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

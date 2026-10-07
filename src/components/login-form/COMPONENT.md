@@ -51,32 +51,32 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | `className` | `string` | — | Class on the card. |
 
 ### LoginForm.Header
-No ref. `<header>` with the logo, title and description, laid out by Root `align`. Native props.
+`ref` → `HTMLElement`. `<header>` with the logo, title and description, laid out by Root `align`. Native props.
 
 ### LoginForm.Logo
-No ref. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label`. Native `<div>` props.
+`ref` → `HTMLDivElement`. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label`. Native `<div>` props.
 
 ### LoginForm.Title
-No ref. The heading (kit Typography, text role by the tier).
+`ref` → `HTMLHeadingElement`. The heading (kit Typography, text role by the tier).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `as` | `"h1" \| "h2" \| "h3"` | `"h1"` | Heading level; `h2` when the page already has an `h1`. |
 
 ### LoginForm.Description
-No ref. The secondary line under the title (kit Typography, secondary tone). Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The secondary line under the title (kit Typography, secondary tone). Native `<p>` props.
 
 ### LoginForm.Body
-No ref. Everything under the header: provider buttons, divider, form, footer. Native `<div>` props.
+`ref` → `HTMLDivElement`. Everything under the header: provider buttons, divider, form, footer. Native `<div>` props.
 
 ### LoginForm.Form
 `forwardRef` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.
 
 ### LoginForm.Actions
-No ref. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action. Native `<div>` props.
+`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action. Native `<div>` props.
 
 ### LoginForm.Footer
-No ref. The secondary line with a `LinkButton` («Нет аккаунта? Зарегистрироваться»); follows Root `align`. Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The secondary line with a `LinkButton` («Нет аккаунта? Зарегистрироваться»); follows Root `align`. Native `<p>` props.
 
 ## Variants
 

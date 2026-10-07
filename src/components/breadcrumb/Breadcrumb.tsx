@@ -108,13 +108,12 @@ function BreadcrumbRoot({
 }
 BreadcrumbRoot.displayName = "Breadcrumb.Root";
 
-export type BreadcrumbItemProps = {
+export type BreadcrumbItemProps = Omit<React.LiHTMLAttributes<HTMLLIElement>, "aria-label"> & {
   href?: string;
   current?: boolean;
-  children?: React.ReactNode;
-  className?: string;
-  /** For a link without visible text (e.g. only a «home» icon). */
+  /** For a link without visible text (e.g. only a «home» icon). Goes to the link. */
   "aria-label"?: string;
+  ref?: React.Ref<HTMLLIElement>;
 };
 
 function BreadcrumbItem({
@@ -123,10 +122,11 @@ function BreadcrumbItem({
   children,
   className,
   "aria-label": ariaLabel,
+  ...rest
 }: BreadcrumbItemProps) {
   const { size } = React.useContext(BreadcrumbContext);
   return (
-    <li className={cx(styles.item, className)}>
+    <li {...rest} className={cx(styles.item, className)}>
       {href ? (
         <LinkButton href={href} size={size} className={styles.link} aria-label={ariaLabel}>
           {children}
@@ -145,14 +145,14 @@ function BreadcrumbItem({
 }
 BreadcrumbItem.displayName = "Breadcrumb.Item";
 
-export type BreadcrumbEllipsisProps = {
-  className?: string;
+export type BreadcrumbEllipsisProps = Omit<React.LiHTMLAttributes<HTMLLIElement>, "children"> & {
+  ref?: React.Ref<HTMLLIElement>;
 };
 
-function BreadcrumbEllipsis({ className }: BreadcrumbEllipsisProps) {
+function BreadcrumbEllipsis({ className, ...rest }: BreadcrumbEllipsisProps) {
   const { labels } = React.useContext(BreadcrumbContext);
   return (
-    <li className={cx(styles.ellipsis, className)}>
+    <li {...rest} className={cx(styles.ellipsis, className)}>
       <span aria-hidden="true">…</span>
       <VisuallyHidden>{labels.ellipsis}</VisuallyHidden>
     </li>

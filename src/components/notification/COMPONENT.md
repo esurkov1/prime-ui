@@ -41,7 +41,7 @@ NotificationCard                     the same card, static, without a timer
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### NotificationProvider
-No ref. Wraps the app once: keeps the toasts and renders their stacks in a portal (one stack per position × tone).
+No DOM of its own, no ref. Wraps the app once: keeps the toasts and renders their stacks in a portal (one stack per position × tone).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -78,7 +78,7 @@ Must be called inside `NotificationProvider`; returns the store.
 | `closable` | `boolean` | `true` | Shows the close button. |
 
 ### NotificationCard
-No ref. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.
+`ref` → `HTMLElement`. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -90,7 +90,7 @@ No ref. A static `<article role="status|alert">` card without a timer: inline co
 | `badge` | `string \| number` | — | A counter next to the title (a `Badge` in the tone hue). |
 | `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card. |
 | `onDismiss` | `() => void` | — | Shows the close button and is called on its click. |
-| `className` | `string` | — | Extra class on the card. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title" \| "children" \| "role">` | — | `className` and the other attributes of the `<article>`. |
 
 ## Variants
 

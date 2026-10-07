@@ -18,7 +18,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Drawer.Content",
-      en: 'No ref. Portal + scrim + `role="dialog"` panel at the edge; renders while open and during its exit animation.',
+      en: '`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel at the edge; renders while open and during its exit animation.',
       ru: "Портал, подложка и панель у края экрана: ловушка фокуса, блокировка прокрутки.",
       props: [
         {

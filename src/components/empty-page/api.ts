@@ -31,7 +31,7 @@ export const api: ComponentApi = {
     },
     {
       name: "EmptyPage.Icon",
-      en: "A `<div>` tile holding one icon.",
+      en: "`ref` → `HTMLDivElement`. A `<div>` tile holding one icon.",
       ru: "Плашка `<div>` с одной иконкой.",
       props: [
         {
@@ -71,7 +71,7 @@ export const api: ComponentApi = {
     },
     {
       name: "EmptyPage.Actions",
-      en: "A `<div>` row of buttons that wraps when narrow.",
+      en: "`ref` → `HTMLDivElement`. A `<div>` row of buttons that wraps when narrow.",
       ru: "Ряд кнопок `<div>`, переносится в узком месте.",
       props: [
         {

@@ -23,6 +23,7 @@ import { type PresenceState, usePresence } from "@/hooks/usePresence";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { mergeRefs } from "@/internal/mergeRefs";
 import {
   OverlayPortalLayerProvider,
   useOverlayPortalLayer,
@@ -128,6 +129,8 @@ export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement> & {
   size?: Exclude<ControlSize, "xs">;
   /** Class on the full-screen scrim. */
   overlayClassName?: string;
+  /** The `role="dialog"` panel. */
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function DrawerContent(props: DrawerContentProps) {
@@ -159,6 +162,7 @@ function DrawerDialog({
   "aria-describedby": ariaDescribedBy,
   state,
   onExitEnd,
+  ref,
   ...rest
 }: DrawerDialogProps) {
   const { open, setOpen, closeOnEscape, closeOnOutsideClick, labels } = useDrawerContext();
@@ -178,6 +182,7 @@ function DrawerDialog({
   const nestedInModal = parentLayer === "modal" || parentLayer === "drawerInModal";
 
   const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
+  const panelRef = React.useMemo(() => mergeRefs(trapRef, ref), [trapRef, ref]);
   useScrollLock(open);
   useInertSiblings(open, trapRef);
   useEscapeKey({ enabled: open && closeOnEscape, onEscape: onClose });
@@ -202,7 +207,7 @@ function DrawerDialog({
         data-nested-in-modal={nestedInModal ? "true" : undefined}
       />
       <div
-        ref={trapRef}
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         tabIndex={-1}

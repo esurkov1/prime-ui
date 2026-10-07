@@ -283,7 +283,7 @@ SidebarRoot.displayName = "Sidebar.Root";
 
 // ─── Regions ──────────────────────────────────────────────────────────────────
 
-export type SidebarHeaderProps = React.ComponentPropsWithoutRef<"div">;
+export type SidebarHeaderProps = React.ComponentProps<"div">;
 
 function SidebarHeader({ className, ...rest }: SidebarHeaderProps) {
   return <div {...rest} className={cx(styles.header, className)} />;
@@ -312,7 +312,7 @@ const SidebarContent = React.forwardRef<HTMLElement, SidebarContentProps>(functi
 });
 SidebarContent.displayName = "Sidebar.Content";
 
-export type SidebarFooterProps = React.ComponentPropsWithoutRef<"div">;
+export type SidebarFooterProps = React.ComponentProps<"div">;
 
 function SidebarFooter({ className, ...rest }: SidebarFooterProps) {
   return <div {...rest} className={cx(styles.footer, className)} />;
@@ -321,7 +321,7 @@ SidebarFooter.displayName = "Sidebar.Footer";
 
 // ─── Group ────────────────────────────────────────────────────────────────────
 
-export type SidebarGroupProps = Omit<React.ComponentPropsWithoutRef<"div">, "role"> & {
+export type SidebarGroupProps = Omit<React.ComponentProps<"div">, "role"> & {
   /** Group heading. In compact mode it folds away. */
   label?: React.ReactNode;
   /** The heading becomes a disclosure button that shows and hides the items. Needs `label`. */
@@ -418,6 +418,7 @@ SidebarGroup.displayName = "Sidebar.Group";
 
 export type SidebarItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /**
@@ -429,14 +430,18 @@ function SidebarItemIcon({ className, ...rest }: SidebarItemIconProps) {
 }
 SidebarItemIcon.displayName = "Sidebar.ItemIcon";
 
-export type SidebarItemCountProps = {
+export type SidebarItemCountProps = Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  "children" | "color"
+> & {
   /** The number (or a short status). */
   children: React.ReactNode;
   /** Badge hue: the count needs attention. Without `color` and `variant` it is a plain number. */
   color?: PaletteColor;
   /** Badge treatment (default `soft` once `color` is set). */
   variant?: Exclude<Variant, "ghost">;
-  className?: string;
+  /** The number `<span>` (the Badge when it has a hue). */
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /**
@@ -444,14 +449,23 @@ export type SidebarItemCountProps = {
  * `variant`). In compact mode the number leaves the row (still read by screen readers) and a badge
  * leaves a dot of its hue on the icon.
  */
-function SidebarItemCount({ children, color, variant, className }: SidebarItemCountProps) {
+function SidebarItemCount({ children, color, variant, className, ...rest }: SidebarItemCountProps) {
   if (color === undefined && variant === undefined) {
-    return <span className={cx(styles.count, styles.countPlain, className)}>{children}</span>;
+    return (
+      <span {...rest} className={cx(styles.count, styles.countPlain, className)}>
+        {children}
+      </span>
+    );
   }
   const hue = color ?? "gray";
   return (
     <>
-      <Badge.Root color={hue} variant={variant ?? "soft"} className={cx(styles.count, className)}>
+      <Badge.Root
+        {...rest}
+        color={hue}
+        variant={variant ?? "soft"}
+        className={cx(styles.count, className)}
+      >
         {children}
       </Badge.Root>
       <ControlSizeProvider value="l">
@@ -465,30 +479,33 @@ function SidebarItemCount({ children, color, variant, className }: SidebarItemCo
 }
 SidebarItemCount.displayName = "Sidebar.ItemCount";
 
-export type SidebarItemShortcutProps = {
+export type SidebarItemShortcutProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /** A key hint, e.g. `<Kbd>⌘K</Kbd>`. */
   children: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Keyboard hint at the end of an item; hidden in compact mode. */
-function SidebarItemShortcut({ children, className }: SidebarItemShortcutProps) {
+function SidebarItemShortcut({ children, className, ...rest }: SidebarItemShortcutProps) {
   return (
-    <span className={cx(styles.shortcut, className)} aria-hidden="true">
+    <span {...rest} className={cx(styles.shortcut, className)} aria-hidden="true">
       {children}
     </span>
   );
 }
 SidebarItemShortcut.displayName = "Sidebar.ItemShortcut";
 
-export type SidebarItemActionProps = {
+export type SidebarItemActionProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "children" | "onClick" | "aria-label"
+> & {
   /** Accessible name and tooltip of the action («Создать задачу»). */
   label: string;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   /** The glyph; a plus by default. */
   children?: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
 /**
@@ -501,12 +518,14 @@ function SidebarItemAction({
   disabled,
   children,
   className,
+  ...rest
 }: SidebarItemActionProps) {
   const { size } = useSidebar();
   return (
     <Tooltip.Root>
       <Tooltip.Trigger>
         <Button.Root
+          {...rest}
           variant="ghost"
           tone="neutral"
           size={TIER_DOWN[size]}
@@ -742,7 +761,7 @@ type SubContextValue = {
 
 const [SubProvider, useSubContext] = createComponentContext<SubContextValue>("Sidebar.Sub");
 
-export type SidebarSubProps = React.ComponentPropsWithoutRef<"div"> & {
+export type SidebarSubProps = React.ComponentProps<"div"> & {
   /** Children shown (controlled). */
   open?: boolean;
   /** Initial open state (uncontrolled). A sub-list also opens by itself when a child becomes current. */
@@ -1057,11 +1076,13 @@ function subRows(children: React.ReactNode) {
   ));
 }
 
-export type SidebarSubContentProps = Omit<React.ComponentPropsWithoutRef<"div">, "role">;
+export type SidebarSubContentProps = Omit<React.ComponentProps<"div">, "role">;
 
 /** The children of a `Sidebar.Sub`: `Sidebar.Item`s on a faint guide line under the parent icon. */
-function SidebarSubContent({ className, children, ...rest }: SidebarSubContentProps) {
+function SidebarSubContent({ className, children, ref, ...rest }: SidebarSubContentProps) {
   const sub = useSubContext();
+  const { regionRef } = sub;
+  const mergedRef = React.useMemo(() => mergeRefs(regionRef, ref), [regionRef, ref]);
   const rail = useRail();
   // On the rail the children live in the flyout; the inline copy stays folded and inert.
   const shown = sub.open && !rail;
@@ -1069,7 +1090,7 @@ function SidebarSubContent({ className, children, ...rest }: SidebarSubContentPr
     // biome-ignore lint/a11y/useSemanticElements: a nav group of links, not a form fieldset
     <div
       {...rest}
-      ref={sub.regionRef}
+      ref={mergedRef}
       id={sub.contentId}
       role="group"
       aria-labelledby={sub.triggerId}
@@ -1090,6 +1111,7 @@ SidebarSubContent.displayName = "Sidebar.SubContent";
 export type SidebarBrandLogoProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /** The product mark (`<img>`, `<svg>`); it fills a square on the icon axis. */
   children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** The product mark: stays on the icon axis in every mode. */

@@ -89,27 +89,27 @@ export const api: ComponentApi = {
     },
     {
       name: "SmartFilter.Toolbar",
-      en: "No ref. A `<div>`: the filter Button (a count Badge while filters apply) and a search Input; the anchor of the panel, a flush Popover.",
+      en: "`ref` → `HTMLDivElement`. A `<div>`: the filter Button (a count Badge while filters apply) and a search Input; the anchor of the panel, a flush Popover.",
       ru: "`<div>`: кнопка фильтра (Badge-счётчик при фильтрах) и поле поиска; якорь панели — Popover без внутренних отступов.",
       props: [
         {
-          name: "className",
-          type: "string",
-          en: "Class on the toolbar.",
-          ru: "Класс панели инструментов.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the toolbar.",
+          ru: "`className` и остальные атрибуты панели инструментов.",
         },
       ],
     },
     {
       name: "SmartFilter.Chips",
-      en: "No ref. A `<div>` of applied filters as removable Badges with «Добавить фильтр» and «Сбросить все»; renders nothing without filters.",
+      en: "`ref` → `HTMLDivElement`. A `<div>` of applied filters as removable Badges with «Добавить фильтр» and «Сбросить все»; renders nothing without filters.",
       ru: "`<div>` с применёнными фильтрами — удаляемыми Badge — и кнопками «Добавить фильтр», «Сбросить все»; без фильтров ничего не рендерит.",
       props: [
         {
-          name: "className",
-          type: "string",
-          en: "Class on the chips row.",
-          ru: "Класс ряда тегов.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the chips row.",
+          ru: "`className` и остальные атрибуты ряда тегов.",
         },
       ],
     },

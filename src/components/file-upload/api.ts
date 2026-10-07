@@ -122,17 +122,17 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.Body",
-      en: "No ref. A centered column for a custom zone body; it takes no pointer events (no drag flicker), nested buttons and links opt back in. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. A centered column for a custom zone body; it takes no pointer events (no drag flicker), nested buttons and links opt back in. Native `<div>` props.",
       props: [],
     },
     {
       name: "FileUpload.Icon",
-      en: "No ref. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid. Native `<span>` props.",
+      en: "`ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid. Native `<span>` props.",
       props: [],
     },
     {
       name: "FileUpload.Title",
-      en: "No ref. The zone title `<p>`. Native `<p>` props.",
+      en: "`ref` → `HTMLParagraphElement`. The zone title `<p>`. Native `<p>` props.",
       props: [
         {
           name: "tone",
@@ -145,12 +145,12 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.Description",
-      en: "No ref. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.",
+      en: "`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.",
       props: [],
     },
     {
       name: "FileUpload.Item",
-      en: "No ref. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.",
       props: [
         {
           name: "size",
@@ -170,7 +170,7 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.FormatBadge",
-      en: "No ref. The file format as a square kit Badge of the row tier (`aria-hidden`: the name carries the extension).",
+      en: "`ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the name carries the extension).",
       props: [
         {
           name: "format",
@@ -187,21 +187,21 @@ export const api: ComponentApi = {
           ru: "Цвет палитры бейджа.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the badge.",
-          ru: "Класс на бейдже.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children" | "color">',
+          en: "`className` and the other attributes of the badge.",
+          ru: "`className` и остальные атрибуты бейджа.",
         },
       ],
     },
     {
       name: "FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions",
-      en: "No ref. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row. Native `<div>` props.",
       props: [],
     },
     {
       name: "FileUpload.ItemProgress",
-      en: "No ref. Upload progress across the row: the kit ProgressBar.",
+      en: "`ref` → `HTMLDivElement` (the wrapper). Upload progress across the row: the kit ProgressBar.",
       props: [
         {
           name: "value",
@@ -217,10 +217,10 @@ export const api: ComponentApi = {
           ru: "Полный объём (по умолчанию ProgressBar).",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the wrapper.",
-          ru: "Класс на обёртке.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the wrapper.",
+          ru: "`className` и остальные атрибуты обёртки.",
         },
       ],
     },

@@ -36,7 +36,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Breadcrumb.Item",
-      en: "No ref. `<li>`: a muted `LinkButton` (`href`), plain text, or the current page (`current`).",
+      en: "`ref` → `HTMLLIElement`. `<li>`: a muted `LinkButton` (`href`), plain text, or the current page (`current`).",
       ru: "`<li>`: приглушённая ссылка `LinkButton` (`href`), текст или текущая страница (`current`).",
       props: [
         {
@@ -54,8 +54,8 @@ export const api: ComponentApi = {
         {
           name: "aria-label",
           type: "string",
-          en: "Name of a link without visible text (e.g. a home icon).",
-          ru: "Имя ссылки без видимого текста (например, иконки «дом»).",
+          en: "Name of a link without visible text (e.g. a home icon); set on the link, not the `li`.",
+          ru: "Имя ссылки без видимого текста (например, иконки «дом»); ставится на ссылку, а не на `li`.",
         },
         {
           name: "children",
@@ -64,23 +64,23 @@ export const api: ComponentApi = {
           ru: "Текст или `Icon`. Строка становится `title` текстового уровня (полный текст при обрезке).",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the `li`.",
-          ru: "Дополнительный класс на `li`.",
+          name: "…rest",
+          type: 'Omit<LiHTMLAttributes<HTMLLIElement>, "aria-label">',
+          en: "`className` and the other `li` attributes.",
+          ru: "`className` и остальные атрибуты `li`.",
         },
       ],
     },
     {
       name: "Breadcrumb.Ellipsis",
-      en: "No ref. `<li>` with «…» for levels skipped on purpose, with visually hidden `labels.ellipsis`.",
+      en: "`ref` → `HTMLLIElement`. `<li>` with «…» for levels skipped on purpose, with visually hidden `labels.ellipsis`.",
       ru: "`<li>` с «…» для намеренно пропущенных уровней и скрытым текстом `labels.ellipsis`.",
       props: [
         {
-          name: "className",
-          type: "string",
-          en: "Extra class.",
-          ru: "Дополнительный класс.",
+          name: "…rest",
+          type: 'Omit<LiHTMLAttributes<HTMLLIElement>, "children">',
+          en: "`className` and the other `li` attributes.",
+          ru: "`className` и остальные атрибуты `li`.",
         },
       ],
     },

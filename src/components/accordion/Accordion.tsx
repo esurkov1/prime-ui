@@ -207,6 +207,7 @@ AccordionTrigger.displayName = "Accordion.Trigger";
 
 export type AccordionIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Decorative leading icon of a trigger; the content lines up with the label after it. */

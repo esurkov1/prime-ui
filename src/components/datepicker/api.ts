@@ -1,10 +1,11 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Datepicker.Root",
-      en: "No ref. A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option below.",
+      en: "`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option below.",
       ru: "Поле (подпись, подсказка или ошибка, кнопка поля с иконкой календаря, значение и шеврон), которое открывает панель календаря в Popover. Принимает все параметры календаря ниже.",
       props: [
         {
@@ -149,24 +150,19 @@ export const api: ComponentApi = {
           en: "Name without a `label` (the value is appended) and extra description ids.",
           ru: "Имя без `label` (значение добавляется) и дополнительные id описания.",
         },
-        {
-          name: "className",
-          type: "string",
-          en: "Class on the field wrapper.",
-          ru: "Класс обёртки поля.",
-        },
+        FIELD_ROOT_REST,
       ],
     },
     {
       name: "Datepicker.Panel",
-      en: "No ref. The calendar without a field, inline in a page: its own card, 1–2 months by the parent's width. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.",
+      en: "`ref` → `HTMLDivElement`. The calendar without a field, inline in a page: its own card, 1–2 months by the parent's width. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.",
       ru: "Календарь без поля прямо на странице: своя карточка, 1–2 месяца по ширине родителя. Принимает `mode`, `value` / `defaultValue` / `onValueChange`, как Root, и все параметры календаря ниже.",
       props: [
         {
-          name: "className",
-          type: "string",
-          en: "Class on the panel.",
-          ru: "Класс панели.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className` and the other attributes of the panel card.",
+          ru: "`className` и остальные атрибуты карточки панели.",
         },
       ],
     },

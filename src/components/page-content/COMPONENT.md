@@ -51,7 +51,7 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth, Section r
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `aria-labelledby`, `className` and the other section attributes. |
 
 ### PageContent.Header
-No ref. Heading column and page actions in one wrapping row; `PageContent.Actions` children move to the end.
+`ref` → `HTMLDivElement`. Heading column and page actions in one wrapping row; `PageContent.Actions` children move to the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -73,14 +73,14 @@ No ref. Heading column and page actions in one wrapping row; `PageContent.Action
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### PageContent.Actions
-No ref. Page-level buttons next to the title; they wrap under the heading on narrow columns.
+`ref` → `HTMLDivElement`. Page-level buttons next to the title; they wrap under the heading on narrow columns.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Buttons), `className` and the other div attributes. |
 
 ### PageContent.Body
-No ref. The page content; blocks 40 apart.
+`ref` → `HTMLDivElement`. The page content; blocks 40 apart.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

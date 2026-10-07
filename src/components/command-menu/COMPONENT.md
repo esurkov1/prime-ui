@@ -42,7 +42,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query state
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### CommandMenu.Root
-No ref. A Modal with a top-aligned palette panel; holds the query and the active item while open (a new opening starts empty, focus in the search field).
+`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; holds the query and the active item while open (a new opening starts empty, focus in the search field).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -54,11 +54,11 @@ No ref. A Modal with a top-aligned palette panel; holds the query and the active
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the rows and the search row: item height, text, icon. |
 | `labels` | `Partial<CommandMenuLabels>` | — | Built-in strings, see Labels. |
 | `aria-label · aria-labelledby · aria-describedby` | `string` | — | Name and description of the dialog when there is no `CommandMenu.Title` / `Description`. |
-| `className` | `string` | — | Extra class on the dialog panel. |
 | `children` | `ReactNode` | — (required) | Title, Description, Input, List, Footer. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the dialog panel. |
 
 ### CommandMenu.Title · CommandMenu.Description
-No ref. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.
+`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.
 
 ### CommandMenu.Input
 `ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; no focus ring (the caret is the indicator). + native input props.
@@ -73,7 +73,7 @@ No ref. `<h2>` / `<p>` above the search row; they name and describe the dialog. 
 `ref` → `HTMLElement`. The scrolling `role="listbox"` (a ScrollContainer) under the search row. + native props.
 
 ### CommandMenu.Group
-No ref. `<div role="group">` named by its `label`; hidden while none of its items match. + native `<div>` props.
+`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while none of its items match. + native `<div>` props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -90,20 +90,20 @@ No ref. `<div role="group">` named by its `label`; hidden while none of its item
 | `disabled` | `boolean` | `false` | Never shows in the results. |
 
 ### CommandMenu.ItemIcon · CommandMenu.ItemShortcut
-No ref. An `aria-hidden` `<span>` holding the leading glyph at the tier icon size / a `Kbd` one tier below, pushed to the end of the item — a hint, not a handler. + native props.
+`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the tier icon size / a `Kbd` one tier below, pushed to the end of the item — a hint, not a handler. + native props.
 
 ### CommandMenu.ItemText
-No ref. A `<span>` column: the title with an ellipsis and an optional description line. + native `<span>` props.
+`ref` → `HTMLSpanElement`. A `<span>` column: the title with an ellipsis and an optional description line. + native `<span>` props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `description` | `ReactNode` | — | Second line (path, details): caption, muted. |
 
 ### CommandMenu.Empty
-No ref. A compact EmptyPage with `role="status"`, shown only while nothing matches: `labels.empty`, `labels.emptyHint`, and `children` as an action under them.
+`ref` → `HTMLDivElement`. A compact EmptyPage with `role="status"`, shown only while nothing matches: `labels.empty`, `labels.emptyHint`, and `children` as an action under them.
 
 ### CommandMenu.Footer · CommandMenu.FooterHint
-No ref. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.
+`ref` → `HTMLDivElement` / `HTMLSpanElement`. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

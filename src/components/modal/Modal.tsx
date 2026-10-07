@@ -9,6 +9,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { mergeRefs } from "@/internal/mergeRefs";
 import { OverlayPortalLayerProvider } from "@/internal/OverlayPortalLayerContext";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
@@ -149,6 +150,8 @@ export type ModalContentProps = React.HTMLAttributes<HTMLDivElement> & {
   container?: HTMLElement | null;
   /** Class on the full-screen scrim. */
   overlayClassName?: string;
+  /** The `role="dialog"` panel. */
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function ModalContent({ container, ...props }: ModalContentProps) {
@@ -179,6 +182,7 @@ function ModalDialog({
   "aria-describedby": ariaDescribedBy,
   state,
   onExitEnd,
+  ref,
   ...rest
 }: ModalDialogProps) {
   const {
@@ -205,6 +209,7 @@ function ModalDialog({
   });
 
   const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
+  const panelRef = React.useMemo(() => mergeRefs(trapRef, ref), [trapRef, ref]);
   useScrollLock(open);
   useInertSiblings(open, trapRef);
   // Scrim layer: the press must start and end outside the panel (no drag-to-close, no click-through).
@@ -236,7 +241,7 @@ function ModalDialog({
       onAnimationEnd={onExitEnd}
     >
       <div
-        ref={trapRef}
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         tabIndex={-1}

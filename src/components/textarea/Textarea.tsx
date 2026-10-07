@@ -183,24 +183,16 @@ TextareaRoot.displayName = "Textarea.Root";
 
 // ─── Counter ─────────────────────────────────────────────────────────────────
 
-export type TextareaCounterProps = {
+export type TextareaCounterProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   current: number;
   max: number;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Character counter for the `counter` slot; turns danger when `current > max`. */
-function TextareaCounter({ current, max, className }: TextareaCounterProps) {
+function TextareaCounter(props: TextareaCounterProps) {
   const { size, labels } = useTextareaContext();
-  return (
-    <FieldCounter
-      current={current}
-      max={max}
-      size={size}
-      label={labels.counter}
-      className={className}
-    />
-  );
+  return <FieldCounter {...props} size={size} label={labels.counter} />;
 }
 
 TextareaCounter.displayName = "Textarea.Counter";

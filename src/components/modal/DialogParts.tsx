@@ -107,16 +107,16 @@ export function DialogShellProvider({
 
 // ─── Icon ─────────────────────────────────────────────────────────────────────
 
-export type DialogIconProps = {
+export type DialogIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /** Soft fill + text color of the role. Default `neutral`. */
   tone?: Tone;
   children: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
-export function DialogIcon({ tone = "neutral", children, className }: DialogIconProps) {
+export function DialogIcon({ tone = "neutral", children, className, ...rest }: DialogIconProps) {
   return (
-    <span className={cx(styles.icon, className)} data-tone={tone} aria-hidden="true">
+    <span {...rest} className={cx(styles.icon, className)} data-tone={tone} aria-hidden="true">
       {children}
     </span>
   );
@@ -125,7 +125,9 @@ DialogIcon.displayName = "Dialog.Icon";
 
 // ─── Title / Description ──────────────────────────────────────────────────────
 
-export type DialogTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "id">;
+export type DialogTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "id"> & {
+  ref?: React.Ref<HTMLHeadingElement>;
+};
 
 export function DialogTitle({ className, ...rest }: DialogTitleProps) {
   const { titleId, registerTitle } = useDialogShell("Title");
@@ -137,7 +139,9 @@ export function DialogTitle({ className, ...rest }: DialogTitleProps) {
 }
 DialogTitle.displayName = "Dialog.Title";
 
-export type DialogDescriptionProps = Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">;
+export type DialogDescriptionProps = Omit<React.HTMLAttributes<HTMLParagraphElement>, "id"> & {
+  ref?: React.Ref<HTMLParagraphElement>;
+};
 
 export function DialogDescription({ className, ...rest }: DialogDescriptionProps) {
   const { descriptionId, registerDescription } = useDialogShell("Description");
@@ -154,6 +158,7 @@ DialogDescription.displayName = "Dialog.Description";
 export type DialogHeaderProps = React.HTMLAttributes<HTMLElement> & {
   /** Built-in close button (square ghost `s`, `labels.close`). Default `true`. */
   showClose?: boolean;
+  ref?: React.Ref<HTMLElement>;
 };
 
 /**
@@ -197,7 +202,9 @@ DialogHeader.displayName = "Dialog.Header";
 
 // ─── Body ─────────────────────────────────────────────────────────────────────
 
-export type DialogBodyProps = React.HTMLAttributes<HTMLDivElement>;
+export type DialogBodyProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /** The only scrolling zone; header and footer stay put. */
 export function DialogBody({ className, ...rest }: DialogBodyProps) {
@@ -210,6 +217,7 @@ DialogBody.displayName = "Dialog.Body";
 export type DialogFooterProps = React.HTMLAttributes<HTMLElement> & {
   /** `fill` — equal-width buttons; `end` — auto width, right-aligned. Default depends on the container. */
   layout?: DialogFooterLayout;
+  ref?: React.Ref<HTMLElement>;
 };
 
 /** Actions in DOM order, primary last. Stacks full width when the dialog is narrower than 360px. */

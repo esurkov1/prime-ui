@@ -32,7 +32,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### DigitInput
-No ref. The field frame (label → cells → hint | error) around a `<fieldset>` of one-character inputs; the value has no gaps, typing always goes to the first empty cell.
+`ref` → `HTMLDivElement` (the field frame). The field frame (label → cells → hint | error) around a `<fieldset>` of one-character inputs; the value has no gaps, typing always goes to the first empty cell.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -58,7 +58,7 @@ No ref. The field frame (label → cells → hint | error) around a `<fieldset>`
 | `id` | `string` | — | Id of the first cell (the label points at it); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids on the group. |
 | `labels` | `Partial<DigitInputLabels>` | — | Built-in strings, see Labels. |
-| `className` | `string` | — | Class on the outer field `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
 
 ## Variants
 No `variant` or `tone`.

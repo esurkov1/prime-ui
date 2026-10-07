@@ -51,28 +51,28 @@ Banner.Root                 <div>; variant, tone, size, placement
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` (`alert`, `status`, `region`), `aria-label` and the other div attributes. |
 
 ### Banner.Content
-A `<div>` grid: icon on the first line, title over description, actions on the right (under the text below 36rem).
+`ref` → `HTMLDivElement`. A `<div>` grid: icon on the first line, title over description, actions on the right (under the text below 36rem).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Banner.Icon
-An `aria-hidden` `<span>` holding one `Icon`, one title line high, in the tone color.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding one `Icon`, one title line high, in the tone color.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (`Icon`), `className` and the other span attributes. |
 
 ### Banner.Title · Banner.Description
-`<span>` elements: the medium title and the secondary text, both capped at the reading width.
+`ref` → `HTMLSpanElement`. `<span>` elements: the medium title and the secondary text, both capped at the reading width.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Banner.Actions
-A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.
+`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

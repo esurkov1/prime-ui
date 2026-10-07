@@ -46,7 +46,7 @@ No ref, no DOM of its own besides the portalled overlay and a visually hidden li
 | `children` | `ReactNode` | — | The app or the screen that drags. |
 
 ### Dnd.Sortable
-Generic `Dnd.Sortable<T>`; no ref. Renders `<div>`, `<ul>` or `<ol>` and registers itself as the drop target; draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.
+Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `<ol>` and registers itself as the drop target; draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -61,10 +61,10 @@ Generic `Dnd.Sortable<T>`; no ref. Renders `<div>`, `<ul>` or `<ol>` and registe
 | `kind` | `string` | `unique per list` | Lists sharing a `kind` exchange items (a board). |
 | `canDrop` | `(id: string) => boolean` | — | Refuses an item by id; the list gets `data-dnd-reject` and turns `danger` before the release. |
 | `as` | `"div" \| "ul" \| "ol"` | `"div"` | Root element; `ul` / `ol` render items as `li`. |
-| `className · aria-label` | `string` | — | Class (the list layout) and the accessible name of the list. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element. |
 
 ### Dnd.SortableItem
-No ref. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.
+`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -81,7 +81,7 @@ No ref. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortab
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children">` | — | `className`, `disabled` and the other button attributes. |
 
 ### Dnd.Draggable
-Generic `Dnd.Draggable<TData>`; no ref. Renders the `as` element; stays in place at reduced opacity (`data-dragging`) while carried. Has no keyboard path of its own: offer a button or a menu for the same move.
+Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. Renders the `as` element; stays in place at reduced opacity (`data-dragging`) while carried. Has no keyboard path of its own: offer a button or a menu for the same move.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -97,7 +97,7 @@ Generic `Dnd.Draggable<TData>`; no ref. Renders the `as` element; stays in place
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `className` and the other attributes. |
 
 ### Dnd.DropZone
-Generic `Dnd.DropZone<TData>`; no ref. Renders the `as` element; state is mirrored by `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. Where zones overlap, the innermost wins.
+Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element; state is mirrored by `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. Where zones overlap, the innermost wins.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

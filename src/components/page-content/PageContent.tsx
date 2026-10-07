@@ -35,7 +35,9 @@ const PageContentSection = React.forwardRef<HTMLElement, PageContentSectionProps
 );
 PageContentSection.displayName = "PageContent.Section";
 
-export type PageContentActionsProps = React.HTMLAttributes<HTMLDivElement>;
+type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
+
+export type PageContentActionsProps = DivProps;
 
 /** Page-level actions (buttons) next to the title; wrap below the heading on narrow columns. */
 function PageContentActions({ className, ...rest }: PageContentActionsProps) {
@@ -43,7 +45,7 @@ function PageContentActions({ className, ...rest }: PageContentActionsProps) {
 }
 PageContentActions.displayName = "PageContent.Actions";
 
-export type PageContentHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+export type PageContentHeaderProps = DivProps;
 
 /** Title and description stack on the left; `PageContent.Actions` children go to the end. */
 function PageContentHeader({ className, children, ...rest }: PageContentHeaderProps) {
@@ -95,7 +97,7 @@ const PageContentDescription = React.forwardRef<HTMLParagraphElement, PageConten
 );
 PageContentDescription.displayName = "PageContent.Description";
 
-export type PageContentBodyProps = React.HTMLAttributes<HTMLDivElement>;
+export type PageContentBodyProps = DivProps;
 
 function PageContentBody({ className, ...rest }: PageContentBodyProps) {
   return <div className={cx(styles.body, className)} {...rest} />;

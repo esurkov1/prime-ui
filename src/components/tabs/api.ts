@@ -63,7 +63,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.List",
-      en: 'No ref. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding indicator; scrolls instead of wrapping.',
+      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding indicator; scrolls instead of wrapping.',
       ru: '`role="tablist"` на `ScrollContainer` со скользящим индикатором: прокручивается с затуханием краёв вместо переноса.',
       props: [
         {
@@ -82,7 +82,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.Item",
-      en: 'No ref. One tab, a `<button role="tab">`; plain text children are wrapped in `Tabs.Label`.',
+      en: '`ref` → `HTMLButtonElement`. One tab, a `<button role="tab">`; plain text children are wrapped in `Tabs.Label`.',
       ru: 'Одна вкладка — `<button role="tab">`; простой текст оборачивается в `Tabs.Label`.',
       props: [
         {
@@ -116,7 +116,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.Icon",
-      en: "No ref. Decorative icon (`aria-hidden`) before the label; muted, accent on the active tab.",
+      en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) before the label; muted, accent on the active tab.",
       ru: "Декоративная иконка перед подписью; приглушённая, на активной вкладке — акцентная.",
       props: [
         {
@@ -131,7 +131,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.Label",
-      en: "No ref. Title; truncates and keeps a stable width when it turns medium weight.",
+      en: "`ref` → `HTMLSpanElement`. Title; truncates and keeps a stable width when it turns medium weight.",
       ru: "Подпись; обрезается многоточием и не меняет ширину при выделении.",
       props: [
         {
@@ -146,7 +146,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.Count",
-      en: "No ref. Counter `Badge` after the label, one tier below the tabs size.",
+      en: "`ref` → `HTMLSpanElement`. Counter `Badge` after the label, one tier below the tabs size.",
       ru: "Счётчик `Badge` после подписи, на ярус меньше вкладок.",
       props: [
         {
@@ -163,17 +163,12 @@ export const api: ComponentApi = {
           en: "The number.",
           ru: "Число.",
         },
-        {
-          name: "className",
-          type: "string",
-          en: "Extra class.",
-          ru: "Дополнительный класс.",
-        },
+        SPAN_REST,
       ],
     },
     {
       name: "Tabs.Description",
-      en: "No ref. Muted second line; becomes the tab's `aria-describedby`.",
+      en: "`ref` → `HTMLSpanElement`. Muted second line; becomes the tab's `aria-describedby`.",
       ru: "Приглушённая вторая строка; становится `aria-describedby` вкладки.",
       props: [
         {
@@ -188,7 +183,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.Panel",
-      en: 'No ref. `<div role="tabpanel">`, focusable, rendered only while its tab is active.',
+      en: '`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active.',
       ru: '`<div role="tabpanel">`, фокусируемая; рендерится только пока её вкладка активна.',
       props: [
         {

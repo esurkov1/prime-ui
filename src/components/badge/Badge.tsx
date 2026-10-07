@@ -42,13 +42,18 @@ export type BadgeRootProps = {
 export type BadgeIconProps = {
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 export type BadgeDotProps = {
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & React.HTMLAttributes<HTMLSpanElement>;
 
-export type BadgeActionProps = {
+export type BadgeActionProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "onClick" | "children"
+> & {
   /** Accessible name and tooltip of the action («Скрыть billing»). */
   label: string;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -59,7 +64,7 @@ export type BadgeActionProps = {
   pressed?: boolean;
   /** The glyph; a minus by default. Sized to the tier icon. */
   children?: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
 const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
@@ -194,9 +199,11 @@ function BadgeAction({
   pressed,
   children,
   className,
+  ...rest
 }: BadgeActionProps) {
   return (
     <button
+      {...rest}
       type="button"
       className={cx(styles.action, className)}
       aria-label={label}

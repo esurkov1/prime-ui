@@ -55,7 +55,7 @@ Badge.Root          <span>: fill, tier dimensions
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className`, `aria-label` (icon-only) and the other span attributes. |
 
 ### Badge.Icon
-A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.
+`ref` → `HTMLSpanElement`. A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -63,14 +63,14 @@ A `<span>` holding one icon at the tier icon size. At the first or last position
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Badge.Dot
-An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon. Also usable alone (a marker on an icon, before a label): it takes the tier of the surrounding control (6px, 8px from `l`) and the color set on it.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon. Also usable alone (a marker on an icon, before a label): it takes the tier of the surrounding control (6px, 8px from `l`) and the color set on it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ### Badge.Action
-A `<button>` segment at the end, revealed on hover and focus; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.
+`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -80,7 +80,7 @@ A `<button>` segment at the end, revealed on hover and focus; the badge reserves
 | `pressed` | `boolean` | — | Toggle state of the action: `aria-pressed`. |
 | `disabled` | `boolean` | `false` | The action is unavailable. |
 | `children` | `ReactNode` | — | A custom glyph at the tier icon size; a minus by default. |
-| `className` | `string` | — | Extra class on the button. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "onClick" \| "children">` | — | `className` and the other button attributes. |
 
 ## Variants
 

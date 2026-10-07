@@ -12,6 +12,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
+import { mergeRefs } from "@/internal/mergeRefs";
 import { DATA_TABLE_INFINITE_ROOT_MARGIN } from "@/internal/runtimeUnits";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -60,7 +61,9 @@ const DEFAULT_LABELS: DataTableLabels = {
   collapse: "Свернуть строку {label}",
 };
 
-export type DataTableProps<Row> = {
+export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  /** The outer card-fill `<div>`. */
+  ref?: React.Ref<HTMLDivElement>;
   columns: DataTableColumn<Row>[];
   rows: Row[];
   size?: ControlSize;
@@ -244,6 +247,8 @@ export function DataTable<Row>({
   error,
   loadingRows,
   toolbar,
+  ref,
+  ...rest
 }: DataTableProps<Row>) {
   const labels = { ...DEFAULT_LABELS, ...labelsProp };
   const infinite = paging === "infinite";
@@ -270,6 +275,7 @@ export function DataTable<Row>({
   const sentinelRef = React.useRef<HTMLDivElement | null>(null);
   const tableRef = React.useRef<HTMLTableElement | null>(null);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const mergedRootRef = React.useMemo(() => mergeRefs(rootRef, ref), [ref]);
 
   const sortColumn =
     sortState && columns.find((column) => column.sortable && column.id === sortState.columnId);
@@ -610,7 +616,8 @@ export function DataTable<Row>({
   return (
     <ControlSizeProvider value={size}>
       <div
-        ref={rootRef}
+        {...rest}
+        ref={mergedRootRef}
         className={cx(styles.root, className)}
         {...toDataAttributes({
           size,

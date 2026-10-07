@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -79,7 +80,9 @@ TabsRoot.displayName = "Tabs.Root";
 
 // ─── List ─────────────────────────────────────────────────────────────────────
 
-export type TabsListProps = React.HTMLAttributes<HTMLDivElement>;
+export type TabsListProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 type IndicatorRect = { left: number; top: number; width: number; height: number };
 
@@ -88,9 +91,10 @@ const EMPTY_RECT: IndicatorRect = { left: 0, top: 0, width: 0, height: 0 };
 const sameRect = (a: IndicatorRect, b: IndicatorRect) =>
   a.left === b.left && a.top === b.top && a.width === b.width && a.height === b.height;
 
-function TabsList({ children, className, ...rest }: TabsListProps) {
+function TabsList({ children, className, ref, ...rest }: TabsListProps) {
   const { orientation, activeValue, onSelect, size } = useTabsContext();
-  const listRef = React.useRef<HTMLElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
+  const mergedRef = useMergedRefs(listRef, ref);
   const [indicator, setIndicator] = React.useState<IndicatorRect>(EMPTY_RECT);
   const isBar = orientation === "horizontal";
 
@@ -170,7 +174,7 @@ function TabsList({ children, className, ...rest }: TabsListProps) {
   return (
     <ScrollContainer
       {...rest}
-      ref={listRef}
+      ref={mergedRef}
       axis="horizontal"
       fade
       scrollbar="hidden"
@@ -214,6 +218,7 @@ export type TabsItemProps = Omit<
    * A `Tabs.Description` makes the item two-line and becomes its accessible description.
    */
   children: React.ReactNode;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
 function hasChildOfType(children: React.ReactNode, type: React.ElementType): boolean {
@@ -271,6 +276,7 @@ TabsItem.displayName = "Tabs.Item";
 
 export type TabsIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 function TabsIcon({ children, className, ...rest }: TabsIconProps) {
@@ -284,6 +290,7 @@ TabsIcon.displayName = "Tabs.Icon";
 
 export type TabsLabelProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /**
@@ -306,18 +313,19 @@ function TabsLabel({ children, className, ...rest }: TabsLabelProps) {
 }
 TabsLabel.displayName = "Tabs.Label";
 
-export type TabsCountProps = {
+export type TabsCountProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children" | "color"> & {
   /** Badge hue. Default `gray`. */
   color?: PaletteColor;
   children: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Counter next to the label: a soft badge one tier below the tabs size. */
-function TabsCount({ color = "gray", children, className }: TabsCountProps) {
+function TabsCount({ color = "gray", children, className, ...rest }: TabsCountProps) {
   const itemId = React.useContext(ItemIdContext);
   return (
     <Badge.Root
+      {...rest}
       id={itemId ? `${itemId}-count` : undefined}
       color={color}
       className={cx(styles.count, className)}
@@ -331,6 +339,7 @@ TabsCount.displayName = "Tabs.Count";
 export type TabsDescriptionProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /** Muted second line; wrap a key value in `<strong>` to emphasize it. */
   children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 function TabsDescription({ children, className, ...rest }: TabsDescriptionProps) {
@@ -351,6 +360,7 @@ TabsDescription.displayName = "Tabs.Description";
 
 export type TabsPanelProps = React.HTMLAttributes<HTMLDivElement> & {
   value: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function TabsPanel({ value, children, className, ...rest }: TabsPanelProps) {

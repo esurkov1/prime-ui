@@ -1,10 +1,11 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "ColorSwatches",
-      en: 'No ref. The field frame (label → swatches → hint | error) around a `role="radiogroup"` of swatch buttons with a roving tab stop.',
+      en: '`ref` → `HTMLDivElement` (the field frame). The field frame (label → swatches → hint | error) around a `role="radiogroup"` of swatch buttons with a roving tab stop.',
       ru: "Рамка поля (подпись → образцы → подсказка или ошибка) вокруг `radiogroup` из кнопок-образцов.",
       props: [
         {
@@ -126,12 +127,7 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Системные строки, см. «Доступность».",
         },
-        {
-          name: "className",
-          type: "string",
-          en: "Class on the outer field `<div>`.",
-          ru: "Класс на внешнем `<div>` поля.",
-        },
+        FIELD_ROOT_REST,
       ],
     },
   ],

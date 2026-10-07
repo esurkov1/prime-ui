@@ -111,7 +111,9 @@ function ThumbnailImage(props: ThumbnailImageProps) {
 }
 ThumbnailImage.displayName = "Thumbnail.Image";
 
-export type ThumbnailFallbackProps = React.HTMLAttributes<HTMLSpanElement>;
+export type ThumbnailFallbackProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** Shown without an image, while it loads and when it fails: palette fill + centered icon. */
 function ThumbnailFallback({ className, ...rest }: ThumbnailFallbackProps) {

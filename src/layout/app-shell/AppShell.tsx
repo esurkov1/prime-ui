@@ -13,7 +13,9 @@ export type AppShellRootProps = React.HTMLAttributes<HTMLDivElement> & {
   fillViewport?: boolean;
 };
 
-export type AppShellNavProps = React.HTMLAttributes<HTMLDivElement>;
+export type AppShellNavProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /** Navigation column (usually `Sidebar.Root`); sits on the canvas. */
 function AppShellNav({ className, ...rest }: AppShellNavProps) {

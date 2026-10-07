@@ -179,6 +179,7 @@ TimelineItem.displayName = "Timeline.Item";
 export type TimelineTitleProps = {
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 /** First line: the event. Medium, primary (accent on the active row); wraps when narrow. */
@@ -194,6 +195,7 @@ TimelineTitle.displayName = "Timeline.Title";
 export type TimelineMetaProps = {
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 /** Second line: date and relative time, muted, tabular numbers. Emphasize a part with `Timeline.MetaPrimary` or `<strong>`. */
@@ -209,6 +211,7 @@ TimelineMeta.displayName = "Timeline.Meta";
 export type TimelineMetaPrimaryProps = {
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 /** Emphasized part of the meta line (the date): primary, medium. */
@@ -226,6 +229,7 @@ export type TimelineValueProps = {
   tone?: Tone;
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 /**
@@ -244,6 +248,7 @@ TimelineValue.displayName = "Timeline.Value";
 export type TimelineValueMetaProps = {
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 /** Second line inside `Timeline.Value` (category, unit): meta size, muted, right-aligned under the value. */

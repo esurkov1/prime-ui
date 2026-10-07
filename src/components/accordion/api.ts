@@ -128,7 +128,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Accordion.Icon",
-      en: "No ref. Decorative leading icon (`aria-hidden`) of the trigger; the content then lines up with the label.",
+      en: "`ref` → `HTMLSpanElement`. Decorative leading icon (`aria-hidden`) of the trigger; the content then lines up with the label.",
       ru: "Декоративная иконка перед подписью; содержимое выравнивается по подписи.",
       props: [
         {

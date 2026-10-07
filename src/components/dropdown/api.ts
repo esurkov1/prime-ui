@@ -139,13 +139,13 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.ItemIcon · Dropdown.ItemShortcut",
-      en: "No ref. An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.",
+      en: "`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.",
       ru: "Иконка в начале пункта по размеру яруса меню / подсказка клавиш (Kbd) в конце пункта.",
       props: [],
     },
     {
       name: "Dropdown.Group",
-      en: 'No ref. `<div role="group">` named by its visible `label`. + native `<div>` props.',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its visible `label`. + native `<div>` props.',
       ru: "Группа пунктов с видимой подписью; подпись даёт группе имя.",
       props: [
         {
@@ -158,20 +158,20 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Separator",
-      en: "No ref. A full-bleed Divider between items or groups.",
+      en: "`ref` → `HTMLDivElement`. A full-bleed Divider between items or groups.",
       ru: "Разделитель на всю ширину панели.",
       props: [
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the divider.",
-          ru: "Дополнительный класс разделителя.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the divider.",
+          ru: "`className` и остальные атрибуты разделителя.",
         },
       ],
     },
     {
       name: "Dropdown.Header · Dropdown.Title · Dropdown.Description",
-      en: "No ref. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description stacked in one column, a trailing badge or button — in the written order / the medium heading line / the muted line under it; both truncate. + native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description stacked in one column, a trailing badge or button — in the written order / the medium heading line / the muted line under it; both truncate. + native `<div>` props.",
       ru: "Неинтерактивная строка сверху: аватар, заголовок и описание одной колонкой, бейдж или кнопка в конце.",
       props: [],
     },

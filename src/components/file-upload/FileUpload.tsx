@@ -36,7 +36,12 @@ const FILE_UPLOAD_LABELS: FileUploadLabels = {
 
 // ─── Drop zone parts ─────────────────────────────────────────────────────────
 
-export type FileUploadBodyProps = React.HTMLAttributes<HTMLDivElement>;
+type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
+type ParagraphProps = React.HTMLAttributes<HTMLParagraphElement> & {
+  ref?: React.Ref<HTMLParagraphElement>;
+};
+
+export type FileUploadBodyProps = DivProps;
 
 /**
  * Custom body of the drop zone: a centered column. It takes no pointer events, so dragging over
@@ -47,7 +52,9 @@ function FileUploadBody({ className, ...rest }: FileUploadBodyProps) {
 }
 FileUploadBody.displayName = "FileUpload.Body";
 
-export type FileUploadIconProps = React.HTMLAttributes<HTMLSpanElement>;
+export type FileUploadIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** Round tinted slot for the zone icon; kit icons inside take the zone tier. */
 function FileUploadIcon({ className, ...rest }: FileUploadIconProps) {
@@ -55,7 +62,7 @@ function FileUploadIcon({ className, ...rest }: FileUploadIconProps) {
 }
 FileUploadIcon.displayName = "FileUpload.Icon";
 
-export type FileUploadTitleProps = React.HTMLAttributes<HTMLParagraphElement> & {
+export type FileUploadTitleProps = ParagraphProps & {
   /** `muted` — secondary color, regular weight (an instruction line in custom bodies). */
   tone?: Extract<TextTone, "default" | "muted">;
 };
@@ -71,7 +78,7 @@ function FileUploadTitle({ className, tone = "default", ...rest }: FileUploadTit
 }
 FileUploadTitle.displayName = "FileUpload.Title";
 
-export type FileUploadDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
+export type FileUploadDescriptionProps = ParagraphProps;
 
 /** Secondary line of the zone (formats, size limit), the kit Hint of the zone tier. */
 function FileUploadDescription(props: FileUploadDescriptionProps) {
@@ -81,7 +88,7 @@ FileUploadDescription.displayName = "FileUpload.Description";
 
 // ─── File row ────────────────────────────────────────────────────────────────
 
-export type FileUploadItemProps = React.HTMLAttributes<HTMLDivElement> & {
+export type FileUploadItemProps = DivProps & {
   /** Failed upload: danger wash and ring, danger description. */
   invalid?: boolean;
   /** Typography, spacing and the format badge follow the control tier. */
@@ -102,31 +109,39 @@ function FileUploadItem({ className, invalid = false, size = "m", ...rest }: Fil
 }
 FileUploadItem.displayName = "FileUpload.Item";
 
-export type FileUploadFormatBadgeProps = {
+export type FileUploadFormatBadgeProps = Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  "children" | "color"
+> & {
   /** File extension; shown upper-case, cut to 8 characters. */
   format: string;
   color?: PaletteColor;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** The file format as a square kit Badge (decorative: the name already carries the extension). */
-function FileUploadFormatBadge({ format, color = "gray", className }: FileUploadFormatBadgeProps) {
+function FileUploadFormatBadge({
+  format,
+  color = "gray",
+  className,
+  ...rest
+}: FileUploadFormatBadgeProps) {
   return (
-    <Badge.Root color={color} className={cx(styles.formatBadge, className)} aria-hidden>
+    <Badge.Root {...rest} color={color} className={cx(styles.formatBadge, className)} aria-hidden>
       {format.trim().slice(0, 8).toUpperCase()}
     </Badge.Root>
   );
 }
 FileUploadFormatBadge.displayName = "FileUpload.FormatBadge";
 
-export type FileUploadItemNameProps = React.HTMLAttributes<HTMLDivElement>;
+export type FileUploadItemNameProps = DivProps;
 
 function FileUploadItemName({ className, ...rest }: FileUploadItemNameProps) {
   return <div className={cx(styles.itemName, className)} {...rest} />;
 }
 FileUploadItemName.displayName = "FileUpload.ItemName";
 
-export type FileUploadItemDescriptionProps = React.HTMLAttributes<HTMLDivElement>;
+export type FileUploadItemDescriptionProps = DivProps;
 
 /** Size, progress or the error of the file; turns danger in an invalid row. */
 function FileUploadItemDescription({ className, ...rest }: FileUploadItemDescriptionProps) {
@@ -134,7 +149,7 @@ function FileUploadItemDescription({ className, ...rest }: FileUploadItemDescrip
 }
 FileUploadItemDescription.displayName = "FileUpload.ItemDescription";
 
-export type FileUploadItemActionsProps = React.HTMLAttributes<HTMLDivElement>;
+export type FileUploadItemActionsProps = DivProps;
 
 /** Buttons at the end of the row (remove, retry). */
 function FileUploadItemActions({ className, ...rest }: FileUploadItemActionsProps) {
@@ -142,16 +157,15 @@ function FileUploadItemActions({ className, ...rest }: FileUploadItemActionsProp
 }
 FileUploadItemActions.displayName = "FileUpload.ItemActions";
 
-export type FileUploadItemProgressProps = {
+export type FileUploadItemProgressProps = Omit<DivProps, "children"> & {
   value: number;
   max?: number;
-  className?: string;
 };
 
 /** Upload progress across the whole row: the kit ProgressBar. */
-function FileUploadItemProgress({ value, max, className }: FileUploadItemProgressProps) {
+function FileUploadItemProgress({ value, max, className, ...rest }: FileUploadItemProgressProps) {
   return (
-    <div className={cx(styles.itemProgress, className)}>
+    <div {...rest} className={cx(styles.itemProgress, className)}>
       <ProgressBar value={value} max={max} />
     </div>
   );

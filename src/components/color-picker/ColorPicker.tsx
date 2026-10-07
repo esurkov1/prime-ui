@@ -24,6 +24,7 @@ import { Select } from "@/components/select/Select";
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import type { FieldRootDomProps } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
 import { SwatchFill } from "@/internal/swatch";
 
@@ -72,7 +73,7 @@ export type ColorPickerRootProps = {
   children: React.ReactNode;
 };
 
-export type ColorPickerHexInputProps = {
+export type ColorPickerHexInputProps = FieldRootDomProps & {
   size?: ControlSize;
   label?: React.ReactNode;
   hint?: React.ReactNode;
@@ -144,11 +145,17 @@ const FORMAT_LABELS: Record<ColorValueFormat, string> = { hsl: "HSL", rgb: "RGB"
 
 const isFormat = (value: string): value is ColorValueFormat => value in FORMAT_LABELS;
 
-function FormatSelect({ className }: { className?: string }) {
+type DivProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+export type ColorPickerFormatSelectProps = DivProps;
+
+function FormatSelect({ className, ...rest }: ColorPickerFormatSelectProps) {
   const { format, setFormat, labels } = useColorPickerContext();
 
   return (
-    <div className={cx(styles.formatSelectWrap, className)}>
+    <div {...rest} className={cx(styles.formatSelectWrap, className)}>
       <Select.Root value={format} onValueChange={(value) => isFormat(value) && setFormat(value)}>
         <Select.Trigger aria-label={labels.format}>
           <Select.Value />
@@ -293,8 +300,7 @@ function StripHexField() {
   );
 }
 
-export type ColorPickerChannelStripProps = {
-  className?: string;
+export type ColorPickerChannelStripProps = DivProps & {
   /**
    * Draws the focus ring on the focused field (default). `false` sets `data-focus-ring="false"` and
    * hides only the visual ring — focus, keyboard and ARIA are unchanged, the error ring still shows.
@@ -304,11 +310,12 @@ export type ColorPickerChannelStripProps = {
 };
 
 /** Channel row: eyedropper on the left, then the cells of the current format. */
-function ChannelStrip({ className, focusRing = true }: ColorPickerChannelStripProps) {
+function ChannelStrip({ className, focusRing = true, ...rest }: ColorPickerChannelStripProps) {
   const { format } = useColorPickerContext();
 
   return (
     <div
+      {...rest}
       className={cx(styles.channelStrip, className)}
       data-focus-ring={focusRing ? undefined : "false"}
     >
@@ -378,6 +385,7 @@ ColorPickerRoot.displayName = "ColorPicker.Root";
 
 export type ColorPickerSliderProps = Omit<AriaColorSliderProps, "isDisabled"> & {
   disabled?: boolean;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function Slider({ className, disabled, ...props }: ColorPickerSliderProps) {
@@ -392,7 +400,14 @@ function Slider({ className, disabled, ...props }: ColorPickerSliderProps) {
 
 export type ColorPickerAreaProps = Omit<AriaColorAreaProps, "isDisabled"> & {
   disabled?: boolean;
+  ref?: React.Ref<HTMLDivElement>;
 };
+
+export type ColorPickerSliderTrackProps = AriaSliderTrackProps & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+export type ColorPickerThumbProps = AriaColorThumbProps & { ref?: React.Ref<HTMLDivElement> };
 
 function Area({ className, disabled, ...props }: ColorPickerAreaProps) {
   return (
@@ -404,7 +419,7 @@ function Area({ className, disabled, ...props }: ColorPickerAreaProps) {
   );
 }
 
-function SliderTrack({ className, style, ...props }: AriaSliderTrackProps) {
+function SliderTrack({ className, style, ...props }: ColorPickerSliderTrackProps) {
   return (
     <AriaSliderTrack
       className={composeRenderProps(className, (c) => cx(styles.sliderTrack, c))}
@@ -426,7 +441,7 @@ function SliderTrack({ className, style, ...props }: AriaSliderTrackProps) {
   );
 }
 
-function Thumb({ className, ...props }: AriaColorThumbProps) {
+function Thumb({ className, ...props }: ColorPickerThumbProps) {
   return (
     <AriaColorThumb
       className={composeRenderProps(className, (c) => cx(styles.thumb, c))}
@@ -435,7 +450,7 @@ function Thumb({ className, ...props }: AriaColorThumbProps) {
   );
 }
 
-function AreaThumb({ className, ...props }: AriaColorThumbProps) {
+function AreaThumb({ className, ...props }: ColorPickerThumbProps) {
   return (
     <AriaColorThumb
       className={composeRenderProps(className, (c) => cx(styles.thumbArea, c))}
@@ -465,10 +480,15 @@ function Swatches(props: ColorPickerSwatchesProps) {
   );
 }
 
+export type ColorPickerSliderMetaProps = DivProps & {
+  /** The channel name. */
+  label: React.ReactNode;
+};
+
 /** Slider heading: the label and the current channel value. */
-function SliderMeta({ label }: { label: React.ReactNode }) {
+function SliderMeta({ label, className, ...rest }: ColorPickerSliderMetaProps) {
   return (
-    <div className={styles.sliderHeader}>
+    <div {...rest} className={cx(styles.sliderHeader, className)}>
       <span className={styles.sliderLabel}>{label}</span>
       <AriaSliderOutput className={styles.sliderValue} />
     </div>
@@ -482,6 +502,7 @@ function HexInput({
   error,
   focusRing = true,
   className,
+  ...rest
 }: ColorPickerHexInputProps) {
   const { labels } = useColorPickerContext();
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -493,6 +514,7 @@ function HexInput({
 
   return (
     <Input.Root
+      {...rest}
       className={className}
       label={label ?? labels.hex}
       hint={hint}
@@ -598,15 +620,18 @@ const EyeDropperButton = React.forwardRef<HTMLButtonElement, ColorPickerEyeDropp
 
 EyeDropperButton.displayName = "ColorPicker.EyeDropperButton";
 
-export type ColorPickerTriggerSwatchProps = {
-  className?: string;
+export type ColorPickerTriggerSwatchProps = Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  "children"
+> & {
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Square of the current color, e.g. inside the popover trigger button. */
-function TriggerSwatch({ className }: ColorPickerTriggerSwatchProps) {
+function TriggerSwatch({ className, ...rest }: ColorPickerTriggerSwatchProps) {
   const state = React.useContext(ColorPickerStateContext);
   return (
-    <span aria-hidden className={cx(styles.triggerSwatch, className)}>
+    <span {...rest} aria-hidden className={cx(styles.triggerSwatch, className)}>
       <SwatchFill value={state ? state.color.toString("css") : null} />
     </span>
   );

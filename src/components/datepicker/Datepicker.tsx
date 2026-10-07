@@ -22,6 +22,7 @@ import {
   type RangeModeProps,
   type ResolvedValue,
   type SingleModeProps,
+  splitCalendarOptions,
   useResolvedValue,
 } from "./DatepickerPanel";
 import {
@@ -134,8 +135,9 @@ function DatepickerRoot({
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
   "aria-describedby": ariaDescribedBy,
-  ...options
+  ...props
 }: DatepickerRootProps) {
+  const { options, rest } = splitCalendarOptions(props);
   const resolved = useResolvedValue({
     mode,
     value: valueProp,
@@ -162,6 +164,7 @@ function DatepickerRoot({
 
   return (
     <FieldFrame
+      {...rest}
       size={size}
       ids={ids}
       label={label}

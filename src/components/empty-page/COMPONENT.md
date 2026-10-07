@@ -44,7 +44,7 @@ EmptyPage.Root               centered column; size, layout
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` (`status` in a filtered list), `aria-labelledby` and the other div attributes. |
 
 ### EmptyPage.Icon
-A `<div>` tile holding one icon.
+`ref` → `HTMLDivElement`. A `<div>` tile holding one icon.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -60,7 +60,7 @@ A `<div>` tile holding one icon.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `id` (for `aria-labelledby`), `className` and the other attributes. |
 
 ### EmptyPage.Actions
-A `<div>` row of buttons that wraps when narrow.
+`ref` → `HTMLDivElement`. A `<div>` row of buttons that wraps when narrow.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

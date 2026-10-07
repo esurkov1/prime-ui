@@ -259,7 +259,11 @@ function DropdownItem({
 }
 DropdownItem.displayName = "Dropdown.Item";
 
-export type DropdownItemIconProps = React.HTMLAttributes<HTMLSpanElement>;
+type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
+
+export type DropdownItemIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** Leading glyph of an item at the menu's icon size (a kit `Icon` follows it). */
 function DropdownItemIcon({ className, ...rest }: DropdownItemIconProps) {
@@ -269,6 +273,7 @@ DropdownItemIcon.displayName = "Dropdown.ItemIcon";
 
 export type DropdownItemShortcutProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLElement>;
 };
 
 /** Key hint at the end of an item (a Kbd one tier below the menu). A hint only — not a handler. */
@@ -280,6 +285,7 @@ DropdownItemShortcut.displayName = "Dropdown.ItemShortcut";
 export type DropdownGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
   /** Visible heading of the group; names it for screen readers. */
   label?: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function DropdownGroup({ label, className, children, ...rest }: DropdownGroupProps) {
@@ -303,15 +309,15 @@ function DropdownGroup({ label, className, children, ...rest }: DropdownGroupPro
 }
 DropdownGroup.displayName = "Dropdown.Group";
 
-export type DropdownSeparatorProps = { className?: string };
+export type DropdownSeparatorProps = Omit<DivProps, "children">;
 
 /** A full-bleed hairline between items or groups. */
-function DropdownSeparator({ className }: DropdownSeparatorProps) {
-  return <Divider className={cx(menu.separator, className)} />;
+function DropdownSeparator({ className, ...rest }: DropdownSeparatorProps) {
+  return <Divider {...rest} className={cx(menu.separator, className)} />;
 }
 DropdownSeparator.displayName = "Dropdown.Separator";
 
-export type DropdownTitleProps = React.HTMLAttributes<HTMLDivElement>;
+export type DropdownTitleProps = DivProps;
 
 /** Heading line of `Dropdown.Header` (a name, a plan). */
 function DropdownTitle({ className, ...rest }: DropdownTitleProps) {
@@ -319,7 +325,7 @@ function DropdownTitle({ className, ...rest }: DropdownTitleProps) {
 }
 DropdownTitle.displayName = "Dropdown.Title";
 
-export type DropdownDescriptionProps = React.HTMLAttributes<HTMLDivElement>;
+export type DropdownDescriptionProps = DivProps;
 
 /** Muted line under `Dropdown.Title` (an email, a quota); truncates with an ellipsis. */
 function DropdownDescription({ className, ...rest }: DropdownDescriptionProps) {
@@ -327,7 +333,7 @@ function DropdownDescription({ className, ...rest }: DropdownDescriptionProps) {
 }
 DropdownDescription.displayName = "Dropdown.Description";
 
-export type DropdownHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+export type DropdownHeaderProps = DivProps;
 
 const isText = (node: React.ReactNode) =>
   React.isValidElement(node) && (node.type === DropdownTitle || node.type === DropdownDescription);

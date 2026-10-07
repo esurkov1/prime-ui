@@ -74,7 +74,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `className` and the other attributes of the panel. |
 
 ### Popover.Header · Popover.Title · Popover.Description · Popover.Actions
-No ref. `<div>` (title + description with a 4 px step) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end, stacked full width below 480 px). + native props.
+`ref` → the element. `<div>` (title + description with a 4 px step) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end, stacked full width below 480 px). + native props.
 
 ## Variants
 The panel has one look: `bg-raised` fill, `--prime-panel-radius`, `shadow-overlay`, no border. Fields inside get the surface field fill; cards inside become sunken tiles.

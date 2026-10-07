@@ -73,7 +73,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Icon",
-      en: "A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.",
+      en: "`ref` → `HTMLSpanElement`. A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.",
       ru: "`<span>` с иконкой размера яруса. Первой или последней — становится сегментом во всю высоту у края.",
       props: [
         {
@@ -93,7 +93,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Dot",
-      en: "An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon. Also usable alone (a marker on an icon, before a label): it takes the tier of the surrounding control (6px, 8px from `l`) and the color set on it.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon. Also usable alone (a marker on an icon, before a label): it takes the tier of the surrounding control (6px, 8px from `l`) and the color set on it.",
       ru: "Точка цвета текста, `aria-hidden`; у края становится сегментом, как иконка. Работает и отдельно (метка на иконке, перед подписью): размер по ярусу окружающего контрола (6px, с `l` — 8px), цвет — заданный на ней.",
       props: [
         {
@@ -106,7 +106,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Action",
-      en: "A `<button>` segment at the end, revealed on hover and focus; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.",
+      en: "`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.",
       ru: "Кнопка-сегмент в конце, появляется при наведении и фокусе; место зарезервировано, ширина не меняется. Одна на бейдж, не вместе с `onRemove`.",
       props: [
         {
@@ -150,10 +150,10 @@ export const api: ComponentApi = {
           ru: "Свой глиф размера иконки яруса; по умолчанию минус.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the button.",
-          ru: "Дополнительный класс кнопки.",
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "onClick" | "children">',
+          en: "`className` and the other button attributes.",
+          ru: "`className` и остальные атрибуты кнопки.",
         },
       ],
     },

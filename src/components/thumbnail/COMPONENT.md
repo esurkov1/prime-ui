@@ -55,7 +55,7 @@ Thumbnail.Root          frame: tier height, width from ratio, radius, palette fi
 | `…rest` | `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | `className`, `onLoad`, `onError` and the other img attributes. |
 
 ### Thumbnail.Fallback
-A `<span>` with an icon (sized to the tier) or a short label on the fill; `aria-hidden` once the image has loaded.
+`ref` → `HTMLSpanElement`. A `<span>` with an icon (sized to the tier) or a short label on the fill; `aria-hidden` once the image has loaded.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

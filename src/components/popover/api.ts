@@ -120,7 +120,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Header · Popover.Title · Popover.Description · Popover.Actions",
-      en: "No ref. `<div>` (title + description with a 4 px step) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end, stacked full width below 480 px). + native props.",
+      en: "`ref` → the element. `<div>` (title + description with a 4 px step) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end, stacked full width below 480 px). + native props.",
       ru: "Шапка, заголовок (имя диалога), описание и ряд кнопок; текст следует ярусу панели.",
       props: [],
     },

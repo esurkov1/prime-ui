@@ -56,14 +56,14 @@ Avatar.Group           overlapping row, gives its size to members
 | `…rest` | `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | `className`, `onLoad`, `onError` and the other img attributes. |
 
 ### Avatar.Fallback
-A `<span>` with initials or an `Icon` under the photo; `aria-hidden` once the photo has loaded.
+`ref` → `HTMLSpanElement`. A `<span>` with initials or an `Icon` under the photo; `aria-hidden` once the photo has loaded.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Avatar.Status
-A presence dot on the bottom-end edge, `role="img"` named by the state, cut out by a ring in `--avatar-ring`.
+`ref` → `HTMLSpanElement`. A presence dot on the bottom-end edge, `role="img"` named by the state, cut out by a ring in `--avatar-ring`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

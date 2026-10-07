@@ -46,7 +46,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Datepicker.Root
-No ref. A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option below.
+`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option below.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -72,14 +72,14 @@ No ref. A field (label, hint / error, the field button with a calendar icon, the
 | `valuePrefix` | `string` | — | Text before the value, e.g. «С». |
 | `id` | `string` | — | Id of the field button; generated when omitted. |
 | `aria-label · aria-labelledby · aria-describedby` | `string` | — | Name without a `label` (the value is appended) and extra description ids. |
-| `className` | `string` | — | Class on the field wrapper. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
 
 ### Datepicker.Panel
-No ref. The calendar without a field, inline in a page: its own card, 1–2 months by the parent's width. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.
+`ref` → `HTMLDivElement`. The calendar without a field, inline in a page: its own card, 1–2 months by the parent's width. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Class on the panel. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className` and the other attributes of the panel card. |
 
 ### Calendar options (Root · Panel)
 Shared by `Datepicker.Root` and `Datepicker.Panel`.

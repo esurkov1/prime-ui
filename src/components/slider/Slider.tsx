@@ -9,7 +9,10 @@ import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Slider.module.css";
 
-export type SliderProps = {
+export type SliderProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "defaultValue" | "defaultChecked" | "onChange"
+> & {
   value?: number;
   defaultValue?: number;
   onValueChange?: (value: number) => void;
@@ -26,8 +29,10 @@ export type SliderProps = {
   size?: ControlSize;
   /** Color of the filled part of the track. */
   tone?: Tone;
-  className?: string;
+  /** Name of the range input when there is no `label`. */
   "aria-label"?: string;
+  /** The outer `<div>`. */
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
@@ -47,7 +52,9 @@ export function Slider({
   size = "m",
   tone = "accent",
   className,
+  style,
   "aria-label": ariaLabel,
+  ...rest
 }: SliderProps) {
   const [value, setValue] = useControllableState({
     value: valueProp,
@@ -62,9 +69,10 @@ export function Slider({
 
   return (
     <div
+      {...rest}
       className={cx(styles.root, className)}
       // The fill and the thumb position follow the value; a custom property carries it to CSS.
-      style={{ "--slider-ratio": ratio } as React.CSSProperties}
+      style={{ ...style, "--slider-ratio": ratio } as React.CSSProperties}
       {...toDataAttributes({ size, tone, disabled: disabled || undefined })}
     >
       <ControlSizeProvider value={size}>

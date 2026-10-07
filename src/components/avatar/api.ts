@@ -58,7 +58,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Avatar.Fallback",
-      en: "A `<span>` with initials or an `Icon` under the photo; `aria-hidden` once the photo has loaded.",
+      en: "`ref` → `HTMLSpanElement`. A `<span>` with initials or an `Icon` under the photo; `aria-hidden` once the photo has loaded.",
       ru: "`<span>` с инициалами или `Icon` под фото; `aria-hidden`, когда фото загрузилось.",
       props: [
         {
@@ -71,7 +71,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Avatar.Status",
-      en: 'A presence dot on the bottom-end edge, `role="img"` named by the state, cut out by a ring in `--avatar-ring`.',
+      en: '`ref` → `HTMLSpanElement`. A presence dot on the bottom-end edge, `role="img"` named by the state, cut out by a ring in `--avatar-ring`.',
       ru: 'Точка присутствия на нижнем крае, `role="img"` с названием состояния, вырезана кольцом цвета `--avatar-ring`.',
       props: [
         {

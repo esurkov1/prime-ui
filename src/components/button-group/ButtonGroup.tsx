@@ -75,6 +75,7 @@ ButtonGroupItem.displayName = "ButtonGroup.Item";
 
 export type ButtonGroupIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 function ButtonGroupIcon({ children, className, ...rest }: ButtonGroupIconProps) {

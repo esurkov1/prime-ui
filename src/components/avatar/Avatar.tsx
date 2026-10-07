@@ -89,7 +89,9 @@ function AvatarImage(props: AvatarImageProps) {
 }
 AvatarImage.displayName = "Avatar.Image";
 
-export type AvatarFallbackProps = React.HTMLAttributes<HTMLSpanElement>;
+export type AvatarFallbackProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** Initials or an icon, shown without a photo, while it loads and when it fails. */
 function AvatarFallback({ className, ...rest }: AvatarFallbackProps) {
@@ -122,6 +124,7 @@ export type AvatarStatusProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "chi
   status: AvatarPresence;
   /** Accessible names of the presence states (Russian defaults). */
   labels?: Partial<AvatarStatusLabels>;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Presence dot; announced as an image with the state name (`labels`). */

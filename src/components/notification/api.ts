@@ -55,7 +55,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "NotificationProvider",
-      en: "No ref. Wraps the app once: keeps the toasts and renders their stacks in a portal (one stack per position × tone).",
+      en: "No DOM of its own, no ref. Wraps the app once: keeps the toasts and renders their stacks in a portal (one stack per position × tone).",
       ru: "Оборачивает приложение один раз: хранит уведомления и рендерит их стопки в портале (стопка на позицию × тон).",
       props: [
         {
@@ -155,7 +155,7 @@ export const api: ComponentApi = {
     },
     {
       name: "NotificationCard",
-      en: 'No ref. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.',
+      en: '`ref` → `HTMLElement`. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.',
       ru: 'Статичная карточка `<article role="status|alert">` без таймера: подтверждения на месте, документация, макеты.',
       props: [
         ...CONTENT,
@@ -166,10 +166,10 @@ export const api: ComponentApi = {
           ru: "Показывает кнопку закрытия и вызывается по клику.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the card.",
-          ru: "Дополнительный класс карточки.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLElement>, "title" | "children" | "role">',
+          en: "`className` and the other attributes of the `<article>`.",
+          ru: "`className` и остальные атрибуты `<article>`.",
         },
       ],
     },

@@ -33,7 +33,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Modal.Content",
-      en: 'No ref. Portal + scrim + `role="dialog"`; renders while open and during its exit animation. Controls inside get size `m`.',
+      en: '`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"`; renders while open and during its exit animation. Controls inside get size `m`.',
       ru: "Портал, подложка и сам диалог: ловушка фокуса, блокировка прокрутки.",
       props: [
         {

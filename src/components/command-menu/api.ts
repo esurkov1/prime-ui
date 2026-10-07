@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "CommandMenu.Root",
-      en: "No ref. A Modal with a top-aligned palette panel; holds the query and the active item while open (a new opening starts empty, focus in the search field).",
+      en: "`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; holds the query and the active item while open (a new opening starts empty, focus in the search field).",
       ru: "Палитра на основе Modal: панель сверху, запрос и активный пункт живут, пока она открыта.",
       props: [
         {
@@ -60,23 +60,23 @@ export const api: ComponentApi = {
           ru: "Имя и описание диалога, если нет `CommandMenu.Title` / `Description`.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the dialog panel.",
-          ru: "Дополнительный класс панели.",
-        },
-        {
           name: "children",
           type: "ReactNode",
           required: true,
           en: "Title, Description, Input, List, Footer.",
           ru: "Title, Description, Input, List, Footer.",
         },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the dialog panel.",
+          ru: "`className` и остальные атрибуты панели диалога.",
+        },
       ],
     },
     {
       name: "CommandMenu.Title · CommandMenu.Description",
-      en: "No ref. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.",
+      en: "`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.",
       ru: "Видимый заголовок и описание над поиском; дают диалогу имя и описание.",
       props: [],
     },
@@ -114,7 +114,7 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Group",
-      en: 'No ref. `<div role="group">` named by its `label`; hidden while none of its items match. + native `<div>` props.',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while none of its items match. + native `<div>` props.',
       ru: "Раздел пунктов с подписью; скрывается, если ни один пункт не подходит.",
       props: [
         {
@@ -160,13 +160,13 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.ItemIcon · CommandMenu.ItemShortcut",
-      en: "No ref. An `aria-hidden` `<span>` holding the leading glyph at the tier icon size / a `Kbd` one tier below, pushed to the end of the item — a hint, not a handler. + native props.",
+      en: "`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the tier icon size / a `Kbd` one tier below, pushed to the end of the item — a hint, not a handler. + native props.",
       ru: "Иконка в начале пункта / подсказка клавиш (Kbd) в конце пункта.",
       props: [],
     },
     {
       name: "CommandMenu.ItemText",
-      en: "No ref. A `<span>` column: the title with an ellipsis and an optional description line. + native `<span>` props.",
+      en: "`ref` → `HTMLSpanElement`. A `<span>` column: the title with an ellipsis and an optional description line. + native `<span>` props.",
       ru: "Текст пункта: заголовок с многоточием и необязательная строка описания.",
       props: [
         {
@@ -179,13 +179,13 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Empty",
-      en: 'No ref. A compact EmptyPage with `role="status"`, shown only while nothing matches: `labels.empty`, `labels.emptyHint`, and `children` as an action under them.',
+      en: '`ref` → `HTMLDivElement`. A compact EmptyPage with `role="status"`, shown only while nothing matches: `labels.empty`, `labels.emptyHint`, and `children` as an action under them.',
       ru: "Пустой результат (компактный EmptyPage), только когда ничего не найдено; `children` — действие.",
       props: [],
     },
     {
       name: "CommandMenu.Footer · CommandMenu.FooterHint",
-      en: "No ref. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.",
+      en: "`ref` → `HTMLDivElement` / `HTMLSpanElement`. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.",
       ru: "Нижняя строка подсказок / одна подсказка: каждая клавиша в своём Kbd и подпись.",
       props: [
         {

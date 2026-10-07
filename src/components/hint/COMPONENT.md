@@ -41,7 +41,7 @@ Hint.Root      <p> with the text
 | `children` | `ReactNode` | — | Text, optionally with `Hint.Icon` first. |
 
 ### Hint.Icon
-No ref. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line. + native `<span>` props.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line. + native `<span>` props.
 
 ## Variants
 Hint has no `variant` or `tone`; its states are flags.

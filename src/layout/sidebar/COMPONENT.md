@@ -67,7 +67,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Sidebar.Header · Sidebar.Footer
-No ref. Header: one fixed-height row for `Sidebar.Brand` and the header Toggle. Footer: items, the item Toggle and `Sidebar.Account` (set apart by air) at the bottom.
+`ref` → `HTMLDivElement`. Header: one fixed-height row for `Sidebar.Brand` and the header Toggle. Footer: items, the item Toggle and `Sidebar.Account` (set apart by air) at the bottom.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -85,7 +85,7 @@ No ref. Header: one fixed-height row for `Sidebar.Brand` and the header Toggle. 
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
 
 ### Sidebar.BrandLogo
-No ref. The product mark (`aria-hidden`): a square of the item height − 8 (at most 32) on the icon axis in every mode; its child fills it.
+`ref` → `HTMLSpanElement`. The product mark (`aria-hidden`): a square of the item height − 8 (at most 32) on the icon axis in every mode; its child fills it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -100,7 +100,7 @@ No ref. The product mark (`aria-hidden`): a square of the item height − 8 (at 
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (Groups, Items, Subs), `className` and the other attributes. |
 
 ### Sidebar.Group
-No ref. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail headings fold and the items always show.
+`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail headings fold and the items always show.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -124,7 +124,7 @@ No ref. `<div role="group">` named by its label. With `collapsible` the heading 
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
 
 ### Sidebar.ItemIcon
-No ref. An icon (`aria-hidden`). Before the label it leads and stays on the icon axis in every mode; after the label it is a quiet trailing glyph (`data-edge="end"`, 14, muted), e.g. ↗ for an external link, hidden in compact mode.
+`ref` → `HTMLSpanElement`. An icon (`aria-hidden`). Before the label it leads and stays on the icon axis in every mode; after the label it is a quiet trailing glyph (`data-edge="end"`, 14, muted), e.g. ↗ for an external link, hidden in compact mode.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -132,25 +132,25 @@ No ref. An icon (`aria-hidden`). Before the label it leads and stays on the icon
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Sidebar.ItemCount
-No ref. A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon.
+`ref` → `HTMLSpanElement` (the number or the Badge). A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | The number (or a short status such as «!»). |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | — | Badge hue: the count needs attention. |
 | `variant` | `"solid" \| "soft" \| "outline"` | — | Badge treatment; `soft` once `color` is set. |
-| `className` | `string` | — | Extra class on the number or the Badge. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other attributes of the number or the Badge. |
 
 ### Sidebar.ItemShortcut
-No ref. Key hint at the end (`aria-hidden`); hidden in compact mode.
+`ref` → `HTMLSpanElement`. Key hint at the end (`aria-hidden`); hidden in compact mode.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | A key hint, e.g. `<Kbd>⌘K</Kbd>`. |
-| `className` | `string` | — | Extra class. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Sidebar.ItemAction
-No ref. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row while the trail (count, hint) steps aside; hidden on the compact rail.
+`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row while the trail (count, hint) steps aside; hidden on the compact rail.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -158,10 +158,10 @@ No ref. A row action (create, add): a ghost icon `Button` one tier down with a t
 | `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | — (required) | The action. |
 | `disabled` | `boolean` | — | Not available. |
 | `children` | `ReactNode` | — | The glyph; `<Icon name="action.add" />` by default. |
-| `className` | `string` | — | Extra class on the Button. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "onClick" \| "aria-label">` | — | `className` and the other attributes of the Button. |
 
 ### Sidebar.Sub
-No ref. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover, to the right). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`).
+`ref` → `HTMLDivElement`. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover, to the right). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -179,7 +179,7 @@ No ref. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubConte
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-expanded" \| "aria-controls">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `disabled`, `className` and the other button attributes. |
 
 ### Sidebar.SubContent
-No ref. `<div role="group">` named by the trigger: the child `Sidebar.Item`s on a faint guide line under the parent icon, labels aligned with the parent label. Height animates; closed content is inert. On the compact rail the same children render in the flyout.
+`ref` → `HTMLDivElement`. `<div role="group">` named by the trigger: the child `Sidebar.Item`s on a faint guide line under the parent icon, labels aligned with the parent label. Height animates; closed content is inert. On the compact rail the same children render in the flyout.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

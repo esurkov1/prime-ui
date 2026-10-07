@@ -5,7 +5,12 @@ import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlS
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
+import {
+  FieldCounter,
+  FieldFrame,
+  type FieldRootDomProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Input.module.css";
@@ -39,7 +44,7 @@ const [InputProvider, useInputContext] = createComponentContext<InputContextValu
 
 // ---- InputRoot ----
 
-export type InputRootProps = {
+export type InputRootProps = FieldRootDomProps & {
   /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
   size?: ControlSize;
   /** Invalid state: danger ring on the field and `aria-invalid` on the input. A non-empty `error` implies it. */
@@ -84,6 +89,7 @@ function InputRoot({
   labels: labelsProp,
   children,
   className,
+  ...rest
 }: InputRootProps) {
   // Without an explicit size the field takes the tier of its host (a form, a panel).
   const hostSize = useOptionalControlSize();
@@ -101,6 +107,7 @@ function InputRoot({
     <InputProvider value={contextValue}>
       <ControlSizeProvider value={size}>
         <FieldFrame
+          {...rest}
           size={size}
           ids={ids}
           label={label}
@@ -123,16 +130,17 @@ InputRoot.displayName = "Input.Root";
 
 // ---- InputWrapper ----
 
-export type InputWrapperProps = {
+export type InputWrapperProps = React.HTMLAttributes<HTMLDivElement> & {
   children: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-function InputWrapper({ children, className }: InputWrapperProps) {
+function InputWrapper({ children, className, ...rest }: InputWrapperProps) {
   const { size, invalid, focusRing } = useInputContext();
 
   return (
     <div
+      {...rest}
       className={cx(styles.wrapper, className)}
       {...toDataAttributes({
         size,
@@ -184,15 +192,15 @@ InputField.displayName = "Input.Field";
 
 // ---- InputIcon ----
 
-export type InputIconProps = {
+export type InputIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   side: "start" | "end";
   children: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
-function InputIcon({ side, children, className }: InputIconProps) {
+function InputIcon({ side, children, className, ...rest }: InputIconProps) {
   return (
-    <span className={cx(styles.icon, className)} data-side={side} aria-hidden="true">
+    <span {...rest} className={cx(styles.icon, className)} data-side={side} aria-hidden="true">
       {children}
     </span>
   );
@@ -201,15 +209,15 @@ InputIcon.displayName = "Input.Icon";
 
 // ---- InputAffix ----
 
-export type InputAffixProps = {
+export type InputAffixProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   side: "start" | "end";
   children: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-function InputAffix({ side, children, className }: InputAffixProps) {
+function InputAffix({ side, children, className, ...rest }: InputAffixProps) {
   return (
-    <div className={cx(styles.affix, className)} data-side={side} aria-hidden="true">
+    <div {...rest} className={cx(styles.affix, className)} data-side={side} aria-hidden="true">
       {children}
     </div>
   );
@@ -218,15 +226,20 @@ InputAffix.displayName = "Input.Affix";
 
 // ---- InputInlineAffix ----
 
-export type InputInlineAffixProps = {
+export type InputInlineAffixProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   side: "start" | "end";
   children: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
-function InputInlineAffix({ side, children, className }: InputInlineAffixProps) {
+function InputInlineAffix({ side, children, className, ...rest }: InputInlineAffixProps) {
   return (
-    <span className={cx(styles.inlineAffix, className)} data-side={side} aria-hidden="true">
+    <span
+      {...rest}
+      className={cx(styles.inlineAffix, className)}
+      data-side={side}
+      aria-hidden="true"
+    >
       {children}
     </span>
   );
@@ -271,24 +284,16 @@ InputClearButton.displayName = "Input.ClearButton";
 
 // ---- InputCounter ----
 
-export type InputCounterProps = {
+export type InputCounterProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   current: number;
   max: number;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Character counter for the support row; turns danger when `current > max`. */
-function InputCounter({ current, max, className }: InputCounterProps) {
+function InputCounter(props: InputCounterProps) {
   const { size, labels } = useInputContext();
-  return (
-    <FieldCounter
-      current={current}
-      max={max}
-      size={size}
-      label={labels.counter}
-      className={className}
-    />
-  );
+  return <FieldCounter {...props} size={size} label={labels.counter} />;
 }
 InputCounter.displayName = "Input.Counter";
 

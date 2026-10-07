@@ -129,15 +129,21 @@ const TONE_BADGE_COLOR: Record<NotificationTone, PaletteColor> = {
   danger: "red",
 };
 
-type CardViewProps = NotificationContent & {
-  className?: string;
-  /** Close button handler; no button without it. */
-  onClose?: () => void;
-  /** Countdown share 0–1; no countdown line when undefined. */
-  progress?: number;
-  stackDepth?: number;
-  stackExpanded?: boolean;
+/** Native attributes of the card `<article>`; `title` is the notification title, not the attribute. */
+type CardDomProps = Omit<React.HTMLAttributes<HTMLElement>, "title" | "children" | "role"> & {
+  ref?: React.Ref<HTMLElement>;
 };
+
+type CardViewProps = NotificationContent &
+  CardDomProps & {
+    className?: string;
+    /** Close button handler; no button without it. */
+    onClose?: () => void;
+    /** Countdown share 0–1; no countdown line when undefined. */
+    progress?: number;
+    stackDepth?: number;
+    stackExpanded?: boolean;
+  };
 
 function CardView({
   tone = "info",
@@ -152,12 +158,14 @@ function CardView({
   progress,
   stackDepth = 0,
   stackExpanded = false,
+  ...rest
 }: CardViewProps) {
   const labels = React.useContext(NotificationLabelsContext);
   const liveRole = tone === "danger" || tone === "warning" ? "alert" : "status";
 
   return (
     <article
+      {...rest}
       className={cx(styles.card, className)}
       role={liveRole}
       aria-live={liveRole === "alert" ? "assertive" : "polite"}
@@ -217,11 +225,11 @@ function CardView({
   );
 }
 
-export type NotificationCardProps = NotificationContent & {
-  /** Shows the close button and is called on its click. */
-  onDismiss?: () => void;
-  className?: string;
-};
+export type NotificationCardProps = NotificationContent &
+  CardDomProps & {
+    /** Shows the close button and is called on its click. */
+    onDismiss?: () => void;
+  };
 
 /**
  * A toast card without a timer: for an inline confirmation, docs and mockups. In an app toasts

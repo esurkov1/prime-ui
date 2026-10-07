@@ -183,16 +183,18 @@ function ColorPresetsRoot({
 }
 ColorPresetsRoot.displayName = "ColorPresets.Root";
 
-export type ColorPresetsSwatchProps = { className?: string };
+export type ColorPresetsSwatchProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /**
  * The current color as a small square for a custom trigger (e.g. inside `Button.Root`). Sized from
  * the host's `--prime-icon-size`; `aria-hidden` — the trigger carries the name.
  */
-function Swatch({ className }: ColorPresetsSwatchProps) {
+function Swatch({ className, ...rest }: ColorPresetsSwatchProps) {
   const { value } = useColorPresetsContext();
   return (
-    <span aria-hidden className={cx(styles.swatch, className)}>
+    <span {...rest} aria-hidden className={cx(styles.swatch, className)}>
       <SwatchFill value={value} />
     </span>
   );
@@ -267,12 +269,16 @@ const Trigger = React.forwardRef<HTMLButtonElement, ColorPresetsTriggerProps>(fu
 });
 Trigger.displayName = "ColorPresets.Trigger";
 
-export type ColorPresetsContentProps = {
+export type ColorPresetsContentProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "role"
+> & {
   /** Visible heading above the grid; also the list's accessible name (else `labels.list`). */
   label?: React.ReactNode;
   align?: PositionAlign;
   side?: PositionSide;
-  className?: string;
+  /** The floating panel. */
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function useNarrowViewport() {
@@ -289,10 +295,10 @@ function useNarrowViewport() {
 }
 
 /** Floating panel (Popover overlay contract) with the swatch grid: `role="listbox"`. */
-function Content({ label, align = "start", side = "bottom", className }: ColorPresetsContentProps) {
+function Content({ label, align = "start", side = "bottom", ...rest }: ColorPresetsContentProps) {
   const { size } = useColorPresetsContext();
   return (
-    <Popover.Content align={align} side={side} size={size} className={className}>
+    <Popover.Content {...rest} align={align} side={side} size={size}>
       <SwatchList label={label} />
     </Popover.Content>
   );

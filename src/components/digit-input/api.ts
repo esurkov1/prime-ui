@@ -1,10 +1,11 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "DigitInput",
-      en: "No ref. The field frame (label → cells → hint | error) around a `<fieldset>` of one-character inputs; the value has no gaps, typing always goes to the first empty cell.",
+      en: "`ref` → `HTMLDivElement` (the field frame). The field frame (label → cells → hint | error) around a `<fieldset>` of one-character inputs; the value has no gaps, typing always goes to the first empty cell.",
       ru: "Рамка поля (подпись → ячейки → подсказка или ошибка) вокруг `<fieldset>` из однозначных полей; значение без пропусков.",
       props: [
         {
@@ -146,12 +147,7 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Системные строки, см. «Доступность».",
         },
-        {
-          name: "className",
-          type: "string",
-          en: "Class on the outer field `<div>`.",
-          ru: "Класс на внешнем `<div>` поля.",
-        },
+        FIELD_ROOT_REST,
       ],
     },
   ],

@@ -69,6 +69,7 @@ LoginFormRoot.displayName = "LoginForm.Root";
 export type LoginFormHeaderProps = {
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLElement>;
 } & React.HTMLAttributes<HTMLElement>;
 
 /** Logo, title, description: icon-left / text-right by default, a centered column with Root `align="center"`. */
@@ -84,6 +85,7 @@ LoginFormHeader.displayName = "LoginForm.Header";
 export type LoginFormLogoProps = {
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 /** Tile for the product mark or an icon (rounded accent square by default, round when `align="center"`). Decorative unless it has an `aria-label`. */
@@ -101,6 +103,7 @@ export type LoginFormTitleProps = {
   as?: "h1" | "h2" | "h3";
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLHeadingElement>;
 } & Omit<React.HTMLAttributes<HTMLHeadingElement>, "children">;
 
 function LoginFormTitle({ as = "h1", className, children, ...rest }: LoginFormTitleProps) {
@@ -121,6 +124,7 @@ LoginFormTitle.displayName = "LoginForm.Title";
 export type LoginFormDescriptionProps = {
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLParagraphElement>;
 } & Omit<React.HTMLAttributes<HTMLParagraphElement>, "children">;
 
 function LoginFormDescription({ className, children, ...rest }: LoginFormDescriptionProps) {
@@ -142,6 +146,7 @@ LoginFormDescription.displayName = "LoginForm.Description";
 export type LoginFormBodyProps = {
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 /** Everything under the header: social buttons, divider, form, footer. */
@@ -175,6 +180,7 @@ LoginFormForm.displayName = "LoginForm.Form";
 export type LoginFormActionsProps = {
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 /**
@@ -193,6 +199,7 @@ LoginFormActions.displayName = "LoginForm.Actions";
 export type LoginFormFooterProps = {
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLParagraphElement>;
 } & Omit<React.HTMLAttributes<HTMLParagraphElement>, "children">;
 
 /** Secondary line with a `LinkButton`: «Нет аккаунта? Зарегистрироваться». Follows Root `align`. */

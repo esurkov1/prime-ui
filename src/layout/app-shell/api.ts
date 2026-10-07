@@ -24,7 +24,7 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Nav",
-      en: "No ref. The navigation column slot (not a landmark: Sidebar renders the `<nav>`).",
+      en: "`ref` → `HTMLDivElement`. The navigation column slot (not a landmark: Sidebar renders the `<nav>`).",
       ru: "Слот колонки навигации (не ориентир: `<nav>` рендерит Sidebar).",
       props: [
         {

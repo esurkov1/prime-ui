@@ -77,7 +77,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Button.Icon",
-      en: "No ref. Decorative icon wrapper (`aria-hidden`) sized to the button tier.",
+      en: "`ref` → `HTMLSpanElement`. Decorative icon wrapper (`aria-hidden`) sized to the button tier.",
       ru: "Иконка размера яруса кнопки; скрыта от скринридеров (`aria-hidden`).",
       props: [
         {

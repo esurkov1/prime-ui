@@ -1,10 +1,14 @@
 import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_ROOT_REST } from "../../internal/field.api";
 
-const className = (element: string): ApiProp => ({
-  name: "className",
-  type: "string",
-  en: `Class on the ${element}.`,
-  ru: `Класс на ${element}.`,
+const DIV_REST = 'Omit<HTMLAttributes<HTMLDivElement>, "children">';
+const SPAN_REST = 'Omit<HTMLAttributes<HTMLSpanElement>, "children">';
+
+const rest = (element: string, type: string): ApiProp => ({
+  name: "…rest",
+  type,
+  en: `\`className\` and the other attributes of the ${element}.`,
+  ru: "`className` и остальные атрибуты элемента.",
 });
 
 const focusRing: ApiProp = {
@@ -91,7 +95,7 @@ export const api: ComponentApi = {
     },
     {
       name: "ColorPicker.HexInput",
-      en: "No ref. The hex value as a kit Input field (label, hint, error); commits on blur / Enter and reverts invalid text.",
+      en: "`ref` → `HTMLDivElement` (the field frame). The hex value as a kit Input field (label, hint, error); commits on blur / Enter and reverts invalid text.",
       ru: "Hex-значение в поле Input (подпись, подсказка, ошибка); применяется по blur / Enter, неверный текст откатывается.",
       props: [
         {
@@ -120,42 +124,42 @@ export const api: ComponentApi = {
           ru: "Ярус поля.",
         },
         focusRing,
-        className("field `<div>`"),
+        FIELD_ROOT_REST,
       ],
     },
     {
       name: "ColorPicker.TriggerSwatch",
-      en: "No ref. A square of the current color for a trigger button (`aria-hidden`); follows the host icon size, e.g. inside `Button.Icon`.",
-      props: [className("`<span>`")],
+      en: "`ref` → `HTMLSpanElement`. A square of the current color for a trigger button (`aria-hidden`); follows the host icon size, e.g. inside `Button.Icon`.",
+      props: [rest("`<span>`", SPAN_REST)],
     },
     {
       name: "ColorPicker.FormatSelect",
-      en: "No ref. A kit Select of the value format (HSL · RGB · Hex), named by `labels.format`.",
-      props: [className("wrapper `<div>`")],
+      en: "`ref` → `HTMLDivElement` (the wrapper). A kit Select of the value format (HSL · RGB · Hex), named by `labels.format`.",
+      props: [rest("wrapper `<div>`", DIV_REST)],
     },
     {
       name: "ColorPicker.ChannelStrip",
-      en: "No ref. One row: the eyedropper, then a field per channel of the current format (or one hex field); each field commits on blur / Enter.",
-      props: [focusRing, className("row `<div>`")],
+      en: "`ref` → `HTMLDivElement`. One row: the eyedropper, then a field per channel of the current format (or one hex field); each field commits on blur / Enter.",
+      props: [focusRing, rest("row `<div>`", DIV_REST)],
     },
     {
       name: "ColorPicker.Area",
-      en: "React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds `ColorPicker.AreaThumb`.",
+      en: "`ref` → `HTMLDivElement`. React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds `ColorPicker.AreaThumb`.",
       props: [disabled, reactAria("ColorArea")],
     },
     {
       name: "ColorPicker.AreaThumb · ColorPicker.Thumb",
-      en: "React Aria `ColorThumb` of the area / of a slider track: a thumb-colored ring with the overlay shadow and a focus ring.",
+      en: "`ref` → `HTMLDivElement`. React Aria `ColorThumb` of the area / of a slider track: a thumb-colored ring with the overlay shadow and a focus ring.",
       props: [reactAria("ColorThumb")],
     },
     {
       name: "ColorPicker.Slider",
-      en: "React Aria `ColorSlider` of one channel (hue, alpha…). Holds `SliderMeta` and `SliderTrack`.",
+      en: "`ref` → `HTMLDivElement`. React Aria `ColorSlider` of one channel (hue, alpha…). Holds `SliderMeta` and `SliderTrack`.",
       props: [disabled, reactAria("ColorSlider")],
     },
     {
       name: "ColorPicker.SliderMeta",
-      en: "No ref. The slider heading: a label and the current channel value.",
+      en: "`ref` → `HTMLDivElement`. The slider heading: a label and the current channel value.",
       props: [
         {
           name: "label",
@@ -164,16 +168,17 @@ export const api: ComponentApi = {
           en: "Visible label of the slider.",
           ru: "Видимая подпись ползунка.",
         },
+        rest("heading `<div>`", DIV_REST),
       ],
     },
     {
       name: "ColorPicker.SliderTrack",
-      en: "React Aria `SliderTrack` with the channel gradient over a transparency checkerboard. Holds `ColorPicker.Thumb`.",
+      en: "`ref` → `HTMLDivElement`. React Aria `SliderTrack` with the channel gradient over a transparency checkerboard. Holds `ColorPicker.Thumb`.",
       props: [reactAria("SliderTrack")],
     },
     {
       name: "ColorPicker.Swatches",
-      en: "No ref. The kit `ColorSwatches` bound to the picker color: a pick sets the color, editing the color moves the selection. Takes every ColorSwatches prop except the value ones, `allowEmpty` and `name`.",
+      en: "`ref` → `HTMLDivElement` (the ColorSwatches field frame). The kit `ColorSwatches` bound to the picker color: a pick sets the color, editing the color moves the selection. Takes every ColorSwatches prop except the value ones, `allowEmpty` and `name`.",
       ru: "`ColorSwatches`, связанный с цветом пикера: выбор меняет цвет, правка цвета двигает выбор.",
       props: [
         {
@@ -322,12 +327,12 @@ export const api: ComponentApi = {
     },
     {
       name: "ColorPresets.Swatch",
-      en: "No ref. The current color as a small square for a custom trigger; follows the host icon size, `aria-hidden`.",
-      props: [className("`<span>`")],
+      en: "`ref` → `HTMLSpanElement`. The current color as a small square for a custom trigger; follows the host icon size, `aria-hidden`.",
+      props: [rest("`<span>`", SPAN_REST)],
     },
     {
       name: "ColorPresets.Content",
-      en: 'No ref. The floating panel with the swatch grid (`role="listbox"`); focus moves to the selected swatch.',
+      en: '`ref` → `HTMLDivElement` (the panel). The floating panel with the swatch grid (`role="listbox"`); focus moves to the selected swatch.',
       props: [
         {
           name: "label",
@@ -349,7 +354,7 @@ export const api: ComponentApi = {
           en: "Alignment along the trigger.",
           ru: "Выравнивание вдоль триггера.",
         },
-        className("panel"),
+        rest("panel", 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "role">'),
       ],
     },
   ],

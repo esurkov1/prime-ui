@@ -6,7 +6,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "ExampleFrame",
-      en: "No ref. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.",
+      en: "`ref` → `HTMLDivElement`. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.",
       ru: "Рамка документации: панель (вид, тема, копирование, ширина) над превью или кодом.",
       props: [
         {
@@ -87,10 +87,10 @@ export const api: ComponentApi = {
           ru: "Содержимое превью, раскладка — `previewLayout`.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the frame.",
-          ru: "Дополнительный класс рамки.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "onCopy">',
+          en: "`className` and the other attributes of the frame `<div>`.",
+          ru: "`className` и остальные атрибуты `<div>` рамки.",
         },
       ],
     },

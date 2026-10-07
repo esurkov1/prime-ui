@@ -51,7 +51,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | `onClick`, `className`, `aria-*`, `data-*` and the other button attributes. |
 
 ### Button.Icon
-No ref. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
+`ref` → `HTMLSpanElement`. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

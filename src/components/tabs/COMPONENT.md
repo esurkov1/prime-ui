@@ -52,7 +52,7 @@ Tabs.Root                 value, size, orientation; lays out the list and the pa
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other div attributes. |
 
 ### Tabs.List
-No ref. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding indicator; scrolls instead of wrapping.
+`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding indicator; scrolls instead of wrapping.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -60,7 +60,7 @@ No ref. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden s
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `aria-label` (name the list), `className` and the other div attributes; `role`, `aria-orientation` and `onKeyDown` are set by the list. |
 
 ### Tabs.Item
-No ref. One tab, a `<button role="tab">`; plain text children are wrapped in `Tabs.Label`.
+`ref` → `HTMLButtonElement`. One tab, a `<button role="tab">`; plain text children are wrapped in `Tabs.Label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -70,7 +70,7 @@ No ref. One tab, a `<button role="tab">`; plain text children are wrapped in `Ta
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" \| "type" \| "role" \| "onClick">` | — | `className`, `aria-*` and the other button attributes. |
 
 ### Tabs.Icon
-No ref. Decorative icon (`aria-hidden`) before the label; muted, accent on the active tab.
+`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) before the label; muted, accent on the active tab.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -78,7 +78,7 @@ No ref. Decorative icon (`aria-hidden`) before the label; muted, accent on the a
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Tabs.Label
-No ref. Title; truncates and keeps a stable width when it turns medium weight.
+`ref` → `HTMLSpanElement`. Title; truncates and keeps a stable width when it turns medium weight.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -86,16 +86,16 @@ No ref. Title; truncates and keeps a stable width when it turns medium weight.
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Tabs.Count
-No ref. Counter `Badge` after the label, one tier below the tabs size.
+`ref` → `HTMLSpanElement`. Counter `Badge` after the label, one tier below the tabs size.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Badge hue. |
 | `children` | `ReactNode` | — (required) | The number. |
-| `className` | `string` | — | Extra class. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Tabs.Description
-No ref. Muted second line; becomes the tab's `aria-describedby`.
+`ref` → `HTMLSpanElement`. Muted second line; becomes the tab's `aria-describedby`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -103,7 +103,7 @@ No ref. Muted second line; becomes the tab's `aria-describedby`.
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Tabs.Panel
-No ref. `<div role="tabpanel">`, focusable, rendered only while its tab is active.
+`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

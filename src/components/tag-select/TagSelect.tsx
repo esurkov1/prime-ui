@@ -12,7 +12,12 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import {
+  FieldFrame,
+  type FieldFrameProps,
+  type FieldRootDomProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import surface from "@/internal/floatingSurface.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { enabledOptions, handleListboxKeyDown } from "@/internal/listbox";
@@ -129,38 +134,39 @@ function canCreate(
   );
 }
 
-export type TagSelectProps = FieldFrameProps & {
-  /** Available tags: value, label and chip color. */
-  options: TagSelectOption[];
-  value?: string[];
-  defaultValue?: string[];
-  onValueChange?: (value: string[]) => void;
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  /** Allow adding a value that is not in `options`. */
-  creatable?: boolean;
-  /** A new value was created (Create row or Enter), not picked from `options`. */
-  onCreate?: (value: string) => void;
-  /** Chip color of values without an option color, including created ones. */
-  defaultColor?: PaletteColor;
-  /** Enables the «⋯» row menu: tag name and color. `value` never changes. */
-  onOptionUpdate?: (value: string, updates: TagSelectOptionUpdate) => void;
-  /** Enables «Удалить» in the row menu; the value is also removed from the selection. */
-  onOptionDelete?: (value: string) => void;
-  disabled?: boolean;
-  placeholder?: string;
-  /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
-  invalid?: boolean;
-  /** Field tier; the list uses the same tier, chips one tier down. */
-  size?: ControlSize;
-  /** Id of the text input; generated when omitted. */
-  id?: string;
-  labels?: Partial<TagSelectLabels>;
-  className?: string;
-  "aria-label"?: string;
-  "aria-labelledby"?: string;
-};
+export type TagSelectProps = FieldRootDomProps &
+  FieldFrameProps & {
+    /** Available tags: value, label and chip color. */
+    options: TagSelectOption[];
+    value?: string[];
+    defaultValue?: string[];
+    onValueChange?: (value: string[]) => void;
+    open?: boolean;
+    defaultOpen?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    /** Allow adding a value that is not in `options`. */
+    creatable?: boolean;
+    /** A new value was created (Create row or Enter), not picked from `options`. */
+    onCreate?: (value: string) => void;
+    /** Chip color of values without an option color, including created ones. */
+    defaultColor?: PaletteColor;
+    /** Enables the «⋯» row menu: tag name and color. `value` never changes. */
+    onOptionUpdate?: (value: string, updates: TagSelectOptionUpdate) => void;
+    /** Enables «Удалить» in the row menu; the value is also removed from the selection. */
+    onOptionDelete?: (value: string) => void;
+    disabled?: boolean;
+    placeholder?: string;
+    /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
+    invalid?: boolean;
+    /** Field tier; the list uses the same tier, chips one tier down. */
+    size?: ControlSize;
+    /** Id of the text input; generated when omitted. */
+    id?: string;
+    labels?: Partial<TagSelectLabels>;
+    className?: string;
+    "aria-label"?: string;
+    "aria-labelledby"?: string;
+  };
 
 /**
  * A multi-value field shown as tag chips: pick from a list, type to filter, create new values.
@@ -194,6 +200,7 @@ export function TagSelect({
   className,
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
+  ...rest
 }: TagSelectProps) {
   const labels = React.useMemo(
     () => ({
@@ -587,6 +594,7 @@ export function TagSelect({
 
   return (
     <FieldFrame
+      {...rest}
       size={size}
       ids={ids}
       label={label}

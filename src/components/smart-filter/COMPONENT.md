@@ -57,18 +57,18 @@ The toolbar and the chips are separate parts so a page can put them in different
 | `children` | `ReactNode` | — (required) | `SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside. |
 
 ### SmartFilter.Toolbar
-No ref. A `<div>`: the filter Button (a count Badge while filters apply) and a search Input; the anchor of the panel, a flush Popover.
+`ref` → `HTMLDivElement`. A `<div>`: the filter Button (a count Badge while filters apply) and a search Input; the anchor of the panel, a flush Popover.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Class on the toolbar. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the toolbar. |
 
 ### SmartFilter.Chips
-No ref. A `<div>` of applied filters as removable Badges with «Добавить фильтр» and «Сбросить все»; renders nothing without filters.
+`ref` → `HTMLDivElement`. A `<div>` of applied filters as removable Badges with «Добавить фильтр» and «Сбросить все»; renders nothing without filters.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Class on the chips row. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the chips row. |
 
 ### SmartFilterField
 One entry of `fields`: data, not a part. Selected values missing from `options` stay visible so they can be removed.

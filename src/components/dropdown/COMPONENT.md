@@ -83,24 +83,24 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 | `children` | `ReactNode` | — | `Dropdown.ItemIcon`, the label, `Dropdown.ItemShortcut`. |
 
 ### Dropdown.ItemIcon · Dropdown.ItemShortcut
-No ref. An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.
+`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.
 
 ### Dropdown.Group
-No ref. `<div role="group">` named by its visible `label`. + native `<div>` props.
+`ref` → `HTMLDivElement`. `<div role="group">` named by its visible `label`. + native `<div>` props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — | Heading of the group (caption, muted); also its accessible name. |
 
 ### Dropdown.Separator
-No ref. A full-bleed Divider between items or groups.
+`ref` → `HTMLDivElement`. A full-bleed Divider between items or groups.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class on the divider. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the divider. |
 
 ### Dropdown.Header · Dropdown.Title · Dropdown.Description
-No ref. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description stacked in one column, a trailing badge or button — in the written order / the medium heading line / the muted line under it; both truncate. + native `<div>` props.
+`ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description stacked in one column, a trailing badge or button — in the written order / the medium heading line / the muted line under it; both truncate. + native `<div>` props.
 
 ## Variants
 The panel is the shared floating surface: `bg-raised`, `--prime-panel-radius` (12), padding 4, `shadow-overlay`; rows have radius 8 and the tier item height.

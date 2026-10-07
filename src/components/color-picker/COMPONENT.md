@@ -68,7 +68,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `surface` | `"none" \| "raised"` | `"none"` | `none` — layout only (inside a Popover or Card). `raised` — a standalone floating panel: raised background, panel radius and padding, overlay shadow. |
 
 ### ColorPicker.HexInput
-No ref. The hex value as a kit Input field (label, hint, error); commits on blur / Enter and reverts invalid text.
+`ref` → `HTMLDivElement` (the field frame). The hex value as a kit Input field (label, hint, error); commits on blur / Enter and reverts invalid text.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -77,32 +77,32 @@ No ref. The hex value as a kit Input field (label, hint, error); commits on blur
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
-| `className` | `string` | — | Class on the field `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
 
 ### ColorPicker.TriggerSwatch
-No ref. A square of the current color for a trigger button (`aria-hidden`); follows the host icon size, e.g. inside `Button.Icon`.
+`ref` → `HTMLSpanElement`. A square of the current color for a trigger button (`aria-hidden`); follows the host icon size, e.g. inside `Button.Icon`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Class on the `<span>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ### ColorPicker.FormatSelect
-No ref. A kit Select of the value format (HSL · RGB · Hex), named by `labels.format`.
+`ref` → `HTMLDivElement` (the wrapper). A kit Select of the value format (HSL · RGB · Hex), named by `labels.format`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Class on the wrapper `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper `<div>`. |
 
 ### ColorPicker.ChannelStrip
-No ref. One row: the eyedropper, then a field per channel of the current format (or one hex field); each field commits on blur / Enter.
+`ref` → `HTMLDivElement`. One row: the eyedropper, then a field per channel of the current format (or one hex field); each field commits on blur / Enter.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
-| `className` | `string` | — | Class on the row `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the row `<div>`. |
 
 ### ColorPicker.Area
-React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds `ColorPicker.AreaThumb`.
+`ref` → `HTMLDivElement`. React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds `ColorPicker.AreaThumb`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -110,14 +110,14 @@ React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Hol
 | `…rest` | `ColorAreaProps (react-aria-components)` | — | The other props of the React Aria `ColorArea` (`channel`, `colorSpace`, `aria-label`…). |
 
 ### ColorPicker.AreaThumb · ColorPicker.Thumb
-React Aria `ColorThumb` of the area / of a slider track: a thumb-colored ring with the overlay shadow and a focus ring.
+`ref` → `HTMLDivElement`. React Aria `ColorThumb` of the area / of a slider track: a thumb-colored ring with the overlay shadow and a focus ring.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `ColorThumbProps (react-aria-components)` | — | The other props of the React Aria `ColorThumb` (`channel`, `colorSpace`, `aria-label`…). |
 
 ### ColorPicker.Slider
-React Aria `ColorSlider` of one channel (hue, alpha…). Holds `SliderMeta` and `SliderTrack`.
+`ref` → `HTMLDivElement`. React Aria `ColorSlider` of one channel (hue, alpha…). Holds `SliderMeta` and `SliderTrack`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -125,21 +125,22 @@ React Aria `ColorSlider` of one channel (hue, alpha…). Holds `SliderMeta` and 
 | `…rest` | `ColorSliderProps (react-aria-components)` | — | The other props of the React Aria `ColorSlider` (`channel`, `colorSpace`, `aria-label`…). |
 
 ### ColorPicker.SliderMeta
-No ref. The slider heading: a label and the current channel value.
+`ref` → `HTMLDivElement`. The slider heading: a label and the current channel value.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — (required) | Visible label of the slider. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the heading `<div>`. |
 
 ### ColorPicker.SliderTrack
-React Aria `SliderTrack` with the channel gradient over a transparency checkerboard. Holds `ColorPicker.Thumb`.
+`ref` → `HTMLDivElement`. React Aria `SliderTrack` with the channel gradient over a transparency checkerboard. Holds `ColorPicker.Thumb`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `SliderTrackProps (react-aria-components)` | — | The other props of the React Aria `SliderTrack` (`channel`, `colorSpace`, `aria-label`…). |
 
 ### ColorPicker.Swatches
-No ref. The kit `ColorSwatches` bound to the picker color: a pick sets the color, editing the color moves the selection. Takes every ColorSwatches prop except the value ones, `allowEmpty` and `name`.
+`ref` → `HTMLDivElement` (the ColorSwatches field frame). The kit `ColorSwatches` bound to the picker color: a pick sets the color, editing the color moves the selection. Takes every ColorSwatches prop except the value ones, `allowEmpty` and `name`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -182,21 +183,21 @@ No DOM. A quick color from a fixed palette: a square trigger and a popover grid 
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "disabled" \| "value">` | — | `aria-label`, `className` and the other button attributes. |
 
 ### ColorPresets.Swatch
-No ref. The current color as a small square for a custom trigger; follows the host icon size, `aria-hidden`.
+`ref` → `HTMLSpanElement`. The current color as a small square for a custom trigger; follows the host icon size, `aria-hidden`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Class on the `<span>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ### ColorPresets.Content
-No ref. The floating panel with the swatch grid (`role="listbox"`); focus moves to the selected swatch.
+`ref` → `HTMLDivElement` (the panel). The floating panel with the swatch grid (`role="listbox"`); focus moves to the selected swatch.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — | Heading above the grid; also the list's accessible name (else `labels.list`). |
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Side of the trigger. |
 | `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment along the trigger. |
-| `className` | `string` | — | Class on the panel. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "role">` | — | `className` and the other attributes of the panel. |
 
 ## Variants
 No `variant` / `tone` / `color`.

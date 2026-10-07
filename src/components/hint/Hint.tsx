@@ -37,7 +37,9 @@ function HintRoot({ className, size = "m", invalid, disabled, children, ...rest 
 }
 HintRoot.displayName = "Hint.Root";
 
-export type HintIconProps = React.HTMLAttributes<HTMLSpanElement>;
+export type HintIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** Leading icon centred on the first line; decorative. */
 function HintIcon({ className, ...rest }: HintIconProps) {

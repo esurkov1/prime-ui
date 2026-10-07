@@ -42,22 +42,22 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other `nav` attributes; an `aria-label` here overrides `labels.nav`. |
 
 ### Breadcrumb.Item
-No ref. `<li>`: a muted `LinkButton` (`href`), plain text, or the current page (`current`).
+`ref` → `HTMLLIElement`. `<li>`: a muted `LinkButton` (`href`), plain text, or the current page (`current`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `href` | `string` | — | Renders a link; without it the item is text. |
 | `current` | `boolean` | — | Current page: `aria-current="page"`, primary text, medium weight. The last item, without `href`. |
-| `aria-label` | `string` | — | Name of a link without visible text (e.g. a home icon). |
+| `aria-label` | `string` | — | Name of a link without visible text (e.g. a home icon); set on the link, not the `li`. |
 | `children` | `ReactNode` | — | Text or an `Icon`. A string also becomes the `title` of a text item (full text when truncated). |
-| `className` | `string` | — | Extra class on the `li`. |
+| `…rest` | `Omit<LiHTMLAttributes<HTMLLIElement>, "aria-label">` | — | `className` and the other `li` attributes. |
 
 ### Breadcrumb.Ellipsis
-No ref. `<li>` with «…» for levels skipped on purpose, with visually hidden `labels.ellipsis`.
+`ref` → `HTMLLIElement`. `<li>` with «…» for levels skipped on purpose, with visually hidden `labels.ellipsis`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. |
+| `…rest` | `Omit<LiHTMLAttributes<HTMLLIElement>, "children">` | — | `className` and the other `li` attributes. |
 
 ## Variants
 
