@@ -14,6 +14,15 @@
     var(--prime-shadow-raised);
 }
 
+/* The product mark inside `Sidebar.BrandLogo`: an accent tile with a glyph. */
+.logo {
+  display: grid;
+  place-items: center;
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+}
+
 /* The shell fills the window frame instead of the viewport. */
 .shell {
   height: 100%;

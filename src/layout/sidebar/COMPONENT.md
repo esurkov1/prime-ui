@@ -8,6 +8,7 @@
 ## When to use
 - The main navigation of an app, inside `AppShell.Nav`.
 - Navigation that users can collapse to an icon rail.
+- Sections with sub-pages (a parent item with child items), grouped and collapsible.
 - Router links (`asChild` + NavLink) with a current page.
 
 ## When not to use
@@ -23,19 +24,26 @@ import { Sidebar, useSidebar } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Sidebar.Root                  rail wrapper; renders <nav> inside; size tier for items
-├─ Sidebar.Header             brand row (fixed height)
-│  └─ Sidebar.Toggle variant="edge"  round toggle across the rail's outer edge
-├─ Sidebar.Content            scrolling middle (ScrollContainer, edge fades, no scrollbar)
-│  └─ Sidebar.Group           role="group" with optional label
-│     └─ Sidebar.Item         <button> / <a> / asChild element
-│        ├─ Sidebar.ItemIcon      leading icon
-│        ├─ (label)               the remaining children
-│        ├─ Sidebar.ItemCount     counter Badge; a dot in compact mode
-│        └─ Sidebar.ItemShortcut  key hint; hidden in compact mode
-└─ Sidebar.Footer             bottom items
-   └─ Sidebar.Toggle          item-shaped mode / panel toggle
-useSidebar()                  state hook for custom parts inside Root
+Sidebar.Root                       rail wrapper; renders <nav> inside; size tier for items
+├─ Sidebar.Header                  one fixed-height row
+│  ├─ Sidebar.Brand                logo + name + muted line (link / div / asChild)
+│  │  └─ Sidebar.BrandLogo         the mark, on the icon axis
+│  └─ Sidebar.Toggle variant="header"  «‹‹» at the header end → round button on the rail edge
+├─ Sidebar.Content                 scrolling middle (ScrollContainer, edge fades, no scrollbar)
+│  └─ Sidebar.Group                role="group"; optional label, `collapsible` heading
+│     ├─ Sidebar.Item              <button> / <a> / asChild element
+│     │  ├─ Sidebar.ItemIcon           leading icon (before the label)
+│     │  ├─ (label)                    the remaining children
+│     │  ├─ Sidebar.ItemCount          plain number, or a Badge with color / variant
+│     │  ├─ Sidebar.ItemShortcut       key hint
+│     │  ├─ Sidebar.ItemIcon           trailing icon (after the label)
+│     │  └─ Sidebar.ItemAction         row action button beside the item element
+│     └─ Sidebar.Sub               parent item with child items
+│        ├─ Sidebar.SubTrigger     disclosure row, chevron at the end
+│        └─ Sidebar.SubContent     child Items on a guide line (a flyout on the compact rail)
+└─ Sidebar.Footer                  bottom items, the item Toggle, the account
+   └─ Sidebar.Account              avatar + name + muted line; a Dropdown.Trigger child
+useSidebar()                       state hook for custom parts inside Root
 ```
 
 ## API
@@ -47,53 +55,76 @@ useSidebar()                  state hook for custom parts inside Root
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; counters one tier down. The rail width does not change. |
-| `mode` | `"expanded" \| "compact" \| "hidden"` | — | Desktop mode (controlled): full rail, icon rail with tooltips, or hidden. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; counters and row actions one tier down. The rail width does not change. |
+| `mode` | `"expanded" \| "compact" \| "hidden"` | — | Desktop mode (controlled): full rail, icon rail with tooltips and flyouts, or hidden. |
 | `defaultMode` | `"expanded" \| "compact" \| "hidden"` | `"expanded"` | Initial mode (uncontrolled). |
 | `onModeChange` | `(mode: SidebarMode) => void` | — | Called with the new mode (Toggle, `useSidebar().setMode`). |
 | `open` | `boolean` | — | Off-canvas panel on narrow viewports (controlled). |
 | `defaultOpen` | `boolean` | `false` | Initial off-canvas state (uncontrolled). |
 | `onOpenChange` | `(open: boolean) => void` | — | Off-canvas open / close: Toggle, scrim, Escape, navigation, leaving the narrow viewport. |
-| `responsive` | `boolean` | `true` | Below 768px the rail leaves the layout and becomes an off-canvas panel with a scrim and a focus trap. |
+| `responsive` | `boolean` | `true` | Below 768px (viewport) the rail leaves the layout and becomes an off-canvas panel with a scrim and a focus trap. |
 | `labels` | `Partial<SidebarLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Sidebar.Header · Sidebar.Footer
-No ref. Brand row at the top; items and the Toggle at the bottom.
+No ref. Header: one fixed-height row for `Sidebar.Brand` and the header Toggle. Footer: items, the item Toggle and `Sidebar.Account` (set apart by air) at the bottom.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
-### Sidebar.Content
-`forwardRef` → `HTMLElement`. The scrolling middle: a `ScrollContainer` with edge fades and no scrollbar.
+### Sidebar.Brand
+`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays (a link shows its name as a tooltip).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (Groups, Items), `className` and the other attributes. |
+| `description` | `ReactNode` | — | Muted second line under the name (workspace, plan). |
+| `href` | `string` | — | Renders an `<a>` (usually home); navigating closes the off-canvas panel. |
+| `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `Link`) as the brand; its children are the logo and the name. |
+| `children` | `ReactNode` | — | `Sidebar.BrandLogo` and the product name. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
+
+### Sidebar.BrandLogo
+No ref. The product mark (`aria-hidden`): a square of the item height − 8 (at most 32) on the icon axis in every mode; its child fills it.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The mark: `<img>`, `<svg>` or a styled element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
+
+### Sidebar.Content
+`forwardRef` → `HTMLElement`. The scrolling middle: a `ScrollContainer` with edge fades and no scrollbar; rows scrolled into view stop clear of the fades.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (Groups, Items, Subs), `className` and the other attributes. |
 
 ### Sidebar.Group
-No ref. `<div role="group">` named by its label.
+No ref. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail headings fold and the items always show.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `label` | `ReactNode` | — | Group heading (`aria-labelledby`); fades out in compact mode and keeps its space. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (Items), `className` and the other div attributes. |
+| `label` | `ReactNode` | — | Group heading (`aria-labelledby`); folds away in compact mode. |
+| `collapsible` | `boolean` | `false` | The heading shows and hides the items. Needs `label`. |
+| `open` | `boolean` | — | Items shown (controlled). |
+| `onOpenChange` | `(open: boolean) => void` | — | Called with the new open state (click, keyboard, a current page moving inside). |
+| `defaultOpen` | `boolean` | `true` | Initial state (uncontrolled). A closed group opens by itself when the current page moves into it. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (Items, Subs), `className` and the other div attributes. |
 
 ### Sidebar.Item
-`forwardRef` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode.
+`forwardRef` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode. With `Sidebar.ItemAction` the element and the action sit side by side in a row `<div>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `current` | `boolean` | `false` | Current page: `aria-current="page"`, `data-state="active"`; surface fill and a raised shadow. |
+| `current` | `boolean` | `false` | Current page: `aria-current="page"`, `data-state="active"`; surface fill and a raised shadow (a deeper wash in a flyout). |
 | `disabled` | `boolean` | `false` | Not interactive: `disabled` / `aria-disabled`, `data-disabled`; a link loses its `href`. |
 | `href` | `string` | — | Renders an `<a>` (with `target`, `rel`). |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `NavLink`) as the item; its children are the label and parts. |
-| `children` | `ReactNode` | — | Label (also the compact tooltip) and parts: `Sidebar.ItemIcon`, `Sidebar.ItemCount`, `Sidebar.ItemShortcut`. |
+| `children` | `ReactNode` | — | Label (also the compact tooltip) and parts: `Sidebar.ItemIcon` (before the label — leading, after it — trailing), `Sidebar.ItemCount`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
 
 ### Sidebar.ItemIcon
-No ref. Leading icon (`aria-hidden`); stays in place in every mode.
+No ref. An icon (`aria-hidden`). Before the label it leads and stays on the icon axis in every mode; after the label it is a quiet trailing glyph (`data-edge="end"`, 14, muted), e.g. ↗ for an external link, hidden in compact mode.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -101,12 +132,14 @@ No ref. Leading icon (`aria-hidden`); stays in place in every mode.
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Sidebar.ItemCount
-No ref. Counter `Badge` after the label; in compact mode a dot on the icon, and the number stays for screen readers.
+No ref. A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | The number. |
-| `className` | `string` | — | Extra class on the Badge. |
+| `children` | `ReactNode` | — (required) | The number (or a short status such as «!»). |
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | — | Badge hue: the count needs attention. |
+| `variant` | `"solid" \| "soft" \| "outline"` | — | Badge treatment; `soft` once `color` is set. |
+| `className` | `string` | — | Extra class on the number or the Badge. |
 
 ### Sidebar.ItemShortcut
 No ref. Key hint at the end (`aria-hidden`); hidden in compact mode.
@@ -116,12 +149,57 @@ No ref. Key hint at the end (`aria-hidden`); hidden in compact mode.
 | `children` | `ReactNode` | — (required) | A key hint, e.g. `<Kbd>⌘K</Kbd>`. |
 | `className` | `string` | — | Extra class. |
 
+### Sidebar.ItemAction
+No ref. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row while the trail (count, hint) steps aside; hidden on the compact rail.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `string` | — (required) | Accessible name and tooltip («Создать задачу»). |
+| `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | — (required) | The action. |
+| `disabled` | `boolean` | — | Not available. |
+| `children` | `ReactNode` | — | The glyph; `<Icon name="action.add" />` by default. |
+| `className` | `string` | — | Extra class on the Button. |
+
+### Sidebar.Sub
+No ref. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover, to the right). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `open` | `boolean` | — | Children shown (controlled). |
+| `onOpenChange` | `(open: boolean) => void` | — | Called with the new open state (click, keyboard, a current page moving inside). |
+| `defaultOpen` | `boolean` | `false` | Initial state (uncontrolled). Opens by itself when a child becomes the current page. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
+
+### Sidebar.SubTrigger
+`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. Expanded: click, `→` / `←` open and close. Compact: hover (after a short intent delay), click, `Enter` · `Space` · `→` open the flyout (`aria-haspopup="dialog"`); on the active path it takes the current lift.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Label (also the flyout title) and parts as in `Sidebar.Item`: `Sidebar.ItemIcon`, `Sidebar.ItemCount`. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-expanded" \| "aria-controls">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `disabled`, `className` and the other button attributes. |
+
+### Sidebar.SubContent
+No ref. `<div role="group">` named by the trigger: the child `Sidebar.Item`s on a faint guide line under the parent icon, labels aligned with the parent label. Height animates; closed content is inert. On the compact rail the same children render in the flyout.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (Items), `className` (on the list) and the other div attributes. |
+
+### Sidebar.Account
+`forwardRef` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line and a ↕ chevron. A button, so it is a `Dropdown.Trigger` child; in compact mode only the avatar stays, with the name as a tooltip.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `description` | `ReactNode` | — | Muted second line under the name (email, role). |
+| `children` | `ReactNode` | — | An `Avatar.Root` (sized to the tier by the slot, hidden from screen readers) and the person's name. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children">` | — | `onClick`, `aria-*`, `className` and the other button attributes. |
+
 ### Sidebar.Toggle
 `forwardRef` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"item" \| "edge"` | `"item"` | `item` — a row in the rail. `edge` — a small round button across the rail's outer edge, level with `Sidebar.Header`, with a tooltip; its chevron turns with the mode. `edge` renders nothing off-canvas (the scrim and Escape close the panel). |
+| `variant` | `"item" \| "header"` | `"item"` | `item` — a row in the rail. `header` — an icon button «‹‹» at the end of `Sidebar.Header`; in compact mode the same button moves onto the rail's outer edge, shrinks and turns round, and its chevrons turn to point out. Off-canvas it stays in the header and closes the panel. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "aria-label" \| "aria-expanded" \| "aria-controls">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `className` and the other button attributes. |
 
 ### useSidebar()
@@ -142,10 +220,8 @@ The rail sits on `bg-canvas` without a border or card; items are transparent row
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `expanded` | `--prime-layout-sidebar-width` (248) with icons and labels | Default desktop navigation | yes |
-| `compact` | `--prime-layout-sidebar-collapsed-width` (56) icon rail; labels fade, tooltips on the right, counters become dots | Users want more content width | |
+| `compact` | `--prime-layout-sidebar-collapsed-width` (56) icon rail; labels fade, tooltips on the right, coloured counts become dots, sub-lists open as flyouts | Users want more content width | |
 | `hidden` | Width 0, panel clipped out and inert | Focus / full-screen views | |
-
-Only the rail width animates (`--prime-motion-duration-base`): icons never move, labels fade.
 
 ### size (Root)
 | Value | Looks like | Use when | Default |
@@ -158,14 +234,28 @@ Only the rail width animates (`--prime-motion-duration-base`): icons never move,
 
 The rail width does not depend on `size`.
 
+### variant (Toggle)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `item` | an item row with a panel icon and the label | a toggle in `Sidebar.Footer` | yes |
+| `header` | a ghost «‹‹» icon button at the end of the header; on the compact rail a small round soft button across the outer edge, chevrons pointing out | a brand header (`Sidebar.Brand`) | |
+
+### ItemCount
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| no `color` / `variant` | a plain muted number | quantities (24 tasks) | yes |
+| `color` | a soft Badge of that hue | the count needs attention (red «7») | |
+| `variant` | a Badge of that treatment (gray unless `color`) | a stronger or outlined count | |
+
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `responsive` (Root) | below 768px: zero-width in layout; opens as a fixed panel over a scrim with `shadow-modal` | apps used on phones | `true` |
+| `collapsible` (Group) | the heading is a button with a chevron at its end; items fold away | long navigation with sections | off |
 | `current` (Item) | surface fill + raised shadow, primary text and icon | the current page | off |
 | `disabled` (Item) | `text-disabled`, no hover, `cursor: not-allowed` | an unavailable section | off |
 
-Put `Sidebar.Toggle` in Footer for collapsible rails, or `<Sidebar.Toggle variant="edge" />` in Header for a quiet round toggle on the rail's edge; on phones pair `responsive` with a menu button in `AppShell.Header` (`open` / `onOpenChange`). One current item at a time; give every item an icon when the rail can go compact.
+Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand; on phones pair `responsive` with a menu button in `AppShell.Header` (`open` / `onOpenChange`). One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
 
 ## States
 | State | Driven by | DOM |
@@ -173,15 +263,24 @@ Put `Sidebar.Toggle` in Footer for collapsible rails, or `<Sidebar.Toggle varian
 | mode | `mode` / `defaultMode` | Root `data-mode`, `data-panel-mode` (the last visible mode while hidden); `<nav inert>` while hidden |
 | off-canvas | `responsive` + viewport < 768px | Root `data-mobile`, `data-state="open" \| "closed"`; `<nav inert>` while closed |
 | current | `current` or a router's `aria-current` | Item `aria-current="page"`, `data-state="active"` |
+| active path | a child of a Sub (or an item of a Group) is current | SubTrigger `data-active-path`; a closed Sub / Group opens |
+| group open | Group `open` / `defaultOpen` (`collapsible`) | heading `aria-expanded`; region `data-state`, `inert` while closed |
+| sub open | Sub `open` / `defaultOpen` | SubTrigger `aria-expanded`; SubContent `data-state`, `inert` while closed |
+| flyout | hover / click / keyboard on a SubTrigger in compact mode | SubTrigger `aria-haspopup="dialog"`, `aria-expanded`; a Popover `role="dialog"` |
 | disabled | `disabled` | Item `disabled` / `aria-disabled`, `data-disabled` |
 
-Leaving the narrow viewport closes the off-canvas panel; navigating from an `href` / `asChild` item closes it too.
+Leaving the narrow viewport closes the off-canvas panel; navigating from an `href` / `asChild` item (or the brand) closes it too. Navigating from a flyout closes the flyout.
 
 ## Layout & spacing
 - Panel padding: `--prime-space-3` block, `--prime-space-2` inline; regions 8 apart; groups 16 apart, items 4 apart.
-- Item horizontal padding is derived from the compact width so icons sit in the same place in every mode.
-- Header is one row of the item height + 8; the edge toggle (20, round, canvas ring) is centred on it and straddles the outer edge. The root clips with `clip-path`, reaching past the edge by the toggle's half-width.
-- Motion: on collapse labels fade out fast before the rail narrows; on expand they fade in after a short delay, once the rail is wide. Group headings fold to zero height in compact mode.
+- Item horizontal padding is derived from the compact width so icons, the brand logo and the account avatar sit on one axis in every mode.
+- Header is one row of the item height + 8. The header toggle (xs, 28) sits at its end, 8 from the rail edge; in compact mode it moves half past the edge, scales to 3/4, turns round and gets a canvas ring. The root clips with `clip-path`, reaching past the edge by the toggle's half-width.
+- Collapsible group: heading 28 high with the chevron (14) at its end, aligned with the item trail; items start 4 below.
+- Sub-list: a 1px `border-default` guide line on the parent icon's centre; every child branches off it with an 8 elbow and a 6 bend; child labels line up with the parent label.
+- Trail (count, key hint, trailing icon) sits at the row end; a row action (one tier down) appears there on hover / focus and the trail moves aside.
+- Footer: items 4 apart; the account (item height + 12, avatar of the tier) is set 8 apart below them.
+- Compact flyout: the kit Popover (flush) to the right, aligned with the parent row; the parent's name heads it on the same line, the children follow on the guide line; current child is a `fill-subtle-active` wash.
+- Motion: on collapse labels fade out fast before the rail narrows; on expand they fade in after a short delay, once the rail is wide. Group headings fold to zero height in compact mode. Disclosures animate height through a grid track (open base · enter, close fast · exit), chevrons rotate (base), the header toggle moves and scales with the rail (base); all durations are tokens and collapse under reduced motion.
 - Off-canvas panel width: min(sidebar width, 100% − `--prime-space-12`).
 - Inside `AppShell.Nav` the rail takes the full height.
 
@@ -190,13 +289,19 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 ### Keyboard
 | Key | Action |
 |---|---|
-| `Tab` | Moves focus through the items; a disabled one is skipped. |
-| `Enter` · `Space` | Opens the section or presses the item button. |
-| `Escape` | Closes the off-canvas panel on a narrow screen. |
+| `Tab` | Moves focus through the items; a disabled or folded one is skipped. |
+| `Enter` · `Space` | Opens the section, presses the item, opens or closes a group or a sub-list; on the compact rail opens the flyout and focuses the first child. |
+| `ArrowRight` · `ArrowLeft` | On a parent item opens / closes the sub-list; on the compact rail → opens the flyout, ← in it returns focus to the parent. |
+| `ArrowDown` · `ArrowUp` · `Home` · `End` | Move focus between the items of a compact flyout. |
+| `Escape` | Closes the flyout (focus returns to the parent) and the off-canvas panel on a narrow screen. |
 
 ### ARIA
 - The panel is a `<nav>` named by `labels.navigation`; groups are `role="group"` named by their label.
 - The current item has `aria-current="page"`; in compact mode the label shows as a tooltip, so icon-only items keep a visible name.
+- A collapsible group heading and a SubTrigger are buttons with `aria-expanded` and `aria-controls`; folded content is `inert`.
+- On the compact rail a SubTrigger has `aria-haspopup="dialog"`; the flyout is a non-modal dialog named by the parent.
+- A row action is its own button next to the item (never nested), named by `label` with a tooltip.
+- The account avatar is hidden from screen readers; the name and the muted line name the button.
 - Off-canvas: scrim, focus trap and Escape; the scrim is a button labelled `labels.close`.
 - Toggle: `aria-expanded`, `aria-controls` → nav, label from `labels`.
 
@@ -215,19 +320,26 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 |---|---|
 | [overview.tsx](examples/overview.tsx) | App navigation on the canvas: items with icons, the current page and a collapse toggle — `Sidebar.ItemIcon`, `current`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: item height, text, icon and counter follow the tier; the rail width stays — `size`. |
-| [structure.tsx](examples/structure.tsx) | Labelled groups and the optional item parts: a counter, a key hint and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `Sidebar.ItemShortcut`, `disabled`. |
-| [edge-toggle.tsx](examples/edge-toggle.tsx) | A small round toggle across the rail's outer edge, level with the header; its chevron turns with the mode — `Sidebar.Toggle`, `variant`. |
+| [structure.tsx](examples/structure.tsx) | Labelled groups and the optional item parts: a plain count, a coloured badge, a key hint, a trailing icon, a row action and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`. |
+| [brand-header.tsx](examples/brand-header.tsx) | A brand block with the collapse toggle at the end of the header; in compact mode the logo stays and the toggle moves onto the rail edge — `Sidebar.Brand`, `Sidebar.BrandLogo`, `description`, `variant`. |
+| [collapsible-groups.tsx](examples/collapsible-groups.tsx) | Group headings that fold their items away, with a chevron at the end of the heading; in compact mode the items always show — `collapsible`, `defaultOpen`. |
+| [nested-items.tsx](examples/nested-items.tsx) | A parent item with child items on a guide line: a current child opens it and marks the parent; on the compact rail the children open in a flyout — `Sidebar.Sub`, `Sidebar.SubTrigger`, `Sidebar.SubContent`. |
+| [account.tsx](examples/account.tsx) | Footer items above the signed-in person: avatar, name and email open the account menu; in compact mode only the avatar stays — `Sidebar.Footer`, `Sidebar.Account`, `description`. |
 | [router.tsx](examples/router.tsx) | A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; only the width animates — `mode`, `onModeChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | Below 768px the rail becomes an off-canvas panel with a scrim, opened from a menu button; narrow the window to try it — `open`, `onOpenChange`. |
 
 ## Mistakes
 - `icon={…}` / `badge={…}` props → use the `Sidebar.ItemIcon` and `Sidebar.ItemCount` parts.
+- A Badge for every count → plain numbers by default; `color` only when the count needs attention.
+- A `<button>` placed inside an item for a row action → use `Sidebar.ItemAction` (it sits beside the item).
+- Hand-made brand markup with its own compact CSS → use `Sidebar.Brand` + `Sidebar.BrandLogo`.
+- A parent that is also a link → a `Sidebar.SubTrigger` only discloses; put the overview page in the children.
 - Items without an icon in a rail that can go compact → compact shows only icons.
 - Wrapping a router link in `Sidebar.Item` without `asChild` → nested interactive elements; use `asChild`.
 - Setting `current` and also relying on the router's `aria-current` → use one source.
 - Placing the Sidebar outside `AppShell.Nav` → it will not take the rail position.
 
 ## Related
-- **Built from:** [ScrollContainer](../../components/scroll-container/COMPONENT.md), [Badge](../../components/badge/COMPONENT.md), [Tooltip](../../components/tooltip/COMPONENT.md), Icon (`nav.sidebarCollapse`, `nav.sidebarExpand`)
-- **See also:** [AppShell](../app-shell/COMPONENT.md), [Drawer](../../components/drawer/COMPONENT.md), [Kbd](../../components/kbd/COMPONENT.md)
+- **Built from:** [ScrollContainer](../../components/scroll-container/COMPONENT.md), [Badge](../../components/badge/COMPONENT.md), [Tooltip](../../components/tooltip/COMPONENT.md), [Popover](../../components/popover/COMPONENT.md) (compact flyout), [Button](../../components/button/COMPONENT.md) (header toggle, row action), [Avatar](../../components/avatar/COMPONENT.md) slot, Icon (`nav.sidebarCollapse`, `nav.sidebarExpand`, `nav.chevronsLeft`, `nav.chevronDown`, `nav.chevronsUpDown`, `action.add`)
+- **See also:** [AppShell](../app-shell/COMPONENT.md), [Dropdown](../../components/dropdown/COMPONENT.md) (account menu), [Drawer](../../components/drawer/COMPONENT.md), [Kbd](../../components/kbd/COMPONENT.md)

@@ -4,40 +4,110 @@
  * No border, no card: items are transparent rows with a `fill-subtle` wash on hover; the current
  * item is lifted to `bg-surface` + `shadow-raised`.
  *
- * Motion: the root's inline size is the only thing that animates (expanded ↔ compact ↔ hidden,
- * one duration and easing). Item padding is derived from the compact width, so icons sit in the
- * same place in every mode; labels clip and fade instead of reflowing. While hidden the panel
- * keeps the width of the last visible mode and is clipped by the root as one piece.
+ * Motion: the root's inline size animates (expanded ↔ compact ↔ hidden, one duration and easing).
+ * Item padding is derived from the compact width, so icons sit on one axis in every mode; labels
+ * clip and fade instead of reflowing. While hidden the panel keeps the width of the last visible
+ * mode and is clipped by the root as one piece.
  *
  * Text leaves first and comes back last: on collapse labels fade out fast before the rail is
  * narrow; on expand they fade in after a delay, once the rail has room — no "Progr…" mid-motion.
  *
- * The root clips with `clip-path`, not `overflow`, so the edge toggle can sit across the outer edge;
- * the clip reaches past the edge by the toggle's half-width and its ring.
+ * Disclosures (collapsible groups, sub-lists) animate their height through a grid track
+ * (0fr → 1fr) like Accordion: open base · enter, close fast · exit; closed content is inert.
+ *
+ * The root clips with `clip-path`, not `overflow`, so the header toggle can sit across the outer
+ * edge in compact mode; the clip reaches past the edge by the toggle's half-width and its ring.
  */
 
-.root {
+.root,
+.flyout {
   --sb-h: var(--prime-control-m-height);
   --sb-icon: var(--prime-control-m-icon);
   --sb-text: var(--prime-control-m-text-size);
   --sb-line-height: var(--prime-control-m-line-height);
   --sb-radius: var(--prime-control-m-radius);
   --sb-gap: var(--prime-control-m-gap);
+  /* Inline actions are one tier down; the account avatar fits the compact rail. */
+  --sb-action-h: var(--prime-control-s-height);
+  --sb-avatar: var(--prime-avatar-m);
 
-  --sb-expanded: var(--prime-layout-sidebar-width);
   --sb-compact: var(--prime-layout-sidebar-collapsed-width);
   --sb-pad: var(--prime-space-2);
   /* Centers the icon inside the compact rail; the same padding is used when expanded. */
   --sb-item-pad: calc((var(--sb-compact) - 2 * var(--sb-pad) - var(--sb-icon)) / 2);
+  --sb-ease: var(--prime-motion-easing-standard);
+}
+
+.root[data-size="xs"],
+.flyout[data-size="xs"] {
+  --sb-h: var(--prime-control-xs-height);
+  --sb-icon: var(--prime-control-xs-icon);
+  --sb-text: var(--prime-control-xs-text-size);
+  --sb-line-height: var(--prime-control-xs-line-height);
+  --sb-radius: var(--prime-control-xs-radius);
+  --sb-gap: var(--prime-control-xs-gap);
+  --sb-action-h: var(--prime-control-xs-height);
+  --sb-avatar: var(--prime-avatar-xs);
+}
+
+.root[data-size="s"],
+.flyout[data-size="s"] {
+  --sb-h: var(--prime-control-s-height);
+  --sb-icon: var(--prime-control-s-icon);
+  --sb-text: var(--prime-control-s-text-size);
+  --sb-line-height: var(--prime-control-s-line-height);
+  --sb-radius: var(--prime-control-s-radius);
+  --sb-gap: var(--prime-control-s-gap);
+  --sb-action-h: var(--prime-control-xs-height);
+  --sb-avatar: var(--prime-avatar-s);
+}
+
+.root[data-size="l"],
+.flyout[data-size="l"] {
+  --sb-h: var(--prime-control-l-height);
+  --sb-icon: var(--prime-control-l-icon);
+  --sb-text: var(--prime-control-l-text-size);
+  --sb-line-height: var(--prime-control-l-line-height);
+  --sb-radius: var(--prime-control-l-radius);
+  --sb-gap: var(--prime-control-l-gap);
+  --sb-action-h: var(--prime-control-m-height);
+  --sb-avatar: var(--prime-avatar-m);
+}
+
+.root[data-size="xl"],
+.flyout[data-size="xl"] {
+  --sb-h: var(--prime-control-xl-height);
+  --sb-icon: var(--prime-control-xl-icon);
+  --sb-text: var(--prime-control-xl-text-size);
+  --sb-line-height: var(--prime-control-xl-line-height);
+  --sb-radius: var(--prime-control-xl-radius);
+  --sb-gap: var(--prime-control-xl-gap);
+  --sb-action-h: var(--prime-control-l-height);
+  --sb-avatar: var(--prime-avatar-l);
+}
+
+.root {
+  --sb-expanded: var(--prime-layout-sidebar-width);
   --sb-width: var(--sb-expanded);
   --sb-panel-width: var(--sb-expanded);
   --sb-duration: var(--prime-motion-duration-base);
-  --sb-ease: var(--prime-motion-easing-standard);
   --sb-text-out: var(--prime-motion-duration-fast);
   --sb-header-h: calc(var(--sb-h) + var(--prime-space-2));
-  --sb-edge-size: var(--prime-space-5);
+  /* Header toggle: an xs icon button inline; on the edge it shrinks to 3/4 and turns round. */
+  --sb-toggle: var(--prime-control-xs-height);
+  --sb-edge-scale: 0.75;
   --sb-edge-ring: var(--prime-space-1);
-  --sb-edge-reach: calc(var(--sb-edge-size) / 2 + var(--sb-edge-ring));
+  --sb-edge-reach: calc(var(--sb-toggle) * var(--sb-edge-scale) / 2 + var(--sb-edge-ring));
+  /* Brand logo: a square on the icon axis, never wider than the compact rail allows. */
+  --sb-logo: min(calc(var(--sb-h) - var(--prime-space-2)), var(--prime-space-8));
+  /* Inline action: where it sits, and how far the trail moves aside to make room for it. */
+  --sb-action-inset: calc((var(--sb-h) - var(--sb-action-h)) / 2);
+  --sb-action-shift: calc(
+    var(--sb-action-inset) +
+    var(--sb-action-h) +
+    var(--prime-space-1) -
+    var(--sb-item-pad)
+  );
 
   /* The rail is canvas: fields keep the canvas field fill; avatar rings match the rail. */
   --avatar-ring: var(--prime-color-bg-canvas);
@@ -52,42 +122,6 @@
   transition:
     width var(--sb-duration) var(--sb-ease),
     clip-path var(--sb-duration) var(--sb-ease);
-}
-
-.root[data-size="xs"] {
-  --sb-h: var(--prime-control-xs-height);
-  --sb-icon: var(--prime-control-xs-icon);
-  --sb-text: var(--prime-control-xs-text-size);
-  --sb-line-height: var(--prime-control-xs-line-height);
-  --sb-radius: var(--prime-control-xs-radius);
-  --sb-gap: var(--prime-control-xs-gap);
-}
-
-.root[data-size="s"] {
-  --sb-h: var(--prime-control-s-height);
-  --sb-icon: var(--prime-control-s-icon);
-  --sb-text: var(--prime-control-s-text-size);
-  --sb-line-height: var(--prime-control-s-line-height);
-  --sb-radius: var(--prime-control-s-radius);
-  --sb-gap: var(--prime-control-s-gap);
-}
-
-.root[data-size="l"] {
-  --sb-h: var(--prime-control-l-height);
-  --sb-icon: var(--prime-control-l-icon);
-  --sb-text: var(--prime-control-l-text-size);
-  --sb-line-height: var(--prime-control-l-line-height);
-  --sb-radius: var(--prime-control-l-radius);
-  --sb-gap: var(--prime-control-l-gap);
-}
-
-.root[data-size="xl"] {
-  --sb-h: var(--prime-control-xl-height);
-  --sb-icon: var(--prime-control-xl-icon);
-  --sb-text: var(--prime-control-xl-text-size);
-  --sb-line-height: var(--prime-control-xl-line-height);
-  --sb-radius: var(--prime-control-xl-radius);
-  --sb-gap: var(--prime-control-xl-gap);
 }
 
 .root[data-mode="compact"] {
@@ -124,7 +158,7 @@
 
 /* --- Regions ----------------------------------------------------------------- */
 
-/* One fixed-height row (a two-line brand fits), so the edge toggle can sit level with it. */
+/* One fixed-height row (a two-line brand fits), so the header toggle can sit level with it. */
 .header {
   display: flex;
   flex: none;
@@ -148,6 +182,8 @@
   margin-inline: calc(-1 * var(--sb-pad));
   padding-block: var(--prime-space-4);
   padding-inline: var(--sb-pad);
+  /* Rows scrolled into view (the current page, focus) stop clear of the edge fades. */
+  scroll-padding-block: var(--prime-space-8);
 }
 
 /* Bare items without groups form one list: item rhythm, not group rhythm. */
@@ -163,6 +199,87 @@
   min-width: 0;
 }
 
+/* The account block sits apart from the footer items: air, not a line. */
+.footer > .account:not(:first-child) {
+  margin-block-start: var(--prime-space-2);
+}
+
+/* --- Brand ------------------------------------------------------------------- */
+
+.brand {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--sb-gap);
+  min-width: 0;
+  /* Centres the logo in the compact rail, on the axis of the item icons. */
+  padding-inline: calc((var(--sb-compact) - 2 * var(--sb-pad) - var(--sb-logo)) / 2);
+  border-radius: var(--sb-radius);
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* Room for the inline header toggle while the brand has its text. */
+.root:not([data-mode="compact"]) .header:has(.headerToggle) > .brand,
+.root[data-mobile] .header:has(.headerToggle) > .brand {
+  margin-inline-end: calc(var(--sb-toggle) + var(--prime-space-1));
+}
+
+.brandLogo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--sb-logo);
+  height: var(--sb-logo);
+}
+
+.brandLogo > * {
+  width: 100%;
+  height: 100%;
+}
+
+.brandText {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.brandName,
+.brandDescription,
+.accountName,
+.accountDescription {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brandName {
+  color: var(--prime-color-text-primary);
+  font-size: var(--sb-text);
+  line-height: var(--sb-line-height);
+  font-weight: var(--prime-font-weight-semibold);
+}
+
+.brandDescription,
+.accountDescription {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-weight: var(--prime-font-weight-regular);
+}
+
+/* --- Groups ------------------------------------------------------------------ */
+
 .group {
   display: flex;
   flex-direction: column;
@@ -170,19 +287,141 @@
   min-width: 0;
 }
 
+/* A collapsible group spaces its items inside the disclosure, so a closed group is one row. */
+.group[data-collapsible] {
+  gap: 0;
+}
+
 .groupLabel {
+  box-sizing: border-box;
   display: flex;
   flex: none;
   align-items: center;
+  gap: var(--sb-gap);
+  width: 100%;
+  min-width: 0;
   height: var(--prime-panel-group-label-height);
+  margin: 0;
   padding-inline: var(--sb-item-pad);
   overflow: hidden;
+  border: 0;
+  border-radius: var(--sb-radius);
+  background: transparent;
   color: var(--prime-color-text-muted);
+  font: inherit;
   font-size: var(--prime-text-caption-size);
   line-height: var(--prime-text-caption-line-height);
   font-weight: var(--prime-font-weight-medium);
   letter-spacing: var(--prime-text-caption-tracking);
+  text-align: start;
   white-space: nowrap;
+}
+
+.groupText {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.groupTrigger {
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
+    color var(--prime-motion-duration-xfast) var(--sb-ease),
+    opacity var(--sb-duration) var(--sb-ease) var(--sb-text-out),
+    height var(--sb-duration) var(--sb-ease);
+}
+
+.groupTrigger:hover {
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-secondary);
+}
+
+.groupTrigger:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* Quiet chevron at the end of the heading; it turns up while the group is open. */
+.groupChevron {
+  flex: none;
+  width: var(--prime-icon-xs);
+  height: var(--prime-icon-xs);
+  color: var(--prime-color-text-muted);
+  transition:
+    rotate var(--prime-motion-duration-base) var(--sb-ease),
+    color var(--prime-motion-duration-xfast) var(--sb-ease);
+}
+
+.groupTrigger:hover .groupChevron {
+  color: var(--prime-color-text-secondary);
+}
+
+.groupTrigger[aria-expanded="true"] .groupChevron {
+  rotate: 180deg;
+}
+
+.groupItems {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  padding-block-start: var(--prime-space-1);
+}
+
+/* --- Disclosure (collapsible group, sub-list) ---------------------------------- */
+
+.disclosure {
+  display: grid;
+  grid-template-rows: 0fr;
+  min-width: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    visibility 0s linear var(--prime-motion-duration-fast);
+}
+
+.disclosure[data-state="open"] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    visibility 0s;
+}
+
+/*
+ * The clip reaches into the rail padding and below the last row, so focus rings and the raised
+ * shadow of a current row are not cut while the height is animating or at rest.
+ */
+.disclosureClip {
+  min-width: 0;
+  min-height: 0;
+  margin-inline: calc(-1 * var(--sb-pad));
+  margin-block-end: calc(-1 * var(--prime-space-1));
+  padding-inline: var(--sb-pad);
+  padding-block-end: var(--prime-space-1);
+  overflow: hidden;
+}
+
+.disclosureClip > * {
+  opacity: 0;
+  translate: 0 calc(-1 * var(--prime-space-1));
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    translate var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+}
+
+.disclosure[data-state="open"] > .disclosureClip > * {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    translate var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+}
+
+/* Disclosures that open on mount (the current page inside) appear in place. */
+.root:not([data-ready]) :is(.disclosure, .disclosureClip > *, .chevron, .groupChevron) {
+  transition: none;
 }
 
 /* --- Item -------------------------------------------------------------------- */
@@ -220,7 +459,14 @@
     transform var(--prime-motion-duration-fast) var(--sb-ease);
 }
 
-.item:hover {
+.item:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  /* Full-width rows inside clipping/scrolling regions: the ring is drawn inside the edge. */
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.item:hover,
+.flyout .item:focus-visible {
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-primary);
 }
@@ -230,17 +476,16 @@
   transform: scale(var(--prime-motion-press-scale));
 }
 
-.item:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  /* Full-width rows inside clipping/scrolling regions: the ring is drawn inside the edge. */
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
 .item[data-state="active"],
 .item[aria-current="page"] {
   background: var(--prime-color-bg-surface);
   color: var(--prime-color-text-primary);
   box-shadow: var(--prime-shadow-raised);
+}
+
+/* A parent whose child is the current page: on the active path, without a fill of its own. */
+.item[data-active-path] {
+  color: var(--prime-color-text-primary);
 }
 
 .item[data-disabled="true"],
@@ -269,8 +514,16 @@
 
 .item:hover .icon,
 .item[data-state="active"] .icon,
-.item[aria-current="page"] .icon {
+.item[aria-current="page"] .icon,
+.item[data-active-path] .icon {
   color: var(--prime-color-text-primary);
+}
+
+/* A trailing icon (external link) stays quiet: one step smaller, muted. */
+.item .icon[data-edge="end"] {
+  width: var(--prime-icon-xs);
+  height: var(--prime-icon-xs);
+  color: var(--prime-color-text-muted);
 }
 
 .item[data-disabled="true"] .icon,
@@ -286,10 +539,24 @@
   white-space: nowrap;
 }
 
-/* The count is a kit Badge (one tier below the items); the dot stands in for it in compact mode. */
+/* Count, key hint, trailing icons: one cluster at the end that can step aside for an action. */
+.trail {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-2);
+  transition: translate var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+/* The count is a plain muted number, or a kit Badge (one tier below the items) when it is coloured. */
 .count {
   flex: none;
   font-variant-numeric: tabular-nums;
+}
+
+.countPlain {
+  color: var(--prime-color-text-muted);
+  font-weight: var(--prime-font-weight-regular);
 }
 
 /* `[data-size]` outranks Badge's own `.dot` display whatever order the modules load in. */
@@ -303,57 +570,310 @@
   align-items: center;
 }
 
-/* Expanding: text and group headings return once the rail has widened. */
-.label,
-.shortcut,
-.groupLabel {
-  transition:
-    opacity var(--sb-duration) var(--sb-ease) var(--sb-text-out),
-    height var(--sb-duration) var(--sb-ease);
-}
-
-/* --- Edge toggle ---------------------------------------------------------------- */
-
-/* A round kit Button across the outer edge, level with the header row; a canvas ring cuts it out. */
-.root .edgeToggle {
-  position: absolute;
-  inset-block-start: calc(var(--prime-space-3) + (var(--sb-header-h) - var(--sb-edge-size)) / 2);
-  inset-inline-end: calc(-1 * var(--sb-edge-size) / 2);
-  z-index: var(--prime-z-sticky);
-  width: var(--sb-edge-size);
-  min-width: 0;
-  height: var(--sb-edge-size);
-  padding: 0;
-  border-radius: var(--prime-radius-full);
+/* Disclosure chevron at the end of a parent row (never next to the text); turns up when open. */
+.item .chevron {
+  flex: none;
+  width: var(--sb-icon);
+  height: var(--sb-icon);
   color: var(--prime-color-text-muted);
-  box-shadow: 0 0 0 var(--sb-edge-ring) var(--prime-color-bg-canvas);
-  transition: color var(--prime-motion-duration-fast) var(--sb-ease);
+  transition:
+    rotate var(--prime-motion-duration-base) var(--sb-ease),
+    color var(--prime-motion-duration-xfast) var(--sb-ease),
+    opacity var(--sb-duration) var(--sb-ease) var(--sb-text-out);
 }
 
-/* Quiet at rest; it comes forward while the pointer is over the rail. */
-.root:hover .edgeToggle,
-.root .edgeToggle:focus-visible {
-  color: var(--prime-color-text-primary);
+.item:hover .chevron {
+  color: var(--prime-color-text-secondary);
 }
 
-.edgeChevron {
-  transition: rotate var(--sb-duration) var(--sb-ease);
-}
-
-.root[data-mode="compact"] .edgeChevron {
+.item[aria-expanded="true"] .chevron {
   rotate: 180deg;
 }
 
-.root[data-mode="hidden"] .edgeToggle {
+/* Expanding: text and group headings return once the rail has widened. */
+.label,
+.trail > :not(.dot),
+.groupLabel,
+.brandText,
+.accountText,
+.accountChevron {
+  transition:
+    opacity var(--sb-duration) var(--sb-ease) var(--sb-text-out),
+    height var(--sb-duration) var(--sb-ease),
+    translate var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+/* --- Inline action -------------------------------------------------------------- */
+
+/* A row holds the item element and its action side by side (no button inside a button). */
+.row {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+/* The label keeps clear of the place the trail moves to. */
+.row .label {
+  margin-inline-end: var(--sb-action-shift);
+}
+
+.root .action {
+  position: absolute;
+  inset-block-start: var(--sb-action-inset);
+  inset-inline-end: var(--sb-action-inset);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+.row:hover > .action,
+.row:focus-within > .action {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.row:hover .trail,
+.row:focus-within .trail {
+  translate: calc(-1 * var(--sb-action-shift)) 0;
+}
+
+/* --- Sub-list ------------------------------------------------------------------- */
+
+/*
+ * Children hang on a faint guide line under the parent icon. Every row draws its own branch: a
+ * line from above that bends into the row (`::before`) and, unless it is the last, the line going
+ * on down (`::after`). Child labels line up with the parent label.
+ */
+.subList {
+  --sub-gap: var(--prime-space-1);
+  --sub-line-x: calc(var(--sb-item-pad) + var(--sb-icon) / 2 - var(--prime-border-width) / 2);
+  --sub-elbow: var(--prime-space-2);
+  --sub-bend: var(--prime-radius-s);
+  /* The first branch starts this far above the list: just below the parent icon. */
+  --sub-reach: calc((var(--sb-h) - var(--sb-icon)) / 2 - var(--prime-space-1));
+  --sub-line: var(--prime-color-border-default);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--sub-gap);
+  min-width: 0;
+  padding-block-start: var(--sub-gap);
+}
+
+.subRow {
+  position: relative;
+  min-width: 0;
+  padding-inline-start: calc(var(--sub-line-x) + var(--sub-elbow));
+}
+
+.subRow::before,
+.subRow:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: var(--sub-line-x);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.subRow::before {
+  inset-block-start: calc(-1 * var(--sub-gap));
+  width: var(--sub-elbow);
+  height: calc(var(--sub-gap) + var(--sb-h) / 2);
+  border-block-end: var(--prime-border-width) solid var(--sub-line);
+  border-inline-start: var(--prime-border-width) solid var(--sub-line);
+  border-end-start-radius: var(--sub-bend);
+}
+
+.subRow:first-child::before {
+  inset-block-start: calc(-1 * (var(--sub-gap) + var(--sub-reach)));
+  height: calc(var(--sub-gap) + var(--sub-reach) + var(--sb-h) / 2);
+}
+
+.subRow:not(:last-child)::after {
+  inset-block: calc(var(--sb-h) / 2 - var(--sub-bend)) 0;
+  border-inline-start: var(--prime-border-width) solid var(--sub-line);
+}
+
+.subRow .item {
+  padding-inline-start: calc(var(--sb-icon) / 2 + var(--sb-gap) - var(--sub-elbow));
+}
+
+/* --- Compact flyout ---------------------------------------------------------------- */
+
+/* The kit floating surface (Popover, flush): the parent's name level with it, then the children. */
+.flyout {
+  padding: 0 var(--prime-space-1) var(--prime-space-1);
+  color: var(--prime-color-text-primary);
+}
+
+.flyoutTitle {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-height: var(--sb-h);
+  padding-inline: var(--sb-item-pad);
+  color: var(--prime-color-text-primary);
+  font-size: var(--sb-text);
+  line-height: var(--sb-line-height);
+  font-weight: var(--prime-font-weight-semibold);
+  white-space: nowrap;
+}
+
+.flyout .subList {
+  --sub-line-x: var(--sb-item-pad);
+  --sub-reach: calc((var(--sb-h) - var(--sb-line-height)) / 2 - var(--prime-space-1));
+
+  padding-block-start: 0;
+}
+
+.flyout .subRow:first-child::before {
+  inset-block-start: calc(-1 * var(--sub-reach));
+  height: calc(var(--sub-reach) + var(--sb-h) / 2);
+}
+
+/* On the raised surface the current row is a deeper wash, not the canvas lift. */
+.flyout .item[data-state="active"],
+.flyout .item[aria-current="page"] {
+  background: var(--prime-color-fill-subtle-active);
+  box-shadow: none;
+}
+
+/* --- Account ---------------------------------------------------------------------- */
+
+.account {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sb-gap);
+  width: 100%;
+  min-width: 0;
+  min-height: calc(var(--sb-h) + var(--prime-space-3));
+  margin: 0;
+  padding-block: var(--prime-space-1);
+  /* Centres the avatar in the compact rail, on the axis of the item icons. */
+  padding-inline: calc((var(--sb-compact) - 2 * var(--sb-pad) - var(--sb-avatar)) / 2)
+    var(--sb-item-pad);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--sb-radius);
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
+    transform var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+.account:hover,
+.account[aria-expanded="true"] {
+  background: var(--prime-color-fill-subtle);
+}
+
+.account:active {
+  background: var(--prime-color-fill-subtle-active);
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+.account:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.accountAvatar {
+  --avatar-slot-size: var(--sb-avatar);
+
+  display: inline-flex;
+  flex: none;
+}
+
+.accountText {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.accountName {
+  font-size: var(--sb-text);
+  line-height: var(--sb-line-height);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.accountChevron {
+  flex: none;
+  width: var(--sb-icon);
+  height: var(--sb-icon);
+  color: var(--prime-color-text-muted);
+}
+
+/* --- Header toggle ------------------------------------------------------------------ */
+
+/*
+ * One kit Button for both places. Expanded: a ghost icon button at the end of the header row.
+ * Compact: it rides the rail edge — moved half out, 3/4 size, round, cut out of the content by a
+ * canvas ring; the chevrons turn to point out. Only transforms, colour and shadow animate.
+ */
+.root .headerToggle {
+  position: absolute;
+  inset-block-start: calc(var(--prime-space-3) + (var(--sb-header-h) - var(--sb-toggle)) / 2);
+  inset-inline-end: 0;
+  z-index: var(--prime-z-sticky);
+  width: var(--sb-toggle);
+  min-width: 0;
+  height: var(--sb-toggle);
+  padding: 0;
+  border-radius: var(--sb-radius);
+  color: var(--prime-color-text-muted);
+  box-shadow: 0 0 0 0 var(--prime-color-bg-canvas);
+  translate: calc(-1 * var(--sb-pad)) 0;
+  scale: 1;
+  transition:
+    translate var(--sb-duration) var(--sb-ease),
+    scale var(--sb-duration) var(--sb-ease),
+    border-radius var(--sb-duration) var(--sb-ease),
+    box-shadow var(--sb-duration) var(--sb-ease),
+    background-color var(--prime-motion-duration-fast) var(--sb-ease),
+    color var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+.root .headerToggle:hover,
+.root .headerToggle:focus-visible {
+  color: var(--prime-color-text-primary);
+}
+
+.headerToggleIcon {
+  transition: rotate var(--sb-duration) var(--sb-ease);
+}
+
+.root[data-mode="compact"]:not([data-mobile]) .headerToggle {
+  border-radius: var(--prime-radius-full);
+  box-shadow: 0 0 0 var(--sb-edge-ring) var(--prime-color-bg-canvas);
+  translate: 50% 0;
+  scale: var(--sb-edge-scale);
+}
+
+/* On the edge it stays quiet until the pointer is over the rail. */
+.root[data-mode="compact"]:not([data-mobile]):hover .headerToggle {
+  color: var(--prime-color-text-primary);
+}
+
+.root[data-mode="compact"]:not([data-mobile]) .headerToggleIcon {
+  rotate: 180deg;
+}
+
+.root[data-mode="hidden"] .headerToggle {
   visibility: hidden;
 }
 
 /* --- Compact (desktop only) ---------------------------------------------------- */
 
 /* Collapsing: text leaves fast, before the rail is narrow; labels clip without an ellipsis. */
-.root[data-mode="compact"]:not([data-mobile]) .label,
-.root[data-mode="compact"]:not([data-mobile]) .shortcut,
-.root[data-mode="compact"]:not([data-mobile]) .groupLabel {
+.root[data-mode="compact"]:not([data-mobile])
+:is(.label, .trail > :not(.dot), .groupLabel, .chevron, .brandText, .accountText, .accountChevron) {
   opacity: 0;
   text-overflow: clip;
   transition:
@@ -366,7 +886,26 @@
   height: 0;
 }
 
-/* The count leaves the row (still read by screen readers); a dot marks the icon's top-end corner. */
+/* Inline actions have no place on the rail. */
+.root[data-mode="compact"]:not([data-mobile]) .action {
+  visibility: hidden;
+}
+
+.root[data-mode="compact"]:not([data-mobile]) .trail {
+  translate: none;
+}
+
+/* A parent stands for its hidden children: on the active path it takes the current lift. */
+.root[data-mode="compact"]:not([data-mobile]) .item[data-active-path] {
+  background: var(--prime-color-bg-surface);
+  box-shadow: var(--prime-shadow-raised);
+}
+
+.root[data-mode="compact"]:not([data-mobile]) .item[aria-haspopup][aria-expanded="true"] {
+  background: var(--prime-color-fill-subtle);
+}
+
+/* The count leaves the row (still read by screen readers); a badge leaves a dot on the icon. */
 .root[data-mode="compact"]:not([data-mobile]) .count {
   position: absolute;
   width: var(--prime-border-width);
@@ -383,7 +922,6 @@
   inset-block-start: calc(50% - var(--sb-icon) / 2 - var(--prime-space-1) / 2);
   inset-inline-start: calc(var(--sb-item-pad) + var(--sb-icon) - var(--prime-space-1));
   display: inline-flex;
-  color: var(--prime-color-accent-default);
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-bg-canvas);
 }
 

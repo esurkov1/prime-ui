@@ -96,31 +96,13 @@ body {
   white-space: nowrap;
 }
 
-/* Brand in the sidebar header; the mark lines up with the item icons in the compact rail. */
-.playgroundBrand {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: var(--prime-space-2);
-  align-self: stretch;
-  min-width: 0;
-  /* Centres the mark in the compact rail, on the axis of the item icons. */
-  --brand-rail: calc(var(--prime-layout-sidebar-collapsed-width) - 2 * var(--prime-space-2));
-  padding-inline: calc((var(--brand-rail) - var(--prime-icon-l)) / 2);
-  border-radius: var(--prime-radius-m);
-  color: inherit;
-  text-decoration: none;
-}
-
+/* The playground mark inside `Sidebar.BrandLogo` (the slot sizes and places it). */
 .playgroundBrandMark {
   box-sizing: border-box;
   display: grid;
-  flex: none;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--prime-space-1);
-  width: var(--prime-icon-l);
-  height: var(--prime-icon-l);
-  padding: var(--prime-space-1);
+  padding: calc(var(--prime-space-1) + var(--prime-border-width));
   border-radius: var(--prime-radius-s);
   background: var(--prime-color-accent-default);
 }
@@ -132,21 +114,6 @@ body {
 
 .playgroundBrandMark > span:nth-child(4) {
   opacity: 0.5;
-}
-
-.playgroundBrandText {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  white-space: nowrap;
-  /* Same timing as the rail labels: back after the rail widens, gone before it narrows. */
-  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard)
-    var(--prime-motion-duration-fast);
-}
-
-[data-mode="compact"]:not([data-mobile]) .playgroundBrandText {
-  opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
 /* Mobile header bar (menu + page title + search), rendered only on narrow viewports. */
@@ -192,31 +159,4 @@ body {
 
 .playgroundFrame[data-preview-surface="accent"] [data-preview-layout] {
   background: var(--prime-color-accent-soft);
-}
-
-/* Sidebar footer: collapse, theme and preview surface in one row; a column in the compact rail. */
-.playgroundSidebarFooter {
-  display: flex;
-  align-items: stretch;
-  gap: var(--prime-space-1);
-}
-
-/* Reversed column: the collapse button stays in the bottom-start corner in both modes. */
-[data-mode="compact"]:not([data-mobile]) .playgroundSidebarFooter {
-  flex-direction: column-reverse;
-}
-
-.playgroundSidebarFooterTip {
-  display: flex;
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.playgroundSidebarFooterTip > button {
-  flex: 1 1 auto;
-  width: 100%;
-}
-
-[data-mode="compact"]:not([data-mobile]) .playgroundSidebarFooterTip {
-  flex: none;
 }
