@@ -2,11 +2,13 @@
 import { Button, Dropdown, Icon, Typography } from "prime-ui-kit";
 import * as React from "react";
 
+import styles from "./examples.module.css";
+
 export default function DropdownOverviewExample() {
   const [status, setStatus] = React.useState("Счёт № 4821 · черновик");
 
   return (
-    <>
+    <div className={styles.row}>
       <Typography.Root as="span" variant="body-m">
         {status}
       </Typography.Root>
@@ -34,6 +36,6 @@ export default function DropdownOverviewExample() {
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
-    </>
+    </div>
   );
 }

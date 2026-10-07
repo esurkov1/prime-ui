@@ -7,3 +7,16 @@
   width: 100%;
   max-width: calc(var(--prime-space-24) * 3);
 }
+
+/* overview.tsx: a list row — the record on the left, its actions button at the end. */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+  width: min(100%, calc(var(--prime-space-24) * 4));
+  padding-block: var(--prime-space-1);
+  padding-inline: var(--prime-space-4) var(--prime-space-1);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-card-bg);
+}
