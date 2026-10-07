@@ -1,8 +1,9 @@
 # ColorSwatches
 
 **Category:** selection
+**Kind:** control
 
-> An inline color choice: a wrapping grid of preset swatches inside a form, without a popover.
+> An inline color choice: preset swatches that wrap inside a form, without a popover.
 
 ## When to use
 - Picking a color for an entity in a form or dialog (pipeline stage, tag, project, calendar).
@@ -21,42 +22,42 @@ import { COLOR_PRESETS, ColorSwatches } from "prime-ui-kit";
 
 ## Anatomy
 ```
-ColorSwatches.Root            field frame (label · grid · hint/error) when label/hint/error are set
-└─ radiogroup                 CSS grid, repeat(auto-fill, swatch) — wraps to the container width
+ColorSwatches                 field frame: label → swatches → hint | error
+└─ radiogroup                 wrapping row of swatches
    ├─ radio × presets         swatch button (color fill, faint inner ring, check when selected)
    ├─ radio «Без цвета»       checkerboard swatch (`allowEmpty`)
    └─ input[type=hidden]      submits the value (`name`)
 ```
-Single leaf component: `ColorSwatches.Root`. Without `label`, `hint` and `error` it renders only the grid.
 
 ## API
 
-### ColorSwatches.Root
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+### ColorSwatches
+No ref. The field frame (label → swatches → hint | error) around a `role="radiogroup"` of swatch buttons with a roving tab stop.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string \| null` | — | Controlled color (a `presets` value); `null` — no color. Compared case- and space-insensitively. |
-| `defaultValue` | `string \| null` | `null` | Initial color (uncontrolled). |
-| `onValueChange` | `(value: string \| null) => void` | — | Called on click and on arrow / Home / End selection. |
-| `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in order, `{ value, label }`; `label` is the radio name and `title`. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Swatch = control height − 8 (20 · 24 · 28 · 32 · 40); gap = tier gap; label and hint of the tier. |
-| `allowEmpty` | `boolean` | `false` | Adds the «no color» swatch after the presets (value `null`). |
-| `label` | `ReactNode` | — | Field label above the grid; names the group. |
-| `required` | `boolean` | — | Red `*` after the label; `aria-required` on the group. |
-| `optional` | `boolean` | — | Muted `labels.optional` after the label. |
-| `hint` | `ReactNode` | — | Help text under the grid. |
-| `error` | `ReactNode` | — | Error under the grid; replaces the hint and implies `invalid`. |
-| `invalid` | `boolean` | — | Invalid state without a message: `aria-invalid`, danger ring on the selected swatch. |
-| `disabled` | `boolean` | `false` | Disables every swatch. |
-| `name` | `string` | — | Renders a hidden input with the selected color (empty string for no color). |
-| `id` | `string` | generated | Id of the group (label, hint and error ids derive from it). |
-| `className` | `string` | — | Class on the outer element (field frame, or the grid without a frame). |
-| `aria-label` | `string` | — | Group name when there is no `label`; falls back to `labels.group`. |
-| `aria-labelledby` | `string` | — | Names the group by another element (e.g. a section title). |
-| `aria-describedby` | `string` | — | Extra description ids, merged with hint / error. |
-| `labels` | `Partial<ColorSwatchesLabels>` | see Accessibility | System strings. |
-
-No ref forwarding, no other native props. Exported types: `ColorSwatchesRootProps`, `ColorSwatchesLabels`; `ColorPreset` and `COLOR_PRESETS` come from ColorPresets.
+| `value` | `string \| null` | — | Controlled color; `null` — no color. |
+| `defaultValue` | `string \| null` | `null` | Initial color when uncontrolled. |
+| `onValueChange` | `(value: string \| null) => void` | — | Called with the preset `value` (as written in `presets`) or `null`. |
+| `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in order: `{ value, label }`; the label is the swatch's accessible name and tooltip. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = the tier gap; label and hint follow it. |
+| `label` | `ReactNode` | — | Label above the swatches; names the radiogroup (`aria-labelledby`). |
+| `required` | `boolean` | — | Red `*` after the label and `aria-required` on the group. |
+| `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
+| `hint` | `ReactNode` | — | Help text under the swatches. Hidden while `error` is shown. |
+| `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
+| `invalid` | `boolean` | — | Danger selection ring and `aria-invalid`. A non-empty `error` implies it. |
+| `disabled` | `boolean` | `false` | Disables every swatch (grey, half transparent). |
+| `allowEmpty` | `boolean` | `false` | Adds the «no color» checkerboard swatch after the presets (value `null`). |
+| `name` | `string` | — | Form field name: a hidden input submits the selected color (empty string for no color). |
+| `id` | `string` | — | Id of the radiogroup; hint id is `<id>-hint`, error id is `<id>-error`. |
+| `aria-label` | `string` | — | Accessible name when there is no visible `label` (else `labels.group`). |
+| `aria-labelledby` | `string` | — | Names the group by an outside element. |
+| `aria-describedby` | `string` | — | Merged before the hint/error ids. |
+| `labels` | `Partial<ColorSwatchesLabels>` | — | Built-in strings, see Labels. |
+| `className` | `string` | — | Class on the outer field `<div>`. |
 
 ## Variants
 
@@ -69,72 +70,76 @@ No ref forwarding, no other native props. Exported types: `ColorSwatchesRootProp
 | `l` | Swatch 32, gap 8, radius 8 | Spacious settings pages | |
 | `xl` | Swatch 40, gap 12, radius 8 | Touch-first layouts | |
 
-### allowEmpty
+**Sizes:** match the size of the form around it: an `m` form uses `m` swatches (28), which sit on the same 4px rhythm as `m` fields.
+
+### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `false` | Presets only | A color is required | yes |
-| `true` | Extra checkerboard swatch «Без цвета» at the end | The color is optional | |
+| `allowEmpty` | an extra checkerboard swatch «Без цвета» at the end | the color is optional | `false` |
+| `invalid` | the selection ring turns danger | the message is shown elsewhere; otherwise pass `error` | — |
+| `disabled` | every swatch grey at half opacity | the choice is unavailable | `false` |
 
 **Combinations**
 - Recommended: `label` + `name` inside a form; `allowEmpty` + `optional` for optional colors; `COLOR_PRESETS.slice(0, 8)` for one row of eight.
-- Allowed but rare: `aria-labelledby` pointing at a `Card.SectionTitle` when the card holds only the color.
 - Avoid: more than ~24 presets (switch to ColorPicker); `required` together with `allowEmpty` (an empty choice cannot satisfy it).
-
-**Sizes**
-Match the size of the form around it: an `m` form uses `m` swatches (28), which sit on the same 4px rhythm as `m` fields.
-
-**Hierarchy**
-The swatch grid is a field: it follows the field → field spacing (20) and never gets its own card or border.
+- The swatches are a field: they follow the field → field spacing (20) and never get their own card or border.
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | selected | `value` / `defaultValue` | `aria-checked="true"`, `data-state="checked"` on the radio; 2px accent ring with a 2px gap and a check mark (light or dark by color contrast) |
-| hover | pointer | Swatch scales to 1.08 |
-| focus-visible | keyboard | Focus ring outside the swatch |
-| invalid | `invalid` / `error` | `aria-invalid`, `data-invalid` on the grid; the selected ring turns `danger-border` |
-| disabled | `disabled` | Native `disabled` on every radio, `aria-disabled` and `data-disabled` on the group; grayscale at half opacity |
+| hover | pointer | the swatch scales to 1.08 (fine pointers only) |
+| focus-visible | keyboard | focus ring outside the swatch |
+| invalid | `invalid` / `error` | `aria-invalid`, `data-invalid` on the group; the selected ring turns `danger-border` |
+| disabled | `disabled` | native `disabled` on every radio, `aria-disabled` and `data-disabled` on the group |
 
 Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 
 ## Layout & spacing
-- The grid is `repeat(auto-fill, <swatch>)`: it takes the container width and wraps to new rows by itself; no column count to set. Width comes from the layout (form column, dialog body).
-- Swatches start flush with the label and the fields above. The selection / focus rings sit outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep `--prime-focus-space` padding, so the rings are never clipped. In your own `overflow` container, keep that padding.
-- In a form: label → grid and grid → hint use the tier `label-gap` / `hint-gap` (built in); field → field 20.
-- Works from 320px: 16 presets wrap into rows.
+- The swatches take the container width and wrap to new rows by themselves; no column count to set. In a content-sized container they stay in one row.
+- The selection / focus rings sit outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep `--prime-focus-space` padding, so the rings are never clipped. In your own `overflow` container, keep that padding.
+- Label → swatches and swatches → hint use the tier `label-gap` / `hint-gap`; field → field 20.
 
 ## Accessibility
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Enters on the selected swatch (or the first one). |
+| `ArrowRight` · `ArrowLeft` | Moves to the next / previous swatch and selects it. |
+| `ArrowDown` · `ArrowUp` | Moves one visual row down / up and selects. |
+| `Home` · `End` | Jumps to the first / last swatch and selects it. |
+
+### ARIA
 - `role="radiogroup"` with one `role="radio"` button per swatch; the color name is the radio's name and `title`.
-- Roving tabindex: Tab enters on the selected swatch (or the first). ← / → move and select, ↑ / ↓ move by visual rows, Home / End jump to the ends.
-- Named by `label`, `aria-labelledby`, `aria-label` or `labels.group`; hint / error are linked through `aria-describedby`.
-- `labels` (`ColorSwatchesLabels`):
-  - `group` — `"Цвет"` (group name without a label)
-  - `empty` — `"Без цвета"` (the empty swatch)
-  - `optional` — `"необязательно"` (marker after the label)
+- Named by `label`, `aria-labelledby`, `aria-label` or `labels.group`; the hint or the error is linked through `aria-describedby`.
+- The check mark is decorative; the selection is announced by `aria-checked`.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+| Key | Default | Used for |
+|---|---|---|
+| `group` | `"Цвет"` | Accessible name of the group without a visible `label` and `aria-label`. |
+| `empty` | `"Без цвета"` | Name of the «no color» swatch (`allowEmpty`). |
+| `optional` | `"необязательно"` | Marker after the label when `optional`. |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [in-form.tsx](examples/in-form.tsx) | Name field + labelled color in a form, `name` submits it | Entity settings dialogs |
-| [sizes.tsx](examples/sizes.tsx) | Five tiers, swatch 20–40 | Matching the form size |
-| [allow-empty.tsx](examples/allow-empty.tsx) | Controlled value, «no color» swatch, `optional` | Optional colors |
-| [wrapping.tsx](examples/wrapping.tsx) | 16 presets in a wide and a narrow column | Any width, no column tuning |
-
-```tsx
-import { ColorSwatches } from "prime-ui-kit";
-
-export function StageColor() {
-  return <ColorSwatches.Root label="Цвет" name="color" defaultValue="#ef4444" />;
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | The kit palette inline under a field label, one color chosen — `label`, `defaultValue`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size, swatch 20 to 40 px with the tier gap — `size`. |
+| [states.tsx](examples/states.tsx) | A default palette next to an invalid and a disabled one — `invalid`, `disabled`. |
+| [wrapping.tsx](examples/wrapping.tsx) | In a narrow column the swatches wrap by themselves and the arrows move by the visual rows. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the color, «no color» included, and names it in the hint — `value`, `onValueChange`, `allowEmpty`. |
+| [in-form.tsx](examples/in-form.tsx) | A calendar event form: the color is submitted by `name` and required on save — `name`, `required`, `error`. |
 
 ## Mistakes
-- A popover palette (`ColorPresets`) for the only color field of a dialog → use `ColorSwatches.Root` inline.
-- Setting `grid-template-columns` or swatch sizes in CSS → the grid wraps by itself; change `size` instead.
-- `required` with `allowEmpty` → drop one of them.
-- A separate `Label.Root` above the grid → pass `label` to Root.
+- `<ColorSwatches.Root>` → the component is a single export: `<ColorSwatches />`.
+- A visible heading next to the swatches made by hand → pass `label`.
+- Presets without names → every preset needs a `label`; it is the swatch's accessible name.
+- Dozens of presets → use ColorPicker.
 
 ## Related
-- [ColorPresets and ColorPicker](../color-picker/COMPONENT.md)
-- [Radio](../radio/COMPONENT.md)
-- [SegmentedControl](../segmented-control/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), `Icon` (check mark)
+- **See also:** [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`, `ColorPicker.Swatches`), [Radio](../radio/COMPONENT.md)

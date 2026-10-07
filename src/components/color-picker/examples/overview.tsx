@@ -1,26 +1,18 @@
-/** HexInput in every size tier with a square soft trigger of the same size that opens the panel in a Popover. Use it for a color field inside forms. */
+/** A color field: a hex value and a swatch button that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.TriggerSwatch`. */
 import { Button, ColorPicker, Popover } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const SIZES = ["xs", "s", "m", "l", "xl"] as const;
-
-function ColorField({ size }: { size: (typeof SIZES)[number] }) {
+export default function ColorPickerOverviewExample() {
   return (
-    <ColorPicker.Root defaultValue="#0090ff">
+    <ColorPicker.Root defaultValue="#5b5bd6">
       <div className={styles.fieldRow}>
-        <ColorPicker.HexInput label={`Цвет · ${size}`} size={size} />
+        <ColorPicker.HexInput label="Акцентный цвет" />
         <Popover.Root>
           <Popover.Trigger>
-            <Button.Root
-              variant="soft"
-              tone="neutral"
-              size={size}
-              aria-label="Открыть палитру"
-              className={styles.swatchTrigger}
-            >
+            <Button.Root variant="soft" tone="neutral" aria-label="Открыть палитру">
               <Button.Icon>
-                <ColorPicker.TriggerSwatch className={styles.swatchFill} />
+                <ColorPicker.TriggerSwatch />
               </Button.Icon>
             </Button.Root>
           </Popover.Trigger>
@@ -40,15 +32,5 @@ function ColorField({ size }: { size: (typeof SIZES)[number] }) {
         </Popover.Root>
       </div>
     </ColorPicker.Root>
-  );
-}
-
-export default function ColorPickerHexInputSizesExample() {
-  return (
-    <div className={styles.sizes}>
-      {SIZES.map((size) => (
-        <ColorField key={size} size={size} />
-      ))}
-    </div>
   );
 }

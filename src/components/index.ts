@@ -113,14 +113,12 @@ export type {
   ColorPickerChannelStripProps,
   ColorPickerColorValue,
   ColorPickerEyeDropperButtonProps,
-  ColorPickerFieldProps,
   ColorPickerHexInputProps,
   ColorPickerLabels,
   ColorPickerPanelProps,
   ColorPickerRootProps,
   ColorPickerSliderProps,
-  ColorPickerSwatchPickerItemProps,
-  ColorPickerSwatchPickerProps,
+  ColorPickerSwatchesProps,
   ColorPickerTriggerSwatchProps,
   ColorValueFormat,
 } from "./color-picker/ColorPicker";
@@ -134,7 +132,7 @@ export type {
   ColorPresetsTriggerProps,
 } from "./color-picker/ColorPresets";
 export { COLOR_PRESETS, ColorPresets } from "./color-picker/ColorPresets";
-export type { ColorSwatchesLabels, ColorSwatchesRootProps } from "./color-swatches/ColorSwatches";
+export type { ColorSwatchesLabels, ColorSwatchesProps } from "./color-swatches/ColorSwatches";
 export { ColorSwatches } from "./color-swatches/ColorSwatches";
 export type {
   CommandMenuBadgeRowProps,

@@ -1,9 +1,17 @@
-/** A standalone raised panel with format select, area, hue and alpha sliders, channel strip and brand swatches. Use it as the full picker layout and part order. */
-import { ColorPicker, Typography } from "prime-ui-kit";
+/** The full raised panel and its part order: format, area, hue and alpha sliders, channels, brand swatches — `ColorPicker.Panel`, `surface`, `ColorPicker.Swatches`. */
+import { ColorPicker } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const PRESETS = ["#e5484d", "#f76b15", "#ffc53d", "#30a46c", "#12a594", "#0090ff", "#8e4ec6"];
+const BRAND_COLORS = [
+  { value: "#e5484d", label: "Красный" },
+  { value: "#f76b15", label: "Оранжевый" },
+  { value: "#ffc53d", label: "Янтарный" },
+  { value: "#30a46c", label: "Зелёный" },
+  { value: "#12a594", label: "Бирюзовый" },
+  { value: "#0090ff", label: "Синий" },
+  { value: "#8e4ec6", label: "Фиолетовый" },
+];
 
 export default function ColorPickerPanelExample() {
   return (
@@ -26,16 +34,7 @@ export default function ColorPickerPanelExample() {
           </ColorPicker.SliderTrack>
         </ColorPicker.Slider>
         <ColorPicker.ChannelStrip />
-        <Typography.Root as="p" variant="caption" tone="secondary">
-          Цвета бренда
-        </Typography.Root>
-        <ColorPicker.SwatchPicker aria-label="Цвета бренда">
-          {PRESETS.map((color) => (
-            <ColorPicker.SwatchPickerItem key={color} color={color}>
-              <ColorPicker.Swatch />
-            </ColorPicker.SwatchPickerItem>
-          ))}
-        </ColorPicker.SwatchPicker>
+        <ColorPicker.Swatches label="Цвета бренда" size="s" presets={BRAND_COLORS} />
       </ColorPicker.Panel>
     </ColorPicker.Root>
   );
