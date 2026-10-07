@@ -10,6 +10,7 @@ import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { usePosition } from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -19,8 +20,16 @@ import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import { getScrollContainers } from "@/internal/scrollAncestors";
 import type { ControlSize, PaletteColor } from "@/internal/states";
-import { CheckIcon, ChevronIcon } from "../select/selectIcons";
-import { handleSelectListboxKeyDown, queryEnabledSelectOptions } from "../select/selectListbox";
+import {
+  handleListboxKeyDown as handleSelectListboxKeyDown,
+  enabledOptions as queryEnabledSelectOptions,
+} from "../select/selectListbox";
+
+const CheckIcon = ({ className }: { className?: string }) => (
+  <Icon name="action.check" className={className} />
+);
+const ChevronIcon = () => <Icon name="nav.chevronDown" />;
+
 import styles from "./TagSelect.module.css";
 
 export type TagSelectOption = {

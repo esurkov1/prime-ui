@@ -1,73 +1,59 @@
-/** Empty with placeholder, selected, clearable, loading, error, disabled and an empty list. Use it as a reference for every field state. */
+/** A default field next to a disabled, a loading, an invalid one and a list with nothing in it — `disabled`, `loading`, `invalid`, `labels`. */
 import { Select } from "prime-ui-kit";
-import * as React from "react";
 
-import styles from "./examples.module.css";
-
-const ROLES = (
-  <>
-    <Select.Item value="viewer">Наблюдатель</Select.Item>
-    <Select.Item value="editor">Редактор</Select.Item>
-    <Select.Item value="admin">Администратор</Select.Item>
-  </>
-);
+const ROLES = [
+  { value: "viewer", label: "Наблюдатель" },
+  { value: "editor", label: "Редактор" },
+  { value: "admin", label: "Администратор" },
+];
 
 export default function SelectStatesExample() {
-  const [role, setRole] = React.useState("editor");
-
   return (
-    <div className={styles.grid}>
-      <Select.Root label="Пусто" hint="Плейсхолдер вместо значения" placeholder="Выберите роль">
+    <>
+      <Select.Root label="default" defaultValue="editor">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
-        <Select.Content>{ROLES}</Select.Content>
+        <Select.Content>
+          {ROLES.map((role) => (
+            <Select.Item key={role.value} value={role.value}>
+              {role.label}
+            </Select.Item>
+          ))}
+        </Select.Content>
       </Select.Root>
-      <Select.Root label="Выбрано" defaultValue="admin">
+      <Select.Root label="disabled" defaultValue="viewer" disabled>
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
-        <Select.Content>{ROLES}</Select.Content>
+        <Select.Content>
+          {ROLES.map((role) => (
+            <Select.Item key={role.value} value={role.value}>
+              {role.label}
+            </Select.Item>
+          ))}
+        </Select.Content>
       </Select.Root>
-      <Select.Root
-        label="С кнопкой сброса"
-        hint="× или Delete очищают значение"
-        value={role}
-        onValueChange={setRole}
-        placeholder="Выберите роль"
-        clearable
-      >
-        <Select.Trigger>
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>{ROLES}</Select.Content>
-      </Select.Root>
-      <Select.Root label="Загрузка" placeholder="Загружаем роли…" loading>
+      <Select.Root label="loading" placeholder="Загружаем роли…" loading>
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
         <Select.Content>{null}</Select.Content>
       </Select.Root>
-      <Select.Root
-        label="Ошибка"
-        required
-        error="Выберите роль, чтобы продолжить"
-        placeholder="Выберите роль"
-      >
+      <Select.Root label="invalid" placeholder="Выберите роль" invalid>
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
-        <Select.Content>{ROLES}</Select.Content>
-      </Select.Root>
-      <Select.Root label="Отключено" defaultValue="viewer" disabled>
-        <Select.Trigger>
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>{ROLES}</Select.Content>
+        <Select.Content>
+          {ROLES.map((role) => (
+            <Select.Item key={role.value} value={role.value}>
+              {role.label}
+            </Select.Item>
+          ))}
+        </Select.Content>
       </Select.Root>
       <Select.Root
-        label="Пустой список"
-        hint="Откройте: панель покажет пустое состояние"
+        label="labels.empty"
         placeholder="Нет доступных команд"
         labels={{ empty: "Команд пока нет" }}
       >
@@ -76,6 +62,6 @@ export default function SelectStatesExample() {
         </Select.Trigger>
         <Select.Content>{null}</Select.Content>
       </Select.Root>
-    </div>
+    </>
   );
 }

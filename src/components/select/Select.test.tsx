@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Badge } from "@/components/badge/Badge";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 
 import { Select } from "./Select";
@@ -367,20 +368,18 @@ describe("Select (composable)", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 
-  it("renders SelectGroup and SelectGroupLabel", () => {
+  it("renders groups named by their label, with a separator", () => {
     render(
       <Select.Root placeholder="Pick">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
         <Select.Content>
-          <Select.Group>
-            <Select.GroupLabel>Group A</Select.GroupLabel>
+          <Select.Group label="Group A">
             <Select.Item value="a1">Item A1</Select.Item>
           </Select.Group>
           <Select.Separator />
-          <Select.Group>
-            <Select.GroupLabel>Group B</Select.GroupLabel>
+          <Select.Group label="Group B">
             <Select.Item value="b1">Item B1</Select.Item>
           </Select.Group>
         </Select.Content>
@@ -388,8 +387,9 @@ describe("Select (composable)", () => {
     );
 
     fireEvent.click(screen.getByRole("combobox"));
-    expect(screen.getByText("Group A")).toBeInTheDocument();
-    expect(screen.getByText("Group B")).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Group A" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Group B" })).toBeInTheDocument();
+    expect(screen.getByRole("separator")).toBeInTheDocument();
     expect(screen.getByText("Item A1")).toBeInTheDocument();
   });
 
@@ -517,53 +517,6 @@ describe("Select (multiple combobox)", () => {
   });
 });
 
-describe("Select (native)", () => {
-  it("renders a native select instead of button listbox", () => {
-    const { container } = render(
-      <Select.Root native placeholder="Pick">
-        <Select.Content>
-          <Select.Item value="one">One</Select.Item>
-          <Select.Item value="two">Two</Select.Item>
-        </Select.Content>
-      </Select.Root>,
-    );
-    expect(container.querySelector("select")).toBeInTheDocument();
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-  });
-
-  it("fires onChange when native select value changes", () => {
-    const onChange = vi.fn();
-    render(
-      <Select.Root native placeholder="Pick" onValueChange={onChange}>
-        <Select.Content>
-          <Select.Item value="a">A</Select.Item>
-          <Select.Item value="b">B</Select.Item>
-        </Select.Content>
-      </Select.Root>,
-    );
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "b" } });
-    expect(onChange).toHaveBeenCalledWith("b");
-  });
-
-  it("forwards id and accessible name props to the native select", () => {
-    render(
-      <>
-        <span id="native-label">Город</span>
-        <Select.Root native id="city" name="city" aria-labelledby="native-label">
-          <Select.Item value="a">A</Select.Item>
-        </Select.Root>
-        <Select.Root native aria-label="Страна">
-          <Select.Item value="b">B</Select.Item>
-        </Select.Root>
-      </>,
-    );
-    const city = screen.getByRole("combobox", { name: "Город" });
-    expect(city).toHaveAttribute("id", "city");
-    expect(city).toHaveAttribute("name", "city");
-    expect(screen.getByRole("combobox", { name: "Страна" })).toBeInTheDocument();
-  });
-});
-
 describe("Select (search, clear, loading, empty)", () => {
   function SearchSelect(props: { onValueChange?: (v: string) => void; loading?: boolean }) {
     return (
@@ -578,8 +531,7 @@ describe("Select (search, clear, loading, empty)", () => {
           <Select.Value />
         </Select.Trigger>
         <Select.Content searchable>
-          <Select.Group>
-            <Select.GroupLabel>Россия</Select.GroupLabel>
+          <Select.Group label="Россия">
             <Select.Item value="msk">Москва</Select.Item>
             <Select.Item value="spb" keywords="питер">
               Санкт-Петербург
@@ -705,17 +657,6 @@ describe("Select (field)", () => {
     expect(trigger).toHaveAttribute("data-invalid", "true");
     expect(screen.queryByText("Подсказка")).not.toBeInTheDocument();
   });
-
-  it("native: label and error are wired to the <select>", () => {
-    render(
-      <Select.Root native label="Страна" error="Обязательно">
-        <Select.Item value="a">A</Select.Item>
-      </Select.Root>,
-    );
-    const select = screen.getByRole("combobox", { name: /Страна/ });
-    expect(select).toHaveAttribute("aria-invalid", "true");
-    expect(select).toHaveAccessibleDescription("Обязательно");
-  });
 });
 
 describe("Select focusRing", () => {
@@ -811,8 +752,8 @@ function RichSelect({ defaultValue }: { defaultValue?: string }) {
   return (
     <Select.Root defaultValue={defaultValue} placeholder="Выберите байк" label="Байк">
       <Select.Trigger>
-        <Select.Value>
-          {({ value, label }) => {
+        <Select.Value
+          renderValue={({ value, label }) => {
             const v = VEHICLES.find((x) => x.value === value);
             return (
               <>
@@ -824,8 +765,8 @@ function RichSelect({ defaultValue }: { defaultValue?: string }) {
               </>
             );
           }}
-        </Select.Value>
-        <Select.Badge color="orange">Новое</Select.Badge>
+        />
+        <Badge.Root color="orange">Новое</Badge.Root>
       </Select.Trigger>
       <Select.Content searchable>
         {VEHICLES.map((v) => (
@@ -860,10 +801,10 @@ describe("Select rich options", () => {
     expect(option).toHaveAttribute("data-rich", "true");
     const meta = option.querySelector('[class*="itemMeta"]');
     expect(meta?.textContent).toBe("300 ฿ / день");
-    expect(meta?.nextElementSibling?.className).toMatch(/itemCheckSlot/);
+    expect(meta?.nextElementSibling?.className).toMatch(/check/);
   });
 
-  it("trigger renders the selected option through the Value render function", async () => {
+  it("trigger renders the selected option through renderValue", async () => {
     render(<RichSelect defaultValue="adv160" />);
     const trigger = screen.getByRole("combobox");
     await waitFor(() => expect(trigger).toHaveTextContent("Honda ADV 160"));
@@ -878,11 +819,10 @@ describe("Select rich options", () => {
     expect(trigger.querySelector('[data-rich="true"]')).toBeNull();
   });
 
-  it("Select.Badge renders a soft badge one tier down inside the trigger", () => {
+  it("a Badge among the Trigger children sits in the trigger one tier down", () => {
     render(<RichSelect />);
     const badge = screen.getByText("Новое");
     expect(screen.getByRole("combobox")).toContainElement(badge);
-    expect(badge).toHaveAttribute("data-variant", "soft");
     expect(badge).toHaveAttribute("data-color", "orange");
     expect(badge).toHaveAttribute("data-tier", "s");
   });

@@ -105,6 +105,7 @@ import LabelSection from "./sections/LabelSection";
 import LinkButtonSection from "./sections/LinkButtonSection";
 import LoginFormSection from "./sections/LoginFormSection";
 import ModalSection from "./sections/ModalSection";
+import NativeSelectSection from "./sections/NativeSelectSection";
 import NotificationSection from "./sections/NotificationSection";
 import PageContentSection from "./sections/PageContentSection";
 import PaginationSection from "./sections/PaginationSection";
@@ -391,6 +392,14 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       keywords: ["селект", "список", "выбор", "value", "onValueChange", "open"],
       icon: ChevronDown,
       Page: SelectSection,
+    },
+    {
+      segment: "native-select",
+      label: "NativeSelect",
+      description: "Системный список выбора в виде поля",
+      keywords: ["native", "select", "option", "системный", "мобильный", "селект"],
+      icon: ChevronDown,
+      Page: NativeSelectSection,
     },
     {
       segment: "tag-select",

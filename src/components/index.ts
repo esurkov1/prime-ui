@@ -312,6 +312,8 @@ export type {
   ModalTriggerProps,
 } from "./modal/Modal";
 export { Modal } from "./modal/Modal";
+export type { NativeSelectLabels, NativeSelectProps } from "./native-select/NativeSelect";
+export { NativeSelect } from "./native-select/NativeSelect";
 export type {
   NotificationAction,
   NotificationCardProps,
@@ -379,9 +381,7 @@ export type {
 } from "./segmented-control/SegmentedControl";
 export { SegmentedControl } from "./segmented-control/SegmentedControl";
 export type {
-  SelectBadgeProps,
   SelectContentProps,
-  SelectGroupLabelProps,
   SelectGroupProps,
   SelectItemDescriptionProps,
   SelectItemIconProps,

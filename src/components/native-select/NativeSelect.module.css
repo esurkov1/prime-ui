@@ -1,0 +1,130 @@
+/* ─── NativeSelect ───────────────────────────────────────────────────────────
+ * The system <select> in the field look (foundation §4, §6, §8): the same fill, tier height,
+ * padding, inset danger ring and focus ring as the Select trigger; the kit chevron on top.
+ */
+
+.root {
+  --ns-h: var(--prime-control-m-height);
+  --ns-px: var(--prime-control-m-field-padding-x);
+  --ns-icon: var(--prime-control-m-icon);
+  --ns-radius: var(--prime-control-m-radius);
+  --ns-text: var(--prime-control-m-text-size);
+  --ns-lh: var(--prime-control-m-line-height);
+  --prime-icon-size: var(--ns-icon);
+
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.root[data-size="xs"] {
+  --ns-h: var(--prime-control-xs-height);
+  --ns-px: var(--prime-control-xs-field-padding-x);
+  --ns-icon: var(--prime-control-xs-icon);
+  --ns-radius: var(--prime-control-xs-radius);
+  --ns-text: var(--prime-control-xs-text-size);
+  --ns-lh: var(--prime-control-xs-line-height);
+}
+
+.root[data-size="s"] {
+  --ns-h: var(--prime-control-s-height);
+  --ns-px: var(--prime-control-s-field-padding-x);
+  --ns-icon: var(--prime-control-s-icon);
+  --ns-radius: var(--prime-control-s-radius);
+  --ns-text: var(--prime-control-s-text-size);
+  --ns-lh: var(--prime-control-s-line-height);
+}
+
+.root[data-size="l"] {
+  --ns-h: var(--prime-control-l-height);
+  --ns-px: var(--prime-control-l-field-padding-x);
+  --ns-icon: var(--prime-control-l-icon);
+  --ns-radius: var(--prime-control-l-radius);
+  --ns-text: var(--prime-control-l-text-size);
+  --ns-lh: var(--prime-control-l-line-height);
+}
+
+.root[data-size="xl"] {
+  --ns-h: var(--prime-control-xl-height);
+  --ns-px: var(--prime-control-xl-field-padding-x);
+  --ns-icon: var(--prime-control-xl-icon);
+  --ns-radius: var(--prime-control-xl-radius);
+  --ns-text: var(--prime-control-xl-text-size);
+  --ns-lh: var(--prime-control-xl-line-height);
+}
+
+.select {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: var(--ns-h);
+  margin: 0;
+  padding-block: 0;
+  /* Room for the chevron: padX · icon · padX. */
+  padding-inline: var(--ns-px) calc(var(--ns-px) + var(--ns-icon) + var(--ns-px));
+  border: 0;
+  border-radius: var(--ns-radius);
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--ns-text);
+  font-weight: var(--prime-font-weight-regular);
+  line-height: var(--ns-lh);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* The empty placeholder option is the one shown. */
+.select:has(> option[value=""]:checked) {
+  color: var(--prime-color-text-placeholder);
+}
+
+.select:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
+}
+
+.select:focus-visible {
+  background: var(--prime-color-field-bg-focus);
+}
+
+/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
+.select:not([data-focus-ring="false"]):focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.select[data-invalid="true"] {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.select[data-invalid="true"]:focus-visible {
+  outline-color: var(--prime-color-danger-border);
+}
+
+.select:disabled {
+  background: var(--prime-color-field-bg-disabled);
+  box-shadow: none;
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+.chevron {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: var(--ns-px);
+  display: inline-flex;
+  align-items: center;
+  color: var(--prime-color-text-muted);
+  pointer-events: none;
+}
+
+.select:disabled + .chevron {
+  color: var(--prime-color-text-disabled);
+}

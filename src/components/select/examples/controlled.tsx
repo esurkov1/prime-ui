@@ -1,16 +1,20 @@
-/** A controlled select whose value lives in parent state, named via aria-label on the trigger. Use it when the selection drives other UI. */
-import { Select, Typography } from "prime-ui-kit";
+/** The parent owns the value: the plan drives the price under the field and a button resets it — `value`, `onValueChange`. */
+import { Button, Select, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./examples.module.css";
+const PRICES: Record<string, string> = {
+  free: "0 ₽ в месяц",
+  pro: "990 ₽ в месяц",
+  team: "4 900 ₽ в месяц",
+};
 
 export default function SelectControlledExample() {
   const [plan, setPlan] = React.useState("pro");
 
   return (
-    <div className={styles.narrow}>
-      <Select.Root value={plan} onValueChange={setPlan} placeholder="Тариф">
-        <Select.Trigger aria-label="Тариф подписки">
+    <>
+      <Select.Root label="Тариф" value={plan} onValueChange={setPlan} placeholder="Выберите тариф">
+        <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
         <Select.Content>
@@ -19,9 +23,12 @@ export default function SelectControlledExample() {
           <Select.Item value="team">Командный</Select.Item>
         </Select.Content>
       </Select.Root>
-      <Typography.Root variant="caption" tone="muted" className={styles.caption}>
-        Значение в состоянии родителя: <code>{plan}</code>
+      <Typography.Root as="p" variant="body-s" tone="secondary">
+        {PRICES[plan] ?? "Тариф не выбран"}
       </Typography.Root>
-    </div>
+      <Button.Root variant="soft" tone="neutral" onClick={() => setPlan("free")}>
+        Вернуть бесплатный
+      </Button.Root>
+    </>
   );
 }

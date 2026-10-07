@@ -61,7 +61,6 @@ const NOT_CONVERTED = new Set([
   "radio",
   "scroll-container",
   "segmented-control",
-  "select",
   "sidebar",
   "slider",
   "smart-filter",
