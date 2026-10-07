@@ -19,9 +19,7 @@ export default function CardVariantsExample() {
 
       <Card.Root variant="metric">
         <Card.HeaderRow>
-          <Card.Lead>
-            <Badge.Root color="green">SLA</Badge.Root>
-          </Card.Lead>
+          <Badge.Root color="green">SLA</Badge.Root>
           <Card.Value>99,95%</Card.Value>
         </Card.HeaderRow>
         <Card.Description>Доступность API за 30 дней</Card.Description>

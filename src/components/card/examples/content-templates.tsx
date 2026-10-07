@@ -1,4 +1,4 @@
-/** Content templates: a call to action, an events list and a campaign tile with a cover — `Card.CtaBody`, `Card.List`, `Card.Cover`. */
+/** Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Description`, `Card.List`, `Card.Cover`. */
 import { Button, Card, LinkButton, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -14,9 +14,9 @@ export default function CardContentTemplatesExample() {
     <div className={styles.grid}>
       <Card.Root variant="cta">
         <Card.Title>Экспорт отчёта</Card.Title>
-        <Card.CtaBody>
+        <Card.Description>
           Сводка по сегментам и метрикам за выбранный период в CSV или XLSX.
-        </Card.CtaBody>
+        </Card.Description>
         <Card.Actions>
           <Button.Root size="s">Скачать CSV</Button.Root>
           <Button.Root variant="ghost" tone="neutral" size="s">
@@ -26,12 +26,12 @@ export default function CardContentTemplatesExample() {
       </Card.Root>
 
       <Card.Root variant="list">
-        <Card.ListHeader>
-          <Card.Title>Последние события</Card.Title>
+        <Card.SectionHeader>
+          <Card.SectionTitle>Последние события</Card.SectionTitle>
           <LinkButton href="#" size="s">
             Все
           </LinkButton>
-        </Card.ListHeader>
+        </Card.SectionHeader>
         <Card.List>
           {EVENTS.map((e) => (
             <Card.ListItem key={e.text}>

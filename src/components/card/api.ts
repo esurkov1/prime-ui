@@ -46,8 +46,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.SectionHeader · Card.SectionTitle · Card.SectionTrailing",
-      en: "`panel` header: a row with a faint hairline below, the title (`<h3>`) and a trailing slot for controls.",
-      ru: "Шапка `panel`: ряд с тонкой линией снизу, заголовок (`<h3>`) и слот справа для контролов.",
+      en: "`panel` and `list` header: a row with a faint hairline below, the title (`<h3>`) and a trailing slot for controls.",
+      ru: "Шапка `panel` и `list`: ряд с тонкой линией снизу, заголовок (`<h3>`) и слот справа для контролов.",
       props: [
         { ...headingAs, en: `SectionTitle: ${headingAs.en}`, ru: `SectionTitle: ${headingAs.ru}` },
         divRest,
@@ -81,15 +81,15 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Card.IconBox · Card.Stack · Card.HeaderRow · Card.Lead · Card.Media",
-      en: "Template layout parts: the 40px accent icon tile, the label + value column, the `metric` header row with its leading slot, and the bottom media slot of `mini-media`.",
-      ru: "Части раскладки шаблонов: плашка иконки 40px, колонка подписи и значения, ряд шапки `metric` с левым слотом и нижний слот `mini-media`.",
+      name: "Card.IconBox · Card.Stack · Card.HeaderRow · Card.Media",
+      en: "Template layout parts: the 40px accent icon tile, the label + value column, the `metric` header row (a leading badge or icon, the value at the end), and the bottom media slot of `mini-media`.",
+      ru: "Части раскладки шаблонов: плашка иконки 40px, колонка подписи и значения, ряд шапки `metric` (бейдж или иконка слева, значение справа) и нижний слот `mini-media`.",
       props: [divRest],
     },
     {
-      name: "Card.CtaBody · Card.Cover · Card.Split · Card.SplitCell · Card.ListHeader · Card.List · Card.ListItem",
-      en: "Template parts: the `cta` text, the `cover` media, the two `split` cells (stacked below 22rem), and the `list` header and `<ul>` / `<li>` items with faint hairlines.",
-      ru: "Части шаблонов: текст `cta`, обложка `cover`, две ячейки `split` (столбиком уже 22rem), шапка `list` и пункты `<ul>` / `<li>` с тонкими линиями.",
+      name: "Card.Cover · Card.Split · Card.List · Card.ListItem",
+      en: "Template parts: the `cover` media, the `split` grid whose two children are the cells (stacked below 22rem), and the `list` `<ul>` / `<li>` items with faint hairlines (head it with `Card.SectionHeader`).",
+      ru: "Части шаблонов: обложка `cover`, сетка `split` — её два дочерних элемента и есть ячейки (столбиком уже 22rem), пункты `list` `<ul>` / `<li>` с тонкими линиями (шапка — `Card.SectionHeader`).",
       props: [divRest],
     },
   ],

@@ -140,7 +140,7 @@ export default function IntroPage() {
               {FOUNDATION_LINKS.map((item) => (
                 <Card.Root key={item.to} variant="cta">
                   <Card.Title>{item.title}</Card.Title>
-                  <Card.CtaBody>{item.text}</Card.CtaBody>
+                  <Card.Description>{item.text}</Card.Description>
                   <Card.Actions>
                     <LinkButton
                       href={item.to}

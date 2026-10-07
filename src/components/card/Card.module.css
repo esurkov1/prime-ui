@@ -114,22 +114,6 @@
   height: var(--card-icon);
 }
 
-.lead {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lead svg {
-  display: block;
-  flex-shrink: 0;
-  width: var(--card-icon);
-  height: var(--card-icon);
-  color: var(--prime-color-text-secondary);
-}
-
 .headerRow {
   display: flex;
   flex-wrap: nowrap;
@@ -186,13 +170,17 @@
   font-weight: var(--prime-text-heading-l-weight);
 }
 
+/* The leading item (a badge, an icon) and the value keep their size; text between them shrinks. */
+.headerRow > :first-child {
+  flex-shrink: 0;
+}
+
 .headerRow > .value {
   flex-shrink: 0;
   text-align: end;
 }
 
-.description,
-.ctaBody {
+.description {
   margin: 0;
   font-size: var(--prime-text-body-s-size);
   line-height: var(--prime-text-body-s-line-height);
@@ -378,16 +366,8 @@
 
 /* ---------- list ---------- */
 
-.listHeader {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-  padding: var(--prime-space-4) var(--card-pad) var(--prime-space-2);
-}
-
-.listHeader:has(+ .list) {
+/* SectionHeader over a list: the same faint hairline as over a body. */
+.sectionHeader:has(+ .list) {
   padding-bottom: var(--prime-space-4);
   background: var(--card-hairline) center bottom / var(--card-hairline-size) no-repeat;
 }
@@ -398,7 +378,7 @@
   list-style: none;
 }
 
-.listHeader + .list {
+.sectionHeader + .list {
   padding-top: var(--prime-space-2);
 }
 
@@ -430,23 +410,24 @@
   min-width: 0;
 }
 
-.splitCell {
+/* Every child of Split is a cell. */
+.split > * {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-1);
   min-width: 0;
 }
 
-.splitCell + .splitCell {
+.split > * + * {
   padding-inline-start: var(--card-pad);
   border-inline-start: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
-.splitCell:first-child {
+.split > :first-child {
   padding-inline-end: var(--card-pad);
 }
 
-.splitCell:has(> .iconBox) {
+.split > :has(> .iconBox) {
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
@@ -508,11 +489,11 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .splitCell:first-child {
+  .split > :first-child {
     padding-inline-end: 0;
   }
 
-  .splitCell + .splitCell {
+  .split > * + * {
     padding-top: var(--card-gap);
     padding-inline-start: 0;
     border-inline-start: 0;

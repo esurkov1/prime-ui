@@ -17,7 +17,7 @@ export default function CardNarrowExample() {
           <div className={width.className}>
             <Card.Root variant="split">
               <Card.Split>
-                <Card.SplitCell>
+                <div>
                   <Card.IconBox>
                     <ShoppingCart aria-hidden />
                   </Card.IconBox>
@@ -25,8 +25,8 @@ export default function CardNarrowExample() {
                     <Card.Label>Конверсия</Card.Label>
                     <Card.Value>3,8%</Card.Value>
                   </Card.Stack>
-                </Card.SplitCell>
-                <Card.SplitCell>
+                </div>
+                <div>
                   <Card.IconBox>
                     <Wallet aria-hidden />
                   </Card.IconBox>
@@ -34,7 +34,7 @@ export default function CardNarrowExample() {
                     <Card.Label>Средний чек</Card.Label>
                     <Card.Value>₽ 2 450</Card.Value>
                   </Card.Stack>
-                </Card.SplitCell>
+                </div>
               </Card.Split>
             </Card.Root>
           </div>

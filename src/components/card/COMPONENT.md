@@ -27,11 +27,11 @@ import { Card } from "prime-ui-kit";
 Card.Root variant="panel"        SectionHeader(SectionTitle, SectionTrailing) · Body · Chart · Actions
 Card.Root variant="mini"         IconBox · Stack(Label, Value)
 Card.Root variant="mini-media"   IconBox · Stack(Label, Value) · Media
-Card.Root variant="metric"       HeaderRow(Lead, Value) · Description
+Card.Root variant="metric"       HeaderRow(Badge or Icon, Value) · Description
 Card.Root variant="stat-trend"   Label · Value · Delta
-Card.Root variant="split"        Split(SplitCell × 2)
-Card.Root variant="cta"          Title · CtaBody · Actions
-Card.Root variant="list"         ListHeader(Title, …) · List(ListItem …)
+Card.Root variant="split"        Split(cell × 2: any element, e.g. IconBox + Stack)
+Card.Root variant="cta"          Title · Description · Actions
+Card.Root variant="list"         SectionHeader(SectionTitle, …) · List(ListItem …)
 Card.Root variant="cover"        Cover · Title · Label · Actions
 ```
 
@@ -49,7 +49,7 @@ Card.Root variant="cover"        Cover · Title · Label · Actions
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
 
 ### Card.SectionHeader · Card.SectionTitle · Card.SectionTrailing
-`panel` header: a row with a faint hairline below, the title (`<h3>`) and a trailing slot for controls.
+`panel` and `list` header: a row with a faint hairline below, the title (`<h3>`) and a trailing slot for controls.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -79,15 +79,15 @@ Metric text: the label (body-s), the value (sized by the template and the card w
 | `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Delta: color by meaning, not by sign (churn up is `danger`). |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
-### Card.IconBox · Card.Stack · Card.HeaderRow · Card.Lead · Card.Media
-Template layout parts: the 40px accent icon tile, the label + value column, the `metric` header row with its leading slot, and the bottom media slot of `mini-media`.
+### Card.IconBox · Card.Stack · Card.HeaderRow · Card.Media
+Template layout parts: the 40px accent icon tile, the label + value column, the `metric` header row (a leading badge or icon, the value at the end), and the bottom media slot of `mini-media`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
-### Card.CtaBody · Card.Cover · Card.Split · Card.SplitCell · Card.ListHeader · Card.List · Card.ListItem
-Template parts: the `cta` text, the `cover` media, the two `split` cells (stacked below 22rem), and the `list` header and `<ul>` / `<li>` items with faint hairlines.
+### Card.Cover · Card.Split · Card.List · Card.ListItem
+Template parts: the `cover` media, the `split` grid whose two children are the cells (stacked below 22rem), and the `list` `<ul>` / `<li>` items with faint hairlines (head it with `Card.SectionHeader`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -157,7 +157,7 @@ No `labels`.
 | [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value, and a large value with its change — `variant`, `Card.Delta`. |
 | [mini-media.tsx](examples/mini-media.tsx) | A KPI with a sparkline or a fill level in the bottom slot — `Card.Media`. |
 | [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a period switch, a summary line and an edge-to-edge chart — `Card.SectionTrailing`, `Card.Chart`. |
-| [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.CtaBody`, `Card.List`, `Card.Cover`. |
+| [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Description`, `Card.List`, `Card.Cover`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
 | [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem. |
 
