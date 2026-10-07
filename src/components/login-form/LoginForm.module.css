@@ -1,0 +1,160 @@
+/*
+ * LoginForm — Graphite sign-in surface. A card on the canvas (card fill, card radius, raised shadow,
+ * no border); fields inside it are one step off the surface, like in Card.
+ * Rhythm (proximity scale): header → body 32, social → divider → form 16, field → field → submit 20,
+ * submit → back action 12, form → footer 24. Spacing is `gap` on the parent.
+ * The tier (`data-size`) only widens padding and gaps; text roles are set in LoginForm.tsx.
+ */
+
+.root {
+  --lf-pad: var(--prime-card-padding-l);
+  --lf-gap: var(--prime-space-8);
+  --lf-field-gap: var(--prime-space-5);
+  --lf-logo: var(--prime-control-xl-height);
+  --lf-logo-icon: var(--prime-icon-l);
+
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lf-gap);
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+  min-width: 0;
+  padding: var(--lf-pad);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  text-align: start;
+}
+
+.root:not([data-flat="true"]) {
+  box-shadow: var(--prime-card-shadow);
+}
+
+.root[data-size="xs"],
+.root[data-size="s"] {
+  --lf-pad: var(--prime-card-padding-s);
+  --lf-gap: var(--prime-space-6);
+  --lf-field-gap: var(--prime-space-4);
+  --lf-logo: var(--prime-control-l-height);
+  --lf-logo-icon: var(--prime-icon-m);
+}
+
+.root[data-size="l"] {
+  --lf-pad: var(--prime-space-8);
+  --lf-gap: var(--prime-space-10);
+  --lf-logo: calc(var(--prime-control-xl-height) + var(--prime-space-2));
+}
+
+.root[data-size="xl"] {
+  --lf-pad: var(--prime-space-10);
+  --lf-gap: var(--prime-space-10);
+  --lf-field-gap: var(--prime-space-6);
+  --lf-logo: calc(var(--prime-control-xl-height) + var(--prime-space-4));
+  --lf-logo-icon: var(--prime-icon-xl);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-1);
+  min-width: 0;
+  text-align: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--lf-logo);
+  height: var(--lf-logo);
+  margin-block-end: var(--prime-space-3);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-bg-sunken);
+  color: var(--prime-color-accent-text);
+  overflow: hidden;
+}
+
+.logo > svg,
+.logo > img {
+  width: var(--lf-logo-icon);
+  height: var(--lf-logo-icon);
+  flex: none;
+  object-fit: contain;
+}
+
+.title,
+.description {
+  margin: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.social,
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lf-field-gap);
+  min-width: 0;
+  margin: 0;
+}
+
+.footer {
+  margin: 0;
+  margin-block-start: var(--prime-space-2);
+  text-align: center;
+}
+
+/*
+ * align="start": the Modal-header language. One row: soft accent tile on the left, title over
+ * description on the right, tile centered against the text block. Without a logo the text simply
+ * sits on the start edge.
+ */
+.root[data-align="start"] .header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--prime-space-4);
+  row-gap: var(--prime-space-1);
+  text-align: start;
+}
+
+.root[data-align="start"] .header:has(> .logo) {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.root[data-align="start"] .header > :not(.logo) {
+  grid-column: -2 / -1;
+}
+
+.root[data-align="start"] .logo {
+  --lf-logo: var(--prime-space-10);
+  --lf-logo-icon: var(--prime-icon-m);
+
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin: 0;
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-accent-soft);
+}
+
+.root[data-align="start"] .footer {
+  text-align: start;
+}

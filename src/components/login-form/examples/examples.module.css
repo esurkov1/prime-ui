@@ -1,0 +1,40 @@
+/* Layout helpers for the LoginForm examples. Semantic tokens only. */
+
+/* Centers one card on the stage (the card itself is capped at the modal width). */
+.stage {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Several cards side by side, wrapping on narrow stages. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--prime-space-6);
+  width: 100%;
+  min-width: 0;
+}
+
+/* A field with a link under it, aligned to the field's end edge. */
+.withLink {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--prime-space-2);
+}
+
+.withLink > :first-child {
+  align-self: stretch;
+}
+
+/* Code cell: digits centered, hint under them. */
+.code {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-space-2);
+}

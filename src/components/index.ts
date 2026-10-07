@@ -290,6 +290,19 @@ export { Label } from "./label/Label";
 export type { LinkButtonRootProps } from "./link-button/LinkButton";
 export { LinkButton } from "./link-button/LinkButton";
 export type {
+  LoginFormActionsProps,
+  LoginFormBodyProps,
+  LoginFormDescriptionProps,
+  LoginFormFooterProps,
+  LoginFormFormProps,
+  LoginFormHeaderProps,
+  LoginFormLogoProps,
+  LoginFormRootProps,
+  LoginFormSocialProps,
+  LoginFormTitleProps,
+} from "./login-form/LoginForm";
+export { LoginForm } from "./login-form/LoginForm";
+export type {
   ModalBodyProps,
   ModalCloseProps,
   ModalConfirmProps,

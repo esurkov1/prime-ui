@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -144,5 +144,77 @@ describe("DigitInput focusRing", () => {
     expect(group).toHaveAttribute("data-focus-ring", "false");
     expect(group).toHaveAttribute("data-invalid", "true");
     expect(screen.getAllByRole("textbox")[0]).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("sets data-full-width on the group only with fullWidth", () => {
+    const { rerender } = render(<DigitInput.Root />);
+    expect(screen.getByRole("group")).not.toHaveAttribute("data-full-width");
+    rerender(<DigitInput.Root fullWidth />);
+    expect(screen.getByRole("group")).toHaveAttribute("data-full-width", "true");
+  });
+
+  it("marks the first cell of every group with groupSize", () => {
+    render(<DigitInput.Root length={6} groupSize={3} />);
+    const starts = screen
+      .getAllByRole("textbox")
+      .map((cell) => cell.getAttribute("data-group-start") === "true");
+    expect(starts).toEqual([false, false, false, true, false, false]);
+  });
+
+  it("mask renders password cells", () => {
+    const { container } = render(<DigitInput.Root mask defaultValue="12" />);
+    expect(container.querySelectorAll('input[type="password"]')).toHaveLength(4);
+  });
+
+  it("carries the joined code in a hidden input with name", () => {
+    const { container } = render(<DigitInput.Root name="code" length={4} defaultValue="12" />);
+    const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    expect(hidden.name).toBe("code");
+    expect(hidden.value).toBe("12");
+  });
+
+  it("has no hidden input without name", () => {
+    const { container } = render(<DigitInput.Root />);
+    expect(container.querySelector('input[type="hidden"]')).toBeNull();
+  });
+
+  it("autoFocus focuses the first empty cell", () => {
+    render(<DigitInput.Root length={4} defaultValue="12" autoFocus />);
+    expect(screen.getByRole("textbox", { name: "Цифра 3 из 4" })).toHaveFocus();
+  });
+
+  it("redirects focus from a later cell to the first empty one", async () => {
+    render(<DigitInput.Root length={4} defaultValue="1" />);
+    await userEvent.click(screen.getByRole("textbox", { name: "Цифра 4 из 4" }));
+    expect(screen.getByRole("textbox", { name: "Цифра 2 из 4" })).toHaveFocus();
+  });
+
+  it("does not leave gaps when a digit is typed past the first empty cell", () => {
+    const onValueChange = vi.fn();
+    render(<DigitInput.Root length={4} onValueChange={onValueChange} />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Цифра 3 из 4" }), {
+      target: { value: "7" },
+    });
+    expect(onValueChange).toHaveBeenLastCalledWith("7");
+    expect(screen.getByRole("textbox", { name: "Цифра 1 из 4" })).toHaveValue("7");
+  });
+
+  it("accepts a whole code delivered into one cell (autofill)", () => {
+    const onComplete = vi.fn();
+    render(<DigitInput.Root length={4} onComplete={onComplete} />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Цифра 1 из 4" }), {
+      target: { value: "4821" },
+    });
+    expect(onComplete).toHaveBeenCalledWith("4821");
+  });
+
+  it("Home and End move between the first and the entry cell", async () => {
+    render(<DigitInput.Root length={4} defaultValue="12" />);
+    const third = screen.getByRole("textbox", { name: "Цифра 3 из 4" });
+    third.focus();
+    await userEvent.keyboard("{Home}");
+    expect(screen.getByRole("textbox", { name: "Цифра 1 из 4" })).toHaveFocus();
+    await userEvent.keyboard("{End}");
+    expect(third).toHaveFocus();
   });
 });

@@ -1,7 +1,13 @@
 import DigitInputControlledExample from "@/components/digit-input/examples/controlled";
 import controlledSource from "@/components/digit-input/examples/controlled.tsx?raw";
+import DigitInputFullWidthExample from "@/components/digit-input/examples/full-width";
+import fullWidthSource from "@/components/digit-input/examples/full-width.tsx?raw";
+import DigitInputGroupedExample from "@/components/digit-input/examples/grouped";
+import groupedSource from "@/components/digit-input/examples/grouped.tsx?raw";
 import DigitInputLengthAndCompleteExample from "@/components/digit-input/examples/length-and-complete";
 import featuresSource from "@/components/digit-input/examples/length-and-complete.tsx?raw";
+import DigitInputMaskedInFormExample from "@/components/digit-input/examples/masked-in-form";
+import maskedSource from "@/components/digit-input/examples/masked-in-form.tsx?raw";
 import DigitInputSizesExample from "@/components/digit-input/examples/sizes";
 import sizesSource from "@/components/digit-input/examples/sizes.tsx?raw";
 import DigitInputStatesExample from "@/components/digit-input/examples/states";
@@ -35,6 +41,42 @@ const digitInputRootApiRows: PlaygroundApiPropRow[] = [
     required: "Нет",
     description:
       "Ярус --prime-control-<tier>-*: квадратная ячейка высотой контрола (28 · 32 · 36 · 40 · 48) и промежуток яруса.",
+  },
+  {
+    prop: "fullWidth",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Ячейки делят ширину контейнера в одной строке и растут вместе с ним; высота остаётся высотой яруса, поэтому ячейки шире, чем выше. data-full-width на fieldset.",
+  },
+  {
+    prop: "groupSize",
+    type: "number",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Группы по N ячеек с увеличенным промежутком между ними (3 → 123 456).",
+  },
+  {
+    prop: "mask",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: 'Скрывает цифры (PIN): ячейки получают type="password".',
+  },
+  {
+    prop: "name",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Имя скрытого input с собранным кодом: код уходит с обычной отправкой формы.",
+  },
+  {
+    prop: "autoFocus",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "При монтировании фокус в первой пустой ячейке.",
   },
   {
     prop: "value",
@@ -181,11 +223,53 @@ export default function DigitInputSection() {
           </div>
 
           <div className="demoBlock">
+            <DemoSectionTitle>Во всю ширину</DemoSectionTitle>
+            <DemoDescription>
+              <code>fullWidth</code>: ячейки делят ширину контейнера и растут вместе с ним, высота
+              остаётся высотой яруса. Для карточек, форм и узких колонок телефона, где код стоит над
+              кнопкой на всю ширину.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <DigitInputFullWidthExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Группы</DemoSectionTitle>
+            <DemoDescription>
+              <code>groupSize</code> делит длинный код на группы: 123 456 или 1234 5678. Работает с
+              квадратными ячейками и с <code>fullWidth</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={groupedSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <DigitInputGroupedExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>PIN в форме</DemoSectionTitle>
+            <DemoDescription>
+              <code>mask</code> прячет цифры, <code>name</code> кладёт собранный код в нативную
+              отправку формы, <code>autoFocus</code> ставит курсор в первую пустую ячейку.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={maskedSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <DigitInputMaskedInFormExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
             <DemoSectionTitle>Клавиатура и длина</DemoSectionTitle>
             <DemoDescription>
-              Цифра переводит фокус вперёд, Backspace в пустой ячейке — назад, стрелки ← и →
-              переходят между ячейками без ввода. <code>onComplete</code> срабатывает один раз,
-              когда заполнена последняя ячейка.
+              Цифра переводит фокус вперёд, Backspace в пустой ячейке — назад, стрелки ← и → и Home
+              / End переходят между ячейками без ввода. Фокус на дальней ячейке уходит в первую
+              пустую, поэтому в коде не бывает «дыр»; целый код из автозаполнения или буфера
+              раскладывается по ячейкам. <code>onComplete</code> срабатывает один раз, когда
+              заполнена последняя ячейка.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>

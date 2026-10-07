@@ -8,7 +8,7 @@ confuse. Links: [components.md](components.md).
 | The user needs to… | Category |
 |---|---|
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
-| type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload |
+| type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload, LoginForm (sign-in screens) |
 | pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, TagSelect, Datepicker, ColorPicker |
 | see data: status, labels, people, numbers, rows, events | Data display — Badge, Tag, Avatar, Kbd, Card, DataTable, Timeline, CodeBlock |
 | learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, SegmentedProgressBar, ProgressCircle, EmptyPage |
@@ -24,7 +24,7 @@ toolbar, view switch with `pressed`) → `ButtonGroup`. Navigation to a URL that
 `LinkButton.Root` (it is an `<a>`); a URL that should look like a button → `Button.Root asChild` with `<a>`.
 
 **Text input.** One line → Input. Several lines → Textarea. Fixed-length code (OTP, PIN) → DigitInput.
-Files → FileUpload. Number with unit → Input with `Input.InlineAffix`. Search in a toolbar → Input
+Files → FileUpload. A sign-in, sign-up or password-reset screen → LoginForm. Number with unit → Input with `Input.InlineAffix`. Search in a toolbar → Input
 with `Input.Icon` + `type="search"`.
 
 **Selection.**

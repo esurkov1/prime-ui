@@ -48,3 +48,12 @@
   justify-content: space-between;
   gap: var(--prime-space-2);
 }
+
+/* A container the full-width code stretches to. */
+.wide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+}

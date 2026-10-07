@@ -22,6 +22,19 @@ export type DigitInputRootProps = {
   /** Number of cells. */
   length?: number;
   size?: ControlSize;
+  /**
+   * Cells share the container width and grow with it (height stays the tier height, so they become
+   * wider than tall). Default `false`: square cells of the tier size, centered.
+   */
+  fullWidth?: boolean;
+  /** Name of the hidden input that carries the joined code in a native form submit. */
+  name?: string;
+  /** Splits the cells into groups of this size with a wider gap between them (`3` → 123 456). */
+  groupSize?: number;
+  /** Hides the digits (PIN): cells are `type="password"`. */
+  mask?: boolean;
+  /** Focuses the first empty cell on mount. */
+  autoFocus?: boolean;
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -61,6 +74,11 @@ function createSlotKeys(len: number) {
 function DigitInputRoot({
   length: lengthProp = 4,
   size = "m",
+  fullWidth = false,
+  name,
+  groupSize,
+  mask = false,
+  autoFocus = false,
   value: valueProp,
   defaultValue = "",
   onValueChange,
@@ -119,12 +137,16 @@ function DigitInputRoot({
     }
   }, []);
 
+  /** The value has no gaps, so the only cell that accepts input is the first empty one (or the last). */
+  const entryIndex = Math.min(normalizeDigits(value, length).length, length - 1);
+
   const handleChangeAt = (index: number, nextChar: string) => {
+    const at = Math.min(index, entryIndex);
     const nextCells = [...cells];
-    nextCells[index] = nextChar;
+    nextCells[at] = nextChar;
     commit(nextCells.join(""));
-    if (nextChar && index < length - 1) {
-      focusAt(index + 1);
+    if (nextChar && at < length - 1) {
+      focusAt(at + 1);
     }
   };
 
@@ -133,8 +155,9 @@ function DigitInputRoot({
     if (digits.length === 0) {
       return;
     }
+    const start = Math.min(startIndex, entryIndex);
     const nextCells = [...cells];
-    let writeIndex = startIndex;
+    let writeIndex = start;
     for (const d of digits) {
       if (writeIndex >= length) {
         break;
@@ -143,9 +166,17 @@ function DigitInputRoot({
       writeIndex++;
     }
     commit(nextCells.join(""));
-    const focusIndex = Math.min(startIndex + digits.length, length - 1);
-    focusAt(focusIndex);
+    focusAt(Math.min(start + digits.length, length - 1));
   };
+
+  const entryIndexRef = React.useRef(entryIndex);
+  entryIndexRef.current = entryIndex;
+
+  React.useEffect(() => {
+    if (autoFocus) {
+      inputRefs.current[entryIndexRef.current]?.focus();
+    }
+  }, [autoFocus]);
 
   return (
     <fieldset
@@ -155,37 +186,53 @@ function DigitInputRoot({
       className={cx(styles.root, className)}
       {...toDataAttributes({
         size,
+        "full-width": fullWidth || undefined,
         invalid: invalid || undefined,
         disabled: disabled || undefined,
         "focus-ring": focusRing ? undefined : false,
       })}
     >
+      {name ? <input type="hidden" name={name} value={normalizeDigits(value, length)} /> : null}
       {cells.map((cell, index) => (
         <input
           key={slotKeys[index]}
           ref={(el) => setInputRef(el, index)}
-          type="text"
+          type={mask ? "password" : "text"}
           inputMode="numeric"
           autoComplete="one-time-code"
-          maxLength={1}
+          autoCorrect="off"
+          spellCheck={false}
           disabled={disabled}
           className={styles.cell}
           data-size={size}
           data-filled={cell ? "true" : undefined}
+          data-group-start={groupSize && index > 0 && index % groupSize === 0 ? "true" : undefined}
           value={cell}
           aria-label={labels.cell
             .replace("{index}", String(index + 1))
             .replace("{length}", String(length))}
           aria-invalid={invalid || undefined}
-          onFocus={(e) => e.currentTarget.select()}
+          onFocus={(e) => {
+            if (index > entryIndex) {
+              focusAt(entryIndex);
+              return;
+            }
+            e.currentTarget.select();
+          }}
           onChange={(e) => {
             if (disabled) {
               return;
             }
-            const raw = e.target.value;
-            const digitsOnly = normalizeDigits(raw, 1);
-            const nextChar = digitsOnly.slice(-1) ?? "";
-            handleChangeAt(index, nextChar);
+            const digits = normalizeDigits(e.target.value, length);
+            if (digits.length <= 1) {
+              handleChangeAt(index, digits);
+            } else if (digits.length === 2 && cells[index]) {
+              // Typing into a filled cell without a selection: keep the new digit only.
+              handleChangeAt(index, digits.replace(cells[index], "").slice(0, 1) || digits[1]);
+            } else {
+              // Autofill or IME delivered the whole code into one cell.
+              handlePaste(0, digits);
+            }
           }}
           onKeyDown={(e) => {
             if (disabled) {
@@ -197,9 +244,15 @@ function DigitInputRoot({
             } else if (e.key === "ArrowLeft" && index > 0) {
               e.preventDefault();
               focusAt(index - 1);
-            } else if (e.key === "ArrowRight" && index < length - 1) {
+            } else if (e.key === "ArrowRight" && index < entryIndex) {
               e.preventDefault();
               focusAt(index + 1);
+            } else if (e.key === "Home") {
+              e.preventDefault();
+              focusAt(0);
+            } else if (e.key === "End") {
+              e.preventDefault();
+              focusAt(entryIndex);
             }
           }}
           onPaste={(e) => {

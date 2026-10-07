@@ -1,6 +1,8 @@
 /*
  * OTP / PIN cells: square fields of the tier height, field system fills and states
  * (see Input.module.css). Digits are one type step larger than the tier text, tabular.
+ * `fullWidth`: one row without wrapping, cells share the width (flex 1) and keep the tier height.
+ * `groupSize`: the first cell of every group gets an extra gap before it.
  */
 .root {
   --prime-digit-cell-size: var(--prime-control-m-height);
@@ -18,6 +20,12 @@
   padding: 0;
   border: 0;
   font-family: var(--prime-font-family-sans);
+}
+
+.root[data-full-width="true"] {
+  flex-wrap: nowrap;
+  justify-content: stretch;
+  width: 100%;
 }
 
 .root[data-size="xs"] {
@@ -78,6 +86,15 @@
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-full-width="true"] .cell {
+  flex: 1 1 0;
+  width: auto;
+}
+
+.cell[data-group-start="true"] {
+  margin-inline-start: var(--prime-digit-gap);
 }
 
 .cell:hover:not(:focus-visible):not(:disabled) {

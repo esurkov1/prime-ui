@@ -33,6 +33,7 @@ import {
   Link2,
   ListChecks,
   ListOrdered,
+  LogIn,
   type LucideIcon,
   Maximize2,
   Megaphone,
@@ -99,6 +100,7 @@ import InputSection from "./sections/InputSection";
 import KbdSection from "./sections/KbdSection";
 import LabelSection from "./sections/LabelSection";
 import LinkButtonSection from "./sections/LinkButtonSection";
+import LoginFormSection from "./sections/LoginFormSection";
 import ModalSection from "./sections/ModalSection";
 import NotificationSection from "./sections/NotificationSection";
 import PageContentSection from "./sections/PageContentSection";
@@ -294,6 +296,23 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       keywords: ["код", "otp", "пин", "цифры", "value", "onValueChange"],
       icon: Hash,
       Page: DigitInputSection,
+    },
+    {
+      segment: "login-form",
+      label: "Login Form",
+      description: "Карточка входа: логотип, провайдеры, поля, ссылки",
+      keywords: [
+        "вход",
+        "логин",
+        "авторизация",
+        "регистрация",
+        "пароль",
+        "sign in",
+        "login",
+        "auth",
+      ],
+      icon: LogIn,
+      Page: LoginFormSection,
     },
     {
       segment: "file-upload",
