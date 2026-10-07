@@ -47,7 +47,7 @@ export default function CardMiniMediaExample() {
           <Card.Value>72 из 100 ГБ</Card.Value>
         </Card.Stack>
         <Card.Media>
-          <ProgressBar.Root value={72} size="s" label="Занято" showValue />
+          <ProgressBar value={72} size="s" label="Занято" showValue />
         </Card.Media>
       </Card.Root>
     </div>

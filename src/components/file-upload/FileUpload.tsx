@@ -314,7 +314,7 @@ export type FileUploadItemProgressProps = {
 function FileUploadItemProgress({ value, max, className, children }: FileUploadItemProgressProps) {
   return (
     <div className={cx(styles.itemProgress, className)}>
-      {children ?? (value !== undefined ? <ProgressBar.Root value={value} max={max} /> : null)}
+      {children ?? (value !== undefined ? <ProgressBar value={value} max={max} /> : null)}
     </div>
   );
 }

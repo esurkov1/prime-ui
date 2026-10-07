@@ -1,15 +1,18 @@
-/** Sizes xs–xl with `label` and `showValue`: the line grows 4 → 8px with the tier (the same scale as Slider). Match the size to the surrounding text. */
-import { type ControlSize, ProgressBar } from "prime-ui-kit";
+/** Every tier: the line grows from 4 to 8 px like the Slider track — `size`. */
+import { ProgressBar, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function ProgressBarSizesExample() {
   return (
-    <div className={styles.stack}>
-      {sizes.map((size) => (
-        <ProgressBar.Root key={size} size={size} value={64} label={`Размер ${size}`} showValue />
+    <div>
+      {SIZES.map((size) => (
+        <div key={size}>
+          <ProgressBar size={size} value={64} label="Загрузка" showValue />
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
+          </Typography.Root>
+        </div>
       ))}
     </div>
   );

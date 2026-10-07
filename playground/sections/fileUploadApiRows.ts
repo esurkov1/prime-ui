@@ -384,7 +384,7 @@ export const fileUploadItemProgressApiRows: PlaygroundApiPropRow[] = [
     type: "number",
     defaultValue: "—",
     required: "Нет",
-    description: "Значение для встроенного ProgressBar.Root.",
+    description: "Значение для встроенного ProgressBar.",
   },
   {
     prop: "max",

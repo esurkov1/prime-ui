@@ -136,7 +136,7 @@ Each takes + native `<div>` props (`className`, `children`, …) and only adds l
 ### FileUpload.ItemProgress
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `number` | — | Renders `ProgressBar.Root` with this value when there are no `children`. |
+| `value` | `number` | — | Renders `ProgressBar` with this value when there are no `children`. |
 | `max` | `number` | — | `max` of that ProgressBar. |
 | `children` | `ReactNode` | — | Custom indicator instead of the ProgressBar. |
 | `className` | `string` | — | Class on the wrapper. |

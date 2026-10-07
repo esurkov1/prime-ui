@@ -240,7 +240,7 @@ export default function FileUploadSection() {
             <PlaygroundApiTable rows={fileUploadItemFooterApiRows} />
             <DemoApiTitle>FileUpload.ItemProgress</DemoApiTitle>
             <DemoDescription>
-              Обёртка прогресса; по умолчанию <code>ProgressBar.Root</code> при переданном{" "}
+              Обёртка прогресса; по умолчанию <code>ProgressBar</code> при переданном{" "}
               <code>value</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={fileUploadItemProgressApiRows} />
