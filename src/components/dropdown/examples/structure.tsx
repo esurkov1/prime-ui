@@ -1,5 +1,4 @@
 /** Optional parts of an account menu: a header with an avatar, a labelled group, item icons, key hints and separators — `Dropdown.Header`, `Dropdown.Group`, `Dropdown.ItemIcon`, `Dropdown.ItemShortcut`. */
-import { BookOpen, LogOut, UserRound } from "lucide-react";
 import { Avatar, Badge, Button, Dropdown, Icon } from "prime-ui-kit";
 
 export default function DropdownStructureExample() {
@@ -25,7 +24,7 @@ export default function DropdownStructureExample() {
         <Dropdown.Group label="Аккаунт">
           <Dropdown.Item>
             <Dropdown.ItemIcon>
-              <UserRound />
+              <Icon name="object.user" />
             </Dropdown.ItemIcon>
             Профиль
             <Dropdown.ItemShortcut>⌘P</Dropdown.ItemShortcut>
@@ -39,7 +38,7 @@ export default function DropdownStructureExample() {
           </Dropdown.Item>
           <Dropdown.Item>
             <Dropdown.ItemIcon>
-              <BookOpen />
+              <Icon name="object.book" />
             </Dropdown.ItemIcon>
             Руководство
           </Dropdown.Item>
@@ -47,7 +46,7 @@ export default function DropdownStructureExample() {
         <Dropdown.Separator />
         <Dropdown.Item>
           <Dropdown.ItemIcon>
-            <LogOut />
+            <Icon name="action.logout" />
           </Dropdown.ItemIcon>
           Выйти
         </Dropdown.Item>

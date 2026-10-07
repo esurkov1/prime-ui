@@ -1,6 +1,5 @@
 /** Password reset request: one field, the primary action and a quiet way back — `LoginForm.Actions`. */
-import { KeyRound } from "lucide-react";
-import { Button, Input, LoginForm } from "prime-ui-kit";
+import { Button, Icon, Input, LoginForm } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -10,7 +9,7 @@ export default function LoginFormForgotPasswordExample() {
       <LoginForm.Root>
         <LoginForm.Header>
           <LoginForm.Logo>
-            <KeyRound aria-hidden />
+            <Icon name="object.key" />
           </LoginForm.Logo>
           <LoginForm.Title>Сброс пароля</LoginForm.Title>
           <LoginForm.Description>

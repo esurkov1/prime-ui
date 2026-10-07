@@ -1,5 +1,4 @@
 /** A parent item with child items on a guide line: a current child opens it and marks the parent; on the compact rail the children open in a flyout — `Sidebar.Sub`, `Sidebar.SubTrigger`, `Sidebar.SubContent`. */
-import { ListTodo } from "lucide-react";
 import { Icon, Sidebar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -36,7 +35,7 @@ export default function SidebarNestedItemsExample() {
           <Sidebar.Sub>
             <Sidebar.SubTrigger>
               <Sidebar.ItemIcon>
-                <ListTodo />
+                <Icon name="object.tasks" />
               </Sidebar.ItemIcon>
               Задачи
             </Sidebar.SubTrigger>

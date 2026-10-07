@@ -1,5 +1,4 @@
 /** A button or ⌘K opens the palette: the query filters the groups by value and keywords, Enter runs the active command — `CommandMenu.Item`, `keywords`. */
-import { LayoutDashboard, Receipt } from "lucide-react";
 import { Button, CommandMenu, Icon } from "prime-ui-kit";
 import * as React from "react";
 
@@ -30,7 +29,7 @@ export default function CommandMenuOverviewExample() {
           <CommandMenu.Group label="Страницы">
             <CommandMenu.Item value="дашборд" keywords="home главная" onSelect={close}>
               <CommandMenu.ItemIcon>
-                <LayoutDashboard />
+                <Icon name="nav.dashboard" />
               </CommandMenu.ItemIcon>
               Дашборд
             </CommandMenu.Item>
@@ -50,7 +49,7 @@ export default function CommandMenuOverviewExample() {
           <CommandMenu.Group label="Настройки">
             <CommandMenu.Item value="счета и оплата" keywords="billing invoices" onSelect={close}>
               <CommandMenu.ItemIcon>
-                <Receipt />
+                <Icon name="object.receipt" />
               </CommandMenu.ItemIcon>
               Счета и оплата
             </CommandMenu.Item>

@@ -1,5 +1,4 @@
 /** Group headings that fold their items away, with a chevron at the end of the heading; in compact mode the items always show — `collapsible`, `defaultOpen`. */
-import { Bell, ChartColumn, ListTodo } from "lucide-react";
 import { Icon, Sidebar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -29,7 +28,7 @@ export default function SidebarCollapsibleGroupsExample() {
             </Sidebar.Item>
             <Sidebar.Item>
               <Sidebar.ItemIcon>
-                <Bell />
+                <Icon name="object.bell" />
               </Sidebar.ItemIcon>
               Уведомления
               <Sidebar.ItemCount color="red">7</Sidebar.ItemCount>
@@ -38,7 +37,7 @@ export default function SidebarCollapsibleGroupsExample() {
           <Sidebar.Group label="Инструменты" collapsible>
             <Sidebar.Item>
               <Sidebar.ItemIcon>
-                <ListTodo />
+                <Icon name="object.tasks" />
               </Sidebar.ItemIcon>
               Задачи
               <Sidebar.ItemCount>48</Sidebar.ItemCount>
@@ -59,7 +58,7 @@ export default function SidebarCollapsibleGroupsExample() {
           <Sidebar.Group label="Метрики" collapsible defaultOpen={false}>
             <Sidebar.Item>
               <Sidebar.ItemIcon>
-                <ChartColumn />
+                <Icon name="object.chart" />
               </Sidebar.ItemIcon>
               Воронка продаж
             </Sidebar.Item>

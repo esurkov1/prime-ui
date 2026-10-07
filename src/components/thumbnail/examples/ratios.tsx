@@ -1,6 +1,5 @@
 /** Every aspect ratio at the same height; keep one ratio per list — `ratio`. */
-import { Image } from "lucide-react";
-import { Thumbnail, type ThumbnailRatio, Typography } from "prime-ui-kit";
+import { Icon, Thumbnail, type ThumbnailRatio, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -13,7 +12,7 @@ export default function ThumbnailRatiosExample() {
         <div key={ratio} className={styles.cell}>
           <Thumbnail.Root size="xl" ratio={ratio} color="blue">
             <Thumbnail.Fallback>
-              <Image aria-hidden />
+              <Icon name="object.image" />
             </Thumbnail.Fallback>
           </Thumbnail.Root>
           <Typography as="span" variant="caption" tone="muted">
