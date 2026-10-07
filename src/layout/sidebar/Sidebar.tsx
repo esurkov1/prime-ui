@@ -41,7 +41,7 @@ const defaultLabels: SidebarLabels = {
   close: "Закрыть навигацию",
 };
 
-/** Below this width a `responsive` sidebar leaves the layout and becomes an off-canvas panel. */
+/** Below this width an `offCanvas="auto"` sidebar leaves the layout and becomes an off-canvas panel. */
 const MOBILE_QUERY = "(max-width: 767.98px)";
 
 /** Hover intent before a compact flyout opens, and the grace period to travel into it. */
@@ -54,13 +54,13 @@ const TIER_DOWN: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "s",
 type SidebarContextValue = {
   mode: SidebarMode;
   setMode: (mode: SidebarMode) => void;
-  /** Off-canvas panel state (narrow viewports only). */
+  /** Off-canvas panel state (only while `offCanvas`). */
   open: boolean;
   setOpen: (open: boolean) => void;
   /** expanded ↔ compact on desktop (hidden → expanded); open ↔ closed off-canvas. */
   toggle: () => void;
-  /** True while the sidebar is off-canvas (responsive and the viewport is narrower than 768px). */
-  isMobile: boolean;
+  /** True while the sidebar is an off-canvas panel (`offCanvas="always"`, or `"auto"` below 768px). */
+  offCanvas: boolean;
   size: ControlSize;
   navId: string;
   labels: SidebarLabels;
@@ -72,8 +72,8 @@ export { useSidebar };
 
 /** The desktop icon rail: labels are gone, items show tooltips, sub-lists open as flyouts. */
 function useRail(): boolean {
-  const { mode, isMobile } = useSidebar();
-  return mode === "compact" && !isMobile;
+  const { mode, offCanvas } = useSidebar();
+  return mode === "compact" && !offCanvas;
 }
 
 /** Items rendered inside a compact flyout: no rail tooltips; navigating closes the flyout. */
@@ -158,12 +158,15 @@ export type SidebarRootProps = React.ComponentPropsWithoutRef<"div"> & {
   mode?: SidebarMode;
   defaultMode?: SidebarMode;
   onModeChange?: (mode: SidebarMode) => void;
-  /** Off-canvas panel on narrow viewports (responsive only). */
+  /** The off-canvas panel (while the sidebar is off-canvas, see `offCanvas`). */
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Below 768px the rail becomes an off-canvas panel with a scrim and a focus trap. */
-  responsive?: boolean;
+  /**
+   * When the rail becomes an off-canvas panel with a scrim and a focus trap, opened by `open`:
+   * `auto` below 768px, `always` at any width (navigation behind a menu button), `never`.
+   */
+  offCanvas?: "auto" | "always" | "never";
   labels?: Partial<SidebarLabels>;
 };
 
@@ -178,14 +181,15 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
     open: openProp,
     defaultOpen = false,
     onOpenChange,
-    responsive = true,
+    offCanvas: offCanvasProp = "auto",
     labels: labelsProp,
     ...rest
   },
   ref,
 ) {
   const labels = React.useMemo(() => ({ ...defaultLabels, ...labelsProp }), [labelsProp]);
-  const isMobile = useMediaQuery(MOBILE_QUERY, responsive);
+  const narrow = useMediaQuery(MOBILE_QUERY, offCanvasProp === "auto");
+  const offCanvas = offCanvasProp === "always" || narrow;
 
   const [mode, setMode] = useControllableState<SidebarMode>({
     value: modeProp,
@@ -197,12 +201,12 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
-  const open = isMobile && openState;
+  const open = offCanvas && openState;
 
   // Leaving the narrow viewport closes the off-canvas panel.
   React.useEffect(() => {
-    if (!isMobile) setOpen(false);
-  }, [isMobile, setOpen]);
+    if (!offCanvas) setOpen(false);
+  }, [offCanvas, setOpen]);
 
   // Disclosures that open on mount (the current page inside) appear in place, without motion.
   const [ready, setReady] = React.useState(false);
@@ -224,18 +228,18 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   const panelRef = useOverlayModal<HTMLElement>(open, close);
 
   const toggle = React.useCallback(() => {
-    if (isMobile) {
+    if (offCanvas) {
       setOpen((prev) => !prev);
       return;
     }
     setMode((prev) => (prev === "expanded" ? "compact" : "expanded"));
-  }, [isMobile, setMode, setOpen]);
+  }, [offCanvas, setMode, setOpen]);
 
   const navId = React.useId();
 
   const context = React.useMemo<SidebarContextValue>(
-    () => ({ mode, setMode, open, setOpen, toggle, isMobile, size, navId, labels }),
-    [mode, setMode, open, setOpen, toggle, isMobile, size, navId, labels],
+    () => ({ mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels }),
+    [mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels],
   );
 
   return (
@@ -248,12 +252,12 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
           size,
           mode,
           "panel-mode": mode === "hidden" ? lastVisibleRef.current : mode,
-          mobile: isMobile || undefined,
-          state: isMobile ? (open ? "open" : "closed") : undefined,
+          "off-canvas": offCanvas || undefined,
+          state: offCanvas ? (open ? "open" : "closed") : undefined,
           ready: ready || undefined,
         })}
       >
-        {isMobile ? (
+        {offCanvas ? (
           <button
             type="button"
             className={styles.scrim}
@@ -267,7 +271,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
           id={navId}
           className={styles.panel}
           aria-label={labels.navigation}
-          inert={(isMobile && !open) || (!isMobile && mode === "hidden") || undefined}
+          inert={(offCanvas && !open) || (!offCanvas && mode === "hidden") || undefined}
         >
           <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
         </nav>
@@ -650,7 +654,7 @@ const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function Sid
   },
   ref,
 ) {
-  const { isMobile, setOpen } = useSidebar();
+  const { offCanvas, setOpen } = useSidebar();
   const flyout = React.useContext(FlyoutContext);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -662,7 +666,7 @@ const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function Sid
     if (event.defaultPrevented) return;
     // Navigating closes the compact flyout and the off-canvas panel.
     flyout?.close();
-    if (isMobile && (href !== undefined || asChild)) setOpen(false);
+    if (offCanvas && (href !== undefined || asChild)) setOpen(false);
   };
 
   const shared = {
@@ -1110,7 +1114,7 @@ const SidebarBrand = React.forwardRef<HTMLElement, SidebarBrandProps>(function S
   { description, href, asChild = false, className, children, onClick, ...rest },
   ref,
 ) {
-  const { isMobile, setOpen } = useSidebar();
+  const { offCanvas, setOpen } = useSidebar();
   const child =
     asChild && React.isValidElement<{ children?: React.ReactNode }>(children) ? children : null;
   const nodes = React.Children.toArray(child ? child.props.children : children);
@@ -1132,7 +1136,7 @@ const SidebarBrand = React.forwardRef<HTMLElement, SidebarBrandProps>(function S
     className: cx(styles.brand, className),
     onClick: (event: React.MouseEvent<HTMLElement>) => {
       onClick?.(event);
-      if (!event.defaultPrevented && isMobile) setOpen(false);
+      if (!event.defaultPrevented && offCanvas) setOpen(false);
     },
   };
 
@@ -1232,9 +1236,9 @@ export type SidebarToggleProps = Omit<
  */
 const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
   function SidebarToggle({ variant = "item", className, onClick, ...rest }, ref) {
-    const { mode, isMobile, open, toggle, navId, labels } = useSidebar();
-    const expanded = isMobile ? open : mode === "expanded";
-    const label = isMobile ? labels.close : expanded ? labels.collapse : labels.expand;
+    const { mode, offCanvas, open, toggle, navId, labels } = useSidebar();
+    const expanded = offCanvas ? open : mode === "expanded";
+    const label = offCanvas ? labels.close : expanded ? labels.collapse : labels.expand;
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
       onClick?.(event);
       if (!event.defaultPrevented) toggle();
@@ -1242,7 +1246,7 @@ const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
 
     if (variant === "header") {
       // One element for both places: it rides the rail edge and changes shape with transforms.
-      const onEdge = !isMobile && mode !== "expanded";
+      const onEdge = !offCanvas && mode !== "expanded";
       return (
         <Tooltip.Root>
           <Tooltip.Trigger>

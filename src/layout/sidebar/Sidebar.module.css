@@ -229,7 +229,7 @@
 
 /* Room for the inline header toggle while the brand has its text. */
 .root:not([data-mode="compact"]) .header:has(.headerToggle) > .brand,
-.root[data-mobile] .header:has(.headerToggle) > .brand {
+.root[data-off-canvas] .header:has(.headerToggle) > .brand {
   margin-inline-end: calc(var(--sb-toggle) + var(--prime-space-1));
 }
 
@@ -852,7 +852,7 @@
   transition: rotate var(--sb-duration) var(--sb-ease);
 }
 
-.root[data-mode="compact"]:not([data-mobile]) .headerToggle {
+.root[data-mode="compact"]:not([data-off-canvas]) .headerToggle {
   border-radius: var(--prime-radius-full);
   box-shadow: 0 0 0 var(--sb-edge-ring) var(--prime-color-bg-canvas);
   translate: 50% 0;
@@ -860,11 +860,11 @@
 }
 
 /* On the edge it stays quiet until the pointer is over the rail. */
-.root[data-mode="compact"]:not([data-mobile]):hover .headerToggle {
+.root[data-mode="compact"]:not([data-off-canvas]):hover .headerToggle {
   color: var(--prime-color-text-primary);
 }
 
-.root[data-mode="compact"]:not([data-mobile]) .headerToggleIcon {
+.root[data-mode="compact"]:not([data-off-canvas]) .headerToggleIcon {
   rotate: 180deg;
 }
 
@@ -875,7 +875,7 @@
 /* --- Compact (desktop only) ---------------------------------------------------- */
 
 /* Collapsing: text leaves fast, before the rail is narrow; labels clip without an ellipsis. */
-.root[data-mode="compact"]:not([data-mobile])
+.root[data-mode="compact"]:not([data-off-canvas])
 :is(.label, .trail > :not(.dot), .groupLabel, .chevron, .brandText, .accountText, .accountChevron) {
   opacity: 0;
   text-overflow: clip;
@@ -885,31 +885,31 @@
 }
 
 /* Group headings fold away in the rail, so groups keep only their gap — no empty rows. */
-.root[data-mode="compact"]:not([data-mobile]) .groupLabel {
+.root[data-mode="compact"]:not([data-off-canvas]) .groupLabel {
   height: 0;
 }
 
 /* Inline actions have no place on the rail. */
-.root[data-mode="compact"]:not([data-mobile]) .action {
+.root[data-mode="compact"]:not([data-off-canvas]) .action {
   visibility: hidden;
 }
 
-.root[data-mode="compact"]:not([data-mobile]) .trail {
+.root[data-mode="compact"]:not([data-off-canvas]) .trail {
   translate: none;
 }
 
 /* A parent stands for its hidden children: on the active path it takes the current lift. */
-.root[data-mode="compact"]:not([data-mobile]) .item[data-active-path] {
+.root[data-mode="compact"]:not([data-off-canvas]) .item[data-active-path] {
   background: var(--prime-color-bg-surface);
   box-shadow: var(--prime-shadow-raised);
 }
 
-.root[data-mode="compact"]:not([data-mobile]) .item[aria-haspopup][aria-expanded="true"] {
+.root[data-mode="compact"]:not([data-off-canvas]) .item[aria-haspopup][aria-expanded="true"] {
   background: var(--prime-color-fill-subtle);
 }
 
 /* The count leaves the row (still read by screen readers); a badge leaves a dot on the icon. */
-.root[data-mode="compact"]:not([data-mobile]) .count {
+.root[data-mode="compact"]:not([data-off-canvas]) .count {
   position: absolute;
   width: var(--prime-border-width);
   height: var(--prime-border-width);
@@ -920,7 +920,7 @@
 }
 
 /* `Badge.Dot` (l tier, 8px) on the icon corner, cut out of the icon by a canvas ring. */
-.root[data-mode="compact"]:not([data-mobile]) .dot {
+.root[data-mode="compact"]:not([data-off-canvas]) .dot {
   position: absolute;
   inset-block-start: calc(50% - var(--sb-icon) / 2 - var(--prime-space-1) / 2);
   inset-inline-start: calc(var(--sb-item-pad) + var(--sb-icon) - var(--prime-space-1));
@@ -928,7 +928,7 @@
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-bg-canvas);
 }
 
-/* --- Off-canvas (responsive, < 768px) ------------------------------------------ */
+/* --- Off-canvas (offCanvas="always", or "auto" below 768px) ---------------------- */
 
 .scrim {
   position: fixed;
@@ -943,13 +943,13 @@
   transition: opacity var(--sb-duration) var(--sb-ease);
 }
 
-.root[data-mobile] {
+.root[data-off-canvas] {
   width: 0;
   clip-path: none;
   transition: none;
 }
 
-.root[data-mobile] .panel {
+.root[data-off-canvas] .panel {
   position: fixed;
   inset-block: 0;
   inset-inline-start: 0;

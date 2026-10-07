@@ -77,11 +77,11 @@ export const api: ComponentApi = {
           ru: "Открытие и закрытие панели: Toggle, подложка, Escape, переход, выход из узкого экрана.",
         },
         {
-          name: "responsive",
-          type: "boolean",
-          default: "true",
-          en: "Below 768px (viewport) the rail leaves the layout and becomes an off-canvas panel with a scrim and a focus trap.",
-          ru: "Уже 768px (окно браузера) рельс уходит из раскладки и становится выезжающей панелью с подложкой и ловушкой фокуса.",
+          name: "offCanvas",
+          type: '"auto" | "always" | "never"',
+          default: '"auto"',
+          en: "When the rail leaves the layout and becomes an off-canvas panel with a scrim and a focus trap, opened by `open`: `auto` — below 768px (viewport); `always` — at any width (navigation behind a menu button); `never` — always a rail.",
+          ru: "Когда рельс уходит из раскладки и становится выезжающей панелью с подложкой и ловушкой фокуса, которую открывает `open`: `auto` — уже 768px (окно браузера); `always` — на любой ширине (навигация за кнопкой меню); `never` — всегда рельс.",
         },
         {
           name: "labels",
@@ -477,10 +477,10 @@ export const api: ComponentApi = {
           ru: "Действие `Sidebar.Toggle`.",
         },
         {
-          name: "isMobile",
+          name: "offCanvas",
           type: "boolean",
-          en: "The sidebar is off-canvas now (responsive and under 768px).",
-          ru: "Сейчас панель выезжающая (responsive и уже 768px).",
+          en: 'The sidebar is an off-canvas panel now (`offCanvas="always"`, or `"auto"` under 768px).',
+          ru: 'Сейчас панель выезжающая (`offCanvas="always"` или `"auto"` уже 768px).',
         },
         {
           name: "size · navId · labels",

@@ -14,7 +14,7 @@ export default function SidebarSizesExample() {
             {size}
           </Typography>
           <div className={`${styles.stage} ${styles.stageAuto}`}>
-            <Sidebar.Root size={size} responsive={false}>
+            <Sidebar.Root size={size} offCanvas="never">
               <Sidebar.Content>
                 <Sidebar.Item current>
                   <Sidebar.ItemIcon>

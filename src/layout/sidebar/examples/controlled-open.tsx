@@ -1,4 +1,4 @@
-/** Below 768px the rail becomes an off-canvas panel with a scrim, opened from a menu button; narrow the window to try it — `open`, `onOpenChange`. */
+/** Navigation behind a menu button at any width: the parent opens the off-canvas panel, the scrim, Escape, the header toggle or a navigation closes it — `offCanvas`, `open`, `onOpenChange`. */
 import { Button, Icon, Sidebar } from "prime-ui-kit";
 import * as React from "react";
 
@@ -9,7 +9,18 @@ export default function SidebarControlledOpenExample() {
 
   return (
     <div className={styles.stage}>
-      <Sidebar.Root open={open} onOpenChange={setOpen}>
+      <Sidebar.Root offCanvas="always" open={open} onOpenChange={setOpen}>
+        <Sidebar.Header>
+          <Sidebar.Brand href="#home" description="Отдел продаж">
+            <Sidebar.BrandLogo>
+              <span className={styles.logo}>
+                <Icon name="nav.layoutGrid" />
+              </span>
+            </Sidebar.BrandLogo>
+            Прайм CRM
+          </Sidebar.Brand>
+          <Sidebar.Toggle variant="header" />
+        </Sidebar.Header>
         <Sidebar.Content>
           <Sidebar.Item href="#home" current>
             <Sidebar.ItemIcon>
@@ -25,9 +36,6 @@ export default function SidebarControlledOpenExample() {
             <Sidebar.ItemCount>2</Sidebar.ItemCount>
           </Sidebar.Item>
         </Sidebar.Content>
-        <Sidebar.Footer>
-          <Sidebar.Toggle />
-        </Sidebar.Footer>
       </Sidebar.Root>
       <div className={styles.content}>
         <Button.Root

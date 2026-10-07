@@ -13,7 +13,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Навигация приложения на холсте: пункты с иконками, текущая страница и кнопка сворачивания — `Sidebar.ItemIcon`, `current`.",
+        "Навигация приложения на холсте: шапка с брендом и кнопкой сворачивания, пункты с иконками и текущая страница — `Sidebar.Brand`, `Sidebar.Toggle`, `Sidebar.ItemIcon`, `current`.",
     },
     {
       slot: "sizes",
@@ -63,7 +63,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "controlled-open",
       description:
-        "Уже 768px рельс становится выезжающей панелью с подложкой, которую открывает кнопка меню; сузьте окно, чтобы проверить — `open`, `onOpenChange`.",
+        "Навигация за кнопкой меню на любой ширине: родитель открывает выезжающую панель, закрывают её подложка, Escape, кнопка в шапке или переход — `offCanvas`, `open`, `onOpenChange`.",
     },
   ],
   api,

@@ -62,7 +62,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `open` | `boolean` | — | Off-canvas panel on narrow viewports (controlled). |
 | `defaultOpen` | `boolean` | `false` | Initial off-canvas state (uncontrolled). |
 | `onOpenChange` | `(open: boolean) => void` | — | Off-canvas open / close: Toggle, scrim, Escape, navigation, leaving the narrow viewport. |
-| `responsive` | `boolean` | `true` | Below 768px (viewport) the rail leaves the layout and becomes an off-canvas panel with a scrim and a focus trap. |
+| `offCanvas` | `"auto" \| "always" \| "never"` | `"auto"` | When the rail leaves the layout and becomes an off-canvas panel with a scrim and a focus trap, opened by `open`: `auto` — below 768px (viewport); `always` — at any width (navigation behind a menu button); `never` — always a rail. |
 | `labels` | `Partial<SidebarLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
@@ -210,7 +210,7 @@ Hook for custom parts inside `Sidebar.Root` (throws outside). Returns the fields
 | `mode · setMode` | `SidebarMode · (mode: SidebarMode) => void` | — | Desktop mode. |
 | `open · setOpen` | `boolean · (open: boolean) => void` | — | Off-canvas panel. |
 | `toggle` | `() => void` | — | The action of `Sidebar.Toggle`. |
-| `isMobile` | `boolean` | — | The sidebar is off-canvas now (responsive and under 768px). |
+| `offCanvas` | `boolean` | — | The sidebar is an off-canvas panel now (`offCanvas="always"`, or `"auto"` under 768px). |
 | `size · navId · labels` | `ControlSize · string · SidebarLabels` | — | Tier, id of the `<nav>` (for `aria-controls` on your own menu button), resolved strings. |
 
 ## Variants
@@ -247,21 +247,27 @@ The rail width does not depend on `size`.
 | `color` | a soft Badge of that hue | the count needs attention (red «7») | |
 | `variant` | a Badge of that treatment (gray unless `color`) | a stronger or outlined count | |
 
+### offCanvas
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `auto` | a rail; below 768px (viewport) zero-width in layout, opens as a fixed panel over a scrim with `shadow-modal` | apps used on phones | yes |
+| `always` | zero-width in layout at any width; the panel opens over a scrim from a menu button (`open`) | full-screen tools and editors where navigation stays behind a button | |
+| `never` | always a rail, whatever the viewport | a fixed frame, previews, desktop-only tools | |
+
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `responsive` (Root) | below 768px: zero-width in layout; opens as a fixed panel over a scrim with `shadow-modal` | apps used on phones | `true` |
 | `collapsible` (Group) | the heading is a button with a chevron at its end; items fold away | long navigation with sections | off |
 | `current` (Item) | surface fill + raised shadow, primary text and icon | the current page | off |
 | `disabled` (Item) | `text-disabled`, no hover, `cursor: not-allowed` | an unavailable section | off |
 
-Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand; on phones pair `responsive` with a menu button in `AppShell.Header` (`open` / `onOpenChange`). One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
+Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand; on phones (`offCanvas="auto"`) or always (`offCanvas="always"`) pair it with a menu button in `AppShell.Header` (`open` / `onOpenChange`). One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | mode | `mode` / `defaultMode` | Root `data-mode`, `data-panel-mode` (the last visible mode while hidden); `<nav inert>` while hidden |
-| off-canvas | `responsive` + viewport < 768px | Root `data-mobile`, `data-state="open" \| "closed"`; `<nav inert>` while closed |
+| off-canvas | `offCanvas="always"`, or `"auto"` + viewport < 768px | Root `data-off-canvas`, `data-state="open" \| "closed"`; `<nav inert>` while closed |
 | current | `current` or a router's `aria-current` | Item `aria-current="page"`, `data-state="active"` |
 | active path | a child of a Sub (or an item of a Group) is current | SubTrigger `data-active-path`; a closed Sub / Group opens |
 | group open | Group `open` / `defaultOpen` (`collapsible`) | heading `aria-expanded`; region `data-state`, `inert` while closed |
@@ -320,7 +326,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | App navigation on the canvas: items with icons, the current page and a collapse toggle — `Sidebar.ItemIcon`, `current`. |
+| [overview.tsx](examples/overview.tsx) | App navigation on the canvas: a brand header with the collapse toggle, items with icons and the current page — `Sidebar.Brand`, `Sidebar.Toggle`, `Sidebar.ItemIcon`, `current`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: item height, text, icon and counter follow the tier; the rail width stays — `size`. |
 | [structure.tsx](examples/structure.tsx) | Labelled groups and the optional item parts: a plain count, a coloured badge, a key hint, a trailing icon, a row action and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`. |
 | [brand-header.tsx](examples/brand-header.tsx) | A brand block with the collapse toggle at the end of the header; in compact mode the logo stays and the toggle moves onto the rail edge — `Sidebar.Brand`, `Sidebar.BrandLogo`, `description`, `variant`. |
@@ -329,7 +335,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 | [account.tsx](examples/account.tsx) | Footer items above the signed-in person: avatar, name and email open the account menu; in compact mode only the avatar stays — `Sidebar.Footer`, `Sidebar.Account`, `description`. |
 | [router.tsx](examples/router.tsx) | A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; only the width animates — `mode`, `onModeChange`. |
-| [controlled-open.tsx](examples/controlled-open.tsx) | Below 768px the rail becomes an off-canvas panel with a scrim, opened from a menu button; narrow the window to try it — `open`, `onOpenChange`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | Navigation behind a menu button at any width: the parent opens the off-canvas panel, the scrim, Escape, the header toggle or a navigation closes it — `offCanvas`, `open`, `onOpenChange`. |
 
 ## Mistakes
 - `icon={…}` / `badge={…}` props → use the `Sidebar.ItemIcon` and `Sidebar.ItemCount` parts.

@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function SidebarAccountExample() {
   return (
     <div className={styles.stage}>
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Content>
           <Sidebar.Item current>
             <Sidebar.ItemIcon>

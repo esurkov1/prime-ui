@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function SidebarBrandHeaderExample() {
   return (
     <div className={styles.stage}>
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Header>
           <Sidebar.Brand href="#home" description="Отдел продаж">
             <Sidebar.BrandLogo>

@@ -10,7 +10,7 @@ export default function AppShellTemplateExample() {
         fillViewport
         className={styles.shell}
         nav={
-          <Sidebar.Root responsive={false}>
+          <Sidebar.Root offCanvas="never">
             <Sidebar.Content>
               <Sidebar.Item current>
                 <Sidebar.ItemIcon>

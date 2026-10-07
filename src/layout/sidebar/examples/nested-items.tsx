@@ -14,7 +14,18 @@ const STAGES = [
 export default function SidebarNestedItemsExample() {
   return (
     <div className={`${styles.stage} ${styles.stageTall}`}>
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
+        <Sidebar.Header>
+          <Sidebar.Brand href="#home" description="Отдел продаж">
+            <Sidebar.BrandLogo>
+              <span className={styles.logo}>
+                <Icon name="nav.layoutGrid" />
+              </span>
+            </Sidebar.BrandLogo>
+            Прайм CRM
+          </Sidebar.Brand>
+          <Sidebar.Toggle variant="header" />
+        </Sidebar.Header>
         <Sidebar.Content>
           <Sidebar.Item href="#overview">
             <Sidebar.ItemIcon>
@@ -57,9 +68,6 @@ export default function SidebarNestedItemsExample() {
             Календарь
           </Sidebar.Item>
         </Sidebar.Content>
-        <Sidebar.Footer>
-          <Sidebar.Toggle />
-        </Sidebar.Footer>
       </Sidebar.Root>
       <div className={styles.content} />
     </div>

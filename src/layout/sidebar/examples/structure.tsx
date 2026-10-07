@@ -7,7 +7,7 @@ import styles from "./examples.module.css";
 export default function SidebarStructureExample() {
   return (
     <div className={`${styles.stage} ${styles.stageTall}`}>
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Content>
           <Sidebar.Group>
             <Sidebar.Item>

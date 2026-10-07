@@ -13,7 +13,7 @@ const LINKS = [
 export default function SidebarRouterExample() {
   return (
     <div className={styles.stage}>
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Content>
           {LINKS.map((link) => (
             <Sidebar.Item key={link.to} asChild>

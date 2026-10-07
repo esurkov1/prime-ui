@@ -9,7 +9,7 @@ export default function AppShellOverviewExample() {
       <AppShell.Root fillViewport className={styles.shell}>
         <AppShell.Nav>
           {/* A small app window: the icon rail fits every frame width; the toggle widens it. */}
-          <Sidebar.Root responsive={false} defaultMode="compact">
+          <Sidebar.Root offCanvas="never" defaultMode="compact">
             <Sidebar.Header>
               <Sidebar.Brand href="#home" description="Отдел продаж">
                 <Sidebar.BrandLogo>

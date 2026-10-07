@@ -27,7 +27,18 @@ export default function SidebarControlledExample() {
         ))}
       </SegmentedControl.Root>
       <div className={styles.stage}>
-        <Sidebar.Root mode={mode} onModeChange={setMode} responsive={false}>
+        <Sidebar.Root mode={mode} onModeChange={setMode} offCanvas="never">
+          <Sidebar.Header>
+            <Sidebar.Brand href="#home" description="Отдел продаж">
+              <Sidebar.BrandLogo>
+                <span className={styles.logo}>
+                  <Icon name="nav.layoutGrid" />
+                </span>
+              </Sidebar.BrandLogo>
+              Прайм CRM
+            </Sidebar.Brand>
+            <Sidebar.Toggle variant="header" />
+          </Sidebar.Header>
           <Sidebar.Content>
             <Sidebar.Item current>
               <Sidebar.ItemIcon>
@@ -49,9 +60,6 @@ export default function SidebarControlledExample() {
               Отчёты
             </Sidebar.Item>
           </Sidebar.Content>
-          <Sidebar.Footer>
-            <Sidebar.Toggle />
-          </Sidebar.Footer>
         </Sidebar.Root>
         <div className={styles.content} />
       </div>

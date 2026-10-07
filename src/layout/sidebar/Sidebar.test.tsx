@@ -114,7 +114,7 @@ describe("Sidebar", () => {
 
   it("renders a link when href is set and blocks it when disabled", () => {
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Item href="/a">A</Sidebar.Item>
         <Sidebar.Item href="/b" disabled>
           B
@@ -131,7 +131,7 @@ describe("Sidebar", () => {
   it("renders a router link via asChild and keeps the item structure", () => {
     render(
       <MemoryRouter initialEntries={["/settings"]}>
-        <Sidebar.Root responsive={false}>
+        <Sidebar.Root offCanvas="never">
           <Sidebar.Item asChild>
             <NavLink to="/" end>
               <Sidebar.ItemIcon>
@@ -157,7 +157,7 @@ describe("Sidebar", () => {
 
   it("uncontrolled: Toggle switches expanded ↔ compact and updates its label", () => {
     const onModeChange = vi.fn();
-    render(<Basic responsive={false} onModeChange={onModeChange} />);
+    render(<Basic offCanvas="never" onModeChange={onModeChange} />);
     const nav = screen.getByRole("navigation");
     const toggle = screen.getByRole("button", { name: "Свернуть панель" });
     expect(toggle).toHaveAttribute("aria-expanded", "true");
@@ -175,7 +175,7 @@ describe("Sidebar", () => {
 
   it("header Toggle: one button that switches modes from the keyboard and stays focused", () => {
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Header>
           <Sidebar.Brand href="/">Склад</Sidebar.Brand>
           <Sidebar.Toggle variant="header" />
@@ -214,7 +214,7 @@ describe("Sidebar", () => {
   });
 
   it("keeps focus on the toggle across mode changes (no remount)", () => {
-    render(<Basic responsive={false} />);
+    render(<Basic offCanvas="never" />);
     const toggle = screen.getByRole("button", { name: "Свернуть панель" });
     toggle.focus();
     fireEvent.click(toggle);
@@ -224,7 +224,7 @@ describe("Sidebar", () => {
   it("controlled mode: renders the given mode and reports changes", () => {
     const onModeChange = vi.fn();
     const { rerender } = render(
-      <Basic responsive={false} mode="compact" onModeChange={onModeChange} />,
+      <Basic offCanvas="never" mode="compact" onModeChange={onModeChange} />,
     );
     const nav = screen.getByRole("navigation");
     expect(rootOf(nav)).toHaveAttribute("data-mode", "compact");
@@ -233,7 +233,7 @@ describe("Sidebar", () => {
     expect(onModeChange).toHaveBeenCalledWith("expanded");
     expect(rootOf(nav)).toHaveAttribute("data-mode", "compact");
 
-    rerender(<Basic responsive={false} mode="hidden" onModeChange={onModeChange} />);
+    rerender(<Basic offCanvas="never" mode="hidden" onModeChange={onModeChange} />);
     expect(rootOf(nav)).toHaveAttribute("data-mode", "hidden");
     // Hidden keeps the panel width of the last visible mode and makes the panel inert.
     expect(rootOf(nav)).toHaveAttribute("data-panel-mode", "compact");
@@ -241,18 +241,18 @@ describe("Sidebar", () => {
   });
 
   it("hidden → Toggle expands", () => {
-    render(<Basic responsive={false} defaultMode="hidden" />);
+    render(<Basic offCanvas="never" defaultMode="hidden" />);
     const nav = screen.getByRole("navigation", { hidden: true });
     fireEvent.click(screen.getByRole("button", { name: "Развернуть панель", hidden: true }));
     expect(rootOf(nav)).toHaveAttribute("data-mode", "expanded");
   });
 
   it("shows a tooltip with the item label in compact mode only", () => {
-    const { rerender } = render(<Basic responsive={false} mode="expanded" />);
+    const { rerender } = render(<Basic offCanvas="never" mode="expanded" />);
     fireEvent.focus(screen.getByRole("button", { name: "Главная" }));
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
 
-    rerender(<Basic responsive={false} mode="compact" />);
+    rerender(<Basic offCanvas="never" mode="compact" />);
     vi.useFakeTimers();
     const item = screen.getByRole("button", { name: "Главная" });
     fireEvent.blur(item);
@@ -267,20 +267,20 @@ describe("Sidebar", () => {
   it("forwards refs to the item element", () => {
     const ref = { current: null as HTMLElement | null };
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Item ref={ref}>A</Sidebar.Item>
       </Sidebar.Root>,
     );
     expect(ref.current).toBe(screen.getByRole("button", { name: "A" }));
   });
 
-  describe("responsive (off-canvas below 768px)", () => {
+  describe("off-canvas (auto below 768px, always, never)", () => {
     it("is closed by default, opens via open prop and closes with Escape", () => {
       mockViewport(true);
       const onOpenChange = vi.fn();
       const { rerender } = render(<Basic open={false} onOpenChange={onOpenChange} />);
       const nav = screen.getByRole("navigation", { hidden: true });
-      expect(rootOf(nav)).toHaveAttribute("data-mobile", "true");
+      expect(rootOf(nav)).toHaveAttribute("data-off-canvas", "true");
       expect(rootOf(nav)).toHaveAttribute("data-state", "closed");
       expect(nav).toHaveAttribute("inert");
 
@@ -342,16 +342,31 @@ describe("Sidebar", () => {
       const nav = screen.getByRole("navigation");
       expect(rootOf(nav)).toHaveAttribute("data-state", "open");
       viewport.set(false);
-      expect(rootOf(nav)).not.toHaveAttribute("data-mobile");
+      expect(rootOf(nav)).not.toHaveAttribute("data-off-canvas");
       expect(rootOf(nav)).not.toHaveAttribute("data-state");
       viewport.set(true);
       expect(rootOf(nav)).toHaveAttribute("data-state", "closed");
     });
 
-    it("responsive={false} never goes off-canvas", () => {
+    it('offCanvas="never" never goes off-canvas', () => {
       mockViewport(true);
-      render(<Basic responsive={false} />);
-      expect(rootOf(screen.getByRole("navigation"))).not.toHaveAttribute("data-mobile");
+      render(<Basic offCanvas="never" />);
+      expect(rootOf(screen.getByRole("navigation"))).not.toHaveAttribute("data-off-canvas");
+    });
+
+    it('offCanvas="always" is a panel behind open at any width', () => {
+      mockViewport(false);
+      const onOpenChange = vi.fn();
+      const { rerender } = render(
+        <Basic offCanvas="always" open={false} onOpenChange={onOpenChange} />,
+      );
+      const nav = screen.getByRole("navigation", { hidden: true });
+      expect(rootOf(nav)).toHaveAttribute("data-off-canvas", "true");
+      expect(nav).toHaveAttribute("inert");
+      rerender(<Basic offCanvas="always" open onOpenChange={onOpenChange} />);
+      expect(rootOf(nav)).toHaveAttribute("data-state", "open");
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(onOpenChange).toHaveBeenCalledWith(false);
     });
   });
 
@@ -377,7 +392,7 @@ describe("Sidebar", () => {
       );
     }
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Probe />
       </Sidebar.Root>,
     );
@@ -389,7 +404,7 @@ describe("Sidebar", () => {
 describe("Sidebar item parts", () => {
   it("ItemCount is a plain number by default and a Badge with color / variant", () => {
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Item>
           Бэклог
           <Sidebar.ItemCount>24</Sidebar.ItemCount>
@@ -415,7 +430,7 @@ describe("Sidebar item parts", () => {
 
   it("an ItemIcon after the label is a trailing icon", () => {
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Item href="/help">
           <Sidebar.ItemIcon>
             <Home data-testid="lead" />
@@ -436,7 +451,7 @@ describe("Sidebar item parts", () => {
   it("ItemAction is a separate button next to the item, never inside it", () => {
     const onClick = vi.fn();
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Item href="/deals">
           Сделки
           <Sidebar.ItemAction label="Создать сделку" onClick={onClick} />
@@ -455,7 +470,7 @@ describe("Sidebar item parts", () => {
 describe("Sidebar.Brand and Sidebar.Account", () => {
   it("Brand renders the logo, name and description; a link with href", () => {
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Header>
           <Sidebar.Brand href="/" description="Отдел продаж">
             <Sidebar.BrandLogo>
@@ -474,7 +489,7 @@ describe("Sidebar.Brand and Sidebar.Account", () => {
 
   it("Account is a button named by the person and opens a Dropdown", () => {
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Footer>
           <Dropdown.Root>
             <Dropdown.Trigger>
@@ -504,7 +519,7 @@ describe("Sidebar.Brand and Sidebar.Account", () => {
 describe("Sidebar.Group collapsible", () => {
   function Groups(props: Partial<React.ComponentProps<typeof Sidebar.Group>>) {
     return (
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Content>
           <Sidebar.Group label="Инструменты" collapsible {...props}>
             <Sidebar.Item href="/tasks">Задачи</Sidebar.Item>
@@ -539,7 +554,7 @@ describe("Sidebar.Group collapsible", () => {
 
   it("opens by itself when it holds the current page", () => {
     render(
-      <Sidebar.Root responsive={false}>
+      <Sidebar.Root offCanvas="never">
         <Sidebar.Group label="Инструменты" collapsible defaultOpen={false}>
           <Sidebar.Item current>Задачи</Sidebar.Item>
         </Sidebar.Group>
@@ -553,7 +568,7 @@ describe("Sidebar.Group collapsible", () => {
 
   it("on the compact rail the items show and the heading leaves the tab order", () => {
     render(
-      <Sidebar.Root responsive={false} mode="compact">
+      <Sidebar.Root offCanvas="never" mode="compact">
         <Sidebar.Group label="Инструменты" collapsible defaultOpen={false}>
           <Sidebar.Item>Задачи</Sidebar.Item>
         </Sidebar.Group>
@@ -573,7 +588,7 @@ describe("Sidebar.Sub", () => {
     ...root
   }: Partial<React.ComponentProps<typeof Sidebar.Root>> & { current?: boolean }) {
     return (
-      <Sidebar.Root responsive={false} {...root}>
+      <Sidebar.Root offCanvas="never" {...root}>
         <Sidebar.Sub>
           <Sidebar.SubTrigger>
             <Sidebar.ItemIcon>
