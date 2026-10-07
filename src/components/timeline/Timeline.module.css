@@ -287,17 +287,17 @@
 
 /*
  * Highlighted look: `fill-subtle-active` pill, accent title, accent dot (a `tone` keeps its dot).
- * `highlight="selected"`: the `active` row keeps it; interactive rows get a faint hover wash.
+ * `highlight="current"`: the `current` row keeps it; interactive rows get a faint hover wash.
  * `highlight="hover"`: the row under the pointer or with keyboard focus gets it, transiently.
  */
-.root[data-highlight="selected"] .row[data-state="active"],
+.root[data-highlight="current"] .row[data-state="active"],
 .root[data-highlight="hover"] .row:is(:hover, :focus-visible) {
   --tl-title-color: var(--prime-color-accent-text);
 
   background: var(--prime-color-fill-subtle-active);
 }
 
-.root[data-highlight="selected"] .row[data-state="active"]:not([data-tone]),
+.root[data-highlight="current"] .row[data-state="active"]:not([data-tone]),
 .root[data-highlight="hover"] .row:is(:hover, :focus-visible):not([data-tone]) {
   --tl-dot-color: var(--prime-color-accent-default);
 }
@@ -306,11 +306,11 @@
   cursor: pointer;
 }
 
-.root[data-highlight="selected"] .row[data-interactive="true"]:hover:not([data-state="active"]) {
+.root[data-highlight="current"] .row[data-interactive="true"]:hover:not([data-state="active"]) {
   background: var(--prime-color-fill-subtle);
 }
 
-.root[data-highlight="selected"] .row[data-interactive="true"]:active:not([data-state="active"]) {
+.root[data-highlight="current"] .row[data-interactive="true"]:active:not([data-state="active"]) {
   background: var(--prime-color-fill-subtle-active);
 }
 
