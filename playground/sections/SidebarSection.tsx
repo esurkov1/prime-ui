@@ -26,6 +26,12 @@ export const page: ComponentPageConfig = {
         "Группы с подписью и необязательные части пункта: счётчик, подсказка клавиш и недоступный раздел — `Sidebar.Group`, `Sidebar.ItemCount`, `Sidebar.ItemShortcut`, `disabled`.",
     },
     {
+      scenario: "edge-toggle",
+      title: "Кнопка на кромке",
+      description:
+        "Маленькая круглая кнопка на внешней кромке рельса на уровне шапки; шеврон поворачивается вместе с режимом — `Sidebar.Toggle`, `variant`.",
+    },
+    {
       scenario: "router",
       title: "Ссылки роутера",
       description:

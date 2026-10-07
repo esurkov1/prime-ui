@@ -169,6 +169,42 @@ describe("Sidebar", () => {
     expect(rootOf(nav)).toHaveAttribute("data-mode", "expanded");
   });
 
+  it("edge Toggle: a round button that switches modes from the keyboard", () => {
+    render(
+      <Sidebar.Root responsive={false}>
+        <Sidebar.Header>
+          Склад
+          <Sidebar.Toggle variant="edge" />
+        </Sidebar.Header>
+      </Sidebar.Root>,
+    );
+    const nav = screen.getByRole("navigation");
+    const toggle = screen.getByRole("button", { name: "Свернуть панель" });
+    expect(toggle).toHaveAttribute("aria-controls", nav.id);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+
+    toggle.focus();
+    fireEvent.keyDown(toggle, { key: "Enter" });
+    fireEvent.click(toggle);
+    expect(rootOf(nav)).toHaveAttribute("data-mode", "compact");
+    expect(toggle).toHaveAccessibleName("Развернуть панель");
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it("edge Toggle renders nothing off-canvas", () => {
+    mockViewport(true);
+    render(
+      <Sidebar.Root>
+        <Sidebar.Header>
+          <Sidebar.Toggle variant="edge" />
+        </Sidebar.Header>
+      </Sidebar.Root>,
+    );
+    // Only the scrim is left: it is labelled `labels.close`; no edge toggle is rendered.
+    expect(screen.queryByRole("button", { name: /панель/ })).toBeNull();
+    expect(document.querySelectorAll("button")).toHaveLength(1);
+  });
+
   it("keeps focus on the toggle across mode changes (no remount)", () => {
     render(<Basic responsive={false} />);
     const toggle = screen.getByRole("button", { name: "Свернуть панель" });

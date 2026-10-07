@@ -139,7 +139,7 @@
   font-weight: var(--prime-text-title-m-weight);
   letter-spacing: var(--prime-text-title-m-tracking);
   overflow-wrap: anywhere;
-  text-wrap: balance;
+  text-wrap-style: balance;
 }
 
 .description {

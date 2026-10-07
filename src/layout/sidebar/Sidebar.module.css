@@ -8,6 +8,12 @@
  * one duration and easing). Item padding is derived from the compact width, so icons sit in the
  * same place in every mode; labels clip and fade instead of reflowing. While hidden the panel
  * keeps the width of the last visible mode and is clipped by the root as one piece.
+ *
+ * Text leaves first and comes back last: on collapse labels fade out fast before the rail is
+ * narrow; on expand they fade in after a delay, once the rail has room — no "Progr…" mid-motion.
+ *
+ * The root clips with `clip-path`, not `overflow`, so the edge toggle can sit across the outer edge;
+ * the clip reaches past the edge by the toggle's half-width and its ring.
  */
 
 .root {
@@ -27,6 +33,11 @@
   --sb-panel-width: var(--sb-expanded);
   --sb-duration: var(--prime-motion-duration-base);
   --sb-ease: var(--prime-motion-easing-standard);
+  --sb-text-out: var(--prime-motion-duration-fast);
+  --sb-header-h: calc(var(--sb-h) + var(--prime-space-2));
+  --sb-edge-size: var(--prime-space-5);
+  --sb-edge-ring: var(--prime-space-1);
+  --sb-edge-reach: calc(var(--sb-edge-size) / 2 + var(--sb-edge-ring));
 
   /* The rail is canvas: fields keep the canvas field fill; avatar rings match the rail. */
   --avatar-ring: var(--prime-color-bg-canvas);
@@ -37,8 +48,10 @@
   width: var(--sb-width);
   height: 100%;
   min-height: 0;
-  overflow: clip;
-  transition: width var(--sb-duration) var(--sb-ease);
+  clip-path: inset(0 calc(-1 * var(--sb-edge-reach)) 0 0);
+  transition:
+    width var(--sb-duration) var(--sb-ease),
+    clip-path var(--sb-duration) var(--sb-ease);
 }
 
 .root[data-size="xs"] {
@@ -83,6 +96,8 @@
 
 .root[data-mode="hidden"] {
   --sb-width: 0;
+
+  clip-path: inset(0);
 }
 
 .root[data-panel-mode="compact"] {
@@ -90,6 +105,7 @@
 }
 
 .panel {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -108,14 +124,16 @@
 
 /* --- Regions ----------------------------------------------------------------- */
 
+/* One fixed-height row (a two-line brand fits), so the edge toggle can sit level with it. */
 .header {
   display: flex;
   flex: none;
   align-items: center;
   gap: var(--sb-gap);
   min-width: 0;
-  min-height: var(--sb-h);
+  height: var(--sb-header-h);
   overflow: hidden;
+  white-space: nowrap;
 }
 
 /*
@@ -154,8 +172,9 @@
 
 .groupLabel {
   display: flex;
+  flex: none;
   align-items: center;
-  min-height: var(--prime-panel-group-label-height);
+  height: var(--prime-panel-group-label-height);
   padding-inline: var(--sb-item-pad);
   overflow: hidden;
   color: var(--prime-color-text-muted);
@@ -164,7 +183,6 @@
   font-weight: var(--prime-font-weight-medium);
   letter-spacing: var(--prime-text-caption-tracking);
   white-space: nowrap;
-  transition: opacity var(--sb-duration) var(--sb-ease);
 }
 
 /* --- Item -------------------------------------------------------------------- */
@@ -266,7 +284,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition: opacity var(--sb-duration) var(--sb-ease);
 }
 
 /* The count is a kit Badge (one tier below the items); the dot stands in for it in compact mode. */
@@ -283,15 +300,69 @@
   display: inline-flex;
   flex: none;
   align-items: center;
-  transition: opacity var(--sb-duration) var(--sb-ease);
+}
+
+/* Expanding: text and group headings return once the rail has widened. */
+.label,
+.shortcut,
+.groupLabel {
+  transition:
+    opacity var(--sb-duration) var(--sb-ease) var(--sb-text-out),
+    height var(--sb-duration) var(--sb-ease);
+}
+
+/* --- Edge toggle ---------------------------------------------------------------- */
+
+/* A round kit Button across the outer edge, level with the header row; a canvas ring cuts it out. */
+.root .edgeToggle {
+  position: absolute;
+  inset-block-start: calc(var(--prime-space-3) + (var(--sb-header-h) - var(--sb-edge-size)) / 2);
+  inset-inline-end: calc(-1 * var(--sb-edge-size) / 2);
+  z-index: var(--prime-z-sticky);
+  width: var(--sb-edge-size);
+  min-width: 0;
+  height: var(--sb-edge-size);
+  padding: 0;
+  border-radius: var(--prime-radius-full);
+  color: var(--prime-color-text-muted);
+  box-shadow: 0 0 0 var(--sb-edge-ring) var(--prime-color-bg-canvas);
+  transition: color var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+/* Quiet at rest; it comes forward while the pointer is over the rail. */
+.root:hover .edgeToggle,
+.root .edgeToggle:focus-visible {
+  color: var(--prime-color-text-primary);
+}
+
+.edgeChevron {
+  transition: rotate var(--sb-duration) var(--sb-ease);
+}
+
+.root[data-mode="compact"] .edgeChevron {
+  rotate: 180deg;
+}
+
+.root[data-mode="hidden"] .edgeToggle {
+  visibility: hidden;
 }
 
 /* --- Compact (desktop only) ---------------------------------------------------- */
 
+/* Collapsing: text leaves fast, before the rail is narrow; labels clip without an ellipsis. */
 .root[data-mode="compact"]:not([data-mobile]) .label,
 .root[data-mode="compact"]:not([data-mobile]) .shortcut,
 .root[data-mode="compact"]:not([data-mobile]) .groupLabel {
   opacity: 0;
+  text-overflow: clip;
+  transition:
+    opacity var(--sb-text-out) var(--prime-motion-easing-exit),
+    height var(--sb-duration) var(--sb-ease);
+}
+
+/* Group headings fold away in the rail, so groups keep only their gap — no empty rows. */
+.root[data-mode="compact"]:not([data-mobile]) .groupLabel {
+  height: 0;
 }
 
 /* The count leaves the row (still read by screen readers); a dot marks the icon's top-end corner. */
@@ -334,7 +405,7 @@
 
 .root[data-mobile] {
   width: 0;
-  overflow: visible;
+  clip-path: none;
   transition: none;
 }
 

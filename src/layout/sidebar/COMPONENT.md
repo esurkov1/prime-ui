@@ -24,7 +24,8 @@ import { Sidebar, useSidebar } from "prime-ui-kit";
 ## Anatomy
 ```
 Sidebar.Root                  rail wrapper; renders <nav> inside; size tier for items
-├─ Sidebar.Header             brand row
+├─ Sidebar.Header             brand row (fixed height)
+│  └─ Sidebar.Toggle variant="edge"  round toggle across the rail's outer edge
 ├─ Sidebar.Content            scrolling middle (ScrollContainer, edge fades, no scrollbar)
 │  └─ Sidebar.Group           role="group" with optional label
 │     └─ Sidebar.Item         <button> / <a> / asChild element
@@ -116,10 +117,11 @@ No ref. Key hint at the end (`aria-hidden`); hidden in compact mode.
 | `className` | `string` | — | Extra class. |
 
 ### Sidebar.Toggle
-`forwardRef` → `HTMLButtonElement`. Item-shaped toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.
+`forwardRef` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `variant` | `"item" \| "edge"` | `"item"` | `item` — a row in the rail. `edge` — a small round button across the rail's outer edge, level with `Sidebar.Header`, with a tooltip; its chevron turns with the mode. `edge` renders nothing off-canvas (the scrim and Escape close the panel). |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "aria-label" \| "aria-expanded" \| "aria-controls">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `className` and the other button attributes. |
 
 ### useSidebar()
@@ -163,7 +165,7 @@ The rail width does not depend on `size`.
 | `current` (Item) | surface fill + raised shadow, primary text and icon | the current page | off |
 | `disabled` (Item) | `text-disabled`, no hover, `cursor: not-allowed` | an unavailable section | off |
 
-Put `Sidebar.Toggle` in Footer for collapsible rails; on phones pair `responsive` with a menu button in `AppShell.Header` (`open` / `onOpenChange`). One current item at a time; give every item an icon when the rail can go compact.
+Put `Sidebar.Toggle` in Footer for collapsible rails, or `<Sidebar.Toggle variant="edge" />` in Header for a quiet round toggle on the rail's edge; on phones pair `responsive` with a menu button in `AppShell.Header` (`open` / `onOpenChange`). One current item at a time; give every item an icon when the rail can go compact.
 
 ## States
 | State | Driven by | DOM |
@@ -178,6 +180,8 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 ## Layout & spacing
 - Panel padding: `--prime-space-3` block, `--prime-space-2` inline; regions 8 apart; groups 16 apart, items 4 apart.
 - Item horizontal padding is derived from the compact width so icons sit in the same place in every mode.
+- Header is one row of the item height + 8; the edge toggle (20, round, canvas ring) is centred on it and straddles the outer edge. The root clips with `clip-path`, reaching past the edge by the toggle's half-width.
+- Motion: on collapse labels fade out fast before the rail narrows; on expand they fade in after a short delay, once the rail is wide. Group headings fold to zero height in compact mode.
 - Off-canvas panel width: min(sidebar width, 100% − `--prime-space-12`).
 - Inside `AppShell.Nav` the rail takes the full height.
 
@@ -212,6 +216,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 | [overview.tsx](examples/overview.tsx) | App navigation on the canvas: items with icons, the current page and a collapse toggle — `Sidebar.ItemIcon`, `current`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: item height, text, icon and counter follow the tier; the rail width stays — `size`. |
 | [structure.tsx](examples/structure.tsx) | Labelled groups and the optional item parts: a counter, a key hint and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `Sidebar.ItemShortcut`, `disabled`. |
+| [edge-toggle.tsx](examples/edge-toggle.tsx) | A small round toggle across the rail's outer edge, level with the header; its chevron turns with the mode — `Sidebar.Toggle`, `variant`. |
 | [router.tsx](examples/router.tsx) | A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; only the width animates — `mode`, `onModeChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | Below 768px the rail becomes an off-canvas panel with a scrim, opened from a menu button; narrow the window to try it — `open`, `onOpenChange`. |

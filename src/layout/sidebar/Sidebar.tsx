@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -463,17 +464,54 @@ SidebarItem.displayName = "Sidebar.Item";
 export type SidebarToggleProps = Omit<
   React.ComponentPropsWithoutRef<"button">,
   "children" | "aria-label" | "aria-expanded" | "aria-controls"
->;
+> & {
+  /**
+   * `item` — a row in the rail (also closes the off-canvas panel). `edge` — a round button on the
+   * rail's outer edge, level with the header; its chevron turns with the mode. The edge toggle is
+   * desktop-only: off-canvas the scrim and Escape close the panel.
+   */
+  variant?: "item" | "edge";
+};
 
 /**
- * Item-shaped toggle: expanded ↔ compact on desktop (hidden → expanded), closes the panel
- * off-canvas. Its label comes from `labels`.
+ * Toggles expanded ↔ compact on desktop (hidden → expanded) and closes the panel off-canvas. Its
+ * label comes from `labels`.
  */
 const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
-  function SidebarToggle({ className, onClick, ...rest }, ref) {
+  function SidebarToggle({ variant = "item", className, onClick, ...rest }, ref) {
     const { mode, isMobile, open, toggle, navId, labels } = useSidebar();
     const expanded = isMobile ? open : mode === "expanded";
     const label = isMobile ? labels.close : expanded ? labels.collapse : labels.expand;
+
+    if (variant === "edge") {
+      if (isMobile) return null;
+      return (
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <Button.Root
+              {...rest}
+              ref={ref}
+              variant="soft"
+              tone="neutral"
+              size="xs"
+              className={cx(styles.edgeToggle, className)}
+              aria-expanded={expanded}
+              aria-controls={navId}
+              aria-label={label}
+              onClick={(event) => {
+                onClick?.(event);
+                if (!event.defaultPrevented) toggle();
+              }}
+            >
+              <Button.Icon>
+                <Icon name="nav.chevronLeft" size="xs" className={styles.edgeChevron} />
+              </Button.Icon>
+            </Button.Root>
+          </Tooltip.Trigger>
+          <Tooltip.Content side="right">{label}</Tooltip.Content>
+        </Tooltip.Root>
+      );
+    }
 
     return (
       <CompactTooltip text={label}>

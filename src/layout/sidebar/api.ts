@@ -223,9 +223,16 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Toggle",
-      en: "`forwardRef` → `HTMLButtonElement`. Item-shaped toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.",
-      ru: "Переключатель в виде пункта: развернуть ↔ компактный на десктопе, закрыть выезжающую панель; подпись и иконка — из состояния и `labels`.",
+      en: "`forwardRef` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.",
+      ru: "Переключатель: развернуть ↔ компактный на десктопе, закрыть выезжающую панель; подпись и иконка — из состояния и `labels`.",
       props: [
+        {
+          name: "variant",
+          type: '"item" | "edge"',
+          default: '"item"',
+          en: "`item` — a row in the rail. `edge` — a small round button across the rail's outer edge, level with `Sidebar.Header`, with a tooltip; its chevron turns with the mode. `edge` renders nothing off-canvas (the scrim and Escape close the panel).",
+          ru: "`item` — пункт в рельсе. `edge` — маленькая круглая кнопка на внешней кромке рельса на уровне `Sidebar.Header`, с подсказкой; шеврон поворачивается вместе с режимом. На узком экране `edge` не рендерится — панель закрывают подложка и Escape.",
+        },
         {
           name: "…rest",
           type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "aria-label" | "aria-expanded" | "aria-controls">',

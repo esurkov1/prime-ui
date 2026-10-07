@@ -102,9 +102,11 @@ body {
   flex: 1 1 auto;
   align-items: center;
   gap: var(--prime-space-2);
+  align-self: stretch;
   min-width: 0;
-  min-height: var(--prime-control-l-height);
-  padding-inline: var(--prime-space-2);
+  /* Centres the mark in the compact rail, on the axis of the item icons. */
+  --brand-rail: calc(var(--prime-layout-sidebar-collapsed-width) - 2 * var(--prime-space-2));
+  padding-inline: calc((var(--brand-rail) - var(--prime-icon-l)) / 2);
   border-radius: var(--prime-radius-m);
   color: inherit;
   text-decoration: none;
@@ -137,6 +139,14 @@ body {
   flex-direction: column;
   min-width: 0;
   white-space: nowrap;
+  /* Same timing as the rail labels: back after the rail widens, gone before it narrows. */
+  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard)
+    var(--prime-motion-duration-fast);
+}
+
+[data-mode="compact"]:not([data-mobile]) .playgroundBrandText {
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
 /* Mobile header bar (menu + page title + search), rendered only on narrow viewports. */

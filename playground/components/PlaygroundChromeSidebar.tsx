@@ -1,13 +1,4 @@
-import {
-  Check,
-  Moon,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Search,
-  Square,
-  SquareStack,
-  Sun,
-} from "lucide-react";
+import { Check, Moon, Search, Square, SquareStack, Sun } from "lucide-react";
 import * as React from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
@@ -16,7 +7,7 @@ import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Kbd } from "@/components/kbd/Kbd";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Typography } from "@/components/typography/Typography";
-import { Sidebar, type SidebarMode, useSidebar } from "@/layout";
+import { Sidebar, type SidebarMode } from "@/layout";
 
 import {
   PLAYGROUND_INTRO,
@@ -94,14 +85,11 @@ function FooterButton({
   );
 }
 
-/** One row at the bottom of the rail: collapse, theme, preview surface. Stacks in compact mode. */
+/** One row at the bottom of the rail: theme and preview surface. Stacks in compact mode. */
 function FooterControls() {
-  const { mode, isMobile, open, toggle, navId, labels } = useSidebar();
   const { scheme, toggleScheme } = usePlaygroundTheme();
   const { surface, setSurface } = usePlaygroundPreviewTheme();
   const isDark = scheme === "dark";
-  const expanded = isMobile ? open : mode === "expanded";
-  const toggleLabel = isMobile ? labels.close : expanded ? labels.collapse : labels.expand;
   const themeLabel = isDark ? "Светлая тема" : "Тёмная тема";
   const active =
     PLAYGROUND_PREVIEW_SURFACES.find((s) => s.value === surface) ?? PLAYGROUND_PREVIEW_SURFACES[0];
@@ -109,15 +97,6 @@ function FooterControls() {
 
   return (
     <div className="playgroundSidebarFooter">
-      <FooterTip label={toggleLabel}>
-        <FooterButton
-          label={toggleLabel}
-          icon={expanded ? <PanelLeftClose /> : <PanelLeftOpen />}
-          aria-expanded={expanded}
-          aria-controls={navId}
-          onClick={toggle}
-        />
-      </FooterTip>
       <FooterTip label={themeLabel}>
         <FooterButton
           label={themeLabel}
@@ -188,6 +167,7 @@ export function PlaygroundChromeSidebar({
     >
       <Sidebar.Header>
         <Brand />
+        <Sidebar.Toggle variant="edge" />
       </Sidebar.Header>
       <Sidebar.Item
         aria-haspopup="dialog"

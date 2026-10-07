@@ -63,7 +63,7 @@
   font-weight: var(--prime-text-heading-m-weight);
   letter-spacing: var(--prime-text-heading-m-tracking);
   overflow-wrap: anywhere;
-  text-wrap: balance;
+  text-wrap-style: balance;
 }
 
 .description {
@@ -74,7 +74,7 @@
   line-height: var(--prime-text-body-m-line-height);
   font-weight: var(--prime-text-body-m-weight);
   overflow-wrap: anywhere;
-  text-wrap: pretty;
+  text-wrap-style: pretty;
 }
 
 /* When the content column is already inset by a parent, avoid a second measure column. */

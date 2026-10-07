@@ -18,13 +18,17 @@
   overflow-wrap: break-word;
 }
 
-/* Headings and titles balance their lines; reading text keeps natural rag. */
+/*
+ * Headings and titles balance their lines; reading text keeps natural rag. The longhand
+ * `text-wrap-style` keeps an inherited `white-space: nowrap` working; the `text-wrap` shorthand
+ * would reset it to `wrap`.
+ */
 .root:is([data-variant^="title-"], [data-variant^="heading-"], [data-variant^="display-"]) {
-  text-wrap: balance;
+  text-wrap-style: balance;
 }
 
 .root:is([data-variant^="body-"], [data-variant="caption"]) {
-  text-wrap: pretty;
+  text-wrap-style: pretty;
 }
 
 /* ─── Roles ─────────────────────────────────────────────────────────────── */
