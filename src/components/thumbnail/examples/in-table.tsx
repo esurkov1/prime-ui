@@ -79,12 +79,5 @@ const columns: DataTableColumn<Vehicle>[] = [
 ];
 
 export default function ThumbnailInTableExample() {
-  return (
-    <DataTable.Root
-      columns={columns}
-      rows={rows}
-      getRowKey={(row) => row.id}
-      showPagination={false}
-    />
-  );
+  return <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} paging="none" />;
 }

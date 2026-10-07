@@ -41,7 +41,6 @@ const NOT_CONVERTED = new Set([
   "color-picker",
   "color-swatches",
   "command-menu",
-  "data-table",
   "datepicker",
   "digit-input",
   "divider",

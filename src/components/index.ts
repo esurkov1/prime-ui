@@ -162,7 +162,7 @@ export type {
   DataTableColumn,
   DataTableLabels,
   DataTableOrder,
-  DataTableRootProps,
+  DataTableProps,
   DataTableSortState,
 } from "./data-table/DataTable";
 export { DataTable } from "./data-table/DataTable";

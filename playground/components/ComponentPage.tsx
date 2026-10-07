@@ -155,12 +155,11 @@ export function ComponentPage({ page }: { page: ComponentPageConfig }) {
           <div className="demoBlock">
             <DemoSectionTitle>Доступность</DemoSectionTitle>
             <DemoApiTitle>Клавиатура</DemoApiTitle>
-            <DataTable.Root
+            <DataTable
               columns={KEY_COLUMNS}
               rows={accessibility.keyboard}
               getRowKey={(row) => row.keys}
-              showPagination={false}
-              pageSize={accessibility.keyboard.length || 1}
+              paging="none"
               highlightRowOnHover={false}
               labels={{ empty: "Своих клавиш нет" }}
             />
@@ -177,12 +176,11 @@ export function ComponentPage({ page }: { page: ComponentPageConfig }) {
             {api.labels.length > 0 ? (
               <>
                 <DemoApiTitle>Системные строки (labels)</DemoApiTitle>
-                <DataTable.Root
+                <DataTable
                   columns={LABEL_COLUMNS}
                   rows={api.labels}
                   getRowKey={(row) => row.key}
-                  showPagination={false}
-                  pageSize={api.labels.length}
+                  paging="none"
                   highlightRowOnHover={false}
                 />
               </>

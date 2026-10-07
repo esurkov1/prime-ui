@@ -1,5 +1,4 @@
-/** `toolbar` above the table: search Input, SegmentedControl filter and an `s` action; `empty` when the filter finds nothing. Use for filterable lists; the row wraps on narrow widths. */
-
+/** A campaign list with search, a status filter and export above the table; the empty text when nothing matches — `toolbar`, `empty`. */
 import {
   Badge,
   Button,
@@ -16,14 +15,13 @@ import styles from "./examples.module.css";
 type Status = "active" | "paused" | "archived";
 type Campaign = { id: string; name: string; status: Status; clicks: number; ctr: number };
 
-const statusLabel: Record<Status, string> = {
-  active: "Активна",
-  paused: "Пауза",
-  archived: "Архив",
+const STATUS: Record<Status, { label: string; color: "green" | "orange" | "gray" }> = {
+  active: { label: "Активна", color: "green" },
+  paused: { label: "Пауза", color: "orange" },
+  archived: { label: "Архив", color: "gray" },
 };
-const statusColor = { active: "green", paused: "orange", archived: "gray" } as const;
 
-const rows: Campaign[] = [
+const CAMPAIGNS: Campaign[] = [
   { id: "c1", name: "Осенняя распродажа", status: "active", clicks: 18_420, ctr: 3.4 },
   { id: "c2", name: "Возврат корзины", status: "active", clicks: 6_105, ctr: 5.1 },
   { id: "c3", name: "Новые клиенты — поиск", status: "paused", clicks: 2_390, ctr: 1.8 },
@@ -33,10 +31,10 @@ const rows: Campaign[] = [
   { id: "c7", name: "Чёрная пятница — тизер", status: "active", clicks: 4_560, ctr: 2.2 },
 ];
 
-const int = new Intl.NumberFormat("ru-RU");
-const pct = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const INT = new Intl.NumberFormat("ru-RU");
+const PCT = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
-const columns: DataTableColumn<Campaign>[] = [
+const COLUMNS: DataTableColumn<Campaign>[] = [
   {
     id: "name",
     header: "Кампания",
@@ -50,7 +48,7 @@ const columns: DataTableColumn<Campaign>[] = [
     header: "Статус",
     accessor: "status",
     cell: (row) => (
-      <Badge.Root color={statusColor[row.status]}>{statusLabel[row.status]}</Badge.Root>
+      <Badge.Root color={STATUS[row.status].color}>{STATUS[row.status].label}</Badge.Root>
     ),
   },
   {
@@ -59,7 +57,7 @@ const columns: DataTableColumn<Campaign>[] = [
     accessor: "clicks",
     sortable: true,
     numeric: true,
-    cell: (row) => int.format(row.clicks),
+    cell: (row) => INT.format(row.clicks),
   },
   {
     id: "ctr",
@@ -67,41 +65,41 @@ const columns: DataTableColumn<Campaign>[] = [
     accessor: "ctr",
     sortable: true,
     numeric: true,
-    cell: (row) => pct.format(row.ctr),
+    cell: (row) => PCT.format(row.ctr),
   },
 ];
 
 export default function DataTableToolbarExample() {
   const [query, setQuery] = React.useState("");
-  const [status, setStatus] = React.useState<"all" | Status>("all");
+  const [status, setStatus] = React.useState("all");
 
-  const filtered = rows.filter(
+  const found = CAMPAIGNS.filter(
     (row) =>
       (status === "all" || row.status === status) &&
       row.name.toLowerCase().includes(query.trim().toLowerCase()),
   );
 
   return (
-    <DataTable.Root
-      columns={columns}
-      rows={filtered}
+    <DataTable
+      columns={COLUMNS}
+      rows={found}
       getRowKey={(row) => row.id}
       pageSize={5}
       empty="Ничего не найдено — измените запрос или фильтр"
       toolbar={
         <div className={styles.toolbar}>
-          <div className={`${styles.toolbarGroup} ${styles.toolbarGrow}`}>
+          <div className={styles.filters}>
             <Input.Root size="s" className={styles.search}>
               <Input.Wrapper>
                 <Input.Icon side="start">
-                  <Icon name="action.search" strokeWidth={2} />
+                  <Icon name="action.search" />
                 </Input.Icon>
                 <Input.Field
                   type="search"
                   placeholder="Поиск кампаний"
                   aria-label="Поиск кампаний"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onValueChange={setQuery}
                 />
               </Input.Wrapper>
             </Input.Root>
@@ -109,7 +107,7 @@ export default function DataTableToolbarExample() {
               size="s"
               aria-label="Статус"
               value={status}
-              onValueChange={(v) => setStatus(v as "all" | Status)}
+              onValueChange={setStatus}
             >
               <SegmentedControl.Item value="all">Все</SegmentedControl.Item>
               <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
