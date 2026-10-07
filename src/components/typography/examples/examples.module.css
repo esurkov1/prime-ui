@@ -9,6 +9,11 @@
   text-align: start;
 }
 
+/* inline-emphasis.tsx: a paragraph keeps inline flow, its spans must not become grid rows. */
+p.block {
+  display: block;
+}
+
 /* weights.tsx */
 .stack {
   display: grid;

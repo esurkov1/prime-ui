@@ -13,6 +13,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  /* A documentation block fills its column, also inside a centering flex parent. */
+  width: 100%;
   min-width: 0;
   max-width: 100%;
   padding: 0 var(--frame-padding) var(--frame-padding);
@@ -342,8 +344,14 @@
 .previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),
 .previewInner[data-preview-layout="stack"] > *:global(:has(table)) {
   align-self: stretch;
-  width: 100%;
   max-width: none;
+}
+
+/* Full width is a default only: a block with its own width (a 320 px phone column around a
+   DataTable or a Datepicker panel) keeps it and stays centered. */
+:where(.previewInner[data-preview-layout="stack"])
+  > :where(:global(:has([data-full-width="true"])), :global(:has(table))) {
+  width: 100%;
 }
 
 /*
@@ -373,10 +381,15 @@
 .previewInner[data-preview-layout="stack-narrow"] > * {
   flex: 0 1 auto;
   align-self: center;
-  width: 100%;
   min-width: 0;
   max-width: min(100%, calc(var(--prime-space-16) * 7));
   margin-inline: auto;
+}
+
+/* The column width is a default only: a block with its own width (a fit-content SegmentedControl,
+   DigitInput cells) keeps it and stays centered instead of stretching its track. */
+:where(.previewInner[data-preview-layout="stack-narrow"]) > * {
+  width: 100%;
 }
 
 /* Code tab: an explicit well (the previewed theme's canvas), same inset and radius as the stage. */

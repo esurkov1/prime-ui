@@ -1,6 +1,8 @@
 /** Row styling: zebra rows without lines, a column wash under the pointer, a headless key/value list — `striped`, `rowDividers`, `highlightColumnOnHover`, `columnDividers`, `showHeader`. */
 import { DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 
+import styles from "./examples.module.css";
+
 type Shift = { day: string; morning: number; evening: number; night: number };
 
 const SHIFTS: Shift[] = [
@@ -20,7 +22,7 @@ const COLUMNS: DataTableColumn<Shift>[] = [
 export default function DataTableAppearanceExample() {
   return (
     <>
-      <div>
+      <div className={styles.specimen}>
         <DataTable
           columns={COLUMNS}
           rows={SHIFTS}
@@ -32,7 +34,7 @@ export default function DataTableAppearanceExample() {
           striped · rowDividers=&#123;false&#125;
         </Typography>
       </div>
-      <div>
+      <div className={styles.specimen}>
         <DataTable
           columns={COLUMNS}
           rows={SHIFTS}
@@ -43,7 +45,7 @@ export default function DataTableAppearanceExample() {
           highlightColumnOnHover
         </Typography>
       </div>
-      <div>
+      <div className={styles.specimen}>
         <DataTable
           columns={COLUMNS}
           rows={SHIFTS}

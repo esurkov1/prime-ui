@@ -212,7 +212,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     },
     {
       segment: "size-tiers",
-      label: "Size tiers",
+      label: "Size Tiers",
       description: "Размеры xs–xl: высота, текст, иконка, радиус",
       keywords: ["размеры", "size", "xs", "xl", "высота", "control"],
       icon: Ruler,
@@ -395,7 +395,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     },
     {
       segment: "native-select",
-      label: "NativeSelect",
+      label: "Native Select",
       description: "Системный список выбора в виде поля",
       keywords: ["native", "select", "option", "системный", "мобильный", "селект"],
       icon: ChevronDown,
@@ -403,7 +403,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     },
     {
       segment: "tag-select",
-      label: "Tag select",
+      label: "Tag Select",
       description: "Множественный выбор с тегами",
       keywords: ["теги", "мультиселект", "multiselect", "value", "onValueChange"],
       icon: Tags,
@@ -411,7 +411,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     },
     {
       segment: "smart-filter",
-      label: "SmartFilter",
+      label: "Smart Filter",
       description: "Умные фильтры: панель значений, поиск и теги применённых фильтров",
       keywords: [
         "фильтры",
@@ -593,7 +593,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     },
     {
       segment: "empty-page",
-      label: "EmptyPage",
+      label: "Empty Page",
       description: "Пустое состояние страницы или блока",
       keywords: ["пусто", "пустое состояние", "empty state"],
       icon: Inbox,
@@ -687,7 +687,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
   layout: [
     {
       segment: "app-shell",
-      label: "AppShell",
+      label: "App Shell",
       description: "Каркас приложения: рельс навигации и панель контента",
       keywords: ["каркас", "оболочка", "layout", "nav", "header", "main", "fillViewport"],
       icon: LayoutTemplate,
@@ -703,7 +703,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     },
     {
       segment: "page-content",
-      label: "PageContent",
+      label: "Page Content",
       description: "Страница: заголовок, описание, действия, секции",
       keywords: ["страница", "заголовок", "секция", "title", "description", "actions"],
       icon: PanelTop,
@@ -727,7 +727,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     },
     {
       segment: "scroll-container",
-      label: "ScrollContainer",
+      label: "Scroll Container",
       description: "Прокручиваемая область с тонким скроллбаром",
       keywords: ["прокрутка", "скролл", "scroll", "axis"],
       icon: ScrollText,
@@ -745,7 +745,7 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
   infrastructure: [
     {
       segment: "example-frame",
-      label: "ExampleFrame",
+      label: "Example Frame",
       description: "Рамка примера: превью, код, вьюпорт",
       keywords: ["пример", "превью", "рамка", "viewport", "code"],
       icon: Frame,

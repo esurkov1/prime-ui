@@ -8,6 +8,27 @@
   min-width: 0;
 }
 
+/* sizes.tsx: one tier per block, its caption right under it, blocks apart. */
+.sizes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-8);
+  width: 100%;
+  min-width: 0;
+}
+
+.size {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.size > :first-child {
+  align-self: stretch;
+}
+
 /* A request row in the list: method, route (takes the room), service. */
 .request {
   display: flex;
