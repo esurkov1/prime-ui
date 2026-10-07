@@ -81,9 +81,6 @@
   border-radius: var(--prime-radius-full);
   box-shadow: var(--prime-shadow-overlay);
   cursor: grab;
-  transition:
-    width var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    height var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .thumb[data-dragging],
@@ -219,51 +216,6 @@
   color: var(--prime-color-text-muted);
 }
 
-/* ---- Swatches ---- */
-.swatchPicker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-space-2);
-  width: 100%;
-  min-width: 0;
-}
-
-.swatchItem {
-  flex-shrink: 0;
-  display: flex;
-  border-radius: var(--prime-radius-full);
-  outline: none;
-  cursor: pointer;
-  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.swatchItem[data-hovered]:not([data-disabled]) {
-  transform: scale(1.08);
-}
-
-.swatchItem[data-selected] {
-  outline: var(--prime-focus-width) solid var(--prime-color-accent-default);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.swatchItem[data-focus-visible] {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.swatchItem[data-disabled] {
-  cursor: not-allowed;
-  filter: grayscale(1);
-}
-
-.swatch {
-  box-sizing: border-box;
-  width: var(--prime-icon-l);
-  height: var(--prime-icon-l);
-  border-radius: var(--prime-radius-full);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
-}
-
 /* ---- Trigger swatch (inside a button) ---- */
 .triggerSwatch {
   position: relative;
@@ -286,79 +238,6 @@
   border-radius: inherit;
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
   pointer-events: none;
-}
-
-.triggerSwatchSvg {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* ---- RAC ColorField (field system, tier m) ---- */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-control-m-label-gap);
-  min-width: 0;
-}
-
-.field :global(.react-aria-Label) {
-  font-size: var(--prime-control-m-label-size);
-  line-height: var(--prime-control-m-label-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  color: var(--prime-color-text-primary);
-}
-
-.field :global(.react-aria-Input) {
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  height: var(--prime-control-m-height);
-  margin: 0;
-  padding-inline: var(--prime-control-m-field-padding-x);
-  border: 0;
-  border-radius: var(--prime-control-m-radius);
-  background: var(--prime-color-field-bg);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  color: var(--prime-color-text-primary);
-  font: inherit;
-  font-size: var(--prime-control-m-text-size);
-  line-height: var(--prime-control-m-line-height);
-  font-variant-numeric: tabular-nums;
-  outline: none;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.field :global(.react-aria-Input[data-hovered]):not([data-focused]) {
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
-}
-
-.field :global(.react-aria-Input[data-focus-visible]),
-.field :global(.react-aria-Input[data-focused]) {
-  background: var(--prime-color-field-bg-focus);
-}
-
-/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
-.field:not([data-focus-ring="false"]) :global(.react-aria-Input[data-focus-visible]),
-.field:not([data-focus-ring="false"]) :global(.react-aria-Input[data-focused]) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.field[data-invalid] :global(.react-aria-Input) {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-.field[data-invalid] :global(.react-aria-Input[data-focused]) {
-  outline-color: var(--prime-color-danger-border);
-}
-
-.field[data-disabled] :global(.react-aria-Input) {
-  background: var(--prime-color-field-bg-disabled);
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
 }
 
 /* ---- Standalone eyedropper: square, same height as a field ---- */

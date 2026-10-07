@@ -31,8 +31,10 @@ describe("FileUpload", () => {
     expect(label).toHaveAttribute("data-variant", "solid");
   });
 
-  it("renders built-in texts from labels; an empty hint is hidden", () => {
-    render(<FileUpload.Root labels={{ title: "Drop a file", hint: "", browse: "Browse" }} />);
+  it("renders built-in texts from labels; an empty description is hidden", () => {
+    render(
+      <FileUpload.Root labels={{ title: "Drop a file", description: "", browse: "Browse" }} />,
+    );
 
     expect(screen.getByText("Drop a file")).toBeInTheDocument();
     expect(screen.getByText("Browse")).toBeInTheDocument();
@@ -133,20 +135,37 @@ describe("FileUpload", () => {
     expect(screen.queryByText(/Выберите файл или перетащите/i)).not.toBeInTheDocument();
   });
 
-  it("renders file item row with format badge", () => {
+  it("renders file item row with a decorative kit Badge and a progress bar", () => {
     render(
       <FileUpload.Item>
-        <FileUpload.ItemRow>
-          <FileUpload.FormatBadge format="pdf" color="red" />
-          <FileUpload.ItemMain>
-            <FileUpload.ItemName>report.pdf</FileUpload.ItemName>
-          </FileUpload.ItemMain>
-        </FileUpload.ItemRow>
+        <FileUpload.FormatBadge format="pdf" color="red" />
+        <FileUpload.ItemName>report.pdf</FileUpload.ItemName>
+        <FileUpload.ItemDescription>1,2 МБ</FileUpload.ItemDescription>
+        <FileUpload.ItemProgress value={40} />
       </FileUpload.Item>,
     );
 
-    expect(screen.getByText("PDF")).toBeInTheDocument();
+    const badge = screen.getByText("PDF");
+    expect(badge).toHaveAttribute("data-color", "red");
+    expect(badge).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByText("report.pdf")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+  });
+
+  it("names the input by the field label and describes it by the error", () => {
+    const { container } = render(
+      <FileUpload.Root
+        label="Скан договора"
+        required
+        hint="PDF до 20 МБ"
+        error="Файл больше 20 МБ"
+      />,
+    );
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(input).toHaveAccessibleName("Скан договора");
+    expect(input).toHaveAccessibleDescription("Файл больше 20 МБ");
+    expect(input).toBeRequired();
+    expect(input).toHaveAttribute("aria-invalid", "true");
   });
 
   it("sets data-size on file item", () => {

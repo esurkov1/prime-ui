@@ -1,4 +1,4 @@
-/** A round drop zone around an Avatar that accepts images and shows a preview; buttons open the same input via `inputRef`. Use it for profile photos. */
+/** A round zone around an Avatar that takes images and shows a preview; buttons open the same input — `inputRef`, `accept`, `className`. */
 import { Avatar, Button, FileUpload, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -41,16 +41,11 @@ export default function FileUploadAvatarUploadExample() {
           </Typography.Root>
         </div>
         <div className={styles.avatarActions}>
-          <Button.Root
-            variant="soft"
-            tone="neutral"
-            size="s"
-            onClick={() => inputRef.current?.click()}
-          >
+          <Button.Root variant="soft" tone="neutral" onClick={() => inputRef.current?.click()}>
             {preview ? "Заменить" : "Загрузить"}
           </Button.Root>
           {preview ? (
-            <Button.Root variant="ghost" tone="danger" size="s" onClick={() => setPreview(null)}>
+            <Button.Root variant="ghost" tone="danger" onClick={() => setPreview(null)}>
               Удалить
             </Button.Root>
           ) : null}

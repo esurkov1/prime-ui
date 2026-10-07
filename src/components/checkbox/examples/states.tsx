@@ -1,29 +1,48 @@
-/** Unchecked, checked, indeterminate, invalid and disabled checkboxes. Use it as a reference for every visual state. */
+/** Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `invalid`, `disabled`. */
 import { Checkbox } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
 
 export default function CheckboxStatesExample() {
   return (
-    <div className={styles.stack}>
-      <Checkbox.Root>
-        <Checkbox.Label>Не отмечен</Checkbox.Label>
-      </Checkbox.Root>
-      <Checkbox.Root defaultChecked>
-        <Checkbox.Label>Отмечен</Checkbox.Label>
-      </Checkbox.Root>
-      <Checkbox.Root indeterminate>
-        <Checkbox.Label>Частично (indeterminate)</Checkbox.Label>
-      </Checkbox.Root>
-      <Checkbox.Root invalid>
-        <Checkbox.Label>Ошибка</Checkbox.Label>
-      </Checkbox.Root>
-      <Checkbox.Root disabled>
-        <Checkbox.Label>Недоступен</Checkbox.Label>
-      </Checkbox.Root>
-      <Checkbox.Root disabled defaultChecked>
-        <Checkbox.Label>Недоступен, отмечен</Checkbox.Label>
-      </Checkbox.Root>
-    </div>
+    <>
+      <div>
+        <div>
+          <Checkbox.Root>
+            <Checkbox.Label>unchecked</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
+        <div>
+          <Checkbox.Root defaultChecked>
+            <Checkbox.Label>checked</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
+        <div>
+          <Checkbox.Root indeterminate>
+            <Checkbox.Label>indeterminate</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
+        <div>
+          <Checkbox.Root invalid>
+            <Checkbox.Label>invalid</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
+      </div>
+      <div>
+        <div>
+          <Checkbox.Root disabled>
+            <Checkbox.Label>disabled</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
+        <div>
+          <Checkbox.Root disabled defaultChecked>
+            <Checkbox.Label>disabled · checked</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
+        <div>
+          <Checkbox.Root disabled indeterminate>
+            <Checkbox.Label>disabled · indeterminate</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
+      </div>
+    </>
   );
 }

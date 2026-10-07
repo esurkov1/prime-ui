@@ -11,7 +11,7 @@ const presets = [
 
 describe("ColorSwatches", () => {
   it("renders a radiogroup with one radio per preset and checks the value", () => {
-    render(<ColorSwatches.Root presets={presets} defaultValue="#22C55E" aria-label="Цвет этапа" />);
+    render(<ColorSwatches presets={presets} defaultValue="#22C55E" aria-label="Цвет этапа" />);
     expect(screen.getByRole("radiogroup", { name: "Цвет этапа" })).toBeInTheDocument();
     expect(screen.getAllByRole("radio")).toHaveLength(3);
     expect(screen.getByRole("radio", { name: "Зелёный" })).toHaveAttribute("aria-checked", "true");
@@ -19,14 +19,14 @@ describe("ColorSwatches", () => {
 
   it("selects on click and calls onValueChange", () => {
     const onValueChange = vi.fn();
-    render(<ColorSwatches.Root presets={presets} onValueChange={onValueChange} />);
+    render(<ColorSwatches presets={presets} onValueChange={onValueChange} />);
     fireEvent.click(screen.getByRole("radio", { name: "Синий" }));
     expect(onValueChange).toHaveBeenCalledWith("#5068f5");
     expect(screen.getByRole("radio", { name: "Синий" })).toHaveAttribute("aria-checked", "true");
   });
 
   it("moves and selects with arrow keys, Home and End (roving tabindex)", () => {
-    render(<ColorSwatches.Root presets={presets} defaultValue="#ef4444" />);
+    render(<ColorSwatches presets={presets} defaultValue="#ef4444" />);
     const red = screen.getByRole("radio", { name: "Красный" });
     expect(red).toHaveAttribute("tabindex", "0");
     red.focus();
@@ -41,7 +41,7 @@ describe("ColorSwatches", () => {
 
   it("adds a no-color swatch with allowEmpty and submits through a hidden input", () => {
     const { container } = render(
-      <ColorSwatches.Root presets={presets} defaultValue="#ef4444" allowEmpty name="color" />,
+      <ColorSwatches presets={presets} defaultValue="#ef4444" allowEmpty name="color" />,
     );
     fireEvent.click(screen.getByRole("radio", { name: "Без цвета" }));
     const input = container.querySelector('input[type="hidden"][name="color"]');
@@ -49,15 +49,21 @@ describe("ColorSwatches", () => {
   });
 
   it("takes label, hint and error like other fields", () => {
-    render(<ColorSwatches.Root presets={presets} label="Цвет" required error="Выберите цвет" />);
+    render(<ColorSwatches presets={presets} label="Цвет" required error="Выберите цвет" />);
     const group = screen.getByRole("radiogroup", { name: "Цвет" });
     expect(group).toHaveAttribute("aria-invalid", "true");
     expect(group).toHaveAttribute("aria-required", "true");
     expect(group).toHaveAccessibleDescription("Выберите цвет");
   });
 
+  it("draws the check icon only on the selected swatch", () => {
+    render(<ColorSwatches presets={presets} defaultValue="#5068f5" />);
+    expect(screen.getByRole("radio", { name: "Синий" }).querySelectorAll("svg")).toHaveLength(2);
+    expect(screen.getByRole("radio", { name: "Красный" }).querySelectorAll("svg")).toHaveLength(1);
+  });
+
   it("disables every swatch", () => {
-    render(<ColorSwatches.Root presets={presets} disabled />);
+    render(<ColorSwatches presets={presets} disabled />);
     for (const radio of screen.getAllByRole("radio")) expect(radio).toBeDisabled();
   });
 });

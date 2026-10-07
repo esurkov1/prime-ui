@@ -1,4 +1,4 @@
-/** Sign-up: five fields in one column, the password confirmation checked on the client, the error of the field shown under it. Use it for a self-service account. */
+/** Sign-up: five fields in one column, a password mismatch shown as the field error — `error`, `LoginForm.Form`. */
 import { Send } from "lucide-react";
 import { Button, Divider, Input, LinkButton, LoginForm } from "prime-ui-kit";
 import * as React from "react";
@@ -21,14 +21,14 @@ export default function LoginFormRegisterExample() {
           <LoginForm.Description>Создайте аккаунт за минуту</LoginForm.Description>
         </LoginForm.Header>
         <LoginForm.Body>
-          <LoginForm.Social>
+          <LoginForm.Actions>
             <Button.Root variant="outline" tone="neutral" fullWidth>
               <Button.Icon>
                 <Send />
               </Button.Icon>
               Продолжить через Telegram
             </Button.Root>
-          </LoginForm.Social>
+          </LoginForm.Actions>
           <Divider.Root>или</Divider.Root>
           <LoginForm.Form onSubmit={(e) => e.preventDefault()}>
             <Input.Root label="Ваше имя" required>

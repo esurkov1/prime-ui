@@ -14,8 +14,6 @@ export type LabelLabels = {
 
 const LABEL_LABELS: LabelLabels = { optional: "необязательно" };
 
-const LabelSizeContext = React.createContext<ControlSize>("m");
-
 export type LabelRootProps = Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size"> & {
   disabled?: boolean;
   size?: ControlSize;
@@ -36,7 +34,8 @@ const LabelRoot = React.forwardRef<HTMLLabelElement, LabelRootProps>(
       {...rest}
       {...toDataAttributes({ disabled: disabled || undefined, size })}
     >
-      <LabelSizeContext.Provider value={size}>
+      {/* `Label.Icon` (and any kit icon inside) takes the label tier. */}
+      <ControlSizeProvider value={size}>
         {children}
         {required ? (
           <span className={styles.asterisk} aria-hidden="true">
@@ -46,34 +45,29 @@ const LabelRoot = React.forwardRef<HTMLLabelElement, LabelRootProps>(
         {optional ? (
           <span className={styles.optional}>{labels?.optional ?? LABEL_LABELS.optional}</span>
         ) : null}
-      </LabelSizeContext.Provider>
+      </ControlSizeProvider>
     </label>
   ),
 );
-LabelRoot.displayName = "LabelRoot";
+LabelRoot.displayName = "Label.Root";
 
-function LabelIcon({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
-  const size = React.useContext(LabelSizeContext);
-  return (
-    <span className={cx(styles.iconSlot, className)} {...rest}>
-      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-    </span>
-  );
+export type LabelIconProps = React.HTMLAttributes<HTMLSpanElement>;
+
+function LabelIcon({ className, ...rest }: LabelIconProps) {
+  return <span className={cx(styles.icon, className)} aria-hidden="true" {...rest} />;
 }
-LabelIcon.displayName = "LabelIcon";
+LabelIcon.displayName = "Label.Icon";
+
+export type LabelDescriptionProps = React.HTMLAttributes<HTMLSpanElement>;
 
 /** Secondary inline text inside the label (units, short clarification). */
-function LabelSub({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
-  return (
-    <span className={cx(styles.sub, className)} {...rest}>
-      {children}
-    </span>
-  );
+function LabelDescription({ className, ...rest }: LabelDescriptionProps) {
+  return <span className={cx(styles.description, className)} {...rest} />;
 }
-LabelSub.displayName = "LabelSub";
+LabelDescription.displayName = "Label.Description";
 
 export const Label = {
   Root: LabelRoot,
   Icon: LabelIcon,
-  Sub: LabelSub,
+  Description: LabelDescription,
 };

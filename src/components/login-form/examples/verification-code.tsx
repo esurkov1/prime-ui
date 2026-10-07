@@ -1,6 +1,6 @@
-/** Second step with a one-time code: DigitInput inside the form, a rejected code turns the cells and the hint to danger, resend and back are quiet actions. Use it after e-mail or SMS confirmation. */
+/** The second step with a one-time code: a rejected code shows its error under the cells, resend is a quiet action — `DigitInput`, `LoginForm.Actions`. */
 import { MailCheck } from "lucide-react";
-import { Button, DigitInput, Hint, LinkButton, LoginForm } from "prime-ui-kit";
+import { Button, DigitInput, LinkButton, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -8,7 +8,6 @@ import styles from "./examples.module.css";
 export default function LoginFormVerificationCodeExample() {
   const [code, setCode] = React.useState("");
   const [invalid, setInvalid] = React.useState(false);
-  const hintId = React.useId();
 
   return (
     <div className={styles.stage}>
@@ -27,27 +26,19 @@ export default function LoginFormVerificationCodeExample() {
               setInvalid(code !== "123456");
             }}
           >
-            <div className={styles.code}>
-              <DigitInput.Root
-                length={6}
-                size="l"
-                fullWidth
-                groupSize={3}
-                value={code}
-                invalid={invalid}
-                aria-describedby={invalid ? hintId : undefined}
-                onValueChange={(value) => {
-                  setCode(value);
-                  setInvalid(false);
-                }}
-                labels={{ group: "Код из письма" }}
-              />
-              {invalid ? (
-                <Hint.Root id={hintId} invalid>
-                  Неверный код. Проверьте письмо и попробуйте ещё раз
-                </Hint.Root>
-              ) : null}
-            </div>
+            <DigitInput
+              length={6}
+              size="l"
+              fullWidth
+              groupSize={3}
+              value={code}
+              error={invalid ? "Неверный код. Проверьте письмо и попробуйте ещё раз" : undefined}
+              onValueChange={(value) => {
+                setCode(value);
+                setInvalid(false);
+              }}
+              labels={{ group: "Код из письма" }}
+            />
             <LoginForm.Actions>
               <Button.Root type="submit" fullWidth disabled={code.length < 6}>
                 Подтвердить

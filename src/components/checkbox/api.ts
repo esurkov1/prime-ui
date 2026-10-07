@@ -1,0 +1,149 @@
+import type { ComponentApi } from "../../../scripts/docs/componentApi";
+
+export const api: ComponentApi = {
+  parts: [
+    {
+      name: "Checkbox.Root",
+      en: "`forwardRef` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row; native input props go to the input.",
+      ru: "Поле: строка-`<label>` с нативным input и квадратом, под ней подсказка или ошибка; нативные пропсы уходят в input.",
+      props: [
+        {
+          name: "checked",
+          type: "boolean",
+          en: "Controlled checked state.",
+          ru: "Управляемое состояние.",
+        },
+        {
+          name: "defaultChecked",
+          type: "boolean",
+          default: "false",
+          en: "Initial state when uncontrolled.",
+          ru: "Начальное состояние без контроля.",
+        },
+        {
+          name: "onCheckedChange",
+          type: "(checked: boolean) => void",
+          en: "Called with the new state on every toggle.",
+          ru: "Новое состояние при каждом переключении.",
+        },
+        {
+          name: "indeterminate",
+          type: "boolean",
+          default: "false",
+          en: "Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`.",
+          ru: "Частичный выбор («выбрать все»): полоска вместо галочки; важнее `checked`.",
+        },
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          default: '"m"',
+          en: "Tier of the box, the text and the gap.",
+          ru: "Ярус квадрата, текста и отступа.",
+        },
+        {
+          name: "hint",
+          type: "ReactNode",
+          en: "Help text under the label text. Hidden while `error` is shown.",
+          ru: "Подсказка под текстом; скрывается, пока показан `error`.",
+        },
+        {
+          name: "error",
+          type: "ReactNode",
+          en: "Error message in the hint slot; implies `invalid`.",
+          ru: "Текст ошибки на месте подсказки; включает `invalid`.",
+        },
+        {
+          name: "invalid",
+          type: "boolean",
+          default: "false",
+          en: "Danger ring on the unchecked box and `aria-invalid`. A non-empty `error` implies it.",
+          ru: "Ошибка без текста: красное кольцо у неотмеченного квадрата, `aria-invalid`.",
+        },
+        {
+          name: "disabled",
+          type: "boolean",
+          default: "false",
+          en: "Disabled fill, dimmed label and hint, no toggling.",
+          ru: "Неактивный вид, приглушённые подпись и подсказка, без переключения.",
+        },
+        {
+          name: "id",
+          type: "string",
+          en: "Id of the input (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
+          ru: "Id input; иначе генерируется. Связывает подпись, подсказку и ошибку.",
+        },
+        {
+          name: "aria-describedby",
+          type: "string",
+          en: "Merged before the hint/error ids.",
+          ru: "Добавляется перед id подсказки и ошибки.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "`Checkbox.Label`. Without it only the box renders — give the root an `aria-label`.",
+          ru: "`Checkbox.Label`. Без него — только квадрат; задайте `aria-label`.",
+        },
+        {
+          name: "className",
+          type: "string",
+          en: "Class on the field `<div>`.",
+          ru: "Класс на `<div>` поля.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange">',
+          en: "`name`, `value`, `required`, `aria-label`, `onBlur`… on the native input.",
+          ru: "`name`, `value`, `required`, `aria-label`… на нативном input.",
+        },
+      ],
+    },
+    {
+      name: "Checkbox.Label",
+      en: "`ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.",
+      ru: "Видимый текст в колонке текста строки-подписи.",
+      props: [],
+    },
+    {
+      name: "Checkbox.Indicator",
+      en: '`ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.',
+      ru: "Квадрат без input (`aria-hidden`) для строк, которые сами несут состояние: `option` + `aria-selected`, `menuitemcheckbox` + `aria-checked`.",
+      props: [
+        {
+          name: "checked",
+          type: "boolean",
+          default: "false",
+          en: "Shows the check.",
+          ru: "Показывает галочку.",
+        },
+        {
+          name: "indeterminate",
+          type: "boolean",
+          default: "false",
+          en: "Shows the bar; wins over `checked`.",
+          ru: "Показывает полоску; важнее `checked`.",
+        },
+        {
+          name: "disabled",
+          type: "boolean",
+          default: "false",
+          en: "Disabled fill.",
+          ru: "Неактивная заливка.",
+        },
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          en: "Box tier; without it the nearest control size (the Select or menu it sits in), else `m`.",
+          ru: "Ярус квадрата; без него — ярус ближайшего контрола, иначе `m`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className`, `data-*` and the other span attributes.",
+          ru: "`className`, `data-*` и остальные атрибуты span.",
+        },
+      ],
+    },
+  ],
+  labels: [],
+};

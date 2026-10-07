@@ -1,4 +1,4 @@
-/** Password reset request: one field, the primary action and a quiet way back. Use `Actions` for a primary button with a ghost companion. */
+/** Password reset request: one field, the primary action and a quiet way back — `LoginForm.Actions`. */
 import { KeyRound } from "lucide-react";
 import { Button, Input, LoginForm } from "prime-ui-kit";
 

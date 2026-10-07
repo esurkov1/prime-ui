@@ -1,9 +1,8 @@
 /*
- * Form field system (foundation §4, §6, §7). Select, Datepicker and TagSelect match this file:
- *   label  → tier label size, weight 500, primary;          gap to field = `label-gap`
- *   field  → fill-based, no visible border, tier height/padding/radius/text
- *   support row (hint | error · counter) → tier hint size;  gap to field = `hint-gap`
- * Tier variables live on `.root[data-size]` and cascade into Wrapper/Field.
+ * Form field system (foundation §4, §6, §7). Label row and support row come from FieldFrame and
+ * FieldSupport; this file is the field itself: fill-based, no visible border, tier
+ * height / padding / radius / text. Tier variables live on `.root[data-size]` and cascade into
+ * Wrapper / Field. Select, Datepicker and TagSelect triggers match it.
  */
 
 /* ---- Root ---- */
@@ -15,19 +14,7 @@
   --prime-input-radius: var(--prime-control-m-radius);
   --prime-input-text: var(--prime-control-m-text-size);
   --prime-input-line-height: var(--prime-control-m-line-height);
-  --prime-input-label-size: var(--prime-control-m-label-size);
-  --prime-input-label-line-height: var(--prime-control-m-label-line-height);
-  --prime-input-hint-size: var(--prime-control-m-hint-size);
-  --prime-input-hint-line-height: var(--prime-control-m-hint-line-height);
-  --prime-input-label-gap: var(--prime-control-m-label-gap);
-  --prime-input-hint-gap: var(--prime-control-m-hint-gap);
-  box-sizing: border-box;
   width: 100%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-input-label-gap);
-  font-family: var(--prime-font-family-sans);
 }
 
 .root[data-size="xs"] {
@@ -38,12 +25,6 @@
   --prime-input-radius: var(--prime-control-xs-radius);
   --prime-input-text: var(--prime-control-xs-text-size);
   --prime-input-line-height: var(--prime-control-xs-line-height);
-  --prime-input-label-size: var(--prime-control-xs-label-size);
-  --prime-input-label-line-height: var(--prime-control-xs-label-line-height);
-  --prime-input-hint-size: var(--prime-control-xs-hint-size);
-  --prime-input-hint-line-height: var(--prime-control-xs-hint-line-height);
-  --prime-input-label-gap: var(--prime-control-xs-label-gap);
-  --prime-input-hint-gap: var(--prime-control-xs-hint-gap);
 }
 
 .root[data-size="s"] {
@@ -54,12 +35,6 @@
   --prime-input-radius: var(--prime-control-s-radius);
   --prime-input-text: var(--prime-control-s-text-size);
   --prime-input-line-height: var(--prime-control-s-line-height);
-  --prime-input-label-size: var(--prime-control-s-label-size);
-  --prime-input-label-line-height: var(--prime-control-s-label-line-height);
-  --prime-input-hint-size: var(--prime-control-s-hint-size);
-  --prime-input-hint-line-height: var(--prime-control-s-hint-line-height);
-  --prime-input-label-gap: var(--prime-control-s-label-gap);
-  --prime-input-hint-gap: var(--prime-control-s-hint-gap);
 }
 
 .root[data-size="l"] {
@@ -70,12 +45,6 @@
   --prime-input-radius: var(--prime-control-l-radius);
   --prime-input-text: var(--prime-control-l-text-size);
   --prime-input-line-height: var(--prime-control-l-line-height);
-  --prime-input-label-size: var(--prime-control-l-label-size);
-  --prime-input-label-line-height: var(--prime-control-l-label-line-height);
-  --prime-input-hint-size: var(--prime-control-l-hint-size);
-  --prime-input-hint-line-height: var(--prime-control-l-hint-line-height);
-  --prime-input-label-gap: var(--prime-control-l-label-gap);
-  --prime-input-hint-gap: var(--prime-control-l-hint-gap);
 }
 
 .root[data-size="xl"] {
@@ -86,29 +55,6 @@
   --prime-input-radius: var(--prime-control-xl-radius);
   --prime-input-text: var(--prime-control-xl-text-size);
   --prime-input-line-height: var(--prime-control-xl-line-height);
-  --prime-input-label-size: var(--prime-control-xl-label-size);
-  --prime-input-label-line-height: var(--prime-control-xl-label-line-height);
-  --prime-input-hint-size: var(--prime-control-xl-hint-size);
-  --prime-input-hint-line-height: var(--prime-control-xl-hint-line-height);
-  --prime-input-label-gap: var(--prime-control-xl-label-gap);
-  --prime-input-hint-gap: var(--prime-control-xl-hint-gap);
-}
-
-/* ---- Header: label, then the optional marker right after it (same as Label.Root optional) ---- */
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: var(--prime-space-1);
-  min-width: 0;
-}
-
-/* ---- Body: field + support row ---- */
-.body {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-input-hint-gap);
 }
 
 /* ---- Wrapper (the visible field) ---- */
@@ -315,21 +261,6 @@
 }
 
 /*
- * ---- Badge (Input.Badge) ----
- * Trailing order: value · unit · badge · icon · clear · affix section. Like an icon it sits padX
- * from the text and padX from the edge (foundation §6); it never shrinks, the value truncates.
- */
-.badge {
-  order: 2;
-  margin-inline-start: calc(var(--prime-input-padding-x) - var(--prime-input-gap));
-}
-
-/* Gray soft is a wash like the field: a stronger wash keeps a neutral badge visible (§4). */
-.badge[data-color="gray"]:not([data-disabled="true"]) {
-  background: var(--prime-color-fill-strong);
-}
-
-/*
  * ---- Trailing action (clear): a segment ----
  * Full field height, flush with the end edge; the icon is centred with padX on both sides, so the
  * icon → edge distance stays padX (foundation §6) while the whole segment is the hit area and takes
@@ -361,11 +292,6 @@
     color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* An end affix section follows: the segment is no longer at the edge, keep the end padding. */
-.wrapper:has(> .action):has(> .affix[data-side="end"]) .action {
-  margin-inline-end: 0;
-}
-
 .action > svg {
   display: block;
   width: calc(var(--prime-input-icon) - var(--prime-space-1));
@@ -391,52 +317,4 @@
   color: var(--prime-color-text-disabled);
   background: transparent;
   cursor: not-allowed;
-}
-
-/* ---- Support row: hint | error (same slot) · counter (right) ---- */
-.meta {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.meta[data-reserve="true"] {
-  min-height: var(--prime-input-hint-line-height);
-}
-
-.metaHint {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.metaCounter {
-  flex-shrink: 0;
-}
-
-.counter {
-  display: block;
-  font-size: var(--prime-input-hint-size);
-  line-height: var(--prime-input-hint-line-height);
-  font-variant-numeric: tabular-nums;
-  color: var(--prime-color-text-muted);
-  white-space: nowrap;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.counter[data-invalid="true"] {
-  color: var(--prime-color-danger-text);
-}
-
-.srOnly {
-  position: absolute;
-  width: var(--prime-border-width);
-  height: var(--prime-border-width);
-  padding: 0;
-  margin: calc(-1 * var(--prime-border-width));
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
 }

@@ -119,8 +119,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "`Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `Badge`, `ClearButton`.",
-          ru: "`Field`, `Icon`, `Affix`, `InlineAffix`, `Badge`, `ClearButton`.",
+          en: "`Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `ClearButton`.",
+          ru: "`Field`, `Icon`, `Affix`, `InlineAffix`, `ClearButton`.",
         },
         {
           name: "className",
@@ -202,27 +202,6 @@ export const api: ComponentApi = {
           required: true,
           en: "Short unit: `₽`, `%`, `кг`.",
           ru: "Короткая единица: `₽`, `%`, `кг`.",
-        },
-        className("<span>"),
-      ],
-    },
-    {
-      name: "Input.Badge",
-      en: "No ref. Soft palette badge one tier below the field, at the trailing edge.",
-      props: [
-        {
-          name: "color",
-          type: '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"',
-          default: '"gray"',
-          en: "Palette hue of the soft badge.",
-          ru: "Цвет палитры мягкого бейджа.",
-        },
-        {
-          name: "children",
-          type: "ReactNode",
-          required: true,
-          en: "Short status text.",
-          ru: "Короткий статус: «Проверен», «Новое».",
         },
         className("<span>"),
       ],

@@ -1,31 +1,43 @@
-/** Off, on, disabled in both positions, read-only and invalid switches. Use it as a reference for every visual state. */
+/** Every state side by side, each labelled by its prop — `checked`, `readOnly`, `invalid`, `disabled`. */
 import { Switch } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
 
 export default function SwitchStatesExample() {
   return (
-    <div className={styles.grid}>
-      <Switch.Root>
-        <Switch.Label>Выключен</Switch.Label>
-      </Switch.Root>
-      <Switch.Root defaultChecked>
-        <Switch.Label>Включён</Switch.Label>
-      </Switch.Root>
-      <Switch.Root disabled>
-        <Switch.Label>Отключён, выкл.</Switch.Label>
-      </Switch.Root>
-      <Switch.Root defaultChecked disabled>
-        <Switch.Label>Отключён, вкл.</Switch.Label>
-      </Switch.Root>
-      <Switch.Root defaultChecked readOnly>
-        <Switch.Label>Только чтение</Switch.Label>
-        <Switch.Hint>Меняет администратор.</Switch.Hint>
-      </Switch.Root>
-      <Switch.Root>
-        <Switch.Label>Ошибка</Switch.Label>
-        <Switch.Error>Включите, чтобы продолжить.</Switch.Error>
-      </Switch.Root>
-    </div>
+    <>
+      <div>
+        <div>
+          <Switch.Root>
+            <Switch.Label>unchecked</Switch.Label>
+          </Switch.Root>
+        </div>
+        <div>
+          <Switch.Root defaultChecked>
+            <Switch.Label>checked</Switch.Label>
+          </Switch.Root>
+        </div>
+        <div>
+          <Switch.Root defaultChecked readOnly>
+            <Switch.Label>readOnly</Switch.Label>
+          </Switch.Root>
+        </div>
+        <div>
+          <Switch.Root invalid>
+            <Switch.Label>invalid</Switch.Label>
+          </Switch.Root>
+        </div>
+      </div>
+      <div>
+        <div>
+          <Switch.Root disabled>
+            <Switch.Label>disabled</Switch.Label>
+          </Switch.Root>
+        </div>
+        <div>
+          <Switch.Root disabled defaultChecked>
+            <Switch.Label>disabled · checked</Switch.Label>
+          </Switch.Root>
+        </div>
+      </div>
+    </>
   );
 }

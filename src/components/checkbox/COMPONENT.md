@@ -1,8 +1,9 @@
 # Checkbox
 
 **Category:** selection
+**Kind:** control
 
-> A checkbox for an independent yes/no choice that submits with a form: checked, indeterminate, groups.
+> A checkbox for an independent yes/no choice that submits with a form: checked, indeterminate, with a hint or an error.
 
 ## When to use
 - Independent on/off options that are saved together with a form (consents, sets of options).
@@ -13,6 +14,7 @@
 - One choice out of several mutually exclusive options → use [Radio](../radio/COMPONENT.md) or [SegmentedControl](../segmented-control/COMPONENT.md) instead.
 - A setting that applies immediately, without a submit → use [Switch](../switch/COMPONENT.md) instead.
 - Picking several values from a long list in a compact field → use [TagSelect](../tag-select/COMPONENT.md) or [Select](../select/COMPONENT.md) with `multiple` instead.
+- A checkbox look inside an option or menu row that carries `aria-selected` itself → `Checkbox.Indicator`, never a nested `Checkbox.Root`.
 
 ## Import
 ```tsx
@@ -21,76 +23,55 @@ import { Checkbox } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Checkbox.Root          wrapper grid + context; ref and input props go to the hidden native input
-├─ Checkbox.Label      clickable row: renders the native input, the box and the text
-├─ Checkbox.Hint       description under the text column (optional)
-└─ Checkbox.Error      error message under the text column (optional, makes the field invalid)
+Checkbox.Root          field grid; ref and input props go to the native input
+├─ <label> row         the native input, the box and the text (rendered by Root)
+│  └─ Checkbox.Label   the visible text (optional)
+└─ hint | error        support text under the text column (`hint`, `error`)
 
 Checkbox.Indicator     the box alone, no input — a mark inside option / menu rows (used without Root)
 ```
-The native `input type="checkbox"` is rendered inside `Checkbox.Label`, so a Root without `Checkbox.Label` renders an empty `Checkbox.Label` itself: `<Checkbox.Root aria-label="…" />` is a valid bare control (tables, settings rows).
+`<Checkbox.Root aria-label="…" />` without `Checkbox.Label` is a valid bare control (table rows).
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### Checkbox.Root
+`forwardRef` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row; native input props go to the input.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `checked` | `boolean` | — | Controlled checked state; use with `onCheckedChange`. |
-| `defaultChecked` | `boolean` | `false` | Initial state in uncontrolled mode. |
-| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on click or Space. |
-| `indeterminate` | `boolean` | `false` | Mixed state (partial «select all»); wins over `checked` visually and is synced to `input.indeterminate`. |
-| `invalid` | `boolean` | `false` | Invalid look and `aria-invalid`; also set automatically while `Checkbox.Error` is mounted. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Size tier of the box, gap and label text. |
-| `fullWidth` | `boolean` | `false` | Stretch to the container width; by default the field is as wide as its content. |
-| `disabled` | `boolean` | `false` | Disables the input; dims box, label and hint. |
-| `id` | `string` | auto (`useId`) | Id of the native input; hint/error ids derive from it. |
-| `aria-describedby` | `string` | — | Extra description ids; merged with the mounted hint and error ids. |
-| `className` | `string` | — | Class on the wrapper `div`. |
-| `children` | `ReactNode` | — | `Checkbox.Label`, `Checkbox.Hint`, `Checkbox.Error`. |
-
-+ native `<input>` props except `type`, `size`, `checked`, `defaultChecked`, `onChange`, `children` (`name`, `value`, `required`, `aria-label`, `onBlur`, `style`, …) — they are applied to the hidden native input, not to the wrapper.
-Ref: `forwardRef` → `HTMLInputElement`. No `asChild`.
+| `checked` | `boolean` | — | Controlled checked state. |
+| `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
+| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle. |
+| `indeterminate` | `boolean` | `false` | Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the box, the text and the gap. |
+| `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
+| `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
+| `invalid` | `boolean` | `false` | Danger ring on the unchecked box and `aria-invalid`. A non-empty `error` implies it. |
+| `disabled` | `boolean` | `false` | Disabled fill, dimmed label and hint, no toggling. |
+| `id` | `string` | — | Id of the input (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
+| `aria-describedby` | `string` | — | Merged before the hint/error ids. |
+| `children` | `ReactNode` | — | `Checkbox.Label`. Without it only the box renders — give the root an `aria-label`. |
+| `className` | `string` | — | Class on the field `<div>`. |
+| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "type" \| "size" \| "checked" \| "defaultChecked" \| "onChange">` | — | `name`, `value`, `required`, `aria-label`, `onBlur`… on the native input. |
 
 ### Checkbox.Label
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactNode` | — | Label text. Empty → only the box is rendered; then set `aria-label` on `Checkbox.Root`. |
-| `className` | `string` | — | Class on the `<label>` row. |
-
-+ native `<label>` HTML attributes except `htmlFor` and `size` (wired from context).
-Ref: `forwardRef` → `HTMLLabelElement`.
-
-### Checkbox.Hint
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactNode` | — (required) | Description text, aligned with the text column; added to `aria-describedby`. |
-| `className` | `string` | — | Class on the `<p>`. |
-
-+ native `<p>` props except `id` (fixed to `<inputId>-hint`). No ref.
-
-### Checkbox.Error
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactNode` | — (required) | Error text in `danger-text`; while mounted the field is invalid. |
-| `className` | `string` | — | Class on the `<p>`. |
-
-+ native `<p>` props except `id` (fixed to `<inputId>-error`). No ref.
+`ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.
 
 ### Checkbox.Indicator
-The box alone, without an input, used **outside** `Checkbox.Root`: a decorative mark (`aria-hidden`, no focus, no pointer events) for rows whose own element carries the state — `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`. Same box, fill and check-draw motion as the field; the host row owns hover and press.
+`ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `checked` | `boolean` | `false` | Shows the check on the accent fill. |
+| `checked` | `boolean` | `false` | Shows the check. |
 | `indeterminate` | `boolean` | `false` | Shows the bar; wins over `checked`. |
-| `disabled` | `boolean` | `false` | Muted box, disabled check color. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | nearest control size, else `"m"` | Box tier (`--prime-control-<tier>-choice`). Inside a sized host (Select, menu) it follows the host. |
-| `className` | `string` | — | Class on the `<span>`. |
-
-+ native `<span>` props except `children`. `ref` → `HTMLSpanElement`. DOM: `data-size`, `data-state="checked" | "unchecked" | "indeterminate"`, `data-disabled`.
+| `disabled` | `boolean` | `false` | Disabled fill. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Box tier; without it the nearest control size (the Select or menu it sits in), else `m`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className`, `data-*` and the other span attributes. |
 
 ## Variants
-Checkbox has no `variant`/`tone`/`color`. Axes: `size`, `fullWidth`.
+Checkbox has no `variant` / `tone` / `color`.
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -101,80 +82,77 @@ Checkbox has no `variant`/`tone`/`color`. Axes: `size`, `fullWidth`.
 | `l` | 20px box, 8px gap, 16/24 text | spacious forms, onboarding | |
 | `xl` | 24px box (radius 6), 12px gap, 16/24 text | touch-first screens | |
 
-### fullWidth
+**Sizes:** the box is optically centred on the first text line; the text follows the tier text size (12 · 13 · 14 · 16 · 16). Match the checkbox `size` to the fields and buttons of the same form.
+
+### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `false` | field shrinks to its content, text wraps inside the container | choices placed side by side or in a list | yes |
-| `true` | field stretches to 100% of the container | the label row must fill a grid cell or a card row | |
+| `indeterminate` | accent box with a horizontal bar | a parent checkbox over a partially selected group | `false` |
+| `invalid` | danger ring on the unchecked box | the message is shown elsewhere; otherwise pass `error` | `false` |
+| `disabled` | muted box, dimmed text and hint | the option is unavailable | `false` |
 
 **Combinations**
-- Match the checkbox `size` to the fields and buttons of the same form (`m` with `m`).
 - `indeterminate` only on a parent checkbox that controls a group; leaf options never use it.
-- `invalid` together with a `Checkbox.Error` text is redundant — the error already sets it. Use bare `invalid` only when the message is shown elsewhere.
-
-**Sizes** — the box is optically centred on the first text line; label text follows the tier text size (12 · 13 · 14 · 16 · 16).
-
-**Hierarchy** — a parent checkbox sits above its children; nested options are indented by the box width plus the gap so they align with the parent text (see [settings-card.tsx](examples/settings-card.tsx)).
+- `invalid` together with `error` is redundant — the error already sets it.
+- Nested options are indented by the box width plus the gap so they align with the parent text.
 
 ## States
-| State | Driven by | DOM | Looks like |
-|---|---|---|---|
-| unchecked | `checked={false}` / default | `data-state="unchecked"` | box `fill-strong`, hover `fill-strong-hover` |
-| checked | `checked` / `defaultChecked` | `data-state="checked"` | box `accent-default` (hover `accent-hover`), check mark in `accent-fg` drawn in with a stroke reveal |
-| indeterminate | `indeterminate` | `data-state="indeterminate"`, `input.indeterminate` | accent box with a horizontal bar |
-| invalid | `invalid` or mounted `Checkbox.Error` | `data-invalid="true"`, `aria-invalid` on input | unchecked box gets a `danger-border` inset ring; focus ring turns `danger-border` |
-| disabled | `disabled` | `data-disabled="true"` on root and label | box `fill-muted`, mark `text-disabled`, `cursor: not-allowed`, hint dimmed |
-| active | pointer press | — | box scales to 92% |
-| focus-visible | keyboard focus | — | outer focus ring around the box |
+| State | Driven by | DOM |
+|---|---|---|
+| unchecked | `checked={false}` / default | `data-state="unchecked"`; box `fill-strong`, hover `fill-strong-hover` |
+| checked | `checked` / `defaultChecked` | `data-state="checked"`; accent box, the check draws in |
+| indeterminate | `indeterminate` | `data-state="indeterminate"`, `input.indeterminate`; accent box with a bar |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid` on the input; danger ring on the unchecked box and on focus |
+| disabled | `disabled` | `data-disabled="true"` on root and label; `fill-muted` box, `cursor: not-allowed` |
+| pressed | pointer press | the box scales to the compact press scale |
+| focus-visible | keyboard focus | outer focus ring around the box |
 
-Root also carries `data-size` and `data-full-width="true"` when `fullWidth`.
-Controlled: `checked` + `onCheckedChange`. Uncontrolled: `defaultChecked` (+ optional `onCheckedChange`). There is no native `onChange` prop.
+Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncontrolled: `defaultChecked` (+ optional `onCheckedChange`). There is no native `onChange` prop.
 
 ## Layout & spacing
-- Grid `[box][text]`; `Checkbox.Hint` / `Checkbox.Error` sit under the text column, not under the box.
-- Checkboxes in a vertical list: gap `--prime-space-3` (12px); separate fields/groups: `--prime-space-5` (20px); group → group `--prime-space-8`.
-- Group several checkboxes in a `role="group"` container named by a `Typography.Root` heading via `aria-labelledby` (gap on the container, no margins); nested options indent by `calc(var(--prime-control-m-choice) + var(--prime-control-m-gap))`.
-- Long labels wrap (`overflow-wrap: anywhere`); the field is `max-width: 100%` and works from 320px.
+- Grid `[box][text]`; the hint or error sits under the text column, not under the box.
+- Checkboxes in a vertical list: gap `--prime-space-3`; separate fields: `--prime-space-5`; group → actions `--prime-space-8`.
+- Long labels wrap (`overflow-wrap: anywhere`); the field shrinks to its content with `max-width: 100%`.
 
 ## Accessibility
-- Native `<input type="checkbox">` (visually hidden, still in the box for validation bubbles), associated with the `<label>` via `htmlFor`.
-- Keyboard: Tab focuses, Space toggles.
-- `aria-invalid` is set when invalid; `aria-describedby` = your ids + hint id + error id (only mounted parts).
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Moves focus to the checkbox. |
+| `Space` | Toggles it. |
+
+### ARIA
+- A native `<input type="checkbox">` (visually hidden over the box, so validation bubbles point at it), wrapped by the `<label>` row.
+- `aria-invalid` is set when invalid; `aria-describedby` = your ids + the hint or the error id.
 - Without visible text, pass `aria-label` on `Checkbox.Root` (it lands on the input).
-- `required` goes to the native input; no visual asterisk is drawn — state it in the label text or a hint.
-- No `labels` keys.
+- `required` goes to the native input; no asterisk is drawn — state it in the text or the hint.
+- `Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked`.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+No `labels`.
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [sizes.tsx](examples/sizes.tsx) | All size tiers | Choosing the tier next to other controls |
-| [states.tsx](examples/states.tsx) | Unchecked, checked, indeterminate, invalid, disabled | Reference for every state |
-| [hint-error.tsx](examples/hint-error.tsx) | `Checkbox.Hint` and `Checkbox.Error` | Consents and options that need an explanation or validation |
-| [select-all.tsx](examples/select-all.tsx) | Controlled «select all» with `indeterminate` | Bulk selection in lists |
-| [settings-card.tsx](examples/settings-card.tsx) | Named group with parent and nested options, disabled option with hint, inside a Card with `Card.Actions` (primary last) | Grouped preferences in a settings form |
-| [without-label.tsx](examples/without-label.tsx) | Empty `Checkbox.Label` + `aria-label`, `name`/`value` | Row selection in tables |
-| [indicator.tsx](examples/indicator.tsx) | `Checkbox.Indicator` in multi-select option rows that carry `aria-selected` | Listbox / menu rows with a checkbox look (no nested input) |
-
-```tsx
-import { Checkbox } from "prime-ui-kit";
-
-export function TermsCheckbox() {
-  return (
-    <Checkbox.Root name="terms" required>
-      <Checkbox.Label>Принимаю условия оферты</Checkbox.Label>
-      <Checkbox.Hint>Без этого мы не сможем оформить заказ.</Checkbox.Hint>
-    </Checkbox.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A checkbox with its label; a click anywhere on the row toggles it. |
+| [sizes.tsx](examples/sizes.tsx) | Every size; the box and the text follow the control tier — `size`. |
+| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `invalid`, `disabled`. |
+| [without-label.tsx](examples/without-label.tsx) | Bare boxes in table rows, named by `aria-label` and submitted with `name` and `value`. |
+| [indicator.tsx](examples/indicator.tsx) | The box alone in a multi-select list: the option row carries `aria-selected`, the box only shows it — `Checkbox.Indicator`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the selection; «select all» turns indeterminate on a partial one — `checked`, `onCheckedChange`, `indeterminate`. |
+| [in-form.tsx](examples/in-form.tsx) | Consent in a sign-up form: a hint under the text, an error after a submit without the tick — `required`, `hint`, `error`. |
 
 ## Mistakes
 - `<Checkbox.Root onChange={…}>` → use `onCheckedChange={(checked) => …}`.
-- `<Checkbox.Root>Текст</Checkbox.Root>` → wrap the text in `Checkbox.Label`; text placed directly in Root is not the checkbox's label.
-- `invalid` plus `Checkbox.Error` → just mount `Checkbox.Error`.
-- Several checkboxes for one-of-many → use `Radio.Root` with items.
-- Checkbox that saves instantly («Тёмная тема») → use `Switch`.
-- `style` on `Checkbox.Root` expecting to style the wrapper → it goes to the hidden input; use `className`.
+- `<Checkbox.Root>Текст</Checkbox.Root>` → wrap the text in `Checkbox.Label`, so it sits in the text column.
+- `invalid` plus `error` → just pass `error`.
+- Several checkboxes for one-of-many → use `Radio.Group`.
+- A checkbox that saves instantly («Тёмная тема») → use `Switch`.
+- `style` on `Checkbox.Root` expecting to style the field → it goes to the hidden input; use `className`.
 
 ## Related
-[Radio](../radio/COMPONENT.md) · [Switch](../switch/COMPONENT.md) · [SegmentedControl](../segmented-control/COMPONENT.md) · [Label](../label/COMPONENT.md) · [Hint](../hint/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (the row), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **See also:** [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

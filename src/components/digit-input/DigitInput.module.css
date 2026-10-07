@@ -1,9 +1,18 @@
 /*
  * OTP / PIN cells: square fields of the tier height, field system fills and states
  * (see Input.module.css). Digits are one type step larger than the tier text, tabular.
+ * The label row and the support row come from FieldFrame; the frame hugs the cells.
  * `fullWidth`: one row without wrapping, cells share the width (flex 1) and keep the tier height.
  * `groupSize`: the first cell of every group gets an extra gap before it.
  */
+.frame {
+  width: fit-content;
+}
+
+.frame:has(> * > .root[data-full-width="true"]) {
+  width: 100%;
+}
+
 .root {
   --prime-digit-cell-size: var(--prime-control-m-height);
   --prime-digit-cell-radius: var(--prime-control-m-radius);
@@ -12,7 +21,6 @@
   --prime-digit-gap: var(--prime-control-m-gap);
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: var(--prime-digit-gap);
   min-width: 0;
   min-inline-size: 0;
@@ -24,8 +32,6 @@
 
 .root[data-full-width="true"] {
   flex-wrap: nowrap;
-  justify-content: stretch;
-  width: 100%;
 }
 
 .root[data-size="xs"] {

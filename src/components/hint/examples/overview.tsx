@@ -10,7 +10,7 @@ export default function HintOverviewExample() {
   return (
     <div className={styles.field}>
       <Label.Root>Код из SMS</Label.Root>
-      <DigitInput.Root length={6} aria-describedby={hintId} />
+      <DigitInput length={6} aria-describedby={hintId} />
       <Hint.Root id={hintId}>Код придёт на +7 900 ••• 12 34 в течение минуты.</Hint.Root>
     </div>
   );

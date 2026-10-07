@@ -1,0 +1,96 @@
+/*
+ * Shared color swatch (ColorSwatches, ColorPresets, ColorPicker). Every swatch carries a faint inner
+ * ring so white / near-background colors stay visible; the selection is a 2px accent ring with a
+ * 2px gap plus a check mark that contrasts with the color.
+ */
+
+/* ---- Color layers ---- */
+.fill,
+.checker {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* "No color": transparency checkerboard, 4 × 4 cells at any size. */
+.checker {
+  background:
+    repeating-conic-gradient(
+      var(--prime-color-bg-surface) 0deg 90deg,
+      var(--prime-color-fill-strong) 90deg 180deg
+    )
+    0 0 / 50% 50%;
+}
+
+/* ---- Selectable swatch ---- */
+.swatch {
+  /* The check mark (a kit Icon without `size`) follows this host size. */
+  --prime-icon-size: calc(var(--swatch-size) * 0.625);
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--swatch-size);
+  height: var(--swatch-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--swatch-radius);
+  background: none;
+  cursor: pointer;
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.swatch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .swatch:hover:not(:disabled) {
+    transform: scale(1.08);
+  }
+}
+
+.swatch[data-state="checked"] {
+  outline: var(--prime-focus-width) solid var(--prime-color-accent-default);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.swatch:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+/* A focused option div shows no browser outline on pointer focus. */
+.swatch:focus:not(:focus-visible):not([data-state="checked"]) {
+  outline: none;
+}
+
+.swatch:disabled {
+  cursor: not-allowed;
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+/* ---- Check mark: light on dark colors, dark on light ones, in both themes ---- */
+.check {
+  position: relative;
+  z-index: 1;
+  color: var(--prime-color-control-thumb);
+  pointer-events: none;
+}
+
+.swatch[data-contrast="dark"] .check {
+  color: var(--prime-color-palette-yellow-solid-fg);
+}

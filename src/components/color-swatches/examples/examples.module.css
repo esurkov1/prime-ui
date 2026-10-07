@@ -1,37 +1,19 @@
-/* Layout only for the ColorSwatches examples: semantic tokens. */
+/* Layout of the ColorSwatches scenarios: semantic tokens only. */
 
-.stack {
-  display: grid;
-  gap: var(--prime-space-5);
-  width: 100%;
-  min-width: 0;
-}
-
+/* in-form.tsx: field → field 20, group → actions 32. */
 .form {
-  display: grid;
-  gap: var(--prime-space-5);
-  width: min(100%, calc(var(--prime-space-16) * 6));
-}
-
-.sizeRow {
   display: flex;
-  align-items: center;
-  gap: var(--prime-space-4);
-  min-width: 0;
+  flex-direction: column;
+  gap: var(--prime-space-5);
+  width: min(100%, var(--prime-modal-width-s));
 }
 
-.sizeTag {
-  flex: 0 0 var(--prime-space-6);
+.actions {
+  display: flex;
+  margin-top: var(--prime-space-3);
 }
 
-.column {
-  display: grid;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
+/* wrapping.tsx: a narrow column. */
 .narrow {
-  display: grid;
-  gap: var(--prime-space-2);
   width: min(100%, calc(var(--prime-space-16) * 3));
 }

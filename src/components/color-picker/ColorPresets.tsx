@@ -1,4 +1,3 @@
-import { Check } from "lucide-react";
 import * as React from "react";
 
 import { Popover } from "@/components/popover/Popover";
@@ -8,9 +7,11 @@ import { markContrast, sameColor } from "@/internal/colorSwatch";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { mergeRefs } from "@/internal/mergeRefs";
+import { gridIndex } from "@/internal/rovingFocus";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./ColorPresets.module.css";
+import { SwatchCheck, SwatchFill, swatchClass } from "./swatch";
 
 export type ColorPreset = {
   /** CSS color stored as the value (`onValueChange` returns it as is). */
@@ -183,16 +184,6 @@ function ColorPresetsRoot({
 }
 ColorPresetsRoot.displayName = "ColorPresets.Root";
 
-/** Color layer of a swatch: an SVG rect (no inline style), or the checkerboard for no color. */
-function SwatchFill({ value }: { value: string | null }) {
-  if (value == null) return <span aria-hidden className={styles.checker} />;
-  return (
-    <svg className={styles.fill} aria-hidden="true" viewBox="0 0 1 1" preserveAspectRatio="none">
-      <rect width="1" height="1" fill={value} />
-    </svg>
-  );
-}
-
 export type ColorPresetsSwatchProps = { className?: string };
 
 /**
@@ -234,14 +225,14 @@ const Trigger = React.forwardRef<HTMLButtonElement, ColorPresetsTriggerProps>(fu
   const name = ariaLabel ?? `${labels.trigger}: ${selectedLabel}`;
 
   if (asChild && children) {
-    // biome-ignore lint/suspicious/noExplicitAny: cloneElement on an arbitrary element
-    const child = children as React.ReactElement<any>;
-    const childRef = (child.props as { ref?: React.Ref<HTMLElement> }).ref;
+    const child = children as React.ReactElement<
+      React.ButtonHTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> }
+    >;
     return (
       <Popover.Trigger>
         {React.cloneElement(child, {
           ...rest,
-          ref: mergeRefs(childRef, ref as React.Ref<HTMLElement>),
+          ref: mergeRefs(child.props.ref, ref as React.Ref<HTMLElement>),
           disabled: disabled || child.props.disabled,
           "aria-label": child.props["aria-label"] ?? name,
         })}
@@ -328,47 +319,24 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
     itemRefs.current[Math.max(0, selectedIndex)]?.focus({ preventScroll: true });
   }, []);
 
-  const move = (index: number) => {
-    const next = Math.min(options.length - 1, Math.max(0, index));
+  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Tab") {
+      // Leave like a native select: focus goes back to the trigger, then Tab moves on from it.
+      triggerRef.current?.focus({ preventScroll: true });
+      close();
+      return;
+    }
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      const option = options[active];
+      if (option) select(option.value);
+      return;
+    }
+    const next = gridIndex(event.key, active, options.length, cols);
+    if (next === null) return;
+    event.preventDefault();
     setActive(next);
     itemRefs.current[next]?.focus();
-  };
-
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    switch (e.key) {
-      case "ArrowRight":
-        move(active + 1);
-        break;
-      case "ArrowLeft":
-        move(active - 1);
-        break;
-      case "ArrowDown":
-        if (active + cols < options.length) move(active + cols);
-        break;
-      case "ArrowUp":
-        if (active - cols >= 0) move(active - cols);
-        break;
-      case "Home":
-        move(0);
-        break;
-      case "End":
-        move(options.length - 1);
-        break;
-      case "Enter":
-      case " ": {
-        const option = options[active];
-        if (option) select(option.value);
-        break;
-      }
-      case "Tab":
-        // Leave like a native select: focus goes back to the trigger, then Tab moves on from it.
-        triggerRef.current?.focus({ preventScroll: true });
-        close();
-        return;
-      default:
-        return;
-    }
-    e.preventDefault();
   };
 
   return (
@@ -402,15 +370,14 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
               aria-label={option.label}
               tabIndex={i === active ? 0 : -1}
               title={option.label}
-              className={styles.option}
-              data-selected={selected ? "" : undefined}
-              data-empty={option.value == null ? "" : undefined}
+              className={swatchClass}
+              data-state={selected ? "checked" : "unchecked"}
               data-contrast={option.contrast}
               onClick={() => select(option.value)}
               onFocus={() => setActive(i)}
             >
               <SwatchFill value={option.value} />
-              {selected ? <Check aria-hidden className={styles.check} strokeWidth={3} /> : null}
+              {selected ? <SwatchCheck /> : null}
             </div>
           );
         })}

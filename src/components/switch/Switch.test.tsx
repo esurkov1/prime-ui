@@ -21,11 +21,10 @@ describe("Switch", () => {
     expect(screen.getAllByRole("switch")).toHaveLength(1);
   });
 
-  it("names the switch from Switch.Label and describes it with Switch.Hint", () => {
+  it("names the switch from Switch.Label and describes it with the hint", () => {
     render(
-      <Switch.Root>
+      <Switch.Root hint="Подсказка">
         <Switch.Label>Тёмная тема</Switch.Label>
-        <Switch.Hint>Подсказка</Switch.Hint>
       </Switch.Root>,
     );
     const control = screen.getByRole("switch", { name: "Тёмная тема" });
@@ -111,28 +110,25 @@ describe("Switch", () => {
     expect(field).toHaveAttribute("data-state", "checked");
   });
 
-  it("renders hint and error sub-components", () => {
+  it("shows the error in place of the hint and marks the switch invalid", () => {
     render(
-      <Switch.Root>
+      <Switch.Root hint="You will receive push notifications" error="Required field">
         <Switch.Label>Notifications</Switch.Label>
-        <Switch.Hint>You will receive push notifications</Switch.Hint>
-        <Switch.Error>Required field</Switch.Error>
       </Switch.Root>,
     );
-    expect(screen.getByText("You will receive push notifications")).toBeInTheDocument();
-    expect(screen.getByText("Required field")).toBeInTheDocument();
+    expect(screen.queryByText("You will receive push notifications")).toBeNull();
+    expect(screen.getByRole("switch")).toHaveAccessibleDescription("Required field");
     expect(screen.getByRole("switch")).toHaveAttribute("aria-invalid", "true");
   });
 
-  it("sets invalid and fullWidth data attributes", () => {
+  it("sets invalid and state data attributes", () => {
     const { container } = render(
-      <Switch.Root invalid fullWidth>
+      <Switch.Root invalid>
         <Switch.Label>Terms</Switch.Label>
       </Switch.Root>,
     );
     const field = container.firstElementChild;
     expect(field).toHaveAttribute("data-invalid", "true");
-    expect(field).toHaveAttribute("data-full-width", "true");
     expect(field).toHaveAttribute("data-state", "unchecked");
   });
 });

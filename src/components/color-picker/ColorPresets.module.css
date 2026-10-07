@@ -1,29 +1,9 @@
 /*
- * ColorPresets — quick color pick: a square swatch trigger + a popover grid of preset swatches.
+ * ColorPresets — quick color pick: a square swatch trigger + a popover grid of preset swatches
+ * (the shared swatch from swatch.module.css).
  * Tier T: trigger = control height · swatch = item-height − 8 (16 · 20 · 24 · 28 · 32) ·
  * gap = control gap · swatch radius steps with size (4 · 6 · 6 · 8 · 8).
- * Every color surface carries a faint inner ring so white / near-background colors stay visible.
  */
-
-/* ---- Shared color layers ---- */
-.fill,
-.checker {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* "No color": transparency checkerboard, 4 × 4 cells at any size. */
-.checker {
-  background:
-    repeating-conic-gradient(
-      var(--prime-color-bg-surface) 0deg 90deg,
-      var(--prime-color-fill-strong) 90deg 180deg
-    )
-    0 0 / 50% 50%;
-}
 
 /* ---- Trigger: square swatch button of the tier height ---- */
 .trigger {
@@ -67,7 +47,6 @@
 
 /* Inner edge above the color layer; darkens on hover / open. */
 .trigger::after,
-.option::after,
 .swatch::after {
   content: "";
   position: absolute;
@@ -139,87 +118,34 @@
 }
 
 .grid {
-  --cpr-swatch: calc(var(--prime-control-m-item-height) - var(--prime-space-2));
-  --cpr-swatch-radius: var(--prime-radius-s);
+  --swatch-size: calc(var(--prime-control-m-item-height) - var(--prime-space-2));
+  --swatch-radius: var(--prime-radius-s);
   display: grid;
-  grid-template-columns: repeat(var(--cpr-columns, 8), var(--cpr-swatch));
+  grid-template-columns: repeat(var(--cpr-columns, 8), var(--swatch-size));
   justify-content: start;
   gap: var(--prime-control-m-gap);
   outline: none;
 }
 
 .grid[data-size="xs"] {
-  --cpr-swatch: calc(var(--prime-control-xs-item-height) - var(--prime-space-2));
-  --cpr-swatch-radius: var(--prime-radius-xs);
+  --swatch-size: calc(var(--prime-control-xs-item-height) - var(--prime-space-2));
+  --swatch-radius: var(--prime-radius-xs);
   gap: var(--prime-control-xs-gap);
 }
 
 .grid[data-size="s"] {
-  --cpr-swatch: calc(var(--prime-control-s-item-height) - var(--prime-space-2));
+  --swatch-size: calc(var(--prime-control-s-item-height) - var(--prime-space-2));
   gap: var(--prime-control-s-gap);
 }
 
 .grid[data-size="l"] {
-  --cpr-swatch: calc(var(--prime-control-l-item-height) - var(--prime-space-2));
-  --cpr-swatch-radius: var(--prime-radius-m);
+  --swatch-size: calc(var(--prime-control-l-item-height) - var(--prime-space-2));
+  --swatch-radius: var(--prime-radius-m);
   gap: var(--prime-control-l-gap);
 }
 
 .grid[data-size="xl"] {
-  --cpr-swatch: calc(var(--prime-control-xl-item-height) - var(--prime-space-2));
-  --cpr-swatch-radius: var(--prime-radius-m);
+  --swatch-size: calc(var(--prime-control-xl-item-height) - var(--prime-space-2));
+  --swatch-radius: var(--prime-radius-m);
   gap: var(--prime-control-xl-gap);
-}
-
-.option {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--cpr-swatch);
-  height: var(--cpr-swatch);
-  border-radius: var(--cpr-swatch-radius);
-  cursor: pointer;
-  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-/* Color layers are clipped to the swatch radius; the ring outside stays visible. */
-.option > .fill,
-.option > .checker {
-  border-radius: inherit;
-  overflow: hidden;
-}
-
-.option:hover {
-  transform: scale(1.08);
-}
-
-/* Selected: 2px accent ring with a 2px gap + check mark. */
-.option[data-selected] {
-  outline: var(--prime-focus-width) solid var(--prime-color-accent-default);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.option:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.option:focus:not(:focus-visible):not([data-selected]) {
-  outline: none;
-}
-
-/* Check mark contrasts with the swatch in both themes: light on dark colors, dark on light ones. */
-.check {
-  position: relative;
-  z-index: 1;
-  width: 62.5%;
-  height: 62.5%;
-  color: var(--prime-color-control-thumb);
-  pointer-events: none;
-}
-
-.option[data-contrast="dark"] .check {
-  color: var(--prime-color-palette-yellow-solid-fg);
 }

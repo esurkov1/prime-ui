@@ -31,10 +31,9 @@
   align-self: stretch;
 }
 
-/* Code cell: digits centered, hint under them. */
-.code {
+/* narrow.tsx: a phone-width stage. */
+.narrow {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--prime-space-2);
+  justify-content: center;
+  width: min(100%, calc(var(--prime-space-16) * 5));
 }

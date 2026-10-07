@@ -1,61 +1,46 @@
 import * as React from "react";
-import { Hint } from "@/components/hint/Hint";
-import { Label } from "@/components/label/Label";
+
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
-import { createComponentContext } from "@/internal/context";
+import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
-import { type FieldDescriptions, useFieldDescriptions } from "@/internal/useFieldDescriptions";
 
 import styles from "./Checkbox.module.css";
+import { ChoiceField, ChoiceLabel, type ChoiceLabelProps, choiceInputClass } from "./ChoiceField";
 
-/** True when `type` appears among `children` (fragments are looked into). */
-function hasChildOfType(children: React.ReactNode, type: unknown): boolean {
-  let found = false;
-  React.Children.forEach(children, (child) => {
-    if (found || !React.isValidElement(child)) return;
-    if (child.type === type) found = true;
-    else if (child.type === React.Fragment)
-      found = hasChildOfType((child.props as { children?: React.ReactNode }).children, type);
-  });
-  return found;
-}
-
-type InputPassthrough = Omit<
+export type CheckboxRootProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  "type" | "size" | "checked" | "defaultChecked" | "onChange" | "children"
->;
-
-type CheckboxContextValue = FieldDescriptions & {
-  inputId: string;
-  size: ControlSize;
-  inputRef: React.Ref<HTMLInputElement>;
-  checked: boolean;
-  invalid: boolean;
-  disabled: boolean;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  inputPropsRef: React.MutableRefObject<InputPassthrough>;
-};
-
-const [CheckboxProvider, useCheckboxContext] =
-  createComponentContext<CheckboxContextValue>("Checkbox");
-
-export type CheckboxRootProps = InputPassthrough & {
+  "type" | "size" | "checked" | "defaultChecked" | "onChange"
+> & {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   /** Mixed state (e.g. «select all» with a partial selection); wins over `checked` visually. */
   indeterminate?: boolean;
-  /** Invalid state; also set while a `Checkbox.Error` is mounted. */
+  /** Invalid state; a non-empty `error` implies it. */
   invalid?: boolean;
+  /** Help text under the label text. Hidden while `error` is shown. */
+  hint?: React.ReactNode;
+  /** Error message in the hint slot; implies `invalid`. */
+  error?: React.ReactNode;
   size?: ControlSize;
-  /** Stretch to the container width. By default the field is as wide as its content. */
-  fullWidth?: boolean;
+  /** `Checkbox.Label`; without it the bare box renders (give it an `aria-label`). */
   children?: React.ReactNode;
 };
+
+/** Check and indeterminate bar; which one shows (and how it draws in) comes from `data-state`. */
+function CheckboxMark() {
+  // Own SVG instead of `Icon`: the draw-in motion needs `pathLength` on the paths.
+  return (
+    <svg viewBox="0 0 24 24" className={styles.svg} aria-hidden="true" focusable="false">
+      <path d="M5.5 12.5l4.25 4.25L18.5 8" pathLength={1} className={styles.checkPath} />
+      <path d="M7 12h10" pathLength={1} className={styles.indeterminateLine} />
+    </svg>
+  );
+}
 
 const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
   (
@@ -65,9 +50,10 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
       defaultChecked = false,
       onCheckedChange,
       indeterminate = false,
-      invalid: invalidProp = false,
+      invalid,
+      hint,
+      error,
       size = "m",
-      fullWidth = false,
       disabled = false,
       className,
       "aria-describedby": ariaDescribedBy,
@@ -76,11 +62,7 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
     },
     ref,
   ) => {
-    const rawId = React.useId();
-    const inputId = id ?? rawId;
-    const descriptions = useFieldDescriptions(inputId, ariaDescribedBy);
-    const invalid = invalidProp || descriptions.hasError;
-
+    const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
     const [checked, setChecked] = useControllableState<boolean>({
       value: checkedProp,
       defaultValue: defaultChecked,
@@ -94,168 +76,48 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
       if (internalRef.current) internalRef.current.indeterminate = indeterminate;
     }, [indeterminate]);
 
-    const handleChange = React.useCallback(
-      (event: React.ChangeEvent<HTMLInputElement>) => setChecked(event.target.checked),
-      [setChecked],
-    );
-
-    const inputPropsRef = React.useRef<InputPassthrough>(inputRest);
-    inputPropsRef.current = inputRest;
-
-    const ctxValue = React.useMemo(
-      () => ({
-        ...descriptions,
-        inputId,
-        size,
-        inputRef: mergedRef,
-        checked,
-        invalid,
-        disabled,
-        handleChange,
-        inputPropsRef,
-      }),
-      [descriptions, inputId, size, mergedRef, checked, invalid, disabled, handleChange],
-    );
-
     return (
-      <CheckboxProvider value={ctxValue}>
-        <ControlSizeProvider value={size}>
-          <div
-            className={cx(styles.field, className)}
-            {...toDataAttributes({
-              size,
-              state: indeterminate ? "indeterminate" : checked ? "checked" : "unchecked",
-              invalid: invalid || undefined,
-              disabled: disabled || undefined,
-              "full-width": fullWidth || undefined,
-            })}
-          >
-            {/* The native input lives in Label; a Root without one still renders the bare control. */}
-            {hasChildOfType(children, CheckboxLabel) ? null : <CheckboxLabel />}
-            {children}
-          </div>
-        </ControlSizeProvider>
-      </CheckboxProvider>
+      <ChoiceField
+        ids={ids}
+        size={size}
+        state={indeterminate ? "indeterminate" : checked ? "checked" : "unchecked"}
+        disabled={disabled}
+        hint={hint}
+        error={error}
+        className={cx(styles.root, className)}
+        control={
+          <>
+            <input
+              {...inputRest}
+              ref={mergedRef}
+              id={ids.controlId}
+              type="checkbox"
+              className={choiceInputClass}
+              disabled={disabled}
+              checked={checked}
+              onChange={(event) => setChecked(event.target.checked)}
+              aria-invalid={ids.invalid || undefined}
+              aria-describedby={ids.describedBy}
+            />
+            <span className={styles.control} aria-hidden="true">
+              <CheckboxMark />
+            </span>
+          </>
+        }
+      >
+        {children}
+      </ChoiceField>
     );
   },
 );
+CheckboxRoot.displayName = "Checkbox.Root";
 
-CheckboxRoot.displayName = "CheckboxRoot";
+export type CheckboxLabelProps = ChoiceLabelProps;
 
-/** Check and indeterminate bar; which one shows (and how it draws in) comes from `data-state`. */
-function CheckboxMark() {
-  return (
-    <svg viewBox="0 0 24 24" className={styles.svg} aria-hidden="true" focusable="false">
-      <path d="M5.5 12.5l4.25 4.25L18.5 8" pathLength={1} className={styles.checkPath} />
-      <path d="M7 12h10" pathLength={1} className={styles.indeterminateLine} />
-    </svg>
-  );
+function CheckboxLabel(props: CheckboxLabelProps) {
+  return <ChoiceLabel {...props} />;
 }
-
-// ─── Label ───────────────────────────────────────────────────────────────────
-
-export type CheckboxLabelProps = {
-  children?: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLLabelElement>, "htmlFor" | "size">;
-
-const CheckboxLabel = React.forwardRef<HTMLLabelElement, CheckboxLabelProps>(function CheckboxLabel(
-  { children, className, ...rest },
-  ref,
-) {
-  const {
-    inputId,
-    inputRef,
-    checked,
-    invalid,
-    disabled,
-    describedBy,
-    handleChange,
-    inputPropsRef,
-    size,
-  } = useCheckboxContext();
-
-  return (
-    <Label.Root
-      ref={ref}
-      htmlFor={inputId}
-      size={size}
-      disabled={disabled}
-      className={cx(styles.labelRow, className)}
-      {...rest}
-    >
-      <span className={styles.controlCell}>
-        <input
-          {...inputPropsRef.current}
-          ref={inputRef}
-          id={inputId}
-          type="checkbox"
-          className={styles.input}
-          disabled={disabled}
-          checked={checked}
-          onChange={handleChange}
-          aria-invalid={invalid || undefined}
-          aria-describedby={describedBy}
-        />
-        <span className={styles.control} aria-hidden="true">
-          <CheckboxMark />
-        </span>
-      </span>
-      {children != null ? <span className={styles.text}>{children}</span> : null}
-    </Label.Root>
-  );
-});
-
-CheckboxLabel.displayName = "CheckboxLabel";
-
-// ─── Hint / Error ────────────────────────────────────────────────────────────
-
-export type CheckboxHintProps = {
-  children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">;
-
-function CheckboxHint({ children, className, ...rest }: CheckboxHintProps) {
-  const { hintId, registerHint, size, disabled } = useCheckboxContext();
-  React.useLayoutEffect(registerHint, [registerHint]);
-
-  return (
-    <Hint.Root
-      id={hintId}
-      size={size}
-      disabled={disabled}
-      className={cx(styles.hintSlot, className)}
-      {...rest}
-    >
-      {children}
-    </Hint.Root>
-  );
-}
-
-CheckboxHint.displayName = "CheckboxHint";
-
-export type CheckboxErrorProps = CheckboxHintProps;
-
-function CheckboxError({ children, className, ...rest }: CheckboxErrorProps) {
-  const { errorId, registerError, size } = useCheckboxContext();
-  React.useLayoutEffect(registerError, [registerError]);
-
-  return (
-    <Hint.Root
-      id={errorId}
-      size={size}
-      invalid
-      className={cx(styles.hintSlot, className)}
-      {...rest}
-    >
-      {children}
-    </Hint.Root>
-  );
-}
-
-CheckboxError.displayName = "CheckboxError";
-
-// ─── Indicator ───────────────────────────────────────────────────────────────
+CheckboxLabel.displayName = "Checkbox.Label";
 
 export type CheckboxIndicatorProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   checked?: boolean;
@@ -296,13 +158,10 @@ function CheckboxIndicator({
     </span>
   );
 }
-
 CheckboxIndicator.displayName = "Checkbox.Indicator";
 
 export const Checkbox = {
   Root: CheckboxRoot,
   Label: CheckboxLabel,
-  Hint: CheckboxHint,
-  Error: CheckboxError,
   Indicator: CheckboxIndicator,
 };

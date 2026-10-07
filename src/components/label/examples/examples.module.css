@@ -1,37 +1,9 @@
-/* Layout helpers for the Label examples. Semantic tokens only. */
+/* Layout of the Label scenarios: semantic tokens only. */
 
-.sizes {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--prime-space-8);
-}
-
-.sizeCell {
+/* overview.tsx: label → control gap of the m tier, like a field's own label. */
+.field {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
-.list {
-  display: grid;
-  justify-items: start;
-  gap: var(--prime-space-4);
-}
-
-.form {
-  display: grid;
-  gap: var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-  padding: var(--prime-card-padding-m);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-}
-
-.field {
-  display: grid;
+  align-items: flex-start;
   gap: var(--prime-control-m-label-gap);
 }

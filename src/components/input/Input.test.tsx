@@ -500,37 +500,29 @@ describe("Input focusRing", () => {
   });
 });
 
-describe("Input.Badge", () => {
-  it("renders a soft palette badge one tier down, after the field and before the end icon", () => {
+describe("Input support row", () => {
+  it("renders nothing under the field without hint, error, counter or reserve", () => {
     render(
-      <Input.Root label="Статус" size="m">
+      <Input.Root label="Имя">
         <Input.Wrapper>
-          <Input.Field defaultValue="ИНН 7701234567" />
-          <Input.Icon side="end">
-            <svg />
-          </Input.Icon>
-          <Input.Badge color="green">Проверен</Input.Badge>
+          <Input.Field />
         </Input.Wrapper>
       </Input.Root>,
     );
-    const badge = screen.getByText("Проверен");
-    expect(badge).toHaveAttribute("data-variant", "soft");
-    expect(badge).toHaveAttribute("data-color", "green");
-    expect(badge).toHaveAttribute("data-tier", "s");
-    expect(badge.className).toContain(styles.badge);
+    const wrapper = screen.getByRole("textbox").parentElement;
+    expect(wrapper?.nextElementSibling).toBeNull();
   });
 
-  it("defaults to gray and follows the field tier", () => {
+  it("reserveSupportRow keeps an empty row of the field tier", () => {
     render(
-      <Input.Root size="l">
+      <Input.Root label="Промокод" size="l" reserveSupportRow>
         <Input.Wrapper>
-          <Input.Field aria-label="Поле" />
-          <Input.Badge>Черновик</Input.Badge>
+          <Input.Field />
         </Input.Wrapper>
       </Input.Root>,
     );
-    const badge = screen.getByText("Черновик");
-    expect(badge).toHaveAttribute("data-color", "gray");
-    expect(badge).toHaveAttribute("data-tier", "m");
+    const row = screen.getByRole("textbox").parentElement?.nextElementSibling;
+    expect(row).toHaveAttribute("data-reserve", "true");
+    expect(row).toHaveAttribute("data-size", "l");
   });
 });

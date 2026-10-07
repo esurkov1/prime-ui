@@ -1,18 +1,15 @@
 import * as React from "react";
-import { Badge } from "@/components/badge/Badge";
-import { Hint } from "@/components/hint/Hint";
-import { Label } from "@/components/label/Label";
-import { useFieldIds } from "@/hooks/useFieldIds";
+
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { ControlSize, PaletteColor } from "@/internal/states";
+import { FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
+import type { ControlSize } from "@/internal/states";
 
-import composableStyles from "./Input.module.css";
-
-// ─── Composable API ──────────────────────────────────────────────────────────
+import { FieldCounter, FieldSupportRow } from "./FieldSupport";
+import styles from "./Input.module.css";
 
 export type InputLabels = {
   /** Muted marker after the label when `optional`. */
@@ -74,7 +71,7 @@ export type InputRootProps = {
 
 function InputRoot({
   size = "m",
-  invalid: invalidProp = false,
+  invalid,
   focusRing = true,
   label,
   required = false,
@@ -88,63 +85,37 @@ function InputRoot({
   children,
   className,
 }: InputRootProps) {
-  const showError = error != null && error !== false && error !== "";
-  const invalid = invalidProp || showError;
-  const showHint = !showError && hint != null && hint !== false;
-  const { inputId, hintId, errorId, describedBy } = useFieldIds(id, {
-    hasHint: showHint,
-    hasError: showError,
-  });
-
+  const ids = useFieldFrame(id, { hint, error, invalid });
   const labels = React.useMemo(() => ({ ...INPUT_LABELS, ...labelsProp }), [labelsProp]);
-  const showSupport = showHint || showError || counter != null || reserveSupportRow;
+  const { invalid: isInvalid, controlId: inputId, describedBy } = ids;
 
   const contextValue = React.useMemo(
-    () => ({ size, invalid, focusRing, required, inputId, describedBy, labels }),
-    [size, invalid, focusRing, required, inputId, describedBy, labels],
+    () => ({ size, invalid: isInvalid, focusRing, required, inputId, describedBy, labels }),
+    [size, isInvalid, focusRing, required, inputId, describedBy, labels],
   );
 
   return (
     <InputProvider value={contextValue}>
       <ControlSizeProvider value={size}>
-        <div
-          className={cx(composableStyles.root, className)}
-          {...toDataAttributes({ size, invalid: invalid || undefined })}
+        <FieldFrame
+          size={size}
+          ids={ids}
+          label={label}
+          required={required}
+          optional={optional}
+          optionalLabel={labels.optional}
+          className={cx(styles.root, className)}
         >
-          {label != null ? (
-            <div className={composableStyles.header}>
-              <Label.Root
-                htmlFor={inputId}
-                size={size}
-                required={required}
-                optional={optional}
-                labels={{ optional: labels.optional }}
-                className={composableStyles.label}
-              >
-                {label}
-              </Label.Root>
-            </div>
-          ) : null}
-          <div className={composableStyles.body}>
-            {children}
-            {showSupport && (
-              <div className={composableStyles.meta} data-reserve={reserveSupportRow || undefined}>
-                {showError ? (
-                  <Hint.Root id={errorId} size={size} invalid className={composableStyles.metaHint}>
-                    {error}
-                  </Hint.Root>
-                ) : showHint ? (
-                  <Hint.Root id={hintId} size={size} className={composableStyles.metaHint}>
-                    {hint}
-                  </Hint.Root>
-                ) : (
-                  <span className={composableStyles.metaHint} />
-                )}
-                {counter != null && <div className={composableStyles.metaCounter}>{counter}</div>}
-              </div>
-            )}
-          </div>
-        </div>
+          {children}
+          <FieldSupportRow
+            ids={ids}
+            size={size}
+            hint={hint}
+            error={error}
+            counter={counter}
+            reserve={reserveSupportRow}
+          />
+        </FieldFrame>
       </ControlSizeProvider>
     </InputProvider>
   );
@@ -163,7 +134,7 @@ function InputWrapper({ children, className }: InputWrapperProps) {
 
   return (
     <div
-      className={cx(composableStyles.wrapper, className)}
+      className={cx(styles.wrapper, className)}
       {...toDataAttributes({
         size,
         invalid: invalid || undefined,
@@ -197,7 +168,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       <input
         ref={ref}
         id={inputId}
-        className={cx(composableStyles.field, className)}
+        className={cx(styles.field, className)}
         aria-invalid={invalid || undefined}
         aria-describedby={resolvedDescribedBy}
         required={required ?? (requiredCtx || undefined)}
@@ -222,7 +193,7 @@ export type InputIconProps = {
 
 function InputIcon({ side, children, className }: InputIconProps) {
   return (
-    <span className={cx(composableStyles.icon, className)} data-side={side} aria-hidden="true">
+    <span className={cx(styles.icon, className)} data-side={side} aria-hidden="true">
       {children}
     </span>
   );
@@ -239,7 +210,7 @@ export type InputAffixProps = {
 
 function InputAffix({ side, children, className }: InputAffixProps) {
   return (
-    <div className={cx(composableStyles.affix, className)} data-side={side} aria-hidden="true">
+    <div className={cx(styles.affix, className)} data-side={side} aria-hidden="true">
       {children}
     </div>
   );
@@ -256,38 +227,12 @@ export type InputInlineAffixProps = {
 
 function InputInlineAffix({ side, children, className }: InputInlineAffixProps) {
   return (
-    <span
-      className={cx(composableStyles.inlineAffix, className)}
-      data-side={side}
-      aria-hidden="true"
-    >
+    <span className={cx(styles.inlineAffix, className)} data-side={side} aria-hidden="true">
       {children}
     </span>
   );
 }
 InputInlineAffix.displayName = "Input.InlineAffix";
-
-// ---- InputBadge ----
-
-export type InputBadgeProps = {
-  /** Palette hue of the soft badge. Default `gray`. */
-  color?: PaletteColor;
-  children: React.ReactNode;
-  className?: string;
-};
-
-/**
- * Status inside the field: a soft Badge one tier below the field, at the trailing edge before
- * the trailing icon / clear button. The value truncates before it; the field height is unchanged.
- */
-function InputBadge({ color = "gray", children, className }: InputBadgeProps) {
-  return (
-    <Badge.Root color={color} variant="soft" className={cx(composableStyles.badge, className)}>
-      {children}
-    </Badge.Root>
-  );
-}
-InputBadge.displayName = "Input.Badge";
 
 // ---- InputClearButton ----
 
@@ -307,7 +252,7 @@ const InputClearButton = React.forwardRef<HTMLButtonElement, InputClearButtonPro
       <button
         ref={ref}
         type="button"
-        className={cx(composableStyles.action, className)}
+        className={cx(styles.action, className)}
         aria-label={labels.clear}
         aria-controls={inputId}
         onClick={(event) => {
@@ -335,24 +280,18 @@ export type InputCounterProps = {
 
 /** Character counter for the support row; turns danger when `current > max`. */
 function InputCounter({ current, max, className }: InputCounterProps) {
-  const { labels } = useInputContext();
-  const spoken = labels.counter.replace("{current}", String(current)).replace("{max}", String(max));
+  const { size, labels } = useInputContext();
   return (
-    <span
-      className={cx(composableStyles.counter, className)}
-      data-invalid={current > max ? "true" : undefined}
-      aria-live="polite"
-    >
-      <span aria-hidden="true">
-        {current}/{max}
-      </span>
-      <span className={composableStyles.srOnly}>{spoken}</span>
-    </span>
+    <FieldCounter
+      current={current}
+      max={max}
+      size={size}
+      label={labels.counter}
+      className={className}
+    />
   );
 }
 InputCounter.displayName = "Input.Counter";
-
-// ---- Namespace export ----
 
 export const Input = {
   Root: InputRoot,
@@ -361,7 +300,6 @@ export const Input = {
   Icon: InputIcon,
   Affix: InputAffix,
   InlineAffix: InputInlineAffix,
-  Badge: InputBadge,
   ClearButton: InputClearButton,
   Counter: InputCounter,
 };

@@ -1,60 +1,27 @@
-/* Layout helpers for the Textarea examples. Semantic tokens only. */
+/* Layout of the Textarea scenarios: semantic tokens only. */
 
-.sizesGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 2)), 1fr));
-  align-items: start;
-  gap: var(--prime-space-5);
-  width: 100%;
-}
-
-.column {
-  display: grid;
-  gap: var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
-.pair {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
-  align-items: start;
-  gap: var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-m);
-}
-
-.cell {
-  display: grid;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-/* Demo block below the field that shows whether the layout shifts. */
-.marker {
-  padding: var(--prime-space-2) var(--prime-space-3);
-  border-radius: var(--prime-radius-s);
-  background: var(--prime-color-fill-subtle);
-}
-
-.card {
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
+/* in-form.tsx: field → field 20, group → actions 32 (foundation §1). */
 .form {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-8);
+  width: min(100%, var(--prime-modal-width-m));
+}
+
+.formHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
   gap: var(--prime-space-5);
 }
 
-.actions {
+.formActions {
   display: flex;
-  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--prime-space-2);
-}
-
-/* Fills its surface tile like Input does, so no stray gap remains on the right. */
-.surfaceField {
-  width: 100%;
 }

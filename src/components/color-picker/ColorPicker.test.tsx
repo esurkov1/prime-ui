@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import type * as React from "react";
-import { I18nProvider, Input } from "react-aria-components";
+import { I18nProvider } from "react-aria-components";
 import { describe, expect, it, vi } from "vitest";
 
 import { ColorPicker } from "./ColorPicker";
@@ -96,20 +96,44 @@ describe("ColorPicker", () => {
   });
 });
 
-describe("ColorPicker focusRing", () => {
-  it("focusRing={false} marks Field and keeps the invalid state", () => {
-    const { container } = render(
+describe("ColorPicker.Swatches", () => {
+  const presets = [
+    { value: "#e5484d", label: "Красный" },
+    { value: "#0090ff", label: "Синий" },
+  ];
+
+  it("follows the picker color and sets it on pick", () => {
+    const onValueChange = vi.fn();
+    render(
       withLocale(
-        <ColorPicker.Field focusRing={false} isInvalid aria-label="Цвет">
-          <Input />
-        </ColorPicker.Field>,
+        <ColorPicker.Root defaultValue="#0090ff" onValueChange={onValueChange}>
+          <ColorPicker.Swatches presets={presets} aria-label="Цвета бренда" />
+        </ColorPicker.Root>,
       ),
     );
-    const field = container.querySelector("[data-focus-ring]");
-    expect(field).toHaveAttribute("data-focus-ring", "false");
-    expect(field).toHaveAttribute("data-invalid", "true");
+    expect(screen.getByRole("radio", { name: "Синий" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "Красный" }));
+    expect(onValueChange.mock.calls[0][0].toString("hex")).toBe("#E5484D");
+    expect(screen.getByRole("radio", { name: "Красный" })).toHaveAttribute("aria-checked", "true");
   });
+});
 
+describe("ColorPicker.HexInput field contract", () => {
+  it("shows the error in place of the hint and marks the field invalid", () => {
+    render(
+      withLocale(
+        <ColorPicker.Root defaultValue="#112233">
+          <ColorPicker.HexInput hint="Формат #RRGGBB" error="Цвет недостаточно контрастный" />
+        </ColorPicker.Root>,
+      ),
+    );
+    const input = screen.getByRole("textbox", { name: "Hex" });
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toHaveAccessibleDescription("Цвет недостаточно контрастный");
+  });
+});
+
+describe("ColorPicker focusRing", () => {
   it("focusRing={false} reaches HexInput and ChannelStrip", () => {
     render(
       withLocale(

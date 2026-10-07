@@ -1,25 +1,21 @@
-/** Empty, filled, error, read-only and disabled fields. Use it to check every state of a multi-line field. */
+/** A default field next to a read-only and a disabled one — `readOnly`, `disabled`. */
 import { Textarea } from "prime-ui-kit";
-import styles from "./examples.module.css";
 
 export default function TextareaStatesExample() {
   return (
-    <div className={styles.pair}>
-      <Textarea.Root label="Пустое" placeholder="Начните печатать" />
-      <Textarea.Root label="Заполненное" defaultValue="Позвоните за час до доставки." />
-      <Textarea.Root label="Ошибка" defaultValue="—" error="Опишите причину возврата." />
+    <>
+      <Textarea.Root label="default" placeholder="Причина возврата" />
       <Textarea.Root
-        label="Только чтение"
+        label="readOnly"
         readOnly
-        defaultValue="Заявка закрыта 12 марта."
-        hint="Текст можно выделить и скопировать."
+        defaultValue="Заявка закрыта 12 марта: товар принят на склад."
       />
       <Textarea.Root
-        label="Отключено"
+        label="disabled"
         disabled
-        placeholder="Недоступно"
-        hint="Поле станет доступно после выбора заказа."
+        placeholder="Причина возврата"
+        hint="Станет доступно после выбора заказа"
       />
-    </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 # Switch
 
 **Category:** selection
+**Kind:** control
 
 > An on/off switch for a setting that takes effect immediately.
 
@@ -21,60 +22,42 @@ import { Switch } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Switch.Root          wrapper grid + context; ref and input props go to the hidden native input
-├─ Switch.Label      clickable row: renders the native input (role="switch"), the track and the text
-├─ Switch.Hint       description under the text column (optional)
-└─ Switch.Error      error message under the text column (optional, makes the field invalid)
+Switch.Root          field grid; ref and input props go to the native input (role="switch")
+├─ <label> row       the native input, the track and the text (rendered by Root)
+│  └─ Switch.Label   the visible text (optional)
+└─ hint | error      support text under the text column (`hint`, `error`)
 ```
-The native input is rendered inside `Switch.Label`, so a Root without `Switch.Label` renders an empty `Switch.Label` itself: `<Switch.Root aria-label="…" />` is a valid bare control (tables, settings rows).
+`<Switch.Root aria-label="…" />` without `Switch.Label` is a valid bare control (settings rows, tables).
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### Switch.Root
+`forwardRef` → `HTMLInputElement` (the native `input type="checkbox" role="switch"`). Renders the field `<div>`, the `<label>` row with the input and the track, and the support row; native input props go to the input.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `checked` | `boolean` | — | Controlled on/off state; use with `onCheckedChange`. |
-| `defaultChecked` | `boolean` | `false` | Initial state in uncontrolled mode. |
-| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on click or Space. |
-| `invalid` | `boolean` | `false` | Invalid look and `aria-invalid`; also set while `Switch.Error` is mounted. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Size tier of the track, thumb, gap and label text. |
-| `fullWidth` | `boolean` | `false` | Stretch to the container width; by default the field is as wide as its content. |
-| `disabled` | `boolean` | `false` | Disables the input. |
-| `readOnly` | `boolean` | `false` | State is visible but cannot change; no hover, `aria-readonly` on the input. |
-| `id` | `string` | auto (`useId`) | Id of the native input; hint/error ids derive from it. |
-| `aria-describedby` | `string` | — | Extra description ids; merged with the mounted hint and error ids. |
-| `className` | `string` | — | Class on the wrapper `div`. |
-| `children` | `ReactNode` | — | `Switch.Label`, `Switch.Hint`, `Switch.Error`. |
-
-+ native `<input>` props except `type`, `size`, `checked`, `defaultChecked`, `onChange`, `children` (`name`, `value`, `required`, `aria-label`, `aria-labelledby`, …) — applied to the hidden native input.
-Ref: `forwardRef` → `HTMLInputElement`. No `asChild`.
+| `checked` | `boolean` | — | Controlled state. |
+| `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
+| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the track (24×16 … 44×24), the text and the gap. |
+| `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
+| `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
+| `invalid` | `boolean` | `false` | Danger ring on the off track and `aria-invalid`. A non-empty `error` implies it. |
+| `disabled` | `boolean` | `false` | No toggling; muted track (on = `accent-soft`), dimmed text and hint. |
+| `readOnly` | `boolean` | `false` | The state is shown and focusable but does not change (`aria-readonly`); no hover or press. |
+| `id` | `string` | — | Id of the input (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
+| `aria-describedby` | `string` | — | Merged before the hint/error ids. |
+| `children` | `ReactNode` | — | `Switch.Label`. Without it only the track renders — name it with `aria-label` or `aria-labelledby`. |
+| `className` | `string` | — | Class on the field `<div>`. |
+| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "type" \| "size" \| "checked" \| "defaultChecked" \| "onChange">` | — | `name`, `value`, `required`, `aria-label`, `aria-labelledby`… on the native input. |
 
 ### Switch.Label
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactNode` | — | Text to the right of the track. Empty → only the track; then name the switch via `aria-label` / `aria-labelledby` on `Switch.Root`. |
-| `className` | `string` | — | Class on the `<label>` row. |
-
-+ native `<label>` HTML attributes except `htmlFor` and `size`. Ref: `forwardRef` → `HTMLLabelElement`.
-
-### Switch.Hint
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactNode` | — (required) | Description under the text column; added to `aria-describedby`. |
-| `className` | `string` | — | Class on the `<p>`. |
-
-+ native `<p>` props except `id`. No ref.
-
-### Switch.Error
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactNode` | — (required) | Error text in `danger-text`; while mounted the field is invalid. |
-| `className` | `string` | — | Class on the `<p>`. |
-
-+ native `<p>` props except `id`. No ref.
+`ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.
 
 ## Variants
-No `variant`/`tone`/`color`. Axes: `size`, `fullWidth`.
+No `variant` / `tone` / `color`.
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -85,75 +68,74 @@ No `variant`/`tone`/`color`. Axes: `size`, `fullWidth`.
 | `l` | track 36×20, thumb 16, 8px gap, 16/24 text | spacious settings pages | |
 | `xl` | track 44×24, thumb 20, 12px gap, 16/24 text | touch-first screens | |
 
-### fullWidth
+**Sizes:** the track is centred on the first text line; the text follows the tier (12 · 13 · 14 · 16 · 16). Use the same tier as the neighbouring Checkbox / Radio / inputs.
+
+### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `false` | field shrinks to its content | most cases | yes |
-| `true` | field stretches to 100% of the container | the row must fill a grid cell | |
+| `readOnly` | normal colours, no hover or press, clicks ignored | the value is meaningful but someone else controls it | `false` |
+| `disabled` | muted track (on = `accent-soft`), dimmed text | the setting is unavailable | `false` |
+| `invalid` | danger ring on the off track | the message is shown elsewhere; otherwise pass `error` | `false` |
 
 **Combinations**
-- `readOnly` vs `disabled`: `readOnly` keeps the normal colours (the value is meaningful, someone else controls it); `disabled` mutes the track (the setting is unavailable). Do not combine them.
-- `invalid` together with `Switch.Error` is redundant; mount `Switch.Error` alone.
-
-**Sizes** — the track is centred on the first text line; label text follows the tier (12 · 13 · 14 · 16 · 16). Use the same tier as the neighbouring Checkbox/Radio/inputs.
-
-**Hierarchy** — a master switch sits above its dependants and drives their `disabled` (see [notification-settings.tsx](examples/notification-settings.tsx)).
+- `readOnly` and `disabled` together are pointless — pick one.
+- `invalid` together with `error` is redundant; pass `error` alone.
+- A master switch sits above its dependants and drives their `disabled`.
 
 ## States
-| State | Driven by | DOM | Looks like |
-|---|---|---|---|
-| off | `checked={false}` / default | `data-state="unchecked"` | track `fill-strong` (hover `fill-strong-hover`), thumb at the start |
-| on | `checked` / `defaultChecked` | `data-state="checked"` | track `accent-default` (hover `accent-hover`), thumb glides to the end |
-| invalid | `invalid` or mounted `Switch.Error` | `data-invalid="true"`, `aria-invalid` | off track gets a `danger-border` inset ring; focus ring `danger-border` |
-| disabled | `disabled` | `data-disabled="true"` | off track `fill-muted`, on track `accent-soft`, thumb without shadow, `cursor: not-allowed` |
-| read-only | `readOnly` | `aria-readonly="true"` on the input | normal colours, no hover, default cursor, clicks ignored |
-| focus-visible | keyboard | — | outer focus ring around the track |
+| State | Driven by | DOM |
+|---|---|---|
+| off | `checked={false}` / default | `data-state="unchecked"`; track `fill-strong` (hover `fill-strong-hover`), thumb at the start |
+| on | `checked` / `defaultChecked` | `data-state="checked"`; accent track, the thumb glides to the end |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid`; danger ring on the off track and on focus |
+| disabled | `disabled` | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, `cursor: not-allowed` |
+| read-only | `readOnly` | `aria-readonly="true"` on the input; no hover, default cursor |
+| pressed | pointer press | the track scales to the compact press scale (not when disabled or read-only) |
+| focus-visible | keyboard | outer focus ring around the track |
 
-Root also carries `data-size` and `data-full-width="true"` when `fullWidth`.
-Controlled: `checked` + `onCheckedChange`. Uncontrolled: `defaultChecked`. No native `onChange` prop.
+Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncontrolled: `defaultChecked`. No native `onChange` prop.
 
 ## Layout & spacing
 - Grid `[track][text]`; hint and error sit under the text column.
-- Switches in a settings list: gap `--prime-space-5` (20px) between fields.
-- Settings row (text left, switch right): flex row with `justify-content: space-between`, gap `--prime-space-4`; `Switch.Label` without children and `aria-labelledby` / `aria-describedby` pointing at the row text.
+- Switches in a settings list: gap `--prime-space-4`–`--prime-space-5` between fields.
+- Settings row (text left, switch right): flex row with `justify-content: space-between`, gap `--prime-space-4`; a bare `Switch.Root` with `aria-labelledby` / `aria-describedby` pointing at the row text.
 - In a form, a `name`d switch submits `"on"` when checked (native checkbox semantics).
 
 ## Accessibility
-- Native `<input type="checkbox" role="switch">` with `aria-checked`, visually hidden, associated with the `<label>`.
-- Keyboard: Tab focuses, Space toggles.
-- `aria-invalid`, `aria-readonly`, `aria-describedby` (your ids + hint + error) are set on the input.
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Moves focus to the switch. |
+| `Space` | Toggles it (not while `readOnly`). |
+
+### ARIA
+- A native `<input type="checkbox" role="switch">` with `aria-checked`, visually hidden over the track and wrapped by the `<label>` row.
+- `aria-invalid`, `aria-readonly` and `aria-describedby` (your ids + the hint or the error) are set on the input.
 - Without visible text, name it with `aria-label` or `aria-labelledby` on `Switch.Root`.
-- No `labels` keys.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+No `labels`.
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [sizes.tsx](examples/sizes.tsx) | All size tiers | Choosing the tier next to other controls |
-| [validation.tsx](examples/validation.tsx) | Hint vs `Switch.Error` | A switch that must be on to continue |
-| [states.tsx](examples/states.tsx) | Off, on, disabled, read-only, invalid | Reference for every state |
-| [on-off.tsx](examples/on-off.tsx) | Off and on switch | Checking contrast on canvas, cards, overlays |
-| [controlled.tsx](examples/controlled.tsx) | `checked` + `onCheckedChange` | Other UI depends on the switch |
-| [in-form.tsx](examples/in-form.tsx) | `name`, `required`, `aria-label` in a form | Form semantics of Switch; prefer Checkbox when the value applies only after submit |
-| [settings-row.tsx](examples/settings-row.tsx) | Text left, track right, `aria-labelledby` | Settings lists |
-| [notification-settings.tsx](examples/notification-settings.tsx) | Master switch disabling dependants in a Card | Dependent settings |
-
-```tsx
-import { Switch } from "prime-ui-kit";
-
-export function BackupSwitch() {
-  return (
-    <Switch.Root name="backup" defaultChecked>
-      <Switch.Label>Резервное копирование</Switch.Label>
-      <Switch.Hint>Каждую ночь в 03:00.</Switch.Hint>
-    </Switch.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A setting that applies at once, with a hint under its text — `hint`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size, track 24×16 to 44×24; the text follows the control tier — `size`. |
+| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `readOnly`, `invalid`, `disabled`. |
+| [settings-row.tsx](examples/settings-row.tsx) | A settings row with text on the left and a bare track on the right — `aria-labelledby`, `aria-describedby`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the state and rewrites the hint to match it — `checked`, `onCheckedChange`. |
+| [in-form.tsx](examples/in-form.tsx) | Switches submitted with a form: the value goes to FormData by `name`, a required one shows an error — `name`, `required`, `error`. |
 
 ## Mistakes
 - `<Switch.Root onChange={…}>` → use `onCheckedChange`.
-- Switch for an option that is saved by a «Сохранить» button → use `Checkbox`.
-- `disabled` for a value managed by an admin → use `readOnly` so the state stays readable.
+- A switch whose value only applies after «Сохранить» → use `Checkbox`.
+- `invalid` plus `error` → pass `error` alone.
+- A bare switch without `aria-label` / `aria-labelledby` → it has no accessible name.
+- `readOnly` used to block a setting that is unavailable → use `disabled`.
 
 ## Related
-[Checkbox](../checkbox/COMPONENT.md) · [Radio](../radio/COMPONENT.md) · [SegmentedControl](../segmented-control/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (the row), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **See also:** [Checkbox](../checkbox/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

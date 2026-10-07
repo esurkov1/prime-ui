@@ -91,8 +91,6 @@ export type {
 } from "./card/Card";
 export { Card } from "./card/Card";
 export type {
-  CheckboxErrorProps,
-  CheckboxHintProps,
   CheckboxIndicatorProps,
   CheckboxLabelProps,
   CheckboxRootProps,
@@ -109,14 +107,12 @@ export type {
   ColorPickerChannelStripProps,
   ColorPickerColorValue,
   ColorPickerEyeDropperButtonProps,
-  ColorPickerFieldProps,
   ColorPickerHexInputProps,
   ColorPickerLabels,
   ColorPickerPanelProps,
   ColorPickerRootProps,
   ColorPickerSliderProps,
-  ColorPickerSwatchPickerItemProps,
-  ColorPickerSwatchPickerProps,
+  ColorPickerSwatchesProps,
   ColorPickerTriggerSwatchProps,
   ColorValueFormat,
 } from "./color-picker/ColorPicker";
@@ -130,7 +126,7 @@ export type {
   ColorPresetsTriggerProps,
 } from "./color-picker/ColorPresets";
 export { COLOR_PRESETS, ColorPresets } from "./color-picker/ColorPresets";
-export type { ColorSwatchesLabels, ColorSwatchesRootProps } from "./color-swatches/ColorSwatches";
+export type { ColorSwatchesLabels, ColorSwatchesProps } from "./color-swatches/ColorSwatches";
 export { ColorSwatches } from "./color-swatches/ColorSwatches";
 export type {
   CommandMenuDescriptionProps,
@@ -172,7 +168,7 @@ export {
   formatDatepickerValue,
   YEARLESS_YEAR,
 } from "./datepicker/Datepicker";
-export type { DigitInputLabels, DigitInputRootProps } from "./digit-input/DigitInput";
+export type { DigitInputLabels, DigitInputProps } from "./digit-input/DigitInput";
 export { DigitInput } from "./digit-input/DigitInput";
 export type { DividerAlign, DividerOrientation, DividerRootProps } from "./divider/Divider";
 export { Divider } from "./divider/Divider";
@@ -229,27 +225,16 @@ export type {
 } from "./example-frame/ExampleFrame";
 export { ExampleFrame } from "./example-frame/ExampleFrame";
 export type {
-  FileUploadActionsRowProps,
-  FileUploadBrowseLabelProps,
+  FileUploadBodyProps,
   FileUploadBrowseLinkProps,
-  FileUploadChipLabelProps,
-  FileUploadChipProps,
-  FileUploadDropBodyProps,
+  FileUploadDescriptionProps,
   FileUploadFormatBadgeProps,
-  FileUploadHintProps,
   FileUploadIconProps,
   FileUploadItemActionsProps,
-  FileUploadItemFooterProps,
-  FileUploadItemMainProps,
-  FileUploadItemMetaProps,
-  FileUploadItemMetaSepProps,
+  FileUploadItemDescriptionProps,
   FileUploadItemNameProps,
   FileUploadItemProgressProps,
   FileUploadItemProps,
-  FileUploadItemRowProps,
-  FileUploadItemStackProps,
-  FileUploadItemTextGroupProps,
-  FileUploadItemTryAgainProps,
   FileUploadLabels,
   FileUploadRootProps,
   FileUploadTitleProps,
@@ -260,7 +245,6 @@ export type { HintIconProps, HintRootProps } from "./hint/Hint";
 export { Hint } from "./hint/Hint";
 export type {
   InputAffixProps,
-  InputBadgeProps,
   InputClearButtonProps,
   InputCounterProps,
   InputFieldProps,
@@ -273,7 +257,12 @@ export type {
 export { Input } from "./input/Input";
 export type { KbdRootProps } from "./kbd/Kbd";
 export { Kbd } from "./kbd/Kbd";
-export type { LabelLabels, LabelRootProps } from "./label/Label";
+export type {
+  LabelDescriptionProps,
+  LabelIconProps,
+  LabelLabels,
+  LabelRootProps,
+} from "./label/Label";
 export { Label } from "./label/Label";
 export type { LinkButtonProps } from "./link-button/LinkButton";
 export { LinkButton } from "./link-button/LinkButton";
@@ -286,7 +275,6 @@ export type {
   LoginFormHeaderProps,
   LoginFormLogoProps,
   LoginFormRootProps,
-  LoginFormSocialProps,
   LoginFormTitleProps,
 } from "./login-form/LoginForm";
 export { LoginForm } from "./login-form/LoginForm";
@@ -352,9 +340,8 @@ export { ProgressBar } from "./progress-bar/ProgressBar";
 export type { ProgressCircleRootProps } from "./progress-circle/ProgressCircle";
 export { ProgressCircle } from "./progress-circle/ProgressCircle";
 export type {
-  RadioErrorProps,
+  RadioGroupLabels,
   RadioGroupProps,
-  RadioHintProps,
   RadioLabelProps,
   RadioRootProps,
 } from "./radio/Radio";
@@ -387,7 +374,7 @@ export type {
   SelectValueProps,
 } from "./select/Select";
 export { Select } from "./select/Select";
-export type { SliderRootProps } from "./slider/Slider";
+export type { SliderProps } from "./slider/Slider";
 export { Slider } from "./slider/Slider";
 export type {
   SmartFilterChipsProps,
@@ -419,8 +406,6 @@ export type {
 } from "./stepper/Stepper";
 export { Stepper } from "./stepper/Stepper";
 export type {
-  SwitchErrorProps,
-  SwitchHintProps,
   SwitchLabelProps,
   SwitchRootProps,
 } from "./switch/Switch";

@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Hint } from "@/components/hint/Hint";
-import { Label } from "@/components/label/Label";
-import { useFieldIds } from "@/hooks/useFieldIds";
+
+import { FieldCounter, FieldSupportRow } from "@/components/input/FieldSupport";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
@@ -23,9 +23,10 @@ const TEXTAREA_LABELS: TextareaLabels = {
   counter: "{current} из {max} символов",
 };
 
-const [TextareaProvider, useTextareaContext] = createComponentContext<{ labels: TextareaLabels }>(
-  "Textarea",
-);
+const [TextareaProvider, useTextareaContext] = createComponentContext<{
+  size: ControlSize;
+  labels: TextareaLabels;
+}>("Textarea");
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
@@ -39,7 +40,7 @@ export type TextareaRootProps = Omit<
   /**
    * Draws the focus ring on the field box (default). `false` hides only the visual ring — focus,
    * keyboard and ARIA are unchanged, the error ring still shows. Turn it off only where focus is
-   * otherwise obvious (a single search field with a caret, e.g. a command palette); WCAG 2.4.7.
+   * otherwise obvious (a single composer field with a caret); WCAG 2.4.7.
    */
   focusRing?: boolean;
   label?: React.ReactNode;
@@ -65,7 +66,7 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
       id,
       className,
       size = "m",
-      invalid: invalidProp = false,
+      invalid,
       focusRing = true,
       label,
       required,
@@ -87,16 +88,9 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
     },
     ref,
   ) => {
-    const showError = error != null && error !== false && error !== "";
-    const invalid = invalidProp || showError;
-    const showHint = !showError && hint != null && hint !== false;
-    const { inputId, hintId, errorId, describedBy } = useFieldIds(id, {
-      hasHint: showHint,
-      hasError: showError,
-      extraDescribedBy: ariaDescribedBy,
-    });
+    const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
     const labels = React.useMemo(() => ({ ...TEXTAREA_LABELS, ...labelsProp }), [labelsProp]);
-    const showSupport = showHint || showError || counter != null || reserveSupportRow;
+    const contextValue = React.useMemo(() => ({ size, labels }), [size, labels]);
 
     const innerRef = React.useRef<HTMLTextAreaElement | null>(null);
     const setRefs = React.useMemo(() => mergeRefs(innerRef, ref), [ref]);
@@ -110,23 +104,23 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
 
     // Clicking the padding of the field focuses the textarea (the box is a div, not a label,
     // so the counter and hints never leak into the accessible name).
-    const handleControlMouseDown = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const focusFromPadding = (event: React.MouseEvent<HTMLDivElement>) => {
       const textarea = innerRef.current;
-      if (!textarea || e.target === textarea || textarea.disabled) return;
-      e.preventDefault();
+      if (!textarea || event.target === textarea || textarea.disabled) return;
+      event.preventDefault();
       textarea.focus();
-    }, []);
+    };
 
     const textarea = (
       <textarea
         ref={setRefs}
-        id={inputId}
+        id={ids.controlId}
         className={cx(styles.textarea, autoResize && styles.textareaAutoResize)}
         disabled={disabled}
         readOnly={readOnly}
         required={required}
-        aria-invalid={invalid || undefined}
-        aria-describedby={describedBy}
+        aria-invalid={ids.invalid || undefined}
+        aria-describedby={ids.describedBy}
         value={value}
         onInput={(event) => {
           if (autoResize && mirrorRef.current) {
@@ -142,73 +136,49 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
       />
     );
 
-    const contextValue = React.useMemo(() => ({ labels }), [labels]);
-
     return (
       <TextareaProvider value={contextValue}>
         <ControlSizeProvider value={size}>
-          <div
-            className={styles.field}
-            {...toDataAttributes({ size, invalid: invalid || undefined })}
+          <FieldFrame
+            size={size}
+            ids={ids}
+            label={label}
+            required={required}
+            optional={optional}
+            disabled={disabled}
+            optionalLabel={labels.optional}
+            className={styles.root}
           >
-            {label != null ? (
-              <div className={styles.header}>
-                <Label.Root
-                  htmlFor={inputId}
-                  size={size}
-                  disabled={disabled}
-                  required={required}
-                  optional={optional}
-                  labels={{ optional: labels.optional }}
-                >
-                  {label}
-                </Label.Root>
-              </div>
-            ) : null}
-            <div className={styles.body}>
-              {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer convenience only; the textarea itself is the focus target */}
-              <div
-                className={cx(styles.control, className)}
-                onMouseDown={handleControlMouseDown}
-                {...toDataAttributes({
-                  size,
-                  invalid: invalid || undefined,
-                  disabled: disabled || undefined,
-                  readonly: readOnly || undefined,
-                  "focus-ring": focusRing ? undefined : false,
-                })}
-              >
-                {autoResize ? (
-                  <div ref={mirrorRef} className={styles.autoResize} data-value="">
-                    {textarea}
-                  </div>
-                ) : (
-                  textarea
-                )}
-              </div>
-              {showSupport ? (
-                <div className={styles.support} data-reserve={reserveSupportRow || undefined}>
-                  {showError ? (
-                    <Hint.Root id={errorId} size={size} invalid className={styles.supportText}>
-                      {error}
-                    </Hint.Root>
-                  ) : showHint ? (
-                    <Hint.Root
-                      id={hintId}
-                      size={size}
-                      disabled={disabled}
-                      className={styles.supportText}
-                    >
-                      {hint}
-                    </Hint.Root>
-                  ) : (
-                    <span className={styles.supportText} />
-                  )}
-                  {counter != null ? <div className={styles.supportCounter}>{counter}</div> : null}
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer convenience only; the textarea itself is the focus target */}
+            <div
+              className={cx(styles.control, className)}
+              onMouseDown={focusFromPadding}
+              {...toDataAttributes({
+                size,
+                invalid: ids.invalid || undefined,
+                disabled: disabled || undefined,
+                readonly: readOnly || undefined,
+                "focus-ring": focusRing ? undefined : false,
+              })}
+            >
+              {autoResize ? (
+                <div ref={mirrorRef} className={styles.autoResize} data-value="">
+                  {textarea}
                 </div>
-              ) : null}
+              ) : (
+                textarea
+              )}
             </div>
-          </div>
+            <FieldSupportRow
+              ids={ids}
+              size={size}
+              hint={hint}
+              error={error}
+              counter={counter}
+              reserve={reserveSupportRow}
+              disabled={disabled}
+            />
+          </FieldFrame>
         </ControlSizeProvider>
       </TextareaProvider>
     );
@@ -227,19 +197,15 @@ export type TextareaCounterProps = {
 
 /** Character counter for the `counter` slot; turns danger when `current > max`. */
 function TextareaCounter({ current, max, className }: TextareaCounterProps) {
-  const { labels } = useTextareaContext();
-  const spoken = labels.counter.replace("{current}", String(current)).replace("{max}", String(max));
+  const { size, labels } = useTextareaContext();
   return (
-    <span
-      className={cx(styles.counter, className)}
-      data-invalid={current > max ? "true" : undefined}
-      aria-live="polite"
-    >
-      <span aria-hidden="true">
-        {current}/{max}
-      </span>
-      <span className={styles.srOnly}>{spoken}</span>
-    </span>
+    <FieldCounter
+      current={current}
+      max={max}
+      size={size}
+      label={labels.counter}
+      className={className}
+    />
   );
 }
 
