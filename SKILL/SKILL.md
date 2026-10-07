@@ -18,6 +18,8 @@ every region.
 
 ## How to use this skill
 
+0. **Read first** — [cheatsheet.md](cheatsheet.md): one page of the decisions agents most often get
+   wrong, each as «do this, not that» with the exact API.
 1. **Choose** — [choosing.md](choosing.md): the category by task, then the component, then the pairs
    that are easy to confuse.
 2. **Read the component** — [components.md](components.md) links each `COMPONENT.md` (API, variants,
@@ -44,6 +46,7 @@ repository; in a consumer project the same files are under `node_modules/prime-u
 
 | File | Read when |
 |---|---|
+| [cheatsheet.md](cheatsheet.md) | first — the most frequent decisions and mistakes in one page |
 | [choosing.md](choosing.md) | unsure which component fits |
 | [components.md](components.md) | finding a component and its docs |
 | [composition.md](composition.md) | building any screen — the rules of assembly, and what to do when the kit lacks a component |
@@ -70,9 +73,10 @@ and `AppShell` belong to the app root, once. A screen component you deliver rend
 a separate `AppLayout` from [layouts.md](layouts.md#app-frame-once-per-app) — never inline the frame
 into a page.
 
-Icons: the kit exports a small set (`Icon name="…"`, `IconSearch`, … — list in
-[api-contract.md](api-contract.md#icons)). For any other icon add `lucide-react` to the app's own
-dependencies and import from it; use the same icon library everywhere.
+Icons: the kit exports a set for product UI (`Icon name="…"`, `IconSearch`, … — list in
+[api-contract.md](api-contract.md#icons)); take every glyph it has from it. Only for a domain glyph
+the kit lacks add `lucide-react` to the app's own dependencies and import from it; use the same icon
+library everywhere.
 
 ## Ten rules
 

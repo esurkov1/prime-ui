@@ -1,0 +1,37 @@
+# prime-ui-kit
+
+> React 19 UI kit (npm `prime-ui-kit`) for product interfaces — admin panels, dashboards, settings, forms and data tables — on one design contract: depth from fill, a 4px grid, one size axis `xs–xl` (default `m`), CSS Modules on semantic `--prime-*` tokens, light and dark themes. Compound components (`X.Root` + parts) and leaves (`<Typography>`, `<DataTable>`) share one API vocabulary: `size`, `variant`, `tone`, `color`, `label`/`hint`/`error`, `value`/`onValueChange`, `checked`/`onCheckedChange`, `open`/`onOpenChange`, `labels`. Every component ships a `COMPONENT.md` reference and copyable `examples/` inside the npm package; an agent skill in `SKILL/` teaches how to build screens with it.
+
+Read the cheatsheet first, then the skill entry point. Never guess a prop: if a name is not in the component's `COMPONENT.md` API table, the component does not have it. In a consumer project the same component files are under `node_modules/prime-ui-kit/src/`.
+
+## Start here
+
+- [Cheatsheet](https://github.com/esurkov1/prime-ui/blob/main/SKILL/cheatsheet.md): one page of "do this, not that" lines with the exact API — setup, size, structure, fields, state, icons, buttons, cards, tables, overlays, states, Sidebar, spacing, anti-slop top 10
+- [Skill entry point](https://github.com/esurkov1/prime-ui/blob/main/SKILL/SKILL.md): how to use the skill, app setup, the ten rules, which file to read when
+
+## Choosing and composing
+
+- [Components index](https://github.com/esurkov1/prime-ui/blob/main/SKILL/components.md): every component by category, with links to its COMPONENT.md and examples
+- [Choosing a component](https://github.com/esurkov1/prime-ui/blob/main/SKILL/choosing.md): category by task, then the component, then pairs that are easy to confuse
+- [Composition](https://github.com/esurkov1/prime-ui/blob/main/SKILL/composition.md): page skeleton, spacing rhythm, hierarchy, surfaces, actions, forms, tables, feedback, overlays, narrow screens, what to do when the kit lacks a component
+- [Screen patterns](https://github.com/esurkov1/prime-ui/tree/main/SKILL/patterns): whole working pages to start from — list, detail, settings, form in a Drawer, dashboard, loading / empty / error states
+- [Layouts](https://github.com/esurkov1/prime-ui/blob/main/SKILL/layouts.md): the app frame (AppShell + Sidebar, once per app), page wrappers, auth screens
+
+## Rules
+
+- [API contract](https://github.com/esurkov1/prime-ui/blob/main/SKILL/api-contract.md): prop vocabulary, controlled vs uncontrolled, forms, destructive actions, the icon registry names
+- [Foundations](https://github.com/esurkov1/prime-ui/blob/main/SKILL/foundations.md): grid, proximity scale, sizes, surfaces, type roles, tone and color
+- [Anti-slop](https://github.com/esurkov1/prime-ui/blob/main/SKILL/anti-slop.md): what makes a screen look generated, bad → good
+- [Checklist](https://github.com/esurkov1/prime-ui/blob/main/SKILL/checklist.md): questions to answer before handing a screen over
+- [Design contract](https://github.com/esurkov1/prime-ui/blob/main/docs/foundation.md): the full design language and API v1 the kit is built on
+
+## Component reference
+
+- [Components](https://github.com/esurkov1/prime-ui/tree/main/src/components): one folder per component; `<dir>/COMPONENT.md` is the full reference (When to use, Anatomy, API with exact defaults, Variants, States, Accessibility, Mistakes) and `<dir>/examples/*.tsx` are copyable scenarios, one per file
+- [Layout components](https://github.com/esurkov1/prime-ui/tree/main/src/layout): AppShell and Sidebar, same structure
+- [Button reference](https://github.com/esurkov1/prime-ui/blob/main/src/components/button/COMPONENT.md): a sample COMPONENT.md, the template every component follows
+
+## Optional
+
+- [README](https://github.com/esurkov1/prime-ui/blob/main/README.md): install, setup, the full component list, public exports
+- [Icon registry source](https://github.com/esurkov1/prime-ui/blob/main/src/icons/index.ts): every `<Icon name>` and the lucide glyph behind it
