@@ -5,21 +5,14 @@
  */
 import * as React from "react";
 
+import { toVarName } from "../../tokens/naming";
 import { primitiveTokens } from "../../tokens/primitives";
 import { semanticTokens } from "../../tokens/semantic";
 import { darkThemeOverrides } from "../../tokens/themes/dark";
 
-export { primitiveTokens, semanticTokens };
+export { primitiveTokens, semanticTokens, toVarName };
 
 type TokenTree = { readonly [key: string]: string | TokenTree };
-
-/** `color.bg.canvas` → `--prime-color-bg-canvas` (same rule as `scripts/build-tokens.ts`). */
-export function toVarName(path: string, prefix = "--prime"): string {
-  return `${prefix}-${path
-    .replaceAll(".", "-")
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .toLowerCase()}`;
-}
 
 /** camelCase role key → kebab name: `bodyS` → `body-s`. */
 export function toKebab(key: string): string {
