@@ -139,8 +139,9 @@
   --sb-panel-width: var(--sb-compact);
 }
 
+/* Not positioned on purpose: the header toggle anchors to `.root`, whose width is what animates
+   (the panel jumps to the target width at once), so the toggle travels with the rail edge. */
 .panel {
-  position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -702,8 +703,9 @@
 /* --- Compact flyout ---------------------------------------------------------------- */
 
 /* The kit floating surface (Popover, flush): the parent's name level with it, then the children. */
+/* Rows keep the same air on the right and at the bottom as the guide line has on the left. */
 .flyout {
-  padding: 0 var(--prime-space-1) var(--prime-space-1);
+  padding: 0 var(--prime-space-2) var(--prime-space-2) var(--prime-space-1);
   color: var(--prime-color-text-primary);
 }
 
@@ -800,10 +802,18 @@
   min-width: 0;
 }
 
+/* Same type and colour as an item label (a white name reads larger than the rows above it). */
 .accountName {
+  color: var(--prime-color-text-secondary);
   font-size: var(--sb-text);
   line-height: var(--sb-line-height);
   font-weight: var(--prime-font-weight-medium);
+  transition: color var(--prime-motion-duration-xfast) var(--sb-ease);
+}
+
+.account:hover .accountName,
+.account[aria-expanded="true"] .accountName {
+  color: var(--prime-color-text-primary);
 }
 
 .accountChevron {
