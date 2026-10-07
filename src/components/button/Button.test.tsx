@@ -1,10 +1,28 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+
 import { Button } from "./Button";
 import styles from "./Button.module.css";
 
 describe("Button", () => {
+  it("takes the host tier without its own size; an explicit size wins", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <Button.Root>Host</Button.Root>
+        <Button.Root size="l">Own</Button.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByRole("button", { name: "Host" })).toHaveAttribute("data-size", "s");
+    expect(screen.getByRole("button", { name: "Own" })).toHaveAttribute("data-size", "l");
+  });
+
+  it("defaults to m outside a host", () => {
+    render(<Button.Root>Save</Button.Root>);
+    expect(screen.getByRole("button", { name: "Save" })).toHaveAttribute("data-size", "m");
+  });
+
   it("renders and handles click", () => {
     const onClick = vi.fn();
     render(<Button.Root onClick={onClick}>Save</Button.Root>);

@@ -41,7 +41,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 |---|---|---|---|
 | `variant` | `"solid" \| "soft" \| "outline" \| "ghost"` | `"solid"` | Visual treatment. |
 | `tone` | `"accent" \| "neutral" \| "danger"` | `"accent"` | Meaning of the action; `danger` for destructive actions. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
 | `loading` | `boolean` | `false` | Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content. |
 | `asChild` | `boolean` | `false` | Merges Button props and styles onto the single child element instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`. |

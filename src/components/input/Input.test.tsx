@@ -2,8 +2,37 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+
 import { Input } from "./Input";
 import styles from "./Input.module.css";
+
+describe("Input size from the host", () => {
+  it("takes the host tier without its own size; an explicit size wins", () => {
+    render(
+      <ControlSizeProvider value="l">
+        <Input.Root label="Почта">
+          <Input.Wrapper>
+            <Input.Field />
+          </Input.Wrapper>
+        </Input.Root>
+        <Input.Root label="Пароль" size="xs">
+          <Input.Wrapper>
+            <Input.Field />
+          </Input.Wrapper>
+        </Input.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByLabelText("Почта").closest("[data-invalid], [data-size]")).toHaveAttribute(
+      "data-size",
+      "l",
+    );
+    expect(screen.getByLabelText("Пароль").closest("[data-size]")).toHaveAttribute(
+      "data-size",
+      "xs",
+    );
+  });
+});
 
 // ─── Composable API ───────────────────────────────────────────────────────────
 

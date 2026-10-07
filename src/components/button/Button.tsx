@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { Slot } from "@/internal/slot";
@@ -38,6 +38,7 @@ export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
   variant?: Variant;
   /** Semantic color. Default `accent`; `danger` for destructive actions. */
   tone?: Extract<Tone, "accent" | "neutral" | "danger">;
+  /** Tier. Default: the tier of the surrounding control (a form, a panel, a field), else `m`. */
   size?: ControlSize;
   fullWidth?: boolean;
   loading?: boolean;
@@ -56,7 +57,7 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
       className,
       variant = "solid",
       tone = "accent",
-      size = "m",
+      size: sizeProp,
       fullWidth,
       type = "button",
       loading = false,
@@ -67,6 +68,9 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
     },
     ref,
   ) => {
+    // Without an explicit size the button takes the tier of its host (a form, a panel, a field).
+    const hostSize = useOptionalControlSize();
+    const size = sizeProp ?? hostSize ?? "m";
     const isDisabled = disabled || loading;
     const layout = getButtonLayout(children);
     const dataAttrs = toDataAttributes({
