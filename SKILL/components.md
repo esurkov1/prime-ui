@@ -72,6 +72,7 @@ System messages, progress and empty states.
 | Notification | Pop-up toast notifications: `NotificationProvider` at the app root and `notify()` from any screen. | [COMPONENT.md](../src/components/notification/COMPONENT.md) · [examples](../src/components/notification/examples/) |
 | ProgressBar | Linear progress: one value on a native `<progress>`, or `segments` that split a whole (storage by type, task statuses), with a label, a percentage and status colors. | [COMPONENT.md](../src/components/progress-bar/COMPONENT.md) · [examples](../src/components/progress-bar/examples/) |
 | ProgressCircle | Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center. | [COMPONENT.md](../src/components/progress-circle/COMPONENT.md) · [examples](../src/components/progress-circle/examples/) |
+| Spinner | An indeterminate loading indicator: a ring with a gap that turns while a request runs. | [COMPONENT.md](../src/components/spinner/COMPONENT.md) · [examples](../src/components/spinner/examples/) |
 | EmptyPage | Empty state of a page or a block: icon, title, explanation and an action. | [COMPONENT.md](../src/components/empty-page/COMPONENT.md) · [examples](../src/components/empty-page/examples/) |
 
 ## Navigation (`navigation`)

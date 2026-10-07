@@ -34,6 +34,7 @@ import {
   ListChecks,
   ListFilter,
   ListOrdered,
+  Loader,
   LogIn,
   type LucideIcon,
   Maximize2,
@@ -117,6 +118,7 @@ import SelectSection from "./sections/SelectSection";
 import SidebarSection from "./sections/SidebarSection";
 import SliderSection from "./sections/SliderSection";
 import SmartFilterSection from "./sections/SmartFilterSection";
+import SpinnerSection from "./sections/SpinnerSection";
 import StepperSection from "./sections/StepperSection";
 import SwitchSection from "./sections/SwitchSection";
 import TabsSection from "./sections/TabsSection";
@@ -571,6 +573,14 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       keywords: ["прогресс", "круг", "кольцо", "value"],
       icon: CircleGauge,
       Page: ProgressCircleSection,
+    },
+    {
+      segment: "spinner",
+      label: "Spinner",
+      description: "Индикатор загрузки без известного прогресса",
+      keywords: ["спиннер", "загрузка", "лоадер", "loader", "loading", "индикатор"],
+      icon: Loader,
+      Page: SpinnerSection,
     },
     {
       segment: "empty-page",

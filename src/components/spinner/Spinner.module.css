@@ -1,0 +1,99 @@
+/*
+ * Spinner — a ring with a gap turning at a constant speed (foundation §7: keyframes are fine for a
+ * spinner; under reduced motion the duration collapses to 0 and the ring stays still).
+ * Size follows the Icon model: an explicit `size` takes the icon scale, otherwise the host's
+ * `--prime-icon-size` or the nearest control tier.
+ */
+.root {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: var(--spinner-box);
+  height: var(--spinner-box);
+  color: inherit;
+  vertical-align: middle;
+}
+
+.ring {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: calc(var(--prime-border-width) * 2) solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: var(--prime-radius-full);
+  animation: primeSpinnerTurn calc(var(--prime-motion-duration-slow) * 3) linear infinite;
+}
+
+/* Explicit `size`: the global icon scale. */
+.sizeXs {
+  --spinner-box: var(--prime-icon-xs);
+}
+
+.sizeS {
+  --spinner-box: var(--prime-icon-s);
+}
+
+.sizeM {
+  --spinner-box: var(--prime-icon-m);
+}
+
+.sizeL {
+  --spinner-box: var(--prime-icon-l);
+}
+
+.sizeXl {
+  --spinner-box: var(--prime-icon-xl);
+}
+
+/* No `size`: the host's icon size, else the control tier of the nearest ControlSizeProvider. */
+.inherit.sizeXs {
+  --spinner-box: var(--prime-icon-size, var(--prime-control-xs-icon));
+}
+
+.inherit.sizeS {
+  --spinner-box: var(--prime-icon-size, var(--prime-control-s-icon));
+}
+
+.inherit.sizeM {
+  --spinner-box: var(--prime-icon-size, var(--prime-control-m-icon));
+}
+
+.inherit.sizeL {
+  --spinner-box: var(--prime-icon-size, var(--prime-control-l-icon));
+}
+
+.inherit.sizeXl {
+  --spinner-box: var(--prime-icon-size, var(--prime-control-xl-icon));
+}
+
+.root[data-tone="secondary"] {
+  color: var(--prime-color-text-secondary);
+}
+
+.root[data-tone="muted"] {
+  color: var(--prime-color-text-muted);
+}
+
+.root[data-tone="accent"] {
+  color: var(--prime-color-accent-text);
+}
+
+.root[data-tone="success"] {
+  color: var(--prime-color-success-text);
+}
+
+.root[data-tone="warning"] {
+  color: var(--prime-color-warning-text);
+}
+
+.root[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
+}
+
+@keyframes primeSpinnerTurn {
+  to {
+    transform: rotate(360deg);
+  }
+}

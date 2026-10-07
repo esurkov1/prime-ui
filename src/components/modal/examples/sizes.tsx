@@ -1,7 +1,5 @@
-/** Modal.Content widths s · m · l · xl; s/m fill the footer with equal buttons, l/xl align them to the end. Pick the narrowest size the content fits. */
+/** Every width; s and m fill the footer with equal buttons, l and xl align them to the end — `size`. */
 import { Button, Modal, Typography } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
 
 const SIZES = [
   { size: "s", width: "440 px — подтверждения" },
@@ -12,12 +10,12 @@ const SIZES = [
 
 export default function ModalSizesExample() {
   return (
-    <div className={styles.row}>
+    <>
       {SIZES.map(({ size, width }) => (
         <Modal.Root key={size}>
           <Modal.Trigger>
             <Button.Root variant="soft" tone="neutral">
-              Размер {size}
+              {size}
             </Button.Root>
           </Modal.Trigger>
           <Modal.Content size={size}>
@@ -27,7 +25,7 @@ export default function ModalSizesExample() {
             </Modal.Header>
             <Modal.Body>
               <Typography.Root variant="body-m" tone="secondary">
-                Выбирайте самый узкий размер, в который контент помещается без переносов строк
+                Выбирайте самый узкий размер, в который содержимое помещается без переносов строк
                 формы.
               </Typography.Root>
             </Modal.Body>
@@ -44,6 +42,6 @@ export default function ModalSizesExample() {
           </Modal.Content>
         </Modal.Root>
       ))}
-    </div>
+    </>
   );
 }

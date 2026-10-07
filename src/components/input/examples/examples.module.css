@@ -1,108 +1,6 @@
-/* Layout helpers for the Input examples. Semantic tokens only. */
+/* Layout of the Input scenarios: semantic tokens only. */
 
-/* Vertical list of fields (field → field). */
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-  width: 100%;
-  min-width: 0;
-}
-
-/* ---- anatomy.tsx: rows are scenarios, columns are sizes xs…xl ---- */
-.anatomyScroller {
-  width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-}
-
-.anatomyGrid {
-  display: grid;
-  grid-template-columns: repeat(
-      5,
-      minmax(calc(var(--prime-panel-min-width) - var(--prime-space-8)), 1fr)
-    );
-  align-items: start;
-  column-gap: var(--prime-space-5);
-  row-gap: var(--prime-space-4);
-}
-
-/* One scenario: its heading and the five cells share the outer columns (subgrid). */
-.anatomyRow {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: subgrid;
-  align-items: start;
-  row-gap: var(--prime-space-2);
-}
-
-.anatomyRowHead {
-  grid-column: 1 / -1;
-  padding-top: var(--prime-space-2);
-  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
-}
-
-/* ---- control-alignment.tsx: one row of controls per size ---- */
-.alignStack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-5);
-  width: 100%;
-  min-width: 0;
-}
-
-.alignRow {
-  display: grid;
-  grid-template-columns: var(--prime-space-8) repeat(4, minmax(0, max-content));
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.alignField {
-  width: calc(var(--prime-panel-min-width) - var(--prime-space-4));
-}
-
-@media (max-width: 767px) {
-  .alignRow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .alignSize {
-    grid-column: 1 / -1;
-  }
-
-  .alignField {
-    width: auto;
-  }
-}
-
-/* ---- sizes.tsx: five sizes in one row, field bottoms aligned ---- */
-.sizesRow {
-  display: grid;
-  grid-template-columns: repeat(
-      auto-fit,
-      minmax(calc(var(--prime-panel-min-width) - var(--prime-space-12)), 1fr)
-    );
-  align-items: end;
-  gap: var(--prime-space-4);
-  width: 100%;
-}
-
-/* ---- states.tsx ---- */
-.statesGrid {
-  display: grid;
-  grid-template-columns: repeat(
-      auto-fill,
-      minmax(calc(var(--prime-panel-min-width) + var(--prime-space-8)), 1fr)
-    );
-  align-items: start;
-  column-gap: var(--prime-space-6);
-  row-gap: var(--prime-space-5);
-  width: 100%;
-}
-
-/* ---- in-form.tsx: field → field 20, group → actions 32 (foundation §1) ---- */
+/* in-form.tsx: field → field 20, group → actions 32 (foundation §1). */
 .form {
   display: flex;
   flex-direction: column;
@@ -119,6 +17,7 @@
 .formFields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: var(--prime-space-5) var(--prime-space-4);
 }
 
@@ -136,16 +35,4 @@
   .formFields {
     grid-template-columns: minmax(0, 1fr);
   }
-}
-
-/* ---- full-width.tsx ---- */
-.widthRoot {
-  display: grid;
-  gap: var(--prime-space-6);
-  width: 100%;
-}
-
-.widthNarrow {
-  width: 100%;
-  max-width: calc(var(--prime-panel-min-width) + var(--prime-space-8));
 }

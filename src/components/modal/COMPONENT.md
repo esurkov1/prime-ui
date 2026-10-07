@@ -1,6 +1,7 @@
 # Modal
 
 **Category:** overlays
+**Kind:** overlay
 
 > A dialog over the page for confirmations, short forms and important text.
 
@@ -115,11 +116,6 @@ No DOM: clone the single child.
 |---|---|---|---|
 | `children` | `ReactElement` | — (required) | Close: closes on click unless `preventDefault()`. Confirm: becomes the Enter target (ref is merged). |
 
-### ModalLabels
-| Key | Default | Used for |
-|---|---|---|
-| `close` | `"Закрыть"` | `aria-label` of the header close button |
-
 ## Variants
 The dialog has one look: `bg-raised`, `--prime-modal-radius` (16), `shadow-modal`, on a `bg-scrim`. Header, body and footer are separated by faint inset hairlines.
 
@@ -151,7 +147,7 @@ When the dialog itself is narrower than 360px, actions stack full width in DOM o
 | `danger` | `danger-soft` tile, danger icon | Delete confirmations | |
 | `info` | `info-soft` tile, info icon | Informational notices | |
 
-### Structure flags
+### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `showClose` | Close button at the end of the header | Default | `true` |
@@ -164,10 +160,16 @@ When the dialog itself is narrower than 360px, actions stack full width in DOM o
 **Hierarchy** — one primary action, last in the footer and wrapped in `Modal.Confirm`; the secondary is `outline` neutral.
 
 ## States
-- Closed / open: `open` / `defaultOpen` / `onOpenChange`. `data-state="open" | "closed"` on the scrim and the dialog (closed while the exit animation plays), `data-size` on the dialog.
-- Header: `data-has-description="true"` when a Description is present. Footer: `data-layout`. Icon: `data-tone`.
-- While open: focus is trapped inside, page scroll is locked, siblings of the portal are `inert`.
-- Loading/disabled actions: use the Button props (`loading`, `disabled`) inside the footer.
+| State | Driven by | DOM |
+|---|---|---|
+| open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state="open" \| "closed"` on the scrim and the dialog (closed while the exit animation plays) |
+| size | `size` on Content | `data-size` on the dialog |
+| header with description | a `Modal.Description` inside | `data-has-description="true"` on the header |
+| footer layout | `layout` or the size default | `data-layout` on the footer |
+| icon tone | `tone` on Icon | `data-tone` on the tile |
+| while open | — | focus trapped inside, page scroll locked, siblings of the portal `inert` |
+
+Loading or disabled actions use the Button props (`loading`, `disabled`) inside the footer.
 
 ## Layout & spacing
 - Dialog padding `--prime-modal-padding` (24) on every zone; header 24 top / 20 bottom, body 20 with a 16 gap between blocks, footer 20 top / 24 bottom.
@@ -176,50 +178,36 @@ When the dialog itself is narrower than 360px, actions stack full width in DOM o
 - Narrow viewport (< 640px): bottom sheet, full width, top corners rounded.
 
 ## Accessibility
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Escape` | Closes the dialog (`closeOnEscape`); focus returns to the opener. |
+| `Enter` | Clicks `Modal.Confirm` unless focus is in a `<textarea>`, a `<select>`, an `<input>` of type checkbox / radio / file / button / submit / reset, a contenteditable element, inside the header, or on the Confirm element itself. A plain `<button>` in the body does not block it. |
+| `Tab` · `Shift+Tab` | Cycles focus inside the dialog. |
+
+### ARIA
 - `role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.
 - Focus moves into the dialog on open (an `autoFocus` field wins) and returns to the opener on close — also after a scrim click (foundation §8).
-- Escape closes (`closeOnEscape`); Enter clicks `Modal.Confirm` except when focus is in a `<textarea>`, a `<select>`, an `<input>` of type checkbox / radio / file / button / submit / reset, a contenteditable element, inside the header, or on the Confirm element itself. A plain `<button>` in the body does not block it.
+- The page behind is `inert` and its scroll is locked.
 - Only the topmost layer reacts: a Select open inside the dialog closes first.
-- `labels.close` — `"Закрыть"`: `aria-label` of the header close button.
+
+### Labels
+| Key | Default | Used for |
+|---|---|---|
+| `close` | `"Закрыть"` | `aria-label` of the header close button |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [link.tsx](examples/link.tsx) | Full anatomy: icon header, body with a copyable link, two equal actions | Default dialog shape |
-| [sizes.tsx](examples/sizes.tsx) | `size` s · m · l · xl and the footer layout per size | Choosing the width |
-| [states.tsx](examples/states.tsx) | Destructive confirm without body (`tone="danger"`, no scrim close, loading) and a header-only notice | Delete confirmations |
-| [composition.tsx](examples/composition.tsx) | Settings form with an inline error, Select and Switch | Short edit forms |
-| [controlled.tsx](examples/controlled.tsx) | `open` from code without Modal.Trigger | Route / store / timer driven dialogs |
-| [features.tsx](examples/features.tsx) | Long scrolling body; portal into a custom `container` | Long text, custom mount node |
-
-```tsx
-import { Button, Modal } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <Modal.Root>
-      <Modal.Trigger>
-        <Button.Root>Открыть</Button.Root>
-      </Modal.Trigger>
-      <Modal.Content size="s">
-        <Modal.Header>
-          <Modal.Title>Сохранить изменения?</Modal.Title>
-        </Modal.Header>
-        <Modal.Footer>
-          <Modal.Close>
-            <Button.Root variant="outline" tone="neutral">
-              Отмена
-            </Button.Root>
-          </Modal.Close>
-          <Modal.Confirm>
-            <Button.Root>Сохранить</Button.Root>
-          </Modal.Confirm>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A trigger opens a dialog with a title, a field and two actions; Enter presses the confirm — `Modal.Trigger`, `Modal.Confirm`. |
+| [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile with a header-only notice, and a header with a footer but no body — `Modal.Icon`, `Modal.Body`, `Modal.Footer`. |
+| [sizes.tsx](examples/sizes.tsx) | Every width; s and m fill the footer with equal buttons, l and xl align them to the end — `size`. |
+| [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Modal.Body`. |
+| [custom-container.tsx](examples/custom-container.tsx) | The dialog portals into a given node instead of the document body — `container`. |
+| [dismiss.tsx](examples/dismiss.tsx) | A destructive confirm closes only from its buttons, and not at all while the request runs — `closeOnOutsideClick`, `closeOnEscape`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state and opens the dialog from code, without a trigger — `open`, `onOpenChange`. |
+| [in-form.tsx](examples/in-form.tsx) | A settings form in a dialog: the footer button submits the form and an empty name keeps it open — `Modal.Body`, `Modal.Footer`, `error`. |
 
 ## Mistakes
 - Destructive confirm that closes on a stray scrim click → `closeOnOutsideClick={false}`.
@@ -230,4 +218,5 @@ export function Example() {
 - Long multi-section forms in a modal → use Drawer.
 
 ## Related
-[Drawer](../drawer/COMPONENT.md) · [Popover](../popover/COMPONENT.md) · [CommandMenu](../command-menu/COMPONENT.md) · [Button](../button/COMPONENT.md)
+- **Built from:** [Button](../button/COMPONENT.md) (header close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`)
+- **See also:** [Drawer](../drawer/COMPONENT.md), [Popover](../popover/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md)

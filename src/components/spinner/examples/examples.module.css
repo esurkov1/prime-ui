@@ -1,0 +1,24 @@
+/* Layout of the Spinner scenarios: semantic tokens only. */
+
+/* overview.tsx: spinner and text in one line, icon → text gap of the m tier. */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-control-m-gap);
+}
+
+/* loading-region.tsx: a bounded block (§4) on the host's card fill. */
+.region {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-3);
+  width: min(100%, var(--prime-modal-width-s));
+  min-height: calc(var(--prime-space-24) * 2);
+  padding: var(--prime-space-6);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+}

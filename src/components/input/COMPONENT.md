@@ -1,6 +1,7 @@
 # Input
 
 **Category:** inputs
+**Kind:** field
 
 > Single-line text field with label, hint, error and slots for icons, affixes, a badge, a clear button and a counter.
 
@@ -132,7 +133,7 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | `l` | 40 high, text 16/24, padX 12, radius 10, label 14/20, hint 13/20 | Spacious forms, onboarding | |
 | `xl` | 48 high, text 16/24, padX 16, radius 12, label 14/20, hint 13/20 | Hero search, landing forms | |
 
-**Sizes:** a field of size T lines up with Button, Select, Datepicker trigger, SegmentedControl and Tabs of size T in one row (same height and radius) — see [control-alignment.tsx](examples/control-alignment.tsx). Label and hint always use the same tier as the field.
+**Sizes:** a field of size T lines up with Button, Select, Datepicker trigger, SegmentedControl and Tabs of size T in one row (same height and radius). Label and hint always use the same tier as the field.
 
 ### side (Input.Icon / Input.Affix / Input.InlineAffix)
 | Value | Looks like | Use when | Default |
@@ -154,8 +155,8 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | `pink` | Soft pink badge | Category marks | |
 | `teal` | Soft teal badge | Category marks | |
 
-### Visual flags
-| Flag | Looks like | Use when | Default |
+### Flags
+| Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `focusRing={false}` | No focus ring; the field still switches to the focus fill, caret visible | A single search field where focus is obvious | `true` |
 | `reserveSupportRow` | Empty support row of hint height under the field | Fields validated on the fly; neighbouring fields in one grid row | `false` |
@@ -193,48 +194,40 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - The value truncates with an ellipsis before badges, icons and affixes; the field height never changes.
 
 ## Accessibility
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Focuses the field, then the clear button when it is shown. |
+| `Enter` · `Space` | On the clear button: clears the value and returns focus to the field. |
+
+### ARIA
 - `label` renders a `<label htmlFor>` bound to the input. Without `label`, set `aria-label` on `Input.Field`. A placeholder never replaces the label.
-- Hint and error are linked through `aria-describedby`; the error replaces the hint.
+- Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.
 - `Input.Icon`, `Input.Affix`, `Input.InlineAffix` are `aria-hidden`: put the meaning in the label (e.g. "Сумма, ₽").
-- `Input.ClearButton` is a real button with an accessible name, `aria-controls` the input, and returns focus to the input.
+- `Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.
 - `Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.
 
-| `labels` key | Default | Used for |
+### Labels
+| Key | Default | Used for |
 |---|---|---|
 | `optional` | `"необязательно"` | Marker after the label when `optional` |
 | `clear` | `"Очистить"` | Accessible name of `Input.ClearButton` |
 | `counter` | `"{current} из {max} символов"` | Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [anatomy.tsx](examples/anatomy.tsx) | Label, `*`, optional, placeholder, hint, error and counter on every size | Reference for assembling a field |
-| [control-alignment.tsx](examples/control-alignment.tsx) | Input, Select, Datepicker and Button of the same size in one row | Filter bars, toolbars |
-| [sizes.tsx](examples/sizes.tsx) | The same field on `xs`…`xl` | Picking a size |
-| [states.tsx](examples/states.tsx) | Empty, filled, disabled, read-only, error with text, `invalid` only | Checking all states |
-| [surfaces.tsx](examples/surfaces.tsx) | A plain field whose fill follows the surface | Fields on canvas vs inside cards/overlays |
-| [controlled.tsx](examples/controlled.tsx) | Controlled value, `Input.ClearButton`, `Input.Counter` with an error over the limit | Search and length-limited text |
-| [clear-button.tsx](examples/clear-button.tsx) | `Input.ClearButton` in sizes s, m, l with a value typed: the full-height clear segment | Search and filter fields |
-| [search-without-focus-ring.tsx](examples/search-without-focus-ring.tsx) | `focusRing={false}` search field | A single search field where focus is obvious |
-| [icons-and-affixes.tsx](examples/icons-and-affixes.tsx) | `Input.Icon`, `Input.Affix` on both sides, `Input.InlineAffix` | E-mail, URL, amount fields |
-| [with-badge.tsx](examples/with-badge.tsx) | `Input.Badge`, `Select.Badge`, `Datepicker.Badge` with palette colors | Marking a value as verified / new / missing |
-| [in-form.tsx](examples/in-form.tsx) | Company details form with required, optional, error and actions | Form spacing reference |
-| [reserved-support-row.tsx](examples/reserved-support-row.tsx) | Toggling an error with `reserveSupportRow`, custom `labels.optional`, explicit `id` | Live validation without layout shift |
-| [full-width.tsx](examples/full-width.tsx) | Capped vs full-width parent | Controlling field width from the layout |
-
-```tsx
-import { Input } from "prime-ui-kit";
-
-export function EmailField() {
-  return (
-    <Input.Root label="Email" required hint="Пришлём ссылку для входа">
-      <Input.Wrapper>
-        <Input.Field type="email" placeholder="name@company.ru" />
-      </Input.Wrapper>
-    </Input.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A labelled field with a hint under it — `label`, `hint`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size tier; the label and the hint follow the field tier — `size`. |
+| [states.tsx](examples/states.tsx) | A default field next to a disabled and a read-only one — `disabled`, `readOnly`. |
+| [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint, an error and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
+| [with-icon.tsx](examples/with-icon.tsx) | A decorative icon at either end of the value — `Input.Icon`, `side`. |
+| [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value — `Input.Affix`, `Input.InlineAffix`. |
+| [with-badge.tsx](examples/with-badge.tsx) | A soft status badge at the end of the field; the height does not change — `Input.Badge`, `color`. |
+| [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single search field where the caret and the lighter fill show focus — `focusRing`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a clear button and a character counter follow it — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`. |
+| [in-form.tsx](examples/in-form.tsx) | Company details form: required fields checked on submit, neighbours keep their bottoms aligned — `required`, `error`, `reserveSupportRow`. |
 
 ## Mistakes
 - `<Input.Field placeholder="Email" />` without a label → add `label` on `Input.Root` or `aria-label` on the field.
@@ -246,6 +239,5 @@ export function EmailField() {
 - `tone="danger"` / `error` as a boolean → use `invalid` or an `error` message.
 
 ## Related
-- [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) — the parts Input renders for `label`, `hint`, `error`.
-- [Textarea](../textarea/COMPONENT.md), [Select](../select/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md) — fields with the same contract.
-- [Badge](../badge/COMPONENT.md) — what `Input.Badge` renders.
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Badge](../badge/COMPONENT.md) (`Input.Badge`)
+- **See also:** [Textarea](../textarea/COMPONENT.md), [Select](../select/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md) — fields with the same contract

@@ -1,8 +1,8 @@
-/** A search field with `focusRing={false}`: the caret and the lighter fill show focus. Use it only for a single search field where focus is otherwise obvious. */
+/** A single search field where the caret and the lighter fill show focus — `focusRing`. */
 import { Icon, Input } from "prime-ui-kit";
 import * as React from "react";
 
-export default function InputSearchWithoutFocusRingExample() {
+export default function InputWithoutFocusRingExample() {
   const [query, setQuery] = React.useState("");
 
   return (
@@ -13,10 +13,10 @@ export default function InputSearchWithoutFocusRingExample() {
         </Input.Icon>
         <Input.Field
           type="search"
-          aria-label="Поиск"
-          placeholder="Поиск"
+          aria-label="Поиск по заказам"
+          placeholder="Поиск по заказам"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onValueChange={setQuery}
         />
         {query ? <Input.ClearButton onClick={() => setQuery("")} /> : null}
       </Input.Wrapper>

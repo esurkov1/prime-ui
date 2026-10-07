@@ -1,0 +1,25 @@
+/*
+ * Enter motion for parts that appear in place (foundation §7, rules 7 and 11): an error line, a new
+ * table row, an empty state, a drop gap. One-shot keyframes, opacity + a small shift, `enter`
+ * easing; durations come from tokens, so reduced motion collapses them globally.
+ *
+ *   .enter      fast · small parts (hint, error line, row, gap)
+ *   .enterBase  base · blocks (empty state, detail panel)
+ *
+ * The host may set `--enter-shift` (default `--prime-space-1`, a rise from below; a negative value
+ * drops in from above) and `animation-delay` in `--prime-motion-stagger` steps for a first render.
+ */
+.enter {
+  animation: primeEnter var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+.enterBase {
+  animation: primeEnter var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
+}
+
+@keyframes primeEnter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--enter-shift, var(--prime-space-1)));
+  }
+}

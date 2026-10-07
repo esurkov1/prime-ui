@@ -1,37 +1,21 @@
-/* Layout for the Modal examples: layout only, text goes through Typography. */
+/* Layout of the Modal scenarios: semantic tokens only. */
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
-}
-
-/* Field groups breathe a little more than plain body blocks. */
+/* in-form.tsx: field → field 20 (foundation §1). */
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-5);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-control-m-label-gap);
-}
-
+/* custom-container.tsx: a bounded block (§4) takes the host's card fill so it reads in both themes. */
 .portalHost {
   position: relative;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-3);
+  justify-content: center;
   width: 100%;
   padding: var(--prime-space-4);
   border-radius: var(--prime-card-radius);
-  /* A bounded block (§4): the host's card fill, so it reads on the stage in both themes. */
   background: var(--prime-color-card-bg);
   box-shadow: var(--prime-card-shadow);
 }

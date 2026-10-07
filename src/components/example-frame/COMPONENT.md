@@ -61,6 +61,7 @@ Does not forward a ref; no native props.
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |
 | `row-start` | wrapping row aligned to the start, gap 12 | toolbars, start-aligned controls | |
 | `row-wrap` | centered wrapping row, items aligned to the top, gap 8 | many small items (badges, tags) | |
+| `matrix` | grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption, gap 8); columns line up across rows, scrolls when wider than the stage | variant, size and state matrices | |
 
 ### viewport
 | Value | Looks like | Use when | Default |

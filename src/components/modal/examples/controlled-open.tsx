@@ -1,21 +1,15 @@
-/** Controlled dialog without Modal.Trigger: the parent owns `open` and opens it from code. Use when a route, store or timer decides when the dialog shows. */
-import { Button, Modal, Typography } from "prime-ui-kit";
+/** The parent owns the open state and opens the dialog from code, without a trigger — `open`, `onOpenChange`. */
+import { Button, Modal } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./examples.module.css";
-
-export default function ModalControlledExample() {
+export default function ModalControlledOpenExample() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div className={styles.row}>
+    <>
       <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(true)}>
-        Открыть из кода
+        Сымитировать конец сессии
       </Button.Root>
-      <Typography.Root as="span" variant="body-s" tone="secondary">
-        open = {String(open)}
-      </Typography.Root>
-
       <Modal.Root open={open} onOpenChange={setOpen}>
         <Modal.Content size="s">
           <Modal.Header>
@@ -34,6 +28,6 @@ export default function ModalControlledExample() {
           </Modal.Footer>
         </Modal.Content>
       </Modal.Root>
-    </div>
+    </>
   );
 }

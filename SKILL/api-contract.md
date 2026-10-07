@@ -115,8 +115,9 @@ export function InviteForm() {
 
 The kit has no skeleton component. DataTable (`loading`), Select (`loading`) and Button (`loading`) have
 built-in states. For a form or page that is loading its data: render the real layout, disable the
-fields, set `aria-busy="true"` on the Card or region, and show `EmptyPage` with a retry action if the
-load fails. Never invent spinners or shimmer blocks.
+fields, set `aria-busy="true"` on the Card or region, put a `Spinner` (with `aria-hidden="true"`,
+since the region already says it is busy) where the content will appear, and show `EmptyPage` with a
+retry action if the load fails. Never draw your own spinners or shimmer blocks.
 
 ## Secondary actions
 
@@ -148,13 +149,18 @@ sets `closeOnEscape={false}` and disables Cancel.
 
 ## Icons
 
-`<Icon name="…" />` names: `action.close`, `action.copy`, `action.eyedropper`, `action.search`,
-`action.upload`, `field.email`, `field.password.hide`, `field.password.show`, `nav.chevronRight`,
-`nav.home`, `nav.itemDot`, `nav.layoutGrid`, `status.locked`, `theme.dark`, `theme.light`. Named
-components: `IconCheck`, `IconChevronRight`, `IconCircleDot`, `IconClose`, `IconCloudUpload`,
-`IconCopy`, `IconDownload`, `IconEye`, `IconEyeOff`, `IconHouse`, `IconLayoutGrid`, `IconLock`,
-`IconMail`, `IconMoon`, `IconNavItemDot`, `IconPipette`, `IconSearch`, `IconSun`. Everything else:
-`lucide-react` (add it to the app's dependencies). Icon-only buttons need `aria-label`; decorative
+`<Icon name="…" />` names:
+- `nav.*`: `chevronDown`, `chevronLeft`, `chevronRight`, `chevronUp`, `home`, `itemDot`, `layoutGrid`,
+  `sidebarCollapse`, `sidebarExpand`;
+- `action.*`: `add`, `check`, `close`, `copy`, `delete`, `download`, `drag`, `externalLink`,
+  `eyedropper`, `filter`, `more`, `remove`, `search`, `upload`;
+- `field.*`: `calendar`, `email`, `password.hide`, `password.show`;
+- `sort.*`: `ascending`, `descending`, `none`;
+- `status.*`: `danger`, `info`, `locked`, `success`, `warning`;
+- `theme.*`: `dark`, `light`; `view.*`: `code`, `preview`; `viewport.*`: `desktop`, `mobile`, `tablet`.
+
+Each glyph is also a named component (`IconAdd`, `IconCalendar`, `IconCheck`, `IconChevronDown`, …,
+`IconSearch`, `IconWarning`). Everything else: `lucide-react` (add it to the app's dependencies). Icon-only buttons need `aria-label`; decorative
 icons inside kit slots (`Button.Icon`, `Input.Icon`, `Sidebar.Item icon`) are hidden automatically.
 
 ## Styling your own wrappers

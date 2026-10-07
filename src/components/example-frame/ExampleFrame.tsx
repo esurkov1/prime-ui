@@ -15,7 +15,11 @@ type Pane = "preview" | "code";
 export type ExampleFrameViewport = "desktop" | "tablet" | "mobile";
 type ColorScheme = "light" | "dark";
 
-/** Раскладка содержимого превью — чтобы в сниппетах не оборачивать компоненты в div.stack/row. */
+/**
+ * Layout of the preview children, so snippets need no wrapper divs for rows and stacks.
+ * `matrix`: labelled specimens — every direct child is a row, its children are cells (a specimen
+ * above its caption), and cells line up in columns across rows.
+ */
 export type ExampleFramePreviewLayout =
   | "default"
   | "stack"
@@ -24,7 +28,8 @@ export type ExampleFramePreviewLayout =
   | "dense-stack"
   | "row"
   | "row-start"
-  | "row-wrap";
+  | "row-wrap"
+  | "matrix";
 
 export type ExampleFrameLabels = {
   preview: string;

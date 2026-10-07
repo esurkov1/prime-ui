@@ -423,6 +423,8 @@ export {
   resolveSmartFilterValues,
   SmartFilter,
 } from "./smart-filter/SmartFilter";
+export type { SpinnerLabels, SpinnerProps } from "./spinner/Spinner";
+export { Spinner } from "./spinner/Spinner";
 export type {
   StepperArrowProps,
   StepperContentProps,

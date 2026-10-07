@@ -299,6 +299,61 @@
   padding-inline-end: var(--prime-space-1);
 }
 
+/*
+ * Matrix (variants, sizes, states): every direct child is a row, its children are cells — the
+ * specimen above its caption. Rows dissolve into one grid, so cells line up in columns; the column
+ * count is the cell count of the first row. A matrix wider than the stage scrolls, never clips.
+ */
+.previewInner[data-preview-layout="matrix"] {
+  --matrix-columns: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--matrix-columns), max-content);
+  align-items: end;
+  justify-content: safe center;
+  gap: var(--prime-space-5) var(--prime-space-6);
+  overflow-x: auto;
+}
+
+.previewInner[data-preview-layout="matrix"] > * {
+  display: contents;
+}
+
+.previewInner[data-preview-layout="matrix"] > * > * {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(2))) {
+  --matrix-columns: 2;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(3))) {
+  --matrix-columns: 3;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(4))) {
+  --matrix-columns: 4;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(5))) {
+  --matrix-columns: 5;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(6))) {
+  --matrix-columns: 6;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(7))) {
+  --matrix-columns: 7;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(8))) {
+  --matrix-columns: 8;
+}
+
 .previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),
 .previewInner[data-preview-layout="stack"] > *:global(:has(.examplePreviewBleed)),
 .previewInner[data-preview-layout="stack"] > *:global(:has(table)) {

@@ -3,9 +3,19 @@ import { describe, expect, it } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import styles from "./Icon.module.css";
-import { Icon } from "./index";
+import { Icon, type IconName, iconRegistry } from "./index";
 
 describe("Icon", () => {
+  it("renders every registry name as a hidden svg", () => {
+    for (const name of Object.keys(iconRegistry) as IconName[]) {
+      const { container, unmount } = render(<Icon name={name} />);
+      const svg = container.querySelector("svg");
+      expect(svg, name).not.toBeNull();
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      unmount();
+    }
+  });
+
   it("explicit size uses the global icon scale", () => {
     render(<Icon name="action.close" size="l" data-testid="i" />);
     const el = screen.getByTestId("i");

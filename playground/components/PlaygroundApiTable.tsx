@@ -13,7 +13,7 @@ export type PlaygroundApiPropRow = {
 };
 
 /** Marks `` `code` `` fragments inside descriptions. */
-function renderInlineCode(text: string): React.ReactNode {
+export function renderInlineCode(text: string): React.ReactNode {
   const parts = text.split(/(`[^`]+`)/g);
   return parts.map((part, i) =>
     part.startsWith("`") && part.endsWith("`") && part.length > 2 ? (

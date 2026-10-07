@@ -1,47 +1,37 @@
-/** Default, disabled and loading (centered spinner, spinner in place of the leading icon, icon-only). Use to see that `loading` needs no `Button.Spinner` and keeps the width. */
+/** Disabled and loading next to the default; the spinner keeps the width — `disabled`, `loading`. */
 import { Button, Icon, Typography } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
-
-function Caption({ children }: { children: string }) {
-  return (
-    <Typography.Root as="span" variant="caption" tone="muted">
-      {children}
-    </Typography.Root>
-  );
-}
 
 export default function ButtonStatesExample() {
   return (
-    <div className={styles.sizeRow}>
-      <div className={styles.sizeCell}>
+    <div>
+      <div>
         <Button.Root>Сохранить</Button.Root>
-        <Caption>default</Caption>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          default
+        </Typography.Root>
       </div>
-      <div className={styles.sizeCell}>
+      <div>
         <Button.Root disabled>Сохранить</Button.Root>
-        <Caption>disabled</Caption>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          disabled
+        </Typography.Root>
       </div>
-      <div className={styles.sizeCell}>
+      <div>
         <Button.Root loading>Сохранить</Button.Root>
-        <Caption>loading</Caption>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          loading
+        </Typography.Root>
       </div>
-      <div className={styles.sizeCell}>
+      <div>
         <Button.Root variant="outline" tone="neutral" loading>
           <Button.Icon>
             <Icon name="action.upload" />
           </Button.Icon>
           Загрузить
         </Button.Root>
-        <Caption>loading + иконка</Caption>
-      </div>
-      <div className={styles.sizeCell}>
-        <Button.Root variant="ghost" tone="neutral" loading aria-label="Копировать">
-          <Button.Icon>
-            <Icon name="action.copy" />
-          </Button.Icon>
-        </Button.Root>
-        <Caption>loading, icon-only</Caption>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          loading · Button.Icon
+        </Typography.Root>
       </div>
     </div>
   );
