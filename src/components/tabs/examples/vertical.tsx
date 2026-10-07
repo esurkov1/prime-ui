@@ -62,17 +62,14 @@ export default function TabsVerticalExample() {
               </Typography.Root>
             </div>
             <div className={styles.rows}>
-              <Switch.Root defaultChecked>
+              <Switch.Root defaultChecked hint="Сразу после оформления заказа.">
                 <Switch.Label>Письма о новых заказах</Switch.Label>
-                <Switch.Hint>Сразу после оформления заказа.</Switch.Hint>
               </Switch.Root>
-              <Switch.Root>
+              <Switch.Root hint="По понедельникам в 9:00.">
                 <Switch.Label>Еженедельная сводка</Switch.Label>
-                <Switch.Hint>По понедельникам в 9:00.</Switch.Hint>
               </Switch.Root>
-              <Switch.Root defaultChecked>
+              <Switch.Root defaultChecked hint="В браузере, пока открыта вкладка.">
                 <Switch.Label>Push-уведомления</Switch.Label>
-                <Switch.Hint>В браузере, пока открыта вкладка.</Switch.Hint>
               </Switch.Root>
             </div>
           </div>

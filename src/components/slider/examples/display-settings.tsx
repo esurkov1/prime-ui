@@ -14,9 +14,12 @@ export default function SliderDisplaySettingsExample() {
       </Card.SectionHeader>
       <Card.Body>
         <div className={styles.settings}>
-          <Switch.Root checked={auto} onCheckedChange={setAuto}>
+          <Switch.Root
+            checked={auto}
+            onCheckedChange={setAuto}
+            hint="Подстраивается под освещение."
+          >
             <Switch.Label>Автояркость</Switch.Label>
-            <Switch.Hint>Подстраивается под освещение.</Switch.Hint>
           </Switch.Root>
           <Slider.Root
             label="Яркость"

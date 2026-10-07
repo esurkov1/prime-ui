@@ -1,62 +1,30 @@
-/* Example layout: semantic tokens only. */
+/* Layout of the Switch scenarios: semantic tokens only. */
 
-.sizesRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--prime-space-8);
-}
-
-.cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
-  align-items: start;
-  gap: var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-m);
-}
-
-.column {
-  display: grid;
-  gap: var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
+/* settings-row.tsx: text on the left, the track on the right. */
 .row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--prime-space-4);
+  width: min(100%, var(--prime-modal-width-s));
 }
 
 .rowText {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--prime-space-1);
   min-width: 0;
 }
 
-.card {
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
+/* in-form.tsx: switches, then actions (group → actions 32). */
 .form {
-  display: grid;
-  justify-items: start;
-  gap: var(--prime-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: min(100%, var(--prime-modal-width-s));
 }
 
-/* In a settings row the switch field takes only the track width. */
-.row > .rowControl {
-  flex: none;
-  width: auto;
+.formActions {
+  display: flex;
+  margin-top: var(--prime-space-4);
 }

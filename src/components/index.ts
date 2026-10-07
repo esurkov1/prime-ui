@@ -439,8 +439,6 @@ export type {
 } from "./stepper/Stepper";
 export { Stepper } from "./stepper/Stepper";
 export type {
-  SwitchErrorProps,
-  SwitchHintProps,
   SwitchLabelProps,
   SwitchRootProps,
 } from "./switch/Switch";
