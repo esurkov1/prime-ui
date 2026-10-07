@@ -20,7 +20,7 @@ content would leave an empty sticky bar). That needs the compound form instead o
 
 ```tsx
 import { LayoutDashboard, Menu, Settings, ShoppingCart, Users } from "lucide-react";
-import { AppShell, Button, NotificationProvider, Sidebar, Typography } from "prime-ui-kit";
+import { AppShell, Button, NotificationProvider, Sidebar } from "prime-ui-kit";
 import { type ReactNode, useState } from "react";
 import styles from "./AppLayout.module.css";
 
@@ -32,10 +32,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <AppShell.Nav>
           <Sidebar.Root open={menuOpen} onOpenChange={setMenuOpen}>
             <Sidebar.Header>
-              <Typography as="span" variant="title-s">
+              <Sidebar.Brand href="/" description="Интернет-магазин">
+                <Sidebar.BrandLogo>
+                  <ShoppingCart />
+                </Sidebar.BrandLogo>
                 Магазин
-              </Typography>
-              <Sidebar.Toggle variant="edge" />
+              </Sidebar.Brand>
+              <Sidebar.Toggle variant="header" />
             </Sidebar.Header>
             <Sidebar.Content>
               <Sidebar.Group label="Продажи">

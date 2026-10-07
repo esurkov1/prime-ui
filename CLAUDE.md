@@ -72,11 +72,14 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
   region; `Panel` is embedded content (`Tabs.Panel`, `Datepicker.Panel`); `Item` is a member of a
   collection (not `Trigger`/`Step`); `Header` / `Body` / `Footer` are zones of a surface, `Actions` is a
   row of buttons inside a zone; `Title` heads a surface, `Label` names a control or item, `Description`
-  is the secondary text (not `Sub`); `Count` is a number badge, `Counter` a character counter;
+  is the secondary text (never `Sub` for text); `Count` is a number badge, `Counter` a character counter;
   `Separator` divides items; `<Action>Button` is a button the kit renders (`CloseButton`, `ClearButton`),
   `Close` is a slot around the consumer's button. A group heading is the `label` prop of `X.Group`
   (never an `X.GroupLabel` part). Optional parts of a collection item are `X.ItemIcon`, `X.ItemCount`,
-  `X.ItemShortcut`, `X.ItemText`.
+  `X.ItemShortcut`, `X.ItemText`; an `X.ItemIcon` after the label is a trailing icon; a row action
+  beside an item is `X.ItemAction` (`label`, `onClick`), never nested inside the item element. A
+  parent item with children is `X.Sub` + `X.SubTrigger` + `X.SubContent` (a submenu). A brand block is
+  `X.Brand` + `X.BrandLogo` with `description`.
 - A root that draws its own separators or indicators (Breadcrumb chevrons, Stepper lines, Accordion
   chevron) has no part for them.
 - Choice controls (Checkbox, Radio, Switch): the root renders the `<label>` with the input; `X.Label` is
@@ -103,8 +106,8 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
 - A visible text label is `label`; a name only for assistive tech is the native `aria-label`, never
   `label`.
 - `asChild?: boolean` only on single interactive elements that may become a link or another element
-  (Button.Root, LinkButton, Sidebar.Item, Timeline.Item). `Trigger`, `Close`, `Confirm`, `Anchor` are always slots that clone one
-  child and take no `className`. `as` only picks a semantic tag for non-interactive elements.
+  (Button.Root, LinkButton, Sidebar.Item, Sidebar.Brand, Timeline.Item). `Trigger`, `Close`,
+  `Confirm`, `Anchor` are always slots that clone one child and take no `className`. `as` only picks a semantic tag for non-interactive elements.
 - Functions: `formatX(value)` for display, `getX(item)` for data accessors, `renderX(item)` to render a
   data item. No function-as-children.
 - Arrays vs parts: children / parts for a hand-written, static set with custom content (menus, tabs,

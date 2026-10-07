@@ -43,7 +43,9 @@ export function useFrozenColumns(
     if (measured.every((width) => width === 0)) return;
     // Browsers ignore `min-width` on table cells, so a column's `minWidth` (resolved to px) is
     // enforced here: frozen widths never go below it.
-    const minimums = [...lead.cells].map((cell) => parseFloat(getComputedStyle(cell).minWidth) || 0);
+    const minimums = [...lead.cells].map(
+      (cell) => parseFloat(getComputedStyle(cell).minWidth) || 0,
+    );
     const next = measured.map((width, index) =>
       Math.max(width, previous?.[index] ?? 0, minimums[index] ?? 0),
     );

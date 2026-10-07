@@ -161,8 +161,8 @@ Cancel.
 ## Icons
 
 `<Icon name="…" />` names:
-- `nav.*`: `chevronDown`, `chevronLeft`, `chevronRight`, `chevronUp`, `home`, `itemDot`, `layoutGrid`,
-  `sidebarCollapse`, `sidebarExpand`;
+- `nav.*`: `chevronDown`, `chevronLeft`, `chevronRight`, `chevronUp`, `chevronsLeft`, `chevronsUpDown`,
+  `home`, `itemDot`, `layoutGrid`, `sidebarCollapse`, `sidebarExpand`;
 - `action.*`: `add`, `check`, `close`, `copy`, `delete`, `download`, `drag`, `externalLink`,
   `eyedropper`, `filter`, `more`, `remove`, `search`, `send`, `settings`, `upload`;
 - `field.*`: `calendar`, `email`, `password.hide`, `password.show`;

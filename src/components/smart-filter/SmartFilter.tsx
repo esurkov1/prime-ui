@@ -454,7 +454,13 @@ const COLOR = { none: "gray", include: "blue", exclude: "red" } as const;
  * The LinkButton tier whose text size equals the Badge text of a tag tier (Badge 12 · 12 · 12 ·
  * 13 · 14, LinkButton 12 · 13 · 14 · 16 · …), so a text action reads as part of the tag row.
  */
-const TIER_BELOW: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "xs", l: "s", xl: "m" };
+const TIER_BELOW: Record<ControlSize, ControlSize> = {
+  xs: "xs",
+  s: "xs",
+  m: "xs",
+  l: "s",
+  xl: "m",
+};
 
 /**
  * A value is a pressable Badge: gray, blue = shown, red with «НЕ» = hidden. A press shows it; the «−»

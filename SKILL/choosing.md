@@ -59,10 +59,13 @@ DataTable), otherwise Spinner. Nothing to show → EmptyPage.
 
 **Overlays.** See the pairs below. Global search over commands and pages (⌘K) → CommandMenu.
 
-**App frame.** Sidebar collapse control: `Sidebar.Toggle` (`variant="item"`) in `Sidebar.Footer` when the
-rail has a footer row anyway; `Sidebar.Toggle variant="edge"` in `Sidebar.Header` for a quiet round
-toggle on the rail's edge. On phones neither replaces the menu button in `AppShell.Header` that opens
-the off-canvas Sidebar (`open` / `onOpenChange`).
+**App frame.** Sidebar collapse control: `Sidebar.Toggle variant="header"` next to `Sidebar.Brand` in
+`Sidebar.Header` — at the header's end while expanded, a small round button on the rail's edge while
+compact (the default for a branded rail); `Sidebar.Toggle` (`variant="item"`) in `Sidebar.Footer` when
+the rail has no brand header. On phones neither replaces the menu button in `AppShell.Header` that
+opens the off-canvas Sidebar (`open` / `onOpenChange`). Sections of a long rail → `Sidebar.Group
+collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user → `Sidebar.Account` in a
+`Dropdown.Trigger` at the bottom of `Sidebar.Footer`.
 
 ## 3. Pairs that are easy to confuse
 
