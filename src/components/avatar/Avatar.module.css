@@ -187,12 +187,22 @@
     var(--avatar-ring, var(--prime-color-bg-canvas));
 }
 
+/* Soft hues are translucent: back them with the opaque surface so overlapped neighbours never
+ * show through. */
+.groupRoot > .root {
+  background:
+    linear-gradient(var(--hue-soft), var(--hue-soft)),
+    var(--avatar-ring, var(--prime-color-bg-canvas));
+}
+
 .groupRoot > * + * {
   margin-inline-start: calc(var(--avatar-size) * -0.25);
 }
 
 .groupOverflow {
-  background: var(--prime-color-fill-muted);
+  background:
+    linear-gradient(var(--prime-color-fill-muted), var(--prime-color-fill-muted)),
+    var(--avatar-ring, var(--prime-color-bg-canvas));
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
   font-size: calc(var(--avatar-size) * 0.36);
