@@ -1,6 +1,7 @@
 # Drawer
 
 **Category:** overlays
+**Kind:** overlay
 
 > A modal side panel that slides in from the edge: filters, forms and record details.
 
@@ -24,164 +25,165 @@ import { Drawer } from "prime-ui-kit";
 ## Anatomy
 ```
 Drawer.Root                    state and dismiss policy (no DOM)
-├── Drawer.Trigger             clones its child; opens on click
-└── Drawer.Content             portal + scrim + role="dialog" panel at the edge
-    ├── Drawer.Header          grid: [Icon] [Title + Description] [close button]
-    │   ├── Drawer.Icon
-    │   ├── Drawer.Title       <h2>
-    │   └── Drawer.Description <p>
-    ├── Drawer.Body            the only scrolling zone
-    └── Drawer.Footer          actions, primary last
-        └── Drawer.Close       clones its child; closes on click
+├─ Drawer.Trigger              clones its child; opens on click
+└─ Drawer.Content              portal + scrim + role="dialog" panel at the edge
+   ├─ Drawer.Header            grid: [Icon] [Title + Description] [close Button]
+   │  ├─ Drawer.Icon
+   │  ├─ Drawer.Title          <h2>
+   │  └─ Drawer.Description    <p>
+   ├─ Drawer.Body              the only scrolling zone (ScrollContainer)
+   └─ Drawer.Footer            actions, primary last
+      └─ Drawer.Close          clones its child; closes on click
 ```
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### Drawer.Root
-No DOM, no ref.
+No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `open` | `boolean` | — | Controlled visibility. |
+| `open` | `boolean` | — | Controlled visibility; together with `onOpenChange`. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
-| `onOpenChange` | `(open: boolean) => void` | — | Called on trigger, close button, Close, Escape and scrim click. |
-| `closeOnEscape` | `boolean` | `true` | Escape closes the drawer. |
-| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the drawer. |
-| `labels` | `Partial<DrawerLabels>` | `{ close: "Закрыть" }` | Built-in strings. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, close button, `Close`, Escape, scrim click, code. |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the dialog. |
+| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the dialog; turn off for destructive confirms. |
+| `labels` | `Partial<DrawerLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Trigger and Content. |
 
-### Drawer.Trigger
-No DOM: clones the single child and chains `onClick`; opens unless the child's handler calls `preventDefault()`.
+### Drawer.Content
+No ref. Portal + scrim + `role="dialog"` panel at the edge; renders while open and during its exit animation.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `side` | `"left" \| "right"` | `"right"` | Edge the panel slides from; rounded only on the edge facing the page. |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 360 · 480 · 640 · 800. Below 640 px of viewport — full width, square corners. |
+| `aria-label` | `string` | — | Dialog name when there is no Title. |
+| `aria-labelledby` | `string` | — | Overrides the Title id. |
+| `aria-describedby` | `string` | — | Overrides the Description id. |
+| `overlayClassName` | `string` | — | Class on the scrim. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
+
+### Drawer.Header
+No ref. Renders `<header>`: [Icon] [Title + Description] [close button]. + native `HTMLAttributes<HTMLElement>`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`. |
+| `children` | `ReactNode` | — | Icon, Title, Description in any order; the icon goes to the leading slot. |
+
+### Drawer.Icon
+No ref. An `aria-hidden` 40 px tile with a tone fill.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color. |
+| `children` | `ReactNode` | — (required) | Icon glyph (sized to the m icon). |
+| `className` | `string` | — | Extra class on the tile. |
+
+### Drawer.Title · Drawer.Description
+No ref. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.
+
+### Drawer.Body
+No ref. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.
+
+### Drawer.Footer
+No ref. Renders `<footer>` with the actions, primary last. + native `HTMLAttributes<HTMLElement>`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Narrower than 360 px — stacked. |
+
+### Drawer.Trigger · Drawer.Close
+No DOM: clone the single child and chain its `onClick` (unless the child's handler calls `preventDefault()`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactElement` | — (required) | One element, usually a Button. |
 
-### Drawer.Content
-No ref. Renders in a portal (`document.body`) while open and during its exit animation.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `side` | `"left" \| "right"` | `"right"` | Edge the panel slides from. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 360 · 480 · 640 · 800. |
-| `overlayClassName` | `string` | — | Class on the scrim. |
-| `aria-label` | `string` | — | Dialog name when there is no Title. |
-| `aria-labelledby` | `string` | — | Overrides the Title id. |
-| `aria-describedby` | `string` | — | Overrides the Description id. |
-| `className` | `string` | — | Class on the panel. |
-
-+ native `<div>` props (on the panel).
-
-### Drawer.Header · Icon · Title · Description · Body · Footer · Close
-The same parts as Modal ([Modal API](../modal/COMPONENT.md#api)):
-
-| Part | Props |
-|---|---|
-| `Drawer.Header` | `showClose?: boolean` (default `true`) + native `<header>` props |
-| `Drawer.Icon` | `tone?: "neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` (default `"neutral"`), `children` (required), `className` |
-| `Drawer.Title` / `Drawer.Description` | native `<h2>` / `<p>` props except `id` |
-| `Drawer.Body` | native `<div>` props; a ScrollContainer |
-| `Drawer.Footer` | `layout?: "fill" \| "end"` (default `"end"`) + native `<footer>` props |
-| `Drawer.Close` | `children: ReactElement` (required) |
-
-Drawer has no `Confirm` part and no Enter-confirm.
-
-### DrawerLabels
-| Key | Default | Used for |
-|---|---|---|
-| `close` | `"Закрыть"` | `aria-label` of the header close button |
-
 ## Variants
-The panel: `bg-raised`, `shadow-modal`, `--prime-modal-radius` only on the edge facing the page, full height, on a `bg-scrim`.
 
 ### side (Content)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `right` | Slides from the right, rounded on its left edge | Details and forms | yes |
-| `left` | Slides from the left, rounded on its right edge | Filters, mobile navigation | |
+| `right` | slides from the right, rounded on its left edge | details and forms | yes |
+| `left` | slides from the left, rounded on its right edge | filters, mobile navigation | |
 
 ### size (Content)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `s` | 360 wide | Details, short help | |
-| `m` | 480 wide | Settings forms | yes |
-| `l` | 640 wide | Wide forms | |
-| `xl` | 800 wide | Tables, previews | |
+| `s` | 360 wide | details, short help | |
+| `m` | 480 wide | settings forms | yes |
+| `l` | 640 wide | wide forms | |
+| `xl` | 800 wide | tables, previews | |
 
 Below 640px of viewport every size is full width with square corners.
 
 ### layout (Footer)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `end` | Auto-width buttons at the end, gap 8 | Most drawers | yes |
-| `fill` | Equal-width buttons in one row, gap 12 | One full-width action («Понятно») | |
+| `end` | auto-width buttons at the end | most drawers | yes |
+| `fill` | equal-width buttons in one row | one full-width action («Понятно») | |
 
 ### tone (Icon)
-Same values as Modal.Icon: `neutral` (default) · `accent` · `success` · `warning` · `danger` · `info` — soft tile fill and icon color of the tone.
-
-### Structure flags
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| `showClose` | Close button in the header | Default | `true` |
-| no Footer | No bottom zone | Read-only details | |
-
-**Combinations** — forms: Footer with outline neutral «Отмена» in `Drawer.Close` and a solid primary with `loading`. Read-only details: no Footer, header close only.
-
-**Hierarchy** — one primary action, last in the footer.
+`neutral` (default) · `accent` · `success` · `warning` · `danger` · `info` — soft tile fill and icon color, as in Modal.
 
 ## States
-- Closed / open: `open` / `defaultOpen` / `onOpenChange`. `data-state` on the scrim and the panel, `data-side`, `data-size` on the panel, `data-nested-in-modal="true"` when opened from a Modal (it then stacks above the Modal).
-- While open: focus is trapped inside, page scroll is locked, siblings of the portal are `inert`.
-- Header `data-has-description`, Footer `data-layout`, Icon `data-tone` as in Modal.
+| State | Driven by | DOM |
+|---|---|---|
+| open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the panel; mounted until the slide-out ends |
+| side / size | Content props | `data-side`, `data-size` on the panel |
+| nested in a Modal | opened from a Modal | `data-nested-in-modal="true"`: stacks above the Modal |
+| open: trapped | while open | focus trapped, page scroll locked, siblings of the portal `inert` |
+
+Motion: the scrim fades, the panel slides from its side over `slow` and leaves over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once.
 
 ## Layout & spacing
-- Zone padding `--prime-drawer-padding` (24); header 24 / 20, body 20 with a 16 gap, footer 20 / 24; hairlines between zones.
-- Full viewport height; only the body scrolls.
-- Fields inside get the surface field fill; cards inside become sunken tiles; group fields 20 apart.
+- Zone padding `--prime-drawer-padding`; hairlines between header, body and footer.
+- Full viewport height; only the body scrolls, with its own side padding.
+- Fields inside get the surface field fill.
 
 ## Accessibility
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Escape` | Closes the drawer (`closeOnEscape`); focus returns to the trigger. |
+| `Tab` · `Shift+Tab` | Cycle focus inside the drawer. |
+
+### ARIA
 - `role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.
 - Focus moves into the panel on open and returns to the opener on close, including after a scrim click.
-- Escape closes (`closeOnEscape`); only the topmost layer reacts.
-- `labels.close` — `"Закрыть"`: `aria-label` of the header close button.
+- The page behind is `inert`, scroll is locked; only the topmost layer reacts.
+- A drawer opened from a Modal stacks above it.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+| Key | Default | Used for |
+|---|---|---|
+| `close` | `"Закрыть"` | `aria-label` of the header close button. |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [sizes.tsx](examples/sizes.tsx) | `size` s · m · l · xl | Choosing the width |
-| [composition.tsx](examples/composition.tsx) | Settings form with Select, SegmentedControl, Switches and a loading Save | Editing settings |
-| [variants-sides.tsx](examples/variants-sides.tsx) | `side` left · right | Filters vs details |
-| [states.tsx](examples/states.tsx) | Read-only details without Footer, success icon | Record details |
-| [features.tsx](examples/features.tsx) | Long scrolling body between fixed header and footer | Histories, logs |
-| [controlled.tsx](examples/controlled.tsx) | `open` from a LinkButton, custom `labels.close`, `layout="fill"` | Opening from any element |
-
-```tsx
-import { Button, Drawer } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <Drawer.Root>
-      <Drawer.Trigger>
-        <Button.Root variant="soft" tone="neutral">
-          Детали
-        </Button.Root>
-      </Drawer.Trigger>
-      <Drawer.Content size="s">
-        <Drawer.Header>
-          <Drawer.Title>Заказ № 1042</Drawer.Title>
-        </Drawer.Header>
-        <Drawer.Body>Собирается на складе.</Drawer.Body>
-      </Drawer.Content>
-    </Drawer.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | Order details next to the list: a trigger, a header with a close button and a read-only body — `Drawer.Trigger`, `Drawer.Body`. |
+| [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile in the header and one full-width action in the footer — `Drawer.Icon`, `Drawer.Footer`, `layout`. |
+| [sizes.tsx](examples/sizes.tsx) | Every panel width, 360 to 800 px; below 640 px of viewport the panel takes the full width — `size`. |
+| [placement.tsx](examples/placement.tsx) | The panel slides from the right for details and from the left for filters — `side`. |
+| [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Drawer.Body`. |
+| [dismiss.tsx](examples/dismiss.tsx) | An import closes only from its buttons, and not at all while it runs — `closeOnOutsideClick`, `closeOnEscape`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the state and opens the drawer from a link, without a trigger — `open`, `onOpenChange`. |
+| [in-form.tsx](examples/in-form.tsx) | A settings form in the panel: the footer button submits the form and an empty name keeps it open — `Drawer.Body`, `Drawer.Footer`, `error`. |
 
 ## Mistakes
 - A delete confirmation in a Drawer → use Modal.
-- Expecting Enter to submit via `Drawer.Confirm` → Drawer has no Confirm; use a form `onSubmit` or the button.
+- Expecting Enter to submit via `Drawer.Confirm` → Drawer has no Confirm; use a `<form>` with a submit button.
 - `side="top"` / `"bottom"` → only `left` and `right`.
 - Padding on a wrapper inside Body → Body already pads and scrolls.
 
 ## Related
-[Modal](../modal/COMPONENT.md) · [Sidebar](../../layout/sidebar/COMPONENT.md) · [Popover](../popover/COMPONENT.md)
+- **Built from:** Button, Icon, ScrollContainer
+- **See also:** [Modal](../modal/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Popover](../popover/COMPONENT.md)

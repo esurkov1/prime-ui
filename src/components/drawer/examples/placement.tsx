@@ -1,27 +1,24 @@
-/** `side="left"` and `side="right"`: right (default) for details and forms, left for filters and navigation. */
+/** The panel slides from the right for details and from the left for filters — `side`. */
 import { Button, Drawer, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
 const SIDES = [
-  { side: "left", label: "Слева", title: "Фильтры" },
-  { side: "right", label: "Справа", title: "Детали заказа" },
+  { side: "left", title: "Фильтры" },
+  { side: "right", title: "Детали заказа" },
 ] as const;
 
-export default function DrawerVariantsSidesExample() {
+export default function DrawerPlacementExample() {
   return (
-    <div className={styles.row}>
-      {SIDES.map(({ side, label, title }) => (
+    <>
+      {SIDES.map(({ side, title }) => (
         <Drawer.Root key={side}>
           <Drawer.Trigger>
             <Button.Root variant="soft" tone="neutral">
-              {label}
+              {side}
             </Button.Root>
           </Drawer.Trigger>
           <Drawer.Content side={side} size="s">
             <Drawer.Header>
               <Drawer.Title>{title}</Drawer.Title>
-              <Drawer.Description>side="{side}"</Drawer.Description>
             </Drawer.Header>
             <Drawer.Body>
               <Typography.Root variant="body-m" tone="secondary">
@@ -31,6 +28,6 @@ export default function DrawerVariantsSidesExample() {
           </Drawer.Content>
         </Drawer.Root>
       ))}
-    </div>
+    </>
   );
 }

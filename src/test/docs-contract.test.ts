@@ -41,7 +41,6 @@ const NOT_CONVERTED = new Set([
   "datepicker",
   "digit-input",
   "dnd",
-  "drawer",
   "dropdown",
   "empty-page",
   "example-frame",

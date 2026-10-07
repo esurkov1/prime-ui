@@ -1,8 +1,8 @@
 import type { ApiLabel, ApiPart, ApiProp } from "../../../scripts/docs/componentApi";
 
 /**
- * API of the dialog parts shared by Modal and Drawer (both are built from `DialogParts.tsx`).
- * Drawer's `api.ts` reuses these when its page is converted.
+ * API of the dialog parts shared by Modal and Drawer (both are built from `DialogParts.tsx`);
+ * both `api.ts` files compose them.
  */
 
 export function dialogRootProps(name: "Modal" | "Drawer"): ApiProp[] {
