@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -19,15 +20,15 @@ function Step({ title, description }: { title: string; description?: string }) {
 function ThreeStepStepper(props: Omit<React.ComponentProps<typeof Stepper.Root>, "children">) {
   return (
     <Stepper.Root {...props}>
-      <Stepper.Step>
+      <Stepper.Item>
         <Step title="First" description="Step one" />
-      </Stepper.Step>
-      <Stepper.Step>
+      </Stepper.Item>
+      <Stepper.Item>
         <Step title="Second" description="Step two" />
-      </Stepper.Step>
-      <Stepper.Step>
+      </Stepper.Item>
+      <Stepper.Item>
         <Step title="Third" description="Step three" />
-      </Stepper.Step>
+      </Stepper.Item>
     </Stepper.Root>
   );
 }
@@ -58,16 +59,16 @@ describe("Stepper", () => {
   it("status override wins over derived status", () => {
     render(
       <Stepper.Root value={0}>
-        <Stepper.Step status="error">
+        <Stepper.Item status="danger">
           <Step title="Broken" />
-        </Stepper.Step>
-        <Stepper.Step>
+        </Stepper.Item>
+        <Stepper.Item>
           <Step title="Next" />
-        </Stepper.Step>
+        </Stepper.Item>
       </Stepper.Root>,
     );
     const buttons = screen.getAllByRole("button");
-    expect(buttons[0]).toHaveAttribute("data-status", "error");
+    expect(buttons[0]).toHaveAttribute("data-status", "danger");
     expect(buttons[1]).toHaveAttribute("data-status", "pending");
   });
 
@@ -81,9 +82,9 @@ describe("Stepper", () => {
   it("renders custom Indicator children", () => {
     render(
       <Stepper.Root>
-        <Stepper.Step>
+        <Stepper.Item>
           <Stepper.Indicator>★</Stepper.Indicator>
-        </Stepper.Step>
+        </Stepper.Item>
       </Stepper.Root>,
     );
     expect(screen.getByText("★")).toBeInTheDocument();
@@ -104,9 +105,9 @@ describe("Stepper", () => {
     render(
       <Stepper.Root value={0}>
         {["A", "B"].map((title) => (
-          <Stepper.Step key={title}>
+          <Stepper.Item key={title}>
             <Step title={title} />
-          </Stepper.Step>
+          </Stepper.Item>
         ))}
       </Stepper.Root>,
     );
@@ -140,16 +141,27 @@ describe("Stepper", () => {
     expect(screen.getByRole("button", { name: /First/ })).toHaveAttribute("aria-current", "step");
   });
 
+  it("items are native buttons: Tab reaches them and Enter selects", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<ThreeStepStepper onValueChange={onValueChange} />);
+    await user.tab();
+    await user.tab();
+    expect(screen.getByRole("button", { name: /Second/ })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(onValueChange).toHaveBeenCalledWith(1);
+  });
+
   it("disabled steps do not select", () => {
     const onValueChange = vi.fn();
     render(
       <Stepper.Root onValueChange={onValueChange}>
-        <Stepper.Step>
+        <Stepper.Item>
           <Step title="A" />
-        </Stepper.Step>
-        <Stepper.Step disabled>
+        </Stepper.Item>
+        <Stepper.Item disabled>
           <Step title="B" />
-        </Stepper.Step>
+        </Stepper.Item>
       </Stepper.Root>,
     );
     const b = screen.getByRole("button", { name: /B/ });

@@ -1,7 +1,7 @@
 /*
  * Stepper — Graphite. Semantic `ol` of step buttons.
  * Indicator: pending = fill-muted, active = accent with soft halo, completed = accent-soft + check,
- * error = danger-soft. Horizontal: chevron separators between steps, stacks vertically under 480px
+ * danger = danger-soft. Horizontal: chevron separators between steps, stacks vertically under 480px
  * of container width. Vertical: full-width rows, active row on fill-subtle.
  */
 
@@ -125,7 +125,8 @@
   color: var(--prime-color-text-placeholder);
 }
 
-.separatorIcon {
+/* Kit Icons below take the stepper's own glyph scale, not the control tier (two classes win). */
+.separator > .separatorIcon {
   flex-shrink: 0;
   width: var(--st-chevron);
   height: var(--st-chevron);
@@ -195,11 +196,11 @@
   background: var(--prime-color-fill-subtle);
 }
 
-.step[data-status="error"] {
+.step[data-status="danger"] {
   color: var(--prime-color-danger-text);
 }
 
-.root[data-orientation="vertical"] .step[data-status="error"] {
+.root[data-orientation="vertical"] .step[data-status="danger"] {
   background: var(--prime-color-danger-soft);
 }
 
@@ -247,12 +248,12 @@
   color: var(--prime-color-accent-text);
 }
 
-.indicator[data-status="error"] {
+.indicator[data-status="danger"] {
   background: var(--prime-color-danger-soft);
   color: var(--prime-color-danger-text);
 }
 
-.root[data-orientation="vertical"] .indicator[data-status="error"] {
+.root[data-orientation="vertical"] .indicator[data-status="danger"] {
   background: var(--prime-color-danger-default);
   color: var(--prime-color-danger-fg);
 }
@@ -263,7 +264,7 @@
   box-shadow: none;
 }
 
-.check {
+.indicator > .check {
   display: block;
   width: var(--st-check);
   height: var(--st-check);
@@ -295,7 +296,7 @@
   overflow-wrap: anywhere;
 }
 
-.arrow {
+.step > .arrow {
   flex-shrink: 0;
   width: var(--st-chevron);
   height: var(--st-chevron);

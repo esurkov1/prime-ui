@@ -1,40 +1,31 @@
-/** All five size tiers of a horizontal stepper (indicator 20 · 24 · 28 · 32 · 36, title in the control text). Use to match the stepper to the surrounding form size. */
-import { type ControlSize, Stepper, Typography } from "prime-ui-kit";
+/** Every size tier: indicator 20 to 36 px, title in the control text of the tier — `size`. */
+import { Stepper, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
+const STEPS = ["Аккаунт", "Команда", "Готово"];
 
 export default function StepperSizesExample() {
   return (
-    <div className={styles.stack}>
-      {sizes.map((size) => (
-        <div key={size} className={styles.group}>
-          <Typography.Root variant="code" tone="muted">
-            size="{size}"
+    <>
+      {SIZES.map((size) => (
+        <div key={size} className={styles.wide}>
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
           </Typography.Root>
           <Stepper.Root orientation="horizontal" size={size} defaultValue={1}>
-            <Stepper.Step>
-              <Stepper.Indicator />
-              <Stepper.Content>
-                <Stepper.Title>Аккаунт</Stepper.Title>
-              </Stepper.Content>
-            </Stepper.Step>
-            <Stepper.Step>
-              <Stepper.Indicator />
-              <Stepper.Content>
-                <Stepper.Title>Команда</Stepper.Title>
-              </Stepper.Content>
-            </Stepper.Step>
-            <Stepper.Step>
-              <Stepper.Indicator />
-              <Stepper.Content>
-                <Stepper.Title>Готово</Stepper.Title>
-              </Stepper.Content>
-            </Stepper.Step>
+            {STEPS.map((title) => (
+              <Stepper.Item key={title}>
+                <Stepper.Indicator />
+                <Stepper.Content>
+                  <Stepper.Title>{title}</Stepper.Title>
+                </Stepper.Content>
+              </Stepper.Item>
+            ))}
           </Stepper.Root>
         </div>
       ))}
-    </div>
+    </>
   );
 }

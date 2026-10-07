@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
-import { IconChevronRight } from "@/icons";
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -10,11 +10,10 @@ import type { ControlSize } from "@/internal/states";
 
 import styles from "./Stepper.module.css";
 
-/** Step state: derived from the Root `value` (before → `completed`, equal → `active`, after → `pending`) unless set on the step. */
-export type StepperStepStatus = "pending" | "active" | "completed" | "error";
+/** Item state: derived from the Root `value` (before → `completed`, equal → `active`, after → `pending`) unless set on the item. */
+export type StepperItemStatus = "pending" | "active" | "completed" | "danger";
 
 type StepperRootContextValue = {
-  orientation: "horizontal" | "vertical";
   value: number;
   select: (index: number) => void;
 };
@@ -22,15 +21,15 @@ type StepperRootContextValue = {
 const [StepperRootProvider, useStepperRootContext] =
   createComponentContext<StepperRootContextValue>("Stepper");
 
-type StepperStepContextValue = { index: number; status: StepperStepStatus };
+type StepperItemContextValue = { index: number; status: StepperItemStatus };
 
-const [StepperStepProvider, useStepperStepContext] =
-  createComponentContext<StepperStepContextValue>("Stepper.Step");
+const [StepperItemProvider, useStepperItemContext] =
+  createComponentContext<StepperItemContextValue>("Stepper.Item");
 
-/** Index of a step, assigned by `Stepper.Root` from the order of its direct `Stepper.Step` children. */
+/** Index of an item, assigned by `Stepper.Root` from the order of its direct `Stepper.Item` children. */
 const StepperIndexContext = React.createContext<number | null>(null);
 
-function deriveStatus(index: number, current: number): StepperStepStatus {
+function deriveStatus(index: number, current: number): StepperItemStatus {
   if (index < current) return "completed";
   if (index === current) return "active";
   return "pending";
@@ -38,20 +37,20 @@ function deriveStatus(index: number, current: number): StepperStepStatus {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-export type StepperRootProps = {
+export type StepperRootProps = Omit<
+  React.OlHTMLAttributes<HTMLOListElement>,
+  "defaultValue" | "onChange"
+> & {
   /** Default `vertical`. A horizontal stepper stacks vertically in containers narrower than 480px. */
   orientation?: "horizontal" | "vertical";
   /** Current step (0-based), controlled. */
   value?: number;
   /** Initial step when uncontrolled. Default `0`. */
   defaultValue?: number;
-  /** Called with the step index when a step is clicked. */
+  /** Called with the item index when an item is clicked. */
   onValueChange?: (index: number) => void;
   size?: ControlSize;
-  /** `Stepper.Step` elements as direct children (an array from `map` is fine). */
-  children: React.ReactNode;
-  className?: string;
-} & Omit<React.OlHTMLAttributes<HTMLOListElement>, "children" | "defaultValue" | "onChange">;
+};
 
 function StepperRoot({
   orientation = "vertical",
@@ -68,15 +67,12 @@ function StepperRoot({
     defaultValue,
     onChange: onValueChange,
   });
-  const contextValue = React.useMemo(
-    () => ({ orientation, value, select: setValue }),
-    [orientation, value, setValue],
-  );
+  const contextValue = React.useMemo(() => ({ value, select: setValue }), [value, setValue]);
 
   let nextIndex = 0;
   const items: React.ReactNode[] = [];
   for (const child of React.Children.toArray(children)) {
-    if (!React.isValidElement(child) || child.type !== StepperStep) {
+    if (!React.isValidElement(child) || child.type !== StepperItem) {
       items.push(child);
       continue;
     }
@@ -85,7 +81,7 @@ function StepperRoot({
     if (orientation === "horizontal" && index > 0) {
       items.push(
         <li key={`separator-${child.key}`} className={styles.separator} aria-hidden="true">
-          <IconChevronRight className={styles.separatorIcon} strokeWidth={2} />
+          <Icon name="nav.chevronRight" className={styles.separatorIcon} strokeWidth={2} />
         </li>,
       );
     }
@@ -112,28 +108,27 @@ function StepperRoot({
 }
 StepperRoot.displayName = "Stepper.Root";
 
-// ─── Step ─────────────────────────────────────────────────────────────────────
+// ─── Item ─────────────────────────────────────────────────────────────────────
 
-export type StepperStepProps = {
-  /** Overrides the status derived from the Root `value` (e.g. `error`). */
-  status?: StepperStepStatus;
-  children: React.ReactNode;
-} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "children">;
+export type StepperItemProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
+  /** Overrides the status derived from the Root `value` (e.g. `danger`). */
+  status?: StepperItemStatus;
+};
 
-const StepperStep = React.forwardRef<HTMLButtonElement, StepperStepProps>(function StepperStep(
+const StepperItem = React.forwardRef<HTMLButtonElement, StepperItemProps>(function StepperItem(
   { status: statusProp, children, className, disabled, onClick, ...rest },
   ref,
 ) {
   const { value, select } = useStepperRootContext();
   const index = React.useContext(StepperIndexContext);
   if (index === null) {
-    throw new Error("Stepper.Step must be a direct child of Stepper.Root");
+    throw new Error("Stepper.Item must be a direct child of Stepper.Root");
   }
   const status = statusProp ?? deriveStatus(index, value);
-  const stepContext = React.useMemo(() => ({ index, status }), [index, status]);
+  const itemContext = React.useMemo(() => ({ index, status }), [index, status]);
 
   return (
-    <StepperStepProvider value={stepContext}>
+    <StepperItemProvider value={itemContext}>
       <li className={styles.item}>
         <button
           {...rest}
@@ -151,77 +146,59 @@ const StepperStep = React.forwardRef<HTMLButtonElement, StepperStepProps>(functi
           {children}
         </button>
       </li>
-    </StepperStepProvider>
+    </StepperItemProvider>
   );
 });
-StepperStep.displayName = "Stepper.Step";
+StepperItem.displayName = "Stepper.Item";
 
 // ─── Parts ────────────────────────────────────────────────────────────────────
 
-function CheckIcon() {
-  return (
-    <svg
-      className={styles.check}
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M5.5 12.5l4.25 4.25L18.5 8"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+type SpanProps = React.HTMLAttributes<HTMLSpanElement>;
 
-export type StepperIndicatorProps = {
-  /** Replaces the default content (step number, or a check when completed). */
+export type StepperIndicatorProps = SpanProps & {
+  /** Replaces the default content (the item number, or a check when completed). */
   children?: React.ReactNode;
-  className?: string;
 };
 
-function StepperIndicator({ children, className }: StepperIndicatorProps) {
-  const { status, index } = useStepperStepContext();
+function StepperIndicator({ children, className, ...rest }: StepperIndicatorProps) {
+  const { status, index } = useStepperItemContext();
   return (
-    <span className={cx(styles.indicator, className)} data-status={status} aria-hidden="true">
-      {children ?? (status === "completed" ? <CheckIcon /> : index + 1)}
+    <span
+      {...rest}
+      className={cx(styles.indicator, className)}
+      data-status={status}
+      aria-hidden="true"
+    >
+      {children ??
+        (status === "completed" ? (
+          <Icon name="action.check" className={styles.check} strokeWidth={2} />
+        ) : (
+          index + 1
+        ))}
     </span>
   );
 }
 StepperIndicator.displayName = "Stepper.Indicator";
 
-export type StepperContentProps = {
-  children: React.ReactNode;
-  className?: string;
-};
+export type StepperContentProps = SpanProps;
 
 /** Text column: `Stepper.Title` and optional `Stepper.Description`. */
-function StepperContent({ children, className }: StepperContentProps) {
-  return <span className={cx(styles.content, className)}>{children}</span>;
+function StepperContent({ className, ...rest }: StepperContentProps) {
+  return <span {...rest} className={cx(styles.content, className)} />;
 }
 StepperContent.displayName = "Stepper.Content";
 
-export type StepperTitleProps = {
-  children: React.ReactNode;
-  className?: string;
-};
+export type StepperTitleProps = SpanProps;
 
-function StepperTitle({ children, className }: StepperTitleProps) {
-  return <span className={cx(styles.title, className)}>{children}</span>;
+function StepperTitle({ className, ...rest }: StepperTitleProps) {
+  return <span {...rest} className={cx(styles.title, className)} />;
 }
 StepperTitle.displayName = "Stepper.Title";
 
-export type StepperDescriptionProps = {
-  children: React.ReactNode;
-  className?: string;
-};
+export type StepperDescriptionProps = SpanProps;
 
-function StepperDescription({ children, className }: StepperDescriptionProps) {
-  return <span className={cx(styles.description, className)}>{children}</span>;
+function StepperDescription({ className, ...rest }: StepperDescriptionProps) {
+  return <span {...rest} className={cx(styles.description, className)} />;
 }
 StepperDescription.displayName = "Stepper.Description";
 
@@ -229,15 +206,15 @@ export type StepperArrowProps = {
   className?: string;
 };
 
-/** Trailing chevron for vertical steps that open a page or panel. */
+/** Trailing chevron for vertical items that open a page or panel. */
 function StepperArrow({ className }: StepperArrowProps) {
-  return <IconChevronRight className={cx(styles.arrow, className)} strokeWidth={2} aria-hidden />;
+  return <Icon name="nav.chevronRight" className={cx(styles.arrow, className)} strokeWidth={2} />;
 }
 StepperArrow.displayName = "Stepper.Arrow";
 
 export const Stepper = {
   Root: StepperRoot,
-  Step: StepperStep,
+  Item: StepperItem,
   Indicator: StepperIndicator,
   Content: StepperContent,
   Title: StepperTitle,

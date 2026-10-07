@@ -426,9 +426,9 @@ export type {
   StepperContentProps,
   StepperDescriptionProps,
   StepperIndicatorProps,
+  StepperItemProps,
+  StepperItemStatus,
   StepperRootProps,
-  StepperStepProps,
-  StepperStepStatus,
   StepperTitleProps,
 } from "./stepper/Stepper";
 export { Stepper } from "./stepper/Stepper";
