@@ -38,7 +38,7 @@ export const api: ComponentApi = {
           name: "loading",
           type: "boolean",
           default: "false",
-          en: "Shows the spinner, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added automatically — place `Button.Spinner` yourself.",
+          en: "Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content.",
           ru: "Спиннер вместо ведущей иконки или по центру над подписью, `aria-busy` и запрет нажатия. Ширина не меняется.",
         },
         {
@@ -90,19 +90,6 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
-          en: "`className` and the other span attributes.",
-          ru: "`className` и остальные атрибуты span.",
-        },
-      ],
-    },
-    {
-      name: "Button.Spinner",
-      en: "No ref. Explicit spinner position; renders only while `Button.Root` is `loading`. Not needed in most cases: `loading` adds a spinner by itself.",
-      ru: "Явное место спиннера. Обычно не нужен: `loading` на корне показывает спиннер сам.",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLSpanElement>",
           en: "`className` and the other span attributes.",
           ru: "`className` и остальные атрибуты span.",
         },

@@ -27,12 +27,7 @@ describe("Button", () => {
   });
 
   it("is disabled while loading", () => {
-    render(
-      <Button.Root loading>
-        <Button.Spinner />
-        Submitting
-      </Button.Root>,
-    );
+    render(<Button.Root loading>Submitting</Button.Root>);
 
     const button = screen.getByRole("button", { name: "Submitting" });
     expect(button).toBeDisabled();
@@ -63,22 +58,13 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: "Wide" })).toHaveAttribute("data-full-width", "true");
   });
 
-  it("Spinner renders only when loading=true", () => {
-    const { rerender, container } = render(
-      <Button.Root>
-        Send
-        <Button.Spinner />
-      </Button.Root>,
-    );
+  it("renders the Spinner only while loading, hidden from screen readers", () => {
+    const { rerender, container } = render(<Button.Root>Send</Button.Root>);
     expect(container.querySelector(`.${styles.spinner}`)).toBeNull();
 
-    rerender(
-      <Button.Root loading>
-        <Button.Spinner />
-        Send
-      </Button.Root>,
-    );
-    expect(container.querySelector(`.${styles.spinner}`)).toBeInTheDocument();
+    rerender(<Button.Root loading>Send</Button.Root>);
+    expect(container.querySelector(`.${styles.spinner}`)).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("button", { name: "Send" })).toBeInTheDocument();
   });
 
   it("Button.Icon renders icon wrapper with aria-hidden", () => {
@@ -222,7 +208,7 @@ describe("Button asChild", () => {
       expect(trail).not.toHaveAttribute("data-icon-only");
     });
 
-    it("renders an automatic spinner over the label when loading without Button.Spinner", () => {
+    it("renders the spinner over the label when loading without a leading icon", () => {
       const { container } = render(<Button.Root loading>Save</Button.Root>);
       const button = screen.getByRole("button", { name: "Save" });
       expect(container.querySelectorAll(`.${styles.spinner}`)).toHaveLength(1);
@@ -240,16 +226,6 @@ describe("Button asChild", () => {
       expect(screen.getByRole("button", { name: "Save" })).not.toHaveAttribute(
         "data-loading-overlay",
       );
-    });
-
-    it("does not add a second spinner when Button.Spinner is present", () => {
-      const { container } = render(
-        <Button.Root loading>
-          <Button.Spinner />
-          Save
-        </Button.Root>,
-      );
-      expect(container.querySelectorAll(`.${styles.spinner}`)).toHaveLength(1);
     });
 
     it("accepts size xs", () => {

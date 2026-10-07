@@ -26,8 +26,8 @@ import { Button } from "prime-ui-kit";
 ## Anatomy
 ```
 Button.Root        <button> (or the single child with asChild); variant, tone, size; size tier for nested icons
-├─ Button.Icon     decorative icon wrapper (aria-hidden), sized to the tier
-└─ Button.Spinner  optional explicit spinner position; renders only while Root is loading
+├─ (Spinner)       rendered by Root while loading, aria-hidden
+└─ Button.Icon     decorative icon wrapper (aria-hidden), sized to the tier
 ```
 
 ## API
@@ -43,7 +43,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `tone` | `"accent" \| "neutral" \| "danger"` | `"accent"` | Meaning of the action; `danger` for destructive actions. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
-| `loading` | `boolean` | `false` | Shows the spinner, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added automatically — place `Button.Spinner` yourself. |
+| `loading` | `boolean` | `false` | Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content. |
 | `asChild` | `boolean` | `false` | Merges Button props and styles onto the single child element instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`. |
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Native button type; not forwarded with `asChild`. |
 | `disabled` | `boolean` | — | Disabled state; `loading` also disables. |
@@ -57,13 +57,6 @@ No ref. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
-
-### Button.Spinner
-No ref. Explicit spinner position; renders only while `Button.Root` is `loading`. Not needed in most cases: `loading` adds a spinner by itself.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ## Variants
 
@@ -110,7 +103,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | hover / active | pointer | hover fill per variant; active `scale(var(--prime-motion-press-scale))` |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset` |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
-| loading | `loading` (native `<button>`) | `data-loading="true"`, `data-disabled="true"`, `aria-busy="true"`; the spinner replaces the leading (or only) icon, otherwise it is centered over the hidden label (`data-loading-overlay="true"`) |
+| loading | `loading` (native `<button>`) | `data-loading="true"`, `data-disabled="true"`, `aria-busy="true"`; a `Spinner` (`aria-hidden`) replaces the leading (or only) icon, otherwise it is centered over the hidden label (`data-loading-overlay="true"`) |
 | asChild disabled / loading | `asChild` + `disabled`/`loading` | `aria-disabled="true"`, `pointer-events: none`, click `preventDefault`; no native `disabled`, no automatic spinner |
 
 Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-full-width`, `data-icon-only`, `data-leading-icon`, `data-trailing-icon`.
@@ -154,10 +147,10 @@ No `labels`.
 - `<Button.Root><Icon name="action.copy" /></Button.Root>` → wrap in `Button.Icon` so the button becomes square and the icon is sized.
 - Icon-only button without `aria-label` → add `aria-label="Копировать"`.
 - `tone="error"` / `variant="primary"` → `tone="danger"`, `variant="solid"`.
-- Adding `<Button.Spinner />` for every loading button → just set `loading`.
+- Putting a `<Spinner />` inside a loading button → just set `loading`; the button places it.
 - `<a>` inside `<Button.Root>` → use `asChild` so there is one interactive element.
 - Submit button without `type="submit"` → the default is `"button"` and will not submit.
 
 ## Related
-- **Built from:** —
-- **See also:** [ButtonGroup](../button-group/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Spinner](../spinner/COMPONENT.md)
+- **Built from:** [Spinner](../spinner/COMPONENT.md)
+- **See also:** [ButtonGroup](../button-group/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md)
