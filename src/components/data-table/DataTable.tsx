@@ -696,9 +696,7 @@ export function DataTable<Row>({
                         disabled={allKeys.length === 0}
                         onCheckedChange={handleSelectAll}
                         aria-label={labels.selectAll}
-                      >
-                        <Checkbox.Label />
-                      </Checkbox.Root>
+                      />
                     </th>
                   ) : null}
                   {expandEnabled ? <th scope="col" className={leadCells("head").toggle} /> : null}
@@ -858,9 +856,7 @@ export function DataTable<Row>({
                               shiftKeyRef.current = false;
                             }}
                             aria-label={formatLabel(labels.selectRow, { label: rowLabel })}
-                          >
-                            <Checkbox.Label />
-                          </Checkbox.Root>
+                          />
                         </td>
                       ) : null}
                       {expandEnabled ? (
