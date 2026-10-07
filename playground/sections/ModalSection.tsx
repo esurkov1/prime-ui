@@ -1,14 +1,6 @@
+import { api } from "@/components/modal/api";
+
 import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
-import {
-  dialogAriaApiRows,
-  dialogBodyApiRows,
-  dialogFooterApiRows,
-  dialogHeaderApiRows,
-  dialogIconApiRows,
-  dialogRootApiRows,
-  dialogSlotApiRows,
-  dialogTextApiRows,
-} from "./dialogApiRows";
 
 export const page: ComponentPageConfig = {
   dir: "modal",
@@ -59,63 +51,7 @@ export const page: ComponentPageConfig = {
         "Форма настроек в окне: кнопка подвала отправляет форму, пустое название не даёт закрыть окно — `Modal.Body`, `Modal.Footer`, `error`.",
     },
   ],
-  api: [
-    {
-      name: "Modal.Root",
-      description: "Состояние открытия и политика закрытия; своего DOM нет.",
-      rows: [
-        ...dialogRootApiRows("Modal"),
-        {
-          prop: "confirmOnEnter",
-          type: "boolean",
-          defaultValue: "true",
-          required: "Нет",
-          description:
-            "Enter нажимает элемент в `Modal.Confirm` (кроме textarea, select, чекбоксов, шапки).",
-        },
-        {
-          prop: "onEnterConfirm",
-          type: "(event: KeyboardEvent) => void",
-          defaultValue: "—",
-          required: "Нет",
-          description: "Свой обработчик Enter вместо нажатия `Modal.Confirm`.",
-        },
-      ],
-    },
-    {
-      name: "Modal.Content",
-      description: "Портал, подложка и сам диалог: ловушка фокуса, блокировка прокрутки.",
-      rows: [
-        {
-          prop: "size",
-          type: '"s" | "m" | "l" | "xl"',
-          defaultValue: '"m"',
-          required: "Нет",
-          description:
-            "Ширина 440 · 560 · 720 · 960 px. Уже 640 px экрана — лист снизу на всю ширину.",
-        },
-        {
-          prop: "container",
-          type: "HTMLElement | null",
-          defaultValue: "document.body",
-          required: "Нет",
-          description: "Узел для портала.",
-        },
-        ...dialogAriaApiRows,
-      ],
-    },
-    { name: "Modal.Header", rows: dialogHeaderApiRows },
-    { name: "Modal.Icon", rows: dialogIconApiRows },
-    { name: "Modal.Title · Modal.Description", rows: dialogTextApiRows },
-    { name: "Modal.Body", rows: dialogBodyApiRows },
-    { name: "Modal.Footer", rows: dialogFooterApiRows('"fill" для s/m, "end" для l/xl') },
-    {
-      name: "Modal.Trigger · Modal.Close · Modal.Confirm",
-      description:
-        "Оборачивают один элемент: `Trigger` открывает, `Close` закрывает, `Confirm` делает кнопку целью Enter.",
-      rows: dialogSlotApiRows,
-    },
-  ],
+  api,
   accessibility: {
     keyboard: [
       {
@@ -134,13 +70,6 @@ export const page: ComponentPageConfig = {
       "При открытии фокус уходит в окно (поле с `autoFocus` побеждает), при закрытии — на элемент, открывший окно, в том числе после клика по подложке.",
       "Страница за окном неактивна (`inert`), прокрутка заблокирована.",
       "Реагирует только верхний слой: Select, открытый внутри окна, закрывается первым.",
-    ],
-    labels: [
-      {
-        key: "close",
-        defaultValue: "Закрыть",
-        description: "`aria-label` кнопки закрытия в шапке.",
-      },
     ],
   },
 };

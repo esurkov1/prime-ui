@@ -11,10 +11,12 @@ export type EmptyPageRootProps = {
   /** Высота контролов, кегль и отступы; по умолчанию `m`. */
   size?: ControlSize;
   /**
-   * `fill` — блок растягивается по высоте родителя и центрирует содержимое (пустое состояние внутри таблицы, скролла, карточки).
-   * `default` — компактный блок по содержимому.
+   * `default` — a block sized by its content.
+   * `fill` — stretches to the parent's height and centers the content (inside a table, a scroll area, a card).
+   * `compact` — a quiet state inside a menu, listbox or command list: panel padding, body-s title,
+   * caption description, a small icon and no entrance motion (it appears on every keystroke).
    */
-  layout?: "default" | "fill";
+  layout?: "default" | "fill" | "compact";
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -30,7 +32,7 @@ const EmptyPageRoot = React.forwardRef<HTMLDivElement, EmptyPageRootProps>(funct
       {...rest}
       {...toDataAttributes({
         size,
-        layout: layout === "fill" ? "fill" : undefined,
+        layout: layout === "default" ? undefined : layout,
       })}
     >
       <ControlSizeProvider value={size}>{children}</ControlSizeProvider>

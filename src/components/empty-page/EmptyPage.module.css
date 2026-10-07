@@ -111,6 +111,30 @@
   min-height: 0;
 }
 
+/*
+ * Compact: the empty state of a menu, listbox or command list (foundation §8 "empty": centered
+ * muted body-s text, optional action). It shows up on every keystroke that filters to nothing, so
+ * it does not move (§7 rule 1): no entrance animation, only the content swap.
+ */
+.root[data-layout="compact"] {
+  --ep-pad-y: var(--prime-space-5);
+  --ep-pad-x: var(--prime-space-3);
+  --ep-icon-box: var(--prime-control-s-height);
+  --ep-icon: var(--prime-icon-s);
+  --ep-icon-radius: var(--prime-radius-m);
+  --ep-title-size: var(--prime-text-body-s-size);
+  --ep-title-line-height: var(--prime-text-body-s-line-height);
+  --ep-title-tracking: var(--prime-text-body-s-tracking);
+  --ep-desc-size: var(--prime-text-caption-size);
+  --ep-desc-line-height: var(--prime-text-caption-line-height);
+
+  gap: var(--prime-space-1);
+}
+
+.root[data-layout="compact"] > * {
+  animation: none;
+}
+
 .iconWrap {
   display: flex;
   flex-shrink: 0;
@@ -173,4 +197,22 @@
   justify-content: center;
   gap: var(--prime-space-2);
   padding-top: var(--prime-space-3);
+}
+
+/* Compact parts: quieter text, tighter groups (the variables are set on the compact root). */
+.root[data-layout="compact"] .title {
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-secondary);
+}
+
+.root[data-layout="compact"] .description {
+  color: var(--prime-color-text-muted);
+}
+
+.root[data-layout="compact"] .iconWrap + .title {
+  padding-top: var(--prime-space-1);
+}
+
+.root[data-layout="compact"] .actions {
+  padding-top: var(--prime-space-2);
 }

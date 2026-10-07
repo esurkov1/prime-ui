@@ -3,7 +3,7 @@ import { Hint } from "@/components/hint/Hint";
 import { Label } from "@/components/label/Label";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -142,6 +142,16 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
 
 CheckboxRoot.displayName = "CheckboxRoot";
 
+/** Check and indeterminate bar; which one shows (and how it draws in) comes from `data-state`. */
+function CheckboxMark() {
+  return (
+    <svg viewBox="0 0 24 24" className={styles.svg} aria-hidden="true" focusable="false">
+      <path d="M5.5 12.5l4.25 4.25L18.5 8" pathLength={1} className={styles.checkPath} />
+      <path d="M7 12h10" pathLength={1} className={styles.indeterminateLine} />
+    </svg>
+  );
+}
+
 // ─── Label ───────────────────────────────────────────────────────────────────
 
 export type CheckboxLabelProps = {
@@ -188,10 +198,7 @@ const CheckboxLabel = React.forwardRef<HTMLLabelElement, CheckboxLabelProps>(fun
           aria-describedby={describedBy}
         />
         <span className={styles.control} aria-hidden="true">
-          <svg viewBox="0 0 24 24" className={styles.svg} aria-hidden="true" focusable="false">
-            <path d="M5.5 12.5l4.25 4.25L18.5 8" pathLength={1} className={styles.checkPath} />
-            <path d="M7 12h10" pathLength={1} className={styles.indeterminateLine} />
-          </svg>
+          <CheckboxMark />
         </span>
       </span>
       {children != null ? <span className={styles.text}>{children}</span> : null}
@@ -248,9 +255,54 @@ function CheckboxError({ children, className, ...rest }: CheckboxErrorProps) {
 
 CheckboxError.displayName = "CheckboxError";
 
+// ─── Indicator ───────────────────────────────────────────────────────────────
+
+export type CheckboxIndicatorProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
+  checked?: boolean;
+  /** Mixed state; wins over `checked` visually. */
+  indeterminate?: boolean;
+  disabled?: boolean;
+  /** Box tier; without it the nearest control size (e.g. the Select or menu it sits in), else `m`. */
+  size?: ControlSize;
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/**
+ * The checkbox box alone, without an input: a decorative mark for rows whose own element carries
+ * the state (`role="option"` with `aria-selected`, `role="menuitemcheckbox"` with `aria-checked`).
+ * Used outside `Checkbox.Root`; it is `aria-hidden` and takes no focus or clicks.
+ */
+function CheckboxIndicator({
+  checked = false,
+  indeterminate = false,
+  disabled = false,
+  size: sizeProp,
+  className,
+  ...rest
+}: CheckboxIndicatorProps) {
+  const controlSize = useOptionalControlSize();
+  return (
+    <span
+      aria-hidden="true"
+      className={cx(styles.control, styles.indicator, className)}
+      {...toDataAttributes({
+        size: sizeProp ?? controlSize ?? "m",
+        state: indeterminate ? "indeterminate" : checked ? "checked" : "unchecked",
+        disabled: disabled || undefined,
+      })}
+      {...rest}
+    >
+      <CheckboxMark />
+    </span>
+  );
+}
+
+CheckboxIndicator.displayName = "Checkbox.Indicator";
+
 export const Checkbox = {
   Root: CheckboxRoot,
   Label: CheckboxLabel,
   Hint: CheckboxHint,
   Error: CheckboxError,
+  Indicator: CheckboxIndicator,
 };

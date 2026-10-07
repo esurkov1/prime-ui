@@ -201,6 +201,55 @@
   transform: none;
 }
 
+/*
+ * ---- Checkbox.Indicator: the box without an input ----
+ * Same box, fill and check motion as the field; the tier and state come from its own data-*.
+ * No hover or press of its own: the row that hosts it (option, menu item) owns those.
+ */
+.indicator {
+  --prime-choice-size: var(--prime-control-m-choice);
+  --prime-choice-radius: var(--prime-radius-xs);
+  pointer-events: none;
+}
+
+.indicator[data-size="xs"] {
+  --prime-choice-size: var(--prime-control-xs-choice);
+}
+
+.indicator[data-size="s"] {
+  --prime-choice-size: var(--prime-control-s-choice);
+}
+
+.indicator[data-size="l"] {
+  --prime-choice-size: var(--prime-control-l-choice);
+}
+
+.indicator[data-size="xl"] {
+  --prime-choice-size: var(--prime-control-xl-choice);
+  --prime-choice-radius: var(--prime-radius-s);
+}
+
+.indicator:is([data-state="checked"], [data-state="indeterminate"]) {
+  background: var(--prime-color-accent-default);
+}
+
+.indicator[data-state="checked"] .checkPath,
+.indicator[data-state="indeterminate"] .indeterminateLine {
+  stroke-dashoffset: 0;
+  transform: scale(1);
+  opacity: 1;
+  transition:
+    stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.indicator[data-disabled="true"] {
+  background: var(--prime-color-fill-muted);
+  box-shadow: none;
+  color: var(--prime-color-text-disabled);
+}
+
 /* ---- description / error under the text column ---- */
 .hintSlot {
   grid-column: 2;

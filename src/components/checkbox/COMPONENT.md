@@ -25,6 +25,8 @@ Checkbox.Root          wrapper grid + context; ref and input props go to the hid
 ├─ Checkbox.Label      clickable row: renders the native input, the box and the text
 ├─ Checkbox.Hint       description under the text column (optional)
 └─ Checkbox.Error      error message under the text column (optional, makes the field invalid)
+
+Checkbox.Indicator     the box alone, no input — a mark inside option / menu rows (used without Root)
 ```
 The native `input type="checkbox"` is rendered inside `Checkbox.Label`, so a Root without `Checkbox.Label` renders an empty `Checkbox.Label` itself: `<Checkbox.Root aria-label="…" />` is a valid bare control (tables, settings rows).
 
@@ -73,6 +75,19 @@ Ref: `forwardRef` → `HTMLLabelElement`.
 | `className` | `string` | — | Class on the `<p>`. |
 
 + native `<p>` props except `id` (fixed to `<inputId>-error`). No ref.
+
+### Checkbox.Indicator
+The box alone, without an input, used **outside** `Checkbox.Root`: a decorative mark (`aria-hidden`, no focus, no pointer events) for rows whose own element carries the state — `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`. Same box, fill and check-draw motion as the field; the host row owns hover and press.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `checked` | `boolean` | `false` | Shows the check on the accent fill. |
+| `indeterminate` | `boolean` | `false` | Shows the bar; wins over `checked`. |
+| `disabled` | `boolean` | `false` | Muted box, disabled check color. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | nearest control size, else `"m"` | Box tier (`--prime-control-<tier>-choice`). Inside a sized host (Select, menu) it follows the host. |
+| `className` | `string` | — | Class on the `<span>`. |
+
++ native `<span>` props except `children`. `ref` → `HTMLSpanElement`. DOM: `data-size`, `data-state="checked" | "unchecked" | "indeterminate"`, `data-disabled`.
 
 ## Variants
 Checkbox has no `variant`/`tone`/`color`. Axes: `size`, `fullWidth`.
@@ -138,6 +153,7 @@ Controlled: `checked` + `onCheckedChange`. Uncontrolled: `defaultChecked` (+ opt
 | [select-all.tsx](examples/select-all.tsx) | Controlled «select all» with `indeterminate` | Bulk selection in lists |
 | [settings-card.tsx](examples/settings-card.tsx) | Named group with parent and nested options, disabled option with hint, inside a Card with `Card.Actions` (primary last) | Grouped preferences in a settings form |
 | [without-label.tsx](examples/without-label.tsx) | Empty `Checkbox.Label` + `aria-label`, `name`/`value` | Row selection in tables |
+| [indicator.tsx](examples/indicator.tsx) | `Checkbox.Indicator` in multi-select option rows that carry `aria-selected` | Listbox / menu rows with a checkbox look (no nested input) |
 
 ```tsx
 import { Checkbox } from "prime-ui-kit";

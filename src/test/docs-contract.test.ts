@@ -18,6 +18,7 @@ import {
   type SlotId,
   slotOrder,
 } from "../../playground/pageStandard";
+import { applyApiToDoc, type ComponentApi } from "../../scripts/docs/componentApi";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
@@ -171,6 +172,7 @@ const playgroundSource = walk("playground", /\.tsx?$/)
 const sectionModules = import.meta.glob<{ page?: ComponentPageConfig }>(
   "../../playground/sections/*Section.tsx",
 );
+const apiModules = import.meta.glob<{ api: ComponentApi }>("../{components,layout}/*/api.ts");
 
 /** H2 section `## <title>` of a markdown document, without the heading line. */
 function docSection(doc: string, title: string): string {
@@ -320,7 +322,7 @@ describe("docs contract", () => {
           previous = order;
           expect(example.description, `${exampleFile(example)}: description`).toMatch(/\.$/);
         }
-        const rootProps = (page.api[0]?.rows ?? []).map((row) => row.prop);
+        const rootProps = (page.api.parts[0]?.props ?? []).map((prop) => prop.name);
         for (const slot of requiredSlots(page.kind, rootProps)) {
           expect(slots, `required slot "${slot}"`).toContain(slot);
         }
@@ -355,8 +357,18 @@ describe("docs contract", () => {
         }
         const labels = a11y.slice(a11y.indexOf("### Labels"));
         const keysInDoc = [...labels.matchAll(/^\| `(\w+)` \|/gm)].map((m) => m[1]);
-        expect(keysInDoc).toEqual((page.accessibility.labels ?? []).map((row) => row.key));
-        if (!page.accessibility.labels?.length) expect(labels).toContain("No `labels`.");
+        expect(keysInDoc).toEqual(page.api.labels.map((label) => label.key));
+      });
+
+      it("COMPONENT.md API and Labels are generated from api.ts (bun run docs:build)", async () => {
+        const load = apiModules[`../${base}/${dir}/api.ts`];
+        expect(load, `${rel}/api.ts`).toBeDefined();
+        const { api } = await load();
+        expect(page.api, `${pascal(dir)}Section must pass the api from api.ts`).toBe(api);
+        const doc = read(docPath);
+        expect(doc === applyApiToDoc(doc, api), `${docPath} is stale: run bun run docs:build`).toBe(
+          true,
+        );
       });
 
       it("COMPONENT.md lists the examples in page order with their JSDoc", () => {

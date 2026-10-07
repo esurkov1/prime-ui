@@ -107,6 +107,8 @@
   "scripts": {
     "clean": "rm -rf dist .dts-stage coverage playground/dist",
     "tokens:build": "bun run scripts/build-tokens.ts",
+    "docs:build": "bun run scripts/build-docs.ts",
+    "verify:docs": "bun run docs:build && git diff --exit-code -- 'src/**/COMPONENT.md'",
     "build": "bun run tokens:build && bun run scripts/bundle-lib.ts",
     "prepublishOnly": "bun run clean && bun run build",
     "dev": "bun run scripts/bundle-lib.ts --watch",

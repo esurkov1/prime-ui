@@ -1,3 +1,5 @@
+import { api } from "@/components/button/api";
+
 import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
@@ -35,124 +37,7 @@ export const page: ComponentPageConfig = {
         "Кнопка отправки на всю ширину показывает идущий запрос — `type`, `loading`, `fullWidth`.",
     },
   ],
-  api: [
-    {
-      name: "Button.Root",
-      description:
-        "Кнопка или слот для одного дочернего элемента при `asChild`; задаёт подачу, тон и размер, передаёт ярус вложенным иконкам.",
-      rows: [
-        {
-          prop: "variant",
-          type: '"solid" | "soft" | "outline" | "ghost"',
-          defaultValue: '"solid"',
-          required: "Нет",
-          description: "Подача: заливка, мягкая заливка, линия или прозрачная.",
-        },
-        {
-          prop: "tone",
-          type: '"accent" | "neutral" | "danger"',
-          defaultValue: '"accent"',
-          required: "Нет",
-          description: "Смысл: главное действие, второстепенное или разрушительное.",
-        },
-        {
-          prop: "size",
-          type: '"xs" | "s" | "m" | "l" | "xl"',
-          defaultValue: '"m"',
-          required: "Нет",
-          description:
-            "Ярус контрола: высота 28 · 32 · 36 · 40 · 48, отступы, кегль, иконка. Совпадает с Input и Select того же размера.",
-        },
-        {
-          prop: "fullWidth",
-          type: "boolean",
-          defaultValue: "—",
-          required: "Нет",
-          description: "Растянуть кнопку на ширину контейнера.",
-        },
-        {
-          prop: "loading",
-          type: "boolean",
-          defaultValue: "false",
-          required: "Нет",
-          description:
-            "Спиннер вместо ведущей иконки или по центру над подписью, `aria-busy` и запрет нажатия. Ширина не меняется.",
-        },
-        {
-          prop: "asChild",
-          type: "boolean",
-          defaultValue: "false",
-          required: "Нет",
-          description:
-            "Передать стили и пропсы единственному дочернему элементу вместо `<button>`.",
-        },
-        {
-          prop: "type",
-          type: '"button" | "submit" | "reset"',
-          defaultValue: '"button"',
-          required: "Нет",
-          description: "Тип нативной кнопки; при `asChild` не передаётся.",
-        },
-        {
-          prop: "disabled",
-          type: "boolean",
-          defaultValue: "—",
-          required: "Нет",
-          description: "Неактивное состояние; `loading` тоже блокирует нажатие.",
-        },
-        {
-          prop: "children",
-          type: "React.ReactNode",
-          defaultValue: "—",
-          required: "Нет",
-          description:
-            "Подпись и `Button.Icon`. Только `Button.Icon` — квадратная кнопка, ей нужен `aria-label`.",
-        },
-        {
-          prop: "…rest",
-          type: "React.ButtonHTMLAttributes<HTMLButtonElement> (без size)",
-          defaultValue: "—",
-          required: "Нет",
-          description: "`onClick`, `className`, `aria-*`, `data-*` и остальные атрибуты кнопки.",
-        },
-      ],
-    },
-    {
-      name: "Button.Icon",
-      description: "Иконка размера яруса кнопки; скрыта от скринридеров (`aria-hidden`).",
-      rows: [
-        {
-          prop: "children",
-          type: "React.ReactNode",
-          defaultValue: "—",
-          required: "Да",
-          description:
-            'Иконка, например `<Icon name="action.copy" />`; без `size` берёт ярус кнопки.',
-        },
-        {
-          prop: "…rest",
-          type: 'Omit<React.HTMLAttributes<HTMLSpanElement>, "children">',
-          defaultValue: "—",
-          required: "Нет",
-          description: "`className` и остальные атрибуты span.",
-        },
-      ],
-    },
-    {
-      name: "Button.Spinner",
-      description:
-        "Явное место спиннера. Обычно не нужен: `loading` на корне показывает спиннер сам.",
-      rows: [
-        {
-          prop: "…rest",
-          type: "React.HTMLAttributes<HTMLSpanElement>",
-          defaultValue: "—",
-          required: "Нет",
-          description: "Без `loading` на `Button.Root` ничего не рендерит.",
-        },
-      ],
-    },
-  ],
+  api,
   accessibility: {
     keyboard: [
       { keys: "Enter · Space", action: "Нажимает кнопку (нативное поведение `<button>`)." },

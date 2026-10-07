@@ -4,6 +4,7 @@ import { DataTable, type DataTableColumn } from "@/components/data-table/DataTab
 import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
 
+import type { ApiLabel, ApiProp, ComponentApi } from "../../scripts/docs/componentApi";
 import { type ExampleBase, getExample } from "../exampleRegistry";
 import { type PageKind, SLOTS, type SlotId, slotLayout } from "../pageStandard";
 import {
@@ -22,18 +23,10 @@ export type ScenarioExample = { scenario: string; title: string; description: st
 
 export type ComponentExample = SlotExample | ScenarioExample;
 
-export type ComponentApiPart = {
-  /** `Button.Root`, `Spinner`… */
-  name: string;
-  description?: string;
-  rows: PlaygroundApiPropRow[];
-};
-
+/** Keyboard and ARIA notes (Russian); the `labels` table comes from `api.labels`. */
 export type ComponentAccessibility = {
   keyboard: { keys: string; action: string }[];
   aria: string[];
-  /** Every `labels` key with its Russian default. */
-  labels?: { key: string; defaultValue: string; description: string }[];
 };
 
 export type ComponentPageConfig = {
@@ -46,9 +39,18 @@ export type ComponentPageConfig = {
   description: string;
   /** In slot order (see `KIND_SLOTS`). Descriptions: «What it shows — `prop`, `prop`.» */
   examples: ComponentExample[];
-  api: ComponentApiPart[];
+  /** The component's `api.ts`: one source for these tables and for COMPONENT.md. */
+  api: ComponentApi;
   accessibility: ComponentAccessibility;
 };
+
+const toRow = (prop: ApiProp): PlaygroundApiPropRow => ({
+  prop: prop.name,
+  type: prop.type,
+  defaultValue: prop.default ?? "—",
+  required: prop.required ? "Да" : "Нет",
+  description: prop.ru,
+});
 
 export const exampleFile = (example: ComponentExample) =>
   "slot" in example ? example.slot : example.scenario;
@@ -57,7 +59,7 @@ export const exampleTitle = (example: ComponentExample) =>
   "slot" in example ? SLOTS[example.slot].title : example.title;
 
 type KeyRow = ComponentAccessibility["keyboard"][number];
-type LabelRow = NonNullable<ComponentAccessibility["labels"]>[number];
+type LabelRow = ApiLabel;
 
 const code = (text: string) => (
   <Typography.Root as="span" variant="body-m">
@@ -88,14 +90,14 @@ const LABEL_COLUMNS: DataTableColumn<LabelRow>[] = [
     id: "default",
     header: "По умолчанию",
     minWidth: "12rem",
-    cell: (row) => code(row.defaultValue),
+    cell: (row) => code(row.default),
   },
   {
     id: "description",
     header: "Назначение",
     grow: true,
     minWidth: "16rem",
-    cell: (row) => prose(row.description),
+    cell: (row) => prose(row.ru),
   },
 ];
 
@@ -124,7 +126,7 @@ function ExampleBlock({ page, example }: { page: ComponentPageConfig; example: C
  * API → accessibility. A section is only a `ComponentPageConfig`.
  */
 export function ComponentPage({ page }: { page: ComponentPageConfig }) {
-  const { accessibility } = page;
+  const { accessibility, api } = page;
   return (
     <PageContent.Section>
       <PageContent.Header>
@@ -141,13 +143,11 @@ export function ComponentPage({ page }: { page: ComponentPageConfig }) {
 
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
-            {page.api.map((part) => (
+            {api.parts.map((part) => (
               <React.Fragment key={part.name}>
                 <DemoApiTitle>{part.name}</DemoApiTitle>
-                {part.description ? (
-                  <DemoDescription>{renderInlineCode(part.description)}</DemoDescription>
-                ) : null}
-                <PlaygroundApiTable rows={part.rows} />
+                {part.ru ? <DemoDescription>{renderInlineCode(part.ru)}</DemoDescription> : null}
+                {part.props.length > 0 ? <PlaygroundApiTable rows={part.props.map(toRow)} /> : null}
               </React.Fragment>
             ))}
           </div>
@@ -174,15 +174,15 @@ export function ComponentPage({ page }: { page: ComponentPageConfig }) {
                 </li>
               ))}
             </ul>
-            {accessibility.labels?.length ? (
+            {api.labels.length > 0 ? (
               <>
                 <DemoApiTitle>Системные строки (labels)</DemoApiTitle>
                 <DataTable.Root
                   columns={LABEL_COLUMNS}
-                  rows={accessibility.labels}
+                  rows={api.labels}
                   getRowKey={(row) => row.key}
                   showPagination={false}
-                  pageSize={accessibility.labels.length}
+                  pageSize={api.labels.length}
                   highlightRowOnHover={false}
                 />
               </>

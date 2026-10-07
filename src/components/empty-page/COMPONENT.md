@@ -38,7 +38,7 @@ EmptyPage.Root              centered column, provides size to children
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Icon tile, type sizes and padding. Provided to children via the control-size context (pass it to Buttons explicitly). |
-| `layout` | `"default" \| "fill"` | `"default"` | `default`: compact block sized by content. `fill`: stretches over the height of a flex parent and centers the content. |
+| `layout` | `"default" \| "fill" \| "compact"` | `"default"` | `default`: block sized by content. `fill`: stretches over the height of a flex parent and centers the content. `compact`: the quiet empty state of a menu, listbox or command list — panel padding, body-s title, caption description, small icon, no entrance motion. |
 | `className` | `string` | — | Class on the root. |
 | `children` | `ReactNode` | — | Parts. |
 
@@ -83,6 +83,7 @@ No ref. + native `<div>` props. Wrapping centered row, gap `--prime-space-2`.
 |---|---|---|---|
 | `default` | Height by content | Standalone empty states | yes |
 | `fill` | Grows to fill a flex parent, content centered | Inside cards/regions with a fixed or min height | |
+| `compact` | Panel padding (20 / 12), small icon tile, body-s secondary title, caption muted description, no entrance motion | Empty result inside a menu, listbox, command list or picker panel (shows up on every keystroke) | |
 
 **Combinations**
 - Recommended: `neutral` + "Сбросить фильтры" for no results; `accent` + a primary action for first run; `danger` + an outline "Повторить".
@@ -94,9 +95,10 @@ No ref. + native `<div>` props. Wrapping centered row, gap `--prime-space-2`.
 |---|---|---|
 | size | `size` | `data-size` on Root |
 | fill | `layout="fill"` | `data-layout="fill"` on Root |
+| compact | `layout="compact"` | `data-layout="compact"` on Root |
 | tone | Icon `tone` | `data-tone` on Icon |
 
-First render: the parts fade and rise in one after another (`--prime-motion-stagger` apart, `base` · `enter`); they are interactive from the first frame, and the motion collapses under reduced motion.
+First render: the parts fade and rise in one after another (`--prime-motion-stagger` apart, `base` · `enter`); they are interactive from the first frame, and the motion collapses under reduced motion. `compact` has no entrance motion: a frequent state stays still (foundation §7, rule 1).
 
 ## Layout & spacing
 - Base gap `--prime-space-2`; icon → title gets `--prime-space-2` more; description → actions `--prime-space-3` more.
@@ -107,6 +109,7 @@ First render: the parts fade and rise in one after another (`--prime-motion-stag
 - Give the title an `id` and the root `aria-labelledby` so the region is named.
 - Mark the icon `aria-hidden`; the title carries the meaning.
 - Title is an `<h2>`: make sure it fits the page heading outline.
+- `compact` inside a filtered list: give the root `role="status"` so the empty result is announced when it replaces the options.
 - EmptyPage has no `labels`.
 
 ## Examples
@@ -114,6 +117,7 @@ First render: the parts fade and rise in one after another (`--prime-motion-stag
 |---|---|---|
 | [data-region.tsx](examples/data-region.tsx) | Card region with a header and `layout="fill"`, accent icon, two actions | Empty list/table area |
 | [no-results.tsx](examples/no-results.tsx) | Search with no results: Icon, Title, Description, Actions | Filters/queries returning nothing |
+| [compact.tsx](examples/compact.tsx) | `layout="compact"` inside a search panel, one small action | Empty result of a menu, listbox or command list; set `role="status"` so it is announced |
 | [icon-tones.tsx](examples/icon-tones.tsx) | `neutral`, `accent`, `danger` icon tones | Choosing the tone by cause |
 | [sizes.tsx](examples/sizes.tsx) | `xs`…`xl` with a button of the same size | Picking a size |
 

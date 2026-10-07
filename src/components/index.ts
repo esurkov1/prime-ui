@@ -99,6 +99,7 @@ export { Card } from "./card/Card";
 export type {
   CheckboxErrorProps,
   CheckboxHintProps,
+  CheckboxIndicatorProps,
   CheckboxLabelProps,
   CheckboxRootProps,
 } from "./checkbox/Checkbox";

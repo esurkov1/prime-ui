@@ -32,34 +32,38 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### Button.Root
-`forwardRef` → `HTMLButtonElement`. + native `<button>` props except `size`.
+`forwardRef` → `HTMLButtonElement`. The `<button>`, or the single child with `asChild`; sets variant, tone and size and passes the tier to nested icons.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `variant` | `"solid" \| "soft" \| "outline" \| "ghost"` | `"solid"` | Visual treatment. |
 | `tone` | `"accent" \| "neutral" \| "danger"` | `"accent"` | Meaning of the action; `danger` for destructive actions. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: height, padding, text, icon, radius. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
 | `loading` | `boolean` | `false` | Shows the spinner, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added automatically — place `Button.Spinner` yourself. |
 | `asChild` | `boolean` | `false` | Merges Button props and styles onto the single child element instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`. |
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Native button type; not forwarded with `asChild`. |
 | `disabled` | `boolean` | — | Disabled state; `loading` also disables. |
-| `children` | `ReactNode` | — | Label and `Button.Icon`. Only `Button.Icon` children → square icon-only button. |
+| `children` | `ReactNode` | — | Label and `Button.Icon`. Only `Button.Icon` children → square icon-only button; give it `aria-label`. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | `onClick`, `className`, `aria-*`, `data-*` and the other button attributes. |
 
 ### Button.Icon
-No ref. + native `<span>` props.
+No ref. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="action.copy" />`. `Icon` without `size` takes the button tier. |
+| `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Button.Spinner
-No ref. + native `<span>` props.
+No ref. Explicit spinner position; renders only while `Button.Root` is `loading`. Not needed in most cases: `loading` adds a spinner by itself.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. Renders nothing unless `Button.Root` has `loading`. Not needed in most cases: `loading` adds a spinner by itself. |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ## Variants
 
@@ -131,6 +135,8 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-full-widt
 - With `asChild` the disabled state is `aria-disabled="true"` without a native `disabled`.
 
 ### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No `labels`.
 
 ## Examples

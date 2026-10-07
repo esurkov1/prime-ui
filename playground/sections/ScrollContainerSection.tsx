@@ -1,6 +1,8 @@
 import { PageContent } from "@/components/page-content/PageContent";
 import ScrollContainerBothAxesExample from "@/components/scroll-container/examples/both-axes";
 import bothAxesSource from "@/components/scroll-container/examples/both-axes.tsx?raw";
+import ScrollContainerEdgeFadeExample from "@/components/scroll-container/examples/edge-fade";
+import edgeFadeSource from "@/components/scroll-container/examples/edge-fade.tsx?raw";
 import ScrollContainerListExample from "@/components/scroll-container/examples/list";
 import listSource from "@/components/scroll-container/examples/list.tsx?raw";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
@@ -33,6 +35,21 @@ const rootRows: PlaygroundApiPropRow[] = [
     defaultValue: '"contain"',
     required: "Нет",
     description: "Значение overscroll-behavior (вложенные панели — обычно contain).",
+  },
+  {
+    prop: "fade",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      'Затухание края, за которым скрыто содержимое: по X при `axis="horizontal"`, иначе по Y.',
+  },
+  {
+    prop: "scrollbar",
+    type: '"thin" | "hidden"',
+    defaultValue: '"thin"',
+    required: "Нет",
+    description: "`hidden` убирает полосу прокрутки — только вместе с `fade`.",
   },
   {
     prop: "className",
@@ -95,6 +112,19 @@ export default function ScrollContainerSection() {
             <PlaygroundExampleFrame.Root code={bothAxesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
                 <ScrollContainerBothAxesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Затухание краёв</DemoSectionTitle>
+            <DemoDescription>
+              <code>fade</code> растворяет край, за которым есть скрытое содержимое;{" "}
+              <code>scrollbar=&quot;hidden&quot;</code> убирает полосу у компактной ленты.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={edgeFadeSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ScrollContainerEdgeFadeExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>

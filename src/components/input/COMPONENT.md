@@ -40,81 +40,93 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### Input.Root
-No ref (renders a `<div>`). Does not forward native props.
+No ref (renders a `<div>`). Does not forward native props. Size, label, support row and the context for `Wrapper` and `Field`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier for height, padding, radius, text, label and hint. Also provided to nested controls via the control-size context. |
-| `invalid` | `boolean` | `false` | Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
 | `label` | `ReactNode` | — | Label above the field, rendered as `<label htmlFor>`. Without it, give `Input.Field` an `aria-label`. |
 | `required` | `boolean` | `false` | Red `*` after the label (`aria-hidden`) and native `required` on `Input.Field`. |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
+| `invalid` | `boolean` | `false` | Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it. |
+| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
 | `counter` | `ReactNode` | — | Right side of the support row, usually `<Input.Counter />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
-| `id` | `string` | auto (`useId`) | Id of the `<input>`; hint id is `${id}-hint`, error id is `${id}-error`. |
-| `labels` | `Partial<InputLabels>` | see Accessibility | Built-in strings. |
+| `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
+| `labels` | `Partial<InputLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Usually `Input.Wrapper`. |
-| `className` | `string` | — | Class on the root `<div>`. |
+| `className` | `string` | — | Class on the `<div>`. |
 
 ### Input.Wrapper
+No ref. The visible field: fill, hover, focus ring, invalid ring.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | Field and slots. |
-| `className` | `string` | — | Class on the field `<div>`. |
+| `children` | `ReactNode` | — (required) | `Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `Badge`, `ClearButton`. |
+| `className` | `string` | — | Class on the field `<div>`; `data-size` and `data-invalid` come from the root. |
 
 ### Input.Field
-`forwardRef` to `HTMLInputElement`. + native `<input>` props except `size` (`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`, …).
+`forwardRef` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `onValueChange` | `(value: string) => void` | — | Called with the new string; native `onChange` still fires first. |
 | `aria-describedby` | `string` | — | Merged with the hint/error ids from the root. |
-| `required` | `boolean` | from `Input.Root` | Explicit value overrides the root's `required`. |
-
-`id`, `aria-invalid` and `aria-describedby` are set from the root context.
+| `required` | `boolean` | — | Overrides the root's `required` for the native input. |
+| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size">` | — | `value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`… |
 
 ### Input.Icon
+No ref. Decorative icon (`aria-hidden`), centered between the edge and the text.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"start" \| "end"` | — (required) | Side of the value. |
 | `children` | `ReactNode` | — (required) | An icon; kit icons without an explicit `size` take the field tier. |
-| `className` | `string` | — | Class on the `<span>` (`aria-hidden`). |
+| `className` | `string` | — | Class on the `<span>`. |
 
 ### Input.Affix
+No ref. Tinted section flush with the edge (`aria-hidden`); the wrapper drops its padding there.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `side` | `"start" \| "end"` | — (required) | Section sits flush with that edge; the wrapper drops its padding there. |
+| `side` | `"start" \| "end"` | — (required) | Edge the section sits on. |
 | `children` | `ReactNode` | — (required) | Static text: protocol, domain, country code. |
-| `className` | `string` | — | Class on the `<div>` (`aria-hidden`). |
+| `className` | `string` | — | Class on the `<div>`. |
 
 ### Input.InlineAffix
+No ref. Muted unit next to the value (`aria-hidden`).
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"start" \| "end"` | — (required) | Side of the value. |
 | `children` | `ReactNode` | — (required) | Short unit: `₽`, `%`, `кг`. |
-| `className` | `string` | — | Class on the `<span>` (`aria-hidden`). |
+| `className` | `string` | — | Class on the `<span>`. |
 
 ### Input.Badge
+No ref. Soft palette badge one tier below the field, at the trailing edge.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the soft badge. |
 | `children` | `ReactNode` | — (required) | Short status text. |
-| `className` | `string` | — | Class on the badge. |
+| `className` | `string` | — | Class on the `<span>`. |
 
 ### Input.ClearButton
-`forwardRef` to `HTMLButtonElement`. + native `<button>` props except `type`, `children`, `aria-label`.
+`forwardRef` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `onClick` | `MouseEventHandler<HTMLButtonElement>` | — | Clear the value here. Afterwards focus returns to the input unless `event.preventDefault()` was called. |
-
-Renders `type="button"`, `aria-label={labels.clear}`, `aria-controls` = input id, close icon. Render it only when the field has a value. It is a **segment**: full field height, flush with the end edge, `icon + 2 × padX` wide with the icon centred (padX to the edge), after the usual field gap so its wash never touches the text; the whole segment is the hit area and takes a `fill-subtle` wash on hover, the inset focus ring on focus. The field drops its end padding while the button is shown.
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label">` | — | The other button attributes. |
 
 ### Input.Counter
+No ref. Character counter for the support row; shows `14/40` and announces `labels.counter`.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `current` | `number` | — (required) | Current length. |
@@ -209,11 +221,13 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.
 
 ### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Default | Used for |
 |---|---|---|
-| `optional` | `"необязательно"` | Marker after the label when `optional` |
-| `clear` | `"Очистить"` | Accessible name of `Input.ClearButton` |
-| `counter` | `"{current} из {max} символов"` | Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced |
+| `optional` | `"необязательно"` | Marker after the label when `optional`. |
+| `clear` | `"Очистить"` | Accessible name of `Input.ClearButton`. |
+| `counter` | `"{current} из {max} символов"` | Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced. |
 
 ## Examples
 | Example | Shows |

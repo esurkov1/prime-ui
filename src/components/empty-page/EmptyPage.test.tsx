@@ -16,6 +16,21 @@ describe("EmptyPage", () => {
     expect(screen.getByText("Добавьте записи, чтобы увидеть список.")).toBeInTheDocument();
   });
 
+  it("marks the compact layout and leaves the default one unmarked", () => {
+    const { rerender } = render(
+      <EmptyPage.Root layout="compact" data-testid="empty">
+        <EmptyPage.Title>Ничего не найдено</EmptyPage.Title>
+      </EmptyPage.Root>,
+    );
+    expect(screen.getByTestId("empty")).toHaveAttribute("data-layout", "compact");
+    rerender(
+      <EmptyPage.Root data-testid="empty">
+        <EmptyPage.Title>Ничего не найдено</EmptyPage.Title>
+      </EmptyPage.Root>,
+    );
+    expect(screen.getByTestId("empty")).not.toHaveAttribute("data-layout");
+  });
+
   it("applies fill layout", () => {
     render(
       <EmptyPage.Root layout="fill" data-testid="empty">

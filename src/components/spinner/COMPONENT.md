@@ -30,14 +30,17 @@ Spinner          <span role="status">; size and tone
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### Spinner
-`ref` → `HTMLSpanElement`. + native `<span>` props except `children`.
+`ref` → `HTMLSpanElement`. A turning ring inside a `role="status"` region with text for screen readers.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Explicit size on the icon scale: 14 · 16 · 20 · 24 · 32. Without it the spinner follows its host like `Icon`: the host's `--prime-icon-size`, else the nearest control tier, else 16. |
 | `tone` | `"default" \| "secondary" \| "muted" \| "accent" \| "success" \| "warning" \| "danger"` | `"default"` | Ring color; `default` inherits `currentColor`. |
-| `labels` | `Partial<SpinnerLabels>` | `{ loading: "Загрузка" }` | Built-in strings. |
+| `labels` | `Partial<SpinnerLabels>` | — | Built-in strings, see Labels. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className`, `aria-hidden`, `data-*` and the other span attributes. |
 
 ## Variants
 
@@ -83,9 +86,11 @@ No keyboard interaction.
 - Under `prefers-reduced-motion` the ring does not turn and stays visible.
 
 ### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Default | Used for |
 |---|---|---|
-| `loading` | `"Загрузка"` | Visually hidden text inside `role="status"` |
+| `loading` | `"Загрузка"` | Visually hidden text inside `role="status"`. |
 
 ## Examples
 | Example | Shows |

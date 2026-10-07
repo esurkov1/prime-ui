@@ -19,13 +19,13 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Size | `size` | Default `m`. Avatar adds `2xl`; Modal/Drawer use a width subset. |
 | Treatment | `variant` | `solid · soft · outline · ghost`; structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
 | Meaning | `tone` | Button: `accent \| neutral \| danger`. Destructive is `danger`, never `error`. |
-| Decoration | `color` | Badge, Avatar, Thumbnail, field badges, `SegmentedControl.Item`. |
+| Decoration | `color` | Badge, Avatar, Thumbnail, field badges, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `FileUpload.FormatBadge`, `Timeline.Item`, TagSelect options. |
 | Validation | `invalid`, `hint`, `error` | A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |
 | Value | `value` / `defaultValue` / `onValueChange(value)` | Select, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, Radio.Group, DigitInput, Pagination. |
 | Text value | native `value` / `onChange` + `onValueChange(string)` | Input, Textarea. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch. |
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure. |
-| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Modal, Drawer, CommandMenu.Dialog, Popover, Dropdown. Turn off for destructive confirms. |
+| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | One pair for every overlay. Today: both on Modal, Drawer, CommandMenu.Dialog; `closeOnOutsideClick` on Popover and Dropdown — check the component's `COMPONENT.md` API. Turn off for destructive confirms. |
 | Flags | `disabled`, `readOnly`, `required`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing` (default `true`) | Fields only; `false` only where focus is obvious otherwise. |
 | System strings | `labels?: Partial<XLabels>` | aria labels, counters, default texts; Russian defaults. Visible content goes in children. |

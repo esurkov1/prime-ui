@@ -29,6 +29,8 @@ import { ScrollContainer } from "prime-ui-kit";
 | `as` | `"div" \| "main" \| "aside" \| "section" \| "nav" \| "article"` | `"div"` | Root element. |
 | `axis` | `"vertical" \| "horizontal" \| "both"` | `"vertical"` | Scroll axis; the other axis is hidden (except `both`). |
 | `overscrollBehavior` | `"auto" \| "contain" \| "none"` | `"contain"` | CSS `overscroll-behavior`; `contain` stops scroll chaining into the page. |
+| `fade` | `boolean` | `false` | Fades the edge where more content is hidden (`--prime-space-8` deep mask), along the horizontal axis for `axis="horizontal"`, along the vertical one otherwise. Tracks scroll and size changes. |
+| `scrollbar` | `"thin" \| "hidden"` | `"thin"` | `thin`: the kit's quiet scrollbar. `hidden`: no scrollbar — only together with `fade` (tab rows, chip strips, rails), so overflow stays visible. |
 | `className` | `string` | — | Extra class on the root (height, padding of the host). |
 
 + native `HTMLAttributes<HTMLElement>` (including `children`, `aria-*`, `tabIndex`, event handlers).
@@ -49,10 +51,21 @@ import { ScrollContainer } from "prime-ui-kit";
 | `auto` | Browser default: scroll chains to the parent | The region is the page's main scroller and should hand off | |
 | `none` | No chaining and no overscroll glow/bounce | Full-screen app regions | |
 
-**Combinations** — `axis="horizontal"` with `overscrollBehavior="contain"` (default) for strips; `as="main"` only for the one main column of a page.
+### fade · scrollbar
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `fade` | The hidden edge dissolves into the surface; appears and disappears with the scroll position, without animation | Strips and lists whose overflow must be hinted (tab rows, segment rows, sidebar rail, chip strips) | off |
+| `scrollbar="hidden"` | No scrollbar; content still scrolls by wheel, touch and keyboard focus | Together with `fade`, where a scrollbar would cut a compact row | `"thin"` |
+
+**Combinations** — `axis="horizontal"` with `overscrollBehavior="contain"` (default) for strips; `axis="horizontal" fade scrollbar="hidden"` for tab and chip rows; `as="main"` only for the one main column of a page. Pointless: `scrollbar="hidden"` without `fade` (overflow becomes invisible).
 
 ## States
-No interactive states and no `data-*` attributes. The scrollbar thumb uses `fill-strong`, darkening to `fill-strong-hover` on hover (WebKit); the track is transparent.
+| State | Driven by | DOM |
+|---|---|---|
+| fade on | `fade` | `data-fade="vertical" \| "horizontal"` |
+| content hidden before / after | scroll position (with `fade`) | `data-overflow-start="true"`, `data-overflow-end="true"` |
+
+The scrollbar thumb uses `fill-strong`, darkening to `fill-strong-hover` on hover (WebKit); the track is transparent. The fade mask follows the scroll at once: scrolling is high-frequency, so nothing animates.
 
 ## Layout & spacing
 - Sets `min-width: 0` and `min-height: 0`, so it shrinks inside a flex or grid parent; give the parent (or the container) a height.
@@ -68,6 +81,7 @@ No interactive states and no `data-*` attributes. The scrollbar thumb uses `fill
 |---|---|---|
 | [list.tsx](examples/list.tsx) | Vertical list in a fixed-height card and a horizontal badge strip | A region inside a card or panel scrolls on its own |
 | [both-axes.tsx](examples/both-axes.tsx) | `axis="both"` wide grid with padding on the scroller; `overscrollBehavior="auto"` list | Wide canvases / schedules; handing scroll to the page |
+| [edge-fade.tsx](examples/edge-fade.tsx) | `fade` on a vertical list and on a horizontal strip with `scrollbar="hidden"` | Hinting hidden overflow in rows and lists |
 
 ```tsx
 import { ScrollContainer } from "prime-ui-kit";

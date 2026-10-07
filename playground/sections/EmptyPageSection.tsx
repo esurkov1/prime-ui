@@ -1,5 +1,7 @@
 import type * as React from "react";
 
+import EmptyPageCompactExample from "@/components/empty-page/examples/compact";
+import compactSource from "@/components/empty-page/examples/compact.tsx?raw";
 import EmptyPageDataRegionExample from "@/components/empty-page/examples/data-region";
 import regionSource from "@/components/empty-page/examples/data-region.tsx?raw";
 import EmptyPageIconTonesExample from "@/components/empty-page/examples/icon-tones";
@@ -28,10 +30,11 @@ const apiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "Root · layout",
-    type: '"default" | "fill"',
+    type: '"default" | "fill" | "compact"',
     defaultValue: '"default"',
     required: "Нет",
-    description: "`fill` растягивает блок по высоте flex-родителя и центрирует.",
+    description:
+      "`fill` растягивает блок по высоте flex-родителя и центрирует; `compact` — тихое состояние внутри меню и списков, без анимации.",
   },
   {
     prop: "Icon · tone",
@@ -119,6 +122,19 @@ export default function EmptyPageSection() {
             code={searchSource}
           >
             <EmptyPageNoResultsExample />
+          </Demo>
+
+          <Demo
+            title="В панели"
+            description={
+              <>
+                <code>layout="compact"</code> — тихое состояние меню и списков: без анимации
+                появления, текст body-s.
+              </>
+            }
+            code={compactSource}
+          >
+            <EmptyPageCompactExample />
           </Demo>
 
           <Demo

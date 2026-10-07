@@ -38,83 +38,72 @@ Modal.Root                    state and dismiss policy (no DOM)
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### Modal.Root
-No DOM, no ref.
+No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `open` | `boolean` | — | Controlled visibility. |
+| `open` | `boolean` | — | Controlled visibility; together with `onOpenChange`. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
-| `onOpenChange` | `(open: boolean) => void` | — | Called on trigger, close button, Close, Escape and scrim click. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, close button, `Close`, Escape, scrim click, code. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the dialog. |
 | `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the dialog; turn off for destructive confirms. |
+| `labels` | `Partial<ModalLabels>` | — | Built-in strings, see Labels. |
+| `children` | `ReactNode` | — | Trigger and Content. |
 | `confirmOnEnter` | `boolean` | `true` | Enter inside the dialog clicks the element wrapped in `Modal.Confirm`. |
 | `onEnterConfirm` | `(event: KeyboardEvent) => void` | — | Replaces the default Enter confirm. |
-| `labels` | `Partial<ModalLabels>` | `{ close: "Закрыть" }` | Built-in strings. |
-| `children` | `ReactNode` | — | Trigger and Content. |
-
-### Modal.Trigger
-No DOM: clones the single child and chains `onClick`; opens unless the child's handler calls `preventDefault()`.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactElement` | — (required) | One element, usually a Button. |
 
 ### Modal.Content
-No ref. Renders in a portal while open and during its exit animation. Controls inside get size `m`.
+No ref. Portal + scrim + `role="dialog"`; renders while open and during its exit animation. Controls inside get size `m`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 440 · 560 · 720 · 960. |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 440 · 560 · 720 · 960. Below 640 px of viewport — a full-width bottom sheet. |
 | `container` | `HTMLElement \| null` | `document.body` | Portal target. |
-| `overlayClassName` | `string` | — | Class on the scrim. |
 | `aria-label` | `string` | — | Dialog name when there is no Title. |
 | `aria-labelledby` | `string` | — | Overrides the Title id. |
 | `aria-describedby` | `string` | — | Overrides the Description id. |
-| `className` | `string` | — | Class on the `role="dialog"` element. |
-
-+ native `<div>` props (on the dialog element).
+| `overlayClassName` | `string` | — | Class on the scrim. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Modal.Header
-No ref. Renders `<header>`.
+No ref. Renders `<header>`: [Icon] [Title + Description] [close button]. + native `HTMLAttributes<HTMLElement>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `showClose` | `boolean` | `true` | Built-in square ghost `s` close button with `labels.close`. |
-| `children` | `ReactNode` | — | Icon, Title, Description in any order. |
-
-+ native `HTMLAttributes<HTMLElement>`.
+| `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`. |
+| `children` | `ReactNode` | — | Icon, Title, Description in any order; the icon goes to the leading slot. |
 
 ### Modal.Icon
-No ref. Renders an `aria-hidden` tile.
+No ref. An `aria-hidden` 40 px tile with a tone fill.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color. |
 | `children` | `ReactNode` | — (required) | Icon glyph (sized to the m icon). |
-| `className` | `string` | — | Extra class. |
+| `className` | `string` | — | Extra class on the tile. |
 
 ### Modal.Title · Modal.Description
-No ref. `<h2>` / `<p>`; their ids are generated and wired to `aria-labelledby` / `aria-describedby`. + native props except `id`.
+No ref. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.
 
 ### Modal.Body
-No ref. A ScrollContainer. + native `<div>` props.
+No ref. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.
 
 ### Modal.Footer
-No ref. Renders `<footer>`.
+No ref. Renders `<footer>` with the actions, primary last. + native `HTMLAttributes<HTMLElement>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `layout` | `"fill" \| "end"` | `"fill"` for `s`/`m`, `"end"` for `l`/`xl` | `fill`: equal-width buttons in one row; `end`: auto width, right-aligned. |
+| `layout` | `"fill" \| "end"` | `"fill" (s/m), "end" (l/xl)` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Narrower than 360 px — stacked. |
 
-+ native `HTMLAttributes<HTMLElement>`.
-
-### Modal.Close · Modal.Confirm
-No DOM: clone the single child.
+### Modal.Trigger · Modal.Close · Modal.Confirm
+No DOM: clone the single child and chain its `onClick` (unless the child's handler calls `preventDefault()`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactElement` | — (required) | Close: closes on click unless `preventDefault()`. Confirm: becomes the Enter target (ref is merged). |
+| `children` | `ReactElement` | — (required) | One element, usually a Button. |
 
 ## Variants
 The dialog has one look: `bg-raised`, `--prime-modal-radius` (16), `shadow-modal`, on a `bg-scrim`. Header, body and footer are separated by faint inset hairlines.
@@ -193,9 +182,11 @@ Loading or disabled actions use the Button props (`loading`, `disabled`) inside 
 - Only the topmost layer reacts: a Select open inside the dialog closes first.
 
 ### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Default | Used for |
 |---|---|---|
-| `close` | `"Закрыть"` | `aria-label` of the header close button |
+| `close` | `"Закрыть"` | `aria-label` of the header close button. |
 
 ## Examples
 | Example | Shows |

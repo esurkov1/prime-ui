@@ -63,3 +63,35 @@
   gap: var(--prime-space-3);
   padding-inline-start: calc(var(--prime-control-m-choice) + var(--prime-control-m-gap));
 }
+
+/* indicator.tsx: a listbox panel with full-width option rows (panel tokens, row hover wash). */
+.optionList {
+  box-sizing: border-box;
+  display: grid;
+  width: min(100%, var(--prime-panel-min-width));
+  padding: var(--prime-panel-padding);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-control-m-gap);
+  min-height: var(--prime-control-m-item-height);
+  padding-inline: var(--prime-control-m-field-padding-x);
+  border-radius: var(--prime-panel-item-radius);
+  cursor: pointer;
+  transition: background-color var(--prime-motion-duration-xfast)
+    var(--prime-motion-easing-standard);
+}
+
+.option:hover {
+  background: var(--prime-color-fill-subtle);
+}
+
+.option:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}

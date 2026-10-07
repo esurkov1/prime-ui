@@ -1,5 +1,7 @@
 import CheckboxHintErrorExample from "@/components/checkbox/examples/hint-error";
 import hintErrorSource from "@/components/checkbox/examples/hint-error.tsx?raw";
+import CheckboxIndicatorExample from "@/components/checkbox/examples/indicator";
+import indicatorSource from "@/components/checkbox/examples/indicator.tsx?raw";
 import CheckboxSelectAllExample from "@/components/checkbox/examples/select-all";
 import selectAllSource from "@/components/checkbox/examples/select-all.tsx?raw";
 import CheckboxSettingsCardExample from "@/components/checkbox/examples/settings-card";
@@ -169,6 +171,44 @@ const checkboxHintApiRows: PlaygroundApiPropRow[] = [
   },
 ];
 
+const checkboxIndicatorApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "checked",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Галочка на акцентной заливке.",
+  },
+  {
+    prop: "indeterminate",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Черта вместо галочки; важнее `checked`.",
+  },
+  {
+    prop: "disabled",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Приглушённый квадрат.",
+  },
+  {
+    prop: "size",
+    type: '"xs" | "s" | "m" | "l" | "xl"',
+    defaultValue: "размер хоста, иначе m",
+    required: "Нет",
+    description: "Ярус квадрата; внутри Select или меню берётся от них.",
+  },
+  {
+    prop: "…rest",
+    type: 'Omit<React.HTMLAttributes<HTMLSpanElement>, "children">',
+    defaultValue: "—",
+    required: "Нет",
+    description: "`className` и атрибуты span; всегда `aria-hidden`.",
+  },
+];
+
 const checkboxErrorApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "children",
@@ -295,6 +335,19 @@ export default function CheckboxSection() {
           </div>
 
           <div className="demoBlock">
+            <DemoSectionTitle>Индикатор без поля</DemoSectionTitle>
+            <DemoDescription>
+              <code>Checkbox.Indicator</code> — только квадрат, без input: строка списка сама несёт{" "}
+              <code>aria-selected</code>, а индикатор лишь показывает выбор.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={indicatorSource.trim()}>
+              <PlaygroundExampleFrame.Stage>
+                <CheckboxIndicatorExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Checkbox.Root</DemoApiTitle>
             <DemoDescription>
@@ -322,6 +375,12 @@ export default function CheckboxSection() {
               Текст ошибки (<code>danger-text</code>); пока смонтирован, поле invalid.
             </DemoDescription>
             <PlaygroundApiTable rows={checkboxErrorApiRows} />
+            <DemoApiTitle>Checkbox.Indicator</DemoApiTitle>
+            <DemoDescription>
+              Квадрат без input, вне <code>Checkbox.Root</code>: декоративная отметка в строках,
+              которые сами несут состояние (<code>aria-selected</code>, <code>aria-checked</code>).
+            </DemoDescription>
+            <PlaygroundApiTable rows={checkboxIndicatorApiRows} />
           </div>
         </div>
       </PageContent.Body>

@@ -5,6 +5,41 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Checkbox } from "./Checkbox";
 
+describe("Checkbox.Indicator", () => {
+  it("draws the box without an input, hidden from assistive technology", () => {
+    render(
+      <div role="option" aria-selected="true" tabIndex={-1}>
+        <Checkbox.Indicator checked data-testid="box" />
+        Москва
+      </div>,
+    );
+    const box = screen.getByTestId("box");
+    expect(box).toHaveAttribute("aria-hidden", "true");
+    expect(box).toHaveAttribute("data-state", "checked");
+    expect(screen.queryByRole("checkbox")).toBeNull();
+    expect(screen.getByRole("option", { name: "Москва" })).toBeInTheDocument();
+  });
+
+  it("indeterminate wins over checked; disabled is marked", () => {
+    render(<Checkbox.Indicator checked indeterminate disabled data-testid="box" />);
+    const box = screen.getByTestId("box");
+    expect(box).toHaveAttribute("data-state", "indeterminate");
+    expect(box).toHaveAttribute("data-disabled", "true");
+  });
+
+  it("takes the size of the nearest control, else m", async () => {
+    const { ControlSizeProvider } = await import("@/internal/ControlSizeContext");
+    const { rerender } = render(<Checkbox.Indicator data-testid="box" />);
+    expect(screen.getByTestId("box")).toHaveAttribute("data-size", "m");
+    rerender(
+      <ControlSizeProvider value="s">
+        <Checkbox.Indicator data-testid="box" />
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByTestId("box")).toHaveAttribute("data-size", "s");
+  });
+});
+
 describe("Checkbox", () => {
   it("renders the bare control when Checkbox.Label is omitted", () => {
     render(<Checkbox.Root aria-label="Выбрать строку" />);
