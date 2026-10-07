@@ -26,7 +26,7 @@ export default function TooltipToolbarExample() {
               </Button.Root>
             </Tooltip.Trigger>
             <Tooltip.Content size="s" side="bottom">
-              {label} <Kbd.Root>{keys}</Kbd.Root>
+              {label} <Kbd>{keys}</Kbd>
             </Tooltip.Content>
           </Tooltip.Root>
         ))}

@@ -462,7 +462,7 @@ export type CommandMenuItemShortcutProps = Omit<React.HTMLAttributes<HTMLElement
 
 /** Key hint at the end of an item (a Kbd one tier below). A hint only — not a handler. */
 function CommandMenuItemShortcut({ className, ...rest }: CommandMenuItemShortcutProps) {
-  return <Kbd.Root className={cx(menu.shortcut, className)} {...rest} />;
+  return <Kbd className={cx(menu.shortcut, className)} {...rest} />;
 }
 CommandMenuItemShortcut.displayName = "CommandMenu.ItemShortcut";
 
@@ -506,7 +506,7 @@ function CommandMenuFooterHint({ keys, children, className, ...rest }: CommandMe
     <span className={cx(styles.footerHint, className)} {...rest}>
       {keys.map((key, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a static list of keys
-        <Kbd.Root key={index}>{key}</Kbd.Root>
+        <Kbd key={index}>{key}</Kbd>
       ))}
       <span className={styles.footerHintLabel}>{children}</span>
     </span>

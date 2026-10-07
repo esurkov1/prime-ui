@@ -359,7 +359,7 @@ function Panel() {
               <Icon name="action.search" />
             </Button.Icon>
             {fill(labels.searchText, { query })}
-            <Kbd.Root className={styles.queryKey}>↵</Kbd.Root>
+            <Kbd className={styles.queryKey}>↵</Kbd>
           </Button.Root>
         </div>
       ),
@@ -443,7 +443,7 @@ function Panel() {
       </Popover.Title>
       {sections.map((section, index) => (
         <React.Fragment key={section.key}>
-          {index > 0 && <Divider.Root role="presentation" />}
+          {index > 0 && <Divider role="presentation" />}
           {section.node}
         </React.Fragment>
       ))}

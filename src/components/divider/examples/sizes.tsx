@@ -1,17 +1,18 @@
-/** Divider label at every size tier xs → xl. Match `size` to the tier of the surrounding content. */
-import { Divider } from "prime-ui-kit";
+/** The label at every tier, matching the content around it — `size`. */
+import { Divider, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const sizes = ["xs", "s", "m", "l", "xl"] as const;
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function DividerSizesExample() {
   return (
-    <div className={styles.column}>
-      {sizes.map((size) => (
-        <Divider.Root align="start" key={size} size={size}>
-          Раздел · {size}
-        </Divider.Root>
+    <div>
+      {SIZES.map((size) => (
+        <div key={size}>
+          <Divider size={size}>Раздел</Divider>
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
+          </Typography.Root>
+        </div>
       ))}
     </div>
   );

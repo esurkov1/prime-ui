@@ -171,8 +171,6 @@
 
 .card {
   --ntf-accent: var(--prime-color-info-default);
-  --ntf-soft: var(--prime-color-info-soft);
-  --ntf-text: var(--prime-color-info-text);
   --ntf-pad: var(--prime-space-4);
   --ntf-gap: var(--prime-space-3);
   --ntf-icon: var(--prime-control-m-icon);
@@ -180,8 +178,6 @@
   --ntf-title-line-height: var(--prime-control-m-line-height);
   --ntf-desc-size: var(--prime-text-body-s-size);
   --ntf-desc-line-height: var(--prime-text-body-s-line-height);
-  --ntf-close: var(--prime-control-xs-height);
-  --ntf-close-icon: var(--prime-control-s-icon);
 
   /* Surface context for fields inside custom content. */
   --prime-color-field-bg: var(--prime-color-field-bg-surface);
@@ -210,8 +206,6 @@
   --ntf-title-line-height: var(--prime-control-xs-line-height);
   --ntf-desc-size: var(--prime-text-caption-size);
   --ntf-desc-line-height: var(--prime-text-caption-line-height);
-  --ntf-close: var(--prime-space-5);
-  --ntf-close-icon: var(--prime-control-xs-icon);
 }
 
 .card[data-size="s"] {
@@ -222,8 +216,6 @@
   --ntf-title-line-height: var(--prime-control-s-line-height);
   --ntf-desc-size: var(--prime-text-caption-size);
   --ntf-desc-line-height: var(--prime-text-caption-line-height);
-  --ntf-close: var(--prime-space-6);
-  --ntf-close-icon: var(--prime-control-xs-icon);
 }
 
 .card[data-size="l"] {
@@ -233,7 +225,6 @@
   --ntf-title-line-height: var(--prime-control-l-line-height);
   --ntf-desc-size: var(--prime-text-body-m-size);
   --ntf-desc-line-height: var(--prime-text-body-m-line-height);
-  --ntf-close: var(--prime-control-s-height);
 }
 
 .card[data-size="xl"] {
@@ -244,26 +235,18 @@
   --ntf-title-line-height: var(--prime-control-xl-line-height);
   --ntf-desc-size: var(--prime-text-body-m-size);
   --ntf-desc-line-height: var(--prime-text-body-m-line-height);
-  --ntf-close: var(--prime-control-s-height);
-  --ntf-close-icon: var(--prime-control-m-icon);
 }
 
 .card[data-tone="success"] {
   --ntf-accent: var(--prime-color-success-default);
-  --ntf-soft: var(--prime-color-success-soft);
-  --ntf-text: var(--prime-color-success-text);
 }
 
 .card[data-tone="danger"] {
   --ntf-accent: var(--prime-color-danger-default);
-  --ntf-soft: var(--prime-color-danger-soft);
-  --ntf-text: var(--prime-color-danger-text);
 }
 
 .card[data-tone="warning"] {
   --ntf-accent: var(--prime-color-warning-default);
-  --ntf-soft: var(--prime-color-warning-soft);
-  --ntf-text: var(--prime-color-warning-text);
 }
 
 /* Cards peeking behind the first one in a collapsed stack: lighter shadow. */
@@ -282,8 +265,7 @@
   color: var(--ntf-accent);
 }
 
-.iconWrap svg,
-.icon {
+.iconWrap svg {
   display: block;
   width: var(--ntf-icon);
   height: var(--ntf-icon);
@@ -313,21 +295,6 @@
   overflow-wrap: anywhere;
 }
 
-.badge {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  height: var(--prime-badge-xs-height);
-  padding-inline: var(--prime-badge-xs-padding-x);
-  border-radius: var(--prime-badge-xs-radius);
-  background: var(--ntf-soft);
-  color: var(--ntf-text);
-  font-size: var(--prime-badge-xs-text-size);
-  font-weight: var(--prime-font-weight-medium);
-  font-variant-numeric: tabular-nums;
-}
-
 .description {
   margin: 0;
   font-size: var(--ntf-desc-size);
@@ -342,46 +309,6 @@
   align-items: center;
   gap: var(--prime-space-2);
   padding-top: var(--prime-space-2);
-}
-
-.closeButton {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--ntf-close);
-  height: var(--ntf-close);
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: var(--prime-radius-s);
-  background: transparent;
-  color: var(--prime-color-text-muted);
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.closeButton:hover {
-  background: var(--prime-color-fill-subtle);
-  color: var(--prime-color-text-primary);
-}
-
-.closeButton:active {
-  background: var(--prime-color-fill-subtle-active);
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
-
-.closeButton:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.closeButton svg {
-  width: var(--ntf-close-icon);
-  height: var(--ntf-close-icon);
 }
 
 /* ---------- Countdown ---------- */

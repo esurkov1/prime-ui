@@ -275,7 +275,7 @@ export type DropdownItemShortcutProps = Omit<React.HTMLAttributes<HTMLElement>, 
 
 /** Key hint at the end of an item (a Kbd one tier below the menu). A hint only — not a handler. */
 function DropdownItemShortcut({ className, ...rest }: DropdownItemShortcutProps) {
-  return <Kbd.Root className={cx(menu.shortcut, styles.shortcut, className)} {...rest} />;
+  return <Kbd className={cx(menu.shortcut, styles.shortcut, className)} {...rest} />;
 }
 DropdownItemShortcut.displayName = "Dropdown.ItemShortcut";
 
@@ -309,7 +309,7 @@ export type DropdownSeparatorProps = { className?: string };
 
 /** A full-bleed hairline between items or groups. */
 function DropdownSeparator({ className }: DropdownSeparatorProps) {
-  return <Divider.Root className={cx(menu.separator, className)} />;
+  return <Divider className={cx(menu.separator, className)} />;
 }
 DropdownSeparator.displayName = "Dropdown.Separator";
 

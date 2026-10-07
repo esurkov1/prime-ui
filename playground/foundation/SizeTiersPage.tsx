@@ -86,7 +86,7 @@ function TierRow({ t }: { t: SizeTier }) {
           <Input.Wrapper>
             <Input.Field aria-label={`Поиск, размер ${t}`} placeholder="Поиск" />
             <Input.InlineAffix side="end">
-              <Kbd.Root>⌘K</Kbd.Root>
+              <Kbd>⌘K</Kbd>
             </Input.InlineAffix>
           </Input.Wrapper>
         </Input.Root>

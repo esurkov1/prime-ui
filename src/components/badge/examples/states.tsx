@@ -1,44 +1,50 @@
-/** Badge is static: the default look and `disabled` for every variant and with a dot. Use `disabled` for labels of inactive or unavailable items. */
+/** An inactive badge, a pressable toggle off and on, and a removable one — `disabled`, `onPress`, `pressed`, `onRemove`. */
 import { Badge, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
+const noop = () => undefined;
 
 export default function BadgeStatesExample() {
   return (
-    <div className={styles.matrix}>
-      <Typography.Root as="span" variant="caption" tone="muted">
-        обычный
-      </Typography.Root>
-      <div className={styles.badges}>
-        <Badge.Root color="green">Оплачен</Badge.Root>
-        <Badge.Root variant="solid" color="green">
+    <div>
+      <div>
+        <Badge.Root color="green" disabled>
           Оплачен
         </Badge.Root>
-        <Badge.Root variant="outline" color="green">
-          Оплачен
-        </Badge.Root>
-        <Badge.Root color="green">
-          <Badge.Dot />
-          Активен
-        </Badge.Root>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          disabled
+        </Typography.Root>
       </div>
-      <Typography.Root as="span" variant="caption" tone="muted">
-        disabled
-      </Typography.Root>
-      <div className={styles.badges}>
-        <Badge.Root color="green" disabled>
-          Оплачен
+      <div>
+        <Badge.Root color="blue" onPress={noop} pressed={false}>
+          Москва
         </Badge.Root>
-        <Badge.Root variant="solid" color="green" disabled>
-          Оплачен
+        <Typography.Root as="span" variant="caption" tone="muted">
+          onPress
+        </Typography.Root>
+      </div>
+      <div>
+        <Badge.Root color="blue" onPress={noop} pressed>
+          Москва
         </Badge.Root>
-        <Badge.Root variant="outline" color="green" disabled>
-          Оплачен
+        <Typography.Root as="span" variant="caption" tone="muted">
+          pressed
+        </Typography.Root>
+      </div>
+      <div>
+        <Badge.Root labels={{ remove: "Убрать «Москва»" }} onRemove={noop}>
+          Москва
         </Badge.Root>
-        <Badge.Root color="green" disabled>
-          <Badge.Dot />
-          Активен
+        <Typography.Root as="span" variant="caption" tone="muted">
+          onRemove
+        </Typography.Root>
+      </div>
+      <div>
+        <Badge.Root labels={{ remove: "Убрать «Москва»" }} onRemove={noop} disabled>
+          Москва
         </Badge.Root>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          onRemove · disabled
+        </Typography.Root>
       </div>
     </div>
   );

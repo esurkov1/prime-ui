@@ -1,5 +1,4 @@
-/** Applied filters panel: each removable badge drops its filter, the button clears all; `labels.remove` names the filter. Use above lists and tables with filters. */
-
+/** Applied filters: each badge drops its filter and names it for screen readers — `onRemove`, `labels`. */
 import { Badge, Button, Typography } from "prime-ui-kit";
 import * as React from "react";
 

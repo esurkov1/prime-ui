@@ -1,33 +1,13 @@
-/* Layout for the Drawer examples: layout only, text goes through Typography. */
+/* Layout of the Drawer scenarios: semantic tokens only. */
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
-}
-
-/* Field groups get 20 between them, a step above plain body blocks. */
+/* in-form.tsx: field groups get 20 between them, a step above plain body blocks. */
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-5);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-control-m-label-gap);
-}
-
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-}
-
-/* Term / value grid; the text inside goes through Typography. */
+/* overview.tsx: a term / value grid. */
 .details {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -35,7 +15,6 @@
   margin: 0;
 }
 
-/* Reset of the native <dd> indent. */
 .details dd {
   margin: 0;
   font-variant-numeric: tabular-nums;

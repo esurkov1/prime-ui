@@ -138,7 +138,7 @@ export function TagOptionMenu({
           ) : null}
           {onUpdate ? (
             <>
-              <Divider.Root className={menu.separator} />
+              <Divider className={menu.separator} />
               <div className={menu.groupLabel}>{labels.colors}</div>
               <div className={menu.tier} data-size="s">
                 {TAG_COLORS.map((hue) => (

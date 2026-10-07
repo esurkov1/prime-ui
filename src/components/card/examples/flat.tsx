@@ -1,5 +1,4 @@
-/** Default `shadow-raised` versus `flat` (no shadow). Use `flat` for dense grids of tiles where shadows add noise. */
-
+/** A flat tile without the raised shadow next to the default one, for dense grids — `flat`. */
 import { Card, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

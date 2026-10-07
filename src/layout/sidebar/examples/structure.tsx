@@ -15,7 +15,7 @@ export default function SidebarStructureExample() {
               </Sidebar.ItemIcon>
               Поиск
               <Sidebar.ItemShortcut>
-                <Kbd.Root>⌘K</Kbd.Root>
+                <Kbd>⌘K</Kbd>
               </Sidebar.ItemShortcut>
             </Sidebar.Item>
             <Sidebar.Item current>

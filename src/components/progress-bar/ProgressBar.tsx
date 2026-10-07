@@ -9,18 +9,20 @@ import {
   resolveSegments,
 } from "@/internal/progressSegments";
 import type { ControlSize, Tone } from "@/internal/states";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./ProgressBar.module.css";
 
 export type ProgressBarLabels = ProgressSegmentsLabels;
 
-type ProgressBarCommonProps = {
+type ProgressBarCommonProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   /** Visible label above the bar and its accessible name. */
   label?: string;
+  /** Default `m`. */
   size?: ControlSize;
   /** Shows the rounded filled percentage at the end of the label row. */
   showValue?: boolean;
-  className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 type ProgressBarValueProps = ProgressBarCommonProps & {
@@ -28,19 +30,19 @@ type ProgressBarValueProps = ProgressBarCommonProps & {
   value: number;
   /** Top of the scale. Default `100`. */
   max?: number;
-  /** Fill color. */
+  /** Fill color. Default `accent`. */
   tone?: Tone;
   segments?: never;
   segmentGap?: never;
   labels?: never;
 };
 
-type ProgressSegmentsProps = ProgressBarCommonProps & {
+type ProgressBarSegmentsProps = ProgressBarCommonProps & {
   /** Parts of the bar in order; each one's width is its share of `max`. */
   segments: ProgressSegment[];
   /** Total capacity. Default: the sum of the segments (they fill the whole bar). */
   max?: number;
-  /** `hairline` draws every segment as its own pill with a gap. */
+  /** `hairline` draws every segment as its own pill with a gap. Default `none`. */
   segmentGap?: "none" | "hairline";
   /** Built-in accessible strings for empty distributions. */
   labels?: Partial<ProgressBarLabels>;
@@ -48,10 +50,27 @@ type ProgressSegmentsProps = ProgressBarCommonProps & {
   tone?: never;
 };
 
-export type ProgressBarRootProps = ProgressBarValueProps | ProgressSegmentsProps;
+export type ProgressBarProps = ProgressBarValueProps | ProgressBarSegmentsProps;
 
-const ProgressBarRoot = React.forwardRef<HTMLDivElement, ProgressBarRootProps>((props, ref) => {
-  const { label, size = "m", showValue = false, className } = props;
+/**
+ * A linear progress line: a single `value` (native `<progress>` for assistive tech) or
+ * `segments` — parts of a whole in one bar (`role="group"` named by the distribution).
+ */
+export function ProgressBar(props: ProgressBarProps) {
+  const {
+    label,
+    size = "m",
+    showValue = false,
+    className,
+    value: valueProp,
+    max: maxProp,
+    tone: toneProp,
+    segments: segmentsProp,
+    segmentGap = "none",
+    labels,
+    "aria-label": ariaLabel,
+    ...rest
+  } = props;
   const labelId = React.useId();
   const descriptionId = React.useId();
 
@@ -59,33 +78,32 @@ const ProgressBarRoot = React.forwardRef<HTMLDivElement, ProgressBarRootProps>((
   let tone: Tone | undefined;
   let bar: React.ReactNode;
 
-  if (props.segments) {
-    const { segments, total, rest, text, ...resolved } = resolveSegments(
-      props.segments,
-      props.max,
-      {
-        ...DEFAULT_PROGRESS_SEGMENTS_LABELS,
-        ...props.labels,
-      },
-    );
+  if (segmentsProp) {
+    const resolved = resolveSegments(segmentsProp, maxProp, {
+      ...DEFAULT_PROGRESS_SEGMENTS_LABELS,
+      ...labels,
+    });
+    const { segments, total, rest: free, text } = resolved;
     percent = resolved.percent;
-    const a11y = label
-      ? { "aria-labelledby": labelId, "aria-describedby": descriptionId }
+    // A name from `label` / `aria-label` keeps the distribution as the description.
+    const named = Boolean(label || ariaLabel);
+    const a11y = named
+      ? {
+          "aria-labelledby": label ? labelId : undefined,
+          "aria-label": label ? undefined : ariaLabel,
+          "aria-describedby": descriptionId,
+        }
       : { "aria-label": text };
 
     bar = (
       <>
-        {label ? (
-          <span id={descriptionId} className={styles.visuallyHidden}>
-            {text}
-          </span>
-        ) : null}
+        {named ? <VisuallyHidden id={descriptionId}>{text}</VisuallyHidden> : null}
         {/* biome-ignore lint/a11y/useSemanticElements: a distribution is a group of parts, not a fieldset */}
         <div
           className={styles.bar}
           role="group"
           {...a11y}
-          {...toDataAttributes({ "segment-gap": props.segmentGap ?? "none" })}
+          {...toDataAttributes({ "segment-gap": segmentGap })}
         >
           {total > 0 ? (
             <span className={styles.segments} style={{ flexGrow: total }}>
@@ -101,17 +119,17 @@ const ProgressBarRoot = React.forwardRef<HTMLDivElement, ProgressBarRootProps>((
               ))}
             </span>
           ) : null}
-          {rest > 0 || total === 0 ? (
-            <span className={styles.rest} style={{ flexGrow: rest > 0 ? rest : 1 }} />
+          {free > 0 || total === 0 ? (
+            <span className={styles.rest} style={{ flexGrow: free > 0 ? free : 1 }} />
           ) : null}
         </div>
       </>
     );
   } else {
-    const max = props.max !== undefined && props.max > 0 ? props.max : 100;
-    const value = Math.min(max, Math.max(props.value, 0));
+    const max = maxProp !== undefined && maxProp > 0 ? maxProp : 100;
+    const value = Math.min(max, Math.max(valueProp ?? 0, 0));
     percent = Math.round((value / max) * 100);
-    tone = props.tone ?? "accent";
+    tone = toneProp ?? "accent";
 
     bar = (
       <>
@@ -119,6 +137,7 @@ const ProgressBarRoot = React.forwardRef<HTMLDivElement, ProgressBarRootProps>((
           value={value}
           max={max}
           aria-labelledby={label ? labelId : undefined}
+          aria-label={label ? undefined : ariaLabel}
           className={styles.native}
         />
         {/* Visual bar: the native element is transparent; one pill slides over the track. */}
@@ -134,7 +153,7 @@ const ProgressBarRoot = React.forwardRef<HTMLDivElement, ProgressBarRootProps>((
   }
 
   return (
-    <div ref={ref} className={cx(styles.root, className)} {...toDataAttributes({ size, tone })}>
+    <div className={cx(styles.root, className)} {...rest} {...toDataAttributes({ size, tone })}>
       {label || showValue ? (
         <div className={styles.header}>
           {label ? (
@@ -152,8 +171,4 @@ const ProgressBarRoot = React.forwardRef<HTMLDivElement, ProgressBarRootProps>((
       {bar}
     </div>
   );
-});
-
-ProgressBarRoot.displayName = "ProgressBar.Root";
-
-export const ProgressBar = { Root: ProgressBarRoot };
+}

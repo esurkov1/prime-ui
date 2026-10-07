@@ -320,7 +320,7 @@ function ExampleFrameCodePane() {
       tabIndex={0}
       aria-label={ctx.labels.codeRegion}
     >
-      <CodeBlock.Root variant="ghost" code={trimmed} colorScheme={ctx.colorScheme} />
+      <CodeBlock variant="ghost" code={trimmed} colorScheme={ctx.colorScheme} />
     </section>
   );
 }

@@ -1,6 +1,7 @@
 # Banner
 
 **Category:** feedback
+**Kind:** primitive
 
 > Full-width in-flow message for a page, section or card: status icon, title, description, actions and dismiss.
 
@@ -10,8 +11,8 @@
 - An edge-to-edge strip above a page or the app shell (`placement="page"`).
 
 ## When not to use
-- A short-lived reaction to an action ("Сохранено") → use [Notification](../notification/COMPONENT.md).
-- An error of one field → use the field `error` or [Hint](../hint/COMPONENT.md).
+- A short-lived reaction to an action («Сохранено») → use [Notification](../notification/COMPONENT.md).
+- An error of one field → the field `error` or [Hint](../hint/COMPONENT.md).
 - A blocking question or confirmation → use [Modal](../modal/COMPONENT.md).
 - An empty list or page → use [EmptyPage](../empty-page/COMPONENT.md).
 - A small status label → use [Badge](../badge/COMPONENT.md).
@@ -23,148 +24,142 @@ import { Banner } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Banner.Root                 tone fill, padding, container for the layout
+Banner.Root                 <div>; variant, tone, size, placement
 ├─ Banner.Content           grid: [icon] [title / description] [actions]
-│  ├─ Banner.Icon           status icon on the first line
-│  ├─ Banner.Title          medium title
-│  ├─ Banner.Description    one step smaller text
-│  └─ Banner.Actions        buttons/links (and the dismiss button when there are actions)
-└─ Banner.CloseButton       optional custom close, top-right, centered on the first line
+│  ├─ Banner.Icon           one Icon on the first line (aria-hidden)
+│  ├─ Banner.Title
+│  ├─ Banner.Description
+│  └─ Banner.Actions        buttons; with onDismiss the close button is last here
+└─ close button             with onDismiss and no Actions: ghost icon Button, top-right
 ```
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### Banner.Root
-`forwardRef` to `HTMLDivElement`. + native `<div>` props (`role`, `aria-label`, …). No role by default.
+`ref` → `HTMLDivElement`. The in-flow message block: fill of the tone, tier spacing; renders the close button with `onDismiss`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"soft" \| "solid" \| "outline"` | `"soft"` | Treatment, see Variants. |
-| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"info"` | Semantic color. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Padding, icon, title and description size. The built-in close/dismiss button takes it; pass it to action buttons yourself. |
-| `placement` | `"inset" \| "page"` | `"inset"` | `inset`: rounded block in the flow or a card. `page`: edge-to-edge strip without radius, content aligned to the page content column. |
-| `onDismiss` | `() => void` | — | Renders a close button (unless a `Banner.CloseButton` child exists) and calls this on click. With `Banner.Actions` the close becomes a square outline button at the end of the actions row. |
-| `labels` | `Partial<BannerLabels>` | see Accessibility | Built-in strings. |
-| `className` | `string` | — | Class on the root. |
-| `children` | `ReactNode` | — | Usually `Banner.Content` (+ `Banner.CloseButton`). |
+| `variant` | `"solid" \| "soft" \| "outline"` | `"soft"` | `soft` tinted fill, `solid` saturated fill for urgent messages, `outline` card fill with a tone ring. |
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"info"` | Semantic color of the message. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Spacing, icon and title follow the control tier; the description is one step smaller. |
+| `placement` | `"inset" \| "page"` | `"inset"` | `inset` — rounded block in the flow or in a card; `page` — edge-to-edge strip above a page, content aligned to the page column. |
+| `onDismiss` | `() => void` | — | Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner. |
+| `labels` | `Partial<BannerLabels>` | — | Built-in strings, see Labels. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` (`alert`, `status`, `region`), `aria-label` and the other div attributes. |
 
 ### Banner.Content
-+ native `<div>` props. Layout of the message; below 36rem of the banner's own width (container query) actions move under the text.
-
-### Banner.Icon
-Polymorphic. + props of the `as` element.
+A `<div>` grid: icon on the first line, title over description, actions on the right (under the text below 36rem).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `as` | `ElementType` | `"div"` | Element or icon component to render, e.g. a lucide icon: `<Banner.Icon as={Info} aria-hidden />`. |
-| `className` | `string` | — | Class. |
-| `children` | `ReactNode` | — | Icon content when `as` is a plain element. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
-### Banner.Title / Banner.Description
-+ native `<span>` props. Title: tier text, medium. Description: one step smaller, secondary in `soft`/`outline`. Both are capped at the reading width.
+### Banner.Icon
+An `aria-hidden` `<span>` holding one `Icon`, one title line high, in the tone color.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (`Icon`), `className` and the other span attributes. |
+
+### Banner.Title · Banner.Description
+`<span>` elements: the medium title and the secondary text, both capped at the reading width.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Banner.Actions
-+ native `<div>` props. Wrapping row with `--prime-space-2` gap; centered on the text block on wide banners.
+A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.
 
-### Banner.CloseButton
-`forwardRef` to `HTMLButtonElement`. + native `<button>` props except `size`; `type` defaults to `"button"`. Must be a direct child of `Banner.Root`. Without children it renders a close icon and `aria-label={labels.dismiss}` (an explicit `aria-label` wins).
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Buttons in the banner `size`), `className` and the other div attributes. |
 
 ## Variants
 
 ### variant
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `soft` | Tone soft fill, primary title, secondary description, tone-colored icon | Most messages | yes |
-| `solid` | Saturated tone fill, tone foreground text (neutral: inverse fill and text) | Urgent, must-see messages (payment failed, outage) | |
-| `outline` | Card fill with a hairline ring of the tone text color, tone icon | Calm notices inside content where a fill is too loud | |
+| `soft` | tinted tone fill, primary text, tone icon | most messages | yes |
+| `solid` | saturated tone fill, contrasting text | urgent: failed payment, outage | |
+| `outline` | card fill with a hairline tone ring | calm notices on a busy surface | |
 
 ### tone
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `info` | Info soft fill / info icon (sky, distinct from accent) | Neutral information, maintenance | yes |
-| `success` | Success soft fill / success icon | Completed operations | |
-| `warning` | Warning soft fill / warning icon | Something needs attention soon (trial ending) | |
-| `danger` | Danger soft fill / danger icon | Errors, failed payments, data loss risk | |
-| `accent` | Accent soft fill / accent icon | Product news, promotions | |
-| `neutral` | Muted fill, secondary icon; `solid` = inverse | Low-importance system notes | |
+| `info` | info fill | maintenance, facts | yes |
+| `success` | success fill | a finished long operation | |
+| `warning` | warning fill | trial ending, quota | |
+| `danger` | danger fill | failed payment, sync error | |
+| `accent` | accent fill | a new feature | |
+| `neutral` | muted fill | quiet notices | |
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | Padding 8, icon 14, title 12/16, description 12/16, radius 8 | Inside dense panels and tables | |
-| `s` | Padding 8 × 12, icon 16, title 13/20, description 12/16, radius 8 | Inside cards and side panels | |
-| `m` | Padding 12 × 16, icon 16, title 14/20, description 13/20, radius 12 | Default | yes |
-| `l` | Padding 16 × 20, icon 20, title 16/24, description 14/20, radius 12 | Page-level messages | |
-| `xl` | Padding 20 × 24, icon 20, title 16/24, description 14/20, radius 16 | Hero / onboarding messages | |
+| `xs` · `s` | tight padding, caption description | dense panels, side columns | |
+| `m` | padding 12 × 16, body-s description | most pages | yes |
+| `l` · `xl` | roomy padding, body-m description | hero areas, empty pages | |
 
 ### placement
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `inset` | Rounded block | In content flow or inside a card | yes |
-| `page` | No radius, edge to edge, text aligned to the page content column | Account-wide notices above the page / app shell | |
-
-**Combinations**
-- Recommended: `soft` + any tone for regular messages; `solid` + `danger`/`warning` for urgent ones; `outline` + `info`/`accent` inside cards.
-- Allowed but rare: `solid` + `accent` for a single promo strip.
-- Pointless: `solid` with `outline`-style action buttons of a different tone — keep actions neutral or matching.
-- Avoid: several `solid` banners on one screen; `placement="page"` inside a card.
-
-**Hierarchy:** at most one page-level banner at a time; one primary action per banner (solid button), the rest outline/ghost.
+| `inset` | rounded block in the flow or inside a card | section messages | yes |
+| `page` | edge-to-edge strip, no radius, content on the page column | account-wide notices above a page | |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| variant / tone / size / placement | props | `data-variant`, `data-tone`, `data-size`, `data-placement` on Root |
-| dismissible | `onDismiss` or `Banner.CloseButton` | close button rendered |
-| hidden | parent state | the banner has no `open` prop: mount/unmount it |
+| look | `variant`, `tone`, `size`, `placement` | `data-variant`, `data-tone`, `data-size`, `data-placement` |
+| dismissible | `onDismiss` | corner ghost Button (`xs`, `s` on `l` / `xl`), or the last outline Button in `Banner.Actions` |
+| narrow | own width < 36rem (a banner with `Banner.Actions` is a size container) | actions move under the text |
+
+No `open` prop: the parent mounts and unmounts the banner.
 
 ## Layout & spacing
-- `width: 100%`; spacing lives in item paddings, so missing parts leave no gaps.
-- Icon → text: tier gap (`--prime-space-2`…`--prime-space-4`); title → description: `--prime-space-1`; text → actions: `--prime-space-3`…`--prime-space-6`.
-- Narrow (< 36rem own width): actions move under the text with `--prime-space-3` above. Works from 320px.
-- Place a page banner as the first child above page content; an inset banner at the top of the section it refers to, separated by the section gap.
+- `width: 100%`; text column capped at `--prime-layout-reading-max-width`.
+- Spacing lives in item paddings, so absent parts leave no gutters.
+- Action buttons take the banner `size`; the close button is centered on the first text line and never grows the banner.
 
 ## Accessibility
-- No role is set: add `role="status"` for polite updates, `role="alert"` for urgent errors, or `role="region"` + `aria-label` for a persistent announcement.
-- Mark the icon `aria-hidden`; the title must carry the meaning.
-- The close button has an accessible name from `labels.dismiss` or its own `aria-label`.
 
-| `labels` key | Default | Used for |
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Actions and the close button are regular buttons in Tab order. |
+
+### ARIA
+- The banner has no role of its own: give an error after an action `role="alert"`, a calm status `role="status"`, a page strip `role="region"` with `aria-label`.
+- The icon is `aria-hidden`: the title carries the meaning, not the color.
+- The close button is named by `labels.dismiss`; after dismissing, move focus somewhere sensible.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+| Key | Default | Used for |
 |---|---|---|
-| `dismiss` | `"Закрыть"` | `aria-label` of the built-in close / dismiss button |
+| `dismiss` | `"Закрыть"` | `aria-label` of the close button. |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [placement.tsx](examples/placement.tsx) | `placement="page"` above a page, `inset` in a card, narrow width with actions under the text | Choosing placement |
-| [variants.tsx](examples/variants.tsx) | `soft`, `solid`, `outline` × all six tones | Choosing variant and tone |
-| [sizes.tsx](examples/sizes.tsx) | `xs`…`xl` with actions and `onDismiss` | Matching density |
-| [dismiss.tsx](examples/dismiss.tsx) | `onDismiss` vs a custom `Banner.CloseButton`, parent-controlled visibility | Dismissible notices |
-
-```tsx
-import { Banner } from "prime-ui-kit";
-
-export function MaintenanceBanner() {
-  return (
-    <Banner.Root tone="info" role="status">
-      <Banner.Content>
-        <Banner.Title>Плановые работы в ночь на субботу</Banner.Title>
-        <Banner.Description>С 02:00 до 04:00 отчёты доступны только для чтения.</Banner.Description>
-      </Banner.Content>
-    </Banner.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A maintenance notice: icon, title and description on a soft info fill. |
+| [variants.tsx](examples/variants.tsx) | Every treatment on every tone: soft by default, solid for urgent, outline for calm — `variant`, `tone`. |
+| [sizes.tsx](examples/sizes.tsx) | Every tier: padding, icon and title follow the control tier, the description is one step smaller — `size`. |
+| [structure.tsx](examples/structure.tsx) | Optional parts: a one-line title, a title with a description, and actions where the close button joins the row — `Banner.Description`, `Banner.Actions`, `onDismiss`. |
+| [dismissible.tsx](examples/dismissible.tsx) | The parent owns visibility: the close button calls back and the parent unmounts the banner; the button name comes from labels — `onDismiss`, `labels`. |
+| [page-strip.tsx](examples/page-strip.tsx) | An edge-to-edge strip above a page and a rounded block inside a card — `placement`. |
+| [narrow.tsx](examples/narrow.tsx) | Below 36rem of its own width the banner moves the actions under the text. |
 
 ## Mistakes
-- `<Banner.Root open={false}>` → there is no `open`; render it conditionally.
-- `tone="error"` → use `tone="danger"`.
-- `variant="ghost"` → not supported; use `outline`.
-- Action buttons without `size` in a non-`m` banner → pass the banner's `size` to them.
-- `Banner.CloseButton` inside `Banner.Content` → make it a direct child of Root.
-- A Banner for "Сохранено" after a click → use a Notification.
+- A hand-made × next to the banner → pass `onDismiss`.
+- A lucide icon passed as a component → put `<Icon name="status.*" />` inside `Banner.Icon`.
+- A toast-like «Сохранено» in a banner → use Notification.
+- Several `solid` banners on one screen → keep `solid` for the one urgent message.
 
 ## Related
-- [Notification](../notification/COMPONENT.md) — transient toasts.
-- [EmptyPage](../empty-page/COMPONENT.md) — empty states.
-- [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md) — actions.
+- **Built from:** Button, Icon
+- **See also:** [Notification](../notification/COMPONENT.md), [Hint](../hint/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md)

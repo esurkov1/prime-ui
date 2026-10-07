@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { exitTimeoutMs } from "@/hooks/usePresence";
 
+import { NotificationCard } from "./Notification";
 import { NotificationProvider, useNotifications } from "./NotificationStore";
 
 function NotificationHarness() {
@@ -78,7 +79,7 @@ describe("Notification", () => {
     fireEvent.click(screen.getByRole("button", { name: "push" }));
     expect(await screen.findByText("Toast title")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "dismiss all" }));
-    // Тесты идут с prefers-reduced-motion: reduce — карточка убирается без exit-анимации
+    // Tests run with prefers-reduced-motion: reduce — the card goes without its exit animation.
     await waitFor(() => expect(screen.queryByText("Toast title")).not.toBeInTheDocument(), {
       timeout: 800,
     });
@@ -122,10 +123,10 @@ describe("Notification", () => {
       </NotificationProvider>,
     );
 
-    // Заполняем info-стек до max (2)
+    // Fill the info stack up to max (2).
     fireEvent.click(screen.getByRole("button", { name: "push" }));
     fireEvent.click(screen.getByRole("button", { name: "push" }));
-    // Warning идёт в собственный стек — не вытесняет info
+    // A warning goes to its own stack and does not push out info.
     fireEvent.click(screen.getByRole("button", { name: "push warning" }));
 
     await waitFor(() => {
@@ -136,9 +137,7 @@ describe("Notification", () => {
 
   it("sets data-tone, alert role for warning and labels from the provider", async () => {
     render(
-      <NotificationProvider
-        labels={{ close: "Hide", regions: { "top-right": "Toasts top right" } }}
-      >
+      <NotificationProvider labels={{ close: "Hide", regionTopRight: "Toasts top right" }}>
         <NotificationHarness />
       </NotificationProvider>,
     );
@@ -533,5 +532,25 @@ describe("Notification", () => {
       fireEvent.pointerUp(el, { pointerId: 2, clientX: 200, clientY: 0 });
       expect(screen.getByText("Swipe me")).toBeInTheDocument();
     });
+  });
+});
+
+describe("NotificationCard", () => {
+  it("renders a static card: close only with onDismiss, no countdown", () => {
+    const onDismiss = vi.fn();
+    const { rerender, container } = render(
+      <NotificationCard tone="success" title="Ссылка скопирована" />,
+    );
+    const card = screen.getByRole("status");
+    expect(card).toHaveAttribute("data-tone", "success");
+    expect(card).toHaveAttribute("data-persistent", "true");
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(container.querySelector("[class*=progressTrack]")).toBeNull();
+
+    rerender(<NotificationCard tone="danger" title="Ошибка" badge={3} onDismiss={onDismiss} />);
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText("3")).toHaveAttribute("data-color", "red");
+    fireEvent.click(screen.getByRole("button", { name: "Закрыть уведомление" }));
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 });

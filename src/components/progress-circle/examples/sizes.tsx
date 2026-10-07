@@ -1,19 +1,17 @@
-/** Diameters 24 · 32 · 48 · 64 · 80 on the 4px grid; inner text from caption to title-l, none on xs/s. Always pass `label`; on xs/s show the value outside the ring. */
+/** Diameters 24 to 80 px; the center text is not rendered on `xs` and `s` — `size`. */
 import { ProgressCircle, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const sizes = ["xs", "s", "m", "l", "xl"] as const;
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function ProgressCircleSizesExample() {
   return (
-    <div className={styles.row}>
-      {sizes.map((size) => (
-        <div key={size} className={styles.item}>
-          <ProgressCircle.Root size={size} value={72} label={`Выполнено, размер ${size}`}>
-            {size === "xs" || size === "s" ? null : "72%"}
-          </ProgressCircle.Root>
-          <Typography.Root as="span" variant="code" tone="muted">
+    <div>
+      {SIZES.map((size) => (
+        <div key={size}>
+          <ProgressCircle size={size} value={72} aria-label="Выполнено">
+            72%
+          </ProgressCircle>
+          <Typography.Root as="span" variant="caption" tone="muted">
             {size}
           </Typography.Root>
         </div>

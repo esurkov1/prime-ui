@@ -34,10 +34,9 @@
   --bn-desc-size: var(--prime-text-body-s-size);
   --bn-desc-line-height: var(--prime-text-body-s-line-height);
   --bn-radius: var(--prime-radius-l);
+  /* Height of the corner close Button (xs; s on l / xl banners). */
   --bn-close: var(--prime-control-xs-height);
-  --bn-close-icon: var(--prime-control-s-icon);
 
-  container-type: inline-size;
   position: relative;
   box-sizing: border-box;
   display: grid;
@@ -53,7 +52,13 @@
   text-align: start;
 }
 
-.root:has(> .closeButton) {
+/* Only a banner with actions needs its own width (the actions move under the text when narrow);
+   without them it keeps an intrinsic width and can size to its text. */
+.root:has(.actions) {
+  container-type: inline-size;
+}
+
+.root:has(> .close) {
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: var(--bn-gap);
 }
@@ -77,8 +82,6 @@
   --bn-desc-size: var(--prime-text-caption-size);
   --bn-desc-line-height: var(--prime-text-caption-line-height);
   --bn-radius: var(--prime-radius-m);
-  --bn-close: var(--prime-space-5);
-  --bn-close-icon: var(--prime-control-xs-icon);
 }
 
 .root[data-size="s"] {
@@ -92,8 +95,6 @@
   --bn-desc-size: var(--prime-text-caption-size);
   --bn-desc-line-height: var(--prime-text-caption-line-height);
   --bn-radius: var(--prime-radius-m);
-  --bn-close: var(--prime-space-6);
-  --bn-close-icon: var(--prime-control-xs-icon);
 }
 
 .root[data-size="l"] {
@@ -105,7 +106,6 @@
   --bn-desc-size: var(--prime-text-body-m-size);
   --bn-desc-line-height: var(--prime-text-body-m-line-height);
   --bn-close: var(--prime-control-s-height);
-  --bn-close-icon: var(--prime-control-m-icon);
 }
 
 .root[data-size="xl"] {
@@ -120,7 +120,6 @@
   --bn-desc-line-height: var(--prime-text-body-m-line-height);
   --bn-radius: var(--prime-radius-xl);
   --bn-close: var(--prime-control-s-height);
-  --bn-close-icon: var(--prime-control-m-icon);
 }
 
 /* ---------- Tones ---------- */
@@ -256,57 +255,18 @@
   order: 1;
 }
 
-.closeButton {
+/* Corner close (a ghost icon Button): top-right, centered on the first text line without growing
+   the banner; it takes the banner's text color so it reads on solid fills too. */
+.root .close {
   grid-column: 2;
   grid-row: 1;
   align-self: start;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--bn-close);
-  height: var(--bn-close);
-  /* Centered on the first text line without growing the banner. */
   margin-block: calc((var(--bn-title-line-height) - var(--bn-close)) / 2);
-  padding: 0;
-  border: 0;
-  border-radius: var(--prime-radius-s);
-  background: transparent;
   color: inherit;
-  font: inherit;
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.closeIcon {
-  width: var(--bn-close-icon);
-  height: var(--bn-close-icon);
-}
-
-/* currentColor wash adapts to solid and soft fills alike. */
-.closeButton:hover:not(:disabled) {
-  background: color-mix(in srgb, currentColor 12%, transparent);
-}
-
-.closeButton:active:not(:disabled) {
-  background: color-mix(in srgb, currentColor 18%, transparent);
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
-
-.closeButton:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.root[data-variant="solid"] .closeButton:focus-visible {
+.root[data-variant="solid"] .close:focus-visible {
   outline-color: currentColor;
-}
-
-.closeButton:disabled {
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
 }
 
 /* ---------- Narrow container: actions under the text ---------- */
@@ -324,11 +284,5 @@
     align-self: start;
     padding-inline-start: 0;
     padding-top: var(--prime-space-3);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .closeButton {
-    transition: none;
   }
 }

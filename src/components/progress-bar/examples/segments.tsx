@@ -1,29 +1,32 @@
-/** `segments` instead of `value`: one continuous bar (`segmentGap="none"`) for parts of one process, separate pills (`"hairline"`) for distinct categories, `max` for a partly filled whole, and an empty list. */
+/** Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list — `segments`, `segmentGap`, `max`. */
 import { ProgressBar, type ProgressSegment } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const review: ProgressSegment[] = [
+const REVIEW: ProgressSegment[] = [
   { value: 40, label: "Принято", tone: "success" },
   { value: 35, label: "На проверке", tone: "warning" },
   { value: 25, label: "Отклонено", tone: "danger" },
 ];
 
-export default function ProgressSegmentsExample() {
+const STORAGE: ProgressSegment[] = [
+  { value: 38, label: "Видео" },
+  { value: 21, label: "Документы", tone: "success" },
+  { value: 12, label: "Архивы", tone: "warning" },
+];
+
+export default function ProgressBarSegmentsExample() {
   return (
-    <div className={styles.stack}>
-      <ProgressBar.Root segments={review} label="Заявки: сплошная полоса" />
-      <ProgressBar.Root segments={review} segmentGap="hairline" label="Заявки: отдельные части" />
-      <ProgressBar.Root
-        segments={[
-          { value: 12, label: "Готово", tone: "success" },
-          { value: 6, label: "В работе" },
-        ]}
-        max={30}
-        label="Спринт: 18 из 30 задач"
+    <div className={styles.column}>
+      <ProgressBar segments={REVIEW} label="Заявки по статусам" />
+      <ProgressBar
+        segments={STORAGE}
+        segmentGap="hairline"
+        max={100}
+        label="Хранилище: 71 из 100 ГБ"
         showValue
       />
-      <ProgressBar.Root segments={[]} label="Нет данных" />
+      <ProgressBar segments={[]} label="Нет данных за период" />
     </div>
   );
 }

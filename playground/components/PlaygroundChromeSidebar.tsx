@@ -201,7 +201,7 @@ export function PlaygroundChromeSidebar({
         </Sidebar.ItemIcon>
         Поиск
         <Sidebar.ItemShortcut>
-          <Kbd.Root>{isMac ? "⌘K" : "Ctrl K"}</Kbd.Root>
+          <Kbd>{isMac ? "⌘K" : "Ctrl K"}</Kbd>
         </Sidebar.ItemShortcut>
       </Sidebar.Item>
       <Sidebar.Content ref={contentRef}>

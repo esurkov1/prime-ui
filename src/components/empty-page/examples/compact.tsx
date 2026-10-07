@@ -1,4 +1,4 @@
-/** The quiet empty state of a search panel: no entrance motion, body-s text, one action — `layout="compact"`. */
+/** The quiet empty state of a search panel: no entrance motion, smaller text, one action — `layout`. */
 import { Button, EmptyPage, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

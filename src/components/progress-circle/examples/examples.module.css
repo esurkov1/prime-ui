@@ -1,9 +1,9 @@
-/* Layout helpers for the ProgressCircle examples. Layout and card surface tokens only. */
+/* Layout of the ProgressCircle scenarios: semantic tokens only. */
 
+/* Several rings in one line; captions of different rings share one baseline. */
 .row {
   display: flex;
   flex-wrap: wrap;
-  /* Captions of different-sized circles share one baseline. */
   align-items: flex-end;
   justify-content: center;
   gap: var(--prime-space-6);
@@ -14,41 +14,4 @@
   flex-direction: column;
   align-items: center;
   gap: var(--prime-space-2);
-}
-
-/* 40rem goals card. */
-.card {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-4);
-  width: min(100%, calc(var(--prime-space-20) * 8));
-  padding: var(--prime-card-padding-m);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
-}
-
-/* Goal columns of at least 10rem. */
-.goals {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-20) * 2)), 1fr));
-  gap: var(--prime-space-4);
-}
-
-.goal {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-3);
-  min-width: 0;
-}
-
-.goalText {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.meta {
-  font-variant-numeric: tabular-nums;
 }

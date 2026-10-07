@@ -22,7 +22,7 @@ export default function PopoverFlushExample() {
         <Popover.Title className={styles.flushHead}>Уведомления</Popover.Title>
         {EVENTS.map((event) => (
           <React.Fragment key={event.id}>
-            <Divider.Root role="presentation" />
+            <Divider role="presentation" />
             <div className={styles.flushRow}>
               <Typography.Root as="span" variant="body-m">
                 {event.title}
@@ -33,7 +33,7 @@ export default function PopoverFlushExample() {
             </div>
           </React.Fragment>
         ))}
-        <Divider.Root role="presentation" />
+        <Divider role="presentation" />
         <div className={styles.flushFooter}>
           <Popover.Close>
             <Button.Root variant="ghost" tone="neutral" size="s">

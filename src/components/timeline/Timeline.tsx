@@ -15,18 +15,18 @@ export type TimelineRootProps = {
   size?: ControlSize;
   /**
    * Who gets the highlighted look (pill, accent title and dot):
-   * `selected` (default) — the `active` row keeps it; interactive rows get a faint hover wash.
-   * `hover` — the row under the pointer or with keyboard focus, transiently; `active` keeps only
+   * `current` (default) — the `current` row keeps it; interactive rows get a faint hover wash.
+   * `hover` — the row under the pointer or with keyboard focus, transiently; `current` keeps only
    * its semantics (`aria-current`), no persistent highlight.
    */
-  highlight?: "selected" | "hover";
+  highlight?: "current" | "hover";
   /** `Timeline.Group` elements. */
   children: React.ReactNode;
   className?: string;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
 
 const TimelineRoot = React.forwardRef<HTMLDivElement, TimelineRootProps>(function TimelineRoot(
-  { size = "m", highlight = "selected", children, className, ...rest },
+  { size = "m", highlight = "current", children, className, ...rest },
   ref,
 ) {
   return (
@@ -88,8 +88,8 @@ export type TimelineItemProps = {
   color?: PaletteColor;
   /** Semantic dot color (status). Wins over `color`; shown at full emphasis. */
   tone?: Tone;
-  /** Highlighted / selected row: soft pill, accent title and dot; `data-state="active"`, `aria-current`. */
-  active?: boolean;
+  /** The current row (open detail, latest event): soft pill, accent title and dot; `data-state="active"`, `aria-current`. */
+  current?: boolean;
   /** Renders the row as a link. */
   href?: string;
   /** Renders the row as the single child element (router link etc.); the dot is prepended to its children. */
@@ -103,15 +103,15 @@ export type TimelineItemProps = {
   Pick<React.AnchorHTMLAttributes<HTMLAnchorElement>, "target" | "rel" | "download">;
 
 const TimelineItem = React.forwardRef<HTMLElement, TimelineItemProps>(function TimelineItem(
-  { color = "blue", tone, active = false, href, asChild, onClick, children, className, ...rest },
+  { color = "blue", tone, current = false, href, asChild, onClick, children, className, ...rest },
   ref,
 ) {
   const interactive = Boolean(asChild || href || onClick);
-  const state = active ? "active" : "inactive";
+  const state = current ? "active" : "inactive";
   const rowProps = {
     ...rest,
     className: cx(styles.row, className),
-    "aria-current": active ? ("true" as const) : undefined,
+    "aria-current": current ? ("true" as const) : undefined,
     ...toDataAttributes({
       state,
       color: tone ? undefined : color,

@@ -6,13 +6,14 @@ import { Portal } from "@/internal/Portal";
 import { primitiveTokens } from "../../../tokens/primitives";
 
 import {
-  DEFAULT_NOTIFICATION_LABELS,
-  NotificationCard,
+  NOTIFICATION_LABELS,
   type NotificationLabels,
   NotificationLabelsContext,
   type NotificationOptions,
   type NotificationPosition,
   type NotificationRecord,
+  REGION_LABEL_KEY,
+  ToastCard,
 } from "./Notification";
 import styles from "./Notification.module.css";
 
@@ -24,11 +25,8 @@ export type NotificationProviderProps = {
   position?: NotificationPosition;
   /** Max visible toasts per stack (position × tone). Default 5. */
   max?: number;
-  /** Built-in strings (close button, region names); `regions` merges per position. */
-  labels?: {
-    close?: string;
-    regions?: Partial<NotificationLabels["regions"]>;
-  };
+  /** Built-in strings: the close button and the region names per position. */
+  labels?: Partial<NotificationLabels>;
 };
 
 type StoreValue = {
@@ -38,7 +36,7 @@ type StoreValue = {
   dismissAll: () => void;
 };
 
-// dismissing — внутренний флаг; не попадает в публичный StoreValue.items
+// `dismissing` is internal: such entries stay mounted for the exit and never reach `items`.
 type NotificationEntry = NotificationRecord & { dismissing?: true };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -236,7 +234,7 @@ function NotificationStack({
     <ol
       ref={listRef}
       className={styles.stack}
-      aria-label={labels.regions[position]}
+      aria-label={labels[REGION_LABEL_KEY[position]]}
       data-expanded={String(expanded)}
       style={{ "--ntf-stack-height": `${stackHeight}px` } as React.CSSProperties}
       onMouseEnter={() => handleHover(true)}
@@ -422,7 +420,7 @@ const NotificationStackItem = React.memo(function NotificationStackItem({
           }
         }}
       >
-        <NotificationCard
+        <ToastCard
           item={item}
           paused={expanded || closing || swiping}
           onDismiss={onDismiss}
@@ -435,8 +433,7 @@ const NotificationStackItem = React.memo(function NotificationStackItem({
 });
 
 // ─── NotificationToaster ──────────────────────────────────────────────────────
-// Получает entries напрямую от провайдера — включая dismissing-элементы,
-// чтобы карточка оставалась смонтированной во время exit-анимации.
+// Gets the provider's entries including the dismissing ones, so a card stays mounted for its exit.
 
 function NotificationToaster({
   entries,
@@ -514,11 +511,8 @@ export function NotificationProvider({
   labels: labelsProp,
 }: NotificationProviderProps) {
   const labels = React.useMemo<NotificationLabels>(
-    () => ({
-      close: labelsProp?.close ?? DEFAULT_NOTIFICATION_LABELS.close,
-      regions: { ...DEFAULT_NOTIFICATION_LABELS.regions, ...labelsProp?.regions },
-    }),
-    [labelsProp?.close, labelsProp?.regions],
+    () => ({ ...NOTIFICATION_LABELS, ...labelsProp }),
+    [labelsProp],
   );
   const [entries, setEntries] = React.useState<NotificationEntry[]>([]);
 
@@ -612,7 +606,6 @@ export function NotificationProvider({
     [position, max],
   );
 
-  // Публичный items не содержит dismissing-элементов
   const publicItems = React.useMemo(() => entries.filter((n) => !n.dismissing), [entries]);
 
   const value = React.useMemo(

@@ -274,13 +274,6 @@
 
 /* ─── Segments: remove and Badge.Action ─────────────────────────────────── */
 
-.glyph {
-  display: block;
-  flex: none;
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
-}
-
 /* The remove segment carries its own inner space, so the text runs up to it. */
 .root[data-removable="true"] {
   --badge-pad-end: 0px;
@@ -334,7 +327,8 @@
   cursor: not-allowed;
 }
 
-/* Any glyph — the default minus or a custom icon — sits at the tier icon size. */
+/* Any glyph — the default close / minus or a custom icon — sits at the tier icon size. */
+.remove > *,
 .action > * {
   display: block;
   flex: none;

@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { type ImageStatus, useImageStatus } from "@/hooks/useImageStatus";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -10,137 +11,100 @@ import styles from "./Avatar.module.css";
 /** `xs` 20 · `s` 24 · `m` 32 · `l` 40 · `xl` 48 · `2xl` 64 (`--prime-avatar-*`). */
 export type AvatarSize = ControlSize | "2xl";
 
-export type AvatarImageStatus = "idle" | "loading" | "loaded" | "error";
-
 type AvatarContextValue = {
-  size: AvatarSize;
-  imageStatus: AvatarImageStatus;
-  setImageStatus: React.Dispatch<React.SetStateAction<AvatarImageStatus>>;
+  imageStatus: ImageStatus;
+  setImageStatus: (status: ImageStatus) => void;
 };
 
 const [AvatarProvider, useAvatarContext] = createComponentContext<AvatarContextValue>("Avatar");
 
-export type AvatarRootProps = {
+/** Size of the surrounding `Avatar.Group`; members without their own `size` take it. */
+const AvatarGroupSizeContext = React.createContext<AvatarSize | undefined>(undefined);
+
+// ─── Root ─────────────────────────────────────────────────────────────────────
+
+export type AvatarRootProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Default `m`, or the size of the surrounding `Avatar.Group`. */
   size?: AvatarSize;
   /** Fallback color (`--prime-color-palette-<hue>-*`). Default `gray`. */
   color?: PaletteColor;
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-const AvatarRoot = React.forwardRef<HTMLDivElement, AvatarRootProps>(
-  ({ size = "m", color = "gray", className, children, ...rest }, ref) => {
-    const [imageStatus, setImageStatus] = React.useState<AvatarImageStatus>("idle");
-
-    const value = React.useMemo(
-      () => ({
-        size,
-        imageStatus,
-        setImageStatus,
-      }),
-      [size, imageStatus],
-    );
-
-    return (
-      <AvatarProvider value={value}>
-        <div
-          ref={ref}
-          className={cx(styles.root, className)}
-          {...toDataAttributes({ size, color })}
-          {...rest}
-        >
-          {children}
-        </div>
-      </AvatarProvider>
-    );
-  },
-);
-
-AvatarRoot.displayName = "AvatarRoot";
-
-export type AvatarImageProps = {
-  src: string;
-  alt?: string;
-  className?: string;
-} & Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" | "alt">;
-
-type AvatarImageInnerProps = AvatarImageProps & {
-  setImageStatus: React.Dispatch<React.SetStateAction<AvatarImageStatus>>;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-const AvatarImageInner = React.forwardRef<HTMLImageElement, AvatarImageInnerProps>(
-  ({ setImageStatus, src, alt = "", className, onLoad, onError, ...rest }, ref) => {
-    const [status, setStatus] = React.useState<"loading" | "loaded" | "error">("loading");
+function AvatarRoot({ size, color = "gray", className, children, ...rest }: AvatarRootProps) {
+  const groupSize = React.useContext(AvatarGroupSizeContext);
+  const [imageStatus, setImageStatus] = React.useState<ImageStatus>("idle");
+  const value = React.useMemo(() => ({ imageStatus, setImageStatus }), [imageStatus]);
 
-    React.useLayoutEffect(() => {
-      setImageStatus("loading");
-      return () => {
-        setImageStatus("idle");
-      };
-    }, [setImageStatus]);
-
-    const handleLoad = React.useCallback(
-      (event: React.SyntheticEvent<HTMLImageElement>) => {
-        setStatus("loaded");
-        setImageStatus("loaded");
-        onLoad?.(event);
-      },
-      [onLoad, setImageStatus],
-    );
-
-    const handleError = React.useCallback(
-      (event: React.SyntheticEvent<HTMLImageElement>) => {
-        setStatus("error");
-        setImageStatus("error");
-        onError?.(event);
-      },
-      [onError, setImageStatus],
-    );
-
-    return (
-      <img
-        ref={ref}
-        src={src}
-        alt={alt}
-        className={cx(styles.image, className)}
-        onLoad={handleLoad}
-        onError={handleError}
-        {...toDataAttributes({ status })}
+  return (
+    <AvatarProvider value={value}>
+      <div
+        className={cx(styles.root, className)}
+        {...toDataAttributes({ size: size ?? groupSize ?? "m", color })}
         {...rest}
-      />
-    );
-  },
-);
+      >
+        {children}
+      </div>
+    </AvatarProvider>
+  );
+}
+AvatarRoot.displayName = "Avatar.Root";
 
-AvatarImageInner.displayName = "AvatarImageInner";
+// ─── Image / Fallback ─────────────────────────────────────────────────────────
 
-const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>((props, ref) => {
+export type AvatarImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
+  src: string;
+  /** Empty (default) when the name next to the avatar already says who it is. */
+  alt?: string;
+  ref?: React.Ref<HTMLImageElement>;
+};
+
+function AvatarImageInner({
+  src,
+  alt = "",
+  className,
+  onLoad,
+  onError,
+  ...rest
+}: AvatarImageProps) {
   const { setImageStatus } = useAvatarContext();
-  return <AvatarImageInner key={props.src} ref={ref} setImageStatus={setImageStatus} {...props} />;
-});
+  const image = useImageStatus(setImageStatus, { onLoad, onError });
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={cx(styles.image, className)}
+      onLoad={image.onLoad}
+      onError={image.onError}
+      {...toDataAttributes({ status: image.status })}
+      {...rest}
+    />
+  );
+}
 
-AvatarImage.displayName = "AvatarImage";
+/** The photo; while it loads or after an error the Fallback shows through. */
+function AvatarImage(props: AvatarImageProps) {
+  // A new source remounts the image and starts again at `loading`.
+  return <AvatarImageInner key={props.src} {...props} />;
+}
+AvatarImage.displayName = "Avatar.Image";
 
-export type AvatarFallbackProps = {
-  children?: React.ReactNode;
-  className?: string;
-} & React.HTMLAttributes<HTMLSpanElement>;
+export type AvatarFallbackProps = React.HTMLAttributes<HTMLSpanElement>;
 
-function AvatarFallback({ children, className, ...rest }: AvatarFallbackProps) {
+/** Initials or an icon, shown without a photo, while it loads and when it fails. */
+function AvatarFallback({ className, ...rest }: AvatarFallbackProps) {
   const { imageStatus } = useAvatarContext();
-
   return (
     <span
       className={cx(styles.fallback, className)}
       aria-hidden={imageStatus === "loaded" ? true : undefined}
       {...rest}
-    >
-      {children}
-    </span>
+    />
   );
 }
+AvatarFallback.displayName = "Avatar.Fallback";
 
-AvatarFallback.displayName = "AvatarFallback";
+// ─── Status ───────────────────────────────────────────────────────────────────
 
 export type AvatarPresence = "online" | "offline" | "away" | "busy";
 
@@ -153,132 +117,75 @@ const AVATAR_STATUS_LABELS: AvatarStatusLabels = {
   busy: "Занят",
 };
 
-export type AvatarStatusProps = {
+export type AvatarStatusProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /** Presence shown as a dot on the avatar's bottom-end edge. */
   status: AvatarPresence;
   /** Accessible names of the presence states (Russian defaults). */
   labels?: Partial<AvatarStatusLabels>;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+};
 
 /** Presence dot; announced as an image with the state name (`labels`). */
 function AvatarStatus({ status, labels, className, ...rest }: AvatarStatusProps) {
   useAvatarContext();
-  const label = { ...AVATAR_STATUS_LABELS, ...labels }[status];
   return (
     <span
       role="img"
-      aria-label={label}
+      aria-label={labels?.[status] ?? AVATAR_STATUS_LABELS[status]}
       className={cx(styles.status, className)}
       {...toDataAttributes({ status })}
       {...rest}
     />
   );
 }
+AvatarStatus.displayName = "Avatar.Status";
 
-AvatarStatus.displayName = "AvatarStatus";
+// ─── Group / Overflow ─────────────────────────────────────────────────────────
 
-const AVATAR_ROOT_DISPLAY = "AvatarRoot";
-const AVATAR_GROUP_OVERFLOW_DISPLAY = "AvatarGroupOverflow";
-
-function getComponentDisplayName(type: unknown): string | undefined {
-  if (typeof type === "function" || (typeof type === "object" && type !== null)) {
-    return (type as { displayName?: string }).displayName;
-  }
-  return undefined;
-}
-
-function isAvatarRootElement(child: React.ReactElement): boolean {
-  return child.type === AvatarRoot || getComponentDisplayName(child.type) === AVATAR_ROOT_DISPLAY;
-}
-
-export type AvatarGroupOverflowProps = {
+export type AvatarGroupProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Size of every member without its own `size`. Default `m`. */
   size?: AvatarSize;
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
+  ref?: React.Ref<HTMLDivElement>;
+};
 
-const AvatarGroupOverflow = React.forwardRef<HTMLDivElement, AvatarGroupOverflowProps>(
-  ({ size = "m", className, children, ...rest }, ref) => (
-    <div
-      ref={ref}
-      className={cx(styles.groupOverflow, className)}
-      {...toDataAttributes({ size })}
-      {...rest}
-    >
-      {children}
-    </div>
-  ),
-);
-
-AvatarGroupOverflow.displayName = AVATAR_GROUP_OVERFLOW_DISPLAY;
-
-function isAvatarGroupOverflowElement(child: React.ReactElement): boolean {
+/** An overlapping row of avatars (`role="group"`); rings match the surface. */
+function AvatarGroup({ size = "m", className, role = "group", ...rest }: AvatarGroupProps) {
   return (
-    child.type === AvatarGroupOverflow ||
-    getComponentDisplayName(child.type) === AVATAR_GROUP_OVERFLOW_DISPLAY
+    <AvatarGroupSizeContext.Provider value={size}>
+      <div
+        role={role}
+        className={cx(styles.group, className)}
+        {...toDataAttributes({ size })}
+        {...rest}
+      />
+    </AvatarGroupSizeContext.Provider>
   );
 }
+AvatarGroup.displayName = "Avatar.Group";
 
-function injectAvatarGroupSize(children: React.ReactNode, size: AvatarSize): React.ReactNode {
-  return React.Children.map(children, (child) => {
-    if (!React.isValidElement(child)) {
-      return child;
-    }
-    if (child.type === React.Fragment) {
-      return React.cloneElement(
-        child,
-        {},
-        injectAvatarGroupSize((child.props as { children?: React.ReactNode }).children, size),
-      );
-    }
-    if (isAvatarRootElement(child)) {
-      const props = child.props as AvatarRootProps;
-      if (props.size !== undefined) {
-        return child;
-      }
-      return React.cloneElement(child, { size } as Partial<AvatarRootProps>);
-    }
-    if (isAvatarGroupOverflowElement(child)) {
-      const props = child.props as AvatarGroupOverflowProps;
-      if (props.size !== undefined) {
-        return child;
-      }
-      return React.cloneElement(child, { size } as Partial<AvatarGroupOverflowProps>);
-    }
-    return child;
-  });
-}
-
-export type AvatarGroupRootProps = {
+export type AvatarOverflowProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Default `m`, or the size of the surrounding `Avatar.Group`. */
   size?: AvatarSize;
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
+  ref?: React.Ref<HTMLDivElement>;
+};
 
-const AvatarGroupRoot = React.forwardRef<HTMLDivElement, AvatarGroupRootProps>(
-  ({ size = "m", className, children, role = "group", ...rest }, ref) => (
+/** The «+N» cell at the end of a group, the same diameter as its avatars. */
+function AvatarOverflow({ size, className, ...rest }: AvatarOverflowProps) {
+  const groupSize = React.useContext(AvatarGroupSizeContext);
+  return (
     <div
-      ref={ref}
-      role={role}
-      className={cx(styles.groupRoot, className)}
-      {...toDataAttributes({ size })}
+      className={cx(styles.overflow, className)}
+      {...toDataAttributes({ size: size ?? groupSize ?? "m" })}
       {...rest}
-    >
-      {injectAvatarGroupSize(children, size)}
-    </div>
-  ),
-);
-
-AvatarGroupRoot.displayName = "AvatarGroupRoot";
+    />
+  );
+}
+AvatarOverflow.displayName = "Avatar.Overflow";
 
 export const Avatar = {
   Root: AvatarRoot,
   Image: AvatarImage,
   Fallback: AvatarFallback,
   Status: AvatarStatus,
-  Group: {
-    Root: AvatarGroupRoot,
-    Overflow: AvatarGroupOverflow,
-  },
+  Group: AvatarGroup,
+  Overflow: AvatarOverflow,
 };

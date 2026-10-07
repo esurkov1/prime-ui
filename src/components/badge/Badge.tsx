@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -61,23 +62,6 @@ export type BadgeActionProps = {
   className?: string;
 };
 
-const RemoveGlyph = (
-  <svg className={styles.glyph} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path
-      d="M4.5 4.5l7 7M11.5 4.5l-7 7"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-const MinusGlyph = (
-  <svg className={styles.glyph} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path d="M4 8h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-  </svg>
-);
-
 const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
   (
     {
@@ -98,18 +82,10 @@ const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
     const { size, tier } = useBadgeTier(sizeProp);
 
     // Badge.Action lives at the end of the badge, outside the text body.
-    let actionProps: BadgeActionProps | null = null;
-    let action: React.ReactNode = null;
-    const content: React.ReactNode[] = [];
-    React.Children.forEach(children, (child) => {
-      if (React.isValidElement(child) && child.type === BadgeAction) {
-        action = child;
-        actionProps = child.props as BadgeActionProps;
-      } else {
-        content.push(child);
-      }
-    });
-    const trailing = Boolean(onRemove || actionProps);
+    const items = React.Children.toArray(children);
+    const actionElement = items.find(isAction) ?? null;
+    const content = items.filter((child) => !isAction(child));
+    const trailing = Boolean(onRemove || actionElement);
     const iconOnly =
       !trailing &&
       content.length > 0 &&
@@ -119,7 +95,6 @@ const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
       endTaken: trailing,
     });
     const body = <ControlSizeProvider value={tier}>{edges.children}</ControlSizeProvider>;
-    const persistent = (actionProps as BadgeActionProps | null)?.persistent;
 
     return (
       <span
@@ -137,7 +112,11 @@ const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
           removable: onRemove ? true : undefined,
           pressable: onPress ? true : undefined,
           pressed: onPress && pressed !== undefined ? pressed : undefined,
-          action: actionProps ? (persistent ? "persistent" : "reveal") : undefined,
+          action: actionElement
+            ? actionElement.props.persistent
+              ? "persistent"
+              : "reveal"
+            : undefined,
           disabled: disabled || undefined,
         })}
         {...rest}
@@ -158,7 +137,7 @@ const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
           // A read-only badge is one element: its content sits in the root.
           body
         )}
-        {action}
+        {actionElement}
         {onRemove ? (
           <button
             type="button"
@@ -167,7 +146,7 @@ const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
             onClick={onRemove}
             disabled={disabled}
           >
-            {RemoveGlyph}
+            <Icon name="action.close" />
           </button>
         ) : null}
       </span>
@@ -175,7 +154,7 @@ const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
   },
 );
 
-BadgeRoot.displayName = "BadgeRoot";
+BadgeRoot.displayName = "Badge.Root";
 
 function BadgeIcon({ children, className, ...rest }: BadgeIconProps) {
   // `data-edge` comes from Badge.Root when the icon sits at an edge of the badge.
@@ -186,14 +165,14 @@ function BadgeIcon({ children, className, ...rest }: BadgeIconProps) {
   );
 }
 
-BadgeIcon.displayName = "BadgeIcon";
+BadgeIcon.displayName = "Badge.Icon";
 
 function BadgeDot({ className, ...rest }: BadgeDotProps) {
   // `data-edge` comes from Badge.Root when the dot sits at an edge of the badge.
   return <span className={cx(styles.dot, className)} aria-hidden="true" {...rest} />;
 }
 
-BadgeDot.displayName = "BadgeDot";
+BadgeDot.displayName = "Badge.Dot";
 
 /**
  * An action at the end of the badge («−» to hide a value): a full-height segment revealed on hover
@@ -219,11 +198,15 @@ function BadgeAction({
       disabled={disabled}
       onClick={onClick}
     >
-      {children ?? MinusGlyph}
+      {children ?? <Icon name="action.remove" />}
     </button>
   );
 }
 
-BadgeAction.displayName = "BadgeAction";
+BadgeAction.displayName = "Badge.Action";
+
+function isAction(child: React.ReactNode): child is React.ReactElement<BadgeActionProps> {
+  return React.isValidElement(child) && child.type === BadgeAction;
+}
 
 export const Badge = { Root: BadgeRoot, Icon: BadgeIcon, Dot: BadgeDot, Action: BadgeAction };

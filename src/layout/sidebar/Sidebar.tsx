@@ -291,7 +291,7 @@ function SidebarItemCount({ children, className }: SidebarItemCountProps) {
 SidebarItemCount.displayName = "Sidebar.ItemCount";
 
 export type SidebarItemShortcutProps = {
-  /** A key hint, e.g. `<Kbd.Root>⌘K</Kbd.Root>`. */
+  /** A key hint, e.g. `<Kbd>⌘K</Kbd>`. */
   children: React.ReactNode;
   className?: string;
 };

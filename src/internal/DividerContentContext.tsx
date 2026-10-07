@@ -1,6 +1,6 @@
 import * as React from "react";
 
-/** Внутри `Divider.Root` — у `Icon` не задаются классы размера; габариты из `--prime-divider-icon`. */
+/** Inside `Divider`, `Icon` gets no size classes; its box comes from `--prime-divider-icon`. */
 export const DividerContentContext = React.createContext(false);
 
 DividerContentContext.displayName = "DividerContentContext";

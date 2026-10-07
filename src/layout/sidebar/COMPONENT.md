@@ -112,7 +112,7 @@ No ref. Key hint at the end (`aria-hidden`); hidden in compact mode.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | A key hint, e.g. `<Kbd.Root>⌘K</Kbd.Root>`. |
+| `children` | `ReactNode` | — (required) | A key hint, e.g. `<Kbd>⌘K</Kbd>`. |
 | `className` | `string` | — | Extra class. |
 
 ### Sidebar.Toggle

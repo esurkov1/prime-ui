@@ -1,49 +1,41 @@
-/** At 375px the title wraps and the amount stays on the right; below 20rem of its own width (container query) the amount moves under the meta line. Use to check mobile layouts. */
-
-import { Timeline, Typography } from "prime-ui-kit";
+/** At 375 px the title wraps and the amount stays right; below 20rem of its own width the amount moves under the meta line. */
+import { Timeline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-function Rows() {
-  return (
-    <Timeline.Group label="Недавно">
-      <Timeline.Item>
-        <Timeline.Title>Аренда закончилась · Марина Л.</Timeline.Title>
-        <Timeline.Meta>
-          <Timeline.MetaPrimary>17.07.26</Timeline.MetaPrimary> · 81 д. назад
-        </Timeline.Meta>
-        <Timeline.Value>+9 450 ฿</Timeline.Value>
-      </Timeline.Item>
-      <Timeline.Item active>
-        <Timeline.Title>ТО: замена масла и фильтров, проверка тормозов</Timeline.Title>
-        <Timeline.Meta>
-          <Timeline.MetaPrimary>10.09.26</Timeline.MetaPrimary> · 26 д. назад
-        </Timeline.Meta>
-        <Timeline.Value>−689 ฿</Timeline.Value>
-      </Timeline.Item>
-    </Timeline.Group>
-  );
-}
+const WIDTHS = [
+  { id: "phone", className: styles.phone, label: "375 px" },
+  { id: "narrow", className: styles.narrow, label: "280 px" },
+];
+
+const EVENTS = [
+  { id: 1, title: "Аренда закончилась · Марина Л.", date: "17.07.26", value: "+9 450 ₽" },
+  {
+    id: 2,
+    title: "ТО: замена масла и фильтров, проверка тормозов",
+    date: "10.09.26",
+    value: "−689 ₽",
+  },
+];
 
 export default function TimelineNarrowExample() {
   return (
     <div className={styles.stack}>
-      <div className={styles.phone}>
-        <Typography.Root variant="caption" tone="muted">
-          375px
-        </Typography.Root>
-        <Timeline.Root>
-          <Rows />
+      {WIDTHS.map((width) => (
+        <Timeline.Root key={width.id} className={width.className}>
+          <Timeline.Group label={width.label}>
+            {EVENTS.map((event) => (
+              <Timeline.Item key={event.id} current={event.id === 2}>
+                <Timeline.Title>{event.title}</Timeline.Title>
+                <Timeline.Meta>
+                  <Timeline.MetaPrimary>{event.date}</Timeline.MetaPrimary>
+                </Timeline.Meta>
+                <Timeline.Value>{event.value}</Timeline.Value>
+              </Timeline.Item>
+            ))}
+          </Timeline.Group>
         </Timeline.Root>
-      </div>
-      <div className={styles.narrow}>
-        <Typography.Root variant="caption" tone="muted">
-          280px
-        </Typography.Root>
-        <Timeline.Root>
-          <Rows />
-        </Timeline.Root>
-      </div>
+      ))}
     </div>
   );
 }

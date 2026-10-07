@@ -1,21 +1,22 @@
-/* Layout for the Typography examples: semantic tokens only. */
+/* Layout of the Typography scenarios: semantic tokens only. */
 
-/* Full-width column of samples (stretches inside a centered host). */
-.scaleList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-4);
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.scaleRow {
-  display: flex;
-  flex-direction: column;
+/* A short text block at a form width. */
+.block {
+  display: grid;
   gap: var(--prime-space-2);
+  max-width: var(--prime-modal-width-s);
+  margin: 0;
+  text-align: start;
 }
 
+/* weights.tsx */
+.stack {
+  display: grid;
+  gap: var(--prime-space-3);
+  text-align: start;
+}
+
+/* article.tsx: long-form text at the reading width. */
 .article {
   display: grid;
   gap: var(--prime-space-4);
@@ -29,47 +30,7 @@
   border-inline-start: var(--prime-space-1) solid var(--prime-color-fill-strong);
 }
 
-.page {
-  display: grid;
-  gap: var(--prime-space-3);
-  max-width: var(--prime-modal-width-s);
-  text-align: start;
-}
-
-.form {
-  display: grid;
-  gap: var(--prime-space-5);
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-space-2);
-}
-
-.columns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-space-4);
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* 200px basis, 280px cap. */
-.narrowColumn {
-  flex: 1 1 calc(var(--prime-space-10) * 5);
-  min-width: 0;
-  max-width: calc(var(--prime-space-10) * 7);
-}
-
-/* 320px basis. */
-.wideColumn {
-  flex: 2 1 calc(var(--prime-space-10) * 8);
-  min-width: 0;
-}
-
-/* 240px — narrow enough to show the ellipsis. */
+/* truncate.tsx: 240px, narrow enough to show the ellipsis. */
 .truncateBox {
   width: min(100%, calc(var(--prime-space-24) * 2.5));
 }

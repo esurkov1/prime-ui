@@ -1,6 +1,7 @@
-/* The root is a size container: give it a definite width, a shrink-wrapped container collapses. */
+/* Layout of the Timeline scenarios. The root is a size container: give it a definite width,
+   a shrink-wrapped container collapses. */
 
-/* 30rem. */
+/* 30rem feed. */
 .feed {
   width: min(100%, calc(var(--prime-space-24) * 5));
 }
@@ -13,28 +14,12 @@
   min-width: 0;
 }
 
-/* Caption above a feed: the gap replaces a bottom margin on the caption. */
-.cell {
-  display: grid;
-  gap: var(--prime-space-3);
-  min-width: 0;
-}
-
-.card {
-  width: min(100%, calc(var(--prime-space-24) * 5));
-}
-
-/* 375px phone width. */
+/* narrow.tsx: a 375px phone column. */
 .phone {
-  box-sizing: border-box;
-  display: grid;
-  gap: var(--prime-space-3);
   width: min(100%, calc(var(--prime-space-1) * 93.75));
 }
 
-/* 280px: below the 20rem container breakpoint. */
+/* narrow.tsx: 280px, below the 20rem container breakpoint. */
 .narrow {
-  display: grid;
-  gap: var(--prime-space-3);
   width: min(100%, calc(var(--prime-space-10) * 7));
 }

@@ -78,7 +78,7 @@ describe("Avatar", () => {
 describe("Avatar.Group", () => {
   it("renders avatars in group container", () => {
     const { container } = render(
-      <Avatar.Group.Root>
+      <Avatar.Group>
         <Avatar.Root>
           <Avatar.Fallback>A</Avatar.Fallback>
         </Avatar.Root>
@@ -88,22 +88,22 @@ describe("Avatar.Group", () => {
         <Avatar.Root>
           <Avatar.Fallback>C</Avatar.Fallback>
         </Avatar.Root>
-      </Avatar.Group.Root>,
+      </Avatar.Group>,
     );
-    expect(container.querySelector(`.${styles.groupRoot}`)).toBeInTheDocument();
+    expect(container.querySelector(`.${styles.group}`)).toBeInTheDocument();
     expect(screen.getByText("A")).toBeInTheDocument();
     expect(screen.getByText("B")).toBeInTheDocument();
     expect(screen.getByText("C")).toBeInTheDocument();
   });
 
-  it("injects size from Group.Root into avatars and overflow", () => {
+  it("passes the group size to avatars and overflow", () => {
     render(
-      <Avatar.Group.Root size="s" data-testid="group-root">
+      <Avatar.Group size="s" data-testid="group-root">
         <Avatar.Root data-testid="a">
           <Avatar.Fallback>A</Avatar.Fallback>
         </Avatar.Root>
-        <Avatar.Group.Overflow data-testid="ov">+3</Avatar.Group.Overflow>
-      </Avatar.Group.Root>,
+        <Avatar.Overflow data-testid="ov">+3</Avatar.Overflow>
+      </Avatar.Group>,
     );
     expect(screen.getByTestId("group-root")).toHaveAttribute("data-size", "s");
     expect(screen.getByTestId("a")).toHaveAttribute("data-size", "s");
@@ -113,22 +113,41 @@ describe("Avatar.Group", () => {
 
   it("does not override explicit size on Avatar.Root", () => {
     render(
-      <Avatar.Group.Root size="s">
+      <Avatar.Group size="s">
         <Avatar.Root size="xl" data-testid="a">
           <Avatar.Fallback>X</Avatar.Fallback>
         </Avatar.Root>
-      </Avatar.Group.Root>,
+      </Avatar.Group>,
     );
     expect(screen.getByTestId("a")).toHaveAttribute("data-size", "xl");
   });
 
-  it("merges className on Group.Root", () => {
+  it("re-shows the fallback when the image source changes", () => {
+    const { container, rerender } = render(
+      <Avatar.Root>
+        <Avatar.Image src="https://example.com/a.png" alt="" />
+        <Avatar.Fallback>F</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    fireEvent.load(container.querySelector("img") as HTMLImageElement);
+    expect(screen.getByText("F")).toHaveAttribute("aria-hidden", "true");
+    rerender(
+      <Avatar.Root>
+        <Avatar.Image src="https://example.com/b.png" alt="" />
+        <Avatar.Fallback>F</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(container.querySelector("img")).toHaveAttribute("data-status", "loading");
+    expect(screen.getByText("F")).not.toHaveAttribute("aria-hidden");
+  });
+
+  it("merges className on Group", () => {
     const { container } = render(
-      <Avatar.Group.Root className="group-custom">
+      <Avatar.Group className="group-custom">
         <Avatar.Root>
           <Avatar.Fallback>X</Avatar.Fallback>
         </Avatar.Root>
-      </Avatar.Group.Root>,
+      </Avatar.Group>,
     );
     expect(container.querySelector(".group-custom")).toBeInTheDocument();
   });
@@ -147,11 +166,11 @@ describe("Avatar.Group", () => {
 
     it("defaults color to gray and exposes the group role", () => {
       render(
-        <Avatar.Group.Root aria-label="Team">
+        <Avatar.Group aria-label="Team">
           <Avatar.Root data-testid="av">
             <Avatar.Fallback>G</Avatar.Fallback>
           </Avatar.Root>
-        </Avatar.Group.Root>,
+        </Avatar.Group>,
       );
       expect(screen.getByTestId("av")).toHaveAttribute("data-color", "gray");
       expect(screen.getByRole("group", { name: "Team" })).toBeInTheDocument();

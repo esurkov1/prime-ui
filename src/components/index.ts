@@ -23,10 +23,9 @@ export type {
 export { Accordion } from "./accordion/Accordion";
 export type {
   AvatarFallbackProps,
-  AvatarGroupOverflowProps,
-  AvatarGroupRootProps,
+  AvatarGroupProps,
   AvatarImageProps,
-  AvatarImageStatus,
+  AvatarOverflowProps,
   AvatarPresence,
   AvatarRootProps,
   AvatarSize,
@@ -37,7 +36,6 @@ export { Avatar } from "./avatar/Avatar";
 export * from "./badge/Badge";
 export type {
   BannerActionsProps,
-  BannerCloseButtonProps,
   BannerContentProps,
   BannerDescriptionProps,
   BannerIconProps,
@@ -98,7 +96,7 @@ export type {
 export { Checkbox } from "./checkbox/Checkbox";
 export type {
   CodeBlockColorScheme,
-  CodeBlockRootProps,
+  CodeBlockProps,
   CodeBlockVariant,
 } from "./code-block/CodeBlock";
 export { CodeBlock } from "./code-block/CodeBlock";
@@ -170,7 +168,7 @@ export {
 } from "./datepicker/Datepicker";
 export type { DigitInputLabels, DigitInputProps } from "./digit-input/DigitInput";
 export { DigitInput } from "./digit-input/DigitInput";
-export type { DividerAlign, DividerOrientation, DividerRootProps } from "./divider/Divider";
+export type { DividerAlign, DividerOrientation, DividerProps } from "./divider/Divider";
 export { Divider } from "./divider/Divider";
 export type {
   Activation,
@@ -255,7 +253,7 @@ export type {
   InputWrapperProps,
 } from "./input/Input";
 export { Input } from "./input/Input";
-export type { KbdRootProps } from "./kbd/Kbd";
+export type { KbdProps } from "./kbd/Kbd";
 export { Kbd } from "./kbd/Kbd";
 export type {
   LabelDescriptionProps,
@@ -302,6 +300,7 @@ export type {
   NotificationOptions,
   NotificationPosition,
   NotificationRecord,
+  NotificationTone,
 } from "./notification/Notification";
 export { NotificationCard } from "./notification/Notification";
 export type { NotificationProviderProps } from "./notification/NotificationStore";
@@ -335,9 +334,12 @@ export type {
   PopoverTriggerProps,
 } from "./popover/Popover";
 export { Popover } from "./popover/Popover";
-export type { ProgressBarLabels, ProgressBarRootProps } from "./progress-bar/ProgressBar";
+export type { ProgressBarLabels, ProgressBarProps } from "./progress-bar/ProgressBar";
 export { ProgressBar } from "./progress-bar/ProgressBar";
-export type { ProgressCircleRootProps } from "./progress-circle/ProgressCircle";
+export type {
+  ProgressCircleLabels,
+  ProgressCircleProps,
+} from "./progress-circle/ProgressCircle";
 export { ProgressCircle } from "./progress-circle/ProgressCircle";
 export type {
   RadioGroupLabels,
@@ -427,7 +429,6 @@ export { Textarea } from "./textarea/Textarea";
 export type {
   ThumbnailFallbackProps,
   ThumbnailImageProps,
-  ThumbnailImageStatus,
   ThumbnailRatio,
   ThumbnailRootProps,
 } from "./thumbnail/Thumbnail";

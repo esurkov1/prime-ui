@@ -1,8 +1,8 @@
 /**
  * Docs contract: every exported component ships a COMPONENT.md and examples/ that stay in sync
- * with the playground and import the kit only by its package name. Components converted to the
- * page standard (`playground/pageStandard.ts`) are also checked for kind, slots, order, the
- * example file canon and the COMPONENT.md template.
+ * with the playground and import the kit only by its package name, and follow the page standard
+ * (`playground/pageStandard.ts`): kind, slots, order, the example file canon and the COMPONENT.md
+ * template.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -22,28 +22,6 @@ import { applyApiToDoc, type ComponentApi } from "../../scripts/docs/componentAp
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
-
-/**
- * Pages still on the old layout. The page-standard checks skip them; Stage 1 converts them and
- * empties this list. Never add a dir here: new and converted pages follow the standard.
- */
-const NOT_CONVERTED = new Set([
-  "avatar",
-  "badge",
-  "banner",
-  "card",
-  "code-block",
-  "divider",
-  "drawer",
-  "empty-page",
-  "kbd",
-  "notification",
-  "progress-bar",
-  "progress-circle",
-  "thumbnail",
-  "timeline",
-  "typography",
-]);
 
 type ComponentDir = { base: "components" | "layout"; dir: string; rel: string };
 
@@ -130,9 +108,6 @@ const PLACEHOLDER_TEXT = /lorem|ipsum|Пункт \d|Item \d|Элемент \d|[\
 
 const dirs = exportedDirs();
 const categories = categoriesByDir();
-const playgroundSource = walk("playground", /\.tsx?$/)
-  .map(read)
-  .join("\n");
 
 const sectionModules = import.meta.glob<{ page?: ComponentPageConfig }>(
   "../../playground/sections/*Section.tsx",
@@ -161,15 +136,9 @@ describe("docs contract", () => {
     expect(dirs.length).toBeGreaterThan(40);
   });
 
-  it("the exclusion list names only exported dirs", () => {
-    const names = new Set(dirs.map((d) => d.dir));
-    for (const dir of NOT_CONVERTED) expect(names.has(dir), dir).toBe(true);
-  });
-
   describe.each(dirs)("$rel", ({ base, dir, rel }) => {
     const docPath = `${rel}/COMPONENT.md`;
     const examples = walk(`${rel}/examples`, /\.tsx$/);
-    const converted = !NOT_CONVERTED.has(dir);
 
     it("has COMPONENT.md and examples/", () => {
       expect(fs.existsSync(path.join(root, docPath)), docPath).toBe(true);
@@ -194,12 +163,6 @@ describe("docs contract", () => {
       const stem = name.replace(/\.tsx$/, "");
 
       expect(read(docPath), `${file} is not listed in COMPONENT.md`).toContain(`examples/${name}`);
-      if (!converted) {
-        expect(
-          playgroundSource.includes(`@/${base}/${dir}/examples/${stem}"`),
-          `${file} is not imported by the playground`,
-        ).toBe(true);
-      }
 
       expect(source.startsWith("/**"), `${file}: first line must be a JSDoc`).toBe(true);
       expect(source.match(/^export default function \w+Example\(/gm)?.length).toBe(1);
@@ -210,16 +173,14 @@ describe("docs contract", () => {
         expect(ok, `${file} imports "${spec}"`).toBe(true);
       }
 
-      if (converted) {
-        expect(jsdocOf(source), `${file}: one-line English JSDoc ending with "."`).toMatch(
-          /^[^Ѐ-ӿ]+\.$/,
-        );
-        expect(source, `${file}: function name`).toMatch(
-          new RegExp(`^export default function ${pascal(dir)}${pascal(stem)}Example\\(\\)`, "m"),
-        );
-        expect(source, `${file}: inline style`).not.toMatch(/style=\{\{/);
-        expect(source, `${file}: placeholder text`).not.toMatch(PLACEHOLDER_TEXT);
-      }
+      expect(jsdocOf(source), `${file}: one-line English JSDoc ending with "."`).toMatch(
+        /^[^Ѐ-ӿ]+\.$/,
+      );
+      expect(source, `${file}: function name`).toMatch(
+        new RegExp(`^export default function ${pascal(dir)}${pascal(stem)}Example\\(\\)`, "m"),
+      );
+      expect(source, `${file}: inline style`).not.toMatch(/style=\{\{/);
+      expect(source, `${file}: placeholder text`).not.toMatch(PLACEHOLDER_TEXT);
     });
 
     it("example styles use semantic tokens only", () => {
@@ -237,8 +198,6 @@ describe("docs contract", () => {
         );
       }
     });
-
-    if (!converted) return;
 
     describe("page standard", () => {
       let page: ComponentPageConfig;

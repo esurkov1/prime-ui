@@ -1,4 +1,4 @@
-/** `EmptyPage.Icon tone`: `neutral` — no data yet, `accent` — first run and a call to start, `danger` — failed to load. Pick the tone by why the area is empty. */
+/** The tile tone tells why the area is empty: no data yet, a first run, or a failed load — `tone`. */
 import { CloudOff, Inbox, Rocket } from "lucide-react";
 import { Button, EmptyPage } from "prime-ui-kit";
 

@@ -921,7 +921,7 @@ export type SelectSeparatorProps = { className?: string };
 
 /** A full-bleed hairline between groups; hidden while searching. */
 function SelectSeparator({ className }: SelectSeparatorProps) {
-  return <Divider.Root className={cx(menu.separator, styles.separator, className)} />;
+  return <Divider className={cx(menu.separator, styles.separator, className)} />;
 }
 SelectSeparator.displayName = "Select.Separator";
 

@@ -210,8 +210,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "A key hint, e.g. `<Kbd.Root>⌘K</Kbd.Root>`.",
-          ru: "Подсказка клавиш, например `<Kbd.Root>⌘K</Kbd.Root>`.",
+          en: "A key hint, e.g. `<Kbd>⌘K</Kbd>`.",
+          ru: "Подсказка клавиш, например `<Kbd>⌘K</Kbd>`.",
         },
         {
           name: "className",

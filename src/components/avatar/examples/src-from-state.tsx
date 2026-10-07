@@ -1,11 +1,10 @@
-/** Changing `src` restarts loading; initials show until the new photo arrives. Use when the photo comes from state (upload, profile switch). */
-
+/** A new photo source restarts loading; initials show until the new photo arrives — `src`. */
 import { Avatar, Button } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-const sources = [
+const SOURCES = [
   "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=128&h=128&fit=crop",
   "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=128&h=128&fit=crop",
 ] as const;
@@ -16,13 +15,13 @@ export default function AvatarSrcFromStateExample() {
   return (
     <div className={styles.row}>
       <Avatar.Root size="xl" color="sky">
-        <Avatar.Image src={sources[index]} alt="" />
+        <Avatar.Image src={SOURCES[index]} alt="" />
         <Avatar.Fallback>ИП</Avatar.Fallback>
       </Avatar.Root>
       <Button.Root
         variant="outline"
         tone="neutral"
-        onClick={() => setIndex((i) => (i + 1) % sources.length)}
+        onClick={() => setIndex((i) => (i + 1) % SOURCES.length)}
       >
         Сменить фото
       </Button.Root>

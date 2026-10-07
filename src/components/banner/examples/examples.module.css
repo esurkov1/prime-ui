@@ -1,4 +1,4 @@
-/* Layout helpers for the Banner examples. Semantic tokens only. */
+/* Layout of the Banner scenarios: semantic tokens only. */
 
 .stack {
   display: flex;
@@ -8,24 +8,13 @@
   min-width: 0;
 }
 
+/* placement.tsx: a page frame above a card. */
 .sections {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-6);
   width: 100%;
   min-width: 0;
-}
-
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-/* 320px column: the banner's own container query moves actions under the text. */
-.narrow {
-  width: min(100%, calc(var(--prime-space-20) * 4));
 }
 
 .pageFrame {
@@ -43,6 +32,12 @@
   padding: var(--prime-space-5) var(--prime-space-4) var(--prime-space-8);
 }
 
+/* narrow.tsx: a 320px column; the banner's container query moves actions under the text. */
+.narrow {
+  width: min(100%, calc(var(--prime-space-20) * 4));
+}
+
+/* dismiss.tsx */
 .restore {
   align-self: flex-start;
 }

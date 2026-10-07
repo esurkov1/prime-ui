@@ -1,33 +1,24 @@
-/* Layout for the Divider examples: layout only, text goes through Typography. */
+/* Layout of the Divider scenarios: semantic tokens only. */
 
+/* A column as wide as a short form: the lines need room to read as lines. */
 .column {
   display: grid;
-  gap: var(--prime-space-6);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
-.group {
-  display: grid;
-  gap: var(--prime-space-2);
-}
-
-.lineSpacingColumn {
-  display: flex;
-  flex-direction: column;
   gap: var(--prime-space-3);
+  width: min(100%, var(--prime-modal-width-s));
 }
 
+/* vertical.tsx: the row stretches the vertical line to the buttons' height. */
 .toolbar {
   display: flex;
   align-items: center;
   gap: var(--prime-space-2);
-  width: fit-content;
 }
 
+/* overview.tsx */
 .list {
   display: flex;
   flex-direction: column;
+  width: min(100%, var(--prime-modal-width-s));
 }
 
 .listRow {
@@ -36,9 +27,4 @@
   justify-content: space-between;
   gap: var(--prime-space-4);
   padding-block: var(--prime-space-3);
-}
-
-.stack {
-  display: grid;
-  gap: var(--prime-space-3);
 }

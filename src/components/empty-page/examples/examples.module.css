@@ -1,6 +1,6 @@
-/* Layout helpers for the EmptyPage examples. Semantic tokens only. */
+/* Layout of the EmptyPage scenarios: semantic tokens only. */
 
-/* Columns of at least 16rem. */
+/* sizes.tsx, icon-tones.tsx: columns of at least 16rem. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr));
@@ -10,14 +10,7 @@
   min-width: 0;
 }
 
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-/* Data region: white surface with a fixed minimum height, EmptyPage fills it. */
+/* data-region.tsx: a card with a minimum height that the empty state fills. */
 .region {
   box-sizing: border-box;
   display: flex;
@@ -30,6 +23,15 @@
   overflow: hidden;
 }
 
+.regionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-4) var(--prime-card-padding-m);
+}
+
 /* compact.tsx: a floating panel (menu / listbox) the compact empty state sits in. */
 .panel {
   box-sizing: border-box;
@@ -40,11 +42,11 @@
   box-shadow: var(--prime-shadow-overlay);
 }
 
-.regionHeader {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-  padding: var(--prime-space-4) var(--prime-card-padding-m);
+/* narrow.tsx: a 320px side panel on the card fill. */
+.narrow {
+  box-sizing: border-box;
+  width: min(100%, calc(var(--prime-space-20) * 4));
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
 }
