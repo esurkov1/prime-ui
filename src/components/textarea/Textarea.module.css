@@ -1,105 +1,53 @@
 /*
- * Textarea follows the Input field system (see Input.module.css): fill-based box, tier text,
- * label above (label-gap), support row below (hint-gap) with hint | error and a right-aligned counter.
+ * Textarea follows the Input field system (see Input.module.css): fill-based box, tier text. Label
+ * row and support row come from FieldFrame and FieldSupport.
  * Vertical padding = (control height − line height) / 2, so one line sits exactly like an Input.
  */
-.field {
+.root {
   --prime-textarea-height: var(--prime-control-m-height);
   --prime-textarea-padding-x: var(--prime-control-m-field-padding-x);
   --prime-textarea-radius: var(--prime-control-m-radius);
   --prime-textarea-body-size: var(--prime-control-m-text-size);
   --prime-textarea-line-height: var(--prime-control-m-line-height);
-  --prime-textarea-label-size: var(--prime-control-m-label-size);
-  --prime-textarea-label-line-height: var(--prime-control-m-label-line-height);
-  --prime-textarea-hint-size: var(--prime-control-m-hint-size);
-  --prime-textarea-hint-line-height: var(--prime-control-m-hint-line-height);
-  --prime-textarea-label-gap: var(--prime-control-m-label-gap);
-  --prime-textarea-hint-gap: var(--prime-control-m-hint-gap);
   --prime-textarea-padding-y: calc(
     (var(--prime-textarea-height) - var(--prime-textarea-line-height)) /
     2
   );
   /* Minimum content height: three lines. */
   --prime-textarea-inner-min-height: calc(var(--prime-textarea-line-height) * 3);
-  box-sizing: border-box;
   width: 100%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-textarea-label-gap);
-  font-family: var(--prime-font-family-sans);
 }
 
-.field[data-size="xs"] {
+.root[data-size="xs"] {
   --prime-textarea-height: var(--prime-control-xs-height);
   --prime-textarea-padding-x: var(--prime-control-xs-field-padding-x);
   --prime-textarea-radius: var(--prime-control-xs-radius);
   --prime-textarea-body-size: var(--prime-control-xs-text-size);
   --prime-textarea-line-height: var(--prime-control-xs-line-height);
-  --prime-textarea-label-size: var(--prime-control-xs-label-size);
-  --prime-textarea-label-line-height: var(--prime-control-xs-label-line-height);
-  --prime-textarea-hint-size: var(--prime-control-xs-hint-size);
-  --prime-textarea-hint-line-height: var(--prime-control-xs-hint-line-height);
-  --prime-textarea-label-gap: var(--prime-control-xs-label-gap);
-  --prime-textarea-hint-gap: var(--prime-control-xs-hint-gap);
 }
 
-.field[data-size="s"] {
+.root[data-size="s"] {
   --prime-textarea-height: var(--prime-control-s-height);
   --prime-textarea-padding-x: var(--prime-control-s-field-padding-x);
   --prime-textarea-radius: var(--prime-control-s-radius);
   --prime-textarea-body-size: var(--prime-control-s-text-size);
   --prime-textarea-line-height: var(--prime-control-s-line-height);
-  --prime-textarea-label-size: var(--prime-control-s-label-size);
-  --prime-textarea-label-line-height: var(--prime-control-s-label-line-height);
-  --prime-textarea-hint-size: var(--prime-control-s-hint-size);
-  --prime-textarea-hint-line-height: var(--prime-control-s-hint-line-height);
-  --prime-textarea-label-gap: var(--prime-control-s-label-gap);
-  --prime-textarea-hint-gap: var(--prime-control-s-hint-gap);
 }
 
-.field[data-size="l"] {
+.root[data-size="l"] {
   --prime-textarea-height: var(--prime-control-l-height);
   --prime-textarea-padding-x: var(--prime-control-l-field-padding-x);
   --prime-textarea-radius: var(--prime-control-l-radius);
   --prime-textarea-body-size: var(--prime-control-l-text-size);
   --prime-textarea-line-height: var(--prime-control-l-line-height);
-  --prime-textarea-label-size: var(--prime-control-l-label-size);
-  --prime-textarea-label-line-height: var(--prime-control-l-label-line-height);
-  --prime-textarea-hint-size: var(--prime-control-l-hint-size);
-  --prime-textarea-hint-line-height: var(--prime-control-l-hint-line-height);
-  --prime-textarea-label-gap: var(--prime-control-l-label-gap);
-  --prime-textarea-hint-gap: var(--prime-control-l-hint-gap);
 }
 
-.field[data-size="xl"] {
+.root[data-size="xl"] {
   --prime-textarea-height: var(--prime-control-xl-height);
   --prime-textarea-padding-x: var(--prime-control-xl-field-padding-x);
   --prime-textarea-radius: var(--prime-control-xl-radius);
   --prime-textarea-body-size: var(--prime-control-xl-text-size);
   --prime-textarea-line-height: var(--prime-control-xl-line-height);
-  --prime-textarea-label-size: var(--prime-control-xl-label-size);
-  --prime-textarea-label-line-height: var(--prime-control-xl-label-line-height);
-  --prime-textarea-hint-size: var(--prime-control-xl-hint-size);
-  --prime-textarea-hint-line-height: var(--prime-control-xl-hint-line-height);
-  --prime-textarea-label-gap: var(--prime-control-xl-label-gap);
-  --prime-textarea-hint-gap: var(--prime-control-xl-hint-gap);
-}
-
-/* ── Header ── */
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: var(--prime-space-1);
-  min-width: 0;
-}
-
-.body {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-textarea-hint-gap);
 }
 
 /* ── Field box ── */
@@ -230,52 +178,4 @@
 
 .textarea:disabled::placeholder {
   color: var(--prime-color-text-disabled);
-}
-
-/* ── Support row: hint | error · counter ── */
-.support {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.support[data-reserve="true"] {
-  min-height: var(--prime-textarea-hint-line-height);
-}
-
-.supportText {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.supportCounter {
-  flex-shrink: 0;
-}
-
-.counter {
-  display: block;
-  font-size: var(--prime-textarea-hint-size);
-  line-height: var(--prime-textarea-hint-line-height);
-  font-variant-numeric: tabular-nums;
-  color: var(--prime-color-text-muted);
-  white-space: nowrap;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.counter[data-invalid="true"] {
-  color: var(--prime-color-danger-text);
-}
-
-.srOnly {
-  position: absolute;
-  width: var(--prime-border-width);
-  height: var(--prime-border-width);
-  padding: 0;
-  margin: calc(-1 * var(--prime-border-width));
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
 }

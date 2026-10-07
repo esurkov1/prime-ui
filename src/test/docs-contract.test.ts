@@ -73,7 +73,6 @@ const NOT_CONVERTED = new Set([
   "switch",
   "tabs",
   "tag-select",
-  "textarea",
   "thumbnail",
   "timeline",
   "tooltip",
