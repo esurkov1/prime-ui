@@ -9,6 +9,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsUpDown,
   ChevronUp,
   Circle,
   CircleDot,
@@ -59,6 +61,8 @@ export const IconChevronDown = createIcon(ChevronDown);
 export const IconChevronLeft = createIcon(ChevronLeft);
 export const IconChevronRight = createIcon(ChevronRight);
 export const IconChevronUp = createIcon(ChevronUp);
+export const IconChevronsLeft = createIcon(ChevronsLeft);
+export const IconChevronsUpDown = createIcon(ChevronsUpDown);
 export const IconCircleDot = createIcon(CircleDot);
 export const IconClose = createIcon(X);
 export const IconCloudUpload = createIcon(CloudUpload);
@@ -109,6 +113,8 @@ export const iconRegistry = {
   "nav.chevronLeft": IconChevronLeft,
   "nav.chevronRight": IconChevronRight,
   "nav.chevronUp": IconChevronUp,
+  "nav.chevronsLeft": IconChevronsLeft,
+  "nav.chevronsUpDown": IconChevronsUpDown,
   "nav.home": IconHouse,
   "nav.itemDot": IconNavItemDot,
   "nav.layoutGrid": IconLayoutGrid,

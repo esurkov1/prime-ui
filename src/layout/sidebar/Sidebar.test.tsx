@@ -1,7 +1,11 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { Home, Settings } from "lucide-react";
+import type * as React from "react";
 import { MemoryRouter, NavLink } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { Avatar } from "@/components/avatar/Avatar";
+import { Dropdown } from "@/components/dropdown/Dropdown";
 
 import { Sidebar, type SidebarMode, useSidebar } from "./Sidebar";
 
@@ -87,11 +91,11 @@ describe("Sidebar", () => {
     expect(screen.getByRole("group", { name: "Разделы" })).toBeInTheDocument();
   });
 
-  it("places item parts around the label: hidden icon, count badge in the name", () => {
+  it("places item parts around the label: hidden icon, a plain count in the name", () => {
     render(<Basic />);
     const item = screen.getByRole("button", { name: /^Настройки\s*5$/ });
     expect(item.firstElementChild).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getByText("5")).toHaveAttribute("data-color", "gray");
+    expect(screen.getByText("5")).not.toHaveAttribute("data-color");
   });
 
   it("puts the scrolling region in a ScrollContainer with edge fades", () => {
@@ -169,12 +173,12 @@ describe("Sidebar", () => {
     expect(rootOf(nav)).toHaveAttribute("data-mode", "expanded");
   });
 
-  it("edge Toggle: a round button that switches modes from the keyboard", () => {
+  it("header Toggle: one button that switches modes from the keyboard and stays focused", () => {
     render(
       <Sidebar.Root responsive={false}>
         <Sidebar.Header>
-          Склад
-          <Sidebar.Toggle variant="edge" />
+          <Sidebar.Brand href="/">Склад</Sidebar.Brand>
+          <Sidebar.Toggle variant="header" />
         </Sidebar.Header>
       </Sidebar.Root>,
     );
@@ -182,27 +186,31 @@ describe("Sidebar", () => {
     const toggle = screen.getByRole("button", { name: "Свернуть панель" });
     expect(toggle).toHaveAttribute("aria-controls", nav.id);
     expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveAttribute("data-variant", "ghost");
 
     toggle.focus();
-    fireEvent.keyDown(toggle, { key: "Enter" });
     fireEvent.click(toggle);
     expect(rootOf(nav)).toHaveAttribute("data-mode", "compact");
     expect(toggle).toHaveAccessibleName("Развернуть панель");
+    // On the rail edge it is the same element, now soft.
+    expect(toggle).toHaveAttribute("data-variant", "soft");
     expect(document.activeElement).toBe(toggle);
   });
 
-  it("edge Toggle renders nothing off-canvas", () => {
+  it("header Toggle closes the off-canvas panel", () => {
     mockViewport(true);
     render(
-      <Sidebar.Root>
+      <Sidebar.Root defaultOpen>
         <Sidebar.Header>
-          <Sidebar.Toggle variant="edge" />
+          <Sidebar.Toggle variant="header" />
         </Sidebar.Header>
       </Sidebar.Root>,
     );
-    // Only the scrim is left: it is labelled `labels.close`; no edge toggle is rendered.
-    expect(screen.queryByRole("button", { name: /панель/ })).toBeNull();
-    expect(document.querySelectorAll("button")).toHaveLength(1);
+    const nav = screen.getByRole("navigation");
+    const toggle = nav.querySelector("button[aria-controls]") as HTMLElement;
+    expect(toggle).toHaveAccessibleName("Закрыть навигацию");
+    fireEvent.click(toggle);
+    expect(rootOf(nav)).toHaveAttribute("data-state", "closed");
   });
 
   it("keeps focus on the toggle across mode changes (no remount)", () => {
@@ -375,5 +383,320 @@ describe("Sidebar", () => {
     );
     fireEvent.click(screen.getByText("hide"));
     expect(seen.at(-1)).toBe("hidden");
+  });
+});
+
+describe("Sidebar item parts", () => {
+  it("ItemCount is a plain number by default and a Badge with color / variant", () => {
+    render(
+      <Sidebar.Root responsive={false}>
+        <Sidebar.Item>
+          Бэклог
+          <Sidebar.ItemCount>24</Sidebar.ItemCount>
+        </Sidebar.Item>
+        <Sidebar.Item>
+          Уведомления
+          <Sidebar.ItemCount color="red">7</Sidebar.ItemCount>
+        </Sidebar.Item>
+        <Sidebar.Item>
+          Сбои
+          <Sidebar.ItemCount variant="solid">!</Sidebar.ItemCount>
+        </Sidebar.Item>
+      </Sidebar.Root>,
+    );
+    expect(screen.getByText("24")).not.toHaveAttribute("data-color");
+    const red = screen.getByText("7");
+    expect(red).toHaveAttribute("data-color", "red");
+    expect(red).toHaveAttribute("data-variant", "soft");
+    const solid = screen.getByText("!");
+    expect(solid).toHaveAttribute("data-color", "gray");
+    expect(solid).toHaveAttribute("data-variant", "solid");
+  });
+
+  it("an ItemIcon after the label is a trailing icon", () => {
+    render(
+      <Sidebar.Root responsive={false}>
+        <Sidebar.Item href="/help">
+          <Sidebar.ItemIcon>
+            <Home data-testid="lead" />
+          </Sidebar.ItemIcon>
+          Справка
+          <Sidebar.ItemIcon>
+            <Settings data-testid="trail" />
+          </Sidebar.ItemIcon>
+        </Sidebar.Item>
+      </Sidebar.Root>,
+    );
+    const link = screen.getByRole("link", { name: "Справка" });
+    expect(link.firstElementChild).toContainElement(screen.getByTestId("lead"));
+    expect(screen.getByTestId("lead").parentElement).not.toHaveAttribute("data-edge");
+    expect(screen.getByTestId("trail").parentElement).toHaveAttribute("data-edge", "end");
+  });
+
+  it("ItemAction is a separate button next to the item, never inside it", () => {
+    const onClick = vi.fn();
+    render(
+      <Sidebar.Root responsive={false}>
+        <Sidebar.Item href="/deals">
+          Сделки
+          <Sidebar.ItemAction label="Создать сделку" onClick={onClick} />
+        </Sidebar.Item>
+      </Sidebar.Root>,
+    );
+    const link = screen.getByRole("link", { name: "Сделки" });
+    const action = screen.getByRole("button", { name: "Создать сделку" });
+    expect(link).not.toContainElement(action);
+    expect(link.parentElement).toContainElement(action);
+    fireEvent.click(action);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Sidebar.Brand and Sidebar.Account", () => {
+  it("Brand renders the logo, name and description; a link with href", () => {
+    render(
+      <Sidebar.Root responsive={false}>
+        <Sidebar.Header>
+          <Sidebar.Brand href="/" description="Отдел продаж">
+            <Sidebar.BrandLogo>
+              <svg data-testid="logo" />
+            </Sidebar.BrandLogo>
+            Прайм CRM
+          </Sidebar.Brand>
+        </Sidebar.Header>
+      </Sidebar.Root>,
+    );
+    const link = screen.getByRole("link", { name: /Прайм CRM/ });
+    expect(link).toHaveAttribute("href", "/");
+    expect(link).toHaveTextContent("Отдел продаж");
+    expect(screen.getByTestId("logo").parentElement).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("Account is a button named by the person and opens a Dropdown", () => {
+    render(
+      <Sidebar.Root responsive={false}>
+        <Sidebar.Footer>
+          <Dropdown.Root>
+            <Dropdown.Trigger>
+              <Sidebar.Account description="anna@company.ru">
+                <Avatar.Root>
+                  <Avatar.Fallback>АС</Avatar.Fallback>
+                </Avatar.Root>
+                Анна Смирнова
+              </Sidebar.Account>
+            </Dropdown.Trigger>
+            <Dropdown.Content>
+              <Dropdown.Item>Выйти</Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown.Root>
+        </Sidebar.Footer>
+      </Sidebar.Root>,
+    );
+    // The avatar initials are hidden: the name says who it is.
+    const account = screen.getByRole("button", { name: /^Анна Смирнова\s*anna@company\.ru$/ });
+    expect(account).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(account);
+    expect(account).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("menuitem", { name: "Выйти" })).toBeInTheDocument();
+  });
+});
+
+describe("Sidebar.Group collapsible", () => {
+  function Groups(props: Partial<React.ComponentProps<typeof Sidebar.Group>>) {
+    return (
+      <Sidebar.Root responsive={false}>
+        <Sidebar.Content>
+          <Sidebar.Group label="Инструменты" collapsible {...props}>
+            <Sidebar.Item href="/tasks">Задачи</Sidebar.Item>
+          </Sidebar.Group>
+        </Sidebar.Content>
+      </Sidebar.Root>
+    );
+  }
+
+  it("the heading is a disclosure button that hides the items from the tab order", () => {
+    render(<Groups />);
+    const heading = screen.getByRole("button", { name: "Инструменты" });
+    const region = document.getElementById(heading.getAttribute("aria-controls") ?? "");
+    expect(heading).toHaveAttribute("aria-expanded", "true");
+    expect(region).toHaveAttribute("data-state", "open");
+    expect(screen.getByRole("group", { name: "Инструменты" })).toBeInTheDocument();
+
+    fireEvent.click(heading);
+    expect(heading).toHaveAttribute("aria-expanded", "false");
+    expect(region).toHaveAttribute("data-state", "closed");
+    expect(region).toHaveAttribute("inert");
+  });
+
+  it("controlled: reports changes through onOpenChange", () => {
+    const onOpenChange = vi.fn();
+    render(<Groups open={false} onOpenChange={onOpenChange} />);
+    const heading = screen.getByRole("button", { name: "Инструменты" });
+    fireEvent.click(heading);
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(heading).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("opens by itself when it holds the current page", () => {
+    render(
+      <Sidebar.Root responsive={false}>
+        <Sidebar.Group label="Инструменты" collapsible defaultOpen={false}>
+          <Sidebar.Item current>Задачи</Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Инструменты" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+  });
+
+  it("on the compact rail the items show and the heading leaves the tab order", () => {
+    render(
+      <Sidebar.Root responsive={false} mode="compact">
+        <Sidebar.Group label="Инструменты" collapsible defaultOpen={false}>
+          <Sidebar.Item>Задачи</Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar.Root>,
+    );
+    const heading = document.querySelector("button[aria-controls]") as HTMLElement;
+    expect(heading).toHaveAttribute("inert");
+    const region = document.getElementById(heading.getAttribute("aria-controls") ?? "");
+    expect(region).toHaveAttribute("data-state", "open");
+    expect(region).not.toHaveAttribute("inert");
+  });
+});
+
+describe("Sidebar.Sub", () => {
+  function Nested({
+    current = false,
+    ...root
+  }: Partial<React.ComponentProps<typeof Sidebar.Root>> & { current?: boolean }) {
+    return (
+      <Sidebar.Root responsive={false} {...root}>
+        <Sidebar.Sub>
+          <Sidebar.SubTrigger>
+            <Sidebar.ItemIcon>
+              <Home />
+            </Sidebar.ItemIcon>
+            Задачи
+          </Sidebar.SubTrigger>
+          <Sidebar.SubContent>
+            <Sidebar.Item href="/backlog">Бэклог</Sidebar.Item>
+            <Sidebar.Item href="/review" current={current}>
+              На проверке
+            </Sidebar.Item>
+          </Sidebar.SubContent>
+        </Sidebar.Sub>
+      </Sidebar.Root>
+    );
+  }
+
+  it("the parent is a disclosure button: click and arrows open and close the children", () => {
+    render(<Nested />);
+    const parent = screen.getByRole("button", { name: "Задачи" });
+    const region = document.getElementById(parent.getAttribute("aria-controls") ?? "");
+    expect(parent).toHaveAttribute("aria-expanded", "false");
+    expect(region).toHaveAttribute("inert");
+    expect(region).toHaveAttribute("role", "group");
+    expect(region).toHaveAttribute("aria-labelledby", parent.id);
+
+    fireEvent.click(parent);
+    expect(parent).toHaveAttribute("aria-expanded", "true");
+    expect(region).not.toHaveAttribute("inert");
+
+    fireEvent.keyDown(parent, { key: "ArrowLeft" });
+    expect(parent).toHaveAttribute("aria-expanded", "false");
+    fireEvent.keyDown(parent, { key: "ArrowRight" });
+    expect(parent).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("a current child opens the parent and marks the active path", () => {
+    render(<Nested current />);
+    const parent = screen.getByRole("button", { name: "Задачи" });
+    expect(parent).toHaveAttribute("aria-expanded", "true");
+    expect(parent).toHaveAttribute("data-active-path", "true");
+    expect(parent).not.toHaveAttribute("aria-current");
+  });
+
+  describe("compact flyout", () => {
+    it("Enter opens the flyout and focuses the first child; arrows move; Escape returns", () => {
+      render(<Nested mode="compact" current />);
+      const parent = screen.getByRole("button", { name: "Задачи" });
+      expect(parent).toHaveAttribute("aria-haspopup", "dialog");
+      expect(parent).toHaveAttribute("aria-expanded", "false");
+      parent.focus();
+      fireEvent.keyDown(parent, { key: "Enter" });
+
+      const flyout = screen.getByRole("dialog", { name: "Задачи" });
+      expect(parent).toHaveAttribute("aria-expanded", "true");
+      const backlog = within(flyout).getByRole("link", { name: "Бэклог" });
+      expect(document.activeElement).toBe(backlog);
+      const review = within(flyout).getByRole("link", { name: "На проверке" });
+      expect(review).toHaveAttribute("aria-current", "page");
+
+      fireEvent.keyDown(backlog, { key: "ArrowDown" });
+      expect(document.activeElement).toBe(review);
+
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(parent).toHaveAttribute("aria-expanded", "false");
+      expect(document.activeElement).toBe(parent);
+    });
+
+    it("ArrowRight opens it and ArrowLeft brings focus back to the parent", () => {
+      render(<Nested mode="compact" />);
+      const parent = screen.getByRole("button", { name: "Задачи" });
+      parent.focus();
+      fireEvent.keyDown(parent, { key: "ArrowRight" });
+      expect(screen.getByRole("dialog")).toContainElement(document.activeElement as HTMLElement);
+      fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowLeft" });
+      expect(document.activeElement).toBe(parent);
+      expect(parent).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("hover opens after the intent delay, leaving closes after the grace period", () => {
+      vi.useFakeTimers();
+      try {
+        render(<Nested mode="compact" />);
+        const parent = screen.getByRole("button", { name: "Задачи" });
+        fireEvent.pointerEnter(parent, { pointerType: "mouse" });
+        expect(parent).toHaveAttribute("aria-expanded", "false");
+        act(() => {
+          vi.advanceTimersByTime(200);
+        });
+        expect(parent).toHaveAttribute("aria-expanded", "true");
+
+        fireEvent.pointerLeave(parent, { pointerType: "mouse" });
+        act(() => {
+          vi.advanceTimersByTime(100);
+        });
+        // Still open: the pointer may be on its way into the flyout.
+        expect(parent).toHaveAttribute("aria-expanded", "true");
+        act(() => {
+          vi.advanceTimersByTime(400);
+        });
+        expect(parent).toHaveAttribute("aria-expanded", "false");
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("a click on a child closes the flyout", () => {
+      render(<Nested mode="compact" />);
+      const parent = screen.getByRole("button", { name: "Задачи" });
+      fireEvent.click(parent);
+      fireEvent.click(within(screen.getByRole("dialog")).getByRole("link", { name: "Бэклог" }));
+      expect(parent).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("keeps the inline children inert on the rail", () => {
+      render(<Nested mode="compact" current />);
+      const parent = screen.getByRole("button", { name: "Задачи" });
+      expect(parent).toHaveAttribute("data-active-path", "true");
+      const inline = document.getElementById(
+        parent.getAttribute("aria-labelledby") ?? `${parent.id.replace(/-trigger$/, "")}-content`,
+      );
+      expect(inline).toHaveAttribute("inert");
+    });
   });
 });
