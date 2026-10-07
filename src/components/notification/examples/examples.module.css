@@ -23,18 +23,16 @@
   width: min(100%, calc(var(--prime-space-16) * 4));
 }
 
-/* in-form.tsx: a settings form on a card fill. */
+/* in-form.tsx: a settings form in a Card. */
+.formCard {
+  width: min(100%, var(--prime-modal-width-s));
+}
+
 .form {
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-5);
-  width: min(100%, var(--prime-modal-width-s));
   padding: var(--prime-card-padding-m);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 }
 
 .actions {

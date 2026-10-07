@@ -1,5 +1,5 @@
 /** Edges fade where more content is hidden; the horizontal strip also hides its scrollbar — `fade`, `scrollbar`. */
-import { Badge, ScrollContainer, Typography } from "prime-ui-kit";
+import { Badge, Card, ScrollContainer, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -20,7 +20,7 @@ const TAGS = ["Новые", "В работе", "Ждут оплаты", "Отг�
 export default function ScrollContainerEdgeFadeExample() {
   return (
     <div className={styles.layout}>
-      <section className={styles.card} aria-label="Лента событий">
+      <Card.Root role="region" className={styles.card} aria-label="Лента событий">
         <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
           Лента событий
         </Typography.Root>
@@ -35,8 +35,8 @@ export default function ScrollContainerEdgeFadeExample() {
             ))}
           </ul>
         </ScrollContainer>
-      </section>
-      <section className={styles.card} aria-label="Фильтры">
+      </Card.Root>
+      <Card.Root role="region" className={styles.card} aria-label="Фильтры">
         <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
           Фильтры
         </Typography.Root>
@@ -47,7 +47,7 @@ export default function ScrollContainerEdgeFadeExample() {
             ))}
           </div>
         </ScrollContainer>
-      </section>
+      </Card.Root>
     </div>
   );
 }

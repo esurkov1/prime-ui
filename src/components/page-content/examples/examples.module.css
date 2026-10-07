@@ -16,15 +16,6 @@
   gap: var(--prime-space-10);
 }
 
-/* A visible block so the column width can be read at a glance. */
-.block {
-  box-sizing: border-box;
-  padding: var(--prime-space-4);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
-}
-
 /* A phone-width main column (360px). */
 .narrow {
   width: min(100%, calc(var(--prime-space-24) * 3.75));

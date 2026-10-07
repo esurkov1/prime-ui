@@ -1,20 +1,20 @@
 /** An empty data region: the empty state stretches over the rest of a card with a header — `layout`. */
 import { PackagePlus } from "lucide-react";
-import { Button, EmptyPage, Typography } from "prime-ui-kit";
+import { Button, Card, EmptyPage } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 export default function EmptyPageDataRegionExample() {
   return (
-    <section className={styles.region} aria-labelledby="orders-region-title">
-      <div className={styles.regionHeader}>
-        <Typography.Root as="h3" variant="title-s" id="orders-region-title">
-          Заказы
-        </Typography.Root>
-        <Button.Root variant="outline" tone="neutral" size="s">
-          Импорт
-        </Button.Root>
-      </div>
+    <Card.Root role="region" aria-labelledby="orders-region-title" className={styles.region}>
+      <Card.SectionHeader>
+        <Card.SectionTitle id="orders-region-title">Заказы</Card.SectionTitle>
+        <Card.SectionTrailing>
+          <Button.Root variant="outline" tone="neutral" size="s">
+            Импорт
+          </Button.Root>
+        </Card.SectionTrailing>
+      </Card.SectionHeader>
       <EmptyPage.Root layout="fill" aria-labelledby="orders-empty-title">
         <EmptyPage.Icon tone="accent">
           <PackagePlus aria-hidden />
@@ -30,6 +30,6 @@ export default function EmptyPageDataRegionExample() {
           <Button.Root>Создать заказ</Button.Root>
         </EmptyPage.Actions>
       </EmptyPage.Root>
-    </section>
+    </Card.Root>
   );
 }

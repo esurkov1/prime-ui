@@ -1,5 +1,5 @@
 /** The same page column at three caps: the whole main, a wide dashboard column, a reading column — `maxWidth`. */
-import { PageContent, Typography } from "prime-ui-kit";
+import { Card, PageContent, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -23,9 +23,13 @@ export default function PageContentVariantsExample() {
               <PageContent.Title>{title}</PageContent.Title>
             </PageContent.Header>
             <PageContent.Body>
-              <Typography.Root as="div" variant="body-s" tone="secondary" className={styles.block}>
-                {value} — {text}
-              </Typography.Root>
+              <Card.Root>
+                <Card.Body>
+                  <Typography.Root variant="body-s" tone="secondary">
+                    {value} — {text}
+                  </Typography.Root>
+                </Card.Body>
+              </Card.Root>
             </PageContent.Body>
           </PageContent.Root>
         ))}

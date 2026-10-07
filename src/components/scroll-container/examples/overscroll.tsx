@@ -1,5 +1,5 @@
 /** At the end of the list the scroll passes on to the page instead of stopping — `overscrollBehavior`. */
-import { ScrollContainer, Typography } from "prime-ui-kit";
+import { Card, ScrollContainer, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -7,7 +7,7 @@ const HOURS = Array.from({ length: 12 }, (_, index) => `${String(9 + index).padS
 
 export default function ScrollContainerOverscrollExample() {
   return (
-    <section className={styles.card} aria-label="Журнал">
+    <Card.Root role="region" className={styles.card} aria-label="Журнал">
       <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
         Журнал выгрузок
       </Typography.Root>
@@ -22,6 +22,6 @@ export default function ScrollContainerOverscrollExample() {
           ))}
         </ul>
       </ScrollContainer>
-    </section>
+    </Card.Root>
   );
 }

@@ -7,15 +7,10 @@
   width: 100%;
 }
 
+/* The Card's size: a fixed height, so the region inside scrolls. */
 .card {
-  display: flex;
-  flex-direction: column;
   width: min(100%, calc(var(--prime-space-24) * 4));
   height: calc(var(--prime-space-24) * 2.5);
-  overflow: hidden;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
 }
 
 .layout > .card {

@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function BannerPageStripExample() {
   return (
     <div className={styles.sections}>
-      <div className={styles.pageFrame}>
+      <Card.Root>
         <Banner.Root
           tone="warning"
           placement="page"
@@ -26,7 +26,7 @@ export default function BannerPageStripExample() {
             Отчёты
           </Typography.Root>
         </div>
-      </div>
+      </Card.Root>
       <Card.Root variant="panel">
         <Card.SectionHeader>
           <Card.SectionTitle>Оплата</Card.SectionTitle>

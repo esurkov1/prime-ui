@@ -1,18 +1,15 @@
 /* Layout of the Datepicker scenarios: semantic tokens only. */
 
-/* A form on a card. */
+/* A form in a Card. */
+.formCard {
+  max-width: calc(var(--prime-space-24) * 5);
+}
+
 .form {
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-5);
-  width: 100%;
-  max-width: calc(var(--prime-space-24) * 5);
   padding: var(--prime-card-padding-m);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 }
 
 .actions {
