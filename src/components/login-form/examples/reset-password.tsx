@@ -1,6 +1,5 @@
 /** A new password after the e-mail link: two fields and a mismatch error under the second one — `error`. */
-import { LockKeyhole } from "lucide-react";
-import { Button, Input, LoginForm } from "prime-ui-kit";
+import { Button, Icon, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -15,7 +14,7 @@ export default function LoginFormResetPasswordExample() {
       <LoginForm.Root>
         <LoginForm.Header>
           <LoginForm.Logo>
-            <LockKeyhole aria-hidden />
+            <Icon name="status.locked" />
           </LoginForm.Logo>
           <LoginForm.Title>Создайте новый пароль</LoginForm.Title>
           <LoginForm.Description>

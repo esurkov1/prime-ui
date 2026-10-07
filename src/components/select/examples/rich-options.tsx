@@ -1,6 +1,5 @@
 /** Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. */
-import { Truck } from "lucide-react";
-import { type PaletteColor, Select, Thumbnail } from "prime-ui-kit";
+import { Icon, type PaletteColor, Select, Thumbnail } from "prime-ui-kit";
 
 type Tariff = { value: string; title: string; terms: string; price: string; color: PaletteColor };
 
@@ -42,7 +41,7 @@ export default function SelectRichOptionsExample() {
               <>
                 <Thumbnail.Root color={tariff?.color}>
                   <Thumbnail.Fallback>
-                    <Truck />
+                    <Icon name="object.truck" />
                   </Thumbnail.Fallback>
                 </Thumbnail.Root>
                 <Select.ItemText>{label}</Select.ItemText>
@@ -59,7 +58,7 @@ export default function SelectRichOptionsExample() {
           <Select.Item key={tariff.value} value={tariff.value}>
             <Thumbnail.Root color={tariff.color}>
               <Thumbnail.Fallback>
-                <Truck />
+                <Icon name="object.truck" />
               </Thumbnail.Fallback>
             </Thumbnail.Root>
             <Select.ItemText>{tariff.title}</Select.ItemText>

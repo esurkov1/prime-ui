@@ -8,7 +8,7 @@ everything, one gap for the whole page, two primary buttons) are listed in
 
 Two status labels, one a Badge and one a styled `span`; three cards with three different paddings.
 
-```tsx
+```tsx partial
 // bad
 <span className={styles.paid}>Оплачен</span>
 <Badge.Root color="orange">Ожидает</Badge.Root>
@@ -22,7 +22,7 @@ Map statuses to colors once (`const STATUS_COLOR: Record<Status, PaletteColor>`)
 
 ## 2. Inline styles, raw values, primitive tokens
 
-```tsx
+```tsx partial
 // bad
 <div style={{ display: "flex", gap: 12, padding: "18px", color: "#6b7280" }} />
 ```
@@ -44,7 +44,7 @@ Text color goes through `Typography tone="secondary"`, not CSS.
 .panel { border: 1px solid var(--prime-color-border-default); background: transparent; }
 ```
 
-```tsx
+```tsx partial
 // bad — a card around a card around a table
 <Card.Root><Card.Root><DataTable columns={columns} rows={rows} /></Card.Root></Card.Root>
 
@@ -55,7 +55,7 @@ Text color goes through `Typography tone="secondary"`, not CSS.
 
 ## 4. Mixed control sizes in one row
 
-```tsx
+```tsx partial
 // bad
 <Input.Root size="s">…</Input.Root>
 <Button.Root>Найти</Button.Root>
@@ -67,7 +67,7 @@ Text color goes through `Typography tone="secondary"`, not CSS.
 
 ## 5. Placeholder instead of label
 
-```tsx
+```tsx partial
 // bad
 <Input.Root>
   <Input.Wrapper>
@@ -120,7 +120,7 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 .table :global(th) svg { color: var(--prime-color-accent-default); }
 ```
 
-```tsx
+```tsx partial
 // good — content drives the height, cell controls one tier down, kit draws dividers and sort icons
 <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} />
 // in a column cell: <Button.Root size="s" variant="ghost" tone="neutral">Настроить</Button.Root>
@@ -137,7 +137,7 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 
 ## 9. Hand-made overlays
 
-```tsx
+```tsx partial
 // bad
 {open && <div className={styles.backdrop}><div className={styles.dialog}>…</div></div>}
 <div className={styles.tooltip} hidden={!hover}>Копировать</div>

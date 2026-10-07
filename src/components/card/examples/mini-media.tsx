@@ -1,6 +1,5 @@
 /** A KPI with a sparkline or a fill level in the bottom slot — `Card.Media`. */
-import { Activity, HardDrive } from "lucide-react";
-import { Card, ProgressBar } from "prime-ui-kit";
+import { Card, Icon, ProgressBar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -11,7 +10,7 @@ export default function CardMiniMediaExample() {
     <div className={styles.grid}>
       <Card.Root variant="mini-media">
         <Card.IconBox>
-          <Activity aria-hidden />
+          <Icon name="object.activity" />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>Запросы в минуту</Card.Label>
@@ -32,7 +31,7 @@ export default function CardMiniMediaExample() {
 
       <Card.Root variant="mini-media">
         <Card.IconBox>
-          <HardDrive aria-hidden />
+          <Icon name="object.storage" />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>Хранилище</Card.Label>

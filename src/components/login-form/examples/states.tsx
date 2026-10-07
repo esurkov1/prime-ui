@@ -1,5 +1,4 @@
 /** The submit cycle: the button is busy while the request runs, a failed request shows a danger Banner and marks the password — `loading`, `invalid`. */
-import { LogIn } from "lucide-react";
 import { Banner, Button, Icon, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
@@ -17,7 +16,7 @@ export default function LoginFormStatesExample() {
       <LoginForm.Root>
         <LoginForm.Header>
           <LoginForm.Logo>
-            <LogIn aria-hidden />
+            <Icon name="action.login" />
           </LoginForm.Logo>
           <LoginForm.Title>Войти в аккаунт</LoginForm.Title>
           <LoginForm.Description>Любая пара email и пароля вернёт ошибку</LoginForm.Description>

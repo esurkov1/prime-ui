@@ -162,18 +162,21 @@ Cancel.
 
 `<Icon name="…" />` names:
 - `nav.*`: `chevronDown`, `chevronLeft`, `chevronRight`, `chevronUp`, `chevronsLeft`, `chevronsUpDown`,
-  `home`, `itemDot`, `layoutGrid`, `sidebarCollapse`, `sidebarExpand`;
+  `dashboard`, `home`, `itemDot`, `layoutGrid`, `menu`, `sidebarCollapse`, `sidebarExpand`;
 - `action.*`: `add`, `check`, `close`, `copy`, `delete`, `download`, `drag`, `externalLink`,
-  `eyedropper`, `filter`, `more`, `remove`, `search`, `send`, `settings`, `upload`;
+  `eyedropper`, `filter`, `login`, `logout`, `more`, `remove`, `search`, `send`, `settings`, `upload`;
 - `field.*`: `calendar`, `email`, `password.hide`, `password.show`;
-- `object.*`: `document`, `package`, `users`;
+- `format.*`: `bold`, `italic`, `link`, `list`, `underline`;
+- `object.*`: `activity`, `bell`, `book`, `cart`, `chart`, `document`, `image`, `inbox`, `key`,
+  `message`, `package`, `receipt`, `rocket`, `storage`, `tasks`, `truck`, `user`, `users`, `wallet`;
 - `sort.*`: `ascending`, `descending`, `none`;
-- `status.*`: `danger`, `info`, `locked`, `success`, `warning`;
+- `status.*`: `danger`, `emailSent`, `info`, `locked`, `offline`, `success`, `warning`;
 - `theme.*`: `dark`, `light`; `view.*`: `code`, `preview`; `viewport.*`: `desktop`, `mobile`, `tablet`.
 
-Each glyph is also a named component (`IconAdd`, `IconCalendar`, `IconCheck`, `IconChevronDown`,
-`IconDocument`, `IconPackage`, `IconSearch`, `IconSend`, `IconSettings`, `IconUsers`, `IconWarning`, …).
-Everything else: `lucide-react` (add it to the app's dependencies). Icon-only buttons need `aria-label`;
+Each glyph is also a named component (`IconAdd`, `IconBell`, `IconCalendar`, `IconCart`,
+`IconChevronDown`, `IconDocument`, `IconMenu`, `IconPackage`, `IconSearch`, `IconUser`,
+`IconWarning`, …). Take a glyph from the kit first; only a domain glyph the kit lacks (a bike, a
+tooth) comes from `lucide-react` (add it to the app's dependencies). Icon-only buttons need `aria-label`;
 decorative icons inside kit slots (`Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`) are hidden
 automatically.
 

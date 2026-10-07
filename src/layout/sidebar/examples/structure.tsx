@@ -1,5 +1,4 @@
 /** Labelled groups and the optional item parts: a plain count, a coloured badge, a key hint, a trailing icon, a row action and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`. */
-import { Bell } from "lucide-react";
 import { Icon, Kbd, Sidebar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -27,7 +26,7 @@ export default function SidebarStructureExample() {
             </Sidebar.Item>
             <Sidebar.Item>
               <Sidebar.ItemIcon>
-                <Bell />
+                <Icon name="object.bell" />
               </Sidebar.ItemIcon>
               Уведомления
               <Sidebar.ItemCount color="red">7</Sidebar.ItemCount>

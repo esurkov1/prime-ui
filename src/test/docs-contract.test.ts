@@ -8,6 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import * as lucide from "lucide-react";
 import type { ComponentPageConfig } from "../../playground/components/ComponentPage";
 import {
   KIND_SLOTS,
@@ -109,6 +110,48 @@ const PLACEHOLDER_TEXT = /lorem|ipsum|Пункт \d|Item \d|Элемент \d|[\
 
 const dirs = exportedDirs();
 const categories = categoriesByDir();
+
+/**
+ * Lucide glyphs examples and patterns may still import directly: domain glyphs the kit registry
+ * does not carry. Every entry needs a reason; a glyph the registry has never belongs here.
+ */
+const DOMAIN_GLYPHS: Record<string, string> = {
+  Bike: "Thumbnail examples show a motorcycle catalog — a product brings its own domain glyphs.",
+};
+
+/** Registry names per lucide glyph, read from `src/icons/index.ts` (aliases share one glyph). */
+function registryNamesByGlyph(): Map<unknown, string[]> {
+  const source = read("src/icons/index.ts");
+  const glyphOf = new Map(
+    [...source.matchAll(/^export const (Icon\w+) = createIcon\((\w+)\);$/gm)].map((m) => [
+      m[1],
+      m[2],
+    ]),
+  );
+  const glyphs = lucide as unknown as Record<string, unknown>;
+  const byGlyph = new Map<unknown, string[]>();
+  for (const [, name, component] of source.matchAll(/^ {2}"([\w.]+)": (Icon\w+),$/gm)) {
+    const glyph = glyphs[glyphOf.get(component) ?? ""];
+    if (!glyph) throw new Error(`src/icons/index.ts: ${name} → ${component} has no lucide glyph`);
+    byGlyph.set(glyph, [...(byGlyph.get(glyph) ?? []), name]);
+  }
+  return byGlyph;
+}
+
+/** Glyph names imported from `lucide-react` (`X as Y` counts as `X`). */
+const lucideImports = (source: string) =>
+  [...source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"lucide-react"/g)].flatMap((m) =>
+    m[1]
+      .split(",")
+      .map(
+        (part) =>
+          part
+            .trim()
+            .replace(/^type\s+/, "")
+            .split(/\s+as\s+/)[0],
+      )
+      .filter(Boolean),
+  );
 
 const sectionModules = import.meta.glob<{ page?: ComponentPageConfig }>(
   "../../playground/sections/*Section.tsx",
@@ -336,5 +379,49 @@ describe("docs contract", () => {
         }
       });
     });
+  });
+});
+
+describe("kit icons first", () => {
+  const byGlyph = registryNamesByGlyph();
+  const glyphs = lucide as unknown as Record<string, unknown>;
+  /** Examples, composition patterns and the code in SKILL docs: everything a consumer copies. */
+  const sources = [
+    ...dirs.flatMap(({ rel }) => walk(`${rel}/examples`, /\.tsx$/)),
+    ...walk("SKILL", /\.(tsx|md)$/),
+  ];
+
+  it("reads the registry", () => {
+    expect(byGlyph.size).toBeGreaterThan(40);
+  });
+
+  /** Code of a source: the whole file, or the ```tsx blocks of a markdown doc. */
+  const code = (file: string) =>
+    file.endsWith(".md")
+      ? [...read(file).matchAll(/^```tsx[^\n]*\n([\s\S]*?)^```$/gm)].map((m) => m[1]).join("\n")
+      : read(file);
+
+  it.each(sources)("%s takes glyphs from the kit registry", (file) => {
+    for (const name of lucideImports(code(file))) {
+      const glyph = glyphs[name];
+      expect(glyph, `${file}: "${name}" is not a lucide-react export`).toBeDefined();
+      const registered = byGlyph.get(glyph);
+      expect(
+        registered,
+        `${file}: use <Icon name="${registered?.[0]}" /> instead of lucide "${name}"`,
+      ).toBeUndefined();
+      expect(
+        DOMAIN_GLYPHS[name],
+        `${file}: lucide "${name}" — add it to the registry (src/icons) or, for a domain glyph, to DOMAIN_GLYPHS with a reason`,
+      ).toBeDefined();
+    }
+  });
+
+  it("allows only domain glyphs that are still used and absent from the registry", () => {
+    const used = new Set(sources.flatMap((file) => lucideImports(code(file))));
+    for (const name of Object.keys(DOMAIN_GLYPHS)) {
+      expect(used.has(name), `DOMAIN_GLYPHS.${name} is unused — remove it`).toBe(true);
+      expect(byGlyph.has(glyphs[name]), `DOMAIN_GLYPHS.${name} is in the registry`).toBe(false);
+    }
   });
 });

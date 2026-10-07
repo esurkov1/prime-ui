@@ -19,8 +19,7 @@ content would leave an empty sticky bar). That needs the compound form instead o
 `AppShell.Template`; hiding a kit part with `display` is placement, which `className` may do.
 
 ```tsx
-import { LayoutDashboard, Menu, Settings, ShoppingCart, Users } from "lucide-react";
-import { AppShell, Button, NotificationProvider, Sidebar } from "prime-ui-kit";
+import { AppShell, Button, Icon, NotificationProvider, Sidebar } from "prime-ui-kit";
 import { type ReactNode, useState } from "react";
 import styles from "./AppLayout.module.css";
 
@@ -34,7 +33,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <Sidebar.Header>
               <Sidebar.Brand href="/" description="Интернет-магазин">
                 <Sidebar.BrandLogo>
-                  <ShoppingCart />
+                  <Icon name="object.cart" />
                 </Sidebar.BrandLogo>
                 Магазин
               </Sidebar.Brand>
@@ -44,20 +43,20 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <Sidebar.Group label="Продажи">
                 <Sidebar.Item href="/" current>
                   <Sidebar.ItemIcon>
-                    <LayoutDashboard />
+                    <Icon name="nav.dashboard" />
                   </Sidebar.ItemIcon>
                   Обзор
                 </Sidebar.Item>
                 <Sidebar.Item href="/orders">
                   <Sidebar.ItemIcon>
-                    <ShoppingCart />
+                    <Icon name="object.cart" />
                   </Sidebar.ItemIcon>
                   Заказы
                   <Sidebar.ItemCount>12</Sidebar.ItemCount>
                 </Sidebar.Item>
                 <Sidebar.Item href="/clients">
                   <Sidebar.ItemIcon>
-                    <Users />
+                    <Icon name="object.users" />
                   </Sidebar.ItemIcon>
                   Клиенты
                 </Sidebar.Item>
@@ -66,7 +65,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <Sidebar.Footer>
               <Sidebar.Item href="/settings">
                 <Sidebar.ItemIcon>
-                  <Settings />
+                  <Icon name="action.settings" />
                 </Sidebar.ItemIcon>
                 Настройки
               </Sidebar.Item>
@@ -81,7 +80,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             onClick={() => setMenuOpen(true)}
           >
             <Button.Icon>
-              <Menu />
+              <Icon name="nav.menu" />
             </Button.Icon>
             Меню
           </Button.Root>

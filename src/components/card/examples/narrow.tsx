@@ -1,6 +1,5 @@
 /** The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem. */
-import { ShoppingCart, Wallet } from "lucide-react";
-import { Card } from "prime-ui-kit";
+import { Card, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -19,7 +18,7 @@ export default function CardNarrowExample() {
               <Card.Split>
                 <div>
                   <Card.IconBox>
-                    <ShoppingCart aria-hidden />
+                    <Icon name="object.cart" />
                   </Card.IconBox>
                   <Card.Stack>
                     <Card.Label>Конверсия</Card.Label>
@@ -28,7 +27,7 @@ export default function CardNarrowExample() {
                 </div>
                 <div>
                   <Card.IconBox>
-                    <Wallet aria-hidden />
+                    <Icon name="object.wallet" />
                   </Card.IconBox>
                   <Card.Stack>
                     <Card.Label>Средний чек</Card.Label>

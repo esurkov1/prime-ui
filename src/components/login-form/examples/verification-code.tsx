@@ -1,6 +1,5 @@
 /** The second step with a one-time code: a rejected code shows its error under the cells, resend is a quiet action — `DigitInput`, `LoginForm.Actions`. */
-import { MailCheck } from "lucide-react";
-import { Button, DigitInput, LinkButton, LoginForm } from "prime-ui-kit";
+import { Button, DigitInput, Icon, LinkButton, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -14,7 +13,7 @@ export default function LoginFormVerificationCodeExample() {
       <LoginForm.Root>
         <LoginForm.Header>
           <LoginForm.Logo>
-            <MailCheck aria-hidden />
+            <Icon name="status.emailSent" />
           </LoginForm.Logo>
           <LoginForm.Title>Введите код</LoginForm.Title>
           <LoginForm.Description>Мы отправили 6 цифр на name@company.ru</LoginForm.Description>
