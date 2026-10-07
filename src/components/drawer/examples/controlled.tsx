@@ -9,7 +9,7 @@ export default function DrawerControlledExample() {
 
   return (
     <div className={styles.row}>
-      <LinkButton.Root
+      <LinkButton
         href="#help"
         onClick={(event) => {
           event.preventDefault();
@@ -17,7 +17,7 @@ export default function DrawerControlledExample() {
         }}
       >
         Как это работает?
-      </LinkButton.Root>
+      </LinkButton>
       <Drawer.Root open={open} onOpenChange={setOpen} labels={{ close: "Закрыть справку" }}>
         <Drawer.Content size="s">
           <Drawer.Header>

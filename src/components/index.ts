@@ -287,7 +287,7 @@ export type { KbdRootProps } from "./kbd/Kbd";
 export { Kbd } from "./kbd/Kbd";
 export type { LabelLabels, LabelRootProps } from "./label/Label";
 export { Label } from "./label/Label";
-export type { LinkButtonRootProps } from "./link-button/LinkButton";
+export type { LinkButtonProps } from "./link-button/LinkButton";
 export { LinkButton } from "./link-button/LinkButton";
 export type {
   LoginFormActionsProps,

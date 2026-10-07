@@ -142,7 +142,7 @@ export default function IntroPage() {
                   <Card.Title>{item.title}</Card.Title>
                   <Card.CtaBody>{item.text}</Card.CtaBody>
                   <Card.Actions>
-                    <LinkButton.Root
+                    <LinkButton
                       href={item.to}
                       size="s"
                       onClick={(event) => {
@@ -151,7 +151,7 @@ export default function IntroPage() {
                       }}
                     >
                       Открыть
-                    </LinkButton.Root>
+                    </LinkButton>
                   </Card.Actions>
                 </Card.Root>
               ))}
@@ -184,9 +184,9 @@ export default function IntroPage() {
               <li>
                 <Typography.Root as="span" variant="body-m">
                   Полный контракт системы описан в{" "}
-                  <LinkButton.Root href={FOUNDATION_DOC} rel="noopener noreferrer" target="_blank">
+                  <LinkButton href={FOUNDATION_DOC} rel="noopener noreferrer" target="_blank">
                     docs/foundation.md
-                  </LinkButton.Root>
+                  </LinkButton>
                   . Здесь он показан вживую.
                 </Typography.Root>
               </li>
@@ -203,30 +203,30 @@ export default function IntroPage() {
             <ul className="introPageList">
               <li>
                 <Typography.Root as="span" variant="body-m">
-                  <LinkButton.Root href={README} rel="noopener noreferrer" target="_blank">
+                  <LinkButton href={README} rel="noopener noreferrer" target="_blank">
                     README
-                  </LinkButton.Root>
+                  </LinkButton>
                   : установка, экспорты пакета, провайдеры.
                 </Typography.Root>
               </li>
               <li>
                 <Typography.Root as="span" variant="body-m">
-                  <LinkButton.Root href={SKILL} rel="noopener noreferrer" target="_blank">
+                  <LinkButton href={SKILL} rel="noopener noreferrer" target="_blank">
                     SKILL/SKILL.md
-                  </LinkButton.Root>
+                  </LinkButton>
                   : правила для AI-агентов, которые собирают интерфейсы на ките.
                 </Typography.Root>
               </li>
               <li>
                 <Typography.Root as="span" variant="body-m">
                   Пакет на{" "}
-                  <LinkButton.Root href={NPM} rel="noopener noreferrer" target="_blank">
+                  <LinkButton href={NPM} rel="noopener noreferrer" target="_blank">
                     npm
-                  </LinkButton.Root>
+                  </LinkButton>
                   , ошибки и предложения — в{" "}
-                  <LinkButton.Root href={ISSUES} rel="noopener noreferrer" target="_blank">
+                  <LinkButton href={ISSUES} rel="noopener noreferrer" target="_blank">
                     Issues
-                  </LinkButton.Root>
+                  </LinkButton>
                   .
                 </Typography.Root>
               </li>

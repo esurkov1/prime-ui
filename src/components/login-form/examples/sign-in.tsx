@@ -41,16 +41,16 @@ export default function LoginFormSignInExample() {
                   />
                 </Input.Wrapper>
               </Input.Root>
-              <LinkButton.Root href="#" size="s" tone="neutral">
+              <LinkButton href="#" size="s" tone="neutral">
                 Забыли пароль?
-              </LinkButton.Root>
+              </LinkButton>
             </div>
             <Button.Root type="submit" fullWidth>
               Войти
             </Button.Root>
           </LoginForm.Form>
           <LoginForm.Footer>
-            Нет аккаунта? <LinkButton.Root href="#">Зарегистрироваться</LinkButton.Root>
+            Нет аккаунта? <LinkButton href="#">Зарегистрироваться</LinkButton>
           </LoginForm.Footer>
         </LoginForm.Body>
       </LoginForm.Root>

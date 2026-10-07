@@ -58,7 +58,7 @@ export default function LoginFormVerificationCodeExample() {
             </LoginForm.Actions>
           </LoginForm.Form>
           <LoginForm.Footer>
-            Не тот адрес? <LinkButton.Root href="#">Изменить email</LinkButton.Root>
+            Не тот адрес? <LinkButton href="#">Изменить email</LinkButton>
           </LoginForm.Footer>
         </LoginForm.Body>
       </LoginForm.Root>

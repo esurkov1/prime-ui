@@ -54,7 +54,6 @@ const NOT_CONVERTED = new Set([
   "hint",
   "kbd",
   "label",
-  "link-button",
   "login-form",
   "notification",
   "page-content",

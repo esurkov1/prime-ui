@@ -99,7 +99,7 @@ function KeyboardDemo() {
         <Button.Root variant="soft" tone="neutral">
           Отмена
         </Button.Root>
-        <LinkButton.Root href="#focus-demo">Ссылка</LinkButton.Root>
+        <LinkButton href="#focus-demo">Ссылка</LinkButton>
       </div>
       <div className={s.focusRow}>
         <Input.Root invalid={invalid} className={s.focusField}>

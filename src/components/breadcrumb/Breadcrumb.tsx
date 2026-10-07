@@ -110,14 +110,14 @@ function BreadcrumbItem({
   return (
     <li className={cx(styles.item, className)}>
       {href ? (
-        <LinkButton.Root
+        <LinkButton
           href={href}
           size={size}
           className={styles.breadcrumbLink}
           aria-label={ariaLabel}
         >
           {children}
-        </LinkButton.Root>
+        </LinkButton>
       ) : (
         <span
           className={cx(styles.text, current && styles.itemCurrent)}

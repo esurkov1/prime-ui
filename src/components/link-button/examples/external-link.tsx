@@ -1,13 +1,13 @@
-/** External link with `target="_blank"` and `rel="noopener noreferrer"` passed to the native `<a>`. Use for links leaving the app; say in the text that a new tab opens. */
+/** A link that leaves the app opens a new tab and says so in its text — `target`, `rel`. */
 import { LinkButton, Typography } from "prime-ui-kit";
 
 export default function LinkButtonExternalLinkExample() {
   return (
     <Typography.Root variant="body-m" tone="secondary">
-      Подробности в{" "}
-      <LinkButton.Root href="https://example.com/docs" target="_blank" rel="noopener noreferrer">
+      Тарифы и лимиты описаны в{" "}
+      <LinkButton href="https://example.com/docs" target="_blank" rel="noopener noreferrer">
         документации (новая вкладка)
-      </LinkButton.Root>
+      </LinkButton>
       .
     </Typography.Root>
   );
