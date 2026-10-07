@@ -1,7 +1,7 @@
 # FileUpload
 
 **Category:** inputs
-**Kind:** composite
+**Kind:** field
 
 > A file drop zone with the field label, hint and error, plus file rows for the selected files.
 
@@ -197,10 +197,12 @@ Also `data-size`, `data-variant` on the zone and `data-size` on Item. Files are 
 | [overview.tsx](examples/overview.tsx) | Attachments of a request: a labelled drop zone and the chosen files as rows with a remove button — `label`, `hint`, `multiple`, `onFilesChange`, `FileUpload.Item`. |
 | [variants.tsx](examples/variants.tsx) | The dashed drop line next to a zone with only the fill, for cards and modals — `variant`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size of the zone and of a file row: padding, icon, button and text follow the tier — `size`. |
-| [structure.tsx](examples/structure.tsx) | A custom body: a muted title with a browse link and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.BrowseLink`. |
+| [states.tsx](examples/states.tsx) | A default zone, a disabled one and an invalid one without a message — `disabled`, `invalid`. |
+| [validation.tsx](examples/validation.tsx) | A required zone with a hint, a rejected file whose error replaces the hint and an optional zone — `required`, `hint`, `error`, `optional`. |
+| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a muted title with a browse link and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.BrowseLink`. |
 | [upload-progress.tsx](examples/upload-progress.tsx) | File rows while uploading, uploaded and failed with a retry — `FileUpload.ItemProgress`, `invalid`, `FileUpload.ItemActions`. |
 | [avatar-upload.tsx](examples/avatar-upload.tsx) | A round zone around an Avatar that takes images and shows a preview; buttons open the same input — `inputRef`, `accept`, `className`. |
-| [states.tsx](examples/states.tsx) | A default zone next to a disabled one and one with an error under it — `disabled`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | A contract upload form: the required scan is checked on submit and its error replaces the hint — `required`, `error`, `name`. |
 | [narrow.tsx](examples/narrow.tsx) | In a phone-width column the zone text wraps and a long file name truncates. |
 
 ## Mistakes

@@ -4,7 +4,7 @@ import * as React from "react";
 
 import styles from "./examples.module.css";
 
-export default function FileUploadStructureExample() {
+export default function FileUploadCustomBodyExample() {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const openPicker = () => inputRef.current?.click();
 

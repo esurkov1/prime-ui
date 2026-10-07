@@ -8,6 +8,26 @@
   width: min(100%, var(--prime-modal-width-s));
 }
 
+/* in-form.tsx: header → field 32 → actions 32 (foundation §1). */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-8);
+  width: min(100%, var(--prime-modal-width-s));
+}
+
+.formHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+}
+
 /* sizes.tsx: a zone and its file row of one tier, then the next tier. */
 .sizeRow {
   display: flex;
@@ -16,7 +36,7 @@
   margin-bottom: var(--prime-space-4);
 }
 
-/* structure.tsx: source buttons under the title. */
+/* custom-body.tsx: source buttons under the title. */
 .sources {
   display: flex;
   flex-wrap: wrap;
