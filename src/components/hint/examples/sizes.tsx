@@ -1,15 +1,13 @@
-/** Hint sizes match the paired field: xs/s/m 12/16 · l/xl 13/20, always smaller than the field text. Use the size of the field above. */
-import { type ControlSize, Hint, Typography } from "prime-ui-kit";
+/** Every size tier, matching the field above: 12/16 for xs–m, 13/20 for l and xl — `size`. */
+import { Hint, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function HintSizesExample() {
   return (
-    <div className={styles.sizes}>
-      {sizes.map((size) => (
-        <div key={size} className={styles.sizeCell}>
+    <div>
+      {SIZES.map((size) => (
+        <div key={size}>
           <Hint.Root size={size}>Не менее 8 символов</Hint.Root>
           <Typography.Root as="span" variant="caption" tone="muted">
             {size}

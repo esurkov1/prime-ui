@@ -44,20 +44,14 @@
 }
 
 /*
- * An error message drops in over `fast` (fade + 4px from above): quick enough to read as instant,
- * no shake. Only transform/opacity move, so the support row never shifts layout while it plays.
- * Runs when the message mounts and when a hint turns into an error in the same slot.
+ * An error message drops in (`enterMotion.enter`, fade + 4px from above, `fast`): quick enough to
+ * read as instant, no shake, no layout shift. Runs when the message mounts and when a hint turns
+ * into an error in the same slot.
  */
 .root[data-invalid="true"] {
-  color: var(--prime-color-danger-text);
-  animation: hintErrorIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
-}
+  --enter-shift: calc(-1 * var(--prime-space-1));
 
-@keyframes hintErrorIn {
-  from {
-    opacity: 0;
-    transform: translateY(calc(-1 * var(--prime-space-1)));
-  }
+  color: var(--prime-color-danger-text);
 }
 
 .root[data-disabled="true"] {

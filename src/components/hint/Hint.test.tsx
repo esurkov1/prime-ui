@@ -58,6 +58,18 @@ describe("Hint", () => {
     expect(screen.getByText("With icon")).toBeInTheDocument();
   });
 
+  it("forwards ref to the paragraph and hides Icon from screen readers", () => {
+    const ref = { current: null as HTMLParagraphElement | null };
+    render(
+      <Hint.Root ref={ref}>
+        <Hint.Icon data-testid="icon">i</Hint.Icon>
+        Text
+      </Hint.Root>,
+    );
+    expect(ref.current?.tagName).toBe("P");
+    expect(screen.getByTestId("icon")).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("merges className on root", () => {
     render(<Hint.Root className="custom-hint">H</Hint.Root>);
     expect(screen.getByText("H")).toHaveClass("custom-hint");

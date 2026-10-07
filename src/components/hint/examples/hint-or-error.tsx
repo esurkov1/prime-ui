@@ -1,4 +1,4 @@
-/** The parent toggles `invalid` and the text of the same element, so the error replaces the hint without a layout jump; `role="alert"` announces it. Use it for validation after a user action. */
+/** After a check the error replaces the hint in the same element, without a layout jump, and is announced — `invalid`, `role`. */
 import { Button, Hint } from "prime-ui-kit";
 import * as React from "react";
 
@@ -8,12 +8,12 @@ export default function HintHintOrErrorExample() {
   const [invalid, setInvalid] = React.useState(false);
 
   return (
-    <div className={styles.list}>
+    <div className={styles.field}>
       <div className={styles.actions}>
-        <Button.Root variant="outline" tone="neutral" size="s" onClick={() => setInvalid(true)}>
-          Проверить
+        <Button.Root variant="soft" tone="neutral" onClick={() => setInvalid(true)}>
+          Опубликовать
         </Button.Root>
-        <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => setInvalid(false)}>
+        <Button.Root variant="ghost" tone="neutral" onClick={() => setInvalid(false)}>
           Сбросить
         </Button.Root>
       </div>

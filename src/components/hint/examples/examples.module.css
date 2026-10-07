@@ -1,41 +1,9 @@
-/* Layout helpers for the Hint examples. Semantic tokens only. */
+/* Layout of the Hint scenarios: semantic tokens only. */
 
-.sizes {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--prime-space-8);
-}
-
-.sizeCell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
-.list {
-  display: grid;
-  justify-items: start;
-  gap: var(--prime-space-3);
-}
-
-.fields {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
-  gap: var(--prime-space-5);
-  width: 100%;
-}
-
+/* overview.tsx, hint-or-error.tsx: label → control → support row with the m-tier gaps. */
 .field {
   display: grid;
-  align-content: start;
-  gap: var(--prime-control-m-label-gap);
-}
-
-.fieldBody {
-  display: grid;
+  justify-items: start;
   gap: var(--prime-control-m-hint-gap);
 }
 
@@ -43,14 +11,4 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--prime-space-2);
-}
-
-.form {
-  display: grid;
-  gap: var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-  padding: var(--prime-card-padding-m);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
 }

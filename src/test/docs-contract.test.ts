@@ -50,7 +50,6 @@ const NOT_CONVERTED = new Set([
   "empty-page",
   "example-frame",
   "file-upload",
-  "hint",
   "kbd",
   "label",
   "link-button",
