@@ -1,12 +1,9 @@
-/** `fillWidth` (default) stretches the table to its container; `fillWidth={false}` sizes it by content; a column can be centered with `align="center"`; a `grow` column takes the free width and wraps long text. Use content width for short lookup tables inside wide layouts, `grow` for description columns. */
-
+/** A short lookup table sized by its content with a centered column, and a `grow` column that takes the free width and wraps — `fullWidth`, `align`, `grow`. */
 import { DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
 
 type Task = { id: string; task: string; hours: number; note: string };
 
-const rows: Task[] = [
+const TASKS: Task[] = [
   {
     id: "T-12",
     task: "Сверстать отчёт по спринту",
@@ -27,15 +24,15 @@ const rows: Task[] = [
   },
 ];
 
-const hours = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
+const HOURS = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
 
-const columns: DataTableColumn<Task>[] = [
+const LOOKUP_COLUMNS: DataTableColumn<Task>[] = [
   { id: "id", header: "Задача", accessor: "id" },
   { id: "task", header: "Описание", accessor: "task" },
-  { id: "hours", header: "Часы", align: "center", cell: (row) => hours.format(row.hours) },
+  { id: "hours", header: "Часы", align: "center", cell: (row) => HOURS.format(row.hours) },
 ];
 
-const withNotes: DataTableColumn<Task>[] = [
+const NOTE_COLUMNS: DataTableColumn<Task>[] = [
   { id: "id", header: "Задача", accessor: "id" },
   { id: "task", header: "Название", accessor: "task" },
   { id: "note", header: "Комментарий", accessor: "note", grow: true },
@@ -43,30 +40,24 @@ const withNotes: DataTableColumn<Task>[] = [
 
 export default function DataTableContentWidthExample() {
   return (
-    <div className={styles.stack}>
-      <div className={styles.group}>
-        <Typography.Root variant="code" tone="muted">
-          fillWidth (по умолчанию)
-        </Typography.Root>
-        <DataTable.Root columns={columns} rows={rows} getRowKey={(row) => row.id} />
-      </div>
-      <div className={styles.group}>
-        <Typography.Root variant="code" tone="muted">
-          fillWidth=&#123;false&#125;
-        </Typography.Root>
-        <DataTable.Root
-          columns={columns}
-          rows={rows}
+    <>
+      <div>
+        <DataTable
+          columns={LOOKUP_COLUMNS}
+          rows={TASKS}
           getRowKey={(row) => row.id}
-          fillWidth={false}
+          fullWidth={false}
         />
-      </div>
-      <div className={styles.group}>
-        <Typography.Root variant="code" tone="muted">
-          grow: колонка «Комментарий» переносит текст
+        <Typography.Root as="span" variant="caption" tone="muted">
+          fullWidth=&#123;false&#125; · align="center"
         </Typography.Root>
-        <DataTable.Root columns={withNotes} rows={rows} getRowKey={(row) => row.id} />
       </div>
-    </div>
+      <div>
+        <DataTable columns={NOTE_COLUMNS} rows={TASKS} getRowKey={(row) => row.id} />
+        <Typography.Root as="span" variant="caption" tone="muted">
+          grow
+        </Typography.Root>
+      </div>
+    </>
   );
 }

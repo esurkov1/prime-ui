@@ -1,479 +1,117 @@
-import type * as React from "react";
+import { api } from "@/components/data-table/api";
 
-import DataTableAppearanceExample from "@/components/data-table/examples/appearance";
-import appearanceSource from "@/components/data-table/examples/appearance.tsx?raw";
-import DataTableContentWidthExample from "@/components/data-table/examples/content-width";
-import contentWidthSource from "@/components/data-table/examples/content-width.tsx?raw";
-import DataTableDashboardExample from "@/components/data-table/examples/dashboard";
-import dashboardSource from "@/components/data-table/examples/dashboard.tsx?raw";
-import DataTableDetailPanelExample from "@/components/data-table/examples/detail-panel";
-import detailPanelSource from "@/components/data-table/examples/detail-panel.tsx?raw";
-import DataTableInfiniteScrollExample from "@/components/data-table/examples/infinite-scroll";
-import infiniteScrollSource from "@/components/data-table/examples/infinite-scroll.tsx?raw";
-import DataTableNarrowExample from "@/components/data-table/examples/narrow";
-import narrowSource from "@/components/data-table/examples/narrow.tsx?raw";
-import DataTableNestedRowsExample from "@/components/data-table/examples/nested-rows";
-import nestedRowsSource from "@/components/data-table/examples/nested-rows.tsx?raw";
-import DataTableNumericExample from "@/components/data-table/examples/numeric";
-import numericSource from "@/components/data-table/examples/numeric.tsx?raw";
-import DataTableSelectionExample from "@/components/data-table/examples/selection";
-import selectionSource from "@/components/data-table/examples/selection.tsx?raw";
-import DataTableSizesExample from "@/components/data-table/examples/sizes";
-import sizesSource from "@/components/data-table/examples/sizes.tsx?raw";
-import DataTableSortingPaginationExample from "@/components/data-table/examples/sorting-pagination";
-import sortingPaginationSource from "@/components/data-table/examples/sorting-pagination.tsx?raw";
-import DataTableStatesExample from "@/components/data-table/examples/states";
-import statesSource from "@/components/data-table/examples/states.tsx?raw";
-import DataTableStickyExample from "@/components/data-table/examples/sticky";
-import stickySource from "@/components/data-table/examples/sticky.tsx?raw";
-import DataTableToolbarExample from "@/components/data-table/examples/toolbar";
-import toolbarSource from "@/components/data-table/examples/toolbar.tsx?raw";
-import { PageContent } from "@/components/page-content/PageContent";
-import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import {
-  DemoApiTitle,
-  DemoDescription,
-  DemoSectionTitle,
-} from "../components/PlaygroundDemoTypography";
-import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
+import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
 
-const api = (
-  prop: string,
-  type: string,
-  defaultValue: string,
-  description: string,
-  required = "Нет",
-): PlaygroundApiPropRow => ({ prop, type, defaultValue, required, description });
-
-const rootApiRows: PlaygroundApiPropRow[] = [
-  api("columns", "DataTableColumn<Row>[]", "—", "Описание колонок.", "Да"),
-  api("rows", "Row[]", "—", "Строки данных; сортируются в памяти, если задана сортировка.", "Да"),
-  api(
-    "size",
-    '"xs" | "s" | "m" | "l" | "xl"',
-    '"m"',
-    "Плотность: xs/s — строка 36, m — 44, l/xl — 52. Пробрасывается вложенным контролам и пагинации.",
-  ),
-  api("getRowKey", "(row, index) => React.Key", "индекс", "Стабильный ключ строки."),
-  api("toolbar", "React.ReactNode", "—", "Слот над таблицей: поиск, фильтры, массовые действия."),
-  api("getRowLabel", "(row) => string", "—", "Имя строки для aria-label чекбокса и шеврона."),
-  api(
-    "selectable",
-    "boolean",
-    "false",
-    "Колонка чекбоксов: «выбрать все» (indeterminate), Shift+клик — диапазон, протягивание по чекбоксам, Space, объявление «Выбрано: N».",
-  ),
-  api(
-    "selected / defaultSelected / onSelectedChange",
-    "React.Key[]",
-    "— / [] / —",
-    "Выбранные id строк (из `getRowKey`).",
-  ),
-  api(
-    "getRowChildren",
-    "(row) => Row[] | undefined",
-    "—",
-    "Вложенные строки под родителем, с отступом `--dt-indent` на уровень.",
-  ),
-  api(
-    "renderExpanded",
-    "(row) => React.ReactNode",
-    "—",
-    "Панель деталей на всю ширину под раскрытой строкой.",
-  ),
-  api(
-    "isRowExpandable",
-    "(row) => boolean",
-    "есть подстроки или renderExpanded",
-    "Какие строки получают шеврон.",
-  ),
-  api(
-    "expanded / defaultExpanded / onExpandedChange",
-    "React.Key[]",
-    "— / [] / —",
-    "Раскрытые id строк.",
-  ),
-  api("onRowClick", "(row, index, event) => void", "—", "Клик по строке."),
-  api(
-    "loading / loadingRows",
-    "boolean / number",
-    "false / min(pageSize, 5)",
-    "Скелетон, пока строк нет; с данными — только `aria-busy`.",
-  ),
-  api(
-    "empty",
-    "React.ReactNode",
-    "labels.empty",
-    "Содержимое пустого состояния (например, EmptyPage).",
-  ),
-  api(
-    "labels",
-    "Partial<DataTableLabels>",
-    "русские строки",
-    "loading, empty, range(from, to, total), loadingMore, scrollForMore, selectAll, selectRow(label), selectedCount(n), expand(label), collapse(label).",
-  ),
-  api("error", "React.ReactNode", "—", 'Заменяет тело таблицы сообщением с `role="alert"`.'),
-  api(
-    "sort / defaultSort / onSortChange",
-    "DataTableSortState",
-    "— / null / —",
-    "Сортировка: `{ columnId, order }` или `null`.",
-  ),
-  api("page / defaultPage / onPageChange", "number", "— / 1 / —", "Текущая страница (с 1)."),
-  api(
-    "pageSize / showPagination / siblingCount",
-    "number / boolean / number",
-    "10 / true / 1",
-    "Пагинация в подвале; компактна на узкой ширине.",
-  ),
-  api("paginationSize", "ControlSize", "= size", "Размер пагинации отдельно от таблицы."),
-  api(
-    "stickyHeader / stickyFirstColumn",
-    "boolean",
-    "false",
-    "Прилипающие шапка и первая колонка.",
-  ),
-  api("showHeader", "boolean", "true", "Показывать `<thead>`."),
-  api(
-    "infiniteScroll / initialVisibleRows / infiniteBatchSize",
-    "boolean / number / number",
-    "false / pageSize / 20",
-    "Бесконечная прокрутка вместо страниц.",
-  ),
-  api(
-    "hasMore / loadingMore / onLoadMore",
-    "boolean / boolean / () => void | Promise<void>",
-    "false / false / —",
-    "Подгрузка следующей порции с сервера.",
-  ),
-  api(
-    "scrollHeight",
-    "number | string",
-    "360 при infiniteScroll, иначе —",
-    "Макс. высота окна прокрутки (число — px). Без `infiniteScroll` задаётся только явно.",
-  ),
-  api("className", "string", "—", "Класс корневого элемента."),
-  api(
-    "dividerStyle",
-    '"standard" | "dashed" | "dotted" | "none"',
-    '"standard"',
-    "Линии между строками.",
-  ),
-  api(
-    "columnDividers",
-    "boolean",
-    "true",
-    "Вертикальные линии между колонками; false — только линии между строками.",
-  ),
-  api("striped", "boolean", "false", "Зебра."),
-  api(
-    "highlightRowOnHover / highlightColumnOnHover",
-    "boolean",
-    "true / false",
-    "Подсветка строки / колонки при наведении.",
-  ),
-  api(
-    "fillWidth",
-    "boolean",
-    "true",
-    "Таблица на всю ширину контейнера; `false` — по содержимому.",
-  ),
-];
-
-const columnApiRows: PlaygroundApiPropRow[] = [
-  api("id", "string", "—", "Уникальный id (сортировка, data-атрибуты).", "Да"),
-  api("header", "React.ReactNode", "—", "Содержимое заголовка.", "Да"),
-  api(
-    "accessor",
-    "keyof Row | (row) => unknown",
-    "—",
-    "Значение ячейки и сортировки по умолчанию.",
-  ),
-  api("cell", "(row) => React.ReactNode", "—", "Своя отрисовка ячейки."),
-  api("numeric", "boolean", "false", "Числа: вправо и `tabular-nums`."),
-  api(
-    "truncate",
-    "boolean",
-    "false",
-    "Одна строка с многоточием и `title`; ширина из `maxWidth` / `width`.",
-  ),
-  api(
-    "grow",
-    "boolean",
-    "false",
-    "Колонка забирает свободную ширину и переносит текст; таблица заполняет контейнер, а не растёт по содержимому.",
-  ),
-  api(
-    "sortable / sortAccessor / sortComparator",
-    "boolean / (row) => unknown / (a, b, order) => number",
-    "false / — / —",
-    "Сортировка колонки.",
-  ),
-  api(
-    "align",
-    '"start" | "center" | "end"',
-    '"start"',
-    "Выравнивание ячеек (у `numeric` — `end`).",
-  ),
-  api(
-    "headerAlign",
-    '"start" | "center" | "end"',
-    '"start"',
-    "Выравнивание заголовка; не зависит от `align`, стрелка сортировки у правого края.",
-  ),
-  api("width / minWidth / maxWidth", "string", "—", "Размеры колонки."),
-  api(
-    "onHeaderClick / onCellClick",
-    "(…) => void",
-    "—",
-    "Клик по заголовку / ячейке (ячейка становится кнопкой).",
-  ),
-];
-
-function Demo({
-  title,
-  description,
-  code,
-  children,
-}: {
-  title: string;
-  description: React.ReactNode;
-  code: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="demoBlock">
-      <DemoSectionTitle>{title}</DemoSectionTitle>
-      <DemoDescription>{description}</DemoDescription>
-      <PlaygroundExampleFrame.Root code={code.trim()} previewLayout="stack">
-        <PlaygroundExampleFrame.Stage>{children}</PlaygroundExampleFrame.Stage>
-      </PlaygroundExampleFrame.Root>
-    </div>
-  );
-}
+export const page: ComponentPageConfig = {
+  dir: "data-table",
+  title: "DataTable",
+  kind: "composite",
+  description:
+    "Таблица записей: сортировка, страницы или бесконечная прокрутка, выбор строк, вложенные строки и состояния загрузки, пустоты и ошибки. Колонки — данные, не разметка.",
+  examples: [
+    {
+      slot: "overview",
+      description:
+        "Последние заказы: сортируемые колонки, Badge статуса, суммы и пять строк на странице — `columns`, `getRowKey`, `pageSize`.",
+    },
+    {
+      slot: "sizes",
+      description: "Все плотности: строки от 36 до 52 px, шапка — высота контрола яруса — `size`.",
+    },
+    {
+      scenario: "numeric",
+      title: "Числа и длинный текст",
+      description:
+        "Отчёт по складу: числа по правому краю табличными цифрами, длинное название в одну строку с подсказкой — `numeric`, `truncate`, `maxWidth`.",
+    },
+    {
+      scenario: "content-width",
+      title: "Ширина таблицы и колонок",
+      description:
+        "Короткий справочник по ширине содержимого с колонкой по центру и колонка `grow`, которая забирает свободную ширину и переносит текст — `fullWidth`, `align`, `grow`.",
+    },
+    {
+      scenario: "appearance",
+      title: "Оформление строк",
+      description:
+        "Зебра без линий, подсветка колонки под курсором, список «ключ — значение» без шапки — `striped`, `rowDividers`, `highlightColumnOnHover`, `columnDividers`, `showHeader`.",
+    },
+    {
+      scenario: "toolbar",
+      title: "Панель над таблицей",
+      description:
+        "Кампании с поиском, фильтром статуса и экспортом над таблицей; текст, когда ничего не найдено — `toolbar`, `empty`.",
+    },
+    {
+      scenario: "selection",
+      title: "Выбор строк",
+      description:
+        "Участники с флажками: диапазон с Shift, протяжка, «выбрать все» и массовые действия на панели — `selectable`, `selected`, `onSelectedChange`, `getRowLabel`.",
+    },
+    {
+      scenario: "nested-rows",
+      title: "Вложенные строки",
+      description:
+        "Партнёры и их статьи расходов: вложенные строки с отступом под именем, переключатель-шеврон, вместе с выбором и сортировкой — `getRowChildren`, `expanded`, `onExpandedChange`.",
+    },
+    {
+      scenario: "detail-panel",
+      title: "Панель деталей",
+      description:
+        "Детали заказа в строке на всю ширину под раскрытым заказом, по краю первой колонки — `renderExpanded`, `defaultExpanded`.",
+    },
+    {
+      scenario: "sticky",
+      title: "Закреплённые шапка и колонка",
+      description:
+        "Продажи по регионам в окне 280 px: шапка и колонка регионов остаются на месте при прокрутке в обе стороны — `stickyHeader`, `stickyFirstColumn`, `scrollHeight`.",
+    },
+    {
+      scenario: "infinite-scroll",
+      title: "Бесконечная прокрутка",
+      description:
+        "Журнал действий: загруженные строки появляются порциями, затем таблица просит сервер о новых — `paging`, `infiniteBatchSize`, `hasMore`, `loadingMore`, `onLoadMore`.",
+    },
+    {
+      slot: "states",
+      description:
+        "Скелетон загрузки, пустой период и ошибка с повтором: шапка остаётся, меняется только тело — `loading`, `loadingRows`, `empty`, `error`.",
+    },
+    {
+      slot: "controlled",
+      description:
+        "Сортировка и страница у родителя (URL или стор): клик по заголовку — по возрастанию → по убыванию → без сортировки, новая сортировка возвращает на первую страницу — `sort`, `onSortChange`, `page`, `onPageChange`.",
+    },
+    {
+      slot: "narrow",
+      description:
+        "Очередь поддержки шириной 320 px: колонки прокручиваются внутри, первая закреплена, панель и подвал перестраиваются, пагинация становится компактной — `stickyFirstColumn`, `size`.",
+    },
+  ],
+  api,
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        action: "Переходит по кнопкам сортировки, флажкам, переключателям и кликабельным ячейкам.",
+      },
+      {
+        keys: "Enter · Space",
+        action: "Сортирует по колонке, раскрывает строку или нажимает кликабельную ячейку.",
+      },
+      { keys: "Space", action: "Отмечает строку на флажке под фокусом." },
+      { keys: "Shift + Space", action: "Отмечает диапазон от последней отмеченной строки." },
+    ],
+    aria: [
+      'Нативная `<table>`; заголовки — `scope="col"`, у сортируемых — `<button>` и `aria-sort`.',
+      "Флажки строк названы `labels.selectRow` с `{label}` из `getRowLabel`; флажок в шапке — `labels.selectAll`, частичный выбор — `indeterminate`.",
+      "После смены выбора вежливая область объявляет `labels.selectedCount`; выбранные строки — `aria-selected`.",
+      "Переключатель раскрытия — кнопка с `aria-expanded`, `aria-controls` (детали или вложенные строки) и `labels.expand` / `labels.collapse`.",
+      'Загрузка: `aria-busy` на таблице и статус `labels.loading`; ошибка — `role="alert"`; пустое состояние — `role="status"`.',
+    ],
+  },
+};
 
 export default function DataTableSection() {
-  return (
-    <PageContent.Section aria-labelledby="data-table-heading">
-      <PageContent.Header>
-        <PageContent.Title id="data-table-heading">Data Table</PageContent.Title>
-        <PageContent.Description measure="full">
-          Таблица на белой поверхности без внешней рамки: приглушённая шапка, тонкие линии между
-          строками, числа вправо. Сортировка, пагинация, выбор, состояния загрузки, пустоты и
-          ошибки, тулбар и адаптация до 320px.
-        </PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>
-        <div className="demoExamples">
-          <Demo
-            title="Дашборд"
-            description={
-              <>
-                Типичный экран: ряд метрик на <code>Card variant="stat-trend"</code> и таблица
-                последних заказов с аватаром, бейджем статуса и суммами в колонке{" "}
-                <code>numeric</code>.
-              </>
-            }
-            code={dashboardSource}
-          >
-            <DataTableDashboardExample />
-          </Demo>
-
-          <Demo
-            title="Плотность"
-            description={
-              <>
-                Одна ось <code>size</code>: <code>xs</code>/<code>s</code> — компактная (36),{" "}
-                <code>m</code> — по умолчанию (44), <code>l</code>/<code>xl</code> — просторная (52)
-                — это минимальная высота строки. Высоту задают отступы ячейки: однострочный текст и
-                контрол на ярус ниже держат строку в минимуме, аватар с двумя строками делает её
-                выше с теми же отступами. Шапка — высота контрола яруса (28–48), её текст на ступень
-                мельче ячеек. Чекбоксы берут ярус таблицы, бейджи — на ступень ниже.
-              </>
-            }
-            code={sizesSource}
-          >
-            <DataTableSizesExample />
-          </Demo>
-
-          <Demo
-            title="Числа и обрезка"
-            description={
-              <>
-                <code>numeric</code> выравнивает вправо и включает <code>tabular-nums</code> —
-                разряды встают столбиком. <code>truncate</code> с <code>maxWidth</code> держит
-                длинный текст в одну строку.
-              </>
-            }
-            code={numericSource}
-          >
-            <DataTableNumericExample />
-          </Demo>
-
-          <Demo
-            title="Сортировка и пагинация"
-            description={
-              <>
-                Управляемые <code>sort</code> и <code>page</code>. Заголовок сортируемой колонки —
-                кнопка с <code>aria-sort</code>; в подвале — диапазон строк и{" "}
-                <code>Pagination</code>.
-              </>
-            }
-            code={sortingPaginationSource}
-          >
-            <DataTableSortingPaginationExample />
-          </Demo>
-
-          <Demo
-            title="Выбор строк"
-            description={
-              <>
-                <code>selectable</code> добавляет колонку чекбоксов. Shift+клик — диапазон от
-                последней строки; зажмите чекбокс и ведите по соседним — все пройденные строки
-                получат то же состояние. Space с клавиатуры, «выбрать все» в шапке, объявление
-                «Выбрано: N». Массовые действия — в <code>toolbar</code>.
-              </>
-            }
-            code={selectionSource}
-          >
-            <DataTableSelectionExample />
-          </Demo>
-
-          <Demo
-            title="Вложенные строки"
-            description={
-              <>
-                <code>getRowChildren</code> — подстроки под родителем с отступом на ширину аватара;
-                шеврон с <code>aria-expanded</code> и <code>aria-controls</code>, раскрытый родитель
-                выделен. <code>expanded</code> / <code>onExpandedChange</code> по id; работает с
-                выбором и сортировкой.
-              </>
-            }
-            code={nestedRowsSource}
-          >
-            <DataTableNestedRowsExample />
-          </Demo>
-
-          <Demo
-            title="Панель деталей"
-            description={
-              <>
-                <code>renderExpanded</code> — строка на всю ширину под раскрытой, текст по первой
-                колонке контента; появление по токенам движения. С <code>stickyFirstColumn</code>{" "}
-                шеврон закреплён вместе с первой колонкой.
-              </>
-            }
-            code={detailPanelSource}
-          >
-            <DataTableDetailPanelExample />
-          </Demo>
-
-          <Demo
-            title="Тулбар: поиск и фильтр"
-            description={
-              <>
-                <code>toolbar</code> над таблицей: <code>Input</code>, <code>SegmentedControl</code>{" "}
-                и кнопка размера <code>s</code>. Поля внутри таблицы автоматически берут фон для
-                поверхности. Если фильтр ничего не нашёл — <code>empty</code>.
-              </>
-            }
-            code={toolbarSource}
-          >
-            <DataTableToolbarExample />
-          </Demo>
-
-          <Demo
-            title="Загрузка, пусто, ошибка"
-            description={
-              <>
-                <code>loading</code> рисует скелетон (<code>loadingRows</code>) и объявляет{" "}
-                <code>labels.loading</code>; <code>empty</code> — приглушённый текст по центру;{" "}
-                <code>error</code> — сообщение с <code>role="alert"</code>, можно с кнопкой повтора.
-                Для иллюстрированной пустоты используйте <code>EmptyPage</code>.
-              </>
-            }
-            code={statesSource}
-          >
-            <DataTableStatesExample />
-          </Demo>
-
-          <Demo
-            title="Прилипающая шапка и первая колонка"
-            description={
-              <>
-                <code>stickyHeader</code> и <code>stickyFirstColumn</code> при прокрутке в обе
-                стороны. Высота окна прокрутки — <code>scrollHeight</code>.
-              </>
-            }
-            code={stickySource}
-          >
-            <DataTableStickyExample />
-          </Demo>
-
-          <Demo
-            title="Бесконечная прокрутка"
-            description={
-              <>
-                <code>infiniteScroll</code> раскрывает строки порциями, затем вызывает{" "}
-                <code>onLoadMore</code>, пока <code>hasMore</code>.
-              </>
-            }
-            code={infiniteScrollSource}
-          >
-            <DataTableInfiniteScrollExample />
-          </Demo>
-
-          <Demo
-            title="Оформление строк"
-            description={
-              <>
-                <code>striped</code>, <code>dividerStyle</code> (<code>none</code>,{" "}
-                <code>dashed</code>, <code>dotted</code>), <code>columnDividers={"{false}"}</code>,{" "}
-                <code>highlightColumnOnHover</code> и таблица без шапки.
-              </>
-            }
-            code={appearanceSource}
-          >
-            <DataTableAppearanceExample />
-          </Demo>
-
-          <Demo
-            title="Ширина таблицы"
-            description={
-              <>
-                По умолчанию <code>fillWidth</code> растягивает таблицу на всю ширину контейнера;{" "}
-                <code>fillWidth=&#123;false&#125;</code> — ширина по содержимому. Колонку можно
-                выровнять по центру через <code>align="center"</code>. Колонка с <code>grow</code>{" "}
-                забирает свободную ширину и переносит длинный текст.
-              </>
-            }
-            code={contentWidthSource}
-          >
-            <DataTableContentWidthExample />
-          </Demo>
-
-          <Demo
-            title="Узкий контейнер (320px)"
-            description={
-              <>
-                Колонки прокручиваются внутри, первая прилипает. Тулбар и подвал перестраиваются по
-                ширине самой таблицы (container query), пагинация сворачивается в «‹ 3 / 8 ›».
-              </>
-            }
-            code={narrowSource}
-          >
-            <DataTableNarrowExample />
-          </Demo>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>API</DemoSectionTitle>
-            <DemoApiTitle>DataTable.Root</DemoApiTitle>
-            <PlaygroundApiTable rows={rootApiRows} />
-            <DemoApiTitle>DataTableColumn&lt;Row&gt;</DemoApiTitle>
-            <PlaygroundApiTable rows={columnApiRows} />
-          </div>
-        </div>
-      </PageContent.Body>
-    </PageContent.Section>
-  );
+  return <ComponentPage page={page} />;
 }

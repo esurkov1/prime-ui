@@ -1,11 +1,10 @@
-/** `stickyHeader` and `stickyFirstColumn` while scrolling both ways inside a `scrollHeight` window. Use for wide reports (months × regions). */
-
+/** Monthly sales by region in a 280 px window: the head and the region column stay while scrolling both ways — `stickyHeader`, `stickyFirstColumn`, `scrollHeight`. */
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
 
-type Region = { region: string } & Record<`m${number}`, number>;
+type Region = { region: string; sales: number[] };
 
-const months = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
-const regions = [
+const MONTHS = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+const REGIONS = [
   "Москва",
   "Санкт-Петербург",
   "Новосибирск",
@@ -18,43 +17,37 @@ const regions = [
   "Ростов-на-Дону",
   "Уфа",
   "Красноярск",
-  "Воронеж",
-  "Пермь",
 ];
 
-const rows: Region[] = regions.map((region, r) => {
-  const row = { region } as Region;
-  months.forEach((_, m) => {
-    row[`m${m}`] = 120 + ((r * 37 + m * 53) % 480);
-  });
-  return row;
-});
+const SALES: Region[] = REGIONS.map((region, r) => ({
+  region,
+  sales: MONTHS.map((_, m) => 120 + ((r * 37 + m * 53) % 480)),
+}));
 
-const int = new Intl.NumberFormat("ru-RU");
+const INT = new Intl.NumberFormat("ru-RU");
 
-const columns: DataTableColumn<Region>[] = [
+const COLUMNS: DataTableColumn<Region>[] = [
   { id: "region", header: "Регион", accessor: "region", minWidth: "10rem" },
-  ...months.map(
+  ...MONTHS.map(
     (label, m): DataTableColumn<Region> => ({
-      id: `m${m}`,
+      id: label,
       header: label,
       numeric: true,
       minWidth: "5rem",
-      cell: (row) => int.format(row[`m${m}`]),
+      cell: (row) => INT.format(row.sales[m]),
     }),
   ),
 ];
 
 export default function DataTableStickyExample() {
   return (
-    <DataTable.Root
-      columns={columns}
-      rows={rows}
+    <DataTable
+      columns={COLUMNS}
+      rows={SALES}
       getRowKey={(row) => row.region}
+      paging="none"
       stickyHeader
       stickyFirstColumn
-      infiniteScroll
-      initialVisibleRows={rows.length}
       scrollHeight={280}
     />
   );

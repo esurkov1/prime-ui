@@ -1,5 +1,4 @@
-/** `numeric` columns align end with `tabular-nums`; `truncate` + `maxWidth` keeps a long name on one line with a `title`. Use for inventories and reports with many numbers. */
-
+/** An inventory report: number columns align to the end in tabular figures, a long name stays on one line with a title — `numeric`, `truncate`, `maxWidth`. */
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
 
 type Sku = {
@@ -11,7 +10,7 @@ type Sku = {
   margin: number;
 };
 
-const rows: Sku[] = [
+const SKUS: Sku[] = [
   {
     sku: "KB-210",
     name: "Клавиатура беспроводная с подсветкой, русская раскладка",
@@ -25,25 +24,18 @@ const rows: Sku[] = [
   { sku: "HB-7P", name: "USB-хаб на 7 портов", stock: 530, price: 2190, sold: 97, margin: 0.402 },
 ];
 
-const int = new Intl.NumberFormat("ru-RU");
-const pct = new Intl.NumberFormat("ru-RU", { style: "percent", maximumFractionDigits: 1 });
+const INT = new Intl.NumberFormat("ru-RU");
+const PCT = new Intl.NumberFormat("ru-RU", { style: "percent", maximumFractionDigits: 1 });
 
-const columns: DataTableColumn<Sku>[] = [
+const COLUMNS: DataTableColumn<Sku>[] = [
   { id: "sku", header: "Артикул", accessor: "sku", width: "6rem" },
   { id: "name", header: "Товар", accessor: "name", truncate: true, maxWidth: "14rem" },
-  { id: "stock", header: "Остаток, шт", numeric: true, cell: (r) => int.format(r.stock) },
-  { id: "price", header: "Цена, ₽", numeric: true, cell: (r) => int.format(r.price) },
-  { id: "sold", header: "Продано", numeric: true, cell: (r) => int.format(r.sold) },
-  { id: "margin", header: "Маржа", numeric: true, cell: (r) => pct.format(r.margin) },
+  { id: "stock", header: "Остаток, шт", numeric: true, cell: (row) => INT.format(row.stock) },
+  { id: "price", header: "Цена, ₽", numeric: true, cell: (row) => INT.format(row.price) },
+  { id: "sold", header: "Продано", numeric: true, cell: (row) => INT.format(row.sold) },
+  { id: "margin", header: "Маржа", numeric: true, cell: (row) => PCT.format(row.margin) },
 ];
 
 export default function DataTableNumericExample() {
-  return (
-    <DataTable.Root
-      columns={columns}
-      rows={rows}
-      getRowKey={(row) => row.sku}
-      showPagination={false}
-    />
-  );
+  return <DataTable columns={COLUMNS} rows={SKUS} getRowKey={(row) => row.sku} paging="none" />;
 }

@@ -1,51 +1,48 @@
-/** Loading skeleton (`loading` + `loadingRows`), `empty` and `error` with a retry button: the header stays, only the body changes. Use for every table backed by a request. */
-
+/** Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `error`. */
 import { Button, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
 
 type Payment = { id: string; payer: string; amount: number };
 
-const columns: DataTableColumn<Payment>[] = [
+const COLUMNS: DataTableColumn<Payment>[] = [
   { id: "id", header: "Платёж", accessor: "id" },
   { id: "payer", header: "Плательщик", accessor: "payer" },
   { id: "amount", header: "Сумма, ₽", accessor: "amount", numeric: true },
 ];
 
-const none: Payment[] = [];
+const NO_PAYMENTS: Payment[] = [];
 
 export default function DataTableStatesExample() {
   return (
-    <div className={styles.statesGrid}>
-      <div className={styles.group}>
-        <Typography.Root variant="code" tone="muted">
-          loading + loadingRows
+    <>
+      <div>
+        <DataTable columns={COLUMNS} rows={NO_PAYMENTS} loading loadingRows={3} />
+        <Typography.Root as="span" variant="caption" tone="muted">
+          loading · loadingRows=&#123;3&#125;
         </Typography.Root>
-        <DataTable.Root columns={columns} rows={none} loading loadingRows={3} />
       </div>
-      <div className={styles.group}>
-        <Typography.Root variant="code" tone="muted">
+      <div>
+        <DataTable columns={COLUMNS} rows={NO_PAYMENTS} empty="Платежей за выбранный период нет" />
+        <Typography.Root as="span" variant="caption" tone="muted">
           empty
         </Typography.Root>
-        <DataTable.Root columns={columns} rows={none} empty="Платежей за выбранный период нет" />
       </div>
-      <div className={styles.group}>
-        <Typography.Root variant="code" tone="muted">
-          error
-        </Typography.Root>
-        <DataTable.Root
-          columns={columns}
-          rows={none}
+      <div>
+        <DataTable
+          columns={COLUMNS}
+          rows={NO_PAYMENTS}
           error={
-            <div className={styles.errorBody}>
+            <>
               Не удалось загрузить платежи
               <Button.Root variant="outline" tone="neutral" size="s">
                 Повторить
               </Button.Root>
-            </div>
+            </>
           }
         />
+        <Typography.Root as="span" variant="caption" tone="muted">
+          error
+        </Typography.Root>
       </div>
-    </div>
+    </>
   );
 }

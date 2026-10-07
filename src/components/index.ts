@@ -162,12 +162,11 @@ export type {
   DataTableColumn,
   DataTableLabels,
   DataTableOrder,
-  DataTableRootProps,
+  DataTableProps,
   DataTableSortState,
 } from "./data-table/DataTable";
 export { DataTable } from "./data-table/DataTable";
 export type {
-  DatepickerBadgeProps,
   DatepickerLabels,
   DatepickerPanelProps,
   DatepickerPreset,
@@ -347,10 +346,7 @@ export type {
   PageContentTitleProps,
 } from "./page-content/PageContent";
 export { PageContent } from "./page-content/PageContent";
-export type {
-  PaginationLabels,
-  PaginationRootProps,
-} from "./pagination/Pagination";
+export type { PaginationLabels, PaginationProps } from "./pagination/Pagination";
 export { Pagination } from "./pagination/Pagination";
 export type {
   PopoverActionsProps,

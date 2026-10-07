@@ -1,25 +1,26 @@
-.card {
+/* Layout of the Dnd scenarios: semantic tokens only. */
+
+.list {
   width: 100%;
   max-width: calc(var(--prime-space-24) * 4);
 }
 
-.list {
-  gap: var(--prime-space-2);
-}
-
-/* A row is a fill on the card, no outline: the field fill reads as "a thing you can hold". */
-.row {
+/* A row is a fill on the page, no outline: the fill reads as "a thing you can hold". */
+.row,
+.handleRow {
   display: flex;
   align-items: center;
   gap: var(--prime-space-3);
   min-width: 0;
   padding: var(--prime-space-3) var(--prime-space-4);
   border-radius: var(--prime-radius-m);
-  background: var(--prime-color-field-bg);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
 }
 
-.rowHandle {
-  padding-left: var(--prime-space-2);
+/* The grip sits closer to the edge: it is a square button with its own inner room. */
+.handleRow {
+  padding-inline-start: var(--prime-space-2);
 }
 
 .rowText {
@@ -27,20 +28,6 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
-}
-
-.hint {
-  margin-top: var(--prime-space-4);
-}
-
-.chips {
-  gap: var(--prime-space-2);
-}
-
-/* The item is the badge's own shape (same radius token as Badge), so the gap and the focus ring match it. */
-.tagItem {
-  display: inline-flex;
-  border-radius: var(--prime-badge-m-radius);
 }
 
 .board {
@@ -78,8 +65,25 @@
   box-shadow: var(--prime-shadow-raised);
 }
 
-/* The sortable area of a column: fills the column so an empty one is still a drop target. */
+/* The sortable area of a column fills it, so an empty column is still a drop target. */
 .cards {
   flex: 1;
   min-height: calc(var(--prime-space-24) * 1.5);
+}
+
+/* 320 px strip; the padding keeps room for the focus ring of the first and last tag. */
+.strip {
+  width: min(100%, calc(var(--prime-space-20) * 4));
+  padding: var(--prime-space-1);
+}
+
+.chips {
+  gap: var(--prime-space-2);
+  width: max-content;
+}
+
+/* The item takes the badge's own shape, so the gap and the focus ring match it. */
+.chip {
+  display: inline-flex;
+  border-radius: var(--prime-badge-m-radius);
 }

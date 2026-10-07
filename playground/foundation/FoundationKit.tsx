@@ -105,12 +105,11 @@ export function TokenTable<Row>({
   getRowKey: (row: Row, index: number) => React.Key;
 }) {
   return (
-    <DataTable.Root
+    <DataTable
       columns={columns}
       rows={rows}
       getRowKey={getRowKey}
-      showPagination={false}
-      pageSize={rows.length || 1}
+      paging="none"
       highlightRowOnHover={false}
     />
   );

@@ -2,8 +2,9 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { Datepicker, datepickerPresets, resolvePanelLayout, YEARLESS_YEAR } from "./Datepicker";
+import { Datepicker, datepickerPresets, YEARLESS_YEAR } from "./Datepicker";
 import { matchPreset, monthGrid, parseTime, rowsNeeded } from "./datepickerModel";
+import { resolvePanelLayout } from "./panelLayout";
 
 const TODAY = new Date(2026, 9, 7); // 7 октября 2026, среда
 
@@ -418,24 +419,13 @@ describe("Datepicker.Panel — доступная ширина", () => {
   });
 });
 
-describe("Datepicker.Badge", () => {
-  it("бейдж в поле: мягкий, на ярус ниже, входит в доступное имя", () => {
-    render(
-      <Datepicker.Root
-        mode="single"
-        label="Дата ТО"
-        placeholder="дд.мм.гггг"
-        value={null}
-        onValueChange={() => {}}
-      >
-        <Datepicker.Badge color="orange">Не заполнено</Datepicker.Badge>
-      </Datepicker.Root>,
+describe("Datepicker labels", () => {
+  it("labels.placeholder is the default field text; placeholder overrides it per field", () => {
+    const { rerender } = render(
+      <Datepicker.Root mode="single" label="Дата ТО" labels={{ placeholder: "дд.мм.гггг" }} />,
     );
-    const badge = screen.getByText("Не заполнено");
-    expect(badge).toHaveAttribute("data-variant", "soft");
-    expect(badge).toHaveAttribute("data-tier", "s");
-    expect(
-      screen.getByRole("button", { name: "Дата ТО дд.мм.гггг Не заполнено" }),
-    ).toContainElement(badge);
+    expect(screen.getByRole("button", { name: "Дата ТО дд.мм.гггг" })).toBeInTheDocument();
+    rerender(<Datepicker.Root mode="single" label="Дата ТО" placeholder="Не заполнено" />);
+    expect(screen.getByRole("button", { name: "Дата ТО Не заполнено" })).toBeInTheDocument();
   });
 });

@@ -1,17 +1,18 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { Pagination } from "./Pagination";
 
 describe("Pagination", () => {
   it("renders navigation with pagination label", () => {
-    render(<Pagination.Root value={1} totalPages={5} onValueChange={() => undefined} />);
+    render(<Pagination value={1} totalPages={5} onValueChange={() => undefined} />);
 
     expect(screen.getByRole("navigation", { name: "Навигация по страницам" })).toBeInTheDocument();
   });
 
   it("defaults size to m via data-size on nav", () => {
-    render(<Pagination.Root value={1} totalPages={5} onValueChange={() => undefined} />);
+    render(<Pagination value={1} totalPages={5} onValueChange={() => undefined} />);
 
     expect(screen.getByRole("navigation", { name: "Навигация по страницам" })).toHaveAttribute(
       "data-size",
@@ -20,7 +21,7 @@ describe("Pagination", () => {
   });
 
   it("sets data-size from size prop", () => {
-    render(<Pagination.Root value={1} totalPages={5} onValueChange={() => undefined} size="xl" />);
+    render(<Pagination value={1} totalPages={5} onValueChange={() => undefined} size="xl" />);
 
     expect(screen.getByRole("navigation", { name: "Навигация по страницам" })).toHaveAttribute(
       "data-size",
@@ -30,7 +31,7 @@ describe("Pagination", () => {
 
   it("calls onValueChange with previous page when Previous is clicked", () => {
     const onPageChange = vi.fn();
-    render(<Pagination.Root value={2} totalPages={5} onValueChange={onPageChange} />);
+    render(<Pagination value={2} totalPages={5} onValueChange={onPageChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Предыдущая страница" }));
     expect(onPageChange).toHaveBeenCalledWith(1);
@@ -38,7 +39,7 @@ describe("Pagination", () => {
 
   it("calls onValueChange with next page when Next is clicked", () => {
     const onPageChange = vi.fn();
-    render(<Pagination.Root value={2} totalPages={5} onValueChange={onPageChange} />);
+    render(<Pagination value={2} totalPages={5} onValueChange={onPageChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Следующая страница" }));
     expect(onPageChange).toHaveBeenCalledWith(3);
@@ -46,14 +47,14 @@ describe("Pagination", () => {
 
   it("calls onValueChange when a page number is clicked", () => {
     const onPageChange = vi.fn();
-    render(<Pagination.Root value={1} totalPages={5} onValueChange={onPageChange} />);
+    render(<Pagination value={1} totalPages={5} onValueChange={onPageChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Страница 3" }));
     expect(onPageChange).toHaveBeenCalledWith(3);
   });
 
   it("shows ellipsis for long page ranges", () => {
-    render(<Pagination.Root value={5} totalPages={20} onValueChange={() => undefined} />);
+    render(<Pagination value={5} totalPages={20} onValueChange={() => undefined} />);
 
     const nav = screen.getByRole("navigation", { name: "Навигация по страницам" });
     const ellipses = within(nav).getAllByText("…");
@@ -64,26 +65,26 @@ describe("Pagination", () => {
   });
 
   it("always shows first and last page for long ranges", () => {
-    render(<Pagination.Root value={10} totalPages={25} onValueChange={() => undefined} />);
+    render(<Pagination value={10} totalPages={25} onValueChange={() => undefined} />);
 
     expect(screen.getByRole("button", { name: "Страница 1" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Страница 25" })).toBeInTheDocument();
   });
 
   it("disables Previous on page 1", () => {
-    render(<Pagination.Root value={1} totalPages={5} onValueChange={() => undefined} />);
+    render(<Pagination value={1} totalPages={5} onValueChange={() => undefined} />);
 
     expect(screen.getByRole("button", { name: "Предыдущая страница" })).toBeDisabled();
   });
 
   it("disables Next on last page", () => {
-    render(<Pagination.Root value={5} totalPages={5} onValueChange={() => undefined} />);
+    render(<Pagination value={5} totalPages={5} onValueChange={() => undefined} />);
 
     expect(screen.getByRole("button", { name: "Следующая страница" })).toBeDisabled();
   });
 
   it("sets aria-current=page on the active page button", () => {
-    render(<Pagination.Root value={3} totalPages={7} onValueChange={() => undefined} />);
+    render(<Pagination value={3} totalPages={7} onValueChange={() => undefined} />);
 
     const current = screen.getByRole("button", { name: "Страница 3" });
     expect(current).toHaveAttribute("aria-current", "page");
@@ -94,13 +95,13 @@ describe("Pagination", () => {
 
   it("renders nothing when totalPages is below 1", () => {
     const { container } = render(
-      <Pagination.Root value={1} totalPages={0} onValueChange={() => undefined} />,
+      <Pagination value={1} totalPages={0} onValueChange={() => undefined} />,
     );
 
     expect(container.firstChild).toBeNull();
   });
   it("renders current/total summary instead of page numbers in compact mode", () => {
-    render(<Pagination.Root value={3} totalPages={12} onValueChange={() => undefined} compact />);
+    render(<Pagination value={3} totalPages={12} onValueChange={() => undefined} compact />);
     const nav = screen.getByRole("navigation", { name: "Навигация по страницам" });
     expect(nav).toHaveAttribute("data-compact", "true");
     expect(screen.queryByRole("button", { name: "Страница 3" })).not.toBeInTheDocument();
@@ -108,9 +109,7 @@ describe("Pagination", () => {
   });
 
   it("keeps page buttons and adds summary for compact auto", () => {
-    render(
-      <Pagination.Root value={3} totalPages={12} onValueChange={() => undefined} compact="auto" />,
-    );
+    render(<Pagination value={3} totalPages={12} onValueChange={() => undefined} compact="auto" />);
     expect(screen.getByRole("navigation", { name: "Навигация по страницам" })).toHaveAttribute(
       "data-compact",
       "auto",
@@ -123,7 +122,7 @@ describe("Pagination", () => {
 
   it("uncontrolled: defaultValue sets the start page and clicks move it", () => {
     const onValueChange = vi.fn();
-    render(<Pagination.Root defaultValue={2} totalPages={5} onValueChange={onValueChange} />);
+    render(<Pagination defaultValue={2} totalPages={5} onValueChange={onValueChange} />);
     expect(screen.getByRole("button", { name: "Страница 2" })).toHaveAttribute(
       "aria-current",
       "page",
@@ -137,8 +136,19 @@ describe("Pagination", () => {
   });
 
   it("uses labels overrides", () => {
-    render(<Pagination.Root totalPages={3} labels={{ nav: "Pages", page: (p) => `Page ${p}` }} />);
+    render(<Pagination totalPages={3} labels={{ nav: "Pages", page: "Page {page}" }} />);
     expect(screen.getByRole("navigation", { name: "Pages" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Page 1" })).toBeInTheDocument();
+  });
+
+  it("works from the keyboard: Tab reaches the buttons, Enter picks a page", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<Pagination defaultValue={1} totalPages={5} onValueChange={onValueChange} />);
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Страница 1" })).toHaveFocus();
+    await user.tab();
+    await user.keyboard("{Enter}");
+    expect(onValueChange).toHaveBeenCalledWith(2);
   });
 });

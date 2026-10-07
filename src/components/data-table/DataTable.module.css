@@ -20,7 +20,6 @@
   --dt-gap: var(--prime-space-2);
   --dt-text-size: var(--prime-control-m-text-size);
   --dt-text-line-height: var(--prime-control-m-line-height);
-  --dt-sort-icon: var(--prime-control-m-icon);
   --dt-choice: var(--prime-control-m-choice);
   /* Expand toggle: square ghost button one tier below the table (m → xs, 28). */
   --dt-toggle: var(--prime-control-xs-height);
@@ -38,7 +37,6 @@
   /* Two steps: on the canvas one step off white equals the canvas, and the table's top edge vanishes. */
   --dt-head-bg: color-mix(in srgb, var(--dt-surface) 92%, var(--prime-color-text-primary));
   --dt-divider-color: var(--prime-color-border-subtle);
-  --dt-divider-style: solid;
   --dt-divider-width: var(--prime-border-width);
   --dt-column-divider-width: var(--prime-border-width);
 
@@ -71,7 +69,6 @@
   --dt-pad-x: var(--prime-space-2);
   --dt-text-size: var(--prime-control-xs-text-size);
   --dt-text-line-height: var(--prime-control-xs-line-height);
-  --dt-sort-icon: var(--prime-control-xs-icon);
   --dt-choice: var(--prime-control-xs-choice);
   --dt-indent: calc(var(--prime-avatar-xs) + var(--dt-gap));
 }
@@ -84,7 +81,6 @@
   --dt-head-line-height: var(--prime-control-s-label-line-height);
   --dt-text-size: var(--prime-control-s-text-size);
   --dt-text-line-height: var(--prime-control-s-line-height);
-  --dt-sort-icon: var(--prime-control-s-icon);
   --dt-choice: var(--prime-control-s-choice);
   --dt-indent: calc(var(--prime-avatar-s) + var(--dt-gap));
 }
@@ -97,7 +93,6 @@
   --dt-head-line-height: var(--prime-control-l-label-line-height);
   --dt-text-size: var(--prime-control-l-text-size);
   --dt-text-line-height: var(--prime-control-l-line-height);
-  --dt-sort-icon: var(--prime-control-l-icon);
   --dt-choice: var(--prime-control-l-choice);
   --dt-toggle: var(--prime-control-s-height);
   --dt-indent: calc(var(--prime-avatar-l) + var(--dt-gap));
@@ -112,7 +107,6 @@
   --dt-pad-x: var(--prime-space-4);
   --dt-text-size: var(--prime-control-xl-text-size);
   --dt-text-line-height: var(--prime-control-xl-line-height);
-  --dt-sort-icon: var(--prime-control-xl-icon);
   --dt-choice: var(--prime-control-xl-choice);
   --dt-toggle: var(--prime-control-s-height);
   --dt-indent: calc(var(--prime-avatar-l) + var(--dt-gap));
@@ -140,15 +134,7 @@
   user-select: none;
 }
 
-.root[data-divider="dashed"] {
-  --dt-divider-style: dashed;
-}
-
-.root[data-divider="dotted"] {
-  --dt-divider-style: dotted;
-}
-
-.root[data-divider="none"] {
+.root[data-row-dividers="false"] {
   --dt-divider-width: 0;
 }
 
@@ -179,8 +165,6 @@
   width: 100%;
   padding: 0;
   isolation: isolate;
-  /* No rubber-band: an elastic overscroll would pull rows away from the sticky head and column. */
-  overscroll-behavior: none;
 }
 
 .table {
@@ -296,13 +280,9 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
+/* The kit Icon takes the tier icon size from the table's ControlSizeProvider. */
 .sortIcon {
-  display: inline-flex;
   flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--dt-sort-icon);
-  height: var(--dt-sort-icon);
   /* Quiet by design: the header is chrome, the data is the content. */
   color: var(--prime-color-text-disabled);
   transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
@@ -315,11 +295,6 @@
 
 .headCell[data-sorted="true"] .sortIcon {
   color: var(--prime-color-text-secondary);
-}
-
-.sortGlyph {
-  width: 100%;
-  height: 100%;
 }
 
 /* ---------- Body ---------- */
@@ -364,7 +339,7 @@
 }
 
 .row + .row .cell {
-  border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color);
+  border-top: var(--dt-divider-width) solid var(--dt-divider-color);
 }
 
 /* ---------- Leading utility columns ---------- */
@@ -412,7 +387,7 @@
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.toggle[aria-expanded="true"] .chevron {
+.toggleCell [aria-expanded="true"] .chevron {
   transform: rotate(90deg);
 }
 
@@ -452,25 +427,18 @@
   --dt-cell-bg: var(--dt-step);
 }
 
-/* Rows mounted by an expand, or newly added to the data, fade in while settling by space-1.
-   Sorting and paging swap rows instantly: they are frequent, and captured rows would escape the
-   scroll viewport's clip in a view transition. */
-.row[data-animate="true"] > .cell {
-  animation: dt-row-enter var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
-}
-
-@keyframes dt-row-enter {
-  from {
-    opacity: 0;
-    transform: translateY(calc(-1 * var(--prime-space-1)));
-  }
+/* Rows mounted by an expand, or newly added to the data, drop in from above (`enterMotion.enterBase`
+   on their cells). Sorting and paging swap rows instantly: they are frequent, and captured rows
+   would escape the scroll viewport's clip in a view transition. */
+.row[data-animate="true"] {
+  --enter-shift: calc(-1 * var(--prime-space-1));
 }
 
 /* Detail panel under an expanded row: sunken step, content aligned with the first content column. */
 .detailCell {
   padding: 0;
   background: var(--dt-step);
-  border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color);
+  border-top: var(--dt-divider-width) solid var(--dt-divider-color);
 }
 
 .detailMotion {
@@ -501,7 +469,7 @@
 }
 
 .detailRow + .row .cell {
-  border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color);
+  border-top: var(--dt-divider-width) solid var(--dt-divider-color);
 }
 
 .row[aria-selected="true"] {
@@ -614,20 +582,17 @@
   }
 }
 
+/* An endless pulse would hold the skeleton at an arbitrary frame once durations collapse. */
 @media (prefers-reduced-motion: reduce) {
-  .skeleton,
-  .row[data-animate="true"] > .cell,
-  .detailRow[data-animate="true"] .detailMotion {
+  .skeleton {
     animation: none;
-  }
-
-  .chevron {
-    transition: none;
   }
 }
 
+/* The default empty state is EmptyPage `compact` (its own padding); a custom `empty` / `error`
+   goes into `.stateContent`. Both end up with space-10 × space-4 around the content. */
 .stateCell {
-  padding: var(--prime-space-10) var(--prime-space-4);
+  padding: var(--prime-space-5) var(--prime-space-1);
   background: var(--dt-surface);
 }
 
@@ -638,6 +603,7 @@
   gap: var(--prime-space-3);
   max-width: var(--prime-layout-reading-max-width);
   margin-inline: auto;
+  padding: var(--prime-space-5) var(--prime-space-3);
   font-size: var(--prime-text-body-s-size);
   line-height: var(--prime-text-body-s-line-height);
   color: var(--prime-color-text-muted);
@@ -651,18 +617,6 @@
 
 .sentinel {
   height: var(--prime-space-1);
-}
-
-.srOnly {
-  position: absolute;
-  width: var(--prime-border-width);
-  height: var(--prime-border-width);
-  margin: calc(-1 * var(--prime-border-width));
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
 }
 
 /* ---------- Footer ---------- */

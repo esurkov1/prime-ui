@@ -1,30 +1,18 @@
-/* Example layout: semantic tokens only. */
+/* Layout of the Datepicker scenarios: semantic tokens only. */
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(calc(var(--prime-space-24) * 2.5), 1fr));
-  gap: var(--prime-space-5) var(--prime-space-4);
-  width: 100%;
-}
-
-/* A 320px phone-width column: the panel measures the column and shows one compact month. */
-.phone {
-  width: calc(var(--prime-space-20) * 4);
-  max-width: 100%;
-}
-
+/* A form on a card. */
 .form {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-5);
+  width: 100%;
+  max-width: calc(var(--prime-space-24) * 5);
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 }
 
 .actions {
@@ -34,7 +22,8 @@
   gap: var(--prime-space-2);
 }
 
-.card {
-  width: 100%;
-  max-width: calc(var(--prime-space-24) * 5);
+/* A 320 px phone column: the panel measures it and shows one compact month. */
+.phone {
+  width: calc(var(--prime-space-20) * 4);
+  max-width: 100%;
 }

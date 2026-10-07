@@ -1,13 +1,14 @@
-/** The main scenario: a toolbar (filter button + search), the applied filters as chips, and a list narrowed by `matchesSmartFilter` and the search text. Values are shown or hidden; a field with a fixed set (method, state) never lets you hide everything. Use above lists and tables with several filterable fields. */
+/** Filters above a request list: the filter button and the search, applied filters as tags, rows narrowed by the value and the text — `fields`, `value`, `search`, `matchesSmartFilter`. */
 import {
   Badge,
   Card,
   matchesSmartFilter,
   SmartFilter,
+  type SmartFilterField,
   type SmartFilterValue,
   Typography,
 } from "prime-ui-kit";
-import { useState } from "react";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
@@ -36,20 +37,16 @@ const REQUESTS = [
   { id: 8, route: "/events/subscribe", method: "POST", service: "events", state: "active" },
 ] as const;
 
-const field = (values: readonly string[]) => values.map((v) => ({ value: v, label: v }));
+const asOptions = (values: readonly string[]) => values.map((v) => ({ value: v, label: v }));
 
-const FIELDS = [
+const FIELDS: SmartFilterField[] = [
   {
     key: "service",
     label: "Сервис",
     finite: false,
-    options: field(["billing", "catalog", "events", "orders"]),
+    options: asOptions(["billing", "catalog", "events", "orders"]),
   },
-  {
-    key: "method",
-    label: "Метод",
-    options: field(["GET", "POST", "PUT", "PATCH", "DELETE"]),
-  },
+  { key: "method", label: "Метод", options: asOptions(["GET", "POST", "PUT", "PATCH", "DELETE"]) },
   {
     key: "state",
     label: "Состояние",
@@ -60,16 +57,16 @@ const FIELDS = [
   },
 ];
 
-export default function SmartFilterHttpRequestsExample() {
-  const [value, setValue] = useState<SmartFilterValue>({});
-  const [search, setSearch] = useState("");
+export default function SmartFilterOverviewExample() {
+  const [value, setValue] = React.useState<SmartFilterValue>({});
+  const [search, setSearch] = React.useState("");
 
-  const rows = REQUESTS.filter(
-    (r) =>
-      matchesSmartFilter(value.service, r.service) &&
-      matchesSmartFilter(value.method, r.method) &&
-      matchesSmartFilter(value.state, r.state) &&
-      r.route.toLowerCase().includes(search.trim().toLowerCase()),
+  const found = REQUESTS.filter(
+    (request) =>
+      matchesSmartFilter(value.service, request.service) &&
+      matchesSmartFilter(value.method, request.method) &&
+      matchesSmartFilter(value.state, request.state) &&
+      request.route.toLowerCase().includes(search.trim().toLowerCase()),
   );
 
   return (
@@ -84,23 +81,23 @@ export default function SmartFilterHttpRequestsExample() {
         <SmartFilter.Toolbar />
         <SmartFilter.Chips />
       </SmartFilter.Root>
-      <Card.Root variant="list" className={styles.card}>
+      <Card.Root variant="list">
         <Card.ListHeader>
           <Card.Title>Запросы</Card.Title>
           <Typography.Root as="span" variant="caption" tone="muted">
-            {rows.length} из {REQUESTS.length}
+            {found.length} из {REQUESTS.length}
           </Typography.Root>
         </Card.ListHeader>
         <Card.List>
-          {rows.map((r) => (
-            <Card.ListItem key={r.id}>
-              <span className={styles.rowMain}>
-                <Badge.Root color={METHOD_COLOR[r.method]}>{r.method}</Badge.Root>
+          {found.map((request) => (
+            <Card.ListItem key={request.id}>
+              <span className={styles.request}>
+                <Badge.Root color={METHOD_COLOR[request.method]}>{request.method}</Badge.Root>
                 <Typography.Root as="span" variant="code" className={styles.route} truncate>
-                  {r.route}
+                  {request.route}
                 </Typography.Root>
                 <Typography.Root as="span" variant="caption" tone="muted">
-                  {r.service}
+                  {request.service}
                 </Typography.Root>
               </span>
             </Card.ListItem>

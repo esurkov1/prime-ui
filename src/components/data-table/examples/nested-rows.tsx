@@ -1,6 +1,4 @@
-/** Tree rows with `getRowChildren`: sub-rows under the parent indented by the avatar width, a chevron toggle, controlled `expanded`, together with selection and sorting. Use for hierarchical data (partners → expenses). */
-
-import { Building2, Car, Wallet } from "lucide-react";
+/** Partners with their expense lines: sub-rows indented under the parent's name, a chevron toggle, together with selection and sorting — `getRowChildren`, `expanded`, `onExpandedChange`. */
 import { Avatar, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -10,18 +8,16 @@ type Entry = {
   id: string;
   name: string;
   note: string;
-  kind: "partner" | "company" | "payout" | "car";
   share: number;
   amount: number;
   children?: Entry[];
 };
 
-const rows: Entry[] = [
+const ENTRIES: Entry[] = [
   {
     id: "denis",
-    name: "Денис",
+    name: "Денис Карпов",
     note: "Партнёр",
-    kind: "partner",
     share: 50,
     amount: 184_000,
     children: [
@@ -29,7 +25,6 @@ const rows: Entry[] = [
         id: "denis-company",
         name: "Расходы компании",
         note: "доля 50%",
-        kind: "company",
         share: 50,
         amount: 62_000,
       },
@@ -37,7 +32,6 @@ const rows: Entry[] = [
         id: "denis-payout",
         name: "Выплата партнёру",
         note: "за сентябрь",
-        kind: "payout",
         share: 50,
         amount: 122_000,
       },
@@ -45,73 +39,57 @@ const rows: Entry[] = [
   },
   {
     id: "olga",
-    name: "Ольга",
+    name: "Ольга Белова",
     note: "Партнёр",
-    kind: "partner",
     share: 30,
     amount: 110_400,
     children: [
-      {
-        id: "olga-company",
-        name: "Расходы компании",
-        note: "доля 30%",
-        kind: "company",
-        share: 30,
-        amount: 37_200,
-      },
+      { id: "olga-company", name: "Расходы компании", note: "доля 30%", share: 30, amount: 37_200 },
       {
         id: "olga-car",
         name: "Toyota Camry · А 123 ВС",
         note: "аренда",
-        kind: "car",
         share: 30,
         amount: 73_200,
       },
     ],
   },
-  { id: "ivan", name: "Иван", note: "Инвестор", kind: "partner", share: 20, amount: 73_600 },
+  { id: "ivan", name: "Иван Сорокин", note: "Инвестор", share: 20, amount: 73_600 },
 ];
 
-const rub = new Intl.NumberFormat("ru-RU", {
+const RUB = new Intl.NumberFormat("ru-RU", {
   style: "currency",
   currency: "RUB",
   maximumFractionDigits: 0,
 });
 
-const icons = { company: Building2, payout: Wallet, car: Car };
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .map((part) => part[0])
+    .join("");
 
-function initials(name: string) {
-  return name.slice(0, 2).toUpperCase();
-}
-
-const columns: DataTableColumn<Entry>[] = [
+const COLUMNS: DataTableColumn<Entry>[] = [
   {
     id: "name",
     header: "Участник",
     accessor: "name",
     sortable: true,
-    cell: (row) => {
-      const Icon = row.kind === "partner" ? null : icons[row.kind];
-      return (
-        <div className={styles.customer}>
-          {Icon ? (
-            <span className={styles.iconBox} aria-hidden="true">
-              <Icon />
-            </span>
-          ) : (
-            <Avatar.Root size="m" color="purple">
-              <Avatar.Fallback>{initials(row.name)}</Avatar.Fallback>
-            </Avatar.Root>
-          )}
-          <div className={styles.customerText}>
-            <span>{row.name}</span>
-            <Typography.Root as="span" variant="caption" tone="muted" truncate>
-              {row.note}
-            </Typography.Root>
-          </div>
+    cell: (row) => (
+      <div className={styles.person}>
+        {row.children ? (
+          <Avatar.Root color="purple">
+            <Avatar.Fallback>{initials(row.name)}</Avatar.Fallback>
+          </Avatar.Root>
+        ) : null}
+        <div className={styles.personText}>
+          <span>{row.name}</span>
+          <Typography.Root as="span" variant="caption" tone="muted" truncate>
+            {row.note}
+          </Typography.Root>
         </div>
-      );
-    },
+      </div>
+    ),
   },
   {
     id: "share",
@@ -127,7 +105,7 @@ const columns: DataTableColumn<Entry>[] = [
     accessor: "amount",
     sortable: true,
     numeric: true,
-    cell: (row) => rub.format(row.amount),
+    cell: (row) => RUB.format(row.amount),
   },
 ];
 
@@ -135,16 +113,16 @@ export default function DataTableNestedRowsExample() {
   const [expanded, setExpanded] = React.useState<React.Key[]>(["denis"]);
 
   return (
-    <DataTable.Root
-      columns={columns}
-      rows={rows}
+    <DataTable
+      columns={COLUMNS}
+      rows={ENTRIES}
       getRowKey={(row) => row.id}
       getRowLabel={(row) => row.name}
       getRowChildren={(row) => row.children}
       expanded={expanded}
       onExpandedChange={setExpanded}
       selectable
-      showPagination={false}
+      paging="none"
     />
   );
 }

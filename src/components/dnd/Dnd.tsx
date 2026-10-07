@@ -1,7 +1,10 @@
-import { GripVertical } from "lucide-react";
 import * as React from "react";
 
+import { Button } from "@/components/button/Button";
+import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import enterMotion from "@/internal/enterMotion.module.css";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { DragControllerContext } from "./context";
 import styles from "./Dnd.module.css";
@@ -37,11 +40,10 @@ export type DndRootProps = {
  * region. Mount once above every screen that drags: a drag crosses component boundaries.
  */
 function DndRoot({ labels, children }: DndRootProps) {
-  const merged = React.useMemo<DndLabels>(() => ({ ...defaultDndLabels, ...labels }), [labels]);
+  const merged: DndLabels = { ...defaultDndLabels, ...labels };
+  // The controller outlives renders and reads the current strings at announcement time.
   const labelsRef = React.useRef(merged);
-  React.useEffect(() => {
-    labelsRef.current = merged;
-  });
+  labelsRef.current = merged;
   const [controller] = React.useState(() => createDragController(() => labelsRef.current));
   const message = useStoreSelector(controller.store, (state) => state.announcement.message);
 
@@ -52,9 +54,9 @@ function DndRoot({ labels, children }: DndRootProps) {
       <DndLabelsContext value={merged}>
         {children}
         <DragOverlay controller={controller} />
-        <div className={styles.liveRegion} role="status" aria-live="polite" aria-atomic="true">
+        <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
           {message}
-        </div>
+        </VisuallyHidden>
       </DndLabelsContext>
     </DragControllerContext>
   );
@@ -65,25 +67,35 @@ DndRoot.displayName = "DndRoot";
 // Handle
 // ---------------------------------------------------------------------------------------------
 
-export type DndHandleProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type">;
+export type DndHandleProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "children"
+>;
 
-/** The grip of a `handle` item: a button, so it is reachable by keyboard (Alt+arrows reorder). */
+/**
+ * The grip of a `handle` item: a ghost icon-only Button (`xs`), so it is reachable by keyboard
+ * (Alt+arrows reorder).
+ */
 const DndHandle = React.forwardRef<HTMLButtonElement, DndHandleProps>(function DndHandle(
-  { className, children, "aria-label": ariaLabel, ...rest },
+  { className, "aria-label": ariaLabel, ...rest },
   ref,
 ) {
   const labels = React.useContext(DndLabelsContext);
   return (
-    <button
+    <Button.Root
       ref={ref}
-      type="button"
+      variant="ghost"
+      tone="neutral"
+      size="xs"
       aria-label={ariaLabel ?? labels.handle}
       {...rest}
       data-dnd-handle=""
       className={cx(styles.handle, className)}
     >
-      {children ?? <GripVertical aria-hidden="true" />}
-    </button>
+      <Button.Icon>
+        <Icon name="action.drag" />
+      </Button.Icon>
+    </Button.Root>
   );
 });
 DndHandle.displayName = "DndHandle";
@@ -282,7 +294,7 @@ function DndPlaceholder({
     <Tag
       aria-hidden="true"
       data-dnd-gap=""
-      className={styles.placeholder}
+      className={cx(styles.placeholder, enterMotion.enterBase)}
       style={
         {
           "--dnd-gap-width": `${width}px`,

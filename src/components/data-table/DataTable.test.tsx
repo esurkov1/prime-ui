@@ -29,10 +29,10 @@ const rows: Row[] = [
 
 describe("DataTable", () => {
   it("draws column dividers by default and drops them with columnDividers={false}", () => {
-    const { container, rerender } = render(<DataTable.Root rows={rows} columns={columns} />);
-    const root = container.querySelector("[data-divider]");
+    const { container, rerender } = render(<DataTable rows={rows} columns={columns} />);
+    const root = container.querySelector("[data-size]");
     expect(root).not.toHaveAttribute("data-column-dividers");
-    rerender(<DataTable.Root rows={rows} columns={columns} columnDividers={false} />);
+    rerender(<DataTable rows={rows} columns={columns} columnDividers={false} />);
     expect(root).toHaveAttribute("data-column-dividers", "false");
   });
 
@@ -44,19 +44,18 @@ describe("DataTable", () => {
   });
 
   it("renders headers and rows", () => {
-    render(<DataTable.Root rows={rows.slice(0, 2)} columns={columns} />);
+    render(<DataTable rows={rows.slice(0, 2)} columns={columns} />);
 
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("A")).toBeInTheDocument();
     expect(screen.getByText("C")).toBeInTheDocument();
-    expect(screen.getByText("Name").closest("div[data-divider]")).toHaveAttribute(
-      "data-divider",
-      "standard",
+    expect(screen.getByText("Name").closest("div[data-size]")).not.toHaveAttribute(
+      "data-row-dividers",
     );
   });
 
   it("marks sorted column header with aria-sort", () => {
-    render(<DataTable.Root rows={rows.slice(0, 3)} columns={columns} pageSize={10} />);
+    render(<DataTable rows={rows.slice(0, 3)} columns={columns} pageSize={10} />);
     const nameHeader = screen.getByText("Name").closest("th") as Element;
     expect(nameHeader).toHaveAttribute("aria-sort", "none");
     fireEvent.click(nameHeader);
@@ -64,7 +63,7 @@ describe("DataTable", () => {
   });
 
   it("sorts rows by header click and toggles asc/desc", () => {
-    render(<DataTable.Root rows={rows.slice(0, 3)} columns={columns} pageSize={10} />);
+    render(<DataTable rows={rows.slice(0, 3)} columns={columns} pageSize={10} />);
 
     const nameHeader = screen.getByText("Name").closest("th");
     expect(nameHeader).toBeInTheDocument();
@@ -84,43 +83,38 @@ describe("DataTable", () => {
   });
 
   it("supports pagination", () => {
-    render(<DataTable.Root rows={rows} columns={columns} pageSize={2} />);
+    render(<DataTable rows={rows} columns={columns} pageSize={2} />);
 
     expect(screen.getByText("Показано 1–2 из 6")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Страница 2" }));
     expect(screen.getByText("Показано 3–4 из 6")).toBeInTheDocument();
   });
 
-  it("sets divider style through prop", () => {
-    render(<DataTable.Root rows={rows.slice(0, 2)} columns={columns} dividerStyle="dashed" />);
-    expect(screen.getByText("Name").closest("div[data-divider]")).toHaveAttribute(
-      "data-divider",
-      "dashed",
-    );
-  });
-
-  it("allows hiding column header row", () => {
-    render(<DataTable.Root rows={rows.slice(0, 2)} columns={columns} showHeader={false} />);
-
-    expect(screen.queryByRole("columnheader", { name: "Name" })).not.toBeInTheDocument();
-    expect(screen.getByRole("cell", { name: "C" })).toBeInTheDocument();
-    expect(screen.getByText("C").closest("div[data-show-header]")).toHaveAttribute(
-      "data-show-header",
+  it("drops row dividers with rowDividers={false}", () => {
+    render(<DataTable rows={rows.slice(0, 2)} columns={columns} rowDividers={false} />);
+    expect(screen.getByText("Name").closest("div[data-size]")).toHaveAttribute(
+      "data-row-dividers",
       "false",
     );
   });
 
+  it("allows hiding column header row", () => {
+    render(<DataTable rows={rows.slice(0, 2)} columns={columns} showHeader={false} />);
+
+    expect(screen.queryByRole("columnheader", { name: "Name" })).not.toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "C" })).toBeInTheDocument();
+    expect(document.querySelector("thead")).toBeNull();
+  });
+
   it("keeps first column as regular cells", () => {
-    render(<DataTable.Root rows={rows.slice(0, 2)} columns={columns} showPagination={false} />);
+    render(<DataTable rows={rows.slice(0, 2)} columns={columns} paging="none" />);
 
     expect(screen.queryByRole("rowheader")).not.toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "C" })).toBeInTheDocument();
   });
 
   it("exposes sticky header and sticky first column flags on root", () => {
-    render(
-      <DataTable.Root rows={rows.slice(0, 2)} columns={columns} stickyHeader stickyFirstColumn />,
-    );
+    render(<DataTable rows={rows.slice(0, 2)} columns={columns} stickyHeader stickyFirstColumn />);
 
     expect(screen.getByText("Name").closest("div[data-sticky-header]")).toHaveAttribute(
       "data-sticky-header",
@@ -152,9 +146,7 @@ describe("DataTable", () => {
       },
     ];
 
-    render(
-      <DataTable.Root size="l" rows={[{ id: 1 }]} columns={chipColumns} showPagination={false} />,
-    );
+    render(<DataTable size="l" rows={[{ id: 1 }]} columns={chipColumns} paging="none" />);
 
     expect(screen.getByText("b").closest("span[data-size]")).toHaveAttribute("data-size", "l");
     expect(screen.getByText("t").closest("span[data-size]")).toHaveAttribute("data-size", "l");
@@ -170,10 +162,10 @@ describe("DataTable", () => {
       { id: "score", header: "Score", accessor: "score", sortable: true, align: "end" },
     ];
     render(
-      <DataTable.Root
+      <DataTable
         rows={rows.slice(0, 1)}
         columns={clickableColumns}
-        showPagination={false}
+        paging="none"
         onRowClick={onRowClick}
       />,
     );
@@ -216,13 +208,12 @@ describe("DataTable", () => {
     vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
 
     render(
-      <DataTable.Root
+      <DataTable
         rows={rows}
         columns={columns}
-        infiniteScroll
+        paging="infinite"
         initialVisibleRows={2}
         infiniteBatchSize={2}
-        showPagination={false}
       />,
     );
 
@@ -242,7 +233,7 @@ describe("DataTable", () => {
 
   it("sets data-highlight-row false when row hover is disabled", () => {
     const { container } = render(
-      <DataTable.Root rows={rows.slice(0, 2)} columns={columns} highlightRowOnHover={false} />,
+      <DataTable rows={rows.slice(0, 2)} columns={columns} highlightRowOnHover={false} />,
     );
     expect(container.querySelector("[data-highlight-row]")).toHaveAttribute(
       "data-highlight-row",
@@ -252,14 +243,14 @@ describe("DataTable", () => {
 
   it("applies striped data-stripe on alternating body rows", () => {
     const { container } = render(
-      <DataTable.Root rows={rows.slice(0, 4)} columns={columns} striped pageSize={10} />,
+      <DataTable rows={rows.slice(0, 4)} columns={columns} striped pageSize={10} />,
     );
     expect(container.querySelectorAll('tr[data-stripe="alt"]')).toHaveLength(2);
   });
 
   it("stays in automatic table layout until the columns are laid out", () => {
     const { container } = render(
-      <DataTable.Root rows={rows.slice(0, 1)} columns={columns} showPagination={false} />,
+      <DataTable rows={rows.slice(0, 1)} columns={columns} paging="none" />,
     );
     // jsdom lays nothing out: widths come from the browser's automatic layout, nothing is frozen.
     expect((container.querySelector("table") as HTMLTableElement).style.tableLayout).toBe("");
@@ -273,9 +264,7 @@ describe("DataTable", () => {
       { id: "name", header: "Name", accessor: "name", width: "8rem" },
       { id: "score", header: "Score", accessor: "score", minWidth: "4rem", maxWidth: "10rem" },
     ];
-    render(
-      <DataTable.Root rows={rows.slice(0, 1)} columns={sizedColumns} showPagination={false} />,
-    );
+    render(<DataTable rows={rows.slice(0, 1)} columns={sizedColumns} paging="none" />);
 
     const nameHeader = screen.getByRole("columnheader", { name: "Name" });
     const scoreHeader = screen.getByRole("columnheader", { name: "Score" });
@@ -288,7 +277,7 @@ describe("DataTable", () => {
 
   it("highlights column on cell mouse enter and clears on table mouse leave", () => {
     const { container } = render(
-      <DataTable.Root rows={rows.slice(0, 2)} columns={columns} highlightColumnOnHover />,
+      <DataTable rows={rows.slice(0, 2)} columns={columns} highlightColumnOnHover />,
     );
     const table = container.querySelector("table");
     expect(table).toBeTruthy();
@@ -303,7 +292,7 @@ describe("DataTable", () => {
     expect(nameCell).not.toHaveAttribute("data-column-hovered");
   });
   it("renders a focusable sort button inside sortable headers", () => {
-    render(<DataTable.Root rows={rows.slice(0, 3)} columns={columns} pageSize={10} />);
+    render(<DataTable rows={rows.slice(0, 3)} columns={columns} pageSize={10} />);
     const button = screen.getByRole("button", { name: "Name" });
     fireEvent.click(button);
     expect(screen.getByRole("columnheader", { name: "Name" })).toHaveAttribute(
@@ -313,36 +302,34 @@ describe("DataTable", () => {
   });
 
   it("shows skeleton rows and a status message while loading without rows", () => {
-    const { container } = render(
-      <DataTable.Root rows={[]} columns={columns} loading loadingRows={3} />,
-    );
+    const { container } = render(<DataTable rows={[]} columns={columns} loading loadingRows={3} />);
     expect(screen.getByRole("status")).toHaveTextContent("Загрузка данных…");
     expect(container.querySelectorAll('tbody tr[data-skeleton="true"]')).toHaveLength(3);
     expect(container.querySelector("table")).toHaveAttribute("aria-busy", "true");
   });
 
   it("renders error state instead of rows", () => {
-    render(<DataTable.Root rows={rows} columns={columns} error="Не удалось загрузить" />);
+    render(<DataTable rows={rows} columns={columns} error="Не удалось загрузить" />);
     expect(screen.getByRole("alert")).toHaveTextContent("Не удалось загрузить");
     expect(screen.queryByText("A")).not.toBeInTheDocument();
   });
 
   it("renders the default empty label, the empty slot and label overrides", () => {
-    const { rerender } = render(<DataTable.Root rows={[]} columns={columns} />);
+    const { rerender } = render(<DataTable rows={[]} columns={columns} />);
     expect(screen.getByText("Нет данных для отображения.")).toBeInTheDocument();
-    rerender(<DataTable.Root rows={[]} columns={columns} empty={<strong>Пусто</strong>} />);
+    rerender(<DataTable rows={[]} columns={columns} empty={<strong>Пусто</strong>} />);
     expect(screen.getByText("Пусто").tagName).toBe("STRONG");
-    rerender(<DataTable.Root rows={[]} columns={columns} labels={{ empty: "Nothing" }} />);
+    rerender(<DataTable rows={[]} columns={columns} labels={{ empty: "Nothing" }} />);
     expect(screen.getByText("Nothing")).toBeInTheDocument();
   });
 
   it("renders the range line from labels.range", () => {
     render(
-      <DataTable.Root
+      <DataTable
         rows={rows}
         columns={columns}
         pageSize={2}
-        labels={{ range: (from, to, total) => `${from}-${to}/${total}` }}
+        labels={{ range: "{from}-{to}/{total}" }}
       />,
     );
     expect(screen.getByText(`1-2/${rows.length}`)).toBeInTheDocument();
@@ -350,7 +337,7 @@ describe("DataTable", () => {
 
   it("marks selected rows", () => {
     render(
-      <DataTable.Root
+      <DataTable
         rows={rows.slice(0, 2)}
         columns={columns}
         getRowKey={(row) => row.id}
@@ -368,9 +355,7 @@ describe("DataTable", () => {
       { id: "score", header: "Score", accessor: "score", numeric: true },
       { id: "id", header: "Id", accessor: "id", numeric: true, align: "center" },
     ];
-    render(
-      <DataTable.Root rows={rows.slice(0, 1)} columns={numericColumns} showPagination={false} />,
-    );
+    render(<DataTable rows={rows.slice(0, 1)} columns={numericColumns} paging="none" />);
     const scoreCell = screen.getByRole("cell", { name: "32" });
     expect(scoreCell).toHaveAttribute("data-align", "end");
     expect(scoreCell).toHaveAttribute("data-numeric", "true");
@@ -382,9 +367,7 @@ describe("DataTable", () => {
       { id: "score", header: "Score", accessor: "score", numeric: true, sortable: true },
       { id: "id", header: "Id", accessor: "id", numeric: true, headerAlign: "end" },
     ];
-    render(
-      <DataTable.Root rows={rows.slice(0, 1)} columns={numericColumns} showPagination={false} />,
-    );
+    render(<DataTable rows={rows.slice(0, 1)} columns={numericColumns} paging="none" />);
     expect(screen.getByRole("columnheader", { name: "Score" })).toHaveAttribute(
       "data-align",
       "start",
@@ -397,10 +380,10 @@ describe("DataTable", () => {
       { id: "name", header: "Name", accessor: "name", truncate: true, maxWidth: "6rem" },
     ];
     render(
-      <DataTable.Root
+      <DataTable
         rows={[{ id: 1, name: "Очень длинное название позиции", score: 1 }]}
         columns={truncColumns}
-        showPagination={false}
+        paging="none"
       />,
     );
     expect(screen.getByText("Очень длинное название позиции")).toHaveAttribute(
@@ -410,9 +393,7 @@ describe("DataTable", () => {
   });
 
   it("renders toolbar slot", () => {
-    render(
-      <DataTable.Root rows={rows.slice(0, 1)} columns={columns} toolbar={<span>Фильтры</span>} />,
-    );
+    render(<DataTable rows={rows.slice(0, 1)} columns={columns} toolbar={<span>Фильтры</span>} />);
     expect(screen.getByText("Фильтры")).toBeInTheDocument();
   });
 });
@@ -447,18 +428,18 @@ describe("DataTable CSS contract", () => {
       onRowClick?: () => void;
     }) {
       return (
-        <DataTable.Root
+        <DataTable
           rows={five}
           columns={columns}
           getRowKey={(row) => row.id}
           getRowLabel={(row) => row.name}
           selectable
-          showPagination={false}
+          paging="none"
           {...props}
         />
       );
     }
-    const box = (name: string) => screen.getByRole("checkbox", { name: `Выбрать: ${name}` });
+    const box = (name: string) => screen.getByRole("checkbox", { name: `Выбрать строку ${name}` });
 
     it("toggles a row on click, announces the count and keeps the row click out", async () => {
       const user = userEvent.setup();
@@ -570,7 +551,7 @@ describe("DataTable CSS contract", () => {
       const onExpandedChange = vi.fn();
       const onRowClick = vi.fn();
       render(
-        <DataTable.Root
+        <DataTable
           rows={tree}
           columns={treeColumns}
           getRowKey={(row) => row.id}
@@ -585,12 +566,12 @@ describe("DataTable CSS contract", () => {
       expect(screen.getByText("Выплата").closest("tbody")).toHaveAttribute("aria-hidden", "true");
       // Only rows with children get a toggle.
       expect(screen.getAllByRole("button", { name: /Развернуть/ })).toHaveLength(1);
-      const toggle = screen.getByRole("button", { name: "Развернуть: Денис" });
+      const toggle = screen.getByRole("button", { name: "Развернуть строку Денис" });
       expect(toggle).toHaveAttribute("aria-expanded", "false");
       await user.click(toggle);
       expect(onExpandedChange).toHaveBeenLastCalledWith(["denis"]);
       expect(onRowClick).not.toHaveBeenCalled();
-      const collapse = screen.getByRole("button", { name: "Свернуть: Денис" });
+      const collapse = screen.getByRole("button", { name: "Свернуть строку Денис" });
       expect(collapse).toHaveAttribute("aria-expanded", "true");
       const child = screen.getByText("Выплата").closest("tr") as HTMLElement;
       expect(child).toHaveAttribute("data-depth", "1");
@@ -604,11 +585,11 @@ describe("DataTable CSS contract", () => {
     it("marks rows newly added to the data for the enter animation, not the first fill", () => {
       const flat = tree.map(({ id, name, score }) => ({ id, name, score }));
       const { rerender } = render(
-        <DataTable.Root rows={flat} columns={treeColumns} getRowKey={(row) => row.id} />,
+        <DataTable rows={flat} columns={treeColumns} getRowKey={(row) => row.id} />,
       );
       expect(screen.getByText("Денис").closest("tr")).not.toHaveAttribute("data-animate");
       rerender(
-        <DataTable.Root
+        <DataTable
           rows={[...flat, { id: "ivan", name: "Иван", score: 3 }]}
           columns={treeColumns}
           getRowKey={(row) => row.id}
@@ -621,7 +602,7 @@ describe("DataTable CSS contract", () => {
     it("sorts sub-rows with the parent and keeps them under it", async () => {
       const user = userEvent.setup();
       render(
-        <DataTable.Root
+        <DataTable
           rows={tree}
           columns={treeColumns}
           getRowKey={(row) => row.id}
@@ -640,7 +621,7 @@ describe("DataTable CSS contract", () => {
     it("renders a detail panel for renderExpanded and works with selection", async () => {
       const user = userEvent.setup();
       render(
-        <DataTable.Root
+        <DataTable
           rows={tree}
           columns={treeColumns}
           getRowKey={(row) => row.id}
@@ -651,26 +632,26 @@ describe("DataTable CSS contract", () => {
         />,
       );
       expect(screen.getAllByRole("button", { name: /Развернуть/ })).toHaveLength(1);
-      const toggle = screen.getByRole("button", { name: "Развернуть: Ольга" });
+      const toggle = screen.getByRole("button", { name: "Развернуть строку Ольга" });
       await user.click(toggle);
       const detail = screen.getByText("Детали: Ольга");
       const detailRow = detail.closest("tr") as HTMLElement;
       expect(toggle).toHaveAttribute("aria-controls", detailRow.id);
       expect(within(detailRow).getByRole("cell")).toHaveAttribute("colspan", "4");
-      await user.click(screen.getByRole("checkbox", { name: "Выбрать: Ольга" }));
+      await user.click(screen.getByRole("checkbox", { name: "Выбрать строку Ольга" }));
       expect(screen.getByText("Ольга").closest("tr")).toHaveAttribute("aria-selected", "true");
     });
   });
 
   it("a grow column fills the table width and the table stops growing to its content", () => {
     const { container } = render(
-      <DataTable.Root
+      <DataTable
         rows={[{ id: 1, note: "Длинный комментарий" }]}
         columns={[
           { id: "id", header: "№", accessor: "id" },
           { id: "note", header: "Комментарий", accessor: "note", grow: true },
         ]}
-        showPagination={false}
+        paging="none"
       />,
     );
     expect(container.querySelector("[data-table-width]")).toHaveAttribute(
@@ -681,12 +662,32 @@ describe("DataTable CSS contract", () => {
     for (const cell of noteCells) expect(cell.style.width).toBe("100%");
   });
 
+  it("sorts from the keyboard: Tab reaches the sort button, Enter cycles the order", async () => {
+    const user = userEvent.setup();
+    render(<DataTable rows={rows.slice(0, 3)} columns={columns} />);
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Name" })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("columnheader", { name: "Name" })).toHaveAttribute(
+      "aria-sort",
+      "ascending",
+    );
+  });
+
+  it('paging="none" renders every row without a footer', () => {
+    const { container } = render(
+      <DataTable rows={rows} columns={columns} paging="none" pageSize={2} />,
+    );
+    expect(container.querySelectorAll("tbody tr")).toHaveLength(rows.length);
+    expect(screen.queryByRole("navigation")).toBeNull();
+  });
+
   it("hides the range line when every row is on screen", () => {
     render(
-      <DataTable.Root
+      <DataTable
         rows={[{ id: 1 }, { id: 2 }]}
         columns={[{ id: "id", header: "№", accessor: "id" }]}
-        showPagination={false}
+        paging="none"
       />,
     );
     expect(screen.queryByText(/Показано/)).toBeNull();
@@ -710,7 +711,7 @@ describe("DataTable CSS contract", () => {
     );
     const cols: DataTableColumn<Row>[] = [{ id: "name", header: "Name", accessor: "name" }];
     const { container, rerender } = render(
-      <DataTable.Root rows={rows} columns={cols} showPagination={false} pageSize={rows.length} />,
+      <DataTable rows={rows} columns={cols} paging="none" pageSize={rows.length} />,
     );
     const table = container.querySelector("table") as HTMLTableElement;
     const col = container.querySelector("colgroup col") as HTMLTableColElement;
@@ -719,12 +720,7 @@ describe("DataTable CSS contract", () => {
     // A search narrows the rows: the column keeps its width.
     width = 60;
     rerender(
-      <DataTable.Root
-        rows={rows.slice(0, 1)}
-        columns={cols}
-        showPagination={false}
-        pageSize={rows.length}
-      />,
+      <DataTable rows={rows.slice(0, 1)} columns={cols} paging="none" pageSize={rows.length} />,
     );
     expect(col.style.width).toBe("120px");
     spy.mockRestore();

@@ -1,10 +1,10 @@
-/** An embedded panel in a 320px column: one compact month instead of two, footer fields wrap above the buttons. Use it to check mobile layouts. */
+/** An embedded panel in a 320 px column: one compact month instead of two, the footer fields wrap above the buttons — `months`, `footer`. */
 import { Datepicker, type DatepickerRange } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-export default function DatepickerNarrowExample() {
+export default function DatepickerNarrowPanelExample() {
   const [range, setRange] = React.useState<DatepickerRange>({ from: null, to: null });
   return (
     <div className={styles.phone}>

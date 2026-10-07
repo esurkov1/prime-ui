@@ -81,12 +81,11 @@ const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
 /** Props table of a playground page: the kit's own DataTable, Badge and Typography. */
 export function PlaygroundApiTable({ rows }: { rows: PlaygroundApiPropRow[] }) {
   return (
-    <DataTable.Root
+    <DataTable
       columns={COLUMNS}
       rows={rows}
       getRowKey={(row) => row.prop}
-      showPagination={false}
-      pageSize={rows.length || 1}
+      paging="none"
       highlightRowOnHover={false}
       labels={{ empty: "Нет пропов" }}
     />
