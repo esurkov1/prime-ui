@@ -162,6 +162,7 @@
   flex-direction: column;
   justify-content: flex-end;
   gap: 0;
+  min-width: 0;
   min-height: var(--prime-space-12);
   padding: var(--prime-space-1);
   font-size: var(--prime-text-caption-size);
@@ -174,6 +175,10 @@
   font-family: var(--prime-font-family-mono);
   font-weight: var(--prime-font-weight-regular);
   opacity: 0.72;
+  /* The 23-step gray ramp is narrower than a hex: clip it instead of spilling into the next step. */
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
 }
 
 @media (max-width: 640px) {
