@@ -139,23 +139,20 @@ export { COLOR_PRESETS, ColorPresets } from "./color-picker/ColorPresets";
 export type { ColorSwatchesLabels, ColorSwatchesRootProps } from "./color-swatches/ColorSwatches";
 export { ColorSwatches } from "./color-swatches/ColorSwatches";
 export type {
-  CommandMenuBadgeRowProps,
-  CommandMenuBadgeSectionLabelProps,
-  CommandMenuBadgeSectionProps,
-  CommandMenuDialogProps,
+  CommandMenuDescriptionProps,
   CommandMenuEmptyProps,
   CommandMenuFooterHintProps,
-  CommandMenuFooterKeyBoxProps,
   CommandMenuFooterProps,
   CommandMenuGroupProps,
   CommandMenuInputProps,
-  CommandMenuInputRowProps,
   CommandMenuItemIconProps,
   CommandMenuItemProps,
   CommandMenuItemShortcutProps,
   CommandMenuItemTextProps,
   CommandMenuLabels,
   CommandMenuListProps,
+  CommandMenuRootProps,
+  CommandMenuTitleProps,
 } from "./command-menu/CommandMenu";
 export { CommandMenu } from "./command-menu/CommandMenu";
 export type {

@@ -1,9 +1,0 @@
-/* Layout for the CommandMenu examples: semantic tokens only. */
-
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
-}

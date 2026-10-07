@@ -1,10 +1,11 @@
 /* ─── CommandMenu ────────────────────────────────────────────────────────────
- * Modal-level search palette: search row on top (hairline below), scrolling list of
- * sections, footer with key hints (hairline above). Items follow the floating panel recipe.
+ * Modal-level search palette on Modal: search row on top (faint hairline below), a scrolling list
+ * of sections, a footer with key hints (hairline above). Rows come from `dropdown/menu.module.css`.
  */
 
-/* Top-aligned palette: the list grows downwards, the search row never jumps. */
-.dialogOverlay {
+/* Top-aligned palette: the list grows downwards, the search row never jumps. `[role]` outranks
+   the Modal scrim layout whatever the CSS order. */
+.overlay[role="presentation"] {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,18 +15,22 @@
   padding-inline: max(var(--prime-modal-viewport-padding), env(safe-area-inset-left, 0px));
 }
 
-/* `.root` дублирует класс, чтобы перебить отступы/сетку `Modal.Content` без зависимости от порядка CSS. */
-.dialogContent.root[role="dialog"] {
-  --cm-width: var(--prime-modal-width-l);
+/* `[role="dialog"]` outranks the padding and grid of `Modal.Content` whatever the CSS order. */
+.content[role="dialog"] {
   --cm-max-height: calc(var(--prime-panel-max-height) * 1.5);
+  /* One content column: title, search icon, group labels and item icons start at 16
+     (list padding 8 + row padding 8). */
+  --cm-inset: calc(var(--prime-space-2) + var(--prime-panel-item-padding-x));
+  /* Fields inside a raised surface stay distinguishable (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 
   box-sizing: border-box;
   display: flex;
-  /* Hug the results: `.root` grows inside the overlay column otherwise and leaves an empty sheet. */
+  /* Hug the results instead of growing into an empty sheet. */
   flex: 0 1 auto;
   flex-direction: column;
   gap: 0;
-  width: min(100%, var(--cm-width));
+  width: min(100%, var(--prime-modal-width-l));
   min-width: 0;
   max-width: 100%;
   max-height: min(var(--cm-max-height), calc(100dvh - 2 * var(--prime-modal-viewport-padding)));
@@ -36,154 +41,59 @@
   box-shadow: var(--prime-shadow-modal);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
-  /* Fields inside a raised surface stay distinguishable (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 }
 
-/* Tier variables (Dialog `size`); `display: contents` keeps the panel's flex column intact. */
+/* Search row height per tier; the row metrics come from `menu.tier` on the same element. */
 .tier {
-  --cm-item-h: var(--prime-control-m-item-height);
-  --cm-text: var(--prime-control-m-text-size);
-  --cm-lh: var(--prime-control-m-line-height);
-  --cm-icon: var(--prime-control-m-icon);
   --cm-input-h: var(--prime-space-12);
 
   display: contents;
 }
 
-.tier[data-size="xs"] {
-  --cm-item-h: var(--prime-control-xs-item-height);
-  --cm-text: var(--prime-control-xs-text-size);
-  --cm-lh: var(--prime-control-xs-line-height);
-  --cm-icon: var(--prime-control-xs-icon);
+.tier:is([data-size="xs"], [data-size="s"]) {
   --cm-input-h: var(--prime-space-10);
 }
 
-.tier[data-size="s"] {
-  --cm-item-h: var(--prime-control-s-item-height);
-  --cm-text: var(--prime-control-s-text-size);
-  --cm-lh: var(--prime-control-s-line-height);
-  --cm-icon: var(--prime-control-s-icon);
-  --cm-input-h: var(--prime-space-10);
-}
-
-.tier[data-size="l"] {
-  --cm-item-h: var(--prime-control-l-item-height);
-  --cm-text: var(--prime-control-l-text-size);
-  --cm-lh: var(--prime-control-l-line-height);
-  --cm-icon: var(--prime-control-l-icon);
+.tier:is([data-size="l"], [data-size="xl"]) {
   --cm-input-h: calc(var(--prime-space-12) + var(--prime-space-2));
-}
-
-.tier[data-size="xl"] {
-  --cm-item-h: var(--prime-control-xl-item-height);
-  --cm-text: var(--prime-control-xl-text-size);
-  --cm-lh: var(--prime-control-xl-line-height);
-  --cm-icon: var(--prime-control-xl-icon);
-  --cm-input-h: calc(var(--prime-space-12) + var(--prime-space-2));
-}
-
-.root {
-  /* One content column for the whole palette: header text, search icon, scope chips, group
-     headings and item icons all start at 16 (list padding 8 + item padding 8). */
-  --cm-inset: calc(var(--prime-space-2) + var(--prime-panel-item-padding-x));
-
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-height: 0;
 }
 
 /* ─── Optional visible title / description (above the search row) ───────── */
 
-.dialogTitle,
-.dialogDescription {
+.title,
+.description {
   padding-inline: var(--cm-inset);
 }
 
-.dialogTitle {
+.title {
   padding-block: var(--prime-space-5) var(--prime-space-2);
 }
 
-.dialogTitle:has(+ .dialogDescription) {
+.title:has(+ .description) {
   padding-block-end: 0;
 }
 
-.dialogDescription {
+.description {
   padding-block: var(--prime-space-1) var(--prime-space-2);
 }
 
 /* ─── Search row ─────────────────────────────────────────────────────────── */
 
 .inputRow {
-  box-sizing: border-box;
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  /* Same icon → text gap as the item rows, so the query lines up with item labels. */
+  /* Same icon → text gap as the rows, so the query lines up with item labels. */
   gap: var(--prime-space-3);
   width: 100%;
   min-height: var(--cm-input-h);
-  padding-block: 0;
   padding-inline: var(--cm-inset);
-  border-bottom: var(--prime-border-width) solid var(--prime-color-border-faint);
-}
-
-.inputIcon {
-  flex-shrink: 0;
-  width: var(--prime-icon-m);
-  height: var(--prime-icon-m);
-  color: var(--prime-color-text-muted);
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-/* The search row sets data-focus-ring="false" (foundation §7: the caret is the indicator);
-   the inset ring below applies only if a consumer turns it back on. */
-.inputRow:first-child {
-  border-start-start-radius: var(--prime-modal-radius);
-  border-start-end-radius: var(--prime-modal-radius);
-}
-
-.inputRow:not([data-focus-ring="false"]):has(.input:focus-visible) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.inputRow:focus-within .inputIcon {
-  color: var(--prime-color-text-secondary);
 }
 
 .input {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 100%;
   min-height: var(--prime-control-l-height);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--prime-color-text-primary);
-  font-family: inherit;
   font-size: var(--prime-text-body-l-size);
   line-height: var(--prime-text-body-l-line-height);
-  outline: none;
-  appearance: none;
 }
 
-.input::-webkit-search-cancel-button {
-  appearance: none;
-}
-
-.input::placeholder {
-  color: var(--prime-color-text-placeholder);
-}
-
-/* ─── List / groups ─────────────────────────────────────────────────────── */
-
-/* Filtered-out rows and groups: `hidden` must win over `display: flex`. */
-.item[hidden],
-.group[hidden] {
-  display: none;
-}
+/* ─── List / groups / items ─────────────────────────────────────────────── */
 
 .list {
   display: flex;
@@ -195,81 +105,14 @@
   padding: var(--prime-space-2);
 }
 
-.group {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+/* A group whose items are all filtered out: `hidden` must win over `display: flex`. */
+.group[hidden] {
+  display: none;
 }
-
-.groupHeading,
-.groupHeadingRich {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-height: var(--prime-panel-group-label-height);
-  padding-inline: var(--prime-panel-item-padding-x);
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
-}
-
-/* ─── Item ───────────────────────────────────────────────────────────────── */
 
 .item {
-  box-sizing: border-box;
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
   gap: var(--prime-space-3);
-  width: 100%;
-  min-height: var(--cm-item-h);
-  margin: 0;
   padding-block: var(--prime-space-1);
-  padding-inline: var(--prime-panel-item-padding-x);
-  border: 0;
-  border-radius: var(--prime-panel-item-radius);
-  background: transparent;
-  color: var(--prime-color-text-primary);
-  font-family: inherit;
-  font-size: var(--cm-text);
-  line-height: var(--cm-lh);
-  text-align: start;
-  cursor: pointer;
-  transition: background-color var(--prime-motion-duration-xfast)
-    var(--prime-motion-easing-standard);
-}
-
-.item[data-selected="true"] {
-  background: var(--prime-color-fill-subtle-active);
-}
-
-.item:active:not([data-disabled="true"]) {
-  background: var(--prime-color-fill-muted);
-}
-
-.item[data-disabled="true"] {
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
-}
-
-.itemIcon {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--cm-icon);
-  height: var(--cm-icon);
-  color: var(--prime-color-text-muted);
-}
-
-.item[data-selected="true"] .itemIcon {
-  color: var(--prime-color-text-secondary);
-}
-
-.item[data-disabled="true"] .itemIcon {
-  color: var(--prime-color-text-disabled);
 }
 
 .itemText {
@@ -294,64 +137,6 @@
   letter-spacing: var(--prime-text-caption-tracking);
 }
 
-.itemShortcut {
-  flex-shrink: 0;
-  margin-inline-start: auto;
-  color: var(--prime-color-text-muted);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ─── Empty ─────────────────────────────────────────────────────────────── */
-
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-1);
-  padding: var(--prime-space-10) var(--prime-space-4);
-  text-align: center;
-}
-
-.emptyText {
-  color: var(--prime-color-text-secondary);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-}
-
-.emptyHint {
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-}
-
-/* ─── Badge section under the search row ────────────────────────────────── */
-
-.badgeSection {
-  display: flex;
-  flex-shrink: 0;
-  flex-direction: column;
-  gap: var(--prime-space-2);
-  padding: var(--prime-space-3) var(--cm-inset);
-  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
-}
-
-.badgeSectionLabel {
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-}
-
-.badgeRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-space-2);
-}
-
 /* ─── Footer with key hints ─────────────────────────────────────────────── */
 
 .footer {
@@ -370,45 +155,12 @@
   line-height: var(--prime-text-caption-line-height);
 }
 
-.footerHintItem {
+.footerHint {
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-1);
 }
 
-.footerHint {
+.footerHintLabel {
   padding-inline-start: var(--prime-space-1);
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-}
-
-/* Key cap: badge s tier, soft fill, tabular digits. */
-.key {
-  box-sizing: border-box;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--prime-badge-s-height);
-  height: var(--prime-badge-s-height);
-  padding-inline: var(--prime-space-1);
-  border-radius: var(--prime-badge-s-radius);
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-secondary);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--prime-badge-s-text-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.key[data-variant="ghost"] {
-  background: transparent;
-  color: var(--prime-color-text-muted);
-}
-
-.key svg {
-  width: var(--prime-badge-s-icon);
-  height: var(--prime-badge-s-icon);
 }

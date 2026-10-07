@@ -38,7 +38,6 @@ export function PlaygroundSearch({
   onOpenChange: (open: boolean) => void;
 }) {
   const navigate = useNavigate();
-  const titleId = React.useId();
 
   const go = (page: PlaygroundPageEntry) => {
     onOpenChange(false);
@@ -46,17 +45,15 @@ export function PlaygroundSearch({
   };
 
   return (
-    <CommandMenu.Dialog open={open} onOpenChange={onOpenChange} aria-labelledby={titleId}>
-      <CommandMenu.DialogTitle id={titleId} className="playgroundVisuallyHidden">
+    <CommandMenu.Root open={open} onOpenChange={onOpenChange}>
+      <CommandMenu.Title className="playgroundVisuallyHidden">
         Поиск по playground
-      </CommandMenu.DialogTitle>
-      <CommandMenu.InputRow>
-        <CommandMenu.Input placeholder="Компонент, токен или проп…" aria-label="Поиск страниц" />
-      </CommandMenu.InputRow>
+      </CommandMenu.Title>
+      <CommandMenu.Input placeholder="Компонент, токен или проп…" aria-label="Поиск страниц" />
       <CommandMenu.List>
         <CommandMenu.Empty />
         {GROUPS.map((group) => (
-          <CommandMenu.Group key={group.id} heading={group.label}>
+          <CommandMenu.Group key={group.id} label={group.label}>
             {group.pages.map((page) => (
               <CommandMenu.Item
                 key={page.segment}
@@ -64,7 +61,9 @@ export function PlaygroundSearch({
                 keywords={[page.description, group.label, ...page.keywords].join(" ")}
                 onSelect={() => go(page)}
               >
-                <CommandMenu.ItemIcon as={page.icon} />
+                <CommandMenu.ItemIcon>
+                  <page.icon />
+                </CommandMenu.ItemIcon>
                 <CommandMenu.ItemText description={page.description}>
                   {page.label}
                 </CommandMenu.ItemText>
@@ -73,6 +72,6 @@ export function PlaygroundSearch({
           </CommandMenu.Group>
         ))}
       </CommandMenu.List>
-    </CommandMenu.Dialog>
+    </CommandMenu.Root>
   );
 }

@@ -1,4 +1,4 @@
-/** A long list that scrolls under the fixed search row, a disabled item hidden from results and custom empty-state texts. Use for picking one entry from a long list by typing. */
+/** A disabled item never shows in the results, and an empty result speaks in the words of the task — `disabled`, `labels`. */
 import { Button, CommandMenu } from "prime-ui-kit";
 import * as React from "react";
 
@@ -9,15 +9,8 @@ const CITIES = [
   "Екатеринбург",
   "Казань",
   "Нижний Новгород",
-  "Челябинск",
-  "Красноярск",
   "Самара",
-  "Уфа",
-  "Ростов-на-Дону",
-  "Омск",
   "Краснодар",
-  "Воронеж",
-  "Пермь",
 ];
 
 export default function CommandMenuStatesExample() {
@@ -29,19 +22,16 @@ export default function CommandMenuStatesExample() {
       <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(true)}>
         Выбрать склад
       </Button.Root>
-
-      <CommandMenu.Dialog
+      <CommandMenu.Root
         open={open}
         onOpenChange={setOpen}
         aria-label="Выбор склада"
-        labels={{ empty: "Склад не найден", emptyHint: "Склада в этом городе пока нет" }}
+        labels={{ empty: "Склад не найден", emptyHint: "В этом городе склада пока нет" }}
       >
-        <CommandMenu.InputRow>
-          <CommandMenu.Input placeholder="Город склада" aria-label="Город склада" />
-        </CommandMenu.InputRow>
+        <CommandMenu.Input placeholder="Город склада" />
         <CommandMenu.List>
           <CommandMenu.Empty />
-          <CommandMenu.Group heading="Склады">
+          <CommandMenu.Group label="Склады">
             {CITIES.map((city) => (
               <CommandMenu.Item key={city} value={city} onSelect={close}>
                 {city}
@@ -52,7 +42,7 @@ export default function CommandMenuStatesExample() {
             </CommandMenu.Item>
           </CommandMenu.Group>
         </CommandMenu.List>
-      </CommandMenu.Dialog>
+      </CommandMenu.Root>
     </>
   );
 }
