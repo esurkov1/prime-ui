@@ -1,29 +1,32 @@
-/** `Avatar.Status` puts a presence dot on the avatar edge: online, away, busy, offline; the state name is announced from `labels`. Use in people lists and chats. */
+/** A presence dot on the avatar edge, announced by its state name — `Avatar.Status`, `labels`. */
 import { Avatar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const people = [
-  { initials: "АК", color: "blue", status: "online", caption: "в сети" },
-  { initials: "ДН", color: "green", status: "away", caption: "отошёл" },
-  { initials: "ЕО", color: "pink", status: "busy", caption: "занят" },
-  { initials: "ИС", color: "gray", status: "offline", caption: "не в сети" },
+const PEOPLE = [
+  { initials: "АК", color: "blue", status: "online", name: "Анна Климова" },
+  { initials: "ДН", color: "green", status: "away", name: "Дмитрий Носов" },
+  { initials: "ЕО", color: "pink", status: "busy", name: "Елена Орлова" },
+  { initials: "ИС", color: "gray", status: "offline", name: "Игорь Савин" },
 ] as const;
 
 export default function AvatarPresenceExample() {
   return (
-    <div className={styles.sizes}>
-      {people.map((p) => (
-        <div key={p.status} className={styles.sizeCell}>
-          <Avatar.Root size="l" color={p.color}>
-            <Avatar.Fallback>{p.initials}</Avatar.Fallback>
-            <Avatar.Status status={p.status} />
+    <ul className={styles.people}>
+      {PEOPLE.map((person) => (
+        <li key={person.status} className={styles.person}>
+          <Avatar.Root color={person.color}>
+            <Avatar.Fallback>{person.initials}</Avatar.Fallback>
+            <Avatar.Status
+              status={person.status}
+              labels={person.status === "away" ? { away: "Отошёл до 15:00" } : undefined}
+            />
           </Avatar.Root>
-          <Typography.Root as="span" variant="caption" tone="muted">
-            {p.caption}
+          <Typography.Root as="span" variant="body-m">
+            {person.name}
           </Typography.Root>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

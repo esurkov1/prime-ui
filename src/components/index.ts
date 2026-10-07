@@ -24,10 +24,9 @@ export type {
 export { Accordion } from "./accordion/Accordion";
 export type {
   AvatarFallbackProps,
-  AvatarGroupOverflowProps,
-  AvatarGroupRootProps,
+  AvatarGroupProps,
   AvatarImageProps,
-  AvatarImageStatus,
+  AvatarOverflowProps,
   AvatarPresence,
   AvatarRootProps,
   AvatarSize,

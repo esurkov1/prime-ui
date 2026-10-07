@@ -1,18 +1,6 @@
-.sizes {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--prime-space-6);
-}
+/* Layout of the Avatar scenarios: semantic tokens only. */
 
-.sizeCell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
+/* src-from-state.tsx: the avatar and its button in one line. */
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -21,28 +9,8 @@
   gap: var(--prime-space-3);
 }
 
-.team {
-  display: grid;
-  gap: var(--prime-space-4);
-  width: 100%;
-  max-width: var(--prime-modal-width-m);
-  padding: var(--prime-card-padding-m);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-}
-
-.teamGroup {
-  --avatar-ring: var(--prime-color-card-bg);
-}
-
-.teamHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-}
-
-.members {
+/* presence.tsx: a short people list. */
+.people {
   display: grid;
   gap: var(--prime-space-3);
   margin: 0;
@@ -50,14 +18,8 @@
   list-style: none;
 }
 
-.member {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+.person {
+  display: flex;
   align-items: center;
   gap: var(--prime-space-3);
-}
-
-.memberText {
-  display: grid;
-  min-width: 0;
 }

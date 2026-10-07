@@ -1,15 +1,13 @@
-/** Six diameters: 20 · 24 · 32 · 40 · 48 · 64 px, default `m`; initials take 40% of the diameter. Use xs in dense tables, m in lists, xl/2xl in profile headers. */
-import { Avatar, type AvatarSize, Typography } from "prime-ui-kit";
+/** Every diameter, 20 to 64 px; initials take 40% of it — `size`. */
+import { Avatar, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const sizes: AvatarSize[] = ["xs", "s", "m", "l", "xl", "2xl"];
+const SIZES = ["xs", "s", "m", "l", "xl", "2xl"] as const;
 
 export default function AvatarSizesExample() {
   return (
-    <div className={styles.sizes}>
-      {sizes.map((size) => (
-        <div key={size} className={styles.sizeCell}>
+    <div>
+      {SIZES.map((size) => (
+        <div key={size}>
           <Avatar.Root size={size} color="blue" aria-label="Анна Климова">
             <Avatar.Fallback>АК</Avatar.Fallback>
           </Avatar.Root>

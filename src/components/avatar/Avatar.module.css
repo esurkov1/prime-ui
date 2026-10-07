@@ -4,7 +4,7 @@
  * `size` tier.
  */
 .root,
-.groupOverflow {
+.overflow {
   --avatar-size: var(--avatar-slot-size, var(--prime-avatar-m));
 
   position: relative;
@@ -31,23 +31,23 @@
   color: var(--hue-text);
 }
 
-:is(.root, .groupOverflow)[data-size="xs"] {
+:is(.root, .overflow)[data-size="xs"] {
   --avatar-size: var(--avatar-slot-size, var(--prime-avatar-xs));
 }
 
-:is(.root, .groupOverflow)[data-size="s"] {
+:is(.root, .overflow)[data-size="s"] {
   --avatar-size: var(--avatar-slot-size, var(--prime-avatar-s));
 }
 
-:is(.root, .groupOverflow)[data-size="l"] {
+:is(.root, .overflow)[data-size="l"] {
   --avatar-size: var(--avatar-slot-size, var(--prime-avatar-l));
 }
 
-:is(.root, .groupOverflow)[data-size="xl"] {
+:is(.root, .overflow)[data-size="xl"] {
   --avatar-size: var(--avatar-slot-size, var(--prime-avatar-xl));
 }
 
-:is(.root, .groupOverflow)[data-size="2xl"] {
+:is(.root, .overflow)[data-size="2xl"] {
   --avatar-size: var(--avatar-slot-size, var(--prime-avatar-2xl));
 }
 
@@ -175,31 +175,31 @@
  * Sidebar) set it to their own background, so the ring matches wherever the group sits.
  * Canvas is the fallback.
  */
-.groupRoot {
+.group {
   display: inline-flex;
   flex-direction: row;
   align-items: center;
   isolation: isolate;
 }
 
-.groupRoot > * {
+.group > * {
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width))
     var(--avatar-ring, var(--prime-color-bg-canvas));
 }
 
 /* Soft hues are translucent: back them with the opaque surface so overlapped neighbours never
  * show through. */
-.groupRoot > .root {
+.group > .root {
   background:
     linear-gradient(var(--hue-soft), var(--hue-soft)),
     var(--avatar-ring, var(--prime-color-bg-canvas));
 }
 
-.groupRoot > * + * {
+.group > * + * {
   margin-inline-start: calc(var(--avatar-size) * -0.25);
 }
 
-.groupOverflow {
+.overflow {
   background:
     linear-gradient(var(--prime-color-fill-muted), var(--prime-color-fill-muted)),
     var(--avatar-ring, var(--prime-color-bg-canvas));
