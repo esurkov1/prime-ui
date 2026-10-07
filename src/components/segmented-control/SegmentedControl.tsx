@@ -51,16 +51,19 @@ function syncThumb(list: HTMLElement, thumb: HTMLElement, animate: boolean) {
     setFlag(thumb, "data-animate", false);
     return;
   }
-  const transform = `translate(${active.offsetLeft}px, ${active.offsetTop}px)`;
+  const left = `${active.offsetLeft}px`;
+  const top = `${active.offsetTop}px`;
   const width = `${active.offsetWidth}px`;
   const height = `${active.offsetHeight}px`;
   const moved =
-    thumb.style.transform !== transform ||
+    thumb.style.left !== left ||
+    thumb.style.top !== top ||
     thumb.style.width !== width ||
     thumb.style.height !== height;
   // Glide only into a user's choice; a layout change (resize, fonts, new items) snaps the thumb.
   if (moved) setFlag(thumb, "data-animate", animate && thumb.hasAttribute("data-visible"));
-  thumb.style.transform = transform;
+  thumb.style.left = left;
+  thumb.style.top = top;
   thumb.style.width = width;
   thumb.style.height = height;
   if (active.dataset.color) thumb.dataset.color = active.dataset.color;
@@ -264,7 +267,7 @@ function SegmentedControlRoot({
               className={styles.thumb}
               aria-hidden="true"
               onTransitionEnd={(event) => {
-                if (event.target === event.currentTarget && event.propertyName === "transform") {
+                if (event.target === event.currentTarget && event.propertyName === "left") {
                   setFlag(event.currentTarget, "data-animate", false);
                 }
               }}

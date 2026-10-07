@@ -433,11 +433,15 @@
     var(--prime-shadow-raised);
 }
 
-/* Glides only into a user's choice (layout changes snap it). Size has to follow the segment, so
-   width/height ride the same curve as the position; color follows on `standard`. */
+/* Glides only into a user's choice (layout changes snap it); color follows on `standard`.
+   Position rides `left`/`top`, not `transform`, on purpose: a transform transition makes the thumb a
+   composited layer, and Safari then misses its overlap with the later segments inside a scrolling
+   row and paints their text under the thumb until the glide ends (WebKit PR #75750). A thumb that
+   stays in normal paint order cannot cover the text; size already animates the same way. */
 .thumb[data-animate="true"] {
   transition:
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    left var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    top var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),

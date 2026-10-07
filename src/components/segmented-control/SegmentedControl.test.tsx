@@ -330,7 +330,7 @@ describe("SegmentedControl — thumb and parts", () => {
       fireEvent.click(screen.getByRole("radio", { name: "A" }));
       rerender(<SegmentedControl.Root value="a">{items}</SegmentedControl.Root>);
       expect(thumb).toHaveAttribute("data-animate", "true");
-      fireEvent.transitionEnd(thumb, { propertyName: "transform" });
+      fireEvent.transitionEnd(thumb, { propertyName: "left" });
       expect(thumb).not.toHaveAttribute("data-animate");
     } finally {
       vi.unstubAllGlobals();
