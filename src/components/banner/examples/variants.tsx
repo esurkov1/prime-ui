@@ -54,9 +54,9 @@ export default function BannerVariantsExample() {
                   {description ? <Banner.Description>{description}</Banner.Description> : null}
                   {tone === "accent" && variant !== "solid" ? (
                     <Banner.Actions>
-                      <LinkButton.Root href="#" size="s">
+                      <LinkButton href="#" size="s">
                         Подробнее
-                      </LinkButton.Root>
+                      </LinkButton>
                     </Banner.Actions>
                   ) : null}
                 </Banner.Content>

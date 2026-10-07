@@ -263,16 +263,10 @@
   height: 100%;
 }
 
-.spinner {
+/* Spinner (kit donor) takes the button's text color even when the overlay hides the label. */
+.root > .spinner {
   order: -1;
-  flex-shrink: 0;
-  box-sizing: border-box;
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
-  border: calc(var(--prime-border-width) * 2) solid var(--btn-fg);
-  border-inline-end-color: transparent;
-  border-radius: var(--prime-radius-full);
-  animation: prime-button-spin calc(var(--prime-motion-duration-slow) * 3) linear infinite;
+  color: var(--btn-fg);
 }
 
 .root[data-loading="true"] {
@@ -294,10 +288,4 @@
   position: absolute;
   inset: 0;
   margin: auto;
-}
-
-@keyframes prime-button-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }

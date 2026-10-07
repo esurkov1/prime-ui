@@ -1,9 +1,12 @@
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import * as React from "react";
 
+import { Badge } from "@/components/badge/Badge";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useOverlayModal } from "@/hooks/useOverlayModal";
+import { Icon } from "@/icons";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -74,8 +77,7 @@ function useMediaQuery(query: string, enabled: boolean): boolean {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"div">, "children"> & {
-  children?: React.ReactNode;
+export type SidebarRootProps = React.ComponentPropsWithoutRef<"div"> & {
   /** Item tier: height, icon and text of `--prime-control-<size>-*`. */
   size?: ControlSize;
   mode?: SidebarMode;
@@ -184,7 +186,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
           aria-label={labels.navigation}
           inert={(isMobile && !open) || (!isMobile && mode === "hidden") || undefined}
         >
-          {children}
+          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
         </nav>
       </div>
     </SidebarProvider>
@@ -201,14 +203,26 @@ function SidebarHeader({ className, ...rest }: SidebarHeaderProps) {
 }
 SidebarHeader.displayName = "Sidebar.Header";
 
-export type SidebarContentProps = React.ComponentPropsWithoutRef<"div">;
+export type SidebarContentProps = React.HTMLAttributes<HTMLElement>;
 
-/** Scrolling middle region. */
-const SidebarContent = React.forwardRef<HTMLDivElement, SidebarContentProps>(
-  function SidebarContent({ className, ...rest }, ref) {
-    return <div {...rest} ref={ref} className={cx(styles.content, className)} />;
-  },
-);
+/**
+ * Scrolling middle region: a ScrollContainer with edge fades and no scrollbar (a classic bar
+ * would take width and move the icons; the rail scrolls by wheel, touch and focus).
+ */
+const SidebarContent = React.forwardRef<HTMLElement, SidebarContentProps>(function SidebarContent(
+  { className, ...rest },
+  ref,
+) {
+  return (
+    <ScrollContainer
+      {...rest}
+      ref={ref}
+      fade
+      scrollbar="hidden"
+      className={cx(styles.content, className)}
+    />
+  );
+});
 SidebarContent.displayName = "Sidebar.Content";
 
 export type SidebarFooterProps = React.ComponentPropsWithoutRef<"div">;
@@ -244,6 +258,54 @@ function SidebarGroup({ className, label, children, ...rest }: SidebarGroupProps
 }
 SidebarGroup.displayName = "Sidebar.Group";
 
+// ─── Item parts ───────────────────────────────────────────────────────────────
+
+export type SidebarItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
+  children: React.ReactNode;
+};
+
+/** Leading icon of an item; stays in place in every mode. */
+function SidebarItemIcon({ className, ...rest }: SidebarItemIconProps) {
+  return <span {...rest} className={cx(styles.icon, className)} aria-hidden="true" />;
+}
+SidebarItemIcon.displayName = "Sidebar.ItemIcon";
+
+export type SidebarItemCountProps = {
+  /** The number (or a short status). */
+  children: React.ReactNode;
+  className?: string;
+};
+
+/**
+ * Counter `Badge` after the label; in compact mode it gives way to a dot on the icon and stays
+ * readable for screen readers.
+ */
+function SidebarItemCount({ children, className }: SidebarItemCountProps) {
+  return (
+    <>
+      <Badge.Root className={cx(styles.count, className)}>{children}</Badge.Root>
+      <span className={styles.dot} aria-hidden="true" />
+    </>
+  );
+}
+SidebarItemCount.displayName = "Sidebar.ItemCount";
+
+export type SidebarItemShortcutProps = {
+  /** A key hint, e.g. `<Kbd.Root>⌘K</Kbd.Root>`. */
+  children: React.ReactNode;
+  className?: string;
+};
+
+/** Keyboard hint at the end of an item; hidden in compact mode. */
+function SidebarItemShortcut({ children, className }: SidebarItemShortcutProps) {
+  return (
+    <span className={cx(styles.shortcut, className)} aria-hidden="true">
+      {children}
+    </span>
+  );
+}
+SidebarItemShortcut.displayName = "Sidebar.ItemShortcut";
+
 // ─── Item ─────────────────────────────────────────────────────────────────────
 
 function textOf(node: React.ReactNode): string {
@@ -255,30 +317,27 @@ function textOf(node: React.ReactNode): string {
   return "";
 }
 
-type ItemInnerProps = {
-  icon?: React.ReactNode;
-  badge?: React.ReactNode;
-  shortcut?: React.ReactNode;
-  children?: React.ReactNode;
-};
+const PART_TYPES: React.ElementType[] = [SidebarItemIcon, SidebarItemCount, SidebarItemShortcut];
 
-function ItemInner({ icon, badge, shortcut, children }: ItemInnerProps) {
-  return (
-    <>
-      {icon === undefined ? null : (
-        <span className={styles.icon} aria-hidden="true">
-          {icon}
-        </span>
-      )}
-      <span className={styles.label}>{children}</span>
-      {badge === undefined || badge === null ? null : <span className={styles.badge}>{badge}</span>}
-      {shortcut === undefined ? null : (
-        <span className={styles.shortcut} aria-hidden="true">
-          {shortcut}
-        </span>
-      )}
-    </>
+/** Parts go to their places; everything else is the label, which clips and fades in compact. */
+function splitItemChildren(children: React.ReactNode) {
+  const nodes = React.Children.toArray(children);
+  const partOf = (type: React.ElementType) =>
+    nodes.find((node) => React.isValidElement(node) && node.type === type);
+  const label = nodes.filter(
+    (node) => !(React.isValidElement(node) && PART_TYPES.includes(node.type as React.ElementType)),
   );
+  return {
+    label,
+    content: (
+      <>
+        {partOf(SidebarItemIcon)}
+        <span className={styles.label}>{label}</span>
+        {partOf(SidebarItemCount)}
+        {partOf(SidebarItemShortcut)}
+      </>
+    ),
+  };
 }
 
 /**
@@ -305,20 +364,12 @@ function CompactTooltip({ text, children }: { text: string; children: React.Reac
 }
 
 type SidebarItemOwnProps = {
-  /** Leading icon; stays in place in every mode. */
-  icon?: React.ReactNode;
-  /** Counter or status; in compact mode it becomes a dot on the icon. */
-  badge?: React.ReactNode;
-  /** Keyboard hint (e.g. `<Kbd>`); hidden in compact mode. */
-  shortcut?: React.ReactNode;
-  /** Current page. Links rendered by a router may set `aria-current="page"` instead. */
-  active?: boolean;
+  /** Current page: `aria-current="page"`. Links rendered by a router may set it themselves. */
+  current?: boolean;
   disabled?: boolean;
-  /**
-   * Render the single child element (e.g. a router link) as the item; its children become the
-   * label.
-   */
+  /** Render the single child element (e.g. a router link) as the item; its children are the content. */
   asChild?: boolean;
+  /** Label and parts: `Sidebar.ItemIcon`, `Sidebar.ItemCount`, `Sidebar.ItemShortcut`. */
   children?: React.ReactNode;
 };
 
@@ -332,10 +383,7 @@ export type SidebarItemProps = SidebarItemOwnProps &
 
 const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function SidebarItem(
   {
-    icon,
-    badge,
-    shortcut,
-    active = false,
+    current = false,
     disabled = false,
     asChild = false,
     href,
@@ -363,27 +411,22 @@ const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function Sid
     ...rest,
     className: cx(styles.item, className),
     onClick: handleClick,
-    "aria-current": active ? ("page" as const) : rest["aria-current"],
+    "aria-current": current ? ("page" as const) : rest["aria-current"],
     ...toDataAttributes({
-      state: active ? "active" : undefined,
+      state: current ? "active" : undefined,
       disabled: disabled || undefined,
     }),
   };
 
-  let element: React.ReactElement;
-  let labelSource: React.ReactNode = children;
+  const child =
+    asChild && React.isValidElement<{ children?: React.ReactNode }>(children) ? children : null;
+  const { label, content } = splitItemChildren(child ? child.props.children : children);
 
-  if (asChild && React.isValidElement<{ children?: React.ReactNode }>(children)) {
-    labelSource = children.props.children;
+  let element: React.ReactElement;
+  if (child) {
     element = (
       <Slot {...shared} ref={ref} aria-disabled={disabled || undefined}>
-        {React.cloneElement(
-          children,
-          undefined,
-          <ItemInner icon={icon} badge={badge} shortcut={shortcut}>
-            {children.props.children}
-          </ItemInner>,
-        )}
+        {React.cloneElement(child, undefined, content)}
       </Slot>
     );
   } else if (href !== undefined) {
@@ -394,9 +437,7 @@ const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function Sid
         href={disabled ? undefined : href}
         aria-disabled={disabled || undefined}
       >
-        <ItemInner icon={icon} badge={badge} shortcut={shortcut}>
-          {children}
-        </ItemInner>
+        {content}
       </a>
     );
   } else {
@@ -407,14 +448,12 @@ const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function Sid
         type={type ?? "button"}
         disabled={disabled}
       >
-        <ItemInner icon={icon} badge={badge} shortcut={shortcut}>
-          {children}
-        </ItemInner>
+        {content}
       </button>
     );
   }
 
-  const tooltipText = textOf(labelSource).trim() || (rest["aria-label"] ?? "");
+  const tooltipText = textOf(label).trim() || (rest["aria-label"] ?? "");
   return <CompactTooltip text={tooltipText}>{element}</CompactTooltip>;
 });
 SidebarItem.displayName = "Sidebar.Item";
@@ -451,7 +490,10 @@ const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
             if (!event.defaultPrevented) toggle();
           }}
         >
-          <ItemInner icon={expanded ? <PanelLeftClose /> : <PanelLeftOpen />}>{label}</ItemInner>
+          <SidebarItemIcon>
+            <Icon name={expanded ? "nav.sidebarCollapse" : "nav.sidebarExpand"} />
+          </SidebarItemIcon>
+          <span className={styles.label}>{label}</span>
         </button>
       </CompactTooltip>
     );
@@ -466,5 +508,8 @@ export const Sidebar = {
   Footer: SidebarFooter,
   Group: SidebarGroup,
   Item: SidebarItem,
+  ItemIcon: SidebarItemIcon,
+  ItemCount: SidebarItemCount,
+  ItemShortcut: SidebarItemShortcut,
   Toggle: SidebarToggle,
 };

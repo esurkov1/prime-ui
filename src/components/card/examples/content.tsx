@@ -29,9 +29,9 @@ export default function CardContentExample() {
       <Card.Root variant="list">
         <Card.ListHeader>
           <Card.Title>Последние события</Card.Title>
-          <LinkButton.Root href="#" size="s">
+          <LinkButton href="#" size="s">
             Все
-          </LinkButton.Root>
+          </LinkButton>
         </Card.ListHeader>
         <Card.List>
           {events.map((e) => (

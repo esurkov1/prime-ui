@@ -8,7 +8,7 @@ import styles from "./ScrollContainer.module.css";
 
 export type ScrollContainerAxis = "vertical" | "horizontal" | "both";
 
-export type ScrollContainerProps = Omit<React.HTMLAttributes<HTMLElement>, "className"> & {
+export type ScrollContainerProps = React.HTMLAttributes<HTMLElement> & {
   /** Root element. Default `div`; `AppShell.Main` renders `main`. */
   as?: "div" | "main" | "aside" | "section" | "nav" | "article";
   /** Scroll axis. Default `vertical`. */
@@ -22,7 +22,6 @@ export type ScrollContainerProps = Omit<React.HTMLAttributes<HTMLElement>, "clas
   fade?: boolean;
   /** `thin` — the kit's quiet scrollbar (default); `hidden` — no scrollbar (pair it with `fade`). */
   scrollbar?: "thin" | "hidden";
-  className?: string;
 };
 
 const axisClass: Record<ScrollContainerAxis, string> = {

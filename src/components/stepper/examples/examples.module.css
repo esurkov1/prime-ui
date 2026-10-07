@@ -1,55 +1,24 @@
-/* Layout for the Stepper examples: semantic tokens only. */
+/* Layout of the Stepper scenarios: semantic tokens only. */
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-8);
+/* The stepper measures its own width (container query), so its wrapper needs one. */
+.wide {
   width: 100%;
-  min-width: 0;
 }
 
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-  min-width: 0;
-}
-
-/* 288px. */
-.vertical {
+/* A side column for a vertical stepper (288px), with anything under it a group gap away. */
+.column {
+  display: grid;
+  gap: var(--prime-space-4);
   width: min(100%, calc(var(--prime-space-24) * 3));
 }
 
-/* 320px. */
+/* A phone-width container (320px). */
 .narrow {
   width: min(100%, calc(var(--prime-drawer-width-s) - var(--prime-space-10)));
 }
 
-.wizard {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: repeat(
-      auto-fit,
-      minmax(min(100%, calc(var(--prime-space-24) * 2.5)), 1fr)
-    );
-  gap: var(--prime-space-6) var(--prime-space-8);
-  width: min(100%, calc(var(--prime-modal-width-l) + var(--prime-space-12)));
-  padding: var(--prime-card-padding-m);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-5);
-  min-width: 0;
-}
-
+/* Back / Next under the stepper. */
 .actions {
   display: flex;
-  justify-content: flex-end;
   gap: var(--prime-space-2);
 }

@@ -5,12 +5,12 @@ import { LinkButton } from "./LinkButton";
 
 describe("LinkButton", () => {
   it("renders", () => {
-    render(<LinkButton.Root href="/x">Label</LinkButton.Root>);
+    render(<LinkButton href="/x">Label</LinkButton>);
     expect(screen.getByRole("link", { name: "Label" })).toBeInTheDocument();
   });
 
   it("passes href", () => {
-    render(<LinkButton.Root href="https://example.com/path">External</LinkButton.Root>);
+    render(<LinkButton href="https://example.com/path">External</LinkButton>);
     expect(screen.getByRole("link", { name: "External" })).toHaveAttribute(
       "href",
       "https://example.com/path",
@@ -19,9 +19,9 @@ describe("LinkButton", () => {
 
   it("sets aria-disabled and tabIndex when disabled", () => {
     render(
-      <LinkButton.Root href="/here" disabled>
+      <LinkButton href="/here" disabled>
         Gone
-      </LinkButton.Root>,
+      </LinkButton>,
     );
     const link = screen.getByRole("link", { name: "Gone" });
     expect(link).toHaveAttribute("aria-disabled", "true");
@@ -30,49 +30,49 @@ describe("LinkButton", () => {
   });
 
   it("applies size data attributes", () => {
-    const { rerender } = render(<LinkButton.Root href="/s">S</LinkButton.Root>);
+    const { rerender } = render(<LinkButton href="/s">S</LinkButton>);
     expect(screen.getByRole("link", { name: "S" })).toHaveAttribute("data-size", "m");
 
     rerender(
-      <LinkButton.Root href="/m" size="l">
+      <LinkButton href="/m" size="l">
         M
-      </LinkButton.Root>,
+      </LinkButton>,
     );
     expect(screen.getByRole("link", { name: "M" })).toHaveAttribute("data-size", "l");
 
     rerender(
-      <LinkButton.Root href="/l" size="xl">
+      <LinkButton href="/l" size="xl">
         L
-      </LinkButton.Root>,
+      </LinkButton>,
     );
     expect(screen.getByRole("link", { name: "L" })).toHaveAttribute("data-size", "xl");
   });
 
   it("merges className", () => {
     render(
-      <LinkButton.Root href="/c" className="extra">
+      <LinkButton href="/c" className="extra">
         C
-      </LinkButton.Root>,
+      </LinkButton>,
     );
     expect(screen.getByRole("link", { name: "C" })).toHaveClass("extra");
   });
 
   it("renders children", () => {
     render(
-      <LinkButton.Root href="/kids">
+      <LinkButton href="/kids">
         <span>Nested</span>
-      </LinkButton.Root>,
+      </LinkButton>,
     );
     expect(screen.getByText("Nested")).toBeInTheDocument();
   });
 
   it("defaults tone to accent and accepts neutral", () => {
-    const { rerender } = render(<LinkButton.Root href="/t">T</LinkButton.Root>);
+    const { rerender } = render(<LinkButton href="/t">T</LinkButton>);
     expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-tone", "accent");
     rerender(
-      <LinkButton.Root href="/t" tone="neutral">
+      <LinkButton href="/t" tone="neutral">
         T
-      </LinkButton.Root>,
+      </LinkButton>,
     );
     expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-tone", "neutral");
   });

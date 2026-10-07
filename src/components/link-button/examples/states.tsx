@@ -1,18 +1,31 @@
-/** Active link and disabled links in both tones; `disabled` renders a `span role="link"` without `href`, out of the Tab order. Use when a destination is temporarily unavailable. */
-import { LinkButton } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+/** A disabled link drops `href` and leaves the Tab order, in both tones — `disabled`. */
+import { LinkButton, Typography } from "prime-ui-kit";
 
 export default function LinkButtonStatesExample() {
   return (
-    <div className={styles.row}>
-      <LinkButton.Root href="#">Активная</LinkButton.Root>
-      <LinkButton.Root href="#" disabled>
-        Недоступная
-      </LinkButton.Root>
-      <LinkButton.Root href="#" tone="neutral" disabled>
-        Недоступная нейтральная
-      </LinkButton.Root>
+    <div>
+      <div>
+        <LinkButton href="#export">Скачать выгрузку</LinkButton>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          default
+        </Typography.Root>
+      </div>
+      <div>
+        <LinkButton href="#export" disabled>
+          Скачать выгрузку
+        </LinkButton>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          disabled
+        </Typography.Root>
+      </div>
+      <div>
+        <LinkButton href="#export" tone="neutral" disabled>
+          Скачать выгрузку
+        </LinkButton>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          neutral · disabled
+        </Typography.Root>
+      </div>
     </div>
   );
 }

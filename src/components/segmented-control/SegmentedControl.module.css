@@ -115,20 +115,11 @@
   height: auto;
 }
 
-/* ─── Viewport (scrolls) → list (the track of segments, holds the thumb) ──── */
+/* ─── Viewport (a ScrollContainer, hidden bar) → list (the track, holds the thumb) ──── */
 
 .viewport {
   display: flex;
   flex: 1 1 auto;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-}
-
-.viewport::-webkit-scrollbar {
-  display: none;
 }
 
 /* Edge fades while the row scrolls: overlays in the track color on the still root. Not a

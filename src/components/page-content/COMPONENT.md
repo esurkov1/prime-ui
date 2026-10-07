@@ -1,6 +1,7 @@
 # PageContent
 
 **Category:** layout
+**Kind:** layout
 
 > Page structure inside the main column: title, description, page actions and content sections.
 
@@ -23,86 +24,67 @@ import { PageContent } from "prime-ui-kit";
 ## Anatomy
 ```
 PageContent.Root | PageContent.Section     column; Root adds maxWidth, Section renders <section>
-├── PageContent.Header                     heading column + actions in one wrapping row
-│   ├── PageContent.Title                  <h1>, heading-m
-│   ├── PageContent.Description            <p>, secondary body-m
-│   └── PageContent.Actions                page buttons (moved to the end of the header row)
-└── PageContent.Body                       page content, blocks 40 apart
+├─ PageContent.Header                      heading column + actions in one wrapping row
+│  ├─ PageContent.Title                    <h1>, heading-m
+│  ├─ PageContent.Description              <p>, secondary body-m
+│  └─ PageContent.Actions                  page buttons (moved to the end of the header row)
+└─ PageContent.Body                        page content, blocks 40 apart
 ```
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### PageContent.Root
-`forwardRef` to `<div>`.
+`forwardRef` → `HTMLDivElement`. The page column inside `main`: header → body 32 apart, centred under its cap.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `maxWidth` | `"full" \| "readable" \| "wide"` | `"full"` | Max width of the column (centred with `margin-inline: auto`). |
-| `className` | `string` | — | Extra class. |
-| `children` | `ReactNode` | — | Header, Body. |
-
-+ native `<div>` props.
+| `maxWidth` | `"full" \| "readable" \| "wide"` | `"full"` | Cap of the column: the whole main, `--prime-layout-content-max-width`, or a ~65ch reading measure. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Header, Body), `className` and the other div attributes. |
 
 ### PageContent.Section
-`forwardRef` to `<section>`. Same column and rhythm as Root, without `maxWidth`.
+`forwardRef` → `HTMLElement`. The same column as a `<section>`, without a cap; name it with `aria-labelledby` → the Title `id`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. |
-| `children` | `ReactNode` | — | Header, Body. |
-
-+ native `<section>` props (`HTMLAttributes<HTMLElement>`; use `aria-labelledby` pointing at the Title `id`).
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `aria-labelledby`, `className` and the other section attributes. |
 
 ### PageContent.Header
-Plain function component (no ref). Children of type `PageContent.Actions` are moved after the heading column; all other children go into the heading column.
+No ref. Heading column and page actions in one wrapping row; `PageContent.Actions` children move to the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. |
-| `children` | `ReactNode` | — | Title, Description, Actions. |
-
-+ native `<div>` props.
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Title, Description, Actions), `className` and the other div attributes. |
 
 ### PageContent.Title
-`forwardRef` to `<h1>`.
+`forwardRef` → `HTMLHeadingElement`. The page `<h1>` in heading-m.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. |
-| `children` | `ReactNode` | — | Page title. |
-
-+ native `<h1>` props.
+| `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `children`, `id`, `className` and the other heading attributes. |
 
 ### PageContent.Description
-`forwardRef` to `<p>`.
+`forwardRef` → `HTMLParagraphElement`. Intro `<p>` in secondary body-m.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `measure` | `"readable" \| "full"` | `"readable"` | `readable` caps the line at the reading width; `full` uses the full width of the parent. |
-| `className` | `string` | — | Extra class. |
-| `children` | `ReactNode` | — | Intro text. |
-
-+ native `<p>` props.
+| `measure` | `"readable" \| "full"` | `"readable"` | `readable` — max ~65ch; `full` — the full width of the parent. |
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### PageContent.Actions
-Plain function component (no ref).
+No ref. Page-level buttons next to the title; they wrap under the heading on narrow columns.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. |
-| `children` | `ReactNode` | — | Page buttons. |
-
-+ native `<div>` props.
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Buttons), `className` and the other div attributes. |
 
 ### PageContent.Body
-Plain function component (no ref).
+No ref. The page content; blocks 40 apart.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. |
-| `children` | `ReactNode` | — | Page content blocks. |
-
-+ native `<div>` props.
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ## Variants
 
@@ -117,51 +99,43 @@ Plain function component (no ref).
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `readable` | Intro line wraps at the reading width | Default, most pages | yes |
-| `full` | Intro uses the full header width | The column is already narrow, or the intro sits next to actions | |
+| `full` | Intro uses the full header width | The column is already narrow | |
 
-**Combinations** — `Root maxWidth="readable"` with the default Description measure for text pages; `Section` + `measure="full"` + `Actions` for app pages. `Description measure="full"` inside `Root maxWidth="readable"` changes nothing visible.
-
-**Hierarchy** — one `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s` / `title-m` headings (`h2`). One primary button in Actions, the rest `soft`/`ghost` neutral.
+One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s` / `title-m` headings (`h2`). One primary button in Actions, the rest `soft` / `ghost` neutral.
 
 ## States
-Static layout. DOM: `data-max-width="readable" | "wide"` on Root (absent for `full`), `data-measure="full"` on Description (absent for `readable`), `data-has-actions="true"` on Header when it contains Actions.
+| State | Driven by | DOM |
+|---|---|---|
+| capped column | `maxWidth` | `data-max-width="readable" \| "wide"` on Root (absent for `full`) |
+| full-width intro | `measure="full"` | `data-measure="full"` on Description |
+| with actions | `PageContent.Actions` child | `data-has-actions="true"` on Header |
 
 ## Layout & spacing
 - No outer padding: edge gutters come from `AppShell.Main`.
 - Header → Body `--prime-space-8` (32); blocks inside Body `--prime-space-10` (40); Title → Description `--prime-space-2` (8); buttons in Actions `--prime-space-2`.
-- Header is a wrapping row (`gap: --prime-space-4` / `--prime-space-6`): actions stay to the right of the title while the heading keeps half a reading measure, otherwise wrap below it — no breakpoint needed, works from 320px.
+- Header is a wrapping row: actions stay to the right of the title while the heading keeps half a reading measure, otherwise they wrap below it — no breakpoint needed, works from 320px.
 - Title and Description wrap long words (`overflow-wrap: anywhere`).
 
 ## Accessibility
+
+### Keyboard
+No keyboard interaction.
+
+### ARIA
 - Title is an `<h1>`; use one per page.
 - Give `PageContent.Section` an `aria-labelledby` that points at the Title `id` to name the region.
-- No keyboard behaviour, no `labels`.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+No `labels`.
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [settings-page.tsx](examples/settings-page.tsx) | Section with title, description, actions and panel cards in Body | App pages with page-level actions |
-| [readable.tsx](examples/readable.tsx) | `Root maxWidth="readable"` with reading text | Terms, articles, help pages |
-| [widths.tsx](examples/widths.tsx) | `Root maxWidth` full · wide · readable side by side | Choosing the column cap |
-
-```tsx
-import { Button, PageContent } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <PageContent.Section>
-      <PageContent.Header>
-        <PageContent.Title>Заказы</PageContent.Title>
-        <PageContent.Description>Все заказы за последний месяц.</PageContent.Description>
-        <PageContent.Actions>
-          <Button.Root>Создать заказ</Button.Root>
-        </PageContent.Actions>
-      </PageContent.Header>
-      <PageContent.Body>…</PageContent.Body>
-    </PageContent.Section>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A page in the main column: title, description and page actions, then the body blocks — `PageContent.Actions`. |
+| [variants.tsx](examples/variants.tsx) | The same page column at three caps: the whole main, a wide dashboard column, a reading column — `maxWidth`. |
+| [narrow.tsx](examples/narrow.tsx) | In a phone-width column the page actions wrap under the heading instead of squeezing it. |
 
 ## Mistakes
 - Padding on `PageContent.Root` to imitate gutters → gutters come from `AppShell.Main`.
@@ -170,4 +144,5 @@ export function Example() {
 - Margins between blocks in Body → Body already sets the 40 gap.
 
 ## Related
-[AppShell](../../layout/app-shell/COMPONENT.md) · [Sidebar](../../layout/sidebar/COMPONENT.md) · [Card](../card/COMPONENT.md) · [EmptyPage](../empty-page/COMPONENT.md)
+- **Built from:** —
+- **See also:** [AppShell](../../layout/app-shell/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Card](../card/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

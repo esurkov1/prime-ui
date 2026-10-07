@@ -1,10 +1,10 @@
 /*
  * Tabs — Graphite. Navigation between content panels.
  * Horizontal: text tabs over a hairline; an accent bar under the active text slides between
- * triggers. The bar is half the tier track thickness (`--prime-control-<tier>-track`, the line of
+ * items. The bar is half the tier track thickness (`--prime-control-<tier>-track`, the line of
  * ProgressBar / Slider): 2 · 2.5 · 3 · 3.5 · 4px, so it grows with the size. Vertical: rounded items without a rail; the active item is a `fill-muted` pill with a
  * short accent mark. Stacks into a scrolling row under 600px of container width.
- * Two-line triggers (with `Tabs.Description`) size to content with a minimum width.
+ * Two-line items (with `Tabs.Description`) size to content with a minimum width.
  * Heights follow control tiers so Tabs line up with Button / Input of the same size.
  */
 
@@ -93,50 +93,14 @@
 
 /* ---------- List ---------- */
 
+/* The list is a ScrollContainer (horizontal, edge fade, hidden scrollbar): it scrolls, never wraps. */
 .list {
   position: relative;
   isolation: isolate;
   display: flex;
-  box-sizing: border-box;
-  min-width: 0;
   max-width: 100%;
   flex-wrap: nowrap;
   align-items: stretch;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-}
-
-.list::-webkit-scrollbar {
-  display: none;
-}
-
-/* Edge fade while the list scrolls (mask is alpha-only; any opaque color works). */
-.list[data-overflow-start="true"] {
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8)
-  );
-}
-
-.list[data-overflow-end="true"] {
-  mask-image: linear-gradient(
-    to left,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8)
-  );
-}
-
-.list[data-overflow-start="true"][data-overflow-end="true"] {
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8),
-    var(--prime-color-text-primary) calc(100% - var(--prime-space-8)),
-    transparent
-  );
 }
 
 .root[data-orientation="vertical"] .list {
@@ -174,7 +138,7 @@
   opacity: 1;
 }
 
-/* Accent bar under the text of the active trigger; thickness follows the tier. */
+/* Accent bar under the text of the active item; thickness follows the tier. */
 .indicatorBar {
   top: auto;
   bottom: 0;
@@ -200,7 +164,7 @@
   background: var(--prime-color-accent-default);
 }
 
-/* ---------- Trigger ---------- */
+/* ---------- Item ---------- */
 
 .tab {
   position: relative;
@@ -237,7 +201,7 @@
   border-radius: var(--tabs-radius);
 }
 
-/* Two-line trigger: label + count on the first line, description on the second. */
+/* Two-line item: label + count on the first line, description on the second. */
 .tab[data-two-line="true"] {
   /* Grid, not wrapping flex: the max-content width is the wider line, not both lines summed. */
   display: inline-grid;
@@ -280,7 +244,7 @@
   cursor: not-allowed;
 }
 
-/* ---------- Trigger parts ---------- */
+/* ---------- Item parts ---------- */
 
 .icon {
   display: inline-flex;

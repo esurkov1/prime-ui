@@ -11,7 +11,6 @@ export {
 export type { ProgressSegment } from "../internal/progressSegments";
 export * from "../layout";
 export type {
-  AccordionArrowProps,
   AccordionContentProps,
   AccordionHeaderProps,
   AccordionIconProps,
@@ -52,14 +51,9 @@ export type {
   BreadcrumbItemProps,
   BreadcrumbLabels,
   BreadcrumbRootProps,
-  BreadcrumbSeparatorProps,
 } from "./breadcrumb/Breadcrumb";
 export { Breadcrumb } from "./breadcrumb/Breadcrumb";
-export type {
-  ButtonIconProps,
-  ButtonRootProps,
-  ButtonSpinnerProps,
-} from "./button/Button";
+export type { ButtonIconProps, ButtonRootProps } from "./button/Button";
 export { Button } from "./button/Button";
 export type {
   ButtonGroupIconProps,
@@ -290,7 +284,7 @@ export type { KbdRootProps } from "./kbd/Kbd";
 export { Kbd } from "./kbd/Kbd";
 export type { LabelLabels, LabelRootProps } from "./label/Label";
 export { Label } from "./label/Label";
-export type { LinkButtonRootProps } from "./link-button/LinkButton";
+export type { LinkButtonProps } from "./link-button/LinkButton";
 export { LinkButton } from "./link-button/LinkButton";
 export type {
   LoginFormActionsProps,
@@ -427,9 +421,9 @@ export type {
   StepperContentProps,
   StepperDescriptionProps,
   StepperIndicatorProps,
+  StepperItemProps,
+  StepperItemStatus,
   StepperRootProps,
-  StepperStepProps,
-  StepperStepStatus,
   StepperTitleProps,
 } from "./stepper/Stepper";
 export { Stepper } from "./stepper/Stepper";

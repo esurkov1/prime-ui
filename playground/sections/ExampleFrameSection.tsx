@@ -1,154 +1,45 @@
-import ExampleFrameBasicExample from "@/components/example-frame/examples/basic";
-import { PageContent } from "@/components/page-content/PageContent";
-import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
-import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import {
-  DemoApiTitle,
-  DemoDescription,
-  DemoSectionTitle,
-} from "../components/PlaygroundDemoTypography";
+import { api } from "@/components/example-frame/api";
 
-const rootRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "code",
-    type: "string",
-    defaultValue: "—",
-    required: "Да",
-    description:
-      "Исходный текст для вкладки «Код», копирования в буфер и подсветки через CodeBlock.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description:
-      "Превью компонентов. Если среди детей есть ExampleFrame.Stage, в превью попадают только его дети; иначе рендерятся все children.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на корневой обёртке фрейма.",
-  },
-  {
-    prop: "colorScheme",
-    type: '"light" | "dark"',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Управляемая цветовая схема превью (контролируемый режим).",
-  },
-  {
-    prop: "defaultColorScheme",
-    type: '"light" | "dark"',
-    defaultValue: '"light"',
-    required: "Нет",
-    description: "Начальная схема в неконтролируемом режиме.",
-  },
-  {
-    prop: "onColorSchemeChange",
-    type: '(scheme: "light" | "dark") => void',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Колбэк при смене light/dark.",
-  },
-  {
-    prop: "viewport",
-    type: '"desktop" | "tablet" | "mobile"',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Управляемая ширина превью.",
-  },
-  {
-    prop: "defaultViewport",
-    type: '"desktop" | "tablet" | "mobile"',
-    defaultValue: '"desktop"',
-    required: "Нет",
-    description: "Начальная ширина в неконтролируемом режиме.",
-  },
-  {
-    prop: "onViewportChange",
-    type: '(v: "desktop" | "tablet" | "mobile") => void',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Колбэк при смене вьюпорта.",
-  },
-  {
-    prop: "showThemeToggle",
-    type: "boolean",
-    defaultValue: "true",
-    required: "Нет",
-    description: "Показывать ли переключатель светлой/тёмной темы в тулбаре.",
-  },
-  {
-    prop: "onCopy",
-    type: "() => void",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Вызывается после успешного копирования code в буфер.",
-  },
-  {
-    prop: "previewLayout",
-    type: "ExampleFramePreviewLayout",
-    defaultValue: '"default"',
-    required: "Нет",
-    description:
-      "Раскладка внутри превью: default, stack, stack-center, stack-narrow, dense-stack, row, row-start, row-wrap.",
-  },
-  {
-    prop: "labels",
-    type: "Partial<ExampleFrameLabels>",
-    defaultValue: "русские строки",
-    required: "Нет",
-    description:
-      "Строки тулбара: preview, code, desktop, tablet, mobile, copy, copied, copyError, themeDark, themeLight, codeRegion.",
-  },
-];
+import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
 
-const stageRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description:
-      "Содержимое, которое попадает только в превью (обходной путь без лишних обёрток в сниппетах).",
+export const page: ComponentPageConfig = {
+  dir: "example-frame",
+  title: "ExampleFrame",
+  kind: "layout",
+  description:
+    "Рамка документации: живой пример, его исходник и ширина устройства в одном блоке. На ней построены все страницы этого сайта.",
+  examples: [
+    {
+      slot: "overview",
+      description:
+        "Живой пример рядом с исходником, с переключателями вида, ширины, темы и копированием — `code`, `previewLayout`.",
+    },
+    {
+      slot: "controlled",
+      description:
+        "Рамки одной страницы делят ширину превью и тему: обе хранит родитель — `viewport`, `colorScheme`.",
+    },
+  ],
+  api,
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        action: "Переводит фокус по переключателям, кнопкам темы и копирования, области кода.",
+      },
+      {
+        keys: "ArrowLeft · ArrowRight",
+        action: "Выбирают вид или ширину внутри переключателя (SegmentedControl).",
+      },
+    ],
+    aria: [
+      "Переключатели вида и ширины — радиогруппы с `aria-label` из `labels.paneSwitch` и `labels.viewportSwitch`.",
+      "Кнопки темы и копирования — кнопки только с иконкой и `aria-label`; после копирования метка меняется на `labels.copied`.",
+      "Область кода — фокусируемая `section` с `aria-label` из `labels.codeRegion`, её можно прокручивать с клавиатуры.",
+    ],
   },
-];
+};
 
 export default function ExampleFrameSection() {
-  return (
-    <PageContent.Section>
-      <PageContent.Header>
-        <PageContent.Title>ExampleFrame</PageContent.Title>
-        <PageContent.Description measure="full">
-          Фрейм «превью + код» для документации: вкладки, ширина устройства (компьютер, планшет,
-          телефон), светлая и тёмная тема превью и копирование исходника. В плейграунде поверх него
-          построен <code>PlaygroundExampleFrame</code>: тема и ширина берутся из настроек
-          плейграунда, фон превью — холст, карточка или плавающий слой.
-        </PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>
-        <div className="demoExamples">
-          <div className="demoBlock">
-            <DemoSectionTitle>Превью и код</DemoSectionTitle>
-            <DemoDescription>
-              <code>ExampleFrame.Root</code> с <code>code</code> и <code>previewLayout</code>; в
-              превью попадают только дети <code>ExampleFrame.Stage</code>.
-            </DemoDescription>
-            <ExampleFrameBasicExample />
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>API</DemoSectionTitle>
-            <DemoApiTitle>ExampleFrame.Root</DemoApiTitle>
-            <PlaygroundApiTable rows={rootRows} />
-            <DemoApiTitle>ExampleFrame.Stage</DemoApiTitle>
-            <PlaygroundApiTable rows={stageRows} />
-          </div>
-        </div>
-      </PageContent.Body>
-    </PageContent.Section>
-  );
+  return <ComponentPage page={page} />;
 }

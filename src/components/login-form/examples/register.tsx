@@ -77,7 +77,7 @@ export default function LoginFormRegisterExample() {
             </Button.Root>
           </LoginForm.Form>
           <LoginForm.Footer>
-            Уже есть аккаунт? <LinkButton.Root href="#">Войти</LinkButton.Root>
+            Уже есть аккаунт? <LinkButton href="#">Войти</LinkButton>
           </LoginForm.Footer>
         </LoginForm.Body>
       </LoginForm.Root>

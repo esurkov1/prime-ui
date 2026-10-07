@@ -1,12 +1,33 @@
-/** A plain segment, a pressed segment and a disabled segment. Use to see the hover, selected and disabled looks. */
-import { ButtonGroup } from "prime-ui-kit";
+/** A plain segment, a toggled one and a disabled one — `pressed`, `disabled`. */
+import { ButtonGroup, Typography } from "prime-ui-kit";
 
 export default function ButtonGroupStatesExample() {
   return (
-    <ButtonGroup.Root aria-label="Статус задачи">
-      <ButtonGroup.Item>Открыта</ButtonGroup.Item>
-      <ButtonGroup.Item pressed>В работе</ButtonGroup.Item>
-      <ButtonGroup.Item disabled>Архив</ButtonGroup.Item>
-    </ButtonGroup.Root>
+    <div>
+      <div>
+        <ButtonGroup.Root aria-label="Статус задачи">
+          <ButtonGroup.Item>Открыта</ButtonGroup.Item>
+        </ButtonGroup.Root>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          default
+        </Typography.Root>
+      </div>
+      <div>
+        <ButtonGroup.Root aria-label="Статус задачи">
+          <ButtonGroup.Item pressed>В работе</ButtonGroup.Item>
+        </ButtonGroup.Root>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          pressed
+        </Typography.Root>
+      </div>
+      <div>
+        <ButtonGroup.Root aria-label="Статус задачи">
+          <ButtonGroup.Item disabled>Архив</ButtonGroup.Item>
+        </ButtonGroup.Root>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          disabled
+        </Typography.Root>
+      </div>
+    </div>
   );
 }

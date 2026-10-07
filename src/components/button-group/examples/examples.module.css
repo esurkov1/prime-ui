@@ -1,43 +1,8 @@
-/* Layout for the ButtonGroup examples: semantic tokens only. */
+/* Layout of the ButtonGroup scenarios: semantic tokens only. */
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--prime-space-3);
-}
-
-.sizeRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--prime-space-6);
-}
-
-.sizeCell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-3);
-  width: 100%;
-}
-
-.spacer {
-  flex: 1 1 auto;
-}
-
-.column {
+/* Field → actions: group gap (foundation §1). The group keeps its own width. */
+.form {
   display: grid;
+  justify-items: start;
   gap: var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
 }

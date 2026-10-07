@@ -1,43 +1,10 @@
-/* Layout for the Accordion examples: layout only, text goes through Typography. */
+/* Layout of the Accordion scenarios: semantic tokens only. */
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-8);
-  width: min(100%, calc(var(--prime-space-10) * 16));
-  min-width: 0;
-}
-
-.grid {
+/* A readable column for the accordion (the root itself is always full width), with whatever
+   sits above it (a caption, a toolbar button) kept at its own width. */
+.panel {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-24) * 3)), 1fr));
-  gap: var(--prime-space-6);
-  width: 100%;
-  min-width: 0;
-}
-
-.group {
-  display: flex;
-  flex-direction: column;
+  justify-items: start;
   gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-5);
-  padding-top: var(--prime-space-1);
-}
-
-.choices {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-}
-
-.row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-10) * 4)), 1fr));
-  gap: var(--prime-space-3);
+  width: min(100%, calc(var(--prime-space-24) * 5));
 }

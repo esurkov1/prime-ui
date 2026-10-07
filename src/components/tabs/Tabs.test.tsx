@@ -24,11 +24,11 @@ function BasicTabs({
       onValueChange={onValueChange}
     >
       <Tabs.List>
-        <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
-        <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
-        <Tabs.Trigger value="tab3" disabled>
+        <Tabs.Item value="tab1">Tab 1</Tabs.Item>
+        <Tabs.Item value="tab2">Tab 2</Tabs.Item>
+        <Tabs.Item value="tab3" disabled>
           Tab 3
-        </Tabs.Trigger>
+        </Tabs.Item>
       </Tabs.List>
       <Tabs.Panel value="tab1">Panel 1</Tabs.Panel>
       <Tabs.Panel value="tab2">Panel 2</Tabs.Panel>
@@ -56,7 +56,7 @@ describe("Tabs — render", () => {
     const { container } = render(
       <Tabs.Root defaultValue="tab1" size="xl">
         <Tabs.List>
-          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+          <Tabs.Item value="tab1">Tab 1</Tabs.Item>
         </Tabs.List>
         <Tabs.Panel value="tab1">Panel 1</Tabs.Panel>
       </Tabs.Root>,
@@ -76,9 +76,9 @@ describe("Tabs — render", () => {
     render(
       <Tabs.Root defaultValue="a">
         <Tabs.List>
-          <Tabs.Trigger value="a">
+          <Tabs.Item value="a">
             <Tabs.Label>Hello</Tabs.Label>
-          </Tabs.Trigger>
+          </Tabs.Item>
         </Tabs.List>
         <Tabs.Panel value="a">Panel</Tabs.Panel>
       </Tabs.Root>,
@@ -90,7 +90,7 @@ describe("Tabs — render", () => {
     render(
       <Tabs.Root defaultValue="a">
         <Tabs.List>
-          <Tabs.Trigger value="a">
+          <Tabs.Item value="a">
             <Tabs.Icon>
               <span data-testid="icon-left" />
             </Tabs.Icon>
@@ -98,7 +98,7 @@ describe("Tabs — render", () => {
             <Tabs.Icon>
               <span data-testid="icon-right" />
             </Tabs.Icon>
-          </Tabs.Trigger>
+          </Tabs.Item>
         </Tabs.List>
         <Tabs.Panel value="a">Panel</Tabs.Panel>
       </Tabs.Root>,
@@ -291,8 +291,8 @@ describe("Tabs — controlled mode", () => {
     render(
       <Tabs.Root value="tab1" onValueChange={onValueChange}>
         <Tabs.List>
-          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
-          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+          <Tabs.Item value="tab1">Tab 1</Tabs.Item>
+          <Tabs.Item value="tab2">Tab 2</Tabs.Item>
         </Tabs.List>
         <Tabs.Panel value="tab1">Panel 1</Tabs.Panel>
         <Tabs.Panel value="tab2">Panel 2</Tabs.Panel>
@@ -307,8 +307,8 @@ describe("Tabs — controlled mode", () => {
     render(
       <Tabs.Root value="tab1">
         <Tabs.List>
-          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
-          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+          <Tabs.Item value="tab1">Tab 1</Tabs.Item>
+          <Tabs.Item value="tab2">Tab 2</Tabs.Item>
         </Tabs.List>
         <Tabs.Panel value="tab1">Panel 1</Tabs.Panel>
         <Tabs.Panel value="tab2">Panel 2</Tabs.Panel>
@@ -336,14 +336,14 @@ describe("Tabs — two-line trigger", () => {
     render(
       <Tabs.Root defaultValue="fleet">
         <Tabs.List>
-          <Tabs.Trigger value="fleet">
+          <Tabs.Item value="fleet">
             <Tabs.Label>В парке</Tabs.Label>
             <Tabs.Count color="blue">12</Tabs.Count>
             <Tabs.Description>
               <strong>3</strong> в подготовке
             </Tabs.Description>
-          </Tabs.Trigger>
-          <Tabs.Trigger value="archive">Архив</Tabs.Trigger>
+          </Tabs.Item>
+          <Tabs.Item value="archive">Архив</Tabs.Item>
         </Tabs.List>
         <Tabs.Panel value="fleet">Fleet</Tabs.Panel>
       </Tabs.Root>,
@@ -376,6 +376,11 @@ describe("Tabs — indicator", () => {
     expect(list.querySelectorAll('[aria-hidden="true"][data-visible]')).toHaveLength(1);
   });
 
+  it("scrolls horizontally with an edge fade and a hidden scrollbar", () => {
+    render(<BasicTabs />);
+    expect(screen.getByRole("tablist")).toHaveAttribute("data-fade", "horizontal");
+  });
+
   it("uses a pill indicator in a vertical list", () => {
     render(<BasicTabs orientation="vertical" />);
     expect(screen.getByRole("tablist")).toHaveAttribute("data-indicator", "pill");
@@ -393,7 +398,7 @@ describe("Tabs — single structural style", () => {
       // @ts-expect-error — Tabs has no `variant`; use SegmentedControl to choose a value.
       <Tabs.Root defaultValue="a" variant="segmented">
         <Tabs.List>
-          <Tabs.Trigger value="a">A</Tabs.Trigger>
+          <Tabs.Item value="a">A</Tabs.Item>
         </Tabs.List>
       </Tabs.Root>,
     );

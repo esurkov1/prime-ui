@@ -171,47 +171,26 @@
   color: var(--prime-color-text-disabled);
 }
 
-.arrow {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
+/* Chevron (kit Icon, tier size from the root) at the end of the trigger; turns when open. */
+.chevron {
   margin-inline-start: auto;
-}
-
-.arrowIcon {
-  display: block;
-  width: var(--acc-icon);
-  height: var(--acc-icon);
   color: var(--prime-color-text-muted);
   transition:
     color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.trigger:hover:not(:disabled) .arrowIcon,
-.item[data-state="open"] .arrowIcon {
+.trigger:hover:not(:disabled) .chevron,
+.trigger[data-state="open"] .chevron {
   color: var(--prime-color-text-secondary);
 }
 
-.trigger:disabled .arrowIcon {
-  color: var(--prime-color-text-disabled);
-}
-
-.arrowIconOpen {
-  display: none;
-}
-
-.item[data-state="open"] .arrowIconRotate {
+.trigger[data-state="open"] .chevron {
   transform: rotate(180deg);
 }
 
-.item[data-state="open"] .arrowIconClosed {
-  display: none;
-}
-
-.item[data-state="open"] .arrowIconOpen {
-  display: block;
+.trigger:disabled .chevron {
+  color: var(--prime-color-text-disabled);
 }
 
 /* ---------- Content ---------- */

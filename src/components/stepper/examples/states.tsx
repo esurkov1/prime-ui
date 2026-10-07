@@ -1,49 +1,48 @@
-/** Explicit `status` on each step (completed, error with a custom indicator, active, pending) and a disabled step. Use when step status comes from the server, e.g. a failed delivery step. */
-import { Stepper } from "prime-ui-kit";
+/** Statuses that come from the server, a failed step with its own indicator and a locked step — `status`, `disabled`. */
+import { Icon, Stepper } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 export default function StepperStatesExample() {
   return (
-    <div className={styles.vertical}>
+    <div className={styles.column}>
       <Stepper.Root>
-        <Stepper.Step status="completed">
+        <Stepper.Item status="completed">
           <Stepper.Indicator />
           <Stepper.Content>
             <Stepper.Title>Оплата прошла</Stepper.Title>
-            <Stepper.Description>completed</Stepper.Description>
+            <Stepper.Description>12 400 ₽ списано с карты</Stepper.Description>
           </Stepper.Content>
-        </Stepper.Step>
-        <Stepper.Step status="error">
-          <Stepper.Indicator>!</Stepper.Indicator>
+        </Stepper.Item>
+        <Stepper.Item status="danger">
+          <Stepper.Indicator>
+            <Icon name="status.danger" />
+          </Stepper.Indicator>
           <Stepper.Content>
             <Stepper.Title>Ошибка доставки</Stepper.Title>
-            <Stepper.Description>error · проверьте адрес</Stepper.Description>
+            <Stepper.Description>Проверьте адрес получателя</Stepper.Description>
           </Stepper.Content>
-          <Stepper.Arrow />
-        </Stepper.Step>
-        <Stepper.Step status="active">
+        </Stepper.Item>
+        <Stepper.Item status="active">
           <Stepper.Indicator />
           <Stepper.Content>
             <Stepper.Title>Подтверждение</Stepper.Title>
-            <Stepper.Description>active</Stepper.Description>
+            <Stepper.Description>Ждём ответа склада</Stepper.Description>
           </Stepper.Content>
-          <Stepper.Arrow />
-        </Stepper.Step>
-        <Stepper.Step status="pending">
+        </Stepper.Item>
+        <Stepper.Item status="pending">
           <Stepper.Indicator />
           <Stepper.Content>
             <Stepper.Title>Получение</Stepper.Title>
-            <Stepper.Description>pending</Stepper.Description>
           </Stepper.Content>
-        </Stepper.Step>
-        <Stepper.Step status="pending" disabled>
+        </Stepper.Item>
+        <Stepper.Item status="pending" disabled>
           <Stepper.Indicator />
           <Stepper.Content>
             <Stepper.Title>Отзыв</Stepper.Title>
-            <Stepper.Description>disabled</Stepper.Description>
+            <Stepper.Description>Откроется после получения</Stepper.Description>
           </Stepper.Content>
-        </Stepper.Step>
+        </Stepper.Item>
       </Stepper.Root>
     </div>
   );

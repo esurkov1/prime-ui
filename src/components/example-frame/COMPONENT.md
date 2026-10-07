@@ -1,6 +1,7 @@
 # ExampleFrame
 
 **Category:** infrastructure
+**Kind:** layout
 
 > A documentation frame: live preview, source code and device width in one block.
 
@@ -19,31 +20,38 @@ import { ExampleFrame } from "prime-ui-kit";
 ```
 
 ## Anatomy
-- `ExampleFrame.Root` — the frame: toolbar (pane switch Preview / Code, theme toggle, copy button, device switch) and either the preview stage or the code pane.
-  - `ExampleFrame.Stage` — marks the content shown in the preview. Without a Stage all `children` are previewed.
+```
+ExampleFrame.Root          frame: toolbar + preview stage or code pane
+├─ (toolbar)               SegmentedControl Preview / Code, theme Button, copy Button, device SegmentedControl
+└─ ExampleFrame.Stage      marks the previewed content (no DOM); without it all children are previewed
+```
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### ExampleFrame.Root
-Does not forward a ref; no native props.
+No ref. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `code` | `string` | — (required) | Source shown on the code pane (TS/TSX highlighting via CodeBlock) and copied by the copy button. |
-| `children` | `ReactNode` | — | Preview content; if an `ExampleFrame.Stage` is among the children, only its children are previewed. |
-| `className` | `string` | — | Extra class on the frame. |
-| `colorScheme` | `"light" \| "dark"` | — | Preview theme, controlled. |
-| `defaultColorScheme` | `"light" \| "dark"` | `"light"` | Initial preview theme, uncontrolled. |
-| `onColorSchemeChange` | `(scheme: "light" \| "dark") => void` | — | Called when the theme toggle is pressed. |
-| `viewport` | `"desktop" \| "tablet" \| "mobile"` | — | Preview width, controlled. |
-| `defaultViewport` | `"desktop" \| "tablet" \| "mobile"` | `"desktop"` | Initial preview width, uncontrolled. |
-| `onViewportChange` | `(v: "desktop" \| "tablet" \| "mobile") => void` | — | Called when the device switch changes. |
-| `showThemeToggle` | `boolean` | `true` | Show the light/dark toggle in the toolbar. |
+| `code` | `string` | — (required) | Source shown on the code pane (TS / TSX highlighting via CodeBlock) and copied by the copy button. |
+| `previewLayout` | `"default" \| "stack" \| "stack-center" \| "stack-narrow" \| "dense-stack" \| "row" \| "row-start" \| "row-wrap" \| "matrix"` | `"default"` | How the preview lays out its children, so snippets need no wrapper divs (see Variants). |
+| `viewport` | `"desktop" \| "tablet" \| "mobile"` | — | Preview width (controlled). |
+| `defaultViewport` | `"desktop" \| "tablet" \| "mobile"` | `"desktop"` | Initial preview width (uncontrolled). |
+| `onViewportChange` | `(viewport: "desktop" \| "tablet" \| "mobile") => void` | — | Called with the new width from the device switch. |
+| `colorScheme` | `"light" \| "dark"` | — | Theme of the stage and code pane (controlled); the page theme is untouched. |
+| `defaultColorScheme` | `"light" \| "dark"` | `"light"` | Initial theme (uncontrolled). |
+| `onColorSchemeChange` | `(scheme: "light" \| "dark") => void` | — | Called with the new theme from the theme toggle. |
+| `showThemeToggle` | `boolean` | `true` | Show the light / dark toggle in the toolbar. |
 | `onCopy` | `() => void` | — | Called after `code` was copied to the clipboard. |
-| `previewLayout` | `ExampleFramePreviewLayout` | `"default"` | How preview children are laid out (see Variants). |
-| `labels` | `Partial<ExampleFrameLabels>` | see Accessibility | Toolbar and region strings. |
+| `labels` | `Partial<ExampleFrameLabels>` | — | Built-in strings, see Labels. |
+| `children` | `ReactNode` | — | Preview content; with an `ExampleFrame.Stage` among them only the Stage's children are previewed. |
+| `className` | `string` | — | Extra class on the frame. |
 
 ### ExampleFrame.Stage
+No DOM. Marks the content rendered in the preview.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | Content rendered only in the preview. |
@@ -61,7 +69,7 @@ Does not forward a ref; no native props.
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |
 | `row-start` | wrapping row aligned to the start, gap 12 | toolbars, start-aligned controls | |
 | `row-wrap` | centered wrapping row, items aligned to the top, gap 8 | many small items (badges, tags) | |
-| `matrix` | grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption, gap 8); columns line up across rows, scrolls when wider than the stage | variant, size and state matrices | |
+| `matrix` | grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns line up across rows, scrolls when wider than the stage | variant, size and state matrices | |
 
 ### viewport
 | Value | Looks like | Use when | Default |
@@ -81,55 +89,54 @@ Frame look: `bg-sunken` chrome with a `border-subtle` hairline and `radius-xl`; 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| pane | toolbar switch (internal state, starts at Preview) | preview stage or code pane is rendered |
+| pane | toolbar switch (internal, starts at Preview) | preview stage or code pane is rendered |
 | viewport | `viewport` / `defaultViewport` | `data-viewport` on the preview viewport |
 | theme | `colorScheme` / `defaultColorScheme` | `data-theme` on the stage and code pane |
 | layout | `previewLayout` | `data-preview-layout` on the stage |
-| copy | copy button | its `aria-label` switches to `labels.copied` / `labels.copyError` for 2 s; on success the copy glyph cross-fades to a check (`data-copy-state` on the icon) |
-
-Controlled: pass `colorScheme` / `viewport` with their change handlers (e.g. to sync all frames on a page); uncontrolled: `default*` props.
+| copy | copy button | its `aria-label` switches to `labels.copied` / `labels.copyError` for 2 s; on success the copy glyph cross-fades to a check (`data-copy-state`) |
 
 ## Layout & spacing
 - The frame is `max-width: 100%`; long code lines scroll inside the code pane instead of widening the page.
 - The toolbar wraps below 640px of frame width; below 400px the device labels are visually hidden (icons stay).
-- Stack frames one per demo block; spacing between blocks comes from the page (`var(--prime-space-10)`–`var(--prime-space-12)` between sections).
+- Stack frames one per demo block; spacing between blocks comes from the page.
 
 ## Accessibility
-- Pane and device switches are SegmentedControls (radio groups); the theme and copy buttons are icon-only Buttons with `aria-label`.
-- The code pane is a focusable `section` (`tabIndex=0`) with `aria-label` from `labels.codeRegion`, so keyboard users can scroll it.
 
-| `labels` key | Default | Used for |
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Moves through the switches, the theme and copy buttons and the code pane. |
+| `ArrowLeft` · `ArrowRight` | Choose the pane or the width inside a switch (SegmentedControl). |
+
+### ARIA
+- The pane and device switches are radio groups named by `labels.paneSwitch` and `labels.viewportSwitch`.
+- The theme and copy buttons are icon-only Buttons with `aria-label`; after copying the label becomes `labels.copied`.
+- The code pane is a focusable `section` with `aria-label` from `labels.codeRegion`, so keyboard users can scroll it.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+| Key | Default | Used for |
 |---|---|---|
-| `preview` | `"Превью"` | Preview pane option |
-| `code` | `"Код"` | Code pane option |
-| `desktop` | `"Десктоп"` | desktop width option |
-| `tablet` | `"Планшет"` | tablet width option |
-| `mobile` | `"Телефон"` | phone width option |
-| `copy` | `"Копировать код"` | copy button `aria-label` |
-| `copied` | `"Скопировано"` | copy button after success |
-| `copyError` | `"Не удалось скопировать"` | copy button after failure |
-| `themeDark` | `"Включить тёмную тему"` | theme toggle in light mode |
-| `themeLight` | `"Включить светлую тему"` | theme toggle in dark mode |
-| `codeRegion` | `"Код примера"` | `aria-label` of the code pane |
+| `paneSwitch` | `"Вид примера"` | `aria-label` of the Preview / Code switch. |
+| `preview` | `"Превью"` | Preview pane option. |
+| `code` | `"Код"` | Code pane option. |
+| `viewportSwitch` | `"Ширина превью"` | `aria-label` of the device switch. |
+| `desktop` | `"Десктоп"` | Desktop width option. |
+| `tablet` | `"Планшет"` | Tablet width option. |
+| `mobile` | `"Телефон"` | Phone width option. |
+| `copy` | `"Копировать код"` | Copy button `aria-label`. |
+| `copied` | `"Скопировано"` | Copy button after success. |
+| `copyError` | `"Не удалось скопировать"` | Copy button after a failure. |
+| `themeDark` | `"Включить тёмную тему"` | Theme toggle in the light theme. |
+| `themeLight` | `"Включить светлую тему"` | Theme toggle in the dark theme. |
+| `codeRegion` | `"Код примера"` | `aria-label` of the code pane. |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [basic.tsx](examples/basic.tsx) | Preview + code with the full toolbar and a `row` layout | documentation pages |
-
-```tsx
-import { Button, ExampleFrame } from "prime-ui-kit";
-
-export function SaveButtonDemo() {
-  return (
-    <ExampleFrame.Root code="<Button.Root>Сохранить</Button.Root>">
-      <ExampleFrame.Stage>
-        <Button.Root>Сохранить</Button.Root>
-      </ExampleFrame.Stage>
-    </ExampleFrame.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A live example next to its source, with the pane, width, theme and copy controls — `code`, `previewLayout`. |
+| [controlled.tsx](examples/controlled.tsx) | Frames of one page share the preview width and theme: the parent owns both — `viewport`, `colorScheme`. |
 
 ## Mistakes
 - Wrapping several preview items in an extra `div` with flex styles → use `previewLayout="row"` or `"stack"`.
@@ -137,6 +144,5 @@ export function SaveButtonDemo() {
 - Expecting `colorScheme` to change the page theme → it only themes the frame's stage and code pane.
 
 ## Related
-- [CodeBlock](../code-block/COMPONENT.md)
-- [SegmentedControl](../segmented-control/COMPONENT.md)
-- [Card](../card/COMPONENT.md)
+- **Built from:** [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [CodeBlock](../code-block/COMPONENT.md), Icon (`view.*`, `viewport.*`, `theme.*`, `action.copy`, `action.check`)
+- **See also:** [Card](../card/COMPONENT.md)

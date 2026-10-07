@@ -1,19 +1,27 @@
-/** Leading and trailing `Icon` inside the link; `Icon` without `size` takes the link tier. Use when an icon hints at the destination; the text stays the accessible name. */
-import { Icon, LinkButton } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+/** An icon before or after the text; `Icon` without a size takes the link tier — `Icon`. */
+import { Icon, LinkButton, Typography } from "prime-ui-kit";
 
 export default function LinkButtonWithIconExample() {
   return (
-    <div className={styles.row}>
-      <LinkButton.Root href="#">
-        <Icon name="field.email" />
-        Написать в поддержку
-      </LinkButton.Root>
-      <LinkButton.Root href="#">
-        Все проекты
-        <Icon name="nav.chevronRight" />
-      </LinkButton.Root>
+    <div>
+      <div>
+        <LinkButton href="#support">
+          <Icon name="field.email" />
+          Написать в поддержку
+        </LinkButton>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          leading
+        </Typography.Root>
+      </div>
+      <div>
+        <LinkButton href="#projects">
+          Все проекты
+          <Icon name="nav.chevronRight" />
+        </LinkButton>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          trailing
+        </Typography.Root>
+      </div>
     </div>
   );
 }

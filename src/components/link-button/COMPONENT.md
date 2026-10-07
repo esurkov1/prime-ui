@@ -1,12 +1,13 @@
 # LinkButton
 
 **Category:** actions
+**Kind:** primitive
 
 > A real link styled as a text action, sized on the control tiers.
 
 ## When to use
 - Navigation to another page or URL inside text, cards, forms and footers.
-- Secondary navigation next to a Button of the same size (“Войти по паролю” beside “Продолжить”).
+- Secondary navigation next to a Button of the same size («Войти по паролю» beside «Продолжить»).
 - Quiet service links in footers and metadata (`tone="neutral"`).
 - External links (`target="_blank"` + `rel="noopener noreferrer"`).
 
@@ -21,18 +22,26 @@
 import { LinkButton } from "prime-ui-kit";
 ```
 
+## Anatomy
+```
+LinkButton   <a> (or <span role="link"> when disabled); tone, size; size tier for nested icons
+└─ children  text and optional Icon before or after it
+```
+
 ## API
 
-### LinkButton.Root
-`forwardRef` → `HTMLAnchorElement` (the `<span>` when `disabled`). + native `<a>` props (`href`, `target`, `rel`, `download`, `onClick`, `aria-*` …). No `asChild`.
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+### LinkButton
+`forwardRef` → `HTMLAnchorElement` (the `<span>` when `disabled`). A native `<a>` styled as a text action; passes its tier to nested icons.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text size, line height, icon size and gap; provided to nested `Icon`. |
-| `tone` | `"accent" \| "neutral"` | `"accent"` | `accent` — a regular link; `neutral` — quiet link. |
-| `disabled` | `boolean` | `false` | Renders `<span role="link" aria-disabled="true" tabIndex={-1}>` without `href`; native anchor props are not passed. |
-| `children` | `ReactNode` | — | Text and optional `Icon`s. |
-| `className` | `string` | — | Extra class on the root. |
+| `tone` | `"accent" \| "neutral"` | `"accent"` | `accent` — a regular link; `neutral` — secondary text, primary on hover, for footers and metadata. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text 12 · 13 · 14 · 16 · 18, line height and icon size. |
+| `disabled` | `boolean` | `false` | Renders `<span role="link" aria-disabled="true" tabIndex={-1}>` without `href`; the native anchor props are not passed. |
+| `children` | `ReactNode` | — | Text and optional `Icon`s before or after it; the text is the accessible name. |
+| `…rest` | `AnchorHTMLAttributes<HTMLAnchorElement>` | — | `href`, `target`, `rel`, `download`, `onClick`, `className`, `aria-*` and the other anchor attributes. |
 
 ## Variants
 
@@ -51,18 +60,19 @@ import { LinkButton } from "prime-ui-kit";
 | `l` | 16/24 text, icon 20, gap 8 | reading text (`body-l`), next to `l` controls | |
 | `xl` | 18/24 text (title-l), icon 20, gap 8 | prominent links in hero blocks | |
 
-Match the link size to the surrounding text or to the Button it sits next to.
+Match the link size to the surrounding text or to the Button it sits next to. Avoid `neutral` links inside body text (they read as plain text) and a LinkButton as the primary action of a form.
 
-**Combinations**
-- Recommended: `accent` inside text and next to actions; `neutral` + `s` for service links.
-- Avoid: `neutral` links inside body text (they read as plain text); making LinkButton the primary action of a form — use Button.
+### Flags
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `disabled` | `text-disabled`, no underline, `cursor: not-allowed` | a destination is temporarily unavailable | off |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | hover | pointer | hover color + underline (`text-decoration-color: currentColor`) |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset`, radius `--prime-radius-xs` |
-| disabled | `disabled` | `<span role="link">`, `aria-disabled="true"`, `tabIndex=-1`, `data-disabled="true"`, `text-disabled` color, no underline, `cursor: not-allowed` |
+| disabled | `disabled` | `<span role="link">`, `aria-disabled="true"`, `tabIndex=-1`, `data-disabled="true"` |
 
 Root attributes: `data-size`, `data-tone`, `data-disabled` (only when disabled).
 
@@ -73,37 +83,39 @@ Root attributes: `data-size`, `data-tone`, `data-disabled` (only when disabled).
 - `max-width: 100%`; `display: inline-flex` with icon and text centered.
 
 ## Accessibility
-- A native `<a>`: Enter follows the link; it is announced as a link.
-- The disabled state is a non-focusable `span role="link"` with `aria-disabled`.
-- Icons are decorative; the text is the accessible name.
-- External links: say “новая вкладка” in the text or `aria-label`.
-- No `labels` keys.
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Enter` | Follows the link (native `<a>`). |
+| `Tab` | Moves focus; a disabled link is skipped. |
+
+### ARIA
+- A native `<a>`: announced as a link, named by its text.
+- The disabled state is a non-focusable `<span role="link" aria-disabled="true">`.
+- Icons are decorative; say «новая вкладка» in the text or `aria-label` for external links.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+No `labels`.
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [sizes.tsx](examples/sizes.tsx) | Five size tiers | matching surrounding text or controls |
-| [tones.tsx](examples/tones.tsx) | `accent` vs `neutral` | regular vs quiet links |
-| [states.tsx](examples/states.tsx) | Active link; disabled in both tones | unavailable destinations |
-| [with-icon.tsx](examples/with-icon.tsx) | Leading and trailing `Icon` | hinting at the destination |
-| [composition.tsx](examples/composition.tsx) | Link in text, beside a Button, neutral footer links | sign-in and form cards |
-| [external-link.tsx](examples/external-link.tsx) | `target="_blank"` + `rel` | links leaving the app |
-
-```tsx
-import { LinkButton } from "prime-ui-kit";
-
-export function DocsLink() {
-  return <LinkButton.Root href="/docs">Документация</LinkButton.Root>;
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A link inside running text that keeps the text's size — `href`. |
+| [variants.tsx](examples/variants.tsx) | A regular link and a quiet one for footers and metadata — `tone`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size tier; text and icon follow the control tier, xs 12 to xl 18 — `size`. |
+| [states.tsx](examples/states.tsx) | A disabled link drops `href` and leaves the Tab order, in both tones — `disabled`. |
+| [with-icon.tsx](examples/with-icon.tsx) | An icon before or after the text; `Icon` without a size takes the link tier — `Icon`. |
+| [external-link.tsx](examples/external-link.tsx) | A link that leaves the app opens a new tab and says so in its text — `target`, `rel`. |
 
 ## Mistakes
-- `<LinkButton.Root onClick={save}>` without `href` → use `Button.Root variant="ghost"`.
-- `disabled` link with `aria-label`/`title` expecting them to render → in the disabled state only children are rendered; put the meaning in the text.
+- `<LinkButton onClick={save}>` without `href` → use `<Button.Root variant="ghost">`.
+- A disabled link with `aria-label` / `title` → in the disabled state only children render; put the meaning in the text.
 - `target="_blank"` without `rel="noopener noreferrer"` → add `rel`.
 - Wrapping a LinkButton in an `<a>` → pass `href` directly.
 
 ## Related
-- [Button](../button/COMPONENT.md)
-- [Breadcrumb](../breadcrumb/COMPONENT.md)
-- [Typography](../typography/COMPONENT.md)
+- **Built from:** —
+- **See also:** [Button](../button/COMPONENT.md), [Breadcrumb](../breadcrumb/COMPONENT.md), [Typography](../typography/COMPONENT.md)

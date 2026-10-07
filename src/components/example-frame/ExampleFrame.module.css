@@ -109,7 +109,7 @@
   filter: none;
 }
 
-/* Перебить min-width: max-content у SegmentedControl.root, иначе перенос не срабатывает */
+/* Let the segment groups shrink below their content so the toolbar can wrap. */
 .toolbar .toolbarPaneSegment,
 .toolbar .toolbarViewportSegment {
   min-width: 0;

@@ -1,6 +1,6 @@
-import { ChevronDown } from "lucide-react";
 import * as React from "react";
 
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -21,7 +21,7 @@ type AccordionBaseProps = Omit<
 
 /** One open item at a time; `value` is the open item (`""` when all are closed). */
 export type AccordionSingleProps = AccordionBaseProps & {
-  type?: "single";
+  multiple?: false;
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -31,7 +31,7 @@ export type AccordionSingleProps = AccordionBaseProps & {
 
 /** Any number of open items; `value` lists them. */
 export type AccordionMultipleProps = AccordionBaseProps & {
-  type: "multiple";
+  multiple: true;
   value?: string[];
   defaultValue?: string[];
   onValueChange?: (value: string[]) => void;
@@ -39,18 +39,13 @@ export type AccordionMultipleProps = AccordionBaseProps & {
 
 export type AccordionRootProps = AccordionSingleProps | AccordionMultipleProps;
 
-type AccordionContextValue = { size: ControlSize };
+type AccordionContextValue = {
+  openValues: string[];
+  toggleItem: (value: string) => void;
+};
 
 const [AccordionProvider, useAccordionContext] =
   createComponentContext<AccordionContextValue>("Accordion");
-
-type AccordionStateContextValue = {
-  openValues: string[];
-  toggleItem: (value: string, disabled: boolean) => void;
-};
-
-const [AccordionStateProvider, useAccordionState] =
-  createComponentContext<AccordionStateContextValue>("Accordion");
 
 type AccordionItemContextValue = {
   value: string;
@@ -63,42 +58,13 @@ type AccordionItemContextValue = {
 const [AccordionItemProvider, useAccordionItem] =
   createComponentContext<AccordionItemContextValue>("Accordion");
 
-export type AccordionItemProps = React.HTMLAttributes<HTMLDivElement> & {
-  value: string;
-  disabled?: boolean;
-};
-
-export type AccordionHeaderProps = React.HTMLAttributes<HTMLHeadingElement>;
-
-export type AccordionTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
-
-export type AccordionContentProps = React.HTMLAttributes<HTMLDivElement>;
-
-export type AccordionIconProps<T extends React.ElementType = "div"> = {
-  as?: T;
-  className?: string;
-  children?: React.ReactNode;
-} & Omit<React.ComponentPropsWithoutRef<T>, "as" | "className">;
-
-type ArrowIcon = React.ElementType<{ className?: string; strokeWidth?: number | string }>;
-
-export type AccordionArrowProps = React.HTMLAttributes<HTMLSpanElement> & {
-  /** Glyph; rotates 180° when the item opens. Default `ChevronDown`. */
-  icon?: ArrowIcon;
-  /** Glyph shown instead of `icon` while open (e.g. `Plus` → `Minus`); disables the rotation. */
-  openIcon?: ArrowIcon;
-};
-
-function toOpenValues(value: string | string[] | undefined): string[] | undefined {
-  if (value === undefined) return undefined;
-  const list = Array.isArray(value) ? value : [value];
-  return Array.from(new Set(list.filter((entry) => entry !== "")));
-}
+const toOpenValues = (value: string | string[] | undefined): string[] | undefined =>
+  value === undefined ? undefined : [...new Set([value].flat().filter((entry) => entry !== ""))];
 
 const AccordionRoot = React.forwardRef<HTMLDivElement, AccordionRootProps>(
   function AccordionRoot(props, ref) {
     const {
-      type = "single",
+      multiple = false,
       value,
       defaultValue,
       onValueChange,
@@ -111,99 +77,73 @@ const AccordionRoot = React.forwardRef<HTMLDivElement, AccordionRootProps>(
     const { collapsible = true, ...rest } = restWithCollapsible as typeof restWithCollapsible & {
       collapsible?: boolean;
     };
-    const contextValue = React.useMemo(() => ({ size }), [size]);
-    const isMultiple = type === "multiple";
     const controlledValues = React.useMemo(() => toOpenValues(value), [value]);
-
     const [uncontrolledValues, setUncontrolledValues] = React.useState<string[]>(
       () => toOpenValues(defaultValue) ?? [],
     );
-
     const openValues = controlledValues ?? uncontrolledValues;
-    const isControlled = controlledValues !== undefined;
-
-    const updateValues = React.useCallback(
-      (nextValues: string[]) => {
-        if (!isControlled) {
-          setUncontrolledValues(nextValues);
-        }
-        if (isMultiple) {
-          (onValueChange as ((next: string[]) => void) | undefined)?.(nextValues);
-        } else {
-          (onValueChange as ((next: string) => void) | undefined)?.(nextValues[0] ?? "");
-        }
-      },
-      [isControlled, isMultiple, onValueChange],
-    );
 
     const toggleItem = React.useCallback(
-      (itemValue: string, disabledItem: boolean) => {
-        if (disabledItem) return;
-
-        if (isMultiple) {
-          if (openValues.includes(itemValue)) {
-            updateValues(openValues.filter((valueEntry) => valueEntry !== itemValue));
-            return;
-          }
-
-          updateValues([...openValues, itemValue]);
-          return;
-        }
-
-        const currentValue = openValues[0];
-        if (currentValue === itemValue) {
-          if (!collapsible) return;
-          updateValues([]);
-          return;
-        }
-
-        updateValues([itemValue]);
+      (itemValue: string) => {
+        const isOpen = openValues.includes(itemValue);
+        if (!multiple && isOpen && !collapsible) return;
+        const next = multiple
+          ? isOpen
+            ? openValues.filter((entry) => entry !== itemValue)
+            : [...openValues, itemValue]
+          : isOpen
+            ? []
+            : [itemValue];
+        if (controlledValues === undefined) setUncontrolledValues(next);
+        if (multiple) (onValueChange as ((next: string[]) => void) | undefined)?.(next);
+        else (onValueChange as ((next: string) => void) | undefined)?.(next[0] ?? "");
       },
-      [collapsible, isMultiple, openValues, updateValues],
+      [collapsible, controlledValues, multiple, onValueChange, openValues],
     );
 
-    const stateContextValue = React.useMemo<AccordionStateContextValue>(
+    const contextValue = React.useMemo<AccordionContextValue>(
       () => ({ openValues, toggleItem }),
       [openValues, toggleItem],
     );
 
     return (
-      <AccordionStateProvider value={stateContextValue}>
-        <AccordionProvider value={contextValue}>
-          <div
-            ref={ref}
-            {...rest}
-            className={cx(styles.root, className)}
-            {...toDataAttributes({ size, layout })}
-          >
-            {children}
-          </div>
-        </AccordionProvider>
-      </AccordionStateProvider>
+      <AccordionProvider value={contextValue}>
+        <div
+          ref={ref}
+          {...rest}
+          className={cx(styles.root, className)}
+          {...toDataAttributes({ size, layout })}
+        >
+          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+        </div>
+      </AccordionProvider>
     );
   },
 );
 AccordionRoot.displayName = "Accordion.Root";
 
+export type AccordionItemProps = React.HTMLAttributes<HTMLDivElement> & {
+  value: string;
+  disabled?: boolean;
+};
+
 const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(function AccordionItem(
   { className, value, disabled = false, children, ...rest },
   ref,
 ) {
-  const state = useAccordionState();
-  const open = state.openValues.includes(value);
+  const { openValues } = useAccordionContext();
+  const open = openValues.includes(value);
   const reactId = React.useId();
-  const triggerId = `prime-accordion-trigger-${reactId}`;
-  const contentId = `prime-accordion-content-${reactId}`;
 
   const itemContextValue = React.useMemo<AccordionItemContextValue>(
     () => ({
       value,
       disabled,
       open,
-      triggerId,
-      contentId,
+      triggerId: `prime-accordion-trigger-${reactId}`,
+      contentId: `prime-accordion-content-${reactId}`,
     }),
-    [contentId, disabled, open, triggerId, value],
+    [disabled, open, reactId, value],
   );
 
   return (
@@ -221,6 +161,8 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(funct
 });
 AccordionItem.displayName = "Accordion.Item";
 
+export type AccordionHeaderProps = React.HTMLAttributes<HTMLHeadingElement>;
+
 const AccordionHeader = React.forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
   function AccordionHeader({ className, ...rest }, ref) {
     return <h3 ref={ref} className={cx(styles.header, className)} {...rest} />;
@@ -228,22 +170,18 @@ const AccordionHeader = React.forwardRef<HTMLHeadingElement, AccordionHeaderProp
 );
 AccordionHeader.displayName = "Accordion.Header";
 
-const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-  function AccordionTrigger({ className, children, ...rest }, ref) {
-    const { size } = useAccordionContext();
-    const state = useAccordionState();
-    const item = useAccordionItem();
+export type AccordionTriggerProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type">;
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      rest.onClick?.(event);
-      if (event.defaultPrevented) return;
-      state.toggleItem(item.value, item.disabled);
-    };
+/** The item's button: its children, then the chevron that turns when the item opens. */
+const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
+  function AccordionTrigger({ className, children, onClick, ...rest }, ref) {
+    const { toggleItem } = useAccordionContext();
+    const item = useAccordionItem();
 
     return (
       <button
         ref={ref}
-        type={rest.type ?? "button"}
+        type="button"
         {...rest}
         id={item.triggerId}
         disabled={item.disabled}
@@ -254,18 +192,37 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
           disabled: item.disabled || undefined,
         })}
         className={cx(styles.trigger, className)}
-        onClick={handleClick}
+        onClick={(event) => {
+          onClick?.(event);
+          if (!event.defaultPrevented) toggleItem(item.value);
+        }}
       >
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+        {children}
+        <Icon name="nav.chevronDown" className={styles.chevron} />
       </button>
     );
   },
 );
 AccordionTrigger.displayName = "Accordion.Trigger";
 
-const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
+export type AccordionIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
+  children: React.ReactNode;
+};
+
+/** Decorative leading icon of a trigger; the content lines up with the label after it. */
+function AccordionIcon({ className, children, ...rest }: AccordionIconProps) {
+  return (
+    <span className={cx(styles.icon, className)} aria-hidden="true" {...rest}>
+      {children}
+    </span>
+  );
+}
+AccordionIcon.displayName = "Accordion.Icon";
+
+export type AccordionContentProps = React.HTMLAttributes<HTMLElement>;
+
+const AccordionContent = React.forwardRef<HTMLElement, AccordionContentProps>(
   function AccordionContent({ className, children, ...rest }, ref) {
-    const { size } = useAccordionContext();
     const item = useAccordionItem();
 
     return (
@@ -279,10 +236,9 @@ const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>
         className={styles.content}
         {...rest}
       >
+        {/* The clip animates the height; the padded inner block carries `className`. */}
         <div className={styles.contentClip}>
-          <div className={cx(styles.contentInner, className)}>
-            <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-          </div>
+          <div className={cx(styles.contentInner, className)}>{children}</div>
         </div>
       </section>
     );
@@ -290,63 +246,11 @@ const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>
 );
 AccordionContent.displayName = "Accordion.Content";
 
-function AccordionIcon<T extends React.ElementType = "div">({
-  as,
-  className,
-  children,
-  ...rest
-}: AccordionIconProps<T>) {
-  const Component = (as ?? "div") as React.ElementType;
-
-  return (
-    <Component className={cx(styles.icon, className)} {...rest}>
-      {children}
-    </Component>
-  );
-}
-AccordionIcon.displayName = "Accordion.Icon";
-
-function AccordionArrow({
-  className,
-  icon: Icon = ChevronDown,
-  openIcon: OpenIcon,
-  ...rest
-}: AccordionArrowProps) {
-  if (OpenIcon == null) {
-    return (
-      <span className={cx(styles.arrow, className)} {...rest}>
-        <Icon
-          aria-hidden
-          className={cx(styles.arrowIcon, styles.arrowIconRotate)}
-          strokeWidth={1.75}
-        />
-      </span>
-    );
-  }
-
-  return (
-    <span className={cx(styles.arrow, className)} {...rest}>
-      <Icon
-        aria-hidden
-        className={cx(styles.arrowIcon, styles.arrowIconClosed)}
-        strokeWidth={1.75}
-      />
-      <OpenIcon
-        aria-hidden
-        className={cx(styles.arrowIcon, styles.arrowIconOpen)}
-        strokeWidth={1.75}
-      />
-    </span>
-  );
-}
-AccordionArrow.displayName = "Accordion.Arrow";
-
 export const Accordion = {
   Root: AccordionRoot,
-  Header: AccordionHeader,
   Item: AccordionItem,
+  Header: AccordionHeader,
   Trigger: AccordionTrigger,
   Icon: AccordionIcon,
-  Arrow: AccordionArrow,
   Content: AccordionContent,
 };

@@ -17,6 +17,20 @@ describe("ExampleFrame", () => {
     expect(screen.getByRole("radio", { name: "Десктоп" })).toBeChecked();
   });
 
+  it("names both toolbar switches and moves the device choice with arrow keys", () => {
+    const onViewportChange = vi.fn();
+    render(
+      <ExampleFrame.Root code="x" onViewportChange={onViewportChange}>
+        preview
+      </ExampleFrame.Root>,
+    );
+    expect(screen.getByRole("radiogroup", { name: "Вид примера" })).toBeInTheDocument();
+    const devices = screen.getByRole("radiogroup", { name: "Ширина превью" });
+    screen.getByRole("radio", { name: "Десктоп" }).focus();
+    fireEvent.keyDown(devices, { key: "ArrowRight" });
+    expect(onViewportChange).toHaveBeenCalledWith("tablet");
+  });
+
   it("switches to the code pane", () => {
     render(<ExampleFrame.Root code="const answer = 42;">preview</ExampleFrame.Root>);
     fireEvent.click(screen.getByRole("radio", { name: "Код" }));

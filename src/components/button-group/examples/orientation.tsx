@@ -1,21 +1,19 @@
-/** Horizontal (default) and vertical groups side by side. Use `orientation="vertical"` for a column of related options. */
+/** A row of segments and a column of related options — `orientation`. */
 import { ButtonGroup } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
 
 export default function ButtonGroupOrientationExample() {
   return (
-    <div className={styles.row}>
-      <ButtonGroup.Root aria-label="Сортировка">
+    <>
+      <ButtonGroup.Root aria-label="Сортировка заказов">
         <ButtonGroup.Item pressed>Новые</ButtonGroup.Item>
-        <ButtonGroup.Item pressed={false}>Популярные</ButtonGroup.Item>
+        <ButtonGroup.Item pressed={false}>По сумме</ButtonGroup.Item>
         <ButtonGroup.Item pressed={false}>Старые</ButtonGroup.Item>
       </ButtonGroup.Root>
-      <ButtonGroup.Root aria-label="Раздел" orientation="vertical">
+      <ButtonGroup.Root aria-label="Раздел настроек" orientation="vertical">
         <ButtonGroup.Item pressed>Профиль</ButtonGroup.Item>
         <ButtonGroup.Item pressed={false}>Безопасность</ButtonGroup.Item>
         <ButtonGroup.Item pressed={false}>Уведомления</ButtonGroup.Item>
       </ButtonGroup.Root>
-    </div>
+    </>
   );
 }

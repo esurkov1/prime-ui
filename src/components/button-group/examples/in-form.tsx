@@ -1,14 +1,14 @@
-/** Segments are native buttons: `type="submit"` and `type="reset"` work inside one group. Use for a compact submit/reset pair in a search or filter form. */
+/** Segments are native buttons, so submit and reset work in one group — `type`. */
 import { ButtonGroup, Input } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 export default function ButtonGroupInFormExample() {
   return (
-    <form className={styles.column} onSubmit={(e) => e.preventDefault()}>
+    <form className={styles.form} onSubmit={(event) => event.preventDefault()}>
       <Input.Root label="Поиск по заказам">
         <Input.Wrapper>
-          <Input.Field name="q" type="search" placeholder="Номер заказа или клиент" />
+          <Input.Field name="query" type="search" placeholder="Номер заказа или клиент" />
         </Input.Wrapper>
       </Input.Root>
       <ButtonGroup.Root aria-label="Отправить или сбросить поиск">

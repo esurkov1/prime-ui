@@ -15,8 +15,8 @@ export default function TypographyCompositionExample() {
         <Typography.Root as="span" variant="body-m" weight="medium" tracking="tight">
           12 400 ₽
         </Typography.Root>
-        , доставка до <LinkButton.Root href="#address">уточнить адрес</LinkButton.Root>. Подробности
-        — в разделе «История покупок».
+        , доставка до <LinkButton href="#address">уточнить адрес</LinkButton>. Подробности — в
+        разделе «История покупок».
       </Typography.Root>
     </div>
   );
