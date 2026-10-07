@@ -12,37 +12,37 @@ export default function TypographyVariantsExample() {
         <Typography.Root variant="body-m" weight="regular">
           {line}
         </Typography.Root>
-        <Divider.Root align="start">weight regular</Divider.Root>
+        <Divider align="start">weight regular</Divider>
       </div>
       <div className={styles.scaleRow}>
         <Typography.Root variant="body-m" weight="medium">
           {line}
         </Typography.Root>
-        <Divider.Root align="start">weight medium</Divider.Root>
+        <Divider align="start">weight medium</Divider>
       </div>
       <div className={styles.scaleRow}>
         <Typography.Root variant="body-m" weight="semibold">
           {line}
         </Typography.Root>
-        <Divider.Root align="start">weight semibold</Divider.Root>
+        <Divider align="start">weight semibold</Divider>
       </div>
       <div className={styles.scaleRow}>
         <Typography.Root variant="body-m" tracking="tighter">
           {line}
         </Typography.Root>
-        <Divider.Root align="start">tracking tighter</Divider.Root>
+        <Divider align="start">tracking tighter</Divider>
       </div>
       <div className={styles.scaleRow}>
         <Typography.Root variant="body-m" tracking="wide">
           {line}
         </Typography.Root>
-        <Divider.Root align="start">tracking wide</Divider.Root>
+        <Divider align="start">tracking wide</Divider>
       </div>
       <div className={styles.scaleRow}>
         <Typography.Root variant="body-m" tone="secondary">
           {line}
         </Typography.Root>
-        <Divider.Root align="start">tone secondary — вторичный цвет текста</Divider.Root>
+        <Divider align="start">tone secondary — вторичный цвет текста</Divider>
       </div>
     </div>
   );

@@ -184,7 +184,7 @@ export {
 } from "./datepicker/Datepicker";
 export type { DigitInputLabels, DigitInputRootProps } from "./digit-input/DigitInput";
 export { DigitInput } from "./digit-input/DigitInput";
-export type { DividerAlign, DividerOrientation, DividerRootProps } from "./divider/Divider";
+export type { DividerAlign, DividerOrientation, DividerProps } from "./divider/Divider";
 export { Divider } from "./divider/Divider";
 export type {
   Activation,

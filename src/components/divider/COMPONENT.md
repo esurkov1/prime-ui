@@ -1,8 +1,9 @@
 # Divider
 
 **Category:** layout
+**Kind:** primitive
 
-> A hairline separator, horizontal or vertical, with or without a label.
+> A hairline separator inside one surface, horizontal or vertical, with or without a label.
 
 ## When to use
 - Separate rows of a list or groups inside one panel, menu or card.
@@ -12,93 +13,101 @@
 
 ## When not to use
 - To separate cards or panels from each other → use fill and spacing ([Card](../card/COMPONENT.md), [PageContent](../page-content/COMPONENT.md) sections), never a line.
-- Separators inside a dropdown menu → use `Dropdown.Separator` ([Dropdown](../dropdown/COMPONENT.md)).
+- Separators inside a dropdown menu → `Dropdown.Separator` ([Dropdown](../dropdown/COMPONENT.md)).
 - Row lines of a table → [DataTable](../data-table/COMPONENT.md) draws them itself.
-- Collapsible sections → use [Accordion](../accordion/COMPONENT.md).
 
 ## Import
 ```tsx
 import { Divider } from "prime-ui-kit";
 ```
 
+## Anatomy
+```
+Divider          <div role="separator">; the line is drawn by ::before / ::after
+└─ label         children (text, Icon) between the two line halves
+```
+
 ## API
 
-### Divider.Root
-`forwardRef` to `<div>`. No `asChild`.
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+### Divider
+`ref` → `HTMLDivElement`. A `role="separator"` hairline in `border-subtle`; children become its label.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Full-width line in a column, or a vertical line that stretches to the height of a flex row. |
-| `align` | `"start" \| "center" \| "end"` | `"center"` | Position of the label on the line. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the surrounding content: label type, gap and icon size. |
-| `children` | `ReactNode` | — | Label (text, or icon + text). Without children the divider is a plain line. An `Icon` inside is sized by the divider, not by its own `size`. |
-| `role` | `string` | `"separator"` | Use `"presentation"` for decorative lines between rows of an already structured list. |
-| `className` | `string` | — | Extra class on the root. |
-
-+ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `vertical` stretches to the height of its flex row and sets `aria-orientation`. |
+| `align` | `"start" \| "center" \| "end"` | `"center"` | Position of the label on the line; `start` reads as a section heading. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the label: type, gap and icon size. Match the content around the divider. |
+| `children` | `ReactNode` | — | Label: text, an `Icon`, or both. Omit for a plain line. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` (`"presentation"` for a purely visual line), `aria-label` and the other div attributes. |
 
 ## Variants
+No `variant`, `tone` or `color`: one hairline in `border-subtle`, label in `text-muted`, weight 500.
+
+### align
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `start` | label flush left, line to the right | a section heading on a line | |
+| `center` | line — label — line | «или», a date in a feed | yes |
+| `end` | line to the left, label flush right | an end marker | |
 
 ### orientation
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `horizontal` | 1px `border-subtle` line across the full row width | Between rows or groups stacked in a column | yes |
-| `vertical` | 1px line stretched to the row height (`align-self: stretch`) | Between groups of buttons in a toolbar | |
+| `horizontal` | full-width line | between rows and blocks | yes |
+| `vertical` | line as tall as its flex row | between toolbar groups | |
 
-### align (only with children)
+### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `start` | Label flush with the start edge, line fills the rest | Section heading on a line («Безопасность») | |
-| `center` | Line – label – line | «или» between alternatives | yes |
-| `end` | Line fills the start, label flush with the end edge | Trailing meta label (rare) | |
-
-### Content
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| no children | One plain line, no gap | List rows, groups | yes |
-| text / icon + text | Muted medium-weight label between line segments, tier gap | Headings, «или» | |
-
-**Combinations**
-- Recommended: plain horizontal line in a `gap` column; `align="start"` + icon + text as a section heading; `align="center"` + «или».
-- Pointless: `orientation="vertical"` with a long label; `align` without children (has no effect).
-
-**Sizes** — label / gap / icon per tier: xs 12/16 · 4 · 14, s 12/16 · 8 · 16, **m 13/20 · 8 · 16**, l 14/20 · 8 · 20, xl 16/24 · 12 · 20. Match the tier of the controls or text around it.
-
-**Hierarchy** — lines are the only separators in the system and stay `border-subtle`; do not stack several labelled dividers in a row, use one heading per group.
+| `xs` · `s` | label 12/16, caption tracking | dense menus, `s` content | |
+| `m` | label 13/20, icon 16 | regular content | yes |
+| `l` · `xl` | label 14/20 · 16/24, icon 20 | large panels | |
 
 ## States
-Static component. DOM: `data-orientation`, `data-align`, `data-size` on the root; `aria-orientation="vertical"` only for vertical dividers.
+| State | Driven by | DOM |
+|---|---|---|
+| plain line | no children | `:empty`, one line |
+| labelled | children | two line halves, each at least `--prime-space-6` long |
+| orientation / align / size | props | `data-orientation`, `data-align`, `data-size`, `aria-orientation` when vertical |
 
 ## Layout & spacing
-- Has no margins: the spacing around a line comes from the parent `gap` (e.g. `--prime-space-3` in a list column, `--prime-space-2` in a toolbar).
-- A horizontal divider takes `width: 100%` of a flex column; a vertical one needs a flex row parent to get height.
-- A long label wraps (`overflow-wrap: anywhere`).
+- No margins: the parent's `gap` sets the rhythm around the line.
+- Horizontal: `width: 100%` in its flex column. Vertical: `align-self: stretch` in a flex row.
+- Label gap and icon size follow the tier (`--prime-control-<size>-gap`, `-icon`).
 
 ## Accessibility
-- `role="separator"` by default; vertical dividers add `aria-orientation="vertical"`.
-- Use `role="presentation"` when the line is purely decorative inside a structured list.
-- No keyboard interaction, no `labels`.
+
+### Keyboard
+No keyboard interaction.
+
+### ARIA
+- `role="separator"`; vertical sets `aria-orientation="vertical"`.
+- A purely visual line between rows that are separate anyway → `role="presentation"`.
+- The label is read as the separator's text; an icon-only divider needs `aria-label`.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+No `labels`.
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [variants.tsx](examples/variants.tsx) | Plain line, `align` start · center · end, line in a gap column, vertical in a toolbar | Picking the right shape |
-| [sizes.tsx](examples/sizes.tsx) | `size` xs → xl with a start label | Matching the label to the content tier |
-| [composition.tsx](examples/composition.tsx) | «или» between buttons, heading with icon, presentation lines in a settings list | Separators inside one surface |
-
-```tsx
-import { Divider } from "prime-ui-kit";
-
-export function Example() {
-  return <Divider.Root>или</Divider.Root>;
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | Hairlines between the rows of a settings list. |
+| [sizes.tsx](examples/sizes.tsx) | The label at every tier, matching the content around it — `size`. |
+| [with-icon.tsx](examples/with-icon.tsx) | An icon before the label and an icon alone on the line; the divider sizes it. |
+| [align.tsx](examples/align.tsx) | The label at the start, the center or the end of the line; `start` heads a section — `align`. |
+| [vertical.tsx](examples/vertical.tsx) | A vertical line between groups of toolbar buttons — `orientation`. |
+| [or-separator.tsx](examples/or-separator.tsx) | An "or" line between two ways to sign in. |
 
 ## Mistakes
 - Margins on the divider → spacing via the parent `gap`.
 - Lines between cards → separate cards by fill and spacing.
 - `<Icon size="l" />` inside the label → leave the size to the divider.
-- Vertical divider in a block container (no height) → place it in a flex row.
+- A vertical divider in a block container (no height) → place it in a flex row.
 
 ## Related
-[Dropdown](../dropdown/COMPONENT.md) · [Card](../card/COMPONENT.md) · [PageContent](../page-content/COMPONENT.md)
+- **Built from:** —
+- **See also:** [Dropdown](../dropdown/COMPONENT.md), [Card](../card/COMPONENT.md), [PageContent](../page-content/COMPONENT.md)

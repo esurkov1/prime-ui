@@ -467,7 +467,7 @@ function Panel() {
       <Popover.Title className={styles.srOnly}>{labels.filter}</Popover.Title>
       {sections.map((section, index) => (
         <React.Fragment key={section.key}>
-          {index > 0 && <Divider.Root role="presentation" />}
+          {index > 0 && <Divider role="presentation" />}
           {section.node}
         </React.Fragment>
       ))}

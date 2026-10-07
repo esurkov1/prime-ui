@@ -28,7 +28,7 @@ LoginForm.Root                      surface: card fill, radius, shadow
 │  └─ LoginForm.Description
 └─ LoginForm.Body
    ├─ LoginForm.Social              provider buttons
-   ├─ Divider.Root                  «или»
+   ├─ Divider                       «или»
    ├─ LoginForm.Form                <form>: Input.Root … · Button submit
    │  └─ LoginForm.Actions          primary button + ghost back action
    └─ LoginForm.Footer              «Нет аккаунта? <LinkButton>»

@@ -28,12 +28,12 @@ export default function TypographyVariantCatalogExample() {
           <Typography.Root variant={variant}>
             Съешь же ещё этих мягких французских булок да выпей чаю
           </Typography.Root>
-          <Divider.Root align="start">
+          <Divider align="start">
             <Typography.Root as="span" variant="code" tone="muted">
               {variant}
             </Typography.Root>{" "}
             · {spec} — {use}
-          </Divider.Root>
+          </Divider>
         </div>
       ))}
     </div>

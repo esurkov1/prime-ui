@@ -24,7 +24,7 @@ export default function LoginFormSignInExample() {
               Продолжить через Telegram
             </Button.Root>
           </LoginForm.Social>
-          <Divider.Root>или</Divider.Root>
+          <Divider>или</Divider>
           <LoginForm.Form onSubmit={(e) => e.preventDefault()}>
             <Input.Root label="Email" required>
               <Input.Wrapper>

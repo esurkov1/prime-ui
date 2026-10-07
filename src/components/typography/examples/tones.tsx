@@ -21,12 +21,12 @@ export default function TypographyTonesExample() {
           <Typography.Root variant="body-m" tone={tone}>
             Оплата по счёту № 4821 получена 12 марта.
           </Typography.Root>
-          <Divider.Root align="start">
+          <Divider align="start">
             <Typography.Root as="span" variant="code" tone="muted">
               tone="{tone}"
             </Typography.Root>{" "}
             — {use}
-          </Divider.Root>
+          </Divider>
         </div>
       ))}
     </div>

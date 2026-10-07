@@ -1,11 +1,12 @@
 import { render, screen } from "@testing-library/react";
+import * as React from "react";
 import { describe, expect, it } from "vitest";
 
 import { Divider } from "./Divider";
 
 describe("Divider", () => {
   it("renders horizontal by default", () => {
-    render(<Divider.Root />);
+    render(<Divider />);
 
     const el = screen.getByRole("separator");
     expect(el).toHaveAttribute("data-orientation", "horizontal");
@@ -14,19 +15,19 @@ describe("Divider", () => {
   });
 
   it("sets data-size from the size prop", () => {
-    render(<Divider.Root size="xl" />);
+    render(<Divider size="xl" />);
     expect(screen.getByRole("separator")).toHaveAttribute("data-size", "xl");
   });
 
   it("renders with text children", () => {
-    render(<Divider.Root>Label</Divider.Root>);
+    render(<Divider>Label</Divider>);
 
     expect(screen.getByText("Label")).toBeInTheDocument();
     expect(screen.getByRole("separator")).toBeInTheDocument();
   });
 
   it("renders vertical orientation", () => {
-    render(<Divider.Root orientation="vertical" />);
+    render(<Divider orientation="vertical" />);
 
     const el = screen.getByRole("separator");
     expect(el).toHaveAttribute("data-orientation", "vertical");
@@ -34,28 +35,30 @@ describe("Divider", () => {
   });
 
   it("sets data-align for start, center, and end", () => {
-    const { rerender } = render(<Divider.Root align="start">A</Divider.Root>);
+    const { rerender } = render(<Divider align="start">A</Divider>);
     expect(screen.getByRole("separator")).toHaveAttribute("data-align", "start");
 
-    rerender(<Divider.Root align="center">A</Divider.Root>);
+    rerender(<Divider align="center">A</Divider>);
     expect(screen.getByRole("separator")).toHaveAttribute("data-align", "center");
 
-    rerender(<Divider.Root align="end">A</Divider.Root>);
+    rerender(<Divider align="end">A</Divider>);
     expect(screen.getByRole("separator")).toHaveAttribute("data-align", "end");
   });
 
-  it("exposes role separator", () => {
-    render(<Divider.Root />);
-    expect(screen.getByRole("separator")).toBeInTheDocument();
+  it("takes a role override and forwards ref", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    const { container } = render(<Divider ref={ref} role="presentation" />);
+    expect(screen.queryByRole("separator")).toBeNull();
+    expect(ref.current).toBe(container.firstChild);
   });
 
   it("merges className", () => {
-    render(<Divider.Root className="custom-divider" />);
+    render(<Divider className="custom-divider" />);
     expect(screen.getByRole("separator")).toHaveClass("custom-divider");
   });
 
   it("defaults align to center and does not set data-variant", () => {
-    render(<Divider.Root>Section</Divider.Root>);
+    render(<Divider>Section</Divider>);
     const el = screen.getByRole("separator");
     expect(el).toHaveAttribute("data-align", "center");
     expect(el).not.toHaveAttribute("data-variant");

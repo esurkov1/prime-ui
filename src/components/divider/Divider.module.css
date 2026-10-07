@@ -75,13 +75,15 @@
   display: none;
 }
 
+/* A label never swallows its line, even in a content-sized container. */
+.root:not(:empty):not([data-orientation="vertical"])::before,
+.root:not(:empty):not([data-orientation="vertical"])::after {
+  min-width: var(--prime-space-6);
+}
+
 /* No content: one line, no gap. */
 .root:empty {
   gap: 0;
-}
-
-.root:empty::before {
-  flex: 1 1 0;
 }
 
 .root:empty::after {

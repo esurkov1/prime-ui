@@ -10,13 +10,13 @@ export default function TypographyStatesExample() {
         <Typography.Root variant="body-m" weight="medium">
           Обычный текст без курсива.
         </Typography.Root>
-        <Divider.Root align="start">italic не задан (false)</Divider.Root>
+        <Divider align="start">italic не задан (false)</Divider>
       </div>
       <div className={styles.scaleRow}>
         <Typography.Root variant="body-m" weight="medium" italic>
           Тот же размер и вес с курсивом — цитата или название научной работы.
         </Typography.Root>
-        <Divider.Root align="start">italic — курсив через data-атрибут и токены</Divider.Root>
+        <Divider align="start">italic — курсив через data-атрибут и токены</Divider>
       </div>
     </div>
   );
