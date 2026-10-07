@@ -9,6 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import * as lucide from "lucide-react";
+import { iconRegistry } from "@/icons/registry";
 import type { ComponentPageConfig } from "../../playground/components/ComponentPage";
 import {
   KIND_SLOTS,
@@ -116,23 +117,13 @@ const categories = categoriesByDir();
  * does not carry. Every entry needs a reason; a glyph the registry has never belongs here.
  */
 const DOMAIN_GLYPHS: Record<string, string> = {
-  Bike: "Thumbnail examples show a motorcycle catalog — a product brings its own domain glyphs.",
+  Bike: "Thumbnail examples show a motorcycle catalog and wrap the glyph with createIcon.",
 };
 
-/** Registry names per lucide glyph, read from `src/icons/index.ts` (aliases share one glyph). */
+/** Registry names per lucide glyph (aliases share one glyph). */
 function registryNamesByGlyph(): Map<unknown, string[]> {
-  const source = read("src/icons/index.ts");
-  const glyphOf = new Map(
-    [...source.matchAll(/^export const (Icon\w+) = createIcon\((\w+)\);$/gm)].map((m) => [
-      m[1],
-      m[2],
-    ]),
-  );
-  const glyphs = lucide as unknown as Record<string, unknown>;
   const byGlyph = new Map<unknown, string[]>();
-  for (const [, name, component] of source.matchAll(/^ {2}"([\w.]+)": (Icon\w+),$/gm)) {
-    const glyph = glyphs[glyphOf.get(component) ?? ""];
-    if (!glyph) throw new Error(`src/icons/index.ts: ${name} → ${component} has no lucide glyph`);
+  for (const [name, glyph] of Object.entries(iconRegistry)) {
     byGlyph.set(glyph, [...(byGlyph.get(glyph) ?? []), name]);
   }
   return byGlyph;

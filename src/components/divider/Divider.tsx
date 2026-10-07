@@ -2,7 +2,6 @@ import type * as React from "react";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
-import { DividerContentContext } from "@/internal/DividerContentContext";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize } from "@/internal/states";
 
@@ -41,9 +40,7 @@ export function Divider({
     >
       {children != null ? (
         <ControlSizeProvider value={size}>
-          <DividerContentContext.Provider value>
-            <span className={styles.content}>{children}</span>
-          </DividerContentContext.Provider>
+          <span className={styles.content}>{children}</span>
         </ControlSizeProvider>
       ) : null}
     </div>

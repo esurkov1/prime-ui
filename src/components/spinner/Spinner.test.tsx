@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { iconBoxStyles as styles } from "@/internal/iconBox";
 
 import { Spinner } from "./Spinner";
-import styles from "./Spinner.module.css";
 
 describe("Spinner", () => {
   it("is a status region named by labels.loading", () => {
@@ -31,7 +31,7 @@ describe("Spinner", () => {
     render(<Spinner size="l" data-testid="s" />);
     const el = screen.getByTestId("s");
     expect(el).toHaveAttribute("data-size", "l");
-    expect(el).toHaveClass(styles.sizeL);
+    expect(el).toHaveClass(styles.l);
     expect(el).not.toHaveClass(styles.inherit);
   });
 

@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { IconHouse } from "@/icons";
-import iconStyles from "@/icons/Icon.module.css";
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { iconBoxStyles } from "@/internal/iconBox";
 import type { PaletteColor } from "@/internal/states";
 import { Badge } from "./Badge";
 import styles from "./Badge.module.css";
@@ -45,10 +45,10 @@ describe("Badge", () => {
   it("passes the badge tier to nested Icon via ControlSizeProvider", () => {
     render(
       <Badge.Root size="xl">
-        <IconHouse data-testid="badge-icon" />
+        <Icon name="nav.home" data-testid="badge-icon" />
       </Badge.Root>,
     );
-    expect(screen.getByTestId("badge-icon")).toHaveClass(iconStyles.sizeXl);
+    expect(screen.getByTestId("badge-icon")).toHaveClass(iconBoxStyles.xl);
   });
 
   it('sets data-disabled="true" when disabled', () => {

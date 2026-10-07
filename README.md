@@ -282,7 +282,7 @@ accessibility, examples and common mistakes.
 | `Tooltip.Provider` | Shared open delay for a group of tooltips. |
 | `OverlayPortalLayerProvider` | Portal target for overlays rendered inside a custom layer. |
 | `applyTheme(scheme, element?)` | Switch the theme without transition flashes. |
-| `Icon`, `IconSearch`, `IconClose`, … | The kit icon set (built on lucide-react). |
+| `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set (built on lucide-react); `createIcon` turns a domain glyph into a kit icon. |
 
 ## Docs inside the package
 

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { Icon } from "@/icons";
-import iconStyles from "@/icons/Icon.module.css";
+import { iconBoxStyles } from "@/internal/iconBox";
 
 import { Label } from "./Label";
 
@@ -40,7 +40,7 @@ describe("Label", () => {
         </Label.Icon>
       </Label.Root>,
     );
-    expect(screen.getByTestId("label-icon")).toHaveClass(iconStyles.sizeS);
+    expect(screen.getByTestId("label-icon")).toHaveClass(iconBoxStyles.s);
   });
 
   it("renders a decorative asterisk when required", () => {

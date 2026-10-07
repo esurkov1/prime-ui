@@ -3,7 +3,9 @@ import * as React from "react";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { iconBoxClass } from "@/internal/iconBox";
 import type { ControlSize, TextTone } from "@/internal/states";
+import toneStyles from "@/internal/textTone.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Spinner.module.css";
@@ -15,14 +17,6 @@ export type SpinnerLabels = {
 
 const SPINNER_LABELS: SpinnerLabels = {
   loading: "Загрузка",
-};
-
-const SIZE_CLASS: Record<ControlSize, string> = {
-  xs: styles.sizeXs,
-  s: styles.sizeS,
-  m: styles.sizeM,
-  l: styles.sizeL,
-  xl: styles.sizeXl,
 };
 
 export type SpinnerProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
@@ -55,12 +49,7 @@ export function Spinner({
   return (
     <span
       role="status"
-      className={cx(
-        styles.root,
-        SIZE_CLASS[size],
-        sizeProp === undefined && styles.inherit,
-        className,
-      )}
+      className={cx(styles.root, iconBoxClass(sizeProp, controlSize), toneStyles.tone, className)}
       {...toDataAttributes({ size, tone: tone === "default" ? undefined : tone })}
       {...rest}
     >

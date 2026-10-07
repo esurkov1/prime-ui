@@ -4,7 +4,7 @@ import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Typography } from "@/components/typography/Typography";
-import { IconCopy } from "@/icons";
+import { Icon } from "@/icons";
 
 import {
   FoundationPage,
@@ -312,7 +312,7 @@ function PressDemo() {
         <Button.Root>press-scale · 0.98</Button.Root>
         <Button.Root variant="soft" tone="neutral" aria-label="press-scale-compact · 0.96">
           <Button.Icon>
-            <IconCopy />
+            <Icon name="action.copy" />
           </Button.Icon>
         </Button.Root>
         <Note>press-scale-compact · 0.96</Note>

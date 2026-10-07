@@ -158,7 +158,7 @@ Cancel.
 | `OverlayPortalLayerProvider` | portal target for overlays inside a custom layer |
 | `useSidebar()` | Sidebar state for custom parts inside `Sidebar.Root` |
 | `matchesSmartFilter`, `resolveSmartFilterValues` | apply a SmartFilter value to your rows |
-| `Icon`, `Icon*` | kit icon set — see Icons below |
+| `Icon`, `createIcon` | kit icon set and domain glyphs — see Icons below |
 
 ## Icons
 
@@ -175,10 +175,9 @@ Cancel.
 - `status.*`: `danger`, `emailSent`, `info`, `locked`, `offline`, `success`, `warning`;
 - `theme.*`: `dark`, `light`; `view.*`: `code`, `preview`; `viewport.*`: `desktop`, `mobile`, `tablet`.
 
-Each glyph is also a named component (`IconAdd`, `IconBell`, `IconCalendar`, `IconCart`,
-`IconChevronDown`, `IconDocument`, `IconMenu`, `IconPackage`, `IconSearch`, `IconUser`,
-`IconWarning`, …). Take a glyph from the kit first; only a domain glyph the kit lacks (a bike, a
-tooth) comes from `lucide-react` (add it to the app's dependencies). Icon-only buttons need `aria-label`;
+Take a glyph from the kit first. Only a domain glyph the kit lacks (a bike, a tooth) comes from
+`lucide-react` (add it to the app's dependencies), wrapped once at module level with `createIcon` so it
+sizes and tones like a kit icon: `const IconBike = createIcon(Bike);` → `<IconBike />`. Icon-only buttons need `aria-label`;
 decorative icons inside kit slots (`Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`) are hidden
 automatically.
 

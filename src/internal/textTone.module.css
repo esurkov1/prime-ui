@@ -1,0 +1,27 @@
+/*
+ * The text tone ladder (`TextTone`) shared by Typography, Icon and Spinner: put `.tone` on the
+ * element and the tone in `data-tone`; `default` (no attribute) keeps the inherited color.
+ */
+.tone[data-tone="secondary"] {
+  color: var(--prime-color-text-secondary);
+}
+
+.tone[data-tone="muted"] {
+  color: var(--prime-color-text-muted);
+}
+
+.tone[data-tone="accent"] {
+  color: var(--prime-color-accent-text);
+}
+
+.tone[data-tone="success"] {
+  color: var(--prime-color-success-text);
+}
+
+.tone[data-tone="warning"] {
+  color: var(--prime-color-warning-text);
+}
+
+.tone[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
+}
