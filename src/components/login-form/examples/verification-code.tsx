@@ -1,4 +1,4 @@
-/** Second step with a one-time code: DigitInput inside the form, a rejected code turns the cells and the hint to danger, resend and back are quiet actions. Use it after e-mail or SMS confirmation. */
+/** The second step with a one-time code: a rejected code shows its error under the cells, resend is a quiet action — `DigitInput`, `LoginForm.Actions`. */
 import { MailCheck } from "lucide-react";
 import { Button, DigitInput, LinkButton, LoginForm } from "prime-ui-kit";
 import * as React from "react";

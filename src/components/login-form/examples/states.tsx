@@ -1,11 +1,11 @@
-/** Real submit cycle: the button shows `loading` while the request runs, a failed request returns a danger Banner above the fields and marks the password. Use it as the reference for server errors. */
+/** The submit cycle: the button is busy while the request runs, a failed request shows a danger Banner and marks the password — `loading`, `invalid`. */
 import { CircleAlert, LogIn } from "lucide-react";
 import { Banner, Button, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-export default function LoginFormSubmitStatesExample() {
+export default function LoginFormStatesExample() {
   const [pending, setPending] = React.useState(false);
   const [failed, setFailed] = React.useState(false);
   const timer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);

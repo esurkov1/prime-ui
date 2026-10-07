@@ -1,9 +1,9 @@
-/** `flat` removes the shadow so the form sits inside a Modal or on a plain page without a double surface. Use it when the host already provides the surface. */
+/** The minimal form: no logo, description or footer, and no shadow for a host that already is a surface — `flat`. */
 import { Button, Input, LoginForm } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-export default function LoginFormFlatExample() {
+export default function LoginFormStructureExample() {
   return (
     <div className={styles.stage}>
       <LoginForm.Root flat>

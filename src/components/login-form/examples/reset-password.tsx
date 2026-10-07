@@ -1,4 +1,4 @@
-/** Setting a new password after the e-mail link: two fields, a mismatch error under the second one. Use it as the last step of the recovery flow. */
+/** A new password after the e-mail link: two fields and a mismatch error under the second one — `error`. */
 import { LockKeyhole } from "lucide-react";
 import { Button, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";

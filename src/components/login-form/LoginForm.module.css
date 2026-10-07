@@ -100,7 +100,6 @@
   min-width: 0;
 }
 
-.social,
 .actions {
   display: flex;
   flex-direction: column;

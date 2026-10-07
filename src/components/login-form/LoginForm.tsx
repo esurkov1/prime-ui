@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Typography, type TypographyRole } from "@/components/typography/Typography";
+import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize } from "@/internal/states";
@@ -31,7 +32,8 @@ const FOOTER_ROLE: Record<ControlSize, TypographyRole> = {
   xl: "body-m",
 };
 
-const LoginFormSizeContext = React.createContext<ControlSize>("m");
+/** Tier of the text parts: the root's `size`, provided through the control-size context. */
+const useLoginFormSize = (): ControlSize => useOptionalControlSize() ?? "m";
 
 export type LoginFormRootProps = {
   /** Tier of spacing and type. Pass the same `size` to the fields and buttons inside. Default `m`. */
@@ -58,11 +60,11 @@ const LoginFormRoot = React.forwardRef<HTMLDivElement, LoginFormRootProps>(funct
       className={cx(styles.root, className)}
       {...toDataAttributes({ size, align, flat })}
     >
-      <LoginFormSizeContext.Provider value={size}>{children}</LoginFormSizeContext.Provider>
+      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
     </div>
   );
 });
-LoginFormRoot.displayName = "LoginFormRoot";
+LoginFormRoot.displayName = "LoginForm.Root";
 
 export type LoginFormHeaderProps = {
   className?: string;
@@ -77,7 +79,7 @@ function LoginFormHeader({ className, children, ...rest }: LoginFormHeaderProps)
     </header>
   );
 }
-LoginFormHeader.displayName = "LoginFormHeader";
+LoginFormHeader.displayName = "LoginForm.Header";
 
 export type LoginFormLogoProps = {
   className?: string;
@@ -92,7 +94,7 @@ function LoginFormLogo({ className, children, ...rest }: LoginFormLogoProps) {
     </div>
   );
 }
-LoginFormLogo.displayName = "LoginFormLogo";
+LoginFormLogo.displayName = "LoginForm.Logo";
 
 export type LoginFormTitleProps = {
   /** Heading element. Default `h1`; use `h2` when the form sits inside a page that already has an `h1`. */
@@ -102,7 +104,7 @@ export type LoginFormTitleProps = {
 } & Omit<React.HTMLAttributes<HTMLHeadingElement>, "children">;
 
 function LoginFormTitle({ as = "h1", className, children, ...rest }: LoginFormTitleProps) {
-  const size = React.useContext(LoginFormSizeContext);
+  const size = useLoginFormSize();
   return (
     <Typography.Root
       as={as}
@@ -114,7 +116,7 @@ function LoginFormTitle({ as = "h1", className, children, ...rest }: LoginFormTi
     </Typography.Root>
   );
 }
-LoginFormTitle.displayName = "LoginFormTitle";
+LoginFormTitle.displayName = "LoginForm.Title";
 
 export type LoginFormDescriptionProps = {
   className?: string;
@@ -122,7 +124,7 @@ export type LoginFormDescriptionProps = {
 } & Omit<React.HTMLAttributes<HTMLParagraphElement>, "children">;
 
 function LoginFormDescription({ className, children, ...rest }: LoginFormDescriptionProps) {
-  const size = React.useContext(LoginFormSizeContext);
+  const size = useLoginFormSize();
   return (
     <Typography.Root
       as="p"
@@ -135,7 +137,7 @@ function LoginFormDescription({ className, children, ...rest }: LoginFormDescrip
     </Typography.Root>
   );
 }
-LoginFormDescription.displayName = "LoginFormDescription";
+LoginFormDescription.displayName = "LoginForm.Description";
 
 export type LoginFormBodyProps = {
   className?: string;
@@ -150,22 +152,7 @@ function LoginFormBody({ className, children, ...rest }: LoginFormBodyProps) {
     </div>
   );
 }
-LoginFormBody.displayName = "LoginFormBody";
-
-export type LoginFormSocialProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-/** Column of full-width provider buttons (`Button.Root variant="outline" tone="neutral" fullWidth`). */
-function LoginFormSocial({ className, children, ...rest }: LoginFormSocialProps) {
-  return (
-    <div className={cx(styles.social, className)} {...rest}>
-      {children}
-    </div>
-  );
-}
-LoginFormSocial.displayName = "LoginFormSocial";
+LoginFormBody.displayName = "LoginForm.Body";
 
 export type LoginFormFormProps = {
   className?: string;
@@ -183,14 +170,17 @@ const LoginFormForm = React.forwardRef<HTMLFormElement, LoginFormFormProps>(func
     </form>
   );
 });
-LoginFormForm.displayName = "LoginFormForm";
+LoginFormForm.displayName = "LoginForm.Form";
 
 export type LoginFormActionsProps = {
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-/** Column of full-width buttons: the primary action first, then a `ghost` back action. */
+/**
+ * Column of full-width buttons: provider buttons above the form, or the primary action first
+ * with a `ghost` back action under it.
+ */
 function LoginFormActions({ className, children, ...rest }: LoginFormActionsProps) {
   return (
     <div className={cx(styles.actions, className)} {...rest}>
@@ -198,7 +188,7 @@ function LoginFormActions({ className, children, ...rest }: LoginFormActionsProp
     </div>
   );
 }
-LoginFormActions.displayName = "LoginFormActions";
+LoginFormActions.displayName = "LoginForm.Actions";
 
 export type LoginFormFooterProps = {
   className?: string;
@@ -207,7 +197,7 @@ export type LoginFormFooterProps = {
 
 /** Secondary line with a `LinkButton`: «Нет аккаунта? Зарегистрироваться». Follows Root `align`. */
 function LoginFormFooter({ className, children, ...rest }: LoginFormFooterProps) {
-  const size = React.useContext(LoginFormSizeContext);
+  const size = useLoginFormSize();
   return (
     <Typography.Root
       as="p"
@@ -220,7 +210,7 @@ function LoginFormFooter({ className, children, ...rest }: LoginFormFooterProps)
     </Typography.Root>
   );
 }
-LoginFormFooter.displayName = "LoginFormFooter";
+LoginFormFooter.displayName = "LoginForm.Footer";
 
 export const LoginForm = {
   Root: LoginFormRoot,
@@ -229,7 +219,6 @@ export const LoginForm = {
   Title: LoginFormTitle,
   Description: LoginFormDescription,
   Body: LoginFormBody,
-  Social: LoginFormSocial,
   Form: LoginFormForm,
   Actions: LoginFormActions,
   Footer: LoginFormFooter,

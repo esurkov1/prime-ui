@@ -291,7 +291,6 @@ export type {
   LoginFormHeaderProps,
   LoginFormLogoProps,
   LoginFormRootProps,
-  LoginFormSocialProps,
   LoginFormTitleProps,
 } from "./login-form/LoginForm";
 export { LoginForm } from "./login-form/LoginForm";

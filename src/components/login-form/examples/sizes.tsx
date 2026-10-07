@@ -1,4 +1,4 @@
-/** Tiers `s`, `m` and `l`: card padding, gaps and text roles follow `size`; pass the same `size` to the fields and buttons. Use `s` in a modal, `m` on a regular page, `l` on a standalone sign-in screen. */
+/** Padding, gaps and text roles of the card follow the tier; the fields and buttons take the same one — `size`. */
 import { Button, Input, LoginForm } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
