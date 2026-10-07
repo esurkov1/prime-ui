@@ -1,5 +1,5 @@
-/** A custom body: a muted title with a browse link and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.BrowseLink`. */
-import { Button, FileUpload, Icon } from "prime-ui-kit";
+/** A custom body: a muted title with a browse link and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`. */
+import { Button, FileUpload, Icon, LinkButton } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -17,9 +17,11 @@ export default function FileUploadStructureExample() {
           </FileUpload.Icon>
           <FileUpload.Title tone="muted">
             Перетащите файлы сюда или{" "}
-            <FileUpload.BrowseLink onClick={openPicker}>
-              выберите на компьютере
-            </FileUpload.BrowseLink>
+            <LinkButton asChild>
+              <button type="button" onClick={openPicker}>
+                выберите на компьютере
+              </button>
+            </LinkButton>
           </FileUpload.Title>
           <div className={styles.sources}>
             <Button.Root variant="soft" tone="neutral" size="s" onClick={openPicker}>

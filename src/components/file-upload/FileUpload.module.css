@@ -207,31 +207,6 @@
   user-select: none;
 }
 
-.browseLink {
-  display: inline;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: var(--prime-radius-xs);
-  background: none;
-  font: inherit;
-  font-weight: var(--prime-font-weight-medium);
-  color: var(--prime-color-accent-text);
-  text-decoration: underline;
-  text-underline-offset: var(--prime-focus-offset);
-  cursor: pointer;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.browseLink:hover {
-  color: var(--prime-color-accent-hover);
-}
-
-.browseLink:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
 /* ─── File row: [badge] name / description [actions], then progress ─── */
 .item {
   --fu-item-pad: var(--prime-space-3);

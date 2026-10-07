@@ -27,7 +27,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Своё содержимое: приглушённый заголовок со ссылкой выбора и кнопки источников вместо встроенного — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.BrowseLink`.",
+        "Своё содержимое: приглушённый заголовок со ссылкой выбора и кнопки источников вместо встроенного — `FileUpload.Body`, `FileUpload.Title`.",
     },
     {
       scenario: "upload-progress",

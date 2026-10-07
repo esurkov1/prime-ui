@@ -79,19 +79,6 @@ function FileUploadDescription(props: FileUploadDescriptionProps) {
 }
 FileUploadDescription.displayName = "FileUpload.Description";
 
-export type FileUploadBrowseLinkProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
-
-/**
- * Inline «browse» link inside a custom title. A button inside the zone label does not activate
- * the label, so pass `onClick` (e.g. `inputRef.current?.click()`).
- */
-const FileUploadBrowseLink = React.forwardRef<HTMLButtonElement, FileUploadBrowseLinkProps>(
-  ({ className, type = "button", ...rest }, ref) => (
-    <button ref={ref} type={type} className={cx(styles.browseLink, className)} {...rest} />
-  ),
-);
-FileUploadBrowseLink.displayName = "FileUpload.BrowseLink";
-
 // ─── File row ────────────────────────────────────────────────────────────────
 
 export type FileUploadItemProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -317,7 +304,6 @@ export const FileUpload = {
   Icon: FileUploadIcon,
   Title: FileUploadTitle,
   Description: FileUploadDescription,
-  BrowseLink: FileUploadBrowseLink,
   Item: FileUploadItem,
   FormatBadge: FileUploadFormatBadge,
   ItemName: FileUploadItemName,

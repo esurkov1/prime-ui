@@ -224,7 +224,6 @@ export type {
 export { ExampleFrame } from "./example-frame/ExampleFrame";
 export type {
   FileUploadBodyProps,
-  FileUploadBrowseLinkProps,
   FileUploadDescriptionProps,
   FileUploadFormatBadgeProps,
   FileUploadIconProps,

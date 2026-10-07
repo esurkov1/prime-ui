@@ -25,6 +25,15 @@
     text-decoration-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
+/* `asChild` on a `<button>`: drop the native button chrome, keep the link look. */
+button.root {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+}
+
 .root[data-tone="neutral"] {
   --link-fg: var(--prime-color-text-secondary);
   --link-fg-hover: var(--prime-color-text-primary);
