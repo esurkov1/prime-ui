@@ -282,12 +282,82 @@ describe("SegmentedControl — roving focus and keyboard", () => {
 });
 
 describe("SegmentedControl — thumb and parts", () => {
-  it("renders one aria-hidden thumb before the items", () => {
+  it("renders one aria-hidden thumb before the items, inside the track", () => {
     renderSegmented();
-    const group = screen.getByRole("radiogroup");
-    const thumb = group.firstElementChild?.firstElementChild;
+    const list = screen.getByRole("radio", { name: "Option A" }).parentElement as HTMLElement;
+    const thumb = list.firstElementChild;
     expect(thumb).toHaveAttribute("aria-hidden", "true");
     expect(thumb).not.toHaveAttribute("role");
+    expect(thumb).toHaveAttribute("data-visible", "true");
+  });
+
+  it("the track clips the thumb, so moving the selection never grows the scroll area", () => {
+    const css = readFileSync(segmentedModuleCssPath, "utf8");
+    const block = css.match(/\.list\s*\{[^}]*\}/s)?.[0] ?? "";
+    expect(block).toContain("position: relative;");
+    expect(block).toContain("overflow: clip;");
+  });
+
+  it("the thumb glides only after a user change, and never under reduced motion", () => {
+    const items = (
+      <>
+        <SegmentedControl.Item value="a">A</SegmentedControl.Item>
+        <SegmentedControl.Item value="b">B</SegmentedControl.Item>
+      </>
+    );
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
+    // jsdom has no layout: give segment "b" its own position so the thumb has somewhere to go.
+    const offsetLeft = vi
+      .spyOn(HTMLElement.prototype, "offsetLeft", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.dataset.value === "b" ? 80 : 0;
+      });
+    try {
+      const { rerender } = render(<SegmentedControl.Root value="a">{items}</SegmentedControl.Root>);
+      const thumb = screen.getByRole("radio", { name: "A" }).parentElement
+        ?.firstElementChild as HTMLElement;
+      expect(thumb).not.toHaveAttribute("data-animate");
+
+      // A value set from outside snaps.
+      rerender(<SegmentedControl.Root value="b">{items}</SegmentedControl.Root>);
+      expect(thumb).not.toHaveAttribute("data-animate");
+
+      rerender(
+        <SegmentedControl.Root value="b" onValueChange={() => {}}>
+          {items}
+        </SegmentedControl.Root>,
+      );
+      fireEvent.click(screen.getByRole("radio", { name: "A" }));
+      rerender(<SegmentedControl.Root value="a">{items}</SegmentedControl.Root>);
+      expect(thumb).toHaveAttribute("data-animate", "true");
+      fireEvent.transitionEnd(thumb, { propertyName: "transform" });
+      expect(thumb).not.toHaveAttribute("data-animate");
+    } finally {
+      vi.unstubAllGlobals();
+      offsetLeft.mockRestore();
+    }
+
+    // Test setup reports `prefers-reduced-motion: reduce`.
+    render(
+      <SegmentedControl.Root defaultValue="a" aria-label="Тихо">
+        <SegmentedControl.Item value="a">X</SegmentedControl.Item>
+        <SegmentedControl.Item value="b">Y</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Y" }));
+    expect(
+      screen.getByRole("radio", { name: "X" }).parentElement?.firstElementChild,
+    ).not.toHaveAttribute("data-animate");
+  });
+
+  it("hides the thumb when nothing is selected", () => {
+    render(
+      <SegmentedControl.Root aria-label="Вид">
+        <SegmentedControl.Item value="a">A</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+    const thumb = screen.getByRole("radio", { name: "A" }).parentElement?.firstElementChild;
+    expect(thumb).not.toHaveAttribute("data-visible");
   });
 
   it("Count renders a badge inside the segment name", () => {
@@ -365,17 +435,17 @@ describe("SegmentedControl — цвет пунктов", () => {
 
   it("бегунок берёт цвет выбранного пункта и сбрасывает его на нейтральный", async () => {
     const { container } = renderStatus();
-    const pill = container.querySelector('[class*="pill"]') as HTMLElement;
-    expect(pill).toHaveAttribute("data-color", "green");
+    const thumb = container.querySelector('[class*="thumb"]') as HTMLElement;
+    expect(thumb).toHaveAttribute("data-color", "green");
     fireEvent.click(screen.getByRole("radio", { name: "Нужно ТО" }));
-    await waitFor(() => expect(pill).toHaveAttribute("data-color", "orange"));
+    await waitFor(() => expect(thumb).toHaveAttribute("data-color", "orange"));
     fireEvent.click(screen.getByRole("radio", { name: "Без цвета" }));
-    await waitFor(() => expect(pill).not.toHaveAttribute("data-color"));
+    await waitFor(() => expect(thumb).not.toHaveAttribute("data-color"));
   });
 
   it("цвет бегунка анимируется тем же токеном движения, что и положение", () => {
     const css = readFileSync(segmentedModuleCssPath, "utf8");
-    const rule = css.slice(css.indexOf('.pill[data-animate="true"] {'));
+    const rule = css.slice(css.indexOf('.thumb[data-animate="true"] {'));
     const block = rule.slice(0, rule.indexOf("}"));
     expect(block).toMatch(/background-color var\(--prime-motion-duration-base\)/);
     expect(block).toMatch(/box-shadow var\(--prime-motion-duration-base\)/);

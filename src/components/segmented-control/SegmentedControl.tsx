@@ -23,11 +23,8 @@ type SegmentedControlContextValue = {
 const [SegmentedControlProvider, useSegmentedControlContext] =
   createComponentContext<SegmentedControlContextValue>("SegmentedControl");
 
-type PillRect = { left: number; top: number; width: number; height: number; color?: string };
-
-const EMPTY_RECT: PillRect = { left: 0, top: 0, width: 0, height: 0 };
-
 const ENABLED_ITEM = '[role="radio"]:not([data-disabled="true"])';
+const CHECKED_ITEM = '[role="radio"][aria-checked="true"]';
 
 function prefersReducedMotion() {
   return (
@@ -35,6 +32,69 @@ function prefersReducedMotion() {
     typeof window.matchMedia === "function" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
+}
+
+function setFlag(element: HTMLElement, name: string, on: boolean) {
+  if (on) element.setAttribute(name, "true");
+  else element.removeAttribute(name);
+}
+
+/**
+ * Thumb and edge fades follow layout, not React state: they are written straight to the DOM, so a
+ * resize or a font swap never re-renders the group. The thumb lives inside the track (`.list`,
+ * `overflow: clip`), so its box can never widen the scroll area of the viewport.
+ */
+function syncThumb(list: HTMLElement, thumb: HTMLElement, animate: boolean) {
+  const active = list.querySelector<HTMLElement>(CHECKED_ITEM);
+  if (!active) {
+    setFlag(thumb, "data-visible", false);
+    setFlag(thumb, "data-animate", false);
+    return;
+  }
+  const transform = `translate(${active.offsetLeft}px, ${active.offsetTop}px)`;
+  const width = `${active.offsetWidth}px`;
+  const height = `${active.offsetHeight}px`;
+  const moved =
+    thumb.style.transform !== transform ||
+    thumb.style.width !== width ||
+    thumb.style.height !== height;
+  // Glide only into a user's choice; a layout change (resize, fonts, new items) snaps the thumb.
+  if (moved) setFlag(thumb, "data-animate", animate && thumb.hasAttribute("data-visible"));
+  thumb.style.transform = transform;
+  thumb.style.width = width;
+  thumb.style.height = height;
+  if (active.dataset.color) thumb.dataset.color = active.dataset.color;
+  else delete thumb.dataset.color;
+  setFlag(thumb, "data-visible", true);
+}
+
+/**
+ * Edge-fade flags go on the root: the fades are overlays on the still track, not a mask. While the
+ * row glides to a chosen segment they follow the destination, not the current offset, so a fade
+ * never sits over the segment being revealed.
+ */
+function syncOverflow(viewport: HTMLElement, scrollLeft = viewport.scrollLeft) {
+  const root = viewport.parentElement;
+  if (!root) return;
+  const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+  setFlag(root, "data-overflow-start", scrollLeft > 1);
+  setFlag(root, "data-overflow-end", maxScroll - scrollLeft > 1);
+}
+
+/**
+ * Scroll offset that shows `item` clear of the edge fades (the neighbour stays under the fade), or
+ * the current offset when it already is.
+ */
+function revealOffset(viewport: HTMLElement, item: HTMLElement): number {
+  const root = viewport.parentElement;
+  const fade = root ? Number.parseFloat(getComputedStyle(root, "::before").width) || 0 : 0;
+  const view = viewport.scrollLeft;
+  const start = item.offsetLeft;
+  const end = start + item.offsetWidth;
+  let left = view;
+  if (start - fade < view) left = start - fade;
+  else if (end + fade > view + viewport.clientWidth) left = end + fade - viewport.clientWidth;
+  return Math.min(Math.max(left, 0), viewport.scrollWidth - viewport.clientWidth);
 }
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -72,85 +132,63 @@ function SegmentedControlRoot({
     onChange: onValueChange,
   });
 
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const scrollerRef = React.useRef<HTMLDivElement>(null);
-  const [overflow, setOverflow] = React.useState({ start: false, end: false });
-  const [pill, setPill] = React.useState<PillRect>(EMPTY_RECT);
-  // The pill slides only after a user change; layout changes (resize, fonts) snap it.
-  const [animate, setAnimate] = React.useState(false);
+  const viewportRef = React.useRef<HTMLDivElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
+  const thumbRef = React.useRef<HTMLDivElement>(null);
+  /** Set by a click or arrow key; the next commit glides the thumb and reveals the item. */
+  const userChangeRef = React.useRef(false);
+  /** Offset the row is gliding to after a choice; `null` once it arrives or the user scrolls. */
+  const scrollTargetRef = React.useRef<number | null>(null);
   const [firstEnabled, setFirstEnabled] = React.useState("");
 
   const onSelect = React.useCallback(
     (nextValue: string) => {
       if (nextValue === selectedValue) return;
-      if (!prefersReducedMotion()) setAnimate(true);
+      userChangeRef.current = true;
       setSelectedValue(nextValue);
     },
     [selectedValue, setSelectedValue],
   );
 
-  const updateOverflow = React.useCallback(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    const maxScroll = scroller.scrollWidth - scroller.clientWidth;
-    const start = scroller.scrollLeft > 1;
-    const end = maxScroll - scroller.scrollLeft > 1;
-    setOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
-  }, []);
-
-  const measure = React.useCallback(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    updateOverflow();
-    const first = root.querySelector<HTMLElement>(ENABLED_ITEM);
-    setFirstEnabled(first?.dataset.value ?? "");
-    const active = root.querySelector<HTMLElement>('[role="radio"][aria-checked="true"]');
-    const next = active
-      ? {
-          left: active.offsetLeft,
-          top: active.offsetTop,
-          width: active.offsetWidth,
-          height: active.offsetHeight,
-          color: active.dataset.color,
-        }
-      : EMPTY_RECT;
-    setPill((prev) =>
-      prev.left === next.left &&
-      prev.top === next.top &&
-      prev.width === next.width &&
-      prev.height === next.height &&
-      prev.color === next.color
-        ? prev
-        : next,
-    );
-  }, [updateOverflow]);
-
+  // After every commit: selection, items or their content may have changed.
   React.useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    measure();
+    const viewport = viewportRef.current;
+    const list = listRef.current;
+    const thumb = thumbRef.current;
+    if (!viewport || !list || !thumb) return;
 
-    const mo = new MutationObserver(measure);
-    mo.observe(root, {
-      subtree: true,
-      childList: true,
-      characterData: true,
-      attributes: true,
-      attributeFilter: ["aria-checked", "data-disabled", "data-color"],
-    });
+    const userChange = userChangeRef.current;
+    userChangeRef.current = false;
+    syncThumb(list, thumb, userChange && !prefersReducedMotion());
+    setFirstEnabled(list.querySelector<HTMLElement>(ENABLED_ITEM)?.dataset.value ?? "");
 
-    let ro: ResizeObserver | undefined;
-    if (typeof ResizeObserver !== "undefined") {
-      ro = new ResizeObserver(measure);
-      ro.observe(root);
-      for (const item of root.querySelectorAll('[role="radio"]')) ro.observe(item);
+    // A chosen segment in a scrolling row is brought into view (only the row scrolls, not the page).
+    const active = list.querySelector<HTMLElement>(CHECKED_ITEM);
+    if (userChange && active && viewport.scrollWidth > viewport.clientWidth) {
+      const left = revealOffset(viewport, active);
+      if (Math.abs(left - viewport.scrollLeft) >= 1 && typeof viewport.scrollTo === "function") {
+        scrollTargetRef.current = left;
+        viewport.scrollTo({ left, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+      }
     }
+    syncOverflow(viewport, scrollTargetRef.current ?? undefined);
+  });
 
-    return () => {
-      mo.disconnect();
-      ro?.disconnect();
-    };
-  }, [measure]);
+  // Layout changes outside React: container resize, font load, two-line height.
+  React.useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    const list = listRef.current;
+    const thumb = thumbRef.current;
+    if (!viewport || !list || !thumb || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => {
+      scrollTargetRef.current = null;
+      syncThumb(list, thumb, false);
+      syncOverflow(viewport);
+    });
+    ro.observe(viewport);
+    ro.observe(list);
+    return () => ro.disconnect();
+  }, []);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     const items = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>(ENABLED_ITEM));
@@ -170,14 +208,11 @@ function SegmentedControlRoot({
     if (!target) return;
 
     event.preventDefault();
-    target.focus();
-    if (typeof target.scrollIntoView === "function") {
-      target.scrollIntoView({ block: "nearest", inline: "nearest" });
-    }
+    // The row reveals the segment itself (clear of the edge fades), so focus must not jump-scroll.
+    target.focus({ preventScroll: true });
     onSelect(target.dataset.value ?? "");
   }
 
-  const hasPill = pill.width > 0 && pill.height > 0;
   const contextValue = React.useMemo<SegmentedControlContextValue>(
     () => ({
       value: selectedValue,
@@ -191,7 +226,6 @@ function SegmentedControlRoot({
   return (
     <SegmentedControlProvider value={contextValue}>
       <div
-        ref={rootRef}
         role="radiogroup"
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
@@ -205,33 +239,38 @@ function SegmentedControlRoot({
         })}
       >
         <div
-          ref={scrollerRef}
-          className={styles.scroller}
-          onScroll={updateOverflow}
-          {...toDataAttributes({
-            "overflow-start": overflow.start || undefined,
-            "overflow-end": overflow.end || undefined,
-          })}
+          ref={viewportRef}
+          className={styles.viewport}
+          onScroll={(event) => {
+            const viewport = event.currentTarget;
+            const target = scrollTargetRef.current;
+            if (target !== null && Math.abs(viewport.scrollLeft - target) < 1) {
+              scrollTargetRef.current = null;
+            }
+            syncOverflow(viewport, scrollTargetRef.current ?? undefined);
+          }}
+          // The user takes over scrolling: fades follow the real offset again.
+          onWheel={() => {
+            scrollTargetRef.current = null;
+          }}
+          onTouchStart={() => {
+            scrollTargetRef.current = null;
+          }}
         >
-          {/* First in DOM order so it always paints below the segments. */}
-          <div
-            className={styles.pill}
-            style={{
-              transform: `translate(${pill.left}px, ${pill.top}px)`,
-              width: pill.width,
-              height: pill.height,
-            }}
-            aria-hidden="true"
-            {...toDataAttributes({
-              visible: hasPill,
-              animate: animate || undefined,
-              color: pill.color,
-            })}
-            onTransitionEnd={(event) => {
-              if (event.propertyName === "transform") setAnimate(false);
-            }}
-          />
-          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+          <div ref={listRef} className={styles.list}>
+            {/* First in DOM order so it always paints below the segments. */}
+            <div
+              ref={thumbRef}
+              className={styles.thumb}
+              aria-hidden="true"
+              onTransitionEnd={(event) => {
+                if (event.target === event.currentTarget && event.propertyName === "transform") {
+                  setFlag(event.currentTarget, "data-animate", false);
+                }
+              }}
+            />
+            <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+          </div>
         </div>
       </div>
     </SegmentedControlProvider>

@@ -153,7 +153,7 @@ Track is `fill-muted` with a faint 1px ring; the selected segment is a floating 
 | group disabled | root `disabled` | root `data-disabled="true"`, `aria-disabled` | all segments disabled, thumb `fill-muted-hover` without shadow |
 | focus-visible | keyboard | — | focus ring on the segment |
 
-Root DOM: `data-size`, `data-disabled`, `data-full-width`; scroller `data-overflow-start` / `data-overflow-end` (edge fades). Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `data-value`, `data-color`. The thumb slides only after a user change (`data-animate`), and not under `prefers-reduced-motion`.
+Root DOM: `data-size`, `data-disabled`, `data-full-width`, `data-overflow-start` / `data-overflow-end` (edge fades in the track color while the row scrolls). Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `data-value`, `data-color`. The thumb glides (`emphasized` + `base`, `data-animate`) only into a user's choice (click, arrows); a value set from outside and layout changes snap it; it stays still under `prefers-reduced-motion`. It sits inside the segment track, which clips it, so moving the selection never changes the row's scroll area; when the row scrolls, the chosen segment is scrolled into view.
 Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue`.
 
 ## Layout & spacing

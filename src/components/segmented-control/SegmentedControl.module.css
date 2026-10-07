@@ -10,7 +10,7 @@
  * two-line segments grow from their content width.
  */
 
-/* Selected pill: `--prime-color-control-selected` (white in light, a lighter step above the track in dark). */
+/* Selected thumb: `--prime-color-control-selected` (white in light, a lighter step above the track in dark). */
 
 .root {
   --seg-pad: var(--prime-space-1);
@@ -115,52 +115,77 @@
   height: auto;
 }
 
-/* ─── Scroller (holds the thumb and the segments) ──────────────────────────── */
+/* ─── Viewport (scrolls) → list (the track of segments, holds the thumb) ──── */
 
-.scroller {
-  position: relative;
-  isolation: isolate;
+.viewport {
   display: flex;
   flex: 1 1 auto;
-  flex-wrap: nowrap;
-  gap: var(--seg-item-gap);
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  border-radius: var(--seg-item-radius);
 }
 
-.scroller::-webkit-scrollbar {
+.viewport::-webkit-scrollbar {
   display: none;
 }
 
-/* Edge fades while the row scrolls (mask is alpha-only; any opaque color works). */
-.scroller[data-overflow-start="true"] {
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8)
-  );
+/* Edge fades while the row scrolls: overlays in the track color on the still root. Not a
+   `mask-image` on the viewport — a mask over a moving thumb makes browsers drop segment text
+   while the thumb glides. */
+.root::before,
+.root::after {
+  content: "";
+  position: absolute;
+  inset-block: var(--seg-pad);
+  z-index: 2;
+  width: var(--prime-space-8);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.scroller[data-overflow-end="true"] {
-  mask-image: linear-gradient(
-    to left,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8)
-  );
+.root::before {
+  left: var(--seg-pad);
+  border-start-start-radius: var(--seg-item-radius);
+  border-end-start-radius: var(--seg-item-radius);
+  background: linear-gradient(to right, var(--prime-color-fill-muted), transparent);
 }
 
-.scroller[data-overflow-start="true"][data-overflow-end="true"] {
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8),
-    var(--prime-color-text-primary) calc(100% - var(--prime-space-8)),
-    transparent
-  );
+.root::after {
+  right: var(--seg-pad);
+  border-start-end-radius: var(--seg-item-radius);
+  border-end-end-radius: var(--seg-item-radius);
+  background: linear-gradient(to left, var(--prime-color-fill-muted), transparent);
+}
+
+.root[data-overflow-start="true"]::before,
+.root[data-overflow-end="true"]::after {
+  opacity: 1;
+}
+
+/* As wide as its segments; `overflow: clip` keeps the thumb (and any rounding of its geometry)
+   out of the viewport's scroll area, so moving the selection never makes the row scroll. */
+.list {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  gap: var(--seg-item-gap);
+  overflow: clip;
+}
+
+/* Full width: the list fills the viewport and single-line segments share it (and truncate). */
+.root[data-full-width="true"] .list {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Two-line segments never shrink below their content: the list grows and the row scrolls. */
+.root[data-full-width="true"] .list:has(> [data-two-line="true"]) {
+  flex: 1 0 auto;
 }
 
 /* ─── Item ──────────────────────────────────────────────────────────────────── */
@@ -191,7 +216,7 @@
   white-space: nowrap;
   user-select: none;
   cursor: pointer;
-  /* Same duration/easing as the sliding pill, so text and fill arrive together. */
+  /* Same duration as the sliding thumb, so text and fill arrive together. */
   transition: color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
@@ -307,52 +332,52 @@
 
 /* ─── Color (SegmentedControl.Item color) ───────────────────────────────────── */
 
-[data-color="gray"]:is(.item, .pill) {
+[data-color="gray"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-gray-soft);
   --seg-hue-text: var(--prime-color-palette-gray-text);
 }
 
-[data-color="blue"]:is(.item, .pill) {
+[data-color="blue"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-blue-soft);
   --seg-hue-text: var(--prime-color-palette-blue-text);
 }
 
-[data-color="green"]:is(.item, .pill) {
+[data-color="green"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-green-soft);
   --seg-hue-text: var(--prime-color-palette-green-text);
 }
 
-[data-color="orange"]:is(.item, .pill) {
+[data-color="orange"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-orange-soft);
   --seg-hue-text: var(--prime-color-palette-orange-text);
 }
 
-[data-color="red"]:is(.item, .pill) {
+[data-color="red"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-red-soft);
   --seg-hue-text: var(--prime-color-palette-red-text);
 }
 
-[data-color="yellow"]:is(.item, .pill) {
+[data-color="yellow"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-yellow-soft);
   --seg-hue-text: var(--prime-color-palette-yellow-text);
 }
 
-[data-color="purple"]:is(.item, .pill) {
+[data-color="purple"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-purple-soft);
   --seg-hue-text: var(--prime-color-palette-purple-text);
 }
 
-[data-color="sky"]:is(.item, .pill) {
+[data-color="sky"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-sky-soft);
   --seg-hue-text: var(--prime-color-palette-sky-text);
 }
 
-[data-color="pink"]:is(.item, .pill) {
+[data-color="pink"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-pink-soft);
   --seg-hue-text: var(--prime-color-palette-pink-text);
 }
 
-[data-color="teal"]:is(.item, .pill) {
+[data-color="teal"]:is(.item, .thumb) {
   --seg-hue-soft: var(--prime-color-palette-teal-soft);
   --seg-hue-text: var(--prime-color-palette-teal-text);
 }
@@ -380,9 +405,9 @@
   grid-column: 2 / -1;
 }
 
-/* ─── Thumb (geometry from TS) ──────────────────────────────────────────────── */
+/* ─── Thumb (geometry written from TS) ──────────────────────────────────────── */
 
-.pill {
+.thumb {
   position: absolute;
   top: 0;
   left: 0;
@@ -396,35 +421,36 @@
   opacity: 0;
 }
 
-.pill[data-visible="true"] {
+.thumb[data-visible="true"] {
   opacity: 1;
 }
 
 /* Colored option selected: soft fill of its hue + a 1px ring of the hue text at low alpha. */
-.pill[data-color] {
+.thumb[data-color] {
   background: var(--seg-hue-soft);
   box-shadow:
     inset 0 0 0 var(--prime-border-width) color-mix(in srgb, var(--seg-hue-text) 32%, transparent),
     var(--prime-shadow-raised);
 }
 
-/* Position, size and color travel together with one motion token. */
-.pill[data-animate="true"] {
+/* Glides only into a user's choice (layout changes snap it). Size has to follow the segment, so
+   width/height ride the same curve as the position; color follows on `standard`. */
+.thumb[data-animate="true"] {
   transition:
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    width var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    height var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
     box-shadow var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.root[data-disabled="true"] .pill {
+.root[data-disabled="true"] .thumb {
   background: var(--prime-color-fill-muted-hover);
   box-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pill[data-animate="true"] {
+  .thumb[data-animate="true"] {
     transition: none;
   }
 }
