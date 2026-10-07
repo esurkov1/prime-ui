@@ -496,6 +496,35 @@ describe("Sidebar.Brand and Sidebar.Account", () => {
     expect(screen.getByTestId("logo").parentElement).toHaveAttribute("aria-hidden", "true");
   });
 
+  it("Brand shows no tooltip on the compact rail and keeps its accessible name", () => {
+    vi.useFakeTimers();
+    try {
+      render(
+        <Sidebar.Root offCanvas="never" mode="compact">
+          <Sidebar.Header>
+            <Sidebar.Brand href="/" description="Отдел продаж">
+              <Sidebar.BrandLogo>
+                <svg />
+              </Sidebar.BrandLogo>
+              Прайм CRM
+            </Sidebar.Brand>
+            <Sidebar.Toggle variant="header" />
+          </Sidebar.Header>
+        </Sidebar.Root>,
+      );
+      const link = screen.getByRole("link", { name: /Прайм CRM/ });
+      fireEvent.pointerEnter(link, { pointerType: "mouse" });
+      fireEvent.focus(link);
+      act(() => {
+        vi.runAllTimers();
+      });
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+      expect(link).not.toHaveAttribute("aria-describedby");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("Account is a button named by the person and opens a Dropdown", () => {
     render(
       <Sidebar.Root offCanvas="never">

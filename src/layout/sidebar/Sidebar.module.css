@@ -4,46 +4,32 @@
  * No border, no card: items are transparent rows with a `fill-subtle` wash on hover; the current
  * item is lifted to `bg-surface` + `shadow-raised`.
  *
- * Motion — one synchronous movement (expanded ↔ compact ↔ hidden): everything starts together
- * and ends together over `--sb-duration` with `--sb-ease`.
+ * Motion — two layers, one clock (expanded ↔ compact ↔ hidden). Every part below is a plain CSS
+ * transition over `--sb-duration` with `--sb-ease`, started by the same style change
+ * (`data-mode` / `data-panel-mode`); nothing is delayed, nothing runs in JS.
  *
- * - The root's inline size animates. The panel keeps the expanded layout for the whole movement,
- *   so no label re-wraps or re-ellipsizes; the root clips it, so text is revealed and hidden by
- *   the moving edge. Item padding is derived from the compact width, so icons never move.
- * - One number for the rest: `--sb-reveal` (1 expanded → 0 compact) drives text opacity, the
- *   heading → separator cross-fade (headings never change height: nothing moves vertically),
- *   count → dot and the account inset. It is registered and not inherited: each
- *   part animates its own copy on the same clock, so a frame restyles only those parts and
- *   nothing is promoted to a compositor layer (a hundred opacity layers cost more than they save).
- * - A row with a fill (current, hovered, open) is cut where its fill ends: `::before` draws the
- *   fill and stops at the moving edge with its radius (`--sb-cut`, from container units of the
- *   root; only these few rows track the edge per frame).
- * - The header toggle travels by `translate` on the same duration and easing.
- * - The compact layout (`--sb-wide: 0`) lands once the rail has arrived (a delayed, zero-length
- *   transition) and is dropped at the very start of an expand, where it looks identical to the
- *   cut expanded layout. While hidden the panel keeps the last visible mode (`data-panel-mode`)
- *   and is clipped by the root as one piece.
+ * - The root is the spacer: it reserves the rail width in the page, paints the canvas and clips
+ *   what shows of the panel to its own box. Its `width` is the only layout that moves; the page
+ *   column follows it.
+ * - The panel is positioned inside it at the expanded width, always: it never lays out again
+ *   between modes (no label re-wraps, no switch at the end). The moving root edge reveals it.
+ * - Text, trailing parts and chevrons fade (`opacity`); group headings keep their height and
+ *   cross-fade into a short separator; a coloured count fades into a dot on the icon; the account
+ *   avatar slides onto the icon axis (`translate`); the header toggle rides the edge (`translate`,
+ *   `scale`).
+ * - Rows keep their full width. Each draws its fill and focus ring on `::before`, whose end edge
+ *   travels from the row end to the icon box, and clips its content at the same edge
+ *   (`clip-path`), both on the rail's clock — so a row ends rail padding before the moving edge at
+ *   every frame, and is a rounded square around the icon at rest.
+ * - While hidden the panel keeps the look of the last visible mode (`data-panel-mode`) and is
+ *   clipped out as one piece.
  *
  * Disclosures (collapsible groups, sub-lists) animate their height through a grid track
- * (0fr → 1fr) on the same clock as the rail, so groups that open for the rail open with it.
+ * (0fr → 1fr) on the same clock, so groups that open for the rail open with it.
  *
  * The root clips with `clip-path`, not `overflow`, so the header toggle can sit across the outer
- * edge in compact mode; the clip reaches past the edge by the toggle's half-width and its ring.
+ * edge: the clip reaches past the edge by the toggle's half-width and ring, beside the header only.
  */
-
-/* 1 = expanded layout, 0 = compact layout; registered so it can switch on a delay. */
-@property --sb-wide {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 1;
-}
-
-/* 1 = expanded look, 0 = compact look; registered so it animates as a number. */
-@property --sb-reveal {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 1;
-}
 
 .root,
 .flyout {
@@ -62,8 +48,10 @@
 
   --sb-compact: var(--prime-layout-sidebar-collapsed-width);
   --sb-pad: var(--prime-space-2);
+  /* What a row shows on the rail: the compact width less the rail padding. */
+  --sb-rail-box: calc(var(--sb-compact) - 2 * var(--sb-pad));
   /* Centers the icon inside the compact rail; the same padding is used when expanded. */
-  --sb-item-pad: calc((var(--sb-compact) - 2 * var(--sb-pad) - var(--sb-icon)) / 2);
+  --sb-item-pad: calc((var(--sb-rail-box) - var(--sb-icon)) / 2);
   --sb-ease: var(--prime-motion-easing-standard);
   --sb-duration: var(--prime-motion-duration-base);
 }
@@ -116,23 +104,21 @@
   --sb-avatar: var(--prime-avatar-l);
 }
 
+/* --- Spacer and panel ------------------------------------------------------------ */
+
 .root {
   --sb-expanded: var(--prime-layout-sidebar-width);
   --sb-width: var(--sb-expanded);
-  /* The panel's laid-out width, and how far it reaches past the moving rail edge. `100cqi` is
-     resolved where `--sb-cut` is used: the root is the nearest container. */
-  --sb-panel-width: calc(
-    var(--sb-compact) +
-    var(--sb-wide) *
-    (var(--sb-expanded) - var(--sb-compact))
-  );
-  --sb-cut: max(0px, calc(var(--sb-panel-width) - 100cqi));
   --sb-header-h: calc(var(--sb-h) + var(--prime-space-2));
   /* Header toggle: an xs icon button inline; on the edge it shrinks to 3/4 and turns round. */
   --sb-toggle: var(--prime-control-xs-height);
   --sb-edge-scale: 0.75;
   --sb-edge-ring: var(--prime-space-1);
   --sb-edge-reach: calc(var(--sb-toggle) * var(--sb-edge-scale) / 2 + var(--sb-edge-ring));
+  /* The clip reaches past the edge only beside the header, where the toggle rides it. */
+  --sb-notch: 0px;
+  --sb-notch-top: var(--prime-space-3);
+  --sb-notch-bottom: calc(var(--prime-space-3) + var(--sb-header-h));
   /* Brand logo: a square on the icon axis, never wider than the compact rail allows. */
   --sb-logo: min(calc(var(--sb-h) - var(--prime-space-2)), var(--prime-space-8));
   /* Inline action: where it sits, and how far the trail moves aside to make room for it. */
@@ -153,16 +139,26 @@
   width: var(--sb-width);
   height: 100%;
   min-height: 0;
-  clip-path: inset(0 calc(-1 * var(--sb-edge-reach)) 0 0);
+  background: var(--prime-color-bg-canvas);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% var(--sb-notch-top),
+    calc(100% + var(--sb-notch)) var(--sb-notch-top),
+    calc(100% + var(--sb-notch)) var(--sb-notch-bottom),
+    100% var(--sb-notch-bottom),
+    100% 100%,
+    0 100%
+  );
   /* The panel's own layout never feeds back into the page. */
   contain: layout style;
-  container-type: inline-size;
-  --sb-wide: 1;
-  --sb-wide-delay: 0s;
   transition:
     width var(--sb-duration) var(--sb-ease),
-    clip-path var(--sb-duration) var(--sb-ease),
-    --sb-wide 0s linear var(--sb-wide-delay);
+    clip-path var(--sb-duration) var(--sb-ease);
+}
+
+.root:has(.headerToggle) {
+  --sb-notch: var(--sb-edge-reach);
 }
 
 .root[data-mode="compact"] {
@@ -170,32 +166,27 @@
 }
 
 .root[data-mode="hidden"] {
-  --sb-width: 0;
-
-  clip-path: inset(0);
+  --sb-width: 0px;
+  --sb-notch: 0px;
 }
 
-/* The compact layout lands once the rail has arrived; an expand drops it at once. */
-.root[data-panel-mode="compact"] {
-  --sb-wide: 0;
-  --sb-wide-delay: var(--sb-duration);
-}
-
-/* Fixed width, so its rows lay out once per mode, not once per frame. */
+/* The expanded layout in every mode: rows lay out once, never per frame or per mode. */
 .panel {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-2);
-  width: var(--sb-panel-width);
-  height: 100%;
+  width: var(--sb-expanded);
   min-height: 0;
   padding-block: var(--prime-space-3);
   padding-inline: var(--sb-pad);
-  background: var(--prime-color-bg-canvas);
   color: var(--prime-color-text-primary);
   font-size: var(--sb-text);
   line-height: var(--sb-line-height);
+  contain: layout style;
 }
 
 /* --- Regions ----------------------------------------------------------------- */
@@ -249,6 +240,7 @@
 /* --- Brand ------------------------------------------------------------------- */
 
 .brand {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
@@ -257,21 +249,156 @@
   gap: var(--sb-gap);
   min-width: 0;
   /* Centres the logo in the compact rail, on the axis of the item icons. */
-  padding-inline: calc((var(--sb-compact) - 2 * var(--sb-pad) - var(--sb-logo)) / 2);
+  padding-inline: calc((var(--sb-rail-box) - var(--sb-logo)) / 2);
   border-radius: var(--sb-radius);
   color: inherit;
   text-decoration: none;
+  isolation: isolate;
+  transition: clip-path var(--sb-duration) var(--sb-ease);
 }
 
-.brand:focus-visible {
+/* Room for the inline header toggle. */
+.header:has(.headerToggle) > .brand {
+  margin-inline-end: calc(var(--sb-toggle) + var(--prime-space-1));
+}
+
+/* --- Rows: fill, ring and the rail cut ------------------------------------------ */
+
+/*
+ * Item, account and brand draw their fill (hover wash, current lift; states set `--sb-fill` /
+ * `--sb-lift`) and their focus ring on `::before`. On the rail its end edge moves to the icon box
+ * and the row clips its content there, on the rail's clock: the row is never wider than what the
+ * rail shows. Block and start sides leave room for the lift shadow.
+ */
+.item::before,
+.account::before,
+.brand::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--sb-fill, transparent);
+  box-shadow: var(--sb-lift, none);
+  pointer-events: none;
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
+    box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+:is(.item, .account, .brand):focus-visible {
+  outline: none;
+}
+
+/* Inside the row edge, so clipping and scrolling regions never cut it. */
+:is(.item, .account, .brand):focus-visible::before {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-/* Room for the inline header toggle in the expanded layout. */
-.header:has(.headerToggle) > .brand {
-  margin-inline-end: calc(var(--sb-wide) * (var(--sb-toggle) + var(--prime-space-1)));
+/*
+ * Only a row that shows a fill or a ring is cut — and only its cut travels. A plain row is cut by
+ * the rail edge itself while its text fades; its (invisible) fill box lands on the icon box at
+ * once, ready for a hover. Fewer running transitions: fewer layers and transition events per move.
+ */
+.root:not([data-off-canvas]) :is(.item, .account, .brand) {
+  clip-path: inset(calc(-1 * var(--prime-space-1)));
 }
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) :is(.item, .account, .brand)::before {
+  inset-inline-end: calc(100% - var(--sb-rail-box));
+}
+
+/* The brand is always cut: beside the header the clip reaches past the edge for the toggle. */
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .brand,
+.root[data-panel-mode="compact"]:not([data-off-canvas])
+  :is(.item, .account):is(
+    :hover,
+    :active,
+    :focus-visible,
+    [aria-current="page"],
+    [data-state="active"],
+    [aria-expanded="true"],
+    [data-active-path]
+  ) {
+  clip-path: inset(
+    calc(-1 * var(--prime-space-1)) calc(100% - var(--sb-rail-box)) calc(-1 * var(--prime-space-1))
+      calc(-1 * var(--prime-space-1))
+  );
+}
+
+/* A filled row: its fill and its cut travel with the edge. */
+.root:not([data-off-canvas])
+:is(.item, .account, .brand):is(
+  :hover,
+  :active,
+  :focus-visible,
+  [aria-current="page"],
+  [data-state="active"],
+  [aria-expanded="true"],
+  [data-active-path]
+)::before {
+  transition:
+    inset-inline-end var(--sb-duration) var(--sb-ease),
+    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
+    box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+/*
+ * Text fades on the rail's clock, both ways, while the cut closes in. Glyphs fade through their
+ * fill (`-webkit-text-fill-color` → transparent; it follows `color`, so hover colours still apply):
+ * a paint-only change. An `opacity` transition would promote every label to its own compositor
+ * layer — on a long menu that is dozens of layers re-layerized every frame, which measurably halved
+ * the frame rate under CPU load. Chevrons fade the same way through their `stroke`. Only boxed
+ * trailing parts (a Badge count, a key hint, a trailing icon) are few and fade with `opacity`.
+ */
+.label,
+.groupText,
+.brandName,
+.brandDescription,
+.accountName,
+.accountDescription,
+.countPlain {
+  -webkit-text-fill-color: currentcolor;
+}
+
+.label,
+.groupText,
+.brandName,
+.brandDescription,
+.accountDescription,
+.countPlain {
+  transition: -webkit-text-fill-color var(--sb-duration) var(--sb-ease);
+}
+
+.trail > :not(.dot, .countPlain) {
+  transition: opacity var(--sb-duration) var(--sb-ease);
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas])
+  :is(
+    .label,
+    .groupText,
+    .brandName,
+    .brandDescription,
+    .accountName,
+    .accountDescription,
+    .countPlain
+  ) {
+  -webkit-text-fill-color: transparent;
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .trail > :not(.dot, .countPlain) {
+  opacity: 0;
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas])
+  :is(.chevron, .groupChevron, .accountChevron) {
+  stroke: transparent;
+}
+
+/* --- Brand parts --------------------------------------------------------------- */
 
 .brandLogo {
   display: inline-flex;
@@ -333,7 +460,13 @@
   gap: 0;
 }
 
+/*
+ * A constant height: nothing below a heading ever moves. On the rail the text and chevron fade
+ * out while a short hairline on the icon axis fades in — the heading becomes a group separator
+ * instead of an empty row.
+ */
 .groupLabel {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex: none;
@@ -341,39 +474,14 @@
   gap: var(--sb-gap);
   width: 100%;
   min-width: 0;
-  /*
-   * A constant height: nothing below a heading ever moves. On the rail the text fades out (its
-   * colour, so the chevron goes with it) while a short hairline on the icon axis fades in — the
-   * heading becomes a group separator instead of an empty row. Both ride the element's own
-   * `--sb-reveal`.
-   */
   height: var(--prime-panel-group-label-height);
   margin: 0;
   padding-inline: var(--sb-item-pad);
-  color: color-mix(
-    in srgb,
-    var(--prime-color-text-muted) calc(var(--sb-reveal) * 100%),
-    transparent
-  );
-  background-image: linear-gradient(
-    color-mix(
-      in srgb,
-      var(--prime-color-border-default) calc((1 - var(--sb-reveal)) * 100%),
-      transparent
-    ),
-    color-mix(
-      in srgb,
-      var(--prime-color-border-default) calc((1 - var(--sb-reveal)) * 100%),
-      transparent
-    )
-  );
-  background-repeat: no-repeat;
-  background-size: var(--sb-icon) var(--prime-border-width);
-  background-position: calc(var(--sb-item-pad)) center;
   overflow: hidden;
   border: 0;
   border-radius: var(--sb-radius);
   background-color: transparent;
+  color: var(--prime-color-text-muted);
   font: inherit;
   font-size: var(--prime-text-caption-size);
   line-height: var(--prime-text-caption-line-height);
@@ -381,7 +489,23 @@
   letter-spacing: var(--prime-text-caption-tracking);
   text-align: start;
   white-space: nowrap;
-  transition: --sb-reveal var(--sb-duration) var(--sb-ease);
+}
+
+/* The rail separator. */
+.groupLabel::after {
+  content: "";
+  position: absolute;
+  inset-block-start: calc(50% - var(--prime-border-width) / 2);
+  inset-inline-start: var(--sb-item-pad);
+  width: var(--sb-icon);
+  height: var(--prime-border-width);
+  background-color: transparent;
+  pointer-events: none;
+  transition: background-color var(--sb-duration) var(--sb-ease);
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupLabel::after {
+  background-color: var(--prime-color-border-default);
 }
 
 .groupText {
@@ -394,7 +518,6 @@
 .groupTrigger {
   cursor: pointer;
   transition:
-    --sb-reveal var(--sb-duration) var(--sb-ease),
     background-color var(--prime-motion-duration-xfast) var(--sb-ease),
     color var(--prime-motion-duration-xfast) var(--sb-ease);
 }
@@ -419,9 +542,11 @@
   flex: none;
   width: var(--prime-icon-xs);
   height: var(--prime-icon-xs);
-  /* The heading's colour, so it fades with the text on the rail. */
   color: inherit;
-  transition: rotate var(--prime-motion-duration-base) var(--sb-ease);
+  stroke: currentcolor;
+  transition:
+    rotate var(--prime-motion-duration-base) var(--sb-ease),
+    stroke var(--sb-duration) var(--sb-ease);
 }
 
 .groupTrigger:hover .groupChevron {
@@ -522,33 +647,8 @@
   isolation: isolate;
   transition:
     color var(--prime-motion-duration-xfast) var(--sb-ease),
-    transform var(--prime-motion-duration-fast) var(--sb-ease);
-}
-
-/*
- * Row fill: hover wash, current lift. Drawn by `::before` (states set `--sb-fill` / `--sb-lift`),
- * so on the rail it can end at the moving edge with its radius while the row keeps its layout.
- */
-.item::before,
-.account::before {
-  content: "";
-  position: absolute;
-  inset-block: 0;
-  inset-inline: 0 var(--sb-row-cut, 0px);
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--sb-fill, transparent);
-  box-shadow: var(--sb-lift, none);
-  pointer-events: none;
-  transition:
-    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
-    box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
-}
-
-.item:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  /* Full-width rows inside clipping/scrolling regions: the ring is drawn inside the edge. */
-  outline-offset: var(--prime-focus-offset-inset);
+    transform var(--prime-motion-duration-fast) var(--sb-ease),
+    clip-path var(--sb-duration) var(--sb-ease);
 }
 
 .item:hover,
@@ -584,41 +684,6 @@
 
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
-}
-
-/*
- * On the rail: in the compact layout a row clips what does not fit at its own end edge (the
- * value changes once per mode, never per frame). Block and start sides leave room for the lift
- * shadow and focus rings.
- */
-.root:not([data-off-canvas]) :is(.item, .account) {
-  clip-path: inset(
-    calc(-1 * var(--prime-space-1)) calc(var(--sb-wide) * -1 * var(--sb-expanded))
-      calc(-1 * var(--prime-space-1)) calc(-1 * var(--prime-space-1))
-  );
-}
-
-/*
- * Mid-motion the panel is wider than the rail; text is cut by the rail edge itself. A row with a
- * fill (current, on the active path, hovered, open) is cut where the fill ends: its fill and text
- * stop at the moving edge with the row radius (`--sb-cut` is 0 at rest). Only these few rows
- * track the edge per frame.
- */
-.root:not([data-off-canvas])
-:is(.item, .account):is(
-  :hover,
-  :active,
-  [aria-current="page"],
-  [data-state="active"],
-  [aria-expanded="true"],
-  [data-active-path]
-) {
-  --sb-row-cut: var(--sb-cut);
-
-  clip-path: inset(
-    calc(-1 * var(--prime-space-1)) var(--sb-cut) calc(-1 * var(--prime-space-1))
-      calc(-1 * var(--prime-space-1))
-  );
 }
 
 .icon {
@@ -686,8 +751,8 @@
 
 /*
  * `Badge.Dot` (l tier, 8px) on the icon corner, cut out of the icon by a canvas ring: it stands for
- * a coloured count on the rail and fades in as the count is cut away by the edge. `[data-size]`
- * outranks Badge's own `.dot` display whatever order the modules load in.
+ * a coloured count on the rail and fades in while the count fades out. `[data-size]` outranks
+ * Badge's own `.dot` display whatever order the modules load in.
  */
 .dot[data-size] {
   position: absolute;
@@ -695,9 +760,17 @@
   inset-inline-start: calc(var(--sb-item-pad) + var(--sb-icon) - var(--prime-space-1));
   display: inline-flex;
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-bg-canvas);
-  opacity: calc(1 - var(--sb-reveal));
-  scale: calc(1 - var(--sb-reveal) * (1 - var(--sb-edge-scale)));
+  opacity: 0;
+  scale: var(--sb-edge-scale);
   pointer-events: none;
+  transition:
+    opacity var(--sb-duration) var(--sb-ease),
+    scale var(--sb-duration) var(--sb-ease);
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .dot[data-size] {
+  opacity: 1;
+  scale: 1;
 }
 
 .shortcut {
@@ -712,8 +785,9 @@
   width: var(--sb-icon);
   height: var(--sb-icon);
   color: var(--prime-color-text-muted);
+  stroke: currentcolor;
   transition:
-    --sb-reveal var(--sb-duration) var(--sb-ease),
+    stroke var(--sb-duration) var(--sb-ease),
     rotate var(--prime-motion-duration-base) var(--sb-ease),
     color var(--prime-motion-duration-xfast) var(--sb-ease);
 }
@@ -724,39 +798,6 @@
 
 .item[aria-expanded="true"] .chevron {
   rotate: 180deg;
-}
-
-/* Text fades on the rail's clock, both ways, while the edge cuts it. */
-.label,
-.trail > :not(.dot),
-.item .chevron,
-.brandText,
-.accountText,
-.accountChevron {
-  opacity: var(--sb-reveal);
-}
-
-.label,
-.item .trail > *,
-.brandText,
-.accountText,
-.accountChevron {
-  transition: --sb-reveal var(--sb-duration) var(--sb-ease);
-}
-
-/* Parts that turn compact take the rail's value; each animates its own copy on the same clock. */
-.root[data-panel-mode="compact"]:not([data-off-canvas])
-:is(
-  .label,
-  .trail > *,
-  .chevron,
-  .groupLabel,
-  .brandText,
-  .accountText,
-  .accountChevron,
-  .account
-) {
-  --sb-reveal: 0;
 }
 
 /* --- Inline action -------------------------------------------------------------- */
@@ -899,8 +940,8 @@
 
 /*
  * Its own card-like row: the avatar sits in an even frame — the inset before it, the gap to the
- * text and the air above and below are one value. On the rail the start inset becomes the one
- * that centres the avatar on the icon axis, on the rail's clock.
+ * text and the air above and below are one value. On the rail the avatar (and the fading text)
+ * slide by the difference to the inset that centres it on the icon axis, on the rail's clock.
  */
 .account {
   position: relative;
@@ -915,12 +956,6 @@
   margin: 0;
   padding-block: 0;
   padding-inline: var(--sb-account-inset);
-  /* Rail: the inset that centres the avatar on the icon axis. */
-  padding-inline-start: calc(
-    var(--sb-account-rail-inset) +
-    var(--sb-reveal) *
-    (var(--sb-account-inset) - var(--sb-account-rail-inset))
-  );
   border: 0;
   border-radius: var(--sb-radius);
   background: transparent;
@@ -931,8 +966,8 @@
   cursor: pointer;
   isolation: isolate;
   transition:
-    --sb-reveal var(--sb-duration) var(--sb-ease),
-    transform var(--prime-motion-duration-fast) var(--sb-ease);
+    transform var(--prime-motion-duration-fast) var(--sb-ease),
+    clip-path var(--sb-duration) var(--sb-ease);
 }
 
 .account:hover,
@@ -946,16 +981,12 @@
   transform: scale(var(--prime-motion-press-scale));
 }
 
-.account:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
 .accountAvatar {
   --avatar-slot-size: var(--sb-avatar);
 
   display: inline-flex;
   flex: none;
+  transition: translate var(--sb-duration) var(--sb-ease);
 }
 
 .accountText {
@@ -963,6 +994,11 @@
   flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
+  transition: translate var(--sb-duration) var(--sb-ease);
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) :is(.accountAvatar, .accountText) {
+  translate: calc(var(--sb-account-rail-inset) - var(--sb-account-inset)) 0;
 }
 
 /* Same type and colour as an item label (a white name reads larger than the rows above it). */
@@ -971,7 +1007,9 @@
   font-size: var(--sb-text);
   line-height: var(--sb-line-height);
   font-weight: var(--prime-font-weight-medium);
-  transition: color var(--prime-motion-duration-xfast) var(--sb-ease);
+  transition:
+    color var(--prime-motion-duration-xfast) var(--sb-ease),
+    -webkit-text-fill-color var(--sb-duration) var(--sb-ease);
 }
 
 .account:hover .accountName,
@@ -984,6 +1022,8 @@
   width: var(--sb-icon);
   height: var(--sb-icon);
   color: var(--prime-color-text-muted);
+  stroke: currentcolor;
+  transition: stroke var(--sb-duration) var(--sb-ease);
 }
 
 /* --- Header toggle ------------------------------------------------------------------ */
@@ -991,7 +1031,7 @@
 /*
  * One kit Button for both places. Expanded: a ghost icon button at the end of the header row.
  * Compact: it rides the rail edge — moved half out, 3/4 size, round, cut out of the content by a
- * canvas ring; the chevrons turn to point out. It is placed from the rail's start by `translate`
+ * canvas ring; the chevrons turn to point out. It is placed from the panel's start by `translate`
  * to where the edge will be, with the rail's duration and easing, so it travels exactly with the
  * edge and never needs a layout per frame. Hidden, it stays at the place of the last visible mode
  * and fades; coming back from hidden it starts at its final place and fades in as the edge
@@ -1074,11 +1114,6 @@
 
 /* --- Compact (desktop only) ---------------------------------------------------- */
 
-/*
- * The compact look follows `data-panel-mode` (hidden keeps the last visible one): text, headings,
- * dots and the account inset ride `--sb-reveal`; state changes below are instant or colour-only.
- */
-
 /* Inline actions have no place on the rail. */
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .action {
   visibility: hidden;
@@ -1114,12 +1149,10 @@
 }
 
 .root[data-off-canvas] {
-  --sb-wide: 1;
-
   width: 0;
+  background: none;
   clip-path: none;
   contain: none;
-  container-type: normal;
   transition: none;
 }
 
@@ -1136,6 +1169,7 @@
   z-index: var(--prime-z-drawer);
   width: min(var(--sb-expanded), calc(100% - var(--prime-space-12)));
   min-width: 0;
+  background: var(--prime-color-bg-canvas);
   box-shadow: var(--prime-shadow-modal);
   transform: translateX(-100%);
   visibility: hidden;

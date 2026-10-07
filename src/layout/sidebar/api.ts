@@ -100,8 +100,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Brand",
-      en: "`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays (a link shows its name as a tooltip).",
-      ru: "Блок продукта: `Sidebar.BrandLogo`, название и приглушённая строка; ссылка при `href`, единственный дочерний элемент при `asChild`, иначе `<div>`. В компактном режиме остаётся логотип (у ссылки — подсказка с названием).",
+      en: "`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays, without a tooltip (it would cover the edge toggle); the faded name still names the link.",
+      ru: "Блок продукта: `Sidebar.BrandLogo`, название и приглушённая строка; ссылка при `href`, единственный дочерний элемент при `asChild`, иначе `<div>`. В компактном режиме остаётся логотип, без подсказки (она закрыла бы кнопку на краю); скрытое название по-прежнему называет ссылку.",
       props: [
         {
           name: "description",

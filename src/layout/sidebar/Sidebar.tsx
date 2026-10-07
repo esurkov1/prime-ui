@@ -9,6 +9,7 @@ import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useOverlayModal } from "@/hooks/useOverlayModal";
 import { Icon } from "@/icons";
+import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -47,6 +48,9 @@ const MOBILE_QUERY = "(max-width: 767.98px)";
 /** Hover intent before a compact flyout opens, and the grace period to travel into it. */
 const FLYOUT_OPEN_DELAY_MS = 120;
 const FLYOUT_CLOSE_DELAY_MS = 300;
+
+/** Rows the rail clips to their icon box: their layers anchor to the visible part. */
+const RAIL_ROWS = `.${styles.item}, .${styles.account}, .${styles.brand}`;
 
 /** One tier down: inline actions and counters inside an item row. */
 const TIER_DOWN: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "s", l: "m", xl: "l" };
@@ -215,10 +219,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
     return () => cancelAnimationFrame(id);
   }, []);
 
-  /*
-   * While hidden the panel keeps the width of the last visible mode, so it clips out (and back
-   * in) as one piece instead of reflowing its items.
-   */
+  // While hidden the panel keeps the look of the last visible mode: it clips out (and back in) as one piece.
   const lastVisibleRef = React.useRef<Exclude<SidebarMode, "hidden">>(
     mode === "hidden" ? "expanded" : mode,
   );
@@ -234,6 +235,27 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
 
   const close = React.useCallback(() => setOpen(false), [setOpen]);
   const panelRef = useOverlayModal<HTMLElement>(open, close);
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const mergedRootRef = React.useMemo(() => mergeRefs<HTMLDivElement>(ref, rootRef), [ref]);
+
+  /*
+   * Rows keep their full width on the rail and are clipped to the icon box, so a row's border box
+   * reaches far past the rail edge. Layers of a row (compact tooltips, the sub-list flyout, a
+   * Dropdown around the account) anchor to the visible part instead: the row up to the rail edge
+   * less the rail padding — the icon box on the rail, the whole row when expanded, the moving cut
+   * mid-motion.
+   */
+  const anchorRect = React.useCallback<AnchorRectResolver>((anchor, rect) => {
+    const root = rootRef.current;
+    if (!root || !root.contains(anchor) || !anchor.matches(RAIL_ROWS)) return rect;
+    const nav = root.querySelector(":scope > nav");
+    const pad = nav ? Number.parseFloat(getComputedStyle(nav).paddingLeft) || 0 : 0;
+    const edge = root.getBoundingClientRect().right - pad;
+    if (rect.right <= edge) return rect;
+    const right = Math.max(rect.left, edge);
+    const { top, bottom, left, height } = rect;
+    return { top, bottom, left, right, width: right - left, height };
+  }, []);
 
   const toggle = React.useCallback(() => {
     if (offCanvas) {
@@ -254,7 +276,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
     <SidebarProvider value={context}>
       <div
         {...rest}
-        ref={ref}
+        ref={mergedRootRef}
         className={cx(styles.root, className)}
         {...toDataAttributes({
           size,
@@ -282,7 +304,9 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
           aria-label={labels.navigation}
           inert={(offCanvas && !open) || (!offCanvas && mode === "hidden") || undefined}
         >
-          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+          <AnchorRectProvider value={offCanvas ? null : anchorRect}>
+            <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+          </AnchorRectProvider>
         </nav>
       </div>
     </SidebarProvider>
@@ -1171,26 +1195,24 @@ const SidebarBrand = React.forwardRef<HTMLElement, SidebarBrandProps>(function S
     },
   };
 
+  // No rail tooltip: the logo speaks for itself and a tooltip would cover the edge toggle. The name
+  // stays in the link (faded, not removed), so it keeps its accessible name in every mode.
   if (child) {
     return (
-      <CompactTooltip text={textOf(name).trim()}>
-        <Slot {...shared} ref={ref}>
-          {React.cloneElement(child, undefined, content)}
-        </Slot>
-      </CompactTooltip>
+      <Slot {...shared} ref={ref}>
+        {React.cloneElement(child, undefined, content)}
+      </Slot>
     );
   }
   if (href !== undefined) {
     return (
-      <CompactTooltip text={textOf(name).trim()}>
-        <a
-          {...(shared as React.ComponentPropsWithoutRef<"a">)}
-          ref={ref as React.Ref<HTMLAnchorElement>}
-          href={href}
-        >
-          {content}
-        </a>
-      </CompactTooltip>
+      <a
+        {...(shared as React.ComponentPropsWithoutRef<"a">)}
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={href}
+      >
+        {content}
+      </a>
     );
   }
   return (
