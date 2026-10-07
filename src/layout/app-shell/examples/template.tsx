@@ -1,29 +1,40 @@
-/** Root, nav, header and main in one component; inside a router main scrolls to the top on every route change — `AppShell.Template`. */
+/** Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template` with `scrollResetKey`. */
 import { AppShell, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
+const PAGES = [
+  { id: "mailings", label: "Рассылки", icon: "field.email", text: "3 активные кампании." },
+  { id: "calendar", label: "Календарь", icon: "field.calendar", text: "5 событий на неделе." },
+] as const;
+
 export default function AppShellTemplateExample() {
+  // In a router app pass the pathname: `scrollResetKey={useLocation().pathname}`.
+  const [pageId, setPageId] = React.useState<(typeof PAGES)[number]["id"]>("mailings");
+  const page = PAGES.find((item) => item.id === pageId) ?? PAGES[0];
+
   return (
     <div className={styles.stage}>
       <AppShell.Template
         fillViewport
         className={styles.shell}
+        scrollResetKey={pageId}
         nav={
           <Sidebar.Root offCanvas="never">
             <Sidebar.Content>
-              <Sidebar.Item current>
-                <Sidebar.ItemIcon>
-                  <Icon name="field.email" />
-                </Sidebar.ItemIcon>
-                Рассылки
-              </Sidebar.Item>
-              <Sidebar.Item>
-                <Sidebar.ItemIcon>
-                  <Icon name="field.calendar" />
-                </Sidebar.ItemIcon>
-                Календарь
-              </Sidebar.Item>
+              {PAGES.map((item) => (
+                <Sidebar.Item
+                  key={item.id}
+                  current={item.id === pageId}
+                  onClick={() => setPageId(item.id)}
+                >
+                  <Sidebar.ItemIcon>
+                    <Icon name={item.icon} />
+                  </Sidebar.ItemIcon>
+                  {item.label}
+                </Sidebar.Item>
+              ))}
             </Sidebar.Content>
           </Sidebar.Root>
         }
@@ -32,11 +43,9 @@ export default function AppShellTemplateExample() {
           <PageContent.Header>
             {/* In a real app this is PageContent.Title (the page h1). */}
             <Typography as="h2" variant="heading-m">
-              Рассылки
+              {page.label}
             </Typography>
-            <PageContent.Description>
-              3 активные кампании, следующая — в пятницу.
-            </PageContent.Description>
+            <PageContent.Description>{page.text}</PageContent.Description>
           </PageContent.Header>
         </PageContent.Section>
       </AppShell.Template>

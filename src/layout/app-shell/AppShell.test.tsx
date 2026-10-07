@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
 import { AppShell } from "./AppShell";
@@ -52,27 +51,47 @@ describe("AppShell", () => {
 
   it("Template composes nav, optional header and main", () => {
     const { rerender } = render(
-      <MemoryRouter>
-        <AppShell.Template nav={<span>sidebar</span>} header={<span>Crumbs</span>}>
-          <span>page</span>
-        </AppShell.Template>
-      </MemoryRouter>,
+      <AppShell.Template nav={<span>sidebar</span>} header={<span>Crumbs</span>}>
+        <span>page</span>
+      </AppShell.Template>,
     );
     expect(screen.getByText("sidebar")).toBeInTheDocument();
     expect(screen.getByRole("banner")).toHaveTextContent("Crumbs");
     expect(screen.getByRole("main")).toHaveTextContent("page");
 
     rerender(
-      <MemoryRouter>
-        <AppShell.Template nav={<span>sidebar</span>}>
-          <span>page</span>
-        </AppShell.Template>
-      </MemoryRouter>,
+      <AppShell.Template nav={<span>sidebar</span>}>
+        <span>page</span>
+      </AppShell.Template>,
     );
     expect(screen.queryByRole("banner")).not.toBeInTheDocument();
   });
 
-  it("Template forwards its ref to main and works outside a router", () => {
+  it("Template scrolls main to the top when scrollResetKey changes", () => {
+    const { rerender } = render(
+      <AppShell.Template scrollResetKey="/a">
+        <span>page</span>
+      </AppShell.Template>,
+    );
+    const main = screen.getByRole("main");
+    main.scrollTop = 120;
+
+    rerender(
+      <AppShell.Template scrollResetKey="/a">
+        <span>page</span>
+      </AppShell.Template>,
+    );
+    expect(main.scrollTop).toBe(120);
+
+    rerender(
+      <AppShell.Template scrollResetKey="/b">
+        <span>page</span>
+      </AppShell.Template>,
+    );
+    expect(main.scrollTop).toBe(0);
+  });
+
+  it("Template forwards its ref to main", () => {
     const ref = { current: null as HTMLElement | null };
     render(
       <AppShell.Template ref={ref} mainProps={{ id: "content" }}>

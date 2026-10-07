@@ -25,7 +25,7 @@ export const page: ComponentPageConfig = {
       scenario: "template",
       title: "Шаблон",
       description:
-        "Root, навигация, шапка и main одним компонентом; внутри роутера main прокручивается наверх при каждой смене маршрута — `AppShell.Template`.",
+        "Root, навигация, шапка и main одним компонентом; main прокручивается наверх при каждой смене страницы — `AppShell.Template` со `scrollResetKey`.",
     },
   ],
   api,

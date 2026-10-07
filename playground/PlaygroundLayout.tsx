@@ -31,61 +31,59 @@ export function PlaygroundLayout() {
   const { pathname } = useLocation();
   const [navOpen, setNavOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
-  const mainRef = React.useRef<HTMLElement>(null);
   const narrow = useNarrowViewport();
 
   usePlaygroundSearchHotkey(setSearchOpen);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to top on route change
-  React.useLayoutEffect(() => {
-    mainRef.current?.scrollTo(0, 0);
-  }, [pathname]);
 
   const page = PLAYGROUND_PAGES.find((p) => pageRoute(p.segment) === pathname);
 
   return (
     <>
-      <AppShell.Root fillViewport>
-        <AppShell.Nav>
-          {/* The sidebar owns its mode: toggling it re-renders the rail, not the page. */}
+      <AppShell.Template
+        fillViewport
+        scrollResetKey={pathname}
+        mainProps={{ id: "playground-main", tabIndex: -1 }}
+        nav={
+          /* The sidebar owns its mode: toggling it re-renders the rail, not the page. */
           <PlaygroundChromeSidebar
             open={navOpen}
             onOpenChange={setNavOpen}
             onSearch={() => setSearchOpen(true)}
           />
-        </AppShell.Nav>
-        {narrow ? (
-          <AppShell.Header className="playgroundMobileBar">
-            <Button.Root
-              variant="ghost"
-              tone="neutral"
-              aria-label="Открыть навигацию"
-              aria-expanded={navOpen}
-              onClick={() => setNavOpen(true)}
-            >
-              <Button.Icon>
-                <Menu />
-              </Button.Icon>
-            </Button.Root>
-            <Typography as="span" variant="title-m" truncate className="playgroundMobileTitle">
-              {page?.label ?? "Prime UI"}
-            </Typography>
-            <Button.Root
-              variant="ghost"
-              tone="neutral"
-              aria-label="Поиск"
-              onClick={() => setSearchOpen(true)}
-            >
-              <Button.Icon>
-                <Search />
-              </Button.Icon>
-            </Button.Root>
-          </AppShell.Header>
-        ) : null}
-        <AppShell.Main ref={mainRef} id="playground-main" tabIndex={-1}>
-          <Outlet />
-        </AppShell.Main>
-      </AppShell.Root>
+        }
+        header={
+          narrow ? (
+            <div className="playgroundMobileBar">
+              <Button.Root
+                variant="ghost"
+                tone="neutral"
+                aria-label="Открыть навигацию"
+                aria-expanded={navOpen}
+                onClick={() => setNavOpen(true)}
+              >
+                <Button.Icon>
+                  <Menu />
+                </Button.Icon>
+              </Button.Root>
+              <Typography as="span" variant="title-m" truncate className="playgroundMobileTitle">
+                {page?.label ?? "Prime UI"}
+              </Typography>
+              <Button.Root
+                variant="ghost"
+                tone="neutral"
+                aria-label="Поиск"
+                onClick={() => setSearchOpen(true)}
+              >
+                <Button.Icon>
+                  <Search />
+                </Button.Icon>
+              </Button.Root>
+            </div>
+          ) : null
+        }
+      >
+        <Outlet />
+      </AppShell.Template>
       <PlaygroundSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </>
   );

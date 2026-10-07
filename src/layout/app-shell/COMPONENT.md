@@ -35,7 +35,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### AppShell.Root
-`forwardRef` → `HTMLDivElement`. Grid of the nav column (canvas) and the content panel (surface); every child that is not `AppShell.Nav` goes into the panel.
+`ref` → `HTMLDivElement`. Grid of the nav column (canvas) and the content panel (surface); every child that is not `AppShell.Nav` goes into the panel.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -50,14 +50,14 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (usually `Sidebar.Root`), `className` and the other div attributes. |
 
 ### AppShell.Header
-`forwardRef` → `HTMLElement`. Sticky `<header>` row of the panel for breadcrumbs, search and actions.
+`ref` → `HTMLElement`. Sticky `<header>` row of the panel for breadcrumbs, search and actions.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes. |
 
 ### AppShell.Main
-`forwardRef` → `HTMLElement`. The `<main>` with the canonical gutters: a vertical `ScrollContainer`.
+`ref` → `HTMLElement`. The `<main>` with the canonical gutters: a vertical `ScrollContainer`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -65,13 +65,14 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes. |
 
 ### AppShell.Template
-`forwardRef` → the `<main>`. Root + Nav + Header + Main in one; inside a router main scrolls to the top on route change.
+`ref` → the `<main>`. Root + Nav + Header + Main in one; main scrolls to the top when `scrollResetKey` changes.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `nav` | `ReactNode` | — | Navigation column content; without it the panel takes the full width. |
 | `header` | `ReactNode` | — | Header content; no header row when omitted. |
 | `mainProps` | `Omit<AppShellMainProps, "children">` | — | Props for Main (e.g. `contentWidth`). |
+| `scrollResetKey` | `unknown` | — | Main scrolls back to the top whenever this value changes; pass the router pathname. |
 | `children` | `ReactNode` | — | Page content inside Main. |
 | `…rest` | `Omit<AppShellRootProps, "children">` | — | Root props: `fillViewport`, `className` and the div attributes. |
 
@@ -129,13 +130,14 @@ No `labels`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | The app frame: Sidebar in the nav column, breadcrumbs in the sticky header, the page in main; only main scrolls — `fillViewport`. |
 | [contained.tsx](examples/contained.tsx) | A shell without navigation whose main column is centred and capped for long reads — `contentWidth`. |
-| [template.tsx](examples/template.tsx) | Root, nav, header and main in one component; inside a router main scrolls to the top on every route change — `AppShell.Template`. |
+| [template.tsx](examples/template.tsx) | Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template` with `scrollResetKey`. |
 
 ## Mistakes
 - Adding padding around the page content → Main already has the gutters.
 - Wrapping Main content in another scroll container → Main scrolls (with `fillViewport`) or the document does.
 - A border or shadow between nav and panel → the fill change is the boundary.
 - Putting the Sidebar directly in Root without `AppShell.Nav` → it lands inside the content panel.
+- `AppShell.Template` in a router app without `scrollResetKey` → a new page opens at the old scroll position; pass the pathname.
 
 ## Related
 - **Built from:** [ScrollContainer](../../components/scroll-container/COMPONENT.md)
