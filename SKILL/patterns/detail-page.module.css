@@ -1,0 +1,90 @@
+/* Detail page: two columns that wrap into one on narrow screens, no breakpoints. */
+
+/* Status badge and due date in the header description, one line. */
+.status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+/* Main column grows; the side column keeps ~18rem and drops below once main would get < 30rem. */
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--prime-space-8) var(--prime-space-6);
+}
+
+.main {
+  display: grid;
+  flex: 999 1 calc(var(--prime-space-24) * 5);
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.aside {
+  display: grid;
+  flex: 1 1 calc(var(--prime-space-24) * 3);
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+/* Totals under the table, aligned with its numeric column. */
+.totals {
+  display: grid;
+  gap: var(--prime-space-2);
+  justify-self: end;
+  width: min(100%, calc(var(--prime-space-24) * 3));
+  margin: 0;
+  padding-inline: var(--prime-space-4);
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+}
+
+.totalRow dd {
+  margin: 0;
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Client card: who it is, then the facts as label → value pairs. */
+.client {
+  display: grid;
+  gap: var(--prime-space-5);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.personText {
+  display: grid;
+  min-width: 0;
+}
+
+.facts {
+  display: grid;
+  gap: var(--prime-space-3);
+  margin: 0;
+}
+
+.fact {
+  display: grid;
+  gap: var(--prime-space-1);
+}
+
+.fact dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

@@ -29,6 +29,7 @@
     "playground/**/*.ts",
     "playground/**/*.tsx",
     "playground/**/*.d.ts",
+    "SKILL/patterns/*.tsx",
     "vitest.config.ts"
   ]
 }

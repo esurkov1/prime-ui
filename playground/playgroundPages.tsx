@@ -2,6 +2,7 @@ import {
   AlignLeft,
   Award,
   Bell,
+  Blocks,
   Bookmark,
   BookOpen,
   Calendar,
@@ -10,11 +11,13 @@ import {
   ChevronsDownUp,
   ChevronsLeftRight,
   ChevronsRight,
+  CircleDashed,
   CircleDot,
   CircleGauge,
   CircleHelp,
   Code2,
   Command,
+  FileText,
   Focus,
   Frame,
   Gauge,
@@ -45,11 +48,13 @@ import {
   Palette,
   PanelLeft,
   PanelRight,
+  PanelRightOpen,
   PanelTop,
   Pipette,
   Rows3,
   Ruler,
   ScrollText,
+  Settings,
   SlidersHorizontal,
   Space,
   SquareRoundCorner,
@@ -65,6 +70,9 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 
+import CompositionPage from "./composition/CompositionPage";
+import { PatternPage } from "./composition/PatternPage";
+import { COMPOSITION_PATTERNS, type CompositionPattern } from "./composition/patterns";
 import ColorsPage from "./foundation/ColorsPage";
 import ElevationPage from "./foundation/ElevationPage";
 import FocusPage from "./foundation/FocusPage";
@@ -142,6 +150,7 @@ import TooltipSection from "./sections/TooltipSection";
  * - **navigation** — moving between views, places and steps.
  * - **overlays** — floating layers, from tooltip to modal surfaces.
  * - **layout** — app frame, page regions, disclosure, dividers, scrolling.
+ * - **composition** — whole screens built from the kit (`SKILL/patterns/`) and the rules behind them.
  * - **infrastructure** — demo tooling, not product UI.
  */
 export type PlaygroundCategoryId =
@@ -154,6 +163,7 @@ export type PlaygroundCategoryId =
   | "navigation"
   | "overlays"
   | "layout"
+  | "composition"
   | "infrastructure";
 
 export type PlaygroundCategoryMeta = { id: PlaygroundCategoryId; label: string };
@@ -168,6 +178,7 @@ export const PLAYGROUND_NAV_CATEGORIES: PlaygroundCategoryMeta[] = [
   { id: "navigation", label: "Навигация" },
   { id: "overlays", label: "Оверлеи" },
   { id: "layout", label: "Раскладка" },
+  { id: "composition", label: "Композиция" },
   { id: "infrastructure", label: "Инфраструктура" },
 ];
 
@@ -182,6 +193,30 @@ type PageDef = {
   icon: LucideIcon;
   Page: ComponentType;
 };
+
+const PATTERN_ICONS: Record<string, LucideIcon> = {
+  "list-page": Table,
+  "detail-page": FileText,
+  "settings-page": Settings,
+  "form-drawer": PanelRightOpen,
+  dashboard: LayoutDashboard,
+  "screen-states": CircleDashed,
+};
+
+/** A composition page: the pattern file is the source, `patterns.ts` adds the page text. */
+function patternPage(pattern: CompositionPattern): PageDef {
+  function Page() {
+    return <PatternPage pattern={pattern} />;
+  }
+  return {
+    segment: pattern.segment,
+    label: pattern.label,
+    description: pattern.title,
+    keywords: pattern.keywords,
+    icon: PATTERN_ICONS[pattern.file] ?? LayoutTemplate,
+    Page,
+  };
+}
 
 /** Order inside a category is by meaning: related components side by side, common ones first. */
 const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
@@ -741,6 +776,17 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       icon: GripVertical,
       Page: DndSection,
     },
+  ],
+  composition: [
+    {
+      segment: "composition",
+      label: "Principles",
+      description: "Как собрать экран из кита: каркас, ритм, иерархия, действия, состояния",
+      keywords: ["композиция", "экран", "страница", "правила", "ритм", "сетка", "layout", "screen"],
+      icon: Blocks,
+      Page: CompositionPage,
+    },
+    ...COMPOSITION_PATTERNS.map(patternPage),
   ],
   infrastructure: [
     {

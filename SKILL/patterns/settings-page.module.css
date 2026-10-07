@@ -1,0 +1,51 @@
+/* Settings page: heading column + panel per section; wraps into one column without breakpoints. */
+
+.section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--prime-space-4) var(--prime-space-10);
+}
+
+/* ~16rem of heading and lead text; drops above the panel once the panel would get < 30rem. */
+.lead {
+  display: grid;
+  flex: 1 1 calc(var(--prime-space-16) * 4);
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.panel {
+  flex: 999 1 calc(var(--prime-space-24) * 5);
+  min-width: 0;
+}
+
+/* Field → field 20. */
+.fields {
+  display: grid;
+  gap: var(--prime-space-5);
+}
+
+/* Two short related fields side by side when there is room; tops aligned. */
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 3)), 1fr));
+  align-items: start;
+  gap: var(--prime-space-5);
+}
+
+/* Danger zone row: text takes the room, the button stays at the end and wraps under it. */
+.danger {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+}
+
+.dangerText {
+  display: grid;
+  flex: 1 1 calc(var(--prime-space-16) * 4);
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
