@@ -131,7 +131,10 @@ export const SCENARIOS = "scenarios";
 
 export type KindSlot = {
   slot: SlotId | typeof SCENARIOS;
-  /** The page must have this slot. Prop-driven requirements are added by `requiredSlots`. */
+  /**
+   * The page must have this slot whatever its API. Prop-driven requirements (`controlled` for a
+   * field with a value, `variants` for a field with `variant`…) come from `PROP_SLOTS`.
+   */
   required?: boolean;
   /** Preview layout of the slot (component-specific scenarios included). */
   layout: ExampleFramePreviewLayout;
@@ -167,13 +170,16 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
   ],
   field: [
     { slot: "overview", required: true, layout: "stack-narrow" },
+    { slot: "variants", layout: "stack-narrow" },
     { slot: "sizes", required: true, layout: "stack-narrow" },
     { slot: "states", required: true, layout: "stack-narrow" },
     { slot: "validation", required: true, layout: "stack-narrow" },
     { slot: "with-icon", layout: "stack-narrow" },
     { slot: SCENARIOS, layout: "stack-narrow" },
-    { slot: "controlled", required: true, layout: "stack-narrow" },
+    { slot: "controlled", layout: "stack-narrow" },
+    { slot: "controlled-open", layout: "stack-narrow" },
     { slot: "in-form", required: true, layout: "stack" },
+    { slot: "narrow", layout: "stack" },
   ],
   overlay: [
     { slot: "overview", required: true, layout: "default" },
