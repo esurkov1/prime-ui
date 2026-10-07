@@ -97,8 +97,6 @@ export type {
 } from "./card/Card";
 export { Card } from "./card/Card";
 export type {
-  CheckboxErrorProps,
-  CheckboxHintProps,
   CheckboxIndicatorProps,
   CheckboxLabelProps,
   CheckboxRootProps,

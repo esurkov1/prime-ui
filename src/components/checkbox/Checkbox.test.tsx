@@ -67,22 +67,21 @@ describe("Checkbox", () => {
 
   it("renders with hint", () => {
     render(
-      <Checkbox.Root>
+      <Checkbox.Root hint="We value your privacy">
         <Checkbox.Label>Accept terms</Checkbox.Label>
-        <Checkbox.Hint>We value your privacy</Checkbox.Hint>
       </Checkbox.Root>,
     );
     expect(screen.getByText("We value your privacy")).toBeInTheDocument();
   });
 
-  it("renders with error text", () => {
+  it("renders with error text that replaces the hint", () => {
     render(
-      <Checkbox.Root>
+      <Checkbox.Root hint="We value your privacy" error="You must accept terms">
         <Checkbox.Label>Accept terms</Checkbox.Label>
-        <Checkbox.Error>You must accept terms</Checkbox.Error>
       </Checkbox.Root>,
     );
     expect(screen.getByText("You must accept terms")).toBeInTheDocument();
+    expect(screen.queryByText("We value your privacy")).toBeNull();
   });
 
   it("toggles checked state on click (uncontrolled)", () => {
@@ -184,11 +183,10 @@ describe("Checkbox", () => {
     expect(wrapper).toHaveAttribute("data-state", "indeterminate");
   });
 
-  it("marks control invalid when Checkbox.Error is rendered", () => {
+  it("marks control invalid when an error is set", () => {
     render(
-      <Checkbox.Root>
+      <Checkbox.Root error="You must accept terms">
         <Checkbox.Label>Accept terms</Checkbox.Label>
-        <Checkbox.Error>You must accept terms</Checkbox.Error>
       </Checkbox.Root>,
     );
     const checkbox = screen.getByRole("checkbox");
@@ -215,21 +213,26 @@ describe("Checkbox", () => {
     expect(checkbox).not.toHaveAttribute("aria-invalid");
   });
 
-  it("sets aria-describedby for hint and error", () => {
-    render(
-      <Checkbox.Root>
+  it("sets aria-describedby for the hint, then for the error that replaces it", () => {
+    const { rerender } = render(
+      <Checkbox.Root hint="Helper" aria-describedby="external">
         <Checkbox.Label>Accept</Checkbox.Label>
-        <Checkbox.Hint>Helper</Checkbox.Hint>
-        <Checkbox.Error>Required</Checkbox.Error>
       </Checkbox.Root>,
     );
     const checkbox = screen.getByRole("checkbox");
-    const describedBy = checkbox.getAttribute("aria-describedby") ?? "";
-    expect(describedBy).toBeTruthy();
-    const hintEl = screen.getByText("Helper");
-    const errorEl = screen.getByText("Required");
-    expect(describedBy).toContain(hintEl.id);
-    expect(describedBy).toContain(errorEl.id);
+    expect(checkbox).toHaveAttribute(
+      "aria-describedby",
+      `external ${screen.getByText("Helper").id}`,
+    );
+    rerender(
+      <Checkbox.Root hint="Helper" error="Required" aria-describedby="external">
+        <Checkbox.Label>Accept</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    expect(checkbox).toHaveAttribute(
+      "aria-describedby",
+      `external ${screen.getByText("Required").id}`,
+    );
   });
 
   it("sets data-disabled on wrapper when disabled", () => {
