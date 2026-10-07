@@ -229,18 +229,10 @@
   gap: var(--prime-space-4);
 }
 
-.previewInner[data-preview-layout="stack"]:global(:has([data-full-width="true"])),
-.previewInner[data-preview-layout="stack"]:global(:has(.examplePreviewBleed)) {
+.previewInner[data-preview-layout="stack"]:global(:has([data-full-width="true"])) {
   align-items: stretch;
   width: 100%;
   margin-inline: 0;
-}
-
-.previewInner[data-preview-layout="stack-center"] {
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
 }
 
 .previewInner[data-preview-layout="row"] {
@@ -252,31 +244,9 @@
   padding-block: clamp(var(--prime-space-6), 4vh, var(--prime-space-12));
 }
 
-.previewInner[data-preview-layout="row-start"] {
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: var(--prime-space-3);
-  padding-block: clamp(var(--prime-space-4), 3vh, var(--prime-space-8));
-}
-
-.previewInner[data-preview-layout="row-wrap"] {
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--prime-space-2);
-}
-
-/* Row layouts group their children with gap; the auto margins that center a single child would
-   push siblings apart. */
-.previewInner:is(
-  [data-preview-layout="row"],
-  [data-preview-layout="row-start"],
-  [data-preview-layout="row-wrap"]
-)
-> * {
+/* A row groups its children with gap; the auto margins that center a single child would push
+   siblings apart. */
+.previewInner[data-preview-layout="row"] > * {
   margin-inline: 0;
 }
 
@@ -286,17 +256,6 @@
   align-items: center;
   justify-content: center;
   gap: var(--prime-space-3);
-}
-
-.previewInner[data-preview-layout="dense-stack"] {
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--prime-space-1);
-  width: 100%;
-  max-height: calc(var(--prime-space-24) * 3 + var(--prime-space-16));
-  overflow: auto;
-  padding-inline-end: var(--prime-space-1);
 }
 
 /*
@@ -381,17 +340,34 @@
 }
 
 .previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),
-.previewInner[data-preview-layout="stack"] > *:global(:has(.examplePreviewBleed)),
 .previewInner[data-preview-layout="stack"] > *:global(:has(table)) {
   align-self: stretch;
   width: 100%;
   max-width: none;
 }
 
+/*
+ * A block that takes `width: 100%` (Stepper, Breadcrumb, Tabs, Card, Timeline, Banner — anything
+ * sized by its own container) would span the whole stage and sit at its start edge. Capped at 640
+ * it stays centered like every other specimen; `fullWidth` and tables still stretch. Page-level
+ * structure that needs the whole stage uses `full`.
+ */
 .previewInner[data-preview-layout="stack"] > * {
   flex: 0 1 auto;
   min-width: 0;
-  max-width: 100%;
+  max-width: min(100%, calc(var(--prime-space-16) * 10));
+}
+
+/* Full: a column of blocks that each take the whole stage width (app shells, page regions). */
+.previewInner[data-preview-layout="full"] {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-space-4);
+}
+
+/* Stretched unless the block sets its own width (a phone-width wrapper stays centered). */
+.previewInner[data-preview-layout="full"] > * {
+  align-self: stretch;
 }
 
 .previewInner[data-preview-layout="stack-narrow"] > * {

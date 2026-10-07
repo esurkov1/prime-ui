@@ -5,7 +5,7 @@ const VIEWPORT = '"desktop" | "tablet" | "mobile"';
 export const api: ComponentApi = {
   parts: [
     {
-      name: "ExampleFrame.Root",
+      name: "ExampleFrame",
       en: "No ref. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.",
       ru: "Рамка документации: панель (вид, тема, копирование, ширина) над превью или кодом.",
       props: [
@@ -18,7 +18,7 @@ export const api: ComponentApi = {
         },
         {
           name: "previewLayout",
-          type: '"default" | "stack" | "stack-center" | "stack-narrow" | "dense-stack" | "row" | "row-start" | "row-wrap" | "matrix"',
+          type: '"default" | "stack" | "stack-narrow" | "full" | "row" | "matrix"',
           default: '"default"',
           en: "How the preview lays out its children, so snippets need no wrapper divs (see Variants).",
           ru: "Как превью раскладывает детей, чтобы примерам не нужны были обёртки (см. «Варианты» в COMPONENT.md).",
@@ -83,28 +83,14 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Preview content; with an `ExampleFrame.Stage` among them only the Stage's children are previewed.",
-          ru: "Содержимое превью; если среди детей есть `ExampleFrame.Stage`, показываются только его дети.",
+          en: "Preview content, laid out by `previewLayout`.",
+          ru: "Содержимое превью, раскладка — `previewLayout`.",
         },
         {
           name: "className",
           type: "string",
           en: "Extra class on the frame.",
           ru: "Дополнительный класс рамки.",
-        },
-      ],
-    },
-    {
-      name: "ExampleFrame.Stage",
-      en: "No DOM. Marks the content rendered in the preview.",
-      ru: "Без DOM: отмечает содержимое превью.",
-      props: [
-        {
-          name: "children",
-          type: "ReactNode",
-          required: true,
-          en: "Content rendered only in the preview.",
-          ru: "Содержимое, которое показывается только в превью.",
         },
       ],
     },

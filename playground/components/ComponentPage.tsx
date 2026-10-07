@@ -112,11 +112,11 @@ function ExampleBlock({ page, example }: { page: ComponentPageConfig; example: C
     <div className="demoBlock">
       <DemoSectionTitle>{exampleTitle(example)}</DemoSectionTitle>
       <DemoDescription>{renderInlineCode(example.description)}</DemoDescription>
-      <PlaygroundExampleFrame.Root code={source} previewLayout={layout}>
+      <PlaygroundExampleFrame code={source} previewLayout={layout}>
         <React.Suspense fallback={null}>
           <Component />
         </React.Suspense>
-      </PlaygroundExampleFrame.Root>
+      </PlaygroundExampleFrame>
     </div>
   );
 }
