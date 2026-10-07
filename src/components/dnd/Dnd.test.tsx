@@ -258,6 +258,17 @@ describe("Dnd.Sortable", () => {
     expect(order()).toEqual(["a", "b", "c"]);
   });
 
+  it("the grip is a named, focusable button and Alt+arrow on it moves its row", () => {
+    const onReorder = vi.fn();
+    render(<Sortable initial={rows("a", "b")} handle onReorder={onReorder} />);
+    const grip = screen.getByTestId("grip-a");
+    expect(grip.tagName).toBe("BUTTON");
+    expect(grip).toHaveAccessibleName("Перетащить");
+    grip.focus();
+    fireEvent.keyDown(grip, { key: "ArrowDown", altKey: true });
+    expect(onReorder).toHaveBeenCalled();
+  });
+
   it("renders li items inside ul", () => {
     render(
       <Dnd.Root>

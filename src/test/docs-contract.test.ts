@@ -43,7 +43,6 @@ const NOT_CONVERTED = new Set([
   "command-menu",
   "digit-input",
   "divider",
-  "dnd",
   "drawer",
   "dropdown",
   "empty-page",
