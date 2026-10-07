@@ -8,9 +8,18 @@ export default function AppShellOverviewExample() {
     <div className={styles.stage}>
       <AppShell.Root fillViewport className={styles.shell}>
         <AppShell.Nav>
-          <Sidebar.Root responsive={false}>
+          {/* A small app window: the icon rail fits every frame width; the toggle widens it. */}
+          <Sidebar.Root responsive={false} defaultMode="compact">
             <Sidebar.Header>
-              <Typography variant="title-s">Acme CRM</Typography>
+              <Sidebar.Brand href="#home" description="Отдел продаж">
+                <Sidebar.BrandLogo>
+                  <span className={styles.logo}>
+                    <Icon name="nav.layoutGrid" />
+                  </span>
+                </Sidebar.BrandLogo>
+                Acme CRM
+              </Sidebar.Brand>
+              <Sidebar.Toggle variant="header" />
             </Sidebar.Header>
             <Sidebar.Content>
               <Sidebar.Item current>
@@ -26,9 +35,6 @@ export default function AppShellOverviewExample() {
                 Отчёты
               </Sidebar.Item>
             </Sidebar.Content>
-            <Sidebar.Footer>
-              <Sidebar.Toggle />
-            </Sidebar.Footer>
           </Sidebar.Root>
         </AppShell.Nav>
         <AppShell.Header>
