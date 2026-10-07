@@ -1,6 +1,6 @@
-/* Layout helpers for the Notification examples. Semantic tokens only. */
+/* Layout of the Notification scenarios: semantic tokens only. */
 
-/* Column of static cards, about as wide as a toast (24rem). */
+/* Static cards in a column about as wide as a toast (24rem). */
 .cards {
   display: flex;
   flex-direction: column;
@@ -9,6 +9,7 @@
   min-width: 0;
 }
 
+/* Buttons that raise toasts. */
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -17,26 +18,18 @@
   gap: var(--prime-space-2);
 }
 
-.controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-4);
-  width: 100%;
-}
-
-/* 16rem position picker. */
+/* placement.tsx: a 16rem position picker. */
 .select {
   width: min(100%, calc(var(--prime-space-16) * 4));
 }
 
-/* 26rem settings card. */
-.card {
+/* in-form.tsx: a settings form on a card fill. */
+.form {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-5);
-  width: min(100%, calc(var(--prime-space-24) * 4 + var(--prime-space-8)));
+  width: min(100%, var(--prime-modal-width-s));
   padding: var(--prime-card-padding-m);
   border-radius: var(--prime-card-radius);
   background: var(--prime-color-card-bg);
@@ -48,8 +41,4 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--prime-space-2);
-}
-
-.count {
-  font-variant-numeric: tabular-nums;
 }

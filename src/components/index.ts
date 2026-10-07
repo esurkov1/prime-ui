@@ -326,6 +326,7 @@ export type {
   NotificationOptions,
   NotificationPosition,
   NotificationRecord,
+  NotificationTone,
 } from "./notification/Notification";
 export { NotificationCard } from "./notification/Notification";
 export type { NotificationProviderProps } from "./notification/NotificationStore";

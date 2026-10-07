@@ -1,10 +1,10 @@
-/** Saving a form: the button shows `loading`, then `notify()` shows a success toast or an error toast with a "Повторить" action. Use it as the default pattern for async save feedback. */
-import { Button, Input, NotificationProvider, Typography, useNotifications } from "prime-ui-kit";
+/** Saving a form: the button shows loading, then a success toast or an error toast with a retry action — `notify`, `action`. */
+import { Button, Input, NotificationProvider, useNotifications } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-function SaveForm() {
+function ReportsForm() {
   const { notify } = useNotifications();
   const [saving, setSaving] = React.useState(false);
   const [email, setEmail] = React.useState("team@prime.dev");
@@ -31,29 +31,32 @@ function SaveForm() {
   };
 
   return (
-    <div className={styles.card}>
-      <Typography.Root as="h3" variant="title-m">
-        Рассылка отчётов
-      </Typography.Root>
-      <Input.Root label="Почта для отчётов" hint="Без «@» сохранение завершится ошибкой">
+    <form
+      className={styles.form}
+      onSubmit={(event) => {
+        event.preventDefault();
+        save();
+      }}
+    >
+      <Input.Root label="Почта для отчётов" hint="Без «@» сохранение завершится ошибкой" required>
         <Input.Wrapper>
-          <Input.Field value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input.Field value={email} onChange={(event) => setEmail(event.target.value)} />
         </Input.Wrapper>
       </Input.Root>
       <div className={styles.actions}>
-        <Button.Root loading={saving} onClick={save}>
+        <Button.Root type="submit" loading={saving}>
           Сохранить
         </Button.Root>
       </div>
-    </div>
+    </form>
   );
 }
 
-export default function NotificationSaveFormExample() {
-  // In an app NotificationProvider wraps the root once; it is here to keep the example self-contained.
+export default function NotificationInFormExample() {
+  // In an app NotificationProvider wraps the root once; here it keeps the example self-contained.
   return (
     <NotificationProvider>
-      <SaveForm />
+      <ReportsForm />
     </NotificationProvider>
   );
 }

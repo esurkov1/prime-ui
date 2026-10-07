@@ -1,205 +1,190 @@
 # Notification
 
 **Category:** feedback
+**Kind:** overlay
 
 > Pop-up toast notifications: `NotificationProvider` at the app root and `notify()` from any screen.
 
 ## When to use
 - A short reaction to a user action: saved, sent, copied, failed to save.
 - A background event the user should notice without leaving the screen (new message, low stock).
-- An error with a quick recovery action ("Повторить").
+- An error with a quick recovery action («Повторить»).
 
 ## When not to use
 - A persistent message about a page or account state → use [Banner](../banner/COMPONENT.md).
-- A field validation error → use the field `error` / [Hint](../hint/COMPONENT.md).
+- A field validation error → the field `error` / [Hint](../hint/COMPONENT.md).
 - A decision the user must make before continuing → use [Modal](../modal/COMPONENT.md).
-- Progress of a long operation → use [ProgressBar](../progress-bar/COMPONENT.md) in the UI.
+- Progress of a long operation → [ProgressBar](../progress-bar/COMPONENT.md) in the UI.
 
 ## Import
 ```tsx
 import { NotificationCard, NotificationProvider, useNotifications } from "prime-ui-kit";
 ```
-Public types: `NotificationOptions`, `NotificationRecord`, `NotificationPosition`, `NotificationAction`, `NotificationLabels`, `NotificationProviderProps`, `NotificationCardProps`.
 
 ## Anatomy
 ```
 NotificationProvider                 store + portaled viewport (z-index toast)
 └─ zone per position                 top/bottom × left/center/right
-   └─ stack per tone                 <ol> named by labels.regions[position]; newest in front
-      └─ NotificationCard            <article role="status|alert">
-         ├─ icon                     tone icon or `icon`
-         ├─ title + badge
+   └─ stack per tone                 <ol> named by labels; newest in front
+      └─ card                        <article role="status|alert">
+         ├─ icon                     tone Icon or `icon`
+         ├─ title + Badge            `badge` counter
          ├─ description
-         ├─ action button            soft neutral, one tier below the card
-         ├─ close button             when `closable`
+         ├─ action Button            soft neutral, one tier below the card
+         ├─ close Button             ghost icon, when `closable`
          └─ countdown line           when not `persistent`
+NotificationCard                     the same card, static, without a timer
 ```
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### NotificationProvider
+No ref. Wraps the app once: keeps the toasts and renders their stacks in a portal (one stack per position × tone).
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `position` | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | `"top-right"` | Default position for `notify()` calls without one. |
+| `max` | `number` | `5` | Max toasts per stack; older ones are dropped. |
+| `labels` | `Partial<NotificationLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | The app. |
-| `position` | `NotificationPosition` | `"top-right"` | Default position for `notify()` calls without one. |
-| `max` | `number` | `5` | Max toasts per stack (position × tone); older ones are dropped. |
-| `labels` | `{ close?: string; regions?: Partial<Record<NotificationPosition, string>> }` | see Accessibility | Built-in strings; `regions` merges per position. |
-
-`NotificationPosition` = `"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"`.
 
 ### useNotifications()
-Must be called inside `NotificationProvider` (throws otherwise). Returns:
-
-| Field | Type | Description |
-|---|---|---|
-| `notify` | `(options: NotificationOptions) => string` | Shows a toast and returns its id. |
-| `dismiss` | `(id: string) => void` | Closes one toast (plays the exit animation). |
-| `dismissAll` | `() => void` | Closes all toasts. |
-| `items` | `NotificationRecord[]` | Active toasts (without the ones playing their exit). |
-
-### NotificationOptions (argument of `notify`)
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `title` | `string` | — (required) | Title. |
-| `description` | `string` | — | Text under the title. |
-| `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Meaning, default icon, stack grouping; `warning` and `danger` are announced assertively. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Padding, icon and text of the card. |
-| `position` | `NotificationPosition` | provider `position` | Screen corner or edge. |
-| `duration` | `number` | `5000` | Auto-close timeout in ms. A value `<= 0` disables the timer. |
-| `persistent` | `boolean` | `false` | No timer and no countdown line; closes only by the close button or `dismiss`. |
-| `icon` | `ReactNode` | tone icon | Custom icon. |
-| `badge` | `string \| number` | — | Counter next to the title. |
-| `closable` | `boolean` | `true` | Close button. |
-| `action` | `{ label: string; onClick: () => void }` | — | Secondary button in the card. Clicking it does not close the toast. |
-
-### NotificationRecord
-`NotificationOptions` with `id`, `createdAt` and resolved `tone`, `position`, `size`, `duration`, `persistent`, `closable` (all required). Used by `items` and by `NotificationCard`.
-
-### NotificationCard
-A single toast card without the store, for docs, mockups or custom hosts. No ref.
+Must be called inside `NotificationProvider`; returns the store.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `item` | `NotificationRecord` | — (required) | What to render. |
-| `paused` | `boolean` | — (required) | Pauses the countdown. Pass `true` for static cards. |
-| `onDismiss` | `(id: string) => void` | — (required) | Called by the close button and when the countdown ends. |
-| `className` | `string` | — | Class on the `<article>`. |
-| `stackDepth` | `number` | `0` | Depth in a stack (`data-stack-depth`). |
-| `stackExpanded` | `boolean` | `false` | Whether the stack is expanded (`data-stack-expanded`). |
+| `notify` | `(options: NotificationOptions) => string` | — | Shows a toast and returns its id. |
+| `dismiss` | `(id: string) => void` | — | Closes one toast with its exit animation. |
+| `dismissAll` | `() => void` | — | Closes every toast. |
+| `items` | `NotificationRecord[]` | — | Active toasts (without the ones playing their exit). |
+
+### notify(options)
+`NotificationOptions`: what the toast shows and how it closes.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Semantic color and tone icon; `danger` and `warning` are announced assertively. |
+| `title` | `string` | — (required) | The message. |
+| `description` | `string` | — | Secondary text under the title. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Padding, icon and text tier of the card. |
+| `icon` | `ReactNode` | — | Replaces the tone icon. |
+| `badge` | `string \| number` | — | A counter next to the title (a `Badge` in the tone hue). |
+| `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card. |
+| `position` | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | — | Default: the provider's `position`. |
+| `duration` | `number` | `5000` | Auto-close delay in ms; the timer pauses on hover, focus, swipe and in a hidden tab. |
+| `persistent` | `boolean` | `false` | No timer and no countdown line. |
+| `closable` | `boolean` | `true` | Shows the close button. |
+
+### NotificationCard
+No ref. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Semantic color and tone icon; `danger` and `warning` are announced assertively. |
+| `title` | `string` | — (required) | The message. |
+| `description` | `string` | — | Secondary text under the title. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Padding, icon and text tier of the card. |
+| `icon` | `ReactNode` | — | Replaces the tone icon. |
+| `badge` | `string \| number` | — | A counter next to the title (a `Badge` in the tone hue). |
+| `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card. |
+| `onDismiss` | `() => void` | — | Shows the close button and is called on its click. |
+| `className` | `string` | — | Extra class on the card. |
 
 ## Variants
 
 ### tone
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `info` | Raised card, info icon (circle "i"), info countdown | Neutral events, messages | yes |
-| `success` | Success check icon | Completed actions | |
-| `warning` | Warning triangle icon | Something needs attention soon | |
-| `danger` | Danger cross icon | Failed actions; pair with `action` to retry | |
+| `info` | raised card, info icon, info countdown | neutral events, messages | yes |
+| `success` | success icon | completed actions | |
+| `warning` | warning icon | something needs attention soon | |
+| `danger` | danger icon | failed actions; pair with `action` to retry | |
 
-The card itself is always a raised surface without a border; only the icon, the badge and the countdown take the tone. Each tone forms its own stack in a position.
+The card is always a raised surface without a border; only the icon, the badge and the countdown take the tone. Each tone forms its own stack in a position.
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | Smallest padding and icon, `xs` text; action button `xs` | Very dense apps | |
-| `s` | Compact; action button `xs` | Dense dashboards | |
-| `m` | Padding 16, icon 16, title 14/20, description 13/20; action button `s` | Default | yes |
-| `l` | Larger padding and text; action button `m` | Touch screens | |
-| `xl` | Largest; action button `l` | Kiosk / large screens | |
+| `xs` · `s` | compact padding and text; action `xs` | dense apps | |
+| `m` | padding 16, title 14/20, description 13/20; action `s` | default | yes |
+| `l` · `xl` | larger padding and text; action `m` / `l` | touch and large screens | |
 
 ### position
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `top-right` | Stack in the top-right corner, grows down | Desktop apps | yes |
-| `top-center` | Centered at the top | Global system events | |
-| `top-left` | Top-left corner | Right-side panels occupy the right | |
-| `bottom-right` | Bottom-right corner, grows up | Chat-like or editor apps | |
-| `bottom-center` | Centered at the bottom | Mobile-like layouts | |
-| `bottom-left` | Bottom-left corner | Apps with right-bottom controls | |
+| `top-right` | top-right corner, grows down | desktop apps | yes |
+| `top-center` · `top-left` | top edge | global events; right panels occupy the right | |
+| `bottom-right` · `bottom-center` · `bottom-left` | bottom edge, grows up | chat-like or mobile-like layouts | |
 
 ### Flags
-| Flag | Looks like | Use when | Default |
+| Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `persistent` | No countdown line, no auto-close | Errors the user must read or act on | `false` |
-| `closable: false` | No close button | Very short confirmations ("Ссылка скопирована") | `true` |
-| `badge` | Small counter after the title | Grouped events ("3 ответа") | — |
-
-**Combinations**
-- Recommended: `danger` + `persistent` + `action: Повторить`; `success` with a short title only.
-- Pointless: `persistent` + `closable: false` (the toast can only be closed by code); `duration` together with `persistent`.
-- Avoid: several positions in one app; long descriptions — keep one or two lines.
+| `persistent` | no countdown line, no auto-close | errors the user must read or act on | `false` |
+| `closable` | close button | turn off for very short confirmations | `true` |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | tone / size | options | `data-tone`, `data-size` on the card |
-| persistent | `persistent` | `data-persistent="true"` |
-| stack position | store | `data-stack-depth`, `data-stack-expanded` on the card; `data-stack-index`, `data-hidden`, `data-state="open" \| "closed"` on the stack item; `data-expanded` on the stack |
-| paused | hover or focus inside the stack, an active swipe, a hidden tab | countdown stops and resumes where it stopped |
-| swipe | pointer drag on a card | `data-swipe="drag" \| "return" \| "out"` and `data-swipe-axis="x" \| "y"` on the card's motion wrapper |
+| persistent | `persistent` (always on a static card) | `data-persistent="true"` |
+| stack position | store | `data-stack-depth`, `data-stack-expanded` on the card; `data-stack-index`, `data-hidden`, `data-state` on the item; `data-expanded` on the stack |
+| paused | hover or focus in the stack, a swipe, a hidden tab | the countdown stops and resumes where it stopped |
+| swipe | pointer drag | `data-swipe="drag" \| "return" \| "out"`, `data-swipe-axis` on the motion wrapper |
 
-Collapsed stacks show up to 3 cards peeking behind each other, each one step lower and 5 % smaller. Hover or keyboard focus expands the stack and pauses the timers; timers also pause while the tab is hidden. Toasts enter from the edge they live on and leave toward it, faster than they came. Swipe a card toward the nearest edge to dismiss it (sideways in corners, vertically in the center): past `--prime-space-12` or with a quick flick; a shorter swipe glides back, and dragging the other way is damped. Under `prefers-reduced-motion` toasts are removed without an exit animation.
+Collapsed stacks show up to 3 cards peeking behind each other. Hover or keyboard focus expands the stack. Toasts enter from their edge and leave toward it, faster than they came; a swipe toward the edge dismisses (past `--prime-space-12` or a quick flick). Under `prefers-reduced-motion` toasts are removed without an exit animation.
 
 ## Layout & spacing
-- Toasts render in a fixed, portaled viewport; zones are `--prime-space-5` from the viewport edge (`--prime-space-3` below 640px) and at most 24rem wide.
+- A fixed, portaled viewport; zones are `--prime-space-5` from the edge (`--prime-space-3` below 640px), at most 24rem wide.
 - Cards in an expanded stack are `--prime-space-2` apart.
-- The viewport does not take pointer events except over the cards.
+- The viewport takes pointer events only over the cards.
 
 ## Accessibility
-- Each card is an `<article>`: `role="status"` + `aria-live="polite"` for `info`/`success`, `role="alert"` + `aria-live="assertive"` for `warning`/`danger`.
-- Each stack is an `<ol>` with an accessible name from `labels.regions[position]`.
-- The icon and countdown line are `aria-hidden`; the close button has `labels.close`.
-- Do not put the only copy of important information in a toast with a timer — use `persistent` or a Banner.
 
-| `labels` key | Default | Used for |
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Focuses the action and the close button; focus inside a stack expands it and pauses the timers. |
+| `Enter` · `Space` | Presses the action or the close button. |
+
+### ARIA
+- Each stack is an `<ol>` named by the region label of its position; each card is an `<article>`: `role="status"` + `aria-live="polite"`, or `role="alert"` + `aria-live="assertive"` for `warning` / `danger`.
+- The icon and the countdown are `aria-hidden`; the close button is named by `labels.close`.
+- Do not keep the only copy of important information in a toast with a timer — use `persistent` or a Banner.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+| Key | Default | Used for |
 |---|---|---|
-| `close` | `"Закрыть уведомление"` | `aria-label` of the close button |
-| `regions["top-left"]` | `"Уведомления сверху слева"` | Name of the top-left stack |
-| `regions["top-center"]` | `"Уведомления сверху по центру"` | Name of the top-center stack |
-| `regions["top-right"]` | `"Уведомления сверху справа"` | Name of the top-right stack |
-| `regions["bottom-left"]` | `"Уведомления снизу слева"` | Name of the bottom-left stack |
-| `regions["bottom-center"]` | `"Уведомления снизу по центру"` | Name of the bottom-center stack |
-| `regions["bottom-right"]` | `"Уведомления снизу справа"` | Name of the bottom-right stack |
+| `close` | `"Закрыть уведомление"` | `aria-label` of the close button. |
+| `regionTopLeft` | `"Уведомления сверху слева"` | Name of the top-left toast list. |
+| `regionTopCenter` | `"Уведомления сверху по центру"` | Name of the top-center toast list. |
+| `regionTopRight` | `"Уведомления сверху справа"` | Name of the top-right toast list. |
+| `regionBottomLeft` | `"Уведомления снизу слева"` | Name of the bottom-left toast list. |
+| `regionBottomCenter` | `"Уведомления снизу по центру"` | Name of the bottom-center toast list. |
+| `regionBottomRight` | `"Уведомления снизу справа"` | Name of the bottom-right toast list. |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [save-form.tsx](examples/save-form.tsx) | Button `loading`, then a success toast or a danger toast with "Повторить" | Async save feedback |
-| [live.tsx](examples/live.tsx) | `notify()` per tone with a position picker, `persistent`, `items.length`, `dismissAll` | Positions, stacking, timers |
-| [tones.tsx](examples/tones.tsx) | Static `NotificationCard` per tone | Docs and mockups |
-| [sizes.tsx](examples/sizes.tsx) | Static cards `xs`…`xl` | Picking a size |
-| [features.tsx](examples/features.tsx) | `icon`, `badge`, `action`, title-only with `closable: false` | Digests and quick confirmations |
-
-```tsx
-import { Button, NotificationProvider, useNotifications } from "prime-ui-kit";
-
-function CopyLink() {
-  const { notify } = useNotifications();
-  return (
-    <Button.Root onClick={() => notify({ tone: "success", title: "Ссылка скопирована" })}>
-      Копировать ссылку
-    </Button.Root>
-  );
-}
-
-export function App() {
-  return (
-    <NotificationProvider>
-      <CopyLink />
-    </NotificationProvider>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A provider at the app root and a success toast from any screen — `NotificationProvider`, `notify`. |
+| [structure.tsx](examples/structure.tsx) | Optional parts on static cards: a custom icon, a counter, an action and a close button, or a title alone — `icon`, `badge`, `action`, `onDismiss`. |
+| [sizes.tsx](examples/sizes.tsx) | Every tier changes padding, icon and text of the card — `size`. |
+| [placement.tsx](examples/placement.tsx) | Toasts in each corner or centered at the top or bottom edge — `position`. |
+| [tones.tsx](examples/tones.tsx) | The four tones: the icon carries the meaning; danger and warning are announced at once — `tone`. |
+| [stacking.tsx](examples/stacking.tsx) | Toasts of one position and tone stack; hover expands the stack and pauses the timers — `max`, `items`, `dismissAll`. |
+| [dismiss.tsx](examples/dismiss.tsx) | A short timer, a toast that stays until closed, and one without a close button — `duration`, `persistent`, `closable`. |
+| [in-form.tsx](examples/in-form.tsx) | Saving a form: the button shows loading, then a success toast or an error toast with a retry action — `notify`, `action`. |
 
 ## Mistakes
 - Calling `useNotifications()` outside `NotificationProvider` → it throws; wrap the app root once.
-- Several providers in one app → one provider at the root; nested ones create separate toasters.
+- Several providers in one app → one provider at the root.
 - `tone: "error"` → use `tone: "danger"`.
 - Expecting `action` to close the toast → call `dismiss(id)` in `onClick` if it should.
-- Using a toast for a permanent state ("trial ends in 3 days") → use a Banner.
+- A toast for a permanent state («пробный период закончится через 3 дня») → use a Banner.
 
 ## Related
-- [Banner](../banner/COMPONENT.md) — persistent in-flow messages.
-- [Button](../button/COMPONENT.md) — `loading` before the result toast.
-- [Modal](../modal/COMPONENT.md) — blocking confirmations.
+- **Built from:** Button, Badge, Icon
+- **See also:** [Banner](../banner/COMPONENT.md), [Button](../button/COMPONENT.md), [Modal](../modal/COMPONENT.md)
