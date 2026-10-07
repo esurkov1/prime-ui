@@ -17,6 +17,7 @@ import {
   Code2,
   Command,
   Focus,
+  GripVertical,
   Frame,
   Gauge,
   Hash,
@@ -86,6 +87,7 @@ import CommandMenuSection from "./sections/CommandMenuSection";
 import DataTableSection from "./sections/DataTableSection";
 import DatepickerSection from "./sections/DatepickerSection";
 import DigitInputSection from "./sections/DigitInputSection";
+import DndSection from "./sections/DndSection";
 import DividerSection from "./sections/DividerSection";
 import DrawerSection from "./sections/DrawerSection";
 import DropdownSection from "./sections/DropdownSection";
@@ -650,6 +652,14 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       keywords: ["прокрутка", "скролл", "scroll", "axis"],
       icon: ScrollText,
       Page: ScrollContainerSection,
+    },
+    {
+      segment: "dnd",
+      label: "Dnd",
+      description: "Перетаскивание: сортируемые списки, Draggable и DropZone",
+      keywords: ["drag", "drop", "перетаскивание", "сортировка", "порядок", "sortable", "доска"],
+      icon: GripVertical,
+      Page: DndSection,
     },
   ],
   infrastructure: [

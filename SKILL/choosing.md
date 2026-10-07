@@ -14,7 +14,7 @@ confuse. Links: [components.md](components.md).
 | learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, SegmentedProgressBar, ProgressCircle, EmptyPage |
 | move between views, places, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper |
 | see something on top of the page | Overlays — Tooltip, Popover, Dropdown, Modal, Drawer, CommandMenu |
-| get the app frame and page structure | Layout — AppShell, Sidebar, PageContent, Accordion, Divider, ScrollContainer |
+| get the app frame and page structure | Layout — AppShell, Sidebar, PageContent, Accordion, Divider, ScrollContainer, Dnd |
 | style text | Foundations — Typography |
 
 ## 2. Inside a category

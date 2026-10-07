@@ -98,7 +98,7 @@ Floating layers above the page, from tooltip to modal.
 
 ## Layout (`layout`)
 
-App frame, page regions, disclosure, separators, scrolling.
+App frame, page regions, disclosure, separators, scrolling, drag and drop.
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -108,6 +108,7 @@ App frame, page regions, disclosure, separators, scrolling.
 | Accordion | Collapsible sections: FAQ, settings groups, checkout steps. | [COMPONENT.md](../src/components/accordion/COMPONENT.md) · [examples](../src/components/accordion/examples/) |
 | Divider | A hairline separator, horizontal or vertical, with or without a label. | [COMPONENT.md](../src/components/divider/COMPONENT.md) · [examples](../src/components/divider/examples/) |
 | ScrollContainer | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents. | [COMPONENT.md](../src/components/scroll-container/COMPONENT.md) · [examples](../src/components/scroll-container/examples/) |
+| Dnd | Pointer-driven drag and drop: reorderable lists, draggable items and drop zones, with touch and keyboard support. | [COMPONENT.md](../src/components/dnd/COMPONENT.md) · [examples](../src/components/dnd/examples/) |
 
 ## Foundations (`foundations`)
 

@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 50 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 51 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines; a strict 4px grid; one size axis
@@ -248,6 +248,7 @@ accessibility, examples and common mistakes.
 | [**Accordion**](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) | Collapsible sections: FAQ, settings groups, checkout steps. |
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator, horizontal or vertical, with or without a label. |
 | [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents. |
+| [**Dnd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dnd/COMPONENT.md) | Pointer-driven drag and drop: reorderable lists, draggable items and drop zones, with touch and keyboard support. |
 
 ### Foundations (`foundations`)
 

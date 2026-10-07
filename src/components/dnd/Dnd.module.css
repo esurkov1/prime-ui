@@ -1,0 +1,237 @@
+/*
+ * Drag and drop. One gesture, one look: the carried clone lifts on a shadow, the source leaves a
+ * gap, the target tints. Depth comes from fill; the dashed line is the "drop here" affordance
+ * (the same exception FileUpload makes). Everything reads --prime-* tokens.
+ */
+
+/* The piece that follows the pointer: a clone of the lifted element, above every layer. */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--prime-z-toast);
+  /* Hit-testing asks what is under the pointer; the answer must be the target, never the carried clone. */
+  pointer-events: none;
+  will-change: transform;
+}
+
+.overlay:empty {
+  display: none;
+}
+
+.lift {
+  box-shadow: var(--prime-shadow-modal);
+  transform-origin: center;
+  animation: lift var(--dnd-lift-duration, var(--prime-motion-duration-fast))
+    var(--dnd-easing, var(--prime-motion-easing-standard)) both;
+}
+
+@keyframes lift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+
+/* An impossible drop says so before the pointer is released. */
+.overlay[data-can-drop="false"] .lift {
+  outline: var(--prime-border-width) dashed var(--prime-color-danger-default);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* The carried clone keeps its colours but never its interactivity. */
+.lift * {
+  pointer-events: none;
+  cursor: inherit;
+}
+
+/* The real element is in its new place but hidden while the carried clone lands on it. */
+:global([data-dnd-landing]) {
+  visibility: hidden;
+}
+
+/* Heard, never seen: clipped rather than display:none, which would drop it from the a11y tree. */
+.liveRegion {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Page-wide while a drag is in flight: "holding" cursor everywhere, no text selection behind the pointer. */
+:global(html[data-dnd-active]) * {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Something that can be picked up. touch-action stays `manipulation`: touch drags wait out a hold
+   instead of claiming the gesture, so lists keep their ordinary scrolling. */
+.draggable {
+  cursor: grab;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.draggable[data-disabled] {
+  cursor: default;
+}
+
+/* Spatial sources keep a faded copy to show the occupied place. */
+.draggable[data-dragging] {
+  cursor: grabbing;
+  opacity: 0.4;
+}
+
+/* Sortable sources leave the layout: the placeholder stands in their place. */
+.draggable[data-lifted] {
+  display: none;
+}
+
+.draggable:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+/* The hole the lifted item leaves, standing where it will land. */
+.placeholder {
+  flex: none;
+  box-sizing: border-box;
+  width: var(--dnd-gap-width, 100%);
+  height: var(--dnd-gap-height, var(--prime-control-m-height));
+  border: var(--prime-border-width) dashed var(--prime-color-accent-default);
+  border-radius: var(--dnd-gap-radius, var(--prime-radius-m));
+  background: var(--prime-color-accent-soft);
+  pointer-events: none;
+  animation: gapIn var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
+}
+
+li.placeholder {
+  list-style: none;
+}
+
+@keyframes gapIn {
+  from {
+    opacity: 0;
+    transform: scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* The sortable container. */
+.sortable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A list that refuses the item in flight says so before the release. */
+.sortable[data-dnd-reject] {
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-danger-soft);
+}
+
+.sortable[data-axis="x"] {
+  flex-direction: row;
+  align-items: stretch;
+}
+
+/* The grip: a real button, so it can be reached by keyboard. */
+.handle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--prime-control-xs-height);
+  height: var(--prime-control-xs-height);
+  padding: 0;
+  border: 0;
+  border-radius: var(--prime-control-xs-radius);
+  background: transparent;
+  color: var(--prime-color-text-muted);
+  cursor: grab;
+  touch-action: manipulation;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.handle svg {
+  width: var(--prime-icon-m);
+  height: var(--prime-icon-m);
+}
+
+.handle:hover {
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-secondary);
+}
+
+.handle:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.handle[disabled] {
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* A box that can take a drop, while one is actually over it. The tint confirms an ongoing gesture,
+   not a pointer passing through, so it eases in slowly. */
+.dropZone {
+  transition:
+    background-color var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    outline-color var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
+}
+
+.dropZone[data-dnd-over] {
+  background: var(--prime-color-accent-soft);
+  outline: var(--prime-border-width) dashed var(--prime-color-accent-default);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* Over it, but this exact spot will not take the item. Said before the pointer is released. */
+.dropZone[data-dnd-reject] {
+  background: var(--prime-color-danger-soft);
+  outline-color: var(--prime-color-danger-default);
+}
+
+/* Where it went, after the overlay is gone. */
+.dropZone[data-dnd-flash] {
+  animation: dropFlash calc(var(--prime-motion-duration-slow) * 2)
+    var(--prime-motion-easing-standard);
+}
+
+@keyframes dropFlash {
+  from {
+    background: var(--prime-color-accent-soft);
+  }
+  to {
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placeholder,
+  .lift,
+  .dropZone[data-dnd-flash] {
+    animation: none;
+  }
+}
