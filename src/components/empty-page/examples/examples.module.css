@@ -1,12 +1,18 @@
 /* Layout of the EmptyPage scenarios: semantic tokens only. */
 
-/* sizes.tsx, icon-tones.tsx: columns of at least 16rem. */
+/* sizes.tsx, icon-tones.tsx: cells of 16rem that wrap; an odd last cell stays centered. */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr));
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
   gap: var(--prime-space-6);
   width: 100%;
+  min-width: 0;
+}
+
+.grid > * {
+  flex: 0 1 calc(var(--prime-space-16) * 4);
   min-width: 0;
 }
 
