@@ -1,0 +1,74 @@
+/*
+ * Palette hue (`PaletteColor`, `--prime-color-palette-<hue>-*`) as four local variables. Put `.hue`
+ * on the element that carries `data-color`; its CSS reads `--hue-soft`, `--hue-text`, `--hue-solid`
+ * and `--hue-solid-fg`. No `data-color` → gray.
+ */
+.hue {
+  --hue-soft: var(--prime-color-palette-gray-soft);
+  --hue-text: var(--prime-color-palette-gray-text);
+  --hue-solid: var(--prime-color-palette-gray-solid);
+  --hue-solid-fg: var(--prime-color-palette-gray-solid-fg);
+}
+
+.hue[data-color="red"] {
+  --hue-soft: var(--prime-color-palette-red-soft);
+  --hue-text: var(--prime-color-palette-red-text);
+  --hue-solid: var(--prime-color-palette-red-solid);
+  --hue-solid-fg: var(--prime-color-palette-red-solid-fg);
+}
+
+.hue[data-color="blue"] {
+  --hue-soft: var(--prime-color-palette-blue-soft);
+  --hue-text: var(--prime-color-palette-blue-text);
+  --hue-solid: var(--prime-color-palette-blue-solid);
+  --hue-solid-fg: var(--prime-color-palette-blue-solid-fg);
+}
+
+.hue[data-color="green"] {
+  --hue-soft: var(--prime-color-palette-green-soft);
+  --hue-text: var(--prime-color-palette-green-text);
+  --hue-solid: var(--prime-color-palette-green-solid);
+  --hue-solid-fg: var(--prime-color-palette-green-solid-fg);
+}
+
+.hue[data-color="orange"] {
+  --hue-soft: var(--prime-color-palette-orange-soft);
+  --hue-text: var(--prime-color-palette-orange-text);
+  --hue-solid: var(--prime-color-palette-orange-solid);
+  --hue-solid-fg: var(--prime-color-palette-orange-solid-fg);
+}
+
+.hue[data-color="yellow"] {
+  --hue-soft: var(--prime-color-palette-yellow-soft);
+  --hue-text: var(--prime-color-palette-yellow-text);
+  --hue-solid: var(--prime-color-palette-yellow-solid);
+  --hue-solid-fg: var(--prime-color-palette-yellow-solid-fg);
+}
+
+.hue[data-color="purple"] {
+  --hue-soft: var(--prime-color-palette-purple-soft);
+  --hue-text: var(--prime-color-palette-purple-text);
+  --hue-solid: var(--prime-color-palette-purple-solid);
+  --hue-solid-fg: var(--prime-color-palette-purple-solid-fg);
+}
+
+.hue[data-color="sky"] {
+  --hue-soft: var(--prime-color-palette-sky-soft);
+  --hue-text: var(--prime-color-palette-sky-text);
+  --hue-solid: var(--prime-color-palette-sky-solid);
+  --hue-solid-fg: var(--prime-color-palette-sky-solid-fg);
+}
+
+.hue[data-color="pink"] {
+  --hue-soft: var(--prime-color-palette-pink-soft);
+  --hue-text: var(--prime-color-palette-pink-text);
+  --hue-solid: var(--prime-color-palette-pink-solid);
+  --hue-solid-fg: var(--prime-color-palette-pink-solid-fg);
+}
+
+.hue[data-color="teal"] {
+  --hue-soft: var(--prime-color-palette-teal-soft);
+  --hue-text: var(--prime-color-palette-teal-text);
+  --hue-solid: var(--prime-color-palette-teal-solid);
+  --hue-solid-fg: var(--prime-color-palette-teal-solid-fg);
+}

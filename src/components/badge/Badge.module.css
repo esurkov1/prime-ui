@@ -1,48 +1,37 @@
 /*
  * Badge — the one chip of the kit: read-only label, counter, removable value, pressable toggle.
- * Soft by default, no borders. Dimensions come from `--prime-badge-<tier>-*`, colors from
- * `--prime-color-palette-<hue>-*`. `data-tier` is the visual tier (equals `data-size` unless the
- * size was inherited from a control, see ./tier.ts).
+ * Soft by default, no borders. Dimensions come from the chip tier (`internal/chipTier`, `--chip-*`),
+ * colors from the palette hue (`internal/palette`, `--hue-*`). `data-tier` is the visual tier
+ * (equals `data-size` unless the size was inherited from a control, see ./tier.ts).
  *
  * Layout: [start segment?] body [end segment?]. An icon or dot at an edge, the remove button and
  * Badge.Action are segments — full height, flush with the edge, the glyph centred, the whole
  * segment is the hit area. A segment takes the side padding of the badge.
  */
 .root {
-  --badge-h: var(--prime-badge-m-height);
-  --badge-px: var(--prime-badge-m-padding-x);
-  --badge-gap: var(--prime-badge-m-gap);
-  --badge-radius: var(--prime-badge-m-radius);
-  --badge-text: var(--prime-badge-m-text-size);
   --badge-lh: var(--prime-text-caption-line-height);
   --badge-dot: calc(var(--prime-space-1) + 2 * var(--prime-border-width));
-  --prime-icon-size: var(--prime-badge-m-icon);
   /* Edge paddings are variables: an icon or dot at an edge turns into a segment and takes that side. */
-  --badge-pad-start: var(--badge-px);
-  --badge-pad-end: var(--badge-px);
-
-  --hue-soft: var(--prime-color-palette-gray-soft);
-  --hue-text: var(--prime-color-palette-gray-text);
-  --hue-solid: var(--prime-color-palette-gray-solid);
-  --hue-solid-fg: var(--prime-color-palette-gray-solid-fg);
+  --badge-pad-start: var(--chip-px);
+  --badge-pad-end: var(--chip-px);
 
   /* A segment holds its mark with equal space on both sides: (padding + gap) / 2 to the edge and
      the same to the text. The flex gap next to a segment is cancelled, so nothing is added. */
-  --badge-seg: calc(var(--prime-icon-size) + var(--badge-px) + var(--badge-gap));
+  --badge-seg: calc(var(--prime-icon-size) + var(--chip-px) + var(--chip-gap));
 
   position: relative;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  gap: var(--badge-gap);
-  height: var(--badge-h);
+  gap: var(--chip-gap);
+  height: var(--chip-h);
   /* Do not stretch inside a column flex/grid parent. */
   width: fit-content;
-  min-width: var(--badge-h);
+  min-width: var(--chip-h);
   max-width: 100%;
   padding-inline: var(--badge-pad-start) var(--badge-pad-end);
-  border-radius: var(--badge-radius);
-  font-size: var(--badge-text);
+  border-radius: var(--chip-radius);
+  font-size: var(--chip-text);
   line-height: var(--badge-lh);
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
@@ -51,46 +40,15 @@
   overflow: hidden;
 }
 
-/* ─── Tiers ─────────────────────────────────────────────────────────────── */
-
-.root[data-tier="xs"] {
-  --badge-h: var(--prime-badge-xs-height);
-  --badge-px: var(--prime-badge-xs-padding-x);
-  --badge-gap: var(--prime-badge-xs-gap);
-  --badge-radius: var(--prime-badge-xs-radius);
-  --badge-text: var(--prime-badge-xs-text-size);
-  --prime-icon-size: var(--prime-badge-xs-icon);
-}
-
-.root[data-tier="s"] {
-  --badge-h: var(--prime-badge-s-height);
-  --badge-px: var(--prime-badge-s-padding-x);
-  --badge-gap: var(--prime-badge-s-gap);
-  --badge-radius: var(--prime-badge-s-radius);
-  --badge-text: var(--prime-badge-s-text-size);
-  --prime-icon-size: var(--prime-badge-s-icon);
-}
-
+/* Bigger tiers get the matching line height and an 8px dot. */
 .root[data-tier="l"] {
-  --badge-h: var(--prime-badge-l-height);
-  --badge-px: var(--prime-badge-l-padding-x);
-  --badge-gap: var(--prime-badge-l-gap);
-  --badge-radius: var(--prime-badge-l-radius);
-  --badge-text: var(--prime-badge-l-text-size);
   --badge-lh: var(--prime-text-body-s-line-height);
   --badge-dot: var(--prime-space-2);
-  --prime-icon-size: var(--prime-badge-l-icon);
 }
 
 .root[data-tier="xl"] {
-  --badge-h: var(--prime-badge-xl-height);
-  --badge-px: var(--prime-badge-xl-padding-x);
-  --badge-gap: var(--prime-badge-xl-gap);
-  --badge-radius: var(--prime-badge-xl-radius);
-  --badge-text: var(--prime-badge-xl-text-size);
   --badge-lh: var(--prime-text-body-m-line-height);
   --badge-dot: var(--prime-space-2);
-  --prime-icon-size: var(--prime-badge-xl-icon);
 }
 
 .root[data-icon-start="true"] {
@@ -103,73 +61,8 @@
 
 .root[data-icon-only="true"] {
   justify-content: center;
-  width: var(--badge-h);
+  width: var(--chip-h);
   padding-inline: 0;
-}
-
-/* ─── Hues ──────────────────────────────────────────────────────────────── */
-
-.root[data-color="red"] {
-  --hue-soft: var(--prime-color-palette-red-soft);
-  --hue-text: var(--prime-color-palette-red-text);
-  --hue-solid: var(--prime-color-palette-red-solid);
-  --hue-solid-fg: var(--prime-color-palette-red-solid-fg);
-}
-
-.root[data-color="blue"] {
-  --hue-soft: var(--prime-color-palette-blue-soft);
-  --hue-text: var(--prime-color-palette-blue-text);
-  --hue-solid: var(--prime-color-palette-blue-solid);
-  --hue-solid-fg: var(--prime-color-palette-blue-solid-fg);
-}
-
-.root[data-color="green"] {
-  --hue-soft: var(--prime-color-palette-green-soft);
-  --hue-text: var(--prime-color-palette-green-text);
-  --hue-solid: var(--prime-color-palette-green-solid);
-  --hue-solid-fg: var(--prime-color-palette-green-solid-fg);
-}
-
-.root[data-color="orange"] {
-  --hue-soft: var(--prime-color-palette-orange-soft);
-  --hue-text: var(--prime-color-palette-orange-text);
-  --hue-solid: var(--prime-color-palette-orange-solid);
-  --hue-solid-fg: var(--prime-color-palette-orange-solid-fg);
-}
-
-.root[data-color="yellow"] {
-  --hue-soft: var(--prime-color-palette-yellow-soft);
-  --hue-text: var(--prime-color-palette-yellow-text);
-  --hue-solid: var(--prime-color-palette-yellow-solid);
-  --hue-solid-fg: var(--prime-color-palette-yellow-solid-fg);
-}
-
-.root[data-color="purple"] {
-  --hue-soft: var(--prime-color-palette-purple-soft);
-  --hue-text: var(--prime-color-palette-purple-text);
-  --hue-solid: var(--prime-color-palette-purple-solid);
-  --hue-solid-fg: var(--prime-color-palette-purple-solid-fg);
-}
-
-.root[data-color="sky"] {
-  --hue-soft: var(--prime-color-palette-sky-soft);
-  --hue-text: var(--prime-color-palette-sky-text);
-  --hue-solid: var(--prime-color-palette-sky-solid);
-  --hue-solid-fg: var(--prime-color-palette-sky-solid-fg);
-}
-
-.root[data-color="pink"] {
-  --hue-soft: var(--prime-color-palette-pink-soft);
-  --hue-text: var(--prime-color-palette-pink-text);
-  --hue-solid: var(--prime-color-palette-pink-solid);
-  --hue-solid-fg: var(--prime-color-palette-pink-solid-fg);
-}
-
-.root[data-color="teal"] {
-  --hue-soft: var(--prime-color-palette-teal-soft);
-  --hue-text: var(--prime-color-palette-teal-text);
-  --hue-solid: var(--prime-color-palette-teal-solid);
-  --hue-solid-fg: var(--prime-color-palette-teal-solid-fg);
 }
 
 /* ─── Variants ──────────────────────────────────────────────────────────── */
@@ -250,27 +143,33 @@
 
 .dot[data-edge] {
   align-self: stretch;
-  width: calc(var(--badge-dot) + var(--badge-px) + var(--badge-gap));
+  width: calc(var(--badge-dot) + var(--chip-px) + var(--chip-gap));
   height: auto;
 }
 
 .icon[data-edge="start"],
 .dot[data-edge="start"] {
-  margin-inline-end: calc(-1 * var(--badge-gap));
+  margin-inline-end: calc(-1 * var(--chip-gap));
 }
 
 .icon[data-edge="end"],
 .dot[data-edge="end"] {
-  margin-inline-start: calc(-1 * var(--badge-gap));
+  margin-inline-start: calc(-1 * var(--chip-gap));
 }
 
-/* ─── Body ──────────────────────────────────────────────────────────────── */
+/* ─── Body and text ─────────────────────────────────────────────────────── */
 
 .body {
   display: inline-flex;
   align-self: stretch;
   align-items: center;
-  gap: var(--badge-gap);
+  gap: var(--chip-gap);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Text runs in a block box: an ellipsis needs one (a flex container never draws it). */
+.text {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -383,24 +282,24 @@
    Resting: the room is split evenly, so the text sits centred. Revealed: the text slides to the
    start and the room opens at the end. The sum never changes. */
 .root[data-action] {
-  --badge-action-room: calc(var(--badge-seg) + var(--badge-gap));
-  --badge-pad-start: calc((var(--badge-px) + var(--badge-action-room)) / 2);
-  --badge-pad-end: calc((var(--badge-px) + var(--badge-action-room)) / 2);
+  --badge-action-room: calc(var(--badge-seg) + var(--chip-gap));
+  --badge-pad-start: calc((var(--chip-px) + var(--badge-action-room)) / 2);
+  --badge-pad-end: calc((var(--chip-px) + var(--badge-action-room)) / 2);
   transition: padding var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-action="persistent"],
 .root[data-action="reveal"]:hover,
 .root[data-action="reveal"]:focus-within {
-  --badge-pad-start: var(--badge-px);
+  --badge-pad-start: var(--chip-px);
   --badge-pad-end: var(--badge-action-room);
 }
 
 /* With a leading icon segment the start has no padding of its own: the room moves by
    (room − px) / 2 at rest and fully to the end when revealed. */
 .root[data-action][data-icon-start="true"] {
-  --badge-pad-start: calc((var(--badge-action-room) - var(--badge-px)) / 2);
-  --badge-pad-end: calc((var(--badge-action-room) + var(--badge-px)) / 2);
+  --badge-pad-start: calc((var(--badge-action-room) - var(--chip-px)) / 2);
+  --badge-pad-end: calc((var(--badge-action-room) + var(--chip-px)) / 2);
 }
 
 .root[data-action="persistent"][data-icon-start="true"],

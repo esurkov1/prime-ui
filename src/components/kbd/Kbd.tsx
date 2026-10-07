@@ -2,6 +2,7 @@ import type * as React from "react";
 
 import { useBadgeTier } from "@/components/badge/tier";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize } from "@/internal/states";
@@ -18,7 +19,11 @@ export type KbdProps = Omit<React.HTMLAttributes<HTMLElement>, "size"> & {
 export function Kbd({ children, className, size: sizeProp, ...rest }: KbdProps) {
   const { size, tier } = useBadgeTier(sizeProp);
   return (
-    <kbd className={cx(styles.root, className)} {...rest} {...toDataAttributes({ size, tier })}>
+    <kbd
+      className={cx(styles.root, chipTier.tier, className)}
+      {...rest}
+      {...toDataAttributes({ size, tier })}
+    >
       <ControlSizeProvider value={tier}>{children}</ControlSizeProvider>
     </kbd>
   );

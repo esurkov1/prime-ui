@@ -3,6 +3,7 @@
  * (24 · 32 · 40 · 48 · 64), width = height × ratio; `fullWidth` flips it: width = container, height
  * from the ratio. Radius steps with the tier. No outline by default (depth from fill); `ring` adds a
  * faint inner ring for photos with a white background on a light surface. Fallback: palette soft fill + icon in the palette text color.
+ * Hue variables come from `internal/palette` (`.hue` on the root).
  */
 
 .root {
@@ -10,8 +11,6 @@
   --thumb-radius: var(--prime-thumbnail-m-radius);
   --thumb-icon: var(--prime-icon-m);
   --thumb-ratio: 1;
-  --hue-soft: var(--prime-color-palette-gray-soft);
-  --hue-text: var(--prime-color-palette-gray-text);
 
   position: relative;
   box-sizing: border-box;
@@ -89,107 +88,10 @@
   --thumb-ratio: 3 / 4;
 }
 
-/* ─── Hues ──────────────────────────────────────────────────────────────── */
-
-.root[data-color="red"] {
-  --hue-soft: var(--prime-color-palette-red-soft);
-  --hue-text: var(--prime-color-palette-red-text);
-}
-
-.root[data-color="blue"] {
-  --hue-soft: var(--prime-color-palette-blue-soft);
-  --hue-text: var(--prime-color-palette-blue-text);
-}
-
-.root[data-color="green"] {
-  --hue-soft: var(--prime-color-palette-green-soft);
-  --hue-text: var(--prime-color-palette-green-text);
-}
-
-.root[data-color="orange"] {
-  --hue-soft: var(--prime-color-palette-orange-soft);
-  --hue-text: var(--prime-color-palette-orange-text);
-}
-
-.root[data-color="yellow"] {
-  --hue-soft: var(--prime-color-palette-yellow-soft);
-  --hue-text: var(--prime-color-palette-yellow-text);
-}
-
-.root[data-color="purple"] {
-  --hue-soft: var(--prime-color-palette-purple-soft);
-  --hue-text: var(--prime-color-palette-purple-text);
-}
-
-.root[data-color="sky"] {
-  --hue-soft: var(--prime-color-palette-sky-soft);
-  --hue-text: var(--prime-color-palette-sky-text);
-}
-
-.root[data-color="pink"] {
-  --hue-soft: var(--prime-color-palette-pink-soft);
-  --hue-text: var(--prime-color-palette-pink-text);
-}
-
-.root[data-color="teal"] {
-  --hue-soft: var(--prime-color-palette-teal-soft);
-  --hue-text: var(--prime-color-palette-teal-text);
-}
-
 /* Solid: the hue itself with a contrasting icon — when the color is a property of the object. */
 .root[data-variant="solid"] {
   background: var(--hue-solid);
   color: var(--hue-solid-fg);
-}
-
-.root[data-color="gray"] {
-  --hue-solid: var(--prime-color-palette-gray-solid);
-  --hue-solid-fg: var(--prime-color-palette-gray-solid-fg);
-}
-
-.root[data-color="red"] {
-  --hue-solid: var(--prime-color-palette-red-solid);
-  --hue-solid-fg: var(--prime-color-palette-red-solid-fg);
-}
-
-.root[data-color="blue"] {
-  --hue-solid: var(--prime-color-palette-blue-solid);
-  --hue-solid-fg: var(--prime-color-palette-blue-solid-fg);
-}
-
-.root[data-color="green"] {
-  --hue-solid: var(--prime-color-palette-green-solid);
-  --hue-solid-fg: var(--prime-color-palette-green-solid-fg);
-}
-
-.root[data-color="orange"] {
-  --hue-solid: var(--prime-color-palette-orange-solid);
-  --hue-solid-fg: var(--prime-color-palette-orange-solid-fg);
-}
-
-.root[data-color="yellow"] {
-  --hue-solid: var(--prime-color-palette-yellow-solid);
-  --hue-solid-fg: var(--prime-color-palette-yellow-solid-fg);
-}
-
-.root[data-color="purple"] {
-  --hue-solid: var(--prime-color-palette-purple-solid);
-  --hue-solid-fg: var(--prime-color-palette-purple-solid-fg);
-}
-
-.root[data-color="sky"] {
-  --hue-solid: var(--prime-color-palette-sky-solid);
-  --hue-solid-fg: var(--prime-color-palette-sky-solid-fg);
-}
-
-.root[data-color="pink"] {
-  --hue-solid: var(--prime-color-palette-pink-solid);
-  --hue-solid-fg: var(--prime-color-palette-pink-solid-fg);
-}
-
-.root[data-color="teal"] {
-  --hue-solid: var(--prime-color-palette-teal-solid);
-  --hue-solid-fg: var(--prime-color-palette-teal-solid-fg);
 }
 
 /* ─── Parts ─────────────────────────────────────────────────────────────── */
