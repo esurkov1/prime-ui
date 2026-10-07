@@ -350,7 +350,11 @@
   height: var(--prime-panel-group-label-height);
   margin: 0;
   padding-inline: var(--sb-item-pad);
-  color: color-mix(in srgb, var(--prime-color-text-muted) calc(var(--sb-reveal) * 100%), transparent);
+  color: color-mix(
+    in srgb,
+    var(--prime-color-text-muted) calc(var(--sb-reveal) * 100%),
+    transparent
+  );
   background-image: linear-gradient(
     color-mix(
       in srgb,
