@@ -43,9 +43,7 @@ export default function ScrollContainerEdgeFadeExample() {
         <ScrollContainer axis="horizontal" fade scrollbar="hidden">
           <div className={styles.strip}>
             {TAGS.map((tag) => (
-              <Badge.Root key={tag} size="m">
-                {tag}
-              </Badge.Root>
+              <Badge.Root key={tag}>{tag}</Badge.Root>
             ))}
           </div>
         </ScrollContainer>
