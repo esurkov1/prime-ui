@@ -247,9 +247,22 @@ describe("docs contract", () => {
           expect(example.description, `${exampleFile(example)}: description`).toMatch(/\.$/);
         }
         const rootProps = (page.api.parts[0]?.props ?? []).map((prop) => prop.name);
-        for (const slot of requiredSlots(page.kind, rootProps)) {
-          expect(slots, `required slot "${slot}"`).toContain(slot);
+        for (const { slot, by } of requiredSlots(page.kind, rootProps)) {
+          const reason = by === "kind" ? `the ${page.kind} kind` : `the root prop \`${by}\``;
+          expect(slots, `required slot "${slot}" (by ${reason})`).toContain(slot);
         }
+      });
+
+      it("the kind allows every slot the root API requires", () => {
+        const allowed = KIND_SLOTS[page.kind].map((entry) => entry.slot);
+        const rootProps = (page.api.parts[0]?.props ?? []).map((prop) => prop.name);
+        const conflicts = requiredSlots(page.kind, rootProps)
+          .filter(({ slot }) => !allowed.includes(slot))
+          .map(({ slot, by }) => `\`${by}\` requires "${slot}"`);
+        expect(
+          conflicts,
+          `PROP_SLOTS require slots a ${page.kind} page does not allow — add them to KIND_SLOTS.${page.kind} in playground/pageStandard.ts or pick another kind`,
+        ).toEqual([]);
       });
 
       it("example descriptions name the same props as the example JSDoc", () => {
