@@ -1,4 +1,4 @@
-/** A visible DialogTitle and DialogDescription, a trailing slot with Kbd and a close button, removable scope tags and footer hints. Use when the palette needs a heading or a search scope. */
+/** A visible DialogTitle and DialogDescription, a trailing slot with Kbd and a close button, removable scope badges and footer hints. Use when the palette needs a heading or a search scope. */
 import { FileText, Settings, Sparkles, X } from "lucide-react";
 import { Badge, Button, CommandMenu, Kbd } from "prime-ui-kit";
 import * as React from "react";
@@ -42,9 +42,9 @@ export default function CommandMenuCompositionExample() {
           <CommandMenu.Input placeholder="Куда перейти" aria-label="Поиск" />
         </CommandMenu.InputRow>
 
-        <CommandMenu.TagSection>
-          <CommandMenu.TagSectionLabel>Область поиска</CommandMenu.TagSectionLabel>
-          <CommandMenu.TagRow>
+        <CommandMenu.BadgeSection>
+          <CommandMenu.BadgeSectionLabel>Область поиска</CommandMenu.BadgeSectionLabel>
+          <CommandMenu.BadgeRow>
             {scopes.map((scope) => (
               <Badge.Root
                 labels={{ remove: `Убрать «${scope}»` }}
@@ -54,8 +54,8 @@ export default function CommandMenuCompositionExample() {
                 {scope}
               </Badge.Root>
             ))}
-          </CommandMenu.TagRow>
-        </CommandMenu.TagSection>
+          </CommandMenu.BadgeRow>
+        </CommandMenu.BadgeSection>
 
         <CommandMenu.List>
           <CommandMenu.Empty />

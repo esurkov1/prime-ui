@@ -5,7 +5,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { ControlSize } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Slider.module.css";
 
@@ -24,6 +24,8 @@ export type SliderRootProps = {
   /** Formats the displayed value and `aria-valuetext` (e.g. `(v) => \`${v} °C\``). */
   formatValue?: (value: number) => string;
   size?: ControlSize;
+  /** Color of the filled part of the track. */
+  tone?: Tone;
   className?: string;
   "aria-label"?: string;
 };
@@ -44,6 +46,7 @@ function SliderRoot({
   showValue = false,
   formatValue,
   size = "m",
+  tone = "accent",
   className,
   "aria-label": ariaLabel,
 }: SliderRootProps) {
@@ -59,7 +62,7 @@ function SliderRoot({
 
   const id = React.useId();
   const safeValue = clamp(value, min, max);
-  const percent = max > min ? ((safeValue - min) / (max - min)) * 100 : 0;
+  const ratio = max > min ? (safeValue - min) / (max - min) : 0;
   const valueText = formatValue ? formatValue(safeValue) : String(safeValue);
 
   const applyValueFromInput = (el: HTMLInputElement) => {
@@ -83,8 +86,8 @@ function SliderRoot({
   return (
     <div
       className={cx(styles.root, className)}
-      style={{ "--slider-percent": `${percent}%` } as React.CSSProperties}
-      {...toDataAttributes({ size, disabled: disabled || undefined })}
+      style={{ "--slider-ratio": ratio } as React.CSSProperties}
+      {...toDataAttributes({ size, tone, disabled: disabled || undefined })}
     >
       <ControlSizeProvider value={size}>
         {showHeader ? (
@@ -103,20 +106,27 @@ function SliderRoot({
             ) : null}
           </div>
         ) : null}
-        <input
-          id={id}
-          type="range"
-          className={styles.track}
-          min={min}
-          max={max}
-          step={step}
-          disabled={disabled}
-          value={safeValue}
-          onChange={handleRangeChange}
-          onInput={handleRangeInput}
-          aria-label={ariaLabel}
-          aria-valuetext={formatValue ? valueText : undefined}
-        />
+        <div className={styles.control}>
+          <input
+            id={id}
+            type="range"
+            className={styles.input}
+            min={min}
+            max={max}
+            step={step}
+            disabled={disabled}
+            value={safeValue}
+            onChange={handleRangeChange}
+            onInput={handleRangeInput}
+            aria-label={ariaLabel}
+            aria-valuetext={formatValue ? valueText : undefined}
+          />
+          {/* Visual layer: the transparent native input above handles pointer, keys and a11y. */}
+          <span className={styles.track} aria-hidden="true">
+            <span className={styles.range} />
+          </span>
+          <span className={styles.thumb} aria-hidden="true" />
+        </div>
       </ControlSizeProvider>
     </div>
   );

@@ -1,6 +1,8 @@
 import type * as React from "react";
 
-import styles from "./PlaygroundApiTable.module.css";
+import { Badge } from "@/components/badge/Badge";
+import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
+import { Typography } from "@/components/typography/Typography";
 
 export type PlaygroundApiPropRow = {
   prop: string;
@@ -23,55 +25,70 @@ function renderInlineCode(text: string): React.ReactNode {
   );
 }
 
-/**
- * Props table for playground pages. A plain semantic table (not DataTable) so documentation
- * renders even while components are being reworked; on narrow screens rows become cards.
- */
+const isRequired = (row: PlaygroundApiPropRow) =>
+  row.required.trim().toLowerCase().startsWith("да");
+
+const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
+  {
+    id: "prop",
+    header: "Проп",
+    minWidth: "10rem",
+    cell: (row) => (
+      <Typography.Root as="span" variant="body-m">
+        <code>{row.prop}</code>{" "}
+        {isRequired(row) ? <Badge.Root color="orange">обязательный</Badge.Root> : null}
+      </Typography.Root>
+    ),
+  },
+  {
+    id: "type",
+    header: "Тип",
+    minWidth: "10rem",
+    cell: (row) => (
+      <Typography.Root as="span" variant="body-m">
+        <code>{row.type}</code>
+      </Typography.Root>
+    ),
+  },
+  {
+    id: "default",
+    header: "По умолчанию",
+    minWidth: "8rem",
+    cell: (row) =>
+      row.defaultValue === "—" || row.defaultValue === "" ? (
+        <Typography.Root as="span" variant="body-m" tone="muted">
+          —
+        </Typography.Root>
+      ) : (
+        <Typography.Root as="span" variant="body-m">
+          <code>{row.defaultValue}</code>
+        </Typography.Root>
+      ),
+  },
+  {
+    id: "description",
+    header: "Описание",
+    grow: true,
+    minWidth: "16rem",
+    cell: (row) => (
+      <Typography.Root as="span" variant="body-m" tone="secondary">
+        {renderInlineCode(row.description)}
+      </Typography.Root>
+    ),
+  },
+];
+
+/** Props table of a playground page: the kit's own DataTable, Badge and Typography. */
 export function PlaygroundApiTable({ rows }: { rows: PlaygroundApiPropRow[] }) {
   return (
-    <div className={styles.root}>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th scope="col">Проп</th>
-            <th scope="col">Тип</th>
-            <th scope="col">По умолчанию</th>
-            <th scope="col">Описание</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => {
-            const required = row.required.trim().toLowerCase().startsWith("да");
-            return (
-              <tr key={row.prop}>
-                <th scope="row" data-label="Проп">
-                  <span className={styles.prop}>
-                    <code>{row.prop}</code>
-                    {required ? (
-                      <span className={styles.required} title="Обязательный">
-                        обяз.
-                      </span>
-                    ) : null}
-                  </span>
-                </th>
-                <td data-label="Тип">
-                  <code className={styles.type}>{row.type}</code>
-                </td>
-                <td data-label="По умолчанию">
-                  {row.defaultValue === "—" || row.defaultValue === "" ? (
-                    <span className={styles.empty}>—</span>
-                  ) : (
-                    <code>{row.defaultValue}</code>
-                  )}
-                </td>
-                <td data-label="Описание" className={styles.description}>
-                  {renderInlineCode(row.description)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <DataTable.Root
+      columns={COLUMNS}
+      rows={rows}
+      getRowKey={(row) => row.prop}
+      showPagination={false}
+      pageSize={rows.length || 1}
+      highlightRowOnHover={false}
+      labels={{ empty: "Нет пропов" }}
+    />
   );
 }

@@ -1,16 +1,34 @@
 /*
- * Native range input. Track = fill-strong, range = accent (gradient up to --slider-percent,
- * set inline from the value), thumb = control-thumb with overlay shadow.
- * Thumb size follows the choice size of the tier, label row follows the field label system.
+ * Slider — one proportion at every tier, all derived from the tier track thickness T
+ * (--prime-control-<tier>-track): thumb is a 4.5T × 3T capsule.
+ *
+ * Layers (bottom → top): `.track` (inactive pill) holds `.range` (active pill whose rounded end
+ * sits at the thumb centre), then `.thumb`, then the transparent native `<input type="range">`
+ * that owns pointer, keyboard and a11y. Its native thumb has the same size as `.thumb`, so the
+ * centre travels the same `[W/2, 100% − W/2]` line and the visual stays under the pointer.
+ *
+ * Hover and press turn the thumb into liquid glass: it grows and goes translucent, so the
+ * rounded end of the range shows through it.
  */
 .root {
-  --slider-track-h: var(--prime-space-1);
-  --slider-thumb-size: var(--prime-control-m-choice);
+  --slider-track: var(--prime-control-m-track);
+  --slider-thumb-h: calc(var(--slider-track) * 3);
+  --slider-thumb-w: calc(var(--slider-track) * 4.5);
+  /* Hover glass frosts the track a little; press glass is clear. */
+  --slider-glass-blur: calc(var(--slider-track) / 4);
   --slider-label-gap: var(--prime-control-m-label-gap);
   --slider-value-size: var(--prime-control-m-label-size);
   --slider-value-line-height: var(--prime-control-m-label-line-height);
   --slider-track-bg: var(--prime-color-fill-strong);
   --slider-range-bg: var(--prime-color-accent-default);
+  --slider-thumb-bg: var(--prime-color-control-thumb);
+  /* Thumb centre, shared by `.range` and `.thumb`. */
+  --slider-center: calc(
+    var(--slider-thumb-w) /
+    2 +
+    (100% - var(--slider-thumb-w)) *
+    var(--slider-ratio, 0)
+  );
   display: flex;
   flex-direction: column;
   gap: var(--slider-label-gap);
@@ -19,37 +37,57 @@
 }
 
 .root[data-size="xs"] {
-  --slider-thumb-size: var(--prime-control-xs-choice);
+  --slider-track: var(--prime-control-xs-track);
   --slider-label-gap: var(--prime-control-xs-label-gap);
   --slider-value-size: var(--prime-control-xs-label-size);
   --slider-value-line-height: var(--prime-control-xs-label-line-height);
 }
 
 .root[data-size="s"] {
-  --slider-thumb-size: var(--prime-control-s-choice);
+  --slider-track: var(--prime-control-s-track);
   --slider-label-gap: var(--prime-control-s-label-gap);
   --slider-value-size: var(--prime-control-s-label-size);
   --slider-value-line-height: var(--prime-control-s-label-line-height);
 }
 
 .root[data-size="l"] {
-  --slider-thumb-size: var(--prime-control-l-choice);
+  --slider-track: var(--prime-control-l-track);
   --slider-label-gap: var(--prime-control-l-label-gap);
   --slider-value-size: var(--prime-control-l-label-size);
   --slider-value-line-height: var(--prime-control-l-label-line-height);
 }
 
 .root[data-size="xl"] {
-  --slider-track-h: var(--prime-space-2);
-  --slider-thumb-size: var(--prime-control-xl-choice);
+  --slider-track: var(--prime-control-xl-track);
   --slider-label-gap: var(--prime-control-xl-label-gap);
   --slider-value-size: var(--prime-control-xl-label-size);
   --slider-value-line-height: var(--prime-control-xl-label-line-height);
 }
 
+.root[data-tone="neutral"] {
+  --slider-range-bg: var(--prime-color-text-secondary);
+}
+
+.root[data-tone="success"] {
+  --slider-range-bg: var(--prime-color-success-default);
+}
+
+.root[data-tone="warning"] {
+  --slider-range-bg: var(--prime-color-warning-default);
+}
+
+.root[data-tone="danger"] {
+  --slider-range-bg: var(--prime-color-danger-default);
+}
+
+.root[data-tone="info"] {
+  --slider-range-bg: var(--prime-color-info-default);
+}
+
 .root[data-disabled="true"] {
   --slider-track-bg: var(--prime-color-fill-muted);
   --slider-range-bg: var(--prime-color-text-disabled);
+  --slider-thumb-bg: var(--prime-color-fill-strong);
 }
 
 .header {
@@ -77,122 +115,144 @@
   color: var(--prime-color-text-disabled);
 }
 
-/* ---- input ---- */
+/* ---- control ---- */
+.control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--slider-thumb-h);
+}
+
 .track {
-  -webkit-appearance: none;
-  appearance: none;
-  display: block;
-  width: 100%;
-  height: var(--slider-thumb-size);
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-  outline: none;
-}
-
-.track:disabled {
-  cursor: not-allowed;
-}
-
-/* WebKit: track with accent range, thumb centred on it. */
-.track::-webkit-slider-runnable-track {
-  height: var(--slider-track-h);
-  border-radius: var(--prime-radius-full);
-  background: linear-gradient(
-    to right,
-    var(--slider-range-bg) 0 var(--slider-percent, 0%),
-    var(--slider-track-bg) var(--slider-percent, 0%) 100%
-  );
-}
-
-.track::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  box-sizing: border-box;
-  width: var(--slider-thumb-size);
-  height: var(--slider-thumb-size);
-  margin-top: calc((var(--slider-track-h) - var(--slider-thumb-size)) / 2);
-  border: 0;
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-control-thumb);
-  /* Hairline edge: a white thumb on a white surface would otherwise be only a soft shadow. */
-  box-shadow:
-    inset 0 0 0 var(--prime-border-width) var(--prime-color-border-default),
-    var(--prime-shadow-overlay);
-  transition:
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.track:not(:disabled):hover::-webkit-slider-thumb {
-  box-shadow:
-    inset 0 0 0 var(--prime-border-width) var(--prime-color-border-default),
-    var(--prime-shadow-overlay),
-    0 0 0 var(--prime-space-1) var(--prime-color-accent-soft);
-}
-
-.track:not(:disabled):active::-webkit-slider-thumb {
-  transform: scale(1.1);
-}
-
-.track:focus-visible::-webkit-slider-thumb {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.track:disabled::-webkit-slider-thumb {
-  box-shadow: none;
-  background: var(--prime-color-fill-strong);
-}
-
-/* Firefox */
-.track::-moz-range-track {
-  height: var(--slider-track-h);
-  border: 0;
+  position: relative;
+  flex: 1;
+  height: var(--slider-track);
   border-radius: var(--prime-radius-full);
   background: var(--slider-track-bg);
 }
 
-.track::-moz-range-progress {
-  height: var(--slider-track-h);
+.range {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: var(--slider-center);
   border-radius: var(--prime-radius-full);
   background: var(--slider-range-bg);
 }
 
-.track::-moz-range-thumb {
+.thumb {
+  position: absolute;
+  inset-inline-start: calc(var(--slider-center) - var(--slider-thumb-w) / 2);
+  top: 0;
   box-sizing: border-box;
-  width: var(--slider-thumb-size);
-  height: var(--slider-thumb-size);
-  border: 0;
+  width: var(--slider-thumb-w);
+  height: var(--slider-thumb-h);
   border-radius: var(--prime-radius-full);
-  background: var(--prime-color-control-thumb);
-  /* Hairline edge: a white thumb on a white surface would otherwise be only a soft shadow. */
-  box-shadow:
-    inset 0 0 0 var(--prime-border-width) var(--prime-color-border-default),
-    var(--prime-shadow-overlay);
+  background: var(--slider-thumb-bg);
+  /* One crisp outer edge (light theme) and a short contact shadow; no inner hairline. */
+  box-shadow: var(--prime-shadow-thumb);
+  pointer-events: none;
   transition:
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.track:not(:disabled):hover::-moz-range-thumb {
-  box-shadow:
-    inset 0 0 0 var(--prime-border-width) var(--prime-color-border-default),
-    var(--prime-shadow-overlay),
-    0 0 0 var(--prime-space-1) var(--prime-color-accent-soft);
+/* Native input: transparent, on top, its thumb matches `.thumb` so hit area = visual. */
+.input {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
 }
 
-.track:not(:disabled):active::-moz-range-thumb {
+.input::-webkit-slider-runnable-track {
+  height: 100%;
+  background: transparent;
+}
+
+.input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--slider-thumb-w);
+  height: var(--slider-thumb-h);
+  border: 0;
+  cursor: grab;
+}
+
+.input::-moz-range-track {
+  height: 100%;
+  background: transparent;
+}
+
+.input::-moz-range-thumb {
+  width: var(--slider-thumb-w);
+  height: var(--slider-thumb-h);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: grab;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.input:disabled::-webkit-slider-thumb {
+  cursor: not-allowed;
+}
+
+.input:disabled::-moz-range-thumb {
+  cursor: not-allowed;
+}
+
+/* ---- states (input is the previous sibling of the visual layer) ---- */
+
+/* Liquid glass: hover lifts the thumb into light glass, press into clear glass; the track and the
+   rounded end of the range show through. One outer glass edge, drawn outside the shape. */
+.input:not(:disabled):hover ~ .thumb {
   transform: scale(1.1);
+  background: color-mix(in srgb, var(--slider-thumb-bg) 44%, transparent);
+  box-shadow:
+    0 0 0 var(--prime-border-width) color-mix(in srgb, var(--slider-thumb-bg) 72%, transparent),
+    var(--prime-shadow-thumb);
+  backdrop-filter: blur(var(--slider-glass-blur)) saturate(1.6);
 }
 
-.track:focus-visible::-moz-range-thumb {
+.input:not(:disabled):active ~ .thumb {
+  transform: scale(1.25);
+  background: color-mix(in srgb, var(--slider-thumb-bg) 20%, transparent);
+  box-shadow:
+    0 0 0 var(--prime-border-width) color-mix(in srgb, var(--slider-thumb-bg) 80%, transparent),
+    var(--prime-shadow-thumb);
+  backdrop-filter: saturate(1.8);
+}
+
+.input:not(:disabled):active {
+  cursor: grabbing;
+}
+
+.input:not(:disabled):active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+
+.input:not(:disabled):active::-moz-range-thumb {
+  cursor: grabbing;
+}
+
+.input:focus-visible ~ .thumb {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 
-.track:disabled::-moz-range-thumb {
+.root[data-disabled="true"] .thumb {
   box-shadow: none;
-  background: var(--prime-color-fill-strong);
 }

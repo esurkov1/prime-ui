@@ -8,6 +8,7 @@ export {
   OverlayPortalLayerProvider,
   useOverlayPortalLayer,
 } from "../internal/OverlayPortalLayerContext";
+export type { ProgressSegment } from "../internal/progressSegments";
 export * from "../layout";
 export type {
   AccordionArrowProps,
@@ -134,7 +135,12 @@ export type {
   ColorPresetsTriggerProps,
 } from "./color-picker/ColorPresets";
 export { COLOR_PRESETS, ColorPresets } from "./color-picker/ColorPresets";
+export type { ColorSwatchesLabels, ColorSwatchesRootProps } from "./color-swatches/ColorSwatches";
+export { ColorSwatches } from "./color-swatches/ColorSwatches";
 export type {
+  CommandMenuBadgeRowProps,
+  CommandMenuBadgeSectionLabelProps,
+  CommandMenuBadgeSectionProps,
   CommandMenuDialogProps,
   CommandMenuEmptyProps,
   CommandMenuFooterHintProps,
@@ -149,9 +155,6 @@ export type {
   CommandMenuItemTextProps,
   CommandMenuLabels,
   CommandMenuListProps,
-  CommandMenuTagRowProps,
-  CommandMenuTagSectionLabelProps,
-  CommandMenuTagSectionProps,
 } from "./command-menu/CommandMenu";
 export { CommandMenu } from "./command-menu/CommandMenu";
 export type {
@@ -360,7 +363,7 @@ export type {
   PopoverTriggerProps,
 } from "./popover/Popover";
 export { Popover } from "./popover/Popover";
-export type { ProgressBarRootProps } from "./progress-bar/ProgressBar";
+export type { ProgressBarLabels, ProgressBarRootProps } from "./progress-bar/ProgressBar";
 export { ProgressBar } from "./progress-bar/ProgressBar";
 export type { ProgressCircleRootProps } from "./progress-circle/ProgressCircle";
 export { ProgressCircle } from "./progress-circle/ProgressCircle";
@@ -383,12 +386,6 @@ export type {
   SegmentedControlRootProps,
 } from "./segmented-control/SegmentedControl";
 export { SegmentedControl } from "./segmented-control/SegmentedControl";
-export type {
-  SegmentedProgressBarLabels,
-  SegmentedProgressBarRootProps,
-  SegmentedProgressSegment,
-} from "./segmented-progress-bar/SegmentedProgressBar";
-export { SegmentedProgressBar } from "./segmented-progress-bar/SegmentedProgressBar";
 export type {
   SelectBadgeProps,
   SelectContentProps,
@@ -459,6 +456,14 @@ export type {
   TextareaRootProps,
 } from "./textarea/Textarea";
 export { Textarea } from "./textarea/Textarea";
+export type {
+  ThumbnailFallbackProps,
+  ThumbnailImageProps,
+  ThumbnailImageStatus,
+  ThumbnailRatio,
+  ThumbnailRootProps,
+} from "./thumbnail/Thumbnail";
+export { Thumbnail } from "./thumbnail/Thumbnail";
 export type {
   TimelineGapProps,
   TimelineGroupProps,

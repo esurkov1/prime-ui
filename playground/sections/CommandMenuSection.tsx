@@ -377,13 +377,13 @@ const itemIconApiRows: PlaygroundApiPropRow[] = [
   },
 ];
 
-const tagSectionApiRows: PlaygroundApiPropRow[] = [
+const badgeSectionApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Метка секции и ряд тегов.",
+    description: "Метка секции и ряд бейджей.",
   },
   {
     prop: "className",
@@ -397,7 +397,7 @@ const tagSectionApiRows: PlaygroundApiPropRow[] = [
     type: "React.HTMLAttributes<HTMLDivElement>",
     defaultValue: "—",
     required: "Нет",
-    description: "Атрибуты контейнера секции тегов.",
+    description: "Атрибуты контейнера секции бейджей.",
   },
 ];
 
@@ -407,7 +407,7 @@ const tagSectionLabelApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Текст подписи над тегами.",
+    description: "Текст подписи над бейджами.",
   },
   {
     prop: "className",
@@ -431,7 +431,7 @@ const tagRowApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Теги или чипы в ряд.",
+    description: "Бейджи (Badge) в ряд.",
   },
   {
     prop: "className",
@@ -614,8 +614,8 @@ export default function CommandMenuSection() {
             <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
               <code>DialogTitle</code> и <code>DialogDescription</code>, слот <code>trailing</code>{" "}
-              с <code>Kbd</code> и кнопкой закрытия, область поиска из тегов (
-              <code>TagSection</code>), футер с подсказками.
+              с <code>Kbd</code> и кнопкой закрытия, область поиска из бейджей (
+              <code>BadgeSection</code>), футер с подсказками.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
               code={compositionSource.trim()}
@@ -685,14 +685,14 @@ export default function CommandMenuSection() {
             <DemoApiTitle>CommandMenu.ItemIcon</DemoApiTitle>
             <DemoDescription>Слот иконки с выбором корневого элемента.</DemoDescription>
             <PlaygroundApiTable rows={itemIconApiRows} />
-            <DemoApiTitle>CommandMenu.TagSection</DemoApiTitle>
-            <DemoDescription>Блок под строкой поиска для фильтров-тегов.</DemoDescription>
-            <PlaygroundApiTable rows={tagSectionApiRows} />
-            <DemoApiTitle>CommandMenu.TagSectionLabel</DemoApiTitle>
-            <DemoDescription>Подпись над рядом тегов.</DemoDescription>
+            <DemoApiTitle>CommandMenu.BadgeSection</DemoApiTitle>
+            <DemoDescription>Блок под строкой поиска для бейджей-фильтров.</DemoDescription>
+            <PlaygroundApiTable rows={badgeSectionApiRows} />
+            <DemoApiTitle>CommandMenu.BadgeSectionLabel</DemoApiTitle>
+            <DemoDescription>Подпись над рядом бейджей.</DemoDescription>
             <PlaygroundApiTable rows={tagSectionLabelApiRows} />
-            <DemoApiTitle>CommandMenu.TagRow</DemoApiTitle>
-            <DemoDescription>Горизонтальный ряд для чипов или тегов.</DemoDescription>
+            <DemoApiTitle>CommandMenu.BadgeRow</DemoApiTitle>
+            <DemoDescription>Горизонтальный ряд бейджей.</DemoDescription>
             <PlaygroundApiTable rows={tagRowApiRows} />
             <DemoApiTitle>CommandMenu.Footer</DemoApiTitle>
             <DemoDescription>Нижняя зона подсказок и ссылок.</DemoDescription>

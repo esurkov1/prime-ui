@@ -38,3 +38,41 @@
 .meta {
   font-variant-numeric: tabular-nums;
 }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-2) var(--prime-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.legendValue {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Legend dots repeat the segment fills. */
+.dot {
+  width: var(--prime-space-2);
+  height: var(--prime-space-2);
+  border-radius: var(--prime-radius-full);
+}
+
+.dot[data-tone="accent"] {
+  background: var(--prime-color-accent-default);
+}
+
+.dot[data-tone="success"] {
+  background: var(--prime-color-success-default);
+}
+
+.dot[data-tone="warning"] {
+  background: var(--prime-color-warning-default);
+}

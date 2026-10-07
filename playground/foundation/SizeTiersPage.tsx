@@ -1,10 +1,20 @@
-import type { CSSProperties } from "react";
+import { Search } from "lucide-react";
+
+import { Badge } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
+import { Checkbox } from "@/components/checkbox/Checkbox";
+import type { DataTableColumn } from "@/components/data-table/DataTable";
+import { Input } from "@/components/input/Input";
+import { Kbd } from "@/components/kbd/Kbd";
+import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
+import { Select } from "@/components/select/Select";
+import { Typography } from "@/components/typography/Typography";
 
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import { DemoApiTitle, DemoDescription } from "../components/PlaygroundDemoTypography";
 import { FoundationPage, FoundationSection, Panel, RuleList, TokenTable } from "./FoundationKit";
 import s from "./foundation.module.css";
-import { formatPx, SIZE_TIERS, type SizeTier, semanticPx, toVarName } from "./tokenModel";
+import { formatPx, SIZE_TIERS, type SizeTier, semanticPx } from "./tokenModel";
 
 const px = (path: string) => formatPx(semanticPx(path));
 const pair = (size: string, lh: string) => `${px(size)}/${px(lh)}`;
@@ -22,89 +32,71 @@ const COLUMNS: { head: string; cell: (t: SizeTier) => string }[] = [
   { head: "Подсказка", cell: (t) => pair(`control.${t}.hintSize`, `control.${t}.hintLineHeight`) },
   { head: "Пункт меню", cell: (t) => px(`control.${t}.itemHeight`) },
   { head: "Checkbox", cell: (t) => px(`control.${t}.choice`) },
+  { head: "Дорожка", cell: (t) => px(`control.${t}.track`) },
+];
+
+const TIER_COLUMNS: DataTableColumn<SizeTier>[] = [
+  {
+    id: "tier",
+    header: "Уровень",
+    cell: (t) => (
+      <span className={s.tierCell}>
+        {t}
+        {t === "m" ? <Badge.Root color="blue">по умолчанию</Badge.Root> : null}
+      </span>
+    ),
+  },
+  ...COLUMNS.map(
+    (c): DataTableColumn<SizeTier> => ({
+      id: c.head,
+      header: c.head,
+      numeric: true,
+      cell: (t) => c.cell(t),
+    }),
+  ),
 ];
 
 function TierTable() {
-  return (
-    <TokenTable head={["Уровень", ...COLUMNS.map((c) => c.head)]}>
-      {SIZE_TIERS.map((t) => (
-        <tr key={t} data-default={t === "m" || undefined}>
-          <th scope="row">
-            {t}
-            {t === "m" ? <span className={s.defaultMark}>по умолчанию</span> : null}
-          </th>
-          {COLUMNS.map((c) => (
-            <td key={c.head} className={s.numeric}>
-              {c.cell(t)}
-            </td>
-          ))}
-        </tr>
-      ))}
-    </TokenTable>
-  );
+  return <TokenTable columns={TIER_COLUMNS} rows={[...SIZE_TIERS]} getRowKey={(t) => t} />;
 }
 
-/** Badge tier one step down from a control tier (pairing rule). */
-function badgeTierFor(t: SizeTier): SizeTier {
-  const i = SIZE_TIERS.indexOf(t);
-  return SIZE_TIERS[Math.max(0, i - 1)];
-}
-
-function tierVars(t: SizeTier): CSSProperties {
-  const v = (k: string) => `var(${toVarName(`control.${t}.${k}`)})`;
-  const b = badgeTierFor(t);
-  const bv = (k: string) => `var(${toVarName(`badge.${b}.${k}`)})`;
-  return {
-    "--t-height": v("height"),
-    "--t-pad": v("paddingX"),
-    "--t-field-pad": v("fieldPaddingX"),
-    "--t-gap": v("gap"),
-    "--t-icon": v("icon"),
-    "--t-radius": v("radius"),
-    "--t-text": v("textSize"),
-    "--t-lh": v("lineHeight"),
-    "--t-choice": v("choice"),
-    "--t-label": v("labelSize"),
-    "--t-label-lh": v("labelLineHeight"),
-    "--t-label-gap": v("labelGap"),
-    "--t-hint": v("hintSize"),
-    "--t-hint-lh": v("hintLineHeight"),
-    "--t-hint-gap": v("hintGap"),
-    "--t-item": v("itemHeight"),
-    "--b-height": bv("height"),
-    "--b-pad": bv("paddingX"),
-    "--b-text": bv("textSize"),
-    "--b-radius": bv("radius"),
-  } as CSSProperties;
-}
-
-/** Plain blocks styled only by tier tokens: renders even while components are being reworked. */
+/** One row of real kit controls of a tier: heights match, the text shares one baseline. */
 function TierRow({ t }: { t: SizeTier }) {
   return (
-    <div className={s.tierRow} style={tierVars(t)}>
-      <span className={s.tierName}>
+    <div className={s.tierRow}>
+      <Typography.Root as="span" variant="caption" tone="muted" className={s.tierName}>
         {t} · {px(`control.${t}.height`)}
-      </span>
+      </Typography.Root>
       <div className={s.tierItems}>
-        <span className={s.tierButton} data-tone="accent">
-          <span className={s.tierIcon} />
+        <Button.Root size={t}>
+          <Button.Icon>
+            <Search />
+          </Button.Icon>
           Сохранить
-        </span>
-        <span className={s.tierButton} data-tone="neutral">
+        </Button.Root>
+        <Button.Root size={t} variant="soft" tone="neutral">
           Отмена
-        </span>
-        <span className={s.tierIconButton} title="Квадратная: ширина = высоте">
-          <span className={s.tierIcon} />
-        </span>
-        <span className={s.tierField}>
-          <span className={s.tierPlaceholder}>Поиск</span>
-          <span className={s.tierBadge}>⌘K</span>
-        </span>
-        <span className={s.tierSegmented}>
-          <span data-active>День</span>
-          <span>Неделя</span>
-        </span>
-        <span className={s.tierChoice} />
+        </Button.Root>
+        <Button.Root size={t} variant="soft" tone="neutral" aria-label="Поиск">
+          <Button.Icon>
+            <Search />
+          </Button.Icon>
+        </Button.Root>
+        <Input.Root size={t} className={s.tierInput}>
+          <Input.Wrapper>
+            <Input.Field aria-label={`Поиск, размер ${t}`} placeholder="Поиск" />
+            <Input.InlineAffix side="end">
+              <Kbd.Root>⌘K</Kbd.Root>
+            </Input.InlineAffix>
+          </Input.Wrapper>
+        </Input.Root>
+        <SegmentedControl.Root size={t} defaultValue="day" aria-label={`Период, размер ${t}`}>
+          <SegmentedControl.Item value="day">День</SegmentedControl.Item>
+          <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+        </SegmentedControl.Root>
+        <Checkbox.Root size={t} defaultChecked>
+          <Checkbox.Label>Все</Checkbox.Label>
+        </Checkbox.Root>
       </div>
     </div>
   );
@@ -120,65 +112,60 @@ function TierLiveRows() {
   );
 }
 
-/** A field + label + hint + open menu of one tier: shows the pairing rules together. */
+/** A Select of one tier with its label and hint: open it to see the menu items of the same tier. */
 function PairingDemo() {
   return (
     <div className={s.pairingGrid}>
       {(["s", "m", "l"] as const).map((t) => (
-        <Panel key={t} className={s.pairingCard} style={tierVars(t)}>
-          <span className={s.demoLabel}>Уровень {t}</span>
-          <div className={s.pairField}>
-            <span className={s.pairLabel}>Город</span>
-            <span className={s.tierField} data-open>
-              <span>Москва</span>
-            </span>
-            <span className={s.pairHint}>Подсказка мельче текста поля</span>
-          </div>
-          <div className={s.pairMenu}>
-            {["Москва", "Казань", "Самара"].map((city, i) => (
-              <span key={city} className={s.pairItem} data-active={i === 0 || undefined}>
-                {city}
-              </span>
-            ))}
-          </div>
+        <Panel key={t} className={s.pairingCard}>
+          <Typography.Root as="span" variant="caption" tone="muted">
+            Уровень {t}
+          </Typography.Root>
+          <Select.Root
+            size={t}
+            defaultValue="msk"
+            label="Город"
+            hint="Подсказка мельче текста поля"
+          >
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Item value="msk">Москва</Select.Item>
+              <Select.Item value="kzn">Казань</Select.Item>
+              <Select.Item value="smr">Самара</Select.Item>
+            </Select.Content>
+          </Select.Root>
         </Panel>
       ))}
     </div>
   );
 }
 
-const BADGE_COLS = ["height", "paddingX", "textSize", "icon", "gap", "radius"] as const;
+const BADGE_TABLE_COLUMNS: DataTableColumn<SizeTier>[] = [
+  { id: "tier", header: "Badge", accessor: (t) => t },
+  ...(
+    [
+      ["height", "Высота"],
+      ["paddingX", "padX"],
+      ["textSize", "Текст"],
+      ["icon", "Иконка"],
+      ["gap", "Gap"],
+      ["radius", "Радиус"],
+    ] as const
+  ).map(
+    ([k, head]): DataTableColumn<SizeTier> => ({
+      id: k,
+      header: head,
+      numeric: true,
+      cell: (t) => px(`badge.${t}.${k}`),
+    }),
+  ),
+  { id: "sample", header: "", cell: (t) => <Badge.Root size={t}>Новый</Badge.Root> },
+];
 
 function BadgeTable() {
-  return (
-    <TokenTable head={["Badge", "Высота", "padX", "Текст", "Иконка", "Gap", "Радиус", ""]}>
-      {SIZE_TIERS.map((t) => (
-        <tr key={t}>
-          <th scope="row">{t}</th>
-          {BADGE_COLS.map((k) => (
-            <td key={k} className={s.numeric}>
-              {px(`badge.${t}.${k}`)}
-            </td>
-          ))}
-          <td>
-            <span
-              className={s.tierBadge}
-              style={
-                {
-                  "--b-height": `var(${toVarName(`badge.${t}.height`)})`,
-                  "--b-pad": `var(${toVarName(`badge.${t}.paddingX`)})`,
-                  "--b-text": `var(${toVarName(`badge.${t}.textSize`)})`,
-                  "--b-radius": `var(${toVarName(`badge.${t}.radius`)})`,
-                } as CSSProperties
-              }
-            >
-              Новый
-            </span>
-          </td>
-        </tr>
-      ))}
-    </TokenTable>
-  );
+  return <TokenTable columns={BADGE_TABLE_COLUMNS} rows={[...SIZE_TIERS]} getRowKey={(t) => t} />;
 }
 
 const providerRows: PlaygroundApiPropRow[] = [
@@ -220,7 +207,7 @@ export default function SizeTiersPage() {
 
       <FoundationSection
         title="В одну линию"
-        description="Каждая строка собрана из обычных блоков на токенах своего уровня. Высоты совпадают, базовая линия текста общая."
+        description="Каждая строка собрана из настоящих компонентов кита своего уровня. Высоты совпадают, базовая линия текста общая."
       >
         <TierLiveRows />
       </FoundationSection>

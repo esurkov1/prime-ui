@@ -2,6 +2,10 @@
  * DataTable — Graphite.
  * Surface container (bg-surface, card radius, no outer border), sunken head, hairline row separators.
  * Density follows `size`: xs/s = compact (row-height-s), m = default (row-height-m), l/xl = comfortable (row-height-l).
+ * Row height is content-driven: the row height token is a minimum, and cells carry vertical padding
+ * `--dt-pad-y` = (row height − control one tier down) / 2. A single line of text or a cell control one
+ * tier down (m table → s button) keeps the row at its tier height; two-line cells with an avatar grow
+ * the row with the same padding above and below.
  */
 
 .root {
@@ -10,6 +14,9 @@
   --dt-head-size: var(--prime-control-m-label-size);
   --dt-head-line-height: var(--prime-control-m-label-line-height);
   --dt-pad-x: var(--prime-table-cell-padding-x);
+  /* Control one tier down: the tallest single-row content (Button, Select, Input in a cell). */
+  --dt-cell-control: var(--prime-control-s-height);
+  --dt-pad-y: calc((var(--dt-row-height) - var(--dt-cell-control)) / 2);
   --dt-gap: var(--prime-space-2);
   --dt-text-size: var(--prime-control-m-text-size);
   --dt-text-line-height: var(--prime-control-m-line-height);
@@ -33,7 +40,7 @@
   --dt-divider-color: var(--prime-color-border-subtle);
   --dt-divider-style: solid;
   --dt-divider-width: var(--prime-border-width);
-  --dt-column-divider-width: 0;
+  --dt-column-divider-width: var(--prime-border-width);
 
   --dt-z-sticky-first-column: 1;
   --dt-z-sticky-header: 2;
@@ -57,6 +64,7 @@
 /* Header is one step below the cell text of the same tier; heights follow the control tiers. */
 .root[data-size="xs"] {
   --dt-row-height: var(--prime-table-row-height-s);
+  --dt-cell-control: var(--prime-control-xs-height);
   --dt-head-height: var(--prime-control-xs-height);
   --dt-head-size: var(--prime-control-xs-label-size);
   --dt-head-line-height: var(--prime-control-xs-label-line-height);
@@ -70,6 +78,7 @@
 
 .root[data-size="s"] {
   --dt-row-height: var(--prime-table-row-height-s);
+  --dt-cell-control: var(--prime-control-xs-height);
   --dt-head-height: var(--prime-control-s-height);
   --dt-head-size: var(--prime-control-s-label-size);
   --dt-head-line-height: var(--prime-control-s-label-line-height);
@@ -82,6 +91,7 @@
 
 .root[data-size="l"] {
   --dt-row-height: var(--prime-table-row-height-l);
+  --dt-cell-control: var(--prime-control-m-height);
   --dt-head-height: var(--prime-control-l-height);
   --dt-head-size: var(--prime-control-l-label-size);
   --dt-head-line-height: var(--prime-control-l-label-line-height);
@@ -95,6 +105,7 @@
 
 .root[data-size="xl"] {
   --dt-row-height: var(--prime-table-row-height-l);
+  --dt-cell-control: var(--prime-control-l-height);
   --dt-head-height: var(--prime-control-xl-height);
   --dt-head-size: var(--prime-control-xl-label-size);
   --dt-head-line-height: var(--prime-control-xl-label-line-height);
@@ -141,8 +152,8 @@
   --dt-divider-width: 0;
 }
 
-.root[data-column-dividers="true"] {
-  --dt-column-divider-width: var(--prime-border-width);
+.root[data-column-dividers="false"] {
+  --dt-column-divider-width: 0;
 }
 
 /* ---------- Toolbar ---------- */
@@ -185,7 +196,14 @@
   min-width: max-content;
 }
 
+/* A `grow` column takes the free width and wraps: the table fills its container and may shrink
+   below its content width (other columns keep their minimum). */
+.root[data-table-width="grow"] .table {
+  width: 100%;
+}
+
 /* ---------- Head ---------- */
+/* One sort indicator per sortable column, always at the end edge of the head cell. */
 
 .headCell {
   height: var(--dt-head-height);
@@ -232,10 +250,12 @@
 }
 
 .sortButton {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--prime-space-1);
-  max-width: 100%;
+  width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
@@ -252,7 +272,11 @@
 }
 
 .headCell[data-align="end"] .sortButton {
-  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.headCell[data-align="center"] .sortButton {
+  justify-content: center;
 }
 
 .sortButton:hover {
@@ -279,17 +303,18 @@
   justify-content: center;
   width: var(--dt-sort-icon);
   height: var(--dt-sort-icon);
-  color: var(--prime-color-text-placeholder);
+  /* Quiet by design: the header is chrome, the data is the content. */
+  color: var(--prime-color-text-disabled);
   transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .sortButton:hover .sortIcon,
 .sortButton:focus-visible .sortIcon {
-  color: var(--prime-color-text-secondary);
+  color: var(--prime-color-text-muted);
 }
 
 .headCell[data-sorted="true"] .sortIcon {
-  color: var(--prime-color-accent-text);
+  color: var(--prime-color-text-secondary);
 }
 
 .sortGlyph {
@@ -309,14 +334,16 @@
 }
 
 .cell {
+  /* A table cell's height is a minimum: content taller than one line grows the row. */
   height: var(--dt-row-height);
-  padding: 0 var(--dt-pad-x);
+  padding: var(--dt-pad-y) var(--dt-pad-x);
   background-color: var(--dt-cell-bg);
   background-image: linear-gradient(var(--dt-wash), var(--dt-wash));
   color: var(--prime-color-text-primary);
   text-align: start;
   vertical-align: middle;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-duration-xfast)
+    var(--prime-motion-easing-standard);
 }
 
 .cell[data-align="center"] {
@@ -424,7 +451,9 @@
   font-weight: var(--prime-font-weight-medium);
 }
 
-/* Rows mounted by an expand slide in from under their parent. */
+/* Rows mounted by an expand, or newly added to the data, fade in while settling by space-1.
+   Sorting and paging swap rows instantly: they are frequent, and captured rows would escape the
+   scroll viewport's clip in a view transition. */
 .row[data-animate="true"] > .cell {
   animation: dt-row-enter var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
 }
@@ -507,6 +536,12 @@
   left: var(--dt-lead, 0);
   z-index: var(--dt-z-sticky-first-column);
   box-shadow: inset calc(-1 * var(--prime-border-width)) 0 0 var(--dt-divider-color);
+}
+
+/* The sticky column draws its own edge; the neighbour's divider would double it. */
+.firstColumnSticky + .cell,
+.firstColumnSticky + .headCell {
+  border-inline-start-width: 0;
 }
 
 .headCell.firstColumnSticky {

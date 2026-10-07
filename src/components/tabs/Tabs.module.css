@@ -1,7 +1,8 @@
 /*
  * Tabs — Graphite. Navigation between content panels.
- * Horizontal: text tabs over a hairline; a 2px accent bar under the active text slides between
- * triggers. Vertical: rounded items without a rail; the active item is a `fill-muted` pill with a
+ * Horizontal: text tabs over a hairline; an accent bar under the active text slides between
+ * triggers. The bar is half the tier track thickness (`--prime-control-<tier>-track`, the line of
+ * ProgressBar / Slider): 2 · 2.5 · 3 · 3.5 · 4px, so it grows with the size. Vertical: rounded items without a rail; the active item is a `fill-muted` pill with a
  * short accent mark. Stacks into a scrolling row under 600px of container width.
  * Two-line triggers (with `Tabs.Description`) size to content with a minimum width.
  * Heights follow control tiers so Tabs line up with Button / Input of the same size.
@@ -15,6 +16,7 @@
   --tabs-icon: var(--prime-control-m-icon);
   --tabs-radius: var(--prime-control-m-radius);
   --tabs-pad-x: var(--prime-control-m-padding-x);
+  --tabs-indicator: calc(var(--prime-control-m-track) / 2);
   --tabs-item-gap: var(--prime-space-5);
   --tabs-two-line-min: calc(4 * var(--tabs-height));
 
@@ -30,6 +32,7 @@
   --tabs-icon: var(--prime-control-xs-icon);
   --tabs-radius: var(--prime-control-xs-radius);
   --tabs-pad-x: var(--prime-control-xs-padding-x);
+  --tabs-indicator: calc(var(--prime-control-xs-track) / 2);
   --tabs-item-gap: var(--prime-space-3);
 }
 
@@ -41,6 +44,7 @@
   --tabs-icon: var(--prime-control-s-icon);
   --tabs-radius: var(--prime-control-s-radius);
   --tabs-pad-x: var(--prime-control-s-padding-x);
+  --tabs-indicator: calc(var(--prime-control-s-track) / 2);
   --tabs-item-gap: var(--prime-space-4);
 }
 
@@ -52,6 +56,7 @@
   --tabs-icon: var(--prime-control-l-icon);
   --tabs-radius: var(--prime-control-l-radius);
   --tabs-pad-x: var(--prime-control-l-padding-x);
+  --tabs-indicator: calc(var(--prime-control-l-track) / 2);
   --tabs-item-gap: var(--prime-space-6);
 }
 
@@ -63,6 +68,7 @@
   --tabs-icon: var(--prime-control-xl-icon);
   --tabs-radius: var(--prime-control-xl-radius);
   --tabs-pad-x: var(--prime-control-xl-padding-x);
+  --tabs-indicator: calc(var(--prime-control-xl-track) / 2);
   --tabs-item-gap: var(--prime-space-8);
 }
 
@@ -168,12 +174,12 @@
   opacity: 1;
 }
 
-/* 2px accent bar under the text of the active trigger. */
+/* Accent bar under the text of the active trigger; thickness follows the tier. */
 .indicatorBar {
   top: auto;
   bottom: 0;
   width: 0;
-  height: var(--prime-focus-width);
+  height: var(--tabs-indicator);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-accent-default);
 }
@@ -189,7 +195,7 @@
   position: absolute;
   inset-block: var(--prime-space-2);
   inset-inline-start: var(--prime-space-1);
-  width: var(--prime-focus-width);
+  width: var(--tabs-indicator);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-accent-default);
 }

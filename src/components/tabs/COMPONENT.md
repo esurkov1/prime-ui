@@ -97,17 +97,19 @@ Tabs have no `variant`: navigation tabs are always underline (horizontal) or pil
 ### orientation
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `horizontal` | regular-weight secondary text over a `border-subtle` hairline; the active tab is primary text, medium weight, with a 2px accent bar under its text that slides between tabs | switching sections above the content | yes |
-| `vertical` | items padded like controls, no rail; active item is a `fill-muted` pill with a short accent mark at the start; hover `fill-subtle`; below a 600px container it becomes a scrolling row above the panel | settings pages with a side list of sections | |
+| `horizontal` | regular-weight secondary text over a `border-subtle` hairline; the active tab is primary text, medium weight, with an accent bar under its text that slides between tabs (thickness by `size`) | switching sections above the content | yes |
+| `vertical` | items padded like controls, no rail; active item is a `fill-muted` pill with a short accent mark at the start (width by `size`); hover `fill-subtle`; below a 600px container it becomes a scrolling row above the panel | settings pages with a side list of sections | |
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | 28px tabs, 12/16 text, gap between tabs 12 | dense panels | |
-| `s` | 32px, 13/20, gap 16 | compact cards | |
-| `m` | 36px, 14/20, gap 20 | default | yes |
-| `l` | 40px, 16/24, gap 24 | page-level sections | |
-| `xl` | 48px, 16/24, gap 32 | hero / landing sections | |
+| `xs` | 28px tabs, 12/16 text, gap between tabs 12, indicator 2px | dense panels | |
+| `s` | 32px, 13/20, gap 16, indicator 2.5px | compact cards | |
+| `m` | 36px, 14/20, gap 20, indicator 3px | default | yes |
+| `l` | 40px, 16/24, gap 24, indicator 3.5px | page-level sections | |
+| `xl` | 48px, 16/24, gap 32, indicator 4px | hero / landing sections | |
+
+The indicator (bar and vertical mark) is half the tier track thickness `--prime-control-<tier>-track` — the line of ProgressBar and Slider — so it grows with the size.
 
 Tab height equals the control height: Tabs line up with Button, Input and SegmentedControl of the same `size`.
 

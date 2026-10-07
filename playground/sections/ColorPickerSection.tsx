@@ -6,12 +6,12 @@ import ColorPickerHexInputSizesExample from "@/components/color-picker/examples/
 import hexInputSizesSource from "@/components/color-picker/examples/hex-input-sizes.tsx?raw";
 import ColorPickerPanelExample from "@/components/color-picker/examples/panel";
 import panelSource from "@/components/color-picker/examples/panel.tsx?raw";
+import ColorPresetsLabelsExample from "@/components/color-picker/examples/presets-labels";
+import presetsLabelsSource from "@/components/color-picker/examples/presets-labels.tsx?raw";
 import ColorPresetsQuickExample from "@/components/color-picker/examples/presets-quick";
 import presetsQuickSource from "@/components/color-picker/examples/presets-quick.tsx?raw";
 import ColorPresetsSizesExample from "@/components/color-picker/examples/presets-sizes";
 import presetsSizesSource from "@/components/color-picker/examples/presets-sizes.tsx?raw";
-import ColorPresetsTagsExample from "@/components/color-picker/examples/presets-tags";
-import presetsTagsSource from "@/components/color-picker/examples/presets-tags.tsx?raw";
 import ColorPickerStatesExample from "@/components/color-picker/examples/states";
 import statesSource from "@/components/color-picker/examples/states.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
@@ -540,9 +540,9 @@ export default function ColorPickerSection() {
               яруса <code>s</code> внутри Popover. Вложенная панель закрывается первой (Escape, клик
               снаружи).
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={presetsTagsSource.trim()}>
+            <PlaygroundExampleFrame.Root code={presetsLabelsSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <ColorPresetsTagsExample />
+                <ColorPresetsLabelsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>

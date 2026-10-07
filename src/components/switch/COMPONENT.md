@@ -26,7 +26,7 @@ Switch.Root          wrapper grid + context; ref and input props go to the hidde
 ├─ Switch.Hint       description under the text column (optional)
 └─ Switch.Error      error message under the text column (optional, makes the field invalid)
 ```
-The native input is rendered inside `Switch.Label`, so `Switch.Label` is required even without visible text.
+The native input is rendered inside `Switch.Label`, so a Root without `Switch.Label` renders an empty `Switch.Label` itself: `<Switch.Root aria-label="…" />` is a valid bare control (tables, settings rows).
 
 ## API
 
@@ -154,7 +154,6 @@ export function BackupSwitch() {
 - `<Switch.Root onChange={…}>` → use `onCheckedChange`.
 - Switch for an option that is saved by a «Сохранить» button → use `Checkbox`.
 - `disabled` for a value managed by an admin → use `readOnly` so the state stays readable.
-- `<Switch.Root aria-label="…">` without `Switch.Label` → the input is rendered by `Switch.Label`; keep `<Switch.Label />` even when empty.
 
 ## Related
 [Checkbox](../checkbox/COMPONENT.md) · [Radio](../radio/COMPONENT.md) · [SegmentedControl](../segmented-control/COMPONENT.md)

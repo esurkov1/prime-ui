@@ -90,16 +90,4 @@
   align-items: baseline;
   gap: var(--prime-space-2);
   min-width: 0;
-  color: var(--prime-color-text-primary);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  font-weight: var(--prime-font-weight-medium);
-}
-
-.galleryHint {
-  overflow: hidden;
-  color: var(--prime-color-text-muted);
-  font-weight: var(--prime-font-weight-regular);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

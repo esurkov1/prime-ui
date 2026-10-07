@@ -1,3 +1,8 @@
+import { Card } from "@/components/card/Card";
+import type { DataTableColumn } from "@/components/data-table/DataTable";
+import { Input } from "@/components/input/Input";
+import { Typography } from "@/components/typography/Typography";
+
 import { SurfaceGallery } from "../components/ExampleSurface";
 import {
   FoundationPage,
@@ -25,9 +30,13 @@ function ShadowCards() {
         const varName = toVarName(`shadow.${key}`);
         return (
           <div key={key} className={s.shadowCard} style={{ boxShadow: `var(${varName})` }}>
-            <span className={s.radiusName}>{key}</span>
+            <Typography.Root as="span" variant="title-s">
+              {key}
+            </Typography.Root>
             <TokenName>{varName}</TokenName>
-            <span className={s.groupNote}>{SHADOW_USE[key] ?? ""}</span>
+            <Typography.Root as="span" variant="body-s" tone="muted">
+              {SHADOW_USE[key] ?? ""}
+            </Typography.Root>
           </div>
         );
       })}
@@ -35,27 +44,50 @@ function ShadowCards() {
   );
 }
 
-/** Canvas → card → floating menu → scrim + modal, drawn with plain blocks on tokens. */
+function LayerTag({ children }: { children: string }) {
+  return (
+    <Typography.Root as="span" variant="caption" tone="muted" className={s.layerTag}>
+      {children}
+    </Typography.Root>
+  );
+}
+
+function StaticField({ value }: { value: string }) {
+  return (
+    <Input.Root>
+      <Input.Wrapper>
+        <Input.Field aria-label={value} defaultValue={value} readOnly tabIndex={-1} />
+      </Input.Wrapper>
+    </Input.Root>
+  );
+}
+
+/**
+ * Canvas → card → floating menu → scrim + modal. The card and the fields are kit components; the
+ * menu and modal planes are drawn on the same tokens because real overlays float in a portal.
+ */
 function LayerStack() {
   return (
     <div className={s.layerStage} aria-hidden>
-      <span className={s.layerTag}>bg.canvas</span>
-      <div className={s.layerCard}>
-        <span className={s.layerTag}>bg.surface · shadow.raised</span>
-        <span className={s.fakeField} />
-        <span className={s.fakeField} />
-      </div>
+      <LayerTag>bg.canvas</LayerTag>
+      <Card.Root className={s.layerCard}>
+        <LayerTag>bg.surface · shadow.raised</LayerTag>
+        <StaticField value="Квартальный отчёт" />
+        <StaticField value="Маркетинг" />
+      </Card.Root>
       <div className={s.layerMenu}>
-        <span className={s.layerTag}>bg.raised · shadow.overlay</span>
-        <span className={s.nestedItem} data-active>
+        <LayerTag>bg.raised · shadow.overlay</LayerTag>
+        <Typography.Root as="span" variant="body-m" className={s.nestedItem} data-active>
           Пункт меню
-        </span>
-        <span className={s.nestedItem}>Ещё пункт</span>
+        </Typography.Root>
+        <Typography.Root as="span" variant="body-m" className={s.nestedItem}>
+          Ещё пункт
+        </Typography.Root>
       </div>
       <div className={s.layerScrim}>
         <div className={s.layerModal}>
-          <span className={s.layerTag}>bg.raised · shadow.modal · поверх bg.scrim</span>
-          <span className={s.fakeField} />
+          <LayerTag>bg.raised · shadow.modal · поверх bg.scrim</LayerTag>
+          <StaticField value="Новый проект" />
         </div>
       </div>
     </div>
@@ -71,28 +103,25 @@ const LAYERS = semanticKeys("z")
   })
   .sort((a, b) => a.value - b.value);
 
+type Layer = (typeof LAYERS)[number];
+
+const LAYER_COLUMNS: DataTableColumn<Layer>[] = [
+  { id: "key", header: "Слой", accessor: "key" },
+  { id: "token", header: "Токен", cell: (layer) => <TokenName>{layer.varName}</TokenName> },
+  { id: "value", header: "z-index", accessor: "value", numeric: true },
+];
+
 function ZLayers() {
-  return (
-    <TokenTable head={["Слой", "Токен", "z-index"]}>
-      {LAYERS.map((layer) => (
-        <tr key={layer.key}>
-          <th scope="row">{layer.key}</th>
-          <td>
-            <TokenName>{layer.varName}</TokenName>
-          </td>
-          <td className={s.numeric}>{layer.value}</td>
-        </tr>
-      ))}
-    </TokenTable>
-  );
+  return <TokenTable columns={LAYER_COLUMNS} rows={LAYERS} getRowKey={(layer) => layer.key} />;
 }
 
 function FieldOnSurface() {
   return (
-    <div className={s.fieldSample}>
-      <span className={s.fakeLabel}>Название</span>
-      <span className={s.fakeField}>Квартальный отчёт</span>
-    </div>
+    <Input.Root label="Название" className={s.fieldSample}>
+      <Input.Wrapper>
+        <Input.Field defaultValue="Квартальный отчёт" />
+      </Input.Wrapper>
+    </Input.Root>
   );
 }
 

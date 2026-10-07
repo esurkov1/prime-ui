@@ -1,6 +1,9 @@
-import type * as React from "react";
+import * as React from "react";
 
+import { Card } from "@/components/card/Card";
+import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
 import { PageContent } from "@/components/page-content/PageContent";
+import { Typography } from "@/components/typography/Typography";
 import { cx } from "@/internal/cx";
 
 import { DemoDescription, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
@@ -50,54 +53,65 @@ export function FoundationSection({
   );
 }
 
-/** White card on the canvas: the default container for token tables and demos. */
+/** A tile for token demos: the kit Card; `className` lays out the content inside it. */
 export function Panel({
   className,
   children,
   ...rest
 }: React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode }) {
   return (
-    <div {...rest} className={cx(s.panel, className)}>
-      {children}
-    </div>
+    <Card.Root {...rest} variant="cta" flat>
+      <div className={cx(s.panel, className)}>{children}</div>
+    </Card.Root>
   );
 }
 
-/** CSS variable name, monospace, wraps anywhere. */
+/** CSS variable name: Typography in the code role, secondary tone. */
 export function TokenName({ children }: { children: string }) {
-  return <code className={s.tokenName}>{children}</code>;
+  return (
+    <Typography.Root as="span" variant="code" tone="secondary" className={s.tokenName}>
+      {children}
+    </Typography.Root>
+  );
 }
 
-/** Bulleted rule list (do/don't, guidance). */
+/** Bulleted rule list (do/don't, guidance): the text of every item is Typography body-m. */
 export function RuleList({ children }: { children: React.ReactNode }) {
-  return <ul className={s.ruleList}>{children}</ul>;
+  return (
+    <ul className={s.ruleList}>
+      {React.Children.map(children, (child) =>
+        React.isValidElement<{ children?: React.ReactNode }>(child) && child.type === "li" ? (
+          <li>
+            <Typography.Root as="span" variant="body-m">
+              {child.props.children}
+            </Typography.Root>
+          </li>
+        ) : (
+          child
+        ),
+      )}
+    </ul>
+  );
 }
 
-/** Plain semantic table with the playground look; scrolls horizontally when narrow. */
-export function TokenTable({
-  head,
-  children,
-  className,
+/** Token table: the kit DataTable, all rows at once. */
+export function TokenTable<Row>({
+  columns,
+  rows,
+  getRowKey,
 }: {
-  head: React.ReactNode[];
-  children: React.ReactNode;
-  className?: string;
+  columns: DataTableColumn<Row>[];
+  rows: Row[];
+  getRowKey: (row: Row, index: number) => React.Key;
 }) {
   return (
-    <div className={cx(s.tableWrap, className)}>
-      <table className={s.table}>
-        <thead>
-          <tr>
-            {head.map((h, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: static header list
-              <th key={i} scope="col">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>{children}</tbody>
-      </table>
-    </div>
+    <DataTable.Root
+      columns={columns}
+      rows={rows}
+      getRowKey={getRowKey}
+      showPagination={false}
+      pageSize={rows.length || 1}
+      highlightRowOnHover={false}
+    />
   );
 }

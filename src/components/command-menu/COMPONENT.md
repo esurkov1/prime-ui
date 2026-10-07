@@ -27,9 +27,9 @@ CommandMenu.Dialog                 Modal with the palette state (query, active i
 ├── CommandMenu.DialogDescription  optional visible <p>
 ├── CommandMenu.InputRow           search row: [leading icon] input [trailing]
 │   └── CommandMenu.Input          role="combobox"
-├── CommandMenu.TagSection         optional scope chips under the search row
-│   ├── CommandMenu.TagSectionLabel
-│   └── CommandMenu.TagRow
+├── CommandMenu.BadgeSection       optional scope chips under the search row
+│   ├── CommandMenu.BadgeSectionLabel
+│   └── CommandMenu.BadgeRow
 ├── CommandMenu.List               role="listbox", scrolls
 │   ├── CommandMenu.Empty          shown only when nothing matches
 │   └── CommandMenu.Group          role="group", hidden when empty
@@ -140,7 +140,7 @@ No ref. `<kbd>` at the end of the item; a hint only. + native `HTMLAttributes<HT
 ### CommandMenu.Empty
 No ref. `role="status"`; renders only when no item matches. Shows `labels.empty` and `labels.emptyHint`; `children` go below (e.g. a «Создать» button). + native `<div>` props.
 
-### CommandMenu.TagSection · TagSectionLabel · TagRow · Footer
+### CommandMenu.BadgeSection · BadgeSectionLabel · BadgeRow · Footer
 No ref. Layout `<div>`s. + native `<div>` props.
 
 ### CommandMenu.FooterHint
@@ -163,7 +163,7 @@ No ref.
 + native `HTMLAttributes<HTMLElement>` except `color`.
 
 ## Variants
-The palette: `bg-raised`, `--prime-modal-radius`, `shadow-modal`, width `--prime-modal-width-l`, top-aligned on the scrim. The search row is separated by a `border-faint` hairline; tag section and footer by `border-subtle`.
+The palette: `bg-raised`, `--prime-modal-radius`, `shadow-modal`, width `--prime-modal-width-l`, top-aligned on the scrim. The search row is separated by a `border-faint` hairline; badge section and footer by `border-subtle`.
 
 ### size (Dialog)
 | Value | Looks like | Use when | Default |
@@ -187,7 +187,7 @@ The query text is always body-l.
 |---|---|---|---|
 | `InputRow leading` default / `null` / custom | Search icon / nothing / your node | Replace the icon with a scope or remove it | search icon |
 | with DialogTitle / DialogDescription | Heading above the search row | The palette needs a visible title | |
-| with TagSection | Chip row under the search row | Search scopes | |
+| with BadgeSection | Chip row under the search row | Search scopes | |
 | with Footer | Key hints at the bottom | Teach the keyboard | |
 
 **Combinations** — global search: `size="m"`, groups with headings, `ItemShortcut`s and a Footer legend. Long single-list picker: one Group, custom `labels.empty` / `labels.emptyHint`.
@@ -225,7 +225,7 @@ The query text is always body-l.
 | [keyboard-search.tsx](examples/keyboard-search.tsx) | ⌘K app palette with groups, keywords, descriptions, shortcuts, empty state and key legend | Global app search |
 | [sizes.tsx](examples/sizes.tsx) | Dialog `size` xs → xl | Matching the app density |
 | [states.tsx](examples/states.tsx) | Long scrolling list, disabled item, custom empty texts | Picking from a long list |
-| [composition.tsx](examples/composition.tsx) | DialogTitle / Description, trailing Kbd and close, scope tags, footer hints and a `ghost` FooterKeyBox | Palettes with a heading or scopes |
+| [composition.tsx](examples/composition.tsx) | DialogTitle / Description, trailing Kbd and close, removable scope badges, footer hints and a `ghost` FooterKeyBox | Palettes with a heading or scopes |
 | [controlled.tsx](examples/controlled.tsx) | Controlled `open` and controlled query | Parent reads / resets the query |
 
 ```tsx

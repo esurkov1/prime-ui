@@ -65,6 +65,17 @@ input::-moz-focus-inner {
   cursor: not-allowed;
 }
 
+/* Inline code inside running text (an identifier, a prop, a token): mono on a muted fill. Code in
+   a block (CodeBlock, <pre>) and code set as text roles (Typography variant="code") stay plain. */
+:where(:not(pre) > code:not([data-variant])) {
+  padding-inline: var(--prime-space-1);
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--prime-text-code-size);
+}
+
 ::selection {
   background: var(--prime-color-accent-soft-hover);
 }

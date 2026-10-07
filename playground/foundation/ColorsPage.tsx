@@ -1,5 +1,10 @@
 import * as React from "react";
 
+import { Badge } from "@/components/badge/Badge";
+import type { DataTableColumn } from "@/components/data-table/DataTable";
+import { Typography } from "@/components/typography/Typography";
+import type { PaletteColor } from "@/internal/states";
+
 import { FoundationPage, FoundationSection, Panel, TokenName, TokenTable } from "./FoundationKit";
 import s from "./foundation.module.css";
 import {
@@ -62,12 +67,14 @@ function Swatch({ path }: { path: string }) {
         style={{ background: `var(${varName})` }}
       />
       <figcaption className={s.swatchCaption}>
-        <span className={s.swatchTitle}>{path.split(".").slice(2).join(".")}</span>
+        <Typography.Root as="span" variant="body-s" weight="medium">
+          {path.split(".").slice(2).join(".")}
+        </Typography.Root>
         <TokenName>{varName}</TokenName>
-        <span className={s.swatchMeta}>
+        <Typography.Root as="span" variant="caption" tone="muted" className={s.numeric}>
           {color ? (transparent ? "transparent" : toHex(color)) : "…"}
           {ref ? ` · ${ref}` : null}
-        </span>
+        </Typography.Root>
       </figcaption>
     </figure>
   );
@@ -79,10 +86,14 @@ function RoleGroups() {
       {ROLE_GROUPS.map((group) => (
         <Panel key={group} className={s.roleGroup}>
           <div className={s.roleGroupHead}>
-            <h5 className={s.groupTitle}>
+            <Typography.Root as="h3" variant="title-s">
               <code>color.{group}</code>
-            </h5>
-            {GROUP_NOTES[group] ? <p className={s.groupNote}>{GROUP_NOTES[group]}</p> : null}
+            </Typography.Root>
+            {GROUP_NOTES[group] ? (
+              <Typography.Root as="p" variant="body-s" tone="muted">
+                {GROUP_NOTES[group]}
+              </Typography.Root>
+            ) : null}
           </div>
           <div className={s.swatchGrid}>
             {semanticLeaves(`color.${group}`).map((leaf) => (
@@ -95,35 +106,33 @@ function RoleGroups() {
   );
 }
 
+const PALETTE_COLUMNS: DataTableColumn<string>[] = [
+  { id: "hue", header: "Оттенок", accessor: (hue) => hue },
+  {
+    id: "soft",
+    header: "soft",
+    cell: (hue) => <Badge.Root color={hue as PaletteColor}>Метка</Badge.Root>,
+  },
+  {
+    id: "solid",
+    header: "solid",
+    cell: (hue) => (
+      <Badge.Root color={hue as PaletteColor} variant="solid">
+        Метка
+      </Badge.Root>
+    ),
+  },
+  {
+    id: "vars",
+    header: "Переменные",
+    cell: (hue) => (
+      <TokenName>{`--prime-color-palette-${hue}-{soft,text,solid,solid-fg}`}</TokenName>
+    ),
+  },
+];
+
 function PaletteTable() {
-  return (
-    <TokenTable head={["Оттенок", "soft + text", "solid + solidFg", "Переменные"]}>
-      {PALETTE_HUES.map((hue) => {
-        const v = (k: string) => `var(${toVarName(`color.palette.${hue}.${k}`)})`;
-        return (
-          <tr key={hue}>
-            <th scope="row">{hue}</th>
-            <td>
-              <span className={s.paletteChip} style={{ background: v("soft"), color: v("text") }}>
-                Метка
-              </span>
-            </td>
-            <td>
-              <span
-                className={s.paletteChip}
-                style={{ background: v("solid"), color: v("solidFg") }}
-              >
-                Метка
-              </span>
-            </td>
-            <td>
-              <TokenName>{`--prime-color-palette-${hue}-{soft,text,solid,solid-fg}`}</TokenName>
-            </td>
-          </tr>
-        );
-      })}
-    </TokenTable>
-  );
+  return <TokenTable columns={PALETTE_COLUMNS} rows={PALETTE_HUES} getRowKey={(hue) => hue} />;
 }
 
 /* --- Primitive ramps --------------------------------------------------------- */
@@ -158,7 +167,9 @@ function PrimitiveRamps() {
     <Panel className={s.ramps}>
       {RAMPS.map((ramp) => (
         <div key={ramp.hue} className={s.ramp}>
-          <span className={s.rampName}>{ramp.hue}</span>
+          <Typography.Root as="span" variant="body-s" weight="medium" className={s.rampName}>
+            {ramp.hue}
+          </Typography.Root>
           <ul className={s.rampSteps} aria-label={`Шкала ${ramp.hue}`}>
             {ramp.steps.map(({ step, hex }) => (
               <li
@@ -231,55 +242,65 @@ function ContrastTable() {
   const colors = useComputedColors(host, varNames);
   const backdrop = colors[BACKDROP];
 
+  const rows = CONTRAST_PAIRS.map((pair) => {
+    const fgRaw = colors[toVarName(pair.fg)];
+    const bgRaw = colors[toVarName(pair.bg)];
+    let ratio: number | null = null;
+    if (fgRaw && bgRaw && backdrop) {
+      const bg = bgRaw.a < 1 ? composite(bgRaw, backdrop) : bgRaw;
+      const fg = fgRaw.a < 1 ? composite(fgRaw, bg) : fgRaw;
+      ratio = contrastRatio(fg, bg);
+    }
+    return { pair, ratio };
+  });
+
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    {
+      id: "sample",
+      header: "Пример",
+      cell: ({ pair }) => (
+        <span
+          className={s.contrastSample}
+          style={{
+            background: `var(${toVarName(pair.bg)})`,
+            color: `var(${toVarName(pair.fg)})`,
+          }}
+        >
+          {pair.min === UI ? <span className={s.contrastRing} /> : "Аа"}
+        </span>
+      ),
+    },
+    {
+      id: "fg",
+      header: "Текст / элемент",
+      cell: ({ pair }) => <TokenName>{toVarName(pair.fg)}</TokenName>,
+    },
+    { id: "bg", header: "Фон", cell: ({ pair }) => <TokenName>{toVarName(pair.bg)}</TokenName> },
+    {
+      id: "ratio",
+      header: "Контраст",
+      numeric: true,
+      cell: ({ ratio }) => (ratio === null ? "…" : `${ratio.toFixed(2)} : 1`),
+    },
+    {
+      id: "verdict",
+      header: "Норма",
+      cell: ({ pair, ratio }) => {
+        if (pair.min === 0) return <Badge.Root>{pair.note}</Badge.Root>;
+        const pass = ratio !== null && ratio >= pair.min;
+        const aaa = ratio !== null && pair.min === TEXT && ratio >= 7;
+        return (
+          <Badge.Root color={pass ? "green" : "red"}>
+            {pass ? (aaa ? "AAA" : pair.min === UI ? "≥ 3 : 1" : "AA") : "Ниже нормы"}
+          </Badge.Root>
+        );
+      },
+    },
+  ];
+
   return (
     <div ref={host}>
-      <TokenTable head={["Пример", "Текст / элемент", "Фон", "Контраст", "Норма"]}>
-        {CONTRAST_PAIRS.map((pair) => {
-          const fgRaw = colors[toVarName(pair.fg)];
-          const bgRaw = colors[toVarName(pair.bg)];
-          let ratio: number | null = null;
-          if (fgRaw && bgRaw && backdrop) {
-            const bg = bgRaw.a < 1 ? composite(bgRaw, backdrop) : bgRaw;
-            const fg = fgRaw.a < 1 ? composite(fgRaw, bg) : fgRaw;
-            ratio = contrastRatio(fg, bg);
-          }
-          const pass = ratio !== null && ratio >= pair.min;
-          const aaa = ratio !== null && pair.min === TEXT && ratio >= 7;
-          return (
-            <tr key={`${pair.fg}|${pair.bg}`}>
-              <td>
-                <span
-                  className={s.contrastSample}
-                  style={{
-                    background: `var(${toVarName(pair.bg)})`,
-                    color: `var(${toVarName(pair.fg)})`,
-                  }}
-                >
-                  {pair.min === UI ? <span className={s.contrastRing} /> : "Аа"}
-                </span>
-              </td>
-              <td>
-                <TokenName>{toVarName(pair.fg)}</TokenName>
-              </td>
-              <td>
-                <TokenName>{toVarName(pair.bg)}</TokenName>
-              </td>
-              <td className={s.numeric}>{ratio === null ? "…" : `${ratio.toFixed(2)} : 1`}</td>
-              <td>
-                {pair.min === 0 ? (
-                  <span className={s.verdict} data-tone="neutral">
-                    {pair.note}
-                  </span>
-                ) : (
-                  <span className={s.verdict} data-tone={pass ? "pass" : "fail"}>
-                    {pass ? (aaa ? "AAA" : pair.min === UI ? "≥ 3 : 1" : "AA") : "Ниже нормы"}
-                  </span>
-                )}
-              </td>
-            </tr>
-          );
-        })}
-      </TokenTable>
+      <TokenTable columns={columns} rows={rows} getRowKey={({ pair }) => `${pair.fg}|${pair.bg}`} />
     </div>
   );
 }

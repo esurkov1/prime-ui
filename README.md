@@ -195,6 +195,7 @@ accessibility, examples and common mistakes.
 | [**SmartFilter**](https://github.com/esurkov1/prime-ui/blob/main/src/components/smart-filter/COMPONENT.md) | A filter bar for lists and tables: a filter button and search with a panel of values, applied filters as tags, and a show / hide choice for every value. |
 | [**Datepicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/datepicker/COMPONENT.md) | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). |
 | [**ColorPicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-picker/COMPONENT.md) | Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. |
+| [**ColorSwatches**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-swatches/COMPONENT.md) | An inline color choice: a wrapping grid of preset swatches inside a form, without a popover. |
 
 ### Data display (`data-display`)
 
@@ -202,6 +203,7 @@ accessibility, examples and common mistakes.
 |---|---|
 | [**Badge**](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) | The kit's one chip: a status, category or count label, a removable value or applied filter, and a pressable toggle with a hover action, in a palette color. |
 | [**Avatar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) | A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups. |
+| [**Thumbnail**](https://github.com/esurkov1/prime-ui/blob/main/src/components/thumbnail/COMPONENT.md) | A preview of an object — product, vehicle, file, cover — at a fixed aspect ratio, with a colored icon fallback. |
 | [**Kbd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kbd/COMPONENT.md) | A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`. |
 | [**Card**](https://github.com/esurkov1/prime-ui/blob/main/src/components/card/COMPONENT.md) | A filled surface block with structural templates for metrics, charts, lists, calls to action and covers. |
 | [**DataTable**](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) | A data table with sorting, pagination or infinite scroll, row selection, nested rows and loading / empty / error states. |
@@ -214,9 +216,8 @@ accessibility, examples and common mistakes.
 |---|---|
 | [**Banner**](https://github.com/esurkov1/prime-ui/blob/main/src/components/banner/COMPONENT.md) | Full-width in-flow message for a page, section or card: status icon, title, description, actions and dismiss. |
 | [**Notification**](https://github.com/esurkov1/prime-ui/blob/main/src/components/notification/COMPONENT.md) | Pop-up toast notifications: `NotificationProvider` at the app root and `notify()` from any screen. |
-| [**ProgressBar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) | Linear progress indicator on a native `<progress>` with a label, a percentage and a status color. |
-| [**SegmentedProgressBar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-progress-bar/COMPONENT.md) | One bar made of proportional segments: storage by type, task statuses, a funnel or quotas. |
-| [**ProgressCircle**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) | Circular progress indicator: a track, a rounded arc and optional content in the center. |
+| [**ProgressBar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) | Linear progress: one value on a native `<progress>`, or `segments` that split a whole (storage by type, task statuses), with a label, a percentage and status colors. |
+| [**ProgressCircle**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) | Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center. |
 | [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty state of a page or a block: icon, title, explanation and an action. |
 
 ### Navigation (`navigation`)

@@ -12,6 +12,18 @@ import { type FieldDescriptions, useFieldDescriptions } from "@/internal/useFiel
 
 import styles from "./Checkbox.module.css";
 
+/** True when `type` appears among `children` (fragments are looked into). */
+function hasChildOfType(children: React.ReactNode, type: unknown): boolean {
+  let found = false;
+  React.Children.forEach(children, (child) => {
+    if (found || !React.isValidElement(child)) return;
+    if (child.type === type) found = true;
+    else if (child.type === React.Fragment)
+      found = hasChildOfType((child.props as { children?: React.ReactNode }).children, type);
+  });
+  return found;
+}
+
 type InputPassthrough = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "type" | "size" | "checked" | "defaultChecked" | "onChange" | "children"
@@ -118,6 +130,8 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
               "full-width": fullWidth || undefined,
             })}
           >
+            {/* The native input lives in Label; a Root without one still renders the bare control. */}
+            {hasChildOfType(children, CheckboxLabel) ? null : <CheckboxLabel />}
             {children}
           </div>
         </ControlSizeProvider>

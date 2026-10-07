@@ -159,7 +159,12 @@ const rootApiRows: PlaygroundApiPropRow[] = [
     '"standard"',
     "Линии между строками.",
   ),
-  api("columnDividers", "boolean", "false", "Вертикальные линии между колонками."),
+  api(
+    "columnDividers",
+    "boolean",
+    "true",
+    "Вертикальные линии между колонками; false — только линии между строками.",
+  ),
   api("striped", "boolean", "false", "Зебра."),
   api(
     "highlightRowOnHover / highlightColumnOnHover",
@@ -191,6 +196,12 @@ const columnApiRows: PlaygroundApiPropRow[] = [
     "boolean",
     "false",
     "Одна строка с многоточием и `title`; ширина из `maxWidth` / `width`.",
+  ),
+  api(
+    "grow",
+    "boolean",
+    "false",
+    "Колонка забирает свободную ширину и переносит текст; таблица заполняет контейнер, а не растёт по содержимому.",
   ),
   api(
     "sortable / sortAccessor / sortComparator",
@@ -262,9 +273,11 @@ export default function DataTableSection() {
             description={
               <>
                 Одна ось <code>size</code>: <code>xs</code>/<code>s</code> — компактная (36),{" "}
-                <code>m</code> — по умолчанию (44), <code>l</code>/<code>xl</code> — просторная
-                (52). Шапка — высота контрола яруса (28–48), её текст на ступень мельче ячеек.
-                Чекбоксы берут ярус таблицы, бейджи — на ступень ниже.
+                <code>m</code> — по умолчанию (44), <code>l</code>/<code>xl</code> — просторная (52)
+                — это минимальная высота строки. Высоту задают отступы ячейки: однострочный текст и
+                контрол на ярус ниже держат строку в минимуме, аватар с двумя строками делает её
+                выше с теми же отступами. Шапка — высота контрола яруса (28–48), её текст на ступень
+                мельче ячеек. Чекбоксы берут ярус таблицы, бейджи — на ступень ниже.
               </>
             }
             code={sizesSource}
@@ -278,7 +291,7 @@ export default function DataTableSection() {
               <>
                 <code>numeric</code> выравнивает вправо и включает <code>tabular-nums</code> —
                 разряды встают столбиком. <code>truncate</code> с <code>maxWidth</code> держит
-                длинный текст в одну строку. <code>columnDividers</code> — вертикальные линии.
+                длинный текст в одну строку.
               </>
             }
             code={numericSource}
@@ -404,7 +417,7 @@ export default function DataTableSection() {
             description={
               <>
                 <code>striped</code>, <code>dividerStyle</code> (<code>none</code>,{" "}
-                <code>dashed</code>, <code>dotted</code>), <code>columnDividers</code>,{" "}
+                <code>dashed</code>, <code>dotted</code>), <code>columnDividers={"{false}"}</code>,{" "}
                 <code>highlightColumnOnHover</code> и таблица без шапки.
               </>
             }
@@ -419,7 +432,8 @@ export default function DataTableSection() {
               <>
                 По умолчанию <code>fillWidth</code> растягивает таблицу на всю ширину контейнера;{" "}
                 <code>fillWidth=&#123;false&#125;</code> — ширина по содержимому. Колонку можно
-                выровнять по центру через <code>align="center"</code>.
+                выровнять по центру через <code>align="center"</code>. Колонка с <code>grow</code>{" "}
+                забирает свободную ширину и переносит длинный текст.
               </>
             }
             code={contentWidthSource}

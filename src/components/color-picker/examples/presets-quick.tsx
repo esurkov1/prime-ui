@@ -1,5 +1,5 @@
-/** ColorPresets as a quick color next to a field: one row of 8 with «no color», the default 8×2 grid with a heading, and a custom Button trigger via asChild. Use it when a fixed palette is enough. */
-import { Button, COLOR_PRESETS, ColorPresets, Input, Label } from "prime-ui-kit";
+/** A quick color from a fixed palette: a compact ColorPresets trigger next to a field (one row of 8 with «no color»), the full palette inline with ColorSwatches when the color is a field of its own, and a custom Button trigger via asChild. */
+import { Button, COLOR_PRESETS, ColorPresets, ColorSwatches, Input, Label } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -22,21 +22,8 @@ export default function ColorPresetsQuickExample() {
         </div>
       </div>
 
-      {/* 16 presets (default): 8 × 2, with a section label. */}
-      <div className={styles.field}>
-        <Label.Root htmlFor="preset-project-name">Проект</Label.Root>
-        <div className={styles.row}>
-          <ColorPresets.Root defaultValue="#a16207">
-            <ColorPresets.Trigger />
-            <ColorPresets.Content label="Цвет проекта" />
-          </ColorPresets.Root>
-          <Input.Root id="preset-project-name">
-            <Input.Wrapper>
-              <Input.Field defaultValue="Редизайн сайта" />
-            </Input.Wrapper>
-          </Input.Root>
-        </div>
-      </div>
+      {/* The color is a field of its own: all 16 presets inline, no popover. */}
+      <ColorSwatches.Root label="Цвет проекта" defaultValue="#a16207" />
 
       {/* Custom trigger: a Button with the current color as its icon. */}
       <div className={styles.inlineRow}>

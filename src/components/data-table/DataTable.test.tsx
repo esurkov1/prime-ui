@@ -28,6 +28,21 @@ const rows: Row[] = [
 ];
 
 describe("DataTable", () => {
+  it("draws column dividers by default and drops them with columnDividers={false}", () => {
+    const { container, rerender } = render(<DataTable.Root rows={rows} columns={columns} />);
+    const root = container.querySelector("[data-divider]");
+    expect(root).not.toHaveAttribute("data-column-dividers");
+    rerender(<DataTable.Root rows={rows} columns={columns} columnDividers={false} />);
+    expect(root).toHaveAttribute("data-column-dividers", "false");
+  });
+
+  it("CSS: rows grow with content, sort icon sits at the end edge and stays quiet", () => {
+    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
+    expect(css).toMatch(/\.cell \{[^}]*padding: var\(--dt-pad-y\) var\(--dt-pad-x\)/);
+    expect(css).not.toMatch(/row-reverse/);
+    expect(css).not.toMatch(/\.sortIcon[^{]*\{[^}]*accent/);
+  });
+
   it("renders headers and rows", () => {
     render(<DataTable.Root rows={rows.slice(0, 2)} columns={columns} />);
 
@@ -565,6 +580,23 @@ describe("DataTable CSS contract", () => {
       expect(screen.queryByText("Выплата")).toBeNull();
     });
 
+    it("marks rows newly added to the data for the enter animation, not the first fill", () => {
+      const flat = tree.map(({ id, name, score }) => ({ id, name, score }));
+      const { rerender } = render(
+        <DataTable.Root rows={flat} columns={treeColumns} getRowKey={(row) => row.id} />,
+      );
+      expect(screen.getByText("Денис").closest("tr")).not.toHaveAttribute("data-animate");
+      rerender(
+        <DataTable.Root
+          rows={[...flat, { id: "ivan", name: "Иван", score: 3 }]}
+          columns={treeColumns}
+          getRowKey={(row) => row.id}
+        />,
+      );
+      expect(screen.getByText("Иван").closest("tr")).toHaveAttribute("data-animate", "true");
+      expect(screen.getByText("Денис").closest("tr")).not.toHaveAttribute("data-animate");
+    });
+
     it("sorts sub-rows with the parent and keeps them under it", async () => {
       const user = userEvent.setup();
       render(
@@ -607,5 +639,35 @@ describe("DataTable CSS contract", () => {
       await user.click(screen.getByRole("checkbox", { name: "Выбрать: Ольга" }));
       expect(screen.getByText("Ольга").closest("tr")).toHaveAttribute("aria-selected", "true");
     });
+  });
+
+  it("a grow column fills the table width and the table stops growing to its content", () => {
+    const { container } = render(
+      <DataTable.Root
+        rows={[{ id: 1, note: "Длинный комментарий" }]}
+        columns={[
+          { id: "id", header: "№", accessor: "id" },
+          { id: "note", header: "Комментарий", accessor: "note", grow: true },
+        ]}
+        showPagination={false}
+      />,
+    );
+    expect(container.querySelector("[data-table-width]")).toHaveAttribute(
+      "data-table-width",
+      "grow",
+    );
+    const noteCells = container.querySelectorAll<HTMLElement>('[data-column-id="note"]');
+    for (const cell of noteCells) expect(cell.style.width).toBe("100%");
+  });
+
+  it("hides the range line when every row is on screen", () => {
+    render(
+      <DataTable.Root
+        rows={[{ id: 1 }, { id: 2 }]}
+        columns={[{ id: "id", header: "№", accessor: "id" }]}
+        showPagination={false}
+      />,
+    );
+    expect(screen.queryByText(/Показано/)).toBeNull();
   });
 });

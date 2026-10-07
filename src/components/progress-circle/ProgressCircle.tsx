@@ -1,104 +1,236 @@
 import * as React from "react";
+
 import { cx } from "@/internal/cx";
-import { remToPx } from "@/internal/layoutPxFromPrimitives";
+import { toDataAttributes } from "@/internal/data-attributes";
+import {
+  DEFAULT_PROGRESS_SEGMENTS_LABELS,
+  type ProgressSegment,
+  type ProgressSegmentsLabels,
+  resolveSegments,
+} from "@/internal/progressSegments";
 import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./ProgressCircle.module.css";
 
-/**
- * Ring geometry per size. Diameters sit on the 4px grid (rem, so they scale with the root font size);
- * stroke widths are line weights in CSS px.
+/*
+ * Geometry in viewBox units (0…100): the stroke is always 1/12 of the diameter, so the ring keeps
+ * one proportion at every tier; the diameter itself comes from CSS (`--pc-size`, rem tokens).
  */
-const PROGRESS_CIRCLE_SIZES = {
-  xs: { diameter: "1.5rem", strokeWidth: 3 },
-  s: { diameter: "2rem", strokeWidth: 4 },
-  m: { diameter: "3rem", strokeWidth: 4 },
-  l: { diameter: "4rem", strokeWidth: 6 },
-  xl: { diameter: "5rem", strokeWidth: 8 },
-} as const satisfies Record<ControlSize, { diameter: string; strokeWidth: number }>;
+const STROKE = 100 / 12;
+const RADIUS = 50 - STROKE / 2;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+/** Visible gap between `hairline` parts: ¾ of the stroke, like ProgressBar. */
+const HAIRLINE_GAP = STROKE * 0.75;
 
 /** Rings below `m` are too small for readable inner text: `children` are not rendered there. */
 const SIZES_WITHOUT_INNER: ReadonlySet<ControlSize> = new Set(["xs", "s"]);
 
-export type ProgressCircleRootProps = {
-  value: number;
-  max?: number;
-  size?: ControlSize;
-  /** Цвет дуги. По умолчанию `accent`. */
-  tone?: Exclude<Tone, "neutral" | "info">;
+export type ProgressCircleLabels = ProgressSegmentsLabels;
+
+type ProgressCircleCommonProps = {
+  /** Accessible name of the ring. Always pass it. */
   label?: string;
+  size?: ControlSize;
   /**
-   * Центрированное содержимое (число, процент, иконка). На `xs` / `s` не рендерится — кольцо
-   * слишком мало; строковое / числовое значение остаётся доступным через `aria-valuetext`.
+   * Centered content (number, percent, icon). Not rendered on `xs` / `s`; a string or number
+   * child stays available as `aria-valuetext`.
    */
   children?: React.ReactNode;
   className?: string;
 };
 
-function clampProgress(value: number, max: number): number {
-  return Math.min(max, Math.max(value, 0));
+type ProgressCircleValueProps = ProgressCircleCommonProps & {
+  /** Current value; clamped to `0…max`. */
+  value: number;
+  /** Top of the scale. Default `100`. */
+  max?: number;
+  /** Arc color. */
+  tone?: Tone;
+  segments?: never;
+  segmentGap?: never;
+  labels?: never;
+};
+
+type ProgressCircleSegmentsProps = ProgressCircleCommonProps & {
+  /** Parts of the ring in order, clockwise from the top; each one's length is its share of `max`. */
+  segments: ProgressSegment[];
+  /** Total capacity. Default: the sum of the segments (they close the ring). */
+  max?: number;
+  /** `hairline` draws every part as its own rounded arc with a gap. */
+  segmentGap?: "none" | "hairline";
+  /** Built-in accessible strings for empty distributions. */
+  labels?: Partial<ProgressCircleLabels>;
+  value?: never;
+  tone?: never;
+};
+
+export type ProgressCircleRootProps = ProgressCircleValueProps | ProgressCircleSegmentsProps;
+
+type Arc = { start: number; length: number; tone?: Tone; rest?: boolean };
+
+/** One arc of `length` from `start` (viewBox units along the circle, clockwise from the top). */
+function arcStyle(start: number, length: number): React.CSSProperties {
+  return {
+    strokeDasharray: `${Math.max(length, 0)} ${CIRCUMFERENCE}`,
+    strokeDashoffset: -start,
+  };
+}
+
+function Ring(props: React.SVGProps<SVGCircleElement>) {
+  return <circle cx={50} cy={50} r={RADIUS} strokeWidth={STROKE} {...props} />;
+}
+
+/** Round cap of a continuous arc: a dot at the arc start (3 o'clock), rotated to `position`. */
+function Cap({ position, tone }: { position: number; tone?: Tone }) {
+  return (
+    <circle
+      cx={50 + RADIUS}
+      cy={50}
+      r={STROKE / 2}
+      className={styles.cap}
+      style={{ rotate: `${(position / CIRCUMFERENCE) * 360}deg` }}
+      {...toDataAttributes({ tone: tone ?? "accent" })}
+    />
+  );
+}
+
+function SegmentArcs({
+  arcs,
+  gap,
+  closed,
+}: {
+  arcs: Arc[];
+  gap: "none" | "hairline";
+  closed: boolean;
+}) {
+  if (gap === "hairline" && arcs.length > 1) {
+    // Round caps add half a stroke on each side; shorten every dash to keep the visible gap.
+    const inset = (STROKE + HAIRLINE_GAP) / 2;
+    return (
+      <>
+        {arcs.map((a, i) => (
+          <Ring
+            // biome-ignore lint/suspicious/noArrayIndexKey: presentational parts in source order
+            key={i}
+            className={a.rest ? styles.restRound : styles.segmentRound}
+            style={arcStyle(a.start + inset, a.length - inset * 2)}
+            {...(a.rest ? {} : toDataAttributes({ tone: a.tone ?? "accent" }))}
+          />
+        ))}
+      </>
+    );
+  }
+  const parts = arcs.filter((a) => !a.rest);
+  const first = parts[0];
+  const last = parts[parts.length - 1];
+  return (
+    <>
+      {parts.map((a, i) => (
+        <Ring
+          // biome-ignore lint/suspicious/noArrayIndexKey: presentational parts in source order
+          key={i}
+          className={styles.segment}
+          style={arcStyle(a.start, a.length)}
+          {...toDataAttributes({ tone: a.tone ?? "accent" })}
+        />
+      ))}
+      {/* Flat joints inside, round caps at both ends of the filled share (as in ProgressBar). */}
+      {first && last && !closed ? (
+        <>
+          <Cap position={first.start} tone={first.tone} />
+          <Cap position={last.start + last.length} tone={last.tone} />
+        </>
+      ) : null}
+    </>
+  );
 }
 
 const ProgressCircleRoot = React.forwardRef<HTMLDivElement, ProgressCircleRootProps>(
-  ({ value, max = 100, size = "m", tone = "accent", label, children, className }, ref) => {
-    const safeMax = max > 0 ? max : 100;
-    const safeValue = clampProgress(value, safeMax);
-    const tier = PROGRESS_CIRCLE_SIZES[size];
-    const sizeVal = remToPx(tier.diameter);
-    const strokeWidth = tier.strokeWidth;
-    const radius = (sizeVal - strokeWidth) / 2;
-    const circumference = 2 * Math.PI * radius;
-    const offset = circumference * (1 - safeValue / safeMax);
-    const center = sizeVal / 2;
-    const innerSize = sizeVal - strokeWidth * 2;
+  (props, ref) => {
+    const { label, size = "m", children, className } = props;
+    const descriptionId = React.useId();
     const showInner = children != null && children !== false && !SIZES_WITHOUT_INNER.has(size);
     const valueText =
       typeof children === "string" || typeof children === "number" ? String(children) : undefined;
 
-    return (
-      <div
-        ref={ref}
-        className={cx(styles.root, className)}
-        data-size={size}
-        data-tone={tone}
-        style={
-          {
-            "--progress-circle-inner-size": `${innerSize}px`,
-          } as React.CSSProperties
-        }
-      >
+    let tone: Tone | undefined;
+    let svg: React.ReactNode;
+    let description: React.ReactNode = null;
+
+    if (props.segments) {
+      const gap = props.segmentGap ?? "none";
+      const { segments, total, rest, scale, text } = resolveSegments(props.segments, props.max, {
+        ...DEFAULT_PROGRESS_SEGMENTS_LABELS,
+        ...props.labels,
+      });
+      const unit = scale > 0 ? CIRCUMFERENCE / scale : 0;
+      const arcs: Arc[] = [];
+      let cursor = 0;
+      for (const seg of segments) {
+        if (seg.value > 0) arcs.push({ start: cursor, length: seg.value * unit, tone: seg.tone });
+        cursor += seg.value * unit;
+      }
+      if (rest > 0 && total > 0) arcs.push({ start: cursor, length: rest * unit, rest: true });
+      const a11y = label
+        ? { "aria-label": label, "aria-describedby": descriptionId }
+        : { "aria-label": text };
+      if (label) {
+        description = (
+          <span id={descriptionId} className={styles.visuallyHidden}>
+            {text}
+          </span>
+        );
+      }
+
+      svg = (
+        // biome-ignore lint/a11y/useSemanticElements: a distribution is a group of parts, not a fieldset
         <svg
-          width={sizeVal}
-          height={sizeVal}
-          viewBox={`0 0 ${sizeVal} ${sizeVal}`}
+          viewBox="0 0 100 100"
+          className={styles.svg}
+          role="group"
+          {...a11y}
+          {...toDataAttributes({ "segment-gap": gap })}
+        >
+          <g className={styles.arcs}>
+            {gap === "none" || total === 0 ? <Ring className={styles.track} /> : null}
+            {total > 0 ? <SegmentArcs arcs={arcs} gap={gap} closed={rest === 0} /> : null}
+          </g>
+        </svg>
+      );
+    } else {
+      const max = props.max !== undefined && props.max > 0 ? props.max : 100;
+      const value = Math.min(max, Math.max(props.value, 0));
+      tone = props.tone ?? "accent";
+      svg = (
+        <svg
+          viewBox="0 0 100 100"
+          className={styles.svg}
           role="progressbar"
-          aria-valuenow={safeValue}
+          aria-valuenow={value}
           aria-valuemin={0}
-          aria-valuemax={safeMax}
+          aria-valuemax={max}
           aria-label={label}
           aria-valuetext={valueText}
         >
-          <circle
-            cx={center}
-            cy={center}
-            r={radius}
-            className={styles.track}
-            fill="none"
-            strokeWidth={strokeWidth}
-          />
-          <circle
-            cx={center}
-            cy={center}
-            r={radius}
-            className={styles.fill}
-            fill="none"
-            strokeWidth={strokeWidth}
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            transform={`rotate(-90 ${center} ${center})`}
-            opacity={safeValue === 0 ? 0 : undefined}
-          />
+          <g className={styles.arcs}>
+            <Ring className={styles.track} />
+            <Ring
+              className={styles.fill}
+              style={{
+                strokeDasharray: `${CIRCUMFERENCE} ${CIRCUMFERENCE}`,
+                strokeDashoffset: CIRCUMFERENCE * (1 - value / max),
+                opacity: value === 0 ? 0 : undefined,
+              }}
+            />
+          </g>
         </svg>
+      );
+    }
+
+    return (
+      <div ref={ref} className={cx(styles.root, className)} {...toDataAttributes({ size, tone })}>
+        {svg}
+        {description}
         {showInner ? (
           <div className={styles.inner} aria-hidden={valueText !== undefined ? true : undefined}>
             {children}
@@ -109,6 +241,6 @@ const ProgressCircleRoot = React.forwardRef<HTMLDivElement, ProgressCircleRootPr
   },
 );
 
-ProgressCircleRoot.displayName = "ProgressCircleRoot";
+ProgressCircleRoot.displayName = "ProgressCircle.Root";
 
 export const ProgressCircle = { Root: ProgressCircleRoot };

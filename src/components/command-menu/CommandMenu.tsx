@@ -629,22 +629,22 @@ function CommandMenuItemIcon<T extends React.ElementType = "span">({
 
 // ─── Секция тегов под строкой поиска ─────────────────────────────────────────
 
-export type CommandMenuTagSectionProps = React.HTMLAttributes<HTMLDivElement>;
+export type CommandMenuBadgeSectionProps = React.HTMLAttributes<HTMLDivElement>;
 
-function CommandMenuTagSection({ className, ...rest }: CommandMenuTagSectionProps) {
-  return <div className={cx(styles.tagSection, className)} {...rest} />;
+function CommandMenuBadgeSection({ className, ...rest }: CommandMenuBadgeSectionProps) {
+  return <div className={cx(styles.badgeSection, className)} {...rest} />;
 }
 
-export type CommandMenuTagSectionLabelProps = React.HTMLAttributes<HTMLDivElement>;
+export type CommandMenuBadgeSectionLabelProps = React.HTMLAttributes<HTMLDivElement>;
 
-function CommandMenuTagSectionLabel({ className, ...rest }: CommandMenuTagSectionLabelProps) {
-  return <div className={cx(styles.tagSectionLabel, className)} {...rest} />;
+function CommandMenuBadgeSectionLabel({ className, ...rest }: CommandMenuBadgeSectionLabelProps) {
+  return <div className={cx(styles.badgeSectionLabel, className)} {...rest} />;
 }
 
-export type CommandMenuTagRowProps = React.HTMLAttributes<HTMLDivElement>;
+export type CommandMenuBadgeRowProps = React.HTMLAttributes<HTMLDivElement>;
 
-function CommandMenuTagRow({ className, ...rest }: CommandMenuTagRowProps) {
-  return <div className={cx(styles.tagRow, className)} {...rest} />;
+function CommandMenuBadgeRow({ className, ...rest }: CommandMenuBadgeRowProps) {
+  return <div className={cx(styles.badgeRow, className)} {...rest} />;
 }
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
@@ -756,9 +756,9 @@ export const CommandMenu = {
   ItemText: CommandMenuItemText,
   ItemShortcut: CommandMenuItemShortcut,
   Empty: CommandMenuEmpty,
-  TagSection: CommandMenuTagSection,
-  TagSectionLabel: CommandMenuTagSectionLabel,
-  TagRow: CommandMenuTagRow,
+  BadgeSection: CommandMenuBadgeSection,
+  BadgeSectionLabel: CommandMenuBadgeSectionLabel,
+  BadgeRow: CommandMenuBadgeRow,
   Footer: CommandMenuFooter,
   FooterKeyBox: CommandMenuFooterKeyBox,
   FooterHint: CommandMenuFooterHint,

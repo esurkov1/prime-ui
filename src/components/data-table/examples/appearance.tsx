@@ -1,4 +1,4 @@
-/** Row styling: `striped` without dividers, `dividerStyle="dashed"` with `highlightColumnOnHover`, `columnDividers` without a header. Use striped rows for long numeric grids, column highlight for comparison tables. */
+/** Row styling: `striped` without dividers, `dividerStyle="dashed"` with `highlightColumnOnHover`, `columnDividers={false}` without a header for a short key/value list. Use striped rows for long numeric grids, column highlight for comparison tables. */
 
 import { DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 
@@ -49,14 +49,14 @@ export default function DataTableAppearanceExample() {
       </div>
       <div className={styles.group}>
         <Typography.Root variant="code" tone="muted">
-          dividerStyle="dotted" + columnDividers + showHeader=&#123;false&#125;
+          dividerStyle="dotted" + columnDividers=&#123;false&#125; + showHeader=&#123;false&#125;
         </Typography.Root>
         <DataTable.Root
           columns={columns}
           rows={rows}
           getRowKey={(r) => r.day}
           dividerStyle="dotted"
-          columnDividers
+          columnDividers={false}
           showHeader={false}
         />
       </div>

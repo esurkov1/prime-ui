@@ -1,7 +1,6 @@
 import {
   AlignLeft,
   Award,
-  BarChart3,
   Bell,
   Bookmark,
   BookOpen,
@@ -22,6 +21,7 @@ import {
   GripVertical,
   Hash,
   History,
+  Image as ImageIcon,
   Inbox,
   Info,
   Keyboard,
@@ -53,6 +53,7 @@ import {
   Space,
   SquareRoundCorner,
   StretchHorizontal,
+  SwatchBook,
   Table,
   Tags,
   TextCursorInput,
@@ -84,6 +85,7 @@ import CardSection from "./sections/CardSection";
 import CheckboxSection from "./sections/CheckboxSection";
 import CodeBlockSection from "./sections/CodeBlockSection";
 import ColorPickerSection from "./sections/ColorPickerSection";
+import ColorSwatchesSection from "./sections/ColorSwatchesSection";
 import CommandMenuSection from "./sections/CommandMenuSection";
 import DataTableSection from "./sections/DataTableSection";
 import DatepickerSection from "./sections/DatepickerSection";
@@ -111,7 +113,6 @@ import ProgressCircleSection from "./sections/ProgressCircleSection";
 import RadioSection from "./sections/RadioSection";
 import ScrollContainerSection from "./sections/ScrollContainerSection";
 import SegmentedControlSection from "./sections/SegmentedControlSection";
-import SegmentedProgressBarSection from "./sections/SegmentedProgressBarSection";
 import SelectSection from "./sections/SelectSection";
 import SidebarSection from "./sections/SidebarSection";
 import SliderSection from "./sections/SliderSection";
@@ -121,6 +122,7 @@ import SwitchSection from "./sections/SwitchSection";
 import TabsSection from "./sections/TabsSection";
 import TagSelectSection from "./sections/TagSelectSection";
 import TextareaSection from "./sections/TextareaSection";
+import ThumbnailSection from "./sections/ThumbnailSection";
 import TimelineSection from "./sections/TimelineSection";
 import TooltipSection from "./sections/TooltipSection";
 
@@ -430,6 +432,14 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       icon: Pipette,
       Page: ColorPickerSection,
     },
+    {
+      segment: "color-swatches",
+      label: "Color Swatches",
+      description: "Выбор цвета из образцов прямо в форме",
+      keywords: ["цвет", "образцы", "палитра", "swatches", "inline", "value", "onValueChange"],
+      icon: SwatchBook,
+      Page: ColorSwatchesSection,
+    },
   ],
   "data-display": [
     {
@@ -460,6 +470,14 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       keywords: ["аватар", "фото", "инициалы", "color", "size"],
       icon: UserRound,
       Page: AvatarSection,
+    },
+    {
+      segment: "thumbnail",
+      label: "Thumbnail",
+      description: "Превью объекта с соотношением сторон",
+      keywords: ["миниатюра", "превью", "картинка", "фото", "обложка", "ratio", "image"],
+      icon: ImageIcon,
+      Page: ThumbnailSection,
     },
     {
       segment: "kbd",
@@ -532,18 +550,19 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     {
       segment: "progress-bar",
       label: "Progress Bar",
-      description: "Линейный индикатор прогресса",
-      keywords: ["прогресс", "загрузка", "value", "max"],
+      description: "Линейный прогресс: одно значение или части целого",
+      keywords: [
+        "прогресс",
+        "загрузка",
+        "сегменты",
+        "распределение",
+        "квоты",
+        "value",
+        "max",
+        "segments",
+      ],
       icon: StretchHorizontal,
       Page: ProgressBarSection,
-    },
-    {
-      segment: "segmented-progress-bar",
-      label: "Segmented Progress Bar",
-      description: "Прогресс из сегментов (шаги, квоты)",
-      keywords: ["прогресс", "сегменты", "шаги", "value"],
-      icon: BarChart3,
-      Page: SegmentedProgressBarSection,
     },
     {
       segment: "progress-circle",

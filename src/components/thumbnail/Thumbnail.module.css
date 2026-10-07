@@ -1,0 +1,242 @@
+/*
+ * Thumbnail — an object preview at a fixed aspect ratio. Height = `--prime-thumbnail-<tier>-height`
+ * (24 · 32 · 40 · 48 · 64), width = height × ratio; `fullWidth` flips it: width = container, height
+ * from the ratio. Radius steps with the tier. A faint inner ring keeps white images visible on any
+ * surface. Fallback: palette soft fill + icon in the palette text color.
+ */
+
+.root {
+  --thumb-height: var(--prime-thumbnail-m-height);
+  --thumb-radius: var(--prime-thumbnail-m-radius);
+  --thumb-icon: var(--prime-icon-m);
+  --thumb-ratio: 1;
+  --hue-soft: var(--prime-color-palette-gray-soft);
+  --hue-text: var(--prime-color-palette-gray-text);
+
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  height: var(--thumb-height);
+  aspect-ratio: var(--thumb-ratio);
+  overflow: hidden;
+  border-radius: var(--thumb-radius);
+  background: var(--hue-soft);
+  color: var(--hue-text);
+  vertical-align: middle;
+  user-select: none;
+}
+
+.root::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
+  pointer-events: none;
+}
+
+.root[data-full-width="true"] {
+  display: flex;
+  width: 100%;
+  height: auto;
+}
+
+/* ─── Tiers ─────────────────────────────────────────────────────────────── */
+
+.root[data-size="xs"] {
+  --thumb-height: var(--prime-thumbnail-xs-height);
+  --thumb-radius: var(--prime-thumbnail-xs-radius);
+  --thumb-icon: var(--prime-icon-xs);
+}
+
+.root[data-size="s"] {
+  --thumb-height: var(--prime-thumbnail-s-height);
+  --thumb-radius: var(--prime-thumbnail-s-radius);
+  --thumb-icon: var(--prime-icon-s);
+}
+
+.root[data-size="l"] {
+  --thumb-height: var(--prime-thumbnail-l-height);
+  --thumb-radius: var(--prime-thumbnail-l-radius);
+  --thumb-icon: var(--prime-icon-l);
+}
+
+.root[data-size="xl"] {
+  --thumb-height: var(--prime-thumbnail-xl-height);
+  --thumb-radius: var(--prime-thumbnail-xl-radius);
+  --thumb-icon: var(--prime-icon-xl);
+}
+
+/* ─── Ratios ────────────────────────────────────────────────────────────── */
+
+.root[data-ratio="4:3"] {
+  --thumb-ratio: 4 / 3;
+}
+
+.root[data-ratio="3:2"] {
+  --thumb-ratio: 3 / 2;
+}
+
+.root[data-ratio="16:9"] {
+  --thumb-ratio: 16 / 9;
+}
+
+.root[data-ratio="3:4"] {
+  --thumb-ratio: 3 / 4;
+}
+
+/* ─── Hues ──────────────────────────────────────────────────────────────── */
+
+.root[data-color="red"] {
+  --hue-soft: var(--prime-color-palette-red-soft);
+  --hue-text: var(--prime-color-palette-red-text);
+}
+
+.root[data-color="blue"] {
+  --hue-soft: var(--prime-color-palette-blue-soft);
+  --hue-text: var(--prime-color-palette-blue-text);
+}
+
+.root[data-color="green"] {
+  --hue-soft: var(--prime-color-palette-green-soft);
+  --hue-text: var(--prime-color-palette-green-text);
+}
+
+.root[data-color="orange"] {
+  --hue-soft: var(--prime-color-palette-orange-soft);
+  --hue-text: var(--prime-color-palette-orange-text);
+}
+
+.root[data-color="yellow"] {
+  --hue-soft: var(--prime-color-palette-yellow-soft);
+  --hue-text: var(--prime-color-palette-yellow-text);
+}
+
+.root[data-color="purple"] {
+  --hue-soft: var(--prime-color-palette-purple-soft);
+  --hue-text: var(--prime-color-palette-purple-text);
+}
+
+.root[data-color="sky"] {
+  --hue-soft: var(--prime-color-palette-sky-soft);
+  --hue-text: var(--prime-color-palette-sky-text);
+}
+
+.root[data-color="pink"] {
+  --hue-soft: var(--prime-color-palette-pink-soft);
+  --hue-text: var(--prime-color-palette-pink-text);
+}
+
+.root[data-color="teal"] {
+  --hue-soft: var(--prime-color-palette-teal-soft);
+  --hue-text: var(--prime-color-palette-teal-text);
+}
+
+/* Solid: the hue itself with a contrasting icon — when the color is a property of the object. */
+.root[data-variant="solid"] {
+  background: var(--hue-solid);
+  color: var(--hue-solid-fg);
+}
+
+.root[data-color="gray"] {
+  --hue-solid: var(--prime-color-palette-gray-solid);
+  --hue-solid-fg: var(--prime-color-palette-gray-solid-fg);
+}
+
+.root[data-color="red"] {
+  --hue-solid: var(--prime-color-palette-red-solid);
+  --hue-solid-fg: var(--prime-color-palette-red-solid-fg);
+}
+
+.root[data-color="blue"] {
+  --hue-solid: var(--prime-color-palette-blue-solid);
+  --hue-solid-fg: var(--prime-color-palette-blue-solid-fg);
+}
+
+.root[data-color="green"] {
+  --hue-solid: var(--prime-color-palette-green-solid);
+  --hue-solid-fg: var(--prime-color-palette-green-solid-fg);
+}
+
+.root[data-color="orange"] {
+  --hue-solid: var(--prime-color-palette-orange-solid);
+  --hue-solid-fg: var(--prime-color-palette-orange-solid-fg);
+}
+
+.root[data-color="yellow"] {
+  --hue-solid: var(--prime-color-palette-yellow-solid);
+  --hue-solid-fg: var(--prime-color-palette-yellow-solid-fg);
+}
+
+.root[data-color="purple"] {
+  --hue-solid: var(--prime-color-palette-purple-solid);
+  --hue-solid-fg: var(--prime-color-palette-purple-solid-fg);
+}
+
+.root[data-color="sky"] {
+  --hue-solid: var(--prime-color-palette-sky-solid);
+  --hue-solid-fg: var(--prime-color-palette-sky-solid-fg);
+}
+
+.root[data-color="pink"] {
+  --hue-solid: var(--prime-color-palette-pink-solid);
+  --hue-solid-fg: var(--prime-color-palette-pink-solid-fg);
+}
+
+.root[data-color="teal"] {
+  --hue-solid: var(--prime-color-palette-teal-solid);
+  --hue-solid-fg: var(--prime-color-palette-teal-solid-fg);
+}
+
+/* ─── Parts ─────────────────────────────────────────────────────────────── */
+
+.image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+}
+
+.image[data-fit="contain"] {
+  object-fit: contain;
+}
+
+.image[data-status="loading"] {
+  opacity: 0;
+}
+
+.image[data-status="error"] {
+  display: none;
+}
+
+.fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.fallback > svg {
+  flex-shrink: 0;
+  width: var(--thumb-icon);
+  height: var(--thumb-icon);
+}
+
+/* Full-width covers get a larger icon, so it does not look lost on a big tile. */
+.root[data-full-width="true"] .fallback > svg {
+  width: var(--prime-icon-xl);
+  height: var(--prime-icon-xl);
+}

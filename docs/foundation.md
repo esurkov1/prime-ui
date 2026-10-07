@@ -105,15 +105,15 @@ Numbers in tables, dates, counters, prices: `font-variant-numeric: tabular-nums`
 
 ## 6. Size tiers
 
-| Tier | Height | Text | Button padX | Field padX | Gap | Icon | Radius | Label | Hint | Menu item | Checkbox |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| xs | 28 | 12/16 | 8 | 8 | 4 | 14 | 6 | 12/16 | 12/16 | 24 | 14 |
-| s | 32 | 13/20 | 12 | 8 | 8 | 16 | 8 | 12/16 | 12/16 | 28 | 16 |
-| **m** | **36** | **14/20** | **16** | **12** | **8** | **16** | **8** | **13/20** | **12/16** | **32** | **18** |
-| l | 40 | 16/24 | 20 | 12 | 8 | 20 | 10 | 14/20 | 13/20 | 36 | 20 |
-| xl | 48 | 16/24 | 24 | 16 | 12 | 20 | 12 | 14/20 | 13/20 | 40 | 24 |
+| Tier | Height | Text | Button padX | Field padX | Gap | Icon | Radius | Label | Hint | Menu item | Checkbox | Track |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| xs | 28 | 12/16 | 8 | 8 | 4 | 14 | 6 | 12/16 | 12/16 | 24 | 14 | 4 |
+| s | 32 | 13/20 | 12 | 8 | 8 | 16 | 8 | 12/16 | 12/16 | 28 | 16 | 5 |
+| **m** | **36** | **14/20** | **16** | **12** | **8** | **16** | **8** | **13/20** | **12/16** | **32** | **18** | **6** |
+| l | 40 | 16/24 | 20 | 12 | 8 | 20 | 10 | 14/20 | 13/20 | 36 | 20 | 7 |
+| xl | 48 | 16/24 | 24 | 16 | 12 | 20 | 12 | 14/20 | 13/20 | 40 | 24 | 8 |
 
-Variables: `--prime-control-<tier>-{height,padding-x,field-padding-x,gap,icon,radius,text-size,line-height,label-size,label-line-height,hint-size,hint-line-height,label-gap,hint-gap,item-height,choice}`.
+Variables: `--prime-control-<tier>-{height,padding-x,field-padding-x,gap,icon,radius,text-size,line-height,label-size,label-line-height,hint-size,hint-line-height,label-gap,hint-gap,item-height,choice,track}`.
 
 Pairing rules:
 - A field of tier T uses label/hint values of tier T. Hint/error is always smaller than the field text.
@@ -123,6 +123,12 @@ Pairing rules:
 - Fields (Input, Textarea, Select, TagSelect, Datepicker trigger, ColorPicker fields): an icon (leading or trailing,
   incl. chevrons and clear buttons) sits centered between the edge and the text — edge→icon = icon→text = the tier's
   `field-padding-x` (xs/s 8 · m/l 12 · xl 16). No optical shrink in fields.
+- Tables: the row height of a tier is a minimum, never a fixed height. Cells pad vertically by
+  (row height − control one tier down) / 2, so one text line or a one-tier-down control keeps the tier
+  height and taller content (avatar + two lines) grows the row with equal padding. Content columns are
+  separated by hairlines by default. A sortable column has one quiet sort icon (`text-disabled`,
+  sorted `text-secondary`, never accent) at the end edge of its head cell, whatever the column's
+  alignment.
 - Buttons: icon + label are one centered group; the icon side gets optical compensation (padding = padX − 4px, never below 8px) and
   the icon→label gap is the tier `gap`. Icon-only buttons are square.
 

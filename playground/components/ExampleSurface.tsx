@@ -1,5 +1,6 @@
 import type * as React from "react";
 
+import { Typography } from "@/components/typography/Typography";
 import { cx } from "@/internal/cx";
 
 import styles from "./ExampleSurface.module.css";
@@ -46,8 +47,12 @@ export function SurfaceGallery({
       {PLAYGROUND_PREVIEW_SURFACES.filter((s) => surfaces.includes(s.value)).map((s) => (
         <div key={s.value} className={styles.galleryCell}>
           <span className={styles.galleryLabel}>
-            {s.label}
-            <span className={styles.galleryHint}>{s.hint}</span>
+            <Typography.Root as="span" variant="caption" weight="medium">
+              {s.label}
+            </Typography.Root>
+            <Typography.Root as="span" variant="caption" tone="muted" truncate>
+              {s.hint}
+            </Typography.Root>
           </span>
           <ExampleSurface tone={s.value}>
             {typeof children === "function" ? children(s.value) : children}

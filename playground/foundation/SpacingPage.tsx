@@ -1,5 +1,12 @@
 import * as React from "react";
 
+import type { DataTableColumn } from "@/components/data-table/DataTable";
+import { Hint } from "@/components/hint/Hint";
+import { Input } from "@/components/input/Input";
+import { Label } from "@/components/label/Label";
+import { Switch } from "@/components/switch/Switch";
+import { Typography } from "@/components/typography/Typography";
+
 import {
   FoundationPage,
   FoundationSection,
@@ -22,8 +29,12 @@ function SpaceScale() {
     <Panel className={s.spaceScale}>
       {SCALE.map(({ step, varName, px }) => (
         <div key={step} className={s.spaceRow}>
-          <span className={s.spaceStep}>{step}</span>
-          <span className={s.spacePx}>{formatPx(px)}px</span>
+          <Typography.Root as="span" variant="body-s" weight="medium">
+            {step}
+          </Typography.Root>
+          <Typography.Root as="span" variant="body-s" tone="muted" className={s.numeric}>
+            {formatPx(px)}px
+          </Typography.Root>
           <span className={s.spaceTrack}>
             <span className={s.spaceBar} style={{ width: `var(${varName})` }} />
           </span>
@@ -73,32 +84,39 @@ function TokenPx({ varName }: { varName: string }) {
   );
 }
 
+const RULE_COLUMNS: DataTableColumn<Rule>[] = [
+  { id: "name", header: "Связь", accessor: "name" },
+  {
+    id: "token",
+    header: "Токен",
+    cell: (rule) => (
+      <span className={s.tokenStack}>
+        <TokenName>{rule.varName}</TokenName>
+        {rule.alt ? <TokenName>{rule.alt}</TokenName> : null}
+      </span>
+    ),
+  },
+  {
+    id: "value",
+    header: "Значение",
+    numeric: true,
+    cell: (rule) => (
+      <>
+        <TokenPx varName={rule.varName} />
+        {rule.alt ? (
+          <>
+            {" – "}
+            <TokenPx varName={rule.alt} />
+          </>
+        ) : null}
+      </>
+    ),
+  },
+  { id: "note", header: "Зачем", accessor: "note" },
+];
+
 function RulesTable() {
-  return (
-    <TokenTable head={["Связь", "Токен", "Значение", "Зачем"]}>
-      {RULES.map((rule) => (
-        <tr key={rule.name}>
-          <th scope="row">{rule.name}</th>
-          <td>
-            <span className={s.tokenStack}>
-              <TokenName>{rule.varName}</TokenName>
-              {rule.alt ? <TokenName>{rule.alt}</TokenName> : null}
-            </span>
-          </td>
-          <td className={s.numeric}>
-            <TokenPx varName={rule.varName} />
-            {rule.alt ? (
-              <>
-                {" – "}
-                <TokenPx varName={rule.alt} />
-              </>
-            ) : null}
-          </td>
-          <td>{rule.note}</td>
-        </tr>
-      ))}
-    </TokenTable>
-  );
+  return <TokenTable columns={RULE_COLUMNS} rows={RULES} getRowKey={(rule) => rule.name} />;
 }
 
 /* --- Live example: spacers are real elements so they can be highlighted ------- */
@@ -106,23 +124,29 @@ function RulesTable() {
 function Gap({ varName, label }: { varName: string; label: string }) {
   return (
     <div className={s.gap} style={{ height: `var(${varName})` }} data-gap-label={label} aria-hidden>
-      <span className={s.gapLabel}>
+      <Typography.Root as="span" variant="caption" tone="accent" className={s.gapLabel}>
         {label} · {varName.replace("--prime-", "")}
-      </span>
+      </Typography.Root>
     </div>
   );
 }
 
-function FakeField({ label, hint, value }: { label: string; hint?: string; value?: string }) {
+/** A real Label, Input and Hint with the spacers between them drawn as elements. */
+function DemoField({ label, hint, value }: { label: string; hint?: string; value?: string }) {
+  const id = React.useId();
   return (
     <div className={s.fakeFieldGroup}>
-      <span className={s.fakeLabel}>{label}</span>
+      <Label.Root htmlFor={id}>{label}</Label.Root>
       <Gap varName="--prime-control-m-label-gap" label="подпись → поле" />
-      <span className={s.fakeField}>{value ?? ""}</span>
+      <Input.Root>
+        <Input.Wrapper>
+          <Input.Field id={id} defaultValue={value ?? ""} />
+        </Input.Wrapper>
+      </Input.Root>
       {hint ? (
         <>
           <Gap varName="--prime-control-m-hint-gap" label="поле → подсказка" />
-          <span className={s.fakeHint}>{hint}</span>
+          <Hint.Root>{hint}</Hint.Root>
         </>
       ) : null}
     </div>
@@ -131,31 +155,33 @@ function FakeField({ label, hint, value }: { label: string; hint?: string; value
 
 function ProximityDemo() {
   const [show, setShow] = React.useState(true);
-  const id = React.useId();
   return (
     <Panel className={s.proximityPanel}>
-      <label className={s.inlineToggle} htmlFor={id}>
-        <input id={id} type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} />
-        Показать отступы
-      </label>
+      <Switch.Root checked={show} onCheckedChange={setShow}>
+        <Switch.Label>Показать отступы</Switch.Label>
+      </Switch.Root>
       <div className={s.proximity} data-show-gaps={show || undefined}>
-        <h5 className={s.fakeSectionTitle}>Профиль</h5>
+        <Typography.Root as="h3" variant="title-m">
+          Профиль
+        </Typography.Root>
         <Gap varName={toVarName("space.4")} label="заголовок → группа" />
-        <FakeField label="Имя" value="Анна" />
+        <DemoField label="Имя" value="Анна" />
         <Gap varName={toVarName("space.5")} label="поле → поле" />
-        <FakeField
+        <DemoField
           label="Email"
           value="anna@example.com"
           hint="На этот адрес придёт подтверждение"
         />
         <Gap varName={toVarName("space.8")} label="группа → группа" />
-        <FakeField label="Компания" value="ООО «Ромашка»" />
+        <DemoField label="Компания" value="ООО «Ромашка»" />
         <Gap varName={toVarName("space.5")} label="поле → поле" />
-        <FakeField label="Должность" />
+        <DemoField label="Должность" />
         <Gap varName={toVarName("space.12")} label="секция → секция" />
-        <h5 className={s.fakeSectionTitle}>Уведомления</h5>
+        <Typography.Root as="h3" variant="title-m">
+          Уведомления
+        </Typography.Root>
         <Gap varName={toVarName("space.4")} label="заголовок → группа" />
-        <FakeField label="Частота писем" value="Раз в неделю" />
+        <DemoField label="Частота писем" value="Раз в неделю" />
       </div>
     </Panel>
   );

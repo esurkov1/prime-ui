@@ -26,9 +26,14 @@ Slider.Root
 ├─ header row (only with `label` or `showValue`)
 │  ├─ Label            from `label`, linked to the input
 │  └─ <output>         from `showValue`, formatted value
-└─ <input type="range">
+└─ control
+   ├─ <input type="range">   transparent, on top: pointer, keyboard, a11y
+   ├─ track                  inactive pill (`aria-hidden`)
+   │  └─ range               active pill, rounded end at the thumb centre
+   └─ thumb                  capsule (`aria-hidden`)
 ```
-Single part: everything is configured by `Slider.Root` props.
+Single part: everything is configured by `Slider.Root` props. The native input's thumb has the
+same size as the visual thumb, so the hit area always matches what is drawn.
 
 ## API
 
@@ -44,7 +49,8 @@ Single part: everything is configured by `Slider.Root` props.
 | `label` | `ReactNode` | — | Visible label (`Label`), linked to the input via `htmlFor`. Without it, pass `aria-label`. |
 | `showValue` | `boolean` | `false` | Shows the current value at the end of the label row (tabular numbers). |
 | `formatValue` | `(value: number) => string` | — | Formats the shown value and sets `aria-valuetext` (e.g. `` (v) => `${v} °C` ``). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Size tier of the thumb and the label row. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Size tier: track, thumb and the label row scale together. |
+| `tone` | `"accent" \| "neutral" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Color of the filled range. |
 | `disabled` | `boolean` | — | Disables the input; mutes track, fill and value. |
 | `aria-label` | `string` | — | Accessible name when there is no visible `label`. |
 | `className` | `string` | — | Class on the root `div`. |
@@ -52,16 +58,31 @@ Single part: everything is configured by `Slider.Root` props.
 No other native props, no `name`, no ref forwarding.
 
 ## Variants
-No `variant`/`tone`/`color`. Axes: `size`, `showValue` (visual flag).
+No `variant`/`color`. Axes: `size`, `tone`, `showValue` (visual flag).
 
 ### size
+Everything derives from the tier track thickness T (`--prime-control-<tier>-track`, shared with
+ProgressBar): the thumb is a 4.5T × 3T capsule, so the control scales as one shape.
+
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | 14px thumb, 4px track, 12/16 label | dense filter panels | |
-| `s` | 16px thumb, 4px track, 12/16 label | compact side panels | |
-| `m` | 18px thumb, 4px track, 13/20 label | regular forms and settings | yes |
-| `l` | 20px thumb, 4px track, 14/20 label | spacious settings pages | |
-| `xl` | 24px thumb, 8px track, 14/20 label | touch-first screens | |
+| `xs` | 4px track, 18×12 thumb, 12/16 label | dense filter panels | |
+| `s` | 5px track, 22.5×15 thumb, 12/16 label | compact side panels | |
+| `m` | 6px track, 27×18 thumb, 13/20 label | regular forms and settings | yes |
+| `l` | 7px track, 31.5×21 thumb, 14/20 label | spacious settings pages | |
+| `xl` | 8px track, 36×24 thumb, 14/20 label | touch-first screens | |
+
+### tone
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `accent` | `accent-default` fill | any regular setting | yes |
+| `neutral` | `text-secondary` fill | monochrome screens, editors, media controls | |
+| `success` | `success-default` fill | a value that means "safe / good" (minimum charge) | |
+| `warning` | `warning-default` fill | a warning threshold | |
+| `danger` | `danger-default` fill | a blocking or destructive threshold | |
+| `info` | `info-default` fill | informational settings next to info UI | |
+
+Tone never carries meaning alone: the label names what the value means.
 
 ### showValue
 | Value | Looks like | Use when | Default |
@@ -74,16 +95,16 @@ No `variant`/`tone`/`color`. Axes: `size`, `showValue` (visual flag).
 - Neither `label` nor `aria-label` → forbidden (unnamed control).
 - A paired number input with `showValue` → redundant; drop `showValue`.
 
-**Sizes** — the root is always 100% wide; the tier changes only the thumb, label/value text and (at `xl`) the track thickness. Use the same tier as the other fields of the form.
+**Sizes** — the root is always 100% wide; the tier changes the track, the thumb (proportionally) and the label/value text. Use the same tier as the other fields of the form.
 
 **Hierarchy** — sliders in a settings card are spaced `--prime-space-6`; a related switch can disable a slider (see [display-settings.tsx](examples/display-settings.tsx)).
 
 ## States
 | State | Driven by | DOM | Looks like |
 |---|---|---|---|
-| default | — | `data-size` | track `fill-strong`, fill `accent-default` up to the value, thumb `control-thumb` with a hairline edge and `shadow-overlay` |
-| hover | pointer | — | soft `accent-soft` halo (4px) around the thumb |
-| active | dragging | — | thumb scales to 110% |
+| default | — | `data-size`, `data-tone` | track `fill-strong`, tone pill up to the thumb centre, opaque `control-thumb` capsule with `shadow-thumb` |
+| hover | pointer | — | light liquid glass: thumb grows to 110%, turns translucent and slightly frosted, one bright outer edge |
+| active | dragging | — | clear glass: thumb grows to 125%, mostly transparent, the rounded end of the range shows through |
 | focus-visible | keyboard | — | outer focus ring around the thumb |
 | disabled | `disabled` | `data-disabled="true"` on root, native `disabled` | track `fill-muted`, fill `text-disabled`, flat thumb `fill-strong`, value `text-disabled`, `cursor: not-allowed` |
 
@@ -106,6 +127,7 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 | File | Scenario | When to use this pattern |
 |---|---|---|
 | [sizes.tsx](examples/sizes.tsx) | All size tiers with label and value | Matching the form tier |
+| [tones.tsx](examples/tones.tsx) | Every `tone` | Picking the fill color |
 | [states.tsx](examples/states.tsx) | Minimum, middle, maximum, disabled | Reference for fill and disabled |
 | [value-format.tsx](examples/value-format.tsx) | `showValue` + `formatValue` (°C, ₽, %) | Values with units |
 | [basic.tsx](examples/basic.tsx) | One labelled slider with value | Checking contrast on any surface |
@@ -125,6 +147,7 @@ export function VolumeSlider() {
 - `<Slider.Root onChange={…}>` → use `onValueChange`.
 - `formatValue` without `showValue` expecting a visible unit → add `showValue`.
 - No `label` and no `aria-label` → add one.
+- `tone="danger"` as decoration → keep `accent`; semantic tones only when the value means risk or a limit.
 - `value={[20, 80]}` for a range → only a single number is supported.
 - Expecting it to submit in a form → there is no `name`; keep the value in state and submit it yourself.
 

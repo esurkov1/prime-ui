@@ -157,6 +157,7 @@
   --prime-control-l-padding-x: var(--prime-ref-space-5);
   --prime-control-l-radius: var(--prime-ref-radius-10);
   --prime-control-l-text-size: var(--prime-ref-font-size-16);
+  --prime-control-l-track: 0.4375rem;
   --prime-control-m-choice: 1.125rem;
   --prime-control-m-field-padding-x: var(--prime-ref-space-3);
   --prime-control-m-gap: var(--prime-ref-space-2);
@@ -173,6 +174,7 @@
   --prime-control-m-padding-x: var(--prime-ref-space-4);
   --prime-control-m-radius: var(--prime-ref-radius-8);
   --prime-control-m-text-size: var(--prime-ref-font-size-14);
+  --prime-control-m-track: 0.375rem;
   --prime-control-s-choice: var(--prime-ref-icon-16);
   --prime-control-s-field-padding-x: var(--prime-ref-space-2);
   --prime-control-s-gap: var(--prime-ref-space-2);
@@ -189,6 +191,7 @@
   --prime-control-s-padding-x: var(--prime-ref-space-3);
   --prime-control-s-radius: var(--prime-ref-radius-8);
   --prime-control-s-text-size: var(--prime-ref-font-size-13);
+  --prime-control-s-track: 0.3125rem;
   --prime-control-xl-choice: var(--prime-ref-icon-24);
   --prime-control-xl-field-padding-x: var(--prime-ref-space-4);
   --prime-control-xl-gap: var(--prime-ref-space-3);
@@ -205,6 +208,7 @@
   --prime-control-xl-padding-x: var(--prime-ref-space-6);
   --prime-control-xl-radius: var(--prime-ref-radius-12);
   --prime-control-xl-text-size: var(--prime-ref-font-size-16);
+  --prime-control-xl-track: 0.5rem;
   --prime-control-xs-choice: var(--prime-ref-icon-14);
   --prime-control-xs-field-padding-x: var(--prime-ref-space-2);
   --prime-control-xs-gap: var(--prime-ref-space-1);
@@ -221,6 +225,7 @@
   --prime-control-xs-padding-x: var(--prime-ref-space-2);
   --prime-control-xs-radius: var(--prime-ref-radius-6);
   --prime-control-xs-text-size: var(--prime-ref-font-size-12);
+  --prime-control-xs-track: 0.25rem;
   --prime-drawer-gap: var(--prime-ref-space-4);
   --prime-drawer-padding: var(--prime-ref-space-6);
   --prime-drawer-width-l: 40rem;
@@ -286,6 +291,7 @@
   --prime-shadow-modal: 0 0 0 1px rgba(17, 19, 24, 0.04), 0 32px 64px -16px rgba(17, 19, 24, 0.30);
   --prime-shadow-overlay: 0 0 0 1px rgba(17, 19, 24, 0.04), 0 12px 32px -8px rgba(17, 19, 24, 0.18);
   --prime-shadow-raised: 0 1px 2px rgba(17, 19, 24, 0.04);
+  --prime-shadow-thumb: 0 0 0 1px rgba(17, 19, 24, 0.08), 0 1px 3px rgba(17, 19, 24, 0.16);
   --prime-space-0: var(--prime-ref-space-0);
   --prime-space-1: var(--prime-ref-space-1);
   --prime-space-10: var(--prime-ref-space-10);
@@ -377,6 +383,16 @@
   --prime-text-title-s-size: var(--prime-ref-font-size-14);
   --prime-text-title-s-tracking: var(--prime-ref-font-tracking-normal);
   --prime-text-title-s-weight: var(--prime-ref-font-weight-semibold);
+  --prime-thumbnail-l-height: var(--prime-ref-space-12);
+  --prime-thumbnail-l-radius: var(--prime-ref-radius-8);
+  --prime-thumbnail-m-height: var(--prime-ref-space-10);
+  --prime-thumbnail-m-radius: var(--prime-ref-radius-8);
+  --prime-thumbnail-s-height: var(--prime-ref-space-8);
+  --prime-thumbnail-s-radius: var(--prime-ref-radius-6);
+  --prime-thumbnail-xl-height: var(--prime-ref-space-16);
+  --prime-thumbnail-xl-radius: var(--prime-ref-radius-12);
+  --prime-thumbnail-xs-height: var(--prime-ref-space-6);
+  --prime-thumbnail-xs-radius: var(--prime-ref-radius-4);
   --prime-tooltip-arrow-height: 0.3125rem;
   --prime-tooltip-arrow-width: 0.625rem;
   --prime-tooltip-max-width: 17.5rem;

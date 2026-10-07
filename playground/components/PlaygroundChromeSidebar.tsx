@@ -15,6 +15,7 @@ import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Kbd } from "@/components/kbd/Kbd";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { Typography } from "@/components/typography/Typography";
 import { Sidebar, type SidebarMode, useSidebar } from "@/layout";
 
 import {
@@ -49,8 +50,12 @@ function Brand() {
         <span />
       </span>
       <span className="playgroundBrandText">
-        <span className="playgroundBrandTitle">Prime UI</span>
-        <span className="playgroundBrandSubtitle">Graphite · playground</span>
+        <Typography.Root as="span" variant="title-s">
+          Prime UI
+        </Typography.Root>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          Graphite · playground
+        </Typography.Root>
       </span>
     </Link>
   );
@@ -181,7 +186,6 @@ export function PlaygroundChromeSidebar({
         <Brand />
       </Sidebar.Header>
       <Sidebar.Item
-        className="playgroundSearchButton"
         icon={<Search />}
         shortcut={<Kbd.Root>{isMac ? "⌘K" : "Ctrl K"}</Kbd.Root>}
         aria-haspopup="dialog"

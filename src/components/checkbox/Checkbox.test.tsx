@@ -6,6 +6,11 @@ import { describe, expect, it, vi } from "vitest";
 import { Checkbox } from "./Checkbox";
 
 describe("Checkbox", () => {
+  it("renders the bare control when Checkbox.Label is omitted", () => {
+    render(<Checkbox.Root aria-label="Выбрать строку" />);
+    expect(screen.getAllByRole("checkbox", { name: "Выбрать строку" })).toHaveLength(1);
+  });
+
   it("renders without crashing", () => {
     render(
       <Checkbox.Root>

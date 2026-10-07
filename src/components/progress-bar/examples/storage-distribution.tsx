@@ -1,24 +1,25 @@
-/** Storage usage in a card: segment weights are shares of the total, a legend repeats the colors in text and screen readers get the distribution as text. Use it for "used by type" breakdowns. */
-import { SegmentedProgressBar, type SegmentedProgressSegment, Typography } from "prime-ui-kit";
+/** Storage usage in a card: `segments` split the used space by type, `max` is the disk size so the free space stays track, a legend repeats the colors in text. Use it for "used by type" breakdowns. */
+import { ProgressBar, type ProgressSegment, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const segments: SegmentedProgressSegment[] = [
+const segments: ProgressSegment[] = [
   { value: 38, label: "Видео", tone: "accent" },
   { value: 21, label: "Документы", tone: "success" },
   { value: 12, label: "Архивы", tone: "warning" },
-  { value: 29, label: "Свободно", tone: "neutral" },
 ];
 
-export default function SegmentedProgressBarStorageDistributionExample() {
+export default function ProgressBarStorageDistributionExample() {
   return (
     <div className={styles.card}>
       <Typography.Root as="h3" variant="title-s">
         Хранилище: 71 из 100 ГБ
       </Typography.Root>
-      <SegmentedProgressBar.Root
+      <ProgressBar.Root
         segments={segments}
+        max={100}
         label="Занято по типам файлов"
+        showValue
         segmentGap="hairline"
       />
       <ul className={styles.legend}>

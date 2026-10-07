@@ -45,6 +45,7 @@ Choosing from options: toggles, lists, ranges, dates, colors.
 | SmartFilter | A filter bar for lists and tables: a filter button and search with a panel of values, applied filters as tags, and a show / hide choice for every value. | [COMPONENT.md](../src/components/smart-filter/COMPONENT.md) · [examples](../src/components/smart-filter/examples/) |
 | Datepicker | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). | [COMPONENT.md](../src/components/datepicker/COMPONENT.md) · [examples](../src/components/datepicker/examples/) |
 | ColorPicker | Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. | [COMPONENT.md](../src/components/color-picker/COMPONENT.md) · [examples](../src/components/color-picker/examples/) |
+| ColorSwatches | An inline color choice: a wrapping grid of preset swatches inside a form, without a popover. | [COMPONENT.md](../src/components/color-swatches/COMPONENT.md) · [examples](../src/components/color-swatches/examples/) |
 
 ## Data display (`data-display`)
 
@@ -54,6 +55,7 @@ Showing data and labels: badges, tags, avatars, cards, tables, feeds, code.
 |---|---|---|
 | Badge | The kit's one chip: a status, category or count label, a removable value or applied filter, and a pressable toggle with a hover action, in a palette color. | [COMPONENT.md](../src/components/badge/COMPONENT.md) · [examples](../src/components/badge/examples/) |
 | Avatar | A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups. | [COMPONENT.md](../src/components/avatar/COMPONENT.md) · [examples](../src/components/avatar/examples/) |
+| Thumbnail | A preview of an object — product, vehicle, file, cover — at a fixed aspect ratio, with a colored icon fallback. | [COMPONENT.md](../src/components/thumbnail/COMPONENT.md) · [examples](../src/components/thumbnail/examples/) |
 | Kbd | A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`. | [COMPONENT.md](../src/components/kbd/COMPONENT.md) · [examples](../src/components/kbd/examples/) |
 | Card | A filled surface block with structural templates for metrics, charts, lists, calls to action and covers. | [COMPONENT.md](../src/components/card/COMPONENT.md) · [examples](../src/components/card/examples/) |
 | DataTable | A data table with sorting, pagination or infinite scroll, row selection, nested rows and loading / empty / error states. | [COMPONENT.md](../src/components/data-table/COMPONENT.md) · [examples](../src/components/data-table/examples/) |
@@ -68,9 +70,8 @@ System messages, progress and empty states.
 |---|---|---|
 | Banner | Full-width in-flow message for a page, section or card: status icon, title, description, actions and dismiss. | [COMPONENT.md](../src/components/banner/COMPONENT.md) · [examples](../src/components/banner/examples/) |
 | Notification | Pop-up toast notifications: `NotificationProvider` at the app root and `notify()` from any screen. | [COMPONENT.md](../src/components/notification/COMPONENT.md) · [examples](../src/components/notification/examples/) |
-| ProgressBar | Linear progress indicator on a native `<progress>` with a label, a percentage and a status color. | [COMPONENT.md](../src/components/progress-bar/COMPONENT.md) · [examples](../src/components/progress-bar/examples/) |
-| SegmentedProgressBar | One bar made of proportional segments: storage by type, task statuses, a funnel or quotas. | [COMPONENT.md](../src/components/segmented-progress-bar/COMPONENT.md) · [examples](../src/components/segmented-progress-bar/examples/) |
-| ProgressCircle | Circular progress indicator: a track, a rounded arc and optional content in the center. | [COMPONENT.md](../src/components/progress-circle/COMPONENT.md) · [examples](../src/components/progress-circle/examples/) |
+| ProgressBar | Linear progress: one value on a native `<progress>`, or `segments` that split a whole (storage by type, task statuses), with a label, a percentage and status colors. | [COMPONENT.md](../src/components/progress-bar/COMPONENT.md) · [examples](../src/components/progress-bar/examples/) |
+| ProgressCircle | Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center. | [COMPONENT.md](../src/components/progress-circle/COMPONENT.md) · [examples](../src/components/progress-circle/examples/) |
 | EmptyPage | Empty state of a page or a block: icon, title, explanation and an action. | [COMPONENT.md](../src/components/empty-page/COMPONENT.md) · [examples](../src/components/empty-page/examples/) |
 
 ## Navigation (`navigation`)

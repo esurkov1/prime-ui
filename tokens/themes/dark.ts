@@ -128,5 +128,6 @@ export const darkThemeOverrides = {
     raised: "none",
     overlay: "0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px -8px rgba(0, 0, 0, 0.6)",
     modal: "0 0 0 1px rgba(255, 255, 255, 0.06), 0 32px 72px -16px rgba(0, 0, 0, 0.75)",
+    thumb: "0 1px 3px rgba(0, 0, 0, 0.5)",
   },
 } as const;

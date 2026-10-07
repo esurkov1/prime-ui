@@ -1,4 +1,4 @@
-/** `tone` colors the arc; at `0` only the track remains; `max` changes the scale (7 of 12); the center holds text or an icon. Always pass `label`: it is the ring's only accessible name. */
+/** Every `tone` colors the arc; at `0` only the track remains; `max` changes the scale (7 of 12); the center holds text or an icon. Always pass `label`: it is the ring's only accessible name. */
 import { Check } from "lucide-react";
 import { ProgressCircle, Typography } from "prime-ui-kit";
 
@@ -44,6 +44,18 @@ export default function ProgressCircleValuesAndTonesExample() {
           20%
         </ProgressCircle.Root>
         <Caption>danger</Caption>
+      </div>
+      <div className={styles.item}>
+        <ProgressCircle.Root size="l" value={55} tone="neutral" label="Индексация">
+          55%
+        </ProgressCircle.Root>
+        <Caption>neutral</Caption>
+      </div>
+      <div className={styles.item}>
+        <ProgressCircle.Root size="l" value={30} tone="info" label="Синхронизация">
+          30%
+        </ProgressCircle.Root>
+        <Caption>info</Caption>
       </div>
       <div className={styles.item}>
         <ProgressCircle.Root size="l" value={7} max={12} label="Месяцев оплачено">

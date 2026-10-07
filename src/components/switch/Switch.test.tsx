@@ -4,6 +4,23 @@ import { describe, expect, it, vi } from "vitest";
 import { Switch } from "./Switch";
 
 describe("Switch", () => {
+  it("renders the bare control when Switch.Label is omitted", () => {
+    const onCheckedChange = vi.fn();
+    render(<Switch.Root aria-label="Активность бота" onCheckedChange={onCheckedChange} />);
+    const input = screen.getByRole("switch", { name: "Активность бота" });
+    fireEvent.click(input);
+    expect(onCheckedChange).toHaveBeenCalledWith(true);
+  });
+
+  it("does not add a second control when Switch.Label is present", () => {
+    render(
+      <Switch.Root>
+        <Switch.Label>Уведомления</Switch.Label>
+      </Switch.Root>,
+    );
+    expect(screen.getAllByRole("switch")).toHaveLength(1);
+  });
+
   it("names the switch from Switch.Label and describes it with Switch.Hint", () => {
     render(
       <Switch.Root>

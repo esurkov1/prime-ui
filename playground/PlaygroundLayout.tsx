@@ -21,12 +21,30 @@ function readMode(): SidebarMode {
   }
 }
 
+const NARROW = "(max-width: 767.98px)";
+
+/** Whether the viewport is narrow enough for the off-canvas sidebar (the AppShell breakpoint). */
+function useNarrowViewport(): boolean {
+  const [narrow, setNarrow] = React.useState(
+    () => typeof window !== "undefined" && window.matchMedia(NARROW).matches,
+  );
+  React.useEffect(() => {
+    const mq = window.matchMedia(NARROW);
+    const update = () => setNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return narrow;
+}
+
 export function PlaygroundLayout() {
   const { pathname } = useLocation();
   const [mode, setModeState] = React.useState<SidebarMode>(readMode);
   const [navOpen, setNavOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const mainRef = React.useRef<HTMLElement>(null);
+  const narrow = useNarrowViewport();
 
   usePlaygroundSearchHotkey(setSearchOpen);
 
@@ -58,32 +76,34 @@ export function PlaygroundLayout() {
             onSearch={() => setSearchOpen(true)}
           />
         </AppShell.Nav>
-        <AppShell.Header className="playgroundMobileBar">
-          <Button.Root
-            variant="ghost"
-            tone="neutral"
-            aria-label="Открыть навигацию"
-            aria-expanded={navOpen}
-            onClick={() => setNavOpen(true)}
-          >
-            <Button.Icon>
-              <Menu />
-            </Button.Icon>
-          </Button.Root>
-          <Typography.Root as="span" variant="title-m" truncate className="playgroundMobileTitle">
-            {page?.label ?? "Prime UI"}
-          </Typography.Root>
-          <Button.Root
-            variant="ghost"
-            tone="neutral"
-            aria-label="Поиск"
-            onClick={() => setSearchOpen(true)}
-          >
-            <Button.Icon>
-              <Search />
-            </Button.Icon>
-          </Button.Root>
-        </AppShell.Header>
+        {narrow ? (
+          <AppShell.Header className="playgroundMobileBar">
+            <Button.Root
+              variant="ghost"
+              tone="neutral"
+              aria-label="Открыть навигацию"
+              aria-expanded={navOpen}
+              onClick={() => setNavOpen(true)}
+            >
+              <Button.Icon>
+                <Menu />
+              </Button.Icon>
+            </Button.Root>
+            <Typography.Root as="span" variant="title-m" truncate className="playgroundMobileTitle">
+              {page?.label ?? "Prime UI"}
+            </Typography.Root>
+            <Button.Root
+              variant="ghost"
+              tone="neutral"
+              aria-label="Поиск"
+              onClick={() => setSearchOpen(true)}
+            >
+              <Button.Icon>
+                <Search />
+              </Button.Icon>
+            </Button.Root>
+          </AppShell.Header>
+        ) : null}
         <AppShell.Main ref={mainRef} id="playground-main" tabIndex={-1}>
           <Outlet />
         </AppShell.Main>

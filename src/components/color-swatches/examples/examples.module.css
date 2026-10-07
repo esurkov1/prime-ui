@@ -1,0 +1,37 @@
+/* Layout only for the ColorSwatches examples: semantic tokens. */
+
+.stack {
+  display: grid;
+  gap: var(--prime-space-5);
+  width: 100%;
+  min-width: 0;
+}
+
+.form {
+  display: grid;
+  gap: var(--prime-space-5);
+  width: min(100%, calc(var(--prime-space-16) * 6));
+}
+
+.sizeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.sizeTag {
+  flex: 0 0 var(--prime-space-6);
+}
+
+.column {
+  display: grid;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.narrow {
+  display: grid;
+  gap: var(--prime-space-2);
+  width: min(100%, calc(var(--prime-space-16) * 3));
+}

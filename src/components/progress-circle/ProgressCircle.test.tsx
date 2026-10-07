@@ -63,4 +63,51 @@ describe("ProgressCircle", () => {
     render(<ProgressCircle.Root value={5} className="custom-circle" />);
     expect(screen.getByRole("progressbar").parentElement).toHaveClass("custom-circle");
   });
+
+  it("supports every tone in value mode", () => {
+    render(<ProgressCircle.Root value={50} tone="info" />);
+    expect(screen.getByRole("progressbar").parentElement).toHaveAttribute("data-tone", "info");
+  });
+
+  describe("segments", () => {
+    const tasks = [
+      { value: 30, label: "Errors", tone: "danger" as const },
+      { value: 70, label: "OK", tone: "success" as const },
+    ];
+
+    it("renders a group named by the distribution instead of a progressbar", () => {
+      render(<ProgressCircle.Root segments={tasks} />);
+      expect(screen.getByRole("group", { name: "Errors: 30%, OK: 70%" })).toBeInTheDocument();
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    it("names the group by label and describes it by the distribution of max", () => {
+      render(<ProgressCircle.Root segments={tasks} max={200} label="Batch" />);
+      const group = screen.getByRole("group", { name: "Batch" });
+      expect(group).toHaveAccessibleDescription("Errors: 15%, OK: 35%");
+    });
+
+    it("draws one arc per non-empty part with its tone and caps when not closed", () => {
+      const { container } = render(
+        <ProgressCircle.Root segments={[...tasks, { value: 0 }]} max={200} />,
+      );
+      const toned = container.querySelectorAll("circle[data-tone]");
+      // two arcs + two caps
+      expect(toned).toHaveLength(4);
+      expect(toned[0]).toHaveAttribute("data-tone", "danger");
+    });
+
+    it("closes the ring without caps when the parts fill the scale", () => {
+      const { container } = render(<ProgressCircle.Root segments={tasks} />);
+      expect(container.querySelectorAll("circle[data-tone]")).toHaveLength(2);
+    });
+
+    it("sets the gap mode and describes empty lists with labels", () => {
+      render(
+        <ProgressCircle.Root segments={[]} segmentGap="hairline" labels={{ empty: "Пусто" }} />,
+      );
+      const group = screen.getByRole("group", { name: "Пусто" });
+      expect(group).toHaveAttribute("data-segment-gap", "hairline");
+    });
+  });
 });

@@ -334,6 +334,8 @@ export const semanticTokens = {
     overlay: "0 0 0 1px rgba(17, 19, 24, 0.04), 0 12px 32px -8px rgba(17, 19, 24, 0.18)",
     /** Modals and drawers. */
     modal: "0 0 0 1px rgba(17, 19, 24, 0.04), 0 32px 64px -16px rgba(17, 19, 24, 0.30)",
+    /** Slider thumb: one crisp outer edge plus a short contact shadow. */
+    thumb: "0 0 0 1px rgba(17, 19, 24, 0.08), 0 1px 3px rgba(17, 19, 24, 0.16)",
   },
 
   motion: {
@@ -385,6 +387,7 @@ export const semanticTokens = {
    * Control size tiers shared by Button, Input, Select, Datepicker, Tabs, SegmentedControl, etc.
    * Pairing: a field of tier T uses `labelSize`/`hintSize` of tier T; menus opened from tier T
    * use `itemHeight` of tier T; badges inside tier T use the badge tier one step down.
+   * `track` is the line thickness of Slider and ProgressBar; their thumb and gaps derive from it.
    */
   control: {
     xs: {
@@ -404,6 +407,7 @@ export const semanticTokens = {
       hintGap: "{space.1}",
       itemHeight: "{space.6}",
       choice: "{icon.14}",
+      track: "0.25rem",
     },
     s: {
       height: "{space.8}",
@@ -422,6 +426,7 @@ export const semanticTokens = {
       hintGap: "{space.1}",
       itemHeight: "{space.7}",
       choice: "{icon.16}",
+      track: "0.3125rem",
     },
     m: {
       height: "{space.9}",
@@ -440,6 +445,7 @@ export const semanticTokens = {
       hintGap: "{space.1}",
       itemHeight: "{space.8}",
       choice: "1.125rem",
+      track: "0.375rem",
     },
     l: {
       height: "{space.10}",
@@ -458,6 +464,7 @@ export const semanticTokens = {
       hintGap: "{space.1}",
       itemHeight: "{space.9}",
       choice: "{icon.20}",
+      track: "0.4375rem",
     },
     xl: {
       height: "{space.12}",
@@ -476,6 +483,7 @@ export const semanticTokens = {
       hintGap: "{space.1}",
       itemHeight: "{space.10}",
       choice: "{icon.24}",
+      track: "0.5rem",
     },
   },
 
@@ -538,6 +546,15 @@ export const semanticTokens = {
     l: "{space.10}",
     xl: "{space.12}",
     "2xl": "{space.16}",
+  },
+
+  /** Thumbnail tier: height (width follows the aspect ratio) and corner radius. */
+  thumbnail: {
+    xs: { height: "{space.6}", radius: "{radius.4}" },
+    s: { height: "{space.8}", radius: "{radius.6}" },
+    m: { height: "{space.10}", radius: "{radius.8}" },
+    l: { height: "{space.12}", radius: "{radius.8}" },
+    xl: { height: "{space.16}", radius: "{radius.12}" },
   },
 
   /** Floating panel shared by Select, Dropdown, Combobox, Datepicker, Popover. Item radius = radius − padding. */

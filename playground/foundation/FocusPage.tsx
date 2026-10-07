@@ -1,5 +1,13 @@
 import * as React from "react";
 
+import { Badge } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
+import type { DataTableColumn } from "@/components/data-table/DataTable";
+import { Input } from "@/components/input/Input";
+import { LinkButton } from "@/components/link-button/LinkButton";
+import { Switch } from "@/components/switch/Switch";
+import { Typography } from "@/components/typography/Typography";
+
 import { SurfaceGallery } from "../components/ExampleSurface";
 import {
   FoundationPage,
@@ -15,71 +23,65 @@ import { composite, contrastRatio, sourceValue, toVarName, useComputedColors } f
 const RING = toVarName("color.focus.ring");
 const BACKGROUNDS = ["color.bg.canvas", "color.bg.surface", "color.bg.raised", "color.accent.soft"];
 
+type TokenRow = { varName: string; value: React.ReactNode };
+
+const TOKEN_COLUMNS: DataTableColumn<TokenRow>[] = [
+  { id: "token", header: "Токен", cell: (row) => <TokenName>{row.varName}</TokenName> },
+  { id: "value", header: "Значение", cell: (row) => row.value },
+];
+
+const TOKEN_ROWS: TokenRow[] = [
+  { varName: "--prime-focus-width", value: sourceValue("focus.width", "light") },
+  { varName: "--prime-focus-offset", value: sourceValue("focus.offset", "light") },
+  { varName: "--prime-focus-offset-inset", value: sourceValue("focus.offsetInset", "light") },
+  { varName: "--prime-focus-space", value: sourceValue("focus.space", "light") },
+  {
+    varName: RING,
+    value: <span className={s.inlineSwatch} style={{ background: `var(${RING})` }} />,
+  },
+];
+
+type RingRow = { bgPath: string; ratio: number | null };
+
+const RING_COLUMNS: DataTableColumn<RingRow>[] = [
+  {
+    id: "bg",
+    header: "Кольцо на фоне",
+    cell: (row) => <TokenName>{toVarName(row.bgPath)}</TokenName>,
+  },
+  {
+    id: "ratio",
+    header: "Контраст",
+    numeric: true,
+    cell: (row) => (row.ratio === null ? "…" : `${row.ratio.toFixed(2)} : 1`),
+  },
+  {
+    id: "verdict",
+    header: "Норма 3 : 1",
+    cell: (row) =>
+      row.ratio !== null && row.ratio >= 3 ? (
+        <Badge.Root color="green">Да</Badge.Root>
+      ) : (
+        <Badge.Root color="red">Нет</Badge.Root>
+      ),
+  },
+];
+
 function RingTokens() {
   const host = React.useRef<HTMLDivElement>(null);
   const names = React.useMemo(() => [RING, ...BACKGROUNDS.map((b) => toVarName(b))], []);
   const colors = useComputedColors(host, names);
   const ring = colors[RING];
   const surface = colors[toVarName("color.bg.surface")];
+  const ringRows: RingRow[] = BACKGROUNDS.map((bgPath) => {
+    const bgRaw = colors[toVarName(bgPath)];
+    const bg = bgRaw && surface && bgRaw.a < 1 ? composite(bgRaw, surface) : bgRaw;
+    return { bgPath, ratio: ring && bg ? contrastRatio(ring, bg) : null };
+  });
   return (
     <div ref={host} className={s.stack}>
-      <TokenTable head={["Токен", "Значение"]}>
-        <tr>
-          <td>
-            <TokenName>--prime-focus-width</TokenName>
-          </td>
-          <td className={s.numeric}>{sourceValue("focus.width", "light")}</td>
-        </tr>
-        <tr>
-          <td>
-            <TokenName>--prime-focus-offset</TokenName>
-          </td>
-          <td className={s.numeric}>{sourceValue("focus.offset", "light")}</td>
-        </tr>
-        <tr>
-          <td>
-            <TokenName>--prime-focus-offset-inset</TokenName>
-          </td>
-          <td className={s.numeric}>{sourceValue("focus.offsetInset", "light")}</td>
-        </tr>
-        <tr>
-          <td>
-            <TokenName>--prime-focus-space</TokenName>
-          </td>
-          <td className={s.numeric}>{sourceValue("focus.space", "light")}</td>
-        </tr>
-        <tr>
-          <td>
-            <TokenName>{RING}</TokenName>
-          </td>
-          <td>
-            <span className={s.inlineSwatch} style={{ background: `var(${RING})` }} />
-          </td>
-        </tr>
-      </TokenTable>
-      <TokenTable head={["Кольцо на фоне", "Контраст", "Норма 3 : 1"]}>
-        {BACKGROUNDS.map((bgPath) => {
-          const bgRaw = colors[toVarName(bgPath)];
-          const bg = bgRaw && surface && bgRaw.a < 1 ? composite(bgRaw, surface) : bgRaw;
-          const ratio = ring && bg ? contrastRatio(ring, bg) : null;
-          return (
-            <tr key={bgPath}>
-              <td>
-                <TokenName>{toVarName(bgPath)}</TokenName>
-              </td>
-              <td className={s.numeric}>{ratio === null ? "…" : `${ratio.toFixed(2)} : 1`}</td>
-              <td>
-                <span
-                  className={s.verdict}
-                  data-tone={ratio !== null && ratio >= 3 ? "pass" : "fail"}
-                >
-                  {ratio !== null && ratio >= 3 ? "Да" : "Нет"}
-                </span>
-              </td>
-            </tr>
-          );
-        })}
-      </TokenTable>
+      <TokenTable columns={TOKEN_COLUMNS} rows={TOKEN_ROWS} getRowKey={(row) => row.varName} />
+      <TokenTable columns={RING_COLUMNS} rows={ringRows} getRowKey={(row) => row.bgPath} />
     </div>
   );
 }
@@ -88,41 +90,38 @@ function KeyboardDemo() {
   const [invalid, setInvalid] = React.useState(false);
   return (
     <Panel className={s.focusDemo}>
-      <p className={s.groupNote}>
+      <Typography.Root as="p" variant="body-s" tone="muted">
         Нажмите Tab. Кольцо появляется только при навигации с клавиатуры (
         <code>:focus-visible</code>). При клике мышью его нет.
-      </p>
+      </Typography.Root>
       <div className={s.focusRow}>
-        <button type="button" className={s.demoButton} data-tone="accent">
-          Сохранить
-        </button>
-        <button type="button" className={s.demoButton} data-tone="neutral">
+        <Button.Root>Сохранить</Button.Root>
+        <Button.Root variant="soft" tone="neutral">
           Отмена
-        </button>
-        <a className={s.demoLink} href="#focus-demo">
-          Ссылка
-        </a>
+        </Button.Root>
+        <LinkButton.Root href="#focus-demo">Ссылка</LinkButton.Root>
       </div>
       <div className={s.focusRow}>
-        <label className={s.focusField} data-invalid={invalid || undefined}>
-          <span className={s.srOnly}>Поле поиска</span>
-          <input
-            className={s.focusInput}
-            placeholder="Поле рисует кольцо на обёртке"
-            aria-invalid={invalid || undefined}
-          />
-        </label>
-        <label className={s.inlineToggle}>
-          <input type="checkbox" checked={invalid} onChange={(e) => setInvalid(e.target.checked)} />
-          Ошибка
-        </label>
+        <Input.Root invalid={invalid} className={s.focusField}>
+          <Input.Wrapper>
+            <Input.Field aria-label="Поле поиска" placeholder="Поле рисует кольцо на обёртке" />
+          </Input.Wrapper>
+        </Input.Root>
+        <Switch.Root checked={invalid} onCheckedChange={setInvalid}>
+          <Switch.Label>Ошибка</Switch.Label>
+        </Switch.Root>
       </div>
     </Panel>
   );
 }
 
+/** The ring drawn permanently (an illustration, not a state of a component) to compare surfaces. */
 function StaticRing() {
-  return <span className={s.ringSample}>Фокус</span>;
+  return (
+    <Typography.Root as="span" variant="body-m" weight="medium" className={s.ringSample}>
+      Фокус
+    </Typography.Root>
+  );
 }
 
 export default function FocusPage() {

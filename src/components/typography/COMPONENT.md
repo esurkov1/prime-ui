@@ -57,7 +57,7 @@ import { Typography } from "prime-ui-kit";
 | `body-m` | 14/20, 400 | default UI text | |
 | `body-s` | 13/20, 400 | secondary text, dense UI | |
 | `caption` | 12/16, 400, +0.01em | hints, meta, table head | |
-| `code` | 13/20, mono (JetBrains Mono), 400 | inline code, IDs | |
+| `code` | 13/20, mono (JetBrains Mono), 400 | IDs and code as a text role (no fill) | |
 
 Titles, headings and display roles use `text-wrap: balance`; body and caption use `text-wrap: pretty`. Weights are only 400 / 500 / 600.
 
@@ -107,6 +107,7 @@ Text has no interactive states. DOM attributes: `data-variant`, `data-weight` an
 - Reading text: cap the column at `--prime-layout-reading-max-width` (≈ 65ch).
 - Text takes the parent width; long words break (`overflow-wrap: break-word`).
 - Numbers in tables and counters: add `font-variant-numeric: tabular-nums` on the host.
+- Inline code inside a sentence is a plain `<code>` element: the kit styles it (`styles.css`) as mono on a `fill-muted` chip with `--prime-space-1` side padding, in any text — Typography, PageContent descriptions, table cells. `<pre><code>` and `variant="code"` stay without the fill.
 
 ## Accessibility
 - Pick `as` by meaning, `variant` by look: a page title is `as="h1"`, even if it uses `heading-m`. Do not skip heading levels.

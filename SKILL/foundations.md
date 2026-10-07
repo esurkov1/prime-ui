@@ -49,6 +49,10 @@ already carries the page gutters — do not add your own outer padding.
 - One row = one size. A toolbar of `s` controls is all `s`.
 - Dense tables/toolbars: `s`. Normal screens: `m`. Hero / marketing CTA: `l`.
 - Badges/Kbd inside a control use one step smaller (`m` control → `s` badge).
+- Tables: controls inside cells (Button, Select, Input) use one tier below the table (`m` table → `s`).
+  Row height is a minimum: two-line cells and avatars grow the row by themselves — never set row or
+  cell heights in CSS. Column dividers and the sort icon position come from DataTable; do not restyle
+  them.
 
 ## 4. Fill, not lines (§1.1, §4)
 

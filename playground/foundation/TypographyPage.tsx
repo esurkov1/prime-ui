@@ -1,4 +1,8 @@
-import type { CSSProperties } from "react";
+import {
+  Typography,
+  type TypographyRole,
+  type TypographyWeight,
+} from "@/components/typography/Typography";
 
 import { FoundationPage, FoundationSection, Panel, RuleList, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
@@ -54,71 +58,59 @@ const ROLES = semanticKeys("text").map((key) => {
   };
 });
 
-function roleStyle(key: string): CSSProperties {
-  const v = (prop: string) => `var(${toVarName(`text.${key}.${prop}`)})`;
-  return {
-    fontSize: v("size"),
-    lineHeight: v("lineHeight"),
-    fontWeight: v("weight"),
-    letterSpacing: v("tracking"),
-    fontFamily: key === "code" ? "var(--prime-font-family-mono)" : undefined,
-  };
-}
-
 function RoleScale() {
   return (
     <Panel className={s.typeScale}>
       {ROLES.map((r) => (
         <div key={r.key} className={s.typeRow}>
           <div className={s.typeMeta}>
-            <span className={s.typeRole}>{r.role}</span>
-            <span className={s.typeNumbers}>
+            <Typography.Root as="span" variant="body-s" weight="medium">
+              {r.role}
+            </Typography.Root>
+            <Typography.Root as="span" variant="caption" tone="muted" className={s.numeric}>
               {formatPx(r.sizePx)}/{formatPx(r.lineHeightPx)} · {r.weight} ·{" "}
               {r.tracking === "0" ? "0" : r.tracking}
-            </span>
-            <span className={s.typeUse}>{ROLE_USE[r.role] ?? ""}</span>
+            </Typography.Root>
+            <Typography.Root as="span" variant="caption" tone="secondary">
+              {ROLE_USE[r.role] ?? ""}
+            </Typography.Root>
             <TokenName>{`${toVarName(`text.${r.key}`)}-*`}</TokenName>
           </div>
-          <p className={s.typeSample} style={roleStyle(r.key)}>
+          <Typography.Root as="p" variant={r.role as TypographyRole} className={s.typeSample}>
             {SAMPLE[r.role] ?? HEADING_SAMPLE}
-          </p>
+          </Typography.Root>
         </div>
       ))}
     </Panel>
   );
 }
 
-const WEIGHTS = Object.entries(primitiveTokens.font.weight);
+const WEIGHTS = Object.entries(primitiveTokens.font.weight) as [TypographyWeight, string][];
 
 function FontFamilies() {
   return (
     <div className={s.twoCol}>
       <Panel className={s.fontCard}>
-        <span className={s.fontCardLabel}>
-          <TokenName>--prime-font-family-sans</TokenName>
-        </span>
-        <span className={s.fontCardSpecimen}>Golos Text</span>
+        <TokenName>--prime-font-family-sans</TokenName>
+        <Typography.Root as="span" variant="display-s">
+          Golos Text
+        </Typography.Root>
         <div className={s.weightRow}>
           {WEIGHTS.map(([name, value]) => (
-            <span key={name} style={{ fontWeight: Number(value) }}>
+            <Typography.Root key={name} as="span" variant="body-m" weight={name}>
               {value} {name}
-            </span>
+            </Typography.Root>
           ))}
         </div>
       </Panel>
       <Panel className={s.fontCard}>
-        <span className={s.fontCardLabel}>
-          <TokenName>--prime-font-family-mono</TokenName>
-        </span>
-        <span
-          className={s.fontCardSpecimen}
-          style={{ fontFamily: "var(--prime-font-family-mono)" }}
-        >
+        <TokenName>--prime-font-family-mono</TokenName>
+        <Typography.Root as="span" variant="code">
           JetBrains Mono
-        </span>
-        <span className={s.weightRow} style={{ fontFamily: "var(--prime-font-family-mono)" }}>
+        </Typography.Root>
+        <Typography.Root as="span" variant="code" tone="secondary">
           ID 4f2a-91c0 · 0O 1lI
-        </span>
+        </Typography.Root>
       </Panel>
     </div>
   );
@@ -131,10 +123,12 @@ function ReadingWidth() {
   return (
     <Panel className={s.readingDemo}>
       <div className={s.readingMeasure}>
-        <span className={s.demoLabel}>
+        <Typography.Root as="span" variant="caption" tone="muted">
           <TokenName>--prime-layout-reading-max-width</TokenName> · body-l
-        </span>
-        <p className={s.readingText}>{READING_TEXT}</p>
+        </Typography.Root>
+        <Typography.Root as="p" variant="body-l">
+          {READING_TEXT}
+        </Typography.Root>
       </div>
     </Panel>
   );
@@ -146,21 +140,29 @@ function TabularNums() {
   return (
     <div className={s.twoCol}>
       <Panel className={s.numbersCard}>
-        <span className={s.demoLabel}>Пропорциональные цифры</span>
+        <Typography.Root as="span" variant="caption" tone="muted">
+          Пропорциональные цифры
+        </Typography.Root>
         {NUMBERS.map((n) => (
-          <span key={n} className={s.numberLine}>
+          <Typography.Root key={n} as="span" variant="title-m" className={s.numberLine}>
             {n}
-          </span>
+          </Typography.Root>
         ))}
       </Panel>
       <Panel className={s.numbersCard}>
-        <span className={s.demoLabel}>
+        <Typography.Root as="span" variant="caption" tone="muted">
           <code>font-variant-numeric: tabular-nums</code>
-        </span>
+        </Typography.Root>
         {NUMBERS.map((n) => (
-          <span key={n} className={s.numberLine} data-tabular="true">
+          <Typography.Root
+            key={n}
+            as="span"
+            variant="title-m"
+            className={s.numberLine}
+            data-tabular="true"
+          >
             {n}
-          </span>
+          </Typography.Root>
         ))}
       </Panel>
     </div>

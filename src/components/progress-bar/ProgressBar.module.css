@@ -1,42 +1,58 @@
-/* ProgressBar — Graphite: `fill-strong` track, accent / tone value, pill ends. */
+/*
+ * ProgressBar — same line as Slider: thickness T = --prime-control-<tier>-track.
+ * Value mode: one pill with a rounded leading end over a `fill-strong` track.
+ * Segments mode: parts of a whole in one pill (or separate pills with `hairline`), the free
+ * capacity up to `max` stays track.
+ */
 
 .root {
-  --pb-track-h: var(--prime-space-1);
+  --pb-track: var(--prime-control-m-track);
+  --pb-gap: calc(var(--pb-track) * 3 / 4);
+  --pb-label-gap: var(--prime-control-m-label-gap);
   --pb-label-size: var(--prime-control-m-label-size);
   --pb-label-line-height: var(--prime-control-m-label-line-height);
   --pb-fill: var(--prime-color-accent-default);
+  --pb-rest: var(--prime-color-fill-strong);
 
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-2);
+  gap: var(--pb-label-gap);
   width: 100%;
   min-width: 0;
   font-family: var(--prime-font-family-sans);
 }
 
 .root[data-size="xs"] {
+  --pb-track: var(--prime-control-xs-track);
+  --pb-label-gap: var(--prime-control-xs-label-gap);
   --pb-label-size: var(--prime-control-xs-label-size);
   --pb-label-line-height: var(--prime-control-xs-label-line-height);
-  gap: var(--prime-space-1);
 }
 
 .root[data-size="s"] {
+  --pb-track: var(--prime-control-s-track);
+  --pb-label-gap: var(--prime-control-s-label-gap);
   --pb-label-size: var(--prime-control-s-label-size);
   --pb-label-line-height: var(--prime-control-s-label-line-height);
-  gap: var(--prime-space-1);
 }
 
 .root[data-size="l"] {
-  --pb-track-h: var(--prime-space-2);
+  --pb-track: var(--prime-control-l-track);
+  --pb-label-gap: var(--prime-control-l-label-gap);
   --pb-label-size: var(--prime-control-l-label-size);
   --pb-label-line-height: var(--prime-control-l-label-line-height);
 }
 
 .root[data-size="xl"] {
-  --pb-track-h: var(--prime-space-2);
+  --pb-track: var(--prime-control-xl-track);
+  --pb-label-gap: var(--prime-control-xl-label-gap);
   --pb-label-size: var(--prime-control-xl-label-size);
   --pb-label-line-height: var(--prime-control-xl-label-line-height);
+}
+
+.root[data-tone="neutral"] {
+  --pb-fill: var(--prime-color-text-secondary);
 }
 
 .root[data-tone="success"] {
@@ -49,6 +65,10 @@
 
 .root[data-tone="danger"] {
   --pb-fill: var(--prime-color-danger-default);
+}
+
+.root[data-tone="info"] {
+  --pb-fill: var(--prime-color-info-default);
 }
 
 .header {
@@ -77,64 +97,121 @@
   font-variant-numeric: tabular-nums;
 }
 
-.track {
-  -webkit-appearance: none;
-  appearance: none;
-  display: block;
-  width: 100%;
-  height: var(--pb-track-h);
-  margin: 0;
-  overflow: hidden;
-  border: 0;
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-strong);
-  color: var(--pb-fill);
-}
-
-.track::-webkit-progress-bar {
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-strong);
-}
-
-/* The native value bar stays invisible (it would jump, and Firefox cannot transition it);
-   `.fill` draws the value over the track instead. */
-.track::-webkit-progress-value {
-  background: transparent;
-}
-
-.track::-moz-progress-bar {
-  background: transparent;
-}
-
-/*
- * Fill: a full-width pill slid in from the inline start by `translate` inside a pill-shaped clip.
- * Translate (not scaleX) keeps the rounded leading end undistorted at every value.
- * The value glides over slow · standard; instant under reduced motion (tokens).
- */
-.fillClip {
+.visuallyHidden {
   position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: var(--pb-track-h);
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
+  margin: calc(-1 * var(--prime-border-width));
+  padding: 0;
   overflow: hidden;
-  border-radius: var(--prime-radius-full);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Native progress stays for assistive tech only; `.bar` draws the value. */
+.native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
   pointer-events: none;
 }
 
-.fill {
-  --pb-dir: -1;
+/* ---- bar: the track is the pill clip itself ---- */
+.bar {
+  --pb-dir: 1;
 
-  display: block;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  display: flex;
+  height: var(--pb-track);
+  overflow: hidden;
+  border-radius: var(--prime-radius-full);
+  background: var(--pb-rest);
+}
+
+.bar:dir(rtl) {
+  --pb-dir: -1;
+}
+
+/* Value mode: one full-width pill slides in from the start, its leading end stays a round cap. */
+.fill {
+  position: absolute;
+  inset: 0;
   border-radius: var(--prime-radius-full);
   background: var(--pb-fill);
-  translate: calc(var(--pb-dir) * (1 - var(--pb-ratio)) * 100%) 0;
+  translate: calc(var(--pb-dir) * (var(--pb-ratio) - 1) * 100%) 0;
   transition:
     translate var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
     background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.fill:dir(rtl) {
-  --pb-dir: 1;
+/*
+ * Segments mode: `.segments` is one pill holding the parts (flat joints inside), so the filled
+ * share ends with the same round cap as a single value; `.rest` is the free capacity.
+ * Weights move by `flex-grow`: every part's start depends on all weights before it, so a
+ * transform version would need JS offsets. The bar is one short row; layout cost is negligible.
+ */
+.segments,
+.rest {
+  display: flex;
+  flex-basis: 0;
+  min-width: 0;
+  border-radius: var(--prime-radius-full);
+  transition: flex-grow var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
+}
+
+.segments {
+  overflow: hidden;
+}
+
+.segment {
+  flex-basis: 0;
+  min-width: 0;
+  background: var(--pb-fill);
+  transition:
+    flex-grow var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.segment[data-tone="neutral"] {
+  --pb-fill: var(--prime-color-text-secondary);
+}
+
+.segment[data-tone="success"] {
+  --pb-fill: var(--prime-color-success-default);
+}
+
+.segment[data-tone="warning"] {
+  --pb-fill: var(--prime-color-warning-default);
+}
+
+.segment[data-tone="danger"] {
+  --pb-fill: var(--prime-color-danger-default);
+}
+
+.segment[data-tone="info"] {
+  --pb-fill: var(--prime-color-info-default);
+}
+
+/* `hairline`: every part and the free rest are separate pills with a gap of ¾T. */
+.bar[data-segment-gap="hairline"] {
+  gap: var(--pb-gap);
+  background: transparent;
+}
+
+.bar[data-segment-gap="hairline"] .segments {
+  gap: var(--pb-gap);
+  overflow: visible;
+}
+
+.bar[data-segment-gap="hairline"] .segment,
+.bar[data-segment-gap="hairline"] .rest {
+  border-radius: var(--prime-radius-full);
+}
+
+.bar[data-segment-gap="hairline"] .rest {
+  background: var(--pb-rest);
 }

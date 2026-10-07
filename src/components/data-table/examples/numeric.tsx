@@ -1,4 +1,4 @@
-/** `numeric` columns align end with `tabular-nums`; `truncate` + `maxWidth` keeps a long name on one line with a `title`; `columnDividers` adds vertical lines. Use for inventories and reports with many numbers. */
+/** `numeric` columns align end with `tabular-nums`; `truncate` + `maxWidth` keeps a long name on one line with a `title`. Use for inventories and reports with many numbers. */
 
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
 
@@ -43,7 +43,6 @@ export default function DataTableNumericExample() {
       columns={columns}
       rows={rows}
       getRowKey={(row) => row.sku}
-      columnDividers
       showPagination={false}
     />
   );

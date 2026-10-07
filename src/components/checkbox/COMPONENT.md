@@ -26,7 +26,7 @@ Checkbox.Root          wrapper grid + context; ref and input props go to the hid
 ├─ Checkbox.Hint       description under the text column (optional)
 └─ Checkbox.Error      error message under the text column (optional, makes the field invalid)
 ```
-The native `input type="checkbox"` is rendered inside `Checkbox.Label`, so `Checkbox.Label` is required even without visible text.
+The native `input type="checkbox"` is rendered inside `Checkbox.Label`, so a Root without `Checkbox.Label` renders an empty `Checkbox.Label` itself: `<Checkbox.Root aria-label="…" />` is a valid bare control (tables, settings rows).
 
 ## API
 
@@ -154,7 +154,7 @@ export function TermsCheckbox() {
 
 ## Mistakes
 - `<Checkbox.Root onChange={…}>` → use `onCheckedChange={(checked) => …}`.
-- `<Checkbox.Root>Текст</Checkbox.Root>` → wrap the text in `Checkbox.Label`; without it no input is rendered.
+- `<Checkbox.Root>Текст</Checkbox.Root>` → wrap the text in `Checkbox.Label`; text placed directly in Root is not the checkbox's label.
 - `invalid` plus `Checkbox.Error` → just mount `Checkbox.Error`.
 - Several checkboxes for one-of-many → use `Radio.Root` with items.
 - Checkbox that saves instantly («Тёмная тема») → use `Switch`.

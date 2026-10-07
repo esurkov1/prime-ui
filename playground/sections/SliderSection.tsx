@@ -11,6 +11,8 @@ import SliderSizesExample from "@/components/slider/examples/sizes";
 import sizesSource from "@/components/slider/examples/sizes.tsx?raw";
 import SliderStatesExample from "@/components/slider/examples/states";
 import statesSource from "@/components/slider/examples/states.tsx?raw";
+import SliderTonesExample from "@/components/slider/examples/tones";
+import tonesSource from "@/components/slider/examples/tones.tsx?raw";
 import SliderValueFormatExample from "@/components/slider/examples/value-format";
 import valueFormatSource from "@/components/slider/examples/value-format.tsx?raw";
 import { SurfaceGallery } from "../components/ExampleSurface";
@@ -29,7 +31,14 @@ const sliderRootApiRows: PlaygroundApiPropRow[] = [
     defaultValue: '"m"',
     required: "Нет",
     description:
-      "Ярус: размер бегунка --prime-control-<tier>-choice и типографика подписи; дорожка 4px, на xl — 8px.",
+      "Ярус: толщина дорожки T = --prime-control-<tier>-track (4–8px), бегунок — капсула 4.5T × 3T, плюс типографика подписи.",
+  },
+  {
+    prop: "tone",
+    type: '"accent" | "neutral" | "success" | "warning" | "danger" | "info"',
+    defaultValue: '"accent"',
+    required: "Нет",
+    description: "Цвет заполнения дорожки.",
   },
   {
     prop: "value",
@@ -99,7 +108,7 @@ const sliderRootApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Класс корня (на нём data-size и data-disabled).",
+    description: "Класс корня (на нём data-size, data-tone и data-disabled).",
   },
 ];
 
@@ -120,8 +129,8 @@ export default function SliderSection() {
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
               <code>xs</code>, <code>s</code>, <code>m</code>, <code>l</code>, <code>xl</code> в
-              одном ряду: растут бегунок и типографика подписи, дорожка утолщается на{" "}
-              <code>xl</code>.
+              одном ряду: всё выводится из толщины дорожки (та же шкала, что у ProgressBar), поэтому
+              дорожка и бегунок растут как одна форма.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
@@ -134,12 +143,26 @@ export default function SliderSection() {
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
               Пустое заполнение на минимуме, середина, максимум и <code>disabled</code>. Наведите на
-              бегунок — появится мягкий ореол; нажмите — бегунок увеличится; Tab рисует кольцо
-              фокуса вокруг бегунка.
+              бегунок — он станет стеклянным; потяните — стекло станет прозрачным и покажет
+              скруглённый конец заполнения; Tab рисует кольцо фокуса вокруг бегунка.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
                 <SliderStatesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Цвет</DemoSectionTitle>
+            <DemoDescription>
+              <code>tone</code> красит заполнение дорожки: <code>accent</code> по умолчанию,{" "}
+              <code>neutral</code> для монохромных экранов, смысловые тона — когда значение несёт
+              смысл (порог, риск).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={tonesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SliderTonesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -217,9 +240,9 @@ export default function SliderSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Slider.Root</DemoApiTitle>
             <DemoDescription>
-              Строка подписи (<code>label</code> + <code>showValue</code>) и нативный{" "}
-              <code>input type=&quot;range&quot;</code>. Заполнение дорожки рисуется через
-              CSS-переменную <code>--slider-percent</code>.
+              Строка подписи (<code>label</code> + <code>showValue</code>) и прозрачный нативный{" "}
+              <code>input type=&quot;range&quot;</code> поверх нарисованных дорожки и бегунка.
+              Положение задаёт CSS-переменная <code>--slider-ratio</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={sliderRootApiRows} />
           </div>

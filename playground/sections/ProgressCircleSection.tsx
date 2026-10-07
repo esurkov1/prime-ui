@@ -3,6 +3,8 @@ import type * as React from "react";
 import { PageContent } from "@/components/page-content/PageContent";
 import ProgressCircleGoalsCardExample from "@/components/progress-circle/examples/goals-card";
 import circleGoalsSource from "@/components/progress-circle/examples/goals-card.tsx?raw";
+import ProgressCircleSegmentsExample from "@/components/progress-circle/examples/segments";
+import circleSegmentsSource from "@/components/progress-circle/examples/segments.tsx?raw";
 import ProgressCircleSizesExample from "@/components/progress-circle/examples/sizes";
 import circleSizesSource from "@/components/progress-circle/examples/sizes.tsx?raw";
 import ProgressCircleValuesAndTonesExample from "@/components/progress-circle/examples/values-and-tones";
@@ -21,30 +23,61 @@ const apiRows: PlaygroundApiPropRow[] = [
     prop: "value",
     type: "number",
     defaultValue: "—",
-    required: "Да",
-    description: "Текущее значение; при 0 дуга скрыта.",
+    required: "Да*",
+    description: "Режим одного значения; при 0 дуга скрыта. *Либо value, либо segments.",
   },
-  { prop: "max", type: "number", defaultValue: "100", required: "Нет", description: "Верх шкалы." },
+  {
+    prop: "segments",
+    type: "ProgressSegment[]",
+    defaultValue: "—",
+    required: "Да*",
+    description:
+      "Режим частей целого: { value, label?, tone? } по часовой стрелке от 12 часов; длина дуги — доля от max. *Либо value, либо segments.",
+  },
+  {
+    prop: "max",
+    type: "number",
+    defaultValue: "100 / сумма сегментов",
+    required: "Нет",
+    description:
+      "Верх шкалы. С segments по умолчанию — сумма частей (кольцо замкнуто); если больше суммы, остаток остаётся треком.",
+  },
+  {
+    prop: "segmentGap",
+    type: '"none" | "hairline"',
+    defaultValue: '"none"',
+    required: "Нет",
+    description: "Только с segments: сплошное кольцо или отдельные скруглённые дуги с зазором.",
+  },
+  {
+    prop: "labels",
+    type: "Partial<ProgressCircleLabels>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Только с segments: тексты для скринридера — empty, allEmpty.",
+  },
   {
     prop: "size",
     type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Диаметр 24 · 32 · 48 · 64 · 80, толщина 3–8.",
+    description:
+      "Диаметр 24 · 32 · 48 · 64 · 80; толщина всегда 1/12 диаметра (2 · 2.7 · 4 · 5.3 · 6.7).",
   },
   {
     prop: "tone",
-    type: '"accent" | "success" | "warning" | "danger"',
+    type: '"accent" | "neutral" | "success" | "warning" | "danger" | "info"',
     defaultValue: '"accent"',
     required: "Нет",
-    description: "Цвет дуги.",
+    description: "Только с value: цвет дуги. У сегментов tone задаётся в каждом.",
   },
   {
     prop: "label",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: '`aria-label` для `role="progressbar"`; обязателен без видимой подписи.',
+    description:
+      'Доступное имя кольца (`role="progressbar"` или `role="group"` у сегментов); передавайте всегда.',
   },
   {
     prop: "children",
@@ -93,8 +126,9 @@ export default function ProgressCircleSection() {
       <PageContent.Header>
         <PageContent.Title id="progress-circle-heading">ProgressCircle</PageContent.Title>
         <PageContent.Description measure="full">
-          Круговой прогресс для компактных метрик и целей: трек, дуга со скруглёнными концами и
-          содержимое в центре.
+          Круговой прогресс для компактных метрик и целей — кольцевая версия ProgressBar: одно
+          значение (<code>value</code>) или части целого (<code>segments</code>), содержимое в
+          центре. Толщина кольца всегда 1/12 диаметра.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -129,13 +163,27 @@ export default function ProgressCircleSection() {
             title="Значения и тона"
             description={
               <>
-                0 (только трек), <code>accent</code>, <code>success</code> с иконкой,{" "}
-                <code>warning</code>, <code>danger</code> и своя шкала <code>max</code>.
+                0 (только трек), все тона — <code>success</code> с иконкой — и своя шкала{" "}
+                <code>max</code>.
               </>
             }
             code={circleToneSource}
           >
             <ProgressCircleValuesAndTonesExample />
+          </Demo>
+
+          <Demo
+            title="Части целого"
+            description={
+              <>
+                <code>segments</code> вместо <code>value</code>, как у ProgressBar: замкнутое кольцо
+                из частей, <code>max</code> — когда части занимают только долю, и{" "}
+                <code>segmentGap=&quot;hairline&quot;</code> для разных категорий.
+              </>
+            }
+            code={circleSegmentsSource}
+          >
+            <ProgressCircleSegmentsExample />
           </Demo>
 
           <div className="demoBlock">

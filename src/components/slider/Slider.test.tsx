@@ -89,4 +89,20 @@ describe("Slider", () => {
     const { container } = render(<Slider.Root size="xl" aria-label="XL" />);
     expect(container.firstChild).toHaveAttribute("data-size", "xl");
   });
+
+  it("sets data-tone (default accent)", () => {
+    const { container, rerender } = render(<Slider.Root aria-label="Tone" />);
+    expect(container.firstChild).toHaveAttribute("data-tone", "accent");
+
+    rerender(<Slider.Root aria-label="Tone" tone="danger" />);
+    expect(container.firstChild).toHaveAttribute("data-tone", "danger");
+  });
+
+  it("is focusable for keyboard control", () => {
+    render(<Slider.Root defaultValue={10} aria-label="Keys" />);
+
+    const slider = screen.getByRole("slider", { name: "Keys" });
+    slider.focus();
+    expect(slider).toHaveFocus();
+  });
 });

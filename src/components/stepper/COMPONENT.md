@@ -13,7 +13,7 @@
 - Switching between independent sections → use [Tabs](../tabs/COMPONENT.md).
 - Paging through a list → use [Pagination](../pagination/COMPONENT.md).
 - A chronological history of events → use [Timeline](../timeline/COMPONENT.md).
-- Progress as a number or bar without step names → use [SegmentedProgressBar](../segmented-progress-bar/COMPONENT.md) or [ProgressBar](../progress-bar/COMPONENT.md).
+- Progress as a number or bar without step names → use [ProgressBar](../progress-bar/COMPONENT.md) (`value` or `segments`).
 
 ## Import
 ```tsx

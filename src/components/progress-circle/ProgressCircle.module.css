@@ -1,7 +1,15 @@
-/* ProgressCircle — Graphite: `fill-strong` ring, accent / tone arc with round caps. */
+/*
+ * ProgressCircle — the ring version of ProgressBar. Geometry lives in viewBox units (0…100,
+ * stroke = 1/12 of the diameter, set in TSX), so the ring keeps one proportion at every tier; `--pc-size`
+ * sets the diameter from rem tokens.
+ * Value mode: track + one round-capped arc. Segments mode: parts clockwise from the top with flat
+ * joints and round caps at both ends of the filled share, or separate round arcs with `hairline`.
+ */
 
 .root {
+  --pc-size: var(--prime-space-12);
   --pc-fill: var(--prime-color-accent-default);
+  --pc-rest: var(--prime-color-fill-strong);
   /* m (48px): caption keeps «100%» clear of the ring. */
   --pc-text-size: var(--prime-text-caption-size);
   --pc-line-height: var(--prime-text-caption-line-height);
@@ -11,54 +19,136 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  width: var(--pc-size);
+  height: var(--pc-size);
   font-family: var(--prime-font-family-sans);
 }
 
+.root[data-size="xs"] {
+  --pc-size: var(--prime-space-6);
+}
+
+.root[data-size="s"] {
+  --pc-size: var(--prime-space-8);
+}
+
 .root[data-size="l"] {
+  --pc-size: var(--prime-space-16);
   --pc-text-size: var(--prime-text-title-m-size);
   --pc-line-height: var(--prime-text-title-m-line-height);
 }
 
 .root[data-size="xl"] {
+  --pc-size: var(--prime-space-20);
   --pc-text-size: var(--prime-text-title-l-size);
   --pc-line-height: var(--prime-text-title-l-line-height);
 }
 
-.root[data-tone="success"] {
+/* Tones: on the root (value mode) and on every part (segments mode). */
+.root[data-tone="neutral"],
+.svg [data-tone="neutral"] {
+  --pc-fill: var(--prime-color-text-secondary);
+}
+
+.root[data-tone="success"],
+.svg [data-tone="success"] {
   --pc-fill: var(--prime-color-success-default);
 }
 
-.root[data-tone="warning"] {
+.root[data-tone="warning"],
+.svg [data-tone="warning"] {
   --pc-fill: var(--prime-color-warning-default);
 }
 
-.root[data-tone="danger"] {
+.root[data-tone="danger"],
+.svg [data-tone="danger"] {
   --pc-fill: var(--prime-color-danger-default);
 }
 
-.root svg {
+.root[data-tone="info"],
+.svg [data-tone="info"] {
+  --pc-fill: var(--prime-color-info-default);
+}
+
+.svg {
   display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.track {
-  stroke: var(--prime-color-fill-strong);
+/* Arcs start at 12 o'clock and run clockwise. */
+.arcs {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transform-box: view-box;
 }
 
-.fill {
+.track,
+.fill,
+.segment,
+.segmentRound,
+.restRound {
+  fill: none;
+}
+
+.track,
+.restRound {
+  stroke: var(--pc-rest);
+}
+
+.fill,
+.segment,
+.segmentRound {
   stroke: var(--pc-fill);
-  stroke-linecap: round;
-  transition: stroke-dashoffset var(--prime-motion-duration-slow)
-    var(--prime-motion-easing-standard);
 }
 
+.fill,
+.segmentRound,
+.restRound {
+  stroke-linecap: round;
+}
+
+.fill,
+.segment,
+.segmentRound,
+.restRound {
+  transition:
+    stroke-dashoffset var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    stroke-dasharray var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    stroke var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.cap {
+  fill: var(--pc-fill);
+  transform-origin: 50% 50%;
+  transform-box: view-box;
+  transition:
+    rotate var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    fill var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
+  margin: calc(-1 * var(--prime-border-width));
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Inner content: the hole of the ring (5/6 of the diameter). */
 .inner {
   position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: var(--progress-circle-inner-size);
-  height: var(--progress-circle-inner-size);
+  width: calc(var(--pc-size) * 5 / 6);
+  height: calc(var(--pc-size) * 5 / 6);
   overflow: hidden;
   color: var(--prime-color-text-primary);
   font-size: var(--pc-text-size);

@@ -1,0 +1,48 @@
+/* Layout only for the Thumbnail examples: semantic tokens. */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--prime-space-6);
+}
+
+.cell {
+  display: grid;
+  justify-items: center;
+  gap: var(--prime-space-2);
+}
+
+/* Thumbnail + text in a table cell or list row. */
+.entity {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.entityText {
+  display: grid;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.grid {
+  display: grid;
+  gap: var(--prime-space-4);
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 3)), 1fr));
+}
+
+.cardContent {
+  display: grid;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}

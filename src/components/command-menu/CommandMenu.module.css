@@ -328,9 +328,9 @@
   line-height: var(--prime-text-caption-line-height);
 }
 
-/* ─── Tags section under the search row ─────────────────────────────────── */
+/* ─── Badge section under the search row ────────────────────────────────── */
 
-.tagSection {
+.badgeSection {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
@@ -339,14 +339,14 @@
   border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
-.tagSectionLabel {
+.badgeSectionLabel {
   color: var(--prime-color-text-muted);
   font-size: var(--prime-text-caption-size);
   font-weight: var(--prime-font-weight-medium);
   line-height: var(--prime-text-caption-line-height);
 }
 
-.tagRow {
+.badgeRow {
   display: flex;
   flex-wrap: wrap;
   gap: var(--prime-space-2);

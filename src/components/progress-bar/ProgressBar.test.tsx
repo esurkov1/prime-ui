@@ -53,7 +53,7 @@ describe("ProgressBar", () => {
 
   it("draws the fill from the clamped value ratio, hidden from assistive tech", () => {
     const { container, rerender } = render(<ProgressBar.Root value={30} max={200} />);
-    const fill = () => container.querySelector<HTMLElement>("[aria-hidden='true'] > span");
+    const fill = () => container.querySelector<HTMLElement>("span[aria-hidden='true'][style]");
     expect(fill()?.style.getPropertyValue("--pb-ratio")).toBe("0.15");
     rerender(<ProgressBar.Root value={500} max={200} />);
     expect(fill()?.style.getPropertyValue("--pb-ratio")).toBe("1");
@@ -63,5 +63,70 @@ describe("ProgressBar", () => {
   it("merges className on root", () => {
     render(<ProgressBar.Root value={5} className="custom-bar" />);
     expect(screen.getByRole("progressbar").parentElement).toHaveClass("custom-bar");
+  });
+
+  it("reflects tone in value mode", () => {
+    const { container } = render(<ProgressBar.Root value={10} tone="info" />);
+    expect(container.firstChild).toHaveAttribute("data-tone", "info");
+  });
+
+  describe("segments", () => {
+    const tasks = [
+      { value: 30, label: "Errors", tone: "danger" as const },
+      { value: 25, label: "Pending", tone: "warning" as const },
+      { value: 45, label: "OK", tone: "success" as const },
+    ];
+
+    it("renders a group named by the distribution", () => {
+      render(<ProgressBar.Root segments={tasks} />);
+      expect(
+        screen.getByRole("group", { name: "Errors: 30%, Pending: 25%, OK: 45%" }),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    it("measures shares against max and leaves the rest as track", () => {
+      const { container } = render(
+        <ProgressBar.Root segments={[{ value: 20, label: "A" }]} max={80} showValue />,
+      );
+      expect(screen.getByRole("group", { name: "A: 25%" })).toBeInTheDocument();
+      expect(screen.getByText("25%")).toBeInTheDocument();
+      const rest = container.querySelector<HTMLElement>("[role='group'] > span:last-child");
+      expect(rest?.style.flexGrow).toBe("60");
+    });
+
+    it("clamps negative weights to zero", () => {
+      render(<ProgressBar.Root segments={[{ value: -10 }, { value: 10 }]} />);
+      expect(screen.getByRole("group", { name: "0%, 100%" })).toBeInTheDocument();
+    });
+
+    it("describes empty distributions with labels", () => {
+      const { rerender } = render(<ProgressBar.Root segments={[{ value: 0 }]} />);
+      expect(screen.getByRole("group", { name: "Все сегменты пусты" })).toBeInTheDocument();
+      rerender(<ProgressBar.Root segments={[]} labels={{ empty: "No data" }} />);
+      expect(screen.getByRole("group", { name: "No data" })).toBeInTheDocument();
+    });
+
+    it("defaults segment tone to accent and sets the gap mode", () => {
+      const { container } = render(
+        <ProgressBar.Root segments={[{ value: 1 }]} segmentGap="hairline" />,
+      );
+      expect(container.querySelector("[data-tone]")).toHaveAttribute("data-tone", "accent");
+      expect(screen.getByRole("group")).toHaveAttribute("data-segment-gap", "hairline");
+    });
+
+    it("labels the group with the visible label and describes it with the distribution", () => {
+      render(
+        <ProgressBar.Root
+          label="Batch status"
+          segments={[
+            { value: 50, label: "A" },
+            { value: 50, label: "B" },
+          ]}
+        />,
+      );
+      const group = screen.getByRole("group", { name: "Batch status" });
+      expect(group).toHaveAccessibleDescription("A: 50%, B: 50%");
+    });
   });
 });

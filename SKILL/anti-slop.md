@@ -107,6 +107,20 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 | a list of `<button>`s for navigation | `Sidebar.Item href`, `Tabs.Trigger` |
 | `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton.Root` |
 
+## 7a. Fighting the table
+
+```css
+/* bad — fixed rows squash two-line cells; restyled sort icons and dividers */
+.table :global(td) { height: 44px; padding: 0; }
+.table :global(th) svg { color: var(--prime-color-accent-default); }
+```
+
+```tsx
+// good — content drives the height, cell controls one tier down, kit draws dividers and sort icons
+<DataTable.Root size="m" columns={columns} rows={rows} getRowKey={(row) => row.id} />
+// in a column cell: <Button.Root size="s" variant="ghost" tone="neutral">Настроить</Button.Root>
+```
+
 ## 8. Decoration and filler
 
 - No emoji in UI. No icon next to every label — an icon earns its place when it speeds recognition

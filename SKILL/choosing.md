@@ -9,9 +9,9 @@ confuse. Links: [components.md](components.md).
 |---|---|
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
 | type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload, LoginForm (sign-in screens) |
-| pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, TagSelect, SmartFilter, Datepicker, ColorPicker |
-| see data: status, labels, people, numbers, rows, events | Data display — Badge, Avatar, Kbd, Card, DataTable, Timeline, CodeBlock |
-| learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, SegmentedProgressBar, ProgressCircle, EmptyPage |
+| pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, TagSelect, SmartFilter, Datepicker, ColorPicker, ColorSwatches |
+| see data: status, labels, people, numbers, rows, events | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DataTable, Timeline, CodeBlock |
+| learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, ProgressCircle, EmptyPage |
 | move between views, places, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper |
 | see something on top of the page | Overlays — Tooltip, Popover, Dropdown, Modal, Drawer, CommandMenu |
 | get the app frame and page structure | Layout — AppShell, Sidebar, PageContent, Accordion, Divider, ScrollContainer, Dnd |
@@ -40,14 +40,16 @@ with `Input.Icon` + `type="search"`.
 | narrowing a list or table by several fields, with search and show / hide | SmartFilter |
 | an approximate number in a range | Slider (exact number → Input) |
 | a date or a period | Datepicker |
-| a color | ColorPicker (free color) / ColorPresets (fixed palette) |
+| a color from a fixed palette in a form or dialog | ColorSwatches (inline grid, default choice) |
+| a compact color next to a field or in a list row | ColorPresets (trigger + popover palette) |
+| any color (hex, eyedropper, channels) | ColorPicker |
 
-**Data.** Status, count, removable value or applied filter → Badge (`onRemove` to remove, `onPress` to toggle). Person → Avatar.
+**Data.** Status, count, removable value or applied filter → Badge (`onRemove` to remove, `onPress` to toggle). Person → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a `ratio` — never a round Avatar for things.
 Keyboard shortcut → Kbd. One block of related numbers/content → Card (pick the template). Rows with
 columns, sorting, selection → DataTable. Chronological events → Timeline. Code → CodeBlock.
 
-**Feedback.** See the pair below. Progress of a single task → ProgressBar; parts of a whole →
-SegmentedProgressBar; compact goal / KPI ring → ProgressCircle. Nothing to show → EmptyPage.
+**Feedback.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
+ProgressBar `segments`; compact goal / KPI ring or a ring breakdown → ProgressCircle (`value` or `segments`). Nothing to show → EmptyPage.
 
 **Overlays.** See the pair below. Global search / commands (⌘K) → CommandMenu.
 

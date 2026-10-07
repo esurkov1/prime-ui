@@ -1,5 +1,9 @@
 import * as React from "react";
 
+import { Badge } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
+import type { DataTableColumn } from "@/components/data-table/DataTable";
+import { Typography } from "@/components/typography/Typography";
 import { IconCopy } from "@/icons";
 
 import {
@@ -112,31 +116,35 @@ function LiveValue({ varName }: { varName: string }) {
   return <>{useLiveVar(varName) || "…"}</>;
 }
 
-function TokenRow({ varName, value, use }: { varName: string; value: string; use: string }) {
-  return (
-    <tr>
-      <td>
-        <TokenName>{varName}</TokenName>
-      </td>
-      <td className={s.numeric}>{value}</td>
-      <td className={s.numeric}>
-        <LiveValue varName={varName} />
-      </td>
-      <td>{use}</td>
-    </tr>
-  );
-}
+type MotionToken = { key: string; varName: string; value: string; use: string };
+
+const TOKEN_ROWS: MotionToken[] = [
+  ...DURATIONS.map((d) => ({ ...d, use: DURATION_USE[d.key] ?? "" })),
+  ...EXTRAS.map((t) => ({ ...t, use: EXTRA_USE[t.key] ?? "" })),
+];
+
+const TOKEN_COLUMNS: DataTableColumn<MotionToken>[] = [
+  { id: "token", header: "Токен", cell: (t) => <TokenName>{t.varName}</TokenName> },
+  { id: "value", header: "Значение", accessor: "value", numeric: true },
+  {
+    id: "live",
+    header: "Сейчас",
+    numeric: true,
+    cell: (t) => <LiveValue varName={t.varName} />,
+  },
+  { id: "use", header: "Для чего", accessor: "use" },
+];
 
 function TokensTable() {
+  return <TokenTable columns={TOKEN_COLUMNS} rows={TOKEN_ROWS} getRowKey={(t) => t.key} />;
+}
+
+/** Muted lead text of a demo panel. */
+function Note({ children }: { children: React.ReactNode }) {
   return (
-    <TokenTable head={["Токен", "Значение", "Сейчас", "Для чего"]}>
-      {DURATIONS.map((d) => (
-        <TokenRow key={d.key} varName={d.varName} value={d.value} use={DURATION_USE[d.key] ?? ""} />
-      ))}
-      {EXTRAS.map((t) => (
-        <TokenRow key={t.key} varName={t.varName} value={t.value} use={EXTRA_USE[t.key] ?? ""} />
-      ))}
-    </TokenTable>
+    <Typography.Root as="span" variant="body-s" tone="muted">
+      {children}
+    </Typography.Root>
   );
 }
 
@@ -146,9 +154,11 @@ function EasingCards() {
       {EASINGS.map((e) => (
         <Panel key={e.key} className={s.easingCard}>
           <EasingCurve name={e.key} value={e.value} />
-          <span className={s.radiusName}>{e.key}</span>
+          <Typography.Root as="span" variant="title-s">
+            {e.key}
+          </Typography.Root>
           <TokenName>{e.varName}</TokenName>
-          <span className={s.groupNote}>{EASING_USE[e.key] ?? ""}</span>
+          <Note>{EASING_USE[e.key] ?? ""}</Note>
         </Panel>
       ))}
     </div>
@@ -168,7 +178,9 @@ function MotionTrack({
 }) {
   return (
     <div className={s.motionCell}>
-      <span className={s.motionLabel}>{label}</span>
+      <Typography.Root as="span" variant="caption" tone="secondary">
+        {label}
+      </Typography.Root>
       <span
         className={s.motionTrack}
         data-playing={playing || undefined}
@@ -190,18 +202,19 @@ function MotionPlayground() {
   return (
     <Panel className={s.motionPanel}>
       <div className={s.motionHead}>
-        <span className={s.groupNote}>
+        <Note>
           Наведите на дорожку или запустите все сразу. Шарик движется с указанной длительностью и
           кривой.
-        </span>
-        <button
-          type="button"
-          className={s.plainButton}
+        </Note>
+        <Button.Root
+          size="s"
+          variant="soft"
+          tone="neutral"
           aria-pressed={playing}
           onClick={() => setPlaying((p) => !p)}
         >
           {playing ? "Вернуть" : "Запустить все"}
-        </button>
+        </Button.Root>
       </div>
       <div className={s.motionGrid}>
         {DURATIONS.flatMap((d) =>
@@ -225,18 +238,19 @@ function EmphasizedDemo() {
   return (
     <Panel className={s.motionPanel}>
       <div className={s.motionHead}>
-        <span className={s.groupNote}>
+        <Note>
           Одна длительность, разные кривые. Emphasized резко трогается и долго, мягко дотягивает до
           цели, никогда не проскакивая её, — так доезжают бегунок, индикатор вкладки, галочка.
-        </span>
-        <button
-          type="button"
-          className={s.plainButton}
+        </Note>
+        <Button.Root
+          size="s"
+          variant="soft"
+          tone="neutral"
           aria-pressed={on}
           onClick={() => setOn((v) => !v)}
         >
           {on ? "Вернуть" : "Переключить"}
-        </button>
+        </Button.Root>
       </div>
       <div className={s.compareGrid}>
         <MotionTrack
@@ -263,23 +277,24 @@ function StaggerDemo() {
   return (
     <Panel className={s.motionPanel}>
       <div className={s.motionHead}>
-        <span className={s.groupNote}>
+        <Note>
           Короткая группа появляется по очереди: opacity и сдвиг вверх, задержка —{" "}
           <code>calc(var(--prime-motion-stagger) * n)</code>. Элементы доступны с первого кадра.
-        </span>
-        <button type="button" className={s.plainButton} onClick={() => setRun((n) => n + 1)}>
+        </Note>
+        <Button.Root size="s" variant="soft" tone="neutral" onClick={() => setRun((n) => n + 1)}>
           Показать снова
-        </button>
+        </Button.Root>
       </div>
       <div key={run} className={s.staggerList}>
         {STAGGER_ITEMS.map((item, i) => (
-          <span
+          <Badge.Root
             key={item}
+            size="l"
             className={s.staggerItem}
             style={{ "--demo-index": i } as React.CSSProperties}
           >
             {item}
-          </span>
+          </Badge.Root>
         ))}
       </div>
     </Panel>
@@ -289,30 +304,18 @@ function StaggerDemo() {
 function PressDemo() {
   return (
     <Panel className={s.motionPanel}>
-      <span className={s.groupNote}>
+      <Note>
         Зажмите кнопку: она сжимается за <code>fast</code> и отпускается тем же переходом. Disabled
         и loading не сжимаются.
-      </span>
+      </Note>
       <div className={s.pressRow}>
-        <button
-          type="button"
-          className={s.pressDemo}
-          style={{ "--demo-press": "var(--prime-motion-press-scale)" } as React.CSSProperties}
-        >
-          press-scale · 0.98
-        </button>
-        <button
-          type="button"
-          className={s.pressDemo}
-          data-compact
-          aria-label="press-scale-compact · 0.96"
-          style={
-            { "--demo-press": "var(--prime-motion-press-scale-compact)" } as React.CSSProperties
-          }
-        >
-          <IconCopy size="s" />
-        </button>
-        <span className={s.groupNote}>press-scale-compact · 0.96</span>
+        <Button.Root>press-scale · 0.98</Button.Root>
+        <Button.Root variant="soft" tone="neutral" aria-label="press-scale-compact · 0.96">
+          <Button.Icon>
+            <IconCopy />
+          </Button.Icon>
+        </Button.Root>
+        <Note>press-scale-compact · 0.96</Note>
       </div>
     </Panel>
   );
@@ -360,9 +363,11 @@ export default function MotionPage() {
         description={
           <>
             Сейчас в системе{" "}
-            <strong>{reduced ? "включено «уменьшить движение»" : "анимации разрешены"}</strong>. При{" "}
-            <code>prefers-reduced-motion: reduce</code> файл <code>globals.css</code> обнуляет все{" "}
-            <code>--prime-motion-duration-*</code> и <code>--prime-motion-stagger</code>, а{" "}
+            <Typography.Root as="span" variant="body-m" weight="semibold">
+              {reduced ? "включено «уменьшить движение»" : "анимации разрешены"}
+            </Typography.Root>
+            . При <code>prefers-reduced-motion: reduce</code> файл <code>globals.css</code> обнуляет
+            все <code>--prime-motion-duration-*</code> и <code>--prime-motion-stagger</code>, а{" "}
             <code>--prime-motion-press-scale*</code> становится 1 — CSS-переходы срабатывают
             мгновенно, кнопки не сжимаются.
           </>

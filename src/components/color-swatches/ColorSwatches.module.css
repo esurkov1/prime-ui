@@ -1,0 +1,125 @@
+/*
+ * ColorSwatches — inline color choice. Tier T: swatch = control height − 8 (20 · 24 · 28 · 32 · 40),
+ * gap = control gap, radius steps with size. The grid auto-fills its container width and wraps.
+ * Every swatch carries a faint inner ring so white / near-background colors stay visible.
+ */
+
+.grid {
+  --csw-size: calc(var(--prime-control-m-height) - var(--prime-space-2));
+  --csw-radius: var(--prime-radius-s);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--csw-size));
+  gap: var(--prime-control-m-gap);
+  /* A definite width: auto-fill counts columns from it (a shrink-to-fit item would get one). */
+  width: 100%;
+  min-width: 0;
+}
+
+.grid[data-size="xs"] {
+  --csw-size: calc(var(--prime-control-xs-height) - var(--prime-space-2));
+  --csw-radius: var(--prime-radius-xs);
+  gap: var(--prime-control-xs-gap);
+}
+
+.grid[data-size="s"] {
+  --csw-size: calc(var(--prime-control-s-height) - var(--prime-space-2));
+  gap: var(--prime-control-s-gap);
+}
+
+.grid[data-size="l"] {
+  --csw-size: calc(var(--prime-control-l-height) - var(--prime-space-2));
+  --csw-radius: var(--prime-radius-m);
+  gap: var(--prime-control-l-gap);
+}
+
+.grid[data-size="xl"] {
+  --csw-size: calc(var(--prime-control-xl-height) - var(--prime-space-2));
+  --csw-radius: var(--prime-radius-m);
+  gap: var(--prime-control-xl-gap);
+}
+
+.option {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--csw-size);
+  height: var(--csw-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--csw-radius);
+  background: none;
+  cursor: pointer;
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.fill,
+.checker {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* "No color": transparency checkerboard, 4 × 4 cells at any size. */
+.checker {
+  background:
+    repeating-conic-gradient(
+      var(--prime-color-bg-surface) 0deg 90deg,
+      var(--prime-color-fill-strong) 90deg 180deg
+    )
+    0 0 / 50% 50%;
+}
+
+.option::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
+  pointer-events: none;
+}
+
+.option:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+
+/* Selected: 2px accent ring with a 2px gap + check mark. */
+.option[data-state="checked"] {
+  outline: var(--prime-focus-width) solid var(--prime-color-accent-default);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.option:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.grid[data-invalid="true"] .option[data-state="checked"] {
+  outline-color: var(--prime-color-danger-border);
+}
+
+.option:disabled {
+  cursor: not-allowed;
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+/* Check mark contrasts with the swatch in both themes: light on dark colors, dark on light ones. */
+.check {
+  position: relative;
+  z-index: 1;
+  width: 62.5%;
+  height: 62.5%;
+  color: var(--prime-color-control-thumb);
+  pointer-events: none;
+}
+
+.option[data-contrast="dark"] .check {
+  color: var(--prime-color-palette-yellow-solid-fg);
+}

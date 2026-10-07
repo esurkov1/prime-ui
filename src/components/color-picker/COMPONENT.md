@@ -6,11 +6,12 @@
 
 ## When to use
 - `ColorPicker` — any color is allowed: brand/theme color, chart series color, design tools. Usually opened from a Popover next to a hex field.
-- `ColorPresets` — a color from a fixed palette with an optional «no color»: tag, project or calendar colors.
+- `ColorPresets` — a color from a fixed palette with an optional «no color»: label, project or calendar colors.
 - `parseColor` — turning a CSS string into a `Color` for a controlled `ColorPicker`.
 
 ## When not to use
-- Picking one of the kit palette hues for a Tag/Badge in TagSelect — the row menu of [TagSelect](../tag-select/COMPONENT.md) already does it.
+- The color is a field of its own in a form or dialog (stage, label, project color) → use [ColorSwatches](../color-swatches/COMPONENT.md): the palette inline, no popover.
+- Picking one of the kit palette hues for a Badge in TagSelect — the row menu of [TagSelect](../tag-select/COMPONENT.md) already does it.
 - Choosing between a few named themes or modes → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Select](../select/COMPONENT.md) instead.
 - A plain text field for a hex code without a picker → use [Input](../input/COMPONENT.md) instead.
 
@@ -267,9 +268,9 @@ Controlled: `value` + `onValueChange` (both components), `open` + `onOpenChange`
 | [formats.tsx](examples/formats.tsx) | `defaultFormat` hsl / rgb / hex sharing one controlled value | Choosing the edit format |
 | [states.tsx](examples/states.tsx) | Disabled area, slider and swatch; HexInput | Part-level states |
 | [brand-color.tsx](examples/brand-color.tsx) | Controlled `Color` with `parseColor`, popover panel, brand swatches, preview, reset in a Card | Brand / theme settings |
-| [presets-quick.tsx](examples/presets-quick.tsx) | ColorPresets: one row + `allowEmpty`, default 8×2 with `label`, `Trigger asChild` | Quick color from a palette |
+| [presets-quick.tsx](examples/presets-quick.tsx) | ColorPresets: one row + `allowEmpty` next to a field, `Trigger asChild`; the full palette inline via ColorSwatches | Quick color from a palette |
 | [presets-sizes.tsx](examples/presets-sizes.tsx) | ColorPresets in all sizes next to Input | Aligning with fields |
-| [presets-tags.tsx](examples/presets-tags.tsx) | Size `s` ColorPresets per row inside a Popover | Per-item colors in lists |
+| [presets-labels.tsx](examples/presets-labels.tsx) | Size `s` ColorPresets per row inside a Popover | Per-item colors in lists |
 
 ```tsx
 import { COLOR_PRESETS, ColorPresets } from "prime-ui-kit";

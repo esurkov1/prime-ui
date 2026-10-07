@@ -1,3 +1,6 @@
+import type { DataTableColumn } from "@/components/data-table/DataTable";
+import { Typography } from "@/components/typography/Typography";
+
 import {
   FoundationPage,
   FoundationSection,
@@ -44,9 +47,9 @@ function RadiusScale() {
       {SCALE.map((r) => (
         <Panel key={r.key} className={s.radiusCard}>
           <span className={s.radiusShape} style={{ borderRadius: `var(${r.varName})` }} />
-          <span className={s.radiusName}>
+          <Typography.Root as="span" variant="title-s">
             {r.key} · {r.label}
-          </span>
+          </Typography.Root>
           <TokenName>{r.varName}</TokenName>
         </Panel>
       ))}
@@ -54,25 +57,24 @@ function RadiusScale() {
   );
 }
 
+type RadiusRow = (typeof COMPONENT_RADII)[number];
+
+const RADII_COLUMNS: DataTableColumn<RadiusRow>[] = [
+  { id: "name", header: "Где", accessor: "name" },
+  { id: "token", header: "Токен", cell: (row) => <TokenName>{toVarName(row.path)}</TokenName> },
+  { id: "px", header: "px", numeric: true, cell: (row) => formatPx(semanticPx(row.path)) },
+  {
+    id: "sample",
+    header: "",
+    cell: (row) => (
+      <span className={s.radiusMini} style={{ borderRadius: `var(${toVarName(row.path)})` }} />
+    ),
+  },
+];
+
 function ComponentRadii() {
   return (
-    <TokenTable head={["Где", "Токен", "px", ""]}>
-      {COMPONENT_RADII.map((row) => {
-        const varName = toVarName(row.path);
-        return (
-          <tr key={row.path}>
-            <th scope="row">{row.name}</th>
-            <td>
-              <TokenName>{varName}</TokenName>
-            </td>
-            <td className={s.numeric}>{formatPx(semanticPx(row.path))}</td>
-            <td>
-              <span className={s.radiusMini} style={{ borderRadius: `var(${varName})` }} />
-            </td>
-          </tr>
-        );
-      })}
-    </TokenTable>
+    <TokenTable columns={RADII_COLUMNS} rows={COMPONENT_RADII} getRowKey={(row) => row.path} />
   );
 }
 
@@ -87,31 +89,39 @@ function NestedDemo() {
       <div className={s.nestedCase}>
         <div className={s.nestedPanel}>
           {items.map((item, i) => (
-            <span key={item} className={s.nestedItem} data-active={i === 0 || undefined}>
+            <Typography.Root
+              as="span"
+              variant="body-m"
+              key={item}
+              className={s.nestedItem}
+              data-active={i === 0 || undefined}
+            >
               {item}
-            </span>
+            </Typography.Root>
           ))}
         </div>
-        <p className={s.caseCaption} data-tone="pass">
+        <Typography.Root as="p" variant="body-s" tone="success">
           Так: {PANEL_R} − {PANEL_P} = {ITEM_R}. Внутренний угол повторяет внешний.
-        </p>
+        </Typography.Root>
       </div>
       <div className={s.nestedCase}>
         <div className={s.nestedPanel}>
           {items.map((item, i) => (
-            <span
+            <Typography.Root
+              as="span"
+              variant="body-m"
               key={item}
               className={s.nestedItem}
               data-active={i === 0 || undefined}
               style={{ borderRadius: "var(--prime-panel-radius)" }}
             >
               {item}
-            </span>
+            </Typography.Root>
           ))}
         </div>
-        <p className={s.caseCaption} data-tone="fail">
+        <Typography.Root as="p" variant="body-s" tone="danger">
           Не так: у пункта тот же радиус {PANEL_R}. В углах зазор становится неровным.
-        </p>
+        </Typography.Root>
       </div>
     </div>
   );

@@ -16,16 +16,6 @@ body {
   background: var(--prime-color-bg-canvas);
 }
 
-/* Inline code inside prose of playground pages (not inside CodeBlock / pre). */
-#playground-main :where(p, li, td, dd, h2, h3, h4, h5) > code {
-  padding-inline: var(--prime-space-1);
-  border-radius: var(--prime-radius-xs);
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-mono);
-  font-size: var(--prime-text-code-size);
-}
-
 /* --- Demo page structure ------------------------------------------------- */
 
 .demoExamples {
@@ -77,53 +67,15 @@ body {
   width: 100%;
 }
 
-/* Link tile on the page plane: card fill from the surface context, hover wash, focus ring. */
-.introFeatureCard {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-1);
-  min-width: 0;
-  padding: var(--prime-card-padding-s);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  color: inherit;
-  text-decoration: none;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.introFeatureCard:hover {
-  background: color-mix(in srgb, var(--prime-color-card-bg) 94%, var(--prime-color-text-primary));
-}
-
-.introFeatureCard:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
+/* Layout only: the text inside each item is Typography. */
 .introPageList {
   display: grid;
   gap: var(--prime-space-2);
   max-width: var(--prime-layout-reading-max-width);
   margin: 0;
   padding-inline-start: var(--prime-space-5);
-  color: var(--prime-color-text-primary);
-  font-size: var(--prime-text-body-m-size);
-  line-height: var(--prime-text-body-m-line-height);
 }
 
-.introPageLink {
-  color: var(--prime-color-accent-text);
-  font-weight: var(--prime-font-weight-medium);
-  text-decoration: underline;
-  text-decoration-thickness: var(--prime-border-width);
-  text-underline-offset: var(--prime-space-1);
-  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
-}
-
-.introPageLink:hover {
-  text-decoration-color: currentColor;
-}
 /* --- Shared preview helpers (used by section snippets) -------------------- */
 
 .row {
@@ -139,17 +91,6 @@ body {
 
 .rowAlignStart {
   align-items: flex-start;
-}
-
-.previewCaption {
-  box-sizing: border-box;
-  margin: 0;
-  width: 100%;
-  text-align: center;
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 .stack {
@@ -191,11 +132,6 @@ body {
   text-decoration: none;
 }
 
-.playgroundBrand:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
 .playgroundBrandMark {
   box-sizing: border-box;
   display: grid;
@@ -225,42 +161,11 @@ body {
   white-space: nowrap;
 }
 
-.playgroundBrandTitle {
-  color: var(--prime-color-text-primary);
-  font-size: var(--prime-text-title-s-size);
-  line-height: var(--prime-text-title-s-line-height);
-  font-weight: var(--prime-text-title-s-weight);
-}
-
-.playgroundBrandSubtitle {
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-}
-
-/* Search entry: a sidebar item that reads as a field (field fill, muted text, ⌘K hint). */
-.playgroundSearchButton {
-  background: var(--prime-color-field-bg);
-  color: var(--prime-color-text-muted);
-  font-weight: var(--prime-font-weight-regular);
-}
-
-.playgroundSearchButton:hover {
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
-  color: var(--prime-color-text-secondary);
-}
-
-/* Mobile header bar (menu + page title + search); the sidebar is off-canvas there. */
-header.playgroundMobileBar {
-  display: none;
-}
-
-@media (max-width: 767.98px) {
-  header.playgroundMobileBar {
-    display: flex;
-    gap: var(--prime-space-2);
-    padding-inline: var(--prime-space-2);
-  }
+/* Mobile header bar (menu + page title + search), rendered only on narrow viewports. */
+.playgroundMobileBar {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
 }
 
 .playgroundMobileTitle {

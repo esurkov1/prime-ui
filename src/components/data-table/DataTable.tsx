@@ -39,6 +39,11 @@ export type DataTableColumn<Row> = {
    * для строковых значений полный текст попадает в `title`.
    */
   truncate?: boolean;
+  /**
+   * The column takes the free width of the table and wraps its text (descriptions, comments). With
+   * such a column the table fills its container instead of growing to its content width.
+   */
+  grow?: boolean;
   onHeaderClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
   onCellClick?: (
     row: Row,
@@ -140,7 +145,7 @@ export type DataTableRootProps<Row> = {
   highlightColumnOnHover?: boolean;
   /** Чередование фона строк (зебра). */
   striped?: boolean;
-  /** Вертикальные разделители между колонками. По умолчанию только горизонтальные hairline. */
+  /** Vertical hairlines between content columns (default `true`); `false` keeps only row separators. */
   columnDividers?: boolean;
   /**
    * Built-in row selection: a leading checkbox column, header «select all» (indeterminate when
@@ -247,7 +252,7 @@ type FlatRow<Row> = {
   childKeys: React.Key[];
   expandable: boolean;
   expanded: boolean;
-  /** Mounted by the latest expand: plays the enter animation. */
+  /** Mounted by the latest expand, or newly added to `rows`: plays the enter animation. */
   animate: boolean;
 };
 
@@ -284,9 +289,9 @@ const SKELETON_DEFAULT_ROWS = 5;
 const DEFAULT_INFINITE_SCROLL_HEIGHT = 360;
 
 function columnSizeStyle<Row>(column: DataTableColumn<Row>): React.CSSProperties | undefined {
-  const { width, minWidth, maxWidth } = column;
-  if (!width && !minWidth && !maxWidth) return undefined;
-  return { width, minWidth, maxWidth };
+  const { width, minWidth, maxWidth, grow } = column;
+  if (!width && !minWidth && !maxWidth && !grow) return undefined;
+  return { width: width ?? (grow ? "100%" : undefined), minWidth, maxWidth };
 }
 
 function DataTableRoot<Row>({
@@ -324,7 +329,7 @@ function DataTableRoot<Row>({
   highlightRowOnHover = true,
   highlightColumnOnHover = false,
   striped = false,
-  columnDividers = false,
+  columnDividers = true,
   getRowLabel,
   selectable = false,
   selected,
@@ -413,6 +418,30 @@ function DataTableRoot<Row>({
     [getRowKey],
   );
 
+  /*
+   * Rows that appeared in `rows` since the previous data (by `getRowKey`; positional ids cannot tell
+   * a new row from a shifted one). They play the enter animation once when mounted. The first fill
+   * (from no rows) is not an addition. The set is kept until the next real addition, so unrelated
+   * re-renders never cut a running animation short. Removed rows unmount at once.
+   */
+  const [rowArrival, setRowArrival] = React.useState<{ rows: Row[]; added: Set<React.Key> }>(
+    () => ({ rows, added: new Set() }),
+  );
+  if (rowArrival.rows !== rows) {
+    let added = rowArrival.added;
+    if (getRowKey && rowArrival.rows.length > 0) {
+      const previous = new Set(rowArrival.rows.map((row, i) => getRowKey(row, i)));
+      const fresh = new Set<React.Key>();
+      rows.forEach((row, i) => {
+        const key = getRowKey(row, i);
+        if (!previous.has(key)) fresh.add(key);
+      });
+      if (fresh.size > 0) added = fresh;
+    }
+    setRowArrival({ rows, added });
+  }
+  const addedKeys = rowArrival.added;
+
   const expandEnabled = Boolean(getRowChildren || renderExpanded);
   const [expandedKeys, setExpandedKeys] = useControllableState<React.Key[]>({
     value: expanded,
@@ -486,7 +515,7 @@ function DataTableRoot<Row>({
           childKeys,
           expandable,
           expanded: isExpanded,
-          animate: parentAnimate,
+          animate: parentAnimate || (depth === 0 && addedKeys.has(key)),
         });
         if (isExpanded && children.length > 0) {
           visit(children, depth + 1, key, parentAnimate || lastExpandedKey === key, 0);
@@ -497,6 +526,7 @@ function DataTableRoot<Row>({
     visit(displayedRows, 0, null, false, pageOffset);
     return out;
   }, [
+    addedKeys,
     childrenOf,
     displayedRows,
     expandEnabled,
@@ -717,8 +747,10 @@ function DataTableRoot<Row>({
   const hasError = error != null && error !== false;
   const showSkeleton = !hasError && loading && displayedRows.length === 0;
   const showEmpty = !hasError && !loading && displayedRows.length === 0;
-  /* «Показано 0–0 из 0» means nothing in loading / empty / error states: the body already says it. */
-  const showRangeMeta = !hasError && !showSkeleton && !showEmpty && totalRows > 0;
+  /* «Показано 0–0 из 0» means nothing in loading / empty / error states: the body already says it,
+     and «Показано 1–5 из 5» says nothing when every row is already on screen. */
+  const showRangeMeta =
+    !hasError && !showSkeleton && !showEmpty && totalRows > 0 && (infiniteScroll || totalPages > 1);
   const showPaginationControl = !infiniteScroll && showPagination && totalPages > 1;
   const showInfiniteMeta =
     !hasError && infiniteScroll && (hasInternalMore || loadingMore || canRequestMore);
@@ -733,11 +765,11 @@ function DataTableRoot<Row>({
         {...toDataAttributes({
           size,
           divider: dividerStyle,
-          "column-dividers": columnDividers,
+          "column-dividers": columnDividers ? undefined : "false",
           "show-header": showHeader,
           "sticky-header": stickyHeader,
           "sticky-first-column": stickyFirstColumn,
-          "table-width": fillWidth ? "fill" : "auto",
+          "table-width": columns.some((c) => c.grow) ? "grow" : fillWidth ? "fill" : "auto",
           "highlight-row": highlightRowOnHover,
           "highlight-column": highlightColumnOnHover,
           striped,
