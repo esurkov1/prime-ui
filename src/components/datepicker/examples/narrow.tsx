@@ -4,7 +4,7 @@ import * as React from "react";
 
 import styles from "./examples.module.css";
 
-export default function DatepickerNarrowPanelExample() {
+export default function DatepickerNarrowExample() {
   const [range, setRange] = React.useState<DatepickerRange>({ from: null, to: null });
   return (
     <div className={styles.phone}>
