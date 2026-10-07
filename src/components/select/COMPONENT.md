@@ -56,7 +56,9 @@ No ref. The field frame (label row · control · support row) holding the value,
 | `defaultValue` | `string \| string[]` | — | Initial value, uncontrolled. |
 | `onValueChange` | `(value: string) => void \| (value: string[]) => void` | — | Called with the picked value (`""` after clearing), or the new list with `multiple`. |
 | `multiple` | `boolean` | `false` | Several values: checkboxes in the list, the list stays open on a pick, labels joined in the trigger. |
-| `open · defaultOpen · onOpenChange` | `boolean · boolean · (open: boolean) => void` | — | Open state of the list: controlled, initial (default `false`), and the callback on every open and close. |
+| `open` | `boolean` | — | Controlled open state of the list. |
+| `defaultOpen` | `boolean` | `false` | Initial open state, uncontrolled. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, pick, Escape, an outside press. |
 | `label` | `ReactNode` | — | Field label above; names the trigger. |
 | `hint` | `ReactNode` | — | Support text under the field; linked by `aria-describedby`. |
 | `error` | `ReactNode` | — | Error message; replaces the hint and implies `invalid`. |
@@ -213,6 +215,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | [clearable.tsx](examples/clearable.tsx) | An optional field that can be reset: a clear segment before the chevron, Delete or Backspace on the trigger — `clearable`. |
 | [rich-options.tsx](examples/rich-options.tsx) | Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: the plan drives the price under the field and a button resets it — `value`, `onValueChange`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the list: a button opens it from code, a pick or Escape closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Regional settings form: the required country is checked on submit, the error replaces the hint — `required`, `error`, `hint`. |
 
 ## Mistakes

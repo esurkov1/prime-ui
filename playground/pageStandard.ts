@@ -131,7 +131,10 @@ export const SCENARIOS = "scenarios";
 
 export type KindSlot = {
   slot: SlotId | typeof SCENARIOS;
-  /** The page must have this slot. Prop-driven requirements are added by `requiredSlots`. */
+  /**
+   * The page must have this slot whatever its API. Prop-driven requirements (`controlled` for a
+   * field with a value, `variants` for a field with `variant`…) come from `PROP_SLOTS`.
+   */
   required?: boolean;
   /** Preview layout of the slot (component-specific scenarios included). */
   layout: ExampleFramePreviewLayout;
@@ -167,13 +170,16 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
   ],
   field: [
     { slot: "overview", required: true, layout: "stack-narrow" },
+    { slot: "variants", layout: "stack-narrow" },
     { slot: "sizes", required: true, layout: "stack-narrow" },
     { slot: "states", required: true, layout: "stack-narrow" },
     { slot: "validation", required: true, layout: "stack-narrow" },
     { slot: "with-icon", layout: "stack-narrow" },
     { slot: SCENARIOS, layout: "stack-narrow" },
-    { slot: "controlled", required: true, layout: "stack-narrow" },
+    { slot: "controlled", layout: "stack-narrow" },
+    { slot: "controlled-open", layout: "stack-narrow" },
     { slot: "in-form", required: true, layout: "stack" },
+    { slot: "narrow", layout: "stack" },
   ],
   overlay: [
     { slot: "overview", required: true, layout: "default" },
@@ -209,40 +215,53 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: "narrow", required: true, layout: "stack" },
   ],
   layout: [
-    { slot: "overview", required: true, layout: "stack" },
-    { slot: "variants", layout: "stack" },
-    { slot: "sizes", layout: "stack" },
-    { slot: "structure", layout: "stack" },
-    { slot: SCENARIOS, layout: "stack" },
-    { slot: "controlled", layout: "stack" },
-    { slot: "controlled-open", layout: "stack" },
-    { slot: "narrow", layout: "stack" },
+    { slot: "overview", required: true, layout: "full" },
+    { slot: "variants", layout: "full" },
+    { slot: "sizes", layout: "full" },
+    { slot: "structure", layout: "full" },
+    { slot: SCENARIOS, layout: "full" },
+    { slot: "controlled", layout: "full" },
+    { slot: "controlled-open", layout: "full" },
+    { slot: "narrow", layout: "full" },
   ],
 };
 
 /**
  * Slots a page must have because of its API: a prop axis on the root (first API table) must be
- * shown. `size` → sizes, `variant`/`tone`/`color` → variants, a state flag → states,
- * `value`/`checked` → controlled, `open` → controlled-open, `closeOnOutsideClick` → dismiss.
+ * shown. `size` → sizes, `variant`/`tone`/`color` → variants, a state flag → states, a
+ * controllable value (`onValueChange`/`defaultValue`, `onCheckedChange`/`defaultChecked`) →
+ * controlled, a controllable open state (`onOpenChange`/`defaultOpen`) → controlled-open,
+ * `closeOnOutsideClick` → dismiss. A bare `value` (ProgressBar) or `open` has nothing to control.
  */
 export const PROP_SLOTS: { props: string[]; slot: SlotId }[] = [
   { props: ["size"], slot: "sizes" },
   { props: ["variant", "tone", "color"], slot: "variants" },
   { props: ["disabled", "readOnly", "loading", "invalid"], slot: "states" },
-  { props: ["value", "checked"], slot: "controlled" },
-  { props: ["open"], slot: "controlled-open" },
+  {
+    props: ["onValueChange", "defaultValue", "onCheckedChange", "defaultChecked"],
+    slot: "controlled",
+  },
+  { props: ["onOpenChange", "defaultOpen"], slot: "controlled-open" },
   { props: ["closeOnOutsideClick"], slot: "dismiss" },
 ];
 
-export function requiredSlots(kind: PageKind, rootProps: readonly string[]): SlotId[] {
-  const required = new Set<SlotId>();
+export type SlotRequirement = {
+  slot: SlotId;
+  /** `kind` when the kind requires it, else the root prop that does. */
+  by: string;
+};
+
+/** Every slot a page of `kind` must have, with the reason (the kind or the root prop). */
+export function requiredSlots(kind: PageKind, rootProps: readonly string[]): SlotRequirement[] {
+  const required = new Map<SlotId, string>();
   for (const entry of KIND_SLOTS[kind]) {
-    if (entry.required && entry.slot !== SCENARIOS) required.add(entry.slot);
+    if (entry.required && entry.slot !== SCENARIOS) required.set(entry.slot, "kind");
   }
   for (const { props, slot } of PROP_SLOTS) {
-    if (props.some((prop) => rootProps.includes(prop))) required.add(slot);
+    const prop = props.find((name) => rootProps.includes(name));
+    if (prop && !required.has(slot)) required.set(slot, prop);
   }
-  return [...required];
+  return [...required].map(([slot, by]) => ({ slot, by }));
 }
 
 export function slotLayout(kind: PageKind, slot: SlotId | null): ExampleFramePreviewLayout {

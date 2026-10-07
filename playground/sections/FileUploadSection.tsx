@@ -5,7 +5,7 @@ import { ComponentPage, type ComponentPageConfig } from "../components/Component
 export const page: ComponentPageConfig = {
   dir: "file-upload",
   title: "FileUpload",
-  kind: "composite",
+  kind: "field",
   description:
     "Зона выбора и перетаскивания файлов с подписью, подсказкой и ошибкой поля и строки выбранных файлов: размер, загрузка, удаление, повтор.",
   examples: [
@@ -25,7 +25,17 @@ export const page: ComponentPageConfig = {
         "Все ярусы зоны и строки файла: отступы, иконка, кнопка и текст берут ярус — `size`.",
     },
     {
-      slot: "structure",
+      slot: "states",
+      description: "Обычная зона, неактивная и с ошибкой без текста — `disabled`, `invalid`.",
+    },
+    {
+      slot: "validation",
+      description:
+        "Обязательная зона с подсказкой, отклонённый файл с ошибкой на месте подсказки и необязательная зона — `required`, `hint`, `error`, `optional`.",
+    },
+    {
+      scenario: "custom-body",
+      title: "Своё содержимое",
       description:
         "Своё содержимое: приглушённый заголовок со ссылкой выбора и кнопки источников вместо встроенного — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.BrowseLink`.",
     },
@@ -42,8 +52,9 @@ export const page: ComponentPageConfig = {
         "Круглая зона вокруг Avatar принимает изображения и показывает превью; кнопки открывают тот же input — `inputRef`, `accept`, `className`.",
     },
     {
-      slot: "states",
-      description: "Обычная зона рядом с неактивной и с ошибкой под ней — `disabled`, `error`.",
+      slot: "in-form",
+      description:
+        "Форма договора: обязательный скан проверяется при отправке, ошибка встаёт на место подсказки — `required`, `error`, `name`.",
     },
     {
       slot: "narrow",

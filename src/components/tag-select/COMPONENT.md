@@ -47,7 +47,9 @@ No ref. The field frame with a chip row and an `<input role="combobox">`, and a 
 | `value` | `string[]` | — | Controlled picked values. |
 | `defaultValue` | `string[]` | `[]` | Initial picked values, uncontrolled. |
 | `onValueChange` | `(value: string[]) => void` | — | Called with the new list after a pick, a removal or a creation. |
-| `open · defaultOpen · onOpenChange` | `boolean · boolean · (open: boolean) => void` | — | Open state of the list: controlled, initial (default `false`), and the callback on every open and close. |
+| `open` | `boolean` | — | Controlled open state of the list. |
+| `defaultOpen` | `boolean` | `false` | Initial open state, uncontrolled. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: field click, Escape, an outside press. |
 | `creatable` | `boolean` | `false` | A typed text that is not an option can be added (the Create row or Enter). |
 | `onCreate` | `(value: string) => void` | — | A new value was created, not picked from `options`. |
 | `defaultColor` | `PaletteColor` | `"gray"` | Chip color of values without an option color, created ones included. |
@@ -149,6 +151,7 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | [many-tags.tsx](examples/many-tags.tsx) | More tags than fit: at rest one row with «+N», focused every tag on up to three wrapped rows that scroll — `defaultValue`. |
 | [manage-tags.tsx](examples/manage-tags.tsx) | Users keep their own tag dictionary: the row «⋯» menu renames, recolors or deletes an option — `onOptionUpdate`, `onOptionDelete`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a preset button replaces the tags and the count follows them — `value`, `onValueChange`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the list: a button opens it from code, Escape or an outside press closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A new task form: the required labels field is checked on submit and its error replaces the hint — `required`, `error`, `creatable`. |
 
 ## Mistakes

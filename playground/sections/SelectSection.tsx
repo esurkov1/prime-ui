@@ -63,6 +63,11 @@ export const page: ComponentPageConfig = {
         "Значением владеет родитель: тариф меняет цену под полем, кнопка сбрасывает его — `value`, `onValueChange`.",
     },
     {
+      slot: "controlled-open",
+      description:
+        "Списком владеет родитель: кнопка открывает его из кода, выбор или Escape закрывают — `open`, `onOpenChange`.",
+    },
+    {
       slot: "in-form",
       description:
         "Форма региональных настроек: обязательная страна проверяется при отправке, ошибка встаёт на место подсказки — `required`, `error`, `hint`.",

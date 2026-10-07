@@ -217,8 +217,7 @@ export { EmptyPage } from "./empty-page/EmptyPage";
 export type {
   ExampleFrameLabels,
   ExampleFramePreviewLayout,
-  ExampleFrameRootProps,
-  ExampleFrameStageProps,
+  ExampleFrameProps,
   ExampleFrameViewport,
 } from "./example-frame/ExampleFrame";
 export { ExampleFrame } from "./example-frame/ExampleFrame";

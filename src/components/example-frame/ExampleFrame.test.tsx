@@ -6,11 +6,9 @@ import { ExampleFrame } from "./ExampleFrame";
 describe("ExampleFrame", () => {
   it("previews children at desktop width by default", () => {
     const { container } = render(
-      <ExampleFrame.Root code="<div />">
-        <ExampleFrame.Stage>
-          <span>stage</span>
-        </ExampleFrame.Stage>
-      </ExampleFrame.Root>,
+      <ExampleFrame code="<div />">
+        <span>stage</span>
+      </ExampleFrame>,
     );
     expect(screen.getByText("stage")).toBeInTheDocument();
     expect(container.querySelector("[data-viewport]")).toHaveAttribute("data-viewport", "desktop");
@@ -20,9 +18,9 @@ describe("ExampleFrame", () => {
   it("names both toolbar switches and moves the device choice with arrow keys", () => {
     const onViewportChange = vi.fn();
     render(
-      <ExampleFrame.Root code="x" onViewportChange={onViewportChange}>
+      <ExampleFrame code="x" onViewportChange={onViewportChange}>
         preview
-      </ExampleFrame.Root>,
+      </ExampleFrame>,
     );
     expect(screen.getByRole("radiogroup", { name: "Вид примера" })).toBeInTheDocument();
     const devices = screen.getByRole("radiogroup", { name: "Ширина превью" });
@@ -32,7 +30,7 @@ describe("ExampleFrame", () => {
   });
 
   it("switches to the code pane", () => {
-    render(<ExampleFrame.Root code="const answer = 42;">preview</ExampleFrame.Root>);
+    render(<ExampleFrame code="const answer = 42;">preview</ExampleFrame>);
     fireEvent.click(screen.getByRole("radio", { name: "Код" }));
     expect(screen.getByRole("region", { name: "Код примера" })).toHaveTextContent(
       "const answer = 42;",
@@ -42,9 +40,9 @@ describe("ExampleFrame", () => {
 
   it("takes toolbar strings from labels", () => {
     render(
-      <ExampleFrame.Root code="x" labels={{ preview: "Preview", copy: "Copy code" }}>
+      <ExampleFrame code="x" labels={{ preview: "Preview", copy: "Copy code" }}>
         preview
-      </ExampleFrame.Root>,
+      </ExampleFrame>,
     );
     expect(screen.getByRole("radio", { name: "Preview" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Copy code" })).toBeInTheDocument();
@@ -53,7 +51,7 @@ describe("ExampleFrame", () => {
   it("swaps the copy glyph to a check next to the button after copying", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
-    render(<ExampleFrame.Root code="const a = 1;">preview</ExampleFrame.Root>);
+    render(<ExampleFrame code="const a = 1;">preview</ExampleFrame>);
     const button = screen.getByRole("button", { name: "Копировать код" });
     const icon = button.querySelector("[data-copy-state]");
     expect(icon).toHaveAttribute("data-copy-state", "idle");

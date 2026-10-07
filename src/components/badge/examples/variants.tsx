@@ -19,10 +19,10 @@ const VARIANTS = ["soft", "solid", "outline"] as const;
 export default function BadgeVariantsExample() {
   return (
     <>
-      {COLORS.map((color) => (
-        <div key={color}>
-          {VARIANTS.map((variant) => (
-            <div key={variant}>
+      {VARIANTS.map((variant) => (
+        <div key={variant}>
+          {COLORS.map((color) => (
+            <div key={color}>
               <Badge.Root variant={variant} color={color}>
                 {color}
               </Badge.Root>

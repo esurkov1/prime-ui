@@ -27,10 +27,10 @@ export default function DatepickerControlledExample() {
         fullWidth
       />
       <div className={styles.actions}>
-        <Button.Root variant="soft" tone="neutral" size="s" onClick={() => setPeriod(LAST_WEEK)}>
+        <Button.Root variant="soft" tone="neutral" onClick={() => setPeriod(LAST_WEEK)}>
           Прошлая неделя
         </Button.Root>
-        <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => setPeriod(NO_PERIOD)}>
+        <Button.Root variant="ghost" tone="neutral" onClick={() => setPeriod(NO_PERIOD)}>
           Сбросить
         </Button.Root>
       </div>

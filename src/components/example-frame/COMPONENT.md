@@ -21,22 +21,22 @@ import { ExampleFrame } from "prime-ui-kit";
 
 ## Anatomy
 ```
-ExampleFrame.Root          frame: toolbar + preview stage or code pane
+ExampleFrame               frame: toolbar + preview stage or code pane
 ├─ (toolbar)               SegmentedControl Preview / Code, theme Button, copy Button, device SegmentedControl
-└─ ExampleFrame.Stage      marks the previewed content (no DOM); without it all children are previewed
+└─ (stage)                 children, laid out by previewLayout
 ```
 
 ## API
 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-### ExampleFrame.Root
+### ExampleFrame
 No ref. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `code` | `string` | — (required) | Source shown on the code pane (TS / TSX highlighting via CodeBlock) and copied by the copy button. |
-| `previewLayout` | `"default" \| "stack" \| "stack-center" \| "stack-narrow" \| "dense-stack" \| "row" \| "row-start" \| "row-wrap" \| "matrix"` | `"default"` | How the preview lays out its children, so snippets need no wrapper divs (see Variants). |
+| `previewLayout` | `"default" \| "stack" \| "stack-narrow" \| "full" \| "row" \| "matrix"` | `"default"` | How the preview lays out its children, so snippets need no wrapper divs (see Variants). |
 | `viewport` | `"desktop" \| "tablet" \| "mobile"` | — | Preview width (controlled). |
 | `defaultViewport` | `"desktop" \| "tablet" \| "mobile"` | `"desktop"` | Initial preview width (uncontrolled). |
 | `onViewportChange` | `(viewport: "desktop" \| "tablet" \| "mobile") => void` | — | Called with the new width from the device switch. |
@@ -46,15 +46,8 @@ No ref. The documentation frame: a toolbar (pane switch, theme toggle, copy butt
 | `showThemeToggle` | `boolean` | `true` | Show the light / dark toggle in the toolbar. |
 | `onCopy` | `() => void` | — | Called after `code` was copied to the clipboard. |
 | `labels` | `Partial<ExampleFrameLabels>` | — | Built-in strings, see Labels. |
-| `children` | `ReactNode` | — | Preview content; with an `ExampleFrame.Stage` among them only the Stage's children are previewed. |
+| `children` | `ReactNode` | — | Preview content, laid out by `previewLayout`. |
 | `className` | `string` | — | Extra class on the frame. |
-
-### ExampleFrame.Stage
-No DOM. Marks the content rendered in the preview.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactNode` | — (required) | Content rendered only in the preview. |
 
 ## Variants
 
@@ -62,14 +55,11 @@ No DOM. Marks the content rendered in the preview.
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `default` | single block centered in the stage | one component | yes |
-| `stack` | centered column, gap 16; a child with `fullWidth` or a table stretches | several blocks one under another | |
-| `stack-center` | centered column, gap 12 | short centered items | |
+| `stack` | centered column, gap 16, children capped at 640px (`10 × --prime-space-16`) so `width: 100%` blocks stay centered; a child with `fullWidth` or a table stretches | several blocks one under another | |
 | `stack-narrow` | column, children capped at `7 × --prime-space-16` and centered | forms and narrow columns | |
-| `dense-stack` | column from the top, gap 4, scrolls past a max height | long lists | |
+| `full` | column, gap 16, every child takes the whole stage width | page structure: app shells, page regions | |
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |
-| `row-start` | wrapping row aligned to the start, gap 12 | toolbars, start-aligned controls | |
-| `row-wrap` | centered wrapping row, items aligned to the top, gap 8 | many small items (badges, tags) | |
-| `matrix` | grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns line up across rows, scrolls when wider than the stage | variant, size and state matrices | |
+| `matrix` | centered grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns (up to 12) line up across rows, are never narrower than their content and grow to 320 / 160 / 128px for 1 / 2 / 3+ columns, so width-less specimens (Slider, `width: 100%` blocks) get a real cell; scrolls when wider than the stage | variant, size and state matrices | |
 
 ### viewport
 | Value | Looks like | Use when | Default |

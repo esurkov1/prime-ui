@@ -54,6 +54,9 @@ No ref. A field (label, hint / error, the field button with a calendar icon, the
 | `value` | `Date \| null  ·  DatepickerRange` | — | Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set. |
 | `defaultValue` | `Date \| null  ·  DatepickerRange` | `null · { from: null, to: null }` | Initial value, uncontrolled. |
 | `onValueChange` | `(value) => void` | — | Called when a pick, a preset, Apply or Reset changes the value. |
+| `open` | `boolean` | — | Controlled visibility of the panel. |
+| `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
+| `onOpenChange` | `(open: boolean) => void` | — | Field click, Escape, an outside press or an applied value. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier (height 28 · 32 · 36 · 40 · 48) and panel tier (day cell 24 · 28 · 32 · 36 · 40). |
 | `label` | `ReactNode` | — | Field label; part of the button's accessible name together with the value. |
 | `hint` | `ReactNode` | — | Support text under the field (`aria-describedby`). |
@@ -63,22 +66,13 @@ No ref. A field (label, hint / error, the field button with a calendar icon, the
 | `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. |
 | `disabled` | `boolean` | `false` | The field cannot be opened. |
 | `fullWidth` | `boolean` | `false` | The field stretches to its container; otherwise it fits the text. |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | Popover alignment to the field. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring (`data-focus-ring="false"`). |
 | `placeholder` | `string` | `labels.placeholder` | Field text without a value for this field. |
 | `valuePrefix` | `string` | — | Text before the value, e.g. «С». |
 | `id` | `string` | — | Id of the field button; generated when omitted. |
 | `aria-label · aria-labelledby · aria-describedby` | `string` | — | Name without a `label` (the value is appended) and extra description ids. |
 | `className` | `string` | — | Class on the field wrapper. |
-
-### Datepicker.Root · popover
-Popover state and placement of `Datepicker.Root`.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `open` | `boolean` | — | Controlled visibility of the panel. |
-| `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
-| `onOpenChange` | `(open: boolean) => void` | — | Field click, Escape, an outside press or an applied value. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` | Popover alignment to the field. |
 
 ### Datepicker.Panel
 No ref. The calendar without a field, inline in a page: its own card, 1–2 months by the parent's width. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.
@@ -210,10 +204,11 @@ Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` 
 | [validation.tsx](examples/validation.tsx) | A required leave period with a hint, the same field with an error and an optional return date — `required`, `hint`, `error`, `optional`. |
 | [range-presets.tsx](examples/range-presets.tsx) | A report period: presets aside, two months, a step prompt, time fields with Reset / Apply, no future days — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`. |
 | [inline-panel.tsx](examples/inline-panel.tsx) | A booking calendar embedded in the page: its own card, two months when the parent has room, the range applies at once — `Datepicker.Panel`, `months`, `prompt`. |
-| [narrow-panel.tsx](examples/narrow-panel.tsx) | An embedded panel in a 320 px column: one compact month instead of two, the footer fields wrap above the buttons — `months`, `footer`. |
 | [yearless.tsx](examples/yearless.tsx) | An annual price change date: day and month without a year, a value prefix and taken days disabled — `yearless`, `valuePrefix`, `isDayDisabled`. |
 | [controlled.tsx](examples/controlled.tsx) | A report filter owns the period: quick buttons set it from outside, the field shows it — `value`, `onValueChange`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the panel: a reminder button opens the calendar from code, a picked day closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A leave request form: a required period that turns into an error after submit and an optional return date — `required`, `error`, `optional`. |
+| [narrow.tsx](examples/narrow.tsx) | An embedded panel in a 320 px column: one compact month instead of two, the footer fields wrap above the buttons — `months`, `footer`. |
 
 ## Mistakes
 - Omitting `mode` → it is required (`"single"` or `"range"`).

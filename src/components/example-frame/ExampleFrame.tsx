@@ -24,12 +24,9 @@ type ColorScheme = "light" | "dark";
 export type ExampleFramePreviewLayout =
   | "default"
   | "stack"
-  | "stack-center"
   | "stack-narrow"
-  | "dense-stack"
+  | "full"
   | "row"
-  | "row-start"
-  | "row-wrap"
   | "matrix";
 
 export type ExampleFrameLabels = {
@@ -80,7 +77,7 @@ type ExampleFrameContextValue = {
 const [ExampleFrameProvider, useExampleFrameContext] =
   createComponentContext<ExampleFrameContextValue>("ExampleFrame");
 
-export type ExampleFrameRootProps = {
+export type ExampleFrameProps = {
   /** Source shown on the code pane (TS/TSX highlighting) and copied by the copy button. */
   code: string;
   children?: React.ReactNode;
@@ -102,7 +99,8 @@ export type ExampleFrameRootProps = {
   labels?: Partial<ExampleFrameLabels>;
 };
 
-function ExampleFrameRoot({
+/** Documentation frame: a toolbar (pane, theme, copy, device width) above the preview or the code. */
+export function ExampleFrame({
   code,
   children,
   className,
@@ -116,7 +114,7 @@ function ExampleFrameRoot({
   onCopy,
   previewLayout = "default",
   labels: labelsProp,
-}: ExampleFrameRootProps) {
+}: ExampleFrameProps) {
   const labels = React.useMemo(() => ({ ...EXAMPLE_FRAME_LABELS, ...labelsProp }), [labelsProp]);
   const [pane, setPane] = React.useState<Pane>("preview");
   const [colorScheme, setColorScheme] = useControllableState({
@@ -165,16 +163,6 @@ function ExampleFrameRoot({
     ],
   );
 
-  let previewChildren: React.ReactNode = null;
-  React.Children.forEach(children, (child) => {
-    if (React.isValidElement(child) && child.type === ExampleFrameStage) {
-      previewChildren = (child.props as { children?: React.ReactNode }).children ?? null;
-    }
-  });
-  if (previewChildren === null) {
-    previewChildren = children;
-  }
-
   return (
     <ExampleFrameProvider value={ctxValue}>
       <div ref={rootRef} className={cx(styles.root, className)}>
@@ -187,7 +175,7 @@ function ExampleFrameRoot({
                 data-preview-layout={previewLayout}
                 data-theme={colorScheme}
               >
-                {previewChildren}
+                {children}
               </div>
             </div>
           </div>
@@ -199,7 +187,7 @@ function ExampleFrameRoot({
   );
 }
 
-ExampleFrameRoot.displayName = "ExampleFrame.Root";
+ExampleFrame.displayName = "ExampleFrame";
 
 function ExampleFrameToolbar() {
   const ctx = useExampleFrameContext();
@@ -326,18 +314,3 @@ function ExampleFrameCodePane() {
 }
 
 ExampleFrameCodePane.displayName = "ExampleFrame.CodePane";
-
-export type ExampleFrameStageProps = {
-  children: React.ReactNode;
-};
-
-function ExampleFrameStage({ children }: ExampleFrameStageProps) {
-  return <>{children}</>;
-}
-
-ExampleFrameStage.displayName = "ExampleFrame.Stage";
-
-export const ExampleFrame = {
-  Root: ExampleFrameRoot,
-  Stage: ExampleFrameStage,
-};

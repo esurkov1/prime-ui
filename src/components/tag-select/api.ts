@@ -34,10 +34,23 @@ export const api: ComponentApi = {
           ru: "Вызывается с новым списком после выбора, удаления или создания.",
         },
         {
-          name: "open · defaultOpen · onOpenChange",
-          type: "boolean · boolean · (open: boolean) => void",
-          en: "Open state of the list: controlled, initial (default `false`), and the callback on every open and close.",
-          ru: "Открытие списка: управляемое, начальное (по умолчанию `false`) и колбэк на каждое открытие и закрытие.",
+          name: "open",
+          type: "boolean",
+          en: "Controlled open state of the list.",
+          ru: "Открытие списка, управляемо.",
+        },
+        {
+          name: "defaultOpen",
+          type: "boolean",
+          default: "false",
+          en: "Initial open state, uncontrolled.",
+          ru: "Начальное открытие без контроля.",
+        },
+        {
+          name: "onOpenChange",
+          type: "(open: boolean) => void",
+          en: "Called on every open and close: field click, Escape, an outside press.",
+          ru: "Вызывается при каждом открытии и закрытии: клик по полю, Escape, нажатие снаружи.",
         },
         {
           name: "creatable",

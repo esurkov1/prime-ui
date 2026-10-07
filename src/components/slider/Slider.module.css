@@ -33,9 +33,7 @@
   flex-direction: column;
   gap: var(--slider-label-gap);
   width: 100%;
-  /* Intrinsic width like a native range: the track has no content of its own, so without it the
-     slider collapses in content-sized layouts (inline rows, max-content grids). */
-  min-width: calc(var(--prime-space-16) * 3);
+  min-width: 0;
 }
 
 .root[data-size="xs"] {

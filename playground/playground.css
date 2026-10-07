@@ -85,37 +85,6 @@ body {
   padding-inline-start: var(--prime-space-5);
 }
 
-/* --- Shared preview helpers (used by section snippets) -------------------- */
-
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-space-3);
-  justify-content: center;
-}
-
-.rowAlignCenter {
-  align-items: center;
-}
-
-.rowAlignStart {
-  align-items: flex-start;
-}
-
-.stack {
-  display: grid;
-  gap: var(--prime-space-4);
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.examplePreviewBleed {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
 /* --- Chrome ------------------------------------------------------------------ */
 
 .playgroundVisuallyHidden {

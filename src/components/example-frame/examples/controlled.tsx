@@ -15,7 +15,7 @@ export default function ExampleFrameControlledExample() {
 
   return (
     <>
-      <ExampleFrame.Root
+      <ExampleFrame
         code={BUTTON_CODE}
         viewport={viewport}
         onViewportChange={setViewport}
@@ -23,8 +23,8 @@ export default function ExampleFrameControlledExample() {
         onColorSchemeChange={setScheme}
       >
         <Button.Root>Сохранить</Button.Root>
-      </ExampleFrame.Root>
-      <ExampleFrame.Root
+      </ExampleFrame>
+      <ExampleFrame
         code={INPUT_CODE}
         viewport={viewport}
         onViewportChange={setViewport}
@@ -36,7 +36,7 @@ export default function ExampleFrameControlledExample() {
             <Input.Field placeholder="name@company.ru" />
           </Input.Wrapper>
         </Input.Root>
-      </ExampleFrame.Root>
+      </ExampleFrame>
     </>
   );
 }

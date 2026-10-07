@@ -6,13 +6,11 @@ const CODE = `<Button.Root variant="soft" tone="neutral">Отмена</Button.Ro
 
 export default function ExampleFrameOverviewExample() {
   return (
-    <ExampleFrame.Root code={CODE} previewLayout="row">
-      <ExampleFrame.Stage>
-        <Button.Root variant="soft" tone="neutral">
-          Отмена
-        </Button.Root>
-        <Button.Root>Сохранить</Button.Root>
-      </ExampleFrame.Stage>
-    </ExampleFrame.Root>
+    <ExampleFrame code={CODE} previewLayout="row">
+      <Button.Root variant="soft" tone="neutral">
+        Отмена
+      </Button.Root>
+      <Button.Root>Сохранить</Button.Root>
+    </ExampleFrame>
   );
 }
