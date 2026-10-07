@@ -1,42 +1,10 @@
-/* Example layout: semantic tokens only. */
+/* Layout of the Slider scenarios: semantic tokens only. */
 
-.sizesGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 2)), 1fr));
-  align-items: end;
-  gap: var(--prime-space-6) var(--prime-space-5);
-  width: 100%;
-}
-
-.column {
-  display: grid;
-  gap: var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
-.pair {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
-  align-items: end;
-  gap: var(--prime-space-6) var(--prime-space-5);
-  width: 100%;
-  max-width: var(--prime-modal-width-m);
-}
-
+/* controlled.tsx: the slider takes the row, the number field a fixed column. */
 .withInput {
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--prime-space-24);
   align-items: end;
   gap: var(--prime-space-4);
-}
-
-.card {
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
-.settings {
-  display: grid;
-  gap: var(--prime-space-6);
+  width: min(100%, var(--prime-modal-width-s));
 }

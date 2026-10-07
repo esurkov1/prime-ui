@@ -64,7 +64,6 @@ const NOT_CONVERTED = new Set([
   "segmented-control",
   "select",
   "sidebar",
-  "slider",
   "smart-filter",
   "stepper",
   "tabs",

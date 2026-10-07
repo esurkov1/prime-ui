@@ -9,14 +9,14 @@ import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Slider.module.css";
 
-export type SliderRootProps = {
+export type SliderProps = {
   value?: number;
   defaultValue?: number;
+  onValueChange?: (value: number) => void;
   min?: number;
   max?: number;
   step?: number;
   disabled?: boolean;
-  onValueChange?: (value: number) => void;
   /** Visible label linked to the range input. Without it, set `aria-label`. */
   label?: React.ReactNode;
   /** Shows the current value at the end of the label row (tabular numbers). */
@@ -30,18 +30,17 @@ export type SliderRootProps = {
   "aria-label"?: string;
 };
 
-function clamp(n: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, n));
-}
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
-function SliderRoot({
+/** A single value on a range: label row with the value, a track with a glass thumb. */
+export function Slider({
   value: valueProp,
   defaultValue,
-  min: minProp,
-  max: maxProp,
-  step: stepProp,
-  disabled,
   onValueChange,
+  min = 0,
+  max = 100,
+  step = 1,
+  disabled,
   label,
   showValue = false,
   formatValue,
@@ -49,58 +48,35 @@ function SliderRoot({
   tone = "accent",
   className,
   "aria-label": ariaLabel,
-}: SliderRootProps) {
-  const min = minProp ?? 0;
-  const max = maxProp ?? 100;
-  const step = stepProp ?? 1;
-  const initialDefault = defaultValue ?? min;
+}: SliderProps) {
   const [value, setValue] = useControllableState({
     value: valueProp,
-    defaultValue: clamp(initialDefault, min, max),
+    defaultValue: clamp(defaultValue ?? min, min, max),
     onChange: onValueChange,
   });
 
-  const id = React.useId();
+  const inputId = React.useId();
   const safeValue = clamp(value, min, max);
   const ratio = max > min ? (safeValue - min) / (max - min) : 0;
   const valueText = formatValue ? formatValue(safeValue) : String(safeValue);
 
-  const applyValueFromInput = (el: HTMLInputElement) => {
-    const next = Number.parseFloat(el.value);
-    if (Number.isNaN(next)) {
-      return;
-    }
-    setValue(next);
-  };
-
-  const handleRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    applyValueFromInput(e.currentTarget);
-  };
-
-  const handleRangeInput = (e: React.FormEvent<HTMLInputElement>) => {
-    applyValueFromInput(e.currentTarget);
-  };
-
-  const showHeader = label != null || showValue;
-
   return (
     <div
       className={cx(styles.root, className)}
+      // The fill and the thumb position follow the value; a custom property carries it to CSS.
       style={{ "--slider-ratio": ratio } as React.CSSProperties}
       {...toDataAttributes({ size, tone, disabled: disabled || undefined })}
     >
       <ControlSizeProvider value={size}>
-        {showHeader ? (
+        {label != null || showValue ? (
           <div className={styles.header}>
             {label != null ? (
-              <Label.Root htmlFor={id} size={size} disabled={disabled} className={styles.label}>
+              <Label.Root htmlFor={inputId} size={size} disabled={disabled}>
                 {label}
               </Label.Root>
-            ) : (
-              <span />
-            )}
+            ) : null}
             {showValue ? (
-              <output className={styles.value} htmlFor={id} aria-hidden="true">
+              <output className={styles.value} htmlFor={inputId} aria-hidden="true">
                 {valueText}
               </output>
             ) : null}
@@ -108,7 +84,7 @@ function SliderRoot({
         ) : null}
         <div className={styles.control}>
           <input
-            id={id}
+            id={inputId}
             type="range"
             className={styles.input}
             min={min}
@@ -116,8 +92,10 @@ function SliderRoot({
             step={step}
             disabled={disabled}
             value={safeValue}
-            onChange={handleRangeChange}
-            onInput={handleRangeInput}
+            onChange={(event) => {
+              const next = Number.parseFloat(event.currentTarget.value);
+              if (!Number.isNaN(next)) setValue(next);
+            }}
             aria-label={ariaLabel}
             aria-valuetext={formatValue ? valueText : undefined}
           />
@@ -131,7 +109,3 @@ function SliderRoot({
     </div>
   );
 }
-
-SliderRoot.displayName = "Slider.Root";
-
-export const Slider = { Root: SliderRoot };

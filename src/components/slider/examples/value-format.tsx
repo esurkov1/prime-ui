@@ -1,9 +1,7 @@
-/** showValue in the label row and formatValue for units (°C, ₽, %) that also become aria-valuetext. Use it whenever the number needs a unit. */
+/** Units in the shown value that are also read by screen readers — `formatValue`, `showValue`. */
 import { Slider } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const rub = new Intl.NumberFormat("ru-RU", {
+const RUB = new Intl.NumberFormat("ru-RU", {
   style: "currency",
   currency: "RUB",
   maximumFractionDigits: 0,
@@ -11,34 +9,24 @@ const rub = new Intl.NumberFormat("ru-RU", {
 
 export default function SliderValueFormatExample() {
   return (
-    <div className={styles.column}>
-      <Slider.Root label="Громкость" showValue defaultValue={64} />
-      <Slider.Root
-        label="Температура"
-        min={16}
-        max={30}
-        defaultValue={22}
+    <>
+      <Slider
+        label="Температура на складе"
+        min={2}
+        max={25}
+        defaultValue={8}
         showValue
-        formatValue={(v) => `${v} °C`}
+        formatValue={(value) => `${value} °C`}
       />
-      <Slider.Root
-        label="Бюджет в месяц"
+      <Slider
+        label="Бюджет кампании в месяц"
         min={0}
         max={200000}
         step={5000}
         defaultValue={45000}
         showValue
-        formatValue={(v) => rub.format(v)}
+        formatValue={(value) => RUB.format(value)}
       />
-      <Slider.Root
-        label="Прозрачность слоя"
-        min={0}
-        max={1}
-        step={0.05}
-        defaultValue={0.8}
-        showValue
-        formatValue={(v) => `${Math.round(v * 100)}%`}
-      />
-    </div>
+    </>
   );
 }

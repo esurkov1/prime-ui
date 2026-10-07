@@ -407,7 +407,7 @@ export type {
   SelectValueProps,
 } from "./select/Select";
 export { Select } from "./select/Select";
-export type { SliderRootProps } from "./slider/Slider";
+export type { SliderProps } from "./slider/Slider";
 export { Slider } from "./slider/Slider";
 export type {
   SmartFilterChipsProps,
