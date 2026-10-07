@@ -6,7 +6,7 @@
 > Help text or a validation error under a field.
 
 ## When to use
-- Under a control without `hint` / `error` props (DigitInput, a custom control) where you wire the ids yourself: format rules, limits, where the value comes from.
+- Under a control without `hint` / `error` props (SegmentedControl, Slider, a custom control) where you wire the ids yourself: format rules, limits, where the value comes from.
 - As the error message of such a control (`invalid`), in the same slot as the hint.
 
 ## When not to use
@@ -110,4 +110,4 @@ No `labels`.
 
 ## Related
 - **Built from:** —
-- **See also:** [Label](../label/COMPONENT.md), [Input](../input/COMPONENT.md), [Textarea](../textarea/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md)
+- **See also:** [Label](../label/COMPONENT.md), [Input](../input/COMPONENT.md), [Textarea](../textarea/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)
