@@ -108,7 +108,7 @@ One column of `columns`: data, not a part.
 | `headerAlign` | `"start" \| "center" \| "end"` | `"start"` | Head alignment; the sort icon stays at the end edge. |
 | `numeric` | `boolean` | — | Tabular figures, no wrapping, end alignment unless `align` is set. |
 | `truncate` | `boolean` | — | One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`. |
-| `grow` | `boolean` | — | Takes the free width and wraps its text; the table then fills its container. |
+| `grow` | `boolean` | — | Takes the free width and wraps its text; the table then fills its container. With `minWidth` it never gets narrower: below that the table scrolls instead of cells overlapping. |
 | `width · minWidth · maxWidth` | `string` | — | CSS sizes of the column (`"14rem"`). |
 | `onHeaderClick` | `(event: MouseEvent<HTMLTableCellElement>) => void` | — | Head cell click (before sorting). |
 | `onCellClick` | `(row: Row, event: MouseEvent \| KeyboardEvent) => void` | — | Makes the cell a focusable `role="button"`; Enter / Space trigger it. |

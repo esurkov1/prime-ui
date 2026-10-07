@@ -22,7 +22,10 @@ export function useFrozenColumns(
 
   const unfreeze = () => {
     widths.current = null;
-    if (tableRef.current) tableRef.current.style.tableLayout = "";
+    if (tableRef.current) {
+      tableRef.current.style.tableLayout = "";
+      tableRef.current.style.minWidth = "";
+    }
     for (const col of cols()) col.style.width = "";
   };
 
@@ -38,11 +41,22 @@ export function useFrozenColumns(
     const measured = [...lead.cells].map((cell) => cell.getBoundingClientRect().width);
     // Not laid out (hidden, or a test DOM): nothing to freeze.
     if (measured.every((width) => width === 0)) return;
-    const next = measured.map((width, index) => Math.max(width, previous?.[index] ?? 0));
+    // Browsers ignore `min-width` on table cells, so a column's `minWidth` (resolved to px) is
+    // enforced here: frozen widths never go below it.
+    const minimums = [...lead.cells].map((cell) => parseFloat(getComputedStyle(cell).minWidth) || 0);
+    const next = measured.map((width, index) =>
+      Math.max(width, previous?.[index] ?? 0, minimums[index] ?? 0),
+    );
+    let floor = 0;
     list.forEach((col, index) => {
-      if (col.dataset.grow !== "true") col.style.width = `${next[index]}px`;
+      const grows = col.dataset.grow === "true";
+      if (!grows) col.style.width = `${next[index]}px`;
+      floor += grows ? (minimums[index] ?? 0) : (next[index] ?? 0);
     });
     table.style.tableLayout = "fixed";
+    // A `grow` column takes the free width but never less than its `minWidth`: below that the
+    // table keeps its width and the container scrolls instead of cells overlapping.
+    table.style.minWidth = `${floor}px`;
     widths.current = next;
   };
 

@@ -390,8 +390,8 @@ export const api: ComponentApi = {
         {
           name: "grow",
           type: "boolean",
-          en: "Takes the free width and wraps its text; the table then fills its container.",
-          ru: "Забирает свободную ширину и переносит текст; таблица тогда заполняет контейнер.",
+          en: "Takes the free width and wraps its text; the table then fills its container. With `minWidth` it never gets narrower: below that the table scrolls instead of cells overlapping.",
+          ru: "Забирает свободную ширину и переносит текст; таблица тогда заполняет контейнер. С `minWidth` не становится уже: ниже этого таблица прокручивается, ячейки не наезжают.",
         },
         {
           name: "width · minWidth · maxWidth",

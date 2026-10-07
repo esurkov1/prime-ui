@@ -725,4 +725,34 @@ describe("DataTable CSS contract", () => {
     expect(col.style.width).toBe("120px");
     spy.mockRestore();
   });
+
+  it("frozen widths respect minWidth; a grow column keeps its minWidth as the table floor", () => {
+    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({
+          width: 50,
+          height: 20,
+          top: 0,
+          left: 0,
+          right: 50,
+          bottom: 20,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        }) as DOMRect,
+    );
+    const cols: DataTableColumn<Row>[] = [
+      { id: "name", header: "Name", accessor: "name", minWidth: "160px" },
+      { id: "score", header: "Score", accessor: "score", grow: true, minWidth: "240px" },
+    ];
+    const { container } = render(
+      <DataTable rows={rows} columns={cols} paging="none" pageSize={rows.length} />,
+    );
+    const table = container.querySelector("table") as HTMLTableElement;
+    const [nameCol, scoreCol] = container.querySelectorAll("colgroup col");
+    expect((nameCol as HTMLTableColElement).style.width).toBe("160px");
+    expect((scoreCol as HTMLTableColElement).style.width).toBe("");
+    expect(table.style.minWidth).toBe("400px");
+    spy.mockRestore();
+  });
 });
