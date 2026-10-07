@@ -121,8 +121,8 @@ export function Pagination({
               ) : (
                 <Button.Root
                   key={item}
-                  variant="ghost"
-                  tone="neutral"
+                  variant={item === current ? "soft" : "ghost"}
+                  tone={item === current ? "accent" : "neutral"}
                   size={size}
                   className={cx(styles.page, styles.pageItem)}
                   onClick={() => go(item)}

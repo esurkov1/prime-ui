@@ -220,8 +220,12 @@
   outline-offset: var(--prime-focus-offset);
 }
 
-/* Active navigation item when rendered via `asChild` (e.g. NavLink sets aria-current). */
-.root[aria-current="page"]:is([data-variant="ghost"], [data-variant="soft"]) {
+/* Current navigation item (e.g. NavLink sets aria-current): ghost / soft get the active fill.
+   Soft accent is already the selected look (foundation §8) and keeps it: a host marks "current"
+   with accent explicitly (Pagination). */
+.root[aria-current="page"]:is([data-variant="ghost"], [data-variant="soft"]):not(
+    [data-tone="accent"][data-variant="soft"]
+  ) {
   --btn-bg: var(--prime-color-fill-subtle-active);
   --btn-fg: var(--prime-color-text-primary);
 }

@@ -76,7 +76,7 @@ No ref. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
 | `ghost` + `neutral` | transparent, secondary text → primary on hover | toolbar buttons, icon-only buttons | |
 | `ghost` + `danger` | transparent, danger text, `danger-soft` on hover | destructive action set apart in a footer | |
 
-`outline` is the only variant with a visible line. With `asChild` and `aria-current="page"`, `ghost`/`soft` show the `fill-subtle-active` selected look.
+`outline` is the only variant with a visible line. With `aria-current="page"` (usually via `asChild` on a router link), `ghost`/`soft` show the `fill-subtle-active` selected look; soft accent keeps its own accent look, so a current item can be marked with accent explicitly (Pagination).
 
 ### size
 | Value | Looks like | Use when | Default |

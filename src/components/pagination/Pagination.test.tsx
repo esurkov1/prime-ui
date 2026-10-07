@@ -88,9 +88,22 @@ describe("Pagination", () => {
 
     const current = screen.getByRole("button", { name: "Страница 3" });
     expect(current).toHaveAttribute("aria-current", "page");
+    // The current page is accent (soft), the others neutral ghost.
+    expect(current).toHaveAttribute("data-tone", "accent");
+    expect(current).toHaveAttribute("data-variant", "soft");
 
     const other = screen.getByRole("button", { name: "Страница 2" });
     expect(other).not.toHaveAttribute("aria-current");
+    expect(other).toHaveAttribute("data-tone", "neutral");
+    expect(other).toHaveAttribute("data-variant", "ghost");
+  });
+
+  it("the Button's aria-current fill skips soft accent, so the current page stays accent", async () => {
+    const fs = await import("node:fs");
+    const css = fs.readFileSync("src/components/button/Button.module.css", "utf8");
+    expect(css).toMatch(
+      /\[aria-current="page"\][^{]*:not\(\s*\[data-tone="accent"\]\[data-variant="soft"\]\s*\)/,
+    );
   });
 
   it("renders nothing when totalPages is below 1", () => {
