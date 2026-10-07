@@ -51,23 +51,24 @@
   --pb-label-line-height: var(--prime-control-xl-label-line-height);
 }
 
-.root[data-tone="neutral"] {
+/* Tone of the whole bar (value mode) or of one part (segments mode). */
+:is(.root, .segment)[data-tone="neutral"] {
   --pb-fill: var(--prime-color-text-secondary);
 }
 
-.root[data-tone="success"] {
+:is(.root, .segment)[data-tone="success"] {
   --pb-fill: var(--prime-color-success-default);
 }
 
-.root[data-tone="warning"] {
+:is(.root, .segment)[data-tone="warning"] {
   --pb-fill: var(--prime-color-warning-default);
 }
 
-.root[data-tone="danger"] {
+:is(.root, .segment)[data-tone="danger"] {
   --pb-fill: var(--prime-color-danger-default);
 }
 
-.root[data-tone="info"] {
+:is(.root, .segment)[data-tone="info"] {
   --pb-fill: var(--prime-color-info-default);
 }
 
@@ -162,26 +163,6 @@
   transition:
     flex-grow var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
     background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
-}
-
-.segment[data-tone="neutral"] {
-  --pb-fill: var(--prime-color-text-secondary);
-}
-
-.segment[data-tone="success"] {
-  --pb-fill: var(--prime-color-success-default);
-}
-
-.segment[data-tone="warning"] {
-  --pb-fill: var(--prime-color-warning-default);
-}
-
-.segment[data-tone="danger"] {
-  --pb-fill: var(--prime-color-danger-default);
-}
-
-.segment[data-tone="info"] {
-  --pb-fill: var(--prime-color-info-default);
 }
 
 /* `hairline`: every part and the free rest are separate pills with a gap of ¾T. */

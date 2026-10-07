@@ -17,7 +17,7 @@ export const api: ComponentApi = {
         {
           name: "label",
           type: "string",
-          en: "Visible label above the line and its accessible name.",
+          en: "Visible label above the line and its accessible name; a value bar without it needs `aria-label`.",
           ru: "Видимая подпись над линией и доступное имя.",
         },
         {
