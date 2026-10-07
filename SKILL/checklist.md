@@ -23,7 +23,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## Text
 - [ ] Every text goes through a kit component or `Typography` with a role; no custom font sizes/weights.
 - [ ] One page title (`PageContent.Title`, `<h1>`); headings descend without skipping levels
-      (`Card.SectionTitle as="h2"` directly under the page title).
+      (`Card.Title as="h2"` directly under the page title).
 - [ ] Secondary text uses `tone="secondary"`/`"muted"`; numbers in tables and prices are tabular.
 - [ ] No filler copy, no emoji, no text that restates the heading.
 

@@ -60,7 +60,7 @@ Stepper.Root                 <ol>; current step; chevrons between horizontal ite
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type">` | — | `onClick` (runs first; `preventDefault()` stops the selection), `className` and the other button attributes. |
 
 ### Stepper.Indicator
-No ref. The circle (`aria-hidden`): the item number, or a check when completed.
+`ref` → `HTMLSpanElement`. The circle (`aria-hidden`): the item number, or a check when completed.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -68,25 +68,25 @@ No ref. The circle (`aria-hidden`): the item number, or a check when completed.
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ### Stepper.Content
-No ref. Text column for the title and the description.
+`ref` → `HTMLSpanElement`. Text column for the title and the description.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ### Stepper.Title · Stepper.Description
-No ref. Step title in the control text; muted secondary line in the hint text.
+`ref` → `HTMLSpanElement`. Step title in the control text; muted secondary line in the hint text.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ### Stepper.Arrow
-No ref. Trailing chevron (`aria-hidden`) for vertical items that open a page or panel.
+`ref` → `SVGSVGElement`. Trailing chevron (`aria-hidden`) for vertical items that open a page or panel.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. |
+| `…rest` | `Omit<SVGAttributes<SVGSVGElement>, "children">` | — | `className` and the other svg attributes. |
 
 ## Variants
 

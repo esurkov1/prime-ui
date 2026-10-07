@@ -38,17 +38,17 @@ export const api: ComponentApi = {
     },
     {
       name: "LoginForm.Header",
-      en: "No ref. `<header>` with the logo, title and description, laid out by Root `align`. Native props.",
+      en: "`ref` → `HTMLElement`. `<header>` with the logo, title and description, laid out by Root `align`. Native props.",
       props: [],
     },
     {
       name: "LoginForm.Logo",
-      en: "No ref. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label`. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label`. Native `<div>` props.",
       props: [],
     },
     {
       name: "LoginForm.Title",
-      en: "No ref. The heading (kit Typography, text role by the tier).",
+      en: "`ref` → `HTMLHeadingElement`. The heading (kit Typography, text role by the tier).",
       props: [
         {
           name: "as",
@@ -61,12 +61,12 @@ export const api: ComponentApi = {
     },
     {
       name: "LoginForm.Description",
-      en: "No ref. The secondary line under the title (kit Typography, secondary tone). Native `<p>` props.",
+      en: "`ref` → `HTMLParagraphElement`. The secondary line under the title (kit Typography, secondary tone). Native `<p>` props.",
       props: [],
     },
     {
       name: "LoginForm.Body",
-      en: "No ref. Everything under the header: provider buttons, divider, form, footer. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. Everything under the header: provider buttons, divider, form, footer. Native `<div>` props.",
       props: [],
     },
     {
@@ -76,12 +76,12 @@ export const api: ComponentApi = {
     },
     {
       name: "LoginForm.Actions",
-      en: "No ref. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action. Native `<div>` props.",
       props: [],
     },
     {
       name: "LoginForm.Footer",
-      en: "No ref. The secondary line with a `LinkButton` («Нет аккаунта? Зарегистрироваться»); follows Root `align`. Native `<p>` props.",
+      en: "`ref` → `HTMLParagraphElement`. The secondary line with a `LinkButton` («Нет аккаунта? Зарегистрироваться»); follows Root `align`. Native `<p>` props.",
       props: [],
     },
   ],

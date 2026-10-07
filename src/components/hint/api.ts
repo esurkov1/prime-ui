@@ -38,7 +38,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Hint.Icon",
-      en: "No ref. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line. + native `<span>` props.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line. + native `<span>` props.",
       ru: "Иконка в начале строки по центру первой линии; скрыта от скринридеров.",
       props: [],
     },

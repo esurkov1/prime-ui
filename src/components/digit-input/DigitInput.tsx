@@ -3,7 +3,12 @@ import * as React from "react";
 import { useControllableState } from "@/hooks/useControllableState";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import {
+  FieldFrame,
+  type FieldFrameProps,
+  type FieldRootDomProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
 
@@ -24,37 +29,38 @@ const DIGIT_INPUT_LABELS: DigitInputLabels = {
   optional: "необязательно",
 };
 
-export type DigitInputProps = FieldFrameProps & {
-  /** Number of cells. */
-  length?: number;
-  size?: ControlSize;
-  /**
-   * Cells share the container width and grow with it (height stays the tier height, so they become
-   * wider than tall). Default `false`: square cells of the tier size, centered.
-   */
-  fullWidth?: boolean;
-  /** Name of the hidden input that carries the joined code in a native form submit. */
-  name?: string;
-  /** Splits the cells into groups of this size with a wider gap between them (`3` → 123 456). */
-  groupSize?: number;
-  /** Hides the digits (PIN): cells are `type="password"`. */
-  mask?: boolean;
-  /** Focuses the first empty cell on mount. */
-  autoFocus?: boolean;
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  /** Called once when the last empty cell is filled. */
-  onComplete?: (value: string) => void;
-  disabled?: boolean;
-  /** Invalid state: danger ring on every cell. A non-empty `error` implies it. */
-  invalid?: boolean;
-  /** Id of the first cell (the label points at it); generated when omitted. */
-  id?: string;
-  "aria-describedby"?: string;
-  labels?: Partial<DigitInputLabels>;
-  className?: string;
-};
+export type DigitInputProps = FieldRootDomProps &
+  FieldFrameProps & {
+    /** Number of cells. */
+    length?: number;
+    size?: ControlSize;
+    /**
+     * Cells share the container width and grow with it (height stays the tier height, so they become
+     * wider than tall). Default `false`: square cells of the tier size, centered.
+     */
+    fullWidth?: boolean;
+    /** Name of the hidden input that carries the joined code in a native form submit. */
+    name?: string;
+    /** Splits the cells into groups of this size with a wider gap between them (`3` → 123 456). */
+    groupSize?: number;
+    /** Hides the digits (PIN): cells are `type="password"`. */
+    mask?: boolean;
+    /** Focuses the first empty cell on mount. */
+    autoFocus?: boolean;
+    value?: string;
+    defaultValue?: string;
+    onValueChange?: (value: string) => void;
+    /** Called once when the last empty cell is filled. */
+    onComplete?: (value: string) => void;
+    disabled?: boolean;
+    /** Invalid state: danger ring on every cell. A non-empty `error` implies it. */
+    invalid?: boolean;
+    /** Id of the first cell (the label points at it); generated when omitted. */
+    id?: string;
+    "aria-describedby"?: string;
+    labels?: Partial<DigitInputLabels>;
+    className?: string;
+  };
 
 const normalizeDigits = (raw: string, length: number) => raw.replace(/\D/g, "").slice(0, length);
 
@@ -85,6 +91,7 @@ export function DigitInput({
   "aria-describedby": ariaDescribedBy,
   labels: labelsProp,
   className,
+  ...rest
 }: DigitInputProps) {
   const labels = { ...DIGIT_INPUT_LABELS, ...labelsProp };
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
@@ -147,6 +154,7 @@ export function DigitInput({
 
   return (
     <FieldFrame
+      {...rest}
       size={size}
       ids={ids}
       label={label}

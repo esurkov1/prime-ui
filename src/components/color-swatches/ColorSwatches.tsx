@@ -3,7 +3,12 @@ import * as React from "react";
 import { COLOR_PRESETS, type ColorPreset } from "@/components/color-picker/ColorPresets";
 import { useControllableState } from "@/hooks/useControllableState";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import {
+  FieldFrame,
+  type FieldFrameProps,
+  type FieldRootDomProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import { gridIndex } from "@/internal/rovingFocus";
 import type { ControlSize } from "@/internal/states";
 import { markContrast, SwatchCheck, SwatchFill, sameColor, swatchClass } from "@/internal/swatch";
@@ -25,28 +30,29 @@ const COLOR_SWATCHES_LABELS: ColorSwatchesLabels = {
   optional: "необязательно",
 };
 
-export type ColorSwatchesProps = Omit<FieldFrameProps, "focusRing"> & {
-  /** Controlled color; `null` — no color. */
-  value?: string | null;
-  defaultValue?: string | null;
-  onValueChange?: (value: string | null) => void;
-  /** Swatches in order. Default: `COLOR_PRESETS` (16). */
-  presets?: readonly ColorPreset[];
-  /** Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = tier gap. */
-  size?: ControlSize;
-  disabled?: boolean;
-  invalid?: boolean;
-  /** Adds the "no color" swatch after the presets (value `null`). */
-  allowEmpty?: boolean;
-  /** Form field name: a hidden input submits the selected color (empty string for no color). */
-  name?: string;
-  id?: string;
-  className?: string;
-  "aria-label"?: string;
-  "aria-labelledby"?: string;
-  "aria-describedby"?: string;
-  labels?: Partial<ColorSwatchesLabels>;
-};
+export type ColorSwatchesProps = FieldRootDomProps &
+  Omit<FieldFrameProps, "focusRing"> & {
+    /** Controlled color; `null` — no color. */
+    value?: string | null;
+    defaultValue?: string | null;
+    onValueChange?: (value: string | null) => void;
+    /** Swatches in order. Default: `COLOR_PRESETS` (16). */
+    presets?: readonly ColorPreset[];
+    /** Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = tier gap. */
+    size?: ControlSize;
+    disabled?: boolean;
+    invalid?: boolean;
+    /** Adds the "no color" swatch after the presets (value `null`). */
+    allowEmpty?: boolean;
+    /** Form field name: a hidden input submits the selected color (empty string for no color). */
+    name?: string;
+    id?: string;
+    className?: string;
+    "aria-label"?: string;
+    "aria-labelledby"?: string;
+    "aria-describedby"?: string;
+    labels?: Partial<ColorSwatchesLabels>;
+  };
 
 /** Number of swatches in the first visual row (the swatches wrap to the container width). */
 function columnsOf(items: Array<HTMLElement | null>): number {
@@ -80,6 +86,7 @@ export function ColorSwatches({
   "aria-labelledby": ariaLabelledBy,
   "aria-describedby": ariaDescribedBy,
   labels: labelsProp,
+  ...rest
 }: ColorSwatchesProps) {
   const labels = { ...COLOR_SWATCHES_LABELS, ...labelsProp };
   const [value, setValue] = useControllableState<string | null>({
@@ -118,6 +125,7 @@ export function ColorSwatches({
 
   return (
     <FieldFrame
+      {...rest}
       size={size}
       ids={ids}
       label={label}

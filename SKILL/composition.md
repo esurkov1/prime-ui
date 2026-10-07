@@ -102,7 +102,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 |---|---|
 | page title | `PageContent.Title` (`heading-m`, the only `h1`) |
 | section heading without a card | `Typography as="h2" variant="title-m"` |
-| card / panel title | `Card.SectionTitle as="h2"` (under the page title) |
+| card / panel title | `Card.Title as="h2"` (under the page title) |
 | group heading inside a card or form | `Typography as="h3" variant="title-s"` |
 | body text, cells | `body-m` |
 | lead under a heading | `body-m` + `tone="secondary"` |
@@ -140,7 +140,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - **One primary per area** (page header, card, dialog, form): `solid`, last in its row. Secondary:
   `soft` + `tone="neutral"`. Dismiss / revert: `ghost` + `neutral` in pages and cards, `outline` +
   `neutral` in Modal / Drawer footers. Rare actions: a `Dropdown` behind an `action.more` icon button.
-- Placement: page actions in `PageContent.Actions`; card actions in `Card.Actions`; dialog actions in
+- Placement: page actions in `PageContent.Actions`; card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; bulk actions in the table toolbar.
 - An empty state's action replaces the header's primary, it does not duplicate it.
 - Destructive: `tone="danger"`; a standalone trigger is `outline`, in a menu it is the last item, the
@@ -157,7 +157,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   `title-s` heading 16 above its fields; no dividers between groups.
 - Form column width: one column up to ~65ch; never stretch a form across a wide panel.
 - Where: ≤ 4 fields → `Modal`; long create / edit → `Drawer` or a page; settings → a panel Card per
-  section, the whole `Card.Root` inside `<form>`, buttons in `Card.Actions`.
+  section, the whole `Card.Root` inside `<form>`, buttons in `Card.Footer`.
 - Submit: `noValidate`, validate all, set `error`s, focus the first invalid field, `loading` on the
   submit button and `disabled` on the fields (`<fieldset disabled>`), then a `Notification`.
 - A footer button outside the form submits it with `form={formId}`.
@@ -263,7 +263,8 @@ Rules for your own component:
 ### Worked example: a metric panel with a period switch
 
 The kit has the metric templates; the switch is a composition: `Card.Root variant="panel"` + a
-SegmentedControl in `Card.SectionTrailing`, one tier down because it sits in the card's header row.
+SegmentedControl right after `Card.Title` in `Card.Header`, one tier down because it sits in the card's
+header row.
 
 ```tsx
 import { Card, SegmentedControl, Typography } from "prime-ui-kit";
@@ -271,15 +272,13 @@ import { Card, SegmentedControl, Typography } from "prime-ui-kit";
 export function RevenuePanel() {
   return (
     <Card.Root variant="panel">
-      <Card.SectionHeader>
-        <Card.SectionTitle as="h2">Выручка</Card.SectionTitle>
-        <Card.SectionTrailing>
-          <SegmentedControl.Root size="s" defaultValue="month" aria-label="Период">
-            <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
-            <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
-          </SegmentedControl.Root>
-        </Card.SectionTrailing>
-      </Card.SectionHeader>
+      <Card.Header>
+        <Card.Title as="h2">Выручка</Card.Title>
+        <SegmentedControl.Root size="s" defaultValue="month" aria-label="Период">
+          <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+          <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
+        </SegmentedControl.Root>
+      </Card.Header>
       <Card.Body>
         <Typography as="p" variant="heading-m">
           ₽ 4,2 млн

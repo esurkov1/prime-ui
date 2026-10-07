@@ -113,7 +113,7 @@ export const api: ComponentApi = {
     },
     {
       name: "SegmentedControl.Icon",
-      en: "No ref. Decorative icon (`aria-hidden`) sized to the tier.",
+      en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) sized to the tier.",
       ru: "Декоративная иконка размера яруса.",
       props: [
         {
@@ -128,7 +128,7 @@ export const api: ComponentApi = {
     },
     {
       name: "SegmentedControl.Label",
-      en: "No ref. Segment title; truncates with an ellipsis. Plain text is wrapped automatically.",
+      en: "`ref` → `HTMLSpanElement`. Segment title; truncates with an ellipsis. Plain text is wrapped automatically.",
       ru: "Подпись сегмента; обрезается многоточием. Простой текст оборачивается сам.",
       props: [
         {
@@ -143,7 +143,7 @@ export const api: ComponentApi = {
     },
     {
       name: "SegmentedControl.Count",
-      en: "No ref. Counter `Badge` after the label, one tier below the control, tabular numbers.",
+      en: "`ref` → `HTMLSpanElement`. Counter `Badge` after the label, one tier below the control, tabular numbers.",
       ru: "Счётчик `Badge` после подписи, на ярус меньше.",
       props: [
         {
@@ -160,17 +160,12 @@ export const api: ComponentApi = {
           en: "The number.",
           ru: "Число.",
         },
-        {
-          name: "className",
-          type: "string",
-          en: "Extra class.",
-          ru: "Дополнительный класс.",
-        },
+        SPAN_REST,
       ],
     },
     {
       name: "SegmentedControl.Description",
-      en: "No ref. Muted second line; makes the segment two-line and becomes its `aria-describedby`.",
+      en: "`ref` → `HTMLSpanElement`. Muted second line; makes the segment two-line and becomes its `aria-describedby`.",
       ru: "Приглушённая вторая строка; делает сегмент двухстрочным и становится `aria-describedby`.",
       props: [
         {

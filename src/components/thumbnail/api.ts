@@ -93,7 +93,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Thumbnail.Fallback",
-      en: "A `<span>` with an icon (sized to the tier) or a short label on the fill; `aria-hidden` once the image has loaded.",
+      en: "`ref` → `HTMLSpanElement`. A `<span>` with an icon (sized to the tier) or a short label on the fill; `aria-hidden` once the image has loaded.",
       ru: "`<span>` с иконкой (размер по ярусу) или короткой подписью на заливке; `aria-hidden`, когда картинка загрузилась.",
       props: [
         {

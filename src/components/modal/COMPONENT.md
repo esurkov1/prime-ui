@@ -56,7 +56,7 @@ No DOM, no ref. State and dismiss policy.
 | `onEnterConfirm` | `(event: KeyboardEvent) => void` | — | Replaces the default Enter confirm. |
 
 ### Modal.Content
-No ref. Portal + scrim + `role="dialog"`; renders while open and during its exit animation. Controls inside get size `m`.
+`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"`; renders while open and during its exit animation. Controls inside get size `m`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -69,7 +69,7 @@ No ref. Portal + scrim + `role="dialog"`; renders while open and during its exit
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Modal.Header
-No ref. Renders `<header>`: [Icon] [Title + Description] [close button]. + native `HTMLAttributes<HTMLElement>`.
+`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [close button]. + native `HTMLAttributes<HTMLElement>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -77,22 +77,22 @@ No ref. Renders `<header>`: [Icon] [Title + Description] [close button]. + nativ
 | `children` | `ReactNode` | — | Icon, Title, Description in any order; the icon goes to the leading slot. |
 
 ### Modal.Icon
-No ref. An `aria-hidden` 40 px tile with a tone fill.
+`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color. |
 | `children` | `ReactNode` | — (required) | Icon glyph (sized to the m icon). |
-| `className` | `string` | — | Extra class on the tile. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Modal.Title · Modal.Description
-No ref. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.
+`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.
 
 ### Modal.Body
-No ref. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.
+`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.
 
 ### Modal.Footer
-No ref. Renders `<footer>` with the actions, primary last. + native `HTMLAttributes<HTMLElement>`.
+`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last. + native `HTMLAttributes<HTMLElement>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

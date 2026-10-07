@@ -119,8 +119,9 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
   context, so a sized host (LoginForm, Popover, Banner) sizes its kit children. A control nested inside
   another control's row (a checkbox look in a Select option) is one tier smaller.
 - Every part that renders DOM accepts `className`, its native attributes and `ref` (React 19 ref as a
-  prop, or `forwardRef`). `displayName` is `X.Part`; behaviour never depends on `displayName` (compare
-  element types).
+  prop, or `forwardRef`); an internal ref is merged with the consumer's. A new part gets a row in
+  `src/test/part-refs.test.tsx`. Only slots and state-only roots (`Modal.Root`, `Popover.Root`…) have
+  no ref. `displayName` is `X.Part`; behaviour never depends on `displayName` (compare element types).
 - Support row: `hint` / `error` are props on every component that has one (not `Hint` / `Error` parts).
 - `labels` holds system strings and default texts (aria labels, announcements, empty texts, counters,
   default placeholders) with Russian defaults; a per-instance visible text is a prop or children.
@@ -143,7 +144,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a separator | `Divider` |
 | a scroll region (thin bar, edge fade, hidden bar) | `ScrollContainer` (`axis`, `fade`, `scrollbar="hidden"`) |
 | an empty result | `EmptyPage` (`layout="compact"` inside menus and lists) |
-| a field label / support row / counter | `Label`, `Hint`, `src/internal/FieldFrame` (`useFieldFrame`, `counter`, `reserveSupportRow`, `group` for a labelled group) |
+| a field label / support row / counter | `Label`, `Hint`, `src/internal/FieldFrame` (`useFieldFrame`, `counter`, `reserveSupportRow`, `group` for a labelled group; `FieldRootDomProps` — a field root's `ref` and native attributes go to the frame, `id` to the control; shared api rows in `src/internal/field.api.ts`) |
 | a checkbox / radio / switch row (control + text + support) | `src/internal/ChoiceField` |
 | a colour swatch (fill, checkerboard, check) | `src/internal/swatch` |
 | menu / listbox rows, a floating panel | `src/internal/menu.module.css`, `floatingSurface.module.css`, `listbox.ts` (listbox keyboard) |

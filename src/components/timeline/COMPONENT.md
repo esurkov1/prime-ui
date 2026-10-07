@@ -69,14 +69,14 @@ Timeline.Root                    size container, sets the tier
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children" \| "color" \| "onClick">` | — | `children` (Title, Meta, Value), `className` and the other row attributes. |
 
 ### Timeline.Title · Timeline.Meta · Timeline.MetaPrimary
-`<span>` lines: the event (medium, accent on the highlighted row, wraps), the muted date line with tabular numbers, and its emphasized part.
+`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps), the muted date line with tabular numbers, and its emphasized part.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Timeline.Value · Timeline.ValueMeta
-`<span>`: the trailing amount (right-aligned, tabular) and a muted second line under it. Moves under the meta below 20rem.
+`ref` → `HTMLSpanElement`. `<span>`: the trailing amount (right-aligned, tabular) and a muted second line under it. Moves under the meta below 20rem.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

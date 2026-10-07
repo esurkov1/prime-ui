@@ -1,18 +1,10 @@
 import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
 
-const divRest: ApiProp = {
+const rest: ApiProp = {
   name: "…rest",
   type: "HTMLAttributes<HTMLElement>",
   en: "`children`, `className` and the other attributes of the element.",
   ru: "`children`, `className` и остальные атрибуты элемента.",
-};
-
-const headingAs: ApiProp = {
-  name: "as",
-  type: '"h2" | "h3" | "h4"',
-  default: '"h3"',
-  en: "Heading level that fits the page outline; the look does not change.",
-  ru: "Уровень заголовка по структуре страницы; вид не меняется.",
 };
 
 export const api: ComponentApi = {
@@ -45,30 +37,60 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Card.SectionHeader · Card.SectionTitle · Card.SectionTrailing",
-      en: "`panel` and `list` header: a row with a faint hairline below, the title (`<h3>`) and a trailing slot for controls.",
-      ru: "Шапка `panel` и `list`: ряд с тонкой линией снизу, заголовок (`<h3>`) и слот справа для контролов.",
-      props: [
-        { ...headingAs, en: `SectionTitle: ${headingAs.en}`, ru: `SectionTitle: ${headingAs.ru}` },
-        divRest,
-      ],
-    },
-    {
-      name: "Card.Body · Card.Actions · Card.Chart",
-      en: "`panel` zones: the padded body (gap 16), the right-aligned footer row of buttons with a hairline above, and an edge-to-edge chart slot.",
-      ru: "Зоны `panel`: тело с отступами (gap 16), ряд кнопок справа с линией сверху и слот графика от края до края.",
-      props: [divRest],
+      name: "Card.Header",
+      en: "`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. In `panel` and `list` it is a padded zone with a faint hairline below; in `metric` it pairs a leading badge or icon with the `Card.Value`. Wraps below 22rem.",
+      ru: "Верхний ряд: сначала `Card.Title`, всё после него (контрол, тихая подпись) — в конце. В `panel` и `list` — зона с отступами и тонкой линией снизу; в `metric` — бейдж или иконка слева и `Card.Value` справа. Уже 22rem переносится.",
+      props: [rest],
     },
     {
       name: "Card.Title",
-      en: "The title of the `cta`, `list` and `cover` templates (`<h3>`, title-m).",
-      ru: "Заголовок шаблонов `cta`, `list` и `cover` (`<h3>`, title-m).",
-      props: [headingAs, divRest],
+      en: "`ref` → `HTMLHeadingElement`. The card heading (`<h3>`, title-s; title-m in `cta`).",
+      ru: "Заголовок карточки (`<h3>`, title-s; в `cta` — title-m).",
+      props: [
+        {
+          name: "as",
+          type: '"h2" | "h3" | "h4"',
+          default: '"h3"',
+          en: "Heading level that fits the page outline; the look does not change.",
+          ru: "Уровень заголовка по структуре страницы; вид не меняется.",
+        },
+        rest,
+      ],
     },
     {
-      name: "Card.Label · Card.Value · Card.Description · Card.Delta",
-      en: "Metric text: the label (body-s), the value (sized by the template and the card width), a description and the change.",
-      ru: "Текст метрики: подпись (body-s), значение (размер по шаблону и ширине карточки), описание и изменение.",
+      name: "Card.Description",
+      en: "`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s, wraps): under the title of `cta` and `cover`, under the header of `metric`.",
+      ru: "Вторичный текст (`<p>`, body-s, переносится): под заголовком `cta` и `cover`, под шапкой `metric`.",
+      props: [rest],
+    },
+    {
+      name: "Card.Body",
+      en: "`ref` → `HTMLDivElement`. The padded content zone (gap 16). In `split` it is the two-cell grid: each child is a cell (stacked below 22rem); in `cover` it holds the title and the description 4 apart.",
+      ru: "Зона содержимого с отступами (gap 16). В `split` — сетка из двух ячеек: каждый дочерний элемент — ячейка (столбиком уже 22rem); в `cover` — заголовок и описание через 4.",
+      props: [rest],
+    },
+    {
+      name: "Card.Media",
+      en: "`ref` → `HTMLDivElement`. A chart, an image or a gauge: edge to edge under the header or the body in `panel`, the 128–192px cover on top in `cover`, the full-width bottom slot in `mini-media`. A chart SVG needs a CSS height.",
+      ru: "График, картинка или шкала: от края до края под шапкой или телом в `panel`, обложка 128–192px сверху в `cover`, нижний слот на всю ширину в `mini-media`. SVG графика нужна высота в CSS.",
+      props: [rest],
+    },
+    {
+      name: "Card.Footer",
+      en: "`ref` → `HTMLDivElement`. The bottom row of buttons, wrapping: right-aligned under a faint hairline in `panel` and `list`, under a full-width hairline in `cta`.",
+      ru: "Нижний ряд кнопок с переносом: справа под тонкой линией в `panel` и `list`, под линией во всю ширину в `cta`.",
+      props: [rest],
+    },
+    {
+      name: "Card.Icon",
+      en: "`ref` → `HTMLDivElement`. The 40px accent tile of a KPI holding one icon; it spans the label and the value rows in `mini`, `mini-media` and a `split` cell.",
+      ru: "Плашка 40px с акцентом для одной иконки KPI; в `mini`, `mini-media` и ячейке `split` занимает высоту подписи и значения.",
+      props: [rest],
+    },
+    {
+      name: "Card.Label · Card.Value · Card.Delta",
+      en: "`ref` → `HTMLSpanElement`. Metric text: the label (body-s, truncates), the value (tabular, sized by the template and the card width) and the change.",
+      ru: "Текст метрики: подпись (body-s, обрезается), значение (табличные цифры, размер по шаблону и ширине карточки) и изменение.",
       props: [
         {
           name: "tone",
@@ -77,20 +99,14 @@ export const api: ComponentApi = {
           en: "Delta: color by meaning, not by sign (churn up is `danger`).",
           ru: "Delta: цвет по смыслу, а не по знаку (рост оттока — `danger`).",
         },
-        divRest,
+        rest,
       ],
     },
     {
-      name: "Card.IconBox · Card.Stack · Card.HeaderRow · Card.Media",
-      en: "Template layout parts: the 40px accent icon tile, the label + value column, the `metric` header row (a leading badge or icon, the value at the end), and the bottom media slot of `mini-media`.",
-      ru: "Части раскладки шаблонов: плашка иконки 40px, колонка подписи и значения, ряд шапки `metric` (бейдж или иконка слева, значение справа) и нижний слот `mini-media`.",
-      props: [divRest],
-    },
-    {
-      name: "Card.Cover · Card.Split · Card.List · Card.ListItem",
-      en: "Template parts: the `cover` media, the `split` grid whose two children are the cells (stacked below 22rem), and the `list` `<ul>` / `<li>` items with faint hairlines (head it with `Card.SectionHeader`).",
-      ru: "Части шаблонов: обложка `cover`, сетка `split` — её два дочерних элемента и есть ячейки (столбиком уже 22rem), пункты `list` `<ul>` / `<li>` с тонкими линиями (шапка — `Card.SectionHeader`).",
-      props: [divRest],
+      name: "Card.List · Card.ListItem",
+      en: "`ref` → `HTMLUListElement` / `HTMLLIElement`. The `list` template: a `<ul>` of `<li>` rows with faint hairlines between them; head it with `Card.Header`.",
+      ru: "Шаблон `list`: `<ul>` из строк `<li>` с тонкими линиями между ними; шапка — `Card.Header`.",
+      props: [rest],
     },
   ],
   labels: [],

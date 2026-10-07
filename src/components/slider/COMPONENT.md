@@ -38,7 +38,7 @@ Slider
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Slider
-No ref (renders a `<div>`). The label row with the value, then a native `<input type="range">` (transparent, on top) over the visual track, fill and thumb.
+`ref` → `HTMLDivElement`. The label row with the value, then a native `<input type="range">` (transparent, on top) over the visual track, fill and thumb.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -55,7 +55,7 @@ No ref (renders a `<div>`). The label row with the value, then a native `<input 
 | `showValue` | `boolean` | `false` | Shows the current value at the end of the label row (tabular numbers, `aria-hidden` — the input announces it). |
 | `formatValue` | `(value: number) => string` | — | Formats the shown value and `aria-valuetext` (units, currency). |
 | `aria-label` | `string` | — | Accessible name when there is no visible `label`. |
-| `className` | `string` | — | Class on the root `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `style` and the other attributes of the root `<div>`; `aria-label` goes to the input. |
 
 ## Variants
 No `variant` / `color`.

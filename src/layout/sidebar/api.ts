@@ -94,7 +94,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Header · Sidebar.Footer",
-      en: "No ref. Header: one fixed-height row for `Sidebar.Brand` and the header Toggle. Footer: items, the item Toggle and `Sidebar.Account` (set apart by air) at the bottom.",
+      en: "`ref` → `HTMLDivElement`. Header: one fixed-height row for `Sidebar.Brand` and the header Toggle. Footer: items, the item Toggle and `Sidebar.Account` (set apart by air) at the bottom.",
       ru: "Header — строка фиксированной высоты для `Sidebar.Brand` и Toggle в шапке. Footer — пункты, Toggle-пункт и `Sidebar.Account` (отделён воздухом) внизу.",
       props: [DIV_REST],
     },
@@ -138,7 +138,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.BrandLogo",
-      en: "No ref. The product mark (`aria-hidden`): a square of the item height − 8 (at most 32) on the icon axis in every mode; its child fills it.",
+      en: "`ref` → `HTMLSpanElement`. The product mark (`aria-hidden`): a square of the item height − 8 (at most 32) on the icon axis in every mode; its child fills it.",
       ru: "Знак продукта: квадрат высотой пункта − 8 (не больше 32) на оси иконок в любом режиме; дочерний элемент заполняет его.",
       props: [
         {
@@ -171,7 +171,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Group",
-      en: 'No ref. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail headings fold and the items always show.',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail headings fold and the items always show.',
       ru: '`<div role="group">`, названная своей подписью. С `collapsible` заголовок — кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце; пункты сворачиваются (inert). В компактном рельсе заголовков нет, пункты видны всегда.',
       props: [
         {
@@ -251,7 +251,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.ItemIcon",
-      en: 'No ref. An icon (`aria-hidden`). Before the label it leads and stays on the icon axis in every mode; after the label it is a quiet trailing glyph (`data-edge="end"`, 14, muted), e.g. ↗ for an external link, hidden in compact mode.',
+      en: '`ref` → `HTMLSpanElement`. An icon (`aria-hidden`). Before the label it leads and stays on the icon axis in every mode; after the label it is a quiet trailing glyph (`data-edge="end"`, 14, muted), e.g. ↗ for an external link, hidden in compact mode.',
       ru: "Иконка. До подписи — ведущая, на оси иконок в любом режиме; после подписи — тихий знак в конце (14, приглушённый), например ↗ у внешней ссылки; в компактном режиме скрыт.",
       props: [
         {
@@ -271,7 +271,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.ItemCount",
-      en: "No ref. A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon.",
+      en: "`ref` → `HTMLSpanElement` (the number or the Badge). A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon.",
       ru: "Счётчик после подписи: по умолчанию простое приглушённое число; `Badge` (на ярус меньше), когда задан `color` или `variant`. В компактном режиме число уходит из строки (остаётся для скринридеров), а бейдж оставляет на иконке точку своего цвета.",
       props: [
         {
@@ -294,16 +294,16 @@ export const api: ComponentApi = {
           ru: "Подача бейджа; `soft`, если задан только `color`.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the number or the Badge.",
-          ru: "Дополнительный класс на числе или Badge.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children" | "color">',
+          en: "`className` and the other attributes of the number or the Badge.",
+          ru: "`className` и остальные атрибуты числа или Badge.",
         },
       ],
     },
     {
       name: "Sidebar.ItemShortcut",
-      en: "No ref. Key hint at the end (`aria-hidden`); hidden in compact mode.",
+      en: "`ref` → `HTMLSpanElement`. Key hint at the end (`aria-hidden`); hidden in compact mode.",
       ru: "Подсказка клавиш в конце; скрыта в компактном режиме.",
       props: [
         {
@@ -314,16 +314,16 @@ export const api: ComponentApi = {
           ru: "Подсказка клавиш, например `<Kbd>⌘K</Kbd>`.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class.",
-          ru: "Дополнительный класс.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
         },
       ],
     },
     {
       name: "Sidebar.ItemAction",
-      en: "No ref. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row while the trail (count, hint) steps aside; hidden on the compact rail.",
+      en: "`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row while the trail (count, hint) steps aside; hidden on the compact rail.",
       ru: "Действие в строке (создать, добавить): призрачная кнопка-иконка `Button` на ярус меньше с подсказкой, рядом с элементом пункта — не внутри. Появляется при наведении и фокусе строки, счётчик отодвигается; в компактном рельсе скрыто.",
       props: [
         {
@@ -353,16 +353,16 @@ export const api: ComponentApi = {
           ru: 'Знак; по умолчанию `<Icon name="action.add" />`.',
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the Button.",
-          ru: "Дополнительный класс на Button.",
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "onClick" | "aria-label">',
+          en: "`className` and the other attributes of the Button.",
+          ru: "`className` и остальные атрибуты Button.",
         },
       ],
     },
     {
       name: "Sidebar.Sub",
-      en: "No ref. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover, to the right). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`).",
+      en: "`ref` → `HTMLDivElement`. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover, to the right). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`).",
       ru: "Родительский пункт с дочерними: `Sidebar.SubTrigger` + `Sidebar.SubContent` в `<div>`. В развёрнутом режиме дочерние раскрываются под родителем на направляющей линии; в компактном рельсе — во всплывающей панели справа (Popover из кита). Текущий дочерний раскрывает список и отмечает родителя как путь к текущей странице (`data-active-path`).",
       props: [
         ...OPEN_TRIAD({ en: "Children", ru: "Дочерние пункты" }),
@@ -397,7 +397,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.SubContent",
-      en: 'No ref. `<div role="group">` named by the trigger: the child `Sidebar.Item`s on a faint guide line under the parent icon, labels aligned with the parent label. Height animates; closed content is inert. On the compact rail the same children render in the flyout.',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by the trigger: the child `Sidebar.Item`s on a faint guide line under the parent icon, labels aligned with the parent label. Height animates; closed content is inert. On the compact rail the same children render in the flyout.',
       ru: '`<div role="group">`, названная родителем: дочерние `Sidebar.Item` на тонкой направляющей под иконкой родителя, подписи выровнены по подписи родителя. Высота анимируется; свёрнутое содержимое inert. В компактном рельсе те же пункты рендерятся во всплывающей панели.',
       props: [
         {

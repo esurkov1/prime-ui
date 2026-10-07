@@ -377,6 +377,7 @@ SegmentedControlItem.displayName = "SegmentedControl.Item";
 export type SegmentedControlIconProps = {
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 function SegmentedControlIcon({ children, className, ...rest }: SegmentedControlIconProps) {
@@ -394,6 +395,7 @@ SegmentedControlIcon.displayName = "SegmentedControl.Icon";
 export type SegmentedControlLabelProps = {
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 /** Segment title; truncates with an ellipsis. Plain text children are wrapped automatically. */
@@ -416,6 +418,7 @@ export type SegmentedControlDescriptionProps = {
   /** Muted second line; wrap the key value in `<strong>` to emphasize it. */
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 /** Second line of a two-line segment; becomes the segment's accessible description. */
@@ -440,11 +443,14 @@ SegmentedControlDescription.displayName = "SegmentedControl.Description";
 
 // ─── Count ────────────────────────────────────────────────────────────────────
 
-export type SegmentedControlCountProps = {
+export type SegmentedControlCountProps = Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  "children" | "color"
+> & {
   /** Badge hue. Default `gray`. */
   color?: PaletteColor;
   children: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Counter after the label: a soft Badge one tier below the control. */
@@ -452,10 +458,12 @@ function SegmentedControlCount({
   color = "gray",
   children,
   className,
+  ...rest
 }: SegmentedControlCountProps) {
   const parts = React.useContext(ItemPartsContext);
   return (
     <Badge.Root
+      {...rest}
       id={parts ? `${parts.itemId}-count` : undefined}
       color={color}
       className={cx(styles.count, className)}

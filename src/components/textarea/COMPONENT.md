@@ -54,13 +54,13 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `…rest` | `Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size" \| "children">` | — | `value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `name`, `disabled`, `readOnly`, `aria-label`… |
 
 ### Textarea.Counter
-No ref. Character counter for the support row; shows `14/280` and announces `labels.counter`.
+`ref` → `HTMLSpanElement`. Character counter for the support row; shows `14/280` and announces `labels.counter`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `current` | `number` | — (required) | Current length. |
 | `max` | `number` | — (required) | Limit; `current > max` turns the counter danger (`data-invalid="true"`). Add `maxLength` on the root for a hard limit. |
-| `className` | `string` | — | Class on the `<span>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ## Variants
 Textarea has no `variant` or `tone`: one field treatment (fill, no visible border).

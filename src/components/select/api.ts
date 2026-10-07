@@ -1,10 +1,18 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_ROOT_REST } from "../../internal/field.api";
+
+const spanRest: ApiProp = {
+  name: "…rest",
+  type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+  en: "`className` and the other span attributes.",
+  ru: "`className` и остальные атрибуты span.",
+};
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Select.Root",
-      en: "No ref. The field frame (label row · control · support row) holding the value, the open state and the search query.",
+      en: "`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query.",
       ru: "Поле целиком: подпись, контрол, строка поддержки; хранит значение, открытие и поиск.",
       props: [
         {
@@ -143,18 +151,13 @@ export const api: ComponentApi = {
           ru: "Системные строки, см. «Доступность».",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the field frame.",
-          ru: "Класс обёртки поля.",
-        },
-        {
           name: "children",
           type: "ReactNode",
           required: true,
           en: "Trigger and Content.",
           ru: "Trigger и Content.",
         },
+        FIELD_ROOT_REST,
       ],
     },
     {
@@ -172,7 +175,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Value",
-      en: "No ref. The picked label (labels joined with `multiple`) with an ellipsis, or the placeholder.",
+      en: "`ref` → `HTMLSpanElement`. The picked label (labels joined with `multiple`) with an ellipsis, or the placeholder.",
       ru: "Выбранная подпись (через запятую при `multiple`) или плейсхолдер.",
       props: [
         {
@@ -181,23 +184,18 @@ export const api: ComponentApi = {
           en: "Single mode: draws the picked option in the trigger with the row parts (Thumbnail, ItemText, ItemDescription); not called while empty.",
           ru: "Одиночный выбор: рисует выбранный пункт в триггере частями строки; без значения не вызывается.",
         },
-        {
-          name: "className",
-          type: "string",
-          en: "Class on the value.",
-          ru: "Класс значения.",
-        },
+        spanRest,
       ],
     },
     {
       name: "Select.TriggerIcon · Select.ItemIcon",
-      en: "No ref. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.",
       ru: "Иконка в начале триггера / пункта по размеру яруса; скрыта от скринридеров.",
       props: [],
     },
     {
       name: "Select.Content",
-      en: 'No ref. Portal + the floating list panel; stays mounted while closed (the items register their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.',
+      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel; stays mounted while closed (the items register their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.',
       ru: "Портал и панель списка; смонтирована и в закрытом виде, чтобы триггер знал подписи.",
       props: [
         {
@@ -208,17 +206,17 @@ export const api: ComponentApi = {
           ru: "Поле поиска сверху; пункты фильтруются по подписи, описанию и `keywords`.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the panel.",
-          ru: "Класс панели.",
-        },
-        {
           name: "children",
           type: "ReactNode",
           required: true,
           en: "Items, groups, separators.",
           ru: "Пункты, группы, разделители.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "hidden" | "onKeyDown" | "onAnimationEnd">',
+          en: "`className` and the other attributes of the panel.",
+          ru: "`className` и остальные атрибуты панели.",
         },
       ],
     },
@@ -264,13 +262,13 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.ItemText · Select.ItemDescription · Select.ItemMeta",
-      en: "No ref. Rich option parts: the title (its text is the label) / a muted second line (searchable; makes the row two-line) / a trailing muted value before the check. A `Thumbnail.Root` child is the leading media, sized to the tier unless it sets `size`.",
+      en: "`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line (searchable; makes the row two-line) / a trailing muted value before the check. A `Thumbnail.Root` child is the leading media, sized to the tier unless it sets `size`. + native `<span>` props.",
       ru: "Части богатого пункта: заголовок, вторая строка, значение справа; Thumbnail слева.",
       props: [],
     },
     {
       name: "Select.Group",
-      en: 'No ref. `<div role="group">` named by its `label`; hidden while the search leaves none of its options. + native `<div>` props.',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while the search leaves none of its options. + native `<div>` props.',
       ru: "Группа пунктов с подписью; скрывается, если поиск не оставил в ней пунктов.",
       props: [
         {
@@ -283,14 +281,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Separator",
-      en: "No ref. A full-bleed Divider between groups; hidden while searching.",
+      en: "`ref` → `HTMLDivElement`. A full-bleed Divider between groups; hidden while searching.",
       ru: "Разделитель на всю ширину; скрыт во время поиска.",
       props: [
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the divider.",
-          ru: "Дополнительный класс разделителя.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the divider.",
+          ru: "`className` и остальные атрибуты разделителя.",
         },
       ],
     },

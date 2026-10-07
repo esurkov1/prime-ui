@@ -152,14 +152,14 @@ export default function SettingsPagePattern() {
                   />
                 </div>
               </Card.Body>
-              <Card.Actions>
+              <Card.Footer>
                 <Button.Root type="reset" variant="ghost" tone="neutral" disabled={saving}>
                   Отменить изменения
                 </Button.Root>
                 <Button.Root type="submit" loading={saving}>
                   Сохранить
                 </Button.Root>
-              </Card.Actions>
+              </Card.Footer>
             </Card.Root>
           </form>
         </section>

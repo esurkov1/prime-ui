@@ -68,7 +68,7 @@ prime-ui-kit is built to be used by coding agents (Claude Code, Cursor, Codex, â
   composition, page recipes, anti-slop rules and a review checklist â€” field-tested on real screens.
 - **Docs contract test** keeps docs, examples and the playground from drifting apart.
 - Kit fixes: `Popover.Trigger` keeps the child's `id` (field labels work for Datepicker and
-  ColorPresets), `Card.Title` / `Card.SectionTitle` take `as` for the heading level, FileUpload `solid`
+  ColorPresets), `Card.Title` takes `as` for the heading level, FileUpload `solid`
   keeps no outline on hover, more prop types exported.
 
 ## Install

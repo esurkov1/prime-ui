@@ -153,9 +153,9 @@ export default function DetailPagePattern() {
           </section>
           <aside className={styles.aside} aria-label="Клиент и история">
             <Card.Root variant="panel">
-              <Card.SectionHeader>
-                <Card.SectionTitle as="h2">Клиент</Card.SectionTitle>
-              </Card.SectionHeader>
+              <Card.Header>
+                <Card.Title as="h2">Клиент</Card.Title>
+              </Card.Header>
               <Card.Body>
                 <div className={styles.client}>
                   <span className={styles.person}>
@@ -201,9 +201,9 @@ export default function DetailPagePattern() {
               </Card.Body>
             </Card.Root>
             <Card.Root variant="panel">
-              <Card.SectionHeader>
-                <Card.SectionTitle as="h2">История</Card.SectionTitle>
-              </Card.SectionHeader>
+              <Card.Header>
+                <Card.Title as="h2">История</Card.Title>
+              </Card.Header>
               <Card.Body>
                 <Timeline.Root highlight="current">
                   {HISTORY.map((event) => (

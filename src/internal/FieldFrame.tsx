@@ -28,6 +28,17 @@ export type FieldFrameProps = {
   focusRing?: boolean;
 };
 
+/**
+ * Native attributes and `ref` of a framed field's root — they land on the frame `<div>`. `id`
+ * belongs to the control, the value props to the field.
+ */
+export type FieldRootDomProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "id" | "children" | "className" | "defaultValue" | "defaultChecked" | "onChange"
+> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
 export function hasFieldError(error: React.ReactNode): boolean {
   return error != null && error !== false && error !== "";
 }
@@ -85,7 +96,9 @@ type FieldFrameRenderProps = FieldFrameProps & {
   reserveSupportRow?: boolean;
   className?: string;
   children: React.ReactNode;
-};
+  /** The outer `<div>`: the host part's ref and native attributes land here. */
+  ref?: React.Ref<HTMLDivElement>;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "className">;
 
 /**
  * Label row · control · support row (hint | error on the left, an optional counter on the right),
@@ -106,6 +119,7 @@ export function FieldFrame({
   reserveSupportRow = false,
   className,
   children,
+  ...rest
 }: FieldFrameRenderProps) {
   const showError = hasFieldError(error);
   const showHint = !showError && hint != null && hint !== false && hint !== "";
@@ -113,6 +127,7 @@ export function FieldFrame({
 
   return (
     <div
+      {...rest}
       className={cx(styles.root, className)}
       {...toDataAttributes({
         size,
@@ -165,19 +180,20 @@ export function FieldFrame({
   );
 }
 
-type FieldCounterProps = {
+type FieldCounterProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   current: number;
   max: number;
   size: ControlSize;
   /** Spoken text, a `{current}` / `{max}` template. */
   label: string;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** `14/40` for the eye, `labels.counter` for screen readers; danger when `current > max`. */
-export function FieldCounter({ current, max, size, label, className }: FieldCounterProps) {
+export function FieldCounter({ current, max, size, label, className, ...rest }: FieldCounterProps) {
   return (
     <span
+      {...rest}
       className={cx(styles.counter, className)}
       data-size={size}
       data-invalid={current > max || undefined}

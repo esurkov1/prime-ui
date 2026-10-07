@@ -101,7 +101,7 @@ export function dialogParts(name: "Modal" | "Drawer", footerDefault: string): Ap
   return [
     {
       name: `${name}.Header`,
-      en: "No ref. Renders `<header>`: [Icon] [Title + Description] [close button]. + native `HTMLAttributes<HTMLElement>`.",
+      en: "`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [close button]. + native `HTMLAttributes<HTMLElement>`.",
       props: [
         {
           name: "showClose",
@@ -120,7 +120,7 @@ export function dialogParts(name: "Modal" | "Drawer", footerDefault: string): Ap
     },
     {
       name: `${name}.Icon`,
-      en: "No ref. An `aria-hidden` 40 px tile with a tone fill.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill.",
       props: [
         {
           name: "tone",
@@ -137,26 +137,26 @@ export function dialogParts(name: "Modal" | "Drawer", footerDefault: string): Ap
           ru: "Иконка 20 px.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Extra class on the tile.",
-          ru: "Дополнительный класс плашки.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes of the tile.",
+          ru: "`className` и остальные атрибуты плашки.",
         },
       ],
     },
     {
       name: `${name}.Title · ${name}.Description`,
-      en: "No ref. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.",
+      en: "`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.",
       props: [],
     },
     {
       name: `${name}.Body`,
-      en: "No ref. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.",
       props: [],
     },
     {
       name: `${name}.Footer`,
-      en: "No ref. Renders `<footer>` with the actions, primary last. + native `HTMLAttributes<HTMLElement>`.",
+      en: "`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last. + native `HTMLAttributes<HTMLElement>`.",
       props: [
         {
           name: "layout",

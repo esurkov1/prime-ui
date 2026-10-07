@@ -41,7 +41,7 @@ DataTable is a single component: columns are data (`DataTableColumn<Row>[]`), no
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### DataTable
-Generic over `Row`; no ref, no native props besides `className`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.
+Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -90,7 +90,7 @@ Generic over `Row`; no ref, no native props besides `className`. A card-fill blo
 | `highlightColumnOnHover` | `boolean` | `false` | Column wash under the pointer (head and cells). |
 | `onRowClick` | `(row: Row, index: number, event: MouseEvent<HTMLTableRowElement>) => void` | — | Row click; rows get a pointer cursor. |
 | `labels` | `Partial<DataTableLabels>` | — | Built-in strings, see Labels. |
-| `className` | `string` | — | Class on the root. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the root `<div>`. |
 
 ### DataTableColumn<Row>
 One column of `columns`: data, not a part.

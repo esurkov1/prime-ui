@@ -68,23 +68,23 @@ The built-in body (icon, `labels.title`, `labels.description` and a decorative s
 | `className` | `string` | — | Class on the drop zone `<label>` (e.g. a round avatar zone). |
 
 ### FileUpload.Body
-No ref. A centered column for a custom zone body; it takes no pointer events (no drag flicker), nested buttons and links opt back in. Native `<div>` props.
+`ref` → `HTMLDivElement`. A centered column for a custom zone body; it takes no pointer events (no drag flicker), nested buttons and links opt back in. Native `<div>` props.
 
 ### FileUpload.Icon
-No ref. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid. Native `<span>` props.
+`ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid. Native `<span>` props.
 
 ### FileUpload.Title
-No ref. The zone title `<p>`. Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The zone title `<p>`. Native `<p>` props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"default" \| "muted"` | `"default"` | `muted` — secondary color, regular weight (an instruction line in custom bodies). |
 
 ### FileUpload.Description
-No ref. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.
 
 ### FileUpload.Item
-No ref. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.
+`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -92,25 +92,25 @@ No ref. A file row: format badge · name over description · actions, then the p
 | `invalid` | `boolean` | `false` | A failed upload: danger wash and ring, danger description. |
 
 ### FileUpload.FormatBadge
-No ref. The file format as a square kit Badge of the row tier (`aria-hidden`: the name carries the extension).
+`ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the name carries the extension).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `format` | `string` | — (required) | File extension; shown upper-case, cut to 8 characters. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the badge. |
-| `className` | `string` | — | Class on the badge. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other attributes of the badge. |
 
 ### FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions
-No ref. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row. Native `<div>` props.
+`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row. Native `<div>` props.
 
 ### FileUpload.ItemProgress
-No ref. Upload progress across the row: the kit ProgressBar.
+`ref` → `HTMLDivElement` (the wrapper). Upload progress across the row: the kit ProgressBar.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `number` | — (required) | Uploaded amount. |
 | `max` | `number` | — | Total amount (ProgressBar default). |
-| `className` | `string` | — | Class on the wrapper. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper. |
 
 ## Variants
 

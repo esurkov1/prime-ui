@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "DataTable",
-      en: "Generic over `Row`; no ref, no native props besides `className`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.",
+      en: "Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.",
       ru: "Блок с заливкой карточки: панель сверху, прокручиваемая `<table>` и подвал (диапазон, Pagination, статус догрузки); передаёт ярус контролам внутри.",
       props: [
         {
@@ -305,10 +305,10 @@ export const api: ComponentApi = {
           ru: "Системные строки, см. «Доступность».",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the root.",
-          ru: "Класс корня.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the root `<div>`.",
+          ru: "`className` и остальные атрибуты корневого `<div>`.",
         },
       ],
     },

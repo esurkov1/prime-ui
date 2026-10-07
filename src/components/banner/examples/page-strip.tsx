@@ -28,9 +28,9 @@ export default function BannerPageStripExample() {
         </div>
       </Card.Root>
       <Card.Root variant="panel">
-        <Card.SectionHeader>
-          <Card.SectionTitle>Оплата</Card.SectionTitle>
-        </Card.SectionHeader>
+        <Card.Header>
+          <Card.Title>Оплата</Card.Title>
+        </Card.Header>
         <Card.Body>
           <Banner.Root tone="danger">
             <Banner.Content>

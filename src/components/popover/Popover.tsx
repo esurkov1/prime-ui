@@ -292,7 +292,9 @@ function useSlotId(id: string | undefined, kind: "title" | "description") {
   return id ?? (kind === "title" ? slots?.titleId : slots?.descriptionId);
 }
 
-export type PopoverHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+export type PopoverHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /** Title + description with a tight 4px step. */
 function PopoverHeader({ className, ...rest }: PopoverHeaderProps) {
@@ -300,7 +302,9 @@ function PopoverHeader({ className, ...rest }: PopoverHeaderProps) {
 }
 PopoverHeader.displayName = "Popover.Header";
 
-export type PopoverTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+export type PopoverTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
+  ref?: React.Ref<HTMLHeadingElement>;
+};
 
 /** Heading of the panel; names the dialog (`aria-labelledby`). */
 function PopoverTitle({ className, id, ...rest }: PopoverTitleProps) {
@@ -309,7 +313,9 @@ function PopoverTitle({ className, id, ...rest }: PopoverTitleProps) {
 }
 PopoverTitle.displayName = "Popover.Title";
 
-export type PopoverDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
+export type PopoverDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & {
+  ref?: React.Ref<HTMLParagraphElement>;
+};
 
 /** Secondary text of the panel; describes the dialog (`aria-describedby`). */
 function PopoverDescription({ className, id, ...rest }: PopoverDescriptionProps) {
@@ -318,7 +324,9 @@ function PopoverDescription({ className, id, ...rest }: PopoverDescriptionProps)
 }
 PopoverDescription.displayName = "Popover.Description";
 
-export type PopoverActionsProps = React.HTMLAttributes<HTMLDivElement>;
+export type PopoverActionsProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /** Buttons at the bottom of the panel: at the end, `gap: 8`; stacked full width on a narrow screen. */
 function PopoverActions({ className, ...rest }: PopoverActionsProps) {

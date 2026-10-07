@@ -111,13 +111,13 @@ export const api: ComponentApi = {
     },
     {
       name: "Timeline.Title · Timeline.Meta · Timeline.MetaPrimary",
-      en: "`<span>` lines: the event (medium, accent on the highlighted row, wraps), the muted date line with tabular numbers, and its emphasized part.",
+      en: "`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps), the muted date line with tabular numbers, and its emphasized part.",
       ru: "Строки `<span>`: событие (medium, акцент на выделенной строке, переносится), приглушённая строка даты и её выделенная часть.",
       props: [spanRest],
     },
     {
       name: "Timeline.Value · Timeline.ValueMeta",
-      en: "`<span>`: the trailing amount (right-aligned, tabular) and a muted second line under it. Moves under the meta below 20rem.",
+      en: "`ref` → `HTMLSpanElement`. `<span>`: the trailing amount (right-aligned, tabular) and a muted second line under it. Moves under the meta below 20rem.",
       ru: "`<span>`: сумма справа (по правому краю, табличные цифры) и приглушённая строка под ней. Уже 20rem уходит под мету.",
       props: [
         {

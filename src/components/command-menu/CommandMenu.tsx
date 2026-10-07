@@ -137,7 +137,7 @@ function CommandMenuState({
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
-export type CommandMenuRootProps = {
+export type CommandMenuRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -152,8 +152,9 @@ export type CommandMenuRootProps = {
   "aria-label"?: string;
   "aria-labelledby"?: string;
   "aria-describedby"?: string;
-  className?: string;
   children: React.ReactNode;
+  /** The dialog panel. */
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function CommandMenuRoot({
@@ -166,7 +167,7 @@ function CommandMenuRoot({
   labels: labelsProp,
   className,
   children,
-  ...aria
+  ...rest
 }: CommandMenuRootProps) {
   const labels = React.useMemo(() => ({ ...COMMAND_MENU_LABELS, ...labelsProp }), [labelsProp]);
   return (
@@ -178,7 +179,7 @@ function CommandMenuRoot({
       closeOnOutsideClick={closeOnOutsideClick}
     >
       <Modal.Content
-        {...aria}
+        {...rest}
         className={cx(styles.content, className)}
         overlayClassName={styles.overlay}
       >
@@ -196,7 +197,9 @@ CommandMenuRoot.displayName = "CommandMenu.Root";
 
 // ─── Title / Description ─────────────────────────────────────────────────────
 
-export type CommandMenuTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "id">;
+export type CommandMenuTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "id"> & {
+  ref?: React.Ref<HTMLHeadingElement>;
+};
 
 /** Visible heading above the search row; names the dialog. */
 function CommandMenuTitle({ className, ...rest }: CommandMenuTitleProps) {
@@ -204,7 +207,9 @@ function CommandMenuTitle({ className, ...rest }: CommandMenuTitleProps) {
 }
 CommandMenuTitle.displayName = "CommandMenu.Title";
 
-export type CommandMenuDescriptionProps = Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">;
+export type CommandMenuDescriptionProps = Omit<React.HTMLAttributes<HTMLParagraphElement>, "id"> & {
+  ref?: React.Ref<HTMLParagraphElement>;
+};
 
 /** Secondary line under the title; describes the dialog. */
 function CommandMenuDescription({ className, ...rest }: CommandMenuDescriptionProps) {
@@ -320,6 +325,7 @@ CommandMenuList.displayName = "CommandMenu.List";
 export type CommandMenuGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
   /** Visible heading of the group; names it for screen readers. */
   label?: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 /** A labelled section of items; hidden while none of its items match the query. */
@@ -431,7 +437,9 @@ function CommandMenuItem({
 }
 CommandMenuItem.displayName = "CommandMenu.Item";
 
-export type CommandMenuItemIconProps = React.HTMLAttributes<HTMLSpanElement>;
+export type CommandMenuItemIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** Leading glyph of an item at the tier icon size (a kit `Icon` follows it). */
 function CommandMenuItemIcon({ className, ...rest }: CommandMenuItemIconProps) {
@@ -442,6 +450,7 @@ CommandMenuItemIcon.displayName = "CommandMenu.ItemIcon";
 export type CommandMenuItemTextProps = React.HTMLAttributes<HTMLSpanElement> & {
   /** Second line (path, details): caption, muted. */
   description?: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** Item text: a title with an ellipsis and an optional description line. */
@@ -465,6 +474,7 @@ CommandMenuItemText.displayName = "CommandMenu.ItemText";
 
 export type CommandMenuItemShortcutProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLElement>;
 };
 
 /** Key hint at the end of an item (a Kbd one tier below). A hint only — not a handler. */
@@ -475,7 +485,9 @@ CommandMenuItemShortcut.displayName = "CommandMenu.ItemShortcut";
 
 // ─── Empty / Footer ──────────────────────────────────────────────────────────
 
-export type CommandMenuEmptyProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role">;
+export type CommandMenuEmptyProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /**
  * Shown only while nothing matches the query: `labels.empty` and `labels.emptyHint`; `children`
@@ -494,7 +506,9 @@ function CommandMenuEmpty({ children, ...rest }: CommandMenuEmptyProps) {
 }
 CommandMenuEmpty.displayName = "CommandMenu.Empty";
 
-export type CommandMenuFooterProps = React.HTMLAttributes<HTMLDivElement>;
+export type CommandMenuFooterProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /** Bottom row of key hints, hairline above. */
 function CommandMenuFooter({ className, ...rest }: CommandMenuFooterProps) {
@@ -505,6 +519,7 @@ CommandMenuFooter.displayName = "CommandMenu.Footer";
 export type CommandMenuFooterHintProps = React.HTMLAttributes<HTMLSpanElement> & {
   /** Keys (text or icons), each in its own Kbd. */
   keys: React.ReactNode[];
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** A footer hint: keys and what they do («↑ ↓ Навигация»). */

@@ -4,6 +4,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { mergeRefs } from "@/internal/mergeRefs";
 import { suspendTransitions } from "@/theme/applyTheme";
 
 import { Button } from "../button/Button";
@@ -77,11 +78,11 @@ type ExampleFrameContextValue = {
 const [ExampleFrameProvider, useExampleFrameContext] =
   createComponentContext<ExampleFrameContextValue>("ExampleFrame");
 
-export type ExampleFrameProps = {
+export type ExampleFrameProps = Omit<React.HTMLAttributes<HTMLDivElement>, "onCopy"> & {
   /** Source shown on the code pane (TS/TSX highlighting) and copied by the copy button. */
   code: string;
-  children?: React.ReactNode;
-  className?: string;
+  /** The outer `<div>`. */
+  ref?: React.Ref<HTMLDivElement>;
   /** Preview color scheme (controlled). */
   colorScheme?: ColorScheme;
   defaultColorScheme?: ColorScheme;
@@ -114,6 +115,8 @@ export function ExampleFrame({
   onCopy,
   previewLayout = "default",
   labels: labelsProp,
+  ref,
+  ...rest
 }: ExampleFrameProps) {
   const labels = React.useMemo(() => ({ ...EXAMPLE_FRAME_LABELS, ...labelsProp }), [labelsProp]);
   const [pane, setPane] = React.useState<Pane>("preview");
@@ -130,6 +133,7 @@ export function ExampleFrame({
 
   // Theme switch inside the frame is instant: no color transition from the old theme.
   const rootRef = React.useRef<HTMLDivElement>(null);
+  const mergedRef = React.useMemo(() => mergeRefs(rootRef, ref), [ref]);
   const previousScheme = React.useRef(colorScheme);
   React.useLayoutEffect(() => {
     if (previousScheme.current === colorScheme) return;
@@ -165,7 +169,7 @@ export function ExampleFrame({
 
   return (
     <ExampleFrameProvider value={ctxValue}>
-      <div ref={rootRef} className={cx(styles.root, className)}>
+      <div {...rest} ref={mergedRef} className={cx(styles.root, className)}>
         <ExampleFrameToolbar />
         {pane === "preview" ? (
           <div className={styles.previewShell}>

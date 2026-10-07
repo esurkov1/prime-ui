@@ -51,14 +51,18 @@ const LabelRoot = React.forwardRef<HTMLLabelElement, LabelRootProps>(
 );
 LabelRoot.displayName = "Label.Root";
 
-export type LabelIconProps = React.HTMLAttributes<HTMLSpanElement>;
+export type LabelIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 function LabelIcon({ className, ...rest }: LabelIconProps) {
   return <span className={cx(styles.icon, className)} aria-hidden="true" {...rest} />;
 }
 LabelIcon.displayName = "Label.Icon";
 
-export type LabelDescriptionProps = React.HTMLAttributes<HTMLSpanElement>;
+export type LabelDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** Secondary inline text inside the label (units, short clarification). */
 function LabelDescription({ className, ...rest }: LabelDescriptionProps) {

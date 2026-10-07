@@ -4,6 +4,7 @@ import { Button } from "@/components/button/Button";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { mergeRefs } from "@/internal/mergeRefs";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { DragControllerContext } from "./context";
@@ -115,7 +116,7 @@ const SortableContext = React.createContext<SortableContextValue | null>(null);
 
 export type DndReorderResult = { ok: boolean } | undefined;
 
-export type DndSortableProps<T> = {
+export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
   /** Items in their current order. */
   items: readonly T[];
   /** Stable unique id of an item. */
@@ -141,9 +142,9 @@ export type DndSortableProps<T> = {
   canDrop?: (id: string) => boolean;
   /** Root element: `ul` / `ol` turn items into `li`. */
   as?: "div" | "ul" | "ol";
-  className?: string;
   /** Accessible name of the list. */
   "aria-label"?: string;
+  ref?: React.Ref<HTMLElement>;
 };
 
 /**
@@ -163,6 +164,7 @@ function DndSortable<T>({
   canDrop,
   as: Tag = "div",
   className,
+  ref: forwardedRef,
   ...rest
 }: DndSortableProps<T>) {
   const generatedKind = React.useId();
@@ -213,7 +215,11 @@ function DndSortable<T>({
   });
   if (placeholder && list.gapBefore === null) children.push(placeholder);
 
-  const { ref, ...targetData } = list.containerProps;
+  const { ref: targetRef, ...targetData } = list.containerProps;
+  const ref = React.useMemo(
+    () => mergeRefs<HTMLElement | null>(targetRef, forwardedRef),
+    [targetRef, forwardedRef],
+  );
   return (
     <SortableContext value={context}>
       <Tag
@@ -237,6 +243,7 @@ export type DndSortableItemProps = {
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLElement>;
 } & Omit<React.HTMLAttributes<HTMLElement>, "id">;
 
 /** One item of a `Dnd.Sortable`. Renders `li` inside `ul` / `ol`, `div` otherwise. */
@@ -247,6 +254,7 @@ function DndSortableItem({
   children,
   onPointerDown,
   onKeyDown,
+  ref,
   ...rest
 }: DndSortableItemProps) {
   const context = React.useContext(SortableContext);
@@ -256,6 +264,7 @@ function DndSortableItem({
   const sortable = context.itemProps(id);
   return (
     <Tag
+      ref={ref as React.Ref<never>}
       tabIndex={context.handle || disabled ? undefined : 0}
       aria-keyshortcuts={disabled ? undefined : "Alt+ArrowUp Alt+ArrowDown"}
       {...rest}
@@ -327,6 +336,7 @@ export type DndDraggableProps<TData = unknown> = {
   onDragEnd?: (item: DragItem<TData>, outcome: DragOutcome) => void;
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLElement>;
 } & Omit<React.HTMLAttributes<HTMLElement>, "id">;
 
 /** Something to carry onto a `Dnd.DropZone`. The source stays in place, faded, until the drop. */
@@ -343,6 +353,7 @@ function DndDraggable<TData = unknown>({
   className,
   children,
   onPointerDown,
+  ref,
   ...rest
 }: DndDraggableProps<TData>) {
   const source = useDragSource<TData | undefined>({
@@ -355,6 +366,7 @@ function DndDraggable<TData = unknown>({
   const dragProps: DragSourceProps = source.props({ id, data, label: label ?? id });
   return (
     <Tag
+      ref={ref as React.Ref<never>}
       {...rest}
       {...dragProps}
       onPointerDown={(event: React.PointerEvent<HTMLElement>) => {
@@ -388,6 +400,7 @@ export type DndDropZoneProps<TData = unknown> = {
   as?: "div" | "section" | "li" | "ul" | "ol" | "span";
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLElement>;
 } & Omit<React.HTMLAttributes<HTMLElement>, "onDrop">;
 
 /** A box that takes dropped items. `data-dnd-over` / `data-dnd-reject` / `data-dnd-flash` mirror its state. */
@@ -402,6 +415,7 @@ function DndDropZone<TData = unknown>({
   as: Tag = "div",
   className,
   children,
+  ref: forwardedRef,
   ...rest
 }: DndDropZoneProps<TData>) {
   const target = useDropTarget<true, TData>({
@@ -414,7 +428,11 @@ function DndDropZone<TData = unknown>({
     flashOnDrop,
     disabled,
   });
-  const { ref, ...targetData } = target.props;
+  const { ref: targetRef, ...targetData } = target.props;
+  const ref = React.useMemo(
+    () => mergeRefs<HTMLElement | null>(targetRef, forwardedRef),
+    [targetRef, forwardedRef],
+  );
   return (
     <Tag
       ref={ref as React.Ref<never>}

@@ -109,7 +109,9 @@ function BannerRoot({
 }
 BannerRoot.displayName = "Banner.Root";
 
-export type BannerContentProps = React.HTMLAttributes<HTMLDivElement>;
+export type BannerContentProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /** Layout of the message: icon on the first line, title over description, actions right (under the text when narrow). */
 function BannerContent({ className, ...rest }: BannerContentProps) {
@@ -117,7 +119,9 @@ function BannerContent({ className, ...rest }: BannerContentProps) {
 }
 BannerContent.displayName = "Banner.Content";
 
-export type BannerIconProps = React.HTMLAttributes<HTMLSpanElement>;
+export type BannerIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** Holds one `Icon` on the first text line, in the tone color. */
 function BannerIcon({ className, ...rest }: BannerIconProps) {
@@ -125,21 +129,27 @@ function BannerIcon({ className, ...rest }: BannerIconProps) {
 }
 BannerIcon.displayName = "Banner.Icon";
 
-export type BannerTitleProps = React.HTMLAttributes<HTMLSpanElement>;
+export type BannerTitleProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 function BannerTitle({ className, ...rest }: BannerTitleProps) {
   return <span className={cx(styles.title, className)} {...rest} />;
 }
 BannerTitle.displayName = "Banner.Title";
 
-export type BannerDescriptionProps = React.HTMLAttributes<HTMLSpanElement>;
+export type BannerDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 function BannerDescription({ className, ...rest }: BannerDescriptionProps) {
   return <span className={cx(styles.description, className)} {...rest} />;
 }
 BannerDescription.displayName = "Banner.Description";
 
-export type BannerActionsProps = React.HTMLAttributes<HTMLDivElement>;
+export type BannerActionsProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /** Action buttons take the banner `size`; with `onDismiss` the close button joins this row. */
 function BannerActions({ className, children, ...rest }: BannerActionsProps) {

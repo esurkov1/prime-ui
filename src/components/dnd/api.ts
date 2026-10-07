@@ -23,7 +23,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Sortable",
-      en: "Generic `Dnd.Sortable<T>`; no ref. Renders `<div>`, `<ul>` or `<ol>` and registers itself as the drop target; draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.",
+      en: "Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `<ol>` and registers itself as the drop target; draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.",
       ru: "Обобщённый `Dnd.Sortable<T>`. Рендерит `<div>`, `<ul>` или `<ol>`, сам регистрируется как цель, рисует зазор и оптимистичный порядок. Ставит `data-axis` и `data-dragging`.",
       props: [
         {
@@ -103,16 +103,16 @@ export const api: ComponentApi = {
           ru: "Корневой элемент; при `ul` / `ol` элементы — `li`.",
         },
         {
-          name: "className · aria-label",
-          type: "string",
-          en: "Class (the list layout) and the accessible name of the list.",
-          ru: "Класс (раскладка списка) и доступное имя списка.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLElement>, "children">',
+          en: "`className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element.",
+          ru: "`className` (раскладка списка), `aria-label` (имя списка) и остальные атрибуты элемента списка.",
         },
       ],
     },
     {
       name: "Dnd.SortableItem",
-      en: "No ref. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.",
+      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.",
       ru: "`<li>` в `ul` / `ol`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Ставит `data-lifted`, `data-dnd-item`, `aria-roledescription`, `aria-keyshortcuts` и `tabIndex={0}` (без `handle`). Нажатия на кнопки, поля, ссылки и `[data-dnd-ignore]` внутри не начинают перетаскивание.",
       props: [
         {
@@ -159,7 +159,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Draggable",
-      en: "Generic `Dnd.Draggable<TData>`; no ref. Renders the `as` element; stays in place at reduced opacity (`data-dragging`) while carried. Has no keyboard path of its own: offer a button or a menu for the same move.",
+      en: "Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. Renders the `as` element; stays in place at reduced opacity (`data-dragging`) while carried. Has no keyboard path of its own: offer a button or a menu for the same move.",
       ru: "Обобщённый `Dnd.Draggable<TData>`. Рендерит элемент `as`; на время переноса остаётся на месте полупрозрачным (`data-dragging`). Своего клавиатурного пути нет — дайте кнопку или меню для того же действия.",
       props: [
         {
@@ -232,7 +232,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.DropZone",
-      en: "Generic `Dnd.DropZone<TData>`; no ref. Renders the `as` element; state is mirrored by `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. Where zones overlap, the innermost wins.",
+      en: "Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element; state is mirrored by `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. Where zones overlap, the innermost wins.",
       ru: "Обобщённый `Dnd.DropZone<TData>`. Рендерит элемент `as`; состояние — `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. При наложении зон побеждает внутренняя.",
       props: [
         {

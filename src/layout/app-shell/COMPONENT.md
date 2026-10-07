@@ -43,7 +43,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Nav, Header, Main), `className` and the other div attributes. |
 
 ### AppShell.Nav
-No ref. The navigation column slot (not a landmark: Sidebar renders the `<nav>`).
+`ref` → `HTMLDivElement`. The navigation column slot (not a landmark: Sidebar renders the `<nav>`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

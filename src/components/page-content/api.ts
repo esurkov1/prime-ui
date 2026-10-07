@@ -37,7 +37,7 @@ export const api: ComponentApi = {
     },
     {
       name: "PageContent.Header",
-      en: "No ref. Heading column and page actions in one wrapping row; `PageContent.Actions` children move to the end.",
+      en: "`ref` → `HTMLDivElement`. Heading column and page actions in one wrapping row; `PageContent.Actions` children move to the end.",
       ru: "Колонка заголовка и действия страницы в одном переносимом ряду; `PageContent.Actions` уходят в конец.",
       props: [
         {
@@ -83,7 +83,7 @@ export const api: ComponentApi = {
     },
     {
       name: "PageContent.Actions",
-      en: "No ref. Page-level buttons next to the title; they wrap under the heading on narrow columns.",
+      en: "`ref` → `HTMLDivElement`. Page-level buttons next to the title; they wrap under the heading on narrow columns.",
       ru: "Кнопки страницы рядом с заголовком; в узкой колонке переносятся под него.",
       props: [
         {
@@ -96,7 +96,7 @@ export const api: ComponentApi = {
     },
     {
       name: "PageContent.Body",
-      en: "No ref. The page content; blocks 40 apart.",
+      en: "`ref` → `HTMLDivElement`. The page content; blocks 40 apart.",
       ru: "Содержимое страницы; блоки с отступом 40.",
       props: [
         {

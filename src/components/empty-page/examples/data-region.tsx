@@ -6,14 +6,12 @@ import styles from "./examples.module.css";
 export default function EmptyPageDataRegionExample() {
   return (
     <Card.Root role="region" aria-labelledby="orders-region-title" className={styles.region}>
-      <Card.SectionHeader>
-        <Card.SectionTitle id="orders-region-title">Заказы</Card.SectionTitle>
-        <Card.SectionTrailing>
-          <Button.Root variant="outline" tone="neutral" size="s">
-            Импорт
-          </Button.Root>
-        </Card.SectionTrailing>
-      </Card.SectionHeader>
+      <Card.Header>
+        <Card.Title id="orders-region-title">Заказы</Card.Title>
+        <Button.Root variant="outline" tone="neutral" size="s">
+          Импорт
+        </Button.Root>
+      </Card.Header>
       <EmptyPage.Root layout="fill" aria-labelledby="orders-empty-title">
         <EmptyPage.Icon tone="accent">
           <Icon name="object.package" />

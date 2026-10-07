@@ -119,7 +119,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Textarea.Counter",
-      en: "No ref. Character counter for the support row; shows `14/280` and announces `labels.counter`.",
+      en: "`ref` → `HTMLSpanElement`. Character counter for the support row; shows `14/280` and announces `labels.counter`.",
       props: [
         {
           name: "current",
@@ -136,10 +136,10 @@ export const api: ComponentApi = {
           ru: "Лимит; при `current > max` счётчик красный. Для жёсткого лимита добавьте `maxLength`.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the `<span>`.",
-          ru: "Класс на `<span>`.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes of the `<span>`.",
+          ru: "`className` и остальные атрибуты `<span>`.",
         },
       ],
     },

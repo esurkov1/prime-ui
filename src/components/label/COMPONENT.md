@@ -46,10 +46,10 @@ Label.Root            <label>: text, then the required `*` or the optional marke
 | `…rest` | `Omit<LabelHTMLAttributes<HTMLLabelElement>, "size">` | — | `id`, `className` and the other label attributes. |
 
 ### Label.Icon
-No ref. A muted, non-shrinking icon slot (`aria-hidden`) before the text; kit icons take the label size. Native `<span>` props.
+`ref` → `HTMLSpanElement`. A muted, non-shrinking icon slot (`aria-hidden`) before the text; kit icons take the label size. Native `<span>` props.
 
 ### Label.Description
-No ref. Regular-weight muted text in the same line (units, context); part of the accessible name. Native `<span>` props.
+`ref` → `HTMLSpanElement`. Regular-weight muted text in the same line (units, context); part of the accessible name. Native `<span>` props.
 
 ## Variants
 Label has no `variant` or `tone`.

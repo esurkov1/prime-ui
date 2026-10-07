@@ -57,7 +57,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Content",
-      en: "A `<div>` grid: icon on the first line, title over description, actions on the right (under the text below 36rem).",
+      en: "`ref` → `HTMLDivElement`. A `<div>` grid: icon on the first line, title over description, actions on the right (under the text below 36rem).",
       ru: "Сетка `<div>`: иконка на первой строке, заголовок над описанием, действия справа (под текстом уже 36rem).",
       props: [
         {
@@ -70,7 +70,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Icon",
-      en: "An `aria-hidden` `<span>` holding one `Icon`, one title line high, in the tone color.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding one `Icon`, one title line high, in the tone color.",
       ru: "`<span>` с `aria-hidden` для одной `Icon` высотой в строку заголовка, цвета тона.",
       props: [
         {
@@ -83,7 +83,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Title · Banner.Description",
-      en: "`<span>` elements: the medium title and the secondary text, both capped at the reading width.",
+      en: "`ref` → `HTMLSpanElement`. `<span>` elements: the medium title and the secondary text, both capped at the reading width.",
       ru: "Элементы `<span>`: заголовок и вторичный текст, оба ограничены шириной чтения.",
       props: [
         {
@@ -96,7 +96,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Actions",
-      en: "A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.",
+      en: "`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.",
       ru: "Ряд кнопок `<div>`; с `onDismiss` кнопка закрытия становится последней квадратной кнопкой ряда.",
       props: [
         {

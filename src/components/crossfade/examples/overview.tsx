@@ -38,9 +38,9 @@ export default function CrossfadeOverviewExample() {
       </SegmentedControl.Root>
 
       <Card.Root variant="panel">
-        <Card.SectionHeader>
-          <Card.SectionTitle as="h3">Поступления за сегодня</Card.SectionTitle>
-        </Card.SectionHeader>
+        <Card.Header>
+          <Card.Title as="h3">Поступления за сегодня</Card.Title>
+        </Card.Header>
         <Card.Body>
           <Crossfade state={status} aria-busy={status === "loading"}>
             {status === "loading" ? (

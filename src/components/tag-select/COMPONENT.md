@@ -39,7 +39,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### TagSelect
-No ref. The field frame with a chip row and an `<input role="combobox">`, and a portaled multi-select list; options come as data.
+`ref` → `HTMLDivElement` (the field frame). The field frame with a chip row and an `<input role="combobox">`, and a portaled multi-select list; options come as data.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -68,7 +68,7 @@ No ref. The field frame with a chip row and an `<input role="combobox">`, and a 
 | `id` | `string` | — | Id of the input; generated when omitted. |
 | `labels` | `Partial<TagSelectLabels>` | — | Built-in strings, see Labels (`colorNames` merges by key). |
 | `aria-label · aria-labelledby` | `string` | — | Name of the input and the list when there is no `label`. |
-| `className` | `string` | — | Class on the field frame. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
 
 ## Variants
 No `variant` or `tone`. The control is the field look; chips are soft Badges on the field's wash (neutral chips a stronger wash, hue chips a wash of their hue); the list is the shared floating panel.

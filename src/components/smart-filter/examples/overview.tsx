@@ -82,12 +82,12 @@ export default function SmartFilterOverviewExample() {
         <SmartFilter.Chips />
       </SmartFilter.Root>
       <Card.Root variant="list">
-        <Card.SectionHeader>
-          <Card.SectionTitle>Запросы</Card.SectionTitle>
+        <Card.Header>
+          <Card.Title>Запросы</Card.Title>
           <Typography as="span" variant="caption" tone="muted">
             {found.length} из {REQUESTS.length}
           </Typography>
-        </Card.SectionHeader>
+        </Card.Header>
         <Card.List>
           {found.map((request) => (
             <Card.ListItem key={request.id}>

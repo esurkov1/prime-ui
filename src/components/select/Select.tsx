@@ -16,7 +16,12 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import {
+  FieldFrame,
+  type FieldFrameProps,
+  type FieldRootDomProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import surface from "@/internal/floatingSurface.module.css";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { enabledOptions, handleListboxKeyDown } from "@/internal/listbox";
@@ -120,25 +125,26 @@ const [SelectProvider, useSelectContext] = createComponentContext<SelectContextV
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
-type SelectRootBase = FieldFrameProps & {
-  size?: ControlSize;
-  disabled?: boolean;
-  placeholder?: string;
-  /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
-  invalid?: boolean;
-  /** Id of the trigger; generated when omitted. */
-  id?: string;
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  /** Clear segment in the trigger (and `Delete` / `Backspace` on it) while a value is selected. */
-  clearable?: boolean;
-  /** Spinner instead of the chevron, `aria-busy`, a status row in the list. */
-  loading?: boolean;
-  labels?: Partial<SelectLabels>;
-  className?: string;
-  children: React.ReactNode;
-};
+type SelectRootBase = FieldRootDomProps &
+  FieldFrameProps & {
+    size?: ControlSize;
+    disabled?: boolean;
+    placeholder?: string;
+    /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
+    invalid?: boolean;
+    /** Id of the trigger; generated when omitted. */
+    id?: string;
+    open?: boolean;
+    defaultOpen?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    /** Clear segment in the trigger (and `Delete` / `Backspace` on it) while a value is selected. */
+    clearable?: boolean;
+    /** Spinner instead of the chevron, `aria-busy`, a status row in the list. */
+    loading?: boolean;
+    labels?: Partial<SelectLabels>;
+    className?: string;
+    children: React.ReactNode;
+  };
 
 type SelectSingleProps = {
   multiple?: false;
@@ -179,6 +185,11 @@ function SelectRoot(props: SelectRootProps) {
     labels: labelsProp,
     className,
     children,
+    multiple: _multiple,
+    value: _value,
+    defaultValue: _defaultValue,
+    onValueChange: _onValueChange,
+    ...rest
   } = props;
   const multiple = props.multiple === true;
   const labels = React.useMemo(() => ({ ...SELECT_LABELS, ...labelsProp }), [labelsProp]);
@@ -289,6 +300,7 @@ function SelectRoot(props: SelectRootProps) {
 
   return (
     <FieldFrame
+      {...rest}
       size={size}
       ids={ids}
       label={label}
@@ -418,18 +430,18 @@ SelectTrigger.displayName = "Select.Trigger";
 /** What `renderValue` receives: the selected option. */
 export type SelectValueItem = { value: string; label: string };
 
-export type SelectValueProps = {
+export type SelectValueProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /**
    * Single mode: renders the selected option in the trigger, e.g. with the same `Thumbnail.Root`,
    * `Select.ItemText` and `Select.ItemDescription` parts as the row. Not called while empty (the
    * placeholder shows) and not used in `multiple` mode.
    */
   renderValue?: (item: SelectValueItem) => React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** The picked label (labels joined in `multiple`), or the placeholder. */
-function SelectValue({ renderValue, className }: SelectValueProps) {
+function SelectValue({ renderValue, className, ...rest }: SelectValueProps) {
   const { selected, labelsByValue, placeholder, multiple, size } = useSelectContext();
   const labelOf = (value: string) => labelsByValue[value] ?? value;
 
@@ -438,6 +450,7 @@ function SelectValue({ renderValue, className }: SelectValueProps) {
     const parts = splitItemChildren(renderValue({ value, label: labelOf(value) }));
     return (
       <span
+        {...rest}
         className={cx(styles.value, className)}
         {...toDataAttributes({ rich: parts.rich || undefined })}
       >
@@ -450,6 +463,7 @@ function SelectValue({ renderValue, className }: SelectValueProps) {
   const display = selected.length > 0 ? selected.map(labelOf).join(", ") : placeholder;
   return (
     <span
+      {...rest}
       className={cx(styles.value, className)}
       {...toDataAttributes({ placeholder: selected.length === 0 || undefined })}
     >
@@ -459,7 +473,9 @@ function SelectValue({ renderValue, className }: SelectValueProps) {
 }
 SelectValue.displayName = "Select.Value";
 
-export type SelectTriggerIconProps = React.HTMLAttributes<HTMLSpanElement>;
+type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLSpanElement> };
+
+export type SelectTriggerIconProps = SpanProps;
 
 /** A leading glyph in the trigger, before the value (decorative). */
 function SelectTriggerIcon({ className, ...rest }: SelectTriggerIconProps) {
@@ -469,7 +485,7 @@ SelectTriggerIcon.displayName = "Select.TriggerIcon";
 
 // ─── Rich option parts (row and trigger) ─────────────────────────────────────
 
-export type SelectItemIconProps = React.HTMLAttributes<HTMLSpanElement>;
+export type SelectItemIconProps = SpanProps;
 
 /** A leading glyph of an option (decorative). */
 function SelectItemIcon({ className, ...rest }: SelectItemIconProps) {
@@ -477,38 +493,44 @@ function SelectItemIcon({ className, ...rest }: SelectItemIconProps) {
 }
 SelectItemIcon.displayName = "Select.ItemIcon";
 
-export type SelectItemTextProps = { children: React.ReactNode; className?: string };
+export type SelectItemTextProps = SpanProps & { children: React.ReactNode };
 
 /** The search query inside an option row; empty in the trigger, so `renderValue` never marks it. */
 const OptionQueryContext = React.createContext("");
 
 /** Title of a rich option; its text is the option label (trigger, typeahead, search). */
-function SelectItemText({ children, className }: SelectItemTextProps) {
+function SelectItemText({ children, className, ...rest }: SelectItemTextProps) {
   const query = React.useContext(OptionQueryContext);
   return (
-    <span className={cx(styles.itemTitle, className)}>{highlightChildren(children, query)}</span>
+    <span {...rest} className={cx(styles.itemTitle, className)}>
+      {highlightChildren(children, query)}
+    </span>
   );
 }
 SelectItemText.displayName = "Select.ItemText";
 
-export type SelectItemDescriptionProps = { children: React.ReactNode; className?: string };
+export type SelectItemDescriptionProps = SpanProps & { children: React.ReactNode };
 
 /** Muted second line under `Select.ItemText`; searchable. Makes the row two-line. */
-function SelectItemDescription({ children, className }: SelectItemDescriptionProps) {
+function SelectItemDescription({ children, className, ...rest }: SelectItemDescriptionProps) {
   const query = React.useContext(OptionQueryContext);
   return (
-    <span className={cx(styles.itemDescription, className)}>
+    <span {...rest} className={cx(styles.itemDescription, className)}>
       {highlightChildren(children, query)}
     </span>
   );
 }
 SelectItemDescription.displayName = "Select.ItemDescription";
 
-export type SelectItemMetaProps = { children: React.ReactNode; className?: string };
+export type SelectItemMetaProps = SpanProps & { children: React.ReactNode };
 
 /** Trailing meta of an option (price, count): muted, tabular, before the check. */
-function SelectItemMeta({ children, className }: SelectItemMetaProps) {
-  return <span className={cx(styles.itemMeta, className)}>{children}</span>;
+function SelectItemMeta({ children, className, ...rest }: SelectItemMetaProps) {
+  return (
+    <span {...rest} className={cx(styles.itemMeta, className)}>
+      {children}
+    </span>
+  );
 }
 SelectItemMeta.displayName = "Select.ItemMeta";
 
@@ -585,14 +607,24 @@ function sizeMedia(leading: React.ReactNode[], size: ControlSize): React.ReactNo
 
 // ─── Content ─────────────────────────────────────────────────────────────────
 
-export type SelectContentProps = {
+export type SelectContentProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "hidden" | "onKeyDown" | "onAnimationEnd"
+> & {
   /** A search field on top of the list; items filter by label, description and `keywords`. */
   searchable?: boolean;
-  className?: string;
   children: React.ReactNode;
+  /** The floating panel. */
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-function SelectContent({ searchable = false, className, children }: SelectContentProps) {
+function SelectContent({
+  searchable = false,
+  className,
+  children,
+  ref,
+  ...rest
+}: SelectContentProps) {
   const {
     isOpen,
     setOpen,
@@ -620,6 +652,11 @@ function SelectContent({ searchable = false, className, children }: SelectConten
     align: "start",
     matchAnchorWidth: true,
   });
+  const { attachLayer } = position;
+  const layerRef = React.useMemo(
+    () => mergeRefs<HTMLDivElement>(attachLayer, ref),
+    [attachLayer, ref],
+  );
   // The panel stays in the DOM while closed (items register the labels shown in the trigger);
   // presence only drives display and motion.
   const presence = usePresence(isOpen, { exitDuration: "fast" });
@@ -729,7 +766,8 @@ function SelectContent({ searchable = false, className, children }: SelectConten
       <DropdownLayerContext.Provider value>
         {/* biome-ignore lint/a11y/noStaticElementInteractions: keys bubble up from the search field and the listbox */}
         <div
-          ref={position.attachLayer}
+          {...rest}
+          ref={layerRef}
           aria-hidden={!isOpen}
           data-react-aria-top-layer="true"
           data-overlay-portal-layer={overlayPortalLayer}
@@ -908,6 +946,7 @@ SelectItem.displayName = "Select.Item";
 export type SelectGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
   /** Visible heading of the group; names it for screen readers. */
   label?: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 /** Options under a heading; hidden while the search leaves none of them. */
@@ -932,11 +971,13 @@ function SelectGroup({ label, className, children, ...rest }: SelectGroupProps) 
 }
 SelectGroup.displayName = "Select.Group";
 
-export type SelectSeparatorProps = { className?: string };
+export type SelectSeparatorProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /** A full-bleed hairline between groups; hidden while searching. */
-function SelectSeparator({ className }: SelectSeparatorProps) {
-  return <Divider className={cx(menu.separator, styles.separator, className)} />;
+function SelectSeparator({ className, ...rest }: SelectSeparatorProps) {
+  return <Divider {...rest} className={cx(menu.separator, styles.separator, className)} />;
 }
 SelectSeparator.displayName = "Select.Separator";
 

@@ -7,6 +7,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { getViewportPadPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Datepicker.module.css";
@@ -121,10 +122,54 @@ export type SingleModeProps = {
   resetValue?: Date | null;
 };
 
+/** Native attributes and `ref` of the element a part renders (the panel card, the field frame). */
+export type DatepickerDomProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "defaultValue" | "defaultChecked" | "onChange"
+> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
 export type DatepickerPanelProps = CalendarOptions &
-  (RangeModeProps | SingleModeProps) & {
-    className?: string;
+  (RangeModeProps | SingleModeProps) &
+  DatepickerDomProps;
+
+/** Separates the calendar options from the native attributes of a part. */
+export function splitCalendarOptions<T extends CalendarOptions>({
+  size,
+  months,
+  presets,
+  prompt,
+  footer,
+  withTime,
+  isDayDisabled,
+  disableFuture,
+  yearless,
+  today,
+  locale,
+  weekStartsOn,
+  labels,
+  ...rest
+}: T): { options: CalendarOptions; rest: Omit<T, keyof CalendarOptions> } {
+  return {
+    options: {
+      size,
+      months,
+      presets,
+      prompt,
+      footer,
+      withTime,
+      isDayDisabled,
+      disableFuture,
+      yearless,
+      today,
+      locale,
+      weekStartsOn,
+      labels,
+    },
+    rest,
   };
+}
 
 /** Resolved (controlled-or-internal) value the panel view works with. */
 export type ResolvedValue =
@@ -146,6 +191,8 @@ type PanelViewProps = CalendarOptions &
     /** After a value is applied (Root closes the popover). */
     onDone?: () => void;
     className?: string;
+    /** Native attributes and `ref` of the panel card (`Datepicker.Panel`). */
+    dom?: Omit<DatepickerDomProps, "className">;
   };
 
 const EMPTY_RANGE: DatepickerRange = { from: null, to: null };
@@ -199,7 +246,7 @@ export function DatepickerPanel({
   defaultValue,
   onValueChange,
   resetValue,
-  ...options
+  ...props
 }: DatepickerPanelProps) {
   const resolved = useResolvedValue({
     mode,
@@ -208,7 +255,11 @@ export function DatepickerPanel({
     onValueChange,
     resetValue,
   } as RangeModeProps | SingleModeProps);
-  return <PanelView {...options} {...resolved} />;
+  const {
+    options,
+    rest: { className, ...dom },
+  } = splitCalendarOptions(props);
+  return <PanelView {...options} {...resolved} className={className} dom={dom} />;
 }
 DatepickerPanel.displayName = "Datepicker.Panel";
 
@@ -228,11 +279,13 @@ export function PanelView(props: PanelViewProps) {
     weekStartsOn = 1,
     onDone,
     className,
+    dom: { ref: domRef, ...dom } = {},
   } = props;
   const labels = { ...DATEPICKER_LABELS, ...props.labels };
   const isRange = props.mode === "range";
   const inPopover = React.useContext(InPopoverContext);
   const [panelNode, setPanelNode] = React.useState<HTMLDivElement | null>(null);
+  const panelRef = React.useMemo(() => mergeRefs(setPanelNode, domRef), [domRef]);
   const parentWidth = useAvailableWidth(inPopover ? null : panelNode);
   const viewportWidth = useViewportWidth(inPopover);
   const hasPresets = Boolean(presets) && isRange;
@@ -449,7 +502,8 @@ export function PanelView(props: PanelViewProps) {
 
   return (
     <div
-      ref={setPanelNode}
+      {...dom}
+      ref={panelRef}
       className={cx(styles.panel, className)}
       data-size={size}
       data-embedded={inPopover ? undefined : "true"}

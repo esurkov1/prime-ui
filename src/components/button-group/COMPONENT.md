@@ -56,7 +56,7 @@ ButtonGroup.Root         <div role="group">; size and orientation for every segm
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `className`, `aria-*` and the other button attributes. |
 
 ### ButtonGroup.Icon
-No ref. Decorative icon wrapper (`aria-hidden`) sized to the group tier.
+`ref` → `HTMLSpanElement`. Decorative icon wrapper (`aria-hidden`) sized to the group tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Slider",
-      en: 'No ref (renders a `<div>`). The label row with the value, then a native `<input type="range">` (transparent, on top) over the visual track, fill and thumb.',
+      en: '`ref` → `HTMLDivElement`. The label row with the value, then a native `<input type="range">` (transparent, on top) over the visual track, fill and thumb.',
       ru: 'Подпись со значением, под ней нативный `<input type="range">` поверх дорожки, заливки и ползунка.',
       props: [
         {
@@ -93,10 +93,10 @@ export const api: ComponentApi = {
           ru: "Доступное имя, когда нет видимой подписи.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the root `<div>`.",
-          ru: "Класс на корневом `<div>`.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `style` and the other attributes of the root `<div>`; `aria-label` goes to the input.",
+          ru: "`className`, `style` и остальные атрибуты корневого `<div>`; `aria-label` уходит полю.",
         },
       ],
     },

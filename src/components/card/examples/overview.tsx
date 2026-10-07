@@ -1,4 +1,4 @@
-/** A company settings panel: a section header, fields on the surface fill and actions at the end — `Card.SectionHeader`, `Card.Body`, `Card.Actions`. */
+/** A company settings panel: a header, fields on the surface fill and buttons in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. */
 import { Button, Card, Input, Switch } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -7,9 +7,9 @@ export default function CardOverviewExample() {
   return (
     <div className={styles.panel}>
       <Card.Root variant="panel">
-        <Card.SectionHeader>
-          <Card.SectionTitle>Профиль компании</Card.SectionTitle>
-        </Card.SectionHeader>
+        <Card.Header>
+          <Card.Title>Профиль компании</Card.Title>
+        </Card.Header>
         <Card.Body>
           <div className={styles.form}>
             <Input.Root label="Название" required>
@@ -27,12 +27,12 @@ export default function CardOverviewExample() {
             </Switch.Root>
           </div>
         </Card.Body>
-        <Card.Actions>
+        <Card.Footer>
           <Button.Root variant="ghost" tone="neutral">
             Отмена
           </Button.Root>
           <Button.Root>Сохранить</Button.Root>
-        </Card.Actions>
+        </Card.Footer>
       </Card.Root>
     </div>
   );

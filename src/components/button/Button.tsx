@@ -145,6 +145,7 @@ ButtonRoot.displayName = "Button.Root";
 export type ButtonIconProps = {
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 function ButtonIcon({ children, className, ...rest }: ButtonIconProps) {

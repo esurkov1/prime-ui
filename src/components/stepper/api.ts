@@ -94,7 +94,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Stepper.Indicator",
-      en: "No ref. The circle (`aria-hidden`): the item number, or a check when completed.",
+      en: "`ref` → `HTMLSpanElement`. The circle (`aria-hidden`): the item number, or a check when completed.",
       ru: "Кружок: номер пункта или галочка у пройденного.",
       props: [
         {
@@ -108,26 +108,26 @@ export const api: ComponentApi = {
     },
     {
       name: "Stepper.Content",
-      en: "No ref. Text column for the title and the description.",
+      en: "`ref` → `HTMLSpanElement`. Text column for the title and the description.",
       ru: "Колонка текста: заголовок и описание.",
       props: [SPAN_REST],
     },
     {
       name: "Stepper.Title · Stepper.Description",
-      en: "No ref. Step title in the control text; muted secondary line in the hint text.",
+      en: "`ref` → `HTMLSpanElement`. Step title in the control text; muted secondary line in the hint text.",
       ru: "Заголовок шага кеглем контрола; приглушённая вторая строка кеглем подсказки.",
       props: [SPAN_REST],
     },
     {
       name: "Stepper.Arrow",
-      en: "No ref. Trailing chevron (`aria-hidden`) for vertical items that open a page or panel.",
+      en: "`ref` → `SVGSVGElement`. Trailing chevron (`aria-hidden`) for vertical items that open a page or panel.",
       ru: "Шеврон в конце вертикального пункта, который открывает страницу или панель.",
       props: [
         {
-          name: "className",
-          type: "string",
-          en: "Extra class.",
-          ru: "Дополнительный класс.",
+          name: "…rest",
+          type: 'Omit<SVGAttributes<SVGSVGElement>, "children">',
+          en: "`className` and the other svg attributes.",
+          ru: "`className` и остальные атрибуты svg.",
         },
       ],
     },

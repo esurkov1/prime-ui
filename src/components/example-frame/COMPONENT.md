@@ -31,7 +31,7 @@ ExampleFrame               frame: toolbar + preview stage or code pane
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### ExampleFrame
-No ref. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.
+`ref` → `HTMLDivElement`. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -47,7 +47,7 @@ No ref. The documentation frame: a toolbar (pane switch, theme toggle, copy butt
 | `onCopy` | `() => void` | — | Called after `code` was copied to the clipboard. |
 | `labels` | `Partial<ExampleFrameLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Preview content, laid out by `previewLayout`. |
-| `className` | `string` | — | Extra class on the frame. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "onCopy">` | — | `className` and the other attributes of the frame `<div>`. |
 
 ## Variants
 

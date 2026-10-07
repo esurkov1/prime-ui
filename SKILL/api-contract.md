@@ -79,7 +79,7 @@ export function PeriodFilter() {
 - Use a real `<form>` with `onSubmit`; the submit button is `<Button.Root type="submit">`. A submit
   button outside the form (Modal / Drawer footer) points at it with `form={formId}`.
 - A form inside a Card: wrap the whole `Card.Root` in the `<form>` (Card parts are styled as direct
-  children of Root — never put a wrapper between `Card.Root` and `Card.Body` / `Card.Actions`).
+  children of Root — never put a wrapper between `Card.Root` and `Card.Body` / `Card.Footer`).
 - Fields side by side in a grid row: `align-items: start`. Input and Textarea have `reserveSupportRow`
   to keep bottoms aligned when only one shows an error; other fields do not.
 - Your own control without a frame: `Label` (with `id`; `htmlFor` when the control is a native input)

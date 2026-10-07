@@ -42,7 +42,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Input.Root
-No ref (renders a `<div>`). Does not forward native props. Size, label, support row and the context for `Wrapper` and `Field`.
+`ref` → `HTMLDivElement` (the field frame). Size, label, support row and the context for `Wrapper` and `Field`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -59,15 +59,15 @@ No ref (renders a `<div>`). Does not forward native props. Size, label, support 
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `labels` | `Partial<InputLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Usually `Input.Wrapper`. |
-| `className` | `string` | — | Class on the `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
 
 ### Input.Wrapper
-No ref. The visible field: fill, hover, focus ring, invalid ring.
+`ref` → `HTMLDivElement`. The visible field: fill, hover, focus ring, invalid ring; `data-size` and `data-invalid` come from the root.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | `Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `ClearButton`. |
-| `className` | `string` | — | Class on the field `<div>`; `data-size` and `data-invalid` come from the root. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the `<div>`. |
 
 ### Input.Field
 `forwardRef` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.
@@ -80,31 +80,31 @@ No ref. The visible field: fill, hover, focus ring, invalid ring.
 | `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size">` | — | `value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`… |
 
 ### Input.Icon
-No ref. Decorative icon (`aria-hidden`), centered between the edge and the text.
+`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`), centered between the edge and the text.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"start" \| "end"` | — (required) | Side of the value. |
 | `children` | `ReactNode` | — (required) | An icon; kit icons without an explicit `size` take the field tier. |
-| `className` | `string` | — | Class on the `<span>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ### Input.Affix
-No ref. Tinted section flush with the edge (`aria-hidden`); the wrapper drops its padding there.
+`ref` → `HTMLDivElement`. Tinted section flush with the edge (`aria-hidden`); the wrapper drops its padding there.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"start" \| "end"` | — (required) | Edge the section sits on. |
 | `children` | `ReactNode` | — (required) | Static text: protocol, domain, country code. |
-| `className` | `string` | — | Class on the `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the `<div>`. |
 
 ### Input.InlineAffix
-No ref. Muted unit next to the value (`aria-hidden`).
+`ref` → `HTMLSpanElement`. Muted unit next to the value (`aria-hidden`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"start" \| "end"` | — (required) | Side of the value. |
 | `children` | `ReactNode` | — (required) | Short unit: `₽`, `%`, `кг`. |
-| `className` | `string` | — | Class on the `<span>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ### Input.ClearButton
 `forwardRef` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.
@@ -115,13 +115,13 @@ No ref. Muted unit next to the value (`aria-hidden`).
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label">` | — | The other button attributes. |
 
 ### Input.Counter
-No ref. Character counter for the support row; shows `14/40` and announces `labels.counter`.
+`ref` → `HTMLSpanElement`. Character counter for the support row; shows `14/40` and announces `labels.counter`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `current` | `number` | — (required) | Current length. |
 | `max` | `number` | — (required) | Limit; `current > max` turns the counter danger (`data-invalid="true"`). |
-| `className` | `string` | — | Class on the `<span>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ## Variants
 Input has no `variant` or `tone`: there is one field treatment (fill, no visible border).

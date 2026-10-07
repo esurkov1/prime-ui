@@ -225,18 +225,18 @@ SmartFilterRoot.displayName = "SmartFilter.Root";
 // Toolbar: filter button + search; the anchor of the panel
 // ---------------------------------------------------------------------------------------------
 
-export type SmartFilterToolbarProps = {
-  className?: string;
+export type SmartFilterToolbarProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-function SmartFilterToolbar({ className }: SmartFilterToolbarProps) {
+function SmartFilterToolbar({ className, ...rest }: SmartFilterToolbarProps) {
   const { fields, total, open, setOpen, search, setSearch, labels, size } = useSmartFilter();
   const hasFilters = fields.length > 0;
 
   return (
     <>
       <Popover.Anchor>
-        <div className={cx(styles.toolbar, className)} data-slot="smart-filter-toolbar">
+        <div {...rest} className={cx(styles.toolbar, className)} data-slot="smart-filter-toolbar">
           {hasFilters && (
             <Button.Root
               variant="soft"
@@ -506,12 +506,12 @@ function ValueToggle({ option, size, mode, canHide, query, onMode }: ValueToggle
 // Chips: applied filters as tags
 // ---------------------------------------------------------------------------------------------
 
-export type SmartFilterChipsProps = {
-  className?: string;
+export type SmartFilterChipsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 /** The applied filters as removable tags, with "add" and "clear all". Renders nothing without filters. */
-function SmartFilterChips({ className }: SmartFilterChipsProps) {
+function SmartFilterChips({ className, ...rest }: SmartFilterChipsProps) {
   const { fields, value, setSelection, total, clearAll, setOpen, setSearch, labels, size } =
     useSmartFilter();
   if (total === 0) return null;
@@ -519,7 +519,7 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
   const tagSize: ControlSize = size === "xs" ? "s" : size;
 
   return (
-    <div className={cx(styles.chips, className)} data-slot="smart-filter-chips">
+    <div {...rest} className={cx(styles.chips, className)} data-slot="smart-filter-chips">
       {fields.flatMap((field) => {
         const selection = value[field.key];
         if (!selection) return [];

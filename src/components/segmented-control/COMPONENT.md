@@ -62,7 +62,7 @@ SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, 
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" \| "type" \| "role">` | — | `aria-label`, `onClick` (runs first and can `preventDefault()` the selection), `className` and the other button attributes. |
 
 ### SegmentedControl.Icon
-No ref. Decorative icon (`aria-hidden`) sized to the tier.
+`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) sized to the tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -70,7 +70,7 @@ No ref. Decorative icon (`aria-hidden`) sized to the tier.
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### SegmentedControl.Label
-No ref. Segment title; truncates with an ellipsis. Plain text is wrapped automatically.
+`ref` → `HTMLSpanElement`. Segment title; truncates with an ellipsis. Plain text is wrapped automatically.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -78,16 +78,16 @@ No ref. Segment title; truncates with an ellipsis. Plain text is wrapped automat
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### SegmentedControl.Count
-No ref. Counter `Badge` after the label, one tier below the control, tabular numbers.
+`ref` → `HTMLSpanElement`. Counter `Badge` after the label, one tier below the control, tabular numbers.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Badge hue. |
 | `children` | `ReactNode` | — (required) | The number. |
-| `className` | `string` | — | Extra class. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### SegmentedControl.Description
-No ref. Muted second line; makes the segment two-line and becomes its `aria-describedby`.
+`ref` → `HTMLSpanElement`. Muted second line; makes the segment two-line and becomes its `aria-describedby`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

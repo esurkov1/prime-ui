@@ -141,7 +141,7 @@ export default function IntroPage() {
                 <Card.Root key={item.to} variant="cta">
                   <Card.Title>{item.title}</Card.Title>
                   <Card.Description>{item.text}</Card.Description>
-                  <Card.Actions>
+                  <Card.Footer>
                     <LinkButton
                       href={item.to}
                       size="s"
@@ -152,7 +152,7 @@ export default function IntroPage() {
                     >
                       Открыть
                     </LinkButton>
-                  </Card.Actions>
+                  </Card.Footer>
                 </Card.Root>
               ))}
             </div>

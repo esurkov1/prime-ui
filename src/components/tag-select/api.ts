@@ -1,10 +1,11 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "TagSelect",
-      en: 'No ref. The field frame with a chip row and an `<input role="combobox">`, and a portaled multi-select list; options come as data.',
+      en: '`ref` → `HTMLDivElement` (the field frame). The field frame with a chip row and an `<input role="combobox">`, and a portaled multi-select list; options come as data.',
       ru: 'Поле с чипами и полем ввода `role="combobox"` и выпадающий список с несколькими значениями; опции — данные.',
       props: [
         {
@@ -168,12 +169,7 @@ export const api: ComponentApi = {
           en: "Name of the input and the list when there is no `label`.",
           ru: "Имя поля и списка, если нет `label`.",
         },
-        {
-          name: "className",
-          type: "string",
-          en: "Class on the field frame.",
-          ru: "Класс обёртки поля.",
-        },
+        FIELD_ROOT_REST,
       ],
     },
   ],

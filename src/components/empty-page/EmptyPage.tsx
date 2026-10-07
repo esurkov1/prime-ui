@@ -54,6 +54,7 @@ EmptyPageRoot.displayName = "EmptyPage.Root";
 export type EmptyPageIconProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Tile fill: `neutral` (default), `accent` — an invitation to start, `danger` — a failure. */
   tone?: Extract<Tone, "neutral" | "accent" | "danger">;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function EmptyPageIcon({ tone = "neutral", className, ...rest }: EmptyPageIconProps) {
@@ -92,7 +93,9 @@ function EmptyPageDescription({ className, ...rest }: EmptyPageDescriptionProps)
 }
 EmptyPageDescription.displayName = "EmptyPage.Description";
 
-export type EmptyPageActionsProps = React.HTMLAttributes<HTMLDivElement>;
+export type EmptyPageActionsProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 function EmptyPageActions({ className, ...rest }: EmptyPageActionsProps) {
   return <div className={cx(styles.actions, useEnterClass(), className)} {...rest} />;

@@ -134,7 +134,7 @@ form rules: `Modal.Body` holds the `<form id>`, `Modal.Footer` holds Cancel + su
 
 `Stepper.Root` (controlled `value`) above one Card that shows the current step's fields; actions
 «Назад» (`variant="soft" tone="neutral"`) and «Далее» / «Готово» at the bottom of the card
-(`Card.Actions`). Mark a failed step with `Stepper.Item status="danger"`. See
+(`Card.Footer`). Mark a failed step with `Stepper.Item status="danger"`. See
 `src/components/stepper/examples/controlled.tsx` and `states.tsx`.
 
 ## Auth (sign in, code)

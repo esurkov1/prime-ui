@@ -81,7 +81,7 @@ export const api: ComponentApi = {
     },
     {
       name: "ButtonGroup.Icon",
-      en: "No ref. Decorative icon wrapper (`aria-hidden`) sized to the group tier.",
+      en: "`ref` → `HTMLSpanElement`. Decorative icon wrapper (`aria-hidden`) sized to the group tier.",
       ru: "Иконка размера яруса группы; скрыта от скринридеров.",
       props: [
         {

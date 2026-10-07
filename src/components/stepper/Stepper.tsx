@@ -154,7 +154,7 @@ StepperItem.displayName = "Stepper.Item";
 
 // ─── Parts ────────────────────────────────────────────────────────────────────
 
-type SpanProps = React.HTMLAttributes<HTMLSpanElement>;
+type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLSpanElement> };
 
 export type StepperIndicatorProps = SpanProps & {
   /** Replaces the default content (the item number, or a check when completed). */
@@ -203,13 +203,20 @@ function StepperDescription({ className, ...rest }: StepperDescriptionProps) {
 }
 StepperDescription.displayName = "Stepper.Description";
 
-export type StepperArrowProps = {
-  className?: string;
+export type StepperArrowProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
+  ref?: React.Ref<SVGSVGElement>;
 };
 
 /** Trailing chevron for vertical items that open a page or panel. */
-function StepperArrow({ className }: StepperArrowProps) {
-  return <Icon name="nav.chevronRight" className={cx(styles.arrow, className)} strokeWidth={2} />;
+function StepperArrow({ className, ...rest }: StepperArrowProps) {
+  return (
+    <Icon
+      {...rest}
+      name="nav.chevronRight"
+      className={cx(styles.arrow, className)}
+      strokeWidth={2}
+    />
+  );
 }
 StepperArrow.displayName = "Stepper.Arrow";
 

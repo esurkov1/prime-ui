@@ -48,7 +48,7 @@ Select.Root                       field frame: label · control · hint/error; v
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Select.Root
-No ref. The field frame (label row · control · support row) holding the value, the open state and the search query.
+`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -73,8 +73,8 @@ No ref. The field frame (label row · control · support row) holding the value,
 | `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `id` | `string` | — | Id of the trigger; generated when omitted. |
 | `labels` | `Partial<SelectLabels>` | — | Built-in strings, see Labels. |
-| `className` | `string` | — | Class on the field frame. |
 | `children` | `ReactNode` | — (required) | Trigger and Content. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
 
 ### Select.Trigger
 `ref` → `HTMLButtonElement`. `<button role="combobox">` with the value, the clear segment and the chevron (a Spinner while `loading`). + native button props.
@@ -84,24 +84,24 @@ No ref. The field frame (label row · control · support row) holding the value,
 | `children` | `ReactNode` | — | `Select.TriggerIcon`, `Select.Value`, optionally a Badge after it. |
 
 ### Select.Value
-No ref. The picked label (labels joined with `multiple`) with an ellipsis, or the placeholder.
+`ref` → `HTMLSpanElement`. The picked label (labels joined with `multiple`) with an ellipsis, or the placeholder.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `renderValue` | `(item: { value: string; label: string }) => ReactNode` | — | Single mode: draws the picked option in the trigger with the row parts (Thumbnail, ItemText, ItemDescription); not called while empty. |
-| `className` | `string` | — | Class on the value. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Select.TriggerIcon · Select.ItemIcon
-No ref. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.
 
 ### Select.Content
-No ref. Portal + the floating list panel; stays mounted while closed (the items register their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.
+`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel; stays mounted while closed (the items register their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `searchable` | `boolean` | `false` | A search field on top; items filter by label, description and `keywords`. |
-| `className` | `string` | — | Class on the panel. |
 | `children` | `ReactNode` | — (required) | Items, groups, separators. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "hidden" \| "onKeyDown" \| "onAnimationEnd">` | — | `className` and the other attributes of the panel. |
 
 ### Select.Item
 `ref` → `HTMLDivElement`. `role="option"` with `aria-selected`; a check on the end (single) or a Checkbox.Indicator in front (`multiple`).
@@ -115,21 +115,21 @@ No ref. Portal + the floating list panel; stays mounted while closed (the items 
 | `children` | `ReactNode` | — (required) | Text, or `Select.ItemIcon`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta` as direct children. |
 
 ### Select.ItemText · Select.ItemDescription · Select.ItemMeta
-No ref. Rich option parts: the title (its text is the label) / a muted second line (searchable; makes the row two-line) / a trailing muted value before the check. A `Thumbnail.Root` child is the leading media, sized to the tier unless it sets `size`.
+`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line (searchable; makes the row two-line) / a trailing muted value before the check. A `Thumbnail.Root` child is the leading media, sized to the tier unless it sets `size`. + native `<span>` props.
 
 ### Select.Group
-No ref. `<div role="group">` named by its `label`; hidden while the search leaves none of its options. + native `<div>` props.
+`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while the search leaves none of its options. + native `<div>` props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — | Heading of the group (caption, muted); also its accessible name. |
 
 ### Select.Separator
-No ref. A full-bleed Divider between groups; hidden while searching.
+`ref` → `HTMLDivElement`. A full-bleed Divider between groups; hidden while searching.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class on the divider. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the divider. |
 
 ## Variants
 No `variant` or `tone`. The trigger is the field look (fill, inset control border, tier radius); the panel is the shared floating surface with menu rows.

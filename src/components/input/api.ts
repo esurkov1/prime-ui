@@ -1,4 +1,5 @@
 import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 const side = (en: string, ru: string): ApiProp => ({
   name: "side",
@@ -8,18 +9,21 @@ const side = (en: string, ru: string): ApiProp => ({
   ru,
 });
 
-const className = (element: string): ApiProp => ({
-  name: "className",
-  type: "string",
-  en: `Class on the \`${element}\`.`,
-  ru: `Класс на \`${element}\`.`,
-});
+const rest = (element: "div" | "span", omit = '"children"'): ApiProp => {
+  const type = element === "div" ? "HTMLDivElement" : "HTMLSpanElement";
+  return {
+    name: "…rest",
+    type: `Omit<HTMLAttributes<${type}>, ${omit}>`,
+    en: `\`className\` and the other attributes of the \`<${element}>\`.`,
+    ru: `\`className\` и остальные атрибуты \`<${element}>\`.`,
+  };
+};
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Input.Root",
-      en: "No ref (renders a `<div>`). Does not forward native props. Size, label, support row and the context for `Wrapper` and `Field`.",
+      en: "`ref` → `HTMLDivElement` (the field frame). Size, label, support row and the context for `Wrapper` and `Field`.",
       ru: "Размер, подпись, строка поддержки и контекст для `Wrapper` и `Field`.",
       props: [
         {
@@ -107,13 +111,13 @@ export const api: ComponentApi = {
           en: "Usually `Input.Wrapper`.",
           ru: "Обычно `Input.Wrapper` с полем и слотами.",
         },
-        className("<div>"),
+        FIELD_ROOT_REST,
       ],
     },
     {
       name: "Input.Wrapper",
-      en: "No ref. The visible field: fill, hover, focus ring, invalid ring.",
-      ru: "Видимое поле: заливка, наведение, фокус, ошибка.",
+      en: "`ref` → `HTMLDivElement`. The visible field: fill, hover, focus ring, invalid ring; `data-size` and `data-invalid` come from the root.",
+      ru: "Видимое поле: заливка, наведение, фокус, ошибка; `data-size` и `data-invalid` приходят из контекста.",
       props: [
         {
           name: "children",
@@ -122,12 +126,7 @@ export const api: ComponentApi = {
           en: "`Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `ClearButton`.",
           ru: "`Field`, `Icon`, `Affix`, `InlineAffix`, `ClearButton`.",
         },
-        {
-          name: "className",
-          type: "string",
-          en: "Class on the field `<div>`; `data-size` and `data-invalid` come from the root.",
-          ru: "Класс поля; `data-size` и `data-invalid` приходят из контекста.",
-        },
+        rest("div"),
       ],
     },
     {
@@ -163,7 +162,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Input.Icon",
-      en: "No ref. Decorative icon (`aria-hidden`), centered between the edge and the text.",
+      en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`), centered between the edge and the text.",
       props: [
         side("Side of the value.", "Сторона значения."),
         {
@@ -173,12 +172,12 @@ export const api: ComponentApi = {
           en: "An icon; kit icons without an explicit `size` take the field tier.",
           ru: "Иконка; без `size` берёт ярус поля.",
         },
-        className("<span>"),
+        rest("span"),
       ],
     },
     {
       name: "Input.Affix",
-      en: "No ref. Tinted section flush with the edge (`aria-hidden`); the wrapper drops its padding there.",
+      en: "`ref` → `HTMLDivElement`. Tinted section flush with the edge (`aria-hidden`); the wrapper drops its padding there.",
       props: [
         side("Edge the section sits on.", "Край, к которому прилегает секция с подложкой."),
         {
@@ -188,12 +187,12 @@ export const api: ComponentApi = {
           en: "Static text: protocol, domain, country code.",
           ru: "Постоянный текст: протокол, домен, код страны.",
         },
-        className("<div>"),
+        rest("div"),
       ],
     },
     {
       name: "Input.InlineAffix",
-      en: "No ref. Muted unit next to the value (`aria-hidden`).",
+      en: "`ref` → `HTMLSpanElement`. Muted unit next to the value (`aria-hidden`).",
       props: [
         side("Side of the value.", "Сторона значения."),
         {
@@ -203,7 +202,7 @@ export const api: ComponentApi = {
           en: "Short unit: `₽`, `%`, `кг`.",
           ru: "Короткая единица: `₽`, `%`, `кг`.",
         },
-        className("<span>"),
+        rest("span"),
       ],
     },
     {
@@ -227,7 +226,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Input.Counter",
-      en: "No ref. Character counter for the support row; shows `14/40` and announces `labels.counter`.",
+      en: "`ref` → `HTMLSpanElement`. Character counter for the support row; shows `14/40` and announces `labels.counter`.",
       props: [
         {
           name: "current",
@@ -243,7 +242,7 @@ export const api: ComponentApi = {
           en: 'Limit; `current > max` turns the counter danger (`data-invalid="true"`).',
           ru: "Лимит; при `current > max` счётчик красный (`data-invalid`).",
         },
-        className("<span>"),
+        rest("span"),
       ],
     },
   ],

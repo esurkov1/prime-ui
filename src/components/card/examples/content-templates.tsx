@@ -1,4 +1,4 @@
-/** Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Description`, `Card.List`, `Card.Cover`. */
+/** Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. */
 import { Button, Card, LinkButton, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -17,21 +17,21 @@ export default function CardContentTemplatesExample() {
         <Card.Description>
           Сводка по сегментам и метрикам за выбранный период в CSV или XLSX.
         </Card.Description>
-        <Card.Actions>
+        <Card.Footer>
           <Button.Root size="s">Скачать CSV</Button.Root>
           <Button.Root variant="ghost" tone="neutral" size="s">
             Настроить
           </Button.Root>
-        </Card.Actions>
+        </Card.Footer>
       </Card.Root>
 
       <Card.Root variant="list">
-        <Card.SectionHeader>
-          <Card.SectionTitle>Последние события</Card.SectionTitle>
+        <Card.Header>
+          <Card.Title>Последние события</Card.Title>
           <LinkButton href="#" size="s">
             Все
           </LinkButton>
-        </Card.SectionHeader>
+        </Card.Header>
         <Card.List>
           {EVENTS.map((e) => (
             <Card.ListItem key={e.text}>
@@ -49,18 +49,18 @@ export default function CardContentTemplatesExample() {
       </Card.Root>
 
       <Card.Root variant="cover">
-        <Card.Cover aria-hidden>
+        <Card.Media aria-hidden>
           <div className={styles.cover} />
-        </Card.Cover>
-        <Card.Stack>
+        </Card.Media>
+        <Card.Body>
           <Card.Title>Кампания «Осень»</Card.Title>
-          <Card.Label>Охват и клики за 7 дней</Card.Label>
-        </Card.Stack>
-        <Card.Actions>
+          <Card.Description>Охват и клики за 7 дней</Card.Description>
+        </Card.Body>
+        <Card.Footer>
           <Button.Root variant="outline" tone="neutral" size="s">
             Открыть отчёт
           </Button.Root>
-        </Card.Actions>
+        </Card.Footer>
       </Card.Root>
     </div>
   );
