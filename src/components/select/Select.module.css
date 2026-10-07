@@ -1,15 +1,10 @@
 /* ─── Select ─────────────────────────────────────────────────────────────────
  * Trigger = field system (foundation §4, §6, §8): fill instead of border, tier height,
  * field padding, inset danger ring on error, the single focus ring.
- * Panel = shared floating panel (`--prime-panel-*`), items use the trigger tier.
+ * Panel = shared floating surface + menu rows (`popover/surface`, `dropdown/menu`).
  */
 
-/* ─── Tier variables (trigger + panel share the same data-size) ─────────── */
-
-.trigger,
-.nativeSelect,
-.nativeChevron,
-.content {
+.trigger {
   --sel-h: var(--prime-control-m-height);
   --sel-px: var(--prime-control-m-field-padding-x);
   --sel-gap: var(--prime-control-m-gap);
@@ -17,13 +12,13 @@
   --sel-radius: var(--prime-control-m-radius);
   --sel-text: var(--prime-control-m-text-size);
   --sel-lh: var(--prime-control-m-line-height);
-  --sel-item-h: var(--prime-control-m-item-height);
-  --sel-choice: var(--prime-control-s-choice);
-  --sel-desc-size: var(--prime-text-body-s-size);
+  --sel-desc: var(--prime-text-body-s-size);
   --sel-desc-lh: var(--prime-text-body-s-line-height);
+  /* A kit Icon inside (chevron, clear, TriggerIcon) takes the tier icon size. */
+  --prime-icon-size: var(--sel-icon);
 }
 
-[data-size="xs"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
+.trigger[data-size="xs"] {
   --sel-h: var(--prime-control-xs-height);
   --sel-px: var(--prime-control-xs-field-padding-x);
   --sel-gap: var(--prime-control-xs-gap);
@@ -31,13 +26,11 @@
   --sel-radius: var(--prime-control-xs-radius);
   --sel-text: var(--prime-control-xs-text-size);
   --sel-lh: var(--prime-control-xs-line-height);
-  --sel-item-h: var(--prime-control-xs-item-height);
-  --sel-choice: var(--prime-control-xs-choice);
-  --sel-desc-size: var(--prime-text-caption-size);
+  --sel-desc: var(--prime-text-caption-size);
   --sel-desc-lh: var(--prime-text-caption-line-height);
 }
 
-[data-size="s"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
+.trigger[data-size="s"] {
   --sel-h: var(--prime-control-s-height);
   --sel-px: var(--prime-control-s-field-padding-x);
   --sel-gap: var(--prime-control-s-gap);
@@ -45,13 +38,11 @@
   --sel-radius: var(--prime-control-s-radius);
   --sel-text: var(--prime-control-s-text-size);
   --sel-lh: var(--prime-control-s-line-height);
-  --sel-item-h: var(--prime-control-s-item-height);
-  --sel-choice: var(--prime-control-xs-choice);
-  --sel-desc-size: var(--prime-text-caption-size);
+  --sel-desc: var(--prime-text-caption-size);
   --sel-desc-lh: var(--prime-text-caption-line-height);
 }
 
-[data-size="l"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
+.trigger[data-size="l"] {
   --sel-h: var(--prime-control-l-height);
   --sel-px: var(--prime-control-l-field-padding-x);
   --sel-gap: var(--prime-control-l-gap);
@@ -59,13 +50,9 @@
   --sel-radius: var(--prime-control-l-radius);
   --sel-text: var(--prime-control-l-text-size);
   --sel-lh: var(--prime-control-l-line-height);
-  --sel-item-h: var(--prime-control-l-item-height);
-  --sel-choice: var(--prime-control-m-choice);
-  --sel-desc-size: var(--prime-text-body-s-size);
-  --sel-desc-lh: var(--prime-text-body-s-line-height);
 }
 
-[data-size="xl"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
+.trigger[data-size="xl"] {
   --sel-h: var(--prime-control-xl-height);
   --sel-px: var(--prime-control-xl-field-padding-x);
   --sel-gap: var(--prime-control-xl-gap);
@@ -73,30 +60,15 @@
   --sel-radius: var(--prime-control-xl-radius);
   --sel-text: var(--prime-control-xl-text-size);
   --sel-lh: var(--prime-control-xl-line-height);
-  --sel-item-h: var(--prime-control-xl-item-height);
-  --sel-choice: var(--prime-control-l-choice);
-  --sel-desc-size: var(--prime-text-body-s-size);
-  --sel-desc-lh: var(--prime-text-body-s-line-height);
-}
-
-.spinner {
-  animation: selectSpin calc(var(--prime-motion-duration-slow) * 3) linear infinite;
-}
-
-@keyframes selectSpin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /* ─── Trigger ─────────────────────────────────────────────────────────────── */
 
 /*
- * Icons (leading, clear, chevron) sit centered between the edge and the text (foundation §6):
+ * Icons (leading, clear, chevron) sit centred between the edge and the text (foundation §6):
  * edge→icon = icon→text = field padX, so the trigger gap is padX too.
  */
-.trigger,
-.nativeSelect {
+.trigger {
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -130,36 +102,30 @@
   transform: scale(var(--prime-motion-press-scale));
 }
 
-.trigger:hover:not(:disabled),
-.nativeSelect:hover:not(:disabled) {
+.trigger:hover:not(:disabled) {
   background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
 }
 
 .trigger[data-state="open"],
-.trigger:focus-visible,
-.nativeSelect:focus-visible {
+.trigger:focus-visible {
   background: var(--prime-color-field-bg-focus);
 }
 
 /* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
-.trigger:not([data-focus-ring="false"]):focus-visible,
-.nativeSelect:not([data-focus-ring="false"]):focus-visible {
+.trigger:not([data-focus-ring="false"]):focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-.trigger[data-invalid="true"],
-.nativeSelect[data-invalid="true"] {
+.trigger[data-invalid="true"] {
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
-.trigger[data-invalid="true"]:focus-visible,
-.nativeSelect[data-invalid="true"]:focus-visible {
+.trigger[data-invalid="true"]:focus-visible {
   outline-color: var(--prime-color-danger-border);
 }
 
-.trigger:disabled,
-.nativeSelect:disabled {
+.trigger:disabled {
   background: var(--prime-color-field-bg-disabled);
   box-shadow: none;
   color: var(--prime-color-text-disabled);
@@ -174,7 +140,7 @@
   min-width: 0;
 }
 
-.triggerValue {
+.value {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
@@ -182,15 +148,23 @@
   white-space: nowrap;
 }
 
-/* Rich value (`Select.Value` render function with media / description): two lines, the trigger
-   grows from the tier height with tier padding; single-line triggers are unchanged. */
-.trigger:has(.triggerValue[data-rich="true"]) {
+.value[data-placeholder="true"] {
+  color: var(--prime-color-text-placeholder);
+}
+
+.trigger:disabled .value {
+  color: var(--prime-color-text-disabled);
+}
+
+/* Rich value (`renderValue` with media / description): two lines, the trigger grows from the
+   tier height with tier padding; single-line triggers are unchanged. */
+.trigger:has(.value[data-rich="true"]) {
   height: auto;
   min-height: var(--sel-h);
   padding-block: var(--sel-gap);
 }
 
-.triggerValue:has(> .valueBody) {
+.value[data-rich="true"] {
   display: flex;
   align-items: center;
   gap: var(--sel-gap);
@@ -203,25 +177,9 @@
   min-width: 0;
 }
 
-/* Select.Badge: after the value, before the clear button and the chevron (padX on both sides). */
-.badge {
-  order: 1;
-}
-
-/* Gray soft is a wash like the field: a stronger wash keeps a neutral badge visible (§4). */
-.badge[data-color="gray"]:not([data-disabled="true"]) {
-  background: var(--prime-color-fill-strong);
-}
-
-.triggerValue[data-placeholder="true"] {
-  color: var(--prime-color-text-placeholder);
-}
-
-.trigger:disabled .triggerValue {
-  color: var(--prime-color-text-disabled);
-}
-
-.triggerIcon {
+.triggerIcon,
+.chevron,
+.clear {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -231,52 +189,27 @@
   color: var(--prime-color-text-muted);
 }
 
-.triggerIcon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.trigger:disabled .triggerIcon {
+.trigger:disabled :is(.triggerIcon, .chevron) {
   color: var(--prime-color-text-disabled);
 }
 
-.triggerChevronSlot,
-.triggerClear {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--sel-icon);
-  height: var(--sel-icon);
-  color: var(--prime-color-text-muted);
-}
-
-.triggerChevronSlot {
+.chevron {
   pointer-events: none;
 }
 
-.triggerChevronSlot svg,
-.triggerClear svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.chevron > svg {
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.trigger[data-state="open"] .triggerChevronSlot svg:not(.spinner) {
+.trigger[data-state="open"] .chevron > svg {
   transform: rotate(180deg);
-}
-
-.trigger:disabled .triggerChevronSlot {
-  color: var(--prime-color-text-disabled);
 }
 
 /*
  * Clear: a full-height segment before the chevron, with the trigger's usual gap on both sides, so
- * its hover wash touches neither the value nor the chevron. The icon sits half a padX inside it.
+ * its hover wash touches neither the value nor the chevron.
  */
-.triggerClear {
+.clear {
   align-self: stretch;
   width: calc(var(--sel-icon) + var(--sel-px));
   height: auto;
@@ -286,106 +219,24 @@
     color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.triggerClear:hover {
+.clear:hover {
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-primary);
-}
-
-.triggerClear svg {
-  width: var(--sel-icon);
-  height: var(--sel-icon);
-}
-
-/* ─── Native <select> ─────────────────────────────────────────────────────── */
-
-.nativeWrap {
-  position: relative;
-  display: flex;
-  width: 100%;
-  min-width: 0;
-}
-
-.nativeSelect {
-  display: block;
-  appearance: none;
-  padding-inline-end: calc(var(--sel-px) + var(--sel-icon) + var(--sel-px));
-}
-
-.nativeSelect[data-multiple="true"] {
-  height: auto;
-  min-height: calc(var(--sel-item-h) * 4);
-  padding: var(--prime-panel-padding);
-}
-
-/* Шеврон — тот же глиф, что у кастомного триггера; цвет из токена, не из data-URI. */
-.nativeChevron {
-  position: absolute;
-  inset-block: 0;
-  inset-inline-end: var(--sel-px);
-  display: inline-flex;
-  align-items: center;
-  width: var(--sel-icon);
-  color: var(--prime-color-text-muted);
-  pointer-events: none;
-}
-
-.nativeChevron svg {
-  display: block;
-  width: 100%;
-  height: var(--sel-icon);
-}
-
-.nativeSelect:disabled + .nativeChevron {
-  color: var(--prime-color-text-disabled);
 }
 
 /* ─── Panel ──────────────────────────────────────────────────────────────── */
 
 .content {
-  /* Fields inside a raised surface stay distinguishable (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  width: max-content;
-  min-width: min(
-    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
-    var(--float-max-w, 100vw)
-  );
-  max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));
-  max-height: min(var(--prime-panel-max-height), var(--float-max-h, var(--prime-panel-max-height)));
-  padding: var(--prime-panel-padding);
   overflow: hidden;
-  border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
-  box-shadow: var(--prime-shadow-overlay);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--sel-text);
-  line-height: var(--sel-lh);
-  outline: none;
 }
 
-/* Закрытый listbox остаётся в DOM для onInitLabel → подпись в триггере; не перехватывать клики по странице. */
+/* Closed: stays mounted (labels for the trigger) but out of layout and of the pointer's way. */
+.content[hidden] {
+  display: none;
+}
+
 .content[aria-hidden="true"] {
   pointer-events: none;
-}
-
-.content[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-z-dropdown);
-}
-
-.content[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-z-dropdown-in-drawer);
-}
-
-.content[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-z-dropdown-in-modal);
-}
-
-.content[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-z-dropdown-in-drawer-in-modal);
 }
 
 .listbox {
@@ -400,95 +251,42 @@
   display: none;
 }
 
-/* ─── Search (top of the panel, hairline below, full bleed) ────────────── */
-
+/* Search row: full bleed across the panel padding, the tier row height. */
 .search {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--sel-gap);
-  height: var(--sel-item-h);
+  gap: var(--menu-gap);
+  height: var(--menu-item-h);
   margin: calc(-1 * var(--prime-panel-padding)) calc(-1 * var(--prime-panel-padding))
     var(--prime-panel-padding);
   padding-block: var(--prime-panel-padding);
   padding-inline: calc(var(--prime-panel-padding) + var(--prime-panel-item-padding-x));
-  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
   box-sizing: content-box;
 }
 
-.searchIcon {
-  flex-shrink: 0;
-  width: var(--prime-icon-s);
-  height: var(--prime-icon-s);
-  color: var(--prime-color-text-muted);
+/* A search hid every option of a group: hide its label too. */
+.group:not(:has([role="option"])) {
+  display: none;
 }
 
-.searchInput {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--prime-color-text-primary);
-  font: inherit;
-  outline: none;
+.content[data-searching="true"] .separator {
+  display: none;
 }
 
-/* Search field: inset ring on the full-bleed row, never clipped by the panel. The panel's own
-   search row sets data-focus-ring="false" (foundation §7: the caret is the indicator). */
-.search:not([data-focus-ring="false"]):has(.searchInput:focus-visible) {
-  /* Follows the panel's top corners so the ring is not cut by its rounding. */
-  border-start-start-radius: var(--prime-panel-radius);
-  border-start-end-radius: var(--prime-panel-radius);
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.searchInput::placeholder {
-  color: var(--prime-color-text-placeholder);
-}
-
-/* ─── Item ───────────────────────────────────────────────────────────────── */
-
-.item {
-  box-sizing: border-box;
+.status {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: var(--sel-gap);
-  width: 100%;
-  min-height: var(--sel-item-h);
-  padding-block: 0;
+  gap: var(--menu-gap);
+  min-height: var(--menu-item-h);
   padding-inline: var(--prime-panel-item-padding-x);
-  border-radius: var(--prime-panel-item-radius);
-  color: var(--prime-color-text-primary);
-  font-size: var(--sel-text);
-  line-height: var(--sel-lh);
-  text-align: start;
-  cursor: pointer;
-  user-select: none;
-  outline: none;
-  transition: background-color var(--prime-motion-duration-xfast)
-    var(--prime-motion-easing-standard);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
 }
 
-.item[data-highlighted="true"] {
-  background: var(--prime-color-fill-subtle);
-}
-
-.item:active:not([data-disabled="true"]) {
-  background: var(--prime-color-fill-subtle-active);
-}
+/* ─── Option ─────────────────────────────────────────────────────────────── */
 
 .item[data-selected="true"] {
   font-weight: var(--prime-font-weight-medium);
-}
-
-.item[data-disabled="true"] {
-  background: transparent;
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
 }
 
 .itemText {
@@ -499,31 +297,9 @@
   white-space: nowrap;
 }
 
-.itemIcon {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--sel-icon);
-  height: var(--sel-icon);
-  color: var(--prime-color-text-muted);
-}
-
-.itemIcon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.item[data-disabled="true"] .itemIcon {
-  color: var(--prime-color-text-disabled);
-}
-
-/* ─── Rich option parts ─────────────────────────────────────────────────── */
-
 /* Two-line option: grows from the tier item height with tier padding. */
 .item[data-rich="true"] {
-  padding-block: var(--sel-gap);
+  padding-block: var(--menu-gap);
 }
 
 .item[data-rich="true"] .itemText {
@@ -548,165 +324,42 @@
   white-space: nowrap;
 }
 
-.item[data-rich="true"] .itemTitle,
-.triggerValue[data-rich="true"] .itemTitle {
+:is(.item[data-rich="true"], .value[data-rich="true"]) .itemTitle {
   font-weight: var(--prime-font-weight-medium);
 }
 
-.itemDescription {
+.itemDescription,
+.itemMeta {
   color: var(--prime-color-text-muted);
-  font-size: var(--sel-desc-size);
+  font-size: var(--menu-desc, var(--sel-desc));
   font-weight: var(--prime-font-weight-regular);
-  line-height: var(--sel-desc-lh);
+  line-height: var(--menu-desc-lh, var(--sel-desc-lh));
 }
 
 .itemMeta {
   flex-shrink: 0;
-  color: var(--prime-color-text-muted);
-  font-size: var(--sel-desc-size);
-  font-weight: var(--prime-font-weight-regular);
-  line-height: var(--sel-desc-lh);
   font-variant-numeric: tabular-nums;
   text-align: end;
   white-space: nowrap;
 }
 
 /* Thumbnail.Root as the leading media of a rich row: placement only, the look is the Thumbnail's. */
-.itemMedia {
+.media {
   flex-shrink: 0;
 }
 
-.trigger:disabled :is(.itemDescription, .itemMeta),
-.item[data-disabled="true"] :is(.itemDescription, .itemMeta) {
+:is(.trigger:disabled, .item[data-disabled="true"]) :is(.itemDescription, .itemMeta) {
   color: var(--prime-color-text-disabled);
 }
 
 /* Fixed trailing column for the check mark (single). */
-.itemCheckSlot {
+.check {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--sel-icon);
-  height: var(--sel-icon);
+  width: var(--menu-icon);
+  height: var(--menu-icon);
   color: var(--prime-color-accent-text);
-}
-
-.itemCheckSlot svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Fixed leading column with a checkbox (multiple). */
-.itemCheckbox {
-  box-sizing: border-box;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--sel-choice);
-  height: var(--sel-choice);
-  border-radius: var(--prime-radius-xs);
-  background: var(--prime-color-fill-strong);
-  color: var(--prime-color-accent-fg);
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.itemCheckbox svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.item[data-highlighted="true"] .itemCheckbox {
-  background: var(--prime-color-fill-strong-hover);
-}
-
-.item[data-selected="true"] .itemCheckbox {
-  background: var(--prime-color-accent-default);
-}
-
-.item[data-disabled="true"] .itemCheckbox {
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-disabled);
-}
-
-/* ─── Group / separator ─────────────────────────────────────────────────── */
-
-.group {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Поиск скрыл все пункты группы — прячем и подпись. */
-.group:not(:has([role="option"])) {
-  display: none;
-}
-
-.groupLabel {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  min-height: var(--prime-panel-group-label-height);
-  padding-inline: var(--prime-panel-item-padding-x);
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
-}
-
-.separator {
-  flex-shrink: 0;
-  align-self: stretch;
-  height: 0;
-  margin-block: var(--prime-panel-padding);
-  margin-inline: calc(-1 * var(--prime-panel-padding));
-  border: 0;
-  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
-}
-
-.content[data-searching="true"] .separator {
-  display: none;
-}
-
-/* ─── Status rows: loading / empty ──────────────────────────────────────── */
-
-.status {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--sel-gap);
-  min-height: var(--sel-item-h);
-  padding-inline: var(--prime-panel-item-padding-x);
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-}
-
-.status .spinner {
-  width: var(--sel-icon);
-  height: var(--sel-icon);
-}
-
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-1);
-  padding: var(--prime-space-4) var(--prime-space-3);
-  text-align: center;
-}
-
-.emptyText {
-  color: var(--prime-color-text-secondary);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-}
-
-.emptyHint {
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
+  --prime-icon-size: var(--menu-icon);
 }

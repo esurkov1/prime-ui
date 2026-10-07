@@ -1,56 +1,9 @@
-/* Layout for the Dropdown examples: layout only, text goes through Typography. */
+/* Layout of the Dropdown scenarios: semantic tokens only. */
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
-}
-
-/* Unstyled button around a Typography label that reads as a text link. */
-.linkTrigger {
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-}
-
-.underline {
-  text-decoration: underline;
-  text-underline-offset: var(--prime-space-1);
-}
-
-.linkTrigger:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-  border-radius: var(--prime-radius-xs);
-}
-
-.wideColumn {
+/* match-trigger-width.tsx: a column with a full-width button. */
+.column {
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: calc(var(--prime-space-24) * 3);
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-  width: 100%;
-  max-width: calc(var(--prime-space-24) * 6);
-}
-
-.toolbarText {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.toolbarActions {
-  display: flex;
-  flex-shrink: 0;
-  gap: var(--prime-space-2);
 }

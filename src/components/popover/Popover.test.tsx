@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Select } from "@/components/select/Select";
 
+import { DropdownLayerContext } from "./layer";
 import { Popover } from "./Popover";
 
 function BasicPopover({
@@ -267,6 +268,86 @@ describe("Popover — overlay contract", () => {
     expect(screen.getByTestId("anchor")).not.toHaveAttribute("aria-expanded");
     fireEvent.pointerDown(document.body);
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("closeOnEscape={false} keeps it open on Escape", () => {
+    render(
+      <Popover.Root defaultOpen closeOnEscape={false}>
+        <Popover.Trigger>
+          <button type="button">Open</button>
+        </Popover.Trigger>
+        <Popover.Content>
+          <div>Panel content</div>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("Close closes the panel and returns focus to the trigger", async () => {
+    const user = userEvent.setup();
+    render(
+      <Popover.Root>
+        <Popover.Trigger>
+          <button type="button">Open</button>
+        </Popover.Trigger>
+        <Popover.Content>
+          <Popover.Close>
+            <button type="button">Готово</button>
+          </Popover.Close>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Open" });
+    await user.click(trigger);
+    await user.click(screen.getByRole("button", { name: "Готово" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("Close does nothing when the child's handler prevents default", () => {
+    render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>
+          <button type="button">Open</button>
+        </Popover.Trigger>
+        <Popover.Content>
+          <Popover.Close>
+            <button type="button" onClick={(event) => event.preventDefault()}>
+              Готово
+            </button>
+          </Popover.Close>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Готово" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("matchTriggerWidth marks the panel and writes the trigger width", () => {
+    render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>
+          <button type="button">Open</button>
+        </Popover.Trigger>
+        <Popover.Content matchTriggerWidth>
+          <div>Panel content</div>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    const panel = screen.getByRole("dialog");
+    expect(panel).toHaveAttribute("data-match-trigger-width", "true");
+    expect(panel.style.getPropertyValue("--float-min-w")).not.toBe("");
+  });
+
+  it("rises above the panel it was opened from inside a dropdown layer", () => {
+    render(
+      <DropdownLayerContext.Provider value>
+        <BasicPopover defaultOpen />
+      </DropdownLayerContext.Provider>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-overlay-stack", "above-dropdown");
   });
 
   it("flush marks the panel for edge-to-edge content", () => {

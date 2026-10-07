@@ -212,8 +212,6 @@ function DatepickerRoot({
           side="bottom"
           size={size}
           trapFocus
-          insetPadding="none"
-          insetGap="none"
           className={styles.popover}
         >
           <div ref={setPanelNode} className={styles.popoverBody}>

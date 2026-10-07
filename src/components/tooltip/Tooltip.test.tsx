@@ -82,6 +82,24 @@ describe("Tooltip", () => {
     vi.useRealTimers();
   });
 
+  it("Content forwards ref and native attributes to the chip", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Tooltip.Root defaultOpen>
+        <Tooltip.Trigger>
+          <button type="button">Trigger</button>
+        </Tooltip.Trigger>
+        <Tooltip.Content ref={ref} className="extra" data-testid="chip">
+          Tooltip text
+        </Tooltip.Content>
+      </Tooltip.Root>,
+    );
+    const chip = screen.getByRole("tooltip");
+    expect(ref.current).toBe(chip);
+    expect(chip).toHaveClass("extra");
+    expect(chip).toHaveAttribute("data-testid", "chip");
+  });
+
   it("is hidden by default", () => {
     render(<BasicTooltip />);
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();

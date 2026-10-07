@@ -1,34 +1,25 @@
-/** `delayDuration` per Tooltip.Root: instant, default 400 ms and one second. Set it on Tooltip.Provider for a whole area or on one Root. */
+/** The show delay of one tooltip: at once, the default 400 ms and one second — `delayDuration`. */
 import { Button, Tooltip } from "prime-ui-kit";
-import styles from "./examples.module.css";
+
+const DELAYS = [
+  { label: "Сразу", delay: 0 },
+  { label: "400 мс", delay: 400 },
+  { label: "1 секунда", delay: 1000 },
+];
 
 export default function TooltipDelayExample() {
   return (
-    <div className={styles.row}>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
-          <Button.Root variant="soft" tone="neutral">
-            Сразу
-          </Button.Root>
-        </Tooltip.Trigger>
-        <Tooltip.Content>delayDuration=0</Tooltip.Content>
-      </Tooltip.Root>
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <Button.Root variant="soft" tone="neutral">
-            По умолчанию
-          </Button.Root>
-        </Tooltip.Trigger>
-        <Tooltip.Content>400 мс</Tooltip.Content>
-      </Tooltip.Root>
-      <Tooltip.Root delayDuration={1000}>
-        <Tooltip.Trigger>
-          <Button.Root variant="soft" tone="neutral">
-            Через секунду
-          </Button.Root>
-        </Tooltip.Trigger>
-        <Tooltip.Content>delayDuration=1000</Tooltip.Content>
-      </Tooltip.Root>
-    </div>
+    <>
+      {DELAYS.map(({ label, delay }) => (
+        <Tooltip.Root key={label} delayDuration={delay}>
+          <Tooltip.Trigger>
+            <Button.Root variant="soft" tone="neutral">
+              {label}
+            </Button.Root>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Черновик сохранится на сервере</Tooltip.Content>
+        </Tooltip.Root>
+      ))}
+    </>
   );
 }

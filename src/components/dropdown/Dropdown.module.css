@@ -1,239 +1,27 @@
 /* ─── Dropdown menu ──────────────────────────────────────────────────────────
- * Shared floating panel (`--prime-panel-*`): raised fill, radius 12, padding 4,
- * items radius 8 = 12 − 4, item height/text/icon from the menu tier.
+ * Rows, groups and separators come from `menu.module.css`; the panel from the shared surface.
+ * Items take real focus (roving inside the menu), so hover and keyboard focus both light a row.
  */
 
-.content {
-  --dd-item-h: var(--prime-control-m-item-height);
-  --dd-text: var(--prime-control-m-text-size);
-  --dd-lh: var(--prime-control-m-line-height);
-  --dd-icon: var(--prime-control-m-icon);
-  --dd-gap: var(--prime-control-m-gap);
-  --dd-meta: var(--prime-control-m-label-size);
-  --dd-meta-lh: var(--prime-control-m-label-line-height);
-  /* Fields inside a raised surface stay distinguishable (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
-  position: fixed;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: max-content;
-  min-width: min(
-    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
-    var(--float-max-w, 100vw)
-  );
-  max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));
-  max-height: min(var(--prime-panel-max-height), var(--float-max-h, var(--prime-panel-max-height)));
-  margin: 0;
-  padding: var(--prime-panel-padding);
-  border: 0;
-  border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
-  box-shadow: var(--prime-shadow-overlay);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--dd-text);
-  line-height: var(--dd-lh);
-  outline: none;
-}
-
-.content[data-size="xs"] {
-  --dd-item-h: var(--prime-control-xs-item-height);
-  --dd-text: var(--prime-control-xs-text-size);
-  --dd-lh: var(--prime-control-xs-line-height);
-  --dd-icon: var(--prime-control-xs-icon);
-  --dd-gap: var(--prime-control-xs-gap);
-  --dd-meta: var(--prime-control-xs-label-size);
-  --dd-meta-lh: var(--prime-control-xs-label-line-height);
-}
-
-.content[data-size="s"] {
-  --dd-item-h: var(--prime-control-s-item-height);
-  --dd-text: var(--prime-control-s-text-size);
-  --dd-lh: var(--prime-control-s-line-height);
-  --dd-icon: var(--prime-control-s-icon);
-  --dd-gap: var(--prime-control-s-gap);
-  --dd-meta: var(--prime-control-s-label-size);
-  --dd-meta-lh: var(--prime-control-s-label-line-height);
-}
-
-.content[data-size="l"] {
-  --dd-item-h: var(--prime-control-l-item-height);
-  --dd-text: var(--prime-control-l-text-size);
-  --dd-lh: var(--prime-control-l-line-height);
-  --dd-icon: var(--prime-control-l-icon);
-  --dd-gap: var(--prime-control-l-gap);
-  --dd-meta: var(--prime-control-l-label-size);
-  --dd-meta-lh: var(--prime-control-l-label-line-height);
-}
-
-.content[data-size="xl"] {
-  --dd-item-h: var(--prime-control-xl-item-height);
-  --dd-text: var(--prime-control-xl-text-size);
-  --dd-lh: var(--prime-control-xl-line-height);
-  --dd-icon: var(--prime-control-xl-icon);
-  --dd-gap: var(--prime-control-xl-gap);
-  --dd-meta: var(--prime-control-xl-label-size);
-  --dd-meta-lh: var(--prime-control-xl-label-line-height);
-}
-
-.content[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-z-dropdown);
-}
-
-.content[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-z-dropdown-in-drawer);
-}
-
-.content[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-z-dropdown-in-modal);
-}
-
-.content[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-z-dropdown-in-drawer-in-modal);
-}
-
-/* ─── Item ───────────────────────────────────────────────────────────────── */
-
 .item {
-  box-sizing: border-box;
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--dd-gap);
-  width: 100%;
-  min-height: var(--dd-item-h);
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--prime-panel-item-padding-x);
-  border: 0;
-  border-radius: var(--prime-panel-item-radius);
-  background: transparent;
-  color: var(--prime-color-text-primary);
-  font: inherit;
-  text-align: start;
   white-space: nowrap;
-  cursor: pointer;
-  outline: none;
-  transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
 }
 
-/* Клавиатурный фокус = подсветка строки (roving focus внутри меню). */
-.item:hover,
-.item:focus-visible {
+.item:is(:hover, :focus-visible):not([data-disabled="true"]) {
   background: var(--prime-color-fill-subtle);
 }
 
-.item:active {
-  background: var(--prime-color-fill-subtle-active);
-}
-
-.item[data-disabled="true"] {
-  background: transparent;
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
-}
-
-.item[data-tone="danger"] {
-  color: var(--prime-color-danger-text);
-}
-
-.item[data-tone="danger"]:hover,
-.item[data-tone="danger"]:focus-visible {
+.item[data-tone="danger"]:is(:hover, :focus-visible):not([data-disabled="true"]) {
   background: var(--prime-color-danger-soft);
 }
 
-.item[data-tone="danger"][data-disabled="true"] {
-  background: transparent;
+.item[data-disabled="true"] .shortcut {
   color: var(--prime-color-text-disabled);
 }
 
-.itemIcon {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--dd-icon);
-  height: var(--dd-icon);
-  color: var(--prime-color-text-muted);
-}
-
-.item[data-tone="danger"] .itemIcon {
-  color: currentColor;
-}
-
-.item[data-disabled="true"] .itemIcon {
-  color: var(--prime-color-text-disabled);
-}
-
-/* Shortcut: Kbd look, muted, pushed to the trailing edge. */
-.itemShortcut {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  margin-inline-start: auto;
-  padding-inline-start: var(--prime-space-4);
-  color: var(--prime-color-text-muted);
-  font-family: var(--prime-font-family-sans);
-  /* One step below the item text of the same tier, so it scales with the menu. */
-  font-size: var(--dd-meta);
-  line-height: var(--dd-meta-lh);
-  font-variant-numeric: tabular-nums;
-}
-
-.item[data-disabled="true"] .itemShortcut {
-  color: var(--prime-color-text-disabled);
-}
-
-/* ─── Group / separator ─────────────────────────────────────────────────── */
-
-.group,
-.block {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  min-width: 0;
-}
-
-.groupLabel {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  min-height: var(--prime-panel-group-label-height);
-  padding-inline: var(--prime-panel-item-padding-x);
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
-}
-
-/* Hairline full-bleed: negative inline margin = panel padding. */
-.separator {
-  flex-shrink: 0;
-  align-self: stretch;
-  height: 0;
-  margin-block: var(--prime-panel-padding);
-  margin-inline: calc(-1 * var(--prime-panel-padding));
-  padding: 0;
-  border: 0;
-  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
-}
-
-/* ─── Header (user info) ────────────────────────────────────────────────── */
+/* ─── Header: who is signed in, the current plan ─────────────────────────── */
 
 .header {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  min-width: 0;
-}
-
-.headerRow {
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -243,48 +31,31 @@
   padding: var(--prime-space-2) var(--prime-panel-item-padding-x);
 }
 
-.headerLeading {
-  display: flex;
-  flex-shrink: 0;
-}
-
-.headerMain {
+.headerText {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
 }
 
-.headerTrailing {
-  display: flex;
-  flex-shrink: 0;
-  align-self: flex-start;
-}
-
-.headerTrailing[data-trailing-align="center"] {
-  align-self: center;
-}
-
-.headerTitle {
+.title,
+.description {
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.title {
   color: var(--prime-color-text-primary);
   font-size: var(--prime-text-body-m-size);
   font-weight: var(--prime-font-weight-medium);
   line-height: var(--prime-text-body-m-line-height);
 }
 
-.headerDescription {
-  min-width: 0;
-  overflow-wrap: anywhere;
+.description {
   color: var(--prime-color-text-muted);
   font-size: var(--prime-text-caption-size);
   line-height: var(--prime-text-caption-line-height);
   letter-spacing: var(--prime-text-caption-tracking);
-}
-
-.headerDescriptionTruncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

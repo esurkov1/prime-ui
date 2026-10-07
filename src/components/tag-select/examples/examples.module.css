@@ -1,34 +1,15 @@
-/* Example layout: semantic tokens only. */
+/* Layout of the TagSelect scenarios: semantic tokens only. */
 
-.column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-  width: 100%;
-  max-width: calc(var(--prime-space-24) * 3.5);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(calc(var(--prime-space-24) * 2.75), 1fr));
-  gap: var(--prime-space-5) var(--prime-space-4);
-  width: 100%;
-}
-
+/* in-form.tsx: field → field 20, actions at the end. */
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-5);
+  width: min(100%, var(--prime-modal-width-m));
 }
 
 .actions {
   display: flex;
-  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--prime-space-2);
-}
-
-.card {
-  width: 100%;
-  max-width: calc(var(--prime-space-24) * 5);
 }

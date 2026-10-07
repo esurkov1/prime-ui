@@ -1,99 +1,70 @@
-/** Rich options with a Thumbnail, ItemText, ItemDescription and ItemMeta, and the trigger rendering the selected option via a Select.Value function. Use it when options need a thumbnail, a second line or a price. */
-import { Bike } from "lucide-react";
+/** Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. */
+import { Truck } from "lucide-react";
 import { type PaletteColor, Select, Thumbnail } from "prime-ui-kit";
 
-type Vehicle = {
-  value: string;
-  title: string;
-  kind: string;
-  price: string;
-  color: PaletteColor;
-};
+type Tariff = { value: string; title: string; terms: string; price: string; color: PaletteColor };
 
-const vehicles: Vehicle[] = [
-  { value: "nmax", title: "Yamaha NMAX 155", kind: "Скутер", price: "250 ฿ / день", color: "blue" },
-  { value: "pcx", title: "Honda PCX 160", kind: "Скутер", price: "250 ฿ / день", color: "sky" },
+const TARIFFS: Tariff[] = [
   {
-    value: "adv160",
-    title: "Honda ADV 160",
-    kind: "Скутер",
-    price: "300 ฿ / день",
-    color: "green",
+    value: "courier",
+    title: "Курьер",
+    terms: "Завтра, 10:00–18:00",
+    price: "450 ₽",
+    color: "blue",
   },
   {
-    value: "adv350",
-    title: "Honda ADV 350",
-    kind: "Максискутер",
-    price: "450 ฿ / день",
-    color: "teal",
-  },
-  {
-    value: "forza",
-    title: "Honda Forza 350",
-    kind: "Максискутер",
-    price: "450 ฿ / день",
-    color: "purple",
-  },
-  {
-    value: "xmax",
-    title: "Yamaha XMAX 300",
-    kind: "Максискутер",
-    price: "450 ฿ / день",
+    value: "express",
+    title: "Экспресс",
+    terms: "Сегодня за 2 часа",
+    price: "890 ₽",
     color: "orange",
   },
+  { value: "pickup", title: "Пункт выдачи", terms: "Через 2 дня", price: "190 ₽", color: "green" },
   {
-    value: "xadv",
-    title: "Honda X-ADV 750",
-    kind: "Премиум",
-    price: "1 300 ฿ / день",
-    color: "red",
-  },
-  {
-    value: "tmax",
-    title: "Yamaha TMAX 560",
-    kind: "Премиум",
-    price: "1 200 ฿ / день",
-    color: "pink",
+    value: "freight",
+    title: "Грузовой",
+    terms: "От 3 дней, до 1 т",
+    price: "2 400 ₽",
+    color: "purple",
   },
 ];
 
-const byValue = new Map(vehicles.map((v) => [v.value, v]));
+const BY_VALUE = new Map(TARIFFS.map((tariff) => [tariff.value, tariff]));
 
 export default function SelectRichOptionsExample() {
   return (
-    <Select.Root label="Байк" defaultValue="adv160" placeholder="Выберите байк">
+    <Select.Root label="Доставка" defaultValue="courier" placeholder="Выберите тариф">
       <Select.Trigger>
-        <Select.Value>
-          {({ value }) => {
-            const v = byValue.get(value);
-            if (!v) return value;
+        <Select.Value
+          renderValue={({ value, label }) => {
+            const tariff = BY_VALUE.get(value);
             return (
               <>
-                <Thumbnail.Root ratio="4:3" color={v.color}>
+                <Thumbnail.Root color={tariff?.color}>
                   <Thumbnail.Fallback>
-                    <Bike />
+                    <Truck />
                   </Thumbnail.Fallback>
                 </Thumbnail.Root>
-                <Select.ItemText>{v.title}</Select.ItemText>
+                <Select.ItemText>{label}</Select.ItemText>
                 <Select.ItemDescription>
-                  {v.kind} · {v.price}
+                  {tariff?.terms} · {tariff?.price}
                 </Select.ItemDescription>
               </>
             );
           }}
-        </Select.Value>
+        />
       </Select.Trigger>
-      <Select.Content searchable>
-        {vehicles.map((v) => (
-          <Select.Item key={v.value} value={v.value}>
-            <Thumbnail.Root ratio="4:3" color={v.color}>
+      <Select.Content>
+        {TARIFFS.map((tariff) => (
+          <Select.Item key={tariff.value} value={tariff.value}>
+            <Thumbnail.Root color={tariff.color}>
               <Thumbnail.Fallback>
-                <Bike />
+                <Truck />
               </Thumbnail.Fallback>
             </Thumbnail.Root>
-            <Select.ItemText>{v.title}</Select.ItemText>
-            <Select.ItemDescription>{v.kind}</Select.ItemDescription>
-            <Select.ItemMeta>{v.price}</Select.ItemMeta>
+            <Select.ItemText>{tariff.title}</Select.ItemText>
+            <Select.ItemDescription>{tariff.terms}</Select.ItemDescription>
+            <Select.ItemMeta>{tariff.price}</Select.ItemMeta>
           </Select.Item>
         ))}
       </Select.Content>

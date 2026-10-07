@@ -210,13 +210,14 @@ function TooltipRoot({
 // ─── Trigger ─────────────────────────────────────────────────────────────────
 
 export type TooltipTriggerProps = {
+  /** One focusable element: a Button, or a `tabIndex={0}` wrapper around a disabled control. */
   children: React.ReactElement;
-  className?: string;
 };
 
 type TriggerChildProps = React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> };
 
-function TooltipTrigger({ children, className }: TooltipTriggerProps) {
+// Not `Slot`: the tooltip id is appended to the child's own `aria-describedby`, not replaced by it.
+function TooltipTrigger({ children }: TooltipTriggerProps) {
   const { isOpen, triggerRef, contentId, scheduleOpen, scheduleClose, close } =
     useTooltipRootContext();
   const props = children.props as TriggerChildProps;
@@ -226,7 +227,6 @@ function TooltipTrigger({ children, className }: TooltipTriggerProps) {
 
   return React.cloneElement(children as React.ReactElement<TriggerChildProps>, {
     ref,
-    className: cx(props.className, className) || undefined,
     "aria-describedby":
       [props["aria-describedby"], isOpen ? contentId : undefined].filter(Boolean).join(" ") ||
       undefined,
@@ -366,12 +366,16 @@ const ARROW_PATH: Record<TooltipSide, { viewBox: string; d: string }> = {
 
 // ─── Content ─────────────────────────────────────────────────────────────────
 
-export type TooltipContentProps = {
+export type TooltipContentProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "id" | "role" | "onPointerEnter" | "onPointerLeave"
+> & {
   children: React.ReactNode;
+  /** Text and padding tier; also the size context of controls inside (a Kbd). */
   size?: ControlSize;
   side?: TooltipSide;
   align?: TooltipAlign;
-  className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function TooltipContent({
@@ -380,6 +384,9 @@ function TooltipContent({
   side = "top",
   align = "center",
   className,
+  style,
+  ref,
+  ...rest
 }: TooltipContentProps) {
   const { isOpen, instant, triggerRef, contentId, scheduleClose, cancelPending } =
     useTooltipRootContext();
@@ -390,6 +397,7 @@ function TooltipContent({
   const presence = usePresence(isOpen, { exitDuration: "fast" });
   // A tooltip replaced by its neighbour leaves at once instead of fading under the new one.
   const mounted = presence.mounted && (isOpen || !instant);
+  const mergedRef = React.useMemo(() => mergeRefs(setContent, ref), [ref]);
 
   React.useLayoutEffect(() => {
     if (!mounted || !content) {
@@ -438,13 +446,15 @@ function TooltipContent({
   return (
     <Portal>
       <div
-        ref={setContent}
+        {...rest}
+        ref={mergedRef}
         id={contentId}
         role="tooltip"
         data-overlay-portal-layer={overlayPortalLayer}
         className={cx(styles.content, overlayMotion.floating, className)}
         style={
           {
+            ...style,
             top: placement?.top ?? 0,
             left: placement?.left ?? 0,
             // The first commit only attaches the node; it is placed before the browser paints.

@@ -112,6 +112,13 @@
 }
 
 /* ---- Panel: section label + swatch grid ---- */
+/* Label above the swatch grid inside the Popover panel. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+}
+
 .label {
   color: var(--prime-color-text-secondary);
   font-size: var(--prime-control-m-label-size);

@@ -133,23 +133,20 @@ export { COLOR_PRESETS, ColorPresets } from "./color-picker/ColorPresets";
 export type { ColorSwatchesLabels, ColorSwatchesRootProps } from "./color-swatches/ColorSwatches";
 export { ColorSwatches } from "./color-swatches/ColorSwatches";
 export type {
-  CommandMenuBadgeRowProps,
-  CommandMenuBadgeSectionLabelProps,
-  CommandMenuBadgeSectionProps,
-  CommandMenuDialogProps,
+  CommandMenuDescriptionProps,
   CommandMenuEmptyProps,
   CommandMenuFooterHintProps,
-  CommandMenuFooterKeyBoxProps,
   CommandMenuFooterProps,
   CommandMenuGroupProps,
   CommandMenuInputProps,
-  CommandMenuInputRowProps,
   CommandMenuItemIconProps,
   CommandMenuItemProps,
   CommandMenuItemShortcutProps,
   CommandMenuItemTextProps,
   CommandMenuLabels,
   CommandMenuListProps,
+  CommandMenuRootProps,
+  CommandMenuTitleProps,
 } from "./command-menu/CommandMenu";
 export { CommandMenu } from "./command-menu/CommandMenu";
 export type {
@@ -202,22 +199,16 @@ export { useDropTarget } from "./dnd/useDropTarget";
 export { moveBefore, useSortableList } from "./dnd/useSortableList";
 export * from "./drawer/Drawer";
 export type {
-  DropdownBlockProps,
   DropdownContentProps,
-  DropdownGroupLabelProps,
+  DropdownDescriptionProps,
   DropdownGroupProps,
-  DropdownHeaderDescriptionProps,
-  DropdownHeaderLeadingProps,
-  DropdownHeaderMainProps,
   DropdownHeaderProps,
-  DropdownHeaderRowProps,
-  DropdownHeaderTitleProps,
-  DropdownHeaderTrailingProps,
   DropdownItemIconProps,
   DropdownItemProps,
   DropdownItemShortcutProps,
   DropdownRootProps,
   DropdownSeparatorProps,
+  DropdownTitleProps,
   DropdownTriggerProps,
 } from "./dropdown/Dropdown";
 export { Dropdown } from "./dropdown/Dropdown";
@@ -314,6 +305,8 @@ export type {
   ModalTriggerProps,
 } from "./modal/Modal";
 export { Modal } from "./modal/Modal";
+export type { NativeSelectLabels, NativeSelectProps } from "./native-select/NativeSelect";
+export { NativeSelect } from "./native-select/NativeSelect";
 export type {
   NotificationAction,
   NotificationCardProps,
@@ -344,11 +337,11 @@ export type { PaginationLabels, PaginationProps } from "./pagination/Pagination"
 export { Pagination } from "./pagination/Pagination";
 export type {
   PopoverActionsProps,
+  PopoverAnchorProps,
+  PopoverCloseProps,
   PopoverContentProps,
   PopoverDescriptionProps,
   PopoverHeaderProps,
-  PopoverInsetGap,
-  PopoverInsetPadding,
   PopoverRootProps,
   PopoverTitleProps,
   PopoverTriggerProps,
@@ -378,9 +371,7 @@ export type {
 } from "./segmented-control/SegmentedControl";
 export { SegmentedControl } from "./segmented-control/SegmentedControl";
 export type {
-  SelectBadgeProps,
   SelectContentProps,
-  SelectGroupLabelProps,
   SelectGroupProps,
   SelectItemDescriptionProps,
   SelectItemIconProps,
@@ -439,7 +430,7 @@ export type {
   TagSelectLabels,
   TagSelectOption,
   TagSelectOptionUpdate,
-  TagSelectRootProps,
+  TagSelectProps,
 } from "./tag-select/TagSelect";
 export { TagSelect } from "./tag-select/TagSelect";
 export type {

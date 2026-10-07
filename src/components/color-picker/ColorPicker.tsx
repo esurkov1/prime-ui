@@ -28,7 +28,6 @@ import {
 import { Button } from "@/components/button/Button";
 import { Input } from "@/components/input/Input";
 import { Select } from "@/components/select/Select";
-import selectStyles from "@/components/select/Select.module.css";
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -143,12 +142,6 @@ function useHexDraft(inputRef: React.RefObject<HTMLInputElement | null>) {
   return { state, text, setText, commit };
 }
 
-const FORMAT_SELECT_LABEL: Record<ColorValueFormat, string> = {
-  hsl: "HSL",
-  rgb: "RGB",
-  hex: "Hex",
-};
-
 function FormatSelect({ className }: { className?: string }) {
   const { format, setFormat, labels } = useColorPickerContext();
 
@@ -163,7 +156,7 @@ function FormatSelect({ className }: { className?: string }) {
         }}
       >
         <Select.Trigger aria-label={labels.format}>
-          <span className={selectStyles.triggerValue}>{FORMAT_SELECT_LABEL[format]}</span>
+          <Select.Value />
         </Select.Trigger>
         <Select.Content>
           <Select.Item label="HSL" value="hsl">

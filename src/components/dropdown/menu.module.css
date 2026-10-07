@@ -1,0 +1,213 @@
+/* ─── Menu parts ─────────────────────────────────────────────────────────────
+ * The rows every list layer shares: Dropdown menu, Select and TagSelect lists, CommandMenu.
+ * `.tier` carries the row metrics of the host's `data-size`; `.menu` is the dropdown-level
+ * floating panel on top of the shared surface (`popover/surface.module.css`).
+ * Rows radius 8 = panel radius 12 − panel padding 4.
+ */
+
+.tier {
+  --menu-item-h: var(--prime-control-m-item-height);
+  --menu-text: var(--prime-control-m-text-size);
+  --menu-lh: var(--prime-control-m-line-height);
+  --menu-icon: var(--prime-control-m-icon);
+  --menu-gap: var(--prime-control-m-gap);
+  --menu-desc: var(--prime-text-body-s-size);
+  --menu-desc-lh: var(--prime-text-body-s-line-height);
+}
+
+.tier[data-size="xs"] {
+  --menu-item-h: var(--prime-control-xs-item-height);
+  --menu-text: var(--prime-control-xs-text-size);
+  --menu-lh: var(--prime-control-xs-line-height);
+  --menu-icon: var(--prime-control-xs-icon);
+  --menu-gap: var(--prime-control-xs-gap);
+  --menu-desc: var(--prime-text-caption-size);
+  --menu-desc-lh: var(--prime-text-caption-line-height);
+}
+
+.tier[data-size="s"] {
+  --menu-item-h: var(--prime-control-s-item-height);
+  --menu-text: var(--prime-control-s-text-size);
+  --menu-lh: var(--prime-control-s-line-height);
+  --menu-icon: var(--prime-control-s-icon);
+  --menu-gap: var(--prime-control-s-gap);
+  --menu-desc: var(--prime-text-caption-size);
+  --menu-desc-lh: var(--prime-text-caption-line-height);
+}
+
+.tier[data-size="l"] {
+  --menu-item-h: var(--prime-control-l-item-height);
+  --menu-text: var(--prime-control-l-text-size);
+  --menu-lh: var(--prime-control-l-line-height);
+  --menu-icon: var(--prime-control-l-icon);
+  --menu-gap: var(--prime-control-l-gap);
+}
+
+.tier[data-size="xl"] {
+  --menu-item-h: var(--prime-control-xl-item-height);
+  --menu-text: var(--prime-control-xl-text-size);
+  --menu-lh: var(--prime-control-xl-line-height);
+  --menu-icon: var(--prime-control-xl-icon);
+  --menu-gap: var(--prime-control-xl-gap);
+}
+
+/* Dropdown-level floating panel: panel padding, capped by the design height and the room. */
+.menu {
+  max-height: min(var(--prime-panel-max-height), var(--float-max-h, var(--prime-panel-max-height)));
+  padding: var(--prime-panel-padding);
+  font-size: var(--menu-text);
+  line-height: var(--menu-lh);
+}
+
+/* ─── Row ────────────────────────────────────────────────────────────────── */
+
+/* Highlight is a fill only: keyboard-driven, high-frequency (foundation §7 rule 1). */
+.item {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--menu-gap);
+  width: 100%;
+  min-height: var(--menu-item-h);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--prime-panel-item-padding-x);
+  border: 0;
+  border-radius: var(--prime-panel-item-radius);
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
+}
+
+.item[data-highlighted="true"] {
+  background: var(--prime-color-fill-subtle);
+}
+
+.item:active:not([data-disabled="true"]) {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.item[data-disabled="true"] {
+  background: transparent;
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Filtered-out rows: `hidden` must win over `display: flex`. */
+.item[hidden] {
+  display: none;
+}
+
+/* Leading glyph: the row icon size; a kit Icon inside follows `--prime-icon-size`. */
+.itemIcon {
+  --prime-icon-size: var(--menu-icon);
+
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--menu-icon);
+  height: var(--menu-icon);
+  color: var(--prime-color-text-muted);
+}
+
+.itemIcon > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.item[data-disabled="true"] .itemIcon {
+  color: var(--prime-color-text-disabled);
+}
+
+/* Destructive row: text and icon in the danger color. */
+.item[data-tone="danger"]:not([data-disabled="true"]),
+.item[data-tone="danger"]:not([data-disabled="true"]) .itemIcon {
+  color: var(--prime-color-danger-text);
+}
+
+/* Trailing key hint (a Kbd): pushed to the end of the row. */
+.shortcut {
+  margin-inline-start: auto;
+}
+
+/* ─── Group / separator ─────────────────────────────────────────────────── */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.groupLabel {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-height: var(--prime-panel-group-label-height);
+  padding-inline: var(--prime-panel-item-padding-x);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
+
+/* A Divider between rows: full bleed across the panel padding. */
+.separator[role]:not([data-orientation="vertical"]) {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: auto;
+  margin-block: var(--prime-panel-padding);
+  margin-inline: calc(-1 * var(--prime-panel-padding));
+}
+
+/* ─── Search row ─────────────────────────────────────────────────────────── */
+
+/*
+ * The permanent focus of its layer: no ring, the caret is the indicator; a faint hairline
+ * separates it from the results (foundation §7). The host sets height and inline padding.
+ */
+.searchRow {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  border-bottom: var(--prime-border-width) solid var(--prime-color-border-faint);
+  color: var(--prime-color-text-muted);
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.searchRow:focus-within {
+  color: var(--prime-color-text-secondary);
+}
+
+.searchInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  outline: none;
+  appearance: none;
+}
+
+.searchInput::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.searchInput::placeholder {
+  color: var(--prime-color-text-placeholder);
+}

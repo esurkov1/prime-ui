@@ -10,9 +10,9 @@ const sampleOptions = [
   { value: "b", label: "Beta", color: "green" as const },
 ];
 
-function BasicTagSelect(props: Partial<React.ComponentProps<typeof TagSelect.Root>>) {
+function BasicTagSelect(props: Partial<React.ComponentProps<typeof TagSelect>>) {
   return (
-    <TagSelect.Root
+    <TagSelect
       options={sampleOptions}
       defaultValue={[]}
       placeholder="Теги"
@@ -123,6 +123,24 @@ describe("TagSelect", () => {
     expect(options.map((o) => o.dataset.value)).toEqual(["b", "a"]);
     expect(options[0]).toHaveAttribute("aria-selected", "true");
     expect(options[1]).toHaveAttribute("aria-selected", "false");
+    expect(options[0]?.querySelector('[data-state="checked"]')).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(options[1]?.querySelector('[data-state="unchecked"]')).not.toBeNull();
+  });
+
+  it("меню ⋯ открывается над списком и переименовывает тег", async () => {
+    const user = userEvent.setup();
+    const onOptionUpdate = vi.fn();
+    render(<BasicTagSelect onOptionUpdate={onOptionUpdate} />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-overlay-stack", "above-dropdown");
+    const name = screen.getByRole("textbox", { name: "Название тега" });
+    await user.clear(name);
+    await user.type(name, "Альфа{Enter}");
+    expect(onOptionUpdate).toHaveBeenCalledWith("a", { label: "Альфа" });
   });
 
   it("с onOptionUpdate / onOptionDelete меню ⋯ есть и у выбранных тегов", () => {
@@ -187,12 +205,12 @@ describe("TagSelect", () => {
 
   it("label, hint и error: подпись и описание поля ввода", () => {
     const { rerender } = render(
-      <TagSelect.Root options={sampleOptions} label="Метки" hint="До пяти" required />,
+      <TagSelect options={sampleOptions} label="Метки" hint="До пяти" required />,
     );
     const input = screen.getByRole("combobox", { name: /Метки/ });
     expect(input).toHaveAccessibleDescription("До пяти");
     expect(input).toHaveAttribute("aria-required", "true");
-    rerender(<TagSelect.Root options={sampleOptions} label="Метки" error="Нужна метка" />);
+    rerender(<TagSelect options={sampleOptions} label="Метки" error="Нужна метка" />);
     expect(input).toHaveAccessibleDescription("Нужна метка");
     expect(input).toHaveAttribute("aria-invalid", "true");
   });
@@ -215,7 +233,7 @@ describe("TagSelect", () => {
       expect(screen.queryByRole("button", { name: /Удалить Beta/i })).not.toBeInTheDocument();
       const more = screen.getByRole("button", { name: "Показать ещё 2" });
       expect(more).toHaveTextContent("+2");
-      expect(more).toHaveAttribute("title", "Beta, Gamma");
+      expect(more.closest("[title]")).toHaveAttribute("title", "Beta, Gamma");
     });
 
     it("«+N» раскрывает поле со всеми тегами и открывает список", () => {

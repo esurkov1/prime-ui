@@ -1,8 +1,9 @@
 # TagSelect
 
 **Category:** selection
+**Kind:** field
 
-> A multi-select field that shows the chosen values as coloured tags, filters as you type and can create new tags.
+> A multi-value field that shows the picked values as coloured tags, filters as you type and can create new tags.
 
 ## When to use
 - Several values from a dictionary shown as removable chips: labels, cities, channels, watchers.
@@ -10,9 +11,9 @@
 - Users maintain the dictionary themselves: rename, recolor or delete options from the list (`onOptionUpdate`, `onOptionDelete`).
 
 ## When not to use
-- One value → use [Select](../select/COMPONENT.md) instead.
-- A few values from a short closed list where chips are not needed → use [Select](../select/COMPONENT.md) with `multiple` instead.
-- 2–6 independent options that should all be visible → use [Checkbox](../checkbox/COMPONENT.md) instead.
+- One value → use [Select](../select/COMPONENT.md).
+- A few values from a short closed list where chips are not needed → use [Select](../select/COMPONENT.md) with `multiple`.
+- 2–6 independent options that should all be visible → use [Checkbox](../checkbox/COMPONENT.md).
 - Values shown outside a field → use [Badge](../badge/COMPONENT.md) (`onRemove` for removable ones).
 
 ## Import
@@ -21,149 +22,141 @@ import { TagSelect, type TagSelectOption } from "prime-ui-kit";
 ```
 
 ## Anatomy
-Single part `TagSelect.Root`. It renders:
 ```
-field frame: label · control · hint/error
-└─ control (field fill)
-   ├─ chips (Badge with `onRemove`, one tier below the field) · «+N» chip button when collapsed
-   ├─ text input (role="combobox")
-   └─ chevron
-portal panel (role="listbox"): panel hint · «Создать» row · option rows (checkbox + tag [+ «⋯» menu])
+TagSelect                       field frame: label · control · hint/error (single export)
+├── control                     field fill, one row at rest, wraps when focused
+│   ├── chip row                ScrollContainer: Badge chips (one tier down) · «+N» Badge · input
+│   │   └── <input role="combobox">
+│   └── chevron
+└── list (portal)               role="listbox", multi-select
+    ├── panel hint              labels.panelHint
+    ├── «Создать» row           with `creatable`
+    └── option row              Checkbox.Indicator · Badge [· «⋯» Button → Popover menu]
 ```
 
 ## API
 
-### TagSelect.Root
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+### TagSelect
+No ref. The field frame with a chip row and an `<input role="combobox">`, and a portaled multi-select list; options come as data.
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `options` | `TagSelectOption[]` | — (required) | Dictionary: `{ value: string; label: string; color?: PaletteColor; disabled?: boolean }`. |
-| `value` | `string[]` | — | Controlled selection in the order it was added; use with `onValueChange`. |
-| `defaultValue` | `string[]` | `[]` | Initial selection in uncontrolled mode. |
-| `onValueChange` | `(value: string[]) => void` | — | Called after adding, removing or creating a tag. |
-| `open` | `boolean` | — | Controlled panel state. |
-| `defaultOpen` | `boolean` | `false` | Initial panel state. |
-| `onOpenChange` | `(open: boolean) => void` | — | Called when the panel opens or closes. |
-| `creatable` | `boolean` | `false` | Typing a value that is not in `options` shows a «Создать» row; Enter adds it. |
-| `onCreate` | `(value: string) => void` | — | Called only for a created value (not for picks from `options`). |
-| `defaultColor` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Chip colour for values without an option colour, including created ones. |
-| `onOptionUpdate` | `(value: string, updates: { label?: string; color?: PaletteColor }) => void` | — | Enables the row «⋯» menu with name field and colour list. `value` never changes. |
-| `onOptionDelete` | `(value: string) => void` | — | Enables «Удалить» in the row menu; the value is also removed from the selection. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier; the list uses the same tier, chips one tier down (`xs` chips at both `xs` and `s`). |
-| `label` | `ReactNode` | — | Label above the field. |
-| `required` | `boolean` | `false` | Red `*` after the label, `aria-required`. |
-| `optional` | `boolean` | — | Muted `labels.optional` marker. |
-| `hint` | `ReactNode` | — | Hint under the field. |
-| `error` | `ReactNode` | — | Error message in the hint slot; non-empty implies `invalid`. |
-| `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring. |
-| `disabled` | `boolean` | `false` | Disables the field, chips and the panel. |
-| `placeholder` | `string` | `""` | Input placeholder while nothing is selected. |
-| `id` | `string` | auto (`useId`) | Id of the text input. |
-| `labels` | `Partial<TagSelectLabels>` | Russian defaults | System strings, see Accessibility. |
-| `aria-label` | `string` | — | Name of the input and listbox without a visible `label`. |
-| `aria-labelledby` | `string` | — | Id of the element that names the field. |
-| `className` | `string` | — | Class on the field frame `div`. |
-
-No other native props, no ref, no hidden form input (submit `value` from state).
+| `options` | `TagSelectOption[]` | — (required) | Available tags: `{ value, label, color?, disabled? }`. |
+| `value` | `string[]` | — | Controlled picked values. |
+| `defaultValue` | `string[]` | `[]` | Initial picked values, uncontrolled. |
+| `onValueChange` | `(value: string[]) => void` | — | Called with the new list after a pick, a removal or a creation. |
+| `open · defaultOpen · onOpenChange` | `boolean · boolean · (open: boolean) => void` | — | Open state of the list: controlled, initial (default `false`), and the callback on every open and close. |
+| `creatable` | `boolean` | `false` | A typed text that is not an option can be added (the Create row or Enter). |
+| `onCreate` | `(value: string) => void` | — | A new value was created, not picked from `options`. |
+| `defaultColor` | `PaletteColor` | `"gray"` | Chip color of values without an option color, created ones included. |
+| `onOptionUpdate` | `(value: string, updates: { label?: string; color?: PaletteColor }) => void` | — | Enables the row «⋯» menu with the tag name and color; `value` never changes. |
+| `onOptionDelete` | `(value: string) => void` | — | Enables «Удалить» in the row menu; the value also leaves the selection. |
+| `label` | `ReactNode` | — | Field label above; names the input. |
+| `hint` | `ReactNode` | — | Support text under the field; linked by `aria-describedby`. |
+| `error` | `ReactNode` | — | Error message; replaces the hint and implies `invalid`. |
+| `required` | `boolean` | `false` | Red `*` after the label and `aria-required` on the input. |
+| `optional` | `boolean` | — | Muted `labels.optional` after the label. |
+| `invalid` | `boolean` | `false` | Danger inset ring and `aria-invalid`. |
+| `disabled` | `boolean` | `false` | Disabled field and chips; the list never opens. |
+| `placeholder` | `string` | `""` | Text in the input while no tag is picked. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier; the list uses the same tier, chips one tier down. |
+| `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
+| `id` | `string` | — | Id of the input; generated when omitted. |
+| `labels` | `Partial<TagSelectLabels>` | — | Built-in strings, see Labels (`colorNames` merges by key). |
+| `aria-label · aria-labelledby` | `string` | — | Name of the input and the list when there is no `label`. |
+| `className` | `string` | — | Class on the field frame. |
 
 ## Variants
-No `variant`/`tone`. Axes: `size`, chip `color` (per option / `defaultColor`), behaviour flags (`creatable`, manageable rows).
+No `variant` or `tone`. The control is the field look; chips are soft Badges on the field's wash (neutral chips a stronger wash, hue chips a wash of their hue); the list is the shared floating panel.
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | 28px field, `xs` chips (no smaller tier), 24px list rows | dense filters | |
-| `s` | 32px field, `xs` chips, 28px rows | compact panels | |
-| `m` | 36px field, `s` chips, 32px rows | regular forms | yes |
-| `l` | 40px field, `m` chips, 36px rows | spacious forms | |
-| `xl` | 48px field, `l` chips, 40px rows | touch-first screens | |
+| `xs` | 28 field, xs chips | Dense filters | |
+| `s` | 32 field, xs chips | Compact panels | |
+| `m` | 36 field, s chips | Regular forms | yes |
+| `l` | 40 field, m chips | Spacious forms | |
+| `xl` | 48 field, l chips | Touch-first screens | |
 
-### color (option `color` / `defaultColor`)
+### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `gray` | neutral soft tag | people, plain values | `defaultColor` |
-| `blue` · `green` · `orange` · `red` · `yellow` · `purple` · `sky` · `pink` · `teal` | soft tag of the hue | categories that users recognise by colour | |
-
-### Behaviour flags
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| `creatable` | «+ Создать [preview tag]» row while the query has no exact match | open vocabularies (labels) | `false` |
-| `onOptionUpdate` / `onOptionDelete` set | each enabled row gets a «⋯» button opening a Popover: name field, «Удалить», colour list | user-managed dictionaries | off |
-
-**Combinations**
-- `creatable` + `onOptionUpdate` → created tags can be renamed/recoloured at once; keep `options` in state and merge updates (see [manage-tags.tsx](examples/manage-tags.tsx)).
-- `onOptionDelete` without keeping `options` in state → the option comes back on the next render; always remove it from your `options`.
-- `labels={{ panelHint: "" }}` hides the line above the list — use it for plain dictionaries (people).
-
-**Sizes** — single-row field height equals `--prime-control-<tier>-height`, aligned with Input and Select of the same tier.
-
-**Hierarchy** — inside a Card the field fill switches to the surface variant like Input next to it.
+| `creatable` | a «Создать» row with the preview chip while the typed text is new | The dictionary is open | `false` |
+| `onOptionUpdate` / `onOptionDelete` | a «⋯» button on the highlighted row opening a rename / color / delete menu | Users keep their own tags | |
+| `disabled` | disabled fill, muted chips, no list | Not editable now | `false` |
+| `invalid` / `error` | danger inset ring (+ the message) | Validation failed | |
 
 ## States
-| State | Driven by | DOM | Looks like |
-|---|---|---|---|
-| collapsed | no focus inside, panel closed | control without `data-expanded` | one row; chips that do not fit go into a «+N» chip (`title` lists them) |
-| expanded | focus inside or panel open | `data-expanded="true"` | all chips on several rows (up to three, then the field scrolls) |
-| open | typing / click / ↑ ↓ | `data-state="open"`, `aria-expanded` on input; panel `data-state`, `data-side` | panel under the field; selected options first with a check, then the rest |
-| invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` | inset `danger-border` ring, error text |
-| disabled | `disabled` | `data-disabled="true"`, native `disabled` | disabled field fill, dimmed chips |
-| option disabled | `options[i].disabled` | row `data-disabled`, native `disabled` | dimmed tag, not selectable, excluded from search |
-| focus-visible | keyboard | `data-focus-ring="false"` when `focusRing={false}` | inset focus ring on the control |
-
-The panel opens only when it has rows (matches or a create row) and closes when it has none. It follows the overlay contract: outside press and Escape close it; the manage Popover is a separate topmost layer.
-Controlled: `value` + `onValueChange`, `open` + `onOpenChange`. Uncontrolled: `defaultValue`, `defaultOpen`.
+| State | Driven by | DOM |
+|---|---|---|
+| collapsed / expanded | focus inside or the list open | `data-expanded="true"` on the control: every chip on up to three rows (then scroll with edge fades); the height animates |
+| open | focus, typing, arrows | `data-state="open"` on the control; list `data-state`, `data-side` |
+| overflow | more chips than fit at rest | a «+N» Badge button with `labels.more` and the hidden labels in `title` |
+| invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the input |
+| disabled | `disabled` | `data-disabled="true"`, native `disabled` on the input |
+| option highlighted / selected / disabled | keyboard and pointer / value / option `disabled` | `data-highlighted`, `aria-selected` + checked indicator, `data-disabled` |
 
 ## Layout & spacing
-- Field is 100% wide; set width with the layout.
-- Label → field: tier `label-gap`; field → field in a form: `--prime-space-5`.
-- Chips are one tier below the field and never change the single-row height in the collapsed state.
+- The field is 100% wide; set the width with the layout.
+- Chips sit `--prime-space-1` apart; the chip row keeps `--prime-focus-space` so chip rings are never cut.
+- The list is at least the field width and `--prime-panel-min-width`; max height `--prime-panel-max-height`, flips near the viewport edge.
 
 ## Accessibility
-- The only tab stop is the text input (`role="combobox"`, `aria-autocomplete="list"`, `aria-controls`, `aria-activedescendant`, `aria-describedby`, `aria-required`, `aria-invalid`).
-- Listbox `role="listbox"` `aria-multiselectable`, rows `role="option"` with `aria-selected`.
-- Keyboard: ↑ / ↓ open and move, Enter / Space toggle the highlighted row (or create), Escape closes, Backspace in an empty input removes the last chip, ← from the start of the input moves to chips, ← / → between chips, Delete / Backspace on a chip remove it (focus moves to a neighbour). Removal is announced in a polite live region.
-- `labels` keys (defaults):
-  - `panelHint` — «Выберите вариант или создайте новый» (`""` hides it)
-  - `create` — «Создать»
-  - `remove` — «Удалить {label}» (chip remove button)
-  - `more` — «Показать ещё {count}» («+N» button)
-  - `removed` — «Удалено: {label}» (live announcement)
-  - `edit` — «Изменить тег {label}» («⋯» button)
-  - `name` — «Название тега» (name field in the menu)
-  - `delete` — «Удалить»
-  - `colors` — «Цвета» (colour list heading)
-  - `colorNames` — gray «По умолчанию», red «Красный», orange «Оранжевый», yellow «Жёлтый», green «Зелёный», blue «Синий», purple «Фиолетовый», pink «Розовый», sky «Голубой», teal «Бирюзовый»
-  - `optional` — «необязательно»
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `ArrowDown` · `ArrowUp` | Open the list and move the highlight over the options. |
+| `Enter` · `Space` | Tick or untick the highlighted option; on the Create row, create the tag. |
+| `Backspace` | In an empty input removes the last tag. |
+| `ArrowLeft` · `ArrowRight` | From the start of the input move focus over the tags and back to the input. |
+| `Delete` | On a tag removes it; focus moves to the neighbour tag. |
+| `Escape` | Closes the list. |
+
+### ARIA
+- The input is `role="combobox"` with `aria-expanded` and `aria-controls`; the list is `role="listbox"` with `aria-multiselectable`, options are `role="option"` with `aria-selected`.
+- The highlight goes through `aria-activedescendant`; the checkbox in a row is decorative.
+- A removal is announced with `labels.removed` in a live region; the remove button is named by `labels.remove`.
+- The hint and the error are linked by `aria-describedby`; the error sets `aria-invalid`.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+| Key | Default | Used for |
+|---|---|---|
+| `panelHint` | `"Выберите вариант или создайте новый"` | Line above the list; `""` hides it. |
+| `create` | `"Создать"` | Action text before the preview of a new tag. |
+| `remove` | `"Удалить {label}"` | Accessible name of a chip's remove button; `{label}` is the tag text. |
+| `more` | `"Показать ещё {count}"` | Accessible name of the «+N» chip; `{count}` is the number of hidden tags. |
+| `removed` | `"Удалено: {label}"` | Screen-reader announcement after a tag is removed. |
+| `edit` | `"Изменить тег {label}"` | Accessible name of a row's «⋯» menu button. |
+| `name` | `"Название тега"` | Accessible name of the tag name field in the menu. |
+| `delete` | `"Удалить"` | Delete button in the menu. |
+| `colors` | `"Цвета"` | Heading of the color list in the menu. |
+| `colorNames` | `"По умолчанию · Красный · Оранжевый · …"` | Names of the palette colors in the menu, by `PaletteColor` key. |
+| `optional` | `"необязательно"` | Muted marker after the label when `optional`. |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [sizes.tsx](examples/sizes.tsx) | All size tiers with chips | Matching other controls |
-| [states.tsx](examples/states.tsx) | Empty, «+N» overflow, error, disabled, disabled option | Reference for every state |
-| [manage-tags.tsx](examples/manage-tags.tsx) | Controlled, `creatable`, `onOptionUpdate`, `onOptionDelete`, custom `labels` | User-managed tag dictionary |
-| [in-form.tsx](examples/in-form.tsx) | Card form with `creatable` labels and `optional` watchers next to Input | Tag fields in forms |
-
-```tsx
-import { TagSelect, type TagSelectOption } from "prime-ui-kit";
-
-const options: TagSelectOption[] = [
-  { value: "bug", label: "Ошибка", color: "red" },
-  { value: "feature", label: "Новая функция", color: "blue" },
-];
-
-export function LabelsField() {
-  return (
-    <TagSelect.Root label="Метки" options={options} defaultValue={["bug"]} creatable />
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A labelled tag field: focus opens the list, typing filters it, picked tags become chips — `label`, `options`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size tier with two picked tags; chips sit one tier below the field — `size`. |
+| [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one, with a disabled option in the list — `disabled`, `invalid`. |
+| [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint, and an error that replaces the hint in the same row — `required`, `optional`, `hint`, `error`. |
+| [creatable.tsx](examples/creatable.tsx) | A typed text that is not in the list becomes a new tag from the Create row or Enter — `creatable`, `onCreate`, `defaultColor`. |
+| [many-tags.tsx](examples/many-tags.tsx) | More tags than fit: at rest one row with «+N», focused every tag on up to three wrapped rows that scroll — `defaultValue`. |
+| [manage-tags.tsx](examples/manage-tags.tsx) | Users keep their own tag dictionary: the row «⋯» menu renames, recolors or deletes an option — `onOptionUpdate`, `onOptionDelete`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a preset button replaces the tags and the count follows them — `value`, `onValueChange`. |
+| [in-form.tsx](examples/in-form.tsx) | A new task form: the required labels field is checked on submit and its error replaces the hint — `required`, `error`, `creatable`. |
 
 ## Mistakes
-- Children like `<TagSelect.Item>` → there are none; pass `options`.
-- `onChange` → use `onValueChange` (`string[]`).
-- `onOptionDelete` / `onOptionUpdate` without updating your `options` state → changes are lost.
-- Using it for a single value → use `Select`.
-- Expecting `name` / form submission → there is no hidden input; submit `value` from state.
+- `TagSelect.Root` → TagSelect is a single export: `<TagSelect …/>`.
+- Options as JSX children → pass `options` data.
+- `onOptionUpdate` without updating your `options` → the rename disappears on the next render; keep `options` in state.
+- A TagSelect for one value → use Select.
 
 ## Related
-[Select](../select/COMPONENT.md) · [Badge](../badge/COMPONENT.md) · [Input](../input/COMPONENT.md) · [Popover](../popover/COMPONENT.md)
+- **Built from:** [Badge](../badge/COMPONENT.md) (chips, «+N»), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator`), [ScrollContainer](../scroll-container/COMPONENT.md) (chip row, list), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md), [Input](../input/COMPONENT.md) and [Divider](../divider/COMPONENT.md) (row menu), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame)
+- **See also:** [Select](../select/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md)

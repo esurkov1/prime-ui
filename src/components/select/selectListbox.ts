@@ -1,14 +1,21 @@
 import type * as React from "react";
 
-/** Опции listbox: только включённые пункты (без `data-disabled`). */
-export function queryEnabledSelectOptions(container: HTMLElement | null): HTMLElement[] {
+import { rovingIndex } from "@/internal/rovingFocus";
+
+/**
+ * Keyboard of a listbox with a virtual highlight (`aria-activedescendant`), shared by Select and
+ * TagSelect. Options carry `data-value` and `data-label`; disabled ones `data-disabled="true"`.
+ */
+
+/** Enabled options of a listbox, in DOM order. */
+export function enabledOptions(container: HTMLElement | null): HTMLElement[] {
   if (!container) return [];
   return Array.from(
     container.querySelectorAll<HTMLElement>('[role="option"]:not([data-disabled="true"])'),
   );
 }
 
-export type SelectListboxKeyboardContext = {
+export type ListboxKeyContext = {
   items: HTMLElement[];
   highlightedValue: string | undefined;
   setHighlightedValue: (value: string | undefined) => void;
@@ -16,60 +23,29 @@ export type SelectListboxKeyboardContext = {
   onClose: () => void;
 };
 
-/** Обработка клавиш для `role="listbox"` (стрелки, Home/End, Enter, Space, Escape). */
-export function handleSelectListboxKeyDown(
-  e: React.KeyboardEvent<HTMLDivElement>,
-  ctx: SelectListboxKeyboardContext,
+/** Arrows, Home and End move the highlight (wrapping); Enter and Space pick it; Escape closes. */
+export function handleListboxKeyDown(
+  event: React.KeyboardEvent<HTMLElement>,
+  { items, highlightedValue, setHighlightedValue, onSelect, onClose }: ListboxKeyContext,
 ): void {
-  const { items, highlightedValue, setHighlightedValue, onSelect, onClose } = ctx;
+  if (event.key === "Escape") {
+    event.preventDefault();
+    onClose();
+    return;
+  }
   if (items.length === 0) return;
-
-  const currentIndex = items.findIndex((i) => i.dataset.value === highlightedValue);
-
-  switch (e.key) {
-    case "ArrowDown": {
-      e.preventDefault();
-      const next = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
-      setHighlightedValue(items[next]?.dataset.value);
-      items[next]?.scrollIntoView?.({ block: "nearest" });
-      break;
-    }
-    case "ArrowUp": {
-      e.preventDefault();
-      const prev = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
-      setHighlightedValue(items[prev]?.dataset.value);
-      items[prev]?.scrollIntoView?.({ block: "nearest" });
-      break;
-    }
-    case "Home": {
-      e.preventDefault();
-      setHighlightedValue(items[0]?.dataset.value);
-      items[0]?.scrollIntoView?.({ block: "nearest" });
-      break;
-    }
-    case "End": {
-      e.preventDefault();
-      const last = items[items.length - 1];
-      setHighlightedValue(last?.dataset.value);
-      last?.scrollIntoView?.({ block: "nearest" });
-      break;
-    }
-    case "Enter":
-    case " ": {
-      e.preventDefault();
-      if (highlightedValue) {
-        const item = items.find((i) => i.dataset.value === highlightedValue);
-        const label = item?.dataset.label ?? item?.textContent?.trim() ?? highlightedValue;
-        onSelect(highlightedValue, label);
-      }
-      break;
-    }
-    case "Escape": {
-      e.preventDefault();
-      onClose();
-      break;
-    }
-    default:
-      break;
+  const current = items.findIndex((item) => item.dataset.value === highlightedValue);
+  const next = rovingIndex(event.key, current, items.length, "vertical");
+  if (next !== null) {
+    event.preventDefault();
+    const item = items[next];
+    setHighlightedValue(item?.dataset.value);
+    item?.scrollIntoView?.({ block: "nearest" });
+    return;
+  }
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    if (highlightedValue === undefined) return;
+    onSelect(highlightedValue, items[current]?.dataset.label ?? highlightedValue);
   }
 }

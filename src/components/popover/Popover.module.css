@@ -1,67 +1,48 @@
 /* ─── Popover ────────────────────────────────────────────────────────────────
- * Shared floating panel surface: raised fill, `--prime-panel-radius`, overlay shadow.
- * Free-form content gets `--prime-panel-content-padding`; one ScrollContainer = surface + scroll.
+ * Free-form content on the shared floating surface (`surface.module.css`): tier padding and gap,
+ * scrolls inside the room next to its trigger (`--float-max-h`).
  */
 
-.popoverScroll {
+.content {
   --po-pad: var(--prime-panel-content-padding);
-  --po-inset-extra: 0px;
   --po-gap: var(--prime-space-3);
   --po-text: var(--prime-control-m-text-size);
   --po-lh: var(--prime-control-m-line-height);
   --po-desc: var(--prime-control-m-label-size);
   --po-desc-lh: var(--prime-control-m-label-line-height);
-  /* Fields inside a raised surface stay distinguishable (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
   --prime-color-card-bg: var(--prime-color-bg-sunken);
   --prime-card-shadow: none;
-
-  position: fixed;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--po-gap);
-  width: max-content;
-  min-width: min(
-    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
-    var(--float-max-w, 100vw)
-  );
-  max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));
-  margin: 0;
-  padding: calc(var(--po-pad) + var(--po-inset-extra));
-  border: 0;
-  border-radius: var(--prime-panel-radius);
   /* Avatar.Group rings match this surface. */
   --avatar-ring: var(--prime-color-bg-raised);
-  background: var(--prime-color-bg-raised);
-  box-shadow: var(--prime-shadow-overlay);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
+
+  gap: var(--po-gap);
+  max-height: var(--float-max-h, none);
+  padding: var(--po-pad);
   font-size: var(--po-text);
   line-height: var(--po-lh);
-  outline: none;
 }
 
-.popoverScroll[data-size="xs"] {
+.content[data-size="xs"],
+.content[data-size="s"] {
   --po-pad: var(--prime-space-3);
   --po-gap: var(--prime-space-2);
+}
+
+.content[data-size="xs"] {
   --po-text: var(--prime-control-xs-text-size);
   --po-lh: var(--prime-control-xs-line-height);
   --po-desc: var(--prime-control-xs-label-size);
   --po-desc-lh: var(--prime-control-xs-label-line-height);
 }
 
-.popoverScroll[data-size="s"] {
-  --po-pad: var(--prime-space-3);
-  --po-gap: var(--prime-space-2);
+.content[data-size="s"] {
   --po-text: var(--prime-control-s-text-size);
   --po-lh: var(--prime-control-s-line-height);
   --po-desc: var(--prime-control-s-label-size);
   --po-desc-lh: var(--prime-control-s-label-line-height);
 }
 
-.popoverScroll[data-size="l"] {
+.content[data-size="l"] {
   --po-gap: var(--prime-space-4);
   --po-text: var(--prime-control-l-text-size);
   --po-lh: var(--prime-control-l-line-height);
@@ -69,7 +50,7 @@
   --po-desc-lh: var(--prime-control-l-label-line-height);
 }
 
-.popoverScroll[data-size="xl"] {
+.content[data-size="xl"] {
   --po-pad: var(--prime-space-5);
   --po-gap: var(--prime-space-4);
   --po-text: var(--prime-control-xl-text-size);
@@ -78,65 +59,16 @@
   --po-desc-lh: var(--prime-control-xl-label-line-height);
 }
 
-.popoverScroll[data-inset-padding="x1"] {
-  --po-inset-extra: var(--prime-space-1);
+/* Exactly the trigger's width (`--float-min-w`), even below the panel minimum. */
+.content[data-match-trigger-width="true"] {
+  width: var(--float-min-w, max-content);
+  min-width: var(--float-min-w, 0px);
 }
 
-.popoverScroll[data-inset-padding="x2"] {
-  --po-inset-extra: var(--prime-space-2);
-}
-
-.popoverScroll[data-inset-padding="x3"] {
-  --po-inset-extra: var(--prime-space-3);
-}
-
-.popoverScroll[data-inset-gap="none"] {
-  --po-gap: 0;
-}
-
-.popoverScroll[data-inset-gap="x2"] {
-  --po-gap: var(--prime-space-2);
-}
-
-.popoverScroll[data-inset-gap="x3"] {
-  --po-gap: var(--prime-space-3);
-}
-
-.popoverScroll[data-inset-gap="x4"] {
-  --po-gap: var(--prime-space-4);
-}
-
-.popoverScroll[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-z-popover);
-}
-
-.popoverScroll[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-z-popover-in-drawer);
-}
-
-.popoverScroll[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-z-popover-in-modal);
-}
-
-.popoverScroll[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-z-popover-in-drawer-in-modal);
-}
-
-/* Поверх listbox/dropdown того же слоя (иначе dropdown 1200 > popover 1000 на page). Уровни как у tooltip. */
-.popoverScroll[data-overlay-portal-layer="page"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-z-tooltip);
-}
-
-.popoverScroll[data-overlay-portal-layer="drawer"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-z-tooltip-in-drawer);
-}
-
-.popoverScroll[data-overlay-portal-layer="modal"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-z-tooltip-in-modal);
-}
-
-.popoverScroll[data-overlay-portal-layer="drawerInModal"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-z-tooltip-in-drawer-in-modal);
+/* Flush: rows reach the panel edges; the content owns its spacing. */
+.content[data-flush="true"] {
+  --po-pad: 0px;
+  --po-gap: 0px;
 }
 
 /* ─── Title / description / actions ─────────────────────────────────────── */
@@ -177,17 +109,10 @@
   padding-block-start: var(--prime-space-1);
 }
 
-/* Узкая панель (320px): кнопки в колонку на всю ширину, основная — последней. */
+/* Narrow screen (320px): buttons stack full width, the primary one last. */
 @media (max-width: 479px) {
   .actions {
     flex-direction: column;
     align-items: stretch;
   }
-}
-
-/* Flush: rows reach the panel edges; the content owns its spacing. */
-.popoverScroll[data-flush="true"] {
-  --po-pad: 0px;
-  --po-inset-extra: 0px;
-  --po-gap: 0px;
 }

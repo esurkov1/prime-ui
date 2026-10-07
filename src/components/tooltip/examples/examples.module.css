@@ -1,24 +1,6 @@
-/* Layout for the Tooltip examples: layout only, text goes through Typography. */
+/* Layout of the Tooltip scenarios: semantic tokens only. */
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
-}
-
-.column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-4);
-}
-
-.wideTrigger {
-  min-width: calc(var(--prime-space-16) * 3);
-}
-
+/* toolbar.tsx: a raised strip of icon buttons. */
 .toolbar {
   display: flex;
   align-items: center;
@@ -29,23 +11,7 @@
   box-shadow: var(--prime-card-shadow);
 }
 
-.inlineHelpTrigger {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-decoration: underline dotted;
-  text-underline-offset: var(--prime-space-1);
-  cursor: help;
-}
-
-.inlineHelpTrigger:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-  border-radius: var(--prime-radius-xs);
-}
-
+/* disabled-trigger.tsx: a focusable wrapper around the disabled button, with the outer ring. */
 .disabledWrap {
   display: inline-flex;
   border-radius: var(--prime-control-m-radius);

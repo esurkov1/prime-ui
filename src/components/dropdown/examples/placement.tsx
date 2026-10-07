@@ -1,30 +1,31 @@
-/** `align` (start · center · end) and `side` (bottom · top). Near the viewport edge the panel flips and shifts automatically. */
+/** Every side and alignment relative to the trigger; near the viewport edge the menu flips and shifts — `side`, `align`. */
 import { Button, Dropdown } from "prime-ui-kit";
-import styles from "./examples.module.css";
 
 const PLACEMENTS = [
-  { label: "Начало", align: "start", side: "bottom" },
-  { label: "Центр", align: "center", side: "bottom" },
-  { label: "Конец", align: "end", side: "bottom" },
-  { label: "Сверху", align: "start", side: "top" },
+  { side: "bottom", align: "start" },
+  { side: "bottom", align: "center" },
+  { side: "bottom", align: "end" },
+  { side: "top", align: "start" },
+  { side: "top", align: "center" },
+  { side: "top", align: "end" },
 ] as const;
 
 export default function DropdownPlacementExample() {
   return (
-    <div className={styles.row}>
-      {PLACEMENTS.map(({ label, align, side }) => (
-        <Dropdown.Root key={label}>
+    <>
+      {PLACEMENTS.map(({ side, align }) => (
+        <Dropdown.Root key={`${side}-${align}`}>
           <Dropdown.Trigger>
-            <Button.Root variant="soft" tone="neutral" size="s">
-              {label}
+            <Button.Root variant="soft" tone="neutral">
+              {side} · {align}
             </Button.Root>
           </Dropdown.Trigger>
-          <Dropdown.Content align={align} side={side}>
+          <Dropdown.Content side={side} align={align}>
             <Dropdown.Item>Экспорт в PDF и печатная версия</Dropdown.Item>
             <Dropdown.Item>Дублировать в проект</Dropdown.Item>
           </Dropdown.Content>
         </Dropdown.Root>
       ))}
-    </div>
+    </>
   );
 }
