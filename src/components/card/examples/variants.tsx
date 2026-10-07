@@ -1,6 +1,5 @@
 /** KPI templates: an icon tile with a value, a badge with a value, and a large value with its change — `variant`, `Card.Delta`. */
-import { Users } from "lucide-react";
-import { Badge, Card } from "prime-ui-kit";
+import { Badge, Card, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -9,7 +8,7 @@ export default function CardVariantsExample() {
     <div className={styles.grid}>
       <Card.Root variant="mini">
         <Card.IconBox>
-          <Users aria-hidden />
+          <Icon name="object.users" />
         </Card.IconBox>
         <Card.Stack>
           <Card.Label>Активные сессии</Card.Label>

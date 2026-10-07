@@ -1,6 +1,5 @@
 /** Every tier changes the icon tile, the title and the padding; buttons in Actions take the same size — `size`. */
-import { FileText } from "lucide-react";
-import { Button, EmptyPage } from "prime-ui-kit";
+import { Button, EmptyPage, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -12,7 +11,7 @@ export default function EmptyPageSizesExample() {
       {SIZES.map((size) => (
         <EmptyPage.Root key={size} size={size} aria-labelledby={`empty-size-${size}`}>
           <EmptyPage.Icon>
-            <FileText aria-hidden />
+            <Icon name="object.document" />
           </EmptyPage.Icon>
           <EmptyPage.Title id={`empty-size-${size}`}>Счетов нет · {size}</EmptyPage.Title>
           <EmptyPage.Description>Выставленные счета появятся здесь.</EmptyPage.Description>

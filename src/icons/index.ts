@@ -19,6 +19,7 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
+  FileText,
   GripVertical,
   House,
   Info,
@@ -30,15 +31,19 @@ import {
   Monitor,
   Moon,
   MoreHorizontal,
+  Package,
   PanelLeftClose,
   PanelLeftOpen,
   Pipette,
   Plus,
   Search,
+  Send,
+  Settings,
   Smartphone,
   Sun,
   Tablet,
   Trash2,
+  Users,
   X,
   XCircle,
 } from "lucide-react";
@@ -62,6 +67,7 @@ export const IconCopy = createIcon(Copy);
 export const IconDanger = createIcon(XCircle);
 export const IconDelete = createIcon(Trash2);
 export const IconDesktop = createIcon(Monitor);
+export const IconDocument = createIcon(FileText);
 export const IconDownload = createIcon(Download);
 export const IconDrag = createIcon(GripVertical);
 export const IconExternalLink = createIcon(ExternalLink);
@@ -77,9 +83,12 @@ export const IconMobile = createIcon(Smartphone);
 export const IconMoon = createIcon(Moon);
 export const IconMore = createIcon(MoreHorizontal);
 export const IconNavItemDot = createIcon(Circle);
+export const IconPackage = createIcon(Package);
 export const IconPipette = createIcon(Pipette);
 export const IconRemove = createIcon(Minus);
 export const IconSearch = createIcon(Search);
+export const IconSend = createIcon(Send);
+export const IconSettings = createIcon(Settings);
 export const IconSidebarCollapse = createIcon(PanelLeftClose);
 export const IconSidebarExpand = createIcon(PanelLeftOpen);
 export const IconSortAscending = createIcon(ArrowUp);
@@ -88,6 +97,7 @@ export const IconSortNone = createIcon(ArrowUpDown);
 export const IconSuccess = createIcon(CheckCircle2);
 export const IconSun = createIcon(Sun);
 export const IconTablet = createIcon(Tablet);
+export const IconUsers = createIcon(Users);
 export const IconWarning = createIcon(AlertTriangle);
 
 /**
@@ -117,11 +127,16 @@ export const iconRegistry = {
   "action.more": IconMore,
   "action.remove": IconRemove,
   "action.search": IconSearch,
+  "action.send": IconSend,
+  "action.settings": IconSettings,
   "action.upload": IconCloudUpload,
   "field.calendar": IconCalendar,
   "field.email": IconMail,
   "field.password.show": IconEye,
   "field.password.hide": IconEyeOff,
+  "object.document": IconDocument,
+  "object.package": IconPackage,
+  "object.users": IconUsers,
   "sort.ascending": IconSortAscending,
   "sort.descending": IconSortDescending,
   "sort.none": IconSortNone,

@@ -1,6 +1,5 @@
 /** No image (an icon or a short label on the fill) and an image that fails and falls back by itself. */
-import { FileText, Package } from "lucide-react";
-import { Thumbnail, Typography } from "prime-ui-kit";
+import { Icon, Thumbnail, Typography } from "prime-ui-kit";
 
 export default function ThumbnailStatesExample() {
   return (
@@ -8,7 +7,7 @@ export default function ThumbnailStatesExample() {
       <div>
         <Thumbnail.Root ratio="4:3" size="l" color="green">
           <Thumbnail.Fallback>
-            <Package aria-hidden />
+            <Icon name="object.package" />
           </Thumbnail.Fallback>
         </Thumbnail.Root>
         <Typography.Root as="span" variant="caption" tone="muted">
@@ -27,7 +26,7 @@ export default function ThumbnailStatesExample() {
         <Thumbnail.Root ratio="4:3" size="l">
           <Thumbnail.Image src="/missing-image.jpg" />
           <Thumbnail.Fallback>
-            <FileText aria-hidden />
+            <Icon name="object.document" />
           </Thumbnail.Fallback>
         </Thumbnail.Root>
         <Typography.Root as="span" variant="caption" tone="muted">
