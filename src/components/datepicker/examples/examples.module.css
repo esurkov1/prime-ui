@@ -2,7 +2,7 @@
 
 /* A form in a Card. */
 .formCard {
-  max-width: calc(var(--prime-space-24) * 5);
+  width: min(100%, calc(var(--prime-space-24) * 5));
 }
 
 .form {
