@@ -1,4 +1,4 @@
-/** An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and underlines the match — `finite`, `icon`, `collapsedLimit`. */
+/** An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and marks the match in accent — `finite`, `icon`, `collapsedLimit`. */
 import { Icon, SmartFilter, type SmartFilterField } from "prime-ui-kit";
 
 const SERVICES = [

@@ -108,7 +108,7 @@ Helpers. `matchesSmartFilter(selection, value)` checks one value on the client (
 | value shown | press | blue Badge, `aria-pressed="true"`, `data-mode="include"` |
 | value hidden | «−», Alt+click, Shift+Enter | red Badge with «НЕ», `data-mode="exclude"`; its «−» stays visible and unhides |
 | cannot hide | last value of a `finite` field | the «−» is disabled |
-| searching | `search` | only matching values, the match underlined; fields with nothing found in a compact EmptyPage; the «Искать» row closes the panel |
+| searching | `search` | only matching values, the match in `accent-text` (a `<mark>`); fields with nothing found in a compact EmptyPage; the «Искать» row closes the panel |
 | no filters | empty value | no count on the button, no Chips |
 
 ## Layout & spacing
@@ -161,7 +161,7 @@ Helpers. `matchesSmartFilter(selection, value)` checks one value on the client (
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Filters above a request list: the filter button and the search, applied filters as tags, rows narrowed by the value and the text — `fields`, `value`, `search`, `matchesSmartFilter`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: the filter button, the search, the tags and the panel follow one tier — `size`. |
-| [many-values.tsx](examples/many-values.tsx) | An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and underlines the match — `finite`, `icon`, `collapsedLimit`. |
+| [many-values.tsx](examples/many-values.tsx) | An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and marks the match in accent — `finite`, `icon`, `collapsedLimit`. |
 | [controlled.tsx](examples/controlled.tsx) | A saved view sets the value from outside; the selection is read back as the list to ask the server for — `value`, `onValueChange`, `resolveSmartFilterValues`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320 px column: the search shrinks next to the filter button and the tags wrap under them — `size`. |
 

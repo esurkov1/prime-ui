@@ -9,7 +9,7 @@ export function matchIndex(text: string, query: string): number {
 }
 
 /**
- * `text` with its first match of `query` marked (underlined); plain text when nothing matches.
+ * `text` with its first match of `query` marked in accent; plain text when nothing matches.
  * The pieces share one span, so a flex row with a `gap` (a menu item) keeps the word whole.
  */
 export function HighlightMatch({ text, query }: { text: string; query: string }) {
