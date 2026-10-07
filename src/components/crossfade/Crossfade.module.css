@@ -1,0 +1,33 @@
+/*
+ * Crossfade — a region that swaps its content between states (foundation §7 rule 8).
+ * The current state is in flow and fades in (`swapMotion.swapIn`, base · enter); the previous one
+ * is laid over it, click-through, and fades out (`swapMotion.swapOut`, fast · exit). The root
+ * glides from the old height to the new one (base · standard) and returns to `auto`. Nothing
+ * moves on the first render; under reduced motion the swap is instant (no layer, no glide).
+ */
+.root {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+  transition: height var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+/* While the height glides the content may be taller than the root: clip it, but keep room for
+   focus rings (foundation §7). */
+.root[data-resizing="true"] {
+  overflow: clip;
+  overflow-clip-margin: var(--prime-focus-space);
+}
+
+.layer {
+  min-width: 0;
+}
+
+/* The leaving state lies over the new one from the top edge and takes no pointer events. */
+.leaving {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  pointer-events: none;
+}

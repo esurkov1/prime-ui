@@ -171,6 +171,8 @@ describe("Banner", () => {
     expect(root.children).toHaveLength(2);
     expect(root.children[1]).toHaveClass(styles.close);
     expect(root.children[1]).toHaveAttribute("data-variant", "ghost");
+    // Takes the banner's text color from the host, so it reads on solid fills.
+    expect(root.children[1]).toHaveAttribute("data-tone", "inherit");
     expect(root.children[1]).toHaveAttribute("data-size", "xs");
   });
 });

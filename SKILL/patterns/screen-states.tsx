@@ -1,8 +1,9 @@
-/** Screen states: a page-level error in a Banner with a retry, a region loading with a Spinner and table skeleton, the table error in place and a first-run EmptyPage. */
+/** Screen states: a page-level error in a Banner with a retry, a region loading with a Spinner and table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states. */
 import {
   Banner,
   Button,
   Card,
+  Crossfade,
   DataTable,
   type DataTableColumn,
   EmptyPage,
@@ -103,24 +104,27 @@ export default function ScreenStatesPattern() {
               </Card.SectionTrailing>
             </Card.SectionHeader>
             <Card.Body>
-              {status === "loading" ? (
-                <div className={styles.loading}>
-                  <Spinner aria-hidden="true" />
-                </div>
-              ) : (
-                <ul className={styles.accounts}>
-                  {ACCOUNTS.map((account) => (
-                    <li key={account.name} className={styles.account}>
-                      <Typography as="span" variant="body-m" tone="secondary">
-                        {account.name}
-                      </Typography>
-                      <Typography as="span" variant="title-m" className={styles.amount}>
-                        {account.balance}
-                      </Typography>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
+              <Crossfade state={status === "loading" ? "loading" : "ready"}>
+                {status === "loading" ? (
+                  <div className={styles.loading}>
+                    <Spinner aria-hidden="true" />
+                  </div>
+                ) : (
+                  <ul className={styles.accounts}>
+                    {ACCOUNTS.map((account) => (
+                      <li key={account.name} className={styles.account}>
+                        <Typography as="span" variant="body-m" tone="secondary">
+                          {account.name}
+                        </Typography>
+                        <Typography as="span" variant="title-m" className={styles.amount}>
+                          {account.balance}
+                        </Typography>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Crossfade>
             </Card.Body>
           </Card.Root>
 

@@ -2,6 +2,7 @@ import {
   AlignLeft,
   Award,
   Bell,
+  Blend,
   Blocks,
   Bookmark,
   BookOpen,
@@ -96,6 +97,7 @@ import CodeBlockSection from "./sections/CodeBlockSection";
 import ColorPickerSection from "./sections/ColorPickerSection";
 import ColorSwatchesSection from "./sections/ColorSwatchesSection";
 import CommandMenuSection from "./sections/CommandMenuSection";
+import CrossfadeSection from "./sections/CrossfadeSection";
 import DataTableSection from "./sections/DataTableSection";
 import DatepickerSection from "./sections/DatepickerSection";
 import DigitInputSection from "./sections/DigitInputSection";
@@ -633,6 +635,14 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       keywords: ["пусто", "пустое состояние", "empty state"],
       icon: Inbox,
       Page: EmptyPageSection,
+    },
+    {
+      segment: "crossfade",
+      label: "Crossfade",
+      description: "Плавная смена состояний области: загрузка, данные, пусто, ошибка",
+      keywords: ["переход", "состояние", "загрузка", "смена", "transition", "loading", "state"],
+      icon: Blend,
+      Page: CrossfadeSection,
     },
   ],
   navigation: [

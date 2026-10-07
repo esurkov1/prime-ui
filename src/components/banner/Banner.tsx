@@ -91,7 +91,7 @@ function BannerRoot({
           {onDismiss && actionsCount === 0 ? (
             <Button.Root
               variant="ghost"
-              tone="neutral"
+              tone="inherit"
               size={CORNER_CLOSE_SIZE[size]}
               aria-label={dismissLabel}
               className={styles.close}

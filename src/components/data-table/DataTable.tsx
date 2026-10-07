@@ -6,6 +6,7 @@ import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Pagination } from "@/components/pagination/Pagination";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -14,6 +15,7 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { DATA_TABLE_INFINITE_ROOT_MARGIN } from "@/internal/runtimeUnits";
 import type { ControlSize } from "@/internal/states";
+import swapMotion from "@/internal/swapMotion.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./DataTable.module.css";
@@ -587,6 +589,10 @@ export function DataTable<Row>({
   const showInfiniteStatus =
     !hasError && infinite && (hasInternalMore || loadingMore || canRequestMore);
   const bodyRows = hasError ? [] : flatRows;
+  /* Body state swaps (loading → rows → empty / error) cross-fade: the body remounts under its
+     state key and fades in; the first render, sorting and paging stay still (same state). */
+  const bodyState = hasError ? "error" : showSkeleton ? "loading" : showEmpty ? "empty" : "rows";
+  const bodySwapped = useStateSwap(bodyState);
   const skeletonCount = Math.max(1, loadingRows ?? Math.min(safePageSize, SKELETON_ROWS));
   const maxHeight = scrollHeight ?? (infinite ? INFINITE_SCROLL_HEIGHT : undefined);
 
@@ -720,7 +726,10 @@ export function DataTable<Row>({
               </thead>
             ) : null}
 
-            <tbody>
+            <tbody
+              key={bodySwapped ? bodyState : undefined}
+              className={bodySwapped ? swapMotion.swapIn : undefined}
+            >
               {hasError ? (
                 <tr>
                   <td colSpan={totalColumns} className={cx(styles.stateCell, styles.stateError)}>

@@ -18,7 +18,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 |---|---|---|
 | Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; Modal/Drawer `Content` takes `size` for its width. `Button.Root`, `Input.Root`, `Icon` and `Checkbox.Indicator` without `size` take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`). |
 | Treatment | `variant` | `solid · soft · outline · ghost`; structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
-| Meaning | `tone` | Button: `accent \| neutral \| danger`. Destructive is `danger`, never `error`. |
+| Meaning | `tone` | Button: `accent \| neutral \| danger`, plus `inherit` (with `ghost \| soft \| outline`) for an action on a colored host — it takes the host's text color; never recolor a Button with a CSS override. Destructive is `danger`, never `error`. |
 | Decoration | `color` | Badge, Avatar, Thumbnail, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `FileUpload.FormatBadge`, `Timeline.Item`, TagSelect options. |
 | Validation | `invalid`, `hint`, `error` | Props, never parts. A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |
 | Value | `value` / `defaultValue` / `onValueChange(value)` | Select, NativeSelect, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, Radio.Group, DigitInput, Pagination, SmartFilter, ColorPicker, ColorSwatches. |
@@ -124,6 +124,8 @@ built-in states. For a card or region that is loading its data: keep the real la
 `aria-busy="true"` on the Card or region, put a `Spinner` (with `aria-hidden="true"`, since the region
 already says it is busy) where the content will appear, and show the error in place (DataTable `error`,
 a `Banner` for the page, `EmptyPage` with `EmptyPage.Icon tone="danger"` and a retry for a region).
+Wrap the region's content in `Crossfade state={status}` so loading → data → empty → error cross-fade
+and the height glides instead of jumping; DataTable's body already does this.
 Never draw your own spinners or shimmer blocks. See [patterns/screen-states.tsx](patterns/screen-states.tsx).
 
 ## Secondary actions
