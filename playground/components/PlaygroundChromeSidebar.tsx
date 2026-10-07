@@ -128,15 +128,16 @@ function FooterControls() {
             <FooterButton label={surfaceLabel} icon={<SquareStack />} />
           </Dropdown.Trigger>
           <Dropdown.Content align="start" side="top">
-            <Dropdown.Group>
-              <Dropdown.GroupLabel>Фон превью</Dropdown.GroupLabel>
+            <Dropdown.Group label="Фон превью">
               {PLAYGROUND_PREVIEW_SURFACES.map((entry) => (
                 <Dropdown.Item key={entry.value} onSelect={() => setSurface(entry.value)}>
-                  <Dropdown.ItemIcon
-                    as={entry.value === surface ? Check : Square}
-                    size={16}
-                    strokeWidth={2}
-                  />
+                  <Dropdown.ItemIcon>
+                    {entry.value === surface ? (
+                      <Check strokeWidth={2} />
+                    ) : (
+                      <Square strokeWidth={2} />
+                    )}
+                  </Dropdown.ItemIcon>
                   {entry.label} — {entry.hint.toLowerCase()}
                 </Dropdown.Item>
               ))}

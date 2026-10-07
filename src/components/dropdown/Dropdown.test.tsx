@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { useOptionalControlSize } from "@/internal/ControlSizeContext";
+
 import { Dropdown } from "./Dropdown";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -298,49 +300,26 @@ describe("Dropdown", () => {
 
   // ─── Groups ──────────────────────────────────────────────────────────────────
 
-  it("renders Block wrapper", () => {
+  it("renders groups named by their label", () => {
     render(
       <Dropdown.Root>
         <Dropdown.Trigger>
           <button type="button">Open</button>
         </Dropdown.Trigger>
         <Dropdown.Content>
-          <Dropdown.Block>
-            <Dropdown.Item>A</Dropdown.Item>
-          </Dropdown.Block>
-          <Dropdown.Block>
-            <Dropdown.Item>B</Dropdown.Item>
-          </Dropdown.Block>
-        </Dropdown.Content>
-      </Dropdown.Root>,
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("menuitem", { name: "A" })).toBeInTheDocument();
-    expect(screen.getByRole("menuitem", { name: "B" })).toBeInTheDocument();
-  });
-
-  it("renders groups and group labels", () => {
-    render(
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <button type="button">Open</button>
-        </Dropdown.Trigger>
-        <Dropdown.Content>
-          <Dropdown.Group>
-            <Dropdown.GroupLabel>Actions</Dropdown.GroupLabel>
+          <Dropdown.Group label="Actions">
             <Dropdown.Item>Edit</Dropdown.Item>
           </Dropdown.Group>
           <Dropdown.Separator />
-          <Dropdown.Group>
-            <Dropdown.GroupLabel>Danger zone</Dropdown.GroupLabel>
+          <Dropdown.Group label="Danger zone">
             <Dropdown.Item tone="danger">Delete</Dropdown.Item>
           </Dropdown.Group>
         </Dropdown.Content>
       </Dropdown.Root>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByText("Actions")).toBeInTheDocument();
-    expect(screen.getByText("Danger zone")).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Actions" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Danger zone" })).toBeInTheDocument();
     expect(screen.getByRole("menuitem", { name: "Edit" })).toBeInTheDocument();
     expect(screen.getByRole("menuitem", { name: "Delete" })).toBeInTheDocument();
   });
@@ -382,10 +361,7 @@ describe("Dropdown", () => {
     expect(screen.getByText("★")).toBeInTheDocument();
   });
 
-  it("ItemIcon supports polymorphic as", () => {
-    function TinyIcon() {
-      return <svg data-testid="poly-icon" aria-hidden />;
-    }
+  it("ItemIcon holds its glyph and hides it from screen readers", () => {
     render(
       <Dropdown.Root>
         <Dropdown.Trigger>
@@ -393,14 +369,18 @@ describe("Dropdown", () => {
         </Dropdown.Trigger>
         <Dropdown.Content>
           <Dropdown.Item>
-            <Dropdown.ItemIcon as={TinyIcon} />
+            <Dropdown.ItemIcon>
+              <svg data-testid="glyph" />
+            </Dropdown.ItemIcon>
             Action
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByTestId("poly-icon")).toBeInTheDocument();
+    const glyph = screen.getByTestId("glyph");
+    expect(glyph.parentElement).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("menuitem", { name: "Action" })).toBeInTheDocument();
   });
 
   it("Trigger merges external ref with internal anchor ref", () => {
@@ -421,27 +401,7 @@ describe("Dropdown", () => {
     expect(ref.current).toHaveTextContent("Open");
   });
 
-  it("renders HeaderRow with title and description", () => {
-    render(
-      <Dropdown.Root defaultOpen>
-        <Dropdown.Trigger>
-          <button type="button">Open</button>
-        </Dropdown.Trigger>
-        <Dropdown.Content>
-          <Dropdown.HeaderRow>
-            <Dropdown.HeaderMain>
-              <Dropdown.HeaderTitle>Title</Dropdown.HeaderTitle>
-              <Dropdown.HeaderDescription>Subtitle</Dropdown.HeaderDescription>
-            </Dropdown.HeaderMain>
-          </Dropdown.HeaderRow>
-        </Dropdown.Content>
-      </Dropdown.Root>,
-    );
-    expect(screen.getByText("Title")).toBeInTheDocument();
-    expect(screen.getByText("Subtitle")).toBeInTheDocument();
-  });
-
-  it("Header wraps row and separator without extra gap class on wrapper", () => {
+  it("Header stacks Title and Description in one column between leading and trailing nodes", () => {
     render(
       <Dropdown.Root defaultOpen>
         <Dropdown.Trigger>
@@ -449,34 +409,24 @@ describe("Dropdown", () => {
         </Dropdown.Trigger>
         <Dropdown.Content>
           <Dropdown.Header data-testid="hdr">
-            <Dropdown.HeaderRow>
-              <Dropdown.HeaderTitle>T</Dropdown.HeaderTitle>
-            </Dropdown.HeaderRow>
-            <Dropdown.Separator />
+            <span data-testid="lead">АП</span>
+            <Dropdown.Title>Title</Dropdown.Title>
+            <Dropdown.Description>Subtitle</Dropdown.Description>
+            <span data-testid="trail">PRO</span>
           </Dropdown.Header>
+          <Dropdown.Separator />
         </Dropdown.Content>
       </Dropdown.Root>,
     );
-    expect(screen.getByTestId("hdr")).toBeInTheDocument();
+    const header = screen.getByTestId("hdr");
+    const title = screen.getByText("Title");
+    expect(title.parentElement).toBe(screen.getByText("Subtitle").parentElement);
+    expect([...header.children]).toEqual([
+      screen.getByTestId("lead"),
+      title.parentElement,
+      screen.getByTestId("trail"),
+    ]);
     expect(screen.getByRole("separator")).toBeInTheDocument();
-  });
-
-  it("HeaderTrailing alignSelf center sets data-trailing-align", () => {
-    render(
-      <Dropdown.Root defaultOpen>
-        <Dropdown.Trigger>
-          <button type="button">Open</button>
-        </Dropdown.Trigger>
-        <Dropdown.Content>
-          <Dropdown.HeaderRow>
-            <Dropdown.HeaderTrailing alignSelf="center" data-testid="trail">
-              x
-            </Dropdown.HeaderTrailing>
-          </Dropdown.HeaderRow>
-        </Dropdown.Content>
-      </Dropdown.Root>,
-    );
-    expect(screen.getByTestId("trail")).toHaveAttribute("data-trailing-align", "center");
   });
 
   // ─── Controlled ──────────────────────────────────────────────────────────────
@@ -498,9 +448,9 @@ describe("Dropdown", () => {
     expect(screen.getByRole("menu")).toBeInTheDocument();
   });
 
-  it("ItemIcon получает размер иконки яруса меню (xl → 20, xs → 14)", () => {
-    function SizedIcon({ size }: { size?: number }) {
-      return <svg data-testid={`icon-${size}`} aria-hidden />;
+  it("the glyph in ItemIcon follows the menu tier (xl, xs)", () => {
+    function TierProbe() {
+      return <span data-testid={`tier-${useOptionalControlSize()}`} />;
     }
     render(
       <>
@@ -510,7 +460,9 @@ describe("Dropdown", () => {
           </Dropdown.Trigger>
           <Dropdown.Content size="xl">
             <Dropdown.Item>
-              <Dropdown.ItemIcon as={SizedIcon} />
+              <Dropdown.ItemIcon>
+                <TierProbe />
+              </Dropdown.ItemIcon>
               Big
             </Dropdown.Item>
           </Dropdown.Content>
@@ -521,15 +473,17 @@ describe("Dropdown", () => {
           </Dropdown.Trigger>
           <Dropdown.Content size="xs">
             <Dropdown.Item>
-              <Dropdown.ItemIcon as={SizedIcon} />
+              <Dropdown.ItemIcon>
+                <TierProbe />
+              </Dropdown.ItemIcon>
               Small
             </Dropdown.Item>
           </Dropdown.Content>
         </Dropdown.Root>
       </>,
     );
-    expect(screen.getByTestId("icon-20")).toBeInTheDocument();
-    expect(screen.getByTestId("icon-14")).toBeInTheDocument();
+    expect(screen.getByTestId("tier-xl")).toBeInTheDocument();
+    expect(screen.getByTestId("tier-xs")).toBeInTheDocument();
   });
 
   it("ItemShortcut рендерит подсказку клавиш как <kbd> внутри пункта", () => {
@@ -602,6 +556,21 @@ describe("Dropdown — overlay contract", () => {
     const trigger = screen.getByRole("button", { name: "Open" });
     fireEvent.click(trigger);
     fireEvent.pointerDown(trigger);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+  });
+
+  it("closeOnEscape={false} keeps it open on Escape", () => {
+    render(
+      <Dropdown.Root defaultOpen closeOnEscape={false}>
+        <Dropdown.Trigger>
+          <button type="button">Open</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Item</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.getByRole("menu")).toBeInTheDocument();
   });
 

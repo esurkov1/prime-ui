@@ -209,22 +209,16 @@ export { useDropTarget } from "./dnd/useDropTarget";
 export { moveBefore, useSortableList } from "./dnd/useSortableList";
 export * from "./drawer/Drawer";
 export type {
-  DropdownBlockProps,
   DropdownContentProps,
-  DropdownGroupLabelProps,
+  DropdownDescriptionProps,
   DropdownGroupProps,
-  DropdownHeaderDescriptionProps,
-  DropdownHeaderLeadingProps,
-  DropdownHeaderMainProps,
   DropdownHeaderProps,
-  DropdownHeaderRowProps,
-  DropdownHeaderTitleProps,
-  DropdownHeaderTrailingProps,
   DropdownItemIconProps,
   DropdownItemProps,
   DropdownItemShortcutProps,
   DropdownRootProps,
   DropdownSeparatorProps,
+  DropdownTitleProps,
   DropdownTriggerProps,
 } from "./dropdown/Dropdown";
 export { Dropdown } from "./dropdown/Dropdown";

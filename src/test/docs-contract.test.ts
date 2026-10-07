@@ -47,7 +47,6 @@ const NOT_CONVERTED = new Set([
   "divider",
   "dnd",
   "drawer",
-  "dropdown",
   "empty-page",
   "example-frame",
   "file-upload",

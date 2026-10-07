@@ -1,42 +1,34 @@
-/** A long grouped list that scrolls inside the panel, with a disabled row skipped by arrow keys. Use when a menu has more items than fit the panel max height. */
-import { Button, Dropdown } from "prime-ui-kit";
-
-const PROJECTS = [
-  "Сайт компании",
-  "Мобильное приложение",
-  "Личный кабинет",
-  "Админ-панель",
-  "Лендинг акции",
-  "Платёжный шлюз",
-  "Справочный центр",
-  "Внутренний портал",
-  "Аналитика продаж",
-  "CRM для партнёров",
-  "Бот поддержки",
-  "Дизайн-система",
-];
+/** A regular, a disabled and a destructive item; arrow keys skip the disabled one — `disabled`, `tone`. */
+import { Button, Dropdown, Icon } from "prime-ui-kit";
 
 export default function DropdownStatesExample() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
         <Button.Root variant="soft" tone="neutral">
-          Переместить в проект
+          Документ
         </Button.Root>
       </Dropdown.Trigger>
       <Dropdown.Content>
-        <Dropdown.Group>
-          <Dropdown.GroupLabel>Недавние</Dropdown.GroupLabel>
-          <Dropdown.Item>Сайт компании</Dropdown.Item>
-          <Dropdown.Item disabled>Архив 2023 — только чтение</Dropdown.Item>
-        </Dropdown.Group>
+        <Dropdown.Item>
+          <Dropdown.ItemIcon>
+            <Icon name="action.copy" />
+          </Dropdown.ItemIcon>
+          Дублировать
+        </Dropdown.Item>
+        <Dropdown.Item disabled>
+          <Dropdown.ItemIcon>
+            <Icon name="status.locked" />
+          </Dropdown.ItemIcon>
+          Архивировать — нет прав
+        </Dropdown.Item>
         <Dropdown.Separator />
-        <Dropdown.Group>
-          <Dropdown.GroupLabel>Все проекты</Dropdown.GroupLabel>
-          {PROJECTS.map((name) => (
-            <Dropdown.Item key={name}>{name}</Dropdown.Item>
-          ))}
-        </Dropdown.Group>
+        <Dropdown.Item tone="danger">
+          <Dropdown.ItemIcon>
+            <Icon name="action.delete" />
+          </Dropdown.ItemIcon>
+          Удалить
+        </Dropdown.Item>
       </Dropdown.Content>
     </Dropdown.Root>
   );
