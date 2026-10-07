@@ -60,7 +60,6 @@ const NOT_CONVERTED = new Set([
   "popover",
   "progress-bar",
   "progress-circle",
-  "radio",
   "scroll-container",
   "segmented-control",
   "select",

@@ -1,23 +1,18 @@
-/** All five size tiers of a selected radio side by side. Use it to pick the tier that matches the neighbouring controls. */
-import { Radio, Typography } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+/** Every size; the circle and the text follow the group tier — `size`. */
+import { Radio } from "prime-ui-kit";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function RadioSizesExample() {
   return (
-    <div className={styles.row}>
+    <div>
       {SIZES.map((size) => (
-        <div key={size} className={styles.cell}>
-          <Radio.Group size={size} defaultValue="on" aria-label={`Размер ${size}`}>
-            <Radio.Root value="on">
-              <Radio.Label>Подпись</Radio.Label>
+        <div key={size}>
+          <Radio.Group size={size} defaultValue={size} aria-label={`Размер ${size}`}>
+            <Radio.Root value={size}>
+              <Radio.Label>{size}</Radio.Label>
             </Radio.Root>
           </Radio.Group>
-          <Typography.Root as="span" variant="caption" tone="muted">
-            {size}
-          </Typography.Root>
         </div>
       ))}
     </div>

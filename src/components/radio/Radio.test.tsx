@@ -153,20 +153,16 @@ describe("Radio", () => {
     expect(screen.getByRole("radio", { name: "A" })).toBeDisabled();
   });
 
-  it("marks aria-invalid from the group and from an option", () => {
+  it("marks aria-invalid on the group and every option", () => {
     render(
-      <>
-        <Radio.Group invalid aria-label="Risk">
-          <Radio.Root value="high">
-            <Radio.Label>High</Radio.Label>
-          </Radio.Root>
-        </Radio.Group>
-        <Radio.Group>
-          <Radio.Root value="low" invalid>
-            <Radio.Label>Low</Radio.Label>
-          </Radio.Root>
-        </Radio.Group>
-      </>,
+      <Radio.Group invalid aria-label="Risk">
+        <Radio.Root value="high">
+          <Radio.Label>High</Radio.Label>
+        </Radio.Root>
+        <Radio.Root value="low">
+          <Radio.Label>Low</Radio.Label>
+        </Radio.Root>
+      </Radio.Group>,
     );
 
     expect(screen.getByRole("radiogroup", { name: "Risk" })).toHaveAttribute(
@@ -175,6 +171,18 @@ describe("Radio", () => {
     );
     expect(screen.getByRole("radio", { name: "High" })).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByRole("radio", { name: "Low" })).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("names the group by its label and marks the required asterisk", () => {
+    render(
+      <Radio.Group label="Способ оплаты" required>
+        <Radio.Root value="card">
+          <Radio.Label>Картой</Radio.Label>
+        </Radio.Root>
+      </Radio.Group>,
+    );
+    expect(screen.getByRole("radiogroup", { name: "Способ оплаты" })).toBeInTheDocument();
+    expect(screen.getByText("*")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("sets required on the inputs and aria-required on the group", () => {
@@ -192,27 +200,26 @@ describe("Radio", () => {
     expect(screen.getByRole("radio", { name: "A" })).toBeRequired();
   });
 
-  it("marks aria-invalid and links the error when Radio.Error is rendered", () => {
+  it("marks aria-invalid and links the group error, which replaces the group hint", () => {
     render(
-      <Radio.Group>
+      <Radio.Group label="Answer" hint="Pick one" error="This field has an error">
         <Radio.Root value="yes">
           <Radio.Label>Yes</Radio.Label>
-          <Radio.Error>This field has an error</Radio.Error>
         </Radio.Root>
       </Radio.Group>,
     );
 
-    const radio = screen.getByRole("radio", { name: "Yes" });
-    expect(radio).toHaveAttribute("aria-invalid", "true");
-    expect(radio).toHaveAccessibleDescription("This field has an error");
+    const group = screen.getByRole("radiogroup", { name: "Answer" });
+    expect(group).toHaveAccessibleDescription("This field has an error");
+    expect(screen.queryByText("Pick one")).toBeNull();
+    expect(screen.getByRole("radio", { name: "Yes" })).toHaveAttribute("aria-invalid", "true");
   });
 
-  it("renders hint and links via aria-describedby", () => {
+  it("renders an option hint and links it via aria-describedby", () => {
     render(
       <Radio.Group>
-        <Radio.Root value="v">
+        <Radio.Root value="v" hint="Helper copy">
           <Radio.Label>L</Radio.Label>
-          <Radio.Hint>Helper copy</Radio.Hint>
         </Radio.Root>
       </Radio.Group>,
     );

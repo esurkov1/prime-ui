@@ -30,12 +30,6 @@
   padding-top: var(--prime-space-1);
 }
 
-.choices {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-}
-
 .row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-10) * 4)), 1fr));

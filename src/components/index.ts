@@ -371,9 +371,8 @@ export { ProgressBar } from "./progress-bar/ProgressBar";
 export type { ProgressCircleRootProps } from "./progress-circle/ProgressCircle";
 export { ProgressCircle } from "./progress-circle/ProgressCircle";
 export type {
-  RadioErrorProps,
+  RadioGroupLabels,
   RadioGroupProps,
-  RadioHintProps,
   RadioLabelProps,
   RadioRootProps,
 } from "./radio/Radio";

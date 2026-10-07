@@ -44,21 +44,15 @@ export default function AccordionCheckoutExample() {
           </Accordion.Header>
           <Accordion.Content>
             <div className={styles.form}>
-              <Radio.Group
-                name="checkout-payment"
-                defaultValue="card"
-                aria-label="Способ оплаты"
-                className={styles.choices}
-              >
+              <Radio.Group name="checkout-payment" defaultValue="card" aria-label="Способ оплаты">
                 <Radio.Root value="card">
                   <Radio.Label>Картой онлайн</Radio.Label>
                 </Radio.Root>
                 <Radio.Root value="sbp">
                   <Radio.Label>СБП</Radio.Label>
                 </Radio.Root>
-                <Radio.Root value="cash">
+                <Radio.Root value="cash" hint="Только в пунктах выдачи">
                   <Radio.Label>При получении</Radio.Label>
-                  <Radio.Hint>Только в пунктах выдачи</Radio.Hint>
                 </Radio.Root>
               </Radio.Group>
               <div>
