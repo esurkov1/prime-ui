@@ -1,4 +1,4 @@
-/** No outline by default: depth comes from the fill. `ring` adds a faint inner ring for photos with a white background on a light surface, where the edge would otherwise vanish. Use it only for such images. */
+/** A faint inner ring for a white-background photo on a light surface, where the edge would vanish — `ring`. */
 import { Thumbnail, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -12,16 +12,16 @@ export default function ThumbnailRingExample() {
         <Thumbnail.Root ratio="4:3" size="xl">
           <Thumbnail.Image src={PHOTO} />
         </Thumbnail.Root>
-        <Typography.Root variant="caption" tone="muted">
-          По умолчанию
+        <Typography.Root as="span" variant="caption" tone="muted">
+          Без кольца
         </Typography.Root>
       </div>
       <div className={styles.cell}>
         <Thumbnail.Root ratio="4:3" size="xl" ring>
           <Thumbnail.Image src={PHOTO} />
         </Thumbnail.Root>
-        <Typography.Root variant="caption" tone="muted">
-          ring
+        <Typography.Root as="span" variant="caption" tone="muted">
+          С кольцом
         </Typography.Root>
       </div>
     </div>

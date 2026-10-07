@@ -463,7 +463,6 @@ export { Textarea } from "./textarea/Textarea";
 export type {
   ThumbnailFallbackProps,
   ThumbnailImageProps,
-  ThumbnailImageStatus,
   ThumbnailRatio,
   ThumbnailRootProps,
 } from "./thumbnail/Thumbnail";

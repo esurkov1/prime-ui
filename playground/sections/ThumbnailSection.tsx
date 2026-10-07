@@ -1,236 +1,63 @@
-import { PageContent } from "@/components/page-content/PageContent";
-import CardGridExample from "@/components/thumbnail/examples/card-grid";
-import cardGridSource from "@/components/thumbnail/examples/card-grid.tsx?raw";
-import FallbackExample from "@/components/thumbnail/examples/fallback";
-import fallbackSource from "@/components/thumbnail/examples/fallback.tsx?raw";
-import InTableExample from "@/components/thumbnail/examples/in-table";
-import inTableSource from "@/components/thumbnail/examples/in-table.tsx?raw";
-import RatiosExample from "@/components/thumbnail/examples/ratios";
-import ratiosSource from "@/components/thumbnail/examples/ratios.tsx?raw";
-import RingExample from "@/components/thumbnail/examples/ring";
-import ringSource from "@/components/thumbnail/examples/ring.tsx?raw";
-import SizesExample from "@/components/thumbnail/examples/sizes";
-import sizesSource from "@/components/thumbnail/examples/sizes.tsx?raw";
-import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import {
-  DemoApiTitle,
-  DemoDescription,
-  DemoSectionTitle,
-} from "../components/PlaygroundDemoTypography";
-import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
+import { api } from "@/components/thumbnail/api";
 
-const rootApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "size",
-    type: '"xs" | "s" | "m" | "l" | "xl"',
-    defaultValue: '"m"',
-    required: "Нет",
-    description: "Высота 24 · 32 · 40 · 48 · 64 и радиус 4 · 6 · 8 · 8 · 12; ширина — из ratio.",
-  },
-  {
-    prop: "ratio",
-    type: '"1:1" | "4:3" | "3:2" | "16:9" | "3:4"',
-    defaultValue: '"1:1"',
-    required: "Нет",
-    description: "Соотношение сторон, ширина ÷ высота.",
-  },
-  {
-    prop: "color",
-    type: "PaletteColor",
-    defaultValue: '"gray"',
-    required: "Нет",
-    description: "Оттенок заливки и иконки фолбэка.",
-  },
-  {
-    prop: "variant",
-    type: '"soft" | "solid"',
-    defaultValue: '"soft"',
-    required: "Нет",
-    description:
-      "soft — мягкая заливка с иконкой цвета; solid — сам цвет с контрастной иконкой, когда цвет — свойство объекта.",
-  },
-  {
-    prop: "fullWidth",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Ширина контейнера, высота из ratio — обложки карточек и галереи.",
-  },
-  {
-    prop: "ring",
-    type: "boolean",
-    defaultValue: "false",
-    required: "Нет",
-    description:
-      "Тонкое внутреннее кольцо по краю — для фото на белом фоне на светлой поверхности.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "className, aria-*, data-* корневого div; ref пробрасывается.",
-  },
-];
+import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
 
-const imageApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "src",
-    type: "string",
-    defaultValue: "—",
-    required: "Да",
-    description: "Адрес изображения; пока грузится и при ошибке виден Fallback.",
+export const page: ComponentPageConfig = {
+  dir: "thumbnail",
+  title: "Thumbnail",
+  kind: "primitive",
+  description:
+    "Превью предмета — товара, машины, файла, обложки — с фиксированным соотношением сторон и цветной подложкой с иконкой. Людей показывает Avatar.",
+  examples: [
+    {
+      slot: "overview",
+      description:
+        "Машина рядом с названием: фото и подложка с иконкой под ним — `Thumbnail.Image`, `Thumbnail.Fallback`, `ratio`.",
+    },
+    {
+      slot: "variants",
+      description:
+        "Заливка подложки: мягкий оттенок или насыщенный цвет со смыслом — `variant`, `color`.",
+    },
+    {
+      slot: "sizes",
+      description:
+        "Все ярусы высоты, от 24 до 64 px; `m` подходит для двухстрочной ячейки — `size`.",
+    },
+    {
+      slot: "states",
+      description:
+        "Без картинки (иконка или короткая подпись на заливке) и картинка с ошибкой, которая сама уходит в подложку.",
+    },
+    {
+      scenario: "ratios",
+      title: "Соотношения сторон",
+      description: "Все соотношения при одной высоте; держите одно соотношение в списке — `ratio`.",
+    },
+    {
+      scenario: "ring",
+      title: "Кольцо",
+      description:
+        "Тонкое внутреннее кольцо для фото на белом фоне на светлой поверхности, где край теряется — `ring`.",
+    },
+    {
+      scenario: "full-width",
+      title: "Во всю ширину",
+      description:
+        "Обложки в сетке карточек берут ширину карточки и держат 16:9 — высота у всех одна — `fullWidth`.",
+    },
+  ],
+  api,
+  accessibility: {
+    keyboard: [],
+    aria: [
+      'Рядом с названием превью декоративно: `alt=""` (по умолчанию), иконки подложки — `aria-hidden`.',
+      'Без названия рядом: осмысленный `alt` у `Thumbnail.Image` или `role="img"` + `aria-label` на корне для превью без картинки.',
+      "Своего поведения нет: оберните превью в ссылку или кнопку, если оно открывает объект.",
+    ],
   },
-  {
-    prop: "alt",
-    type: "string",
-    defaultValue: '""',
-    required: "Нет",
-    description: "Пусто, если рядом уже есть название объекта.",
-  },
-  {
-    prop: "fit",
-    type: '"cover" | "contain"',
-    defaultValue: '"cover"',
-    required: "Нет",
-    description: "cover — обрезает до заполнения; contain — целиком на заливке фолбэка.",
-  },
-  {
-    prop: "…rest",
-    type: "React.ImgHTMLAttributes<HTMLImageElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "loading, onLoad, onError и прочие атрибуты img; ref пробрасывается.",
-  },
-];
-
-const fallbackApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Иконка (размер по ярусу) или короткая подпись.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLSpanElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "className и атрибуты span.",
-  },
-];
-
-function Demo({
-  title,
-  description,
-  code,
-  children,
-}: {
-  title: string;
-  description: React.ReactNode;
-  code: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="demoBlock">
-      <DemoSectionTitle>{title}</DemoSectionTitle>
-      <DemoDescription>{description}</DemoDescription>
-      <PlaygroundExampleFrame.Root code={code.trim()} previewLayout="stack-center">
-        <PlaygroundExampleFrame.Stage>{children}</PlaygroundExampleFrame.Stage>
-      </PlaygroundExampleFrame.Root>
-    </div>
-  );
-}
+};
 
 export default function ThumbnailSection() {
-  return (
-    <PageContent.Section>
-      <PageContent.Header>
-        <PageContent.Title>Thumbnail</PageContent.Title>
-        <PageContent.Description measure="full">
-          Превью объекта — товара, транспорта, файла, обложки — с фиксированным соотношением сторон.
-          Пока картинка грузится или если её нет, видна цветная заливка с иконкой. Людей показывает
-          Avatar.
-        </PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>
-        <div className="demoExamples">
-          <Demo
-            title="В таблице"
-            description={
-              <>Миниатюра 16:9 рядом с двухстрочной ячейкой: строка таблицы растёт по контенту.</>
-            }
-            code={inTableSource}
-          >
-            <InTableExample />
-          </Demo>
-          <Demo
-            title="Соотношения сторон"
-            description={
-              <>
-                <code>ratio</code>: 1:1 · 4:3 · 3:2 · 16:9 · 3:4 при одной высоте.
-              </>
-            }
-            code={ratiosSource}
-          >
-            <RatiosExample />
-          </Demo>
-          <Demo
-            title="Размеры"
-            description={
-              <>
-                <code>size</code> задаёт высоту 24 · 32 · 40 · 48 · 64. По умолчанию <code>m</code>.
-              </>
-            }
-            code={sizesSource}
-          >
-            <SizesExample />
-          </Demo>
-          <Demo
-            title="Фолбэк"
-            description={<>Иконка, подпись и картинка, которая не загрузилась.</>}
-            code={fallbackSource}
-          >
-            <FallbackExample />
-          </Demo>
-          <Demo
-            title="Обводка"
-            description={
-              <>
-                По умолчанию обводки нет — превью отделяет заливка. <code>ring</code> добавляет
-                тонкое внутреннее кольцо для фото на белом фоне, край которых иначе теряется на
-                светлой поверхности.
-              </>
-            }
-            code={ringSource}
-          >
-            <RingExample />
-          </Demo>
-          <Demo
-            title="Обложки в карточках"
-            description={
-              <>
-                <code>fullWidth</code>: ширина карточки, высота из соотношения — у всех карточек
-                сетки одинаковая обложка.
-              </>
-            }
-            code={cardGridSource}
-          >
-            <CardGridExample />
-          </Demo>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>API</DemoSectionTitle>
-            <DemoApiTitle>Thumbnail.Root</DemoApiTitle>
-            <PlaygroundApiTable rows={rootApiRows} />
-            <DemoApiTitle>Thumbnail.Image</DemoApiTitle>
-            <PlaygroundApiTable rows={imageApiRows} />
-            <DemoApiTitle>Thumbnail.Fallback</DemoApiTitle>
-            <PlaygroundApiTable rows={fallbackApiRows} />
-          </div>
-        </div>
-      </PageContent.Body>
-    </PageContent.Section>
-  );
+  return <ComponentPage page={page} />;
 }

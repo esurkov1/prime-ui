@@ -1,9 +1,11 @@
-/* Layout only for the Thumbnail examples: semantic tokens. */
+/* Layout of the Thumbnail scenarios: semantic tokens only. */
 
+/* ratios.tsx, ring.tsx: thumbnails with captions in one line. */
 .row {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
+  justify-content: center;
   gap: var(--prime-space-6);
 }
 
@@ -13,11 +15,12 @@
   gap: var(--prime-space-2);
 }
 
-/* Thumbnail + text in a table cell or list row. */
+/* overview.tsx: thumbnail + text in a list row. */
 .entity {
   display: flex;
   align-items: center;
   gap: var(--prime-space-3);
+  width: min(100%, var(--prime-modal-width-s));
   min-width: 0;
 }
 
@@ -27,13 +30,7 @@
   min-width: 0;
 }
 
-.meta {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
+/* full-width.tsx: a card grid. */
 .grid {
   display: grid;
   gap: var(--prime-space-4);

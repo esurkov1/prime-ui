@@ -1,10 +1,10 @@
-/** `fullWidth` covers in a card grid: the thumbnail takes the card width and keeps 16:9, so every card in the grid has the same cover height. Use for catalogs and galleries. */
+/** Covers in a card grid take the card width and keep 16:9, so every cover has one height — `fullWidth`. */
 import { Bike } from "lucide-react";
 import { Card, type PaletteColor, Thumbnail, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const bikes: { id: string; title: string; meta: string; color: PaletteColor; photo?: string }[] = [
+const BIKES: { id: string; title: string; meta: string; color: PaletteColor; photo?: string }[] = [
   { id: "1", title: "Honda ADV 350", meta: "2026 · 5672", color: "red" },
   {
     id: "2",
@@ -16,10 +16,10 @@ const bikes: { id: string; title: string; meta: string; color: PaletteColor; pho
   { id: "3", title: "Honda PCX 160", meta: "2025 · 9031", color: "blue" },
 ];
 
-export default function ThumbnailCardGridExample() {
+export default function ThumbnailFullWidthExample() {
   return (
     <div className={styles.grid}>
-      {bikes.map((bike) => (
+      {BIKES.map((bike) => (
         <Card.Root key={bike.id} variant="panel">
           <Card.Body>
             <div className={styles.cardContent}>
