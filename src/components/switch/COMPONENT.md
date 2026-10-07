@@ -41,7 +41,7 @@ Switch.Root          field grid; ref and input props go to the native input (rol
 | `checked` | `boolean` | — | Controlled state. |
 | `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
 | `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the track (24×16 … 44×24), the text and the gap. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the off track and `aria-invalid`. A non-empty `error` implies it. |

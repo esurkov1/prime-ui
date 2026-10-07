@@ -29,8 +29,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the track (24×16 … 44×24), the text and the gap.",
+          default: 'host tier, else "m"',
+          en: "Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`.",
           ru: "Ярус дорожки (24×16 … 44×24), текста и отступа.",
         },
         {

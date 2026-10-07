@@ -45,7 +45,7 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 | `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
 | `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
 | `indeterminate` | `boolean` | `false` | Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the box, the text and the gap. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the unchecked box and `aria-invalid`. A non-empty `error` implies it. |

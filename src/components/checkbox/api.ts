@@ -36,8 +36,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the box, the text and the gap.",
+          default: 'host tier, else "m"',
+          en: "Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`.",
           ru: "Ярус квадрата, текста и отступа.",
         },
         {

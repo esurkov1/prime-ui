@@ -5,11 +5,17 @@ import { Button } from "@/components/button/Button";
 import { Hint } from "@/components/hint/Hint";
 import { ProgressBar } from "@/components/progress-bar/ProgressBar";
 import { Icon } from "@/icons";
-import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import {
+  FieldFrame,
+  type FieldFrameProps,
+  type FieldRootDomProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import type { ControlSize, PaletteColor, TextTone } from "@/internal/states";
+import { visuallyHiddenClass } from "@/internal/VisuallyHidden";
 
 import styles from "./FileUpload.module.css";
 
@@ -43,10 +49,7 @@ type ParagraphProps = React.HTMLAttributes<HTMLParagraphElement> & {
 
 export type FileUploadBodyProps = DivProps;
 
-/**
- * Custom body of the drop zone: a centered column. It takes no pointer events, so dragging over
- * text never flickers the drop state; nested buttons and links opt back in.
- */
+/** Custom body of the drop zone: a centered column; nested buttons and links stay interactive. */
 function FileUploadBody({ className, ...rest }: FileUploadBodyProps) {
   return <div className={cx(styles.body, className)} {...rest} />;
 }
@@ -82,7 +85,7 @@ export type FileUploadDescriptionProps = ParagraphProps;
 
 /** Secondary line of the zone (formats, size limit), the kit Hint of the zone tier. */
 function FileUploadDescription(props: FileUploadDescriptionProps) {
-  return <Hint.Root size={useOptionalControlSize() ?? "m"} {...props} />;
+  return <Hint.Root size={useControlSize(undefined)} {...props} />;
 }
 FileUploadDescription.displayName = "FileUpload.Description";
 
@@ -91,12 +94,18 @@ FileUploadDescription.displayName = "FileUpload.Description";
 export type FileUploadItemProps = DivProps & {
   /** Failed upload: danger wash and ring, danger description. */
   invalid?: boolean;
-  /** Typography, spacing and the format badge follow the control tier. */
+  /** Typography, spacing and the format badge follow the control tier (default: the host tier, else `m`). */
   size?: ControlSize;
 };
 
 /** A file row: format badge · name over description · actions, then the progress bar. */
-function FileUploadItem({ className, invalid = false, size = "m", ...rest }: FileUploadItemProps) {
+function FileUploadItem({
+  className,
+  invalid = false,
+  size: sizeProp,
+  ...rest
+}: FileUploadItemProps) {
+  const size = useControlSize(sizeProp);
   return (
     <ControlSizeProvider value={size}>
       <div
@@ -174,11 +183,9 @@ FileUploadItemProgress.displayName = "FileUpload.ItemProgress";
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
-export type FileUploadRootProps = Omit<
-  React.LabelHTMLAttributes<HTMLLabelElement>,
-  "children" | "htmlFor"
-> &
+export type FileUploadRootProps = FieldRootDomProps &
   Omit<FieldFrameProps, "focusRing"> & {
+    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
     variant?: FileUploadVariant;
     /** Access to the hidden file input (open the picker programmatically). */
@@ -193,123 +200,132 @@ export type FileUploadRootProps = Omit<
     name?: string;
     onFilesChange?: (files: File[]) => void;
     labels?: Partial<FileUploadLabels>;
+    /** Id of the file input; generated when omitted. */
+    id?: string;
     /** Custom body (`FileUpload.Body`); replaces the built-in icon, title, description and button. */
     children?: React.ReactNode;
   };
 
-const FileUploadRoot = React.forwardRef<HTMLLabelElement, FileUploadRootProps>(
-  (
-    {
-      size = "m",
-      variant = "dashed",
-      inputRef,
-      accept,
-      multiple,
-      disabled = false,
-      invalid,
-      name,
-      onFilesChange,
-      label,
-      required,
-      optional,
-      hint,
-      error,
-      id,
-      labels: labelsProp,
-      className,
-      children,
-      ...rest
-    },
-    ref,
-  ) => {
-    const labels = { ...FILE_UPLOAD_LABELS, ...labelsProp };
-    const ids = useFieldFrame(id, { hint, error, invalid });
-    const [dragOver, setDragOver] = React.useState(false);
+/**
+ * The field: label · drop zone · hint or error. `className`, `ref` and the rest go to the frame,
+ * `id` and `aria-label` to the hidden file input.
+ */
+function FileUploadRoot({
+  size: sizeProp,
+  variant = "dashed",
+  inputRef,
+  accept,
+  multiple,
+  disabled = false,
+  invalid,
+  name,
+  onFilesChange,
+  label,
+  required,
+  optional,
+  hint,
+  error,
+  id,
+  labels: labelsProp,
+  "aria-label": ariaLabel,
+  children,
+  ...rest
+}: FileUploadRootProps) {
+  const size = useControlSize(sizeProp);
+  const labels = { ...FILE_UPLOAD_LABELS, ...labelsProp };
+  const ids = useFieldFrame(id, { label, hint, error, invalid });
+  const [dragOver, setDragOver] = React.useState(false);
+  // Enter / leave pairs fire for every child the pointer crosses; the zone is left at depth 0.
+  const dragDepth = React.useRef(0);
 
-    const onDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
-      event.preventDefault();
-      if (!disabled) setDragOver(true);
-    };
+  const onDragEnter = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    dragDepth.current += 1;
+    if (!disabled) setDragOver(true);
+  };
 
-    const onDragLeave = (event: React.DragEvent<HTMLLabelElement>) => {
-      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragOver(false);
-    };
+  const onDragLeave = () => {
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setDragOver(false);
+  };
 
-    const onDrop = (event: React.DragEvent<HTMLLabelElement>) => {
-      event.preventDefault();
-      setDragOver(false);
-      if (!disabled) onFilesChange?.(Array.from(event.dataTransfer.files));
-    };
+  const onDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    dragDepth.current = 0;
+    setDragOver(false);
+    if (!disabled) onFilesChange?.(Array.from(event.dataTransfer.files));
+  };
 
-    return (
-      <FieldFrame
-        size={size}
-        ids={ids}
-        label={label}
-        required={required}
-        optional={optional}
-        hint={hint}
-        error={error}
-        disabled={disabled}
-        optionalLabel={labels.optional}
+  return (
+    <FieldFrame
+      {...rest}
+      size={size}
+      ids={ids}
+      label={label}
+      required={required}
+      optional={optional}
+      hint={hint}
+      error={error}
+      disabled={disabled}
+      optionalLabel={labels.optional}
+    >
+      <label
+        className={styles.root}
+        {...toDataAttributes({
+          size,
+          variant,
+          state: dragOver ? "active" : undefined,
+          invalid: ids.invalid || undefined,
+          disabled: disabled || undefined,
+        })}
+        onDragEnter={onDragEnter}
+        // Allows the drop; the state itself follows enter / leave.
+        onDragOver={(event) => event.preventDefault()}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
       >
-        <label
-          ref={ref}
-          {...rest}
-          className={cx(styles.root, className)}
-          {...toDataAttributes({
-            size,
-            variant,
-            state: dragOver ? "active" : undefined,
-            invalid: ids.invalid || undefined,
-            disabled: disabled || undefined,
-          })}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDrop={onDrop}
-        >
-          <input
-            ref={inputRef}
-            id={ids.controlId}
-            type="file"
-            className={styles.input}
-            name={name}
-            accept={accept}
-            multiple={multiple}
-            required={required}
-            disabled={disabled}
-            aria-labelledby={label != null ? ids.labelId : undefined}
-            aria-describedby={ids.describedBy}
-            aria-invalid={ids.invalid || undefined}
-            onChange={(event) => {
-              onFilesChange?.(Array.from(event.target.files ?? []));
-              event.target.value = "";
-            }}
-          />
-          <ControlSizeProvider value={size}>
-            {children ?? (
-              <FileUploadBody>
-                <FileUploadIcon>
-                  <Icon name="action.upload" size={size} tone="secondary" />
-                </FileUploadIcon>
-                <div className={styles.copy}>
-                  <FileUploadTitle>{labels.title}</FileUploadTitle>
-                  {labels.description ? (
-                    <FileUploadDescription>{labels.description}</FileUploadDescription>
-                  ) : null}
-                </div>
-                {/* Decorative: the whole zone is the target, so the «button» is a styled span. */}
-                <Button.Root asChild variant="soft" tone="neutral" size={size} disabled={disabled}>
-                  <span className={styles.browse}>{labels.browse}</span>
-                </Button.Root>
-              </FileUploadBody>
-            )}
-          </ControlSizeProvider>
-        </label>
-      </FieldFrame>
-    );
-  },
-);
+        <input
+          ref={inputRef}
+          id={ids.controlId}
+          type="file"
+          className={cx(visuallyHiddenClass, styles.input)}
+          name={name}
+          accept={accept}
+          multiple={multiple}
+          required={required}
+          disabled={disabled}
+          aria-label={ariaLabel}
+          aria-labelledby={ids.labelledBy}
+          aria-describedby={ids.describedBy}
+          aria-invalid={ids.invalid || undefined}
+          onChange={(event) => {
+            onFilesChange?.(Array.from(event.target.files ?? []));
+            event.target.value = "";
+          }}
+        />
+        <ControlSizeProvider value={size}>
+          {children ?? (
+            <FileUploadBody>
+              <FileUploadIcon>
+                <Icon name="action.upload" size={size} tone="secondary" />
+              </FileUploadIcon>
+              <div className={styles.copy}>
+                <FileUploadTitle>{labels.title}</FileUploadTitle>
+                {labels.description ? (
+                  <FileUploadDescription>{labels.description}</FileUploadDescription>
+                ) : null}
+              </div>
+              {/* Decorative: the whole zone is the target, so the «button» is a styled span. */}
+              <Button.Root asChild variant="soft" tone="neutral" size={size} disabled={disabled}>
+                <span>{labels.browse}</span>
+              </Button.Root>
+            </FileUploadBody>
+          )}
+        </ControlSizeProvider>
+      </label>
+    </FieldFrame>
+  );
+}
 FileUploadRoot.displayName = "FileUpload.Root";
 
 export const FileUpload = {

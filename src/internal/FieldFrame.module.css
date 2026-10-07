@@ -38,6 +38,15 @@
   align-self: flex-start;
 }
 
+/*
+ * A disabled native control dims the label and the hint even when its host does not pass
+ * `disabled` to the frame (`disabled` on `Input.Field`); the error keeps its color.
+ */
+.root:has(> .body :is(input, textarea, select):disabled)
+:is(.label, .label *, .supportText:not([data-invalid="true"])) {
+  color: var(--prime-color-text-disabled);
+}
+
 .body {
   display: flex;
   flex-direction: column;

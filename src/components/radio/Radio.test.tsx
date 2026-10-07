@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+
 import { Radio } from "./Radio";
 import styles from "./Radio.module.css";
 
@@ -255,5 +257,49 @@ describe("Radio", () => {
 
     expect(ref.current).toBeInstanceOf(HTMLInputElement);
     expect(ref.current?.type).toBe("radio");
+  });
+
+  it("Group: className, ref and rest go to the frame; id and aria names to the radiogroup", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    const { container } = render(
+      <Radio.Group ref={ref} id="plan" className="custom" data-testid="frame" aria-label="Тариф">
+        <Radio.Root value="a">
+          <Radio.Label>A</Radio.Label>
+        </Radio.Root>
+      </Radio.Group>,
+    );
+    const frame = screen.getByTestId("frame");
+    expect(frame).toBe(container.firstChild);
+    expect(ref.current).toBe(frame);
+    expect(frame).toHaveClass("custom");
+    const group = screen.getByRole("radiogroup", { name: "Тариф" });
+    expect(group).toHaveAttribute("id", "plan");
+    expect(group).not.toHaveAttribute("aria-disabled");
+  });
+
+  it("label={false} leaves no dangling aria-labelledby", () => {
+    render(
+      <Radio.Group label={false} aria-label="Без подписи">
+        <Radio.Root value="a">
+          <Radio.Label>A</Radio.Label>
+        </Radio.Root>
+      </Radio.Group>,
+    );
+    expect(screen.getByRole("radiogroup", { name: "Без подписи" })).not.toHaveAttribute(
+      "aria-labelledby",
+    );
+  });
+
+  it("takes the host tier without its own size", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <Radio.Group aria-label="Host">
+          <Radio.Root value="a">
+            <Radio.Label>A</Radio.Label>
+          </Radio.Root>
+        </Radio.Group>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByRole("radiogroup", { name: "Host" })).toHaveAttribute("data-size", "s");
   });
 });

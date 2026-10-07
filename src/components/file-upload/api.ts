@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "FileUpload.Root",
-      en: "`forwardRef` → `HTMLLabelElement` (the drop zone). The field frame (label → zone → hint | error) around a `<label>` drop zone with a visually hidden file input; native label props go to the zone.",
+      en: "`ref` → `HTMLDivElement` (the field frame). The field frame (label → zone → hint | error) around a `<label>` drop zone with a visually hidden file input. Field-root rule: `className`, `ref` and the rest go to the frame; `id` and `aria-label` to the file input.",
       ru: "Рамка поля (подпись → зона → подсказка или ошибка) вокруг зоны-`<label>` со скрытым input файла.",
       props: [
         {
@@ -17,8 +17,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the zone padding, icon, title, button, label and hint.",
+          default: 'host tier, else "m"',
+          en: "Tier of the zone padding, icon, title, button, label and hint. Without it the tier of its host (a form, a panel), else `m`.",
           ru: "Ярус отступов, иконки, заголовка, кнопки, подписи и подсказки.",
         },
         {
@@ -113,16 +113,22 @@ export const api: ComponentApi = {
           ru: "Своё содержимое (`FileUpload.Body`) вместо встроенного.",
         },
         {
-          name: "className",
+          name: "aria-label",
           type: "string",
-          en: "Class on the drop zone `<label>` (e.g. a round avatar zone).",
-          ru: "Класс на зоне-`<label>` (например, круглая зона аватара).",
+          en: "Name of the file input when there is no `label`.",
+          ru: "Имя input файла, когда нет `label`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>`. The zone reads `--file-upload-padding` and `--file-upload-radius` from that class (a round zone around an avatar).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля. Зона берёт из этого класса `--file-upload-padding` и `--file-upload-radius` (круглая зона аватара).",
         },
       ],
     },
     {
       name: "FileUpload.Body",
-      en: "`ref` → `HTMLDivElement`. A centered column for a custom zone body; it takes no pointer events (no drag flicker), nested buttons and links opt back in. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. A centered column for a custom zone body; nested buttons and links stay interactive (drag-over follows enter / leave depth, so crossing children never flickers it). Native `<div>` props.",
       props: [],
     },
     {
@@ -155,8 +161,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the padding, text and the format badge.",
+          default: 'host tier, else "m"',
+          en: "Tier of the padding, text and the format badge. Without it the tier of its host, else `m`.",
           ru: "Ярус отступов, текста и бейджа формата.",
         },
         {

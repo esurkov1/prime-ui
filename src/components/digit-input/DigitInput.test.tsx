@@ -248,4 +248,20 @@ describe("DigitInput focusRing", () => {
     await userEvent.keyboard("{End}");
     expect(third).toHaveFocus();
   });
+
+  it("label={false} names the group from labels.group, without a dangling aria-labelledby", () => {
+    render(<DigitInput label={false} />);
+    const group = screen.getByRole("group", { name: "Код" });
+    expect(group).not.toHaveAttribute("aria-labelledby");
+  });
+
+  it("autoFocus focuses the entry cell on mount", () => {
+    render(<DigitInput length={4} defaultValue="12" autoFocus />);
+    expect(screen.getByRole("textbox", { name: "Цифра 3 из 4" })).toHaveFocus();
+  });
+
+  it("fullWidth marks the frame itself", () => {
+    const { container } = render(<DigitInput fullWidth />);
+    expect(container.firstChild).toHaveAttribute("data-full-width", "true");
+  });
 });

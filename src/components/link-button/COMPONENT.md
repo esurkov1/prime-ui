@@ -40,7 +40,7 @@ LinkButton   <a> (without href when disabled, or the child with asChild); tone, 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"accent" \| "neutral"` | `"accent"` | `accent` — a regular link; `neutral` — secondary text, primary on hover, for footers and metadata. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text 12 · 13 · 14 · 16 · 18, line height and icon size. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier: text 12 · 13 · 14 · 16 · 18, line height and icon size. Without it the tier of its host (a form, a panel, a hint), else `m`. |
 | `disabled` | `boolean` | `false` | Renders `<a role="link" aria-disabled="true" tabIndex={-1}>` without `href` and swallows the click; `id`, `aria-*` and the other native props stay. |
 | `asChild` | `boolean` | `false` | Merges the link look onto its single child instead of rendering `<a>`: a router link, or a `<button type="button">` for an inline action that is not navigation. `disabled` becomes `aria-disabled` and swallows the click. |
 | `children` | `ReactNode` | — | Text and optional `Icon`s before or after it; the text is the accessible name. |

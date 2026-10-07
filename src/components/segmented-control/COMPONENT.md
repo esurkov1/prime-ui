@@ -45,7 +45,7 @@ SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, 
 | `defaultValue` | `string` | `""` | Initial value (uncontrolled); `""` — nothing selected. |
 | `onValueChange` | `(value: string) => void` | — | Called with the new value on click or arrow keys. |
 | `disabled` | `boolean` | `false` | Disables the whole group. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. Without it the tier of its host (a toolbar, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | `false` | Fills the container; single-line segments share the width equally and truncate. |
 | `children` | `ReactNode` | — | `SegmentedControl.Item`s (may be wrapped, e.g. in `Tooltip.Trigger`). |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" \| "onChange">` | — | `aria-label` / `aria-labelledby` (name the group), `className` and the other div attributes. |

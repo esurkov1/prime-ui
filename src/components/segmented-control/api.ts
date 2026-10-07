@@ -46,8 +46,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48.",
+          default: 'host tier, else "m"',
+          en: "Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. Without it the tier of its host (a toolbar, a panel with a size), else `m`.",
           ru: "Ярус; внешняя высота равна высоте контрола 28 · 32 · 36 · 40 · 48.",
         },
         {

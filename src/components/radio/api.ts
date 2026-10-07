@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Radio.Group",
-      en: '`forwardRef` → `HTMLDivElement` (the `role="radiogroup"` element). Owns the value, the shared `name` and size; renders the group label above and the hint / error below the options.',
+      en: '`ref` → `HTMLDivElement` (the field frame). Owns the value, the shared `name` and size; renders the group label above and the hint / error below the options. Field-root rule: `className`, `ref` and the rest go to the frame; `id`, `aria-label`, `aria-labelledby` and `aria-describedby` to the `role="radiogroup"` element.',
       ru: "Держит значение, общий `name` и размер; подпись группы сверху, подсказка или ошибка под вариантами.",
       props: [
         {
@@ -34,8 +34,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of every circle, text, the label and the hint.",
+          default: 'host tier, else "m"',
+          en: "Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`.",
           ru: "Ярус кружков, текста, подписи и подсказки.",
         },
         {
@@ -98,22 +98,28 @@ export const api: ComponentApi = {
           ru: "Системные строки, см. «Доступность».",
         },
         {
-          name: "className",
+          name: "id",
           type: "string",
-          en: "Class on the outer field `<div>` (label, options, support row).",
-          ru: "Класс на внешнем `<div>` поля.",
+          en: 'Id of the `role="radiogroup"` element (generated when omitted); also the default `name`.',
+          ru: "Id элемента radiogroup (иначе генерируется); он же `name` по умолчанию.",
+        },
+        {
+          name: "aria-label / aria-labelledby / aria-describedby",
+          type: "string",
+          en: "Name and description of the radiogroup (`aria-describedby` is merged before the hint / error ids).",
+          ru: "Имя и описание radiogroup (`aria-describedby` — перед id подсказки и ошибки).",
         },
         {
           name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" | "onChange" | "dir">',
-          en: "`id`, `aria-label`, `aria-labelledby`, `aria-describedby` and the other attributes of the radiogroup element.",
-          ru: "`id`, `aria-label`, `aria-describedby` и остальные атрибуты radiogroup.",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange" | "dir">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>`.",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля.",
         },
       ],
     },
     {
       name: "Radio.Root",
-      en: "`forwardRef` → `HTMLInputElement` (the native radio). One option inside `Radio.Group`: the `<label>` row with the input and the circle, and its hint; native input props go to the input.",
+      en: "`ref` → `HTMLInputElement` (the native radio). One option inside `Radio.Group`: the `<label>` row with the input and the circle, and its hint; native input props go to the input.",
       ru: "Один вариант внутри `Radio.Group`: строка-`<label>` с input и кружком и его подсказка.",
       props: [
         {

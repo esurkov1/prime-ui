@@ -17,16 +17,6 @@
   width: 100%;
 }
 
-/*
- * `disabled` lives on Input.Field, not on the root: the label and the hint dim with it, the same
- * as a disabled Textarea or Select.
- */
-.root:has(.field:disabled) > label,
-.root:has(.field:disabled) > label *,
-.root:has(.field:disabled) p:not([data-invalid="true"]) {
-  color: var(--prime-color-text-disabled);
-}
-
 .root[data-size="xs"] {
   --prime-input-height: var(--prime-control-xs-height);
   --prime-input-padding-x: var(--prime-control-xs-field-padding-x);

@@ -8,7 +8,7 @@ import {
   type ChoiceLabelProps,
   choiceInputClass,
 } from "@/internal/ChoiceField";
-import { useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useFieldFrame } from "@/internal/FieldFrame";
@@ -58,7 +58,7 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
       invalid,
       hint,
       error,
-      size = "m",
+      size: sizeProp,
       disabled = false,
       readOnly = false,
       className,
@@ -68,6 +68,7 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
     },
     ref,
   ) => {
+    const size = useControlSize(sizeProp);
     const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
     const [checked, setChecked] = useControllableState<boolean>({
       value: checkedProp,
@@ -152,13 +153,13 @@ function CheckboxIndicator({
   className,
   ...rest
 }: CheckboxIndicatorProps) {
-  const controlSize = useOptionalControlSize();
+  const size = useControlSize(sizeProp);
   return (
     <span
       aria-hidden="true"
       className={cx(styles.control, styles.indicator, className)}
       {...toDataAttributes({
-        size: sizeProp ?? controlSize ?? "m",
+        size,
         state: indeterminate ? "indeterminate" : checked ? "checked" : "unchecked",
         disabled: disabled || undefined,
       })}

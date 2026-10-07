@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -123,13 +123,14 @@ function SegmentedControlRoot({
   defaultValue = "",
   onValueChange,
   disabled = false,
-  size = "m",
+  size: sizeProp,
   fullWidth = false,
   children,
   className,
   onKeyDown,
   ...rest
 }: SegmentedControlRootProps) {
+  const size = useControlSize(sizeProp);
   const [selectedValue, setSelectedValue] = useControllableState<string>({
     value,
     defaultValue,

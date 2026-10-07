@@ -37,7 +37,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `length` | `number` | `4` | Number of cells. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier: the cell is a square with the side of the control height (28 · 32 · 36 · 40 · 48); label and hint follow it. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier: the cell is a square with the side of the control height (28 · 32 · 36 · 40 · 48); label and hint follow it. Without it the tier of its host (LoginForm, a panel), else `m`. |
 | `label` | `ReactNode` | — | Label above the cells; names the group (`aria-labelledby`) and focuses the first cell on click. Without it the group is named by `labels.group`. |
 | `required` | `boolean` | — | Red `*` after the label and native `required` on every cell. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
@@ -58,7 +58,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | `id` | `string` | — | Id of the first cell (the label points at it); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids on the group. |
 | `labels` | `Partial<DigitInputLabels>` | — | Built-in strings, see Labels. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ## Variants
 No `variant` or `tone`.

@@ -57,7 +57,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | `aria-labelledby` | `string` | — | Names the group by an outside element. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `labels` | `Partial<ColorSwatchesLabels>` | — | Built-in strings, see Labels. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ## Variants
 

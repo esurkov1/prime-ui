@@ -4,14 +4,14 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Textarea.Root",
-      en: "`forwardRef` → `HTMLTextAreaElement`. Renders the label row, the field box with the native `<textarea>` and the support row; native `<textarea>` props go to the textarea.",
+      en: "`ref` → `HTMLTextAreaElement`. Renders the label row, the field box with the native `<textarea>` and the support row. Field-root rule for a leaf without a `Field` part: `className` goes to the field frame; `id`, `ref` and the native `<textarea>` props to the textarea.",
       ru: "Подпись, поле с нативным `<textarea>` и строка поддержки; нативные пропсы уходят в `<textarea>`.",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier for text, padding, radius, label and hint. One line of text sits exactly like an Input of the same size.",
+          default: 'host tier, else "m"',
+          en: "Tier for text, padding, radius, label and hint. One line of text sits exactly like an Input of the same size. Without it the tier of its host (LoginForm, Popover, a panel with a size), else `m`.",
           ru: "Ярус: кегль, отступы, радиус, подпись и подсказка. Одна строка стоит как Input того же яруса.",
         },
         {
@@ -106,8 +106,8 @@ export const api: ComponentApi = {
         {
           name: "className",
           type: "string",
-          en: "Class on the visible field box (not on the outer wrapper).",
-          ru: "Класс на видимом поле, не на внешней обёртке.",
+          en: "Class on the field frame `<div>` (label, field box, support row), as on every field root.",
+          ru: "Класс на `<div>` рамки поля (подпись, поле, строка поддержки), как у каждого корня поля.",
         },
         {
           name: "…rest",

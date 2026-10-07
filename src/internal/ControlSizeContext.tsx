@@ -20,3 +20,12 @@ ControlSizeProvider.displayName = "ControlSizeProvider";
 export function useOptionalControlSize(): ControlSize | undefined {
   return React.useContext(ControlSizeContext) ?? undefined;
 }
+
+/**
+ * Tier of a field or control: its own `size`, else the tier of its host (a form, a panel, a
+ * popover, a table), else `m`.
+ */
+export function useControlSize(sizeProp: ControlSize | undefined): ControlSize {
+  const host = React.useContext(ControlSizeContext);
+  return sizeProp ?? host ?? "m";
+}

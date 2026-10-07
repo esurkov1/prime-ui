@@ -1,6 +1,6 @@
-import * as React from "react";
+import type * as React from "react";
 
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize } from "@/internal/states";
@@ -16,16 +16,29 @@ const LABEL_LABELS: LabelLabels = { optional: "необязательно" };
 
 export type LabelRootProps = Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size"> & {
   disabled?: boolean;
+  /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
   size?: ControlSize;
   /** Appends a red `*` (decorative, `aria-hidden`). Put native `required` on the control itself. */
   required?: boolean;
   /** Appends the muted optional marker (`labels.optional`). */
   optional?: boolean;
   labels?: Partial<LabelLabels>;
+  ref?: React.Ref<HTMLLabelElement>;
 };
 
-const LabelRoot = React.forwardRef<HTMLLabelElement, LabelRootProps>(
-  ({ className, disabled, children, size = "m", required, optional, labels, ...rest }, ref) => (
+function LabelRoot({
+  className,
+  disabled,
+  children,
+  size: sizeProp,
+  required,
+  optional,
+  labels,
+  ref,
+  ...rest
+}: LabelRootProps) {
+  const size = useControlSize(sizeProp);
+  return (
     // biome-ignore lint/a11y/noLabelWithoutControl: field label primitive; association via htmlFor or wrapping control is caller responsibility
     <label
       ref={ref}
@@ -47,8 +60,8 @@ const LabelRoot = React.forwardRef<HTMLLabelElement, LabelRootProps>(
         ) : null}
       </ControlSizeProvider>
     </label>
-  ),
-);
+  );
+}
 LabelRoot.displayName = "Label.Root";
 
 export type LabelIconProps = React.HTMLAttributes<HTMLSpanElement> & {

@@ -74,7 +74,7 @@ Select.Root                       field frame: label · control · hint/error; v
 | `id` | `string` | — | Id of the trigger; generated when omitted. |
 | `labels` | `Partial<SelectLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Trigger and Content. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### Select.Trigger
 `ref` → `HTMLButtonElement`. `<button role="combobox">` with the value, the clear segment and the chevron (a Spinner while `loading`). + native button props.

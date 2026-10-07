@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -33,6 +33,7 @@ export type TextareaRootProps = Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   "size" | "children"
 > & {
+  /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
   size?: ControlSize;
   /** Invalid state: danger ring and `aria-invalid`. A non-empty `error` implies it. */
   invalid?: boolean;
@@ -57,127 +58,130 @@ export type TextareaRootProps = Omit<
   /** Called with the new string value; native `onChange` still fires. */
   onValueChange?: (value: string) => void;
   labels?: Partial<TextareaLabels>;
+  /** The native `<textarea>`. */
+  ref?: React.Ref<HTMLTextAreaElement>;
 };
 
-const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
-  (
-    {
-      id,
-      className,
-      size = "m",
-      invalid,
-      focusRing = true,
-      label,
-      required,
-      optional = false,
-      hint,
-      error,
-      counter,
-      reserveSupportRow = false,
-      autoResize = true,
-      disabled,
-      readOnly,
-      value,
-      onInput,
-      onChange,
-      onValueChange,
-      labels: labelsProp,
-      "aria-describedby": ariaDescribedBy,
-      ...rest
-    },
-    ref,
-  ) => {
-    const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
-    const labels = React.useMemo(() => ({ ...TEXTAREA_LABELS, ...labelsProp }), [labelsProp]);
-    const contextValue = React.useMemo(() => ({ size, labels }), [size, labels]);
+/**
+ * A multi-line field. `className` goes to the field frame, `id`, `ref` and the native attributes
+ * to the `<textarea>` (it has no `Field` part).
+ */
+function TextareaRoot({
+  id,
+  className,
+  size: sizeProp,
+  invalid,
+  focusRing = true,
+  label,
+  required,
+  optional = false,
+  hint,
+  error,
+  counter,
+  reserveSupportRow = false,
+  autoResize = true,
+  disabled,
+  readOnly,
+  value,
+  onInput,
+  onChange,
+  onValueChange,
+  labels: labelsProp,
+  "aria-describedby": ariaDescribedBy,
+  ref,
+  ...rest
+}: TextareaRootProps) {
+  const size = useControlSize(sizeProp);
+  const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
+  const labels = React.useMemo(() => ({ ...TEXTAREA_LABELS, ...labelsProp }), [labelsProp]);
+  const contextValue = React.useMemo(() => ({ size, labels }), [size, labels]);
 
-    const innerRef = React.useRef<HTMLTextAreaElement | null>(null);
-    const setRefs = React.useMemo(() => mergeRefs(innerRef, ref), [ref]);
-    const mirrorRef = React.useRef<HTMLDivElement>(null);
+  const innerRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const setRefs = React.useMemo(() => mergeRefs(innerRef, ref), [ref]);
+  const mirrorRef = React.useRef<HTMLDivElement>(null);
 
-    // The auto-resize mirror copies the text; sync it on mount and on controlled value changes.
-    React.useLayoutEffect(() => {
-      if (!autoResize || !mirrorRef.current || !innerRef.current) return;
-      mirrorRef.current.dataset.value = typeof value === "string" ? value : innerRef.current.value;
-    }, [autoResize, value]);
+  // The auto-resize mirror copies the text; sync it on mount and on controlled value changes.
+  React.useLayoutEffect(() => {
+    if (!autoResize || !mirrorRef.current || !innerRef.current) return;
+    mirrorRef.current.dataset.value = typeof value === "string" ? value : innerRef.current.value;
+  }, [autoResize, value]);
 
-    // Clicking the padding of the field focuses the textarea (the box is a div, not a label,
-    // so the counter and hints never leak into the accessible name).
-    const focusFromPadding = (event: React.MouseEvent<HTMLDivElement>) => {
-      const textarea = innerRef.current;
-      if (!textarea || event.target === textarea || textarea.disabled) return;
-      event.preventDefault();
-      textarea.focus();
-    };
+  // Clicking the padding of the field focuses the textarea (the box is a div, not a label,
+  // so the counter and hints never leak into the accessible name).
+  const focusFromPadding = (event: React.MouseEvent<HTMLDivElement>) => {
+    const textarea = innerRef.current;
+    if (!textarea || event.target === textarea || textarea.disabled) return;
+    event.preventDefault();
+    textarea.focus();
+  };
 
-    const textarea = (
-      <textarea
-        {...rest}
-        ref={setRefs}
-        id={ids.controlId}
-        className={cx(styles.textarea, autoResize && styles.textareaAutoResize)}
-        disabled={disabled}
-        readOnly={readOnly}
-        required={required}
-        aria-invalid={ids.invalid || undefined}
-        aria-describedby={ids.describedBy}
-        value={value}
-        onInput={(event) => {
-          if (autoResize && mirrorRef.current) {
-            mirrorRef.current.dataset.value = event.currentTarget.value;
-          }
-          onInput?.(event);
-        }}
-        onChange={(event) => {
-          onChange?.(event);
-          onValueChange?.(event.target.value);
-        }}
-      />
-    );
+  const textarea = (
+    <textarea
+      {...rest}
+      ref={setRefs}
+      id={ids.controlId}
+      className={cx(styles.textarea, autoResize && styles.textareaAutoResize)}
+      disabled={disabled}
+      readOnly={readOnly}
+      required={required}
+      aria-invalid={ids.invalid || undefined}
+      aria-describedby={ids.describedBy}
+      value={value}
+      onInput={(event) => {
+        if (autoResize && mirrorRef.current) {
+          mirrorRef.current.dataset.value = event.currentTarget.value;
+        }
+        onInput?.(event);
+      }}
+      onChange={(event) => {
+        onChange?.(event);
+        onValueChange?.(event.target.value);
+      }}
+    />
+  );
 
-    return (
-      <TextareaProvider value={contextValue}>
-        <ControlSizeProvider value={size}>
-          <FieldFrame
-            size={size}
-            ids={ids}
-            label={label}
-            required={required}
-            optional={optional}
-            disabled={disabled}
-            hint={hint}
-            error={error}
-            counter={counter}
-            reserveSupportRow={reserveSupportRow}
-            optionalLabel={labels.optional}
-            className={styles.root}
+  return (
+    <TextareaProvider value={contextValue}>
+      <ControlSizeProvider value={size}>
+        <FieldFrame
+          size={size}
+          ids={ids}
+          label={label}
+          required={required}
+          optional={optional}
+          disabled={disabled}
+          hint={hint}
+          error={error}
+          counter={counter}
+          reserveSupportRow={reserveSupportRow}
+          optionalLabel={labels.optional}
+          className={cx(styles.root, className)}
+        >
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer convenience only; the textarea itself is the focus target */}
+          <div
+            className={styles.control}
+            onMouseDown={focusFromPadding}
+            {...toDataAttributes({
+              size,
+              invalid: ids.invalid || undefined,
+              disabled: disabled || undefined,
+              readonly: readOnly || undefined,
+              "focus-ring": focusRing ? undefined : false,
+            })}
           >
-            {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer convenience only; the textarea itself is the focus target */}
-            <div
-              className={cx(styles.control, className)}
-              onMouseDown={focusFromPadding}
-              {...toDataAttributes({
-                size,
-                invalid: ids.invalid || undefined,
-                disabled: disabled || undefined,
-                readonly: readOnly || undefined,
-                "focus-ring": focusRing ? undefined : false,
-              })}
-            >
-              {autoResize ? (
-                <div ref={mirrorRef} className={styles.autoResize} data-value="">
-                  {textarea}
-                </div>
-              ) : (
-                textarea
-              )}
-            </div>
-          </FieldFrame>
-        </ControlSizeProvider>
-      </TextareaProvider>
-    );
-  },
-);
+            {autoResize ? (
+              <div ref={mirrorRef} className={styles.autoResize} data-value="">
+                {textarea}
+              </div>
+            ) : (
+              textarea
+            )}
+          </div>
+        </FieldFrame>
+      </ControlSizeProvider>
+    </TextareaProvider>
+  );
+}
 
 TextareaRoot.displayName = "Textarea.Root";
 

@@ -77,7 +77,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### ColorPicker.TriggerSwatch
 `ref` → `HTMLSpanElement`. A square of the current color for a trigger button (`aria-hidden`); follows the host icon size, e.g. inside `Button.Icon`.

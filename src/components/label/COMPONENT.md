@@ -37,7 +37,7 @@ Label.Root            <label>: text, then the required `*` or the optional marke
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500. Without it the tier of its host, else `m`. |
 | `required` | `boolean` | — | Appends a red `*` (`aria-hidden`). Put native `required` on the control itself. |
 | `optional` | `boolean` | — | Appends the muted optional marker (`labels.optional`). |
 | `disabled` | `boolean` | — | Disabled color for the text and the markers, `aria-disabled`. |

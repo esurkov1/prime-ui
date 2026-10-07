@@ -59,17 +59,48 @@ describe("FileUpload", () => {
     expect(onFilesChange).not.toHaveBeenCalled();
   });
 
-  it("sets data-state=active on dragover and clears it on dragleave", () => {
+  it("sets data-state=active on dragenter and keeps it while crossing children", () => {
     render(<FileUpload.Root />);
 
-    const label = screen.getByText(/Выберите файл или перетащите/i).closest("label");
-    expect(label).toBeTruthy();
+    const label = screen.getByText(/Выберите файл или перетащите/i).closest("label") as HTMLElement;
+    const title = screen.getByText(/Выберите файл или перетащите/i);
 
-    fireEvent.dragOver(label as HTMLElement);
+    fireEvent.dragEnter(label);
     expect(label).toHaveAttribute("data-state", "active");
 
-    fireEvent.dragLeave(label as HTMLElement, { relatedTarget: document.body });
+    // Into a child: enter on the child, then leave on the zone — still over the zone.
+    fireEvent.dragEnter(title);
+    fireEvent.dragLeave(label);
+    expect(label).toHaveAttribute("data-state", "active");
+
+    // Out of the child and the zone.
+    fireEvent.dragLeave(title);
     expect(label).not.toHaveAttribute("data-state");
+  });
+
+  it("puts className, ref and native props on the frame, id and aria-label on the input", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    const { container } = render(
+      <FileUpload.Root
+        ref={ref}
+        id="scan"
+        className="custom"
+        data-testid="frame"
+        aria-label="Загрузить скан"
+      />,
+    );
+    const frame = screen.getByTestId("frame");
+    expect(frame).toBe(container.firstChild);
+    expect(ref.current).toBe(frame);
+    expect(frame).toHaveClass("custom");
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(input).toHaveAttribute("id", "scan");
+    expect(input).toHaveAccessibleName("Загрузить скан");
+  });
+
+  it("label={false} leaves no dangling aria-labelledby", () => {
+    const { container } = render(<FileUpload.Root label={false} />);
+    expect(container.querySelector('input[type="file"]')).not.toHaveAttribute("aria-labelledby");
   });
 
   it("calls onFilesChange on drop", () => {

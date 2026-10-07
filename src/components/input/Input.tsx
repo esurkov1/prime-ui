@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { Icon } from "@/icons";
-import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -74,7 +74,6 @@ export type InputRootProps = FieldRootDomProps & {
   id?: string;
   labels?: Partial<InputLabels>;
   children: React.ReactNode;
-  className?: string;
 };
 
 function InputRoot({
@@ -94,10 +93,8 @@ function InputRoot({
   className,
   ...rest
 }: InputRootProps) {
-  // Without an explicit size the field takes the tier of its host (a form, a panel).
-  const hostSize = useOptionalControlSize();
-  const size = sizeProp ?? hostSize ?? "m";
-  const ids = useFieldFrame(id, { hint, error, invalid });
+  const size = useControlSize(sizeProp);
+  const ids = useFieldFrame(id, { label, hint, error, invalid });
   const labels = React.useMemo(() => ({ ...INPUT_LABELS, ...labelsProp }), [labelsProp]);
   const { invalid: isInvalid, controlId: inputId, describedBy } = ids;
   const inputRef = React.useRef<HTMLInputElement | null>(null);

@@ -9,7 +9,7 @@
   width: fit-content;
 }
 
-.frame:has(> * > .root[data-full-width="true"]) {
+.frame[data-full-width="true"] {
   width: 100%;
 }
 

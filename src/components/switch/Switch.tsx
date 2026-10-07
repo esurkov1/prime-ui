@@ -7,6 +7,7 @@ import {
   type ChoiceLabelProps,
   choiceInputClass,
 } from "@/internal/ChoiceField";
+import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
@@ -41,7 +42,7 @@ const SwitchRoot = React.forwardRef<HTMLInputElement, SwitchRootProps>(
       invalid,
       hint,
       error,
-      size = "m",
+      size: sizeProp,
       disabled = false,
       readOnly = false,
       className,
@@ -51,6 +52,7 @@ const SwitchRoot = React.forwardRef<HTMLInputElement, SwitchRootProps>(
     },
     ref,
   ) => {
+    const size = useControlSize(sizeProp);
     const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
     const [checked, setChecked] = useControllableState<boolean>({
       value: checkedProp,

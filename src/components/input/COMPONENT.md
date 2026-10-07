@@ -59,7 +59,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `labels` | `Partial<InputLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Usually `Input.Wrapper`. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### Input.Wrapper
 `ref` → `HTMLDivElement`. The visible field: fill, hover, focus ring, invalid ring; `data-size` and `data-invalid` come from the root.

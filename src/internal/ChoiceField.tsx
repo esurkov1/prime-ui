@@ -5,7 +5,7 @@ import { Label } from "@/components/label/Label";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { type FieldIds, hasFieldError } from "@/internal/FieldFrame";
+import type { FieldIds } from "@/internal/FieldFrame";
 import type { ControlSize, DataState } from "@/internal/states";
 
 import styles from "./ChoiceField.module.css";
@@ -44,8 +44,7 @@ export function ChoiceField({
   className,
   children,
 }: ChoiceFieldProps) {
-  const showError = hasFieldError(error);
-  const showHint = !showError && hint != null && hint !== false && hint !== "";
+  const { showError, showHint } = ids;
 
   return (
     <ControlSizeProvider value={size}>

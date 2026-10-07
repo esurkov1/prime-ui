@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { Slot } from "@/internal/slot";
@@ -9,6 +9,7 @@ import type { ControlSize, Tone } from "@/internal/states";
 import styles from "./LinkButton.module.css";
 
 export type LinkButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  /** Tier. Default: the tier of the surrounding control or text host, else `m`. */
   size?: ControlSize;
   /** `accent` — a regular link; `neutral` — quiet links in footers, metadata and dense navigation. */
   tone?: Extract<Tone, "accent" | "neutral">;
@@ -23,7 +24,7 @@ export type LinkButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 
 export function LinkButton({
-  size = "m",
+  size: sizeProp,
   tone = "accent",
   disabled = false,
   asChild = false,
@@ -34,6 +35,7 @@ export function LinkButton({
   ref,
   ...rest
 }: LinkButtonProps) {
+  const size = useControlSize(sizeProp);
   const shared = {
     className: cx(styles.root, className),
     ...toDataAttributes({ size, tone, disabled: disabled || undefined }),
