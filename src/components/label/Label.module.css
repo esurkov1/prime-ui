@@ -43,7 +43,7 @@
   color: var(--prime-color-text-disabled);
 }
 
-.iconSlot {
+.icon {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -55,12 +55,12 @@
   font-weight: var(--prime-font-weight-medium);
 }
 
-.sub,
+.description,
 .optional {
   font-weight: var(--prime-font-weight-regular);
   color: var(--prime-color-text-muted);
 }
 
-.root[data-disabled="true"] :is(.asterisk, .sub, .optional, .iconSlot) {
+.root[data-disabled="true"] :is(.asterisk, .description, .optional, .icon) {
   color: var(--prime-color-text-disabled);
 }

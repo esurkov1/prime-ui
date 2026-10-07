@@ -59,13 +59,29 @@ describe("Label", () => {
     expect(screen.getByText("optional")).toBeInTheDocument();
   });
 
-  it("renders Sub", () => {
+  it("renders Description inside the label, so it is part of the accessible name", () => {
+    render(
+      <>
+        <Label.Root htmlFor="budget">
+          Бюджет <Label.Description>₽, без НДС</Label.Description>
+        </Label.Root>
+        <input id="budget" />
+      </>,
+    );
+    expect(screen.getByText("₽, без НДС")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveAccessibleName("Бюджет ₽, без НДС");
+  });
+
+  it("hides the icon slot from assistive technology", () => {
     render(
       <Label.Root>
-        Title <Label.Sub>(optional)</Label.Sub>
+        <Label.Icon data-testid="slot">
+          <Icon name="field.email" />
+        </Label.Icon>
+        Email
       </Label.Root>,
     );
-    expect(screen.getByText("(optional)")).toBeInTheDocument();
+    expect(screen.getByTestId("slot")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("merges className on root", () => {
