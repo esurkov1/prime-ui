@@ -276,7 +276,6 @@ export type { HintIconProps, HintRootProps } from "./hint/Hint";
 export { Hint } from "./hint/Hint";
 export type {
   InputAffixProps,
-  InputBadgeProps,
   InputClearButtonProps,
   InputCounterProps,
   InputFieldProps,

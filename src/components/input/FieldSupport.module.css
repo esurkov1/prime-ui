@@ -1,0 +1,58 @@
+/* Support row of the text fields: hint | error (same slot) · counter (right). Tier from `data-size`. */
+.row,
+.counter {
+  --fs-size: var(--prime-control-m-hint-size);
+  --fs-line-height: var(--prime-control-m-hint-line-height);
+}
+
+:is(.row, .counter)[data-size="xs"] {
+  --fs-size: var(--prime-control-xs-hint-size);
+  --fs-line-height: var(--prime-control-xs-hint-line-height);
+}
+
+:is(.row, .counter)[data-size="s"] {
+  --fs-size: var(--prime-control-s-hint-size);
+  --fs-line-height: var(--prime-control-s-hint-line-height);
+}
+
+:is(.row, .counter)[data-size="l"] {
+  --fs-size: var(--prime-control-l-hint-size);
+  --fs-line-height: var(--prime-control-l-hint-line-height);
+}
+
+:is(.row, .counter)[data-size="xl"] {
+  --fs-size: var(--prime-control-xl-hint-size);
+  --fs-line-height: var(--prime-control-xl-hint-line-height);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.row[data-reserve="true"] {
+  min-height: var(--fs-line-height);
+}
+
+.text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.counter {
+  display: block;
+  flex-shrink: 0;
+  font-size: var(--fs-size);
+  line-height: var(--fs-line-height);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-color-text-muted);
+  white-space: nowrap;
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.counter[data-invalid="true"] {
+  color: var(--prime-color-danger-text);
+}

@@ -3,7 +3,7 @@
 **Category:** inputs
 **Kind:** field
 
-> Single-line text field with label, hint, error and slots for icons, affixes, a badge, a clear button and a counter.
+> Single-line text field with label, hint, error and slots for icons, affixes, a clear button and a counter.
 
 ## When to use
 - Any single-line value: name, e-mail, phone, search query, amount, URL, code.
@@ -32,11 +32,10 @@ Input.Root            label row, field body, support row; provides size / invali
    ├─ Input.Icon           decorative icon (start | end)
    ├─ Input.InlineAffix    muted text next to the value (start | end)
    ├─ Input.Field          native <input>
-   ├─ Input.Badge          soft palette badge at the trailing edge
    └─ Input.ClearButton    trailing clear action: a full-height segment at the end edge
 Input.Counter         goes into Input.Root `counter` (support row, right side)
 ```
-The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · badge · end icon · clear button · end affix. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
+The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · end icon · clear button · end affix. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
 
 ## API
 
@@ -67,7 +66,7 @@ No ref. The visible field: fill, hover, focus ring, invalid ring.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | `Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `Badge`, `ClearButton`. |
+| `children` | `ReactNode` | — (required) | `Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `ClearButton`. |
 | `className` | `string` | — | Class on the field `<div>`; `data-size` and `data-invalid` come from the root. |
 
 ### Input.Field
@@ -107,15 +106,6 @@ No ref. Muted unit next to the value (`aria-hidden`).
 | `children` | `ReactNode` | — (required) | Short unit: `₽`, `%`, `кг`. |
 | `className` | `string` | — | Class on the `<span>`. |
 
-### Input.Badge
-No ref. Soft palette badge one tier below the field, at the trailing edge.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the soft badge. |
-| `children` | `ReactNode` | — (required) | Short status text. |
-| `className` | `string` | — | Class on the `<span>`. |
-
 ### Input.ClearButton
 `forwardRef` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.
 
@@ -153,20 +143,6 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | `start` | Before the value. Icon: muted, centered between edge and text (edge → icon = icon → text = field padX). Affix: tinted `fill-subtle` section flush with the edge. Inline affix: muted text before the value | Search icon, `https://`, currency sign before the number | — (required) |
 | `end` | After the value. Same treatments at the trailing side; numeric fields with an end inline affix align the value to the end | Lock icon on read-only, domain suffix, units `₽ % кг` | — |
 
-### color (Input.Badge)
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| `gray` | Soft badge on a stronger neutral wash (`fill-strong`) so it stays visible on the field fill | Neutral status ("Черновик") | yes |
-| `blue` | Soft blue badge | "Новое", informational marks | |
-| `green` | Soft green badge | "Проверен", verified values | |
-| `orange` | Soft orange badge | "Не заполнено", needs attention | |
-| `red` | Soft red badge | Rejected or blocked value | |
-| `yellow` | Soft yellow badge | Pending | |
-| `purple` | Soft purple badge | Category marks | |
-| `sky` | Soft sky badge | Category marks | |
-| `pink` | Soft pink badge | Category marks | |
-| `teal` | Soft teal badge | Category marks | |
-
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -176,11 +152,11 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 
 **Combinations**
 - Recommended: `Input.Icon side="start"` + `Input.ClearButton` for search; `Input.Affix` on both sides for URLs; `Input.InlineAffix side="end"` with `inputMode="decimal"` for amounts.
-- Allowed but rare: `Input.Badge` together with an end icon (badge sits before the icon).
+- Allowed but rare: an end icon together with the clear button (the icon sits before the button).
 - Pointless: `required` and `optional` together; `hint` and `error` together (the error replaces the hint); `invalid` without any message in a form where the user needs to know what is wrong.
 - Forbidden: `focusRing={false}` on regular form fields (WCAG 2.4.7).
 
-**Hierarchy:** keep one size for all fields of a form; mark required/optional consistently; use the badge only for a status of the value, not for decoration.
+**Hierarchy:** keep one size for all fields of a form; mark required/optional consistently; a status of the value goes into the hint, not into the field.
 
 ## States
 | State | Driven by | DOM |
@@ -203,7 +179,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - Field → field in a form: `--prime-space-5` (20); group → actions: `--prime-space-8` (32).
 - `Input.Root` is `width: 100%` and `min-width: 0`; there is no `fullWidth` prop — the width comes from the parent (grid column, flex item, capped wrapper).
 - Use `reserveSupportRow` on fields that share a grid row so their bottoms stay aligned when only one shows an error.
-- The value truncates with an ellipsis before badges, icons and affixes; the field height never changes.
+- The value truncates with an ellipsis before icons and affixes; the field height never changes.
 
 ## Accessibility
 
@@ -238,7 +214,6 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint, an error and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A decorative icon at either end of the value — `Input.Icon`, `side`. |
 | [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value — `Input.Affix`, `Input.InlineAffix`. |
-| [with-badge.tsx](examples/with-badge.tsx) | A soft status badge at the end of the field; the height does not change — `Input.Badge`, `color`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single search field where the caret and the lighter fill show focus — `focusRing`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a clear button and a character counter follow it — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`. |
 | [in-form.tsx](examples/in-form.tsx) | Company details form: required fields checked on submit, neighbours keep their bottoms aligned — `required`, `error`, `reserveSupportRow`. |
@@ -253,5 +228,5 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `tone="danger"` / `error` as a boolean → use `invalid` or an `error` message.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Badge](../badge/COMPONENT.md) (`Input.Badge`)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), `Icon` (`Input.ClearButton`)
 - **See also:** [Textarea](../textarea/COMPONENT.md), [Select](../select/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md) — fields with the same contract

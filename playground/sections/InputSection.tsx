@@ -31,12 +31,6 @@ export const page: ComponentPageConfig = {
         "Постоянные префикс и суффикс у краёв и единица рядом со значением — `Input.Affix`, `Input.InlineAffix`.",
     },
     {
-      scenario: "with-badge",
-      title: "Бейдж в поле",
-      description:
-        "Мягкий бейдж статуса у конца поля; высота не меняется — `Input.Badge`, `color`.",
-    },
-    {
       scenario: "without-focus-ring",
       title: "Без кольца фокуса",
       description: "Одно поле поиска, где фокус видно по каретке и светлой заливке — `focusRing`.",
