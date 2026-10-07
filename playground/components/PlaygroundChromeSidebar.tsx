@@ -2,11 +2,8 @@ import { Check, Moon, Search, Square, SquareStack, Sun } from "lucide-react";
 import * as React from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
-import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Kbd } from "@/components/kbd/Kbd";
-import { Tooltip } from "@/components/tooltip/Tooltip";
-import { Typography } from "@/components/typography/Typography";
 import { Sidebar, type SidebarMode } from "@/layout";
 
 import {
@@ -36,98 +33,60 @@ function PageItem({ page }: { page: PlaygroundPageEntry }) {
 
 function Brand() {
   return (
-    <Link to="/" className="playgroundBrand" aria-label="Prime UI — на главную">
-      <span className="playgroundBrandMark" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-        <span />
-      </span>
-      <span className="playgroundBrandText">
-        <Typography as="span" variant="title-s">
-          Prime UI
-        </Typography>
-        <Typography as="span" variant="caption" tone="muted">
-          Graphite · playground
-        </Typography>
-      </span>
-    </Link>
+    <Sidebar.Brand asChild description="Graphite · playground">
+      <Link to="/" aria-label="Prime UI — на главную">
+        <Sidebar.BrandLogo>
+          <span className="playgroundBrandMark">
+            <span />
+            <span />
+            <span />
+            <span />
+          </span>
+        </Sidebar.BrandLogo>
+        Prime UI
+      </Link>
+    </Sidebar.Brand>
   );
 }
 
-/**
- * Tooltip on a wrapper: the tooltip and the dropdown trigger both need the button's ref, so the
- * tooltip anchors to the span around it.
- */
-function FooterTip({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        <span className="playgroundSidebarFooterTip">{children}</span>
-      </Tooltip.Trigger>
-      <Tooltip.Content side="top">{label}</Tooltip.Content>
-    </Tooltip.Root>
-  );
-}
-
-function FooterButton({
-  label,
-  icon,
-  ...rest
-}: Omit<React.ComponentPropsWithRef<"button">, "children"> & {
-  label: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <Button.Root {...rest} variant="ghost" tone="neutral" aria-label={label}>
-      <Button.Icon>{icon}</Button.Icon>
-    </Button.Root>
-  );
-}
-
-/** One row at the bottom of the rail: theme and preview surface. Stacks in compact mode. */
+/** Footer rows: the theme switch and the preview surface menu, item-shaped like the rest. */
 function FooterControls() {
   const { scheme, toggleScheme } = usePlaygroundTheme();
   const { surface, setSurface } = usePlaygroundPreviewTheme();
   const isDark = scheme === "dark";
-  const themeLabel = isDark ? "Светлая тема" : "Тёмная тема";
   const active =
     PLAYGROUND_PREVIEW_SURFACES.find((s) => s.value === surface) ?? PLAYGROUND_PREVIEW_SURFACES[0];
-  const surfaceLabel = `Фон превью: ${active.label}`;
 
   return (
-    <div className="playgroundSidebarFooter">
-      <FooterTip label={themeLabel}>
-        <FooterButton
-          label={themeLabel}
-          icon={isDark ? <Sun /> : <Moon />}
-          onClick={toggleScheme}
-        />
-      </FooterTip>
-      <FooterTip label={surfaceLabel}>
-        <Dropdown.Root>
-          <Dropdown.Trigger>
-            <FooterButton label={surfaceLabel} icon={<SquareStack />} />
-          </Dropdown.Trigger>
-          <Dropdown.Content align="start" side="top">
-            <Dropdown.Group label="Фон превью">
-              {PLAYGROUND_PREVIEW_SURFACES.map((entry) => (
-                <Dropdown.Item key={entry.value} onSelect={() => setSurface(entry.value)}>
-                  <Dropdown.ItemIcon>
-                    {entry.value === surface ? (
-                      <Check strokeWidth={2} />
-                    ) : (
-                      <Square strokeWidth={2} />
-                    )}
-                  </Dropdown.ItemIcon>
-                  {entry.label} — {entry.hint.toLowerCase()}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Group>
-          </Dropdown.Content>
-        </Dropdown.Root>
-      </FooterTip>
-    </div>
+    <>
+      <Sidebar.Item onClick={toggleScheme}>
+        <Sidebar.ItemIcon>{isDark ? <Sun /> : <Moon />}</Sidebar.ItemIcon>
+        {isDark ? "Светлая тема" : "Тёмная тема"}
+      </Sidebar.Item>
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <Sidebar.Item>
+            <Sidebar.ItemIcon>
+              <SquareStack />
+            </Sidebar.ItemIcon>
+            Фон превью
+            <Sidebar.ItemCount>{active.label}</Sidebar.ItemCount>
+          </Sidebar.Item>
+        </Dropdown.Trigger>
+        <Dropdown.Content align="start" side="top">
+          <Dropdown.Group label="Фон превью">
+            {PLAYGROUND_PREVIEW_SURFACES.map((entry) => (
+              <Dropdown.Item key={entry.value} onSelect={() => setSurface(entry.value)}>
+                <Dropdown.ItemIcon>
+                  {entry.value === surface ? <Check strokeWidth={2} /> : <Square strokeWidth={2} />}
+                </Dropdown.ItemIcon>
+                {entry.label} — {entry.hint.toLowerCase()}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Group>
+        </Dropdown.Content>
+      </Dropdown.Root>
+    </>
   );
 }
 
@@ -139,7 +98,7 @@ export type PlaygroundChromeSidebarProps = {
   onSearch: () => void;
 };
 
-/** Playground navigation built from the kit: Sidebar m, groups = categories, search, footer controls. */
+/** Playground navigation built from the kit: brand header, search, collapsible categories, footer. */
 export function PlaygroundChromeSidebar({
   mode,
   onModeChange,
@@ -167,7 +126,7 @@ export function PlaygroundChromeSidebar({
     >
       <Sidebar.Header>
         <Brand />
-        <Sidebar.Toggle variant="edge" />
+        <Sidebar.Toggle variant="header" />
       </Sidebar.Header>
       <Sidebar.Item
         aria-haspopup="dialog"
@@ -189,7 +148,7 @@ export function PlaygroundChromeSidebar({
           <PageItem page={PLAYGROUND_INTRO} />
         </Sidebar.Group>
         {PLAYGROUND_NAV.map((category) => (
-          <Sidebar.Group key={category.id} label={category.label}>
+          <Sidebar.Group key={category.id} label={category.label} collapsible>
             {category.pages.map((page) => (
               <PageItem key={page.segment} page={page} />
             ))}
