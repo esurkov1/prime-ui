@@ -17,6 +17,7 @@ export type ButtonGroupRootProps = React.HTMLAttributes<HTMLDivElement> & {
 
 const ButtonGroupRoot = React.forwardRef<HTMLDivElement, ButtonGroupRootProps>(
   ({ orientation = "horizontal", size = "m", fullWidth, children, className, ...rest }, ref) => (
+    // biome-ignore lint/a11y/useSemanticElements: a group of buttons, not a form fieldset
     <div
       ref={ref}
       role="group"
