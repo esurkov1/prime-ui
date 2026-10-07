@@ -5,75 +5,52 @@ import { toDataAttributes } from "@/internal/data-attributes";
 
 import styles from "./PageContent.module.css";
 
-/** Ограничение ширины текстового блока внутри колонки `main`. */
+/** Cap of the page column inside `main`. */
 export type PageContentMaxWidth = "full" | "readable" | "wide";
 
-export type PageContentRootProps = {
+export type PageContentRootProps = React.HTMLAttributes<HTMLDivElement> & {
   maxWidth?: PageContentMaxWidth;
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
+};
 
 const PageContentRoot = React.forwardRef<HTMLDivElement, PageContentRootProps>(
-  function PageContentRoot({ maxWidth = "full", className, children, ...rest }, forwardedRef) {
+  function PageContentRoot({ maxWidth = "full", className, ...rest }, forwardedRef) {
     return (
       <div
         ref={forwardedRef}
         className={cx(styles.root, className)}
         {...rest}
-        {...toDataAttributes({
-          "max-width": maxWidth === "full" ? undefined : maxWidth,
-        })}
-      >
-        {children}
-      </div>
+        {...toDataAttributes({ "max-width": maxWidth === "full" ? undefined : maxWidth })}
+      />
     );
   },
 );
 PageContentRoot.displayName = "PageContent.Root";
 
-export type PageContentSectionProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLElement>;
+export type PageContentSectionProps = React.HTMLAttributes<HTMLElement>;
 
 const PageContentSection = React.forwardRef<HTMLElement, PageContentSectionProps>(
-  function PageContentSection({ className, children, ...rest }, forwardedRef) {
-    return (
-      <section ref={forwardedRef} className={cx(styles.section, className)} {...rest}>
-        {children}
-      </section>
-    );
+  function PageContentSection({ className, ...rest }, forwardedRef) {
+    return <section ref={forwardedRef} className={cx(styles.section, className)} {...rest} />;
   },
 );
 PageContentSection.displayName = "PageContent.Section";
 
-export type PageContentHeaderProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-export type PageContentActionsProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
+export type PageContentActionsProps = React.HTMLAttributes<HTMLDivElement>;
 
 /** Page-level actions (buttons) next to the title; wrap below the heading on narrow columns. */
-function PageContentActions({ className, children, ...rest }: PageContentActionsProps) {
-  return (
-    <div className={cx(styles.actions, className)} {...rest}>
-      {children}
-    </div>
-  );
+function PageContentActions({ className, ...rest }: PageContentActionsProps) {
+  return <div className={cx(styles.actions, className)} {...rest} />;
 }
 PageContentActions.displayName = "PageContent.Actions";
 
+export type PageContentHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+
+/** Title and description stack on the left; `PageContent.Actions` children go to the end. */
 function PageContentHeader({ className, children, ...rest }: PageContentHeaderProps) {
   const items = React.Children.toArray(children);
   const isActions = (child: React.ReactNode) =>
     React.isValidElement(child) && child.type === PageContentActions;
   const actions = items.filter(isActions);
-  const heading = items.filter((child) => !isActions(child));
 
   return (
     <div
@@ -81,70 +58,47 @@ function PageContentHeader({ className, children, ...rest }: PageContentHeaderPr
       data-has-actions={actions.length > 0 ? "true" : undefined}
       {...rest}
     >
-      <div className={styles.heading}>{heading}</div>
+      <div className={styles.heading}>{items.filter((child) => !isActions(child))}</div>
       {actions}
     </div>
   );
 }
 PageContentHeader.displayName = "PageContent.Header";
 
-export type PageContentTitleProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLHeadingElement>;
+export type PageContentTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
 
 const PageContentTitle = React.forwardRef<HTMLHeadingElement, PageContentTitleProps>(
-  function PageContentTitle({ className, children, ...rest }, forwardedRef) {
-    return (
-      <h1 ref={forwardedRef} className={cx(styles.title, className)} {...rest}>
-        {children}
-      </h1>
-    );
+  function PageContentTitle({ className, ...rest }, forwardedRef) {
+    return <h1 ref={forwardedRef} className={cx(styles.title, className)} {...rest} />;
   },
 );
 PageContentTitle.displayName = "PageContent.Title";
 
 export type PageContentDescriptionMeasure = "readable" | "full";
 
-export type PageContentDescriptionProps = {
-  /** `readable` — max ~65ch; `full` — use full width of the parent (e.g. inside an already padded `main`). */
+export type PageContentDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & {
+  /** `readable` — max ~65ch; `full` — the full width of the parent (e.g. an already padded `main`). */
   measure?: PageContentDescriptionMeasure;
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLParagraphElement>;
+};
 
 const PageContentDescription = React.forwardRef<HTMLParagraphElement, PageContentDescriptionProps>(
-  function PageContentDescription(
-    { className, children, measure = "readable", ...rest },
-    forwardedRef,
-  ) {
+  function PageContentDescription({ className, measure = "readable", ...rest }, forwardedRef) {
     return (
       <p
         ref={forwardedRef}
         className={cx(styles.description, className)}
         {...rest}
-        {...toDataAttributes({
-          measure: measure === "full" ? "full" : undefined,
-        })}
-      >
-        {children}
-      </p>
+        {...toDataAttributes({ measure: measure === "full" ? "full" : undefined })}
+      />
     );
   },
 );
 PageContentDescription.displayName = "PageContent.Description";
 
-export type PageContentBodyProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
+export type PageContentBodyProps = React.HTMLAttributes<HTMLDivElement>;
 
-function PageContentBody({ className, children, ...rest }: PageContentBodyProps) {
-  return (
-    <div className={cx(styles.body, className)} {...rest}>
-      {children}
-    </div>
-  );
+function PageContentBody({ className, ...rest }: PageContentBodyProps) {
+  return <div className={cx(styles.body, className)} {...rest} />;
 }
 PageContentBody.displayName = "PageContent.Body";
 

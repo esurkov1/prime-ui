@@ -1,4 +1,4 @@
-/* Layout for the PageContent examples: the frame imitates AppShell.Main (canvas + gutter). */
+/* Layout of the PageContent scenarios: the frame imitates AppShell.Main (canvas + gutter). */
 
 .main {
   box-sizing: border-box;
@@ -23,4 +23,9 @@
   border-radius: var(--prime-card-radius);
   background: var(--prime-color-card-bg);
   box-shadow: var(--prime-card-shadow);
+}
+
+/* A phone-width main column (360px). */
+.narrow {
+  width: min(100%, calc(var(--prime-space-24) * 3.75));
 }

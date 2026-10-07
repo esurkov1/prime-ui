@@ -1,23 +1,19 @@
-/** `PageContent.Root maxWidth` full · wide · readable: the same page column at three caps. Use `wide` for dashboards on very wide screens, `readable` for text pages, `full` everywhere else. */
+/** The same page column at three caps: the whole main, a wide dashboard column, a reading column — `maxWidth`. */
 import { PageContent, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 const WIDTHS = [
-  { value: "full", title: "На всю ширину", text: "maxWidth: full — колонка занимает весь main." },
-  {
-    value: "wide",
-    title: "Широкая колонка",
-    text: "maxWidth: wide — не шире --prime-layout-content-max-width, по центру.",
-  },
+  { value: "full", title: "Сделки", text: "Колонка занимает всю ширину main." },
+  { value: "wide", title: "Дашборд продаж", text: "Не шире ширины контента, по центру." },
   {
     value: "readable",
-    title: "Колонка для чтения",
-    text: "maxWidth: readable — около 65 знаков в строке, по центру.",
+    title: "Условия использования",
+    text: "Около 65 знаков в строке, по центру.",
   },
 ] as const;
 
-export default function PageContentWidthsExample() {
+export default function PageContentVariantsExample() {
   return (
     <div className={styles.main}>
       <div className={styles.stack}>
@@ -28,7 +24,7 @@ export default function PageContentWidthsExample() {
             </PageContent.Header>
             <PageContent.Body>
               <Typography.Root as="div" variant="body-s" tone="secondary" className={styles.block}>
-                {text}
+                {value} — {text}
               </Typography.Root>
             </PageContent.Body>
           </PageContent.Root>
