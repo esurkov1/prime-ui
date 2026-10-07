@@ -9,7 +9,6 @@
 - Reordering a list, a row of chips or a set of settings by hand (`Dnd.Sortable`).
 - Moving an item between lists to an exact position: a board of columns (several `Dnd.Sortable` with one `kind`).
 - Moving an item onto a target with no inner order: a folder, an assignee (`Dnd.Draggable` + `Dnd.DropZone`).
-- Any custom drag the parts do not cover, through the hooks (`useDragSource`, `useDropTarget`, `useSortableList`).
 
 ## When not to use
 - Picking files from the computer → use [FileUpload](../file-upload/COMPONENT.md) (native file drop).
@@ -73,7 +72,7 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `className` (the row look: fill, radius, padding) and the other attributes; `onPointerDown` / `onKeyDown` run first, `preventDefault()` keeps the drag from starting. |
 
 ### Dnd.Handle
-`forwardRef` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button with the `action.drag` icon; a press always starts the drag, Alt+arrows on it reorder its item.
+`ref` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button with the `action.drag` icon; a press always starts the drag, Alt+arrows on it reorder its item.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -110,8 +109,8 @@ Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element
 | `as` | `"div" \| "section" \| "li" \| "ul" \| "ol" \| "span"` | `"div"` | Element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "onDrop">` | — | `className` (the zone's own look) and the other attributes. |
 
-### moveBefore · useSortableList · useDragSource · useDropTarget · useDraggedItem
-Helpers for custom drags; the parts are built on them. `moveBefore(items, id, beforeId, getId)` is the body of every `onReorder`; the hooks expose the sortable engine, a drag source, a drop target and the item in flight.
+### moveBefore
+`moveBefore(items, id, beforeId, getId)` returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.
 
 ## Variants
 
@@ -139,7 +138,7 @@ Helpers for custom drags; the parts are built on them. `moveBefore(items, id, be
 | cancelled | Escape, a system-cancelled pointer | the clone flies back, nothing changes |
 | disabled | `disabled` | `data-disabled`, no `aria-roledescription` |
 
-All motion is on the tokens (lift `fast`, glide and landing `base`, flash `slow` × 2, `standard` easing); under `prefers-reduced-motion` the lift, the gap fade, the glide and the flash are off.
+All motion is on the tokens (lift `fast`, glide and landing `base`, flash `slow`, `standard` easing; `data-dnd-flash` clears when the flash animation ends); under `prefers-reduced-motion` the lift, the gap fade, the glide and the flash are off.
 
 ## Layout & spacing
 - The list gap is `--prime-space-2`; override it with `className`.

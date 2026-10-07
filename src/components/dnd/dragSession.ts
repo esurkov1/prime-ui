@@ -80,7 +80,7 @@ export type DragOverlayEvent =
  */
 export type DragOutcome = "drop" | "release" | "cancel";
 
-export type Activation = {
+type Activation = {
   /** Pointer travel, in px, that turns a press into a drag. */
   distance: number;
   /** Hold time, in ms, that does the same without any travel. */
@@ -89,19 +89,18 @@ export type Activation = {
   tolerance: number;
 };
 
-// A mouse commits as soon as it moves 4px (past the tremor of a click). A finger cannot use travel,
-// because travel is how a list scrolls, so touch waits out a hold and gives up once the finger runs.
-const ACTIVATION = {
-  mouse: { distance: 4, delay: 0, tolerance: Number.POSITIVE_INFINITY },
-  pen: { distance: 4, delay: 0, tolerance: Number.POSITIVE_INFINITY },
-  touch: { distance: Number.POSITIVE_INFINITY, delay: 180, tolerance: 10 },
-} satisfies Record<PointerKind, Activation>;
-
-export function activationFor(pointerType: string): Activation {
-  if (pointerType === "touch") return ACTIVATION.touch;
-  if (pointerType === "pen") return ACTIVATION.pen;
-  return ACTIVATION.mouse;
-}
+// A mouse or a pen commits as soon as it moves 4px (past the tremor of a click). A finger cannot use
+// travel, because travel is how a list scrolls, so touch waits out a hold and gives up once it runs.
+const POINTER_ACTIVATION: Activation = {
+  distance: 4,
+  delay: 0,
+  tolerance: Number.POSITIVE_INFINITY,
+};
+const TOUCH_ACTIVATION: Activation = {
+  distance: Number.POSITIVE_INFINITY,
+  delay: 180,
+  tolerance: 10,
+};
 
 function pointerKindOf(pointerType: string): PointerKind {
   return pointerType === "touch" || pointerType === "pen" ? pointerType : "mouse";
@@ -112,10 +111,10 @@ export type BeginDragParams<TData> = {
   /** The element the drag lifts: the whole card, even when the press landed on a handle inside it. */
   element: HTMLElement;
   item: DragItem<TData>;
-  activation?: Activation;
+  // Methods, not function-typed properties: the session stores params of any payload type.
   /** Fired once the press became a drag, with the press point and the rect the item occupied. */
-  onDragStart?: (item: DragItem<TData>, point: Point, origin: Rect) => void;
-  onDragEnd?: (item: DragItem<TData>, outcome: DragOutcome) => void;
+  onDragStart?(item: DragItem<TData>, point: Point, origin: Rect): void;
+  onDragEnd?(item: DragItem<TData>, outcome: DragOutcome): void;
 };
 
 export type DragController = {
@@ -145,7 +144,7 @@ export function createDragController(
     origin: Point;
     activation: Activation;
     holdTimer: ReturnType<typeof setTimeout> | null;
-    params: BeginDragParams<never>;
+    params: BeginDragParams<unknown>;
   } | null = null;
   let active: {
     pointerId: number;
@@ -159,7 +158,7 @@ export function createDragController(
     scrollersFor: Element | null;
     frame: number | null;
     lastFrameAt: number;
-    params: BeginDragParams<never>;
+    params: BeginDragParams<unknown>;
   } | null = null;
 
   const emit = (event: DragOverlayEvent) => {
@@ -235,7 +234,7 @@ export function createDragController(
   };
 
   const startFrames = () => {
-    if (!active || typeof requestAnimationFrame !== "function") return;
+    if (!active) return;
     active.lastFrameAt = performance.now();
     active.frame = requestAnimationFrame(runFrame);
   };
@@ -290,7 +289,7 @@ export function createDragController(
       radius: null,
     }));
     emit({ type: "end", item, outcome, origin });
-    params.onDragEnd?.(item as DragItem<never>, outcome);
+    params.onDragEnd?.(item, outcome);
     swallowNextClick(element);
   };
 
@@ -449,22 +448,19 @@ export function createDragController(
     if (params.event.button !== 0 || active !== null) return;
     if (pending) abandonPending();
 
-    const activation = params.activation ?? activationFor(params.event.pointerType);
-    const origin = { x: params.event.clientX, y: params.event.clientY };
+    const activation = params.event.pointerType === "touch" ? TOUCH_ACTIVATION : POINTER_ACTIVATION;
     pending = {
       pointerId: params.event.pointerId,
-      origin,
+      origin: { x: params.event.clientX, y: params.event.clientY },
       activation,
       holdTimer: null,
-      params: params as unknown as BeginDragParams<never>,
+      params,
     };
     attach();
     if (activation.delay > 0) {
       pending.holdTimer = setTimeout(() => {
         if (pending) activate(pending.origin);
       }, activation.delay);
-    } else if (activation.distance === 0) {
-      activate(origin);
     }
   };
 

@@ -167,7 +167,6 @@ export { DigitInput } from "./digit-input/DigitInput";
 export type { DividerAlign, DividerOrientation, DividerProps } from "./divider/Divider";
 export { Divider } from "./divider/Divider";
 export type {
-  Activation,
   DndDraggableProps,
   DndDropZoneProps,
   DndHandleProps,
@@ -178,15 +177,9 @@ export type {
   DndSortableProps,
   DragItem,
   DragOutcome,
-  DragSourceOptions,
-  DropTargetOptions,
-  InsertionPoint,
-  SortableListOptions,
 } from "./dnd/Dnd";
 export { Dnd } from "./dnd/Dnd";
-export { useDraggedItem, useDragSource } from "./dnd/useDragSource";
-export { useDropTarget } from "./dnd/useDropTarget";
-export { moveBefore, useSortableList } from "./dnd/useSortableList";
+export { moveBefore } from "./dnd/useSortableList";
 export * from "./drawer/Drawer";
 export type {
   DropdownContentProps,

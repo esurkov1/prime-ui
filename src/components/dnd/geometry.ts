@@ -19,7 +19,8 @@ export function rectOf(element: Element): Rect {
 function currentTranslation(element: Element): Point {
   // Only an element mid-animation is drawn away from its layout box; skipping the style read for the
   // rest keeps a long list cheap to measure on every pointer move.
-  if (typeof element.getAnimations === "function" && element.getAnimations().length === 0) {
+  // `getAnimations` is missing in jsdom, where consumers test screens built with the kit.
+  if (!element.getAnimations || element.getAnimations().length === 0) {
     return { x: 0, y: 0 };
   }
   const transform = getComputedStyle(element).transform;

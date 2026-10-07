@@ -1,7 +1,22 @@
 import * as React from "react";
 
+import { motionDurationMs, prefersReducedMotion } from "@/hooks/usePresence";
+
 import { layoutRect } from "./geometry";
-import { motionAllowed, readDragMotion } from "./motion";
+
+/**
+ * WAAPI timing from the motion tokens (`--prime-motion-duration-<token>`,
+ * `--prime-motion-easing-standard`), read at animation time so theme and app overrides apply;
+ * WAAPI cannot take `var()`.
+ */
+export function motionTiming(duration: "fast" | "base"): KeyframeAnimationOptions {
+  const easing = getComputedStyle(document.documentElement)
+    .getPropertyValue("--prime-motion-easing-standard")
+    .trim();
+  return easing
+    ? { duration: motionDurationMs(duration), easing }
+    : { duration: motionDurationMs(duration) };
+}
 
 /**
  * Animates layout changes of list items from the position currently on screen. Hit testing still uses
@@ -10,8 +25,8 @@ import { motionAllowed, readDragMotion } from "./motion";
 export function useFlipList(
   container: HTMLElement | null,
   layoutKey: string,
-  selector = "[data-dnd-item]",
-  enabled = true,
+  selector: string,
+  enabled: boolean,
 ) {
   const previous = React.useRef(new Map<string, { left: number; top: number }>());
   const running = React.useRef(new Map<HTMLElement, Animation>());
@@ -26,11 +41,11 @@ export function useFlipList(
     // this frame only refreshes it.
     const justStarted = enabled && !wasEnabled.current;
     wasEnabled.current = enabled;
-    const animate = enabled && !justStarted && motionAllowed();
+    const reduced = prefersReducedMotion();
+    const timing = enabled && !justStarted && !reduced ? motionTiming("base") : null;
     // Positions are kept relative to the container, so scrolling the page or the list (auto-scroll
     // during a drag) never reads as items moving.
     const box = container.getBoundingClientRect();
-    const motion = animate ? readDragMotion() : null;
     for (const node of container.querySelectorAll<HTMLElement>(selector)) {
       const id = node.dataset.dndItem;
       if (id === undefined) continue;
@@ -40,7 +55,7 @@ export function useFlipList(
       const top = rect.top - box.top + container.scrollTop;
       next.set(id, { left, top });
       const before = previous.current.get(id);
-      if (!motion || !before || typeof node.animate !== "function") continue;
+      if (!timing || !before) continue;
       const dx = before.left - left;
       const dy = before.top - top;
       if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
@@ -51,7 +66,7 @@ export function useFlipList(
       running.current.get(node)?.cancel();
       const animation = node.animate(
         [{ transform: `translate(${dx + offsetX}px, ${dy + offsetY}px)` }, { transform: "none" }],
-        { duration: motion.shift, easing: motion.easing },
+        timing,
       );
       running.current.set(node, animation);
       const forget = () => {
@@ -61,7 +76,7 @@ export function useFlipList(
       animation.addEventListener("cancel", forget, { once: true });
     }
     for (const [node, animation] of running.current) {
-      if (!node.isConnected || node.hasAttribute("data-lifted") || !motionAllowed()) {
+      if (!node.isConnected || node.hasAttribute("data-lifted") || reduced) {
         animation.cancel();
         running.current.delete(node);
       }

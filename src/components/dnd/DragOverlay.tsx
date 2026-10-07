@@ -1,10 +1,13 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
+
+import { prefersReducedMotion } from "@/hooks/usePresence";
+
 import styles from "./Dnd.module.css";
 import type { DragController, DragPreview } from "./dragSession";
 import type { Point, Rect } from "./geometry";
 import { layoutRect } from "./geometry";
-import { motionAllowed, readDragMotion } from "./motion";
+import { motionTiming } from "./useFlipList";
 
 function translate(point: Point, grab: Point): string {
   return `translate3d(${Math.round(point.x - grab.x)}px, ${Math.round(point.y - grab.y)}px, 0)`;
@@ -28,6 +31,7 @@ function cloneFor(preview: DragPreview): HTMLElement {
     node.removeAttribute("data-lifted");
     node.removeAttribute("tabindex");
   }
+  clone.classList.add(styles.lift);
   return clone;
 }
 
@@ -39,16 +43,16 @@ export function DragOverlay({ controller }: { controller: DragController }) {
   const frameRef = React.useRef<number | null>(null);
   const [mounted, setMounted] = React.useState(false);
 
-  const landingRef = React.useRef<{ element: Element; stop: () => void } | null>(null);
+  /** Stops whatever the previous drop left running: the clone's flight and the hidden destination. */
+  const stopLandingRef = React.useRef<(() => void) | null>(null);
   const endTokenRef = React.useRef(0);
 
   React.useEffect(() => setMounted(true), []);
 
-  // Ends whatever the previous drop left running: the clone's flight and the hidden destination.
   const settle = React.useCallback((host: HTMLDivElement) => {
     endTokenRef.current += 1;
-    landingRef.current?.stop();
-    landingRef.current = null;
+    stopLandingRef.current?.();
+    stopLandingRef.current = null;
     host.replaceChildren();
     host.removeAttribute("data-can-drop");
   }, []);
@@ -59,8 +63,16 @@ export function DragOverlay({ controller }: { controller: DragController }) {
   const land = React.useCallback(
     (host: HTMLDivElement, lifted: HTMLElement, id: string, fallback: Rect | null) => {
       const token = ++endTokenRef.current;
-      const motion = readDragMotion();
+      const timing: KeyframeAnimationOptions = { ...motionTiming("base"), fill: "forwards" };
       const from = host.style.transform;
+      const settleOnFinish = (animation: Animation) =>
+        animation.addEventListener(
+          "finish",
+          () => {
+            if (endTokenRef.current === token) settle(host);
+          },
+          { once: true },
+        );
       const dissolve = () => {
         const to = fallback
           ? translate({ x: fallback.left, y: fallback.top }, { x: 0, y: 0 })
@@ -70,16 +82,10 @@ export function DragOverlay({ controller }: { controller: DragController }) {
             { transform: from, opacity: 1 },
             { transform: to, opacity: 0 },
           ],
-          { duration: motion.settle, easing: motion.easing, fill: "forwards" },
+          timing,
         );
-        landingRef.current = { element: host, stop: () => animation.cancel() };
-        animation.addEventListener(
-          "finish",
-          () => {
-            if (endTokenRef.current === token) settle(host);
-          },
-          { once: true },
-        );
+        stopLandingRef.current = () => animation.cancel();
+        settleOnFinish(animation);
       };
       const destinationFor = (): HTMLElement | null => {
         for (const node of document.querySelectorAll<HTMLElement>("[data-dnd-item]")) {
@@ -92,29 +98,17 @@ export function DragOverlay({ controller }: { controller: DragController }) {
       };
       const attempt = (retry: boolean) => {
         if (endTokenRef.current !== token) return;
-        if (typeof host.animate !== "function" || typeof lifted.animate !== "function") {
-          settle(host);
-          return;
-        }
         const destination = destinationFor();
         if (!destination) {
           // The owner may not have committed yet; after that the item is simply somewhere else.
-          if (retry && typeof requestAnimationFrame === "function") {
-            requestAnimationFrame(() => attempt(false));
-          } else {
-            dissolve();
-          }
+          if (retry) requestAnimationFrame(() => attempt(false));
+          else dissolve();
           return;
         }
         const rect = layoutRect(destination);
         const to = translate({ x: rect.left, y: rect.top }, { x: 0, y: 0 });
         destination.setAttribute("data-dnd-landing", "");
-        const options = {
-          duration: motion.settle,
-          easing: motion.easing,
-          fill: "forwards",
-        } as const;
-        const flight = host.animate([{ transform: from }, { transform: to }], options);
+        const flight = host.animate([{ transform: from }, { transform: to }], timing);
         // From the clone's drawn (lifted) state to flat: no second copy of the lift numbers.
         const drawn = getComputedStyle(lifted);
         const setDown = lifted.animate(
@@ -122,21 +116,14 @@ export function DragOverlay({ controller }: { controller: DragController }) {
             { transform: drawn.transform, boxShadow: drawn.boxShadow },
             { transform: "none", boxShadow: "none" },
           ],
-          options,
+          timing,
         );
-        const stop = () => {
+        stopLandingRef.current = () => {
           destination.removeAttribute("data-dnd-landing");
           flight.cancel();
           setDown.cancel();
         };
-        landingRef.current = { element: destination, stop };
-        flight.addEventListener(
-          "finish",
-          () => {
-            if (endTokenRef.current === token) settle(host);
-          },
-          { once: true },
-        );
+        settleOnFinish(flight);
       };
       // After the commit the owner's drop handler caused, before the next paint.
       queueMicrotask(() => attempt(true));
@@ -151,40 +138,22 @@ export function DragOverlay({ controller }: { controller: DragController }) {
       const host = hostRef.current;
       if (host) host.style.transform = translate(pointRef.current, grabRef.current);
     };
-    // One paint per frame at most: a pointer fires far more often than a display refreshes.
-    const schedule = () => {
-      if (frameRef.current !== null) return;
-      if (typeof requestAnimationFrame !== "function") {
-        paint();
-        return;
-      }
-      frameRef.current = requestAnimationFrame(paint);
-    };
     return controller.subscribeOverlay((event) => {
       const host = hostRef.current;
       if (!host) return;
       if (event.type === "start") {
         grabRef.current = event.preview.grab;
         pointRef.current = event.preview.point;
-        // The previous landing holds its final transform (fill: forwards) until cancelled.
-        landingRef.current?.stop();
-        landingRef.current = null;
-        endTokenRef.current += 1;
-        if (typeof host.getAnimations === "function") {
-          for (const animation of host.getAnimations()) animation.cancel();
-        }
-        const motion = readDragMotion();
-        host.style.setProperty("--dnd-lift-duration", `${motion.lift}ms`);
-        host.style.setProperty("--dnd-easing", motion.easing);
+        // The previous landing holds its final transform (fill: forwards) until stopped.
+        settle(host);
         host.replaceChildren(cloneFor(event.preview));
-        const lifted = host.firstElementChild;
-        if (lifted instanceof HTMLElement && styles.lift) lifted.classList.add(styles.lift);
         host.style.transform = translate(event.preview.point, event.preview.grab);
         return;
       }
       if (event.type === "move") {
         pointRef.current = event.point;
-        schedule();
+        // One paint per frame at most: a pointer fires far more often than a display refreshes.
+        frameRef.current ??= requestAnimationFrame(paint);
         return;
       }
       if (frameRef.current !== null) {
@@ -192,11 +161,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         frameRef.current = null;
       }
       const lifted = host.firstElementChild;
-      if (
-        !(lifted instanceof HTMLElement) ||
-        !motionAllowed() ||
-        typeof host.animate !== "function"
-      ) {
+      if (!(lifted instanceof HTMLElement) || prefersReducedMotion()) {
         settle(host);
         return;
       }
@@ -216,9 +181,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
 
   React.useEffect(
     () => () => {
-      if (frameRef.current !== null && typeof cancelAnimationFrame === "function") {
-        cancelAnimationFrame(frameRef.current);
-      }
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     },
     [],
   );
