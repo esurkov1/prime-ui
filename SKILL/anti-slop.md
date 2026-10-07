@@ -1,6 +1,8 @@
 # Anti-slop
 
-What makes a screen look generated. Each rule: bad → good.
+What makes a screen look generated. Each rule: bad → good. Screen-level mistakes (cards around
+everything, one gap for the whole page, two primary buttons) are listed in
+[composition.md](composition.md#13-screen-level-anti-slop).
 
 ## 1. Same-looking things built differently
 
@@ -33,7 +35,7 @@ Map statuses to colors once (`const STATUS_COLOR: Record<Status, PaletteColor>`)
 .row { display: flex; gap: var(--prime-space-3); }
 ```
 
-Text color goes through `Typography.Root tone="secondary"`, not CSS.
+Text color goes through `Typography tone="secondary"`, not CSS.
 
 ## 3. Borders instead of fill; card in a card
 
@@ -44,10 +46,11 @@ Text color goes through `Typography.Root tone="secondary"`, not CSS.
 
 ```tsx
 // bad — a card around a card around a table
-<Card.Root><Card.Root><DataTable.Root … /></Card.Root></Card.Root>
+<Card.Root><Card.Root><DataTable columns={columns} rows={rows} /></Card.Root></Card.Root>
 
-// good — DataTable already is a filled block
-<DataTable.Root … />
+// good — DataTable already is a filled block; a section heading is enough
+<Typography as="h2" variant="title-m">Последние оплаты</Typography>
+<DataTable columns={columns} rows={rows} />
 ```
 
 ## 4. Mixed control sizes in one row
@@ -98,14 +101,16 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 
 | Instead of | Use |
 |---|---|
-| `<div className={styles.line} />` | `<Divider.Root />` |
-| `<span className={styles.key}>⌘</span>` | `<Kbd.Root aria-label="Command">⌘</Kbd.Root>` |
-| `<h2 className={styles.title}>` with custom font size | `<Typography.Root as="h2" variant="heading-s">` |
+| `<div className={styles.line} />` | `<Divider />` |
+| `<span className={styles.key}>⌘</span>` | `<Kbd aria-label="Command">⌘</Kbd>` |
+| `<h2 className={styles.title}>` with custom font size | `<Typography as="h2" variant="title-m">` |
 | `<span className={styles.pill}>Новый</span>` | `<Badge.Root color="blue">Новый</Badge.Root>` |
 | `<div className={styles.box}>` with bg + radius | `<Card.Root variant="panel">` |
-| `<a className={styles.link}>` | `<LinkButton.Root href="…">` |
-| a list of `<button>`s for navigation | `Sidebar.Item href`, `Tabs.Trigger` |
-| `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton.Root` |
+| `<a className={styles.link}>` | `<LinkButton href="…">` |
+| a list of `<button>`s for navigation | `Sidebar.Item href`, `Tabs.Item` |
+| `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton` |
+| a hand-built spinner, shimmer or «Loading…» text | `loading` on Button / Select / DataTable, otherwise `Spinner` |
+| a search Input + a row of filter Selects above a table | `SmartFilter` in the DataTable `toolbar` |
 
 ## 7a. Fighting the table
 
@@ -117,7 +122,7 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 
 ```tsx
 // good — content drives the height, cell controls one tier down, kit draws dividers and sort icons
-<DataTable.Root size="m" columns={columns} rows={rows} getRowKey={(row) => row.id} />
+<DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} />
 // in a column cell: <Button.Root size="s" variant="ghost" tone="neutral">Настроить</Button.Root>
 ```
 
@@ -140,7 +145,13 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 // good
 <Modal.Root open={open} onOpenChange={setOpen}>…</Modal.Root>
 <Tooltip.Root>
-  <Tooltip.Trigger>…</Tooltip.Trigger>
+  <Tooltip.Trigger>
+    <Button.Root variant="ghost" tone="neutral" aria-label="Копировать ссылку">
+      <Button.Icon>
+        <Icon name="action.copy" />
+      </Button.Icon>
+    </Button.Root>
+  </Tooltip.Trigger>
   <Tooltip.Content>Копировать</Tooltip.Content>
 </Tooltip.Root>
 ```

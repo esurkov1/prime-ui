@@ -60,7 +60,7 @@ already carries the page gutters — do not add your own outer padding.
   the gray canvas and the content panel is the white surface — there a Card becomes a gray sunken tile
   without a shadow. Fields follow their host. The kit switches all of this automatically — just nest
   components, never set backgrounds yourself.
-- Separate blocks by fill and air. Hairlines (`Divider.Root`) only inside a block: list rows, table rows,
+- Separate blocks by fill and air. Hairlines (`Divider`) only inside a block: list rows, table rows,
   between a form and its footer.
 - A card inside a card becomes a sunken tile automatically — use it sparingly; usually a section heading
   inside one card is better.
@@ -76,9 +76,9 @@ Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Us
 
 - `tone` is meaning: `neutral · accent · success · warning · danger · info`. Destructive is `danger`.
 - `color` is decoration from the palette: `gray · blue · green · orange · red · yellow · purple · sky ·
-  pink · teal` — Badge, Avatar, Thumbnail, field badges, SegmentedControl dots, count badges of Tabs
-  and SegmentedControl, FileUpload format badges, Timeline dots, TagSelect tags. Use one hue per meaning across
-  the product (e.g. «Оплачен» is always green).
+  pink · teal` — Badge, Avatar, Thumbnail, SegmentedControl dots, count badges of Tabs and
+  SegmentedControl, FileUpload format badges, Timeline dots, TagSelect tags. Use one hue per meaning
+  across the product (e.g. «Оплачен» is always green): keep one `Record<Status, PaletteColor>` map.
 - Never convey meaning by color alone: a status badge has text.
 
 ## 7. Typography (§5)
@@ -89,15 +89,20 @@ Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Us
 | `body-s` | 13/20 | secondary text, dense UI |
 | `body-m` | 14/20 | default text |
 | `body-l` | 16/24 | reading text |
-| `title-s` | 14/20 600 | card title, group heading |
-| `title-m` | 16/24 600 | modal / section title |
+| `title-s` | 14/20 600 | card title, group heading inside a card or form |
+| `title-m` | 16/24 600 | page section heading without a card, modal title |
+| `title-l` | 18/24 600 | large block title |
 | `heading-s` | 20/28 600 | page sub-heading |
 | `heading-m` | 24/32 600 | page title (`PageContent.Title`) |
+| `heading-l` | 30/36 600 | marketing / auth title |
 | `display-*` | 36–60 | hero numbers only |
+| `code` | 13/20 mono | identifiers, inline code |
 
-Weights only 400/500/600. Numbers in tables, prices, dates: tabular (the kit does it in DataTable and
-Card.Value). Reading text max width `--prime-layout-reading-max-width` (`PageContent.Root maxWidth="readable"`).
-Secondary text uses `tone="secondary"`/`"muted"` on `Typography.Root`, not a lighter custom color.
+`variant` is required on `Typography`. Weights only 400/500/600. Numbers in tables, prices, dates:
+tabular (the kit does it in DataTable `numeric` columns and `Card.Value`; your own amounts take
+`font-variant-numeric: tabular-nums`). Reading text max width `--prime-layout-reading-max-width`
+(`PageContent.Root maxWidth="readable"`). Secondary text uses `tone="secondary"`/`"muted"` on
+`Typography`, not a lighter custom color.
 
 ## 8. Hierarchy through air (§1.6)
 
