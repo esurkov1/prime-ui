@@ -11,7 +11,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Stepper.Root",
-      en: "No ref. `<ol>` of items; owns the current step, numbers the items and adds chevrons between horizontal ones.",
+      en: "`ref` → `HTMLOListElement`. `<ol>` of items; owns the current step, numbers the items and adds chevrons between horizontal ones.",
       ru: "Список `<ol>`: хранит текущий шаг, нумерует пункты и ставит шевроны между горизонтальными.",
       props: [
         {

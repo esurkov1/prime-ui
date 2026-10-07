@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Breadcrumb.Root",
-      en: "No ref. `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and collapses the middle levels on narrow containers.",
+      en: "`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and collapses the middle levels on narrow containers.",
       ru: "`<nav>` со списком `<ol>`: рисует шевроны между уровнями, задаёт размер и сворачивает средние уровни в узком контейнере.",
       props: [
         {

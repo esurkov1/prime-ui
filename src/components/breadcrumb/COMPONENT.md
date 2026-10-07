@@ -32,7 +32,7 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Breadcrumb.Root
-No ref. `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and collapses the middle levels on narrow containers.
+`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and collapses the middle levels on narrow containers.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

@@ -115,6 +115,7 @@ export type SegmentedControlRootProps = Omit<
   size?: ControlSize;
   /** Stretch to the container width; segments share it equally and truncate their labels. */
   fullWidth?: boolean;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function SegmentedControlRoot({

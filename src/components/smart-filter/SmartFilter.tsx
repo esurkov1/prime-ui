@@ -155,6 +155,7 @@ export type SmartFilterRootProps = {
   className?: string;
   /** `SmartFilter.Toolbar` and `SmartFilter.Chips`. */
   children: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 const EMPTY_VALUE: SmartFilterValue = {};
@@ -172,6 +173,7 @@ function SmartFilterRoot({
   labels,
   className,
   children,
+  ref,
 }: SmartFilterRootProps) {
   const [current, setCurrent] = useControllableState<SmartFilterValue>({
     value,
@@ -209,14 +211,14 @@ function SmartFilterRoot({
   return (
     <SmartFilterProvider value={context}>
       <Popover.Root open={open} onOpenChange={setOpen}>
-        <div className={cx(styles.root, className)} data-size={size}>
+        <div ref={ref} className={cx(styles.root, className)} data-size={size}>
           {children}
         </div>
       </Popover.Root>
     </SmartFilterProvider>
   );
 }
-SmartFilterRoot.displayName = "SmartFilterRoot";
+SmartFilterRoot.displayName = "SmartFilter.Root";
 
 // ---------------------------------------------------------------------------------------------
 // Toolbar: filter button + search; the anchor of the panel
@@ -280,7 +282,7 @@ function SmartFilterToolbar({ className }: SmartFilterToolbarProps) {
     </>
   );
 }
-SmartFilterToolbar.displayName = "SmartFilterToolbar";
+SmartFilterToolbar.displayName = "SmartFilter.Toolbar";
 
 /** The matched part of a label, underlined. */
 function Highlighted({ text, query }: { text: string; query: string }) {
@@ -570,7 +572,7 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
     </div>
   );
 }
-SmartFilterChips.displayName = "SmartFilterChips";
+SmartFilterChips.displayName = "SmartFilter.Chips";
 
 export const SmartFilter = {
   Root: SmartFilterRoot,

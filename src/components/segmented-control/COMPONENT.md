@@ -37,7 +37,7 @@ SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### SegmentedControl.Root
-No ref. `<div role="radiogroup">`: the track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row.
+`ref` → `HTMLDivElement`. `<div role="radiogroup">`: the track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

@@ -11,7 +11,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Tabs.Root",
-      en: "No ref. `<div>` that owns the active value, size and orientation and lays out the list and the panel.",
+      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel.",
       ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель.",
       props: [
         {

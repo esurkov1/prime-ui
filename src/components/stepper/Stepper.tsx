@@ -50,6 +50,7 @@ export type StepperRootProps = Omit<
   /** Called with the item index when an item is clicked. */
   onValueChange?: (index: number) => void;
   size?: ControlSize;
+  ref?: React.Ref<HTMLOListElement>;
 };
 
 function StepperRoot({

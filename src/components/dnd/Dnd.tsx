@@ -61,7 +61,7 @@ function DndRoot({ labels, children }: DndRootProps) {
     </DragControllerContext>
   );
 }
-DndRoot.displayName = "DndRoot";
+DndRoot.displayName = "Dnd.Root";
 
 // ---------------------------------------------------------------------------------------------
 // Handle
@@ -98,7 +98,7 @@ const DndHandle = React.forwardRef<HTMLButtonElement, DndHandleProps>(function D
     </Button.Root>
   );
 });
-DndHandle.displayName = "DndHandle";
+DndHandle.displayName = "Dnd.Handle";
 
 // ---------------------------------------------------------------------------------------------
 // Sortable
@@ -229,7 +229,7 @@ function DndSortable<T>({
     </SortableContext>
   );
 }
-DndSortable.displayName = "DndSortable";
+DndSortable.displayName = "Dnd.Sortable";
 
 export type DndSortableItemProps = {
   /** Must match `getId` of the item. */
@@ -277,7 +277,7 @@ function DndSortableItem({
     </Tag>
   );
 }
-DndSortableItem.displayName = "DndSortableItem";
+DndSortableItem.displayName = "Dnd.SortableItem";
 
 function DndPlaceholder({
   as: Tag,
@@ -368,7 +368,7 @@ function DndDraggable<TData = unknown>({
     </Tag>
   );
 }
-DndDraggable.displayName = "DndDraggable";
+DndDraggable.displayName = "Dnd.Draggable";
 
 // ---------------------------------------------------------------------------------------------
 // DropZone
@@ -427,7 +427,7 @@ function DndDropZone<TData = unknown>({
     </Tag>
   );
 }
-DndDropZone.displayName = "DndDropZone";
+DndDropZone.displayName = "Dnd.DropZone";
 
 export const Dnd = {
   Root: DndRoot,

@@ -14,7 +14,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "SegmentedControl.Root",
-      en: 'No ref. `<div role="radiogroup">`: the track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row.',
+      en: '`ref` → `HTMLDivElement`. `<div role="radiogroup">`: the track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row.',
       ru: '`<div role="radiogroup">`: дорожка со скользящим бегунком, клавиатура и горизонтальная прокрутка ряда.',
       props: [
         {
