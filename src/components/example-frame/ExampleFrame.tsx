@@ -1,18 +1,19 @@
-import { Code2, Eye, Monitor, Smartphone, Tablet } from "lucide-react";
 import * as React from "react";
 
-import { Button } from "@/components/button/Button";
-import { CodeBlock } from "@/components/code-block/CodeBlock";
-import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
-import { Icon, IconCheck } from "@/icons";
+import { useControllableState } from "@/hooks/useControllableState";
+import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { suspendTransitions } from "@/theme/applyTheme";
 
+import { Button } from "../button/Button";
+import { CodeBlock } from "../code-block/CodeBlock";
+import { SegmentedControl } from "../segmented-control/SegmentedControl";
 import styles from "./ExampleFrame.module.css";
 
 type Pane = "preview" | "code";
-export type ExampleFrameViewport = "desktop" | "tablet" | "mobile";
+const VIEWPORTS = ["desktop", "tablet", "mobile"] as const;
+export type ExampleFrameViewport = (typeof VIEWPORTS)[number];
 type ColorScheme = "light" | "dark";
 
 /**
@@ -32,8 +33,10 @@ export type ExampleFramePreviewLayout =
   | "matrix";
 
 export type ExampleFrameLabels = {
+  paneSwitch: string;
   preview: string;
   code: string;
+  viewportSwitch: string;
   desktop: string;
   tablet: string;
   mobile: string;
@@ -46,8 +49,10 @@ export type ExampleFrameLabels = {
 };
 
 const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
+  paneSwitch: "Вид примера",
   preview: "Превью",
   code: "Код",
+  viewportSwitch: "Ширина превью",
   desktop: "Десктоп",
   tablet: "Планшет",
   mobile: "Телефон",
@@ -80,7 +85,7 @@ export type ExampleFrameRootProps = {
   code: string;
   children?: React.ReactNode;
   className?: string;
-  /** Управляемая цветовая схема превью (light/dark). */
+  /** Preview color scheme (controlled). */
   colorScheme?: ColorScheme;
   defaultColorScheme?: ColorScheme;
   onColorSchemeChange?: (scheme: ColorScheme) => void;
@@ -88,14 +93,11 @@ export type ExampleFrameRootProps = {
   viewport?: ExampleFrameViewport;
   defaultViewport?: ExampleFrameViewport;
   onViewportChange?: (v: ExampleFrameViewport) => void;
-  /** Показывать ли кнопку переключения light/dark в тулбаре. */
+  /** Show the light / dark toggle in the toolbar. Default `true`. */
   showThemeToggle?: boolean;
-  /** Вызывается после успешного копирования `code` в буфер. */
+  /** Called after `code` was copied to the clipboard. */
   onCopy?: () => void;
-  /**
-   * Как выстроить детей внутри превью. По умолчанию — по центру (один блок).
-   * Для списков из нескольких компонентов используйте `stack` / `stack-center` / `row`.
-   */
+  /** How the preview lays out its children. Default `default`: one centered block. */
   previewLayout?: ExampleFramePreviewLayout;
   labels?: Partial<ExampleFrameLabels>;
 };
@@ -117,13 +119,16 @@ function ExampleFrameRoot({
 }: ExampleFrameRootProps) {
   const labels = React.useMemo(() => ({ ...EXAMPLE_FRAME_LABELS, ...labelsProp }), [labelsProp]);
   const [pane, setPane] = React.useState<Pane>("preview");
-  const [uncontrolledViewport, setUncontrolledViewport] =
-    React.useState<ExampleFrameViewport>(defaultViewport);
-  const [uncontrolledScheme, setUncontrolledScheme] =
-    React.useState<ColorScheme>(defaultColorScheme);
-
-  const isSchemeControlled = colorSchemeProp !== undefined;
-  const colorScheme = isSchemeControlled ? colorSchemeProp : uncontrolledScheme;
+  const [colorScheme, setColorScheme] = useControllableState({
+    value: colorSchemeProp,
+    defaultValue: defaultColorScheme,
+    onChange: onColorSchemeChange,
+  });
+  const [viewport, setViewport] = useControllableState({
+    value: viewportProp,
+    defaultValue: defaultViewport,
+    onChange: onViewportChange,
+  });
 
   // Theme switch inside the frame is instant: no color transition from the old theme.
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -133,29 +138,6 @@ function ExampleFrameRoot({
     previousScheme.current = colorScheme;
     if (rootRef.current) suspendTransitions(rootRef.current);
   }, [colorScheme]);
-
-  const isViewportControlled = viewportProp !== undefined;
-  const viewport = isViewportControlled ? viewportProp : uncontrolledViewport;
-
-  const setColorScheme = React.useCallback(
-    (next: ColorScheme) => {
-      if (!isSchemeControlled) {
-        setUncontrolledScheme(next);
-      }
-      onColorSchemeChange?.(next);
-    },
-    [isSchemeControlled, onColorSchemeChange],
-  );
-
-  const setViewport = React.useCallback(
-    (next: ExampleFrameViewport) => {
-      if (!isViewportControlled) {
-        setUncontrolledViewport(next);
-      }
-      onViewportChange?.(next);
-    },
-    [isViewportControlled, onViewportChange],
-  );
 
   const ctxValue = React.useMemo<ExampleFrameContextValue>(
     () => ({
@@ -251,16 +233,17 @@ function ExampleFrameToolbar() {
           value={ctx.pane}
           onValueChange={(v) => ctx.setPane(v as Pane)}
           size="s"
+          aria-label={labels.paneSwitch}
         >
           <SegmentedControl.Item value="preview">
             <SegmentedControl.Icon>
-              <Eye size={14} strokeWidth={2} aria-hidden />
+              <Icon name="view.preview" />
             </SegmentedControl.Icon>
             {labels.preview}
           </SegmentedControl.Item>
           <SegmentedControl.Item value="code">
             <SegmentedControl.Icon>
-              <Code2 size={14} strokeWidth={2} aria-hidden />
+              <Icon name="view.code" />
             </SegmentedControl.Icon>
             {labels.code}
           </SegmentedControl.Item>
@@ -295,7 +278,7 @@ function ExampleFrameToolbar() {
             {/* Both glyphs stay mounted and cross-fade in place (see `.copyIcon`). */}
             <Button.Icon className={styles.copyIcon} data-copy-state={copyState}>
               <Icon name="action.copy" size="s" tone="secondary" data-glyph="copy" />
-              <IconCheck size="s" tone="secondary" data-glyph="check" />
+              <Icon name="action.check" size="s" tone="secondary" data-glyph="check" />
             </Button.Icon>
           </Button.Root>
         </div>
@@ -306,25 +289,16 @@ function ExampleFrameToolbar() {
           value={ctx.viewport}
           onValueChange={(v) => ctx.setViewport(v as ExampleFrameViewport)}
           size="s"
+          aria-label={labels.viewportSwitch}
         >
-          <SegmentedControl.Item value="desktop">
-            <SegmentedControl.Icon>
-              <Monitor size={14} strokeWidth={2} aria-hidden />
-            </SegmentedControl.Icon>
-            <span className={styles.viewportLabel}>{labels.desktop}</span>
-          </SegmentedControl.Item>
-          <SegmentedControl.Item value="tablet">
-            <SegmentedControl.Icon>
-              <Tablet size={14} strokeWidth={2} aria-hidden />
-            </SegmentedControl.Icon>
-            <span className={styles.viewportLabel}>{labels.tablet}</span>
-          </SegmentedControl.Item>
-          <SegmentedControl.Item value="mobile">
-            <SegmentedControl.Icon>
-              <Smartphone size={14} strokeWidth={2} aria-hidden />
-            </SegmentedControl.Icon>
-            <span className={styles.viewportLabel}>{labels.mobile}</span>
-          </SegmentedControl.Item>
+          {VIEWPORTS.map((viewport) => (
+            <SegmentedControl.Item key={viewport} value={viewport}>
+              <SegmentedControl.Icon>
+                <Icon name={`viewport.${viewport}`} />
+              </SegmentedControl.Icon>
+              <span className={styles.viewportLabel}>{labels[viewport]}</span>
+            </SegmentedControl.Item>
+          ))}
         </SegmentedControl.Root>
       ) : null}
     </div>
