@@ -68,7 +68,7 @@ describe("Accordion", () => {
   });
 
   it("single mode: closes other items when opening a new one", () => {
-    renderAccordion(undefined, { type: "single" });
+    renderAccordion(undefined, { multiple: false });
     fireEvent.click(screen.getByRole("button", { name: /Section 1/ }));
     expect(screen.getByRole("button", { name: /Section 1/ })).toHaveAttribute(
       "aria-expanded",
@@ -86,7 +86,7 @@ describe("Accordion", () => {
   });
 
   it("multiple mode: keeps multiple items open", () => {
-    renderAccordion(undefined, { type: "multiple" });
+    renderAccordion(undefined, { multiple: true });
     fireEvent.click(screen.getByRole("button", { name: /Section 1/ }));
     fireEvent.click(screen.getByRole("button", { name: /Section 2/ }));
     expect(screen.getByRole("button", { name: /Section 1/ })).toHaveAttribute(
@@ -232,7 +232,7 @@ describe("Accordion", () => {
   it("multiple: onValueChange receives the list of open items", () => {
     const onValueChange = vi.fn();
     render(
-      <Accordion.Root type="multiple" defaultValue={["a"]} onValueChange={onValueChange}>
+      <Accordion.Root multiple defaultValue={["a"]} onValueChange={onValueChange}>
         <Accordion.Item value="a">
           <Accordion.Header>
             <Accordion.Trigger>Section A</Accordion.Trigger>
@@ -269,24 +269,32 @@ describe("Accordion", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "true");
   });
 
-  it("Arrow swaps to openIcon when the item opens", () => {
-    const Closed = (p: { className?: string }) => <svg data-testid="closed" {...p} />;
-    const Opened = (p: { className?: string }) => <svg data-testid="opened" {...p} />;
+  it("the trigger draws one hidden chevron after its content and marks the open state", () => {
+    renderAccordion(undefined, { defaultValue: "item-1" });
+    const trigger = screen.getByRole("button", { name: "Section 1" });
+    const chevron = trigger.querySelector("svg");
+    expect(chevron).toHaveAttribute("aria-hidden", "true");
+    expect(trigger.lastElementChild).toBe(chevron);
+    expect(trigger).toHaveAttribute("data-state", "open");
+  });
+
+  it("Accordion.Icon is decorative", () => {
     render(
-      <Accordion.Root defaultValue="a">
+      <Accordion.Root>
         <Accordion.Item value="a">
           <Accordion.Header>
             <Accordion.Trigger>
+              <Accordion.Icon>
+                <svg data-testid="lead" />
+              </Accordion.Icon>
               Section A
-              <Accordion.Arrow icon={Closed} openIcon={Opened} />
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content>Content A</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
-    expect(screen.getByTestId("closed")).toBeInTheDocument();
-    expect(screen.getByTestId("opened")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Section A/ })).toHaveAttribute("data-state", "open");
+    expect(screen.getByTestId("lead").parentElement).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("button", { name: "Section A" })).toBeInTheDocument();
   });
 });

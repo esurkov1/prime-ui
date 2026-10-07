@@ -11,7 +11,6 @@ export {
 export type { ProgressSegment } from "../internal/progressSegments";
 export * from "../layout";
 export type {
-  AccordionArrowProps,
   AccordionContentProps,
   AccordionHeaderProps,
   AccordionIconProps,

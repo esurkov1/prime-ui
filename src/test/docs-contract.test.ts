@@ -28,7 +28,6 @@ const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
  * empties this list. Never add a dir here: new and converted pages follow the standard.
  */
 const NOT_CONVERTED = new Set([
-  "accordion",
   "app-shell",
   "avatar",
   "badge",
