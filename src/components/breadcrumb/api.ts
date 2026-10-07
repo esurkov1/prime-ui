@@ -1,0 +1,102 @@
+import type { ComponentApi } from "../../../scripts/docs/componentApi";
+
+export const api: ComponentApi = {
+  parts: [
+    {
+      name: "Breadcrumb.Root",
+      en: "No ref. `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and collapses the middle levels on narrow containers.",
+      ru: "`<nav>` со списком `<ol>`: рисует шевроны между уровнями, задаёт размер и сворачивает средние уровни в узком контейнере.",
+      props: [
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          default: '"m"',
+          en: "Text of the links, the current page and the ellipsis; chevrons and icons take the same tier.",
+          ru: "Кегль ссылок, текущей страницы и многоточия; шевроны и иконки — того же яруса.",
+        },
+        {
+          name: "labels",
+          type: "Partial<BreadcrumbLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "`Breadcrumb.Item`s and `Breadcrumb.Ellipsis`, in order; no separators by hand.",
+          ru: "`Breadcrumb.Item` и `Breadcrumb.Ellipsis` по порядку; разделители не нужны.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLElement>",
+          en: "`className` and the other `nav` attributes; an `aria-label` here overrides `labels.nav`.",
+          ru: "`className` и остальные атрибуты `nav`; `aria-label` здесь заменяет `labels.nav`.",
+        },
+      ],
+    },
+    {
+      name: "Breadcrumb.Item",
+      en: "No ref. `<li>`: a muted `LinkButton` (`href`), plain text, or the current page (`current`).",
+      ru: "`<li>`: приглушённая ссылка `LinkButton` (`href`), текст или текущая страница (`current`).",
+      props: [
+        {
+          name: "href",
+          type: "string",
+          en: "Renders a link; without it the item is text.",
+          ru: "Делает уровень ссылкой; без него — текст.",
+        },
+        {
+          name: "current",
+          type: "boolean",
+          en: 'Current page: `aria-current="page"`, primary text, medium weight. The last item, without `href`.',
+          ru: 'Текущая страница: `aria-current="page"`, основной текст. Последний уровень, без `href`.',
+        },
+        {
+          name: "aria-label",
+          type: "string",
+          en: "Name of a link without visible text (e.g. a home icon).",
+          ru: "Имя ссылки без видимого текста (например, иконки «дом»).",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "Text or an `Icon`. A string also becomes the `title` of a text item (full text when truncated).",
+          ru: "Текст или `Icon`. Строка становится `title` текстового уровня (полный текст при обрезке).",
+        },
+        {
+          name: "className",
+          type: "string",
+          en: "Extra class on the `li`.",
+          ru: "Дополнительный класс на `li`.",
+        },
+      ],
+    },
+    {
+      name: "Breadcrumb.Ellipsis",
+      en: "No ref. `<li>` with «…» for levels skipped on purpose, with visually hidden `labels.ellipsis`.",
+      ru: "`<li>` с «…» для намеренно пропущенных уровней и скрытым текстом `labels.ellipsis`.",
+      props: [
+        {
+          name: "className",
+          type: "string",
+          en: "Extra class.",
+          ru: "Дополнительный класс.",
+        },
+      ],
+    },
+  ],
+  labels: [
+    {
+      key: "nav",
+      default: "Навигационная цепочка",
+      en: "`aria-label` of the `nav` landmark.",
+      ru: "`aria-label` области `nav`.",
+    },
+    {
+      key: "ellipsis",
+      default: "Скрытые разделы",
+      en: "Hidden text of `Breadcrumb.Ellipsis`.",
+      ru: "Скрытый текст `Breadcrumb.Ellipsis`.",
+    },
+  ],
+};

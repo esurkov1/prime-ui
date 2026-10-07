@@ -29,7 +29,6 @@ export default function AppShellWithSidebarExample() {
         <AppShell.Header>
           <Breadcrumb.Root>
             <Breadcrumb.Item href="#crm">CRM</Breadcrumb.Item>
-            <Breadcrumb.Separator />
             <Breadcrumb.Item current>Обзор</Breadcrumb.Item>
           </Breadcrumb.Root>
         </AppShell.Header>

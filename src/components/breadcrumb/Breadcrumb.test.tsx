@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { Breadcrumb } from "./Breadcrumb";
@@ -45,26 +46,18 @@ describe("Breadcrumb", () => {
     expect(span).toHaveAttribute("aria-current", "page");
   });
 
-  it("renders Separator with chevron by default", () => {
+  it("draws a hidden chevron between levels, none before the first", () => {
     const { container } = render(
       <Breadcrumb.Root>
         <Breadcrumb.Item href="/a">A</Breadcrumb.Item>
-        <Breadcrumb.Separator />
-        <Breadcrumb.Item href="/b">B</Breadcrumb.Item>
+        <Breadcrumb.Item current>B</Breadcrumb.Item>
       </Breadcrumb.Root>,
     );
-    const sep = container.querySelector('li[aria-hidden="true"]');
-    expect(sep).toBeTruthy();
-    expect(sep?.querySelector("svg")).toBeInTheDocument();
-  });
-
-  it("Separator accepts custom children", () => {
-    render(
-      <Breadcrumb.Root>
-        <Breadcrumb.Separator>{">"}</Breadcrumb.Separator>
-      </Breadcrumb.Root>,
-    );
-    expect(screen.getByText(">")).toBeInTheDocument();
+    const items = container.querySelectorAll("li");
+    expect(items).toHaveLength(3);
+    expect(items[0]).not.toHaveAttribute("aria-hidden");
+    expect(items[1]).toHaveAttribute("aria-hidden", "true");
+    expect(items[1].querySelector("svg")).toBeInTheDocument();
   });
 
   it("renders Ellipsis", () => {
@@ -107,13 +100,12 @@ describe("Breadcrumb", () => {
     const link = screen.getByRole("link", { name: "A" });
     expect(link).toHaveAttribute("data-size", "l");
   });
+
   it("marks long paths as collapsible and inserts a hidden auto ellipsis", () => {
     const { container } = render(
       <Breadcrumb.Root>
         <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-        <Breadcrumb.Separator />
         <Breadcrumb.Item href="/a">A</Breadcrumb.Item>
-        <Breadcrumb.Separator />
         <Breadcrumb.Item current>Current</Breadcrumb.Item>
       </Breadcrumb.Root>,
     );
@@ -127,7 +119,6 @@ describe("Breadcrumb", () => {
     render(
       <Breadcrumb.Root>
         <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-        <Breadcrumb.Separator />
         <Breadcrumb.Item current>Current</Breadcrumb.Item>
       </Breadcrumb.Root>,
     );
@@ -135,5 +126,22 @@ describe("Breadcrumb", () => {
       "data-collapsible",
       "false",
     );
+  });
+
+  it("Tab moves through the links and skips the current page", async () => {
+    const user = userEvent.setup();
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/orders">Orders</Breadcrumb.Item>
+        <Breadcrumb.Item current>Order</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Home" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Orders" })).toHaveFocus();
+    await user.tab();
+    expect(document.body).toHaveFocus();
   });
 });

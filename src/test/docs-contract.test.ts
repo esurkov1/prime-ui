@@ -32,7 +32,6 @@ const NOT_CONVERTED = new Set([
   "avatar",
   "badge",
   "banner",
-  "breadcrumb",
   "card",
   "checkbox",
   "code-block",

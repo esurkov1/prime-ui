@@ -51,7 +51,6 @@ export type {
   BreadcrumbItemProps,
   BreadcrumbLabels,
   BreadcrumbRootProps,
-  BreadcrumbSeparatorProps,
 } from "./breadcrumb/Breadcrumb";
 export { Breadcrumb } from "./breadcrumb/Breadcrumb";
 export type { ButtonIconProps, ButtonRootProps } from "./button/Button";

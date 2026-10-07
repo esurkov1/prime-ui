@@ -1,60 +1,11 @@
-/* Layout for the Breadcrumb examples: semantic tokens only. */
+/* Layout of the Breadcrumb scenarios: semantic tokens only. */
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-5);
+/* The trail measures its own width (container query), so its wrapper needs one. */
+.wide {
   width: 100%;
-  min-width: 0;
-}
-
-.sizeRow {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-4);
-  min-width: 0;
-}
-
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.caption {
-  flex: none;
-  min-width: var(--prime-space-8);
 }
 
 /* 320px — the narrowest supported width. */
 .narrow {
   width: min(100%, calc(var(--prime-drawer-width-s) - var(--prime-space-10)));
-}
-
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-2);
-  width: 100%;
-  min-width: 0;
-}
-
-.titleRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-}
-
-.actions {
-  display: flex;
-  gap: var(--prime-space-2);
-}
-
-/* Breadcrumb is a size container: it needs a definite width inside a flex row. */
-.trail {
-  flex: 1 1 auto;
-  min-width: 0;
 }
