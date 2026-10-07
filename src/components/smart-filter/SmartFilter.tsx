@@ -1,9 +1,9 @@
-import { ChevronDown, ListFilter, Plus } from "lucide-react";
 import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
+import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Input } from "@/components/input/Input";
 import { Kbd } from "@/components/kbd/Kbd";
 import { Popover } from "@/components/popover/Popover";
@@ -13,6 +13,7 @@ import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import type { ControlSize } from "@/internal/states";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import {
   canExcludeValue,
@@ -34,8 +35,8 @@ export { matchesSmartFilter, resolveSmartFilterValues } from "./model";
 export type SmartFilterOption = {
   value: string;
   label: string;
-  /** A mark before the label: a status dot, an icon. Decorative. */
-  leading?: React.ReactNode;
+  /** A decorative icon before the label (`<Icon name="…" />`). */
+  icon?: React.ReactNode;
 };
 
 export type SmartFilterField = {
@@ -90,7 +91,7 @@ export type SmartFilterLabels = {
   remove: string;
 };
 
-export const defaultSmartFilterLabels: SmartFilterLabels = {
+const DEFAULT_LABELS: SmartFilterLabels = {
   filter: "Фильтр",
   searchPlaceholder: "Поиск",
   clearSearch: "Очистить поиск",
@@ -176,66 +177,37 @@ function SmartFilterRoot({
   children,
 }: SmartFilterRootProps) {
   const [current, setCurrent] = useControllableState<SmartFilterValue>({
-    ...(value !== undefined ? { value } : {}),
+    value,
     defaultValue: defaultValue ?? EMPTY_VALUE,
-    ...(onValueChange ? { onChange: onValueChange } : {}),
+    onChange: onValueChange,
   });
   const [text, setText] = useControllableState<string>({
-    ...(search !== undefined ? { value: search } : {}),
+    value: search,
     defaultValue: defaultSearch,
-    ...(onSearchChange ? { onChange: onSearchChange } : {}),
+    onChange: onSearchChange,
   });
   const [open, setOpen] = React.useState(false);
-  const merged = React.useMemo(() => ({ ...defaultSmartFilterLabels, ...labels }), [labels]);
 
-  const total = fields.reduce((n, field) => n + selectionSize(current[field.key]), 0);
-
-  const setSelection = React.useCallback(
-    (key: string, selection: SmartFilterSelection) =>
-      setCurrent((prev) => withSelection(prev, key, selection)),
-    [setCurrent],
-  );
-  const clearAll = React.useCallback(
-    () =>
-      setCurrent((prev) => {
-        let next = prev;
-        for (const field of fields) {
-          next = withSelection(next, field.key, { include: [], exclude: [] });
-        }
-        return next;
-      }),
-    [setCurrent, fields],
-  );
-
-  const context = React.useMemo<Ctx>(
-    () => ({
-      fields,
-      value: current,
-      setSelection,
-      clearAll,
-      total,
-      open,
-      setOpen,
-      search: text,
-      setSearch: setText,
-      labels: merged,
-      size,
-      collapsedLimit,
-    }),
-    [
-      fields,
-      current,
-      setSelection,
-      clearAll,
-      total,
-      open,
-      text,
-      setText,
-      merged,
-      size,
-      collapsedLimit,
-    ],
-  );
+  const context: Ctx = {
+    fields,
+    value: current,
+    setSelection: (key, selection) => setCurrent((prev) => withSelection(prev, key, selection)),
+    clearAll: () =>
+      setCurrent((prev) =>
+        fields.reduce(
+          (next, field) => withSelection(next, field.key, { include: [], exclude: [] }),
+          prev,
+        ),
+      ),
+    total: fields.reduce((n, field) => n + selectionSize(current[field.key]), 0),
+    open,
+    setOpen,
+    search: text,
+    setSearch: setText,
+    labels: { ...DEFAULT_LABELS, ...labels },
+    size,
+    collapsedLimit,
+  };
 
   return (
     <SmartFilterProvider value={context}>
@@ -275,7 +247,7 @@ function SmartFilterToolbar({ className }: SmartFilterToolbarProps) {
               onClick={() => setOpen(!open)}
             >
               <Button.Icon>
-                <ListFilter />
+                <Icon name="action.filter" />
               </Button.Icon>
               {labels.filter}
               {total > 0 && <Badge.Root color="blue">{total}</Badge.Root>}
@@ -424,7 +396,7 @@ function Panel() {
               >
                 {fill(labels.more, { count: options.length - collapsedLimit })}
                 <Badge.Icon>
-                  <ChevronDown />
+                  <Icon name="nav.chevronDown" />
                 </Badge.Icon>
               </Badge.Root>
             )}
@@ -437,9 +409,11 @@ function Panel() {
     sections.push({
       key: "empty",
       node: (
-        <Typography.Root as="p" variant="caption" tone="muted" className={styles.note}>
-          {fill(labels.noMatches, { fields: empty.join(", ") })}
-        </Typography.Root>
+        <EmptyPage.Root layout="compact" size={size} role="status">
+          <EmptyPage.Description>
+            {fill(labels.noMatches, { fields: empty.join(", ") })}
+          </EmptyPage.Description>
+        </EmptyPage.Root>
       ),
     });
   }
@@ -464,7 +438,9 @@ function Panel() {
 
   return (
     <>
-      <Popover.Title className={styles.srOnly}>{labels.filter}</Popover.Title>
+      <Popover.Title>
+        <VisuallyHidden>{labels.filter}</VisuallyHidden>
+      </Popover.Title>
       {sections.map((section, index) => (
         <React.Fragment key={section.key}>
           {index > 0 && <Divider.Root role="presentation" />}
@@ -510,7 +486,7 @@ function ValueToggle({ option, size, mode, canHide, query, onMode }: ValueToggle
       }}
     >
       {mode === "exclude" && `${labels.not} `}
-      {option.leading}
+      {option.icon ? <Badge.Icon>{option.icon}</Badge.Icon> : null}
       <span>
         <Highlighted text={option.label} query={query} />
       </span>
@@ -581,7 +557,7 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
         }}
       >
         <Button.Icon>
-          <Plus />
+          <Icon name="action.add" />
         </Button.Icon>
         {labels.add}
       </Button.Root>

@@ -65,7 +65,6 @@ const NOT_CONVERTED = new Set([
   "select",
   "sidebar",
   "slider",
-  "smart-filter",
   "stepper",
   "switch",
   "tabs",

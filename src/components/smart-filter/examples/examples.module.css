@@ -1,3 +1,5 @@
+/* Layout of the SmartFilter scenarios: semantic tokens only. */
+
 .stack {
   display: flex;
   flex-direction: column;
@@ -6,12 +8,8 @@
   min-width: 0;
 }
 
-.card {
-  width: 100%;
-  min-width: 0;
-}
-
-.rowMain {
+/* A request row in the list: method, route (takes the room), service. */
+.request {
   display: flex;
   align-items: center;
   gap: var(--prime-space-3);
@@ -24,29 +22,14 @@
   min-width: 0;
 }
 
-.dot {
-  flex: none;
-  width: var(--prime-space-2);
-  height: var(--prime-space-2);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-text-disabled);
-}
-
-.dot[data-online] {
-  background: var(--prime-color-palette-green-solid);
-}
-
-.presets {
+.views {
   display: flex;
   flex-wrap: wrap;
   gap: var(--prime-space-2);
 }
 
-.resolved {
-  margin: 0;
-  padding: var(--prime-space-3) var(--prime-space-4);
-  border-radius: var(--prime-radius-m);
-  background: var(--prime-color-bg-sunken);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+/* 320 px: the smallest supported viewport. */
+.narrow {
+  width: min(100%, calc(var(--prime-space-20) * 4));
+  min-width: 0;
 }

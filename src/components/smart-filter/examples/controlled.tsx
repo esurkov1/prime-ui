@@ -1,4 +1,4 @@
-/** Controlled value set from outside (preset buttons) and read back as ready-made lists with `resolveSmartFilterValues`: a hidden value of a fixed field becomes "all except" for the request. Use when filters come from a URL, a saved view or a server query. */
+/** A saved view sets the value from outside; the selection is read back as the list to ask the server for — `value`, `onValueChange`, `resolveSmartFilterValues`. */
 import {
   Button,
   resolveSmartFilterValues,
@@ -7,22 +7,21 @@ import {
   type SmartFilterValue,
   Typography,
 } from "prime-ui-kit";
-import { useState } from "react";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
 const FIELDS: SmartFilterField[] = [
-  {
-    key: "method",
-    label: "Метод",
-    options: METHODS.map((v) => ({ value: v, label: v })),
-  },
+  { key: "method", label: "Метод", options: METHODS.map((v) => ({ value: v, label: v })) },
 ];
 
+const ONLY_PUT: SmartFilterValue = { method: { include: ["PUT"], exclude: [] } };
+const NO_READS: SmartFilterValue = { method: { include: [], exclude: ["GET", "POST"] } };
+
 export default function SmartFilterControlledExample() {
-  const [value, setValue] = useState<SmartFilterValue>({});
+  const [value, setValue] = React.useState<SmartFilterValue>({});
 
   return (
     <div className={styles.stack}>
@@ -30,28 +29,18 @@ export default function SmartFilterControlledExample() {
         <SmartFilter.Toolbar />
         <SmartFilter.Chips />
       </SmartFilter.Root>
-      <div className={styles.presets}>
-        <Button.Root
-          variant="soft"
-          tone="neutral"
-          size="s"
-          onClick={() => setValue({ method: { include: ["PUT"], exclude: [] } })}
-        >
+      <div className={styles.views}>
+        <Button.Root variant="soft" tone="neutral" size="s" onClick={() => setValue(ONLY_PUT)}>
           Только PUT
         </Button.Root>
-        <Button.Root
-          variant="soft"
-          tone="neutral"
-          size="s"
-          onClick={() => setValue({ method: { include: [], exclude: ["GET", "POST"] } })}
-        >
+        <Button.Root variant="soft" tone="neutral" size="s" onClick={() => setValue(NO_READS)}>
           Без GET и POST
         </Button.Root>
         <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => setValue({})}>
           Сбросить
         </Button.Root>
       </div>
-      <Typography.Root as="div" variant="code" className={styles.resolved}>
+      <Typography.Root as="span" variant="code" tone="secondary">
         {`method: ${JSON.stringify(resolveSmartFilterValues(value.method, METHODS))}`}
       </Typography.Root>
     </div>

@@ -1,6 +1,7 @@
 # SmartFilter
 
 **Category:** selection
+**Kind:** composite
 
 > A filter bar for lists and tables: a filter button and a search with a panel of values, applied filters as removable tags, and a "show / hide" choice for every value.
 
@@ -22,166 +23,156 @@ import { SmartFilter, matchesSmartFilter, resolveSmartFilterValues } from "prime
 
 ## Anatomy
 ```
-SmartFilter.Root                  state + context, no panel of its own (flex column)
-├─ SmartFilter.Toolbar            [Filter button (count Badge)] [search Input] — the anchor of the panel
-│  └─ panel (Popover.Content flush) portaled, as wide as the toolbar; sections split by edge-to-edge Dividers
-│     ├─ query row                muted band: ghost Button «Искать «text»» + Kbd ↵, while typing
-│     ├─ field rows               Typography label · value Badges with «−» Badge.Action (· «Ещё N» Badge)
-│     ├─ no-matches row           Typography caption, while typing
+SmartFilter.Root                  state + context (flex column)
+├─ SmartFilter.Toolbar            [filter Button (count Badge)] [search Input] — the anchor of the panel
+│  └─ panel                       flush Popover as wide as the toolbar; sections split by Dividers
+│     ├─ query row                ghost Button «Искать «text»» + Kbd ↵, while typing
+│     ├─ field rows               field label · value Badges with a «−» Badge.Action · «Ещё N» Badge
+│     ├─ no matches               compact EmptyPage naming the fields with nothing found
 │     └─ footer                   hint · count · Reset Button
-└─ SmartFilter.Chips              applied filters as Badge ×N · add / clear all Buttons (nothing without filters)
+└─ SmartFilter.Chips              applied filters as removable Badges · add / clear all Buttons
 ```
-Everything is built from kit components (Button, Badge, Input, Icon, Popover, Divider, Typography, Kbd, Badge with `onRemove`, `onPress` and `Badge.Action`); the component's own CSS only lays them out. The toolbar and the chips are separate parts so a page can put them in different places (the toolbar in a header strip, the chips under it). The panel opens on the filter button and when the search gets focus.
+The toolbar and the chips are separate parts so a page can put them in different places; both only need to be inside `Root`.
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 ### SmartFilter.Root
-`<div>`. No ref forwarding.
+No ref. A `<div>` (flex column) with the state and the context; sets `data-size`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `fields` | `readonly SmartFilterField[]` | — (required) | Fields of this screen, in display order. Empty: only the search remains, no button. Pass a stable reference. |
-| `value` | `SmartFilterValue` | — | Controlled selection per field key. |
+| `fields` | `readonly SmartFilterField[]` | — (required) | Fields of this screen, in display order; empty — only the search. Pass a stable reference. |
+| `value` | `SmartFilterValue` | — | Selection per field key, controlled: `{ include, exclude }` per field. |
 | `defaultValue` | `SmartFilterValue` | `{}` | Initial selection, uncontrolled. |
-| `onValueChange` | `(value: SmartFilterValue) => void` | — | Called with the whole next value. Keys of fields this root does not show are kept. |
-| `search` | `string` | — | Controlled search text. |
+| `onValueChange` | `(value: SmartFilterValue) => void` | — | The whole next value; keys of fields this root does not show are kept. |
+| `search` | `string` | — | Search text, controlled. |
 | `defaultSearch` | `string` | `""` | Initial search text, uncontrolled. |
-| `onSearchChange` | `(search: string) => void` | — | Called on every keystroke (debounce in the owner when it queries a server). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the button, the search, the tags and the panel. |
+| `onSearchChange` | `(search: string) => void` | — | Every keystroke; debounce in the owner when it asks a server. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the filter button, the search, the tags and the panel. |
 | `collapsedLimit` | `number` | `12` | Values of one field shown before «Ещё N» (not while searching). |
-| `labels` | `Partial<SmartFilterLabels>` | Russian defaults | Built-in strings, see Accessibility. |
-| `className` | `string` | — | Extra class on the root. |
-| `children` | `ReactNode` | — (required) | `SmartFilter.Toolbar` and `SmartFilter.Chips`. |
-
-Sets `data-size`.
+| `labels` | `Partial<SmartFilterLabels>` | — | Built-in strings, see Labels. |
+| `className` | `string` | — | Class on the root. |
+| `children` | `ReactNode` | — (required) | `SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside. |
 
 ### SmartFilter.Toolbar
-`<div>` (the anchor of the panel). No ref forwarding. Throws outside `SmartFilter.Root`.
+No ref. A `<div>`: the filter Button (a count Badge while filters apply) and a search Input; the anchor of the panel, a flush Popover.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class (e.g. a flex-basis). |
-
-The button is a `Button` (`soft` neutral, toolbar `size`) with a blue `Badge` counter while filters apply; the search is an `Input` (`type="search"`, `Icon action.search`) with a clear button. Enter and Escape in the search close the panel.
+| `className` | `string` | — | Class on the toolbar. |
 
 ### SmartFilter.Chips
-`<div>`. No ref forwarding. Renders nothing without filters.
+No ref. A `<div>` of applied filters as removable Badges with «Добавить фильтр» and «Сбросить все»; renders nothing without filters.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `className` | `string` | — | Extra class. |
-
-Each applied value is a removable `Badge`: blue «Метод: PUT» for show, red «Сервис: не billing» for hide; × removes it. Badges use the badge tier of the root `size` (24px at `m`), smaller than the toolbar. "Добавить фильтр" (ghost button) opens the panel, "Сбросить все" clears every field of this root.
+| `className` | `string` | — | Class on the chips row. |
 
 ### SmartFilterField
-| Key | Type | Default | Description |
+One entry of `fields`: data, not a part. Selected values missing from `options` stay visible so they can be removed.
+
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `key` | `string` | — | Key of the field in the value. |
-| `label` | `string` | — | Field name in the panel and the chips. |
-| `options` | `SmartFilterOption[]` | — | `{ value, label, leading? }`: `leading` is a decorative mark before the label (a status dot, an icon). |
+| `key` | `string` | — (required) | Key of the field in the value. |
+| `label` | `string` | — (required) | Field name in the panel and the chips. |
+| `options` | `{ value: string; label: string; icon?: ReactNode }[]` | — (required) | Values; `icon` is a decorative kit Icon before the label. |
 | `finite` | `boolean` | `true` | A fixed set: hiding every value is refused. `false` for an open set (services, users). |
 
-Selected values that are missing from `options` (a deleted service) stay visible so they can be removed.
-
-### SmartFilterValue
-`Record<string, { include: string[]; exclude: string[] }>`. `include` = show only these (empty = any), `exclude` = hide these. A value is never in both; a field without values is absent.
-
-### Helpers
-| Export | Use |
-|---|---|
-| `matchesSmartFilter(selection, value)` | Client-side check of one value: `include` empty means any, `exclude` rejects. `selection` may be `undefined` (passes). |
-| `resolveSmartFilterValues(selection, all)` | For a fixed field: the list to ask a server for. "Hide" becomes "all except"; `[]` means no filter (also when everything is included). |
+### matchesSmartFilter · resolveSmartFilterValues
+Helpers. `matchesSmartFilter(selection, value)` checks one value on the client (`include` empty = any, `exclude` rejects). `resolveSmartFilterValues(selection, all)` turns a fixed field into the list to ask a server for: «hide» becomes «all except», `[]` — no filter.
 
 ## Variants
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | toolbar 28; value and filter tags 16; secondary buttons `xs` | Dense table toolbars | |
-| `s` | toolbar 32; tags 20; buttons `xs` | Compact toolbars | |
-| `m` | toolbar 36; tags 24; buttons `xs` | Most pages | yes |
-| `l` | toolbar 40; tags 28; buttons `s` | Roomier pages | |
-| `xl` | toolbar 48; tags 32; buttons `m` | Hero search | |
+| `xs` | toolbar 28; value and filter tags 16; secondary buttons `xs` | dense table toolbars | |
+| `s` | toolbar 32; tags 20; buttons `xs` | compact toolbars | |
+| `m` | toolbar 36; tags 24; buttons `xs` | most pages | yes |
+| `l` | toolbar 40; tags 28; buttons `s` | roomier pages | |
+| `xl` | toolbar 48; tags 32; buttons `m` | hero search | |
 
-Values and applied filters are `Badge`s of the root `size` (badge tiers sit below control tiers), so plates are always smaller than the toolbar's button and field.
+### field `finite`
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `true` | the «−» of the last shown value is disabled | fixed sets (method, status) | yes |
+| `false` | every value can be hidden | open sets (services, users) | |
 
 ## States
-| State | How it shows |
-|---|---|
-| closed / open | The filter button has `aria-expanded` and `data-state`; the panel is a `Popover` below the toolbar. |
-| value neutral | Gray `Badge`. |
-| value shown | Blue `Badge`, `aria-pressed="true"`, `data-mode="include"`. |
-| value hidden | Red `Badge` with «НЕ» before the label, `data-mode="exclude"`; its «−» stays visible (`persistent`) and unhides it. |
-| hover / focus of a value | The «−» `Badge.Action` slides in at the end and the text moves toward the start; the badge width does not change, neighbours do not move. |
-| press | Shows only this value (press again to clear). Alt+click and Shift+Enter hide. |
-| cannot hide | The «−» is disabled: hiding it would leave a fixed field empty. |
-| searching | The panel shows only matching values with the match underlined, fields with nothing found are named in a note, and a row "Искать «…»" closes the panel. |
-| no filters | No count on the button, no `Chips`. |
+| State | Driven by | DOM |
+|---|---|---|
+| closed / open | filter button, search focus | button `aria-expanded`; the panel is a Popover below the toolbar |
+| value neutral | no selection | gray Badge |
+| value shown | press | blue Badge, `aria-pressed="true"`, `data-mode="include"` |
+| value hidden | «−», Alt+click, Shift+Enter | red Badge with «НЕ», `data-mode="exclude"`; its «−» stays visible and unhides |
+| cannot hide | last value of a `finite` field | the «−» is disabled |
+| searching | `search` | only matching values, the match underlined; fields with nothing found in a compact EmptyPage; the «Искать» row closes the panel |
+| no filters | empty value | no count on the button, no Chips |
 
 ## Layout & spacing
-- The panel is a `flush` Popover as wide as the toolbar and aligned to its start. Every section (query band, field rows, no-matches row, footer) is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`; footer `--prime-space-2` × `--prime-space-4`), and `Divider`s between them run edge to edge. Field label column `--prime-space-24`, label and values on one baseline.
-- Values wrap with `--prime-space-2` gaps; chips wrap the same way with "Сбросить все" pushed to the end.
-- The root is a flex column (`--prime-space-3`): `Toolbar` then `Chips`. The parts only need to be inside `Root`, not direct children: put the toolbar in a header strip and the chips in another container if the page asks for it.
+- The panel is a flush Popover as wide as the toolbar; every section is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`, footer `--prime-space-2` × `--prime-space-4`), Dividers run edge to edge, the field label column is `--prime-space-24`.
+- Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end.
+- The root is a flex column (`--prime-space-3`): Toolbar, then Chips.
 
 ## Accessibility
-- The filter button: `aria-expanded`, `aria-haspopup="dialog"`; the panel is a non-modal `role="dialog"` named by its (visually hidden) title; Escape closes it, an outside press too; presses on the toolbar do not.
-- Keyboard: Tab reaches each value and then its «−» (revealed on focus); Enter / Space on a value shows it; **Shift+Enter** hides it; **Alt+click** hides with the mouse.
-- Values are toggle buttons (`aria-pressed` while shown); the «−» has its own name («Скрыть …» / «Не скрывать …»). A hidden value carries the «НЕ» text, so meaning is never in color alone.
-- The count and the chips tell the state without opening the panel; every chip has a remove button with a name.
 
-`labels` keys (`{query}`, `{value}`, `{field}`, `{fields}`, `{count}` are substituted):
-
-| Key | Default |
+### Keyboard
+| Key | Action |
 |---|---|
-| `filter` | `Фильтр` |
-| `searchPlaceholder` | `Поиск` |
-| `clearSearch` | `Очистить поиск` |
-| `searchText` | `Искать «{query}»` |
-| `noMatches` | `{fields} — нет совпадений` |
-| `hint` | `Нажмите значение, чтобы показать только его; «−» справа — скрыть` |
-| `count` | `Фильтров: {count}` |
-| `reset` | `Сбросить` |
-| `more` | `Ещё {count}` |
-| `add` | `Добавить фильтр` |
-| `clearAll` | `Сбросить все` |
-| `showValue` | `Показать только {value}` |
-| `hideValue` | `Скрыть {value}` |
-| `unhideValue` | `Не скрывать {value}` |
-| `not` | `НЕ` |
-| `chipInclude` | `{field}: {value}` |
-| `chipExclude` | `{field}: не {value}` |
-| `remove` | `Убрать фильтр «{value}»` |
+| `Tab` | Moves through the panel values and their «−» (shown on focus). |
+| `Enter` · `Space` | Shows only this value; pressing again clears it. |
+| `Shift + Enter` | Hides the value. |
+| `Enter` · `Escape` | In the search, close the panel. |
+
+### ARIA
+- The filter button has `aria-expanded` and `aria-haspopup="dialog"`; the panel is a non-modal `role="dialog"` named by a visually hidden `labels.filter` title.
+- Values are toggle buttons with `aria-pressed`; the «−» has its own name (`labels.hideValue` / `labels.unhideValue`); a hidden value carries the «НЕ» text, so meaning is never in color alone.
+- Fields with nothing found are announced through `role="status"`.
+- Every filter tag has a remove button named by `labels.remove`.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+| Key | Default | Used for |
+|---|---|---|
+| `filter` | `"Фильтр"` | Filter button and panel name. |
+| `searchPlaceholder` | `"Поиск"` | Placeholder and name of the search. |
+| `clearSearch` | `"Очистить поиск"` | Name of the search clear button. |
+| `searchText` | `"Искать «{query}»"` | The text search row while typing. |
+| `noMatches` | `"{fields} — нет совпадений"` | Fields with nothing found while typing (compact EmptyPage). |
+| `hint` | `"Нажмите значение, чтобы показать только его; «−» справа — скрыть"` | Panel footer hint. |
+| `count` | `"Фильтров: {count}"` | Panel footer counter. |
+| `reset` | `"Сбросить"` | Panel footer reset. |
+| `more` | `"Ещё {count}"` | Collapsed values of a field. |
+| `add` | `"Добавить фильтр"` | Chips row: opens the panel. |
+| `clearAll` | `"Сбросить все"` | Chips row: clears every field. |
+| `showValue` | `"Показать только {value}"` | Title of a value. |
+| `hideValue` | `"Скрыть {value}"` | Name of the «−» of a value. |
+| `unhideValue` | `"Не скрывать {value}"` | Name of the «−» of a hidden value. |
+| `not` | `"НЕ"` | Prefix of a hidden value. |
+| `chipInclude` | `"{field}: {value}"` | Text of a «show» tag. |
+| `chipExclude` | `"{field}: не {value}"` | Text of a «hide» tag. |
+| `remove` | `"Убрать фильтр «{value}»"` | Name of a tag's remove button. |
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [http-requests.tsx](examples/http-requests.tsx) | Toolbar + chips over a list narrowed with `matchesSmartFilter` and the search text | The main case: a list with several filterable fields |
-| [many-values.tsx](examples/many-values.tsx) | Open field with twenty services, status dots, `collapsedLimit`, a preset hidden value | Services, users, projects |
-| [controlled.tsx](examples/controlled.tsx) | Controlled value set by preset buttons, read back with `resolveSmartFilterValues` | Filters from a URL, a saved view or a server query |
-| [sizes.tsx](examples/sizes.tsx) | `s`, `m`, `l` | Matching the surrounding controls |
-
-```tsx
-import { SmartFilter } from "prime-ui-kit";
-
-export function Example() {
-  const [value, setValue] = useState({});
-  return (
-    <SmartFilter.Root fields={fields} value={value} onValueChange={setValue}>
-      <SmartFilter.Toolbar />
-      <SmartFilter.Chips />
-    </SmartFilter.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | Filters above a request list: the filter button and the search, applied filters as tags, rows narrowed by the value and the text — `fields`, `value`, `search`, `matchesSmartFilter`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size tier: the filter button, the search, the tags and the panel follow one tier — `size`. |
+| [many-values.tsx](examples/many-values.tsx) | An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and underlines the match — `finite`, `icon`, `collapsedLimit`. |
+| [controlled.tsx](examples/controlled.tsx) | A saved view sets the value from outside; the selection is read back as the list to ask the server for — `value`, `onValueChange`, `resolveSmartFilterValues`. |
+| [narrow.tsx](examples/narrow.tsx) | A 320 px column: the search shrinks next to the filter button and the tags wrap under them — `size`. |
 
 ## Mistakes
 - Creating `fields` inline on every render → pass a stable array (a module constant or `useMemo`).
-- A fixed field marked `finite: false` → the user can hide every value and get an empty list; leave `finite` on for fixed sets.
-- Filtering the list yourself with `includes` → use `matchesSmartFilter`, which treats an empty `include` as "any" and applies `exclude`.
-- Sending `include` to a server for a hidden value of a fixed field → use `resolveSmartFilterValues`, it turns "hide" into "all except".
+- A fixed field marked `finite: false` → the user can hide every value and get an empty list.
+- Filtering the list with `includes` → use `matchesSmartFilter` (empty `include` is "any", `exclude` rejects).
+- Sending `include` to a server for a hidden value of a fixed field → use `resolveSmartFilterValues`.
 - Putting `Chips` outside `SmartFilter.Root` → every part needs the root.
-- A second filter row of buttons next to the toolbar → fields belong in `fields`.
-- Restyling values or tags with own CSS → they are kit `Badge`s; change the kit, not the filter.
+- A second row of filter buttons next to the toolbar → fields belong in `fields`.
 
 ## Related
-[Popover](../popover/COMPONENT.md) · [Badge](../badge/COMPONENT.md) · [Input](../input/COMPONENT.md) · [TagSelect](../tag-select/COMPONENT.md) · [DataTable](../data-table/COMPONENT.md)
+- **Built from:** [Button](../button/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Input](../input/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Typography](../typography/COMPONENT.md)
+- **See also:** [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)
