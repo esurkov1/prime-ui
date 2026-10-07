@@ -1,6 +1,6 @@
 # Dropdown
 
-**Category:** overlays (Оверлеи)
+**Category:** overlays
 
 > A menu of actions that opens from a trigger: groups, a profile header and destructive items.
 

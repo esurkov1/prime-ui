@@ -1,6 +1,6 @@
 # FileUpload
 
-**Category:** inputs (Поля ввода)
+**Category:** inputs
 
 > File picker zone with drag and drop, plus presentational parts for the list of selected files.
 

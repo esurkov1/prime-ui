@@ -1,6 +1,6 @@
 # PageContent
 
-**Category:** layout (Раскладка)
+**Category:** layout
 
 > Page structure inside the main column: title, description, page actions and content sections.
 

@@ -1,6 +1,6 @@
 # LinkButton
 
-**Category:** actions (Действия)
+**Category:** actions
 
 > A real link styled as a text action, sized on the control tiers.
 

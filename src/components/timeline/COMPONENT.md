@@ -1,6 +1,6 @@
 # Timeline
 
-**Category:** data-display (Данные)
+**Category:** data-display
 
 > An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels.
 

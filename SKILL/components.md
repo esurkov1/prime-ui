@@ -5,7 +5,7 @@ Index of every kit component, grouped like the playground menu. Each row links t
 Paths are relative to this folder in the kit repository; in a consumer project prefix them with
 `node_modules/prime-ui-kit/` instead of `../`.
 
-## Действия (`actions`)
+## Actions (`actions`)
 
 Explicit actions on click.
 
@@ -15,7 +15,7 @@ Explicit actions on click.
 | ButtonGroup | Joined buttons and toggle segments in one neutral bar. | [COMPONENT.md](../src/components/button-group/COMPONENT.md) · [examples](../src/components/button-group/examples/) |
 | LinkButton | A real link styled as a text action, sized on the control tiers. | [COMPONENT.md](../src/components/link-button/COMPONENT.md) · [examples](../src/components/link-button/examples/) |
 
-## Поля ввода (`inputs`)
+## Inputs (`inputs`)
 
 Typing values and field anatomy: label, hint, error.
 
@@ -28,7 +28,7 @@ Typing values and field anatomy: label, hint, error.
 | Label | Field label (native `<label>`) with required and optional markers. | [COMPONENT.md](../src/components/label/COMPONENT.md) · [examples](../src/components/label/examples/) |
 | Hint | Help text or a validation error under a field. | [COMPONENT.md](../src/components/hint/COMPONENT.md) · [examples](../src/components/hint/examples/) |
 
-## Выбор (`selection`)
+## Selection (`selection`)
 
 Choosing from options: toggles, lists, ranges, dates, colors.
 
@@ -44,7 +44,7 @@ Choosing from options: toggles, lists, ranges, dates, colors.
 | Datepicker | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). | [COMPONENT.md](../src/components/datepicker/COMPONENT.md) · [examples](../src/components/datepicker/examples/) |
 | ColorPicker | Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. | [COMPONENT.md](../src/components/color-picker/COMPONENT.md) · [examples](../src/components/color-picker/examples/) |
 
-## Данные (`data-display`)
+## Data display (`data-display`)
 
 Showing data and labels: badges, tags, avatars, cards, tables, feeds, code.
 
@@ -59,7 +59,7 @@ Showing data and labels: badges, tags, avatars, cards, tables, feeds, code.
 | Timeline | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. | [COMPONENT.md](../src/components/timeline/COMPONENT.md) · [examples](../src/components/timeline/examples/) |
 | CodeBlock | A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host. | [COMPONENT.md](../src/components/code-block/COMPONENT.md) · [examples](../src/components/code-block/examples/) |
 
-## Обратная связь (`feedback`)
+## Feedback (`feedback`)
 
 System messages, progress and empty states.
 
@@ -72,7 +72,7 @@ System messages, progress and empty states.
 | ProgressCircle | Circular progress indicator: a track, a rounded arc and optional content in the center. | [COMPONENT.md](../src/components/progress-circle/COMPONENT.md) · [examples](../src/components/progress-circle/examples/) |
 | EmptyPage | Empty state of a page or a block: icon, title, explanation and an action. | [COMPONENT.md](../src/components/empty-page/COMPONENT.md) · [examples](../src/components/empty-page/examples/) |
 
-## Навигация (`navigation`)
+## Navigation (`navigation`)
 
 Moving between views, places and steps.
 
@@ -83,7 +83,7 @@ Moving between views, places and steps.
 | Pagination | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. | [COMPONENT.md](../src/components/pagination/COMPONENT.md) · [examples](../src/components/pagination/examples/) |
 | Stepper | Steps of a multi-step process with pending, active, completed and error statuses. | [COMPONENT.md](../src/components/stepper/COMPONENT.md) · [examples](../src/components/stepper/examples/) |
 
-## Оверлеи (`overlays`)
+## Overlays (`overlays`)
 
 Floating layers above the page, from tooltip to modal.
 
@@ -96,7 +96,7 @@ Floating layers above the page, from tooltip to modal.
 | Drawer | A modal side panel that slides in from the edge: filters, forms and record details. | [COMPONENT.md](../src/components/drawer/COMPONENT.md) · [examples](../src/components/drawer/examples/) |
 | CommandMenu | A command palette in a dialog: a search field that filters a list of commands and pages (⌘K). | [COMPONENT.md](../src/components/command-menu/COMPONENT.md) · [examples](../src/components/command-menu/examples/) |
 
-## Раскладка (`layout`)
+## Layout (`layout`)
 
 App frame, page regions, disclosure, separators, scrolling.
 
@@ -109,7 +109,7 @@ App frame, page regions, disclosure, separators, scrolling.
 | Divider | A hairline separator, horizontal or vertical, with or without a label. | [COMPONENT.md](../src/components/divider/COMPONENT.md) · [examples](../src/components/divider/examples/) |
 | ScrollContainer | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents. | [COMPONENT.md](../src/components/scroll-container/COMPONENT.md) · [examples](../src/components/scroll-container/examples/) |
 
-## Основа (`foundations`)
+## Foundations (`foundations`)
 
 Text roles.
 
@@ -117,7 +117,7 @@ Text roles.
 |---|---|---|
 | Typography | Text roles of the Golos Text type scale applied to any text element, with reading-width guidance. | [COMPONENT.md](../src/components/typography/COMPONENT.md) · [examples](../src/components/typography/examples/) |
 
-## Инфраструктура (`infrastructure`)
+## Infrastructure (`infrastructure`)
 
 Docs tooling, not product UI.
 

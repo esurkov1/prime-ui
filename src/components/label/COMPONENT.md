@@ -1,6 +1,6 @@
 # Label
 
-**Category:** inputs (Поля ввода)
+**Category:** inputs
 
 > Field label (native `<label>`) with required and optional markers.
 

@@ -1,6 +1,6 @@
 # Datepicker
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`).
 
@@ -12,7 +12,7 @@
 
 ## When not to use
 - Typing a date with a mask (passport fields, very old dates) → use [Input](../input/COMPONENT.md) instead.
-- Choosing a period from a few fixed options only (Неделя / Месяц / Год) → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Select](../select/COMPONENT.md) instead.
+- Choosing a period from a few fixed options only (week / month / year) → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Select](../select/COMPONENT.md) instead.
 - Time only → use [Input](../input/COMPONENT.md) instead.
 
 ## Import

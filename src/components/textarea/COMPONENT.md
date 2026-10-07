@@ -1,6 +1,6 @@
 # Textarea
 
-**Category:** inputs (Поля ввода)
+**Category:** inputs
 
 > Multi-line text field with label, hint, error and a character counter; grows with its content by default.
 

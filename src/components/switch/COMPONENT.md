@@ -1,6 +1,6 @@
 # Switch
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > An on/off switch for a setting that takes effect immediately.
 

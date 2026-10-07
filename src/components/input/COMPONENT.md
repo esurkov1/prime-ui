@@ -1,6 +1,6 @@
 # Input
 
-**Category:** inputs (Поля ввода)
+**Category:** inputs
 
 > Single-line text field with label, hint, error and slots for icons, affixes, a badge, a clear button and a counter.
 

@@ -1,6 +1,6 @@
 # Breadcrumb
 
-**Category:** navigation (Навигация)
+**Category:** navigation
 
 > Breadcrumbs: the path to the current page.
 

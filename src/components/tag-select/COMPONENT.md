@@ -1,6 +1,6 @@
 # TagSelect
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > A multi-select field that shows the chosen values as coloured tags, filters as you type and can create new tags.
 

@@ -1,6 +1,6 @@
 # Pagination
 
-**Category:** navigation (Навигация)
+**Category:** navigation
 
 > Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view.
 

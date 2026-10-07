@@ -1,6 +1,6 @@
 # SegmentedProgressBar
 
-**Category:** feedback (Обратная связь)
+**Category:** feedback
 
 > One bar made of proportional segments: storage by type, task statuses, a funnel or quotas.
 

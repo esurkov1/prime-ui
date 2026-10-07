@@ -1,6 +1,6 @@
 # Radio
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > Radio buttons for choosing exactly one option out of a small visible set.
 

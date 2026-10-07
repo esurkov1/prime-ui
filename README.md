@@ -30,6 +30,27 @@ every screen you build looks like it was drawn by the same hand.
 
 ---
 
+## Use with AI assistants
+
+prime-ui-kit is built to be used by coding agents (Claude Code, Cursor, Codex, …) as well as people:
+
+1. **Install the agent skill** — it teaches the agent the design rules, the API and page recipes:
+
+   ```bash
+   npx degit esurkov1/prime-ui/SKILL .claude/skills/prime-ui-kit
+   ```
+
+   Other agents: copy the same folder into their skills or rules directory
+   ([details](#install-the-skill)).
+2. **The docs are already on disk.** Every component ships `COMPONENT.md` (full API, variants, states,
+   a11y, mistakes) and copyable `examples/*.tsx` in `node_modules/prime-ui-kit/src/components/<name>/`,
+   matching the installed version.
+3. **Ask for screens in plain words** — "build an orders list with filters and a table", "review this
+   page against the design system". The skill makes the agent pick kit components, apply the spacing
+   scale, wire every state and run a checklist before handing the screen over.
+
+---
+
 ## What's new in 0.9.0
 
 - **API v1.** One vocabulary across the kit: `size`, `variant`, `tone`, `color`, `invalid/hint/error`,
@@ -87,22 +108,22 @@ export function App() {
       nav={
         <Sidebar.Root>
           <Sidebar.Content>
-            <Sidebar.Item active>Клиенты</Sidebar.Item>
+            <Sidebar.Item active>Clients</Sidebar.Item>
           </Sidebar.Content>
         </Sidebar.Root>
       }
     >
       <PageContent.Section>
         <PageContent.Header>
-          <PageContent.Title>Новый клиент</PageContent.Title>
+          <PageContent.Title>New client</PageContent.Title>
         </PageContent.Header>
         <PageContent.Body>
-          <Input.Root label="Email" required hint="Пришлём приглашение">
+          <Input.Root label="Email" required hint="We will send an invitation">
             <Input.Wrapper>
               <Input.Field type="email" placeholder="name@company.ru" />
             </Input.Wrapper>
           </Input.Root>
-          <Button.Root>Пригласить</Button.Root>
+          <Button.Root>Invite</Button.Root>
         </PageContent.Body>
       </PageContent.Section>
     </AppShell.Template>
@@ -140,7 +161,7 @@ The full contract lives in [`docs/foundation.md`](https://github.com/esurkov1/pr
 Every link opens the full reference: anatomy, every prop with its default, every variant, states,
 accessibility, examples and common mistakes.
 
-### Действия (`actions`)
+### Actions (`actions`)
 
 | Component | What it is for |
 |---|---|
@@ -148,7 +169,7 @@ accessibility, examples and common mistakes.
 | [**ButtonGroup**](https://github.com/esurkov1/prime-ui/blob/main/src/components/button-group/COMPONENT.md) | Joined buttons and toggle segments in one neutral bar. |
 | [**LinkButton**](https://github.com/esurkov1/prime-ui/blob/main/src/components/link-button/COMPONENT.md) | A real link styled as a text action, sized on the control tiers. |
 
-### Поля ввода (`inputs`)
+### Inputs (`inputs`)
 
 | Component | What it is for |
 |---|---|
@@ -159,7 +180,7 @@ accessibility, examples and common mistakes.
 | [**Label**](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) | Field label (native `<label>`) with required and optional markers. |
 | [**Hint**](https://github.com/esurkov1/prime-ui/blob/main/src/components/hint/COMPONENT.md) | Help text or a validation error under a field. |
 
-### Выбор (`selection`)
+### Selection (`selection`)
 
 | Component | What it is for |
 |---|---|
@@ -173,7 +194,7 @@ accessibility, examples and common mistakes.
 | [**Datepicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/datepicker/COMPONENT.md) | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). |
 | [**ColorPicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-picker/COMPONENT.md) | Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. |
 
-### Данные (`data-display`)
+### Data display (`data-display`)
 
 | Component | What it is for |
 |---|---|
@@ -186,7 +207,7 @@ accessibility, examples and common mistakes.
 | [**Timeline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/timeline/COMPONENT.md) | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. |
 | [**CodeBlock**](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) | A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host. |
 
-### Обратная связь (`feedback`)
+### Feedback (`feedback`)
 
 | Component | What it is for |
 |---|---|
@@ -197,7 +218,7 @@ accessibility, examples and common mistakes.
 | [**ProgressCircle**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) | Circular progress indicator: a track, a rounded arc and optional content in the center. |
 | [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty state of a page or a block: icon, title, explanation and an action. |
 
-### Навигация (`navigation`)
+### Navigation (`navigation`)
 
 | Component | What it is for |
 |---|---|
@@ -206,7 +227,7 @@ accessibility, examples and common mistakes.
 | [**Pagination**](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. |
 | [**Stepper**](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) | Steps of a multi-step process with pending, active, completed and error statuses. |
 
-### Оверлеи (`overlays`)
+### Overlays (`overlays`)
 
 | Component | What it is for |
 |---|---|
@@ -217,7 +238,7 @@ accessibility, examples and common mistakes.
 | [**Drawer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) | A modal side panel that slides in from the edge: filters, forms and record details. |
 | [**CommandMenu**](https://github.com/esurkov1/prime-ui/blob/main/src/components/command-menu/COMPONENT.md) | A command palette in a dialog: a search field that filters a list of commands and pages (⌘K). |
 
-### Раскладка (`layout`)
+### Layout (`layout`)
 
 | Component | What it is for |
 |---|---|
@@ -228,13 +249,13 @@ accessibility, examples and common mistakes.
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator, horizontal or vertical, with or without a label. |
 | [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents. |
 
-### Основа (`foundations`)
+### Foundations (`foundations`)
 
 | Component | What it is for |
 |---|---|
 | [**Typography**](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md) | Text roles of the Golos Text type scale applied to any text element, with reading-width guidance. |
 
-### Инфраструктура (`infrastructure`)
+### Infrastructure (`infrastructure`)
 
 | Component | What it is for |
 |---|---|
@@ -299,8 +320,8 @@ git clone --depth 1 https://github.com/esurkov1/prime-ui.git /tmp/prime-ui
 cp -r /tmp/prime-ui/SKILL .claude/skills/prime-ui-kit
 ```
 
-The agent picks the skill up automatically when you ask it to build or review a screen («сверстай
-страницу настроек на prime-ui-kit», «проверь экран на дизайн-систему»). To update it, run the same
+The agent picks the skill up automatically when you ask it to build or review a screen ("build a
+settings page with prime-ui-kit", "check this screen against the design system"). To update it, run the same
 command again with `--force` (degit) or re-copy the folder.
 
 ## Package exports

@@ -1,6 +1,6 @@
 # Slider
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > A slider for picking an approximate numeric value within a range, with an optional label and value readout.
 
@@ -11,7 +11,7 @@
 
 ## When not to use
 - An exact number that users type (quantity, amount) → use [Input](../input/COMPONENT.md) with `type="number"` instead.
-- One of a few named levels (Низкий / Средний / Высокий) → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Radio](../radio/COMPONENT.md) instead.
+- One of a few named levels (low / medium / high) → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Radio](../radio/COMPONENT.md) instead.
 - A two-handle range (from–to) → not supported; use two inputs.
 - On/off → use [Switch](../switch/COMPONENT.md) instead.
 

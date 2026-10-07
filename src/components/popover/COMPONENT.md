@@ -1,6 +1,6 @@
 # Popover
 
-**Category:** overlays (Оверлеи)
+**Category:** overlays
 
 > A non-modal floating panel anchored to a trigger: short forms, filters, confirmations, explanations.
 

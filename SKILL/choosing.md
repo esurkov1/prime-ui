@@ -7,15 +7,15 @@ confuse. Links: [components.md](components.md).
 
 | The user needs to… | Category |
 |---|---|
-| trigger an action (save, delete, go on) | Действия — Button, ButtonGroup, LinkButton |
-| type a value (text, number, code, file) | Поля ввода — Input, Textarea, DigitInput, FileUpload |
-| pick from options, toggle, set a range, date or color | Выбор — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, TagSelect, Datepicker, ColorPicker |
-| see data: status, labels, people, numbers, rows, events | Данные — Badge, Tag, Avatar, Kbd, Card, DataTable, Timeline, CodeBlock |
-| learn what happened or how far along it is | Обратная связь — Banner, Notification, ProgressBar, SegmentedProgressBar, ProgressCircle, EmptyPage |
-| move between views, places, steps | Навигация — Tabs, Breadcrumb, Pagination, Stepper |
-| see something on top of the page | Оверлеи — Tooltip, Popover, Dropdown, Modal, Drawer, CommandMenu |
-| get the app frame and page structure | Раскладка — AppShell, Sidebar, PageContent, Accordion, Divider, ScrollContainer |
-| style text | Typography |
+| trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
+| type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload |
+| pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, TagSelect, Datepicker, ColorPicker |
+| see data: status, labels, people, numbers, rows, events | Data display — Badge, Tag, Avatar, Kbd, Card, DataTable, Timeline, CodeBlock |
+| learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, SegmentedProgressBar, ProgressCircle, EmptyPage |
+| move between views, places, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper |
+| see something on top of the page | Overlays — Tooltip, Popover, Dropdown, Modal, Drawer, CommandMenu |
+| get the app frame and page structure | Layout — AppShell, Sidebar, PageContent, Accordion, Divider, ScrollContainer |
+| style text | Foundations — Typography |
 
 ## 2. Inside a category
 
@@ -60,12 +60,12 @@ SegmentedProgressBar; compact goal / KPI ring → ProgressCircle. Nothing to sho
 | Badge / Tag | Badge is a read-only label (status, count). Tag is a value the user added or can remove (filter, keyword, selected option). |
 | Banner / Notification / Hint | Banner: persistent message in the page flow about a page/section state (trial ends, maintenance). Notification: transient toast about the result of an action (saved, failed). Hint: help or validation text under one field. |
 | Button / LinkButton | Button does something (submit, open, delete). LinkButton goes somewhere (a URL, «Подробнее», «Все заказы»). |
-| Checkbox / Switch / Radio | Checkbox: choice submitted later with a button, can be multiple. Switch: on/off that applies at once (no Save button). Radio: one of several, submitted later. A «privacy» toggle inside a create form that is submitted → Checkbox. |
+| Checkbox / Switch / Radio | Checkbox: choice submitted later with a button, can be multiple. Switch: on/off that applies at once (no Save button). Radio: one of several, submitted later. A privacy toggle inside a create form that is submitted → Checkbox. |
 | Card / plain section | Card for a bounded block of related content that stands out on the canvas (metric, panel, list). A page section with a heading inside `PageContent.Body` needs no card when it is the only thing in its region. Never wrap a single field or a whole page in a Card. |
 | EmptyPage / empty DataTable | Empty table (no rows yet or nothing matches the filter): use the DataTable `empty` prop — keep headers and toolbar. Whole page / region with no data at all (first run): EmptyPage with an action. |
 | Accordion / Tabs | Accordion when the user may need several sections open or reads them in order (FAQ, settings groups). Tabs when sections are alternatives viewed one at a time. |
 | Divider / gap | Divider inside a block between rows or a form and its footer. Between blocks use air (`gap`), not lines. |
-| Breadcrumb / back button | Breadcrumb on pages below a top-level section (Заказы → № 48 213) and deeper; not on top-level pages. A single «Назад» without hierarchy → `LinkButton` or `Button variant="ghost"`. |
+| Breadcrumb / back button | Breadcrumb on pages below a top-level section (Orders → order #48213) and deeper; not on top-level pages. A single “Back” without hierarchy → `LinkButton` or `Button variant="ghost"`. |
 | Pagination / infinite scroll | Pagination for tables people return to or reference; `DataTable` `infiniteScroll` for feeds. |
 | Stepper / Tabs | Stepper for a sequential process with completion status; Tabs for non-sequential views. |
 | Modal confirm / undo toast | Irreversible destructive action → Modal with `tone="danger"` confirm and `closeOnOutsideClick={false}`. Reversible action → do it, show a Notification with an undo action. |

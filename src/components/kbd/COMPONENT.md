@@ -1,6 +1,6 @@
 # Kbd
 
-**Category:** data-display (Данные)
+**Category:** data-display
 
 > A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`.
 

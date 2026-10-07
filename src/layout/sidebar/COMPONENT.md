@@ -1,6 +1,6 @@
 # Sidebar
 
-**Category:** layout (Раскладка)
+**Category:** layout
 
 > App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens.
 

@@ -1,6 +1,6 @@
 # Tooltip
 
-**Category:** overlays (Оверлеи)
+**Category:** overlays
 
 > A short hint that appears next to an element on hover or keyboard focus.
 

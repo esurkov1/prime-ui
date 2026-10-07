@@ -1,6 +1,6 @@
 # ProgressCircle
 
-**Category:** feedback (Обратная связь)
+**Category:** feedback
 
 > Circular progress indicator: a track, a rounded arc and optional content in the center.
 

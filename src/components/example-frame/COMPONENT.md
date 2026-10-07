@@ -1,6 +1,6 @@
 # ExampleFrame
 
-**Category:** infrastructure (Инфраструктура)
+**Category:** infrastructure
 
 > A documentation frame: live preview, source code and device width in one block.
 

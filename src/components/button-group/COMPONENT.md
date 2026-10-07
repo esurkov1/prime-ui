@@ -1,6 +1,6 @@
 # ButtonGroup
 
-**Category:** actions (Действия)
+**Category:** actions
 
 > Joined buttons and toggle segments in one neutral bar.
 

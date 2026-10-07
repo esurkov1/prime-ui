@@ -1,6 +1,6 @@
 # Hint
 
-**Category:** inputs (Поля ввода)
+**Category:** inputs
 
 > Help text or a validation error under a field.
 

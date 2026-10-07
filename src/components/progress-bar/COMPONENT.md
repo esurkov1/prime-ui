@@ -1,6 +1,6 @@
 # ProgressBar
 
-**Category:** feedback (Обратная связь)
+**Category:** feedback
 
 > Linear progress indicator on a native `<progress>` with a label, a percentage and a status color.
 

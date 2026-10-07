@@ -1,6 +1,6 @@
 # CodeBlock
 
-**Category:** data-display (Данные)
+**Category:** data-display
 
 > A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host.
 

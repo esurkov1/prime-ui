@@ -1,6 +1,6 @@
 # Avatar
 
-**Category:** data-display (Данные)
+**Category:** data-display
 
 > A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups.
 

@@ -1,6 +1,6 @@
 # Modal
 
-**Category:** overlays (Оверлеи)
+**Category:** overlays
 
 > A dialog over the page for confirmations, short forms and important text.
 

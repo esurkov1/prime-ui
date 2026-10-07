@@ -1,6 +1,6 @@
 # DigitInput
 
-**Category:** inputs (Поля ввода)
+**Category:** inputs
 
 > A row of square single-digit cells for a fixed-length code (OTP from SMS, PIN, pickup code).
 

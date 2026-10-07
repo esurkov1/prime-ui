@@ -1,6 +1,6 @@
 # Notification
 
-**Category:** feedback (Обратная связь)
+**Category:** feedback
 
 > Pop-up toast notifications: `NotificationProvider` at the app root and `notify()` from any screen.
 

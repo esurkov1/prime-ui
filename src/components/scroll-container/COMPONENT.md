@@ -1,6 +1,6 @@
 # ScrollContainer
 
-**Category:** layout (Раскладка)
+**Category:** layout
 
 > A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents.
 

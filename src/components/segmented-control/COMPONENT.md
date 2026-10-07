@@ -1,6 +1,6 @@
 # SegmentedControl
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > A switch between 2–5 mutually exclusive options or modes that takes effect immediately.
 

@@ -1,6 +1,6 @@
 # Badge
 
-**Category:** data-display (Данные)
+**Category:** data-display
 
 > A compact static label for a status, category or count, in a palette color.
 

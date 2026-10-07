@@ -1,6 +1,6 @@
 # Checkbox
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > A checkbox for an independent yes/no choice that submits with a form: checked, indeterminate, groups.
 

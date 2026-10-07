@@ -1,6 +1,6 @@
 # Select
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > A dropdown field for choosing one value (or several with `multiple`) from a closed list.
 

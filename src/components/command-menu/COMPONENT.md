@@ -1,6 +1,6 @@
 # CommandMenu
 
-**Category:** overlays (Оверлеи)
+**Category:** overlays
 
 > A command palette in a dialog: a search field that filters a list of commands and pages (⌘K).
 

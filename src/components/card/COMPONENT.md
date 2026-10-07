@@ -1,6 +1,6 @@
 # Card
 
-**Category:** data-display (Данные)
+**Category:** data-display
 
 > A filled surface block with structural templates for metrics, charts, lists, calls to action and covers.
 

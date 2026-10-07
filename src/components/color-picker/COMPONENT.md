@@ -1,6 +1,6 @@
 # ColorPicker
 
-**Category:** selection (Выбор)
+**Category:** selection
 
 > Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette.
 

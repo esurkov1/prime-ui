@@ -1,6 +1,6 @@
 # Tabs
 
-**Category:** navigation (Навигация)
+**Category:** navigation
 
 > Tabs for navigating between content panels of one screen.
 

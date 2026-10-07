@@ -1,6 +1,6 @@
 # Banner
 
-**Category:** feedback (Обратная связь)
+**Category:** feedback
 
 > Full-width in-flow message for a page, section or card: status icon, title, description, actions and dismiss.
 

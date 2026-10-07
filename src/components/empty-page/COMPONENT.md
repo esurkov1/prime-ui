@@ -1,6 +1,6 @@
 # EmptyPage
 
-**Category:** feedback (Обратная связь)
+**Category:** feedback
 
 > Empty state of a page or a block: icon, title, explanation and an action.
 

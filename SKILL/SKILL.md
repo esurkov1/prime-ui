@@ -5,8 +5,8 @@ description: >
   Use when laying out screens, forms, tables, dashboards, settings or navigation on prime-ui-kit; when
   choosing which kit component fits a task; when a needed component is missing and must be composed from
   the kit; and when reviewing a screen for design-system compliance (spacing rhythm, sizes, tokens,
-  states, a11y). Triggers: "сверстай экран", "форма", "таблица", "настройки", "дашборд", "какой
-  компонент", "prime-ui-kit", "проверь экран на дизайн-систему".
+  states, a11y). Triggers: build a screen, page, form, table, settings, dashboard, navigation;
+  which component to use; prime-ui-kit; review a screen against the design system — in any language.
 ---
 
 # prime-ui-kit

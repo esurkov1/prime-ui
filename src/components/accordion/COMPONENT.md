@@ -1,6 +1,6 @@
 # Accordion
 
-**Category:** layout (Раскладка)
+**Category:** layout
 
 > Collapsible sections: FAQ, settings groups, checkout steps.
 

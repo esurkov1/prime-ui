@@ -1,6 +1,6 @@
 # Stepper
 
-**Category:** navigation (Навигация)
+**Category:** navigation
 
 > Steps of a multi-step process with pending, active, completed and error statuses.
 

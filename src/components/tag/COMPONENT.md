@@ -1,6 +1,6 @@
 # Tag
 
-**Category:** data-display (Данные)
+**Category:** data-display
 
 > A chip for a selected value, applied filter or keyword, with an optional remove button and a palette color.
 

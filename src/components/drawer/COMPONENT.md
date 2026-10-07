@@ -1,6 +1,6 @@
 # Drawer
 
-**Category:** overlays (Оверлеи)
+**Category:** overlays
 
 > A modal side panel that slides in from the edge: filters, forms and record details.
 

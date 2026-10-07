@@ -1,6 +1,6 @@
 # DataTable
 
-**Category:** data-display (Данные)
+**Category:** data-display
 
 > A data table with sorting, pagination or infinite scroll, row selection, nested rows and loading / empty / error states.
 

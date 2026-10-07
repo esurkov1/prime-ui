@@ -98,7 +98,7 @@ describe("docs contract", () => {
       }
       const category = categories.get(dir);
       expect(category, `${dir} is not shown by any CATEGORY_PAGES page`).toBeDefined();
-      expect(doc).toContain(`**Category:** ${category?.id} (${category?.label})`);
+      expect(doc).toMatch(new RegExp(`^\\*\\*Category:\\*\\* ${category?.id}$`, "m"));
       expect(doc).not.toMatch(/--prime-(ref|sys)-/);
     });
 

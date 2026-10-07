@@ -1,6 +1,6 @@
 # Button
 
-**Category:** actions (Действия)
+**Category:** actions
 
 > A button for explicit actions, with variants, tones, sizes and a built-in loading state.
 

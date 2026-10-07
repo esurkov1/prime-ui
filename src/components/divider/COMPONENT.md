@@ -1,6 +1,6 @@
 # Divider
 
-**Category:** layout (Раскладка)
+**Category:** layout
 
 > A hairline separator, horizontal or vertical, with or without a label.
 

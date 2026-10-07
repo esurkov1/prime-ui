@@ -61,7 +61,7 @@ A component change is done only when all of these agree. Do them in the same cha
 5. **Playground** — `playground/sections/<Name>Section.tsx` imports every example (preview + `?raw` code,
    via `@/components/<dir>/examples/<file>`), and its `PlaygroundApiTable` rows match the code. A new
    component also gets a page in `CATEGORY_PAGES` (`playground/playgroundPages.tsx`).
-6. **COMPONENT.md** — full reference (English, same template everywhere): Category line matching
+6. **COMPONENT.md** — full reference (English, same template everywhere): `**Category:** <id>` matching
    `CATEGORY_PAGES`, When to use / not, Import, Anatomy, API (every prop, exact defaults), Variants (every
    union value), States, Layout & spacing, Accessibility (every `labels` key), Examples (every file),
    Mistakes, Related.

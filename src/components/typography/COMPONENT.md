@@ -1,6 +1,6 @@
 # Typography
 
-**Category:** foundations (Основа)
+**Category:** foundations
 
 > Text roles of the Golos Text type scale applied to any text element, with reading-width guidance.
 
