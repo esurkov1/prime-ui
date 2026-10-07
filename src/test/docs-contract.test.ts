@@ -67,7 +67,6 @@ const NOT_CONVERTED = new Set([
   "stepper",
   "switch",
   "tabs",
-  "tag-select",
   "textarea",
   "thumbnail",
   "timeline",

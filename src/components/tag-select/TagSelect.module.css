@@ -1,75 +1,60 @@
 /* ─── TagSelect ──────────────────────────────────────────────────────────────
- * Field = field system (same fill, height, padding, states as Select/Input).
- * At rest the field is one row: chips that do not fit collapse into a "+N" button. Focused or open
- * (`data-expanded`) it grows to show every chip on wrapped rows (up to 3, then it scrolls inside)
- * and collapses back on blur / close; the height animates with the motion tokens.
- * Chips are `Badge` in the badge tier one step below the field.
+ * Field = field system (same fill, height, padding, states as Select / Input).
+ * At rest the field is one row: chips that do not fit collapse into «+N». Focused or open
+ * (`data-expanded`) it grows to show every chip on wrapped rows (up to 3, then it scrolls inside a
+ * fading ScrollContainer) and collapses back on blur / close; the height animates.
+ * Chips are `Badge` one tier below the field. The list is the shared panel with menu rows.
  */
 
-.control,
-.panel {
+.control {
   --ts-h: var(--prime-control-m-height);
   --ts-px: var(--prime-control-m-field-padding-x);
-  --ts-gap: var(--prime-control-m-gap);
   --ts-icon: var(--prime-control-m-icon);
   --ts-radius: var(--prime-control-m-radius);
   --ts-text: var(--prime-control-m-text-size);
   --ts-lh: var(--prime-control-m-line-height);
-  --ts-item-h: var(--prime-control-m-item-height);
-  --ts-choice: var(--prime-control-s-choice);
   /* Chip row = badge tier one step down (foundation §6). */
   --ts-row: var(--prime-badge-s-height);
+  --prime-icon-size: var(--ts-icon);
 }
 
-[data-size="xs"]:is(.control, .panel) {
+.control[data-size="xs"] {
   --ts-h: var(--prime-control-xs-height);
   --ts-px: var(--prime-control-xs-field-padding-x);
-  --ts-gap: var(--prime-control-xs-gap);
   --ts-icon: var(--prime-control-xs-icon);
   --ts-radius: var(--prime-control-xs-radius);
   --ts-text: var(--prime-control-xs-text-size);
   --ts-lh: var(--prime-control-xs-line-height);
-  --ts-item-h: var(--prime-control-xs-item-height);
-  --ts-choice: var(--prime-control-xs-choice);
   --ts-row: var(--prime-badge-xs-height);
 }
 
-[data-size="s"]:is(.control, .panel) {
+.control[data-size="s"] {
   --ts-h: var(--prime-control-s-height);
   --ts-px: var(--prime-control-s-field-padding-x);
-  --ts-gap: var(--prime-control-s-gap);
   --ts-icon: var(--prime-control-s-icon);
   --ts-radius: var(--prime-control-s-radius);
   --ts-text: var(--prime-control-s-text-size);
   --ts-lh: var(--prime-control-s-line-height);
-  --ts-item-h: var(--prime-control-s-item-height);
-  --ts-choice: var(--prime-control-xs-choice);
   --ts-row: var(--prime-badge-xs-height);
 }
 
-[data-size="l"]:is(.control, .panel) {
+.control[data-size="l"] {
   --ts-h: var(--prime-control-l-height);
   --ts-px: var(--prime-control-l-field-padding-x);
-  --ts-gap: var(--prime-control-l-gap);
   --ts-icon: var(--prime-control-l-icon);
   --ts-radius: var(--prime-control-l-radius);
   --ts-text: var(--prime-control-l-text-size);
   --ts-lh: var(--prime-control-l-line-height);
-  --ts-item-h: var(--prime-control-l-item-height);
-  --ts-choice: var(--prime-control-m-choice);
   --ts-row: var(--prime-badge-m-height);
 }
 
-[data-size="xl"]:is(.control, .panel) {
+.control[data-size="xl"] {
   --ts-h: var(--prime-control-xl-height);
   --ts-px: var(--prime-control-xl-field-padding-x);
-  --ts-gap: var(--prime-control-xl-gap);
   --ts-icon: var(--prime-control-xl-icon);
   --ts-radius: var(--prime-control-xl-radius);
   --ts-text: var(--prime-control-xl-text-size);
   --ts-lh: var(--prime-control-xl-line-height);
-  --ts-item-h: var(--prime-control-xl-item-height);
-  --ts-choice: var(--prime-control-l-choice);
   --ts-row: var(--prime-badge-l-height);
 }
 
@@ -80,7 +65,7 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  /* Chevron centered between the text and the edge: text→icon = icon→edge = padX (foundation §6). */
+  /* Chevron centred between the text and the edge: text→icon = icon→edge = padX (foundation §6). */
   gap: var(--ts-px);
   width: 100%;
   min-width: 0;
@@ -106,7 +91,7 @@
     height var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-/* Пустое поле: плейсхолдер стоит на месте текста поля. */
+/* Empty field: the placeholder stands where the field text does. */
 .control:not(:has(.chips > .chip)) {
   padding-inline-start: var(--ts-px);
 }
@@ -141,9 +126,9 @@
   cursor: not-allowed;
 }
 
-/* Clips / scrolls focusable chips: padded by the focus space so rings are never cut (§7 a);
-   the negative margin keeps the chips where they were. */
-.chips {
+/* The chip row (a ScrollContainer): padded by the focus space so chip rings are never cut (§7 a);
+   the negative margin keeps the chips where they were. At rest it clips to one row. */
+.control .chips {
   display: flex;
   flex: 1 1 auto;
   flex-wrap: nowrap;
@@ -167,8 +152,8 @@
   outline: none;
 }
 
-/* Свёрнутый ввод: место под чипы, но поле остаётся фокусируемым. */
-.inputCollapsed {
+/* Folded input: room for the chips, the field stays focusable. */
+.input[data-collapsed="true"] {
   flex: 1 1 0;
   min-width: 0;
   width: 0;
@@ -182,7 +167,7 @@
   cursor: not-allowed;
 }
 
-.chevronSlot {
+.chevron {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -193,22 +178,19 @@
   pointer-events: none;
 }
 
-.chevronSlot svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.chevron > svg {
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.control[data-state="open"] .chevronSlot svg {
+.control[data-state="open"] .chevron > svg {
   transform: rotate(180deg);
 }
 
-.control[data-disabled="true"] .chevronSlot {
+.control[data-disabled="true"] .chevron {
   color: var(--prime-color-text-disabled);
 }
 
-/* Невидимый ряд для измерения ширин чипов. */
+/* The invisible row that measures chip widths. */
 .measure {
   position: absolute;
   inset-block-start: 0;
@@ -233,21 +215,19 @@
   flex-wrap: wrap;
   max-height: calc(3 * var(--ts-row) + 2 * var(--prime-space-1) + 2 * var(--prime-focus-space));
   overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
 }
 
 .control[data-expanded="true"] .input {
   height: var(--ts-row);
 }
 
-.control[data-expanded="true"] .chevronSlot {
+.control[data-expanded="true"] .chevron {
   margin-block-start: calc((var(--ts-row) - var(--ts-icon)) / 2);
 }
 
-/* ─── Chips: `Badge` (soft badge, tier one step below the field) ─────────── */
+/* ─── Chips: `Badge` one tier below the field ─────────────────────────────── */
 
-/* A chip may shrink to an ellipsis; "+N" never does. */
+/* A chip may shrink to an ellipsis; «+N» never does. */
 .chip {
   flex: 0 1 auto;
   min-width: 0;
@@ -269,107 +249,31 @@
   outline-offset: var(--prime-focus-offset);
 }
 
-/* "+N" is a real button around a Badge. */
-.moreButton {
-  display: inline-flex;
-  flex-shrink: 0;
-  padding: 0;
-  border: 0;
-  border-radius: var(--prime-radius-s);
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.moreButton:active:not(:disabled) {
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
-
-.moreButton:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.moreButton:disabled {
-  cursor: not-allowed;
-}
-
-.srOnly {
-  position: absolute;
-  width: var(--prime-border-width);
-  height: var(--prime-border-width);
-  margin: calc(-1 * var(--prime-border-width));
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-}
-
 /*
- * Chips sit on the field's own wash (foundation §4): neutral chips take a stronger wash, hue chips a
- * wash of their hue, so every chip clearly steps off the field in both themes.
+ * Chips sit on the field's own wash (foundation §4): neutral chips take a stronger wash, hue chips
+ * a translucent wash of their hue, so every chip clearly steps off the field in both themes.
  */
 .control .chip[data-color="gray"]:not([data-disabled="true"]),
 .control .chipMore:not([data-disabled="true"]) {
   background: var(--prime-color-fill-strong);
 }
 
-/* Hue chips: a translucent wash of the hue text instead of the opaque light tint, which is as light
-   as the field wash in the light theme. */
 .control .chip:not([data-color="gray"], [data-disabled="true"]) {
   background: color-mix(in srgb, currentColor 16%, transparent);
 }
 
 /* ─── Panel ──────────────────────────────────────────────────────────────── */
 
-.panel {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  width: max-content;
-  min-width: min(
-    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
-    var(--float-max-w, 100vw)
-  );
-  max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));
-  max-height: min(var(--prime-panel-max-height), var(--float-max-h, var(--prime-panel-max-height)));
-  padding: var(--prime-panel-padding);
-  border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
-  box-shadow: var(--prime-shadow-overlay);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--ts-text);
-  line-height: var(--ts-lh);
-  outline: none;
+/* Closed: stays mounted but out of layout and of the pointer's way. */
+.panel[hidden] {
+  display: none;
 }
 
 .panel[aria-hidden="true"] {
   pointer-events: none;
 }
 
-.panel[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-z-dropdown);
-}
-
-.panel[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-z-dropdown-in-drawer);
-}
-
-.panel[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-z-dropdown-in-modal);
-}
-
-.panel[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-z-dropdown-in-drawer-in-modal);
-}
-
-.hint {
+.panelHint {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -381,55 +285,19 @@
   letter-spacing: var(--prime-text-caption-tracking);
 }
 
-.option {
-  box-sizing: border-box;
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--ts-gap);
-  width: 100%;
-  min-height: var(--ts-item-h);
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--prime-panel-item-padding-x);
-  border: 0;
-  border-radius: var(--prime-panel-item-radius);
-  background: transparent;
-  color: var(--prime-color-text-primary);
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-  outline: none;
-  transition: background-color var(--prime-motion-duration-xfast)
-    var(--prime-motion-easing-standard);
-}
-
-.option[data-highlighted="true"]:not([data-disabled="true"]) {
-  background: var(--prime-color-fill-subtle);
-}
-
-.option:active:not([data-disabled="true"]) {
-  background: var(--prime-color-fill-subtle-active);
-}
-
-.option[data-disabled="true"] {
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
-}
-
-/* Строка с меню ⋯: кнопка выбора на всю ширину + кнопка справа. */
+/* A row with the «⋯» menu: a pick button across the row and the menu button at the end. */
 .optionManaged {
   padding-inline-end: var(--prime-space-1);
   cursor: default;
 }
 
-.optionSelect {
+.optionPick {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
-  gap: var(--ts-gap);
+  gap: var(--menu-gap);
   min-width: 0;
-  height: var(--ts-item-h);
+  height: var(--menu-item-h);
   padding: 0;
   border: 0;
   background: transparent;
@@ -439,56 +307,19 @@
   cursor: pointer;
 }
 
-.optionSelect:disabled {
+.optionPick:disabled {
   cursor: not-allowed;
 }
 
-/* Fixed leading column: checkbox (add to selection) / plus (create). */
-.optionCheckbox,
-.optionLead {
-  box-sizing: border-box;
+.createIcon {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--ts-choice);
-  height: var(--ts-choice);
-}
-
-.optionCheckbox {
-  border-radius: var(--prime-radius-xs);
-  background: var(--prime-color-fill-strong);
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.option[data-highlighted="true"] .optionCheckbox {
-  background: var(--prime-color-fill-strong-hover);
-}
-
-/* Selected option: checked box (unchecking removes the tag). */
-.option[data-selected="true"] .optionCheckbox {
-  background: var(--prime-color-accent-default);
-  color: var(--prime-color-accent-fg);
-}
-
-.optionCheckbox svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.option[data-disabled="true"] .optionCheckbox {
-  background: var(--prime-color-fill-muted);
-}
-
-.optionLead {
+  width: var(--menu-icon);
+  height: var(--menu-icon);
   color: var(--prime-color-text-muted);
-}
-
-.optionLead svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+  --prime-icon-size: var(--menu-icon);
 }
 
 .createLabel {
@@ -496,196 +327,60 @@
   color: var(--prime-color-text-muted);
 }
 
-.optionMenuTrigger {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: calc(var(--ts-item-h) - var(--prime-space-2));
-  height: calc(var(--ts-item-h) - var(--prime-space-2));
-  padding: 0;
-  border: 0;
-  border-radius: var(--prime-radius-s);
-  background: transparent;
-  color: var(--prime-color-text-muted);
-  cursor: pointer;
+/* The «⋯» button shows on the highlighted row, on focus and while its menu is open. */
+.menuTrigger {
   opacity: 0;
-  transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.option[data-highlighted="true"] .optionMenuTrigger,
-.optionMenuTrigger:focus-visible,
-.optionMenuTrigger[aria-expanded="true"] {
+.option[data-highlighted="true"] .menuTrigger,
+.menuTrigger:focus-visible,
+.menuTrigger[aria-expanded="true"] {
   opacity: 1;
 }
 
 @media (hover: none) {
-  .optionMenuTrigger {
+  .menuTrigger {
     opacity: 1;
   }
 }
 
-.optionMenuTrigger:hover:not(:disabled) {
-  background: var(--prime-color-fill-subtle-active);
-  color: var(--prime-color-text-primary);
-}
+/* ─── Row menu (rename, delete, color) ───────────────────────────────────── */
 
-.optionMenuTrigger:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: 0;
-}
-
-.optionMenuTrigger:disabled {
-  cursor: not-allowed;
-}
-
-.optionMenuDots {
-  display: block;
-  width: var(--prime-icon-s);
-  height: var(--prime-icon-s);
-}
-
-/* ─── Manage popover (rename, delete, color) ─────────────────────────────── */
-
-.managePopoverSurface {
+.menuPanel {
   min-width: var(--prime-panel-min-width);
+}
+
+.menuBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
   padding: var(--prime-panel-padding);
 }
 
-.managePopoverShell {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.manageField {
-  padding: var(--prime-space-1);
-}
-
-.manageDelete {
+.menuDelete {
   justify-content: flex-start;
   width: 100%;
 }
 
-.manageDeleteIcon {
-  width: var(--prime-icon-s);
-  height: var(--prime-icon-s);
+.colorRow {
+  justify-content: space-between;
 }
 
-.manageSeparator {
-  height: 0;
-  margin-block: var(--prime-panel-padding);
-  margin-inline: calc(-1 * var(--prime-panel-padding));
-  border: 0;
-  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
-}
-
-.manageColorsHeading {
-  display: flex;
-  align-items: center;
-  min-height: var(--prime-panel-group-label-height);
-  padding-inline: var(--prime-panel-item-padding-x);
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
-}
-
-.manageColorList {
-  display: flex;
-  flex-direction: column;
-}
-
-.manageColorRow {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-control-s-gap);
-  width: 100%;
-  min-height: var(--prime-control-s-item-height);
-  padding-block: 0;
-  padding-inline: var(--prime-panel-item-padding-x);
-  border: 0;
-  border-radius: var(--prime-panel-item-radius);
-  background: transparent;
-  color: var(--prime-color-text-primary);
-  font-family: inherit;
-  font-size: var(--prime-control-s-text-size);
-  line-height: var(--prime-control-s-line-height);
-  text-align: start;
-  cursor: pointer;
-}
-
-.manageColorRow:hover {
+.colorRow:hover {
   background: var(--prime-color-fill-subtle);
 }
 
-.manageColorRow:focus-visible {
+.colorRow:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-.manageColorSwatch {
+.colorCheck {
+  display: inline-flex;
   flex-shrink: 0;
-  width: var(--prime-icon-s);
-  height: var(--prime-icon-s);
-  border-radius: var(--prime-radius-xs);
-  background: var(--prime-color-palette-gray-solid);
-}
-
-.manageColorSwatch[data-color="red"] {
-  background: var(--prime-color-palette-red-solid);
-}
-
-.manageColorSwatch[data-color="blue"] {
-  background: var(--prime-color-palette-blue-solid);
-}
-
-.manageColorSwatch[data-color="green"] {
-  background: var(--prime-color-palette-green-solid);
-}
-
-.manageColorSwatch[data-color="orange"] {
-  background: var(--prime-color-palette-orange-solid);
-}
-
-.manageColorSwatch[data-color="yellow"] {
-  background: var(--prime-color-palette-yellow-solid);
-}
-
-.manageColorSwatch[data-color="purple"] {
-  background: var(--prime-color-palette-purple-solid);
-}
-
-.manageColorSwatch[data-color="sky"] {
-  background: var(--prime-color-palette-sky-solid);
-}
-
-.manageColorSwatch[data-color="pink"] {
-  background: var(--prime-color-palette-pink-solid);
-}
-
-.manageColorSwatch[data-color="teal"] {
-  background: var(--prime-color-palette-teal-solid);
-}
-
-.manageColorLabel {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.manageCheck,
-.manageCheckPlaceholder {
-  flex-shrink: 0;
-  width: var(--prime-icon-s);
-  height: var(--prime-icon-s);
+  width: var(--menu-icon);
+  height: var(--menu-icon);
   color: var(--prime-color-accent-text);
+  --prime-icon-size: var(--menu-icon);
 }

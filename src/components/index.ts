@@ -440,7 +440,7 @@ export type {
   TagSelectLabels,
   TagSelectOption,
   TagSelectOptionUpdate,
-  TagSelectRootProps,
+  TagSelectProps,
 } from "./tag-select/TagSelect";
 export { TagSelect } from "./tag-select/TagSelect";
 export type {
