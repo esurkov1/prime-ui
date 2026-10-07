@@ -191,8 +191,10 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   description of the example names.
 - Exactly one `export default function <Component><Scenario>Example()` (`ButtonOverviewExample`).
 - Imports: kit only from `"prime-ui-kit"`, then `import * as React from "react"` (only this form) when
-  hooks are needed, then `./examples.module.css` (the only CSS an example may import). Icons from the
-  kit's `Icon`; `lucide-react` only for a glyph the kit lacks.
+  hooks are needed, then `./examples.module.css` (the only CSS an example may import).
+- Icons from the kit first: `<Icon name="…" />` for any glyph the registry has (`src/icons`). A direct
+  `lucide-react` import only for a domain glyph listed in `DOMAIN_GLYPHS` (docs contract) with a
+  reason; a generic glyph goes into the registry instead. The contract fails otherwise.
 - Data: module-level `UPPER_SNAKE_CASE` constants above the function; pure helpers allowed, no helper
   components — except one inner component for a provider-based API that must call its hook inside the
   provider (`useNotifications`). State is named by meaning: `[query, setQuery]`, `[open, setOpen]`.
@@ -315,8 +317,10 @@ A component change is done only when all of these agree. Do them in the same cha
 8. **SKILL/** — holds no per-component content: `components.md` is a category tree of links to each
    `COMPONENT.md` and `examples/`. Touch it only when a component is added / removed / renamed (one
    line), when the choice between components changes (`choosing.md`), or when a shared rule changes
-   (`api-contract.md`, `foundations.md`). No symlinks: npm drops them. Every TSX snippet in SKILL must
-   compile against the current kit. A new or changed screen pattern goes to `SKILL/patterns/` with an
+   (`api-contract.md`, `foundations.md`). No symlinks: npm drops them. Every ```tsx block in SKILL
+   compiles against the kit (checked by `skill-docs.test.ts`) unless marked ```tsx partial.
+   `cheatsheet.md` is the one-page «do X, not Y» entry (read first): update it when a shared rule or a
+   cross-component decision changes. A new or changed screen pattern goes to `SKILL/patterns/` with an
    entry in `playground/composition/patterns.ts` and a row in `SKILL/composition.md`.
 9. **README.md** — when the public surface changes (new component, export, count, install step).
 
@@ -358,6 +362,8 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `SKILL/patterns/` | composition patterns: one working screen per file (`<name>.tsx` + `<name>.module.css`, `export default function <Name>Pattern`); the one source for the skill and the playground «Композиция» pages |
 | `playground/composition/` | composition pages: `patterns.ts` (page text per pattern), `PatternPage.tsx`, `CompositionPage.tsx` (principles), `patternRegistry.ts` (glob loader) |
 | `src/test/patterns-contract.test.ts` | pattern canon, links from `SKILL/composition.md`, playground list, render smoke test |
+| `src/test/skill-docs.test.ts` | SKILL tsx snippets typecheck against the kit (fragments: ```tsx partial); SKILL and `llms.txt` links resolve |
+| `llms.txt` | entry point for LLMs (llms.txt convention): links to `SKILL/cheatsheet.md`, `SKILL.md`, components / choosing / composition, patterns, foundation |
 
 ## Release
 
