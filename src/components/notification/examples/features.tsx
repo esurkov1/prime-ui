@@ -1,102 +1,42 @@
-import { Button, NotificationProvider, useNotifications } from "prime-ui-kit";
+/** Card options: a custom `icon`, a `badge` counter, an `action` button, and a short title-only toast without a close button (`closable: false`). Use them for message digests and quick confirmations. */
+import { MessageSquare } from "lucide-react";
+import { NotificationCard, type NotificationRecord } from "prime-ui-kit";
 
-function FeaturesDemo() {
-  const { notify, dismissAll } = useNotifications();
+import styles from "./examples.module.css";
 
-  const runStackDemo = () => {
-    const types = ["info", "success"] as const;
-    for (let index = 0; index < 6; index += 1) {
-      window.setTimeout(() => {
-        notify({
-          type: types[index % 2],
-          title: `Stack ${index + 1} of 6`,
-          description:
-            "Same type and position share one column; hover expands the stack and pauses timers.",
-          position: "bottom-right",
-          duration: 6000 + index * 500,
-          badge: index + 1,
-        });
-      }, index * 140);
-    }
-  };
+const base = {
+  position: "top-right",
+  size: "m",
+  duration: 0,
+  persistent: true,
+  closable: true,
+  createdAt: 0,
+} as const;
 
+const withEverything: NotificationRecord = {
+  ...base,
+  id: "features-rich",
+  tone: "info",
+  title: "Новые ответы в обсуждении",
+  description: "Мария и ещё двое ответили на ваш комментарий.",
+  icon: <MessageSquare aria-hidden />,
+  badge: 3,
+  action: { label: "Открыть", onClick: () => {} },
+};
+
+const titleOnly: NotificationRecord = {
+  ...base,
+  id: "features-title",
+  tone: "success",
+  title: "Ссылка скопирована",
+  closable: false,
+};
+
+export default function NotificationFeaturesExample() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-m)",
-        alignItems: "flex-start",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "var(--prime-sys-spacing-s)",
-          alignItems: "center",
-        }}
-      >
-        <Button.Root type="button" variant="neutral" mode="stroke" onClick={runStackDemo}>
-          Enqueue six toasts
-        </Button.Root>
-        <Button.Root type="button" size="s" variant="neutral" mode="ghost" onClick={dismissAll}>
-          dismissAll()
-        </Button.Root>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "var(--prime-sys-spacing-s)",
-          alignItems: "center",
-        }}
-      >
-        <Button.Root
-          type="button"
-          size="s"
-          variant="neutral"
-          mode="stroke"
-          onClick={() =>
-            notify({
-              type: "info",
-              title: "Quick dismiss",
-              description: "duration: 2000",
-              duration: 2000,
-              position: "top-center",
-              size: "m",
-            })
-          }
-        >
-          duration 2s
-        </Button.Root>
-        <Button.Root
-          type="button"
-          size="s"
-          variant="neutral"
-          mode="stroke"
-          onClick={() =>
-            notify({
-              type: "success",
-              title: "Longer on screen",
-              description: "duration: 14000",
-              duration: 14000,
-              position: "top-center",
-              size: "m",
-            })
-          }
-        >
-          duration 14s
-        </Button.Root>
-      </div>
+    <div className={styles.cards}>
+      <NotificationCard item={withEverything} paused onDismiss={() => {}} />
+      <NotificationCard item={titleOnly} paused onDismiss={() => {}} />
     </div>
-  );
-}
-
-export default function FeaturesExample() {
-  return (
-    <NotificationProvider max={5} position="top-right">
-      <FeaturesDemo />
-    </NotificationProvider>
   );
 }

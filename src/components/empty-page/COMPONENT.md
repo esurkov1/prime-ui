@@ -1,143 +1,143 @@
 # EmptyPage
 
-## About
+**Category:** feedback (Обратная связь)
 
-Центрированный блок **пустого состояния**: **`EmptyPage.Icon`** (область под глиф), **`EmptyPage.Title`** (**`<h2>`**), **`EmptyPage.Description`**, **`EmptyPage.Actions`** (ряд кнопок). Ось **`size`** (`s`–`xl`) задаёт иконку, кегль и отступы и пробрасывается в **`ControlSizeProvider`** для дочерних **`Button`**.
+> Empty state of a page or a block: icon, title, explanation and an action.
 
-- **Используйте** на странице списка, в теле таблицы, в карточке или в **`ScrollContainer`**, когда данных нет и нужен явный призыв к действию.
-- **`layout="fill"`** — блок растягивается по высоте **flex**-родителя с заданной **`min-height`** (типично «область таблицы»); **`default`** — компактный блок по содержимому.
-- **Не** подменяйте **`Title`** на **`PageContent.Title`** (**`<h1>`**): пустое состояние — регион страницы, заголовок вью остаётся один на маршруте.
+## When to use
+- A list, table or page has no data yet (first run) and the user should know what to do.
+- A search or filter returned nothing.
+- Data failed to load and the user can retry.
+- Inside a card or data region that should keep its height (`layout="fill"`).
 
-## Composition
+## When not to use
+- A short "no rows" line inside a table → use the [DataTable](../data-table/COMPONENT.md) `empty` slot.
+- A message about the page while data is present → use [Banner](../banner/COMPONENT.md).
+- A transient result of an action → use [Notification](../notification/COMPONENT.md).
+- Loading in progress → show a loading state, not an empty state.
 
-- **`EmptyPage.Root`** — колонка по центру, **`text-align: center`**; **`size`**, **`layout`** через `data-*`.
-- **`EmptyPage.Icon`** — подложка под глиф в духе иконки шапки [**`Modal.Panel`**](../modal/COMPONENT.md) (`headerIcon`): скругление **`--prime-sys-size-control-*-radius`**, фон **`--prime-sys-color-status-error-background`**, цвет глифа **`--prime-sys-color-status-error-foreground`** (не «сырой» красный). Внутрь — **`lucide-react`** или **`Icon`** с **`aria-hidden`**.
-- **`EmptyPage.Title`** — **`h2`**; связывайте с **`aria-labelledby`** на корне.
-- **`EmptyPage.Description`** — **`p`**, вторичный цвет контента.
-- **`EmptyPage.Actions`** — **`flex`**-ряд с **`gap`** по размеру; внутри — **`Button`**, **`ButtonGroup`**, **`LinkButton`**.
+## Import
+```tsx
+import { EmptyPage } from "prime-ui-kit";
+```
 
-### Canonical example
+## Anatomy
+```
+EmptyPage.Root              centered column, provides size to children
+├─ EmptyPage.Icon           rounded icon tile (tone)
+├─ EmptyPage.Title          <h2>
+├─ EmptyPage.Description    <p>, secondary text
+└─ EmptyPage.Actions        centered row of buttons
+```
+
+## API
+
+### EmptyPage.Root
+`forwardRef` to `HTMLDivElement`. + native `<div>` props (`aria-labelledby`, `role`, …).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Icon tile, type sizes and padding. Provided to children via the control-size context (pass it to Buttons explicitly). |
+| `layout` | `"default" \| "fill"` | `"default"` | `default`: compact block sized by content. `fill`: stretches over the height of a flex parent and centers the content. |
+| `className` | `string` | — | Class on the root. |
+| `children` | `ReactNode` | — | Parts. |
+
+### EmptyPage.Icon
+No ref. + native `<div>` props.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `tone` | `"neutral" \| "accent" \| "danger"` | `"neutral"` | Tile color. |
+| `children` | `ReactNode` | — | An svg icon (mark it `aria-hidden`); sized by the tier. |
+| `className` | `string` | — | Class. |
+
+### EmptyPage.Title
+`forwardRef` to `HTMLHeadingElement`. + native `<h2>` props. Semibold title capped at the reading width.
+
+### EmptyPage.Description
+`forwardRef` to `HTMLParagraphElement`. + native `<p>` props. Secondary text capped at the reading width.
+
+### EmptyPage.Actions
+No ref. + native `<div>` props. Wrapping centered row, gap `--prime-space-2`.
+
+## Variants
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | Padding 24 × 12, tile 32 / icon 16, title 14/20, description 12/16 | Inside small cards, popovers | |
+| `s` | Padding 32 × 16, tile 40 / icon 20, title 14/20, description 13/20 | Cards, side panels, table regions | |
+| `m` | Padding 40 × 16, tile 48 / icon 24, title 16/24, description 14/20 | Sections and data regions | yes |
+| `l` | Padding 48 × 24, tile 56 / icon 24, title 18/24, description 14/20 | Large regions | |
+| `xl` | Padding 64 × 32, tile 64 / icon 32, title 20/28, description 16/24 | A whole empty page | |
+
+### tone (EmptyPage.Icon)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `neutral` | `fill-muted` tile, secondary icon | No data / no results | yes |
+| `accent` | Accent soft tile, accent icon | First run, invitation to create something | |
+| `danger` | Danger soft tile, danger icon | Loading failed | |
+
+### layout
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `default` | Height by content | Standalone empty states | yes |
+| `fill` | Grows to fill a flex parent, content centered | Inside cards/regions with a fixed or min height | |
+
+**Combinations**
+- Recommended: `neutral` + "Сбросить фильтры" for no results; `accent` + a primary action for first run; `danger` + an outline "Повторить".
+- Hierarchy: at most one primary (solid) button, placed last; the rest outline/ghost.
+- Pointless: `layout="fill"` in a parent that is not a flex column with height.
+
+## States
+| State | Driven by | DOM |
+|---|---|---|
+| size | `size` | `data-size` on Root |
+| fill | `layout="fill"` | `data-layout="fill"` on Root |
+| tone | Icon `tone` | `data-tone` on Icon |
+
+## Layout & spacing
+- Base gap `--prime-space-2`; icon → title gets `--prime-space-2` more; description → actions `--prime-space-3` more.
+- Text is centered and capped at `--prime-layout-reading-max-width`; long words wrap.
+- EmptyPage has no fill or radius of its own: the host card/region provides the surface.
+
+## Accessibility
+- Give the title an `id` and the root `aria-labelledby` so the region is named.
+- Mark the icon `aria-hidden`; the title carries the meaning.
+- Title is an `<h2>`: make sure it fits the page heading outline.
+- EmptyPage has no `labels`.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [data-region.tsx](examples/data-region.tsx) | Card region with a header and `layout="fill"`, accent icon, two actions | Empty list/table area |
+| [no-results.tsx](examples/no-results.tsx) | Search with no results: Icon, Title, Description, Actions | Filters/queries returning nothing |
+| [icon-tones.tsx](examples/icon-tones.tsx) | `neutral`, `accent`, `danger` icon tones | Choosing the tone by cause |
+| [sizes.tsx](examples/sizes.tsx) | `xs`…`xl` with a button of the same size | Picking a size |
 
 ```tsx
-import { Search } from "lucide-react";
 import { Button, EmptyPage } from "prime-ui-kit";
 
-export function EmptySearchResults() {
+export function NoInvoices() {
   return (
-    <EmptyPage.Root aria-labelledby="empty-heading">
-      <EmptyPage.Icon aria-hidden>
-        <Search strokeWidth={2} aria-hidden />
-      </EmptyPage.Icon>
-      <EmptyPage.Title id="empty-heading">Ничего не найдено</EmptyPage.Title>
-      <EmptyPage.Description>
-        Измените фильтры или сбросьте поиск — тогда мы снова покажем результаты.
-      </EmptyPage.Description>
+    <EmptyPage.Root aria-labelledby="no-invoices-title">
+      <EmptyPage.Title id="no-invoices-title">Счетов нет</EmptyPage.Title>
+      <EmptyPage.Description>Выставленные счета появятся здесь.</EmptyPage.Description>
       <EmptyPage.Actions>
-        <Button.Root type="button" variant="primary">
-          Сбросить фильтры
-        </Button.Root>
+        <Button.Root>Выставить счёт</Button.Root>
       </EmptyPage.Actions>
     </EmptyPage.Root>
   );
 }
 ```
 
-### Пустое состояние в области таблицы
-
-Родитель с **`min-height`** (и обычно рамкой области данных) + **`layout="fill"`** — контент визуально по центру «подложки».
-
-```tsx
-import { PackagePlus } from "lucide-react";
-import { Button, EmptyPage } from "prime-ui-kit";
-
-export function OrdersTableEmpty() {
-  return (
-    <div className="ordersTableBodyRegion">
-      <EmptyPage.Root layout="fill" aria-labelledby="empty-table-heading">
-        <EmptyPage.Icon aria-hidden>
-          <PackagePlus strokeWidth={2} aria-hidden />
-        </EmptyPage.Icon>
-        <EmptyPage.Title id="empty-table-heading">Пока нет позиций</EmptyPage.Title>
-        <EmptyPage.Description>Добавьте первую строку или импортируйте каталог.</EmptyPage.Description>
-        <EmptyPage.Actions>
-          <Button.Root type="button" variant="primary">
-            Добавить позицию
-          </Button.Root>
-        </EmptyPage.Actions>
-      </EmptyPage.Root>
-    </div>
-  );
-}
-```
-
-### Связь с DataTable
-
-У **`DataTable`** пустой набор строк может отображаться через **`emptyText`** (строка в таблице). Для **богатого** пустого состояния с кнопкой и иконкой не подставляйте разметку внутрь **`emptyText`**: рендерите **`EmptyPage`** **вместо** таблицы или **в** ячейке-обёртке с **`layout="fill"`**, когда **`rows.length === 0`** и не **`loading`**.
-
-### Playground
-
-Живые примеры: **`playground/sections/EmptyPageSection.tsx`**.
-
-## Extended examples
-
-| Playground (сниппет) | Runnable (`examples/*.tsx`) |
-|----------------------|------------------------------|
-| [`canonical.tsx`](../../../playground/snippets/empty-page/canonical.tsx) | [`examples/canonical.tsx`](./examples/canonical.tsx) |
-| [`sizes.tsx`](../../../playground/snippets/empty-page/sizes.tsx) | [`examples/sizes.tsx`](./examples/sizes.tsx) |
-| [`table-region.tsx`](../../../playground/snippets/empty-page/table-region.tsx) | [`examples/table-region.tsx`](./examples/table-region.tsx) |
-
-## Rules
-
-- Заголовок вью — один **`h1`** ([`PageContent.Title`](../page-content/COMPONENT.md)); в **`EmptyPage`** используйте **`Title`** (**`h2`**).
-- Иконка декоративная — **`aria-hidden`** на обёртке или SVG.
-- Размеры кнопок в **`Actions`** наследуются от **`ControlSizeProvider`** на **`Root`**; при необходимости оберните действия в отдельный **`ControlSizeProvider`**.
-
-## API
-
-### EmptyPage.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `s` \| `m` \| `l` \| `xl` | `m` | No | Шкала иконки, текста, отступов; `ControlSizeProvider` для потомков. |
-| layout | `default` \| `fill` | `default` | No | `fill` — растянуть по высоте flex-родителя (пустое тело таблицы / панели). |
-| className | `string` | — | No | Дополнительный класс корня. |
-| children | `React.ReactNode` | — | No | Icon, Title, Description, Actions. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | В т.ч. `ref` (`forwardRef`), `aria-*`. |
-
-### EmptyPage.Icon
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Класс подложки под иконку. |
-| children | `React.ReactNode` | — | No | Глиф (например из `lucide-react`). |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Атрибуты обёртки. |
-
-### EmptyPage.Title
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Класс на **`h2`**. |
-| children | `React.ReactNode` | — | No | Заголовок блока. |
-| …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | В т.ч. `ref` (`forwardRef`), `id` для `aria-labelledby`. |
-
-### EmptyPage.Description
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Класс на **`p`**. |
-| children | `React.ReactNode` | — | No | Пояснение. |
-| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | В т.ч. `ref` (`forwardRef`). |
-
-### EmptyPage.Actions
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Класс на flex-контейнере действий. |
-| children | `React.ReactNode` | — | No | Кнопки и т.п. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Атрибуты **`div`**. |
+## Mistakes
+- Buttons in a non-`m` EmptyPage without `size` → pass the same `size` to them.
+- `tone` on `EmptyPage.Root` → `tone` belongs to `EmptyPage.Icon`.
+- Showing an empty state while data is loading → show loading first.
+- Several primary buttons → one primary, placed last.
 
 ## Related
-
-- [PageContent](../page-content/COMPONENT.md) — шапка маршрута (**`h1`**).
-- [DataTable](../data-table/COMPONENT.md) — **`emptyText`** vs отдельный **`EmptyPage`**.
-- [Button](../button/COMPONENT.md) — действия в **`Actions`**.
+- [DataTable](../data-table/COMPONENT.md) — built-in `empty` slot for tables.
+- [Banner](../banner/COMPONENT.md), [Notification](../notification/COMPONENT.md).
+- [Card](../card/COMPONENT.md) — host surface for data regions.

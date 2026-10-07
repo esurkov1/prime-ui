@@ -3,46 +3,75 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  width: var(--icon-box);
+  height: var(--icon-box);
 }
 
-/* Размеры = size.control.*.icon из семантических токенов (theme-light/dark.css). */
+/* Explicit `size` prop: global icon scale. */
 .sizeXs {
-  width: var(--prime-sys-size-control-xs-icon);
-  height: var(--prime-sys-size-control-xs-icon);
+  --icon-box: var(--prime-icon-xs);
 }
 
 .sizeS {
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
+  --icon-box: var(--prime-icon-s);
 }
 
 .sizeM {
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
+  --icon-box: var(--prime-icon-m);
 }
 
 .sizeL {
-  width: var(--prime-sys-size-control-l-icon);
-  height: var(--prime-sys-size-control-l-icon);
+  --icon-box: var(--prime-icon-l);
 }
 
 .sizeXl {
-  width: var(--prime-sys-size-control-xl-icon);
-  height: var(--prime-sys-size-control-xl-icon);
+  --icon-box: var(--prime-icon-xl);
 }
 
-.toneDefault {
-  color: currentColor;
+/*
+ * No `size` prop: follow the host. A host may set `--prime-icon-size` (Button, Badge, Tag, Kbd…);
+ * otherwise the icon uses the control tier of the nearest ControlSizeProvider.
+ */
+.inherit.sizeXs {
+  --icon-box: var(--prime-icon-size, var(--prime-control-xs-icon));
 }
 
-.toneSubtle {
-  color: var(--prime-sys-color-content-secondary);
+.inherit.sizeS {
+  --icon-box: var(--prime-icon-size, var(--prime-control-s-icon));
 }
 
-.toneAccent {
-  color: var(--prime-sys-color-content-accent);
+.inherit.sizeM {
+  --icon-box: var(--prime-icon-size, var(--prime-control-m-icon));
 }
 
-.toneDanger {
-  color: var(--prime-sys-color-content-danger);
+.inherit.sizeL {
+  --icon-box: var(--prime-icon-size, var(--prime-control-l-icon));
+}
+
+.inherit.sizeXl {
+  --icon-box: var(--prime-icon-size, var(--prime-control-xl-icon));
+}
+
+.root[data-tone="secondary"] {
+  color: var(--prime-color-text-secondary);
+}
+
+.root[data-tone="muted"] {
+  color: var(--prime-color-text-muted);
+}
+
+.root[data-tone="accent"] {
+  color: var(--prime-color-accent-text);
+}
+
+.root[data-tone="success"] {
+  color: var(--prime-color-success-text);
+}
+
+.root[data-tone="warning"] {
+  color: var(--prime-color-warning-text);
+}
+
+.root[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
 }

@@ -1,140 +1,150 @@
 # AppShell
 
-## About
+**Category:** layout (Раскладка)
 
-Каркас приложения: **сетка** `nav` + **`main`** (прокручиваемая колонка). Поля контентной колонки (**`--prime-sys-spacing-x6`** по вертикали и горизонтали) **встроены в `AppShell.Main`** — отдельной обёртки нет.
+> The app frame: a navigation rail on the canvas and a content panel on the surface.
 
-**`AppShell.Template`** — рекомендуемая сборка: **`Root`** + **`Nav`** + **`Main`**, дети шаблона рендерятся **прямо внутри** `<main>`, плюс при монтировании **внутри React Router** сбрасывается прокрутка **`main`** при смене пути.
+## When to use
+- The root layout of an application: navigation column, optional sticky header, scrolling main column.
+- Any page that needs the kit's responsive gutters and the surface context for cards and fields.
 
-**Не** дублируйте те же поля вокруг страницы: внутри **`main`** используйте **`PageContent.Section`** или **`PageContent.Root`** (у **`PageContent`** краевых полей к колонке нет — их даёт **`Main`**).
+## When not to use
+- The navigation itself → use [Sidebar](../sidebar/COMPONENT.md) inside `AppShell.Nav`.
+- Page heading, actions and sections inside main → use [PageContent](../../components/page-content/COMPONENT.md).
+- A temporary side panel over the page → use [Drawer](../../components/drawer/COMPONENT.md).
+- A scroll region inside a page → use [ScrollContainer](../../components/scroll-container/COMPONENT.md).
 
----
-
-## Схема слоёв и отступов
-
-Внешние поля у контента в правой колонке задаёт **сам** элемент **`AppShell.Main`** (класс **`layoutMain`** в сборке; в DOM — **`data-app-shell-main-padded`** для проверки в DevTools).
-
-### Дерево регионов
-
-```
-┌─ AppShell.Root ───────────────────────────────────────────── fillViewport → высота вьюпорта, без padding
-│    data-layout-template="app" (у Template)
-│
-├── AppShell.Nav          data-layout-region="nav"            padding: 0 у оболочки; внутренние отступы — у Sidebar
-│    └── …
-│
-└── AppShell.Main         <main> ScrollContainer, прокрутка по вертикали
-     data-layout-region="main"
-     data-app-shell-main-padded=""
-     padding-block / padding-inline = var(--prime-sys-spacing-x6)   ← канон полей колонки
-     └── маршруты: <Outlet /> / страницы / PageContent.*
+## Import
+```tsx
+import { AppShell } from "prime-ui-kit";
 ```
 
-### Зазор между колонками
-
-На **`min-width: 48rem`**, если **`data-layout-template="app"`** и сайдбар **`expanded`** или **`compact`**, между **`Nav`** и **`Main`** — **`column-gap: var(--prime-sys-spacing-x3)`** (разделитель колонок, не замена полей внутри `main`).
-
-### Сводка по токенам
-
-| Участок | Токен / правило |
-|--------|------------------|
-| Поля контента внутри `main` | `--prime-sys-spacing-x6` (block + inline) |
-| Зазор nav ↔ main (широкий экран + открытый sidebar) | `--prime-sys-spacing-x3` |
-| Корень сетки, слот `nav` | `padding: 0` у оболочек; поля `main` — см. выше |
-
-### Диаграмма (Mermaid)
-
-```mermaid
-flowchart TB
-  subgraph Root["AppShell.Root"]
-    Nav["AppShell.Nav"]
-    Main["AppShell.Main\nx6 padding + scroll"]
-  end
-  Nav --- Main
-  Main --> Page["Страница / Outlet / PageContent"]
+## Anatomy
 ```
+AppShell.Root                grid: nav column | content panel (bg-surface)
+├── AppShell.Nav             navigation column on the canvas (usually Sidebar.Root)
+├── AppShell.Header          sticky top bar of the panel
+└── AppShell.Main            <main>, scrolls, carries the gutters
+AppShell.Template            Root + Nav + Header + Main in one component
+```
+Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 
----
+## API
 
-## Composition
+### AppShell.Root
+`forwardRef` to `<div>`.
 
-- **`AppShell.Root`** — корневая сетка; опционально **`fillViewport`**.
-- **`AppShell.Nav`** — слот навигации (**`data-layout-region="nav"`**).
-- **`AppShell.Main`** — **`<main>`** с каноническими полями колонки и прокруткой (**`data-layout-region="main"`**).
-- **`AppShell.Template`** — **`Root`** + **`Nav`** + **`Main`**, дети — **прямые** дочерние узлы **`main`** + сброс прокрутки при смене **`pathname`** (если предок — React Router).
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `fillViewport` | `boolean` | `false` | Shell is exactly the viewport height and only `AppShell.Main` scrolls; otherwise the document scrolls and the nav is sticky. |
+| `className` | `string` | — | Extra class. |
+| `children` | `ReactNode` | — | `AppShell.Nav`, `AppShell.Header`, `AppShell.Main`. |
 
-### Пример (сайдбар + маршруты)
++ native `<div>` props.
+
+### AppShell.Nav
+No ref. A `<div>` grid slot (not a landmark; Sidebar renders the `<nav>`). + native `<div>` props.
+
+### AppShell.Header
+`forwardRef` to `<header>`. A flex row (gap 12) for breadcrumbs, search and actions. + native `HTMLAttributes<HTMLElement>`.
+
+### AppShell.Main
+`forwardRef` to `<main>` (a vertical ScrollContainer with `overscroll-behavior: contain`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `contentWidth` | `"contained" \| "full"` | `"full"` | `full`: whole panel with gutters; `contained`: centred column up to `--prime-layout-content-max-width`. |
+| `className` | `string` | — | Extra class. |
+| `children` | `ReactNode` | — | Page content. |
+
++ native `HTMLAttributes<HTMLElement>`.
+
+### AppShell.Template
+`forwardRef` to the `<main>` element. Renders Root, Nav (when `nav` is set), Header (when `header` is set) and Main. Inside a react-router tree it scrolls main to the top on every route change.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `nav` | `ReactNode` | — | Navigation column content; without it the panel takes the full width. |
+| `header` | `ReactNode` | — | Header content; no header row when omitted. |
+| `mainProps` | `Omit<AppShellMainProps, "children">` | — | Props for Main (e.g. `contentWidth`). |
+| `fillViewport` | `boolean` | `false` | Passed to Root. |
+| `children` | `ReactNode` | — | Page content inside Main. |
+
++ other Root props (native `<div>` props on Root).
+
+## Variants
+
+### fillViewport (Root)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `false` | Shell at least viewport high; the document scrolls; nav sticks to the top | Content sites, simple apps | yes |
+| `true` | Shell exactly viewport high; only Main scrolls; header and nav stay put | Dense apps with a fixed frame | |
+
+### contentWidth (Main)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `full` | Content spans the panel with responsive gutters | Tables, dashboards | yes |
+| `contained` | Centred column up to the content max width | Long-read pages | |
+
+### Structure
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| with `AppShell.Nav` | Two columns: canvas rail + surface panel | Apps with navigation | |
+| without Nav | Panel takes the full width | Single-page tools, auth screens | |
+| with `AppShell.Header` | Sticky bar at the top of the panel | Breadcrumbs, page actions, mobile menu button | |
+
+**Combinations** — `AppShell.Template` with `nav={<Sidebar.Root …/>}` and `PageContent` inside is the standard app. `contentWidth="contained"` + `PageContent.Root maxWidth="readable"` for docs/articles.
+
+## States
+Static layout. DOM: `data-fill-viewport="true"` on Root (only when set), `data-content-width` on Main.
+
+## Layout & spacing
+- Two full-height planes edge to edge: no inset, radius, shadow or border — the boundary is the fill change (canvas → surface).
+- Gutters in Main and Header: `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px. Main top padding `--prime-space-6` (24) → `--prime-space-10` (40) from 1024px; bottom `--prime-space-16`.
+- Header: min height = control m + 2 × `--prime-space-3`, padding-block `--prime-space-3`, `z-index: --prime-z-sticky`.
+- The panel is a surface context: fields use the surface field fill, Cards inside become sunken tiles without shadow.
+
+## Accessibility
+- Main is the `<main>` landmark and Header is `<header>`; the navigation landmark comes from Sidebar (`<nav>`).
+- Give the page one `<h1>` (PageContent.Title).
+- No keyboard behaviour, no `labels`.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [with-sidebar.tsx](examples/with-sidebar.tsx) | Sidebar in Nav, breadcrumbs in Header, page with action and metric card in Main, `fillViewport` | Root layout of an app |
+| [contained.tsx](examples/contained.tsx) | No Nav, `Main contentWidth="contained"` with a readable page | Docs, articles, long-read pages |
 
 ```tsx
-import { AppShell, Sidebar } from "prime-ui-kit";
-import { Outlet } from "react-router-dom";
+import { AppShell, PageContent, Sidebar } from "prime-ui-kit";
 
-export function AppLayout() {
+export function Example() {
   return (
-    <AppShell.Template fillViewport nav={<Sidebar.Root /* … */>{/* … */}</Sidebar.Root>}>
-      <Outlet />
+    <AppShell.Template
+      fillViewport
+      nav={
+        <Sidebar.Root>
+          <Sidebar.Content>
+            <Sidebar.Item active>Обзор</Sidebar.Item>
+          </Sidebar.Content>
+        </Sidebar.Root>
+      }
+    >
+      <PageContent.Section>
+        <PageContent.Header>
+          <PageContent.Title>Обзор</PageContent.Title>
+        </PageContent.Header>
+      </PageContent.Section>
     </AppShell.Template>
   );
 }
 ```
 
-### Пример (одна колонка, без `nav`)
-
-```tsx
-import { AppShell } from "prime-ui-kit";
-
-export function FullWidthMain() {
-  return (
-    <AppShell.Root fillViewport>
-      <AppShell.Main>{/* страница — поля уже на main */}</AppShell.Main>
-    </AppShell.Root>
-  );
-}
-```
-
----
-
-## Почему «пропали отступы»
-
-1. **Не подключены стили пакета** — **`prime-ui-kit/styles.css`** и **`prime-ui-kit/bundle.css`** (или эквивалент).
-2. **Маршруты не внутри `AppShell.Template`** — **`Outlet`** должен быть ребёнком **`Template`** (или контент внутри **`AppShell.Main`** при ручной сборке).
-3. **Ожидание полей от `PageContent.Root`** — краевые поля задаёт **`Main`**, не **`PageContent`**.
-4. **Редкий full-bleed в `main`** — при необходимости обнулите поля через **`className`** на **`AppShell.Main`** (осознанно, точечно).
-
----
-
-## Rules
-
-- **`AppShell.Template`** внутри **`BrowserRouter`** / **`MemoryRouter`** — для сброса прокрутки.
-- **`ref`** на **`Template`** вешается на **`<main>`** (`AppShell.Main`).
-- Не дублируйте обёртки с полями **`x6`** вокруг страницы.
-
-## API
-
-### AppShell.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| fillViewport | `boolean` | `false` | No | Растягивает корень на высоту вьюпорта. |
-| className | `string` | — | No | Класс на корневом `div`. |
-| children | `React.ReactNode` | — | No | Обычно `Nav` + `Main`. |
-| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | В т.ч. `ref` (`forwardRef`). |
-
-### AppShell.Template
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| fillViewport | `boolean` | — | No | Пробрасывается в `Root`. |
-| className | `string` | — | No | Класс на `Root`. |
-| nav | `React.ReactNode` | — | **Yes** | Левая колонка (напр. `Sidebar.Root`). |
-| children | `React.ReactNode` | — | No | Контент внутри `<main>` (прямые дети). |
-| navProps | `Omit<AppShellNavProps, "children">` | — | No | Пропсы на слот навигации. |
-| mainProps | `Omit<AppShellMainProps, "children">` | — | No | Пропсы на `main` (напр. `id`, `tabIndex`). |
-| …rest | `HTMLAttributes<HTMLDivElement>` | — | No | Остальное на `Root`. |
-
-`AppShell.Nav` и `AppShell.Main` — см. исходные типы в **`AppShell.tsx`**.
+## Mistakes
+- Adding padding around the page content → Main already has the gutters.
+- Wrapping Main content in another scroll container → Main scrolls (with `fillViewport`) or the document does.
+- A border or shadow between nav and panel → the fill change is the boundary.
+- Putting the Sidebar directly in Root without `AppShell.Nav` → it lands inside the content panel.
 
 ## Related
-
-- [PageContent](../../components/page-content/COMPONENT.md)
-- [Sidebar](../sidebar/COMPONENT.md)
+[Sidebar](../sidebar/COMPONENT.md) · [PageContent](../../components/page-content/COMPONENT.md) · [ScrollContainer](../../components/scroll-container/COMPONENT.md) · [Breadcrumb](../../components/breadcrumb/COMPONENT.md)

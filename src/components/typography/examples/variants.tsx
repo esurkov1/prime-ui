@@ -1,60 +1,48 @@
+/** One `variant="body-m"` line with each `weight`, the extreme `tracking` values and `tone="secondary"`. Use to see how the override props change a role. */
 import { Divider, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const line = "Один размер `m`, разные оси оформления: `weight`, `tracking` и `tone`.";
+const line = "Съешь же ещё этих мягких французских булок да выпей чаю";
 
-/** `weight`, крайние `tracking` и `tone` на `variant="body-default"`. Зеркало `playground/snippets/typography/variants.tsx`. */
-export default function TypographyExampleVariants() {
+export default function TypographyVariantsExample() {
   return (
-    <div className={styles.typographyScaleList}>
-      <div className={styles.typographyScaleRow}>
-        <Typography.Root variant="body-default" weight="regular">
-          {line} (regular)
+    <div className={styles.scaleList}>
+      <div className={styles.scaleRow}>
+        <Typography.Root variant="body-m" weight="regular">
+          {line}
         </Typography.Root>
-        <Divider.Root variant="text" align="start">
-          weight regular
-        </Divider.Root>
+        <Divider.Root align="start">weight regular</Divider.Root>
       </div>
-      <div className={styles.typographyScaleRow}>
-        <Typography.Root variant="body-default" weight="medium">
-          {line} (medium)
+      <div className={styles.scaleRow}>
+        <Typography.Root variant="body-m" weight="medium">
+          {line}
         </Typography.Root>
-        <Divider.Root variant="text" align="start">
-          weight medium
-        </Divider.Root>
+        <Divider.Root align="start">weight medium</Divider.Root>
       </div>
-      <div className={styles.typographyScaleRow}>
-        <Typography.Root variant="body-default" weight="semibold">
-          {line} (semibold)
+      <div className={styles.scaleRow}>
+        <Typography.Root variant="body-m" weight="semibold">
+          {line}
         </Typography.Root>
-        <Divider.Root variant="text" align="start">
-          weight semibold
-        </Divider.Root>
+        <Divider.Root align="start">weight semibold</Divider.Root>
       </div>
-      <div className={styles.typographyScaleRow}>
-        <Typography.Root variant="body-default" tracking="tighter">
-          {line} (tracking tighter)
+      <div className={styles.scaleRow}>
+        <Typography.Root variant="body-m" tracking="tighter">
+          {line}
         </Typography.Root>
-        <Divider.Root variant="text" align="start">
-          tracking tighter
-        </Divider.Root>
+        <Divider.Root align="start">tracking tighter</Divider.Root>
       </div>
-      <div className={styles.typographyScaleRow}>
-        <Typography.Root variant="body-default" tracking="wide">
-          {line} (tracking wide)
+      <div className={styles.scaleRow}>
+        <Typography.Root variant="body-m" tracking="wide">
+          {line}
         </Typography.Root>
-        <Divider.Root variant="text" align="start">
-          tracking wide
-        </Divider.Root>
+        <Divider.Root align="start">tracking wide</Divider.Root>
       </div>
-      <div className={styles.typographyScaleRow}>
-        <Typography.Root variant="body-default" tone="muted">
-          {line} (tone muted)
+      <div className={styles.scaleRow}>
+        <Typography.Root variant="body-m" tone="secondary">
+          {line}
         </Typography.Root>
-        <Divider.Root variant="text" align="start">
-          tone muted — вторичный цвет текста
-        </Divider.Root>
+        <Divider.Root align="start">tone secondary — вторичный цвет текста</Divider.Root>
       </div>
     </div>
   );

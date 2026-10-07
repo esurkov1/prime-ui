@@ -1,219 +1,403 @@
+/*
+ * Tabs — Graphite. Navigation between content panels.
+ * Horizontal: text tabs over a hairline; a 2px accent bar under the active text slides between
+ * triggers. Vertical: rounded items without a rail; the active item is a `fill-muted` pill with a
+ * short accent mark. Stacks into a scrolling row under 600px of container width.
+ * Two-line triggers (with `Tabs.Description`) size to content with a minimum width.
+ * Heights follow control tiers so Tabs line up with Button / Input of the same size.
+ */
+
 .root {
-  --prime-tabs-trigger-height: var(--prime-sys-size-control-m-height);
-  --prime-tabs-trigger-text: var(--prime-sys-size-control-m-text);
-  --prime-tabs-trigger-gap: var(--prime-sys-size-control-m-gap);
-  --prime-tabs-trigger-pad-x: var(--prime-sys-size-control-m-buttonPaddingX);
-  --prime-tabs-trigger-pad-y: var(--prime-sys-size-control-m-buttonPaddingY);
-  /* Расстояние между триггерами в горизонтальном списке. */
-  --prime-tabs-item-gap: var(--prime-sys-spacing-x6);
-  --prime-tabs-icon-size: var(--prime-sys-size-control-m-icon);
+  --tabs-height: var(--prime-control-m-height);
+  --tabs-text-size: var(--prime-control-m-text-size);
+  --tabs-line-height: var(--prime-control-m-line-height);
+  --tabs-gap: var(--prime-control-m-gap);
+  --tabs-icon: var(--prime-control-m-icon);
+  --tabs-radius: var(--prime-control-m-radius);
+  --tabs-pad-x: var(--prime-control-m-padding-x);
+  --tabs-item-gap: var(--prime-space-5);
+  --tabs-two-line-min: calc(4 * var(--tabs-height));
+
+  min-width: 0;
+  font-family: var(--prime-font-family-sans);
+}
+
+.root[data-size="xs"] {
+  --tabs-height: var(--prime-control-xs-height);
+  --tabs-text-size: var(--prime-control-xs-text-size);
+  --tabs-line-height: var(--prime-control-xs-line-height);
+  --tabs-gap: var(--prime-control-xs-gap);
+  --tabs-icon: var(--prime-control-xs-icon);
+  --tabs-radius: var(--prime-control-xs-radius);
+  --tabs-pad-x: var(--prime-control-xs-padding-x);
+  --tabs-item-gap: var(--prime-space-3);
 }
 
 .root[data-size="s"] {
-  --prime-tabs-trigger-height: var(--prime-sys-size-control-s-height);
-  --prime-tabs-trigger-text: var(--prime-sys-size-control-s-text);
-  --prime-tabs-trigger-gap: var(--prime-sys-size-control-s-gap);
-  --prime-tabs-trigger-pad-x: var(--prime-sys-size-control-s-buttonPaddingX);
-  --prime-tabs-trigger-pad-y: var(--prime-sys-size-control-s-buttonPaddingY);
-  --prime-tabs-item-gap: var(--prime-sys-spacing-x4);
-  --prime-tabs-icon-size: var(--prime-sys-size-control-s-icon);
+  --tabs-height: var(--prime-control-s-height);
+  --tabs-text-size: var(--prime-control-s-text-size);
+  --tabs-line-height: var(--prime-control-s-line-height);
+  --tabs-gap: var(--prime-control-s-gap);
+  --tabs-icon: var(--prime-control-s-icon);
+  --tabs-radius: var(--prime-control-s-radius);
+  --tabs-pad-x: var(--prime-control-s-padding-x);
+  --tabs-item-gap: var(--prime-space-4);
 }
 
 .root[data-size="l"] {
-  --prime-tabs-trigger-height: var(--prime-sys-size-control-l-height);
-  --prime-tabs-trigger-text: var(--prime-sys-size-control-l-text);
-  --prime-tabs-trigger-gap: var(--prime-sys-size-control-l-gap);
-  --prime-tabs-trigger-pad-x: var(--prime-sys-size-control-l-buttonPaddingX);
-  --prime-tabs-trigger-pad-y: var(--prime-sys-size-control-l-buttonPaddingY);
-  --prime-tabs-item-gap: var(--prime-sys-spacing-x8);
-  --prime-tabs-icon-size: var(--prime-sys-size-control-l-icon);
+  --tabs-height: var(--prime-control-l-height);
+  --tabs-text-size: var(--prime-control-l-text-size);
+  --tabs-line-height: var(--prime-control-l-line-height);
+  --tabs-gap: var(--prime-control-l-gap);
+  --tabs-icon: var(--prime-control-l-icon);
+  --tabs-radius: var(--prime-control-l-radius);
+  --tabs-pad-x: var(--prime-control-l-padding-x);
+  --tabs-item-gap: var(--prime-space-6);
 }
 
 .root[data-size="xl"] {
-  --prime-tabs-trigger-height: var(--prime-sys-size-control-xl-height);
-  --prime-tabs-trigger-text: var(--prime-sys-size-control-xl-text);
-  --prime-tabs-trigger-gap: var(--prime-sys-size-control-xl-gap);
-  --prime-tabs-trigger-pad-x: var(--prime-sys-size-control-xl-buttonPaddingX);
-  --prime-tabs-trigger-pad-y: var(--prime-sys-size-control-xl-buttonPaddingY);
-  --prime-tabs-item-gap: var(--prime-sys-spacing-x8);
-  --prime-tabs-icon-size: var(--prime-sys-size-control-xl-icon);
+  --tabs-height: var(--prime-control-xl-height);
+  --tabs-text-size: var(--prime-control-xl-text-size);
+  --tabs-line-height: var(--prime-control-xl-line-height);
+  --tabs-gap: var(--prime-control-xl-gap);
+  --tabs-icon: var(--prime-control-xl-icon);
+  --tabs-radius: var(--prime-control-xl-radius);
+  --tabs-pad-x: var(--prime-control-xl-padding-x);
+  --tabs-item-gap: var(--prime-space-8);
+}
+
+/* ---------- Layout ---------- */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
 }
 
 .root[data-orientation="vertical"] {
-  display: flex;
-  gap: var(--prime-sys-spacing-x4);
+  container-type: inline-size;
 }
+
+.root[data-orientation="vertical"] .layout {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--prime-space-6);
+}
+
+/* ---------- List ---------- */
 
 .list {
   position: relative;
   isolation: isolate;
   display: flex;
-  gap: var(--prime-tabs-item-gap);
   box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
 }
 
-.root[data-orientation="horizontal"] .list {
-  flex-wrap: nowrap;
-  align-items: center;
-  border-top: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Edge fade while the list scrolls (mask is alpha-only; any opaque color works). */
+.list[data-overflow-start="true"] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    var(--prime-color-text-primary) var(--prime-space-8)
+  );
+}
+
+.list[data-overflow-end="true"] {
+  mask-image: linear-gradient(
+    to left,
+    transparent,
+    var(--prime-color-text-primary) var(--prime-space-8)
+  );
+}
+
+.list[data-overflow-start="true"][data-overflow-end="true"] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    var(--prime-color-text-primary) var(--prime-space-8),
+    var(--prime-color-text-primary) calc(100% - var(--prime-space-8)),
+    transparent
+  );
 }
 
 .root[data-orientation="vertical"] .list {
   flex-direction: column;
-  gap: var(--prime-tabs-trigger-gap);
-  border-right: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  flex-shrink: 0;
+  gap: var(--prime-space-1);
+  min-width: var(--tabs-two-line-min);
+  overflow: visible;
 }
 
-/* Плавающая полоса активной вкладки (в одном стиле с SegmentedControl). */
+/* Horizontal: text tabs over a hairline. */
+.root[data-orientation="horizontal"] .list {
+  gap: var(--tabs-item-gap);
+  box-shadow: inset 0 calc(-1 * var(--prime-border-width)) 0 var(--prime-color-border-subtle);
+}
+
+/* ---------- Indicator ---------- */
+
 .indicator {
   position: absolute;
+  top: 0;
+  left: 0;
   z-index: 0;
   pointer-events: none;
-  background: var(--prime-sys-color-accent-base);
   opacity: 0;
   transition:
-    transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    height var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    opacity var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    width var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    height var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .indicator[data-visible="true"] {
   opacity: 1;
 }
 
-.indicatorHorizontal {
-  bottom: var(--prime-sys-unit-neg-1px);
-  left: 0;
-  height: var(--prime-sys-unit-2px);
+/* 2px accent bar under the text of the active trigger. */
+.indicatorBar {
+  top: auto;
+  bottom: 0;
   width: 0;
+  height: var(--prime-focus-width);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-accent-default);
 }
 
-.indicatorVertical {
-  right: var(--prime-sys-unit-neg-1px);
-  top: 0;
-  width: var(--prime-sys-unit-2px);
+/* Vertical: `fill-muted` pill with a short accent mark at the inline start. */
+.indicatorPill {
+  border-radius: var(--tabs-radius);
+  background: var(--prime-color-fill-muted);
+}
+
+.indicatorPill::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--prime-space-2);
+  inset-inline-start: var(--prime-space-1);
+  width: var(--prime-focus-width);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-accent-default);
+}
+
+/* ---------- Trigger ---------- */
+
+.tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tabs-gap);
+  box-sizing: border-box;
+  min-width: 0;
+  height: var(--tabs-height);
+  margin: 0;
+  padding: 0 var(--prime-space-1);
+  border: 0;
+  border-radius: var(--prime-radius-xs);
+  background: none;
+  color: var(--prime-color-text-secondary);
+  font-family: inherit;
+  font-size: var(--tabs-text-size);
+  line-height: var(--tabs-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-orientation="vertical"] .tab {
+  justify-content: flex-start;
+  padding: 0 var(--tabs-pad-x);
+  border-radius: var(--tabs-radius);
+}
+
+/* Two-line trigger: label + count on the first line, description on the second. */
+.tab[data-two-line="true"] {
+  /* Grid, not wrapping flex: the max-content width is the wider line, not both lines summed. */
+  display: inline-grid;
+  grid-template-columns: minmax(0, auto) auto;
+  align-content: center;
+  justify-content: start;
+  justify-items: start;
+  column-gap: var(--tabs-gap);
+  row-gap: 0;
+  height: auto;
+  padding-block: var(--prime-space-2) var(--prime-space-3);
+}
+
+/* Vertical items get a minimum width; horizontal ones hug their text so the bar matches it. */
+.root[data-orientation="vertical"] .tab[data-two-line="true"] {
+  min-width: var(--tabs-two-line-min);
+  padding-block: var(--prime-space-2);
+}
+
+.tab:hover:not([data-disabled="true"]) {
+  color: var(--prime-color-text-primary);
+}
+
+.root[data-orientation="vertical"] .tab:hover:not([data-disabled="true"], [aria-selected="true"]) {
+  background: var(--prime-color-fill-subtle);
+}
+
+.tab[aria-selected="true"] {
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.tab:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.tab[data-disabled="true"] {
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ---------- Trigger parts ---------- */
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tabs-icon);
+  height: var(--tabs-icon);
+  line-height: 0;
+  color: var(--prime-color-text-muted);
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tab:hover:not([data-disabled="true"]) .icon,
+.tab[aria-selected="true"] .icon {
+  color: inherit;
+}
+
+.tab[aria-selected="true"] .icon:first-child {
+  color: var(--prime-color-accent-text);
+}
+
+.tab[data-disabled="true"] .icon {
+  color: var(--prime-color-text-disabled);
+}
+
+/* The hidden medium-weight copy keeps the width stable between inactive and active. */
+.label {
+  display: inline-grid;
+  min-width: 0;
+  font: inherit;
+}
+
+.labelText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.label[data-text]::after {
+  /* Empty alt text keeps the copy out of the accessible name. */
+  content: attr(data-text) / "";
   height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--prime-font-weight-medium);
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+.count {
+  flex-shrink: 0;
+}
+
+.description {
+  grid-column: 1 / -1;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description strong {
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.tab[data-disabled="true"] .description,
+.tab[data-disabled="true"] .description strong {
+  color: var(--prime-color-text-disabled);
+}
+
+/* ---------- Panel ---------- */
+
+.panel {
+  box-sizing: border-box;
+  min-width: 0;
+  flex: 1 1 auto;
+  font-size: var(--tabs-text-size);
+  line-height: var(--tabs-line-height);
+  color: var(--prime-color-text-primary);
+}
+
+.panel:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+  border-radius: var(--prime-radius-xs);
+}
+
+.panel :where(p, ul, ol) {
+  margin: 0;
+}
+
+/* ---------- Vertical → horizontal row in narrow containers ---------- */
+
+@container (max-width: 37.5rem) {
+  .root[data-orientation="vertical"] .layout {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--prime-space-4);
+  }
+
+  .root[data-orientation="vertical"] .list {
+    flex-direction: row;
+    min-width: 0;
+    overflow-x: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .indicator {
     transition: none;
   }
-}
-
-.tab {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--prime-tabs-trigger-gap);
-  padding-inline: var(--prime-tabs-trigger-pad-x);
-  padding-block: var(--prime-tabs-trigger-pad-y);
-  height: var(--prime-tabs-trigger-height);
-  box-sizing: border-box;
-  font-size: var(--prime-tabs-trigger-text);
-  font-family: inherit;
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  white-space: nowrap;
-  color: var(--prime-sys-color-content-secondary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-/* Слот иконки — как у Button.Icon (две иконки: слева и справа от подписи). */
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: var(--prime-tabs-icon-size);
-  height: var(--prime-tabs-icon-size);
-}
-
-.icon svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/*
- * Явный кегль для всего DOM внутри триггера, кроме дерева слота .icon:
- * иначе Typography / стили превью (.root[data-variant]) перебивают с той же специфичностью.
- * Одинаковая жирность у всех вкладок (medium) — без скачка при смене активной; disabled — regular.
- */
-.root .tab *:not(.icon, .icon *) {
-  font-size: var(--prime-tabs-trigger-text);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  font-weight: var(--prime-sys-typography-weight-medium);
-}
-
-.tab .icon {
-  line-height: 0;
-}
-
-/* Опциональная обёртка подписи: сжатие в flex-ряду при длинном тексте. */
-.label {
-  min-width: 0;
-  flex-shrink: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* У активной вкладки первая иконка — primary, остальные слоты остаются subtle. */
-.tab[aria-selected="true"] .icon:first-of-type :global(svg) {
-  color: var(--prime-sys-color-accent-base);
-}
-
-.tab:hover {
-  color: var(--prime-sys-color-content-primary);
-}
-
-.tab[aria-selected="true"] {
-  color: var(--prime-sys-color-content-primary);
-}
-
-.tab:focus-visible {
-  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-  border-radius: var(--prime-sys-shape-radius-s);
-}
-
-.tab[data-disabled="true"] {
-  color: var(--prime-sys-color-content-disabled);
-  cursor: not-allowed;
-  font-weight: var(--prime-sys-typography-weight-regular);
-}
-
-.root .tab[data-disabled="true"] *:not(.icon, .icon *) {
-  font-weight: var(--prime-sys-typography-weight-regular);
-}
-
-.tab[data-disabled="true"] .icon:first-of-type :global(svg) {
-  color: var(--prime-sys-color-content-disabled);
-}
-
-/* Кегль как у триггеров: токен задан на `.root` по `data-size` и наследуется сюда. */
-.panel {
-  box-sizing: border-box;
-  padding: var(--prime-sys-spacing-x4) 0;
-  font-size: var(--prime-tabs-trigger-text);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-content-primary);
-}
-
-/* Вложенная типографика — тот же ярус, что и `size` у Tabs.Root (не фиксированный body). */
-.root .panel
-  *:not(a, a *, button, button *, input, textarea, select, code, code *, kbd, kbd *, pre, pre *) {
-  font-size: var(--prime-tabs-trigger-text);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-}
-
-.panel :where(p, ul, ol) {
-  margin: 0;
 }

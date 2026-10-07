@@ -1,19 +1,29 @@
 import * as React from "react";
+import { Badge } from "@/components/badge/Badge";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { usePosition } from "@/hooks/usePosition";
+import { usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import {
+  FieldFrame,
+  type FieldFrameProps,
+  type FieldIds,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
+import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import { getScrollContainers } from "@/internal/scrollAncestors";
-import type { SelectSize } from "@/internal/states";
+import type { ControlSize, PaletteColor } from "@/internal/states";
 
 import styles from "./Select.module.css";
+import { CheckIcon, ChevronIcon, ClearIcon, SearchIcon, Spinner } from "./selectIcons";
 import { handleSelectListboxKeyDown, queryEnabledSelectOptions } from "./selectListbox";
 
 /** Стабильные опции `usePosition` — не создавать новый объект на каждом рендере Select.Content. */
@@ -22,13 +32,51 @@ const SELECT_LISTBOX_POSITION_OPTS = {
   align: "start" as const,
 };
 
+export type SelectLabels = {
+  /** Placeholder and accessible name of the search field (`Select.Content searchable`). */
+  search: string;
+  /** Empty state: no items or nothing matches. */
+  empty: string;
+  /** Second line of the empty state while searching. */
+  emptyHint: string;
+  /** Status row while `loading`. */
+  loading: string;
+  /** Tooltip of the clear button (`clearable`). */
+  clear: string;
+  /** Muted marker after the label when `optional`. */
+  optional: string;
+};
+
+const SELECT_LABELS: SelectLabels = {
+  search: "Поиск",
+  empty: "Ничего не найдено",
+  emptyHint: "Попробуйте изменить запрос",
+  loading: "Загрузка…",
+  clear: "Очистить",
+  optional: "необязательно",
+};
+
+/** `id` опции для `aria-activedescendant` (без пробелов — валидный id). */
+function optionDomId(listboxId: string, value: string): string {
+  return `${listboxId}-opt-${value.replace(/\s+/g, "_")}`;
+}
+
+/** Пауза, после которой буфер typeahead начинается заново. */
+const TYPEAHEAD_RESET_MS = 500;
+
+function normalizeQuery(q: string): string {
+  return q.trim().toLocaleLowerCase();
+}
+
 // ─── Context ─────────────────────────────────────────────────────────────────
 
 type SelectedLabelBinding = { value: string; label: string };
 
 type SelectContextValue = {
-  size: SelectSize;
-  hasError: boolean;
+  size: ControlSize;
+  invalid: boolean;
+  focusRing: boolean;
+  required: boolean;
   isOpen: boolean;
   /** When `true`, value is `string[]`, list stays open on pick, options toggle, listbox is `aria-multiselectable`. */
   multiple: boolean;
@@ -46,91 +94,212 @@ type SelectContextValue = {
   setHighlightedValue: (v: string | undefined) => void;
   triggerId: string;
   listboxId: string;
+  /** Hint / error ids of the field frame. */
+  describedBy: string | undefined;
   triggerRef: React.RefObject<HTMLButtonElement | null>;
   disabled?: boolean;
   placeholder?: string;
   onInitLabel: (value: string, label: string) => void;
+  /** Строка поиска `Select.Content searchable`; пустая — фильтра нет. */
+  query: string;
+  setQuery: (q: string) => void;
+  loading: boolean;
+  clearable: boolean;
+  hasValue: boolean;
+  clear: () => void;
+  labels: SelectLabels;
 };
 
 const [SelectProvider, useSelectContext] = createComponentContext<SelectContextValue>("Select");
 
 // ─── SelectRoot ───────────────────────────────────────────────────────────────
 
-type SelectRootBase = {
-  size?: SelectSize;
+type SelectRootBase = FieldFrameProps & {
+  size?: ControlSize;
   disabled?: boolean;
   placeholder?: string;
-  hasError?: boolean;
+  /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
+  invalid?: boolean;
+  /** Id of the control (trigger or native `<select>`); generated when omitted. */
+  id?: string;
+  labels?: Partial<SelectLabels>;
+  className?: string;
   children: React.ReactNode;
 };
 
-export type SelectRootProps =
-  | (SelectRootBase & {
-      multiple?: false;
-      native?: false;
-      value?: string;
-      defaultValue?: string;
-      onChange?: (value: string) => void;
-    })
-  | (SelectRootBase & {
-      multiple: true;
-      native?: false;
-      value?: string[];
-      defaultValue?: string[];
-      onChange?: (value: string[]) => void;
-    })
-  | (SelectRootBase & {
-      multiple?: false;
-      native: true;
-      value?: string;
-      defaultValue?: string;
-      onChange?: (value: string) => void;
-    })
-  | (SelectRootBase & {
-      multiple: true;
-      native: true;
-      value?: string[];
-      defaultValue?: string[];
-      onChange?: (value: string[]) => void;
-    });
-
-function SelectRoot(props: SelectRootProps) {
-  if (props.multiple === true) {
-    if (props.native === true) {
-      return <SelectNativeMultiRoot {...props} />;
-    }
-    return <SelectComboboxMultiRoot {...props} />;
-  }
-  if (props.native === true) {
-    return <SelectNativeRoot {...props} />;
-  }
-  return <SelectComboboxRoot {...props} />;
-}
-SelectRoot.displayName = "SelectRoot";
-
-type SelectComboboxSingleRootProps = SelectRootBase & {
+type SelectSingleValueProps = {
   multiple?: false;
-  native?: false;
   value?: string;
   defaultValue?: string;
-  onChange?: (value: string) => void;
+  /** Picked value; `""` after clearing. */
+  onValueChange?: (value: string) => void;
 };
 
+type SelectMultipleValueProps = {
+  multiple: true;
+  value?: string[];
+  defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
+};
+
+type SelectComboboxProps = {
+  native?: false;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Clear button in the trigger (and `Delete` / `Backspace` on it) while a value is selected. */
+  clearable?: boolean;
+  /** Spinner instead of the chevron, `aria-busy`, a status row in the list. */
+  loading?: boolean;
+};
+
+/**
+ * Native mode: the system `<select>`. It has no `Select.Trigger`, so naming attributes and
+ * `name` go on Root.
+ */
+type SelectNativeProps = Pick<
+  React.SelectHTMLAttributes<HTMLSelectElement>,
+  "name" | "aria-label" | "aria-labelledby" | "aria-describedby"
+> & {
+  native: true;
+};
+
+export type SelectRootProps = SelectRootBase &
+  (SelectSingleValueProps | SelectMultipleValueProps) &
+  (SelectComboboxProps | SelectNativeProps);
+
+type FieldBinding = {
+  size: ControlSize;
+  ids: FieldIds;
+  focusRing: boolean;
+  required: boolean;
+  labels: SelectLabels;
+};
+
+function SelectRoot(props: SelectRootProps) {
+  const {
+    size = "m",
+    label,
+    required = false,
+    optional,
+    hint,
+    error,
+    invalid,
+    focusRing = true,
+    disabled,
+    id,
+    labels: labelsProp,
+    className,
+  } = props;
+  const labels = React.useMemo(() => ({ ...SELECT_LABELS, ...labelsProp }), [labelsProp]);
+  const ids = useFieldFrame(
+    id,
+    { hint, error, invalid },
+    props.native === true ? props["aria-describedby"] : undefined,
+  );
+  const field: FieldBinding = { size, ids, focusRing, required, labels };
+
+  let control: React.ReactNode;
+  if (props.native === true) {
+    control =
+      props.multiple === true ? (
+        <SelectNativeMultiRoot {...props} field={field} />
+      ) : (
+        <SelectNativeRoot {...props} field={field} />
+      );
+  } else {
+    control =
+      props.multiple === true ? (
+        <SelectComboboxMultiRoot {...props} field={field} />
+      ) : (
+        <SelectComboboxRoot {...props} field={field} />
+      );
+  }
+
+  return (
+    <FieldFrame
+      size={size}
+      ids={ids}
+      label={label}
+      required={required}
+      optional={optional}
+      hint={hint}
+      error={error}
+      disabled={disabled}
+      optionalLabel={labels.optional}
+      className={className}
+    >
+      {control}
+    </FieldFrame>
+  );
+}
+SelectRoot.displayName = "Select.Root";
+
+/** Общее состояние открытия / поиска / подсветки обоих combobox-режимов. */
+function useComboboxShell(
+  { open, defaultOpen, onOpenChange }: SelectComboboxProps,
+  controlId: string,
+) {
+  const [isOpen, setIsOpen] = useControllableState<boolean>({
+    value: open,
+    defaultValue: defaultOpen ?? false,
+    onChange: onOpenChange,
+  });
+  const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
+  const [query, setQuery] = React.useState("");
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+
+  /* Закрытие (в том числе снаружи, через `open`) сбрасывает строку поиска. */
+  React.useEffect(() => {
+    if (!isOpen) setQuery("");
+  }, [isOpen]);
+
+  const onClose = React.useCallback(() => setIsOpen(false), [setIsOpen]);
+  const onOpen = React.useCallback(() => setIsOpen(true), [setIsOpen]);
+
+  return {
+    isOpen,
+    setIsOpen,
+    highlightedValue,
+    setHighlightedValue,
+    query,
+    setQuery,
+    triggerId: controlId,
+    listboxId: `${controlId}-listbox`,
+    triggerRef,
+    onClose,
+    onOpen,
+  };
+}
+
+type ComboboxRootInternalProps<V> = SelectRootBase &
+  SelectComboboxProps & {
+    value?: V;
+    defaultValue?: V;
+    onValueChange?: (value: V) => void;
+    field: FieldBinding;
+  };
+
 function SelectComboboxRoot({
-  size = "m",
   value,
   defaultValue,
-  onChange,
+  onValueChange,
   disabled,
   placeholder,
-  hasError = false,
+  clearable = false,
+  loading = false,
+  open,
+  defaultOpen,
+  onOpenChange,
+  field,
   children,
-}: SelectComboboxSingleRootProps) {
+}: ComboboxRootInternalProps<string>) {
+  const { size, ids, focusRing, required, labels } = field;
   const handleChange = React.useCallback(
     (v: string | undefined) => {
-      if (v !== undefined) onChange?.(v);
+      if (v !== undefined) onValueChange?.(v);
     },
-    [onChange],
+    [onValueChange],
   );
 
   const [selectedValue, setSelectedValue] = useControllableState<string | undefined>({
@@ -142,13 +311,8 @@ function SelectComboboxRoot({
   const [selectedLabelBinding, setSelectedLabelBinding] = React.useState<
     SelectedLabelBinding | undefined
   >(undefined);
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
-
-  const generatedId = React.useId();
-  const triggerId = `${generatedId}-trigger`;
-  const listboxId = `${generatedId}-listbox`;
-  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const shell = useComboboxShell({ open, defaultOpen, onOpenChange }, ids.controlId);
+  const { setIsOpen } = shell;
 
   // Sync ref so onInitLabel doesn't go stale
   const selectedValueRef = React.useRef(selectedValue);
@@ -166,49 +330,74 @@ function SelectComboboxRoot({
       setSelectedLabelBinding({ value: val, label });
       setIsOpen(false);
     },
-    [setSelectedValue],
+    [setSelectedValue, setIsOpen],
   );
 
-  const onClose = React.useCallback(() => setIsOpen(false), []);
-  const onOpen = React.useCallback(() => setIsOpen(true), []);
+  const hasValue = selectedValue !== undefined && selectedValue !== "";
+  const clear = React.useCallback(() => {
+    setSelectedValue("");
+    setSelectedLabelBinding(undefined);
+  }, [setSelectedValue]);
 
   const contextValue = React.useMemo<SelectContextValue>(
     () => ({
       size,
-      hasError,
-      isOpen,
+      invalid: ids.invalid,
+      focusRing,
+      required,
+      isOpen: shell.isOpen,
       multiple: false,
       selectedValue,
       selectedLabelBinding,
       selectedValues: [],
       labelsByValue: {},
       onSelect,
-      onClose,
-      onOpen,
-      highlightedValue,
-      setHighlightedValue,
-      triggerId,
-      listboxId,
-      triggerRef,
+      onClose: shell.onClose,
+      onOpen: shell.onOpen,
+      highlightedValue: shell.highlightedValue,
+      setHighlightedValue: shell.setHighlightedValue,
+      triggerId: shell.triggerId,
+      listboxId: shell.listboxId,
+      describedBy: ids.describedBy,
+      triggerRef: shell.triggerRef,
       disabled,
       placeholder,
       onInitLabel,
+      query: shell.query,
+      setQuery: shell.setQuery,
+      loading,
+      clearable,
+      hasValue,
+      clear,
+      labels,
     }),
     [
       size,
-      hasError,
-      isOpen,
+      ids.invalid,
+      focusRing,
+      ids.describedBy,
+      required,
+      shell.isOpen,
       selectedValue,
       selectedLabelBinding,
       onSelect,
-      onClose,
-      onOpen,
-      highlightedValue,
-      triggerId,
-      listboxId,
+      shell.onClose,
+      shell.onOpen,
+      shell.highlightedValue,
+      shell.setHighlightedValue,
+      shell.triggerId,
+      shell.listboxId,
+      shell.triggerRef,
       disabled,
       placeholder,
       onInitLabel,
+      shell.query,
+      shell.setQuery,
+      loading,
+      clearable,
+      hasValue,
+      clear,
+      labels,
     ],
   );
 
@@ -218,39 +407,30 @@ function SelectComboboxRoot({
     </SelectProvider>
   );
 }
-SelectComboboxRoot.displayName = "SelectComboboxRoot";
 
 function SelectComboboxMultiRoot({
-  size = "m",
   value,
   defaultValue,
-  onChange,
+  onValueChange,
   disabled,
   placeholder,
-  hasError = false,
+  clearable = false,
+  loading = false,
+  open,
+  defaultOpen,
+  onOpenChange,
+  field,
   children,
-}: Omit<Extract<SelectRootProps, { multiple: true }>, "native" | "multiple">) {
-  const handleChange = React.useCallback(
-    (next: string[]) => {
-      onChange?.(next);
-    },
-    [onChange],
-  );
-
+}: ComboboxRootInternalProps<string[]>) {
+  const { size, ids, focusRing, required, labels } = field;
   const [selectedValues, setSelectedValues] = useControllableState<string[]>({
     value,
     defaultValue: defaultValue ?? [],
-    onChange: handleChange,
+    onChange: onValueChange,
   });
 
   const [labelsByValue, setLabelsByValue] = React.useState<Record<string, string>>({});
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>(undefined);
-
-  const generatedId = React.useId();
-  const triggerId = `${generatedId}-trigger`;
-  const listboxId = `${generatedId}-listbox`;
-  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const shell = useComboboxShell({ open, defaultOpen, onOpenChange }, ids.controlId);
 
   const onInitLabel = React.useCallback((val: string, label: string) => {
     setLabelsByValue((prev) => {
@@ -272,46 +452,70 @@ function SelectComboboxMultiRoot({
     [setSelectedValues],
   );
 
-  const onClose = React.useCallback(() => setIsOpen(false), []);
-  const onOpen = React.useCallback(() => setIsOpen(true), []);
+  const hasValue = selectedValues.length > 0;
+  const clear = React.useCallback(() => {
+    setSelectedValues([]);
+  }, [setSelectedValues]);
 
   const contextValue = React.useMemo<SelectContextValue>(
     () => ({
       size,
-      hasError,
-      isOpen,
+      invalid: ids.invalid,
+      focusRing,
+      required,
+      isOpen: shell.isOpen,
       multiple: true,
       selectedValue: undefined,
       selectedLabelBinding: undefined,
       selectedValues,
       labelsByValue,
       onSelect,
-      onClose,
-      onOpen,
-      highlightedValue,
-      setHighlightedValue,
-      triggerId,
-      listboxId,
-      triggerRef,
+      onClose: shell.onClose,
+      onOpen: shell.onOpen,
+      highlightedValue: shell.highlightedValue,
+      setHighlightedValue: shell.setHighlightedValue,
+      triggerId: shell.triggerId,
+      listboxId: shell.listboxId,
+      describedBy: ids.describedBy,
+      triggerRef: shell.triggerRef,
       disabled,
       placeholder,
       onInitLabel,
+      query: shell.query,
+      setQuery: shell.setQuery,
+      loading,
+      clearable,
+      hasValue,
+      clear,
+      labels,
     }),
     [
       size,
-      hasError,
-      isOpen,
+      ids.invalid,
+      focusRing,
+      ids.describedBy,
+      required,
+      shell.isOpen,
       selectedValues,
       labelsByValue,
       onSelect,
-      onClose,
-      onOpen,
-      highlightedValue,
-      triggerId,
-      listboxId,
+      shell.onClose,
+      shell.onOpen,
+      shell.highlightedValue,
+      shell.setHighlightedValue,
+      shell.triggerId,
+      shell.listboxId,
+      shell.triggerRef,
       disabled,
       placeholder,
       onInitLabel,
+      shell.query,
+      shell.setQuery,
+      loading,
+      clearable,
+      hasValue,
+      clear,
+      labels,
     ],
   );
 
@@ -321,7 +525,6 @@ function SelectComboboxMultiRoot({
     </SelectProvider>
   );
 }
-SelectComboboxMultiRoot.displayName = "SelectComboboxMultiRoot";
 
 // ─── SelectTrigger ────────────────────────────────────────────────────────────
 
@@ -331,9 +534,29 @@ export type SelectTriggerProps = Omit<
 >;
 
 const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
-  ({ className, children, onClick, onKeyDown, ...rest }, forwardedRef) => {
-    const { isOpen, onOpen, onClose, triggerId, listboxId, disabled, size, hasError, triggerRef } =
-      useSelectContext();
+  (
+    { className, children, onClick, onKeyDown, "aria-describedby": ariaDescribedBy, ...rest },
+    forwardedRef,
+  ) => {
+    const {
+      isOpen,
+      onOpen,
+      onClose,
+      triggerId,
+      listboxId,
+      disabled,
+      size,
+      invalid,
+      focusRing,
+      required,
+      describedBy,
+      triggerRef,
+      loading,
+      clearable,
+      hasValue,
+      clear,
+      labels,
+    } = useSelectContext();
 
     const setRefs = React.useCallback(
       (el: HTMLButtonElement | null) => {
@@ -346,6 +569,8 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
       },
       [forwardedRef, triggerRef],
     );
+
+    const showClear = clearable && hasValue && !disabled && !loading;
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       onClick?.(e);
@@ -360,6 +585,11 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
       if (["ArrowDown", "ArrowUp", " ", "Enter"].includes(e.key)) {
         e.preventDefault();
         if (!isOpen) onOpen();
+        return;
+      }
+      if (showClear && (e.key === "Delete" || e.key === "Backspace")) {
+        e.preventDefault();
+        clear();
       }
     };
 
@@ -372,30 +602,67 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={listboxId}
+        aria-invalid={invalid || undefined}
+        aria-required={required || undefined}
+        aria-describedby={[ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined}
+        aria-busy={loading || undefined}
         disabled={disabled}
         className={cx(styles.trigger, className)}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
-        {...toDataAttributes({ open: isOpen, size, "has-error": hasError })}
+        {...toDataAttributes({
+          state: isOpen ? "open" : "closed",
+          size,
+          invalid: invalid || undefined,
+          loading: loading || undefined,
+          disabled: disabled || undefined,
+          "focus-ring": focusRing ? undefined : false,
+        })}
         {...rest}
       >
         <span className={styles.triggerMain}>{children}</span>
+        {showClear ? (
+          // Не кнопка: вложенные интерактивные элементы в <button> недопустимы.
+          // Клавиатура — Delete / Backspace на триггере.
+          <span
+            className={styles.triggerClear}
+            aria-hidden
+            title={labels.clear}
+            data-select-clear=""
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={(e) => {
+              e.stopPropagation();
+              clear();
+            }}
+          >
+            <ClearIcon />
+          </span>
+        ) : null}
         <span className={styles.triggerChevronSlot} aria-hidden>
-          <span className={styles.triggerChevron} />
+          {loading ? <Spinner className={styles.spinner} /> : <ChevronIcon />}
         </span>
       </button>
     );
   },
 );
-SelectTrigger.displayName = "SelectTrigger";
+SelectTrigger.displayName = "Select.Trigger";
 
 // ─── SelectValue ─────────────────────────────────────────────────────────────
 
+/** What `Select.Value` passes to its render function: the selected option. */
+export type SelectValueItem = { value: string; label: string };
+
 export type SelectValueProps = {
   className?: string;
+  /**
+   * Single mode: renders the selected option in the trigger, e.g. with the same
+   * `Select.ItemMedia` / `Select.ItemText` / `Select.ItemDescription` parts as the row.
+   * Not called while empty (the placeholder shows) and ignored in `multiple` mode.
+   */
+  children?: (item: SelectValueItem) => React.ReactNode;
 };
 
-function SelectValue({ className }: SelectValueProps) {
+function SelectValue({ className, children }: SelectValueProps) {
   const ctx = useSelectContext();
   if (ctx.multiple) {
     const { selectedValues, labelsByValue, placeholder } = ctx;
@@ -413,11 +680,25 @@ function SelectValue({ className }: SelectValueProps) {
     );
   }
   const { selectedLabelBinding, selectedValue, placeholder } = ctx;
+  const empty = selectedValue === undefined || selectedValue === "";
   /* Подпись из items валидна только для текущего value; иначе — raw value или placeholder до onInitLabel */
-  const display =
+  const label =
     selectedLabelBinding && selectedLabelBinding.value === selectedValue
       ? selectedLabelBinding.label
-      : (selectedValue ?? placeholder);
+      : selectedValue;
+  if (children && !empty) {
+    const parts = partitionRichChildren(children({ value: selectedValue, label: label ?? "" }));
+    return (
+      <span
+        className={cx(styles.triggerValue, className)}
+        {...toDataAttributes({ rich: parts.rich || undefined })}
+      >
+        {parts.media}
+        <span className={styles.valueBody}>{parts.body}</span>
+      </span>
+    );
+  }
+  const display = empty ? placeholder : label;
   return (
     <span
       className={cx(styles.triggerValue, className)}
@@ -442,14 +723,151 @@ function SelectTriggerIcon({ className, children, ...rest }: SelectTriggerIconPr
 }
 SelectTriggerIcon.displayName = "SelectTriggerIcon";
 
+// ─── SelectBadge ──────────────────────────────────────────────────────────────
+
+export type SelectBadgeProps = {
+  /** Palette hue of the soft badge. Default `gray`. */
+  color?: PaletteColor;
+  children: React.ReactNode;
+  className?: string;
+};
+
+/**
+ * Status inside the trigger: a soft Badge one tier below the field, at the trailing edge before
+ * the clear button and the chevron. The value truncates before it; the trigger height is unchanged.
+ */
+function SelectBadge({ color = "gray", children, className }: SelectBadgeProps) {
+  return (
+    <Badge.Root color={color} variant="soft" className={cx(styles.badge, className)}>
+      {children}
+    </Badge.Root>
+  );
+}
+SelectBadge.displayName = "Select.Badge";
+
+// ─── Rich option parts (row and trigger) ──────────────────────────────────────
+
+export type SelectItemMediaProps = {
+  /** Palette hue of the tile (soft fill + hue text for an icon). Without it — a neutral fill. */
+  color?: PaletteColor;
+  /** An icon or an `<img>` (covers the tile). */
+  children: React.ReactNode;
+  className?: string;
+};
+
+/** Leading thumbnail tile of a rich option; the option grows to two lines. */
+function SelectItemMedia({ color, children, className }: SelectItemMediaProps) {
+  return (
+    <span
+      className={cx(styles.itemMedia, className)}
+      aria-hidden="true"
+      {...toDataAttributes({ color })}
+    >
+      {children}
+    </span>
+  );
+}
+SelectItemMedia.displayName = "Select.ItemMedia";
+
+export type SelectItemTextProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+
+/** Title of a rich option; its text is the option label (trigger, typeahead, search). */
+function SelectItemText({ children, className }: SelectItemTextProps) {
+  return <span className={cx(styles.itemTitle, className)}>{children}</span>;
+}
+SelectItemText.displayName = "Select.ItemText";
+
+export type SelectItemDescriptionProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+
+/** Muted second line under `Select.ItemText`; searchable. */
+function SelectItemDescription({ children, className }: SelectItemDescriptionProps) {
+  return <span className={cx(styles.itemDescription, className)}>{children}</span>;
+}
+SelectItemDescription.displayName = "Select.ItemDescription";
+
+export type SelectItemMetaProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+
+/** Trailing meta of an option (price, count): muted, tabular, right-aligned, before the check. */
+function SelectItemMeta({ children, className }: SelectItemMetaProps) {
+  return <span className={cx(styles.itemMeta, className)}>{children}</span>;
+}
+SelectItemMeta.displayName = "Select.ItemMeta";
+
+type RichParts = {
+  media: React.ReactNode[];
+  body: React.ReactNode[];
+  meta: React.ReactNode[];
+  /** Two-line layout: a description or a media tile is present. */
+  rich: boolean;
+  title: React.ReactNode | undefined;
+  description: React.ReactNode | undefined;
+};
+
+/** Splits rich parts out of children (fragments are flattened; parts must be direct children). */
+function partitionRichChildren(children: React.ReactNode): RichParts {
+  const parts: RichParts = {
+    media: [],
+    body: [],
+    meta: [],
+    rich: false,
+    title: undefined,
+    description: undefined,
+  };
+  let index = 0;
+  const visit = (node: React.ReactNode) => {
+    React.Children.forEach(node, (raw) => {
+      if (raw == null || raw === false) return;
+      /* Свои ключи: части рендерятся массивами в разных слотах. */
+      const child = React.isValidElement(raw)
+        ? React.cloneElement(raw, { key: raw.key ?? `prime-select-part-${index++}` })
+        : raw;
+      if (React.isValidElement(child)) {
+        const props = child.props as { children?: React.ReactNode };
+        if (child.type === React.Fragment) {
+          visit(props.children);
+          return;
+        }
+        if (child.type === SelectItemMedia) {
+          parts.media.push(child);
+          parts.rich = true;
+          return;
+        }
+        if (child.type === SelectItemMeta) {
+          parts.meta.push(child);
+          return;
+        }
+        if (child.type === SelectItemText) parts.title = props.children;
+        if (child.type === SelectItemDescription) {
+          parts.description = props.children;
+          parts.rich = true;
+        }
+      }
+      parts.body.push(child);
+    });
+  };
+  visit(children);
+  return parts;
+}
+
 // ─── SelectContent ────────────────────────────────────────────────────────────
 
 export type SelectContentProps = {
   className?: string;
+  /** Поле поиска вверху панели; пункты фильтруются по подписи и `keywords`. */
+  searchable?: boolean;
   children: React.ReactNode;
 };
 
-function SelectContent({ className, children }: SelectContentProps) {
+function SelectContent({ className, searchable = false, children }: SelectContentProps) {
   const {
     isOpen,
     onClose,
@@ -463,6 +881,10 @@ function SelectContent({ className, children }: SelectContentProps) {
     selectedValues,
     multiple,
     size,
+    query,
+    setQuery,
+    loading,
+    labels,
   } = useSelectContext();
 
   const selectedValueRef = React.useRef(selectedValue);
@@ -474,6 +896,8 @@ function SelectContent({ className, children }: SelectContentProps) {
 
   const overlayPortalLayer = useOverlayPortalLayer();
   const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const listboxRef = React.useRef<HTMLElement | null>(null);
+  const searchRef = React.useRef<HTMLInputElement | null>(null);
   const { resolvedSide, update } = usePosition(
     triggerRef,
     contentRef,
@@ -484,7 +908,14 @@ function SelectContent({ className, children }: SelectContentProps) {
   const updateRef = React.useRef(update);
   updateRef.current = update;
 
-  const getItems = React.useCallback(() => queryEnabledSelectOptions(contentRef.current), []);
+  const getItems = React.useCallback(() => queryEnabledSelectOptions(listboxRef.current), []);
+
+  /* Пустое состояние: после рендера считаем видимые опции (пункты сами скрываются по поиску). */
+  const [isEmpty, setIsEmpty] = React.useState(false);
+  React.useLayoutEffect(() => {
+    const count = listboxRef.current?.querySelectorAll('[role="option"]').length ?? 0;
+    setIsEmpty((prev) => (prev === (count === 0) ? prev : count === 0));
+  });
 
   /* Позиционирование только когда список открыт */
   React.useLayoutEffect(() => {
@@ -501,28 +932,33 @@ function SelectContent({ className, children }: SelectContentProps) {
       return;
     }
 
-    const bootstrap = () => {
-      requestAnimationFrame(() => {
-        const el = contentRef.current;
-        if (!el) return;
-        el.focus({ preventScroll: true });
-        const items = queryEnabledSelectOptions(el);
-        if (multipleRef.current) {
-          const sv = selectedValuesRef.current;
-          const firstSelected = sv.find((v) => items.some((i) => i.dataset.value === v));
-          setHighlightedValue(firstSelected ?? undefined);
-        } else {
-          const sv = selectedValueRef.current;
-          const selectedIndex = items.findIndex((i) => i.dataset.value === sv);
-          if (selectedIndex >= 0 && sv) {
-            setHighlightedValue(sv);
-          }
+    const rafId = requestAnimationFrame(() => {
+      const focusTarget = searchRef.current ?? listboxRef.current;
+      if (!focusTarget) return;
+      focusTarget.focus({ preventScroll: true });
+      const items = queryEnabledSelectOptions(listboxRef.current);
+      if (multipleRef.current) {
+        const sv = selectedValuesRef.current;
+        const firstSelected = sv.find((v) => items.some((i) => i.dataset.value === v));
+        setHighlightedValue(firstSelected ?? undefined);
+      } else {
+        const sv = selectedValueRef.current;
+        const selected = items.find((i) => i.dataset.value === sv);
+        if (selected && sv) {
+          setHighlightedValue(sv);
+          selected.scrollIntoView?.({ block: "nearest" });
         }
-      });
-    };
-
-    bootstrap();
+      }
+    });
+    return () => cancelAnimationFrame(rafId);
   }, [isOpen, setHighlightedValue]);
+
+  /* Поиск: подсветка уходит на первый найденный пункт. */
+  React.useEffect(() => {
+    if (!isOpen || query === "") return;
+    const first = queryEnabledSelectOptions(listboxRef.current)[0];
+    setHighlightedValue(first?.dataset.value);
+  }, [isOpen, query, setHighlightedValue]);
 
   /* Как у Dropdown/Popover: пересчёт fixed при scroll предков триггера, resize, смене размера панели. */
   React.useEffect(() => {
@@ -560,41 +996,162 @@ function SelectContent({ className, children }: SelectContentProps) {
     };
   }, [isOpen, triggerRef]);
 
-  useEscapeKey({ enabled: isOpen, onEscape: onClose });
-  useOutsideClick({ refs: [triggerRef, contentRef], enabled: isOpen, onOutsideClick: onClose });
+  const closeAndReturnFocus = React.useCallback(() => {
+    onClose();
+    triggerRef.current?.focus({ preventScroll: true });
+  }, [onClose, triggerRef]);
+
+  useEscapeKey({ enabled: isOpen, onEscape: closeAndReturnFocus });
+  useOutsideClick({
+    refs: [triggerRef, contentRef],
+    enabled: isOpen,
+    /* Focus follows the pointer (foundation §8): no return to the trigger. */
+    onOutsideClick: onClose,
+  });
+  // The listbox stays in the DOM (labels for the trigger); presence only drives display + motion.
+  const presence = usePresence(isOpen, { exitDuration: "fast" });
+
+  /* Typeahead по подписи (заголовку): буфер символов сбрасывается после паузы. */
+  const typeahead = React.useRef({ buffer: "", timer: 0 });
+  React.useEffect(() => () => window.clearTimeout(typeahead.current.timer), []);
+
+  const handleTypeahead = React.useCallback(
+    (key: string) => {
+      const state = typeahead.current;
+      window.clearTimeout(state.timer);
+      state.buffer += key.toLocaleLowerCase();
+      state.timer = window.setTimeout(() => {
+        state.buffer = "";
+      }, TYPEAHEAD_RESET_MS);
+      const items = getItems();
+      const start = items.findIndex((i) => i.dataset.value === highlightedValue);
+      /* Один и тот же символ подряд — по кругу по пунктам на эту букву; иначе — по префиксу. */
+      const repeated = [...state.buffer].every((c) => c === state.buffer[0]);
+      const query = repeated ? key.toLocaleLowerCase() : state.buffer;
+      const from = repeated ? start + 1 : Math.max(start, 0);
+      const pool = [...items.slice(from), ...items.slice(0, from)];
+      const match = pool.find((i) => (i.dataset.label ?? "").toLocaleLowerCase().startsWith(query));
+      if (match) {
+        setHighlightedValue(match.dataset.value);
+        match.scrollIntoView?.({ block: "nearest" });
+      }
+    },
+    [getItems, highlightedValue, setHighlightedValue],
+  );
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
+      /* В поле поиска пробел, Home и End — редактирование текста, а не навигация. */
+      if (e.target instanceof HTMLInputElement && [" ", "Home", "End"].includes(e.key)) return;
+      const printable = e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+      if (
+        printable &&
+        !(e.target instanceof HTMLInputElement) &&
+        (e.key !== " " || typeahead.current.buffer !== "")
+      ) {
+        e.preventDefault();
+        handleTypeahead(e.key);
+        return;
+      }
+      if (e.key === "Tab") {
+        onClose();
+        return;
+      }
       handleSelectListboxKeyDown(e, {
         items: getItems(),
         highlightedValue,
         setHighlightedValue,
-        onSelect,
-        onClose,
+        onSelect: (value, label) => {
+          onSelect(value, label);
+          if (!multiple) triggerRef.current?.focus({ preventScroll: true });
+        },
+        onClose: closeAndReturnFocus,
       });
     },
-    [getItems, highlightedValue, setHighlightedValue, onSelect, onClose],
+    [
+      getItems,
+      highlightedValue,
+      setHighlightedValue,
+      onSelect,
+      onClose,
+      closeAndReturnFocus,
+      multiple,
+      triggerRef,
+      handleTypeahead,
+    ],
   );
+
+  const activeDescendant =
+    isOpen && highlightedValue !== undefined ? optionDomId(listboxId, highlightedValue) : undefined;
+  const showEmpty = isEmpty && !loading;
 
   return (
     <Portal>
-      <ScrollContainer
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: клавиши всплывают от поиска и listbox */}
+      <div
         ref={contentRef}
-        id={listboxId}
-        role="listbox"
-        aria-multiselectable={multiple ? true : undefined}
-        aria-labelledby={triggerId}
         aria-hidden={!isOpen}
-        tabIndex={-1}
         data-react-aria-top-layer="true"
         data-overlay-portal-layer={overlayPortalLayer}
-        className={cx(styles.content, className)}
+        className={cx(styles.content, overlayMotion.floating, className)}
         onKeyDown={handleKeyDown}
-        style={{ display: isOpen ? undefined : "none" }}
-        {...toDataAttributes({ side: resolvedSide, size })}
+        onAnimationEnd={presence.onExitEnd}
+        style={{ display: presence.mounted ? undefined : "none" }}
+        {...toDataAttributes({
+          side: resolvedSide,
+          size,
+          searching: query !== "",
+          state: presence.state,
+        })}
       >
-        {children}
-      </ScrollContainer>
+        {searchable ? (
+          // The search field is the permanent focus of the panel: no ring (foundation §7).
+          <div className={styles.search} data-focus-ring="false">
+            <SearchIcon className={styles.searchIcon} />
+            <input
+              ref={searchRef}
+              type="text"
+              className={styles.searchInput}
+              value={query}
+              placeholder={labels.search}
+              aria-label={labels.search}
+              aria-controls={listboxId}
+              aria-activedescendant={activeDescendant}
+              aria-autocomplete="list"
+              autoComplete="off"
+              spellCheck={false}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+        ) : null}
+        {loading ? (
+          <div className={styles.status} role="status">
+            <Spinner className={styles.spinner} />
+            <span>{labels.loading}</span>
+          </div>
+        ) : null}
+        <ScrollContainer
+          ref={listboxRef}
+          id={listboxId}
+          role="listbox"
+          aria-multiselectable={multiple ? true : undefined}
+          aria-labelledby={triggerId}
+          aria-activedescendant={searchable ? undefined : activeDescendant}
+          aria-busy={loading || undefined}
+          tabIndex={-1}
+          className={styles.listbox}
+        >
+          {children}
+        </ScrollContainer>
+        {showEmpty ? (
+          <div className={styles.empty} role="status">
+            <span className={styles.emptyText}>{labels.empty}</span>
+            {query !== "" && labels.emptyHint ? (
+              <span className={styles.emptyHint}>{labels.emptyHint}</span>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
     </Portal>
   );
 }
@@ -637,6 +1194,20 @@ function selectItemTextFromRest(rest: React.ReactNode[]): string | undefined {
   return parts.length > 0 ? parts.join(" ") : undefined;
 }
 
+/** Option label: explicit `label`, then `Select.ItemText`, then plain text children, then `value`. */
+function resolveItemLabel(
+  label: string | undefined,
+  children: React.ReactNode,
+  value: string,
+): string {
+  if (label) return label;
+  const { title } = partitionRichChildren(children);
+  const titleText = title === undefined ? "" : extractPlainTextFromNode(title).trim();
+  if (titleText) return titleText;
+  const { rest } = partitionSelectItemChildren(children);
+  return selectItemTextFromRest(rest) ?? (typeof children === "string" ? children : value);
+}
+
 function partitionSelectItemChildren(children: React.ReactNode) {
   const icons: React.ReactElement[] = [];
   const rest: React.ReactNode[] = [];
@@ -658,13 +1229,15 @@ export type SelectItemProps = {
   value: string;
   /** Explicit label for display in trigger; falls back to string children, then value */
   label?: string;
+  /** Дополнительные слова для поиска (`Select.Content searchable`). */
+  keywords?: string;
   disabled?: boolean;
   className?: string;
   children: React.ReactNode;
 };
 
 const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
-  ({ value, label, disabled, className, children }, ref) => {
+  ({ value, label, keywords, disabled, className, children }, ref) => {
     const {
       multiple,
       size,
@@ -674,49 +1247,52 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
       setHighlightedValue,
       onSelect,
       onInitLabel,
+      listboxId,
+      query,
     } = useSelectContext();
 
     const { icons, rest } = partitionSelectItemChildren(children);
+    const parts = partitionRichChildren(rest);
 
     const isSelected = multiple ? selectedValues.includes(value) : selectedValue === value;
     const isHighlighted = highlightedValue === value;
-    const resolvedLabel =
-      label ??
-      selectItemTextFromRest(rest) ??
-      (typeof children === "string" ? children : undefined) ??
-      value;
+    const resolvedLabel = resolveItemLabel(label, children, value);
+    const descriptionText =
+      parts.description === undefined ? "" : extractPlainTextFromNode(parts.description);
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: перезапуск при внешнем `selectedValue` (single); в multi в контексте всегда `undefined`
     React.useEffect(() => {
       onInitLabel(value, resolvedLabel);
     }, [value, resolvedLabel, onInitLabel, selectedValue]);
 
+    const q = normalizeQuery(query);
+    if (
+      q !== "" &&
+      !normalizeQuery(`${resolvedLabel} ${descriptionText} ${keywords ?? ""}`).includes(q)
+    ) {
+      return null;
+    }
+
     const handleClick = () => {
       if (!disabled) onSelect(value, resolvedLabel);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if ((e.key === "Enter" || e.key === " ") && !disabled) {
-        e.preventDefault();
-        onSelect(value, resolvedLabel);
-      }
-    };
-
-    const handleMouseEnter = () => {
-      if (!disabled) setHighlightedValue(value);
+    const handleMouseMove = () => {
+      if (!disabled && !isHighlighted) setHighlightedValue(value);
     };
 
     return (
+      // biome-ignore lint/a11y/useFocusableInteractive: фокус остаётся на listbox / поиске (aria-activedescendant)
+      // biome-ignore lint/a11y/useKeyWithClickEvents: клавиатура обрабатывается на listbox
       <div
         ref={ref}
+        id={optionDomId(listboxId, value)}
         role="option"
         aria-selected={isSelected}
         aria-disabled={disabled || undefined}
-        tabIndex={-1}
         className={cx(styles.item, className)}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        onMouseEnter={handleMouseEnter}
+        onMouseMove={handleMouseMove}
         {...toDataAttributes({
           value,
           label: resolvedLabel,
@@ -724,19 +1300,27 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
           highlighted: isHighlighted,
           disabled: Boolean(disabled),
           size,
+          rich: parts.rich || undefined,
         })}
       >
+        {multiple ? (
+          <span className={styles.itemCheckbox} aria-hidden="true">
+            {isSelected ? <CheckIcon /> : null}
+          </span>
+        ) : null}
         {icons.map((icon, index) =>
           React.cloneElement(icon, {
             key: icon.key ?? `prime-select-item-icon-${String(index)}`,
           }),
         )}
-        <span className={styles.itemText}>{rest}</span>
-        {isSelected ? (
+        {parts.media}
+        <span className={styles.itemText}>{parts.body}</span>
+        {parts.meta}
+        {multiple ? null : (
           <span className={styles.itemCheckSlot} aria-hidden="true">
-            <span className={styles.itemCheck} />
+            {isSelected ? <CheckIcon /> : null}
           </span>
-        ) : null}
+        )}
       </div>
     );
   },
@@ -799,12 +1383,7 @@ function renderNativeOptionElement(
   keyIndex: number,
 ): React.ReactNode {
   const { value, label, disabled, children } = el.props;
-  const { rest } = partitionSelectItemChildren(children);
-  const resolvedLabel =
-    label ??
-    selectItemTextFromRest(rest) ??
-    (typeof children === "string" ? children : undefined) ??
-    value;
+  const resolvedLabel = resolveItemLabel(label, children, value);
   return (
     <option key={`prime-select-native-opt-${keyIndex}`} value={value} disabled={disabled}>
       {resolvedLabel}
@@ -878,26 +1457,49 @@ function walkNativeOptions(node: React.ReactNode): NativeOptionsWalkResult {
   return { nodes, firstEnabledValue };
 }
 
-type SelectNativeRootProps = Omit<
-  Exclude<Extract<SelectRootProps, { native: true }>, { multiple: true }>,
-  "native"
->;
+type NativeRootInternalProps<V> = SelectRootBase &
+  Omit<SelectNativeProps, "native"> & {
+    value?: V;
+    defaultValue?: V;
+    onValueChange?: (value: V) => void;
+    field: FieldBinding;
+  };
 
-function SelectNativeRoot({
-  size = "m",
-  value,
-  defaultValue,
-  onChange,
-  disabled,
-  placeholder,
-  hasError = false,
-  children,
-}: SelectNativeRootProps) {
+function nativeSelectProps(
+  {
+    name,
+    disabled,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+  }: Pick<SelectRootBase, "disabled"> & Omit<SelectNativeProps, "native">,
+  { size, ids, focusRing, required }: FieldBinding,
+) {
+  return {
+    id: ids.controlId,
+    name,
+    required: required || undefined,
+    disabled,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ids.describedBy,
+    "aria-invalid": ids.invalid || undefined,
+    className: styles.nativeSelect,
+    ...toDataAttributes({
+      size,
+      invalid: ids.invalid || undefined,
+      disabled: disabled || undefined,
+      "focus-ring": focusRing ? undefined : false,
+    }),
+  };
+}
+
+function SelectNativeRoot(props: NativeRootInternalProps<string>) {
+  const { value, defaultValue, onValueChange, placeholder, children, field } = props;
   const handleChange = React.useCallback(
     (v: string | undefined) => {
-      if (v !== undefined) onChange?.(v);
+      if (v !== undefined) onValueChange?.(v);
     },
-    [onChange],
+    [onValueChange],
   );
 
   const [selectedValue, setSelectedValue] = useControllableState<string | undefined>({
@@ -915,80 +1517,49 @@ function SelectNativeRoot({
   const selectValue =
     selectedValue === undefined ? (hasPlaceholder ? "" : (firstEnabledValue ?? "")) : selectedValue;
 
-  const handleNativeChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const v = e.target.value;
-      setSelectedValue(v === "" ? undefined : v);
-    },
-    [setSelectedValue],
-  );
-
   return (
-    <ControlSizeProvider value={size}>
-      <select
-        className={styles.nativeSelect}
-        disabled={disabled}
-        value={selectValue}
-        onChange={handleNativeChange}
-        {...toDataAttributes({ size, "has-error": hasError })}
-      >
-        {hasPlaceholder ? <option value="">{placeholder}</option> : null}
-        {optionNodes}
-      </select>
+    <ControlSizeProvider value={field.size}>
+      <span className={styles.nativeWrap}>
+        <select
+          {...nativeSelectProps(props, field)}
+          value={selectValue}
+          onChange={(e) => setSelectedValue(e.target.value === "" ? undefined : e.target.value)}
+        >
+          {hasPlaceholder ? <option value="">{placeholder}</option> : null}
+          {optionNodes}
+        </select>
+        <span className={styles.nativeChevron} data-size={field.size} aria-hidden>
+          <ChevronIcon />
+        </span>
+      </span>
     </ControlSizeProvider>
   );
 }
-SelectNativeRoot.displayName = "SelectNativeRoot";
 
-function SelectNativeMultiRoot({
-  size = "m",
-  value,
-  defaultValue,
-  onChange,
-  disabled,
-  hasError = false,
-  children,
-}: Omit<Extract<SelectRootProps, { multiple: true; native: true }>, "native" | "multiple">) {
-  const handleChange = React.useCallback(
-    (next: string[]) => {
-      onChange?.(next);
-    },
-    [onChange],
-  );
-
+function SelectNativeMultiRoot(props: NativeRootInternalProps<string[]>) {
+  const { value, defaultValue, onValueChange, children, field } = props;
   const [selectedValues, setSelectedValues] = useControllableState<string[]>({
     value,
     defaultValue: defaultValue ?? [],
-    onChange: handleChange,
+    onChange: onValueChange,
   });
 
   const { nodes: optionNodes } = React.useMemo(() => walkNativeOptions(children), [children]);
 
-  const handleNativeChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const next = Array.from(e.target.selectedOptions, (o) => o.value);
-      setSelectedValues(next);
-    },
-    [setSelectedValues],
-  );
-
   return (
-    <ControlSizeProvider value={size}>
+    <ControlSizeProvider value={field.size}>
       <select
-        className={styles.nativeSelect}
+        {...nativeSelectProps(props, field)}
         data-multiple="true"
-        disabled={disabled}
         multiple
         value={selectedValues}
-        onChange={handleNativeChange}
-        {...toDataAttributes({ size, "has-error": hasError })}
+        onChange={(e) => setSelectedValues(Array.from(e.target.selectedOptions, (o) => o.value))}
       >
         {optionNodes}
       </select>
     </ControlSizeProvider>
   );
 }
-SelectNativeMultiRoot.displayName = "SelectNativeMultiRoot";
 
 // ─── Namespace export ─────────────────────────────────────────────────────────
 
@@ -997,9 +1568,14 @@ export const Select = {
   Trigger: SelectTrigger,
   Value: SelectValue,
   TriggerIcon: SelectTriggerIcon,
+  Badge: SelectBadge,
   Content: SelectContent,
   Item: SelectItem,
   ItemIcon: SelectItemIcon,
+  ItemMedia: SelectItemMedia,
+  ItemText: SelectItemText,
+  ItemDescription: SelectItemDescription,
+  ItemMeta: SelectItemMeta,
   Group: SelectGroup,
   GroupLabel: SelectGroupLabel,
   Separator: SelectSeparator,

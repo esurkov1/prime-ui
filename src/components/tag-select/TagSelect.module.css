@@ -1,136 +1,253 @@
-/* Поле: те же токены, что у Select `.trigger`, но многострочно + перенос чипов. */
+/* ─── TagSelect ──────────────────────────────────────────────────────────────
+ * Field = field system (same fill, height, padding, states as Select/Input).
+ * At rest the field is one row: chips that do not fit collapse into a "+N" button. Focused or open
+ * (`data-expanded`) it grows to show every chip on wrapped rows (up to 3, then it scrolls inside)
+ * and collapses back on blur / close; the height animates with the motion tokens.
+ * Chips are `Tag` in the badge tier one step below the field.
+ */
+
+.control,
+.panel {
+  --ts-h: var(--prime-control-m-height);
+  --ts-px: var(--prime-control-m-field-padding-x);
+  --ts-gap: var(--prime-control-m-gap);
+  --ts-icon: var(--prime-control-m-icon);
+  --ts-radius: var(--prime-control-m-radius);
+  --ts-text: var(--prime-control-m-text-size);
+  --ts-lh: var(--prime-control-m-line-height);
+  --ts-item-h: var(--prime-control-m-item-height);
+  --ts-choice: var(--prime-control-s-choice);
+  /* Chip row = badge tier one step down (foundation §6). */
+  --ts-row: var(--prime-badge-s-height);
+}
+
+[data-size="xs"]:is(.control, .panel) {
+  --ts-h: var(--prime-control-xs-height);
+  --ts-px: var(--prime-control-xs-field-padding-x);
+  --ts-gap: var(--prime-control-xs-gap);
+  --ts-icon: var(--prime-control-xs-icon);
+  --ts-radius: var(--prime-control-xs-radius);
+  --ts-text: var(--prime-control-xs-text-size);
+  --ts-lh: var(--prime-control-xs-line-height);
+  --ts-item-h: var(--prime-control-xs-item-height);
+  --ts-choice: var(--prime-control-xs-choice);
+  --ts-row: var(--prime-badge-xs-height);
+}
+
+[data-size="s"]:is(.control, .panel) {
+  --ts-h: var(--prime-control-s-height);
+  --ts-px: var(--prime-control-s-field-padding-x);
+  --ts-gap: var(--prime-control-s-gap);
+  --ts-icon: var(--prime-control-s-icon);
+  --ts-radius: var(--prime-control-s-radius);
+  --ts-text: var(--prime-control-s-text-size);
+  --ts-lh: var(--prime-control-s-line-height);
+  --ts-item-h: var(--prime-control-s-item-height);
+  --ts-choice: var(--prime-control-xs-choice);
+  --ts-row: var(--prime-badge-xs-height);
+}
+
+[data-size="l"]:is(.control, .panel) {
+  --ts-h: var(--prime-control-l-height);
+  --ts-px: var(--prime-control-l-field-padding-x);
+  --ts-gap: var(--prime-control-l-gap);
+  --ts-icon: var(--prime-control-l-icon);
+  --ts-radius: var(--prime-control-l-radius);
+  --ts-text: var(--prime-control-l-text-size);
+  --ts-lh: var(--prime-control-l-line-height);
+  --ts-item-h: var(--prime-control-l-item-height);
+  --ts-choice: var(--prime-control-m-choice);
+  --ts-row: var(--prime-badge-m-height);
+}
+
+[data-size="xl"]:is(.control, .panel) {
+  --ts-h: var(--prime-control-xl-height);
+  --ts-px: var(--prime-control-xl-field-padding-x);
+  --ts-gap: var(--prime-control-xl-gap);
+  --ts-icon: var(--prime-control-xl-icon);
+  --ts-radius: var(--prime-control-xl-radius);
+  --ts-text: var(--prime-control-xl-text-size);
+  --ts-lh: var(--prime-control-xl-line-height);
+  --ts-item-h: var(--prime-control-xl-item-height);
+  --ts-choice: var(--prime-control-l-choice);
+  --ts-row: var(--prime-badge-l-height);
+}
+
+/* ─── Field ──────────────────────────────────────────────────────────────── */
 
 .control {
-  --ts-pad-x: var(--prime-sys-size-control-m-inputPaddingX);
-  --ts-pad-y: var(--prime-sys-size-control-m-inputPaddingY);
-  --ts-gap: var(--prime-sys-size-control-m-gap);
-  --ts-chevron: var(--prime-sys-size-control-m-icon);
-
   position: relative;
   box-sizing: border-box;
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--ts-gap);
+  align-items: center;
+  /* Chevron centered between the text and the edge: text→icon = icon→edge = padX (foundation §6). */
+  gap: var(--ts-px);
   width: 100%;
   min-width: 0;
-  padding-inline-start: var(--ts-pad-x);
-  padding-inline-end: calc(var(--ts-pad-x) + var(--ts-chevron) + var(--ts-gap));
-  padding-block: var(--ts-pad-y);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
-  background: var(--prime-sys-color-field-bg);
-  color: var(--prime-sys-color-field-text);
-  font-size: var(--prime-sys-size-control-m-text);
-  font-family: inherit;
+  height: var(--ts-h);
+  padding-block: 0;
+  /* Chips sit closer to the edge than text (padX − 4); the chevron side keeps padX. */
+  padding-inline: calc(var(--ts-px) - var(--prime-space-1)) var(--ts-px);
+  border-radius: var(--ts-radius);
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--ts-text);
+  line-height: var(--ts-lh);
   cursor: text;
-  text-align: left;
-  outline: none;
+  /* `height: auto` of the expanded field animates where the browser supports it. */
+  interpolate-size: allow-keywords;
   transition:
-    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    height var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.control[data-size="s"] {
-  --ts-pad-x: var(--prime-sys-size-control-s-inputPaddingX);
-  --ts-pad-y: var(--prime-sys-size-control-s-inputPaddingY);
-  --ts-gap: var(--prime-sys-size-control-s-gap);
-  --ts-chevron: var(--prime-sys-size-control-s-icon);
-  border-radius: var(--prime-sys-size-control-s-radius);
-  font-size: var(--prime-sys-size-control-s-text);
-}
-
-.control[data-size="m"] {
-  --ts-gap: var(--prime-sys-size-control-m-gap);
-  --ts-chevron: var(--prime-sys-size-control-m-icon);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  font-size: var(--prime-sys-size-control-m-text);
-}
-
-.control[data-size="l"] {
-  --ts-pad-x: var(--prime-sys-size-control-l-inputPaddingX);
-  --ts-pad-y: var(--prime-sys-size-control-l-inputPaddingY);
-  --ts-gap: var(--prime-sys-size-control-l-gap);
-  --ts-chevron: var(--prime-sys-size-control-l-icon);
-  border-radius: var(--prime-sys-size-control-l-radius);
-  font-size: var(--prime-sys-size-control-l-text);
-}
-
-.control[data-size="xl"] {
-  --ts-pad-x: var(--prime-sys-size-control-xl-inputPaddingX);
-  --ts-pad-y: var(--prime-sys-size-control-xl-inputPaddingY);
-  --ts-gap: var(--prime-sys-size-control-xl-gap);
-  --ts-chevron: var(--prime-sys-size-control-xl-icon);
-  border-radius: var(--prime-sys-size-control-xl-radius);
-  font-size: var(--prime-sys-size-control-xl-text);
-}
-
-/* Минимальная высота как у однострочного поля только когда нет тегов и нет ввода; иначе высота по строкам чипов. */
-.control[data-empty="true"] {
-  min-height: var(--prime-sys-size-control-m-height);
-}
-
-.control[data-empty="true"][data-size="s"] {
-  min-height: var(--prime-sys-size-control-s-height);
-}
-
-.control[data-empty="true"][data-size="m"] {
-  min-height: var(--prime-sys-size-control-m-height);
-}
-
-.control[data-empty="true"][data-size="l"] {
-  min-height: var(--prime-sys-size-control-l-height);
-}
-
-.control[data-empty="true"][data-size="xl"] {
-  min-height: var(--prime-sys-size-control-xl-height);
+/* Пустое поле: плейсхолдер стоит на месте текста поля. */
+.control:not(:has(.chips > .chip)) {
+  padding-inline-start: var(--ts-px);
 }
 
 .control:hover:not([data-disabled="true"]) {
-  border-color: var(--prime-sys-color-field-borderHover);
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
 }
 
-.control:focus-within:not([data-disabled="true"]) {
-  border-color: var(--prime-sys-color-field-borderFocus);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+.control:focus-within:not([data-disabled="true"]),
+.control[data-state="open"] {
+  background: var(--prime-color-field-bg-focus);
 }
 
-.control[data-has-error="true"] {
-  border-color: var(--prime-sys-color-field-borderError);
+/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
+.control:not([data-focus-ring="false"]):has(.input:focus-visible) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
-.control[data-has-error="true"]:focus-within {
-  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+.control[data-invalid="true"] {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.control[data-invalid="true"]:has(.input:focus-visible) {
+  outline-color: var(--prime-color-danger-border);
 }
 
 .control[data-disabled="true"] {
-  background: var(--prime-sys-color-surface-accentSoft);
-  border-color: transparent;
+  background: var(--prime-color-field-bg-disabled);
   box-shadow: none;
+  color: var(--prime-color-text-disabled);
   cursor: not-allowed;
-  color: var(--prime-sys-color-content-disabled);
 }
 
+/* Clips / scrolls focusable chips: padded by the focus space so rings are never cut (§7 a);
+   the negative margin keeps the chips where they were. */
 .chips {
   display: flex;
   flex: 1 1 auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: var(--ts-gap);
-  box-sizing: border-box;
-  width: 100%;
+  gap: var(--prime-space-1);
   min-width: 0;
+  margin: calc(-1 * var(--prime-focus-space));
+  padding: var(--prime-focus-space);
+  overflow: hidden;
 }
 
-.chip {
+.input {
+  flex: 1 0 var(--prime-space-12);
+  min-width: var(--prime-space-12);
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+/* Свёрнутый ввод: место под чипы, но поле остаётся фокусируемым. */
+.inputCollapsed {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 0;
+}
+
+.input::placeholder {
+  color: var(--prime-color-text-placeholder);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.chevronSlot {
   display: inline-flex;
-  max-width: 100%;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--ts-icon);
+  height: var(--ts-icon);
+  color: var(--prime-color-text-muted);
+  pointer-events: none;
 }
 
-/* Только обрезка длинной подписи в flex-ряду; токены бейджа не трогаем. */
-.chipBadge {
-  max-width: 100%;
+.chevronSlot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.control[data-state="open"] .chevronSlot svg {
+  transform: rotate(180deg);
+}
+
+.control[data-disabled="true"] .chevronSlot {
+  color: var(--prime-color-text-disabled);
+}
+
+/* Невидимый ряд для измерения ширин чипов. */
+.measure {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: flex;
+  gap: var(--prime-space-1);
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ─── Expanded (focused / open): every chip, wrapped rows, max 3 rows then scroll ─── */
+
+.control[data-expanded="true"] {
+  align-items: flex-start;
+  height: auto;
+  min-height: var(--ts-h);
+  padding-block: calc((var(--ts-h) - var(--ts-row)) / 2);
+}
+
+.control[data-expanded="true"] .chips {
+  flex-wrap: wrap;
+  max-height: calc(3 * var(--ts-row) + 2 * var(--prime-space-1) + 2 * var(--prime-focus-space));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.control[data-expanded="true"] .input {
+  height: var(--ts-row);
+}
+
+.control[data-expanded="true"] .chevronSlot {
+  margin-block-start: calc((var(--ts-row) - var(--ts-icon)) / 2);
+}
+
+/* ─── Chips: `Tag` (soft badge, tier one step below the field) ─────────── */
+
+/* A chip may shrink to an ellipsis; "+N" never does. */
+.chip {
+  flex: 0 1 auto;
   min-width: 0;
 }
 
@@ -140,218 +257,235 @@
   text-overflow: ellipsis;
 }
 
-.chipRemove {
+.chipMore {
+  flex-shrink: 0;
+}
+
+/* Chip focused with the arrow keys (outer ring; the row is padded by the focus space). */
+.chip:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+/* "+N" is a real button around a Tag. */
+.moreButton {
   display: inline-flex;
   flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
   padding: 0;
-  border: none;
-  border-radius: var(--prime-sys-shape-radius-s);
-  background: transparent;
-  color: inherit;
-  opacity: 0.8;
-  cursor: pointer;
-  transition: opacity var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-.chipRemove:hover:not(:disabled) {
-  opacity: 1;
-}
-
-.chipRemove:focus-visible {
-  outline: none;
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
-}
-
-.chipRemove:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.removeIcon {
-  display: block;
-  width: 0.625rem;
-  height: 0.625rem;
-}
-
-.input {
-  flex: 1 1 4rem;
-  min-width: 2rem;
-  margin: 0;
-  padding: 0;
-  border: none;
+  border: 0;
+  border-radius: var(--prime-radius-s);
   background: transparent;
   color: inherit;
   font: inherit;
-  line-height: var(--prime-sys-typography-body-lineHeight);
+  cursor: pointer;
+}
+
+.moreButton:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.moreButton:disabled {
+  cursor: not-allowed;
+}
+
+.srOnly {
+  position: absolute;
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
+  margin: calc(-1 * var(--prime-border-width));
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Chips sit on the field's own wash (foundation §4): neutral chips take a stronger wash, hue chips a
+ * wash of their hue, so every chip clearly steps off the field in both themes.
+ */
+.control .chip[data-color="gray"]:not([data-disabled="true"]),
+.control .chipMore:not([data-disabled="true"]) {
+  background: var(--prime-color-fill-strong);
+}
+
+/* Hue chips: a translucent wash of the hue text instead of the opaque light tint, which is as light
+   as the field wash in the light theme. */
+.control .chip:not([data-color="gray"], [data-disabled="true"]) {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+/* ─── Panel ──────────────────────────────────────────────────────────────── */
+
+.panel {
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: min(
+    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
+    var(--float-max-w, 100vw)
+  );
+  max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));
+  max-height: min(var(--prime-panel-max-height), var(--float-max-h, var(--prime-panel-max-height)));
+  padding: var(--prime-panel-padding);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--ts-text);
+  line-height: var(--ts-lh);
   outline: none;
 }
 
-/* Без фокуса и без текста — не занимает вторую строку в flex-wrap. */
-.inputCollapsed {
-  flex: 0 1 0;
-  min-width: 0;
-  width: 0;
-  height: 0;
-  min-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  line-height: 0;
-  font-size: 0;
-}
-
-.input::placeholder {
-  color: var(--prime-sys-color-field-placeholder);
-}
-
-.control[data-disabled="true"] .input::placeholder {
-  color: var(--prime-sys-color-content-disabled);
-}
-
-.chevronSlot {
-  position: absolute;
-  top: 50%;
-  right: var(--ts-pad-x);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--ts-chevron);
-  min-width: var(--ts-chevron);
+.panel[aria-hidden="true"] {
   pointer-events: none;
-  transform: translateY(-50%);
 }
 
-.chevron {
-  display: block;
-  flex-shrink: 0;
-  width: var(--prime-sys-unit-0p45rem);
-  height: var(--prime-sys-unit-0p45rem);
-  border-right: var(--prime-sys-unit-1p5px) solid currentColor;
-  border-bottom: var(--prime-sys-unit-1p5px) solid currentColor;
-  transform: rotate(45deg) translateY(-10%);
-  opacity: 0.6;
-  transition:
-    transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+.panel[data-overlay-portal-layer="page"] {
+  z-index: var(--prime-z-dropdown);
 }
 
-.control[data-open="true"] .chevron {
-  transform: rotate(225deg) translateY(-10%);
+.panel[data-overlay-portal-layer="drawer"] {
+  z-index: var(--prime-z-dropdown-in-drawer);
 }
 
-/* Панель списка */
-.panelInner {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-width: 0;
+.panel[data-overlay-portal-layer="modal"] {
+  z-index: var(--prime-z-dropdown-in-modal);
+}
+
+.panel[data-overlay-portal-layer="drawerInModal"] {
+  z-index: var(--prime-z-dropdown-in-drawer-in-modal);
 }
 
 .hint {
-  padding-inline: var(--prime-sys-spacing-x3);
-  padding-block: var(--prime-sys-spacing-x2) var(--prime-sys-spacing-x1);
-}
-
-.optionRow {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  gap: var(--prime-sys-spacing-x2);
+  min-height: var(--prime-panel-group-label-height);
+  padding-inline: var(--prime-panel-item-padding-x);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
+
+.option {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--ts-gap);
   width: 100%;
-  min-width: 0;
-  cursor: pointer;
-  border: none;
-  background: none;
-  text-align: left;
+  min-height: var(--ts-item-h);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--prime-panel-item-padding-x);
+  border: 0;
+  border-radius: var(--prime-panel-item-radius);
+  background: transparent;
+  color: var(--prime-color-text-primary);
   font: inherit;
-  color: inherit;
-  padding-inline: var(--prime-sys-spacing-x3);
-  padding-block: var(--prime-sys-spacing-x2);
-  border-radius: var(--prime-sys-shape-radius-m);
-  transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  text-align: start;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.optionRow:hover:not([data-disabled="true"]) {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
+.option[data-highlighted="true"]:not([data-disabled="true"]) {
+  background: var(--prime-color-fill-subtle);
 }
 
-.optionRow[data-highlighted="true"]:not([data-disabled="true"]) {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
+.option:active:not([data-disabled="true"]) {
+  background: var(--prime-color-fill-subtle-active);
 }
 
-.optionRow[data-disabled="true"] {
-  opacity: 0.45;
+.option[data-disabled="true"] {
+  color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }
 
-.createRow {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-x2);
-  width: 100%;
-  min-width: 0;
-  cursor: pointer;
-  border: none;
-  background: none;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  padding-inline: var(--prime-sys-spacing-x3);
-  padding-block: var(--prime-sys-spacing-x2);
-  border-radius: var(--prime-sys-shape-radius-m);
-  transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+/* Строка с меню ⋯: кнопка выбора на всю ширину + кнопка справа. */
+.optionManaged {
+  padding-inline-end: var(--prime-space-1);
+  cursor: default;
 }
 
-.createRow:hover:not([data-disabled="true"]),
-.createRow[data-highlighted="true"]:not([data-disabled="true"]) {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
+.optionSelect {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--ts-gap);
+  min-width: 0;
+  height: var(--ts-item-h);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.optionSelect:disabled {
+  cursor: not-allowed;
+}
+
+/* Fixed leading column: checkbox (add to selection) / plus (create). */
+.optionCheckbox,
+.optionLead {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--ts-choice);
+  height: var(--ts-choice);
+}
+
+.optionCheckbox {
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-fill-strong);
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.option[data-highlighted="true"] .optionCheckbox {
+  background: var(--prime-color-fill-strong-hover);
+}
+
+/* Selected option: checked box (unchecking removes the tag). */
+.option[data-selected="true"] .optionCheckbox {
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+}
+
+.optionCheckbox svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.option[data-disabled="true"] .optionCheckbox {
+  background: var(--prime-color-fill-muted);
+}
+
+.optionLead {
+  color: var(--prime-color-text-muted);
+}
+
+.optionLead svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .createLabel {
   flex-shrink: 0;
-}
-
-/* Строка списка с меню «⋯» (optionManagement) */
-.optionRowWrap {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-sys-spacing-x1);
-  width: 100%;
-  min-width: 0;
-  padding-inline: var(--prime-sys-spacing-x3);
-  padding-block: var(--prime-sys-spacing-x2);
-  border-radius: var(--prime-sys-shape-radius-m);
-  transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-.optionRowWrap:hover:not([data-disabled="true"]) {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-}
-
-.optionRowWrap[data-highlighted="true"]:not([data-disabled="true"]) {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-}
-
-.optionRowSelect {
-  display: flex;
-  align-items: center;
-  flex: 1 1 auto;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  cursor: pointer;
-  background: none;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-}
-
-.optionRowSelect:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
+  color: var(--prime-color-text-muted);
 }
 
 .optionMenuTrigger {
@@ -359,186 +493,191 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  margin: 0;
-  padding: var(--prime-sys-spacing-x1);
-  border: none;
-  border-radius: var(--prime-sys-shape-radius-s);
+  width: calc(var(--ts-item-h) - var(--prime-space-2));
+  height: calc(var(--ts-item-h) - var(--prime-space-2));
+  padding: 0;
+  border: 0;
+  border-radius: var(--prime-radius-s);
   background: transparent;
-  color: var(--prime-sys-color-content-secondary);
+  color: var(--prime-color-text-muted);
   cursor: pointer;
+  opacity: 0;
   transition:
-    background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
-    color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.option[data-highlighted="true"] .optionMenuTrigger,
+.optionMenuTrigger:focus-visible,
+.optionMenuTrigger[aria-expanded="true"] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .optionMenuTrigger {
+    opacity: 1;
+  }
 }
 
 .optionMenuTrigger:hover:not(:disabled) {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  color: var(--prime-sys-color-content-primary);
+  background: var(--prime-color-fill-subtle-active);
+  color: var(--prime-color-text-primary);
 }
 
 .optionMenuTrigger:focus-visible {
-  outline: none;
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: 0;
 }
 
 .optionMenuTrigger:disabled {
   cursor: not-allowed;
-  opacity: 0.45;
 }
 
 .optionMenuDots {
   display: block;
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
+  width: var(--prime-icon-s);
+  height: var(--prime-icon-s);
 }
 
-/* Поповер редактирования тега */
-.managePopoverSurface[data-size="s"] {
-  /* Узже стандартного Popover s: меньше внешний padding, без лишнего gap на корне */
-  --dd-pad: var(--prime-sys-spacing-x2);
-  min-width: min(var(--prime-sys-unit-9p5rem), 100vw);
+/* ─── Manage popover (rename, delete, color) ─────────────────────────────── */
+
+.managePopoverSurface {
+  min-width: var(--prime-panel-min-width);
+  padding: var(--prime-panel-padding);
 }
 
 .managePopoverShell {
-  margin: 0;
-  padding: 0;
-  border: none;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-x2);
-  font-size: var(--prime-sys-size-control-s-text);
-  line-height: var(--prime-sys-typography-body-lineHeight);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.manageField {
+  padding: var(--prime-space-1);
 }
 
 .manageDelete {
   justify-content: flex-start;
   width: 100%;
-  font-size: inherit;
 }
 
 .manageDeleteIcon {
-  display: block;
-  flex-shrink: 0;
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
+  width: var(--prime-icon-s);
+  height: var(--prime-icon-s);
 }
 
 .manageSeparator {
-  width: 100%;
-  height: var(--prime-sys-border-width-control);
-  margin: 0;
-  border: none;
-  background: var(--prime-sys-color-border-separator);
+  height: 0;
+  margin-block: var(--prime-panel-padding);
+  margin-inline: calc(-1 * var(--prime-panel-padding));
+  border: 0;
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
 .manageColorsHeading {
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
-  font-size: inherit;
-  font-weight: var(--prime-sys-typography-weight-regular);
-  color: var(--prime-sys-color-content-muted);
+  display: flex;
+  align-items: center;
+  min-height: var(--prime-panel-group-label-height);
+  padding-inline: var(--prime-panel-item-padding-x);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 .manageColorList {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  min-width: 0;
-  max-height: min(12rem, 45vh);
-  overflow-y: auto;
 }
 
 .manageColorRow {
   display: flex;
   align-items: center;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-control-s-gap);
   width: 100%;
-  min-width: 0;
-  margin: 0;
-  padding-block: var(--prime-sys-spacing-x1);
-  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
-  border: none;
-  border-radius: var(--prime-sys-shape-radius-s);
+  min-height: var(--prime-control-s-item-height);
+  padding-block: 0;
+  padding-inline: var(--prime-panel-item-padding-x);
+  border: 0;
+  border-radius: var(--prime-panel-item-radius);
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font-family: inherit;
+  font-size: var(--prime-control-s-text-size);
+  line-height: var(--prime-control-s-line-height);
+  text-align: start;
   cursor: pointer;
-  background: none;
-  text-align: left;
-  font-size: inherit;
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: inherit;
-  transition: background var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
 }
 
 .manageColorRow:hover {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  background: var(--prime-color-fill-subtle);
 }
 
-/* Квадрат цвета: те же семантические фоны, что у Badge filled, без лишней высоты */
+.manageColorRow:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
 .manageColorSwatch {
   flex-shrink: 0;
-  display: block;
-  box-sizing: border-box;
-  width: var(--prime-sys-unit-0p75rem);
-  height: var(--prime-sys-unit-0p75rem);
-  border-radius: var(--prime-sys-shape-radius-s);
-}
-
-.manageColorSwatch[data-color="gray"] {
-  background: var(--prime-sys-color-badge-grayFilled-background);
+  width: var(--prime-icon-s);
+  height: var(--prime-icon-s);
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-palette-gray-solid);
 }
 
 .manageColorSwatch[data-color="red"] {
-  background: var(--prime-sys-color-status-error-backgroundEmphasis);
+  background: var(--prime-color-palette-red-solid);
 }
 
 .manageColorSwatch[data-color="blue"] {
-  background: var(--prime-sys-color-status-information-backgroundEmphasis);
+  background: var(--prime-color-palette-blue-solid);
 }
 
 .manageColorSwatch[data-color="green"] {
-  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+  background: var(--prime-color-palette-green-solid);
 }
 
 .manageColorSwatch[data-color="orange"] {
-  background: var(--prime-sys-color-status-warning-backgroundEmphasis);
+  background: var(--prime-color-palette-orange-solid);
 }
 
 .manageColorSwatch[data-color="yellow"] {
-  background: var(--prime-sys-color-status-away-backgroundEmphasis);
+  background: var(--prime-color-palette-yellow-solid);
 }
 
 .manageColorSwatch[data-color="purple"] {
-  background: var(--prime-sys-color-status-feature-backgroundEmphasis);
+  background: var(--prime-color-palette-purple-solid);
 }
 
 .manageColorSwatch[data-color="sky"] {
-  background: var(--prime-sys-color-status-verified-backgroundEmphasis);
+  background: var(--prime-color-palette-sky-solid);
 }
 
 .manageColorSwatch[data-color="pink"] {
-  background: var(--prime-sys-color-badge-pink-backgroundEmphasis);
+  background: var(--prime-color-palette-pink-solid);
 }
 
 .manageColorSwatch[data-color="teal"] {
-  background: var(--prime-sys-color-badge-teal-backgroundEmphasis);
+  background: var(--prime-color-palette-teal-solid);
 }
 
 .manageColorLabel {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.manageCheck {
-  flex-shrink: 0;
-  width: var(--prime-sys-unit-0p75rem);
-  height: var(--prime-sys-unit-0p75rem);
-  color: var(--prime-sys-color-content-primary);
-}
-
+.manageCheck,
 .manageCheckPlaceholder {
   flex-shrink: 0;
-  width: var(--prime-sys-unit-0p75rem);
-  height: var(--prime-sys-unit-0p75rem);
+  width: var(--prime-icon-s);
+  height: var(--prime-icon-s);
+  color: var(--prime-color-accent-text);
 }

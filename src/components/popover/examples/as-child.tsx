@@ -1,23 +1,28 @@
-import { Popover } from "prime-ui-kit";
+/** A text-link button as the trigger: any single element can open the panel. Use for inline explanations of terms in text. */
+import { Popover, Typography } from "prime-ui-kit";
 
-import styles from "./popover-examples.module.css";
+import preview from "./examples.module.css";
 
-/**
- * Single custom child under `Popover.Trigger` (native `<button>` styled as a text link): ref and ARIA merge on that element.
- */
 export default function PopoverAsChildExample() {
   return (
     <Popover.Root>
-      <Popover.Trigger asChild>
-        <button className={styles.textLinkTrigger} type="button">
-          Text button trigger
+      <Popover.Trigger>
+        <button type="button" className={preview.textLinkTrigger}>
+          <Typography.Root
+            as="span"
+            variant="body-m"
+            weight="medium"
+            tone="accent"
+            className={preview.underline}
+          >
+            Что такое НДС 0%?
+          </Typography.Root>
         </button>
       </Popover.Trigger>
-      <Popover.Content align="start" side="bottom">
-        <p className={styles.panelTextMuted}>
-          One arbitrary element as the anchor; the kit merges <code>ref</code>,{" "}
-          <code>aria-expanded</code>, <code>aria-controls</code>, and the click toggle handler.
-        </p>
+      <Popover.Content>
+        <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+          Ставка для экспорта товаров. Нужны подтверждающие документы в течение 180 дней.
+        </Typography.Root>
       </Popover.Content>
     </Popover.Root>
   );

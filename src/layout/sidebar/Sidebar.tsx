@@ -1,737 +1,470 @@
-import {
-  ChevronsUpDown,
-  PanelLeftClose,
-  PanelLeftOpen,
-  PanelRightClose,
-  PanelRightOpen,
-} from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import * as React from "react";
-import { NavLink } from "react-router-dom";
 
-import { Divider } from "@/components/divider/Divider";
-import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
-import { Typography } from "@/components/typography/Typography";
+import { useControllableState } from "@/hooks/useControllableState";
+import { useOverlayModal } from "@/hooks/useOverlayModal";
+import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { toDataAttributes } from "@/internal/data-attributes";
 import { Slot } from "@/internal/slot";
-import type { SidebarSize } from "@/internal/states";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Sidebar.module.css";
-import { SidebarRoot, type SidebarRootProps } from "./SidebarRoot";
-import { useSidebarContext } from "./sidebar-context";
-import type { SidebarLayoutMode } from "./sidebarLayout";
 
-export type { SidebarLayoutMode, SidebarRootProps, SidebarSize };
-export { useSidebarContext };
+/** Desktop rail mode: full width, icon rail, or collapsed to zero width. */
+export type SidebarMode = "expanded" | "compact" | "hidden";
 
-/** @deprecated Используйте `responsive` из `Sidebar.Root`. */
-export type SidebarResponsive = boolean;
-
-const SidebarComposedRoot = SidebarRoot;
-
-export type SidebarToggleButtonProps = Omit<
-  React.ComponentPropsWithoutRef<"button">,
-  "children" | "aria-label"
-> & {
-  openLabel?: string;
-  closedLabel?: string;
-  placement?: "inline" | "edge";
+export type SidebarLabels = {
+  /** `aria-label` of the `<nav>` landmark. */
+  navigation: string;
+  /** Toggle label while the rail is expanded. */
+  collapse: string;
+  /** Toggle label while the rail is compact or hidden. */
+  expand: string;
+  /** Toggle label inside the off-canvas panel, and the scrim's label. */
+  close: string;
 };
 
-function iconForToggle(state: SidebarLayoutMode, side: "left" | "right") {
-  if (side === "left") {
-    return state === "hidden" ? <PanelLeftOpen size="1em" /> : <PanelLeftClose size="1em" />;
-  }
-  return state === "hidden" ? <PanelRightOpen size="1em" /> : <PanelRightClose size="1em" />;
+const defaultLabels: SidebarLabels = {
+  navigation: "Навигация",
+  collapse: "Свернуть панель",
+  expand: "Развернуть панель",
+  close: "Закрыть навигацию",
+};
+
+/** Below this width a `responsive` sidebar leaves the layout and becomes an off-canvas panel. */
+const MOBILE_QUERY = "(max-width: 767.98px)";
+
+type SidebarContextValue = {
+  mode: SidebarMode;
+  setMode: (mode: SidebarMode) => void;
+  /** Off-canvas panel state (narrow viewports only). */
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  /** expanded ↔ compact on desktop (hidden → expanded); open ↔ closed off-canvas. */
+  toggle: () => void;
+  /** True while the sidebar is off-canvas (responsive and the viewport is narrower than 768px). */
+  isMobile: boolean;
+  size: ControlSize;
+  navId: string;
+  labels: SidebarLabels;
+};
+
+const [SidebarProvider, useSidebar] = createComponentContext<SidebarContextValue>("Sidebar");
+
+export { useSidebar };
+
+function useMediaQuery(query: string, enabled: boolean): boolean {
+  const subscribe = React.useCallback(
+    (onChange: () => void) => {
+      if (!enabled || typeof window === "undefined" || !window.matchMedia) return () => {};
+      const mq = window.matchMedia(query);
+      mq.addEventListener("change", onChange);
+      return () => mq.removeEventListener("change", onChange);
+    },
+    [enabled, query],
+  );
+  const getSnapshot = () =>
+    enabled && typeof window !== "undefined" && !!window.matchMedia
+      ? window.matchMedia(query).matches
+      : false;
+  return React.useSyncExternalStore(subscribe, getSnapshot, () => false);
 }
 
-const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleButtonProps>(
-  (
-    {
-      className,
-      openLabel = "Скрыть сайдбар",
-      closedLabel = "Открыть сайдбар",
-      placement = "inline",
-      ...rest
-    },
-    ref,
-  ) => {
-    const { state, toggleOpen, navPanelId, side } = useSidebarContext();
-    const expanded = state !== "hidden";
+// ─── Root ─────────────────────────────────────────────────────────────────────
 
-    return (
-      <button
-        {...rest}
-        ref={ref}
-        type={rest.type ?? "button"}
-        className={cx(styles.toggleButton, className)}
-        aria-expanded={expanded}
-        aria-controls={navPanelId}
-        aria-label={expanded ? openLabel : closedLabel}
-        data-placement={placement}
-        onClick={(event) => {
-          rest.onClick?.(event);
-          if (!event.defaultPrevented) {
-            toggleOpen();
-          }
-        }}
-      >
-        <span className={styles.menuIcon} aria-hidden="true">
-          {iconForToggle(state, side)}
-        </span>
-      </button>
-    );
-  },
-);
-
-SidebarToggleButton.displayName = "SidebarToggleButton";
-
-export type SidebarNavPanelProps = React.ComponentPropsWithoutRef<"nav"> & {
-  /** По умолчанию рендерится встроенная кнопка сворачивания на грани панели (`placement="edge"`). Состояние — через `Sidebar.Root` (`state` / `onStateChange`) или `useSidebarContext`. */
-  showToggle?: boolean;
+export type SidebarRootProps = Omit<React.ComponentPropsWithoutRef<"div">, "children"> & {
+  children?: React.ReactNode;
+  /** Item tier: height, icon and text of `--prime-control-<size>-*`. */
+  size?: ControlSize;
+  mode?: SidebarMode;
+  defaultMode?: SidebarMode;
+  onModeChange?: (mode: SidebarMode) => void;
+  /** Off-canvas panel on narrow viewports (responsive only). */
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Below 768px the rail becomes an off-canvas panel with a scrim and a focus trap. */
+  responsive?: boolean;
+  labels?: Partial<SidebarLabels>;
 };
 
-function SidebarNavPanel({
-  className,
-  id,
-  showToggle = true,
-  children,
-  ...rest
-}: SidebarNavPanelProps) {
-  const { navPanelId } = useSidebarContext();
+const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function SidebarRoot(
+  {
+    children,
+    className,
+    size = "m",
+    mode: modeProp,
+    defaultMode = "expanded",
+    onModeChange,
+    open: openProp,
+    defaultOpen = false,
+    onOpenChange,
+    responsive = true,
+    labels: labelsProp,
+    ...rest
+  },
+  ref,
+) {
+  const labels = React.useMemo(() => ({ ...defaultLabels, ...labelsProp }), [labelsProp]);
+  const isMobile = useMediaQuery(MOBILE_QUERY, responsive);
+
+  const [mode, setMode] = useControllableState<SidebarMode>({
+    value: modeProp,
+    defaultValue: defaultMode,
+    onChange: onModeChange,
+  });
+  const [openState, setOpen] = useControllableState<boolean>({
+    value: openProp,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  const open = isMobile && openState;
+
+  // Leaving the narrow viewport closes the off-canvas panel.
+  React.useEffect(() => {
+    if (!isMobile) setOpen(false);
+  }, [isMobile, setOpen]);
+
+  /*
+   * While hidden the panel keeps the width of the last visible mode, so it clips out (and back
+   * in) as one piece instead of reflowing its items.
+   */
+  const lastVisibleRef = React.useRef<Exclude<SidebarMode, "hidden">>(
+    mode === "hidden" ? "expanded" : mode,
+  );
+  if (mode !== "hidden") lastVisibleRef.current = mode;
+
+  const close = React.useCallback(() => setOpen(false), [setOpen]);
+  const panelRef = useOverlayModal<HTMLElement>(open, close);
+
+  const toggle = React.useCallback(() => {
+    if (isMobile) {
+      setOpen((prev) => !prev);
+      return;
+    }
+    setMode((prev) => (prev === "expanded" ? "compact" : "expanded"));
+  }, [isMobile, setMode, setOpen]);
+
+  const navId = React.useId();
+
+  const context = React.useMemo<SidebarContextValue>(
+    () => ({ mode, setMode, open, setOpen, toggle, isMobile, size, navId, labels }),
+    [mode, setMode, open, setOpen, toggle, isMobile, size, navId, labels],
+  );
 
   return (
-    <nav
-      {...rest}
-      id={id ?? navPanelId}
-      className={cx(styles.navPanel, className)}
-      aria-label={rest["aria-label"] ?? "Sidebar navigation"}
-    >
-      <div className={styles.navPanelSurface}>
-        {children}
-        {showToggle ? <SidebarToggleButton placement="edge" /> : null}
+    <SidebarProvider value={context}>
+      <div
+        {...rest}
+        ref={ref}
+        className={cx(styles.root, className)}
+        {...toDataAttributes({
+          size,
+          mode,
+          "panel-mode": mode === "hidden" ? lastVisibleRef.current : mode,
+          mobile: isMobile || undefined,
+          state: isMobile ? (open ? "open" : "closed") : undefined,
+        })}
+      >
+        {isMobile ? (
+          <button
+            type="button"
+            className={styles.scrim}
+            aria-label={labels.close}
+            tabIndex={-1}
+            onClick={close}
+          />
+        ) : null}
+        <nav
+          ref={panelRef as React.Ref<HTMLElement>}
+          id={navId}
+          className={styles.panel}
+          aria-label={labels.navigation}
+          inert={(isMobile && !open) || (!isMobile && mode === "hidden") || undefined}
+        >
+          {children}
+        </nav>
       </div>
-    </nav>
+    </SidebarProvider>
   );
-}
+});
+SidebarRoot.displayName = "Sidebar.Root";
 
-SidebarNavPanel.displayName = "SidebarNavPanel";
+// ─── Regions ──────────────────────────────────────────────────────────────────
 
-export type SidebarHeaderProps = React.ComponentPropsWithoutRef<"header">;
+export type SidebarHeaderProps = React.ComponentPropsWithoutRef<"div">;
 
 function SidebarHeader({ className, ...rest }: SidebarHeaderProps) {
-  return <header {...rest} className={cx(styles.header, className)} />;
+  return <div {...rest} className={cx(styles.header, className)} />;
 }
+SidebarHeader.displayName = "Sidebar.Header";
 
-SidebarHeader.displayName = "SidebarHeader";
+export type SidebarContentProps = React.ComponentPropsWithoutRef<"div">;
 
-export type SidebarHeaderRowProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarHeaderRow({ className, ...rest }: SidebarHeaderRowProps) {
-  return <div {...rest} className={cx(styles.headerRow, className)} />;
-}
-
-SidebarHeaderRow.displayName = "SidebarHeaderRow";
-
-export type SidebarHeaderMainProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarHeaderMain({ className, ...rest }: SidebarHeaderMainProps) {
-  return <div {...rest} className={cx(styles.headerMain, className)} />;
-}
-
-SidebarHeaderMain.displayName = "SidebarHeaderMain";
-
-export type SidebarContentProps = Omit<
-  React.ComponentPropsWithoutRef<typeof ScrollContainer>,
-  "as"
->;
-
-function SidebarContent({ className, axis = "vertical", ...rest }: SidebarContentProps) {
-  return (
-    <ScrollContainer
-      {...rest}
-      axis={axis}
-      className={cx(styles.content, className)}
-      overscrollBehavior="contain"
-    />
-  );
-}
-
-SidebarContent.displayName = "SidebarContent";
-
-export type SidebarFooterProps = React.ComponentPropsWithoutRef<"footer"> & {
-  variant?: "plain" | "inset";
-};
-
-function SidebarFooter({ className, variant = "plain", ...rest }: SidebarFooterProps) {
-  return (
-    <footer
-      {...rest}
-      className={cx(styles.footer, className, variant === "inset" && styles.footerInset)}
-    />
-  );
-}
-
-SidebarFooter.displayName = "SidebarFooter";
-
-export type SidebarTextProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarText({ className, ...rest }: SidebarTextProps) {
-  return <span {...rest} className={cx(styles.text, className)} />;
-}
-
-SidebarText.displayName = "SidebarText";
-
-export type SidebarIdentityButtonProps = Omit<
-  React.ComponentPropsWithoutRef<"button">,
-  "children"
-> & {
-  leading?: React.ReactNode;
-  title: React.ReactNode;
-  subtitle?: React.ReactNode;
-  trailing?: React.ReactNode;
-};
-
-const SidebarIdentityButton = React.forwardRef<HTMLButtonElement, SidebarIdentityButtonProps>(
-  (
-    { className, type = "button", leading, title, subtitle, trailing, disabled, onClick, ...rest },
-    ref,
-  ) => {
-    const { size: _size } = useSidebarContext();
-    void _size;
-
-    return (
-      <button
-        {...rest}
-        ref={ref}
-        type={type}
-        disabled={disabled}
-        onClick={onClick}
-        className={cx(styles.identityButton, className)}
-        aria-label={typeof title === "string" ? title : rest["aria-label"]}
-      >
-        {leading === undefined ? null : (
-          <span className={styles.identityButtonLeading} aria-hidden="true">
-            {leading}
-          </span>
-        )}
-        <span className={styles.identityButtonMain}>
-          <span className={styles.identityButtonTitle}>{title}</span>
-          {subtitle === undefined ? null : (
-            <span className={styles.identityButtonSubtitle}>{subtitle}</span>
-          )}
-        </span>
-        <span className={styles.identityButtonTrailing} aria-hidden="true">
-          {trailing ?? <ChevronsUpDown size="1em" strokeWidth={2} />}
-        </span>
-      </button>
-    );
+/** Scrolling middle region. */
+const SidebarContent = React.forwardRef<HTMLDivElement, SidebarContentProps>(
+  function SidebarContent({ className, ...rest }, ref) {
+    return <div {...rest} ref={ref} className={cx(styles.content, className)} />;
   },
 );
+SidebarContent.displayName = "Sidebar.Content";
 
-SidebarIdentityButton.displayName = "SidebarIdentityButton";
+export type SidebarFooterProps = React.ComponentPropsWithoutRef<"div">;
 
-export type SidebarGroupProps = React.ComponentPropsWithoutRef<"section"> & {
-  title?: React.ReactNode;
-  action?: React.ReactNode;
+function SidebarFooter({ className, ...rest }: SidebarFooterProps) {
+  return <div {...rest} className={cx(styles.footer, className)} />;
+}
+SidebarFooter.displayName = "Sidebar.Footer";
+
+export type SidebarGroupProps = Omit<React.ComponentPropsWithoutRef<"div">, "role"> & {
+  /** Group heading. In compact mode it fades out and leaves its spacing. */
+  label?: React.ReactNode;
 };
 
-function parseLengthToPx(value: string, baseFontSize: number): number | null {
-  const raw = value.trim().toLowerCase();
-  if (raw.length === 0) return null;
-
-  if (raw.endsWith("px")) {
-    const parsed = Number.parseFloat(raw.slice(0, -2));
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-
-  if (raw.endsWith("rem") || raw.endsWith("em")) {
-    const parsed = Number.parseFloat(raw.slice(0, -3));
-    return Number.isFinite(parsed) ? parsed * baseFontSize : null;
-  }
-
-  const parsed = Number.parseFloat(raw);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function SidebarHeadingText({ children }: { children: React.ReactNode }) {
-  const { isMobile } = useSidebarContext();
-  const trackRef = React.useRef<HTMLSpanElement | null>(null);
-  const textRef = React.useRef<HTMLSpanElement | null>(null);
-  const previousOffsetRef = React.useRef(0);
-
-  const measureOffset = React.useCallback(() => {
-    const track = trackRef.current;
-    const text = textRef.current;
-    if (track == null || text == null) return;
-
-    const applyOffset = (next: number) => {
-      const normalized = Math.abs(next) < 0.5 ? 0 : next;
-      if (Math.abs(previousOffsetRef.current - normalized) < 0.5) return;
-      previousOffsetRef.current = normalized;
-      text.style.setProperty("--sb-heading-offset-px", `${normalized}px`);
-    };
-
-    if (isMobile || typeof window === "undefined") {
-      applyOffset(0);
-      return;
-    }
-
-    const root = track.closest<HTMLElement>("[data-sidebar-root='true']");
-    if (root == null) return;
-
-    const computed = window.getComputedStyle(root);
-    const progressValue = Number.parseFloat(computed.getPropertyValue("--sb-progress"));
-    const progress = Number.isFinite(progressValue) ? Math.max(0, Math.min(1, progressValue)) : 0;
-
-    if (progress <= 0.001) {
-      applyOffset(0);
-      return;
-    }
-
-    const trackWidth = track.clientWidth;
-    const intrinsicTextWidth = text.scrollWidth;
-
-    const baseFontSize = Number.parseFloat(
-      window.getComputedStyle(document.documentElement).fontSize,
-    );
-
-    const compactWidth = parseLengthToPx(
-      computed.getPropertyValue("--sb-compact-width"),
-      baseFontSize,
-    );
-    const currentWidth = root.getBoundingClientRect().width;
-
-    if (compactWidth === null || currentWidth <= 0) {
-      applyOffset(0);
-      return;
-    }
-
-    // Project current heading track ratio to compact sidebar width to get a stable
-    // compact target and avoid mid-transition bounce.
-    const trackRatio = trackWidth / currentWidth;
-    const compactTrackWidth = compactWidth * trackRatio;
-    const compactTextWidth = Math.min(intrinsicTextWidth, compactTrackWidth);
-    const targetCompactOffset = Math.max(0, (compactTrackWidth - compactTextWidth) / 2);
-
-    applyOffset(targetCompactOffset * progress);
-  }, [isMobile]);
-
-  React.useLayoutEffect(() => {
-    measureOffset();
-  }, [measureOffset]);
-
-  React.useLayoutEffect(() => {
-    if (typeof window === "undefined") return;
-    const track = trackRef.current;
-    const text = textRef.current;
-    if (track == null || text == null) return;
-    const observer = new ResizeObserver(() => {
-      measureOffset();
-    });
-
-    observer.observe(track);
-    observer.observe(text);
-
-    return () => observer.disconnect();
-  }, [measureOffset]);
-
+function SidebarGroup({ className, label, children, ...rest }: SidebarGroupProps) {
+  const labelId = React.useId();
   return (
-    <span ref={trackRef} className={styles.headingTrack}>
-      <span
-        ref={textRef}
-        className={styles.headingText}
-        style={{ "--sb-heading-offset-px": "0px" } as React.CSSProperties}
-      >
-        {children}
-      </span>
-    </span>
-  );
-}
-
-function SidebarGroup({ className, title, action, children, ...rest }: SidebarGroupProps) {
-  return (
-    <section {...rest} className={cx(styles.group, className)}>
-      {title !== undefined ? (
-        <div className={styles.groupHeader}>
-          <Typography.Root as="h3" variant="body-small" tone="muted" className={styles.groupLabel}>
-            <SidebarHeadingText>{title}</SidebarHeadingText>
-          </Typography.Root>
-          {action === undefined ? null : <div className={styles.groupHeaderAction}>{action}</div>}
-        </div>
-      ) : null}
-      {children}
-    </section>
-  );
-}
-
-SidebarGroup.displayName = "SidebarGroup";
-
-export type SidebarGroupLabelProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarGroupLabel({ className, children, ...rest }: SidebarGroupLabelProps) {
-  return (
-    <Typography.Root
-      as="div"
-      variant="body-small"
-      tone="muted"
-      className={cx(styles.groupLabel, className)}
+    // biome-ignore lint/a11y/useSemanticElements: a nav group of links, not a form fieldset
+    <div
       {...rest}
+      role="group"
+      aria-labelledby={label === undefined ? undefined : labelId}
+      className={cx(styles.group, className)}
     >
-      <SidebarHeadingText>{children}</SidebarHeadingText>
-    </Typography.Root>
+      {label === undefined ? null : (
+        <div id={labelId} className={styles.groupLabel}>
+          {label}
+        </div>
+      )}
+      {children}
+    </div>
   );
 }
+SidebarGroup.displayName = "Sidebar.Group";
 
-SidebarGroupLabel.displayName = "SidebarGroupLabel";
+// ─── Item ─────────────────────────────────────────────────────────────────────
 
-export type SidebarSeparatorProps = React.ComponentPropsWithoutRef<typeof Divider.Root>;
-
-function SidebarSeparator({ className, variant = "line-spacing", ...rest }: SidebarSeparatorProps) {
-  return <Divider.Root {...rest} variant={variant} className={cx(styles.separator, className)} />;
-}
-
-SidebarSeparator.displayName = "SidebarSeparator";
-
-export type SidebarMenuProps = React.ComponentPropsWithoutRef<"ul">;
-
-function SidebarMenu({ className, ...rest }: SidebarMenuProps) {
-  return <ul {...rest} className={cx(styles.menu, className)} />;
-}
-
-SidebarMenu.displayName = "SidebarMenu";
-
-export type SidebarMenuItemProps = React.ComponentPropsWithoutRef<"li">;
-
-function SidebarMenuItem({ className, ...rest }: SidebarMenuItemProps) {
-  return <li {...rest} className={cx(styles.menuItem, className)} />;
-}
-
-SidebarMenuItem.displayName = "SidebarMenuItem";
-
-export type SidebarMenuIconProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarMenuIcon({ className, ...rest }: SidebarMenuIconProps) {
-  return <span {...rest} className={cx(styles.menuIcon, className)} aria-hidden="true" />;
-}
-
-SidebarMenuIcon.displayName = "SidebarMenuIcon";
-
-export type SidebarMenuLabelProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarMenuLabel({ className, ...rest }: SidebarMenuLabelProps) {
-  return <span {...rest} className={cx(styles.menuLabel, className)} />;
-}
-
-SidebarMenuLabel.displayName = "SidebarMenuLabel";
-
-export type SidebarMenuTrailingProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarMenuTrailing({ className, ...rest }: SidebarMenuTrailingProps) {
-  return <span {...rest} className={cx(styles.menuTrailing, className)} aria-hidden="true" />;
-}
-
-SidebarMenuTrailing.displayName = "SidebarMenuTrailing";
-
-export type SidebarMenuActionProps = React.ComponentPropsWithoutRef<"button"> & {
-  children?: React.ReactNode;
-};
-
-const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
-  ({ className, children, type = "button", ...rest }, ref) => {
-    return (
-      <button {...rest} ref={ref} type={type} className={cx(styles.menuAction, className)}>
-        {children}
-      </button>
-    );
-  },
-);
-
-SidebarMenuAction.displayName = "SidebarMenuAction";
-
-export type SidebarMenuButtonProps = React.ComponentPropsWithoutRef<"button"> & {
-  active?: boolean;
-  asChild?: boolean;
-  tooltip?: React.ReactNode;
-};
-
-function extractTextFromNode(node: unknown): string {
-  if (typeof node === "string" || typeof node === "number") {
-    return String(node);
-  }
-  if (Array.isArray(node)) {
-    return node.map((item) => extractTextFromNode(item)).join(" ");
-  }
+function textOf(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(textOf).join("");
   if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
-    return extractTextFromNode(node.props.children);
+    return textOf(node.props.children);
   }
   return "";
 }
 
-function resolveMenuTooltipContent(
-  explicitTooltip: React.ReactNode | undefined,
-  fallbackNode: unknown,
-): React.ReactNode | null {
-  if (explicitTooltip !== undefined && explicitTooltip !== null) {
-    if (typeof explicitTooltip === "string") {
-      const normalized = explicitTooltip.trim();
-      return normalized.length > 0 ? normalized : null;
-    }
-    return explicitTooltip;
-  }
+type ItemInnerProps = {
+  icon?: React.ReactNode;
+  badge?: React.ReactNode;
+  shortcut?: React.ReactNode;
+  children?: React.ReactNode;
+};
 
-  const fallbackText = extractTextFromNode(fallbackNode).trim();
-  return fallbackText.length > 0 ? fallbackText : null;
-}
-
-function SidebarCompactTooltip({
-  content,
-  children,
-}: {
-  content: React.ReactNode | null;
-  children: React.ReactElement;
-}) {
-  const { state, isMobile } = useSidebarContext();
-  const shouldShowTooltip = !isMobile && state === "compact" && content !== null;
-
-  if (!shouldShowTooltip) {
-    return children;
-  }
-
+function ItemInner({ icon, badge, shortcut, children }: ItemInnerProps) {
   return (
-    <Tooltip.Provider delayDuration={0}>
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <span className={styles.menuTooltipAnchor}>{children}</span>
-        </Tooltip.Trigger>
-        <Tooltip.Content side="right" size="l">
-          {content}
-        </Tooltip.Content>
-      </Tooltip.Root>
-    </Tooltip.Provider>
+    <>
+      {icon === undefined ? null : (
+        <span className={styles.icon} aria-hidden="true">
+          {icon}
+        </span>
+      )}
+      <span className={styles.label}>{children}</span>
+      {badge === undefined || badge === null ? null : <span className={styles.badge}>{badge}</span>}
+      {shortcut === undefined ? null : (
+        <span className={styles.shortcut} aria-hidden="true">
+          {shortcut}
+        </span>
+      )}
+    </>
   );
 }
 
-const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
-  (
-    {
-      className,
-      active,
-      asChild = false,
-      disabled,
-      onClick,
-      type = "button",
-      tooltip,
-      children,
-      ...rest
-    },
-    ref,
-  ) => {
-    const tooltipContent = resolveMenuTooltipContent(tooltip, rest["aria-label"] ?? children);
+/**
+ * Wraps an item in a tooltip that opens only in compact mode. The tooltip is always mounted so
+ * switching modes never remounts the item (focus stays on it).
+ */
+function CompactTooltip({ text, children }: { text: string; children: React.ReactElement }) {
+  const { mode, isMobile } = useSidebar();
+  const enabled = mode === "compact" && !isMobile && text.length > 0;
+  const [open, setOpen] = React.useState(false);
+  return (
+    <Tooltip.Root
+      open={enabled && open}
+      onOpenChange={(next) => setOpen(enabled && next)}
+      delayDuration={0}
+    >
+      {/* Slot keeps the item's own ref: Tooltip.Trigger replaces the child's ref. */}
+      <Tooltip.Trigger>
+        <Slot>{children}</Slot>
+      </Tooltip.Trigger>
+      <Tooltip.Content side="right">{text}</Tooltip.Content>
+    </Tooltip.Root>
+  );
+}
 
-    if (asChild) {
-      const element = (
-        <Slot
-          {...rest}
-          ref={ref as React.Ref<HTMLElement>}
-          className={cx(styles.menuButton, className)}
-          data-active={active ? "true" : undefined}
-          aria-disabled={disabled || undefined}
-          onClick={
-            disabled
-              ? (e: React.MouseEvent) => {
-                  e.preventDefault();
-                }
-              : onClick
-          }
-        >
-          {children}
-        </Slot>
-      );
+type SidebarItemOwnProps = {
+  /** Leading icon; stays in place in every mode. */
+  icon?: React.ReactNode;
+  /** Counter or status; in compact mode it becomes a dot on the icon. */
+  badge?: React.ReactNode;
+  /** Keyboard hint (e.g. `<Kbd>`); hidden in compact mode. */
+  shortcut?: React.ReactNode;
+  /** Current page. Links rendered by a router may set `aria-current="page"` instead. */
+  active?: boolean;
+  disabled?: boolean;
+  /**
+   * Render the single child element (e.g. a router link) as the item; its children become the
+   * label.
+   */
+  asChild?: boolean;
+  children?: React.ReactNode;
+};
 
-      return <SidebarCompactTooltip content={tooltipContent}>{element}</SidebarCompactTooltip>;
+export type SidebarItemProps = SidebarItemOwnProps &
+  Omit<React.ComponentPropsWithoutRef<"button">, keyof SidebarItemOwnProps> & {
+    /** Renders an `<a>` instead of a `<button>`. */
+    href?: string;
+    target?: string;
+    rel?: string;
+  };
+
+const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function SidebarItem(
+  {
+    icon,
+    badge,
+    shortcut,
+    active = false,
+    disabled = false,
+    asChild = false,
+    href,
+    className,
+    children,
+    onClick,
+    type,
+    ...rest
+  },
+  ref,
+) {
+  const { isMobile, setOpen } = useSidebar();
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (disabled) {
+      event.preventDefault();
+      return;
     }
+    onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+    // Navigating from the off-canvas panel closes it.
+    if (!event.defaultPrevented && isMobile && (href !== undefined || asChild)) setOpen(false);
+  };
 
-    const element = (
-      <button
-        {...rest}
-        ref={ref}
-        type={type}
-        disabled={disabled}
-        className={cx(styles.menuButton, className)}
-        data-active={active ? "true" : undefined}
-        onClick={onClick}
+  const shared = {
+    ...rest,
+    className: cx(styles.item, className),
+    onClick: handleClick,
+    "aria-current": active ? ("page" as const) : rest["aria-current"],
+    ...toDataAttributes({
+      state: active ? "active" : undefined,
+      disabled: disabled || undefined,
+    }),
+  };
+
+  let element: React.ReactElement;
+  let labelSource: React.ReactNode = children;
+
+  if (asChild && React.isValidElement<{ children?: React.ReactNode }>(children)) {
+    labelSource = children.props.children;
+    element = (
+      <Slot {...shared} ref={ref} aria-disabled={disabled || undefined}>
+        {React.cloneElement(
+          children,
+          undefined,
+          <ItemInner icon={icon} badge={badge} shortcut={shortcut}>
+            {children.props.children}
+          </ItemInner>,
+        )}
+      </Slot>
+    );
+  } else if (href !== undefined) {
+    element = (
+      <a
+        {...(shared as React.ComponentPropsWithoutRef<"a">)}
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={disabled ? undefined : href}
+        aria-disabled={disabled || undefined}
       >
-        {children}
+        <ItemInner icon={icon} badge={badge} shortcut={shortcut}>
+          {children}
+        </ItemInner>
+      </a>
+    );
+  } else {
+    element = (
+      <button
+        {...shared}
+        ref={ref as React.Ref<HTMLButtonElement>}
+        type={type ?? "button"}
+        disabled={disabled}
+      >
+        <ItemInner icon={icon} badge={badge} shortcut={shortcut}>
+          {children}
+        </ItemInner>
       </button>
     );
+  }
 
-    return <SidebarCompactTooltip content={tooltipContent}>{element}</SidebarCompactTooltip>;
-  },
-);
+  const tooltipText = textOf(labelSource).trim() || (rest["aria-label"] ?? "");
+  return <CompactTooltip text={tooltipText}>{element}</CompactTooltip>;
+});
+SidebarItem.displayName = "Sidebar.Item";
 
-SidebarMenuButton.displayName = "SidebarMenuButton";
+// ─── Toggle ───────────────────────────────────────────────────────────────────
 
-export type SidebarMenuLinkProps = React.ComponentPropsWithoutRef<"a"> & {
-  active?: boolean;
-};
+export type SidebarToggleProps = Omit<
+  React.ComponentPropsWithoutRef<"button">,
+  "children" | "aria-label" | "aria-expanded" | "aria-controls"
+>;
 
-const SidebarMenuLink = React.forwardRef<HTMLAnchorElement, SidebarMenuLinkProps>(
-  ({ active, className, ...rest }, ref) => (
-    <SidebarMenuButton asChild active={active} className={className}>
-      <a {...rest} ref={ref} />
-    </SidebarMenuButton>
-  ),
-);
+/**
+ * Item-shaped toggle: expanded ↔ compact on desktop (hidden → expanded), closes the panel
+ * off-canvas. Its label comes from `labels`.
+ */
+const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
+  function SidebarToggle({ className, onClick, ...rest }, ref) {
+    const { mode, isMobile, open, toggle, navId, labels } = useSidebar();
+    const expanded = isMobile ? open : mode === "expanded";
+    const label = isMobile ? labels.close : expanded ? labels.collapse : labels.expand;
 
-SidebarMenuLink.displayName = "SidebarMenuLink";
-
-export type SidebarMenuRouterLinkProps = React.ComponentPropsWithoutRef<typeof NavLink> & {
-  tooltip?: React.ReactNode;
-};
-
-const SidebarMenuRouterLink = React.forwardRef<HTMLAnchorElement, SidebarMenuRouterLinkProps>(
-  ({ className, tooltip, ...rest }, ref) => {
-    const tooltipContent = resolveMenuTooltipContent(tooltip, rest["aria-label"] ?? rest.children);
-
-    if (typeof className === "function") {
-      const element = (
-        <NavLink
-          ref={ref}
+    return (
+      <CompactTooltip text={label}>
+        <button
           {...rest}
-          className={(navState) =>
-            cx(styles.menuButton, navState.isActive && styles.menuButtonActive, className(navState))
-          }
-        />
-      );
-      return <SidebarCompactTooltip content={tooltipContent}>{element}</SidebarCompactTooltip>;
-    }
-
-    const element = <NavLink ref={ref} {...rest} className={cx(styles.menuButton, className)} />;
-    return <SidebarCompactTooltip content={tooltipContent}>{element}</SidebarCompactTooltip>;
+          ref={ref}
+          type="button"
+          className={cx(styles.item, className)}
+          aria-expanded={expanded}
+          aria-controls={navId}
+          aria-label={label}
+          onClick={(event) => {
+            onClick?.(event);
+            if (!event.defaultPrevented) toggle();
+          }}
+        >
+          <ItemInner icon={expanded ? <PanelLeftClose /> : <PanelLeftOpen />}>{label}</ItemInner>
+        </button>
+      </CompactTooltip>
+    );
   },
 );
+SidebarToggle.displayName = "Sidebar.Toggle";
 
-SidebarMenuRouterLink.displayName = "SidebarMenuRouterLink";
-
-export type SidebarNavPanelBodyProps = React.ComponentPropsWithoutRef<typeof ScrollContainer>;
-
-function SidebarNavPanelBody({ className, axis = "vertical", ...rest }: SidebarNavPanelBodyProps) {
-  return (
-    <ScrollContainer
-      {...rest}
-      axis={axis}
-      className={cx(styles.navPanelBody, className)}
-      overscrollBehavior="contain"
-    />
-  );
-}
-
-SidebarNavPanelBody.displayName = "SidebarNavPanelBody";
-
-export type SidebarNavDocTreeProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarNavDocTree({ className, ...rest }: SidebarNavDocTreeProps) {
-  return <div {...rest} className={cx(styles.navDocTree, className)} />;
-}
-
-SidebarNavDocTree.displayName = "SidebarNavDocTree";
-
-export type SidebarNavPanelHeadingProps = React.ComponentPropsWithoutRef<"h2">;
-
-function SidebarNavPanelHeading({ className, ...rest }: SidebarNavPanelHeadingProps) {
-  const { children, ...headingRest } = rest;
-  return (
-    <h2 {...headingRest} className={cx(styles.navPanelHeading, className)}>
-      <SidebarHeadingText>{children}</SidebarHeadingText>
-    </h2>
-  );
-}
-
-SidebarNavPanelHeading.displayName = "SidebarNavPanelHeading";
-
-export type SidebarNavCategoryProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarNavCategory({ className, ...rest }: SidebarNavCategoryProps) {
-  return <div {...rest} className={cx(styles.navCategory, className)} />;
-}
-
-SidebarNavCategory.displayName = "SidebarNavCategory";
-
-export type SidebarNavCategoryTriggerProps = React.ComponentPropsWithoutRef<"button">;
-
-const SidebarNavCategoryTrigger = React.forwardRef<
-  HTMLButtonElement,
-  SidebarNavCategoryTriggerProps
->(({ className, type = "button", children, ...rest }, ref) => (
-  <button ref={ref} type={type} className={cx(styles.navCategoryTrigger, className)} {...rest}>
-    {children}
-  </button>
-));
-SidebarNavCategoryTrigger.displayName = "SidebarNavCategoryTrigger";
-
-export type SidebarNavCategoryLabelProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarNavCategoryLabel({ className, ...rest }: SidebarNavCategoryLabelProps) {
-  return <span {...rest} className={cx(styles.navCategoryLabel, className)} />;
-}
-
-SidebarNavCategoryLabel.displayName = "SidebarNavCategoryLabel";
-
-export type SidebarNavCategoryCountProps = React.ComponentPropsWithoutRef<"span">;
-
-function SidebarNavCategoryCount({ className, ...rest }: SidebarNavCategoryCountProps) {
-  return <span {...rest} className={cx(styles.navCategoryCount, className)} />;
-}
-
-SidebarNavCategoryCount.displayName = "SidebarNavCategoryCount";
-
-export type SidebarNavCategoryPanelProps = React.ComponentPropsWithoutRef<"div">;
-
-function SidebarNavCategoryPanel({ className, ...rest }: SidebarNavCategoryPanelProps) {
-  return <div {...rest} className={cx(styles.navCategoryPanel, className)} />;
-}
-
-SidebarNavCategoryPanel.displayName = "SidebarNavCategoryPanel";
-
-export type SidebarMenuSlotButtonProps = SidebarMenuButtonProps;
-
-const SidebarMenuSlotButton = React.forwardRef<HTMLButtonElement, SidebarMenuSlotButtonProps>(
-  (props, ref) => <SidebarMenuButton {...props} ref={ref} />,
-);
-
-SidebarMenuSlotButton.displayName = "SidebarMenuSlotButton";
-
-export const Sidebar = Object.assign(SidebarComposedRoot, {
-  Root: SidebarComposedRoot,
-  NavPanel: SidebarNavPanel,
-  NavPanelBody: SidebarNavPanelBody,
-  NavDocTree: SidebarNavDocTree,
-  NavPanelHeading: SidebarNavPanelHeading,
-  NavCategory: SidebarNavCategory,
-  NavCategoryTrigger: SidebarNavCategoryTrigger,
-  NavCategoryLabel: SidebarNavCategoryLabel,
-  NavCategoryCount: SidebarNavCategoryCount,
-  NavCategoryPanel: SidebarNavCategoryPanel,
+export const Sidebar = {
+  Root: SidebarRoot,
   Header: SidebarHeader,
-  HeaderRow: SidebarHeaderRow,
-  HeaderMain: SidebarHeaderMain,
   Content: SidebarContent,
   Footer: SidebarFooter,
-  ToggleButton: SidebarToggleButton,
-  IdentityButton: SidebarIdentityButton,
   Group: SidebarGroup,
-  GroupLabel: SidebarGroupLabel,
-  Separator: SidebarSeparator,
-  Menu: SidebarMenu,
-  MenuItem: SidebarMenuItem,
-  MenuButton: SidebarMenuButton,
-  MenuLink: SidebarMenuLink,
-  MenuRouterLink: SidebarMenuRouterLink,
-  MenuAction: SidebarMenuAction,
-  MenuIcon: SidebarMenuIcon,
-  MenuLabel: SidebarMenuLabel,
-  MenuTrailing: SidebarMenuTrailing,
-  MenuSlotButton: SidebarMenuSlotButton,
-  Text: SidebarText,
-});
+  Item: SidebarItem,
+  Toggle: SidebarToggle,
+};

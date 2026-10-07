@@ -1,373 +1,331 @@
+/*
+ * Banner — Graphite. In-flow message block, no borders.
+ * soft: tinted tone fill, primary text, tone icon · solid: saturated tone fill ·
+ * outline: card fill with a hairline tone ring.
+ *
+ * Layout (left-aligned, Notification's status-icon pattern):
+ *   [icon] [title          ] [actions] [×]
+ *          [description    ]
+ * The icon sits on the title's first line, title and description stack in a text column capped at
+ * the reading width, actions are on the right and vertically centered on the text. Below 36rem of the
+ * banner's own width (container query) the actions move under the text. The close button is top-right,
+ * centered on the first line.
+ * Spacing lives in item paddings (not grid gaps), so absent parts leave no empty gutters.
+ * `placement="page"`: edge-to-edge strip without radius, content aligned to the page content column.
+ */
+
 .root {
+  --bn-bg: var(--prime-color-info-default);
+  --bn-fg: var(--prime-color-info-fg);
+  --bn-icon-color: currentColor;
+  --bn-desc-color: currentColor;
+  --bn-soft: var(--prime-color-info-soft);
+  --bn-text: var(--prime-color-info-text);
+  --bn-solid: var(--prime-color-info-default);
+  --bn-solid-fg: var(--prime-color-info-fg);
+
+  --bn-pad-y: var(--prime-space-3);
+  --bn-pad-x: var(--prime-space-4);
+  --bn-gap: var(--prime-space-3);
+  --bn-actions-gap: var(--prime-space-4);
+  --bn-icon: var(--prime-control-m-icon);
+  --bn-title-size: var(--prime-control-m-text-size);
+  --bn-title-line-height: var(--prime-control-m-line-height);
+  --bn-desc-size: var(--prime-text-body-s-size);
+  --bn-desc-line-height: var(--prime-text-body-s-line-height);
+  --bn-radius: var(--prime-radius-l);
+  --bn-close: var(--prime-control-xs-height);
+  --bn-close-icon: var(--prime-control-s-icon);
+
+  container-type: inline-size;
   position: relative;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
   width: 100%;
-  border: var(--prime-sys-unit-1px) solid transparent;
+  min-width: 0;
+  padding: var(--bn-pad-y) var(--bn-pad-x);
+  border-radius: var(--bn-radius);
+  background: var(--bn-bg);
+  color: var(--bn-fg);
+  font-family: var(--prime-font-family-sans);
+  text-align: start;
 }
 
-.content {
-  grid-column: 2;
-  justify-self: center;
-  display: inline-flex;
-  max-width: min(100%, var(--prime-sys-unit-72rem));
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
+.root:has(> .closeButton) {
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--bn-gap);
 }
 
-.icon {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
+/* Full-width page strip: no radius, content follows the page content column. */
+.root[data-placement="page"] {
+  --bn-radius: 0;
+  padding-inline: max(var(--bn-pad-x), calc((100% - var(--prime-layout-content-max-width)) / 2));
 }
 
-.icon svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+/* ---------- Sizes ---------- */
 
-.title {
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: 1.25;
-}
-
-.description {
-  line-height: 1.35;
-  opacity: 0.92;
-}
-
-.actions {
-  display: inline-flex;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  align-items: center;
+.root[data-size="xs"] {
+  --bn-pad-y: var(--prime-space-2);
+  --bn-pad-x: var(--prime-space-2);
+  --bn-gap: var(--prime-space-2);
+  --bn-actions-gap: var(--prime-space-3);
+  --bn-icon: var(--prime-control-xs-icon);
+  --bn-title-size: var(--prime-control-xs-text-size);
+  --bn-title-line-height: var(--prime-control-xs-line-height);
+  --bn-desc-size: var(--prime-text-caption-size);
+  --bn-desc-line-height: var(--prime-text-caption-line-height);
+  --bn-radius: var(--prime-radius-m);
+  --bn-close: var(--prime-space-5);
+  --bn-close-icon: var(--prime-control-xs-icon);
 }
 
 .root[data-size="s"] {
-  column-gap: var(--prime-sys-size-control-s-gap);
-  min-height: var(--prime-sys-size-control-s-height);
-  padding-block: var(--prime-sys-spacing-x2);
-  padding-inline: var(--prime-sys-size-control-s-inputPaddingX);
-  border-radius: var(--prime-sys-size-control-s-radius);
-}
-
-.root[data-size="s"] .content {
-  gap: var(--prime-sys-size-control-s-gap);
-}
-
-.root[data-size="s"] .icon {
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
-}
-
-.root[data-size="s"] .title {
-  font-size: var(--prime-sys-size-control-s-text);
-}
-
-.root[data-size="s"] .description {
-  font-size: var(--prime-sys-size-control-s-supportText);
-}
-
-.root[data-size="s"] .actions {
-  gap: var(--prime-sys-size-control-s-gap);
-}
-
-.root[data-size="m"] {
-  column-gap: var(--prime-sys-size-control-m-gap);
-  min-height: var(--prime-sys-size-control-m-height);
-  padding-block: var(--prime-sys-spacing-x2);
-  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
-  border-radius: var(--prime-sys-size-control-m-radius);
-}
-
-.root[data-size="m"] .content {
-  gap: var(--prime-sys-size-control-m-gap);
-}
-
-.root[data-size="m"] .icon {
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
-}
-
-.root[data-size="m"] .title {
-  font-size: var(--prime-sys-size-control-m-text);
-}
-
-.root[data-size="m"] .description {
-  font-size: var(--prime-sys-size-control-m-supportText);
-}
-
-.root[data-size="m"] .actions {
-  gap: var(--prime-sys-size-control-m-gap);
+  --bn-pad-y: var(--prime-space-2);
+  --bn-pad-x: var(--prime-space-3);
+  --bn-gap: var(--prime-space-2);
+  --bn-actions-gap: var(--prime-space-3);
+  --bn-icon: var(--prime-control-s-icon);
+  --bn-title-size: var(--prime-control-s-text-size);
+  --bn-title-line-height: var(--prime-control-s-line-height);
+  --bn-desc-size: var(--prime-text-caption-size);
+  --bn-desc-line-height: var(--prime-text-caption-line-height);
+  --bn-radius: var(--prime-radius-m);
+  --bn-close: var(--prime-space-6);
+  --bn-close-icon: var(--prime-control-xs-icon);
 }
 
 .root[data-size="l"] {
-  column-gap: var(--prime-sys-size-control-l-gap);
-  min-height: var(--prime-sys-size-control-l-height);
-  padding-block: var(--prime-sys-spacing-x3);
-  padding-inline: var(--prime-sys-size-control-l-inputPaddingX);
-  border-radius: var(--prime-sys-size-control-l-radius);
-}
-
-.root[data-size="l"] .content {
-  gap: var(--prime-sys-size-control-l-gap);
-}
-
-.root[data-size="l"] .icon {
-  width: var(--prime-sys-size-control-l-icon);
-  height: var(--prime-sys-size-control-l-icon);
-}
-
-.root[data-size="l"] .title {
-  font-size: var(--prime-sys-size-control-l-text);
-}
-
-.root[data-size="l"] .description {
-  font-size: var(--prime-sys-size-control-l-supportText);
-}
-
-.root[data-size="l"] .actions {
-  gap: var(--prime-sys-size-control-l-gap);
+  --bn-pad-y: var(--prime-space-4);
+  --bn-pad-x: var(--prime-space-5);
+  --bn-icon: var(--prime-control-l-icon);
+  --bn-title-size: var(--prime-control-l-text-size);
+  --bn-title-line-height: var(--prime-control-l-line-height);
+  --bn-desc-size: var(--prime-text-body-m-size);
+  --bn-desc-line-height: var(--prime-text-body-m-line-height);
+  --bn-close: var(--prime-control-s-height);
+  --bn-close-icon: var(--prime-control-m-icon);
 }
 
 .root[data-size="xl"] {
-  column-gap: var(--prime-sys-size-control-xl-gap);
-  min-height: var(--prime-sys-size-control-xl-height);
-  padding-block: var(--prime-sys-spacing-x4);
-  padding-inline: var(--prime-sys-size-control-xl-inputPaddingX);
-  border-radius: var(--prime-sys-size-control-xl-radius);
+  --bn-pad-y: var(--prime-space-5);
+  --bn-pad-x: var(--prime-space-6);
+  --bn-gap: var(--prime-space-4);
+  --bn-actions-gap: var(--prime-space-6);
+  --bn-icon: var(--prime-control-xl-icon);
+  --bn-title-size: var(--prime-control-xl-text-size);
+  --bn-title-line-height: var(--prime-control-xl-line-height);
+  --bn-desc-size: var(--prime-text-body-m-size);
+  --bn-desc-line-height: var(--prime-text-body-m-line-height);
+  --bn-radius: var(--prime-radius-xl);
+  --bn-close: var(--prime-control-s-height);
+  --bn-close-icon: var(--prime-control-m-icon);
 }
 
-.root[data-size="xl"] .content {
-  gap: var(--prime-sys-size-control-xl-gap);
+/* ---------- Tones ---------- */
+
+.root[data-tone="neutral"] {
+  --bn-soft: var(--prime-color-fill-muted);
+  --bn-text: var(--prime-color-text-secondary);
+  --bn-solid: var(--prime-color-bg-inverse);
+  --bn-solid-fg: var(--prime-color-text-inverse);
 }
 
-.root[data-size="xl"] .icon {
-  width: var(--prime-sys-size-control-xl-icon);
-  height: var(--prime-sys-size-control-xl-icon);
+.root[data-tone="accent"] {
+  --bn-soft: var(--prime-color-accent-soft);
+  --bn-text: var(--prime-color-accent-text);
+  --bn-solid: var(--prime-color-accent-default);
+  --bn-solid-fg: var(--prime-color-accent-fg);
 }
 
-.root[data-size="xl"] .title {
-  font-size: var(--prime-sys-size-control-xl-text);
+.root[data-tone="warning"] {
+  --bn-soft: var(--prime-color-warning-soft);
+  --bn-text: var(--prime-color-warning-text);
+  --bn-solid: var(--prime-color-warning-default);
+  --bn-solid-fg: var(--prime-color-warning-fg);
 }
 
-.root[data-size="xl"] .description {
-  font-size: var(--prime-sys-size-control-xl-supportText);
+.root[data-tone="danger"] {
+  --bn-soft: var(--prime-color-danger-soft);
+  --bn-text: var(--prime-color-danger-text);
+  --bn-solid: var(--prime-color-danger-default);
+  --bn-solid-fg: var(--prime-color-danger-fg);
 }
 
-.root[data-size="xl"] .actions {
-  gap: var(--prime-sys-size-control-xl-gap);
+.root[data-tone="success"] {
+  --bn-soft: var(--prime-color-success-soft);
+  --bn-text: var(--prime-color-success-text);
+  --bn-solid: var(--prime-color-success-default);
+  --bn-solid-fg: var(--prime-color-success-fg);
+}
+
+/* ---------- Variants ---------- */
+
+.root[data-variant="solid"] {
+  --bn-bg: var(--bn-solid);
+  --bn-fg: var(--bn-solid-fg);
+}
+
+.root[data-variant="soft"] {
+  --bn-bg: var(--bn-soft);
+  --bn-fg: var(--prime-color-text-primary);
+  --bn-icon-color: var(--bn-text);
+  --bn-desc-color: var(--prime-color-text-secondary);
+}
+
+.root[data-variant="outline"] {
+  --bn-bg: var(--prime-color-card-bg);
+  --bn-fg: var(--prime-color-text-primary);
+  --bn-icon-color: var(--bn-text);
+  --bn-desc-color: var(--prime-color-text-secondary);
+
+  box-shadow: inset 0 0 0 var(--prime-border-width)
+    color-mix(in srgb, var(--bn-text) 32%, transparent);
+}
+
+/* ---------- Slots ---------- */
+
+.content {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "icon title actions"
+    "icon description actions";
+  align-items: start;
+  min-width: 0;
+}
+
+/* The icon box is one title line high, so the glyph is centered on the first line. */
+.icon {
+  grid-area: icon;
+  box-sizing: content-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--bn-icon);
+  height: var(--bn-title-line-height);
+  padding-inline-end: var(--bn-gap);
+  color: var(--bn-icon-color);
+}
+
+.icon svg {
+  display: block;
+  width: var(--bn-icon);
+  height: var(--bn-icon);
+}
+
+.title {
+  grid-area: title;
+  min-width: 0;
+  max-inline-size: var(--prime-layout-reading-max-width);
+  font-size: var(--bn-title-size);
+  line-height: var(--bn-title-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.description {
+  grid-area: description;
+  min-width: 0;
+  max-inline-size: var(--prime-layout-reading-max-width);
+  font-size: var(--bn-desc-size);
+  line-height: var(--bn-desc-line-height);
+  color: var(--bn-desc-color);
+  overflow-wrap: anywhere;
+}
+
+.content:has(> .title) > .description {
+  padding-top: var(--prime-space-1);
+}
+
+.actions {
+  grid-area: actions;
+  align-self: center;
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  padding-inline-start: var(--bn-actions-gap);
+}
+
+/* Dismiss inside the actions row: a regular square button, last in the row. */
+.actionsClose {
+  order: 1;
 }
 
 .closeButton {
-  grid-column: 3;
-  justify-self: end;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  display: inline-flex;
   flex-shrink: 0;
-  margin: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--bn-close);
+  height: var(--bn-close);
+  /* Centered on the first text line without growing the banner. */
+  margin-block: calc((var(--bn-title-line-height) - var(--bn-close)) / 2);
+  padding: 0;
+  border: 0;
+  border-radius: var(--prime-radius-s);
+  background: transparent;
   color: inherit;
-  transition: opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.root[data-variant="light"]
-  .closeButton[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled),
-.root[data-variant="lighter"]
-  .closeButton[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled),
-.root[data-variant="stroke"]
-  .closeButton[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled) {
-  color: inherit;
+.closeIcon {
+  width: var(--bn-close-icon);
+  height: var(--bn-close-icon);
+}
+
+/* currentColor wash adapts to solid and soft fills alike. */
+.closeButton:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.closeButton:active:not(:disabled) {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.closeButton:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.root[data-variant="solid"] .closeButton:focus-visible {
+  outline-color: currentColor;
 }
 
 .closeButton:disabled {
+  color: var(--prime-color-text-disabled);
   cursor: not-allowed;
-  opacity: 0.45;
 }
 
-.root[data-variant="filled"]
-  .closeButton[data-variant="neutral"][data-mode="ghost"]:hover:not(:disabled) {
-  background: transparent;
-  color: inherit;
+/* ---------- Narrow container: actions under the text ---------- */
+
+@container (max-width: 36rem) {
+  .content {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "icon title"
+      "icon description"
+      ". actions";
+  }
+
+  .actions {
+    align-self: start;
+    padding-inline-start: 0;
+    padding-top: var(--prime-space-3);
+  }
 }
 
-.root[data-variant="filled"] .closeButton[data-variant="neutral"][data-mode="ghost"]:focus-visible {
-  box-shadow: 0 0 0 var(--prime-sys-border-width-focusRing) var(--prime-sys-color-focus-ring);
-  border-color: transparent;
-}
-
-.root[data-variant="filled"] .closeButton {
-  opacity: 0.72;
-}
-
-.root[data-variant="light"] .closeButton,
-.root[data-variant="lighter"] .closeButton,
-.root[data-variant="stroke"] .closeButton {
-  opacity: 0.48;
-}
-
-.root[data-variant="light"] .closeButton:hover:not(:disabled),
-.root[data-variant="lighter"] .closeButton:hover:not(:disabled),
-.root[data-variant="stroke"] .closeButton:hover:not(:disabled) {
-  opacity: 0.72;
-}
-
-.root[data-variant="filled"] .closeButton:hover:not(:disabled) {
-  opacity: 0.92;
-}
-
-/* --- Filled --- */
-.root[data-variant="filled"][data-status="error"] {
-  background: var(--prime-sys-color-status-error-backgroundEmphasis);
-  color: var(--prime-sys-color-content-inverse);
-}
-
-.root[data-variant="filled"][data-status="warning"] {
-  background: var(--prime-sys-color-status-warning-backgroundEmphasis);
-  color: var(--prime-sys-color-content-inverse);
-}
-
-.root[data-variant="filled"][data-status="success"] {
-  background: var(--prime-sys-color-status-success-backgroundEmphasis);
-  color: var(--prime-sys-color-content-inverse);
-}
-
-.root[data-variant="filled"][data-status="information"] {
-  background: var(--prime-sys-color-status-information-backgroundEmphasis);
-  color: var(--prime-sys-color-content-inverse);
-}
-
-.root[data-variant="filled"][data-status="feature"] {
-  background: var(--prime-sys-color-status-feature-backgroundEmphasis);
-  color: var(--prime-sys-color-content-inverse);
-}
-
-/* --- Light --- */
-.root[data-variant="light"][data-status="error"] {
-  background: var(--prime-sys-color-status-error-background);
-  color: var(--prime-sys-color-status-error-foreground);
-}
-
-.root[data-variant="light"][data-status="warning"] {
-  background: var(--prime-sys-color-status-warning-background);
-  color: var(--prime-sys-color-status-warning-foreground);
-}
-
-.root[data-variant="light"][data-status="success"] {
-  background: var(--prime-sys-color-status-success-background);
-  color: var(--prime-sys-color-status-success-foreground);
-}
-
-.root[data-variant="light"][data-status="information"] {
-  background: var(--prime-sys-color-status-information-background);
-  color: var(--prime-sys-color-status-information-foreground);
-}
-
-.root[data-variant="light"][data-status="feature"] {
-  background: var(--prime-sys-color-status-feature-background);
-  color: var(--prime-sys-color-status-feature-foreground);
-}
-
-/* --- Lighter --- */
-.root[data-variant="lighter"][data-status="error"] {
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-status-error-background) 58%,
-    var(--prime-sys-color-surface-default)
-  );
-  color: var(--prime-sys-color-status-error-foreground);
-}
-
-.root[data-variant="lighter"][data-status="warning"] {
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-status-warning-background) 58%,
-    var(--prime-sys-color-surface-default)
-  );
-  color: var(--prime-sys-color-status-warning-foreground);
-}
-
-.root[data-variant="lighter"][data-status="success"] {
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-status-success-background) 58%,
-    var(--prime-sys-color-surface-default)
-  );
-  color: var(--prime-sys-color-status-success-foreground);
-}
-
-.root[data-variant="lighter"][data-status="information"] {
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-status-information-background) 58%,
-    var(--prime-sys-color-surface-default)
-  );
-  color: var(--prime-sys-color-status-information-foreground);
-}
-
-.root[data-variant="lighter"][data-status="feature"] {
-  background: color-mix(
-    in srgb,
-    var(--prime-sys-color-status-feature-background) 58%,
-    var(--prime-sys-color-surface-default)
-  );
-  color: var(--prime-sys-color-status-feature-foreground);
-}
-
-/* --- Stroke: нижняя акцентная полоса по статусу --- */
-.root[data-variant="stroke"] {
-  background: var(--prime-sys-color-surface-raised);
-  color: var(--prime-sys-color-content-primary);
-}
-
-.root[data-variant="stroke"]::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: var(--prime-sys-unit-1px);
-  pointer-events: none;
-}
-
-.root[data-variant="stroke"][data-status="error"] .icon {
-  color: var(--prime-sys-color-status-error-foreground);
-}
-
-.root[data-variant="stroke"][data-status="error"]::after {
-  background: var(--prime-sys-color-status-error-border);
-}
-
-.root[data-variant="stroke"][data-status="warning"] .icon {
-  color: var(--prime-sys-color-status-warning-foreground);
-}
-
-.root[data-variant="stroke"][data-status="warning"]::after {
-  background: var(--prime-sys-color-status-warning-border);
-}
-
-.root[data-variant="stroke"][data-status="success"] .icon {
-  color: var(--prime-sys-color-status-success-foreground);
-}
-
-.root[data-variant="stroke"][data-status="success"]::after {
-  background: var(--prime-sys-color-status-success-border);
-}
-
-.root[data-variant="stroke"][data-status="information"] .icon {
-  color: var(--prime-sys-color-status-information-foreground);
-}
-
-.root[data-variant="stroke"][data-status="information"]::after {
-  background: var(--prime-sys-color-status-information-border);
-}
-
-.root[data-variant="stroke"][data-status="feature"] .icon {
-  color: var(--prime-sys-color-status-feature-foreground);
-}
-
-.root[data-variant="stroke"][data-status="feature"]::after {
-  background: var(--prime-sys-color-status-feature-border);
+@media (prefers-reduced-motion: reduce) {
+  .closeButton {
+    transition: none;
+  }
 }

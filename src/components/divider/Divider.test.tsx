@@ -54,15 +54,10 @@ describe("Divider", () => {
     expect(screen.getByRole("separator")).toHaveClass("custom-divider");
   });
 
-  it("variant line-spacing sets data-variant", () => {
-    render(<Divider.Root variant="line-spacing" />);
-    expect(screen.getByRole("separator")).toHaveAttribute("data-variant", "line-spacing");
-  });
-
-  it("variant text defaults align to start", () => {
-    render(<Divider.Root variant="text">Section</Divider.Root>);
+  it("defaults align to center and does not set data-variant", () => {
+    render(<Divider.Root>Section</Divider.Root>);
     const el = screen.getByRole("separator");
-    expect(el).toHaveAttribute("data-variant", "text");
-    expect(el).toHaveAttribute("data-align", "start");
+    expect(el).toHaveAttribute("data-align", "center");
+    expect(el).not.toHaveAttribute("data-variant");
   });
 });

@@ -65,4 +65,15 @@ describe("LinkButton", () => {
     );
     expect(screen.getByText("Nested")).toBeInTheDocument();
   });
+
+  it("defaults tone to accent and accepts neutral", () => {
+    const { rerender } = render(<LinkButton.Root href="/t">T</LinkButton.Root>);
+    expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-tone", "accent");
+    rerender(
+      <LinkButton.Root href="/t" tone="neutral">
+        T
+      </LinkButton.Root>,
+    );
+    expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-tone", "neutral");
+  });
 });

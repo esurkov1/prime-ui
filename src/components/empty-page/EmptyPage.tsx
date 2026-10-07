@@ -3,22 +3,18 @@ import * as React from "react";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { EmptyPageSize } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./EmptyPage.module.css";
 
-export type { EmptyPageSize };
-
-export type EmptyPageLayout = "default" | "fill";
-
 export type EmptyPageRootProps = {
   /** Высота контролов, кегль и отступы; по умолчанию `m`. */
-  size?: EmptyPageSize;
+  size?: ControlSize;
   /**
    * `fill` — блок растягивается по высоте родителя и центрирует содержимое (пустое состояние внутри таблицы, скролла, карточки).
    * `default` — компактный блок по содержимому.
    */
-  layout?: EmptyPageLayout;
+  layout?: "default" | "fill";
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -44,13 +40,15 @@ const EmptyPageRoot = React.forwardRef<HTMLDivElement, EmptyPageRootProps>(funct
 EmptyPageRoot.displayName = "EmptyPage.Root";
 
 export type EmptyPageIconProps = {
+  /** Подложка иконки: `neutral` (по умолчанию), `accent` — приглашение к действию, `danger` — ошибка. */
+  tone?: Extract<Tone, "neutral" | "accent" | "danger">;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-function EmptyPageIcon({ className, children, ...rest }: EmptyPageIconProps) {
+function EmptyPageIcon({ tone = "neutral", className, children, ...rest }: EmptyPageIconProps) {
   return (
-    <div className={cx(styles.iconWrap, className)} {...rest}>
+    <div className={cx(styles.iconWrap, className)} data-tone={tone} {...rest}>
       {children}
     </div>
   );

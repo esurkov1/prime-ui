@@ -1,25 +1,157 @@
 # Popover
 
-**Default sizing:** when designing screens and examples, start with **`m`** for `size` (where a size axis exists) unless the scenario explicitly needs another value.
+**Category:** overlays (Оверлеи)
 
-## About
+> A non-modal floating panel anchored to a trigger: short forms, filters, confirmations, explanations.
 
-A composite “anchor + portaled panel”: clicking the trigger toggles a non-modal dialog next to the anchor, positioned toward the viewport edge and dismissible with Escape or an outside click.
+## When to use
+- Filters or quick settings tied to one button.
+- A short form (invite, rename) that does not need a full dialog.
+- A lightweight confirm next to a destructive action.
+- An explanation with more than one sentence, or with a link, next to a term.
 
-- **Use** for short contextual panels—help text, compact filters, a few fields or actions—without leaving the page or blocking the whole UI.
-- **Use** when content should stay visually tied to a specific control (metrics, footnotes, inline configuration).
-- **Do not use** for full-screen or blocking flows; prefer [Modal](../modal/COMPONENT.md).
-- **Do not use** for hover-only hints; prefer [Tooltip](../tooltip/COMPONENT.md).
-- **Do not use** expecting left/right placement relative to the anchor; only **top** and **bottom** sides are supported.
-- **Do not use** with multiple or fragment children under `Popover.Trigger`; exactly **one** element is supported.
+## When not to use
+- A one-line hint on hover → use [Tooltip](../tooltip/COMPONENT.md).
+- A list of actions or menu items → use [Dropdown](../dropdown/COMPONENT.md).
+- Choosing a value from options → use [Select](../select/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md).
+- A task that blocks the page or a long form → use [Modal](../modal/COMPONENT.md) or [Drawer](../drawer/COMPONENT.md).
+- A date picker → use [Datepicker](../datepicker/COMPONENT.md) (built on the same panel).
 
-## Composition
+## Import
+```tsx
+import { Popover } from "prime-ui-kit";
+```
 
-- **`Popover.Root`** — holds open state (controlled or uncontrolled), stable ids for trigger and content, and the trigger element ref used for positioning.
-- **`Popover.Trigger`** — must wrap **exactly one** `React` element; ref, `aria-*`, and click-to-toggle are merged onto that child (`cloneElement`).
-- **`Popover.Content`** — rendered in a **portal** only when open; root is a scroll container with `role="dialog"`, positioned from the trigger via `side` / `align`, wraps children in `ControlSizeProvider` when `size` is set, and applies optional **`insetPadding`** / **`insetGap`** on the same node (`data-inset-padding`, `data-inset-gap`).
+## Anatomy
+```
+Popover.Root               state (no DOM)
+├── Popover.Trigger        clones its single child (usually a Button)
+└── Popover.Content        portaled panel, role="dialog", scrolls (ScrollContainer)
+    ├── Popover.Header     title + description, 4 apart
+    │   ├── Popover.Title        <h2>, names the dialog
+    │   └── Popover.Description  <p>, describes the dialog
+    ├── …content
+    └── Popover.Actions    buttons at the end, right-aligned
+```
 
-### Minimal example
+## API
+
+### Popover.Root
+No DOM, no ref.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `open` | `boolean` | — | Controlled visibility. |
+| `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on trigger click, Escape and outside press. |
+| `closeOnOutsideClick` | `boolean` | `true` | A pointerdown outside the panel and its trigger closes it. |
+| `children` | `ReactNode` | — (required) | Trigger and Content. |
+
+### Popover.Trigger
+No DOM of its own: clones the child (`cloneElement`), like `asChild`. Merges the child's `ref`, sets `id`, `aria-expanded`, `aria-haspopup="dialog"`, `aria-controls`, `data-state`, and chains `onClick` (toggles).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactElement` | — (required) | Exactly one element (Button, a `<button>` styled as a link). |
+
+### Popover.Content
+No ref. Rendered in a portal while open and during its exit animation.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `side` | `"bottom" \| "top"` | `"bottom"` | Preferred side; flips when it does not fit. |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | Horizontal alignment to the trigger. |
+| `sameMinWidthAsTrigger` | `boolean` | `false` | The panel takes the trigger width (not wider than the panel max width and viewport). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Padding, gap and text tier; size context for controls inside. |
+| `trapFocus` | `boolean` | `false` | Moves focus into the panel and keeps Tab inside; focus returns to the trigger on close. |
+| `insetPadding` | `"none" \| "x1" \| "x2" \| "x3"` | `"none"` | Extra padding on top of the tier padding: +4 · +8 · +12. |
+| `insetGap` | `"none" \| "pad" \| "x2" \| "x3" \| "x4"` | `"pad"` | Gap between direct children: tier gap, or 0 · 8 · 12 · 16. |
+| `stackAboveDropdown` | `boolean` | `false` | Raise the panel above a dropdown / listbox of the same layer (trigger inside a Select, TagSelect or Dropdown panel). |
+| `className` | `string` | — | Extra class on the panel (e.g. a fixed width). |
+| `children` | `ReactNode` | — (required) | Panel content. |
+
+### Popover.Header · Popover.Actions
+No ref. + native `<div>` props.
+
+### Popover.Title
+No ref. Renders `<h2>`; without an own `id` it becomes the dialog name (`aria-labelledby`). + native heading props.
+
+### Popover.Description
+No ref. Renders `<p>`; without an own `id` it becomes the dialog description (`aria-describedby`). + native `<p>` props.
+
+## Variants
+The panel has one look: `bg-raised` fill, `--prime-panel-radius`, `shadow-overlay`, no border. Fields inside get the surface field fill; cards inside become sunken tiles.
+
+### size (Content)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | padding 12, gap 8, text 12/16 | Next to xs triggers | |
+| `s` | padding 12, gap 8, text 13/20 | Dense toolbars | |
+| `m` | padding 16, gap 12, text 14/20 | Most panels | yes |
+| `l` | padding 16, gap 16, text 16/24 | l triggers, roomier forms | |
+| `xl` | padding 20, gap 16, text 16/24 | xl triggers | |
+
+Title uses the tier text size with title weight; Description uses the tier label size (m: 13/20) in `text-secondary`.
+
+### side / align (Content)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `side="bottom"` | Below the trigger, `--prime-space-1` away | Default | yes |
+| `side="top"` | Above the trigger | Triggers near the bottom of the screen | |
+| `align="start"` | Start edges aligned | Default, LTR reading | yes |
+| `align="center"` | Centred under the trigger | Small icon triggers | |
+| `align="end"` | End edges aligned | Triggers at the right edge | |
+
+### insetPadding / insetGap
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `insetPadding="none"` | Tier padding only | Default | yes |
+| `insetPadding="x1"` · `"x2"` · `"x3"` | +4 · +8 · +12 padding | Airy marketing/explainer panels | |
+| `insetGap="pad"` | Tier gap (8 / 12 / 16) | Default | yes |
+| `insetGap="none"` | No gap between children | Own layout inside | |
+| `insetGap="x2"` · `"x3"` · `"x4"` | 8 · 12 · 16 gap | Fixed rhythm independent of size | |
+
+### Flags
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `sameMinWidthAsTrigger` | Panel as wide as the trigger | Full-width triggers in narrow columns | `false` |
+| `trapFocus` | Focus moves into the panel | Forms inside the panel | `false` |
+| `stackAboveDropdown` | Higher z-index on the same layer | Popover opened from inside a listbox | `false` |
+
+**Combinations** — panel `size` = trigger `size` = sizes of the buttons in Actions. Forms: `trapFocus` + Header + Actions. Destructive confirm: Actions with ghost neutral «Отмена» and solid `tone="danger"` primary.
+
+**Hierarchy** — one primary button in Actions (last), the rest `ghost` neutral.
+
+## States
+- Closed / open: uncontrolled by default; `open` + `onOpenChange` for controlled. There is no `disabled` on Popover: a disabled trigger simply never opens it.
+- Panel DOM: `data-state="open" | "closed"`, `data-side` (resolved), `data-size`, `data-inset-padding`, `data-inset-gap`, `data-overlay-portal-layer`, `data-overlay-stack="above-dropdown"` (with `stackAboveDropdown`).
+- Trigger DOM: `data-state="open" | "closed"`, `aria-expanded`.
+
+## Layout & spacing
+- Width is `max-content` between `--prime-panel-min-width` and twice that, never wider than the viewport; set an explicit width with `className` for forms.
+- Max height follows the free space on the resolved side; the panel scrolls inside.
+- Kept `--prime-space-2` from viewport edges; repositions on scroll / resize.
+- Actions: right-aligned, `--prime-space-2` gap; below 480px they stack full width.
+
+## Accessibility
+- Panel: `role="dialog"`, `aria-modal="false"`, named by Popover.Title (or by the trigger when there is no Title), described by Popover.Description.
+- Trigger: `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`.
+- Dismiss (foundation §8): Escape closes and returns focus to the trigger; an outside press closes without moving focus back (focus follows the pointer). Clicks inside nested layers (a Select list inside the panel) do not close it. Only the topmost layer reacts.
+- Use `trapFocus` for forms so keyboard users land inside the panel.
+- No `labels`.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | `size` xs → xl with header and actions | Matching the panel to the trigger |
+| [inset-variants.tsx](examples/inset-variants.tsx) | `insetPadding` / `insetGap` | Custom density |
+| [states.tsx](examples/states.tsx) | Destructive confirm, disabled trigger | Confirming next to the action |
+| [placement.tsx](examples/placement.tsx) | `side` × `align` | Placing near edges |
+| [controlled.tsx](examples/controlled.tsx) | `open` + `onOpenChange` from the parent | Opening from other UI |
+| [composition.tsx](examples/composition.tsx) | Report filters with SegmentedControl and checkboxes | Filters / quick settings |
+| [full-width.tsx](examples/full-width.tsx) | `sameMinWidthAsTrigger` | Narrow columns |
+| [as-child.tsx](examples/as-child.tsx) | Text-link button as the trigger | Inline explanations |
+| [features.tsx](examples/features.tsx) | Invite form with `trapFocus` and a nested Select | Short forms |
 
 ```tsx
 import { Button, Popover } from "prime-ui-kit";
@@ -27,120 +159,27 @@ import { Button, Popover } from "prime-ui-kit";
 export function Example() {
   return (
     <Popover.Root>
-      <Popover.Trigger asChild>
-        <Button.Root type="button">Open</Button.Root>
+      <Popover.Trigger>
+        <Button.Root variant="soft" tone="neutral">
+          Условия тарифа
+        </Button.Root>
       </Popover.Trigger>
       <Popover.Content>
-        Panel
+        <Popover.Header>
+          <Popover.Title>Тариф «Бизнес»</Popover.Title>
+          <Popover.Description>До 10 пользователей и 50 ГБ хранилища.</Popover.Description>
+        </Popover.Header>
       </Popover.Content>
     </Popover.Root>
   );
 }
 ```
 
-### Canonical panel (reference)
-
-Short English recipe (stroke trigger, **`insetPadding` / `insetGap`**, body copy): **`examples/canonical-panel.tsx`**.
-
-### Playground-aligned examples
-
-**`playground/sections/PopoverSection.tsx`** and **`playground/snippets/popover/`** define the demo order and code shown in the playground (Russian UI copy). Matching runnable package examples (imports from **`"prime-ui-kit"`**) live next to this file:
-
-| Playground block | Snippet | Example file |
-|------------------|---------|--------------|
-| Sizes | `sizes.tsx` | `sizes.tsx` |
-| Inset variants | `inset-variants.tsx` | `inset-variants.tsx` |
-| States | `states.tsx` | `states.tsx` |
-| Placement | `placement.tsx` | `placement.tsx` |
-| Controlled | `controlled.tsx` | `controlled.tsx` |
-| Composition | `composition.tsx` | `composition.tsx` |
-| Full width (trigger) | `full-width.tsx` | `full-width.tsx` |
-| Custom trigger | `as-child.tsx` | `as-child.tsx` |
-| Focus + nested Select | `features.tsx` | `features.tsx` |
-
-Shared layout for these examples: **`examples/popover-examples.module.css`**.
-
-### Additional examples in `examples/`
-
-| File | Intent |
-|------|--------|
-| `canonical-panel.tsx` | Default English composition: stroke trigger, inset spacing, short copy |
-| `date-trigger.tsx` | Date-style trigger label; native **`type="date"`** field; **`trapFocus`** |
-| `rich-content.tsx` | Badges, **`Divider`**, **`Hint`** — denser non-modal panel |
-| `form-in-popover.tsx` | Controlled root, small form, **`trapFocus`**, submit closes |
-
-### Extended usage
-
-- **Controlled popovers:** pass **`open`** and **`onOpenChange`** on **`Popover.Root`**; keep **`Popover.Trigger`** and **`Popover.Content`** as siblings. Close from inside the panel by calling the same setter or relying on outside click / Escape.
-- **Forms and focus:** set **`trapFocus={true}`** on **`Popover.Content`** when several controls should keep Tab cycles inside the panel (see **`examples/form-in-popover.tsx`**, **`examples/date-trigger.tsx`**, and **`examples/features.tsx`**).
-- **Match trigger width:** use **`sameMinWidthAsTrigger`** when the panel should match the trigger’s **`width`** and **`minWidth`** (`border-box`, text wraps; still bounded by panel max width and viewport). See **`examples/full-width.tsx`**.
-- **Nested Select:** portaled Select listbox clicks owned by the panel are not treated as outside closes (see `isPortaledSelectListboxOwnedByContainer` in implementation; **`examples/features.tsx`**).
-- **Density:** tune **`size`** on **`Popover.Content`** for nested controls and **`insetPadding` / `insetGap`** for internal vertical rhythm; optional **`className`** on **`Content`** for scoped layout hooks.
-
-### Note for LLMs
-
-When generating **Popover** markup for this library: (1) **`Popover.Trigger`** accepts **exactly one** child element—no fragments or multiple nodes. (2) Prefer **`Button.Root`**, **`LinkButton.Root`**, or another kit control as the trigger so sizing and focus styles stay on the design-system tier. (3) Only **`side="top"`** and **`side="bottom"`** are valid; do not assume left/right anchoring. (4) Align scenarios with **`playground/snippets/popover/`** and the matching **`examples/*.tsx`** files in the table above; add **`canonical-panel.tsx`**, **`date-trigger.tsx`**, **`rich-content.tsx`**, or **`form-in-popover.tsx`** when you need those extra recipes. (5) Do not wrap kit components to restyle them; use **`size`**, **`variant`**, **`mode`**, **`insetPadding`**, **`insetGap`**, and documented props only.
-
-## Rules
-
-- **Uncontrolled:** use `defaultOpen` on `Popover.Root` for the initial open state after mount.
-- **Controlled:** pass `open` and `onOpenChange` together; parent can open or close from outside logic.
-- When closed, **`Popover.Content`** returns `null` (nothing is mounted in the portal).
-- **`trapFocus`** on `Popover.Content` keeps Tab cycling inside the panel while open and restores focus on close when enabled.
-- **Escape** and **outside click** call close; clicks on a portaled **Select** listbox that belongs to the panel are ignored as outside (see `isPortaledSelectListboxOwnedByContainer`).
-- **Non-modal:** `aria-modal={false}`—focus can leave the page; this is intentional for a lightweight overlay.
-- Trigger receives **`aria-expanded`**, **`aria-haspopup="dialog"`**, and **`aria-controls`** pointing at the content id; **`aria-labelledby`** on the panel references the trigger id—give the anchor a visible name or **`aria-label`** when there is no text.
-- There is no popover-level **`disabled`**; if the anchor (e.g. [Button](../button/COMPONENT.md)) is disabled, it will not open.
-- **`asChild`** exists for slot API compatibility; merging always applies to the single child—**`asChild={false}`** does not render an internal button.
-- Density: tune **`Popover.Content` `size`** for the control tier and **`insetPadding` / `insetGap`** for inner spacing; optional **`className`** on `Content` for further styling.
-
-## API
-
-### Popover.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| open | `boolean` | — | No | Controlled open state; use with `onOpenChange`. |
-| defaultOpen | `boolean` | `false` | No | Initial state in uncontrolled mode. |
-| onOpenChange | `(open: boolean) => void` | — | No | Fires when opening or closing (trigger, Escape, outside click). |
-| children | `React.ReactNode` | — | Yes | Typically `Popover.Trigger` and `Popover.Content`. |
-
-### Popover.Trigger
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactElement` | — | Yes | Single anchor element; ref, ARIA, and click handler are merged in. |
-| asChild | `boolean` | `true` | No | Reserved for slot API compatibility; behavior always merges with the single child. |
-
-### Popover.Content
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| align | `"start" \| "center" \| "end"` | `"start"` | No | Horizontal alignment of the panel relative to the trigger. |
-| side | `"bottom" \| "top"` | `"bottom"` | No | Preferred side; layout may flip at the viewport edge. |
-| sameMinWidthAsTrigger | `boolean` | `false` | No | When `true`, panel `width` and `minWidth` match the trigger (`border-box`); text wraps; still subject to panel max width and viewport. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control density tier for nested controls via `ControlSizeProvider`. |
-| trapFocus | `boolean` | `false` | No | Trap focus inside the panel while open. |
-| insetPadding | `"none" \| "x1" \| "x2" \| "x3"` | `"none"` | No | Extra inset padding relative to the panel tier (`data-inset-padding`). |
-| insetGap | `"none" \| "x2" \| "x3" \| "x4"` | `"none"` | No | Vertical gap between direct children (`data-inset-gap`). |
-| className | `string` | — | No | Extra class on the panel root. |
-| children | `React.ReactNode` | — | Yes | Panel body. |
+## Mistakes
+- `side="left"` / `"right"` → Popover supports only `top` and `bottom`.
+- A form without `trapFocus` → add it so Tab stays in the panel.
+- A popover opened from inside a Select/Dropdown panel hides behind it → `stackAboveDropdown`.
+- Menu of actions built from buttons in a Popover → use Dropdown (roving focus, menu roles).
 
 ## Related
-
-- [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md) — typical triggers.
-- [Select](../select/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) — nested overlays; Select listbox clicks are treated as inside the popover when owned by the panel.
-- [Input](../input/COMPONENT.md), [Textarea](../textarea/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Switch](../switch/COMPONENT.md) — fields inside the panel.
-- [Typography](../typography/COMPONENT.md), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) — text and labels in the panel.
-- [Badge](../badge/COMPONENT.md), [Divider](../divider/COMPONENT.md) — structured panel chrome.
-- [Modal](../modal/COMPONENT.md) — blocking modal flow.
-- [Tooltip](../tooltip/COMPONENT.md) — short hover/focus hint without an action panel.
-
-</think>
-<think>
-I made a mistake in Related - Switch should link to COMPONENT.md not Switch.tsx
-</think>
-
-
-<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
-Glob
+[Tooltip](../tooltip/COMPONENT.md) · [Dropdown](../dropdown/COMPONENT.md) · [Modal](../modal/COMPONENT.md) · [Datepicker](../datepicker/COMPONENT.md) · [ColorPicker](../color-picker/COMPONENT.md)

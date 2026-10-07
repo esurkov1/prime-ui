@@ -1,67 +1,50 @@
-.demoViewport {
+/* Layout for the Sidebar examples: small "app windows" (canvas rail + surface content). Semantic tokens only. */
+
+.stage {
   box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  height: 22rem;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.demoViewportTall {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  height: 26rem;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.appGrid {
-  height: 100%;
-  min-height: 0;
-}
-
-.mainPlaceholder {
-  box-sizing: border-box;
-  margin: 0;
-  min-height: 0;
-}
-
-.row {
   display: flex;
-  align-items: stretch;
-  gap: 0;
   width: 100%;
-  max-width: 100%;
-  min-height: 0;
+  height: calc(var(--prime-space-24) * 4);
+  overflow: hidden;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-canvas);
+  /* The rail shares the preview's canvas fill: a hairline keeps the window edge visible. */
+  box-shadow:
+    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
+    var(--prime-shadow-raised);
 }
 
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-s);
-  margin-bottom: var(--prime-sys-spacing-s);
+/* A window that hugs its rail (size comparison). */
+.stageAuto {
+  height: auto;
 }
 
-.note {
-  margin: 0 0 var(--prime-sys-spacing-m);
-  color: var(--prime-sys-color-content-secondary);
+/* Content plane next to the rail, like AppShell: surface fill, edge to edge. */
+.content {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--prime-space-4);
+  background: var(--prime-color-bg-surface);
 }
 
-.code {
-  font-family: ui-monospace, monospace;
-  font-size: 0.9em;
+.sizes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--prime-space-24) * 2.5), 1fr));
+  gap: var(--prime-space-4);
+  width: 100%;
 }
 
-.controlledColumn {
+.sizeColumn {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 0;
+  gap: var(--prime-space-2);
+  min-width: 0;
 }
 
-.controlledStage {
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: 100%;
 }

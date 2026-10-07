@@ -43,22 +43,20 @@ describe("Label", () => {
     expect(screen.getByTestId("label-icon")).toHaveClass(iconStyles.sizeS);
   });
 
-  it("renders Asterisk with default asterisk character", () => {
-    render(
-      <Label.Root>
-        Required <Label.Asterisk />
-      </Label.Root>,
-    );
-    expect(screen.getByText("*")).toBeInTheDocument();
+  it("renders a decorative asterisk when required", () => {
+    render(<Label.Root required>Email</Label.Root>);
+    expect(screen.getByText("*")).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("renders Asterisk with custom children", () => {
-    render(
-      <Label.Root>
-        <Label.Asterisk>†</Label.Asterisk>
+  it("renders the optional marker with the default and custom label", () => {
+    const { rerender } = render(<Label.Root optional>Note</Label.Root>);
+    expect(screen.getByText("необязательно")).toBeInTheDocument();
+    rerender(
+      <Label.Root optional labels={{ optional: "optional" }}>
+        Note
       </Label.Root>,
     );
-    expect(screen.getByText("†")).toBeInTheDocument();
+    expect(screen.getByText("optional")).toBeInTheDocument();
   });
 
   it("renders Sub", () => {

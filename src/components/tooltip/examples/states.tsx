@@ -1,57 +1,45 @@
-import { Button, Label, Tooltip } from "prime-ui-kit";
-import type * as React from "react";
-
+/** Hover / focus trigger, a disabled button wrapped in a focusable span, and an inline term in text. Use to explain why an action is unavailable or what a term means. */
+import { Button, Tooltip, Typography } from "prime-ui-kit";
 import styles from "./examples.module.css";
 
-function Block({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className={styles.demoItem}>
-      <Label.Root size="s">{label}</Label.Root>
-      {children}
-    </div>
-  );
-}
-
-/** Default trigger, native disabled (tooltip does not open), glossary-style focus trigger (mirrors `playground/snippets/tooltip/states.tsx`). */
 export default function TooltipStatesExample() {
   return (
-    <div className={styles.rowWrapXlJustifyCenter}>
-      <Block label="Default — hover and focus">
-        <Tooltip.Provider delayDuration={200}>
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Button.Root type="button" variant="neutral" mode="stroke">
-                Save
+    <Tooltip.Provider delayDuration={200}>
+      <div className={styles.row}>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <Button.Root variant="soft" tone="neutral">
+              Наведите или Tab
+            </Button.Root>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Черновик сохранится на сервере</Tooltip.Content>
+        </Tooltip.Root>
+
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            {/* biome-ignore lint/a11y/noNoninteractiveTabindex: the wrapper must be focusable to explain the disabled button */}
+            <span className={styles.disabledWrap} tabIndex={0}>
+              <Button.Root variant="soft" tone="neutral" disabled>
+                Опубликовать
               </Button.Root>
-            </Tooltip.Trigger>
-            <Tooltip.Content>Send the draft to the server</Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-      </Block>
-      <Block label="Native disabled — hover does not open">
-        <Tooltip.Provider delayDuration={200}>
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Button.Root type="button" variant="neutral" mode="stroke" disabled>
-                Unavailable
-              </Button.Root>
-            </Tooltip.Trigger>
-            <Tooltip.Content>This copy does not appear on native disabled hover</Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-      </Block>
-      <Block label="Keyboard focus — unstyled term button">
-        <Tooltip.Provider delayDuration={200}>
+            </span>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Заполните обязательные поля, чтобы опубликовать</Tooltip.Content>
+        </Tooltip.Root>
+
+        <Typography.Root variant="body-m" tone="secondary">
+          Конверсия{" "}
           <Tooltip.Root>
             <Tooltip.Trigger>
               <button type="button" className={styles.inlineHelpTrigger}>
-                KPI
+                CR
               </button>
             </Tooltip.Trigger>
-            <Tooltip.Content>Key performance indicator</Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-      </Block>
-    </div>
+            <Tooltip.Content>Доля посетителей, совершивших покупку</Tooltip.Content>
+          </Tooltip.Root>{" "}
+          выросла на 4%
+        </Typography.Root>
+      </div>
+    </Tooltip.Provider>
   );
 }

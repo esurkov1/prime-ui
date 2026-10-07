@@ -1,34 +1,60 @@
-import { Hint, Input, Label } from "prime-ui-kit";
+/** A hand-built field (Label + Select + Hint) in default, error and disabled states; the hint id goes to the trigger's `aria-describedby`. Use it for controls without `hint`/`error` props. */
+import { Hint, Label, Select } from "prime-ui-kit";
+import * as React from "react";
 
-/** Label + field + hint for default, invalid, and disabled rows (aligned with playground `field-states`). */
+import styles from "./examples.module.css";
+
+type FieldState = "default" | "error" | "disabled";
+
+const HINT_TEXT: Record<FieldState, string> = {
+  default: "Отчёты придут в начале периода.",
+  error: "Выберите периодичность отчётов.",
+  disabled: "Доступно на тарифе «Бизнес».",
+};
+
+function ReportField({ state }: { state: FieldState }) {
+  const labelId = React.useId();
+  const hintId = React.useId();
+
+  return (
+    <div className={styles.field}>
+      <Label.Root id={labelId} disabled={state === "disabled"}>
+        Периодичность
+      </Label.Root>
+      <div className={styles.fieldBody}>
+        <Select.Root
+          invalid={state === "error"}
+          placeholder="Не выбрано"
+          defaultValue={state === "default" ? "week" : undefined}
+          disabled={state === "disabled"}
+        >
+          <Select.Trigger aria-labelledby={labelId} aria-describedby={hintId}>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="week">Раз в неделю</Select.Item>
+            <Select.Item value="month">Раз в месяц</Select.Item>
+          </Select.Content>
+        </Select.Root>
+        <Hint.Root
+          id={hintId}
+          invalid={state === "error"}
+          disabled={state === "disabled"}
+          role={state === "error" ? "alert" : undefined}
+        >
+          {HINT_TEXT[state]}
+        </Hint.Root>
+      </div>
+    </div>
+  );
+}
+
 export default function HintFieldStatesExample() {
   return (
-    <>
-      <Label.Root htmlFor="hint-ex-st-ok">Project name</Label.Root>
-      <Input.Root id="hint-ex-st-ok">
-        <Input.Wrapper>
-          <Input.Field type="text" defaultValue="Alpha" />
-        </Input.Wrapper>
-      </Input.Root>
-      <Hint.Root variant="default">Visible to everyone in this workspace.</Hint.Root>
-
-      <Label.Root htmlFor="hint-ex-st-err">Tax ID</Label.Root>
-      <Input.Root id="hint-ex-st-err" hasError>
-        <Input.Wrapper>
-          <Input.Field type="text" defaultValue="12" />
-        </Input.Wrapper>
-      </Input.Root>
-      <Hint.Root variant="error">Enter 10 or 12 digits.</Hint.Root>
-
-      <Label.Root htmlFor="hint-ex-st-dis" disabled>
-        Request limit
-      </Label.Root>
-      <Input.Root id="hint-ex-st-dis">
-        <Input.Wrapper>
-          <Input.Field type="text" disabled defaultValue="read only" />
-        </Input.Wrapper>
-      </Input.Root>
-      <Hint.Root variant="disabled">Value comes from the plan and cannot be edited.</Hint.Root>
-    </>
+    <div className={styles.fields}>
+      <ReportField state="default" />
+      <ReportField state="error" />
+      <ReportField state="disabled" />
+    </div>
   );
 }

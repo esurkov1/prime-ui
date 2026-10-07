@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { Avatar, type AvatarSize } from "./Avatar";
 import styles from "./Avatar.module.css";
 
-const sizes: AvatarSize[] = ["s", "m", "l", "xl", "2xl", "3xl", "4xl", "5xl", "6xl"];
+const sizes: AvatarSize[] = ["xs", "s", "m", "l", "xl", "2xl"];
 
 describe("Avatar", () => {
   it("renders image with src and alt", () => {
@@ -131,5 +131,60 @@ describe("Avatar.Group", () => {
       </Avatar.Group.Root>,
     );
     expect(container.querySelector(".group-custom")).toBeInTheDocument();
+  });
+
+  describe("Avatar sizes and colors", () => {
+    it("supports xs and palette color on Root", () => {
+      render(
+        <Avatar.Root size="xs" color="teal" data-testid="av">
+          <Avatar.Fallback>T</Avatar.Fallback>
+        </Avatar.Root>,
+      );
+      const el = screen.getByTestId("av");
+      expect(el).toHaveAttribute("data-size", "xs");
+      expect(el).toHaveAttribute("data-color", "teal");
+    });
+
+    it("defaults color to gray and exposes the group role", () => {
+      render(
+        <Avatar.Group.Root aria-label="Team">
+          <Avatar.Root data-testid="av">
+            <Avatar.Fallback>G</Avatar.Fallback>
+          </Avatar.Root>
+        </Avatar.Group.Root>,
+      );
+      expect(screen.getByTestId("av")).toHaveAttribute("data-color", "gray");
+      expect(screen.getByRole("group", { name: "Team" })).toBeInTheDocument();
+    });
+  });
+  describe("Avatar.Status", () => {
+    it("announces presence with the default Russian label", () => {
+      render(
+        <Avatar.Root>
+          <Avatar.Fallback>АК</Avatar.Fallback>
+          <Avatar.Status status="busy" />
+        </Avatar.Root>,
+      );
+      const dot = screen.getByRole("img", { name: "Занят" });
+      expect(dot).toHaveAttribute("data-status", "busy");
+    });
+
+    it.each(["online", "offline", "away", "busy"] as const)("sets data-status=%s", (status) => {
+      render(
+        <Avatar.Root>
+          <Avatar.Status status={status} data-testid="dot" />
+        </Avatar.Root>,
+      );
+      expect(screen.getByTestId("dot")).toHaveAttribute("data-status", status);
+    });
+
+    it("takes custom labels", () => {
+      render(
+        <Avatar.Root>
+          <Avatar.Status status="away" labels={{ away: "Анна отошла" }} />
+        </Avatar.Root>,
+      );
+      expect(screen.getByRole("img", { name: "Анна отошла" })).toBeInTheDocument();
+    });
   });
 });

@@ -73,7 +73,7 @@ describe("Checkbox", () => {
   it("works as controlled component", () => {
     const onChange = vi.fn();
     const { rerender } = render(
-      <Checkbox.Root checked={false} onChange={onChange}>
+      <Checkbox.Root checked={false} onCheckedChange={onChange}>
         <Checkbox.Label />
       </Checkbox.Root>,
     );
@@ -81,34 +81,35 @@ describe("Checkbox", () => {
     expect(checkbox).not.toBeChecked();
 
     fireEvent.click(checkbox);
-    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith(true);
+    expect(checkbox).not.toBeChecked();
 
     rerender(
-      <Checkbox.Root checked={true} onChange={onChange}>
+      <Checkbox.Root checked={true} onCheckedChange={onChange}>
         <Checkbox.Label />
       </Checkbox.Root>,
     );
     expect(checkbox).toBeChecked();
   });
 
-  it("sets data-checked attribute on wrapper when checked", () => {
+  it("sets data-state=checked on wrapper when checked", () => {
     render(
       <Checkbox.Root defaultChecked>
         <Checkbox.Label>Accept</Checkbox.Label>
       </Checkbox.Root>,
     );
-    const wrapper = screen.getByRole("checkbox").closest("[data-checked]");
-    expect(wrapper).toHaveAttribute("data-checked", "true");
+    const wrapper = screen.getByRole("checkbox").closest("[data-state]");
+    expect(wrapper).toHaveAttribute("data-state", "checked");
   });
 
-  it("does not set data-checked when unchecked", () => {
+  it("sets data-state=unchecked when unchecked", () => {
     render(
       <Checkbox.Root>
         <Checkbox.Label>Accept</Checkbox.Label>
       </Checkbox.Root>,
     );
-    const wrapper = screen.getByRole("checkbox").closest("[data-checked]");
-    expect(wrapper).toHaveAttribute("data-checked", "false");
+    const wrapper = screen.getByRole("checkbox").closest("[data-state]");
+    expect(wrapper).toHaveAttribute("data-state", "unchecked");
   });
 
   it("sets indeterminate property on native input", () => {
@@ -121,26 +122,26 @@ describe("Checkbox", () => {
     expect(checkbox.indeterminate).toBe(true);
   });
 
-  it("sets data-indeterminate attribute when indeterminate", () => {
+  it("sets data-state=indeterminate when indeterminate", () => {
     render(
       <Checkbox.Root indeterminate>
         <Checkbox.Label>Partial</Checkbox.Label>
       </Checkbox.Root>,
     );
     const checkbox = screen.getByRole("checkbox");
-    const wrapper = checkbox.closest("[data-indeterminate]");
-    expect(wrapper).toHaveAttribute("data-indeterminate", "true");
+    const wrapper = checkbox.closest("[data-state]");
+    expect(wrapper).toHaveAttribute("data-state", "indeterminate");
   });
 
-  it("data-checked is false when indeterminate even if checked", () => {
+  it("indeterminate wins over checked in data-state", () => {
     render(
       <Checkbox.Root defaultChecked indeterminate>
         <Checkbox.Label />
       </Checkbox.Root>,
     );
     const checkbox = screen.getByRole("checkbox");
-    const wrapper = checkbox.closest("[data-checked]");
-    expect(wrapper).toHaveAttribute("data-checked", "false");
+    const wrapper = checkbox.closest("[data-state]");
+    expect(wrapper).toHaveAttribute("data-state", "indeterminate");
   });
 
   it("marks control invalid when Checkbox.Error is rendered", () => {
@@ -154,9 +155,9 @@ describe("Checkbox", () => {
     expect(checkbox).toHaveAttribute("aria-invalid", "true");
   });
 
-  it("marks control invalid when variant=error", () => {
+  it("marks control invalid when invalid is set", () => {
     render(
-      <Checkbox.Root variant="error">
+      <Checkbox.Root invalid>
         <Checkbox.Label>Accept terms</Checkbox.Label>
       </Checkbox.Root>,
     );
@@ -236,21 +237,33 @@ describe("Checkbox", () => {
     expect(ref.current?.type).toBe("checkbox");
   });
 
-  it("calls onChange when clicked", () => {
+  it("calls onCheckedChange when the label is clicked", () => {
     const onChange = vi.fn();
     render(
-      <Checkbox.Root onChange={onChange}>
+      <Checkbox.Root onCheckedChange={onChange}>
         <Checkbox.Label>Accept</Checkbox.Label>
       </Checkbox.Root>,
     );
     fireEvent.click(screen.getByText("Accept"));
-    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith(true);
   });
 
-  it("does not fire onChange when disabled", async () => {
+  it("toggles with the Space key", async () => {
     const onChange = vi.fn();
     render(
-      <Checkbox.Root disabled onChange={onChange}>
+      <Checkbox.Root onCheckedChange={onChange}>
+        <Checkbox.Label>Accept</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    screen.getByRole("checkbox").focus();
+    await userEvent.keyboard(" ");
+    expect(onChange).toHaveBeenCalledWith(true);
+  });
+
+  it("does not fire onCheckedChange when disabled", async () => {
+    const onChange = vi.fn();
+    render(
+      <Checkbox.Root disabled onCheckedChange={onChange}>
         <Checkbox.Label>Accept</Checkbox.Label>
       </Checkbox.Root>,
     );

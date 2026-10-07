@@ -1,8 +1,4 @@
-import type { PositionSide } from "@/hooks/usePosition";
-import {
-  getFloatingPanelOffsetPx,
-  getFloatingViewportPadPx,
-} from "@/internal/layoutPxFromPrimitives";
+import { getPanelOffsetPx, getViewportPadPx, type PositionSide } from "@/hooks/usePosition";
 
 export const POPOVER_MIN_MAX_HEIGHT = 120;
 
@@ -21,9 +17,9 @@ export function getPopoverMaxHeightForAnchorSide(
 }
 
 export function getPopoverPanelOffsetPx(): number {
-  return getFloatingPanelOffsetPx();
+  return getPanelOffsetPx();
 }
 
 export function getPopoverViewportPadPx(): number {
-  return getFloatingViewportPadPx();
+  return getViewportPadPx();
 }

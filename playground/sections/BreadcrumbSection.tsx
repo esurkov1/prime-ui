@@ -1,3 +1,10 @@
+import type * as React from "react";
+import BreadcrumbCollapseExample from "@/components/breadcrumb/examples/collapse";
+import collapseSource from "@/components/breadcrumb/examples/collapse.tsx?raw";
+import BreadcrumbPageHeaderExample from "@/components/breadcrumb/examples/page-header";
+import pageHeaderSource from "@/components/breadcrumb/examples/page-header.tsx?raw";
+import BreadcrumbSizesExample from "@/components/breadcrumb/examples/sizes";
+import sizesSource from "@/components/breadcrumb/examples/sizes.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,235 +13,150 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import BreadcrumbCompositionSnippet from "../snippets/breadcrumb/composition";
-import breadcrumbCompositionSource from "../snippets/breadcrumb/composition.tsx?raw";
-import BreadcrumbFullWidthSnippet from "../snippets/breadcrumb/full-width";
-import breadcrumbFullWidthSource from "../snippets/breadcrumb/full-width.tsx?raw";
-import BreadcrumbLongEllipsisSnippet from "../snippets/breadcrumb/long-ellipsis";
-import breadcrumbLongEllipsisSource from "../snippets/breadcrumb/long-ellipsis.tsx?raw";
-import BreadcrumbSizesSnippet from "../snippets/breadcrumb/sizes";
-import breadcrumbSizesSource from "../snippets/breadcrumb/sizes.tsx?raw";
-import BreadcrumbStatesSnippet from "../snippets/breadcrumb/states";
-import breadcrumbStatesSource from "../snippets/breadcrumb/states.tsx?raw";
 
-const breadcrumbRootApiRows: PlaygroundApiPropRow[] = [
+const apiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Элементы списка: Item, Separator, Ellipsis внутри <ol>.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Доп. класс на <nav>.",
-  },
-  {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    prop: "Breadcrumb.Root · size",
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Кегль ссылок, текущей страницы, многоточия; иконки разделителя и «дом».",
+    description: "Размер текста и шеврона.",
   },
   {
-    prop: "…rest",
+    prop: "Breadcrumb.Root · labels",
+    type: "Partial<{ nav: string; ellipsis: string }>",
+    defaultValue: "русские строки",
+    required: "Нет",
+    description: "`aria-label` навигации и скрытый текст многоточия.",
+  },
+  {
+    prop: "Breadcrumb.Root · …rest",
     type: "React.HTMLAttributes<HTMLElement>",
     defaultValue: "—",
     required: "Нет",
-    description:
-      "Атрибуты nav: например aria-label (по умолчанию задаётся «Breadcrumb»), id, data-*.",
+    description: "className и атрибуты `nav`; свой `aria-label` перекрывает `labels.nav`.",
   },
-];
-
-const breadcrumbItemApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "href",
+    prop: "Breadcrumb.Item · href",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Если задан — рендерится LinkButton; иначе span.",
+    description: "Ссылка (LinkButton). Без `href` — текст.",
   },
   {
-    prop: "current",
+    prop: "Breadcrumb.Item · current",
     type: "boolean",
     defaultValue: "—",
     required: "Нет",
-    description: 'Текущая страница: стиль и aria-current="page" на span.',
+    description: 'Текущая страница: `aria-current="page"`, `text-primary`, `title` для обрезки.',
   },
   {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Текст или иконка пункта.",
-  },
-  {
-    prop: "className",
+    prop: "Breadcrumb.Item · aria-label",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Доп. класс на <li>.",
+    description: "Имя ссылки без видимого текста (иконка «дом»).",
   },
   {
-    prop: "aria-label",
+    prop: "Breadcrumb.Item · className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Для ссылки без видимого текста (например, только иконка «дом»).",
+    description: "Класс элемента `li`.",
+  },
+  {
+    prop: "Breadcrumb.Separator",
+    type: "children?, className?",
+    defaultValue: "шеврон",
+    required: "Нет",
+    description: "Разделитель (`aria-hidden`).",
+  },
+  {
+    prop: "Breadcrumb.Ellipsis",
+    type: "className?",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Ручное «…» вместо скрытых сегментов.",
   },
 ];
 
-const breadcrumbSeparatorApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "Icon nav.chevronRight",
-    required: "Нет",
-    description: "Кастомный разделитель; по умолчанию шеврон в тоне subtle.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Доп. класс на <li aria-hidden>.",
-  },
-];
-
-const breadcrumbEllipsisApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Доп. класс на <li> с символом многоточия.",
-  },
-];
+function Demo({
+  title,
+  description,
+  code,
+  children,
+}: {
+  title: string;
+  description: React.ReactNode;
+  code: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="demoBlock">
+      <DemoSectionTitle>{title}</DemoSectionTitle>
+      <DemoDescription>{description}</DemoDescription>
+      <PlaygroundExampleFrame.Root code={code.trim()} previewLayout="stack">
+        <PlaygroundExampleFrame.Stage>{children}</PlaygroundExampleFrame.Stage>
+      </PlaygroundExampleFrame.Root>
+    </div>
+  );
+}
 
 export default function BreadcrumbSection() {
   return (
-    <PageContent.Section>
+    <PageContent.Section aria-labelledby="breadcrumb-heading">
       <PageContent.Header>
-        <PageContent.Title>Breadcrumb</PageContent.Title>
+        <PageContent.Title id="breadcrumb-heading">Breadcrumb</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Цепочка от раздела до текущей страницы: по пути можно переходить по ссылкам, последний
-              пункт показывает, где вы сейчас. Один параметр размера подстраивает подписи,
-              многоточие и иконки разделителя.
-            </>
-          }
+          Путь к текущей странице. Предыдущие уровни — приглушённые ссылки, текущий — основной цвет.
+          Список никогда не переносится: сегменты обрезаются, а на узкой ширине середина
+          сворачивается в «…».
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
-          <div className="demoBlock">
-            <DemoSectionTitle>Размеры</DemoSectionTitle>
-            <DemoDescription>
-              Четыре ряда с <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-              <code>xl</code> на <code>Breadcrumb.Root</code> — общий масштаб для всей цепочки.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={breadcrumbSizesSource.trim()}
-              previewLayout="stack-center"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <BreadcrumbSizesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Шапка страницы"
+            description={
+              <>
+                Путь размера <code>s</code> над заголовком и действиями. Первая ссылка — иконка с{" "}
+                <code>aria-label</code>.
+              </>
+            }
+            code={pageHeaderSource}
+          >
+            <BreadcrumbPageHeaderExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Состояния</DemoSectionTitle>
-            <DemoDescription>
-              Сверху: промежуточные пункты с <code>href</code>, финал с <code>current</code>{" "}
-              (текущая страница). Снизу: средний сегмент без <code>href</code> — обычный текст в{" "}
-              <code>span</code>, не ссылка.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={breadcrumbStatesSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <BreadcrumbStatesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Размеры"
+            description={
+              <>
+                <code>xs · s · m · l · xl</code> — текст и шеврон по ярусу контролов.
+              </>
+            }
+            code={sizesSource}
+          >
+            <BreadcrumbSizesExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
-            <DemoDescription>
-              Первый пункт только с иконкой: класс <code>itemHome</code> из стилей крошек и
-              обязательный <code>aria-label</code> на <code>Item</code>. Разделители заменены на
-              символ через <code>children</code> у <code>Separator</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={breadcrumbCompositionSource.trim()}
-              previewLayout="stack"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <BreadcrumbCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Full width / responsive</DemoSectionTitle>
-            <DemoDescription>
-              Список внутри корня — <code>flex</code> с <code>flex-wrap</code>: в узком контейнере
-              длинные подписи переносятся на следующую строку без обрезки.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={breadcrumbFullWidthSource.trim()}
-              previewLayout="stack"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <BreadcrumbFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              Схлопывание середины пути через <code>Breadcrumb.Ellipsis</code> между разделителями —
-              удобно для глубокой вложенности каталога или документации.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={breadcrumbLongEllipsisSource.trim()}
-              previewLayout="stack"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <BreadcrumbLongEllipsisSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Длинный путь и узкая ширина"
+            description={
+              <>
+                Сегменты обрезаются многоточием; от пяти детей уже 30rem средние уровни
+                сворачиваются, но остаются в дереве доступности.
+              </>
+            }
+            code={collapseSource}
+          >
+            <BreadcrumbCollapseExample />
+          </Demo>
 
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
-            <DemoApiTitle>Breadcrumb.Root</DemoApiTitle>
-            <DemoDescription>
-              Обёртка-<code>nav</code> с подписью для скринридеров, список-<code>ol</code> и
-              контекст размера для дочерних частей.
-            </DemoDescription>
-            <PlaygroundApiTable rows={breadcrumbRootApiRows} />
-            <DemoApiTitle>Breadcrumb.Item</DemoApiTitle>
-            <DemoDescription>
-              Элемент списка: ссылка через внутренний <code>LinkButton</code> или текстовый{" "}
-              <code>span</code> для текущей страницы и необязательных «заголовков» без перехода.
-            </DemoDescription>
-            <PlaygroundApiTable rows={breadcrumbItemApiRows} />
-            <DemoApiTitle>Breadcrumb.Separator</DemoApiTitle>
-            <DemoDescription>
-              Служебный пункт между сегментами: по умолчанию иконка-шеврон, скрыт от вспомогательных
-              технологий через <code>aria-hidden</code>.
-            </DemoDescription>
-            <PlaygroundApiTable rows={breadcrumbSeparatorApiRows} />
-            <DemoApiTitle>Breadcrumb.Ellipsis</DemoApiTitle>
-            <DemoDescription>
-              Визуальный маркер пропущенных уровней вложенности (символ «…» внутри <code>li</code>).
-            </DemoDescription>
-            <PlaygroundApiTable rows={breadcrumbEllipsisApiRows} />
+            <DemoApiTitle>Breadcrumb</DemoApiTitle>
+            <PlaygroundApiTable rows={apiRows} />
           </div>
         </div>
       </PageContent.Body>

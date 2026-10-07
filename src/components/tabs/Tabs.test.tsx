@@ -24,11 +24,11 @@ function BasicTabs({
       onValueChange={onValueChange}
     >
       <Tabs.List>
-        <Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
-        <Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
-        <Tabs.Tab value="tab3" disabled>
+        <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+        <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+        <Tabs.Trigger value="tab3" disabled>
           Tab 3
-        </Tabs.Tab>
+        </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Panel value="tab1">Panel 1</Tabs.Panel>
       <Tabs.Panel value="tab2">Panel 2</Tabs.Panel>
@@ -56,7 +56,7 @@ describe("Tabs — render", () => {
     const { container } = render(
       <Tabs.Root defaultValue="tab1" size="xl">
         <Tabs.List>
-          <Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Panel value="tab1">Panel 1</Tabs.Panel>
       </Tabs.Root>,
@@ -76,9 +76,9 @@ describe("Tabs — render", () => {
     render(
       <Tabs.Root defaultValue="a">
         <Tabs.List>
-          <Tabs.Tab value="a">
+          <Tabs.Trigger value="a">
             <Tabs.Label>Hello</Tabs.Label>
-          </Tabs.Tab>
+          </Tabs.Trigger>
         </Tabs.List>
         <Tabs.Panel value="a">Panel</Tabs.Panel>
       </Tabs.Root>,
@@ -90,7 +90,7 @@ describe("Tabs — render", () => {
     render(
       <Tabs.Root defaultValue="a">
         <Tabs.List>
-          <Tabs.Tab value="a">
+          <Tabs.Trigger value="a">
             <Tabs.Icon>
               <span data-testid="icon-left" />
             </Tabs.Icon>
@@ -98,7 +98,7 @@ describe("Tabs — render", () => {
             <Tabs.Icon>
               <span data-testid="icon-right" />
             </Tabs.Icon>
-          </Tabs.Tab>
+          </Tabs.Trigger>
         </Tabs.List>
         <Tabs.Panel value="a">Panel</Tabs.Panel>
       </Tabs.Root>,
@@ -243,12 +243,19 @@ describe("Tabs — keyboard (vertical)", () => {
     expect(screen.getByText("Panel 1")).toBeInTheDocument();
   });
 
-  it("ArrowRight does not navigate in vertical mode", () => {
+  it("ArrowRight also navigates in vertical mode (list may wrap into a row)", () => {
     render(<BasicTabs defaultValue="tab1" orientation="vertical" />);
     const tab1 = screen.getByRole("tab", { name: "Tab 1" });
     tab1.focus();
 
     fireEvent.keyDown(screen.getByRole("tablist"), { key: "ArrowRight" });
+    expect(screen.getByText("Panel 2")).toBeInTheDocument();
+  });
+
+  it("ArrowDown does not navigate in horizontal mode", () => {
+    render(<BasicTabs defaultValue="tab1" />);
+    screen.getByRole("tab", { name: "Tab 1" }).focus();
+    fireEvent.keyDown(screen.getByRole("tablist"), { key: "ArrowDown" });
     expect(screen.getByText("Panel 1")).toBeInTheDocument();
   });
 });
@@ -284,8 +291,8 @@ describe("Tabs — controlled mode", () => {
     render(
       <Tabs.Root value="tab1" onValueChange={onValueChange}>
         <Tabs.List>
-          <Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
-          <Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Panel value="tab1">Panel 1</Tabs.Panel>
         <Tabs.Panel value="tab2">Panel 2</Tabs.Panel>
@@ -300,8 +307,8 @@ describe("Tabs — controlled mode", () => {
     render(
       <Tabs.Root value="tab1">
         <Tabs.List>
-          <Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
-          <Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Panel value="tab1">Panel 1</Tabs.Panel>
         <Tabs.Panel value="tab2">Panel 2</Tabs.Panel>
@@ -319,5 +326,83 @@ describe("Tabs — uncontrolled mode", () => {
     render(<BasicTabs defaultValue="tab1" />);
     fireEvent.click(screen.getByRole("tab", { name: "Tab 2" }));
     expect(screen.getByText("Panel 2")).toBeInTheDocument();
+  });
+});
+
+// ─── Two-line triggers ───────────────────────────────────────────────────────
+
+describe("Tabs — two-line trigger", () => {
+  it("names the tab by label + count and describes it by the description", () => {
+    render(
+      <Tabs.Root defaultValue="fleet">
+        <Tabs.List>
+          <Tabs.Trigger value="fleet">
+            <Tabs.Label>В парке</Tabs.Label>
+            <Tabs.Count color="blue">12</Tabs.Count>
+            <Tabs.Description>
+              <strong>3</strong> в подготовке
+            </Tabs.Description>
+          </Tabs.Trigger>
+          <Tabs.Trigger value="archive">Архив</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Panel value="fleet">Fleet</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    const tab = screen.getByRole("tab", { name: "В парке 12" });
+    expect(tab).toHaveAttribute("data-two-line", "true");
+    expect(tab).toHaveAccessibleDescription("3 в подготовке");
+    expect(screen.getByText("12")).toHaveAttribute("data-color", "blue");
+    const plain = screen.getByRole("tab", { name: "Архив" });
+    expect(plain).not.toHaveAttribute("data-two-line");
+    expect(plain).not.toHaveAttribute("aria-describedby");
+  });
+
+  it("sets data-state on triggers", () => {
+    render(<BasicTabs defaultValue="tab2" />);
+    expect(screen.getByRole("tab", { name: "Tab 2" })).toHaveAttribute("data-state", "active");
+    expect(screen.getByRole("tab", { name: "Tab 1" })).toHaveAttribute("data-state", "inactive");
+  });
+});
+
+// ─── Indicator and structure ─────────────────────────────────────────────────
+
+describe("Tabs — indicator", () => {
+  it("renders one hidden bar indicator before the triggers in a horizontal list", () => {
+    render(<BasicTabs />);
+    const list = screen.getByRole("tablist");
+    expect(list).toHaveAttribute("data-indicator", "bar");
+    const indicator = list.firstElementChild;
+    expect(indicator).toHaveAttribute("aria-hidden", "true");
+    expect(list.querySelectorAll('[aria-hidden="true"][data-visible]')).toHaveLength(1);
+  });
+
+  it("uses a pill indicator in a vertical list", () => {
+    render(<BasicTabs orientation="vertical" />);
+    expect(screen.getByRole("tablist")).toHaveAttribute("data-indicator", "pill");
+  });
+});
+
+describe("Tabs — single structural style", () => {
+  it("has no variant: no data-variant on the root", () => {
+    const { container } = render(<BasicTabs />);
+    expect(container.querySelector("[data-variant]")).toBeNull();
+  });
+
+  it("rejects the removed segmented variant at the type level", () => {
+    render(
+      // @ts-expect-error — Tabs has no `variant`; use SegmentedControl to choose a value.
+      <Tabs.Root defaultValue="a" variant="segmented">
+        <Tabs.List>
+          <Tabs.Trigger value="a">A</Tabs.Trigger>
+        </Tabs.List>
+      </Tabs.Root>,
+    );
+    expect(screen.getByRole("tab", { name: "A" })).toBeInTheDocument();
+  });
+
+  it("wraps plain text in a label without duplicating the accessible name", () => {
+    render(<BasicTabs />);
+    const tab = screen.getByRole("tab", { name: "Tab 1" });
+    expect(tab.querySelector("[data-text]")).toHaveAttribute("data-text", "Tab 1");
   });
 });

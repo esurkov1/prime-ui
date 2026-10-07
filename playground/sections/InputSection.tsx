@@ -1,4 +1,28 @@
+import InputAnatomyExample from "@/components/input/examples/anatomy";
+import anatomySource from "@/components/input/examples/anatomy.tsx?raw";
+import InputControlAlignmentExample from "@/components/input/examples/control-alignment";
+import alignRowSource from "@/components/input/examples/control-alignment.tsx?raw";
+import InputControlledExample from "@/components/input/examples/controlled";
+import controlledSource from "@/components/input/examples/controlled.tsx?raw";
+import InputFullWidthExample from "@/components/input/examples/full-width";
+import fullWidthSource from "@/components/input/examples/full-width.tsx?raw";
+import InputIconsAndAffixesExample from "@/components/input/examples/icons-and-affixes";
+import compositionSource from "@/components/input/examples/icons-and-affixes.tsx?raw";
+import InputInFormExample from "@/components/input/examples/in-form";
+import formSource from "@/components/input/examples/in-form.tsx?raw";
+import InputReservedSupportRowExample from "@/components/input/examples/reserved-support-row";
+import featuresSource from "@/components/input/examples/reserved-support-row.tsx?raw";
+import InputSearchWithoutFocusRingExample from "@/components/input/examples/search-without-focus-ring";
+import searchNoRingSource from "@/components/input/examples/search-without-focus-ring.tsx?raw";
+import InputSizesExample from "@/components/input/examples/sizes";
+import sizesSource from "@/components/input/examples/sizes.tsx?raw";
+import InputStatesExample from "@/components/input/examples/states";
+import statesSource from "@/components/input/examples/states.tsx?raw";
+import InputSurfacesExample from "@/components/input/examples/surfaces";
+import InputWithBadgeExample from "@/components/input/examples/with-badge";
+import badgeSource from "@/components/input/examples/with-badge.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,82 +30,110 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import InputCompositionSnippet from "../snippets/input/composition";
-import compositionSource from "../snippets/input/composition.tsx?raw";
-import InputControlledSnippet from "../snippets/input/controlled";
-import controlledSource from "../snippets/input/controlled.tsx?raw";
-import InputFeaturesSnippet from "../snippets/input/features";
-import featuresSource from "../snippets/input/features.tsx?raw";
-import InputFullWidthSnippet from "../snippets/input/full-width";
-import fullWidthSource from "../snippets/input/full-width.tsx?raw";
-import InputSizesSnippet from "../snippets/input/sizes";
-import sizesSource from "../snippets/input/sizes.tsx?raw";
-import InputStatesSnippet from "../snippets/input/states";
-import statesSource from "../snippets/input/states.tsx?raw";
 
 const inputRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Размер: высота обёртки, кегль, отступы и иконки из одного яруса токенов.",
-  },
-  {
-    prop: "hasError",
-    type: "boolean",
-    defaultValue: "false",
-    required: "Нет",
-    description: "Визуальная ошибка и aria-invalid на поле; true также если передан error.",
+    description:
+      "Ярус --prime-control-<size>-*: высота, отступы, радиус, кегль поля, подписи и подсказки.",
   },
   {
     prop: "label",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Подпись над полем; рендерится как label с htmlFor на id инпута.",
+    description: "Подпись над полем (<label htmlFor>). Без неё задайте aria-label на Input.Field.",
   },
   {
-    prop: "optionalLabel",
-    type: "React.ReactNode",
-    defaultValue: "—",
+    prop: "required",
+    type: "boolean",
+    defaultValue: "false",
     required: "Нет",
-    description: "Вторичный текст в строке заголовка (например «по желанию»).",
+    description: "Красная * после подписи (aria-hidden) и нативный required на Input.Field.",
+  },
+  {
+    prop: "optional",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Приглушённая пометка сразу после текста подписи (labels.optional).",
   },
   {
     prop: "hint",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Подсказка под полем через Hint.Root.",
+    description: "Подсказка под полем; скрывается, пока показан error.",
   },
   {
     prop: "error",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Текст ошибки под полем; включает hasError и связывает aria-describedby.",
+    description: "Текст ошибки в слоте подсказки; включает invalid и aria-invalid.",
+  },
+  {
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Состояние ошибки без текста: красное кольцо, aria-invalid и data-invalid.",
+  },
+  {
+    prop: "focusRing",
+    type: "boolean",
+    defaultValue: "true",
+    required: "Нет",
+    description:
+      'false скрывает только кольцо фокуса на Input.Wrapper (data-focus-ring="false"); фокус, клавиатура и ARIA не меняются, кольцо ошибки остаётся. Только там, где фокус и так очевиден (одно поле поиска с кареткой); WCAG 2.4.7.',
+  },
+  {
+    prop: "counter",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Правая часть строки поддержки, обычно <Input.Counter current max />.",
+  },
+  {
+    prop: "reserveSupportRow",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Строка поддержки рендерится всегда, поэтому появление ошибки не сдвигает вёрстку.",
   },
   {
     prop: "id",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Явный id для input; иначе генерируется (useFieldIds).",
+    description: "Явный id поля; иначе генерируется. Связывает подпись, подсказку и ошибку.",
+  },
+  {
+    prop: "labels",
+    type: "Partial<InputLabels>",
+    defaultValue:
+      '{ optional: "необязательно", clear: "Очистить", counter: "{current} из {max} символов" }',
+    required: "Нет",
+    description:
+      "Системные строки: пометка optional, имя Input.ClearButton, озвучка Input.Counter ({current} и {max} подставляются).",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Обычно Input.Wrapper с полем и слотами; задаёт контекст для вложенных частей.",
+    description: "Обычно Input.Wrapper с Field и слотами.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный класс на корневом контейнере блока поля.",
+    description: "Класс корня.",
   },
 ];
 
@@ -91,31 +143,31 @@ const inputWrapperApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Обводка и фон поля: Field, Icon, Affix, InlineAffix в одном flex-ряду.",
+    description: "Field, Icon, Affix, InlineAffix, ClearButton в нужном порядке.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный класс на обёртке; data-size и data-has-error с контекста.",
+    description: "Класс заливки поля; data-size и data-invalid приходят из контекста.",
   },
 ];
 
 const inputFieldApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на нативном input.",
-  },
-  {
     prop: "aria-describedby",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Склеивается с id подсказок/ошибки из контекста.",
+    description: "Добавляется к id подсказки и ошибки из контекста.",
+  },
+  {
+    prop: "onValueChange",
+    type: "(value: string) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Новое строковое значение; нативный onChange тоже вызывается.",
   },
   {
     prop: "…rest",
@@ -123,7 +175,7 @@ const inputFieldApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description:
-      "type, placeholder, value, defaultValue, disabled, readOnly, required, name, autoComplete, inputMode, maxLength, min, max, step, pattern, onChange, onBlur и остальные атрибуты input (кроме size — зарезервирован под дизайн-систему).",
+      "value, onChange, type, disabled, readOnly, maxLength и т. д. HTML size зарезервирован.",
   },
 ];
 
@@ -133,21 +185,22 @@ const inputIconApiRows: PlaygroundApiPropRow[] = [
     type: '"start" | "end"',
     defaultValue: "—",
     required: "Да",
-    description: "Сторона иконки относительно текста поля.",
+    description:
+      "Сторона иконки. Иконка стоит по центру между краем и текстом: край → иконка = иконка → текст = отступ поля яруса.",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Обычно компонент Icon; узел помечен aria-hidden.",
+    description: "Иконка; без явного size берёт размер яруса поля.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный класс на span-обёртке.",
+    description: "Класс span.",
   },
 ];
 
@@ -157,21 +210,21 @@ const inputAffixApiRows: PlaygroundApiPropRow[] = [
     type: '"start" | "end"',
     defaultValue: "—",
     required: "Да",
-    description: "Сторона блочного аффикса с фоном и разделителем.",
+    description: "Сторона блочного аффикса с подложкой fill-subtle.",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Текст или короткая метка (https://, домен, валюта).",
+    description: "Статичный текст: протокол, домен, код страны.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный класс на контейнере аффикса.",
+    description: "Класс контейнера.",
   },
 ];
 
@@ -181,51 +234,142 @@ const inputInlineAffixApiRows: PlaygroundApiPropRow[] = [
     type: '"start" | "end"',
     defaultValue: "—",
     required: "Да",
-    description: "Сторона инлайн-аффикса в строке с вводом.",
+    description: "Сторона аффикса в строке ввода.",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Короткий текст без отдельной секции (€, ₽, %).",
+    description: "Короткий текст: ₽, %, кг.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный класс на span.",
+    description: "Класс span.",
   },
 ];
 
+const inputBadgeApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "color",
+    type: '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"',
+    defaultValue: '"gray"',
+    required: "Нет",
+    description: "Цвет палитры мягкого бейджа (ярус на шаг ниже поля).",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Да",
+    description: "Короткий статус: «Проверен», «Новое».",
+  },
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Класс бейджа.",
+  },
+];
+
+const inputClearButtonApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "onClick",
+    type: "(event) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Очистите значение здесь; затем фокус вернётся в поле (если не вызван preventDefault).",
+  },
+  {
+    prop: "…rest",
+    type: "React.ButtonHTMLAttributes<HTMLButtonElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Кроме type, children и aria-label (имя — labels.clear у Input.Root). Рендерите кнопку только при непустом значении.",
+  },
+];
+
+const inputCounterApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "current",
+    type: "number",
+    defaultValue: "—",
+    required: "Да",
+    description: "Текущая длина.",
+  },
+  {
+    prop: "max",
+    type: "number",
+    defaultValue: "—",
+    required: "Да",
+    description:
+      "Лимит; при current > max счётчик становится красным (data-invalid). Скринридер читает labels.counter.",
+  },
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Класс span.",
+  },
+];
 export default function InputSection() {
   return (
     <PageContent.Section>
       <PageContent.Header>
         <PageContent.Title>Input</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Однострочное поле ввода с единым оформлением: подпись и подсказка сверху и снизу,
-              внутри — рамка с текстом, иконками и текстовыми аффиксами. Подходит для почты, поиска,
-              сумм и коротких кодов; многострочный ввод — отдельный компонент Textarea.
-            </>
-          }
+          Однострочное поле и эталон системы полей: подпись сверху, поле на заливке без видимой
+          рамки, строка поддержки снизу (подсказка или ошибка слева, счётчик справа). Select,
+          Datepicker, TagSelect и Textarea повторяют этот же контракт. Многострочный ввод —
+          Textarea.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
           <div className="demoBlock">
+            <DemoSectionTitle>Анатомия поля</DemoSectionTitle>
+            <DemoDescription>
+              Подпись, <code>required</code> (красная *), <code>optional</code>, плейсхолдер,
+              подсказка, ошибка и <code>Input.Counter</code> на каждом размере. Подпись и подсказка
+              берут ярус поля, подсказка всегда мельче текста поля. Строки выровнены по колонкам.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={anatomySource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <InputAnatomyExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Выравнивание с другими контролами</DemoSectionTitle>
+            <DemoDescription>
+              Button, Input, Select и триггер Datepicker одного <code>size</code> имеют одну высоту
+              и радиус, поэтому панель фильтров собирается без подгонки отступов.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={alignRowSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <InputControlAlignmentExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Четыре значения <code>size</code> на <code>Input.Root</code> (<code>s</code>,{" "}
-              <code>m</code>, <code>l</code>, <code>xl</code>): одна и та же разметка с иконкой
-              слева, меняются только токены высоты и типографики.
+              <code>size</code> на <code>Input.Root</code>: <code>xs</code> 28, <code>s</code> 32,{" "}
+              <code>m</code> 36 (по умолчанию), <code>l</code> 40, <code>xl</code> 48. Иконка без
+              явного <code>size</code> подстраивается под ярус.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <InputSizesSnippet />
+                <InputSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -233,69 +377,136 @@ export default function InputSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Обычное поле с <code>hint</code>, <code>disabled</code> и <code>readOnly</code> на{" "}
-              <code>Input.Field</code>, обязательность через <code>required</code>, ошибка через{" "}
-              <code>error</code> на Root (или <code>hasError</code>) — на инпут уходит{" "}
-              <code>aria-invalid</code>.
+              Пустое, заполненное, <code>disabled</code>, <code>readOnly</code>, ошибка с текстом и
+              без (<code>invalid</code>). Наведите курсор — заливка темнеет; нажмите Tab — поле
+              светлеет и получает кольцо фокуса (у поля с ошибкой кольцо красное).
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <InputStatesSnippet />
+                <InputStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoSectionTitle>Поверхности</DemoSectionTitle>
             <DemoDescription>
-              Значение и обработчик на <code>Input.Field</code> (<code>value</code>,{" "}
-              <code>onChange</code>): родитель владеет строкой поиска; подпись поля продублирована в{" "}
-              <code>aria-label</code> для скринридеров.
+              Заливка поля приходит из контекста <code>--prime-color-field-bg</code>: белая на
+              canvas, серая внутри карточек, модалок и поповеров. Сниппет одинаковый — меняется
+              только фон.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <InputControlledSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
+            <SurfaceGallery surfaces={["canvas", "surface", "raised"]}>
+              <InputSurfacesExample />
+            </SurfaceGallery>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoSectionTitle>Контролируемое значение, очистка и счётчик</DemoSectionTitle>
             <DemoDescription>
-              Слоты <code>Input.Icon</code> (<code>side</code>), <code>Input.Affix</code>{" "}
-              (выделенные края) и <code>Input.InlineAffix</code> (символ в строке) внутри{" "}
-              <code>Input.Wrapper</code>.
+              <code>value</code> и <code>onChange</code> на <code>Input.Field</code>.{" "}
+              <code>Input.ClearButton</code> показывается только при непустом значении и возвращает
+              фокус в поле. <code>Input.Counter</code> краснеет при превышении лимита.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={controlledSource.trim()}
+              previewLayout="stack-narrow"
+            >
               <PlaygroundExampleFrame.Stage>
-                <InputCompositionSnippet />
+                <InputControlledExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoSectionTitle>Поиск без кольца фокуса</DemoSectionTitle>
             <DemoDescription>
-              Корень поля тянется на ширину родителя (<code>width: 100%</code> у Root): сравнение
-              узкой колонки и блока на всю ширину превью.
+              <code>focusRing={"{false}"}</code> на <code>Input.Root</code> убирает только кольцо:
+              фокус, клавиатура и ARIA прежние, поле светлеет, кольцо ошибки остаётся. Используйте
+              там, где фокус очевиден и без кольца — одно поле поиска с кареткой (WCAG 2.4.7).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={searchNoRingSource.trim()}
+              previewLayout="stack-narrow"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <InputSearchWithoutFocusRingExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Иконки и аффиксы</DemoSectionTitle>
+            <DemoDescription>
+              <code>Input.Icon</code>, блочный <code>Input.Affix</code> с подложкой и{" "}
+              <code>Input.InlineAffix</code> в строке ввода. Все слоты декоративные (
+              <code>aria-hidden</code>), имя поля даёт подпись.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={compositionSource.trim()}
+              previewLayout="stack-narrow"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <InputIconsAndAffixesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Бейдж в поле</DemoSectionTitle>
+            <DemoDescription>
+              <code>Input.Badge</code>, <code>Select.Badge</code> и <code>Datepicker.Badge</code> —
+              мягкий бейдж палитры на ярус ниже поля у правого края, перед иконкой или шевроном
+              (край → бейдж = отступ поля). Высота поля не меняется, текст обрезается перед бейджем;
+              цвет — <code>color</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={badgeSource.trim()} previewLayout="stack-narrow">
+              <PlaygroundExampleFrame.Stage>
+                <InputWithBadgeExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Форма в карточке</DemoSectionTitle>
+            <DemoDescription>
+              Реквизиты компании на поверхности: поле → поле 20px, группа → действия 32px.{" "}
+              <code>reserveSupportRow</code> у соседних полей держит строку одинаковой высоты, даже
+              когда ошибка есть только у одного.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={formSource.trim()}
+              previewLayout="stack"
+              surface="surface"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <InputInFormExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Ошибка без сдвига вёрстки</DemoSectionTitle>
+            <DemoDescription>
+              С <code>reserveSupportRow</code> строка поддержки занимает место заранее: переключите
+              ошибку — кнопка под полем не двигается. <code>labels.optional</code> меняет текст
+              пометки, явный <code>id</code> пригодится для тестов.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-narrow">
+              <PlaygroundExampleFrame.Stage>
+                <InputReservedSupportRowExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Ширина</DemoSectionTitle>
+            <DemoDescription>
+              Отдельного <code>fullWidth</code> нет: <code>Input.Root</code> занимает ширину
+              родителя, ширину задаёт колонка формы.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <InputFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              Явный <code>id</code> на Root для стабильных тестов и связки с подсказками; связка{" "}
-              <code>label</code> + <code>optionalLabel</code>; одновременно <code>hint</code> и{" "}
-              <code>error</code> (ошибка включает визуальное состояние ошибки).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <InputFeaturesSnippet />
+                <InputFullWidthExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -304,14 +515,13 @@ export default function InputSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Input.Root</DemoApiTitle>
             <DemoDescription>
-              Блок поля: размер, подписи, подсказка и ошибка, контекст для Wrapper и Field.
+              Размер, подпись, строка поддержки и контекст для Wrapper и Field.
             </DemoDescription>
             <PlaygroundApiTable rows={inputRootApiRows} />
 
             <DemoApiTitle>Input.Wrapper</DemoApiTitle>
             <DemoDescription>
-              Рамка вокруг нативного input и декоративных слотов; наследует размер и флаг ошибки из
-              контекста.
+              Видимое поле: заливка, наведение, фокус, ошибка и disabled.
             </DemoDescription>
             <PlaygroundApiTable rows={inputWrapperApiRows} />
 
@@ -323,29 +533,22 @@ export default function InputSection() {
             <PlaygroundApiTable rows={inputFieldApiRows} />
 
             <DemoApiTitle>Input.Icon</DemoApiTitle>
-            <DemoDescription>
-              Декоративная иконка слева или справа; не озвучивается (<code>aria-hidden</code>).
-            </DemoDescription>
             <PlaygroundApiTable rows={inputIconApiRows} />
 
             <DemoApiTitle>Input.Affix</DemoApiTitle>
-            <DemoDescription>
-              Текстовый блок-аффикс с фоном по краю поля (префикс URL, зона домена).
-            </DemoDescription>
             <PlaygroundApiTable rows={inputAffixApiRows} />
 
             <DemoApiTitle>Input.InlineAffix</DemoApiTitle>
-            <DemoDescription>
-              Компактный аффикс в одной строке с вводом (валюта, единицы).
-            </DemoDescription>
             <PlaygroundApiTable rows={inputInlineAffixApiRows} />
 
-            <DemoApiTitle>useInputContext</DemoApiTitle>
-            <DemoDescription>
-              Публичный хук для продвинутой композиции: возвращает{" "}
-              <code>{`{ size, hasError, inputId, describedBy }`}</code> — те же значения, что
-              получает <code>Input.Field</code> из провайдера.
-            </DemoDescription>
+            <DemoApiTitle>Input.Badge</DemoApiTitle>
+            <PlaygroundApiTable rows={inputBadgeApiRows} />
+
+            <DemoApiTitle>Input.ClearButton</DemoApiTitle>
+            <PlaygroundApiTable rows={inputClearButtonApiRows} />
+
+            <DemoApiTitle>Input.Counter</DemoApiTitle>
+            <PlaygroundApiTable rows={inputCounterApiRows} />
           </div>
         </div>
       </PageContent.Body>

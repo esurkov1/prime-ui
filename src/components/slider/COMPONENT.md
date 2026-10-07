@@ -1,86 +1,132 @@
 # Slider
 
-**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
+**Category:** selection (Выбор)
 
-## About
+> A slider for picking an approximate numeric value within a range, with an optional label and value readout.
 
-A horizontal range control built on the native `input type="range"`, with optional text label and kit sizing (`s`–`xl`).
+## When to use
+- An approximate value where the position matters more than the exact number: volume, brightness, opacity, a price ceiling.
+- A bounded numeric setting with a coarse `step` (25%, 0.5 stars).
+- Next to a number input when users need both dragging and exact entry (controlled, shared state).
 
-**When to use**
+## When not to use
+- An exact number that users type (quantity, amount) → use [Input](../input/COMPONENT.md) with `type="number"` instead.
+- One of a few named levels (Низкий / Средний / Высокий) → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Radio](../radio/COMPONENT.md) instead.
+- A two-handle range (from–to) → not supported; use two inputs.
+- On/off → use [Switch](../switch/COMPONENT.md) instead.
 
-- Picking a number along a continuous or stepped interval: volume, brightness, percentages, temperature bands, or filter caps (for example a maximum price).
-- When native range keyboard and pointer behavior is enough and you want minimal custom logic.
-
-**When not to use**
-
-- Vertical sliders — the implementation is horizontal only.
-- When you need thumb labels, icons, or other slots on the track — compose with surrounding layout and text.
-- Built-in error, required, loading, or read-only modes — use form primitives and hints around the control.
-- A small set of fixed choices — prefer radio or segmented controls instead of a continuous range.
-
-## Composition
-
-- **`Slider`** is a single-part API: **`Slider.Root`** wraps **`ControlSizeProvider`**, an optional **`label`** (linked to the input with `htmlFor` / `id`), and one styled **`input type="range"`**.
-- The root `div` carries **`data-size`** from **`size`**; there are no other exported subcomponents.
-
-### Canonical example
-
+## Import
 ```tsx
 import { Slider } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <Slider.Root label="Output level" min={0} max={100} step={1} defaultValue={50} />
-  );
-}
 ```
 
-### Playground-aligned examples
-
-**`playground/sections/SliderSection.tsx`** and **`playground/snippets/slider/`** define the demo order and code shown in the playground (Russian UI copy in snippets). Matching runnable package examples (imports from **`"prime-ui-kit"`**) live next to this file:
-
-| Playground block | Snippet | Example file |
-|------------------|---------|--------------|
-| Sizes | `sizes.tsx` | `sizes.tsx` |
-| States | `states.tsx` | `states.tsx` |
-| Controlled | `controlled.tsx` | `controlled.tsx` |
-| Composition | `composition.tsx` | `composition.tsx` |
-| Full width | `full-width.tsx` | `full-width.tsx` |
-| Features (range / step) | `features.tsx` | `features.tsx` |
-
-Shared layout for controlled and full-width demos: **`examples/examples.module.css`**.
-
-**LLM note:** Prefer reading the runnable files under `./examples/*.tsx` for full scenarios and prop combinations; this page keeps the contract (rules + API tables) authoritative.
-
-## Rules
-
-- **Controlled:** pass **`value`** and **`onChange`**. **Uncontrolled:** pass **`defaultValue`**, or omit both value props — the effective initial value is **`min`**, clamped to **`[min, max]`**.
-- **`min`**, **`max`**, and **`step`** default to **`0`**, **`100`**, and **`1`**; fractional **`step`** values are allowed.
-- Displayed value is **clamped** to **`[min, max]`**; non-numeric input updates are ignored.
-- With **`label`**, the visible label is associated via **`id`** / **`htmlFor`**. Without **`label`**, set **`aria-label`** (or an external accessible name) so assistive technologies get a proper name.
-- **`disabled`** sets the native **`disabled`** state on the range input.
-- There is no **`asChild`** or portal behavior; focus and **`focus-visible`** styling follow the native control and theme.
+## Anatomy
+```
+Slider.Root
+├─ header row (only with `label` or `showValue`)
+│  ├─ Label            from `label`, linked to the input
+│  └─ <output>         from `showValue`, formatted value
+└─ <input type="range">
+```
+Single part: everything is configured by `Slider.Root` props.
 
 ## API
 
 ### Slider.Root
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | `number` | — | Controlled value (clamped to `[min, max]`); use with `onValueChange`. |
+| `defaultValue` | `number` | `min` | Initial value in uncontrolled mode (clamped). |
+| `onValueChange` | `(value: number) => void` | — | Called on every thumb move. |
+| `min` | `number` | `0` | Lower bound. |
+| `max` | `number` | `100` | Upper bound. |
+| `step` | `number` | `1` | Step of the native range; fractional steps work. |
+| `label` | `ReactNode` | — | Visible label (`Label`), linked to the input via `htmlFor`. Without it, pass `aria-label`. |
+| `showValue` | `boolean` | `false` | Shows the current value at the end of the label row (tabular numbers). |
+| `formatValue` | `(value: number) => string` | — | Formats the shown value and sets `aria-valuetext` (e.g. `` (v) => `${v} °C` ``). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Size tier of the thumb and the label row. |
+| `disabled` | `boolean` | — | Disables the input; mutes track, fill and value. |
+| `aria-label` | `string` | — | Accessible name when there is no visible `label`. |
+| `className` | `string` | — | Class on the root `div`. |
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| value | `number` | — | No | Controlled value; use with **`onChange`** for external state |
-| defaultValue | `number` | — | No | Initial value when uncontrolled; clamped to **`[min, max]`**; if omitted, the internal initial value is **`min`** |
-| min | `number` | `0` | No | Minimum for the native `type="range"` |
-| max | `number` | `100` | No | Maximum for the native `type="range"` |
-| step | `number` | `1` | No | Step increment (may be fractional) |
-| disabled | `boolean` | — | No | Blocks input and lowers track opacity |
-| onChange | `(value: number) => void` | — | No | Fires when the value changes after user input (pointer, touch, or native range keys) |
-| label | `string` | — | No | Text above the track; creates an associated **`label`** with **`htmlFor`** on the input |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track height, thumb, and label type scale from one control token tier |
-| className | `string` | — | No | Extra class on the root container |
-| aria-label | `string` | — | No | Accessible name when there is no visible **`label`** |
+No other native props, no `name`, no ref forwarding.
+
+## Variants
+No `variant`/`tone`/`color`. Axes: `size`, `showValue` (visual flag).
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | 14px thumb, 4px track, 12/16 label | dense filter panels | |
+| `s` | 16px thumb, 4px track, 12/16 label | compact side panels | |
+| `m` | 18px thumb, 4px track, 13/20 label | regular forms and settings | yes |
+| `l` | 20px thumb, 4px track, 14/20 label | spacious settings pages | |
+| `xl` | 24px thumb, 8px track, 14/20 label | touch-first screens | |
+
+### showValue
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `false` | no readout; the header shows only the label | the position is self-explanatory (volume) or the value is shown elsewhere (a paired input) | yes |
+| `true` | value at the right end of the label row, `text-secondary`, tabular nums | the number matters (price, temperature, percent) | |
+
+**Combinations**
+- `showValue` + `formatValue` for any value with a unit; `formatValue` alone only changes `aria-valuetext`.
+- Neither `label` nor `aria-label` → forbidden (unnamed control).
+- A paired number input with `showValue` → redundant; drop `showValue`.
+
+**Sizes** — the root is always 100% wide; the tier changes only the thumb, label/value text and (at `xl`) the track thickness. Use the same tier as the other fields of the form.
+
+**Hierarchy** — sliders in a settings card are spaced `--prime-space-6`; a related switch can disable a slider (see [display-settings.tsx](examples/display-settings.tsx)).
+
+## States
+| State | Driven by | DOM | Looks like |
+|---|---|---|---|
+| default | — | `data-size` | track `fill-strong`, fill `accent-default` up to the value, thumb `control-thumb` with a hairline edge and `shadow-overlay` |
+| hover | pointer | — | soft `accent-soft` halo (4px) around the thumb |
+| active | dragging | — | thumb scales to 110% |
+| focus-visible | keyboard | — | outer focus ring around the thumb |
+| disabled | `disabled` | `data-disabled="true"` on root, native `disabled` | track `fill-muted`, fill `text-disabled`, flat thumb `fill-strong`, value `text-disabled`, `cursor: not-allowed` |
+
+Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back to `min`).
+
+## Layout & spacing
+- Always full width of its container; place it in a grid column to limit width.
+- Label row → track: tier `label-gap`; label and value are on one baseline, value pinned right.
+- Between sliders in a form: `--prime-space-5`; in a settings card: `--prime-space-6`.
+- With a paired input: grid `minmax(0, 1fr) auto-width column`, `align-items: end`, gap `--prime-space-4`.
+
+## Accessibility
+- Native `<input type="range">`: Arrow keys change by `step`, Page Up / Page Down by a larger step, Home / End jump to the ends.
+- `label` is a `<label htmlFor>`; otherwise `aria-label` is required.
+- `formatValue` sets `aria-valuetext`, so screen readers announce the unit.
+- The visual `<output>` is `aria-hidden` (the value is announced by the input).
+- No `labels` keys.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | All size tiers with label and value | Matching the form tier |
+| [states.tsx](examples/states.tsx) | Minimum, middle, maximum, disabled | Reference for fill and disabled |
+| [value-format.tsx](examples/value-format.tsx) | `showValue` + `formatValue` (°C, ₽, %) | Values with units |
+| [basic.tsx](examples/basic.tsx) | One labelled slider with value | Checking contrast on any surface |
+| [controlled.tsx](examples/controlled.tsx) | `value` + `onValueChange` shared with a number Input | Drag plus exact entry |
+| [range-step.tsx](examples/range-step.tsx) | Custom `min`/`max`/`step`, fractional step, `aria-label` only | Bounded settings |
+| [display-settings.tsx](examples/display-settings.tsx) | Card with sliders and a Switch that disables one | Settings panels |
+
+```tsx
+import { Slider } from "prime-ui-kit";
+
+export function VolumeSlider() {
+  return <Slider.Root label="Громкость" showValue defaultValue={60} />;
+}
+```
+
+## Mistakes
+- `<Slider.Root onChange={…}>` → use `onValueChange`.
+- `formatValue` without `showValue` expecting a visible unit → add `showValue`.
+- No `label` and no `aria-label` → add one.
+- `value={[20, 80]}` for a range → only a single number is supported.
+- Expecting it to submit in a form → there is no `name`; keep the value in state and submit it yourself.
 
 ## Related
-
-- [Label](../label/COMPONENT.md)
-- [Hint](../hint/COMPONENT.md)
-- [DigitInput](../digit-input/COMPONENT.md)
+[Input](../input/COMPONENT.md) · [SegmentedControl](../segmented-control/COMPONENT.md) · [Switch](../switch/COMPONENT.md) · [Label](../label/COMPONENT.md)

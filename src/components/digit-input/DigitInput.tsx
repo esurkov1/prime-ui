@@ -1,23 +1,43 @@
 import * as React from "react";
-
-import type { DigitInputSize } from "@/internal/states";
-
-import { useControllableState } from "../../hooks/useControllableState";
-import { cx } from "../../internal/cx";
+import { useControllableState } from "@/hooks/useControllableState";
+import { cx } from "@/internal/cx";
+import { toDataAttributes } from "@/internal/data-attributes";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./DigitInput.module.css";
 
-export type { DigitInputSize };
+export type DigitInputLabels = {
+  /** Accessible name of the group. */
+  group: string;
+  /** Accessible name of a cell; `{index}` (1-based) and `{length}` are replaced. */
+  cell: string;
+};
+
+const DIGIT_INPUT_LABELS: DigitInputLabels = {
+  group: "Код",
+  cell: "Цифра {index} из {length}",
+};
 
 export type DigitInputRootProps = {
+  /** Number of cells. */
   length?: number;
-  size?: DigitInputSize;
+  size?: ControlSize;
   value?: string;
   defaultValue?: string;
-  onChange?: (value: string) => void;
-  disabled?: boolean;
-  hasError?: boolean;
+  onValueChange?: (value: string) => void;
+  /** Called once when the last empty cell is filled. */
   onComplete?: (value: string) => void;
+  disabled?: boolean;
+  invalid?: boolean;
+  /**
+   * Draws the focus ring on the focused cell (default). `false` sets `data-focus-ring="false"` on
+   * the fieldset and hides only the visual ring — focus, keyboard and ARIA are unchanged, the error
+   * ring still shows. Turn it off only where focus is otherwise obvious; WCAG 2.4.7.
+   */
+  focusRing?: boolean;
+  /** Id(s) of the hint / error text describing the group. */
+  "aria-describedby"?: string;
+  labels?: Partial<DigitInputLabels>;
   className?: string;
 };
 
@@ -43,13 +63,17 @@ function DigitInputRoot({
   size = "m",
   value: valueProp,
   defaultValue = "",
-  onChange,
-  disabled,
-  hasError,
+  onValueChange,
   onComplete,
+  disabled,
+  invalid,
+  focusRing = true,
+  "aria-describedby": ariaDescribedBy,
+  labels: labelsProp,
   className,
 }: DigitInputRootProps) {
   const length = lengthProp;
+  const labels = { ...DIGIT_INPUT_LABELS, ...labelsProp };
   const slotKeysRef = React.useRef<string[] | null>(null);
   if (!slotKeysRef.current || slotKeysRef.current.length !== length) {
     slotKeysRef.current = createSlotKeys(length);
@@ -59,7 +83,7 @@ function DigitInputRoot({
   const [value, setValue] = useControllableState({
     value: valueProp !== undefined ? normalizeDigits(valueProp, length) : undefined,
     defaultValue: defaultNormalized,
-    onChange,
+    onChange: onValueChange,
   });
 
   const prevLenRef = React.useRef(0);
@@ -125,11 +149,16 @@ function DigitInputRoot({
 
   return (
     <fieldset
-      aria-label="Digit input"
+      aria-label={labels.group}
+      aria-describedby={ariaDescribedBy}
+      disabled={disabled}
       className={cx(styles.root, className)}
-      data-size={size}
-      data-has-error={hasError ? "true" : "false"}
-      data-disabled={disabled ? "true" : "false"}
+      {...toDataAttributes({
+        size,
+        invalid: invalid || undefined,
+        disabled: disabled || undefined,
+        "focus-ring": focusRing ? undefined : false,
+      })}
     >
       {cells.map((cell, index) => (
         <input
@@ -142,8 +171,13 @@ function DigitInputRoot({
           disabled={disabled}
           className={styles.cell}
           data-size={size}
+          data-filled={cell ? "true" : undefined}
           value={cell}
-          aria-label={`Digit ${index + 1} of ${length}`}
+          aria-label={labels.cell
+            .replace("{index}", String(index + 1))
+            .replace("{length}", String(length))}
+          aria-invalid={invalid || undefined}
+          onFocus={(e) => e.currentTarget.select()}
           onChange={(e) => {
             if (disabled) {
               return;
@@ -160,6 +194,12 @@ function DigitInputRoot({
             if (e.key === "Backspace" && !cells[index] && index > 0) {
               e.preventDefault();
               focusAt(index - 1);
+            } else if (e.key === "ArrowLeft" && index > 0) {
+              e.preventDefault();
+              focusAt(index - 1);
+            } else if (e.key === "ArrowRight" && index < length - 1) {
+              e.preventDefault();
+              focusAt(index + 1);
             }
           }}
           onPaste={(e) => {
@@ -175,6 +215,6 @@ function DigitInputRoot({
   );
 }
 
-DigitInputRoot.displayName = "DigitInputRoot";
+DigitInputRoot.displayName = "DigitInput.Root";
 
 export const DigitInput = { Root: DigitInputRoot };

@@ -1,3 +1,13 @@
+import CommandMenuCompositionExample from "@/components/command-menu/examples/composition";
+import compositionSource from "@/components/command-menu/examples/composition.tsx?raw";
+import CommandMenuControlledExample from "@/components/command-menu/examples/controlled";
+import controlledSource from "@/components/command-menu/examples/controlled.tsx?raw";
+import CommandMenuKeyboardSearchExample from "@/components/command-menu/examples/keyboard-search";
+import featuresSource from "@/components/command-menu/examples/keyboard-search.tsx?raw";
+import CommandMenuSizesExample from "@/components/command-menu/examples/sizes";
+import variantsSource from "@/components/command-menu/examples/sizes.tsx?raw";
+import CommandMenuStatesExample from "@/components/command-menu/examples/states";
+import statesSource from "@/components/command-menu/examples/states.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,22 +16,23 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import CommandMenuCompositionSnippet from "../snippets/command-menu/composition-tags-footer";
-import compositionSource from "../snippets/command-menu/composition-tags-footer.tsx?raw";
-import CommandMenuControlledSnippet from "../snippets/command-menu/controlled-open-search";
-import controlledSource from "../snippets/command-menu/controlled-open-search.tsx?raw";
-import CommandMenuFeaturesSnippet from "../snippets/command-menu/features-keyboard-search";
-import featuresSource from "../snippets/command-menu/features-keyboard-search.tsx?raw";
-import CommandMenuFullWidthSnippet from "../snippets/command-menu/full-width-panel";
-import fullWidthSource from "../snippets/command-menu/full-width-panel.tsx?raw";
-import CommandMenuItemIconAsSnippet from "../snippets/command-menu/item-icon-as";
-import itemIconAsSource from "../snippets/command-menu/item-icon-as.tsx?raw";
-import CommandMenuStatesSnippet from "../snippets/command-menu/states-disabled-filter";
-import statesSource from "../snippets/command-menu/states-disabled-filter.tsx?raw";
-import CommandMenuVariantsSnippet from "../snippets/command-menu/variants-density-items";
-import variantsSource from "../snippets/command-menu/variants-density-items.tsx?raw";
 
 const dialogApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "size",
+    type: '"xs" | "s" | "m" | "l" | "xl"',
+    defaultValue: '"m"',
+    required: "Нет",
+    description:
+      "Ярус пунктов (высота item-height 24–40, кегль, иконка) и строки поиска (l/xl — выше).",
+  },
+  {
+    prop: "labels",
+    type: "Partial<CommandMenuLabels>",
+    defaultValue: "русские",
+    required: "Нет",
+    description: "search (плейсхолдер и имя поля поиска), empty, emptyHint.",
+  },
   {
     prop: "open",
     type: "boolean",
@@ -51,11 +62,11 @@ const dialogApiRows: PlaygroundApiPropRow[] = [
     description: "Закрытие по Escape (через Modal).",
   },
   {
-    prop: "closeOnOverlayClick",
+    prop: "closeOnOutsideClick",
     type: "boolean",
     defaultValue: "true",
     required: "Нет",
-    description: "Закрытие по клику на подложку.",
+    description: "Клик по подложке (вне диалога) закрывает палитру.",
   },
   {
     prop: "overlayClassName",
@@ -73,11 +84,11 @@ const dialogApiRows: PlaygroundApiPropRow[] = [
       "Дополнительный класс панели контента (например модификаторы ширины из CSS-модуля).",
   },
   {
-    prop: "contentClassName",
+    prop: "aria-label",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Алиас класса для той же панели; объединяется с className внутри.",
+    description: "Имя диалога, если нет видимого заголовка.",
   },
   {
     prop: "aria-labelledby",
@@ -156,7 +167,7 @@ const inputRowApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Слот слева от поля (иконка поиска).",
+    description: "Слот слева от поля. По умолчанию — иконка поиска; `null` убирает её.",
   },
   {
     prop: "trailing",
@@ -164,13 +175,6 @@ const inputRowApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description: "Слот справа (клавиши, кнопка закрытия).",
-  },
-  {
-    prop: "density",
-    type: '"compact" | "comfortable"',
-    defaultValue: '"compact"',
-    required: "Нет",
-    description: "Высота строки ввода: компактная или с большим вертикальным запасом.",
   },
   {
     prop: "children",
@@ -196,6 +200,20 @@ const inputRowApiRows: PlaygroundApiPropRow[] = [
 ];
 
 const inputApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "onValueChange",
+    type: "(value: string) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Строка запроса при вводе; нативный onChange тоже вызывается.",
+  },
+  {
+    prop: "placeholder / aria-label",
+    type: "string",
+    defaultValue: "labels.search",
+    required: "Нет",
+    description: "По умолчанию — «Поиск» из labels Dialog.",
+  },
   {
     prop: "value",
     type: "string | number | readonly string[]",
@@ -288,7 +306,8 @@ const itemApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Да",
-    description: "Текст для фильтрации; пустая строка — пункт всегда проходит фильтр.",
+    description:
+      "Текст для фильтрации вместе с keywords; при пустой строке пункт виден, пока запрос пуст или совпали keywords.",
   },
   {
     prop: "keywords",
@@ -296,13 +315,6 @@ const itemApiRows: PlaygroundApiPropRow[] = [
     defaultValue: '""',
     required: "Нет",
     description: "Дополнительные слова для поиска (латиница/кириллица в одной строке).",
-  },
-  {
-    prop: "size",
-    type: '"s" | "m"',
-    defaultValue: '"s"',
-    required: "Нет",
-    description: "Высота и типографика строки пункта.",
   },
   {
     prop: "onSelect",
@@ -316,7 +328,7 @@ const itemApiRows: PlaygroundApiPropRow[] = [
     type: "boolean",
     defaultValue: "—",
     required: "Нет",
-    description: "Пункт неактивен и исключается из списка кандидатов клавиатуры.",
+    description: "Пункт скрыт из выдачи и не выбирается (не показывается приглушённым).",
   },
   {
     prop: "children",
@@ -450,7 +462,7 @@ const footerApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Класс футера (например footerMuted из CSS-модуля).",
+    description: "Дополнительный класс футера.",
   },
   {
     prop: "…rest",
@@ -463,32 +475,77 @@ const footerApiRows: PlaygroundApiPropRow[] = [
 
 const footerKeyBoxApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "tone",
-    type: '"default" | "muted"',
-    defaultValue: '"default"',
+    prop: "variant",
+    type: '"soft" | "ghost"',
+    defaultValue: '"soft"',
     required: "Нет",
-    description: "Вариант бейджа: контурный или светлый (для приглушённого футера).",
+    description: "`soft` — клавиша на мягкой заливке, `ghost` — только текст.",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Содержимое внутри Badge.Icon (иконка или текст клавиши).",
+    description: "Подпись клавиши или иконка (рендерится в `<kbd>`).",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Класс бейджа-подсказки.",
+    description: "Класс элемента kbd.",
   },
   {
     prop: "…rest",
-    type: 'Omit<React.HTMLAttributes<HTMLDivElement>, "color">',
+    type: 'Omit<React.HTMLAttributes<HTMLElement>, "color">',
     defaultValue: "—",
     required: "Нет",
-    description: "Остальные атрибуты корня Badge (color зарезервирован токенами).",
+    description: "Остальные атрибуты kbd.",
+  },
+];
+
+const footerHintApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "keys",
+    type: "React.ReactNode[]",
+    defaultValue: "—",
+    required: "Да",
+    description: "Клавиши (строки или иконки), каждая рендерится как FooterKeyBox.",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Подпись, например «Навигация».",
+  },
+];
+
+const emptyApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Действие под текстом (например кнопка «Создать»). Текст — labels.empty / labels.emptyHint у Dialog; блок виден, только когда ни один пункт не подошёл.",
+  },
+];
+
+const itemPartsApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "ItemText · description",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Вторая строка пункта (путь, пояснение): caption, приглушённый цвет.",
+  },
+  {
+    prop: "ItemShortcut · children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Сочетание клавиш у правого края пункта; только подсказка.",
   },
 ];
 
@@ -510,28 +567,62 @@ export default function CommandMenuSection() {
       <PageContent.Body>
         <div className="demoExamples">
           <div className="demoBlock">
-            <DemoSectionTitle>Варианты</DemoSectionTitle>
+            <DemoSectionTitle>Палитра приложения</DemoSectionTitle>
             <DemoDescription>
-              <code>InputRow density</code> (<code>compact</code> / <code>comfortable</code>) и
-              размер строк списка <code>Item size</code> (<code>s</code> / <code>m</code>).
+              Открытие по ⌘K / Ctrl+K, группы, фильтр по <code>value</code> и <code>keywords</code>,
+              вторая строка через <code>ItemText</code>, сочетания клавиш в{" "}
+              <code>ItemShortcut</code>, легенда клавиш в <code>FooterHint</code>. Наберите «xyz» —
+              появится <code>CommandMenu.Empty</code>: «Ничего не найдено» с подсказкой.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <CommandMenuVariantsSnippet />
+                <CommandMenuKeyboardSearchExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Неактивный пункт (<code>disabled</code> — не попадает в навигацию), пункт с пустым{" "}
-              <code>value</code> (всегда остаётся в выдаче), подсказка про пустой список после
-              фильтра.
+              <code>size</code> у <code>CommandMenu.Dialog</code> — та же ось xs–xl, что у
+              контролов: высота пунктов, кегль и иконки; на <code>l</code> и <code>xl</code> строка
+              поиска выше. По умолчанию — <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <CommandMenuStatesSnippet />
+                <CommandMenuSizesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>
+              Длинный список, недоступные пункты, пустое состояние
+            </DemoSectionTitle>
+            <DemoDescription>
+              Строка поиска закреплена, список прокручивается под ней. <code>disabled</code>{" "}
+              скрывает пункт из выдачи. Текст пустого состояния и подсказку можно заменить.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <CommandMenuStatesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              <code>DialogTitle</code> и <code>DialogDescription</code>, слот <code>trailing</code>{" "}
+              с <code>Kbd</code> и кнопкой закрытия, область поиска из тегов (
+              <code>TagSection</code>), футер с подсказками.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={compositionSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <CommandMenuCompositionExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -540,64 +631,14 @@ export default function CommandMenuSection() {
             <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
             <DemoDescription>
               <code>Dialog open</code> / <code>onOpenChange</code> и контролируемое поле{" "}
-              <code>Input value</code> с синхронизацией строки поиска снаружи.
+              <code>Input value</code> / <code>onChange</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root
+              code={controlledSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <CommandMenuControlledSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
-            <DemoDescription>
-              Заголовок над панелью, слоты <code>InputRow</code> (иконка, <code>Kbd</code>, кнопка
-              закрытия), секция <code>TagSection</code> с тегами, группы с <code>ItemIcon</code>,
-              текстовый <code>Footer</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <CommandMenuCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
-            <DemoDescription>
-              Узел панели расширяется классом из CSS-модуля (<code>dialogContentWide</code>) через{" "}
-              <code>className</code> на <code>Dialog</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <CommandMenuFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Полиморфная разметка</DemoSectionTitle>
-            <DemoDescription>
-              <code>CommandMenu.ItemIcon</code> с пропом <code>as</code>: SVG-компонент или нативный{" "}
-              <code>span</code> с текстовой меткой.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={itemIconAsSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <CommandMenuItemIconAsSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              Глобальное сочетание ⌘K / Ctrl+K, фильтрация по <code>keywords</code>, подсказки в{" "}
-              <code>FooterKeyBox</code> (навигация, выбор, закрытие).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <CommandMenuFeaturesSnippet />
+                <CommandMenuControlledExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -611,15 +652,13 @@ export default function CommandMenuSection() {
             <PlaygroundApiTable rows={dialogApiRows} />
             <DemoApiTitle>CommandMenu.DialogTitle</DemoApiTitle>
             <DemoDescription>
-              Заголовок диалога (разметка и стили как у <code>h2</code> в шапке{" "}
-              <code>Modal.Panel</code>).
+              Заголовок диалога (разметка и стили как у <code>Modal.Title</code>).
             </DemoDescription>
             <PlaygroundApiTable rows={dialogTitleApiRows} />
             <DemoApiTitle>CommandMenu.DialogDescription</DemoApiTitle>
             <DemoDescription>
-              Описание для вспомогательных технологий (стили как у текста описания в шапке{" "}
-              <code>Modal.Panel</code>
-              ).
+              Видимое описание (стили как у <code>Modal.Description</code>); с диалогом связывается
+              вручную через <code>aria-describedby</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={dialogDescriptionApiRows} />
             <DemoApiTitle>CommandMenu.InputRow</DemoApiTitle>
@@ -660,9 +699,18 @@ export default function CommandMenuSection() {
             <PlaygroundApiTable rows={footerApiRows} />
             <DemoApiTitle>CommandMenu.FooterKeyBox</DemoApiTitle>
             <DemoDescription>
-              Компактный бейдж для обозначения клавиш (обёртка над <code>Badge</code>).
+              Клавиша в мягкой плашке (<code>kbd</code>).
             </DemoDescription>
             <PlaygroundApiTable rows={footerKeyBoxApiRows} />
+            <DemoApiTitle>CommandMenu.FooterHint</DemoApiTitle>
+            <DemoDescription>Группа клавиш с подписью.</DemoDescription>
+            <PlaygroundApiTable rows={footerHintApiRows} />
+            <DemoApiTitle>CommandMenu.Empty</DemoApiTitle>
+            <DemoDescription>Пустое состояние списка (role=&quot;status&quot;).</DemoDescription>
+            <PlaygroundApiTable rows={emptyApiRows} />
+            <DemoApiTitle>CommandMenu.ItemText / ItemShortcut</DemoApiTitle>
+            <DemoDescription>Части строки пункта.</DemoDescription>
+            <PlaygroundApiTable rows={itemPartsApiRows} />
           </div>
         </div>
       </PageContent.Body>

@@ -1,7 +1,11 @@
 import * as React from "react";
 
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
-import { computeFloatingPosition } from "@/hooks/usePosition";
+import {
+  computeFloatingPosition,
+  FLOAT_MAX_WIDTH_VAR,
+  FLOAT_MIN_WIDTH_VAR,
+} from "@/hooks/usePosition";
 import { getScrollContainers } from "@/internal/scrollAncestors";
 
 import {
@@ -31,6 +35,10 @@ function layoutEqual(a: PopoverLayout, b: PopoverLayout): boolean {
     a.style.left === b.style.left &&
     a.style.maxHeight === b.style.maxHeight &&
     a.style.minWidth === b.style.minWidth &&
+    (a.style as Record<string, unknown>)[FLOAT_MAX_WIDTH_VAR] ===
+      (b.style as Record<string, unknown>)[FLOAT_MAX_WIDTH_VAR] &&
+    (a.style as Record<string, unknown>)[FLOAT_MIN_WIDTH_VAR] ===
+      (b.style as Record<string, unknown>)[FLOAT_MIN_WIDTH_VAR] &&
     a.style.width === b.style.width &&
     a.style.boxSizing === b.style.boxSizing
   );
@@ -71,7 +79,7 @@ export function usePopoverPosition({
       sameMinWidthAsTrigger && anchorW > 0
         ? { width: anchorW, minWidth: anchorW, boxSizing: "border-box" as const }
         : pos.minWidth !== undefined
-          ? { minWidth: pos.minWidth }
+          ? { [FLOAT_MIN_WIDTH_VAR]: `${pos.minWidth}px` }
           : {};
 
     const next: PopoverLayout = {
@@ -87,8 +95,9 @@ export function usePopoverPosition({
           panelOffset,
           viewportPad,
         ),
+        [FLOAT_MAX_WIDTH_VAR]: `${pos.maxWidth}px`,
         ...matchTriggerBox,
-      },
+      } as unknown as React.CSSProperties,
     };
 
     setLayout((prev) => (prev && layoutEqual(prev, next) ? prev : next));

@@ -1,95 +1,75 @@
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
-}
+/* Layout for the Typography examples: semantic tokens only. */
 
-.stackTight {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-s);
-}
-
-.formFields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-l);
-}
-
-.hero {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-l);
-  max-width: 40rem;
-}
-
+/* Full-width column of samples (stretches inside a centered host). */
 .scaleList {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
+  gap: var(--prime-space-4);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-/* Layout parity with playground/snippets/typography (PlaygroundExampleFrame preview). */
-.typographyScaleList {
+.scaleRow {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-x4);
+  gap: var(--prime-space-2);
 }
 
-.typographyScaleRow {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x2);
-}
-
-.articleLandmarks {
+.article {
   display: grid;
-  gap: var(--prime-sys-spacing-x4);
-  max-width: 40rem;
+  gap: var(--prime-space-4);
+  max-width: var(--prime-layout-reading-max-width);
   text-align: start;
 }
 
-.articleLandmarks blockquote {
+.article blockquote {
   margin: 0;
-  padding-inline-start: var(--prime-sys-spacing-x3);
-  border-inline-start: 3px solid var(--prime-sys-color-border-subtle);
+  padding-inline-start: var(--prime-space-3);
+  border-inline-start: var(--prime-space-1) solid var(--prime-color-fill-strong);
 }
 
-.readingAndForm {
+.page {
   display: grid;
-  gap: var(--prime-sys-spacing-x3);
-  max-width: 22rem;
+  gap: var(--prime-space-3);
+  max-width: var(--prime-modal-width-s);
   text-align: start;
 }
 
-.readingAndFormFields {
+.form {
   display: grid;
-  gap: var(--prime-sys-spacing-x3);
+  gap: var(--prime-space-5);
 }
 
-.readingAndFormActions {
+.actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-space-2);
 }
 
-.fullWidthColumns {
+.columns {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-l);
+  gap: var(--prime-space-4);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.fullWidthNarrow {
-  flex: 1 1 12.5rem;
+/* 200px basis, 280px cap. */
+.narrowColumn {
+  flex: 1 1 calc(var(--prime-space-10) * 5);
   min-width: 0;
-  max-width: 17.5rem;
+  max-width: calc(var(--prime-space-10) * 7);
 }
 
-.fullWidthWide {
-  flex: 2 1 20rem;
+/* 320px basis. */
+.wideColumn {
+  flex: 2 1 calc(var(--prime-space-10) * 8);
   min-width: 0;
 }
 
-.inlineLinkInherit {
-  color: inherit;
+/* 240px — narrow enough to show the ellipsis. */
+.truncateBox {
+  width: min(100%, calc(var(--prime-space-24) * 2.5));
 }

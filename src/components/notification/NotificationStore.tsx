@@ -1,15 +1,18 @@
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import * as React from "react";
 
+import { exitTimeoutMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { remToPx } from "@/internal/layoutPxFromPrimitives";
 import { Portal } from "@/internal/Portal";
 import { primitiveTokens } from "../../../tokens/primitives";
 
 import {
+  DEFAULT_NOTIFICATION_LABELS,
   NotificationCard,
+  type NotificationLabels,
+  NotificationLabelsContext,
   type NotificationOptions,
   type NotificationPosition,
   type NotificationRecord,
-  type NotificationType,
 } from "./Notification";
 import styles from "./Notification.module.css";
 
@@ -17,8 +20,15 @@ import styles from "./Notification.module.css";
 
 export type NotificationProviderProps = {
   children: React.ReactNode;
+  /** Default position for `notify()` calls without one. Default `top-right`. */
   position?: NotificationPosition;
+  /** Max visible toasts per stack (position × tone). Default 5. */
   max?: number;
+  /** Built-in strings (close button, region names); `regions` merges per position. */
+  labels?: {
+    close?: string;
+    regions?: Partial<NotificationLabels["regions"]>;
+  };
 };
 
 type StoreValue = {
@@ -34,28 +44,23 @@ type NotificationEntry = NotificationRecord & { dismissing?: true };
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const DEFAULT_DURATION = 5000;
+/** Cards visible in a collapsed stack; older ones are hidden and click-through. */
 const PEEK_VISIBLE = 3;
-const PEEK_PX = 8;
+/** Collapsed stack: scale step per depth and its floor. */
+const SCALE_STEP = 0.04;
+const MIN_SCALE = 0.88;
+/** Collapsed stack: opacity of the front card and the two peeking behind it. */
+const PEEK_OPACITY = [1, 0.72, 0.48] as const;
+/** Hover intent: the stack collapses this long after the pointer leaves it. */
+const COLLAPSE_DELAY_MS = 100;
+/** z-index of the front card inside its stack; older cards sit below it. */
+const Z_FRONT = 100;
 
-// Значения из design-token: primitiveTokens.motion.*
-// Framer-motion принимает duration в секундах и ease как массив чисел
-function _msToS(ms: string): number {
-  return Number.parseFloat(ms) / 1000;
+/** Vertical offset of each peeking card in a collapsed stack and the gap of an expanded one: `space.2`. */
+function space2Px(): number {
+  return remToPx(primitiveTokens.space[2]);
 }
-function _parseBezier(s: string): [number, number, number, number] {
-  const m = s.match(/cubic-bezier\(([^)]+)\)/);
-  const p = m ? m[1].split(",").map(Number.parseFloat) : [0.2, 0, 0, 1];
-  return [p[0], p[1], p[2], p[3]] as [number, number, number, number];
-}
 
-const EASE = _parseBezier(primitiveTokens.motion.easing.standard);
-const DUR_SLOW = _msToS(primitiveTokens.motion.duration.slow); // 500ms → 0.5s
-const DUR_MEDIUM = _msToS(primitiveTokens.motion.duration.medium); // 350ms → 0.35s
-const DUR_FAST = _msToS(primitiveTokens.motion.duration.fast); // 200ms → 0.2s
-const TWEEN_SLOW = { type: "tween", duration: DUR_SLOW, ease: EASE } as const;
-
-// DISMISS_CLEANUP_MS: чуть больше exit-анимации (medium = 350ms)
-const DISMISS_CLEANUP_MS = Math.round(DUR_MEDIUM * 1000) + 100;
 const POSITIONS: readonly NotificationPosition[] = [
   "top-left",
   "top-center",
@@ -64,7 +69,7 @@ const POSITIONS: readonly NotificationPosition[] = [
   "bottom-center",
   "bottom-right",
 ];
-const TYPES: readonly NotificationType[] = ["success", "error", "warning", "info"];
+const TONES: readonly NotificationRecord["tone"][] = ["success", "danger", "warning", "info"];
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -81,19 +86,39 @@ function isTop(position: NotificationPosition): boolean {
 }
 
 // ─── NotificationStack ────────────────────────────────────────────────────────
+// Motion without a layout library: every card is absolutely positioned at the stack's anchor edge
+// (top or bottom); its offset, scale and opacity are computed here from measured heights and set
+// as CSS custom properties, which CSS transitions with the motion tokens. Enter / exit are CSS
+// keyframes on an inner wrapper so they never fight the positioning transform.
+
+type ItemLayout = {
+  index: number;
+  y: number;
+  scale: number;
+  opacity: number;
+  hidden: boolean;
+};
+
+const RESTING_LAYOUT: ItemLayout = { index: 0, y: 0, scale: 1, opacity: 1, hidden: false };
 
 function NotificationStack({
   position,
   items,
   onDismiss,
+  onExited,
 }: {
   position: NotificationPosition;
   items: NotificationEntry[];
   onDismiss: (id: string) => void;
+  onExited: (id: string) => void;
 }) {
+  const labels = React.useContext(NotificationLabelsContext);
   const [expanded, setExpanded] = React.useState(false);
+  const [heights, setHeights] = React.useState<Record<string, number>>({});
   const collapseTimerRef = React.useRef<number | null>(null);
+  const lastLayoutRef = React.useRef(new Map<string, ItemLayout>());
   const top = isTop(position);
+  const step = React.useMemo(space2Px, []);
 
   const handleHover = React.useCallback((hovered: boolean) => {
     if (collapseTimerRef.current !== null) {
@@ -103,7 +128,7 @@ function NotificationStack({
     if (hovered) {
       setExpanded(true);
     } else {
-      collapseTimerRef.current = window.setTimeout(() => setExpanded(false), 100);
+      collapseTimerRef.current = window.setTimeout(() => setExpanded(false), COLLAPSE_DELAY_MS);
     }
   }, []);
 
@@ -114,138 +139,193 @@ function NotificationStack({
     [],
   );
 
-  // Только активные (не dismissing) элементы участвуют в визуальном расчёте
-  const visible = items.filter((n) => !n.dismissing);
+  const reportHeight = React.useCallback((id: string, height: number) => {
+    setHeights((prev) => (prev[id] === height ? prev : { ...prev, [id]: height }));
+  }, []);
+
+  // Forget heights of unmounted cards.
+  React.useEffect(() => {
+    setHeights((prev) => {
+      const ids = new Set(items.map((n) => n.id));
+      const stale = Object.keys(prev).filter((id) => !ids.has(id));
+      if (stale.length === 0) return prev;
+      const next = { ...prev };
+      for (const id of stale) delete next[id];
+      return next;
+    });
+  }, [items]);
+
+  // Only active cards take part in the layout; a dismissed card keeps its last place while it fades.
+  const active = items.filter((n) => !n.dismissing);
+  const sign = top ? 1 : -1;
+  const layouts = new Map<string, ItemLayout>();
+  let flowHeight = 0;
+  active.forEach((item, index) => {
+    const hidden = !expanded && index >= PEEK_VISIBLE;
+    layouts.set(item.id, {
+      index,
+      y: sign * (expanded ? flowHeight : index * step),
+      scale: expanded ? 1 : Math.max(1 - index * SCALE_STEP, MIN_SCALE),
+      opacity: hidden ? 0 : expanded ? 1 : PEEK_OPACITY[index],
+      hidden,
+    });
+    flowHeight += (heights[item.id] ?? 0) + step;
+  });
+
+  const frontHeight = active.length > 0 ? (heights[active[0].id] ?? 0) : 0;
+  const stackHeight =
+    active.length === 0
+      ? 0
+      : expanded
+        ? flowHeight - step
+        : frontHeight + Math.min(active.length - 1, PEEK_VISIBLE - 1) * step;
+
+  React.useLayoutEffect(() => {
+    for (const [id, layout] of layouts) lastLayoutRef.current.set(id, layout);
+    const ids = new Set(items.map((n) => n.id));
+    for (const id of lastLayoutRef.current.keys()) {
+      if (!ids.has(id)) lastLayoutRef.current.delete(id);
+    }
+  });
 
   return (
-    <motion.ol
-      layout
+    <ol
       className={styles.stack}
-      aria-label={`Notifications at ${position}`}
+      aria-label={labels.regions[position]}
       data-expanded={String(expanded)}
-      data-stacked={visible.length > 1 ? "true" : undefined}
-      transition={{ layout: TWEEN_SLOW }}
+      style={{ "--ntf-stack-height": `${stackHeight}px` } as React.CSSProperties}
       onMouseEnter={() => handleHover(true)}
       onMouseLeave={() => handleHover(false)}
     >
-      <AnimatePresence>
-        {visible.map((item, index) => (
+      {items.map((item) => {
+        const closing = item.dismissing === true;
+        const layout = layouts.get(item.id) ?? lastLayoutRef.current.get(item.id) ?? RESTING_LAYOUT;
+        return (
           <NotificationStackItem
             key={item.id}
             item={item}
-            index={index}
+            index={layout.index}
+            y={layout.y}
+            scale={layout.scale}
+            opacity={layout.opacity}
+            hidden={layout.hidden}
+            closing={closing}
             expanded={expanded}
-            paused={expanded}
-            top={top}
-            hidden={!expanded && index >= PEEK_VISIBLE}
             onDismiss={onDismiss}
+            onExited={onExited}
+            onHeight={reportHeight}
           />
-        ))}
-      </AnimatePresence>
-    </motion.ol>
+        );
+      })}
+    </ol>
   );
 }
 
-// React.memo: не перерендериваем, пока props не изменились.
-// Это критично — без мемо каждый setProgress в NotificationCard (60fps) поднимался бы
-// до motion.li layout и засыпал LayoutGroup уведомлениями.
+// React.memo: the card's 60fps countdown re-renders stay inside NotificationCard; the item only
+// re-renders when its place in the stack changes.
 const NotificationStackItem = React.memo(function NotificationStackItem({
   item,
   index,
-  expanded,
-  paused,
-  top,
+  y,
+  scale,
+  opacity,
   hidden,
+  closing,
+  expanded,
   onDismiss,
+  onExited,
+  onHeight,
 }: {
   item: NotificationRecord;
   index: number;
-  expanded: boolean;
-  paused: boolean;
-  top: boolean;
+  y: number;
+  scale: number;
+  opacity: number;
   hidden: boolean;
+  closing: boolean;
+  expanded: boolean;
   onDismiss: (id: string) => void;
+  onExited: (id: string) => void;
+  onHeight: (id: string, height: number) => void;
 }) {
-  const scale = expanded ? 1 : Math.max(1 - index * 0.04, 0.88);
-  const opacity = expanded ? 1 : index === 0 ? 1 : index === 1 ? 0.7 : 0.45;
-  const y = expanded ? 0 : (top ? 1 : -1) * index * PEEK_PX;
+  const ref = React.useRef<HTMLLIElement>(null);
+  const { id } = item;
 
-  const rotateEnter = top ? -45 : 45;
-  const rotateExit = top ? 25 : -25;
+  // Measure before paint so offsets are right on the first frame; follow later size changes.
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    onHeight(id, el.offsetHeight);
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => onHeight(id, el.offsetHeight));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [id, onHeight]);
 
-  // layoutDependency: layout измеряется только при реальных изменениях позиции/состояния,
-  // а не на каждом ре-рендере от внешних причин.
-  const layoutDep = `${item.id}-${index}-${String(expanded)}-${String(hidden)}`;
+  const state = closing ? "closed" : "open";
 
   return (
-    <motion.li
+    <li
+      ref={ref}
       className={styles.item}
       data-stack-index={index}
-      layout
-      layoutDependency={layoutDep}
-      initial={{ opacity: 0, y: top ? -16 : 16, rotateX: rotateEnter, transformPerspective: 700 }}
-      animate={{
-        opacity: hidden ? 0 : opacity,
-        y,
-        scale,
-        rotateX: 0,
-        transformPerspective: 700,
-        zIndex: 100 - index,
-      }}
-      exit={{
-        opacity: 0,
-        rotateX: rotateExit,
-        transformPerspective: 700,
-        transition: {
-          opacity: { type: "tween", duration: DUR_MEDIUM, ease: EASE },
-          rotateX: { type: "tween", duration: DUR_MEDIUM, ease: EASE },
-        },
-      }}
-      transition={{
-        opacity: { type: "tween", duration: DUR_FAST, ease: EASE },
-        y: TWEEN_SLOW,
-        scale: TWEEN_SLOW,
-        rotateX: TWEEN_SLOW,
-        layout: TWEEN_SLOW,
-      }}
-      style={{
-        transformOrigin: top ? "top center" : "bottom center",
-        pointerEvents: hidden ? "none" : "auto",
-      }}
+      data-hidden={hidden ? "true" : undefined}
+      data-state={state}
+      style={
+        {
+          "--ntf-y": `${y}px`,
+          "--ntf-scale": scale,
+          "--ntf-opacity": opacity,
+          zIndex: Z_FRONT - index,
+        } as React.CSSProperties
+      }
     >
-      <NotificationCard
-        item={item}
-        paused={paused}
-        onDismiss={onDismiss}
-        stackDepth={index}
-        stackExpanded={expanded}
-      />
-    </motion.li>
+      <div
+        className={styles.motion}
+        data-state={state}
+        onAnimationEnd={(event) => {
+          if (closing && event.target === event.currentTarget) onExited(id);
+        }}
+      >
+        <NotificationCard
+          item={item}
+          paused={expanded || closing}
+          onDismiss={onDismiss}
+          stackDepth={index}
+          stackExpanded={expanded}
+        />
+      </div>
+    </li>
   );
 });
 
 // ─── NotificationToaster ──────────────────────────────────────────────────────
 // Получает entries напрямую от провайдера — включая dismissing-элементы,
-// чтобы стек оставался смонтированным во время exit-анимации.
+// чтобы карточка оставалась смонтированной во время exit-анимации.
 
 function NotificationToaster({
   entries,
   onDismiss,
+  onExited,
 }: {
   entries: NotificationEntry[];
   onDismiss: (id: string) => void;
+  onExited: (id: string) => void;
 }) {
   const grouped = React.useMemo(() => {
-    const map = new Map<NotificationPosition, Map<NotificationType, NotificationEntry[]>>();
+    const map = new Map<
+      NotificationPosition,
+      Map<NotificationRecord["tone"], NotificationEntry[]>
+    >();
     for (const entry of entries) {
       if (!map.has(entry.position)) map.set(entry.position, new Map());
-      const byType = map.get(entry.position);
-      if (!byType) continue;
-      if (!byType.has(entry.type)) byType.set(entry.type, []);
-      byType.get(entry.type)?.push(entry);
+      const byTone = map.get(entry.position);
+      if (!byTone) continue;
+      if (!byTone.has(entry.tone)) byTone.set(entry.tone, []);
+      byTone.get(entry.tone)?.push(entry);
     }
-    for (const byType of map.values()) {
-      for (const list of byType.values()) {
+    for (const byTone of map.values()) {
+      for (const list of byTone.values()) {
         list.sort((a, b) => b.createdAt - a.createdAt);
       }
     }
@@ -256,15 +336,15 @@ function NotificationToaster({
     <Portal>
       <div className={styles.viewport}>
         {POSITIONS.map((pos) => {
-          const byType = grouped.get(pos);
-          if (!byType?.size) return null;
+          const byTone = grouped.get(pos);
+          if (!byTone?.size) return null;
 
           const [vertical, horizontal] = pos.split("-") as [
             "top" | "bottom",
             "left" | "center" | "right",
           ];
 
-          const stacks = TYPES.map((type) => ({ type, items: byType.get(type) ?? [] })).filter(
+          const stacks = TONES.map((tone) => ({ tone, items: byTone.get(tone) ?? [] })).filter(
             (s) => s.items.length > 0,
           );
 
@@ -273,16 +353,15 @@ function NotificationToaster({
               key={pos}
               className={`${styles.zone} ${styles[vertical]} ${styles[horizontal]}`}
             >
-              <LayoutGroup id={`zone-${pos}`}>
-                {stacks.map((s) => (
-                  <NotificationStack
-                    key={s.type}
-                    position={pos}
-                    items={s.items}
-                    onDismiss={onDismiss}
-                  />
-                ))}
-              </LayoutGroup>
+              {stacks.map((s) => (
+                <NotificationStack
+                  key={s.tone}
+                  position={pos}
+                  items={s.items}
+                  onDismiss={onDismiss}
+                  onExited={onExited}
+                />
+              ))}
             </section>
           );
         })}
@@ -297,22 +376,74 @@ export function NotificationProvider({
   children,
   position = "top-right",
   max = 5,
+  labels: labelsProp,
 }: NotificationProviderProps) {
+  const labels = React.useMemo<NotificationLabels>(
+    () => ({
+      close: labelsProp?.close ?? DEFAULT_NOTIFICATION_LABELS.close,
+      regions: { ...DEFAULT_NOTIFICATION_LABELS.regions, ...labelsProp?.regions },
+    }),
+    [labelsProp?.close, labelsProp?.regions],
+  );
   const [entries, setEntries] = React.useState<NotificationEntry[]>([]);
 
-  const dismiss = React.useCallback((id: string) => {
-    // Фаза 1: помечаем как dismissing → AnimatePresence запускает exit-анимацию
-    setEntries((prev) => prev.map((n) => (n.id === id ? { ...n, dismissing: true } : n)));
-    // Фаза 2: удаляем из стейта после завершения анимации
-    window.setTimeout(() => {
-      setEntries((prev) => prev.filter((n) => n.id !== id));
-    }, DISMISS_CLEANUP_MS);
+  const entriesRef = React.useRef(entries);
+  entriesRef.current = entries;
+  const exitTimersRef = React.useRef(new Map<string, number>());
+
+  React.useEffect(() => {
+    const timers = exitTimersRef.current;
+    return () => {
+      for (const timer of timers.values()) clearTimeout(timer);
+      timers.clear();
+    };
   }, []);
 
-  const dismissAll = React.useCallback(() => {
-    setEntries((prev) => prev.map((n) => ({ ...n, dismissing: true as const })));
-    window.setTimeout(() => setEntries([]), DISMISS_CLEANUP_MS);
+  // Phase 2: drop the entry once its exit animation ended (or the token-based timeout fired).
+  const remove = React.useCallback((id: string) => {
+    const timer = exitTimersRef.current.get(id);
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      exitTimersRef.current.delete(id);
+    }
+    setEntries((prev) => prev.filter((n) => n.id !== id));
   }, []);
+
+  // Phase 1: mark as dismissing so the card plays its exit; under reduced motion remove at once.
+  const startExit = React.useCallback(
+    (ids: string[]) => {
+      if (ids.length === 0) return;
+      const target = new Set(ids);
+      if (prefersReducedMotion()) {
+        for (const id of ids) {
+          const timer = exitTimersRef.current.get(id);
+          if (timer !== undefined) clearTimeout(timer);
+          exitTimersRef.current.delete(id);
+        }
+        setEntries((prev) => prev.filter((n) => !target.has(n.id)));
+        return;
+      }
+      setEntries((prev) =>
+        prev.map((n) => (target.has(n.id) && !n.dismissing ? { ...n, dismissing: true } : n)),
+      );
+      const timeout = exitTimeoutMs("base");
+      for (const id of ids) {
+        if (exitTimersRef.current.has(id)) continue;
+        exitTimersRef.current.set(
+          id,
+          window.setTimeout(() => remove(id), timeout),
+        );
+      }
+    },
+    [remove],
+  );
+
+  const dismiss = React.useCallback((id: string) => startExit([id]), [startExit]);
+
+  const dismissAll = React.useCallback(
+    () => startExit(entriesRef.current.filter((n) => !n.dismissing).map((n) => n.id)),
+    [startExit],
+  );
 
   const notify = React.useCallback(
     (options: NotificationOptions): string => {
@@ -320,6 +451,7 @@ export function NotificationProvider({
       const record: NotificationEntry = {
         ...options,
         id,
+        tone: options.tone ?? "info",
         size: options.size ?? "m",
         position: options.position ?? position,
         duration: options.duration ?? DEFAULT_DURATION,
@@ -330,12 +462,13 @@ export function NotificationProvider({
 
       setEntries((prev) => {
         const sameStack = prev.filter(
-          (n) => n.position === record.position && n.type === record.type && !n.dismissing,
+          (n) => n.position === record.position && n.tone === record.tone && !n.dismissing,
         );
-        const otherStacks = prev.filter(
-          (n) => n.position !== record.position || n.type !== record.type,
+        // Other stacks and cards still playing their exit stay as they are.
+        const rest = prev.filter(
+          (n) => n.position !== record.position || n.tone !== record.tone || n.dismissing,
         );
-        return [...otherStacks, ...[record, ...sameStack].slice(0, max)];
+        return [...rest, ...[record, ...sameStack].slice(0, max)];
       });
 
       return id;
@@ -353,20 +486,17 @@ export function NotificationProvider({
 
   return (
     <StoreContext.Provider value={value}>
-      {children}
-      <NotificationToaster entries={entries} onDismiss={dismiss} />
+      <NotificationLabelsContext.Provider value={labels}>
+        {children}
+        <NotificationToaster entries={entries} onDismiss={dismiss} onExited={remove} />
+      </NotificationLabelsContext.Provider>
     </StoreContext.Provider>
   );
 }
 
-export function useNotifications(): Pick<StoreValue, "notify" | "dismiss" | "dismissAll"> {
+/** `notify`, `dismiss`, `dismissAll` and the live `items` list of the nearest `NotificationProvider`. */
+export function useNotifications(): StoreValue {
   const ctx = React.useContext(StoreContext);
   if (!ctx) throw new Error("useNotifications must be used within NotificationProvider");
-  return { notify: ctx.notify, dismiss: ctx.dismiss, dismissAll: ctx.dismissAll };
-}
-
-export function useNotificationStore(): StoreValue {
-  const ctx = React.useContext(StoreContext);
-  if (!ctx) throw new Error("useNotificationStore must be used within NotificationProvider");
   return ctx;
 }

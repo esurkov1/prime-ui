@@ -1,99 +1,110 @@
-/* Высота трека — как у ProgressBar (Slider control-height). */
+/* SegmentedProgressBar — Graphite: `fill-strong` track, proportional segments in accent / status fills. */
+
 .root {
+  --seg-track-h: var(--prime-space-1);
+  --seg-label-size: var(--prime-control-m-label-size);
+  --seg-label-line-height: var(--prime-control-m-label-line-height);
+
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--seg-progress-root-gap);
+  gap: var(--prime-space-2);
   width: 100%;
+  min-width: 0;
+  font-family: var(--prime-font-family-sans);
+}
+
+.root[data-size="xs"] {
+  --seg-label-size: var(--prime-control-xs-label-size);
+  --seg-label-line-height: var(--prime-control-xs-label-line-height);
+  gap: var(--prime-space-1);
 }
 
 .root[data-size="s"] {
-  --seg-progress-root-gap: var(--prime-sys-size-control-s-gap);
-  --seg-progress-track-h: var(--prime-sys-spacing-xs);
-  --seg-progress-label-size: var(--prime-sys-size-control-s-text);
-}
-
-.root[data-size="m"] {
-  --seg-progress-root-gap: var(--prime-sys-size-control-m-gap);
-  --seg-progress-track-h: var(--prime-sys-spacing-xs);
-  --seg-progress-label-size: var(--prime-sys-size-control-m-text);
+  --seg-label-size: var(--prime-control-s-label-size);
+  --seg-label-line-height: var(--prime-control-s-label-line-height);
+  gap: var(--prime-space-1);
 }
 
 .root[data-size="l"] {
-  --seg-progress-root-gap: var(--prime-sys-size-control-l-gap);
-  --seg-progress-track-h: var(--prime-sys-spacing-s);
-  --seg-progress-label-size: var(--prime-sys-size-control-l-text);
+  --seg-track-h: var(--prime-space-2);
+  --seg-label-size: var(--prime-control-l-label-size);
+  --seg-label-line-height: var(--prime-control-l-label-line-height);
 }
 
 .root[data-size="xl"] {
-  --seg-progress-root-gap: var(--prime-sys-size-control-xl-gap);
-  --seg-progress-track-h: var(--prime-sys-spacing-s);
-  --seg-progress-label-size: var(--prime-sys-size-control-xl-text);
+  --seg-track-h: var(--prime-space-2);
+  --seg-label-size: var(--prime-control-xl-label-size);
+  --seg-label-line-height: var(--prime-control-xl-label-line-height);
 }
 
 .label {
-  font-size: var(--seg-progress-label-size);
-  color: var(--prime-sys-color-content-primary);
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-primary);
+  font-size: var(--seg-label-size);
+  line-height: var(--seg-label-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .visuallyHidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
+  margin: calc(-1 * var(--prime-border-width));
   padding: 0;
-  margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
 
 .track {
   display: flex;
-  flex-direction: row;
   width: 100%;
-  min-height: var(--seg-progress-track-h);
-  border-radius: var(--prime-sys-shape-radius-round);
+  min-height: var(--seg-track-h);
   overflow: hidden;
-  background: var(--prime-sys-color-surface-accentSoft);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-strong);
 }
 
+/* `hairline`: segments separated by a clear gap (one grid step) that shows the surface behind the bar. */
 .root[data-segment-gap="hairline"] .track {
-  gap: 1px;
-  background: var(--prime-sys-color-border-subtle);
+  gap: var(--prime-space-1);
+  background: transparent;
 }
 
-.root[data-segment-gap="none"] .track {
-  gap: 0;
-}
-
-/* Скругление только у трека (overflow: hidden) — не у каждого сегмента, иначе «капсулы» и зазоры. */
 .segment {
   box-sizing: border-box;
   min-width: 0;
-  height: var(--seg-progress-track-h);
-  border-radius: 0;
+  height: var(--seg-track-h);
   transition:
-    flex-grow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+    flex-grow var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.segment[data-tone="primary"] {
-  background: var(--prime-sys-color-action-primaryBackground);
+.root[data-segment-gap="hairline"] .segment {
+  border-radius: var(--prime-radius-full);
+}
+
+.segment[data-tone="accent"] {
+  background: var(--prime-color-accent-default);
 }
 
 .segment[data-tone="success"] {
-  background: var(--prime-sys-color-status-success-backgroundEmphasis);
+  background: var(--prime-color-success-default);
 }
 
 .segment[data-tone="warning"] {
-  background: var(--prime-sys-color-status-warning-backgroundEmphasis);
+  background: var(--prime-color-warning-default);
 }
 
 .segment[data-tone="danger"] {
-  background: var(--prime-sys-color-action-errorBackground);
+  background: var(--prime-color-danger-default);
 }
 
 .segment[data-tone="neutral"] {
-  background: var(--prime-sys-color-surface-accentSoft);
+  background: var(--prime-color-fill-strong-hover);
 }

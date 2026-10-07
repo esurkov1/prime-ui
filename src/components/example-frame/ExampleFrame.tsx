@@ -7,6 +7,7 @@ import { SegmentedControl } from "@/components/segmented-control/SegmentedContro
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { suspendTransitions } from "@/theme/applyTheme";
 
 import styles from "./ExampleFrame.module.css";
 
@@ -25,9 +26,37 @@ export type ExampleFramePreviewLayout =
   | "row-start"
   | "row-wrap";
 
+export type ExampleFrameLabels = {
+  preview: string;
+  code: string;
+  desktop: string;
+  tablet: string;
+  mobile: string;
+  copy: string;
+  copied: string;
+  copyError: string;
+  themeDark: string;
+  themeLight: string;
+  codeRegion: string;
+};
+
+const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
+  preview: "Превью",
+  code: "Код",
+  desktop: "Десктоп",
+  tablet: "Планшет",
+  mobile: "Телефон",
+  copy: "Копировать код",
+  copied: "Скопировано",
+  copyError: "Не удалось скопировать",
+  themeDark: "Включить тёмную тему",
+  themeLight: "Включить светлую тему",
+  codeRegion: "Код примера",
+};
+
 type ExampleFrameContextValue = {
   code: string;
-  language: string;
+  labels: ExampleFrameLabels;
   pane: Pane;
   setPane: (p: Pane) => void;
   viewport: ExampleFrameViewport;
@@ -42,17 +71,15 @@ const [ExampleFrameProvider, useExampleFrameContext] =
   createComponentContext<ExampleFrameContextValue>("ExampleFrame");
 
 export type ExampleFrameRootProps = {
-  /** Исходный текст для вкладки «Код» и для копирования (независимо от активной вкладки). */
+  /** Source shown on the code pane (TS/TSX highlighting) and copied by the copy button. */
   code: string;
-  /** Зарезервировано под будущую мультиязычность; сейчас подсветка всегда TS/TSX (`CodeBlock`). */
-  language?: string;
   children?: React.ReactNode;
   className?: string;
   /** Управляемая цветовая схема превью (light/dark). */
   colorScheme?: ColorScheme;
   defaultColorScheme?: ColorScheme;
   onColorSchemeChange?: (scheme: ColorScheme) => void;
-  /** Управляемая ширина превью (desktop / tablet / mobile). */
+  /** Preview width (desktop / tablet / mobile). Default `desktop`. */
   viewport?: ExampleFrameViewport;
   defaultViewport?: ExampleFrameViewport;
   onViewportChange?: (v: ExampleFrameViewport) => void;
@@ -65,30 +92,25 @@ export type ExampleFrameRootProps = {
    * Для списков из нескольких компонентов используйте `stack` / `stack-center` / `row`.
    */
   previewLayout?: ExampleFramePreviewLayout;
-  /**
-   * Синхронизация с глобальным бренд-пресетом (например playground: `data-theme-preset` на `html`).
-   * Если задан только `data-theme` без пресета, на узле действует «голый» dark/light из theme-*.css —
-   * без оверлеев `[data-theme][data-theme-preset]` из playground, цвета превью расходятся с оболочкой.
-   */
-  themePreset?: string;
+  labels?: Partial<ExampleFrameLabels>;
 };
 
 function ExampleFrameRoot({
   code,
-  language = "tsx",
   children,
   className,
   colorScheme: colorSchemeProp,
   defaultColorScheme = "light",
   onColorSchemeChange,
   viewport: viewportProp,
-  defaultViewport = "tablet",
+  defaultViewport = "desktop",
   onViewportChange,
   showThemeToggle = true,
   onCopy,
   previewLayout = "default",
-  themePreset,
+  labels: labelsProp,
 }: ExampleFrameRootProps) {
+  const labels = React.useMemo(() => ({ ...EXAMPLE_FRAME_LABELS, ...labelsProp }), [labelsProp]);
   const [pane, setPane] = React.useState<Pane>("preview");
   const [uncontrolledViewport, setUncontrolledViewport] =
     React.useState<ExampleFrameViewport>(defaultViewport);
@@ -97,6 +119,15 @@ function ExampleFrameRoot({
 
   const isSchemeControlled = colorSchemeProp !== undefined;
   const colorScheme = isSchemeControlled ? colorSchemeProp : uncontrolledScheme;
+
+  // Theme switch inside the frame is instant: no color transition from the old theme.
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const previousScheme = React.useRef(colorScheme);
+  React.useLayoutEffect(() => {
+    if (previousScheme.current === colorScheme) return;
+    previousScheme.current = colorScheme;
+    if (rootRef.current) suspendTransitions(rootRef.current);
+  }, [colorScheme]);
 
   const isViewportControlled = viewportProp !== undefined;
   const viewport = isViewportControlled ? viewportProp : uncontrolledViewport;
@@ -124,7 +155,7 @@ function ExampleFrameRoot({
   const ctxValue = React.useMemo<ExampleFrameContextValue>(
     () => ({
       code,
-      language,
+      labels,
       pane,
       setPane,
       viewport,
@@ -136,7 +167,7 @@ function ExampleFrameRoot({
     }),
     [
       code,
-      language,
+      labels,
       pane,
       viewport,
       setViewport,
@@ -159,7 +190,7 @@ function ExampleFrameRoot({
 
   return (
     <ExampleFrameProvider value={ctxValue}>
-      <div className={cx(styles.root, className)}>
+      <div ref={rootRef} className={cx(styles.root, className)}>
         <ExampleFrameToolbar />
         {pane === "preview" ? (
           <div className={styles.previewShell}>
@@ -168,16 +199,13 @@ function ExampleFrameRoot({
                 className={styles.previewInner}
                 data-preview-layout={previewLayout}
                 data-theme={colorScheme}
-                {...(themePreset != null && themePreset !== ""
-                  ? { "data-theme-preset": themePreset }
-                  : {})}
               >
                 {previewChildren}
               </div>
             </div>
           </div>
         ) : (
-          <ExampleFrameCodePane themePreset={themePreset} />
+          <ExampleFrameCodePane />
         )}
       </div>
     </ExampleFrameProvider>
@@ -206,8 +234,9 @@ function ExampleFrameToolbar() {
     ctx.setColorScheme(ctx.colorScheme === "light" ? "dark" : "light");
   };
 
+  const { labels } = ctx;
   const copyLabel =
-    copyState === "copied" ? "Скопировано" : copyState === "error" ? "Ошибка" : "Копировать код";
+    copyState === "copied" ? labels.copied : copyState === "error" ? labels.copyError : labels.copy;
 
   return (
     <div className={styles.toolbar}>
@@ -222,46 +251,44 @@ function ExampleFrameToolbar() {
             <SegmentedControl.Icon>
               <Eye size={14} strokeWidth={2} aria-hidden />
             </SegmentedControl.Icon>
-            Preview
+            {labels.preview}
           </SegmentedControl.Item>
           <SegmentedControl.Item value="code">
             <SegmentedControl.Icon>
               <Code2 size={14} strokeWidth={2} aria-hidden />
             </SegmentedControl.Icon>
-            Code
+            {labels.code}
           </SegmentedControl.Item>
         </SegmentedControl.Root>
         <div className={styles.toolbarLine1End}>
           {ctx.showThemeToggle ? (
             <Button.Root
+              variant="soft"
+              tone="neutral"
               type="button"
-              variant="neutral"
-              mode="lighter"
               size="s"
               onClick={toggleScheme}
-              aria-label={
-                ctx.colorScheme === "light" ? "Включить тёмную тему" : "Включить светлую тему"
-              }
+              aria-label={ctx.colorScheme === "light" ? labels.themeDark : labels.themeLight}
             >
               <Button.Icon>
                 {ctx.colorScheme === "light" ? (
-                  <Icon name="theme.dark" size="s" tone="subtle" />
+                  <Icon name="theme.dark" size="s" tone="secondary" />
                 ) : (
-                  <Icon name="theme.light" size="s" tone="subtle" />
+                  <Icon name="theme.light" size="s" tone="secondary" />
                 )}
               </Button.Icon>
             </Button.Root>
           ) : null}
           <Button.Root
+            variant="soft"
+            tone="neutral"
             type="button"
-            variant="neutral"
-            mode="lighter"
             size="s"
             onClick={handleCopy}
             aria-label={copyLabel}
           >
             <Button.Icon>
-              <Icon name="action.copy" size="s" tone="subtle" />
+              <Icon name="action.copy" size="s" tone="secondary" />
             </Button.Icon>
           </Button.Root>
         </div>
@@ -277,19 +304,19 @@ function ExampleFrameToolbar() {
             <SegmentedControl.Icon>
               <Monitor size={14} strokeWidth={2} aria-hidden />
             </SegmentedControl.Icon>
-            Desktop
+            <span className={styles.viewportLabel}>{labels.desktop}</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="tablet">
             <SegmentedControl.Icon>
               <Tablet size={14} strokeWidth={2} aria-hidden />
             </SegmentedControl.Icon>
-            Tablet
+            <span className={styles.viewportLabel}>{labels.tablet}</span>
           </SegmentedControl.Item>
           <SegmentedControl.Item value="mobile">
             <SegmentedControl.Icon>
               <Smartphone size={14} strokeWidth={2} aria-hidden />
             </SegmentedControl.Icon>
-            Mobile
+            <span className={styles.viewportLabel}>{labels.mobile}</span>
           </SegmentedControl.Item>
         </SegmentedControl.Root>
       ) : null}
@@ -299,16 +326,21 @@ function ExampleFrameToolbar() {
 
 ExampleFrameToolbar.displayName = "ExampleFrame.Toolbar";
 
-function ExampleFrameCodePane({ themePreset }: { themePreset?: string }) {
+function ExampleFrameCodePane() {
   const ctx = useExampleFrameContext();
   const trimmed = ctx.code.trimEnd();
-  const presetProps =
-    themePreset != null && themePreset !== "" ? { "data-theme-preset": themePreset } : {};
 
   return (
-    <div className={styles.codePane} data-theme={ctx.colorScheme} {...presetProps}>
-      <CodeBlock.Root code={trimmed} colorScheme={ctx.colorScheme} />
-    </div>
+    // Plain CodeBlock is not focusable itself; the scrolling pane takes keyboard focus instead.
+    <section
+      className={styles.codePane}
+      data-theme={ctx.colorScheme}
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region must be keyboard-reachable
+      tabIndex={0}
+      aria-label={ctx.labels.codeRegion}
+    >
+      <CodeBlock.Root variant="ghost" code={trimmed} colorScheme={ctx.colorScheme} />
+    </section>
   );
 }
 

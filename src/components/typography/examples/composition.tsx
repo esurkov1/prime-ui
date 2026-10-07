@@ -1,28 +1,22 @@
-import { Typography } from "prime-ui-kit";
+/** Nested `Typography.Root` spans with other `weight` / `tracking` and a LinkButton inside one paragraph. Use to emphasize values inside running text. */
+import { LinkButton, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-/**
- * Вложенные `Typography.Root` и ссылка внутри блока.
- * Зеркало `playground/snippets/typography/composition.tsx`.
- */
-export default function TypographyExampleComposition() {
+export default function TypographyCompositionExample() {
   return (
-    <div className={styles.typographyScaleList}>
-      <Typography.Root variant="body-default" as="div">
+    <div className={styles.scaleList}>
+      <Typography.Root variant="body-m" as="div">
         Сводка по заказу № 4821: статус{" "}
-        <Typography.Root as="span" variant="body-default" weight="semibold">
+        <Typography.Root as="span" variant="body-m" weight="semibold">
           отправлен
         </Typography.Root>
         . Сумма{" "}
-        <Typography.Root as="span" variant="body-default" weight="medium" tracking="tight">
+        <Typography.Root as="span" variant="body-m" weight="medium" tracking="tight">
           12 400 ₽
         </Typography.Root>
-        , доставка до{" "}
-        <a href="#typography-example-composition" className={styles.inlineLinkInherit}>
-          уточнить адрес
-        </a>
-        . Подробности — в разделе «История покупок».
+        , доставка до <LinkButton.Root href="#address">уточнить адрес</LinkButton.Root>. Подробности
+        — в разделе «История покупок».
       </Typography.Root>
     </div>
   );

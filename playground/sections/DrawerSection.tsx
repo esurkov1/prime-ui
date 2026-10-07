@@ -1,3 +1,15 @@
+import DrawerCompositionExample from "@/components/drawer/examples/composition";
+import compositionSource from "@/components/drawer/examples/composition.tsx?raw";
+import DrawerControlledExample from "@/components/drawer/examples/controlled";
+import controlledSource from "@/components/drawer/examples/controlled.tsx?raw";
+import DrawerFeaturesExample from "@/components/drawer/examples/features";
+import featuresSource from "@/components/drawer/examples/features.tsx?raw";
+import DrawerSizesExample from "@/components/drawer/examples/sizes";
+import sizesSource from "@/components/drawer/examples/sizes.tsx?raw";
+import DrawerStatesExample from "@/components/drawer/examples/states";
+import statesSource from "@/components/drawer/examples/states.tsx?raw";
+import DrawerVariantsSidesExample from "@/components/drawer/examples/variants-sides";
+import variantsSidesSource from "@/components/drawer/examples/variants-sides.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,82 +18,33 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import DrawerCompositionSnippet from "../snippets/drawer/composition";
-import compositionSource from "../snippets/drawer/composition.tsx?raw";
-import DrawerControlledSnippet from "../snippets/drawer/controlled";
-import controlledSource from "../snippets/drawer/controlled.tsx?raw";
-import DrawerFeaturesSnippet from "../snippets/drawer/features";
-import featuresSource from "../snippets/drawer/features.tsx?raw";
-import DrawerFullWidthSnippet from "../snippets/drawer/full-width";
-import fullWidthSource from "../snippets/drawer/full-width.tsx?raw";
-import DrawerResponsiveSnippet from "../snippets/drawer/responsive";
-import responsiveSource from "../snippets/drawer/responsive.tsx?raw";
-import DrawerSizesSnippet from "../snippets/drawer/sizes";
-import sizesSource from "../snippets/drawer/sizes.tsx?raw";
-import DrawerStatesSnippet from "../snippets/drawer/states";
-import statesSource from "../snippets/drawer/states.tsx?raw";
-import DrawerTriggerLinkSnippet from "../snippets/drawer/trigger-link";
-import triggerLinkSource from "../snippets/drawer/trigger-link.tsx?raw";
-import DrawerVariantsSidesSnippet from "../snippets/drawer/variants-sides";
-import variantsSidesSource from "../snippets/drawer/variants-sides.tsx?raw";
+import {
+  dialogAriaApiRows,
+  dialogBodyApiRows,
+  dialogFooterApiRows,
+  dialogHeaderApiRows,
+  dialogIconApiRows,
+  dialogRootApiRows,
+  dialogSlotApiRows,
+  dialogTextApiRows,
+} from "./dialogApiRows";
 
-const drawerApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "open",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Да",
-    description: "Контролируемое состояние открытия.",
-  },
-  {
-    prop: "onOpenChange",
-    type: "(open: boolean) => void",
-    defaultValue: "—",
-    required: "Да",
-    description: "Вызывается на Esc, клик по overlay, крестик и внешние действия.",
-  },
-  {
-    prop: "title",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Заголовок в шапке.",
-  },
-  {
-    prop: "description",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Подзаголовок в шапке.",
-  },
-  {
-    prop: "icon",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Иконка слева в шапке.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Контент body внутри ScrollContainer.",
-  },
-  {
-    prop: "footer",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Нижняя зона действий.",
-  },
+const drawerContentApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "side",
     type: '"left" | "right"',
     defaultValue: '"right"',
     required: "Нет",
-    description: "Сторона выезда панели.",
+    description: "Край, с которого выезжает панель.",
   },
+  {
+    prop: "size",
+    type: '"s" | "m" | "l" | "xl"',
+    defaultValue: '"m"',
+    required: "Нет",
+    description: "Ширина 360 · 480 · 640 · 800 px; уже 640 px экрана — на всю ширину.",
+  },
+  ...dialogAriaApiRows,
 ];
 
 export default function DrawerSection() {
@@ -90,99 +53,121 @@ export default function DrawerSection() {
       <PageContent.Header>
         <PageContent.Title id="drawer-heading">Drawer</PageContent.Title>
         <PageContent.Description measure="full">
-          Боковая панель с фиксированной шапкой и футером, прокруткой в body, закрытием по Escape и
-          клику на подложку, а также анимацией slide-in и slide-out.
+          Модальная боковая панель для фильтров, форм и деталей записи. Те же части, что у Modal:
+          шапка и подвал закреплены и отделены еле заметными линиями, прокручивается только тело.
+          Закрытие по Escape, крестику и клику на подложку. Для подтверждений используйте Modal.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
           <div className="demoBlock">
-            <DemoSectionTitle>Сторона выезда</DemoSectionTitle>
-            <DemoDescription>Проп side поддерживает left и right.</DemoDescription>
-            <PlaygroundExampleFrame.Root code={variantsSidesSource.trim()} previewLayout="row">
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoDescription>
+              <code>size</code>: <code>s</code> 360 · <code>m</code> 480 (по умолчанию) ·{" "}
+              <code>l</code> 640 · <code>xl</code> 800 px. Уже 640 px панель всегда занимает всю
+              ширину экрана и теряет скругления.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <DrawerVariantsSidesSnippet />
+                <DrawerSizesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Панель настроек с формой</DemoSectionTitle>
+            <DemoDescription>
+              Поля в теле получают заливку «на поверхности» и размер <code>m</code>, группы полей —
+              шаг 20 px. В подвале под линией — «Отмена» и «Сохранить» с <code>loading</code>, по
+              умолчанию справа (<code>layout=&quot;end&quot;</code>).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={compositionSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <DrawerCompositionExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Сторона выезда</DemoSectionTitle>
+            <DemoDescription>
+              <code>side=&quot;right&quot;</code> (по умолчанию) — детали и формы,{" "}
+              <code>side=&quot;left&quot;</code> — фильтры и навигация.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={variantsSidesSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <DrawerVariantsSidesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Без подвала</DemoSectionTitle>
+            <DemoDescription>
+              Без <code>Drawer.Footer</code> нижней зоны нет — панель только для просмотра. Иконка в
+              шапке с <code>tone=&quot;success&quot;</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <DrawerStatesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Длинное содержимое</DemoSectionTitle>
+            <DemoDescription>
+              Тело прокручивается между закреплёнными шапкой и подвалом; линии отмечают их границы.
+              Описание под заголовком — body-s, приглушённым цветом.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <DrawerFeaturesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
             <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-            <DemoDescription>Открытие и закрытие полностью управляются снаружи.</DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <DrawerControlledSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
-            <DemoDescription>Форма в body и кнопки в footer.</DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <DrawerCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Состояния</DemoSectionTitle>
-            <DemoDescription>С вариантами footer и без footer.</DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <DrawerStatesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
-            <DemoDescription>Вертикальный стек fullWidth-кнопок в footer.</DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <DrawerFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Адаптив</DemoSectionTitle>
-            <DemoDescription>Ширина панели ограничена значением min(28rem, 90vw).</DemoDescription>
-            <PlaygroundExampleFrame.Root code={responsiveSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <DrawerResponsiveSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Дополнительно</DemoSectionTitle>
             <DemoDescription>
-              Открытие по ссылке, длинный body и альтернативные компоновки.
+              <code>open</code> и <code>onOpenChange</code> на <code>Drawer.Root</code> — открыть
+              можно из любого места, например из ссылки. Фокус после закрытия возвращается к
+              открывшему элементу. <code>layout=&quot;fill&quot;</code> растягивает кнопку подвала.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={triggerLinkSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root
+              code={controlledSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DrawerTriggerLinkSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <DrawerFeaturesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <DrawerSizesSnippet />
+                <DrawerControlledExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
-            <DemoApiTitle>Drawer</DemoApiTitle>
-            <DemoDescription>Единый компонент вместо compound API.</DemoDescription>
-            <PlaygroundApiTable rows={drawerApiRows} />
+            <DemoApiTitle>Drawer.Root</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogRootApiRows("Drawer")} />
+            <DemoApiTitle>Drawer.Content</DemoApiTitle>
+            <PlaygroundApiTable rows={drawerContentApiRows} />
+            <DemoApiTitle>Drawer.Header</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogHeaderApiRows} />
+            <DemoApiTitle>Drawer.Icon</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogIconApiRows} />
+            <DemoApiTitle>Drawer.Title · Drawer.Description</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogTextApiRows} />
+            <DemoApiTitle>Drawer.Body</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogBodyApiRows} />
+            <DemoApiTitle>Drawer.Footer</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogFooterApiRows('"end"')} />
+            <DemoApiTitle>Drawer.Trigger · Drawer.Close</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogSlotApiRows} />
           </div>
         </div>
       </PageContent.Body>

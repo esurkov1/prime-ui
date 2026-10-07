@@ -1,0 +1,26 @@
+/* Layout for the PageContent examples: the frame imitates AppShell.Main (canvas + gutter). */
+
+.main {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--prime-layout-gutter-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-canvas);
+  container-type: inline-size;
+}
+
+/* Several page columns stacked with the section rhythm. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-10);
+}
+
+/* A visible block so the column width can be read at a glance. */
+.block {
+  box-sizing: border-box;
+  padding: var(--prime-space-4);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+}

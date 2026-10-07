@@ -1,3 +1,21 @@
+import DatepickerBadgeExample from "@/components/datepicker/examples/badge";
+import datepickerBadgeSource from "@/components/datepicker/examples/badge.tsx?raw";
+import DatepickerInFormExample from "@/components/datepicker/examples/in-form";
+import datepickerInFormSource from "@/components/datepicker/examples/in-form.tsx?raw";
+import DatepickerInlinePanelExample from "@/components/datepicker/examples/inline-panel";
+import datepickerInlinePanelSource from "@/components/datepicker/examples/inline-panel.tsx?raw";
+import DatepickerNarrowExample from "@/components/datepicker/examples/narrow";
+import datepickerNarrowSource from "@/components/datepicker/examples/narrow.tsx?raw";
+import DatepickerRangePresetsExample from "@/components/datepicker/examples/range-presets";
+import datepickerRangePresetsSource from "@/components/datepicker/examples/range-presets.tsx?raw";
+import DatepickerSingleExample from "@/components/datepicker/examples/single";
+import datepickerSingleSource from "@/components/datepicker/examples/single.tsx?raw";
+import DatepickerSizesExample from "@/components/datepicker/examples/sizes";
+import datepickerSizesSource from "@/components/datepicker/examples/sizes.tsx?raw";
+import DatepickerStatesExample from "@/components/datepicker/examples/states";
+import datepickerStatesSource from "@/components/datepicker/examples/states.tsx?raw";
+import DatepickerYearlessExample from "@/components/datepicker/examples/yearless";
+import datepickerYearlessSource from "@/components/datepicker/examples/yearless.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,390 +24,216 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import DatepickerCompositionSnippet from "../snippets/datepicker/composition";
-import compositionSource from "../snippets/datepicker/composition.tsx?raw";
-import DatepickerControlledValueSnippet from "../snippets/datepicker/controlled-value";
-import controlledValueSource from "../snippets/datepicker/controlled-value.tsx?raw";
-import DatepickerFullWidthSnippet from "../snippets/datepicker/full-width";
-import fullWidthSource from "../snippets/datepicker/full-width.tsx?raw";
-import DatepickerPopoverSnippet from "../snippets/datepicker/popover";
-import popoverSource from "../snippets/datepicker/popover.tsx?raw";
-import DatepickerRangePresetsTimeSnippet from "../snippets/datepicker/range-presets-time";
-import rangePresetsTimeSource from "../snippets/datepicker/range-presets-time.tsx?raw";
-import DatepickerResponsiveMonthsSnippet from "../snippets/datepicker/responsive-months";
-import responsiveMonthsSource from "../snippets/datepicker/responsive-months.tsx?raw";
-import DatepickerSizesSnippet from "../snippets/datepicker/sizes";
-import sizesSource from "../snippets/datepicker/sizes.tsx?raw";
-import DatepickerStatesSnippet from "../snippets/datepicker/states";
-import statesSource from "../snippets/datepicker/states.tsx?raw";
-import DatepickerVariantsModesSnippet from "../snippets/datepicker/variants-modes";
-import variantsModesSource from "../snippets/datepicker/variants-modes.tsx?raw";
 
-const calendarApiRows: PlaygroundApiPropRow[] = [
+const panelApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: "из Shell или «m»",
-    required: "Нет",
-    description:
-      "Размер сетки и навигации: токены высоты ячеек, кегля и кнопок; можно переопределить поверх размера из Datepicker.Shell.",
+    prop: "mode",
+    type: '"range" | "single"',
+    defaultValue: "—",
+    required: "Да",
+    description: "Диапазон или одна дата; от режима зависят типы value и onValueChange.",
   },
   {
-    prop: "responsiveMonths",
-    type: "boolean",
+    prop: "value / defaultValue / onValueChange",
+    type: "DatepickerRange | Date | null",
+    defaultValue: "пусто",
+    required: "Нет",
+    description:
+      "Значение в «настенном» времени (локальные поля Date), контролируемое или нет. В range границы могут быть null.",
+  },
+  {
+    prop: "months",
+    type: "1 | 2",
+    defaultValue: "1",
+    required: "Нет",
+    description:
+      "Сколько месяцев рядом. Если два не помещаются (окно — для поповера, своя ширина — для встроенной панели), показывается один.",
+  },
+  {
+    prop: "presets",
+    type: "DatepickerPreset[] | false",
     defaultValue: "false",
     required: "Нет",
     description:
-      "Подстраивать число колонок месяцев (1 или 2) по ширине контейнера; при true проп numberOfMonths игнорируется.",
+      "Колонка периодов слева (range). Готовые: datepickerPresets, набор DEFAULT_DATEPICKER_PRESETS, «Всё время» — datepickerPresets.allTime().",
   },
-  {
-    prop: "responsiveBreakpoints",
-    type: "{ twoColumns: number }",
-    defaultValue: "{ twoColumns: 500 }",
-    required: "Нет",
-    description: "Порог ширины контейнера (px) для переключения на два месяца рядом.",
-  },
-  {
-    prop: "weekStartsOn",
-    type: "0 | 1 | 2 | 3 | 4 | 5 | 6",
-    defaultValue: "1",
-    required: "Нет",
-    description: "Первый день недели в шапке (по умолчанию понедельник).",
-  },
-  {
-    prop: "navLayout",
-    type: 'React-day-picker: до/после сетки ("before" | "after" | ...)',
-    defaultValue: '"after"',
-    required: "Нет",
-    description: "Раскладка навигации по месяцам (пробрасывается в react-day-picker).",
-  },
-  {
-    prop: "month",
-    type: "Date",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Отображаемый месяц в контролируемом режиме (см. onMonthChange).",
-  },
-  {
-    prop: "onMonthChange",
-    type: "(month: Date) => void",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Смена месяца пользователем; синхронизируется с контекстом Shell для пресетов.",
-  },
-  {
-    prop: "numberOfMonths",
-    type: "number",
-    defaultValue: "1",
-    required: "Нет",
-    description: "Фиксированное число месяцев в ряд, если responsiveMonths не включён.",
-  },
-  {
-    prop: "mode",
-    type: '"single" | "range" | "multiple" | …',
-    defaultValue: "—",
-    required: "Да",
-    description:
-      "Режим выбора дат; типы selected/onSelect зависят от режима (см. документацию react-day-picker).",
-  },
-  {
-    prop: "selected",
-    type: "Date | DateRange | Date[] | …",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Выбранное значение в контролируемом режиме (формат зависит от mode).",
-  },
-  {
-    prop: "onSelect",
-    type: "(value: …) => void",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Обработчик выбора; сигнатура соответствует mode.",
-  },
-  {
-    prop: "disabled",
-    type: "Matcher | Matcher[]",
-    defaultValue: "—",
-    required: "Нет",
-    description:
-      "Недоступные дни (диапазоны, дни недели, произвольная функция — см. react-day-picker).",
-  },
-  {
-    prop: "locale",
-    type: "Locale (date-fns)",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Локаль для подписей месяцев и дней недели.",
-  },
-  {
-    prop: "classNames",
-    type: "Partial<ClassNames>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Переопределение имён классов day-picker; сливается с оформлением Prime.",
-  },
-  {
-    prop: "components",
-    type: "Partial<CustomComponents>",
-    defaultValue: "—",
-    required: "Нет",
-    description:
-      "Кастомные части календаря; встроенные Chevron и MonthCaption дополняют переданное.",
-  },
-  {
-    prop: "style",
-    type: "React.CSSProperties",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Инлайн-стили корня day-picker.",
-  },
-  {
-    prop: "…rest",
-    type: "DayPickerProps (react-day-picker)",
-    defaultValue: "—",
-    required: "Нет",
-    description:
-      "Остальные пропсы DayPicker: модификаторы, футер, captionLayout, dir, timeZone и т.д.",
-  },
-];
-
-const shellApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
     description:
-      "Размер оболочки и контекст для Calendar, Time, Value и Presets без собственного size.",
+      "Клетка дня = высота пункта меню яруса (24 · 28 · 32 · 36 · 40); кнопки нижней строки на ступень меньше.",
   },
   {
-    prop: "presets",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description:
-      "Слот под полосу пресетов (обычно Datepicker.Presets); при наличии включается нижняя панель и data-layout.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Календарь, время, подпись выбора и прочая разметка внутри оболочки.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный класс корневого контейнера (например ширина или отступы).",
-  },
-];
-
-const presetsApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "mode",
-    type: '"single" | "range"',
-    defaultValue: "—",
-    required: "Да",
-    description:
-      "Режим пресетов: одна дата или диапазон; от этого зависят поля presets и onSelect.",
-  },
-  {
-    prop: "presets",
-    type: "DatepickerPresetSingle[] | DatepickerPresetRange[]",
-    defaultValue: "—",
-    required: "Да",
-    description: "Список кнопок быстрого выбора с подписью и значением.",
-  },
-  {
-    prop: "onSelect",
-    type: "(date: Date | undefined) => void | (range: DateRange | undefined) => void",
-    defaultValue: "—",
-    required: "Да",
-    description: "Вызов при клике по пресету; для диапазона передаётся DateRange.",
-  },
-  {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: "из Shell или «m»",
-    required: "Нет",
-    description: "Размер сегментов ButtonGroup в полосе пресетов.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс блока пресетов.",
-  },
-  {
-    prop: "title",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Объявлено в публичном типе; в текущей разметке не выводится.",
-  },
-];
-
-const timeApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "mode",
-    type: '"single" | "range"',
-    defaultValue: '"single"',
-    required: "Нет",
-    description: "В режиме range нужны from, to и два обработчика; иначе value и onChange.",
-  },
-  {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: "из Shell или «m»",
-    required: "Нет",
-    description: "Размер полей Input для времени.",
-  },
-  {
-    prop: "value",
-    type: "Date | undefined",
-    defaultValue: "—",
-    required: "Да (single)",
-    description: "Дата-якорь для времени; при отсутствии поле time disabled.",
-  },
-  {
-    prop: "onChange",
-    type: "(next: Date) => void",
-    defaultValue: "—",
-    required: "Да (single)",
-    description: 'Обновление даты с новыми часами и минутами из input type="time".',
-  },
-  {
-    prop: "from",
-    type: "Date | undefined",
-    defaultValue: "—",
-    required: "Да (range)",
-    description: "Начало диапазона; время редактируется отдельно от конца.",
-  },
-  {
-    prop: "to",
-    type: "Date | undefined",
-    defaultValue: "—",
-    required: "Да (range)",
-    description: "Конец диапазона.",
-  },
-  {
-    prop: "onFromChange",
-    type: "(next: Date) => void",
-    defaultValue: "—",
-    required: "Да (range)",
-    description: "Изменение времени у даты начала.",
-  },
-  {
-    prop: "onToChange",
-    type: "(next: Date) => void",
-    defaultValue: "—",
-    required: "Да (range)",
-    description: "Изменение времени у даты конца.",
-  },
-  {
-    prop: "labels",
-    type: "{ time?: string } | { from?: string; to?: string }",
-    defaultValue: "«Время» / «Начало» / «Конец»",
-    required: "Нет",
-    description: "Подписи к полям времени.",
-  },
-];
-
-const valueApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: "из Shell или «m»",
-    required: "Нет",
-    description:
-      "Маппится на семантический variant Typography (роли caption / body), а не на ось size контролов.",
-  },
-  {
-    prop: "as",
-    type: '"p" | "span" | "div"',
-    defaultValue: '"p"',
-    required: "Нет",
-    description: "Корневой тег текста.",
-  },
-  {
-    prop: "tone",
-    type: '"default" | "muted"',
-    defaultValue: '"muted"',
-    required: "Нет",
-    description: "Наследует Typography: приглушённый текст для подписи выбранной даты.",
-  },
-  {
-    prop: "weight",
-    type: '"regular" | "medium" | "semibold"',
-    defaultValue: '"regular"',
-    required: "Нет",
-    description: "Начертание.",
-  },
-  {
-    prop: "tracking",
-    type: '"normal" | "tight" | "tighter" | "wide"',
-    defaultValue: '"normal"',
-    required: "Нет",
-    description: "Межбуквенное расстояние.",
-  },
-  {
-    prop: "italic",
+    prop: "prompt",
     type: "boolean",
     defaultValue: "false",
     required: "Нет",
-    description: "Курсив.",
+    description: "Подсказка-шаг «Выберите начальную/конечную дату» под календарём.",
   },
   {
-    prop: "children",
-    type: "React.ReactNode",
+    prop: "footer",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Нижняя строка с датами и кнопками «Сбросить» / «Применить». Без неё выбор применяется сразу.",
+  },
+  {
+    prop: "withTime",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Поля времени в нижней строке (00:00 — 23:59 по умолчанию).",
+  },
+  {
+    prop: "isDayDisabled / disableFuture",
+    type: "(day: Date) => boolean / boolean",
     defaultValue: "—",
     required: "Нет",
-    description: "Отформатированная строка или произвольная разметка рядом с календарём.",
+    description: "Недоступные дни; будущие дни приглушены при disableFuture.",
+  },
+  {
+    prop: "yearless",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Ежегодная дата «день + месяц»: без года, значения в YEARLESS_YEAR.",
+  },
+  {
+    prop: "resetValue",
+    type: "DatepickerRange | Date | null",
+    defaultValue: "пусто",
+    required: "Нет",
+    description: "Что отдать по «Сбросить».",
+  },
+  {
+    prop: "today / locale / weekStartsOn / labels",
+    type: "Date / Locale / 0–6 / Partial<DatepickerLabels>",
+    defaultValue: "сегодня / ru / 1 / русские",
+    required: "Нет",
+    description: "«Сегодня» в нужном часовом поясе, локаль date-fns, начало недели и подписи.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный класс.",
+    description: "Класс корня панели (у Root — класс обёртки поля).",
+  },
+];
+
+const rootApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "…DatepickerPanelProps",
+    type: "—",
+    defaultValue: "—",
+    required: "—",
+    description: "Все пропы панели.",
   },
   {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLElement>",
+    prop: "size",
+    type: '"xs" | "s" | "m" | "l" | "xl"',
+    defaultValue: '"m"',
+    required: "Нет",
+    description: "Ярус поля и панели; поле выравнивается с Input и Select того же размера.",
+  },
+  {
+    prop: "placeholder",
+    type: "string",
+    defaultValue: '"Выбрать дату"',
+    required: "Нет",
+    description: "Текст поля без значения.",
+  },
+  {
+    prop: "label / required / optional / hint / error",
+    type: "ReactNode / boolean / boolean / ReactNode / ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Атрибуты выбранного тега as (кроме переопределённых Typography).",
-  },
-];
-
-const utilFormatTimeApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "date",
-    type: "Date | undefined",
-    defaultValue: "—",
-    required: "Да",
     description:
-      'Исходная дата; возвращается строка HH:mm для value нативного input type="time" в локальном времени, иначе пустая строка.',
-  },
-];
-
-const utilMergeTimeApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "date",
-    type: "Date",
-    defaultValue: "—",
-    required: "Да",
-    description: "Дата, в которую подставляется время.",
+      "Поле формы как у Input: подпись над полем, *, «необязательно», подсказка и ошибка под ним (error включает invalid).",
   },
   {
-    prop: "timeHHmm",
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Inset-кольцо danger, aria-invalid, data-invalid — без текста.",
+  },
+  {
+    prop: "valuePrefix",
     type: "string",
     defaultValue: "—",
+    required: "Нет",
+    description: "Текст перед значением, например «С 15 октября».",
+  },
+  {
+    prop: "aria-label / aria-labelledby / aria-describedby",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Имя поля без label (к нему добавляется значение) или связь с внешними элементами.",
+  },
+  {
+    prop: "disabled / align / fullWidth",
+    type: 'boolean / "start" | "center" | "end" / boolean',
+    defaultValue: 'false / "start" / false',
+    required: "Нет",
+    description: "Блокировка, выравнивание поповера, кнопка на всю ширину.",
+  },
+  {
+    prop: "open / defaultOpen / onOpenChange",
+    type: "boolean / boolean / (open: boolean) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Управляемое открытие поповера.",
+  },
+  {
+    prop: "focusRing",
+    type: "boolean",
+    defaultValue: "true",
+    required: "Нет",
+    description: 'false скрывает только кольцо фокуса (data-focus-ring="false").',
+  },
+  {
+    prop: "id",
+    type: "string",
+    defaultValue: "авто",
+    required: "Нет",
+    description: "id кнопки поля.",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Украшения поля: Datepicker.Badge перед шевроном (входит в доступное имя).",
+  },
+];
+
+const badgeApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "color",
+    type: "PaletteColor",
+    defaultValue: '"gray"',
+    required: "Нет",
+    description: "Цвет мягкого бейджа (на ярус ниже поля).",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
     required: "Да",
-    description: "Строка «ЧЧ:мм»; некорректные части трактуются как 0.",
+    description: "Текст бейджа.",
+  },
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Дополнительный класс бейджа.",
   },
 ];
 
@@ -399,177 +243,174 @@ export default function DatepickerSection() {
       <PageContent.Header>
         <PageContent.Title>Datepicker</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Выбор одной даты или периода в календарной сетке с оформлением на токенах Prime. В
-              продуктовом UI календарь и оболочку <code>Datepicker.Shell</code> размещают внутри{" "}
-              <code>Popover.Content</code> (кнопка или поле — триггер); все примеры ниже следуют
-              этому паттерну. Движок сетки — react-day-picker, локаль и форматирование — через
-              date-fns.
-            </>
-          }
+          Выбор даты или периода: <code>Datepicker.Root</code> — кнопка с поповером,{" "}
+          <code>Datepicker.Panel</code> — та же панель внутри страницы. Пресеты слева, один или два
+          месяца, подсказка, нижняя строка с временем. Колесо над открытым поповером не прокручивает
+          страницу. Стрелки двигают фокус по дням, PageUp/PageDown листают месяцы, Home/End — начало
+          и конец недели, Enter выбирает.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
           <div className="demoBlock">
+            <DemoSectionTitle>Период с пресетами</DemoSectionTitle>
+            <DemoDescription>
+              <code>months=&#123;2&#125;</code>, <code>presets</code>, <code>prompt</code>,{" "}
+              <code>footer</code> и <code>withTime</code>; будущие дни недоступны.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={datepickerRangePresetsSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <DatepickerRangePresetsExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Бейдж в поле</DemoSectionTitle>
+            <DemoDescription>
+              <code>Datepicker.Badge</code> внутри <code>Datepicker.Root</code>: мягкий бейдж на
+              ярус ниже у правого края, перед шевроном; входит в доступное имя поля.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={datepickerBadgeSource.trim()}
+              previewLayout="stack-narrow"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <DatepickerBadgeExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Четыре значения <code>Datepicker.Shell</code> и <code>Datepicker.Calendar</code>{" "}
-              <code>size</code> — каждое открывается своим <code>Popover</code> с кнопкой-триггером.
+              <code>xs</code>–<code>xl</code>: высота поля 28–48 — в одну линию с Input, Select и
+              Button того же размера. Панель берёт тот же ярус: клетка дня 24–40 px. По умолчанию —{" "}
+              <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+            <PlaygroundExampleFrame.Root
+              code={datepickerSizesSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DatepickerSizesSnippet />
+                <DatepickerSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Варианты и режимы</DemoSectionTitle>
+            <DemoSectionTitle>Состояния поля</DemoSectionTitle>
             <DemoDescription>
-              <code>mode=&quot;single&quot;</code> и <code>mode=&quot;range&quot;</code> — отдельные
-              поповеры с кнопками-триггерами.
+              Поле устроено как остальные поля: заливка без рамки, при наведении темнее, открыто или
+              в фокусе — <code>field-bg-focus</code> с кольцом. <code>label</code>,{" "}
+              <code>hint</code> и <code>error</code> — пропсы Root (ошибка включает кольцо danger и
+              попадает в <code>aria-describedby</code>); <code>disabled</code> не открывает панель.
+              Сегодняшний день — акцентный цвет и полужирный, без точки.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={variantsModesSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={datepickerStatesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <DatepickerVariantsModesSnippet />
+                <DatepickerStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoSectionTitle>Одна дата</DemoSectionTitle>
             <DemoDescription>
-              Два поповера: календарь с <code>disabled</code> по дням недели и связка дата +{" "}
-              <code>Datepicker.Time</code>.
+              <code>mode=&quot;single&quot;</code> без нижней строки: клик по дню сразу применяет
+              значение.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={datepickerSingleSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DatepickerStatesSnippet />
+                <DatepickerSingleExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Расположение месяцев</DemoSectionTitle>
+            <DemoSectionTitle>Встроенная панель</DemoSectionTitle>
             <DemoDescription>
-              <code>responsiveMonths</code> и <code>responsiveBreakpoints</code> внутри поповера;
-              превью с <code>examplePreviewBleed</code> для ширины контейнера.
+              <code>Datepicker.Panel</code> без поповера сама себе карточка: заливка, радиус, поля и
+              тень карточки (на холсте — белая, внутри карточки — утопленная плитка). Ширина по
+              содержимому, месяцы прижаты к началу; два месяца — когда родителю хватает места, иначе
+              один.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={responsiveMonthsSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={datepickerInlinePanelSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DatepickerResponsiveMonthsSnippet />
+                <DatepickerInlinePanelExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoSectionTitle>Узкий экран, 320 px</DemoSectionTitle>
             <DemoDescription>
-              Состояние в React; подпись <code>Datepicker.Value</code> внутри панели поповера; после
-              выбора даты поповер закрывается.
+              Datepicker сам считает доступную ширину. В поповере это окно минус 8 px с каждой
+              стороны: два месяца превращаются в один, колонка периодов уходит в прокручиваемую
+              строку над календарём, панель никогда не шире экрана. Встроенная панель меряет
+              доступную ширину родителя (не свою): уже одного месяца — компактный режим (клетки
+              сжимаются, поля меньше, поля даты в нижней строке встают над кнопками). Ниже —{" "}
+              <code>months=&#123;2&#125;</code> в колонке 320 px: один месяц.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledValueSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={datepickerNarrowSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DatepickerControlledValueSnippet />
+                <DatepickerNarrowExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoSectionTitle>Форма в карточке</DemoSectionTitle>
             <DemoDescription>
-              Пресеты, календарь, время и <code>Datepicker.Value</code> в одном поповере, общее
-              состояние.
+              Заявка на отпуск: обязательный период (<code>required</code> на{" "}
+              <code>Datepicker.Root</code>), ошибка после отправки на месте подсказки,
+              необязательная дата выхода (<code>optional</code>).
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={datepickerInFormSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DatepickerCompositionSnippet />
+                <DatepickerInFormExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoSectionTitle>Ежегодная дата</DemoSectionTitle>
             <DemoDescription>
-              Широкая <code>Popover.Content</code> и <code>Datepicker.Shell</code> с{" "}
-              <code>min-w-0</code>, чтобы сетка не ломала раскладку.
+              <code>yearless</code>: день и месяц без года, <code>isDayDisabled</code> закрывает
+              занятые даты.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={datepickerYearlessSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DatepickerFullWidthSnippet />
+                <DatepickerYearlessExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              Эталон: иконка календаря на триггере и закрытие после выбора даты; ниже — диапазон с
-              пресетами и <code>Datepicker.Time</code> в отдельном поповере.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={popoverSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <DatepickerPopoverSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-            <PlaygroundExampleFrame.Root code={rangePresetsTimeSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <DatepickerRangePresetsTimeSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>API</DemoSectionTitle>
-            <DemoApiTitle>Datepicker.Calendar</DemoApiTitle>
-            <DemoDescription>
-              Сетка дней на базе react-day-picker с классами и размерами Prime; опционально
-              адаптивное число месяцев.
-            </DemoDescription>
-            <PlaygroundApiTable rows={calendarApiRows} />
-
-            <DemoApiTitle>Datepicker.Shell</DemoApiTitle>
-            <DemoDescription>
-              Общий контекст размера и месяца для дочерних частей; опциональная нижняя полоса
-              пресетов.
-            </DemoDescription>
-            <PlaygroundApiTable rows={shellApiRows} />
-
-            <DemoApiTitle>Datepicker.Presets</DemoApiTitle>
-            <DemoDescription>
-              Горизонтальная группа кнопок быстрого выбора; для диапазона переключает{" "}
-              <code>DateRange</code>.
-            </DemoDescription>
-            <PlaygroundApiTable rows={presetsApiRows} />
-
-            <DemoApiTitle>Datepicker.Time</DemoApiTitle>
-            <DemoDescription>
-              Одно или два поля <code>type=&quot;time&quot;</code> на базе Input; время вшивается в
-              выбранные даты.
-            </DemoDescription>
-            <PlaygroundApiTable rows={timeApiRows} />
-
-            <DemoApiTitle>Datepicker.Value</DemoApiTitle>
-            <DemoDescription>
-              Текстовая подпись с типографикой кита; размер текста выводится из контекста датпикера.
-            </DemoDescription>
-            <PlaygroundApiTable rows={valueApiRows} />
-
-            <DemoApiTitle>formatTimeInputValue</DemoApiTitle>
-            <DemoDescription>
-              Утилита для синхронизации <code>Date</code> с нативным полем времени.
-            </DemoDescription>
-            <PlaygroundApiTable rows={utilFormatTimeApiRows} />
-
-            <DemoApiTitle>mergeTimeIntoDate</DemoApiTitle>
-            <DemoDescription>
-              Утилита для применения строки времени к существующей дате.
-            </DemoDescription>
-            <PlaygroundApiTable rows={utilMergeTimeApiRows} />
           </div>
         </div>
+
+        <DemoApiTitle>Datepicker.Panel</DemoApiTitle>
+        <PlaygroundApiTable rows={panelApiRows} />
+        <DemoApiTitle>Datepicker.Root</DemoApiTitle>
+        <PlaygroundApiTable rows={rootApiRows} />
+        <DemoApiTitle>Datepicker.Badge</DemoApiTitle>
+        <PlaygroundApiTable rows={badgeApiRows} />
       </PageContent.Body>
     </PageContent.Section>
   );

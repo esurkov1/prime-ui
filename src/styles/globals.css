@@ -1,20 +1,21 @@
-/* Roboto Flex: variable opsz + wght; Roboto Mono: код и моноширинные зоны */
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Roboto+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+/* Golos Text: interface face with full Cyrillic; JetBrains Mono: code and IDs. */
+@import url("https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "./reset.css";
 @import "./tokens.css";
 @import "./theme-light.css";
 @import "./theme-dark.css";
-@import "./units.css";
 
 :root {
-  font-family: var(--prime-sys-typography-family-base);
+  font-family: var(--prime-font-family-sans);
   font-size: 16px;
-  color: var(--prime-sys-color-content-primary);
-  background: var(--prime-sys-color-surface-default);
+  color: var(--prime-color-text-primary);
+  background: var(--prime-color-bg-canvas);
   text-rendering: optimizeLegibility;
   font-kerning: normal;
+  font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
 }
 
 :root[data-theme="dark"],
@@ -23,19 +24,30 @@
 }
 
 body {
-  background: var(--prime-sys-color-surface-default);
-  color: var(--prime-sys-color-content-primary);
-  font-size: var(--prime-sys-typography-body-size);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  font-weight: var(--prime-sys-typography-weight-regular);
-  letter-spacing: var(--prime-sys-typography-body-letterSpacing);
+  background: var(--prime-color-bg-canvas);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
+  font-weight: var(--prime-text-body-m-weight);
 }
 
-:where(*, *::before, *::after):focus {
-  outline: none;
+/* One focus ring for every interactive element. Components that draw focus on a wrapper
+   (fields) suppress it on the native element and use the same tokens on the wrapper. */
+:where(
+    a,
+    button,
+    [role="button"],
+    [role="tab"],
+    [role="menuitem"],
+    [role="option"],
+    summary,
+    [tabindex]:not([tabindex="-1"])
+  ):focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }
 
-:where(*, *::before, *::after):focus-visible {
+:where(input, textarea, select):focus-visible {
   outline: none;
 }
 
@@ -44,28 +56,47 @@ body {
 }
 
 button::-moz-focus-inner,
-input::-moz-focus-inner,
-select::-moz-focus-inner,
-textarea::-moz-focus-inner {
+input::-moz-focus-inner {
   border: 0;
   padding: 0;
 }
 
-/* Поля с оболочкой (Input, Textarea и т.д.) рисуют фокус на wrapper — не дублируем кольцо на нативном элементе. */
-:where(input, textarea, select):focus-visible {
-  box-shadow: none;
-}
-
-:where(a, button, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
-}
-
-/* Курсор при наведении на неактивные контролы (без pointer-events: none на корне). */
 :where(:disabled, [aria-disabled="true"], [data-disabled="true"]) {
   cursor: not-allowed;
 }
 
-/* Accordion: высота задаётся компонентом через --prime-accordion-content-height */
+::selection {
+  background: var(--prime-color-accent-soft-hover);
+}
+
+/* Fill-based controls have no visible outline. Users who ask for more contrast get one. */
+@media (prefers-contrast: more) {
+  :root,
+  [data-theme] {
+    --prime-color-border-control: var(--prime-color-text-muted);
+    --prime-color-border-subtle: var(--prime-color-text-muted);
+  }
+}
+
+/* Theme switches are instant: a running color transition would start from the old theme and blink. */
+[data-theme-switching],
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  /* biome-ignore lint/complexity/noImportantStyles: must beat component-module transitions for one frame */
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-theme] {
+    --prime-motion-duration-fast: 0ms;
+    --prime-motion-duration-base: 0ms;
+    --prime-motion-duration-slow: 0ms;
+  }
+}
+
+/* Accordion: height is provided by the component via --prime-accordion-content-height */
 @keyframes prime-accordion-down {
   from {
     height: 0;

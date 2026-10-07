@@ -1,72 +1,63 @@
-.stack {
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--prime-space-6);
+}
+
+.sizeCell {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
+  align-items: center;
+  gap: var(--prime-space-2);
 }
 
 .row {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--prime-sys-spacing-m);
+  justify-content: center;
+  gap: var(--prime-space-3);
 }
 
-.rowStretch {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: var(--prime-sys-spacing-m);
+.team {
+  display: grid;
+  gap: var(--prime-space-4);
+  width: 100%;
+  max-width: var(--prime-modal-width-m);
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
 }
 
-.list {
+.teamGroup {
+  --avatar-ring: var(--prime-color-card-bg);
+}
+
+.teamHeader {
   display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-l);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+}
+
+.members {
+  display: grid;
+  gap: var(--prime-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.listItem {
-  display: flex;
-  flex-direction: row;
+.member {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--prime-sys-spacing-m);
+  gap: var(--prime-space-3);
+}
+
+.memberText {
+  display: grid;
   min-width: 0;
-}
-
-.listItemBody {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x1);
-  min-width: 0;
-}
-
-.navBar {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-sys-spacing-m);
-  padding: var(--prime-sys-spacing-m) var(--prime-sys-spacing-l);
-  border-radius: var(--prime-sys-shape-radius-m);
-  background: var(--prime-sys-color-surface-raised);
-  border: 1px solid var(--prime-sys-color-border-subtle);
-}
-
-.navCluster {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-sys-spacing-l);
-}
-
-.navUser {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--prime-sys-spacing-s);
 }

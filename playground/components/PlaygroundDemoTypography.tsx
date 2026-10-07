@@ -3,63 +3,28 @@ import type * as React from "react";
 import { Typography } from "@/components/typography/Typography";
 import { cx } from "@/internal/cx";
 
-type TypographyRootProps = React.ComponentProps<typeof Typography.Root>;
-
-/** Заголовок блока примера на странице плейграунда (под заголовком страницы). */
-export function DemoSectionTitle({
-  className,
-  children,
-  ...rest
-}: Omit<TypographyRootProps, "as" | "variant" | "weight" | "tracking">) {
-  return (
-    <Typography.Root
-      {...rest}
-      as="h4"
-      variant="heading-section"
-      weight="semibold"
-      tracking="tight"
-      className={className}
-    >
-      {children}
-    </Typography.Root>
-  );
+/** Example block title under the page title (h1): `title-l`, h2. */
+export function DemoSectionTitle(props: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <Typography.Root {...props} as="h2" variant="title-l" />;
 }
 
-/** Подзаголовок API или вложенный заголовок внутри блока. */
-export function DemoApiTitle({
-  className,
-  children,
-  ...rest
-}: Omit<TypographyRootProps, "as" | "variant" | "weight" | "tracking">) {
-  return (
-    <Typography.Root
-      {...rest}
-      as="h5"
-      variant="heading-subsection"
-      weight="semibold"
-      tracking="tight"
-      className={className}
-    >
-      {children}
-    </Typography.Root>
-  );
+/** API subtitle or nested heading inside a block: `title-s`, h3. */
+export function DemoApiTitle(props: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <Typography.Root {...props} as="h3" variant="title-s" />;
 }
 
-/** Вводный текст под заголовком блока: основной кегль, приглушённый тон. */
+/** Lead text under a block title: `body-m`, secondary, reading width. */
 export function DemoDescription({
   className,
-  children,
   ...rest
-}: Omit<TypographyRootProps, "as" | "variant" | "tone">) {
+}: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <Typography.Root
       {...rest}
       as="p"
-      variant="body-default"
-      tone="muted"
+      variant="body-m"
+      tone="secondary"
       className={cx("demoBlockDescription", className)}
-    >
-      {children}
-    </Typography.Root>
+    />
   );
 }

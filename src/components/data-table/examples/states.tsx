@@ -1,42 +1,49 @@
-import { DataTable, type DataTableColumn } from "prime-ui-kit";
+/** Loading skeleton (`loading` + `loadingRows`), `empty` and `error` with a retry button: the header stays, only the body changes. Use for every table backed by a request. */
 
-import styles from "./examples-demos.module.css";
+import { Button, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 
-type Row = { id: string; label: string };
+import styles from "./examples.module.css";
 
-const columns: DataTableColumn<Row>[] = [
-  { id: "id", header: "Код", accessor: "id", minWidth: "6rem" },
-  { id: "label", header: "Название", accessor: "label", minWidth: "12rem" },
+type Payment = { id: string; payer: string; amount: number };
+
+const columns: DataTableColumn<Payment>[] = [
+  { id: "id", header: "Платёж", accessor: "id" },
+  { id: "payer", header: "Плательщик", accessor: "payer" },
+  { id: "amount", header: "Сумма, ₽", accessor: "amount", numeric: true },
 ];
 
-/** Соответствует `playground/snippets/data-table/states.tsx`. */
+const none: Payment[] = [];
+
 export default function DataTableStatesExample() {
   return (
-    <div className={styles.statesStack}>
-      <div>
-        <p className={styles.leadTight}>
-          <code>loading</code> при пустом наборе строк: одна строка с <code>loadingText</code>.
-        </p>
-        <DataTable.Root
-          columns={columns}
-          rows={[]}
-          loading
-          loadingText="Загружаем справочник…"
-          showPagination={false}
-          pageSize={10}
-        />
+    <div className={styles.statesGrid}>
+      <div className={styles.group}>
+        <Typography.Root variant="code" tone="muted">
+          loading + loadingRows
+        </Typography.Root>
+        <DataTable.Root columns={columns} rows={none} loading loadingRows={3} />
       </div>
-      <div>
-        <p className={styles.leadTight}>
-          Пустой список: <code>emptyText</code> вместо строк данных.
-        </p>
+      <div className={styles.group}>
+        <Typography.Root variant="code" tone="muted">
+          empty
+        </Typography.Root>
+        <DataTable.Root columns={columns} rows={none} empty="Платежей за выбранный период нет" />
+      </div>
+      <div className={styles.group}>
+        <Typography.Root variant="code" tone="muted">
+          error
+        </Typography.Root>
         <DataTable.Root
           columns={columns}
-          rows={[]}
-          loading={false}
-          emptyText="Пока нет ни одной записи — добавьте первую через кнопку «Создать»."
-          showPagination={false}
-          pageSize={10}
+          rows={none}
+          error={
+            <div className={styles.errorBody}>
+              Не удалось загрузить платежи
+              <Button.Root variant="outline" tone="neutral" size="s">
+                Повторить
+              </Button.Root>
+            </div>
+          }
         />
       </div>
     </div>

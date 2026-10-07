@@ -1,102 +1,104 @@
 # Divider
 
-## Canonical
+**Category:** layout (Раскладка)
 
-- **What:** `Divider.Root` draws a horizontal or vertical separator (pseudo-element lines) with optional **children** (label, icon + text). Nested controls inherit **`size`** via **`ControlSizeProvider`**.
-- **Defaults:** `orientation="horizontal"`, `variant="default"`, `size="m"`. **`align`** defaults to **`start`** for **`variant="text"`**, otherwise **`center`**.
-- **Import:** `import { Divider } from "prime-ui-kit"`.
+> A hairline separator, horizontal or vertical, with or without a label.
+
+## When to use
+- Separate rows of a list or groups inside one panel, menu or card.
+- An «или» between two alternative actions (sign in / get a link by email).
+- A section heading drawn on a line (`align="start"`).
+- A vertical break between groups of buttons in a toolbar row.
+
+## When not to use
+- To separate cards or panels from each other → use fill and spacing ([Card](../card/COMPONENT.md), [PageContent](../page-content/COMPONENT.md) sections), never a line.
+- Separators inside a dropdown menu → use `Dropdown.Separator` ([Dropdown](../dropdown/COMPONENT.md)).
+- Row lines of a table → [DataTable](../data-table/COMPONENT.md) draws them itself.
+- Collapsible sections → use [Accordion](../accordion/COMPONENT.md).
+
+## Import
+```tsx
+import { Divider } from "prime-ui-kit";
+```
+
+## API
+
+### Divider.Root
+`forwardRef` to `<div>`. No `asChild`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Full-width line in a column, or a vertical line that stretches to the height of a flex row. |
+| `align` | `"start" \| "center" \| "end"` | `"center"` | Position of the label on the line. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the surrounding content: label type, gap and icon size. |
+| `children` | `ReactNode` | — | Label (text, or icon + text). Without children the divider is a plain line. An `Icon` inside is sized by the divider, not by its own `size`. |
+| `role` | `string` | `"separator"` | Use `"presentation"` for decorative lines between rows of an already structured list. |
+| `className` | `string` | — | Extra class on the root. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+## Variants
+
+### orientation
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `horizontal` | 1px `border-subtle` line across the full row width | Between rows or groups stacked in a column | yes |
+| `vertical` | 1px line stretched to the row height (`align-self: stretch`) | Between groups of buttons in a toolbar | |
+
+### align (only with children)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `start` | Label flush with the start edge, line fills the rest | Section heading on a line («Безопасность») | |
+| `center` | Line – label – line | «или» between alternatives | yes |
+| `end` | Line fills the start, label flush with the end edge | Trailing meta label (rare) | |
+
+### Content
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| no children | One plain line, no gap | List rows, groups | yes |
+| text / icon + text | Muted medium-weight label between line segments, tier gap | Headings, «или» | |
+
+**Combinations**
+- Recommended: plain horizontal line in a `gap` column; `align="start"` + icon + text as a section heading; `align="center"` + «или».
+- Pointless: `orientation="vertical"` with a long label; `align` without children (has no effect).
+
+**Sizes** — label / gap / icon per tier: xs 12/16 · 4 · 14, s 12/16 · 8 · 16, **m 13/20 · 8 · 16**, l 14/20 · 8 · 20, xl 16/24 · 12 · 20. Match the tier of the controls or text around it.
+
+**Hierarchy** — lines are the only separators in the system and stay `border-subtle`; do not stack several labelled dividers in a row, use one heading per group.
+
+## States
+Static component. DOM: `data-orientation`, `data-align`, `data-size` on the root; `aria-orientation="vertical"` only for vertical dividers.
+
+## Layout & spacing
+- Has no margins: the spacing around a line comes from the parent `gap` (e.g. `--prime-space-3` in a list column, `--prime-space-2` in a toolbar).
+- A horizontal divider takes `width: 100%` of a flex column; a vertical one needs a flex row parent to get height.
+- A long label wraps (`overflow-wrap: anywhere`).
+
+## Accessibility
+- `role="separator"` by default; vertical dividers add `aria-orientation="vertical"`.
+- Use `role="presentation"` when the line is purely decorative inside a structured list.
+- No keyboard interaction, no `labels`.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [variants.tsx](examples/variants.tsx) | Plain line, `align` start · center · end, line in a gap column, vertical in a toolbar | Picking the right shape |
+| [sizes.tsx](examples/sizes.tsx) | `size` xs → xl with a start label | Matching the label to the content tier |
+| [composition.tsx](examples/composition.tsx) | «или» between buttons, heading with icon, presentation lines in a settings list | Separators inside one surface |
 
 ```tsx
 import { Divider } from "prime-ui-kit";
 
 export function Example() {
-  return <Divider.Root />;
+  return <Divider.Root>или</Divider.Root>;
 }
 ```
 
-## Extended
+## Mistakes
+- Margins on the divider → spacing via the parent `gap`.
+- Lines between cards → separate cards by fill and spacing.
+- `<Icon size="l" />` inside the label → leave the size to the divider.
+- Vertical divider in a block container (no height) → place it in a flex row.
 
-### About
-
-`Divider` is a non-interactive visual separator: a line built from `::before` / `::after`, optionally wrapping a label or icon. **`Icon`** inside **`children`** does not use its own size classes — glyph size follows **`--prime-divider-icon`** from the root **`data-size`**.
-
-**When to use**
-
-- Separate blocks in a form, card, or settings column without an extra bordered panel.
-- Full-width rows in a list-like shell (`examples/list-separators.tsx`).
-- Section-style labels inline with the line (`variant="text"`) — see `examples/section-breaks.tsx`.
-- Between flex children in a column when rhythm comes from the parent **`gap`** (`variant="line-spacing"`) — see `examples/line-spacing-column.tsx`.
-- A vertical bar between toolbar actions (`orientation="vertical"`); parent row should **`align-items: stretch`** so the line gets height.
-
-**When not to use**
-
-- As the only semantic boundary for document structure — use real headings / **`section`** (and **`hr`** when a thematic break is appropriate).
-- For switchable or collapsible grouping — use [Tabs](../tabs/COMPONENT.md) or [Accordion](../accordion/COMPONENT.md).
-- **`orientation="vertical"`** in a row with no definite height — the vertical line needs stretch from the parent.
-- Purely decorative repetition next to text that already states structure — hide from AT (**`role="presentation"`**, **`aria-hidden`**) per **Rules**.
-
-### Composition
-
-- Single public part: **`Divider.Root`** — optional **`children`** render in an inner **`span`** (**`styles.content`**).
-- Place **`Divider.Root`** in document order where the break should appear; no required child structure beyond optional slot content.
-
-### Examples (source)
-
-| Scenario | File |
-|----------|------|
-| Section breaks (`variant="text"`) | [`examples/section-breaks.tsx`](examples/section-breaks.tsx) |
-| Splits inside one card | [`examples/card-splits.tsx`](examples/card-splits.tsx) |
-| List row separators | [`examples/list-separators.tsx`](examples/list-separators.tsx) |
-| Inset copy in a stack, full-bleed rules | [`examples/inset-stack.tsx`](examples/inset-stack.tsx) |
-| `line-spacing` + vertical toolbar | [`examples/line-spacing-column.tsx`](examples/line-spacing-column.tsx) |
-
-Shared layout tokens for the examples: [`examples/divider-examples.module.css`](examples/divider-examples.module.css).
-
-Playground snippets (same demos as `playground/sections/DividerSection.tsx`):
-
-- **`variants.tsx`** — empty horizontal line; **`default`** with centered label; **`variant="text"`**; **`line-spacing`** between rows in a column; **`orientation="vertical"`** between toolbar-style buttons; full-width line between list rows (**`size="s"`**).
-- **`sizes.tsx`** — **`variant="text"`** at **`size`** **`s`**, **`m`**, and **`xl`** (three steps to compare label scale and spacing).
-- **`composition.tsx`** — **`Icon`** + label inside **`variant="text"`** **`size="m"`**; second divider at **`size="xl"`** with icon + label.
-
-### Rules
-
-- **Non-interactive:** no disabled/loading/focus states; behavior is plain **`div`** semantics unless you set **`role`** / **`aria-*`**.
-- **`variant="default"`** — full-width line; optional centered label unless **`align`** overrides.
-- **`variant="text"`** — uppercase section label styling; **`align`** defaults to **`start`**.
-- **`variant="line-spacing"`** — **`flex: 0 0 auto`** so it does not act as a flex grow spacer; spacing is the parent’s **`gap`**.
-- **Semantics:** default **`role="separator"`**; for **`orientation="vertical"`**, **`aria-orientation="vertical"`** is set automatically.
-- **Decoration:** redundant lines → **`role="presentation"`** (or **`none`**) and **`aria-hidden`** (see list example).
-- **Sizing:** match adjacent controls with the same **`size`** prop; do not patch stroke width with ad hoc pixels.
-
-### API
-
-#### Divider.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| orientation | `"horizontal"` \| `"vertical"` | `"horizontal"` | No | Line direction. |
-| align | `"start"` \| `"center"` \| `"end"` | `center` for `default` / `line-spacing`; `start` for `text` | No | Balance of `::before` / `::after` stubs around content. |
-| variant | `"default"` \| `"line-spacing"` \| `"text"` | `"default"` | No | Visual mode and flex participation. |
-| size | `"s"` \| `"m"` \| `"l"` \| `"xl"` | `"m"` | No | Gap, label type, icon scale, **`ControlSizeProvider`** value. |
-| children | `React.ReactNode` | — | No | Label, icon + text, or omit for a solid line. |
-| className | `string` | — | No | Extra class on the root. |
-| role | `string` | `"separator"` | No | Override for decorative separators. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | `aria-*`, `data-*`, etc. |
-
-### Related
-
-- [Typography](../typography/COMPONENT.md)
-- [Button](../button/COMPONENT.md)
-- [Link button](../link-button/COMPONENT.md)
-- [Tabs](../tabs/COMPONENT.md)
-- [Accordion](../accordion/COMPONENT.md)
-
-## LLM note
-
-- One export shape: **`Divider.Root`** only; no subcomponents.
-- **`variant` × `align` defaults:** `text` → **`align` `start`**; else **`center`** (explicit **`align`** always wins).
-- **`line-spacing`:** use only when the parent flex column uses **`gap`** for vertical rhythm; divider must not be relied on for layout height.
-- **Vertical:** requires ancestor **`align-items: stretch`** (or explicit height) so `::before`/`::after` flex segments fill the row.
-- **Children:** toggles inner **`span`** and **`ControlSizeProvider`**; **`Icon`** ignores its own **`size`** when inside divider content.
-- **a11y:** default **`separator`** is announced; for decorative list lines between items, mirror **`examples/list-separators.tsx`**: **`ul`/`li`**, separator **`li`** with **`aria-hidden`**, **`Divider.Root`** with **`role="presentation"`**.
-- **Playground alignment:** `variants.tsx` is one frame (empty line, `default` label, `text`, `line-spacing` column, vertical toolbar, list-row separator); `sizes.tsx` is `text` at **s / m / xl**; `composition.tsx` is icon + text at **m** and **xl**.
+## Related
+[Dropdown](../dropdown/COMPONENT.md) · [Card](../card/COMPONENT.md) · [PageContent](../page-content/COMPONENT.md)

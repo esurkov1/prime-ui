@@ -1,22 +1,30 @@
-import { Inbox } from "lucide-react";
-import { EmptyPage, type EmptyPageSize } from "prime-ui-kit";
+/** Sizes xs–xl change the icon tile, title size and padding; pass the same `size` to the buttons in Actions. Use small sizes inside cards and tables, large ones for whole pages. */
+import { FileText } from "lucide-react";
+import { Button, type ControlSize, EmptyPage, Typography } from "prime-ui-kit";
 
-import styles from "./examples-demos.module.css";
+import styles from "./examples.module.css";
 
-const sizes = ["s", "m", "l", "xl"] as const satisfies readonly EmptyPageSize[];
+const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
 
-/** Лестница размеров `s`–`xl`: иконка, кегль и отступы согласованы. */
-export function EmptyPageSizes() {
+export default function EmptyPageSizesExample() {
   return (
-    <div className={styles.stack}>
+    <div className={styles.grid}>
       {sizes.map((size) => (
-        <EmptyPage.Root key={size} size={size} aria-labelledby={`empty-size-${size}`}>
-          <EmptyPage.Icon aria-hidden>
-            <Inbox strokeWidth={2} aria-hidden />
-          </EmptyPage.Icon>
-          <EmptyPage.Title id={`empty-size-${size}`}>Размер {size}</EmptyPage.Title>
-          <EmptyPage.Description>Одинаковая структура, разная шкала.</EmptyPage.Description>
-        </EmptyPage.Root>
+        <div key={size} className={styles.group}>
+          <Typography.Root variant="code" tone="muted">
+            size="{size}"
+          </Typography.Root>
+          <EmptyPage.Root size={size} aria-labelledby={`empty-size-${size}`}>
+            <EmptyPage.Icon>
+              <FileText aria-hidden />
+            </EmptyPage.Icon>
+            <EmptyPage.Title id={`empty-size-${size}`}>Счетов нет</EmptyPage.Title>
+            <EmptyPage.Description>Выставленные счета появятся здесь.</EmptyPage.Description>
+            <EmptyPage.Actions>
+              <Button.Root size={size}>Выставить счёт</Button.Root>
+            </EmptyPage.Actions>
+          </EmptyPage.Root>
+        </div>
       ))}
     </div>
   );

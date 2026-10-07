@@ -57,7 +57,7 @@ describe("ButtonGroup", () => {
       </ButtonGroup.Root>,
     );
 
-    expect(screen.getByRole("button", { name: "On" })).toHaveAttribute("data-state", "on");
+    expect(screen.getByRole("button", { name: "On" })).toHaveAttribute("data-state", "active");
     expect(screen.getByRole("button", { name: "On" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: "Off" })).toHaveAttribute("aria-pressed", "false");
   });
@@ -100,5 +100,34 @@ describe("ButtonGroup", () => {
     );
 
     expect(container.firstElementChild).toHaveAttribute("data-size", "xl");
+  });
+
+  it("exposes role=group and fullWidth", () => {
+    render(
+      <ButtonGroup.Root aria-label="Tier" fullWidth>
+        <ButtonGroup.Item>A</ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+    const group = screen.getByRole("group", { name: "Tier" });
+    expect(group).toHaveAttribute("data-full-width", "true");
+  });
+
+  it("marks icon-only and leading-icon segments", () => {
+    render(
+      <ButtonGroup.Root>
+        <ButtonGroup.Item aria-label="Bold">
+          <ButtonGroup.Icon>B</ButtonGroup.Icon>
+        </ButtonGroup.Item>
+        <ButtonGroup.Item>
+          <ButtonGroup.Icon>G</ButtonGroup.Icon>
+          Grid
+        </ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Bold" })).toHaveAttribute("data-icon-only", "true");
+    expect(screen.getByRole("button", { name: "Grid" })).toHaveAttribute(
+      "data-leading-icon",
+      "true",
+    );
   });
 });

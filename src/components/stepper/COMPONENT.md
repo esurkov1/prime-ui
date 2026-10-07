@@ -1,221 +1,167 @@
 # Stepper
 
-**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
+**Category:** navigation (Навигация)
 
-## About
+> Steps of a multi-step process with pending, active, completed and error statuses.
 
-Multi-step progress UI on a semantic ordered list (`<ol>` / `<li>`) for **`Stepper`**, plus **`HorizontalStepper`** and **`VerticalStepper`** layouts where each row uses an explicit visual **`state`**.
+## When to use
+- Checkout, onboarding and setup wizards where the user moves through ordered steps.
+- Showing which steps are done, which is current and which failed.
+- A vertical step list next to the step form (`orientation="vertical"`, the default).
 
-**When to use**
+## When not to use
+- Switching between independent sections → use [Tabs](../tabs/COMPONENT.md).
+- Paging through a list → use [Pagination](../pagination/COMPONENT.md).
+- A chronological history of events → use [Timeline](../timeline/COMPONENT.md).
+- Progress as a number or bar without step names → use [SegmentedProgressBar](../segmented-progress-bar/COMPONENT.md) or [ProgressBar](../progress-bar/COMPONENT.md).
 
-- Wizards, checkout or form stages, and any flow where discrete ordered steps should read clearly.
-- **`Stepper`** when **`currentStep`** (and optional per-step **`status`**) should drive numbering and completed / active / pending / error visuals.
-- **`HorizontalStepper`** / **`VerticalStepper`** when step logic lives in the app (store, router, API) and you set **`state`** on each **`Item`** yourself.
+## Import
+```tsx
+import { Stepper } from "prime-ui-kit";
+```
 
-**When not to use**
+## Anatomy
+- `Stepper.Root` — `<ol>`; holds the current step index; in horizontal mode inserts chevron separators between steps.
+  - `Stepper.Step` — `<li>` with a `<button>`; must be a direct child of Root (index = order).
+    - `Stepper.Indicator` — circle with the step number, a check when completed, or custom content.
+    - `Stepper.Content` — text column.
+      - `Stepper.Title` — step name.
+      - `Stepper.Description` — muted support text.
+    - `Stepper.Arrow` — trailing chevron for vertical rows that open a page or panel.
 
-- Site hierarchy or drill-down navigation — prefer [Breadcrumb](../breadcrumb/COMPONENT.md).
-- When a single continuous fraction matters more than discrete steps — consider [Progress bar](../progress-bar/COMPONENT.md).
-- Primitive rails alone when you need native **ordered list** semantics — use **`Stepper.Root`** or add appropriate roles / markup around primitives.
+## API
 
-## Composition
+### Stepper.Root
+Does not forward a ref. + native `<ol>` props (except `children`, `defaultValue`, `onChange`).
 
-- **`Stepper.Root`** — `<ol>`; provides **`orientation`**, **`currentStep`**, **`size`**, and a per-render counter for automatic step indices. Children: **`Stepper.Step`** (alias **`Stepper.Item`**) and, in horizontal flows, **`Stepper.SeparatorIcon`** between steps.
-- **`Stepper.Step` / `Stepper.Item`** — `<li>` wrapping a **`<button>`**; supplies step context (**`status`**, **`index`**) to **`Indicator`** and **`Content`**. Optional **`Stepper.Arrow`** after content is common in **vertical** orientation.
-- **`Stepper.Indicator` / `Stepper.ItemIndicator`** — **`span`**; default shows **1-based index** or a checkmark when completed; **`aria-hidden`**. Maps high-level **`error`** to **`data-legacy-status="error"`** for styling.
-- **`Stepper.Content`** — title and optional description beside the indicator.
-- **`Stepper.SeparatorIcon`** — `<li>` with a chevron between horizontal steps (delegates to **`HorizontalStepper.SeparatorIcon`**).
-- **`Stepper.Arrow`** — vertical arrow icon (delegates to **`VerticalStepper.Arrow`**).
-- **`HorizontalStepper.Root`** — non-semantic **`div`** rail; children: **`SeparatorIcon`** and **`Item`** buttons, each with **`ItemIndicator`** inside.
-- **`VerticalStepper.Root`** — non-semantic **`div`** column; children: **`Item`** rows with **`ItemIndicator`**, label text, and optional **`Arrow`**.
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `orientation` | `"horizontal" \| "vertical"` | `"vertical"` | Layout. A horizontal stepper stacks vertically when its container is narrower than 30rem. |
+| `value` | `number` | — | Current step (0-based), controlled. |
+| `defaultValue` | `number` | `0` | Initial step, uncontrolled. |
+| `onValueChange` | `(index: number) => void` | — | Called with the step index when a step is clicked. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Indicator size, text and spacing. |
+| `children` | `ReactNode` | — (required) | `Stepper.Step` elements as direct children (an array from `map` is fine). |
+| `className` | `string` | — | Extra class on the `<ol>`. |
 
-### Scenarios (playground + `examples/`)
+### Stepper.Step
+`forwardRef` → `HTMLButtonElement`. + native `<button>` props except `type`, `children` (`className` goes on the button).
 
-Live demos use **`playground/snippets/stepper/*.tsx`** (see **`playground/sections/StepperSection.tsx`**). The table lists the same scenarios with package-oriented copies under **`examples/`** (aligned 1:1 with those snippets; order matches the playground section).
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `status` | `"pending" \| "active" \| "completed" \| "error"` | derived | Overrides the status derived from Root `value` (before → `completed`, equal → `active`, after → `pending`). |
+| `disabled` | `boolean` | — | Native disabled; the step cannot be selected. |
+| `onClick` | `(event) => void` | — | Runs before selection; `event.preventDefault()` cancels selecting the step. |
+| `children` | `ReactNode` | — (required) | Indicator, Content, Arrow. |
 
-| Scenario | What it shows | `examples/` |
-|----------|---------------|-------------|
-| Sizes | Four **`size`** values on **`Stepper.Root`** (`s`–`xl`), same three steps per row. | [`examples/sizes.tsx`](examples/sizes.tsx) |
-| Low-level API | **`HorizontalStepper`** and **`VerticalStepper`** with explicit per-row **`state`** (no **`currentStep`** / semantic **`<ol>`**). | [`examples/low-level-api.tsx`](examples/low-level-api.tsx) |
-| States | **`disabled`** step and **`status="error"`** with custom **`Indicator`** content. | [`examples/states.tsx`](examples/states.tsx) |
-| Orientation | **`orientation="horizontal"`** with **`SeparatorIcon`**; vertical default with **`Stepper.Arrow`** on steps. | [`examples/orientation.tsx`](examples/orientation.tsx) |
-| Controlled | Parent **`currentStep`** plus **Back** / **Next** **`Button`** actions. | [`examples/controlled.tsx`](examples/controlled.tsx) |
-| Composition | Custom **`Indicator`**, **`Content`**, and an extra icon beside the label (**`IconMail`**). | [`examples/composition.tsx`](examples/composition.tsx) |
-| Full width | Horizontal rail spanning a wide card; root **`className`** spreads steps (**`width: 100%`**, **`justify-content: space-between`**). | [`examples/full-width.tsx`](examples/full-width.tsx) |
-| Polymorphic **`as`** | **`HorizontalStepper.SeparatorIcon`** and **`VerticalStepper.Arrow`** with **`as={IconHouse}`** / **`as={IconMail}`**. | [`examples/polymorphic-as.tsx`](examples/polymorphic-as.tsx) |
-| Features | **`Stepper.Item`** / **`ItemIndicator`** aliases, explicit **`index`**, **`SeparatorIcon`** as separate list items. | [`examples/features.tsx`](examples/features.tsx) |
+### Stepper.Indicator
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | step number / check | Replaces the default content (e.g. `!` for an error). |
+| `className` | `string` | — | Extra class. |
 
-**Additional narrative examples** (not duplicated as snippet files): checkout horizontal rail → [`examples/01-checkout-horizontal.tsx`](examples/01-checkout-horizontal.tsx); onboarding + back/next → [`examples/02-onboarding-vertical.tsx`](examples/02-onboarding-vertical.tsx); vertical primitive rail → [`examples/03-vertical-primitive-rail.tsx`](examples/03-vertical-primitive-rail.tsx); error step + **`currentStep`** on payment → [`examples/04-checkout-step-error.tsx`](examples/04-checkout-step-error.tsx); horizontal primitive only → [`examples/05-horizontal-primitive.tsx`](examples/05-horizontal-primitive.tsx).
+### Stepper.Content, Stepper.Title, Stepper.Description
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | Content. |
+| `className` | `string` | — | Extra class. |
 
-**LLM note:** Prefer `./examples/*.tsx` for runnable scenarios; this page keeps rules and API tables authoritative.
+### Stepper.Arrow
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `className` | `string` | — | Extra class. |
 
-### Canonical example
+## Variants
+
+### orientation
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `vertical` | full-width rows (indicator · text · optional arrow); hover `fill-subtle`, active row on `fill-subtle`, error row on `danger-soft` | side columns of wizards, step lists with descriptions | yes |
+| `horizontal` | steps in a row with placeholder-colored chevrons between them; hover → primary text; below 30rem container width the steps stack one per row and chevrons hide | checkout headers with short step names | |
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | indicator 20, 12/16 text, check 14 | dense panels | |
+| `s` | indicator 24, 13/20 text, check 14 | compact cards | |
+| `m` | indicator 28, 14/20 text, check 16 | default | yes |
+| `l` | indicator 32, 16/24 text, check 16 | large forms | |
+| `xl` | indicator 36, 16/24 text, check 20 | hero onboarding | |
+
+Title uses the control text of the tier, Description the hint text of the tier.
+
+### status
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `pending` | `fill-muted` circle with secondary number, secondary text | steps after the current one | derived |
+| `active` | accent circle with a `space-1` `accent-soft` halo, primary text | the current step | derived |
+| `completed` | `accent-soft` circle with an accent check, primary text | finished steps | derived |
+| `error` | horizontal: `danger-soft` circle; vertical: solid danger circle on a `danger-soft` row; danger text | a step that needs attention | |
+
+**Combinations**
+- Recommended: derive statuses from `value`; set `status="error"` only on the failing step with `<Stepper.Indicator>!</Stepper.Indicator>`; disable steps the user cannot reach yet.
+- Avoid: `Stepper.Arrow` in horizontal mode (the root adds chevrons); `Stepper.Description` in horizontal mode with long text; several `active` steps.
+
+## States
+| State | Driven by | DOM |
+|---|---|---|
+| status | `value` or `status` | `data-status` on the button and the indicator; `aria-current="step"` on the active step |
+| disabled | `disabled` | native `disabled`, `data-disabled="true"`, `text-disabled`, muted indicator without halo |
+| hover / active | pointer | vertical `fill-subtle` / `fill-subtle-active`; horizontal text → primary |
+| focus-visible | keyboard | outer focus ring |
+
+Root attributes: `data-orientation`, `data-size`. Controlled: `value` + `onValueChange`; uncontrolled: `defaultValue` (clicks still select steps).
+
+## Layout & spacing
+- The root is a size container (`inline-size: 100%`): give it a definite width, a shrink-wrapped parent collapses it.
+- Wizard: stepper column and form side by side with `gap: var(--prime-space-8)`, stacking on narrow widths (`grid-template-columns: repeat(auto-fit, minmax(…, 1fr))`).
+- Vertical rows are separated by `var(--prime-space-1)` (`var(--prime-space-2)` at `size="xl"`); the same value is the row gap of a wrapping horizontal stepper.
+
+## Accessibility
+- Semantic `<ol>`; each step is a `<button>` inside an `<li>`; the active one has `aria-current="step"`.
+- Separators, indicator and arrow are `aria-hidden`; the step name comes from Title (and Description).
+- Give the `<ol>` an `aria-label` when there are several steppers on a page.
+- Keyboard: Tab between steps, Enter/Space selects. No `labels` keys.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [wizard.tsx](examples/wizard.tsx) | Vertical stepper + step form + Back / Next | setup and onboarding wizards |
+| [orientation.tsx](examples/orientation.tsx) | Horizontal and vertical (with Description and Arrow), one `value` | choosing a layout |
+| [states.tsx](examples/states.tsx) | Explicit completed / error / active / pending + disabled | server-driven statuses |
+| [sizes.tsx](examples/sizes.tsx) | Five size tiers | matching the form size |
+| [narrow.tsx](examples/narrow.tsx) | Horizontal stepper at 320px stacks | phones |
 
 ```tsx
 import { Stepper } from "prime-ui-kit";
 
-export function Example() {
+export function CheckoutSteps() {
   return (
-    <Stepper.Root orientation="vertical">
-      <Stepper.Step type="button">
+    <Stepper.Root orientation="horizontal" defaultValue={1}>
+      <Stepper.Step>
         <Stepper.Indicator />
-        <Stepper.Content title="Account" description="Sign in or create a profile" />
-        <Stepper.Arrow />
+        <Stepper.Content>
+          <Stepper.Title>Корзина</Stepper.Title>
+        </Stepper.Content>
       </Stepper.Step>
-      <Stepper.Step type="button">
+      <Stepper.Step>
         <Stepper.Indicator />
-        <Stepper.Content title="Workspace" description="Name and region" />
-        <Stepper.Arrow />
-      </Stepper.Step>
-      <Stepper.Step type="button">
-        <Stepper.Indicator />
-        <Stepper.Content title="Finish" />
+        <Stepper.Content>
+          <Stepper.Title>Оплата</Stepper.Title>
+        </Stepper.Content>
       </Stepper.Step>
     </Stepper.Root>
   );
 }
 ```
 
-## Rules
-
-- **`Stepper.Root`**: **`currentStep`** defaults to **`0`**; indices before it are **`completed`**, the equal index is **`active`**, after are **`pending`**. Override any step with **`status`** on **`Stepper.Step`** (e.g. **`error`**).
-- **`Stepper.Step`** without **`index`** consumes the next auto index in child order; mixing explicit **`index`** and auto indices requires careful ordering.
-- **`SeparatorIcon`** is intended for **`orientation="horizontal"`**; it is not the vertical connector pattern.
-- Primitives use **`StepperAlignItemState`**: **`default`** \| **`active`** \| **`completed`** only—no built-in **`error`**; use **`Stepper`** for **`error`** or custom indicator content.
-- Active step sets **`aria-current="step"`** on the **`Stepper`** step button; indicators and separators use **`aria-hidden`** where the label carries meaning—keep titles and descriptions meaningful for assistive tech.
-- **`HorizontalStepper`** / **`VerticalStepper`** do not emit **`<ol>`** / **`<li>`**; add list semantics externally if required.
-- Step transitions, validation, and routing are **app-owned**; the kit handles presentation and button interactions only.
-
-## API
-
-Exported types include **`StepStatus`**, **`StepperOrientation`**, **`StepperSize`**, and **`StepperAlignItemState`** (for primitives).
-
-### Stepper.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| orientation | `"horizontal" \| "vertical"` | `"vertical"` | No | Layout of the step list |
-| currentStep | `number` | `0` | No | Active step index for default statuses |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control tier for the subtree |
-| children | `React.ReactNode` | — | Yes | Steps and optional **`SeparatorIcon`** |
-| className | `string` | — | No | Class on **`<ol>`** (e.g. full-width horizontal rail: **`width: 100%`** and **`justify-content: space-between`** to override the default centered flex layout) |
-
-### Stepper.Step (Stepper.Item)
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| index | `number` | auto | No | Step index for status and indicator |
-| status | `StepStatus` | from **`currentStep`** | No | **`pending`** \| **`active`** \| **`completed`** \| **`error`** |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | **`button`** **`type`** |
-| disabled | `boolean` | — | No | Disables the step button |
-| className | `string` | — | No | Class on **`<button>`** |
-| children | `React.ReactNode` | — | Yes | Indicator, content, optional arrow |
-| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type">` | — | No | Other button attributes (**`ref`** supported) |
-
-### Stepper.Indicator (Stepper.ItemIndicator)
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | index / checkmark | No | Custom indicator content |
-| className | `string` | — | No | Class on **`span`** |
-
-### Stepper.Content
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| title | `string` | — | Yes | Primary label |
-| description | `string` | — | No | Secondary text |
-| className | `string` | — | No | Wrapper class |
-
-### Stepper.SeparatorIcon
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the inner icon |
-
-### Stepper.Arrow
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| as | `React.ElementType` | `IconChevronRight` | No | Icon component |
-| className | `string` | — | No | Class on the icon |
-| …rest | props of **`as`** | — | No | Forwarded to the icon |
-
-### HorizontalStepper.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control tier |
-| className | `string` | — | No | Class on **`div`** |
-| children | `React.ReactNode` | — | No | Rail content |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Container attributes |
-
-### HorizontalStepper.SeparatorIcon
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| as | `React.ElementType` | `IconChevronRight` | No | Separator icon component |
-| className | `string` | — | No | Class on the SVG |
-| …rest | `Omit<React.ComponentPropsWithoutRef<T>, "as" \| "className">` | — | No | Forwarded to **`as`** |
-
-### HorizontalStepper.Item
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| state | `StepperAlignItemState` | `"default"` | No | **`default`** \| **`active`** \| **`completed`** |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | **`button`** **`type`** |
-| className | `string` | — | No | Class on **`<button>`** |
-| children | `React.ReactNode` | — | No | Indicator and label |
-| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type">` | — | No | Other button attributes (**`ref`** supported) |
-
-### HorizontalStepper.ItemIndicator
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| state | `StepperAlignItemState` | from context | No | Visual override |
-| className | `string` | — | No | Class on **`div`** |
-| children | `React.ReactNode` | checkmark when completed | No | Circle contents when not completed |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | **`div`** attributes |
-
-### VerticalStepper.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control tier |
-| className | `string` | — | No | Class on **`div`** |
-| children | `React.ReactNode` | — | No | Vertical items |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Container attributes |
-
-### VerticalStepper.Arrow
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| as | `React.ElementType` | `IconChevronRight` | No | Icon component |
-| className | `string` | — | No | Class on the icon |
-| …rest | `Omit<React.ComponentPropsWithoutRef<T>, "as" \| "className">` | — | No | Forwarded to **`as`** |
-
-### VerticalStepper.Item
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| state | `StepperAlignItemState` | `"default"` | No | Row state |
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | **`button`** **`type`** |
-| className | `string` | — | No | Class on **`<button>`** |
-| children | `React.ReactNode` | — | No | Indicator, text, optional arrow |
-| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type">` | — | No | Other button attributes (**`ref`** supported) |
-
-### VerticalStepper.ItemIndicator
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| state | `StepperAlignItemState` | from context | No | Indicator state |
-| className | `string` | — | No | Class on **`div`** |
-| children | `React.ReactNode` | checkmark when completed | No | Circle contents when not completed |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | **`div`** attributes |
+## Mistakes
+- Wrapping `Stepper.Step` in another component or element → it must be a direct child of Root (it throws otherwise).
+- 1-based `value` → steps are 0-based.
+- Adding separators by hand in horizontal mode → the root inserts them.
+- `status="error"` without changing the indicator → pass `<Stepper.Indicator>!</Stepper.Indicator>` so the error does not read as a number only.
 
 ## Related
-
-- [Button](../button/COMPONENT.md) — next / back actions next to a controlled stepper
-- [Modal](../modal/COMPONENT.md) and [Drawer](../drawer/COMPONENT.md) — wizard shells
-- [Breadcrumb](../breadcrumb/COMPONENT.md) — hierarchy, not linear stages
-- [Progress bar](../progress-bar/COMPONENT.md) — continuous progress instead of discrete steps
+- [Tabs](../tabs/COMPONENT.md)
+- [Pagination](../pagination/COMPONENT.md)
+- [Timeline](../timeline/COMPONENT.md)

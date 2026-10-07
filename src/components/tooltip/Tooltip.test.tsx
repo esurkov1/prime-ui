@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Tooltip } from "./Tooltip";
+import { computeTooltipPosition, Tooltip } from "./Tooltip";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -213,10 +213,11 @@ describe("Tooltip", () => {
       expect(trigger).toHaveAttribute("aria-describedby", tooltip.id);
     });
 
-    it("aria-describedby is set even when tooltip is closed", () => {
+    it("closed tooltip: no dangling aria-describedby, data-state=closed on the trigger", () => {
       render(<BasicTooltip />);
       const trigger = screen.getByRole("button", { name: "Trigger" });
-      expect(trigger).toHaveAttribute("aria-describedby");
+      expect(trigger).not.toHaveAttribute("aria-describedby");
+      expect(trigger).toHaveAttribute("data-state", "closed");
     });
   });
 
@@ -225,5 +226,81 @@ describe("Tooltip", () => {
       render(<BasicTooltip defaultOpen={true} />);
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
     });
+  });
+});
+
+describe("Tooltip — позиционирование и клавиатура", () => {
+  const rect = { top: 4, bottom: 36, left: 100, right: 132, width: 32, height: 32 };
+
+  it("у верхнего края переворачивается вниз и держит 8px от краёв", () => {
+    const pos = computeTooltipPosition(rect, 120, 24, 320, 640, "top", 4, 8);
+    expect(pos.side).toBe("bottom");
+    expect(pos.top).toBe(40);
+    const edge = computeTooltipPosition(
+      { ...rect, left: 0, right: 32 },
+      120,
+      24,
+      320,
+      640,
+      "bottom",
+      4,
+      8,
+    );
+    expect(edge.left).toBe(8);
+  });
+
+  it("Escape закрывает открытый тултип", () => {
+    const onOpenChange = vi.fn();
+    render(
+      <Tooltip.Root defaultOpen onOpenChange={onOpenChange}>
+        <Tooltip.Trigger>
+          <button type="button">T</button>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Подсказка</Tooltip.Content>
+      </Tooltip.Root>,
+    );
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
+});
+
+describe("Tooltip — overlay contract", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  it("pointer-leave plays the exit (data-state=closed) and unmounts after it", async () => {
+    render(<BasicTooltip delayDuration={0} />);
+    const trigger = screen.getByRole("button", { name: "Trigger" });
+    await act(async () => {
+      fireEvent.mouseEnter(trigger);
+      vi.runAllTimers();
+    });
+    expect(screen.getByRole("tooltip")).toHaveAttribute("data-state", "open");
+
+    fireEvent.mouseLeave(trigger);
+    expect(screen.getByRole("tooltip")).toHaveAttribute("data-state", "closed");
+
+    fireEvent.animationEnd(screen.getByRole("tooltip"));
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 });

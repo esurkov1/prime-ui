@@ -1,4 +1,14 @@
+import type * as React from "react";
+
 import { PageContent } from "@/components/page-content/PageContent";
+import PaginationCompactExample from "@/components/pagination/examples/compact";
+import compactSource from "@/components/pagination/examples/compact.tsx?raw";
+import PaginationListFooterExample from "@/components/pagination/examples/list-footer";
+import listFooterSource from "@/components/pagination/examples/list-footer.tsx?raw";
+import PaginationSizesExample from "@/components/pagination/examples/sizes";
+import sizesSource from "@/components/pagination/examples/sizes.tsx?raw";
+import PaginationStatesExample from "@/components/pagination/examples/states";
+import statesSource from "@/components/pagination/examples/states.tsx?raw";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,189 +16,157 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import PaginationControlledSnippet from "../snippets/pagination/controlled";
-import paginationControlledSource from "../snippets/pagination/controlled.tsx?raw";
-import PaginationFeaturesSnippet from "../snippets/pagination/features";
-import paginationFeaturesSource from "../snippets/pagination/features.tsx?raw";
-import PaginationFullWidthSnippet from "../snippets/pagination/full-width";
-import paginationFullWidthSource from "../snippets/pagination/full-width.tsx?raw";
-import PaginationRangeModesSnippet from "../snippets/pagination/range-modes";
-import paginationRangeModesSource from "../snippets/pagination/range-modes.tsx?raw";
-import PaginationSizesSnippet from "../snippets/pagination/sizes";
-import paginationSizesSource from "../snippets/pagination/sizes.tsx?raw";
-import PaginationStatesSnippet from "../snippets/pagination/states";
-import paginationStatesSource from "../snippets/pagination/states.tsx?raw";
 
 const paginationRootApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "page",
+    prop: "value / defaultValue",
     type: "number",
-    defaultValue: "—",
-    required: "Да",
-    description:
-      "Текущая страница (1 … totalPages); значение ограничивается диапазоном при расчёте.",
+    defaultValue: "— / 1",
+    required: "Нет",
+    description: "Текущая страница (с 1), управляемо / начально; ограничивается `1…totalPages`.",
   },
   {
     prop: "totalPages",
     type: "number",
     defaultValue: "—",
     required: "Да",
-    description: "Число страниц. При значении меньше 1 компонент ничего не рендерит.",
+    description: "Число страниц; при значении меньше 1 ничего не рендерится.",
   },
   {
-    prop: "onPageChange",
+    prop: "onValueChange",
     type: "(page: number) => void",
     defaultValue: "—",
-    required: "Да",
-    description: "Вызывается при выборе номера страницы или нажатии «назад» / «вперёд».",
+    required: "Нет",
+    description: "Выбор страницы или стрелки.",
   },
   {
     prop: "siblingCount",
     type: "number",
     defaultValue: "1",
     required: "Нет",
-    description: "Сколько номеров страниц показывать слева и справа от текущей в сокращённом ряду.",
+    description: "Сколько номеров по бокам от текущей при `totalPages > 7`.",
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
+    description: "Ярус контролов: высота как у Button / Input того же размера.",
+  },
+  {
+    prop: "compact",
+    type: 'boolean | "auto"',
+    defaultValue: "false",
+    required: "Нет",
+    description: '«Текущая / всего» вместо номеров; `"auto"` — по ширине контейнера.',
+  },
+  {
+    prop: "labels",
+    type: "Partial<PaginationLabels>",
+    defaultValue: "русские строки",
+    required: "Нет",
     description:
-      "Размер кнопок номеров и стрелок; многоточие подстраивается под тот же ярус токенов.",
+      "Тексты для скринридеров: nav, previous, next, page(n), of. `labels.nav` задаёт `aria-label` навигации.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный CSS-класс для корневого <nav>.",
+    description: "Класс корневого `nav`.",
   },
 ];
 
+function Demo({
+  title,
+  description,
+  code,
+  children,
+}: {
+  title: string;
+  description: React.ReactNode;
+  code: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="demoBlock">
+      <DemoSectionTitle>{title}</DemoSectionTitle>
+      <DemoDescription>{description}</DemoDescription>
+      <PlaygroundExampleFrame.Root code={code.trim()} previewLayout="stack">
+        <PlaygroundExampleFrame.Stage>{children}</PlaygroundExampleFrame.Stage>
+      </PlaygroundExampleFrame.Root>
+    </div>
+  );
+}
+
 export default function PaginationSection() {
   return (
-    <PageContent.Section>
+    <PageContent.Section aria-labelledby="pagination-heading">
       <PageContent.Header>
-        <PageContent.Title>Pagination</PageContent.Title>
+        <PageContent.Title id="pagination-heading">Pagination</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Переключение страниц длинного списка: стрелки «назад» и «вперёд», номера и сокращение
-              ряда многоточием, когда страниц много. Текущая страница выделяется; границы списка
-              отключают лишние переходы.
-            </>
-          }
+          Навигация по страницам: стрелки, номера с многоточием и компактный вид «3 / 12» для узких
+          мест. Кнопки — ghost, текущая страница — <code>accent-soft</code>.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
-          <div className="demoBlock">
-            <DemoSectionTitle>Размеры</DemoSectionTitle>
-            <DemoDescription>
-              Четыре значения <code>size</code> — <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-              <code>xl</code>; на длинном диапазоне видны и стрелки, и номера, и ячейка с «…» в
-              одном масштабе.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={paginationSizesSource.trim()}
-              previewLayout="stack-center"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <PaginationSizesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Подвал списка"
+            description={
+              <>
+                Диапазон записей, выбор количества на странице и пагинация одного размера{" "}
+                <code>s</code> в одном ряду; на узкой ширине ряд переносится.
+              </>
+            }
+            code={listFooterSource}
+          >
+            <PaginationListFooterExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Диапазон номеров</DemoSectionTitle>
-            <DemoDescription>
-              При не больше семи страницах показываются все номера подряд; при большем — края (1 и
-              последняя) и «окно» вокруг текущей с «…». Отдельного пропа нет: поведение задаёт{" "}
-              <code>totalPages</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={paginationRangeModesSource.trim()}
-              previewLayout="stack"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <PaginationRangeModesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Размеры"
+            description={
+              <>
+                <code>xs · s · m · l · xl</code>. Рядом — Button того же размера: высоты совпадают
+                (28 · 32 · 36 · 40 · 48).
+              </>
+            }
+            code={sizesSource}
+          >
+            <PaginationSizesExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Состояния</DemoSectionTitle>
-            <DemoDescription>
-              На первой странице отключена кнопка «назад», на последней — «вперёд»; при{" "}
-              <code>totalPages=1</code> неактивны обе. Текущая страница помечается{" "}
-              <code>aria-current=&quot;page&quot;</code> и визуально выделяется.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={paginationStatesSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <PaginationStatesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Состояния и диапазон"
+            description={
+              <>
+                Отключённые стрелки на краях, без многоточия до 7 страниц, окно вокруг текущей —{" "}
+                <code>siblingCount</code>.
+              </>
+            }
+            code={statesSource}
+          >
+            <PaginationStatesExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
-            <DemoDescription>
-              Компонент только контролируемый: нужны <code>page</code> и <code>onPageChange</code>.
-              Состояние живёт у родителя; можно синхронизировать его с таблицей, запросом или
-              другими кнопками.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={paginationControlledSource.trim()}
-              previewLayout="stack"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <PaginationControlledSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
-            <DemoDescription>
-              Растянуть блок на ширину колонки или панели — обёртка с <code>width: 100%</code> и
-              выравниванием (например подпись слева, пагинация справа). У{" "}
-              <code>Pagination.Root</code> отдельного пропа ширины нет.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={paginationFullWidthSource.trim()}
-              previewLayout="stack"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <PaginationFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              <code>siblingCount</code> сужает или расширяет окно номеров вокруг активной страницы.
-              При <code>totalPages</code> меньше 1 возвращается <code>null</code> (не рендерится
-              разметка навигации).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={paginationFeaturesSource.trim()}
-              previewLayout="stack"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <PaginationFeaturesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Компактный вид"
+            description={
+              <>
+                <code>compact</code> всегда показывает «текущая / всего»;{" "}
+                <code>compact="auto"</code> переключается сам по ширине контейнера — так работает
+                подвал DataTable на мобильных.
+              </>
+            }
+            code={compactSource}
+          >
+            <PaginationCompactExample />
+          </Demo>
 
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Pagination.Root</DemoApiTitle>
-            <DemoDescription>
-              Обертка-навигация с кнопками страниц и стрелками; внутри используются{" "}
-              <code>Button.Root</code> и иконки направления.
-            </DemoDescription>
             <PlaygroundApiTable rows={paginationRootApiRows} />
           </div>
         </div>

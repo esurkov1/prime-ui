@@ -66,4 +66,23 @@ describe("PageContent", () => {
 
     expect(screen.getByText("Wide lead")).toHaveAttribute("data-measure", "full");
   });
+
+  it("places Actions next to the heading block", () => {
+    render(
+      <PageContent.Header data-testid="header">
+        <PageContent.Title>Projects</PageContent.Title>
+        <PageContent.Description>All projects</PageContent.Description>
+        <PageContent.Actions>
+          <button type="button">New project</button>
+        </PageContent.Actions>
+      </PageContent.Header>,
+    );
+
+    const header = screen.getByTestId("header");
+    expect(header).toHaveAttribute("data-has-actions", "true");
+    const [heading, actions] = Array.from(header.children);
+    expect(heading).toContainElement(screen.getByRole("heading", { level: 1 }));
+    expect(heading).not.toContainElement(screen.getByRole("button", { name: "New project" }));
+    expect(actions).toContainElement(screen.getByRole("button", { name: "New project" }));
+  });
 });

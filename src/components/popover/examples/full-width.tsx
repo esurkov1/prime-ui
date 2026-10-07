@@ -1,25 +1,21 @@
-import { Button, Popover } from "prime-ui-kit";
+/** `sameMinWidthAsTrigger`: the panel takes the width of a full-width trigger and the text wraps. Use in narrow columns and sidebars. */
+import { Button, Popover, Typography } from "prime-ui-kit";
 
-import styles from "./popover-examples.module.css";
+import preview from "./examples.module.css";
 
-/**
- * `sameMinWidthAsTrigger`: panel width matches the trigger (`border-box`), useful in narrow columns.
- */
 export default function PopoverFullWidthExample() {
   return (
-    <div className={styles.narrowColumn}>
+    <div className={preview.narrowColumn}>
       <Popover.Root>
-        <Popover.Trigger asChild>
-          <Button.Root className={styles.fullWidthTrigger} mode="stroke" variant="neutral">
-            Match trigger width
+        <Popover.Trigger>
+          <Button.Root variant="soft" tone="neutral" fullWidth>
+            Условия тарифа
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" sameMinWidthAsTrigger side="bottom">
-          <p className={styles.panelTextMuted}>
-            <code>sameMinWidthAsTrigger</code> sets panel <code>width</code> and{" "}
-            <code>minWidth</code> to the anchor — text wraps, still capped by panel max width and
-            the viewport.
-          </p>
+        <Popover.Content sameMinWidthAsTrigger>
+          <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+            До 10 пользователей, 50 ГБ хранилища и приоритетная поддержка.
+          </Typography.Root>
         </Popover.Content>
       </Popover.Root>
     </div>

@@ -1,34 +1,46 @@
-import { Button, Popover } from "prime-ui-kit";
+/** A destructive confirm with Header, Title, Description and Actions, and a disabled trigger that never opens the panel. Use for lightweight confirmations next to the action. */
+import { Button, Popover, Typography } from "prime-ui-kit";
+import * as React from "react";
 
-import styles from "./popover-examples.module.css";
+import preview from "./examples.module.css";
 
-/**
- * `defaultOpen` for initially visible panel; disabled trigger does not open the popover.
- */
 export default function PopoverStatesExample() {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <div className={styles.sizesRow}>
-      <Popover.Root defaultOpen>
-        <Popover.Trigger asChild>
-          <Button.Root mode="stroke" variant="neutral">
-            Starts open
+    <div className={preview.row}>
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Trigger>
+          <Button.Root variant="soft" tone="danger">
+            Удалить комментарий
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <p className={styles.panelTextMuted}>
-            <code>defaultOpen</code> on the root — initial open state without lifting state up.
-          </p>
+        <Popover.Content className={preview.panelWidth}>
+          <Popover.Header>
+            <Popover.Title>Удалить комментарий?</Popover.Title>
+            <Popover.Description>Его нельзя будет восстановить.</Popover.Description>
+          </Popover.Header>
+          <Popover.Actions>
+            <Button.Root variant="ghost" tone="neutral" onClick={() => setOpen(false)}>
+              Отмена
+            </Button.Root>
+            <Button.Root tone="danger" onClick={() => setOpen(false)}>
+              Удалить
+            </Button.Root>
+          </Popover.Actions>
         </Popover.Content>
       </Popover.Root>
 
       <Popover.Root>
-        <Popover.Trigger asChild>
-          <Button.Root disabled mode="stroke" variant="neutral">
-            Trigger disabled
+        <Popover.Trigger>
+          <Button.Root variant="soft" tone="neutral" disabled>
+            Недоступно
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content align="start" side="bottom">
-          <p className={styles.panelTextMuted}>Panel never opens while the button is disabled.</p>
+        <Popover.Content>
+          <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+            Не откроется: триггер отключён.
+          </Typography.Root>
         </Popover.Content>
       </Popover.Root>
     </div>

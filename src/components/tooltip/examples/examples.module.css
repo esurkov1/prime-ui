@@ -1,67 +1,53 @@
-/* Mirrors playground/snippets/tooltip/snippets.module.css — layout for package examples */
+/* Layout for the Tooltip examples: layout only, text goes through Typography. */
 
-.demoItem {
-  display: grid;
-  gap: var(--prime-sys-spacing-s);
-  justify-items: center;
-}
-
-.rowWrapXlCenter {
+.row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-xl);
   align-items: center;
-}
-
-.rowWrapXlJustifyCenter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-xl);
   justify-content: center;
+  gap: var(--prime-space-3);
 }
 
-.rowWrapMStretch {
+.column {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-m);
-  align-items: stretch;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-4);
 }
 
-.controlledStack {
-  display: grid;
-  gap: var(--prime-sys-spacing-l);
-  max-width: 22.5rem;
-}
-
-.surfacePanel {
-  display: grid;
-  gap: var(--prime-sys-spacing-m);
-  justify-items: center;
-  padding: var(--prime-sys-spacing-l);
-  border-radius: var(--prime-sys-radius-m);
-}
-
-.surfaceDefault {
-  background: var(--prime-sys-color-surface-default);
-}
-
-.surfaceRaised {
-  background: var(--prime-sys-color-surface-raised);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  padding: var(--prime-space-1);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
 }
 
 .inlineHelpTrigger {
-  margin: 0;
   padding: 0;
-  border: none;
+  border: 0;
   background: none;
-  font: inherit;
   color: inherit;
-  cursor: help;
+  font: inherit;
   text-decoration: underline dotted;
-  text-underline-offset: 2px;
+  text-underline-offset: var(--prime-space-1);
+  cursor: help;
 }
 
-.tooltipContentP {
-  margin: 0;
+.inlineHelpTrigger:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+  border-radius: var(--prime-radius-xs);
+}
+
+.disabledWrap {
+  display: inline-flex;
+  border-radius: var(--prime-control-m-radius);
+}
+
+.disabledWrap:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }

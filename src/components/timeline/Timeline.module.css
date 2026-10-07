@@ -1,0 +1,500 @@
+/*
+ * Timeline — Graphite. Activity feed: labelled `ol` groups of rows.
+ * Row grid: dot column · text (title over meta) · value (centered on the row, right-aligned).
+ * The 2px `border-subtle` line is drawn per `li` around the dot and spans the first to the last dot.
+ * Active row: `fill-subtle-active` pill (radius l), accent title and dot. Interactive rows:
+ * hover `fill-subtle`, inset focus ring. Below 20rem of root width the value moves under the meta.
+ */
+
+.root {
+  --tl-title-size: var(--prime-control-m-text-size);
+  --tl-title-line-height: var(--prime-control-m-line-height);
+  --tl-meta-size: var(--prime-text-body-s-size);
+  --tl-meta-line-height: var(--prime-text-body-s-line-height);
+  --tl-label-size: var(--prime-text-title-s-size);
+  --tl-label-line-height: var(--prime-text-title-s-line-height);
+  --tl-label-tracking: var(--prime-text-title-s-tracking);
+  --tl-label-gap: var(--prime-space-2);
+  --tl-group-gap: var(--prime-space-4);
+  --tl-dot: calc(var(--prime-space-2) + var(--prime-border-width) * 2);
+  --tl-gap-dot: var(--prime-space-2);
+  --tl-gap-pad-y: var(--prime-space-2);
+  --tl-dot-col: var(--prime-space-6);
+  --tl-gap: var(--prime-space-4);
+  --tl-pad-y: var(--prime-space-3);
+  --tl-pad-start: var(--prime-space-2);
+  --tl-pad-end: var(--prime-space-4);
+  --tl-line: calc(var(--prime-border-width) * 2);
+
+  /* Fill the available width: an inline-size container collapses inside shrink-wrapped parents. */
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--tl-group-gap);
+  inline-size: 100%;
+  min-width: 0;
+  font-family: var(--prime-font-family-sans);
+}
+
+.root[data-size="xs"] {
+  --tl-title-size: var(--prime-control-xs-text-size);
+  --tl-title-line-height: var(--prime-control-xs-line-height);
+  --tl-meta-size: var(--prime-text-caption-size);
+  --tl-meta-line-height: var(--prime-text-caption-line-height);
+  --tl-label-size: var(--prime-text-caption-size);
+  --tl-label-line-height: var(--prime-text-caption-line-height);
+  --tl-label-tracking: var(--prime-text-caption-tracking);
+  --tl-label-gap: var(--prime-space-1);
+  --tl-group-gap: var(--prime-space-3);
+  --tl-dot: var(--prime-space-2);
+  --tl-gap-pad-y: var(--prime-space-1);
+  --tl-dot-col: var(--prime-space-4);
+  --tl-gap: var(--prime-space-2);
+  --tl-pad-y: var(--prime-space-1);
+  --tl-pad-start: var(--prime-space-1);
+  --tl-pad-end: var(--prime-space-2);
+}
+
+.root[data-size="s"] {
+  --tl-title-size: var(--prime-control-s-text-size);
+  --tl-title-line-height: var(--prime-control-s-line-height);
+  --tl-meta-size: var(--prime-text-caption-size);
+  --tl-meta-line-height: var(--prime-text-caption-line-height);
+  --tl-label-size: var(--prime-text-body-s-size);
+  --tl-label-line-height: var(--prime-text-body-s-line-height);
+  --tl-label-gap: var(--prime-space-1);
+  --tl-dot: var(--prime-space-2);
+  --tl-gap-pad-y: var(--prime-space-1);
+  --tl-dot-col: var(--prime-space-5);
+  --tl-gap: var(--prime-space-3);
+  --tl-pad-y: var(--prime-space-2);
+  --tl-pad-start: var(--prime-space-1);
+  --tl-pad-end: var(--prime-space-3);
+}
+
+.root[data-size="l"] {
+  --tl-title-size: var(--prime-control-l-text-size);
+  --tl-title-line-height: var(--prime-control-l-line-height);
+  --tl-meta-size: var(--prime-text-body-m-size);
+  --tl-meta-line-height: var(--prime-text-body-m-line-height);
+  --tl-label-size: var(--prime-text-title-m-size);
+  --tl-label-line-height: var(--prime-text-title-m-line-height);
+  --tl-label-tracking: var(--prime-text-title-m-tracking);
+  --tl-label-gap: var(--prime-space-2);
+  --tl-group-gap: var(--prime-space-5);
+  --tl-dot: var(--prime-space-3);
+  --tl-gap-dot: calc(var(--prime-space-2) + var(--prime-border-width) * 2);
+  --tl-dot-col: var(--prime-space-7);
+}
+
+.root[data-size="xl"] {
+  --tl-title-size: var(--prime-control-xl-text-size);
+  --tl-title-line-height: var(--prime-control-xl-line-height);
+  --tl-meta-size: var(--prime-text-body-m-size);
+  --tl-meta-line-height: var(--prime-text-body-m-line-height);
+  --tl-label-size: var(--prime-text-title-m-size);
+  --tl-label-line-height: var(--prime-text-title-m-line-height);
+  --tl-label-tracking: var(--prime-text-title-m-tracking);
+  --tl-label-gap: var(--prime-space-3);
+  --tl-group-gap: var(--prime-space-5);
+  --tl-dot: var(--prime-space-3);
+  --tl-gap-dot: calc(var(--prime-space-2) + var(--prime-border-width) * 2);
+  --tl-gap-pad-y: var(--prime-space-3);
+  --tl-dot-col: var(--prime-space-8);
+  --tl-gap: var(--prime-space-5);
+  --tl-pad-y: var(--prime-space-4);
+  --tl-pad-start: var(--prime-space-3);
+  --tl-pad-end: var(--prime-space-5);
+}
+
+/* ---------- Group ---------- */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tl-label-gap);
+  min-width: 0;
+}
+
+.groupLabel {
+  /* Starts at the dots' leading edge, so heading and dots share one vertical edge. */
+  padding-inline: calc(var(--tl-pad-start) + (var(--tl-dot-col) - var(--tl-dot)) / 2)
+    var(--tl-pad-end);
+  color: var(--prime-color-text-primary);
+  font-size: var(--tl-label-size);
+  line-height: var(--tl-label-line-height);
+  font-weight: var(--prime-font-weight-semibold);
+  letter-spacing: var(--tl-label-tracking);
+  overflow-wrap: anywhere;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Item + connecting line ---------- */
+
+.item {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Rows touch (no gap), so per-row segments form one line between the first and last dot centers.
+ * `::before` runs from the row top to the dot, `::after` from the dot to the row bottom; the line
+ * stops at the dot edge, so a translucent dot never shows the line through it. */
+.item::before,
+.item::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(var(--tl-pad-start) + (var(--tl-dot-col) - var(--tl-line)) / 2);
+  width: var(--tl-line);
+  background: var(--prime-color-border-subtle);
+  pointer-events: none;
+}
+
+.item::before {
+  top: 0;
+  bottom: calc(50% + var(--tl-dot) / 2);
+}
+
+.item::after {
+  top: calc(50% + var(--tl-dot) / 2);
+  bottom: 0;
+}
+
+.item:first-child::before,
+.item:last-child::after {
+  display: none;
+}
+
+/* The interval around a `Timeline.Gap` is dashed end to end: the gap's own segments and the
+ * neighbouring events' segments that face it. */
+.gapItem {
+  --tl-dot: var(--tl-gap-dot);
+}
+
+.gapItem::before,
+.gapItem::after,
+.gapItem + .item::before,
+.item:has(+ .gapItem)::after {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--prime-color-border-default) 0 var(--prime-space-1),
+    transparent var(--prime-space-1) var(--prime-space-2)
+  );
+}
+
+/* ---------- Row ---------- */
+
+.row {
+  --tl-hue: var(--prime-color-palette-blue-solid);
+  /* Decorative hues sit at reduced emphasis; tones and the active row use full color. */
+  --tl-dot-color: color-mix(in srgb, var(--tl-hue) 55%, transparent);
+
+  appearance: none;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: var(--tl-dot-col) minmax(0, 1fr) auto;
+  grid-template-areas:
+    "dot title value"
+    "dot meta value";
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: var(--tl-gap);
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: var(--tl-pad-y) var(--tl-pad-end) var(--tl-pad-y) var(--tl-pad-start);
+  border: 0;
+  border-radius: var(--prime-radius-l);
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  font-size: var(--tl-title-size);
+  line-height: var(--tl-title-line-height);
+  text-align: start;
+  text-decoration: none;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.row[data-color="gray"] {
+  --tl-hue: var(--prime-color-palette-gray-solid);
+}
+
+.row[data-color="green"] {
+  --tl-hue: var(--prime-color-palette-green-solid);
+}
+
+.row[data-color="orange"] {
+  --tl-hue: var(--prime-color-palette-orange-solid);
+}
+
+.row[data-color="red"] {
+  --tl-hue: var(--prime-color-palette-red-solid);
+}
+
+.row[data-color="yellow"] {
+  --tl-hue: var(--prime-color-palette-yellow-solid);
+}
+
+.row[data-color="purple"] {
+  --tl-hue: var(--prime-color-palette-purple-solid);
+}
+
+.row[data-color="sky"] {
+  --tl-hue: var(--prime-color-palette-sky-solid);
+}
+
+.row[data-color="pink"] {
+  --tl-hue: var(--prime-color-palette-pink-solid);
+}
+
+.row[data-color="teal"] {
+  --tl-hue: var(--prime-color-palette-teal-solid);
+}
+
+.row[data-tone="neutral"] {
+  --tl-dot-color: var(--prime-color-text-muted);
+}
+
+.row[data-tone="accent"] {
+  --tl-dot-color: var(--prime-color-accent-default);
+}
+
+.row[data-tone="success"] {
+  --tl-dot-color: var(--prime-color-success-default);
+}
+
+.row[data-tone="warning"] {
+  --tl-dot-color: var(--prime-color-warning-default);
+}
+
+.row[data-tone="danger"] {
+  --tl-dot-color: var(--prime-color-danger-default);
+}
+
+.row[data-tone="info"] {
+  --tl-dot-color: var(--prime-color-info-default);
+}
+
+/*
+ * Highlighted look: `fill-subtle-active` pill, accent title, accent dot (a `tone` keeps its dot).
+ * `highlight="selected"`: the `active` row keeps it; interactive rows get a faint hover wash.
+ * `highlight="hover"`: the row under the pointer or with keyboard focus gets it, transiently.
+ */
+.root[data-highlight="selected"] .row[data-state="active"],
+.root[data-highlight="hover"] .row:is(:hover, :focus-visible) {
+  --tl-title-color: var(--prime-color-accent-text);
+
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.root[data-highlight="selected"] .row[data-state="active"]:not([data-tone]),
+.root[data-highlight="hover"] .row:is(:hover, :focus-visible):not([data-tone]) {
+  --tl-dot-color: var(--prime-color-accent-default);
+}
+
+.row[data-interactive="true"] {
+  cursor: pointer;
+}
+
+.root[data-highlight="selected"] .row[data-interactive="true"]:hover:not([data-state="active"]) {
+  background: var(--prime-color-fill-subtle);
+}
+
+.root[data-highlight="selected"] .row[data-interactive="true"]:active:not([data-state="active"]) {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+/* Full-width list row: the ring is drawn inside its edge. */
+.row:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.dot {
+  grid-area: dot;
+  align-self: center;
+  justify-self: center;
+  box-sizing: border-box;
+  width: var(--tl-dot);
+  height: var(--tl-dot);
+  border-radius: 50%;
+  background: var(--tl-dot-color);
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* ---------- Text ---------- */
+
+.title {
+  grid-area: title;
+  min-width: 0;
+  color: var(--tl-title-color, var(--prime-color-text-primary));
+  font-weight: var(--prime-font-weight-medium);
+  overflow-wrap: anywhere;
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.meta {
+  grid-area: meta;
+  min-width: 0;
+  color: var(--prime-color-text-muted);
+  font-size: var(--tl-meta-size);
+  line-height: var(--tl-meta-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.metaPrimary,
+.meta strong {
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.value {
+  grid-area: value;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: center;
+  justify-self: end;
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.value[data-tone="accent"] {
+  color: var(--prime-color-accent-text);
+}
+
+.value[data-tone="success"] {
+  color: var(--prime-color-success-text);
+}
+
+.value[data-tone="warning"] {
+  color: var(--prime-color-warning-text);
+}
+
+.value[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
+}
+
+.value[data-tone="info"] {
+  color: var(--prime-color-info-text);
+}
+
+/* Second line under the value (category, unit): meta size, muted, regular. */
+.valueMeta {
+  color: var(--prime-color-text-muted);
+  font-size: var(--tl-meta-size);
+  line-height: var(--tl-meta-line-height);
+  font-weight: var(--prime-font-weight-regular);
+}
+
+/* ---------- Gap: interval between events ---------- */
+
+.gapRow {
+  --tl-gap-color: var(--prime-color-text-muted);
+  --tl-gap-dot-color: var(--prime-color-text-muted);
+
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: var(--tl-dot-col) minmax(0, 1fr) auto;
+  grid-template-areas: "dot caption trailing";
+  align-items: center;
+  column-gap: var(--tl-gap);
+  width: 100%;
+  min-width: 0;
+  padding: var(--tl-gap-pad-y) var(--tl-pad-end) var(--tl-gap-pad-y) var(--tl-pad-start);
+  color: var(--tl-gap-color);
+  font-size: var(--tl-meta-size);
+  line-height: var(--tl-meta-line-height);
+  font-variant-numeric: tabular-nums;
+}
+
+.gapRow[data-tone="accent"] {
+  --tl-gap-color: var(--prime-color-accent-text);
+  --tl-gap-dot-color: var(--prime-color-accent-default);
+}
+
+.gapRow[data-tone="success"] {
+  --tl-gap-color: var(--prime-color-success-text);
+  --tl-gap-dot-color: var(--prime-color-success-default);
+}
+
+.gapRow[data-tone="warning"] {
+  --tl-gap-color: var(--prime-color-warning-text);
+  --tl-gap-dot-color: var(--prime-color-warning-default);
+}
+
+.gapRow[data-tone="danger"] {
+  --tl-gap-color: var(--prime-color-danger-text);
+  --tl-gap-dot-color: var(--prime-color-danger-default);
+}
+
+.gapRow[data-tone="info"] {
+  --tl-gap-color: var(--prime-color-info-text);
+  --tl-gap-dot-color: var(--prime-color-info-default);
+}
+
+.gapDot {
+  grid-area: dot;
+  justify-self: center;
+  box-sizing: border-box;
+  width: var(--tl-dot);
+  height: var(--tl-dot);
+  border: var(--tl-line) solid var(--tl-gap-dot-color);
+  border-radius: 50%;
+}
+
+.gapCaption {
+  grid-area: caption;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.gapTrailing {
+  grid-area: trailing;
+  text-align: end;
+  white-space: nowrap;
+}
+
+/* ---------- Narrow container: value under the meta ---------- */
+
+@container (max-width: 20rem) {
+  .row {
+    grid-template-columns: var(--tl-dot-col) minmax(0, 1fr);
+    grid-template-areas:
+      "dot title"
+      "dot meta"
+      "dot value";
+    grid-template-rows: auto auto auto;
+  }
+
+  .value {
+    align-items: flex-start;
+    justify-self: start;
+    text-align: start;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .dot,
+  .title {
+    transition: none;
+  }
+}

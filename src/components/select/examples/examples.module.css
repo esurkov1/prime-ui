@@ -1,48 +1,54 @@
-.stack {
+/* Example layout: semantic tokens only. */
+
+.sizeRow {
   display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-s);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-3);
+  width: 100%;
 }
 
-.stackNarrow {
-  width: 100%;
-  max-width: calc(var(--prime-sys-unit-1rem) * 22);
-}
-
-.fullWidthShell {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: calc(var(--prime-sys-unit-1rem) * 20);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-xs);
-  width: 100%;
-  max-width: calc(var(--prime-sys-unit-1rem) * 22);
+.sizeCell {
+  flex: 0 1 calc(var(--prime-space-20) * 2);
   min-width: 0;
 }
 
-.fieldFullBleed {
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--prime-space-24) * 2.5), 1fr));
+  gap: var(--prime-space-5) var(--prime-space-4);
+  width: 100%;
+}
+
+.narrow {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-xs);
+  gap: var(--prime-space-3);
   width: 100%;
-  min-width: 0;
-  max-width: none;
+  max-width: calc(var(--prime-space-24) * 3);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
-  width: 100%;
-  max-width: calc(var(--prime-sys-unit-1rem) * 28);
-  min-width: 0;
+  gap: var(--prime-space-5);
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+}
+
+.card {
+  width: 100%;
+  max-width: calc(var(--prime-space-24) * 5);
+}
+
+/* Centred caption under the field (text styling comes from Typography). */
 .caption {
-  margin: 0;
-  color: var(--prime-sys-color-content-secondary);
+  width: 100%;
+  text-align: center;
 }

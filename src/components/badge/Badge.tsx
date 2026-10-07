@@ -1,112 +1,62 @@
 import * as React from "react";
 
-import {
-  ControlSizeProvider,
-  controlSurfaceToInputSize,
-  useOptionalControlSize,
-} from "@/internal/ControlSizeContext";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
 
 import styles from "./Badge.module.css";
-
-export type BadgeColor =
-  | "gray"
-  | "red"
-  | "blue"
-  | "green"
-  | "orange"
-  | "yellow"
-  | "purple"
-  | "sky"
-  | "pink"
-  | "teal";
-
-/** Состояние индикатора при `variant="status"`. */
-export type BadgeStatus = "online" | "offline" | "away" | "busy";
-
-export type BadgeVariant = "filled" | "light" | "lighter" | "stroke" | "status";
-
-export type BadgeSize = "s" | "m" | "l" | "xl";
+import { useBadgeTier } from "./tier";
 
 export type BadgeRootProps = {
-  color?: BadgeColor;
-  variant?: BadgeVariant;
-  size?: BadgeSize;
+  /** Palette hue (categorization, not status). Default `gray`. */
+  color?: PaletteColor;
+  /** Treatment. Default `soft`. */
+  variant?: Exclude<Variant, "ghost">;
+  /** Badge tier; without it the badge follows the surrounding control one tier down. */
+  size?: ControlSize;
   disabled?: boolean;
-  /** При `variant="status"` — цвет точки (online / offline / away / busy). */
-  status?: BadgeStatus;
-  /** При `variant="status"` — `aria-label` на корне (`role="status"`). */
-  label?: string;
   children?: React.ReactNode;
   className?: string;
-} & React.HTMLAttributes<HTMLDivElement>;
+} & React.HTMLAttributes<HTMLSpanElement>;
 
 export type BadgeIconProps = {
   children: React.ReactNode;
   className?: string;
-} & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 export type BadgeDotProps = {
   className?: string;
 } & React.HTMLAttributes<HTMLSpanElement>;
 
-const BadgeRoot = React.forwardRef<HTMLDivElement, BadgeRootProps>(
+const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
   (
-    {
-      color = "gray",
-      variant = "light",
-      size: sizeProp,
-      disabled,
-      status,
-      label,
-      children,
-      className,
-      ...rest
-    },
+    { color = "gray", variant = "soft", size: sizeProp, disabled, children, className, ...rest },
     ref,
   ) => {
-    const controlSurface = useOptionalControlSize();
-    const size =
-      sizeProp ?? (controlSurface !== undefined ? controlSurfaceToInputSize(controlSurface) : "m");
+    const { size, tier } = useBadgeTier(sizeProp);
+    const iconOnly =
+      React.Children.count(children) > 0 &&
+      React.Children.toArray(children).every(
+        (child) => React.isValidElement(child) && child.type === BadgeIcon,
+      );
 
-    const isStatus = variant === "status";
-    const presence = isStatus ? (status ?? "online") : undefined;
-
-    const dataProps = isStatus
-      ? toDataAttributes({
-          variant: "status",
-          status: presence,
-          size,
-          disabled: disabled ? true : undefined,
-        })
-      : toDataAttributes({
+    return (
+      <span
+        ref={ref}
+        className={cx(styles.root, className)}
+        {...toDataAttributes({
           color,
           variant,
           size,
-          disabled: disabled ? true : undefined,
-        });
-
-    if (isStatus) {
-      return (
-        <div
-          ref={ref}
-          role="status"
-          aria-label={label}
-          className={cx(styles.root, className)}
-          {...dataProps}
-          {...rest}
-        >
-          <span className={styles.statusDot} aria-hidden="true" />
-          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-        </div>
-      );
-    }
-
-    return (
-      <div ref={ref} className={cx(styles.root, className)} {...dataProps} {...rest}>
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-      </div>
+          tier,
+          "icon-only": iconOnly || undefined,
+          disabled: disabled || undefined,
+        })}
+        {...rest}
+      >
+        <ControlSizeProvider value={tier}>{children}</ControlSizeProvider>
+      </span>
     );
   },
 );

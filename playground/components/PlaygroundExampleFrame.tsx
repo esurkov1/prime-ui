@@ -1,6 +1,6 @@
 import { ExampleFrame, type ExampleFrameRootProps } from "@/components/example-frame/ExampleFrame";
 
-import { usePlaygroundPreviewTheme } from "./PlaygroundPreviewTheme";
+import { type PlaygroundPreviewSurface, usePlaygroundPreviewTheme } from "./PlaygroundPreviewTheme";
 import { usePlaygroundTheme } from "./PlaygroundTheme";
 
 export type PlaygroundExampleFrameRootProps = Omit<
@@ -11,20 +11,32 @@ export type PlaygroundExampleFrameRootProps = Omit<
   | "viewport"
   | "defaultViewport"
   | "onViewportChange"
->;
+  | "themePreset"
+> & {
+  /** Preview background for this example only; defaults to the playground-wide choice. */
+  surface?: PlaygroundPreviewSurface;
+};
 
-function PlaygroundExampleFrameRoot(props: PlaygroundExampleFrameRootProps) {
-  const { scheme, preset } = usePlaygroundTheme();
-  const { viewport, setViewport } = usePlaygroundPreviewTheme();
+/**
+ * ExampleFrame bound to playground state: theme from `<html data-theme>`, shared viewport and
+ * preview surface. The surface is applied by `playground.css` via `data-preview-surface`.
+ */
+function PlaygroundExampleFrameRoot({
+  surface: surfaceProp,
+  ...props
+}: PlaygroundExampleFrameRootProps) {
+  const { scheme } = usePlaygroundTheme();
+  const { viewport, setViewport, surface } = usePlaygroundPreviewTheme();
   return (
-    <ExampleFrame.Root
-      {...props}
-      colorScheme={scheme}
-      themePreset={preset}
-      showThemeToggle={false}
-      viewport={viewport}
-      onViewportChange={setViewport}
-    />
+    <div className="playgroundFrame" data-preview-surface={surfaceProp ?? surface}>
+      <ExampleFrame.Root
+        {...props}
+        colorScheme={scheme}
+        showThemeToggle={false}
+        viewport={viewport}
+        onViewportChange={setViewport}
+      />
+    </div>
   );
 }
 

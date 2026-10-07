@@ -2,29 +2,30 @@ import * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import type { TextTone } from "@/internal/states";
 
 import styles from "./Typography.module.css";
 
-/** Семантические роли чтения; соответствуют `typography.role` в `tokens/semantic.ts`. */
-export type TypographyVariant =
-  | "display"
-  | "headline"
-  | "heading-page"
-  | "heading-section"
-  | "heading-subsection"
-  | "heading-group"
-  | "body-large"
-  | "body-default"
-  | "body-small"
-  | "body-compact"
+/** Text roles from the foundation (`--prime-text-<role>-*`). */
+export type TypographyRole =
   | "caption"
-  | "caption-micro";
+  | "body-s"
+  | "body-m"
+  | "body-l"
+  | "title-s"
+  | "title-m"
+  | "title-l"
+  | "heading-s"
+  | "heading-m"
+  | "heading-l"
+  | "display-s"
+  | "display-m"
+  | "display-l"
+  | "code";
 
 export type TypographyWeight = "regular" | "medium" | "semibold";
 
 export type TypographyTracking = "normal" | "tight" | "tighter" | "wide";
-
-export type TypographyTone = "default" | "muted";
 
 export type TypographyAs =
   | "p"
@@ -48,11 +49,17 @@ export type TypographyAs =
 
 export type TypographyRootProps = {
   as?: TypographyAs;
-  variant: TypographyVariant;
+  /** Text role (`--prime-text-<role>-*`). */
+  variant: TypographyRole;
+  /** Overrides the role's weight. Omit to use the role's own weight. */
   weight?: TypographyWeight;
+  /** Overrides the role's tracking. Omit to use the role's own tracking. */
   tracking?: TypographyTracking;
+  /** Clamp to one line with an ellipsis (set `title` when the full text matters). */
+  truncate?: boolean;
   italic?: boolean;
-  tone?: TypographyTone;
+  /** Text color. Default `default` (primary text). */
+  tone?: TextTone;
   children?: React.ReactNode;
   className?: string;
 } & React.HTMLAttributes<HTMLElement>;
@@ -62,8 +69,9 @@ const TypographyRoot = React.forwardRef<HTMLElement, TypographyRootProps>(
     {
       as: Tag = "p",
       variant,
-      weight = "regular",
-      tracking = "normal",
+      weight,
+      tracking,
+      truncate = false,
       italic = false,
       tone = "default",
       className,
@@ -79,10 +87,11 @@ const TypographyRoot = React.forwardRef<HTMLElement, TypographyRootProps>(
         {...rest}
         {...toDataAttributes({
           variant,
-          weight: weight === "regular" ? undefined : weight,
-          tracking: tracking === "normal" ? undefined : tracking,
+          weight,
+          tracking,
           tone: tone === "default" ? undefined : tone,
           ...(italic ? { italic: true } : {}),
+          ...(truncate ? { truncate: true } : {}),
         })}
       >
         {children}

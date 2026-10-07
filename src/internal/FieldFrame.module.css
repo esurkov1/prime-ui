@@ -1,0 +1,46 @@
+/*
+ * Field frame of Select, TagSelect and Datepicker: the same rhythm as `Input.Root`
+ * (label → `label-gap` → field → `hint-gap` → support row).
+ */
+.root {
+  --ff-label-gap: var(--prime-control-m-label-gap);
+  --ff-hint-gap: var(--prime-control-m-hint-gap);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ff-label-gap);
+  min-width: 0;
+  max-width: 100%;
+  font-family: var(--prime-font-family-sans);
+}
+
+.root[data-size="xs"] {
+  --ff-label-gap: var(--prime-control-xs-label-gap);
+  --ff-hint-gap: var(--prime-control-xs-hint-gap);
+}
+
+.root[data-size="s"] {
+  --ff-label-gap: var(--prime-control-s-label-gap);
+  --ff-hint-gap: var(--prime-control-s-hint-gap);
+}
+
+.root[data-size="l"] {
+  --ff-label-gap: var(--prime-control-l-label-gap);
+  --ff-hint-gap: var(--prime-control-l-hint-gap);
+}
+
+.root[data-size="xl"] {
+  --ff-label-gap: var(--prime-control-xl-label-gap);
+  --ff-hint-gap: var(--prime-control-xl-hint-gap);
+}
+
+.label {
+  align-self: flex-start;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ff-hint-gap);
+  min-width: 0;
+}

@@ -13,6 +13,8 @@ import {
   Lock,
   Mail,
   Moon,
+  Pipette,
+  Search,
   Sun,
   X,
 } from "lucide-react";
@@ -36,6 +38,8 @@ export const IconHouse = createIcon(House);
 export const IconLayoutGrid = createIcon(LayoutGrid);
 export const IconLock = createIcon(Lock);
 export const IconMoon = createIcon(Moon);
+export const IconPipette = createIcon(Pipette);
+export const IconSearch = createIcon(Search);
 export const IconSun = createIcon(Sun);
 
 export const iconRegistry = {
@@ -45,6 +49,8 @@ export const iconRegistry = {
   "nav.layoutGrid": IconLayoutGrid,
   "action.close": IconClose,
   "action.copy": IconCopy,
+  "action.eyedropper": IconPipette,
+  "action.search": IconSearch,
   "action.upload": IconCloudUpload,
   "field.email": IconMail,
   "field.password.show": IconEye,
@@ -67,4 +73,4 @@ export const Icon = React.forwardRef<SVGSVGElement, NamedIconProps>(({ name, ...
 
 Icon.displayName = "Icon";
 
-export type { BaseIconProps, IconSize, IconTone } from "./Icon";
+export type { BaseIconProps } from "./Icon";

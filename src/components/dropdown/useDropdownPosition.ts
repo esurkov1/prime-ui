@@ -1,7 +1,12 @@
 import * as React from "react";
 
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
-import { computeFloatingPosition } from "@/hooks/usePosition";
+import {
+  computeFloatingPosition,
+  FLOAT_MAX_HEIGHT_VAR,
+  FLOAT_MAX_WIDTH_VAR,
+  FLOAT_MIN_WIDTH_VAR,
+} from "@/hooks/usePosition";
 import { getScrollContainers } from "@/internal/scrollAncestors";
 
 import {
@@ -24,13 +29,18 @@ type Params = {
   sameMinWidthAsTrigger: boolean;
 };
 
+function styleVar(layout: DropdownLayout, name: string): unknown {
+  return (layout.style as Record<string, unknown>)[name];
+}
+
 function layoutEqual(a: DropdownLayout, b: DropdownLayout): boolean {
   return (
     a.resolvedSide === b.resolvedSide &&
     a.style.top === b.style.top &&
     a.style.left === b.style.left &&
-    a.style.maxHeight === b.style.maxHeight &&
-    a.style.minWidth === b.style.minWidth
+    styleVar(a, FLOAT_MAX_HEIGHT_VAR) === styleVar(b, FLOAT_MAX_HEIGHT_VAR) &&
+    styleVar(a, FLOAT_MIN_WIDTH_VAR) === styleVar(b, FLOAT_MIN_WIDTH_VAR) &&
+    styleVar(a, FLOAT_MAX_WIDTH_VAR) === styleVar(b, FLOAT_MAX_WIDTH_VAR)
   );
 }
 
@@ -70,15 +80,16 @@ export function useDropdownPosition({
         position: "fixed",
         top: pos.top,
         left: pos.left,
-        maxHeight: getDropdownMaxHeightForAnchorSide(
+        [FLOAT_MAX_HEIGHT_VAR]: `${getDropdownMaxHeightForAnchorSide(
           anchorRect,
           pos.resolvedSide,
           vh,
           panelOffset,
           viewportPad,
-        ),
-        ...(pos.minWidth !== undefined ? { minWidth: pos.minWidth } : {}),
-      },
+        )}px`,
+        [FLOAT_MAX_WIDTH_VAR]: `${pos.maxWidth}px`,
+        ...(pos.minWidth !== undefined ? { [FLOAT_MIN_WIDTH_VAR]: `${pos.minWidth}px` } : {}),
+      } as React.CSSProperties,
     };
 
     setLayout((prev) => (prev && layoutEqual(prev, next) ? prev : next));

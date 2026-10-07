@@ -1,97 +1,198 @@
-/* Высота трека и бегунка — доля control-height того же яруса, чтобы масштаб шёл с токенами. */
+/*
+ * Native range input. Track = fill-strong, range = accent (gradient up to --slider-percent,
+ * set inline from the value), thumb = control-thumb with overlay shadow.
+ * Thumb size follows the choice size of the tier, label row follows the field label system.
+ */
 .root {
+  --slider-track-h: var(--prime-space-1);
+  --slider-thumb-size: var(--prime-control-m-choice);
+  --slider-label-gap: var(--prime-control-m-label-gap);
+  --slider-value-size: var(--prime-control-m-label-size);
+  --slider-value-line-height: var(--prime-control-m-label-line-height);
+  --slider-track-bg: var(--prime-color-fill-strong);
+  --slider-range-bg: var(--prime-color-accent-default);
   display: flex;
   flex-direction: column;
-  gap: var(--slider-root-gap);
+  gap: var(--slider-label-gap);
   width: 100%;
+  min-width: 0;
+}
+
+.root[data-size="xs"] {
+  --slider-thumb-size: var(--prime-control-xs-choice);
+  --slider-label-gap: var(--prime-control-xs-label-gap);
+  --slider-value-size: var(--prime-control-xs-label-size);
+  --slider-value-line-height: var(--prime-control-xs-label-line-height);
 }
 
 .root[data-size="s"] {
-  --slider-root-gap: var(--prime-sys-size-control-s-gap);
-  --slider-track-h: var(--prime-sys-spacing-xs);
-  --slider-thumb-size: var(--prime-sys-size-control-s-icon);
-  --slider-label-size: var(--prime-sys-size-control-s-text);
-}
-
-.root[data-size="m"] {
-  --slider-root-gap: var(--prime-sys-size-control-m-gap);
-  --slider-track-h: var(--prime-sys-spacing-xs);
-  --slider-thumb-size: var(--prime-sys-size-control-m-icon);
-  --slider-label-size: var(--prime-sys-size-control-m-text);
+  --slider-thumb-size: var(--prime-control-s-choice);
+  --slider-label-gap: var(--prime-control-s-label-gap);
+  --slider-value-size: var(--prime-control-s-label-size);
+  --slider-value-line-height: var(--prime-control-s-label-line-height);
 }
 
 .root[data-size="l"] {
-  --slider-root-gap: var(--prime-sys-size-control-l-gap);
-  --slider-track-h: var(--prime-sys-spacing-s);
-  --slider-thumb-size: var(--prime-sys-size-control-l-icon);
-  --slider-label-size: var(--prime-sys-size-control-l-text);
+  --slider-thumb-size: var(--prime-control-l-choice);
+  --slider-label-gap: var(--prime-control-l-label-gap);
+  --slider-value-size: var(--prime-control-l-label-size);
+  --slider-value-line-height: var(--prime-control-l-label-line-height);
 }
 
 .root[data-size="xl"] {
-  --slider-root-gap: var(--prime-sys-size-control-xl-gap);
-  --slider-track-h: var(--prime-sys-spacing-s);
-  --slider-thumb-size: var(--prime-sys-size-control-xl-icon);
-  --slider-label-size: var(--prime-sys-size-control-xl-text);
+  --slider-track-h: var(--prime-space-2);
+  --slider-thumb-size: var(--prime-control-xl-choice);
+  --slider-label-gap: var(--prime-control-xl-label-gap);
+  --slider-value-size: var(--prime-control-xl-label-size);
+  --slider-value-line-height: var(--prime-control-xl-label-line-height);
 }
 
+.root[data-disabled="true"] {
+  --slider-track-bg: var(--prime-color-fill-muted);
+  --slider-range-bg: var(--prime-color-text-disabled);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.label {
+  min-width: 0;
+}
+
+.value {
+  flex-shrink: 0;
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--slider-value-size);
+  line-height: var(--slider-value-line-height);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-color-text-secondary);
+}
+
+.root[data-disabled="true"] .value {
+  color: var(--prime-color-text-disabled);
+}
+
+/* ---- input ---- */
 .track {
   -webkit-appearance: none;
   appearance: none;
+  display: block;
   width: 100%;
-  height: var(--slider-track-h);
-  border-radius: var(--prime-sys-shape-radius-round);
-  outline: none;
+  height: var(--slider-thumb-size);
+  margin: 0;
+  padding: 0;
+  background: transparent;
   cursor: pointer;
-  background: var(--prime-sys-color-surface-accentSoft);
-  accent-color: var(--prime-sys-color-action-primaryBackground);
+  outline: none;
+}
+
+.track:disabled {
+  cursor: not-allowed;
+}
+
+/* WebKit: track with accent range, thumb centred on it. */
+.track::-webkit-slider-runnable-track {
+  height: var(--slider-track-h);
+  border-radius: var(--prime-radius-full);
+  background: linear-gradient(
+    to right,
+    var(--slider-range-bg) 0 var(--slider-percent, 0%),
+    var(--slider-track-bg) var(--slider-percent, 0%) 100%
+  );
 }
 
 .track::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
   width: var(--slider-thumb-size);
   height: var(--slider-thumb-size);
-  border-radius: var(--prime-sys-shape-radius-round);
-  background: var(--prime-sys-color-surface-elevated);
-  border: var(--prime-sys-border-width-focusRing) solid
-    var(--prime-sys-color-action-primaryBackground);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  cursor: pointer;
-  transition: box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  margin-top: calc((var(--slider-track-h) - var(--slider-thumb-size)) / 2);
+  border: 0;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-control-thumb);
+  /* Hairline edge: a white thumb on a white surface would otherwise be only a soft shadow. */
+  box-shadow:
+    inset 0 0 0 var(--prime-border-width) var(--prime-color-border-default),
+    var(--prime-shadow-overlay);
+  transition:
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.track:focus-visible {
-  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
+.track:not(:disabled):hover::-webkit-slider-thumb {
+  box-shadow:
+    inset 0 0 0 var(--prime-border-width) var(--prime-color-border-default),
+    var(--prime-shadow-overlay),
+    0 0 0 var(--prime-space-1) var(--prime-color-accent-soft);
 }
 
-.track::-webkit-slider-thumb:hover {
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+.track:not(:disabled):active::-webkit-slider-thumb {
+  transform: scale(1.1);
 }
 
-.track:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.track:focus-visible::-webkit-slider-thumb {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.track:disabled::-webkit-slider-thumb {
+  box-shadow: none;
+  background: var(--prime-color-fill-strong);
+}
+
+/* Firefox */
+.track::-moz-range-track {
+  height: var(--slider-track-h);
+  border: 0;
+  border-radius: var(--prime-radius-full);
+  background: var(--slider-track-bg);
+}
+
+.track::-moz-range-progress {
+  height: var(--slider-track-h);
+  border-radius: var(--prime-radius-full);
+  background: var(--slider-range-bg);
 }
 
 .track::-moz-range-thumb {
+  box-sizing: border-box;
   width: var(--slider-thumb-size);
   height: var(--slider-thumb-size);
-  border-radius: var(--prime-sys-shape-radius-round);
-  background: var(--prime-sys-color-surface-elevated);
-  border: var(--prime-sys-border-width-focusRing) solid
-    var(--prime-sys-color-action-primaryBackground);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  cursor: pointer;
-  transition: box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  border: 0;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-control-thumb);
+  /* Hairline edge: a white thumb on a white surface would otherwise be only a soft shadow. */
+  box-shadow:
+    inset 0 0 0 var(--prime-border-width) var(--prime-color-border-default),
+    var(--prime-shadow-overlay);
+  transition:
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.track::-moz-range-track {
-  height: var(--slider-track-h);
-  border-radius: var(--prime-sys-shape-radius-round);
-  background: var(--prime-sys-color-surface-accentSoft);
+.track:not(:disabled):hover::-moz-range-thumb {
+  box-shadow:
+    inset 0 0 0 var(--prime-border-width) var(--prime-color-border-default),
+    var(--prime-shadow-overlay),
+    0 0 0 var(--prime-space-1) var(--prime-color-accent-soft);
 }
 
-.label {
-  font-size: var(--slider-label-size);
-  color: var(--prime-sys-color-content-primary);
+.track:not(:disabled):active::-moz-range-thumb {
+  transform: scale(1.1);
+}
+
+.track:focus-visible::-moz-range-thumb {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.track:disabled::-moz-range-thumb {
+  box-shadow: none;
+  background: var(--prime-color-fill-strong);
 }

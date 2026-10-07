@@ -1,0 +1,164 @@
+/*
+ * Overlay motion — the one set of enter/exit animations for every floating layer
+ * (foundation §7 "Overlay contract"). Layers carry `data-state="open|closed"` from `usePresence`;
+ * the closed state plays the exit animation and stays mounted until `animationend`.
+ * Durations collapse to 0 under `prefers-reduced-motion` (globals.css), and `usePresence`
+ * unmounts at once there. A closing panel takes no pointer events; a closing scrim still does.
+ *
+ *   scrim     fade                    base · enter / base · exit
+ *   dialog    fade + scale 0.98 → 1   base · enter / fast · exit   (bottom sheet < 640px: slide)
+ *   sheet     slide up / down         slow · enter / base · exit
+ *   drawer    slide from its side     slow · enter / base · exit
+ *   floating  fade + 4px from anchor  fast · enter / fast · exit   (popover, menu, listbox, tooltip)
+ */
+
+/* A closing scrim keeps catching pointer events, so the dismissing click never falls through to
+   the page beneath it; the closing panels themselves are click-through. */
+[data-state="closed"].dialog,
+[data-state="closed"].drawer,
+[data-state="closed"].floating {
+  pointer-events: none;
+}
+
+/* ─── Scrim ──────────────────────────────────────────────────────────────── */
+
+.scrim[data-state="open"] {
+  animation: overlayFadeIn var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
+}
+
+.scrim[data-state="closed"] {
+  animation: overlayFadeOut var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
+}
+
+/* ─── Dialog (Modal, CommandMenu) ────────────────────────────────────────── */
+
+.dialog[data-state="open"] {
+  animation: overlayDialogIn var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
+}
+
+.dialog[data-state="closed"] {
+  animation: overlayDialogOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
+}
+
+@media (max-width: 639px) {
+  .dialog[data-state="open"] {
+    animation: overlaySheetIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter)
+      both;
+  }
+
+  .dialog[data-state="closed"] {
+    animation: overlaySheetOut var(--prime-motion-duration-base) var(--prime-motion-easing-exit)
+      both;
+  }
+}
+
+/* ─── Drawer ─────────────────────────────────────────────────────────────── */
+
+.drawer {
+  --overlay-drawer-from: 100%;
+}
+
+.drawer[data-side="left"] {
+  --overlay-drawer-from: -100%;
+}
+
+.drawer[data-state="open"] {
+  animation: overlayDrawerIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;
+}
+
+.drawer[data-state="closed"] {
+  animation: overlayDrawerOut var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
+}
+
+/* ─── Floating panels: popover, dropdown, listbox, datepicker, tooltip ─── */
+
+.floating {
+  /* Offset toward the anchor: the panel grows out of its trigger along the resolved side. */
+  --overlay-shift: 0 calc(-1 * var(--prime-space-1));
+}
+
+.floating[data-side="top"] {
+  --overlay-shift: 0 var(--prime-space-1);
+}
+
+.floating[data-side="left"] {
+  --overlay-shift: var(--prime-space-1) 0;
+}
+
+.floating[data-side="right"] {
+  --overlay-shift: calc(-1 * var(--prime-space-1)) 0;
+}
+
+.floating[data-state="open"] {
+  animation: overlayFloatIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+.floating[data-state="closed"] {
+  animation: overlayFloatOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────── */
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes overlayFadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes overlayDialogIn {
+  from {
+    opacity: 0;
+    scale: 0.98;
+  }
+}
+
+@keyframes overlayDialogOut {
+  to {
+    opacity: 0;
+    scale: 0.98;
+  }
+}
+
+@keyframes overlaySheetIn {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes overlaySheetOut {
+  to {
+    translate: 0 100%;
+  }
+}
+
+@keyframes overlayDrawerIn {
+  from {
+    translate: var(--overlay-drawer-from) 0;
+  }
+}
+
+@keyframes overlayDrawerOut {
+  to {
+    translate: var(--overlay-drawer-from) 0;
+  }
+}
+
+@keyframes overlayFloatIn {
+  from {
+    opacity: 0;
+    translate: var(--overlay-shift);
+  }
+}
+
+@keyframes overlayFloatOut {
+  to {
+    opacity: 0;
+    translate: var(--overlay-shift);
+  }
+}

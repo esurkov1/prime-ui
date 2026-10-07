@@ -1,137 +1,186 @@
 # Radio
 
-**Default `size`:** use **`m`** for the size axis unless the screen or field explicitly needs another tier.
+**Category:** selection (Выбор)
 
-## Canonical
+> Radio buttons for choosing exactly one option out of a small visible set.
 
-- **`Radio`** — compound choice control: **`Radio.Root`** (field wrapper `.field`, `data-size`, `data-variant`, `data-disabled`, `data-invalid`), **`Radio.Label`** (native `input type="radio"` + marker + optional text), optional **`Radio.Hint`** and **`Radio.Error`** (wired into `aria-describedby` and invalid styling).
-- **`variant`:** **`default`** or **`error`** on **`Radio.Root`**; mounting **`Radio.Error`** also drives invalid / `aria-invalid` for that instance.
-- **`size`:** **`s` | `m` | `l` | `xl`** on **`Radio.Root`** — marker, label, and hint/error scale via context (`ControlSizeProvider`).
-- **Groups:** several **`Radio.Root`** nodes share the same **`name`** (and optionally **`value` / `checked` / `onChange`**) — there is **no** separate **`RadioGroup`**; behavior is native HTML or your controlled state.
-- **`Radio.Root` `ref`** is forwarded to the **native `<input type="radio">`**.
-- **DOM `type`** is always **`radio`**; the design-system **`size`** prop is **not** the HTML `size` attribute (that key is omitted from input props).
+## When to use
+- One choice out of 2–7 visible options where the user benefits from seeing all of them at once: plan, payment method, delivery slot.
+- Options that need a description under the label (`Radio.Hint`) or a reason why one is unavailable.
+- A required one-of-many question in a form.
 
-## Extended
+## When not to use
+- 2–4 short view modes or filters that apply instantly → use [SegmentedControl](../segmented-control/COMPONENT.md) instead.
+- A long list (8+ options) or limited space → use [Select](../select/COMPONENT.md) instead.
+- Independent yes/no options → use [Checkbox](../checkbox/COMPONENT.md) instead.
+- A single on/off setting → use [Switch](../switch/COMPONENT.md) instead.
 
-### About
+## Import
+```tsx
+import { Radio } from "prime-ui-kit";
+```
 
-A compound radio field: wrapper, label row with a native radio and decorative rings, plus optional hint and error text aligned under the label column.
+## Anatomy
+```
+Radio.Group             role="radiogroup"; value, name, size and shared flags
+└─ Radio.Root           one option (value); ref and input props go to the hidden native input
+   ├─ Radio.Label       clickable row: renders the native input, the circle and the text
+   ├─ Radio.Hint        description under the text column (optional)
+   └─ Radio.Error       error message under the text column (optional, makes the option invalid)
+```
+`Radio.Root` must be inside `Radio.Group`; the native `input type="radio"` is rendered by `Radio.Label`.
 
-- **When to use** — exactly one choice from mutually exclusive options that submit with the form (`name`, `value`, `required`); native group semantics with the same **`name`** on each **`Radio.Root`**; short helper or validation copy per option via **`Radio.Hint`** / **`Radio.Error`**.
-- **When not to use** — multiple independent toggles or “select many” (prefer [Checkbox](../checkbox/COMPONENT.md)).
-- **When not to use** — a single binary on/off where a switch fits the product language (prefer [Switch](../switch/COMPONENT.md)).
-- **When not to use** — a compact segmented bar of modes in one control (prefer [Segmented control](../segmented-control/COMPONENT.md)).
-- **When not to use** — fully custom markup or `asChild`; the marker and label row are fixed by the implementation.
+## API
 
-### Playground snippets
+### Radio.Group
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | `string` | — | Controlled selected value; use with `onValueChange`. |
+| `defaultValue` | `string` | — | Initial value in uncontrolled mode; nothing selected when omitted. |
+| `onValueChange` | `(value: string) => void` | — | Called with the chosen option's `value` (click, Space, arrows). |
+| `name` | `string` | auto (`useId`) | Native `name` shared by all radios. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Size tier for every option. |
+| `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | Stack the options or lay them out in a wrapping row. |
+| `invalid` | `boolean` | `false` | Invalid state for every option (`aria-invalid` on the group and inputs). |
+| `required` | `boolean` | `false` | Native `required` on the radios and `aria-required` on the group. |
+| `disabled` | `boolean` | `false` | Disables every option. |
+| `fullWidth` | `boolean` | `false` | Stretch every option to the container width. |
+| `className` | `string` | — | Class on the group `div`. |
 
-Demos match **`playground/sections/RadioSection.tsx`** (order and intent). Sources use `@/` imports under **`playground/snippets/radio/`**:
++ native `<div>` props except `defaultValue`, `onChange`, `dir` (use `aria-label` / `aria-labelledby` to name the group).
+Ref: `forwardRef` → `HTMLDivElement`.
 
-| Block | File | What it shows |
-|-------|------|----------------|
-| **Sizes** | [`sizes.tsx`](../../../playground/snippets/radio/sizes.tsx) | **`size`** **`s`**, **`m`**, **`l`**, **`xl`** at **`variant="default"`**; separate **`name`** per row so previews do not clash. |
-| **Variants** | [`variants.tsx`](../../../playground/snippets/radio/variants.tsx) | **`variant="default"`** with **`Radio.Hint`** vs **`variant="error"`** with **`Radio.Error`** and **`aria-invalid`**. |
-| **States** | [`states.tsx`](../../../playground/snippets/radio/states.tsx) | Unchecked, selected, **`disabled`** (off/on), row with **`Radio.Hint`** and **`aria-describedby`**. |
-| **Controlled** | [`controlled.tsx`](../../../playground/snippets/radio/controlled.tsx) (+ [`radio-snippets.module.css`](../../../playground/snippets/radio/radio-snippets.module.css)) | Same **`name`**, **`checked`** + **`onChange`** with **`e.currentTarget.checked`**; summary line. |
-| **Composition** | [`composition.tsx`](../../../playground/snippets/radio/composition.tsx) | Two options, shared **`name`**, **`Radio.Hint`** under each (payment-style block). |
-| **Full width** | [`full-width.tsx`](../../../playground/snippets/radio/full-width.tsx) (+ [`radio-snippets.module.css`](../../../playground/snippets/radio/radio-snippets.module.css)) | Narrow column (`previewBannerNarrowColumn` in playground): root stretches **`width: 100%`**, label uses remaining space. |
-| **Specific** | [`form-group.tsx`](../../../playground/snippets/radio/form-group.tsx) (+ [`radio-snippets.module.css`](../../../playground/snippets/radio/radio-snippets.module.css)) | **`fieldset`** / **`legend`**, **`required`**, **`FormData`** on submit. |
+### Radio.Root
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | `string` | — (required) | Value reported to the group when this option is chosen. |
+| `invalid` | `boolean` | `false` | Invalid state for this option only; also set by the group or a mounted `Radio.Error`. |
+| `disabled` | `boolean` | `false` | Disables this option (the group's `disabled` wins). |
+| `id` | `string` | auto (`useId`) | Id of the native input; hint/error ids derive from it. |
+| `aria-describedby` | `string` | — | Extra description ids; merged with the mounted hint and error ids. |
+| `className` | `string` | — | Class on the option wrapper `div`. |
+| `children` | `ReactNode` | — | `Radio.Label`, `Radio.Hint`, `Radio.Error`. |
 
-### Scenarios (recipes)
++ native `<input>` props except `type`, `size`, `checked`, `defaultChecked`, `onChange`, `name`, `value`, `children` — applied to the hidden native input. `required` on `Radio.Root` is ignored (overridden by the group): set `required` on `Radio.Group`.
+Ref: `forwardRef` → `HTMLInputElement`. No `asChild`.
 
-| Scenario | Approach |
-|----------|----------|
-| Shipping method | **`fieldset`** + **`legend`**; shared **`name`**; **`Radio.Hint`** for delivery copy per option. → [`examples/shipping-method.tsx`](examples/shipping-method.tsx) |
-| Plan picker | Controlled group: **`checked`** + **`onChange`**, same **`name`**, optional summary line. → [`examples/plan-picker.tsx`](examples/plan-picker.tsx) |
-| Settings group | Themed or preference block; **`disabled`** on tier-gated options. → [`examples/settings-group.tsx`](examples/settings-group.tsx) |
-| Single primary channel | One-notice policy (email vs SMS vs app); still radios, not checkboxes. → [`examples/notification-channel.tsx`](examples/notification-channel.tsx) |
+### Radio.Label
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Label text. |
+| `className` | `string` | — | Class on the `<label>` row. |
 
-Runnable recipe examples use **`prime-ui-kit`** imports under **`examples/`**. Snippet-level demos (internal `@/` imports) are listed in **Playground snippets** above.
++ native `<label>` HTML attributes except `htmlFor` and `size`. Ref: `forwardRef` → `HTMLLabelElement`.
 
-### Composition
+### Radio.Hint
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | Description text under the label; added to `aria-describedby`. |
+| `className` | `string` | — | Class on the `<p>`. |
 
-- **`Radio.Root`** — provides context (`inputId`, hint/error ids, `describedBy`, hint/error registration) and wraps children in a **`div`** with class **`field`**.
-- **`Radio.Label`** — [Label](../label/COMPONENT.md) with **`htmlFor`** tied to the input; contains the **`input`**, SVG marker, and optional **`children`** text.
-- **`Radio.Hint`** — optional; registers so its id is merged into **`aria-describedby`**; uses the disabled hint variant when the root is **`disabled`**.
-- **`Radio.Error`** — optional; error-styled **`Hint.Root`** and registers invalid state (same effect as **`variant="error"`** on the root for styling).
-- **Order:** **`Radio.Root`** → **`Radio.Label`** → **`Radio.Hint`** and/or **`Radio.Error`** when needed. Public API: **`Radio.Root`**, **`Radio.Label`**, **`Radio.Hint`**, **`Radio.Error`**.
++ native `<p>` props except `id`. No ref.
 
-### Minimal example
+### Radio.Error
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | Error text in `danger-text`; while mounted the option is invalid. |
+| `className` | `string` | — | Class on the `<p>`. |
+
++ native `<p>` props except `id`. No ref.
+
+## Variants
+No `variant`/`tone`/`color`. Axes on `Radio.Group`: `size`, `orientation`, `fullWidth`.
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | 14px circle, 4px gap, 12/16 text | dense filters and tables | |
+| `s` | 16px circle, 8px gap, 13/20 text | compact forms and side panels | |
+| `m` | 18px circle, 8px gap, 14/20 text | regular forms | yes |
+| `l` | 20px circle, 8px gap, 16/24 text | spacious forms, onboarding | |
+| `xl` | 24px circle, 12px gap, 16/24 text | touch-first screens | |
+
+### orientation
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `vertical` | options stacked, gap `--prime-space-2` | options with descriptions, more than 3 options | yes |
+| `horizontal` | options in a wrapping row, column gap `--prime-space-5`, row gap `--prime-space-2` | 2–4 short labels without hints | |
+
+### fullWidth
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `false` | each option is as wide as its content | most cases | yes |
+| `true` | each option stretches to the container width | options laid out in a grid or a card list | |
+
+**Combinations**
+- `orientation="horizontal"` with `Radio.Hint` on options → avoid: descriptions break the row; use vertical.
+- `invalid` on the group plus one `Radio.Error` under the last option — show a group error once.
+- `fullWidth` with `horizontal` is pointless: every option takes the full row.
+
+**Sizes** — match the form: `m` radios next to `m` inputs and buttons. The circle is centred on the first text line.
+
+**Hierarchy** — one group per question; name it with a visible heading (`Typography.Root` with an `id`) + `aria-labelledby` on `Radio.Group`, or with `aria-label`.
+
+## States
+| State | Driven by | DOM | Looks like |
+|---|---|---|---|
+| unselected | group `value` ≠ option `value` | `data-state="unchecked"` on option | circle `fill-strong`, hover `fill-strong-hover` |
+| selected | group `value` = option `value` | `data-state="checked"` | circle `accent-default` (hover `accent-hover`) with a thumb-coloured dot (40%) that pops in |
+| invalid | group `invalid`, option `invalid`, or mounted `Radio.Error` | `data-invalid="true"`, `aria-invalid` | unselected circle gets a `danger-border` inset ring; focus ring `danger-border` |
+| disabled | group or option `disabled` | `data-disabled="true"`, `aria-disabled` on group | circle `fill-muted`, dot `text-disabled`, `cursor: not-allowed` |
+| active | pointer press | — | circle scales to 92% |
+| focus-visible | keyboard | — | outer focus ring around the circle |
+
+Group carries `data-size`, `data-orientation`, `data-invalid`, `data-disabled`, `aria-orientation`, `aria-required`. Option carries `data-size`, `data-state`, `data-invalid`, `data-disabled`, `data-full-width`.
+Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue`.
+
+## Layout & spacing
+- Options inside a group: gap `--prime-space-2` (vertical) — set your own gap via `className` when options have hints (e.g. `--prime-space-4`).
+- Group heading → first option: `--prime-space-2` (gap on the parent, no margins); group → group: `--prime-space-8`.
+- In a Card: content in `Card.Body`, buttons in `Card.Actions` as a direct child of `Card.Root` after the body, primary action last.
+- Hint and error align with the text column, not with the circle.
+- Long labels wrap; works from 320px (horizontal rows wrap).
+
+## Accessibility
+- Group: `role="radiogroup"`, `aria-orientation`, `aria-invalid`, `aria-required`, `aria-disabled`. Name it with `aria-labelledby` (pointing at a visible heading) or `aria-label`.
+- Options are native `<input type="radio">` sharing one `name`: Tab enters the group, arrow keys move the selection, Space selects.
+- Each input gets `aria-describedby` = your ids + hint id + error id.
+- No `labels` keys.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | All size tiers | Choosing the tier next to other controls |
+| [states.tsx](examples/states.tsx) | Unselected, selected, invalid, disabled | Reference for every state |
+| [hint-error.tsx](examples/hint-error.tsx) | Required invalid group with hints and one error, named by a heading via `aria-labelledby` | Validating a one-of-many form question |
+| [horizontal.tsx](examples/horizontal.tsx) | `orientation="horizontal"` with a heading via `aria-labelledby` | 2–4 short options in a row |
+| [plan-picker.tsx](examples/plan-picker.tsx) | Controlled group in a Card with descriptions, a disabled option, summary text and `Card.Actions` (primary last) | A choice with consequences in a settings form |
 
 ```tsx
 import { Radio } from "prime-ui-kit";
 
-export function Example() {
+export function PeriodRadio() {
   return (
-    <Radio.Root name="option" value="a">
-      <Radio.Label>Option</Radio.Label>
-    </Radio.Root>
+    <Radio.Group name="period" defaultValue="week" aria-label="Период отчёта">
+      <Radio.Root value="week">
+        <Radio.Label>Неделя</Radio.Label>
+      </Radio.Root>
+      <Radio.Root value="month">
+        <Radio.Label>Месяц</Radio.Label>
+      </Radio.Root>
+    </Radio.Group>
   );
 }
 ```
 
-### Rules
-
-- Support **controlled** (`checked` + `onChange`) and **uncontrolled** (`defaultChecked`); use standard input change semantics from the native radio.
-- Build a **group** with multiple **`Radio.Root`** instances sharing the same **`name`**; wrap in **`fieldset`** / **`legend`** when the group needs a visible or programmatic heading.
-- **`variant="error"`** or a mounted **`Radio.Error`** sets **`aria-invalid`** on the input and error styling on that root; **`disabled`** disables the input and dims the label/hint treatment.
-- **`aria-describedby`** on **`Radio.Root`** is merged with hint and error ids when those slots mount.
-- Set **`aria-label`** or ensure visible label text when **`Radio.Label`** has no readable children (icon-only or empty label).
-
-## API
-
-### Radio.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| variant | `"default" \| "error"` | `"default"` | no | Error styling and `data-invalid` when `error` or when `Radio.Error` is mounted. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | no | Marker, typography, and hint/error scale from one control token tier. |
-| id | `string` | auto (`useId`) | no | Input id; paired with `Radio.Label` via `htmlFor`. |
-| className | `string` | — | no | Class on the field wrapper (`.field` around Label, Hint, Error slots). |
-| disabled | `boolean` | — | no | Disables the input and label row; stays in sync with label visuals. |
-| aria-describedby | `string` | — | no | Combined with hint and error ids when `Radio.Hint` / `Radio.Error` mount. |
-| children | `React.ReactNode` | — | no | Typically `Label`, optional `Hint` / `Error`. |
-| ref | `React.Ref<HTMLInputElement>` | — | no | Ref to the native radio input. |
-| …rest | `Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" \| "size">` | — | no | Other native attributes on the `input` (e.g. `name`, `value`, `checked`, `defaultChecked`, `onChange`, `required`, `readOnly`, `form`). `type` is always `radio`. |
-
-### Radio.Label
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | no | Label text beside the marker; omit only if an accessible name is set on the root input via remaining root props (e.g. `aria-label`). |
-| className | `string` | — | no | Class on the label row (`Label.Root`). |
-| …rest | `Omit<React.HTMLAttributes<HTMLLabelElement>, "htmlFor" \| "size">` | — | no | Other label attributes; `htmlFor` and `size` come from context. |
-
-### Radio.Hint
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | yes | Supplementary text below the label. |
-| className | `string` | — | no | Additional class on the hint slot (offset under the marker column). |
-| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Paragraph attributes; `id` is managed internally for `aria-describedby`. |
-
-### Radio.Error
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | yes | Error message text; registers invalid context (`aria-invalid` on input). |
-| className | `string` | — | no | Additional class on the error slot. |
-| …rest | `Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">` | — | no | Paragraph attributes; `id` is managed internally for `aria-describedby`. |
+## Mistakes
+- `Radio.Root` outside `Radio.Group` → always wrap options in `Radio.Group` (it throws without the context).
+- `checked` / `onChange` on `Radio.Root` → put `value` / `onValueChange` on `Radio.Group`.
+- `size` or `required` on `Radio.Root` → set them on `Radio.Group`.
+- An error under every option → mark the group `invalid` and render one `Radio.Error`.
+- Unnamed group → add `aria-labelledby` (visible heading) or `aria-label`.
+- Raw `<p>` / `<legend>` with custom font CSS for the heading → use `Typography.Root` (e.g. `body-s`, `weight="medium"`, `tone="secondary"`).
+- `Card.Actions` inside `Card.Body`, primary button first → put `Card.Actions` after `Card.Body`, primary last.
 
 ## Related
-
-- [Checkbox](../checkbox/COMPONENT.md) — independent or multi-select toggles.
-- [Switch](../switch/COMPONENT.md) — binary setting with a different control pattern.
-- [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) — primitives used inside Radio; pair with [Input](../input/COMPONENT.md) in larger forms.
-- [Segmented control](../segmented-control/COMPONENT.md) — compact mode switching in one bar.
-
-## LLM note
-
-- Export: **`import { Radio } from "prime-ui-kit"`** — use **`Radio.Root`**, **`Radio.Label`**, **`Radio.Hint`**, **`Radio.Error`** only; there is **no** `RadioGroup`.
-- **`RadioRootProps`**: extends **`Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size">`** plus **`variant?`**, **`size?`**, **`className?`**, **`children?`**; **`ref`** → **`<input type="radio">`**.
-- **`variant`** literals: **`default`**, **`error`** — error semantics also activate when **`Radio.Error`** mounts inside that **`Radio.Root`**.
-- **`size`** literals: **`s`**, **`m`**, **`l`**, **`xl`** — default **`m`**.
-- Grouping: repeat **`Radio.Root`** with the same **`name`**; for controlled mode, set **`checked`/`onChange`** (or **`defaultChecked`**) consistently across the group.
-- Do not invent a **`Radio.Group`** wrapper — it is not part of the API.
-- Per-root context: **`Radio.Error`** / **`variant="error"`** affect **that** instance’s input **`aria-invalid`** and wrapper **`data-invalid`**; for a whole-group message, either mirror **`variant="error"`** on each root in the group or add separate page-level copy as required by your form pattern.
-- **Playground demos** live under **`playground/snippets/radio/`** and are wired from **`playground/sections/RadioSection.tsx`**. **Recipes** under **`src/components/radio/examples/`** import **`prime-ui-kit`** for copy-paste after **`npm install prime-ui-kit`**.
+[Checkbox](../checkbox/COMPONENT.md) · [Switch](../switch/COMPONENT.md) · [SegmentedControl](../segmented-control/COMPONENT.md) · [Select](../select/COMPONENT.md)

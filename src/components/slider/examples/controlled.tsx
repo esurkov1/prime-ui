@@ -1,23 +1,43 @@
-import { Slider } from "prime-ui-kit";
+/** A controlled slider sharing one value with a number input. Use it when users need both rough dragging and exact keyboard entry. */
+import { Input, Slider } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-/** Controlled pair `value` + `onChange`; mirror the current value in adjacent copy. */
+const MIN = 0;
+const MAX = 100;
+
 export default function SliderControlledExample() {
-  const [level, setLevel] = React.useState(62);
+  const [discount, setDiscount] = React.useState(15);
 
   return (
-    <div className={styles.controlledColumn}>
-      <Slider.Root
-        label="Reserve level"
-        value={level}
-        onChange={setLevel}
-        min={0}
-        max={100}
-        step={1}
-      />
-      <span className={styles.valueHint}>Current value: {level}%</span>
+    <div className={styles.column}>
+      <div className={styles.withInput}>
+        <Slider.Root
+          label="Скидка"
+          min={MIN}
+          max={MAX}
+          value={discount}
+          onValueChange={setDiscount}
+          formatValue={(v) => `${v}%`}
+        />
+        <Input.Root>
+          <Input.Wrapper>
+            <Input.Field
+              type="number"
+              min={MIN}
+              max={MAX}
+              aria-label="Скидка, %"
+              value={discount}
+              onChange={(e) => {
+                const next = Number(e.target.value);
+                if (!Number.isNaN(next)) setDiscount(Math.min(MAX, Math.max(MIN, next)));
+              }}
+            />
+            <Input.InlineAffix side="end">%</Input.InlineAffix>
+          </Input.Wrapper>
+        </Input.Root>
+      </div>
     </div>
   );
 }

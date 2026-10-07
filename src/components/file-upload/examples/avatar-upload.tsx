@@ -1,53 +1,60 @@
-import { Avatar, FileUpload } from "prime-ui-kit";
+/** A round drop zone around an Avatar that accepts images and shows a preview; buttons open the same input via `inputRef`. Use it for profile photos. */
+import { Avatar, Button, FileUpload, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-/**
- * Аватар: одно фото, превью через Avatar и object URL.
- * В проде не забывайте вызывать URL.revokeObjectURL при смене/сбросе файла.
- */
-export function FileUploadAvatarUploadExample() {
-  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+import styles from "./examples.module.css";
+
+export default function FileUploadAvatarUploadExample() {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
+      if (preview) URL.revokeObjectURL(preview);
     };
-  }, [previewUrl]);
+  }, [preview]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-l)",
-        maxWidth: 320,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: "var(--prime-sys-spacing-m)" }}>
-        <Avatar.Root size="xl">
-          {previewUrl ? <Avatar.Image src={previewUrl} alt="Предпросмотр аватара" /> : null}
-          <Avatar.Fallback>U</Avatar.Fallback>
+    <div className={styles.avatarRow}>
+      <FileUpload.Root
+        inputRef={inputRef}
+        accept="image/png,image/jpeg"
+        variant="solid"
+        className={styles.avatarZone}
+        aria-label="Загрузить фото профиля"
+        onFilesChange={([file]) => {
+          if (file) setPreview(URL.createObjectURL(file));
+        }}
+      >
+        <Avatar.Root size="2xl">
+          {preview ? <Avatar.Image src={preview} alt="" /> : null}
+          <Avatar.Fallback>АК</Avatar.Fallback>
         </Avatar.Root>
-        <FileUpload.Root
-          accept="image/jpeg,image/png,image/webp"
-          onFilesChange={(files) => {
-            const file = files[0];
-            setPreviewUrl((prev) => {
-              if (prev) {
-                URL.revokeObjectURL(prev);
-              }
-              return file ? URL.createObjectURL(file) : null;
-            });
-          }}
-        >
-          <FileUpload.DropBody>
-            <FileUpload.Title>Загрузить фото</FileUpload.Title>
-            <FileUpload.Hint>PNG или JPEG, до 5 МБ</FileUpload.Hint>
-            <FileUpload.BrowseLabel>Нажмите или перетащите файл</FileUpload.BrowseLabel>
-          </FileUpload.DropBody>
-        </FileUpload.Root>
+      </FileUpload.Root>
+      <div className={styles.avatarText}>
+        <div className={styles.avatarCopy}>
+          <Typography.Root as="p" variant="title-s">
+            Фото профиля
+          </Typography.Root>
+          <Typography.Root as="p" variant="body-s" tone="secondary">
+            PNG или JPG, не меньше 400×400 px. Можно перетащить на аватар.
+          </Typography.Root>
+        </div>
+        <div className={styles.avatarActions}>
+          <Button.Root
+            variant="soft"
+            tone="neutral"
+            size="s"
+            onClick={() => inputRef.current?.click()}
+          >
+            {preview ? "Заменить" : "Загрузить"}
+          </Button.Root>
+          {preview ? (
+            <Button.Root variant="ghost" tone="danger" size="s" onClick={() => setPreview(null)}>
+              Удалить
+            </Button.Root>
+          ) : null}
+        </div>
       </div>
     </div>
   );

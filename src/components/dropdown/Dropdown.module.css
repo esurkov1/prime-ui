@@ -1,121 +1,197 @@
-.content {
-  --dropdown-separator-mix: 40%;
-  --dd-pad: var(--prime-sys-spacing-x3);
-  --dd-min-w: var(--prime-sys-unit-11rem);
-  --dd-item-gap: var(--prime-sys-size-control-m-gap);
-  --dd-item-height: var(--prime-sys-size-control-m-height);
-  --dd-item-pad-x: var(--prime-sys-size-control-m-buttonPaddingX);
-  --dd-item-radius: var(--prime-sys-size-control-m-radius);
-  --dd-item-text: var(--prime-sys-size-control-m-text);
-  --dd-icon-size: var(--prime-sys-size-control-m-icon);
-  --dd-group-label-font: var(--prime-sys-size-control-s-supportText);
-  --dd-group-label-pt: var(--prime-sys-spacing-x2);
-  --dd-group-label-px: var(--prime-sys-spacing-x3);
-  --dd-group-label-pb: var(--prime-sys-spacing-x1);
-  --dd-header-gap: var(--prime-sys-spacing-x3);
-  --dd-header-pad-inline: var(--prime-sys-spacing-x2);
-  --dd-header-pad-block: var(--prime-sys-spacing-x3);
-  --dd-header-desc-font: var(--prime-sys-size-control-s-supportText);
-  --dd-separator-stack-pad: var(--prime-sys-spacing-x2);
-  /* Как у Popover `.popoverScroll`: те же поля и масштаб `--dd-pad` по `data-size`. */
-  --po-inset-extra: 0px;
+/* ─── Dropdown menu ──────────────────────────────────────────────────────────
+ * Shared floating panel (`--prime-panel-*`): raised fill, radius 12, padding 4,
+ * items radius 8 = 12 − 4, item height/text/icon from the menu tier.
+ */
 
+.content {
+  --dd-item-h: var(--prime-control-m-item-height);
+  --dd-text: var(--prime-control-m-text-size);
+  --dd-lh: var(--prime-control-m-line-height);
+  --dd-icon: var(--prime-control-m-icon);
+  --dd-gap: var(--prime-control-m-gap);
+  --dd-meta: var(--prime-control-m-label-size);
+  --dd-meta-lh: var(--prime-control-m-label-line-height);
+  /* Fields inside a raised surface stay distinguishable (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
+  position: fixed;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  position: fixed;
   width: max-content;
-  max-width: min(var(--prime-sys-unit-20rem), 100vw);
+  min-width: min(
+    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
+    var(--float-max-w, 100vw)
+  );
+  max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));
+  max-height: min(var(--prime-panel-max-height), var(--float-max-h, var(--prime-panel-max-height)));
   margin: 0;
-  background: var(--prime-sys-color-surface-elevated);
-  border: none;
-  border-radius: var(--prime-sys-shape-radius-l);
-  box-shadow: var(--prime-sys-elevation-shadow-surface), var(--prime-sys-elevation-shadow-modal);
-  padding: calc(var(--dd-pad) + var(--po-inset-extra));
-  min-width: var(--dd-min-w);
-  /* max-height задаётся из JS по свободному месту во вьюпорте; прокрутка — ScrollContainer */
-  transform-origin: top center;
+  padding: var(--prime-panel-padding);
+  border: 0;
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--dd-text);
+  line-height: var(--dd-lh);
+  outline: none;
 }
 
-.content[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-sys-elevation-zIndex-dropdown);
-}
-
-.content[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawer);
-}
-
-.content[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-sys-elevation-zIndex-dropdownInModal);
-}
-
-.content[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawerInModal);
+.content[data-size="xs"] {
+  --dd-item-h: var(--prime-control-xs-item-height);
+  --dd-text: var(--prime-control-xs-text-size);
+  --dd-lh: var(--prime-control-xs-line-height);
+  --dd-icon: var(--prime-control-xs-icon);
+  --dd-gap: var(--prime-control-xs-gap);
+  --dd-meta: var(--prime-control-xs-label-size);
+  --dd-meta-lh: var(--prime-control-xs-label-line-height);
 }
 
 .content[data-size="s"] {
-  --dd-pad: calc((var(--prime-sys-spacing-x2) + var(--prime-sys-spacing-x3)) / 2);
-  --dd-min-w: var(--prime-sys-unit-9p5rem);
-  --dd-item-gap: var(--prime-sys-size-control-s-gap);
-  --dd-item-height: var(--prime-sys-size-control-s-height);
-  --dd-item-pad-x: var(--prime-sys-size-control-s-buttonPaddingX);
-  --dd-item-radius: var(--prime-sys-size-control-s-radius);
-  --dd-item-text: var(--prime-sys-size-control-s-text);
-  --dd-icon-size: var(--prime-sys-size-control-s-icon);
-  --dd-group-label-font: var(--prime-sys-size-control-s-supportText);
-  --dd-group-label-pt: var(--prime-sys-spacing-x1);
-  --dd-group-label-px: var(--prime-sys-spacing-x2);
-  --dd-group-label-pb: var(--prime-sys-spacing-x1);
-  --dd-header-gap: var(--prime-sys-spacing-x2);
-  --dd-header-pad-inline: var(--prime-sys-spacing-x2);
-  --dd-header-pad-block: var(--prime-sys-spacing-x3);
+  --dd-item-h: var(--prime-control-s-item-height);
+  --dd-text: var(--prime-control-s-text-size);
+  --dd-lh: var(--prime-control-s-line-height);
+  --dd-icon: var(--prime-control-s-icon);
+  --dd-gap: var(--prime-control-s-gap);
+  --dd-meta: var(--prime-control-s-label-size);
+  --dd-meta-lh: var(--prime-control-s-label-line-height);
 }
 
 .content[data-size="l"] {
-  --dd-pad: var(--prime-sys-spacing-x4);
-  --dd-min-w: var(--prime-sys-unit-12p5rem);
-  --dd-item-gap: var(--prime-sys-size-control-l-gap);
-  --dd-item-height: var(--prime-sys-size-control-l-height);
-  --dd-item-pad-x: var(--prime-sys-size-control-l-buttonPaddingX);
-  --dd-item-radius: var(--prime-sys-size-control-l-radius);
-  --dd-item-text: var(--prime-sys-size-control-l-text);
-  --dd-icon-size: var(--prime-sys-size-control-l-icon);
-  --dd-group-label-font: var(--prime-sys-size-control-l-supportText);
-  --dd-group-label-pt: var(--prime-sys-spacing-x2);
-  --dd-group-label-px: var(--prime-sys-spacing-x4);
-  --dd-group-label-pb: var(--prime-sys-spacing-x2);
-  --dd-header-desc-font: var(--prime-sys-size-control-m-supportText);
-  --dd-header-pad-inline: var(--prime-sys-spacing-x3);
-  --dd-header-pad-block: var(--prime-sys-spacing-x4);
-  --dd-separator-stack-pad: var(--prime-sys-spacing-x3);
+  --dd-item-h: var(--prime-control-l-item-height);
+  --dd-text: var(--prime-control-l-text-size);
+  --dd-lh: var(--prime-control-l-line-height);
+  --dd-icon: var(--prime-control-l-icon);
+  --dd-gap: var(--prime-control-l-gap);
+  --dd-meta: var(--prime-control-l-label-size);
+  --dd-meta-lh: var(--prime-control-l-label-line-height);
 }
 
 .content[data-size="xl"] {
-  --dd-pad: var(--prime-sys-spacing-x5);
-  --dd-min-w: var(--prime-sys-unit-14rem);
-  --dd-item-gap: var(--prime-sys-size-control-xl-gap);
-  --dd-item-height: var(--prime-sys-size-control-xl-height);
-  --dd-item-pad-x: var(--prime-sys-size-control-xl-buttonPaddingX);
-  --dd-item-radius: var(--prime-sys-size-control-xl-radius);
-  --dd-item-text: var(--prime-sys-size-control-xl-text);
-  --dd-icon-size: var(--prime-sys-size-control-xl-icon);
-  --dd-group-label-font: var(--prime-sys-size-control-xl-supportText);
-  --dd-group-label-pt: var(--prime-sys-spacing-x3);
-  --dd-group-label-px: var(--prime-sys-spacing-x4);
-  --dd-group-label-pb: var(--prime-sys-spacing-x2);
-  --dd-header-gap: var(--prime-sys-spacing-x3);
-  --dd-header-desc-font: var(--prime-sys-size-control-xl-supportText);
-  --dd-header-pad-inline: var(--prime-sys-spacing-x3);
-  --dd-header-pad-block: var(--prime-sys-spacing-x4);
-  --dd-separator-stack-pad: var(--prime-sys-spacing-x3);
+  --dd-item-h: var(--prime-control-xl-item-height);
+  --dd-text: var(--prime-control-xl-text-size);
+  --dd-lh: var(--prime-control-xl-line-height);
+  --dd-icon: var(--prime-control-xl-icon);
+  --dd-gap: var(--prime-control-xl-gap);
+  --dd-meta: var(--prime-control-xl-label-size);
+  --dd-meta-lh: var(--prime-control-xl-label-line-height);
 }
 
-/* Тёмная тема: между «серым» elevated (800) и почти чёрным canvas (950) — surface (900) */
-:global([data-theme="dark"]) .content {
-  background: var(--prime-sys-color-surface-raised);
+.content[data-overlay-portal-layer="page"] {
+  z-index: var(--prime-z-dropdown);
 }
 
+.content[data-overlay-portal-layer="drawer"] {
+  z-index: var(--prime-z-dropdown-in-drawer);
+}
+
+.content[data-overlay-portal-layer="modal"] {
+  z-index: var(--prime-z-dropdown-in-modal);
+}
+
+.content[data-overlay-portal-layer="drawerInModal"] {
+  z-index: var(--prime-z-dropdown-in-drawer-in-modal);
+}
+
+/* ─── Item ───────────────────────────────────────────────────────────────── */
+
+.item {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--dd-gap);
+  width: 100%;
+  min-height: var(--dd-item-h);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--prime-panel-item-padding-x);
+  border: 0;
+  border-radius: var(--prime-panel-item-radius);
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* Клавиатурный фокус = подсветка строки (roving focus внутри меню). */
+.item:hover,
+.item:focus-visible {
+  background: var(--prime-color-fill-subtle);
+}
+
+.item:active {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.item[data-disabled="true"] {
+  background: transparent;
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+.item[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
+}
+
+.item[data-tone="danger"]:hover,
+.item[data-tone="danger"]:focus-visible {
+  background: var(--prime-color-danger-soft);
+}
+
+.item[data-tone="danger"][data-disabled="true"] {
+  background: transparent;
+  color: var(--prime-color-text-disabled);
+}
+
+.itemIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--dd-icon);
+  height: var(--dd-icon);
+  color: var(--prime-color-text-muted);
+}
+
+.item[data-tone="danger"] .itemIcon {
+  color: currentColor;
+}
+
+.item[data-disabled="true"] .itemIcon {
+  color: var(--prime-color-text-disabled);
+}
+
+/* Shortcut: Kbd look, muted, pushed to the trailing edge. */
+.itemShortcut {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  margin-inline-start: auto;
+  padding-inline-start: var(--prime-space-4);
+  color: var(--prime-color-text-muted);
+  font-family: var(--prime-font-family-sans);
+  /* One step below the item text of the same tier, so it scales with the menu. */
+  font-size: var(--dd-meta);
+  line-height: var(--dd-meta-lh);
+  font-variant-numeric: tabular-nums;
+}
+
+.item[data-disabled="true"] .itemShortcut {
+  color: var(--prime-color-text-disabled);
+}
+
+/* ─── Group / separator ─────────────────────────────────────────────────── */
+
+.group,
 .block {
   display: flex;
   flex-direction: column;
@@ -123,40 +199,64 @@
   min-width: 0;
 }
 
-.block > * + * {
-  margin-top: var(--dd-pad);
+.groupLabel {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: var(--prime-panel-group-label-height);
+  padding-inline: var(--prime-panel-item-padding-x);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
 }
+
+/* Hairline full-bleed: negative inline margin = panel padding. */
+.separator {
+  flex-shrink: 0;
+  align-self: stretch;
+  height: 0;
+  margin-block: var(--prime-panel-padding);
+  margin-inline: calc(-1 * var(--prime-panel-padding));
+  padding: 0;
+  border: 0;
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+/* ─── Header (user info) ────────────────────────────────────────────────── */
 
 .header {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   min-width: 0;
-  width: 100%;
-}
-
-.header > * + * {
-  margin-top: var(--prime-sys-spacing-x1);
 }
 
 .headerRow {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  box-sizing: border-box;
+  gap: var(--prime-space-3);
   width: 100%;
   min-width: 0;
-  padding: var(--dd-header-pad-block) var(--dd-header-pad-inline);
-}
-
-.headerRow > * + * {
-  margin-inline-start: var(--dd-header-gap);
+  padding: var(--prime-space-2) var(--prime-panel-item-padding-x);
 }
 
 .headerLeading {
+  display: flex;
   flex-shrink: 0;
 }
 
+.headerMain {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .headerTrailing {
+  display: flex;
   flex-shrink: 0;
   align-self: flex-start;
 }
@@ -165,191 +265,26 @@
   align-self: center;
 }
 
-.headerMain {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.headerMain > * + * {
-  margin-top: var(--prime-sys-spacing-x1);
-}
-
 .headerTitle {
-  font-size: var(--dd-item-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: 1.25;
-  color: var(--prime-sys-color-content-primary);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-body-m-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-body-m-line-height);
 }
 
 .headerDescription {
-  font-size: var(--dd-header-desc-font);
-  line-height: 1.25;
-  color: var(--prime-sys-color-content-secondary);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 .headerDescriptionTruncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.content[data-side="bottom"] {
-  animation: dropdownInBottom var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-.content[data-side="top"] {
-  transform-origin: bottom center;
-  animation: dropdownInTop var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-@keyframes dropdownInBottom {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(calc(-1 * var(--prime-sys-unit-4px)));
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes dropdownInTop {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(var(--prime-sys-unit-4px));
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.item {
-  display: flex;
-  align-items: center;
-  min-height: var(--dd-item-height);
-  padding-block: 0;
-  padding-inline: var(--dd-item-pad-x);
-  border-radius: var(--dd-item-radius);
-  font-size: var(--dd-item-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: 1;
-  color: var(--prime-sys-color-content-primary);
-  cursor: pointer;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  box-sizing: border-box;
-  transition: background var(--prime-sys-motion-fast);
-}
-
-.item:hover,
-.item:focus-visible {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  outline: none;
-}
-
-.item[data-disabled="true"] {
-  color: var(--prime-sys-color-content-disabled);
-  cursor: not-allowed;
-}
-
-.item[data-destructive="true"] {
-  color: var(--prime-sys-color-content-danger);
-}
-
-.itemIcon {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--dd-icon-size);
-  height: var(--dd-icon-size);
-  margin-inline-end: var(--dd-item-gap);
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.item[data-destructive="true"] .itemIcon {
-  color: var(--prime-sys-color-content-danger);
-}
-
-.group {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.group > * + * {
-  margin-top: var(--prime-sys-spacing-x1);
-}
-
-.group > .item + .item {
-  margin-top: 0;
-}
-
-.groupLabel {
-  padding: var(--dd-group-label-pt) var(--dd-group-label-px) var(--dd-group-label-pb);
-  font-size: var(--dd-group-label-font);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: 1.2;
-  color: var(--prime-sys-color-content-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.separator {
-  flex: 0 0 auto;
-  align-self: stretch;
-  box-sizing: border-box;
-  min-width: 0;
-  display: block;
-  width: 100%;
-  height: var(--prime-sys-unit-1px);
-  margin: 0;
-  padding: 0;
-  border: none;
-  background-color: color-mix(
-    in srgb,
-    var(--prime-sys-color-border-subtle) var(--dropdown-separator-mix),
-    var(--prime-sys-color-surface-elevated)
-  );
-}
-
-/* Вертикальный шаг между прямыми детьми — как `gap` у Popover (`--po-inset-gap` = `--dd-pad`); пары пунктов меню сбрасываются ниже. */
-.content > * + * {
-  margin-top: var(--dd-pad);
-}
-
-.content > .item + .item {
-  margin-top: 0;
-}
-
-.content > .separator + * {
-  margin-top: 0;
-}
-
-.content > .item + .separator,
-.content > .group + .separator {
-  margin-top: var(--dd-separator-stack-pad);
-  margin-bottom: var(--dd-separator-stack-pad);
-}
-
-.content > .block + .block {
-  margin-top: var(--dd-pad);
-}
-
-.content > .block + .separator {
-  margin-top: var(--dd-separator-stack-pad);
-  margin-bottom: var(--dd-separator-stack-pad);
-}
-
-:global([data-theme="dark"]) .content .separator {
-  background-color: color-mix(
-    in srgb,
-    var(--prime-sys-color-border-subtle) var(--dropdown-separator-mix),
-    var(--prime-sys-color-surface-raised)
-  );
 }

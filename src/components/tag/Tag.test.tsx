@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { Tag } from "./Tag";
 
 describe("Tag", () => {
@@ -14,26 +15,38 @@ describe("Tag", () => {
     expect(container.firstElementChild).toHaveAttribute("data-size", size);
   });
 
-  it("defaults to data-size m", () => {
+  it("defaults to size m, gray, soft", () => {
     const { container } = render(<Tag.Root>d</Tag.Root>);
     expect(container.firstElementChild).toHaveAttribute("data-size", "m");
+    expect(container.firstElementChild).toHaveAttribute("data-color", "gray");
+    expect(container.firstElementChild).toHaveAttribute("data-variant", "soft");
+  });
+
+  it("sets data-color and data-variant", () => {
+    const { container } = render(
+      <Tag.Root color="blue" variant="outline">
+        c
+      </Tag.Root>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-color", "blue");
+    expect(container.firstElementChild).toHaveAttribute("data-variant", "outline");
   });
 
   it("does not show remove button without onRemove", () => {
     render(<Tag.Root>Only</Tag.Root>);
-    expect(screen.queryByRole("button", { name: "Remove" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Удалить" })).not.toBeInTheDocument();
   });
 
   it("shows remove button when onRemove is passed", () => {
     render(<Tag.Root onRemove={() => undefined}>Removable</Tag.Root>);
-    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Удалить" })).toBeInTheDocument();
   });
 
   it("calls onRemove when remove button is clicked", async () => {
     const user = userEvent.setup();
     const onRemove = vi.fn();
     render(<Tag.Root onRemove={onRemove}>X</Tag.Root>);
-    await user.click(screen.getByRole("button", { name: "Remove" }));
+    await user.click(screen.getByRole("button", { name: "Удалить" }));
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 
@@ -44,7 +57,7 @@ describe("Tag", () => {
       </Tag.Root>,
     );
     expect(container.firstElementChild).toHaveAttribute("data-disabled", "true");
-    expect(screen.getByRole("button", { name: "Remove" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Удалить" })).toBeDisabled();
   });
 
   it("renders Icon", () => {
@@ -62,5 +75,29 @@ describe("Tag", () => {
   it("merges className on Root", () => {
     const { container } = render(<Tag.Root className="custom-tag">t</Tag.Root>);
     expect(container.firstElementChild).toHaveClass("custom-tag");
+  });
+
+  it("uses labels.remove as the accessible name of the remove button", () => {
+    render(
+      <Tag.Root labels={{ remove: "Remove Design" }} onRemove={() => undefined}>
+        Design
+      </Tag.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Remove Design" })).toBeInTheDocument();
+  });
+
+  it("supports size xs and steps down inside a control", () => {
+    const { container } = render(
+      <>
+        <Tag.Root size="xs">a</Tag.Root>
+        <ControlSizeProvider value="l">
+          <Tag.Root>b</Tag.Root>
+        </ControlSizeProvider>
+      </>,
+    );
+    const [a, b] = Array.from(container.querySelectorAll("[data-size]"));
+    expect(a).toHaveAttribute("data-tier", "xs");
+    expect(b).toHaveAttribute("data-size", "l");
+    expect(b).toHaveAttribute("data-tier", "m");
   });
 });

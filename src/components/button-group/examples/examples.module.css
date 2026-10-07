@@ -1,0 +1,43 @@
+/* Layout for the ButtonGroup examples: semantic tokens only. */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--prime-space-3);
+}
+
+.sizeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--prime-space-6);
+}
+
+.sizeCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+  width: 100%;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.column {
+  display: grid;
+  gap: var(--prime-space-5);
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+}

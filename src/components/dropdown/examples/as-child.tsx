@@ -1,25 +1,22 @@
-import { Dropdown } from "@/components/dropdown/Dropdown";
+/** A text-link button as the trigger: any single element can open the menu. Use for inline sort / view switches in text. */
+import { Dropdown, Typography } from "prime-ui-kit";
 
-import styles from "./dropdown-examples.module.css";
+import styles from "./examples.module.css";
 
-/** Триггер как единственный ребёнок: aria и клик сливаются с ссылкой — как в `playground/snippets/dropdown/as-child.tsx`. */
 export default function DropdownAsChildExample() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <a
-          href="/playground"
-          className={styles.linkTrigger}
-          onClick={(e) => {
-            e.preventDefault();
-          }}
-        >
-          Открыть как ссылка-триггер
-        </a>
+        <button type="button" className={styles.linkTrigger}>
+          <Typography.Root as="span" variant="body-m" tone="accent" className={styles.underline}>
+            Сортировка: по дате
+          </Typography.Root>
+        </button>
       </Dropdown.Trigger>
       <Dropdown.Content>
-        <Dropdown.Item>Пункт 1</Dropdown.Item>
-        <Dropdown.Item>Пункт 2</Dropdown.Item>
+        <Dropdown.Item>По дате</Dropdown.Item>
+        <Dropdown.Item>По названию</Dropdown.Item>
+        <Dropdown.Item>По размеру</Dropdown.Item>
       </Dropdown.Content>
     </Dropdown.Root>
   );

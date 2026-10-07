@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { Input } from "./Input";
+import styles from "./Input.module.css";
 
 // ─── Composable API ───────────────────────────────────────────────────────────
 
@@ -171,10 +172,10 @@ describe("Input composable API", () => {
     });
   });
 
-  describe("hasError state", () => {
-    it("sets aria-invalid on Field when hasError=true", () => {
+  describe("invalid state", () => {
+    it("sets aria-invalid on Field when invalid", () => {
       render(
-        <Input.Root hasError>
+        <Input.Root invalid>
           <Input.Wrapper>
             <Input.Field placeholder="Email" />
           </Input.Wrapper>
@@ -184,17 +185,17 @@ describe("Input composable API", () => {
       expect(screen.getByPlaceholderText("Email")).toHaveAttribute("aria-invalid", "true");
     });
 
-    it("sets data-has-error on Wrapper when hasError=true", () => {
+    it("sets data-invalid on Wrapper when invalid", () => {
       const { container } = render(
-        <Input.Root hasError>
+        <Input.Root invalid>
           <Input.Wrapper>
             <Input.Field placeholder="Email" />
           </Input.Wrapper>
         </Input.Root>,
       );
 
-      const wrapper = container.querySelector("[data-has-error]");
-      expect(wrapper).toHaveAttribute("data-has-error", "true");
+      const wrapper = container.querySelector(`.${styles.wrapper}`);
+      expect(wrapper).toHaveAttribute("data-invalid", "true");
     });
 
     it("sets aria-invalid when error prop is provided on Root", () => {
@@ -240,9 +241,9 @@ describe("Input composable API", () => {
       expect(screen.getByPlaceholderText("name@company.com")).toHaveAttribute("id", "email");
     });
 
-    it("renders optionalLabel", () => {
+    it("renders the optional marker from labels.optional", () => {
       render(
-        <Input.Root label="Name" optionalLabel="(Optional)">
+        <Input.Root optional labels={{ optional: "(Optional)" }} label="Name">
           <Input.Wrapper>
             <Input.Field placeholder="test" />
           </Input.Wrapper>
@@ -267,7 +268,7 @@ describe("Input composable API", () => {
       expect(hint).toHaveAttribute("id");
     });
 
-    it("renders error text with data-variant=error", () => {
+    it("renders error text with data-invalid", () => {
       render(
         <Input.Root error="This field is required">
           <Input.Wrapper>
@@ -278,7 +279,7 @@ describe("Input composable API", () => {
 
       const error = screen.getByText("This field is required");
       expect(error).toBeInTheDocument();
-      expect(error).toHaveAttribute("data-variant", "error");
+      expect(error).toHaveAttribute("data-invalid", "true");
     });
   });
 
@@ -376,5 +377,160 @@ describe("Input composable API", () => {
 
       consoleSpy.mockRestore();
     });
+  });
+});
+
+describe("Input field system", () => {
+  it("required: shows a decorative asterisk and sets native required", () => {
+    render(
+      <Input.Root label="Email" required>
+        <Input.Wrapper>
+          <Input.Field placeholder="req" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(screen.getByPlaceholderText("req")).toBeRequired();
+    expect(screen.getByText("*")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByPlaceholderText("req")).toHaveAccessibleName("Email");
+  });
+
+  it("optional: renders the default marker", () => {
+    render(
+      <Input.Root label="Company" optional>
+        <Input.Wrapper>
+          <Input.Field />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(screen.getByText("необязательно")).toBeInTheDocument();
+  });
+
+  it("error replaces the hint in the same slot", () => {
+    render(
+      <Input.Root hint="Helper" error="Broken">
+        <Input.Wrapper>
+          <Input.Field placeholder="swap" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(screen.queryByText("Helper")).toBeNull();
+    const errorEl = screen.getByText("Broken");
+    expect(screen.getByPlaceholderText("swap").getAttribute("aria-describedby")).toBe(errorEl.id);
+  });
+
+  it("renders a counter in the support row and flags overflow", () => {
+    render(
+      <Input.Root counter={<Input.Counter current={12} max={10} />}>
+        <Input.Wrapper>
+          <Input.Field />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(screen.getByText("12/10").parentElement).toHaveAttribute("data-invalid", "true");
+    expect(screen.getByText("12 из 10 символов")).toBeInTheDocument();
+  });
+
+  it("calls onValueChange with the string value alongside onChange", () => {
+    const onChange = vi.fn();
+    const onValueChange = vi.fn();
+    render(
+      <Input.Root>
+        <Input.Wrapper>
+          <Input.Field placeholder="v" onChange={onChange} onValueChange={onValueChange} />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    fireEvent.change(screen.getByPlaceholderText("v"), { target: { value: "abc" } });
+    expect(onChange).toHaveBeenCalledOnce();
+    expect(onValueChange).toHaveBeenCalledWith("abc");
+  });
+
+  it("takes the clear button name from labels.clear", () => {
+    render(
+      <Input.Root labels={{ clear: "Clear search" }}>
+        <Input.Wrapper>
+          <Input.Field defaultValue="x" />
+          <Input.ClearButton />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Clear search" })).toBeInTheDocument();
+  });
+
+  it("ClearButton calls onClick and returns focus to the field", () => {
+    const onClick = vi.fn();
+    render(
+      <Input.Root>
+        <Input.Wrapper>
+          <Input.Field placeholder="clear" defaultValue="x" />
+          <Input.ClearButton onClick={onClick} />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Очистить" }));
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(screen.getByPlaceholderText("clear")).toHaveFocus();
+  });
+});
+
+describe("Input focusRing", () => {
+  it("focusRing={false} marks the wrapper and keeps the invalid state", () => {
+    render(
+      <Input.Root focusRing={false} invalid>
+        <Input.Wrapper>
+          <Input.Field aria-label="Поиск" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const wrapper = screen.getByRole("textbox", { name: "Поиск" }).parentElement;
+    expect(wrapper).toHaveAttribute("data-focus-ring", "false");
+    expect(wrapper).toHaveAttribute("data-invalid", "true");
+    expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("omits the attribute by default", () => {
+    render(
+      <Input.Root>
+        <Input.Wrapper>
+          <Input.Field aria-label="Имя" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(screen.getByRole("textbox").parentElement).not.toHaveAttribute("data-focus-ring");
+  });
+});
+
+describe("Input.Badge", () => {
+  it("renders a soft palette badge one tier down, after the field and before the end icon", () => {
+    render(
+      <Input.Root label="Статус" size="m">
+        <Input.Wrapper>
+          <Input.Field defaultValue="ИНН 7701234567" />
+          <Input.Icon side="end">
+            <svg />
+          </Input.Icon>
+          <Input.Badge color="green">Проверен</Input.Badge>
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const badge = screen.getByText("Проверен");
+    expect(badge).toHaveAttribute("data-variant", "soft");
+    expect(badge).toHaveAttribute("data-color", "green");
+    expect(badge).toHaveAttribute("data-tier", "s");
+    expect(badge.className).toContain(styles.badge);
+  });
+
+  it("defaults to gray and follows the field tier", () => {
+    render(
+      <Input.Root size="l">
+        <Input.Wrapper>
+          <Input.Field aria-label="Поле" />
+          <Input.Badge>Черновик</Input.Badge>
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const badge = screen.getByText("Черновик");
+    expect(badge).toHaveAttribute("data-color", "gray");
+    expect(badge).toHaveAttribute("data-tier", "m");
   });
 });

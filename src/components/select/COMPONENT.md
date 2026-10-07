@@ -1,291 +1,285 @@
 # Select
 
-**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
+**Category:** selection (Выбор)
 
-## About
+> A dropdown field for choosing one value (or several with `multiple`) from a closed list.
 
-A field for choosing from a closed set of options. By default (**`native`** `false`) it is a combobox — a trigger shows the current choice or a placeholder, and a portaled listbox lets the user pick. Set **`multiple`** to **`true`** on **`Select.Root`** for multiselect: **`value`** / **`defaultValue`** / **`onChange`** use **`string[]`**; picking toggles options; the list stays open until blur, outside click, or **Escape**; **`Select.Value`** shows selected labels joined with **`, `**; the listbox sets **`aria-multiselectable`**.
+## When to use
+- One value from a closed list of 5+ options in forms, filters and settings: country, role, time zone.
+- A long list where search helps (`Select.Content searchable`, `keywords`).
+- A few values from a short list shown as a comma-separated text (`multiple`).
+- Options that need a thumbnail, a second line or a trailing meta (rich options).
+- The OS picker on mobile-first forms (`native`).
 
-With **`native`** `true`, **`Select.Root`** renders a native **`<select>`** (single) or **`<select multiple>`** (when **`multiple`** is **`true`**) with **`<option>`** / **`<optgroup>`** built from the same **`Select.Item`** (and optional **`Select.Group`**) tree.
+## When not to use
+- 2–5 options that should all be visible → use [Radio](../radio/COMPONENT.md) or [SegmentedControl](../segmented-control/COMPONENT.md) instead.
+- Many values shown as removable tags, or creating new values → use [TagSelect](../tag-select/COMPONENT.md) instead.
+- Free text input → use [Input](../input/COMPONENT.md) instead.
+- A menu of actions (not a value) → use [Dropdown](../dropdown/COMPONENT.md) instead.
+- Global search / command palette → use [CommandMenu](../command-menu/COMPONENT.md) instead.
+- Dates → use [Datepicker](../datepicker/COMPONENT.md) instead.
 
-**When to use**
-
-- Forms, settings, and filters where one or many options must be chosen from a predefined list (role, country, departments, themes, intervals).
-- Flows where a compact trigger is enough and the full list should open on demand with keyboard support.
-- Long option lists structured with **`Select.Group`**, **`Select.GroupLabel`**, and **`Select.Separator`**.
-- Multiselect from the same list without chips or free-text creation — **`multiple`** on the combobox, or **`native`** + **`multiple`** for a platform **`<select multiple>`**.
-
-**When not to use**
-
-- Free text or ad-hoc tags with a chip row and optional “create” — prefer [Tag select](../tag-select/COMPONENT.md).
-- Async search-as-you-type or virtualized remote lists — this primitive expects static **`Select.Item`** children (extend at the app layer if needed).
-- Command or action menus — use [Dropdown](../dropdown/COMPONENT.md) when choices are actions, not form values.
-
-## Composition
-
-- **`Select.Root`** — owns **`native`**, **`multiple`**, value (string or **`string[]`** depending on **`multiple`**), **`size`**, **`hasError`**, **`disabled`**, **`placeholder`**. When **`native`** is `false`, the combobox also owns open state and highlight. Wrap everything else.
-- **`Select.Trigger`** — (non-**`native`** only) the combobox **`button`**. Put **`Select.Value`** inside; optionally **`Select.TriggerIcon`** before **`Select.Value`**. The implementation sets the trigger **`id`**; associate an external [Label](../label/COMPONENT.md) with **`aria-labelledby`** pointing at the label’s **`id`**.
-- **`Select.Value`** — (non-**`native`** only) displays the selected label(s): one label in single mode, or comma-separated labels in **`multiple`** mode, otherwise **`placeholder`** when empty.
-- **`Select.Content`** — when **`native`** is `false`: portaled **`role="listbox"`** with **`display: none`** and **`aria-hidden`** while closed (items stay mounted so **`Select.Item`** can register labels for **`Select.Value`** — do not unmount the list when closed). Closed panel uses **`pointer-events: none`** so fixed layers in **`body`** do not block navigation. With **`multiple`**, the listbox gets **`aria-multiselectable="true"`**. When **`native`** is `true`, **`Select.Content`** is optional; items build the **`<select>`** DOM.
-- **`Select.Item`** — one option per row; optional **`Select.ItemIcon`** children are split into a leading icon slot vs label text (stable marker on **`Select.ItemIcon`**, not only `===` type — duplicate module chunks in the bundle still work). Row spacing tokens are applied on the item (**`data-size`** from root). Use **`label`** when the trigger should show different text than the row content.
-- **`Select.Group`** / **`Select.GroupLabel`** / **`Select.Separator`** — optional structure inside **`Select.Content`** (or under **`native`** root for optgroups).
-
-### Canonical example (single)
-
+## Import
 ```tsx
-import * as React from "react";
-import { Label, Select, Typography } from "prime-ui-kit";
-
-export function Example() {
-  const labelId = React.useId();
-
-  return (
-    <div>
-      <Label.Root id={labelId}>
-        Department
-      </Label.Root>
-      <Select.Root placeholder="Choose">
-        <Select.Trigger aria-labelledby={labelId}>
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Item value="eng">Engineering</Select.Item>
-          <Select.Item value="design">Design</Select.Item>
-          <Select.Item value="sales">Sales</Select.Item>
-        </Select.Content>
-      </Select.Root>
-      <Typography.Root as="p" variant="caption" tone="muted">
-        Used for routing internal requests only.
-      </Typography.Root>
-    </div>
-  );
-}
+import { Select } from "prime-ui-kit";
 ```
 
-### Multiselect (combobox)
+## Anatomy
+```
+Select.Root                     field frame: label · control · hint/error; value and open state
+├─ Select.Trigger               role="combobox" button (combobox mode)
+│  ├─ Select.TriggerIcon        leading icon (optional)
+│  ├─ Select.Value              selected label / placeholder, or a render function
+│  └─ Select.Badge              status badge at the trailing edge (optional)
+└─ Select.Content               portal panel: search row (optional), listbox, empty / loading rows
+   ├─ Select.Group              role="group"
+   │  ├─ Select.GroupLabel      group heading
+   │  └─ Select.Item            role="option"
+   │     ├─ Select.ItemIcon     icon before the text (optional)
+   │     ├─ Select.ItemMedia    thumbnail tile (optional, makes the row two-line)
+   │     ├─ Select.ItemText     title (optional; plain text children also work)
+   │     ├─ Select.ItemDescription  muted second line (optional)
+   │     └─ Select.ItemMeta     trailing meta before the check (optional)
+   └─ Select.Separator          hairline between groups
+```
+`native` mode: `Select.Root native > Select.Item | Select.Group > (Select.GroupLabel, Select.Item)` — no Trigger/Content; it renders a system `<select>` (`Select.Group` → `<optgroup>`, `Select.Separator` is ignored).
+
+## API
+
+### Select.Root
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | `string` (`string[]` with `multiple`) | — | Controlled value; use with `onValueChange`. |
+| `defaultValue` | `string` (`string[]` with `multiple`) | — (`[]` with `multiple`) | Initial value in uncontrolled mode. |
+| `onValueChange` | `(value: string) => void` (`(value: string[]) => void` with `multiple`) | — | Called after a pick or clear (`""` / `[]` after clearing). |
+| `multiple` | `boolean` | `false` | Multi-select: value is `string[]` in pick order, options toggle, the panel stays open. |
+| `native` | `boolean` | `false` | Render the system `<select>` from the same `Select.Item` parts. |
+| `open` | `boolean` | — | Controlled open state (combobox mode only). |
+| `defaultOpen` | `boolean` | `false` | Initial open state (combobox mode only). |
+| `onOpenChange` | `(open: boolean) => void` | — | Called when the panel opens or closes (combobox mode only). |
+| `clearable` | `boolean` | `false` | Clear button in the trigger and Delete / Backspace on it while a value is set (combobox mode only). |
+| `loading` | `boolean` | `false` | Spinner instead of the chevron, `aria-busy`, a status row in the panel (combobox mode only). |
+| `placeholder` | `string` | — | Text while empty (in `native` single mode an empty `<option>`). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Size tier of the trigger, panel items, label and hint. |
+| `label` | `ReactNode` | — | Label above the field, linked to the control. |
+| `required` | `boolean` | `false` | Red `*` after the label; `aria-required` (native: `required`). |
+| `optional` | `boolean` | — | Muted `labels.optional` marker after the label. |
+| `hint` | `ReactNode` | — | Hint under the field; in `aria-describedby`. |
+| `error` | `ReactNode` | — | Error message in the hint slot; a non-empty `error` implies `invalid`. |
+| `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. |
+| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring (`data-focus-ring="false"`). |
+| `disabled` | `boolean` | — | Disables the field. |
+| `id` | `string` | auto (`useId`) | Id of the trigger or native `<select>`. |
+| `labels` | `Partial<SelectLabels>` | Russian defaults | System strings, see Accessibility. |
+| `className` | `string` | — | Class on the field frame `div`. |
+| `children` | `ReactNode` | — (required) | `Trigger` + `Content`; in `native` mode `Item` / `Group` directly. |
+| `name` | `string` | — | `native` only: form field name. |
+| `aria-label` / `aria-labelledby` / `aria-describedby` | `string` | — | `native` only: naming of the `<select>`. |
+
+No ref on Root. In combobox mode there is no hidden form input — submit the value from state.
+
+### Select.Trigger
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | `Select.TriggerIcon`, `Select.Value`, `Select.Badge`; the chevron slot is added automatically. |
+| `className` | `string` | — | Class on the `<button>`. |
+
++ native `<button>` props except `id`, `type`, `role` (`aria-label`, `onClick`, `onKeyDown`, … — your handlers run first).
+Ref: `forwardRef` → `HTMLButtonElement`.
+
+### Select.Value
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `(item: { value: string; label: string }) => ReactNode` | — | Single mode only: renders the selected option (e.g. `ItemMedia` + `ItemText` + `ItemDescription`); not called while empty. |
+| `className` | `string` | — | Class on the value `<span>`. |
+
+With `multiple`, the labels of selected options are joined with `", "`.
+
+### Select.TriggerIcon
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Leading icon, tier icon size, `text-muted`. |
+| `className` | `string` | — | Class on the `<span>`. |
+
++ native `<span>` props.
+
+### Select.Badge
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Hue of the soft badge (one tier below the field). |
+| `children` | `ReactNode` | — (required) | Badge text. |
+| `className` | `string` | — | Class on the badge. |
+
+### Select.Content
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `searchable` | `boolean` | `false` | Search row at the top; filters items by label, description and `keywords`. |
+| `className` | `string` | — | Class on the portal panel. |
+| `children` | `ReactNode` | — (required) | Items, groups, separators. They stay mounted while closed so `Select.Value` knows the labels. |
+
+### Select.Item
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | `string` | — (required) | Option value. |
+| `label` | `string` | — | Label shown in the trigger and used for typeahead; falls back to `Select.ItemText`, plain text children, then `value`. |
+| `keywords` | `string` | — | Extra search words (synonyms, transliteration). |
+| `disabled` | `boolean` | — | Not selectable, skipped by arrows. |
+| `className` | `string` | — | Class on the option `div`. |
+| `children` | `ReactNode` | — (required) | Text and rich parts (direct children). |
+
+Ref: `forwardRef` → `HTMLDivElement`. No other native props.
+
+### Select.ItemIcon
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Icon before the option text. |
+| `className` | `string` | — | Class on the `<span>`. |
+
++ native `<span>` props.
+
+### Select.ItemMedia
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | — | Tile hue (soft fill + hue icon); without it a neutral fill. |
+| `children` | `ReactNode` | — (required) | An icon or an `<img>` (covers the tile). |
+| `className` | `string` | — | Class on the tile. |
+
+### Select.ItemText · Select.ItemDescription · Select.ItemMeta
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | ItemText: title (its text is the option label). ItemDescription: muted second line, searchable. ItemMeta: trailing muted tabular value. |
+| `className` | `string` | — | Class on the `<span>`. |
+
+### Select.Group · Select.GroupLabel · Select.Separator
+| Part | Props | Notes |
+|---|---|---|
+| `Select.Group` | native `<div>` props | `role="group"`. |
+| `Select.GroupLabel` | native `<div>` props | Group heading in caption style of the tier. |
+| `Select.Separator` | native `<hr>` props | Hairline between groups. |
+
+## Variants
+No `variant`/`tone`. Axes: `size`, mode (`multiple`, `native`), visual flags (`clearable`, `loading`, `searchable`), `color` (Badge, ItemMedia), rich option layout.
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | 28px trigger, 8px padX, 12/16 text, 24px items | dense table filters | |
+| `s` | 32px trigger, 8px padX, 13/20 text, 28px items | compact toolbars and side panels | |
+| `m` | 36px trigger, 12px padX, 14/20 text, 32px items | regular forms | yes |
+| `l` | 40px trigger, 12px padX, 16/24 text, 36px items | spacious forms | |
+| `xl` | 48px trigger, 16px padX, 16/24 text, 40px items | touch-first screens | |
+
+### mode
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| single combobox | trigger with value + chevron, portal panel with a check on the selected row | most cases | yes |
+| `multiple` | rows with a checkbox on the left, panel stays open, trigger shows labels joined by commas | a few values from a short list | |
+| `native` | system `<select>` with the same field fill and chevron; `multiple` → a list box 4 rows tall | mobile-first forms, very simple lists | |
+
+### Flags
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `clearable` | × before the chevron while a value is set | the field is optional and can be reset | `false` |
+| `loading` | spinner instead of the chevron, «Загрузка…» row in the panel | options load asynchronously | `false` |
+| `searchable` (Content) | search row with a hairline at the top of the panel | more than ~10 options | `false` |
+
+### color (Select.Badge, Select.ItemMedia)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `gray` | neutral soft fill (Badge uses `fill-strong` so it reads on the field) | neutral status | Badge default |
+| `blue` · `green` · `orange` · `red` · `yellow` · `purple` · `sky` · `pink` · `teal` | soft fill of the hue, hue text/icon | categorising options or showing a status | |
+| none (ItemMedia) | neutral tile | thumbnails / images | ItemMedia default |
+
+### Rich option layout
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| plain | one line of text, check on the right | most lists | yes |
+| rich (`ItemMedia` or `ItemDescription`) | two lines with a tile on the left (`data-rich`); trigger grows the same way via a `Select.Value` function | products, people, vehicles | |
+
+**Combinations**
+- `multiple` + `native` → allowed (system multi list) but rare; prefer combobox `multiple` or TagSelect.
+- `native` + `clearable` / `loading` / `searchable` / `open` → not supported (combobox-only props).
+- `Select.Value` render function + `multiple` → ignored; the trigger shows joined labels.
+- `invalid` + `error` → redundant; `error` implies `invalid`.
+
+**Sizes** — trigger height equals `--prime-control-<tier>-height`, so it lines up with Button, Input, SegmentedControl, Datepicker trigger of the same size. The panel uses the trigger's tier for item height and text.
+
+**Hierarchy** — inside a Card the field fill variable `--prime-color-field-bg` switches to `field-bg-surface` (currently the same value); keep all fields of a form at one size.
+
+## States
+| State | Driven by | DOM | Looks like |
+|---|---|---|---|
+| empty | no value | `data-placeholder="true"` on Value | placeholder in `text-placeholder` |
+| hover | pointer | — | field fill darkens 6% toward text |
+| open | `open` / click / Arrow keys | trigger `data-state="open"`, `aria-expanded`; panel `data-state`, `data-side` | `field-bg-focus` fill, chevron rotates 180° |
+| focus-visible | keyboard | — | inset focus ring (unless `focusRing={false}`) |
+| invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` | inset `danger-border` ring; error text below |
+| disabled | `disabled` | `data-disabled="true"`, native `disabled` | `field-bg-disabled`, `text-disabled`, `cursor: not-allowed` |
+| loading | `loading` | `data-loading="true"`, `aria-busy` | spinner, status row |
+| searching | typing in search | panel `data-searching="true"` | filtered rows, empty state «Ничего не найдено» + hint |
+| option highlighted / selected / disabled | keyboard / value / `disabled` | `data-highlighted`, `data-selected`, `aria-selected`, `data-disabled`, `aria-disabled` | row fill / check icon / dimmed |
+
+Root frame carries `data-size`, `data-invalid`, `data-disabled`; trigger also `data-size`, `data-focus-ring`. Panel follows the overlay contract: closes on outside press (focus follows the pointer) and on Escape (focus returns to the trigger); Tab closes it.
+Controlled: `value` + `onValueChange`, `open` + `onOpenChange`. Uncontrolled: `defaultValue`, `defaultOpen`.
+
+## Layout & spacing
+- Trigger is 100% wide; set the width with the layout (grid column, max-width wrapper).
+- Label → field: tier `label-gap`; field → hint: tier `hint-gap`; field → field in a form: `--prime-space-5`.
+- Panel: at least `--prime-panel-min-width`, at most twice that, max height `--prime-panel-max-height` (scrolls); flips near the viewport edge.
+- Long values truncate with an ellipsis in the trigger.
+
+## Accessibility
+- Trigger: `role="combobox"`, `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls`, `aria-invalid`, `aria-required`, `aria-busy`, `aria-describedby` (hint/error). Without a visible `label`, set `aria-label` on `Select.Trigger` (or on Root in `native`).
+- Listbox: `role="listbox"`, `aria-multiselectable` with `multiple`, options `role="option"` with `aria-selected`; focus stays on the listbox / search with `aria-activedescendant`.
+- Keyboard: on trigger Enter / Space / ↑ / ↓ open, Delete / Backspace clear (`clearable`); in the panel ↑ / ↓ / Home / End move, Enter / Space pick, Escape closes, Tab closes, printable keys do typeahead by label (repeat a letter to cycle).
+- `labels` keys (defaults):
+  - `search` — «Поиск» (search placeholder and name)
+  - `empty` — «Ничего не найдено»
+  - `emptyHint` — «Попробуйте изменить запрос» (shown while searching)
+  - `loading` — «Загрузка…»
+  - `clear` — «Очистить» (clear button tooltip)
+  - `optional` — «необязательно»
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | All size tiers | Aligning with other controls |
+| [states.tsx](examples/states.tsx) | Placeholder, selected, clearable, loading, error, disabled, empty list | Reference for every state |
+| [search-groups.tsx](examples/search-groups.tsx) | `searchable`, `keywords`, groups, separator, disabled option | Long lists |
+| [multiple.tsx](examples/multiple.tsx) | Controlled `multiple` | A few values from a short list |
+| [rich-options.tsx](examples/rich-options.tsx) | ItemMedia (colours), ItemText, ItemDescription, ItemMeta, `Select.Value` render function | Options with thumbnails and meta |
+| [in-form.tsx](examples/in-form.tsx) | Card form: `required`, `hint`, `optional`, groups, `TriggerIcon`, item `label` | Selects inside forms |
+| [controlled.tsx](examples/controlled.tsx) | `value` + `onValueChange`, `aria-label` on trigger | Selection drives other UI; surfaces |
+| [native.tsx](examples/native.tsx) | `native` with label and hint | OS picker on mobile |
+| [with-badge.tsx](examples/with-badge.tsx) | `Select.ItemIcon` in options, `Select.Badge` with `color` following the value | The chosen option carries a status |
 
 ```tsx
-import * as React from "react";
 import { Select } from "prime-ui-kit";
 
-export function MultiExample() {
-  const [value, setValue] = React.useState<string[]>(["eng"]);
-
+export function RoleSelect() {
   return (
-    <Select.Root multiple value={value} onChange={setValue} placeholder="Choose departments">
-      <Select.Trigger aria-label="Departments">
+    <Select.Root label="Роль" defaultValue="editor" placeholder="Выберите роль">
+      <Select.Trigger>
         <Select.Value />
       </Select.Trigger>
       <Select.Content>
-        <Select.Item value="eng">Engineering</Select.Item>
-        <Select.Item value="design">Design</Select.Item>
-        <Select.Item value="sales">Sales</Select.Item>
+        <Select.Item value="viewer">Наблюдатель</Select.Item>
+        <Select.Item value="editor">Редактор</Select.Item>
+        <Select.Item value="admin">Администратор</Select.Item>
       </Select.Content>
     </Select.Root>
   );
 }
 ```
 
-### Native `<select>` (`native`)
-
-```tsx
-import { Select } from "prime-ui-kit";
-
-export function NativeExample() {
-  return (
-    <Select.Root native placeholder="Choose">
-      <Select.Item value="a">Option A</Select.Item>
-      <Select.Item value="b">Option B</Select.Item>
-    </Select.Root>
-  );
-}
-```
-
-### Native `<select multiple>` (`native` + `multiple`)
-
-```tsx
-import * as React from "react";
-import { Select } from "prime-ui-kit";
-
-export function NativeMultiExample() {
-  const [value, setValue] = React.useState<string[]>(["a"]);
-
-  return (
-    <Select.Root native multiple value={value} onChange={setValue}>
-      <Select.Item value="a">Option A</Select.Item>
-      <Select.Item value="b">Option B</Select.Item>
-    </Select.Root>
-  );
-}
-```
-
-You can wrap items in **`Select.Content`** for parity with the composable tree; behavior is the same.
-
-### Playground snippets (live demos)
-
-These files power **`playground/sections/SelectSection.tsx`** (Russian copy in the playground UI). Order matches the section.
-
-| File | Intent |
-|------|--------|
-| `playground/snippets/select/sizes.tsx` | Four **`size`** values **`s`–`xl`** in one column |
-| `playground/snippets/select/states.tsx` | Placeholder only, **`defaultValue`**, root **`disabled`**, **`hasError`** |
-| `playground/snippets/select/controlled.tsx` | **`value`** / **`onChange`** with caption showing parent state |
-| `playground/snippets/select/composition.tsx` | **`Select.TriggerIcon`**, **`Select.ItemIcon`**, item **`label`** vs short row text |
-| `playground/snippets/select/full-width.tsx` | Trigger fills a narrow shell (**`width: 100%`** from kit styles) |
-| `playground/snippets/select/native.tsx` | **`Select.Root`** **`native`** with optional **`Select.Content`** wrapper |
-| `playground/snippets/select/multiple.tsx` | **`Select.Root`** **`multiple`**: **`string[]`** value, list stays open on pick |
-| `playground/snippets/select/features.tsx` | **`Group`** / **`GroupLabel`** / **`Separator`**, disabled item, long list + scroll |
-
-### Examples next to this file
-
-Runnable examples use **`@/`** in the workspace; published consumers import **`prime-ui-kit`**. **`pattern-*`** files mirror the playground snippets above in English (same APIs).
-
-| File | Intent |
-|------|--------|
-| `examples/pattern-sizes.tsx` | **`sizes.tsx`** snippet |
-| `examples/pattern-states.tsx` | **`states.tsx`** snippet |
-| `examples/pattern-controlled.tsx` | **`controlled.tsx`** snippet |
-| `examples/pattern-multiple.tsx` | **`multiple.tsx`** snippet |
-| `examples/pattern-composition.tsx` | **`composition.tsx`** snippet |
-| `examples/pattern-full-width.tsx` | **`full-width.tsx`** snippet |
-| `examples/pattern-native.tsx` | **`native.tsx`** snippet |
-| `examples/pattern-features.tsx` | **`features.tsx`** snippet |
-
-### Additional scenarios
-
-| File | Intent |
-|------|--------|
-| [`./examples/01-country.tsx`](./examples/01-country.tsx) | Visible **`Label.Root`** + **`aria-labelledby`** on **`Select.Trigger`** and helper copy |
-| [`./examples/02-controlled.tsx`](./examples/02-controlled.tsx) | Controlled **`value`** / **`onChange`** with **`Label.Root`** (same tier options as **`pattern-controlled.tsx`**) |
-| [`./examples/03-groups.tsx`](./examples/03-groups.tsx) | Time zones with **`Select.Group`**, **`Select.GroupLabel`**, **`Select.Separator`** |
-| [`./examples/04-full-width-form.tsx`](./examples/04-full-width-form.tsx) | Multi-field form column; triggers span the track |
-
-**LLM note:** Prefer **`pattern-*`** and `playground/snippets/select/*.tsx` for parity with live demos; use **`01`–`04`** for labeled forms and richer scenarios. This page keeps the contract (rules + API tables) authoritative.
-
-## Rules
-
-- **`native`** — default **`false`**. **`true`**: **`<select>`** (or **`<select multiple>`** when **`multiple`** is **`true`**) with kit styling; combobox trigger, portaled listbox, and listbox keyboard model are not used for the single-select native path. Options are collected by walking **`children`** for **`Select.Item`** (and **`Select.Group`** / **`Select.GroupLabel`** → **`<optgroup>`**; **`Select.Separator`** is skipped). **`placeholder`** adds a first **`<option value="">`** for single native select; do not use **`value=""`** on an **`Select.Item`** if you rely on that placeholder. **`Select.ItemIcon`** / **`Select.TriggerIcon`** are not represented in the native control.
-- **`multiple`** — default **`false`**. **`true`**: use **`string[]`** for **`value`**, **`defaultValue`**, and **`onChange`**. Combobox: toggling an option does not close the list; **`Select.Value`** joins labels in selection order. Native: platform rules for **`<select multiple>`** (e.g. modifier keys for multi-select on desktop).
-- **Controlled:** set **`value`** and **`onChange`** together (types follow **`multiple`**). **Uncontrolled:** use **`defaultValue`** or neither; initial empty selection is **`undefined`** / **`[]`** as appropriate.
-- **`onChange`** fires when the controlled value changes (string or **`string[]`**).
-- **`disabled`** on **`Select.Root`** prevents opening the list and selecting; the trigger is inactive (combobox) or the **`<select>`** is disabled (native).
-- **`disabled`** on **`Select.Item`** skips that option for pointer selection and for arrow-key navigation among enabled options only.
-- **`hasError`** on **`Select.Root`** applies error styling to the trigger (combobox) or native select.
-- **Width:** there is no **`fullWidth`** prop on **`Select.Root`**. The combobox trigger uses **`width: 100%`** — constrain with the parent layout.
-- **`Select.Content`** uses **`Portal`**; **`Select.Item`** effects call **`onInitLabel`** so **`Select.Value`** stays aligned with item labels. While open, the listbox **repositions** like **Dropdown** / **Popover**: **`resize`** on **`window`** and **`visualViewport`**, **`scroll`** on the trigger’s scroll ancestors, and **`ResizeObserver`** on the panel when the runtime supports it — the panel stays anchored to the trigger when the page or a scroll container moves.
-- **`Select.Content`** (combobox): on open the listbox receives focus; **Escape** and outside click close. **Enter** / **Space** on a highlighted option applies selection (toggle in **`multiple`** mode). With **`multiple`**, the listbox is **`aria-multiselectable`**.
-- **`Select.Trigger`** is **`role="combobox"`** with **`aria-expanded`**, **`aria-haspopup="listbox"`**, **`aria-controls`**. Items use **`role="option"`**, **`aria-selected`**, **`aria-disabled`** when disabled.
-- If there is no visible label on the trigger, set **`aria-label`** on **`Select.Trigger`**, or **`aria-labelledby`** with an external [Label](../label/COMPONENT.md).
-- List position is resolved internally; there are no public **`side`** / **`align`** props on **`Select.Content`**.
-
-## API
-
-### Select.Root
-
-Discriminated by **`multiple`** and **`native`**:
-
-| Mode | `value` / `defaultValue` | `onChange` |
-|------|--------------------------|------------|
-| Default (combobox, single) | `string` | `(value: string) => void` |
-| Combobox **`multiple`** | `string[]` | `(value: string[]) => void` |
-| **`native`** (single) | `string` | `(value: string) => void` |
-| **`native`** + **`multiple`** | `string[]` | `(value: string[]) => void` |
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Token tier: trigger height, type scale, padding, icon sizes |
-| multiple | `boolean` | `false` | No | **`true`**: multiselect; value types are **`string[]`** |
-| value | `string` or `string[]` | — | No | Controlled selected value(s) |
-| defaultValue | `string` or `string[]` | — | No | Initial value when uncontrolled |
-| onChange | `(value: string) => void` or `(value: string[]) => void` | — | No | Fires after selection changes |
-| disabled | `boolean` | — | No | Disables the control |
-| placeholder | `string` | — | No | Shown in the trigger when empty (combobox); native single: empty **`<option>`** |
-| hasError | `boolean` | `false` | No | Error styling |
-| native | `boolean` | `false` | No | **`true`**: native **`<select>`** (single or **`multiple`**) |
-| children | `React.ReactNode` | — | Yes | **`Select.Trigger`** + **`Select.Content`** (combobox) or **`Select.Item`** tree (**`native`**) |
-
-### Select.Trigger
-
-`forwardRef` to the underlying **`button`**. Props omit **`id`**, **`type`**, and **`role`** (set by the implementation).
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | No | Usually **`Select.Value`** and optionally **`Select.TriggerIcon`** |
-| className | `string` | — | No | Additional class on the button |
-| disabled | `boolean` | — | No | Native disabled; final state also respects **`Select.Root`** **`disabled`** |
-| ref | `React.Ref<HTMLButtonElement>` | — | No | Ref to the button element |
-| …rest | `Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "id" \| "type" \| "role">` | — | No | e.g. **`aria-label`**, **`aria-labelledby`**, event handlers |
-
-### Select.Value
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the value / placeholder span |
-
-### Select.TriggerIcon
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | No | Icon or other content to the left of the value |
-| className | `string` | — | No | Wrapper class |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other **`span`** attributes |
-
-### Select.Content
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the portaled listbox container |
-| children | `React.ReactNode` | — | Yes | Items, groups, and separators (listbox portal stays mounted; hidden while closed) |
-
-### Select.Item
-
-`forwardRef` to the option root **`div`**.
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| value | `string` | — | Yes | Submitted / controlled string value |
-| label | `string` | — | No | Text shown in the trigger; otherwise derived from non-icon children or **`value`** |
-| disabled | `boolean` | — | No | Option not selectable |
-| className | `string` | — | No | Class on the option row |
-| children | `React.ReactNode` | — | Yes | Label content and optional **`Select.ItemIcon`** |
-| ref | `React.Ref<HTMLDivElement>` | — | No | Ref on the option root |
-
-### Select.ItemIcon
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | No | Icon before the item text |
-| className | `string` | — | No | Wrapper class |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other **`span`** attributes |
-
-### Select.Group
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the **`role="group"`** container |
-| children | `React.ReactNode` | — | No | Group label and items |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other **`div`** attributes |
-
-### Select.GroupLabel
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the label |
-| children | `React.ReactNode` | — | No | Group heading text |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other **`div`** attributes |
-
-### Select.Separator
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the **`hr`** |
-| …rest | `React.HTMLAttributes<HTMLHRElement>` | — | No | Other **`hr`** attributes |
+## Mistakes
+- `onChange` on Root → use `onValueChange`.
+- `<Select.Trigger>Текст</Select.Trigger>` without `Select.Value` → the selected label never shows; put `<Select.Value />` inside.
+- Unmounting `Select.Content` while closed → the trigger loses option labels; keep it rendered (it hides itself).
+- `error` text plus `invalid` → `error` alone is enough.
+- `clearable` / `searchable` with `native` → not supported; use the combobox mode.
+- Expecting `name` to submit the combobox value → only `native` has `name`; submit from state.
+- Rich parts wrapped in a custom component → `ItemMedia` / `ItemText` / `ItemDescription` / `ItemMeta` must be direct children (fragments are fine).
 
 ## Related
-
-- [Label](../label/COMPONENT.md) — visible field label; pair with **`aria-labelledby`** on **`Select.Trigger`** when needed.
-- [Hint](../hint/COMPONENT.md) — helper or error text below the field.
-- [Input](../input/COMPONENT.md) — free-form text when a fixed list is not appropriate.
-- [Tag select](../tag-select/COMPONENT.md) — chips, filter input, optional creatable values.
-- [Dropdown](../dropdown/COMPONENT.md) — action menus, not single form values.
-- [Modal](../modal/COMPONENT.md) / [Drawer](../drawer/COMPONENT.md) — nested focus and stacking when the select sits inside overlays.
+[TagSelect](../tag-select/COMPONENT.md) · [Radio](../radio/COMPONENT.md) · [SegmentedControl](../segmented-control/COMPONENT.md) · [Dropdown](../dropdown/COMPONENT.md) · [Input](../input/COMPONENT.md) · [Datepicker](../datepicker/COMPONENT.md)

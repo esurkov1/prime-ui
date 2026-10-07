@@ -1,0 +1,77 @@
+.stack {
+  display: grid;
+  gap: var(--prime-space-4);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--prime-space-6);
+}
+
+.sizeCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.matrix {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: var(--prime-space-4);
+  row-gap: var(--prime-space-3);
+  width: 100%;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.field {
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+}
+
+.list {
+  display: grid;
+  width: 100%;
+  max-width: var(--prime-modal-width-m);
+  margin: 0;
+  padding: var(--prime-card-padding-s);
+  list-style: none;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--prime-space-3);
+  padding-block: var(--prime-space-3);
+}
+
+.item + .item {
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

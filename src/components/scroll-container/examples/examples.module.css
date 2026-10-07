@@ -1,0 +1,66 @@
+/* Layout for the ScrollContainer examples: layout and card surface only, text goes through Typography. */
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--prime-space-24) * 2.5), 1fr));
+  gap: var(--prime-space-4);
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: calc(var(--prime-space-24) * 2.5);
+  overflow: hidden;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+}
+
+.cardTitle {
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 var(--prime-space-4) var(--prime-space-3);
+  list-style: none;
+}
+
+.list li {
+  padding-block: var(--prime-space-2);
+  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+/* Dividers only between items. */
+.list li:last-child {
+  border-bottom: 0;
+}
+
+.strip {
+  display: flex;
+  gap: var(--prime-space-2);
+  width: max-content;
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+/* Two-axis scroller: the side padding lives on the scrolling element itself (foundation §7). */
+.canvas {
+  padding: 0 var(--prime-space-4) var(--prime-space-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, var(--prime-space-24));
+  gap: var(--prime-space-1);
+  width: max-content;
+}
+
+.cell {
+  padding: var(--prime-space-2);
+  border-radius: var(--prime-radius-s);
+  background: var(--prime-color-fill-subtle);
+  font-variant-numeric: tabular-nums;
+}

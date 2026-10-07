@@ -1,192 +1,236 @@
 # Datepicker
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Category:** selection (Выбор)
 
-## About
+> A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`).
 
-Composite pieces for picking a calendar date or range: a size-aware shell, a day grid built on react-day-picker with kit styling, optional quick presets, optional time inputs, and a caption-sized text wrapper. Pass `locale` and formatting from **date-fns** (or compatible) so labels match your UI language.
+## When to use
+- A single date in a form or a filter (`mode="single"`).
+- A period for reports and analytics with ready-made presets, two months and optional time (`mode="range"`).
+- A calendar embedded in a page (booking, scheduling) — `Datepicker.Panel`.
+- An annual date without a year: birthdays, anniversaries (`yearless`).
 
-- **When to use** — booking, scheduling, or any task where users choose one day or a from–to range from a calendar grid.
-- **When to use** — filters and reports that pair the grid with quick presets and optional time fields in the same shell.
-- **When to use** — forms that need a short caption (`Datepicker.Value`) tied to picker scale and tone.
-- **When not to use** — free-text or partial dates (use a plain or masked [Input](../input/COMPONENT.md) instead).
-- **When not to use** — always-visible full calendars as default page chrome; open the shell from a trigger in [Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md), or [Drawer](../drawer/COMPONENT.md).
-- **When not to use** — month- or year-only picking without days (use a slimmer control or native inputs).
+## When not to use
+- Typing a date with a mask (passport fields, very old dates) → use [Input](../input/COMPONENT.md) instead.
+- Choosing a period from a few fixed options only (Неделя / Месяц / Год) → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Select](../select/COMPONENT.md) instead.
+- Time only → use [Input](../input/COMPONENT.md) instead.
 
-## Canonical
-
-- **Exports** — `Datepicker` (`Shell`, `Calendar`, `Presets`, `Time`, `Value`), `formatTimeInputValue`, `mergeTimeIntoDate`, and types including **`DateRange`** (re-exported from react-day-picker).
-- **Hierarchy** — `Datepicker.Shell` is the panel root; **`Datepicker.Calendar` must be inside `Shell`** (directly or nested) so `size` context resolves.
-- **Selection** — `Calendar` forwards **react-day-picker** `DayPicker` props: `mode="single"` or `mode="range"`, `selected`, `onSelect`, `disabled`, `locale`, etc.
-- **Presets** — Pass `Datepicker.Presets` as **`Shell`’s `presets` prop**; `Presets` **`mode`** (`"single"` | `"range"`) must match the calendar **`mode`**.
-- **Layout** — `Calendar` supports **`responsiveMonths`** (ignores `numberOfMonths` when `true`) and **`responsiveBreakpoints.twoColumns`** (default **500** px). Default **`weekStartsOn`** is **1** (Monday).
-- **Popover** — Typical pattern: `Datepicker.Shell` inside **`Popover.Content`** with **`insetPadding="none"`**.
-- **Presets `title`** — Typed on `Datepicker.Presets` but **not rendered** in the UI.
-- **Time** — `Datepicker.Time` keeps `input type="time"` **disabled** until the anchor date exists (`value`, or `from` / `to` in range mode).
-
-## Extended
-
-### Playground snippets
-
-Demos match **`playground/sections/DatepickerSection.tsx`** (order and intent). Sources use `@/` imports under **`playground/snippets/datepicker/`**:
-
-| Block | File | What it shows |
-|-------|------|----------------|
-| **Sizes** | [`sizes.tsx`](../../../playground/snippets/datepicker/sizes.tsx) (+ [`sizes.module.css`](../../../playground/snippets/datepicker/sizes.module.css)) | Four **`Datepicker.Shell`** / **`Calendar`** **`size`** values (**`s`**–**`xl`**), each in its own **`Popover`**. |
-| **Variants and modes** | [`variants-modes.tsx`](../../../playground/snippets/datepicker/variants-modes.tsx) (+ [`sizes.module.css`](../../../playground/snippets/datepicker/sizes.module.css)) | **`mode="single"`** vs **`mode="range"`** with separate triggers. |
-| **States** | [`states.tsx`](../../../playground/snippets/datepicker/states.tsx) | **`disabled`** by day of week; **`Calendar`** + **`Datepicker.Time`** (time inputs disabled until a date exists). |
-| **Responsive months** | [`responsive-months.tsx`](../../../playground/snippets/datepicker/responsive-months.tsx) | **`responsiveMonths`**, **`responsiveBreakpoints`**; preview uses **`examplePreviewBleed`** for container width. |
-| **Controlled value** | [`controlled-value.tsx`](../../../playground/snippets/datepicker/controlled-value.tsx) | Controlled **`selected`** / **`onSelect`**; **`Datepicker.Value`**; popover closes after a date is chosen. |
-| **Composition** | [`composition.tsx`](../../../playground/snippets/datepicker/composition.tsx) | **`Shell`** **`presets`**, **`Calendar`**, **`Time`**, **`Value`** in one panel; shared parent state. |
-| **Full width** | [`full-width.tsx`](../../../playground/snippets/datepicker/full-width.tsx) | Wide **`Popover.Content`** and **`Datepicker.Shell className="min-w-0"`** with **`responsiveMonths`**. |
-| **Trigger with icon** | [`popover.tsx`](../../../playground/snippets/datepicker/popover.tsx) | Calendar icon on **`Popover.Trigger`**; close after single-date select. |
-| **Range presets + time** | [`range-presets-time.tsx`](../../../playground/snippets/datepicker/range-presets-time.tsx) | **`mode="range"`** on **`Calendar`** and **`Presets`**; **`Datepicker.Time`** with **`mode="range"`**. |
-
-### Scenarios (recipes)
-
-Runnable **`prime-ui-kit`** examples under **`examples/`** (type-checked with the library build). Copy into your app and wire spacing/theme (see [Label](../label/COMPONENT.md) for the label primitive).
-
-| Scenario | File |
-|----------|------|
-| **Booking (stay + time)** — **`mode="range"`** on **`Calendar`** and **`Presets`**, **`Datepicker.Time`** **`mode="range"`**; presets for short stays and windows | [`booking.tsx`](./examples/booking.tsx) (`BookingDateRangeExample`) |
-| **Birthdate** — **`mode="single"`**, **`disabled`** for future days, **`Datepicker.Value`**, default month near a sensible year when empty | [`birthdate.tsx`](./examples/birthdate.tsx) (`BirthdateSingleExample`) |
-| **Range (reports / filters)** — **`numberOfMonths={2}`** or **`responsiveMonths`**; presets such as this month / last month / last N days | [`range-report.tsx`](./examples/range-report.tsx) (`ReportRangeExample`) |
-| **Full-width form field** — **`Button.Root fullWidth`** as **`Popover.Trigger`**; wide **`Popover.Content`** and **`Shell className="min-w-0"`** | [`full-width-form.tsx`](./examples/full-width-form.tsx) (`FullWidthFormDateExample`) |
-
-Snippet-level demos (internal **`@/`** imports) are listed in **Playground snippets** above.
-
-## LLM note
-
-- Playground order and copy mirror **`playground/sections/DatepickerSection.tsx`**; runnable snippet sources live in **`playground/snippets/datepicker/`**.
-- Always compose **`Datepicker.Shell` → `Datepicker.Calendar`** at minimum; never use **`Calendar` without `Shell`** in real UIs if you rely on **`size`** context (default **`m`** on `Shell`).
-- For overlays, default to **[Popover](../popover/COMPONENT.md)** with **`insetPadding="none"`** on content unless the design system specifies otherwise.
-- **Controlled state:** bind **`selected`** and **`onSelect`** from react-day-picker; for range, state type is **`DateRange | undefined`**.
-- **Do not** mix **`Presets` `mode="range"`** with **`Calendar` `mode="single"`** (or the reverse) in one shell.
-- **Do not** invent a **`title`** UI for **`Datepicker.Presets`** — it is not implemented.
-- Pass **`locale`** from **date-fns** (`import { ru } from "date-fns/locale"`) into **`Calendar`** for localized month/weekday labels.
-- Month navigation **`aria-label`** strings on the kit nav buttons are **English**; override via **`Calendar` `components`** if the product language must match.
-- **Utilities:** use **`formatTimeInputValue`** / **`mergeTimeIntoDate`** only when integrating custom time inputs; **`Datepicker.Time`** already uses them.
-
-## Composition
-
-- **`Datepicker.Shell`** — Root wrapper: sets `DatepickerSize` context, owns `requestedMonth` / `requestMonth` for syncing the grid month when presets fire. Optional **`presets`** renders a bottom row after **`children`**.
-- **`Datepicker.Calendar`** — Must live under `Shell` (directly or nested) so `size` context resolves. Forwards **react-day-picker** `DayPicker` props; kit adds `responsiveMonths`, `responsiveBreakpoints`, and `size`.
-- **`Datepicker.Presets`** — Optional; usually passed as `Shell`’s `presets` prop. Calls `requestMonth` when a preset is chosen so the visible month follows the selection.
-- **`Datepicker.Time`** — Optional; place as a child of `Shell` (e.g. under or beside `Calendar`). Single mode merges time into one `Date`; range mode uses `from` / `to` and separate change handlers.
-- **`Datepicker.Value`** — Optional caption: `Typography.Root` with picker-scale typography; default `tone` is `muted`.
-
-### Minimal example
-
+## Import
 ```tsx
-import { enUS } from "date-fns/locale";
-import { Datepicker } from "prime-ui-kit";
-
-export function DatepickerMinimal() {
-  return (
-    <Datepicker.Shell>
-      <Datepicker.Calendar locale={enUS} mode="single" />
-    </Datepicker.Shell>
-  );
-}
+import {
+  DEFAULT_DATEPICKER_PRESETS,
+  Datepicker,
+  type DatepickerPreset,
+  type DatepickerRange,
+  datepickerPresets,
+  formatDatepickerValue,
+  YEARLESS_YEAR,
+} from "prime-ui-kit";
 ```
 
-## Rules
+## Anatomy
+```
+Datepicker.Root             field frame (label · field button · hint/error) + popover with the panel
+└─ Datepicker.Badge         status badge inside the field before the chevron (optional child)
 
-- Prefer **`Datepicker.Shell` inside [Popover](../popover/COMPONENT.md) `Content`** (often with `insetPadding="none"` on `Content`) opened from a trigger that shows the current value; the calendar is large and focus-heavy for inline page defaults.
-- **Controlled vs uncontrolled** — Drive selection with **`selected`** and **`onSelect`** from react-day-picker (and optional **`month`** / **`onMonthChange`**) when the parent must own state; otherwise rely on day-picker internal state where types allow.
-- **`responsiveMonths`** — When `true`, **`numberOfMonths` is ignored**; the kit measures the calendar viewport and switches between one and two columns using **`responsiveBreakpoints.twoColumns`** (default **500** px).
-- **Presets** — Use **`mode="single"`** or **`mode="range"`** per instance; do not mix range presets with single calendar mode in one `Presets`. The **`title`** prop exists on the type but **is not rendered** in the component.
-- **Time fields** — **`Datepicker.Time`** disables `input type="time"` until the anchor date exists (`value` in single mode; `from` / `to` in range mode). Default labels are Russian (**«Время»**, **«Начало»**, **«Конец»**); override via **`labels`**.
-- **Accessibility** — Day grid roles and keyboard navigation come from react-day-picker; month nav uses [Button](../button/COMPONENT.md) with English **`aria-label`** strings in the kit—replace via **`components`** / **`classNames`** on `Calendar` if your product language differs. Ensure the popover trigger has an accessible name. Time row uses **`useId`**-scoped labels on [Input](../input/COMPONENT.md).
-- **Styling and layout** — The module imports **`react-day-picker/style.css`**. **`responsiveMonths`** depends on container width; in tight flex layouts without **`min-width: 0`**, width can clip—check popover and grid CSS.
-- **Time zones** — Behavior follows local `Date` instances and how the browser shows **`type="time"`**; UTC shifts are the app’s responsibility.
+Datepicker.Panel            the same calendar panel without a field, styled as a card
+  presets column (range + presets) · 1–2 months grid · prompt row · footer (dates, time, Сбросить / Применить)
+```
 
 ## API
 
-### Datepicker.Calendar
+### Datepicker.Panel
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `mode` | `"range" \| "single"` | — (required) | Range of dates or one date; defines the value type. |
+| `value` | `DatepickerRange` (range) · `Date \| null` (single) | — | Controlled value in wall-clock time; range bounds may be `null`. |
+| `defaultValue` | `DatepickerRange` · `Date \| null` | `{ from: null, to: null }` · `null` | Initial value in uncontrolled mode. |
+| `onValueChange` | `(value: DatepickerRange) => void` · `(value: Date \| null) => void` | — | Called when a value is applied (immediately, or on «Применить» with `footer`). |
+| `resetValue` | `DatepickerRange` · `Date \| null` | empty range · `null` | Value applied by «Сбросить». |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier: day cell = menu item height of the tier; footer controls one tier down. |
+| `months` | `1 \| 2` | `1` | Months side by side; falls back to one when there is no room. |
+| `presets` | `DatepickerPreset[] \| false` | `false` | Presets column (range only). |
+| `prompt` | `boolean` | `false` | Step prompt under the calendar («Выберите начальную дату» / «… конечную дату» / «Выберите дату»). |
+| `footer` | `boolean` | `false` | Footer with the picked dates and «Сбросить» / «Применить»; without it a pick applies at once. |
+| `withTime` | `boolean` | `false` | Time fields in the footer (default 00:00 — 23:59). |
+| `isDayDisabled` | `(day: Date) => boolean` | — | Disabled days (day = local midnight). |
+| `disableFuture` | `boolean` | `false` | Days after `today` are muted and disabled. |
+| `yearless` | `boolean` | `false` | Day + month only; months cycle inside `YEARLESS_YEAR` (2000). |
+| `today` | `Date` | current day | «Today» for highlighting, presets and `disableFuture`. |
+| `locale` | date-fns `Locale` | `ru` | Month and weekday names, value format. |
+| `weekStartsOn` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6` | `1` | First day of the week (Monday). |
+| `labels` | `Partial<DatepickerLabels>` | Russian defaults | System strings, see Accessibility. |
+| `className` | `string` | — | Class on the panel root. |
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | from `Shell` context, else `m` | No | Cell typography, nav buttons, and control scale. |
-| responsiveMonths | `boolean` | `false` | No | If `true`, `numberOfMonths` is ignored; column count follows viewport width. |
-| responsiveBreakpoints | `{ twoColumns: number }` | `{ twoColumns: 500 }` | No | Pixel width at which the layout uses two month columns. |
-| weekStartsOn | `0`–`6` | `1` | No | First weekday column (0 = Sunday). |
-| navLayout | `DayPicker` nav layout | `"after"` | No | Month navigation placement (react-day-picker). |
-| month | `Date` | — | No | Displayed month (controlled when set). |
-| onMonthChange | `(d: Date) => void` | — | No | Month changes; also notifies `Shell` month context. |
-| numberOfMonths | `number` | `1` | No | Fixed month count when `responsiveMonths` is not `true`. |
-| classNames, components, style | `DayPicker` props | — | No | Merged with kit defaults; custom `components` extend kit chevron and month caption. |
-| mode, selected, onSelect, disabled, locale, … | `DayPickerProps` | — | Varies | Other react-day-picker props are forwarded to `DayPicker`. |
+No ref, no other native props.
 
-### Datepicker.Shell
+### Datepicker.Root
+All `Datepicker.Panel` props (`className` goes to the field frame), plus:
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `m` | No | Size context for `Calendar`, `Presets`, `Time`, and `Value`. |
-| presets | `ReactNode` | — | No | Bottom bar (commonly `Datepicker.Presets`). |
-| children | `ReactNode` | — | Yes | Main panel content (`Calendar`, `Time`, `Value`, etc.). |
-| className | `string` | — | No | Root element class. |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `placeholder` | `string` | `"Выбрать дату"` | Field text without a value. |
+| `valuePrefix` | `string` | — | Text before the value, e.g. «С». |
+| `open` | `boolean` | — | Controlled popover state. |
+| `defaultOpen` | `boolean` | `false` | Initial popover state. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called when the popover opens or closes. |
+| `fullWidth` | `boolean` | `false` | Field stretches to the container; otherwise it fits its text. |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | Popover alignment to the field. |
+| `label` | `ReactNode` | — | Label above the field. |
+| `required` | `boolean` | `false` | Red `*` after the label. |
+| `optional` | `boolean` | — | Muted `labels.optional` marker. |
+| `hint` | `ReactNode` | — | Hint under the field. |
+| `error` | `ReactNode` | — | Error in the hint slot; non-empty implies `invalid`. |
+| `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. |
+| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring. |
+| `disabled` | `boolean` | `false` | Disables the field; the popover cannot open. |
+| `id` | `string` | auto (`useId`) | Id of the field button. |
+| `aria-label` | `string` | — | Name without a `label`; the current value is appended («Период: 6 окт — 3 нояб»). |
+| `aria-labelledby` | `string` | — | Id(s) that name the field. |
+| `aria-describedby` | `string` | — | Extra description ids, merged with hint/error. |
+| `children` | `ReactNode` | — | Field adornments: `Datepicker.Badge`. |
 
-### Datepicker.Presets
+### Datepicker.Badge
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Hue of the soft badge (one tier below the field). |
+| `children` | `ReactNode` | — (required) | Badge text; part of the field's accessible name. |
+| `className` | `string` | — | Class on the badge. |
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| mode | `"single" \| "range"` | — | Yes | Selects preset shape and `onSelect` signature. |
-| presets | `DatepickerPresetSingle[]` or `DatepickerPresetRange[]` | — | Yes | Quick actions; single items use `{ label, date }`, range items use `{ label, range }`. |
-| onSelect | `(date: Date \| undefined) => void` or `(range: DateRange \| undefined) => void` | — | Yes | Invoked when a preset button is pressed; updates shell month from the preset anchor. |
-| size | `"s" \| "m" \| "l" \| "xl"` | from context | No | [ButtonGroup](../button-group/COMPONENT.md) segment size. |
-| className | `string` | — | No | Block wrapper class. |
-| title | `string` | — | No | Present in types only; not rendered. |
+### Helpers
+| Export | Type | Description |
+|---|---|---|
+| `DatepickerRange` | `{ from: Date \| null; to: Date \| null }` | Range value; `from: null` = no lower bound. |
+| `DatepickerPreset` | `{ key: string; label: string; days: (today: Date) => { from: Date \| null; to: Date } }` | A preset. |
+| `datepickerPresets` | object | `today`, `yesterday`, `thisWeek`, `lastWeek`, `thisMonth`, `lastMonth`, `thisYear`, `lastYear`, `allTime(start?, label?)`. Relabel with `{ ...preset, label }`. |
+| `DEFAULT_DATEPICKER_PRESETS` | `DatepickerPreset[]` | Сегодня, Вчера, Эта неделя, Этот месяц, Прошлая неделя, Прошлый месяц, Этот год, Прошлый год. |
+| `formatDatepickerValue(props)` | `string \| null` | The text the field would show for a value (preset name, «6 окт — 3 нояб», time when needed). `props`: `{ mode: "single", value: Date \| null }` or `{ mode: "range", value: DatepickerRange }` plus the same calendar options as Root (`presets`, `withTime`, `size`, …) so the text matches the field, e.g. `formatDatepickerValue({ mode: "range", value: range })`. |
+| `YEARLESS_YEAR` | `2000` | Leap year used for `yearless` values. |
 
-### Datepicker.Time
+## Variants
+No `variant`/`tone`. Axes: `mode`, `size`, `months`, structural flags (`presets`, `prompt`, `footer`, `withTime`, `yearless`), `fullWidth`, `align`, Badge `color`.
 
-**Single** (default — `mode` omitted or `"single"`)
+### mode
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `single` | one day highlighted; field shows «6 окт» | one date | — (required) |
+| `range` | continuous band from start to end (rounded outer ends), hover preview while picking the end | periods, stays, reports | |
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| value | `Date \| undefined` | — | Yes | Anchor date; time field disabled when unset. |
-| onChange | `(next: Date) => void` | — | Yes | Called with date merged from `HH:mm` input. |
-| labels | `{ time?: string }` | — | No | Overrides default time label. |
-| size | `"s" \| "m" \| "l" \| "xl"` | from context | No | Input size. |
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | 28px field, 24px day cell | dense filters | |
+| `s` | 32px field, 28px cell | compact toolbars | |
+| `m` | 36px field, 32px cell, footer controls `s` | regular forms | yes |
+| `l` | 40px field, 36px cell | spacious forms | |
+| `xl` | 48px field, 40px cell | touch-first screens | |
 
-**Range** (`mode="range"`)
+### months
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `1` | one month; adjacent months' days shown muted | single dates, short ranges | yes |
+| `2` | two months with a gap; falls back to one when the viewport (popover) or the parent (panel) is too narrow | ranges that cross months | |
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| mode | `"range"` | — | Yes | Enables two time fields. |
-| from | `Date \| undefined` | — | Yes | Start date; start time disabled when unset. |
-| to | `Date \| undefined` | — | Yes | End date; end time disabled when unset. |
-| onFromChange | `(next: Date) => void` | — | Yes | Merges time into `from`. |
-| onToChange | `(next: Date) => void` | — | Yes | Merges time into `to`. |
-| labels | `{ from?: string; to?: string }` | — | No | Overrides default range labels. |
-| size | `"s" \| "m" \| "l" \| "xl"` | from context | No | Input size. |
+### Structural flags
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `presets` | «Период» column on the left (or a scrolling row above on narrow screens); active preset is pressed | analytics periods | `false` |
+| `prompt` | muted step line under the grid | first-time or infrequent use of ranges | `false` |
+| `footer` | dates (dd.MM.yyyy) and «Сбросить» / «Применить» | the user should confirm, or with time | `false` |
+| `withTime` | HH:mm inputs in the footer | timestamps (requires `footer`) | `false` |
+| `yearless` | month title without year, value «15 октября» | annual dates | `false` |
+| `fullWidth` | field fills the container | form columns | `false` |
+| `align` `start` / `center` / `end` | popover aligned to the field's start / center / end | field near the right edge → `end` | `start` |
 
-### Datepicker.Value
+### color (Datepicker.Badge)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `gray` | neutral soft badge | neutral note | yes |
+| `blue` · `green` · `orange` · `red` · `yellow` · `purple` · `sky` · `pink` · `teal` | soft badge of the hue | status of the date («Не заполнено», «Просрочено») | |
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | from context | No | Масштаб пикера; внутри маппится на [Typography](../typography/COMPONENT.md) `variant`. |
-| tone | `Typography` tone | `muted` | No | Передаётся в `Typography.Root`. |
-| as, weight, tracking, italic, children, className, … | `Omit<TypographyRootProps, "variant">` | — | No | Как у `Typography.Root`, но кегль задаётся через `size` пикера (см. выше). |
+**Combinations**
+- `withTime` without `footer` → time fields are not rendered; always combine them.
+- `presets` with `mode="single"` → ignored (range only).
+- `footer` + `presets` → a preset click still applies at once.
+- `yearless` + `disableFuture` → pointless (no year to compare meaningfully).
 
-### Utilities
+**Sizes** — field height = `--prime-control-<tier>-height`, aligned with Input, Select, Button of the same tier; the panel uses the same tier.
 
-| Name | Signature | Description |
-|------|-----------|-------------|
-| `formatTimeInputValue` | `(date?: Date) => string` | `HH:mm` for `input type="time"` `value`. |
-| `mergeTimeIntoDate` | `(date: Date, timeHHmm: string) => Date` | New `Date` with hours and minutes from the string. |
+**Hierarchy** — in forms use `fullWidth` like the other fields; in toolbars keep the content width.
 
-### Exported types
+## States
+| State | Driven by | DOM | Looks like |
+|---|---|---|---|
+| empty | no value | trigger `data-empty="true"` | placeholder text |
+| hover | pointer | — | field fill darkens 6% |
+| open | click / `open` | trigger `data-state="open"` | `field-bg-focus` fill, popover with focus on the selected (or today's) day |
+| focus-visible | keyboard | `data-focus-ring="false"` when `focusRing={false}` | inset focus ring |
+| invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` | inset `danger-border` ring, error text |
+| disabled | `disabled` | `data-disabled="true"`, native `disabled` | `field-bg-disabled`, cannot open |
+| full width | `fullWidth` | `data-full-width="true"` | field 100% wide |
+| today | — | day `data-today`, `aria-current="date"` | accent text, semibold |
+| selected / range band | value | day `aria-pressed`, `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start`, `data-band-end` | accent edges and a soft band |
+| day disabled | `isDayDisabled` / `disableFuture` | native `disabled` | muted |
 
-`DatepickerCalendarProps`, `DatepickerShellProps`, `DatepickerPresetsProps`, `DatepickerTimeProps`, `DatepickerTimeSingleProps`, `DatepickerTimeRangeProps`, `DatepickerValueProps`, `DatepickerSize`, `DatepickerPresetSingle`, `DatepickerPresetRange`, and **`DateRange`** (re-exported from react-day-picker) are exported from the package alongside the component and utilities.
+Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` / `stacked`). The popover follows the overlay contract (outside press / Escape close; focus is trapped while open; wheel over the panel does not scroll the page).
+Controlled: `value` + `onValueChange`, `open` + `onOpenChange`. Uncontrolled: `defaultValue`, `defaultOpen`.
+
+## Layout & spacing
+- The field fits its text by default (`width: fit-content`, max 100%); in forms use `fullWidth`.
+- Label → field: tier `label-gap`; field → field in a form: `--prime-space-5`.
+- Months gap `--prime-space-6`. Embedded panel measures its parent; narrower than one month → compact cells and footer fields above the buttons. Works from 320px.
+
+## Accessibility
+- Field: `<button>` named by the label + value (+ badge) or by `aria-label` + value; `aria-describedby` with hint/error, `aria-invalid`.
+- Popover is a dialog with a focus trap; focus lands on the selected or today's day.
+- Grid keyboard: ← / → day, ↑ / ↓ week, Page Up / Page Down month (Shift — year, not in `yearless`), Home / End start / end of week, Enter / Space pick. Escape closes and returns focus to the field.
+- Day buttons have full date labels («6 октября 2025»), `aria-pressed` in the selection, `aria-current="date"` for today. Month title is a polite live region.
+- `labels` keys (defaults):
+  - `pickStart` — «Выберите начальную дату»
+  - `pickEnd` — «Выберите конечную дату»
+  - `pickDate` — «Выберите дату»
+  - `reset` — «Сбросить»
+  - `apply` — «Применить»
+  - `prevMonth` — «Предыдущий месяц»
+  - `nextMonth` — «Следующий месяц»
+  - `rangeStart` — «Начало периода»
+  - `rangeEnd` — «Конец периода»
+  - `date` — «Дата»
+  - `timeStart` — «Время начала»
+  - `timeEnd` — «Время конца»
+  - `time` — «Время»
+  - `until` — «до» (range without a start: «до 6 окт»)
+  - `presetsTitle` — «Период»
+  - `optional` — «необязательно»
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [range-presets.tsx](examples/range-presets.tsx) | Range with presets, two months, `prompt`, `footer`, `withTime`, `disableFuture` | Report periods |
+| [badge.tsx](examples/badge.tsx) | `Datepicker.Badge` in an empty field | Flagging a missing date |
+| [sizes.tsx](examples/sizes.tsx) | All size tiers | Aligning with other controls |
+| [states.tsx](examples/states.tsx) | Empty, filled, error, disabled | Reference for every state |
+| [single.tsx](examples/single.tsx) | `mode="single"` applied on click | One-off dates |
+| [inline-panel.tsx](examples/inline-panel.tsx) | `Datepicker.Panel` with two months and `prompt` | Calendars embedded in a page |
+| [narrow.tsx](examples/narrow.tsx) | Panel in a 320px column | Mobile layouts |
+| [in-form.tsx](examples/in-form.tsx) | Required range with error after submit, optional date, in a Card | Date fields in forms |
+| [yearless.tsx](examples/yearless.tsx) | `yearless`, `valuePrefix`, `isDayDisabled` | Annual dates |
+
+```tsx
+import { Datepicker } from "prime-ui-kit";
+
+export function SaleDate() {
+  return <Datepicker.Root mode="single" label="Дата продажи" />;
+}
+```
+
+## Mistakes
+- Omitting `mode` → it is required (`"single"` or `"range"`).
+- `value={new Date()}` with `mode="range"` → pass `{ from, to }`.
+- `withTime` without `footer` → add `footer`.
+- `presets` on `mode="single"` → presets work only for ranges.
+- `hint` instead of `prompt` for the step line → `hint` is the field hint under the field; the calendar step line is `prompt`.
+- Converting values to UTC inside the component → values are wall-clock local dates; convert in the app.
 
 ## Related
-
-- [Popover](../popover/COMPONENT.md)
-- [Button](../button/COMPONENT.md)
-- [ButtonGroup](../button-group/COMPONENT.md)
-- [Input](../input/COMPONENT.md)
-- [Label](../label/COMPONENT.md)
-- [Typography](../typography/COMPONENT.md)
-- [Modal](../modal/COMPONENT.md)
-- [Drawer](../drawer/COMPONENT.md)
+[Input](../input/COMPONENT.md) · [Select](../select/COMPONENT.md) · [SegmentedControl](../segmented-control/COMPONENT.md) · [Popover](../popover/COMPONENT.md) · [Badge](../badge/COMPONENT.md)

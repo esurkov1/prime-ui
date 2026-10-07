@@ -1,42 +1,52 @@
+/** A selected segment, a group without a selection, a disabled item and a disabled group. Use it as a reference for every state. */
 import { SegmentedControl, Typography } from "prime-ui-kit";
 
-import styles from "./segmented-examples.module.css";
+import styles from "./examples.module.css";
 
-/** Default group, one disabled item, entire group disabled (mirrors playground/snippets/segmented/states). */
-export default function SegmentedStatesExample() {
+export default function SegmentedControlStatesExample() {
   return (
-    <div className={styles.demoStack}>
-      <div className={styles.demoRow}>
-        <Typography.Root as="span" variant="body-compact" tone="muted">
-          Default
-        </Typography.Root>
-        <SegmentedControl.Root defaultValue="day">
-          <SegmentedControl.Item value="day">Day</SegmentedControl.Item>
-          <SegmentedControl.Item value="week">Week</SegmentedControl.Item>
-          <SegmentedControl.Item value="month">Month</SegmentedControl.Item>
+    <div className={styles.stack}>
+      <div className={styles.cell}>
+        <SegmentedControl.Root defaultValue="week" aria-label="Период">
+          <SegmentedControl.Item value="day">День</SegmentedControl.Item>
+          <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+          <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
         </SegmentedControl.Root>
-      </div>
-      <div className={styles.demoRow}>
-        <Typography.Root as="span" variant="body-compact" tone="muted">
-          One segment disabled
+        <Typography.Root variant="caption" tone="muted">
+          Выбран сегмент
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="active">
-          <SegmentedControl.Item value="active">Active</SegmentedControl.Item>
+      </div>
+      <div className={styles.cell}>
+        <SegmentedControl.Root aria-label="Период без выбора">
+          <SegmentedControl.Item value="day">День</SegmentedControl.Item>
+          <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+          <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
+        </SegmentedControl.Root>
+        <Typography.Root variant="caption" tone="muted">
+          Без выбора
+        </Typography.Root>
+      </div>
+      <div className={styles.cell}>
+        <SegmentedControl.Root defaultValue="active" aria-label="Статус кампании">
+          <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
           <SegmentedControl.Item value="paused" disabled>
-            Paused
+            На паузе
           </SegmentedControl.Item>
-          <SegmentedControl.Item value="archived">Archived</SegmentedControl.Item>
+          <SegmentedControl.Item value="archived">Архив</SegmentedControl.Item>
         </SegmentedControl.Root>
-      </div>
-      <div className={styles.demoRow}>
-        <Typography.Root as="span" variant="body-compact" tone="muted">
-          Entire control disabled
+        <Typography.Root variant="caption" tone="muted">
+          Item disabled
         </Typography.Root>
-        <SegmentedControl.Root defaultValue="day" disabled>
-          <SegmentedControl.Item value="day">Day</SegmentedControl.Item>
-          <SegmentedControl.Item value="week">Week</SegmentedControl.Item>
-          <SegmentedControl.Item value="month">Month</SegmentedControl.Item>
+      </div>
+      <div className={styles.cell}>
+        <SegmentedControl.Root defaultValue="week" disabled aria-label="Период недоступен">
+          <SegmentedControl.Item value="day">День</SegmentedControl.Item>
+          <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+          <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
         </SegmentedControl.Root>
+        <Typography.Root variant="caption" tone="muted">
+          Root disabled
+        </Typography.Root>
       </div>
     </div>
   );

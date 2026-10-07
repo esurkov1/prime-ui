@@ -6,59 +6,54 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { HintSize, LabelSize, SwitchSize, SwitchVariant } from "@/internal/states";
+import type { ControlSize } from "@/internal/states";
+import { type FieldDescriptions, useFieldDescriptions } from "@/internal/useFieldDescriptions";
 
 import styles from "./Switch.module.css";
 
-type SwitchContextValue = {
+type InputPassthrough = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "type" | "size" | "checked" | "defaultChecked" | "onChange" | "children"
+>;
+
+type SwitchContextValue = FieldDescriptions & {
   inputId: string;
-  hintId: string;
-  errorId: string;
-  size: SwitchSize;
+  size: ControlSize;
   inputRef: React.Ref<HTMLInputElement>;
+  checked: boolean;
   invalid: boolean;
   disabled: boolean;
   readOnly: boolean;
-  isChecked: boolean;
-  describedBy: string | undefined;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  restInputPropsRef: React.MutableRefObject<
-    Omit<
-      React.InputHTMLAttributes<HTMLInputElement>,
-      "type" | "checked" | "defaultChecked" | "onChange"
-    >
-  >;
-  registerHint: () => void;
-  unregisterHint: () => void;
-  registerError: () => void;
-  unregisterError: () => void;
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  inputPropsRef: React.MutableRefObject<InputPassthrough>;
 };
 
 const [SwitchProvider, useSwitchContext] = createComponentContext<SwitchContextValue>("Switch");
 
-export type SwitchRootProps = Omit<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  "type" | "size" | "checked" | "defaultChecked" | "onChange"
-> & {
-  label?: React.ReactNode;
+export type SwitchRootProps = InputPassthrough & {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  variant?: SwitchVariant;
-  size?: SwitchSize;
+  /** Invalid state; also set while a `Switch.Error` is mounted. */
+  invalid?: boolean;
+  size?: ControlSize;
+  /** Stretch to the container width. By default the field is as wide as its content. */
+  fullWidth?: boolean;
+  children?: React.ReactNode;
 };
 
 const SwitchRoot = React.forwardRef<HTMLInputElement, SwitchRootProps>(
   (
     {
       id,
-      checked,
+      checked: checkedProp,
       defaultChecked = false,
       onCheckedChange,
-      variant = "default",
+      invalid: invalidProp = false,
       size = "m",
-      disabled,
-      readOnly,
+      fullWidth = false,
+      disabled = false,
+      readOnly = false,
       className,
       "aria-describedby": ariaDescribedBy,
       children,
@@ -68,82 +63,40 @@ const SwitchRoot = React.forwardRef<HTMLInputElement, SwitchRootProps>(
   ) => {
     const rawId = React.useId();
     const inputId = id ?? rawId;
-    const hintId = `${inputId}-hint`;
-    const errorId = `${inputId}-error`;
+    const descriptions = useFieldDescriptions(inputId, ariaDescribedBy);
+    const invalid = invalidProp || descriptions.hasError;
 
-    const [hasHint, setHasHint] = React.useState(false);
-    const [hasError, setHasError] = React.useState(false);
-
-    const invalid = variant === "error" || hasError;
-
-    const [isChecked, setChecked] = useControllableState<boolean>({
-      value: checked,
+    const [checked, setChecked] = useControllableState<boolean>({
+      value: checkedProp,
       defaultValue: defaultChecked,
       onChange: onCheckedChange,
     });
 
     const handleChange = React.useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (readOnly) {
-          e.preventDefault();
-          return;
-        }
-        setChecked(e.target.checked);
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (readOnly) return;
+        setChecked(event.target.checked);
       },
       [readOnly, setChecked],
     );
 
-    const restInputPropsRef = React.useRef(inputRest);
-    restInputPropsRef.current = inputRest;
-
-    const parts = [
-      ariaDescribedBy,
-      hasHint ? hintId : undefined,
-      hasError ? errorId : undefined,
-    ].filter(Boolean);
-    const describedBy = parts.length > 0 ? parts.join(" ") : undefined;
-
-    const registerHint = React.useCallback(() => setHasHint(true), []);
-    const unregisterHint = React.useCallback(() => setHasHint(false), []);
-    const registerError = React.useCallback(() => setHasError(true), []);
-    const unregisterError = React.useCallback(() => setHasError(false), []);
+    const inputPropsRef = React.useRef<InputPassthrough>(inputRest);
+    inputPropsRef.current = inputRest;
 
     const ctxValue = React.useMemo(
       () => ({
+        ...descriptions,
         inputId,
-        hintId,
-        errorId,
         size,
         inputRef: ref,
-        invalid,
-        disabled: Boolean(disabled),
-        readOnly: Boolean(readOnly),
-        isChecked,
-        describedBy,
-        handleChange,
-        restInputPropsRef,
-        registerHint,
-        unregisterHint,
-        registerError,
-        unregisterError,
-      }),
-      [
-        inputId,
-        hintId,
-        errorId,
-        size,
-        ref,
+        checked,
         invalid,
         disabled,
         readOnly,
-        isChecked,
-        describedBy,
         handleChange,
-        registerHint,
-        unregisterHint,
-        registerError,
-        unregisterError,
-      ],
+        inputPropsRef,
+      }),
+      [descriptions, inputId, size, ref, checked, invalid, disabled, readOnly, handleChange],
     );
 
     return (
@@ -153,11 +106,10 @@ const SwitchRoot = React.forwardRef<HTMLInputElement, SwitchRootProps>(
             className={cx(styles.field, className)}
             {...toDataAttributes({
               size,
-              variant,
-              disabled: Boolean(disabled),
-              invalid,
-              checked: isChecked,
-              readonly: Boolean(readOnly),
+              state: checked ? "checked" : "unchecked",
+              invalid: invalid || undefined,
+              disabled: disabled || undefined,
+              "full-width": fullWidth || undefined,
             })}
           >
             {children}
@@ -184,13 +136,13 @@ const SwitchLabel = React.forwardRef<HTMLLabelElement, SwitchLabelProps>(functio
   const {
     inputId,
     inputRef,
+    checked,
     invalid,
     disabled,
     readOnly,
-    isChecked,
     describedBy,
     handleChange,
-    restInputPropsRef,
+    inputPropsRef,
     size,
   } = useSwitchContext();
 
@@ -198,39 +150,37 @@ const SwitchLabel = React.forwardRef<HTMLLabelElement, SwitchLabelProps>(functio
     <Label.Root
       ref={ref}
       htmlFor={inputId}
-      size={size as LabelSize}
+      size={size}
       disabled={disabled}
       className={cx(styles.labelRow, className)}
       {...rest}
     >
       <span className={styles.controlCell}>
         <input
+          {...inputPropsRef.current}
           ref={inputRef}
           id={inputId}
           className={styles.input}
           type="checkbox"
           role="switch"
-          checked={isChecked}
+          checked={checked}
           disabled={disabled}
-          aria-checked={isChecked}
+          aria-checked={checked}
           aria-invalid={invalid || undefined}
           aria-readonly={readOnly || undefined}
           aria-describedby={describedBy}
           onChange={handleChange}
-          {...restInputPropsRef.current}
         />
         <span className={styles.track} aria-hidden="true" />
       </span>
-      {children !== undefined && children !== null ? (
-        <span className={styles.text}>{children}</span>
-      ) : null}
+      {children != null ? <span className={styles.text}>{children}</span> : null}
     </Label.Root>
   );
 });
 
 SwitchLabel.displayName = "SwitchLabel";
 
-// ─── Hint ────────────────────────────────────────────────────────────────────
+// ─── Hint / Error ────────────────────────────────────────────────────────────
 
 export type SwitchHintProps = {
   children: React.ReactNode;
@@ -238,20 +188,14 @@ export type SwitchHintProps = {
 } & Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">;
 
 function SwitchHint({ children, className, ...rest }: SwitchHintProps) {
-  const { hintId, registerHint, unregisterHint, size, disabled } = useSwitchContext();
-
-  React.useLayoutEffect(() => {
-    registerHint();
-    return () => {
-      unregisterHint();
-    };
-  }, [registerHint, unregisterHint]);
+  const { hintId, registerHint, size, disabled } = useSwitchContext();
+  React.useLayoutEffect(registerHint, [registerHint]);
 
   return (
     <Hint.Root
       id={hintId}
-      size={size as HintSize}
-      variant={disabled ? "disabled" : "default"}
+      size={size}
+      disabled={disabled}
       className={cx(styles.hintSlot, className)}
       {...rest}
     >
@@ -262,28 +206,17 @@ function SwitchHint({ children, className, ...rest }: SwitchHintProps) {
 
 SwitchHint.displayName = "SwitchHint";
 
-// ─── Error ───────────────────────────────────────────────────────────────────
-
-export type SwitchErrorProps = {
-  children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">;
+export type SwitchErrorProps = SwitchHintProps;
 
 function SwitchError({ children, className, ...rest }: SwitchErrorProps) {
-  const { errorId, registerError, unregisterError, size } = useSwitchContext();
-
-  React.useLayoutEffect(() => {
-    registerError();
-    return () => {
-      unregisterError();
-    };
-  }, [registerError, unregisterError]);
+  const { errorId, registerError, size } = useSwitchContext();
+  React.useLayoutEffect(registerError, [registerError]);
 
   return (
     <Hint.Root
       id={errorId}
-      size={size as HintSize}
-      variant="error"
+      size={size}
+      invalid
       className={cx(styles.hintSlot, className)}
       {...rest}
     >
@@ -293,8 +226,6 @@ function SwitchError({ children, className, ...rest }: SwitchErrorProps) {
 }
 
 SwitchError.displayName = "SwitchError";
-
-// ─── Namespace ───────────────────────────────────────────────────────────────
 
 export const Switch = {
   Root: SwitchRoot,

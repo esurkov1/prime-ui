@@ -3,32 +3,42 @@ import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
-import { isPortaledSelectListboxOwnedByContainer, useOutsideClick } from "@/hooks/useOutsideClick";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import { usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { toDataAttributes } from "@/internal/data-attributes";
 import { remToPx } from "@/internal/layoutPxFromPrimitives";
 import { mergeRefs } from "@/internal/mergeRefs";
 import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
+import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
-import type { DropdownSize } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
 import { primitiveTokens } from "../../../tokens/primitives";
 
 import styles from "./Dropdown.module.css";
 import { handleMenuNavigationKeyDown } from "./menuKeyboard";
 import { useDropdownPosition } from "./useDropdownPosition";
 
-export type { DropdownSize };
+const DropdownContentSizeContext = React.createContext<ControlSize>("m");
 
-const DropdownContentSizeContext = React.createContext<DropdownSize>("m");
-
-function useDropdownContentSize(): DropdownSize {
+function useDropdownContentSize(): ControlSize {
   return React.useContext(DropdownContentSizeContext);
 }
 
-function dropdownItemIconPx(menuSize: DropdownSize): number {
-  return remToPx(primitiveTokens.icon[menuSize]);
+/** Иконка пункта = `--prime-control-<tier>-icon` (foundation §6): 14 · 16 · 16 · 20 · 20. */
+const DROPDOWN_ICON_BY_SIZE = {
+  xs: 14,
+  s: 16,
+  m: 16,
+  l: 20,
+  xl: 20,
+} as const satisfies Record<ControlSize, keyof typeof primitiveTokens.icon>;
+
+function dropdownItemIconPx(menuSize: ControlSize): number {
+  return remToPx(primitiveTokens.icon[DROPDOWN_ICON_BY_SIZE[menuSize]]);
 }
 
 type Ctx = {
@@ -38,6 +48,7 @@ type Ctx = {
   triggerId: string;
   menuId: string;
   triggerRef: React.RefObject<HTMLElement | null>;
+  closeOnOutsideClick: boolean;
 };
 
 const [DropdownProvider, useDropdownContext] = createComponentContext<Ctx>("Dropdown");
@@ -46,10 +57,18 @@ export type DropdownRootProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** A pointerdown outside the panel and its trigger closes it. Default `true`. */
+  closeOnOutsideClick?: boolean;
   children: React.ReactNode;
 };
 
-function DropdownRoot({ open, defaultOpen = false, onOpenChange, children }: DropdownRootProps) {
+function DropdownRoot({
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  closeOnOutsideClick = true,
+  children,
+}: DropdownRootProps) {
   const [isOpen, setIsOpen] = useControllableState({
     value: open,
     defaultValue: defaultOpen,
@@ -63,8 +82,8 @@ function DropdownRoot({ open, defaultOpen = false, onOpenChange, children }: Dro
   const onToggle = React.useCallback(() => setIsOpen((v) => !v), [setIsOpen]);
 
   const value = React.useMemo(
-    () => ({ isOpen, onClose, onToggle, triggerId, menuId, triggerRef }),
-    [isOpen, onClose, onToggle, triggerId, menuId],
+    () => ({ isOpen, onClose, onToggle, triggerId, menuId, triggerRef, closeOnOutsideClick }),
+    [isOpen, onClose, onToggle, triggerId, menuId, closeOnOutsideClick],
   );
 
   return <DropdownProvider value={value}>{children}</DropdownProvider>;
@@ -72,12 +91,11 @@ function DropdownRoot({ open, defaultOpen = false, onOpenChange, children }: Dro
 DropdownRoot.displayName = "DropdownRoot";
 
 export type DropdownTriggerProps = {
+  /** The element that opens the panel (usually a Button); it receives ref, ARIA and the click handler. */
   children: React.ReactElement;
-  asChild?: boolean;
 };
 
-function DropdownTrigger({ children, asChild: _asChild = true }: DropdownTriggerProps) {
-  void _asChild;
+function DropdownTrigger({ children }: DropdownTriggerProps) {
   const { isOpen, onToggle, triggerId, menuId, triggerRef } = useDropdownContext();
   const toggleRef = React.useRef(onToggle);
   toggleRef.current = onToggle;
@@ -101,6 +119,7 @@ function DropdownTrigger({ children, asChild: _asChild = true }: DropdownTrigger
     ref: mergedRef,
     id: triggerId,
     "aria-expanded": isOpen,
+    "data-state": isOpen ? "open" : "closed",
     "aria-haspopup": "menu",
     "aria-controls": menuId,
     onClick: (e: React.MouseEvent<HTMLElement>) => {
@@ -115,7 +134,7 @@ export type DropdownContentProps = {
   align?: PositionAlign;
   side?: PositionSide;
   sameMinWidthAsTrigger?: boolean;
-  size?: DropdownSize;
+  size?: ControlSize;
   children: React.ReactNode;
   className?: string;
 };
@@ -128,12 +147,15 @@ function DropdownContent({
   children,
   className,
 }: DropdownContentProps) {
-  const { isOpen, onClose, triggerRef, menuId, triggerId } = useDropdownContext();
+  const { isOpen, onClose, triggerRef, menuId, triggerId, closeOnOutsideClick } =
+    useDropdownContext();
   const overlayPortalLayer = useOverlayPortalLayer();
   const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const presence = usePresence(isOpen, { exitDuration: "fast" });
 
   const layout = useDropdownPosition({
-    open: isOpen,
+    // Keeps its position while the exit animation plays.
+    open: presence.mounted,
     triggerRef,
     contentRef,
     side,
@@ -148,12 +170,12 @@ function DropdownContent({
   useOutsideClick({
     refs: [triggerRef, contentRef],
     enabled: isOpen,
-    onOutsideClick: onClose,
-    shouldSuppressOutsideClick: (target) =>
-      isPortaledSelectListboxOwnedByContainer(target, contentRef.current),
+    onOutsideClick: () => {
+      if (closeOnOutsideClick) onClose();
+    },
   });
 
-  if (!isOpen) return null;
+  if (!presence.mounted) return null;
 
   return (
     <Portal>
@@ -167,9 +189,11 @@ function DropdownContent({
             data-react-aria-top-layer="true"
             data-overlay-portal-layer={overlayPortalLayer}
             data-side={layout?.resolvedSide ?? side}
+            data-state={presence.state}
             data-size={size}
-            className={cx(styles.content, className)}
+            className={cx(styles.content, overlayMotion.floating, className)}
             style={layout?.style}
+            onAnimationEnd={presence.onExitEnd}
             onKeyDown={(e) => handleMenuNavigationKeyDown(e, e.currentTarget)}
           >
             {children}
@@ -184,12 +208,19 @@ DropdownContent.displayName = "DropdownContent";
 export type DropdownItemProps = {
   onSelect?: () => void;
   disabled?: boolean;
-  destructive?: boolean;
+  /** `danger` — destructive action (delete, revoke). Default `neutral`. */
+  tone?: Extract<Tone, "neutral" | "danger">;
   children: React.ReactNode;
   className?: string;
 };
 
-function DropdownItem({ onSelect, disabled, destructive, children, className }: DropdownItemProps) {
+function DropdownItem({
+  onSelect,
+  disabled,
+  tone = "neutral",
+  children,
+  className,
+}: DropdownItemProps) {
   const { onClose } = useDropdownContext();
 
   const activate = () => {
@@ -205,8 +236,7 @@ function DropdownItem({ onSelect, disabled, destructive, children, className }: 
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : 0}
       className={cx(styles.item, className)}
-      data-disabled={disabled ? "true" : undefined}
-      data-destructive={destructive ? "true" : undefined}
+      {...toDataAttributes({ tone, disabled: disabled || undefined })}
       onClick={activate}
       onKeyDown={(e) => {
         if ((e.key === "Enter" || e.key === " ") && !disabled) {
@@ -248,6 +278,14 @@ const DropdownItemIcon = React.forwardRef<HTMLElement, DropdownItemIconProps>(
 );
 DropdownItemIcon.displayName = "DropdownItemIcon";
 
+export type DropdownItemShortcutProps = React.HTMLAttributes<HTMLElement>;
+
+/** Сочетание клавиш справа в пункте (стиль Kbd, приглушённый). Только подсказка — не обработчик. */
+function DropdownItemShortcut({ className, ...rest }: DropdownItemShortcutProps) {
+  return <kbd className={cx(styles.itemShortcut, className)} {...rest} />;
+}
+DropdownItemShortcut.displayName = "DropdownItemShortcut";
+
 export type DropdownGroupProps = React.HTMLAttributes<HTMLDivElement>;
 
 function DropdownGroup({ className, ...rest }: DropdownGroupProps) {
@@ -259,7 +297,11 @@ DropdownGroup.displayName = "DropdownGroup";
 export type DropdownGroupLabelProps = { children: React.ReactNode; className?: string };
 
 function DropdownGroupLabel({ children, className }: DropdownGroupLabelProps) {
-  return <div className={cx(styles.groupLabel, className)}>{children}</div>;
+  return (
+    <div role="presentation" className={cx(styles.groupLabel, className)}>
+      {children}
+    </div>
+  );
 }
 DropdownGroupLabel.displayName = "DropdownGroupLabel";
 
@@ -367,6 +409,7 @@ export const Dropdown = {
   HeaderTrailing: DropdownHeaderTrailing,
   Item: DropdownItem,
   ItemIcon: DropdownItemIcon,
+  ItemShortcut: DropdownItemShortcut,
   Group: DropdownGroup,
   GroupLabel: DropdownGroupLabel,
   Separator: DropdownSeparator,

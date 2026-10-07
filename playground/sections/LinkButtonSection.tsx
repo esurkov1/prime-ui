@@ -1,3 +1,15 @@
+import LinkButtonCompositionExample from "@/components/link-button/examples/composition";
+import linkButtonCompositionSource from "@/components/link-button/examples/composition.tsx?raw";
+import LinkButtonExternalLinkExample from "@/components/link-button/examples/external-link";
+import linkButtonExternalLinkSource from "@/components/link-button/examples/external-link.tsx?raw";
+import LinkButtonSizesExample from "@/components/link-button/examples/sizes";
+import linkButtonSizesSource from "@/components/link-button/examples/sizes.tsx?raw";
+import LinkButtonStatesExample from "@/components/link-button/examples/states";
+import linkButtonStatesSource from "@/components/link-button/examples/states.tsx?raw";
+import LinkButtonTonesExample from "@/components/link-button/examples/tones";
+import linkButtonTonesSource from "@/components/link-button/examples/tones.tsx?raw";
+import LinkButtonWithIconExample from "@/components/link-button/examples/with-icon";
+import linkButtonWithIconSource from "@/components/link-button/examples/with-icon.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,23 +18,23 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import LinkButtonCompositionSnippet from "../snippets/link-button/composition";
-import linkButtonCompositionSource from "../snippets/link-button/composition.tsx?raw";
-import LinkButtonExternalLinkSnippet from "../snippets/link-button/external-link";
-import linkButtonExternalLinkSource from "../snippets/link-button/external-link.tsx?raw";
-import LinkButtonSizesSnippet from "../snippets/link-button/sizes";
-import linkButtonSizesSource from "../snippets/link-button/sizes.tsx?raw";
-import LinkButtonStatesSnippet from "../snippets/link-button/states";
-import linkButtonStatesSource from "../snippets/link-button/states.tsx?raw";
 
 const linkButtonRootApiRows = [
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "нет",
     description:
-      "Размер строки: кегль, отступы между элементами и контекст для вложенных иконок (ControlSizeProvider).",
+      "Ярус контрола: кегль, межстрочный интервал и размер вложенных иконок (ControlSizeProvider). xl берёт кегль title-l (18).",
+  },
+  {
+    prop: "tone",
+    type: '"accent" | "neutral"',
+    defaultValue: '"accent"',
+    required: "нет",
+    description:
+      "accent — обычная ссылка; neutral — вторичный текст, на наведении основной: футеры, метаданные.",
   },
   {
     prop: "disabled",
@@ -30,7 +42,7 @@ const linkButtonRootApiRows = [
     defaultValue: "false",
     required: "нет",
     description:
-      'Недоступное состояние: рендерится span с role="link", без href и без перехода; aria-disabled и tabIndex={-1}.',
+      'Недоступное состояние: рендерится span с role="link", без href и без перехода; aria-disabled и tabIndex={-1}. Остальные атрибуты ссылки при этом не передаются.',
   },
   {
     prop: "children",
@@ -70,13 +82,10 @@ export default function LinkButtonSection() {
       <PageContent.Header>
         <PageContent.Title>LinkButton</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Ссылка в стиле интерфейса: цвет текста, подчёркивание при наведении и при фокусе с
-              клавиатуры, четыре размера. Для действий «сделать что-то» без перехода по URL лучше
-              использовать кнопку.
-            </>
-          }
+          Текстовая ссылка с размерами контролов: акцентный или нейтральный тон, подчёркивание при
+          наведении, общее кольцо фокуса. Пять размеров <code>xs</code>–<code>xl</code>. Для
+          действий без перехода по адресу используйте Button (<code>variant=&quot;ghost&quot;</code>
+          ).
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -84,15 +93,26 @@ export default function LinkButtonSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Ряд ссылок с пропом <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-              <code>xl</code> — одна визуальная линия, разная плотность текста и отступов.
+              <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> · <code>xl</code>:
+              кегль и иконка берутся из яруса контрола, по умолчанию <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={linkButtonSizesSource.trim()}
-              previewLayout="stack-center"
-            >
+            <PlaygroundExampleFrame.Root code={linkButtonSizesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <LinkButtonSizesSnippet />
+                <LinkButtonSizesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Тон</DemoSectionTitle>
+            <DemoDescription>
+              <code>tone=&quot;accent&quot;</code> (по умолчанию) — обычная ссылка;{" "}
+              <code>tone=&quot;neutral&quot;</code> — вторичный текст, на наведении становится
+              основным. Подходит для футеров и метаданных.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={linkButtonTonesSource.trim()} previewLayout="row">
+              <PlaygroundExampleFrame.Stage>
+                <LinkButtonTonesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -100,28 +120,42 @@ export default function LinkButtonSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Обычная ссылка с <code>href</code> и вариант с <code>disabled</code>: без навигации,
-              внешний вид «приглушённый» через <code>data-disabled</code>.
+              Наведите курсор — появляется подчёркивание, <kbd>Tab</kbd> — кольцо фокуса.{" "}
+              <code>disabled</code> рендерит <code>span role=&quot;link&quot;</code> без{" "}
+              <code>href</code> и убирает ссылку из порядка табуляции.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={linkButtonStatesSource.trim()} previewLayout="row">
               <PlaygroundExampleFrame.Stage>
-                <LinkButtonStatesSnippet />
+                <LinkButtonStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция с иконками</DemoSectionTitle>
+            <DemoSectionTitle>С иконкой</DemoSectionTitle>
             <DemoDescription>
-              Произвольные дочерние узлы: компонент <code>Icon</code> подхватывает размер из
-              контекста корня; для ссылки только с иконкой задайте <code>aria-label</code>.
+              <code>Icon</code> без <code>size</code> наследует ярус ссылки; иконка декоративная,
+              имя ссылки — её текст.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={linkButtonWithIconSource.trim()} previewLayout="row">
+              <PlaygroundExampleFrame.Stage>
+                <LinkButtonWithIconExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoDescription>
+              Карточка входа: ссылка внутри текста, ссылка рядом с кнопкой того же размера и
+              нейтральные служебные ссылки размера <code>s</code>.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
               code={linkButtonCompositionSource.trim()}
-              previewLayout="row"
+              previewLayout="stack-center"
             >
               <PlaygroundExampleFrame.Stage>
-                <LinkButtonCompositionSnippet />
+                <LinkButtonCompositionExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -129,16 +163,16 @@ export default function LinkButtonSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Внешняя ссылка</DemoSectionTitle>
             <DemoDescription>
-              Атрибуты <code>target</code> и <code>rel</code> из стандартного API{" "}
-              <code>&lt;a&gt;</code> — для открытия в новой вкладке укажите{" "}
-              <code>rel=&quot;noopener noreferrer&quot;</code>.
+              <code>target=&quot;_blank&quot;</code> и{" "}
+              <code>rel=&quot;noopener noreferrer&quot;</code> пробрасываются в нативный{" "}
+              <code>&lt;a&gt;</code>; о новой вкладке сообщите в тексте.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
               code={linkButtonExternalLinkSource.trim()}
-              previewLayout="stack"
+              previewLayout="row"
             >
               <PlaygroundExampleFrame.Stage>
-                <LinkButtonExternalLinkSnippet />
+                <LinkButtonExternalLinkExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -147,9 +181,8 @@ export default function LinkButtonSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>LinkButton.Root</DemoApiTitle>
             <DemoDescription>
-              Корневой узел: интерактивный <code>&lt;a&gt;</code> или недоступный{" "}
-              <code>&lt;span role=&quot;link&quot;&gt;</code> при <code>disabled</code>. Стили и
-              data-атрибуты размера — из модуля компонента.
+              Нативный <code>&lt;a&gt;</code> или недоступный <code>span</code>; размер передаётся
+              вложенным иконкам.
             </DemoDescription>
             <PlaygroundApiTable rows={linkButtonRootApiRows} />
           </div>

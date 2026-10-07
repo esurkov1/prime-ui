@@ -1,198 +1,212 @@
+/*
+ * Textarea follows the Input field system (see Input.module.css): fill-based box, tier text,
+ * label above (label-gap), support row below (hint-gap) with hint | error and a right-aligned counter.
+ * Vertical padding = (control height − line height) / 2, so one line sits exactly like an Input.
+ */
 .field {
-  --prime-textarea-body-size: var(--prime-sys-size-control-m-text);
-  --prime-textarea-line-height: var(--prime-sys-typography-body-lineHeight);
-  /* Токен minHeight — высота всего .control (border-box с padding). Внутри — вычитаем вертикальный padding. */
-  --prime-textarea-min-height: var(--prime-sys-size-textarea-m-minHeight);
-  --prime-textarea-inner-min-height: calc(
-    var(--prime-sys-size-textarea-m-minHeight) -
-    2 *
-    var(--prime-sys-size-textarea-m-paddingX)
+  --prime-textarea-height: var(--prime-control-m-height);
+  --prime-textarea-padding-x: var(--prime-control-m-field-padding-x);
+  --prime-textarea-radius: var(--prime-control-m-radius);
+  --prime-textarea-body-size: var(--prime-control-m-text-size);
+  --prime-textarea-line-height: var(--prime-control-m-line-height);
+  --prime-textarea-label-size: var(--prime-control-m-label-size);
+  --prime-textarea-label-line-height: var(--prime-control-m-label-line-height);
+  --prime-textarea-hint-size: var(--prime-control-m-hint-size);
+  --prime-textarea-hint-line-height: var(--prime-control-m-hint-line-height);
+  --prime-textarea-label-gap: var(--prime-control-m-label-gap);
+  --prime-textarea-hint-gap: var(--prime-control-m-hint-gap);
+  --prime-textarea-padding-y: calc(
+    (var(--prime-textarea-height) - var(--prime-textarea-line-height)) /
+    2
   );
-  --prime-textarea-stack-gap: var(--prime-sys-size-control-m-gap);
+  /* Minimum content height: three lines. */
+  --prime-textarea-inner-min-height: calc(var(--prime-textarea-line-height) * 3);
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  display: grid;
-  gap: var(--prime-textarea-stack-gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-textarea-label-gap);
+  font-family: var(--prime-font-family-sans);
+}
+
+.field[data-size="xs"] {
+  --prime-textarea-height: var(--prime-control-xs-height);
+  --prime-textarea-padding-x: var(--prime-control-xs-field-padding-x);
+  --prime-textarea-radius: var(--prime-control-xs-radius);
+  --prime-textarea-body-size: var(--prime-control-xs-text-size);
+  --prime-textarea-line-height: var(--prime-control-xs-line-height);
+  --prime-textarea-label-size: var(--prime-control-xs-label-size);
+  --prime-textarea-label-line-height: var(--prime-control-xs-label-line-height);
+  --prime-textarea-hint-size: var(--prime-control-xs-hint-size);
+  --prime-textarea-hint-line-height: var(--prime-control-xs-hint-line-height);
+  --prime-textarea-label-gap: var(--prime-control-xs-label-gap);
+  --prime-textarea-hint-gap: var(--prime-control-xs-hint-gap);
 }
 
 .field[data-size="s"] {
-  --prime-textarea-body-size: var(--prime-sys-size-control-s-text);
-  --prime-textarea-min-height: var(--prime-sys-size-textarea-s-minHeight);
-  --prime-textarea-inner-min-height: calc(
-    var(--prime-sys-size-textarea-s-minHeight) -
-    2 *
-    var(--prime-sys-size-textarea-s-paddingX)
-  );
-  --prime-textarea-stack-gap: var(--prime-sys-size-control-s-gap);
+  --prime-textarea-height: var(--prime-control-s-height);
+  --prime-textarea-padding-x: var(--prime-control-s-field-padding-x);
+  --prime-textarea-radius: var(--prime-control-s-radius);
+  --prime-textarea-body-size: var(--prime-control-s-text-size);
+  --prime-textarea-line-height: var(--prime-control-s-line-height);
+  --prime-textarea-label-size: var(--prime-control-s-label-size);
+  --prime-textarea-label-line-height: var(--prime-control-s-label-line-height);
+  --prime-textarea-hint-size: var(--prime-control-s-hint-size);
+  --prime-textarea-hint-line-height: var(--prime-control-s-hint-line-height);
+  --prime-textarea-label-gap: var(--prime-control-s-label-gap);
+  --prime-textarea-hint-gap: var(--prime-control-s-hint-gap);
 }
 
 .field[data-size="l"] {
-  --prime-textarea-body-size: var(--prime-sys-size-control-l-text);
-  --prime-textarea-min-height: var(--prime-sys-size-textarea-l-minHeight);
-  --prime-textarea-inner-min-height: calc(
-    var(--prime-sys-size-textarea-l-minHeight) -
-    2 *
-    var(--prime-sys-size-textarea-l-paddingX)
-  );
-  --prime-textarea-stack-gap: var(--prime-sys-size-control-l-gap);
+  --prime-textarea-height: var(--prime-control-l-height);
+  --prime-textarea-padding-x: var(--prime-control-l-field-padding-x);
+  --prime-textarea-radius: var(--prime-control-l-radius);
+  --prime-textarea-body-size: var(--prime-control-l-text-size);
+  --prime-textarea-line-height: var(--prime-control-l-line-height);
+  --prime-textarea-label-size: var(--prime-control-l-label-size);
+  --prime-textarea-label-line-height: var(--prime-control-l-label-line-height);
+  --prime-textarea-hint-size: var(--prime-control-l-hint-size);
+  --prime-textarea-hint-line-height: var(--prime-control-l-hint-line-height);
+  --prime-textarea-label-gap: var(--prime-control-l-label-gap);
+  --prime-textarea-hint-gap: var(--prime-control-l-hint-gap);
 }
 
 .field[data-size="xl"] {
-  --prime-textarea-body-size: var(--prime-sys-size-control-xl-text);
-  --prime-textarea-min-height: var(--prime-sys-size-textarea-xl-minHeight);
-  --prime-textarea-inner-min-height: calc(
-    var(--prime-sys-size-textarea-xl-minHeight) -
-    2 *
-    var(--prime-sys-size-textarea-xl-paddingX)
-  );
-  --prime-textarea-stack-gap: var(--prime-sys-size-control-xl-gap);
+  --prime-textarea-height: var(--prime-control-xl-height);
+  --prime-textarea-padding-x: var(--prime-control-xl-field-padding-x);
+  --prime-textarea-radius: var(--prime-control-xl-radius);
+  --prime-textarea-body-size: var(--prime-control-xl-text-size);
+  --prime-textarea-line-height: var(--prime-control-xl-line-height);
+  --prime-textarea-label-size: var(--prime-control-xl-label-size);
+  --prime-textarea-label-line-height: var(--prime-control-xl-label-line-height);
+  --prime-textarea-hint-size: var(--prime-control-xl-hint-size);
+  --prime-textarea-hint-line-height: var(--prime-control-xl-hint-line-height);
+  --prime-textarea-label-gap: var(--prime-control-xl-label-gap);
+  --prime-textarea-hint-gap: var(--prime-control-xl-hint-gap);
 }
 
+/* ── Header ── */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-textarea-hint-gap);
+}
+
+/* ── Field box ── */
 .control {
-  position: relative;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
   display: flex;
   flex-direction: column;
+  padding: var(--prime-textarea-padding-y) var(--prime-textarea-padding-x);
+  border-radius: var(--prime-textarea-radius);
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
   cursor: text;
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
-  background: var(--prime-sys-color-field-bg);
-  color: var(--prime-sys-color-field-text);
   transition:
-    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* min-height только у зеркала ::after (inner); дублирование здесь + flex:1 давало лишнюю полосу снизу */
-.control[data-size="s"] {
-  border-radius: var(--prime-sys-size-textarea-s-radius);
-  padding: var(--prime-sys-size-textarea-s-paddingX);
+.control:hover:not(:focus-within):not([data-disabled="true"]):not([data-readonly="true"]) {
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
 }
 
-.control[data-size="m"] {
-  border-radius: var(--prime-sys-size-textarea-m-radius);
-  padding: var(--prime-sys-size-textarea-m-paddingX);
+.control:has(textarea:focus-visible) {
+  background: var(--prime-color-field-bg-focus);
 }
 
-.control[data-size="l"] {
-  border-radius: var(--prime-sys-size-textarea-l-radius);
-  padding: var(--prime-sys-size-textarea-l-paddingX);
-}
-
-.control[data-size="xl"] {
-  border-radius: var(--prime-sys-size-textarea-xl-radius);
-  padding: var(--prime-sys-size-textarea-xl-paddingX);
-}
-
-.control:hover {
-  border-color: var(--prime-sys-color-field-borderHover);
-}
-
-.control:focus-within {
-  border-color: var(--prime-sys-color-field-borderFocus);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
+.control:not([data-focus-ring="false"]):has(textarea:focus-visible) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
 .control[data-invalid="true"] {
-  border-color: var(--prime-sys-color-field-borderError);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
-.control[data-invalid="true"]:focus-within {
-  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
+.control[data-invalid="true"]:has(textarea:focus-visible) {
+  outline-color: var(--prime-color-danger-border);
 }
 
 .control[data-disabled="true"] {
-  background: var(--prime-sys-color-surface-accentSoft);
-  border-color: transparent;
+  background: var(--prime-color-field-bg-disabled);
+  color: var(--prime-color-text-disabled);
   box-shadow: none;
+  cursor: not-allowed;
 }
 
-.controlStack {
-  flex: 0 0 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
+.control[data-readonly="true"] {
+  cursor: default;
 }
 
-.textareaRegion {
-  flex: 0 0 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.controlFooter {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--prime-sys-spacing-x1);
-  padding-top: var(--prime-sys-spacing-x1);
-}
-
-/* ── Auto-resize wrapper (CSS grid trick) ── */
-
+/* ── Auto-resize wrapper (CSS grid mirror trick) ── */
 .autoResize {
   display: grid;
-  flex: 0 0 auto;
   min-width: 0;
   width: 100%;
 }
 
 .autoResize::after {
   content: attr(data-value) " ";
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  visibility: hidden;
   grid-area: 1 / 1 / 2 / 2;
-  /* Должны совпадать с .textarea — иначе высота зеркала ≠ высоте текста и растёт «пол» снизу */
+  visibility: hidden;
+  min-width: 0;
+  min-height: var(--prime-textarea-inner-min-height);
+  /* Must match .textarea exactly, otherwise the mirror and the text differ in height. */
+  padding: 0;
+  border: 0;
   font-family: inherit;
   font-size: var(--prime-textarea-body-size);
   font-weight: inherit;
-  font-style: inherit;
   line-height: var(--prime-textarea-line-height);
   letter-spacing: inherit;
-  min-width: 0;
-  min-height: var(--prime-textarea-inner-min-height);
-  /* padding/border must match .textarea exactly */
-  padding: 0;
-  border: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
-/* ── Base textarea ── */
-
+/* ── Textarea element ── */
 .textarea {
   -webkit-appearance: none;
   appearance: none;
-  resize: vertical;
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
   border: 0;
   background: transparent;
   color: inherit;
   outline: none;
   box-shadow: none;
+  resize: vertical;
+  font: inherit;
   font-size: var(--prime-textarea-body-size);
   line-height: var(--prime-textarea-line-height);
-  /* Не наследовать nowrap от предков; переносы в value и мягкий перенос длинных строк */
   white-space: pre-wrap;
-  overflow-wrap: break-word;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .textarea:focus,
 .textarea:focus-visible {
   outline: none;
-  box-shadow: none;
 }
 
-/* Applied to textarea when autoResize=true — overrides resize/overflow */
+/* autoResize: the textarea shares the grid cell with the mirror and never scrolls. */
 .textareaAutoResize {
   grid-area: 1 / 1 / 2 / 2;
   resize: none;
@@ -200,45 +214,67 @@
 }
 
 .textarea:not(.textareaAutoResize) {
-  flex: 1 1 auto;
   min-height: var(--prime-textarea-inner-min-height);
 }
 
-.textarea:disabled {
-  color: var(--prime-sys-color-content-disabled);
-}
-
 .textarea::placeholder {
-  color: var(--prime-sys-color-field-placeholder);
-  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  color: var(--prime-color-text-placeholder);
+  opacity: 1;
 }
 
-.control:hover .textarea::placeholder,
-.control:focus-within .textarea::placeholder {
-  color: var(--prime-sys-color-content-secondary);
+.textarea:disabled {
+  color: var(--prime-color-text-disabled);
+  -webkit-text-fill-color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
 }
 
-/* ── Hint / error (типографика — Hint.Root) ── */
-
-.hintSlot {
-  width: 100%;
-  max-width: 100%;
+.textarea:disabled::placeholder {
+  color: var(--prime-color-text-disabled);
 }
 
-/* ── Char counter (компактно, внутри поля — как AlignUI) ── */
+/* ── Support row: hint | error · counter ── */
+.support {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
 
-.charCounter {
-  font-size: var(--prime-textarea-body-size);
-  line-height: var(--prime-textarea-line-height);
+.support[data-reserve="true"] {
+  min-height: var(--prime-textarea-hint-line-height);
+}
+
+.supportText {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.supportCounter {
+  flex-shrink: 0;
+}
+
+.counter {
+  display: block;
+  font-size: var(--prime-textarea-hint-size);
+  line-height: var(--prime-textarea-hint-line-height);
   font-variant-numeric: tabular-nums;
-  color: var(--prime-sys-color-content-muted);
-  letter-spacing: var(--prime-sys-typography-tracking-normal);
+  color: var(--prime-color-text-muted);
+  white-space: nowrap;
 }
 
-.control[data-disabled="true"] .charCounter {
-  color: var(--prime-sys-color-content-disabled);
+.counter[data-invalid="true"] {
+  color: var(--prime-color-danger-text);
 }
 
-.charCounter[data-overflow="true"] {
-  color: var(--prime-sys-color-content-danger);
+.srOnly {
+  position: absolute;
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
+  padding: 0;
+  margin: calc(-1 * var(--prime-border-width));
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }

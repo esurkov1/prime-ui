@@ -24,4 +24,17 @@ describe("EmptyPage", () => {
     );
     expect(screen.getByTestId("empty")).toHaveAttribute("data-layout", "fill");
   });
+
+  it("sets icon tone, neutral by default", () => {
+    render(
+      <EmptyPage.Root>
+        <EmptyPage.Icon data-testid="a">i</EmptyPage.Icon>
+        <EmptyPage.Icon data-testid="b" tone="danger">
+          i
+        </EmptyPage.Icon>
+      </EmptyPage.Root>,
+    );
+    expect(screen.getByTestId("a")).toHaveAttribute("data-tone", "neutral");
+    expect(screen.getByTestId("b")).toHaveAttribute("data-tone", "danger");
+  });
 });

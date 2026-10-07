@@ -1,0 +1,20 @@
+/* Layout for the AppShell examples: a small "app window" frame. Semantic tokens only. */
+
+.stage {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: calc(var(--prime-space-24) * 5);
+  overflow: hidden;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-canvas);
+  /* The rail shares the preview's canvas fill: a hairline keeps the window edge visible. */
+  box-shadow:
+    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
+    var(--prime-shadow-raised);
+}
+
+/* The shell fills the window frame instead of the viewport. */
+.shell {
+  height: 100%;
+}

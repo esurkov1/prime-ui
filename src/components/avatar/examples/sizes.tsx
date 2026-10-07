@@ -1,23 +1,22 @@
-import { Avatar, type AvatarSize } from "@/components/avatar/Avatar";
+/** Six diameters: 20 · 24 · 32 · 40 · 48 · 64 px, default `m`; initials take 40% of the diameter. Use xs in dense tables, m in lists, xl/2xl in profile headers. */
+import { Avatar, type AvatarSize, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const sampleSrc =
-  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=256&h=256&fit=crop";
+const sizes: AvatarSize[] = ["xs", "s", "m", "l", "xl", "2xl"];
 
-const sizes: AvatarSize[] = ["s", "m", "l", "xl", "2xl", "3xl", "4xl", "5xl", "6xl"];
-
-/**
- * Full `size` scale in one row — mirrors `playground/snippets/avatar/sizes.tsx`.
- */
 export default function AvatarSizesExample() {
   return (
-    <div className={styles.row}>
+    <div className={styles.sizes}>
       {sizes.map((size) => (
-        <Avatar.Root key={size} size={size}>
-          <Avatar.Image src={sampleSrc} alt="" />
-          <Avatar.Fallback>{size}</Avatar.Fallback>
-        </Avatar.Root>
+        <div key={size} className={styles.sizeCell}>
+          <Avatar.Root size={size} color="blue" aria-label="Анна Климова">
+            <Avatar.Fallback>АК</Avatar.Fallback>
+          </Avatar.Root>
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
+          </Typography.Root>
+        </div>
       ))}
     </div>
   );

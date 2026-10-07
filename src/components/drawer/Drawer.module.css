@@ -1,207 +1,92 @@
+/*
+ * Drawer — raised edge panel on a scrim. Same zones as Modal (DialogParts.module.css), each
+ * with its own side padding; header and footer stay put, only the body scrolls. Width per size tier; full width below 640px. Nested drawers stack in DOM order on the same
+ * layer; inside a Modal the shell moves to `--prime-z-drawer-nested-shell`.
+ */
+
+.root {
+  display: contents;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--prime-sys-elevation-zIndex-drawer);
-  background: var(--prime-sys-color-surface-overlay);
-  backdrop-filter: blur(var(--prime-sys-unit-8px));
+  z-index: var(--prime-z-drawer);
+  background: var(--prime-color-bg-scrim);
 }
 
 .overlay[data-nested-in-modal="true"] {
-  z-index: var(--prime-sys-elevation-zIndex-drawerNestedShell);
-}
-
-.overlay[data-state="open"] {
-  animation: drawerFadeIn var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-.overlay[data-state="closing"] {
-  animation: drawerFadeOut var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  z-index: var(--prime-z-drawer-nested-shell);
 }
 
 .panel {
+  --drawer-width: var(--prime-drawer-width-m);
+  /* Fields inside a raised surface use the "on surface" fill. */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
+  --dialog-padding: var(--prime-drawer-padding);
+
   position: fixed;
   top: 0;
   bottom: 0;
-  width: min(28rem, 90vw);
+  z-index: var(--prime-z-drawer);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  width: min(100vw, var(--drawer-width));
   min-height: 0;
   overflow: hidden;
-  z-index: var(--prime-sys-elevation-zIndex-drawer);
-  background: color-mix(in srgb, var(--prime-sys-color-surface-elevated) 94%, transparent);
-  color: var(--prime-sys-color-content-primary);
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  box-shadow: var(--prime-sys-elevation-shadow-modal);
+  /* Avatar.Group rings match this surface. */
+  --avatar-ring: var(--prime-color-bg-raised);
+  background: var(--prime-color-bg-raised);
+  color: var(--prime-color-text-primary);
+  box-shadow: var(--prime-shadow-modal);
   outline: none;
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
+}
+
+.panel[data-size="s"] {
+  --drawer-width: var(--prime-drawer-width-s);
+}
+
+.panel[data-size="l"] {
+  --drawer-width: var(--prime-drawer-width-l);
+}
+
+.panel[data-size="xl"] {
+  --drawer-width: var(--prime-drawer-width-xl);
 }
 
 .panel[data-nested-in-modal="true"] {
-  z-index: var(--prime-sys-elevation-zIndex-drawerNestedShell);
+  z-index: var(--prime-z-drawer-nested-shell);
 }
 
+/* Rounded only on the edge that faces the page. */
 .panel[data-side="right"] {
   right: 0;
-  border-radius: var(--prime-sys-shape-radius-l) 0 0 var(--prime-sys-shape-radius-l);
+  border-start-start-radius: var(--prime-modal-radius);
+  border-end-start-radius: var(--prime-modal-radius);
 }
 
 .panel[data-side="left"] {
   left: 0;
-  border-radius: 0 var(--prime-sys-shape-radius-l) var(--prime-sys-shape-radius-l) 0;
+  border-start-end-radius: var(--prime-modal-radius);
+  border-end-end-radius: var(--prime-modal-radius);
 }
 
-.panel[data-state="open"][data-side="right"] {
-  animation: drawerSlideInFromRight var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
+/* ─── Narrow viewport: full width, square corners ────────────────────────── */
 
-.panel[data-state="closing"][data-side="right"] {
-  animation: drawerSlideOutToRight var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-.panel[data-state="open"][data-side="left"] {
-  animation: drawerSlideInFromLeft var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-.panel[data-state="closing"][data-side="left"] {
-  animation: drawerSlideOutToLeft var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--prime-sys-spacing-x3);
-  padding-inline: var(--prime-sys-spacing-x5);
-  padding-block: var(--prime-sys-spacing-x5);
-  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  flex-shrink: 0;
-}
-
-.headerMain {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--prime-sys-spacing-x3);
-  min-width: 0;
-}
-
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--prime-sys-size-control-m-height);
-  height: var(--prime-sys-size-control-m-height);
-  border-radius: var(--prime-sys-shape-radius-m);
-  background: var(--prime-sys-color-surface-raised);
-  color: var(--prime-sys-color-content-secondary);
-  flex-shrink: 0;
-}
-
-.titleBlock {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x1);
-  min-width: 0;
-}
-
-.title {
-  margin: 0;
-  font-size: var(--prime-sys-size-control-m-text);
-  font-weight: var(--prime-sys-typography-title-weight);
-  line-height: 1.2;
-  color: var(--prime-sys-color-content-primary);
-}
-
-.description {
-  margin: 0;
-  color: var(--prime-sys-color-content-secondary);
-  font-size: var(--prime-sys-size-control-s-text);
-  line-height: 1.4;
-}
-
-.closeButton {
-  flex-shrink: 0;
-}
-
-.body {
-  flex: 1;
-  min-height: 0;
-  padding-inline: var(--prime-sys-spacing-x5);
-  padding-block: var(--prime-sys-spacing-x5);
-}
-
-.footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--prime-sys-spacing-x3);
-  padding-inline: var(--prime-sys-spacing-x5);
-  padding-block: var(--prime-sys-spacing-x4);
-  border-top: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  flex-shrink: 0;
-}
-
-@keyframes drawerFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes drawerFadeOut {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes drawerSlideInFromRight {
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes drawerSlideOutToRight {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes drawerSlideInFromLeft {
-  from {
-    transform: translateX(-100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes drawerSlideOutToLeft {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-100%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .overlay,
+@media (max-width: 639px) {
   .panel {
-    animation: none;
+    width: 100vw;
+    border-radius: 0;
+  }
+
+  .panel[data-side="left"],
+  .panel[data-side="right"] {
+    border-radius: 0;
   }
 }
+
+/* Motion (scrim fade, panel slide from its side) lives in internal/overlayMotion.module.css. */

@@ -13,6 +13,19 @@ describe("Button", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it("defaults to variant solid, tone accent, size m", () => {
+    render(<Button.Root>Save</Button.Root>);
+    const button = screen.getByRole("button", { name: "Save" });
+    expect(button).toHaveAttribute("data-variant", "solid");
+    expect(button).toHaveAttribute("data-tone", "accent");
+    expect(button).toHaveAttribute("data-size", "m");
+  });
+
+  it("sets data-disabled when disabled", () => {
+    render(<Button.Root disabled>Off</Button.Root>);
+    expect(screen.getByRole("button", { name: "Off" })).toHaveAttribute("data-disabled", "true");
+  });
+
   it("is disabled while loading", () => {
     render(
       <Button.Root loading>
@@ -104,15 +117,15 @@ describe("Button asChild", () => {
     expect(link).toHaveClass("extra");
   });
 
-  it("forwards data-variant, data-mode, data-size to the child", () => {
+  it("forwards data-variant, data-tone, data-size to the child", () => {
     render(
-      <Button.Root asChild variant="error" mode="stroke" size="l">
+      <Button.Root variant="outline" tone="danger" asChild size="l">
         <a href="/">Link</a>
       </Button.Root>,
     );
     const link = screen.getByRole("link", { name: "Link" });
-    expect(link).toHaveAttribute("data-variant", "error");
-    expect(link).toHaveAttribute("data-mode", "stroke");
+    expect(link).toHaveAttribute("data-variant", "outline");
+    expect(link).toHaveAttribute("data-tone", "danger");
     expect(link).toHaveAttribute("data-size", "l");
   });
 
@@ -178,5 +191,70 @@ describe("Button asChild", () => {
       </Button.Root>,
     );
     expect(screen.getByRole("link", { name: "Link" })).not.toHaveAttribute("type");
+  });
+
+  describe("Button layout", () => {
+    it("marks icon-only, leading and trailing icon layouts", () => {
+      render(
+        <>
+          <Button.Root aria-label="Only">
+            <Button.Icon>x</Button.Icon>
+          </Button.Root>
+          <Button.Root>
+            <Button.Icon>x</Button.Icon>
+            Lead
+          </Button.Root>
+          <Button.Root>
+            Trail
+            <Button.Icon>x</Button.Icon>
+          </Button.Root>
+        </>,
+      );
+      expect(screen.getByRole("button", { name: "Only" })).toHaveAttribute(
+        "data-icon-only",
+        "true",
+      );
+      const lead = screen.getByRole("button", { name: "Lead" });
+      expect(lead).toHaveAttribute("data-leading-icon", "true");
+      expect(lead).not.toHaveAttribute("data-trailing-icon");
+      const trail = screen.getByRole("button", { name: "Trail" });
+      expect(trail).toHaveAttribute("data-trailing-icon", "true");
+      expect(trail).not.toHaveAttribute("data-icon-only");
+    });
+
+    it("renders an automatic spinner over the label when loading without Button.Spinner", () => {
+      const { container } = render(<Button.Root loading>Save</Button.Root>);
+      const button = screen.getByRole("button", { name: "Save" });
+      expect(container.querySelectorAll(`.${styles.spinner}`)).toHaveLength(1);
+      expect(button).toHaveAttribute("data-loading-overlay", "true");
+    });
+
+    it("puts the automatic spinner in place of a leading icon", () => {
+      const { container } = render(
+        <Button.Root loading>
+          <Button.Icon>x</Button.Icon>
+          Save
+        </Button.Root>,
+      );
+      expect(container.querySelectorAll(`.${styles.spinner}`)).toHaveLength(1);
+      expect(screen.getByRole("button", { name: "Save" })).not.toHaveAttribute(
+        "data-loading-overlay",
+      );
+    });
+
+    it("does not add a second spinner when Button.Spinner is present", () => {
+      const { container } = render(
+        <Button.Root loading>
+          <Button.Spinner />
+          Save
+        </Button.Root>,
+      );
+      expect(container.querySelectorAll(`.${styles.spinner}`)).toHaveLength(1);
+    });
+
+    it("accepts size xs", () => {
+      render(<Button.Root size="xs">Tiny</Button.Root>);
+      expect(screen.getByRole("button", { name: "Tiny" })).toHaveAttribute("data-size", "xs");
+    });
   });
 });

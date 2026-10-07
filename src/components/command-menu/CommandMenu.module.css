@@ -1,321 +1,413 @@
-/* Палитра команд: панель сверху экрана */
+/* ─── CommandMenu ────────────────────────────────────────────────────────────
+ * Modal-level search palette: search row on top (hairline below), scrolling list of
+ * sections, footer with key hints (hairline above). Items follow the floating panel recipe.
+ */
+
+/* Top-aligned palette: the list grows downwards, the search row never jumps. */
 .dialogOverlay {
-  /* Перебиваем Modal overlay (grid + place-items: center), иначе панель не сжимается по ширине вьюпорта (min-width: auto у grid-item). */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: var(--prime-sys-spacing-x5);
-  padding-bottom: max(
-    var(--prime-sys-size-control-m-buttonPaddingY),
-    env(safe-area-inset-bottom, 0)
-  );
-  padding-left: max(var(--prime-sys-size-control-m-buttonPaddingX), env(safe-area-inset-left, 0));
-  padding-right: max(var(--prime-sys-size-control-m-buttonPaddingX), env(safe-area-inset-right, 0));
-  /* Прокрутка — ScrollContainer (классы в CommandMenuDialog overlayClassName) */
+  padding-block-start: clamp(var(--prime-modal-viewport-padding), 12vh, var(--prime-space-24));
+  padding-block-end: max(var(--prime-modal-viewport-padding), env(safe-area-inset-bottom, 0px));
+  padding-inline: max(var(--prime-modal-viewport-padding), env(safe-area-inset-left, 0px));
 }
 
-.dialogContent {
+/* `.root` дублирует класс, чтобы перебить отступы/сетку `Modal.Content` без зависимости от порядка CSS. */
+.dialogContent.root[role="dialog"] {
+  --cm-width: var(--prime-modal-width-l);
+  --cm-max-height: calc(var(--prime-panel-max-height) * 1.5);
+
   box-sizing: border-box;
+  display: flex;
+  /* Hug the results: `.root` grows inside the overlay column otherwise and leaves an empty sheet. */
+  flex: 0 1 auto;
+  flex-direction: column;
+  gap: 0;
+  width: min(100%, var(--cm-width));
   min-width: 0;
   max-width: 100%;
-  width: min(100%, var(--prime-sys-unit-45rem));
-  max-height: min(88vh, var(--prime-sys-unit-44rem));
+  max-height: min(var(--cm-max-height), calc(100dvh - 2 * var(--prime-modal-viewport-padding)));
   padding: 0;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
-  gap: 0;
-  background: var(--prime-sys-color-surface-elevated);
-  border-radius: var(--prime-sys-size-modal-radius);
-  box-shadow: var(--prime-sys-elevation-shadow-modal);
+  border-radius: var(--prime-modal-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-modal);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  /* Fields inside a raised surface stay distinguishable (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 }
 
-/*
- * Внутренний контент модалки добавляет класс .content из Modal.module.css (padding, gap, display: grid).
- * Специфичность выше, чем у одного `.dialogContent`, из‑за чего визуально появляется «вторая оболочка»
- * с отступом ~var(--prime-sys-unit-16px). Комбинируем с role на том же узле.
- */
-.dialogContent[role="dialog"] {
-  padding: 0;
-  gap: 0;
-  display: flex;
-  flex-direction: column;
-  /* Перебиваем width/border-radius из Modal `.content` (та же проблема специфичности). */
-  box-sizing: border-box;
-  min-width: 0;
-  max-width: 100%;
-  width: min(100%, var(--prime-sys-unit-45rem));
-  border-radius: var(--prime-sys-size-modal-radius);
+/* Tier variables (Dialog `size`); `display: contents` keeps the panel's flex column intact. */
+.tier {
+  --cm-item-h: var(--prime-control-m-item-height);
+  --cm-text: var(--prime-control-m-text-size);
+  --cm-lh: var(--prime-control-m-line-height);
+  --cm-icon: var(--prime-control-m-icon);
+  --cm-input-h: var(--prime-space-12);
+
+  display: contents;
 }
 
-/* Узкая панель (ограничение max-width) */
-.dialogContentNarrow {
-  width: min(100%, var(--prime-sys-unit-39p5rem));
-  max-width: 100%;
+.tier[data-size="xs"] {
+  --cm-item-h: var(--prime-control-xs-item-height);
+  --cm-text: var(--prime-control-xs-text-size);
+  --cm-lh: var(--prime-control-xs-line-height);
+  --cm-icon: var(--prime-control-xs-icon);
+  --cm-input-h: var(--prime-space-10);
 }
 
-.dialogContent.dialogContentNarrow[role="dialog"] {
-  max-width: 100%;
-  width: min(100%, var(--prime-sys-unit-39p5rem));
+.tier[data-size="s"] {
+  --cm-item-h: var(--prime-control-s-item-height);
+  --cm-text: var(--prime-control-s-text-size);
+  --cm-lh: var(--prime-control-s-line-height);
+  --cm-icon: var(--prime-control-s-icon);
+  --cm-input-h: var(--prime-space-10);
 }
 
-.dialogContentWide {
-  width: min(100%, var(--prime-sys-unit-43p75rem));
-  max-width: 100%;
+.tier[data-size="l"] {
+  --cm-item-h: var(--prime-control-l-item-height);
+  --cm-text: var(--prime-control-l-text-size);
+  --cm-lh: var(--prime-control-l-line-height);
+  --cm-icon: var(--prime-control-l-icon);
+  --cm-input-h: calc(var(--prime-space-12) + var(--prime-space-2));
 }
 
-.dialogContent.dialogContentWide[role="dialog"] {
-  max-width: 100%;
-  width: min(100%, var(--prime-sys-unit-43p75rem));
-}
-
-/* Компактная высота панели */
-.dialogContent.dialogContentTight[role="dialog"] {
-  max-height: min(88vh, var(--prime-sys-unit-27p5rem));
-}
-
-@media (min-width: var(--prime-sys-unit-768px)) {
-  .dialogContent.dialogContentTight[role="dialog"] {
-    height: var(--prime-sys-unit-27p5rem);
-    max-height: min(88vh, var(--prime-sys-unit-27p5rem));
-  }
-}
-
-/* Split: фиксированная высота на широких вьюпортах */
-.dialogContent.dialogContentSplitMd[role="dialog"] {
-  overflow: hidden;
-}
-
-@media (min-width: var(--prime-sys-unit-768px)) {
-  .dialogContent.dialogContentSplitMd[role="dialog"] {
-    height: var(--prime-sys-unit-27p5rem);
-    max-height: min(88vh, var(--prime-sys-unit-27p5rem));
-  }
+.tier[data-size="xl"] {
+  --cm-item-h: var(--prime-control-xl-item-height);
+  --cm-text: var(--prime-control-xl-text-size);
+  --cm-lh: var(--prime-control-xl-line-height);
+  --cm-icon: var(--prime-control-xl-icon);
+  --cm-input-h: calc(var(--prime-space-12) + var(--prime-space-2));
 }
 
 .root {
+  /* One content column for the whole palette: header text, search icon, scope chips, group
+     headings and item icons all start at 16 (list padding 8 + item padding 8). */
+  --cm-inset: calc(var(--prime-space-2) + var(--prime-panel-item-padding-x));
+
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  flex: 1;
 }
 
+/* ─── Optional visible title / description (above the search row) ───────── */
+
+.dialogTitle,
+.dialogDescription {
+  padding-inline: var(--cm-inset);
+}
+
+.dialogTitle {
+  padding-block: var(--prime-space-5) var(--prime-space-2);
+}
+
+.dialogTitle:has(+ .dialogDescription) {
+  padding-block-end: 0;
+}
+
+.dialogDescription {
+  padding-block: var(--prime-space-1) var(--prime-space-2);
+}
+
+/* ─── Search row ─────────────────────────────────────────────────────────── */
+
 .inputRow {
+  box-sizing: border-box;
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: var(--prime-sys-spacing-x2);
-  box-sizing: border-box;
+  /* Same icon → text gap as the item rows, so the query lines up with item labels. */
+  gap: var(--prime-space-3);
   width: 100%;
-  min-height: var(--prime-sys-unit-3rem);
+  min-height: var(--cm-input-h);
   padding-block: 0;
-  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
-  background: var(--prime-sys-color-surface-elevated);
-  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-}
-
-.inputRowComfortable {
-  min-height: var(--prime-sys-unit-3p5rem);
-  gap: var(--prime-sys-spacing-x3);
+  padding-inline: var(--cm-inset);
+  border-bottom: var(--prime-border-width) solid var(--prime-color-border-faint);
 }
 
 .inputIcon {
   flex-shrink: 0;
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
-  color: var(--prime-sys-color-content-muted);
-  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  width: var(--prime-icon-m);
+  height: var(--prime-icon-m);
+  color: var(--prime-color-text-muted);
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* The search row sets data-focus-ring="false" (foundation §7: the caret is the indicator);
+   the inset ring below applies only if a consumer turns it back on. */
+.inputRow:first-child {
+  border-start-start-radius: var(--prime-modal-radius);
+  border-start-end-radius: var(--prime-modal-radius);
+}
+
+.inputRow:not([data-focus-ring="false"]):has(.input:focus-visible) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
 .inputRow:focus-within .inputIcon {
-  color: var(--prime-sys-color-content-secondary);
+  color: var(--prime-color-text-secondary);
 }
 
 .input {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
-  border: none;
+  height: 100%;
+  min-height: var(--prime-control-l-height);
+  padding: 0;
+  border: 0;
   background: transparent;
-  color: var(--prime-sys-color-content-primary);
-  font-size: var(--prime-sys-size-control-m-text);
-  line-height: var(--prime-sys-typography-body-lineHeight);
+  color: var(--prime-color-text-primary);
+  font-family: inherit;
+  font-size: var(--prime-text-body-l-size);
+  line-height: var(--prime-text-body-l-line-height);
   outline: none;
-  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  appearance: none;
+}
+
+.input::-webkit-search-cancel-button {
+  appearance: none;
 }
 
 .input::placeholder {
-  color: var(--prime-sys-color-content-muted);
-  transition: color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  color: var(--prime-color-text-placeholder);
 }
 
-.inputRow:hover .input::placeholder {
-  color: var(--prime-sys-color-content-secondary);
+/* ─── List / groups ─────────────────────────────────────────────────────── */
+
+/* Filtered-out rows and groups: `hidden` must win over `display: flex`. */
+.item[hidden],
+.group[hidden] {
+  display: none;
 }
 
 .list {
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  /* Прокрутка — ScrollContainer */
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
+  gap: var(--prime-space-1);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--prime-space-2);
 }
 
 .group {
-  position: relative;
-  padding: var(--prime-sys-spacing-x2) var(--prime-sys-spacing-x2);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.groupFlush {
-  padding: 0;
-}
-
-.groupHeading {
-  font-size: var(--prime-sys-size-control-s-supportText);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  line-height: var(--prime-sys-typography-lineHeightScale-s);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--prime-sys-color-content-secondary);
-  margin: 0 0 var(--prime-sys-spacing-x2);
-  padding: var(--prime-sys-spacing-x2) var(--prime-sys-size-control-m-buttonPaddingX) 0;
-}
-
-/* Заголовок из JSX (иконки, счётчики) — без uppercase */
+.groupHeading,
 .groupHeadingRich {
-  margin: 0 0 var(--prime-sys-spacing-x2);
-  padding: var(--prime-sys-spacing-x2) var(--prime-sys-size-control-m-buttonPaddingX) 0;
-  font-size: var(--prime-sys-size-control-m-text);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-content-primary);
-  font-weight: var(--prime-sys-typography-weight-regular);
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.item {
-  --cm-item-gap: var(--prime-sys-size-control-s-gap);
-  --cm-item-radius: var(--prime-sys-size-control-s-radius);
-  --cm-item-text: var(--prime-sys-size-control-s-text);
-  --cm-item-icon: var(--prime-sys-size-control-s-icon);
-
   display: flex;
   align-items: center;
-  gap: var(--cm-item-gap);
-  border-radius: var(--cm-item-radius);
-  background: transparent;
-  color: var(--prime-sys-color-content-primary);
-  font-size: var(--cm-item-text);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  cursor: pointer;
-  border: none;
+  gap: var(--prime-space-2);
+  min-height: var(--prime-panel-group-label-height);
+  padding-inline: var(--prime-panel-item-padding-x);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
+
+/* ─── Item ───────────────────────────────────────────────────────────────── */
+
+.item {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--prime-space-3);
   width: 100%;
-  text-align: left;
+  min-height: var(--cm-item-h);
+  margin: 0;
+  padding-block: var(--prime-space-1);
+  padding-inline: var(--prime-panel-item-padding-x);
+  border: 0;
+  border-radius: var(--prime-panel-item-radius);
+  background: transparent;
+  color: var(--prime-color-text-primary);
   font-family: inherit;
-  padding-block: var(--prime-sys-spacing-x2);
-  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
-  transition:
-    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-.item[data-size="m"] {
-  --cm-item-gap: var(--prime-sys-size-control-m-gap);
-  --cm-item-radius: var(--prime-sys-size-control-m-radius);
-  --cm-item-text: var(--prime-sys-size-control-m-text);
-  --cm-item-icon: var(--prime-sys-size-control-m-icon);
-
-  padding-block: var(--prime-sys-spacing-x3);
-  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
-}
-
-.item:not([data-disabled="true"]):hover {
-  background: var(--prime-sys-color-surface-default);
+  font-size: var(--cm-text);
+  line-height: var(--cm-lh);
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .item[data-selected="true"] {
-  background: var(--prime-sys-color-surface-default);
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.item:active:not([data-disabled="true"]) {
+  background: var(--prime-color-fill-muted);
 }
 
 .item[data-disabled="true"] {
-  opacity: 0.5;
+  color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }
 
-.itemAlignStart {
-  align-items: flex-start;
-}
-
 .itemIcon {
-  flex-shrink: 0;
-  width: var(--cm-item-icon);
-  height: var(--cm-item-icon);
-  color: var(--prime-sys-color-content-secondary);
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  width: var(--cm-icon);
+  height: var(--cm-icon);
+  color: var(--prime-color-text-muted);
 }
 
-.footer {
+.item[data-selected="true"] .itemIcon {
+  color: var(--prime-color-text-secondary);
+}
+
+.item[data-disabled="true"] .itemIcon {
+  color: var(--prime-color-text-disabled);
+}
+
+.itemText {
   display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.itemLabel,
+.itemDescription {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemDescription {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
+
+.itemShortcut {
   flex-shrink: 0;
-  flex-wrap: wrap;
+  margin-inline-start: auto;
+  color: var(--prime-color-text-muted);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Empty ─────────────────────────────────────────────────────────────── */
+
+.empty {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-sys-size-control-m-gap);
-  min-height: var(--prime-sys-unit-3rem);
-  padding: var(--prime-sys-spacing-x3) var(--prime-sys-size-control-m-buttonPaddingX);
-  background: var(--prime-sys-color-surface-elevated);
-  border-top: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  justify-content: center;
+  gap: var(--prime-space-1);
+  padding: var(--prime-space-10) var(--prime-space-4);
+  text-align: center;
 }
 
-.footerDense {
-  min-height: var(--prime-sys-unit-3p5rem);
-  padding-block: var(--prime-sys-spacing-x3);
+.emptyText {
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
 }
 
-.footerMuted {
-  background: var(--prime-sys-color-surface-default);
+.emptyHint {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
 }
 
-/* Подсказки клавиш в футере — реализованы через Badge (см. CommandMenuFooterKeyBox). */
-.footerKeyBadge {
-  flex-shrink: 0;
-}
-
-.footerHint {
-  font-size: var(--prime-sys-size-control-s-supportText);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-content-secondary);
-}
+/* ─── Tags section under the search row ─────────────────────────────────── */
 
 .tagSection {
+  display: flex;
   flex-shrink: 0;
-  padding: var(--prime-sys-spacing-x3) var(--prime-sys-size-control-m-buttonPaddingX);
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  padding: var(--prime-space-3) var(--cm-inset);
+  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
 .tagSectionLabel {
-  margin: 0 0 var(--prime-sys-spacing-x3);
-  font-size: var(--prime-sys-size-control-s-supportText);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  color: var(--prime-sys-color-content-secondary);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
 }
 
 .tagRow {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-space-2);
 }
 
-/* Действие справа в пункте — появляется при hover / выделении */
-.itemAction {
-  opacity: 0;
-  transition: opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+/* ─── Footer with key hints ─────────────────────────────────────────────── */
+
+.footer {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2) var(--prime-space-4);
+  min-height: var(--prime-space-10);
+  padding: var(--prime-space-2) var(--cm-inset);
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
 }
 
-.item:hover .itemAction,
-.item:focus-visible .itemAction,
-.item[data-selected="true"] .itemAction {
-  opacity: 1;
+.footerHintItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+.footerHint {
+  padding-inline-start: var(--prime-space-1);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+}
+
+/* Key cap: badge s tier, soft fill, tabular digits. */
+.key {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--prime-badge-s-height);
+  height: var(--prime-badge-s-height);
+  padding-inline: var(--prime-space-1);
+  border-radius: var(--prime-badge-s-radius);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--prime-badge-s-text-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.key[data-variant="ghost"] {
+  background: transparent;
+  color: var(--prime-color-text-muted);
+}
+
+.key svg {
+  width: var(--prime-badge-s-icon);
+  height: var(--prime-badge-s-icon);
 }

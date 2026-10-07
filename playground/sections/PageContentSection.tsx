@@ -1,7 +1,18 @@
+import PageContentReadableExample from "@/components/page-content/examples/readable";
+import readableSource from "@/components/page-content/examples/readable.tsx?raw";
+import PageContentSettingsPageExample from "@/components/page-content/examples/settings-page";
+import settingsSource from "@/components/page-content/examples/settings-page.tsx?raw";
+import PageContentWidthsExample from "@/components/page-content/examples/widths";
+import widthsSource from "@/components/page-content/examples/widths.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
+import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 
 const rootRows: PlaygroundApiPropRow[] = [
   {
@@ -141,6 +152,24 @@ const descriptionRows: PlaygroundApiPropRow[] = [
   },
 ];
 
+const actionsRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Кнопки страницы (зазор 8 px). Справа от заголовка, пока ему хватает места; иначе под ним.",
+  },
+  {
+    prop: "className / …rest",
+    type: "React.HTMLAttributes<HTMLDivElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Атрибуты нативного div.",
+  },
+];
+
 const bodyRows: PlaygroundApiPropRow[] = [
   {
     prop: "className",
@@ -171,22 +200,57 @@ export default function PageContentSection() {
       <PageContent.Header>
         <PageContent.Title>PageContent</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Семантическая разметка контентной колонки: <code>PageContent.Section</code> (регион
-              страницы без собственных внешних полей к краю колонки), <code>PageContent.Root</code>{" "}
-              (<code>maxWidth</code> и структура шапки/тела; краевые поля колонки даёт{" "}
-              <code>AppShell.Main</code> в составе <code>AppShell.Template</code>),{" "}
-              <code>Title</code> → <code>&lt;h1&gt;</code>, <code>Description</code> с{" "}
-              <code>measure=&quot;readable&quot; | &quot;full&quot;</code>, <code>Body</code>. Поля
-              у контентной колонки — в ките (<code>AppShell.Template</code>), без дублирующей
-              обёртки в плейграунде.
-            </>
-          }
+          Разметка страницы внутри <code>AppShell.Main</code>: <code>Section</code> или{" "}
+          <code>Root</code> (с <code>maxWidth</code>), шапка с <code>Title</code> (
+          <code>&lt;h1&gt;</code>, heading-m), <code>Description</code> и <code>Actions</code>,
+          затем <code>Body</code>. Шапка → тело — 32 px, блоки тела — 40 px. Своих полей к краю
+          колонки у PageContent нет — их задаёт <code>AppShell.Main</code>.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Страница настроек</DemoSectionTitle>
+            <DemoDescription>
+              <code>PageContent.Actions</code> внутри <code>Header</code> стоят справа от заголовка
+              и переносятся под него на узкой колонке (без брейкпоинтов). Карточки в{" "}
+              <code>Body</code> идут с шагом 40 px. Фон рамки имитирует <code>AppShell.Main</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={settingsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <PageContentSettingsPageExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Колонка для чтения</DemoSectionTitle>
+            <DemoDescription>
+              <code>PageContent.Root maxWidth=&quot;readable&quot;</code> держит строку около 65
+              знаков; <code>Description</code> по умолчанию тоже в мере чтения.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={readableSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <PageContentReadableExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Ширина колонки</DemoSectionTitle>
+            <DemoDescription>
+              <code>maxWidth</code> на <code>PageContent.Root</code>: <code>full</code> (по
+              умолчанию) — вся ширина <code>main</code>, <code>wide</code> — не шире{" "}
+              <code>--prime-layout-content-max-width</code>, <code>readable</code> — мера чтения.
+              Разница видна на широком экране.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={widthsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <PageContentWidthsExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>PageContent.Root</DemoApiTitle>
@@ -199,6 +263,8 @@ export default function PageContentSection() {
             <PlaygroundApiTable rows={titleRows} />
             <DemoApiTitle>PageContent.Description</DemoApiTitle>
             <PlaygroundApiTable rows={descriptionRows} />
+            <DemoApiTitle>PageContent.Actions</DemoApiTitle>
+            <PlaygroundApiTable rows={actionsRows} />
             <DemoApiTitle>PageContent.Body</DemoApiTitle>
             <PlaygroundApiTable rows={bodyRows} />
           </div>

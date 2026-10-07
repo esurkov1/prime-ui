@@ -1,7 +1,16 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import ScrollContainerBothAxesExample from "@/components/scroll-container/examples/both-axes";
+import bothAxesSource from "@/components/scroll-container/examples/both-axes.tsx?raw";
+import ScrollContainerListExample from "@/components/scroll-container/examples/list";
+import listSource from "@/components/scroll-container/examples/list.tsx?raw";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
+import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 
 const rootRows: PlaygroundApiPropRow[] = [
   {
@@ -19,27 +28,11 @@ const rootRows: PlaygroundApiPropRow[] = [
     description: "Ось прокрутки: только по Y, только по X или обе.",
   },
   {
-    prop: "touch",
-    type: "boolean",
-    defaultValue: "true",
-    required: "Нет",
-    description:
-      "Включает -webkit-overflow-scrolling: touch (удобно для вложенных скроллов на iOS).",
-  },
-  {
     prop: "overscrollBehavior",
     type: '"auto" | "contain" | "none"',
     defaultValue: '"contain"',
     required: "Нет",
     description: "Значение overscroll-behavior (вложенные панели — обычно contain).",
-  },
-  {
-    prop: "flexItem",
-    type: "boolean",
-    defaultValue: "true",
-    required: "Нет",
-    description:
-      "min-height/min-width: 0 — чтобы скролл работал внутри flex/grid без переполнения.",
   },
   {
     prop: "className",
@@ -70,18 +63,42 @@ export default function ScrollContainerSection() {
       <PageContent.Header>
         <PageContent.Title>ScrollContainer</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Обёртка с едиными правилами прокрутки: ось, overscroll, touch и flex-item.
-              Используется внутри <code>AppShell.Main</code>, панелей Dropdown/Select/Popover, теле
-              Drawer, вьюпорте DataTable, списке Command Menu и оверлее Command Menu. Отдельных
-              превью в разделе примеров нет — это инфраструктурный узел.
-            </>
-          }
+          Область прокрутки с тонким скроллбаром и едиными правилами: ось,{" "}
+          <code>overscroll-behavior</code> и всегда <code>min-width/min-height: 0</code>, чтобы
+          сжиматься внутри flex/grid. На ней построены тело Modal и Drawer, панели Select, Dropdown
+          и Popover, список CommandMenu и вьюпорт DataTable.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Вертикальная и горизонтальная прокрутка</DemoSectionTitle>
+            <DemoDescription>
+              Слева список в карточке фиксированной высоты: прокрутка сжимается внутри flex-колонки,{" "}
+              <code>overscrollBehavior=&quot;contain&quot;</code> не прокручивает страницу в конце
+              списка. Справа — <code>axis=&quot;horizontal&quot;</code> для ленты фильтров.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={listSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ScrollContainerListExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Две оси и передача прокрутки</DemoSectionTitle>
+            <DemoDescription>
+              <code>axis=&quot;both&quot;</code> — широкая сетка прокручивается по X и Y.{" "}
+              <code>overscrollBehavior=&quot;auto&quot;</code> — в конце списка прокрутка переходит
+              странице (по умолчанию <code>contain</code> её останавливает).
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={bothAxesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <ScrollContainerBothAxesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>ScrollContainer</DemoApiTitle>

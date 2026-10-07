@@ -1,43 +1,49 @@
+/*
+ * Documentation frame: a contained block with its own fill, so it reads on any page background
+ * (canvas or surface, both themes). The chrome is the sunken wash with a hairline ring; the
+ * preview stage and the code pane are inset wells with concentric radii
+ * (radius-xl 16 − padding 4 = radius-l 12).
+ */
 .root {
+  /* Fields in the toolbar sit on a wash. The stage resets this through its own data-theme. */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  --frame-padding: var(--prime-space-1);
+
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  border-radius: var(--prime-sys-shape-radius-4xl);
-  background: var(--prime-sys-color-surface-elevated);
-  overflow: hidden;
-  text-align: start;
-  /* Иначе длинные строки кода раздувают раскладку и вылезают за родителя playground. */
   min-width: 0;
   max-width: 100%;
+  padding: 0 var(--frame-padding) var(--frame-padding);
+  overflow: hidden;
+  border-radius: var(--prime-radius-xl);
+  background: var(--prime-color-bg-sunken);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
+  color: var(--prime-color-text-primary);
+  text-align: start;
 }
 
-/* Сжатие и прокрутка панелей превью/кода в колонке flex */
+/* Long code lines must not widen the playground column. */
 .root > * {
   min-width: 0;
 }
 
 /*
- * Тулбар: одна строка, пока помещается; при нехватке места — перенос (flex-wrap).
- * Первая группа — по ширине контента; сегмент устройств прижат вправо (margin-left: auto)
- * и забирает остаток строки (flex-grow). На отдельной строке после переноса — растягивается
- * на всю ширину (единственный flex-grow на линии).
- * Без фиксированных @media/@container: только intrinsic wrap.
+ * Toolbar: one line while it fits, wraps otherwise. The pane switch keeps its content width;
+ * the device switch is pushed to the end and takes the rest of the line after a wrap.
  */
 .toolbar {
-  flex-shrink: 0;
+  container-type: inline-size;
   display: flex;
-  flex-direction: row;
+  flex-shrink: 0;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
-  row-gap: var(--prime-sys-spacing-x3);
-  column-gap: var(--prime-sys-spacing-x3);
-  padding: var(--prime-sys-spacing-x3) var(--prime-sys-spacing-x4);
-  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  background: var(--prime-sys-color-surface-raised);
+  gap: var(--prime-space-3);
   min-width: 0;
-  container-type: inline-size;
+  /* Controls sit 12 from the frame edge: frame padding 4 + toolbar padding 8. */
+  padding: var(--prime-space-3) var(--prime-space-2) var(--prime-space-2);
 }
 
 .toolbarLine1 {
@@ -47,7 +53,7 @@
   align-items: center;
   flex: 0 1 auto;
   min-width: 0;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-space-2);
 }
 
 .toolbarLine1End {
@@ -55,7 +61,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-space-2);
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -80,7 +86,7 @@
   min-width: 0;
 }
 
-@container (max-width: 44rem) {
+@container (max-width: 639px) {
   .toolbarLine1 {
     flex: 1 1 100%;
     width: 100%;
@@ -97,88 +103,107 @@
     margin-left: 0;
   }
 
+  /* Stretched groups share the width equally, like `fullWidth`. */
   .toolbarPaneSegment :global([role="radio"]),
   .toolbarViewportSegment :global([role="radio"]) {
+    flex: 1 1 0;
     min-width: 0;
   }
 }
 
+/* Phone-width frame: device labels would be cut to «Деск…»; keep icons, labels stay for screen readers. */
+@container (max-width: 399px) {
+  .viewportLabel {
+    position: absolute;
+    width: var(--prime-border-width);
+    height: var(--prime-border-width);
+    margin: calc(-1 * var(--prime-border-width));
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
 .previewShell {
-  padding: var(--prime-sys-spacing-x4);
-  background: var(--prime-sys-color-surface-default);
+  min-width: 0;
 }
 
 .previewViewport {
-  margin-inline: auto;
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  transition: max-width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  margin-inline: auto;
+  transition: max-width var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 .previewViewport[data-viewport="desktop"] {
   max-width: none;
 }
 
+/* 768px tablet and 384px phone, expressed on the spacing scale. */
 .previewViewport[data-viewport="tablet"] {
-  max-width: var(--prime-sys-unit-48rem);
+  max-width: calc(var(--prime-space-24) * 8);
 }
 
 .previewViewport[data-viewport="mobile"] {
-  max-width: var(--prime-sys-unit-24p375rem);
+  max-width: calc(var(--prime-space-24) * 4);
 }
 
-/* Область превью на всю ширину вьюпорта; контент — через flex + data-preview-layout */
+/* Stage: canvas of the previewed theme; layout via flex + data-preview-layout. */
 .previewInner {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  min-height: var(--prime-sys-unit-10rem);
-  padding: var(--prime-sys-spacing-x4);
-  border-radius: var(--prime-sys-shape-radius-l);
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  background: transparent;
-  /* Обрезка контента шире карточки (широкие группы кнопок, таблицы без своей прокрутки). */
+  min-height: calc(var(--prime-space-20) * 2);
+  padding: var(--prime-space-6) var(--prime-space-4);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-bg-canvas);
+  /* The stage paints the canvas, so cards inside are back in the canvas context. */
+  --prime-color-card-bg: var(--prime-color-bg-surface);
+  --prime-card-shadow: var(--prime-shadow-raised);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
+  color: var(--prime-color-text-primary);
+  /* Clip content wider than the card (wide button groups, tables without their own scroll). */
   overflow: hidden;
 }
 
 /*
- * Без align-self: center дочерние элементы получают stretch по умолчанию — при width: fit-content у контролов
- * блок визуально «прилипает» к логическому start.
+ * Without align-self: center children stretch by default — fit-content controls would then
+ * stick to the logical start.
  */
 .previewInner > * {
   align-self: center;
-  margin-inline: auto;
   min-width: 0;
   max-width: 100%;
+  margin-inline: auto;
 }
 
-/* fullWidth в превью: растягиваем прямого ребёнка, содержащего fullWidth */
+/* fullWidth in the preview: stretch the direct child that contains it (a capped child stays centered). */
 .previewInner > *:global(:has([data-full-width="true"])) {
   align-self: stretch;
   width: 100%;
-  margin-inline: 0;
+  margin-inline: auto;
 }
 
-/* Раскладка превью: без лишних обёрток в сниппетах (колонка / ряд). */
+/* Preview layouts: no wrapper divs needed in snippets. */
 .previewInner[data-preview-layout="stack"] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--prime-sys-spacing-x4);
+  gap: var(--prime-space-4);
 }
 
 .previewInner[data-preview-layout="stack"]:global(:has([data-full-width="true"])),
-.previewInner[data-preview-layout="stack-narrow"]:global(:has([data-full-width="true"])),
-.previewInner[data-preview-layout="stack"]:global(:has(.examplePreviewBleed)),
-.previewInner[data-preview-layout="stack-narrow"]:global(:has(.examplePreviewBleed)) {
-  width: 100%;
+.previewInner[data-preview-layout="stack"]:global(:has(.examplePreviewBleed)) {
   align-items: stretch;
+  width: 100%;
   margin-inline: 0;
 }
 
@@ -186,7 +211,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--prime-sys-spacing-x3);
+  gap: var(--prime-space-3);
 }
 
 .previewInner[data-preview-layout="row"] {
@@ -194,8 +219,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: var(--prime-sys-spacing-x3);
-  padding-block: clamp(var(--prime-sys-unit-1p5rem), 4vh, var(--prime-sys-unit-3rem));
+  gap: var(--prime-space-3);
+  padding-block: clamp(var(--prime-space-6), 4vh, var(--prime-space-12));
 }
 
 .previewInner[data-preview-layout="row-start"] {
@@ -203,8 +228,8 @@
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: var(--prime-sys-spacing-x3);
-  padding-block: clamp(var(--prime-sys-unit-1rem), 3vh, var(--prime-sys-unit-2rem));
+  gap: var(--prime-space-3);
+  padding-block: clamp(var(--prime-space-4), 3vh, var(--prime-space-8));
 }
 
 .previewInner[data-preview-layout="row-wrap"] {
@@ -212,72 +237,80 @@
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: center;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-space-2);
 }
 
+/* Row layouts group their children with gap; the auto margins that center a single child would
+   push siblings apart. */
+.previewInner:is(
+  [data-preview-layout="row"],
+  [data-preview-layout="row-start"],
+  [data-preview-layout="row-wrap"]
+)
+> * {
+  margin-inline: 0;
+}
+
+/* Narrow column (forms): the stage stays full width, its content is capped and centered. */
 .previewInner[data-preview-layout="stack-narrow"] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--prime-sys-spacing-x3);
-  box-sizing: border-box;
-  max-width: min(100%, var(--prime-sys-unit-28rem));
-  margin-inline: auto;
+  gap: var(--prime-space-3);
 }
 
 .previewInner[data-preview-layout="dense-stack"] {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: var(--prime-sys-unit-0p35rem);
-  box-sizing: border-box;
-  max-height: var(--prime-sys-unit-22rem);
+  gap: var(--prime-space-1);
   width: 100%;
+  max-height: calc(var(--prime-space-24) * 3 + var(--prime-space-16));
   overflow: auto;
-  padding-right: var(--prime-sys-unit-0p25rem);
+  padding-inline-end: var(--prime-space-1);
 }
 
 .previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),
-.previewInner[data-preview-layout="stack-narrow"] > *:global(:has([data-full-width="true"])),
 .previewInner[data-preview-layout="stack"] > *:global(:has(.examplePreviewBleed)),
-.previewInner[data-preview-layout="stack-narrow"] > *:global(:has(.examplePreviewBleed)),
-.previewInner[data-preview-layout="stack"] > *:global(:has(table)),
-.previewInner[data-preview-layout="stack-narrow"] > *:global(:has(table)) {
+.previewInner[data-preview-layout="stack"] > *:global(:has(table)) {
+  align-self: stretch;
   width: 100%;
   max-width: none;
-  align-self: stretch;
 }
 
-.previewInner[data-preview-layout="stack-narrow"] > * {
-  max-width: 100%;
-}
-
-.previewInner[data-preview-layout="stack"] > *,
-.previewInner[data-preview-layout="stack-narrow"] > * {
+.previewInner[data-preview-layout="stack"] > * {
   flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
 }
 
-.previewInner[data-theme="dark"] {
-  background: transparent;
-  border-color: var(--prime-sys-color-border-subtle);
+.previewInner[data-preview-layout="stack-narrow"] > * {
+  flex: 0 1 auto;
+  align-self: center;
+  width: 100%;
+  min-width: 0;
+  max-width: min(100%, calc(var(--prime-space-16) * 7));
+  margin-inline: auto;
 }
 
-/*
- * Вкладка «Код»: контейнер для `CodeBlock` (подсветка TS/TSX без Shiki).
- */
+/* Code tab: an explicit well (the previewed theme's canvas), same inset and radius as the stage. */
 .codePane {
   box-sizing: border-box;
-  margin: 0;
-  padding: var(--prime-sys-spacing-x4);
-  background: var(--prime-sys-color-surface-default);
   min-width: 0;
   max-width: 100%;
-  max-height: min(var(--prime-sys-unit-32rem), 70vh);
-  overflow-x: auto;
-  overflow-y: auto;
-  font-size: var(--prime-sys-typography-sizeScale-xs);
-  line-height: 1.55;
-  color: var(--prime-sys-color-content-primary);
+  max-height: min(calc(var(--prime-space-16) * 8), 70vh);
+  margin: 0;
+  padding: var(--prime-space-4);
+  overflow: auto;
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-bg-canvas);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-code-size);
+  line-height: var(--prime-text-code-line-height);
+}
+
+.codePane:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }

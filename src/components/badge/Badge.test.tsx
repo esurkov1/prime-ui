@@ -2,12 +2,13 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { IconHouse } from "@/icons";
 import iconStyles from "@/icons/Icon.module.css";
-import type { BadgeColor, BadgeVariant } from "./Badge";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import type { PaletteColor } from "@/internal/states";
 import { Badge } from "./Badge";
 import styles from "./Badge.module.css";
 
-const colorsForMatrix: BadgeColor[] = ["gray", "red", "blue", "green", "orange"];
-const allColors: BadgeColor[] = [
+const colorsForMatrix: PaletteColor[] = ["gray", "red", "blue", "green", "orange"];
+const allColors: PaletteColor[] = [
   "gray",
   "red",
   "blue",
@@ -19,7 +20,7 @@ const allColors: BadgeColor[] = [
   "pink",
   "teal",
 ];
-const pillVariants: BadgeVariant[] = ["filled", "light", "lighter", "stroke"];
+const pillVariants = ["solid", "soft", "outline"] as const;
 
 describe("Badge", () => {
   it("renders", () => {
@@ -29,75 +30,24 @@ describe("Badge", () => {
 
   it.each(colorsForMatrix)("sets data-color=%s", (color) => {
     render(<Badge.Root color={color}>x</Badge.Root>);
-    expect(screen.getByText("x").closest("div")).toHaveAttribute("data-color", color);
+    expect(screen.getByText("x").closest("[data-color]")).toHaveAttribute("data-color", color);
   });
 
   it.each(pillVariants)("sets data-variant=%s", (variant) => {
     render(<Badge.Root variant={variant}>x</Badge.Root>);
-    expect(screen.getByText("x").closest("div")).toHaveAttribute("data-variant", variant);
+    expect(screen.getByText("x").closest("[data-variant]")).toHaveAttribute(
+      "data-variant",
+      variant,
+    );
   });
 
-  it("variant status sets role=status and data-status", () => {
+  it("passes the badge tier to nested Icon via ControlSizeProvider", () => {
     render(
-      <Badge.Root variant="status" status="busy" label="User is busy">
-        Busy
+      <Badge.Root size="xl">
+        <IconHouse data-testid="badge-icon" />
       </Badge.Root>,
     );
-    const el = screen.getByRole("status", { name: "User is busy" });
-    expect(el).toHaveAttribute("data-variant", "status");
-    expect(el).toHaveAttribute("data-status", "busy");
-  });
-
-  it.each(["online", "offline", "away", "busy"] as const)("variant status: data-status=%s", (s) => {
-    render(
-      <Badge.Root variant="status" status={s}>
-        {s}
-      </Badge.Root>,
-    );
-    expect(screen.getByText(s)).toHaveAttribute("data-status", s);
-  });
-
-  it("variant status defaults data-status to online when status omitted", () => {
-    render(<Badge.Root variant="status">On</Badge.Root>);
-    expect(screen.getByText("On")).toHaveAttribute("data-status", "online");
-  });
-
-  it.each(["s", "m", "l", "xl"] as const)("variant status sets data-size=%s", (size) => {
-    render(
-      <Badge.Root variant="status" size={size}>
-        x
-      </Badge.Root>,
-    );
-    expect(screen.getByText("x")).toHaveAttribute("data-size", size);
-  });
-
-  it("variant status passes ControlSizeProvider to children for Icon", () => {
-    const { rerender } = render(
-      <Badge.Root variant="status" size="xl">
-        <IconHouse data-testid="status-icon" />
-      </Badge.Root>,
-    );
-    expect(screen.getByTestId("status-icon")).toHaveClass(iconStyles.sizeXl);
-    rerender(
-      <Badge.Root variant="status" size="s">
-        <IconHouse data-testid="status-icon" />
-      </Badge.Root>,
-    );
-    expect(screen.getByTestId("status-icon")).toHaveClass(iconStyles.sizeS);
-  });
-
-  it("variant status merges className", () => {
-    render(
-      <Badge.Root variant="status" status="offline" className="sb-custom">
-        Off
-      </Badge.Root>,
-    );
-    expect(screen.getByText("Off")).toHaveClass("sb-custom");
-  });
-
-  it.each(["s", "m", "l", "xl"] as const)("sets data-size=%s", (size) => {
-    render(<Badge.Root size={size}>x</Badge.Root>);
-    expect(screen.getByText("x")).toHaveAttribute("data-size", size);
+    expect(screen.getByTestId("badge-icon")).toHaveClass(iconStyles.sizeXl);
   });
 
   it('sets data-disabled="true" when disabled', () => {
@@ -157,16 +107,54 @@ describe("Badge", () => {
     expect(container.querySelector(".custom-dot")).toBeInTheDocument();
   });
 
-  it("defaults: gray, light, m", () => {
+  it("defaults: gray, soft, m", () => {
     render(<Badge.Root>d</Badge.Root>);
     const el = screen.getByText("d");
     expect(el).toHaveAttribute("data-color", "gray");
-    expect(el).toHaveAttribute("data-variant", "light");
+    expect(el).toHaveAttribute("data-variant", "soft");
     expect(el).toHaveAttribute("data-size", "m");
   });
 
   it.each(allColors)("exposes data-color for extended palette: %s", (color) => {
     render(<Badge.Root color={color}>c</Badge.Root>);
     expect(screen.getByText("c")).toHaveAttribute("data-color", color);
+  });
+
+  it("supports size xs", () => {
+    render(<Badge.Root size="xs">9</Badge.Root>);
+    const el = screen.getByText("9");
+    expect(el).toHaveAttribute("data-size", "xs");
+    expect(el).toHaveAttribute("data-tier", "xs");
+  });
+
+  it("inside a control uses the badge tier one step down", () => {
+    render(
+      <ControlSizeProvider value="m">
+        <Badge.Root>ctx</Badge.Root>
+      </ControlSizeProvider>,
+    );
+    const el = screen.getByText("ctx");
+    expect(el).toHaveAttribute("data-size", "m");
+    expect(el).toHaveAttribute("data-tier", "s");
+  });
+
+  it("explicit size wins over context", () => {
+    render(
+      <ControlSizeProvider value="xl">
+        <Badge.Root size="m">own</Badge.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByText("own")).toHaveAttribute("data-tier", "m");
+  });
+
+  it("marks icon-only badges", () => {
+    render(
+      <Badge.Root data-testid="io">
+        <Badge.Icon>
+          <span>i</span>
+        </Badge.Icon>
+      </Badge.Root>,
+    );
+    expect(screen.getByTestId("io")).toHaveAttribute("data-icon-only", "true");
   });
 });

@@ -1,81 +1,55 @@
+/* Layout for the Stepper examples: semantic tokens only. */
+
 .stack {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
+  gap: var(--prime-space-8);
+  width: 100%;
+  min-width: 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+/* 288px. */
+.vertical {
+  width: min(100%, calc(var(--prime-space-24) * 3));
+}
+
+/* 320px. */
+.narrow {
+  width: min(100%, calc(var(--prime-drawer-width-s) - var(--prime-space-10)));
+}
+
+.wizard {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, calc(var(--prime-space-24) * 2.5)), 1fr)
+    );
+  gap: var(--prime-space-6) var(--prime-space-8);
+  width: min(100%, calc(var(--prime-modal-width-l) + var(--prime-space-12)));
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-5);
+  min-width: 0;
 }
 
 .actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-m);
-}
-
-.rail {
-  width: 100%;
-  max-width: min(100%, 36rem);
-}
-
-.stackLoose {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x8);
-}
-
-.stackCompact {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
-}
-
-.horizontalRailMd {
-  width: 100%;
-  max-width: min(100%, 28rem);
-}
-
-.horizontalRailXl {
-  width: 100%;
-  max-width: min(100%, 36rem);
-}
-
-.horizontalRail2xl {
-  width: 100%;
-  max-width: min(100%, 42rem);
-}
-
-.verticalRail {
-  width: 232px;
-  flex-shrink: 0;
-}
-
-.verticalRailNarrow {
-  width: 200px;
-}
-
-.fullWidthCard {
-  width: 100%;
-  max-width: 100%;
-  border: 1px solid var(--prime-sys-color-stroke-subtle);
-  padding: var(--prime-sys-spacing-m);
-}
-
-.stepLabelRow {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  align-items: flex-start;
-  gap: var(--prime-sys-spacing-xs);
-}
-
-.iconMuted {
-  margin-top: 2px;
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-  color: var(--prime-sys-color-content-secondary);
-}
-
-/* Horizontal `Stepper.Root`: override default centered rail for full-width demos */
-.horizontalSpreadRoot {
-  width: 100%;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
 }

@@ -1,0 +1,92 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-14) * 4)), 1fr));
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+.gridWide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-24) * 3)), 1fr));
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+/* Width probes for the container-query demo: 18rem and 40rem. */
+.w18 {
+  width: min(100%, calc(var(--prime-space-24) * 3));
+}
+
+.w40 {
+  width: min(100%, calc(var(--prime-space-20) * 8));
+}
+
+/* 36rem. */
+.panel {
+  width: min(100%, calc(var(--prime-space-24) * 6));
+}
+
+/* Sparkline: fixed height from tokens, stretches to the card width. */
+.spark {
+  display: block;
+  width: 100%;
+  height: var(--prime-space-10);
+  color: var(--prime-color-accent-default);
+  overflow: visible;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  /* Fixed height: a viewBox-only SVG would otherwise scale to a square of the card width. */
+  height: calc(var(--prime-space-24) * 2);
+  color: var(--prime-color-accent-default);
+}
+
+.chartFill {
+  fill: var(--prime-color-accent-soft);
+}
+
+.chartLine {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: calc(2 * var(--prime-border-width));
+  vector-effect: non-scaling-stroke;
+}
+
+.cover {
+  background: linear-gradient(
+    135deg,
+    var(--prime-color-accent-soft) 0%,
+    var(--prime-color-palette-sky-soft) 100%
+  );
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.listMeta {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-5);
+}

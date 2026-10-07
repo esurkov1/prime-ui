@@ -1,31 +1,34 @@
-import { Button, Label, Tooltip } from "prime-ui-kit";
-import type * as React from "react";
-
+/** `delayDuration` per Tooltip.Root: instant, default 400 ms and one second. Set it on Tooltip.Provider for a whole area or on one Root. */
+import { Button, Tooltip } from "prime-ui-kit";
 import styles from "./examples.module.css";
 
-function TooltipDemoItem({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className={styles.demoItem}>
-      <Label.Root size="s">{label}</Label.Root>
-      {children}
-    </div>
-  );
-}
-
-/** `Tooltip.Provider` with `delayDuration={800}` (mirrors `playground/snippets/tooltip/delay.tsx`). */
 export default function TooltipDelayExample() {
   return (
-    <TooltipDemoItem label="Delay 800 ms">
-      <Tooltip.Provider delayDuration={800}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="stroke">
-              Hover me slowly
-            </Button.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content>Appears after 800ms</Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-    </TooltipDemoItem>
+    <div className={styles.row}>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Button.Root variant="soft" tone="neutral">
+            Сразу
+          </Button.Root>
+        </Tooltip.Trigger>
+        <Tooltip.Content>delayDuration=0</Tooltip.Content>
+      </Tooltip.Root>
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <Button.Root variant="soft" tone="neutral">
+            По умолчанию
+          </Button.Root>
+        </Tooltip.Trigger>
+        <Tooltip.Content>400 мс</Tooltip.Content>
+      </Tooltip.Root>
+      <Tooltip.Root delayDuration={1000}>
+        <Tooltip.Trigger>
+          <Button.Root variant="soft" tone="neutral">
+            Через секунду
+          </Button.Root>
+        </Tooltip.Trigger>
+        <Tooltip.Content>delayDuration=1000</Tooltip.Content>
+      </Tooltip.Root>
+    </div>
   );
 }

@@ -1,4 +1,23 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import SelectControlledExample from "@/components/select/examples/controlled";
+import controlledSource from "@/components/select/examples/controlled.tsx?raw";
+import SelectInFormExample from "@/components/select/examples/in-form";
+import inFormSource from "@/components/select/examples/in-form.tsx?raw";
+import SelectMultipleExample from "@/components/select/examples/multiple";
+import multipleSource from "@/components/select/examples/multiple.tsx?raw";
+import SelectNativeExample from "@/components/select/examples/native";
+import nativeSource from "@/components/select/examples/native.tsx?raw";
+import SelectRichOptionsExample from "@/components/select/examples/rich-options";
+import richOptionsSource from "@/components/select/examples/rich-options.tsx?raw";
+import SelectSearchGroupsExample from "@/components/select/examples/search-groups";
+import searchGroupsSource from "@/components/select/examples/search-groups.tsx?raw";
+import SelectSizesExample from "@/components/select/examples/sizes";
+import sizesSource from "@/components/select/examples/sizes.tsx?raw";
+import SelectStatesExample from "@/components/select/examples/states";
+import statesSource from "@/components/select/examples/states.tsx?raw";
+import SelectWithBadgeExample from "@/components/select/examples/with-badge";
+import withBadgeSource from "@/components/select/examples/with-badge.tsx?raw";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,96 +25,156 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import SelectCompositionSnippet from "../snippets/select/composition";
-import compositionSource from "../snippets/select/composition.tsx?raw";
-import SelectControlledSnippet from "../snippets/select/controlled";
-import controlledSource from "../snippets/select/controlled.tsx?raw";
-import SelectFeaturesSnippet from "../snippets/select/features";
-import featuresSource from "../snippets/select/features.tsx?raw";
-import SelectFullWidthSnippet from "../snippets/select/full-width";
-import fullWidthSource from "../snippets/select/full-width.tsx?raw";
-import SelectMultipleSnippet from "../snippets/select/multiple";
-import multipleSource from "../snippets/select/multiple.tsx?raw";
-import SelectNativeSnippet from "../snippets/select/native";
-import nativeSource from "../snippets/select/native.tsx?raw";
-import SelectSizesSnippet from "../snippets/select/sizes";
-import sizesSource from "../snippets/select/sizes.tsx?raw";
-import SelectStatesSnippet from "../snippets/select/states";
-import statesSource from "../snippets/select/states.tsx?raw";
 
 const selectRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description:
-      "Ярус токенов: высота триггера, кегль, отступы, размеры иконок в триггере и списке.",
+    description: "Ярус: высота триггера 28–48, кегль, отступы; пункты списка — того же яруса.",
   },
   {
-    prop: "value",
+    prop: "label",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Подпись над полем; связана с триггером (или нативным select) через htmlFor.",
+  },
+  {
+    prop: "required / optional",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Красная * после подписи и aria-required / приглушённое «необязательно» (labels.optional).",
+  },
+  {
+    prop: "hint",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Подсказка под полем, попадает в aria-describedby.",
+  },
+  {
+    prop: "error",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Текст ошибки на месте подсказки; непустой error включает invalid.",
+  },
+  {
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Ошибка без текста: кольцо danger, aria-invalid, data-invalid.",
+  },
+  {
+    prop: "value / defaultValue",
     type: "string | string[]",
     defaultValue: "—",
     required: "Нет",
-    description:
-      "Одиночный выбор: `string`. При `multiple`: массив `value` выбранных Item (порядок — порядок выбора).",
+    description: "Выбранное значение; при multiple — массив в порядке выбора.",
   },
   {
-    prop: "defaultValue",
-    type: "string | string[]",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Начальное значение, если не передан value (для `multiple` — массив).",
-  },
-  {
-    prop: "onChange",
+    prop: "onValueChange",
     type: "(value: string) => void | (value: string[]) => void",
     defaultValue: "—",
     required: "Нет",
-    description: "После выбора пункта: строка или массив строк в зависимости от `multiple`.",
+    description: 'После выбора или сброса ("" / []); тип зависит от multiple.',
   },
   {
-    prop: "disabled",
-    type: "boolean",
+    prop: "open / defaultOpen / onOpenChange",
+    type: "boolean / boolean / (open: boolean) => void",
     defaultValue: "—",
     required: "Нет",
-    description: "Отключает триггер и открытие списка для всего экземпляра.",
-  },
-  {
-    prop: "placeholder",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Текст в триггере, пока значение не выбрано (data-placeholder у Select.Value).",
-  },
-  {
-    prop: "hasError",
-    type: "boolean",
-    defaultValue: "false",
-    required: "Нет",
-    description: "Визуальная ошибка валидации: обводка триггера (data-has-error).",
-  },
-  {
-    prop: "native",
-    type: "boolean",
-    defaultValue: "false",
-    required: "Нет",
-    description:
-      "Нативный `<select>` с option/optgroup из дерева Item/Group; без триггера и портального listbox.",
+    description: "Открытие списка: контролируемое или нет. Только режим комбобокса.",
   },
   {
     prop: "multiple",
     type: "boolean",
     defaultValue: "false",
     required: "Нет",
-    description: "Мультивыбор: `value`/`onChange` — массивы; список остаётся открытым при выборе.",
+    description: "Мультивыбор: значение — массив, список не закрывается при выборе.",
+  },
+  {
+    prop: "native",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Системный <select>: пункты из Item, группы — optgroup. name и aria-* — на Root.",
+  },
+  {
+    prop: "placeholder",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Текст в триггере без значения (data-placeholder у Select.Value).",
+  },
+  {
+    prop: "clearable",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "× в триггере; Delete/Backspace на триггере тоже очищают.",
+  },
+  {
+    prop: "loading",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Спиннер вместо шеврона, aria-busy, строка labels.loading в панели.",
+  },
+  {
+    prop: "disabled",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Отключает поле целиком.",
+  },
+  {
+    prop: "id",
+    type: "string",
+    defaultValue: "авто",
+    required: "Нет",
+    description: "id триггера или нативного select.",
+  },
+  {
+    prop: "labels",
+    type: "Partial<SelectLabels>",
+    defaultValue: "русские",
+    required: "Нет",
+    description: "search, empty, emptyHint, loading, clear, optional — все системные строки.",
+  },
+  {
+    prop: "focusRing",
+    type: "boolean",
+    defaultValue: "true",
+    required: "Нет",
+    description:
+      'false скрывает только кольцо фокуса (data-focus-ring="false"); фокус, клавиатура и кольцо ошибки остаются.',
+  },
+  {
+    prop: "name / aria-label / aria-labelledby / aria-describedby",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Только при native: атрибуты системного <select> (у него нет Select.Trigger).",
+  },
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Класс обёртки поля (подпись + контрол + подсказка).",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Триггер, портальный список (Select.Content) и вложенные Item/Group.",
+    description: "Trigger и Content (в native — сразу Item/Group).",
   },
 ];
 
@@ -148,6 +227,70 @@ const selectValueApiRows: PlaygroundApiPropRow[] = [
     required: "Нет",
     description: "Класс для текста выбранного значения или подсказки.",
   },
+  {
+    prop: "children",
+    type: "(item: { value: string; label: string }) => React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Только одиночный выбор: рисует выбранный пункт в триггере (ItemMedia / ItemText / ItemDescription). Не вызывается без значения.",
+  },
+];
+
+const selectBadgeApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "color",
+    type: "PaletteColor",
+    defaultValue: '"gray"',
+    required: "Нет",
+    description: "Цвет мягкого бейджа в конце триггера (на ярус ниже поля).",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Да",
+    description: "Текст статуса.",
+  },
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Дополнительный класс бейджа.",
+  },
+];
+
+const selectRichPartsApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "Select.ItemMedia",
+    type: "color?: PaletteColor, children, className",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Плитка слева: иконка или <img>; color — мягкая заливка палитры. Делает пункт двухстрочным.",
+  },
+  {
+    prop: "Select.ItemText",
+    type: "children, className",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Название пункта; его текст — подпись для триггера, typeahead и поиска.",
+  },
+  {
+    prop: "Select.ItemDescription",
+    type: "children, className",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Вторая приглушённая строка; участвует в поиске.",
+  },
+  {
+    prop: "Select.ItemMeta",
+    type: "children, className",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Значение справа перед галочкой (цена, счётчик), табличные цифры.",
+  },
 ];
 
 const selectTriggerIconApiRows: PlaygroundApiPropRow[] = [
@@ -180,14 +323,22 @@ const selectContentApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: 'Класс портального контейнера списка (role="listbox").',
+    description: "Класс портальной панели (поиск + listbox).",
+  },
+  {
+    prop: "searchable",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Поле поиска сверху панели (labels.search); фильтр по подписи и keywords.",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Пункты, группы, разделители; рендерится только пока список открыт.",
+    description:
+      "Пункты, группы, разделители. Остаются смонтированными при закрытом списке — так Select.Value знает подписи.",
   },
 ];
 
@@ -197,7 +348,7 @@ const selectItemApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: "—",
     required: "Да",
-    description: "Значение опции; попадает в onChange Root и в data-value для клавиатуры.",
+    description: "Значение опции; попадает в onValueChange Root и в data-value для клавиатуры.",
   },
   {
     prop: "label",
@@ -206,6 +357,13 @@ const selectItemApiRows: PlaygroundApiPropRow[] = [
     required: "Нет",
     description:
       "Подпись в триггере после выбора; если не задана — из текстовых children или value.",
+  },
+  {
+    prop: "keywords",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Дополнительные слова для поиска (синонимы, латиница, сокращения).",
   },
   {
     prop: "disabled",
@@ -349,13 +507,14 @@ export default function SelectSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Четыре значения <code>size</code> на корне: <code>s</code>, <code>m</code>,{" "}
-              <code>l</code>, <code>xl</code> — высота триггера, кегль и отступы из одного яруса
-              токенов.
+              <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> · <code>xl</code> —
+              28, 32, 36, 40 и 48 px. Триггер выравнивается в одну линию с Button и Input того же
+              размера, пункты списка берут высоту и кегль того же яруса. По умолчанию —{" "}
+              <code>m</code>.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <SelectSizesSnippet />
+                <SelectSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -363,52 +522,124 @@ export default function SelectSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Подсказка без выбора, <code>defaultValue</code>, отключённый корень{" "}
-              <code>disabled</code> и ошибка <code>hasError</code> на <code>Select.Root</code>.
+              Подпись, подсказка и ошибка — пропсы <code>label</code>, <code>hint</code>,{" "}
+              <code>error</code> на <code>Select.Root</code>, как у Input. Плейсхолдер,{" "}
+              <code>clearable</code>, <code>loading</code>, <code>disabled</code> и пустой список
+              (текст — <code>labels.empty</code>). Наведение затемняет заливку поля, фокус и
+              открытие переключают её на <code>field-bg-focus</code> с кольцом фокуса.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <SelectStatesSnippet />
+                <SelectStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Поиск, группы и длинный список</DemoSectionTitle>
+            <DemoDescription>
+              <code>Select.Content searchable</code>: поле поиска сверху панели (плейсхолдер —{" "}
+              <code>labels.search</code>), фильтр по подписи и <code>keywords</code>. Группы с{" "}
+              <code>GroupLabel</code> и <code>Separator</code>, недоступный пункт пропускается
+              стрелками. Длинный список прокручивается внутри панели (
+              <code>--prime-panel-max-height</code>), у края экрана панель переворачивается.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={searchGroupsSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <SelectSearchGroupsExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Мультиселект</DemoSectionTitle>
+            <DemoDescription>
+              <code>Select.Root multiple</code>: значение — массив строк, у пунктов слева чекбокс,
+              список не закрывается после выбора, в триггере подписи через запятую.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={multipleSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <SelectMultipleExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Богатые пункты</DemoSectionTitle>
+            <DemoDescription>
+              <code>Select.ItemMedia</code> — плитка с иконкой или картинкой (<code>color</code>{" "}
+              палитры), <code>Select.ItemText</code> и <code>Select.ItemDescription</code> — две
+              строки, <code>Select.ItemMeta</code> — значение справа перед галочкой. Пункт и триггер
+              растут до двух строк с отступами яруса; триггер рисует выбранный пункт через функцию в{" "}
+              <code>Select.Value</code>. Typeahead — по названию, поиск — по названию и описанию.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={richOptionsSource.trim()}
+              previewLayout="stack-narrow"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <SelectRichOptionsExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Иконки пунктов и бейдж</DemoSectionTitle>
+            <DemoDescription>
+              <code>Select.ItemIcon</code> — иконка перед текстом пункта; <code>Select.Badge</code>{" "}
+              в триггере — мягкий бейдж на ярус ниже поля перед шевроном, его <code>color</code>{" "}
+              следует за выбранным значением.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={withBadgeSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <SelectWithBadgeExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Форма в карточке</DemoSectionTitle>
+            <DemoDescription>
+              Card переключает переменную <code>--prime-color-field-bg</code> на{" "}
+              <code>field-bg-surface</code>. <code>label</code>, <code>required</code>,{" "}
+              <code>optional</code> и <code>hint</code> на Root, иконка в триггере (
+              <code>Select.TriggerIcon</code>) и <code>label</code> пункта: в списке короткий код, в
+              триггере полное название.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={inFormSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <SelectInFormExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>На разных поверхностях</DemoSectionTitle>
+            <DemoDescription>
+              Один и тот же триггер на холсте, в карточке и на плавающем слое — заливка поля берётся
+              из <code>--prime-color-field-bg</code> текущей поверхности.
+            </DemoDescription>
+            <SurfaceGallery>
+              <SelectControlledExample />
+            </SurfaceGallery>
           </div>
 
           <div className="demoBlock">
             <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
             <DemoDescription>
-              Пара <code>value</code> и <code>onChange</code> на <code>Select.Root</code>: выбранное
-              значение хранится в состоянии родителя и отображается под полем.
+              Пара <code>value</code> и <code>onValueChange</code>: значение хранится у родителя.
+              Открытие списка так же контролируется парой <code>open</code> /{" "}
+              <code>onOpenChange</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={controlledSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <SelectControlledSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
-            <DemoDescription>
-              <code>Select.TriggerIcon</code> и <code>Select.ItemIcon</code>; у пунктов задан{" "}
-              <code>label</code> — в триггере длинная подпись, в списке остаётся короткая разметка
-              (например код валюты).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <SelectCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
-            <DemoDescription>
-              Триггер по умолчанию тянется на ширину контейнера (<code>width: 100%</code> в стилях)
-              — в узкой колонке список остаётся по содержимому с ограничением по вьюпорту.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <SelectFullWidthSnippet />
+                <SelectControlledExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -416,43 +647,13 @@ export default function SelectSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Нативный select</DemoSectionTitle>
             <DemoDescription>
-              <code>Select.Root native</code> — нативный <code>&lt;select&gt;</code> с теми же
-              токенами размера; пункты из <code>Select.Item</code> (можно обернуть в{" "}
-              <code>Select.Content</code>
-              ).
+              <code>Select.Root native</code> — системный <code>&lt;select&gt;</code> с теми же
+              токенами размера; пункты из <code>Select.Item</code>, группы становятся{" "}
+              <code>&lt;optgroup&gt;</code>. Удобен на мобильных.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={nativeSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={nativeSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <SelectNativeSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Мультиселект (комбобокс)</DemoSectionTitle>
-            <DemoDescription>
-              <code>Select.Root multiple</code>: <code>value</code> и <code>onChange</code> с
-              массивом строк; пункты переключаются кликом или клавиатурой; список не закрывается
-              после выбора; в триггере подписи через запятую.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={multipleSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <SelectMultipleSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              <code>Select.Group</code>, <code>Select.GroupLabel</code>,{" "}
-              <code>Select.Separator</code>, отключённый пункт, длинный список с прокруткой; панель
-              позиционируется у края экрана и переворачивается при нехватке места (внутренняя логика
-              позиционирования).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <SelectFeaturesSnippet />
+                <SelectNativeExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -477,10 +678,13 @@ export default function SelectSection() {
             <DemoApiTitle>Select.TriggerIcon</DemoApiTitle>
             <DemoDescription>Слот иконки слева от значения в триггере.</DemoDescription>
             <PlaygroundApiTable rows={selectTriggerIconApiRows} />
+            <DemoApiTitle>Select.Badge</DemoApiTitle>
+            <DemoDescription>Статус в триггере перед кнопкой сброса и шевроном.</DemoDescription>
+            <PlaygroundApiTable rows={selectBadgeApiRows} />
             <DemoApiTitle>Select.Content</DemoApiTitle>
             <DemoDescription>
-              Портальный listbox с фокусом и клавиатурной навигацией; не рендерится, пока список
-              закрыт.
+              Портальная панель: необязательный поиск, listbox с клавиатурной навигацией, пустое
+              состояние и статус загрузки.
             </DemoDescription>
             <PlaygroundApiTable rows={selectContentApiRows} />
             <DemoApiTitle>Select.Item</DemoApiTitle>
@@ -491,6 +695,11 @@ export default function SelectSection() {
             <DemoApiTitle>Select.ItemIcon</DemoApiTitle>
             <DemoDescription>Иконка в строке пункта (до текста).</DemoDescription>
             <PlaygroundApiTable rows={selectItemIconApiRows} />
+            <DemoApiTitle>Богатый пункт</DemoApiTitle>
+            <DemoDescription>
+              Части пункта и функции в <code>Select.Value</code>; прямые дети Item.
+            </DemoDescription>
+            <PlaygroundApiTable rows={selectRichPartsApiRows} />
             <DemoApiTitle>Select.Group</DemoApiTitle>
             <DemoDescription>Секция пунктов с role=&quot;group&quot;.</DemoDescription>
             <PlaygroundApiTable rows={selectGroupApiRows} />

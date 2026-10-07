@@ -1,21 +1,91 @@
+import LabelInFormExample from "@/components/label/examples/in-form";
+import labelCompositionSource from "@/components/label/examples/in-form.tsx?raw";
+import LabelMarkersExample from "@/components/label/examples/markers";
+import labelMarkersSource from "@/components/label/examples/markers.tsx?raw";
+import LabelSizesExample from "@/components/label/examples/sizes";
+import labelSizesSource from "@/components/label/examples/sizes.tsx?raw";
+import LabelStatesExample from "@/components/label/examples/states";
+import labelStatesSource from "@/components/label/examples/states.tsx?raw";
+import LabelWithIconExample from "@/components/label/examples/with-icon";
+import labelWithIconSource from "@/components/label/examples/with-icon.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
-import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import LabelCompositionSnippet from "../snippets/label/composition";
-import compositionSource from "../snippets/label/composition.tsx?raw";
-import LabelMixedRequiredOptionalSnippet from "../snippets/label/mixed-required-optional";
-import mixedRequiredOptionalSource from "../snippets/label/mixed-required-optional.tsx?raw";
-import LabelSizesSnippet from "../snippets/label/sizes";
-import labelSizesSource from "../snippets/label/sizes.tsx?raw";
-import LabelStatesSnippet from "../snippets/label/states";
-import labelStatesSource from "../snippets/label/states.tsx?raw";
-import LabelSubLineSnippet from "../snippets/label/sub-line";
-import labelSubLineSource from "../snippets/label/sub-line.tsx?raw";
+
+const labelRootApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "size",
+    type: '"xs" | "s" | "m" | "l" | "xl"',
+    defaultValue: '"m"',
+    required: "Нет",
+    description: "Размер парного поля. Кегль: xs/s 12/16 · m 13/20 · l/xl 14/20, вес 500.",
+  },
+  {
+    prop: "htmlFor",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "id связанного контрола. Для кастомных контролов — id лейбла + aria-labelledby.",
+  },
+  {
+    prop: "required",
+    type: "boolean",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Добавляет красную звёздочку (aria-hidden). Нативный required ставьте на сам контрол.",
+  },
+  {
+    prop: "optional",
+    type: "boolean",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Приглушённая пометка после текста из labels.optional.",
+  },
+  {
+    prop: "labels",
+    type: "Partial<LabelLabels>",
+    defaultValue: '{ optional: "необязательно" }',
+    required: "Нет",
+    description: "Системные строки: текст пометки optional.",
+  },
+  {
+    prop: "disabled",
+    type: "boolean",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Цвет text-disabled для текста и маркеров, aria-disabled.",
+  },
+  {
+    prop: "…rest",
+    type: 'Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size">',
+    defaultValue: "—",
+    required: "Нет",
+    description: "id, className и прочие атрибуты label; ref передаётся на <label>.",
+  },
+];
+
+const labelPartsApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "Label.Sub",
+    type: "HTMLAttributes<HTMLSpanElement>",
+    defaultValue: "—",
+    required: "—",
+    description: "Приглушённое уточнение в той же строке: единицы, контекст.",
+  },
+  {
+    prop: "Label.Icon",
+    type: "HTMLAttributes<HTMLSpanElement>",
+    defaultValue: "—",
+    required: "—",
+    description: "Слот ведущей иконки; передаёт size лейбла в Icon через контекст.",
+  },
+];
 
 export default function LabelSection() {
   return (
@@ -23,13 +93,9 @@ export default function LabelSection() {
       <PageContent.Header>
         <PageContent.Title>Label</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Подпись к полю ввода или другому элементу управления: связь через <code>htmlFor</code>{" "}
-              и <code>id</code>, четыре размера текста, неактивный вид, опционально иконка,
-              звёздочка для обязательных полей и вторая строка пояснения.
-            </>
-          }
+          Название поля формы — нативный <code>&lt;label&gt;</code>. Input, Textarea и Slider рисуют
+          его сами через проп <code>label</code>; отдельный <code>Label</code> нужен над Select,
+          DigitInput и кастомными контролами. Плейсхолдер лейбл не заменяет.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -37,16 +103,27 @@ export default function LabelSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Проп <code>size</code> на <code>Label.Root</code>: <code>s</code>, <code>m</code>,{" "}
-              <code>l</code>, <code>xl</code> — для текста без иконки и для строки с{" "}
-              <code>Label.Icon</code> (иконка подстраивается под тот же размер).
+              Берите тот же <code>size</code>, что у поля. Пары <code>xs</code>/<code>s</code> и{" "}
+              <code>l</code>/<code>xl</code> совпадают по кеглю — различие в высоте самого поля.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={labelSizesSource.trim()}
-              previewLayout="stack-center"
-            >
+            <PlaygroundExampleFrame.Root code={labelSizesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <LabelSizesSnippet />
+                <LabelSizesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Обязательные и необязательные</DemoSectionTitle>
+            <DemoDescription>
+              <code>required</code> добавляет красную <code>*</code>, <code>optional</code> —
+              пометку «необязательно» (текст меняется через <code>labels.optional</code>).{" "}
+              <code>Label.Sub</code> — уточнение в той же строке. В форме отмечайте меньшинство:
+              если почти всё обязательно — помечайте необязательные, и наоборот.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={labelMarkersSource.trim()}>
+              <PlaygroundExampleFrame.Stage>
+                <LabelMarkersExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -54,56 +131,41 @@ export default function LabelSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Обычный лейбл с <code>htmlFor</code>, затем <code>disabled</code> (приглушённый цвет и{" "}
-              <code>aria-disabled</code>), затем маркер обязательности через{" "}
-              <code>Label.Asterisk</code> (отдельный слот, не путать с HTML-атрибутом{" "}
-              <code>required</code> на инпуте).
+              Лейбл не реагирует на наведение и фокус сам — клик по нему фокусирует связанное поле.{" "}
+              <code>disabled</code> приглушает текст вместе со звёздочкой и пометкой.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={labelStatesSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={labelStatesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <LabelStatesSnippet />
+                <LabelStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция с иконкой</DemoSectionTitle>
+            <DemoSectionTitle>С иконкой</DemoSectionTitle>
             <DemoDescription>
-              Слот <code>Label.Icon</code> оборачивает глиф; контекст размера передаётся внутрь для
-              согласованной типографики и иконки.
+              <code>Label.Icon</code> — приглушённая иконка перед текстом в размере лейбла.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={labelWithIconSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <LabelCompositionSnippet />
+                <LabelWithIconExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Дополнительная строка (Sub)</DemoSectionTitle>
+            <DemoSectionTitle>Композиция: форма приглашения</DemoSectionTitle>
             <DemoDescription>
-              <code>Label.Sub</code> — вспомогательный текст под основным названием (единицы,
-              контекст, уточнение без отдельного блока подсказки).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={labelSubLineSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <LabelSubLineSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Обязательность и необязательность</DemoSectionTitle>
-            <DemoDescription>
-              Сочетание <code>Label.Asterisk</code> для обязательного поля и подписи в{" "}
-              <code>Label.Sub</code> для необязательного — типичная пара в одной форме.
+              Встроенные лейблы Input рядом с отдельным <code>Label</code> над Select выглядят
+              одинаково: тот же кегль, отступ до поля <code>--prime-control-m-label-gap</code>.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
-              code={mixedRequiredOptionalSource.trim()}
-              previewLayout="stack"
+              code={labelCompositionSource.trim()}
+              previewLayout="stack-center"
+              surface="canvas"
             >
               <PlaygroundExampleFrame.Stage>
-                <LabelMixedRequiredOptionalSnippet />
+                <LabelInFormExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -111,145 +173,9 @@ export default function LabelSection() {
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Label.Root</DemoApiTitle>
-            <DemoDescription>
-              Корневой <code>&lt;label&gt;</code>: размер, неактивность и контекст для дочерних
-              слотов.
-            </DemoDescription>
-            <PlaygroundApiTable
-              rows={[
-                {
-                  prop: "size",
-                  type: '"s" | "m" | "l" | "xl"',
-                  defaultValue: '"m"',
-                  required: "Нет",
-                  description: "Масштаб текста и отступов; передаётся в контекст для Label.Icon.",
-                },
-                {
-                  prop: "disabled",
-                  type: "boolean",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Визуально приглушает лейбл; data-disabled и aria-disabled.",
-                },
-                {
-                  prop: "htmlFor",
-                  type: "string",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "id связанного элемента управления (нативный for у label).",
-                },
-                {
-                  prop: "className",
-                  type: "string",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Дополнительный CSS-класс корня.",
-                },
-                {
-                  prop: "children",
-                  type: "React.ReactNode",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Текст и вложенные Label.Icon, Label.Asterisk, Label.Sub.",
-                },
-                {
-                  prop: "…rest",
-                  type: 'Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size">',
-                  defaultValue: "—",
-                  required: "Нет",
-                  description:
-                    "Остальные атрибуты нативного label (id, style, onClick, aria-* и т.д.).",
-                },
-              ]}
-            />
-            <DemoApiTitle>Label.Icon</DemoApiTitle>
-            <DemoDescription>
-              Обёртка для иконки рядом с текстом; размер иконки согласуется с <code>size</code> у{" "}
-              <code>Label.Root</code>.
-            </DemoDescription>
-            <PlaygroundApiTable
-              rows={[
-                {
-                  prop: "className",
-                  type: "string",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Дополнительный CSS-класс слота.",
-                },
-                {
-                  prop: "children",
-                  type: "React.ReactNode",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Обычно компонент Icon; размер берётся из родительского Label.Root.",
-                },
-                {
-                  prop: "…rest",
-                  type: "React.HTMLAttributes<HTMLSpanElement>",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Прочие атрибуты обёртки span.",
-                },
-              ]}
-            />
-            <DemoApiTitle>Label.Asterisk</DemoApiTitle>
-            <DemoDescription>
-              Маркер обязательного поля; по умолчанию символ «*», стиль акцентного цвета.
-            </DemoDescription>
-            <PlaygroundApiTable
-              rows={[
-                {
-                  prop: "className",
-                  type: "string",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Дополнительный CSS-класс.",
-                },
-                {
-                  prop: "children",
-                  type: "React.ReactNode",
-                  defaultValue: '"*"',
-                  required: "Нет",
-                  description: "Другой символ или текст вместо звёздочки по умолчанию.",
-                },
-                {
-                  prop: "…rest",
-                  type: "React.HTMLAttributes<HTMLSpanElement>",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Прочие атрибуты обёртки span.",
-                },
-              ]}
-            />
-            <DemoApiTitle>Label.Sub</DemoApiTitle>
-            <DemoDescription>
-              Второстепенная строка под основным названием поля (мельче и вторичный цвет).
-            </DemoDescription>
-            <PlaygroundApiTable
-              rows={[
-                {
-                  prop: "className",
-                  type: "string",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Дополнительный CSS-класс подписи.",
-                },
-                {
-                  prop: "children",
-                  type: "React.ReactNode",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Поясняющий или служебный текст (например «необязательно»).",
-                },
-                {
-                  prop: "…rest",
-                  type: "React.HTMLAttributes<HTMLSpanElement>",
-                  defaultValue: "—",
-                  required: "Нет",
-                  description: "Прочие атрибуты обёртки span.",
-                },
-              ]}
-            />
+            <PlaygroundApiTable rows={labelRootApiRows} />
+            <DemoApiTitle>Части</DemoApiTitle>
+            <PlaygroundApiTable rows={labelPartsApiRows} />
           </div>
         </div>
       </PageContent.Body>

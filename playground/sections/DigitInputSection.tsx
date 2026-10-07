@@ -1,4 +1,17 @@
+import DigitInputControlledExample from "@/components/digit-input/examples/controlled";
+import controlledSource from "@/components/digit-input/examples/controlled.tsx?raw";
+import DigitInputLengthAndCompleteExample from "@/components/digit-input/examples/length-and-complete";
+import featuresSource from "@/components/digit-input/examples/length-and-complete.tsx?raw";
+import DigitInputSizesExample from "@/components/digit-input/examples/sizes";
+import sizesSource from "@/components/digit-input/examples/sizes.tsx?raw";
+import DigitInputStatesExample from "@/components/digit-input/examples/states";
+import statesSource from "@/components/digit-input/examples/states.tsx?raw";
+import DigitInputSurfacesExample from "@/components/digit-input/examples/surfaces";
+import surfacesSource from "@/components/digit-input/examples/surfaces.tsx?raw";
+import DigitInputVerificationStepExample from "@/components/digit-input/examples/verification-step";
+import compositionSource from "@/components/digit-input/examples/verification-step.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,16 +19,6 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import DigitInputCompositionSnippet from "../snippets/digit-input/composition";
-import compositionSource from "../snippets/digit-input/composition.tsx?raw";
-import DigitInputControlledSnippet from "../snippets/digit-input/controlled";
-import controlledSource from "../snippets/digit-input/controlled.tsx?raw";
-import DigitInputFeaturesSnippet from "../snippets/digit-input/features";
-import featuresSource from "../snippets/digit-input/features.tsx?raw";
-import DigitInputSizesSnippet from "../snippets/digit-input/sizes";
-import sizesSource from "../snippets/digit-input/sizes.tsx?raw";
-import DigitInputStatesSnippet from "../snippets/digit-input/states";
-import statesSource from "../snippets/digit-input/states.tsx?raw";
 
 const digitInputRootApiRows: PlaygroundApiPropRow[] = [
   {
@@ -27,54 +30,77 @@ const digitInputRootApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Размер каждой ячейки: высота, радиус, кегль и промежуток из токенов контролов.",
+    description:
+      "Ярус --prime-control-<tier>-*: квадратная ячейка высотой контрола (28 · 32 · 36 · 40 · 48) и промежуток яруса.",
   },
   {
     prop: "value",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description:
-      "Контролируемое значение: остаются только цифры, обрезается до length. Вместе с onChange.",
+    description: "Контролируемое значение: остаются только цифры, обрезается до length.",
   },
   {
     prop: "defaultValue",
     type: "string",
     defaultValue: '""',
     required: "Нет",
-    description: "Начальное значение при неконтролируемом режиме (нормализуется как цифры).",
+    description: "Начальное значение в неконтролируемом режиме (нормализуется до цифр).",
   },
   {
-    prop: "onChange",
+    prop: "onValueChange",
     type: "(value: string) => void",
     defaultValue: "—",
     required: "Нет",
     description: "Вызывается при каждом изменении собранной строки цифр.",
   },
   {
-    prop: "disabled",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Блокирует все ячейки; на корне data-disabled.",
-  },
-  {
-    prop: "hasError",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Стиль ошибки для обводки ячеек; на корне data-has-error.",
-  },
-  {
     prop: "onComplete",
     type: "(value: string) => void",
     defaultValue: "—",
     required: "Нет",
+    description: "Один раз, когда заполнена последняя пустая ячейка.",
+  },
+  {
+    prop: "disabled",
+    type: "boolean",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Блокирует все ячейки: заливка field-bg-disabled, цифры text-disabled.",
+  },
+  {
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "—",
+    required: "Нет",
     description:
-      "Один раз, когда длина строки впервые достигает length (после ввода последней цифры).",
+      "Красное кольцо и цифры, aria-invalid на ячейках. Текст ошибки — в Hint через aria-describedby.",
+  },
+  {
+    prop: "focusRing",
+    type: "boolean",
+    defaultValue: "true",
+    required: "Нет",
+    description:
+      'false ставит data-focus-ring="false" на fieldset и скрывает только кольцо фокуса ячейки; фокус, клавиатура, ARIA и кольцо ошибки остаются.',
+  },
+  {
+    prop: "labels",
+    type: "Partial<DigitInputLabels>",
+    defaultValue: '{ group: "Код", cell: "Цифра {index} из {length}" }',
+    required: "Нет",
+    description:
+      "Доступные имена: group — fieldset (например «Код из SMS»), cell — каждой ячейки ({index} с 1).",
+  },
+  {
+    prop: "aria-describedby",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "id подсказки или ошибки, описывающей группу.",
   },
   {
     prop: "className",
@@ -91,13 +117,9 @@ export default function DigitInputSection() {
       <PageContent.Header>
         <PageContent.Title>DigitInput</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Несколько отдельных полей для посимвольного ввода кода: подходит для PIN, одноразового
-              кода из SMS или ключа восстановления. Цифры можно вставить из буфера — они заполнят
-              ячейки подряд с активной позиции.
-            </>
-          }
+          Ряд квадратных ячеек для кода фиксированной длины: одноразовый код из SMS, PIN, код выдачи
+          заказа. Одна ячейка — одна цифра; вставка из буфера заполняет ячейки подряд, буквы
+          отбрасываются.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -105,13 +127,13 @@ export default function DigitInputSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Четыре ряда с <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-              <code>xl</code>; одинаковая длина <code>length=4</code> и заполненное{" "}
-              <code>defaultValue</code> для сравнения масштаба.
+              <code>xs</code>, <code>s</code>, <code>m</code>, <code>l</code>, <code>xl</code> в
+              одном ряду: сторона ячейки равна высоте Input и Button того же размера, цифры на шаг
+              крупнее текста яруса.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <DigitInputSizesSnippet />
+                <DigitInputSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -119,12 +141,28 @@ export default function DigitInputSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Без флагов, затем <code>hasError</code> (красная обводка) и <code>disabled</code> (все
-              инпуты неактивны).
+              Пустое, частично и полностью заполненное, <code>invalid</code> и <code>disabled</code>
+              . Наведите курсор — заливка ячейки темнеет; нажмите Tab — кольцо фокуса, а содержимое
+              ячейки выделяется, и новая цифра заменяет старую.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <DigitInputStatesSnippet />
+                <DigitInputStatesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Поверхности</DemoSectionTitle>
+            <DemoDescription>
+              Ячейки — поля системы форм: на холсте белые, внутри карточки или поповера заливка
+              переключается на <code>field-bg-surface</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={surfacesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SurfaceGallery className="examplePreviewBleed">
+                  <DigitInputSurfacesExample />
+                </SurfaceGallery>
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -132,12 +170,26 @@ export default function DigitInputSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
             <DemoDescription>
-              Строка кода хранится в состоянии родителя через <code>value</code> и{" "}
-              <code>onChange</code>; подпись показывает текущее значение и счётчик символов.
+              Строка кода живёт в состоянии родителя (<code>value</code> +{" "}
+              <code>onValueChange</code>), поэтому её можно сбросить кнопкой.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <DigitInputControlledSnippet />
+                <DigitInputControlledExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Клавиатура и длина</DemoSectionTitle>
+            <DemoDescription>
+              Цифра переводит фокус вперёд, Backspace в пустой ячейке — назад, стрелки ← и →
+              переходят между ячейками без ввода. <code>onComplete</code> срабатывает один раз,
+              когда заполнена последняя ячейка.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <DigitInputLengthAndCompleteExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -145,28 +197,13 @@ export default function DigitInputSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
-              В форме рядом ставятся <code>Label.Root</code>, <code>DigitInput.Root</code> и{" "}
-              <code>Hint.Root</code>: подпись сверху, подсказка снизу, без встроенных слотов у
-              самого DigitInput.
+              Шаг подтверждения входа: <code>Label.Root</code>, код из шести ячеек и{" "}
+              <code>Hint.Root</code>, который при ошибке получает <code>invalid</code>. Проверка
+              запускается по <code>onComplete</code>.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <DigitInputCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              Разная <code>length</code> и <code>defaultValue</code> в неконтролируемом режиме;{" "}
-              <code>onComplete</code> после ввода последней цифры. Ввод с клавиатуры переводит фокус
-              вперёд; пустая ячейка и Backspace возвращают фокус назад; вставка из буфера
-              распределяет цифры по ячейкам (небуквенные символы отбрасываются).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <DigitInputFeaturesSnippet />
+                <DigitInputVerificationStepExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -175,8 +212,10 @@ export default function DigitInputSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>DigitInput.Root</DemoApiTitle>
             <DemoDescription>
-              Группа ячеек: корень — <code>fieldset</code> с <code>aria-label</code>; внутри — по
-              одному <code>input</code> на цифру, без дополнительных подкомпонентов в публичном API.
+              Корень — <code>fieldset</code> с именем из <code>labels.group</code>; внутри по одному{" "}
+              <code>input</code> на цифру (<code>inputMode=&quot;numeric&quot;</code>,{" "}
+              <code>autoComplete=&quot;one-time-code&quot;</code>). Подпись и подсказку ставьте
+              рядом: Label.Root и Hint.Root.
             </DemoDescription>
             <PlaygroundApiTable rows={digitInputRootApiRows} />
           </div>

@@ -1,0 +1,35 @@
+/** An empty data region: a card with a header and a minimum height where `layout="fill"` stretches the empty state over the remaining height. Use it instead of a table when there are no rows yet. */
+import { PackagePlus } from "lucide-react";
+import { Button, EmptyPage, Typography } from "prime-ui-kit";
+
+import styles from "./examples.module.css";
+
+export default function EmptyPageDataRegionExample() {
+  return (
+    <section className={styles.region} aria-labelledby="orders-region-title">
+      <div className={styles.regionHeader}>
+        <Typography.Root as="h3" variant="title-s" id="orders-region-title">
+          Заказы
+        </Typography.Root>
+        <Button.Root variant="outline" tone="neutral" size="s">
+          Импорт
+        </Button.Root>
+      </div>
+      <EmptyPage.Root layout="fill" aria-labelledby="orders-empty-title">
+        <EmptyPage.Icon tone="accent">
+          <PackagePlus aria-hidden />
+        </EmptyPage.Icon>
+        <EmptyPage.Title id="orders-empty-title">Заказов пока нет</EmptyPage.Title>
+        <EmptyPage.Description>
+          Создайте заказ вручную или подключите магазин — заказы начнут появляться автоматически.
+        </EmptyPage.Description>
+        <EmptyPage.Actions>
+          <Button.Root variant="outline" tone="neutral">
+            Подключить магазин
+          </Button.Root>
+          <Button.Root>Создать заказ</Button.Root>
+        </EmptyPage.Actions>
+      </EmptyPage.Root>
+    </section>
+  );
+}

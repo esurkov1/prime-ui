@@ -1,31 +1,39 @@
+/*
+ * Notification (toast) — Graphite.
+ * Raised card (bg-raised, panel radius, shadow-overlay, no border), status icon, title, description,
+ * optional action and badge, close button, countdown line.
+ */
+
 .viewport {
   position: fixed;
-  z-index: var(--prime-sys-elevation-zIndex-toast);
+  z-index: var(--prime-z-toast);
   inset: 0;
   pointer-events: none;
 }
 
 .zone {
+  --ntf-edge: var(--prime-space-5);
+
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--prime-sys-spacing-x3);
-  width: min(100vw - var(--prime-sys-spacing-x8), var(--prime-sys-unit-26rem));
+  gap: var(--prime-space-3);
+  width: min(100vw - 2 * var(--ntf-edge), calc(var(--prime-space-24) * 4));
   pointer-events: none;
 }
 
 .top {
-  top: var(--prime-sys-spacing-x5);
+  top: var(--ntf-edge);
 }
 
 .bottom {
-  bottom: var(--prime-sys-spacing-x5);
+  bottom: var(--ntf-edge);
   flex-direction: column-reverse;
 }
 
 .left {
-  left: var(--prime-sys-spacing-x5);
+  left: var(--ntf-edge);
 }
 
 .center {
@@ -34,273 +42,327 @@
 }
 
 .right {
-  right: var(--prime-sys-spacing-x5);
+  right: var(--ntf-edge);
 }
 
+@media (max-width: 640px) {
+  .zone {
+    --ntf-edge: var(--prime-space-3);
+  }
+}
+
+/* ---------- Stack ---------- */
+
+/*
+ * Cards are absolutely positioned at the stack's anchor edge. NotificationStore computes each
+ * card's offset / scale / opacity (`--ntf-y`, `--ntf-scale`, `--ntf-opacity`) and the stack height
+ * (`--ntf-stack-height`) from measured card heights; CSS transitions them with the motion tokens.
+ * Enter / exit play as keyframes on the inner `.motion` wrapper, so they never fight the
+ * positioning transform. Durations collapse to 0 under `prefers-reduced-motion` (globals.css).
+ */
 .stack {
   position: relative;
   width: 100%;
-  list-style: none;
+  height: var(--ntf-stack-height);
   margin: 0;
   padding: 0;
+  list-style: none;
   pointer-events: auto;
+  transition: height var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
 }
 
 .item {
-  position: relative;
-  width: 100%;
-}
-
-.item + .item {
-  margin-top: var(--prime-sys-spacing-x2);
-}
-
-.stack[data-expanded="false"] .item {
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
-  margin-top: 0;
+  left: 0;
+  transform: translateY(var(--ntf-y)) scale(var(--ntf-scale));
+  transform-origin: top center;
+  opacity: var(--ntf-opacity);
+  transition:
+    transform var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
 }
 
-.stack[data-expanded="false"] .item[data-stack-index="0"] {
-  position: relative;
-}
-
-/* Bottom zone: стек растёт вверх, новая карточка внизу */
-.bottom .stack {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: var(--prime-sys-spacing-x2);
-}
-
-.bottom .stack .item + .item {
-  margin-top: 0;
-}
-
-/* Bottom collapsed: абсолютные карточки прибиты к низу (где item[0]) */
-.bottom .stack[data-expanded="false"] .item {
+.bottom .item {
   top: auto;
   bottom: 0;
+  transform-origin: bottom center;
 }
 
-/* Padding для видимости peek-карточек (fan-эффект) */
-.top .stack[data-expanded="false"][data-stacked="true"] {
-  padding-bottom: 14px;
+/* Cards beyond the peeking ones and cards playing their exit are click-through. */
+.item[data-hidden="true"],
+.item[data-state="closed"] {
+  pointer-events: none;
 }
 
-.bottom .stack[data-expanded="false"][data-stacked="true"] {
-  padding-top: 14px;
+.motion {
+  /* Enter shift: from the anchor edge, two peek steps. */
+  --ntf-enter-shift: calc(-2 * var(--prime-space-2));
+
+  transform-origin: top center;
 }
+
+.bottom .motion {
+  --ntf-enter-shift: calc(2 * var(--prime-space-2));
+
+  transform-origin: bottom center;
+}
+
+.motion[data-state="open"] {
+  animation:
+    ntfFadeIn var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both,
+    ntfShiftIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;
+}
+
+.motion[data-state="closed"] {
+  animation: ntfExit var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
+}
+
+@keyframes ntfFadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ntfShiftIn {
+  from {
+    translate: 0 var(--ntf-enter-shift);
+    scale: 0.96;
+  }
+}
+
+@keyframes ntfExit {
+  to {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+/* ---------- Card ---------- */
 
 .card {
+  --ntf-accent: var(--prime-color-info-default);
+  --ntf-soft: var(--prime-color-info-soft);
+  --ntf-text: var(--prime-color-info-text);
+  --ntf-pad: var(--prime-space-4);
+  --ntf-gap: var(--prime-space-3);
+  --ntf-icon: var(--prime-control-m-icon);
+  --ntf-title-size: var(--prime-control-m-text-size);
+  --ntf-title-line-height: var(--prime-control-m-line-height);
+  --ntf-desc-size: var(--prime-text-body-s-size);
+  --ntf-desc-line-height: var(--prime-text-body-s-line-height);
+  --ntf-close: var(--prime-control-xs-height);
+  --ntf-close-icon: var(--prime-control-s-icon);
+
+  /* Surface context for fields inside custom content. */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
   position: relative;
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: flex-start;
-  gap: var(--prime-sys-spacing-x2);
+  align-items: start;
+  gap: var(--ntf-gap);
   width: 100%;
-  box-sizing: border-box;
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  border-radius: var(--prime-sys-shape-radius-l);
-  background: var(--prime-sys-color-surface-raised);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  padding: var(--ntf-pad);
   overflow: hidden;
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
 }
 
-.card[data-stack-expanded="false"][data-stack-depth="0"] {
-  box-shadow:
-    var(--prime-sys-elevation-shadow-surface),
-    0 var(--prime-sys-unit-2px) var(--prime-sys-unit-6px)
-    color-mix(in srgb, var(--prime-sys-color-content-primary) 10%, transparent);
-}
-
-.card[data-stack-expanded="false"][data-stack-depth="1"],
-.card[data-stack-expanded="false"][data-stack-depth="2"],
-.card[data-stack-expanded="false"][data-stack-depth="3"],
-.card[data-stack-expanded="false"][data-stack-depth="4"] {
-  box-shadow:
-    var(--prime-sys-elevation-shadow-surface),
-    0 var(--prime-sys-unit-1px) var(--prime-sys-unit-3px)
-    color-mix(in srgb, var(--prime-sys-color-content-primary) 7%, transparent);
+.card[data-size="xs"] {
+  --ntf-pad: var(--prime-space-2);
+  --ntf-gap: var(--prime-space-2);
+  --ntf-icon: var(--prime-control-xs-icon);
+  --ntf-title-size: var(--prime-control-xs-text-size);
+  --ntf-title-line-height: var(--prime-control-xs-line-height);
+  --ntf-desc-size: var(--prime-text-caption-size);
+  --ntf-desc-line-height: var(--prime-text-caption-line-height);
+  --ntf-close: var(--prime-space-5);
+  --ntf-close-icon: var(--prime-control-xs-icon);
 }
 
 .card[data-size="s"] {
-  padding: var(--prime-sys-spacing-x2);
-}
-
-.card[data-size="m"] {
-  padding: var(--prime-sys-spacing-x3);
+  --ntf-pad: var(--prime-space-3);
+  --ntf-gap: var(--prime-space-2);
+  --ntf-icon: var(--prime-control-s-icon);
+  --ntf-title-size: var(--prime-control-s-text-size);
+  --ntf-title-line-height: var(--prime-control-s-line-height);
+  --ntf-desc-size: var(--prime-text-caption-size);
+  --ntf-desc-line-height: var(--prime-text-caption-line-height);
+  --ntf-close: var(--prime-space-6);
+  --ntf-close-icon: var(--prime-control-xs-icon);
 }
 
 .card[data-size="l"] {
-  padding: var(--prime-sys-spacing-x4);
+  --ntf-pad: var(--prime-space-5);
+  --ntf-icon: var(--prime-control-l-icon);
+  --ntf-title-size: var(--prime-control-l-text-size);
+  --ntf-title-line-height: var(--prime-control-l-line-height);
+  --ntf-desc-size: var(--prime-text-body-m-size);
+  --ntf-desc-line-height: var(--prime-text-body-m-line-height);
+  --ntf-close: var(--prime-control-s-height);
 }
 
-.card[data-type="success"] {
-  --notification-accent: var(--prime-sys-color-status-success-backgroundEmphasis);
-  --notification-background-soft: var(--prime-sys-color-status-success-background);
+.card[data-size="xl"] {
+  --ntf-pad: var(--prime-space-6);
+  --ntf-gap: var(--prime-space-4);
+  --ntf-icon: var(--prime-control-xl-icon);
+  --ntf-title-size: var(--prime-control-xl-text-size);
+  --ntf-title-line-height: var(--prime-control-xl-line-height);
+  --ntf-desc-size: var(--prime-text-body-m-size);
+  --ntf-desc-line-height: var(--prime-text-body-m-line-height);
+  --ntf-close: var(--prime-control-s-height);
+  --ntf-close-icon: var(--prime-control-m-icon);
 }
 
-.card[data-type="error"] {
-  --notification-accent: var(--prime-sys-color-status-error-backgroundEmphasis);
-  --notification-background-soft: var(--prime-sys-color-status-error-background);
+.card[data-tone="success"] {
+  --ntf-accent: var(--prime-color-success-default);
+  --ntf-soft: var(--prime-color-success-soft);
+  --ntf-text: var(--prime-color-success-text);
 }
 
-.card[data-type="warning"] {
-  --notification-accent: var(--prime-sys-color-status-warning-backgroundEmphasis);
-  --notification-background-soft: var(--prime-sys-color-status-warning-background);
+.card[data-tone="danger"] {
+  --ntf-accent: var(--prime-color-danger-default);
+  --ntf-soft: var(--prime-color-danger-soft);
+  --ntf-text: var(--prime-color-danger-text);
 }
 
-.card[data-type="info"] {
-  --notification-accent: var(--prime-sys-color-status-information-backgroundEmphasis);
-  --notification-background-soft: var(--prime-sys-color-status-information-background);
+.card[data-tone="warning"] {
+  --ntf-accent: var(--prime-color-warning-default);
+  --ntf-soft: var(--prime-color-warning-soft);
+  --ntf-text: var(--prime-color-warning-text);
 }
 
+/* Cards peeking behind the first one in a collapsed stack: lighter shadow. */
+.card[data-stack-expanded="false"]:not([data-stack-depth="0"]) {
+  box-shadow: var(--prime-shadow-raised);
+}
+
+/* ---------- Slots ---------- */
+
+/* Icon box is as tall as the title line so the glyph centers on the first line. */
 .iconWrap {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--notification-accent);
-  background: var(--notification-background-soft);
-  border-radius: var(--prime-sys-shape-radius-m);
+  height: var(--ntf-title-line-height);
+  color: var(--ntf-accent);
 }
 
-.card[data-size="s"] .iconWrap {
-  width: var(--prime-sys-size-control-s-height);
-  height: var(--prime-sys-size-control-s-height);
-}
-
-.card[data-size="m"] .iconWrap {
-  width: var(--prime-sys-size-control-m-height);
-  height: var(--prime-sys-size-control-m-height);
-}
-
-.card[data-size="l"] .iconWrap {
-  width: var(--prime-sys-size-control-l-height);
-  height: var(--prime-sys-size-control-l-height);
-}
-
+.iconWrap svg,
 .icon {
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
-}
-
-.card[data-size="s"] .icon {
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
-}
-
-.card[data-size="l"] .icon {
-  width: var(--prime-sys-size-control-l-icon);
-  height: var(--prime-sys-size-control-l-icon);
+  display: block;
+  width: var(--ntf-icon);
+  height: var(--ntf-icon);
 }
 
 .content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
   min-width: 0;
-  display: grid;
-  gap: var(--prime-sys-spacing-x1);
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-space-2);
   min-width: 0;
 }
 
 .title {
+  min-width: 0;
   margin: 0;
-  color: var(--prime-sys-color-content-primary);
-  font-weight: var(--prime-sys-typography-weight-medium);
-}
-
-.card[data-size="s"] .title {
-  font-size: var(--prime-sys-size-control-s-text);
-}
-
-.card[data-size="m"] .title {
-  font-size: var(--prime-sys-size-control-m-text);
-}
-
-.card[data-size="l"] .title {
-  font-size: var(--prime-sys-size-control-l-text);
+  font-size: var(--ntf-title-size);
+  line-height: var(--ntf-title-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
 }
 
 .badge {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  min-height: var(--prime-sys-size-badge-s-height);
-  padding-inline: var(--prime-sys-size-badge-s-paddingX);
-  border-radius: var(--prime-sys-size-badge-s-radius);
-  background: var(--notification-background-soft);
-  color: var(--notification-accent);
-  font-size: var(--prime-sys-size-badge-s-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
+  height: var(--prime-badge-xs-height);
+  padding-inline: var(--prime-badge-xs-padding-x);
+  border-radius: var(--prime-badge-xs-radius);
+  background: var(--ntf-soft);
+  color: var(--ntf-text);
+  font-size: var(--prime-badge-xs-text-size);
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
 }
 
 .description {
   margin: 0;
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.card[data-size="s"] .description {
-  font-size: var(--prime-sys-size-control-s-supportText);
-}
-
-.card[data-size="m"] .description {
-  font-size: var(--prime-sys-size-control-m-supportText);
-}
-
-.card[data-size="l"] .description {
-  font-size: var(--prime-sys-size-control-l-supportText);
+  font-size: var(--ntf-desc-size);
+  line-height: var(--ntf-desc-line-height);
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
 }
 
 .actionRow {
-  margin-top: var(--prime-sys-spacing-x1);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-space-2);
+  padding-top: var(--prime-space-2);
 }
 
 .closeButton {
-  flex-shrink: 0;
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--prime-sys-size-control-s-height);
-  height: var(--prime-sys-size-control-s-height);
-  border: none;
-  border-radius: var(--prime-sys-size-control-s-radius);
+  width: var(--ntf-close);
+  height: var(--ntf-close);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--prime-radius-s);
   background: transparent;
-  color: var(--prime-sys-color-content-secondary);
+  color: var(--prime-color-text-muted);
   cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .closeButton:hover {
-  background: var(--prime-sys-color-surface-accentSoft);
-  color: var(--prime-sys-color-content-primary);
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-primary);
 }
 
-.closeButton svg {
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
+.closeButton:active {
+  background: var(--prime-color-fill-subtle-active);
 }
 
 .closeButton:focus-visible {
-  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-border-focus);
-  outline-offset: var(--prime-sys-unit-2px);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
+
+.closeButton svg {
+  width: var(--ntf-close-icon);
+  height: var(--ntf-close-icon);
+}
+
+/* ---------- Countdown ---------- */
 
 .progressTrack {
   position: absolute;
-  left: 0;
   right: 0;
   bottom: 0;
-  height: var(--prime-sys-unit-2px);
-  background: color-mix(in srgb, var(--notification-accent) 18%, transparent);
+  left: 0;
+  height: calc(var(--prime-border-width) * 2);
+  background: var(--prime-color-fill-muted);
 }
 
 .progressValue {
@@ -308,61 +370,5 @@
   width: 100%;
   height: 100%;
   transform-origin: left center;
-  background: var(--notification-accent);
-}
-
-.card[data-persistent="true"] {
-  border-color: color-mix(
-    in srgb,
-    var(--notification-accent) 50%,
-    var(--prime-sys-color-border-subtle)
-  );
-  box-shadow:
-    var(--prime-sys-elevation-shadow-surface),
-    0 0 var(--prime-sys-spacing-x2) color-mix(in srgb, var(--notification-accent) 30%, transparent);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .card[data-persistent="true"] {
-    animation: notification-glow 2s ease-in-out infinite;
-  }
-}
-
-@keyframes notification-glow {
-  0%,
-  100% {
-    box-shadow:
-      var(--prime-sys-elevation-shadow-surface),
-      0 0 var(--prime-sys-spacing-x2)
-      color-mix(in srgb, var(--notification-accent) 25%, transparent);
-  }
-
-  50% {
-    box-shadow:
-      var(--prime-sys-elevation-shadow-surface),
-      0 0 var(--prime-sys-spacing-x4)
-      color-mix(in srgb, var(--notification-accent) 42%, transparent);
-  }
-}
-
-@media (max-width: 48rem) {
-  .zone {
-    width: min(100vw - var(--prime-sys-spacing-x6), var(--prime-sys-unit-24rem));
-  }
-
-  .top {
-    top: var(--prime-sys-spacing-x3);
-  }
-
-  .bottom {
-    bottom: var(--prime-sys-spacing-x3);
-  }
-
-  .left {
-    left: var(--prime-sys-spacing-x3);
-  }
-
-  .right {
-    right: var(--prime-sys-spacing-x3);
-  }
+  background: var(--ntf-accent);
 }

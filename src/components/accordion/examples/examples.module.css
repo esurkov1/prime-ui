@@ -1,30 +1,43 @@
+/* Layout for the Accordion examples: layout only, text goes through Typography. */
+
 .stack {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-s);
+  gap: var(--prime-space-8);
+  width: min(100%, calc(var(--prime-space-10) * 16));
+  min-width: 0;
 }
 
-.bodyStack {
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-24) * 3)), 1fr));
+  gap: var(--prime-space-6);
+  width: 100%;
+  min-width: 0;
+}
+
+.group {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
+  gap: var(--prime-space-2);
+  min-width: 0;
 }
 
-.lead {
-  margin: 0;
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.actions {
+.form {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-m);
-  margin-top: var(--prime-sys-spacing-s);
+  flex-direction: column;
+  gap: var(--prime-space-5);
+  padding-top: var(--prime-space-1);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
 }
 
 .row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--prime-sys-spacing-m);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-10) * 4)), 1fr));
+  gap: var(--prime-space-3);
 }

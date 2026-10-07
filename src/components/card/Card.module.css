@@ -1,56 +1,99 @@
+/*
+ * Card — Graphite surface: `--prime-color-card-bg` (bg-surface on the canvas, bg-sunken inside a surface
+ * plane), card radius, shadow-raised unless the host plane turns it into a sunken tile, no border.
+ * Internal layout adapts to the card's own width (container queries).
+ */
+
 .root {
+  --card-pad: var(--prime-card-padding-m);
+  --card-gap: var(--prime-card-gap);
+  --card-icon: var(--prime-icon-m);
+  --card-icon-box: var(--prime-control-l-height);
+  /* Faint zone hairline, inset by the side padding — same language as Modal/Drawer. */
+  --card-hairline: linear-gradient(
+    var(--prime-color-border-faint),
+    var(--prime-color-border-faint)
+  );
+  --card-hairline-size: calc(100% - 2 * var(--card-pad)) var(--prime-border-width);
+
+  /* Fields inside a card are one step off the surface. */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
+  container-type: inline-size;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  border-radius: var(--prime-sys-shape-radius-l);
-  background: var(--prime-sys-color-surface-raised);
+  border-radius: var(--prime-card-radius);
+  /* Avatar.Group rings match this surface. */
+  --avatar-ring: var(--prime-color-card-bg);
+  background: var(--prime-color-card-bg);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
   text-align: start;
 }
 
-.root[data-flat="false"] {
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
+/* A surface plane (Card, Modal, Popover, AppShell content) sets `--prime-card-shadow: none` next to
+ * `--prime-color-card-bg`, so a nested card is a flat sunken tile. */
+.root:not([data-flat="true"]) {
+  box-shadow: var(--prime-card-shadow);
 }
+
+/* Context for nested cards: set on children so the card's own fill and shadow still read the host's values. */
+.root > * {
+  --prime-color-card-bg: var(--prime-color-bg-sunken);
+  --prime-card-shadow: none;
+}
+
+/* ---------- Variants ---------- */
 
 .root[data-variant="mini"] {
   display: flex;
-  flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--prime-sys-spacing-l);
-  padding: var(--prime-sys-spacing-l);
+  gap: var(--prime-space-3);
+  padding: var(--card-pad);
 }
 
 .root[data-variant="mini-media"] {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   align-content: flex-start;
-  row-gap: var(--prime-sys-spacing-m);
-  column-gap: var(--prime-sys-spacing-l);
-  padding: var(--prime-sys-spacing-l);
+  gap: var(--card-gap) var(--prime-space-3);
+  padding: var(--card-pad);
 }
 
-.root[data-variant="metric"] {
+.root[data-variant="metric"],
+.root[data-variant="stat-trend"],
+.root[data-variant="cta"] {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--prime-sys-spacing-m);
-  padding: var(--prime-sys-spacing-l);
+  gap: var(--prime-space-2);
+  padding: var(--card-pad);
 }
 
-.root[data-variant="panel"] {
+.root[data-variant="cta"] {
+  gap: var(--prime-space-3);
+}
+
+.root[data-variant="panel"],
+.root[data-variant="list"],
+.root[data-variant="cover"] {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 0;
   padding: 0;
   overflow: hidden;
-  /* Минимальная высота оболочки: Body с flex-grow получает оставшееся место под график/таблицу. */
-  min-height: var(--prime-sys-unit-18rem);
 }
+
+.root[data-variant="split"] {
+  padding: var(--card-pad);
+}
+
+/* ---------- Slots ---------- */
 
 .iconBox {
   display: flex;
@@ -58,69 +101,89 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: calc(var(--prime-sys-size-control-m-icon) + var(--prime-sys-spacing-m) * 2);
-  height: calc(var(--prime-sys-size-control-m-icon) + var(--prime-sys-spacing-m) * 2);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  background: var(--prime-sys-color-status-information-background);
-  color: var(--prime-sys-color-status-information-foreground);
+  width: var(--card-icon-box);
+  height: var(--card-icon-box);
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-accent-soft);
+  color: var(--prime-color-accent-text);
 }
 
 .iconBox svg {
   display: block;
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
+  width: var(--card-icon);
+  height: var(--card-icon);
 }
 
 .lead {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  justify-content: flex-start;
   min-width: 0;
   max-width: 100%;
 }
 
 .lead svg {
   display: block;
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
   flex-shrink: 0;
-  color: var(--prime-sys-color-content-primary);
+  width: var(--card-icon);
+  height: var(--card-icon);
+  color: var(--prime-color-text-secondary);
 }
 
 .headerRow {
   display: flex;
-  flex-direction: row;
   flex-wrap: nowrap;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--prime-sys-spacing-m);
+  gap: var(--prime-space-3);
   width: 100%;
   min-width: 0;
 }
 
 .stack {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: var(--prime-sys-spacing-xs);
+  gap: var(--prime-space-1);
   min-width: 0;
-  flex: 1 1 auto;
 }
 
 .label {
-  font-size: var(--prime-sys-size-control-m-supportText);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
-  font-weight: var(--prime-sys-typography-weight-regular);
-  color: var(--prime-sys-color-content-secondary);
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  color: var(--prime-color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .value {
-  font-size: var(--prime-sys-size-control-m-text);
-  line-height: var(--prime-sys-typography-lineHeightScale-s);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  color: var(--prime-sys-color-content-primary);
+  min-width: 0;
+  font-size: var(--prime-text-title-l-size);
+  line-height: var(--prime-text-title-l-line-height);
+  letter-spacing: var(--prime-text-title-l-tracking);
+  font-weight: var(--prime-text-title-l-weight);
+  color: var(--prime-color-text-primary);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.root[data-variant="metric"] .value {
+  font-size: var(--prime-text-heading-m-size);
+  line-height: var(--prime-text-heading-m-line-height);
+  letter-spacing: var(--prime-text-heading-m-tracking);
+  font-weight: var(--prime-text-heading-m-weight);
+}
+
+.root[data-variant="stat-trend"] .value {
+  font-size: var(--prime-text-heading-l-size);
+  line-height: var(--prime-text-heading-l-line-height);
+  letter-spacing: var(--prime-text-heading-l-tracking);
+  font-weight: var(--prime-text-heading-l-weight);
 }
 
 .headerRow > .value {
@@ -128,12 +191,14 @@
   text-align: end;
 }
 
-.description {
+.description,
+.ctaBody {
   margin: 0;
-  font-size: var(--prime-sys-size-control-m-supportText);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
-  font-weight: var(--prime-sys-typography-weight-regular);
-  color: var(--prime-sys-color-content-secondary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
 }
 
 .media {
@@ -143,9 +208,7 @@
   justify-content: flex-end;
   width: 100%;
   min-width: 0;
-  min-height: var(--prime-sys-spacing-4xl);
-  padding-block-start: var(--prime-sys-spacing-s);
-  border-block-start: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  min-height: var(--prime-space-10);
 }
 
 .root[data-variant="mini-media"] > .iconBox {
@@ -159,31 +222,76 @@
 
 .root[data-variant="mini-media"] > .media {
   flex: 1 1 100%;
-  width: 100%;
   min-width: 100%;
 }
 
-.sectionHeader {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-sys-spacing-m);
-  padding: var(--prime-sys-spacing-l) var(--prime-sys-spacing-xl);
-  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  background: var(--prime-sys-color-surface-raised);
-}
-
+.title,
 .sectionTitle {
   margin: 0;
   min-width: 0;
+  font-size: var(--prime-text-title-s-size);
+  line-height: var(--prime-text-title-s-line-height);
+  letter-spacing: var(--prime-text-title-s-tracking);
+  font-weight: var(--prime-text-title-s-weight);
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.root[data-variant="cta"] .title {
+  font-size: var(--prime-text-title-m-size);
+  line-height: var(--prime-text-title-m-line-height);
+  letter-spacing: var(--prime-text-title-m-tracking);
+  font-weight: var(--prime-text-title-m-weight);
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.delta[data-tone="success"] {
+  color: var(--prime-color-success-text);
+}
+
+.delta[data-tone="warning"] {
+  color: var(--prime-color-warning-text);
+}
+
+.delta[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  width: 100%;
+  min-width: 0;
+  padding-top: var(--prime-space-2);
+}
+
+/* ---------- panel ---------- */
+
+.sectionHeader {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  min-height: var(--prime-control-m-height);
+  padding: var(--prime-space-4) var(--card-pad) 0;
+}
+
+.sectionTitle {
   flex: 1 1 auto;
-  font-size: var(--prime-sys-size-control-m-text);
-  line-height: var(--prime-sys-typography-lineHeightScale-s);
-  font-weight: var(--prime-sys-typography-title-weight);
-  color: var(--prime-sys-color-content-primary);
 }
 
 .sectionTrailing {
@@ -191,193 +299,133 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
-  color: var(--prime-sys-color-content-secondary);
+  gap: var(--prime-space-2);
+  color: var(--prime-color-text-secondary);
 }
 
 .sectionTrailing svg {
   display: block;
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
+  width: var(--prime-icon-s);
+  height: var(--prime-icon-s);
 }
 
-/* Текст, таблицы, сводки — с полями по краям. */
 .body {
   box-sizing: border-box;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-l);
+  gap: var(--card-gap);
   min-width: 0;
   min-height: 0;
-  flex: 1 1 auto;
-  padding: var(--prime-sys-spacing-l) var(--prime-sys-spacing-xl) var(--prime-sys-spacing-xl);
-  background: var(--prime-sys-color-surface-raised);
+  padding: var(--card-gap) var(--card-pad) var(--card-pad);
 }
 
-.body > *:only-child {
+.body > *:only-child,
+.chart > *:only-child {
   flex: 1 1 auto;
-  min-height: 0;
   align-self: stretch;
   width: 100%;
+  min-height: 0;
 }
 
-/* График edge-to-edge под заголовком секции (без внутренних полей). */
+/* Chart is edge-to-edge under the section header. */
 .chart {
   box-sizing: border-box;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: 0;
   min-width: 0;
   min-height: 0;
-  flex: 1 1 auto;
-  padding: 0;
-  background: var(--prime-sys-color-surface-raised);
+  padding: var(--card-gap) 0 0;
 }
-
-.chart > *:only-child {
-  flex: 1 1 auto;
-  min-height: 0;
-  align-self: stretch;
-  width: 100%;
-}
-
-/* --- variant panel: распределение высоты между Body и Chart --- */
 
 .root[data-variant="panel"] > .sectionHeader + .body:last-child,
-.root[data-variant="panel"] > .sectionHeader + .chart:last-child {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.root[data-variant="panel"] > .sectionHeader + .body:not(:last-child) {
-  flex: 0 1 auto;
-}
-
+.root[data-variant="panel"] > .sectionHeader + .chart:last-child,
 .root[data-variant="panel"] > .body + .chart {
   flex: 1 1 auto;
   min-height: 0;
 }
 
-/* --- stat-trend: крупная метрика + дельта периода --- */
-
-.root[data-variant="stat-trend"] {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--prime-sys-spacing-s);
-  padding: var(--prime-sys-spacing-l);
+/* Body followed by a chart: the chart brings its own top spacing. */
+.root[data-variant="panel"] > .sectionHeader + .body:has(+ .chart) {
+  flex: 0 1 auto;
+  padding-bottom: 0;
 }
 
-.root[data-variant="stat-trend"] .value {
-  font-size: var(--prime-sys-typography-sizeScale-3xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xl);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  letter-spacing: -0.02em;
+/* Header followed by content: faint inset hairline under the header (charts stay edge-to-edge). */
+.sectionHeader:has(+ .body) {
+  padding-bottom: var(--prime-space-4);
+  background: var(--card-hairline) center bottom / var(--card-hairline-size) no-repeat;
 }
 
-.title {
-  margin: 0;
-  font-size: var(--prime-sys-size-control-m-text);
-  line-height: var(--prime-sys-typography-lineHeightScale-s);
-  font-weight: var(--prime-sys-typography-title-weight);
-  color: var(--prime-sys-color-content-primary);
+.sectionHeader + .body {
+  padding-top: var(--prime-space-4);
 }
 
-.delta {
-  font-size: var(--prime-sys-size-control-m-supportText);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
-  font-weight: var(--prime-sys-typography-weight-medium);
+/* Content before the footer keeps the same 16px above the hairline as the footer has below it. */
+.root[data-variant="panel"] > .body:has(+ .actions),
+.root[data-variant="list"] > .list:has(+ .actions) {
+  padding-bottom: var(--prime-space-4);
 }
 
-.delta[data-trend="up"] {
-  color: var(--prime-sys-color-status-success-foreground);
+/* Actions as the card's footer: faint hairline above, same side padding. */
+.root[data-variant="panel"] > .actions,
+.root[data-variant="list"] > .actions {
+  justify-content: flex-end;
+  padding: var(--prime-space-4) var(--card-pad) var(--card-pad);
+  background: var(--card-hairline) center top / var(--card-hairline-size) no-repeat;
 }
 
-.delta[data-trend="down"] {
-  color: var(--prime-sys-color-content-danger);
-}
-
-.delta[data-trend="neutral"] {
-  color: var(--prime-sys-color-content-secondary);
-}
-
-/* --- cta: заголовок, текст, действия внизу (как base tile + CTA) --- */
-
-.root[data-variant="cta"] {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--prime-sys-spacing-m);
-  padding: var(--prime-sys-spacing-l);
-}
-
-.ctaBody {
-  font-size: var(--prime-sys-size-control-m-supportText);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.actions {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-sys-spacing-m);
-  width: 100%;
-  min-width: 0;
-  padding-top: var(--prime-sys-spacing-m);
-  border-top: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-}
-
-/* --- list: заголовок + список строк (лента активности / алерты) --- */
-
-.root[data-variant="list"] {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-  padding: 0;
-  overflow: hidden;
-}
+/* ---------- list ---------- */
 
 .listHeader {
   display: flex;
-  flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--prime-sys-spacing-m);
-  padding: var(--prime-sys-spacing-l);
-  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-4) var(--card-pad) var(--prime-space-2);
+}
+
+.listHeader:has(+ .list) {
+  padding-bottom: var(--prime-space-4);
+  background: var(--card-hairline) center bottom / var(--card-hairline-size) no-repeat;
 }
 
 .list {
-  list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 var(--prime-space-2);
+  list-style: none;
+}
+
+.listHeader + .list {
+  padding-top: var(--prime-space-2);
 }
 
 .listItem {
-  padding: var(--prime-sys-spacing-m) var(--prime-sys-spacing-l);
-  border-bottom: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  font-size: var(--prime-sys-size-control-m-supportText);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
-  color: var(--prime-sys-color-content-primary);
+  padding: var(--prime-space-3) var(--card-pad);
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
 }
 
-.listItem:last-child {
-  border-bottom: none;
+.listItem + .listItem {
+  background: var(--card-hairline) center top / var(--card-hairline-size) no-repeat;
 }
 
-/* --- split: две метрики в одной плитке --- */
-
-.root[data-variant="split"] {
-  padding: var(--prime-sys-spacing-l);
+/* CTA: title + text is the header, actions are the footer. */
+.root[data-variant="cta"] > .actions {
+  padding-top: var(--prime-space-4);
+  background: var(--card-hairline) center top / 100% var(--prime-border-width) no-repeat;
 }
+
+/* ---------- split ---------- */
 
 .split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--card-gap) 0;
   width: 100%;
   min-width: 0;
 }
@@ -385,67 +433,93 @@
 .splitCell {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-xs);
+  gap: var(--prime-space-1);
   min-width: 0;
-  padding-inline: var(--prime-sys-spacing-m);
+}
+
+.splitCell + .splitCell {
+  padding-inline-start: var(--card-pad);
+  border-inline-start: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
 .splitCell:first-child {
-  padding-inline-start: 0;
+  padding-inline-end: var(--card-pad);
 }
 
-.splitCell:last-child {
-  padding-inline-end: 0;
-  border-inline-start: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-}
-
-/* Как mini: IconBox + Stack — ряд, иконка в токенизированной плитке */
 .splitCell:has(> .iconBox) {
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--prime-sys-spacing-l);
+  gap: var(--prime-space-3);
 }
 
-.splitCell:has(> .iconBox) > .stack {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-/* --- cover: медиа сверху + контент (как Card.Meta + cover в Ant Design) --- */
-
-.root[data-variant="cover"] {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-  padding: 0;
-  overflow: hidden;
-}
+/* ---------- cover ---------- */
 
 .cover {
   display: block;
   width: 100%;
-  min-height: var(--prime-sys-unit-8rem);
-  max-height: var(--prime-sys-unit-12rem);
+  min-height: calc(var(--prime-space-16) * 2);
+  max-height: calc(var(--prime-space-24) * 2);
   overflow: hidden;
-  background: var(--prime-sys-color-surface-default);
+  background: var(--prime-color-bg-sunken);
 }
 
 .cover > * {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: var(--prime-sys-unit-8rem);
+  min-height: calc(var(--prime-space-16) * 2);
   object-fit: cover;
 }
 
 .root[data-variant="cover"] > .stack {
-  padding: var(--prime-sys-spacing-l);
-  padding-top: var(--prime-sys-spacing-m);
-  gap: var(--prime-sys-spacing-xs);
+  gap: var(--prime-space-1);
+  padding: var(--card-gap) var(--card-pad) 0;
+}
+
+.root[data-variant="cover"] > .stack:last-child {
+  padding-bottom: var(--card-pad);
 }
 
 .root[data-variant="cover"] > .actions {
-  padding: var(--prime-sys-spacing-m) var(--prime-sys-spacing-l) var(--prime-sys-spacing-l);
+  padding: var(--card-gap) var(--card-pad) var(--card-pad);
+}
+
+/* ---------- Responsive (own width; container = the card, so only descendants adapt) ---------- */
+
+@container (max-width: 20rem) {
+  .root[data-variant="stat-trend"] .value {
+    font-size: var(--prime-text-heading-m-size);
+    line-height: var(--prime-text-heading-m-line-height);
+    letter-spacing: var(--prime-text-heading-m-tracking);
+  }
+}
+
+@container (min-width: 36rem) {
+  .root[data-variant="stat-trend"] .value {
+    font-size: var(--prime-text-display-s-size);
+    line-height: var(--prime-text-display-s-line-height);
+    letter-spacing: var(--prime-text-display-s-tracking);
+  }
+}
+
+@container (max-width: 22rem) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .splitCell:first-child {
+    padding-inline-end: 0;
+  }
+
+  .splitCell + .splitCell {
+    padding-top: var(--card-gap);
+    padding-inline-start: 0;
+    border-inline-start: 0;
+    border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  }
+
+  .headerRow {
+    flex-wrap: wrap;
+  }
 }

@@ -1,57 +1,65 @@
 import * as React from "react";
 
-import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useModalKeyboard } from "@/hooks/useModalKeyboard";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { type PresenceState, usePresence } from "@/hooks/usePresence";
 import { useScrollLock } from "@/hooks/useScrollLock";
-import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import { mergeRefs } from "@/internal/mergeRefs";
 import { OverlayPortalLayerProvider } from "@/internal/OverlayPortalLayerContext";
+import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
-import type { ButtonSize } from "@/internal/states";
-
+import type { ControlSize } from "@/internal/states";
+import {
+  DialogBody,
+  DialogClose,
+  DialogConfirm,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogIcon,
+  DialogShellProvider,
+  DialogTitle,
+  dialogShellClassName,
+  useDialogShellValue,
+} from "./DialogParts";
 import styles from "./Modal.module.css";
+import { useInertSiblings } from "./useInertSiblings";
 
-// ─── Context ─────────────────────────────────────────────────────────────────
+export type {
+  DialogBodyProps as ModalBodyProps,
+  DialogCloseProps as ModalCloseProps,
+  DialogConfirmProps as ModalConfirmProps,
+  DialogDescriptionProps as ModalDescriptionProps,
+  DialogFooterProps as ModalFooterProps,
+  DialogHeaderProps as ModalHeaderProps,
+  DialogIconProps as ModalIconProps,
+  DialogTitleProps as ModalTitleProps,
+} from "./DialogParts";
 
-/** Единый масштаб оболочки модалки и каскада `ControlSizeProvider` (кнопка закрытия в шапке без своего `size`). */
-const MODAL_SHELL_SIZE = "m" as const satisfies ButtonSize;
+export type ModalLabels = {
+  /** `aria-label` of the header close button. */
+  close: string;
+};
+
+const MODAL_LABELS: ModalLabels = {
+  close: "Закрыть",
+};
 
 type ModalContextValue = {
   open: boolean;
-  onOpen: () => void;
-  onClose: () => void;
+  setOpen: (open: boolean) => void;
   closeOnEscape: boolean;
-  closeOnOverlayClick: boolean;
+  closeOnOutsideClick: boolean;
   confirmOnEnter: boolean;
   onEnterConfirm?: (event: KeyboardEvent) => void;
-  primaryActionRef: React.MutableRefObject<HTMLElement | null>;
+  labels: ModalLabels;
 };
 
 const [ModalProvider, useModalContext] = createComponentContext<ModalContextValue>("Modal");
-
-/** Внутренняя связка контента панели ↔ шапки: id для `h2`/`p` и регистрация для `aria-*` на `role="dialog"`. */
-type ModalContentShellContextValue = {
-  titleId: string;
-  descId: string;
-  registerHeader: (state: { hasDescription: boolean } | null) => void;
-};
-
-const ModalContentShellContext = React.createContext<ModalContentShellContextValue | null>(null);
-
-function useModalContentShell(): ModalContentShellContextValue {
-  const value = React.useContext(ModalContentShellContext);
-  if (value === null) {
-    throw new Error(
-      "[prime-ui-kit] Modal header block must be used inside the dialog panel (internal).",
-    );
-  }
-  return value;
-}
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
@@ -59,17 +67,18 @@ export type ModalRootProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Escape closes the dialog. Default `true`. */
   closeOnEscape?: boolean;
-  closeOnOverlayClick?: boolean;
   /**
-   * Если `true`, Enter вызывает `click()` по кнопке из `Modal.Footer` **`primary`** (или **`onEnterConfirm`**).
+   * A click on the scrim (any pointerdown outside the dialog) closes it. Default `true`; turn it
+   * off for destructive confirms.
    */
+  closeOnOutsideClick?: boolean;
+  /** Enter clicks the action wrapped in `Modal.Confirm`. Default `true`. */
   confirmOnEnter?: boolean;
-  /**
-   * Заменяет стандартное подтверждение по Enter: вызывается вместо программного `click()` по **`primary`**.
-   * При необходимости подавить нативное поведение элемента под фокусом вызовите `event.preventDefault()`.
-   */
+  /** Replaces the default Enter confirm (the `Modal.Confirm` click). */
   onEnterConfirm?: (event: KeyboardEvent) => void;
+  labels?: Partial<ModalLabels>;
   children?: React.ReactNode;
 };
 
@@ -78,39 +87,43 @@ function ModalRoot({
   defaultOpen = false,
   onOpenChange,
   closeOnEscape = true,
-  closeOnOverlayClick = true,
+  closeOnOutsideClick = true,
   confirmOnEnter = true,
   onEnterConfirm,
+  labels,
   children,
 }: ModalRootProps) {
-  const [isOpen, setIsOpen] = useControllableState({
+  const [isOpen, setOpen] = useControllableState({
     value: open,
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
 
-  const primaryActionRef = React.useRef<HTMLElement | null>(null);
-
-  const onOpen = React.useCallback(() => setIsOpen(true), [setIsOpen]);
-  const onClose = React.useCallback(() => setIsOpen(false), [setIsOpen]);
-
-  return (
-    <ModalProvider
-      value={{
-        open: isOpen,
-        onOpen,
-        onClose,
-        closeOnEscape,
-        closeOnOverlayClick,
-        confirmOnEnter,
-        onEnterConfirm,
-        primaryActionRef,
-      }}
-    >
-      {children}
-    </ModalProvider>
+  const closeLabel = labels?.close ?? MODAL_LABELS.close;
+  const value = React.useMemo<ModalContextValue>(
+    () => ({
+      open: isOpen,
+      setOpen,
+      closeOnEscape,
+      closeOnOutsideClick,
+      confirmOnEnter,
+      onEnterConfirm,
+      labels: { close: closeLabel },
+    }),
+    [
+      isOpen,
+      setOpen,
+      closeOnEscape,
+      closeOnOutsideClick,
+      confirmOnEnter,
+      onEnterConfirm,
+      closeLabel,
+    ],
   );
+
+  return <ModalProvider value={value}>{children}</ModalProvider>;
 }
+ModalRoot.displayName = "Modal.Root";
 
 // ─── Trigger ──────────────────────────────────────────────────────────────────
 
@@ -118,192 +131,98 @@ export type ModalTriggerProps = {
   children: React.ReactElement<{ onClick?: React.MouseEventHandler }>;
 };
 
+/** Opens the dialog on the child's click (unless the child prevents default). */
 function ModalTrigger({ children }: ModalTriggerProps) {
-  const { onOpen } = useModalContext();
+  const { setOpen } = useModalContext();
   const child = React.Children.only(children);
   return React.cloneElement(child, {
     onClick: (event: React.MouseEvent) => {
       child.props.onClick?.(event);
-      if (!event.defaultPrevented) {
-        onOpen();
-      }
+      if (!event.defaultPrevented) setOpen(true);
     },
   });
 }
-
-// ─── Close ────────────────────────────────────────────────────────────────────
-
-export type ModalCloseProps = {
-  children: React.ReactElement<{
-    onClick?: React.MouseEventHandler;
-    className?: string;
-    size?: ButtonSize;
-    ref?: React.Ref<HTMLElement>;
-  }>;
-};
-
-const ModalClose = React.forwardRef<HTMLElement, ModalCloseProps>(function ModalClose(
-  { children },
-  forwardedRef,
-) {
-  const { onClose } = useModalContext();
-  const child = React.Children.only(children);
-  const childRef = (child as React.ReactElement & { ref?: React.Ref<HTMLElement> }).ref;
-  const mergedRef = mergeRefs(childRef, forwardedRef);
-
-  return React.cloneElement(child, {
-    ref: mergedRef,
-    onClick: (event: React.MouseEvent) => {
-      child.props.onClick?.(event);
-      if (!event.defaultPrevented) {
-        onClose();
-      }
-    },
-  });
-});
-
-// ─── Footer (публичный слот: secondary → extra → primary) ────────────────────
-
-export type ModalFooterProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
-  /** Основное действие (Enter при `confirmOnEnter`); один элемент, например `Button.Root`. */
-  primary?: React.ReactElement<{
-    ref?: React.Ref<HTMLElement>;
-    onClick?: React.MouseEventHandler;
-    className?: string;
-    size?: ButtonSize;
-  }>;
-  /** Обычно отмена / закрытие (`Modal.Close` + кнопка). */
-  secondary?: React.ReactNode;
-  /** Дополнительные кнопки между `secondary` и `primary` (несколько кнопок — фрагмент). */
-  extra?: React.ReactNode;
-};
-
-function FooterPrimarySlot({
-  children,
-}: {
-  children: React.ReactElement<{
-    ref?: React.Ref<HTMLElement>;
-    onClick?: React.MouseEventHandler;
-    className?: string;
-    size?: ButtonSize;
-  }>;
-}) {
-  const { primaryActionRef } = useModalContext();
-  const child = React.Children.only(children);
-  const childRef = (child as React.ReactElement & { ref?: React.Ref<HTMLElement> }).ref;
-  const mergedRef = mergeRefs(childRef, (node: HTMLElement | null) => {
-    primaryActionRef.current = node;
-  });
-
-  return React.cloneElement(child, { ref: mergedRef });
-}
-
-function ModalFooter({ primary, secondary, extra, className, ...rest }: ModalFooterProps) {
-  return (
-    <footer className={cx(styles.footer, className)} data-prime-modal-footer="" {...rest}>
-      {secondary}
-      {extra}
-      {primary != null ? <FooterPrimarySlot>{primary}</FooterPrimarySlot> : null}
-    </footer>
-  );
-}
-
-// ─── Portal ───────────────────────────────────────────────────────────────────
-
-type ModalPortalProps = {
-  children: React.ReactNode;
-  container?: HTMLElement | null;
-};
-
-function ModalPortal({ children, container }: ModalPortalProps) {
-  const { open } = useModalContext();
-  if (!open) return null;
-  return <Portal container={container}>{children}</Portal>;
-}
-
-// ─── Overlay ──────────────────────────────────────────────────────────────────
-
-type ModalOverlayProps = React.HTMLAttributes<HTMLDivElement>;
-
-function ModalOverlay({ className, onClick, children, ...rest }: ModalOverlayProps) {
-  const { onClose, closeOnOverlayClick } = useModalContext();
-
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    onClick?.(event);
-    if (!event.defaultPrevented && closeOnOverlayClick && event.target === event.currentTarget) {
-      onClose();
-    }
-  };
-
-  return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay; keyboard handled by useModalKeyboard in ModalContent
-    <div
-      role="presentation"
-      className={cx(styles.overlay, className)}
-      onClick={handleClick}
-      data-testid="modal-overlay"
-      {...rest}
-    >
-      {children}
-    </div>
-  );
-}
-
-// ─── Layer (Portal + Overlay) ────────────────────────────────────────────────
-
-type ModalLayerProps = ModalPortalProps & Omit<ModalOverlayProps, "children">;
-
-function ModalLayer({ children, container, ...overlayProps }: ModalLayerProps) {
-  return (
-    <ModalPortal container={container}>
-      <ModalOverlay {...overlayProps}>{children}</ModalOverlay>
-    </ModalPortal>
-  );
-}
+ModalTrigger.displayName = "Modal.Trigger";
 
 // ─── Content ──────────────────────────────────────────────────────────────────
 
-type ModalContentProps = React.HTMLAttributes<HTMLDivElement> & {
-  "aria-label"?: string;
-  "aria-labelledby"?: string;
-  "aria-describedby"?: string;
+export type ModalContentProps = React.HTMLAttributes<HTMLDivElement> & {
+  /**
+   * Dialog width: `s` 440 · `m` 560 · `l` 720 · `xl` 960. Below 640px of viewport the dialog is
+   * always a full-width bottom sheet.
+   */
+  size?: Exclude<ControlSize, "xs">;
+  /** Portal target. Default `document.body`. */
+  container?: HTMLElement | null;
+  /** Class on the full-screen scrim. */
+  overlayClassName?: string;
 };
 
-function ModalContent({
-  children,
-  className,
-  "aria-label": ariaLabel,
-  "aria-labelledby": ariaLabelledByProp,
-  "aria-describedby": ariaDescribedByProp,
-  ...rest
-}: ModalContentProps) {
-  const { open, onClose, closeOnEscape, confirmOnEnter, onEnterConfirm, primaryActionRef } =
-    useModalContext();
-
-  const internalTitleId = React.useId();
-  const internalDescId = React.useId();
-  const titleId = ariaLabelledByProp ?? internalTitleId;
-  const descId = ariaDescribedByProp ?? internalDescId;
-
-  const [headerState, setHeaderState] = React.useState<{ hasDescription: boolean } | null>(null);
-  const registerHeader = React.useCallback((state: { hasDescription: boolean } | null) => {
-    setHeaderState(state);
-  }, []);
-
-  const shellValue = React.useMemo<ModalContentShellContextValue>(
-    () => ({ titleId, descId, registerHeader }),
-    [titleId, descId, registerHeader],
+function ModalContent({ container, ...props }: ModalContentProps) {
+  const { open } = useModalContext();
+  // Stays mounted with `data-state="closed"` while the exit animation plays.
+  const presence = usePresence(open, { exitDuration: "base" });
+  if (!presence.mounted) return null;
+  return (
+    <Portal container={container}>
+      <ModalDialog {...props} state={presence.state} onExitEnd={presence.onExitEnd} />
+    </Portal>
   );
+}
 
-  const ariaLabelledByResolved =
-    ariaLabelledByProp ?? (ariaLabel ? undefined : headerState != null ? titleId : undefined);
-  const ariaDescribedByResolved =
-    ariaDescribedByProp ?? (headerState?.hasDescription ? descId : undefined);
+type ModalDialogProps = Omit<ModalContentProps, "container"> & {
+  state: PresenceState;
+  onExitEnd: (event: React.SyntheticEvent<Element>) => void;
+};
+
+/** Mounted inside the portal so focus trap and inert siblings see the attached node. */
+function ModalDialog({
+  size = "m",
+  overlayClassName,
+  className,
+  children,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
+  state,
+  onExitEnd,
+  ...rest
+}: ModalDialogProps) {
+  const {
+    open,
+    setOpen,
+    closeOnEscape,
+    closeOnOutsideClick,
+    confirmOnEnter,
+    onEnterConfirm,
+    labels,
+  } = useModalContext();
+
+  const confirmRef = React.useRef<HTMLElement | null>(null);
+  const onClose = React.useCallback(() => setOpen(false), [setOpen]);
+
+  const shell = useDialogShellValue({
+    ariaLabel,
+    ariaLabelledBy,
+    ariaDescribedBy,
+    onClose,
+    closeLabel: labels.close,
+    footerLayout: size === "s" || size === "m" ? "fill" : "end",
+    confirmRef,
+  });
 
   const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
-
   useScrollLock(open);
-
+  useInertSiblings(open, trapRef);
+  // Scrim layer: the press must start and end outside the panel (no drag-to-close, no click-through).
+  useOutsideClick({
+    refs: [trapRef],
+    enabled: open,
+    trigger: "click",
+    onOutsideClick: () => {
+      if (closeOnOutsideClick) onClose();
+    },
+  });
   useModalKeyboard({
     open,
     trapRef,
@@ -311,248 +230,53 @@ function ModalContent({
     onClose,
     confirmOnEnter,
     onEnterConfirm,
-    primaryRef: primaryActionRef,
+    primaryRef: confirmRef,
   });
 
-  React.useEffect(() => {
-    if (!open) return;
-
-    const container = trapRef.current;
-    if (!container) return;
-
-    let portalRoot: Element | null = container;
-    while (portalRoot && portalRoot.parentElement !== document.body) {
-      portalRoot = portalRoot.parentElement;
-    }
-
-    const siblings = Array.from(document.body.children).filter((el) => el !== portalRoot);
-    const prev = siblings.map((el) => ({
-      el: el as HTMLElement,
-      inert: (el as HTMLElement).inert,
-      ariaHidden: el.getAttribute("aria-hidden"),
-    }));
-
-    for (const { el } of prev) {
-      el.inert = true;
-      el.setAttribute("aria-hidden", "true");
-    }
-
-    return () => {
-      for (const { el, inert, ariaHidden } of prev) {
-        el.inert = inert;
-        if (ariaHidden === null) {
-          el.removeAttribute("aria-hidden");
-        } else {
-          el.setAttribute("aria-hidden", ariaHidden);
-        }
-      }
-    };
-  }, [open, trapRef]);
-
   return (
-    <ModalContentShellContext.Provider value={shellValue}>
+    // Scrim dismiss is a pointerdown outside the dialog (useOutsideClick), Escape via useModalKeyboard.
+    <div
+      role="presentation"
+      className={cx(styles.overlay, overlayMotion.scrim, overlayClassName)}
+      data-testid="modal-overlay"
+      data-state={state}
+      onAnimationEnd={onExitEnd}
+    >
       <div
         ref={trapRef}
         role="dialog"
         aria-modal="true"
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledByResolved}
-        aria-describedby={ariaDescribedByResolved}
         tabIndex={-1}
-        className={cx(styles.content, className)}
+        className={cx(dialogShellClassName, styles.content, overlayMotion.dialog, className)}
+        data-size={size}
+        data-state={state}
+        {...shell.aria}
         {...rest}
       >
-        <OverlayPortalLayerProvider value="modal">
-          <ControlSizeProvider value={MODAL_SHELL_SIZE}>{children}</ControlSizeProvider>
-        </OverlayPortalLayerProvider>
+        <DialogShellProvider value={shell.value}>
+          <OverlayPortalLayerProvider value="modal">
+            <ControlSizeProvider value="m">{children}</ControlSizeProvider>
+          </OverlayPortalLayerProvider>
+        </DialogShellProvider>
       </div>
-    </ModalContentShellContext.Provider>
-  );
-}
-
-// ─── Header ───────────────────────────────────────────────────────────────────
-
-type ModalHeaderProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
-  icon?: React.ReactNode;
-  /** Текст заголовка (рендерится как `h2`). */
-  title: React.ReactNode;
-  /** Подзаголовок под заголовком (рендерится как `p`). */
-  description?: React.ReactNode;
-  /** Показать встроенную кнопку закрытия в шапке (иконка). */
-  showClose?: boolean;
-  /** Подпись для встроенной кнопки закрытия (`aria-label`). */
-  closeAriaLabel?: string;
-};
-
-function ModalHeader({
-  icon,
-  title,
-  description,
-  showClose = true,
-  closeAriaLabel = "Close",
-  className,
-  ...rest
-}: ModalHeaderProps) {
-  const { onClose } = useModalContext();
-  const { titleId, descId, registerHeader } = useModalContentShell();
-
-  const hasDescription = description != null && description !== "";
-
-  React.useLayoutEffect(() => {
-    registerHeader({
-      hasDescription,
-    });
-    return () => {
-      registerHeader(null);
-    };
-  }, [hasDescription, registerHeader]);
-
-  return (
-    <header
-      className={cx(styles.header, !hasDescription && styles.headerNoDescription, className)}
-      {...rest}
-    >
-      {icon && <div className={styles.headerIcon}>{icon}</div>}
-      <div className={styles.headText}>
-        <h2 id={titleId} className={styles.title}>
-          {title}
-        </h2>
-        {hasDescription ? (
-          <p id={descId} className={styles.description}>
-            {description}
-          </p>
-        ) : null}
-        {showClose ? (
-          <Button.Root
-            type="button"
-            variant="neutral"
-            mode="ghost"
-            size={MODAL_SHELL_SIZE}
-            aria-label={closeAriaLabel}
-            className={styles.closeBtn}
-            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-              if (!event.defaultPrevented) {
-                onClose();
-              }
-            }}
-          >
-            <Button.Icon>
-              <Icon name="action.close" tone="subtle" />
-            </Button.Icon>
-          </Button.Root>
-        ) : null}
-      </div>
-    </header>
-  );
-}
-
-// ─── Body ─────────────────────────────────────────────────────────────────────
-
-type ModalBodyProps = React.HTMLAttributes<HTMLDivElement>;
-
-function ModalBody({ children, className, ...rest }: ModalBodyProps) {
-  return (
-    <div className={cx(styles.body, className)} {...rest}>
-      {children}
     </div>
   );
 }
 
-// ─── Panel (публичная оболочка: Layer + Content + шапка/тело/подвал) ───────────
+ModalContent.displayName = "Modal.Content";
 
-export type ModalPanelProps = Omit<React.HTMLAttributes<HTMLDivElement>, "title"> & {
-  /** Узел для `createPortal` (по умолчанию `document.body`). */
-  container?: HTMLElement | null;
-  /** Класс на полноэкранной подложке. */
-  overlayClassName?: string;
-  /** Заголовок; если задан, рендерится шапка с `h2` и опционально телом с разделителем. */
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  icon?: React.ReactNode;
-  showClose?: boolean;
-  closeAriaLabel?: string;
-  /** При `title` оборачивается в зону тела; без `title` — рендерится сразу в панели (например headless-диалог). */
-  children?: React.ReactNode;
-  /** Предпочтительно `Modal.Footer` со слотами `secondary` / `extra` / `primary` для явного действия по Enter. */
-  footer?: React.ReactNode;
-  footerClassName?: string;
-  bodyClassName?: string;
-  bodyStyle?: React.CSSProperties;
-};
-
-function ModalPanel({
-  container,
-  overlayClassName,
-  className,
-  style,
-  title,
-  description,
-  icon,
-  showClose = true,
-  closeAriaLabel = "Close",
-  children,
-  footer,
-  footerClassName,
-  bodyClassName,
-  bodyStyle,
-  "aria-label": ariaLabel,
-  "aria-labelledby": ariaLabelledBy,
-  "aria-describedby": ariaDescribedBy,
-  ...rest
-}: ModalPanelProps) {
-  const hasHeader = title != null && title !== "";
-
-  const footerNode =
-    footer != null ? (
-      React.isValidElement(footer) && footer.type === ModalFooter ? (
-        React.cloneElement(footer as React.ReactElement<ModalFooterProps>, {
-          className: cx((footer.props as ModalFooterProps).className, footerClassName),
-        })
-      ) : (
-        <footer className={cx(styles.footer, footerClassName)}>{footer}</footer>
-      )
-    ) : null;
-
-  return (
-    <ModalLayer className={overlayClassName} container={container}>
-      <ModalContent
-        aria-describedby={ariaDescribedBy}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        className={className}
-        style={style}
-        {...rest}
-      >
-        {hasHeader ? (
-          <ModalHeader
-            closeAriaLabel={closeAriaLabel}
-            description={description}
-            icon={icon}
-            showClose={showClose}
-            title={title}
-          />
-        ) : null}
-        {children != null ? (
-          hasHeader ? (
-            <ModalBody className={bodyClassName} style={bodyStyle}>
-              {children}
-            </ModalBody>
-          ) : (
-            children
-          )
-        ) : null}
-        {footerNode}
-      </ModalContent>
-    </ModalLayer>
-  );
-}
-
-// ─── Публичный API ────────────────────────────────────────────────────────────
+// ─── Public API ───────────────────────────────────────────────────────────────
 
 export const Modal = {
   Root: ModalRoot,
   Trigger: ModalTrigger,
-  Close: ModalClose,
-  Footer: ModalFooter,
-  Panel: ModalPanel,
+  Content: ModalContent,
+  Header: DialogHeader,
+  Icon: DialogIcon,
+  Title: DialogTitle,
+  Description: DialogDescription,
+  Body: DialogBody,
+  Footer: DialogFooter,
+  Close: DialogClose,
+  Confirm: DialogConfirm,
 };

@@ -4,14 +4,12 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { InputSize } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Notification.module.css";
 
-// ─── useCountdown ─────────────────────────────────────────────────────────────
-// Хук живёт здесь, чтобы ре-рендеры прогресс-бара не поднимались до motion.li.
-
-export function useCountdown(
+// Countdown lives in the card so progress re-renders never reach the stack item.
+function useCountdown(
   item: NotificationRecord,
   paused: boolean,
   onExpire: (id: string) => void,
@@ -60,8 +58,6 @@ export function useCountdown(
   return progress;
 }
 
-export type NotificationType = "success" | "error" | "warning" | "info";
-export type NotificationSize = "s" | "m" | "l";
 export type NotificationPosition =
   | "top-left"
   | "top-center"
@@ -70,16 +66,41 @@ export type NotificationPosition =
   | "bottom-center"
   | "bottom-right";
 
+export type NotificationLabels = {
+  /** `aria-label` of the close button. */
+  close: string;
+  /** Accessible names of the toast regions, per position. */
+  regions: Record<NotificationPosition, string>;
+};
+
+export const DEFAULT_NOTIFICATION_LABELS: NotificationLabels = {
+  close: "Закрыть уведомление",
+  regions: {
+    "top-left": "Уведомления сверху слева",
+    "top-center": "Уведомления сверху по центру",
+    "top-right": "Уведомления сверху справа",
+    "bottom-left": "Уведомления снизу слева",
+    "bottom-center": "Уведомления снизу по центру",
+    "bottom-right": "Уведомления снизу справа",
+  },
+};
+
+/** Labels provided by `NotificationProvider`; a standalone card uses the defaults. */
+export const NotificationLabelsContext = React.createContext<NotificationLabels>(
+  DEFAULT_NOTIFICATION_LABELS,
+);
+
 export type NotificationAction = {
   label: string;
   onClick: () => void;
 };
 
 export type NotificationOptions = {
-  type: NotificationType;
+  /** Semantic color and default icon. Default `info`. `danger` and `warning` are announced assertively. */
+  tone?: Extract<Tone, "info" | "success" | "warning" | "danger">;
   title: string;
   description?: string;
-  size?: NotificationSize;
+  size?: ControlSize;
   position?: NotificationPosition;
   duration?: number;
   persistent?: boolean;
@@ -91,15 +112,16 @@ export type NotificationOptions = {
 
 export type NotificationRecord = NotificationOptions & {
   id: string;
+  tone: NonNullable<NotificationOptions["tone"]>;
   position: NotificationPosition;
-  size: NotificationSize;
+  size: ControlSize;
   duration: number;
   persistent: boolean;
   closable: boolean;
   createdAt: number;
 };
 
-type NotificationCardProps = {
+export type NotificationCardProps = {
   item: NotificationRecord;
   className?: string;
   paused: boolean;
@@ -108,15 +130,21 @@ type NotificationCardProps = {
   stackExpanded?: boolean;
 };
 
-const actionButtonSize: Record<NotificationSize, InputSize> = {
-  s: "s",
+/** Action button sits one tier below the card (pairing rule for nested controls). */
+const actionButtonSize: Record<ControlSize, ControlSize> = {
+  xs: "xs",
+  s: "xs",
   m: "s",
   l: "m",
+  xl: "l",
 };
 
-const defaultIconByType: Record<NotificationType, React.ComponentType<{ className?: string }>> = {
+const defaultIconByTone: Record<
+  NotificationRecord["tone"],
+  React.ComponentType<{ className?: string }>
+> = {
   success: CheckCircle2,
-  error: XCircle,
+  danger: XCircle,
   warning: AlertTriangle,
   info: Info,
 };
@@ -130,8 +158,9 @@ export function NotificationCard({
   stackExpanded = false,
 }: NotificationCardProps) {
   const progress = useCountdown(item, paused, onDismiss);
-  const DefaultIcon = defaultIconByType[item.type];
-  const liveRole = item.type === "error" || item.type === "warning" ? "alert" : "status";
+  const labels = React.useContext(NotificationLabelsContext);
+  const DefaultIcon = defaultIconByTone[item.tone];
+  const liveRole = item.tone === "danger" || item.tone === "warning" ? "alert" : "status";
 
   return (
     <article
@@ -139,11 +168,11 @@ export function NotificationCard({
       role={liveRole}
       aria-live={liveRole === "alert" ? "assertive" : "polite"}
       {...toDataAttributes({
-        type: item.type,
+        tone: item.tone,
         size: item.size,
         persistent: item.persistent,
-        stackDepth,
-        stackExpanded,
+        "stack-depth": stackDepth,
+        "stack-expanded": stackExpanded,
       })}
     >
       <div className={styles.iconWrap} aria-hidden="true">
@@ -158,10 +187,10 @@ export function NotificationCard({
         {item.action ? (
           <div className={styles.actionRow}>
             <Button.Root
+              variant="soft"
+              tone="neutral"
               type="button"
               size={actionButtonSize[item.size]}
-              variant="neutral"
-              mode="stroke"
               onClick={item.action.onClick}
             >
               {item.action.label}
@@ -173,7 +202,7 @@ export function NotificationCard({
         <button
           type="button"
           className={styles.closeButton}
-          aria-label="Dismiss notification"
+          aria-label={labels.close}
           onClick={() => onDismiss(item.id)}
         >
           <X aria-hidden="true" />

@@ -1,42 +1,66 @@
+/*
+ * Field label. Tier T uses `--prime-control-<T>-label-*` (foundation §6):
+ * xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500, primary text.
+ */
 .root {
-  font-size: var(--prime-sys-size-control-m-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-primary);
+  --prime-label-size: var(--prime-control-m-label-size);
+  --prime-label-line-height: var(--prime-control-m-label-line-height);
   display: inline-flex;
   align-items: center;
-  gap: var(--prime-sys-size-control-m-gap);
+  flex-wrap: wrap;
+  column-gap: var(--prime-space-1);
+  min-width: 0;
+  max-width: 100%;
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--prime-label-size);
+  line-height: var(--prime-label-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.root[data-size="xs"] {
+  --prime-label-size: var(--prime-control-xs-label-size);
+  --prime-label-line-height: var(--prime-control-xs-label-line-height);
 }
 
 .root[data-size="s"] {
-  font-size: var(--prime-sys-size-control-s-text);
-  gap: var(--prime-sys-size-control-s-gap);
+  --prime-label-size: var(--prime-control-s-label-size);
+  --prime-label-line-height: var(--prime-control-s-label-line-height);
 }
 
 .root[data-size="l"] {
-  font-size: var(--prime-sys-size-control-l-text);
-  gap: var(--prime-sys-size-control-l-gap);
+  --prime-label-size: var(--prime-control-l-label-size);
+  --prime-label-line-height: var(--prime-control-l-label-line-height);
 }
 
 .root[data-size="xl"] {
-  font-size: var(--prime-sys-size-control-xl-text);
-  gap: var(--prime-sys-size-control-xl-gap);
+  --prime-label-size: var(--prime-control-xl-label-size);
+  --prime-label-line-height: var(--prime-control-xl-label-line-height);
+}
+
+.root[data-disabled="true"] {
+  color: var(--prime-color-text-disabled);
 }
 
 .iconSlot {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-}
-
-.root[data-disabled="true"] {
-  color: var(--prime-sys-color-content-disabled);
+  color: var(--prime-color-text-muted);
 }
 
 .asterisk {
-  color: var(--prime-sys-color-content-danger);
+  color: var(--prime-color-danger-text);
+  font-weight: var(--prime-font-weight-medium);
 }
 
-.sub {
-  color: var(--prime-sys-color-content-secondary);
-  font-weight: var(--prime-sys-typography-weight-regular);
+.sub,
+.optional {
+  font-weight: var(--prime-font-weight-regular);
+  color: var(--prime-color-text-muted);
+}
+
+.root[data-disabled="true"] :is(.asterisk, .sub, .optional, .iconSlot) {
+  color: var(--prime-color-text-disabled);
 }

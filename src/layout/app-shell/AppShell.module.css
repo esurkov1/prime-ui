@@ -1,43 +1,99 @@
-.layoutRoot {
+/*
+ * App shell: two full-height planes edge to edge — the navigation column on the canvas and the
+ * content plane on the surface. No inset, radius, shadow or border: the boundary is the fill
+ * change. Gutters inside the content plane: 16 → 24 from 640px → 32 from 1024px; top air
+ * 24 → 40 from 1024px.
+ */
+
+.root {
+  --shell-gutter: var(--prime-layout-gutter-s);
+  --shell-top: var(--prime-space-6);
+
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
-  align-items: stretch;
-  column-gap: 0;
-  row-gap: 0;
+  grid-template-columns: auto minmax(0, 1fr);
   width: 100%;
-  min-height: 0;
-  padding: 0;
-  background: transparent;
+  min-width: 0;
+  min-height: 100dvh;
+  background: var(--prime-color-bg-canvas);
+  color: var(--prime-color-text-primary);
 }
 
-.layoutRoot > .layoutMain:only-child {
-  grid-column: 1 / -1;
+.root:not(:has(> .nav)) {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.layoutRoot[data-fill-viewport="true"] {
+.root[data-fill-viewport="true"] {
   height: 100dvh;
-  max-height: 100dvh;
+  min-height: 0;
   overflow: hidden;
 }
 
-.layoutNav {
-  box-sizing: border-box;
-  min-width: 0;
-  min-height: 0;
-  max-height: 100%;
-  padding: 0;
-  margin: 0;
-  overflow: visible;
-  background: transparent;
+@media (min-width: 640px) {
+  .root {
+    --shell-gutter: var(--prime-layout-gutter-m);
+  }
 }
 
-/**
- * Прокручиваемая колонка контента: канон полей к краю колонки (`x6`) встроен сюда — отдельная обёртка не нужна.
- * Маркер для отладки: `data-app-shell-main-padded`.
+@media (min-width: 1024px) {
+  .root {
+    --shell-gutter: var(--prime-layout-gutter-l);
+    --shell-top: var(--prime-space-10);
+  }
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  box-sizing: border-box;
+  display: flex;
+  height: 100dvh;
+  min-width: 0;
+}
+
+.root[data-fill-viewport="true"] > .nav {
+  position: static;
+  height: 100%;
+  min-height: 0;
+}
+
+.panel {
+  /* Surface context: fields use the surface fill, cards become sunken tiles (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  --prime-color-card-bg: var(--prime-color-bg-sunken);
+  --prime-card-shadow: none;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: clip;
+  background: var(--prime-color-bg-surface);
+  color: var(--prime-color-text-primary);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--prime-z-sticky);
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+  min-height: calc(var(--prime-control-m-height) + 2 * var(--prime-space-3));
+  padding-block: var(--prime-space-3);
+  padding-inline: var(--shell-gutter);
+  background: var(--prime-color-bg-surface);
+}
+
+/*
+ * Percent padding resolves against the panel width, so `contained` centers content without a
+ * wrapper element.
  */
-.layoutMain {
+.main {
   box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
@@ -45,16 +101,15 @@
   min-width: 0;
   min-height: 0;
   margin: 0;
-  background: transparent;
-  padding-block: var(--prime-sys-spacing-x6);
-  padding-inline: var(--prime-sys-spacing-x6);
+  padding-block: var(--shell-top) var(--prime-space-16);
+  /* Default: the whole panel, only the responsive gutters. */
+  padding-inline: var(--shell-gutter);
 }
 
-@media (min-width: 48rem) {
-  .layoutRoot[data-layout-template="app"]:has(
-      [data-sidebar-root="true"][data-state="expanded"],
-      [data-sidebar-root="true"][data-state="compact"]
-    ) {
-    column-gap: var(--prime-sys-spacing-x3);
-  }
+/* Long-read pages: a centered column up to the content max width. */
+.main[data-content-width="contained"] {
+  padding-inline: max(
+    var(--shell-gutter),
+    calc((100% - var(--prime-layout-content-max-width)) / 2)
+  );
 }

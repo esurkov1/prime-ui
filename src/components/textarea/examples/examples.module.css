@@ -1,33 +1,60 @@
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
-}
+/* Layout helpers for the Textarea examples. Semantic tokens only. */
 
-.compositionStack {
+.sizesGrid {
   display: grid;
-  gap: var(--prime-sys-spacing-x3);
-  max-width: min(100%, 28rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 2)), 1fr));
+  align-items: start;
+  gap: var(--prime-space-5);
+  width: 100%;
 }
 
-.blockSpacer {
-  margin-top: var(--prime-sys-spacing-l);
+.column {
+  display: grid;
+  gap: var(--prime-space-5);
   width: 100%;
+  max-width: var(--prime-modal-width-s);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
+  align-items: start;
+  gap: var(--prime-space-5);
+  width: 100%;
+  max-width: var(--prime-modal-width-m);
+}
+
+.cell {
+  display: grid;
+  gap: var(--prime-space-2);
   min-width: 0;
 }
 
-.labelBlock {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-s);
+/* Demo block below the field that shows whether the layout shifts. */
+.marker {
+  padding: var(--prime-space-2) var(--prime-space-3);
+  border-radius: var(--prime-radius-s);
+  background: var(--prime-color-fill-subtle);
 }
 
-.fullWidthCard {
-  box-sizing: border-box;
+.card {
   width: 100%;
-  max-width: min(100%, 22rem);
-  padding: var(--prime-sys-spacing-x3);
-  border-radius: var(--prime-sys-radius-m);
-  border: 1px dashed var(--prime-sys-color-border-subtle);
-  background: var(--prime-sys-color-surface-raised);
+  max-width: var(--prime-modal-width-s);
+}
+
+.form {
+  display: grid;
+  gap: var(--prime-space-5);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+}
+
+/* Fills its surface tile like Input does, so no stray gap remains on the right. */
+.surfaceField {
+  width: 100%;
 }

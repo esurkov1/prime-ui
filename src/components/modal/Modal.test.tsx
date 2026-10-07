@@ -2,420 +2,470 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
+import { Select } from "@/components/select/Select";
 
-import { Modal } from "./Modal";
+import { Modal, type ModalRootProps } from "./Modal";
+
+/** A scrim dismiss is a full click that starts and ends outside the panel. */
+function clickScrim(scrim: HTMLElement) {
+  fireEvent.pointerDown(scrim);
+  fireEvent.click(scrim);
+}
 
 function BasicModal({
-  closeOnEscape = true,
-  closeOnOverlayClick = true,
-}: {
-  closeOnEscape?: boolean;
-  closeOnOverlayClick?: boolean;
-}) {
+  onConfirm,
+  ...rootProps
+}: Omit<ModalRootProps, "children"> & { onConfirm?: () => void }) {
   return (
-    <Modal.Root closeOnEscape={closeOnEscape} closeOnOverlayClick={closeOnOverlayClick}>
+    <Modal.Root {...rootProps}>
       <Modal.Trigger>
         <Button.Root>Open</Button.Root>
       </Modal.Trigger>
-      <Modal.Panel
-        description="Test description"
-        footer={
-          <Modal.Footer
-            primary={<Button.Root>Confirm</Button.Root>}
-            secondary={
-              <Modal.Close>
-                <Button.Root variant="neutral" mode="stroke">
-                  Cancel
-                </Button.Root>
-              </Modal.Close>
-            }
-          />
-        }
-        title="Test title"
-      >
-        <p>Body content</p>
-        <Button.Root>Focusable inside</Button.Root>
-      </Modal.Panel>
+      <Modal.Content>
+        <Modal.Header>
+          <Modal.Icon tone="danger">
+            <svg />
+          </Modal.Icon>
+          <Modal.Title>Test title</Modal.Title>
+          <Modal.Description>Test description</Modal.Description>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Body content</p>
+          <Button.Root>Focusable inside</Button.Root>
+        </Modal.Body>
+        <Modal.Footer>
+          <Modal.Close>
+            <Button.Root variant="outline" tone="neutral">
+              Cancel
+            </Button.Root>
+          </Modal.Close>
+          <Modal.Confirm>
+            <Button.Root onClick={onConfirm}>Confirm</Button.Root>
+          </Modal.Confirm>
+        </Modal.Footer>
+      </Modal.Content>
     </Modal.Root>
   );
 }
 
-describe("Modal", () => {
-  it("renders Trigger and opens Panel on click", () => {
-    render(<BasicModal />);
+function openModal() {
+  fireEvent.click(screen.getByRole("button", { name: "Open" }));
+}
 
+describe("Modal", () => {
+  it("opens from Trigger", () => {
+    render(<BasicModal />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    openModal();
 
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
   });
 
-  it("sets aria-labelledby and aria-describedby from header", () => {
+  it("labels the dialog from Title and Description", () => {
     render(<BasicModal />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    openModal();
 
-    const modal = screen.getByRole("dialog");
-    const heading = screen.getByRole("heading", { name: "Test title" });
-    const description = screen.getByText("Test description");
-    expect(modal).toHaveAttribute("aria-labelledby", heading.id);
-    expect(modal).toHaveAttribute("aria-describedby", description.id);
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute(
+      "aria-labelledby",
+      screen.getByRole("heading", { name: "Test title" }).id,
+    );
+    expect(dialog).toHaveAttribute("aria-describedby", screen.getByText("Test description").id);
   });
 
-  it("uses explicit aria-labelledby and aria-describedby on Panel", () => {
+  it("uses explicit aria-labelledby / aria-describedby as the part ids", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Panel
-          aria-describedby="custom-desc"
-          aria-labelledby="custom-title"
-          description="Custom desc"
-          title="Custom"
-        />
+        <Modal.Content aria-describedby="custom-desc" aria-labelledby="custom-title">
+          <Modal.Header>
+            <Modal.Title>Custom</Modal.Title>
+            <Modal.Description>Custom desc</Modal.Description>
+          </Modal.Header>
+        </Modal.Content>
       </Modal.Root>,
     );
 
-    const modal = screen.getByRole("dialog");
+    const dialog = screen.getByRole("dialog");
     expect(screen.getByRole("heading", { name: "Custom" })).toHaveAttribute("id", "custom-title");
     expect(screen.getByText("Custom desc")).toHaveAttribute("id", "custom-desc");
-    expect(modal).toHaveAttribute("aria-labelledby", "custom-title");
-    expect(modal).toHaveAttribute("aria-describedby", "custom-desc");
+    expect(dialog).toHaveAttribute("aria-labelledby", "custom-title");
+    expect(dialog).toHaveAttribute("aria-describedby", "custom-desc");
   });
 
-  it("omits aria-describedby when there is no description", () => {
+  it("omits aria-describedby without a Description", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Panel title="Title only" />
+        <Modal.Content>
+          <Modal.Header>
+            <Modal.Title>Title only</Modal.Title>
+          </Modal.Header>
+        </Modal.Content>
       </Modal.Root>,
     );
 
-    const modal = screen.getByRole("dialog");
-    expect(modal).toHaveAttribute("aria-labelledby", screen.getByRole("heading").id);
-    expect(modal).not.toHaveAttribute("aria-describedby");
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("aria-labelledby", screen.getByRole("heading").id);
+    expect(dialog).not.toHaveAttribute("aria-describedby");
   });
 
-  it("uses modal shell size on built-in header close button", () => {
-    render(<BasicModal />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    expect(screen.getByRole("button", { name: "Close" })).toHaveAttribute("data-size", "m");
+  it("renders the header icon with its tone and hides it from assistive tech", () => {
+    render(<BasicModal defaultOpen />);
+    const icon = screen.getByRole("dialog").querySelector("[data-tone]");
+    expect(icon).toHaveAttribute("data-tone", "danger");
+    expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("closes via built-in header close button", () => {
+  it("renders the header close as a small ghost icon button with labels.close", () => {
+    render(<BasicModal defaultOpen labels={{ close: "Close dialog" }} />);
+    const close = screen.getByRole("button", { name: "Close dialog" });
+    expect(close).toHaveAttribute("data-size", "s");
+    expect(close).toHaveAttribute("data-variant", "ghost");
+  });
+
+  it("hides the header close with showClose={false}", () => {
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content>
+          <Modal.Header showClose={false}>
+            <Modal.Title>No close</Modal.Title>
+          </Modal.Header>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+    expect(screen.queryByRole("button", { name: "Закрыть" })).not.toBeInTheDocument();
+  });
+
+  it("defaults to size m and exposes size on the dialog", () => {
+    const { rerender } = render(
+      <Modal.Root defaultOpen>
+        <Modal.Content aria-label="Sized" />
+      </Modal.Root>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-size", "m");
+
+    rerender(
+      <Modal.Root defaultOpen>
+        <Modal.Content aria-label="Sized" size="xl" />
+      </Modal.Root>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-size", "xl");
+  });
+
+  it("lays footer actions out as fill for s/m and end for l/xl, overridable", () => {
+    const footer = (size: "s" | "m" | "l" | "xl", layout?: "fill" | "end") => (
+      <Modal.Root defaultOpen>
+        <Modal.Content aria-label="Footer" size={size}>
+          <Modal.Footer layout={layout} data-testid="footer">
+            <Button.Root>OK</Button.Root>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal.Root>
+    );
+    const { rerender } = render(footer("m"));
+    expect(screen.getByTestId("footer")).toHaveAttribute("data-layout", "fill");
+    rerender(footer("l"));
+    expect(screen.getByTestId("footer")).toHaveAttribute("data-layout", "end");
+    rerender(footer("s", "end"));
+    expect(screen.getByTestId("footer")).toHaveAttribute("data-layout", "end");
+  });
+
+  it("keeps the autoFocus target as initial focus and returns focus to the trigger", async () => {
+    render(
+      <Modal.Root>
+        <Modal.Trigger>
+          <Button.Root>Open</Button.Root>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Header>
+            <Modal.Title>Rename</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {/* biome-ignore lint/a11y/noAutofocus: initial focus target under test */}
+            <input aria-label="Name" autoFocus />
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Open" });
+    trigger.focus();
+    fireEvent.click(trigger);
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Name" }));
+    });
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it("moves focus to the first focusable element on open", async () => {
     render(<BasicModal />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    openModal();
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole("button", { name: "Закрыть" }));
+    });
+  });
+
+  it("ignores Escape already handled by a nested control", () => {
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content aria-label="Nested">
+          <Modal.Body>
+            <input
+              aria-label="Combobox"
+              onKeyDown={(event) => {
+                if (event.key === "Escape") event.preventDefault();
+              }}
+            />
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+
+    fireEvent.keyDown(screen.getByRole("textbox", { name: "Combobox" }), { key: "Escape" });
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+  it("closes via the header close button", () => {
+    render(<BasicModal />);
+    openModal();
+    fireEvent.click(screen.getByRole("button", { name: "Закрыть" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("closes via Modal.Close in footer (Cancel)", () => {
+  it("closes via Modal.Close", () => {
     render(<BasicModal />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
+    openModal();
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("closes on Escape key by default", () => {
-    render(<BasicModal />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
+  it("closes on Escape by default and not with closeOnEscape={false}", () => {
+    const { unmount } = render(<BasicModal />);
+    openModal();
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
+    unmount();
 
-  it("does not close on Escape when closeOnEscape=false", () => {
     render(<BasicModal closeOnEscape={false} />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
+    openModal();
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("closes on overlay click by default", () => {
-    render(<BasicModal />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    const overlay = screen.getByTestId("modal-overlay");
-    fireEvent.click(overlay);
+  it("closes on overlay click by default and not with closeOnOutsideClick={false}", () => {
+    const { unmount } = render(<BasicModal />);
+    openModal();
+    clickScrim(screen.getByTestId("modal-overlay"));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
+    unmount();
 
-  it("does not close on overlay click when closeOnOverlayClick=false", () => {
-    render(<BasicModal closeOnOverlayClick={false} />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    const overlay = screen.getByTestId("modal-overlay");
-    fireEvent.click(overlay);
+    render(<BasicModal closeOnOutsideClick={false} />);
+    openModal();
+    clickScrim(screen.getByTestId("modal-overlay"));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("renders footer actions", () => {
-    render(<BasicModal />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    expect(screen.getByRole("button", { name: "Confirm" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+  it("does not close when the click starts inside the dialog", () => {
+    render(<BasicModal defaultOpen />);
+    fireEvent.pointerDown(screen.getByText("Body content"));
+    fireEvent.click(screen.getByText("Body content"));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("supports title and footer without body text", () => {
+  it("supports header and footer without a body", () => {
     render(
       <Modal.Root defaultOpen>
-        <Modal.Panel
-          footer={<Modal.Footer primary={<Button.Root>Action</Button.Root>} />}
-          title="Header footer"
-        />
+        <Modal.Content>
+          <Modal.Header>
+            <Modal.Title>Header footer</Modal.Title>
+          </Modal.Header>
+          <Modal.Footer>
+            <Button.Root>Action</Button.Root>
+          </Modal.Footer>
+        </Modal.Content>
       </Modal.Root>,
     );
-
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Header footer" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Action" })).toBeInTheDocument();
-    expect(screen.queryByText("Body content")).not.toBeInTheDocument();
   });
 
-  it("supports title only", () => {
-    render(
-      <Modal.Root defaultOpen>
-        <Modal.Panel title="Header only" />
-      </Modal.Root>,
-    );
-
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Header only" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Action" })).not.toBeInTheDocument();
-  });
-
-  it("moves focus to first focusable element on open (focus trap)", async () => {
-    render(<BasicModal />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    await waitFor(() => {
-      const closeBtn = screen.getByRole("button", { name: "Close" });
-      expect(document.activeElement).toBe(closeBtn);
-    });
-  });
-
-  it("triggers footer primary button on Enter when focus is not on primary", () => {
+  it("Enter clicks Modal.Confirm when focus is elsewhere", () => {
     const onConfirm = vi.fn();
-    render(
-      <Modal.Root>
-        <Modal.Trigger>
-          <Button.Root>Open</Button.Root>
-        </Modal.Trigger>
-        <Modal.Panel
-          footer={
-            <Modal.Footer
-              primary={
-                <Button.Root type="button" onClick={onConfirm}>
-                  Confirm
-                </Button.Root>
-              }
-              secondary={
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="stroke">
-                    Cancel
-                  </Button.Root>
-                </Modal.Close>
-              }
-            />
-          }
-          title="Confirm action"
-        >
-          <p>Body</p>
-        </Modal.Panel>
-      </Modal.Root>,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    screen.getByRole("button", { name: "Cancel" }).focus();
-    fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), { key: "Enter" });
-
+    render(<BasicModal onConfirm={onConfirm} />);
+    openModal();
+    const cancel = screen.getByRole("button", { name: "Cancel" });
+    cancel.focus();
+    fireEvent.keyDown(cancel, { key: "Enter" });
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
-  it("does not trigger primary on Enter when confirmOnEnter is false", () => {
+  it("Enter does nothing with confirmOnEnter={false}", () => {
     const onConfirm = vi.fn();
-    render(
-      <Modal.Root confirmOnEnter={false}>
-        <Modal.Trigger>
-          <Button.Root>Open</Button.Root>
-        </Modal.Trigger>
-        <Modal.Panel
-          footer={
-            <Modal.Footer
-              primary={
-                <Button.Root type="button" onClick={onConfirm}>
-                  Confirm
-                </Button.Root>
-              }
-              secondary={
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="stroke">
-                    Cancel
-                  </Button.Root>
-                </Modal.Close>
-              }
-            />
-          }
-          title="T"
-        >
-          <p>Body</p>
-        </Modal.Panel>
-      </Modal.Root>,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    screen.getByRole("button", { name: "Cancel" }).focus();
-    fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), { key: "Enter" });
-
+    render(<BasicModal confirmOnEnter={false} onConfirm={onConfirm} />);
+    openModal();
+    const cancel = screen.getByRole("button", { name: "Cancel" });
+    cancel.focus();
+    fireEvent.keyDown(cancel, { key: "Enter" });
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
-  it("calls onEnterConfirm instead of default primary click", () => {
+  it("onEnterConfirm replaces the default confirm click", () => {
     const onCustom = vi.fn();
     const onConfirm = vi.fn();
-    render(
-      <Modal.Root onEnterConfirm={onCustom}>
-        <Modal.Trigger>
-          <Button.Root>Open</Button.Root>
-        </Modal.Trigger>
-        <Modal.Panel
-          footer={
-            <Modal.Footer
-              primary={
-                <Button.Root type="button" onClick={onConfirm}>
-                  Confirm
-                </Button.Root>
-              }
-              secondary={
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="stroke">
-                    Cancel
-                  </Button.Root>
-                </Modal.Close>
-              }
-            />
-          }
-          title="T"
-        >
-          <p>Body</p>
-        </Modal.Panel>
-      </Modal.Root>,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    screen.getByRole("button", { name: "Cancel" }).focus();
-    fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), { key: "Enter" });
-
+    render(<BasicModal onEnterConfirm={onCustom} onConfirm={onConfirm} />);
+    openModal();
+    const cancel = screen.getByRole("button", { name: "Cancel" });
+    cancel.focus();
+    fireEvent.keyDown(cancel, { key: "Enter" });
     expect(onCustom).toHaveBeenCalledTimes(1);
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
-  it("Enter targets Modal.Footer primary when extra buttons are focused", () => {
+  it("Enter targets Modal.Confirm when another footer button is focused", () => {
     const onConfirm = vi.fn();
     const onDetails = vi.fn();
     render(
-      <Modal.Root>
-        <Modal.Trigger>
-          <Button.Root>Open</Button.Root>
-        </Modal.Trigger>
-        <Modal.Panel
-          footer={
-            <Modal.Footer
-              extra={
-                <>
-                  <Button.Root type="button">Help</Button.Root>
-                  <Button.Root type="button" onClick={onDetails}>
-                    Details
-                  </Button.Root>
-                </>
-              }
-              primary={
-                <Button.Root type="button" onClick={onConfirm}>
-                  Confirm
-                </Button.Root>
-              }
-              secondary={
-                <Modal.Close>
-                  <Button.Root variant="neutral" mode="stroke">
-                    Cancel
-                  </Button.Root>
-                </Modal.Close>
-              }
-            />
-          }
-          title="Order"
-        >
-          <p>Body</p>
-        </Modal.Panel>
+      <Modal.Root defaultOpen>
+        <Modal.Content aria-label="Order">
+          <Modal.Footer>
+            <Button.Root onClick={onDetails}>Details</Button.Root>
+            <Modal.Confirm>
+              <Button.Root onClick={onConfirm}>Confirm</Button.Root>
+            </Modal.Confirm>
+          </Modal.Footer>
+        </Modal.Content>
       </Modal.Root>,
     );
-
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    screen.getByRole("button", { name: "Details" }).focus();
-    fireEvent.keyDown(screen.getByRole("button", { name: "Details" }), { key: "Enter" });
-
+    const details = screen.getByRole("button", { name: "Details" });
+    details.focus();
+    fireEvent.keyDown(details, { key: "Enter" });
     expect(onConfirm).toHaveBeenCalledTimes(1);
     expect(onDetails).not.toHaveBeenCalled();
   });
 
-  it("does not fire Enter confirm from textarea", () => {
+  it("does not confirm on Enter from a textarea", () => {
     const onConfirm = vi.fn();
     render(
-      <Modal.Root>
-        <Modal.Trigger>
-          <Button.Root>Open</Button.Root>
-        </Modal.Trigger>
-        <Modal.Panel
-          footer={
-            <Modal.Footer
-              primary={
-                <Button.Root type="button" onClick={onConfirm}>
-                  OK
-                </Button.Root>
-              }
-            />
-          }
-          title="Form"
-        >
-          <textarea data-testid="ta" defaultValue="line" />
-        </Modal.Panel>
+      <Modal.Root defaultOpen>
+        <Modal.Content aria-label="Form">
+          <Modal.Body>
+            <textarea data-testid="ta" defaultValue="line" />
+          </Modal.Body>
+          <Modal.Footer>
+            <Modal.Confirm>
+              <Button.Root onClick={onConfirm}>OK</Button.Root>
+            </Modal.Confirm>
+          </Modal.Footer>
+        </Modal.Content>
       </Modal.Root>,
     );
-
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
     screen.getByTestId("ta").focus();
     fireEvent.keyDown(screen.getByTestId("ta"), { key: "Enter" });
-
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
-  it("works in controlled mode with aria-label only", () => {
+  it("works controlled with aria-label only", () => {
+    const onOpenChange = vi.fn();
     const { rerender } = render(
-      <Modal.Root open={false}>
-        <Modal.Panel aria-label="Controlled modal">
-          <p>Controlled</p>
-        </Modal.Panel>
+      <Modal.Root open={false} onOpenChange={onOpenChange}>
+        <Modal.Content aria-label="Controlled modal" />
       </Modal.Root>,
     );
-
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
     rerender(
-      <Modal.Root open={true}>
-        <Modal.Panel aria-label="Controlled modal">
-          <p>Controlled</p>
-        </Modal.Panel>
+      <Modal.Root open onOpenChange={onOpenChange}>
+        <Modal.Content aria-label="Controlled modal" />
       </Modal.Root>,
     );
+    expect(screen.getByRole("dialog", { name: "Controlled modal" })).toBeInTheDocument();
 
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("makes the page behind inert while open", () => {
+    const outside = document.createElement("div");
+    document.body.appendChild(outside);
+    const { unmount } = render(<BasicModal defaultOpen />);
+    expect(outside).toHaveAttribute("aria-hidden", "true");
+    unmount();
+    expect(outside).not.toHaveAttribute("aria-hidden");
+    outside.remove();
+  });
+});
+
+describe("Modal — overlay contract", () => {
+  function ModalWithSelect() {
+    return (
+      <Modal.Root defaultOpen>
+        <Modal.Content aria-label="With select">
+          <Modal.Body>
+            <p>Modal body</p>
+            <Select.Root placeholder="Pick">
+              <Select.Trigger>
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="one">One</Select.Item>
+              </Select.Content>
+            </Select.Root>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>
+    );
+  }
+
+  it("a pointerdown inside a nested Select listbox does not close the modal", () => {
+    render(<ModalWithSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const listbox = screen.getByRole("listbox");
+    fireEvent.pointerDown(listbox);
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("an outside click closes only the topmost layer (Select first, then the modal)", () => {
+    render(<ModalWithSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    clickScrim(screen.getByTestId("modal-overlay"));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    clickScrim(screen.getByTestId("modal-overlay"));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("Escape closes only the topmost layer", () => {
+    render(<ModalWithSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("a drag that starts inside the dialog and ends on the scrim does not close it", () => {
+    render(<BasicModal defaultOpen />);
+    fireEvent.pointerDown(screen.getByText("Body content"));
+    fireEvent.click(screen.getByTestId("modal-overlay"));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("returns focus to the trigger after an outside click", () => {
+    render(<BasicModal />);
+    const trigger = screen.getByRole("button", { name: "Open" });
+    trigger.focus();
+    fireEvent.click(trigger);
+    clickScrim(screen.getByTestId("modal-overlay"));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
   });
 });

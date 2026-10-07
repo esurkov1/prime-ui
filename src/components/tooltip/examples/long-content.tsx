@@ -1,34 +1,21 @@
-import { Button, Label, Tooltip } from "prime-ui-kit";
-import type * as React from "react";
-
+/** A long hint that wraps at the tooltip max width. Use for a sentence of explanation; anything with actions belongs in a Popover. */
+import { Button, Tooltip } from "prime-ui-kit";
 import styles from "./examples.module.css";
 
-function TooltipDemoItem({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className={styles.demoItem}>
-      <Label.Root size="s">{label}</Label.Root>
-      {children}
-    </div>
-  );
-}
-
-/** Multi-line body, `size="m"`, theme max-width and wrapping (mirrors `playground/snippets/tooltip/long-content.tsx`). */
 export default function TooltipLongContentExample() {
   return (
-    <TooltipDemoItem label="Long copy, size m">
-      <Tooltip.Provider delayDuration={200}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="stroke">
-              Details
-            </Button.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content>
-            Password must be at least 12 characters and include upper and lower case letters and
-            numbers. Do not reuse passwords from other services.
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-    </TooltipDemoItem>
+    <div className={styles.row}>
+      <Tooltip.Root delayDuration={200}>
+        <Tooltip.Trigger>
+          <Button.Root variant="soft" tone="neutral">
+            Требования к паролю
+          </Button.Root>
+        </Tooltip.Trigger>
+        <Tooltip.Content size="l">
+          Не короче 12 символов, буквы разного регистра и цифры. Не используйте пароль от других
+          сервисов.
+        </Tooltip.Content>
+      </Tooltip.Root>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -179,7 +180,7 @@ describe("Dropdown", () => {
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
 
-  it("closes on outside click (mousedown)", () => {
+  it("closes on outside click (pointerdown)", () => {
     render(
       <div>
         <BasicDropdown />
@@ -188,7 +189,7 @@ describe("Dropdown", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     expect(screen.getByRole("menu")).toBeInTheDocument();
-    fireEvent.mouseDown(screen.getByRole("button", { name: "Outside" }));
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Outside" }));
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
 
@@ -278,24 +279,21 @@ describe("Dropdown", () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
-  // ─── Destructive item ────────────────────────────────────────────────────────
+  // ─── Danger item ────────────────────────────────────────────────────────
 
-  it("destructive item has data-destructive attribute", () => {
+  it("tone=danger item has data-tone attribute", () => {
     render(
       <Dropdown.Root>
         <Dropdown.Trigger>
           <button type="button">Open</button>
         </Dropdown.Trigger>
         <Dropdown.Content>
-          <Dropdown.Item destructive>Delete</Dropdown.Item>
+          <Dropdown.Item tone="danger">Delete</Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("menuitem", { name: "Delete" })).toHaveAttribute(
-      "data-destructive",
-      "true",
-    );
+    expect(screen.getByRole("menuitem", { name: "Delete" })).toHaveAttribute("data-tone", "danger");
   });
 
   // ─── Groups ──────────────────────────────────────────────────────────────────
@@ -335,7 +333,7 @@ describe("Dropdown", () => {
           <Dropdown.Separator />
           <Dropdown.Group>
             <Dropdown.GroupLabel>Danger zone</Dropdown.GroupLabel>
-            <Dropdown.Item destructive>Delete</Dropdown.Item>
+            <Dropdown.Item tone="danger">Delete</Dropdown.Item>
           </Dropdown.Group>
         </Dropdown.Content>
       </Dropdown.Root>,
@@ -409,7 +407,7 @@ describe("Dropdown", () => {
     const ref = React.createRef<HTMLButtonElement>();
     render(
       <Dropdown.Root>
-        <Dropdown.Trigger asChild>
+        <Dropdown.Trigger>
           <button ref={ref} type="button">
             Open
           </button>
@@ -497,6 +495,132 @@ describe("Dropdown", () => {
 
   it("defaultOpen=true opens menu on mount", () => {
     render(<BasicDropdown defaultOpen={true} />);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+  });
+
+  it("ItemIcon получает размер иконки яруса меню (xl → 20, xs → 14)", () => {
+    function SizedIcon({ size }: { size?: number }) {
+      return <svg data-testid={`icon-${size}`} aria-hidden />;
+    }
+    render(
+      <>
+        <Dropdown.Root defaultOpen>
+          <Dropdown.Trigger>
+            <button type="button">A</button>
+          </Dropdown.Trigger>
+          <Dropdown.Content size="xl">
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={SizedIcon} />
+              Big
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+        <Dropdown.Root defaultOpen>
+          <Dropdown.Trigger>
+            <button type="button">B</button>
+          </Dropdown.Trigger>
+          <Dropdown.Content size="xs">
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={SizedIcon} />
+              Small
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+      </>,
+    );
+    expect(screen.getByTestId("icon-20")).toBeInTheDocument();
+    expect(screen.getByTestId("icon-14")).toBeInTheDocument();
+  });
+
+  it("ItemShortcut рендерит подсказку клавиш как <kbd> внутри пункта", () => {
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Open</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>
+            Копировать
+            <Dropdown.ItemShortcut>⌘C</Dropdown.ItemShortcut>
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitem", { name: /Копировать/ });
+    expect(item.querySelector("kbd")).toHaveTextContent("⌘C");
+  });
+
+  it("trigger reflects data-state open/closed", () => {
+    render(
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <button type="button">Toggle</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <span>Body</span>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Toggle" });
+    expect(trigger).toHaveAttribute("data-state", "closed");
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute("data-state", "open");
+  });
+});
+
+describe("Dropdown — overlay contract", () => {
+  it("Escape closes and returns focus to the trigger", () => {
+    render(<BasicDropdown />);
+    const trigger = screen.getByRole("button", { name: "Open" });
+    trigger.focus();
+    fireEvent.click(trigger);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  // Focus follows the pointer (foundation §8): the focus trap does not restore the opener after an
+  // outside press, so a click on another control keeps that control's focus.
+  it("an outside click on another control closes it and focuses that control", async () => {
+    const user = userEvent.setup();
+    render(
+      <div>
+        <BasicDropdown />
+        <button type="button">Снаружи</button>
+      </div>,
+    );
+    await user.click(screen.getByRole("button", { name: "Open" }));
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    const outside = screen.getByRole("button", { name: "Снаружи" });
+    await user.click(outside);
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(outside).toHaveFocus();
+  });
+
+  it("a pointerdown on the trigger is not an outside click", () => {
+    render(<BasicDropdown />);
+    const trigger = screen.getByRole("button", { name: "Open" });
+    fireEvent.click(trigger);
+    fireEvent.pointerDown(trigger);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+  });
+
+  it("closeOnOutsideClick={false} keeps it open on an outside click", () => {
+    render(
+      <div>
+        <Dropdown.Root closeOnOutsideClick={false}>
+          <Dropdown.Trigger>
+            <button type="button">Open</button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item>Item</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+        <button type="button">Outside</button>
+      </div>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Outside" }));
     expect(screen.getByRole("menu")).toBeInTheDocument();
   });
 });

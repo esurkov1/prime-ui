@@ -1,63 +1,107 @@
-/* Высота трека — доля control-height того же яруса, как у Slider. */
+/* ProgressBar — Graphite: `fill-strong` track, accent / tone value, pill ends. */
+
 .root {
+  --pb-track-h: var(--prime-space-1);
+  --pb-label-size: var(--prime-control-m-label-size);
+  --pb-label-line-height: var(--prime-control-m-label-line-height);
+  --pb-fill: var(--prime-color-accent-default);
+
   display: flex;
   flex-direction: column;
-  gap: var(--progress-root-gap);
+  gap: var(--prime-space-2);
   width: 100%;
+  min-width: 0;
+  font-family: var(--prime-font-family-sans);
+}
+
+.root[data-size="xs"] {
+  --pb-label-size: var(--prime-control-xs-label-size);
+  --pb-label-line-height: var(--prime-control-xs-label-line-height);
+  gap: var(--prime-space-1);
 }
 
 .root[data-size="s"] {
-  --progress-root-gap: var(--prime-sys-size-control-s-gap);
-  --progress-track-h: var(--prime-sys-spacing-xs);
-  --progress-label-size: var(--prime-sys-size-control-s-text);
-}
-
-.root[data-size="m"] {
-  --progress-root-gap: var(--prime-sys-size-control-m-gap);
-  --progress-track-h: var(--prime-sys-spacing-xs);
-  --progress-label-size: var(--prime-sys-size-control-m-text);
+  --pb-label-size: var(--prime-control-s-label-size);
+  --pb-label-line-height: var(--prime-control-s-label-line-height);
+  gap: var(--prime-space-1);
 }
 
 .root[data-size="l"] {
-  --progress-root-gap: var(--prime-sys-size-control-l-gap);
-  --progress-track-h: var(--prime-sys-spacing-s);
-  --progress-label-size: var(--prime-sys-size-control-l-text);
+  --pb-track-h: var(--prime-space-2);
+  --pb-label-size: var(--prime-control-l-label-size);
+  --pb-label-line-height: var(--prime-control-l-label-line-height);
 }
 
 .root[data-size="xl"] {
-  --progress-root-gap: var(--prime-sys-size-control-xl-gap);
-  --progress-track-h: var(--prime-sys-spacing-s);
-  --progress-label-size: var(--prime-sys-size-control-xl-text);
+  --pb-track-h: var(--prime-space-2);
+  --pb-label-size: var(--prime-control-xl-label-size);
+  --pb-label-line-height: var(--prime-control-xl-label-line-height);
+}
+
+.root[data-tone="success"] {
+  --pb-fill: var(--prime-color-success-default);
+}
+
+.root[data-tone="warning"] {
+  --pb-fill: var(--prime-color-warning-default);
+}
+
+.root[data-tone="danger"] {
+  --pb-fill: var(--prime-color-danger-default);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  min-width: 0;
+  font-size: var(--pb-label-size);
+  line-height: var(--pb-label-line-height);
 }
 
 .label {
-  font-size: var(--progress-label-size);
-  color: var(--prime-sys-color-content-primary);
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  color: var(--prime-color-text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 .track {
   -webkit-appearance: none;
   appearance: none;
+  display: block;
   width: 100%;
-  height: var(--progress-track-h);
-  border: 0;
-  background: var(--prime-sys-color-surface-accentSoft);
-  border-radius: var(--prime-sys-shape-radius-round);
+  height: var(--pb-track-h);
+  margin: 0;
   overflow: hidden;
+  border: 0;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-strong);
+  color: var(--pb-fill);
 }
 
 .track::-webkit-progress-bar {
-  background: var(--prime-sys-color-surface-accentSoft);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-strong);
 }
 
 .track::-webkit-progress-value {
-  background: var(--prime-sys-color-action-primaryBackground);
-  border-radius: var(--prime-sys-shape-radius-round);
-  transition: width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  border-radius: var(--prime-radius-full);
+  background: var(--pb-fill);
+  transition: width var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
 }
 
 .track::-moz-progress-bar {
-  background: var(--prime-sys-color-action-primaryBackground);
-  border-radius: var(--prime-sys-shape-radius-round);
-  transition: width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  border-radius: var(--prime-radius-full);
+  background: var(--pb-fill);
 }

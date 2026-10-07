@@ -4,35 +4,47 @@ import * as React from "react";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import type { AccordionSize } from "@/internal/states";
+import { toDataAttributes } from "@/internal/data-attributes";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Accordion.module.css";
 
-export type AccordionType = "single" | "multiple";
-
-export type { AccordionSize };
-
-export type AccordionRootProps = React.HTMLAttributes<HTMLDivElement> & {
-  type?: AccordionType;
-  value?: string | string[];
-  defaultValue?: string | string[];
-  onValueChange?: (value: string | string[]) => void;
-  /** Только для `type="single"`. Если `false`, в одиночном режиме нельзя закрыть открытый пункт. По умолчанию `true`. */
-  collapsible?: boolean;
-  /** Размер триггера, иконок и отступов контента. По умолчанию `m`. */
-  size?: AccordionSize;
-  /** Групповой список без зазоров (`grouped`) или отдельные карточки (`separate`). */
+type AccordionBaseProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "defaultValue" | "onChange"
+> & {
+  /** Trigger, icon and content spacing tier. Default `m`. */
+  size?: ControlSize;
+  /** `grouped` — one frame without gaps (default); `separate` — every item is its own card. */
   layout?: "grouped" | "separate";
 };
 
-type AccordionContextValue = { size: AccordionSize };
+/** One open item at a time; `value` is the open item (`""` when all are closed). */
+export type AccordionSingleProps = AccordionBaseProps & {
+  type?: "single";
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  /** When `false`, the open item cannot be closed by clicking it. Default `true`. */
+  collapsible?: boolean;
+};
+
+/** Any number of open items; `value` lists them. */
+export type AccordionMultipleProps = AccordionBaseProps & {
+  type: "multiple";
+  value?: string[];
+  defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
+};
+
+export type AccordionRootProps = AccordionSingleProps | AccordionMultipleProps;
+
+type AccordionContextValue = { size: ControlSize };
 
 const [AccordionProvider, useAccordionContext] =
   createComponentContext<AccordionContextValue>("Accordion");
 
 type AccordionStateContextValue = {
-  type: AccordionType;
-  collapsible: boolean;
   openValues: string[];
   toggleItem: (value: string, disabled: boolean) => void;
 };
@@ -68,144 +80,109 @@ export type AccordionIconProps<T extends React.ElementType = "div"> = {
   children?: React.ReactNode;
 } & Omit<React.ComponentPropsWithoutRef<T>, "as" | "className">;
 
+type ArrowIcon = React.ElementType<{ className?: string; strokeWidth?: number | string }>;
+
 export type AccordionArrowProps = React.HTMLAttributes<HTMLSpanElement> & {
-  openIcon?: React.ElementType<{ className?: string; strokeWidth?: number | string }>;
-  closeIcon?: React.ElementType<{ className?: string; strokeWidth?: number | string }>;
+  /** Glyph; rotates 180° when the item opens. Default `ChevronDown`. */
+  icon?: ArrowIcon;
+  /** Glyph shown instead of `icon` while open (e.g. `Plus` → `Minus`); disables the rotation. */
+  openIcon?: ArrowIcon;
 };
 
-function singleControlledValue(value: string | string[] | undefined): string | undefined {
+function toOpenValues(value: string | string[] | undefined): string[] | undefined {
   if (value === undefined) return undefined;
-  if (Array.isArray(value)) return value[0] ?? "";
-  return value;
+  const list = Array.isArray(value) ? value : [value];
+  return Array.from(new Set(list.filter((entry) => entry !== "")));
 }
 
-function singleDefaultValue(defaultValue: string | string[] | undefined): string | undefined {
-  if (defaultValue === undefined) return undefined;
-  if (Array.isArray(defaultValue)) return defaultValue[0] ?? "";
-  return defaultValue;
-}
+const AccordionRoot = React.forwardRef<HTMLDivElement, AccordionRootProps>(
+  function AccordionRoot(props, ref) {
+    const {
+      type = "single",
+      value,
+      defaultValue,
+      onValueChange,
+      size = "m",
+      layout = "grouped",
+      className,
+      children,
+      ...restWithCollapsible
+    } = props;
+    const { collapsible = true, ...rest } = restWithCollapsible as typeof restWithCollapsible & {
+      collapsible?: boolean;
+    };
+    const contextValue = React.useMemo(() => ({ size }), [size]);
+    const isMultiple = type === "multiple";
+    const controlledValues = React.useMemo(() => toOpenValues(value), [value]);
 
-function multipleControlledValue(value: string | string[] | undefined): string[] | undefined {
-  if (value === undefined) return undefined;
-  if (Array.isArray(value)) return value;
-  return value === "" ? [] : [value];
-}
+    const [uncontrolledValues, setUncontrolledValues] = React.useState<string[]>(
+      () => toOpenValues(defaultValue) ?? [],
+    );
 
-function multipleDefaultValue(defaultValue: string | string[] | undefined): string[] | undefined {
-  if (defaultValue === undefined) return undefined;
-  if (Array.isArray(defaultValue)) return defaultValue;
-  return defaultValue === "" ? [] : [defaultValue];
-}
+    const openValues = controlledValues ?? uncontrolledValues;
+    const isControlled = controlledValues !== undefined;
 
-function normalizeValues(values: string[]): string[] {
-  return Array.from(new Set(values.filter((value) => value !== "")));
-}
+    const updateValues = React.useCallback(
+      (nextValues: string[]) => {
+        if (!isControlled) {
+          setUncontrolledValues(nextValues);
+        }
+        if (isMultiple) {
+          (onValueChange as ((next: string[]) => void) | undefined)?.(nextValues);
+        } else {
+          (onValueChange as ((next: string) => void) | undefined)?.(nextValues[0] ?? "");
+        }
+      },
+      [isControlled, isMultiple, onValueChange],
+    );
 
-const AccordionRoot = React.forwardRef<HTMLDivElement, AccordionRootProps>(function AccordionRoot(
-  {
-    type = "single",
-    value,
-    defaultValue,
-    onValueChange,
-    collapsible = true,
-    size = "m",
-    layout = "grouped",
-    className,
-    children,
-    ...rest
-  },
-  ref,
-) {
-  const contextValue = React.useMemo(() => ({ size }), [size]);
-  const isMultiple = type === "multiple";
-  const isControlled = value !== undefined;
+    const toggleItem = React.useCallback(
+      (itemValue: string, disabledItem: boolean) => {
+        if (disabledItem) return;
 
-  const initialUncontrolledValues = React.useMemo(() => {
-    if (isMultiple) return normalizeValues(multipleDefaultValue(defaultValue) ?? []);
-    const initialSingle = singleDefaultValue(defaultValue);
-    return initialSingle ? [initialSingle] : [];
-  }, [defaultValue, isMultiple]);
+        if (isMultiple) {
+          if (openValues.includes(itemValue)) {
+            updateValues(openValues.filter((valueEntry) => valueEntry !== itemValue));
+            return;
+          }
 
-  const [uncontrolledValues, setUncontrolledValues] =
-    React.useState<string[]>(initialUncontrolledValues);
-
-  const controlledValues = React.useMemo(() => {
-    if (!isControlled) return undefined;
-    if (isMultiple) return normalizeValues(multipleControlledValue(value) ?? []);
-    const singleValue = singleControlledValue(value);
-    return singleValue ? [singleValue] : [];
-  }, [isControlled, isMultiple, value]);
-
-  const openValues = controlledValues ?? uncontrolledValues;
-
-  const updateValues = React.useCallback(
-    (nextValues: string[]) => {
-      if (!isControlled) {
-        setUncontrolledValues(nextValues);
-      }
-
-      if (isMultiple) {
-        onValueChange?.(nextValues);
-      } else {
-        onValueChange?.(nextValues[0] ?? "");
-      }
-    },
-    [isControlled, isMultiple, onValueChange],
-  );
-
-  const toggleItem = React.useCallback(
-    (itemValue: string, disabledItem: boolean) => {
-      if (disabledItem) return;
-
-      if (isMultiple) {
-        if (openValues.includes(itemValue)) {
-          updateValues(openValues.filter((valueEntry) => valueEntry !== itemValue));
+          updateValues([...openValues, itemValue]);
           return;
         }
 
-        updateValues([...openValues, itemValue]);
-        return;
-      }
+        const currentValue = openValues[0];
+        if (currentValue === itemValue) {
+          if (!collapsible) return;
+          updateValues([]);
+          return;
+        }
 
-      const currentValue = openValues[0];
-      if (currentValue === itemValue) {
-        if (!collapsible) return;
-        updateValues([]);
-        return;
-      }
+        updateValues([itemValue]);
+      },
+      [collapsible, isMultiple, openValues, updateValues],
+    );
 
-      updateValues([itemValue]);
-    },
-    [collapsible, isMultiple, openValues, updateValues],
-  );
+    const stateContextValue = React.useMemo<AccordionStateContextValue>(
+      () => ({ openValues, toggleItem }),
+      [openValues, toggleItem],
+    );
 
-  const stateContextValue = React.useMemo<AccordionStateContextValue>(
-    () => ({
-      type,
-      collapsible,
-      openValues,
-      toggleItem,
-    }),
-    [collapsible, openValues, toggleItem, type],
-  );
-
-  return (
-    <AccordionStateProvider value={stateContextValue}>
-      <AccordionProvider value={contextValue}>
-        <div
-          ref={ref}
-          className={cx(styles.root, className)}
-          data-size={size}
-          data-type={type}
-          data-layout={layout}
-          {...rest}
-        >
-          {children}
-        </div>
-      </AccordionProvider>
-    </AccordionStateProvider>
-  );
-});
+    return (
+      <AccordionStateProvider value={stateContextValue}>
+        <AccordionProvider value={contextValue}>
+          <div
+            ref={ref}
+            {...rest}
+            className={cx(styles.root, className)}
+            {...toDataAttributes({ size, layout })}
+          >
+            {children}
+          </div>
+        </AccordionProvider>
+      </AccordionStateProvider>
+    );
+  },
+);
 AccordionRoot.displayName = "Accordion.Root";
 
 const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(function AccordionItem(
@@ -233,10 +210,9 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(funct
     <AccordionItemProvider value={itemContextValue}>
       <div
         ref={ref}
-        className={cx(styles.item, className)}
-        data-state={open ? "open" : "closed"}
-        data-disabled={disabled ? "" : undefined}
         {...rest}
+        className={cx(styles.item, className)}
+        {...toDataAttributes({ state: open ? "open" : "closed", disabled: disabled || undefined })}
       >
         {children}
       </div>
@@ -273,8 +249,10 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
         disabled={item.disabled}
         aria-controls={item.contentId}
         aria-expanded={item.open}
-        data-state={item.open ? "open" : "closed"}
-        data-disabled={item.disabled ? "" : undefined}
+        {...toDataAttributes({
+          state: item.open ? "open" : "closed",
+          disabled: item.disabled || undefined,
+        })}
         className={cx(styles.trigger, className)}
         onClick={handleClick}
       >
@@ -359,16 +337,14 @@ AccordionIcon.displayName = "Accordion.Icon";
 
 function AccordionArrow({
   className,
-  openIcon: OpenIcon = ChevronDown,
-  closeIcon: CloseIcon,
+  icon: Icon = ChevronDown,
+  openIcon: OpenIcon,
   ...rest
 }: AccordionArrowProps) {
-  const isRotatingChevron = CloseIcon == null || CloseIcon === OpenIcon;
-
-  if (isRotatingChevron) {
+  if (OpenIcon == null) {
     return (
       <span className={cx(styles.arrow, className)} {...rest}>
-        <OpenIcon
+        <Icon
           aria-hidden
           className={cx(styles.arrowIcon, styles.arrowIconRotate)}
           strokeWidth={1.75}
@@ -379,12 +355,12 @@ function AccordionArrow({
 
   return (
     <span className={cx(styles.arrow, className)} {...rest}>
-      <OpenIcon
+      <Icon
         aria-hidden
         className={cx(styles.arrowIcon, styles.arrowIconClosed)}
         strokeWidth={1.75}
       />
-      <CloseIcon
+      <OpenIcon
         aria-hidden
         className={cx(styles.arrowIcon, styles.arrowIconOpen)}
         strokeWidth={1.75}

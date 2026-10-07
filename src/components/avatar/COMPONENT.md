@@ -1,160 +1,229 @@
 # Avatar
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Category:** data-display (Данные)
 
-## About
+> A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups.
 
-Circular avatar with an optional photo (`Avatar.Image`), a fallback layer (`Avatar.Fallback`), and an optional horizontal stack (`Avatar.Group`) with an overflow cell.
+## When to use
+- A person or organization next to its name: lists, comments, table cells, headers.
+- The signed-in user in the app chrome.
+- Participants of a project or chat as an overlapping group with "+N".
+- Presence (online / away / busy / offline) on a person.
 
-- **Use** for profile pictures, participant lists, assignees in tables, and compact identity in headers or comments when a face or initials aid recognition.
-- **Use** `Avatar.Group` when several avatars should overlap in one row and you may show a “+N” overflow.
-- **Do not use** as the only focusable control without a wrapping `button` or `link` when the avatar itself must be actionable.
-- **Do not use** for non-circular crops or rich media cards; keep this primitive for round avatars and short fallback content.
-- **Do not use** expecting an external “controlled” image load state; status lives inside `Avatar.Root` and resets when `src` changes (see Rules).
+## When not to use
+- A status or category of an item (not a person) → use [Badge](../badge/COMPONENT.md).
+- A removable selected person in a field → use [Tag](../tag/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md).
+- A product image or cover → use `Card.Media` / `Card.Cover` from [Card](../card/COMPONENT.md) or a plain `<img>`.
+- An icon-only action → use [Button](../button/COMPONENT.md).
 
-## Composition
-
-- **`Avatar.Root`** — outer `div` with `data-size`, provides context (`size`, internal image status). Place **`Avatar.Image`** (optional) and **`Avatar.Fallback`** inside; image is painted above the fallback in the layout.
-- **`Avatar.Image`** — `img` with `data-status` (`loading` \| `loaded` \| `error`). Requires **`src`**; the implementation remounts when **`src`** changes, which restarts loading and context status.
-- **`Avatar.Fallback`** — `span` shown when the image is absent, loading, or in error; when the image has loaded successfully, the fallback gets **`aria-hidden`**.
-- **`Avatar.Group.Root`** — horizontal flex row; passes its **`size`** into child **`Avatar.Root`** and **`Avatar.Group.Overflow`** that omit their own **`size`** (including through **`React.Fragment`** children).
-- **`Avatar.Group.Overflow`** — cell matching avatar dimensions for text such as `+3`.
-
-### Canonical example
-
-Один фрагмент разметки: одиночный аватар (**`Image`** + **`Fallback`**), группа с **`Overflow`**, плюс **`Fallback`** с иконкой и подписи через **[Typography](../typography/COMPONENT.md)**. Импорт только из **`prime-ui-kit`**.
-
-Те же идеи, что в плейграунде (**`playground/sections/AvatarSection.tsx`** + **`playground/snippets/avatar/*.tsx`**): полная шкала **`size`** (`s`–`6xl`), три статуса картинки (**`idle`** / **`loaded`** / **`error`**), группа из трёх, смена **`src`** из состояния родителя, пара **Image + Fallback** и **Fallback** с **`Icon`**, группа с **`Avatar.Group.Overflow`**. В монорепозитории см. **`examples/sizes.tsx`**, **`states.tsx`**, **`group-three.tsx`**, **`src-from-state.tsx`** (импорты **`@/`**); **`fallback-variants.tsx`** и **`group-overflow.tsx`** закрывают композицию и переполнение.
-
+## Import
 ```tsx
-import { Avatar, Icon, Typography } from "prime-ui-kit";
-
-const sampleSrc =
-  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=128&h=128&fit=crop";
-
-export function CanonicalAvatarDemo() {
-  return (
-    <>
-      <Typography as="p" variant="body-small" tone="muted">
-        Profile cell
-      </Typography>
-      <Avatar.Root size="l" aria-label="Jamie Chen, online">
-        <Avatar.Image src={sampleSrc} alt="" />
-        <Avatar.Fallback>JC</Avatar.Fallback>
-      </Avatar.Root>
-
-      <Typography as="p" variant="body-small" tone="muted">
-        Overlapping group + overflow
-      </Typography>
-      <Avatar.Group.Root aria-label="Reviewers: three faces, two not shown">
-        <Avatar.Root>
-          <Avatar.Image src={sampleSrc} alt="" />
-          <Avatar.Fallback>A</Avatar.Fallback>
-        </Avatar.Root>
-        <Avatar.Root>
-          <Avatar.Fallback>B</Avatar.Fallback>
-        </Avatar.Root>
-        <Avatar.Root>
-          <Avatar.Fallback>C</Avatar.Fallback>
-        </Avatar.Root>
-        <Avatar.Group.Overflow aria-label="Two additional reviewers">+2</Avatar.Group.Overflow>
-      </Avatar.Group.Root>
-
-      <Typography as="p" variant="body-small" tone="muted">
-        Icon-only fallback
-      </Typography>
-      <Avatar.Root aria-label="Invitee, no photo yet">
-        <Avatar.Fallback>
-          <Icon name="field.email" size="l" tone="subtle" />
-        </Avatar.Fallback>
-      </Avatar.Root>
-    </>
-  );
-}
+import { Avatar } from "prime-ui-kit";
 ```
 
-### Extended examples
+## Anatomy
+```
+Avatar.Root                   circle, size and fallback hue
+├── Avatar.Image              photo; hidden while loading / on error
+├── Avatar.Fallback           initials or icon, visible until the photo loads
+└── Avatar.Status             optional presence dot on the bottom-end edge
 
-Готовые сценарии с раскладкой на **`--prime-sys-`* (см. [`examples/examples.module.css`](./examples/examples.module.css)):
-
-| Файл | Сценарий |
-|------|----------|
-| [`examples/sizes.tsx`](./examples/sizes.tsx) | Все значения **`size`** подряд (`s`–`6xl`), как [`playground/snippets/avatar/sizes.tsx`](../../../playground/snippets/avatar/sizes.tsx) |
-| [`examples/states.tsx`](./examples/states.tsx) | Без **`Image`** / успешная загрузка / неверный URL, как [`states.tsx`](../../../playground/snippets/avatar/states.tsx) |
-| [`examples/group-three.tsx`](./examples/group-three.tsx) | **`Avatar.Group.Root`** из трёх **`Avatar.Root`**, как [`group-three.tsx`](../../../playground/snippets/avatar/group-three.tsx) |
-| [`examples/src-from-state.tsx`](./examples/src-from-state.tsx) | Родитель меняет **`src`** (сброс загрузки по URL), как [`src-from-state.tsx`](../../../playground/snippets/avatar/src-from-state.tsx) |
-| [`examples/fallback-variants.tsx`](./examples/fallback-variants.tsx) | Фото, инициалы и иконка в **`Fallback`** (см. также [`composition.tsx`](../../../playground/snippets/avatar/composition.tsx)) |
-| [`examples/group-overflow.tsx`](./examples/group-overflow.tsx) | Два лица + **`Avatar.Group.Overflow`**, как [`group-overflow.tsx`](../../../playground/snippets/avatar/group-overflow.tsx) |
-| [`examples/team-list.tsx`](./examples/team-list.tsx) | Список команды: аватар + имя + роль |
-| [`examples/comment-thread.tsx`](./examples/comment-thread.tsx) | Ветка комментариев с аватаром у каждого сообщения |
-| [`examples/app-header-nav.tsx`](./examples/app-header-nav.tsx) | Шапка: навигация **[LinkButton](../link-button/COMPONENT.md)** и блок «аккаунт» с аватаром |
-
-Файлы **`sizes`**, **`states`**, **`group-three`**, **`src-from-state`** используют импорты **`@/`** для сборки внутри репозитория; остальные примеры — из **`"prime-ui-kit"`** для копирования в приложение-потребитель.
-
-### Note for LLMs
-
-При генерации экранов опирайся на публичный API выше и на **исходники** в `src/components/avatar/examples/*.tsx`. Сценарии из таблицы выше **согласованы** с **`playground/snippets/avatar/*.tsx`** (размеры, состояния, группа, смена **`src`**, композиция слотов, переполнение). Для продуктовых экранов копируй примеры с **`prime-ui-kit`**; в самом ките правь зеркала с **`@/`**. Не дублируй длинные листинги в ответе — укажи путь к файлу примера или сниппета.
-
-## Rules
-
-- Image lifecycle is **internal**: context status is `idle` \| `loading` \| `loaded` \| `error`; there is no prop to control it from outside—change **`src`** (or remove **`Avatar.Image`**) to reset behavior.
-- Put **`Avatar.Image`** and **`Avatar.Fallback`** only under **`Avatar.Root`**; **`Avatar.Fallback`** does not accept a **`src`**—photos go through **`Avatar.Image`** only.
-- Give **`Avatar.Root`** or a wrapper a clear name for assistive tech (**`aria-label`**, **`aria-labelledby`**, or nearby visible text). On **`Avatar.Image`**, use a non-empty **`alt`** when the photo conveys meaning; use **`alt=""`** when it duplicates a visible name.
-- After a successful load, **`Avatar.Fallback`** is **`aria-hidden`** so screen readers do not double-announce initials and alt text.
-- For **`Avatar.Group.Root`** and **`Avatar.Group.Overflow`**, prefer summary labels (**`aria-label`**) when the stack or “+N” needs context.
-- There is no **`disabled`** prop; mute or disable via the parent (e.g. button **`disabled`**, link **`aria-disabled`**, reduced opacity).
-- **`Avatar.Group`** is laid out as a **horizontal** row only; nesting **`Avatar.Root`** inside another **`Avatar.Root`** is not a supported pattern.
+Avatar.Group.Root             overlapping row, passes size to children
+├── Avatar.Root …
+└── Avatar.Group.Overflow     "+N" cell of the same diameter
+```
 
 ## API
 
 ### Avatar.Root
+Forwards `ref` to the `<div>`. No `asChild`. Provides context for Image, Fallback and Status (they throw outside Root).
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl" \| "2xl" \| "3xl" \| "4xl" \| "5xl" \| "6xl"` | `"m"` | No | Diameter, radius, and fallback typography scale |
-| children | `React.ReactNode` | — | No | Typically `Avatar.Image` and `Avatar.Fallback` |
-| className | `string` | — | No | Additional class on the root |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other root attributes |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` (`AvatarSize`) | `"m"` | Diameter 20 · 24 · 32 · 40 · 48 · 64px. Inside `Avatar.Group.Root` the group size is used when `size` is not set. |
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` (`PaletteColor`) | `"gray"` | Hue of the fallback layer (soft fill + hue text). |
+| `children` | `ReactNode` | — | `Avatar.Image`, `Avatar.Fallback`, `Avatar.Status`. |
+| `className` | `string` | — | Extra class on the root. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`), e.g. `aria-label` when no name is written next to it.
 
 ### Avatar.Image
+Forwards `ref` to the `<img>`. Remounts when `src` changes (loading restarts).
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| src | `string` | — | Yes | Image URL; changing `src` remounts the image and resets status |
-| alt | `string` | `""` | No | Alternative text for the image |
-| className | `string` | — | No | Class on the `img` |
-| …rest | `Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | No | e.g. `loading`, `decoding`, event handlers |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `src` | `string` | — (required) | Image URL. |
+| `alt` | `string` | `""` | Empty when the name is written next to the avatar; otherwise the person's name. |
+| `className` | `string` | — | Extra class on the image. |
+
++ native `<img>` props except `src` and `alt` (`onLoad` / `onError` are still called).
 
 ### Avatar.Fallback
+No ref forwarding.
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | No | Initials, icon, or placeholder |
-| className | `string` | — | No | Class on the `span` |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other attributes |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Initials (1–2 letters) or an icon (fills about 50% of the circle). |
+| `className` | `string` | — | Extra class. |
+
++ native `<span>` props.
+
+### Avatar.Status
+No ref forwarding.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `status` | `"online" \| "offline" \| "away" \| "busy"` (`AvatarPresence`) | — (required) | Presence state. |
+| `labels` | `Partial<AvatarStatusLabels>` | see Accessibility | Accessible names of the states. |
+| `className` | `string` | — | Extra class. |
+
++ native `<span>` props except `children`.
 
 ### Avatar.Group.Root
+Forwards `ref` to the `<div>`.
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | same as `Avatar.Root` | `"m"` | No | Size applied to child `Avatar.Root` and `Avatar.Group.Overflow` without their own `size` |
-| children | `React.ReactNode` | — | No | `Avatar.Root` nodes and optional `Avatar.Group.Overflow` |
-| className | `string` | — | No | Class on the group container |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other attributes |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | `AvatarSize` | `"m"` | Passed to every direct `Avatar.Root` / `Avatar.Group.Overflow` child (also inside fragments) that has no own `size`. |
+| `role` | `string` | `"group"` | ARIA role; give the group an `aria-label` ("Участники: 6"). |
+| `className` | `string` | — | Extra class. |
+| `children` | `ReactNode` | — | Avatars and an optional Overflow cell. |
+
++ native `<div>` props.
 
 ### Avatar.Group.Overflow
+Forwards `ref` to the `<div>`.
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | same as `Avatar.Root` | `"m"` | No | Local size when not inherited from the group |
-| children | `React.ReactNode` | — | No | e.g. `+3` |
-| className | `string` | — | No | Class on the overflow cell |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other attributes |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | `AvatarSize` | `"m"` | Diameter; set by the group when omitted. |
+| `className` | `string` | — | Extra class. |
+| `children` | `ReactNode` | — | "+N" text. |
+
++ native `<div>` props (give it `aria-label`, e.g. "Ещё 3 участника").
+
+### CSS custom properties
+| Property | Default | Description |
+|---|---|---|
+| `--avatar-ring` | `var(--prime-color-bg-canvas)` | Ring around group members and the status dot. Card, Modal, Drawer, Popover and Sidebar set it to their own fill; set it yourself on a custom filled block (e.g. `var(--prime-color-card-bg)`). |
+| `--avatar-slot-size` | — | Set by a host slot to size the avatar to the slot; wins over `size`. |
+
+## Variants
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | 20px circle | Dense table cells, inline mentions | |
+| `s` | 24px | Menus, compact groups in a header | |
+| `m` | 32px | Lists and rows | yes |
+| `l` | 40px | Comments, people lists with two-line text | |
+| `xl` | 48px | Cards, profile blocks | |
+| `2xl` | 64px | Profile headers | |
+
+Initials are 40% of the diameter, "+N" 36%, weight 500. The status dot is 30% of the diameter.
+
+### color
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `gray` | Neutral gray wash, gray initials | Unknown user, guest, icon fallback | yes |
+| `blue` | Blue wash and initials | Person hue | |
+| `green` | Green | Person hue | |
+| `orange` | Orange | Person hue | |
+| `red` | Red | Person hue | |
+| `yellow` | Yellow | Person hue | |
+| `purple` | Purple | Person hue | |
+| `sky` | Sky blue | Person hue | |
+| `pink` | Pink | Person hue | |
+| `teal` | Teal | Person hue | |
+
+`color` affects only the fallback; a loaded photo covers it. Derive the hue from a stable user id so a person always has the same color.
+
+### Avatar.Status `status`
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `online` | Success-colored dot with a ring | The person is active | — (required) |
+| `away` | Warning-colored dot | Idle | |
+| `busy` | Danger-colored dot | Do not disturb | |
+| `offline` | Gray solid dot | Not connected | |
+
+### Fallback content (structural)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| initials | 1–2 letters in the hue text | A known person without a photo | |
+| icon | Icon at 50% of the circle | Guest, system account, unknown entity | |
+
+**Combinations**
+- Recommended: `Avatar.Image` + `Avatar.Fallback` always together; `m` in lists, `s` in groups in headers.
+- Allowed: `Avatar.Status` on any size from `m` up (smaller dots become hard to see).
+- Avoid: a colored fallback that changes between renders; presence on `xs`; a group mixing explicit sizes.
+
+**Sizes**
+Avatar has its own scale (adds `2xl`). In a row next to an `m` control (36px) use `m` (32px); next to a two-line list item use `l`.
+
+**Hierarchy**
+The avatar supports the name, it does not replace it: keep the name as text next to it whenever there is room.
+
+## States
+| State / attribute | Element | Driven by | Notes |
+|---|---|---|---|
+| `data-size` | Root, Group.Root, Group.Overflow | `size` / group size | |
+| `data-color` | Root | `color` | Always set (default `gray`). |
+| `data-status="loading" \| "loaded" \| "error"` | Image | image load events | `loading`: transparent, fades in on `loaded`; `error`: hidden, the fallback stays. |
+| `aria-hidden="true"` | Fallback | image status `loaded` | The fallback is hidden from screen readers once the photo is shown. |
+| `data-status="online" \| "offline" \| "away" \| "busy"` | Status | `status` | Dot color. |
+
+Loading state is internal (uncontrolled); changing `src` restarts it.
+
+## Layout & spacing
+- Inline-flex, never shrinks; vertical-align middle.
+- Avatar → name: `gap: var(--prime-space-3)` in lists and cards; `gap: var(--prime-space-2)` inside DataTable cells (DataTable indents sub-rows by avatar + `--prime-space-2`, so child text lines up under the parent's text). Name and secondary line stacked without gap.
+- Group: members overlap by 25% of the diameter with a 2px ring in `--avatar-ring`.
+- In a list item use a grid `auto minmax(0, 1fr) auto` so long names truncate.
+
+## Accessibility
+- `Avatar.Image` `alt`: empty when the name is written next to it, otherwise the name. Without a photo, put `aria-label` on `Avatar.Root` when no name is shown.
+- `Avatar.Status` is `role="img"` with `aria-label` from `labels`.
+- `Avatar.Group.Root` is `role="group"`; give it `aria-label`. Give `Avatar.Group.Overflow` an `aria-label` ("Ещё 3 участника").
+- `labels` (`AvatarStatusLabels`) on `Avatar.Status`:
+  - `online` — `"В сети"`
+  - `offline` — `"Не в сети"`
+  - `away` — `"Отошёл"`
+  - `busy` — `"Занят"`
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | Six diameters xs–2xl | Picking a size for the context |
+| [colors.tsx](examples/colors.tsx) | Ten fallback hues | Coloring initials per user |
+| [states.tsx](examples/states.tsx) | Photo, initials, broken URL, icon fallback | Handling missing or failing photos |
+| [src-from-state.tsx](examples/src-from-state.tsx) | Switching `src` from state | Photo upload or profile switch |
+| [presence.tsx](examples/presence.tsx) | `Avatar.Status` online / away / busy / offline | People lists and chats |
+| [group.tsx](examples/group.tsx) | Groups `s` and `l` with "+N" | Participants of a project or chat |
+| [team-card.tsx](examples/team-card.tsx) | Card with a group and a member list with presence | Team overviews; `--avatar-ring` on a custom fill |
+
+```tsx
+import { Avatar } from "prime-ui-kit";
+
+export function UserAvatar() {
+  return (
+    <Avatar.Root color="blue">
+      <Avatar.Image src="/avatars/anna.jpg" alt="Анна Климова" />
+      <Avatar.Fallback>АК</Avatar.Fallback>
+    </Avatar.Root>
+  );
+}
+```
+
+## Mistakes
+- `Avatar.Image` without `Avatar.Fallback` → add initials; a failed photo otherwise leaves an empty circle.
+- `alt="Анна Климова"` while the name is printed next to it → `alt=""` (avoid double announcement).
+- A random `color` on every render → derive it from the user id.
+- A custom presence dot → use `Avatar.Status`.
+- A group on a custom filled block with a canvas-colored ring → set `--avatar-ring` to that fill.
+- `size` on every avatar in a group → set `size` once on `Avatar.Group.Root`.
 
 ## Related
-
-- [Button](../button/COMPONENT.md)
-- [Dropdown](../dropdown/COMPONENT.md)
-- [Label](../label/COMPONENT.md)
-- [Tooltip](../tooltip/COMPONENT.md)
-- [Typography](../typography/COMPONENT.md)
+- [Badge](../badge/COMPONENT.md) — status labels for items.
+- [Card](../card/COMPONENT.md) — profile and team cards.
+- [DataTable](../data-table/COMPONENT.md) — avatars in table cells.
+- [Sidebar](../../layout/sidebar/COMPONENT.md) — the signed-in user in the app chrome.

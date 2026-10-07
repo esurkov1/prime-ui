@@ -1,4 +1,17 @@
+import CodeBlockApiDocsExample from "@/components/code-block/examples/api-docs";
+import apiDocsSource from "@/components/code-block/examples/api-docs.tsx?raw";
+import CodeBlockColorSchemeExample from "@/components/code-block/examples/color-scheme";
+import colorSchemeSource from "@/components/code-block/examples/color-scheme.tsx?raw";
+import CodeBlockControlledExample from "@/components/code-block/examples/controlled";
+import controlledSource from "@/components/code-block/examples/controlled.tsx?raw";
+import CodeBlockLongLinesExample from "@/components/code-block/examples/long-lines";
+import longLinesSource from "@/components/code-block/examples/long-lines.tsx?raw";
+import CodeBlockSurfacesExample from "@/components/code-block/examples/surfaces";
+import surfacesSource from "@/components/code-block/examples/surfaces.tsx?raw";
+import CodeBlockVariantsExample from "@/components/code-block/examples/variants";
+import variantsSource from "@/components/code-block/examples/variants.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,18 +19,6 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import CodeBlockCompositionSnippet from "../snippets/code-block/composition";
-import compositionSource from "../snippets/code-block/composition.tsx?raw";
-import CodeBlockControlledSnippet from "../snippets/code-block/controlled";
-import controlledSource from "../snippets/code-block/controlled.tsx?raw";
-import CodeBlockFeaturesSnippet from "../snippets/code-block/features";
-import featuresSource from "../snippets/code-block/features.tsx?raw";
-import CodeBlockFullWidthSnippet from "../snippets/code-block/full-width";
-import fullWidthSource from "../snippets/code-block/full-width.tsx?raw";
-import CodeBlockSizesSnippet from "../snippets/code-block/sizes";
-import sizesSource from "../snippets/code-block/sizes.tsx?raw";
-import CodeBlockVariantsSnippet from "../snippets/code-block/variants";
-import variantsSource from "../snippets/code-block/variants.tsx?raw";
 
 const codeBlockRootApiRows: PlaygroundApiPropRow[] = [
   {
@@ -29,11 +30,20 @@ const codeBlockRootApiRows: PlaygroundApiPropRow[] = [
       "Исходник TS/TSX; перед подсветкой у конца обрезаются пробельные символы (trimEnd).",
   },
   {
+    prop: "variant",
+    type: '"soft" | "ghost"',
+    defaultValue: '"soft"',
+    required: "Нет",
+    description:
+      "soft — утопленная панель с отступами, роль текста code (13/20), горизонтальная прокрутка, tabIndex=0. ghost — голый pre, кегль и фон от хоста.",
+  },
+  {
     prop: "colorScheme",
     type: '"light" | "dark"',
-    defaultValue: '"light"',
+    defaultValue: "— (тема страницы)",
     required: "Нет",
-    description: "Палитра токенов подсветки: data-theme на корне для селекторов в стилях.",
+    description:
+      "Зафиксировать схему только для блока (data-theme на pre). Без пропа блок следует теме страницы.",
   },
   {
     prop: "className",
@@ -58,54 +68,82 @@ export default function CodeBlockSection() {
       <PageContent.Header>
         <PageContent.Title>Code Block</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Статичный фрагмент кода на TypeScript или TSX с подсветкой синтаксиса средствами кита.
-              Схему оформления можно зафиксировать пропом <code>colorScheme</code> независимо от
-              темы страницы; размер шрифта задаётся снаружи — компонент наследует кегль и
-              межстрочный интервал от родителя.
-            </>
-          }
+          Статичный фрагмент TypeScript или TSX с подсветкой синтаксиса. По умолчанию — утопленная
+          панель без обводки (<code>variant=&quot;soft&quot;</code>); <code>ghost</code> отдаёт
+          кегль и фон хосту. Цвета токенов следуют теме страницы, схему можно зафиксировать{" "}
+          <code>colorScheme</code>. Пропа <code>size</code> нет: это не контрол, размер текста —
+          роль <code>code</code> или кегль хоста.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
           <div className="demoBlock">
-            <DemoSectionTitle>Размеры</DemoSectionTitle>
+            <DemoSectionTitle>Оформление</DemoSectionTitle>
             <DemoDescription>
-              Отдельного пропа <code>size</code> нет: четыре обёртки с разными{" "}
-              <code>font-size</code> и <code>line-height</code> (токены типографики), внутри один и
-              тот же <code>CodeBlock.Root</code> с <code>colorScheme</code> из темы плейграунда.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
-              <PlaygroundExampleFrame.Stage>
-                <CodeBlockSizesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Варианты</DemoSectionTitle>
-            <DemoDescription>
-              Визуальный режим подсветки — <code>colorScheme=&quot;light&quot;</code> и{" "}
-              <code>&quot;dark&quot;</code> на одном фрагменте, без переключения темы всей страницы.
+              <code>soft</code> — панель с отступами 12/16 и радиусом <code>m</code>;{" "}
+              <code>ghost</code> — голый <code>pre</code> для хоста, который рисует свою панель
+              (здесь — акцентная подложка с мелким кеглем).
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <CodeBlockVariantsSnippet />
+                <CodeBlockVariantsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoSectionTitle>Цветовая схема</DemoSectionTitle>
             <DemoDescription>
-              Проп <code>code</code> берётся из состояния: кнопки переключают два разных фрагмента
-              (утилита и хук).
+              <code>colorScheme=&quot;light&quot;</code> и <code>&quot;dark&quot;</code> на одном
+              фрагменте без переключения темы страницы; зафиксированный блок получает{" "}
+              <code>bg-raised</code>, чтобы читаться внутри противоположной темы.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={colorSchemeSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <CodeBlockColorSchemeExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>На поверхностях</DemoSectionTitle>
+            <DemoDescription>
+              Подложка <code>soft</code> (<code>fill-muted</code>) одинаково читается на холсте, в
+              карточке, во всплывающем слое и на акцентном фоне.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={surfacesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SurfaceGallery>
+                  <CodeBlockSurfacesExample />
+                </SurfaceGallery>
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Смена фрагмента</DemoSectionTitle>
+            <DemoDescription>
+              Проп <code>code</code> берётся из состояния: переключатель меняет показываемый
+              фрагмент.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <CodeBlockControlledSnippet />
+                <CodeBlockControlledExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Длинные строки</DemoSectionTitle>
+            <DemoDescription>
+              Блок занимает ширину колонки, длинная строка прокручивается внутри. Блок{" "}
+              <code>soft</code> — остановка <kbd>Tab</kbd>, чтобы прокрутку можно было сделать с
+              клавиатуры; если переполнения не бывает, передайте{" "}
+              <code>tabIndex=&#123;-1&#125;</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={longLinesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <CodeBlockLongLinesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -113,41 +151,12 @@ export default function CodeBlockSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
-              Карточка «документации API»: заголовок и пояснение на <code>Typography.Root</code>,
-              блок кода вложен в панель с фоном.
+              Фрагмент документации API: заголовок и пояснение на <code>Typography.Root</code>, ниже
+              пример ответа с <code>aria-label</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={apiDocsSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <CodeBlockCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
-            <DemoDescription>
-              Узкая колонка и <code>overflow-x: auto</code> на обёртке; у{" "}
-              <code>CodeBlock.Root</code> — класс <code>codeBlockFullBleed</code>, чтобы длинная
-              строка растягивала пре и появлялась прокрутка.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CodeBlockFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              Атрибуты доступности и тестов: <code>id</code>, <code>aria-label</code>,{" "}
-              <code>data-snippet-kind</code>, оформление через <code>style</code> на корне. В строке
-              кода в конце намеренно оставлены пробелы — перед подсветкой срабатывает{" "}
-              <code>trimEnd</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CodeBlockFeaturesSnippet />
+                <CodeBlockApiDocsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -156,9 +165,9 @@ export default function CodeBlockSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>CodeBlock.Root</DemoApiTitle>
             <DemoDescription>
-              Корень выводит <code>pre</code> с вложенным <code>code</code>; HTML подсветки строится
-              функцией <code>highlightTsxHtml</code> и подставляется через{" "}
-              <code>dangerouslySetInnerHTML</code> (передавайте только доверенный исходник).
+              Выводит <code>pre</code> с вложенным <code>code</code>; HTML подсветки строит{" "}
+              <code>highlightTsxHtml</code> и подставляет через <code>dangerouslySetInnerHTML</code>{" "}
+              — передавайте только доверенный исходник.
             </DemoDescription>
             <PlaygroundApiTable rows={codeBlockRootApiRows} />
           </div>

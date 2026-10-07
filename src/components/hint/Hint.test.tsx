@@ -16,14 +16,14 @@ describe("Hint", () => {
     expect(screen.getByText("Helper copy")).toBeInTheDocument();
   });
 
-  it("sets data-variant to error", () => {
-    render(<Hint.Root variant="error">Invalid</Hint.Root>);
-    expect(screen.getByText("Invalid")).toHaveAttribute("data-variant", "error");
+  it("sets data-invalid when invalid", () => {
+    render(<Hint.Root invalid>Invalid</Hint.Root>);
+    expect(screen.getByText("Invalid")).toHaveAttribute("data-invalid", "true");
   });
 
-  it("sets data-variant to disabled", () => {
-    render(<Hint.Root variant="disabled">Inactive</Hint.Root>);
-    expect(screen.getByText("Inactive")).toHaveAttribute("data-variant", "disabled");
+  it("sets data-disabled when disabled", () => {
+    render(<Hint.Root disabled>Inactive</Hint.Root>);
+    expect(screen.getByText("Inactive")).toHaveAttribute("data-disabled", "true");
   });
 
   it("defaults data-size to m", () => {

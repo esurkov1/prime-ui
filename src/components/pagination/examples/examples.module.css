@@ -1,0 +1,73 @@
+/* Layout for the Pagination examples: semantic tokens only. */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-5);
+  width: 100%;
+  min-width: 0;
+}
+
+/* caption · pagination · button of the same tier, columns aligned across rows */
+.sizeGrid {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  justify-items: start;
+  gap: var(--prime-space-4);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+  width: 100%;
+  min-width: 0;
+}
+
+/* 320px. */
+.narrow {
+  width: min(100%, calc(var(--prime-drawer-width-s) - var(--prime-space-10)));
+}
+
+/* 576px. */
+.wide {
+  width: min(100%, calc(var(--prime-modal-width-m) + var(--prime-space-4)));
+}
+
+.footer {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  width: 100%;
+  padding: var(--prime-space-3) var(--prime-space-4);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+}
+
+/* Right group: the per-page select sits next to the pager it controls. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-6);
+}
+
+.summary {
+  font-variant-numeric: tabular-nums;
+}
+
+.perPage {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+}

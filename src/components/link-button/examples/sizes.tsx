@@ -1,21 +1,23 @@
-import { LinkButton } from "prime-ui-kit";
+/** All five size tiers; text and icon come from the control tier (xs 12 · s 13 · m 14 · l 16 · xl 18). Use to match the link to the text or controls around it. */
+import { LinkButton, Typography } from "prime-ui-kit";
 
-/** `size` ladder `s`–`xl` — mirrors [`playground/snippets/link-button/sizes.tsx`](../../../../playground/snippets/link-button/sizes.tsx). */
+import styles from "./examples.module.css";
+
+const sizes = ["xs", "s", "m", "l", "xl"] as const;
+
 export default function LinkButtonSizesExample() {
   return (
-    <>
-      <LinkButton.Root href="#" size="s">
-        LinkButton s
-      </LinkButton.Root>
-      <LinkButton.Root href="#" size="m">
-        LinkButton m
-      </LinkButton.Root>
-      <LinkButton.Root href="#" size="l">
-        LinkButton l
-      </LinkButton.Root>
-      <LinkButton.Root href="#" size="xl">
-        LinkButton xl
-      </LinkButton.Root>
-    </>
+    <div className={styles.sizeRow}>
+      {sizes.map((size) => (
+        <div key={size} className={styles.sizeCell}>
+          <LinkButton.Root href="#" size={size}>
+            Подробнее
+          </LinkButton.Root>
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
+          </Typography.Root>
+        </div>
+      ))}
+    </div>
   );
 }

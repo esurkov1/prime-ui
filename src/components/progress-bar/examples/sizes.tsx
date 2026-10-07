@@ -1,13 +1,16 @@
-import { ProgressBar } from "prime-ui-kit";
+/** Sizes xs–xl with `label` and `showValue`: the track is 4px for xs–m and 8px for l–xl, the label follows the control tier. Match the size to the surrounding text. */
+import { type ControlSize, ProgressBar } from "prime-ui-kit";
 
-/** Four sizes: track height and label scale from `--prime-sys-size-control-{s|m|l|xl}-*` (playground: `snippets/progress/bar-sizes.tsx`). */
+import styles from "./examples.module.css";
+
+const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+
 export default function ProgressBarSizesExample() {
   return (
-    <>
-      <ProgressBar.Root size="s" value={30} label="Size s" />
-      <ProgressBar.Root size="m" value={40} label="Size m" />
-      <ProgressBar.Root size="l" value={50} label="Size l" />
-      <ProgressBar.Root size="xl" value={60} label="Size xl" />
-    </>
+    <div className={styles.stack}>
+      {sizes.map((size) => (
+        <ProgressBar.Root key={size} size={size} value={64} label={`Размер ${size}`} showValue />
+      ))}
+    </div>
   );
 }

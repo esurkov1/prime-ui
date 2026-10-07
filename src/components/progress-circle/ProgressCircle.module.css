@@ -1,18 +1,54 @@
+/* ProgressCircle — Graphite: `fill-strong` ring, accent / tone arc with round caps. */
+
 .root {
+  --pc-fill: var(--prime-color-accent-default);
+  /* m (48px): caption keeps «100%» clear of the ring. */
+  --pc-text-size: var(--prime-text-caption-size);
+  --pc-line-height: var(--prime-text-caption-line-height);
+
   position: relative;
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  font-family: var(--prime-font-family-sans);
+}
+
+.root[data-size="l"] {
+  --pc-text-size: var(--prime-text-title-m-size);
+  --pc-line-height: var(--prime-text-title-m-line-height);
+}
+
+.root[data-size="xl"] {
+  --pc-text-size: var(--prime-text-title-l-size);
+  --pc-line-height: var(--prime-text-title-l-line-height);
+}
+
+.root[data-tone="success"] {
+  --pc-fill: var(--prime-color-success-default);
+}
+
+.root[data-tone="warning"] {
+  --pc-fill: var(--prime-color-warning-default);
+}
+
+.root[data-tone="danger"] {
+  --pc-fill: var(--prime-color-danger-default);
+}
+
+.root svg {
+  display: block;
 }
 
 .track {
-  stroke: var(--prime-sys-color-surface-accentSoft);
+  stroke: var(--prime-color-fill-strong);
 }
 
 .fill {
-  stroke: var(--prime-sys-color-action-primaryBackground);
+  stroke: var(--pc-fill);
   stroke-linecap: round;
-  transition: stroke-dashoffset var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  transition: stroke-dashoffset var(--prime-motion-duration-slow)
+    var(--prime-motion-easing-standard);
 }
 
 .inner {
@@ -20,26 +56,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-primary);
+  box-sizing: border-box;
   width: var(--progress-circle-inner-size);
   height: var(--progress-circle-inner-size);
-  padding: var(--prime-sys-spacing-xs);
-  box-sizing: border-box;
-}
-
-.root[data-size="s"] .inner {
-  font-size: var(--prime-sys-size-control-s-text);
-}
-
-.root[data-size="m"] .inner {
-  font-size: var(--prime-sys-size-control-m-text);
-}
-
-.root[data-size="l"] .inner {
-  font-size: var(--prime-sys-size-control-l-text);
-}
-
-.root[data-size="xl"] .inner {
-  font-size: var(--prime-sys-size-control-xl-text);
+  overflow: hidden;
+  color: var(--prime-color-text-primary);
+  font-size: var(--pc-text-size);
+  line-height: var(--pc-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }

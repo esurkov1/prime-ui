@@ -1,41 +1,44 @@
-import { Filter, SlidersHorizontal } from "lucide-react";
-import { Button, Checkbox, Popover, Typography } from "prime-ui-kit";
+/** Report filters panel: header, full-width SegmentedControl, checkboxes and reset/apply actions. Use for filters and quick settings tied to one button. */
+import { SlidersHorizontal } from "lucide-react";
+import { Button, Checkbox, Popover, SegmentedControl } from "prime-ui-kit";
 
-import styles from "./popover-examples.module.css";
+import preview from "./examples.module.css";
 
-/**
- * Trigger with `Button.Icon`, header row, body copy, and native checkboxes with panel padding from `Content` `size`.
- */
 export default function PopoverCompositionExample() {
   return (
     <Popover.Root>
-      <Popover.Trigger asChild>
-        <Button.Root mode="stroke" variant="neutral">
+      <Popover.Trigger>
+        <Button.Root variant="soft" tone="neutral">
           <Button.Icon>
-            <SlidersHorizontal aria-hidden strokeWidth={1.75} />
+            <SlidersHorizontal />
           </Button.Icon>
-          Report filters
+          Фильтры
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content align="start" side="bottom">
-        <div className={styles.compositionHeader}>
-          <Filter aria-hidden className={styles.headerIcon} strokeWidth={1.75} />
-          <Typography.Root as="span" variant="body-small" weight="semibold">
-            Quick filters
-          </Typography.Root>
-        </div>
-        <Typography.Root as="p" className={styles.panelTextMuted} variant="body-small">
-          Icon on the trigger, header and copy; panel padding comes from <code>Content</code>{" "}
-          <code>size</code>.
-        </Typography.Root>
-        <div className={styles.checkboxStack}>
+      <Popover.Content className={preview.panelWidth} trapFocus>
+        <Popover.Header>
+          <Popover.Title>Фильтры отчёта</Popover.Title>
+          <Popover.Description>Применяются ко всем графикам на странице.</Popover.Description>
+        </Popover.Header>
+        <SegmentedControl.Root defaultValue="month" fullWidth aria-label="Период">
+          <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+          <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
+          <SegmentedControl.Item value="year">Год</SegmentedControl.Item>
+        </SegmentedControl.Root>
+        <div className={preview.stack}>
           <Checkbox.Root defaultChecked>
-            <Checkbox.Label>Active only</Checkbox.Label>
+            <Checkbox.Label>Только активные клиенты</Checkbox.Label>
           </Checkbox.Root>
           <Checkbox.Root>
-            <Checkbox.Label>Hide zero values</Checkbox.Label>
+            <Checkbox.Label>Скрыть нулевые строки</Checkbox.Label>
           </Checkbox.Root>
         </div>
+        <Popover.Actions>
+          <Button.Root variant="ghost" tone="neutral">
+            Сбросить
+          </Button.Root>
+          <Button.Root>Применить</Button.Root>
+        </Popover.Actions>
       </Popover.Content>
     </Popover.Root>
   );

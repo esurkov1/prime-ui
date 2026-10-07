@@ -1,75 +1,65 @@
-import { Badge, DataTable, type DataTableColumn, Tag } from "prime-ui-kit";
+/** Controlled `sort` and `page`: a header click goes asc → desc → none, and a sort change returns to page 1. Use when sorting and paging live in the URL or a store. */
 
-type InvoiceRow = {
-  id: string;
-  customer: string;
-  amount: number;
-  country: string;
-  status: "Paid" | "Pending" | "Overdue";
-};
+import { DataTable, type DataTableColumn, type DataTableSortState } from "prime-ui-kit";
+import * as React from "react";
 
-const rows: InvoiceRow[] = [
-  { id: "INV-1001", customer: "Monday Inc.", amount: 1240, country: "USA", status: "Paid" },
-  { id: "INV-1002", customer: "Pixel Lab", amount: 860, country: "Germany", status: "Pending" },
-  { id: "INV-1003", customer: "Stella Team", amount: 2910, country: "Spain", status: "Paid" },
-  { id: "INV-1004", customer: "Nordic Grid", amount: 1490, country: "Sweden", status: "Pending" },
-  { id: "INV-1005", customer: "Onboardly", amount: 480, country: "France", status: "Overdue" },
-  { id: "INV-1006", customer: "Clever Peak", amount: 3010, country: "Canada", status: "Paid" },
-  { id: "INV-1007", customer: "Nimbus", amount: 1980, country: "UK", status: "Pending" },
-  { id: "INV-1008", customer: "Solar Crest", amount: 540, country: "Italy", status: "Overdue" },
-  { id: "INV-1009", customer: "Edge Point", amount: 2270, country: "USA", status: "Paid" },
-  { id: "INV-1010", customer: "Seven Loop", amount: 1750, country: "Poland", status: "Pending" },
-  { id: "INV-1011", customer: "Mint Dash", amount: 900, country: "Japan", status: "Paid" },
-  { id: "INV-1012", customer: "Blue Stone", amount: 1425, country: "Norway", status: "Overdue" },
-];
+type Order = { id: number; customer: string; city: string; date: string; total: number };
 
-function mapStatusToColor(status: InvoiceRow["status"]) {
-  if (status === "Paid") return "green";
-  if (status === "Overdue") return "red";
-  return "yellow";
-}
+const customers = ["Анна С.", "Борис К.", "Вера Л.", "Глеб М.", "Дарья Н.", "Егор П."];
+const cities = ["Москва", "Казань", "Самара", "Томск", "Пермь"];
 
-const columns: DataTableColumn<InvoiceRow>[] = [
-  { id: "id", header: "Invoice", accessor: "id", sortable: true, minWidth: "8rem" },
-  { id: "customer", header: "Customer", accessor: "customer", sortable: true, minWidth: "12rem" },
+const rows: Order[] = Array.from({ length: 23 }, (_, i) => ({
+  id: 5000 + i,
+  customer: customers[i % customers.length],
+  city: cities[(i * 3) % cities.length],
+  date: `2026-09-${String((i % 28) + 1).padStart(2, "0")}`,
+  total: 1200 + ((i * 7919) % 48_000),
+}));
+
+const rub = new Intl.NumberFormat("ru-RU", {
+  style: "currency",
+  currency: "RUB",
+  maximumFractionDigits: 0,
+});
+const day = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
+
+const columns: DataTableColumn<Order>[] = [
+  { id: "id", header: "№", accessor: "id", sortable: true, numeric: true, width: "5rem" },
+  { id: "customer", header: "Покупатель", accessor: "customer", sortable: true },
+  { id: "city", header: "Город", accessor: "city", sortable: true },
   {
-    id: "amount",
-    header: "Amount",
-    accessor: "amount",
+    id: "date",
+    header: "Дата",
+    accessor: "date",
     sortable: true,
-    align: "end",
-    cell: (row) => `$${row.amount.toLocaleString()}`,
-    minWidth: "7rem",
+    cell: (row) => day.format(new Date(row.date)),
   },
   {
-    id: "country",
-    header: "Country",
-    accessor: "country",
+    id: "total",
+    header: "Сумма",
+    accessor: "total",
     sortable: true,
-    minWidth: "8rem",
-    cell: (row) => <Tag.Root>{row.country}</Tag.Root>,
-  },
-  {
-    id: "status",
-    header: "Status",
-    accessor: "status",
-    sortable: true,
-    minWidth: "8rem",
-    cell: (row) => (
-      <Badge.Root color={mapStatusToColor(row.status)} variant="light">
-        {row.status}
-      </Badge.Root>
-    ),
+    numeric: true,
+    cell: (row) => rub.format(row.total),
   },
 ];
 
-/** Соответствует `playground/snippets/data-table/sorting-pagination.tsx`. */
 export default function DataTableSortingPaginationExample() {
+  const [sort, setSort] = React.useState<DataTableSortState>({ columnId: "total", order: "desc" });
+  const [page, setPage] = React.useState(1);
+
   return (
     <DataTable.Root
       columns={columns}
       rows={rows}
-      defaultSort={{ columnId: "amount", order: "desc" }}
+      getRowKey={(row) => row.id}
+      sort={sort}
+      onSortChange={(next) => {
+        setSort(next);
+        setPage(1);
+      }}
+      page={page}
+      onPageChange={setPage}
       pageSize={5}
     />
   );

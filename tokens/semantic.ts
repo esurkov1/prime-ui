@@ -1,728 +1,598 @@
 /**
- * Семантика: нейтральные поверхности — `color.gray.0` (бумага); литеральный светлый текст на тёмном — `color.white`;
- * акцентный «чёрный» — `color.black`. См. план §3.1.
+ * Semantic layer (`--prime-*`). Components read only these variables.
+ * Path → variable: `color.bg.canvas` → `--prime-color-bg-canvas`, camelCase → kebab-case.
+ * Values below are the light theme; `themes/dark.ts` overrides colors and shadows.
+ *
+ * Design rules (see docs/foundation.md):
+ * - Depth comes from fills, not borders. `border.subtle` is a hairline, `border.control` is transparent
+ *   (it becomes visible only under `prefers-contrast: more`).
+ * - Every size is on the 4px grid. Controls share one size axis: xs 28 · s 32 · m 36 · l 40 · xl 48.
+ * - A nested radius equals the outer radius minus the padding between them.
  */
+
+const hues = ["blue", "green", "orange", "red", "yellow", "purple", "sky", "pink", "teal"] as const;
+type Hue = (typeof hues)[number];
+const hueRef: Record<Hue, string> = {
+  blue: "cobalt",
+  green: "green",
+  orange: "orange",
+  red: "red",
+  yellow: "yellow",
+  purple: "purple",
+  sky: "sky",
+  pink: "pink",
+  teal: "teal",
+};
+
+/** Light palette for Badge / Tag / Avatar colors: soft fill + readable text + solid fill. */
+function lightPalette() {
+  const out: Record<string, { soft: string; text: string; solid: string; solidFg: string }> = {
+    gray: {
+      /** Translucent: a gray chip stays visible on fields, tiles and tracks. */
+      soft: "color-mix(in srgb, var(--prime-ref-color-gray-925) 10%, transparent)",
+      text: "{color.gray.700}",
+      solid: "{color.gray.600}",
+      solidFg: "{color.white}",
+    },
+  };
+  for (const hue of hues) {
+    const r = hueRef[hue];
+    out[hue] =
+      hue === "yellow"
+        ? {
+            soft: "{color.yellow.100}",
+            text: "{color.yellow.800}",
+            solid: "{color.yellow.400}",
+            solidFg: "{color.gray.925}",
+          }
+        : {
+            soft: `{color.${r}.100}`,
+            text: `{color.${r}.700}`,
+            solid: `{color.${r}.700}`,
+            solidFg: "{color.white}",
+          };
+  }
+  return out;
+}
+
 export const semanticTokens = {
   color: {
-    surface: {
-      default: "{color.gray.50}",
+    bg: {
+      /** App background. */
+      canvas: "{color.gray.50}",
+      /** Cards, panels, table bodies. */
+      surface: "{color.gray.0}",
+      /** Floating layers: menus, popovers, modals, drawers. */
       raised: "{color.gray.0}",
-      elevated: "{color.gray.0}",
-      overlay: "{color.overlay.scrimLight}",
-      accentSoft: "{color.gray.100}",
-      dangerSoft: "{color.red.50}",
+      /** Inset areas inside a surface: modal footer, table head, code. */
+      sunken: "{color.gray.75}",
+      inverse: "{color.gray.925}",
+      scrim: "rgba(17, 19, 24, 0.44)",
     },
-    content: {
-      primary: "{color.gray.950}",
-      secondary: "{color.gray.600}",
-      muted: "{color.gray.500}",
+    fill: {
+      /** Transparent wash: ghost hover, row hover. Works on any background. */
+      subtle: "rgba(17, 19, 24, 0.04)",
+      subtleActive: "rgba(17, 19, 24, 0.07)",
+      /**
+       * Neutral buttons, chips, segmented track. Translucent ink wash: always one step off whatever
+       * it sits on (canvas, card, sunken tile, a custom container), in both themes.
+       */
+      muted: "color-mix(in srgb, var(--prime-ref-color-gray-925) 7%, transparent)",
+      mutedHover: "color-mix(in srgb, var(--prime-ref-color-gray-925) 10%, transparent)",
+      /** Unchecked checkbox, switch track, slider track. Same wash, stronger. */
+      strong: "color-mix(in srgb, var(--prime-ref-color-gray-925) 15%, transparent)",
+      strongHover: "color-mix(in srgb, var(--prime-ref-color-gray-925) 22%, transparent)",
+    },
+    text: {
+      primary: "{color.gray.925}",
+      secondary: "{color.gray.700}",
+      muted: "{color.gray.600}",
+      /** gray.600: keeps AA on the field wash over every host, including the canvas. */
+      placeholder: "{color.gray.600}",
       disabled: "{color.gray.400}",
-      inverse: "{color.white}",
-      accent: "{color.lavender.600}",
-      danger: "{color.red.800}",
+      inverse: "{color.gray.0}",
     },
     border: {
-      subtle: "{color.gray.200}",
-      separator: "{color.gray.300}",
-      strong: "{color.gray.300}",
-      emphasis: "{color.gray.950}",
-      muted: "{color.gray.200}",
-      accent: "{color.gray.400}",
-      danger: "{color.red.400}",
-      disabled: "{color.gray.100}",
-      inverse: "{color.white}",
+      /** Zone separators inside floating layers (dialog header/footer): only just visible. */
+      faint: "{color.gray.75}",
+      /** Hairline separators: dividers, table rows. Barely visible by design. */
+      subtle: "{color.gray.100}",
+      /** Stroke-mode buttons and the few places that genuinely need a line. */
+      default: "{color.gray.150}",
+      /** Control outline. Transparent; `globals.css` turns it on for `prefers-contrast: more`. */
+      control: "transparent",
     },
-    status: {
-      information: {
-        background: "{color.blue.100}",
-        backgroundEmphasis: "{color.blue.600}",
-        foreground: "{color.blue.800}",
-        border: "{color.blue.200}",
-      },
-      warning: {
-        background: "{color.orange.100}",
-        backgroundEmphasis: "{color.orange.600}",
-        foreground: "{color.orange.800}",
-        border: "{color.orange.200}",
-      },
-      success: {
-        background: "{color.green.100}",
-        backgroundEmphasis: "{color.green.600}",
-        foreground: "{color.green.800}",
-        border: "{color.green.200}",
-      },
-      away: {
-        background: "{color.yellow.100}",
-        backgroundEmphasis: "{color.yellow.600}",
-        foreground: "{color.yellow.800}",
-        border: "{color.yellow.200}",
-      },
-      feature: {
-        background: "{color.purple.100}",
-        backgroundEmphasis: "{color.purple.600}",
-        foreground: "{color.purple.800}",
-        border: "{color.purple.200}",
-      },
-      verified: {
-        background: "{color.sky.100}",
-        backgroundEmphasis: "{color.sky.600}",
-        foreground: "{color.sky.800}",
-        border: "{color.sky.200}",
-      },
-      error: {
-        background: "{color.red.100}",
-        backgroundEmphasis: "{color.red.600}",
-        foreground: "{color.red.800}",
-        border: "{color.red.200}",
-      },
-    },
-    /** Акцент: фокус, выделенные элементы, ссылки, индикатор активной вкладки. */
     accent: {
-      base: "{color.lavender.600}",
-      soft: "rgba(79, 91, 213, 0.10)",
+      default: "{color.cobalt.700}",
+      hover: "{color.cobalt.800}",
+      fg: "{color.white}",
+      soft: "{color.cobalt.100}",
+      softHover: "{color.cobalt.200}",
+      text: "{color.cobalt.700}",
     },
-    focus: {
-      ring: "{color.lavender.600}",
+    danger: {
+      default: "{color.red.600}",
+      hover: "{color.red.700}",
+      fg: "{color.white}",
+      soft: "{color.red.100}",
+      text: "{color.red.700}",
+      border: "{color.red.500}",
     },
-    action: {
-      primaryBackground: "{color.gray.950}",
-      primaryBackgroundHover: "{color.gray.800}",
-      primaryForeground: "{color.white}",
-      primarySoftBackground: "{color.gray.100}",
-      primarySoftForeground: "{color.gray.950}",
-      neutralBackground: "{color.gray.50}",
-      neutralBackgroundHover: "{color.gray.100}",
-      neutralForeground: "{color.gray.600}",
-      errorBackground: "{color.red.600}",
-      errorBackgroundHover: "{color.red.700}",
-      errorForeground: "{color.white}",
+    success: {
+      default: "{color.green.700}",
+      fg: "{color.white}",
+      soft: "{color.green.100}",
+      text: "{color.green.700}",
     },
-    field: {
-      bg: "{color.gray.50}",
-      text: "{color.gray.950}",
-      placeholder: "{color.gray.400}",
-      border: "transparent",
-      borderHover: "{color.gray.300}",
-      borderFocus: "{color.lavender.600}",
-      borderError: "{color.red.500}",
+    warning: {
+      default: "{color.orange.700}",
+      fg: "{color.white}",
+      soft: "{color.orange.100}",
+      text: "{color.orange.800}",
     },
-    tooltip: {
-      background: "{color.gray.900}",
-      foreground: "{color.white}",
-      border: "{color.gray.700}",
-    },
-    /** Бейдж: серый filled + палитры pink/teal без прямых `--prime-ref-*` в CSS компонента. */
-    badge: {
-      grayFilled: {
-        background: "{color.gray.600}",
-      },
-      /** Серый `light`: тонированная заливка, видна и на поле, и на elevated-панели. */
-      graySoft: {
-        background: "{color.gray.100}",
-      },
-      pink: {
-        backgroundSoft: "{color.pink.100}",
-        foregroundOnSoft: "{color.pink.800}",
-        backgroundEmphasis: "{color.pink.500}",
-        border: "{color.pink.300}",
-      },
-      teal: {
-        backgroundSoft: "{color.teal.100}",
-        foregroundOnSoft: "{color.teal.800}",
-        backgroundEmphasis: "{color.teal.500}",
-        border: "{color.teal.300}",
-      },
+    /** Sky, not cobalt: info must read differently from the accent. */
+    info: {
+      default: "{color.sky.700}",
+      fg: "{color.white}",
+      soft: "{color.sky.100}",
+      text: "{color.sky.800}",
     },
     /**
-     * Разделители ячеек таблицы: смешение с `border-subtle` (тема задаёт процент в light/dark).
+     * Field fill depends on what it sits on. `bg` is the canvas value; every surface component
+     * (Card, Modal, Drawer, Popover, Sidebar…) sets `--prime-color-field-bg: var(--prime-color-field-bg-surface)`.
      */
-    dataTable: {
-      dividerVertical: "color-mix(in srgb, var(--prime-sys-color-border-subtle) 72%, transparent)",
-      dividerHorizontal:
-        "color-mix(in srgb, var(--prime-sys-color-border-subtle) 82%, transparent)",
-      headBackground: "{color.surface.default}",
-      rowBackground: "{color.surface.elevated}",
+    field: {
+      /** Translucent wash, visible on any background; `bgSurface` kept equal for surface contexts. */
+      bg: "color-mix(in srgb, var(--prime-ref-color-gray-925) 6%, transparent)",
+      bgSurface: "color-mix(in srgb, var(--prime-ref-color-gray-925) 6%, transparent)",
+      bgFocus: "{color.gray.0}",
+      bgDisabled: "color-mix(in srgb, var(--prime-ref-color-gray-925) 4%, transparent)",
     },
-  },
-  typography: {
-    family: {
-      base: "{font.family.base}",
+    /**
+     * Card fill depends on what it sits on (same idea as `field`). On the canvas a card is white and raised;
+     * every surface plane (AppShell content, Card, Modal, Drawer, Popover) sets
+     * `--prime-color-card-bg: var(--prime-color-bg-sunken)`, and a card on a sunken fill drops its shadow.
+     */
+    card: {
+      bg: "{color.bg.surface}",
     },
-    body: {
-      size: "{font.size.s}",
-      lineHeight: "{typography.lineHeight.normal}",
-      letterSpacing: "{font.letterSpacing.normal}",
-    },
-    lineHeight: {
-      tight: "1.25",
-      normal: "1.5",
-      relaxed: "1.65",
+    focus: {
+      ring: "{color.cobalt.700}",
     },
     control: {
-      s: "{font.size.xs}",
-      m: "{font.size.s}",
-      l: "{font.size.m}",
+      /** Switch thumb, slider thumb. */
+      thumb: "{color.white}",
+      /** Selected segment in a segmented track: one step lighter than the track. */
+      selected: "{color.gray.0}",
     },
-    support: {
-      "3xs": "{font.size.3xs}",
-      "2xs": "{font.size.2xs}",
-      xs: "{font.size.xs}",
-      s: "{font.size.s}",
+    tooltip: {
+      bg: "{color.gray.925}",
+      text: "{color.gray.0}",
+    },
+    palette: lightPalette(),
+  },
+
+  font: {
+    family: {
+      sans: "{font.family.sans}",
+      mono: "{font.family.mono}",
     },
     weight: {
       regular: "{font.weight.regular}",
       medium: "{font.weight.medium}",
       semibold: "{font.weight.semibold}",
-      bold: "{font.weight.bold}",
     },
-    style: {
-      normal: "normal",
-      italic: "italic",
+  },
+
+  /**
+   * Type roles. Each role = size / lineHeight / weight / tracking.
+   * Big headings get tighter leading and negative tracking; small text gets more air.
+   */
+  text: {
+    caption: {
+      size: "{font.size.12}",
+      lineHeight: "{font.lineHeight.16}",
+      weight: "{font.weight.regular}",
+      tracking: "{font.tracking.wide}",
     },
-    title: {
-      size: "{font.size.l}",
+    bodyS: {
+      size: "{font.size.13}",
+      lineHeight: "{font.lineHeight.20}",
+      weight: "{font.weight.regular}",
+      tracking: "{font.tracking.normal}",
+    },
+    bodyM: {
+      size: "{font.size.14}",
+      lineHeight: "{font.lineHeight.20}",
+      weight: "{font.weight.regular}",
+      tracking: "{font.tracking.normal}",
+    },
+    bodyL: {
+      size: "{font.size.16}",
+      lineHeight: "{font.lineHeight.24}",
+      weight: "{font.weight.regular}",
+      tracking: "{font.tracking.normal}",
+    },
+    titleS: {
+      size: "{font.size.14}",
+      lineHeight: "{font.lineHeight.20}",
       weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.normal}",
     },
-    sizeScale: {
-      "3xs": "{font.size.3xs}",
-      "2xs": "{font.size.2xs}",
-      xs: "{font.size.xs}",
-      s: "{font.size.s}",
-      m: "{font.size.m}",
-      l: "{font.size.l}",
-      xl: "{font.size.xl}",
-      "2xl": "{font.size.2xl}",
-      "3xl": "{font.size.3xl}",
-      "4xl": "{font.size.4xl}",
-      "5xl": "{font.size.5xl}",
-      "6xl": "{font.size.6xl}",
-      "7xl": "{font.size.7xl}",
-      "8xl": "{font.size.8xl}",
-      "9xl": "{font.size.9xl}",
-      labelMicro: "{font.size.labelMicro}",
+    titleM: {
+      size: "{font.size.16}",
+      lineHeight: "{font.lineHeight.24}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.tight}",
     },
-    lineHeightScale: {
-      "3xs": "{font.lineHeight.3xs}",
-      "2xs": "{font.lineHeight.2xs}",
-      xs: "{font.lineHeight.xs}",
-      s: "{font.lineHeight.s}",
-      m: "{font.lineHeight.m}",
-      l: "{font.lineHeight.l}",
-      xl: "{font.lineHeight.xl}",
-      "2xl": "{font.lineHeight.2xl}",
-      "3xl": "{font.lineHeight.3xl}",
-      "4xl": "{font.lineHeight.4xl}",
-      "5xl": "{font.lineHeight.5xl}",
-      "6xl": "{font.lineHeight.6xl}",
-      "7xl": "{font.lineHeight.7xl}",
-      "8xl": "{font.lineHeight.8xl}",
-      "9xl": "{font.lineHeight.9xl}",
-      labelMicro: "{font.lineHeight.labelMicro}",
+    titleL: {
+      size: "{font.size.18}",
+      lineHeight: "{font.lineHeight.24}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.tight}",
     },
-    tracking: {
-      tighter: "{font.letterSpacing.tighter}",
-      tight: "{font.letterSpacing.tight}",
-      normal: "{font.letterSpacing.normal}",
-      wide: "{font.letterSpacing.wide}",
-      wider: "{font.letterSpacing.wider}",
+    headingS: {
+      size: "{font.size.20}",
+      lineHeight: "{font.lineHeight.28}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.tight}",
     },
-    /**
-     * Семантические роли чтения (Typography `variant`): пары `fontSize` / `lineHeight` согласованы
-     * по смыслу с [Material Design 3 type scale](https://m3.material.io/styles/typography/type-scale-tokens)
-     * (Display / Headline / Title / Body / Label), [Polaris Text](https://polaris.shopify.com/components/typography/text)
-     * и уровнями текста [Apple HIG — Typography](https://developer.apple.com/design/human-interface-guidelines/typography)
-     * (Large Title … Caption). Кегли — в `font.size.*`; ниже — ссылки на ступени `sizeScale`.
-     */
-    role: {
-      /** MD3 Display Large (57/45); Polaris `heading3xl`; Apple Large Title */
-      display: {
-        fontSize: "{typography.sizeScale.9xl}",
-        lineHeight: "{typography.lineHeightScale.9xl}",
-      },
-      /** MD3 Headline Large (32/40); Polaris `heading2xl`; Apple Title 1 */
-      headline: {
-        fontSize: "{typography.sizeScale.6xl}",
-        lineHeight: "{typography.lineHeightScale.6xl}",
-      },
-      /** MD3 Headline Medium (28/36); Polaris `headingXl`; Apple Title 2 */
-      headingPage: {
-        fontSize: "{typography.sizeScale.4xl}",
-        lineHeight: "{typography.lineHeightScale.4xl}",
-      },
-      /** MD3 Headline Small (24/32); Polaris `headingLg`; Apple Title 3 */
-      headingSection: {
-        fontSize: "{typography.sizeScale.2xl}",
-        lineHeight: "{typography.lineHeightScale.2xl}",
-      },
-      /** MD3 Title Large (22/28); Polaris `headingMd`; Apple Headline */
-      headingSubsection: {
-        fontSize: "{typography.sizeScale.xl}",
-        lineHeight: "{typography.lineHeightScale.xl}",
-      },
-      /** MD3 Title Small (14/20); Polaris `headingSm` / `headingXs`; Apple Subheadline / Footnote */
-      headingGroup: {
-        fontSize: "{typography.sizeScale.xs}",
-        lineHeight: "{typography.lineHeightScale.xs}",
-      },
-      /** MD3 Body Large (~16px); Polaris bodyLg; Apple Body / Callout */
-      bodyLarge: {
-        fontSize: "{typography.sizeScale.s}",
-        lineHeight: "{typography.lineHeightScale.s}",
-      },
-      /** MD3 Body Medium (~14px); Polaris bodyMd; Apple Subheadline / Footnote */
-      bodyDefault: {
-        fontSize: "{typography.sizeScale.xs}",
-        lineHeight: "{typography.lineHeightScale.xs}",
-      },
-      /** MD3 Body Small (~12px); Polaris bodySm; Apple Footnote */
-      bodySmall: {
-        fontSize: "{typography.sizeScale.2xs}",
-        lineHeight: "{typography.lineHeightScale.2xs}",
-      },
-      /** MD3 Label Large (14/20): кегль как у Body Medium, межстрочный плотнее (`2xs`), чем у `body-default` */
-      bodyCompact: {
-        fontSize: "{typography.sizeScale.xs}",
-        lineHeight: "{typography.lineHeightScale.2xs}",
-      },
-      /** MD3 Label Medium (~12px); Apple Caption1 */
-      caption: {
-        fontSize: "{typography.sizeScale.2xs}",
-        lineHeight: "{typography.lineHeightScale.2xs}",
-      },
-      /** MD3 Label Small (~11px); Apple Caption2 */
-      captionMicro: {
-        fontSize: "{typography.sizeScale.labelMicro}",
-        lineHeight: "{typography.lineHeightScale.labelMicro}",
-      },
+    headingM: {
+      size: "{font.size.24}",
+      lineHeight: "{font.lineHeight.32}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.tighter}",
+    },
+    headingL: {
+      size: "{font.size.30}",
+      lineHeight: "{font.lineHeight.36}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.tighter}",
+    },
+    displayS: {
+      size: "{font.size.36}",
+      lineHeight: "{font.lineHeight.44}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.tighter}",
+    },
+    displayM: {
+      size: "{font.size.48}",
+      lineHeight: "{font.lineHeight.56}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.tightest}",
+    },
+    displayL: {
+      size: "{font.size.60}",
+      lineHeight: "{font.lineHeight.68}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.tightest}",
+    },
+    code: {
+      size: "{font.size.13}",
+      lineHeight: "{font.lineHeight.20}",
+      weight: "{font.weight.regular}",
+      tracking: "{font.tracking.normal}",
     },
   },
-  shape: {
-    radius: {
-      xs: "{radius.xs}",
-      s: "{radius.s}",
-      m: "{radius.m}",
-      l: "{radius.l}",
-      "4xl": "{radius.4xl}",
-      round: "{radius.round}",
-    },
+
+  /** 4px grid; the key is the number of 4px steps. Values outside this scale are not allowed. */
+  space: {
+    0: "{space.0}",
+    1: "{space.1}",
+    2: "{space.2}",
+    3: "{space.3}",
+    4: "{space.4}",
+    5: "{space.5}",
+    6: "{space.6}",
+    7: "{space.7}",
+    8: "{space.8}",
+    9: "{space.9}",
+    10: "{space.10}",
+    12: "{space.12}",
+    14: "{space.14}",
+    16: "{space.16}",
+    20: "{space.20}",
+    24: "{space.24}",
   },
+
+  radius: {
+    xs: "{radius.4}",
+    s: "{radius.6}",
+    m: "{radius.8}",
+    l: "{radius.12}",
+    xl: "{radius.16}",
+    "2xl": "{radius.20}",
+    full: "{radius.full}",
+  },
+
+  icon: {
+    xs: "{icon.14}",
+    s: "{icon.16}",
+    m: "{icon.20}",
+    l: "{icon.24}",
+    xl: "{icon.32}",
+  },
+
   border: {
-    width: {
-      control: "1px",
-      focusRing: "2px",
-    },
+    width: "1px",
   },
-  /**
-   * Алиасы сетки → примитивы `spaces.layout.*`. `x*` — счётчики шагов по **4px** для layout (drawer и т.д.).
-   */
-  spacing: {
-    xs: "{spaces.layout.xs}",
-    s: "{spaces.layout.s}",
-    m: "{spaces.layout.m}",
-    l: "{spaces.layout.l}",
-    xl: "{spaces.layout.xl}",
-    "2xl": "{spaces.layout.2xl}",
-    "3xl": "{spaces.layout.3xl}",
-    "4xl": "{spaces.layout.4xl}",
-    "5xl": "{spaces.layout.5xl}",
-    "6xl": "{spaces.layout.6xl}",
-    x0: "{spaces.layout.0}",
-    x1: "{spaces.layout.xs}",
-    x2: "{spaces.layout.s}",
-    x3: "{spaces.layout.m}",
-    x4: "{spaces.layout.l}",
-    x5: "{spaces.layout.xl}",
-    x6: "{spaces.layout.2xl}",
-    x8: "{spaces.layout.3xl}",
-    x10: "{spaces.layout.4xl}",
-    x12: "{spaces.layout.5xl}",
-    x14: "{spaces.layout.6xl}",
+
+  focus: {
+    width: "2px",
+    /** Outer ring for buttons, links, chips, tabs… */
+    offset: "2px",
+    /** Fields draw the ring inside their edge: it reads as a crisp accent border and can never be clipped. */
+    offsetInset: "-2px",
+    /** Minimum free space a scroll/overflow container keeps around focusable content (= width + offset). */
+    space: "4px",
   },
-  /**
-   * Слои наложения: `--prime-sys-elevation-zIndex-*` + контекст `OverlayPortalLayer` для порталов
-   * (popover/dropdown/tooltip внутри drawer/modal — см. `drawerInModal`, `*InModal`, `*InDrawerInModal`).
-   */
-  elevation: {
-    zIndex: {
-      base: "{zIndex.base}",
-      sticky: "{zIndex.sticky}",
-      popover: "{zIndex.popover}",
-      dropdown: "{zIndex.dropdown}",
-      tooltip: "{zIndex.tooltip}",
-      drawer: "{zIndex.drawer}",
-      modal: "{zIndex.modal}",
-      popoverInDrawer: "{zIndex.popoverInDrawer}",
-      dropdownInDrawer: "{zIndex.dropdownInDrawer}",
-      tooltipInDrawer: "{zIndex.tooltipInDrawer}",
-      popoverInModal: "{zIndex.popoverInModal}",
-      dropdownInModal: "{zIndex.dropdownInModal}",
-      tooltipInModal: "{zIndex.tooltipInModal}",
-      drawerNestedShell: "{zIndex.drawerNestedShell}",
-      popoverInDrawerInModal: "{zIndex.popoverInDrawerInModal}",
-      dropdownInDrawerInModal: "{zIndex.dropdownInDrawerInModal}",
-      tooltipInDrawerInModal: "{zIndex.tooltipInDrawerInModal}",
-      toast: "{zIndex.toast}",
-    },
-    shadow: {
-      surface: "{shadow.s}",
-      modal: "{shadow.3xl}",
-      tooltip: "0 12px 28px rgba(15, 17, 21, 0.22), 0 4px 10px rgba(15, 17, 21, 0.16)",
-      buttonFocus: "0 0 0 2px rgba(10, 10, 12, 0.14)",
-      primaryFocus: "0 0 0 2px rgba(10, 10, 12, 0.2)",
-      errorFocus: "0 0 0 2px rgba(220, 38, 38, 0.2)",
-      fancyButtonNeutral:
-        "0 1px 2px rgba(14, 18, 27, 0.24), 0 0 0 1px var(--prime-sys-color-content-primary)",
-      fancyButtonPrimary:
-        "0 1px 2px rgba(14, 18, 27, 0.24), 0 0 0 1px var(--prime-sys-color-action-primaryBackground)",
-      fancyButtonError:
-        "0 1px 2px rgba(14, 18, 27, 0.24), 0 0 0 1px var(--prime-sys-color-action-errorBackground)",
-    },
+
+  shadow: {
+    /** Cards on canvas: a whisper, depth mostly comes from the fill. */
+    raised: "0 1px 2px rgba(17, 19, 24, 0.04)",
+    /** Menus, popovers, tooltips, datepicker. */
+    overlay: "0 0 0 1px rgba(17, 19, 24, 0.04), 0 12px 32px -8px rgba(17, 19, 24, 0.18)",
+    /** Modals and drawers. */
+    modal: "0 0 0 1px rgba(17, 19, 24, 0.04), 0 32px 64px -16px rgba(17, 19, 24, 0.30)",
   },
-  size: {
-    /**
-     * Ярусы контрола: одна ось высоты (`size.*`), общая иконка/типографика,
-     * `gap` / `inputPaddingX` — `primitive.spaces.control.spacing.*` (линейно s→xl), совпадают внутри яруса.
-     * `buttonPadding*` — `primitive.spaces.control.button.*` (линейно s→xl).
-     * `inputPaddingY` — вертикаль поля (по `spacing.*`).
-     * `radius` — `primitive.radius.*` по ярусу (контролы xs…xl; см. `shape.radius` для крупных поверхностей).
-     */
-    control: {
-      xs: {
-        height: "{size.xs}",
-        radius: "{radius.xs}",
-        icon: "{icon.xs}",
-        gap: "{spacing.xs}",
-        buttonPaddingX: "{spacing.s}",
-        buttonPaddingY: "{spacing.s}",
-        inputPaddingX: "{spacing.xs}",
-        inputPaddingY: "{spacing.xs}",
-        text: "{typography.support.3xs}",
-        supportText: "{typography.support.3xs}",
-      },
-      s: {
-        height: "{size.s}",
-        radius: "{radius.s}",
-        icon: "{icon.s}",
-        gap: "{spaces.control.spacing.s}",
-        buttonPaddingX: "{spaces.control.button.s}",
-        buttonPaddingY: "{spaces.control.button.s}",
-        inputPaddingX: "{spaces.control.spacing.s}",
-        inputPaddingY: "{spacing.xs}",
-        text: "{typography.support.2xs}",
-        supportText: "{typography.support.2xs}",
-      },
-      m: {
-        height: "{size.m}",
-        radius: "{radius.s}",
-        icon: "{icon.m}",
-        gap: "{spaces.control.spacing.m}",
-        buttonPaddingX: "{spaces.control.button.m}",
-        buttonPaddingY: "{spaces.control.button.m}",
-        inputPaddingX: "{spaces.control.spacing.m}",
-        inputPaddingY: "{spacing.s}",
-        text: "{typography.control.s}",
-        supportText: "{typography.support.2xs}",
-      },
-      l: {
-        height: "{size.l}",
-        radius: "{radius.l}",
-        icon: "{icon.l}",
-        gap: "{spaces.control.spacing.l}",
-        buttonPaddingX: "{spaces.control.button.l}",
-        buttonPaddingY: "{spaces.control.button.l}",
-        inputPaddingX: "{spaces.control.spacing.l}",
-        inputPaddingY: "{spacing.s}",
-        text: "{typography.control.m}",
-        supportText: "{typography.support.xs}",
-      },
-      xl: {
-        height: "{size.xl}",
-        radius: "{radius.xl}",
-        icon: "{icon.xl}",
-        gap: "{spaces.control.spacing.xl}",
-        buttonPaddingX: "{spaces.control.button.xl}",
-        buttonPaddingY: "{spaces.control.button.xl}",
-        inputPaddingX: "{spaces.control.spacing.xl}",
-        inputPaddingY: "{spacing.m}",
-        text: "{typography.control.l}",
-        supportText: "{typography.support.xs}",
-      },
-    },
-    modal: {
-      radius: "{shape.radius.4xl}",
-      maxWidth: "30rem",
-      paddingX: "{spacing.xl}",
-      paddingY: "{spacing.xl}",
-      titleGap: "{spacing.x1}",
-      contentGap: "{spacing.l}",
-      headerGap: "{spacing.m}",
-      headerPaddingBottom: "{spacing.l}",
-      headTextPaddingRight: "{spacing.3xl}",
-      bodyGap: "{spacing.l}",
-      footerGap: "{spacing.m}",
-      footerPaddingTop: "{spacing.l}",
-      overlayPaddingX: "{spacing.l}",
-      overlayPaddingY: "{spacing.l}",
-      headerIconSize: "{size.m}",
-    },
-    drawer: {
-      s: {
-        paddingX: "{spacing.x3}",
-        paddingY: "{spacing.x3}",
-        titleGap: "{size.control.s.gap}",
-        headerGap: "{spacing.x2}",
-        footerGap: "{spacing.x2}",
-        titleText: "{size.control.s.text}",
-      },
-      m: {
-        paddingX: "{spacing.x5}",
-        paddingY: "{spacing.x5}",
-        titleGap: "{size.control.m.gap}",
-        headerGap: "{spacing.x3}",
-        footerGap: "{spacing.x3}",
-        titleText: "{size.control.m.text}",
-      },
-      l: {
-        paddingX: "{spacing.x6}",
-        paddingY: "{spacing.x6}",
-        titleGap: "{size.control.l.gap}",
-        headerGap: "{spacing.x3}",
-        footerGap: "{spacing.x3}",
-        titleText: "{size.control.l.text}",
-      },
-      xl: {
-        paddingX: "{spacing.x8}",
-        paddingY: "{spacing.x8}",
-        titleGap: "{size.control.xl.gap}",
-        headerGap: "{spacing.x4}",
-        footerGap: "{spacing.x4}",
-        titleText: "{size.control.xl.text}",
-      },
-    },
-    /** Внутренний отступ: одно значение на обе оси (см. `paddingX` = Y). */
-    textarea: {
-      s: {
-        minHeight: "4rem",
-        radius: "{radius.s}",
-        paddingX: "{spacing.s}",
-      },
-      m: {
-        minHeight: "5rem",
-        radius: "{radius.m}",
-        paddingX: "{spacing.m}",
-      },
-      l: {
-        minHeight: "6rem",
-        radius: "{radius.l}",
-        paddingX: "{spacing.l}",
-      },
-      xl: {
-        minHeight: "8rem",
-        radius: "{radius.xl}",
-        paddingX: "{spacing.xl}",
-      },
-    },
-    choice: {
-      s: {
-        control: "{icon.s}",
-        dot: "{spaces.layout.xs}",
-        gap: "{spacing.s}",
-        text: "{typography.support.2xs}",
-      },
-      m: {
-        control: "{icon.m}",
-        dot: "{spaces.layout.s}",
-        gap: "{spacing.s}",
-        text: "{typography.control.s}",
-      },
-      l: {
-        control: "{icon.l}",
-        dot: "{spaces.layout.s}",
-        gap: "{spacing.m}",
-        text: "{typography.control.m}",
-      },
-      xl: {
-        control: "{icon.xl}",
-        dot: "{spaces.layout.m}",
-        gap: "{spacing.l}",
-        text: "{typography.control.l}",
-      },
-    },
-    switch: {
-      s: {
-        trackWidth: "1.75rem",
-        trackHeight: "1rem",
-        thumb: "{icon.xs}",
-      },
-      m: {
-        trackWidth: "2rem",
-        trackHeight: "1.25rem",
-        thumb: "{icon.s}",
-      },
-      l: {
-        trackWidth: "2.25rem",
-        trackHeight: "1.25rem",
-        thumb: "{icon.m}",
-      },
-      xl: {
-        trackWidth: "2.5rem",
-        trackHeight: "1.5rem",
-        thumb: "{icon.l}",
-      },
-    },
-    /** На ступень ниже кнопки того же яруса; высота из контента + `paddingY`. Боковые — `buttonPaddingX`. */
-    badge: {
-      s: {
-        paddingX: "{size.control.xs.buttonPaddingX}",
-        paddingY: "{size.control.xs.inputPaddingY}",
-        text: "{size.control.xs.text}",
-        dotSize: "{spaces.layout.xs}",
-        iconSize: "{size.control.xs.icon}",
-        gap: "{size.control.xs.gap}",
-        radius: "{radius.2xs}",
-      },
-      m: {
-        paddingX: "{size.control.s.buttonPaddingX}",
-        paddingY: "{size.control.s.inputPaddingY}",
-        text: "{size.control.s.text}",
-        dotSize: "{spaces.layout.s}",
-        iconSize: "{size.control.s.icon}",
-        gap: "{size.control.s.gap}",
-        radius: "{radius.2xs}",
-      },
-      l: {
-        paddingX: "{size.control.m.buttonPaddingX}",
-        paddingY: "{size.control.m.inputPaddingY}",
-        text: "{size.control.m.text}",
-        dotSize: "{spaces.layout.m}",
-        iconSize: "{size.control.m.icon}",
-        gap: "{size.control.m.gap}",
-        radius: "{radius.2xs}",
-      },
-      xl: {
-        paddingX: "{size.control.l.buttonPaddingX}",
-        paddingY: "{size.control.l.inputPaddingY}",
-        text: "{size.control.l.text}",
-        dotSize: "{spaces.layout.l}",
-        iconSize: "{size.control.l.icon}",
-        gap: "{size.control.l.gap}",
-        radius: "{radius.xs}",
-      },
-    },
-    avatar: {
-      s: { size: "{size.s}", text: "{typography.support.2xs}", radius: "{shape.radius.round}" },
-      m: { size: "{size.m}", text: "{typography.support.2xs}", radius: "{shape.radius.round}" },
-      l: { size: "{size.l}", text: "{typography.control.s}", radius: "{shape.radius.round}" },
-      xl: { size: "{size.xl}", text: "{typography.control.l}", radius: "{shape.radius.round}" },
-      "2xl": {
-        size: "{size.2xl}",
-        text: "{typography.sizeScale.2xl}",
-        radius: "{shape.radius.round}",
-      },
-      "3xl": {
-        size: "{size.3xl}",
-        text: "{typography.sizeScale.3xl}",
-        radius: "{shape.radius.round}",
-      },
-      "4xl": {
-        size: "{size.4xl}",
-        text: "{typography.sizeScale.4xl}",
-        radius: "{shape.radius.round}",
-      },
-      "5xl": {
-        size: "{size.5xl}",
-        text: "{typography.sizeScale.5xl}",
-        radius: "{shape.radius.round}",
-      },
-      "6xl": {
-        size: "{size.6xl}",
-        text: "{typography.sizeScale.6xl}",
-        radius: "{shape.radius.round}",
-      },
-    },
-    /** На ступень ниже control того же яруса: компактнее по padding/тексту/радиусу. */
-    tooltip: {
-      s: {
-        paddingX: "{size.control.xs.inputPaddingX}",
-        paddingY: "{size.control.xs.inputPaddingY}",
-        text: "{size.control.xs.supportText}",
-        radius: "{size.control.xs.radius}",
-      },
-      m: {
-        paddingX: "{size.control.s.inputPaddingX}",
-        paddingY: "{size.control.s.inputPaddingY}",
-        text: "{size.control.s.supportText}",
-        radius: "{size.control.s.radius}",
-      },
-      l: {
-        paddingX: "{size.control.m.inputPaddingX}",
-        paddingY: "{size.control.m.inputPaddingY}",
-        text: "{size.control.m.supportText}",
-        radius: "{size.control.m.radius}",
-      },
-      xl: {
-        paddingX: "{size.control.l.inputPaddingX}",
-        paddingY: "{size.control.l.inputPaddingY}",
-        text: "{size.control.l.supportText}",
-        radius: "{size.control.l.radius}",
-      },
-    },
-    /** На ступень ниже кнопки того же яруса (как `size.badge`); боковые — `buttonPaddingX`. */
-    tag: {
-      s: {
-        paddingX: "{size.control.xs.buttonPaddingX}",
-        paddingY: "{size.control.xs.inputPaddingY}",
-        text: "{size.control.xs.text}",
-        iconSize: "{size.control.xs.icon}",
-        gap: "{size.control.xs.gap}",
-        radius: "{radius.2xs}",
-      },
-      m: {
-        paddingX: "{size.control.s.buttonPaddingX}",
-        paddingY: "{size.control.s.inputPaddingY}",
-        text: "{size.control.s.text}",
-        iconSize: "{size.control.s.icon}",
-        gap: "{size.control.s.gap}",
-        radius: "{radius.2xs}",
-      },
-      l: {
-        paddingX: "{size.control.m.buttonPaddingX}",
-        paddingY: "{size.control.m.inputPaddingY}",
-        text: "{size.control.m.text}",
-        iconSize: "{size.control.m.icon}",
-        gap: "{size.control.m.gap}",
-        radius: "{radius.2xs}",
-      },
-      xl: {
-        paddingX: "{size.control.l.buttonPaddingX}",
-        paddingY: "{size.control.l.inputPaddingY}",
-        text: "{size.control.l.text}",
-        iconSize: "{size.control.l.icon}",
-        gap: "{size.control.l.gap}",
-        radius: "{radius.xs}",
-      },
-    },
-    /** Ярус `s` на ступень ниже: совпадает с `size.control.xs`. */
-    kbd: {
-      height: "{size.control.xs.height}",
-      paddingX: "{size.control.xs.inputPaddingX}",
-      paddingY: "{size.control.xs.inputPaddingY}",
-      text: "{size.control.xs.text}",
-      radius: "{size.control.xs.radius}",
-    },
-  },
+
   motion: {
     duration: {
-      fast: "{motion.duration.fast}",
-      medium: "{motion.duration.medium}",
-      slow: "{motion.duration.slow}",
+      fast: "{duration.120}",
+      base: "{duration.200}",
+      slow: "{duration.300}",
     },
     easing: {
-      standard: "{motion.easing.standard}",
+      standard: "{easing.standard}",
+      enter: "{easing.enter}",
+      exit: "{easing.exit}",
     },
-    fast: "{motion.duration.fast}",
-    medium: "{motion.duration.medium}",
-    slow: "{motion.duration.slow}",
-    standard: "{motion.easing.standard}",
+  },
+
+  z: {
+    base: "{zIndex.base}",
+    sticky: "{zIndex.sticky}",
+    popover: "{zIndex.popover}",
+    dropdown: "{zIndex.dropdown}",
+    tooltip: "{zIndex.tooltip}",
+    drawer: "{zIndex.drawer}",
+    popoverInDrawer: "{zIndex.popoverInDrawer}",
+    dropdownInDrawer: "{zIndex.dropdownInDrawer}",
+    tooltipInDrawer: "{zIndex.tooltipInDrawer}",
+    modal: "{zIndex.modal}",
+    popoverInModal: "{zIndex.popoverInModal}",
+    dropdownInModal: "{zIndex.dropdownInModal}",
+    tooltipInModal: "{zIndex.tooltipInModal}",
+    drawerNestedShell: "{zIndex.drawerNestedShell}",
+    popoverInDrawerInModal: "{zIndex.popoverInDrawerInModal}",
+    dropdownInDrawerInModal: "{zIndex.dropdownInDrawerInModal}",
+    tooltipInDrawerInModal: "{zIndex.tooltipInDrawerInModal}",
+    toast: "{zIndex.toast}",
+  },
+
+  /**
+   * Control size tiers shared by Button, Input, Select, Datepicker, Tabs, SegmentedControl, etc.
+   * Pairing: a field of tier T uses `labelSize`/`hintSize` of tier T; menus opened from tier T
+   * use `itemHeight` of tier T; badges inside tier T use the badge tier one step down.
+   */
+  control: {
+    xs: {
+      height: "{space.7}",
+      paddingX: "{space.2}",
+      fieldPaddingX: "{space.2}",
+      gap: "{space.1}",
+      icon: "{icon.14}",
+      radius: "{radius.6}",
+      textSize: "{font.size.12}",
+      lineHeight: "{font.lineHeight.16}",
+      labelSize: "{font.size.12}",
+      labelLineHeight: "{font.lineHeight.16}",
+      hintSize: "{font.size.12}",
+      hintLineHeight: "{font.lineHeight.16}",
+      labelGap: "{space.1}",
+      hintGap: "{space.1}",
+      itemHeight: "{space.6}",
+      choice: "{icon.14}",
+    },
+    s: {
+      height: "{space.8}",
+      paddingX: "{space.3}",
+      fieldPaddingX: "{space.2}",
+      gap: "{space.2}",
+      icon: "{icon.16}",
+      radius: "{radius.8}",
+      textSize: "{font.size.13}",
+      lineHeight: "{font.lineHeight.20}",
+      labelSize: "{font.size.12}",
+      labelLineHeight: "{font.lineHeight.16}",
+      hintSize: "{font.size.12}",
+      hintLineHeight: "{font.lineHeight.16}",
+      labelGap: "{space.1}",
+      hintGap: "{space.1}",
+      itemHeight: "{space.7}",
+      choice: "{icon.16}",
+    },
+    m: {
+      height: "{space.9}",
+      paddingX: "{space.4}",
+      fieldPaddingX: "{space.3}",
+      gap: "{space.2}",
+      icon: "{icon.16}",
+      radius: "{radius.8}",
+      textSize: "{font.size.14}",
+      lineHeight: "{font.lineHeight.20}",
+      labelSize: "{font.size.13}",
+      labelLineHeight: "{font.lineHeight.20}",
+      hintSize: "{font.size.12}",
+      hintLineHeight: "{font.lineHeight.16}",
+      labelGap: "{space.2}",
+      hintGap: "{space.1}",
+      itemHeight: "{space.8}",
+      choice: "1.125rem",
+    },
+    l: {
+      height: "{space.10}",
+      paddingX: "{space.5}",
+      fieldPaddingX: "{space.3}",
+      gap: "{space.2}",
+      icon: "{icon.20}",
+      radius: "{radius.10}",
+      textSize: "{font.size.16}",
+      lineHeight: "{font.lineHeight.24}",
+      labelSize: "{font.size.14}",
+      labelLineHeight: "{font.lineHeight.20}",
+      hintSize: "{font.size.13}",
+      hintLineHeight: "{font.lineHeight.20}",
+      labelGap: "{space.2}",
+      hintGap: "{space.1}",
+      itemHeight: "{space.9}",
+      choice: "{icon.20}",
+    },
+    xl: {
+      height: "{space.12}",
+      paddingX: "{space.6}",
+      fieldPaddingX: "{space.4}",
+      gap: "{space.3}",
+      icon: "{icon.20}",
+      radius: "{radius.12}",
+      textSize: "{font.size.16}",
+      lineHeight: "{font.lineHeight.24}",
+      labelSize: "{font.size.14}",
+      labelLineHeight: "{font.lineHeight.20}",
+      hintSize: "{font.size.13}",
+      hintLineHeight: "{font.lineHeight.20}",
+      labelGap: "{space.2}",
+      hintGap: "{space.1}",
+      itemHeight: "{space.10}",
+      choice: "{icon.24}",
+    },
+  },
+
+  /** Badge / Tag / Kbd tiers. Inside a control of tier T use the badge tier one step down. */
+  badge: {
+    xs: {
+      height: "1rem",
+      paddingX: "{space.1}",
+      textSize: "{font.size.12}",
+      icon: "0.75rem",
+      gap: "{space.1}",
+      radius: "{radius.4}",
+    },
+    s: {
+      height: "{space.5}",
+      paddingX: "0.375rem",
+      textSize: "{font.size.12}",
+      icon: "0.75rem",
+      gap: "{space.1}",
+      radius: "{radius.6}",
+    },
+    m: {
+      height: "{space.6}",
+      paddingX: "{space.2}",
+      textSize: "{font.size.12}",
+      icon: "{icon.14}",
+      gap: "{space.1}",
+      radius: "{radius.6}",
+    },
+    l: {
+      height: "{space.7}",
+      paddingX: "0.625rem",
+      textSize: "{font.size.13}",
+      icon: "{icon.16}",
+      gap: "{space.1}",
+      radius: "{radius.8}",
+    },
+    xl: {
+      height: "{space.8}",
+      paddingX: "{space.3}",
+      textSize: "{font.size.14}",
+      icon: "{icon.16}",
+      gap: "{space.2}",
+      radius: "{radius.8}",
+    },
+  },
+
+  switch: {
+    xs: { width: "{space.6}", height: "1rem", thumb: "0.75rem" },
+    s: { width: "{space.7}", height: "1rem", thumb: "0.75rem" },
+    m: { width: "{space.8}", height: "{space.5}", thumb: "1rem" },
+    l: { width: "{space.9}", height: "{space.5}", thumb: "1rem" },
+    xl: { width: "2.75rem", height: "{space.6}", thumb: "{icon.20}" },
+  },
+
+  avatar: {
+    xs: "{space.5}",
+    s: "{space.6}",
+    m: "{space.8}",
+    l: "{space.10}",
+    xl: "{space.12}",
+    "2xl": "{space.16}",
+  },
+
+  /** Floating panel shared by Select, Dropdown, Combobox, Datepicker, Popover. Item radius = radius − padding. */
+  panel: {
+    radius: "{radius.12}",
+    padding: "{space.1}",
+    itemRadius: "{radius.8}",
+    itemPaddingX: "{space.2}",
+    contentPadding: "{space.4}",
+    offset: "{space.1}",
+    groupLabelHeight: "{space.7}",
+    maxHeight: "20rem",
+    minWidth: "12rem",
+  },
+
+  card: {
+    /** Context: surfaces set it to `none` together with `--prime-color-card-bg` (see color.card). */
+    shadow: "{shadow.raised}",
+    radius: "{radius.12}",
+    paddingS: "{space.4}",
+    paddingM: "{space.5}",
+    paddingL: "{space.6}",
+    gap: "{space.4}",
+  },
+
+  modal: {
+    radius: "{radius.16}",
+    padding: "{space.6}",
+    gap: "{space.4}",
+    viewportPadding: "{space.4}",
+    widthS: "27.5rem",
+    widthM: "35rem",
+    widthL: "45rem",
+    widthXl: "60rem",
+  },
+
+  drawer: {
+    padding: "{space.6}",
+    gap: "{space.4}",
+    widthS: "22.5rem",
+    widthM: "30rem",
+    widthL: "40rem",
+    widthXl: "50rem",
+  },
+
+  tooltip: {
+    radius: "{radius.6}",
+    paddingX: "{space.2}",
+    paddingY: "{space.1}",
+    maxWidth: "17.5rem",
+  },
+
+  table: {
+    rowHeightS: "{space.9}",
+    rowHeightM: "2.75rem",
+    rowHeightL: "3.25rem",
+    cellPaddingX: "{space.3}",
+  },
+
+  layout: {
+    sidebarWidth: "15.5rem",
+    sidebarCollapsedWidth: "{space.14}",
+    gutterS: "{space.4}",
+    gutterM: "{space.6}",
+    gutterL: "{space.8}",
+    contentMaxWidth: "75rem",
+    readingMaxWidth: "42rem",
   },
 } as const;

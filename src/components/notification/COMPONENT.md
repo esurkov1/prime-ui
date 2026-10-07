@@ -1,156 +1,204 @@
 # Notification
 
-**Default `size`:** use **`m`** for the notification card size unless the surface explicitly needs **`s`** or **`l`**.
+**Category:** feedback (Обратная связь)
 
-## Canonical
+> Pop-up toast notifications: `NotificationProvider` at the app root and `notify()` from any screen.
 
-- **`NotificationProvider`** — wraps the tree that calls hooks; mounts a **portal** with fixed **zones** per viewport corner/edge. Each **`notify`** item is grouped by **`position`** and **`type`** into separate stacks (**`max`** per stack, default **`5`**).
-- **`useNotifications`** — **`notify`**, **`dismiss`**, **`dismissAll`** only; throws outside the provider.
-- **`useNotificationStore`** — same methods plus **`items`** (**`NotificationRecord[]`**, active only, no exit-animation rows).
-- **`NotificationCard`** — **`article`** with live region semantics, icon, title, optional badge/description/**`action`** (neutral stroke **`Button.Root`**), optional close, progress track unless **`persistent`**.
-- **Stacks** — Framer Motion list; hover expands stack and **pauses** countdowns until collapse. **`error`** / **`warning`** → **`role="alert"`**, **`aria-live="assertive"`**; **`success`** / **`info`** → **`status`**, **`polite`**.
+## When to use
+- A short reaction to a user action: saved, sent, copied, failed to save.
+- A background event the user should notice without leaving the screen (new message, low stock).
+- An error with a quick recovery action ("Повторить").
 
-## Extended
+## When not to use
+- A persistent message about a page or account state → use [Banner](../banner/COMPONENT.md).
+- A field validation error → use the field `error` / [Hint](../hint/COMPONENT.md).
+- A decision the user must make before continuing → use [Modal](../modal/COMPONENT.md).
+- Progress of a long operation → use [ProgressBar](../progress-bar/COMPONENT.md) in the UI.
 
-### About
-
-Toast notifications for short, non-blocking feedback after actions (save, send, job finished) when focus must not be trapped.
-
-- **When to use** — confirmations or lightweight errors that do not need a blocking dialog.
-- **When to use** — one optional secondary **`action`** (e.g. undo, open detail) alongside auto-dismiss.
-- **When to use** — **`useNotificationStore`** when the UI must reflect **`items`** (counters, bulk dismiss, custom chrome).
-- **When not to use** — blocking decisions, long forms, or primary workflow inside the toast; prefer [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md), or [Banner](../banner/COMPONENT.md).
-- **When not to use** — multiple nested **`NotificationProvider`**s unless you intentionally want several portals.
-
-### Composition
-
-- **`NotificationProvider`** → context + **`NotificationToaster`** (portal, zones, **`NotificationStack`** per **`position`** + **`type`**).
-- **`NotificationStack` / `NotificationStackItem`** (internal) — ordered list; peek/collapse behavior and **`paused`** passed to **`NotificationCard`**.
-- **`NotificationCard`** — public for static previews or fully custom wiring; live toasts should use **`notify`**.
-
-### Scenarios (playground + `examples/`)
-
-Live demos in the playground use **`playground/snippets/notification/*.tsx`** (see **`playground/sections/NotificationSection.tsx`**). The table below lists the same scenarios with package-oriented copies under **`examples/`** (aligned 1:1 with those snippets).
-
-| Scenario | Approach |
-|----------|----------|
-| Sizes | Static **`NotificationCard`** row for **`s`** / **`m`** / **`l`** with **`persistent`** and **`closable: false`** so only scale differs. → [`examples/sizes.tsx`](examples/sizes.tsx) |
-| Variants (`type`) | Four **`type`** values on static cards; **`persistent: true`** shows accent border and glow pulse (default live **`notify()`** is **`persistent: false`**). → [`examples/variants.tsx`](examples/variants.tsx) |
-| States | Static **`persistent`** vs **`closable: false`**, plus buttons for timed toast, hover-pause stack, and **`notify`** with **`persistent`**. → [`examples/states.tsx`](examples/states.tsx) |
-| Positions | Six **`NotificationPosition`** values; **`position`** in **`notify`** options. → [`examples/positions.tsx`](examples/positions.tsx) |
-| Controlled store | **`useNotificationStore()`** — **`items`**, **`notify`**, **`dismiss(id)`** per row. → [`examples/controlled.tsx`](examples/controlled.tsx) |
-| Composition | **`icon`**, **`badge`**, **`description`**, **`action`**; static card plus live **`notify`** (e.g. lucide **`Bell`**). → [`examples/composition.tsx`](examples/composition.tsx) |
-| Stack / timing | Burst stack (**`max`** per stack), hover expand + pause, **`dismissAll`**, short vs long **`duration`**. → [`examples/features.tsx`](examples/features.tsx) |
-
-**Additional examples:** interactive **`type`** buttons → [`examples/error-success.tsx`](examples/error-success.tsx); **`action`** + **`LinkButton`** trigger → [`examples/action-toast.tsx`](examples/action-toast.tsx). Deprecated aliases: [`examples/toast-queue.tsx`](examples/toast-queue.tsx) → **`features`**, [`examples/notification-store.tsx`](examples/notification-store.tsx) → **`controlled`**.
-
-### Minimal example
-
+## Import
 ```tsx
-import { NotificationProvider, useNotifications } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <NotificationProvider>
-      <Notifier />
-    </NotificationProvider>
-  );
-}
-
-function Notifier() {
-  const { notify } = useNotifications();
-  return (
-    <button type="button" onClick={() => notify({ type: "info", title: "Hello" })}>
-      Notify
-    </button>
-  );
-}
+import { NotificationCard, NotificationProvider, useNotifications } from "prime-ui-kit";
 ```
+Public types: `NotificationOptions`, `NotificationRecord`, `NotificationPosition`, `NotificationAction`, `NotificationLabels`, `NotificationProviderProps`, `NotificationCardProps`.
 
-### Rules
-
-- Call **`useNotifications`** or **`useNotificationStore`** only under **`NotificationProvider`**; both hooks throw if context is missing.
-- **`notify`** returns a string **`id`**; pass it to **`dismiss`** or use **`dismissAll`** for every active toast.
-- **`useNotificationStore`** exposes the same methods plus **`items`**: **`NotificationRecord[]`** of non-dismissing entries only (no internal closing-animation flag).
-- Options passed to **`notify`** are merged with defaults: **`size`** `"m"`, **`position`** from the provider, **`duration`** `5000` ms, **`persistent`** `false`, **`closable`** `true`.
-- With **`persistent`**, there is no auto-dismiss, no progress bar, and duration does not drive closing; users or **`dismiss`** / **`dismissAll`** must close the card. Visually, **`persistent`** also turns on the accent-tinted **border** and (unless **`prefers-reduced-motion`**) the **`notification-glow`** shadow pulse — default **`notify()`** uses **`persistent: false`**, so live toasts look flatter unless you opt in.
-- If **`duration <= 0`**, the countdown effect does not run—time-based auto-dismiss does not occur; close via **`dismiss`** or the close button when **`closable`**.
-- Stacks are keyed by **`position`** and **`type`**; **`max`** (default `5`) caps depth per stack—older items in that stack are dropped when exceeded.
-- **`type`** `error` and **`warning`** use **`role="alert"`** and **`aria-live="assertive"`**; other types use **`role="status"`** and **`aria-live="polite"`**.
-- Close control uses **`aria-label="Dismiss notification"`**; default type icons are **`aria-hidden`** inside the icon wrapper.
-- Each stack list has **`aria-label`** `Notifications at <position>`.
-- Nested **`NotificationProvider`** instances each render their own portal and zones—usually one root provider is enough.
-- **`NotificationCard`** is not connected to the store by itself; supply **`item`**, **`paused`**, and **`onDismiss`** and keep **`item`** fields consistent with **`NotificationRecord`**.
+## Anatomy
+```
+NotificationProvider                 store + portaled viewport (z-index toast)
+└─ zone per position                 top/bottom × left/center/right
+   └─ stack per tone                 <ol> named by labels.regions[position]; newest in front
+      └─ NotificationCard            <article role="status|alert">
+         ├─ icon                     tone icon or `icon`
+         ├─ title + badge
+         ├─ description
+         ├─ action button            soft neutral, one tier below the card
+         ├─ close button             when `closable`
+         └─ countdown line           when not `persistent`
+```
 
 ## API
 
 ### NotificationProvider
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The app. |
+| `position` | `NotificationPosition` | `"top-right"` | Default position for `notify()` calls without one. |
+| `max` | `number` | `5` | Max toasts per stack (position × tone); older ones are dropped. |
+| `labels` | `{ close?: string; regions?: Partial<Record<NotificationPosition, string>> }` | see Accessibility | Built-in strings; `regions` merges per position. |
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | Yes | Subtree where notification hooks are used |
-| position | `NotificationPosition` | `"top-right"` | No | Default **`position`** for **`notify`** when omitted in options |
-| max | `number` | `5` | No | Maximum items per stack (same **`position`** + **`type`**) |
-
-### NotificationOptions (`notify` payload)
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| type | `"success" \| "error" \| "warning" \| "info"` | — | Yes | Semantics, default icon, and stack grouping |
-| title | `string` | — | Yes | Primary heading |
-| description | `string` | — | No | Secondary text |
-| size | `"s" \| "m" \| "l"` | `"m"` | No | Card scale |
-| position | `NotificationPosition` | provider default | No | Corner or edge anchor |
-| duration | `number` | `5000` | No | Auto-dismiss delay in ms (ignored for closing when **`persistent`**; see Rules when `<= 0`) |
-| persistent | `boolean` | `false` | No | Disable timer and progress UI |
-| icon | `React.ReactNode` | type default | No | Custom leading icon |
-| badge | `string \| number` | — | No | Label next to the title |
-| closable | `boolean` | `true` | No | Show dismiss button |
-| action | `{ label: string; onClick: () => void }` | — | No | Secondary action rendered as neutral stroke **`Button.Root`** |
-
-`notify` returns the new record’s **`id`** (`string`).
-
-### NotificationRecord
-
-All **`NotificationOptions`** fields plus required **`id`**, **`position`**, **`size`**, **`duration`**, **`persistent`**, **`closable`**, and **`createdAt`** (`number`, ms). Defaults are filled when the record is created inside **`notify`**.
-
-### NotificationCard
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| item | `NotificationRecord` | — | Yes | Card data |
-| paused | `boolean` | — | Yes | Pause countdown (e.g. expanded stack) |
-| onDismiss | `(id: string) => void` | — | Yes | Called to remove the toast (timer or UI) |
-| stackDepth | `number` | `0` | No | Stack index for layout / `data-*` |
-| stackExpanded | `boolean` | `false` | No | Whether the parent stack is expanded |
-| className | `string` | — | No | Extra class on the root `article` |
+`NotificationPosition` = `"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"`.
 
 ### useNotifications()
+Must be called inside `NotificationProvider` (throws otherwise). Returns:
 
 | Field | Type | Description |
-|------|------|-------------|
-| notify | `(options: NotificationOptions) => string` | Enqueue a notification |
-| dismiss | `(id: string) => void` | Dismiss one by id |
-| dismissAll | `() => void` | Dismiss all active |
+|---|---|---|
+| `notify` | `(options: NotificationOptions) => string` | Shows a toast and returns its id. |
+| `dismiss` | `(id: string) => void` | Closes one toast (plays the exit animation). |
+| `dismissAll` | `() => void` | Closes all toasts. |
+| `items` | `NotificationRecord[]` | Active toasts (without the ones playing their exit). |
 
-### useNotificationStore()
+### NotificationOptions (argument of `notify`)
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `title` | `string` | — (required) | Title. |
+| `description` | `string` | — | Text under the title. |
+| `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Meaning, default icon, stack grouping; `warning` and `danger` are announced assertively. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Padding, icon and text of the card. |
+| `position` | `NotificationPosition` | provider `position` | Screen corner or edge. |
+| `duration` | `number` | `5000` | Auto-close timeout in ms. A value `<= 0` disables the timer. |
+| `persistent` | `boolean` | `false` | No timer and no countdown line; closes only by the close button or `dismiss`. |
+| `icon` | `ReactNode` | tone icon | Custom icon. |
+| `badge` | `string \| number` | — | Counter next to the title. |
+| `closable` | `boolean` | `true` | Close button. |
+| `action` | `{ label: string; onClick: () => void }` | — | Secondary button in the card. Clicking it does not close the toast. |
 
-Same **`notify`**, **`dismiss`**, and **`dismissAll`** as above, plus **`items`**: `NotificationRecord[]` (active only, excluding items in the exit-animation phase).
+### NotificationRecord
+`NotificationOptions` with `id`, `createdAt` and resolved `tone`, `position`, `size`, `duration`, `persistent`, `closable` (all required). Used by `items` and by `NotificationCard`.
+
+### NotificationCard
+A single toast card without the store, for docs, mockups or custom hosts. No ref.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `item` | `NotificationRecord` | — (required) | What to render. |
+| `paused` | `boolean` | — (required) | Pauses the countdown. Pass `true` for static cards. |
+| `onDismiss` | `(id: string) => void` | — (required) | Called by the close button and when the countdown ends. |
+| `className` | `string` | — | Class on the `<article>`. |
+| `stackDepth` | `number` | `0` | Depth in a stack (`data-stack-depth`). |
+| `stackExpanded` | `boolean` | `false` | Whether the stack is expanded (`data-stack-expanded`). |
+
+## Variants
+
+### tone
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `info` | Raised card, info icon (circle "i"), info countdown | Neutral events, messages | yes |
+| `success` | Success check icon | Completed actions | |
+| `warning` | Warning triangle icon | Something needs attention soon | |
+| `danger` | Danger cross icon | Failed actions; pair with `action` to retry | |
+
+The card itself is always a raised surface without a border; only the icon, the badge and the countdown take the tone. Each tone forms its own stack in a position.
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | Smallest padding and icon, `xs` text; action button `xs` | Very dense apps | |
+| `s` | Compact; action button `xs` | Dense dashboards | |
+| `m` | Padding 16, icon 16, title 14/20, description 13/20; action button `s` | Default | yes |
+| `l` | Larger padding and text; action button `m` | Touch screens | |
+| `xl` | Largest; action button `l` | Kiosk / large screens | |
+
+### position
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `top-right` | Stack in the top-right corner, grows down | Desktop apps | yes |
+| `top-center` | Centered at the top | Global system events | |
+| `top-left` | Top-left corner | Right-side panels occupy the right | |
+| `bottom-right` | Bottom-right corner, grows up | Chat-like or editor apps | |
+| `bottom-center` | Centered at the bottom | Mobile-like layouts | |
+| `bottom-left` | Bottom-left corner | Apps with right-bottom controls | |
+
+### Flags
+| Flag | Looks like | Use when | Default |
+|---|---|---|---|
+| `persistent` | No countdown line, no auto-close | Errors the user must read or act on | `false` |
+| `closable: false` | No close button | Very short confirmations ("Ссылка скопирована") | `true` |
+| `badge` | Small counter after the title | Grouped events ("3 ответа") | — |
+
+**Combinations**
+- Recommended: `danger` + `persistent` + `action: Повторить`; `success` with a short title only.
+- Pointless: `persistent` + `closable: false` (the toast can only be closed by code); `duration` together with `persistent`.
+- Avoid: several positions in one app; long descriptions — keep one or two lines.
+
+## States
+| State | Driven by | DOM |
+|---|---|---|
+| tone / size | options | `data-tone`, `data-size` on the card |
+| persistent | `persistent` | `data-persistent="true"` |
+| stack position | store | `data-stack-depth`, `data-stack-expanded` on the card; `data-stack-index`, `data-hidden`, `data-state="open" \| "closed"` on the stack item; `data-expanded` on the stack |
+| paused | hover over the stack | countdown stops while the stack is expanded |
+
+Collapsed stacks show up to 3 cards peeking behind each other; hover expands the stack and pauses the timers. Under `prefers-reduced-motion` toasts are removed without an exit animation.
+
+## Layout & spacing
+- Toasts render in a fixed, portaled viewport; zones are `--prime-space-5` from the viewport edge (`--prime-space-3` below 640px) and at most 24rem wide.
+- Cards in an expanded stack are `--prime-space-2` apart.
+- The viewport does not take pointer events except over the cards.
+
+## Accessibility
+- Each card is an `<article>`: `role="status"` + `aria-live="polite"` for `info`/`success`, `role="alert"` + `aria-live="assertive"` for `warning`/`danger`.
+- Each stack is an `<ol>` with an accessible name from `labels.regions[position]`.
+- The icon and countdown line are `aria-hidden`; the close button has `labels.close`.
+- Do not put the only copy of important information in a toast with a timer — use `persistent` or a Banner.
+
+| `labels` key | Default | Used for |
+|---|---|---|
+| `close` | `"Закрыть уведомление"` | `aria-label` of the close button |
+| `regions["top-left"]` | `"Уведомления сверху слева"` | Name of the top-left stack |
+| `regions["top-center"]` | `"Уведомления сверху по центру"` | Name of the top-center stack |
+| `regions["top-right"]` | `"Уведомления сверху справа"` | Name of the top-right stack |
+| `regions["bottom-left"]` | `"Уведомления снизу слева"` | Name of the bottom-left stack |
+| `regions["bottom-center"]` | `"Уведомления снизу по центру"` | Name of the bottom-center stack |
+| `regions["bottom-right"]` | `"Уведомления снизу справа"` | Name of the bottom-right stack |
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [save-form.tsx](examples/save-form.tsx) | Button `loading`, then a success toast or a danger toast with "Повторить" | Async save feedback |
+| [live.tsx](examples/live.tsx) | `notify()` per tone with a position picker, `persistent`, `items.length`, `dismissAll` | Positions, stacking, timers |
+| [tones.tsx](examples/tones.tsx) | Static `NotificationCard` per tone | Docs and mockups |
+| [sizes.tsx](examples/sizes.tsx) | Static cards `xs`…`xl` | Picking a size |
+| [features.tsx](examples/features.tsx) | `icon`, `badge`, `action`, title-only with `closable: false` | Digests and quick confirmations |
+
+```tsx
+import { Button, NotificationProvider, useNotifications } from "prime-ui-kit";
+
+function CopyLink() {
+  const { notify } = useNotifications();
+  return (
+    <Button.Root onClick={() => notify({ tone: "success", title: "Ссылка скопирована" })}>
+      Копировать ссылку
+    </Button.Root>
+  );
+}
+
+export function App() {
+  return (
+    <NotificationProvider>
+      <CopyLink />
+    </NotificationProvider>
+  );
+}
+```
+
+## Mistakes
+- Calling `useNotifications()` outside `NotificationProvider` → it throws; wrap the app root once.
+- Several providers in one app → one provider at the root; nested ones create separate toasters.
+- `tone: "error"` → use `tone: "danger"`.
+- Expecting `action` to close the toast → call `dismiss(id)` in `onClick` if it should.
+- Using a toast for a permanent state ("trial ends in 3 days") → use a Banner.
 
 ## Related
-
-- [Banner](../banner/COMPONENT.md)
-- [Button](../button/COMPONENT.md)
-- [Drawer](../drawer/COMPONENT.md)
-- [Modal](../modal/COMPONENT.md)
-
-## LLM note
-
-- Imports: **`NotificationProvider`**, **`useNotifications`**, **`useNotificationStore`**, **`NotificationCard`**, types **`NotificationOptions`**, **`NotificationRecord`**, **`NotificationPosition`**, **`NotificationType`**, **`NotificationSize`**, **`NotificationAction`** from **`"prime-ui-kit"`**.
-- **`notify`** requires **`type`** and **`title`**; optional **`description`**, **`size`**, **`position`**, **`duration`**, **`persistent`**, **`icon`**, **`badge`**, **`closable`**, **`action`**.
-- **`action`** is not a React node — it is **`{ label: string; onClick: () => void }`**; the kit renders **`Button.Root`** (neutral stroke) inside the card.
-- Stack key = **`position` + `type`**; **`max`** applies per stack, not globally.
-- **`persistent: true`** removes the progress bar and auto-dismiss; closing is manual or via **`dismiss`** / **`dismissAll`**.
-- **`duration <= 0`** disables timer-based dismissal (still closable if **`closable`**).
-- Do not nest **`NotificationProvider`** without a reason; one app root is typical.
-- For static **`NotificationCard`**, build a full **`NotificationRecord`** (including **`id`**, **`position`**, **`size`**, **`duration`**, **`persistent`**, **`closable`**, **`createdAt`**) and wire **`onDismiss`** yourself.
+- [Banner](../banner/COMPONENT.md) — persistent in-flow messages.
+- [Button](../button/COMPONENT.md) — `loading` before the result toast.
+- [Modal](../modal/COMPONENT.md) — blocking confirmations.

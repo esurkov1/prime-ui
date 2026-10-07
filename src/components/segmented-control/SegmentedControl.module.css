@@ -1,68 +1,166 @@
+/*
+ * SegmentedControl — Graphite. Choose one value / mode.
+ * Track: `fill-muted` (a step off the host in both themes) with a faint 1px ring, padding 2px (xs, s)
+ * or 4px (m–xl). Outer height = control height of the tier, so a single-line group lines up with
+ * Button / Input of the same size. The selected segment is a floating thumb one step lighter than the
+ * track with its own faint ring; it slides between segments. Segment radius = track radius − padding.
+ * Two-line segments (with `SegmentedControl.Description`) grow the track to their content.
+ * Narrow containers: segments never wrap; the row scrolls horizontally with edge fades.
+ * `fullWidth` stretches the group: single-line segments share the width equally (labels truncate),
+ * two-line segments grow from their content width.
+ */
+
+/* Selected pill: `--prime-color-control-selected` (white in light, a lighter step above the track in dark). */
+
 .root {
-  /* isolate creates a new stacking context so z-index on items works correctly */
-  isolation: isolate;
+  --seg-pad: var(--prime-space-1);
+  --seg-item-gap: var(--prime-space-1);
+  --seg-control-height: var(--prime-control-m-height);
+  --seg-radius: var(--prime-radius-l);
+  --seg-text: var(--prime-control-m-text-size);
+  --seg-line-height: var(--prime-control-m-line-height);
+  --seg-gap: var(--prime-control-m-gap);
+  --seg-icon: var(--prime-control-m-icon);
+  --seg-item-pad-x: var(--prime-space-3);
+  --seg-height: calc(var(--seg-control-height) - 2 * var(--seg-pad));
+  --seg-item-radius: calc(var(--seg-radius) - var(--seg-pad));
+  --seg-two-line-min: calc(3 * var(--seg-control-height));
+  /* Two-line segment: tier padding; description = tier hint size (one step below the label). */
+  --seg-two-line-pad-x: var(--prime-control-m-padding-x);
+  --seg-two-line-pad-y: var(--prime-space-2);
+  --seg-desc-size: var(--prime-control-m-hint-size);
+  --seg-desc-line-height: var(--prime-control-m-hint-line-height);
+  /* Faint 1px rings: a wash of the text color, so they read on any fill in both themes. */
+  --seg-ring: color-mix(in srgb, var(--prime-color-text-primary) 7%, transparent);
+  --seg-thumb-ring: color-mix(in srgb, var(--prime-color-text-primary) 10%, transparent);
+
   position: relative;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  justify-content: start;
-  gap: var(--prime-seg-gap);
+  box-sizing: border-box;
+  display: flex;
   width: fit-content;
   max-width: 100%;
-  box-sizing: border-box;
-  padding: var(--prime-seg-pad);
-  /* Трек — цвет поля ввода с тонкой обводкой (как у полей формы). */
-  background: var(--prime-sys-color-field-bg);
-  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
-  border-radius: var(--prime-seg-radius);
+  min-width: 0;
+  height: var(--seg-control-height);
+  padding: var(--seg-pad);
+  border-radius: var(--seg-radius);
+  background: var(--prime-color-fill-muted);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--seg-ring);
+  font-family: var(--prime-font-family-sans);
 }
 
-/* Пилюля: визуальный ярус на ступень ниже номинального размера. */
+/* Per tier: track padding · track radius · segment padding-x (inner radius = radius − padding). */
+.root[data-size="xs"] {
+  --seg-control-height: var(--prime-control-xs-height);
+  --seg-two-line-pad-x: var(--prime-control-xs-padding-x);
+  --seg-two-line-pad-y: var(--prime-space-1);
+  --seg-desc-size: var(--prime-control-xs-hint-size);
+  --seg-desc-line-height: var(--prime-control-xs-hint-line-height);
+  --seg-radius: var(--prime-radius-m);
+  --seg-text: var(--prime-control-xs-text-size);
+  --seg-line-height: var(--prime-control-xs-line-height);
+  --seg-gap: var(--prime-control-xs-gap);
+  --seg-icon: var(--prime-control-xs-icon);
+  --seg-item-pad-x: var(--prime-space-2);
+}
+
 .root[data-size="s"] {
-  --prime-seg-height: var(--prime-sys-size-control-xs-height);
-  --prime-seg-radius: var(--prime-sys-size-control-xs-radius);
-  --prime-seg-pad: var(--prime-sys-unit-0p125rem);
-  --prime-seg-gap: var(--prime-sys-size-control-xs-gap);
-  --prime-seg-text: var(--prime-sys-size-control-xs-text);
-  --prime-seg-item-pad-x: var(--prime-sys-size-control-xs-buttonPaddingX);
-  --prime-seg-item-pad-y: var(--prime-sys-size-control-xs-buttonPaddingY);
-  --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p125rem);
-  --prime-seg-indicator-radius: var(--prime-sys-size-control-xs-radius);
+  --seg-control-height: var(--prime-control-s-height);
+  --seg-two-line-pad-x: var(--prime-control-s-padding-x);
+  --seg-two-line-pad-y: var(--prime-space-1);
+  --seg-desc-size: var(--prime-control-s-hint-size);
+  --seg-desc-line-height: var(--prime-control-s-hint-line-height);
+  --seg-radius: var(--prime-control-l-radius);
+  --seg-text: var(--prime-control-s-text-size);
+  --seg-line-height: var(--prime-control-s-line-height);
+  --seg-gap: var(--prime-control-s-gap);
+  --seg-icon: var(--prime-control-s-icon);
+  --seg-item-pad-x: var(--prime-space-3);
 }
 
 .root[data-size="m"] {
-  --prime-seg-gap: var(--prime-sys-size-control-s-gap);
-  --prime-seg-height: var(--prime-sys-size-control-s-height);
-  --prime-seg-text: var(--prime-sys-size-control-s-text);
-  --prime-seg-radius: var(--prime-sys-size-control-s-radius);
-  --prime-seg-pad: var(--prime-sys-unit-0p1875rem);
-  --prime-seg-item-pad-x: var(--prime-sys-spacing-x3);
-  --prime-seg-item-pad-y: var(--prime-sys-spacing-x3);
-  --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p125rem);
-  --prime-seg-indicator-radius: var(--prime-sys-size-control-xs-radius);
+  --seg-control-height: var(--prime-control-m-height);
 }
 
 .root[data-size="l"] {
-  --prime-seg-gap: var(--prime-sys-size-control-m-gap);
-  --prime-seg-height: var(--prime-sys-size-control-m-height);
-  --prime-seg-text: var(--prime-sys-size-control-m-text);
-  --prime-seg-radius: var(--prime-sys-size-control-m-radius);
-  --prime-seg-pad: var(--prime-sys-unit-0p3125rem);
-  --prime-seg-item-pad-x: var(--prime-sys-unit-1p25rem);
-  --prime-seg-item-pad-y: var(--prime-sys-unit-1p25rem);
-  --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p15rem);
-  --prime-seg-indicator-radius: var(--prime-sys-size-control-xs-radius);
+  --seg-control-height: var(--prime-control-l-height);
+  --seg-two-line-pad-x: var(--prime-control-l-padding-x);
+  --seg-desc-size: var(--prime-control-l-hint-size);
+  --seg-desc-line-height: var(--prime-control-l-hint-line-height);
+  --seg-text: var(--prime-control-l-text-size);
+  --seg-line-height: var(--prime-control-l-line-height);
+  --seg-gap: var(--prime-control-l-gap);
+  --seg-icon: var(--prime-control-l-icon);
+  --seg-item-pad-x: var(--prime-space-4);
 }
 
 .root[data-size="xl"] {
-  --prime-seg-gap: var(--prime-sys-size-control-l-gap);
-  --prime-seg-height: var(--prime-sys-size-control-l-height);
-  --prime-seg-text: var(--prime-sys-size-control-l-text);
-  --prime-seg-radius: var(--prime-sys-size-control-l-radius);
-  --prime-seg-pad: var(--prime-sys-unit-0p35rem);
-  --prime-seg-item-pad-x: var(--prime-sys-unit-1p75rem);
-  --prime-seg-item-pad-y: var(--prime-sys-unit-1p75rem);
-  --prime-seg-indicator-inset-block: var(--prime-sys-unit-0p175rem);
+  --seg-control-height: var(--prime-control-xl-height);
+  --seg-two-line-pad-x: var(--prime-control-xl-padding-x);
+  --seg-two-line-pad-y: var(--prime-space-3);
+  --seg-desc-size: var(--prime-control-xl-hint-size);
+  --seg-desc-line-height: var(--prime-control-xl-hint-line-height);
+  --seg-radius: var(--prime-radius-xl);
+  --seg-text: var(--prime-control-xl-text-size);
+  --seg-line-height: var(--prime-control-xl-line-height);
+  --seg-gap: var(--prime-control-xl-gap);
+  --seg-icon: var(--prime-control-xl-icon);
+  --seg-item-pad-x: var(--prime-space-5);
+}
+
+.root[data-full-width="true"] {
+  width: 100%;
+}
+
+.root:has([data-two-line="true"]) {
+  height: auto;
+}
+
+/* ─── Scroller (holds the thumb and the segments) ──────────────────────────── */
+
+.scroller {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  gap: var(--seg-item-gap);
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  border-radius: var(--seg-item-radius);
+}
+
+.scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* Edge fades while the row scrolls (mask is alpha-only; any opaque color works). */
+.scroller[data-overflow-start="true"] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    var(--prime-color-text-primary) var(--prime-space-8)
+  );
+}
+
+.scroller[data-overflow-end="true"] {
+  mask-image: linear-gradient(
+    to left,
+    transparent,
+    var(--prime-color-text-primary) var(--prime-space-8)
+  );
+}
+
+.scroller[data-overflow-start="true"][data-overflow-end="true"] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    var(--prime-color-text-primary) var(--prime-space-8),
+    var(--prime-color-text-primary) calc(100% - var(--prime-space-8)),
+    transparent
+  );
 }
 
 /* ─── Item ──────────────────────────────────────────────────────────────────── */
@@ -70,82 +168,263 @@
 .item {
   position: relative;
   z-index: 1;
-  display: flex;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
   align-items: center;
   justify-content: center;
-  gap: var(--prime-seg-gap);
-  padding-inline: var(--prime-seg-item-pad-x);
-  padding-block: var(--prime-seg-item-pad-y);
-  height: var(--prime-seg-height);
-  font-size: var(--prime-seg-text);
-  font-family: inherit;
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-secondary);
+  gap: var(--seg-gap);
+  min-width: 0;
+  height: var(--seg-height);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--seg-item-pad-x);
+  border: 0;
+  border-radius: var(--seg-item-radius);
   background: transparent;
-  border: none;
-  border-radius: var(--prime-seg-radius);
-  cursor: pointer;
-  transition:
-    color var(--prime-sys-motion-fast),
-    background-color var(--prime-sys-motion-fast),
-    box-shadow var(--prime-sys-motion-fast);
+  color: var(--prime-color-text-secondary);
+  font: inherit;
+  font-size: var(--seg-text);
+  line-height: var(--seg-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  text-align: start;
   white-space: nowrap;
   user-select: none;
+  cursor: pointer;
+  /* Same duration/easing as the sliding pill, so text and fill arrive together. */
+  transition: color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.root[data-full-width="true"] .item {
+  flex: 1 1 0;
+}
+
+/* Icon-only segment: square (width = segment height). */
+.item[data-icon-only="true"] {
+  width: var(--seg-height);
+  min-width: var(--seg-height);
+  padding-inline: 0;
+}
+
+/* Two-line segment: label + count on the first line, description on the second. */
+.item[data-two-line="true"] {
+  /* Grid, not wrapping flex: the max-content width is the wider line, not both lines summed. */
+  display: inline-grid;
+  grid-template-columns: minmax(0, auto) auto;
+  align-content: center;
+  justify-content: start;
+  justify-items: start;
+  row-gap: 0;
+  height: auto;
+  min-width: var(--seg-two-line-min);
+  padding-block: var(--seg-two-line-pad-y);
+  padding-inline: var(--seg-two-line-pad-x);
+}
+
+/* Full width with two-line segments: grow from content, so the row spreads evenly. */
+.root[data-full-width="true"] .item[data-two-line="true"] {
+  flex: 1 0 auto;
+}
+
+/* Hover is a text step only: the sliding thumb is the only fill, so nothing fights its motion. */
+.item[aria-checked="false"]:not([data-disabled="true"]):hover {
+  color: var(--prime-color-text-primary);
 }
 
 .item[aria-checked="true"] {
-  color: var(--prime-sys-color-content-primary);
+  color: var(--prime-color-text-primary);
 }
 
-.item:not([data-disabled="true"]):not([aria-checked="true"]):hover {
-  color: var(--prime-sys-color-content-primary);
-}
-
+/* The row scrolls (clips), so the ring is drawn inside the segment. */
 .item:focus-visible {
-  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
 .item[data-disabled="true"] {
-  color: var(--prime-sys-color-content-disabled);
-  opacity: 0.55;
+  color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }
 
-/* ─── Icon ──────────────────────────────────────────────────────────────────── */
+/* ─── Parts ─────────────────────────────────────────────────────────────────── */
+
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .icon {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  width: var(--seg-icon);
+  height: var(--seg-icon);
+  line-height: 0;
+}
+
+.icon > :global(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.count {
   flex-shrink: 0;
+  align-self: center;
+  font-variant-numeric: tabular-nums;
 }
 
-.root[data-size="s"] .icon :global(svg) {
-  width: var(--prime-sys-size-control-xs-icon);
-  height: var(--prime-sys-size-control-xs-icon);
+/* Gray soft equals the track fill; a text wash keeps a neutral count visible on track and thumb. */
+.item .count[data-color="gray"] {
+  background: color-mix(in srgb, var(--prime-color-text-primary) 8%, transparent);
 }
 
-/* ─── Floating indicator (geometry from TS + inset-block / inset-inline) ─ */
+.description {
+  grid-column: 1 / -1;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-muted);
+  font-size: var(--seg-desc-size);
+  line-height: var(--seg-desc-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-/* Пилюля — elevated поверх трека-поля, с тенью и обводкой border-strong. */
-.indicator {
+.description strong {
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.item[data-disabled="true"] .description,
+.item[data-disabled="true"] .description strong {
+  color: var(--prime-color-text-disabled);
+}
+
+/* ─── Color (SegmentedControl.Item color) ───────────────────────────────────── */
+
+[data-color="gray"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-gray-soft);
+  --seg-hue-text: var(--prime-color-palette-gray-text);
+}
+
+[data-color="blue"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-blue-soft);
+  --seg-hue-text: var(--prime-color-palette-blue-text);
+}
+
+[data-color="green"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-green-soft);
+  --seg-hue-text: var(--prime-color-palette-green-text);
+}
+
+[data-color="orange"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-orange-soft);
+  --seg-hue-text: var(--prime-color-palette-orange-text);
+}
+
+[data-color="red"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-red-soft);
+  --seg-hue-text: var(--prime-color-palette-red-text);
+}
+
+[data-color="yellow"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-yellow-soft);
+  --seg-hue-text: var(--prime-color-palette-yellow-text);
+}
+
+[data-color="purple"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-purple-soft);
+  --seg-hue-text: var(--prime-color-palette-purple-text);
+}
+
+[data-color="sky"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-sky-soft);
+  --seg-hue-text: var(--prime-color-palette-sky-text);
+}
+
+[data-color="pink"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-pink-soft);
+  --seg-hue-text: var(--prime-color-palette-pink-text);
+}
+
+[data-color="teal"]:is(.item, .pill) {
+  --seg-hue-soft: var(--prime-color-palette-teal-soft);
+  --seg-hue-text: var(--prime-color-palette-teal-text);
+}
+
+/* Hue dot before the content (same size as Badge.Dot). */
+.dot {
+  flex-shrink: 0;
+  width: calc(var(--prime-space-1) + 2 * var(--prime-border-width));
+  height: calc(var(--prime-space-1) + 2 * var(--prime-border-width));
+  border-radius: var(--prime-radius-full);
+  background: var(--seg-hue-text);
+}
+
+.item[data-disabled="true"] .dot {
+  background: var(--prime-color-text-disabled);
+}
+
+/* Two-line segment with a dot: the dot gets its own column, the description aligns with the label. */
+.item[data-two-line="true"]:has(> .dot) {
+  grid-template-columns: auto minmax(0, auto) auto;
+  column-gap: var(--seg-gap);
+}
+
+.item[data-two-line="true"]:has(> .dot) .description {
+  grid-column: 2 / -1;
+}
+
+/* ─── Thumb (geometry from TS) ──────────────────────────────────────────────── */
+
+.pill {
   position: absolute;
-  left: 0;
   top: 0;
+  left: 0;
   z-index: 0;
-  border-radius: var(--prime-seg-indicator-radius, var(--prime-seg-radius));
-  background: var(--prime-sys-color-surface-elevated);
+  border-radius: var(--seg-item-radius);
+  background: var(--prime-color-control-selected);
   box-shadow:
-    var(--prime-sys-elevation-shadow-surface),
-    inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-strong);
-  transition: none;
+    inset 0 0 0 var(--prime-border-width) var(--seg-thumb-ring),
+    var(--prime-shadow-raised);
   pointer-events: none;
+  opacity: 0;
 }
 
-.root[data-animate="true"] .indicator {
+.pill[data-visible="true"] {
+  opacity: 1;
+}
+
+/* Colored option selected: soft fill of its hue + a 1px ring of the hue text at low alpha. */
+.pill[data-color] {
+  background: var(--seg-hue-soft);
+  box-shadow:
+    inset 0 0 0 var(--prime-border-width) color-mix(in srgb, var(--seg-hue-text) 32%, transparent),
+    var(--prime-shadow-raised);
+}
+
+/* Position, size and color travel together with one motion token. */
+.pill[data-animate="true"] {
   transition:
-    transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    width var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    height var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    width var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    height var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.root[data-disabled="true"] .pill {
+  background: var(--prime-color-fill-muted-hover);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill[data-animate="true"] {
+    transition: none;
+  }
 }

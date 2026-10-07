@@ -1,207 +1,186 @@
-/* Как у Dropdown `.content`: один ScrollContainer — фон, скругление, тени, padding, прокрутка (без второго слоя под «хром»). */
-.popoverScroll {
-  --dropdown-separator-mix: 40%;
-  --dd-pad: var(--prime-sys-spacing-x3);
-  --dd-min-w: var(--prime-sys-unit-11rem);
-  --dd-item-gap: var(--prime-sys-size-control-m-gap);
-  --dd-item-height: var(--prime-sys-size-control-m-height);
-  --dd-item-pad-x: var(--prime-sys-size-control-m-buttonPaddingX);
-  --dd-item-radius: var(--prime-sys-size-control-m-radius);
-  --dd-item-text: var(--prime-sys-size-control-m-text);
-  --dd-icon-size: var(--prime-sys-size-control-m-icon);
-  --dd-group-label-font: var(--prime-sys-size-control-s-supportText);
-  --dd-group-label-pt: var(--prime-sys-spacing-x2);
-  --dd-group-label-px: var(--prime-sys-spacing-x3);
-  --dd-group-label-pb: var(--prime-sys-spacing-x1);
-  --dd-header-gap: var(--prime-sys-spacing-x3);
-  --dd-header-pad-inline: var(--prime-sys-spacing-x2);
-  --dd-header-pad-block: var(--prime-sys-spacing-x3);
-  --dd-header-desc-font: var(--prime-sys-size-control-s-supportText);
-  --dd-separator-stack-pad: var(--prime-sys-spacing-x2);
-  --po-inset-extra: 0px;
-  --po-inset-gap: var(--dd-pad);
+/* ─── Popover ────────────────────────────────────────────────────────────────
+ * Shared floating panel surface: raised fill, `--prime-panel-radius`, overlay shadow.
+ * Free-form content gets `--prime-panel-content-padding`; one ScrollContainer = surface + scroll.
+ */
 
+.popoverScroll {
+  --po-pad: var(--prime-panel-content-padding);
+  --po-inset-extra: 0px;
+  --po-gap: var(--prime-space-3);
+  --po-text: var(--prime-control-m-text-size);
+  --po-lh: var(--prime-control-m-line-height);
+  --po-desc: var(--prime-control-m-label-size);
+  --po-desc-lh: var(--prime-control-m-label-line-height);
+  /* Fields inside a raised surface stay distinguishable (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  --prime-color-card-bg: var(--prime-color-bg-sunken);
+  --prime-card-shadow: none;
+
+  position: fixed;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  position: fixed;
+  gap: var(--po-gap);
   width: max-content;
-  max-width: min(var(--prime-sys-unit-20rem), 100vw);
-  background: var(--prime-sys-color-surface-elevated);
-  border: none;
-  border-radius: var(--prime-sys-shape-radius-l);
-  box-shadow: var(--prime-sys-elevation-shadow-surface), var(--prime-sys-elevation-shadow-modal);
-  padding: calc(var(--dd-pad) + var(--po-inset-extra));
-  min-width: var(--dd-min-w);
-  box-sizing: border-box;
+  min-width: min(
+    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
+    var(--float-max-w, 100vw)
+  );
+  max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));
   margin: 0;
-  transform-origin: top center;
-  gap: var(--po-inset-gap);
-  font-size: var(--dd-item-text);
-  line-height: 1.25;
-  color: var(--prime-sys-color-content-primary);
+  padding: calc(var(--po-pad) + var(--po-inset-extra));
+  border: 0;
+  border-radius: var(--prime-panel-radius);
+  /* Avatar.Group rings match this surface. */
+  --avatar-ring: var(--prime-color-bg-raised);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--po-text);
+  line-height: var(--po-lh);
+  outline: none;
+}
+
+.popoverScroll[data-size="xs"] {
+  --po-pad: var(--prime-space-3);
+  --po-gap: var(--prime-space-2);
+  --po-text: var(--prime-control-xs-text-size);
+  --po-lh: var(--prime-control-xs-line-height);
+  --po-desc: var(--prime-control-xs-label-size);
+  --po-desc-lh: var(--prime-control-xs-label-line-height);
+}
+
+.popoverScroll[data-size="s"] {
+  --po-pad: var(--prime-space-3);
+  --po-gap: var(--prime-space-2);
+  --po-text: var(--prime-control-s-text-size);
+  --po-lh: var(--prime-control-s-line-height);
+  --po-desc: var(--prime-control-s-label-size);
+  --po-desc-lh: var(--prime-control-s-label-line-height);
+}
+
+.popoverScroll[data-size="l"] {
+  --po-gap: var(--prime-space-4);
+  --po-text: var(--prime-control-l-text-size);
+  --po-lh: var(--prime-control-l-line-height);
+  --po-desc: var(--prime-control-l-label-size);
+  --po-desc-lh: var(--prime-control-l-label-line-height);
+}
+
+.popoverScroll[data-size="xl"] {
+  --po-pad: var(--prime-space-5);
+  --po-gap: var(--prime-space-4);
+  --po-text: var(--prime-control-xl-text-size);
+  --po-lh: var(--prime-control-xl-line-height);
+  --po-desc: var(--prime-control-xl-label-size);
+  --po-desc-lh: var(--prime-control-xl-label-line-height);
+}
+
+.popoverScroll[data-inset-padding="x1"] {
+  --po-inset-extra: var(--prime-space-1);
+}
+
+.popoverScroll[data-inset-padding="x2"] {
+  --po-inset-extra: var(--prime-space-2);
+}
+
+.popoverScroll[data-inset-padding="x3"] {
+  --po-inset-extra: var(--prime-space-3);
+}
+
+.popoverScroll[data-inset-gap="none"] {
+  --po-gap: 0;
+}
+
+.popoverScroll[data-inset-gap="x2"] {
+  --po-gap: var(--prime-space-2);
+}
+
+.popoverScroll[data-inset-gap="x3"] {
+  --po-gap: var(--prime-space-3);
+}
+
+.popoverScroll[data-inset-gap="x4"] {
+  --po-gap: var(--prime-space-4);
 }
 
 .popoverScroll[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-sys-elevation-zIndex-popover);
+  z-index: var(--prime-z-popover);
 }
 
 .popoverScroll[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-sys-elevation-zIndex-popoverInDrawer);
+  z-index: var(--prime-z-popover-in-drawer);
 }
 
 .popoverScroll[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-sys-elevation-zIndex-popoverInModal);
+  z-index: var(--prime-z-popover-in-modal);
 }
 
 .popoverScroll[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-sys-elevation-zIndex-popoverInDrawerInModal);
+  z-index: var(--prime-z-popover-in-drawer-in-modal);
 }
 
 /* Поверх listbox/dropdown того же слоя (иначе dropdown 1200 > popover 1000 на page). Уровни как у tooltip. */
 .popoverScroll[data-overlay-portal-layer="page"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-sys-elevation-zIndex-tooltip);
+  z-index: var(--prime-z-tooltip);
 }
 
 .popoverScroll[data-overlay-portal-layer="drawer"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-sys-elevation-zIndex-tooltipInDrawer);
+  z-index: var(--prime-z-tooltip-in-drawer);
 }
 
 .popoverScroll[data-overlay-portal-layer="modal"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-sys-elevation-zIndex-tooltipInModal);
+  z-index: var(--prime-z-tooltip-in-modal);
 }
 
 .popoverScroll[data-overlay-portal-layer="drawerInModal"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-sys-elevation-zIndex-tooltipInDrawerInModal);
+  z-index: var(--prime-z-tooltip-in-drawer-in-modal);
 }
 
-.popoverScroll[data-size="s"] {
-  --dd-pad: calc((var(--prime-sys-spacing-x2) + var(--prime-sys-spacing-x3)) / 2);
-  --dd-min-w: var(--prime-sys-unit-9p5rem);
-  --dd-item-gap: var(--prime-sys-size-control-s-gap);
-  --dd-item-height: var(--prime-sys-size-control-s-height);
-  --dd-item-pad-x: var(--prime-sys-size-control-s-buttonPaddingX);
-  --dd-item-radius: var(--prime-sys-size-control-s-radius);
-  --dd-item-text: var(--prime-sys-size-control-s-text);
-  --dd-icon-size: var(--prime-sys-size-control-s-icon);
-  --dd-group-label-font: var(--prime-sys-size-control-s-supportText);
-  --dd-group-label-pt: var(--prime-sys-spacing-x1);
-  --dd-group-label-px: var(--prime-sys-spacing-x2);
-  --dd-group-label-pb: var(--prime-sys-spacing-x1);
-  --dd-header-gap: var(--prime-sys-spacing-x2);
-  --dd-header-pad-inline: var(--prime-sys-spacing-x2);
-  --dd-header-pad-block: var(--prime-sys-spacing-x3);
+/* ─── Title / description / actions ─────────────────────────────────────── */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  min-width: 0;
 }
 
-.popoverScroll[data-size="l"] {
-  --dd-pad: var(--prime-sys-spacing-x4);
-  --dd-min-w: var(--prime-sys-unit-12p5rem);
-  --dd-item-gap: var(--prime-sys-size-control-l-gap);
-  --dd-item-height: var(--prime-sys-size-control-l-height);
-  --dd-item-pad-x: var(--prime-sys-size-control-l-buttonPaddingX);
-  --dd-item-radius: var(--prime-sys-size-control-l-radius);
-  --dd-item-text: var(--prime-sys-size-control-l-text);
-  --dd-icon-size: var(--prime-sys-size-control-l-icon);
-  --dd-group-label-font: var(--prime-sys-size-control-l-supportText);
-  --dd-group-label-pt: var(--prime-sys-spacing-x2);
-  --dd-group-label-px: var(--prime-sys-spacing-x4);
-  --dd-group-label-pb: var(--prime-sys-spacing-x2);
-  --dd-header-desc-font: var(--prime-sys-size-control-m-supportText);
-  --dd-header-pad-inline: var(--prime-sys-spacing-x3);
-  --dd-header-pad-block: var(--prime-sys-spacing-x4);
-  --dd-separator-stack-pad: var(--prime-sys-spacing-x3);
+.title {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--prime-color-text-primary);
+  /* Title and description follow the panel tier, like the controls inside it. */
+  font-size: var(--po-text);
+  font-weight: var(--prime-text-title-s-weight);
+  line-height: var(--po-lh);
+  letter-spacing: var(--prime-text-title-s-tracking);
 }
 
-.popoverScroll[data-size="xl"] {
-  --dd-pad: var(--prime-sys-spacing-x5);
-  --dd-min-w: var(--prime-sys-unit-14rem);
-  --dd-item-gap: var(--prime-sys-size-control-xl-gap);
-  --dd-item-height: var(--prime-sys-size-control-xl-height);
-  --dd-item-pad-x: var(--prime-sys-size-control-xl-buttonPaddingX);
-  --dd-item-radius: var(--prime-sys-size-control-xl-radius);
-  --dd-item-text: var(--prime-sys-size-control-xl-text);
-  --dd-icon-size: var(--prime-sys-size-control-xl-icon);
-  --dd-group-label-font: var(--prime-sys-size-control-xl-supportText);
-  --dd-group-label-pt: var(--prime-sys-spacing-x3);
-  --dd-group-label-px: var(--prime-sys-spacing-x4);
-  --dd-group-label-pb: var(--prime-sys-spacing-x2);
-  --dd-header-gap: var(--prime-sys-spacing-x3);
-  --dd-header-desc-font: var(--prime-sys-size-control-xl-supportText);
-  --dd-header-pad-inline: var(--prime-sys-spacing-x3);
-  --dd-header-pad-block: var(--prime-sys-spacing-x4);
-  --dd-separator-stack-pad: var(--prime-sys-spacing-x3);
+.description {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--prime-color-text-secondary);
+  font-size: var(--po-desc);
+  line-height: var(--po-desc-lh);
 }
 
-.popoverScroll[data-inset-padding="none"] {
-  --po-inset-extra: 0px;
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+  padding-block-start: var(--prime-space-1);
 }
 
-.popoverScroll[data-inset-padding="x1"] {
-  --po-inset-extra: var(--prime-sys-spacing-x1);
-}
-
-.popoverScroll[data-inset-padding="x2"] {
-  --po-inset-extra: var(--prime-sys-spacing-x2);
-}
-
-.popoverScroll[data-inset-padding="x3"] {
-  --po-inset-extra: var(--prime-sys-spacing-x3);
-}
-
-.popoverScroll[data-inset-gap="none"] {
-  --po-inset-gap: 0;
-}
-
-.popoverScroll[data-inset-gap="x2"] {
-  --po-inset-gap: var(--prime-sys-spacing-x2);
-}
-
-.popoverScroll[data-inset-gap="x3"] {
-  --po-inset-gap: var(--prime-sys-spacing-x3);
-}
-
-.popoverScroll[data-inset-gap="x4"] {
-  --po-inset-gap: var(--prime-sys-spacing-x4);
-}
-
-:global([data-theme="dark"]) .popoverScroll {
-  background: var(--prime-sys-color-surface-raised);
-}
-
-.popoverScroll[data-side="bottom"] {
-  animation: popoverInBottom var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-.popoverScroll[data-side="top"] {
-  transform-origin: bottom center;
-  animation: popoverInTop var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-@keyframes popoverInBottom {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(calc(-1 * var(--prime-sys-unit-4px)));
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes popoverInTop {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(var(--prime-sys-unit-4px));
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .popoverScroll[data-side="bottom"],
-  .popoverScroll[data-side="top"] {
-    animation: none;
+/* Узкая панель (320px): кнопки в колонку на всю ширину, основная — последней. */
+@media (max-width: 479px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

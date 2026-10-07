@@ -1,15 +1,13 @@
 import * as React from "react";
 
+import { Label } from "@/components/label/Label";
+import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { SliderSize } from "@/internal/states";
-
-import { useControllableState } from "../../hooks/useControllableState";
-import { cx } from "../../internal/cx";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Slider.module.css";
-
-export type { SliderSize };
 
 export type SliderRootProps = {
   value?: number;
@@ -18,9 +16,14 @@ export type SliderRootProps = {
   max?: number;
   step?: number;
   disabled?: boolean;
-  onChange?: (value: number) => void;
-  label?: string;
-  size?: SliderSize;
+  onValueChange?: (value: number) => void;
+  /** Visible label linked to the range input. Without it, set `aria-label`. */
+  label?: React.ReactNode;
+  /** Shows the current value at the end of the label row (tabular numbers). */
+  showValue?: boolean;
+  /** Formats the displayed value and `aria-valuetext` (e.g. `(v) => \`${v} °C\``). */
+  formatValue?: (value: number) => string;
+  size?: ControlSize;
   className?: string;
   "aria-label"?: string;
 };
@@ -36,8 +39,10 @@ function SliderRoot({
   max: maxProp,
   step: stepProp,
   disabled,
-  onChange,
+  onValueChange,
   label,
+  showValue = false,
+  formatValue,
   size = "m",
   className,
   "aria-label": ariaLabel,
@@ -49,11 +54,13 @@ function SliderRoot({
   const [value, setValue] = useControllableState({
     value: valueProp,
     defaultValue: clamp(initialDefault, min, max),
-    onChange,
+    onChange: onValueChange,
   });
 
   const id = React.useId();
   const safeValue = clamp(value, min, max);
+  const percent = max > min ? ((safeValue - min) / (max - min)) * 100 : 0;
+  const valueText = formatValue ? formatValue(safeValue) : String(safeValue);
 
   const applyValueFromInput = (el: HTMLInputElement) => {
     const next = Number.parseFloat(el.value);
@@ -71,16 +78,33 @@ function SliderRoot({
     applyValueFromInput(e.currentTarget);
   };
 
+  const showHeader = label != null || showValue;
+
   return (
-    <div className={cx(styles.root, className)} {...toDataAttributes({ size })}>
+    <div
+      className={cx(styles.root, className)}
+      style={{ "--slider-percent": `${percent}%` } as React.CSSProperties}
+      {...toDataAttributes({ size, disabled: disabled || undefined })}
+    >
       <ControlSizeProvider value={size}>
-        {label ? (
-          <label className={styles.label} htmlFor={id}>
-            {label}
-          </label>
+        {showHeader ? (
+          <div className={styles.header}>
+            {label != null ? (
+              <Label.Root htmlFor={id} size={size} disabled={disabled} className={styles.label}>
+                {label}
+              </Label.Root>
+            ) : (
+              <span />
+            )}
+            {showValue ? (
+              <output className={styles.value} htmlFor={id} aria-hidden="true">
+                {valueText}
+              </output>
+            ) : null}
+          </div>
         ) : null}
         <input
-          id={label ? id : undefined}
+          id={id}
           type="range"
           className={styles.track}
           min={min}
@@ -91,12 +115,13 @@ function SliderRoot({
           onChange={handleRangeChange}
           onInput={handleRangeInput}
           aria-label={ariaLabel}
+          aria-valuetext={formatValue ? valueText : undefined}
         />
       </ControlSizeProvider>
     </div>
   );
 }
 
-SliderRoot.displayName = "SliderRoot";
+SliderRoot.displayName = "Slider.Root";
 
 export const Slider = { Root: SliderRoot };

@@ -1,51 +1,218 @@
 # Dropdown
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Category:** overlays (Оверлеи)
 
-## Canonical
+> A menu of actions that opens from a trigger: groups, a profile header and destructive items.
 
-**What:** `Dropdown` is a **portaled action menu** (`role="menu"`): one trigger toggles a floating list of **`menuitem`** rows. **`Dropdown.Trigger`** clones **exactly one** child element and merges **`aria-expanded`**, **`aria-haspopup="menu"`**, **`aria-controls`**, **`id`**, ref, and toggle **`onClick`**. **`Dropdown.Content`** renders **only when open**, applies focus trap, Escape/outside close, and arrow-key roving focus among items.
+## When to use
+- Secondary actions of a card, row or document behind a «⋯» or labelled button.
+- An account / user menu in the app header.
+- A short list of commands (export formats, sort order) where picking one runs an action.
 
-**Parts:** `Root` → `Trigger` + `Content`. Inside `Content`: `Block`, `Header` (+ `HeaderRow`, `HeaderLeading`, `HeaderMain`, `HeaderTitle`, `HeaderDescription`, `HeaderTrailing`), `Group` + `GroupLabel`, `Separator`, `Item` (+ `ItemIcon`).
+## When not to use
+- Choosing and showing a value in a form → use [Select](../select/COMPONENT.md) (or [TagSelect](../tag-select/COMPONENT.md) for several).
+- Searching across many commands → use [CommandMenu](../command-menu/COMPONENT.md).
+- Free content, forms or filters in a floating panel → use [Popover](../popover/COMPONENT.md).
+- A hint on hover → use [Tooltip](../tooltip/COMPONENT.md).
+- Two to four always-visible actions → show [Button](../button/COMPONENT.md)s or a [ButtonGroup](../button-group/COMPONENT.md).
 
-**State:** Uncontrolled: **`defaultOpen`** on `Root`. Controlled: **`open`** + **`onOpenChange`**. **`Item.onSelect`** runs on activation, then the menu closes unless **`disabled`**.
+## Import
+```tsx
+import { Dropdown } from "prime-ui-kit";
+```
 
-**Position:** **`Content.align`**: `start` | `center` | `end`. **`Content.side`**: `bottom` | `top` (may flip). **`sameMinWidthAsTrigger`** widens the panel to at least the trigger width. Resolved side is on **`data-side`** on the menu node.
+## Anatomy
+```
+Dropdown.Root                     state (no DOM)
+├── Dropdown.Trigger              clones its single child (usually a Button)
+└── Dropdown.Content              portaled role="menu" panel, scrolls
+    ├── Dropdown.Block            vertical section (header + list)
+    │   └── Dropdown.Header       user / plan header
+    │       └── Dropdown.HeaderRow
+    │           ├── Dropdown.HeaderLeading      avatar / icon
+    │           ├── Dropdown.HeaderMain
+    │           │   ├── Dropdown.HeaderTitle
+    │           │   └── Dropdown.HeaderDescription
+    │           └── Dropdown.HeaderTrailing     badge / button
+    ├── Dropdown.Group            role="group"
+    │   ├── Dropdown.GroupLabel
+    │   └── Dropdown.Item         role="menuitem" button
+    │       ├── Dropdown.ItemIcon
+    │       ├── label
+    │       └── Dropdown.ItemShortcut
+    └── Dropdown.Separator        full-bleed hairline
+```
 
-**Runnable examples**
+## API
 
-**Playground snippets** (order matches [`playground/sections/DropdownSection.tsx`](../../../playground/sections/DropdownSection.tsx); keep **`examples/`** in sync when changing these):
+### Dropdown.Root
+No DOM, no ref.
 
-| Snippet | Scenario |
-|---------|----------|
-| [`playground/snippets/dropdown/sizes.tsx`](../../../playground/snippets/dropdown/sizes.tsx) | **`Content.size`** s–xl: panel, rows, group label, default **`ItemIcon`** size |
-| [`playground/snippets/dropdown/variants.tsx`](../../../playground/snippets/dropdown/variants.tsx) | Plain rows and **`Item.destructive`** |
-| [`playground/snippets/dropdown/states.tsx`](../../../playground/snippets/dropdown/states.tsx) | **`Item.disabled`** (no activation / no close) |
-| [`playground/snippets/dropdown/placement.tsx`](../../../playground/snippets/dropdown/placement.tsx) | **`align`** start/center/end and **`side`** top |
-| [`playground/snippets/dropdown/controlled.tsx`](../../../playground/snippets/dropdown/controlled.tsx) | **`open`** / **`onOpenChange`** on **`Root`** |
-| [`playground/snippets/dropdown/composition.tsx`](../../../playground/snippets/dropdown/composition.tsx) | **`Block`**, header slots, **`GroupLabel`**, **`ItemIcon`**, nested trailing **Button** |
-| [`playground/snippets/dropdown/full-width.tsx`](../../../playground/snippets/dropdown/full-width.tsx) | **`sameMinWidthAsTrigger`** with narrow trigger |
-| [`playground/snippets/dropdown/as-child.tsx`](../../../playground/snippets/dropdown/as-child.tsx) | **`Trigger`** merges props into a single child (e.g. link) |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `open` | `boolean` | — | Controlled visibility. |
+| `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on trigger click, item select, Escape and outside press. |
+| `closeOnOutsideClick` | `boolean` | `true` | A pointerdown outside the panel and its trigger closes it. |
+| `children` | `ReactNode` | — (required) | Trigger and Content. |
 
-**Package `examples/`** (same folder as this file; `@/` imports in-repo, **`prime-ui-kit`** for consumers):
+### Dropdown.Trigger
+No DOM of its own: clones the child (`cloneElement`), like `asChild`. Merges the child's `ref`, sets `id`, `aria-expanded`, `aria-haspopup="menu"`, `aria-controls`, `data-state`, chains `onClick` (toggles).
 
-| File | Mirrors snippet | Scenario |
-|------|-----------------|----------|
-| [`examples/sizes.tsx`](examples/sizes.tsx) | `sizes.tsx` | Same as playground sizes |
-| [`examples/variants.tsx`](examples/variants.tsx) | `variants.tsx` | Same as playground variants |
-| [`examples/states.tsx`](examples/states.tsx) | `states.tsx` | Same as playground states |
-| [`examples/placement-demo.tsx`](examples/placement-demo.tsx) | `placement.tsx` | Same as playground placement |
-| [`examples/controlled.tsx`](examples/controlled.tsx) | `controlled.tsx` | Same as playground controlled |
-| [`examples/composition.tsx`](examples/composition.tsx) | `composition.tsx` | Same as playground composition |
-| [`examples/full-width.tsx`](examples/full-width.tsx) | `full-width.tsx` | Same as playground full-width |
-| [`examples/as-child.tsx`](examples/as-child.tsx) | `as-child.tsx` | Same as playground as-child |
-| [`examples/actions-menu.tsx`](examples/actions-menu.tsx) | — | Icon-only trigger, row icons, separator, **`destructive`** |
-| [`examples/account-menu.tsx`](examples/account-menu.tsx) | — | Header + avatar, **`sameMinWidthAsTrigger`**, sign out |
-| [`examples/select-like-list.tsx`](examples/select-like-list.tsx) | — | Trigger shows choice; still **`role="menu"`** (not **Select**) |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactElement` | — (required) | Exactly one element. |
 
-Shared layout tokens for some examples: [`examples/dropdown-examples.module.css`](examples/dropdown-examples.module.css) (mirrors [`playground/snippets/dropdown/dropdown-snippets.module.css`](../../../playground/snippets/dropdown/dropdown-snippets.module.css)).
+### Dropdown.Content
+No ref. Rendered in a portal while open and during its exit animation. Traps focus while open and returns it to the trigger on close.
 
-**Minimal import:**
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `side` | `"bottom" \| "top"` | `"bottom"` | Preferred side; flips when it does not fit. |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | Horizontal alignment to the trigger. |
+| `sameMinWidthAsTrigger` | `boolean` | `false` | The panel is at least as wide as the trigger. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Item height, text and icon tier; size context for controls inside. |
+| `className` | `string` | — | Extra class on the panel. |
+| `children` | `ReactNode` | — (required) | Items, groups, blocks, separators. |
+
+### Dropdown.Item
+No ref. Renders `<button type="button" role="menuitem">`. Activating it calls `onSelect` and closes the menu.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `onSelect` | `() => void` | — | Action on click / Enter / Space. |
+| `disabled` | `boolean` | — | `aria-disabled`, `tabIndex={-1}`, skipped by arrow keys, does not close the menu. |
+| `tone` | `"neutral" \| "danger"` | `"neutral"` | `danger` for destructive actions (delete, revoke). |
+| `className` | `string` | — | Extra class. |
+| `children` | `ReactNode` | — (required) | ItemIcon, label, ItemShortcut. |
+
+### Dropdown.ItemIcon
+`forwardRef` to the rendered element. Polymorphic.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `as` | `ElementType` | `"span"` | Icon component (e.g. a lucide icon); receives `size`. |
+| `size` | `number` | tier icon (14 · 16 · 16 · 20 · 20) | Icon size in px; by default follows the Content `size`. |
+| `aria-hidden` | `boolean` | `true` | Decorative by default. |
+| `className` | `string` | — | Extra class. |
+| `children` | `ReactNode` | — | Glyph when `as` is a wrapper. |
+
++ any other props, passed to the `as` element (e.g. `strokeWidth`).
+
+### Dropdown.ItemShortcut
+No ref. Renders `<kbd>` at the end of the item. A hint only: bind the key yourself. + native `HTMLAttributes<HTMLElement>`.
+
+### Dropdown.Group
+No ref. `<div role="group">`. + native `<div>` props.
+
+### Dropdown.GroupLabel
+No ref.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | Group heading. |
+| `className` | `string` | — | Extra class. |
+
+### Dropdown.Separator
+No ref. Renders `<hr>`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `className` | `string` | — | Extra class. |
+
+### Dropdown.Block · Header · HeaderRow · HeaderLeading · HeaderMain · HeaderTitle
+No ref. Layout `<div>`s. + native `<div>` props.
+
+### Dropdown.HeaderDescription
+No ref.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `truncate` | `boolean` | — | One line with an ellipsis (long emails). |
+
++ native `<div>` props.
+
+### Dropdown.HeaderTrailing
+No ref.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `alignSelf` | `"start" \| "center"` | `"start"` | Vertical alignment in the header row (`center` for a button). |
+
++ native `<div>` props.
+
+## Variants
+The panel has one look: `bg-raised` fill, `--prime-panel-radius` (12), `--prime-panel-padding` (4), `shadow-overlay`; items have radius 8.
+
+### size (Content)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | item 24, text 12/16, icon 14 | xs triggers | |
+| `s` | item 28, text 13/20, icon 16 | Dense toolbars, s triggers | |
+| `m` | item 32, text 14/20, icon 16 | Most menus | yes |
+| `l` | item 36, text 16/24, icon 20 | l triggers | |
+| `xl` | item 40, text 16/24, icon 20 | xl triggers | |
+
+### tone (Item)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `neutral` | Primary text, muted icon, `fill-subtle` on hover / focus | Regular actions | yes |
+| `danger` | `danger-text` label and icon, `danger-soft` on hover / focus | Delete, revoke, leave — last in the menu after a Separator | |
+
+### side / align (Content)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `side="bottom"` | Below the trigger, `--prime-space-1` away | Default | yes |
+| `side="top"` | Above the trigger | Triggers near the bottom of the screen | |
+| `align="start"` | Start edges aligned | Default | yes |
+| `align="center"` | Centred to the trigger | Small centred triggers | |
+| `align="end"` | End edges aligned | «⋯» buttons and user menus at the right edge | |
+
+### Flags
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `sameMinWidthAsTrigger` | Panel at least trigger width | Full-width triggers | `false` |
+| `disabled` (Item) | `text-disabled`, no hover fill | Unavailable action that should stay visible | — |
+| `truncate` (HeaderDescription) | One line with ellipsis | Long emails | — |
+| `alignSelf` (HeaderTrailing) `start` · `center` | Trailing slot at the top or centred | Badge (`start`), button (`center`) | `start` |
+
+**Combinations** — Content `size` = trigger `size`. Destructive item: `tone="danger"` placed last, separated by `Dropdown.Separator`. A disabled danger item looks like any disabled item.
+
+**Hierarchy** — keep the primary action outside the menu as a visible button; the menu holds secondary actions. Group long menus with `GroupLabel`; one danger group at the end.
+
+## States
+- Closed / open: uncontrolled by default; `open` + `onOpenChange` for controlled. Selecting an item closes the menu.
+- Panel DOM: `data-state="open" | "closed"`, `data-side` (resolved), `data-size`, `data-overlay-portal-layer`.
+- Item DOM: `data-tone`, `data-disabled="true"`, `aria-disabled`.
+- Trigger DOM: `data-state`, `aria-expanded`.
+- Hover and keyboard focus highlight the row with background (`fill-subtle` / `danger-soft`), not a ring; active `fill-subtle-active`.
+- No built-in search or empty state.
+
+## Layout & spacing
+- Width `max-content` between `--prime-panel-min-width` and twice that; max height `--prime-panel-max-height` or the free space, then the list scrolls.
+- Item padding-x `--prime-panel-item-padding-x` (8); icon → label gap is the tier gap; the shortcut is pushed to the end with `--prime-space-4` before it.
+- Separators are full-bleed hairlines with `--prime-panel-padding` above and below.
+- Kept `--prime-space-2` from viewport edges.
+
+## Accessibility
+- Panel `role="menu"` labelled by the trigger; items `role="menuitem"`; groups `role="group"`.
+- Keyboard: Arrow Down / Up move between enabled items (wrapping), Home / End jump to the first / last, Enter / Space activate, Tab is kept inside (focus trap), Escape closes and returns focus to the trigger.
+- An outside press closes without moving focus back (foundation §8); only the topmost layer reacts.
+- Icon-only triggers need `aria-label`. ItemIcon is `aria-hidden` by default.
+- No `labels`.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | `size` xs → xl with icons, shortcuts, danger item | Matching the menu to the trigger |
+| [variants.tsx](examples/variants.tsx) | Item kinds, groups, disabled and `tone="danger"` | Document actions menu |
+| [states.tsx](examples/states.tsx) | Long scrolling list with groups and a disabled row | Many items |
+| [row-actions.tsx](examples/row-actions.tsx) | Card toolbar with a visible primary action and «⋯» menu | Secondary actions of a card / row |
+| [composition.tsx](examples/composition.tsx) | Account menu with header, avatar, badge and plan block | User menu |
+| [placement.tsx](examples/placement.tsx) | `align` × `side` | Placing near edges |
+| [full-width.tsx](examples/full-width.tsx) | `sameMinWidthAsTrigger` | Full-width triggers |
+| [controlled.tsx](examples/controlled.tsx) | `open` + `onOpenChange` in parent state | Syncing with other UI |
+| [as-child.tsx](examples/as-child.tsx) | Text-link button as the trigger | Inline switches |
 
 ```tsx
 import { Button, Dropdown } from "prime-ui-kit";
@@ -54,189 +221,26 @@ export function Example() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <Button.Root type="button" variant="neutral" mode="stroke">
-          Actions
+        <Button.Root variant="soft" tone="neutral">
+          Действия
         </Button.Root>
       </Dropdown.Trigger>
       <Dropdown.Content>
-        <Dropdown.Item>Edit</Dropdown.Item>
-        <Dropdown.Item>Duplicate</Dropdown.Item>
+        <Dropdown.Item onSelect={() => {}}>Переименовать</Dropdown.Item>
+        <Dropdown.Separator />
+        <Dropdown.Item tone="danger">Удалить</Dropdown.Item>
       </Dropdown.Content>
     </Dropdown.Root>
   );
 }
 ```
 
----
+## Mistakes
+- `onClick` on Dropdown.Item → use `onSelect` (Item has no `onClick` prop).
+- Using Dropdown as a form select that shows the chosen value → use Select.
+- `tone="error"` → destructive tone is `danger`.
+- A different `size` on the trigger and the panel → use the same tier.
+- Setting `size` on every `ItemIcon` → leave it, it follows the panel.
 
-## Extended
-
-### About
-
-A composite **action menu**: the trigger toggles a portaled panel with commands, optional groups, a header block, and separators. Positioning and focus behavior follow a single-level `role="menu"` pattern.
-
-- **Use** for secondary operations on cards, table rows, or toolbars without a full settings page.
-- **Use** when you need a compact “more” menu next to an avatar, text, or icon trigger.
-- **Use** with **controlled** `open` / `onOpenChange` when another part of the UI must stay in sync (tours, hints, analytics).
-- **Use** `destructive` items and **groups** when you must separate safe vs dangerous or unrelated actions.
-- **Do not use** for choosing a single value shown on the trigger — that is **[Select](../select/COMPONENT.md)**.
-- **Do not use** for arbitrary floating content without menu semantics — prefer **[Popover](../popover/COMPONENT.md)**.
-- **Do not use** for nested multi-level submenus; the API is a **flat** menu only.
-
-### Composition
-
-- **`Dropdown.Root`** wraps everything and owns open state (controlled or uncontrolled).
-- **`Dropdown.Trigger`** must wrap **exactly one** React element; refs, `id`, `aria-*`, and toggle `onClick` are merged into that child.
-- **`Dropdown.Content`** renders **only when open** (portal + `role="menu"`). Put **`Dropdown.Block`** / **`Dropdown.Group`** / **`Dropdown.Item`** children inside it.
-- **`Dropdown.Block`** — generic section; **`Dropdown.Header`** and **`HeaderRow`**, **`HeaderLeading`**, **`HeaderMain`**, **`HeaderTitle`**, **`HeaderDescription`**, **`HeaderTrailing`** compose a header area inside the panel.
-- **`Dropdown.Item`** — actionable row (`role="menuitem"`); may include **`Dropdown.ItemIcon`** before text.
-- **`Dropdown.Group`** + **`Dropdown.GroupLabel`** label a set of items; **`Dropdown.Separator`** is an `hr` between blocks.
-
-### Rules
-
-- **Uncontrolled:** set **`defaultOpen`** on `Root` (defaults to `false`); internal state updates on toggle.
-- **Controlled:** pass **`open`** and **`onOpenChange`**; the parent is the source of truth for visibility.
-- **`Dropdown.Trigger`** accepts a **single** `ReactElement` — wrap composite UI in one node if needed.
-- **`onSelect`** on **`Dropdown.Item`** runs on activation, then the menu **closes**, unless the item is **`disabled`** (disabled items do not activate or close).
-- **Keyboard:** **ArrowUp** / **ArrowDown**, **Home**, **End** move focus among enabled menu items; **Enter** and **Space** activate; **Escape** closes and focus returns via the focus trap.
-- **Pointer / outside:** clicks outside the trigger and panel close the menu; outside clicks are suppressed for portaled Select listboxes owned by the panel container.
-- **A11y:** trigger gets **`aria-expanded`**, **`aria-haspopup="menu"`**, **`aria-controls`**; the menu has **`aria-labelledby`** pointing at the trigger **`id`**. Icon-only triggers need an accessible name (**`aria-label`** or visible text).
-- **`Dropdown.Content` · `size`** drives the tier for padding, row height, typography, and default **`ItemIcon`** size unless you pass an explicit **`size`** on **`ItemIcon`**.
-- **`align`** / **`side`** are preferences; **`data-side`** on the menu reflects the **resolved** side after layout.
-- **Portal:** the menu is not a DOM child of the trigger — mind **z-index** and stacking when opening from **[Modal](../modal/COMPONENT.md)** or **[Drawer](../drawer/COMPONENT.md)**.
-
-### API
-
-#### Dropdown.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| open | `boolean` | — | No | Controlled open state. |
-| defaultOpen | `boolean` | `false` | No | Initial open state when uncontrolled. |
-| onOpenChange | `(open: boolean) => void` | — | No | Called when open state changes. |
-| children | `React.ReactNode` | — | Yes | Trigger, content, and nested parts. |
-
-#### Dropdown.Trigger
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactElement` | — | Yes | Single element; ref, `id`, ARIA, and merged `onClick` are applied to it. |
-| asChild | `boolean` | `true` | No | Kept for API consistency; the trigger always clones the child element. |
-
-#### Dropdown.Content
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| align | `"start" \| "center" \| "end"` | `"start"` | No | Horizontal alignment of the panel to the trigger. |
-| side | `"bottom" \| "top"` | `"bottom"` | No | Preferred side; may flip when space is tight. |
-| sameMinWidthAsTrigger | `boolean` | `false` | No | Panel minimum width is not less than the trigger width. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Tier for panel metrics, rows, group labels, and default icon size. |
-| className | `string` | — | No | Extra class on the portaled menu container. |
-| children | `React.ReactNode` | — | Yes | Menu body: blocks, groups, items, etc. |
-
-#### Dropdown.Block
-
-Inherits `React.HTMLAttributes<HTMLDivElement>` (e.g. `className`, `children`).
-
-#### Dropdown.Header
-
-Same as `Dropdown.Block`.
-
-#### Dropdown.HeaderRow
-
-Same as `Dropdown.Block`.
-
-#### Dropdown.HeaderLeading
-
-Same as `Dropdown.Block`.
-
-#### Dropdown.HeaderMain
-
-Same as `Dropdown.Block`.
-
-#### Dropdown.HeaderTitle
-
-Same as `Dropdown.Block`.
-
-#### Dropdown.HeaderDescription
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| truncate | `boolean` | — | No | Single-line truncation with ellipsis. |
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Description text. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other `div` attributes. |
-
-#### Dropdown.HeaderTrailing
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| alignSelf | `"start" \| "center"` | `"start"` | No | Vertical alignment within the header row. |
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Trailing slot content. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other `div` attributes. |
-
-#### Dropdown.Item
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| onSelect | `() => void` | — | No | Called on activation; then the menu closes (if not `disabled`). |
-| disabled | `boolean` | — | No | Inactive item; no activation or close. |
-| destructive | `boolean` | — | No | Danger styling (`data-destructive`). |
-| className | `string` | — | No | Extra class on the `<button>`. |
-| children | `React.ReactNode` | — | Yes | Label, `ItemIcon`, etc. |
-
-#### Dropdown.ItemIcon
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| as | `React.ElementType` | `"span"` | No | Root element or icon component. |
-| aria-hidden | `boolean \| "true" \| "false"` | `true` | No | Hide decorative icons when the item has text. |
-| className | `string` | — | No | Extra class on the wrapper. |
-| children | `React.ReactNode` | — | No | Content when not using `as` alone. |
-| size | `number` | from `Content` `size` tier | No | Icon size in px; overrides the automatic tier size. |
-| …rest | `Record<string, unknown>` | — | No | Passed through to the `as` element (e.g. icon props), except reserved fields. |
-
-#### Dropdown.Group
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class (`role="group"`). |
-| children | `React.ReactNode` | — | No | Group label and items. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Other `div` attributes. |
-
-#### Dropdown.GroupLabel
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | Yes | Group heading text. |
-
-#### Dropdown.Separator
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class on the `hr`. |
-
-### Related
-
-- [Button](../button/COMPONENT.md) — typical trigger.
-- [Link button](../link-button/COMPONENT.md) — text-style trigger when a button chrome is not desired.
-- [Select](../select/COMPONENT.md) — single-value field with a labeled trigger.
-- [Popover](../popover/COMPONENT.md) — generic portaled surface without `menu` / `menuitem` behavior.
-- [Modal](../modal/COMPONENT.md) / [Drawer](../drawer/COMPONENT.md) — shells where menus often open from headers or rows.
-- [Avatar](../avatar/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Typography](../typography/COMPONENT.md) — common header and row content.
-
----
-
-## LLM note
-
-- **Do not** invent submenu APIs or nest another `role="menu"` inside items — flat list only.
-- **Trigger contract:** `Dropdown.Trigger` → single `ReactElement`; fragments or multiple nodes break `cloneElement`.
-- **Prefer `Button.Root`** (or `LinkButton`) as trigger with **`type="button"`** when inside forms.
-- **Icon-only trigger:** set **`aria-label`** on the trigger element (merged onto the cloned child).
-- **Choosing a form value** with listbox/combobox semantics → **Select**, not Dropdown; a “workspace switcher” that only mimics selection in the trigger label is still a menu — call that out in copy if users might confuse them.
-- **Destructive actions:** use **`destructive`** on **`Dropdown.Item`**, often after **`Separator`**, not a different component.
-- **Layout:** `Content.align="end"` is common for right-aligned toolbars; pair with **`sameMinWidthAsTrigger`** when the panel should match a narrow control.
-- **Imports for consumers:** `import { Dropdown, … } from "prime-ui-kit"`. In-repo examples under `examples/` use `@/components/...` paths.
-- **Playground source of truth for visuals:** `playground/snippets/dropdown/*.tsx` — keep docs and snippets aligned when API changes.
+## Related
+[Select](../select/COMPONENT.md) · [CommandMenu](../command-menu/COMPONENT.md) · [Popover](../popover/COMPONENT.md) · [Kbd](../kbd/COMPONENT.md) · [Avatar](../avatar/COMPONENT.md)

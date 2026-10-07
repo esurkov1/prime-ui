@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Banner } from "./Banner";
+import styles from "./Banner.module.css";
 
 describe("Banner", () => {
   it("renders root with content", () => {
@@ -13,28 +14,31 @@ describe("Banner", () => {
     expect(screen.getByText("Content")).toBeInTheDocument();
   });
 
-  it("sets data-status for all statuses", () => {
-    const statuses = ["information", "warning", "error", "success", "feature"] as const;
+  it("sets data-tone and data-variant", () => {
+    const tones = ["neutral", "accent", "info", "warning", "danger", "success"] as const;
 
-    for (const status of statuses) {
-      const { container, unmount } = render(
-        <Banner.Root status={status}>
-          <Banner.Content>S</Banner.Content>
-        </Banner.Root>,
-      );
-      expect(container.firstElementChild).toHaveAttribute("data-status", status);
-      unmount();
+    for (const tone of tones) {
+      for (const variant of ["soft", "solid", "outline"] as const) {
+        const { container, unmount } = render(
+          <Banner.Root tone={tone} variant={variant}>
+            <Banner.Content>S</Banner.Content>
+          </Banner.Root>,
+        );
+        expect(container.firstElementChild).toHaveAttribute("data-tone", tone);
+        expect(container.firstElementChild).toHaveAttribute("data-variant", variant);
+        unmount();
+      }
     }
   });
 
-  it("defaults variant to filled and status to information", () => {
+  it("defaults variant to soft and tone to info", () => {
     const { container } = render(
       <Banner.Root>
         <Banner.Content>X</Banner.Content>
       </Banner.Root>,
     );
-    expect(container.firstElementChild).toHaveAttribute("data-variant", "filled");
-    expect(container.firstElementChild).toHaveAttribute("data-status", "information");
+    expect(container.firstElementChild).toHaveAttribute("data-variant", "soft");
+    expect(container.firstElementChild).toHaveAttribute("data-tone", "info");
   });
 
   it("defaults size to m and sets data-size for all sizes", () => {
@@ -65,11 +69,20 @@ describe("Banner", () => {
       </Banner.Root>,
     );
 
-    const dismiss = screen.getByRole("button", { name: "Dismiss" });
+    const dismiss = screen.getByRole("button", { name: "Закрыть" });
     expect(dismiss).toBeInTheDocument();
 
     fireEvent.click(dismiss);
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("takes the close button name from labels", () => {
+    render(
+      <Banner.Root onDismiss={() => {}} labels={{ dismiss: "Скрыть" }}>
+        <Banner.Content>Message</Banner.Content>
+      </Banner.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Скрыть" })).toBeInTheDocument();
   });
 
   it("hides dismiss button when onDismiss is omitted", () => {
@@ -78,7 +91,7 @@ describe("Banner", () => {
         <Banner.Content>No close</Banner.Content>
       </Banner.Root>,
     );
-    expect(screen.queryByRole("button", { name: "Dismiss" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Закрыть" })).not.toBeInTheDocument();
   });
 
   it("does not inject dismiss when CloseButton is present", () => {
@@ -89,7 +102,7 @@ describe("Banner", () => {
         <Banner.CloseButton aria-label="Custom close" type="button" />
       </Banner.Root>,
     );
-    expect(screen.queryByRole("button", { name: "Dismiss" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Закрыть" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Custom close" })).toBeInTheDocument();
   });
 
@@ -113,5 +126,61 @@ describe("Banner", () => {
     expect(screen.getByText("Title text")).toBeInTheDocument();
     expect(screen.getByText("Description text")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Action" })).toBeInTheDocument();
+  });
+
+  it("defaults placement to inset and sets page placement", () => {
+    const { container, rerender } = render(
+      <Banner.Root>
+        <Banner.Content>X</Banner.Content>
+      </Banner.Root>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-placement", "inset");
+    rerender(
+      <Banner.Root placement="page">
+        <Banner.Content>X</Banner.Content>
+      </Banner.Root>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-placement", "page");
+  });
+
+  it("moves dismiss into the actions row as the last square button when actions exist", () => {
+    const { container } = render(
+      <Banner.Root onDismiss={() => {}}>
+        <Banner.Content>
+          <Banner.Icon data-testid="icon" />
+          <Banner.Title>Пробный период закончится 12 октября</Banner.Title>
+          <Banner.Description>Выберите тариф.</Banner.Description>
+          <Banner.Actions>
+            <button type="button">Выбрать тариф</button>
+          </Banner.Actions>
+        </Banner.Content>
+      </Banner.Root>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    // With actions there is no corner close: dismiss lines up with the other buttons.
+    expect(root.children).toHaveLength(1);
+    expect(root.children[0]).toHaveClass(styles.content);
+    const close = screen.getByRole("button", { name: "Закрыть" });
+    expect(close).toHaveClass(styles.actionsClose);
+    expect(close.parentElement).toHaveClass(styles.actions);
+    expect(screen.getByTestId("icon")).toHaveClass(styles.icon);
+    expect(screen.getByText("Пробный период закончится 12 октября")).toHaveClass(styles.title);
+    expect(screen.getByText("Выберите тариф.")).toHaveClass(styles.description);
+    expect(screen.getByRole("button", { name: "Выбрать тариф" }).parentElement).toHaveClass(
+      styles.actions,
+    );
+  });
+
+  it("keeps the small corner close when there are no actions", () => {
+    const { container } = render(
+      <Banner.Root onDismiss={() => {}}>
+        <Banner.Content>
+          <Banner.Title>Изменения сохранены</Banner.Title>
+        </Banner.Content>
+      </Banner.Root>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.children).toHaveLength(2);
+    expect(root.children[1]).toHaveClass(styles.closeButton);
   });
 });

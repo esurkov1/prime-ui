@@ -3,10 +3,12 @@ import * as React from "react";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import type { ControlSize, PaletteColor } from "@/internal/states";
 
 import styles from "./Avatar.module.css";
 
-export type AvatarSize = "s" | "m" | "l" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl";
+/** `xs` 20 · `s` 24 · `m` 32 · `l` 40 · `xl` 48 · `2xl` 64 (`--prime-avatar-*`). */
+export type AvatarSize = ControlSize | "2xl";
 
 export type AvatarImageStatus = "idle" | "loading" | "loaded" | "error";
 
@@ -20,12 +22,14 @@ const [AvatarProvider, useAvatarContext] = createComponentContext<AvatarContextV
 
 export type AvatarRootProps = {
   size?: AvatarSize;
+  /** Fallback color (`--prime-color-palette-<hue>-*`). Default `gray`. */
+  color?: PaletteColor;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 const AvatarRoot = React.forwardRef<HTMLDivElement, AvatarRootProps>(
-  ({ size = "m", className, children, ...rest }, ref) => {
+  ({ size = "m", color = "gray", className, children, ...rest }, ref) => {
     const [imageStatus, setImageStatus] = React.useState<AvatarImageStatus>("idle");
 
     const value = React.useMemo(
@@ -42,7 +46,7 @@ const AvatarRoot = React.forwardRef<HTMLDivElement, AvatarRootProps>(
         <div
           ref={ref}
           className={cx(styles.root, className)}
-          {...toDataAttributes({ size })}
+          {...toDataAttributes({ size, color })}
           {...rest}
         >
           {children}
@@ -138,6 +142,42 @@ function AvatarFallback({ children, className, ...rest }: AvatarFallbackProps) {
 
 AvatarFallback.displayName = "AvatarFallback";
 
+export type AvatarPresence = "online" | "offline" | "away" | "busy";
+
+export type AvatarStatusLabels = Record<AvatarPresence, string>;
+
+const AVATAR_STATUS_LABELS: AvatarStatusLabels = {
+  online: "В сети",
+  offline: "Не в сети",
+  away: "Отошёл",
+  busy: "Занят",
+};
+
+export type AvatarStatusProps = {
+  /** Presence shown as a dot on the avatar's bottom-end edge. */
+  status: AvatarPresence;
+  /** Accessible names of the presence states (Russian defaults). */
+  labels?: Partial<AvatarStatusLabels>;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+
+/** Presence dot; announced as an image with the state name (`labels`). */
+function AvatarStatus({ status, labels, className, ...rest }: AvatarStatusProps) {
+  useAvatarContext();
+  const label = { ...AVATAR_STATUS_LABELS, ...labels }[status];
+  return (
+    <span
+      role="img"
+      aria-label={label}
+      className={cx(styles.status, className)}
+      {...toDataAttributes({ status })}
+      {...rest}
+    />
+  );
+}
+
+AvatarStatus.displayName = "AvatarStatus";
+
 const AVATAR_ROOT_DISPLAY = "AvatarRoot";
 const AVATAR_GROUP_OVERFLOW_DISPLAY = "AvatarGroupOverflow";
 
@@ -217,9 +257,10 @@ export type AvatarGroupRootProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 const AvatarGroupRoot = React.forwardRef<HTMLDivElement, AvatarGroupRootProps>(
-  ({ size = "m", className, children, ...rest }, ref) => (
+  ({ size = "m", className, children, role = "group", ...rest }, ref) => (
     <div
       ref={ref}
+      role={role}
       className={cx(styles.groupRoot, className)}
       {...toDataAttributes({ size })}
       {...rest}
@@ -235,6 +276,7 @@ export const Avatar = {
   Root: AvatarRoot,
   Image: AvatarImage,
   Fallback: AvatarFallback,
+  Status: AvatarStatus,
   Group: {
     Root: AvatarGroupRoot,
     Overflow: AvatarGroupOverflow,

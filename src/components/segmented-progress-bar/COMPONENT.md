@@ -1,119 +1,128 @@
 # SegmentedProgressBar
 
-**Default `size`:** use **`m`** for the size axis unless the screen explicitly needs another tier.
+**Category:** feedback (Обратная связь)
 
-## Canonical
+> One bar made of proportional segments: storage by type, task statuses, a funnel or quotas.
 
-- **`SegmentedProgressBar`** — proportional **stacked** bar: **`SegmentedProgressBar.Root`** only; one segment per category, width ∝ **`value`** (weight).
-- **`segments`:** each item has **`value`** (≥ 0, clamped), optional **`label`** (tooltip + assistive copy), optional **`tone`**: **`primary` | `success` | `warning` | `danger` | `neutral`** (default **`primary`**).
-- **`segmentGap`:** **`none`** (default, continuous bar) or **`hairline`** (1px separators via track background).
-- **`label`:** optional visible title above the track; when set, the track uses **`aria-labelledby`** + **`aria-describedby`** with a visually hidden distribution string; without **`label`**, **`aria-label`** is the distribution text.
-- **Not** a native **`<progress>`** — track is **`role="group"`**; use [ProgressBar](../progress-bar/COMPONENT.md) for a single determinate fraction.
-- **Not** for picking a segment — use [SegmentedControl](../segmented-control/COMPONENT.md); **not** for steps — use [Stepper](../stepper/COMPONENT.md).
+## When to use
+- Showing how a whole splits into parts: used space by file type, tasks by status, budget by category.
+- Several progress parts in one line (done / in progress / overdue).
 
-## Extended
+## When not to use
+- A single value toward a goal → use [ProgressBar](../progress-bar/COMPONENT.md) or [ProgressCircle](../progress-circle/COMPONENT.md).
+- Navigating discrete wizard steps → use [Stepper](../stepper/COMPONENT.md).
+- Choosing one of several options → use [SegmentedControl](../segmented-control/COMPONENT.md).
+- Detailed data with axes → use a chart.
 
-### About
+## Import
+```tsx
+import { SegmentedProgressBar } from "prime-ui-kit";
+```
+Types: `SegmentedProgressSegment`, `SegmentedProgressBarRootProps`, `SegmentedProgressBarLabels`.
 
-`SegmentedProgressBar` shows a part-to-whole breakdown: segment widths follow **`value[i] / sum(values)`** via **`flex-grow`**, so layout stays correct in shrink-to-fit parents. Percentages in the accessibility description are rounded to whole numbers.
+## API
 
-- **When to use** — status mixes (errors / pending / success), survey or poll shares, rollout phase allocation, storage or budget split by category.
-- **When to use** — **`segmentGap="none"`** for one solid bar; **`hairline`** when segments should read as separate columns.
-- **When to use** — per-segment **`label`** for tooltips and clearer **`aria-*`** distribution text.
-- **When not to use** — a single task completion percentage; use **ProgressBar**.
-- **When not to use** — interactive selection or toggles; use **SegmentedControl**.
-- **When not to use** — discrete wizard steps; use **Stepper**.
+### SegmentedProgressBar.Root
+Leaf component. `forwardRef` to the track `HTMLDivElement` (`role="group"`). No native props passthrough.
 
-### Composition
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `segments` | `SegmentedProgressSegment[]` | — (required) | Segments in order; each one's width is its share of the sum of all values. |
+| `label` | `string` | — | Visible label above the track; the track is labelled by it and described by the distribution text. Without `label` the distribution text is the track's `aria-label`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Track height and label typography (same scale as ProgressBar). |
+| `segmentGap` | `"none" \| "hairline"` | `"none"` | Gap between segments, see Variants. |
+| `labels` | `Partial<SegmentedProgressBarLabels>` | see Accessibility | Accessible texts for empty states. |
+| `className` | `string` | — | Class on the root `<div>`. |
 
-- **`SegmentedProgressBar.Root`** — outer wrapper with **`data-size`**, **`data-segment-gap`**, optional visible **`label`**, optional visually hidden distribution **`span`** (when **`label`** is set), and a **`role="group"`** track with one **`div`** per segment (presentational fills).
+### SegmentedProgressSegment
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `value` | `number` | — (required) | Non-negative weight; negative or non-finite values count as 0. |
+| `label` | `string` | — | Name used in the accessible distribution text and as the segment `title`. |
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger"` | `"accent"` | Segment fill. |
 
-### Playground (`playground/sections/SegmentedProgressBarSection.tsx`)
+## Variants
 
-The section renders snippets from **`playground/snippets/progress/`** (segmented bar demos only):
+### tone (segment)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `accent` | Accent fill | The main or "in progress" share | yes |
+| `success` | Success fill | Done / accepted | |
+| `warning` | Warning fill | Pending / at risk | |
+| `danger` | Danger fill | Overdue / rejected | |
+| `neutral` | `fill-strong-hover` fill, slightly darker than the track | Free space, "other" | |
 
-| Demo (section) | Snippet | What it shows |
-|----------------|---------|----------------|
-| Распределение | [`segmented-distribution.tsx`](../../../playground/snippets/progress/segmented-distribution.tsx) | Weights as shares of the sum (like percentages when the total is 100); visible **`label`** and per-segment **`label`** / **`tone`** (Russian copy in the snippet; **`previewLayout="stack"`**). |
-| Размеры | [`segmented-sizes.tsx`](../../../playground/snippets/progress/segmented-sizes.tsx) | **`size`** **`s`**, **`m`**, **`l`**, **`xl`** with the same weights (**`previewLayout="stack-center"`**). |
-| Зазор между сегментами | [`segmented-gap.tsx`](../../../playground/snippets/progress/segmented-gap.tsx) | Default **`segmentGap="none"`** vs **`hairline`** (1px separators); **`previewLayout="stack"`**. |
+### segmentGap
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `none` | One continuous pill on a `fill-strong` track | Parts of a single process | yes |
+| `hairline` | Segments as separate pills with a 4px gap, track background transparent | Distinct categories (file types, statuses) | |
 
-`playground/snippets/segmented/*` is for **SegmentedControl**, not this component.
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | Track 4px, label 12/16, gap 4 | Table cells | |
+| `s` | Track 4px, label 12/16, gap 4 | Compact lists | |
+| `m` | Track 4px, label 13/20, gap 8 | Default | yes |
+| `l` | Track 8px, label 14/20, gap 8 | Prominent summaries | |
+| `xl` | Track 8px, label 14/20, gap 8 | Dashboards hero | |
 
-### Example files in `examples/`
+**Combinations**
+- Recommended: `hairline` + a legend for categories; `neutral` for the "free" remainder.
+- Pointless: one segment only — use ProgressBar.
+- Avoid: more than 5–6 segments; color as the only carrier of meaning — add a legend.
 
-Imports use **`"prime-ui-kit"`** so the same patterns work in an app. **`distribution-breakdown`**, **`size-ladder`**, and **`segment-gaps`** mirror the three playground frames above (same structure; English labels and copy where the snippets use Russian).
+## States
+| State | Driven by | DOM |
+|---|---|---|
+| size / gap | props | `data-size`, `data-segment-gap` on the root |
+| segment tone | `segment.tone` | `data-tone` on each segment |
+| empty | `segments` empty or all values 0 | only the `fill-strong` track with `segmentGap="none"`; with `"hairline"` the track is transparent, so an empty bar is invisible (show a text or use `none` when data can be empty). The accessible text is `labels.empty` / `labels.allEmpty` |
 
-| File | Scenario |
-|------|----------|
-| [`distribution-breakdown.tsx`](examples/distribution-breakdown.tsx) | **`label`** + weighted segments + **`tone`** (`snippets/progress/segmented-distribution.tsx`). |
-| [`size-ladder.tsx`](examples/size-ladder.tsx) | **`size`** ladder **`s`–`xl`** (`snippets/progress/segmented-sizes.tsx`; snippet wraps rows in **`stack`** + **`examplePreviewBleed`** for the playground). |
-| [`segment-gaps.tsx`](examples/segment-gaps.tsx) | **`segmentGap`** **`none`** vs **`hairline`** (`snippets/progress/segmented-gap.tsx`). |
-| [`multi-phase-rollout.tsx`](examples/multi-phase-rollout.tsx) | Phase mix (internal / beta / GA) with distinct **`tone`** values — not mounted in the section; extra recipe. |
-| [`storage-mix.tsx`](examples/storage-mix.tsx) | Category-style breakdown with **`hairline`** — not mounted in the section; extra recipe. |
+Segment widths animate (flex-grow transition; none under `prefers-reduced-motion`).
 
-### Minimal example
+## Layout & spacing
+- `width: 100%` of the parent. Label → track: `--prime-space-1` (xs/s) or `--prime-space-2` (m–xl).
+- Put a legend under the bar with `--prime-space-4` from it.
+
+## Accessibility
+- The track is `role="group"`; its accessible text lists the shares: "Видео: 38%, Документы: 21%, …" (segments without `label` are read as "NN%").
+- With `label`: `aria-labelledby` the label and `aria-describedby` the visually hidden distribution; without `label`: `aria-label` = distribution.
+
+| `labels` key | Default | Used for |
+|---|---|---|
+| `empty` | `"Нет сегментов"` | Accessible text when `segments` is empty |
+| `allEmpty` | `"Все сегменты пусты"` | Accessible text when every segment is 0 |
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [storage-distribution.tsx](examples/storage-distribution.tsx) | Storage by type in a card with a legend, `hairline`, `neutral` free space | "Used by type" breakdowns |
+| [sizes.tsx](examples/sizes.tsx) | `xs`…`xl` with labels | Picking a size |
+| [segment-gap.tsx](examples/segment-gap.tsx) | `none` vs `hairline`, empty `segments` | Gap choice and the empty state |
 
 ```tsx
 import { SegmentedProgressBar } from "prime-ui-kit";
 
-export function Example() {
+export function TaskStatus() {
   return (
     <SegmentedProgressBar.Root
+      label="Задачи"
       segments={[
-        { value: 30, label: "Errors", tone: "danger" },
-        { value: 25, label: "Pending", tone: "warning" },
-        { value: 35, label: "Success", tone: "success" },
-        { value: 10, label: "Other", tone: "neutral" },
+        { value: 55, label: "Выполнено", tone: "success" },
+        { value: 25, label: "В работе" },
+        { value: 20, label: "Просрочено", tone: "danger" },
       ]}
     />
   );
 }
 ```
 
-### Rules
-
-- **Weights** are non-negative; invalid numbers are treated as **`0`**. If the sum is **`0`**, the track shows no fills (track background only).
-- **Layout** uses **`flex-grow`** from weights, not `%` width, so proportions stay correct when the parent shrinks.
-- **`segmentGap`:** **`none`** — track background **`surface-accentSoft`**; **`hairline`** — **`gap: 1px`** on the track, background **`border-subtle`**, segments sit on top so a thin line shows between fills.
-- **`tone`** omitted → **`primary`**.
-- Segment **`label`** → native **`title`** on the segment **div**.
-
-## API
-
-### SegmentedProgressBar.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| `segments` | `SegmentedProgressSegment[]` | — | Yes | Non-negative weights; layout is proportional to the sum. |
-| `label` | `string` | — | No | Text above the track; **`aria-labelledby`** + **`aria-describedby`** when set. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Track height and label typography (aligned with ProgressBar). |
-| `segmentGap` | `"none" \| "hairline"` | `"none"` | No | Gap between segment fills. |
-| `className` | `string` | — | No | Class on the outer wrapper. |
-| `ref` | `React.Ref<HTMLDivElement>` | — | No | Ref to the **`role="group"`** track element. |
-
-### SegmentedProgressSegment
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `value` | `number` | Yes | Weight ≥ 0; contributes to proportion. |
-| `label` | `string` | No | Tooltip and assistive segment label in the distribution string. |
-| `tone` | `"primary" \| "success" \| "warning" \| "danger" \| "neutral"` | No | Default **`primary`**. |
+## Mistakes
+- Passing percentages that do not sum to 100 and expecting fixed widths → widths are always shares of the sum.
+- Segments without `label` → screen readers hear only percentages; give each segment a label.
+- `tone="info"` → not supported for segments.
 
 ## Related
-
-- [ProgressBar](../progress-bar/COMPONENT.md) — single determinate progress on **`<progress>`**.
-- [ProgressCircle](../progress-circle/COMPONENT.md) — circular fraction.
-- [Typography](../typography/COMPONENT.md) — headings and legends beside the bar.
-
-## LLM note
-
-- Playground source of truth for live demos: **`playground/sections/SegmentedProgressBarSection.tsx`** → **`playground/snippets/progress/segmented-{distribution,sizes,gap}.tsx`** (not **`snippets/segmented/`**, which is SegmentedControl).
-- Export: **`import { SegmentedProgressBar } from "prime-ui-kit"`** — public surface is **`SegmentedProgressBar.Root`** only (namespace object).
-- **`SegmentedProgressBarRootProps`:** **`segments`** (required), **`label?`**, **`size?`**, **`segmentGap?`**, **`className?`**; **`ref`** → track **`div`** (**`role="group"`**).
-- **`SegmentedProgressSegment`:** **`value`** (number), **`label?`**, **`tone?`** — **`tone`** literals: **`primary`**, **`success`**, **`warning`**, **`danger`**, **`neutral`**.
-- **`size`** literals: **`s`**, **`m`**, **`l`**, **`xl`** — default **`m`**.
-- **`segmentGap`** literals: **`none`**, **`hairline`** — default **`none`**.
-- Do not describe this as a native progress bar; it is **`role="group"`**, not **`role="progressbar"`**.
-- Do not suggest **SegmentedControl** or **Stepper** for the same job unless the UX is selection or steps, not a static breakdown.
-- For a single 0–100% task, recommend **ProgressBar** instead.
+- [ProgressBar](../progress-bar/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md).
+- [Stepper](../stepper/COMPONENT.md) — step navigation.

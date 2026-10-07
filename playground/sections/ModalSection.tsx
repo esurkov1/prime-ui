@@ -1,3 +1,15 @@
+import ModalCompositionExample from "@/components/modal/examples/composition";
+import compositionSource from "@/components/modal/examples/composition.tsx?raw";
+import ModalControlledExample from "@/components/modal/examples/controlled";
+import controlledSource from "@/components/modal/examples/controlled.tsx?raw";
+import ModalFeaturesExample from "@/components/modal/examples/features";
+import featuresSource from "@/components/modal/examples/features.tsx?raw";
+import ModalLinkExample from "@/components/modal/examples/link";
+import linkSource from "@/components/modal/examples/link.tsx?raw";
+import ModalSizesExample from "@/components/modal/examples/sizes";
+import sizesSource from "@/components/modal/examples/sizes.tsx?raw";
+import ModalStatesExample from "@/components/modal/examples/states";
+import statesSource from "@/components/modal/examples/states.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,166 +18,44 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import ModalCompositionSnippet from "../snippets/modal/composition";
-import compositionSource from "../snippets/modal/composition.tsx?raw";
-import ModalControlledSnippet from "../snippets/modal/controlled";
-import controlledSource from "../snippets/modal/controlled.tsx?raw";
-import ModalFeaturesSnippet from "../snippets/modal/features";
-import featuresSource from "../snippets/modal/features.tsx?raw";
-import ModalFullWidthSnippet from "../snippets/modal/full-width";
-import fullWidthSource from "../snippets/modal/full-width.tsx?raw";
-import ModalStatesSnippet from "../snippets/modal/states";
-import statesSource from "../snippets/modal/states.tsx?raw";
+import {
+  dialogAriaApiRows,
+  dialogBodyApiRows,
+  dialogFooterApiRows,
+  dialogHeaderApiRows,
+  dialogIconApiRows,
+  dialogRootApiRows,
+  dialogSlotApiRows,
+  dialogTextApiRows,
+} from "./dialogApiRows";
 
 const modalRootApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "open",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Контролируемое открытие; вместе с onOpenChange.",
-  },
-  {
-    prop: "defaultOpen",
-    type: "boolean",
-    defaultValue: "false",
-    required: "Нет",
-    description: "Начальное состояние в неконтролируемом режиме.",
-  },
-  {
-    prop: "onOpenChange",
-    type: "(open: boolean) => void",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Вызывается при смене открытости (триггер, закрытие, программно).",
-  },
-  {
-    prop: "closeOnEscape",
-    type: "boolean",
-    defaultValue: "true",
-    required: "Нет",
-    description: "Закрытие по Escape внутри открытого диалога.",
-  },
-  {
-    prop: "closeOnOverlayClick",
-    type: "boolean",
-    defaultValue: "true",
-    required: "Нет",
-    description: "Закрытие по клику на подложку (только если target — сам оверлей).",
-  },
+  ...dialogRootApiRows("Modal"),
   {
     prop: "confirmOnEnter",
     type: "boolean",
     defaultValue: "true",
     required: "Нет",
-    description: "Enter имитирует клик по `Modal.Footer` `primary` (см. также `onEnterConfirm`).",
+    description:
+      "Enter нажимает действие в Modal.Confirm (кроме textarea, select, чекбоксов, шапки и самой кнопки).",
   },
   {
     prop: "onEnterConfirm",
     type: "(event: KeyboardEvent) => void",
     defaultValue: "—",
     required: "Нет",
-    description: "Свой обработчик вместо программного клика по primary.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Триггер, портал и прочая разметка внутри провайдера контекста.",
+    description: "Свой обработчик вместо нажатия Modal.Confirm.",
   },
 ];
 
-const modalTriggerApiRows: PlaygroundApiPropRow[] = [
+const modalContentApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "children",
-    type: "React.ReactElement<{ onClick?: React.MouseEventHandler }>",
-    defaultValue: "—",
-    required: "Да",
-    description: "Ровно один дочерний элемент; к нему добавляется открытие по клику.",
-  },
-];
-
-const modalCloseApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "children",
-    type: "React.ReactElement<{ onClick?: …; className?: string; size?: ButtonSize }>",
-    defaultValue: "—",
-    required: "Да",
-    description: "Ровно один дочерний элемент (обычно кнопка в подвале); по клику закрывает модал.",
-  },
-];
-
-const modalPanelApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "title",
-    type: "React.ReactNode",
-    defaultValue: "—",
+    prop: "size",
+    type: '"s" | "m" | "l" | "xl"',
+    defaultValue: '"m"',
     required: "Нет",
-    description: "Заголовок шапки; если задан, показывается шапка с `h2`, тело — с разделителем.",
-  },
-  {
-    prop: "description",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Подзаголовок под заголовком.",
-  },
-  {
-    prop: "icon",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Иконка слева от текста в шапке.",
-  },
-  {
-    prop: "showClose",
-    type: "boolean",
-    defaultValue: "true",
-    required: "Нет",
-    description: "Встроенная кнопка закрытия в шапке (если есть `title`).",
-  },
-  {
-    prop: "closeAriaLabel",
-    type: "string",
-    defaultValue: '"Close"',
-    required: "Нет",
-    description: "`aria-label` для кнопки закрытия в шапке.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Основной контент; при наличии `title` оформляется как тело панели.",
-  },
-  {
-    prop: "footer",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Нижняя зона; предпочтительно `Modal.Footer` (`secondary` / `extra` / `primary`).",
-  },
-  {
-    prop: "footerClassName",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на `<footer>` (сливается с `Modal.Footer`, если `footer` — он).",
-  },
-  {
-    prop: "bodyClassName",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на области тела (если есть `title` и `children`).",
-  },
-  {
-    prop: "bodyStyle",
-    type: "React.CSSProperties",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Инлайн-стили тела (например maxHeight + overflow для прокрутки).",
+    description:
+      "Ширина 440 · 560 · 720 · 960 px. Уже 640 px экрана любой размер открывается снизу на всю ширину.",
   },
   {
     prop: "container",
@@ -174,55 +64,7 @@ const modalPanelApiRows: PlaygroundApiPropRow[] = [
     required: "Нет",
     description: "Узел для портала.",
   },
-  {
-    prop: "overlayClassName",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на полноэкранной подложке.",
-  },
-  {
-    prop: "aria-label",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Имя диалога без шапки (например headless); иначе связывание через `title`.",
-  },
-  {
-    prop: "aria-labelledby",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Переопределение id заголовка для `role=dialog`.",
-  },
-  {
-    prop: "aria-describedby",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Переопределение id описания.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на панели диалога (белая карточка).",
-  },
-  {
-    prop: "style",
-    type: "React.CSSProperties",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Инлайн-стили панели.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Прочие атрибуты корня панели (фокус, a11y, data-*).",
-  },
+  ...dialogAriaApiRows,
 ];
 
 export default function ModalSection() {
@@ -231,43 +73,73 @@ export default function ModalSection() {
       <PageContent.Header>
         <PageContent.Title id="modal-heading">Modal</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Окно поверх страницы для важного текста, подтверждений и коротких форм. Открывается по
-              клику на триггер или из кода, блокирует прокрутку фона и удерживает фокус внутри
-              панели, пока пользователь не закроет диалог.
-            </>
-          }
+          Окно поверх страницы для подтверждений, коротких форм и важного текста. Шапка с иконкой и
+          заголовком в одну строку, тело и подвал разделены еле заметными линиями; прокручивается
+          только тело. Фокус удерживается внутри, страница за окном неактивна.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
           <div className="demoBlock">
-            <DemoSectionTitle>Структура и композиция</DemoSectionTitle>
+            <DemoSectionTitle>Анатомия</DemoSectionTitle>
             <DemoDescription>
-              Публичный API: <code>Modal.Root</code> → <code>Modal.Panel</code> с пропами{" "}
-              <code>title</code>, <code>description</code>, <code>children</code>,{" "}
-              <code>footer</code>. Ниже — варианты: только шапка+футер, шапка+текст, только шапка,
-              форма, юртекст.
+              Шапка: <code>Modal.Icon</code> 40 px, <code>Modal.Title</code> и{" "}
+              <code>Modal.Description</code>, крестик. Тело с полем и копированием, подвал с двумя
+              кнопками равной ширины — для размеров <code>s</code> и <code>m</code> это{" "}
+              <code>layout=&quot;fill&quot;</code> по умолчанию.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={linkSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <ModalCompositionSnippet />
+                <ModalLinkExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              По умолчанию закрытие по Escape и клику на подложку; с{" "}
-              <code>closeOnEscape=&#123;false&#125;</code> и{" "}
-              <code>closeOnOverlayClick=&#123;false&#125;</code> — только явные кнопки (например
-              опасное действие или пошаговый сценарий).
+              <code>size</code> на <code>Modal.Content</code>: <code>s</code> 440 · <code>m</code>{" "}
+              560 (по умолчанию) · <code>l</code> 720 · <code>xl</code> 960 px. Для <code>l</code> и{" "}
+              <code>xl</code> кнопки подвала встают справа по содержимому (
+              <code>layout=&quot;end&quot;</code>). Уже 640 px экрана окно открывается снизу; если
+              само окно уже 360 px, кнопки встают столбиком, основная — последней.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <ModalStatesSnippet />
+                <ModalSizesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Подтверждение удаления</DemoSectionTitle>
+            <DemoDescription>
+              Шапка и подвал без тела — линия над подвалом остаётся.{" "}
+              <code>Modal.Icon tone=&quot;danger&quot;</code>, опасное действие в{" "}
+              <code>Modal.Confirm</code> (Enter подтверждает), подложка не закрывает окно, на время
+              запроса кнопка показывает <code>loading</code>. Рядом — информационное окно из одной
+              шапки.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <ModalStatesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Форма настроек</DemoSectionTitle>
+            <DemoDescription>
+              Поля получают заливку «на поверхности» и размер <code>m</code>, группы полей — шаг 20
+              px. Ошибка показывается под полем без сдвига вёрстки (<code>reserveSupportRow</code>),
+              первое поле получает фокус через <code>autoFocus</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={compositionSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <ModalCompositionExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -275,41 +147,29 @@ export default function ModalSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
             <DemoDescription>
-              Пара <code>open</code> и <code>onOpenChange</code>: открытие и закрытие с кнопок вне
-              модала, синхронизация с маршрутом или стором; <code>Modal.Trigger</code> не
-              обязателен.
+              <code>open</code> и <code>onOpenChange</code> без <code>Modal.Trigger</code>: окно
+              открывает код (маршрут, стор, таймер). Фокус после закрытия возвращается на элемент,
+              который был активен до открытия.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root
+              code={controlledSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <ModalControlledSnippet />
+                <ModalControlledExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoSectionTitle>Длинное содержимое и свой контейнер</DemoSectionTitle>
             <DemoDescription>
-              В <code>footer</code> — вертикальный стек: у <code>Button.Root</code> включён{" "}
-              <code>fullWidth</code>, чтобы кнопки занимали всю ширину колонки панели (удобно на
-              узком макете).
+              Когда окно упирается в высоту экрана, прокручивается только <code>Modal.Body</code> —
+              шапка и подвал на месте. <code>container</code> монтирует портал в заданный узел.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <ModalFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              Проп <code>container</code> у <code>Modal.Panel</code> для монтирования в заданный
-              узел; прокрутка длинного списка — через <code>bodyStyle</code> (например maxHeight)
-              при заблокированном фоне.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <ModalFeaturesSnippet />
+                <ModalFeaturesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -317,30 +177,29 @@ export default function ModalSection() {
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Modal.Root</DemoApiTitle>
-            <DemoDescription>
-              Контекст открытости и политика закрытия для вложенных частей.
-            </DemoDescription>
+            <DemoDescription>Состояние открытия и политика закрытия.</DemoDescription>
             <PlaygroundApiTable rows={modalRootApiRows} />
-            <DemoApiTitle>Modal.Trigger</DemoApiTitle>
+            <DemoApiTitle>Modal.Content</DemoApiTitle>
             <DemoDescription>
-              Открывает модал по клику, не отменяя существующий <code>onClick</code> потомка.
+              Портал, подложка и сам диалог: ловушка фокуса, блокировка прокрутки, Escape.
             </DemoDescription>
-            <PlaygroundApiTable rows={modalTriggerApiRows} />
-            <DemoApiTitle>Modal.Close</DemoApiTitle>
+            <PlaygroundApiTable rows={modalContentApiRows} />
+            <DemoApiTitle>Modal.Header</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogHeaderApiRows} />
+            <DemoApiTitle>Modal.Icon</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogIconApiRows} />
+            <DemoApiTitle>Modal.Title · Modal.Description</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogTextApiRows} />
+            <DemoApiTitle>Modal.Body</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogBodyApiRows} />
+            <DemoApiTitle>Modal.Footer</DemoApiTitle>
+            <PlaygroundApiTable rows={dialogFooterApiRows('"fill" для s/m, "end" для l/xl')} />
+            <DemoApiTitle>Modal.Trigger · Modal.Close · Modal.Confirm</DemoApiTitle>
             <DemoDescription>
-              Оборачивает кнопку действия, которая должна закрыть модал (чаще в подвале: «Отмена»,
-              «Готово»).
+              Оборачивают один элемент: Trigger открывает, Close закрывает, Confirm делает кнопку
+              целью Enter.
             </DemoDescription>
-            <PlaygroundApiTable rows={modalCloseApiRows} />
-            <DemoApiTitle>Modal.Panel</DemoApiTitle>
-            <DemoDescription>
-              Единственная оболочка панели: портал, подложка, белая карточка, фокус-ловушка, Escape,
-              скролл-лок, шапка/тело/подвал из пропсов. Ширина панели по умолчанию ограничена
-              вьюпортом в стилях (<code>min(100%, …)</code>) — отдельного режима «адаптивной ширины»
-              не нужно. Без <code>title</code> — только <code>children</code> (например Command Menu
-              с <code>aria-labelledby</code>).
-            </DemoDescription>
-            <PlaygroundApiTable rows={modalPanelApiRows} />
+            <PlaygroundApiTable rows={dialogSlotApiRows} />
           </div>
         </div>
       </PageContent.Body>

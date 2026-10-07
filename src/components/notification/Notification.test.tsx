@@ -1,5 +1,6 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import * as React from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { NotificationProvider, useNotifications } from "./NotificationStore";
 
@@ -11,7 +12,7 @@ function NotificationHarness() {
         type="button"
         onClick={() =>
           notify({
-            type: "info",
+            tone: "info",
             title: "Toast title",
             description: "Toast body",
           })
@@ -23,7 +24,7 @@ function NotificationHarness() {
         type="button"
         onClick={() =>
           notify({
-            type: "warning",
+            tone: "warning",
             title: "Warning title",
             description: "Warning body",
           })
@@ -35,7 +36,7 @@ function NotificationHarness() {
         type="button"
         onClick={() =>
           notify({
-            type: "warning",
+            tone: "warning",
             title: "Persistent title",
             description: "Persistent body",
             persistent: true,
@@ -75,7 +76,7 @@ describe("Notification", () => {
     fireEvent.click(screen.getByRole("button", { name: "push" }));
     expect(await screen.findByText("Toast title")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "dismiss all" }));
-    // Двухфазное удаление: элемент анимируется ~240 мс, затем убирается из DOM
+    // Тесты идут с prefers-reduced-motion: reduce — карточка убирается без exit-анимации
     await waitFor(() => expect(screen.queryByText("Toast title")).not.toBeInTheDocument(), {
       timeout: 800,
     });
@@ -112,7 +113,7 @@ describe("Notification", () => {
     });
   });
 
-  it("different types form separate stacks on the same position", async () => {
+  it("different tones form separate stacks on the same position", async () => {
     render(
       <NotificationProvider max={2}>
         <NotificationHarness />
@@ -128,6 +129,220 @@ describe("Notification", () => {
     await waitFor(() => {
       expect(screen.getAllByText("Toast title")).toHaveLength(2);
       expect(screen.getAllByText("Warning title")).toHaveLength(1);
+    });
+  });
+
+  it("sets data-tone, alert role for warning and labels from the provider", async () => {
+    render(
+      <NotificationProvider
+        labels={{ close: "Hide", regions: { "top-right": "Toasts top right" } }}
+      >
+        <NotificationHarness />
+      </NotificationProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "push warning" }));
+    const card = (await screen.findByText("Warning title")).closest("article");
+    expect(card).toHaveAttribute("data-tone", "warning");
+    expect(card).toHaveAttribute("role", "alert");
+    expect(screen.getByRole("button", { name: "Hide" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Toasts top right" })).toBeInTheDocument();
+  });
+
+  it("defaults tone to info with status role", async () => {
+    function Harness() {
+      const { notify } = useNotifications();
+      return (
+        <button type="button" onClick={() => notify({ title: "Plain" })}>
+          plain
+        </button>
+      );
+    }
+    render(
+      <NotificationProvider>
+        <Harness />
+      </NotificationProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "plain" }));
+    const card = (await screen.findByText("Plain")).closest("article");
+    expect(card).toHaveAttribute("data-tone", "info");
+    expect(card).toHaveAttribute("role", "status");
+  });
+
+  describe("stack motion", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.useRealTimers();
+    });
+
+    function CountingHarness({ position }: { position?: "top-right" | "bottom-left" }) {
+      const { notify, dismiss, items } = useNotifications();
+      const count = React.useRef(0);
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              count.current += 1;
+              notify({ title: `Toast ${count.current}`, position, persistent: true });
+            }}
+          >
+            push
+          </button>
+          <button type="button" onClick={() => items[0] && dismiss(items[0].id)}>
+            dismiss newest
+          </button>
+        </>
+      );
+    }
+
+    function stackItems(name = "Уведомления сверху справа") {
+      return Array.from(screen.getByRole("list", { name }).children) as HTMLElement[];
+    }
+
+    function stubMotion() {
+      vi.stubGlobal("matchMedia", (query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+      }));
+    }
+
+    it("puts the newest card on top and peeks older ones behind it", () => {
+      render(
+        <NotificationProvider>
+          <CountingHarness />
+        </NotificationProvider>,
+      );
+      const push = screen.getByRole("button", { name: "push" });
+      for (let i = 0; i < 4; i += 1) fireEvent.click(push);
+
+      const items = stackItems();
+      const byIndex = (i: number) =>
+        items.find((li) => li.getAttribute("data-stack-index") === String(i)) as HTMLElement;
+
+      expect(byIndex(0)).toHaveTextContent("Toast 4");
+      expect(byIndex(3)).toHaveTextContent("Toast 1");
+      expect(byIndex(0).style.getPropertyValue("--ntf-y")).toBe("0px");
+      expect(byIndex(1).style.getPropertyValue("--ntf-y")).toBe("8px");
+      expect(byIndex(1).style.getPropertyValue("--ntf-scale")).toBe("0.96");
+      expect(byIndex(1).style.getPropertyValue("--ntf-opacity")).toBe("0.72");
+      expect(byIndex(2).style.getPropertyValue("--ntf-opacity")).toBe("0.48");
+      expect(byIndex(3)).toHaveAttribute("data-hidden", "true");
+      expect(byIndex(3).style.getPropertyValue("--ntf-opacity")).toBe("0");
+      expect(byIndex(0)).not.toHaveAttribute("data-hidden");
+    });
+
+    it("peeks upward in bottom stacks", () => {
+      render(
+        <NotificationProvider>
+          <CountingHarness position="bottom-left" />
+        </NotificationProvider>,
+      );
+      const push = screen.getByRole("button", { name: "push" });
+      fireEvent.click(push);
+      fireEvent.click(push);
+      const older = stackItems("Уведомления снизу слева").find(
+        (li) => li.getAttribute("data-stack-index") === "1",
+      );
+      expect(older?.style.getPropertyValue("--ntf-y")).toBe("-8px");
+    });
+
+    it("keeps at most `max` cards per stack, dropping the oldest", () => {
+      render(
+        <NotificationProvider max={3}>
+          <CountingHarness />
+        </NotificationProvider>,
+      );
+      const push = screen.getByRole("button", { name: "push" });
+      for (let i = 0; i < 5; i += 1) fireEvent.click(push);
+      expect(stackItems()).toHaveLength(3);
+      expect(screen.queryByText("Toast 2")).not.toBeInTheDocument();
+      expect(screen.getByText("Toast 5")).toBeInTheDocument();
+    });
+
+    it("expands on hover and collapses after the pointer leaves", () => {
+      vi.useFakeTimers();
+      render(
+        <NotificationProvider>
+          <CountingHarness />
+        </NotificationProvider>,
+      );
+      const push = screen.getByRole("button", { name: "push" });
+      for (let i = 0; i < 4; i += 1) fireEvent.click(push);
+      const list = screen.getByRole("list", { name: "Уведомления сверху справа" });
+
+      fireEvent.mouseEnter(list);
+      expect(list).toHaveAttribute("data-expanded", "true");
+      for (const li of stackItems()) {
+        expect(li).not.toHaveAttribute("data-hidden");
+        expect(li.style.getPropertyValue("--ntf-scale")).toBe("1");
+        expect(li.style.getPropertyValue("--ntf-opacity")).toBe("1");
+      }
+
+      fireEvent.mouseLeave(list);
+      expect(list).toHaveAttribute("data-expanded", "true");
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+      expect(list).toHaveAttribute("data-expanded", "false");
+    });
+
+    it("keeps a dismissed card until its exit animation ends, out of the offsets", () => {
+      stubMotion();
+      render(
+        <NotificationProvider>
+          <CountingHarness />
+        </NotificationProvider>,
+      );
+      const push = screen.getByRole("button", { name: "push" });
+      fireEvent.click(push);
+      fireEvent.click(push);
+      fireEvent.click(screen.getByRole("button", { name: "dismiss newest" }));
+
+      const closing = screen.getByText("Toast 2").closest("li") as HTMLElement;
+      expect(closing).toHaveAttribute("data-state", "closed");
+      const remaining = screen.getByText("Toast 1").closest("li") as HTMLElement;
+      expect(remaining).toHaveAttribute("data-stack-index", "0");
+      expect(remaining.style.getPropertyValue("--ntf-y")).toBe("0px");
+
+      fireEvent.animationEnd(closing.firstElementChild as HTMLElement);
+      expect(screen.queryByText("Toast 2")).not.toBeInTheDocument();
+      expect(screen.getByText("Toast 1")).toBeInTheDocument();
+    });
+
+    it("removes a dismissed card by the token timeout when no animationend arrives", () => {
+      stubMotion();
+      vi.useFakeTimers();
+      render(
+        <NotificationProvider>
+          <CountingHarness />
+        </NotificationProvider>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "push" }));
+      fireEvent.click(screen.getByRole("button", { name: "dismiss newest" }));
+      expect(screen.getByText("Toast 1")).toBeInTheDocument();
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+      expect(screen.queryByText("Toast 1")).not.toBeInTheDocument();
+    });
+
+    it("removes a dismissed card immediately under reduced motion", () => {
+      // The test setup reports `prefers-reduced-motion: reduce`.
+      render(
+        <NotificationProvider>
+          <CountingHarness />
+        </NotificationProvider>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "push" }));
+      fireEvent.click(screen.getByRole("button", { name: "dismiss newest" }));
+      expect(screen.queryByText("Toast 1")).not.toBeInTheDocument();
     });
   });
 });

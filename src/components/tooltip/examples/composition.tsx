@@ -1,38 +1,37 @@
-import { Button, Icon, LinkButton, Tooltip, Typography } from "prime-ui-kit";
+/** Editor toolbar of icon-only buttons: each has an `aria-label`, the tooltip repeats the name and shows the shortcut in Kbd. Use one Tooltip.Provider for a whole toolbar. */
+
+import { Bold, Italic, Link2, List, Underline } from "lucide-react";
+import { Button, Kbd, Tooltip } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-/** Link trigger with rich content; icon-only button with `aria-label` (mirrors `playground/snippets/tooltip/composition.tsx`). */
+const TOOLS = [
+  { icon: Bold, label: "Жирный", keys: "⌘B" },
+  { icon: Italic, label: "Курсив", keys: "⌘I" },
+  { icon: Underline, label: "Подчёркнутый", keys: "⌘U" },
+  { icon: List, label: "Список", keys: "⌘⇧8" },
+  { icon: Link2, label: "Ссылка", keys: "⌘K" },
+] as const;
+
 export default function TooltipCompositionExample() {
   return (
-    <div className={styles.rowWrapXlCenter}>
-      <Tooltip.Provider delayDuration={200}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <LinkButton.Root href="#" onClick={(e) => e.preventDefault()}>
-              Promotion terms
-            </LinkButton.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content>
-            <Typography.Root variant="body-small" as="p" className={styles.tooltipContentP}>
-              Discount applies through month-end on orders over $100.
-            </Typography.Root>
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-
-      <Tooltip.Provider delayDuration={200}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <Button.Root type="button" variant="neutral" mode="ghost" aria-label="Copy link">
-              <Button.Icon>
-                <Icon name="action.copy" size="s" tone="subtle" />
-              </Button.Icon>
-            </Button.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content size="s">Copy link to clipboard</Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-    </div>
+    <Tooltip.Provider delayDuration={300}>
+      <div className={styles.toolbar} role="toolbar" aria-label="Форматирование">
+        {TOOLS.map(({ icon: ToolIcon, label, keys }) => (
+          <Tooltip.Root key={label}>
+            <Tooltip.Trigger>
+              <Button.Root variant="ghost" tone="neutral" size="s" aria-label={label}>
+                <Button.Icon>
+                  <ToolIcon />
+                </Button.Icon>
+              </Button.Root>
+            </Tooltip.Trigger>
+            <Tooltip.Content size="s" side="bottom">
+              {label} <Kbd.Root size="xs">{keys}</Kbd.Root>
+            </Tooltip.Content>
+          </Tooltip.Root>
+        ))}
+      </div>
+    </Tooltip.Provider>
   );
 }

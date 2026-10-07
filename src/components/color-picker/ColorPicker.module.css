@@ -1,275 +1,291 @@
-/* —— Размеры слайдера как у Slider (control-m) —— */
-.slider[data-size="m"] {
-  --slider-root-gap: var(--prime-sys-spacing-x3);
-  --slider-track-h: var(--prime-sys-spacing-xs);
-  --slider-thumb-size: var(--prime-sys-size-control-m-icon);
-  --slider-label-size: var(--prime-sys-size-control-m-text);
-}
+/*
+ * ColorPicker parts (react-aria-components). Inputs follow the field system (Input.module.css):
+ * fill-based, no borders, tier m. Thumbs: thumb-colored ring + overlay shadow, like Slider.
+ * Color surfaces get a subtle inner edge so white / transparent colors stay visible.
+ */
 
-/* ---- Slider (hue / alpha) — внешний вид как у китового Slider ---- */
-.slider {
+/* ---- Panel: vertical layout of the picker; optional raised surface ---- */
+.panel {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--slider-root-gap);
+  gap: var(--prime-space-3);
   width: 100%;
+  min-width: 0;
 }
 
-.slider + .slider {
-  margin-block-start: var(--prime-sys-spacing-x2);
+.panel[data-surface="raised"] {
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  padding: var(--prime-panel-content-padding);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+/* ---- Hue / alpha slider ---- */
+.slider {
+  --cp-track-h: var(--prime-space-3);
+  --cp-thumb: var(--prime-control-m-choice);
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  width: 100%;
+  min-width: 0;
 }
 
 .sliderHeader {
   display: flex;
-  flex-direction: row;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--prime-sys-spacing-x2);
+  gap: var(--prime-space-2);
   width: 100%;
+  min-width: 0;
 }
 
 .sliderLabel {
-  font-size: var(--slider-label-size);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-primary);
+  font-size: var(--prime-control-m-label-size);
+  line-height: var(--prime-control-m-label-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-primary);
 }
 
 .sliderValue {
-  font-size: var(--prime-sys-size-control-s-supportText);
+  font-size: var(--prime-control-m-label-size);
+  line-height: var(--prime-control-m-label-line-height);
   font-variant-numeric: tabular-nums;
-  color: var(--prime-sys-color-content-muted);
+  color: var(--prime-color-text-secondary);
 }
 
 .sliderTrack {
   box-sizing: border-box;
   width: 100%;
-  height: var(--slider-track-h);
-  border-radius: var(--prime-sys-shape-radius-round);
-  outline: none;
+  height: var(--cp-track-h);
+  border-radius: var(--prime-radius-full);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
   cursor: pointer;
-}
-
-.sliderTrack:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-spacing-xs);
 }
 
 .slider[data-disabled] .sliderTrack {
-  opacity: 0.5;
   cursor: not-allowed;
+  filter: grayscale(1);
 }
 
-/* ---- Thumb на слайдере: тот же вид, что у маркера области (.thumbArea) ---- */
-.thumb {
+/* ---- Thumbs (slider + area) ---- */
+.thumb,
+.thumbArea {
   z-index: 2;
   box-sizing: border-box;
-  width: var(--slider-thumb-size);
-  height: var(--slider-thumb-size);
-  border-radius: var(--prime-sys-shape-radius-round);
-  border: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-border-inverse);
-  box-shadow:
-    0 0 0 var(--prime-sys-border-width-control) var(--prime-sys-color-border-strong),
-    var(--prime-sys-elevation-shadow-surface);
-  cursor: pointer;
-  transition: box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  width: var(--cp-thumb, var(--prime-control-m-choice));
+  height: var(--cp-thumb, var(--prime-control-m-choice));
+  border: var(--prime-focus-width) solid var(--prime-color-control-thumb);
+  border-radius: var(--prime-radius-full);
+  box-shadow: var(--prime-shadow-overlay);
+  cursor: grab;
+  transition:
+    width var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    height var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.thumb[data-hovered]:not([data-disabled]) {
-  box-shadow:
-    0 0 0 var(--prime-sys-border-width-control) var(--prime-sys-color-border-strong),
-    var(--prime-sys-elevation-shadow-buttonFocus);
+.thumb[data-dragging],
+.thumbArea[data-dragging] {
+  cursor: grabbing;
 }
 
-.thumb[data-disabled] {
-  opacity: 0.5;
+.thumb[data-focus-visible],
+.thumbArea[data-focus-visible] {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.thumb[data-disabled],
+.thumbArea[data-disabled] {
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-/* RAC задаёт только left + translate(-50%,-50%); без top вертикаль не по центру трека */
+/* RAC sets only left + translate(-50%, -50%); centre vertically on the track. */
 .slider[data-orientation="horizontal"] .thumb {
   top: 50%;
 }
 
-/* ---- Область выбора: маркер с белым кольцом (как в референсе) ---- */
+/* ---- Saturation / lightness area ---- */
 .area {
-  --area-thumb-size: var(--prime-sys-size-control-m-icon);
+  --cp-thumb: var(--prime-control-l-choice);
   box-sizing: border-box;
   width: 100%;
-  min-height: var(--prime-sys-unit-14p5rem);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
-  background-clip: padding-box;
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  outline: none;
-}
-
-.area:focus-visible {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-spacing-xs);
+  aspect-ratio: 4 / 3;
+  border-radius: var(--prime-radius-m);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
 }
 
 .area[data-disabled] {
-  opacity: 0.45;
+  filter: grayscale(1);
   pointer-events: none;
 }
 
-.thumbArea {
-  z-index: 2;
-  box-sizing: border-box;
-  width: var(--area-thumb-size);
-  height: var(--area-thumb-size);
-  border-radius: var(--prime-sys-shape-radius-round);
-  border: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-border-inverse);
-  box-shadow:
-    0 0 0 var(--prime-sys-border-width-control) var(--prime-sys-color-border-strong),
-    var(--prime-sys-elevation-shadow-surface);
-  cursor: pointer;
-  transition: box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-.thumbArea[data-hovered]:not([data-disabled]) {
-  box-shadow:
-    0 0 0 var(--prime-sys-border-width-control) var(--prime-sys-color-border-strong),
-    var(--prime-sys-elevation-shadow-buttonFocus);
-}
-
-.thumbArea[data-disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ---- Селектор формата (стандартный Select на всю ширину) ---- */
+/* ---- Format select ---- */
 .formatSelectWrap {
   display: flex;
+  flex-direction: column;
   width: 100%;
   min-width: 0;
-  flex-direction: column;
 }
 
-/* ---- Полоса: пипетка + сегменты каналов ---- */
+/* ---- Channel strip: eyedropper + equal grid columns, one field per channel ----
+ * Each cell is a field row (foundation §9 "Field affixes"): the value and its unit are one
+ * end-aligned group separated by the compact (xs) tier gap, so number–unit spacing is identical in every cell.
+ * Column widths come from the grid, never from fixed widths on the cells. */
 .channelStrip {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: auto;
+  grid-auto-columns: minmax(0, 1fr);
   align-items: stretch;
+  gap: var(--prime-space-1);
   width: 100%;
-  min-height: var(--prime-sys-size-control-m-height);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
-  background: var(--prime-sys-color-field-bg);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  overflow: hidden;
-}
-
-.channelStrip > * + * {
-  border-inline-start: var(--prime-sys-border-width-control) solid
-    var(--prime-sys-color-border-subtle);
+  min-width: 0;
+  height: var(--prime-control-m-height);
 }
 
 .channelStripLead {
   display: flex;
-  flex-shrink: 0;
-  align-items: stretch;
 }
 
-.channelStrip .channelStripEyedropperBtn.channelStripEyedropperBtn {
-  min-width: var(--prime-sys-size-control-m-height);
-  width: var(--prime-sys-size-control-m-height);
-  height: auto;
-  min-height: 100%;
+.channelStrip .channelStripEyedropperBtn {
+  aspect-ratio: 1;
+  height: 100%;
   padding: 0;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
-}
-
-.channelStrip .channelStripEyedropperBtn.channelStripEyedropperBtn:hover:not(:disabled) {
-  box-shadow: none;
 }
 
 .channelCell {
+  box-sizing: border-box;
   display: flex;
-  flex: 1 1 0;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-sys-spacing-x1);
+  align-items: baseline;
+  align-self: stretch;
+  gap: var(--prime-control-xs-gap);
   min-width: 0;
-  padding-inline: var(--prime-sys-spacing-x2);
+  padding-block: calc((var(--prime-control-m-height) - var(--prime-control-s-line-height)) / 2);
+  padding-inline: var(--prime-space-2) var(--prime-space-1);
+  border-radius: var(--prime-control-m-radius);
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-control-s-text-size);
+  line-height: var(--prime-control-s-line-height);
+  font-variant-numeric: tabular-nums;
+  cursor: text;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.channelCellHex {
-  flex: 1 1 auto;
-  justify-content: flex-start;
-  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
+.channelCell:hover:not(:focus-within) {
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
+}
+
+.channelCell:has(.channelInput:focus-visible) {
+  background: var(--prime-color-field-bg-focus);
+}
+
+/* `focusRing={false}` (data-focus-ring="false") hides only the ring. */
+.channelStrip:not([data-focus-ring="false"]) .channelCell:has(.channelInput:focus-visible) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
 .channelInput {
   box-sizing: border-box;
+  flex: 1 1 auto;
   width: 100%;
   min-width: 0;
-  border: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
   background: transparent;
-  padding-block: var(--prime-sys-spacing-x2);
-  font-size: var(--prime-sys-size-control-s-text);
-  font-variant-numeric: tabular-nums;
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-field-text);
-  text-align: center;
+  color: inherit;
+  font: inherit;
+  text-align: end;
   outline: none;
+}
+
+.channelCellHex {
+  padding-inline: var(--prime-control-s-field-padding-x);
 }
 
 .channelCellHex .channelInput {
   text-align: start;
 }
 
-.channelInput:focus-visible {
-  outline: none;
-}
-
 .channelSuffix {
   flex-shrink: 0;
-  font-size: var(--prime-sys-size-control-s-supportText);
-  color: var(--prime-sys-color-content-muted);
+  color: var(--prime-color-text-muted);
 }
 
 /* ---- Swatches ---- */
 .swatchPicker {
   display: flex;
-  flex-wrap: nowrap;
-  gap: var(--prime-sys-spacing-x2);
+  flex-wrap: wrap;
+  gap: var(--prime-space-2);
   width: 100%;
-  justify-content: flex-start;
-  overflow-x: auto;
-  padding-block-end: var(--prime-sys-spacing-x1);
-  scrollbar-width: thin;
+  min-width: 0;
 }
 
 .swatchItem {
   flex-shrink: 0;
-  cursor: pointer;
-  padding: var(--prime-sys-spacing-x1);
-  border-radius: var(--prime-sys-size-control-s-radius);
+  display: flex;
+  border-radius: var(--prime-radius-full);
   outline: none;
-  transition: background-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  cursor: pointer;
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .swatchItem[data-hovered]:not([data-disabled]) {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
+  transform: scale(1.08);
+}
+
+.swatchItem[data-selected] {
+  outline: var(--prime-focus-width) solid var(--prime-color-accent-default);
+  outline-offset: var(--prime-focus-offset);
 }
 
 .swatchItem[data-focus-visible] {
-  outline: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-spacing-xs);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }
 
+.swatchItem[data-disabled] {
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.swatch {
+  box-sizing: border-box;
+  width: var(--prime-icon-l);
+  height: var(--prime-icon-l);
+  border-radius: var(--prime-radius-full);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
+}
+
+/* ---- Trigger swatch (inside a button) ---- */
 .triggerSwatch {
   position: relative;
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
   box-sizing: border-box;
-  width: var(--prime-sys-unit-1rem);
-  height: var(--prime-sys-unit-1rem);
-  border-radius: var(--prime-sys-shape-radius-s);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  display: inline-block;
+  flex-shrink: 0;
+  /* Follows the host's icon size (Button sets `--prime-icon-size` per tier); m outside a host. */
+  width: var(--prime-icon-size, var(--prime-control-m-icon));
+  height: var(--prime-icon-size, var(--prime-control-m-icon));
+  overflow: hidden;
+  border-radius: var(--prime-radius-xs);
+  vertical-align: middle;
+}
+
+/* Inner edge painted above the color layer. */
+.triggerSwatch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
+  pointer-events: none;
 }
 
 .triggerSwatchSvg {
@@ -280,63 +296,75 @@
   height: 100%;
 }
 
-.swatch {
-  box-sizing: border-box;
-  width: var(--prime-sys-size-control-l-icon);
-  height: var(--prime-sys-size-control-l-icon);
-  border-radius: var(--prime-sys-shape-radius-round);
-  border: var(--prime-sys-border-width-focusRing) solid var(--prime-sys-color-border-inverse);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-}
-
-.swatchItem[data-selected] .swatch {
-  box-shadow: 0 0 0 var(--prime-sys-border-width-focusRing)
-    var(--prime-sys-color-action-primaryBackground);
-}
-
-/* ---- RAC ColorField (опционально) ---- */
-.field :global(.react-aria-Group) {
+/* ---- RAC ColorField (field system, tier m) ---- */
+.field {
   display: flex;
-  align-items: center;
-  min-height: var(--prime-sys-size-control-m-height);
-  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
-  padding-block: var(--prime-sys-size-control-m-inputPaddingY);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
-  background: var(--prime-sys-color-field-bg);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  transition:
-    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-.field :global(.react-aria-Group):focus-within {
-  border-color: var(--prime-sys-color-field-borderFocus);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
-}
-
-.field :global(.react-aria-Input) {
-  flex: 1;
+  flex-direction: column;
+  gap: var(--prime-control-m-label-gap);
   min-width: 0;
-  border: none;
-  background: transparent;
-  font-size: var(--prime-sys-size-control-m-text);
-  font-variant-numeric: tabular-nums;
-  color: var(--prime-sys-color-field-text);
-  outline: none;
 }
 
 .field :global(.react-aria-Label) {
-  margin-inline-end: var(--prime-sys-spacing-x2);
-  font-size: var(--prime-sys-size-control-s-supportText);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-secondary);
-  white-space: nowrap;
+  font-size: var(--prime-control-m-label-size);
+  line-height: var(--prime-control-m-label-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-primary);
 }
 
-/* ---- Пипетка: отдельная квадратная кнопка (вне полосы) ---- */
+.field :global(.react-aria-Input) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: var(--prime-control-m-height);
+  margin: 0;
+  padding-inline: var(--prime-control-m-field-padding-x);
+  border: 0;
+  border-radius: var(--prime-control-m-radius);
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  font-size: var(--prime-control-m-text-size);
+  line-height: var(--prime-control-m-line-height);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.field :global(.react-aria-Input[data-hovered]):not([data-focused]) {
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
+}
+
+.field :global(.react-aria-Input[data-focus-visible]),
+.field :global(.react-aria-Input[data-focused]) {
+  background: var(--prime-color-field-bg-focus);
+}
+
+/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
+.field:not([data-focus-ring="false"]) :global(.react-aria-Input[data-focus-visible]),
+.field:not([data-focus-ring="false"]) :global(.react-aria-Input[data-focused]) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.field[data-invalid] :global(.react-aria-Input) {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.field[data-invalid] :global(.react-aria-Input[data-focused]) {
+  outline-color: var(--prime-color-danger-border);
+}
+
+.field[data-disabled] :global(.react-aria-Input) {
+  background: var(--prime-color-field-bg-disabled);
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ---- Standalone eyedropper: square, same height as a field ---- */
 .eyeDropperSquare {
   flex-shrink: 0;
+  width: var(--prime-control-m-height);
+  min-width: var(--prime-control-m-height);
   padding: 0;
-  min-width: var(--prime-sys-size-control-m-height);
 }

@@ -1,20 +1,12 @@
 import * as React from "react";
 
-import type { InputSize } from "@/internal/states";
+import type { ControlSize } from "@/internal/states";
 
-/** Размер «контрольной поверхности» (поля, кнопки, селект и т.д.) для каскада в дочерние `Icon`. */
-export type ControlSurfaceSize = "xs" | InputSize;
-
-/** Для Badge / Tag / Kbd: в ярусе только s–xl, `xs` с контекста маппится в `s`. */
-export function controlSurfaceToInputSize(surface: ControlSurfaceSize): InputSize {
-  return surface === "xs" ? "s" : surface;
-}
-
-const ControlSizeContext = React.createContext<ControlSurfaceSize | null>(null);
+const ControlSizeContext = React.createContext<ControlSize | null>(null);
 ControlSizeContext.displayName = "ControlSizeContext";
 
 export type ControlSizeProviderProps = {
-  value: ControlSurfaceSize;
+  value: ControlSize;
   children: React.ReactNode;
 };
 
@@ -25,6 +17,6 @@ export function ControlSizeProvider({ value, children }: ControlSizeProviderProp
 ControlSizeProvider.displayName = "ControlSizeProvider";
 
 /** Для `Icon`: если `size` не передан явно, берётся из ближайшего контрола. */
-export function useOptionalControlSize(): ControlSurfaceSize | undefined {
+export function useOptionalControlSize(): ControlSize | undefined {
   return React.useContext(ControlSizeContext) ?? undefined;
 }

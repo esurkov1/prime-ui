@@ -1,37 +1,48 @@
+/**
+ * Primitive layer (`--prime-ref-*`). Raw values only: no meaning, never used by components directly.
+ * Everything that has a role lives in `semantic.ts`.
+ */
 export const primitiveTokens = {
-  /** Цвета: white/black, нейтраль `gray`, палитры 50–950. */
   color: {
-    white: "#f8f7f4",
-    black: "#0f1115",
-    /** Скрим модалок/оверлеев (значения вынесены из семантики). */
-    overlay: {
-      scrimLight: "rgba(15, 17, 21, 0.58)",
-      scrimDark: "rgba(8, 10, 14, 0.78)",
-    },
-    /** Нейтраль: шкала 50–950 + `0` (бумага), альфы для оверлеев. */
+    white: "#ffffff",
+    black: "#000000",
+    /** Graphite: cool neutral, slight blue bias. 0–100 light surfaces, 750–950 dark surfaces. */
     gray: {
-      0: "#f8f7f4",
-      50: "#f3f4f7",
-      100: "#eceef2",
-      200: "#dde1e8",
-      300: "#c7ced9",
-      400: "#9ba6b6",
-      500: "#707c8e",
-      600: "#566174",
-      700: "#3f495a",
-      800: "#2b3342",
-      900: "#1b2230",
-      950: "#121823",
-      alpha10: "rgba(112, 124, 142, 0.10)",
-      alpha16: "rgba(112, 124, 142, 0.16)",
-      alpha24: "rgba(112, 124, 142, 0.24)",
+      0: "#ffffff",
+      25: "#f7f8fa",
+      50: "#f3f4f6",
+      75: "#eef0f3",
+      100: "#e8eaee",
+      150: "#e0e3e8",
+      200: "#d5d9e0",
+      300: "#b9bec8",
+      400: "#949bab",
+      500: "#636a79",
+      600: "#575e6d",
+      700: "#3b4150",
+      750: "#343a44",
+      800: "#2a2f38",
+      825: "#252a32",
+      850: "#20242b",
+      875: "#1b1e25",
+      900: "#16191f",
+      925: "#111318",
+      950: "#0d0f13",
     },
-    /** Акцент (лавандовый): фокус, выделение, ссылки, активные вкладки. */
-    lavender: {
-      300: "#aab4f5",
-      600: "#4f5bd5",
+    /** Cobalt: brand accent. */
+    cobalt: {
+      50: "#f0f2fe",
+      100: "#e6eafd",
+      200: "#cdd5fb",
+      300: "#aab6ff",
+      400: "#93a3ff",
+      500: "#5068f5",
+      600: "#3f59f0",
+      700: "#2f4ae0",
+      800: "#2540c8",
+      900: "#1d33a0",
+      950: "#1b2249",
     },
-    /** Палитра red: шкала 50–950 (ориентир — Tailwind v3). */
     red: {
       50: "#fef2f2",
       100: "#fee2e2",
@@ -45,35 +56,6 @@ export const primitiveTokens = {
       900: "#7f1d1d",
       950: "#450a0a",
     },
-    /** Палитра blue: шкала 50–950 (ориентир — Tailwind v3). */
-    blue: {
-      50: "#eff6ff",
-      100: "#dbeafe",
-      200: "#bfdbfe",
-      300: "#93c5fd",
-      400: "#60a5fa",
-      500: "#3b82f6",
-      600: "#2563eb",
-      700: "#1d4ed8",
-      800: "#1e40af",
-      900: "#1e3a8a",
-      950: "#172554",
-    },
-    /** Палитра green: шкала 50–950 (ориентир — Tailwind v3). */
-    green: {
-      50: "#f0fdf4",
-      100: "#dcfce7",
-      200: "#bbf7d0",
-      300: "#86efac",
-      400: "#4ade80",
-      500: "#22c55e",
-      600: "#16a34a",
-      700: "#15803d",
-      800: "#166534",
-      900: "#14532d",
-      950: "#052e16",
-    },
-    /** Палитра orange: шкала 50–950 (ориентир — Tailwind v3). */
     orange: {
       50: "#fff7ed",
       100: "#ffedd5",
@@ -87,7 +69,6 @@ export const primitiveTokens = {
       900: "#7c2d12",
       950: "#431407",
     },
-    /** Палитра yellow: шкала 50–950 (ориентир — Tailwind v3). */
     yellow: {
       50: "#fefce8",
       100: "#fef9c3",
@@ -101,49 +82,19 @@ export const primitiveTokens = {
       900: "#713f12",
       950: "#422006",
     },
-    /** Палитра purple: шкала 50–950 (ориентир — Tailwind v3). */
-    purple: {
-      50: "#faf5ff",
-      100: "#f3e8ff",
-      200: "#e9d5ff",
-      300: "#d8b4fe",
-      400: "#c084fc",
-      500: "#a855f7",
-      600: "#9333ea",
-      700: "#7e22ce",
-      800: "#6b21a8",
-      900: "#581c87",
-      950: "#3b0764",
+    green: {
+      50: "#f0fdf4",
+      100: "#dcfce7",
+      200: "#bbf7d0",
+      300: "#86efac",
+      400: "#4ade80",
+      500: "#22c55e",
+      600: "#16a34a",
+      700: "#15803d",
+      800: "#166534",
+      900: "#14532d",
+      950: "#052e16",
     },
-    /** Палитра sky: шкала 50–950 (ориентир — Tailwind v3). */
-    sky: {
-      50: "#f0f9ff",
-      100: "#e0f2fe",
-      200: "#bae6fd",
-      300: "#7dd3fc",
-      400: "#38bdf8",
-      500: "#0ea5e9",
-      600: "#0284c7",
-      700: "#0369a1",
-      800: "#075985",
-      900: "#0c4a6e",
-      950: "#082f49",
-    },
-    /** Палитра pink: шкала 50–950 (ориентир — Tailwind v3). */
-    pink: {
-      50: "#fdf2f8",
-      100: "#fce7f3",
-      200: "#fbcfe8",
-      300: "#f9a8d4",
-      400: "#f472b6",
-      500: "#ec4899",
-      600: "#db2777",
-      700: "#be185d",
-      800: "#9d174d",
-      900: "#831843",
-      950: "#500724",
-    },
-    /** Палитра teal: шкала 50–950 (ориентир — Tailwind v3). */
     teal: {
       50: "#f0fdfa",
       100: "#ccfbf1",
@@ -157,227 +108,165 @@ export const primitiveTokens = {
       900: "#134e4a",
       950: "#042f2e",
     },
-  },
-  /** Высота ряда / блока: ось `xs`→`6xl`, шаг **+0.25rem**; в семантике контролы — xs…xl. */
-  size: {
-    xs: "1.75rem",
-    s: "2rem",
-    m: "2.25rem",
-    l: "2.5rem",
-    xl: "2.75rem",
-    "2xl": "3rem",
-    "3xl": "3.25rem",
-    "4xl": "3.5rem",
-    "5xl": "3.75rem",
-    "6xl": "4rem",
-  },
-  /**
-   * Кольцевой прогресс: диаметр в rem (как в макете) и толщина штриха в px.
-   * TS читает те же значения, что и визуальная шкала компонента.
-   */
-  progressCircle: {
-    s: { diameter: "2.5625rem", strokeWidth: "3" },
-    m: { diameter: "3.375rem", strokeWidth: "4" },
-    l: { diameter: "4.25rem", strokeWidth: "5" },
-    xl: { diameter: "5.125rem", strokeWidth: "6" },
-  },
-  /** Отступы: `layout` — сетка макета; `control` — ритм внутри контролов. */
-  spaces: {
-    /** Сетка макета: шаг **0.25rem (4px)**, ось `xs`→`6xl` + `0`; `spacing.x*` — шаги по 4px. */
-    layout: {
-      0: "0",
-      xs: "0.25rem",
-      s: "0.5rem",
-      m: "0.75rem",
-      l: "1rem",
-      xl: "1.25rem",
-      "2xl": "1.5rem",
-      "3xl": "2rem",
-      "4xl": "2.5rem",
-      "5xl": "3rem",
-      "6xl": "3.5rem",
+    sky: {
+      50: "#f0f9ff",
+      100: "#e0f2fe",
+      200: "#bae6fd",
+      300: "#7dd3fc",
+      400: "#38bdf8",
+      500: "#0ea5e9",
+      600: "#0284c7",
+      700: "#0369a1",
+      800: "#075985",
+      900: "#0c4a6e",
+      950: "#082f49",
     },
-    /** Контролы: горизонтальный ритм (`spacing`) и отступ кнопки (`button`). */
-    control: {
-      /** Gap и inputPaddingX: ось `xs`→`6xl`, шаг **+0.125rem**. */
-      spacing: {
-        xs: "0.375rem",
-        s: "0.5rem",
-        m: "0.625rem",
-        l: "0.75rem",
-        xl: "0.875rem",
-        "2xl": "1rem",
-        "3xl": "1.125rem",
-        "4xl": "1.25rem",
-        "5xl": "1.375rem",
-        "6xl": "1.5rem",
-      },
-      /** Padding кнопки: на **+0.125rem** больше соответствующего `spacing.*`. */
-      button: {
-        xs: "0.5rem",
-        s: "0.625rem",
-        m: "0.75rem",
-        l: "0.875rem",
-        xl: "1rem",
-        "2xl": "1.125rem",
-        "3xl": "1.25rem",
-        "4xl": "1.375rem",
-        "5xl": "1.5rem",
-        "6xl": "1.625rem",
-      },
+    purple: {
+      50: "#faf5ff",
+      100: "#f3e8ff",
+      200: "#e9d5ff",
+      300: "#d8b4fe",
+      400: "#c084fc",
+      500: "#a855f7",
+      600: "#9333ea",
+      700: "#7e22ce",
+      800: "#6b21a8",
+      900: "#581c87",
+      950: "#3b0764",
+    },
+    pink: {
+      50: "#fdf2f8",
+      100: "#fce7f3",
+      200: "#fbcfe8",
+      300: "#f9a8d4",
+      400: "#f472b6",
+      500: "#ec4899",
+      600: "#db2777",
+      700: "#be185d",
+      800: "#9d174d",
+      900: "#831843",
+      950: "#500724",
     },
   },
-  /** Скругления: ось `xs`→`6xl` + `circle`; контролы — xs…xl, крупные поверхности — 3xl…6xl. */
+
+  /** 4px grid. Key = number of 4px steps (`4` → 16px). */
+  space: {
+    0: "0",
+    1: "0.25rem",
+    2: "0.5rem",
+    3: "0.75rem",
+    4: "1rem",
+    5: "1.25rem",
+    6: "1.5rem",
+    7: "1.75rem",
+    8: "2rem",
+    9: "2.25rem",
+    10: "2.5rem",
+    12: "3rem",
+    14: "3.5rem",
+    16: "4rem",
+    20: "5rem",
+    24: "6rem",
+  },
+
   radius: {
     0: "0",
-    "2xs": "6px",
-    xs: "8px",
-    s: "10px",
-    m: "11px",
-    l: "12px",
-    xl: "13px",
-    "2xl": "16px",
-    "3xl": "20px",
-    "4xl": "24px",
-    "5xl": "32px",
-    "6xl": "40px",
-    round: "9999px",
+    4: "4px",
+    6: "6px",
+    8: "8px",
+    10: "10px",
+    12: "12px",
+    16: "16px",
+    20: "20px",
+    full: "9999px",
   },
-  /** Иконки и маркеры: ось `xs`→`6xl`, шаг **+0.125rem**. */
-  icon: {
-    xs: "0.75rem",
-    s: "0.875rem",
-    m: "1rem",
-    l: "1.125rem",
-    xl: "1.25rem",
-    "2xl": "1.375rem",
-    "3xl": "1.5rem",
-    "4xl": "1.625rem",
-    "5xl": "1.75rem",
-    "6xl": "1.875rem",
-  },
-  /** Типографика: семейства, кегль, интерлиньяж, вес, трекинг. */
+
   font: {
-    /** Гарнитуры: базовая и моноширинная. */
     family: {
-      base: '"Roboto Flex", "Roboto", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      mono: '"Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
+      sans: '"Golos Text", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+      mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
     },
-    /**
-     * Кегль: ось `3xs`→`6xl` (+0.125rem), плюс **7xl–9xl** под [MD3 type scale](https://m3.material.io/styles/typography/type-scale-tokens)
-     * (Display) и **labelMicro** (11px — Label Small).
-     */
+    /** Modular scale, ~1.2 in the body range, ~1.25 for headings. */
     size: {
-      "3xs": "0.625rem",
-      "2xs": "0.75rem",
-      xs: "0.875rem",
-      s: "1rem",
-      m: "1.125rem",
-      l: "1.25rem",
-      xl: "1.375rem",
-      "2xl": "1.5rem",
-      "3xl": "1.625rem",
-      "4xl": "1.75rem",
-      "5xl": "1.875rem",
-      "6xl": "2rem",
-      "7xl": "2.25rem",
-      "8xl": "2.8125rem",
-      "9xl": "3.5625rem",
-      labelMicro: "0.6875rem",
+      12: "0.75rem",
+      13: "0.8125rem",
+      14: "0.875rem",
+      16: "1rem",
+      18: "1.125rem",
+      20: "1.25rem",
+      24: "1.5rem",
+      30: "1.875rem",
+      36: "2.25rem",
+      48: "3rem",
+      60: "3.75rem",
     },
-    /** Межстрочный интервал под шкалу `font.size.*`. */
     lineHeight: {
-      "3xs": "0.875rem",
-      "2xs": "1rem",
-      xs: "1.125rem",
-      s: "1.25rem",
-      m: "1.375rem",
-      l: "1.5rem",
-      xl: "1.625rem",
-      "2xl": "1.75rem",
-      "3xl": "1.875rem",
-      "4xl": "2rem",
-      "5xl": "2.125rem",
-      "6xl": "2.25rem",
-      "7xl": "2.5rem",
-      "8xl": "3.125rem",
-      "9xl": "4rem",
-      labelMicro: "1rem",
+      16: "1rem",
+      20: "1.25rem",
+      24: "1.5rem",
+      28: "1.75rem",
+      32: "2rem",
+      36: "2.25rem",
+      44: "2.75rem",
+      56: "3.5rem",
+      68: "4.25rem",
     },
-    /** Начертания (числовые веса шрифта). */
     weight: {
       regular: "400",
       medium: "500",
       semibold: "600",
-      bold: "700",
     },
-    /** Межбуквенный интервал (em). */
-    letterSpacing: {
+    tracking: {
+      tightest: "-0.03em",
       tighter: "-0.02em",
       tight: "-0.01em",
       normal: "0",
-      wide: "0.04em",
-      wider: "0.06em",
+      wide: "0.01em",
+      caps: "0.06em",
     },
   },
-  /** Тени: ось `xs`→`6xl`, усиление с размером. */
-  shadow: {
-    xs: "0 2px 4px rgba(15, 17, 21, 0.08)",
-    s: "0 4px 8px rgba(15, 17, 21, 0.1)",
-    m: "0 8px 16px rgba(15, 17, 21, 0.14)",
-    l: "0 16px 32px rgba(15, 17, 21, 0.2)",
-    xl: "0 24px 48px rgba(15, 17, 21, 0.24)",
-    "2xl": "0 32px 64px rgba(15, 17, 21, 0.26)",
-    "3xl": "0 40px 80px rgba(15, 17, 21, 0.28)",
-    "4xl": "0 48px 96px rgba(15, 17, 21, 0.3)",
-    "5xl": "0 56px 112px rgba(15, 17, 21, 0.32)",
-    "6xl": "0 64px 128px rgba(15, 17, 21, 0.34)",
+
+  icon: {
+    14: "0.875rem",
+    16: "1rem",
+    20: "1.25rem",
+    24: "1.5rem",
+    32: "2rem",
   },
-  /** Движение: длительности и кривые easing. */
-  motion: {
-    /** Длительности по смыслу (не ось размеров). */
-    duration: {
-      fast: "200ms",
-      medium: "350ms",
-      slow: "500ms",
-    },
-    /** Кривые сглаживания. */
-    easing: {
-      standard: "cubic-bezier(0.2, 0, 0, 1)",
-    },
+
+  duration: {
+    0: "0ms",
+    100: "100ms",
+    120: "120ms",
+    200: "200ms",
+    300: "300ms",
+    400: "400ms",
   },
-  /**
-   * Z-index: именованные роли слоёв (не ось размеров). Интервалы с запасом.
-   *
-   * Глобальная страница: base → sticky → popover → dropdown → tooltip.
-   * Блокирующие оболочки: drawer (ниже) → modal (выше). Порталы на `body` внутри drawer/modal
-   * используют отдельные уровни (`*InDrawer`, `*InModal`, `*InDrawerInModal`), см. `OverlayPortalLayerContext`.
-   *
-   * Drawer внутри modal: оболочка `drawerNestedShell` выше `modal`; порталы внутри — ещё выше.
-   * Тосты — поверх всех перечисленных слоёв.
-   */
+  easing: {
+    standard: "cubic-bezier(0.2, 0, 0, 1)",
+    enter: "cubic-bezier(0, 0, 0, 1)",
+    exit: "cubic-bezier(0.3, 0, 1, 1)",
+  },
+
+  /** Stacking order. In-overlay layers sit above their host so nested portals stay on top. */
   zIndex: {
-    base: "10",
+    base: "1",
     sticky: "100",
     popover: "1000",
     dropdown: "1200",
     tooltip: "1600",
-    /** `Drawer`, mobile fullscreen `Sidebar` — ниже модалки. */
     drawer: "2000",
-    /** `Modal` (оверлей + диалог), CommandMenu — поверх drawer. */
-    modal: "3000",
     popoverInDrawer: "2100",
     dropdownInDrawer: "2200",
     tooltipInDrawer: "2300",
+    modal: "3000",
     popoverInModal: "3100",
     dropdownInModal: "3200",
     tooltipInModal: "3300",
-    /** Оверлей и панель `Drawer`, открытого поверх `Modal`. */
     drawerNestedShell: "3400",
     popoverInDrawerInModal: "3500",
     dropdownInDrawerInModal: "3600",
     tooltipInDrawerInModal: "3700",
-    /** Выше модалок и вложенных порталов — очередь тостов. */
     toast: "10000",
   },
 } as const;

@@ -1,22 +1,23 @@
+/** A controlled group with value and onValueChange driving a caption. Use it when the selection changes other content on the page. */
 import { SegmentedControl, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./segmented-examples.module.css";
+import styles from "./examples.module.css";
 
-/** Controlled selection with `value` and `onValueChange` (mirrors playground/snippets/segmented/controlled). */
-export default function SegmentedControlledExample() {
-  const [controlled, setControlled] = React.useState("week");
+const LABELS: Record<string, string> = { day: "за день", week: "за неделю", month: "за месяц" };
+
+export default function SegmentedControlControlledExample() {
+  const [period, setPeriod] = React.useState("week");
 
   return (
-    <div className={styles.demoStack}>
-      <SegmentedControl.Root value={controlled} onValueChange={setControlled}>
-        <SegmentedControl.Item value="day">Day</SegmentedControl.Item>
-        <SegmentedControl.Item value="week">Week</SegmentedControl.Item>
-        <SegmentedControl.Item value="month">Month</SegmentedControl.Item>
+    <div className={styles.cell}>
+      <SegmentedControl.Root value={period} onValueChange={setPeriod} aria-label="Период отчёта">
+        <SegmentedControl.Item value="day">День</SegmentedControl.Item>
+        <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+        <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
       </SegmentedControl.Root>
-      <Typography.Root as="p" variant="body-compact" tone="muted" className={styles.demoCaption}>
-        Selected: <strong>{controlled}</strong> — state is held in React (<code>value</code> +{" "}
-        <code>onValueChange</code>).
+      <Typography.Root variant="caption" tone="muted">
+        Показываем выручку {LABELS[period]}
       </Typography.Root>
     </div>
   );

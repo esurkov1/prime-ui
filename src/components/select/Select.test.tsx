@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -11,7 +12,7 @@ function BasicSelect({
   value,
   onChange,
   disabled,
-  hasError,
+  invalid,
   placeholder = "Pick one",
   size,
 }: {
@@ -19,17 +20,17 @@ function BasicSelect({
   value?: string;
   onChange?: (v: string) => void;
   disabled?: boolean;
-  hasError?: boolean;
+  invalid?: boolean;
   placeholder?: string;
   size?: "s" | "m" | "l" | "xl";
 }) {
   return (
     <Select.Root
+      invalid={invalid}
       defaultValue={defaultValue}
       value={value}
-      onChange={onChange}
+      onValueChange={onChange}
       disabled={disabled}
-      hasError={hasError}
       placeholder={placeholder}
       size={size}
     >
@@ -214,7 +215,7 @@ describe("Select (composable)", () => {
   it("controlled: external value change does not keep stale item label (e.g. __none__ → id)", async () => {
     const noop = vi.fn();
     const { rerender } = render(
-      <Select.Root value="__none__" onChange={noop} placeholder="Pick">
+      <Select.Root value="__none__" onValueChange={noop} placeholder="Pick">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -231,7 +232,7 @@ describe("Select (composable)", () => {
     });
 
     rerender(
-      <Select.Root value="two" onChange={noop} placeholder="Pick">
+      <Select.Root value="two" onValueChange={noop} placeholder="Pick">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -252,7 +253,7 @@ describe("Select (composable)", () => {
   it("controlled: rapid external value changes resolve to final label", async () => {
     const noop = vi.fn();
     const { rerender } = render(
-      <Select.Root value="one" onChange={noop} placeholder="Pick">
+      <Select.Root value="one" onValueChange={noop} placeholder="Pick">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -264,7 +265,7 @@ describe("Select (composable)", () => {
     );
 
     rerender(
-      <Select.Root value="two" onChange={noop} placeholder="Pick">
+      <Select.Root value="two" onValueChange={noop} placeholder="Pick">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -275,7 +276,7 @@ describe("Select (composable)", () => {
       </Select.Root>,
     );
     rerender(
-      <Select.Root value="one" onChange={noop} placeholder="Pick">
+      <Select.Root value="one" onValueChange={noop} placeholder="Pick">
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
@@ -295,7 +296,7 @@ describe("Select (composable)", () => {
     const noop = vi.fn();
     render(
       <React.StrictMode>
-        <Select.Root value="two" onChange={noop} placeholder="Pick">
+        <Select.Root value="two" onValueChange={noop} placeholder="Pick">
           <Select.Trigger>
             <Select.Value />
           </Select.Trigger>
@@ -339,9 +340,9 @@ describe("Select (composable)", () => {
     expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 
-  it("hasError sets data-has-error on trigger", () => {
-    render(<BasicSelect hasError />);
-    expect(screen.getByRole("combobox")).toHaveAttribute("data-has-error", "true");
+  it("invalid sets data-invalid on trigger", () => {
+    render(<BasicSelect invalid />);
+    expect(screen.getByRole("combobox")).toHaveAttribute("data-invalid", "true");
   });
 
   it("size variant sets data-size on trigger", () => {
@@ -360,7 +361,7 @@ describe("Select (composable)", () => {
     fireEvent.click(screen.getByRole("combobox"));
     expect(screen.getByRole("listbox")).toBeInTheDocument();
 
-    fireEvent.mouseDown(screen.getByRole("button", { name: "Outside" }));
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Outside" }));
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 
@@ -470,7 +471,7 @@ describe("Select (multiple combobox)", () => {
         multiple
         value={value}
         defaultValue={defaultValue}
-        onChange={onChange}
+        onValueChange={onChange}
         placeholder="Pick"
       >
         <Select.Trigger aria-label="Multi">
@@ -531,7 +532,7 @@ describe("Select (native)", () => {
   it("fires onChange when native select value changes", () => {
     const onChange = vi.fn();
     render(
-      <Select.Root native placeholder="Pick" onChange={onChange}>
+      <Select.Root native placeholder="Pick" onValueChange={onChange}>
         <Select.Content>
           <Select.Item value="a">A</Select.Item>
           <Select.Item value="b">B</Select.Item>
@@ -540,5 +541,385 @@ describe("Select (native)", () => {
     );
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "b" } });
     expect(onChange).toHaveBeenCalledWith("b");
+  });
+
+  it("forwards id and accessible name props to the native select", () => {
+    render(
+      <>
+        <span id="native-label">Город</span>
+        <Select.Root native id="city" name="city" aria-labelledby="native-label">
+          <Select.Item value="a">A</Select.Item>
+        </Select.Root>
+        <Select.Root native aria-label="Страна">
+          <Select.Item value="b">B</Select.Item>
+        </Select.Root>
+      </>,
+    );
+    const city = screen.getByRole("combobox", { name: "Город" });
+    expect(city).toHaveAttribute("id", "city");
+    expect(city).toHaveAttribute("name", "city");
+    expect(screen.getByRole("combobox", { name: "Страна" })).toBeInTheDocument();
+  });
+});
+
+describe("Select (search, clear, loading, empty)", () => {
+  function SearchSelect(props: { onValueChange?: (v: string) => void; loading?: boolean }) {
+    return (
+      <Select.Root
+        placeholder="Город"
+        clearable
+        defaultValue="msk"
+        labels={{ search: "Найти город" }}
+        {...props}
+      >
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content searchable>
+          <Select.Group>
+            <Select.GroupLabel>Россия</Select.GroupLabel>
+            <Select.Item value="msk">Москва</Select.Item>
+            <Select.Item value="spb" keywords="питер">
+              Санкт-Петербург
+            </Select.Item>
+          </Select.Group>
+        </Select.Content>
+      </Select.Root>
+    );
+  }
+
+  it("фильтрует пункты по строке поиска и ключевым словам", () => {
+    render(<SearchSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const search = screen.getByRole("textbox", { name: "Найти город" });
+    fireEvent.change(search, { target: { value: "питер" } });
+    expect(screen.getByRole("option", { name: "Санкт-Петербург" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Москва" })).not.toBeInTheDocument();
+  });
+
+  it("показывает пустое состояние, когда ничего не найдено", () => {
+    render(<SearchSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Найти город" }), {
+      target: { value: "zzz" },
+    });
+    expect(screen.queryAllByRole("option")).toHaveLength(0);
+    expect(screen.getByText("Ничего не найдено")).toBeInTheDocument();
+  });
+
+  it("Enter в поиске выбирает первый найденный пункт", async () => {
+    const onChange = vi.fn();
+    render(<SearchSelect onValueChange={onChange} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const search = screen.getByRole("textbox", { name: "Найти город" });
+    fireEvent.change(search, { target: { value: "санкт" } });
+    await waitFor(() =>
+      expect(screen.getByRole("option", { name: "Санкт-Петербург" })).toHaveAttribute(
+        "data-highlighted",
+        "true",
+      ),
+    );
+    fireEvent.keyDown(search, { key: "Enter" });
+    expect(onChange).toHaveBeenCalledWith("spb");
+  });
+
+  it("clearable: Delete на триггере сбрасывает значение", () => {
+    const onChange = vi.fn();
+    render(<SearchSelect onValueChange={onChange} />);
+    const trigger = screen.getByRole("combobox");
+    fireEvent.keyDown(trigger, { key: "Delete" });
+    expect(onChange).toHaveBeenCalledWith("");
+    expect(trigger).toHaveTextContent("Город");
+  });
+
+  it("controlled open: onOpenChange reports the trigger toggle", () => {
+    const onOpenChange = vi.fn();
+    const { rerender } = render(
+      <Select.Root open={false} onOpenChange={onOpenChange}>
+        <Select.Trigger aria-label="Город">
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="a">A</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole("combobox");
+    fireEvent.click(trigger);
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(trigger).toHaveAttribute("data-state", "closed");
+    rerender(
+      <Select.Root open onOpenChange={onOpenChange}>
+        <Select.Trigger aria-label="Город">
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="a">A</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    expect(trigger).toHaveAttribute("data-state", "open");
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("loading: aria-busy на триггере и строка загрузки в панели", () => {
+    render(<SearchSelect loading />);
+    const trigger = screen.getByRole("combobox");
+    expect(trigger).toHaveAttribute("aria-busy", "true");
+    fireEvent.click(trigger);
+    expect(screen.getByText("Загрузка…")).toBeInTheDocument();
+  });
+});
+
+describe("Select (field)", () => {
+  it("label, hint and error: label names the trigger, error replaces hint and implies invalid", () => {
+    const { rerender } = render(
+      <Select.Root label="Город" hint="Подсказка" required>
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="a">A</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole("combobox", { name: /Город/ });
+    expect(trigger).toHaveAttribute("aria-required", "true");
+    expect(trigger).toHaveAccessibleDescription("Подсказка");
+    expect(trigger).not.toHaveAttribute("aria-invalid");
+
+    rerender(
+      <Select.Root label="Город" hint="Подсказка" error="Выберите город">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="a">A</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    expect(trigger).toHaveAccessibleDescription("Выберите город");
+    expect(trigger).toHaveAttribute("aria-invalid", "true");
+    expect(trigger).toHaveAttribute("data-invalid", "true");
+    expect(screen.queryByText("Подсказка")).not.toBeInTheDocument();
+  });
+
+  it("native: label and error are wired to the <select>", () => {
+    render(
+      <Select.Root native label="Страна" error="Обязательно">
+        <Select.Item value="a">A</Select.Item>
+      </Select.Root>,
+    );
+    const select = screen.getByRole("combobox", { name: /Страна/ });
+    expect(select).toHaveAttribute("aria-invalid", "true");
+    expect(select).toHaveAccessibleDescription("Обязательно");
+  });
+});
+
+describe("Select focusRing", () => {
+  it("focusRing={false} marks the trigger and keeps the invalid state", () => {
+    render(
+      <Select.Root focusRing={false} invalid placeholder="Pick">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content searchable>
+          <Select.Item value="one">One</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole("combobox");
+    expect(trigger).toHaveAttribute("data-focus-ring", "false");
+    expect(trigger).toHaveAttribute("data-invalid", "true");
+    expect(trigger).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("the panel search row never draws a ring", () => {
+    render(
+      <Select.Root placeholder="Pick">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content searchable>
+          <Select.Item value="one">One</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    expect(screen.getByRole("combobox")).not.toHaveAttribute("data-focus-ring");
+    fireEvent.click(screen.getByRole("combobox"));
+    expect(screen.getByRole("textbox").parentElement).toHaveAttribute("data-focus-ring", "false");
+  });
+});
+
+describe("Select — overlay contract", () => {
+  // Focus follows the pointer (foundation §8): an outside press closes the listbox and does NOT
+  // pull focus back to the trigger — empty space leaves nothing focused, another control takes it.
+  // (Earlier the trigger got focus back, so leaving a field took two clicks.)
+  it("an outside click on empty space closes the listbox and leaves nothing focused", async () => {
+    const user = userEvent.setup();
+    render(
+      <div>
+        <BasicSelect />
+        <div data-testid="empty-space">empty</div>
+      </div>,
+    );
+    const trigger = screen.getByRole("combobox");
+    await user.click(trigger);
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+    await user.click(screen.getByTestId("empty-space"));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(trigger).not.toHaveFocus();
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it("an outside click on another control moves focus to that control", async () => {
+    const user = userEvent.setup();
+    render(
+      <div>
+        <BasicSelect />
+        <button type="button">Другая кнопка</button>
+      </div>,
+    );
+    await user.click(screen.getByRole("combobox"));
+    const other = screen.getByRole("button", { name: "Другая кнопка" });
+    await user.click(other);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(other).toHaveFocus();
+  });
+
+  it("Escape closes the listbox and returns focus to the trigger", () => {
+    render(<BasicSelect />);
+    const trigger = screen.getByRole("combobox");
+    fireEvent.click(trigger);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+});
+
+// ─── Rich options, badge, typeahead ─────────────────────────────────────────
+
+const VEHICLES = [
+  { value: "nmax", title: "Yamaha NMAX 155", kind: "Скутер", price: "250 ฿ / день" },
+  { value: "adv160", title: "Honda ADV 160", kind: "Скутер", price: "300 ฿ / день" },
+  { value: "adv350", title: "Honda ADV 350", kind: "Максискутер", price: "450 ฿ / день" },
+];
+
+function RichSelect({ defaultValue }: { defaultValue?: string }) {
+  return (
+    <Select.Root defaultValue={defaultValue} placeholder="Выберите байк" label="Байк">
+      <Select.Trigger>
+        <Select.Value>
+          {({ value, label }) => {
+            const v = VEHICLES.find((x) => x.value === value);
+            return (
+              <>
+                <Select.ItemMedia color="green">M</Select.ItemMedia>
+                <Select.ItemText>{label}</Select.ItemText>
+                <Select.ItemDescription>{`${v?.kind} · ${v?.price}`}</Select.ItemDescription>
+              </>
+            );
+          }}
+        </Select.Value>
+        <Select.Badge color="orange">Новое</Select.Badge>
+      </Select.Trigger>
+      <Select.Content searchable>
+        {VEHICLES.map((v) => (
+          <Select.Item key={v.value} value={v.value}>
+            <Select.ItemMedia color="blue">M</Select.ItemMedia>
+            <Select.ItemText>{v.title}</Select.ItemText>
+            <Select.ItemDescription>{v.kind}</Select.ItemDescription>
+            <Select.ItemMeta>{v.price}</Select.ItemMeta>
+          </Select.Item>
+        ))}
+      </Select.Content>
+    </Select.Root>
+  );
+}
+
+describe("Select rich options", () => {
+  it("rich item: title is the label, two-line layout, meta before the check", () => {
+    render(<RichSelect defaultValue="adv160" />);
+    const option = screen.getByRole("option", { name: /Honda ADV 160/, hidden: true });
+    expect(option).toHaveAttribute("data-label", "Honda ADV 160");
+    expect(option).toHaveAttribute("data-rich", "true");
+    const meta = option.querySelector('[class*="itemMeta"]');
+    expect(meta?.textContent).toBe("300 ฿ / день");
+    expect(meta?.nextElementSibling?.className).toMatch(/itemCheckSlot/);
+  });
+
+  it("trigger renders the selected option through the Value render function", async () => {
+    render(<RichSelect defaultValue="adv160" />);
+    const trigger = screen.getByRole("combobox");
+    await waitFor(() => expect(trigger).toHaveTextContent("Honda ADV 160"));
+    expect(trigger).toHaveTextContent("Скутер · 300 ฿ / день");
+    expect(trigger.querySelector('[data-rich="true"]')).not.toBeNull();
+  });
+
+  it("empty rich trigger shows the placeholder, not the render function", () => {
+    render(<RichSelect />);
+    const trigger = screen.getByRole("combobox");
+    expect(trigger).toHaveTextContent("Выберите байк");
+    expect(trigger.querySelector('[data-rich="true"]')).toBeNull();
+  });
+
+  it("Select.Badge renders a soft badge one tier down inside the trigger", () => {
+    render(<RichSelect />);
+    const badge = screen.getByText("Новое");
+    expect(screen.getByRole("combobox")).toContainElement(badge);
+    expect(badge).toHaveAttribute("data-variant", "soft");
+    expect(badge).toHaveAttribute("data-color", "orange");
+    expect(badge).toHaveAttribute("data-tier", "s");
+  });
+
+  it("search matches the description too", () => {
+    render(<RichSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Поиск" }), {
+      target: { value: "максискутер" },
+    });
+    const options = screen.getAllByRole("option");
+    expect(options.map((o) => o.dataset.value)).toEqual(["adv350"]);
+  });
+
+  it("single-line items keep the plain layout", () => {
+    render(<BasicSelect />);
+    for (const option of screen.getAllByRole("option", { hidden: true })) {
+      expect(option).not.toHaveAttribute("data-rich");
+    }
+  });
+});
+
+describe("Select typeahead", () => {
+  it("a letter highlights the next option whose title starts with it; repeats cycle", () => {
+    render(<RichSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const panel = screen.getByRole("listbox");
+    fireEvent.keyDown(panel, { key: "h" });
+    const highlighted = () =>
+      screen.getAllByRole("option").find((o) => o.dataset.highlighted === "true")?.dataset.value;
+    expect(highlighted()).toBe("adv160");
+    fireEvent.keyDown(panel, { key: "h" });
+    expect(highlighted()).toBe("adv350");
+    fireEvent.keyDown(panel, { key: "h" });
+    expect(highlighted()).toBe("adv160");
+  });
+
+  it("typed prefix narrows to the matching title", () => {
+    vi.useFakeTimers();
+    try {
+      render(<RichSelect />);
+      fireEvent.click(screen.getByRole("combobox"));
+      const panel = screen.getByRole("listbox");
+      /* Space inside a typed prefix is part of the query, not «select». */
+      for (const key of "honda adv 3") fireEvent.keyDown(panel, { key });
+      const value = screen.getAllByRole("option").find((o) => o.dataset.highlighted === "true")
+        ?.dataset.value;
+      expect(value).toBe("adv350");
+      expect(screen.getByRole("combobox")).toHaveAttribute("aria-expanded", "true");
+      vi.advanceTimersByTime(600);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

@@ -1,0 +1,243 @@
+/*
+ * Header / body / footer of Modal and Drawer. Every zone owns its side padding
+ * (`--dialog-padding`, set by Modal.Content / Drawer.Content): the scrolling body keeps it inside
+ * the scroll box, so focus rings of edge-to-edge fields are never clipped (foundation §7).
+ * Header and footer are separated by a faint hairline (a 1px background line inset by the same padding):
+ *
+ *   header  24 top · 20 bottom
+ *   ─────── body 20 · gap 16 (scrolls)
+ *   ─────── footer 20 top · 24 bottom
+ */
+
+/* ─── Shell ──────────────────────────────────────────────────────────────── */
+
+/* Applied by Modal.Content and Drawer.Content next to their own surface class. */
+.shell {
+  --dialog-hairline: linear-gradient(
+    var(--prime-color-border-faint),
+    var(--prime-color-border-faint)
+  );
+  --dialog-hairline-size: calc(100% - 2 * var(--dialog-padding)) var(--prime-border-width);
+
+  container: prime-dialog / inline-size;
+  /* Surface context: nested cards become sunken tiles without shadow (foundation §4). */
+  --prime-color-card-bg: var(--prime-color-bg-sunken);
+  --prime-card-shadow: none;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+
+/*
+ * Grid, not markup order: icon | title + description | close always share one row,
+ * whatever order the children come in.
+ */
+.header {
+  display: grid;
+  flex: 0 0 auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--prime-space-4);
+  row-gap: var(--prime-space-1);
+  min-width: 0;
+  padding: var(--prime-space-6) var(--dialog-padding) var(--prime-space-5);
+}
+
+/* Faint inset hairline under the header when a body or footer follows. */
+.header:not(:last-child) {
+  background: var(--dialog-hairline) center bottom / var(--dialog-hairline-size) no-repeat;
+}
+
+.header:has(> .icon) {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+/* Title, description and any custom text sit in the text column (second from the end). */
+.header > :not(.icon, .close) {
+  grid-column: -3 / -2;
+}
+
+/*
+ * With a description the block is 24 + 4 + 20 = 48: the 40px icon box is offset to sit centered
+ * against a one-line description and stays at the top when the description wraps.
+ */
+.header[data-has-description="true"] {
+  align-items: start;
+}
+
+/* Header alone closes with the dialog's 24px rhythm. */
+.header:last-child {
+  padding-block-end: var(--prime-space-6);
+}
+
+.icon {
+  --prime-icon-size: var(--prime-icon-m);
+
+  grid-column: 1;
+  grid-row: 1;
+
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-space-10);
+  height: var(--prime-space-10);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+}
+
+.header[data-has-description="true"] > .icon {
+  grid-row: 1 / span 2;
+  margin-block-start: calc(
+    (
+      var(--prime-text-title-m-line-height) +
+      var(--prime-space-1) +
+      var(--prime-text-body-s-line-height) -
+      var(--prime-space-10)
+    ) /
+    2
+  );
+}
+
+/* Raw SVG children (lucide etc.) follow the icon tier too. */
+.icon > svg {
+  flex: 0 0 auto;
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+}
+
+.icon[data-tone="accent"] {
+  background: var(--prime-color-accent-soft);
+  color: var(--prime-color-accent-text);
+}
+
+.icon[data-tone="success"] {
+  background: var(--prime-color-success-soft);
+  color: var(--prime-color-success-text);
+}
+
+.icon[data-tone="warning"] {
+  background: var(--prime-color-warning-soft);
+  color: var(--prime-color-warning-text);
+}
+
+.icon[data-tone="danger"] {
+  background: var(--prime-color-danger-soft);
+  color: var(--prime-color-danger-text);
+}
+
+.icon[data-tone="info"] {
+  background: var(--prime-color-info-soft);
+  color: var(--prime-color-info-text);
+}
+
+.title {
+  margin: 0;
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-title-m-size);
+  line-height: var(--prime-text-title-m-line-height);
+  font-weight: var(--prime-text-title-m-weight);
+  letter-spacing: var(--prime-text-title-m-tracking);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.description {
+  margin: 0;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-text-body-s-weight);
+  overflow-wrap: anywhere;
+}
+
+/*
+ * Square ghost close (tier s). With a description it hangs from the top, centered on the title's
+ * first line; the inline pull puts the glyph on the content edge.
+ */
+.close {
+  grid-column: -2 / -1;
+  grid-row: 1;
+  width: var(--prime-control-s-height);
+  min-width: var(--prime-control-s-height);
+  padding-inline: 0;
+  margin-inline-end: calc(-1 * var(--prime-space-2));
+}
+
+.header[data-has-description="true"] > .close {
+  margin-block: calc((var(--prime-text-title-m-line-height) - var(--prime-control-s-height)) / 2);
+}
+
+/* ─── Body ───────────────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--prime-space-5) var(--dialog-padding);
+  overflow-wrap: anywhere;
+}
+
+/* Headless dialog: full 24px top. */
+.body:first-child {
+  padding-block-start: var(--prime-space-6);
+}
+
+.body:last-child {
+  padding-block-end: var(--prime-space-6);
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+
+.footer {
+  display: grid;
+  flex: 0 0 auto;
+  align-items: center;
+  min-width: 0;
+  padding: var(--prime-space-5) var(--dialog-padding) var(--prime-space-6);
+}
+
+/* Footer after a body gets the hairline above it (after a header the header already draws one). */
+.footer:not(:first-child):not(.header + .footer) {
+  background: var(--dialog-hairline) center top / var(--dialog-hairline-size) no-repeat;
+}
+
+.footer:first-child {
+  padding-block-start: var(--prime-space-6);
+}
+
+/* Equal-width actions in one row. */
+.footer[data-layout="fill"] {
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--prime-space-3);
+}
+
+.footer[data-layout="fill"] > * {
+  width: 100%;
+}
+
+/* Auto-width actions, right-aligned. */
+.footer[data-layout="end"] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+}
+
+/* Dialog narrower than 360px: one action per row, full width, DOM order (primary last). */
+@container prime-dialog (max-width: 359px) {
+  .footer[data-layout] {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--prime-space-2);
+  }
+
+  .footer[data-layout] > * {
+    width: 100%;
+  }
+}

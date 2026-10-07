@@ -1,17 +1,25 @@
+/** Controlled `value` + `onValueChange` with the text length passed to `Textarea.Counter`. Use it for length-limited text such as reviews. */
 import { Textarea } from "prime-ui-kit";
 import * as React from "react";
 
-/** Parent-owned `value` / `onChange`; character count in `Textarea.Hint`. */
+import styles from "./examples.module.css";
+
+const MAX = 280;
+
 export default function TextareaControlledExample() {
-  const [notes, setNotes] = React.useState("Draft text is stored in parent state.");
+  const [text, setText] = React.useState("Курьер приехал раньше срока, всё целое.");
 
   return (
-    <Textarea.Root
-      value={notes}
-      onChange={(e) => setNotes(e.target.value)}
-      placeholder="Type here…"
-    >
-      <Textarea.Hint>Characters: {notes.length}</Textarea.Hint>
-    </Textarea.Root>
+    <div className={styles.column}>
+      <Textarea.Root
+        label="Отзыв о доставке"
+        value={text}
+        onValueChange={setText}
+        maxLength={MAX}
+        placeholder="Что понравилось, что нет"
+        hint="Отзыв появится после модерации."
+        counter={<Textarea.Counter current={text.length} max={MAX} />}
+      />
+    </div>
   );
 }

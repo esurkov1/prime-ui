@@ -1,37 +1,42 @@
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
-}
+/* Example layout: semantic tokens only. */
 
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--prime-sys-spacing-m);
-}
-
-.muted {
-  margin: 0;
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.controlledColumn {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x2);
+.sizesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 2)), 1fr));
+  align-items: end;
+  gap: var(--prime-space-6) var(--prime-space-5);
   width: 100%;
-  max-width: 20rem;
-  box-sizing: border-box;
 }
 
-.valueHint {
-  margin: 0;
-  font-size: var(--prime-sys-typography-sizeScale-xs);
-  line-height: var(--prime-sys-typography-lineHeightScale-xs);
-  color: var(--prime-sys-color-content-secondary);
+.column {
+  display: grid;
+  gap: var(--prime-space-5);
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
 }
 
-.narrowColumn {
-  width: min(12rem, 100%);
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
+  align-items: end;
+  gap: var(--prime-space-6) var(--prime-space-5);
+  width: 100%;
+  max-width: var(--prime-modal-width-m);
+}
+
+.withInput {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--prime-space-24);
+  align-items: end;
+  gap: var(--prime-space-4);
+}
+
+.card {
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+}
+
+.settings {
+  display: grid;
+  gap: var(--prime-space-6);
 }

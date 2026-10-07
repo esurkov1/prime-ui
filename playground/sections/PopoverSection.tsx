@@ -1,4 +1,22 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import PopoverAsChildExample from "@/components/popover/examples/as-child";
+import asChildSource from "@/components/popover/examples/as-child.tsx?raw";
+import PopoverCompositionExample from "@/components/popover/examples/composition";
+import compositionSource from "@/components/popover/examples/composition.tsx?raw";
+import PopoverControlledExample from "@/components/popover/examples/controlled";
+import controlledSource from "@/components/popover/examples/controlled.tsx?raw";
+import PopoverFeaturesExample from "@/components/popover/examples/features";
+import featuresSource from "@/components/popover/examples/features.tsx?raw";
+import PopoverFullWidthExample from "@/components/popover/examples/full-width";
+import fullWidthSource from "@/components/popover/examples/full-width.tsx?raw";
+import PopoverInsetVariantsExample from "@/components/popover/examples/inset-variants";
+import insetVariantsSource from "@/components/popover/examples/inset-variants.tsx?raw";
+import PopoverPlacementExample from "@/components/popover/examples/placement";
+import placementSource from "@/components/popover/examples/placement.tsx?raw";
+import PopoverSizesExample from "@/components/popover/examples/sizes";
+import sizesSource from "@/components/popover/examples/sizes.tsx?raw";
+import PopoverStatesExample from "@/components/popover/examples/states";
+import statesSource from "@/components/popover/examples/states.tsx?raw";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,24 +24,6 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import PopoverAsChildSnippet from "../snippets/popover/as-child";
-import asChildSource from "../snippets/popover/as-child.tsx?raw";
-import PopoverCompositionSnippet from "../snippets/popover/composition";
-import compositionSource from "../snippets/popover/composition.tsx?raw";
-import PopoverControlledSnippet from "../snippets/popover/controlled";
-import controlledSource from "../snippets/popover/controlled.tsx?raw";
-import PopoverFeaturesSnippet from "../snippets/popover/features";
-import featuresSource from "../snippets/popover/features.tsx?raw";
-import PopoverFullWidthSnippet from "../snippets/popover/full-width";
-import fullWidthSource from "../snippets/popover/full-width.tsx?raw";
-import PopoverInsetVariantsSnippet from "../snippets/popover/inset-variants";
-import insetVariantsSource from "../snippets/popover/inset-variants.tsx?raw";
-import PopoverPlacementSnippet from "../snippets/popover/placement";
-import placementSource from "../snippets/popover/placement.tsx?raw";
-import PopoverSizesSnippet from "../snippets/popover/sizes";
-import sizesSource from "../snippets/popover/sizes.tsx?raw";
-import PopoverStatesSnippet from "../snippets/popover/states";
-import statesSource from "../snippets/popover/states.tsx?raw";
 
 const popoverRootApiRows: PlaygroundApiPropRow[] = [
   {
@@ -48,6 +48,14 @@ const popoverRootApiRows: PlaygroundApiPropRow[] = [
     description: "Вызывается при открытии и закрытии (триггер, Escape, клик снаружи).",
   },
   {
+    prop: "closeOnOutsideClick",
+    type: "boolean",
+    defaultValue: "true",
+    required: "Нет",
+    description:
+      "Клик в любом месте вне панели и триггера закрывает её. false — закрытие только явно.",
+  },
+  {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
@@ -64,14 +72,6 @@ const popoverTriggerApiRows: PlaygroundApiPropRow[] = [
     required: "Да",
     description:
       "Ровно один элемент-триггер; на него накладываются ref, aria-атрибуты и обработчик клика.",
-  },
-  {
-    prop: "asChild",
-    type: "boolean",
-    defaultValue: "true",
-    required: "Нет",
-    description:
-      "Проп в API для совместимости с паттерном слота; реализация всегда сливает поведение с единственным ребёнком через cloneElement.",
   },
 ];
 
@@ -100,7 +100,7 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
     description: "Ярус отступов и типографики панели; дочерние контролы в ControlSizeProvider.",
@@ -118,7 +118,7 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
     defaultValue: '"none"',
     required: "Нет",
     description:
-      "Дополнительный внутренний отступ к полям как у Dropdown (--dd-pad); data-inset-padding на корне панели.",
+      "Добавка к внутреннему отступу яруса: x1 +4, x2 +8, x3 +12 px; data-inset-padding на корне панели.",
   },
   {
     prop: "insetGap",
@@ -126,7 +126,15 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
     defaultValue: '"pad"',
     required: "Нет",
     description:
-      "Вертикальный зазор между прямыми дочерними элементами; pad совпадает с полями панели (--dd-pad).",
+      "Вертикальный зазор между прямыми дочерними элементами: pad — зазор яруса (8 для xs/s, 12 для m, 16 для l/xl), x2 8, x3 12, x4 16 px, none — без зазора.",
+  },
+  {
+    prop: "stackAboveDropdown",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Поднять панель над выпадающим списком того же слоя — если триггер внутри Select/TagSelect или Dropdown.",
   },
   {
     prop: "children",
@@ -144,6 +152,39 @@ const popoverContentApiRows: PlaygroundApiPropRow[] = [
   },
 ];
 
+const popoverPartsApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "Popover.Header",
+    type: "React.HTMLAttributes<HTMLDivElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Заголовок и описание стопкой с зазором 4 px.",
+  },
+  {
+    prop: "Popover.Title",
+    type: "React.HTMLAttributes<HTMLHeadingElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "h2: кегль яруса панели, вес title-s; становится доступным именем панели через aria-labelledby.",
+  },
+  {
+    prop: "Popover.Description",
+    type: "React.HTMLAttributes<HTMLParagraphElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "p: кегль подписи яруса (m — 13/20), secondary; связывается с панелью через aria-describedby.",
+  },
+  {
+    prop: "Popover.Actions",
+    type: "React.HTMLAttributes<HTMLDivElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Кнопки справа с зазором 8 px; уже 480 px — во всю ширину, основная последней.",
+  },
+];
+
 export default function PopoverSection() {
   return (
     <PageContent.Section>
@@ -154,7 +195,7 @@ export default function PopoverSection() {
             <>
               Всплывающая панель рядом с кнопкой или ссылкой: внутри можно разместить форму,
               фильтры, выбор из списка или поясняющий текст. Панель фиксируется у края окна,
-              подстраивается при прокрутке и закрывается по Escape или клику вне области.
+              подстраивается при прокрутке и плавно закрывается по Escape или клику в пустое место.
             </>
           }
         </PageContent.Description>
@@ -164,13 +205,13 @@ export default function PopoverSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Проп <code>size</code> на <code>Popover.Content</code>: ряд <code>s</code>,{" "}
-              <code>m</code>, <code>l</code>, <code>xl</code> — отступы панели и кегль текста по
-              ярусу контрола; вложенные контролы получают размер через провайдер.
+              <code>size</code> на <code>Popover.Content</code> — <code>xs</code>–<code>xl</code>:
+              внутренний отступ (12 для xs/s, 16 для m/l, 20 для xl), кегль и ярус вложенных
+              контролов. Берите тот же размер, что у триггера. По умолчанию — <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <PopoverSizesSnippet />
+                <PopoverSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -181,9 +222,12 @@ export default function PopoverSection() {
               Плотность задаётся <code>insetPadding</code> и <code>insetGap</code> на{" "}
               <code>Popover.Content</code> (включая <code>none</code> для плотного макета).
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={insetVariantsSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root
+              code={insetVariantsSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <PopoverInsetVariantsSnippet />
+                <PopoverInsetVariantsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -191,13 +235,14 @@ export default function PopoverSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              <code>defaultOpen</code> на корне — панель видна сразу после монтирования. Отдельного{" "}
-              <code>disabled</code> у поповера нет: недоступный триггер (например кнопка с{" "}
-              <code>disabled</code>) не откроет панель.
+              Подтверждение опасного действия: <code>Header</code>, <code>Title</code>,{" "}
+              <code>Description</code> и <code>Actions</code> с кнопкой{" "}
+              <code>tone=&quot;danger&quot;</code>. Отдельного <code>disabled</code> у поповера нет:
+              отключённый триггер не откроет панель.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <PopoverStatesSnippet />
+                <PopoverStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -209,9 +254,9 @@ export default function PopoverSection() {
               <code>start</code>, <code>center</code>, <code>end</code>); у границы вьюпорта сторона
               может смениться автоматически.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={placementSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={placementSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <PopoverPlacementSnippet />
+                <PopoverPlacementExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -222,9 +267,12 @@ export default function PopoverSection() {
               <code>open</code> и <code>onOpenChange</code> на <code>Popover.Root</code>: состояние
               держит родитель (кнопка «Открыть извне», счётчики, шаги мастера).
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={controlledSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <PopoverControlledSnippet />
+                <PopoverControlledExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -232,12 +280,16 @@ export default function PopoverSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
-              Триггер с <code>Button.Icon</code>, заголовок, текст и нативные чекбоксы; поля панели
-              задаёт <code>size</code> на <code>Popover.Content</code>.
+              Фильтры отчёта: шапка, <code>SegmentedControl</code> на всю ширину, чекбоксы и кнопки
+              «Сбросить» / «Применить». Панель приподнята (<code>bg-raised</code>), поля внутри
+              получают серую заливку.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={compositionSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <PopoverCompositionSnippet />
+                <PopoverCompositionExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -248,9 +300,9 @@ export default function PopoverSection() {
               <code>sameMinWidthAsTrigger</code> — ширина панели как у триггера (не только
               min-width); удобно в узкой колонке.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <PopoverFullWidthSnippet />
+                <PopoverFullWidthExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -258,13 +310,12 @@ export default function PopoverSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Триггер не только кнопка</DemoSectionTitle>
             <DemoDescription>
-              <code>Popover.Trigger</code> принимает один дочерний элемент — здесь нативная{" "}
-              <code>&lt;button&gt;</code> без визуала кнопки (как текстовая ссылка); к ней
-              добавляются подписи доступности и переключение по клику.
+              <code>Popover.Trigger</code> принимает один дочерний элемент — здесь кнопка в виде
+              текстовой ссылки; к ней добавляются aria-атрибуты и переключение по клику.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={asChildSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={asChildSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <PopoverAsChildSnippet />
+                <PopoverAsChildExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -272,12 +323,12 @@ export default function PopoverSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Фокус и вложенный выбор</DemoSectionTitle>
             <DemoDescription>
-              <code>trapFocus</code> для формы в панели; рядом <code>Input</code> и{" "}
-              <code>Select</code> — клик по выпадающему списку не закрывает поповер как «снаружи».
+              Форма приглашения: <code>trapFocus</code> держит Tab внутри панели, клик по списку
+              вложенного <code>Select</code> не считается кликом снаружи. Отправка закрывает панель.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <PopoverFeaturesSnippet />
+                <PopoverFeaturesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -301,6 +352,11 @@ export default function PopoverSection() {
               фокуса.
             </DemoDescription>
             <PlaygroundApiTable rows={popoverContentApiRows} />
+            <DemoApiTitle>Header · Title · Description · Actions</DemoApiTitle>
+            <DemoDescription>
+              Готовая разметка панели с доступными именем и описанием.
+            </DemoDescription>
+            <PlaygroundApiTable rows={popoverPartsApiRows} />
           </div>
         </div>
       </PageContent.Body>

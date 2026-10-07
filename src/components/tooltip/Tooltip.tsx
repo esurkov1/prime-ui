@@ -1,18 +1,22 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { getPanelOffsetPx, getViewportPadPx } from "@/hooks/usePosition";
+import { usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
+import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Tooltip.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type TooltipSize = "s" | "m" | "l" | "xl";
 export type TooltipSide = "top" | "bottom" | "left" | "right";
 
 // ─── Provider Context ─────────────────────────────────────────────────────────
@@ -59,10 +63,19 @@ export type TooltipRootProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Задержка показа (мс) для этого тултипа; по умолчанию — из `Tooltip.Provider` (400). */
+  delayDuration?: number;
 };
 
-function TooltipRoot({ children, open, defaultOpen, onOpenChange }: TooltipRootProps) {
-  const { delayDuration } = React.useContext(TooltipProviderContext);
+function TooltipRoot({
+  children,
+  open,
+  defaultOpen,
+  onOpenChange,
+  delayDuration: delayProp,
+}: TooltipRootProps) {
+  const providerDelay = React.useContext(TooltipProviderContext).delayDuration;
+  const delayDuration = delayProp ?? providerDelay;
 
   const [isOpen, setIsOpen] = useControllableState<boolean>({
     value: open,
@@ -88,6 +101,9 @@ function TooltipRoot({ children, open, defaultOpen, onOpenChange }: TooltipRootP
     return () => clearTimeout(timeoutRef.current);
   }, []);
 
+  /* WAI-ARIA tooltip: Escape скрывает подсказку, фокус остаётся на триггере. */
+  useEscapeKey({ enabled: isOpen, onEscape: handleClose });
+
   return (
     <TooltipRootProvider value={{ isOpen, triggerRef, contentId, handleOpen, handleClose }}>
       {children}
@@ -103,7 +119,7 @@ export type TooltipTriggerProps = {
 };
 
 function TooltipTrigger({ children, className }: TooltipTriggerProps) {
-  const { triggerRef, contentId, handleOpen, handleClose } = useTooltipRootContext();
+  const { isOpen, triggerRef, contentId, handleOpen, handleClose } = useTooltipRootContext();
   const props = children.props as React.HTMLAttributes<HTMLElement> & {
     ref?: React.Ref<HTMLElement>;
   };
@@ -115,7 +131,10 @@ function TooltipTrigger({ children, className }: TooltipTriggerProps) {
     {
       ref: triggerRef,
       className: cx(props.className, className) || undefined,
-      "aria-describedby": contentId,
+      "aria-describedby":
+        [props["aria-describedby"], isOpen ? contentId : undefined].filter(Boolean).join(" ") ||
+        undefined,
+      ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
       onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
         props.onMouseEnter?.(e);
         handleOpen();
@@ -138,45 +157,58 @@ function TooltipTrigger({ children, className }: TooltipTriggerProps) {
 
 // ─── Positioning ──────────────────────────────────────────────────────────────
 
-const TOOLTIP_OFFSET = 6;
+type TooltipCoords = { top: number; left: number; side: TooltipSide };
 
-type TooltipCoords = { top: number; left: number };
+const OPPOSITE: Record<TooltipSide, TooltipSide> = {
+  top: "bottom",
+  bottom: "top",
+  left: "right",
+  right: "left",
+};
 
-function computePosition(
-  anchor: HTMLElement,
-  content: HTMLElement,
+/** Позиция по стороне; если не влезает — противоположная сторона; затем сдвиг в пределах вьюпорта. */
+export function computeTooltipPosition(
+  ar: Pick<DOMRectReadOnly, "top" | "left" | "right" | "bottom" | "width" | "height">,
+  cw: number,
+  ch: number,
+  vw: number,
+  vh: number,
   side: TooltipSide,
+  offset: number,
+  pad: number,
 ): TooltipCoords {
-  const ar = anchor.getBoundingClientRect();
-  const cr = content.getBoundingClientRect();
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
+  const place = (s: TooltipSide) => {
+    switch (s) {
+      case "top":
+        return { top: ar.top - ch - offset, left: ar.left + ar.width / 2 - cw / 2 };
+      case "bottom":
+        return { top: ar.bottom + offset, left: ar.left + ar.width / 2 - cw / 2 };
+      case "left":
+        return { top: ar.top + ar.height / 2 - ch / 2, left: ar.left - cw - offset };
+      case "right":
+        return { top: ar.top + ar.height / 2 - ch / 2, left: ar.right + offset };
+    }
+  };
+  const fits = (s: TooltipSide, p: { top: number; left: number }) =>
+    s === "top" || s === "bottom"
+      ? p.top >= pad && p.top + ch <= vh - pad
+      : p.left >= pad && p.left + cw <= vw - pad;
 
-  let top: number;
-  let left: number;
-
-  switch (side) {
-    case "top":
-      top = ar.top - cr.height - TOOLTIP_OFFSET;
-      left = ar.left + ar.width / 2 - cr.width / 2;
-      break;
-    case "bottom":
-      top = ar.bottom + TOOLTIP_OFFSET;
-      left = ar.left + ar.width / 2 - cr.width / 2;
-      break;
-    case "left":
-      top = ar.top + ar.height / 2 - cr.height / 2;
-      left = ar.left - cr.width - TOOLTIP_OFFSET;
-      break;
-    case "right":
-      top = ar.top + ar.height / 2 - cr.height / 2;
-      left = ar.right + TOOLTIP_OFFSET;
-      break;
+  let resolved = side;
+  let pos = place(side);
+  if (!fits(side, pos)) {
+    const alt = OPPOSITE[side];
+    const altPos = place(alt);
+    if (fits(alt, altPos)) {
+      resolved = alt;
+      pos = altPos;
+    }
   }
 
   return {
-    top: Math.round(Math.max(8, Math.min(top, vh - cr.height - 8))),
-    left: Math.round(Math.max(8, Math.min(left, vw - cr.width - 8))),
+    top: Math.round(Math.max(pad, Math.min(pos.top, vh - ch - pad))),
+    left: Math.round(Math.max(pad, Math.min(pos.left, vw - cw - pad))),
+    side: resolved,
   };
 }
 
@@ -184,7 +216,7 @@ function computePosition(
 
 export type TooltipContentProps = {
   children: React.ReactNode;
-  size?: TooltipSize;
+  size?: ControlSize;
   side?: TooltipSide;
   className?: string;
 };
@@ -194,9 +226,12 @@ function TooltipContent({ children, size = "m", side = "top", className }: Toolt
   const overlayPortalLayer = useOverlayPortalLayer();
   const contentRef = React.useRef<HTMLDivElement | null>(null);
   const [coords, setCoords] = React.useState<TooltipCoords | null>(null);
+  // Pointer-leave / blur / Escape close it with the shared fade-out (Overlay contract).
+  const presence = usePresence(isOpen, { exitDuration: "fast" });
+  const mounted = presence.mounted;
 
   React.useEffect(() => {
-    if (!isOpen) {
+    if (!mounted) {
       setCoords(null);
       return;
     }
@@ -205,7 +240,19 @@ function TooltipContent({ children, size = "m", side = "top", className }: Toolt
       const anchor = triggerRef.current;
       const content = contentRef.current;
       if (!anchor || !content) return;
-      setCoords(computePosition(anchor, content, side));
+      const cr = content.getBoundingClientRect();
+      setCoords(
+        computeTooltipPosition(
+          anchor.getBoundingClientRect(),
+          cr.width,
+          cr.height,
+          window.innerWidth,
+          window.innerHeight,
+          side,
+          getPanelOffsetPx(),
+          getViewportPadPx(),
+        ),
+      );
     };
 
     const frameId = requestAnimationFrame(update);
@@ -217,9 +264,9 @@ function TooltipContent({ children, size = "m", side = "top", className }: Toolt
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update, true);
     };
-  }, [isOpen, triggerRef, side]);
+  }, [mounted, triggerRef, side]);
 
-  if (!isOpen) return null;
+  if (!mounted) return null;
 
   const positionStyle: React.CSSProperties = {
     position: "fixed",
@@ -234,9 +281,17 @@ function TooltipContent({ children, size = "m", side = "top", className }: Toolt
         id={contentId}
         role="tooltip"
         data-overlay-portal-layer={overlayPortalLayer}
-        className={cx(styles.content, className)}
+        className={cx(styles.content, overlayMotion.floating, className)}
         style={positionStyle}
-        {...toDataAttributes({ size, side })}
+        onAnimationEnd={presence.onExitEnd}
+        {...toDataAttributes({
+          state: presence.state,
+          size,
+          /* Resolved side: flips to the opposite one when the requested side does not fit. */
+          side: coords?.side ?? side,
+          /* До первого измерения прозрачен (CSS), чтобы не мигать в (0, 0). */
+          positioned: coords ? true : undefined,
+        })}
       >
         <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
       </div>

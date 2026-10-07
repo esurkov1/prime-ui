@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useLayoutEffect } from "react";
 import { useInRouterContext, useLocation } from "react-router-dom";
 
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
@@ -9,62 +8,79 @@ import { mergeRefs } from "@/internal/mergeRefs";
 
 import styles from "./AppShell.module.css";
 
-export type AppShellRootProps = {
+export type AppShellRootProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Viewport-high shell: only `AppShell.Main` scrolls. Otherwise the document scrolls. */
   fillViewport?: boolean;
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
+};
 
+export type AppShellNavProps = React.HTMLAttributes<HTMLDivElement>;
+
+/** Navigation column (usually `Sidebar.Root`); sits on the canvas. */
+function AppShellNav({ className, ...rest }: AppShellNavProps) {
+  return <div {...rest} className={cx(styles.nav, className)} />;
+}
+AppShellNav.displayName = "AppShell.Nav";
+
+/**
+ * Grid: navigation column | content panel. Everything that is not `AppShell.Nav` goes into the
+ * content panel (`bg-surface`, inset from the window on wide screens).
+ */
 const AppShellRoot = React.forwardRef<HTMLDivElement, AppShellRootProps>(function AppShellRoot(
   { fillViewport = false, className, children, ...rest },
-  forwardedRef,
+  ref,
 ) {
+  const items = React.Children.toArray(children);
+  const isNav = (child: React.ReactNode) =>
+    React.isValidElement(child) && child.type === AppShellNav;
+  const nav = items.filter(isNav);
+  const panel = items.filter((child) => !isNav(child));
+
   return (
     <div
-      ref={forwardedRef}
-      className={cx(styles.layoutRoot, className)}
       {...rest}
-      {...toDataAttributes({ "fill-viewport": fillViewport ? true : undefined })}
+      ref={ref}
+      className={cx(styles.root, className)}
+      {...toDataAttributes({ "fill-viewport": fillViewport || undefined })}
     >
-      {children}
+      {nav}
+      <div className={styles.panel}>{panel}</div>
     </div>
   );
 });
 AppShellRoot.displayName = "AppShell.Root";
 
-export type AppShellNavProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
+export type AppShellHeaderProps = React.HTMLAttributes<HTMLElement>;
 
-function AppShellNav({ className, children, ...rest }: AppShellNavProps) {
-  return (
-    <div className={cx(styles.layoutNav, className)} data-layout-region="nav" {...rest}>
-      {children}
-    </div>
-  );
-}
-AppShellNav.displayName = "AppShell.Nav";
+/** Top bar of the content panel (breadcrumbs, page actions, mobile menu button). Sticky. */
+const AppShellHeader = React.forwardRef<HTMLElement, AppShellHeaderProps>(function AppShellHeader(
+  { className, ...rest },
+  ref,
+) {
+  return <header {...rest} ref={ref} className={cx(styles.header, className)} />;
+});
+AppShellHeader.displayName = "AppShell.Header";
 
-export type AppShellMainProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLElement>;
+/** `full` (default): the whole panel with responsive gutters; `contained`: centered, up to `--prime-layout-content-max-width` (long-read pages). */
+export type AppShellContentWidth = "contained" | "full";
 
+export type AppShellMainProps = React.HTMLAttributes<HTMLElement> & {
+  contentWidth?: AppShellContentWidth;
+};
+
+/** `<main>` with the canonical gutters; scrolls inside the panel when `fillViewport` is set. */
 const AppShellMain = React.forwardRef<HTMLElement, AppShellMainProps>(function AppShellMain(
-  { className, children, ...rest },
-  forwardedRef,
+  { contentWidth = "full", className, children, ...rest },
+  ref,
 ) {
   return (
     <ScrollContainer
+      {...rest}
       as="main"
-      ref={forwardedRef}
+      ref={ref}
       axis="vertical"
       overscrollBehavior="contain"
-      className={cx(styles.layoutMain, className)}
-      data-layout-region="main"
-      data-app-shell-main-padded=""
-      {...rest}
+      className={cx(styles.main, className)}
+      data-content-width={contentWidth}
     >
       {children}
     </ScrollContainer>
@@ -72,49 +88,38 @@ const AppShellMain = React.forwardRef<HTMLElement, AppShellMainProps>(function A
 });
 AppShellMain.displayName = "AppShell.Main";
 
-function AppShellMainRouteScrollReset({
-  mainRef,
-}: {
-  mainRef: React.RefObject<HTMLElement | null>;
-}) {
+function RouteScrollReset({ mainRef }: { mainRef: React.RefObject<HTMLElement | null> }) {
   const { pathname } = useLocation();
-  // biome-ignore lint/correctness/useExhaustiveDependencies: сброс прокрутки main при смене маршрута
-  useLayoutEffect(() => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset main scroll on route change
+  React.useLayoutEffect(() => {
     mainRef.current?.scrollTo(0, 0);
   }, [pathname]);
   return null;
 }
 
-export type AppShellTemplateProps = {
-  fillViewport?: boolean;
-  className?: string;
-  /** Навигация: `Sidebar.Root` или `nav`. */
-  nav: React.ReactNode;
+export type AppShellTemplateProps = Omit<AppShellRootProps, "children"> & {
+  /** Navigation column content, usually `Sidebar.Root`. */
+  nav?: React.ReactNode;
+  /** `AppShell.Header` content; no header row when omitted. */
+  header?: React.ReactNode;
   children?: React.ReactNode;
-  navProps?: Omit<AppShellNavProps, "children">;
   mainProps?: Omit<AppShellMainProps, "children">;
-} & Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "ref">;
+};
 
+/** Root + Nav + Header + Main in one; inside a router, main scrolls to top on route change. */
 const AppShellTemplate = React.forwardRef<HTMLElement, AppShellTemplateProps>(
-  function AppShellTemplate(
-    { fillViewport, className, nav, children, navProps, mainProps, ...rootRest },
-    forwardedRef,
-  ) {
-    const mainElementRef = React.useRef<HTMLElement>(null);
-    const setMainRef = React.useMemo(() => mergeRefs(mainElementRef, forwardedRef), [forwardedRef]);
+  function AppShellTemplate({ nav, header, children, mainProps, ...rootProps }, ref) {
+    const mainRef = React.useRef<HTMLElement>(null);
+    const setMainRef = React.useMemo(() => mergeRefs(mainRef, ref), [ref]);
     const inRouter = useInRouterContext();
 
     return (
-      <AppShellRoot
-        fillViewport={fillViewport}
-        className={className}
-        {...rootRest}
-        data-layout-template="app"
-      >
-        <AppShellNav {...navProps}>{nav}</AppShellNav>
-        <AppShellMain ref={setMainRef} {...mainProps}>
+      <AppShellRoot {...rootProps}>
+        {nav == null ? null : <AppShellNav>{nav}</AppShellNav>}
+        {header == null ? null : <AppShellHeader>{header}</AppShellHeader>}
+        <AppShellMain {...mainProps} ref={setMainRef}>
           {children}
-          {inRouter ? <AppShellMainRouteScrollReset mainRef={mainElementRef} /> : null}
+          {inRouter ? <RouteScrollReset mainRef={mainRef} /> : null}
         </AppShellMain>
       </AppShellRoot>
     );
@@ -125,6 +130,7 @@ AppShellTemplate.displayName = "AppShell.Template";
 export const AppShell = {
   Root: AppShellRoot,
   Nav: AppShellNav,
+  Header: AppShellHeader,
   Main: AppShellMain,
   Template: AppShellTemplate,
 };

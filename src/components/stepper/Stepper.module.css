@@ -1,55 +1,321 @@
-/* Stepper: семантический ol + li; визуал шагов — StepperAlign.module.css. */
+/*
+ * Stepper — Graphite. Semantic `ol` of step buttons.
+ * Indicator: pending = fill-muted, active = accent with soft halo, completed = accent-soft + check,
+ * error = danger-soft. Horizontal: chevron separators between steps, stacks vertically under 480px
+ * of container width. Vertical: full-width rows, active row on fill-subtle.
+ */
 
 .root {
-  list-style: none;
+  --st-circle: var(--prime-control-xs-height);
+  --st-check: var(--prime-icon-s);
+  --st-chevron: var(--prime-icon-s);
+  --st-ind-size: var(--prime-text-caption-size);
+  --st-ind-line-height: var(--prime-text-caption-line-height);
+  --st-text: var(--prime-control-m-text-size);
+  --st-line-height: var(--prime-control-m-line-height);
+  --st-support: var(--prime-control-m-hint-size);
+  --st-support-line-height: var(--prime-control-m-hint-line-height);
+  --st-radius: var(--prime-control-m-radius);
+  --st-gap: var(--prime-space-3);
+  --st-v-pad: var(--prime-space-2);
+  --st-root-h-gap: var(--prime-space-4);
+  --st-root-v-gap: var(--prime-space-1);
+
+  /* Fill the available width: an inline-size container has no intrinsic width and would
+   * collapse to 0 inside shrink-wrapped / flex parents. */
+  container-type: inline-size;
+  inline-size: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
+  list-style: none;
+  font-family: var(--prime-font-family-sans);
 }
 
-.stepLi {
-  list-style: none;
+.root[data-size="xs"] {
+  --st-circle: var(--prime-space-5);
+  --st-check: var(--prime-icon-xs);
+  --st-chevron: var(--prime-icon-xs);
+  --st-text: var(--prime-control-xs-text-size);
+  --st-line-height: var(--prime-control-xs-line-height);
+  --st-support: var(--prime-control-xs-hint-size);
+  --st-support-line-height: var(--prime-control-xs-hint-line-height);
+  --st-radius: var(--prime-control-xs-radius);
+  --st-gap: var(--prime-space-2);
+  --st-v-pad: var(--prime-space-1);
+  --st-root-h-gap: var(--prime-space-2);
+}
+
+.root[data-size="s"] {
+  --st-circle: var(--prime-space-6);
+  --st-check: var(--prime-icon-xs);
+  --st-chevron: var(--prime-icon-xs);
+  --st-text: var(--prime-control-s-text-size);
+  --st-line-height: var(--prime-control-s-line-height);
+  --st-support: var(--prime-control-s-hint-size);
+  --st-support-line-height: var(--prime-control-s-hint-line-height);
+  --st-radius: var(--prime-control-s-radius);
+  --st-gap: var(--prime-space-2);
+  --st-root-h-gap: var(--prime-space-3);
+}
+
+.root[data-size="l"] {
+  --st-circle: var(--prime-control-s-height);
+  --st-ind-size: var(--prime-text-body-s-size);
+  --st-ind-line-height: var(--prime-text-body-s-line-height);
+  --st-text: var(--prime-control-l-text-size);
+  --st-line-height: var(--prime-control-l-line-height);
+  --st-support: var(--prime-control-l-hint-size);
+  --st-support-line-height: var(--prime-control-l-hint-line-height);
+  --st-radius: var(--prime-control-l-radius);
+  --st-v-pad: var(--prime-space-3);
+  --st-root-h-gap: var(--prime-space-5);
+}
+
+.root[data-size="xl"] {
+  --st-circle: var(--prime-control-m-height);
+  --st-check: var(--prime-icon-m);
+  --st-chevron: var(--prime-icon-m);
+  --st-ind-size: var(--prime-text-body-s-size);
+  --st-ind-line-height: var(--prime-text-body-s-line-height);
+  --st-text: var(--prime-control-xl-text-size);
+  --st-line-height: var(--prime-control-xl-line-height);
+  --st-support: var(--prime-control-xl-hint-size);
+  --st-support-line-height: var(--prime-control-xl-hint-line-height);
+  --st-radius: var(--prime-control-xl-radius);
+  --st-gap: var(--prime-space-4);
+  --st-v-pad: var(--prime-space-3);
+  --st-root-h-gap: var(--prime-space-6);
+  --st-root-v-gap: var(--prime-space-2);
+}
+
+/* ---------- Layout ---------- */
+
+.root[data-orientation="horizontal"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--st-root-v-gap) var(--st-root-h-gap);
+}
+
+.root[data-orientation="vertical"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--st-root-v-gap);
+}
+
+.item {
+  min-width: 0;
   margin: 0;
   padding: 0;
-}
-
-.root[data-orientation="horizontal"] .stepLi {
-  flex: 0 0 auto;
-}
-
-.separatorLi {
   list-style: none;
+}
+
+.root[data-orientation="horizontal"] .item {
+  flex: 0 1 auto;
+}
+
+.separator {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
   margin: 0;
   padding: 0;
+  list-style: none;
+  color: var(--prime-color-text-placeholder);
+}
+
+.separatorIcon {
+  flex-shrink: 0;
+  width: var(--st-chevron);
+  height: var(--st-chevron);
+}
+
+/* ---------- Step ---------- */
+
+.step {
+  appearance: none;
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  border-radius: var(--st-radius);
+  background: transparent;
+  color: var(--prime-color-text-secondary);
+  font: inherit;
+  font-size: var(--st-text);
+  line-height: var(--st-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-orientation="horizontal"] .step {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
+  gap: var(--st-gap);
+  padding: var(--prime-space-1);
 }
 
-/* Title & description внутри ячейки сетки (vertical) / flex (horizontal) */
+.root[data-orientation="horizontal"] .step:hover:not(:disabled) {
+  color: var(--prime-color-text-primary);
+}
+
+.root[data-orientation="vertical"] .step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--st-gap);
+  width: 100%;
+  padding: var(--st-v-pad);
+}
+
+.root[data-orientation="vertical"] .step:hover:not(:disabled) {
+  background: var(--prime-color-fill-subtle);
+}
+
+.root[data-orientation="vertical"] .step:active:not(:disabled) {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.step[data-status="active"],
+.step[data-status="completed"] {
+  color: var(--prime-color-text-primary);
+}
+
+.root[data-orientation="vertical"] .step[data-status="active"] {
+  background: var(--prime-color-fill-subtle);
+}
+
+.step[data-status="error"] {
+  color: var(--prime-color-danger-text);
+}
+
+.root[data-orientation="vertical"] .step[data-status="error"] {
+  background: var(--prime-color-danger-soft);
+}
+
+.step:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.step:disabled {
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ---------- Indicator ---------- */
+
+.indicator {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--st-circle);
+  height: var(--st-circle);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+  font-size: var(--st-ind-size);
+  line-height: var(--st-ind-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.indicator[data-status="active"] {
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+  box-shadow: 0 0 0 var(--prime-space-1) var(--prime-color-accent-soft);
+}
+
+.indicator[data-status="completed"] {
+  background: var(--prime-color-accent-soft);
+  color: var(--prime-color-accent-text);
+}
+
+.indicator[data-status="error"] {
+  background: var(--prime-color-danger-soft);
+  color: var(--prime-color-danger-text);
+}
+
+.root[data-orientation="vertical"] .indicator[data-status="error"] {
+  background: var(--prime-color-danger-default);
+  color: var(--prime-color-danger-fg);
+}
+
+.step:disabled .indicator {
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-disabled);
+  box-shadow: none;
+}
+
+.check {
+  display: block;
+  width: var(--st-check);
+  height: var(--st-check);
+}
+
+/* ---------- Text ---------- */
 
 .content {
-  flex: 1;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-0);
   min-width: 0;
 }
 
 .title {
-  font-size: var(--st-text, var(--prime-sys-size-control-m-text));
-  font-weight: var(--prime-sys-typography-weight-medium);
+  font-size: var(--st-text);
+  line-height: var(--st-line-height);
+  font-weight: var(--prime-font-weight-medium);
   color: inherit;
+  overflow-wrap: anywhere;
 }
 
 .description {
-  font-size: var(--st-support, var(--prime-sys-size-control-m-supportText));
-  color: var(--prime-sys-color-content-secondary);
-  margin-top: var(--prime-sys-spacing-x1);
+  font-size: var(--st-support);
+  line-height: var(--st-support-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  color: var(--prime-color-text-muted);
+  overflow-wrap: anywhere;
 }
 
-.stepLi[data-status="pending"] .title {
-  color: inherit;
+.arrow {
+  flex-shrink: 0;
+  width: var(--st-chevron);
+  height: var(--st-chevron);
+  color: var(--prime-color-text-placeholder);
 }
 
-.stepLi[data-status="active"] .description,
-.stepLi[data-status="completed"] .description,
-.stepLi[data-status="error"] .description {
-  color: var(--prime-sys-color-content-secondary);
+/* ---------- Narrow container: horizontal → vertical ---------- */
+
+@container (max-width: 30rem) {
+  .root[data-orientation="horizontal"] .item {
+    flex-basis: 100%;
+  }
+
+  .root[data-orientation="horizontal"] .separator {
+    display: none;
+  }
+
+  .root[data-orientation="horizontal"] .step {
+    width: 100%;
+    padding: var(--st-v-pad);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    transition: none;
+  }
 }

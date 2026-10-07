@@ -1,13 +1,80 @@
+/*
+ * EmptyPage — Graphite empty / zero state.
+ * Neutral icon tile, title, muted description, actions. Works inside tables, cards and pages.
+ */
+
 .root {
+  --ep-pad-y: var(--prime-space-10);
+  --ep-pad-x: var(--prime-space-4);
+  --ep-icon-box: var(--prime-control-xl-height);
+  --ep-icon: var(--prime-icon-l);
+  --ep-icon-radius: var(--prime-radius-l);
+  --ep-title-size: var(--prime-text-title-m-size);
+  --ep-title-line-height: var(--prime-text-title-m-line-height);
+  --ep-title-tracking: var(--prime-text-title-m-tracking);
+  --ep-desc-size: var(--prime-text-body-m-size);
+  --ep-desc-line-height: var(--prime-text-body-m-line-height);
+
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--prime-space-2);
   width: 100%;
   min-width: 0;
   max-width: 100%;
+  padding: var(--ep-pad-y) var(--ep-pad-x);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
   text-align: center;
+}
+
+.root[data-size="xs"] {
+  --ep-pad-y: var(--prime-space-6);
+  --ep-pad-x: var(--prime-space-3);
+  --ep-icon-box: var(--prime-control-s-height);
+  --ep-icon: var(--prime-icon-s);
+  --ep-icon-radius: var(--prime-radius-m);
+  --ep-title-size: var(--prime-text-title-s-size);
+  --ep-title-line-height: var(--prime-text-title-s-line-height);
+  --ep-title-tracking: var(--prime-text-title-s-tracking);
+  --ep-desc-size: var(--prime-text-caption-size);
+  --ep-desc-line-height: var(--prime-text-caption-line-height);
+}
+
+.root[data-size="s"] {
+  --ep-pad-y: var(--prime-space-8);
+  --ep-icon-box: var(--prime-control-l-height);
+  --ep-icon: var(--prime-icon-m);
+  --ep-icon-radius: var(--prime-radius-m);
+  --ep-title-size: var(--prime-text-title-s-size);
+  --ep-title-line-height: var(--prime-text-title-s-line-height);
+  --ep-title-tracking: var(--prime-text-title-s-tracking);
+  --ep-desc-size: var(--prime-text-body-s-size);
+  --ep-desc-line-height: var(--prime-text-body-s-line-height);
+}
+
+.root[data-size="l"] {
+  --ep-pad-y: var(--prime-space-12);
+  --ep-pad-x: var(--prime-space-6);
+  --ep-icon-box: calc(var(--prime-control-xl-height) + var(--prime-space-2));
+  --ep-title-size: var(--prime-text-title-l-size);
+  --ep-title-line-height: var(--prime-text-title-l-line-height);
+  --ep-title-tracking: var(--prime-text-title-l-tracking);
+}
+
+.root[data-size="xl"] {
+  --ep-pad-y: var(--prime-space-16);
+  --ep-pad-x: var(--prime-space-8);
+  --ep-icon-box: var(--prime-space-16);
+  --ep-icon: var(--prime-icon-xl);
+  --ep-icon-radius: var(--prime-radius-xl);
+  --ep-title-size: var(--prime-text-heading-s-size);
+  --ep-title-line-height: var(--prime-text-heading-s-line-height);
+  --ep-title-tracking: var(--prime-text-heading-s-tracking);
+  --ep-desc-size: var(--prime-text-body-l-size);
+  --ep-desc-line-height: var(--prime-text-body-l-line-height);
 }
 
 .root[data-layout="fill"] {
@@ -16,35 +83,59 @@
   min-height: 0;
 }
 
-/* Как у иконки в шапке Modal (`headerIcon`): подложка + `currentColor` на глифе; красный — семантика status-error. */
 .iconWrap {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  background: var(--prime-sys-color-status-error-background);
-  color: var(--prime-sys-color-status-error-foreground);
+  width: var(--ep-icon-box);
+  height: var(--ep-icon-box);
+  border-radius: var(--ep-icon-radius);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+}
+
+.iconWrap[data-tone="accent"] {
+  background: var(--prime-color-accent-soft);
+  color: var(--prime-color-accent-text);
+}
+
+.iconWrap[data-tone="danger"] {
+  background: var(--prime-color-danger-soft);
+  color: var(--prime-color-danger-text);
 }
 
 .iconWrap svg {
   display: block;
   flex-shrink: 0;
+  width: var(--ep-icon);
+  height: var(--ep-icon);
 }
 
 .title {
+  max-width: min(100%, var(--prime-layout-reading-max-width));
   margin: 0;
-  max-width: min(100%, var(--prime-sys-unit-40rem));
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: 1.25;
-  color: var(--prime-sys-color-content-primary);
+  font-size: var(--ep-title-size);
+  line-height: var(--ep-title-line-height);
+  letter-spacing: var(--ep-title-tracking);
+  font-weight: var(--prime-font-weight-semibold);
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* Icon → title is a group boundary: more air than title → description. */
+.iconWrap + .title {
+  padding-top: var(--prime-space-2);
 }
 
 .description {
+  max-width: min(100%, var(--prime-layout-reading-max-width));
   margin: 0;
-  max-width: min(100%, var(--prime-sys-unit-40rem));
-  line-height: 1.45;
-  color: var(--prime-sys-color-content-secondary);
+  font-size: var(--ep-desc-size);
+  line-height: var(--ep-desc-line-height);
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
 }
 
 .actions {
@@ -52,124 +143,6 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-}
-
-/* size s */
-.root[data-size="s"] {
-  gap: var(--prime-sys-size-control-s-gap);
-  padding-block: var(--prime-sys-spacing-xl);
-  padding-inline: var(--prime-sys-spacing-m);
-}
-
-.root[data-size="s"] .iconWrap {
-  width: calc(var(--prime-sys-size-control-s-icon) * 2 + var(--prime-sys-spacing-m));
-  height: calc(var(--prime-sys-size-control-s-icon) * 2 + var(--prime-sys-spacing-m));
-  border-radius: var(--prime-sys-size-control-s-radius);
-}
-
-.root[data-size="s"] .iconWrap svg {
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
-}
-
-.root[data-size="s"] .title {
-  font-size: var(--prime-sys-size-control-s-text);
-}
-
-.root[data-size="s"] .description {
-  font-size: var(--prime-sys-size-control-s-supportText);
-}
-
-.root[data-size="s"] .actions {
-  gap: var(--prime-sys-size-control-s-gap);
-}
-
-/* size m */
-.root[data-size="m"] {
-  gap: var(--prime-sys-size-control-m-gap);
-  padding-block: var(--prime-sys-spacing-2xl);
-  padding-inline: var(--prime-sys-spacing-l);
-}
-
-.root[data-size="m"] .iconWrap {
-  width: calc(var(--prime-sys-size-control-m-icon) * 2 + var(--prime-sys-spacing-m));
-  height: calc(var(--prime-sys-size-control-m-icon) * 2 + var(--prime-sys-spacing-m));
-  border-radius: var(--prime-sys-size-control-m-radius);
-}
-
-.root[data-size="m"] .iconWrap svg {
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
-}
-
-.root[data-size="m"] .title {
-  font-size: var(--prime-sys-size-control-m-text);
-}
-
-.root[data-size="m"] .description {
-  font-size: var(--prime-sys-size-control-m-supportText);
-}
-
-.root[data-size="m"] .actions {
-  gap: var(--prime-sys-size-control-m-gap);
-}
-
-/* size l */
-.root[data-size="l"] {
-  gap: var(--prime-sys-size-control-l-gap);
-  padding-block: var(--prime-sys-spacing-3xl);
-  padding-inline: var(--prime-sys-spacing-xl);
-}
-
-.root[data-size="l"] .iconWrap {
-  width: calc(var(--prime-sys-size-control-l-icon) * 2 + var(--prime-sys-spacing-m));
-  height: calc(var(--prime-sys-size-control-l-icon) * 2 + var(--prime-sys-spacing-m));
-  border-radius: var(--prime-sys-size-control-l-radius);
-}
-
-.root[data-size="l"] .iconWrap svg {
-  width: var(--prime-sys-size-control-l-icon);
-  height: var(--prime-sys-size-control-l-icon);
-}
-
-.root[data-size="l"] .title {
-  font-size: var(--prime-sys-size-control-l-text);
-}
-
-.root[data-size="l"] .description {
-  font-size: var(--prime-sys-size-control-l-supportText);
-}
-
-.root[data-size="l"] .actions {
-  gap: var(--prime-sys-size-control-l-gap);
-}
-
-/* size xl */
-.root[data-size="xl"] {
-  gap: var(--prime-sys-size-control-xl-gap);
-  padding-block: var(--prime-sys-spacing-4xl);
-  padding-inline: var(--prime-sys-spacing-2xl);
-}
-
-.root[data-size="xl"] .iconWrap {
-  width: calc(var(--prime-sys-size-control-xl-icon) * 2 + var(--prime-sys-spacing-l));
-  height: calc(var(--prime-sys-size-control-xl-icon) * 2 + var(--prime-sys-spacing-l));
-  border-radius: var(--prime-sys-size-control-xl-radius);
-}
-
-.root[data-size="xl"] .iconWrap svg {
-  width: var(--prime-sys-size-control-xl-icon);
-  height: var(--prime-sys-size-control-xl-icon);
-}
-
-.root[data-size="xl"] .title {
-  font-size: var(--prime-sys-size-control-xl-text);
-}
-
-.root[data-size="xl"] .description {
-  font-size: var(--prime-sys-size-control-xl-supportText);
-}
-
-.root[data-size="xl"] .actions {
-  gap: var(--prime-sys-size-control-xl-gap);
+  gap: var(--prime-space-2);
+  padding-top: var(--prime-space-3);
 }

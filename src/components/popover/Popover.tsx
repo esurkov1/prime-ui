@@ -3,20 +3,20 @@ import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
-import { isPortaledSelectListboxOwnedByContainer, useOutsideClick } from "@/hooks/useOutsideClick";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import { usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { mergeRefs } from "@/internal/mergeRefs";
 import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
+import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
-import type { DropdownSize } from "@/internal/states";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Popover.module.css";
 import { usePopoverPosition } from "./usePopoverPosition";
-
-export type PopoverSize = DropdownSize;
 
 type Ctx = {
   isOpen: boolean;
@@ -25,6 +25,7 @@ type Ctx = {
   triggerId: string;
   contentId: string;
   triggerRef: React.RefObject<HTMLElement | null>;
+  closeOnOutsideClick: boolean;
 };
 
 const [PopoverProvider, usePopoverContext] = createComponentContext<Ctx>("Popover");
@@ -33,10 +34,18 @@ export type PopoverRootProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** A pointerdown outside the panel and its trigger closes it. Default `true`. */
+  closeOnOutsideClick?: boolean;
   children: React.ReactNode;
 };
 
-function PopoverRoot({ open, defaultOpen = false, onOpenChange, children }: PopoverRootProps) {
+function PopoverRoot({
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  closeOnOutsideClick = true,
+  children,
+}: PopoverRootProps) {
   const [isOpen, setIsOpen] = useControllableState({
     value: open,
     defaultValue: defaultOpen,
@@ -50,8 +59,8 @@ function PopoverRoot({ open, defaultOpen = false, onOpenChange, children }: Popo
   const onToggle = React.useCallback(() => setIsOpen((v) => !v), [setIsOpen]);
 
   const value = React.useMemo(
-    () => ({ isOpen, onClose, onToggle, triggerId, contentId, triggerRef }),
-    [isOpen, onClose, onToggle, triggerId, contentId],
+    () => ({ isOpen, onClose, onToggle, triggerId, contentId, triggerRef, closeOnOutsideClick }),
+    [isOpen, onClose, onToggle, triggerId, contentId, closeOnOutsideClick],
   );
 
   return <PopoverProvider value={value}>{children}</PopoverProvider>;
@@ -59,12 +68,11 @@ function PopoverRoot({ open, defaultOpen = false, onOpenChange, children }: Popo
 PopoverRoot.displayName = "PopoverRoot";
 
 export type PopoverTriggerProps = {
+  /** The element that opens the panel (usually a Button); it receives ref, ARIA and the click handler. */
   children: React.ReactElement;
-  asChild?: boolean;
 };
 
-function PopoverTrigger({ children, asChild: _asChild = true }: PopoverTriggerProps) {
-  void _asChild;
+function PopoverTrigger({ children }: PopoverTriggerProps) {
   const { isOpen, onToggle, triggerId, contentId, triggerRef } = usePopoverContext();
   const toggleRef = React.useRef(onToggle);
   toggleRef.current = onToggle;
@@ -86,8 +94,10 @@ function PopoverTrigger({ children, asChild: _asChild = true }: PopoverTriggerPr
 
   return React.cloneElement(child, {
     ref: mergedRef,
-    id: triggerId,
+    // Keep the child's own id (a field label's htmlFor points at it); fall back to the generated one.
+    id: (child.props?.id as string | undefined) ?? triggerId,
     "aria-expanded": isOpen,
+    "data-state": isOpen ? "open" : "closed",
     "aria-haspopup": "dialog",
     "aria-controls": contentId,
     onClick: (e: React.MouseEvent<HTMLElement>) => {
@@ -105,7 +115,7 @@ export type PopoverContentProps = {
   align?: PositionAlign;
   side?: PositionSide;
   sameMinWidthAsTrigger?: boolean;
-  size?: PopoverSize;
+  size?: ControlSize;
   trapFocus?: boolean;
   /** Дополнение к внутренним полям как у Dropdown (`padding` = `--dd-pad` + inset). */
   insetPadding?: PopoverInsetPadding;
@@ -132,12 +142,15 @@ function PopoverContent({
   children,
   className,
 }: PopoverContentProps) {
-  const { isOpen, onClose, triggerRef, contentId, triggerId } = usePopoverContext();
+  const { isOpen, onClose, triggerRef, contentId, triggerId, closeOnOutsideClick } =
+    usePopoverContext();
   const overlayPortalLayer = useOverlayPortalLayer();
   const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const presence = usePresence(isOpen, { exitDuration: "fast" });
 
   const layout = usePopoverPosition({
-    open: isOpen,
+    // Keeps its position while the exit animation plays.
+    open: presence.mounted,
     triggerRef,
     contentRef,
     side,
@@ -151,46 +164,131 @@ function PopoverContent({
   });
   const ref = React.useMemo(() => mergeRefs(contentRef, trapRef), [trapRef]);
 
-  useEscapeKey({ enabled: isOpen, onEscape: onClose });
+  // Overlay contract: Escape closes the panel and returns focus to the trigger when it was inside
+  // the panel. An outside press only closes it: focus follows the pointer (foundation §8).
+  const dismiss = React.useCallback(() => {
+    const active = document.activeElement;
+    if (!active || active === document.body || contentRef.current?.contains(active)) {
+      triggerRef.current?.focus({ preventScroll: true });
+    }
+    onClose();
+  }, [onClose, triggerRef]);
+  useEscapeKey({ enabled: isOpen, onEscape: dismiss });
   useOutsideClick({
     refs: [triggerRef, contentRef],
     enabled: isOpen,
-    onOutsideClick: onClose,
-    shouldSuppressOutsideClick: (target) =>
-      isPortaledSelectListboxOwnedByContainer(target, contentRef.current),
+    onOutsideClick: () => {
+      if (closeOnOutsideClick) onClose();
+    },
   });
 
-  if (!isOpen) return null;
+  const titleId = `${contentId}-title`;
+  const descriptionId = `${contentId}-description`;
+  const [hasTitle, setHasTitle] = React.useState(false);
+  const [hasDescription, setHasDescription] = React.useState(false);
+  const slots = React.useMemo(
+    () => ({ titleId, descriptionId, setHasTitle, setHasDescription }),
+    [titleId, descriptionId],
+  );
+
+  if (!presence.mounted) return null;
 
   return (
     <Portal>
       <ControlSizeProvider value={size}>
-        <ScrollContainer
-          ref={ref}
-          id={contentId}
-          role="dialog"
-          aria-modal={false}
-          aria-labelledby={triggerId}
-          data-react-aria-top-layer="true"
-          data-overlay-portal-layer={overlayPortalLayer}
-          data-overlay-stack={stackAboveDropdown ? "above-dropdown" : undefined}
-          data-side={layout?.resolvedSide ?? side}
-          data-size={size}
-          data-inset-padding={insetPadding}
-          data-inset-gap={insetGap}
-          className={cx(styles.popoverScroll, className)}
-          style={layout?.style}
-        >
-          {children}
-        </ScrollContainer>
+        <PopoverSlotsContext.Provider value={slots}>
+          <ScrollContainer
+            ref={ref}
+            id={contentId}
+            role="dialog"
+            aria-modal={false}
+            aria-labelledby={hasTitle ? titleId : triggerRef.current?.id || triggerId}
+            aria-describedby={hasDescription ? descriptionId : undefined}
+            data-react-aria-top-layer="true"
+            data-overlay-portal-layer={overlayPortalLayer}
+            data-overlay-stack={stackAboveDropdown ? "above-dropdown" : undefined}
+            data-side={layout?.resolvedSide ?? side}
+            data-state={presence.state}
+            data-size={size}
+            data-inset-padding={insetPadding}
+            data-inset-gap={insetGap}
+            className={cx(styles.popoverScroll, overlayMotion.floating, className)}
+            style={layout?.style}
+            onAnimationEnd={presence.onExitEnd}
+          >
+            {children}
+          </ScrollContainer>
+        </PopoverSlotsContext.Provider>
       </ControlSizeProvider>
     </Portal>
   );
 }
 PopoverContent.displayName = "PopoverContent";
 
+// ─── Header / Title / Description / Actions ─────────────────────────────────
+
+type PopoverSlots = {
+  titleId: string;
+  descriptionId: string;
+  setHasTitle: (v: boolean) => void;
+  setHasDescription: (v: boolean) => void;
+};
+
+const PopoverSlotsContext = React.createContext<PopoverSlots | null>(null);
+
+export type PopoverHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+
+/** Заголовок + описание с плотным шагом (4px) внутри панели. */
+function PopoverHeader({ className, ...rest }: PopoverHeaderProps) {
+  return <div className={cx(styles.header, className)} {...rest} />;
+}
+PopoverHeader.displayName = "PopoverHeader";
+
+export type PopoverTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+
+/** Заголовок панели; становится доступным именем диалога (`aria-labelledby`). */
+function PopoverTitle({ className, id, ...rest }: PopoverTitleProps) {
+  const slots = React.useContext(PopoverSlotsContext);
+  const setHasTitle = slots?.setHasTitle;
+  React.useLayoutEffect(() => {
+    if (!setHasTitle || id) return;
+    setHasTitle(true);
+    return () => setHasTitle(false);
+  }, [setHasTitle, id]);
+  return <h2 id={id ?? slots?.titleId} className={cx(styles.title, className)} {...rest} />;
+}
+PopoverTitle.displayName = "PopoverTitle";
+
+export type PopoverDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
+
+function PopoverDescription({ className, id, ...rest }: PopoverDescriptionProps) {
+  const slots = React.useContext(PopoverSlotsContext);
+  const setHasDescription = slots?.setHasDescription;
+  React.useLayoutEffect(() => {
+    if (!setHasDescription || id) return;
+    setHasDescription(true);
+    return () => setHasDescription(false);
+  }, [setHasDescription, id]);
+  return (
+    <p id={id ?? slots?.descriptionId} className={cx(styles.description, className)} {...rest} />
+  );
+}
+PopoverDescription.displayName = "PopoverDescription";
+
+export type PopoverActionsProps = React.HTMLAttributes<HTMLDivElement>;
+
+/** Кнопки внизу панели: справа, `gap: 8`; на узкой панели — в колонку на всю ширину. */
+function PopoverActions({ className, ...rest }: PopoverActionsProps) {
+  return <div className={cx(styles.actions, className)} {...rest} />;
+}
+PopoverActions.displayName = "PopoverActions";
+
 export const Popover = {
   Root: PopoverRoot,
   Trigger: PopoverTrigger,
   Content: PopoverContent,
+  Header: PopoverHeader,
+  Title: PopoverTitle,
+  Description: PopoverDescription,
+  Actions: PopoverActions,
 };

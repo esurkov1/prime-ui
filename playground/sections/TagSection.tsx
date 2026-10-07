@@ -1,4 +1,17 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import TagAppliedFiltersExample from "@/components/tag/examples/applied-filters";
+import tagAppliedFiltersSource from "@/components/tag/examples/applied-filters.tsx?raw";
+import TagColorsExample from "@/components/tag/examples/colors";
+import tagColorsSource from "@/components/tag/examples/colors.tsx?raw";
+import TagSizesExample from "@/components/tag/examples/sizes";
+import tagSizesSource from "@/components/tag/examples/sizes.tsx?raw";
+import TagStatesExample from "@/components/tag/examples/states";
+import tagStatesSource from "@/components/tag/examples/states.tsx?raw";
+import TagSurfacesExample from "@/components/tag/examples/surfaces";
+import tagSurfacesSource from "@/components/tag/examples/surfaces.tsx?raw";
+import TagWithIconExample from "@/components/tag/examples/with-icon";
+import tagWithIconSource from "@/components/tag/examples/with-icon.tsx?raw";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,60 +19,66 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import TagBasicSnippet from "../snippets/tag/basic";
-import tagBasicSource from "../snippets/tag/basic.tsx?raw";
-import TagCompositionSnippet from "../snippets/tag/composition";
-import tagCompositionSource from "../snippets/tag/composition.tsx?raw";
-import TagRemovableSnippet from "../snippets/tag/removable";
-import tagRemovableSource from "../snippets/tag/removable.tsx?raw";
-import TagSizesSnippet from "../snippets/tag/sizes";
-import tagSizesSource from "../snippets/tag/sizes.tsx?raw";
-import TagStatesSnippet from "../snippets/tag/states";
-import tagStatesSource from "../snippets/tag/states.tsx?raw";
 
 const tagRootApiRows: PlaygroundApiPropRow[] = [
   {
+    prop: "color",
+    type: '"gray" | "blue" | "sky" | "teal" | "green" | "yellow" | "orange" | "red" | "pink" | "purple"',
+    defaultValue: '"gray"',
+    required: "Нет",
+    description: "Оттенок палитры, как у Badge: мягкая заливка и текст оттенка.",
+  },
+  {
+    prop: "variant",
+    type: '"soft" | "outline"',
+    defaultValue: '"soft"',
+    required: "Нет",
+    description: "soft — мягкая заливка, outline — тонкий контур без заливки.",
+  },
+  {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: "m или из ControlSizeContext",
-    required: "нет",
+    type: '"xs" | "s" | "m" | "l" | "xl"',
+    defaultValue: 'из контрола или "m"',
+    required: "Нет",
     description:
-      "Визуальный размер. Если не задан, при обёртке в контекст размера контролов берётся соответствующий размер из контекста.",
+      "Ярусы бейджа: 16 · 20 · 24 · 28 · 32 px. Без size внутри контрола тег на ярус меньше контрола (data-size — размер контрола, data-tier — визуальный ярус).",
   },
   {
     prop: "onRemove",
     type: "() => void",
     defaultValue: "—",
-    required: "нет",
-    description: "При передаче справа отображается кнопка удаления; клик вызывает колбэк.",
+    required: "Нет",
+    description: "Показывает кнопку удаления справа; клик вызывает колбэк.",
+  },
+  {
+    prop: "labels",
+    type: "Partial<TagLabels>",
+    defaultValue: '{ remove: "Удалить" }',
+    required: "Нет",
+    description:
+      "Системные строки. remove — доступное имя кнопки удаления; включайте текст тега: «Убрать фильтр «Москва»».",
   },
   {
     prop: "disabled",
     type: "boolean",
     defaultValue: "—",
-    required: "нет",
-    description: "Отключает тег и кнопку удаления; на корне выставляется aria-disabled.",
+    required: "Нет",
+    description:
+      "Приглушённый текст; кнопка удаления нативно disabled, на корне aria-disabled и data-disabled.",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
-    required: "нет",
-    description: "Содержимое тела тега; внутри доступен ControlSizeProvider с выбранным size.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "нет",
-    description: "Дополнительный класс на корневом span.",
+    required: "Нет",
+    description: "Текст и опционально Tag.Icon в начале.",
   },
   {
     prop: "…rest",
     type: "React.HTMLAttributes<HTMLSpanElement>",
     defaultValue: "—",
-    required: "нет",
-    description: "Стандартные атрибуты span (data-*, aria-*, onClick и т.д.).",
+    required: "Нет",
+    description: "className и остальные атрибуты корневого span; ref передаётся на span.",
   },
 ];
 
@@ -68,15 +87,15 @@ const tagIconApiRows: PlaygroundApiPropRow[] = [
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
-    required: "да",
-    description: "Обычно иконка; оборачивается в слот со стилями иконки тега.",
+    required: "Да",
+    description: "Иконка; цвет текста тега, размер по ярусу тега.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
-    required: "нет",
-    description: "Дополнительный класс на обёртке иконки.",
+    required: "Нет",
+    description: "Дополнительный класс обёртки.",
   },
 ];
 
@@ -86,13 +105,10 @@ export default function TagSection() {
       <PageContent.Header>
         <PageContent.Title>Tag</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Компактная метка (чип) для фильтров, выбранных значений и метаданных. Поддерживает
-              иконку слева от текста и опциональную кнопку удаления справа. Размер согласован с осью
-              размеров контролов через <code>ControlSizeProvider</code>.
-            </>
-          }
+          Чип на мягкой заливке без обводки (по умолчанию нейтральной) — для выбранных значений,
+          применённых фильтров и ключевых слов, с необязательной кнопкой удаления. Цветной статус
+          только для чтения — это <code>Badge</code>; переключатели — <code>ButtonGroup</code> или{" "}
+          <code>Checkbox</code>.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -100,13 +116,28 @@ export default function TagSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Ряд <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>, <code>xl</code>{" "}
-              — высота, радиус, кегль и размер иконки берутся из одного яруса системных токенов
-              контролов.
+              Ярусы <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> ·{" "}
+              <code>xl</code> общие с <code>Badge</code>. Внутри контрола (например в{" "}
+              <code>TagSelect</code>) тег без <code>size</code> сам берёт ярус на ступень ниже.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tagSizesSource.trim()} previewLayout="stack-center">
+            <PlaygroundExampleFrame.Root code={tagSizesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <TagSizesSnippet />
+                <TagSizesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Цвета и варианты</DemoSectionTitle>
+            <DemoDescription>
+              Десять оттенков <code>color</code>, как у <code>Badge</code>. <code>soft</code> (по
+              умолчанию) — мягкая заливка, <code>outline</code> — тонкий контур без заливки.
+              Нейтральный <code>gray</code> — для обычных значений, цвет — для группировки по
+              категориям.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={tagColorsSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TagColorsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -114,54 +145,57 @@ export default function TagSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Обычный, с кнопкой удаления (<code>onRemove</code>) и <code>disabled</code>.
-              Отключённое состояние блокирует кнопку удаления и выставляет{" "}
-              <code>aria-disabled</code> на корне.
+              Сам тег не фокусируется — фокус получает только кнопка удаления. Наведите на крестик
+              или нажмите <code>Tab</code>: появится подложка и кольцо фокуса. При{" "}
+              <code>disabled</code> кнопка заблокирована, текст приглушён.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tagStatesSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={tagStatesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <TagStatesSnippet />
+                <TagStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoSectionTitle>С иконкой</DemoSectionTitle>
             <DemoDescription>
-              Иконка через <code>Tag.Icon</code> перед текстом, только текст или текст с кнопкой
-              удаления. Размер иконки автоматически согласован с <code>size</code> корня через
-              контекст.
+              <code>Tag.Icon</code> ставит иконку перед текстом; размер подстраивается под ярус.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tagCompositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={tagWithIconSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <TagCompositionSnippet />
+                <TagWithIconExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Базовый пример</DemoSectionTitle>
+            <DemoSectionTitle>На разных поверхностях</DemoSectionTitle>
             <DemoDescription>
-              Статичные метки без иконки и без <code>onRemove</code> — типично для технологий
-              проекта или категорий товара.
+              Нейтральная заливка остаётся различимой на холсте, карточке и всплывающем слое.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tagBasicSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={tagSurfacesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <TagBasicSnippet />
+                <SurfaceGallery>
+                  <TagSurfacesExample />
+                </SurfaceGallery>
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Удаляемые теги</DemoSectionTitle>
+            <DemoSectionTitle>Композиция: применённые фильтры</DemoSectionTitle>
             <DemoDescription>
-              Проп <code>onRemove</code> добавляет справа кнопку с крестиком; подпись для
-              скринридеров фиксирована (<code>aria-label=&quot;Remove&quot;</code> в разметке
-              компонента).
+              Каждый тег снимает свой фильтр; <code>labels.remove</code> включает название фильтра,
+              чтобы скринридер не читал пять одинаковых «Удалить». После удаления переведите фокус
+              на соседний тег или поле, из которого фильтр был добавлен.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tagRemovableSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={tagAppliedFiltersSource.trim()}
+              previewLayout="stack-center"
+              surface="canvas"
+            >
               <PlaygroundExampleFrame.Stage>
-                <TagRemovableSnippet />
+                <TagAppliedFiltersExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>

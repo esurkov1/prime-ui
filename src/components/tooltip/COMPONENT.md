@@ -1,148 +1,147 @@
 # Tooltip
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Category:** overlays (Оверлеи)
 
-## About
+> A short hint that appears next to an element on hover or keyboard focus.
 
-A composite tooltip: optional delay provider, root with open state, trigger that wraps a single element, and content rendered in a portal and positioned relative to the trigger.
+## When to use
+- Name and shortcut of an icon-only button.
+- Why a control is disabled (wrap the disabled control in a focusable element).
+- A one-line definition of a term or abbreviation in text.
 
-- **Use** to clarify icon-only controls, abbreviated labels, dense table cells, or non-obvious metrics on hover or keyboard focus.
-- **Use** when the extra text is short and supplementary; keep the trigger’s visible label or `aria-label` as the primary affordance where possible.
-- **Do not use** for long explanations or content that should stay visible without hover—prefer inline help, a hint, or a dedicated panel.
-- **Do not use** for interactive content inside the layer (links, buttons, inputs); tooltip content is non-interactive and uses `pointer-events: none` in styles.
-- **Do not use** one root for multiple anchors—each trigger needs its own `Tooltip.Root` (or separate instances).
-- **Do not rely** on tooltips opening for natively `disabled` controls; disabled elements often do not receive hover/focus—wrap or use a different focusable pattern if a tooltip is required.
+## When not to use
+- Content with links, buttons or fields, or anything the user must read to continue → use [Popover](../popover/COMPONENT.md).
+- A list of actions → use [Dropdown](../dropdown/COMPONENT.md).
+- Help text under a field → use the field `hint` or [Hint](../hint/COMPONENT.md).
+- Status messages → use [Notification](../notification/COMPONENT.md) or [Banner](../banner/COMPONENT.md).
+- The only label of an icon-only button → the button still needs `aria-label`; the tooltip only repeats it.
 
-## Composition
-
-- **`Tooltip.Provider`** (optional) — wraps a subtree to share **`delayDuration`** (default **400** ms) for nested **`Tooltip.Root`** instances. Omit it when the default delay is fine.
-- **`Tooltip.Root`** — holds open state (controlled or uncontrolled). Children must include **`Tooltip.Trigger`** and **`Tooltip.Content`** (order in the tree is conventional; both participate via context).
-- **`Tooltip.Trigger`** — accepts **exactly one** **`React.ReactElement`** child. The implementation **`cloneElement`s** it: merges **`ref`**, **`className`**, **`aria-describedby`**, and pointer/focus handlers. The child must forward refs and accept standard DOM props.
-- **`Tooltip.Content`** — tooltip body; rendered through **`Portal`** as a **`div`** with **`role="tooltip"`** and **`id`** matching the trigger’s **`aria-describedby`**. Sets **`data-size`** and **`data-side`** for styling (including the arrow). Wraps children in **`ControlSizeProvider`** for the chosen **`size`**.
-
-### Minimal example
-
+## Import
 ```tsx
 import { Tooltip } from "prime-ui-kit";
+```
+
+## Anatomy
+```
+Tooltip.Provider        optional; shared show delay for a subtree
+└── Tooltip.Root        state of one tooltip (no DOM)
+    ├── Tooltip.Trigger clones its single child element and adds handlers
+    └── Tooltip.Content portaled role="tooltip" chip
+```
+
+## API
+
+### Tooltip.Provider
+No DOM, no ref.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `delayDuration` | `number` | `400` | Show delay in ms for every Tooltip.Root inside. |
+| `children` | `ReactNode` | — (required) | Subtree. |
+
+### Tooltip.Root
+No DOM, no ref. Works without a Provider (delay 400).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `open` | `boolean` | — | Controlled visibility. |
+| `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on hover, focus, blur, pointer-leave and Escape. |
+| `delayDuration` | `number` | from Provider (`400`) | Show delay in ms for this tooltip; hiding is immediate. |
+| `children` | `ReactNode` | — (required) | Tooltip.Trigger and Tooltip.Content. |
+
+### Tooltip.Trigger
+No DOM of its own: clones the child (`cloneElement`), like `asChild`. Sets the child's `ref` (a `ref` on the child is replaced), merges `className`, appends `aria-describedby` while open, sets `data-state`, and chains `onMouseEnter`, `onMouseLeave`, `onFocus`, `onBlur`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactElement` | — (required) | Exactly one focusable element (Button, a `<button>`, a `tabIndex={0}` span around a disabled control). |
+| `className` | `string` | — | Merged with the child's `className`. |
+
+### Tooltip.Content
+No ref. Rendered in a portal only while open (and during its exit animation).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `side` | `"top" \| "bottom" \| "left" \| "right"` | `"top"` | Preferred side; flips to the opposite side when it does not fit, then shifts inside the viewport. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text and padding tier; also the size context for controls inside (e.g. Kbd). |
+| `className` | `string` | — | Extra class on the chip. |
+| `children` | `ReactNode` | — (required) | Hint text, optionally with a Kbd. |
+
+## Variants
+Tooltip has no `variant` or `tone`: it is always a flat inverse chip (`tooltip-bg`, `tooltip-text`), no arrow, no shadow, so it reads the same on canvas, cards and floating layers.
+
+### size (Content)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | caption 12/16, padding 4 × 8, radius 6 | Next to xs controls | |
+| `s` | caption 12/16, padding 4 × 8 | Dense toolbars, s controls | |
+| `m` | caption 12/16, padding 4 × 8 | Most controls | yes |
+| `l` | body-s 13/20, padding 4 × 8 | l controls, longer sentences | |
+| `xl` | body-s 13/20, padding 8 × 12 | xl controls | |
+
+### side (Content)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `top` | Centred above the trigger, `--prime-space-1` away | Default for buttons in content | yes |
+| `bottom` | Centred below the trigger | Toolbars at the top of a screen | |
+| `left` | Vertically centred, to the left | Triggers near the right edge | |
+| `right` | Vertically centred, to the right | Sidebar / rail icons | |
+
+**Combinations** — size of the tooltip = size of the trigger control; inside the chip use `Kbd` one tier smaller (`size="s"` tooltip → `size="xs"` Kbd).
+
+## States
+- Closed / open: uncontrolled by default; `open` + `onOpenChange` for controlled. Opens after `delayDuration` on mouse-enter or focus; closes immediately on mouse-leave, blur or Escape.
+- Content DOM: `data-state="open" | "closed"` (closed during the fade-out), `data-size`, `data-side` (the resolved side after flipping), `data-positioned="true"` after the first measurement (invisible before), `data-overlay-portal-layer` (z-index layer when inside Modal / Drawer).
+- Trigger DOM: `data-state="open" | "closed"` on the child.
+- The chip has `pointer-events: none`, so it never blocks clicks on the trigger.
+
+## Layout & spacing
+- Max width `--prime-tooltip-max-width`, never wider than the viewport minus `--prime-space-4`; text wraps (`overflow-wrap: anywhere`).
+- Kept `--prime-space-2` from viewport edges; repositions on scroll and resize.
+- Enter / exit motion comes from the shared overlay motion (fade + 4px from the anchor, fast).
+
+## Accessibility
+- Content has `role="tooltip"`; the trigger gets `aria-describedby` pointing at it while open.
+- Opens on keyboard focus, closes on Escape with focus staying on the trigger (WAI-ARIA tooltip pattern).
+- The trigger must be focusable. A natively `disabled` button gets no pointer or focus events: wrap it in `<span tabIndex={0}>`.
+- Icon-only buttons need their own `aria-label`; the tooltip is a description, not the name.
+- No `labels`.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | `size` xs → xl next to matching buttons | Matching the tooltip to the control tier |
+| [long-content.tsx](examples/long-content.tsx) | Long text wrapping at max width (also shown on canvas, card and floating surfaces) | One-sentence explanations |
+| [states.tsx](examples/states.tsx) | Hover/focus, disabled button in a focusable span, inline term | Explaining unavailable actions and terms |
+| [side.tsx](examples/side.tsx) | `side` top · bottom · left · right | Placing near edges and in toolbars |
+| [controlled.tsx](examples/controlled.tsx) | `open` + `onOpenChange` driven by a Switch | Showing the hint programmatically |
+| [composition.tsx](examples/composition.tsx) | Icon-only toolbar with names and Kbd shortcuts | Toolbars |
+| [delay.tsx](examples/delay.tsx) | `delayDuration` 0 · default · 1000 | Tuning the show delay |
+
+```tsx
+import { Button, Tooltip } from "prime-ui-kit";
 
 export function Example() {
   return (
     <Tooltip.Root>
       <Tooltip.Trigger>
-        <button type="button">Hover</button>
-      </Tooltip.Trigger>
-      <Tooltip.Content>Help text</Tooltip.Content>
-    </Tooltip.Root>
-  );
-}
-```
-
-### Canonical example (icon-only control)
-
-Use this as the default copy-paste shell: **`aria-label`** (or another accessible name) on the **focusable** trigger, **`Button.Icon`** + **`Icon`**, and a short **`Tooltip.Content`** (often **`size="s"`** next to a **`size="m"`** control).
-
-```tsx
-import { Button, Icon, Tooltip } from "prime-ui-kit";
-
-export function CopyLinkHint() {
-  return (
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        <Button.Root
-          type="button"
-          variant="neutral"
-          mode="ghost"
-          aria-label="Copy link"
-        >
-          <Button.Icon>
-            <Icon name="action.copy" size="s" tone="subtle" />
-          </Button.Icon>
+        <Button.Root variant="soft" tone="neutral">
+          Экспорт
         </Button.Root>
       </Tooltip.Trigger>
-      <Tooltip.Content size="s">Copy page link to clipboard</Tooltip.Content>
+      <Tooltip.Content>Выгрузка займёт около минуты</Tooltip.Content>
     </Tooltip.Root>
   );
 }
 ```
 
-Source of truth (stays in sync with the snippet above): `examples/canonical-icon-hint.tsx`.
-
-The **playground** (`playground/sections/TooltipSection.tsx`) renders the same scenarios as **`playground/snippets/tooltip/*.tsx`** (internal `@/` imports). **`examples/`** below mirrors those snippets with **`"prime-ui-kit"`** imports; playground copy may differ (e.g. Russian labels) but structure and props match.
-
-### Example files in `examples/`
-
-| File | Scenario (aligned with `playground/snippets/tooltip/`) |
-|------|----------|
-| `sizes.tsx` | Four **`Tooltip.Content`** sizes **`s`–`xl`** on the same trigger pattern |
-| `surfaces.tsx` | Same tooltip on **`surface-default`** vs **`surface-raised`** panels |
-| `states.tsx` | Default trigger; native **`disabled`** (tooltip does not open); glossary-style **`button`** trigger |
-| `side.tsx` | **`side`** **`top`** \| **`bottom`** \| **`left`** \| **`right`** |
-| `controlled.tsx` | **`open`** / **`onOpenChange`** with **`Tooltip.Provider`** **`delayDuration={0}`** and **`Switch`** |
-| `composition.tsx` | **`LinkButton`** + **`Typography`** in content; icon-only **`Button`** with **`aria-label`** |
-| `delay.tsx` | **`Tooltip.Provider`** **`delayDuration={800}`** |
-| `long-content.tsx` | Multi-line copy; **`size="m"`**; theme **`max-width`** / wrapping |
-
-| File | Extra recipe |
-|------|----------|
-| `canonical-icon-hint.tsx` | Minimal icon-only shell: **`aria-label`**, **`size="s"`** hint |
-
-### Extended usage
-
-- **Delay:** wrap a subtree in **`Tooltip.Provider`** and set **`delayDuration`** (ms). Default is **400**; use a longer value to reduce accidental flashes, or **`0`** for tests and controlled demos.
-- **Long text:** rely on the built-in **`max-width`** and **`word-break`** on the content surface; prefer shorter copy when possible—if users must read a paragraph, use inline help, **Hint**, or **Popover** instead.
-- **Placement:** set **`side`** on **`Tooltip.Content`** when **top** clips; coordinates are **viewport-clamped** (**8px** inset) but the kit does **not** auto-flip to the opposite side.
-- **Controlled:** pass **`open`** and **`onOpenChange`** on **`Tooltip.Root`**; pointer/focus on the trigger still updates the same state. Pair with **`delayDuration={0}`** when an external control should show the tooltip immediately.
-- **Disabled triggers:** native **`disabled`** elements often skip hover/focus—wrap with a focusable container or use **`aria-disabled`** + custom styling if a tooltip on a “disabled” control is required.
-
-### Note for LLMs
-
-When generating **Tooltip** markup for this library: (1) **`Tooltip.Trigger`** takes **exactly one** **`ReactElement`** child (the implementation uses **`cloneElement`**). (2) Put the **accessible name** on the trigger (**`aria-label`**, visible text, or **`aria-labelledby`**)—the tooltip supplements it; do not rely on the tooltip alone for the control’s name. (3) Do not put **links, buttons, or inputs** inside **`Tooltip.Content`** (non-interactive layer, **`pointer-events: none`**). (4) Use **one** **`Tooltip.Root`** per anchor; do not attach one root to multiple triggers. (5) For starting points, mirror **`examples/canonical-icon-hint.tsx`**, then adapt the named files in **`examples/`** (same scenarios as **`playground/snippets/tooltip/`**).
-
-## Rules
-
-- **Uncontrolled:** omit **`open`**; optional **`defaultOpen`** (defaults to **`false`**). **Controlled:** pass **`open`** and **`onOpenChange`**; the same open state drives visibility together with hover/focus on the trigger.
-- Opening is **delayed** by **`Tooltip.Provider`**’s **`delayDuration`** after **`mouseenter`** or **`focus`**; leaving or **blur** clears the timer and closes. Cleanup runs on unmount.
-- **Position:** **`side`** is **`top`** \| **`bottom`** \| **`left`** \| **`right`** (default **`top`**). Coordinates are **clamped** to the viewport (**8px** inset); there is **no automatic flip** to the opposite side when space is tight—choose **`side`** explicitly if needed.
-- **Accessibility:** trigger gets **`aria-describedby`** pointing at the content **`id`**; content uses **`role="tooltip"`**. For inline glossary-style terms, prefer **`button type="button"`** as the trigger so keyboard focus is predictable.
-- **Portal:** content does not sit in the trigger’s DOM subtree; it won’t inherit layout/CSS from ancestors of the trigger (only what you pass as children and classes on **`Tooltip.Content`**).
-- **`Tooltip.Content`** defaults **`size`** to **`m`** and **`side`** to **`top`**; visual scale and arrow follow **`data-size`** / **`data-side`** and theme tokens—there is no separate **`variant`** prop.
-
-## API
-
-The package exports the **`Tooltip`** namespace object and types **`TooltipSize`**, **`TooltipSide`**, **`TooltipProviderProps`**, **`TooltipRootProps`**, **`TooltipTriggerProps`**, **`TooltipContentProps`**.
-
-### Tooltip.Provider
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| delayDuration | `number` | `400` | No | Milliseconds to wait before opening after pointer enters or the trigger receives focus |
-| children | `React.ReactNode` | — | Yes | Subtree whose tooltips use this delay |
-
-### Tooltip.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | Yes | Typically `Tooltip.Trigger` and `Tooltip.Content` |
-| open | `boolean` | — | No | Controlled open state |
-| defaultOpen | `boolean` | `false` | No | Initial open state when uncontrolled |
-| onOpenChange | `(open: boolean) => void` | — | No | Called when open state changes |
-
-### Tooltip.Trigger
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactElement` | — | Yes | Single element; receives ref, `aria-describedby`, and open/close handlers |
-| className | `string` | — | No | Merged with the child’s `className` via `cx()` |
-
-### Tooltip.Content
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | Yes | Tooltip body; wrapped in `ControlSizeProvider` for nested controls that read control size |
-| size | `TooltipSize` (`"s"` \| `"m"` \| `"l"` \| `"xl"`) | `"m"` | No | Padding, typography, and arrow scale |
-| side | `TooltipSide` (`"top"` \| `"bottom"` \| `"left"` \| `"right"`) | `"top"` | No | Placement relative to the trigger before viewport clamping |
-| className | `string` | — | No | Additional class on the portal root |
+## Mistakes
+- Tooltip on a `disabled` button directly → wrap the button in a focusable `span`.
+- Links or buttons inside Tooltip.Content → use Popover.
+- Several children inside Tooltip.Trigger → exactly one element.
+- Relying on the tooltip as the button's name → add `aria-label` to the button.
+- Passing a `ref` to the trigger child and expecting it to be kept → the trigger replaces it.
 
 ## Related
-
-[Button](../button/COMPONENT.md) — typical focusable trigger; [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) — persistent field labeling and helper text; [Popover](../popover/COMPONENT.md) — focusable, interactive overlay content.
+[Popover](../popover/COMPONENT.md) · [Kbd](../kbd/COMPONENT.md) · [Button](../button/COMPONENT.md) · [Hint](../hint/COMPONENT.md)

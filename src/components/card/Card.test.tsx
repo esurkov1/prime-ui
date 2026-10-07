@@ -38,11 +38,11 @@ describe("Card", () => {
       <Card.Root variant="stat-trend" data-testid="stat-card">
         <Card.Label>MRR</Card.Label>
         <Card.Value>120k</Card.Value>
-        <Card.Delta trend="up">+5%</Card.Delta>
+        <Card.Delta tone="success">+5%</Card.Delta>
       </Card.Root>,
     );
     expect(screen.getByTestId("stat-card")).toHaveAttribute("data-variant", "stat-trend");
-    expect(screen.getByText("+5%")).toHaveAttribute("data-trend", "up");
+    expect(screen.getByText("+5%")).toHaveAttribute("data-tone", "success");
   });
 
   it("renders panel variant with padded body and chart", () => {
@@ -57,5 +57,18 @@ describe("Card", () => {
     );
     expect(screen.getByText("Intro")).toBeInTheDocument();
     expect(screen.getByText("Plot")).toBeInTheDocument();
+  });
+
+  it("titles render h3 by default and take a heading level via as", () => {
+    render(
+      <Card.Root variant="panel">
+        <Card.SectionHeader>
+          <Card.SectionTitle as="h2">Профиль</Card.SectionTitle>
+        </Card.SectionHeader>
+        <Card.Title>Тариф</Card.Title>
+      </Card.Root>,
+    );
+    expect(screen.getByRole("heading", { level: 2, name: "Профиль" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Тариф" })).toBeInTheDocument();
   });
 });

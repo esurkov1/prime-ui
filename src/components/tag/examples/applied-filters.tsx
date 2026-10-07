@@ -1,0 +1,48 @@
+/** Applied filters panel: each tag removes its filter, the button clears all; `labels.remove` names the filter. Use above lists and tables with filters. */
+
+import { Button, Tag, Typography } from "prime-ui-kit";
+import * as React from "react";
+
+import styles from "./examples.module.css";
+
+const INITIAL = ["Москва", "Санкт-Петербург", "Есть в наличии", "До 5 000 ₽"];
+
+export default function TagAppliedFiltersExample() {
+  const [filters, setFilters] = React.useState(INITIAL);
+  const titleId = React.useId();
+
+  return (
+    <section className={styles.filters} aria-labelledby={titleId}>
+      <div className={styles.filtersHeader}>
+        <Typography.Root as="h3" variant="title-s" id={titleId}>
+          Фильтры
+        </Typography.Root>
+        <Button.Root
+          variant="ghost"
+          tone="neutral"
+          size="s"
+          onClick={() => setFilters(filters.length > 0 ? [] : INITIAL)}
+        >
+          {filters.length > 0 ? "Сбросить все" : "Вернуть"}
+        </Button.Root>
+      </div>
+      {filters.length > 0 ? (
+        <div className={styles.tags}>
+          {filters.map((label) => (
+            <Tag.Root
+              labels={{ remove: `Убрать фильтр «${label}»` }}
+              key={label}
+              onRemove={() => setFilters((prev) => prev.filter((item) => item !== label))}
+            >
+              {label}
+            </Tag.Root>
+          ))}
+        </div>
+      ) : (
+        <Typography.Root variant="body-s" tone="muted">
+          Фильтры не выбраны — показаны все товары.
+        </Typography.Root>
+      )}
+    </section>
+  );
+}

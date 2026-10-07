@@ -3,14 +3,14 @@ import * as React from "react";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { LinkButtonSize } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./LinkButton.module.css";
 
-export type { LinkButtonSize };
-
 export type LinkButtonRootProps = {
-  size?: LinkButtonSize;
+  size?: ControlSize;
+  /** `accent` — a regular link; `neutral` — quiet links in footers, metadata and dense navigation. */
+  tone?: Extract<Tone, "accent" | "neutral">;
   disabled?: boolean;
   children?: React.ReactNode;
   className?: string;
@@ -20,6 +20,7 @@ const LinkButtonRoot = React.forwardRef<HTMLAnchorElement, LinkButtonRootProps>(
   (
     {
       size = "m",
+      tone = "accent",
       disabled = false,
       children,
       className,
@@ -32,6 +33,7 @@ const LinkButtonRoot = React.forwardRef<HTMLAnchorElement, LinkButtonRootProps>(
     const cls = cx(styles.root, className);
     const dataProps = toDataAttributes({
       size,
+      tone,
       ...(disabled ? { disabled: true } : {}),
     });
 

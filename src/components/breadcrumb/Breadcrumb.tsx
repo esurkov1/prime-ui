@@ -4,42 +4,88 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { BreadcrumbSize } from "@/internal/states";
+import type { ControlSize } from "@/internal/states";
 
 import { LinkButton } from "../link-button/LinkButton";
 
 import styles from "./Breadcrumb.module.css";
 
-export type { BreadcrumbSize };
+export type BreadcrumbLabels = {
+  /** `aria-label` of the `nav` landmark. */
+  nav: string;
+  /** Accessible text of `Breadcrumb.Ellipsis` (skipped levels). */
+  ellipsis: string;
+};
 
-const BreadcrumbSizeContext = React.createContext<BreadcrumbSize>("m");
-BreadcrumbSizeContext.displayName = "BreadcrumbSizeContext";
+const DEFAULT_LABELS: BreadcrumbLabels = {
+  nav: "Навигационная цепочка",
+  ellipsis: "Скрытые разделы",
+};
 
-function useBreadcrumbSize(): BreadcrumbSize {
-  return React.useContext(BreadcrumbSizeContext);
-}
+type BreadcrumbContextValue = { size: ControlSize; labels: BreadcrumbLabels };
+
+const BreadcrumbContext = React.createContext<BreadcrumbContextValue>({
+  size: "m",
+  labels: DEFAULT_LABELS,
+});
 
 export type BreadcrumbRootProps = {
   children: React.ReactNode;
   className?: string;
   /** Кегль ссылок (LinkButton), текущей страницы, многоточия; иконка-разделитель и иконка «дом» — тот же ярус. */
-  size?: BreadcrumbSize;
+  size?: ControlSize;
+  /** Built-in strings. */
+  labels?: Partial<BreadcrumbLabels>;
 } & React.HTMLAttributes<HTMLElement>;
 
-function BreadcrumbRoot({ children, className, size = "m", ...rest }: BreadcrumbRootProps) {
+/** Minimum number of list children (item, separator, item, separator, item) to enable collapsing. */
+const COLLAPSIBLE_MIN_CHILDREN = 5;
+
+function BreadcrumbRoot({
+  children,
+  className,
+  size = "m",
+  labels: labelsProp,
+  ...rest
+}: BreadcrumbRootProps) {
+  const items = React.Children.toArray(children);
+  const collapsible = items.length >= COLLAPSIBLE_MIN_CHILDREN;
+  const nav = labelsProp?.nav ?? DEFAULT_LABELS.nav;
+  const ellipsis = labelsProp?.ellipsis ?? DEFAULT_LABELS.ellipsis;
+  const contextValue = React.useMemo(
+    () => ({ size, labels: { nav, ellipsis } }),
+    [size, nav, ellipsis],
+  );
+
   return (
-    <BreadcrumbSizeContext.Provider value={size}>
+    <BreadcrumbContext.Provider value={contextValue}>
       <ControlSizeProvider value={size}>
         <nav
-          aria-label="Breadcrumb"
-          className={cx(styles.root, className)}
-          {...toDataAttributes({ size })}
+          aria-label={nav}
           {...rest}
+          className={cx(styles.root, className)}
+          {...toDataAttributes({ size, collapsible })}
         >
-          <ol>{children}</ol>
+          <ol className={styles.list}>
+            {collapsible ? (
+              <>
+                {items.slice(0, 2)}
+                {/* Shown only on narrow widths (container query) in place of the middle items. */}
+                <li aria-hidden="true" className={cx(styles.ellipsis, styles.autoCollapse)}>
+                  …
+                </li>
+                <li aria-hidden="true" className={cx(styles.separator, styles.autoCollapse)}>
+                  <Icon name="nav.chevronRight" size={size} tone="secondary" />
+                </li>
+                {items.slice(2)}
+              </>
+            ) : (
+              children
+            )}
+          </ol>
         </nav>
       </ControlSizeProvider>
-    </BreadcrumbSizeContext.Provider>
+    </BreadcrumbContext.Provider>
   );
 }
 BreadcrumbRoot.displayName = "Breadcrumb.Root";
@@ -60,7 +106,7 @@ function BreadcrumbItem({
   className,
   "aria-label": ariaLabel,
 }: BreadcrumbItemProps) {
-  const size = useBreadcrumbSize();
+  const { size } = React.useContext(BreadcrumbContext);
   return (
     <li className={cx(styles.item, className)}>
       {href ? (
@@ -74,8 +120,9 @@ function BreadcrumbItem({
         </LinkButton.Root>
       ) : (
         <span
-          className={current ? styles.itemCurrent : undefined}
+          className={cx(styles.text, current && styles.itemCurrent)}
           aria-current={current ? "page" : undefined}
+          title={typeof children === "string" ? children : undefined}
         >
           {children}
         </span>
@@ -91,10 +138,10 @@ export type BreadcrumbSeparatorProps = {
 };
 
 function BreadcrumbSeparator({ children, className }: BreadcrumbSeparatorProps) {
-  const size = useBreadcrumbSize();
+  const { size } = React.useContext(BreadcrumbContext);
   return (
     <li aria-hidden="true" className={cx(styles.separator, className)}>
-      {children ?? <Icon name="nav.chevronRight" size={size} tone="subtle" />}
+      {children ?? <Icon name="nav.chevronRight" size={size} tone="secondary" />}
     </li>
   );
 }
@@ -105,7 +152,13 @@ export type BreadcrumbEllipsisProps = {
 };
 
 function BreadcrumbEllipsis({ className }: BreadcrumbEllipsisProps) {
-  return <li className={cx(styles.ellipsis, className)}>…</li>;
+  const { labels } = React.useContext(BreadcrumbContext);
+  return (
+    <li className={cx(styles.ellipsis, className)}>
+      <span aria-hidden="true">…</span>
+      <span className={styles.srOnly}>{labels.ellipsis}</span>
+    </li>
+  );
 }
 BreadcrumbEllipsis.displayName = "Breadcrumb.Ellipsis";
 

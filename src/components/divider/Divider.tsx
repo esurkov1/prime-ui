@@ -4,23 +4,18 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { DividerContentContext } from "@/internal/DividerContentContext";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { DividerSize } from "@/internal/states";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Divider.module.css";
-
-export type { DividerSize };
 
 export type DividerOrientation = "horizontal" | "vertical";
 export type DividerAlign = "start" | "center" | "end";
 
-/** `line-spacing` — маркер для линии между секциями (ритм соседей — через `gap` у flex-родителя); `text` — подпись секции. */
-export type DividerVariant = "default" | "line-spacing" | "text";
-
 export type DividerRootProps = {
   orientation?: DividerOrientation;
+  /** Position of the label (children) on the line. Default `center`. */
   align?: DividerAlign;
-  variant?: DividerVariant;
-  size?: DividerSize;
+  size?: ControlSize;
   children?: React.ReactNode;
   className?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -29,8 +24,7 @@ const DividerRoot = React.forwardRef<HTMLDivElement, DividerRootProps>(
   (
     {
       orientation = "horizontal",
-      align: alignProp,
-      variant = "default",
+      align = "center",
       size = "m",
       children,
       className,
@@ -39,8 +33,6 @@ const DividerRoot = React.forwardRef<HTMLDivElement, DividerRootProps>(
     },
     ref,
   ) => {
-    const align: DividerAlign = alignProp ?? (variant === "text" ? "start" : "center");
-
     return (
       <div
         {...rest}
@@ -48,7 +40,7 @@ const DividerRoot = React.forwardRef<HTMLDivElement, DividerRootProps>(
         className={cx(styles.root, className)}
         role={role}
         {...(orientation === "vertical" ? { "aria-orientation": "vertical" as const } : {})}
-        {...toDataAttributes({ orientation, align, variant, size })}
+        {...toDataAttributes({ orientation, align, size })}
       >
         {children != null ? (
           <ControlSizeProvider value={size}>

@@ -3,34 +3,52 @@ import * as React from "react";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { LabelSize } from "@/internal/states";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Label.module.css";
 
-export type { LabelSize };
+export type LabelLabels = {
+  /** Muted marker after the label text when `optional`. */
+  optional: string;
+};
 
-const LabelSizeContext = React.createContext<LabelSize>("m");
+const LABEL_LABELS: LabelLabels = { optional: "необязательно" };
+
+const LabelSizeContext = React.createContext<ControlSize>("m");
 
 export type LabelRootProps = Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size"> & {
   disabled?: boolean;
-  size?: LabelSize;
+  size?: ControlSize;
+  /** Appends a red `*` (decorative, `aria-hidden`). Put native `required` on the control itself. */
+  required?: boolean;
+  /** Appends the muted optional marker (`labels.optional`). */
+  optional?: boolean;
+  labels?: Partial<LabelLabels>;
 };
 
 const LabelRoot = React.forwardRef<HTMLLabelElement, LabelRootProps>(
-  ({ className, disabled, children, size = "m", ...rest }, ref) => {
-    return (
-      // biome-ignore lint/a11y/noLabelWithoutControl: field label primitive; association via htmlFor or wrapping control is caller responsibility
-      <label
-        ref={ref}
-        className={cx(styles.root, className)}
-        aria-disabled={disabled || undefined}
-        {...rest}
-        {...toDataAttributes({ disabled, size })}
-      >
-        <LabelSizeContext.Provider value={size}>{children}</LabelSizeContext.Provider>
-      </label>
-    );
-  },
+  ({ className, disabled, children, size = "m", required, optional, labels, ...rest }, ref) => (
+    // biome-ignore lint/a11y/noLabelWithoutControl: field label primitive; association via htmlFor or wrapping control is caller responsibility
+    <label
+      ref={ref}
+      className={cx(styles.root, className)}
+      aria-disabled={disabled || undefined}
+      {...rest}
+      {...toDataAttributes({ disabled: disabled || undefined, size })}
+    >
+      <LabelSizeContext.Provider value={size}>
+        {children}
+        {required ? (
+          <span className={styles.asterisk} aria-hidden="true">
+            *
+          </span>
+        ) : null}
+        {optional ? (
+          <span className={styles.optional}>{labels?.optional ?? LABEL_LABELS.optional}</span>
+        ) : null}
+      </LabelSizeContext.Provider>
+    </label>
+  ),
 );
 LabelRoot.displayName = "LabelRoot";
 
@@ -44,15 +62,7 @@ function LabelIcon({ className, children, ...rest }: React.HTMLAttributes<HTMLSp
 }
 LabelIcon.displayName = "LabelIcon";
 
-function LabelAsterisk({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
-  return (
-    <span className={cx(styles.asterisk, className)} {...rest}>
-      {children ?? "*"}
-    </span>
-  );
-}
-LabelAsterisk.displayName = "LabelAsterisk";
-
+/** Secondary inline text inside the label (units, short clarification). */
 function LabelSub({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
   return (
     <span className={cx(styles.sub, className)} {...rest}>
@@ -62,4 +72,8 @@ function LabelSub({ className, children, ...rest }: React.HTMLAttributes<HTMLSpa
 }
 LabelSub.displayName = "LabelSub";
 
-export const Label = { Root: LabelRoot, Icon: LabelIcon, Asterisk: LabelAsterisk, Sub: LabelSub };
+export const Label = {
+  Root: LabelRoot,
+  Icon: LabelIcon,
+  Sub: LabelSub,
+};

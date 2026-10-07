@@ -1,6 +1,7 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type * as React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TagSelect } from "./TagSelect";
 
@@ -37,14 +38,14 @@ describe("TagSelect", () => {
     render(<BasicTagSelect />);
     fireEvent.focus(screen.getByRole("combobox"));
     fireEvent.click(screen.getByRole("option", { name: "Alpha" }));
-    expect(screen.getByRole("button", { name: /Remove Alpha/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Удалить Alpha/i })).toBeInTheDocument();
   });
 
   it("снимает последний тег по Backspace при пустом вводе", () => {
     render(<BasicTagSelect defaultValue={["a"]} />);
     const input = screen.getByRole("combobox");
     fireEvent.keyDown(input, { key: "Backspace" });
-    expect(screen.queryByRole("button", { name: /Remove Alpha/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Удалить Alpha/i })).not.toBeInTheDocument();
   });
 
   it("в режиме creatable показывает строку создания для нового текста", () => {
@@ -59,15 +60,27 @@ describe("TagSelect", () => {
     const input = screen.getByRole("combobox");
     fireEvent.change(input, { target: { value: "новый" } });
     fireEvent.click(screen.getByRole("option", { name: /новый/i }));
-    expect(screen.getByRole("button", { name: /Remove новый/i })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Remove новый/i }));
-    expect(screen.queryByRole("button", { name: /Remove новый/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Удалить новый/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Удалить новый/i }));
+    expect(screen.queryByRole("button", { name: /Удалить новый/i })).not.toBeInTheDocument();
     fireEvent.focus(input);
     expect(screen.getByRole("option", { name: "новый" })).toBeInTheDocument();
   });
 
-  it("не открывает список при фокусе если нечего выбирать и нет creatable", () => {
+  // Раньше выбранные прятались из списка; теперь они сверху с галочкой: при многих тегах часть
+  // свёрнута в «+N», и снять их можно прямо в списке.
+  it("все теги выбраны: список открывается, выбранные отмечены; снятие галочки убирает тег", () => {
     render(<BasicTagSelect defaultValue={["a", "b"]} />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    const alpha = screen.getByRole("option", { name: "Alpha" });
+    expect(alpha).toHaveAttribute("aria-selected", "true");
+    fireEvent.click(alpha);
+    expect(screen.queryByRole("button", { name: /Удалить Alpha/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Alpha" })).toHaveAttribute("aria-selected", "false");
+  });
+
+  it("пустой список без опций и без creatable не открывается", () => {
+    render(<BasicTagSelect options={[]} />);
     fireEvent.focus(screen.getByRole("combobox"));
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
@@ -80,9 +93,9 @@ describe("TagSelect", () => {
     expect(onValueChange).toHaveBeenCalledWith(["b"]);
   });
 
-  it("вызывает onCreated только при создании через creatable", () => {
+  it("вызывает onCreate только при создании через creatable", () => {
     const onCreated = vi.fn();
-    render(<BasicTagSelect creatable onCreated={onCreated} />);
+    render(<BasicTagSelect creatable onCreate={onCreated} />);
     const input = screen.getByRole("combobox");
     fireEvent.change(input, { target: { value: "newtag" } });
     fireEvent.click(screen.getByRole("option", { name: /newtag/i }));
@@ -93,71 +106,251 @@ describe("TagSelect", () => {
     render(<BasicTagSelect defaultValue={["a"]} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.click(screen.getByRole("button", { name: /Remove Alpha/i }));
-    expect(screen.queryByRole("button", { name: /Remove Alpha/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Удалить Alpha/i }));
+    expect(screen.queryByRole("button", { name: /Удалить Alpha/i })).not.toBeInTheDocument();
   });
 
-  it("при optionManagement показывает кнопку меню у опции", () => {
-    render(
-      <BasicTagSelect
-        optionManagement={{
-          onUpdate: vi.fn(),
-          onDelete: vi.fn(),
-        }}
-      />,
-    );
+  it("с onOptionUpdate / onOptionDelete показывает кнопку меню у опции", () => {
+    render(<BasicTagSelect onOptionUpdate={vi.fn()} onOptionDelete={vi.fn()} />);
     fireEvent.focus(screen.getByRole("combobox"));
-    expect(screen.getByRole("button", { name: /Edit tag Alpha/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Изменить тег Alpha/i })).toBeInTheDocument();
   });
 
-  it("при optionManagement не дублирует уже выбранные в основном списке (только строки для добавления)", () => {
-    render(
-      <BasicTagSelect
-        defaultValue={["a"]}
-        optionManagement={{
-          onUpdate: vi.fn(),
-          onDelete: vi.fn(),
-        }}
-      />,
-    );
+  it("выбранные — первыми в списке, с отмеченным чекбоксом", () => {
+    render(<BasicTagSelect defaultValue={["b"]} />);
     fireEvent.focus(screen.getByRole("combobox"));
-    expect(screen.getByRole("option", { name: "Beta" })).toBeInTheDocument();
-    expect(screen.queryByRole("option", { name: "Alpha" })).not.toBeInTheDocument();
+    const options = screen.getAllByRole("option");
+    expect(options.map((o) => o.dataset.value)).toEqual(["b", "a"]);
+    expect(options[0]).toHaveAttribute("aria-selected", "true");
+    expect(options[1]).toHaveAttribute("aria-selected", "false");
   });
 
-  it("при optionManagement при всех выбранных тегах панель не открывается; после снятия тега — снова есть ⋯", () => {
+  it("с onOptionUpdate / onOptionDelete меню ⋯ есть и у выбранных тегов", () => {
     render(
       <BasicTagSelect
         defaultValue={["a", "b"]}
-        optionManagement={{
-          onUpdate: vi.fn(),
-          onDelete: vi.fn(),
-        }}
+        onOptionUpdate={vi.fn()}
+        onOptionDelete={vi.fn()}
       />,
     );
-    const input = screen.getByRole("combobox");
-    fireEvent.focus(input);
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Remove Alpha/i }));
-    fireEvent.focus(input);
-    expect(screen.getByRole("listbox")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Edit tag Alpha/i })).toBeInTheDocument();
+    fireEvent.focus(screen.getByRole("combobox"));
+    expect(screen.getByRole("button", { name: /Изменить тег Alpha/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Изменить тег Beta/i })).toBeInTheDocument();
   });
 
   it("вызывает onDelete из меню (опция видна, пока не выбрана в поле)", () => {
     const onDelete = vi.fn();
     render(
-      <BasicTagSelect
-        defaultValue={["b"]}
-        optionManagement={{
-          onUpdate: vi.fn(),
-          onDelete,
-        }}
-      />,
+      <BasicTagSelect defaultValue={["b"]} onOptionUpdate={vi.fn()} onOptionDelete={onDelete} />,
     );
     fireEvent.focus(screen.getByRole("combobox"));
-    fireEvent.click(screen.getByRole("button", { name: /Edit tag Alpha/i }));
-    fireEvent.click(screen.getByRole("button", { name: /^Delete$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Удалить$/i }));
     expect(onDelete).toHaveBeenCalledWith("a");
+  });
+
+  it("только onOptionDelete: в меню нет поля имени и палитры", () => {
+    render(<BasicTagSelect onOptionDelete={vi.fn()} />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+    expect(screen.getByRole("button", { name: /^Удалить$/i })).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Название тега" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Синий" })).not.toBeInTheDocument();
+  });
+
+  it("labels переопределяют системные строки", () => {
+    render(
+      <BasicTagSelect
+        defaultValue={["a"]}
+        labels={{ remove: "Remove {label}", panelHint: "Pick tags" }}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Remove Alpha" })).toBeInTheDocument();
+    fireEvent.focus(screen.getByRole("combobox"));
+    expect(screen.getByText("Pick tags")).toBeInTheDocument();
+  });
+
+  it("чипы — Tag: цвет опции в data-color", () => {
+    render(<BasicTagSelect defaultValue={["b"]} />);
+    const remove = screen.getByRole("button", { name: /Удалить Beta/i });
+    expect(remove.closest("[data-color]")).toHaveAttribute("data-color", "green");
+  });
+
+  it("controlled open: onOpenChange и data-state", () => {
+    const onOpenChange = vi.fn();
+    const { container } = render(<BasicTagSelect open={false} onOpenChange={onOpenChange} />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(container.querySelector('[data-state="closed"]')).toBeInTheDocument();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("label, hint и error: подпись и описание поля ввода", () => {
+    const { rerender } = render(
+      <TagSelect.Root options={sampleOptions} label="Метки" hint="До пяти" required />,
+    );
+    const input = screen.getByRole("combobox", { name: /Метки/ });
+    expect(input).toHaveAccessibleDescription("До пяти");
+    expect(input).toHaveAttribute("aria-required", "true");
+    rerender(<TagSelect.Root options={sampleOptions} label="Метки" error="Нужна метка" />);
+    expect(input).toHaveAccessibleDescription("Нужна метка");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+  });
+
+  describe("чипы в одну строку", () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("не помещающиеся чипы сворачиваются в «+N»", () => {
+      vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(60);
+      vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(150);
+      render(
+        <BasicTagSelect
+          options={[...sampleOptions, { value: "c", label: "Gamma", color: "red" }]}
+          defaultValue={["a", "b", "c"]}
+        />,
+      );
+      expect(screen.getByRole("button", { name: /Удалить Alpha/i })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /Удалить Beta/i })).not.toBeInTheDocument();
+      const more = screen.getByRole("button", { name: "Показать ещё 2" });
+      expect(more).toHaveTextContent("+2");
+      expect(more).toHaveAttribute("title", "Beta, Gamma");
+    });
+
+    it("«+N» раскрывает поле со всеми тегами и открывает список", () => {
+      vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(60);
+      vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(150);
+      const { container } = render(
+        <BasicTagSelect
+          options={[...sampleOptions, { value: "c", label: "Gamma", color: "red" }]}
+          defaultValue={["a", "b", "c"]}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "Показать ещё 2" }));
+      expect(container.querySelector('[data-expanded="true"]')).not.toBeNull();
+      expect(screen.getByRole("button", { name: /Удалить Gamma/i })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /Показать ещё/ })).not.toBeInTheDocument();
+      expect(screen.getByRole("listbox")).toBeInTheDocument();
+      expect(screen.getByRole("combobox")).toHaveFocus();
+    });
+
+    it("сворачивается обратно при уходе фокуса", async () => {
+      const { container } = render(
+        <>
+          <BasicTagSelect defaultValue={["a"]} />
+          <button type="button">Снаружи</button>
+        </>,
+      );
+      const input = screen.getByRole("combobox");
+      act(() => input.focus());
+      expect(container.querySelector('[data-expanded="true"]')).not.toBeNull();
+      fireEvent.keyDown(input, { key: "Escape" });
+      act(() => screen.getByRole("button", { name: "Снаружи" }).focus());
+      await waitFor(() => expect(container.querySelector('[data-expanded="true"]')).toBeNull());
+    });
+  });
+
+  describe("клавиатура по тегам", () => {
+    it("ArrowLeft из пустого ввода — на последний тег, дальше по тегам; ArrowRight с последнего — в ввод", () => {
+      render(<BasicTagSelect defaultValue={["a", "b"]} />);
+      const input = screen.getByRole("combobox");
+      input.focus();
+      fireEvent.keyDown(input, { key: "ArrowLeft" });
+      const beta = screen
+        .getByRole("button", { name: /Удалить Beta/i })
+        .closest("[data-chip-value]");
+      expect(beta).toHaveFocus();
+      fireEvent.keyDown(beta as Element, { key: "ArrowLeft" });
+      const alpha = screen
+        .getByRole("button", { name: /Удалить Alpha/i })
+        .closest("[data-chip-value]");
+      expect(alpha).toHaveFocus();
+      fireEvent.keyDown(alpha as Element, { key: "ArrowRight" });
+      fireEvent.keyDown(beta as Element, { key: "ArrowRight" });
+      expect(input).toHaveFocus();
+    });
+
+    it("Delete на теге удаляет его, фокус — на соседний, озвучивается «Удалено: …»", () => {
+      render(<BasicTagSelect defaultValue={["a", "b"]} />);
+      const input = screen.getByRole("combobox");
+      input.focus();
+      fireEvent.keyDown(input, { key: "ArrowLeft" });
+      fireEvent.keyDown(input, { key: "ArrowLeft" });
+      const beta = screen
+        .getByRole("button", { name: /Удалить Beta/i })
+        .closest("[data-chip-value]");
+      fireEvent.keyDown(beta as Element, { key: "Delete" });
+      expect(screen.queryByRole("button", { name: /Удалить Beta/i })).not.toBeInTheDocument();
+      expect(screen.getByRole("status")).toHaveTextContent("Удалено: Beta");
+      expect(
+        screen.getByRole("button", { name: /Удалить Alpha/i }).closest("[data-chip-value]"),
+      ).toHaveFocus();
+      fireEvent.keyDown(document.activeElement as Element, { key: "Backspace" });
+      expect(screen.getByRole("status")).toHaveTextContent("Удалено: Alpha");
+      expect(input).toHaveFocus();
+    });
+
+    it("Backspace в пустом вводе озвучивает удаление", () => {
+      render(<BasicTagSelect defaultValue={["a"]} />);
+      fireEvent.keyDown(screen.getByRole("combobox"), { key: "Backspace" });
+      expect(screen.getByRole("status")).toHaveTextContent("Удалено: Alpha");
+    });
+  });
+});
+
+describe("TagSelect focusRing", () => {
+  it("focusRing={false} marks the field and keeps the invalid state", () => {
+    render(<BasicTagSelect focusRing={false} invalid />);
+    const input = screen.getByRole("combobox");
+    const control = input.closest("[data-focus-ring]");
+    expect(control).toHaveAttribute("data-focus-ring", "false");
+    expect(control).toHaveAttribute("data-invalid", "true");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+  });
+});
+
+describe("TagSelect — overlay contract", () => {
+  it("an outside click closes the panel; a click on the field does not", () => {
+    render(
+      <div>
+        <BasicTagSelect />
+        <div data-testid="empty-space" />
+      </div>,
+    );
+    const input = screen.getByRole("combobox");
+    fireEvent.focus(input);
+    fireEvent.pointerDown(input);
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+
+    fireEvent.pointerDown(screen.getByTestId("empty-space"));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  // One outside click both closes the panel and blurs / collapses the field (focus follows the
+  // pointer, foundation §8); previously the first click only closed the panel.
+  it("one click on empty space closes the panel and collapses the field", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <div>
+        <BasicTagSelect defaultValue={["a"]} />
+        <p>empty</p>
+      </div>,
+    );
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+    expect(container.querySelector('[data-expanded="true"]')).not.toBeNull();
+    await user.click(screen.getByText("empty"));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(input).not.toHaveFocus();
+    await waitFor(() => expect(container.querySelector('[data-expanded="true"]')).toBeNull());
+  });
+
+  it("Escape closes the panel", () => {
+    render(<BasicTagSelect />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 });

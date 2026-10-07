@@ -1,37 +1,23 @@
-import { Icon, Label } from "prime-ui-kit";
+/** Label sizes match the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20. Always use the size of the field below. */
+import { type ControlSize, Label, Typography } from "prime-ui-kit";
 
-/** Mirrors `playground/snippets/label/sizes.tsx`: plain text and `Label.Icon` rows for `s`–`xl`. */
-export function LabelSizesExample() {
+import styles from "./examples.module.css";
+
+const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+
+export default function LabelSizesExample() {
   return (
-    <>
-      <Label.Root size="s">Label s</Label.Root>
-      <Label.Root size="m">Label m</Label.Root>
-      <Label.Root size="l">Label l</Label.Root>
-      <Label.Root size="xl">Label xl</Label.Root>
-      <Label.Root size="s">
-        <Label.Icon>
-          <Icon aria-hidden name="nav.home" />
-        </Label.Icon>
-        Label s
-      </Label.Root>
-      <Label.Root size="m">
-        <Label.Icon>
-          <Icon aria-hidden name="nav.home" />
-        </Label.Icon>
-        Label m
-      </Label.Root>
-      <Label.Root size="l">
-        <Label.Icon>
-          <Icon aria-hidden name="nav.home" />
-        </Label.Icon>
-        Label l
-      </Label.Root>
-      <Label.Root size="xl">
-        <Label.Icon>
-          <Icon aria-hidden name="nav.home" />
-        </Label.Icon>
-        Label xl
-      </Label.Root>
-    </>
+    <div className={styles.sizes}>
+      {sizes.map((size) => (
+        <div key={size} className={styles.sizeCell}>
+          <Label.Root size={size} required>
+            Email
+          </Label.Root>
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
+          </Typography.Root>
+        </div>
+      ))}
+    </div>
   );
 }

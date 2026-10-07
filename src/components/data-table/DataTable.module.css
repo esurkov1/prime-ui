@@ -1,330 +1,132 @@
-.root {
-  --dt-row-height: var(--prime-sys-size-control-m-height);
-  --dt-cell-gap: var(--prime-sys-size-control-m-gap);
-  --dt-cell-pad-x: var(--prime-sys-size-control-m-buttonPaddingX);
-  --dt-cell-pad-y: var(--prime-sys-size-control-m-buttonPaddingY);
-  --dt-text: var(--prime-sys-size-control-m-text);
+/*
+ * DataTable — Graphite.
+ * Surface container (bg-surface, card radius, no outer border), sunken head, hairline row separators.
+ * Density follows `size`: xs/s = compact (row-height-s), m = default (row-height-m), l/xl = comfortable (row-height-l).
+ */
 
-  display: grid;
-  gap: var(--prime-sys-spacing-x3);
-  width: 100%;
-  --dt-head-bg: var(--prime-sys-color-dataTable-headBackground);
-  --dt-row-bg: var(--prime-sys-color-dataTable-rowBackground);
-  --dt-divider-color-vertical: var(--prime-sys-color-dataTable-dividerVertical);
-  --dt-divider-color-horizontal: var(--prime-sys-color-dataTable-dividerHorizontal);
+.root {
+  --dt-row-height: var(--prime-table-row-height-m);
+  --dt-head-height: var(--prime-control-m-height);
+  --dt-head-size: var(--prime-control-m-label-size);
+  --dt-head-line-height: var(--prime-control-m-label-line-height);
+  --dt-pad-x: var(--prime-table-cell-padding-x);
+  --dt-gap: var(--prime-space-2);
+  --dt-text-size: var(--prime-control-m-text-size);
+  --dt-text-line-height: var(--prime-control-m-line-height);
+  --dt-sort-icon: var(--prime-control-m-icon);
+  --dt-choice: var(--prime-control-m-choice);
+  /* Expand toggle: square ghost button one tier below the table (m → xs, 28). */
+  --dt-toggle: var(--prime-control-xs-height);
+  /* Sub-row indent per depth: an avatar of the tier + the cell gap, so a child's content starts
+   * under the parent's text. Override `--dt-indent` on the root for other leading content. */
+  --dt-indent: calc(var(--prime-avatar-m) + var(--dt-gap));
+  /* Leading utility columns (selection, expand toggle); widths include padding. */
+  --dt-select-w: calc(var(--dt-choice) + 2 * var(--dt-pad-x));
+  --dt-toggle-w: var(--dt-toggle);
+
+  /* Bounded block: card-bg contrasts with the host plane (surface on canvas, sunken on a surface). */
+  --dt-surface: var(--prime-color-card-bg);
+  /* One opaque step off the table fill, so sticky head and zebra rows stay visible on either host. */
+  --dt-step: color-mix(in srgb, var(--dt-surface) 96%, var(--prime-color-text-primary));
+  /* Two steps: on the canvas one step off white equals the canvas, and the table's top edge vanishes. */
+  --dt-head-bg: color-mix(in srgb, var(--dt-surface) 92%, var(--prime-color-text-primary));
+  --dt-divider-color: var(--prime-color-border-subtle);
   --dt-divider-style: solid;
-  --dt-divider-width: var(--prime-sys-unit-1px);
-  --dt-sort-icon: var(--prime-sys-size-control-m-icon);
-  --dt-z-sticky-first-column: 10;
-  --dt-z-sticky-header: 20;
-  --dt-z-sticky-header-first-column: 30;
-  --dt-z-sticky-corner: 40;
-  --dt-sticky-header-shadow: 0 var(--prime-sys-unit-1px) 0 0 var(--prime-sys-color-border-subtle);
-  --dt-sticky-first-column-shadow:
-    var(--prime-sys-unit-1px) 0 0 0 var(--prime-sys-color-border-subtle),
-    8px 0 16px -14px color-mix(in srgb, var(--prime-sys-color-content-primary) 42%, transparent);
-  --dt-sticky-corner-shadow:
-    var(--prime-sys-unit-1px) 0 0 0 var(--prime-sys-color-border-subtle),
-    0 var(--prime-sys-unit-1px) 0 0 var(--prime-sys-color-border-subtle),
-    8px 0 16px -14px color-mix(in srgb, var(--prime-sys-color-content-primary) 42%, transparent),
-    0 8px 16px -14px color-mix(in srgb, var(--prime-sys-color-content-primary) 42%, transparent);
-  /* Подсветки: смесь с фоном строки/шапки, без «заливки» action-hover */
-  --dt-row-hover-bg: color-mix(
-    in srgb,
-    var(--prime-sys-color-content-primary) 7%,
-    var(--dt-row-bg)
-  );
-  --dt-column-hover-bg: color-mix(
-    in srgb,
-    var(--prime-sys-color-content-primary) 9%,
-    var(--dt-row-bg)
-  );
-  --dt-column-hover-head-bg: color-mix(
-    in srgb,
-    var(--prime-sys-color-content-primary) 9%,
-    var(--dt-head-bg)
-  );
-  --dt-row-striped-bg: color-mix(
-    in srgb,
-    var(--prime-sys-color-content-primary) 4.5%,
-    var(--dt-row-bg)
-  );
+  --dt-divider-width: var(--prime-border-width);
+  --dt-column-divider-width: 0;
+
+  --dt-z-sticky-first-column: 1;
+  --dt-z-sticky-header: 2;
+  --dt-z-sticky-corner: 3;
+
+  /* Surface context: fields inside the table are one step off the surface. */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--prime-card-radius);
+  background: var(--dt-surface);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+}
+
+/* Header is one step below the cell text of the same tier; heights follow the control tiers. */
+.root[data-size="xs"] {
+  --dt-row-height: var(--prime-table-row-height-s);
+  --dt-head-height: var(--prime-control-xs-height);
+  --dt-head-size: var(--prime-control-xs-label-size);
+  --dt-head-line-height: var(--prime-control-xs-label-line-height);
+  --dt-pad-x: var(--prime-space-2);
+  --dt-text-size: var(--prime-control-xs-text-size);
+  --dt-text-line-height: var(--prime-control-xs-line-height);
+  --dt-sort-icon: var(--prime-control-xs-icon);
+  --dt-choice: var(--prime-control-xs-choice);
+  --dt-indent: calc(var(--prime-avatar-xs) + var(--dt-gap));
 }
 
 .root[data-size="s"] {
-  --dt-row-height: var(--prime-sys-size-control-s-height);
-  --dt-cell-gap: var(--prime-sys-size-control-s-gap);
-  --dt-cell-pad-x: var(--prime-sys-size-control-s-buttonPaddingX);
-  --dt-cell-pad-y: var(--prime-sys-size-control-s-buttonPaddingY);
-  --dt-text: var(--prime-sys-size-control-s-text);
-  --dt-sort-icon: var(--prime-sys-size-control-s-icon);
+  --dt-row-height: var(--prime-table-row-height-s);
+  --dt-head-height: var(--prime-control-s-height);
+  --dt-head-size: var(--prime-control-s-label-size);
+  --dt-head-line-height: var(--prime-control-s-label-line-height);
+  --dt-text-size: var(--prime-control-s-text-size);
+  --dt-text-line-height: var(--prime-control-s-line-height);
+  --dt-sort-icon: var(--prime-control-s-icon);
+  --dt-choice: var(--prime-control-s-choice);
+  --dt-indent: calc(var(--prime-avatar-s) + var(--dt-gap));
 }
 
 .root[data-size="l"] {
-  --dt-row-height: var(--prime-sys-size-control-l-height);
-  --dt-cell-gap: var(--prime-sys-size-control-l-gap);
-  --dt-cell-pad-x: var(--prime-sys-size-control-l-buttonPaddingX);
-  --dt-cell-pad-y: var(--prime-sys-size-control-l-buttonPaddingY);
-  --dt-text: var(--prime-sys-size-control-l-text);
-  --dt-sort-icon: var(--prime-sys-size-control-l-icon);
+  --dt-row-height: var(--prime-table-row-height-l);
+  --dt-head-height: var(--prime-control-l-height);
+  --dt-head-size: var(--prime-control-l-label-size);
+  --dt-head-line-height: var(--prime-control-l-label-line-height);
+  --dt-text-size: var(--prime-control-l-text-size);
+  --dt-text-line-height: var(--prime-control-l-line-height);
+  --dt-sort-icon: var(--prime-control-l-icon);
+  --dt-choice: var(--prime-control-l-choice);
+  --dt-toggle: var(--prime-control-s-height);
+  --dt-indent: calc(var(--prime-avatar-l) + var(--dt-gap));
 }
 
 .root[data-size="xl"] {
-  --dt-row-height: var(--prime-sys-size-control-xl-height);
-  --dt-cell-gap: var(--prime-sys-size-control-xl-gap);
-  --dt-cell-pad-x: var(--prime-sys-size-control-xl-buttonPaddingX);
-  --dt-cell-pad-y: var(--prime-sys-size-control-xl-buttonPaddingY);
-  --dt-text: var(--prime-sys-size-control-xl-text);
-  --dt-sort-icon: var(--prime-sys-size-control-xl-icon);
+  --dt-row-height: var(--prime-table-row-height-l);
+  --dt-head-height: var(--prime-control-xl-height);
+  --dt-head-size: var(--prime-control-xl-label-size);
+  --dt-head-line-height: var(--prime-control-xl-label-line-height);
+  --dt-pad-x: var(--prime-space-4);
+  --dt-text-size: var(--prime-control-xl-text-size);
+  --dt-text-line-height: var(--prime-control-xl-line-height);
+  --dt-sort-icon: var(--prime-control-xl-icon);
+  --dt-choice: var(--prime-control-xl-choice);
+  --dt-toggle: var(--prime-control-s-height);
+  --dt-indent: calc(var(--prime-avatar-l) + var(--dt-gap));
 }
 
-.viewport {
-  width: 100%;
-  /* Прокрутка — ScrollContainer */
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-  border-radius: var(--prime-sys-shape-radius-l);
-  background: var(--dt-row-bg);
-  isolation: isolate;
+/* Without a selection column the toggle column is first and carries the leading cell padding. */
+.root[data-expandable="true"]:not([data-selectable="true"]) {
+  --dt-toggle-w: calc(var(--dt-toggle) + var(--dt-pad-x));
 }
 
-.table {
-  /* Узкая таблица по содержимому — data-table-width="auto"; по умолчанию fill — см. [data-table-width="fill"] */
-  width: max-content;
-  border-collapse: separate;
-  border-spacing: 0;
+.root[data-selectable="true"] {
+  --dt-lead: var(--dt-select-w);
 }
 
-.root[data-table-width="fill"] .table {
-  width: 100%;
-  min-width: max-content;
-  /* table-layout: auto (по умолчанию) — движок считает ширины по содержимому и min/max ячеек и распределяет лишнюю ширину */
+.root[data-expandable="true"] {
+  --dt-lead: var(--dt-toggle-w);
 }
 
-.head {
-  background: var(--dt-head-bg);
+.root[data-selectable="true"][data-expandable="true"] {
+  --dt-lead: calc(var(--dt-select-w) + var(--dt-toggle-w));
 }
 
-.headRow {
-  box-shadow: inset 0 var(--prime-sys-unit-neg-1px) 0 0 var(--prime-sys-color-border-subtle);
-}
-
-.headCell {
-  height: var(--dt-row-height);
-  padding: var(--dt-cell-pad-y) var(--dt-cell-pad-x);
-  font-size: var(--dt-text);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  color: var(--prime-sys-color-content-primary);
-  line-height: 1.25;
-  white-space: nowrap;
-  vertical-align: middle;
-}
-
-.headCell[data-align="start"] {
-  text-align: left;
-}
-
-.headCell[data-align="center"] {
-  text-align: center;
-}
-
-.headCell[data-align="end"] {
-  text-align: right;
-}
-
-.headCell[data-sortable="true"] {
-  cursor: pointer;
+/* Only while dragging across checkboxes: no native text selection. */
+.root[data-dragging="true"] {
   user-select: none;
-}
-
-.headCell + .headCell {
-  border-inline-start: var(--dt-divider-width) var(--dt-divider-style)
-    var(--dt-divider-color-vertical);
-}
-
-.root[data-sticky-header="true"] .headCell {
-  position: sticky;
-  top: 0;
-  z-index: var(--dt-z-sticky-header);
-  background: var(--dt-head-bg);
-  box-shadow: var(--dt-sticky-header-shadow);
-}
-
-.headLabel {
-  display: inline-flex;
-  align-items: center;
-}
-
-.sortButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--dt-cell-gap);
-  width: 100%;
-  min-height: 100%;
-  padding: 0;
-  color: inherit;
-  pointer-events: none;
-}
-
-.sortLabel {
-  line-height: 1.25;
-  font-weight: inherit;
-}
-
-.sortIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--prime-sys-color-content-muted);
-  width: var(--dt-sort-icon);
-  height: var(--dt-sort-icon);
-  flex-shrink: 0;
-}
-
-.sortGlyph {
-  width: var(--dt-sort-icon);
-  height: var(--dt-sort-icon);
-}
-
-.body {
-  background: var(--dt-row-bg);
-}
-
-.row {
-  background: var(--dt-row-bg);
-  transition: background-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-.cell {
-  height: var(--dt-row-height);
-  padding: var(--dt-cell-pad-y) var(--dt-cell-pad-x);
-  font-size: var(--dt-text);
-  line-height: 1.25;
-  color: var(--prime-sys-color-content-primary);
-  vertical-align: middle;
-}
-
-.cell[data-align="start"] {
-  text-align: left;
-}
-
-.cell[data-align="center"] {
-  text-align: center;
-}
-
-.cell[data-align="end"] {
-  text-align: right;
-}
-
-.cell + .cell {
-  border-inline-start: var(--dt-divider-width) var(--dt-divider-style)
-    var(--dt-divider-color-vertical);
-}
-
-.row + .row .cell {
-  border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color-horizontal);
-}
-
-.firstColumnSticky {
-  position: sticky;
-  left: 0;
-  z-index: var(--dt-z-sticky-first-column);
-  background: var(--dt-row-bg);
-  box-shadow: var(--dt-sticky-first-column-shadow);
-}
-
-.headCell.firstColumnSticky {
-  z-index: var(--dt-z-sticky-header-first-column);
-  background: var(--dt-head-bg);
-}
-
-.cornerCellSticky {
-  top: 0;
-  left: 0;
-  z-index: var(--dt-z-sticky-corner);
-  box-shadow: var(--dt-sticky-corner-shadow);
-}
-
-/* Надежный layering-паттерн для sticky header + first column:
-   body first column < header cells < corner 0x0 */
-.root[data-sticky-first-column="true"] .body .cell[data-first-column="true"] {
-  z-index: var(--dt-z-sticky-first-column);
-}
-
-.root[data-sticky-header="true"] .head .headCell {
-  z-index: var(--dt-z-sticky-header);
-}
-
-.root[data-sticky-header="true"][data-sticky-first-column="true"]
-  .head
-  .headCell[data-first-column="true"] {
-  position: sticky;
-  top: 0;
-  left: 0;
-  z-index: var(--dt-z-sticky-corner);
-}
-
-.root[data-highlight-row="true"] .row:hover {
-  background: var(--dt-row-hover-bg);
-}
-
-.root[data-highlight-row="true"] .row:hover .cell {
-  background: var(--dt-row-hover-bg);
-}
-
-.root[data-highlight-row="true"] .row:hover .firstColumnSticky {
-  background: var(--dt-row-hover-bg);
-}
-
-/* Колонка под курсором */
-.root[data-highlight-column="true"] thead .headCell[data-column-hovered="true"] {
-  background: var(--dt-column-hover-head-bg);
-}
-
-.root[data-highlight-column="true"] .cell[data-column-hovered="true"] {
-  background: var(--dt-column-hover-bg);
-}
-
-.root[data-highlight-column="true"] .firstColumnSticky[data-column-hovered="true"] {
-  background: var(--dt-column-hover-bg);
-}
-
-/* Зебра */
-.root[data-striped="true"] .row[data-stripe="alt"] {
-  background: var(--dt-row-striped-bg);
-}
-
-.root[data-striped="true"] .row[data-stripe="alt"] .cell {
-  background: var(--dt-row-striped-bg);
-}
-
-.root[data-striped="true"] .row[data-stripe="alt"] .firstColumnSticky {
-  background: var(--dt-row-striped-bg);
-}
-
-.stateCell {
-  padding: var(--prime-sys-spacing-x8) var(--prime-sys-spacing-x4);
-  text-align: center;
-  font-size: var(--dt-text);
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.sentinel {
-  height: var(--prime-sys-unit-2px);
-}
-
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-sys-spacing-x3);
-}
-
-.meta {
-  margin: 0;
-  font-size: var(--dt-text);
-  color: var(--prime-sys-color-content-secondary);
 }
 
 .root[data-divider="dashed"] {
@@ -337,4 +139,536 @@
 
 .root[data-divider="none"] {
   --dt-divider-width: 0;
+}
+
+.root[data-column-dividers="true"] {
+  --dt-column-divider-width: var(--prime-border-width);
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2);
+  padding: var(--prime-space-3) var(--dt-pad-x);
+}
+
+.toolbar > * {
+  min-width: 0;
+}
+
+/* ---------- Viewport & table ---------- */
+
+/* Full-bleed: head and rows touch the container edges; the root clips them to its radius.
+ * Focusables at the edges (sort buttons, clickable cells) use the inset focus ring. */
+.viewport {
+  width: 100%;
+  padding: 0;
+  isolation: isolate;
+  /* No rubber-band: an elastic overscroll would pull rows away from the sticky head and column. */
+  overscroll-behavior: none;
+}
+
+.table {
+  width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--dt-text-size);
+  line-height: var(--dt-text-line-height);
+}
+
+.root[data-table-width="fill"] .table {
+  width: 100%;
+  min-width: max-content;
+}
+
+/* ---------- Head ---------- */
+
+.headCell {
+  height: var(--dt-head-height);
+  padding: 0 var(--dt-pad-x);
+  background: var(--dt-head-bg);
+  font-size: var(--dt-head-size);
+  line-height: var(--dt-head-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-muted);
+  text-align: start;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.headCell[data-sorted="true"] {
+  color: var(--prime-color-text-secondary);
+}
+
+.headCell[data-align="center"] {
+  text-align: center;
+}
+
+.headCell[data-align="end"] {
+  text-align: end;
+}
+
+.headCell + .headCell {
+  border-inline-start: var(--dt-column-divider-width) solid var(--dt-divider-color);
+}
+
+.root[data-sticky-header="true"] .headCell {
+  position: sticky;
+  top: 0;
+  z-index: var(--dt-z-sticky-header);
+}
+
+.headLabel {
+  display: inline-block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--prime-radius-xs);
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.headCell[data-align="end"] .sortButton {
+  flex-direction: row-reverse;
+}
+
+.sortButton:hover {
+  color: var(--prime-color-text-primary);
+}
+
+/*
+ * Inset ring on the whole head cell: the header sits at the edge of the scrolling viewport, and
+ * the sort button has no padding, so a ring on the button itself would cut through its label.
+ */
+.sortButton:focus-visible {
+  outline: none;
+}
+
+.headCell:has(.sortButton:focus-visible) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.sortIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--dt-sort-icon);
+  height: var(--dt-sort-icon);
+  color: var(--prime-color-text-placeholder);
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.sortButton:hover .sortIcon,
+.sortButton:focus-visible .sortIcon {
+  color: var(--prime-color-text-secondary);
+}
+
+.headCell[data-sorted="true"] .sortIcon {
+  color: var(--prime-color-accent-text);
+}
+
+.sortGlyph {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Body ---------- */
+
+/*
+ * Every cell paints an opaque base (`--dt-cell-bg`) plus a translucent wash (`--dt-wash`), so sticky
+ * cells stay opaque while hover / stripe / column highlight compose without extra colors.
+ */
+.row {
+  --dt-cell-bg: var(--dt-surface);
+  --dt-wash: transparent;
+}
+
+.cell {
+  height: var(--dt-row-height);
+  padding: 0 var(--dt-pad-x);
+  background-color: var(--dt-cell-bg);
+  background-image: linear-gradient(var(--dt-wash), var(--dt-wash));
+  color: var(--prime-color-text-primary);
+  text-align: start;
+  vertical-align: middle;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.cell[data-align="center"] {
+  text-align: center;
+}
+
+.cell[data-align="end"] {
+  text-align: end;
+}
+
+.cell[data-numeric="true"] {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cell + .cell {
+  border-inline-start: var(--dt-column-divider-width) solid var(--dt-divider-color);
+}
+
+.row + .row .cell {
+  border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color);
+}
+
+/* ---------- Leading utility columns ---------- */
+
+/* Selection (checkbox) column: fixed width = control + paddings, centered. */
+.selectCell {
+  box-sizing: border-box;
+  width: var(--dt-select-w);
+  min-width: var(--dt-select-w);
+  max-width: var(--dt-select-w);
+  padding-inline: var(--dt-pad-x);
+  line-height: 0;
+  text-align: center;
+}
+
+/* The whole cell is the press-and-drag target. */
+.row > .selectCell {
+  cursor: pointer;
+}
+
+/* Expand toggle column: the button only; the next cell's padding is the gap to the content. */
+.toggleCell {
+  box-sizing: border-box;
+  width: var(--dt-toggle-w);
+  min-width: var(--dt-toggle-w);
+  max-width: var(--dt-toggle-w);
+  padding-inline: 0;
+  line-height: 0;
+}
+
+.root:not([data-selectable="true"]) .toggleCell {
+  padding-inline-start: var(--dt-pad-x);
+}
+
+/* Lead columns read as one block with the content: no column divider inside them. */
+.toggleCell,
+.selectCell + .cell,
+.toggleCell + .cell,
+.selectCell + .headCell,
+.toggleCell + .headCell {
+  border-inline-start-width: 0;
+}
+
+.chevron {
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.toggle[aria-expanded="true"] .chevron {
+  transform: rotate(90deg);
+}
+
+/* Sub-rows: the first content cell is indented by depth. */
+.row[data-depth] > .cell[data-first-column="true"] {
+  padding-inline-start: calc(var(--dt-pad-x) + var(--dt-depth) * var(--dt-indent));
+}
+
+.truncate {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.root[data-striped="true"] .row[data-stripe="alt"] {
+  --dt-cell-bg: var(--dt-step);
+}
+
+.root[data-highlight-row="true"] .row:hover {
+  --dt-wash: var(--prime-color-fill-subtle);
+}
+
+.root[data-highlight-column="true"] .cell[data-column-hovered="true"],
+.root[data-highlight-column="true"] .headCell[data-column-hovered="true"] {
+  background-image: linear-gradient(var(--prime-color-fill-subtle), var(--prime-color-fill-subtle));
+}
+
+/* Expanded parent: one opaque step off the table fill, so its group reads as one. */
+.row[data-expanded="true"] {
+  --dt-cell-bg: var(--dt-step);
+}
+
+.row[data-expanded="true"] > .cell[data-first-column="true"] {
+  font-weight: var(--prime-font-weight-medium);
+}
+
+/* Rows mounted by an expand slide in from under their parent. */
+.row[data-animate="true"] > .cell {
+  animation: dt-row-enter var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
+}
+
+@keyframes dt-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--prime-space-1)));
+  }
+}
+
+/* Detail panel under an expanded row: sunken step, content aligned with the first content column. */
+.detailCell {
+  padding: 0;
+  background: var(--dt-step);
+  border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color);
+}
+
+.detailMotion {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.detailRow[data-animate="true"] .detailMotion {
+  animation: dt-detail-enter var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;
+}
+
+@keyframes dt-detail-enter {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+/* Padded content (focus-space kept) inside the clipping wrapper. */
+.detailContent {
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--prime-space-3) var(--dt-pad-x) var(--prime-space-4)
+    calc(var(--dt-lead) + var(--dt-pad-x));
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  color: var(--prime-color-text-secondary);
+}
+
+.detailRow + .row .cell {
+  border-top: var(--dt-divider-width) var(--dt-divider-style) var(--dt-divider-color);
+}
+
+.row[aria-selected="true"] {
+  --dt-cell-bg: var(--prime-color-accent-soft);
+  --dt-wash: transparent;
+}
+
+.root[data-highlight-row="true"] .row[aria-selected="true"]:hover {
+  --dt-cell-bg: var(--prime-color-accent-soft-hover);
+}
+
+.row[data-clickable="true"] {
+  cursor: pointer;
+}
+
+.root[data-highlight-row="true"] .row[data-clickable="true"]:active {
+  --dt-wash: var(--prime-color-fill-subtle-active);
+}
+
+.cell[role="button"] {
+  cursor: pointer;
+}
+
+.cell[role="button"]:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* ---------- Sticky first column ---------- */
+
+.firstColumnSticky {
+  position: sticky;
+  left: var(--dt-lead, 0);
+  z-index: var(--dt-z-sticky-first-column);
+  box-shadow: inset calc(-1 * var(--prime-border-width)) 0 0 var(--dt-divider-color);
+}
+
+.headCell.firstColumnSticky {
+  z-index: var(--dt-z-sticky-header);
+}
+
+/* Leading utility cells stick together with the first content column. */
+.stickyLead {
+  position: sticky;
+  left: 0;
+  z-index: var(--dt-z-sticky-first-column);
+}
+
+.root[data-selectable="true"] .toggleCell.stickyLead {
+  left: var(--dt-select-w);
+}
+
+.headCell.stickyLead {
+  z-index: var(--dt-z-sticky-header);
+}
+
+.root[data-sticky-header="true"][data-sticky-first-column="true"]
+  .headCell[data-first-column="true"],
+.cornerCellSticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--dt-z-sticky-corner);
+}
+
+/* ---------- States: skeleton, empty, error ---------- */
+
+.skeletonRow {
+  pointer-events: none;
+}
+
+.skeleton {
+  display: inline-block;
+  width: 64%;
+  max-width: 100%;
+  height: var(--prime-space-2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-muted);
+  vertical-align: middle;
+  animation: dt-pulse calc(var(--prime-motion-duration-slow) * 5)
+    var(--prime-motion-easing-standard) infinite alternate;
+}
+
+.skeletonRow .cell:nth-child(3n + 2) .skeleton {
+  width: 80%;
+}
+
+.skeletonRow .cell:nth-child(3n) .skeleton {
+  width: 40%;
+}
+
+.selectCell .skeleton {
+  width: var(--dt-choice);
+  height: var(--dt-choice);
+  border-radius: var(--prime-radius-xs);
+}
+
+@keyframes dt-pulse {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .row[data-animate="true"] > .cell,
+  .detailRow[data-animate="true"] .detailMotion {
+    animation: none;
+  }
+
+  .chevron {
+    transition: none;
+  }
+}
+
+.stateCell {
+  padding: var(--prime-space-10) var(--prime-space-4);
+  background: var(--dt-surface);
+}
+
+.stateContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-3);
+  max-width: var(--prime-layout-reading-max-width);
+  margin-inline: auto;
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  color: var(--prime-color-text-muted);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.stateError .stateContent {
+  color: var(--prime-color-danger-text);
+}
+
+.sentinel {
+  height: var(--prime-space-1);
+}
+
+.srOnly {
+  position: absolute;
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
+  margin: calc(-1 * var(--prime-border-width));
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2) var(--prime-space-4);
+  min-height: var(--prime-table-row-height-s);
+  padding: var(--prime-space-2) var(--dt-pad-x);
+  border-top: var(--prime-border-width) solid var(--dt-divider-color);
+}
+
+.meta {
+  flex: 0 0 auto;
+  margin: 0;
+  min-width: 0;
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  color: var(--prime-color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pagination {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+@container (max-width: 30rem) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .meta {
+    text-align: center;
+  }
 }

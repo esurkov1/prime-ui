@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { FileUpload } from "./FileUpload";
 
 function makeDataTransferWithFiles(files: File[]): DataTransfer {
-  // jsdom не предоставляет DataTransfer; достаточно итерируемого `files` для Array.from
+  // jsdom has no DataTransfer; an iterable `files` is enough for Array.from
   return { files: files as unknown as FileList } as DataTransfer;
 }
 
@@ -13,8 +13,8 @@ describe("FileUpload", () => {
   it("renders default drop zone", () => {
     render(<FileUpload.Root />);
 
-    expect(screen.getByText(/Choose a file or drag/i)).toBeInTheDocument();
-    expect(screen.getByText("Browse file")).toBeInTheDocument();
+    expect(screen.getByText(/Выберите файл или перетащите/i)).toBeInTheDocument();
+    expect(screen.getByText("Выбрать файл")).toBeInTheDocument();
   });
 
   it("sets data-size on root", () => {
@@ -23,30 +23,58 @@ describe("FileUpload", () => {
     expect(label).toHaveAttribute("data-size", "l");
   });
 
-  it("sets data-appearance on root", () => {
-    const { container } = render(<FileUpload.Root appearance="solid" />);
+  it("sets data-variant on root (dashed by default)", () => {
+    const { container, rerender } = render(<FileUpload.Root />);
     const label = container.querySelector("label");
-    expect(label).toHaveAttribute("data-appearance", "solid");
+    expect(label).toHaveAttribute("data-variant", "dashed");
+    rerender(<FileUpload.Root variant="solid" />);
+    expect(label).toHaveAttribute("data-variant", "solid");
   });
 
-  it("sets data-dragover on dragover and clears on dragleave", () => {
+  it("renders built-in texts from labels; an empty hint is hidden", () => {
+    render(<FileUpload.Root labels={{ title: "Drop a file", hint: "", browse: "Browse" }} />);
+
+    expect(screen.getByText("Drop a file")).toBeInTheDocument();
+    expect(screen.getByText("Browse")).toBeInTheDocument();
+    expect(screen.queryByText(/JPEG/)).not.toBeInTheDocument();
+  });
+
+  it("sets invalid state on root and input", () => {
+    const { container } = render(<FileUpload.Root invalid />);
+
+    expect(container.querySelector("label")).toHaveAttribute("data-invalid", "true");
+    expect(container.querySelector("input")).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("ignores drag-over and drop while disabled", () => {
+    const onFilesChange = vi.fn();
+    const { container } = render(<FileUpload.Root disabled onFilesChange={onFilesChange} />);
+    const label = container.querySelector("label") as HTMLElement;
+
+    fireEvent.dragOver(label);
+    expect(label).not.toHaveAttribute("data-state");
+    fireEvent.drop(label, { dataTransfer: makeDataTransferWithFiles([new File(["x"], "a.txt")]) });
+    expect(onFilesChange).not.toHaveBeenCalled();
+  });
+
+  it("sets data-state=active on dragover and clears it on dragleave", () => {
     render(<FileUpload.Root />);
 
-    const label = screen.getByText(/Choose a file or drag/i).closest("label");
+    const label = screen.getByText(/Выберите файл или перетащите/i).closest("label");
     expect(label).toBeTruthy();
 
     fireEvent.dragOver(label as HTMLElement);
-    expect(label).toHaveAttribute("data-dragover", "true");
+    expect(label).toHaveAttribute("data-state", "active");
 
     fireEvent.dragLeave(label as HTMLElement, { relatedTarget: document.body });
-    expect(label).not.toHaveAttribute("data-dragover");
+    expect(label).not.toHaveAttribute("data-state");
   });
 
   it("calls onFilesChange on drop", () => {
     const onFilesChange = vi.fn();
     render(<FileUpload.Root onFilesChange={onFilesChange} />);
 
-    const label = screen.getByText(/Choose a file or drag/i).closest("label") as HTMLElement;
+    const label = screen.getByText(/Выберите файл или перетащите/i).closest("label") as HTMLElement;
     const file = new File(["x"], "doc.txt", { type: "text/plain" });
     const dt = makeDataTransferWithFiles([file]);
 
@@ -73,7 +101,7 @@ describe("FileUpload", () => {
   it("sets disabled state on root and input", () => {
     render(<FileUpload.Root disabled />);
 
-    const label = screen.getByText(/Choose a file or drag/i).closest("label");
+    const label = screen.getByText(/Выберите файл или перетащите/i).closest("label");
     expect(label).toHaveAttribute("data-disabled", "true");
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -102,7 +130,7 @@ describe("FileUpload", () => {
     );
 
     expect(screen.getByTestId("custom")).toHaveTextContent("Upload zone");
-    expect(screen.queryByText(/Choose a file or drag/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Выберите файл или перетащите/i)).not.toBeInTheDocument();
   });
 
   it("renders file item row with format badge", () => {
@@ -129,5 +157,14 @@ describe("FileUpload", () => {
     );
     const item = container.firstChild as HTMLElement;
     expect(item).toHaveAttribute("data-size", "l");
+  });
+
+  it("sets data-invalid on a failed file item", () => {
+    const { container } = render(
+      <FileUpload.Item invalid>
+        <FileUpload.ItemName>x</FileUpload.ItemName>
+      </FileUpload.Item>,
+    );
+    expect(container.firstChild).toHaveAttribute("data-invalid", "true");
   });
 });

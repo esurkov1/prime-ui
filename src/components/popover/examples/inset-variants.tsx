@@ -1,44 +1,56 @@
-import { Button, Popover } from "prime-ui-kit";
+/** Panel density via `insetPadding` and `insetGap`: default, extra air and no gap. Use none/extra values only for custom layouts inside the panel. */
+import { Button, Popover, Typography } from "prime-ui-kit";
 
-import styles from "./popover-examples.module.css";
+import preview from "./examples.module.css";
 
-/**
- * `insetPadding` and `insetGap` on `Popover.Content`, including `none` for a flush layout.
- */
 export default function PopoverInsetVariantsExample() {
   return (
-    <div className={styles.sizesRow}>
+    <div className={preview.row}>
       <Popover.Root>
-        <Popover.Trigger asChild>
-          <Button.Root mode="stroke" variant="neutral">
-            padding: none
+        <Popover.Trigger>
+          <Button.Root variant="soft" tone="neutral">
+            По умолчанию
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content insetGap="none" insetPadding="none">
-          <p className={styles.flushText}>Content flush to the panel radius.</p>
+        <Popover.Content>
+          <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+            Отступ панели по ярусу m — 16 px.
+          </Typography.Root>
+          <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+            Зазор между блоками — 12 px.
+          </Typography.Root>
         </Popover.Content>
       </Popover.Root>
 
       <Popover.Root>
-        <Popover.Trigger asChild>
-          <Button.Root mode="stroke" variant="neutral">
-            padding: x2
+        <Popover.Trigger>
+          <Button.Root variant="soft" tone="neutral">
+            insetPadding=&quot;x3&quot;
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content insetGap="x2" insetPadding="x2">
-          <p className={styles.panelTextMuted}>Typical inset defaults for inner spacing.</p>
+        <Popover.Content insetPadding="x3" insetGap="x4">
+          <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+            Больше воздуха вокруг содержимого.
+          </Typography.Root>
+          <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+            И между абзацами (insetGap x4).
+          </Typography.Root>
         </Popover.Content>
       </Popover.Root>
 
       <Popover.Root>
-        <Popover.Trigger asChild>
-          <Button.Root mode="stroke" variant="neutral">
-            padding: x3
+        <Popover.Trigger>
+          <Button.Root variant="soft" tone="neutral">
+            insetGap=&quot;none&quot;
           </Button.Root>
         </Popover.Trigger>
-        <Popover.Content insetGap="x4" insetPadding="x3">
-          <p className={styles.panelTextMuted}>More air between blocks (gap x4).</p>
-          <p className={styles.panelTextMuted}>Second paragraph shows vertical rhythm.</p>
+        <Popover.Content insetGap="none">
+          <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+            Строки идут вплотную —
+          </Typography.Root>
+          <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+            удобно для собственной разметки.
+          </Typography.Root>
         </Popover.Content>
       </Popover.Root>
     </div>

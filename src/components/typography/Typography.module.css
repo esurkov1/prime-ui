@@ -1,96 +1,189 @@
+/*
+ * Typography — one element per text role (`--prime-text-<role>-*`), exposed as `data-variant`.
+ */
 .root {
+  --t-size: var(--prime-text-body-m-size);
+  --t-lh: var(--prime-text-body-m-line-height);
+  --t-weight: var(--prime-text-body-m-weight);
+  --t-tracking: var(--prime-text-body-m-tracking);
+
   margin: 0;
-  color: var(--prime-sys-color-content-primary);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--t-size);
+  line-height: var(--t-lh);
+  font-weight: var(--t-weight);
+  letter-spacing: var(--t-tracking);
+  font-style: normal;
+  overflow-wrap: break-word;
+}
+
+/* Headings and titles balance their lines; reading text keeps natural rag. */
+.root:is([data-variant^="title-"], [data-variant^="heading-"], [data-variant^="display-"]) {
   text-wrap: balance;
-  font-style: var(--prime-sys-typography-style-normal);
-  font-weight: var(--prime-sys-typography-weight-regular);
-  letter-spacing: var(--prime-sys-typography-tracking-normal);
 }
 
-.root[data-tone="muted"] {
-  color: var(--prime-sys-color-content-secondary);
+.root:is([data-variant^="body-"], [data-variant="caption"]) {
+  text-wrap: pretty;
 }
 
-.root[data-italic="true"] {
-  font-style: var(--prime-sys-typography-style-italic);
+/* ─── Roles ─────────────────────────────────────────────────────────────── */
+
+.root[data-variant="caption"] {
+  --t-size: var(--prime-text-caption-size);
+  --t-lh: var(--prime-text-caption-line-height);
+  --t-weight: var(--prime-text-caption-weight);
+  --t-tracking: var(--prime-text-caption-tracking);
+}
+
+.root[data-variant="body-s"] {
+  --t-size: var(--prime-text-body-s-size);
+  --t-lh: var(--prime-text-body-s-line-height);
+  --t-weight: var(--prime-text-body-s-weight);
+  --t-tracking: var(--prime-text-body-s-tracking);
+}
+
+.root[data-variant="body-l"] {
+  --t-size: var(--prime-text-body-l-size);
+  --t-lh: var(--prime-text-body-l-line-height);
+  --t-weight: var(--prime-text-body-l-weight);
+  --t-tracking: var(--prime-text-body-l-tracking);
+}
+
+.root[data-variant="title-s"] {
+  --t-size: var(--prime-text-title-s-size);
+  --t-lh: var(--prime-text-title-s-line-height);
+  --t-weight: var(--prime-text-title-s-weight);
+  --t-tracking: var(--prime-text-title-s-tracking);
+}
+
+.root[data-variant="title-m"] {
+  --t-size: var(--prime-text-title-m-size);
+  --t-lh: var(--prime-text-title-m-line-height);
+  --t-weight: var(--prime-text-title-m-weight);
+  --t-tracking: var(--prime-text-title-m-tracking);
+}
+
+.root[data-variant="title-l"] {
+  --t-size: var(--prime-text-title-l-size);
+  --t-lh: var(--prime-text-title-l-line-height);
+  --t-weight: var(--prime-text-title-l-weight);
+  --t-tracking: var(--prime-text-title-l-tracking);
+}
+
+.root[data-variant="heading-s"] {
+  --t-size: var(--prime-text-heading-s-size);
+  --t-lh: var(--prime-text-heading-s-line-height);
+  --t-weight: var(--prime-text-heading-s-weight);
+  --t-tracking: var(--prime-text-heading-s-tracking);
+}
+
+.root[data-variant="heading-m"] {
+  --t-size: var(--prime-text-heading-m-size);
+  --t-lh: var(--prime-text-heading-m-line-height);
+  --t-weight: var(--prime-text-heading-m-weight);
+  --t-tracking: var(--prime-text-heading-m-tracking);
+}
+
+.root[data-variant="heading-l"] {
+  --t-size: var(--prime-text-heading-l-size);
+  --t-lh: var(--prime-text-heading-l-line-height);
+  --t-weight: var(--prime-text-heading-l-weight);
+  --t-tracking: var(--prime-text-heading-l-tracking);
+}
+
+.root[data-variant="display-s"] {
+  --t-size: var(--prime-text-display-s-size);
+  --t-lh: var(--prime-text-display-s-line-height);
+  --t-weight: var(--prime-text-display-s-weight);
+  --t-tracking: var(--prime-text-display-s-tracking);
+}
+
+.root[data-variant="display-m"] {
+  --t-size: var(--prime-text-display-m-size);
+  --t-lh: var(--prime-text-display-m-line-height);
+  --t-weight: var(--prime-text-display-m-weight);
+  --t-tracking: var(--prime-text-display-m-tracking);
+}
+
+.root[data-variant="display-l"] {
+  --t-size: var(--prime-text-display-l-size);
+  --t-lh: var(--prime-text-display-l-line-height);
+  --t-weight: var(--prime-text-display-l-weight);
+  --t-tracking: var(--prime-text-display-l-tracking);
+}
+
+.root[data-variant="code"] {
+  --t-size: var(--prime-text-code-size);
+  --t-lh: var(--prime-text-code-line-height);
+  --t-weight: var(--prime-text-code-weight);
+  --t-tracking: var(--prime-text-code-tracking);
+
+  font-family: var(--prime-font-family-mono);
+}
+
+/* ─── Overrides ─────────────────────────────────────────────────────────── */
+
+.root[data-weight="regular"] {
+  --t-weight: var(--prime-font-weight-regular);
 }
 
 .root[data-weight="medium"] {
-  font-weight: var(--prime-sys-typography-weight-medium);
+  --t-weight: var(--prime-font-weight-medium);
 }
 
 .root[data-weight="semibold"] {
-  font-weight: var(--prime-sys-typography-weight-semibold);
+  --t-weight: var(--prime-font-weight-semibold);
+}
+
+/* Tracking steps reuse the role scale: normal 0 · tight −0.01em · tighter −0.02em · wide +0.01em. */
+.root[data-tracking="normal"] {
+  --t-tracking: var(--prime-text-body-m-tracking);
 }
 
 .root[data-tracking="tight"] {
-  letter-spacing: var(--prime-sys-typography-tracking-tight);
+  --t-tracking: var(--prime-text-title-m-tracking);
 }
 
 .root[data-tracking="tighter"] {
-  letter-spacing: var(--prime-sys-typography-tracking-tighter);
+  --t-tracking: var(--prime-text-heading-m-tracking);
 }
 
 .root[data-tracking="wide"] {
-  letter-spacing: var(--prime-sys-typography-tracking-wide);
+  --t-tracking: var(--prime-text-caption-tracking);
 }
 
-.root[data-variant="display"] {
-  font-size: var(--prime-sys-typography-role-display-fontSize);
-  line-height: var(--prime-sys-typography-role-display-lineHeight);
+.root[data-italic="true"] {
+  font-style: italic;
 }
 
-.root[data-variant="headline"] {
-  font-size: var(--prime-sys-typography-role-headline-fontSize);
-  line-height: var(--prime-sys-typography-role-headline-lineHeight);
+.root[data-tone="secondary"] {
+  color: var(--prime-color-text-secondary);
 }
 
-.root[data-variant="heading-page"] {
-  font-size: var(--prime-sys-typography-role-headingPage-fontSize);
-  line-height: var(--prime-sys-typography-role-headingPage-lineHeight);
+.root[data-tone="muted"] {
+  color: var(--prime-color-text-muted);
 }
 
-.root[data-variant="heading-section"] {
-  font-size: var(--prime-sys-typography-role-headingSection-fontSize);
-  line-height: var(--prime-sys-typography-role-headingSection-lineHeight);
+.root[data-tone="accent"] {
+  color: var(--prime-color-accent-text);
 }
 
-.root[data-variant="heading-subsection"] {
-  font-size: var(--prime-sys-typography-role-headingSubsection-fontSize);
-  line-height: var(--prime-sys-typography-role-headingSubsection-lineHeight);
+.root[data-tone="success"] {
+  color: var(--prime-color-success-text);
 }
 
-.root[data-variant="heading-group"] {
-  font-size: var(--prime-sys-typography-role-headingGroup-fontSize);
-  line-height: var(--prime-sys-typography-role-headingGroup-lineHeight);
+.root[data-tone="warning"] {
+  color: var(--prime-color-warning-text);
 }
 
-.root[data-variant="body-large"] {
-  font-size: var(--prime-sys-typography-role-bodyLarge-fontSize);
-  line-height: var(--prime-sys-typography-role-bodyLarge-lineHeight);
+.root[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
 }
 
-.root[data-variant="body-default"] {
-  font-size: var(--prime-sys-typography-role-bodyDefault-fontSize);
-  line-height: var(--prime-sys-typography-role-bodyDefault-lineHeight);
-}
-
-.root[data-variant="body-small"] {
-  font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
-  line-height: var(--prime-sys-typography-role-bodySmall-lineHeight);
-}
-
-.root[data-variant="body-compact"] {
-  font-size: var(--prime-sys-typography-role-bodyCompact-fontSize);
-  line-height: var(--prime-sys-typography-role-bodyCompact-lineHeight);
-}
-
-.root[data-variant="caption"] {
-  font-size: var(--prime-sys-typography-role-caption-fontSize);
-  line-height: var(--prime-sys-typography-role-caption-lineHeight);
-}
-
-.root[data-variant="caption-micro"] {
-  font-size: var(--prime-sys-typography-role-captionMicro-fontSize);
-  line-height: var(--prime-sys-typography-role-captionMicro-lineHeight);
+.root[data-truncate="true"] {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
 }

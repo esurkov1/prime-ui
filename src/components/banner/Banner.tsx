@@ -2,24 +2,50 @@ import { X } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/button/Button";
-import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { BannerSize } from "@/internal/states";
+import type { ControlSize, Tone, Variant } from "@/internal/states";
 
 import styles from "./Banner.module.css";
 
-export type BannerVariant = "filled" | "light" | "lighter" | "stroke";
+export type BannerLabels = {
+  /** `aria-label` of the close button. */
+  dismiss: string;
+};
 
-export type BannerStatus = "information" | "warning" | "error" | "success" | "feature";
+const DEFAULT_LABELS: BannerLabels = { dismiss: "Закрыть" };
 
-export type { BannerSize };
+const BannerLabelsContext = React.createContext<BannerLabels>(DEFAULT_LABELS);
+
+/**
+ * When the banner has actions, dismiss moves into the actions row as a regular square button of the
+ * same size, so it lines up with the other buttons; otherwise it is the small corner close.
+ */
+type BannerDismissContextValue = {
+  onDismiss?: () => void;
+  size: ControlSize;
+  registerActions: () => () => void;
+};
+const BannerDismissContext = React.createContext<BannerDismissContextValue | null>(null);
 
 export type BannerRootProps = {
-  variant?: BannerVariant;
-  status?: BannerStatus;
-  size?: BannerSize;
+  /** Treatment: `soft` tinted fill (default), `solid` saturated fill, `outline` surface with a tone ring. */
+  variant?: Exclude<Variant, "ghost">;
+  /** Semantic color. Default `info`. */
+  tone?: Tone;
+  /** Spacing and type tier. Default `m`. */
+  size?: ControlSize;
+  /**
+   * `inset` (default): rounded block in the content flow or inside a card.
+   * `page`: edge-to-edge strip (no radius) at the top of a page or app shell; content follows the
+   * page content column.
+   */
+  placement?: "inset" | "page";
+  /** Renders a close button (unless `Banner.CloseButton` is already a child) and calls this on click. */
   onDismiss?: () => void;
+  /** Built-in strings. */
+  labels?: Partial<BannerLabels>;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -32,31 +58,47 @@ function childHasCloseButton(children: React.ReactNode): boolean {
 
 const BannerRoot = React.forwardRef<HTMLDivElement, BannerRootProps>(function BannerRoot(
   {
-    variant = "filled",
-    status = "information",
+    variant = "soft",
+    tone = "info",
     size = "m",
+    placement = "inset",
     onDismiss,
+    labels: labelsProp,
     className,
     children,
     ...rest
   },
   forwardedRef,
 ) {
-  const showInjectedClose = Boolean(onDismiss) && !childHasCloseButton(children);
+  const [actionsCount, setActionsCount] = React.useState(0);
+  const registerActions = React.useCallback(() => {
+    setActionsCount((n) => n + 1);
+    return () => setActionsCount((n) => n - 1);
+  }, []);
+  const dismissContext = React.useMemo<BannerDismissContextValue>(
+    () => ({ onDismiss, size, registerActions }),
+    [onDismiss, size, registerActions],
+  );
+  const showInjectedClose =
+    Boolean(onDismiss) && !childHasCloseButton(children) && actionsCount === 0;
+  const dismiss = labelsProp?.dismiss ?? DEFAULT_LABELS.dismiss;
+  const labels = React.useMemo<BannerLabels>(() => ({ dismiss }), [dismiss]);
 
   return (
     <div
       ref={forwardedRef}
       {...rest}
       className={cx(styles.root, className)}
-      {...toDataAttributes({ variant, status, size })}
+      {...toDataAttributes({ variant, tone, size, placement })}
     >
-      <ControlSizeProvider value={size}>
-        {children}
-        {showInjectedClose ? (
-          <BannerCloseButton aria-label="Dismiss" type="button" onClick={onDismiss} />
-        ) : null}
-      </ControlSizeProvider>
+      <BannerLabelsContext.Provider value={labels}>
+        <BannerDismissContext.Provider value={dismissContext}>
+          <ControlSizeProvider value={size}>
+            {children}
+            {showInjectedClose ? <BannerCloseButton onClick={onDismiss} /> : null}
+          </ControlSizeProvider>
+        </BannerDismissContext.Provider>
+      </BannerLabelsContext.Provider>
     </div>
   );
 });
@@ -67,6 +109,7 @@ export type BannerContentProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
+/** Layout of the message: icon on the first line, title over description, actions right (under the text when narrow). */
 function BannerContent({ className, children, ...rest }: BannerContentProps) {
   return (
     <div className={cx(styles.content, className)} {...rest}>
@@ -131,10 +174,35 @@ export type BannerActionsProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
+/** Action buttons take the banner `size`; with `onDismiss` the close button joins this row. */
 function BannerActions({ className, children, ...rest }: BannerActionsProps) {
+  const dismiss = React.useContext(BannerDismissContext);
+  const labels = React.useContext(BannerLabelsContext);
+  const register = dismiss?.registerActions;
+  const hasDismiss = Boolean(dismiss?.onDismiss);
+
+  React.useLayoutEffect(() => {
+    if (!register || !hasDismiss) return;
+    return register();
+  }, [register, hasDismiss]);
+
   return (
     <div className={cx(styles.actions, className)} {...rest}>
       {children}
+      {dismiss?.onDismiss ? (
+        <Button.Root
+          variant="outline"
+          tone="neutral"
+          size={dismiss.size}
+          aria-label={labels.dismiss}
+          className={styles.actionsClose}
+          onClick={dismiss.onDismiss}
+        >
+          <Button.Icon>
+            <X aria-hidden strokeWidth={2} />
+          </Button.Icon>
+        </Button.Root>
+      ) : null}
     </div>
   );
 }
@@ -146,26 +214,21 @@ export type BannerCloseButtonProps = {
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size">;
 
 const BannerCloseButton = React.forwardRef<HTMLButtonElement, BannerCloseButtonProps>(
-  function BannerCloseButton({ className, children, type = "button", ...rest }, forwardedRef) {
-    const controlSize = useOptionalControlSize() ?? "m";
-    const buttonSize = controlSize === "xs" ? "s" : controlSize;
-
+  function BannerCloseButton(
+    { className, children, type = "button", "aria-label": ariaLabel, ...rest },
+    forwardedRef,
+  ) {
+    const labels = React.useContext(BannerLabelsContext);
     return (
-      <Button.Root
+      <button
         ref={forwardedRef}
         type={type}
-        size={buttonSize}
-        mode="ghost"
-        variant="neutral"
+        aria-label={ariaLabel ?? (children == null ? labels.dismiss : undefined)}
         className={cx(styles.closeButton, className)}
         {...rest}
       >
-        {children ?? (
-          <Button.Icon>
-            <X aria-hidden strokeWidth={2} />
-          </Button.Icon>
-        )}
-      </Button.Root>
+        {children ?? <X className={styles.closeIcon} aria-hidden strokeWidth={2} />}
+      </button>
     );
   },
 );

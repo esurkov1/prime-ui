@@ -1,3 +1,21 @@
+import DropdownAsChildExample from "@/components/dropdown/examples/as-child";
+import asChildSource from "@/components/dropdown/examples/as-child.tsx?raw";
+import DropdownCompositionExample from "@/components/dropdown/examples/composition";
+import compositionSource from "@/components/dropdown/examples/composition.tsx?raw";
+import DropdownControlledExample from "@/components/dropdown/examples/controlled";
+import controlledSource from "@/components/dropdown/examples/controlled.tsx?raw";
+import DropdownFullWidthExample from "@/components/dropdown/examples/full-width";
+import fullWidthSource from "@/components/dropdown/examples/full-width.tsx?raw";
+import DropdownPlacementExample from "@/components/dropdown/examples/placement";
+import placementSource from "@/components/dropdown/examples/placement.tsx?raw";
+import DropdownRowActionsExample from "@/components/dropdown/examples/row-actions";
+import rowActionsSource from "@/components/dropdown/examples/row-actions.tsx?raw";
+import DropdownSizesExample from "@/components/dropdown/examples/sizes";
+import sizesSource from "@/components/dropdown/examples/sizes.tsx?raw";
+import DropdownStatesExample from "@/components/dropdown/examples/states";
+import statesSource from "@/components/dropdown/examples/states.tsx?raw";
+import DropdownVariantsExample from "@/components/dropdown/examples/variants";
+import variantsSource from "@/components/dropdown/examples/variants.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,22 +24,6 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import DropdownAsChildSnippet from "../snippets/dropdown/as-child";
-import asChildSource from "../snippets/dropdown/as-child.tsx?raw";
-import DropdownCompositionSnippet from "../snippets/dropdown/composition";
-import compositionSource from "../snippets/dropdown/composition.tsx?raw";
-import DropdownControlledSnippet from "../snippets/dropdown/controlled";
-import controlledSource from "../snippets/dropdown/controlled.tsx?raw";
-import DropdownFullWidthSnippet from "../snippets/dropdown/full-width";
-import fullWidthSource from "../snippets/dropdown/full-width.tsx?raw";
-import DropdownPlacementSnippet from "../snippets/dropdown/placement";
-import placementSource from "../snippets/dropdown/placement.tsx?raw";
-import DropdownSizesSnippet from "../snippets/dropdown/sizes";
-import sizesSource from "../snippets/dropdown/sizes.tsx?raw";
-import DropdownStatesSnippet from "../snippets/dropdown/states";
-import statesSource from "../snippets/dropdown/states.tsx?raw";
-import DropdownVariantsSnippet from "../snippets/dropdown/variants";
-import variantsSource from "../snippets/dropdown/variants.tsx?raw";
 
 const dropdownDivSlotRows: PlaygroundApiPropRow[] = [
   {
@@ -70,6 +72,14 @@ const dropdownRootApiRows: PlaygroundApiPropRow[] = [
     description: "Колбэк при открытии и закрытии.",
   },
   {
+    prop: "closeOnOutsideClick",
+    type: "boolean",
+    defaultValue: "true",
+    required: "Нет",
+    description:
+      "Клик в любом месте вне панели и триггера закрывает её. false — закрытие только явно.",
+  },
+  {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
@@ -85,14 +95,6 @@ const dropdownTriggerApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Да",
     description: "Ровно один элемент; на него навешиваются ref, aria и объединённый onClick.",
-  },
-  {
-    prop: "asChild",
-    type: "boolean",
-    defaultValue: "true",
-    required: "Нет",
-    description:
-      "В типе API сохранён для согласованности с паттерном слияния; фактически триггер всегда клонирует дочерний элемент.",
   },
 ];
 
@@ -120,10 +122,10 @@ const dropdownContentApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Ярус токенов для панели, пунктов, подписей групп и размера иконки по умолчанию.",
+    description: "Ярус пунктов (высота 24–40, кегль, иконка); совпадает с размером триггера.",
   },
   {
     prop: "className",
@@ -157,11 +159,11 @@ const dropdownItemApiRows: PlaygroundApiPropRow[] = [
     description: "Недоступный пункт: aria-disabled, tabIndex -1, без закрытия по клику.",
   },
   {
-    prop: "destructive",
-    type: "boolean",
-    defaultValue: "—",
+    prop: "tone",
+    type: '"neutral" | "danger"',
+    defaultValue: '"neutral"',
     required: "Нет",
-    description: "Акцент опасного действия (data-destructive).",
+    description: "danger — опасное действие (удалить, отозвать): data-tone, цвет danger.",
   },
   {
     prop: "className",
@@ -222,6 +224,23 @@ const dropdownItemIconApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description: "Пробрасываются в элемент as (strokeWidth и др.), кроме зарезервированных полей.",
+  },
+];
+
+const dropdownItemShortcutApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Сочетание клавиш, например `⌘C`. Только подсказка — обработчик вешайте сами.",
+  },
+  {
+    prop: "…rest",
+    type: "React.HTMLAttributes<HTMLElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Атрибуты элемента kbd.",
   },
 ];
 
@@ -358,38 +377,76 @@ export default function DropdownSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Проп <code>size</code> на <code>Dropdown.Content</code>: отступы панели, строки
-              пунктов, <code>GroupLabel</code> и размер иконки по умолчанию в <code>ItemIcon</code>{" "}
-              (если не передан числовой <code>size</code>).
+              <code>size</code> на <code>Dropdown.Content</code> — <code>xs</code>–<code>xl</code>:
+              высота пункта 24–40, кегль и иконка того же яруса. Берите тот же размер, что у
+              триггера. По умолчанию — <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <DropdownSizesSnippet />
+                <DropdownSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Варианты</DemoSectionTitle>
+            <DemoSectionTitle>Виды пунктов и группы</DemoSectionTitle>
             <DemoDescription>
-              Обычные строки и визуальный вариант опасного действия — булевый проп{" "}
-              <code>destructive</code> у <code>Dropdown.Item</code>.
+              Пункт с иконкой (<code>ItemIcon</code>) и сочетанием клавиш (<code>ItemShortcut</code>
+              ), недоступный (<code>disabled</code>), опасный (<code>tone="danger"</code>), группы с{" "}
+              <code>GroupLabel</code> и разделители. Наведение и фокус с клавиатуры подсвечивают
+              строку <code>fill-subtle</code>, опасный пункт — <code>danger-soft</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={variantsSource.trim()}>
+            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <DropdownVariantsSnippet />
+                <DropdownVariantsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoSectionTitle>Длинный список</DemoSectionTitle>
             <DemoDescription>
-              Недоступный пункт через <code>disabled</code>: не активируется и не закрывает меню.
+              Панель ограничена <code>--prime-panel-max-height</code> и прокручивается; недоступные
+              пункты пропускаются стрелками. Поиска и пустого состояния у Dropdown нет: для
+              фильтрации действий используйте CommandMenu, для выбора значения — Select с{" "}
+              <code>searchable</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()}>
+            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <DropdownStatesSnippet />
+                <DropdownStatesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Действия в карточке</DemoSectionTitle>
+            <DemoDescription>
+              Основное действие остаётся на виду, остальные — в меню «⋯» (квадратная кнопка только с
+              иконкой и <code>aria-label</code>), панель выровнена по правому краю.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={rowActionsSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <DropdownRowActionsExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Меню пользователя</DemoSectionTitle>
+            <DemoDescription>
+              <code>Block</code>, <code>Header</code> с <code>HeaderLeading</code> /{" "}
+              <code>HeaderMain</code> / <code>HeaderTrailing</code>, усечённый e-mail в{" "}
+              <code>HeaderDescription truncate</code>, группы и кнопка внутри шапки.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={compositionSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <DropdownCompositionExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -397,13 +454,26 @@ export default function DropdownSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Расположение панели</DemoSectionTitle>
             <DemoDescription>
-              <code>align</code> — стык панели к левому краю, центру или правому краю триггера;{" "}
-              <code>side</code> — предпочтение открываться снизу или сверху (с учётом границ
-              экрана).
+              <code>align</code> — к началу, центру или концу триггера; <code>side</code> —
+              предпочтение снизу или сверху. У края экрана панель переворачивается и сдвигается,
+              оставляя 8 px до границы.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={placementSource.trim()} previewLayout="row-start">
+            <PlaygroundExampleFrame.Root code={placementSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <DropdownPlacementSnippet />
+                <DropdownPlacementExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Ширина по триггеру</DemoSectionTitle>
+            <DemoDescription>
+              <code>sameMinWidthAsTrigger</code>: панель не уже триггера — для кнопок на всю ширину
+              колонки.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack-center">
+              <PlaygroundExampleFrame.Stage>
+                <DropdownFullWidthExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -411,53 +481,28 @@ export default function DropdownSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
             <DemoDescription>
-              <code>open</code> и <code>onOpenChange</code> на <code>Dropdown.Root</code> для связи
-              с родительским состоянием (мастер, подсказки, аналитика).
+              <code>open</code> и <code>onOpenChange</code> на <code>Dropdown.Root</code> — для
+              связи с состоянием родителя (подсказки, аналитика).
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root
+              code={controlledSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DropdownControlledSnippet />
+                <DropdownControlledExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoSectionTitle>Свой триггер</DemoSectionTitle>
             <DemoDescription>
-              <code>Block</code>, <code>Header</code> с рядом <code>HeaderRow</code>,{" "}
-              <code>HeaderLeading</code> / <code>HeaderMain</code> / <code>HeaderTrailing</code>,{" "}
-              <code>GroupLabel</code>, <code>ItemIcon</code> и вложенная кнопка в трейлинге.
+              <code>Dropdown.Trigger</code> клонирует единственного ребёнка: ссылка получает{" "}
+              <code>aria-expanded</code>, <code>aria-controls</code> и обработчик клика.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()}>
+            <PlaygroundExampleFrame.Root code={asChildSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <DropdownCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Full width / минимальная ширина</DemoSectionTitle>
-            <DemoDescription>
-              <code>sameMinWidthAsTrigger</code> на <code>Dropdown.Content</code>: минимальная
-              ширина панели не меньше ширины триггера — удобно для узкой иконки-кнопки и длинных
-              подписей пунктов.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()}>
-              <PlaygroundExampleFrame.Stage>
-                <DropdownFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>asChild</DemoSectionTitle>
-            <DemoDescription>
-              <code>Dropdown.Trigger</code> клонирует единственного ребёнка: на ссылку добавляются{" "}
-              <code>aria-expanded</code>, <code>aria-controls</code> и общий обработчик клика.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={asChildSource.trim()}>
-              <PlaygroundExampleFrame.Stage>
-                <DropdownAsChildSnippet />
+                <DropdownAsChildExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -530,6 +575,12 @@ export default function DropdownSection() {
               Слот иконки слева от текста пункта; размер по умолчанию согласован с размером панели.
             </DemoDescription>
             <PlaygroundApiTable rows={dropdownItemIconApiRows} />
+
+            <DemoApiTitle>Dropdown.ItemShortcut</DemoApiTitle>
+            <DemoDescription>
+              Приглушённая подсказка сочетания клавиш у правого края пункта.
+            </DemoDescription>
+            <PlaygroundApiTable rows={dropdownItemShortcutApiRows} />
 
             <DemoApiTitle>Dropdown.Group</DemoApiTitle>
             <DemoDescription>Семантическая группа пунктов внутри меню.</DemoDescription>

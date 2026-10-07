@@ -1,4 +1,21 @@
+import BadgeIconsExample from "@/components/badge/examples/icons";
+import badgeIconsSource from "@/components/badge/examples/icons.tsx?raw";
+import BadgeInControlsExample from "@/components/badge/examples/in-controls";
+import badgeInControlsSource from "@/components/badge/examples/in-controls.tsx?raw";
+import BadgeOrderListExample from "@/components/badge/examples/order-list";
+import badgeOrderListSource from "@/components/badge/examples/order-list.tsx?raw";
+import BadgePaletteExample from "@/components/badge/examples/palette";
+import badgePaletteSource from "@/components/badge/examples/palette.tsx?raw";
+import BadgeSizesExample from "@/components/badge/examples/sizes";
+import badgeSizesSource from "@/components/badge/examples/sizes.tsx?raw";
+import BadgeStatesExample from "@/components/badge/examples/states";
+import badgeStatesSource from "@/components/badge/examples/states.tsx?raw";
+import BadgeSurfacesExample from "@/components/badge/examples/surfaces";
+import badgeSurfacesSource from "@/components/badge/examples/surfaces.tsx?raw";
+import BadgeVariantsExample from "@/components/badge/examples/variants";
+import badgeVariantsSource from "@/components/badge/examples/variants.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,85 +23,52 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import BadgeContextSizeSnippet from "../snippets/badge/context-size";
-import badgeContextSizeSource from "../snippets/badge/context-size.tsx?raw";
-import BadgeDisabledSnippet from "../snippets/badge/disabled";
-import badgeDisabledSource from "../snippets/badge/disabled.tsx?raw";
-import BadgeDotIconSnippet from "../snippets/badge/dot-icon";
-import badgeDotIconSource from "../snippets/badge/dot-icon.tsx?raw";
-import BadgeIconsSnippet from "../snippets/badge/icons";
-import badgeIconsSource from "../snippets/badge/icons.tsx?raw";
-import BadgeSemanticColorsSnippet from "../snippets/badge/semantic-colors";
-import badgeSemanticColorsSource from "../snippets/badge/semantic-colors.tsx?raw";
-import BadgeSizesSnippet from "../snippets/badge/sizes";
-import badgeSizesSource from "../snippets/badge/sizes.tsx?raw";
-import BadgeVariantsSnippet from "../snippets/badge/variants";
-import badgeVariantsSource from "../snippets/badge/variants.tsx?raw";
 
 const badgeRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "color",
-    type: '"gray" | "red" | "blue" | "green" | "orange" | "yellow" | "purple" | "sky" | "pink" | "teal"',
+    type: '"gray" | "blue" | "sky" | "teal" | "green" | "yellow" | "orange" | "red" | "pink" | "purple"',
     defaultValue: '"gray"',
     required: "Нет",
-    description: 'Семантический цвет заливки и текста; не используется при variant="status".',
+    description:
+      "Оттенок палитры (--prime-color-palette-<hue>-*), одинаково работает в светлой и тёмной теме. Для категорий, а не статуса.",
   },
   {
     prop: "variant",
-    type: '"filled" | "light" | "lighter" | "stroke" | "status"',
-    defaultValue: '"light"',
+    type: '"soft" | "solid" | "outline"',
+    defaultValue: '"soft"',
     required: "Нет",
-    description: "Визуальный стиль: заливка, мягкий фон, обводка или статус с точкой.",
+    description: "soft — мягкая заливка, solid — насыщенная, outline — тонкий внутренний контур.",
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
-    defaultValue: 'из контекста или "m"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
+    defaultValue: 'из контрола или "m"',
     required: "Нет",
     description:
-      'Размер бейджа; если не задан, берётся из ControlSizeContext (контрольная поверхность → размер поля ввода), иначе "m".',
+      "Высота 16 · 20 · 24 · 28 · 32 px. Без size внутри Button, Input и других контролов бейдж на ярус меньше контрола (m → s, xl → l, s/xs → xs). Явный size всегда побеждает.",
   },
   {
     prop: "disabled",
     type: "boolean",
     defaultValue: "—",
     required: "Нет",
-    description: "Приглушённый вид (data-disabled).",
-  },
-  {
-    prop: "status",
-    type: '"online" | "offline" | "away" | "busy"',
-    defaultValue: '"online"',
-    required: "Нет",
-    description: 'Цвет индикаторной точки; только при variant="status".',
-  },
-  {
-    prop: "label",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: 'aria-label на корне при variant="status" (role="status").',
+    description: "Приглушённый вид: fill-muted и text-disabled (data-disabled).",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Текст и слоты (<Badge.Dot />, <Badge.Icon />, иконки).",
+    description:
+      "Текст, Badge.Dot, Badge.Icon. Только Badge.Icon без текста — квадратный бейдж (добавьте aria-label).",
   },
   {
-    prop: "className",
-    type: "string",
+    prop: "…rest",
+    type: "React.HTMLAttributes<HTMLSpanElement>",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный CSS-класс корневого div.",
-  },
-  {
-    prop: "…htmlProps",
-    type: "React.HTMLAttributes<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Остальные атрибуты div: id, style, data-*, обработчики.",
+    description: "Остальные атрибуты span: className, id, aria-*, data-*. ref передаётся на span.",
   },
 ];
 
@@ -94,38 +78,24 @@ const badgeIconApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Иконка (например <Icon />); оборачивается в span с выравниванием в ряду бейджа.",
+    description: "Иконка; размер подстраивается под ярус бейджа (12–16 px).",
   },
   {
-    prop: "className",
-    type: "string",
+    prop: "…rest",
+    type: 'Omit<React.HTMLAttributes<HTMLSpanElement>, "children">',
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный класс обёртки иконки.",
-  },
-  {
-    prop: "…htmlProps",
-    type: 'Omit<React.HTMLAttributes<HTMLDivElement>, "children">',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Прочие атрибуты для span-обёртки (кроме children).",
+    description: "className и прочие атрибуты span-обёртки.",
   },
 ];
 
 const badgeDotApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный класс декоративной точки.",
-  },
-  {
-    prop: "…htmlProps",
+    prop: "…rest",
     type: "React.HTMLAttributes<HTMLSpanElement>",
     defaultValue: "—",
     required: "Нет",
-    description: "Атрибуты span; точка помечена aria-hidden.",
+    description: "className и атрибуты span. Точка в currentColor, всегда aria-hidden.",
   },
 ];
 
@@ -135,13 +105,9 @@ export default function BadgeSection() {
       <PageContent.Header>
         <PageContent.Title>Badge</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Небольшая метка рядом с текстом или в списке: статус, категория, счётчик. Набор частей{" "}
-              <code>Badge.Root</code>, опционально <code>Badge.Dot</code> и <code>Badge.Icon</code>.
-              Цвета и варианты оформления задаются пропами.
-            </>
-          }
+          Компактная неинтерактивная метка: статус, категория, окружение, счётчик. По умолчанию
+          мягкая заливка без обводки, цифры моноширинные. Для удаляемых и фильтр-чипов —{" "}
+          <code>Tag</code>, для клавиш — <code>Kbd</code>, для действий — <code>Button</code>.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -149,16 +115,12 @@ export default function BadgeSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Явный проп <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-              <code>xl</code> при <code>variant=&quot;light&quot;</code> и{" "}
-              <code>color=&quot;gray&quot;</code>.
+              Пять ярусов <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> ·{" "}
+              <code>xl</code> — 16, 20, 24, 28 и 32 px. Значение по умолчанию — <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={badgeSizesSource.trim()}
-              previewLayout="stack-center"
-            >
+            <PlaygroundExampleFrame.Root code={badgeSizesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <BadgeSizesSnippet />
+                <BadgeSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -166,14 +128,27 @@ export default function BadgeSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Варианты</DemoSectionTitle>
             <DemoDescription>
-              Проп <code>variant</code>: <code>filled</code>, <code>light</code>,{" "}
-              <code>lighter</code>, <code>stroke</code> с одним <code>color</code>; отдельно{" "}
-              <code>variant=&quot;status&quot;</code> с <code>status</code> и подписями для экранных
-              читалок через <code>label</code>.
+              <code>soft</code> (по умолчанию) — основной вариант для меток в таблицах и списках;{" "}
+              <code>solid</code> — для одного акцентного бейджа на экране; <code>outline</code> —
+              без заливки. Точка состояния — часть <code>Badge.Dot</code>; присутствие человека
+              показывает <code>Avatar.Status</code>.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={badgeVariantsSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <BadgeVariantsSnippet />
+                <BadgeVariantsExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Палитра</DemoSectionTitle>
+            <DemoDescription>
+              Десять оттенков <code>color</code>. Цвет только дублирует смысл — текст бейджа должен
+              читаться и без него.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={badgePaletteSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <BadgePaletteExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -181,69 +156,72 @@ export default function BadgeSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Проп <code>disabled</code>: приглушение на <code>filled</code>, <code>stroke</code> и{" "}
-              <code>status</code>.
+              Бейдж не реагирует на наведение и не получает фокус — это статичный текст. Из
+              состояний есть только <code>disabled</code>: серая заливка и приглушённый текст для
+              любого варианта.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={badgeDisabledSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={badgeStatesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <BadgeDisabledSnippet />
+                <BadgeStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoSectionTitle>Точка и иконки</DemoSectionTitle>
             <DemoDescription>
-              <code>Badge.Dot</code> — маркер перед текстом; <code>Badge.Icon</code> — иконка в
-              строке метки (проп <code>children</code> обязателен).
+              <code>Badge.Dot</code> — маркер в цвете текста, <code>Badge.Icon</code> — иконка слева
+              или справа. Если внутри только <code>Badge.Icon</code>, бейдж становится квадратным;
+              дайте ему <code>aria-label</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={badgeDotIconSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={badgeIconsSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <BadgeDotIconSnippet />
+                <BadgeIconsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Иконки</DemoSectionTitle>
+            <DemoSectionTitle>Внутри контролов</DemoSectionTitle>
             <DemoDescription>
-              Примеры <code>Badge</code> с иконками: иконка слева от текста, иконка справа, только
-              иконка без текста, комбинация с <code>Badge.Dot</code>. Иконки автоматически
-              масштабируются в зависимости от размера бейджа.
+              Без <code>size</code> бейдж внутри <code>Button</code> или <code>Input</code>{" "}
+              автоматически берёт ярус на ступень ниже контрола: кнопка <code>s</code> →{" "}
+              <code>xs</code>, <code>m</code> → <code>s</code>, <code>l</code> → <code>m</code>.
+              Явный <code>size</code> отключает это правило.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={badgeIconsSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={badgeInControlsSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <BadgeIconsSnippet />
+                <BadgeInControlsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Семантические цвета</DemoSectionTitle>
+            <DemoSectionTitle>На разных поверхностях</DemoSectionTitle>
             <DemoDescription>
-              Все значения <code>color</code> на одном <code>variant=&quot;light&quot;</code> и
-              размере <code>m</code> — чтобы сравнить палитру подписей.
+              Мягкие заливки рассчитаны на холст, карточку и всплывающий слой без подстройки.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={badgeSurfacesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SurfaceGallery>
+                  <BadgeSurfacesExample />
+                </SurfaceGallery>
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция: список заказов</DemoSectionTitle>
+            <DemoDescription>
+              Типичное место бейджа — колонка статуса в строке списка или таблицы.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
-              code={badgeSemanticColorsSource.trim()}
-              previewLayout="stack"
+              code={badgeOrderListSource.trim()}
+              previewLayout="stack-center"
+              surface="canvas"
             >
               <PlaygroundExampleFrame.Stage>
-                <BadgeSemanticColorsSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Размер из контекста</DemoSectionTitle>
-            <DemoDescription>
-              Без <code>size</code> на <code>Badge.Root</code> используется ближайший{" "}
-              <code>ControlSizeProvider</code>: размер контрольной поверхности маппится как у полей
-              ввода; значение <code>xs</code> с контекста даёт визуальный размер <code>s</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={badgeContextSizeSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <BadgeContextSizeSnippet />
+                <BadgeOrderListExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -252,21 +230,17 @@ export default function BadgeSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Badge.Root</DemoApiTitle>
             <DemoDescription>
-              Корневой контейнер метки; выставляет <code>data-*</code> для стилей и оборачивает
-              детей в <code>ControlSizeProvider</code> для согласованных вложенных иконок.
+              Корень метки; выставляет <code>data-size</code> (номинальный размер) и{" "}
+              <code>data-tier</code> (визуальный ярус).
             </DemoDescription>
             <PlaygroundApiTable rows={badgeRootApiRows} />
 
             <DemoApiTitle>Badge.Icon</DemoApiTitle>
-            <DemoDescription>
-              Выравнивает иконку в ряду с текстом бейджа; дочерний элемент обязателен.
-            </DemoDescription>
             <PlaygroundApiTable rows={badgeIconApiRows} />
 
             <DemoApiTitle>Badge.Dot</DemoApiTitle>
             <DemoDescription>
-              Декоративная круглая отметка внутри метки (не путать с точкой варианта{" "}
-              <code>status</code>).
+              Декоративная точка внутри метки в цвете текста бейджа.
             </DemoDescription>
             <PlaygroundApiTable rows={badgeDotApiRows} />
           </div>

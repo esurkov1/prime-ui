@@ -1,59 +1,70 @@
+/*
+ * CodeBlock — monospace `code` role on a sunken wash, no border.
+ * Token colors come from the palette, so they follow the theme; `data-theme` on the root
+ * (from `colorScheme`) re-scopes the whole palette when a fixed scheme is requested.
+ */
 .root {
   box-sizing: border-box;
   margin: 0;
-  padding: 0;
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-mono);
+  font-variant-ligatures: none;
   white-space: pre;
   tab-size: 2;
+}
+
+.root[data-variant="soft"] {
+  max-width: 100%;
+  padding: var(--prime-space-3) var(--prime-space-4);
+  overflow-x: auto;
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-fill-muted);
+  font-size: var(--prime-text-code-size);
+  line-height: var(--prime-text-code-line-height);
+  font-weight: var(--prime-text-code-weight);
+  letter-spacing: var(--prime-text-code-tracking);
+}
+
+/* Forced scheme: the block carries its own background so the palette stays legible. */
+.root[data-variant="soft"][data-theme] {
+  background: var(--prime-color-bg-raised);
+}
+
+.root[data-variant="ghost"] {
+  padding: 0;
   background: transparent;
-  font-family: var(--prime-ref-font-family-mono);
   font-size: inherit;
   line-height: inherit;
-  color: var(--prime-sys-color-content-primary);
+}
+
+.root:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
 .code {
   font-family: inherit;
 }
 
-/* Подсветка TS/TSX (`highlightTsxHtml`) */
-.root[data-theme="light"] :global(.prime-tok-k) {
-  color: var(--prime-ref-color-purple-800);
-  font-weight: var(--prime-sys-typography-weight-medium);
+/* Syntax tokens from `highlightTsxHtml`. */
+.root :global(.prime-tok-k) {
+  color: var(--prime-color-palette-purple-text);
+  font-weight: var(--prime-font-weight-medium);
 }
 
-.root[data-theme="dark"] :global(.prime-tok-k) {
-  color: var(--prime-ref-color-purple-300);
-  font-weight: var(--prime-sys-typography-weight-medium);
+.root :global(.prime-tok-s) {
+  color: var(--prime-color-palette-teal-text);
 }
 
-.root[data-theme="light"] :global(.prime-tok-s) {
-  color: var(--prime-ref-color-teal-800);
+.root :global(.prime-tok-c) {
+  color: var(--prime-color-text-muted);
+  font-style: italic;
 }
 
-.root[data-theme="dark"] :global(.prime-tok-s) {
-  color: var(--prime-ref-color-teal-200);
+.root :global(.prime-tok-n) {
+  color: var(--prime-color-palette-orange-text);
 }
 
-.root[data-theme="light"] :global(.prime-tok-c) {
-  color: var(--prime-sys-color-content-muted);
-}
-
-.root[data-theme="dark"] :global(.prime-tok-c) {
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.root[data-theme="light"] :global(.prime-tok-n) {
-  color: var(--prime-ref-color-orange-700);
-}
-
-.root[data-theme="dark"] :global(.prime-tok-n) {
-  color: var(--prime-ref-color-orange-300);
-}
-
-.root[data-theme="light"] :global(.prime-tok-x) {
-  color: var(--prime-ref-color-blue-700);
-}
-
-.root[data-theme="dark"] :global(.prime-tok-x) {
-  color: var(--prime-ref-color-blue-300);
+.root :global(.prime-tok-x) {
+  color: var(--prime-color-palette-blue-text);
 }

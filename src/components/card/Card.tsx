@@ -2,23 +2,22 @@ import * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import type { Tone } from "@/internal/states";
 
 import styles from "./Card.module.css";
 
-/** Карточки дашборда: KPI, списки, CTA, split, cover и секции с графиками. */
-export type CardVariant =
-  | "mini"
-  | "mini-media"
-  | "metric"
-  | "panel"
-  | "stat-trend"
-  | "cta"
-  | "list"
-  | "split"
-  | "cover";
-
 export type CardRootProps = {
-  variant: CardVariant;
+  /** Structural template: KPI tiles, lists, CTA, split, cover and chart sections. Default `panel`. */
+  variant?:
+    | "mini"
+    | "mini-media"
+    | "metric"
+    | "panel"
+    | "stat-trend"
+    | "cta"
+    | "list"
+    | "split"
+    | "cover";
   /**
    * Без лёгкой тени (плоская плитка на фоне страницы).
    * По умолчанию — тень поверхности для отделения от фона.
@@ -29,7 +28,7 @@ export type CardRootProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>(function CardRoot(
-  { variant, flat = false, className, children, ...rest },
+  { variant = "panel", flat = false, className, children, ...rest },
   forwardedRef,
 ) {
   return (
@@ -37,7 +36,7 @@ const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>(function CardRo
       ref={forwardedRef}
       {...rest}
       className={cx(styles.root, className)}
-      {...toDataAttributes({ variant, flat })}
+      {...toDataAttributes({ variant, flat: flat || undefined })}
     >
       {children}
     </div>
@@ -157,34 +156,34 @@ function CardMedia({ className, children, ...rest }: CardMediaProps) {
 }
 CardMedia.displayName = "CardMedia";
 
+export type CardHeadingLevel = "h2" | "h3" | "h4";
+
 export type CardTitleProps = {
+  /** Heading level that fits the page outline (the look does not change). */
+  as?: CardHeadingLevel;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLHeadingElement>;
 
-function CardTitle({ className, children, ...rest }: CardTitleProps) {
+function CardTitle({ as: Tag = "h3", className, children, ...rest }: CardTitleProps) {
   return (
-    <h3 className={cx(styles.title, className)} {...rest}>
+    <Tag className={cx(styles.title, className)} {...rest}>
       {children}
-    </h3>
+    </Tag>
   );
 }
 CardTitle.displayName = "CardTitle";
 
 export type CardDeltaProps = {
-  /** Подкраска тренда: рост / падение / нейтрально. */
-  trend?: "up" | "down" | "neutral";
+  /** Color of the change: `success` — good, `danger` — bad, `neutral` (default). Independent of the sign. */
+  tone?: Extract<Tone, "neutral" | "success" | "warning" | "danger">;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLSpanElement>;
 
-function CardDelta({ className, trend, children, ...rest }: CardDeltaProps) {
+function CardDelta({ className, tone = "neutral", children, ...rest }: CardDeltaProps) {
   return (
-    <span
-      className={cx(styles.delta, className)}
-      {...(trend != null ? { "data-trend": trend } : {})}
-      {...rest}
-    >
+    <span {...rest} className={cx(styles.delta, className)} data-tone={tone}>
       {children}
     </span>
   );
@@ -324,15 +323,17 @@ function CardSectionHeader({ className, children, ...rest }: CardSectionHeaderPr
 CardSectionHeader.displayName = "CardSectionHeader";
 
 export type CardSectionTitleProps = {
+  /** Heading level that fits the page outline (the look does not change). */
+  as?: CardHeadingLevel;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLHeadingElement>;
 
-function CardSectionTitle({ className, children, ...rest }: CardSectionTitleProps) {
+function CardSectionTitle({ as: Tag = "h3", className, children, ...rest }: CardSectionTitleProps) {
   return (
-    <h3 className={cx(styles.sectionTitle, className)} {...rest}>
+    <Tag className={cx(styles.sectionTitle, className)} {...rest}>
       {children}
-    </h3>
+    </Tag>
   );
 }
 CardSectionTitle.displayName = "CardSectionTitle";

@@ -1,213 +1,185 @@
 # Accordion
 
-**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
+**Category:** layout (Раскладка)
 
-## About
+> Collapsible sections: FAQ, settings groups, checkout steps.
 
-A compound disclosure pattern: each item has a header trigger and expandable body content, with optional height animation. Use it to stack optional sections (FAQ, settings groups, legal blocks) without leaving the page.
+## When to use
+- A list of questions with answers (FAQ).
+- Groups of settings where the user opens one or several at a time.
+- Step-by-step forms where one step stays open (`collapsible={false}`).
 
-**When to use**
+## When not to use
+- Switching between peer views of the same area → use [Tabs](../tabs/COMPONENT.md).
+- A single show/hide toggle next to a field → a [Button](../button/COMPONENT.md) plus conditional content.
+- A linear wizard with progress → use [Stepper](../stepper/COMPONENT.md).
+- Floating extra content → use [Popover](../popover/COMPONENT.md).
+- A static separator between groups → use [Divider](../divider/COMPONENT.md).
 
-- Long pages where users open only the sections they need: FAQs, delivery and return copy, grouped settings, order or project detail blocks, knowledge-base articles, sidebars and narrow columns.
-- One-at-a-time expansion (`type="single"`) or several open panels (`type="multiple"`) when comparing sections side by side.
-- Visual density control via `layout="grouped"` (single frame) vs `layout="separate"` (card-like items).
+## Import
+```tsx
+import { Accordion } from "prime-ui-kit";
+```
 
-**When not to use**
+## Anatomy
+```
+Accordion.Root               frame (grouped) or column of cards (separate)
+└── Accordion.Item           one section; data-state open/closed
+    ├── Accordion.Header     <h3> wrapper of the trigger
+    │   └── Accordion.Trigger    <button>; holds the label
+    │       ├── Accordion.Icon   optional leading icon
+    │       ├── <span>label</span>
+    │       └── Accordion.Arrow  indicator at the end (chevron or icon / openIcon pair)
+    └── Accordion.Content    <section> panel with height animation
+```
 
-- Switching one shared panel with a horizontal tab list — prefer [Tabs](../tabs/COMPONENT.md).
-- When every section must stay visible without extra interaction.
-- Deep hierarchical navigation — prefer a flat list, tree, or separate routes instead of nested accordions.
-- Very heavy bodies inside animated panels (large lists, charts) if `ResizeObserver`-driven height updates become costly.
+## API
 
-## Composition
+### Accordion.Root
+`forwardRef` to `<div>`. The props are a union on `type`.
 
-- **`Accordion.Root`** wraps all items and supplies `size`, `type`, `layout`, and open-state (`value` / `defaultValue` / `onValueChange`).
-- Per item the order is: **`Accordion.Item`** (required `value`) → **`Accordion.Header`** → **`Accordion.Trigger`** (native `button`) as a **direct** child of the header → **`Accordion.Content`** as a **sibling** of the header (same item), not nested inside the trigger.
-- Put label text, optional **`Accordion.Icon`**, and optional **`Accordion.Arrow`** inside the trigger as needed.
-- **`Accordion.Content`** renders an outer **`section`** (ARIA region) and an inner padded block; `className` applies to the inner block; `style` is merged onto the outer node with the animation height variable.
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `type` | `"single" \| "multiple"` | `"single"` | One open item at a time, or any number. |
+| `value` | `string` (single) · `string[]` (multiple) | — | Open item(s), controlled. In single mode `""` means all closed. |
+| `defaultValue` | `string` (single) · `string[]` (multiple) | — | Initially open item(s), uncontrolled. |
+| `onValueChange` | `(value: string) => void` (single) · `(value: string[]) => void` (multiple) | — | Called on every toggle; single mode passes `""` when the item closes. |
+| `collapsible` | `boolean` | `true` | Single mode only: `false` keeps the open item open when its trigger is clicked again. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Trigger height, text, icon and paddings. |
+| `layout` | `"grouped" \| "separate"` | `"grouped"` | One surface with hairlines between items, or each item as its own card. |
 
-### Canonical example
++ native `<div>` props (except `defaultValue`, `onChange`).
 
-Single open section at a time, **`layout="grouped"`** (one frame), **`Accordion.Icon as={LucideIcon}`** plus **`Accordion.Arrow`** on each trigger, and rich body copy with a **`LinkButton`**. For **`size`** steps, **`type="multiple"`** / **`layout="separate"`**, disabled and **`collapsible={false}`**, controlled **`value`**, **`Accordion.Arrow`** with **`openIcon` / `closeIcon`**, **`Accordion.Icon as="span"`**, and full-bleed width in preview, see the runnable **`./examples/*.tsx`** files and the playground snippets listed below (full source in those files—avoid duplicating long demos here).
+### Accordion.Item
+`forwardRef` to `<div>`.
 
-**Imports:** in this repo use the **`@/…`** paths shown; published apps import the same components from **`prime-ui-kit`**.
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | `string` | — (required) | Item id used in `value`. |
+| `disabled` | `boolean` | `false` | The trigger is disabled and the item cannot be toggled. |
+
++ native `<div>` props.
+
+### Accordion.Header
+`forwardRef` to `<h3>`. + native heading props.
+
+### Accordion.Trigger
+`forwardRef` to `<button>` (`type="button"` unless set). `id`, `disabled`, `aria-controls`, `aria-expanded` are set by the item. A custom `onClick` runs first; calling `event.preventDefault()` cancels the toggle. + native `<button>` props.
+
+### Accordion.Icon
+Polymorphic, no ref.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `as` | `ElementType` | `"div"` | Element or icon component to render (e.g. a lucide icon). |
+| `className` | `string` | — | Extra class. |
+| `children` | `ReactNode` | — | Icon glyph when `as` is a wrapper. |
+
++ props of the `as` element. Sized to the tier icon; content panel aligns with the label text when present.
+
+### Accordion.Arrow
+No ref; renders a `<span>` at the end of the trigger.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `icon` | `ElementType<{ className?; strokeWidth? }>` | `ChevronDown` | Glyph; rotates 180° when the item opens. |
+| `openIcon` | `ElementType<{ className?; strokeWidth? }>` | — | Glyph shown instead of `icon` while open (e.g. `Plus` → `Minus`); disables the rotation. |
+
++ native `<span>` props.
+
+### Accordion.Content
+`forwardRef` to the outer `<section>`. `className` goes to the inner padded block; `style` and other props go to the `<section>`. + native `<div>` props.
+
+## Variants
+
+### layout
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `grouped` | One `card-bg` surface with card radius, `border-subtle` hairlines between items, no shadow of its own | FAQ, short settings lists | yes |
+| `separate` | Each item is a separate card (`card-bg`, card radius, `card-shadow`) with `--prime-space-2` between them | Heavier sections, checkout steps | |
+
+### type
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `single` | Opening one item closes the other | FAQ, step-by-step forms | yes |
+| `multiple` | Items open independently | Settings the user compares side by side | |
+
+### collapsible (single only)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `true` | Clicking the open item closes it | Most lists | yes |
+| `false` | One item always stays open | Checkout / step forms | |
+
+### Arrow
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| default chevron | Muted chevron rotating 180° on open | Most accordions | yes |
+| `icon` + `openIcon` | Two glyphs swapped on open, no rotation | «+ / −» style | |
+
+### Leading icon
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| no `Accordion.Icon` | Label starts at the padding edge | Text-only lists | yes |
+| with `Accordion.Icon` | Secondary-colored tier icon before the label; panel text indents to the label | Settings groups with category icons | |
+
+**Combinations** — `layout="separate"` + `collapsible={false}` for checkouts; `type="multiple"` + leading icons for settings. `collapsible` exists only on the single variant: passing it with `type="multiple"` is a type error.
+
+**Sizes** — trigger min height = control height + 8 (xs 36, s 40) or + 16 (**m 52**, l 56, xl 64); trigger text = the control text of the tier; panel text: xs caption 12/16, s body-s 13/20, m body-m 14/20, l body-m 14/20, xl body-l 16/24. Horizontal padding: xs/s 12, m 16, l 20, xl 24.
+
+**Hierarchy** — one accordion per content block; do not nest accordions inside accordion panels.
+
+## States
+- Open/closed: driven by `value` / `defaultValue` + `onValueChange`. `data-state="open" | "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `aria-hidden` on a closed Content.
+- Disabled item: `disabled` on Item → `data-disabled` on Item and Trigger, native `disabled` on the button, text in `text-disabled`, `cursor: not-allowed`.
+- Hover: trigger gets `fill-subtle`; active `fill-subtle-active`; focus-visible: inset focus ring inside the trigger.
+- Root: `data-size`, `data-layout`.
+- Height animates with motion tokens; no transition under `prefers-reduced-motion`.
+
+## Layout & spacing
+- Takes the full width of its parent (`width: 100%`); the parent sets the measure.
+- Panel content is a flex column with `--prime-space-3` gap; it reserves `--prime-focus-space` at the top so focus rings of fields inside are not clipped.
+- Fields inside panels get the surface field fill automatically.
+- Stack several accordions or an accordion and other blocks with the page gap (`--prime-space-8` between groups).
+
+## Accessibility
+- The trigger is a native `<button>` inside an `<h3>`: Tab moves between triggers, Enter / Space toggles. No arrow-key navigation.
+- `aria-expanded` and `aria-controls` on the trigger; the panel is a `<section>` with `aria-labelledby` pointing at the trigger.
+- Arrow icons are `aria-hidden`.
+- No `labels`.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [layouts.tsx](examples/layouts.tsx) | FAQ in `grouped` and `separate` | Choosing the frame |
+| [sizes.tsx](examples/sizes.tsx) | `size` xs → xl | Matching the density of the screen |
+| [states.tsx](examples/states.tsx) | Leading icons, «+ / −» arrow, controlled `type="multiple"`, disabled item | Settings groups |
+| [checkout.tsx](examples/checkout.tsx) | `separate` + `collapsible={false}` with form fields | Step-by-step forms |
 
 ```tsx
-import { Accordion } from "@/components/accordion/Accordion";
-import { LinkButton } from "@/components/link-button/LinkButton";
-import { Typography } from "@/components/typography/Typography";
-import { Package, ShieldCheck, Truck } from "lucide-react";
+import { Accordion } from "prime-ui-kit";
 
 export function Example() {
   return (
-    <Accordion.Root type="single" layout="grouped" defaultValue="delivery" collapsible>
+    <Accordion.Root defaultValue="delivery">
       <Accordion.Item value="delivery">
         <Accordion.Header>
           <Accordion.Trigger>
-            <Accordion.Icon as={Truck} />
-            <span>Delivery &amp; tracking</span>
+            <span>Сколько идёт доставка?</span>
             <Accordion.Arrow />
           </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content>
-          <Typography.Root as="p" variant="body-default" tone="muted">
-            Orders ship within one business day. Tracking links are sent by email when the carrier
-            scans the package.
-          </Typography.Root>
-        </Accordion.Content>
-      </Accordion.Item>
-      <Accordion.Item value="returns">
-        <Accordion.Header>
-          <Accordion.Trigger>
-            <Accordion.Icon as={Package} />
-            <span>Returns</span>
-            <Accordion.Arrow />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content>
-          <Typography.Root as="p" variant="body-default" tone="muted">
-            Unopened items in original packaging are returnable within 30 days. Opened goods may
-            qualify for store credit—see the policy for exceptions.
-          </Typography.Root>
-        </Accordion.Content>
-      </Accordion.Item>
-      <Accordion.Item value="compliance">
-        <Accordion.Header>
-          <Accordion.Trigger>
-            <Accordion.Icon as={ShieldCheck} />
-            <span>Compliance</span>
-            <Accordion.Arrow />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content>
-          <Typography.Root as="p" variant="body-default" tone="muted">
-            We process card data in line with PCI DSS. For regional privacy questions, read the
-            notices linked below.
-          </Typography.Root>
-          <LinkButton.Root href="#" size="s">
-            Privacy &amp; data processing
-          </LinkButton.Root>
-        </Accordion.Content>
+        <Accordion.Content>По Москве — 1–2 дня.</Accordion.Content>
       </Accordion.Item>
     </Accordion.Root>
   );
 }
 ```
 
-### Examples (source)
-
-| File | Intent |
-|------|--------|
-| [`./examples/01-faq-marketing.tsx`](./examples/01-faq-marketing.tsx) | FAQ: `type="single"`, `layout="grouped"`, **`Accordion.Icon as={Icon}`** + default chevron (**aligns with** `playground/snippets/accordion/composition.tsx`). |
-| [`./examples/02-settings-panels.tsx`](./examples/02-settings-panels.tsx) | Settings: **`type="multiple"`**, **`layout="separate"`**, **`defaultValue`** as string array (**aligns with** `playground/snippets/accordion/variants-layout-type.tsx`). |
-| [`./examples/03-checkout-order-summary.tsx`](./examples/03-checkout-order-summary.tsx) | Checkout: **`Accordion.Arrow openIcon` / `closeIcon`** (plus default chevron on another item) and links in the body (**aligns with** `playground/snippets/accordion/features-arrow.tsx`). |
-| [`./examples/04-api-docs-sections.tsx`](./examples/04-api-docs-sections.tsx) | Controlled **`value`** + **`onValueChange`** with `type="single"` (**aligns with** `playground/snippets/accordion/controlled.tsx`). |
-| [`./examples/05-knowledge-base-categories.tsx`](./examples/05-knowledge-base-categories.tsx) | **`collapsible={false}`**, **`Accordion.Item disabled`**, **`defaultValue`** (**aligns with** `playground/snippets/accordion/states.tsx`). |
-
-### Playground snippets
-
-Demos wired from [`playground/sections/AccordionSection.tsx`](../../../playground/sections/AccordionSection.tsx) (Russian copy; same public API as this doc):
-
-| Snippet | Intent |
-|---------|--------|
-| [`playground/snippets/accordion/sizes.tsx`](../../../playground/snippets/accordion/sizes.tsx) | **`size`**: `s` / `m` / `l` / `xl` ladder. |
-| [`playground/snippets/accordion/variants-layout-type.tsx`](../../../playground/snippets/accordion/variants-layout-type.tsx) | **`layout`** `grouped` vs `separate`; **`type="multiple"`** with array **`defaultValue`**. |
-| [`playground/snippets/accordion/states.tsx`](../../../playground/snippets/accordion/states.tsx) | **`disabled`**, initial **`defaultValue`**, **`collapsible={false}`** in `single`. |
-| [`playground/snippets/accordion/controlled.tsx`](../../../playground/snippets/accordion/controlled.tsx) | External buttons + **`value` / `onValueChange`**. |
-| [`playground/snippets/accordion/composition.tsx`](../../../playground/snippets/accordion/composition.tsx) | Trigger row: **`Accordion.Icon as={Icon}`**, label in **`span`**, **`Accordion.Arrow`**. |
-| [`playground/snippets/accordion/full-width.tsx`](../../../playground/snippets/accordion/full-width.tsx) | Root fills preview column (**`examplePreviewBleed`** in playground). |
-| [`playground/snippets/accordion/icon-as.tsx`](../../../playground/snippets/accordion/icon-as.tsx) | **`Accordion.Icon as="span"`** with arbitrary child markup (e.g. Lucide as child). |
-| [`playground/snippets/accordion/features-arrow.tsx`](../../../playground/snippets/accordion/features-arrow.tsx) | **`openIcon` / `closeIcon`** vs default rotating chevron. |
-
-**LLM note:** Prefer reading **`./examples/*.tsx`** and the **`playground/snippets/accordion/*.tsx`** files for full markup and prop combinations; this page keeps the contract (rules + API tables) authoritative.
-
-## Rules
-
-- Use **`type="single"`** for at most one open item, **`type="multiple"`** for any subset open; `defaultValue` is a string or string array matching the type.
-- **Controlled:** pass **`value`** (`string` or `string[]`); updates go through **`onValueChange`**. In `single`, the callback receives a string; closing the open item yields **`""`**. In `multiple`, the callback receives the open id array.
-- **Uncontrolled:** omit `value` and optionally set **`defaultValue`**.
-- **`collapsible`** applies only to **`type="single"`**; set **`collapsible={false}`** to keep at least one item open once opened (cannot collapse to none).
-- **`disabled`** on **`Accordion.Item`** disables the trigger and blocks toggling for that item.
-- **`Accordion.Trigger`:** custom **`onClick`** runs first; call **`preventDefault()`** on the event if you need to cancel the built-in toggle. Prefer **`type="button"`** (default) inside forms.
-- **`Accordion.Arrow`** icons use **`aria-hidden`**; the accessible name must come from trigger text (or an explicit label pattern you add).
-- Keyboard: trigger is a button — **Enter** / **Space** activate; focus ring follows **`focus-visible`** from the theme.
-- **`data-state`** is **`open` | `closed`** on item, trigger, and content wrapper; **`data-disabled`** when the item is disabled.
-- **`AccordionContentProps`** is typed from **`HTMLDivElement`** attributes even though the outer DOM node is **`section`** — target the real **`section`** in tests and CSS when needed.
-
-## API
-
-### Accordion.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| type | `"single" \| "multiple"` | `"single"` | No | One open item vs many. |
-| value | `string \| string[]` | — | No | Controlled open value(s). |
-| defaultValue | `string \| string[]` | — | No | Initial open value(s) when uncontrolled. |
-| onValueChange | `(value: string \| string[]) => void` | — | No | `single`: string (empty string if none open). `multiple`: string array. |
-| collapsible | `boolean` | `true` | No | `single` only: if `false`, the open item cannot be closed to leave none open. |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Trigger, icons, and content spacing. |
-| layout | `"grouped" \| "separate"` | `"grouped"` | No | Shared frame vs card-like items. |
-| className | `string` | — | No | Root wrapper class. |
-| children | `React.ReactNode` | — | No | `Accordion.Item` nodes. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Passed to the root `div`. |
-
-### Accordion.Item
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| value | `string` | — | Yes | Unique id among siblings under one root. |
-| disabled | `boolean` | `false` | No | Item cannot open; trigger disabled. |
-| className | `string` | — | No | Item wrapper class. |
-| children | `React.ReactNode` | — | No | Header + content. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Passed to the item `div`. |
-
-### Accordion.Header
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Header class. |
-| children | `React.ReactNode` | — | No | Typically one `Accordion.Trigger`. |
-| …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | Rendered as `h3`. |
-
-### Accordion.Trigger
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| type | `"button" \| "submit" \| "reset"` | `"button"` | No | Prefer `button` in forms. |
-| className | `string` | — | No | Button class. |
-| children | `React.ReactNode` | — | No | Label and optional icon/arrow slots. |
-| …rest | `React.ButtonHTMLAttributes<HTMLButtonElement>` | — | No | `onClick` invoked before internal toggle. |
-
-### Accordion.Icon
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| as | `React.ElementType` | `"div"` | No | Polymorphic element for the icon wrapper. |
-| className | `string` | — | No | Wrapper class. |
-| children | `React.ReactNode` | — | No | Icon content when using a text-only element. |
-| …rest | Depends on `as` | — | No | Props for the chosen element (except `as` / `className`). |
-
-### Accordion.Arrow
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| openIcon | `React.ElementType` | `ChevronDown` | No | Default chevron rotates when closed vs open; or paired with `closeIcon`. |
-| closeIcon | `React.ElementType` | — | No | If set and differs from `openIcon`, shows two icons without rotation. |
-| className | `string` | — | No | `span` wrapper class. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Icons are `aria-hidden`. |
-
-### Accordion.Content
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Class on the inner padded block. |
-| style | `React.CSSProperties` | — | No | Merged on the outer `section` with the animated height CSS variable. |
-| children | `React.ReactNode` | — | No | Panel body. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Spread on the outer `section`; `aria-labelledby` / `aria-hidden` come from context. |
+## Mistakes
+- Trigger without `Accordion.Header` → wrap it so the section has a heading.
+- `value={["a"]}` without `type="multiple"` → arrays only in multiple mode.
+- Expecting `className` on Content to style the `<section>` → it styles the inner padded block.
+- Accordion used for tab-like switching → use Tabs.
 
 ## Related
-
-- [Typography](../typography/COMPONENT.md) — body copy inside `Accordion.Content`.
-- [Button](../button/COMPONENT.md) — external actions coordinated with controlled `value` on the root.
-- [Tabs](../tabs/COMPONENT.md) — alternative when one panel switches without a vertical stack of headers.
-- [Modal](../modal/COMPONENT.md) and [Drawer](../drawer/COMPONENT.md) — often host accordions in limited vertical space.
+[Tabs](../tabs/COMPONENT.md) · [Card](../card/COMPONENT.md) · [Stepper](../stepper/COMPONENT.md) · [Divider](../divider/COMPONENT.md)

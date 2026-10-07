@@ -1,130 +1,155 @@
+/*
+ * Drop zone: the one place where a visible dashed line is part of the design (affordance for
+ * "drop here"). Fill follows the field context (white on canvas, gray inside surfaces).
+ * `variant="solid"` drops the line and keeps only the fill. Drag-over is `data-state="active"`.
+ * File rows: transparent wash (works on any surface), tier typography, palette format badge.
+ */
 .root {
-  /* Размер по умолчанию — m (ярлык всегда с data-size из TS) */
-  --fu-pad: var(--prime-sys-spacing-x6);
-  --fu-stack: var(--prime-sys-spacing-x4);
-  --fu-copy-gap: var(--prime-sys-size-control-m-gap);
-  --fu-title: var(--prime-sys-size-control-m-text);
-  --fu-chip-h: var(--prime-sys-size-control-m-height);
-  --fu-chip-px: var(--prime-sys-size-control-m-buttonPaddingX);
-  --fu-chip-py: var(--prime-sys-size-control-m-buttonPaddingY);
-  --fu-chip-radius: var(--prime-sys-size-control-m-radius);
-  --fu-chip-font: var(--prime-sys-size-control-m-supportText);
-  --fu-surface-radius: var(--prime-sys-shape-radius-l);
-  --fu-maxw: var(--prime-sys-unit-22rem);
-
+  --fu-pad: var(--prime-space-6);
+  --fu-stack: var(--prime-space-4);
+  --fu-copy-gap: var(--prime-space-1);
+  --fu-title: var(--prime-control-m-text-size);
+  --fu-title-line-height: var(--prime-control-m-line-height);
+  --fu-btn-h: var(--prime-control-m-height);
+  --fu-btn-px: var(--prime-control-m-padding-x);
+  --fu-btn-radius: var(--prime-control-m-radius);
+  --fu-btn-text: var(--prime-control-m-text-size);
+  --fu-btn-line-height: var(--prime-control-m-line-height);
+  --fu-icon-box: var(--prime-control-m-height);
+  --fu-radius: var(--prime-radius-l);
   position: relative;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  box-sizing: border-box;
+  min-width: 0;
   padding: var(--fu-pad);
-  border: var(--prime-sys-border-width-control) dashed var(--prime-sys-color-border-subtle);
-  border-radius: var(--fu-surface-radius);
-  background: var(--prime-sys-color-surface-elevated);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  cursor: pointer;
+  border: var(--prime-border-width) dashed var(--prime-color-border-default);
+  border-radius: var(--fu-radius);
+  background: var(--prime-color-field-bg);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
   text-align: center;
+  cursor: pointer;
   transition:
-    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+    border-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-size="xs"] {
+  --fu-pad: var(--prime-space-4);
+  --fu-stack: var(--prime-space-2);
+  --fu-title: var(--prime-control-xs-text-size);
+  --fu-title-line-height: var(--prime-control-xs-line-height);
+  --fu-btn-h: var(--prime-control-xs-height);
+  --fu-btn-px: var(--prime-control-xs-padding-x);
+  --fu-btn-radius: var(--prime-control-xs-radius);
+  --fu-btn-text: var(--prime-control-xs-text-size);
+  --fu-btn-line-height: var(--prime-control-xs-line-height);
+  --fu-icon-box: var(--prime-control-xs-height);
+  --fu-radius: var(--prime-radius-m);
 }
 
 .root[data-size="s"] {
-  --fu-pad: var(--prime-sys-spacing-x5);
-  --fu-stack: var(--prime-sys-spacing-x3);
-  --fu-copy-gap: var(--prime-sys-size-control-s-gap);
-  --fu-title: var(--prime-sys-size-control-s-text);
-  --fu-chip-h: var(--prime-sys-size-control-s-height);
-  --fu-chip-px: var(--prime-sys-size-control-s-buttonPaddingX);
-  --fu-chip-py: var(--prime-sys-size-control-s-buttonPaddingY);
-  --fu-chip-radius: var(--prime-sys-size-control-s-radius);
-  --fu-chip-font: var(--prime-sys-size-control-s-supportText);
-  --fu-surface-radius: var(--prime-sys-shape-radius-m);
-  --fu-maxw: var(--prime-sys-unit-18rem);
+  --fu-pad: var(--prime-space-5);
+  --fu-stack: var(--prime-space-3);
+  --fu-title: var(--prime-control-s-text-size);
+  --fu-title-line-height: var(--prime-control-s-line-height);
+  --fu-btn-h: var(--prime-control-s-height);
+  --fu-btn-px: var(--prime-control-s-padding-x);
+  --fu-btn-radius: var(--prime-control-s-radius);
+  --fu-btn-text: var(--prime-control-s-text-size);
+  --fu-btn-line-height: var(--prime-control-s-line-height);
+  --fu-icon-box: var(--prime-control-s-height);
+  --fu-radius: var(--prime-radius-m);
 }
 
 .root[data-size="l"] {
-  --fu-pad: var(--prime-sys-spacing-x8);
-  --fu-stack: var(--prime-sys-spacing-x5);
-  --fu-copy-gap: var(--prime-sys-size-control-l-gap);
-  --fu-title: var(--prime-sys-size-control-l-text);
-  --fu-chip-h: var(--prime-sys-size-control-l-height);
-  --fu-chip-px: var(--prime-sys-size-control-l-buttonPaddingX);
-  --fu-chip-py: var(--prime-sys-size-control-l-buttonPaddingY);
-  --fu-chip-radius: var(--prime-sys-size-control-l-radius);
-  --fu-chip-font: var(--prime-sys-size-control-l-supportText);
-  --fu-surface-radius: var(--prime-sys-shape-radius-4xl);
-  --fu-maxw: var(--prime-sys-unit-26rem);
+  --fu-pad: var(--prime-space-8);
+  --fu-stack: var(--prime-space-5);
+  --fu-title: var(--prime-control-l-text-size);
+  --fu-title-line-height: var(--prime-control-l-line-height);
+  --fu-btn-h: var(--prime-control-l-height);
+  --fu-btn-px: var(--prime-control-l-padding-x);
+  --fu-btn-radius: var(--prime-control-l-radius);
+  --fu-btn-text: var(--prime-control-l-text-size);
+  --fu-btn-line-height: var(--prime-control-l-line-height);
+  --fu-icon-box: var(--prime-control-l-height);
 }
 
 .root[data-size="xl"] {
-  --fu-pad: var(--prime-sys-spacing-x10);
-  --fu-stack: var(--prime-sys-spacing-x5);
-  --fu-copy-gap: var(--prime-sys-size-control-xl-gap);
-  --fu-title: var(--prime-sys-size-control-xl-text);
-  --fu-chip-h: var(--prime-sys-size-control-xl-height);
-  --fu-chip-px: var(--prime-sys-size-control-xl-buttonPaddingX);
-  --fu-chip-py: var(--prime-sys-size-control-xl-buttonPaddingY);
-  --fu-chip-radius: var(--prime-sys-size-control-xl-radius);
-  --fu-chip-font: var(--prime-sys-size-control-xl-supportText);
-  --fu-surface-radius: var(--prime-sys-shape-radius-4xl);
-  --fu-maxw: var(--prime-sys-unit-28rem);
+  --fu-pad: var(--prime-space-10);
+  --fu-stack: var(--prime-space-6);
+  --fu-copy-gap: var(--prime-space-2);
+  --fu-title: var(--prime-control-xl-text-size);
+  --fu-title-line-height: var(--prime-control-xl-line-height);
+  --fu-btn-h: var(--prime-control-xl-height);
+  --fu-btn-px: var(--prime-control-xl-padding-x);
+  --fu-btn-radius: var(--prime-control-xl-radius);
+  --fu-btn-text: var(--prime-control-xl-text-size);
+  --fu-btn-line-height: var(--prime-control-xl-line-height);
+  --fu-icon-box: var(--prime-control-xl-height);
+  --fu-radius: var(--prime-radius-xl);
 }
 
 .root:hover:not([data-disabled="true"]) {
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  border-color: var(--prime-sys-color-border-subtle);
-  box-shadow: none;
+  border-color: var(--prime-color-text-placeholder);
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
 }
 
-.root[data-dragover="true"]:not([data-disabled="true"]) {
-  border-color: var(--prime-sys-color-border-accent);
-  background: var(--prime-sys-color-surface-accentSoft);
-  box-shadow: none;
+.root[data-state="active"]:not([data-disabled="true"]) {
+  border-color: var(--prime-color-accent-default);
+  background: var(--prime-color-accent-soft);
 }
 
-.root:focus-within:not([data-disabled="true"]) {
-  border-color: var(--prime-sys-color-content-primary);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+.root:has(.input:focus-visible) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.root[data-invalid="true"]:has(.input:focus-visible) {
+  outline-color: var(--prime-color-danger-border);
 }
 
 .root[data-disabled="true"] {
+  border-color: var(--prime-color-border-subtle);
+  background: var(--prime-color-field-bg-disabled);
+  color: var(--prime-color-text-disabled);
   cursor: not-allowed;
-  opacity: 0.55;
 }
 
-/* Модалки Align: сплошная граница, фон как у поля, hover «светлее» */
-.root[data-appearance="solid"] {
-  border-style: solid;
-  border-color: var(--prime-sys-color-border-subtle);
-  background: var(--prime-sys-color-surface-default);
-  box-shadow: none;
+.root[data-invalid="true"]:not([data-state="active"]) {
+  border-color: var(--prime-color-danger-border);
 }
 
-.root[data-appearance="solid"]:hover:not([data-disabled="true"]) {
-  background: var(--prime-sys-color-surface-elevated);
-  border-color: var(--prime-sys-color-border-subtle);
-  box-shadow: none;
+.root[data-variant="solid"] {
+  border-color: transparent;
 }
 
-.root[data-appearance="solid"][data-dragover="true"]:not([data-disabled="true"]) {
-  border-color: var(--prime-sys-color-border-accent);
-  background: var(--prime-sys-color-surface-accentSoft);
+/* Hover must not bring the dashed line back on `solid` (beats `.root:hover:not(...)`). */
+.root[data-variant="solid"]:hover:not([data-disabled="true"]) {
+  border-color: transparent;
 }
 
-.root[data-appearance="solid"]:focus-within:not([data-disabled="true"]) {
-  border-color: var(--prime-sys-color-content-primary);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+.root[data-variant="solid"][data-invalid="true"]:not([data-state="active"]) {
+  border-color: var(--prime-color-danger-border);
 }
 
+.root[data-variant="solid"][data-state="active"]:not([data-disabled="true"]) {
+  border-color: var(--prime-color-accent-default);
+}
+
+/* Visually hidden but focusable (keyboard opens the picker via the label). */
 .input {
   position: absolute;
-  width: var(--prime-sys-unit-1px);
-  height: var(--prime-sys-unit-1px);
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
   margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
   opacity: 0;
   pointer-events: none;
 }
@@ -134,14 +159,33 @@
   flex-direction: column;
   align-items: center;
   gap: var(--fu-stack);
-  max-width: var(--fu-maxw);
+  max-width: 100%;
+  min-width: 0;
 }
 
 .iconWrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--prime-sys-color-content-muted);
+  flex-shrink: 0;
+  width: var(--fu-icon-box);
+  height: var(--fu-icon-box);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-muted);
+}
+
+.root[data-state="active"] .iconWrap {
+  background: var(--prime-color-bg-surface);
+  color: var(--prime-color-accent-text);
+}
+
+.root[data-invalid="true"]:not([data-state="active"]) .iconWrap {
+  color: var(--prime-color-danger-text);
+}
+
+.root[data-disabled="true"] .iconWrap {
+  color: var(--prime-color-text-disabled);
 }
 
 .copy {
@@ -149,81 +193,90 @@
   flex-direction: column;
   align-items: center;
   gap: var(--fu-copy-gap);
+  min-width: 0;
 }
 
 .title {
   margin: 0;
   font-size: var(--fu-title);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-content-primary);
-  letter-spacing: var(--prime-sys-typography-tracking-normal);
+  line-height: var(--fu-title-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
 }
 
 .titleMuted {
-  color: var(--prime-sys-color-content-secondary);
+  font-weight: var(--prime-font-weight-regular);
+  color: var(--prime-color-text-secondary);
 }
 
-/* Чип «Browse» — та же ярусность, что контрол данного size */
+.root[data-disabled="true"] :is(.title, .titleMuted) {
+  color: var(--prime-color-text-disabled);
+}
+
+/* Decorative "Browse" button: neutral filled control of the same tier (the whole zone is the target). */
 .browse {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  min-height: var(--fu-chip-h);
-  padding-inline: var(--fu-chip-px);
-  padding-block: var(--fu-chip-py);
-  border-radius: var(--fu-chip-radius);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
-  background: var(--prime-sys-color-field-bg);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-  font-size: var(--fu-chip-font);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: 1.2;
-  color: var(--prime-sys-color-content-secondary);
+  height: var(--fu-btn-h);
+  padding-inline: var(--fu-btn-px);
+  border-radius: var(--fu-btn-radius);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-primary);
+  font-size: var(--fu-btn-text);
+  line-height: var(--fu-btn-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  white-space: nowrap;
   pointer-events: none;
   user-select: none;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root:hover:not([data-disabled="true"]) .browse {
+  background: var(--prime-color-fill-muted-hover);
 }
 
 .root[data-disabled="true"] .browse {
-  background: var(--prime-sys-color-surface-accentSoft);
-  border-color: transparent;
-  box-shadow: none;
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-disabled);
 }
 
 .browseLink {
   display: inline;
   margin: 0;
   padding: 0;
-  border: none;
+  border: 0;
+  border-radius: var(--prime-radius-xs);
   background: none;
   font: inherit;
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-accent-text);
+  text-decoration: underline;
+  text-underline-offset: var(--prime-focus-offset);
   cursor: pointer;
   pointer-events: auto;
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-action-primaryBackground);
-  text-decoration: underline;
-  text-underline-offset: var(--prime-sys-unit-2px);
 }
 
 .browseLink:hover {
-  color: var(--prime-sys-color-action-primaryBackgroundHover);
+  color: var(--prime-color-accent-hover);
 }
 
 .browseLink:focus-visible {
-  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-  border-radius: var(--prime-sys-shape-radius-s);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }
 
-/* ─── Модалки: тело без pointer-events, интерактив внутри с pointer-events: auto ─ */
+/* ─── Modal body: no pointer events, interactive children opt back in ─── */
 .dropBody {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--fu-stack, var(--prime-sys-spacing-x5));
+  gap: var(--fu-stack, var(--prime-space-4));
   width: 100%;
+  min-width: 0;
   text-align: center;
   pointer-events: none;
 }
@@ -232,342 +285,299 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--prime-sys-spacing-x3);
+  gap: var(--prime-space-2);
   pointer-events: auto;
 }
 
 .chip {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  gap: var(--prime-sys-spacing-x2);
-  box-sizing: border-box;
-  min-height: var(--fu-chip-h, var(--prime-sys-unit-2p5rem));
-  padding: var(--prime-sys-unit-0p375rem) var(--prime-sys-unit-1rem) var(--prime-sys-unit-0p375rem)
-    var(--prime-sys-unit-0p375rem);
+  gap: var(--prime-space-2);
+  min-height: var(--fu-btn-h, var(--prime-control-m-height));
   margin: 0;
-  border: none;
-  border-radius: var(--prime-sys-shape-radius-round);
+  padding-block: 0;
+  padding-inline: var(--prime-space-1) var(--prime-space-3);
+  border: 0;
+  border-radius: var(--prime-radius-full);
   background: transparent;
-  box-shadow: none;
-  cursor: pointer;
-  font: inherit;
   color: inherit;
-  transition:
-    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .chip:hover {
-  background: var(--prime-sys-color-surface-accentSoft);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  background: var(--prime-color-fill-subtle);
+}
+
+.chip:active {
+  background: var(--prime-color-fill-subtle-active);
 }
 
 .chip:focus-visible {
-  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }
 
 .chipLabel {
-  font-size: var(--fu-chip-font, var(--prime-sys-size-control-m-text));
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-content-secondary);
+  font-size: var(--fu-btn-text, var(--prime-control-m-text-size));
+  line-height: var(--fu-btn-line-height, var(--prime-control-m-line-height));
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-secondary);
 }
 
-/* ─── Карточка файла (списки загрузки) — ring inset как Align `ring-1 ring-inset` ─ */
+/* ─── File row ─── */
 .item {
-  --fu-item-pad-block: var(--prime-sys-spacing-x4);
-  --fu-item-pad-inline: var(--prime-sys-spacing-x4);
-  --fu-item-pad-inline-start: var(--fu-item-pad-inline);
-  --fu-item-col-gap: var(--prime-sys-spacing-x4);
-  --fu-item-row-gap: var(--prime-sys-spacing-x3);
-  --fu-item-main-gap: var(--prime-sys-spacing-x1);
-  --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
-  --fu-item-stack-gap: var(--prime-sys-spacing-x2);
-  --fu-item-name-font: var(--prime-sys-size-control-m-text);
-  --fu-item-meta-font: var(--prime-sys-typography-support-2xs);
-  --fu-item-badge: var(--prime-sys-unit-2p5rem);
-  --fu-item-badge-radius: var(--prime-sys-shape-radius-m);
-  --fu-item-progress-h: var(--prime-sys-unit-0p5rem);
-  --fu-item-status-icon: var(--prime-sys-size-control-m-icon);
-  --fu-item-radius: var(--prime-sys-shape-radius-4xl);
-  --fu-item-maxw: var(--prime-sys-unit-25rem);
-
+  --fu-item-pad: var(--prime-space-3);
+  --fu-item-gap: var(--prime-space-3);
+  --fu-item-name: var(--prime-control-m-text-size);
+  --fu-item-name-line-height: var(--prime-control-m-line-height);
+  --fu-item-meta: var(--prime-control-m-hint-size);
+  --fu-item-meta-line-height: var(--prime-control-m-hint-line-height);
+  --fu-item-badge: var(--prime-control-m-height);
+  --fu-item-badge-radius: var(--prime-radius-m);
+  --fu-item-badge-text: var(--prime-badge-s-text-size);
+  --fu-item-icon: var(--prime-control-m-icon);
+  --fu-item-radius: var(--prime-radius-l);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--fu-item-col-gap);
-  box-sizing: border-box;
+  gap: var(--fu-item-gap);
   width: 100%;
-  max-width: var(--fu-item-maxw);
-  padding-block: var(--fu-item-pad-block);
-  padding-inline: var(--fu-item-pad-inline);
-  padding-inline-start: var(--fu-item-pad-inline-start);
-  border: none;
+  min-width: 0;
+  padding: var(--fu-item-pad);
   border-radius: var(--fu-item-radius);
-  background: var(--prime-sys-color-surface-elevated);
-  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
+  background: var(--prime-color-fill-subtle);
+  font-family: var(--prime-font-family-sans);
+}
+
+.item[data-size="xs"] {
+  --fu-item-pad: var(--prime-space-2);
+  --fu-item-gap: var(--prime-space-2);
+  --fu-item-name: var(--prime-control-xs-text-size);
+  --fu-item-name-line-height: var(--prime-control-xs-line-height);
+  --fu-item-meta: var(--prime-control-xs-hint-size);
+  --fu-item-meta-line-height: var(--prime-control-xs-hint-line-height);
+  --fu-item-badge: var(--prime-control-xs-height);
+  --fu-item-badge-radius: var(--prime-radius-s);
+  --fu-item-badge-text: var(--prime-badge-xs-text-size);
+  --fu-item-icon: var(--prime-control-xs-icon);
+  --fu-item-radius: var(--prime-radius-m);
 }
 
 .item[data-size="s"] {
-  --fu-item-pad-block: var(--prime-sys-spacing-x3);
-  --fu-item-pad-inline: var(--prime-sys-spacing-x3);
-  --fu-item-pad-inline-start: var(--fu-item-pad-inline);
-  --fu-item-col-gap: var(--prime-sys-spacing-x3);
-  --fu-item-row-gap: var(--prime-sys-spacing-x2);
-  --fu-item-main-gap: var(--prime-sys-spacing-x1);
-  --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
-  --fu-item-stack-gap: var(--prime-sys-spacing-x2);
-  --fu-item-name-font: var(--prime-sys-size-control-s-text);
-  --fu-item-meta-font: var(--prime-sys-size-control-s-supportText);
-  --fu-item-badge: var(--prime-sys-unit-2rem);
-  --fu-item-badge-radius: var(--prime-sys-shape-radius-s);
-  --fu-item-progress-h: var(--prime-sys-unit-0p375rem);
-  --fu-item-status-icon: var(--prime-sys-size-control-s-icon);
-  --fu-item-radius: var(--prime-sys-shape-radius-l);
-  --fu-item-maxw: var(--prime-sys-unit-22rem);
+  --fu-item-pad: var(--prime-space-2);
+  --fu-item-gap: var(--prime-space-2);
+  --fu-item-name: var(--prime-control-s-text-size);
+  --fu-item-name-line-height: var(--prime-control-s-line-height);
+  --fu-item-meta: var(--prime-control-s-hint-size);
+  --fu-item-meta-line-height: var(--prime-control-s-hint-line-height);
+  --fu-item-badge: var(--prime-control-s-height);
+  --fu-item-badge-radius: var(--prime-radius-s);
+  --fu-item-icon: var(--prime-control-s-icon);
+  --fu-item-radius: var(--prime-radius-m);
 }
 
 .item[data-size="l"] {
-  --fu-item-pad-block: var(--prime-sys-spacing-x4);
-  --fu-item-pad-inline: var(--prime-sys-spacing-x4);
-  --fu-item-pad-inline-start: var(--fu-item-pad-inline);
-  --fu-item-col-gap: var(--prime-sys-spacing-x4);
-  --fu-item-row-gap: var(--prime-sys-spacing-x2);
-  --fu-item-main-gap: var(--prime-sys-spacing-x1);
-  --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
-  --fu-item-stack-gap: var(--prime-sys-spacing-x2);
-  --fu-item-name-font: var(--prime-sys-size-control-l-text);
-  --fu-item-meta-font: var(--prime-sys-size-control-l-supportText);
-  --fu-item-badge: var(--prime-sys-unit-2p75rem);
-  --fu-item-badge-radius: var(--prime-sys-shape-radius-m);
-  --fu-item-progress-h: var(--prime-sys-unit-0p5rem);
-  --fu-item-status-icon: var(--prime-sys-size-control-l-icon);
-  --fu-item-radius: var(--prime-sys-shape-radius-4xl);
-  --fu-item-maxw: var(--prime-sys-unit-28rem);
+  --fu-item-pad: var(--prime-space-4);
+  --fu-item-name: var(--prime-control-l-text-size);
+  --fu-item-name-line-height: var(--prime-control-l-line-height);
+  --fu-item-meta: var(--prime-control-l-hint-size);
+  --fu-item-meta-line-height: var(--prime-control-l-hint-line-height);
+  --fu-item-badge: var(--prime-control-l-height);
+  --fu-item-badge-text: var(--prime-badge-m-text-size);
+  --fu-item-icon: var(--prime-control-l-icon);
 }
 
 .item[data-size="xl"] {
-  --fu-item-pad-block: var(--prime-sys-spacing-x5);
-  --fu-item-pad-inline: var(--prime-sys-spacing-x5);
-  --fu-item-pad-inline-start: var(--fu-item-pad-inline);
-  --fu-item-col-gap: var(--prime-sys-spacing-x4);
-  --fu-item-row-gap: var(--prime-sys-spacing-x3);
-  --fu-item-main-gap: var(--prime-sys-spacing-x1);
-  --fu-item-text-group-gap: var(--prime-sys-spacing-x1);
-  --fu-item-stack-gap: var(--prime-sys-spacing-x2);
-  --fu-item-name-font: var(--prime-sys-size-control-xl-text);
-  --fu-item-meta-font: var(--prime-sys-size-control-xl-supportText);
-  --fu-item-badge: var(--prime-sys-unit-3rem);
-  --fu-item-badge-radius: var(--prime-sys-shape-radius-l);
-  --fu-item-progress-h: var(--prime-sys-unit-0p5625rem);
-  --fu-item-status-icon: var(--prime-sys-size-control-xl-icon);
-  --fu-item-radius: var(--prime-sys-shape-radius-4xl);
-  --fu-item-maxw: var(--prime-sys-unit-30rem);
+  --fu-item-pad: var(--prime-space-4);
+  --fu-item-gap: var(--prime-space-4);
+  --fu-item-name: var(--prime-control-xl-text-size);
+  --fu-item-name-line-height: var(--prime-control-xl-line-height);
+  --fu-item-meta: var(--prime-control-xl-hint-size);
+  --fu-item-meta-line-height: var(--prime-control-xl-hint-line-height);
+  --fu-item-badge: var(--prime-control-xl-height);
+  --fu-item-badge-radius: var(--prime-radius-l);
+  --fu-item-badge-text: var(--prime-badge-l-text-size);
+  --fu-item-icon: var(--prime-control-xl-icon);
+  --fu-item-radius: var(--prime-radius-xl);
 }
 
-.item[data-variant="error"] {
-  box-shadow: inset 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-danger);
+.item[data-invalid="true"] {
+  background: var(--prime-color-danger-soft);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
 .itemRow {
   display: flex;
-  align-items: flex-start;
-  gap: var(--fu-item-row-gap);
+  align-items: center;
+  gap: var(--fu-item-gap);
+  min-width: 0;
 }
 
 .itemMain {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--fu-item-main-gap);
+  gap: var(--prime-space-1);
+}
+
+.itemStack {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--prime-space-2);
+}
+
+.itemTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
 }
 
 .itemName {
-  font-size: var(--fu-item-name-font);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-content-primary);
-}
-
-.itemNameRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-sys-spacing-x2);
-  width: 100%;
-}
-
-.itemInlineStatus {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--prime-sys-spacing-x1);
-  flex-shrink: 0;
-  font-size: var(--fu-item-meta-font);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-}
-
-.itemInlineStatus strong {
-  font-weight: var(--prime-sys-typography-weight-medium);
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--fu-item-name);
+  line-height: var(--fu-item-name-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .itemMeta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--prime-sys-spacing-x1);
-  font-size: var(--fu-item-meta-font);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-content-secondary);
+  gap: var(--prime-space-1);
+  min-width: 0;
+  font-size: var(--fu-item-meta);
+  line-height: var(--fu-item-meta-line-height);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-color-text-muted);
 }
 
 .itemMeta strong {
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-primary);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-primary);
+}
+
+.item[data-invalid="true"] .itemMeta {
+  color: var(--prime-color-danger-text);
 }
 
 .itemMetaSep {
-  color: var(--prime-sys-color-content-secondary);
+  color: var(--prime-color-text-placeholder);
   user-select: none;
-}
-
-.itemStack {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--fu-item-stack-gap);
-  flex: 1;
-  min-width: 0;
-}
-
-.itemTextGroup {
-  display: flex;
-  flex-direction: column;
-  gap: var(--fu-item-text-group-gap);
-  width: 100%;
-  min-width: 0;
 }
 
 .itemTryAgain {
   margin: 0;
   padding: 0;
-  border: none;
+  border: 0;
+  border-radius: var(--prime-radius-xs);
   background: none;
   font: inherit;
-  cursor: pointer;
-  font-size: var(--fu-item-meta-font);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-body-lineHeight);
+  font-size: var(--fu-item-meta);
+  line-height: var(--fu-item-meta-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-danger-text);
   text-decoration: underline;
-  text-underline-offset: var(--prime-sys-unit-2px);
-  color: var(--prime-sys-color-content-danger);
+  text-underline-offset: var(--prime-focus-offset);
+  cursor: pointer;
 }
 
 .itemTryAgain:hover {
-  color: var(--prime-sys-color-action-errorBackgroundHover);
+  color: var(--prime-color-danger-hover);
 }
 
 .itemTryAgain:focus-visible {
-  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-  border-radius: var(--prime-sys-shape-radius-s);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }
 
 .itemActions {
   display: flex;
   flex-shrink: 0;
-  align-items: flex-start;
+  align-items: center;
+  gap: var(--prime-space-1);
 }
 
-.itemFooter {
-  width: 100%;
-}
-
+.itemFooter,
 .itemProgress {
   width: 100%;
-}
-
-.itemProgress > * {
-  height: var(--fu-item-progress-h, var(--prime-sys-unit-0p5rem));
+  min-width: 0;
 }
 
 .formatBadge {
+  box-sizing: border-box;
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--fu-item-badge, var(--prime-sys-unit-2p5rem));
-  height: var(--fu-item-badge, var(--prime-sys-unit-2p5rem));
-  min-width: var(--fu-item-badge, var(--prime-sys-unit-2p5rem));
-  padding-inline: 0;
-  border-radius: var(--fu-item-badge-radius, var(--prime-sys-shape-radius-m));
-  font-size: var(--fu-item-meta-font, var(--prime-sys-typography-support-2xs));
-  font-weight: var(--prime-sys-typography-weight-semibold);
+  width: var(--fu-item-badge, var(--prime-control-m-height));
+  height: var(--fu-item-badge, var(--prime-control-m-height));
+  padding: 0;
+  border-radius: var(--fu-item-badge-radius, var(--prime-radius-m));
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--fu-item-badge-text, var(--prime-badge-s-text-size));
   line-height: 1;
-  letter-spacing: 0.02em;
+  font-weight: var(--prime-font-weight-semibold);
+  letter-spacing: var(--prime-text-caption-tracking);
   text-transform: uppercase;
-}
-
-.formatBadge[data-color="gray"] {
-  background: var(--prime-sys-color-surface-accentSoft);
-  color: var(--prime-sys-color-content-secondary);
+  /* Neutral badge sits on the row's own wash: a stronger wash keeps it visible (foundation §4). */
+  background: var(--prime-color-fill-strong);
+  color: var(--prime-color-text-secondary);
 }
 
 .formatBadge[data-color="red"] {
-  background: var(--prime-sys-color-status-error-background);
-  color: var(--prime-sys-color-status-error-foreground);
+  --fu-hue: var(--prime-color-palette-red-text);
 }
 
 .formatBadge[data-color="blue"] {
-  background: var(--prime-sys-color-status-information-background);
-  color: var(--prime-sys-color-status-information-foreground);
+  --fu-hue: var(--prime-color-palette-blue-text);
 }
 
 .formatBadge[data-color="green"] {
-  background: var(--prime-sys-color-status-success-background);
-  color: var(--prime-sys-color-status-success-foreground);
+  --fu-hue: var(--prime-color-palette-green-text);
 }
 
 .formatBadge[data-color="orange"] {
-  background: var(--prime-sys-color-status-warning-background);
-  color: var(--prime-sys-color-status-warning-foreground);
+  --fu-hue: var(--prime-color-palette-orange-text);
 }
 
 .formatBadge[data-color="purple"] {
-  background: var(--prime-sys-color-status-feature-background);
-  color: var(--prime-sys-color-status-feature-foreground);
+  --fu-hue: var(--prime-color-palette-purple-text);
 }
 
 .formatBadge[data-color="sky"] {
-  background: var(--prime-sys-color-status-verified-background);
-  color: var(--prime-sys-color-status-verified-foreground);
+  --fu-hue: var(--prime-color-palette-sky-text);
 }
 
 .formatBadge[data-color="yellow"] {
-  background: var(--prime-sys-color-status-away-background);
-  color: var(--prime-sys-color-status-away-foreground);
+  --fu-hue: var(--prime-color-palette-yellow-text);
 }
 
-/* Иконки статуса в мета-строке — размер с `Item` (`data-size`) */
-.itemStatusIcon {
-  flex-shrink: 0;
-  width: var(--fu-item-status-icon);
-  height: var(--fu-item-status-icon);
+.formatBadge[data-color="pink"] {
+  --fu-hue: var(--prime-color-palette-pink-text);
 }
 
-.itemStatusIcon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.formatBadge[data-color="teal"] {
+  --fu-hue: var(--prime-color-palette-teal-text);
 }
 
-/* Для иконки «загрузка» в мета-строке карточки файла */
-.statusIconSpin {
-  animation: fileUploadSpin 0.8s linear infinite;
-}
-
-@keyframes fileUploadSpin {
-  to {
-    transform: rotate(360deg);
-  }
+/*
+ * Hue badges: a translucent wash of the hue text (not the opaque light `soft` tint, which is as light
+ * as the row in the light theme), so the badge always steps off the row it sits on (foundation §4).
+ */
+.formatBadge:not([data-color="gray"]) {
+  background: color-mix(in srgb, var(--fu-hue) 16%, transparent);
+  color: var(--fu-hue);
 }

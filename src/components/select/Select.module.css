@@ -1,237 +1,367 @@
-/* ─── Select (composable) ────────────────────────────────────────────────── */
+/* ─── Select ─────────────────────────────────────────────────────────────────
+ * Trigger = field system (foundation §4, §6, §8): fill instead of border, tier height,
+ * field padding, inset danger ring on error, the single focus ring.
+ * Panel = shared floating panel (`--prime-panel-*`), items use the trigger tier.
+ */
 
-/* Trigger — горизонтальный ритм как у Input.wrapper: `inputPaddingX` + тот же `control-*-gap` между слотами. */
+/* ─── Tier variables (trigger + panel share the same data-size) ─────────── */
 
-.trigger {
-  --select-trigger-pad-x: var(--prime-sys-size-control-m-inputPaddingX);
-  --select-trigger-pad-y: var(--prime-sys-size-control-m-inputPaddingY);
-  --select-trigger-gap: var(--prime-sys-size-control-m-gap);
-  /* Слот под шеврон = ширина иконки яруса — зеркалит отступ текста при `TriggerIcon` слева. */
-  --select-chevron-slot: var(--prime-sys-size-control-m-icon);
+.trigger,
+.nativeSelect,
+.nativeChevron,
+.content {
+  --sel-h: var(--prime-control-m-height);
+  --sel-px: var(--prime-control-m-field-padding-x);
+  --sel-gap: var(--prime-control-m-gap);
+  --sel-icon: var(--prime-control-m-icon);
+  --sel-radius: var(--prime-control-m-radius);
+  --sel-text: var(--prime-control-m-text-size);
+  --sel-lh: var(--prime-control-m-line-height);
+  --sel-item-h: var(--prime-control-m-item-height);
+  --sel-choice: var(--prime-control-s-choice);
+  --sel-desc-size: var(--prime-text-body-s-size);
+  --sel-desc-lh: var(--prime-text-body-s-line-height);
+  --sel-media-h: var(--prime-space-7);
+  --sel-media-w: var(--prime-space-10);
+  --sel-media-radius: var(--prime-radius-s);
+}
 
+[data-size="xs"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
+  --sel-h: var(--prime-control-xs-height);
+  --sel-px: var(--prime-control-xs-field-padding-x);
+  --sel-gap: var(--prime-control-xs-gap);
+  --sel-icon: var(--prime-control-xs-icon);
+  --sel-radius: var(--prime-control-xs-radius);
+  --sel-text: var(--prime-control-xs-text-size);
+  --sel-lh: var(--prime-control-xs-line-height);
+  --sel-item-h: var(--prime-control-xs-item-height);
+  --sel-choice: var(--prime-control-xs-choice);
+  --sel-desc-size: var(--prime-text-caption-size);
+  --sel-desc-lh: var(--prime-text-caption-line-height);
+  --sel-media-h: var(--prime-space-5);
+  --sel-media-w: var(--prime-space-7);
+  --sel-media-radius: var(--prime-radius-xs);
+}
+
+[data-size="s"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
+  --sel-h: var(--prime-control-s-height);
+  --sel-px: var(--prime-control-s-field-padding-x);
+  --sel-gap: var(--prime-control-s-gap);
+  --sel-icon: var(--prime-control-s-icon);
+  --sel-radius: var(--prime-control-s-radius);
+  --sel-text: var(--prime-control-s-text-size);
+  --sel-lh: var(--prime-control-s-line-height);
+  --sel-item-h: var(--prime-control-s-item-height);
+  --sel-choice: var(--prime-control-xs-choice);
+  --sel-desc-size: var(--prime-text-caption-size);
+  --sel-desc-lh: var(--prime-text-caption-line-height);
+  --sel-media-h: var(--prime-space-6);
+  --sel-media-w: var(--prime-space-8);
+  --sel-media-radius: var(--prime-radius-xs);
+}
+
+[data-size="l"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
+  --sel-h: var(--prime-control-l-height);
+  --sel-px: var(--prime-control-l-field-padding-x);
+  --sel-gap: var(--prime-control-l-gap);
+  --sel-icon: var(--prime-control-l-icon);
+  --sel-radius: var(--prime-control-l-radius);
+  --sel-text: var(--prime-control-l-text-size);
+  --sel-lh: var(--prime-control-l-line-height);
+  --sel-item-h: var(--prime-control-l-item-height);
+  --sel-choice: var(--prime-control-m-choice);
+  --sel-desc-size: var(--prime-text-body-s-size);
+  --sel-desc-lh: var(--prime-text-body-s-line-height);
+  --sel-media-h: var(--prime-space-8);
+  --sel-media-w: var(--prime-space-12);
+  --sel-media-radius: var(--prime-radius-m);
+}
+
+[data-size="xl"]:is(.trigger, .nativeSelect, .nativeChevron, .content) {
+  --sel-h: var(--prime-control-xl-height);
+  --sel-px: var(--prime-control-xl-field-padding-x);
+  --sel-gap: var(--prime-control-xl-gap);
+  --sel-icon: var(--prime-control-xl-icon);
+  --sel-radius: var(--prime-control-xl-radius);
+  --sel-text: var(--prime-control-xl-text-size);
+  --sel-lh: var(--prime-control-xl-line-height);
+  --sel-item-h: var(--prime-control-xl-item-height);
+  --sel-choice: var(--prime-control-l-choice);
+  --sel-desc-size: var(--prime-text-body-s-size);
+  --sel-desc-lh: var(--prime-text-body-s-line-height);
+  --sel-media-h: var(--prime-space-10);
+  --sel-media-w: var(--prime-space-14);
+  --sel-media-radius: var(--prime-radius-m);
+}
+
+.spinner {
+  animation: selectSpin calc(var(--prime-motion-duration-slow) * 3) linear infinite;
+}
+
+@keyframes selectSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Trigger ─────────────────────────────────────────────────────────────── */
+
+/*
+ * Icons (leading, clear, chevron) sit centered between the edge and the text (foundation §6):
+ * edge→icon = icon→text = field padX, so the trigger gap is padX too.
+ */
+.trigger,
+.nativeSelect {
   position: relative;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: var(--select-trigger-gap);
+  gap: var(--sel-px);
   width: 100%;
   min-width: 0;
-  padding-inline: var(--select-trigger-pad-x);
-  padding-block: var(--select-trigger-pad-y);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
-  background: var(--prime-sys-color-field-bg);
-  color: var(--prime-sys-color-field-text);
-  font-size: var(--prime-sys-size-control-m-text);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  font-family: inherit;
+  height: var(--sel-h);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--sel-px);
+  border: 0;
+  border-radius: var(--sel-radius);
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--sel-text);
+  font-weight: var(--prime-font-weight-regular);
+  line-height: var(--sel-lh);
+  text-align: start;
   cursor: pointer;
-  text-align: left;
   outline: none;
   transition:
-    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.trigger[data-size="s"] {
-  --select-trigger-pad-x: var(--prime-sys-size-control-s-inputPaddingX);
-  --select-trigger-pad-y: var(--prime-sys-size-control-s-inputPaddingY);
-  --select-trigger-gap: var(--prime-sys-size-control-s-gap);
-  --select-chevron-slot: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-height);
-  border-radius: var(--prime-sys-size-control-s-radius);
-  font-size: var(--prime-sys-size-control-s-text);
+.trigger:hover:not(:disabled),
+.nativeSelect:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
 }
 
-.trigger[data-size="m"] {
-  --select-trigger-gap: var(--prime-sys-size-control-m-gap);
-  --select-chevron-slot: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-height);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  font-size: var(--prime-sys-size-control-m-text);
+.trigger[data-state="open"],
+.trigger:focus-visible,
+.nativeSelect:focus-visible {
+  background: var(--prime-color-field-bg-focus);
 }
 
-.trigger[data-size="l"] {
-  --select-trigger-pad-x: var(--prime-sys-size-control-l-inputPaddingX);
-  --select-trigger-pad-y: var(--prime-sys-size-control-l-inputPaddingY);
-  --select-trigger-gap: var(--prime-sys-size-control-l-gap);
-  --select-chevron-slot: var(--prime-sys-size-control-l-icon);
-  height: var(--prime-sys-size-control-l-height);
-  border-radius: var(--prime-sys-size-control-l-radius);
-  font-size: var(--prime-sys-size-control-l-text);
+/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
+.trigger:not([data-focus-ring="false"]):focus-visible,
+.nativeSelect:not([data-focus-ring="false"]):focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
-.trigger[data-size="xl"] {
-  --select-trigger-pad-x: var(--prime-sys-size-control-xl-inputPaddingX);
-  --select-trigger-pad-y: var(--prime-sys-size-control-xl-inputPaddingY);
-  --select-trigger-gap: var(--prime-sys-size-control-xl-gap);
-  --select-chevron-slot: var(--prime-sys-size-control-xl-icon);
-  height: var(--prime-sys-size-control-xl-height);
-  border-radius: var(--prime-sys-size-control-xl-radius);
-  font-size: var(--prime-sys-size-control-xl-text);
+.trigger[data-invalid="true"],
+.nativeSelect[data-invalid="true"] {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.trigger[data-invalid="true"]:focus-visible,
+.nativeSelect[data-invalid="true"]:focus-visible {
+  outline-color: var(--prime-color-danger-border);
+}
+
+.trigger:disabled,
+.nativeSelect:disabled {
+  background: var(--prime-color-field-bg-disabled);
+  box-shadow: none;
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
 }
 
 .triggerMain {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
-  gap: var(--select-trigger-gap);
+  gap: var(--sel-px);
   min-width: 0;
 }
 
-.trigger:hover {
-  border-color: var(--prime-sys-color-field-borderHover);
-}
-
-.trigger:focus-visible {
-  border-color: var(--prime-sys-color-field-borderFocus);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
-}
-
-.trigger[data-has-error="true"] {
-  border-color: var(--prime-sys-color-field-borderError);
-}
-
-.trigger[data-has-error="true"]:focus-visible {
-  box-shadow: var(--prime-sys-elevation-shadow-errorFocus);
-}
-
-.trigger:disabled {
-  background: var(--prime-sys-color-surface-accentSoft);
-  border-color: transparent;
-  box-shadow: none;
-  cursor: not-allowed;
-  color: var(--prime-sys-color-content-disabled);
-}
-
-/* Слот шеврона по ширине иконки яруса — глиф по центру, до края поля тот же шаг, что у текста/иконки. */
-.triggerChevronSlot {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--select-chevron-slot);
-  min-width: var(--select-chevron-slot);
-  pointer-events: none;
-}
-
-.triggerChevron {
-  display: block;
-  flex-shrink: 0;
-  width: var(--prime-sys-unit-0p45rem);
-  height: var(--prime-sys-unit-0p45rem);
-  border-right: var(--prime-sys-unit-1p5px) solid currentColor;
-  border-bottom: var(--prime-sys-unit-1p5px) solid currentColor;
-  transform: rotate(45deg) translateY(-10%);
-  opacity: 0.6;
-  transition:
-    transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    opacity var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-.trigger[data-open="true"] .triggerChevron {
-  transform: rotate(225deg) translateY(-10%);
-}
-
-.trigger:hover .triggerChevron,
-.trigger:focus-visible .triggerChevron {
-  opacity: 0.9;
-}
-
-.trigger:disabled .triggerChevron {
-  opacity: 0.3;
-}
-
-/* Trigger value / placeholder */
-
 .triggerValue {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.triggerValue[data-placeholder="true"] {
-  color: var(--prime-sys-color-field-placeholder);
+/* Rich value (`Select.Value` render function with media / description): two lines, the trigger
+   grows from the tier height with tier padding; single-line triggers are unchanged. */
+.trigger:has(.triggerValue[data-rich="true"]) {
+  height: auto;
+  min-height: var(--sel-h);
+  padding-block: var(--sel-gap);
 }
 
-/* Trigger custom icon slot */
-
-.triggerIcon {
+.triggerValue:has(> .valueBody) {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: var(--sel-gap);
+}
+
+.valueBody {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Select.Badge: after the value, before the clear button and the chevron (padX on both sides). */
+.badge {
+  order: 1;
+}
+
+/* Gray soft is a wash like the field: a stronger wash keeps a neutral badge visible (§4). */
+.badge[data-color="gray"]:not([data-disabled="true"]) {
+  background: var(--prime-color-fill-strong);
+}
+
+.triggerValue[data-placeholder="true"] {
+  color: var(--prime-color-text-placeholder);
+}
+
+.trigger:disabled .triggerValue {
+  color: var(--prime-color-text-disabled);
+}
+
+.triggerIcon {
+  display: inline-flex;
   flex-shrink: 0;
-  color: var(--prime-sys-color-content-muted);
-}
-
-.trigger[data-size="s"] .triggerIcon {
-  width: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-icon);
-}
-
-.trigger[data-size="m"] .triggerIcon {
-  width: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-icon);
-}
-
-.trigger[data-size="l"] .triggerIcon {
-  width: var(--prime-sys-size-control-l-icon);
-  height: var(--prime-sys-size-control-l-icon);
-}
-
-.trigger[data-size="xl"] .triggerIcon {
-  width: var(--prime-sys-size-control-xl-icon);
-  height: var(--prime-sys-size-control-xl-icon);
-}
-
-/* Native <select> — те же токены, что у .trigger; appearance: none + фоновый шеврон. */
-
-.nativeSelect {
-  composes: trigger;
-  appearance: none;
-  width: 100%;
-  cursor: pointer;
-  padding-right: calc(var(--select-trigger-pad-x) + var(--select-chevron-slot));
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--select-trigger-pad-x) center;
-  background-size: var(--prime-sys-unit-0p45rem);
-}
-
-.nativeSelect:focus-visible {
-  outline: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--sel-icon);
+  height: var(--sel-icon);
+  color: var(--prime-color-text-muted);
 }
 
 .triggerIcon svg {
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
 }
 
-/* ─── Content (dropdown) ─────────────────────────────────────────────────── */
+.trigger:disabled .triggerIcon {
+  color: var(--prime-color-text-disabled);
+}
+
+.triggerChevronSlot,
+.triggerClear {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--sel-icon);
+  height: var(--sel-icon);
+  color: var(--prime-color-text-muted);
+}
+
+.triggerChevronSlot {
+  pointer-events: none;
+}
+
+.triggerChevronSlot svg,
+.triggerClear svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.trigger[data-state="open"] .triggerChevronSlot svg:not(.spinner) {
+  transform: rotate(180deg);
+}
+
+.trigger:disabled .triggerChevronSlot {
+  color: var(--prime-color-text-disabled);
+}
+
+.triggerClear {
+  border-radius: var(--prime-radius-xs);
+  cursor: pointer;
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.triggerClear:hover {
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-primary);
+}
+
+/* ─── Native <select> ─────────────────────────────────────────────────────── */
+
+.nativeWrap {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.nativeSelect {
+  display: block;
+  appearance: none;
+  padding-inline-end: calc(var(--sel-px) + var(--sel-icon) + var(--sel-px));
+}
+
+.nativeSelect[data-multiple="true"] {
+  height: auto;
+  min-height: calc(var(--sel-item-h) * 4);
+  padding: var(--prime-panel-padding);
+}
+
+/* Шеврон — тот же глиф, что у кастомного триггера; цвет из токена, не из data-URI. */
+.nativeChevron {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: var(--sel-px);
+  display: inline-flex;
+  align-items: center;
+  width: var(--sel-icon);
+  color: var(--prime-color-text-muted);
+  pointer-events: none;
+}
+
+.nativeChevron svg {
+  display: block;
+  width: 100%;
+  height: var(--sel-icon);
+}
+
+.nativeSelect:disabled + .nativeChevron {
+  color: var(--prime-color-text-disabled);
+}
+
+/* ─── Panel ──────────────────────────────────────────────────────────────── */
 
 .content {
+  /* Fields inside a raised surface stay distinguishable (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-x1);
-  /* Как у Dropdown: иначе width:auto у fixed растягивается под вьюпорт, offsetWidth огромный,
-   * и clamp в usePosition загоняет left к var(--prime-sys-unit-8px) — список уезжает влево от триггера. */
   width: max-content;
-  max-width: min(var(--prime-sys-unit-28rem), 100vw);
-  /* Прокрутка — ScrollContainer */
-  /* Основной лимит — inline maxHeight из usePosition; запас на первый кадр до RAF. */
-  max-height: min(85dvh, var(--prime-sys-unit-40rem));
-  padding: var(--prime-sys-spacing-x1);
-  border-radius: var(--prime-sys-shape-radius-l);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
-  background: var(--prime-sys-color-surface-elevated);
-  box-shadow: var(--prime-sys-elevation-shadow-modal);
+  min-width: min(
+    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
+    var(--float-max-w, 100vw)
+  );
+  max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));
+  max-height: min(var(--prime-panel-max-height), var(--float-max-h, var(--prime-panel-max-height)));
+  padding: var(--prime-panel-padding);
+  overflow: hidden;
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--sel-text);
+  line-height: var(--sel-lh);
   outline: none;
-  font-family: inherit;
-  color: var(--prime-sys-color-content-primary);
 }
 
 /* Закрытый listbox остаётся в DOM для onInitLabel → подпись в триггере; не перехватывать клики по странице. */
@@ -240,104 +370,122 @@
 }
 
 .content[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-sys-elevation-zIndex-dropdown);
+  z-index: var(--prime-z-dropdown);
 }
 
 .content[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawer);
+  z-index: var(--prime-z-dropdown-in-drawer);
 }
 
 .content[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-sys-elevation-zIndex-dropdownInModal);
+  z-index: var(--prime-z-dropdown-in-modal);
 }
 
 .content[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-sys-elevation-zIndex-dropdownInDrawerInModal);
+  z-index: var(--prime-z-dropdown-in-drawer-in-modal);
 }
 
-/*
- * Токены ряда пункта задаём на самом `.item` (+ `data-size`), а не только на `.content`:
- * иначе при портале в `body` и клиентской навигации в dev возможна потеря наследования
- * `--select-item-*` → `gap`/`padding-inline` становятся невалидными и схлопываются в 0.
- */
+.listbox {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  outline: none;
+}
+
+.listbox:empty {
+  display: none;
+}
+
+/* ─── Search (top of the panel, hairline below, full bleed) ────────────── */
+
+.search {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--sel-gap);
+  height: var(--sel-item-h);
+  margin: calc(-1 * var(--prime-panel-padding)) calc(-1 * var(--prime-panel-padding))
+    var(--prime-panel-padding);
+  padding-block: var(--prime-panel-padding);
+  padding-inline: calc(var(--prime-panel-padding) + var(--prime-panel-item-padding-x));
+  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  box-sizing: content-box;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  width: var(--prime-icon-s);
+  height: var(--prime-icon-s);
+  color: var(--prime-color-text-muted);
+}
+
+.searchInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  outline: none;
+}
+
+/* Search field: inset ring on the full-bleed row, never clipped by the panel. The panel's own
+   search row sets data-focus-ring="false" (foundation §7: the caret is the indicator). */
+.search:not([data-focus-ring="false"]):has(.searchInput:focus-visible) {
+  /* Follows the panel's top corners so the ring is not cut by its rounding. */
+  border-start-start-radius: var(--prime-panel-radius);
+  border-start-end-radius: var(--prime-panel-radius);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.searchInput::placeholder {
+  color: var(--prime-color-text-placeholder);
+}
 
 /* ─── Item ───────────────────────────────────────────────────────────────── */
 
 .item {
-  --select-item-min-height: var(--prime-sys-size-control-m-height);
-  --select-item-text: var(--prime-sys-typography-control-s);
-  --select-item-pad-x: var(--prime-sys-size-control-m-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-m-icon);
-  --select-item-gap: var(--prime-sys-size-control-m-gap);
-  --select-item-radius: var(--prime-sys-size-control-m-radius);
-
-  display: flex;
-  align-items: center;
-  gap: var(--select-item-gap);
   box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--sel-gap);
   width: 100%;
-  min-height: var(--select-item-min-height);
+  min-height: var(--sel-item-h);
   padding-block: 0;
-  padding-inline: var(--select-item-pad-x);
-  border-radius: var(--select-item-radius);
-  cursor: pointer;
-  font-size: var(--select-item-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: 1.2;
-  color: var(--prime-sys-color-content-primary);
+  padding-inline: var(--prime-panel-item-padding-x);
+  border-radius: var(--prime-panel-item-radius);
+  color: var(--prime-color-text-primary);
+  font-size: var(--sel-text);
+  line-height: var(--sel-lh);
   text-align: start;
-  transition: background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-  outline: none;
+  cursor: pointer;
   user-select: none;
+  outline: none;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.item[data-size="s"] {
-  --select-item-min-height: var(--prime-sys-size-control-s-height);
-  --select-item-text: var(--prime-sys-typography-support-2xs);
-  --select-item-pad-x: var(--prime-sys-size-control-s-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-s-icon);
-  --select-item-gap: var(--prime-sys-size-control-s-gap);
-  --select-item-radius: var(--prime-sys-size-control-s-radius);
-}
-
-.item[data-size="m"] {
-  --select-item-min-height: var(--prime-sys-size-control-m-height);
-  --select-item-text: var(--prime-sys-typography-control-s);
-  --select-item-pad-x: var(--prime-sys-size-control-m-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-m-icon);
-  --select-item-gap: var(--prime-sys-size-control-m-gap);
-  --select-item-radius: var(--prime-sys-size-control-m-radius);
-}
-
-.item[data-size="l"] {
-  --select-item-min-height: var(--prime-sys-size-control-l-height);
-  --select-item-text: var(--prime-sys-typography-control-m);
-  --select-item-pad-x: var(--prime-sys-size-control-l-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-l-icon);
-  --select-item-gap: var(--prime-sys-size-control-l-gap);
-  --select-item-radius: var(--prime-sys-size-control-l-radius);
-}
-
-.item[data-size="xl"] {
-  --select-item-min-height: var(--prime-sys-size-control-xl-height);
-  --select-item-text: var(--prime-sys-typography-control-l);
-  --select-item-pad-x: var(--prime-sys-size-control-xl-inputPaddingX);
-  --select-item-icon-size: var(--prime-sys-size-control-xl-icon);
-  --select-item-gap: var(--prime-sys-size-control-xl-gap);
-  --select-item-radius: var(--prime-sys-size-control-xl-radius);
-}
-
-.item:hover,
 .item[data-highlighted="true"] {
-  background: var(--prime-sys-color-accent-soft);
+  background: var(--prime-color-fill-subtle);
+}
+
+.item:active:not([data-disabled="true"]) {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.item[data-selected="true"] {
+  font-weight: var(--prime-font-weight-medium);
 }
 
 .item[data-disabled="true"] {
-  color: var(--prime-sys-color-content-disabled);
+  background: transparent;
+  color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }
-
-/* Item text area */
 
 .itemText {
   flex: 1 1 auto;
@@ -347,90 +495,285 @@
   white-space: nowrap;
 }
 
-/* Слот галочки = ширина иконки яруса: боковой воздух только `padding-inline` у `.item`, как слева у `ItemIcon`. */
+.itemIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--sel-icon);
+  height: var(--sel-icon);
+  color: var(--prime-color-text-muted);
+}
+
+.itemIcon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.item[data-disabled="true"] .itemIcon {
+  color: var(--prime-color-text-disabled);
+}
+
+/* ─── Rich option parts ─────────────────────────────────────────────────── */
+
+/* Two-line option: grows from the tier item height with tier padding. */
+.item[data-rich="true"] {
+  padding-block: var(--sel-gap);
+}
+
+.item[data-rich="true"] .itemText {
+  display: flex;
+  flex-direction: column;
+}
+
+.item[data-rich="true"][data-selected="true"] {
+  background: var(--prime-color-accent-soft);
+}
+
+.item[data-rich="true"][data-selected="true"][data-highlighted="true"] {
+  background: var(--prime-color-accent-soft-hover);
+}
+
+.itemTitle,
+.itemDescription {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item[data-rich="true"] .itemTitle,
+.triggerValue[data-rich="true"] .itemTitle {
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.itemDescription {
+  color: var(--prime-color-text-muted);
+  font-size: var(--sel-desc-size);
+  font-weight: var(--prime-font-weight-regular);
+  line-height: var(--sel-desc-lh);
+}
+
+.itemMeta {
+  flex-shrink: 0;
+  color: var(--prime-color-text-muted);
+  font-size: var(--sel-desc-size);
+  font-weight: var(--prime-font-weight-regular);
+  line-height: var(--sel-desc-lh);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.itemMedia {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--sel-media-w);
+  height: var(--sel-media-h);
+  overflow: hidden;
+  border-radius: var(--sel-media-radius);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+}
+
+.itemMedia > svg {
+  display: block;
+  width: var(--sel-icon);
+  height: var(--sel-icon);
+}
+
+.itemMedia > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemMedia[data-color="gray"] {
+  background: var(--prime-color-palette-gray-soft);
+  color: var(--prime-color-palette-gray-text);
+}
+
+.itemMedia[data-color="blue"] {
+  background: var(--prime-color-palette-blue-soft);
+  color: var(--prime-color-palette-blue-text);
+}
+
+.itemMedia[data-color="green"] {
+  background: var(--prime-color-palette-green-soft);
+  color: var(--prime-color-palette-green-text);
+}
+
+.itemMedia[data-color="orange"] {
+  background: var(--prime-color-palette-orange-soft);
+  color: var(--prime-color-palette-orange-text);
+}
+
+.itemMedia[data-color="red"] {
+  background: var(--prime-color-palette-red-soft);
+  color: var(--prime-color-palette-red-text);
+}
+
+.itemMedia[data-color="yellow"] {
+  background: var(--prime-color-palette-yellow-soft);
+  color: var(--prime-color-palette-yellow-text);
+}
+
+.itemMedia[data-color="purple"] {
+  background: var(--prime-color-palette-purple-soft);
+  color: var(--prime-color-palette-purple-text);
+}
+
+.itemMedia[data-color="sky"] {
+  background: var(--prime-color-palette-sky-soft);
+  color: var(--prime-color-palette-sky-text);
+}
+
+.itemMedia[data-color="pink"] {
+  background: var(--prime-color-palette-pink-soft);
+  color: var(--prime-color-palette-pink-text);
+}
+
+.itemMedia[data-color="teal"] {
+  background: var(--prime-color-palette-teal-soft);
+  color: var(--prime-color-palette-teal-text);
+}
+
+.trigger:disabled :is(.itemDescription, .itemMeta),
+.item[data-disabled="true"] :is(.itemDescription, .itemMeta) {
+  color: var(--prime-color-text-disabled);
+}
+
+/* Fixed trailing column for the check mark (single). */
 .itemCheckSlot {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--select-item-icon-size);
-  min-width: var(--select-item-icon-size);
+  width: var(--sel-icon);
+  height: var(--sel-icon);
+  color: var(--prime-color-accent-text);
 }
 
-.itemCheck {
+.itemCheckSlot svg {
   display: block;
-  flex-shrink: 0;
-  box-sizing: border-box;
-  width: var(--prime-sys-unit-0p4rem);
-  height: var(--prime-sys-unit-0p72rem);
-  border-right: var(--prime-sys-unit-2px) solid var(--prime-sys-color-content-accent);
-  border-bottom: var(--prime-sys-unit-2px) solid var(--prime-sys-color-content-accent);
-  transform: rotate(45deg) translateY(-15%);
-}
-
-/* Item icon slot */
-
-.itemIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: var(--select-item-icon-size);
-  height: var(--select-item-icon-size);
-  line-height: 1;
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.itemIcon svg {
   width: 100%;
   height: 100%;
+}
+
+/* Fixed leading column with a checkbox (multiple). */
+.itemCheckbox {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--sel-choice);
+  height: var(--sel-choice);
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-fill-strong);
+  color: var(--prime-color-accent-fg);
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.itemCheckbox svg {
   display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.item[data-disabled="true"] .itemIcon {
-  opacity: 0.55;
+.item[data-highlighted="true"] .itemCheckbox {
+  background: var(--prime-color-fill-strong-hover);
 }
 
-/* ─── Group ──────────────────────────────────────────────────────────────── */
+.item[data-selected="true"] .itemCheckbox {
+  background: var(--prime-color-accent-default);
+}
+
+.item[data-disabled="true"] .itemCheckbox {
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-disabled);
+}
+
+/* ─── Group / separator ─────────────────────────────────────────────────── */
 
 .group {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-x1);
+}
+
+/* Поиск скрыл все пункты группы — прячем и подпись. */
+.group:not(:has([role="option"])) {
+  display: none;
 }
 
 .groupLabel {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
-  padding-block: var(--prime-sys-spacing-x1);
-  font-size: var(--prime-sys-typography-support-2xs);
-  color: var(--prime-sys-color-content-muted);
-  font-weight: var(--prime-sys-typography-weight-medium);
+  min-height: var(--prime-panel-group-label-height);
+  padding-inline: var(--prime-panel-item-padding-x);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
 }
-
-.groupLabel[data-size="s"] {
-  padding-inline: var(--prime-sys-size-control-s-inputPaddingX);
-}
-
-.groupLabel[data-size="m"] {
-  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
-}
-
-.groupLabel[data-size="l"] {
-  padding-inline: var(--prime-sys-size-control-l-inputPaddingX);
-}
-
-.groupLabel[data-size="xl"] {
-  padding-inline: var(--prime-sys-size-control-xl-inputPaddingX);
-}
-
-/* ─── Separator ──────────────────────────────────────────────────────────── */
 
 .separator {
   flex-shrink: 0;
   align-self: stretch;
-  margin: 0;
-  border: none;
-  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+  height: 0;
+  margin-block: var(--prime-panel-padding);
+  margin-inline: calc(-1 * var(--prime-panel-padding));
+  border: 0;
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+.content[data-searching="true"] .separator {
+  display: none;
+}
+
+/* ─── Status rows: loading / empty ──────────────────────────────────────── */
+
+.status {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--sel-gap);
+  min-height: var(--sel-item-h);
+  padding-inline: var(--prime-panel-item-padding-x);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+}
+
+.status .spinner {
+  width: var(--sel-icon);
+  height: var(--sel-icon);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-1);
+  padding: var(--prime-space-4) var(--prime-space-3);
+  text-align: center;
+}
+
+.emptyText {
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+}
+
+.emptyHint {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
 }

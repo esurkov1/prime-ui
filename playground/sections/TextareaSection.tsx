@@ -1,4 +1,23 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import TextareaControlledExample from "@/components/textarea/examples/controlled";
+import controlledSource from "@/components/textarea/examples/controlled.tsx?raw";
+import TextareaHeightAndLimitsExample from "@/components/textarea/examples/height-and-limits";
+import featuresSource from "@/components/textarea/examples/height-and-limits.tsx?raw";
+import TextareaHintAndErrorExample from "@/components/textarea/examples/hint-and-error";
+import variantsSource from "@/components/textarea/examples/hint-and-error.tsx?raw";
+import TextareaInFormExample from "@/components/textarea/examples/in-form";
+import compositionSource from "@/components/textarea/examples/in-form.tsx?raw";
+import TextareaReservedSupportRowExample from "@/components/textarea/examples/reserved-support-row";
+import supportRowSource from "@/components/textarea/examples/reserved-support-row.tsx?raw";
+import TextareaSizesExample from "@/components/textarea/examples/sizes";
+import sizesSource from "@/components/textarea/examples/sizes.tsx?raw";
+import TextareaStatesExample from "@/components/textarea/examples/states";
+import statesSource from "@/components/textarea/examples/states.tsx?raw";
+import TextareaSurfacesExample from "@/components/textarea/examples/surfaces";
+import surfacesSource from "@/components/textarea/examples/surfaces.tsx?raw";
+import TextareaWithLabelExample from "@/components/textarea/examples/with-label";
+import labelSource from "@/components/textarea/examples/with-label.tsx?raw";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,35 +25,79 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import TextareaCompositionSnippet from "../snippets/textarea/composition";
-import compositionSource from "../snippets/textarea/composition.tsx?raw";
-import TextareaControlledSnippet from "../snippets/textarea/controlled";
-import controlledSource from "../snippets/textarea/controlled.tsx?raw";
-import TextareaFeaturesSnippet from "../snippets/textarea/features";
-import featuresSource from "../snippets/textarea/features.tsx?raw";
-import TextareaFullWidthSnippet from "../snippets/textarea/full-width";
-import fullWidthSource from "../snippets/textarea/full-width.tsx?raw";
-import TextareaSizesSnippet from "../snippets/textarea/sizes";
-import sizesSource from "../snippets/textarea/sizes.tsx?raw";
-import TextareaStatesSnippet from "../snippets/textarea/states";
-import statesSource from "../snippets/textarea/states.tsx?raw";
-import TextareaVariantsSnippet from "../snippets/textarea/variants";
-import variantsSource from "../snippets/textarea/variants.tsx?raw";
 
 const textareaRootApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "variant",
-    type: '"default" | "error"',
-    defaultValue: '"default"',
-    required: "Нет",
-    description: "Визуальная роль: обычное поле или акцент ошибки (aria-invalid, обводка).",
-  },
-  {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Кегль, отступы, минимальная высота и радиус из яруса токенов textarea.",
+    description:
+      "Ярус --prime-control-<tier>-*: одна строка стоит как Input того же размера, минимум три строки.",
+  },
+  {
+    prop: "label",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Видимая подпись (Label.Root яруса), связана с textarea через htmlFor.",
+  },
+  {
+    prop: "required",
+    type: "boolean",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Нативный required на textarea и красная звёздочка после подписи.",
+  },
+  {
+    prop: "optional",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Приглушённая пометка labels.optional сразу после текста подписи.",
+  },
+  {
+    prop: "hint",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Подсказка под полем; скрывается, пока показана ошибка.",
+  },
+  {
+    prop: "error",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Текст ошибки в месте подсказки; непустое значение включает invalid.",
+  },
+  {
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Состояние ошибки без текста (aria-invalid, data-invalid, красное кольцо).",
+  },
+  {
+    prop: "focusRing",
+    type: "boolean",
+    defaultValue: "true",
+    required: "Нет",
+    description:
+      'false скрывает только кольцо фокуса на коробке поля (data-focus-ring="false"); фокус, клавиатура, ARIA и кольцо ошибки остаются.',
+  },
+  {
+    prop: "counter",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Правая часть строки поддержки, обычно <Textarea.Counter current max />.",
+  },
+  {
+    prop: "reserveSupportRow",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Строка поддержки рендерится всегда, поэтому появление ошибки не сдвигает макет.",
   },
   {
     prop: "autoResize",
@@ -44,89 +107,45 @@ const textareaRootApiRows: PlaygroundApiPropRow[] = [
     description: "Рост высоты по содержимому; при false остаётся нативный resize угла.",
   },
   {
+    prop: "onValueChange",
+    type: "(value: string) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Новое строковое значение; нативный onChange тоже вызывается.",
+  },
+  {
+    prop: "labels",
+    type: "Partial<TextareaLabels>",
+    defaultValue: '{ optional: "необязательно", counter: "{current} из {max} символов" }',
+    required: "Нет",
+    description: "Встроенные строки: пометка optional и текст счётчика для скринридера.",
+  },
+  {
     prop: "id",
     type: "string",
     defaultValue: "useId()",
     required: "Нет",
-    description:
-      "Связь с подсказками: Hint/Error получают производные id; иначе стабильный id из React.",
+    description: "id textarea; от него строятся id подсказки и ошибки.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Класс видимой оболочки поля (элемент label с data-атрибутами состояния).",
-  },
-  {
-    prop: "disabled",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Блокировка ввода; подсказка Hint переключается в вариант disabled.",
-  },
-  {
-    prop: "readOnly",
-    type: "boolean",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Только чтение; Hint ведёт себя как при disabled.",
-  },
-  {
-    prop: "value",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Контролируемое значение; при autoResize синхронизируется data-value обёртки.",
-  },
-  {
-    prop: "defaultValue",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Начальное значение в неконтролируемом режиме.",
-  },
-  {
-    prop: "onInput",
-    type: "React.FormEventHandler<HTMLTextAreaElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Обработчик ввода; внутри дополнительно обновляется autoResize.",
-  },
-  {
-    prop: "aria-describedby",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительные описания; к ним добавляются id Hint и Error при наличии.",
-  },
-  {
-    prop: "aria-invalid",
-    type: "Booleanish",
-    defaultValue: "из variant / наличия Error",
-    required: "Нет",
     description:
-      'Явная инвалидность; иначе выводится из variant="error" или смонтированного Error.',
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description:
-      "Textarea.CharCounter внутри корня (подвал), Textarea.Hint и Textarea.Error — снаружи label.",
+      "Класс видимой коробки поля (data-invalid, data-disabled, data-readonly, data-size).",
   },
   {
     prop: "…rest",
-    type: 'Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size">',
+    type: 'Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size" | "children">',
     defaultValue: "—",
     required: "Нет",
     description:
-      "placeholder, rows, maxLength, required, onChange, name, autoComplete и прочие атрибуты textarea.",
+      "value, defaultValue, onChange, placeholder, rows, maxLength, disabled, readOnly, name и прочие атрибуты textarea.",
   },
 ];
 
-const textareaCharCounterApiRows: PlaygroundApiPropRow[] = [
+const textareaCounterApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "current",
     type: "number",
@@ -139,55 +158,15 @@ const textareaCharCounterApiRows: PlaygroundApiPropRow[] = [
     type: "number",
     defaultValue: "—",
     required: "Да",
-    description: "Лимит для отображения «current/max»; при current > max — data-overflow.",
-  },
-];
-
-const textareaHintApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Текст подсказки; рендерится через Hint.Root с размером из контекста Textarea.",
+    description:
+      "Лимит «current/max»; при current > max — data-invalid и цвет ошибки. Для жёсткого лимита добавьте maxLength.",
   },
   {
     prop: "className",
     type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Дополнительный класс у слота подсказки.",
-  },
-  {
-    prop: "…rest",
-    type: 'Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Атрибуты параграфа; id задан контекстом для aria-describedby на textarea.",
-  },
-];
-
-const textareaErrorApiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Текст ошибки; регистрирует слот в контексте и variant error у Hint.",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный класс у слота ошибки.",
-  },
-  {
-    prop: "…rest",
-    type: 'Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">',
-    defaultValue: "—",
-    required: "Нет",
-    description: "Атрибуты параграфа; id задан контекстом для aria-describedby на textarea.",
+    description: "Класс span счётчика.",
   },
 ];
 
@@ -197,13 +176,9 @@ export default function TextareaSection() {
       <PageContent.Header>
         <PageContent.Title>Textarea</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Многострочное поле для отзывов, описаний и длинных ответов. Можно задать размер,
-              показать подсказку или текст ошибки, ограничить длину и вывести счётчик символов. По
-              умолчанию высота подстраивается под текст без скриптового измерения.
-            </>
-          }
+          Многострочное поле системы форм: подпись с пометкой «необязательно», заливка без обводки,
+          строка поддержки с подсказкой или ошибкой слева и счётчиком справа. По умолчанию высота
+          растёт вместе с текстом, минимум — три строки.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -211,26 +186,40 @@ export default function TextareaSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Четыре значения <code>size</code> — <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-              <code>xl</code>; у каждого поля своя <code>Textarea.Hint</code> с подписью размера.
+              Пять значений <code>size</code>: <code>xs</code>, <code>s</code>, <code>m</code>,{" "}
+              <code>l</code>, <code>xl</code>. Первая строка текста стоит так же, как в Input того
+              же размера; по умолчанию — <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <TextareaSizesSnippet />
+                <TextareaSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Варианты</DemoSectionTitle>
+            <DemoSectionTitle>Подпись</DemoSectionTitle>
             <DemoDescription>
-              <code>variant=&quot;default&quot;</code> и <code>variant=&quot;error&quot;</code> с
-              парным <code>Textarea.Error</code>; ошибка подключает <code>aria-describedby</code> и
-              инвалидность.
+              <code>label</code> рисует подпись яруса; <code>required</code> добавляет звёздочку,{" "}
+              <code>optional</code> — пометку «необязательно» (текст меняется через{" "}
+              <code>labels.optional</code>). Без видимой подписи задайте <code>aria-label</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={labelSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaWithLabelExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Подсказка и ошибка</DemoSectionTitle>
+            <DemoDescription>
+              <code>hint</code> под полем; непустой <code>error</code> сам включает{" "}
+              <code>invalid</code>, ставит <code>aria-invalid</code> и занимает место подсказки.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <TextareaVariantsSnippet />
+                <TextareaHintAndErrorExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -238,25 +227,69 @@ export default function TextareaSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Обычное поле с подсказкой, <code>disabled</code>, <code>readOnly</code> и нативный{" "}
-              <code>required</code> (атрибут на textarea).
+              Пустое, заполненное, ошибка, <code>readOnly</code> и <code>disabled</code>. Наведите
+              курсор — заливка темнеет; нажмите Tab — появится кольцо фокуса. Клик по отступу поля
+              тоже ставит фокус в textarea.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <TextareaStatesSnippet />
+                <TextareaStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoSectionTitle>Поверхности</DemoSectionTitle>
             <DemoDescription>
-              <code>value</code> и <code>onChange</code> у родителя; длина текста выводится в{" "}
-              <code>Textarea.Hint</code>.
+              На холсте поле белое, внутри Card, Modal или Popover заливка переключается на{" "}
+              <code>field-bg-surface</code>, чтобы поле не сливалось с карточкой.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={surfacesSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SurfaceGallery className="examplePreviewBleed">
+                  <TextareaSurfacesExample />
+                </SurfaceGallery>
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Контролируемый режим и счётчик</DemoSectionTitle>
+            <DemoDescription>
+              <code>value</code> и <code>onValueChange</code> у родителя; длина текста передаётся в{" "}
+              <code>Textarea.Counter</code> в слоте <code>counter</code> — справа в строке
+              поддержки.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <TextareaControlledSnippet />
+                <TextareaControlledExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Резерв строки поддержки</DemoSectionTitle>
+            <DemoDescription>
+              Включите ошибку переключателем: без <code>reserveSupportRow</code> нижний блок
+              сдвигается, с ним строка под ошибку уже занята.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={supportRowSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaReservedSupportRowExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Высота и лимиты</DemoSectionTitle>
+            <DemoDescription>
+              <code>autoResize</code> по умолчанию и фиксированная высота с нативным resize. Счётчик
+              без <code>maxLength</code> показывает переполнение, с <code>maxLength</code> лишний
+              ввод блокируется.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <TextareaHeightAndLimitsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -264,39 +297,12 @@ export default function TextareaSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
-              Заголовок секции через <code>Typography</code>, поле со счётчиком и подсказкой,
-              отдельно — поле с <code>Textarea.Error</code> (корень сам оборачивает textarea в{" "}
-              <code>label</code>).
+              Форма обращения в карточке: Input и Textarea размера <code>m</code>, обязательное и
+              необязательное поле, счётчик и ошибка после отправки без сдвига макета.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
               <PlaygroundExampleFrame.Stage>
-                <TextareaCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
-            <DemoDescription>
-              Поле тянется на ширину родителя (<code>width: 100%</code> у корня); узкий контейнер
-              имитирует колонку карточки или боковую панель.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <TextareaFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              <code>autoResize</code> по умолчанию и отключение, <code>Textarea.CharCounter</code> с
-              обычным и переполненным лимитом, связка <code>maxLength</code> со счётчиком.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={featuresSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <TextareaFeaturesSnippet />
+                <TextareaInFormExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -305,28 +311,17 @@ export default function TextareaSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Textarea.Root</DemoApiTitle>
             <DemoDescription>
-              Обёртка поля: контекст для Hint/Error, опциональный подвал для счётчика, нативный{" "}
-              <code>textarea</code> внутри <code>label</code>.
+              Владеет нативным <code>textarea</code>: атрибуты textarea передаются прямо на Root.
+              Подпись, подсказка, ошибка и счётчик — пропсы Root, как у Input.
             </DemoDescription>
             <PlaygroundApiTable rows={textareaRootApiRows} />
-            <DemoApiTitle>Textarea.CharCounter</DemoApiTitle>
+            <DemoApiTitle>Textarea.Counter</DemoApiTitle>
             <DemoDescription>
-              Счётчик «текущий/максимум» в подвале; при превышении max помечается{" "}
-              <code>data-overflow</code>, живой регион <code>aria-live=&quot;polite&quot;</code>.
+              Счётчик «текущий/максимум» для слота <code>counter</code>: табличные цифры,{" "}
+              <code>aria-live=&quot;polite&quot;</code>, для скринридера —{" "}
+              <code>labels.counter</code>.
             </DemoDescription>
-            <PlaygroundApiTable rows={textareaCharCounterApiRows} />
-            <DemoApiTitle>Textarea.Hint</DemoApiTitle>
-            <DemoDescription>
-              Вспомогательный текст под полем; связывается с textarea через{" "}
-              <code>aria-describedby</code>.
-            </DemoDescription>
-            <PlaygroundApiTable rows={textareaHintApiRows} />
-            <DemoApiTitle>Textarea.Error</DemoApiTitle>
-            <DemoDescription>
-              Сообщение об ошибке; влияет на <code>aria-invalid</code> и стиль поля вместе с{" "}
-              <code>variant</code>.
-            </DemoDescription>
-            <PlaygroundApiTable rows={textareaErrorApiRows} />
+            <PlaygroundApiTable rows={textareaCounterApiRows} />
           </div>
         </div>
       </PageContent.Body>

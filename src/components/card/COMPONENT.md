@@ -1,327 +1,391 @@
 # Card
 
-**Defaults:** use **`variant`** and documented slots as in the canonical example below. Set **`flat`** when the card should read as a flat surface on the page (no elevation shadow).
+**Category:** data-display (Данные)
 
-## About
+> A filled surface block with structural templates for metrics, charts, lists, calls to action and covers.
 
-Composable surfaces for **dashboard KPIs**, **lists**, **CTA tiles**, **split metrics**, **media headers**, and **chart shells**: layout presets are driven by **`variant`** on **`Card.Root`**. Typography and spacing use semantic tokens (`--prime-sys-*`). The kit does not ship chart primitives — mount a chart library root, SVG, or [ProgressBar](../progress-bar/COMPONENT.md) inside **`Card.Media`**, **`Card.Chart`** (**`panel`**, edge-to-edge), padded **`Card.Body`**, or **`Card.Cover`**.
+## When to use
+- KPI tiles on a dashboard (`mini`, `mini-media`, `metric`, `stat-trend`, `split`).
+- A chart or text widget with a header and controls (`panel`).
+- A settings or profile form grouped on its own surface (`panel` + `Body` + `Actions`).
+- An activity list (`list`), a call to action (`cta`), a tile with an image on top (`cover`).
 
-Further reading: [Material Design 3 — Cards](https://m3.material.io/components/cards/guidelines), [IBM Carbon — Tile](https://carbondesignsystem.com/components/tile/usage/), [Nielsen Norman Group — Dashboard Design](https://www.nngroup.com/articles/dashboard-design/).
+## When not to use
+- A whole page region with a title and description → use [PageContent](../page-content/COMPONENT.md) sections; do not wrap every section in a card.
+- Tabular data → use [DataTable](../data-table/COMPONENT.md) (it has its own fill).
+- A message about the page state → use [Banner](../banner/COMPONENT.md); nothing to show yet → [EmptyPage](../empty-page/COMPONENT.md).
+- Content that floats over the page → use [Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md) or [Drawer](../drawer/COMPONENT.md).
+- Collapsible groups → use [Accordion](../accordion/COMPONENT.md).
 
-- **Use** **`variant="mini"`** for a compact KPI: optional **`IconBox`** + **`Stack`** with **`Label`** and **`Value`**.
-- **Use** **`variant="mini-media"`** for the same leading row as **`mini`**, then **`Media`** for a sparkline, ring, or thin progress strip.
-- **Use** **`variant="metric"`** for a title row: **`HeaderRow`** with **`Lead`** (badge or icon) and **`Value`**, plus **`Description`** underneath.
-- **Use** **`variant="panel"`** for a titled block: **`SectionHeader`** + **`Body`** (padded copy or tables) and/or **`Chart`** (full-width chart area, no inner padding).
-- **Use** **`variant="stat-trend"`** for a large KPI with period delta: **`Label`**, **`Value`**, **`Delta`** (`trend`: `up` | `down` | `neutral`).
-- **Use** **`variant="cta"`** for a call-to-action tile: **`Title`**, **`CtaBody`**, **`Actions`**.
-- **Use** **`variant="list"`** for activity or alerts: **`ListHeader`**, **`List`** / **`ListItem`**.
-- **Use** **`variant="split"`** for two related metrics: **`Split`** with two **`SplitCell`** blocks (often **`IconBox`** + **`Stack`** each).
-- **Use** **`variant="cover"`** for media on top: **`Cover`**, then **`Stack`** and optional **`Actions`**.
-- **Do not use** the whole card as the only focus target for navigation; prefer [LinkButton](../link-button/COMPONENT.md) or an inner control, unless you add explicit `role` / `tabIndex` and keyboard handling.
-- **Do not use** decorative icons without **`aria-hidden`** when the text already conveys the meaning.
+## Import
+```tsx
+import { Card } from "prime-ui-kit";
+```
 
-## Canonical example
+## Anatomy
+```
+Card.Root variant="mini"         IconBox · Stack(Label, Value)
+Card.Root variant="mini-media"   IconBox · Stack(Label, Value) · Media
+Card.Root variant="metric"       HeaderRow(Lead, Value) · Description
+Card.Root variant="stat-trend"   Label · Value · Delta
+Card.Root variant="split"        Split > SplitCell(IconBox, Stack(Label, Value)) ×2
+Card.Root variant="panel"        SectionHeader(SectionTitle, SectionTrailing) · Body · Chart · Actions
+Card.Root variant="cta"          Title · CtaBody · Actions
+Card.Root variant="list"         ListHeader(Title, link) · List > ListItem … · Actions
+Card.Root variant="cover"        Cover · Stack(Title, Label) · Actions
+```
+The parts are free slots: every part works in any template, but the spacing rules above are tuned for these trees.
 
-Rich **`panel`**: section header with trailing control, padded intro in **`Body`**, and an edge-to-edge **`Chart`** region for a real chart root.
+## API
+
+### Card.Root
+`<div>`. Forwards `ref`. No `asChild`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `variant` | `"mini" \| "mini-media" \| "metric" \| "panel" \| "stat-trend" \| "cta" \| "list" \| "split" \| "cover"` | `"panel"` | Structural template: layout, padding and the value text role. |
+| `flat` | `boolean` | `false` | Removes the card shadow. No border in either case. |
+| `className` | `string` | — | Extra class. |
+| `children` | `ReactNode` | — | Parts. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`). `data-variant` / `data-flat` are always set by the component.
+
+### Card.Delta
+`<span>`. No ref forwarding. Change of a metric: body-s, weight 500, `tabular-nums`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Color by meaning (good / bad), independent of the sign. |
+| `children` | `ReactNode` | — | Content ("+18% к сентябрю"). |
+| `className` | `string` | — | Extra class. |
+
++ native `<span>` props. `data-tone` is always set by the component.
+
+### Card.IconBox
+`<div>`. No ref forwarding. 40px tile (`control-l-height`), radius 8, `accent-soft` fill, `accent-text` icon 20px. In `mini`, `mini-media`, `SplitCell`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.Lead
+`<div>`. No ref forwarding. Leading element of a `HeaderRow` (badge, icon in `text-secondary`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.HeaderRow
+`<div>`. No ref forwarding. Row with space-between: lead left, value right (`metric`). Wraps below 22rem card width.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.Stack
+`<div>`. No ref forwarding. Column with `--prime-space-1` gap for Label + Value (or Title + Label in `cover`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.Label
+`<span>`. No ref forwarding. Metric caption: body-s, `text-secondary`, one line with ellipsis.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<span>` props (`HTMLAttributes<HTMLSpanElement>`).
+
+### Card.Value
+`<span>`. No ref forwarding. The number: title-l (heading-m in `metric`, heading-l in `stat-trend`), `tabular-nums`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<span>` props (`HTMLAttributes<HTMLSpanElement>`).
+
+### Card.Description
+`<p>`. No ref forwarding. Secondary line: body-s, `text-secondary`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<p>` props (`HTMLAttributes<HTMLParagraphElement>`).
+
+### Card.Media
+`<div>`. No ref forwarding. Bottom full-width slot of `mini-media` (sparkline, ProgressBar); min height 40px.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.Title
+Heading (`<h3>` by default). No ref forwarding. Card title: title-s (title-m in `cta`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `as` | `"h2" \| "h3" \| "h4"` | `"h3"` | Heading level for the page outline; the look does not change. |
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native heading props (`HTMLAttributes<HTMLHeadingElement>`).
+
+### Card.Actions
+`<div>`. No ref forwarding. Action row, `gap` 8. In `panel` / `list` it is the footer: right-aligned, faint hairline above. In `cta` a hairline above.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.CtaBody
+`<div>`. No ref forwarding. Body text of a `cta` card: body-s, `text-secondary`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.Cover
+`<div>`. No ref forwarding. Top media of a `cover` card: full width, 128–192px high, sunken fill; the child image/element covers it.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.Split
+`<div>`. No ref forwarding. Two-column grid for `split`; one column below 22rem card width.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.SplitCell
+`<div>`. No ref forwarding. One cell of `Split`; a hairline separates the cells. With an `IconBox` it becomes a row.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.ListHeader
+`<div>`. No ref forwarding. Header row of a `list` card (title + link); faint hairline below when followed by `List`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.List
+`<ul>`. Forwards `ref`. List of a `list` card (no bullets).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<ul>` props (`HTMLAttributes<HTMLUListElement>`).
+
+### Card.ListItem
+`<li>`. Forwards `ref`. Item: body-m, padding 12 × card padding, faint hairline between items.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<li>` props (`HTMLAttributes<HTMLLIElement>`).
+
+### Card.SectionHeader
+`<div>`. No ref forwarding. Header of a `panel` card: title + trailing, min height 36px; faint hairline below when followed by `Body`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.SectionTitle
+Heading (`<h3>` by default). No ref forwarding. Panel title: title-s.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `as` | `"h2" \| "h3" \| "h4"` | `"h3"` | Heading level for the page outline; the look does not change. |
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native heading props (`HTMLAttributes<HTMLHeadingElement>`).
+
+### Card.SectionTrailing
+`<div>`. No ref forwarding. Right side of `SectionHeader`: controls, icon 16px in `text-secondary`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.Body
+`<div>`. No ref forwarding. Padded content of a `panel`: column with `--prime-card-gap` (16) gap; a single child stretches.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+### Card.Chart
+`<div>`. No ref forwarding. Edge-to-edge chart area of a `panel` (no side padding); a single child stretches.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Content. |
+| `className` | `string` | — | Extra class. |
+
++ native `<div>` props (`HTMLAttributes<HTMLDivElement>`).
+
+## Variants
+
+### variant (structural templates)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `mini` | Row: 40px accent icon tile + label (body-s) and value (title-l); padding 20 | A compact KPI tile | |
+| `mini-media` | `mini` row plus a full-width bottom `Media` slot | A KPI with a sparkline or a ProgressBar | |
+| `metric` | Column: header row (badge/lead left, heading-m value right) + description; gap 8 | A KPI with a qualifier badge (SLA, period) | |
+| `stat-trend` | Column: label, large heading-l value (heading-m below 20rem, display-s above 36rem card width), delta | The main number of a dashboard with its change | |
+| `split` | Two metric cells side by side with a hairline between; stacked below 22rem | Two related metrics in one tile | |
+| `panel` | No padding on the root; header (title + trailing) with a faint hairline, padded `Body`, edge-to-edge `Chart`, footer `Actions` right-aligned with a hairline above | Chart widgets, settings forms, any titled block | yes |
+| `cta` | Column: title-m title, body-s text, actions under a hairline; gap 12 | A call to action (export, upgrade, connect) | |
+| `list` | No padding on the root; list header with hairline, items separated by faint hairlines | Recent events, short lists with a "Все" link | |
+| `cover` | No padding; 128–192px media on top, title + label, actions | Campaign, project or product tiles | |
+
+All variants share: `--prime-color-card-bg` fill, radius 12 (`--prime-card-radius`), `--prime-card-shadow`, no border.
+
+### flat (visual flag)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `false` | Card fill + barely visible raised shadow | Cards on the page canvas | yes |
+| `true` | Same fill, no shadow (`data-flat`) | Dense grids of tiles where many shadows add noise | |
+
+### Card.Delta `tone`
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `neutral` | `text-secondary` | A change with no good/bad meaning | yes |
+| `success` | `success-text` | The change is good (revenue up, churn down) | |
+| `warning` | `warning-text` | The change needs attention | |
+| `danger` | `danger-text` | The change is bad (churn up) | |
+
+**Combinations**
+- Recommended: a row of `mini` / `stat-trend` cards for KPIs; `panel` for charts and forms; `Delta tone` by meaning, not by sign (`+0,6 п. п.` churn is `danger`).
+- Allowed but rare: `flat` cards in dense grids; parts outside their template (e.g. `Description` in `stat-trend`).
+- Avoid: a card inside a card for layout (a nested card becomes a sunken tile without shadow — use it only for a real inner block); borders around cards; a `cover` without a meaningful image.
+
+**Sizes**
+Card has no `size`. Padding is `--prime-card-padding-m` (20); `Body` gap is `--prime-card-gap` (16). The card fills its column (`width: 100%`); set widths with the grid around it.
+
+**Hierarchy**
+One `stat-trend` (the main number) per dashboard row, the rest `mini` or `metric`. In a panel footer: one primary Button, the rest `ghost`.
+
+## States
+Card is not interactive (no hover, focus or selection).
+
+| Attribute | Element | Driven by |
+|---|---|---|
+| `data-variant` | Root | `variant` (always set, default `panel`) |
+| `data-flat="true"` | Root | `flat` |
+| `data-tone` | Delta | `tone` (always set, default `neutral`) |
+
+Surface context: the card sets `--prime-color-field-bg: var(--prime-color-field-bg-surface)` (fields inside stay distinguishable), `--avatar-ring` to its fill, and for its children `--prime-color-card-bg: var(--prime-color-bg-sunken)` + `--prime-card-shadow: none`, so a nested card or table becomes a sunken tile. Inside AppShell content, Modal, Drawer or Popover the card itself is a sunken tile without shadow.
+
+## Layout & spacing
+- Grid of cards: `repeat(auto-fit, minmax(min(100%, 14rem), 1fr))` with `gap: var(--prime-space-4)`.
+- Fields inside `Card.Body`: field → field `--prime-space-5` (20).
+- The card is a size container (`container-type: inline-size`): `split` stacks below 22rem, `HeaderRow` wraps below 22rem, `stat-trend` value changes at 20rem / 36rem.
+- Long values wrap (`overflow-wrap: anywhere`); labels truncate with ellipsis.
+- Charts: give the SVG a fixed CSS height; `Card.Chart` stretches it edge to edge.
+
+## Accessibility
+- `Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.
+- `Card.Title` and `Card.SectionTitle` render `<h3>` by default; directly under a page `<h1>` (`PageContent.Title`) pass `as="h2"` so no level is skipped.
+- Decorative icons in `IconBox` and decorative covers get `aria-hidden`.
+- Controls in `SectionTrailing` need their own accessible names (e.g. `aria-label="Период"` on SegmentedControl).
+- No `labels` keys.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [metrics.tsx](examples/metrics.tsx) | `mini`, `metric`, `stat-trend` with `Delta` success / danger | KPI rows on dashboards |
+| [mini-media.tsx](examples/mini-media.tsx) | `mini-media` with a sparkline and a ProgressBar | KPI with a trend or fill level |
+| [responsive.tsx](examples/responsive.tsx) | `split` and `stat-trend` at 18rem and 40rem | Two related metrics; container-query behaviour |
+| [panel-chart.tsx](examples/panel-chart.tsx) | `panel` with header switch, body text, edge-to-edge chart | Chart widgets |
+| [content.tsx](examples/content.tsx) | `cta`, `list`, `cover` | Calls to action, activity lists, tiles with media |
+| [settings.tsx](examples/settings.tsx) | `panel` with a form and footer actions | Settings and profile forms |
+| [flat.tsx](examples/flat.tsx) | Default shadow vs `flat` | Dense tile grids |
 
 ```tsx
-import { Card, Icon, Typography } from "prime-ui-kit";
+import { Card } from "prime-ui-kit";
 
-export function RevenuePanelCard() {
+export function RevenueCard() {
   return (
-    <Card.Root variant="panel">
-      <Card.SectionHeader>
-        <Card.SectionTitle>Revenue</Card.SectionTitle>
-        <Card.SectionTrailing>
-          <Icon name="nav.layoutGrid" aria-hidden />
-        </Card.SectionTrailing>
-      </Card.SectionHeader>
-      <Card.Body>
-        <Typography.Root variant="body-small" tone="muted">
-          Quarter-to-date summary; the chart mounts below with no horizontal or vertical padding inside
-          Card.Chart.
-        </Typography.Root>
-      </Card.Body>
-      <Card.Chart>
-        <div id="revenue-chart" aria-hidden />
-      </Card.Chart>
+    <Card.Root variant="stat-trend">
+      <Card.Label>Выручка за месяц</Card.Label>
+      <Card.Value>₽ 4,2 млн</Card.Value>
+      <Card.Delta tone="success">+18% к сентябрю</Card.Delta>
     </Card.Root>
   );
 }
 ```
 
-## Playground snippets
+## Mistakes
+- `<div className="card">` with a border → use `Card.Root`; depth comes from fill, not lines.
+- Wrapping every page section in a card → use PageContent sections; cards are for bounded blocks.
+- `Card.Delta tone="success"` for every "+" → choose the tone by meaning.
+- Custom padding on `Card.Root variant="panel"` → padding belongs to `SectionHeader` / `Body` / `Actions`.
+- A chart SVG with only a `viewBox` → give it a CSS height, or it scales to a square.
+- Setting a white background on fields inside a card → leave the field context; the card switches it.
 
-Live demos use these files (same order as the **Card** section in the playground):
-
-| Scenario | Snippet | Notes |
-|----------|---------|-------|
-| Mini | [`mini.tsx`](../../../playground/snippets/card/mini.tsx) | `variant="mini"`: **`IconBox`** + **`Stack`** (**`Label`**, **`Value`**) |
-| Mini + media | [`mini-media.tsx`](../../../playground/snippets/card/mini-media.tsx) | `variant="mini-media"`: same as mini + bottom **`Media`** |
-| Metric | [`metric.tsx`](../../../playground/snippets/card/metric.tsx) | `variant="metric"`: **`HeaderRow`** (**`Lead`**, **`Value`**) + **`Description`** |
-| Stat + trend | [`stat-trend.tsx`](../../../playground/snippets/card/stat-trend.tsx) | `variant="stat-trend"`: **`Value`** + **`Delta`** (`trend`) |
-| CTA | [`cta.tsx`](../../../playground/snippets/card/cta.tsx) | `variant="cta"`: **`Title`**, **`CtaBody`**, **`Actions`** |
-| List | [`list.tsx`](../../../playground/snippets/card/list.tsx) | `variant="list"`: **`ListHeader`**, **`List`** / **`ListItem`** |
-| Split | [`split.tsx`](../../../playground/snippets/card/split.tsx) | `variant="split"`: **`Split`** with two **`SplitCell`** blocks |
-| Cover | [`cover.tsx`](../../../playground/snippets/card/cover.tsx) | `variant="cover"`: **`Cover`**, **`Stack`**, **`Actions`** |
-| Panel (chart only) | [`panel.tsx`](../../../playground/snippets/card/panel.tsx) | `variant="panel"`: **`SectionHeader`** + edge-to-edge **`Chart`** |
-| Panel (body + chart) | [`panel-content-chart.tsx`](../../../playground/snippets/card/panel-content-chart.tsx) | same **`panel`**: **`Body`** + **`Chart`** |
-| Flat surface | [`flat.tsx`](../../../playground/snippets/card/flat.tsx) | **`flat`** prop: shadow vs no shadow on **`mini`** |
-| KPI grid | [`row.tsx`](../../../playground/snippets/card/row.tsx) | several mini cards in playground `introFeatureGrid` |
-
-Supporting CSS modules in that folder: `flat.module.css`, `mini-media.module.css`, `variants-stack.module.css`.
-
-## Extended examples
-
-Copy-oriented scenarios (English copy, `prime-ui-kit` imports) live next to this file. For single-variant demos, see **Playground snippets** above.
-
-| File | Scenario |
-|------|----------|
-| [examples/mini-kpi.tsx](./examples/mini-kpi.tsx) | **`mini`**: компактный KPI с иконкой |
-| [examples/metric-dashboard.tsx](./examples/metric-dashboard.tsx) | KPI row: **`stat-trend`**, **`metric`**, **`mini-media`** |
-| [examples/list-card.tsx](./examples/list-card.tsx) | Activity list with header link |
-| [examples/media-mini.tsx](./examples/media-mini.tsx) | **`mini-media`**: sparkline and **`ProgressBar`** |
-| [examples/split-layout.tsx](./examples/split-layout.tsx) | **`split`**: two metrics in one tile |
-| [examples/cta-cover.tsx](./examples/cta-cover.tsx) | **`cta`** tile and **`cover`** with gradient banner |
-
-## Composition
-
-- **`Card.Root`** — required **`variant`**: `"mini"` \| `"mini-media"` \| `"metric"` \| `"panel"` \| `"stat-trend"` \| `"cta"` \| `"list"` \| `"split"` \| `"cover"`. Optional **`flat`** removes the default surface shadow. Sets `data-variant` / `data-flat` for styling.
-- **`Card.IconBox`** — square leading area in **`mini`** and **`mini-media`**: background **`status-information-background`**, radius **`size-control-m-radius`**, icon color via **`status-information-foreground`** (decorative icons: **`aria-hidden`**).
-- **`Card.Lead`** — left cluster in **`HeaderRow`** (badge from [Badge](../badge/COMPONENT.md), raw icon, or both).
-- **`Card.HeaderRow`** — top row for **`metric`**: typically **`Lead`** + **`Value`**.
-- **`Card.Stack`** — vertical block for **`Label`** + **`Value`** in **`mini`** and **`mini-media`**.
-- **`Card.Label`** — secondary line (muted).
-- **`Card.Value`** — primary metric string.
-- **`Card.Description`** — supporting line under the header row (`p`).
-- **`Card.Media`** — bottom region with top border; place charts or progress here.
-- **`Card.SectionHeader`** — bar with bottom border for **`panel`**.
-- **`Card.SectionTitle`** — `h3` title.
-- **`Card.SectionTrailing`** — optional actions or icon on the right.
-- **`Card.Body`** — **`panel`**: padded region for text, summaries, or tables. With **`variant="panel"`**, the shell has a **minimum height**; a **single element child** can stretch inside the padded box. Override height via **`className`** on **`Root`** if needed.
-- **`Card.Chart`** — **`panel`**: **no** horizontal or vertical inner padding; mount the chart library root here for **edge-to-edge** drawing under the header. Optional after **`Body`**; then **`Chart`** fills remaining height.
-- **`Card.Title`** — **`h3`** with **`title`** styles; use in **`cta`**, **`list`** header, **`cover`** stack.
-- **`Card.Delta`** — supporting line for **`stat-trend`**; optional **`trend`** sets `data-trend` for color (`up` \| `down` \| `neutral`).
-- **`Card.CtaBody`** — body copy in **`cta`**.
-- **`Card.Actions`** — row of actions (border-top); use in **`cta`** and **`cover`**.
-- **`Card.Cover`** — top media region for **`cover`** (image or decorative block; keep meaningful images described in text for a11y).
-- **`Card.Split`** / **`Card.SplitCell`** — two-column grid for **`split`**.
-- **`Card.ListHeader`** — top bar for **`list`** (border-bottom).
-- **`Card.List`** / **`Card.ListItem`** — semantic **`ul`** / **`li`** for **`list`**.
-
-## Rules
-
-- Typography follows the **control `m` tier** (`--prime-sys-size-control-m-text` for values and section titles, `--prime-sys-size-control-m-supportText` for labels and descriptions), aligned with [Label](../label/COMPONENT.md) / [Input](../input/COMPONENT.md) defaults.
-- Prefer **`flat`** on dense dashboards if shadows feel noisy; default shadow uses **`--prime-sys-elevation-shadow-surface`**.
-- **`SectionTitle`** and **`Title`** are **`h3`**; match heading levels to the page outline.
-- **`Description`** is a **`p`** — only one block per card unless you compose custom markup inside **`Body`** for **`panel`**.
-- **`variant="panel"`** sets a **minimum height** on **`Root`**. Order after **`SectionHeader`**: optional **`Body`**, optional **`Chart`**. If both are present, **`Body`** sizes to its content and **`Chart`** takes the **remaining height**. A **single element child** in **`Chart`** (or in **`Body`** when it is the only block) stretches within that region.
-- For **`mini-media`**, keep **`Media`** height predictable so grid rows align, or use one column on narrow viewports.
-- Icons in **`IconBox`** / **`Lead`** should not be the sole carrier of meaning; pair with visible text.
-- Decorative content in **`Cover`** should not rely on imagery alone for critical information — repeat key facts in **`Stack`**.
-- **`List`** uses a real **`ul`**; keep **`ListItem`** text meaningful for screen readers.
-
-## API
-
-### Card.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| variant | `"mini" \| "mini-media" \| "metric" \| "panel" \| "stat-trend" \| "cta" \| "list" \| "split" \| "cover"` | — | Yes | Layout preset and padding. |
-| flat | `boolean` | `false` | No | When `true`, no drop shadow (surface still bordered). |
-| className | `string` | — | No | Extra class on the root. |
-| children | `React.ReactNode` | — | No | Slots listed in Composition. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Native attributes on the root `div`. |
-
-### Card.IconBox
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Icon node. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the wrapper `div`. |
-
-### Card.Lead
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Badge, icon, or group. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the wrapper `div`. |
-
-### Card.HeaderRow
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Typically `Lead` + `Value`. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the flex row. |
-
-### Card.Stack
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | `Label` + `Value` for mini. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the stack `div`. |
-
-### Card.Label
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Secondary label text. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Attributes on the `span`. |
-
-### Card.Value
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Primary value. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Attributes on the `span`. |
-
-### Card.Description
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Supporting copy. |
-| …rest | `React.HTMLAttributes<HTMLParagraphElement>` | — | No | Attributes on the `p`. |
-
-### Card.Media
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Chart, SVG, or progress. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the region `div`. |
-
-### Card.Title
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Heading text (`h3`). |
-| …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | Attributes on the `h3`. |
-
-### Card.Delta
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| trend | `"up" \| "down" \| "neutral"` | — | No | Sets `data-trend` for color. |
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Delta / period copy. |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Attributes on the `span`. |
-
-### Card.CtaBody
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Supporting copy in **`cta`**. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the `div`. |
-
-### Card.Actions
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Buttons / links row. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the `div`. |
-
-### Card.Cover
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Image or media block (`cover` variant). |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the `div`. |
-
-### Card.Split
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Typically two **`SplitCell`** children. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the grid `div`. |
-
-### Card.SplitCell
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | One metric column: **`Label`** + **`Value`**, or **`IconBox`** + **`Stack`**. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the cell `div`. |
-
-### Card.ListHeader
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Title row for **`list`**. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the `div`. |
-
-### Card.List
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | **`ListItem`** nodes. |
-| …rest | `React.HTMLAttributes<HTMLUListElement>` | — | No | Attributes on the `ul` (forwardRef). |
-
-### Card.ListItem
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Row content. |
-| …rest | `React.HTMLAttributes<HTMLLIElement>` | — | No | Attributes on the `li` (forwardRef). |
-
-### Card.SectionHeader
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Title row content. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the header `div`. |
-
-### Card.SectionTitle
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Heading text. |
-| …rest | `React.HTMLAttributes<HTMLHeadingElement>` | — | No | Attributes on the `h3`. |
-
-### Card.SectionTrailing
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Icons or actions. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the trailing `div`. |
-
-### Card.Body
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | Padded **`panel`** content (text, tables). One **element** child can stretch inside the padded area. |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the body `div`. |
-
-### Card.Chart
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| className | `string` | — | No | Extra class. |
-| children | `React.ReactNode` | — | No | **`panel`** chart root; **no** inner padding (edge-to-edge). |
-| …rest | `React.HTMLAttributes<HTMLDivElement>` | — | No | Attributes on the chart region `div`. |
-
-## Imports
-
-```ts
-import { Card } from "prime-ui-kit";
-```
-
-CSS for this component is included in the main bundle (`prime-ui-kit/styles.css` / `bundle.css`) when you import the library styles.
+## Related
+- [DataTable](../data-table/COMPONENT.md) — tables on their own fill.
+- [Badge](../badge/COMPONENT.md) — qualifiers in `Card.Lead`.
+- [ProgressBar](../progress-bar/COMPONENT.md) — fill level in `Card.Media`.
+- [SegmentedControl](../segmented-control/COMPONENT.md) — period switch in `SectionTrailing`.
+- [PageContent](../page-content/COMPONENT.md) — page sections around cards.

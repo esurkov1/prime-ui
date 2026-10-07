@@ -1,17 +1,71 @@
+/*
+ * Kbd — monospace key cap on a sunken wash, no border. Uses the badge tiers
+ * (`--prime-badge-<tier>-*`); `data-tier` is the visual tier (see badge/tier.ts).
+ * The wash is a translucent fill so the key reads as inset on canvas, cards and panels alike.
+ */
 .root {
+  --kbd-h: var(--prime-badge-m-height);
+  --kbd-px: var(--prime-badge-m-padding-x);
+  --kbd-gap: var(--prime-badge-m-gap);
+  --kbd-radius: var(--prime-badge-m-radius);
+  --kbd-text: var(--prime-badge-m-text-size);
+  --prime-icon-size: var(--prime-badge-m-icon);
+
+  box-sizing: border-box;
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  font-size: var(--prime-sys-size-control-xs-text);
-  line-height: var(--prime-sys-typography-lineHeightScale-3xs);
-  font-family: var(--prime-sys-typography-family-base);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-primary);
-  background: var(--prime-sys-color-surface-raised);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  gap: var(--kbd-gap);
+  height: var(--kbd-h);
+  min-width: var(--kbd-h);
+  padding-inline: var(--kbd-px);
+  border-radius: var(--kbd-radius);
+  background: var(--prime-color-fill-subtle-active);
+  color: var(--prime-color-text-secondary);
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--kbd-text);
+  line-height: 1;
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.root[data-tier="xs"] {
+  --kbd-h: var(--prime-badge-xs-height);
+  --kbd-px: var(--prime-badge-xs-padding-x);
+  --kbd-gap: var(--prime-badge-xs-gap);
+  --kbd-radius: var(--prime-badge-xs-radius);
+  --kbd-text: var(--prime-badge-xs-text-size);
+  --prime-icon-size: var(--prime-badge-xs-icon);
+}
+
+.root[data-tier="s"] {
+  --kbd-h: var(--prime-badge-s-height);
+  --kbd-px: var(--prime-badge-s-padding-x);
+  --kbd-gap: var(--prime-badge-s-gap);
+  --kbd-radius: var(--prime-badge-s-radius);
+  --kbd-text: var(--prime-badge-s-text-size);
+  --prime-icon-size: var(--prime-badge-s-icon);
+}
+
+.root[data-tier="l"] {
+  --kbd-h: var(--prime-badge-l-height);
+  --kbd-px: var(--prime-badge-l-padding-x);
+  --kbd-gap: var(--prime-badge-l-gap);
+  --kbd-radius: var(--prime-badge-l-radius);
+  --kbd-text: var(--prime-badge-l-text-size);
+  --prime-icon-size: var(--prime-badge-l-icon);
+}
+
+.root[data-tier="xl"] {
+  --kbd-h: var(--prime-badge-xl-height);
+  --kbd-px: var(--prime-badge-xl-padding-x);
+  --kbd-gap: var(--prime-badge-xl-gap);
+  --kbd-radius: var(--prime-badge-xl-radius);
+  --kbd-text: var(--prime-badge-xl-text-size);
+  --prime-icon-size: var(--prime-badge-xl-icon);
 }
 
 .root > * {
@@ -19,57 +73,8 @@
   line-height: inherit;
 }
 
-/* Номинальный size как у инпута; визуально на ступень ниже кнопки того же имени (`size.control.*`). */
-.root[data-size="s"] {
-  --prime-icon-size: var(--prime-sys-size-control-xs-icon);
-  height: var(--prime-sys-size-kbd-height);
-  min-width: var(--prime-sys-size-kbd-height);
-  padding-inline: var(--prime-sys-size-kbd-paddingX);
-  padding-block: var(--prime-sys-size-kbd-paddingY);
-  font-size: var(--prime-sys-size-kbd-text);
-  line-height: var(--prime-sys-typography-lineHeightScale-3xs);
-  border-radius: var(--prime-sys-size-kbd-radius);
-  gap: var(--prime-sys-size-control-xs-gap);
-}
-
-.root[data-size="m"] {
-  --prime-icon-size: var(--prime-sys-size-control-xs-icon);
-  height: var(--prime-sys-size-control-xs-height);
-  min-width: var(--prime-sys-size-control-xs-height);
-  padding-inline: var(--prime-sys-size-control-xs-inputPaddingX);
-  padding-block: var(--prime-sys-size-control-xs-inputPaddingY);
-  font-size: var(--prime-sys-size-control-xs-text);
-  line-height: var(--prime-sys-typography-lineHeightScale-3xs);
-  border-radius: var(--prime-sys-size-control-xs-radius);
-  gap: var(--prime-sys-size-control-xs-gap);
-}
-
-.root[data-size="l"] {
-  --prime-icon-size: var(--prime-sys-size-control-s-icon);
-  height: var(--prime-sys-size-control-s-height);
-  min-width: var(--prime-sys-size-control-s-height);
-  padding-inline: var(--prime-sys-size-control-s-inputPaddingX);
-  padding-block: var(--prime-sys-size-control-s-inputPaddingY);
-  font-size: var(--prime-sys-size-control-s-text);
-  line-height: var(--prime-sys-typography-lineHeightScale-2xs);
-  border-radius: var(--prime-sys-size-control-s-radius);
-  gap: var(--prime-sys-size-control-s-gap);
-}
-
-.root[data-size="xl"] {
-  --prime-icon-size: var(--prime-sys-size-control-m-icon);
-  height: var(--prime-sys-size-control-m-height);
-  min-width: var(--prime-sys-size-control-m-height);
-  padding-inline: var(--prime-sys-size-control-m-inputPaddingX);
-  padding-block: var(--prime-sys-size-control-m-inputPaddingY);
-  font-size: var(--prime-sys-size-control-m-text);
-  line-height: var(--prime-sys-typography-lineHeightScale-xs);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  gap: var(--prime-sys-size-control-m-gap);
-}
-
 .root :where(svg) {
+  flex-shrink: 0;
   width: var(--prime-icon-size);
   height: var(--prime-icon-size);
-  flex-shrink: 0;
 }

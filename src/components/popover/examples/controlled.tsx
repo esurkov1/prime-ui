@@ -1,40 +1,39 @@
+/** Controlled popover: `open` + `onOpenChange` held by the parent, opened from another button and closed from inside. Use when other UI must open or close the panel. */
 import { Button, Popover, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./popover-examples.module.css";
+import preview from "./examples.module.css";
 
-/**
- * Controlled `open` / `onOpenChange` on `Popover.Root`: open from outside, toggle from trigger, close from panel.
- */
 export default function PopoverControlledExample() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div className={styles.controlledRow}>
-      <Typography.Root as="p" className={styles.stateLine} variant="body-small" weight="medium">
-        Panel is {open ? "open" : "closed"}
-      </Typography.Root>
-      <div className={styles.sizesRow}>
-        <Button.Root mode="stroke" variant="neutral" onClick={() => setOpen(true)}>
-          Open from outside
+    <div className={preview.column}>
+      <div className={preview.row}>
+        <Button.Root variant="ghost" tone="neutral" onClick={() => setOpen(true)}>
+          Открыть извне
         </Button.Root>
         <Popover.Root open={open} onOpenChange={setOpen}>
-          <Popover.Trigger asChild>
-            <Button.Root mode="filled" variant="primary">
-              Toggle with trigger
+          <Popover.Trigger>
+            <Button.Root variant="soft" tone="neutral">
+              Триггер
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="start" side="bottom">
-            <p className={styles.panelTextMuted}>
-              State is driven by <code>open</code> and <code>onOpenChange</code> on{" "}
-              <code>Popover.Root</code>.
-            </p>
-            <Button.Root mode="ghost" variant="neutral" onClick={() => setOpen(false)}>
-              Close
-            </Button.Root>
+          <Popover.Content>
+            <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+              Состояние хранит родитель.
+            </Typography.Root>
+            <Popover.Actions>
+              <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(false)}>
+                Закрыть
+              </Button.Root>
+            </Popover.Actions>
           </Popover.Content>
         </Popover.Root>
       </div>
+      <Typography.Root as="p" variant="body-s" tone="secondary">
+        Панель {open ? "открыта" : "закрыта"}
+      </Typography.Root>
     </div>
   );
 }

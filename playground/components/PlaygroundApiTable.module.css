@@ -1,0 +1,148 @@
+.root {
+  container-type: inline-size;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  text-align: start;
+}
+
+.table thead th {
+  height: var(--prime-control-m-height);
+  padding-inline: var(--prime-table-cell-padding-x);
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  font-weight: var(--prime-font-weight-medium);
+  text-align: start;
+  white-space: nowrap;
+}
+
+.table tbody th,
+.table tbody td {
+  padding: var(--prime-space-3) var(--prime-table-cell-padding-x);
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  font-weight: var(--prime-font-weight-regular);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table tbody tr:first-child th,
+.table tbody tr:first-child td {
+  border-top: 0;
+}
+
+.table code {
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--prime-text-code-size);
+  line-height: var(--prime-text-code-line-height);
+  overflow-wrap: break-word;
+}
+
+.prop {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-1) var(--prime-space-2);
+}
+
+.prop > code {
+  white-space: nowrap;
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.required {
+  display: inline-flex;
+  align-items: center;
+  height: var(--prime-badge-s-height);
+  padding-inline: var(--prime-badge-s-padding-x);
+  border-radius: var(--prime-badge-s-radius);
+  background: var(--prime-color-danger-soft);
+  color: var(--prime-color-danger-text);
+  font-size: var(--prime-badge-s-text-size);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.type {
+  color: var(--prime-color-accent-text);
+}
+
+.empty {
+  color: var(--prime-color-text-disabled);
+}
+
+.description {
+  min-width: 16rem;
+  color: var(--prime-color-text-secondary);
+}
+
+.description code {
+  padding-inline: var(--prime-space-1);
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-primary);
+}
+
+/* Narrow container: every row becomes a stacked card with inline labels. */
+@container (max-width: 40rem) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .table tbody tr {
+    display: grid;
+    gap: var(--prime-space-1);
+    padding: var(--prime-space-3) var(--prime-table-cell-padding-x);
+    border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  }
+
+  .table tbody tr:first-child {
+    border-top: 0;
+  }
+
+  .table tbody th,
+  .table tbody td {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: var(--prime-space-2);
+    padding: 0;
+    border-top: 0;
+  }
+
+  .table tbody th::before,
+  .table tbody td::before {
+    content: attr(data-label);
+    color: var(--prime-color-text-muted);
+    font-size: var(--prime-text-caption-size);
+    line-height: var(--prime-text-body-s-line-height);
+  }
+
+  .description {
+    min-width: 0;
+  }
+
+  .table code {
+    overflow-wrap: anywhere;
+  }
+
+  /* Grid cells would stretch a code chip to the column width; keep it hugging its text. */
+  .table tbody td > code {
+    justify-self: start;
+  }
+}

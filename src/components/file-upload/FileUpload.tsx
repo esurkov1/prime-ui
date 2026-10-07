@@ -7,28 +7,29 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { FileUploadSize, HintSize } from "@/internal/states";
+import type { ControlSize, PaletteColor, TextTone } from "@/internal/states";
 
 import styles from "./FileUpload.module.css";
 
-export type { FileUploadSize };
+/** Drop zone treatment: `dashed` shows the drop affordance line, `solid` keeps only the fill. */
+export type FileUploadVariant = "dashed" | "solid";
 
-export type FileUploadFormatBadgeColor =
-  | "gray"
-  | "red"
-  | "blue"
-  | "green"
-  | "orange"
-  | "purple"
-  | "sky"
-  | "yellow";
+export type FileUploadLabels = {
+  /** Title of the built-in drop zone body. */
+  title: string;
+  /** Hint under the title (formats, size limit). An empty string hides it. */
+  hint: string;
+  /** Decorative «browse» button text of the built-in body. */
+  browse: string;
+};
 
-export type FileUploadItemVariant = "default" | "error";
+const FILE_UPLOAD_LABELS: FileUploadLabels = {
+  title: "Выберите файл или перетащите его сюда",
+  hint: "JPEG, PNG, PDF, MP4 до 50 МБ",
+  browse: "Выбрать файл",
+};
 
-/** `dashed` — дефолтная зона; `solid` — как в модалках Align (сплошная обводка, фон canvas → elevated при hover). */
-export type FileUploadAppearance = "dashed" | "solid";
-
-// ─── Drop zone slots (как AlignUI FileUpload.Icon / Title / Button) ─────────
+// ─── Drop zone slots ─────────────────────────────────────────────────────────
 
 export type FileUploadIconProps = React.HTMLAttributes<HTMLSpanElement>;
 
@@ -42,8 +43,8 @@ function FileUploadIcon({ className, children, ...rest }: FileUploadIconProps) {
 FileUploadIcon.displayName = "FileUpload.Icon";
 
 export type FileUploadTitleProps = React.HTMLAttributes<HTMLParagraphElement> & {
-  /** `muted` — как `text-sub-600` в Align (строка подсказки в модалке). */
-  tone?: "default" | "muted";
+  /** `muted` — secondary text color, regular weight (instruction line in custom bodies). */
+  tone?: Extract<TextTone, "default" | "muted">;
 };
 
 function FileUploadTitle({ className, children, tone = "default", ...rest }: FileUploadTitleProps) {
@@ -60,7 +61,7 @@ export type FileUploadHintProps = React.HTMLAttributes<HTMLParagraphElement>;
 function FileUploadHint({ className, children, ...rest }: FileUploadHintProps) {
   const controlSize = useOptionalControlSize() ?? "m";
   return (
-    <Hint.Root size={controlSize as HintSize} className={className} {...rest}>
+    <Hint.Root size={controlSize} className={className} {...rest}>
       {children}
     </Hint.Root>
   );
@@ -78,7 +79,7 @@ function FileUploadBrowseLabel({ className, children, ...rest }: FileUploadBrows
 }
 FileUploadBrowseLabel.displayName = "FileUpload.BrowseLabel";
 
-/** Кнопка «browse» внутри заголовка модалки (primary + underline, не открывает picker по клику сама по себе — навесьте `onClick`). */
+/** Inline «browse» link inside a custom title; does not open the picker by itself — pass `onClick`. */
 export type FileUploadBrowseLinkProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 const FileUploadBrowseLink = React.forwardRef<HTMLButtonElement, FileUploadBrowseLinkProps>(
@@ -98,7 +99,7 @@ const FileUploadBrowseLink = React.forwardRef<HTMLButtonElement, FileUploadBrows
 );
 FileUploadBrowseLink.displayName = "FileUpload.BrowseLink";
 
-/** Обёртка для модалок: `pointer-events: none` + колонка; вложенные кнопки/ссылки с `pointer-events: auto`. */
+/** Custom body column: `pointer-events: none`; nested buttons and links get `pointer-events: auto`. */
 export type FileUploadDropBodyProps = React.HTMLAttributes<HTMLDivElement>;
 
 function FileUploadDropBody({ className, children, ...rest }: FileUploadDropBodyProps) {
@@ -110,7 +111,7 @@ function FileUploadDropBody({ className, children, ...rest }: FileUploadDropBody
 }
 FileUploadDropBody.displayName = "FileUpload.DropBody";
 
-/** Ряд чипов «My Device / Dropbox» — `pointer-events: auto`. */
+/** Row of source chips (device, cloud…) — `pointer-events: auto`. */
 export type FileUploadActionsRowProps = React.HTMLAttributes<HTMLDivElement>;
 
 function FileUploadActionsRow({ className, children, ...rest }: FileUploadActionsRowProps) {
@@ -122,7 +123,7 @@ function FileUploadActionsRow({ className, children, ...rest }: FileUploadAction
 }
 FileUploadActionsRow.displayName = "FileUpload.ActionsRow";
 
-/** Кнопка-источник внутри `Root` — останавливает всплытие к `label`, не открывает файловый диалог. */
+/** Source button inside `Root`: stops propagation to the label, does not open the file dialog. */
 export type FileUploadChipProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 const FileUploadChip = React.forwardRef<HTMLButtonElement, FileUploadChipProps>(
@@ -153,11 +154,11 @@ function FileUploadChipLabel({ className, children, ...rest }: FileUploadChipLab
 }
 FileUploadChipLabel.displayName = "FileUpload.ChipLabel";
 
-// ─── File row (блоки 01 / списки загрузки) ───────────────────────────────────
+// ─── File row ────────────────────────────────────────────────────────────────
 
 export type FileUploadFormatBadgeProps = {
   format: string;
-  color?: FileUploadFormatBadgeColor;
+  color?: PaletteColor;
   className?: string;
 };
 
@@ -176,21 +177,17 @@ function FileUploadFormatBadge({ format, color = "gray", className }: FileUpload
 FileUploadFormatBadge.displayName = "FileUpload.FormatBadge";
 
 export type FileUploadItemProps = React.HTMLAttributes<HTMLDivElement> & {
-  variant?: FileUploadItemVariant;
-  /** Типографика, отступы, бейдж формата, прогресс и иконки статуса — из того же яруса, что контролы. */
-  size?: FileUploadSize;
+  /** Failed upload: danger wash and ring, danger meta text. */
+  invalid?: boolean;
+  /** Typography, spacing, format badge and status icons follow the control tier. */
+  size?: ControlSize;
 };
 
-function FileUploadItem({
-  className,
-  variant = "default",
-  size = "m",
-  ...rest
-}: FileUploadItemProps) {
+function FileUploadItem({ className, invalid = false, size = "m", ...rest }: FileUploadItemProps) {
   return (
     <div
       className={cx(styles.item, className)}
-      {...toDataAttributes({ variant, size })}
+      {...toDataAttributes({ size, invalid: invalid || undefined })}
       {...rest}
     />
   );
@@ -219,7 +216,7 @@ function FileUploadItemMain({ className, children, ...rest }: FileUploadItemMain
 }
 FileUploadItemMain.displayName = "FileUpload.ItemMain";
 
-/** Вертикальный стек внутри `ItemMain` (колонка ошибки: текст + «Try again»). */
+/** Vertical stack inside `ItemMain` (error column: text + retry action). */
 export type FileUploadItemStackProps = React.HTMLAttributes<HTMLDivElement>;
 
 function FileUploadItemStack({ className, children, ...rest }: FileUploadItemStackProps) {
@@ -231,7 +228,7 @@ function FileUploadItemStack({ className, children, ...rest }: FileUploadItemSta
 }
 FileUploadItemStack.displayName = "FileUpload.ItemStack";
 
-/** Группа имени файла + мета-строки (`space-y-1`). */
+/** File name + meta line group. */
 export type FileUploadItemTextGroupProps = React.HTMLAttributes<HTMLDivElement>;
 
 function FileUploadItemTextGroup({ className, children, ...rest }: FileUploadItemTextGroupProps) {
@@ -326,15 +323,22 @@ FileUploadItemProgress.displayName = "FileUpload.ItemProgress";
 // ─── Root ────────────────────────────────────────────────────────────────────
 
 export type FileUploadRootProps = Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "children"> & {
-  size?: FileUploadSize;
-  appearance?: FileUploadAppearance;
-  /** Доступ к скрытому input (программный клик из модалки и т.п.). */
+  size?: ControlSize;
+  variant?: FileUploadVariant;
+  /** Access to the hidden file input (open the picker programmatically). */
   inputRef?: React.Ref<HTMLInputElement>;
   accept?: string;
   multiple?: boolean;
-  /** Блокирует выбор файлов и drag-and-drop. */
+  /** Blocks picking and drag-and-drop. */
   disabled?: boolean;
+  /** Invalid state (e.g. a rejected file): danger line and `aria-invalid` on the input. */
+  invalid?: boolean;
+  /** Name of the hidden input inside a form. */
+  name?: string;
   onFilesChange?: (files: File[]) => void;
+  /** Texts of the built-in body (used when there are no `children`). */
+  labels?: Partial<FileUploadLabels>;
+  /** Custom body; replaces the built-in icon, title, hint and browse button. */
   children?: React.ReactNode;
 };
 
@@ -342,32 +346,35 @@ const FileUploadRoot = React.forwardRef<HTMLLabelElement, FileUploadRootProps>(
   (
     {
       size = "m",
-      appearance = "dashed",
+      variant = "dashed",
       inputRef: inputRefProp,
       accept,
       multiple,
-      disabled,
+      disabled = false,
+      invalid = false,
+      name,
       onFilesChange,
+      labels: labelsProp,
       className,
       children,
       ...rest
     },
     ref,
   ) => {
+    const labels = { ...FILE_UPLOAD_LABELS, ...labelsProp };
     const [isDragOver, setIsDragOver] = React.useState(false);
     const mergeInputRef = useMergedRefs(inputRefProp);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const list = e.target.files;
-      const files = list ? Array.from(list) : [];
-      onFilesChange?.(files);
+      onFilesChange?.(list ? Array.from(list) : []);
       e.target.value = "";
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      setIsDragOver(true);
+      if (!disabled) setIsDragOver(true);
     };
 
     const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -382,21 +389,20 @@ const FileUploadRoot = React.forwardRef<HTMLLabelElement, FileUploadRootProps>(
       e.stopPropagation();
       setIsDragOver(false);
       if (!disabled) {
-        const files = Array.from(e.dataTransfer.files);
-        onFilesChange?.(files);
+        onFilesChange?.(Array.from(e.dataTransfer.files));
       }
     };
 
     const defaultBody = (
       <div className={styles.inner}>
         <FileUploadIcon>
-          <Icon name="action.upload" size={size} tone="subtle" />
+          <Icon name="action.upload" size={size} tone="secondary" />
         </FileUploadIcon>
         <div className={styles.copy}>
-          <FileUploadTitle>{"Choose a file or drag & drop it here."}</FileUploadTitle>
-          <FileUploadHint>JPEG, PNG, PDF, MP4 up to 50 MB.</FileUploadHint>
+          <FileUploadTitle>{labels.title}</FileUploadTitle>
+          {labels.hint ? <FileUploadHint>{labels.hint}</FileUploadHint> : null}
         </div>
-        <FileUploadBrowseLabel>Browse file</FileUploadBrowseLabel>
+        <FileUploadBrowseLabel>{labels.browse}</FileUploadBrowseLabel>
       </div>
     );
 
@@ -405,9 +411,13 @@ const FileUploadRoot = React.forwardRef<HTMLLabelElement, FileUploadRootProps>(
         ref={ref}
         {...rest}
         className={cx(styles.root, className)}
-        {...toDataAttributes({ size, appearance })}
-        data-dragover={isDragOver ? true : undefined}
-        data-disabled={disabled ? true : undefined}
+        {...toDataAttributes({
+          size,
+          variant,
+          state: isDragOver ? "active" : undefined,
+          invalid: invalid || undefined,
+          disabled: disabled || undefined,
+        })}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -416,11 +426,12 @@ const FileUploadRoot = React.forwardRef<HTMLLabelElement, FileUploadRootProps>(
           ref={mergeInputRef}
           type="file"
           className={styles.input}
+          name={name}
           accept={accept}
           multiple={multiple}
           onChange={handleChange}
           disabled={disabled}
-          aria-disabled={disabled || undefined}
+          aria-invalid={invalid || undefined}
         />
         <ControlSizeProvider value={size}>{children ?? defaultBody}</ControlSizeProvider>
       </label>
@@ -428,7 +439,7 @@ const FileUploadRoot = React.forwardRef<HTMLLabelElement, FileUploadRootProps>(
   },
 );
 
-FileUploadRoot.displayName = "FileUploadRoot";
+FileUploadRoot.displayName = "FileUpload.Root";
 
 export const FileUpload = {
   Root: FileUploadRoot,

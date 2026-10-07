@@ -3,31 +3,32 @@ import type * as React from "react";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { HintSize } from "@/internal/states";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Hint.module.css";
 
-export type HintVariant = "default" | "error" | "disabled";
-
-export type { HintSize };
-
 export type HintRootProps = {
-  size?: HintSize;
-  variant?: HintVariant;
+  size?: ControlSize;
+  /** Error message styling (`danger-text`). */
+  invalid?: boolean;
+  /** Dimmed text next to a disabled control. */
+  disabled?: boolean;
   children?: React.ReactNode;
   className?: string;
 } & React.HTMLAttributes<HTMLParagraphElement>;
 
-function HintRoot({
-  className,
-  size = "m",
-  variant = "default",
-  children,
-  ...rest
-}: HintRootProps) {
+function HintRoot({ className, size = "m", invalid, disabled, children, ...rest }: HintRootProps) {
   return (
     <ControlSizeProvider value={size}>
-      <p className={cx(styles.root, className)} {...rest} {...toDataAttributes({ variant, size })}>
+      <p
+        className={cx(styles.root, className)}
+        {...rest}
+        {...toDataAttributes({
+          size,
+          invalid: invalid || undefined,
+          disabled: disabled || undefined,
+        })}
+      >
         {children}
       </p>
     </ControlSizeProvider>

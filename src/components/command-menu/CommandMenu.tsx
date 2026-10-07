@@ -1,13 +1,14 @@
 import * as React from "react";
 
-import { Badge } from "@/components/badge/Badge";
-import { Modal, type ModalPanelProps, type ModalRootProps } from "@/components/modal/Modal";
-import modalShellStyles from "@/components/modal/Modal.module.css";
+import modalShellStyles from "@/components/modal/DialogParts.module.css";
+import { Modal, type ModalContentProps, type ModalRootProps } from "@/components/modal/Modal";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import scrollContainerStyles from "@/components/scroll-container/ScrollContainer.module.css";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import type { ControlSize, Variant } from "@/internal/states";
 import styles from "./CommandMenu.module.css";
 
 // ─── Filtering & item registry ───────────────────────────────────────────────
@@ -33,9 +34,25 @@ function matchesQuery(entry: ItemEntry, query: string): boolean {
   return hay.includes(q);
 }
 
+export type CommandMenuLabels = {
+  /** Default placeholder and accessible name of `CommandMenu.Input`. */
+  search: string;
+  /** `CommandMenu.Empty`: nothing matches the query. */
+  empty: string;
+  /** Second line of `CommandMenu.Empty`. */
+  emptyHint: string;
+};
+
+const COMMAND_MENU_LABELS: CommandMenuLabels = {
+  search: "Поиск",
+  empty: "Ничего не найдено",
+  emptyHint: "Попробуйте изменить запрос",
+};
+
 // ─── Context ─────────────────────────────────────────────────────────────────
 
 type CommandMenuContextValue = {
+  labels: CommandMenuLabels;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   listboxId: string;
@@ -59,7 +76,13 @@ const [CommandMenuProvider, useCommandMenuContext] =
 
 const CommandMenuGroupContext = React.createContext<string>("");
 
-function CommandMenuRootProvider({ children }: { children: React.ReactNode }) {
+function CommandMenuRootProvider({
+  labels,
+  children,
+}: {
+  labels: CommandMenuLabels;
+  children: React.ReactNode;
+}) {
   const listboxId = React.useId();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const itemsRef = React.useRef<Map<string, ItemEntry>>(new Map());
@@ -142,6 +165,7 @@ function CommandMenuRootProvider({ children }: { children: React.ReactNode }) {
 
   const value = React.useMemo(
     () => ({
+      labels,
       search,
       setSearch,
       listboxId,
@@ -154,7 +178,17 @@ function CommandMenuRootProvider({ children }: { children: React.ReactNode }) {
       activateSelected,
       inputRef,
     }),
-    [search, listboxId, activeId, registerItem, visibleIds, itemGet, moveActive, activateSelected],
+    [
+      labels,
+      search,
+      listboxId,
+      activeId,
+      registerItem,
+      visibleIds,
+      itemGet,
+      moveActive,
+      activateSelected,
+    ],
   );
 
   return <CommandMenuProvider value={value}>{children}</CommandMenuProvider>;
@@ -162,40 +196,53 @@ function CommandMenuRootProvider({ children }: { children: React.ReactNode }) {
 
 // ─── Dialog ──────────────────────────────────────────────────────────────────
 
-export type CommandMenuDialogProps = Omit<ModalRootProps, "children"> &
+export type CommandMenuDialogProps = Pick<
+  ModalRootProps,
+  "open" | "defaultOpen" | "onOpenChange" | "closeOnEscape" | "closeOnOutsideClick"
+> &
   Pick<
-    ModalPanelProps,
-    "children" | "className" | "overlayClassName" | "aria-labelledby" | "aria-describedby"
+    ModalContentProps,
+    | "children"
+    | "className"
+    | "overlayClassName"
+    | "aria-label"
+    | "aria-labelledby"
+    | "aria-describedby"
   > & {
-    /** Дополнительный класс для панели (совмещается с `className` панели). */
-    contentClassName?: string;
+    /** Tier of the list rows and the search row: item height, text, icon. Default `m`. */
+    size?: ControlSize;
+    labels?: Partial<CommandMenuLabels>;
   };
 
 function CommandMenuDialog({
   children,
   overlayClassName,
   className,
-  contentClassName,
   open,
   defaultOpen,
   onOpenChange,
   closeOnEscape = true,
-  closeOnOverlayClick = true,
+  closeOnOutsideClick = true,
+  size = "m",
+  labels: labelsProp,
+  "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
   "aria-describedby": ariaDescribedBy,
 }: CommandMenuDialogProps) {
+  const labels = React.useMemo(() => ({ ...COMMAND_MENU_LABELS, ...labelsProp }), [labelsProp]);
   return (
     <Modal.Root
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
       closeOnEscape={closeOnEscape}
-      closeOnOverlayClick={closeOnOverlayClick}
+      closeOnOutsideClick={closeOnOutsideClick}
     >
-      <Modal.Panel
+      <Modal.Content
+        aria-label={ariaLabel}
         aria-describedby={ariaDescribedBy}
         aria-labelledby={ariaLabelledBy}
-        className={cx(styles.dialogContent, styles.root, contentClassName, className)}
+        className={cx(styles.dialogContent, styles.root, className)}
         overlayClassName={cx(
           scrollContainerStyles.root,
           scrollContainerStyles.vertical,
@@ -206,64 +253,105 @@ function CommandMenuDialog({
           overlayClassName,
         )}
       >
-        <CommandMenuRootProvider>{children}</CommandMenuRootProvider>
-      </Modal.Panel>
+        {/* `display: contents`: carries the tier variables without breaking the panel's flex column. */}
+        <div className={styles.tier} data-size={size}>
+          <ControlSizeProvider value={size}>
+            <CommandMenuRootProvider labels={labels}>{children}</CommandMenuRootProvider>
+          </ControlSizeProvider>
+        </div>
+      </Modal.Content>
     </Modal.Root>
   );
 }
 
 function CommandMenuDialogTitle({ className, ...rest }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h2 className={cx(modalShellStyles.title, className)} {...rest} />;
+  return <h2 className={cx(modalShellStyles.title, styles.dialogTitle, className)} {...rest} />;
 }
 
 function CommandMenuDialogDescription({
   className,
   ...rest
 }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cx(modalShellStyles.description, className)} {...rest} />;
+  return (
+    <p
+      className={cx(modalShellStyles.description, styles.dialogDescription, className)}
+      {...rest}
+    />
+  );
 }
 
 // ─── Input row + input ───────────────────────────────────────────────────────
 
 export type CommandMenuInputRowProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Слот слева; по умолчанию — иконка поиска. `null` — без иконки. */
   leading?: React.ReactNode;
   trailing?: React.ReactNode;
-  /** `compact` — ниже строка поиска, `comfortable` — выше. */
-  density?: "compact" | "comfortable";
 };
 
+/** Search row; its height follows the Dialog `size` (taller on `l` / `xl`). */
 function CommandMenuInputRow({
   leading,
   trailing,
   children,
   className,
-  density = "compact",
   ...rest
 }: CommandMenuInputRowProps) {
   return (
-    <div
-      className={cx(
-        styles.inputRow,
-        density === "comfortable" && styles.inputRowComfortable,
-        className,
-      )}
-      {...rest}
-    >
-      {leading}
+    // The search field is the permanent focus of the palette: no ring (foundation §7).
+    <div className={cx(styles.inputRow, className)} data-focus-ring="false" {...rest}>
+      {leading === undefined ? <SearchGlyph className={styles.inputIcon} /> : leading}
       {children}
       {trailing}
     </div>
   );
 }
 
+function SearchGlyph({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+      <circle
+        cx="11"
+        cy="11"
+        r="6.5"
+        stroke="currentColor"
+        strokeWidth={1.7}
+        vectorEffect="non-scaling-stroke"
+      />
+      <path
+        d="M16 16l4 4"
+        stroke="currentColor"
+        strokeWidth={1.7}
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
 export type CommandMenuInputProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "size" | "type"
->;
+> & {
+  /** Called with the new query; native `onChange` still fires. */
+  onValueChange?: (value: string) => void;
+};
 
 const CommandMenuInput = React.forwardRef<HTMLInputElement, CommandMenuInputProps>(
-  ({ className, onKeyDown, value: valueProp, onChange, ...rest }, forwardedRef) => {
+  (
+    {
+      className,
+      onKeyDown,
+      value: valueProp,
+      onChange,
+      onValueChange,
+      placeholder,
+      "aria-label": ariaLabel,
+      ...rest
+    },
+    forwardedRef,
+  ) => {
     const {
+      labels,
       search,
       setSearch,
       listboxId,
@@ -297,6 +385,7 @@ const CommandMenuInput = React.forwardRef<HTMLInputElement, CommandMenuInputProp
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       onChange?.(e);
+      onValueChange?.(e.target.value);
       if (!isControlled) {
         setSearch(e.target.value);
       }
@@ -338,6 +427,8 @@ const CommandMenuInput = React.forwardRef<HTMLInputElement, CommandMenuInputProp
         {...rest}
         ref={setRefs}
         type="search"
+        placeholder={placeholder ?? labels.search}
+        aria-label={ariaLabel ?? (rest["aria-labelledby"] ? undefined : labels.search)}
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
@@ -392,15 +483,28 @@ function CommandMenuGroup({ heading, className, children, ...rest }: CommandMenu
   const { visibleIds, itemGet } = useCommandMenuContext();
 
   const hasVisible = visibleIds.some((id) => itemGet(id)?.groupId === groupId);
+  const hasHeading = heading !== undefined && heading !== null;
+  const headingId = `${groupId}-heading`;
 
   return (
     <CommandMenuGroupContext.Provider value={groupId}>
-      <div className={cx(styles.group, className)} hidden={hasVisible ? undefined : true} {...rest}>
-        {heading !== undefined && heading !== null ? (
+      {/* biome-ignore lint/a11y/useSemanticElements: role="group" внутри role="listbox"; <fieldset> там недопустим */}
+      <div
+        role="group"
+        aria-labelledby={hasHeading ? headingId : undefined}
+        className={cx(styles.group, className)}
+        hidden={hasVisible ? undefined : true}
+        {...rest}
+      >
+        {hasHeading ? (
           typeof heading === "string" ? (
-            <div className={styles.groupHeading}>{heading}</div>
+            <div id={headingId} className={styles.groupHeading}>
+              {heading}
+            </div>
           ) : (
-            <div className={styles.groupHeadingRich}>{heading}</div>
+            <div id={headingId} className={styles.groupHeadingRich}>
+              {heading}
+            </div>
           )
         ) : null}
         {children}
@@ -411,32 +515,19 @@ function CommandMenuGroup({ heading, className, children, ...rest }: CommandMenu
 
 // ─── Item ────────────────────────────────────────────────────────────────────
 
-export type CommandMenuItemSize = "s" | "m";
-
 export type CommandMenuItemProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "onSelect"
 > & {
-  /** Текст для фильтрации; пустая строка — пункт всегда виден при любом запросе. */
+  /** Text matched with `keywords`; with `""` the item shows only while the query is empty or `keywords` match. */
   value: string;
   keywords?: string;
-  size?: CommandMenuItemSize;
   onSelect?: () => void;
 };
 
 const CommandMenuItem = React.forwardRef<HTMLButtonElement, CommandMenuItemProps>(
   (
-    {
-      className,
-      value,
-      keywords = "",
-      disabled,
-      size = "s",
-      onSelect,
-      onClick,
-      onPointerMove,
-      ...rest
-    },
+    { className, value, keywords = "", disabled, onSelect, onClick, onPointerMove, ...rest },
     forwardedRef,
   ) => {
     const id = React.useId();
@@ -507,7 +598,6 @@ const CommandMenuItem = React.forwardRef<HTMLButtonElement, CommandMenuItemProps
         disabled={disabled}
         className={cx(styles.item, className)}
         {...toDataAttributes({
-          size,
           selected: selected ? true : undefined,
           disabled: disabled ? true : undefined,
         })}
@@ -534,7 +624,7 @@ function CommandMenuItemIcon<T extends React.ElementType = "span">({
   ...rest
 }: CommandMenuItemIconProps<T>) {
   const Comp = as ?? "span";
-  return <Comp className={cx(styles.itemIcon, className)} {...rest} />;
+  return <Comp className={cx(styles.itemIcon, className)} aria-hidden {...rest} />;
 }
 
 // ─── Секция тегов под строкой поиска ─────────────────────────────────────────
@@ -565,30 +655,91 @@ function CommandMenuFooter({ className, ...rest }: CommandMenuFooterProps) {
   return <div className={cx(styles.footer, className)} {...rest} />;
 }
 
-export type CommandMenuFooterKeyBoxProps = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
-  /** На футере с `footerMuted` — бейдж `lighter`, иначе `stroke` (контур). */
-  tone?: "default" | "muted";
+export type CommandMenuFooterKeyBoxProps = Omit<React.HTMLAttributes<HTMLElement>, "color"> & {
+  /** `soft` — клавиша на мягкой подложке (по умолчанию), `ghost` — только текст. */
+  variant?: Extract<Variant, "soft" | "ghost">;
 };
 
-const CommandMenuFooterKeyBox = React.forwardRef<HTMLDivElement, CommandMenuFooterKeyBoxProps>(
-  ({ className, children, tone = "default", ...rest }, ref) => {
-    const variant = tone === "muted" ? "lighter" : "stroke";
-    return (
-      <Badge.Root
-        ref={ref}
-        variant={variant}
-        color="gray"
-        size="s"
-        className={cx(styles.footerKeyBadge, className)}
-        {...rest}
-      >
-        <Badge.Icon>{children}</Badge.Icon>
-      </Badge.Root>
-    );
-  },
+/** Клавиша в подсказках футера (стиль Kbd). */
+const CommandMenuFooterKeyBox = React.forwardRef<HTMLElement, CommandMenuFooterKeyBoxProps>(
+  ({ className, variant = "soft", ...rest }, ref) => (
+    <kbd
+      ref={ref}
+      className={cx(styles.key, className)}
+      {...toDataAttributes({ variant })}
+      {...rest}
+    />
+  ),
 );
 
 CommandMenuFooterKeyBox.displayName = "CommandMenu.FooterKeyBox";
+
+export type CommandMenuFooterHintProps = React.HTMLAttributes<HTMLSpanElement> & {
+  /** Клавиши (строки или иконки), каждая — отдельный `FooterKeyBox`. */
+  keys: React.ReactNode[];
+};
+
+/** Подсказка футера: клавиши + подпись («↑ ↓ Навигация»). */
+function CommandMenuFooterHint({ keys, children, className, ...rest }: CommandMenuFooterHintProps) {
+  return (
+    <span className={cx(styles.footerHintItem, className)} {...rest}>
+      {keys.map((k, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: статичный список клавиш
+        <CommandMenuFooterKeyBox key={i}>{k}</CommandMenuFooterKeyBox>
+      ))}
+      <span className={styles.footerHint}>{children}</span>
+    </span>
+  );
+}
+
+// ─── Empty ───────────────────────────────────────────────────────────────────
+
+export type CommandMenuEmptyProps = React.HTMLAttributes<HTMLDivElement>;
+
+/**
+ * Пустое состояние: показывается, только когда по запросу нет ни одного пункта.
+ * Текст — `labels.empty` / `labels.emptyHint` у Dialog; `children` — действие под ним.
+ */
+function CommandMenuEmpty({ children, className, ...rest }: CommandMenuEmptyProps) {
+  const { visibleIds, labels } = useCommandMenuContext();
+  if (visibleIds.length > 0) return null;
+  return (
+    <div role="status" className={cx(styles.empty, className)} {...rest}>
+      <span className={styles.emptyText}>{labels.empty}</span>
+      {labels.emptyHint ? <span className={styles.emptyHint}>{labels.emptyHint}</span> : null}
+      {children}
+    </div>
+  );
+}
+
+// ─── Item parts ──────────────────────────────────────────────────────────────
+
+export type CommandMenuItemShortcutProps = React.HTMLAttributes<HTMLElement>;
+
+/** Сочетание клавиш справа в пункте (приглушённый Kbd). */
+function CommandMenuItemShortcut({ className, ...rest }: CommandMenuItemShortcutProps) {
+  return <kbd className={cx(styles.itemShortcut, className)} {...rest} />;
+}
+
+export type CommandMenuItemTextProps = React.HTMLAttributes<HTMLSpanElement> & {
+  /** Вторая строка (путь, описание) — caption, muted. */
+  description?: React.ReactNode;
+};
+
+/** Текст пункта: заголовок с многоточием + необязательное описание. */
+function CommandMenuItemText({
+  description,
+  children,
+  className,
+  ...rest
+}: CommandMenuItemTextProps) {
+  return (
+    <span className={cx(styles.itemText, className)} {...rest}>
+      <span className={styles.itemLabel}>{children}</span>
+      {description ? <span className={styles.itemDescription}>{description}</span> : null}
+    </span>
+  );
+}
 
 // ─── Namespace ───────────────────────────────────────────────────────────────
 
@@ -602,9 +753,13 @@ export const CommandMenu = {
   Group: CommandMenuGroup,
   Item: CommandMenuItem,
   ItemIcon: CommandMenuItemIcon,
+  ItemText: CommandMenuItemText,
+  ItemShortcut: CommandMenuItemShortcut,
+  Empty: CommandMenuEmpty,
   TagSection: CommandMenuTagSection,
   TagSectionLabel: CommandMenuTagSectionLabel,
   TagRow: CommandMenuTagRow,
   Footer: CommandMenuFooter,
   FooterKeyBox: CommandMenuFooterKeyBox,
+  FooterHint: CommandMenuFooterHint,
 };

@@ -15,6 +15,7 @@
     "**/*.spec.ts",
     "**/*.spec.tsx",
     "src/test/**",
+    "src/**/examples/**",
     "tokens/**/*.d.ts"
   ]
 }

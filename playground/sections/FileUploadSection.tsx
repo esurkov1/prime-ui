@@ -1,4 +1,17 @@
+import FileUploadAvatarUploadExample from "@/components/file-upload/examples/avatar-upload";
+import avatarSource from "@/components/file-upload/examples/avatar-upload.tsx?raw";
+import FileUploadFileListExample from "@/components/file-upload/examples/file-list";
+import controlledSource from "@/components/file-upload/examples/file-list.tsx?raw";
+import FileUploadInCardExample from "@/components/file-upload/examples/in-card";
+import compositionSource from "@/components/file-upload/examples/in-card.tsx?raw";
+import FileUploadSizesExample from "@/components/file-upload/examples/sizes";
+import sizesSource from "@/components/file-upload/examples/sizes.tsx?raw";
+import FileUploadStatesExample from "@/components/file-upload/examples/states";
+import statesSource from "@/components/file-upload/examples/states.tsx?raw";
+import FileUploadVariantsExample from "@/components/file-upload/examples/variants";
+import variantsSource from "@/components/file-upload/examples/variants.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,24 +19,6 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import FileUploadAvatarRowsSnippet from "../snippets/file-upload/avatar-rows";
-import avatarRowsSource from "../snippets/file-upload/avatar-rows.tsx?raw";
-import FileUploadCircleModalSnippet from "../snippets/file-upload/circle-modal";
-import circleModalSource from "../snippets/file-upload/circle-modal.tsx?raw";
-import FileUploadCompositionSnippet from "../snippets/file-upload/composition";
-import compositionSource from "../snippets/file-upload/composition.tsx?raw";
-import FileUploadControlledSnippet from "../snippets/file-upload/controlled";
-import controlledSource from "../snippets/file-upload/controlled.tsx?raw";
-import FileUploadCustomChildrenSnippet from "../snippets/file-upload/custom-children";
-import customChildrenSource from "../snippets/file-upload/custom-children.tsx?raw";
-import FileUploadFullWidthSnippet from "../snippets/file-upload/full-width";
-import fullWidthSource from "../snippets/file-upload/full-width.tsx?raw";
-import FileUploadSizesSnippet from "../snippets/file-upload/sizes";
-import sizesUploadSource from "../snippets/file-upload/sizes.tsx?raw";
-import FileUploadStatesSnippet from "../snippets/file-upload/states";
-import statesSource from "../snippets/file-upload/states.tsx?raw";
-import FileUploadVariantsSnippet from "../snippets/file-upload/variants";
-import variantsSource from "../snippets/file-upload/variants.tsx?raw";
 import {
   fileUploadActionsRowApiRows,
   fileUploadBrowseLabelApiRows,
@@ -56,15 +51,11 @@ export default function FileUploadSection() {
       <PageContent.Header>
         <PageContent.Title>FileUpload</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Набор блоков для выбора файлов: зона перетаскивания с нативным диалогом, карточки уже
-              выбранных файлов с прогрессом и статусом, чипы дополнительных источников. Размеры{" "}
-              <code>s</code> · <code>m</code> · <code>l</code> · <code>xl</code> согласованы между
-              зоной и карточкой; у карточки задавайте тот же <code>size</code>, что у кнопок
-              действий рядом.
-            </>
-          }
+          Зона выбора файлов: <code>label</code> со скрытым <code>input type=&quot;file&quot;</code>
+          , клик открывает системный диалог, файлы можно перетащить. Результат приходит в{" "}
+          <code>onFilesChange(File[])</code>; список, загрузку на сервер и прогресс ведёт
+          приложение, а строки файлов собираются из презентационных слотов{" "}
+          <code>FileUpload.Item</code>.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -72,31 +63,30 @@ export default function FileUploadSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Сетка <code>FileUpload.Root</code> и ряд карточек <code>FileUpload.Item</code> с{" "}
-              <code>size</code> <code>s</code> → <code>xl</code>; внутри карточки —{" "}
-              <code>FormatBadge</code>, строка имени с индикатором загрузки и{" "}
-              <code>ItemProgress</code> с <code>value</code>.
+              <code>size</code> <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> ·{" "}
+              <code>xl</code> у зоны (поля, радиус, круг иконки и кнопка «Выбрать» высотой контрола)
+              и у строки файла (кегль, бейдж формата). Зона и строка всегда тянутся на ширину
+              родителя.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={sizesUploadSource.trim()}
-              previewLayout="stack-center"
-            >
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <FileUploadSizesSnippet />
+                <FileUploadSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Варианты</DemoSectionTitle>
+            <DemoSectionTitle>Оформление зоны и поверхности</DemoSectionTitle>
             <DemoDescription>
-              У корня — <code>appearance=&quot;dashed&quot;</code> и <code>&quot;solid&quot;</code>
-              {";"} у карточки — <code>variant=&quot;default&quot;</code> и{" "}
-              <code>&quot;error&quot;</code>.
+              <code>variant=&quot;dashed&quot;</code> (по умолчанию) — заливка поля и пунктир;{" "}
+              <code>&quot;solid&quot;</code> — только заливка, для карточек и модалок. Заливка
+              следует контексту поля: белая на холсте, серая внутри карточки и всплывающей панели.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={variantsSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <FileUploadVariantsSnippet />
+                <SurfaceGallery surfaces={["canvas", "surface", "raised"]}>
+                  <FileUploadVariantsExample />
+                </SurfaceGallery>
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -104,92 +94,60 @@ export default function FileUploadSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Активная и <code>disabled</code> зона; карточки с прогрессом, успехом и ошибкой (
-              <code>ItemTryAgain</code>). Подсветка при перетаскивании файла на зону —{" "}
-              <code>data-dragover</code> на корне (проверьте в браузере).
+              Зона: наведите курсор — заливка темнеет; Tab — кольцо фокуса по внутреннему краю зоны,
+              Enter или пробел открывают диалог; перетащите файл из системы — зона получает{" "}
+              <code>data-state=&quot;active&quot;</code> и подсвечивается акцентом;{" "}
+              <code>disabled</code> — приглушённая заливка, drop игнорируется. Строки файла:
+              загрузка с <code>ItemProgress</code>, готовый файл с действием, ошибка —{" "}
+              <code>invalid</code> и <code>ItemTryAgain</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={statesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <FileUploadStatesSnippet />
+                <FileUploadStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoSectionTitle>Список выбранных файлов</DemoSectionTitle>
             <DemoDescription>
-              Список выбранных файлов в состоянии React: <code>onFilesChange</code>,{" "}
-              <code>multiple</code>, <code>accept</code>; сброс списка отдельной кнопкой.
+              <code>multiple</code> + <code>accept</code>; каждый вызов <code>onFilesChange</code>{" "}
+              дописывает файлы в состояние, строки удаляются кнопкой. Значение input сбрасывается
+              после выбора, поэтому тот же файл можно добавить снова.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={controlledSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <FileUploadControlledSnippet />
+                <FileUploadFileListExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoSectionTitle>Композиция: документы к заявке</DemoSectionTitle>
             <DemoDescription>
-              <code>DropBody</code> с <code>Title tone=&quot;muted&quot;</code> и{" "}
-              <code>BrowseLink</code>, ряд <code>Chip</code> / <code>ChipLabel</code>;{" "}
-              <code>inputRef</code> для программного открытия диалога с кнопок-источников.
+              Зона <code>solid</code> в карточке со своим телом: <code>DropBody</code>,{" "}
+              <code>Title tone=&quot;muted&quot;</code> со ссылкой <code>BrowseLink</code> и чипы
+              источников <code>ActionsRow</code> / <code>Chip</code>. Вложенные кнопки не всплывают
+              к <code>label</code>, поэтому диалог открывается через общий{" "}
+              <code>inputRef.current?.click()</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={compositionSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <FileUploadCompositionSnippet />
+                <FileUploadInCardExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoSectionTitle>Загрузка аватара</DemoSectionTitle>
             <DemoDescription>
-              Зона растягивается на ширину родителя (<code>width: 100%</code> у <code>Root</code>) —
-              типично для формы в колонке.
+              Круглая зона вокруг <code>Avatar</code> принимает только изображения (
+              <code>accept</code>), превью — через <code>URL.createObjectURL</code>. Кнопки рядом
+              открывают тот же input через <code>inputRef</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={avatarSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <FileUploadFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи: свой контент и accept</DemoSectionTitle>
-            <DemoDescription>
-              Замена стандартного тела зоны через <code>children</code> и ограничение типов файлов{" "}
-              <code>accept=&quot;image/*&quot;</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={customChildrenSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <FileUploadCustomChildrenSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи: круглая зона</DemoSectionTitle>
-            <DemoDescription>
-              Круглый контейнер через CSS, <code>DropBody</code>, общий <code>inputRef</code> с
-              внешней кнопкой «Загрузить фото».
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={circleModalSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <FileUploadCircleModalSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи: список с аватаром</DemoSectionTitle>
-            <DemoDescription>
-              Строка настроек профиля рядом с <code>Avatar</code> и кнопками — без отдельной зоны
-              FileUpload (кнопки можно связать с общим <code>inputRef</code> в продукте).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={avatarRowsSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <FileUploadAvatarRowsSnippet />
+                <FileUploadAvatarUploadExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -216,7 +174,7 @@ export default function FileUploadSection() {
             <PlaygroundApiTable rows={fileUploadHintApiRows} />
             <DemoApiTitle>FileUpload.BrowseLabel</DemoApiTitle>
             <DemoDescription>
-              Стилизованная подпись «Browse» (pointer-events: none на зоне).
+              Декоративная кнопка «Выбрать» того же яруса; кликабельна вся зона.
             </DemoDescription>
             <PlaygroundApiTable rows={fileUploadBrowseLabelApiRows} />
             <DemoApiTitle>FileUpload.BrowseLink</DemoApiTitle>
@@ -226,7 +184,8 @@ export default function FileUploadSection() {
             <PlaygroundApiTable rows={fileUploadBrowseLinkApiRows} />
             <DemoApiTitle>FileUpload.DropBody</DemoApiTitle>
             <DemoDescription>
-              Колонка для модальных композиций; ослабляет pointer-events на зоне.
+              Колонка своего тела зоны с отступами яруса; pointer-events: none, вложенные кнопки
+              включают их обратно.
             </DemoDescription>
             <PlaygroundApiTable rows={fileUploadDropBodyApiRows} />
             <DemoApiTitle>FileUpload.ActionsRow</DemoApiTitle>
@@ -244,7 +203,10 @@ export default function FileUploadSection() {
             <DemoDescription>Бейдж расширения файла на карточке.</DemoDescription>
             <PlaygroundApiTable rows={fileUploadFormatBadgeApiRows} />
             <DemoApiTitle>FileUpload.Item</DemoApiTitle>
-            <DemoDescription>Карточка одного файла в списке.</DemoDescription>
+            <DemoDescription>
+              Строка одного файла: прозрачная подложка <code>fill-subtle</code>, работает на любой
+              поверхности. Ширину задаёт контейнер.
+            </DemoDescription>
             <PlaygroundApiTable rows={fileUploadItemApiRows} />
             <DemoApiTitle>FileUpload.ItemRow</DemoApiTitle>
             <DemoDescription>Горизонтальный ряд: бейдж, основной блок, действия.</DemoDescription>
@@ -253,7 +215,7 @@ export default function FileUploadSection() {
             <DemoDescription>Правая колонка с текстом и метаданными.</DemoDescription>
             <PlaygroundApiTable rows={fileUploadItemMainApiRows} />
             <DemoApiTitle>FileUpload.ItemStack</DemoApiTitle>
-            <DemoDescription>Вертикальный стек для ошибки и «Try again».</DemoDescription>
+            <DemoDescription>Вертикальный стек для ошибки и «Попробовать снова».</DemoDescription>
             <PlaygroundApiTable rows={fileUploadItemStackApiRows} />
             <DemoApiTitle>FileUpload.ItemTextGroup</DemoApiTitle>
             <DemoDescription>Группа имени и мета-строки.</DemoDescription>

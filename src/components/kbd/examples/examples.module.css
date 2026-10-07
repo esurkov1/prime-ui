@@ -1,0 +1,67 @@
+.stack {
+  display: grid;
+  gap: var(--prime-space-4);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-3);
+}
+
+.sizeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--prime-space-6);
+}
+
+.sizeCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.chord {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+/* Keys of one chord inside a control: tighter than the control gap. */
+.keys {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+.field {
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+}
+
+.list {
+  display: grid;
+  gap: var(--prime-space-3);
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+  margin: 0;
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+}
+
+.listRow dd {
+  margin: 0;
+}

@@ -1,0 +1,44 @@
+/* Layout for the Divider examples: layout only, text goes through Typography. */
+
+.column {
+  display: grid;
+  gap: var(--prime-space-6);
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+}
+
+.group {
+  display: grid;
+  gap: var(--prime-space-2);
+}
+
+.lineSpacingColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  width: fit-content;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+  padding-block: var(--prime-space-3);
+}
+
+.stack {
+  display: grid;
+  gap: var(--prime-space-3);
+}

@@ -10,7 +10,7 @@ describe("Breadcrumb", () => {
         <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
       </Breadcrumb.Root>,
     );
-    expect(screen.getByRole("navigation", { name: "Breadcrumb" })).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Навигационная цепочка" })).toBeInTheDocument();
     expect(screen.getByRole("list")).toBeInTheDocument();
   });
 
@@ -73,7 +73,18 @@ describe("Breadcrumb", () => {
         <Breadcrumb.Ellipsis />
       </Breadcrumb.Root>,
     );
-    expect(screen.getByText("…")).toBeInTheDocument();
+    expect(screen.getByText("…")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByText("Скрытые разделы")).toBeInTheDocument();
+  });
+
+  it("uses labels overrides", () => {
+    render(
+      <Breadcrumb.Root labels={{ nav: "Breadcrumbs", ellipsis: "More" }}>
+        <Breadcrumb.Ellipsis />
+      </Breadcrumb.Root>,
+    );
+    expect(screen.getByRole("navigation", { name: "Breadcrumbs" })).toBeInTheDocument();
+    expect(screen.getByText("More")).toBeInTheDocument();
   });
 
   it("merges className on Root", () => {
@@ -82,7 +93,7 @@ describe("Breadcrumb", () => {
         <Breadcrumb.Item href="/">H</Breadcrumb.Item>
       </Breadcrumb.Root>,
     );
-    expect(screen.getByRole("navigation", { name: "Breadcrumb" })).toHaveClass("crumbs");
+    expect(screen.getByRole("navigation", { name: "Навигационная цепочка" })).toHaveClass("crumbs");
   });
 
   it("sets data-size on Root and passes size to links", () => {
@@ -95,5 +106,34 @@ describe("Breadcrumb", () => {
     expect(nav).toHaveAttribute("data-size", "l");
     const link = screen.getByRole("link", { name: "A" });
     expect(link).toHaveAttribute("data-size", "l");
+  });
+  it("marks long paths as collapsible and inserts a hidden auto ellipsis", () => {
+    const { container } = render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Separator />
+        <Breadcrumb.Item href="/a">A</Breadcrumb.Item>
+        <Breadcrumb.Separator />
+        <Breadcrumb.Item current>Current</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    const nav = screen.getByRole("navigation", { name: "Навигационная цепочка" });
+    expect(nav).toHaveAttribute("data-collapsible", "true");
+    expect(container.querySelectorAll("li")).toHaveLength(7);
+    expect(screen.getByRole("link", { name: "A" })).toBeInTheDocument();
+  });
+
+  it("does not collapse short paths", () => {
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Separator />
+        <Breadcrumb.Item current>Current</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    expect(screen.getByRole("navigation", { name: "Навигационная цепочка" })).toHaveAttribute(
+      "data-collapsible",
+      "false",
+    );
   });
 });

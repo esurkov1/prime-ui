@@ -43,6 +43,14 @@ describe("ProgressBar", () => {
     expect(screen.getByRole("progressbar")).toHaveAttribute("value", expected);
   });
 
+  it("defaults data-tone to accent and reflects tone", () => {
+    const { rerender } = render(<ProgressBar.Root value={40} />);
+    const root = () => screen.getByRole("progressbar").parentElement;
+    expect(root()).toHaveAttribute("data-tone", "accent");
+    rerender(<ProgressBar.Root value={40} tone="danger" />);
+    expect(root()).toHaveAttribute("data-tone", "danger");
+  });
+
   it("merges className on root", () => {
     render(<ProgressBar.Root value={5} className="custom-bar" />);
     expect(screen.getByRole("progressbar").parentElement).toHaveClass("custom-bar");

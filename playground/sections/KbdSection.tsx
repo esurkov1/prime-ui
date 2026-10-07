@@ -1,4 +1,13 @@
+import KbdInControlsExample from "@/components/kbd/examples/in-controls";
+import inControlsSource from "@/components/kbd/examples/in-controls.tsx?raw";
+import KbdModifierKeysExample from "@/components/kbd/examples/modifier-keys";
+import modifierKeysSource from "@/components/kbd/examples/modifier-keys.tsx?raw";
+import KbdShortcutListExample from "@/components/kbd/examples/shortcut-list";
+import shortcutListSource from "@/components/kbd/examples/shortcut-list.tsx?raw";
+import KbdSizesExample from "@/components/kbd/examples/sizes";
+import sizesSource from "@/components/kbd/examples/sizes.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,23 +15,15 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import KbdCompositionSnippet from "../snippets/kbd/composition";
-import compositionSource from "../snippets/kbd/composition.tsx?raw";
-import KbdInheritSizeSnippet from "../snippets/kbd/inherit-size";
-import inheritSizeSource from "../snippets/kbd/inherit-size.tsx?raw";
-import KbdSizesSnippet from "../snippets/kbd/sizes";
-import sizesSource from "../snippets/kbd/sizes.tsx?raw";
-import KbdStatesSnippet from "../snippets/kbd/states";
-import statesSource from "../snippets/kbd/states.tsx?raw";
 
 const kbdRootApiRows = [
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: "контекст или «m»",
     required: "Нет",
     description:
-      "Номинальный размер (ритм как у полей ввода). Без пропа: из ближайшего ControlSizeProvider, иначе «m»; для контекста «xs» используется «s».",
+      "Ярус бейджа: высота 16 · 20 · 24 · 28 · 32. Без пропа внутри контрола — на ступень ниже его размера (m → s), вне контрола — «m». data-size — размер контрола, data-tier — визуальный ярус.",
   },
   {
     prop: "className",
@@ -36,7 +37,7 @@ const kbdRootApiRows = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Да",
-    description: "Подпись клавиши, иконка, сочетание символов или смешанная разметка.",
+    description: "Подпись клавиши или иконка (размер иконки — по ярусу клавиши).",
   },
   {
     prop: "…rest",
@@ -53,14 +54,9 @@ export default function KbdSection() {
       <PageContent.Header>
         <PageContent.Title>Kbd</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Подпись для одной клавиши или шага сочетания: компактная «плашка» с рамкой и лёгкой
-              тенью. Размеры <code>s</code>–<code>xl</code> согласованы с контролами; без{" "}
-              <code>size</code> масштаб подхватывается из <code>ControlSizeProvider</code> (как у
-              полей и кнопок). Внутрь можно положить текст и иконки из кита.
-            </>
-          }
+          Подпись клавиши: нативный <code>&lt;kbd&gt;</code>, моноширинный шрифт на полупрозрачной
+          утопленной подложке без обводки. Размеры <code>xs</code>–<code>xl</code> — ярусы бейджа;
+          внутри кнопки, поля или пункта меню клавиша сама берёт ярус на ступень ниже контрола.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -68,27 +64,45 @@ export default function KbdSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Ряд <code>Kbd.Root</code> с явным <code>size</code>: <code>s</code>, <code>m</code>,{" "}
-              <code>l</code>, <code>xl</code>.
+              <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> · <code>xl</code> —
+              высота 16 · 20 · 24 · 28 · 32, по умолчанию <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <KbdSizesSnippet />
+                <KbdSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Состояния</DemoSectionTitle>
+            <DemoSectionTitle>Внутри кнопки и поля</DemoSectionTitle>
             <DemoDescription>
-              Отдельных пропов вроде <code>disabled</code> нет: это не кнопка, а подсказка по
-              клавише. Ниже — обычный элемент и вариант с <code>title</code> (нативная всплывающая
-              подсказка); при необходимости можно передать <code>hidden</code>,{" "}
-              <code>aria-hidden</code> и другие атрибуты через разметку.
+              Без <code>size</code> клавиша следует ярусу контрола на ступень ниже: в кнопке{" "}
+              <code>s</code> — <code>xs</code>, в <code>m</code> — <code>s</code>, в <code>l</code>{" "}
+              — <code>m</code>. Явный <code>size</code> перекрывает контекст.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={inControlsSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <KbdStatesSnippet />
+                <KbdInControlsExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Состояния и поверхности</DemoSectionTitle>
+            <DemoDescription>
+              Пропов <code>disabled</code> или <code>loading</code> нет — это подпись, а не контрол.
+              Для символов ⌘ ⌥ ⇧ добавьте <code>aria-label</code> или <code>title</code>. Подложка
+              полупрозрачная и читается на любой поверхности.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={modifierKeysSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <SurfaceGallery>
+                  <KbdModifierKeysExample />
+                </SurfaceGallery>
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -96,29 +110,15 @@ export default function KbdSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
-              Несколько <code>Kbd.Root</code> в одной строке для сочетания (между ними — обычный
-              текст или <code>span</code> с <code>aria-hidden</code>). Во втором ряду — иконка{" "}
-              <code>Icon</code> и подпись внутри одного <code>Kbd.Root</code> при{" "}
-              <code>size="m"</code>.
+              Справка по горячим клавишам: сочетание — по одному <code>Kbd.Root</code> на клавишу,
+              иконка и текст могут стоять в одной клавише.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={shortcutListSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <KbdCompositionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Наследование размера из контекста</DemoSectionTitle>
-            <DemoDescription>
-              Если <code>size</code> не задан, используется ближайший{" "}
-              <code>ControlSizeProvider</code> (типично внутри поля, кнопки или блока формы). Явный{" "}
-              <code>size</code> на <code>Kbd.Root</code> перекрывает контекст. Значение контекста{" "}
-              <code>xs</code> приводится к размеру клавиши <code>s</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={inheritSizeSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <KbdInheritSizeSnippet />
+                <KbdShortcutListExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -127,8 +127,7 @@ export default function KbdSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Kbd.Root</DemoApiTitle>
             <DemoDescription>
-              Семантический элемент <code>kbd</code> с оформлением кита; дочерним элементам доступен
-              контекст размера для иконок.
+              Семантический <code>kbd</code>; передаёт ярус вложенным иконкам.
             </DemoDescription>
             <PlaygroundApiTable rows={[...kbdRootApiRows]} />
           </div>

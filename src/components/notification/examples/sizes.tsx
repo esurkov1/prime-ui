@@ -1,53 +1,29 @@
-import { NotificationCard, NotificationProvider, type NotificationRecord } from "prime-ui-kit";
+/** Sizes xs–xl change padding, icon and text of the card; pass `size` to `notify()` or to a static record. Use smaller sizes for dense apps, larger ones for touch screens. */
+import { type ControlSize, NotificationCard, type NotificationRecord } from "prime-ui-kit";
 
-function demoItem(
-  overrides: Partial<NotificationRecord> & Pick<NotificationRecord, "id" | "size">,
-): NotificationRecord {
-  return {
-    type: "info",
-    title: `Size ${overrides.size}`,
-    description: "Same type and copy; only the card scale changes.",
-    position: "top-right",
-    duration: 60000,
-    persistent: true,
-    closable: false,
-    createdAt: Date.now(),
-    ...overrides,
-  };
-}
+import styles from "./examples.module.css";
 
-function SizesDemo() {
-  const sizes = (["s", "m", "l"] as const).map((size) =>
-    demoItem({ id: `demo-size-${size}`, size, title: `Size ${size}` }),
-  );
+const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
 
+const card = (size: ControlSize): NotificationRecord => ({
+  id: `sizes-${size}`,
+  tone: "info",
+  title: `Размер ${size}`,
+  description: "Меняются отступы, иконка и текст карточки.",
+  position: "top-right",
+  size,
+  duration: 0,
+  persistent: true,
+  closable: true,
+  createdAt: 0,
+});
+
+export default function NotificationSizesExample() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-m)",
-        maxWidth: 420,
-      }}
-    >
-      {sizes.map((item) => (
-        <NotificationCard
-          key={item.id}
-          item={item}
-          paused={false}
-          onDismiss={() => {}}
-          stackDepth={0}
-          stackExpanded
-        />
+    <div className={styles.cards}>
+      {sizes.map((size) => (
+        <NotificationCard key={size} item={card(size)} paused onDismiss={() => {}} />
       ))}
     </div>
-  );
-}
-
-export default function SizesExample() {
-  return (
-    <NotificationProvider>
-      <SizesDemo />
-    </NotificationProvider>
   );
 }

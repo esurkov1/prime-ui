@@ -1,127 +1,123 @@
 /*
- * Номинальный `data-size` = размер родителя.
- * Визуальный ярус на ступень ниже: s→xs, m→xs, l→s, xl→m.
+ * Divider — a hairline in `--prime-color-border-subtle`, optionally with content.
+ * `data-size` follows the surrounding content tier: each tier has its own label type, gap and icon
+ * from the control tier tokens, so xs → xl step visibly:
+ *   xs 12/16 · gap 4 · icon 14   s 12/16 · gap 8 · icon 16   m 13/20 · gap 8 · icon 16
+ *   l 14/20 · gap 8 · icon 20    xl 16/24 · gap 12 · icon 20
  */
 .root {
+  --divider-gap: var(--prime-control-m-gap);
+  --divider-icon: var(--prime-control-m-icon);
+  --divider-text: var(--prime-control-m-label-size);
+  --divider-lh: var(--prime-control-m-label-line-height);
+  --divider-tracking: normal;
+
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: var(--prime-divider-gap);
-  color: var(--prime-sys-color-content-secondary);
-  box-sizing: border-box;
+  gap: var(--divider-gap);
+  color: var(--prime-color-text-muted);
+  font-size: var(--divider-text);
+  line-height: var(--divider-lh);
+  letter-spacing: var(--divider-tracking);
+}
+
+.root[data-size="xs"] {
+  --divider-gap: var(--prime-control-xs-gap);
+  --divider-icon: var(--prime-control-xs-icon);
+  --divider-text: var(--prime-control-xs-label-size);
+  --divider-lh: var(--prime-control-xs-label-line-height);
+  --divider-tracking: var(--prime-text-caption-tracking);
 }
 
 .root[data-size="s"] {
-  --prime-divider-gap: var(--prime-sys-size-control-xs-gap);
-  --prime-divider-icon: var(--prime-sys-size-control-xs-icon);
-  --prime-divider-inline-pad: var(--prime-sys-size-control-xs-buttonPaddingX);
-  --prime-divider-align-stub: var(--prime-sys-size-control-xs-buttonPaddingX);
-  --prime-divider-label-font-size: var(--prime-sys-size-control-xs-text);
-  --prime-divider-label-line-height: var(--prime-sys-typography-lineHeightScale-2xs);
-}
-
-.root[data-size="m"] {
-  --prime-divider-gap: var(--prime-sys-size-control-xs-gap);
-  --prime-divider-icon: var(--prime-sys-size-control-xs-icon);
-  --prime-divider-inline-pad: var(--prime-sys-size-control-xs-buttonPaddingX);
-  --prime-divider-align-stub: var(--prime-sys-size-control-xs-buttonPaddingX);
-  --prime-divider-label-font-size: var(--prime-sys-size-control-xs-text);
-  --prime-divider-label-line-height: var(--prime-sys-typography-lineHeightScale-2xs);
+  --divider-gap: var(--prime-control-s-gap);
+  --divider-icon: var(--prime-control-s-icon);
+  --divider-text: var(--prime-control-s-label-size);
+  --divider-lh: var(--prime-control-s-label-line-height);
+  --divider-tracking: var(--prime-text-caption-tracking);
 }
 
 .root[data-size="l"] {
-  --prime-divider-gap: var(--prime-sys-size-control-s-gap);
-  --prime-divider-icon: var(--prime-sys-size-control-s-icon);
-  --prime-divider-inline-pad: var(--prime-sys-size-control-s-buttonPaddingX);
-  --prime-divider-align-stub: var(--prime-sys-size-control-s-buttonPaddingX);
-  --prime-divider-label-font-size: var(--prime-sys-size-control-s-text);
-  --prime-divider-label-line-height: var(--prime-sys-typography-lineHeightScale-xs);
+  --divider-gap: var(--prime-control-l-gap);
+  --divider-icon: var(--prime-control-l-icon);
+  --divider-text: var(--prime-control-l-label-size);
+  --divider-lh: var(--prime-control-l-label-line-height);
 }
 
 .root[data-size="xl"] {
-  --prime-divider-gap: var(--prime-sys-size-control-m-gap);
-  --prime-divider-icon: var(--prime-sys-size-control-m-icon);
-  --prime-divider-inline-pad: var(--prime-sys-size-control-m-buttonPaddingX);
-  --prime-divider-align-stub: var(--prime-sys-size-control-m-buttonPaddingX);
-  --prime-divider-label-font-size: var(--prime-sys-size-control-m-text);
-  --prime-divider-label-line-height: var(--prime-sys-typography-lineHeightScale-s);
+  --divider-gap: var(--prime-control-xl-gap);
+  --divider-icon: var(--prime-control-xl-icon);
+  --divider-text: var(--prime-control-xl-text-size);
+  --divider-lh: var(--prime-control-xl-line-height);
 }
 
-/* В колонке flex (меню, карточки) тянем линию на всю ширину ряда */
+/* Horizontal dividers span the row inside flex columns (menus, cards). */
 .root:not([data-orientation="vertical"]) {
   width: 100%;
   min-width: 0;
 }
 
-.content {
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--prime-divider-gap);
-}
-
 .root::before,
 .root::after {
   content: "";
-  flex: 1;
-  height: var(--prime-sys-unit-1px);
-  background: var(--prime-sys-color-border-subtle);
+  flex: 1 1 0;
+  height: var(--prime-border-width);
+  background: var(--prime-color-border-subtle);
 }
 
+/* Start/end: the label sits flush with the content edge, the line takes the rest. */
 .root[data-align="start"]::before {
-  flex: 0 0 var(--prime-divider-align-stub);
+  display: none;
 }
 
 .root[data-align="end"]::after {
-  flex: 0 0 var(--prime-divider-align-stub);
+  display: none;
+}
+
+/* No content: one line, no gap. */
+.root:empty {
+  gap: 0;
 }
 
 .root:empty::before {
-  flex: 1;
+  flex: 1 1 0;
 }
 
 .root:empty::after {
   display: none;
 }
 
-.root:empty {
-  gap: 0;
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--divider-gap);
+  min-width: 0;
+  font-weight: var(--prime-font-weight-medium);
+  overflow-wrap: anywhere;
 }
 
 .root[data-orientation="vertical"] {
   flex-direction: column;
-  width: var(--prime-sys-unit-1px);
-  height: 100%;
+  align-self: stretch;
+  width: var(--prime-border-width);
+  height: auto;
 }
 
 .root[data-orientation="vertical"]::before,
 .root[data-orientation="vertical"]::after {
-  width: var(--prime-sys-unit-1px);
+  width: var(--prime-border-width);
   height: auto;
-  flex: 1;
 }
 
-.root[data-variant="line-spacing"] {
-  flex: 0 0 auto;
+.root[data-orientation="vertical"]:not(:empty) {
+  width: auto;
 }
 
-.root[data-variant="text"] {
-  flex: 0 0 auto;
-  font-size: var(--prime-divider-label-font-size);
-  line-height: var(--prime-divider-label-line-height);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--prime-sys-color-content-muted);
-}
-
-.root[data-variant="text"] .content {
-  padding-inline: var(--prime-divider-inline-pad);
-}
-
-/* Icon внутри не ставит size-класс — только эти правила (и --prime-divider-* от data-size). */
+/* Icon inside content has no size class (DividerContentContext); the divider sizes it. */
 .root[data-size] .content svg {
-  box-sizing: border-box;
-  width: var(--prime-divider-icon);
-  height: var(--prime-divider-icon);
   flex-shrink: 0;
+  box-sizing: border-box;
+  width: var(--divider-icon);
+  height: var(--divider-icon);
 }

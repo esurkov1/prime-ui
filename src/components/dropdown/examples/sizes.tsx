@@ -1,99 +1,40 @@
-import { Copy, Edit, Trash2 } from "lucide-react";
-import { Button } from "@/components/button/Button";
-import { Dropdown } from "@/components/dropdown/Dropdown";
+/** Dropdown.Content at every size tier xs → xl with icons, shortcuts and a danger item. Give the menu the same size as its trigger. */
+import { Copy, Pencil, Trash2 } from "lucide-react";
+import { Button, Dropdown } from "prime-ui-kit";
 
-/** Ярус `size` на `Dropdown.Content`: s, m, l, xl — как в `playground/snippets/dropdown/sizes.tsx`. */
+import styles from "./examples.module.css";
+
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
+
 export default function DropdownSizesExample() {
   return (
-    <>
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <Button.Root type="button" size="s" variant="neutral" mode="stroke">
-            size=&quot;s&quot;
-          </Button.Root>
-        </Dropdown.Trigger>
-        <Dropdown.Content size="s">
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Edit} strokeWidth={2} />
-            Редактировать
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Copy} strokeWidth={2} />
-            Дублировать
-          </Dropdown.Item>
-          <Dropdown.Separator />
-          <Dropdown.Item destructive>
-            <Dropdown.ItemIcon as={Trash2} strokeWidth={2} />
-            Удалить
-          </Dropdown.Item>
-        </Dropdown.Content>
-      </Dropdown.Root>
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <Button.Root type="button" size="m" variant="neutral" mode="stroke">
-            size=&quot;m&quot;
-          </Button.Root>
-        </Dropdown.Trigger>
-        <Dropdown.Content size="m">
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Edit} strokeWidth={2} />
-            Редактировать
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Copy} strokeWidth={2} />
-            Дублировать
-          </Dropdown.Item>
-          <Dropdown.Separator />
-          <Dropdown.Item destructive>
-            <Dropdown.ItemIcon as={Trash2} strokeWidth={2} />
-            Удалить
-          </Dropdown.Item>
-        </Dropdown.Content>
-      </Dropdown.Root>
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <Button.Root type="button" size="l" variant="neutral" mode="stroke">
-            size=&quot;l&quot;
-          </Button.Root>
-        </Dropdown.Trigger>
-        <Dropdown.Content size="l">
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Edit} strokeWidth={2} />
-            Редактировать
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Copy} strokeWidth={2} />
-            Дублировать
-          </Dropdown.Item>
-          <Dropdown.Separator />
-          <Dropdown.Item destructive>
-            <Dropdown.ItemIcon as={Trash2} strokeWidth={2} />
-            Удалить
-          </Dropdown.Item>
-        </Dropdown.Content>
-      </Dropdown.Root>
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <Button.Root type="button" size="xl" variant="neutral" mode="stroke">
-            size=&quot;xl&quot;
-          </Button.Root>
-        </Dropdown.Trigger>
-        <Dropdown.Content size="xl">
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Edit} strokeWidth={2} />
-            Редактировать
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Dropdown.ItemIcon as={Copy} strokeWidth={2} />
-            Дублировать
-          </Dropdown.Item>
-          <Dropdown.Separator />
-          <Dropdown.Item destructive>
-            <Dropdown.ItemIcon as={Trash2} strokeWidth={2} />
-            Удалить
-          </Dropdown.Item>
-        </Dropdown.Content>
-      </Dropdown.Root>
-    </>
+    <div className={styles.row}>
+      {SIZES.map((size) => (
+        <Dropdown.Root key={size}>
+          <Dropdown.Trigger>
+            <Button.Root variant="soft" tone="neutral" size={size}>
+              Размер {size}
+            </Button.Root>
+          </Dropdown.Trigger>
+          <Dropdown.Content size={size}>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={Pencil} />
+              Переименовать
+              <Dropdown.ItemShortcut>F2</Dropdown.ItemShortcut>
+            </Dropdown.Item>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon as={Copy} />
+              Дублировать
+              <Dropdown.ItemShortcut>⌘D</Dropdown.ItemShortcut>
+            </Dropdown.Item>
+            <Dropdown.Separator />
+            <Dropdown.Item tone="danger">
+              <Dropdown.ItemIcon as={Trash2} />
+              Удалить
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+      ))}
+    </div>
   );
 }

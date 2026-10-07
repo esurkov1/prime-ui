@@ -37,7 +37,17 @@ describe("SegmentedProgressBar", () => {
 
   it("shows empty track when all weights are zero", () => {
     render(<SegmentedProgressBar.Root segments={[{ value: 0 }, { value: 0 }]} />);
-    expect(screen.getByRole("group", { name: "All segments empty" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Все сегменты пусты" })).toBeInTheDocument();
+  });
+
+  it("uses labels overrides for empty distributions", () => {
+    render(<SegmentedProgressBar.Root segments={[]} labels={{ empty: "No data" }} />);
+    expect(screen.getByRole("group", { name: "No data" })).toBeInTheDocument();
+  });
+
+  it("defaults segment tone to accent", () => {
+    const { container } = render(<SegmentedProgressBar.Root segments={[{ value: 1 }]} />);
+    expect(container.querySelector("[data-tone]")).toHaveAttribute("data-tone", "accent");
   });
 
   it("associates visible label with group via aria-labelledby and description", () => {

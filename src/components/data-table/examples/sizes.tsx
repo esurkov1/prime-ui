@@ -1,85 +1,67 @@
-import { Badge, DataTable, type DataTableColumn, type DataTableSize, Tag } from "prime-ui-kit";
+/** Density via `size`: rows 36 / 36 / 44 / 52 / 52, the header is the control height of the tier and one step smaller in text; badges follow by themselves. Use `s` for dense back-office lists, `m` by default. */
 
-import styles from "./examples-demos.module.css";
+import { Badge, type ControlSize, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 
-type TeamRow = {
-  id: string;
-  member: string;
-  role: string;
-  team: string;
-  status: "Online" | "Offline" | "Busy" | "Away";
-};
+import styles from "./examples.module.css";
 
-const rows: TeamRow[] = [
-  { id: "u1", member: "James Brown", role: "Product Manager", team: "Core", status: "Online" },
-  { id: "u2", member: "Sophia Williams", role: "Designer", team: "Growth", status: "Busy" },
-  { id: "u3", member: "Arthur Taylor", role: "Frontend Engineer", team: "Core", status: "Offline" },
-  { id: "u4", member: "Emma Wright", role: "QA Engineer", team: "Platform", status: "Away" },
-  {
-    id: "u5",
-    member: "Matthew Johnson",
-    role: "Data Engineer",
-    team: "Analytics",
-    status: "Online",
-  },
+type Invoice = { id: string; client: string; status: "paid" | "due"; amount: number };
+
+const rows: Invoice[] = [
+  { id: "INV-1042", client: "ООО «Северный ветер»", status: "paid", amount: 184_500 },
+  { id: "INV-1043", client: "ИП Гончаров", status: "due", amount: 42_000 },
+  { id: "INV-1044", client: "АО «Транслайн»", status: "paid", amount: 1_250_000 },
 ];
 
-function mapStatusToBadge(status: TeamRow["status"]): "online" | "offline" | "busy" | "away" {
-  if (status === "Online") return "online";
-  if (status === "Offline") return "offline";
-  if (status === "Busy") return "busy";
-  return "away";
-}
+const rub = new Intl.NumberFormat("ru-RU", {
+  style: "currency",
+  currency: "RUB",
+  maximumFractionDigits: 0,
+});
 
-const columns: DataTableColumn<TeamRow>[] = [
-  { id: "member", header: "Member", accessor: "member", sortable: true, minWidth: "12rem" },
-  { id: "role", header: "Role", accessor: "role", sortable: true, minWidth: "12rem" },
-  {
-    id: "team",
-    header: "Team",
-    accessor: "team",
-    sortable: true,
-    minWidth: "9rem",
-    cell: (row) => <Tag.Root>{row.team}</Tag.Root>,
-  },
+const columns: DataTableColumn<Invoice>[] = [
+  { id: "id", header: "Счёт", accessor: "id", width: "7rem" },
+  { id: "client", header: "Клиент", accessor: "client", truncate: true, maxWidth: "16rem" },
   {
     id: "status",
-    header: "Status",
-    accessor: "status",
-    sortable: true,
-    minWidth: "8rem",
-    cell: (row) => (
-      <Badge.Root variant="status" status={mapStatusToBadge(row.status)} label={row.status}>
-        {row.status}
-      </Badge.Root>
-    ),
+    header: "Статус",
+    cell: (row) =>
+      row.status === "paid" ? (
+        <Badge.Root color="green">Оплачен</Badge.Root>
+      ) : (
+        <Badge.Root color="orange">Ожидает</Badge.Root>
+      ),
   },
+  { id: "amount", header: "Сумма", numeric: true, cell: (row) => rub.format(row.amount) },
 ];
 
-function SizeRow({ size }: { size: DataTableSize }) {
-  return (
-    <>
-      <p className={styles.demoLabel}>size = {size}</p>
-      <DataTable.Root
-        className={styles.demoTable}
-        columns={columns}
-        rows={rows}
-        size={size}
-        pageSize={2}
-        paginationSize={size}
-      />
-    </>
-  );
-}
+const densities: { size: ControlSize; note: string }[] = [
+  { size: "xs", note: "строка 36 · шапка 28, 12/16 · ячейки 12/16" },
+  { size: "s", note: "строка 36 · шапка 32, 12/16 · ячейки 13/20" },
+  { size: "m", note: "по умолчанию · строка 44 · шапка 36, 13/20 · ячейки 14/20" },
+  { size: "l", note: "строка 52 · шапка 40, 14/20 · ячейки 16/24" },
+  { size: "xl", note: "строка 52 · шапка 48, 14/20 · ячейки 16/24" },
+];
 
-/** Соответствует `playground/snippets/data-table/sizes.tsx`. */
 export default function DataTableSizesExample() {
   return (
-    <>
-      <SizeRow size="s" />
-      <SizeRow size="m" />
-      <SizeRow size="l" />
-      <SizeRow size="xl" />
-    </>
+    <div className={styles.stack}>
+      {densities.map(({ size, note }) => (
+        <div key={size} className={styles.group}>
+          <Typography.Root variant="caption" tone="muted">
+            <Typography.Root as="span" variant="code" tone="muted">
+              size="{size}"
+            </Typography.Root>{" "}
+            — {note}
+          </Typography.Root>
+          <DataTable.Root
+            size={size}
+            columns={columns}
+            rows={rows}
+            getRowKey={(row) => row.id}
+            showPagination={false}
+          />
+        </div>
+      ))}
+    </div>
   );
 }

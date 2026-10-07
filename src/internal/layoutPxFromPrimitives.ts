@@ -1,5 +1,3 @@
-import { primitiveTokens } from "../../tokens/primitives";
-
 /**
  * Fallback, если нет `document` (SSR) или `getComputedStyle` не дал валидный px
  * (должен совпадать с типичным `font-size` на `:root` в `globals`).
@@ -22,19 +20,4 @@ export function getRootFontSizePx(): number {
 export function remToPx(rem: string, rootPx: number = getRootFontSizePx()): number {
   const n = Number.parseFloat(rem);
   return Number.isFinite(n) ? Math.round(n * rootPx) : 0;
-}
-
-/** Зазор панели от якоря: `spaces.layout.s`. */
-export function getFloatingPanelOffsetPx(): number {
-  return remToPx(primitiveTokens.spaces.layout.s);
-}
-
-/** Зазор listbox от триггера Select: `spaces.layout.xs`. */
-export function getFloatingSelectListboxOffsetPx(): number {
-  return remToPx(primitiveTokens.spaces.layout.xs);
-}
-
-/** Внутренний отступ от края вьюпорта при расчёте позиции / max-height. */
-export function getFloatingViewportPadPx(): number {
-  return remToPx(primitiveTokens.spaces.layout.s);
 }

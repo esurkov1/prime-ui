@@ -1,7 +1,16 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import AppShellContainedExample from "@/layout/app-shell/examples/contained";
+import containedSource from "@/layout/app-shell/examples/contained.tsx?raw";
+import AppShellWithSidebarExample from "@/layout/app-shell/examples/with-sidebar";
+import appShellSource from "@/layout/app-shell/examples/with-sidebar.tsx?raw";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
+import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
 
 const rootRows: PlaygroundApiPropRow[] = [
   {
@@ -10,7 +19,7 @@ const rootRows: PlaygroundApiPropRow[] = [
     defaultValue: "false",
     required: "Нет",
     description:
-      "Если true, корневой слой растягивается на высоту вьюпорта (типично для shell приложения с фиксированным сайдбаром и прокручиваемым main).",
+      "Оболочка высотой во вьюпорт: прокручивается только `AppShell.Main`. Без него прокручивается документ, а навигация липкая.",
   },
   {
     prop: "className",
@@ -24,7 +33,8 @@ const rootRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Обычно `AppShell.Nav` + `AppShell.Main`.",
+    description:
+      "`AppShell.Nav` — колонка навигации на холсте; всё остальное (`Header`, `Main`) попадает в панель контента на поверхности.",
   },
   {
     prop: "…rest",
@@ -78,29 +88,30 @@ const templateRows: PlaygroundApiPropRow[] = [
     prop: "nav",
     type: "React.ReactNode",
     defaultValue: "—",
-    required: "Да",
-    description: "Левая колонка: напр. `Sidebar.Root` или `nav`.",
+    required: "Нет",
+    description: "Колонка навигации: обычно `Sidebar.Root`. Без неё панель занимает всю ширину.",
   },
   {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Контент как прямые дети `<main>` (`AppShell.Main` уже задаёт поля `x6`).",
+    description:
+      "Контент как прямые дети `<main>`; поля и центрирование уже заданы в `AppShell.Main`.",
   },
   {
-    prop: "navProps",
-    type: 'Omit<AppShellNavProps, "children">',
+    prop: "header",
+    type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Пропсы на слот навигации.",
+    description: "Содержимое шапки панели (`AppShell.Header`); без него шапки нет.",
   },
   {
     prop: "mainProps",
     type: 'Omit<AppShellMainProps, "children">',
     defaultValue: "—",
     required: "Нет",
-    description: "Пропсы на основную колонку (ref сюда же через forwardRef на `Main`).",
+    description: "Пропсы на `main`, например `contentWidth`; ref Template тоже попадает на `main`.",
   },
   {
     prop: "…rest",
@@ -111,7 +122,32 @@ const templateRows: PlaygroundApiPropRow[] = [
   },
 ];
 
+const headerRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Хлебные крошки, поиск, действия — flex-ряд с зазором 12 px.",
+  },
+  {
+    prop: "className / …rest",
+    type: "React.HTMLAttributes<HTMLElement>",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Атрибуты `<header>`, включая `ref`.",
+  },
+];
+
 const mainRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "contentWidth",
+    type: '"contained" | "full"',
+    defaultValue: '"full"',
+    required: "Нет",
+    description:
+      "`full` — на всю ширину панели с адаптивными полями 16 / 24 / 32 px; `contained` — по центру, не шире `--prime-layout-content-max-width` (1200 px), для страниц с длинным текстом.",
+  },
   {
     prop: "className",
     type: "string",
@@ -142,24 +178,45 @@ export default function AppShellSection() {
       <PageContent.Header>
         <PageContent.Title>AppShell</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Каркас: CSS Grid — <strong>nav</strong> (<code>AppShell.Nav</code>,{" "}
-              <code>data-layout-region=&quot;nav&quot;</code>) и <strong>main</strong> (
-              <code>AppShell.Main</code>, <code>data-layout-region=&quot;main&quot;</code>).{" "}
-              <code>AppShell.Template</code> помечает корень как{" "}
-              <code>data-layout-template=&quot;app&quot;</code>: на широком экране — зазор между
-              колонками при открытом <code>Sidebar</code> (
-              <code>sidebarSlot=&quot;page-nav&quot;</code>
-              ). Поля контентной колонки заданы на <code>AppShell.Main</code> (
-              <code>--prime-sys-spacing-x6</code>); отдельную обёртку с теми же полями не добавляют.
-              См. <code>src/layout/app-shell/COMPONENT.md</code>.
-            </>
-          }
+          Каркас приложения: две плоскости во всю высоту, край в край — слева{" "}
+          <code>AppShell.Nav</code> на холсте, справа контент на поверхности. Без отступов,
+          радиусов, теней и рамок: границу даёт только смена заливки. В контенте — необязательная
+          липкая <code>AppShell.Header</code> и прокручиваемая <code>AppShell.Main</code>: сверху 24
+          → 40 px (от 1024 px), поля 16 → 24 → 32; с <code>contentWidth=&quot;contained&quot;</code>{" "}
+          колонка по центру и не шире 1200 px. Карточки внутри становятся утопленными плитками.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Сайдбар, шапка и страница</DemoSectionTitle>
+            <DemoDescription>
+              <code>Sidebar</code> в <code>AppShell.Nav</code>, хлебные крошки в{" "}
+              <code>AppShell.Header</code>, заголовок с действием и карточка в{" "}
+              <code>AppShell.Main</code>. С <code>fillViewport</code> прокручивается только{" "}
+              <code>main</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={appShellSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <AppShellWithSidebarExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Колонка для длинного текста</DemoSectionTitle>
+            <DemoDescription>
+              Без <code>AppShell.Nav</code> панель занимает всю ширину;{" "}
+              <code>contentWidth=&quot;contained&quot;</code> на <code>AppShell.Main</code>{" "}
+              центрирует колонку и ограничивает её <code>--prime-layout-content-max-width</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={containedSource.trim()} previewLayout="stack">
+              <PlaygroundExampleFrame.Stage>
+                <AppShellContainedExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>AppShell.Root</DemoApiTitle>
@@ -168,6 +225,8 @@ export default function AppShellSection() {
             <PlaygroundApiTable rows={templateRows} />
             <DemoApiTitle>AppShell.Nav</DemoApiTitle>
             <PlaygroundApiTable rows={navRows} />
+            <DemoApiTitle>AppShell.Header</DemoApiTitle>
+            <PlaygroundApiTable rows={headerRows} />
             <DemoApiTitle>AppShell.Main</DemoApiTitle>
             <PlaygroundApiTable rows={mainRows} />
           </div>

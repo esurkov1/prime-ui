@@ -1,218 +1,156 @@
+import type * as React from "react";
+
+import EmptyPageDataRegionExample from "@/components/empty-page/examples/data-region";
+import regionSource from "@/components/empty-page/examples/data-region.tsx?raw";
+import EmptyPageIconTonesExample from "@/components/empty-page/examples/icon-tones";
+import tonesSource from "@/components/empty-page/examples/icon-tones.tsx?raw";
+import EmptyPageNoResultsExample from "@/components/empty-page/examples/no-results";
+import searchSource from "@/components/empty-page/examples/no-results.tsx?raw";
+import EmptyPageSizesExample from "@/components/empty-page/examples/sizes";
+import sizesSource from "@/components/empty-page/examples/sizes.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
-import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
-import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
   DemoDescription,
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import EmptyPageCanonicalSnippet from "../snippets/empty-page/canonical";
-import canonicalSource from "../snippets/empty-page/canonical.tsx?raw";
-import EmptyPageSizesSnippet from "../snippets/empty-page/sizes";
-import sizesSource from "../snippets/empty-page/sizes.tsx?raw";
-import EmptyPageTableRegionSnippet from "../snippets/empty-page/table-region";
-import tableRegionSource from "../snippets/empty-page/table-region.tsx?raw";
+import type { PlaygroundPreviewSurface } from "../components/PlaygroundPreviewTheme";
 
-const rootRows: PlaygroundApiPropRow[] = [
+const apiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    prop: "Root · size",
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description:
-      "Шкала иконки, кегля и отступов; пробрасывается в ControlSizeProvider для дочерних контролов.",
+    description: "Плитка иконки, кегль и отступы; кнопкам в Actions передайте тот же size.",
   },
   {
-    prop: "layout",
+    prop: "Root · layout",
     type: '"default" | "fill"',
     defaultValue: '"default"',
     required: "Нет",
-    description:
-      "fill — растянуть по высоте flex-родителя (область таблицы / панели с min-height).",
+    description: "`fill` растягивает блок по высоте flex-родителя и центрирует.",
   },
   {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
+    prop: "Icon · tone",
+    type: '"neutral" | "accent" | "danger"',
+    defaultValue: '"neutral"',
     required: "Нет",
-    description: "Дополнительный класс корневой обёртки.",
+    description: "Цвет плитки: нет данных / первый запуск / ошибка.",
   },
   {
-    prop: "children",
-    type: "React.ReactNode",
+    prop: "Title",
+    type: "h2",
     defaultValue: "—",
-    required: "Нет",
-    description: "Icon, Title, Description, Actions.",
+    required: "Да",
+    description: "Заголовок; свяжите с Root через `aria-labelledby`.",
   },
   {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLDivElement>",
+    prop: "Description",
+    type: "p",
     defaultValue: "—",
     required: "Нет",
-    description: "В т.ч. ref (forwardRef), aria-labelledby.",
+    description: "Пояснение `text-secondary`.",
+  },
+  {
+    prop: "Actions",
+    type: "div",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Ряд кнопок; главное действие последним.",
   },
 ];
 
-const iconRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс круглой подложки под иконку.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Глиф (lucide-react и т.д.).",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Атрибуты обёртки; для декора — aria-hidden.",
-  },
-];
-
-const titleRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на h2.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Заголовок пустого состояния (не h1 страницы).",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLHeadingElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "В т.ч. id для связи с aria-labelledby на Root.",
-  },
-];
-
-const descriptionRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс на p.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Поясняющий текст.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLParagraphElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Атрибуты абзаца.",
-  },
-];
-
-const actionsRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс flex-контейнера действий.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Button, ButtonGroup, LinkButton.",
-  },
-  {
-    prop: "…rest",
-    type: "React.HTMLAttributes<HTMLDivElement>",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Атрибуты div.",
-  },
-];
+function Demo({
+  title,
+  description,
+  code,
+  surface,
+  children,
+}: {
+  title: string;
+  description: React.ReactNode;
+  code: string;
+  surface?: PlaygroundPreviewSurface;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="demoBlock">
+      <DemoSectionTitle>{title}</DemoSectionTitle>
+      <DemoDescription>{description}</DemoDescription>
+      <PlaygroundExampleFrame.Root code={code.trim()} previewLayout="stack" surface={surface}>
+        <PlaygroundExampleFrame.Stage>{children}</PlaygroundExampleFrame.Stage>
+      </PlaygroundExampleFrame.Root>
+    </div>
+  );
+}
 
 export default function EmptyPageSection() {
   return (
-    <PageContent.Section>
+    <PageContent.Section aria-labelledby="empty-page-heading">
       <PageContent.Header>
-        <PageContent.Title>EmptyPage</PageContent.Title>
+        <PageContent.Title id="empty-page-heading">EmptyPage</PageContent.Title>
         <PageContent.Description measure="full">
-          Центрированное пустое состояние: иконка, заголовок (<code>h2</code>), описание и действия.
-          Размер <code>size</code> согласует иконку и типографику;{" "}
-          <code>layout=&quot;fill&quot;</code> — для области с минимальной высотой (как тело
-          таблицы).
+          Пустое состояние с иконкой, заголовком, пояснением и действием: нет результатов, первый
+          запуск, ошибка загрузки. Для короткого текста внутри таблицы хватит{" "}
+          <code>DataTable empty</code>.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
-          <div className="demoBlock">
-            <DemoSectionTitle>Канонический пример</DemoSectionTitle>
-            <DemoDescription>
-              Иконка, текст и одна первичная кнопка; корень с <code>aria-labelledby</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={canonicalSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <EmptyPageCanonicalSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Область данных"
+            description={
+              <>
+                Карточка списка без строк: <code>layout="fill"</code> занимает оставшуюся высоту.
+              </>
+            }
+            code={regionSource}
+            surface="canvas"
+          >
+            <EmptyPageDataRegionExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Размеры</DemoSectionTitle>
-            <DemoDescription>
-              Лестница <code>s</code>–<code>xl</code>: одна структура, разная шкала токенов.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
-              <PlaygroundExampleFrame.Stage>
-                <EmptyPageSizesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Нет результатов"
+            description={<>Базовый состав: Icon, Title, Description, Actions.</>}
+            code={searchSource}
+          >
+            <EmptyPageNoResultsExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Область как у таблицы</DemoSectionTitle>
-            <DemoDescription>
-              Родитель с рамкой и <code>min-height</code>; <code>layout=&quot;fill&quot;</code>{" "}
-              центрирует блок по вертикали внутри области.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tableRegionSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <EmptyPageTableRegionSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Тон иконки"
+            description={
+              <>
+                <code>neutral</code> — данных нет, <code>accent</code> — первый запуск,{" "}
+                <code>danger</code> — ошибка загрузки.
+              </>
+            }
+            code={tonesSource}
+          >
+            <EmptyPageIconTonesExample />
+          </Demo>
+
+          <Demo
+            title="Размеры"
+            description={
+              <>
+                <code>xs · s · m · l · xl</code>; кнопкам в <code>Actions</code> передайте тот же{" "}
+                <code>size</code>.
+              </>
+            }
+            code={sizesSource}
+          >
+            <EmptyPageSizesExample />
+          </Demo>
 
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
-            <DemoApiTitle>EmptyPage.Root</DemoApiTitle>
-            <PlaygroundApiTable rows={rootRows} />
-            <DemoApiTitle>EmptyPage.Icon</DemoApiTitle>
-            <PlaygroundApiTable rows={iconRows} />
-            <DemoApiTitle>EmptyPage.Title</DemoApiTitle>
-            <PlaygroundApiTable rows={titleRows} />
-            <DemoApiTitle>EmptyPage.Description</DemoApiTitle>
-            <PlaygroundApiTable rows={descriptionRows} />
-            <DemoApiTitle>EmptyPage.Actions</DemoApiTitle>
-            <PlaygroundApiTable rows={actionsRows} />
+            <DemoApiTitle>EmptyPage</DemoApiTitle>
+            <PlaygroundApiTable rows={apiRows} />
           </div>
         </div>
       </PageContent.Body>

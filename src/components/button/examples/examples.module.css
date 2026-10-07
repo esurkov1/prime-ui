@@ -1,0 +1,90 @@
+/* Layout for the Button examples: semantic tokens only. */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-3);
+}
+
+.stack {
+  display: grid;
+  gap: var(--prime-space-4);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sizeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--prime-space-6);
+}
+
+.sizeCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+.matrixScroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Centered by auto margins, not justify-content: a wider matrix then scrolls instead of clipping its start. */
+.matrix {
+  display: grid;
+  grid-template-columns: max-content repeat(4, max-content);
+  align-items: center;
+  width: max-content;
+  margin-inline: auto;
+  gap: var(--prime-space-3) var(--prime-space-4);
+}
+
+.editorBar {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  width: 100%;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--prime-space-3);
+  width: 100%;
+}
+
+/* Narrow host: the form footer stacks full width, primary last (foundation §9). */
+.composition {
+  container-type: inline-size;
+}
+
+@container (max-width: 479.98px) {
+  .footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .footer > .spacer {
+    display: none;
+  }
+}

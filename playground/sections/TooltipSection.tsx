@@ -1,4 +1,19 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import TooltipCompositionExample from "@/components/tooltip/examples/composition";
+import tooltipCompositionSource from "@/components/tooltip/examples/composition.tsx?raw";
+import TooltipControlledExample from "@/components/tooltip/examples/controlled";
+import tooltipControlledSource from "@/components/tooltip/examples/controlled.tsx?raw";
+import TooltipDelayExample from "@/components/tooltip/examples/delay";
+import tooltipDelaySource from "@/components/tooltip/examples/delay.tsx?raw";
+import TooltipLongContentExample from "@/components/tooltip/examples/long-content";
+import tooltipLongContentSource from "@/components/tooltip/examples/long-content.tsx?raw";
+import TooltipSideExample from "@/components/tooltip/examples/side";
+import tooltipSideSource from "@/components/tooltip/examples/side.tsx?raw";
+import TooltipSizesExample from "@/components/tooltip/examples/sizes";
+import tooltipSizesSource from "@/components/tooltip/examples/sizes.tsx?raw";
+import TooltipStatesExample from "@/components/tooltip/examples/states";
+import tooltipStatesSource from "@/components/tooltip/examples/states.tsx?raw";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,22 +21,6 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import TooltipCompositionSnippet from "../snippets/tooltip/composition";
-import tooltipCompositionSource from "../snippets/tooltip/composition.tsx?raw";
-import TooltipControlledSnippet from "../snippets/tooltip/controlled";
-import tooltipControlledSource from "../snippets/tooltip/controlled.tsx?raw";
-import TooltipDelaySnippet from "../snippets/tooltip/delay";
-import tooltipDelaySource from "../snippets/tooltip/delay.tsx?raw";
-import TooltipLongContentSnippet from "../snippets/tooltip/long-content";
-import tooltipLongContentSource from "../snippets/tooltip/long-content.tsx?raw";
-import TooltipSideSnippet from "../snippets/tooltip/side";
-import tooltipSideSource from "../snippets/tooltip/side.tsx?raw";
-import TooltipSizesSnippet from "../snippets/tooltip/sizes";
-import tooltipSizesSource from "../snippets/tooltip/sizes.tsx?raw";
-import TooltipStatesSnippet from "../snippets/tooltip/states";
-import tooltipStatesSource from "../snippets/tooltip/states.tsx?raw";
-import TooltipSurfacesSnippet from "../snippets/tooltip/surfaces";
-import tooltipSurfacesSource from "../snippets/tooltip/surfaces.tsx?raw";
 
 const tooltipProviderApiRows: PlaygroundApiPropRow[] = [
   {
@@ -63,6 +62,13 @@ const tooltipRootApiRows: PlaygroundApiPropRow[] = [
     description: "Начальное состояние в неконтролируемом режиме.",
   },
   {
+    prop: "delayDuration",
+    type: "number",
+    defaultValue: "из Provider (400)",
+    required: "Нет",
+    description: "Задержка показа в мс для одной подсказки.",
+  },
+  {
     prop: "onOpenChange",
     type: "(open: boolean) => void",
     defaultValue: "—",
@@ -99,7 +105,7 @@ const tooltipContentApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "нет",
     description: "Масштаб оформления; дочерние контролы оборачиваются в ControlSizeProvider.",
@@ -141,44 +147,46 @@ export default function TooltipSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Проп <code>size</code> на <code>Tooltip.Content</code>: ряд <code>s</code>,{" "}
-              <code>m</code>, <code>l</code>, <code>xl</code> при одном и том же триггере.
+              <code>size</code> на <code>Tooltip.Content</code> — <code>xs</code>–<code>xl</code>:
+              xs–m набраны caption (12/16), l и xl — body-s (13/20). Берите размер элемента, к
+              которому относится подсказка. По умолчанию — <code>m</code>.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
               code={tooltipSizesSource.trim()}
               previewLayout="stack-center"
             >
               <PlaygroundExampleFrame.Stage>
-                <TooltipSizesSnippet />
+                <TooltipSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Варианты оформления</DemoSectionTitle>
+            <DemoSectionTitle>На разных поверхностях</DemoSectionTitle>
             <DemoDescription>
-              Отдельного пропа <code>variant</code> нет: внешний вид задаётся токенами темы. Ниже —
-              одна и та же подсказка на разных фонах интерфейса (<code>surface-default</code> и{" "}
-              <code>surface-raised</code>).
+              Вариантов нет: подсказка — плоская инверсная плашка без стрелки и тени (
+              <code>--prime-color-tooltip-bg</code>), поэтому одинаково читается на холсте, в
+              карточке и на плавающем слое.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tooltipSurfacesSource.trim()} previewLayout="row">
-              <PlaygroundExampleFrame.Stage>
-                <TooltipSurfacesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
+            <SurfaceGallery>
+              <TooltipLongContentExample />
+            </SurfaceGallery>
           </div>
 
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Обычный триггер открывает подсказку по hover и focus; у нативной <code>disabled</code>{" "}
-              кнопки наведение не срабатывает — для пояснения к недоступному действию используйте
-              текст рядом или обёртку. Для сокращений и терминов удобна кнопка без визуального
-              оформления (нативный фокус и клавиатура).
+              Подсказка открывается по наведению и по фокусу с клавиатуры, закрывается по Escape и
+              уходу фокуса. У нативно отключённой кнопки нет событий указателя — оберните её в
+              фокусируемый <code>span</code>, чтобы объяснить, почему действие недоступно. Для
+              терминов в тексте подойдёт кнопка без оформления.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tooltipStatesSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root
+              code={tooltipStatesSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <TooltipStatesSnippet />
+                <TooltipStatesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -187,12 +195,15 @@ export default function TooltipSection() {
             <DemoSectionTitle>Расположение</DemoSectionTitle>
             <DemoDescription>
               Проп <code>side</code> на <code>Tooltip.Content</code>: <code>top</code>,{" "}
-              <code>bottom</code>, <code>left</code>, <code>right</code>; стрелка и позиция
-              подстраиваются под выбранную сторону.
+              <code>bottom</code>, <code>left</code>, <code>right</code>. Если места нет, подсказка
+              переворачивается на противоположную сторону и сдвигается на 8 px от края.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tooltipSideSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root
+              code={tooltipSideSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <TooltipSideSnippet />
+                <TooltipSideExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -200,16 +211,15 @@ export default function TooltipSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
             <DemoDescription>
-              <code>open</code> и <code>onOpenChange</code> на <code>Tooltip.Root</code>; для
-              мгновенного отклика в примере провайдер с <code>delayDuration=0</code>. Переключатель
-              и наведение на триггер меняют одно и то же состояние.
+              <code>open</code> и <code>onOpenChange</code> на <code>Tooltip.Root</code>:
+              переключатель и наведение на триггер меняют одно и то же состояние.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
               code={tooltipControlledSource.trim()}
-              previewLayout="stack"
+              previewLayout="stack-center"
             >
               <PlaygroundExampleFrame.Stage>
-                <TooltipControlledSnippet />
+                <TooltipControlledExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -217,26 +227,32 @@ export default function TooltipSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
-              Триггер — любой одиночный элемент (ссылка, кнопка только с иконкой); в контенте —
-              типографика и вложенная разметка. У иконки задайте доступное имя через{" "}
-              <code>aria-label</code> на кнопке.
+              Панель форматирования: квадратные кнопки только с иконкой, у каждой{" "}
+              <code>aria-label</code>; подсказка повторяет название и показывает сочетание клавиш в{" "}
+              <code>Kbd</code>. Один <code>Tooltip.Provider</code> на всю панель.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tooltipCompositionSource.trim()} previewLayout="row">
+            <PlaygroundExampleFrame.Root
+              code={tooltipCompositionSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <TooltipCompositionSnippet />
+                <TooltipCompositionExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Задержка провайдера</DemoSectionTitle>
+            <DemoSectionTitle>Задержка</DemoSectionTitle>
             <DemoDescription>
-              <code>Tooltip.Provider</code> с <code>delayDuration=800</code> — реже мигающие
-              подсказки при быстром движении курсора по плотной сетке контролов.
+              <code>delayDuration</code> на <code>Tooltip.Provider</code> (для всей области) или на
+              отдельном <code>Tooltip.Root</code>. По умолчанию — 400 мс.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={tooltipDelaySource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={tooltipDelaySource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <TooltipDelaySnippet />
+                <TooltipDelayExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -244,16 +260,15 @@ export default function TooltipSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Длинный текст</DemoSectionTitle>
             <DemoDescription>
-              Многострочный текст в <code>Tooltip.Content</code> с <code>size=&quot;m&quot;</code>.
-              Ширина ограничена стилями компонента (<code>max-width</code>), длинные слова
-              переносятся.
+              Текст переносится по <code>--prime-tooltip-max-width</code> и никогда не шире окна
+              минус 16 px. Для длинных пояснений с действиями используйте Popover.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
               code={tooltipLongContentSource.trim()}
-              previewLayout="stack"
+              previewLayout="stack-center"
             >
               <PlaygroundExampleFrame.Stage>
-                <TooltipLongContentSnippet />
+                <TooltipLongContentExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>

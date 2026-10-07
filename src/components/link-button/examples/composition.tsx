@@ -1,27 +1,30 @@
-import { Icon, LinkButton } from "prime-ui-kit";
+/** Sign-in card: a link inside text, a link next to a Button of the same size and neutral `s` service links. Use as the pattern for mixing links and actions in one block. */
+import { Button, LinkButton, Typography } from "prime-ui-kit";
 
-/** Icons inside root pick up control size context — mirrors [`playground/snippets/link-button/composition.tsx`](../../../../playground/snippets/link-button/composition.tsx). */
+import styles from "./examples.module.css";
+
 export default function LinkButtonCompositionExample() {
-  const rowStyle = {
-    display: "flex" as const,
-    flexWrap: "wrap" as const,
-    gap: "var(--prime-sys-spacing-m)",
-    alignItems: "center" as const,
-  };
-
   return (
-    <div style={rowStyle}>
-      <LinkButton.Root href="#">
-        <Icon name="field.email" size="s" />
-        Link with icon on the left
-      </LinkButton.Root>
-      <LinkButton.Root href="#">
-        Icon on the right
-        <Icon name="action.close" size="s" />
-      </LinkButton.Root>
-      <LinkButton.Root href="#" aria-label="Open profile">
-        <Icon name="field.email" size="s" />
-      </LinkButton.Root>
+    <div className={styles.card}>
+      <Typography.Root variant="body-m" tone="secondary">
+        Ссылка для входа отправлена на почту. Не пришло письмо?{" "}
+        <LinkButton.Root href="#">Отправить ещё раз</LinkButton.Root>
+      </Typography.Root>
+      <div className={styles.between}>
+        <LinkButton.Root href="#">Войти по паролю</LinkButton.Root>
+        <Button.Root>Продолжить</Button.Root>
+      </div>
+      <nav aria-label="Служебные ссылки" className={styles.footer}>
+        <LinkButton.Root href="#" tone="neutral" size="s">
+          Условия
+        </LinkButton.Root>
+        <LinkButton.Root href="#" tone="neutral" size="s">
+          Конфиденциальность
+        </LinkButton.Root>
+        <LinkButton.Root href="#" tone="neutral" size="s">
+          Помощь
+        </LinkButton.Root>
+      </nav>
     </div>
   );
 }

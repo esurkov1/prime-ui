@@ -1,4 +1,17 @@
+import CheckboxHintErrorExample from "@/components/checkbox/examples/hint-error";
+import hintErrorSource from "@/components/checkbox/examples/hint-error.tsx?raw";
+import CheckboxSelectAllExample from "@/components/checkbox/examples/select-all";
+import selectAllSource from "@/components/checkbox/examples/select-all.tsx?raw";
+import CheckboxSettingsCardExample from "@/components/checkbox/examples/settings-card";
+import settingsCardSource from "@/components/checkbox/examples/settings-card.tsx?raw";
+import CheckboxSizesExample from "@/components/checkbox/examples/sizes";
+import sizesSource from "@/components/checkbox/examples/sizes.tsx?raw";
+import CheckboxStatesExample from "@/components/checkbox/examples/states";
+import statesSource from "@/components/checkbox/examples/states.tsx?raw";
+import CheckboxWithoutLabelExample from "@/components/checkbox/examples/without-label";
+import withoutLabelSource from "@/components/checkbox/examples/without-label.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,36 +19,30 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import CheckboxCompositionSnippet from "../snippets/checkbox/composition";
-import compositionSource from "../snippets/checkbox/composition.tsx?raw";
-import CheckboxControlledSnippet from "../snippets/checkbox/controlled";
-import controlledSource from "../snippets/checkbox/controlled.tsx?raw";
-import CheckboxFullWidthSnippet from "../snippets/checkbox/full-width";
-import fullWidthSource from "../snippets/checkbox/full-width.tsx?raw";
-import CheckboxSizesSnippet from "../snippets/checkbox/sizes";
-import sizesSource from "../snippets/checkbox/sizes.tsx?raw";
-import CheckboxSpecificSnippet from "../snippets/checkbox/specific";
-import specificSource from "../snippets/checkbox/specific.tsx?raw";
-import CheckboxStatesSnippet from "../snippets/checkbox/states";
-import statesSource from "../snippets/checkbox/states.tsx?raw";
-import CheckboxVariantsSnippet from "../snippets/checkbox/variants";
-import variantsSource from "../snippets/checkbox/variants.tsx?raw";
 
 const checkboxRootApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "variant",
-    type: '"default" | "error"',
-    defaultValue: '"default"',
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
     required: "Нет",
     description:
-      "Визуальная семантика: error даёт обводку ошибки; invalid также включается при наличии Checkbox.Error.",
+      "Красное кольцо у неотмеченного квадрата и aria-invalid без текста ошибки; Checkbox.Error включает то же самое.",
+  },
+  {
+    prop: "fullWidth",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Растянуть на ширину контейнера; по умолчанию ширина по содержимому.",
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Размер квадрата, отступов и кегля подписи из яруса токенов choice/control.",
+    description:
+      "Ярус: квадрат 14 · 16 · 18 · 20 · 24 px, зазор до текста и кегль подписи из токенов control.",
   },
   {
     prop: "indeterminate",
@@ -65,7 +72,7 @@ const checkboxRootApiRows: PlaygroundApiPropRow[] = [
     type: "boolean",
     defaultValue: "—",
     required: "Нет",
-    description: "Контролируемое значение «отмечен»; вместе с onChange задаёт управляемый режим.",
+    description: "Контролируемое значение «отмечен»; вместе с onCheckedChange.",
   },
   {
     prop: "defaultChecked",
@@ -75,18 +82,18 @@ const checkboxRootApiRows: PlaygroundApiPropRow[] = [
     description: "Начальное значение в неконтролируемом режиме.",
   },
   {
-    prop: "onChange",
-    type: "React.ChangeEventHandler<HTMLInputElement>",
+    prop: "onCheckedChange",
+    type: "(checked: boolean) => void",
     defaultValue: "—",
     required: "Нет",
-    description: "Обработчик изменения; внутри обновляется внутреннее состояние checked.",
+    description: "Новое значение после клика или пробела.",
   },
   {
     prop: "disabled",
     type: "boolean",
-    defaultValue: "—",
+    defaultValue: "false",
     required: "Нет",
-    description: "Блокировка input и приглушение подписи (через Label).",
+    description: "Блокирует input; квадрат fill-muted, подпись и подсказка text-disabled.",
   },
   {
     prop: "aria-describedby",
@@ -105,7 +112,7 @@ const checkboxRootApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "…rest",
-    type: 'Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size">',
+    type: 'Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange" | "children">',
     defaultValue: "—",
     required: "Нет",
     description:
@@ -131,7 +138,7 @@ const checkboxLabelApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "…rest",
-    type: 'Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "htmlFor" | "size">',
+    type: 'Omit<React.HTMLAttributes<HTMLLabelElement>, "htmlFor" | "size">',
     defaultValue: "—",
     required: "Нет",
     description: "Атрибуты label, кроме htmlFor и size (задаются из контекста и размера поля).",
@@ -192,13 +199,9 @@ export default function CheckboxSection() {
       <PageContent.Header>
         <PageContent.Title>Checkbox</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Флажок «да/нет» с подписью, подсказкой и сообщением об ошибке. Подходит для согласий,
-              настроек и таблиц с множественным выбором; есть отдельное визуальное состояние для
-              частично выбранной группы.
-            </>
-          }
+          Независимый выбор «да / нет», который отправляется вместе с формой: согласия, наборы
+          опций, множественный выбор в списках. Для взаимоисключающих вариантов — Radio, для
+          мгновенно применяемой настройки — Switch.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -206,27 +209,13 @@ export default function CheckboxSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Четыре значения <code>size</code>: <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-              <code>xl</code> — высота квадрата, зазор до текста и кегль подписи согласованы
-              токенами.
+              <code>size</code> <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> ·{" "}
+              <code>xl</code> — квадрат 14–24 px, зазор и кегль подписи берутся из того же яруса,
+              что у полей и кнопок. По умолчанию <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <CheckboxSizesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Варианты</DemoSectionTitle>
-            <DemoDescription>
-              Проп <code>variant</code>: <code>default</code> и <code>error</code> (красная обводка
-              квадрата). Сообщение через <code>Checkbox.Error</code> тоже переводит поле в invalid —
-              см. блок «Композиция».
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CheckboxVariantsSnippet />
+                <CheckboxSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -234,68 +223,73 @@ export default function CheckboxSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Не отмечен / отмечен, <code>indeterminate</code>, нативный <code>required</code> на
-              input, <code>disabled</code> в обычном и отмеченном виде.
+              Не отмечен, отмечен, <code>indeterminate</code>, <code>invalid</code> и{" "}
+              <code>disabled</code> — на холсте, в карточке и на всплывающей панели. Наведите
+              курсор, чтобы увидеть hover, или перейдите по Tab — кольцо фокуса появляется вокруг
+              квадрата; пробел переключает флажок.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={statesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <CheckboxStatesSnippet />
+                <SurfaceGallery surfaces={["canvas", "surface", "raised"]}>
+                  <CheckboxStatesExample />
+                </SurfaceGallery>
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoSectionTitle>Описание и ошибка</DemoSectionTitle>
             <DemoDescription>
-              <code>checked</code> и <code>onChange</code> для полностью управляемого флага;
-              отдельно можно держать <code>indeterminate</code> из состояния родителя (типично для
-              «выбрать все» в таблице).
+              <code>Checkbox.Hint</code> и <code>Checkbox.Error</code> выравниваются по колонке
+              текста и попадают в <code>aria-describedby</code>. Смонтированный{" "}
+              <code>Checkbox.Error</code> сам переводит поле в invalid — <code>invalid</code> на
+              корне не нужен.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={hintErrorSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <CheckboxControlledSnippet />
+                <CheckboxHintErrorExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoSectionTitle>«Выбрать все»</DemoSectionTitle>
             <DemoDescription>
-              Слоты <code>Checkbox.Label</code>, <code>Checkbox.Hint</code> и{" "}
-              <code>Checkbox.Error</code>: подсказка, только ошибка (без{" "}
-              <code>variant=&quot;error&quot;</code> на корне) и полный набор с вариантом ошибки на
-              корне.
+              Контролируемый режим: <code>checked</code> + <code>onCheckedChange</code>.
+              Родительский флажок получает <code>indeterminate</code>, пока выбрана только часть
+              списка.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={selectAllSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <CheckboxCompositionSnippet />
+                <CheckboxSelectAllExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>На ширину контейнера</DemoSectionTitle>
+            <DemoSectionTitle>Композиция: карточка настроек</DemoSectionTitle>
             <DemoDescription>
-              Корень поля уже <code>width: 100%</code>: в узкой колонке (карточка, сайдбар) подпись
-              переносится во второй столбец сетки, подсказка остаётся выровненной под текст.
+              Группа в <code>fieldset</code> с общим флажком и вложенными пунктами, недоступная
+              опция с объяснением в подсказке и отдельная настройка с описанием. Размер{" "}
+              <code>m</code>, отступ вложенных пунктов равен ширине квадрата и зазора.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={settingsCardSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <CheckboxFullWidthSnippet />
+                <CheckboxSettingsCardExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
+            <DemoSectionTitle>Без видимой подписи</DemoSectionTitle>
             <DemoDescription>
-              Пустой <code>Checkbox.Label</code> с обязательным <code>aria-label</code> на{" "}
-              <code>Checkbox.Root</code> для экранных читалок; <code>name</code> и{" "}
-              <code>value</code> для отправки формы.
+              В строках таблицы оставьте пустой <code>Checkbox.Label</code> и задайте{" "}
+              <code>aria-label</code> на <code>Checkbox.Root</code>; <code>name</code> и{" "}
+              <code>value</code> уходят в форму как у обычного input.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={specificSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={withoutLabelSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <CheckboxSpecificSnippet />
+                <CheckboxWithoutLabelExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -304,26 +298,28 @@ export default function CheckboxSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Checkbox.Root</DemoApiTitle>
             <DemoDescription>
-              Обёртка поля и провайдер контекста: размер, вариант, состояние checked/indeterminate и
-              ссылки на слоты hint/error.
+              Обёртка поля и провайдер контекста. Ref и все input-атрибуты уходят на скрытый
+              нативный <code>input type=&quot;checkbox&quot;</code>. На корне —{" "}
+              <code>data-size</code>, <code>data-state</code> (
+              <code>checked | unchecked | indeterminate</code>), <code>data-invalid</code>,{" "}
+              <code>data-disabled</code>, <code>data-full-width</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={checkboxRootApiRows} />
             <DemoApiTitle>Checkbox.Label</DemoApiTitle>
             <DemoDescription>
-              Подпись и кликабельная область: связь <code>htmlFor</code> с input, сетка «квадрат +
-              текст», рендер нативного <code>input type=&quot;checkbox&quot;</code>.
+              Кликабельная строка «квадрат + текст»: рендерит input и связывает его через{" "}
+              <code>htmlFor</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={checkboxLabelApiRows} />
             <DemoApiTitle>Checkbox.Hint</DemoApiTitle>
             <DemoDescription>
-              Вторичный текст под подписью; регистрируется в контексте для{" "}
+              Описание под текстом (<code>text-muted</code>), добавляется в{" "}
               <code>aria-describedby</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={checkboxHintApiRows} />
             <DemoApiTitle>Checkbox.Error</DemoApiTitle>
             <DemoDescription>
-              Сообщение об ошибке визуально как Hint с вариантом error; включает invalid у всего
-              поля.
+              Текст ошибки (<code>danger-text</code>); пока смонтирован, поле invalid.
             </DemoDescription>
             <PlaygroundApiTable rows={checkboxErrorApiRows} />
           </div>

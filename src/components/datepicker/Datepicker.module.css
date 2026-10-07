@@ -1,387 +1,680 @@
-/* Дополняет react-day-picker/style.css и синхронизирует датпикер с Prime tokens */
+/* ─── Datepicker ─────────────────────────────────────────────────────────────
+ * Trigger = field system. Panel: square day cells = tier item height, continuous range
+ * band (inner cells radius 0, outer ends rounded), presets column, footer with time + actions.
+ */
 
-/* ─── Корневой блок календаря ─────────────────────────────────────────────── */
+/* ─── Tier variables ────────────────────────────────────────────────────── */
 
-.pickerRoot {
-  --dp-control-height: var(--prime-sys-size-control-m-height);
-  --dp-control-icon: var(--prime-sys-size-control-m-icon);
-  --dp-control-gap: var(--prime-sys-size-control-m-gap);
-  --dp-control-text: var(--prime-sys-size-control-m-text);
-  --dp-support-text: var(--prime-sys-size-control-m-supportText);
-  --dp-shell-gap: var(--prime-sys-spacing-x4);
-  --dp-month-gap: var(--prime-sys-spacing-x4);
-  --dp-header-pad-x: var(--prime-sys-spacing-x2);
-  --dp-header-gap: var(--prime-sys-spacing-x2);
-  --dp-nav-control-height: var(--prime-sys-size-control-s-height);
+.panel,
+.trigger {
+  --dp-cell: var(--prime-control-m-item-height);
+  --dp-text: var(--prime-control-m-text-size);
+  --dp-lh: var(--prime-control-m-line-height);
+  --dp-icon: var(--prime-control-m-icon);
+  --dp-radius: var(--prime-panel-item-radius);
+  /* Trigger: field of the same tier. */
+  --dp-h: var(--prime-control-m-height);
+  --dp-px: var(--prime-control-m-field-padding-x);
+  --dp-gap: var(--prime-control-m-gap);
+  --dp-field-radius: var(--prime-control-m-radius);
+  /* Footer fields: one tier down. */
+  --dp-field-h: var(--prime-control-s-height);
+  --dp-field-text: var(--prime-control-s-text-size);
+}
 
-  --rdp-accent-color: var(--prime-sys-color-action-primaryBackground);
-  --rdp-accent-background-color: var(--prime-sys-color-surface-accentSoft);
-  --rdp-day-height: var(--dp-control-height);
-  --rdp-day-width: var(--dp-control-height);
-  --rdp-day_button-height: var(--dp-control-height);
-  --rdp-day_button-width: var(--dp-control-height);
-  --rdp-day_button-border-radius: var(--prime-sys-size-control-m-radius);
-  --rdp-months-gap: var(--dp-month-gap);
-  --rdp-nav_button-height: var(--dp-control-height);
-  --rdp-nav_button-width: var(--dp-control-height);
-  --rdp-nav-height: var(--dp-control-height);
-  --rdp-weekday-padding: var(--prime-sys-spacing-x1) 0;
-  --rdp-range_start-color: var(--prime-sys-color-content-inverse);
-  --rdp-range_end-color: var(--prime-sys-color-content-inverse);
+[data-size="xs"]:is(.panel, .trigger) {
+  --dp-cell: var(--prime-control-xs-item-height);
+  --dp-text: var(--prime-control-xs-text-size);
+  --dp-lh: var(--prime-control-xs-line-height);
+  --dp-icon: var(--prime-control-xs-icon);
+  --dp-radius: var(--prime-radius-s);
+  --dp-h: var(--prime-control-xs-height);
+  --dp-px: var(--prime-control-xs-field-padding-x);
+  --dp-gap: var(--prime-control-xs-gap);
+  --dp-field-radius: var(--prime-control-xs-radius);
+  --dp-field-h: var(--prime-control-xs-height);
+  --dp-field-text: var(--prime-control-xs-text-size);
+}
 
+[data-size="s"]:is(.panel, .trigger) {
+  --dp-cell: var(--prime-control-s-item-height);
+  --dp-text: var(--prime-control-s-text-size);
+  --dp-lh: var(--prime-control-s-line-height);
+  --dp-icon: var(--prime-control-s-icon);
+  --dp-radius: var(--prime-radius-s);
+  --dp-h: var(--prime-control-s-height);
+  --dp-px: var(--prime-control-s-field-padding-x);
+  --dp-gap: var(--prime-control-s-gap);
+  --dp-field-radius: var(--prime-control-s-radius);
+  --dp-field-h: var(--prime-control-xs-height);
+  --dp-field-text: var(--prime-control-xs-text-size);
+}
+
+[data-size="l"]:is(.panel, .trigger) {
+  --dp-cell: var(--prime-control-l-item-height);
+  --dp-text: var(--prime-control-l-text-size);
+  --dp-lh: var(--prime-control-l-line-height);
+  --dp-icon: var(--prime-control-l-icon);
+  --dp-h: var(--prime-control-l-height);
+  --dp-px: var(--prime-control-l-field-padding-x);
+  --dp-gap: var(--prime-control-l-gap);
+  --dp-field-radius: var(--prime-control-l-radius);
+  --dp-field-h: var(--prime-control-m-height);
+  --dp-field-text: var(--prime-control-m-text-size);
+}
+
+[data-size="xl"]:is(.panel, .trigger) {
+  --dp-cell: var(--prime-control-xl-item-height);
+  --dp-text: var(--prime-control-xl-text-size);
+  --dp-lh: var(--prime-control-xl-line-height);
+  --dp-icon: var(--prime-control-xl-icon);
+  --dp-h: var(--prime-control-xl-height);
+  --dp-px: var(--prime-control-xl-field-padding-x);
+  --dp-gap: var(--prime-control-xl-gap);
+  --dp-field-radius: var(--prime-control-xl-radius);
+  --dp-field-h: var(--prime-control-l-height);
+  --dp-field-text: var(--prime-control-l-text-size);
+}
+
+/* ─── Trigger (field) ───────────────────────────────────────────────────── */
+
+.trigger {
   box-sizing: border-box;
-  position: relative;
-  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  /* Icons centered between the edge and the text: edge→icon = icon→text = padX (foundation §6). */
+  gap: var(--dp-px);
+  /* Ширина по содержимому, не шире контейнера. */
+  width: fit-content;
   max-width: 100%;
-  padding: 0;
+  min-width: 0;
+  height: var(--dp-h);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--dp-px);
   border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  font-family: inherit;
-  font-size: var(--dp-control-text);
-  color: var(--prime-sys-color-content-primary);
-}
-
-.pickerRoot[data-size="s"] {
-  --dp-control-height: var(--prime-sys-size-control-s-height);
-  --dp-control-icon: var(--prime-sys-size-control-s-icon);
-  --dp-control-gap: var(--prime-sys-size-control-s-gap);
-  --dp-control-text: var(--prime-sys-size-control-s-text);
-  --dp-support-text: var(--prime-sys-size-control-s-supportText);
-  --rdp-day_button-border-radius: var(--prime-sys-size-control-s-radius);
-  --dp-shell-gap: var(--prime-sys-spacing-x3);
-  --dp-month-gap: var(--prime-sys-spacing-x3);
-  --dp-header-pad-x: var(--prime-sys-spacing-x2);
-  --dp-nav-control-height: var(--prime-sys-size-control-xs-height);
-}
-
-.pickerRoot[data-size="l"] {
-  --dp-control-height: var(--prime-sys-size-control-l-height);
-  --dp-control-icon: var(--prime-sys-size-control-l-icon);
-  --dp-control-gap: var(--prime-sys-size-control-l-gap);
-  --dp-control-text: var(--prime-sys-size-control-l-text);
-  --dp-support-text: var(--prime-sys-size-control-l-supportText);
-  --rdp-day_button-border-radius: var(--prime-sys-size-control-l-radius);
-  --dp-shell-gap: var(--prime-sys-spacing-x5);
-  --dp-month-gap: var(--prime-sys-spacing-x5);
-  --dp-header-pad-x: var(--prime-sys-spacing-x3);
-  --dp-nav-control-height: var(--prime-sys-size-control-m-height);
-}
-
-.pickerRoot[data-size="xl"] {
-  --dp-control-height: var(--prime-sys-size-control-xl-height);
-  --dp-control-icon: var(--prime-sys-size-control-xl-icon);
-  --dp-control-gap: var(--prime-sys-size-control-xl-gap);
-  --dp-control-text: var(--prime-sys-size-control-xl-text);
-  --dp-support-text: var(--prime-sys-size-control-xl-supportText);
-  --rdp-day_button-border-radius: var(--prime-sys-size-control-xl-radius);
-  --dp-shell-gap: var(--prime-sys-spacing-x6);
-  --dp-month-gap: var(--prime-sys-spacing-x6);
-  --dp-header-pad-x: var(--prime-sys-spacing-x3);
-  --dp-nav-control-height: var(--prime-sys-size-control-l-height);
-}
-
-/* ─── Day-button: transitions, hover, today, selected ───────────────────── */
-
-.pickerRoot :global(.rdp-day_button) {
-  transition:
-    background-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
-    color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
-    box-shadow var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-  font-size: var(--dp-control-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-}
-
-.pickerRoot :global(.rdp-day_button:hover:not([disabled]):not([aria-selected="true"])) {
-  background-color: var(--prime-sys-color-action-primarySoftBackground);
-  color: var(--prime-sys-color-action-primarySoftForeground);
-}
-
-/* Текущая дата: акцентный цвет текста, если не выбрана */
-.pickerRoot :global(.rdp-today:not(.rdp-selected):not(.rdp-range_middle) .rdp-day_button) {
-  color: var(--prime-sys-color-action-primaryBackground);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-}
-
-/* Выбранная дата (single + range_start + range_end) — единый стиль: залитый фон */
-.pickerRoot :global(.rdp-day_button[aria-selected="true"]) {
-  background-color: var(--prime-sys-color-action-primaryBackground);
-  color: var(--prime-sys-color-action-primaryForeground);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
-}
-
-/* Средина диапазона перекрывает залитый фон выше */
-.pickerRoot :global(.rdp-range_middle) {
-  background-color: var(--prime-sys-color-action-primarySoftBackground);
-}
-
-.pickerRoot :global(.rdp-range_middle .rdp-day_button) {
-  background-color: transparent;
-  color: var(--prime-sys-color-action-primarySoftForeground);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  box-shadow: none;
-}
-
-.pickerRoot :global(.rdp-day_button:focus-visible) {
+  border-radius: var(--dp-field-radius);
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--dp-text);
+  line-height: var(--dp-lh);
+  text-align: start;
+  cursor: pointer;
   outline: none;
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* ─── Сетка месяцев ─────────────────────────────────────────────────────── */
-
-.months {
+.trigger[data-full-width="true"] {
   display: flex;
-  flex-wrap: wrap;
   width: 100%;
-  max-width: none;
-  gap: var(--dp-month-gap);
 }
 
-.month {
-  /* Семь колонок дней + table-layout:fixed — стабильная ширина при смене месяца (подпись, строки) и без лишнего пересчёта max-content у поповера */
-  --dp-month-grid-min-width: calc(7 * var(--rdp-day_button-width));
-  min-width: min(100%, max(var(--dp-month-grid-min-width), var(--prime-sys-unit-15rem)));
-  flex: 1 1 var(--dp-month-grid-min-width);
+.trigger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
+}
+
+.trigger[data-state="open"],
+.trigger:focus-visible {
+  background: var(--prime-color-field-bg-focus);
+}
+
+/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
+.trigger:not([data-focus-ring="false"]):focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.trigger[data-invalid="true"] {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.trigger[data-invalid="true"]:focus-visible {
+  outline-color: var(--prime-color-danger-border);
+}
+
+.trigger:disabled {
+  background: var(--prime-color-field-bg-disabled);
+  box-shadow: none;
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+.triggerIcon {
+  flex-shrink: 0;
+  width: var(--dp-icon);
+  height: var(--dp-icon);
+  color: var(--prime-color-text-muted);
+}
+
+.triggerChevron {
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.trigger[data-state="open"] .triggerChevron {
+  transform: rotate(180deg);
+}
+
+.trigger:disabled .triggerIcon {
+  color: var(--prime-color-text-disabled);
+}
+
+.triggerLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Datepicker.Badge: after the value, before the chevron (padX on both sides via the gap). */
+.triggerBadge {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* Gray soft is a wash like the field: a stronger wash keeps a neutral badge visible (§4). */
+.triggerBadge > [data-color="gray"]:not([data-disabled="true"]) {
+  background: var(--prime-color-fill-strong);
+}
+
+.trigger[data-empty="true"]:not(:disabled) .triggerLabel {
+  color: var(--prime-color-text-placeholder);
+}
+
+/* ─── Popover shell ─────────────────────────────────────────────────────── */
+
+[role="dialog"].popover {
+  width: fit-content;
+  max-width: var(--float-max-w, calc(100vw - 2 * var(--prime-space-2)));
+  padding: 0;
+}
+
+.popoverBody {
   display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ─── Panel ──────────────────────────────────────────────────────────────── */
+
+.panel {
+  /* Fields inside a raised surface stay distinguishable (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+
+  display: flex;
+  min-width: 0;
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--dp-text);
+  line-height: var(--dp-lh);
+}
+
+.panel[data-layout="stacked"] {
   flex-direction: column;
-  gap: var(--prime-sys-spacing-x2);
 }
 
-/* react-day-picker рендерит <table> без явной ширины */
-.pickerRoot :global(.rdp-month_grid) {
-  width: 100%;
-  table-layout: fixed;
+/* ─── Presets ────────────────────────────────────────────────────────────── */
+
+.presets {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  width: calc(var(--dp-cell) * 5);
+  padding: var(--prime-panel-padding);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-inline-end: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
-/* ─── Навигация (prev/next) ─────────────────────────────────────────────── */
+.presetTitle {
+  display: flex;
+  align-items: center;
+  min-height: var(--prime-panel-group-label-height);
+  margin: 0;
+  padding-inline: var(--prime-panel-item-padding-x);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
 
-.nav {
+.presetItem {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: var(--dp-cell);
+  padding-block: 0;
+  padding-inline: var(--prime-panel-item-padding-x);
+  border: 0;
+  border-radius: var(--prime-panel-item-radius);
+  background: transparent;
+  color: var(--prime-color-text-secondary);
+  font: inherit;
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.presetItem:hover {
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-primary);
+}
+
+.presetItem:active {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.presetItem[aria-pressed="true"] {
+  background: var(--prime-color-accent-soft);
+  color: var(--prime-color-accent-text);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+/* Narrow: presets become a horizontally scrolling row above the calendar. */
+.panel[data-layout="stacked"] .presets {
+  flex-direction: row;
+  gap: var(--prime-space-1);
+  width: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-inline-end: 0;
+  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  scrollbar-width: none;
+}
+
+.panel[data-layout="stacked"] .presetTitle {
   display: none;
 }
 
-.navButton {
-  flex: 0 0 auto;
+.panel[data-layout="stacked"] .presetItem {
+  background: var(--prime-color-fill-muted);
 }
 
-.pickerRoot[data-size="s"] .navButton {
-  --prime-icon-size: var(--prime-sys-size-control-xs-icon);
-  --prime-button-font-size: var(--prime-sys-size-control-xs-text);
-  height: var(--prime-sys-size-control-xs-height);
-  min-width: var(--prime-sys-size-control-xs-height);
-  border-radius: var(--prime-sys-size-control-xs-radius);
-  gap: var(--prime-sys-size-control-xs-gap);
-  padding-inline: var(--prime-sys-size-control-xs-buttonPaddingX);
-  padding-block: var(--prime-sys-size-control-xs-buttonPaddingY);
+.panel[data-layout="stacked"] .presetItem:hover {
+  background: var(--prime-color-fill-muted-hover);
 }
 
-.pickerRoot[data-size="m"] .navButton {
-  --prime-icon-size: var(--prime-sys-size-control-s-icon);
-  --prime-button-font-size: var(--prime-sys-size-control-s-text);
-  height: var(--prime-sys-size-control-s-height);
-  min-width: var(--prime-sys-size-control-s-height);
-  border-radius: var(--prime-sys-size-control-s-radius);
-  gap: var(--prime-sys-size-control-s-gap);
-  padding-inline: var(--prime-sys-size-control-s-buttonPaddingX);
-  padding-block: var(--prime-sys-size-control-s-buttonPaddingY);
+.panel[data-layout="stacked"] .presetItem[aria-pressed="true"] {
+  background: var(--prime-color-accent-soft);
 }
 
-.pickerRoot[data-size="l"] .navButton {
-  --prime-icon-size: var(--prime-sys-size-control-m-icon);
-  --prime-button-font-size: var(--prime-sys-size-control-m-text);
-  height: var(--prime-sys-size-control-m-height);
-  min-width: var(--prime-sys-size-control-m-height);
-  border-radius: var(--prime-sys-size-control-m-radius);
-  gap: var(--prime-sys-size-control-m-gap);
-  padding-inline: var(--prime-sys-size-control-m-buttonPaddingX);
-  padding-block: var(--prime-sys-size-control-m-buttonPaddingY);
+/* ─── Calendar ───────────────────────────────────────────────────────────── */
+
+.main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  padding: var(--prime-space-3);
 }
 
-.pickerRoot[data-size="xl"] .navButton {
-  --prime-icon-size: var(--prime-sys-size-control-l-icon);
-  --prime-button-font-size: var(--prime-sys-size-control-l-text);
-  height: var(--prime-sys-size-control-l-height);
-  min-width: var(--prime-sys-size-control-l-height);
-  border-radius: var(--prime-sys-size-control-l-radius);
-  gap: var(--prime-sys-size-control-l-gap);
-  padding-inline: var(--prime-sys-size-control-l-buttonPaddingX);
-  padding-block: var(--prime-sys-size-control-l-buttonPaddingY);
+.months {
+  display: flex;
+  justify-content: flex-start;
+  gap: var(--prime-space-6);
 }
 
-.monthCaption {
+.month {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  width: calc(var(--dp-cell) * 7);
+}
+
+.monthHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--dp-header-gap);
-  width: 100%;
-  min-height: 0;
-  height: auto;
-  margin-bottom: 0;
-  padding: var(--dp-header-pad-x);
-  border-radius: var(--prime-sys-shape-radius-m);
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  box-sizing: border-box;
-  font-size: var(--dp-control-text);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  text-align: center;
+  height: var(--dp-cell);
 }
 
-.monthCaptionLabel {
+.monthTitle {
   flex: 1 1 auto;
   min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Текст заголовка месяца внутри общей pill-шапки */
-.monthCaptionLabel :global(.rdp-caption_label) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100%;
-  padding: 0;
+  overflow: hidden;
+  font-size: var(--prime-text-title-s-size);
+  font-weight: var(--prime-text-title-s-weight);
+  line-height: var(--prime-text-title-s-line-height);
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-.monthCaptionSpacer {
-  width: var(--dp-nav-control-height);
-  height: var(--dp-nav-control-height);
-  flex: 0 0 var(--dp-nav-control-height);
+.nav,
+.navSpacer {
+  flex-shrink: 0;
+  width: var(--dp-cell);
+  height: var(--dp-cell);
+}
+
+/* Ghost icon button. */
+.nav {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dp-radius);
+  background: transparent;
+  color: var(--prime-color-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.nav :global(svg) {
+  width: var(--dp-icon);
+  height: var(--dp-icon);
+}
+
+.nav:hover {
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-primary);
+}
+
+.nav:active {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+/* Сетка месяца: разметка — таблица (семантика), раскладка — CSS Grid на 7 равных колонок. */
+.table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rowGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .weekday {
-  font-size: var(--dp-support-text);
-  color: var(--prime-sys-color-content-secondary);
-  font-weight: var(--prime-sys-typography-weight-medium);
+  display: grid;
+  place-items: center;
+  height: var(--prime-panel-group-label-height);
+  padding: 0;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-regular);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
 }
 
-/* ─── Shell — карточка-обёртка ───────────────────────────────────────────── */
-
-.shell {
-  --dp-shell-gap: var(--prime-sys-spacing-x4);
-  --dp-support-text: var(--prime-sys-size-control-m-supportText);
-
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x3);
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
+.weekday[data-weekend="true"] {
+  color: var(--prime-color-text-placeholder);
 }
 
-.shell[data-size="s"] {
-  --dp-shell-gap: var(--prime-sys-spacing-x3);
-  --dp-support-text: var(--prime-sys-size-control-s-supportText);
-  gap: var(--prime-sys-spacing-x2);
+.cell {
+  display: grid;
+  place-items: center;
+  height: var(--dp-cell);
+  padding: 0;
 }
 
-.shell[data-size="l"] {
-  --dp-shell-gap: var(--prime-sys-spacing-x5);
-  --dp-support-text: var(--prime-sys-size-control-l-supportText);
-  gap: var(--prime-sys-spacing-x4);
+/* Continuous band: inner cells square, rounded only on the outer side of each run. */
+.cell[data-band="selected"] {
+  background: var(--prime-color-accent-soft);
 }
 
-.shell[data-size="xl"] {
-  --dp-shell-gap: var(--prime-sys-spacing-x6);
-  --dp-support-text: var(--prime-sys-size-control-xl-supportText);
-  gap: var(--prime-sys-spacing-x5);
+.cell[data-band="preview"] {
+  background: color-mix(in srgb, var(--prime-color-accent-soft) 60%, transparent);
 }
 
-/* ─── .presetsRow — полоса пресетов снизу ───────────────────────────────── */
-
-.presetsRow {
-  width: 100%;
-  overflow: hidden;
-  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
-  background: var(--prime-sys-color-surface-raised);
+.cell[data-band-start="true"] {
+  border-start-start-radius: var(--dp-radius);
+  border-end-start-radius: var(--dp-radius);
 }
 
-/* ─── .presetsBlock — горизонтальный скролл-контейнер с кнопками ────────── */
+.cell[data-band-end="true"] {
+  border-start-end-radius: var(--dp-radius);
+  border-end-end-radius: var(--dp-radius);
+}
 
-.presetsBlock {
-  width: 100%;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--prime-sys-spacing-x3);
-  padding: var(--prime-sys-spacing-x3) var(--dp-shell-gap);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
+.day {
+  position: relative;
   box-sizing: border-box;
+  width: 100%;
+  max-width: var(--dp-cell);
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dp-radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.presetsBlock[data-size="s"] {
-  gap: var(--prime-sys-spacing-x2);
-  padding: var(--prime-sys-spacing-x2) var(--dp-shell-gap);
+.day:hover:not(:disabled):not([data-edge="true"]) {
+  background: var(--prime-color-fill-subtle);
 }
 
-.presetsBlock[data-size="l"] {
-  gap: var(--prime-sys-spacing-x3);
-  padding: var(--prime-sys-spacing-x3) var(--dp-shell-gap);
+.cell[data-band] .day:hover:not(:disabled):not([data-edge="true"]) {
+  background: var(--prime-color-accent-soft-hover);
 }
 
-.presetsBlock[data-size="xl"] {
-  gap: var(--prime-sys-spacing-x4);
-  padding: var(--prime-sys-spacing-x4) var(--dp-shell-gap);
+.day:active:not(:disabled):not([data-edge="true"]) {
+  background: var(--prime-color-fill-subtle-active);
 }
 
-.presetsGroup {
-  flex-shrink: 0;
-  flex-grow: 0;
+.day:focus-visible,
+.nav:focus-visible,
+.presetItem:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
-/* ─── Time section ──────────────────────────────────────────────────────── */
-
-.timeSection {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-x2);
-  padding-top: var(--prime-sys-spacing-x3);
-  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
+.day:disabled {
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
 }
 
-.timeSection[data-size="s"] {
-  padding-top: var(--prime-sys-spacing-x2);
+.cell[data-band="selected"] .day:not([data-edge="true"]) {
+  color: var(--prime-color-accent-text);
 }
 
-.timeSection[data-size="l"] {
-  padding-top: var(--prime-sys-spacing-x4);
+/* Today: accent text + semibold; `aria-current="date"` names it for assistive tech. */
+.day[data-today="true"] {
+  color: var(--prime-color-accent-text);
+  font-weight: var(--prime-font-weight-semibold);
 }
 
-.timeSection[data-size="xl"] {
-  padding-top: var(--prime-sys-spacing-x5);
+.day[data-today="true"]:disabled {
+  color: var(--prime-color-text-disabled);
 }
 
-.timeRow {
+.day[data-edge="true"] {
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.day[data-edge="true"]:hover {
+  background: var(--prime-color-accent-hover);
+}
+
+/* Days of the neighbouring months: context only, not interactive. */
+.outsideDay {
+  color: var(--prime-color-text-disabled);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.hint {
+  margin: 0;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+
+/* Нижняя строка и подсказка не расширяют панель: ширину задают месяцы. */
+.footer,
+.hint {
+  contain: inline-size;
+}
+
+.footer {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-x3);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2) var(--prime-space-3);
+  padding-block-start: var(--prime-space-3);
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
-.timeField {
-  flex: 1 1 min(100%, var(--prime-sys-unit-11rem));
+/* The fields keep a readable basis: when the row is too narrow they wrap above the actions
+   instead of shrinking to empty slivers (foundation §9: nothing clips). */
+.footerFields {
+  display: flex;
+  flex: 1 1 calc(var(--prime-space-24) * 2);
+  align-items: center;
+  gap: var(--prime-space-2);
   min-width: 0;
 }
 
-.timeInputRoot {
-  width: 100%;
-}
-
-.timeInputField {
-  font-variant-numeric: tabular-nums;
-}
-
-/* ─── Value text ────────────────────────────────────────────────────────── */
-
-.valueText {
-  font-variant-numeric: tabular-nums;
-}
-
-/* ─── Viewport-обёртка Calendar ─────────────────────────────────────────── */
-
-.calendarViewport {
+.field {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
   min-width: 0;
+  height: var(--dp-field-h);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-field-bg);
+  font-size: var(--dp-field-text);
+}
+
+.fieldDate {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-inline: var(--prime-space-2);
+  overflow: hidden;
+  color: var(--prime-color-text-primary);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fieldDate[data-empty="true"] {
+  color: var(--prime-color-text-placeholder);
+}
+
+.fieldTime {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: calc(var(--dp-field-h) * 1.75);
+  height: 100%;
+  padding-inline: var(--prime-space-2);
+  border: 0;
+  border-inline-start: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  outline: none;
+}
+
+.field:has(.fieldTime:focus-visible) {
+  background: var(--prime-color-field-bg-focus);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.fieldTime[aria-invalid="true"] {
+  color: var(--prime-color-danger-text);
+}
+
+.field:has(.fieldTime[aria-invalid="true"]) {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.dash {
+  flex-shrink: 0;
+  color: var(--prime-color-text-muted);
+}
+
+.footerActions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--prime-space-2);
+  margin-inline-start: auto;
+}
+
+/* ─── Embedded panel (Datepicker.Panel) ────────────────────────────────────
+ * The embedded panel is itself the bounded block (foundation §4): card fill, radius, padding and
+ * shadow from the card context, so it reads on any host. It sizes to its content and never centers
+ * months in slack; months (1 or 2) follow the parent's available width (see resolvePanelLayout).
+ */
+
+.panel[data-embedded="true"] {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+}
+
+.panel[data-embedded="true"] .main {
+  padding: var(--prime-card-padding-s);
+}
+
+/* Narrower than one month: the panel takes the column, cells shrink. */
+.panel[data-compact="true"] {
   width: 100%;
+}
+
+.panel[data-compact="true"] .month {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  max-width: calc(var(--dp-cell) * 7);
+}
+
+/* Narrower than one month: cells shrink, tighter gutters. */
+.panel[data-compact="true"] .main {
+  padding: var(--prime-space-2);
+}
+
+.panel[data-compact="true"] .months {
+  gap: var(--prime-space-4);
+}
+
+.panel[data-compact="true"] .footerFields {
+  flex-basis: 100%;
+}
+
+.panel[data-compact="true"] .footerActions {
+  flex: 1 1 100%;
+  justify-content: flex-end;
 }

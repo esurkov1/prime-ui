@@ -1,83 +1,114 @@
-.root {
+/*
+ * Avatar — circle sized by `--prime-avatar-<tier>`; fallback initials use palette hues.
+ * A host slot may size the avatar to itself by setting `--avatar-slot-size`; it wins over the
+ * `size` tier.
+ */
+.root,
+.groupOverflow {
+  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-m));
+
   position: relative;
+  box-sizing: border-box;
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  background: var(--prime-sys-color-surface-accentSoft);
-  overflow: hidden;
-  flex-shrink: 0;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--prime-radius-full);
+  font-size: calc(var(--avatar-size) * 0.4);
+  line-height: 1;
+  font-weight: var(--prime-font-weight-medium);
+  vertical-align: middle;
+  user-select: none;
 }
 
-.root[data-size="s"] {
-  width: var(--prime-sys-size-avatar-s-size);
-  height: var(--prime-sys-size-avatar-s-size);
-  font-size: var(--prime-sys-size-avatar-s-text);
-  border-radius: var(--prime-sys-size-avatar-s-radius);
+.root {
+  --hue-soft: var(--prime-color-palette-gray-soft);
+  --hue-text: var(--prime-color-palette-gray-text);
+
+  background: var(--hue-soft);
+  color: var(--hue-text);
 }
 
-.root[data-size="m"] {
-  width: var(--prime-sys-size-avatar-m-size);
-  height: var(--prime-sys-size-avatar-m-size);
-  font-size: var(--prime-sys-size-avatar-m-text);
-  border-radius: var(--prime-sys-size-avatar-m-radius);
+:is(.root, .groupOverflow)[data-size="xs"] {
+  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-xs));
 }
 
-.root[data-size="l"] {
-  width: var(--prime-sys-size-avatar-l-size);
-  height: var(--prime-sys-size-avatar-l-size);
-  font-size: var(--prime-sys-size-avatar-l-text);
-  border-radius: var(--prime-sys-size-avatar-l-radius);
+:is(.root, .groupOverflow)[data-size="s"] {
+  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-s));
 }
 
-.root[data-size="xl"] {
-  width: var(--prime-sys-size-avatar-xl-size);
-  height: var(--prime-sys-size-avatar-xl-size);
-  font-size: var(--prime-sys-size-avatar-xl-text);
-  border-radius: var(--prime-sys-size-avatar-xl-radius);
+:is(.root, .groupOverflow)[data-size="l"] {
+  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-l));
 }
 
-.root[data-size="2xl"] {
-  width: var(--prime-sys-size-avatar-2xl-size);
-  height: var(--prime-sys-size-avatar-2xl-size);
-  font-size: var(--prime-sys-size-avatar-2xl-text);
-  border-radius: var(--prime-sys-size-avatar-2xl-radius);
+:is(.root, .groupOverflow)[data-size="xl"] {
+  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-xl));
 }
 
-.root[data-size="3xl"] {
-  width: var(--prime-sys-size-avatar-3xl-size);
-  height: var(--prime-sys-size-avatar-3xl-size);
-  font-size: var(--prime-sys-size-avatar-3xl-text);
-  border-radius: var(--prime-sys-size-avatar-3xl-radius);
+:is(.root, .groupOverflow)[data-size="2xl"] {
+  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-2xl));
 }
 
-.root[data-size="4xl"] {
-  width: var(--prime-sys-size-avatar-4xl-size);
-  height: var(--prime-sys-size-avatar-4xl-size);
-  font-size: var(--prime-sys-size-avatar-4xl-text);
-  border-radius: var(--prime-sys-size-avatar-4xl-radius);
+/* ─── Hues ──────────────────────────────────────────────────────────────── */
+
+.root[data-color="red"] {
+  --hue-soft: var(--prime-color-palette-red-soft);
+  --hue-text: var(--prime-color-palette-red-text);
 }
 
-.root[data-size="5xl"] {
-  width: var(--prime-sys-size-avatar-5xl-size);
-  height: var(--prime-sys-size-avatar-5xl-size);
-  font-size: var(--prime-sys-size-avatar-5xl-text);
-  border-radius: var(--prime-sys-size-avatar-5xl-radius);
+.root[data-color="blue"] {
+  --hue-soft: var(--prime-color-palette-blue-soft);
+  --hue-text: var(--prime-color-palette-blue-text);
 }
 
-.root[data-size="6xl"] {
-  width: var(--prime-sys-size-avatar-6xl-size);
-  height: var(--prime-sys-size-avatar-6xl-size);
-  font-size: var(--prime-sys-size-avatar-6xl-text);
-  border-radius: var(--prime-sys-size-avatar-6xl-radius);
+.root[data-color="green"] {
+  --hue-soft: var(--prime-color-palette-green-soft);
+  --hue-text: var(--prime-color-palette-green-text);
 }
+
+.root[data-color="orange"] {
+  --hue-soft: var(--prime-color-palette-orange-soft);
+  --hue-text: var(--prime-color-palette-orange-text);
+}
+
+.root[data-color="yellow"] {
+  --hue-soft: var(--prime-color-palette-yellow-soft);
+  --hue-text: var(--prime-color-palette-yellow-text);
+}
+
+.root[data-color="purple"] {
+  --hue-soft: var(--prime-color-palette-purple-soft);
+  --hue-text: var(--prime-color-palette-purple-text);
+}
+
+.root[data-color="sky"] {
+  --hue-soft: var(--prime-color-palette-sky-soft);
+  --hue-text: var(--prime-color-palette-sky-text);
+}
+
+.root[data-color="pink"] {
+  --hue-soft: var(--prime-color-palette-pink-soft);
+  --hue-text: var(--prime-color-palette-pink-text);
+}
+
+.root[data-color="teal"] {
+  --hue-soft: var(--prime-color-palette-teal-soft);
+  --hue-text: var(--prime-color-palette-teal-text);
+}
+
+/* ─── Parts ─────────────────────────────────────────────────────────────── */
 
 .image {
   position: absolute;
   inset: 0;
   z-index: 1;
+  border-radius: inherit;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
 }
 
 .image[data-status="loading"] {
@@ -96,131 +127,73 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+  border-radius: inherit;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  font-weight: var(--prime-sys-typography-weight-medium);
-  color: var(--prime-sys-color-content-secondary);
-  font-size: inherit;
-  user-select: none;
+  overflow: hidden;
   text-align: center;
 }
 
-/* Avatar.Group.Root — горизонтальный ряд: слева направо, последний в DOM перекрывает предыдущие */
+/* An icon as fallback fills about half of the circle. */
+.fallback > svg {
+  width: 50%;
+  height: 50%;
+}
+
+/* Presence dot on the bottom-end edge, cut out of the avatar by a ring in the surface color. */
+.status {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  width: calc(var(--avatar-size) * 0.3);
+  height: calc(var(--avatar-size) * 0.3);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-success-default);
+  box-shadow: 0 0 0 calc(2 * var(--prime-border-width))
+    var(--avatar-ring, var(--prime-color-bg-canvas));
+}
+
+.status[data-status="offline"] {
+  background: var(--prime-color-palette-gray-solid);
+}
+
+.status[data-status="away"] {
+  background: var(--prime-color-warning-default);
+}
+
+.status[data-status="busy"] {
+  background: var(--prime-color-danger-default);
+}
+
+/* ─── Group: overlap with a ring in the surface color ──────────────────── */
+
+/*
+ * `--avatar-ring` is inherited, not declared here: surfaces (Card, Modal, Drawer, Popover,
+ * Sidebar) set it to their own background, so the ring matches wherever the group sits.
+ * Canvas is the fallback.
+ */
 .groupRoot {
   display: inline-flex;
   flex-direction: row;
   align-items: center;
+  isolation: isolate;
 }
 
 .groupRoot > * {
-  position: relative;
-  flex-shrink: 0;
-  box-sizing: border-box;
-  border: var(--prime-sys-unit-2px) solid var(--prime-sys-color-surface-raised);
-  border-radius: var(--prime-sys-shape-radius-round);
+  box-shadow: 0 0 0 calc(2 * var(--prime-border-width))
+    var(--avatar-ring, var(--prime-color-bg-canvas));
 }
 
-.groupRoot[data-size="s"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-0p56rem);
+.groupRoot > * + * {
+  margin-inline-start: calc(var(--avatar-size) * -0.25);
 }
 
-.groupRoot[data-size="m"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-0p7rem);
-}
-
-.groupRoot[data-size="l"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-0p84rem);
-}
-
-.groupRoot[data-size="xl"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-0p98rem);
-}
-
-.groupRoot[data-size="2xl"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-1p12rem);
-}
-
-.groupRoot[data-size="3xl"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-1p26rem);
-}
-
-.groupRoot[data-size="4xl"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-1p4rem);
-}
-
-.groupRoot[data-size="5xl"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-1p54rem);
-}
-
-.groupRoot[data-size="6xl"] > * + * {
-  margin-inline-start: var(--prime-sys-unit-neg-1p68rem);
-}
-
-/* Слот +N: тот же диаметр и типографика, что у Avatar.Root этого размера */
 .groupOverflow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--prime-sys-color-surface-accentSoft);
-  color: var(--prime-sys-color-content-secondary);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  user-select: none;
-  text-align: center;
-}
-
-.groupOverflow[data-size="s"] {
-  width: var(--prime-sys-size-avatar-s-size);
-  height: var(--prime-sys-size-avatar-s-size);
-  font-size: var(--prime-sys-size-avatar-s-text);
-}
-
-.groupOverflow[data-size="m"] {
-  width: var(--prime-sys-size-avatar-m-size);
-  height: var(--prime-sys-size-avatar-m-size);
-  font-size: var(--prime-sys-size-avatar-m-text);
-}
-
-.groupOverflow[data-size="l"] {
-  width: var(--prime-sys-size-avatar-l-size);
-  height: var(--prime-sys-size-avatar-l-size);
-  font-size: var(--prime-sys-size-avatar-l-text);
-}
-
-.groupOverflow[data-size="xl"] {
-  width: var(--prime-sys-size-avatar-xl-size);
-  height: var(--prime-sys-size-avatar-xl-size);
-  font-size: var(--prime-sys-size-avatar-xl-text);
-}
-
-.groupOverflow[data-size="2xl"] {
-  width: var(--prime-sys-size-avatar-2xl-size);
-  height: var(--prime-sys-size-avatar-2xl-size);
-  font-size: var(--prime-sys-size-avatar-2xl-text);
-}
-
-.groupOverflow[data-size="3xl"] {
-  width: var(--prime-sys-size-avatar-3xl-size);
-  height: var(--prime-sys-size-avatar-3xl-size);
-  font-size: var(--prime-sys-size-avatar-3xl-text);
-}
-
-.groupOverflow[data-size="4xl"] {
-  width: var(--prime-sys-size-avatar-4xl-size);
-  height: var(--prime-sys-size-avatar-4xl-size);
-  font-size: var(--prime-sys-size-avatar-4xl-text);
-}
-
-.groupOverflow[data-size="5xl"] {
-  width: var(--prime-sys-size-avatar-5xl-size);
-  height: var(--prime-sys-size-avatar-5xl-size);
-  font-size: var(--prime-sys-size-avatar-5xl-text);
-}
-
-.groupOverflow[data-size="6xl"] {
-  width: var(--prime-sys-size-avatar-6xl-size);
-  height: var(--prime-sys-size-avatar-6xl-size);
-  font-size: var(--prime-sys-size-avatar-6xl-text);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--avatar-size) * 0.36);
 }

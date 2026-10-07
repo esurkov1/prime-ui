@@ -1,19 +1,105 @@
+/*
+ * Demo container that imitates a real surface. Fills, not borders, separate it from the
+ * preview background; surfaces above the canvas switch the field context (foundation §4).
+ */
 .root {
+  box-sizing: border-box;
   display: flex;
+  flex-direction: column;
+  /* Snippets that return several siblings (fragments) get the in-group rhythm. */
+  gap: var(--prime-space-3);
   width: max-content;
   max-width: 100%;
   min-width: 0;
+  padding: var(--prime-card-padding-s);
+  border-radius: var(--prime-card-radius);
   overflow: hidden;
-  flex-direction: column;
-  padding: var(--prime-sys-spacing-x4);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
-  border-radius: var(--prime-sys-shape-radius-l);
-  background: linear-gradient(
-      to bottom,
-      var(--prime-sys-color-surface-elevated),
-      var(--prime-sys-color-surface-raised)
-    )
-    padding-box;
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  color: var(--prime-color-text-primary);
+}
+
+/* Same fill as its host canvas: a hairline keeps the tile's bounds readable (foundation §4). */
+.root[data-surface="canvas"] {
+  background: var(--prime-color-bg-canvas);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
+}
+
+.root[data-surface="surface"] {
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  background: var(--prime-color-bg-surface);
+  box-shadow: var(--prime-shadow-raised);
+}
+
+.root[data-surface="raised"] {
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+.root[data-surface="accent"] {
+  background: var(--prime-color-accent-soft);
+}
+
+/* --- Gallery: one example on every surface --------------------------------- */
+
+/*
+ * On a docs page (the surface plane) the gallery brings its own canvas, so the Surface tile does
+ * not vanish into the page; inside an example stage (already canvas) it is a plain grid.
+ */
+.gallery {
   box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--prime-space-3);
+  width: 100%;
+  min-width: 0;
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-canvas);
+  /* A canvas plane again: restore the canvas field and card context (foundation §4). */
+  --prime-color-field-bg: var(--prime-color-bg-surface);
+  --prime-color-card-bg: var(--prime-color-bg-surface);
+  --prime-card-shadow: var(--prime-shadow-raised);
+}
+
+:global([data-preview-layout]) .gallery {
+  --prime-color-field-bg: inherit;
+  --prime-color-card-bg: inherit;
+  --prime-card-shadow: inherit;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.galleryCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.galleryCell > .root {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: var(--prime-space-24);
+  justify-content: center;
+}
+
+.galleryLabel {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.galleryHint {
+  overflow: hidden;
+  color: var(--prime-color-text-muted);
+  font-weight: var(--prime-font-weight-regular);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -1,21 +1,21 @@
+/** Five tiers side by side: text, padding, label and hint come from the size. Pick the size that matches the neighbouring fields. */
 import { Textarea } from "prime-ui-kit";
+import styles from "./examples.module.css";
 
-/** Four `size` tiers — one field per size with a matching `Textarea.Hint` label. */
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
+
 export default function TextareaSizesExample() {
   return (
-    <>
-      <Textarea.Root size="s" placeholder="Size s">
-        <Textarea.Hint>size=&quot;s&quot;</Textarea.Hint>
-      </Textarea.Root>
-      <Textarea.Root size="m" placeholder="Size m">
-        <Textarea.Hint>size=&quot;m&quot;</Textarea.Hint>
-      </Textarea.Root>
-      <Textarea.Root size="l" placeholder="Size l">
-        <Textarea.Hint>size=&quot;l&quot;</Textarea.Hint>
-      </Textarea.Root>
-      <Textarea.Root size="xl" placeholder="Size xl">
-        <Textarea.Hint>size=&quot;xl&quot;</Textarea.Hint>
-      </Textarea.Root>
-    </>
+    <div className={styles.sizesGrid}>
+      {SIZES.map((size) => (
+        <Textarea.Root
+          key={size}
+          size={size}
+          label={`Размер ${size}`}
+          placeholder="Комментарий"
+          hint={`Подсказка яруса ${size}`}
+        />
+      ))}
+    </div>
   );
 }

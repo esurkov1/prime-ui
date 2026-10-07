@@ -1,23 +1,26 @@
-import { DigitInput } from "prime-ui-kit";
+/** Five tiers in a row: the cell is square with the side equal to the control height (28 · 32 · 36 · 40 · 48). Match the size of the surrounding buttons and inputs. */
+import { DigitInput, Typography } from "prime-ui-kit";
 
-/**
- * Четыре размера ячеек: `size` s, m, l, xl — те же токены контролов, что у поля ввода.
- * Паритет с `playground/snippets/digit-input/sizes.tsx`.
- */
+import styles from "./examples.module.css";
+
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
+
 export default function DigitInputSizesExample() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-m)",
-        alignItems: "center",
-      }}
-    >
-      <DigitInput.Root size="s" length={4} defaultValue="1234" />
-      <DigitInput.Root size="m" length={4} defaultValue="1234" />
-      <DigitInput.Root size="l" length={4} defaultValue="1234" />
-      <DigitInput.Root size="xl" length={4} defaultValue="1234" />
+    <div className={styles.sizesRow}>
+      {SIZES.map((size) => (
+        <div key={size} className={styles.cell}>
+          <DigitInput.Root
+            size={size}
+            length={4}
+            defaultValue="2048"
+            labels={{ group: `Код, ${size}` }}
+          />
+          <Typography.Root variant="caption" tone="muted">
+            {size}
+          </Typography.Root>
+        </div>
+      ))}
     </div>
   );
 }

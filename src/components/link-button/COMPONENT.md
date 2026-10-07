@@ -1,108 +1,109 @@
 # LinkButton
 
-**Проектирование по умолчанию:** при проектировании экранов и примеров изначально выбирай **`m`** для `size` (где есть ось размера), если явно не оговорено иное.
+**Category:** actions (Действия)
 
-## Canonical
+> A real link styled as a text action, sized on the control tiers.
 
-Text-style **navigation** control: **`LinkButton.Root`** only — control typography, inline-flex, underline on hover / `:focus-visible`, sizes **`s`–`xl`**. Import **`LinkButton`** from **`prime-ui-kit`**.
+## When to use
+- Navigation to another page or URL inside text, cards, forms and footers.
+- Secondary navigation next to a Button of the same size (“Войти по паролю” beside “Продолжить”).
+- Quiet service links in footers and metadata (`tone="neutral"`).
+- External links (`target="_blank"` + `rel="noopener noreferrer"`).
+
+## When not to use
+- An action without a URL (save, open a dialog) → use [Button](../button/COMPONENT.md) with `variant="ghost"`.
+- A navigation item that must look like a button → use [Button](../button/COMPONENT.md) with `asChild` and an `<a>`.
+- The path to the current page → use [Breadcrumb](../breadcrumb/COMPONENT.md).
+- Long-form text styling → use [Typography](../typography/COMPONENT.md).
+
+## Import
+```tsx
+import { LinkButton } from "prime-ui-kit";
+```
+
+## API
+
+### LinkButton.Root
+`forwardRef` → `HTMLAnchorElement` (the `<span>` when `disabled`). + native `<a>` props (`href`, `target`, `rel`, `download`, `onClick`, `aria-*` …). No `asChild`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text size, line height, icon size and gap; provided to nested `Icon`. |
+| `tone` | `"accent" \| "neutral"` | `"accent"` | `accent` — a regular link; `neutral` — quiet link. |
+| `disabled` | `boolean` | `false` | Renders `<span role="link" aria-disabled="true" tabIndex={-1}>` without `href`; native anchor props are not passed. |
+| `children` | `ReactNode` | — | Text and optional `Icon`s. |
+| `className` | `string` | — | Extra class on the root. |
+
+## Variants
+
+### tone
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `accent` | accent text, medium weight; on hover `accent-hover` and an underline appears | regular links in text, forms and cards | yes |
+| `neutral` | secondary text; on hover primary text + underline | footers, metadata, dense service navigation | |
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | 12/16 text, icon 14, gap 4 | captions, table meta | |
+| `s` | 13/20 text, icon 16, gap 4 | footers, secondary text | |
+| `m` | 14/20 text, icon 16, gap 4 | default UI text, next to `m` controls | yes |
+| `l` | 16/24 text, icon 20, gap 8 | reading text (`body-l`), next to `l` controls | |
+| `xl` | 18/24 text (title-l), icon 20, gap 8 | prominent links in hero blocks | |
+
+Match the link size to the surrounding text or to the Button it sits next to.
+
+**Combinations**
+- Recommended: `accent` inside text and next to actions; `neutral` + `s` for service links.
+- Avoid: `neutral` links inside body text (they read as plain text); making LinkButton the primary action of a form — use Button.
+
+## States
+| State | Driven by | DOM |
+|---|---|---|
+| hover | pointer | hover color + underline (`text-decoration-color: currentColor`) |
+| focus-visible | keyboard | outer focus ring with `--prime-focus-offset`, radius `--prime-radius-xs` |
+| disabled | `disabled` | `<span role="link">`, `aria-disabled="true"`, `tabIndex=-1`, `data-disabled="true"`, `text-disabled` color, no underline, `cursor: not-allowed` |
+
+Root attributes: `data-size`, `data-tone`, `data-disabled` (only when disabled).
+
+## Layout & spacing
+- Inline in text: put a space before it (`{" "}`) and keep the text's size.
+- Next to a Button: same `size`, `justify-content: space-between` or `gap: var(--prime-space-3)`.
+- Footer link rows: `gap: var(--prime-space-2) var(--prime-space-4)`, wrap allowed.
+- `max-width: 100%`; `display: inline-flex` with icon and text centered.
+
+## Accessibility
+- A native `<a>`: Enter follows the link; it is announced as a link.
+- The disabled state is a non-focusable `span role="link"` with `aria-disabled`.
+- Icons are decorative; the text is the accessible name.
+- External links: say “новая вкладка” in the text or `aria-label`.
+- No `labels` keys.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | Five size tiers | matching surrounding text or controls |
+| [tones.tsx](examples/tones.tsx) | `accent` vs `neutral` | regular vs quiet links |
+| [states.tsx](examples/states.tsx) | Active link; disabled in both tones | unavailable destinations |
+| [with-icon.tsx](examples/with-icon.tsx) | Leading and trailing `Icon` | hinting at the destination |
+| [composition.tsx](examples/composition.tsx) | Link in text, beside a Button, neutral footer links | sign-in and form cards |
+| [external-link.tsx](examples/external-link.tsx) | `target="_blank"` + `rel` | links leaving the app |
 
 ```tsx
 import { LinkButton } from "prime-ui-kit";
 
-<LinkButton.Root href="/settings">
-  Settings
-</LinkButton.Root>
+export function DocsLink() {
+  return <LinkButton.Root href="/docs">Документация</LinkButton.Root>;
+}
 ```
 
-| Piece | Role |
-|--------|------|
-| `LinkButton.Root` | `<a>` with anchor props, or `<span role="link">` when `disabled` |
+## Mistakes
+- `<LinkButton.Root onClick={save}>` without `href` → use `Button.Root variant="ghost"`.
+- `disabled` link with `aria-label`/`title` expecting them to render → in the disabled state only children are rendered; put the meaning in the text.
+- `target="_blank"` without `rel="noopener noreferrer"` → add `rel`.
+- Wrapping a LinkButton in an `<a>` → pass `href` directly.
 
-### Playground demos
-
-Порядок и смысл совпадают с **`playground/sections/LinkButtonSection.tsx`**. Исходники с импортами **`@/`** — в **`playground/snippets/link-button/`**:
-
-| Блок в секции | Сниппет | Содержание |
-|---------------|---------|------------|
-| Размеры | [`sizes.tsx`](../../../playground/snippets/link-button/sizes.tsx) | **`size`** **`s`**–**`xl`**, подписи **LinkButton s** … **xl** |
-| Состояния | [`states.tsx`](../../../playground/snippets/link-button/states.tsx) | Активная с **`href`** и **`disabled`** (span, без перехода) |
-| Композиция с иконками | [`composition.tsx`](../../../playground/snippets/link-button/composition.tsx) | **`Icon`** слева/справа, только иконка + **`aria-label`** |
-| Внешняя ссылка | [`external-link.tsx`](../../../playground/snippets/link-button/external-link.tsx) | **`target="_blank"`** и **`rel="noopener noreferrer"`** |
-
-### Примеры в `examples/`
-
-Импорт **`"prime-ui-kit"`** — для копипаста в приложение. Зеркала сниппетов (та же структура и сценарий):
-
-| Файл | Сниппет playground |
-|------|-------------------|
-| [`sizes.tsx`](examples/sizes.tsx) | [`sizes.tsx`](../../../playground/snippets/link-button/sizes.tsx) |
-| [`disabled.tsx`](examples/disabled.tsx) | [`states.tsx`](../../../playground/snippets/link-button/states.tsx) |
-| [`composition.tsx`](examples/composition.tsx) | [`composition.tsx`](../../../playground/snippets/link-button/composition.tsx) |
-| [`external.tsx`](examples/external.tsx) | [`external-link.tsx`](../../../playground/snippets/link-button/external-link.tsx) |
-
-Дополнительные сценарии (отдельного фрейма в playground нет):
-
-| Файл | Сценарий |
-|------|----------|
-| [`inline-text-link.tsx`](examples/inline-text-link.tsx) | Встроенная ссылка в абзаце, **`size="m"`** |
-| [`footer-legal.tsx`](examples/footer-legal.tsx) | Плотный ряд legal, **`size="s"`** |
-| [`navigation-cluster.tsx`](examples/navigation-cluster.tsx) | Горизонтальная навигация с разделителями |
-
-## Extended
-
-### About
-
-- **Use** for in-app routes and sections when the UI should read as a **link**, not a filled button.
-- **Use** inline in copy (help, legal, helper text) where a compact or scaled text link fits the layout; smaller tiers often use **`size="s"`** in footers and dense chrome.
-- **Use** when nested icons should follow **control** size tokens — **`size`** sets **`ControlSizeProvider`** for children.
-- **Do not use** for actions that do not navigate (submit, toggle, open dialogs); use **Button** or another control.
-- **Do not use** expecting **`asChild`** or polymorphic roots; you cannot attach these styles to a child router **`Link`** via one prop.
-- **Do not use** **`disabled`** to mean “still in tab order with full link semantics”; disabled mode removes focus and drops anchor attributes (see Rules).
-
-### Composition
-
-- **`LinkButton`** — namespace object with **`LinkButton.Root`** only.
-- **`LinkButton.Root`** — when **`disabled`** is false (default), renders **`<a>`** with anchor attributes from props and wraps **`children`** in **`ControlSizeProvider`** for **`size`**.
-- When **`disabled`** is true, renders **`<span role="link">`** with **`aria-disabled="true"`**, **`tabIndex={-1}`**, and the same size context — no **`href`** or other spread anchor props on the DOM node.
-
-### Rules
-
-- **`size`** defaults to **`m`**; valid values are **`"s"`**, **`"m"`**, **`"l"`**, **`"xl"`** (control token tier).
-- With **`disabled={true}`**, anchor props (including **`href`**, **`target`**, **`onClick`**) are **not** applied — the root is a **`span`**; do not rely on them for accessibility or behavior in that mode.
-- Active link: native **`<a>`** with your **`href`**; keyboard **Enter** activates like a normal link.
-- Disabled presentation: **`role="link"`**, **`aria-disabled="true"`**, **`tabIndex={-1}`** — not in tab order by default; avoid if the item should remain focusable as a link.
-- For **icon-only** links, provide a name (**`aria-label`** or visible text).
-- For **`target="_blank"`**, set **`rel="noopener noreferrer"`** (and warn in UI if policy requires it).
-- There is no loading or error variant; for async work without navigation, prefer **Button** (or another pattern).
-- One visual style only (no **`variant`**); hierarchy comes from **`size`** and surrounding layout. No built-in **`fullWidth`** — use layout or **`className`** on the root if you need block-level stretch.
-- **`ref`** is forwarded to the DOM root (**`<a>`** or the disabled **`<span>`**); the public ref type is **`HTMLAnchorElement`** even though the disabled node is a **`span`**.
-
-### API
-
-#### LinkButton.Root
-
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control height / type scale; size context for nested icons via `ControlSizeProvider`. |
-| disabled | `boolean` | `false` | No | Renders `span` with `role="link"` instead of `a`; no navigation. |
-| children | `React.ReactNode` | — | No | Link content (text, icons, etc.). |
-| className | `string` | — | No | Additional class on the root element. |
-| href | `string` | — | No | Navigation target on the active `<a>`; ignored when `disabled` (no `href` on the span). |
-| …anchorProps | `React.AnchorHTMLAttributes<HTMLAnchorElement>` | — | No | Other anchor attributes forwarded to `<a>` only when `disabled` is false (`target`, `rel`, `download`, `onClick`, `aria-*`, `tabIndex`, etc.); `ref` targets `<a>` or the disabled `<span>`. |
-
-### Related
-
-- [Button](../button/COMPONENT.md) — actions, forms, loading/disabled without link semantics.
-- [Breadcrumb](../breadcrumb/COMPONENT.md) — trail navigation; items may use `LinkButton` internally.
-- [Typography](../typography/COMPONENT.md) — body text and inline links without control padding; `LinkButton` matches control alignment and scale.
-
-## LLM note
-
-- **Import:** `import { LinkButton } from "prime-ui-kit"` — render **`LinkButton.Root`**; there is no flat **`LinkButton`** element export.
-- **Semantics:** Prefer **`LinkButton`** over **`Button`** when the primary affordance is **navigation** (URL change), not a command.
-- **`disabled`:** Forces **`span`** + **`aria-disabled`**; **`href` / `onClick` / `target`** from props are **ignored** — do not pass them expecting behavior.
-- **External / new tab:** Always pair **`target="_blank"`** with **`rel="noopener noreferrer"`**.
-- **Router:** No **`asChild`** — wrap router **`Link`** by styling it separately or use plain **`<a href>`** from the kit; do not invent a polymorphic API.
-- **Density:** Footer and legal rows → often **`size="s"`**; primary in-sentence link in body copy → usually **`m`** unless the surrounding control tier dictates otherwise.
-- **Icons:** Children can include **`Icon`**; size context flows from **`LinkButton.Root`** — keep icon tier consistent with **`size`** on the root.
-- **Verification:** Таблицы **Playground demos** и **Примеры в `examples/`** выше; исходники сниппетов — `playground/snippets/link-button/*.tsx`.
+## Related
+- [Button](../button/COMPONENT.md)
+- [Breadcrumb](../breadcrumb/COMPONENT.md)
+- [Typography](../typography/COMPONENT.md)

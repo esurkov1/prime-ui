@@ -1,45 +1,74 @@
 .root {
+  --link-text: var(--prime-control-m-text-size);
+  --link-lh: var(--prime-control-m-line-height);
+  --link-gap: var(--prime-space-1);
+  --link-fg: var(--prime-color-accent-text);
+  --link-fg-hover: var(--prime-color-accent-hover);
+  --prime-icon-size: var(--prime-control-m-icon);
+
   display: inline-flex;
   align-items: center;
-  gap: var(--prime-sys-size-control-m-gap);
-  font-size: var(--prime-sys-size-control-m-text);
-  color: var(--prime-sys-color-content-primary);
+  gap: var(--link-gap);
+  max-width: 100%;
+  border-radius: var(--prime-radius-xs);
+  color: var(--link-fg);
+  font-size: var(--link-text);
+  line-height: var(--link-lh);
+  font-weight: var(--prime-font-weight-medium);
   text-decoration-line: underline;
   text-decoration-color: transparent;
-  text-underline-offset: var(--prime-sys-unit-2px);
-  transition:
-    color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
-    text-decoration-color var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  text-decoration-thickness: var(--prime-border-width);
+  text-underline-offset: calc(var(--prime-space-1) - var(--prime-border-width));
   cursor: pointer;
+  transition:
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    text-decoration-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.root:hover {
-  color: var(--prime-sys-color-content-accent);
+.root[data-tone="neutral"] {
+  --link-fg: var(--prime-color-text-secondary);
+  --link-fg-hover: var(--prime-color-text-primary);
+}
+
+.root[data-size="xs"] {
+  --link-text: var(--prime-control-xs-text-size);
+  --link-lh: var(--prime-control-xs-line-height);
+  --prime-icon-size: var(--prime-control-xs-icon);
+}
+
+.root[data-size="s"] {
+  --link-text: var(--prime-control-s-text-size);
+  --link-lh: var(--prime-control-s-line-height);
+  --prime-icon-size: var(--prime-control-s-icon);
+}
+
+.root[data-size="l"] {
+  --link-text: var(--prime-control-l-text-size);
+  --link-lh: var(--prime-control-l-line-height);
+  --link-gap: var(--prime-space-2);
+  --prime-icon-size: var(--prime-control-l-icon);
+}
+
+/* Control tiers l and xl share text 16/24, so xl steps up to the title-l type (18) to stay distinct. */
+.root[data-size="xl"] {
+  --link-text: var(--prime-text-title-l-size);
+  --link-lh: var(--prime-text-title-l-line-height);
+  --link-gap: var(--prime-space-2);
+  --prime-icon-size: var(--prime-control-xl-icon);
+}
+
+.root:hover:not([data-disabled="true"]) {
+  color: var(--link-fg-hover);
   text-decoration-color: currentColor;
 }
 
 .root:focus-visible {
-  outline: var(--prime-sys-unit-2px) solid var(--prime-sys-color-focus-ring);
-  outline-offset: var(--prime-sys-unit-2px);
-  text-decoration-color: currentColor;
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }
 
 .root[data-disabled="true"] {
-  color: var(--prime-sys-color-content-disabled);
+  color: var(--prime-color-text-disabled);
   text-decoration: none;
-}
-
-.root[data-size="s"] {
-  gap: var(--prime-sys-size-control-s-gap);
-  font-size: var(--prime-sys-size-control-s-text);
-}
-
-.root[data-size="l"] {
-  gap: var(--prime-sys-size-control-l-gap);
-  font-size: var(--prime-sys-size-control-l-text);
-}
-
-.root[data-size="xl"] {
-  gap: var(--prime-sys-size-control-xl-gap);
-  font-size: var(--prime-sys-size-control-xl-text);
+  cursor: not-allowed;
 }

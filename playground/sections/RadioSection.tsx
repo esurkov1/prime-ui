@@ -1,4 +1,15 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import RadioHintErrorExample from "@/components/radio/examples/hint-error";
+import hintErrorSource from "@/components/radio/examples/hint-error.tsx?raw";
+import RadioHorizontalExample from "@/components/radio/examples/horizontal";
+import horizontalSource from "@/components/radio/examples/horizontal.tsx?raw";
+import RadioPlanPickerExample from "@/components/radio/examples/plan-picker";
+import planPickerSource from "@/components/radio/examples/plan-picker.tsx?raw";
+import RadioSizesExample from "@/components/radio/examples/sizes";
+import sizesSource from "@/components/radio/examples/sizes.tsx?raw";
+import RadioStatesExample from "@/components/radio/examples/states";
+import statesSource from "@/components/radio/examples/states.tsx?raw";
+import { SurfaceGallery } from "../components/ExampleSurface";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
   DemoApiTitle,
@@ -6,42 +17,110 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import RadioCompositionSnippet from "../snippets/radio/composition";
-import compositionSource from "../snippets/radio/composition.tsx?raw";
-import RadioControlledSnippet from "../snippets/radio/controlled";
-import controlledSource from "../snippets/radio/controlled.tsx?raw";
-import RadioFormGroupSnippet from "../snippets/radio/form-group";
-import formGroupSource from "../snippets/radio/form-group.tsx?raw";
-import RadioFullWidthSnippet from "../snippets/radio/full-width";
-import fullWidthSource from "../snippets/radio/full-width.tsx?raw";
-import RadioSizesSnippet from "../snippets/radio/sizes";
-import sizesSource from "../snippets/radio/sizes.tsx?raw";
-import RadioStatesSnippet from "../snippets/radio/states";
-import statesSource from "../snippets/radio/states.tsx?raw";
-import RadioVariantsSnippet from "../snippets/radio/variants";
-import variantsSource from "../snippets/radio/variants.tsx?raw";
 
-const radioRootApiRows: PlaygroundApiPropRow[] = [
+const radioGroupApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "variant",
-    type: '"default" | "error"',
-    defaultValue: '"default"',
+    prop: "value / defaultValue",
+    type: "string",
+    defaultValue: "—",
     required: "Нет",
-    description: "Визуальная семантика: ошибка валидации и data-invalid на корне.",
+    description: "Выбранный пункт: контролируемый или начальный.",
+  },
+  {
+    prop: "onValueChange",
+    type: "(value: string) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Вызывается с value выбранного пункта (клик, пробел, стрелки).",
+  },
+  {
+    prop: "name",
+    type: "string",
+    defaultValue: "useId()",
+    required: "Нет",
+    description: "Общее нативное name пунктов для отправки формы.",
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Размер маркера, подписи, hint и error из одного яруса токенов.",
+    description:
+      "Ярус для всех пунктов: круг 14 · 16 · 18 · 20 · 24 px, подпись, hint и error из одного яруса токенов.",
+  },
+  {
+    prop: "orientation",
+    type: '"vertical" | "horizontal"',
+    defaultValue: '"vertical"',
+    required: "Нет",
+    description: "Столбец или ряд с переносом.",
+  },
+  {
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Красное кольцо у невыбранных кругов и aria-invalid на группе и пунктах.",
+  },
+  {
+    prop: "required",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Нативный required на пунктах и aria-required на группе.",
   },
   {
     prop: "disabled",
     type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Блокирует все пункты.",
+  },
+  {
+    prop: "fullWidth",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Растянуть каждый пункт на ширину контейнера.",
+  },
+  {
+    prop: "…rest",
+    type: 'Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue" | "onChange" | "dir">',
     defaultValue: "—",
     required: "Нет",
-    description: "Блокировка выбора; синхронизируется с Label и визуальным состоянием.",
+    description:
+      'aria-label / aria-labelledby (или fieldset + legend снаружи), className. role="radiogroup".',
+  },
+];
+
+const radioRootApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "value",
+    type: "string",
+    defaultValue: "—",
+    required: "Да",
+    description: "Значение пункта, которое получит Radio.Group.",
+  },
+  {
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Ошибка только у этого пункта; Radio.Error включает её сам.",
+  },
+  {
+    prop: "disabled",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Блокировка пункта.",
+  },
+  {
+    prop: "className",
+    type: "string",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Класс на обёртке пункта (div.field), не на input.",
   },
   {
     prop: "id",
@@ -51,34 +130,19 @@ const radioRootApiRows: PlaygroundApiPropRow[] = [
     description: "id нативного input; при отсутствии генерируется через useId.",
   },
   {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Класс обёртки .field вокруг слотов Label, Hint и Error.",
-  },
-  {
-    prop: "aria-describedby",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description:
-      "Дополняется id подсказки и сообщения об ошибке при наличии Radio.Hint / Radio.Error.",
-  },
-  {
     prop: "children",
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Radio.Label, Radio.Hint, Radio.Error и вложенная разметка.",
+    description: "Radio.Label, Radio.Hint, Radio.Error.",
   },
   {
     prop: "…rest",
-    type: 'Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size">',
+    type: 'Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange" | "name" | "value" | "children">',
     defaultValue: "—",
     required: "Нет",
     description:
-      'name, value, checked, defaultChecked, onChange, required, readOnly и прочие атрибуты input type="radio".',
+      'aria-describedby, autoFocus и прочие атрибуты input type="radio"; ref — на input.',
   },
 ];
 
@@ -160,14 +224,11 @@ export default function RadioSection() {
       <PageContent.Header>
         <PageContent.Title>Radio</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Переключатель «один из нескольких»: подходит, когда варианты взаимоисключающие (тариф,
-              способ оплаты, слот доставки). У каждого пункта свой маркер и подпись; несколько
-              пунктов связываются одинаковым <code>name</code>. Рядом можно показать подсказку или
-              текст ошибки проверки.
-            </>
-          }
+          Выбор одного варианта из 2–7 видимых: тариф, способ оплаты, слот доставки. Пункты
+          собираются в <code>Radio.Group</code> с <code>value</code> / <code>onValueChange</code>,
+          подпись группы — <code>fieldset</code> с <code>legend</code> или <code>aria-label</code>.
+          Для 2–4 коротких режимов отображения удобнее SegmentedControl, для длинных списков —
+          Select.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -175,27 +236,13 @@ export default function RadioSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
             <DemoDescription>
-              Четыре значения <code>size</code> — <code>s</code>, <code>m</code>, <code>l</code>,{" "}
-              <code>xl</code> — при <code>variant=&quot;default&quot;</code>; у каждого пункта своё{" "}
-              <code>name</code>, чтобы превью не мешало другим блокам.
+              <code>size</code> <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> ·{" "}
+              <code>xl</code> — тот же ярус, что у Checkbox, полей и кнопок. По умолчанию{" "}
+              <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
+            <PlaygroundExampleFrame.Root code={sizesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <RadioSizesSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Варианты</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;default&quot;</code> с <code>Radio.Hint</code> и{" "}
-              <code>variant=&quot;error&quot;</code> с <code>Radio.Error</code>: ошибка подсвечивает
-              обводку маркера и выставляет <code>aria-invalid</code> на input.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <RadioVariantsSnippet />
+                <RadioSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -203,94 +250,90 @@ export default function RadioSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Состояния</DemoSectionTitle>
             <DemoDescription>
-              Выбрано и не выбрано, <code>disabled</code> (вкл./выкл.), плюс строка с{" "}
-              <code>Radio.Hint</code> для связи по <code>aria-describedby</code>.
+              Не выбран, выбран, <code>invalid</code> и <code>disabled</code> — на холсте, в
+              карточке и на всплывающей панели. Hover видно при наведении; Tab переводит фокус в
+              группу, стрелки двигают выбор, кольцо фокуса рисуется вокруг круга.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statesSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={statesSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <RadioStatesSnippet />
+                <SurfaceGallery surfaces={["canvas", "surface", "raised"]}>
+                  <RadioStatesExample />
+                </SurfaceGallery>
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
+            <DemoSectionTitle>Описание и ошибка</DemoSectionTitle>
             <DemoDescription>
-              Состояние в родителе: у каждого пункта одинаковый <code>name</code>,{" "}
-              <code>checked</code> привязан к значению в <code>useState</code>, в{" "}
-              <code>onChange</code> обновляем состояние при <code>e.currentTarget.checked</code>.
+              <code>Radio.Hint</code> и <code>Radio.Error</code> стоят под колонкой текста и
+              попадают в <code>aria-describedby</code>. Ошибку группы показывайте один раз — под
+              последним пунктом, а всю группу помечайте <code>invalid</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={controlledSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={hintErrorSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <RadioControlledSnippet />
+                <RadioHintErrorExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Композиция</DemoSectionTitle>
+            <DemoSectionTitle>В строку</DemoSectionTitle>
             <DemoDescription>
-              Группа из двух пунктов с подписью и <code>Radio.Hint</code> под каждым — типичный блок
-              выбора способа оплаты.
+              Короткие подписи без описаний выстраиваются в ряд через{" "}
+              <code>orientation=&quot;horizontal&quot;</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={horizontalSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <RadioCompositionSnippet />
+                <RadioHorizontalExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Full width</DemoSectionTitle>
+            <DemoSectionTitle>Композиция: выбор тарифа</DemoSectionTitle>
             <DemoDescription>
-              Корень поля тянется на ширину контейнера (<code>width: 100%</code> у обёртки): в узкой
-              колонке подпись занимает оставшееся место в сетке label.
+              Контролируемая группа (<code>value</code> + <code>onValueChange</code>) в карточке
+              настроек: у каждого плана описание, недоступный вариант объясняет причину в подсказке.
+              Размер <code>m</code>.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={fullWidthSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={planPickerSource.trim()}>
               <PlaygroundExampleFrame.Stage>
-                <RadioFullWidthSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Специфичные фичи</DemoSectionTitle>
-            <DemoDescription>
-              Нативная форма: общий <code>name</code>, <code>fieldset</code>/<code>legend</code>,{" "}
-              <code>required</code> на пунктах и чтение выбранного значения через{" "}
-              <code>FormData</code> при отправке.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={formGroupSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <RadioFormGroupSnippet />
+                <RadioPlanPickerExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
+            <DemoApiTitle>Radio.Group</DemoApiTitle>
+            <DemoDescription>
+              Значение, имя, размер и общие флаги для пунктов;{" "}
+              <code>role=&quot;radiogroup&quot;</code>.
+            </DemoDescription>
+            <PlaygroundApiTable rows={radioGroupApiRows} />
             <DemoApiTitle>Radio.Root</DemoApiTitle>
             <DemoDescription>
-              Обёртка поля и провайдер контекста: размер, вариант, связь hint/error с input через
-              id.
+              Пункт группы. Ref и input-атрибуты уходят на скрытый нативный{" "}
+              <code>input type=&quot;radio&quot;</code>; на корне — <code>data-size</code>,{" "}
+              <code>data-state</code>, <code>data-invalid</code>, <code>data-disabled</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={radioRootApiRows} />
             <DemoApiTitle>Radio.Label</DemoApiTitle>
             <DemoDescription>
-              Подпись и визуальный маркер: рендерит <code>Label.Root</code>, нативный{" "}
-              <code>type=&quot;radio&quot;</code> и SVG-кольца.
+              Кликабельная строка «круг + текст»: рендерит input и связывает его через{" "}
+              <code>htmlFor</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={radioLabelApiRows} />
             <DemoApiTitle>Radio.Hint</DemoApiTitle>
             <DemoDescription>
-              Вторичный текст под пунктом; регистрируется в контексте для{" "}
+              Описание под текстом (<code>text-muted</code>), добавляется в{" "}
               <code>aria-describedby</code>.
             </DemoDescription>
             <PlaygroundApiTable rows={radioHintApiRows} />
             <DemoApiTitle>Radio.Error</DemoApiTitle>
             <DemoDescription>
-              Сообщение об ошибке (через <code>Hint.Root</code> с вариантом error); влияет на{" "}
-              <code>aria-invalid</code>.
+              Текст ошибки (<code>danger-text</code>); пока смонтирован, пункт invalid.
             </DemoDescription>
             <PlaygroundApiTable rows={radioErrorApiRows} />
           </div>

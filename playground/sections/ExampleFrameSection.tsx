@@ -1,7 +1,12 @@
+import ExampleFrameBasicExample from "@/components/example-frame/examples/basic";
 import { PageContent } from "@/components/page-content/PageContent";
 import type { PlaygroundApiPropRow } from "../components/PlaygroundApiTable";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import { DemoApiTitle, DemoSectionTitle } from "../components/PlaygroundDemoTypography";
+import {
+  DemoApiTitle,
+  DemoDescription,
+  DemoSectionTitle,
+} from "../components/PlaygroundDemoTypography";
 
 const rootRows: PlaygroundApiPropRow[] = [
   {
@@ -11,13 +16,6 @@ const rootRows: PlaygroundApiPropRow[] = [
     required: "Да",
     description:
       "Исходный текст для вкладки «Код», копирования в буфер и подсветки через CodeBlock.",
-  },
-  {
-    prop: "language",
-    type: "string",
-    defaultValue: '"tsx"',
-    required: "Нет",
-    description: "Зарезервировано; подсветка ориентирована на TS/TSX.",
   },
   {
     prop: "children",
@@ -65,7 +63,7 @@ const rootRows: PlaygroundApiPropRow[] = [
   {
     prop: "defaultViewport",
     type: '"desktop" | "tablet" | "mobile"',
-    defaultValue: '"tablet"',
+    defaultValue: '"desktop"',
     required: "Нет",
     description: "Начальная ширина в неконтролируемом режиме.",
   },
@@ -99,12 +97,12 @@ const rootRows: PlaygroundApiPropRow[] = [
       "Раскладка внутри превью: default, stack, stack-center, stack-narrow, dense-stack, row, row-start, row-wrap.",
   },
   {
-    prop: "themePreset",
-    type: "string",
-    defaultValue: "—",
+    prop: "labels",
+    type: "Partial<ExampleFrameLabels>",
+    defaultValue: "русские строки",
     required: "Нет",
     description:
-      "Синхронизация с data-theme-preset на превью (например как у html в playground), чтобы цвета не расходились с оболочкой.",
+      "Строки тулбара: preview, code, desktop, tablet, mobile, copy, copied, copyError, themeDark, themeLight, codeRegion.",
   },
 ];
 
@@ -125,19 +123,23 @@ export default function ExampleFrameSection() {
       <PageContent.Header>
         <PageContent.Title>ExampleFrame</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Фрейм «превью + код» для документации и демо: тулбар с переключением вкладок, выбором
-              ширины устройства и копированием исходника. В плейграунде обёртка{" "}
-              <code>PlaygroundExampleFrame</code> строится поверх этого API. В каталоге основных
-              компонентов отдельной страницы с живыми примерами нет — это вспомогательный блок для
-              показа кода рядом с UI.
-            </>
-          }
+          Фрейм «превью + код» для документации: вкладки, ширина устройства (компьютер, планшет,
+          телефон), светлая и тёмная тема превью и копирование исходника. В плейграунде поверх него
+          построен <code>PlaygroundExampleFrame</code>: тема и ширина берутся из настроек
+          плейграунда, фон превью — холст, карточка или плавающий слой.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
+          <div className="demoBlock">
+            <DemoSectionTitle>Превью и код</DemoSectionTitle>
+            <DemoDescription>
+              <code>ExampleFrame.Root</code> с <code>code</code> и <code>previewLayout</code>; в
+              превью попадают только дети <code>ExampleFrame.Stage</code>.
+            </DemoDescription>
+            <ExampleFrameBasicExample />
+          </div>
+
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>ExampleFrame.Root</DemoApiTitle>

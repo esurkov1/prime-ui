@@ -1,105 +1,58 @@
-export const interactionStates = [
-  "default",
-  "hover",
-  "active",
-  "focus",
-  "focus-visible",
-  "disabled",
+/**
+ * Shared API vocabulary (docs/foundation.md §10). One name per concept; components import
+ * these types instead of declaring their own aliases.
+ */
+
+/** Control size tiers: xs 28 · s 32 · m 36 · l 40 · xl 48. Default is always `m`. */
+export const controlSizes = ["xs", "s", "m", "l", "xl"] as const;
+export type ControlSize = (typeof controlSizes)[number];
+
+/** Visual treatment. */
+export const variants = ["solid", "soft", "outline", "ghost"] as const;
+export type Variant = (typeof variants)[number];
+
+/** Semantic color. Destructive is `danger`. */
+export const tones = ["neutral", "accent", "success", "warning", "danger", "info"] as const;
+export type Tone = (typeof tones)[number];
+
+/** Decorative palette color (Badge, Tag, Avatar). */
+export const paletteColors = [
+  "gray",
+  "blue",
+  "green",
+  "orange",
+  "red",
+  "yellow",
+  "purple",
+  "sky",
+  "pink",
+  "teal",
 ] as const;
+export type PaletteColor = (typeof paletteColors)[number];
 
-export const selectionStates = ["selected", "checked", "indeterminate"] as const;
+/** Values of `data-state`. */
+export const dataStates = [
+  "open",
+  "closed",
+  "checked",
+  "unchecked",
+  "indeterminate",
+  "active",
+  "inactive",
+] as const;
+export type DataState = (typeof dataStates)[number];
 
-export const validationStates = ["valid", "invalid", "readonly", "required"] as const;
-
-export const asyncStates = ["idle", "loading", "success", "error"] as const;
-
-export const disclosureStates = ["open", "closed"] as const;
-
-export const componentVariants = {
-  button: ["primary", "neutral", "error"] as const,
-  input: ["default", "error"] as const,
-  textarea: ["default", "error"] as const,
-  checkbox: ["default", "error"] as const,
-  radio: ["default", "error"] as const,
-  switch: ["default", "error"] as const,
-  select: ["default", "error"] as const,
-  modal: ["default"] as const,
-} as const;
-
-export const componentSizes = {
-  buttonGroup: ["s", "m", "l", "xl"] as const,
-  button: ["s", "m", "l", "xl"] as const,
-  input: ["s", "m", "l", "xl"] as const,
-  textarea: ["s", "m", "l", "xl"] as const,
-  checkbox: ["s", "m", "l", "xl"] as const,
-  radio: ["s", "m", "l", "xl"] as const,
-  switch: ["s", "m", "l", "xl"] as const,
-  select: ["s", "m", "l", "xl"] as const,
-  fileUpload: ["s", "m", "l", "xl"] as const,
-  linkButton: ["s", "m", "l", "xl"] as const,
-  breadcrumb: ["s", "m", "l", "xl"] as const,
-  divider: ["s", "m", "l", "xl"] as const,
-  label: ["s", "m", "l", "xl"] as const,
-  hint: ["s", "m", "l", "xl"] as const,
-  banner: ["s", "m", "l", "xl"] as const,
-  digitInput: ["s", "m", "l", "xl"] as const,
-  kbd: ["s", "m", "l", "xl"] as const,
-  slider: ["s", "m", "l", "xl"] as const,
-  tabs: ["s", "m", "l", "xl"] as const,
-  pagination: ["s", "m", "l", "xl"] as const,
-  stepper: ["s", "m", "l", "xl"] as const,
-  accordion: ["s", "m", "l", "xl"] as const,
-  dropdown: ["s", "m", "l", "xl"] as const,
-  progressBar: ["s", "m", "l", "xl"] as const,
-  sidebar: ["s", "m", "l", "xl"] as const,
-  drawer: ["s", "m", "l", "xl"] as const,
-  dataTable: ["s", "m", "l", "xl"] as const,
-  emptyPage: ["s", "m", "l", "xl"] as const,
-} as const;
-
-export const buttonModes = ["filled", "stroke", "lighter", "ghost", "fancy"] as const;
-
-export type InteractionState = (typeof interactionStates)[number];
-export type SelectionState = (typeof selectionStates)[number];
-export type ValidationState = (typeof validationStates)[number];
-export type AsyncState = (typeof asyncStates)[number];
-export type DisclosureState = (typeof disclosureStates)[number];
-
-export type ButtonVariant = (typeof componentVariants.button)[number];
-export type InputVariant = (typeof componentVariants.input)[number];
-export type TextareaVariant = (typeof componentVariants.textarea)[number];
-export type CheckboxVariant = (typeof componentVariants.checkbox)[number];
-export type RadioVariant = (typeof componentVariants.radio)[number];
-export type SwitchVariant = (typeof componentVariants.switch)[number];
-export type SelectVariant = (typeof componentVariants.select)[number];
-export type ModalVariant = (typeof componentVariants.modal)[number];
-
-export type ButtonGroupSize = (typeof componentSizes.buttonGroup)[number];
-export type ButtonSize = (typeof componentSizes.button)[number];
-export type InputSize = (typeof componentSizes.input)[number];
-export type TextareaSize = (typeof componentSizes.textarea)[number];
-export type CheckboxSize = (typeof componentSizes.checkbox)[number];
-export type RadioSize = (typeof componentSizes.radio)[number];
-export type SwitchSize = (typeof componentSizes.switch)[number];
-export type SelectSize = (typeof componentSizes.select)[number];
-export type FileUploadSize = (typeof componentSizes.fileUpload)[number];
-export type LinkButtonSize = (typeof componentSizes.linkButton)[number];
-export type BreadcrumbSize = (typeof componentSizes.breadcrumb)[number];
-export type DividerSize = (typeof componentSizes.divider)[number];
-export type LabelSize = (typeof componentSizes.label)[number];
-export type HintSize = (typeof componentSizes.hint)[number];
-export type BannerSize = (typeof componentSizes.banner)[number];
-export type DigitInputSize = (typeof componentSizes.digitInput)[number];
-export type KbdSize = (typeof componentSizes.kbd)[number];
-export type SliderSize = (typeof componentSizes.slider)[number];
-export type TabsSize = (typeof componentSizes.tabs)[number];
-export type PaginationSize = (typeof componentSizes.pagination)[number];
-export type StepperSize = (typeof componentSizes.stepper)[number];
-export type AccordionSize = (typeof componentSizes.accordion)[number];
-export type DropdownSize = (typeof componentSizes.dropdown)[number];
-export type ProgressBarSize = (typeof componentSizes.progressBar)[number];
-export type SidebarSize = (typeof componentSizes.sidebar)[number];
-export type DrawerSize = (typeof componentSizes.drawer)[number];
-export type DataTableSize = (typeof componentSizes.dataTable)[number];
-export type EmptyPageSize = (typeof componentSizes.emptyPage)[number];
-export type ButtonMode = (typeof buttonModes)[number];
+/**
+ * Text color (Typography, Icon). `default` is primary text, `secondary` and `muted` are the
+ * two quieter steps; the rest map to the semantic `*-text` colors.
+ */
+export const textTones = [
+  "default",
+  "secondary",
+  "muted",
+  "accent",
+  "success",
+  "warning",
+  "danger",
+] as const;
+export type TextTone = (typeof textTones)[number];

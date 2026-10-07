@@ -1,16 +1,23 @@
+/** `Label.Icon` puts a muted icon before the text, sized by the label size. Use it when an icon helps scan a long form. */
 import { Icon, Label } from "prime-ui-kit";
 
-/** Icon slot: size follows `Label.Root`; hide decorative glyphs from assistive tech. */
-export function WithIconExample() {
+import styles from "./examples.module.css";
+
+export default function LabelWithIconExample() {
   return (
-    <>
-      <Label.Root htmlFor="example-label-icon-upload">
+    <div className={styles.list}>
+      <Label.Root htmlFor="label-icon-email" required>
         <Label.Icon>
-          <Icon aria-hidden name="action.upload" />
+          <Icon name="field.email" />
         </Label.Icon>
-        Attachment
+        Рабочий email
       </Label.Root>
-      <input id="example-label-icon-upload" type="file" name="attachment" />
-    </>
+      <Label.Root htmlFor="label-icon-lock" size="l">
+        <Label.Icon>
+          <Icon name="status.locked" />
+        </Label.Icon>
+        Пароль
+      </Label.Root>
+    </div>
   );
 }

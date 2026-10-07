@@ -1,123 +1,123 @@
 # Pagination
 
-**Default `size`:** use **`m`** for the size axis unless the toolbar or table footer explicitly needs another tier.
+**Category:** navigation (Навигация)
 
-## Canonical
+> Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view.
 
-- **`Pagination`** is a single compound export: **`Pagination.Root`** only (`Pagination = { Root }`).
-- **Controlled API:** **`page`**, **`totalPages`**, and **`onPageChange`** are all required; there is no uncontrolled mode.
-- **Semantics:** root is a **`nav`** with **`aria-label="Pagination"`**, **`data-size`**, previous/next **ghost** **`Button.Root`** cells with **`Button.Icon`**, numeric page **`Button.Root`** cells (current page **`primary`** **`filled`**), and ellipsis **`span`**s (**`aria-hidden`**).
-- **Range logic:** if **`totalPages ≤ 7`**, every page index is shown; otherwise the row is shortened with **`siblingCount`** (default **`1`**) and **`…`** segments while keeping first and last pages visible.
-- **Edge cases:** **`totalPages < 1`** renders **`null`**; **`page`** is clamped to **`1 … totalPages`** for display and clicks; previous/next are **`disabled`** on the first/last page.
-- **Copy:** arrow and **“Page N”** strings are fixed in the implementation (English); there are no i18n props on **`Pagination`**.
+## When to use
+- Lists and tables split into pages, usually in their footer.
+- Narrow places (cards, mobile footers) — `compact` or `compact="auto"`.
 
-## Extended
+## When not to use
+- Steps of a process with names and statuses → use [Stepper](../stepper/COMPONENT.md).
+- Switching sections of one screen → use [Tabs](../tabs/COMPONENT.md).
+- A table with its own footer → [DataTable](../data-table/COMPONENT.md) already includes pagination.
 
-### About
-
-Chunked navigation for lists and tables: chevron previous/next, numbered pages, and ellipses for long ranges.
-
-- **Use** when the dataset is split into discrete pages and **`totalPages`** is known (server-driven or client-side paging).
-- **Use** in table footers, list toolbars, or search result bars alongside a short range summary.
-- **Do not use** as the only paging affordance when the product is infinite-scroll-only with no page index.
-- **Do not use** when **`totalPages < 1`** and you still need chrome—**`Pagination.Root`** returns nothing; show an empty state or omit the bar in the parent.
-- **Do not use** when you must replace inner markup or strings; structure and **Button** wiring are fixed—fork or wrap at app level if you need deep customization.
-
-### Composition
-
-- **`Pagination.Root`** — the only public part. Renders the **`nav`** row; **`className`** merges onto that **`nav`** only.
-- Full-width or “meta left / pager right” layouts are parent responsibility (flex or grid around **`Pagination.Root`**)—there is no **`fullWidth`** prop on **`Pagination`**.
-
-### Playground snippets
-
-Demos match **`playground/sections/PaginationSection.tsx`** (order and intent). Sources use **`@/`** under **`playground/snippets/pagination/`**; section descriptions and some labels are Russian in the playground UI.
-
-| Playground block | Snippet | Intent |
-|------------------|---------|--------|
-| Размеры | [`sizes.tsx`](../../../playground/snippets/pagination/sizes.tsx) (+ [`sizes.module.css`](../../../playground/snippets/pagination/sizes.module.css)) | **`size`** **`s`–`xl`**, long range (**`totalPages={20}`**), local state per row |
-| Диапазон номеров | [`range-modes.tsx`](../../../playground/snippets/pagination/range-modes.tsx) (+ [`rows.module.css`](../../../playground/snippets/pagination/rows.module.css)) | All indices when **`totalPages ≤ 7`** vs ellipsis row when larger |
-| Состояния | [`states.tsx`](../../../playground/snippets/pagination/states.tsx) | First / last / single-page arrow **`disabled`** semantics |
-| Контролируемый режим | [`controlled.tsx`](../../../playground/snippets/pagination/controlled.tsx) (+ [`controlled.module.css`](../../../playground/snippets/pagination/controlled.module.css)) | Shared **`page`** with external jump buttons |
-| Full width | [`full-width.tsx`](../../../playground/snippets/pagination/full-width.tsx) (+ [`full-width.module.css`](../../../playground/snippets/pagination/full-width.module.css)) | Flex toolbar: meta left, pager right (no **`fullWidth`** prop) |
-| Специфичные фичи | [`features.tsx`](../../../playground/snippets/pagination/features.tsx) | **`siblingCount`** **`0`** / **`2`**; **`totalPages=0`** → **`null`** |
-
-### Scenarios (see `examples/`)
-
-| Scenario | Approach |
-|----------|----------|
-| Size ladder | Same as playground **Размеры**; package copy in English. → [`examples/sizes.tsx`](examples/sizes.tsx) |
-| Range modes | Same as playground **Диапазон номеров**. → [`examples/range-modes.tsx`](examples/range-modes.tsx) |
-| Disabled arrows / single page | Same as playground **Состояния**. → [`examples/states.tsx`](examples/states.tsx) |
-| Sibling window + empty data | Same as playground **Специфичные фичи** (`siblingCount`, `totalPages=0`). → [`examples/features.tsx`](examples/features.tsx) |
-| Table footer | Pair a range summary with **`Pagination.Root`** in a footer row; keep **`page`** in sync with fetched rows. → [`examples/table-footer.tsx`](examples/table-footer.tsx) |
-| Compact toolbar | Set **`size="s"`** for denser toolbars or mobile-adjacent rows. → [`examples/compact.tsx`](examples/compact.tsx) |
-| Full-width list bar | **`display: flex`**, **`justify-content: space-between`**, **`flex-wrap`**: meta text + pager. → [`examples/full-width-list.tsx`](examples/full-width-list.tsx) |
-| Controlled page index | Store **`page`** in React state (or router); update from **`onPageChange`** and any other controls (e.g. jump to first/last). → [`examples/controlled-page.tsx`](examples/controlled-page.tsx) |
-| Canonical wiring | Minimal **`Pagination.Root`** with required props; short row + long row with **`siblingCount`**. → [`examples/canonical-composition.tsx`](examples/canonical-composition.tsx) |
-
-### Minimal example
-
+## Import
 ```tsx
 import { Pagination } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <Pagination.Root page={1} totalPages={5} onPageChange={() => {}} />
-  );
-}
 ```
-
-### Canonical composition (reference)
-
-For **default wiring**, **long ranges**, and **`siblingCount`**, open **`examples/canonical-composition.tsx`** next to this file. Imports use **`"prime-ui-kit"`** so snippets work in an app after installing the package.
-
-### Example files in `examples/`
-
-| File | Scenario |
-|------|----------|
-| `sizes.tsx` | **`size`** ladder + long range (mirror [`sizes.tsx`](../../../playground/snippets/pagination/sizes.tsx)) |
-| `range-modes.tsx` | Short vs long `totalPages` (mirror [`range-modes.tsx`](../../../playground/snippets/pagination/range-modes.tsx)) |
-| `states.tsx` | First / last / single page (mirror [`states.tsx`](../../../playground/snippets/pagination/states.tsx)) |
-| `controlled-page.tsx` | Controlled `page` + jump buttons (mirror [`controlled.tsx`](../../../playground/snippets/pagination/controlled.tsx)) |
-| `full-width-list.tsx` | Full-width bar (mirror [`full-width.tsx`](../../../playground/snippets/pagination/full-width.tsx)) |
-| `features.tsx` | `siblingCount` and `totalPages=0` (mirror [`features.tsx`](../../../playground/snippets/pagination/features.tsx)) |
-| `canonical-composition.tsx` | Required props, default size, short row + long row with `siblingCount` |
-| `table-footer.tsx` | Table footer: row range + pager |
-| `compact.tsx` | Compact row: `size="s"` |
-
-### Rules
-
-- **Controlled only:** **`page`**, **`totalPages`**, and **`onPageChange`** are required.
-- **`page`** is clamped internally to **`1 … totalPages`** before rendering and when handling clicks.
-- If **`totalPages < 1`**, the component returns **`null`**.
-- The active page button sets **`aria-current="page"`**; other page buttons use **`aria-label`** of the form **`Page {n}`**; arrows use **“Previous page”** / **“Next page”**.
-- Syncing **`page`** to the URL, router, or query params is the parent’s responsibility.
 
 ## API
 
 ### Pagination.Root
+Renders `<nav>`; does not forward a ref. + native `<nav>` props (`HTMLAttributes<HTMLElement>` except `defaultValue`, `onChange`); `aria-label` always comes from `labels.nav`.
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| page | `number` | — | Yes | Current page; clamped to `1 … totalPages` for display and navigation |
-| totalPages | `number` | — | Yes | Page count; if `< 1`, renders nothing |
-| onPageChange | `(page: number) => void` | — | Yes | Called when the user selects a page or an arrow |
-| siblingCount | `number` | `1` | No | How many page indices to show on each side of the current page when `totalPages > 7` |
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` | No | Control and ellipsis scale (`--prime-sys-size-control-*`) |
-| className | `string` | — | No | Extra class on the root `nav` |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `totalPages` | `number` | — (required) | Number of pages. Below `1` nothing is rendered. |
+| `value` | `number` | — | Current page (1-based), controlled. Clamped to `1…totalPages`. |
+| `defaultValue` | `number` | `1` | Initial page, uncontrolled. |
+| `onValueChange` | `(page: number) => void` | — | Called on a page button or arrow click (not when the page does not change). |
+| `siblingCount` | `number` | `1` | Pages on each side of the current one before an ellipsis (only when `totalPages > 7`). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: button height, radius, text, icon. |
+| `compact` | `boolean \| "auto"` | `false` | `true` — arrows + «current / total» instead of numbers; `"auto"` — fills the parent and switches to compact when the container is narrower than 22rem. |
+| `labels` | `Partial<PaginationLabels>` | see Accessibility | Screen-reader strings. |
+| `className` | `string` | — | Extra class on the `nav`. |
+
+## Variants
+
+### compact
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `false` | ghost arrow buttons around page numbers; ellipsis «…» for skipped ranges | desktop list and table footers | yes |
+| `true` | arrows around «3 / 12» (current in primary medium, total muted, tabular numbers) | cards, mobile footers, tight toolbars | |
+| `"auto"` | `display: block; width: 100%`; full view right-aligned, below 22rem container width the compact view with arrows at the edges | responsive footers (DataTable uses this) | |
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | 28px square buttons, 12/16 text, icon 14, no gap | dense tables | |
+| `s` | 32px, 13/20, icon 16, gap 4 | list and table footers next to an `s` Select | |
+| `m` | 36px, 14/20, icon 16, gap 4 | default | yes |
+| `l` | 40px, 16/24, icon 20, gap 4 | large layouts | |
+| `xl` | 48px, 16/24, icon 20, gap 8 | touch-first screens | |
+
+Button height equals the control height: Pagination lines up with Button, Input and Select of the same `size`.
+
+### Page range
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `totalPages ≤ 7` | every page number, no ellipsis | short lists | |
+| `siblingCount={1}` | 1 … 19 20 21 … 40 | most lists | yes |
+| `siblingCount={2}` | 1 … 18 19 20 21 22 … 40 | wide footers, frequent jumps | |
+
+**Combinations**
+- Recommended: `size="s"` with a rows-per-page Select of the same size in a list footer; `compact="auto"` when the footer can get narrow.
+- Avoid: a large `siblingCount` together with `compact="auto"` in a narrow container — the full row overflows before it collapses.
+
+## States
+| State | Driven by | DOM |
+|---|---|---|
+| current page | `value` / `defaultValue` | `aria-current="page"`, `data-current="true"`, `accent-soft` fill + accent text |
+| hover / active | pointer | `fill-subtle` / `fill-subtle-active`, primary text |
+| focus-visible | keyboard | outer focus ring |
+| disabled arrow | first / last page | native `disabled`, `text-disabled` |
+
+Root attributes: `data-size`, `data-compact` (`"true"` / `"false"` / `"auto"`). Controlled: `value` + `onValueChange`; uncontrolled: `defaultValue`.
+
+## Layout & spacing
+- In a list footer: range text on the left, controls on the right (`justify-content: space-between`), `gap: var(--prime-space-6)` between the per-page Select and the pager; let the row wrap.
+- `compact="auto"` needs a parent with a width — it is a size container.
+
+## Accessibility
+- `nav` landmark with `aria-label`; page buttons have `aria-label` from `labels.page(n)` and the current one `aria-current="page"`; the ellipsis is `aria-hidden`.
+- Compact view reads «3 из 12» via the visually hidden `labels.of`.
+- Keyboard: Tab through buttons, Enter/Space activates.
+
+| `labels` key | Default | Used for |
+|---|---|---|
+| `nav` | `"Навигация по страницам"` | `aria-label` of the `nav` |
+| `previous` | `"Предыдущая страница"` | previous arrow |
+| `next` | `"Следующая страница"` | next arrow |
+| `page` | `(page) => \`Страница ${page}\`` | page button `aria-label` |
+| `of` | `"из"` | hidden word between current and total in the compact view |
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [list-footer.tsx](examples/list-footer.tsx) | Range + rows-per-page Select + `s` pagination | list and table footers |
+| [sizes.tsx](examples/sizes.tsx) | Every size next to a Button of the same size | aligning with controls |
+| [states.tsx](examples/states.tsx) | Disabled edge arrows, ≤ 7 pages, `siblingCount` 1 and 2 | choosing the range behaviour |
+| [compact.tsx](examples/compact.tsx) | `compact` and `compact="auto"` at 36rem and 20rem | narrow and responsive footers |
+
+```tsx
+import { Pagination } from "prime-ui-kit";
+import * as React from "react";
+
+export function OrdersPager() {
+  const [page, setPage] = React.useState(1);
+  return <Pagination.Root value={page} totalPages={12} onValueChange={setPage} />;
+}
+```
+
+## Mistakes
+- `page` / `onPageChange` → use `value` / `onValueChange`.
+- 0-based page index → pages start at `1`.
+- Passing `aria-label` to change the landmark name → use `labels={{ nav: "…" }}`.
+- `compact="auto"` inside a shrink-wrapped flex item → give the parent a width.
 
 ## Related
-
-- [Button](../button/COMPONENT.md) — page and arrow cells are **`Button.Root`** + **`Button.Icon`**.
-- [DataTable](../data-table/COMPONENT.md) — typical host for a footer pager.
-
-## LLM note
-
-- **Playground:** demos and order — **`playground/sections/PaginationSection.tsx`** + **`playground/snippets/pagination/*.tsx`**; **`examples/`** files in the table above mirror those snippets with **`prime-ui-kit`** imports where noted.
-- **Imports:** **`import { Pagination } from "prime-ui-kit"`** — use **`Pagination.Root`** only; there is no flat **`Pagination`** element.
-- **Props:** **`page`**, **`totalPages`**, **`onPageChange`** required; optional **`siblingCount`**, **`size`**, **`className`**.
-- **`size`** literals: **`s`**, **`m`**, **`l`**, **`xl`** — default **`m`**; maps to **`data-size`** on the root **`nav`**.
-- **`totalPages < 1`:** render is **`null`** — parent must handle empty data or hide the footer.
-- **No uncontrolled mode** — always pass **`page`** and **`onPageChange`**; lift state to the parent or router.
-- **Layout:** no **`fullWidth`** on **`Pagination`**; wrap in flex/grid and align in the parent.
-- **Strings:** labels are English and built-in; do not assume i18n props exist on **`Pagination`**.
+- [DataTable](../data-table/COMPONENT.md)
+- [Select](../select/COMPONENT.md)
+- [Stepper](../stepper/COMPONENT.md)

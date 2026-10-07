@@ -4,6 +4,19 @@ import { describe, expect, it, vi } from "vitest";
 import { Switch } from "./Switch";
 
 describe("Switch", () => {
+  it("names the switch from Switch.Label and describes it with Switch.Hint", () => {
+    render(
+      <Switch.Root>
+        <Switch.Label>Тёмная тема</Switch.Label>
+        <Switch.Hint>Подсказка</Switch.Hint>
+      </Switch.Root>,
+    );
+    const control = screen.getByRole("switch", { name: "Тёмная тема" });
+    expect(control).toHaveAccessibleDescription("Подсказка");
+    fireEvent.click(screen.getByText("Тёмная тема"));
+    expect(control).toBeChecked();
+  });
+
   it("toggles in uncontrolled mode", () => {
     render(
       <Switch.Root>
@@ -78,7 +91,7 @@ describe("Switch", () => {
 
     const field = onContainer.querySelector("[data-disabled='true']");
     expect(field).toBeTruthy();
-    expect(field).toHaveAttribute("data-checked", "true");
+    expect(field).toHaveAttribute("data-state", "checked");
   });
 
   it("renders hint and error sub-components", () => {
@@ -91,5 +104,18 @@ describe("Switch", () => {
     );
     expect(screen.getByText("You will receive push notifications")).toBeInTheDocument();
     expect(screen.getByText("Required field")).toBeInTheDocument();
+    expect(screen.getByRole("switch")).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("sets invalid and fullWidth data attributes", () => {
+    const { container } = render(
+      <Switch.Root invalid fullWidth>
+        <Switch.Label>Terms</Switch.Label>
+      </Switch.Root>,
+    );
+    const field = container.firstElementChild;
+    expect(field).toHaveAttribute("data-invalid", "true");
+    expect(field).toHaveAttribute("data-full-width", "true");
+    expect(field).toHaveAttribute("data-state", "unchecked");
   });
 });

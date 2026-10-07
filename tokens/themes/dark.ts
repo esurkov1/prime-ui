@@ -1,154 +1,132 @@
+/**
+ * Dark theme. Not an inversion: surfaces step up in lightness (canvas → surface → raised),
+ * accent and status colors move to lighter steps so text keeps WCAG AA on dark fills.
+ */
+const hues = ["blue", "green", "orange", "red", "yellow", "purple", "sky", "pink", "teal"] as const;
+type Hue = (typeof hues)[number];
+const hueRef: Record<Hue, string> = {
+  blue: "cobalt",
+  green: "green",
+  orange: "orange",
+  red: "red",
+  yellow: "yellow",
+  purple: "purple",
+  sky: "sky",
+  pink: "pink",
+  teal: "teal",
+};
+
+function darkPalette() {
+  const out: Record<string, { soft: string; text: string; solid: string; solidFg: string }> = {
+    gray: {
+      soft: "color-mix(in srgb, var(--prime-ref-color-gray-100) 12%, transparent)",
+      text: "{color.gray.300}",
+      solid: "{color.gray.300}",
+      solidFg: "{color.gray.950}",
+    },
+  };
+  for (const hue of hues) {
+    const r = hueRef[hue];
+    out[hue] = {
+      soft: `color-mix(in srgb, var(--prime-ref-color-${r}-500) 16%, transparent)`,
+      text: `{color.${r}.300}`,
+      solid: `{color.${r}.400}`,
+      solidFg: "{color.gray.950}",
+    };
+  }
+  return out;
+}
+
 export const darkThemeOverrides = {
   color: {
-    status: {
-      information: {
-        background: "color-mix(in srgb, var(--prime-ref-color-blue-500) 16%, transparent)",
-        backgroundEmphasis: "{color.blue.500}",
-        foreground: "{color.blue.300}",
-        border: "{color.blue.800}",
-      },
-      warning: {
-        background: "color-mix(in srgb, var(--prime-ref-color-orange-500) 16%, transparent)",
-        backgroundEmphasis: "{color.orange.500}",
-        foreground: "{color.orange.300}",
-        border: "{color.orange.800}",
-      },
-      success: {
-        background: "color-mix(in srgb, var(--prime-ref-color-green-500) 16%, transparent)",
-        backgroundEmphasis: "{color.green.500}",
-        foreground: "{color.green.300}",
-        border: "{color.green.800}",
-      },
-      away: {
-        background: "color-mix(in srgb, var(--prime-ref-color-yellow-500) 16%, transparent)",
-        backgroundEmphasis: "{color.yellow.500}",
-        foreground: "{color.yellow.300}",
-        border: "{color.yellow.800}",
-      },
-      feature: {
-        background: "color-mix(in srgb, var(--prime-ref-color-purple-500) 16%, transparent)",
-        backgroundEmphasis: "{color.purple.500}",
-        foreground: "{color.purple.300}",
-        border: "{color.purple.800}",
-      },
-      verified: {
-        background: "color-mix(in srgb, var(--prime-ref-color-sky-500) 16%, transparent)",
-        backgroundEmphasis: "{color.sky.500}",
-        foreground: "{color.sky.300}",
-        border: "{color.sky.800}",
-      },
-      error: {
-        background: "color-mix(in srgb, var(--prime-ref-color-red-500) 16%, transparent)",
-        backgroundEmphasis: "{color.red.500}",
-        foreground: "{color.red.300}",
-        border: "{color.red.800}",
-      },
+    bg: {
+      canvas: "{color.gray.950}",
+      surface: "{color.gray.900}",
+      raised: "{color.gray.875}",
+      /** = canvas: nested tiles on the 900 surface need a clear step (925 read as 1.03:1). */
+      sunken: "{color.gray.950}",
+      inverse: "{color.gray.100}",
+      scrim: "rgba(0, 0, 0, 0.6)",
     },
-    surface: {
-      default: "{color.gray.950}",
-      raised: "{color.gray.900}",
-      elevated: "{color.gray.800}",
-      accentSoft: "{color.gray.800}",
-      dangerSoft: "{color.red.950}",
-      overlay: "{color.overlay.scrimDark}",
+    fill: {
+      subtle: "rgba(233, 235, 240, 0.05)",
+      subtleActive: "rgba(233, 235, 240, 0.09)",
+      muted: "color-mix(in srgb, var(--prime-ref-color-gray-100) 7%, transparent)",
+      mutedHover: "color-mix(in srgb, var(--prime-ref-color-gray-100) 10%, transparent)",
+      strong: "color-mix(in srgb, var(--prime-ref-color-gray-100) 16%, transparent)",
+      strongHover: "color-mix(in srgb, var(--prime-ref-color-gray-100) 22%, transparent)",
     },
-    content: {
-      primary: "{color.gray.50}",
+    text: {
+      primary: "{color.gray.100}",
       secondary: "{color.gray.300}",
       muted: "{color.gray.400}",
+      placeholder: "{color.gray.400}",
       disabled: "{color.gray.600}",
-      inverse: "{color.gray.950}",
-      accent: "{color.lavender.300}",
-      danger: "{color.red.200}",
+      inverse: "{color.gray.925}",
     },
     border: {
+      faint: "{color.gray.850}",
+      /** One step above raised (875) so hairlines stay visible on floating layers too. */
       subtle: "{color.gray.800}",
-      separator: "{color.gray.500}",
-      strong: "{color.gray.600}",
-      emphasis: "{color.gray.50}",
-      muted: "{color.gray.700}",
-      accent: "{color.gray.500}",
-      danger: "{color.red.400}",
-      disabled: "{color.gray.800}",
-      inverse: "{color.white}",
-    },
-    action: {
-      primaryBackground: "{color.gray.50}",
-      primaryBackgroundHover: "{color.gray.200}",
-      primaryForeground: "{color.gray.950}",
-      primarySoftBackground:
-        "color-mix(in srgb, var(--prime-ref-color-gray-50) 42%, var(--prime-ref-color-gray-950))",
-      primarySoftForeground: "{color.gray.50}",
-      neutralBackground: "{color.gray.900}",
-      neutralBackgroundHover: "{color.gray.800}",
-      neutralForeground: "{color.gray.50}",
-      errorBackground: "{color.red.500}",
-      errorBackgroundHover: "{color.red.600}",
-      errorForeground: "{color.white}",
+      default: "{color.gray.750}",
+      control: "transparent",
     },
     accent: {
-      base: "{color.lavender.300}",
-      soft: "rgba(170, 180, 245, 0.12)",
+      default: "{color.cobalt.600}",
+      hover: "{color.cobalt.500}",
+      fg: "{color.white}",
+      soft: "{color.cobalt.950}",
+      softHover: "color-mix(in srgb, var(--prime-ref-color-cobalt-500) 28%, transparent)",
+      text: "{color.cobalt.400}",
     },
-    focus: {
-      ring: "{color.lavender.300}",
+    danger: {
+      default: "{color.red.600}",
+      hover: "{color.red.500}",
+      fg: "{color.white}",
+      soft: "color-mix(in srgb, var(--prime-ref-color-red-500) 16%, transparent)",
+      text: "{color.red.300}",
+      border: "{color.red.400}",
+    },
+    success: {
+      default: "{color.green.400}",
+      fg: "{color.gray.950}",
+      soft: "color-mix(in srgb, var(--prime-ref-color-green-500) 16%, transparent)",
+      text: "{color.green.300}",
+    },
+    warning: {
+      default: "{color.orange.400}",
+      fg: "{color.gray.950}",
+      soft: "color-mix(in srgb, var(--prime-ref-color-orange-500) 16%, transparent)",
+      text: "{color.orange.300}",
+    },
+    info: {
+      default: "{color.sky.400}",
+      fg: "{color.gray.950}",
+      soft: "color-mix(in srgb, var(--prime-ref-color-sky-500) 16%, transparent)",
+      text: "{color.sky.300}",
     },
     field: {
-      bg: "{color.gray.900}",
-      text: "{color.gray.50}",
-      placeholder: "{color.gray.500}",
-      border: "transparent",
-      borderHover: "{color.gray.700}",
-      borderFocus: "{color.lavender.300}",
-      borderError: "{color.red.400}",
+      bg: "color-mix(in srgb, var(--prime-ref-color-gray-100) 6%, transparent)",
+      bgSurface: "color-mix(in srgb, var(--prime-ref-color-gray-100) 6%, transparent)",
+      bgFocus: "{color.gray.925}",
+      bgDisabled: "color-mix(in srgb, var(--prime-ref-color-gray-100) 4%, transparent)",
+    },
+    focus: {
+      ring: "{color.cobalt.400}",
+    },
+    control: {
+      thumb: "{color.gray.100}",
+      selected: "{color.gray.750}",
     },
     tooltip: {
-      background: "{color.gray.100}",
-      foreground: "{color.gray.950}",
-      border: "{color.gray.300}",
+      bg: "{color.gray.750}",
+      text: "{color.gray.100}",
     },
-    dataTable: {
-      dividerVertical: "color-mix(in srgb, var(--prime-sys-color-border-subtle) 78%, transparent)",
-      dividerHorizontal:
-        "color-mix(in srgb, var(--prime-sys-color-border-subtle) 86%, transparent)",
-      headBackground: "{color.surface.elevated}",
-      rowBackground: "{color.surface.default}",
-    },
-    badge: {
-      grayFilled: {
-        background: "{color.gray.500}",
-      },
-      graySoft: {
-        background: "color-mix(in srgb, var(--prime-ref-color-gray-400) 18%, transparent)",
-      },
-      pink: {
-        backgroundSoft: "color-mix(in srgb, var(--prime-ref-color-pink-500) 16%, transparent)",
-        foregroundOnSoft: "{color.pink.300}",
-        backgroundEmphasis: "{color.pink.500}",
-        border: "{color.pink.800}",
-      },
-      teal: {
-        backgroundSoft: "color-mix(in srgb, var(--prime-ref-color-teal-500) 16%, transparent)",
-        foregroundOnSoft: "{color.teal.300}",
-        backgroundEmphasis: "{color.teal.500}",
-        border: "{color.teal.800}",
-      },
-    },
+    palette: darkPalette(),
   },
-  elevation: {
-    shadow: {
-      surface: "0 1px 2px rgba(8, 10, 14, 0.35)",
-      modal: "0 24px 48px rgba(8, 10, 14, 0.45)",
-      tooltip: "0 14px 30px rgba(8, 10, 14, 0.5), 0 4px 10px rgba(8, 10, 14, 0.4)",
-      buttonFocus: "0 0 0 2px rgba(170, 180, 245, 0.28)",
-      primaryFocus: "0 0 0 2px rgba(244, 244, 245, 0.4)",
-      errorFocus: "0 0 0 2px rgba(248, 113, 113, 0.38)",
-      fancyButtonNeutral:
-        "0 1px 2px rgba(8, 10, 14, 0.45), 0 0 0 1px var(--prime-sys-color-content-primary)",
-      fancyButtonPrimary:
-        "0 1px 2px rgba(8, 10, 14, 0.45), 0 0 0 1px var(--prime-sys-color-action-primaryBackground)",
-      fancyButtonError:
-        "0 1px 2px rgba(8, 10, 14, 0.45), 0 0 0 1px var(--prime-sys-color-action-errorBackground)",
-    },
+  shadow: {
+    raised: "none",
+    overlay: "0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px -8px rgba(0, 0, 0, 0.6)",
+    modal: "0 0 0 1px rgba(255, 255, 255, 0.06), 0 32px 72px -16px rgba(0, 0, 0, 0.75)",
   },
 } as const;

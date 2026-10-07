@@ -1,0 +1,52 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
+  gap: var(--prime-space-4);
+  width: 100%;
+}
+
+.cell {
+  display: grid;
+  align-content: start;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+/* A host that draws its own panel (its type comes from Typography caption): a ghost CodeBlock
+ * inherits the host's type and background. */
+.host {
+  padding: var(--prime-space-3) var(--prime-space-4);
+  overflow-x: auto;
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-accent-soft);
+}
+
+.column {
+  display: grid;
+  gap: var(--prime-space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.narrow {
+  display: grid;
+  gap: var(--prime-space-2);
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+  min-width: 0;
+}
+
+/* Heading → text 8, text → code 16: the code sits in its own row of the outer grid. */
+.doc {
+  display: grid;
+  gap: var(--prime-space-4);
+  width: 100%;
+  max-width: var(--prime-layout-reading-max-width);
+  min-width: 0;
+}
+
+.docText {
+  display: grid;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}

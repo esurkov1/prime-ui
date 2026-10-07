@@ -1,0 +1,40 @@
+/* Layout helpers for the EmptyPage examples. Semantic tokens only. */
+
+/* Columns of at least 16rem. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr));
+  align-items: start;
+  gap: var(--prime-space-6);
+  width: 100%;
+  min-width: 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+/* Data region: white surface with a fixed minimum height, EmptyPage fills it. */
+.region {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(var(--prime-space-24) * 3);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+  overflow: hidden;
+}
+
+.regionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-4) var(--prime-card-padding-m);
+}

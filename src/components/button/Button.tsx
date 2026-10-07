@@ -4,7 +4,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { Slot } from "@/internal/slot";
-import type { ButtonMode, ButtonSize, ButtonVariant } from "@/internal/states";
+import type { ControlSize, Tone, Variant } from "@/internal/states";
 
 import styles from "./Button.module.css";
 
@@ -14,10 +14,42 @@ type ButtonContextValue = {
 
 const [ButtonProvider, useButtonContext] = createComponentContext<ButtonContextValue>("Button");
 
+type ButtonLayout = {
+  iconOnly: boolean;
+  leadingIcon: boolean;
+  trailingIcon: boolean;
+  hasSpinner: boolean;
+};
+
+/**
+ * Reads the direct children to drive optical padding (icon side = padX − 4px),
+ * the square icon-only shape and where the loading spinner goes.
+ */
+function getButtonLayout(children: React.ReactNode): ButtonLayout {
+  const items = React.Children.toArray(children).filter(
+    (child) => !(typeof child === "string" && child.trim() === ""),
+  );
+  const isIcon = (child: React.ReactNode) =>
+    React.isValidElement(child) && child.type === ButtonIcon;
+  const isSpinner = (child: React.ReactNode) =>
+    React.isValidElement(child) && child.type === ButtonSpinner;
+  const content = items.filter((child) => !isSpinner(child));
+  const iconOnly = content.length > 0 && content.every(isIcon);
+
+  return {
+    iconOnly,
+    leadingIcon: !iconOnly && content.length > 0 && isIcon(content[0]),
+    trailingIcon: !iconOnly && content.length > 0 && isIcon(content[content.length - 1]),
+    hasSpinner: items.some(isSpinner),
+  };
+}
+
 export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size"> & {
-  variant?: ButtonVariant;
-  mode?: ButtonMode;
-  size?: ButtonSize;
+  /** Visual treatment. Default `solid`. */
+  variant?: Variant;
+  /** Semantic color. Default `accent`; `danger` for destructive actions. */
+  tone?: Extract<Tone, "accent" | "neutral" | "danger">;
+  size?: ControlSize;
   fullWidth?: boolean;
   loading?: boolean;
   /**
@@ -37,8 +69,8 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
     {
       children,
       className,
-      variant = "primary",
-      mode = "filled",
+      variant = "solid",
+      tone = "accent",
       size = "m",
       fullWidth,
       type = "button",
@@ -54,7 +86,22 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
     const isDisabled = disabled || loading;
     const contextValue = React.useMemo(() => ({ loading }), [loading]);
 
-    const dataAttrs = toDataAttributes({ variant, mode, size, loading, "full-width": fullWidth });
+    const layout = getButtonLayout(children);
+    const dataAttrs = toDataAttributes({
+      variant,
+      tone,
+      size,
+      disabled: isDisabled || undefined,
+      loading,
+      "full-width": fullWidth,
+      "icon-only": layout.iconOnly || undefined,
+      "leading-icon": layout.leadingIcon || undefined,
+      "trailing-icon": layout.trailingIcon || undefined,
+      // Auto spinner without a leading icon is centered over the hidden label: width stays put.
+      "loading-overlay":
+        (loading && !asChild && !layout.hasSpinner && !layout.leadingIcon && !layout.iconOnly) ||
+        undefined,
+    });
 
     if (asChild) {
       const { onClick: userOnClick, ...restWithoutClick } = rest;
@@ -98,7 +145,12 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
           aria-labelledby={ariaLabelledBy}
           {...dataAttrs}
         >
-          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+          <ControlSizeProvider value={size}>
+            {loading && !layout.hasSpinner ? (
+              <span className={styles.spinner} aria-hidden="true" />
+            ) : null}
+            {children}
+          </ControlSizeProvider>
         </button>
       </ButtonProvider>
     );

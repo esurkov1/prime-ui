@@ -1,3 +1,9 @@
+import DividerCompositionExample from "@/components/divider/examples/composition";
+import compositionSource from "@/components/divider/examples/composition.tsx?raw";
+import DividerSizesExample from "@/components/divider/examples/sizes";
+import sizesSource from "@/components/divider/examples/sizes.tsx?raw";
+import DividerVariantsExample from "@/components/divider/examples/variants";
+import variantsSource from "@/components/divider/examples/variants.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,12 +12,6 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import DividerCompositionSnippet from "../snippets/divider/composition";
-import compositionSource from "../snippets/divider/composition.tsx?raw";
-import DividerSizesSnippet from "../snippets/divider/sizes";
-import sizesSource from "../snippets/divider/sizes.tsx?raw";
-import DividerVariantsSnippet from "../snippets/divider/variants";
-import variantsSource from "../snippets/divider/variants.tsx?raw";
 
 const dividerRootApiRows: PlaygroundApiPropRow[] = [
   {
@@ -25,26 +25,18 @@ const dividerRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "align",
     type: '"start" | "center" | "end"',
-    defaultValue: "center для variant default, start для variant text",
+    defaultValue: '"center"',
     required: "Нет",
     description:
-      "Где оставить короткую «заглушку» линии относительно подписи (псевдоэлементы до/после контента).",
-  },
-  {
-    prop: "variant",
-    type: '"default" | "line-spacing" | "text"',
-    defaultValue: '"default"',
-    required: "Нет",
-    description:
-      "default — подпись между линиями или пустая линия; line-spacing — маркер в колонке с gap; text — стиль заголовка секции.",
+      "Где стоит подпись на линии; start — подпись у начала без линии перед ней (заголовок секции), end — у конца.",
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
     description:
-      "Ярус токенов контрола: зазор, кегль подписи (variant text), отступы и размер иконки в children.",
+      "Размер окружающего контента; подпись, отступ и иконка берутся из ступени: xs 12/16 · иконка 14, s 12/16 · 16, m 13/20 · 16, l 14/20 · 20, xl 16/24 · 20.",
   },
   {
     prop: "children",
@@ -52,7 +44,7 @@ const dividerRootApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description:
-      "Подпись или разметка с иконкой; без children — сплошная линия. У Icon внутри не задаётся size-класс — габариты из токена разделителя (`--prime-divider-icon`).",
+      "Подпись или иконка с текстом; без children — сплошная линия. Размер Icon внутри задаёт разделитель, а не проп size иконки.",
   },
   {
     prop: "className",
@@ -66,7 +58,8 @@ const dividerRootApiRows: PlaygroundApiPropRow[] = [
     type: "string",
     defaultValue: '"separator"',
     required: "Нет",
-    description: "Роль в DOM; для декоративной линии часто задают presentation и aria-hidden.",
+    description:
+      "По умолчанию separator (вертикальный получает aria-orientation); для декоративной линии в списке — presentation.",
   },
   {
     prop: "…rest",
@@ -83,13 +76,10 @@ export default function DividerSection() {
       <PageContent.Header>
         <PageContent.Title>Divider</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Линия и подпись между блоками: <code>default</code>, <code>line-spacing</code>,{" "}
-              <code>text</code>, размеры <code>s</code>–<code>xl</code>. У каждого примера внизу
-              есть короткая подсказка — на неё и смотрите. Роль по умолчанию <code>separator</code>.
-            </>
-          }
+          Тонкая линия цвета <code>border-subtle</code>, горизонтальная или вертикальная, при
+          необходимости с подписью или иконкой. Это единственное место, где в системе появляются
+          линии: строки списка, группы в панели, «или» между вариантами. Карточки и панели линией не
+          отделяются — только заливкой и отступами.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -97,35 +87,44 @@ export default function DividerSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Варианты</DemoSectionTitle>
             <DemoDescription>
-              Один блок: пустая линия, подпись по центру, заголовок секции, маркер между строками,
-              вертикальный разделитель, линия в списке.
+              Пустая линия или подпись в линии (<code>align</code> start · center · end;{" "}
+              <code>start</code> — заголовок секции), линия в колонке с <code>gap</code>,{" "}
+              <code>orientation=&quot;vertical&quot;</code> — между группами в ряду.
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root code={variantsSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <DividerVariantsSnippet />
+                <DividerVariantsExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
             <DemoSectionTitle>Размеры</DemoSectionTitle>
-            <DemoDescription>Три ступени — s, m, xl — для сравнения кегля подписи.</DemoDescription>
+            <DemoDescription>
+              <code>xs</code> · <code>s</code> · <code>m</code> · <code>l</code> · <code>xl</code> —
+              размер окружающего контента; подпись, отступ и иконка растут со ступенью:{" "}
+              <code>xs</code> и <code>s</code> — 12/16, <code>m</code> — 13/20, <code>l</code> —
+              14/20, <code>xl</code> — 16/24.
+            </DemoDescription>
             <PlaygroundExampleFrame.Root code={sizesSource.trim()} previewLayout="stack-center">
               <PlaygroundExampleFrame.Stage>
-                <DividerSizesSnippet />
+                <DividerSizesExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
 
           <div className="demoBlock">
-            <DemoSectionTitle>Иконка и текст</DemoSectionTitle>
+            <DemoSectionTitle>Композиция</DemoSectionTitle>
             <DemoDescription>
-              Внутри разделителя иконка и подпись выравниваются в ряд с отступом <code>gap</code> из
-              токенов размера.
+              Вход с альтернативой «или», заголовок секции с иконкой и линии между строками списка
+              настроек (<code>role=&quot;presentation&quot;</code> — список уже размечен).
             </DemoDescription>
-            <PlaygroundExampleFrame.Root code={compositionSource.trim()} previewLayout="stack">
+            <PlaygroundExampleFrame.Root
+              code={compositionSource.trim()}
+              previewLayout="stack-center"
+            >
               <PlaygroundExampleFrame.Stage>
-                <DividerCompositionSnippet />
+                <DividerCompositionExample />
               </PlaygroundExampleFrame.Stage>
             </PlaygroundExampleFrame.Root>
           </div>
@@ -134,7 +133,7 @@ export default function DividerSection() {
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Divider.Root</DemoApiTitle>
             <DemoDescription>
-              Единственный публичный узел: контейнер с псевдоэлементами-линиями и опциональным{" "}
+              Единственный узел: контейнер с линиями-псевдоэлементами и необязательным{" "}
               <code>span</code> для children.
             </DemoDescription>
             <PlaygroundApiTable rows={dividerRootApiRows} />

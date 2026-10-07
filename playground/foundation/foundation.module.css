@@ -1,0 +1,1267 @@
+/*
+ * Foundation pages. Same contract as components: semantic tokens only, fills instead of
+ * borders, 4px grid, flex/grid with gap. Demo blocks below are plain elements on tokens.
+ */
+
+/* --- Shared ------------------------------------------------------------------ */
+
+/*
+ * Tiles inside page content: the page is the surface plane, so a tile is a sunken fill without
+ * a shadow; fields inside read like on the canvas.
+ */
+.panel {
+  --prime-color-field-bg: var(--prime-color-bg-surface);
+
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  color: var(--prime-color-text-primary);
+}
+
+.stack {
+  display: grid;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.tokenName {
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.tokenStack {
+  display: grid;
+  gap: var(--prime-space-1);
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: var(--prime-text-title-s-size);
+  line-height: var(--prime-text-title-s-line-height);
+  font-weight: var(--prime-text-title-s-weight);
+}
+
+.groupNote {
+  margin: 0;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+}
+
+.demoLabel {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ruleList {
+  display: grid;
+  gap: var(--prime-space-2);
+  max-width: var(--prime-layout-reading-max-width);
+  margin: 0;
+  padding-inline-start: var(--prime-space-5);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
+}
+
+.ruleList li::marker {
+  color: var(--prime-color-text-muted);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.measureProbe {
+  position: absolute;
+  height: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.inlineToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  cursor: pointer;
+}
+
+.inlineToggle input {
+  width: var(--prime-control-s-choice);
+  height: var(--prime-control-s-choice);
+  margin: 0;
+  accent-color: var(--prime-color-accent-default);
+}
+
+.plainButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: var(--prime-control-s-height);
+  padding-inline: var(--prime-control-s-padding-x);
+  border: 0;
+  border-radius: var(--prime-control-s-radius);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  font-size: var(--prime-control-s-text-size);
+  font-weight: var(--prime-font-weight-medium);
+  cursor: pointer;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.plainButton:hover {
+  background: var(--prime-color-fill-muted-hover);
+}
+
+/* Panels that hold fake fields are surfaces: switch the field context (foundation §4). */
+.proximityPanel,
+.tierPanel,
+.pairingCard,
+.focusDemo {
+  --prime-color-field-bg: var(--prime-color-bg-surface);
+}
+
+/* --- Tables -------------------------------------------------------------------- */
+
+.tableWrap {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+}
+
+.table {
+  width: 100%;
+  /* Narrow screens scroll the table inside its tile instead of breaking token names. */
+  min-width: calc(var(--prime-space-24) * 6);
+  border-collapse: collapse;
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+}
+
+.table code {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.table th,
+.table td {
+  padding: var(--prime-space-2) var(--prime-table-cell-padding-x);
+  text-align: start;
+  vertical-align: middle;
+}
+
+.table thead th {
+  height: var(--prime-control-m-height);
+  padding-block: 0;
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  font-weight: var(--prime-font-weight-medium);
+  white-space: nowrap;
+}
+
+.table tbody tr + tr > * {
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+.table tbody th {
+  font-weight: var(--prime-font-weight-medium);
+  white-space: nowrap;
+}
+
+.table tbody tr[data-default] > * {
+  background: var(--prime-color-fill-subtle);
+}
+
+.defaultMark {
+  margin-inline-start: var(--prime-space-2);
+  color: var(--prime-color-accent-text);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-regular);
+}
+
+.verdict {
+  display: inline-flex;
+  align-items: center;
+  height: var(--prime-badge-m-height);
+  padding-inline: var(--prime-badge-m-padding-x);
+  border-radius: var(--prime-badge-m-radius);
+  font-size: var(--prime-badge-m-text-size);
+  font-weight: var(--prime-font-weight-medium);
+  white-space: nowrap;
+}
+
+.verdict[data-tone="pass"] {
+  background: var(--prime-color-success-soft);
+  color: var(--prime-color-success-text);
+}
+
+.verdict[data-tone="fail"] {
+  background: var(--prime-color-danger-soft);
+  color: var(--prime-color-danger-text);
+}
+
+.verdict[data-tone="neutral"] {
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-muted);
+}
+
+/* --- Colors -------------------------------------------------------------------- */
+
+.roleGroups {
+  display: grid;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.roleGroup {
+  display: grid;
+  gap: var(--prime-space-4);
+}
+
+.roleGroupHead {
+  display: grid;
+  gap: var(--prime-space-1);
+}
+
+.swatchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  align-items: start;
+  gap: var(--prime-space-4) var(--prime-space-3);
+}
+
+.swatch {
+  display: grid;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin: 0;
+}
+
+/* The chip sits on a checkerboard so transparent and translucent roles stay readable. */
+.swatchChip {
+  height: var(--prime-space-12);
+  border-radius: var(--prime-radius-m);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
+}
+
+.swatchChip[data-transparent] {
+  background-image:
+    linear-gradient(45deg, var(--prime-color-fill-muted) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--prime-color-fill-muted) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--prime-color-fill-muted) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--prime-color-fill-muted) 75%) !important;
+  background-size: var(--prime-space-3) var(--prime-space-3) !important;
+}
+
+.swatchCaption {
+  display: grid;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.swatchTitle {
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.swatchMeta {
+  color: var(--prime-color-text-muted);
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  overflow-wrap: anywhere;
+}
+
+.paletteChip {
+  display: inline-flex;
+  align-items: center;
+  height: var(--prime-badge-m-height);
+  padding-inline: var(--prime-badge-m-padding-x);
+  border-radius: var(--prime-badge-m-radius);
+  font-size: var(--prime-badge-m-text-size);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.contrastSample {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-space-12);
+  height: var(--prime-control-m-height);
+  border-radius: var(--prime-radius-m);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
+  font-size: var(--prime-text-body-m-size);
+  font-weight: var(--prime-font-weight-semibold);
+}
+
+.contrastRing {
+  width: var(--prime-space-5);
+  height: var(--prime-space-3);
+  border-radius: var(--prime-radius-xs);
+  outline: var(--prime-focus-width) solid currentColor;
+  outline-offset: var(--prime-focus-offset);
+}
+
+.ramps {
+  display: grid;
+  gap: var(--prime-space-3);
+}
+
+.ramp {
+  display: grid;
+  grid-template-columns: var(--prime-space-16) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.rampName {
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-body-s-size);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.rampSteps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  grid-auto-columns: minmax(var(--prime-space-10), 1fr);
+  grid-auto-flow: column;
+  overflow-x: auto;
+  border-radius: var(--prime-radius-m);
+}
+
+.rampStep {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0;
+  min-height: var(--prime-space-12);
+  padding: var(--prime-space-1);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.rampHex {
+  font-family: var(--prime-font-family-mono);
+  font-weight: var(--prime-font-weight-regular);
+  opacity: 0.72;
+}
+
+@media (max-width: 640px) {
+  .ramp {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--prime-space-1);
+  }
+}
+
+.inlineSwatch {
+  display: inline-block;
+  width: var(--prime-space-6);
+  height: var(--prime-space-6);
+  border-radius: var(--prime-radius-s);
+  vertical-align: middle;
+}
+
+/* --- Typography ---------------------------------------------------------------- */
+
+.typeScale {
+  display: grid;
+  padding-block: var(--prime-space-2);
+}
+
+.typeRow {
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--prime-space-2) var(--prime-space-6);
+  padding-block: var(--prime-space-4);
+}
+
+.typeRow + .typeRow {
+  border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+.typeMeta {
+  display: grid;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.typeRole {
+  font-size: var(--prime-text-title-s-size);
+  line-height: var(--prime-text-title-s-line-height);
+  font-weight: var(--prime-text-title-s-weight);
+}
+
+.typeNumbers {
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-variant-numeric: tabular-nums;
+}
+
+.typeUse {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+}
+
+.typeSample {
+  min-width: 0;
+  margin: 0;
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+@container (max-width: 40rem) {
+  .typeRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .typeRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.fontCard {
+  display: grid;
+  align-content: start;
+  gap: var(--prime-space-3);
+}
+
+.fontCardLabel {
+  display: block;
+}
+
+.fontCardSpecimen {
+  font-size: var(--prime-text-heading-l-size);
+  line-height: var(--prime-text-heading-l-line-height);
+  letter-spacing: var(--prime-text-heading-l-tracking);
+  font-weight: var(--prime-font-weight-semibold);
+}
+
+.weightRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-2) var(--prime-space-4);
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
+}
+
+.readingDemo {
+  display: grid;
+}
+
+.readingMeasure {
+  display: grid;
+  gap: var(--prime-space-2);
+  max-width: var(--prime-layout-reading-max-width);
+  padding-inline-end: var(--prime-space-4);
+  border-inline-end: var(--prime-focus-width) dashed var(--prime-color-accent-default);
+}
+
+.readingText {
+  margin: 0;
+  font-size: var(--prime-text-body-l-size);
+  line-height: var(--prime-text-body-l-line-height);
+}
+
+.numbersCard {
+  display: grid;
+  justify-items: end;
+  gap: var(--prime-space-1);
+}
+
+.numbersCard > .demoLabel {
+  justify-self: start;
+  margin-block-end: var(--prime-space-2);
+}
+
+.numberLine {
+  font-size: var(--prime-text-title-l-size);
+  line-height: var(--prime-text-title-l-line-height);
+  font-variant-numeric: proportional-nums;
+}
+
+.numberLine[data-tabular] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Spacing ------------------------------------------------------------------- */
+
+.spaceScale {
+  display: grid;
+  gap: var(--prime-space-2);
+}
+
+.spaceRow {
+  display: grid;
+  /* The bar track is as wide as the largest step, so the token name sits right after it. */
+  grid-template-columns: var(--prime-space-8) var(--prime-space-12) var(--prime-space-24) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--prime-space-3);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+}
+
+.spaceStep {
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.spacePx {
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.spaceTrack {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: var(--prime-space-5);
+}
+
+.spaceBar {
+  height: var(--prime-space-3);
+  min-width: var(--prime-border-width);
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-accent-default);
+}
+
+@media (max-width: 640px) {
+  .spaceRow {
+    grid-template-columns: var(--prime-space-8) var(--prime-space-12) minmax(0, 1fr);
+  }
+
+  .spaceRow > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.proximityPanel {
+  display: grid;
+  gap: var(--prime-space-4);
+}
+
+.proximity {
+  display: flex;
+  flex-direction: column;
+  max-width: var(--prime-modal-width-s);
+}
+
+.fakeSectionTitle {
+  margin: 0;
+  font-size: var(--prime-text-title-m-size);
+  line-height: var(--prime-text-title-m-line-height);
+  font-weight: var(--prime-text-title-m-weight);
+  letter-spacing: var(--prime-text-title-m-tracking);
+}
+
+.fakeFieldGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.fakeLabel {
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-control-m-label-size);
+  line-height: var(--prime-control-m-label-line-height);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.fakeField {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: var(--prime-control-m-height);
+  padding-inline: var(--prime-control-m-field-padding-x);
+  border-radius: var(--prime-control-m-radius);
+  background: var(--prime-color-field-bg);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-control-m-text-size);
+  line-height: var(--prime-control-m-line-height);
+}
+
+.fakeHint {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-control-m-hint-size);
+  line-height: var(--prime-control-m-hint-line-height);
+}
+
+.gap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gapLabel {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(100% + var(--prime-space-3));
+  translate: 0 -50%;
+  color: var(--prime-color-accent-text);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.proximity[data-show-gaps] .gap {
+  background: color-mix(in srgb, var(--prime-color-accent-default) 18%, transparent);
+}
+
+.proximity[data-show-gaps] .gapLabel {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .gapLabel {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    font-size: var(--prime-badge-xs-text-size);
+  }
+}
+
+/* --- Radius -------------------------------------------------------------------- */
+
+.radiusGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
+  gap: var(--prime-space-3);
+}
+
+.radiusCard {
+  display: grid;
+  /* Captions line up across tiles even when a token name wraps. */
+  align-content: start;
+  justify-items: start;
+  gap: var(--prime-space-2);
+  padding: var(--prime-card-padding-s);
+}
+
+.radiusShape {
+  width: var(--prime-space-16);
+  height: var(--prime-space-16);
+  background: var(--prime-color-accent-soft);
+  box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-accent-default);
+}
+
+.radiusName {
+  font-size: var(--prime-text-title-s-size);
+  line-height: var(--prime-text-title-s-line-height);
+  font-weight: var(--prime-text-title-s-weight);
+}
+
+.radiusMini {
+  display: inline-block;
+  width: var(--prime-space-10);
+  height: var(--prime-space-6);
+  background: var(--prime-color-fill-strong);
+  vertical-align: middle;
+}
+
+.nestedCase {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-6);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+}
+
+.nestedPanel {
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  display: grid;
+  gap: 0;
+  min-width: var(--prime-panel-min-width);
+  padding: var(--prime-panel-padding);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+.nestedItem {
+  display: flex;
+  align-items: center;
+  height: var(--prime-control-m-item-height);
+  padding-inline: var(--prime-panel-item-padding-x);
+  border-radius: var(--prime-panel-item-radius);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-control-m-text-size);
+  line-height: var(--prime-control-m-line-height);
+}
+
+.nestedItem[data-active] {
+  background: var(--prime-color-accent-soft);
+  color: var(--prime-color-accent-text);
+}
+
+.caseCaption {
+  margin: 0;
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+}
+
+.caseCaption[data-tone="pass"] {
+  color: var(--prime-color-success-text);
+}
+
+.caseCaption[data-tone="fail"] {
+  color: var(--prime-color-danger-text);
+}
+
+/* --- Elevation ----------------------------------------------------------------- */
+
+.shadowGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--prime-space-6);
+  padding: var(--prime-space-6);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-canvas);
+}
+
+.shadowCard {
+  display: grid;
+  align-content: start;
+  gap: var(--prime-space-2);
+  min-height: var(--prime-space-24);
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-raised);
+}
+
+.layerPanel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.layerStage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--prime-space-6);
+  min-height: 18rem;
+  padding: var(--prime-space-6);
+  padding-inline-end: calc(36% + var(--prime-space-6));
+  background: var(--prime-color-bg-canvas);
+}
+
+.layerStage > .layerTag {
+  position: absolute;
+  inset-block-start: var(--prime-space-2);
+  inset-inline-start: var(--prime-space-6);
+}
+
+.layerTag {
+  color: var(--prime-color-text-muted);
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+}
+
+.layerCard {
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  display: grid;
+  gap: var(--prime-space-3);
+  margin-block-start: var(--prime-space-4);
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-surface);
+  box-shadow: var(--prime-shadow-raised);
+}
+
+.layerMenu {
+  display: grid;
+  gap: 0;
+  align-self: start;
+  margin-block-start: var(--prime-space-16);
+  margin-inline-start: calc(-1 * var(--prime-space-12));
+  padding: var(--prime-panel-padding);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+.layerMenu > .layerTag {
+  padding: var(--prime-space-1) var(--prime-panel-item-padding-x);
+}
+
+.layerScrim {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: grid;
+  place-items: center;
+  width: 36%;
+  padding: var(--prime-space-4);
+  background: var(--prime-color-bg-scrim);
+}
+
+.layerModal {
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  display: grid;
+  gap: var(--prime-space-3);
+  width: 100%;
+  padding: var(--prime-space-4);
+  border-radius: var(--prime-modal-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-modal);
+}
+
+@media (max-width: 768px) {
+  .layerStage {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline-end: var(--prime-space-6);
+  }
+
+  .layerMenu {
+    margin: 0;
+  }
+
+  .layerScrim {
+    position: static;
+    width: auto;
+    border-radius: var(--prime-card-radius);
+  }
+}
+
+.fieldSample {
+  display: grid;
+  gap: var(--prime-control-m-label-gap);
+  width: 100%;
+}
+
+/* --- Motion -------------------------------------------------------------------- */
+
+.easingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--prime-space-3);
+}
+
+.easingCard {
+  display: grid;
+  align-content: start;
+  gap: var(--prime-space-2);
+}
+
+.bezier {
+  width: var(--prime-space-24);
+  height: var(--prime-space-24);
+  overflow: visible;
+}
+
+.bezierGrid {
+  fill: none;
+  stroke: var(--prime-color-border-default);
+  stroke-width: 1;
+}
+
+.bezierHandle {
+  fill: none;
+  stroke: var(--prime-color-text-disabled);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.bezierPath {
+  fill: none;
+  stroke: var(--prime-color-accent-default);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.motionPanel {
+  display: grid;
+  gap: var(--prime-space-4);
+}
+
+.motionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+}
+
+.motionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--prime-space-3) var(--prime-space-6);
+}
+
+.motionCell {
+  display: grid;
+  gap: var(--prime-space-1);
+}
+
+.motionLabel {
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+}
+
+.motionTrack {
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  height: var(--prime-control-s-height);
+  padding-inline: var(--prime-space-1);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-muted);
+  cursor: pointer;
+}
+
+.motionDot {
+  width: var(--prime-space-6);
+  height: var(--prime-space-6);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-accent-default);
+  transition: transform var(--demo-duration) var(--demo-easing);
+}
+
+.motionTrack:hover .motionDot,
+.motionTrack[data-playing] .motionDot {
+  transform: translateX(calc(100cqw - 100%));
+}
+
+/* --- Focus --------------------------------------------------------------------- */
+
+.focusDemo {
+  display: grid;
+  gap: var(--prime-space-4);
+}
+
+.focusRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.demoButton {
+  display: inline-flex;
+  align-items: center;
+  height: var(--prime-control-m-height);
+  padding-inline: var(--prime-control-m-padding-x);
+  border: 0;
+  border-radius: var(--prime-control-m-radius);
+  font: inherit;
+  font-size: var(--prime-control-m-text-size);
+  font-weight: var(--prime-font-weight-medium);
+  cursor: pointer;
+}
+
+.demoButton[data-tone="accent"] {
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+}
+
+.demoButton[data-tone="neutral"] {
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-primary);
+}
+
+.demoLink {
+  border-radius: var(--prime-radius-xs);
+  color: var(--prime-color-accent-text);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.focusField {
+  display: flex;
+  align-items: center;
+  flex: 1 1 16rem;
+  max-width: var(--prime-modal-width-s);
+  height: var(--prime-control-m-height);
+  padding-inline: var(--prime-control-m-field-padding-x);
+  border-radius: var(--prime-control-m-radius);
+  background: var(--prime-color-field-bg);
+}
+
+.focusField:focus-within {
+  background: var(--prime-color-field-bg-focus);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.focusField[data-invalid] {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.focusField[data-invalid]:focus-within {
+  outline-color: var(--prime-color-danger-border);
+}
+
+.focusInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  font-size: var(--prime-control-m-text-size);
+}
+
+.focusInput::placeholder {
+  color: var(--prime-color-text-placeholder);
+}
+
+.ringSample {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  height: var(--prime-control-m-height);
+  padding-inline: var(--prime-control-m-padding-x);
+  border-radius: var(--prime-control-m-radius);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-control-m-text-size);
+  font-weight: var(--prime-font-weight-medium);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+/* --- Size tiers -----------------------------------------------------------------
+ * Tier boxes read private custom properties (`--t-*`, `--b-*`) assigned from tier tokens
+ * inline, so one recipe draws every tier.
+ */
+
+.tierPanel {
+  display: grid;
+  gap: var(--prime-space-4);
+  overflow-x: auto;
+}
+
+.tierRow {
+  display: grid;
+  grid-template-columns: var(--prime-space-16) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--prime-space-4);
+}
+
+.tierName {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  font-variant-numeric: tabular-nums;
+}
+
+.tierItems {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.tierButton,
+.tierIconButton,
+.tierField,
+.tierSegmented {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  box-sizing: border-box;
+  height: var(--t-height);
+  border-radius: var(--t-radius);
+  font-size: var(--t-text);
+  line-height: var(--t-lh);
+  white-space: nowrap;
+}
+
+.tierButton {
+  gap: var(--t-gap);
+  padding-inline: var(--t-pad);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+/* Button icon side: padX − 4px, never below 8px (pairing rule). */
+.tierButton:has(.tierIcon) {
+  padding-inline-start: max(calc(var(--t-pad) - var(--prime-space-1)), var(--prime-space-2));
+}
+
+.tierButton[data-tone="accent"] {
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+}
+
+.tierButton[data-tone="neutral"] {
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-primary);
+}
+
+.tierIcon {
+  flex-shrink: 0;
+  width: var(--t-icon);
+  height: var(--t-icon);
+  border-radius: var(--prime-radius-xs);
+  background: currentColor;
+  opacity: 0.85;
+}
+
+.tierIconButton {
+  justify-content: center;
+  width: var(--t-height);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+}
+
+.tierField {
+  justify-content: space-between;
+  gap: var(--t-gap);
+  width: 12rem;
+  padding-inline: var(--t-field-pad);
+  background: var(--prime-color-field-bg);
+  color: var(--prime-color-text-primary);
+}
+
+/* Fields draw the ring inside their edge (foundation §7). */
+.tierField[data-open] {
+  width: 100%;
+  background: var(--prime-color-field-bg-focus);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.tierPlaceholder {
+  color: var(--prime-color-text-placeholder);
+}
+
+.tierBadge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: var(--b-height);
+  padding-inline: var(--b-pad);
+  border-radius: var(--b-radius);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+  font-size: var(--b-text);
+  line-height: 1;
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.tierSegmented {
+  gap: 0;
+  padding: var(--prime-space-1);
+  background: var(--prime-color-fill-muted);
+}
+
+.tierSegmented > span {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding-inline: calc(var(--t-pad) - var(--prime-space-1));
+  border-radius: calc(var(--t-radius) - var(--prime-space-1));
+  color: var(--prime-color-text-secondary);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.tierSegmented > span[data-active] {
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-raised);
+  color: var(--prime-color-text-primary);
+}
+
+.tierChoice {
+  flex-shrink: 0;
+  width: var(--t-choice);
+  height: var(--t-choice);
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-accent-default);
+}
+
+.pairingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--prime-space-3);
+}
+
+.pairingCard {
+  display: grid;
+  align-content: start;
+  gap: var(--prime-space-3);
+}
+
+.pairField {
+  display: flex;
+  flex-direction: column;
+}
+
+.pairLabel {
+  padding-block-end: var(--t-label-gap);
+  font-size: var(--t-label);
+  line-height: var(--t-label-lh);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.pairHint {
+  padding-block-start: var(--t-hint-gap);
+  color: var(--prime-color-text-muted);
+  font-size: var(--t-hint);
+  line-height: var(--t-hint-lh);
+}
+
+.pairMenu {
+  display: grid;
+  padding: var(--prime-panel-padding);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+.pairItem {
+  display: flex;
+  align-items: center;
+  height: var(--t-item);
+  padding-inline: var(--prime-panel-item-padding-x);
+  border-radius: var(--prime-panel-item-radius);
+  font-size: var(--t-text);
+  line-height: var(--t-lh);
+}
+
+.pairItem[data-active] {
+  background: var(--prime-color-accent-soft);
+  color: var(--prime-color-accent-text);
+}

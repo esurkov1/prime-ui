@@ -1,195 +1,203 @@
 /*
- * Зазор контрол–текст: не меньше, чем у поля m; для l/xl растёт пропорционально размеру
- * контрола (фиксированный px при крупном чекбоксе выглядел «уже», чем у s).
+ * Choice layout (shared by Checkbox / Radio / Switch):
+ *   grid  [control] [text]
+ *         [       ] [hint / error]
+ * The label row is a subgrid of the root so descriptions align with the text column.
+ * The control cell is one text line tall, so the box is optically centred on the first line.
  */
 .field {
-  --prime-choice-control-size: var(--prime-sys-size-choice-m-control);
-  --prime-choice-col-gap: var(--prime-sys-size-control-m-inputPaddingX);
-  /* Совпадает с левым краем колонки текста в `labelRow` (grid: control | text). */
-  --prime-choice-hint-offset: calc(var(--prime-choice-control-size) + var(--prime-choice-col-gap));
-  --prime-choice-stack-gap: var(--prime-sys-size-control-m-gap);
+  --prime-choice-size: var(--prime-control-m-choice);
+  --prime-choice-radius: var(--prime-radius-xs);
+  --prime-choice-gap: var(--prime-control-m-gap);
+  --prime-choice-text: var(--prime-control-m-text-size);
+  --prime-choice-line-height: var(--prime-control-m-line-height);
   box-sizing: border-box;
-  width: 100%;
+  /* Shrink to content (so choices sit side by side in horizontal groups); text still wraps
+   * within the container. `fullWidth` stretches the field. */
+  width: fit-content;
+  max-width: 100%;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--prime-choice-stack-gap);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--prime-choice-gap);
+  row-gap: 0;
+  align-content: start;
+}
+
+.field[data-full-width="true"] {
+  width: 100%;
+}
+
+.field[data-size="xs"] {
+  --prime-choice-size: var(--prime-control-xs-choice);
+  --prime-choice-gap: var(--prime-control-xs-gap);
+  --prime-choice-text: var(--prime-control-xs-text-size);
+  --prime-choice-line-height: var(--prime-control-xs-line-height);
 }
 
 .field[data-size="s"] {
-  --prime-choice-control-size: var(--prime-sys-size-choice-s-control);
-  --prime-choice-col-gap: var(--prime-sys-size-control-s-inputPaddingX);
+  --prime-choice-size: var(--prime-control-s-choice);
+  --prime-choice-gap: var(--prime-control-s-gap);
+  --prime-choice-text: var(--prime-control-s-text-size);
+  --prime-choice-line-height: var(--prime-control-s-line-height);
 }
 
 .field[data-size="l"] {
-  --prime-choice-control-size: var(--prime-sys-size-choice-l-control);
-  --prime-choice-col-gap: var(--prime-sys-size-control-l-inputPaddingX);
+  --prime-choice-size: var(--prime-control-l-choice);
+  --prime-choice-gap: var(--prime-control-l-gap);
+  --prime-choice-text: var(--prime-control-l-text-size);
+  --prime-choice-line-height: var(--prime-control-l-line-height);
 }
 
 .field[data-size="xl"] {
-  --prime-choice-control-size: var(--prime-sys-size-choice-xl-control);
-  --prime-choice-col-gap: var(--prime-sys-size-control-xl-inputPaddingX);
+  --prime-choice-size: var(--prime-control-xl-choice);
+  --prime-choice-radius: var(--prime-radius-s);
+  --prime-choice-gap: var(--prime-control-xl-gap);
+  --prime-choice-text: var(--prime-control-xl-text-size);
+  --prime-choice-line-height: var(--prime-control-xl-line-height);
 }
 
-/* .field — выше специфичность, чем у Label.Root (inline-flex + gap), чтобы сетка не ломалась. */
+/* `.field .labelRow` outranks Label.Root's own inline-flex. */
 .field .labelRow {
+  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0;
-  row-gap: 0;
-  column-gap: var(--prime-choice-col-gap);
-  align-items: center;
+  grid-template-columns: subgrid;
+  column-gap: var(--prime-choice-gap);
+  align-items: start;
   width: 100%;
+  font-size: var(--prime-choice-text);
+  line-height: var(--prime-choice-line-height);
+  font-weight: var(--prime-font-weight-regular);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .controlCell {
   position: relative;
-  flex-shrink: 0;
-  width: var(--prime-choice-control-size);
-  height: var(--prime-choice-control-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-choice-size);
+  height: max(var(--prime-choice-size), var(--prime-choice-line-height));
 }
 
+/* Native input stays in the box (for validation bubbles) but is invisible. */
 .input {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   opacity: 0;
   pointer-events: none;
 }
 
 .control {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  box-sizing: border-box;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: var(--prime-choice-size);
+  height: var(--prime-choice-size);
+  border-radius: var(--prime-choice-radius);
+  background: var(--prime-color-fill-strong);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-accent-fg);
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .svg {
+  display: block;
   width: 100%;
   height: 100%;
-  display: inline-flex;
   overflow: visible;
 }
 
-/* ---- rect (background + border) ---- */
-
-.rect {
-  fill: var(--prime-sys-color-surface-raised);
-  stroke: var(--prime-sys-color-field-border);
-  stroke-width: 1;
-  transition:
-    fill var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    stroke var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-/* ---- checkmark path ---- */
-
-.checkPath {
-  fill: none;
-  stroke: var(--prime-sys-color-content-inverse);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 14;
-  stroke-dashoffset: 14;
-  transition: stroke-dashoffset var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
-}
-
-/* ---- indeterminate line ---- */
-
+/* Rounded check / bar, drawn with a stroke reveal and a small pop (scale) on check. */
+.checkPath,
 .indeterminateLine {
   fill: none;
-  stroke: var(--prime-sys-color-content-inverse);
-  stroke-width: 1.5;
+  stroke: currentColor;
+  stroke-width: 2.25;
   stroke-linecap: round;
-  stroke-dasharray: 7;
-  stroke-dashoffset: 7;
-  transition: stroke-dashoffset var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.6);
+  opacity: 0;
+  transition:
+    stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* Текст подписи наследует кегль от Label.Root; ограничиваем перенос. */
+.field[data-state="checked"] .checkPath,
+.field[data-state="indeterminate"] .indeterminateLine {
+  stroke-dashoffset: 0;
+  transform: scale(1);
+  opacity: 1;
+}
+
 .text {
-  line-height: var(--prime-sys-typography-body-lineHeight);
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-/* ---- hover (unchecked) ---- */
-
-.labelRow:hover .rect {
-  stroke: var(--prime-sys-color-field-borderHover);
-  fill: var(--prime-sys-color-action-neutralBackgroundHover);
+/* ---- hover ---- */
+.labelRow:hover .control {
+  background: var(--prime-color-fill-strong-hover);
 }
 
-/* ---- checked / indeterminate — rect fill ---- */
-
-.field[data-checked="true"] .rect,
-.field[data-indeterminate="true"] .rect {
-  fill: var(--prime-sys-color-action-primaryBackground);
-  stroke: var(--prime-sys-color-action-primaryBackground);
+/* ---- active: tactile press ---- */
+.labelRow:active .control {
+  transform: scale(0.92);
 }
 
-/* ---- checked / indeterminate — hover ---- */
-
-.field[data-checked="true"] .labelRow:hover .rect,
-.field[data-indeterminate="true"] .labelRow:hover .rect {
-  fill: var(--prime-sys-color-action-primaryBackgroundHover);
-  stroke: var(--prime-sys-color-action-primaryBackgroundHover);
+/* ---- checked / indeterminate ---- */
+.field:is([data-state="checked"], [data-state="indeterminate"]) .control {
+  background: var(--prime-color-accent-default);
 }
 
-/* ---- animate checkmark ---- */
-
-.field[data-checked="true"] .checkPath {
-  stroke-dashoffset: 0;
-}
-
-/* ---- animate indeterminate line ---- */
-
-.field[data-indeterminate="true"] .indeterminateLine {
-  stroke-dashoffset: 0;
+.field:is([data-state="checked"], [data-state="indeterminate"]) .labelRow:hover .control {
+  background: var(--prime-color-accent-hover);
 }
 
 /* ---- focus-visible ---- */
-
 .input:focus-visible + .control {
-  border-radius: var(--prime-sys-shape-radius-s);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }
 
-/* ---- invalid (variant=error или Checkbox.Error) — как у Radio ---- */
+/* ---- invalid ---- */
+.field[data-invalid="true"][data-state="unchecked"] .control {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
 
-.field[data-invalid="true"] .rect {
-  stroke: var(--prime-sys-color-field-borderError);
+.field[data-invalid="true"] .input:focus-visible + .control {
+  outline-color: var(--prime-color-danger-border);
 }
 
 /* ---- disabled ---- */
-
 .field[data-disabled="true"] .labelRow {
   cursor: not-allowed;
 }
 
-.field[data-disabled="true"] .rect {
-  stroke: var(--prime-sys-color-border-subtle);
-  fill: var(--prime-sys-color-surface-accentSoft);
+.field[data-disabled="true"] .control,
+.field[data-disabled="true"] .labelRow:hover .control {
+  background: var(--prime-color-fill-muted);
+  box-shadow: none;
+  color: var(--prime-color-text-disabled);
+  transform: none;
 }
 
-.field[data-disabled="true"] .checkPath,
-.field[data-disabled="true"] .indeterminateLine {
-  stroke: var(--prime-sys-color-content-disabled);
-}
-
-.field[data-disabled="true"] .labelRow:hover .rect {
-  stroke: var(--prime-sys-color-border-subtle);
-  fill: var(--prime-sys-color-surface-accentSoft);
-}
-
-/* Hint / error — под колонкой текста (как meta у Input), не под квадратом. */
+/* ---- description / error under the text column ---- */
 .hintSlot {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  padding-inline-start: var(--prime-choice-hint-offset);
-  justify-content: flex-start;
+  grid-column: 2;
+  min-width: 0;
 }

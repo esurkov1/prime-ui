@@ -1,0 +1,40 @@
+/* Example layout: semantic tokens only. */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--prime-space-24) * 2.5), 1fr));
+  gap: var(--prime-space-5) var(--prime-space-4);
+  width: 100%;
+}
+
+/* A 320px phone-width column: the panel measures the column and shows one compact month. */
+.phone {
+  width: calc(var(--prime-space-20) * 4);
+  max-width: 100%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-5);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+}
+
+.card {
+  width: 100%;
+  max-width: calc(var(--prime-space-24) * 5);
+}

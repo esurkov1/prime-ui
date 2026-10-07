@@ -1,13 +1,37 @@
-.fieldStack {
+/* Layout for the Modal examples: layout only, text goes through Typography. */
+
+.row {
   display: flex;
-  flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
-  width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-3);
 }
 
-.labeledControl {
+/* Field groups breathe a little more than plain body blocks. */
+.form {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-s);
+  gap: var(--prime-space-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-control-m-label-gap);
+}
+
+.portalHost {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-3);
   width: 100%;
+  padding: var(--prime-space-4);
+  border-radius: var(--prime-card-radius);
+  /* A bounded block (§4): the host's card fill, so it reads on the stage in both themes. */
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
 }

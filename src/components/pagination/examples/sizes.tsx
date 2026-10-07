@@ -1,50 +1,27 @@
-import { Pagination, type PaginationSize } from "prime-ui-kit";
+/** Pagination at every size tier next to a Button of the same size; heights match (28–48). Use to align the pager with neighbouring controls. */
+import { Button, type ControlSize, Pagination, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-function PaginationSizeRow({ size }: { size: PaginationSize }) {
-  const [page, setPage] = React.useState(8);
+import styles from "./examples.module.css";
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x2)",
-        alignItems: "flex-start",
-      }}
-    >
-      <p
-        style={{
-          margin: 0,
-          fontSize: "var(--prime-sys-size-control-s-supportText)",
-          color: "var(--prime-sys-color-content-secondary)",
-        }}
-      >
-        {size}
-      </p>
-      <Pagination.Root page={page} totalPages={20} onPageChange={setPage} size={size} />
-    </div>
-  );
-}
+const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
 
-/**
- * Four control tiers on a long page row (arrows, numbers, ellipsis share one scale per `size`).
- * Parity with `playground/snippets/pagination/sizes.tsx`.
- */
 export default function PaginationSizesExample() {
+  const [page, setPage] = React.useState(4);
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x4)",
-        alignItems: "center",
-      }}
-    >
-      <PaginationSizeRow size="s" />
-      <PaginationSizeRow size="m" />
-      <PaginationSizeRow size="l" />
-      <PaginationSizeRow size="xl" />
+    <div className={styles.sizeGrid}>
+      {sizes.map((size) => (
+        <React.Fragment key={size}>
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
+          </Typography.Root>
+          <Pagination.Root size={size} value={page} totalPages={12} onValueChange={setPage} />
+          <Button.Root variant="outline" tone="neutral" size={size}>
+            Кнопка {size}
+          </Button.Root>
+        </React.Fragment>
+      ))}
     </div>
   );
 }

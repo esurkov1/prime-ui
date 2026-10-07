@@ -1,75 +1,112 @@
+/*
+ * OTP / PIN cells: square fields of the tier height, field system fills and states
+ * (see Input.module.css). Digits are one type step larger than the tier text, tabular.
+ */
 .root {
+  --prime-digit-cell-size: var(--prime-control-m-height);
+  --prime-digit-cell-radius: var(--prime-control-m-radius);
+  --prime-digit-cell-text: var(--prime-text-body-l-size);
+  --prime-digit-cell-line-height: var(--prime-text-body-l-line-height);
+  --prime-digit-gap: var(--prime-control-m-gap);
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--prime-digit-gap);
-  border: none;
+  min-width: 0;
+  min-inline-size: 0;
   margin: 0;
   padding: 0;
-  min-width: 0;
+  border: 0;
+  font-family: var(--prime-font-family-sans);
+}
+
+.root[data-size="xs"] {
+  --prime-digit-cell-size: var(--prime-control-xs-height);
+  --prime-digit-cell-radius: var(--prime-control-xs-radius);
+  --prime-digit-cell-text: var(--prime-control-xs-text-size);
+  --prime-digit-cell-line-height: var(--prime-control-xs-line-height);
+  --prime-digit-gap: var(--prime-control-xs-gap);
 }
 
 .root[data-size="s"] {
-  --prime-digit-cell-size: var(--prime-sys-size-control-s-height);
-  --prime-digit-cell-radius: var(--prime-sys-size-control-s-radius);
-  --prime-digit-cell-text: var(--prime-sys-size-control-s-text);
-  --prime-digit-gap: var(--prime-sys-size-control-s-gap);
-}
-
-.root[data-size="m"] {
-  --prime-digit-cell-size: var(--prime-sys-size-control-m-height);
-  --prime-digit-cell-radius: var(--prime-sys-size-control-m-radius);
-  --prime-digit-cell-text: var(--prime-sys-size-control-m-text);
-  --prime-digit-gap: var(--prime-sys-size-control-m-gap);
+  --prime-digit-cell-size: var(--prime-control-s-height);
+  --prime-digit-cell-radius: var(--prime-control-s-radius);
+  --prime-digit-cell-text: var(--prime-text-body-m-size);
+  --prime-digit-cell-line-height: var(--prime-text-body-m-line-height);
+  --prime-digit-gap: var(--prime-control-s-gap);
 }
 
 .root[data-size="l"] {
-  --prime-digit-cell-size: var(--prime-sys-size-control-l-height);
-  --prime-digit-cell-radius: var(--prime-sys-size-control-l-radius);
-  --prime-digit-cell-text: var(--prime-sys-size-control-l-text);
-  --prime-digit-gap: var(--prime-sys-size-control-l-gap);
+  --prime-digit-cell-size: var(--prime-control-l-height);
+  --prime-digit-cell-radius: var(--prime-control-l-radius);
+  --prime-digit-cell-text: var(--prime-text-title-l-size);
+  --prime-digit-cell-line-height: var(--prime-text-title-l-line-height);
+  --prime-digit-gap: var(--prime-control-l-gap);
 }
 
 .root[data-size="xl"] {
-  --prime-digit-cell-size: var(--prime-sys-size-control-xl-height);
-  --prime-digit-cell-radius: var(--prime-sys-size-control-xl-radius);
-  --prime-digit-cell-text: var(--prime-sys-size-control-xl-text);
-  --prime-digit-gap: var(--prime-sys-size-control-xl-gap);
-}
-
-.root[data-disabled="true"] {
-  cursor: not-allowed;
+  --prime-digit-cell-size: var(--prime-control-xl-height);
+  --prime-digit-cell-radius: var(--prime-control-xl-radius);
+  --prime-digit-cell-text: var(--prime-text-heading-s-size);
+  --prime-digit-cell-line-height: var(--prime-text-heading-s-line-height);
+  --prime-digit-gap: var(--prime-control-xl-gap);
 }
 
 .cell {
+  -webkit-appearance: none;
+  appearance: none;
   box-sizing: border-box;
+  flex: 0 0 auto;
   width: var(--prime-digit-cell-size);
-  min-width: 0;
   height: var(--prime-digit-cell-size);
-  text-align: center;
-  font-size: var(--prime-digit-cell-text);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
   border-radius: var(--prime-digit-cell-radius);
-  background: var(--prime-sys-color-field-bg);
-  color: var(--prime-sys-color-field-text);
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
+  caret-color: var(--prime-color-accent-default);
+  font: inherit;
+  font-size: var(--prime-digit-cell-text);
+  line-height: var(--prime-digit-cell-line-height);
+  font-weight: var(--prime-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
   outline: none;
   transition:
-    border-color var(--prime-sys-motion-medium),
-    box-shadow var(--prime-sys-motion-medium);
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.cell:focus {
-  border-color: var(--prime-sys-color-field-borderFocus);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+.cell:hover:not(:focus-visible):not(:disabled) {
+  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
 }
 
-.root[data-has-error="true"] .cell {
-  border-color: var(--prime-sys-color-field-borderError);
+.cell:focus-visible {
+  background: var(--prime-color-field-bg-focus);
 }
 
-.root[data-disabled="true"] .cell {
-  background: var(--prime-sys-color-surface-accentSoft);
-  color: var(--prime-sys-color-content-disabled);
+/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
+.root:not([data-focus-ring="false"]) .cell:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.root[data-invalid="true"] .cell {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+  color: var(--prime-color-danger-text);
+}
+
+.root[data-invalid="true"] .cell:focus-visible {
+  outline-color: var(--prime-color-danger-border);
+}
+
+.cell:disabled {
+  background: var(--prime-color-field-bg-disabled);
+  box-shadow: none;
+  color: var(--prime-color-text-disabled);
+  -webkit-text-fill-color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }

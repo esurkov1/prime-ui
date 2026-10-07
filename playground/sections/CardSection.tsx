@@ -1,3 +1,19 @@
+import type * as React from "react";
+
+import CardContentExample from "@/components/card/examples/content";
+import contentSource from "@/components/card/examples/content.tsx?raw";
+import CardFlatExample from "@/components/card/examples/flat";
+import flatSource from "@/components/card/examples/flat.tsx?raw";
+import CardMetricsExample from "@/components/card/examples/metrics";
+import metricsSource from "@/components/card/examples/metrics.tsx?raw";
+import CardMiniMediaExample from "@/components/card/examples/mini-media";
+import miniMediaSource from "@/components/card/examples/mini-media.tsx?raw";
+import CardPanelChartExample from "@/components/card/examples/panel-chart";
+import panelChartSource from "@/components/card/examples/panel-chart.tsx?raw";
+import CardResponsiveExample from "@/components/card/examples/responsive";
+import responsiveSource from "@/components/card/examples/responsive.tsx?raw";
+import CardSettingsExample from "@/components/card/examples/settings";
+import settingsSource from "@/components/card/examples/settings.tsx?raw";
 import { PageContent } from "@/components/page-content/PageContent";
 import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import {
@@ -6,69 +22,151 @@ import {
   DemoSectionTitle,
 } from "../components/PlaygroundDemoTypography";
 import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import CardCoverSnippet from "../snippets/card/cover";
-import coverSource from "../snippets/card/cover.tsx?raw";
-import CardCtaSnippet from "../snippets/card/cta";
-import ctaSource from "../snippets/card/cta.tsx?raw";
-import CardFlatSnippet from "../snippets/card/flat";
-import flatSource from "../snippets/card/flat.tsx?raw";
-import CardListSnippet from "../snippets/card/list";
-import listSource from "../snippets/card/list.tsx?raw";
-import CardMetricSnippet from "../snippets/card/metric";
-import metricSource from "../snippets/card/metric.tsx?raw";
-import CardMiniSnippet from "../snippets/card/mini";
-import miniSource from "../snippets/card/mini.tsx?raw";
-import CardMiniMediaSnippet from "../snippets/card/mini-media";
-import miniMediaSource from "../snippets/card/mini-media.tsx?raw";
-import CardPanelSnippet from "../snippets/card/panel";
-import panelSource from "../snippets/card/panel.tsx?raw";
-import CardPanelContentChartSnippet from "../snippets/card/panel-content-chart";
-import panelContentChartSource from "../snippets/card/panel-content-chart.tsx?raw";
-import CardRowSnippet from "../snippets/card/row";
-import rowSource from "../snippets/card/row.tsx?raw";
-import CardSplitSnippet from "../snippets/card/split";
-import splitSource from "../snippets/card/split.tsx?raw";
-import CardStatTrendSnippet from "../snippets/card/stat-trend";
-import statTrendSource from "../snippets/card/stat-trend.tsx?raw";
+import type { PlaygroundPreviewSurface } from "../components/PlaygroundPreviewTheme";
 
 const cardRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "variant",
-    type: '"mini" | "mini-media" | "metric" | "panel" | "stat-trend" | "cta" | "list" | "split" | "cover"',
-    defaultValue: "—",
-    required: "Да",
+    type: '"mini" | "mini-media" | "metric" | "stat-trend" | "split" | "panel" | "cta" | "list" | "cover"',
+    defaultValue: '"panel"',
+    required: "Нет",
     description:
-      "Макет: KPI, mini+media, metric, panel (заголовок + график), KPI+дельта (stat-trend), CTA, список (list), две метрики (split), обложка+cover.",
+      "Макет и роль значения: mini — title-l, metric — heading-m, stat-trend — heading-l (display-s на широкой карточке).",
   },
   {
     prop: "flat",
     type: "boolean",
     defaultValue: "false",
     required: "Нет",
-    description: "Убрать тень поверхности (остаётся бордер и фон).",
-  },
-  {
-    prop: "className",
-    type: "string",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Дополнительный класс корневого div.",
-  },
-  {
-    prop: "children",
-    type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Слоты Card.* в соответствии с variant.",
+    description:
+      "Без тени `shadow-raised`: плоская белая поверхность. Рамки у карточки нет в любом случае.",
   },
   {
     prop: "…rest",
     type: "React.HTMLAttributes<HTMLDivElement>",
     defaultValue: "—",
     required: "Нет",
-    description: "Атрибуты корневого div (id, role, aria-*, data-*).",
+    description: "Атрибуты корневого div (id, role, aria-*, data-*, className).",
   },
 ];
+
+const slotApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "IconBox",
+    type: "div",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Плитка 40px `accent-soft` под иконку (mini, mini-media, split).",
+  },
+  {
+    prop: "Stack / Label / Value",
+    type: "div / span / span",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Подпись и значение (`tabular-nums`).",
+  },
+  {
+    prop: "HeaderRow / Lead / Description",
+    type: "div / div / p",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Верхний ряд `metric` и строка пояснения.",
+  },
+  {
+    prop: "Delta",
+    type: "span, tone: neutral | success | warning | danger",
+    defaultValue: 'tone="neutral"',
+    required: "Нет",
+    description: "Дельта; tone по смыслу: neutral (text-secondary) / success / warning / danger.",
+  },
+  {
+    prop: "Media",
+    type: "div",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Нижний слот mini-media: спарклайн, ProgressBar.",
+  },
+  {
+    prop: "SectionHeader / SectionTitle / SectionTrailing",
+    type: "div / h2 | h3 | h4 / div",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Заголовок `panel` с действиями справа.",
+  },
+  {
+    prop: "SectionTitle as",
+    type: '"h2" | "h3" | "h4"',
+    defaultValue: '"h3"',
+    required: "Нет",
+    description: "Уровень заголовка панели по структуре страницы; вид не меняется.",
+  },
+  {
+    prop: "Body / Chart",
+    type: "div",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Текст и поля с отступами / график от края до края.",
+  },
+  {
+    prop: "Title / CtaBody / Actions",
+    type: "h2 | h3 | h4 / div / div",
+    defaultValue: "—",
+    required: "Нет",
+    description: "CTA и cover.",
+  },
+  {
+    prop: "Title as",
+    type: '"h2" | "h3" | "h4"',
+    defaultValue: '"h3"',
+    required: "Нет",
+    description: "Уровень заголовка карточки по структуре страницы; вид не меняется.",
+  },
+  {
+    prop: "ListHeader / List / ListItem",
+    type: "div / ul / li",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Список событий с тонкими разделителями.",
+  },
+  {
+    prop: "Split / SplitCell",
+    type: "div",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Две метрики; складываются уже 22rem.",
+  },
+  {
+    prop: "Cover",
+    type: "div",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Медиа сверху (cover).",
+  },
+];
+
+function Demo({
+  title,
+  description,
+  code,
+  surface,
+  children,
+}: {
+  title: string;
+  description: React.ReactNode;
+  code: string;
+  surface?: PlaygroundPreviewSurface;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="demoBlock">
+      <DemoSectionTitle>{title}</DemoSectionTitle>
+      <DemoDescription>{description}</DemoDescription>
+      <PlaygroundExampleFrame.Root code={code.trim()} previewLayout="stack" surface={surface}>
+        <PlaygroundExampleFrame.Stage>{children}</PlaygroundExampleFrame.Stage>
+      </PlaygroundExampleFrame.Root>
+    </div>
+  );
+}
 
 export default function CardSection() {
   return (
@@ -76,188 +174,118 @@ export default function CardSection() {
       <PageContent.Header>
         <PageContent.Title id="card-heading">Card</PageContent.Title>
         <PageContent.Description measure="full">
-          {
-            <>
-              Карточки для дашборда: KPI, тренды, CTA, списки событий, split-метрики, обложки и
-              секции с графиками. Стили на семантических токенах; графики подключаются снаружи
-              (слоты Media, Body, Chart).
-            </>
-          }
+          Белая поверхность на сером холсте: без рамки, глубина — заливкой и лёгкой тенью. Варианты
+          для метрик, графиков, списков и CTA; внутренняя раскладка подстраивается под ширину самой
+          карточки (container queries).
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
         <div className="demoExamples">
-          <div className="demoBlock">
-            <DemoSectionTitle>Mini</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;mini&quot;</code>: <code>IconBox</code> + вертикальный{" "}
-              <code>Stack</code> с <code>Label</code> и <code>Value</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={miniSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardMiniSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Метрики"
+            description={
+              <>
+                <code>mini</code>, <code>metric</code> и <code>stat-trend</code>: у каждого своя
+                роль значения (title-l, heading-m, heading-l). <code>Delta</code> окрашивается по{" "}
+                <code>tone</code> — хорошо или плохо, а не знак изменения.
+              </>
+            }
+            code={metricsSource}
+            surface="canvas"
+          >
+            <CardMetricsExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Mini + media</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;mini-media&quot;</code>: как у mini — <code>IconBox</code>,{" "}
-              <code>Stack</code> с <code>Label</code> и <code>Value</code>, плюс нижний слот{" "}
-              <code>Media</code> (спарклайн, <code>ProgressBar</code>).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={miniMediaSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardMiniMediaSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Метрика с медиа"
+            description={
+              <>
+                <code>mini-media</code> добавляет нижний слот <code>Media</code>. Высоту спарклайна
+                задаёт CSS, SVG только растягивается по ширине.
+              </>
+            }
+            code={miniMediaSource}
+            surface="canvas"
+          >
+            <CardMiniMediaExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Metric</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;metric&quot;</code>: верхний ряд <code>HeaderRow</code> —{" "}
-              <code>Lead</code> (бейдж или иконка) и <code>Value</code>, ниже{" "}
-              <code>Description</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={metricSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardMetricSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Адаптация по ширине карточки"
+            description={
+              <>
+                <code>split</code> складывает ячейки уже 22rem; значение <code>stat-trend</code>{" "}
+                уменьшается до heading-m уже 20rem и растёт до display-s шире 36rem.
+              </>
+            }
+            code={responsiveSource}
+            surface="canvas"
+          >
+            <CardResponsiveExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Stat + trend</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;stat-trend&quot;</code>: крупное значение и <code>Delta</code> с{" "}
-              <code>trend</code> (рост / падение / нейтрально).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={statTrendSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardStatTrendSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Панель с графиком"
+            description={
+              <>
+                <code>panel</code>: <code>SectionHeader</code> с переключателем периода, текст в{" "}
+                <code>Body</code> и график от края до края в <code>Chart</code>.
+              </>
+            }
+            code={panelChartSource}
+            surface="canvas"
+          >
+            <CardPanelChartExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>CTA</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;cta&quot;</code>: <code>Title</code>, <code>CtaBody</code>, внизу{" "}
-              <code>Actions</code> (кнопки и ссылки).
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={ctaSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardCtaSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="CTA, список, обложка"
+            description={
+              <>
+                <code>cta</code>, <code>list</code> и <code>cover</code>. Еле заметные линии
+                отделяют шапку списка, его пункты и подвал с действиями.
+              </>
+            }
+            code={contentSource}
+            surface="canvas"
+          >
+            <CardContentExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>List</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;list&quot;</code>: <code>ListHeader</code> и <code>List</code> из{" "}
-              <code>ListItem</code> — лента событий или алерты.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={listSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardListSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Карточка настроек"
+            description={
+              <>
+                Поля внутри карточки получают фон <code>field-bg-surface</code> — они остаются
+                различимыми на белом. Отступ поле → поле 20px, действия справа.
+              </>
+            }
+            code={settingsSource}
+            surface="canvas"
+          >
+            <CardSettingsExample />
+          </Demo>
 
-          <div className="demoBlock">
-            <DemoSectionTitle>Split</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;split&quot;</code>: <code>Split</code> с двумя{" "}
-              <code>SplitCell</code> — две связанные метрики в одной плитке.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={splitSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardSplitSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Cover</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;cover&quot;</code>: верхний слот <code>Cover</code> (медиа или
-              градиент), затем <code>Stack</code> и <code>Actions</code>.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={coverSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardCoverSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Панель (график)</DemoSectionTitle>
-            <DemoDescription>
-              <code>variant=&quot;panel&quot;</code>: <code>SectionHeader</code> и область{" "}
-              <code>Chart</code> без внутренних полей — корень библиотеки графиков на всю ширину и
-              высоту под заголовком.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={panelSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardPanelSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Панель: текст и график</DemoSectionTitle>
-            <DemoDescription>
-              Тот же <code>variant=&quot;panel&quot;</code>: сверху <code>Body</code> — текст или
-              таблица с отступами; ниже <code>Chart</code> — график без полей, занимает оставшуюся
-              высоту.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root
-              code={panelContentChartSource.trim()}
-              previewLayout="stack"
-            >
-              <PlaygroundExampleFrame.Stage>
-                <CardPanelContentChartSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Плоская поверхность</DemoSectionTitle>
-            <DemoDescription>
-              Проп <code>flat</code> убирает тень — удобно для плотных сеток, когда достаточно
-              бордера.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={flatSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardFlatSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>Сетка KPI</DemoSectionTitle>
-            <DemoDescription>
-              Пример с классом <code>introFeatureGrid</code> из плейграунда: несколько mini-карточек
-              в адаптивной сетке.
-            </DemoDescription>
-            <PlaygroundExampleFrame.Root code={rowSource.trim()} previewLayout="stack">
-              <PlaygroundExampleFrame.Stage>
-                <CardRowSnippet />
-              </PlaygroundExampleFrame.Stage>
-            </PlaygroundExampleFrame.Root>
-          </div>
+          <Demo
+            title="Тень и flat"
+            description={
+              <>
+                По умолчанию — <code>shadow-raised</code>; <code>flat</code> убирает тень для
+                плотных сеток. Рамки нет в обоих случаях.
+              </>
+            }
+            code={flatSource}
+            surface="canvas"
+          >
+            <CardFlatExample />
+          </Demo>
 
           <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Card.Root</DemoApiTitle>
-            <DemoDescription>
-              Остальные части (<code>IconBox</code>, <code>HeaderRow</code>, <code>Media</code>,{" "}
-              <code>Body</code>, <code>Chart</code> и др.) — в <code>COMPONENT.md</code> компонента.
-            </DemoDescription>
             <PlaygroundApiTable rows={cardRootApiRows} />
+            <DemoApiTitle>Слоты</DemoApiTitle>
+            <PlaygroundApiTable rows={slotApiRows} />
           </div>
         </div>
       </PageContent.Body>

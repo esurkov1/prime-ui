@@ -1,73 +1,62 @@
 import * as React from "react";
 import { Hint } from "@/components/hint/Hint";
+import { Label } from "@/components/label/Label";
+import { useFieldIds } from "@/hooks/useFieldIds";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { HintSize, TextareaSize, TextareaVariant } from "@/internal/states";
+import { mergeRefs } from "@/internal/mergeRefs";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./Textarea.module.css";
 
-// ─── Context ──────────────────────────────────────────────────────────────────
-
-type TextareaContextValue = {
-  hintId: string;
-  errorId: string;
-  size: TextareaSize;
-  disabled: boolean;
-  readOnly: boolean;
-  registerHint: () => void;
-  unregisterHint: () => void;
-  registerError: () => void;
-  unregisterError: () => void;
+export type TextareaLabels = {
+  /** Muted marker after the label when `optional`. */
+  optional: string;
+  /** Screen-reader text of `Textarea.Counter`; `{current}` and `{max}` are replaced. */
+  counter: string;
 };
 
-const [TextareaProvider, useTextareaContext] =
-  createComponentContext<TextareaContextValue>("Textarea");
-
-// ─── Char counter (объявлен до Root для partition по child.type) ──────────────
-
-export type TextareaCharCounterProps = {
-  current: number;
-  max: number;
+const TEXTAREA_LABELS: TextareaLabels = {
+  optional: "необязательно",
+  counter: "{current} из {max} символов",
 };
 
-function TextareaCharCounter({ current, max }: TextareaCharCounterProps) {
-  const overflow = current > max;
-  return (
-    <span
-      className={styles.charCounter}
-      data-overflow={overflow ? "true" : undefined}
-      aria-live="polite"
-    >
-      {current}/{max}
-    </span>
-  );
-}
-
-TextareaCharCounter.displayName = "Textarea.CharCounter";
-
-function partitionTextareaChildren(children: React.ReactNode) {
-  const counters: React.ReactElement[] = [];
-  const rest: React.ReactNode[] = [];
-
-  React.Children.forEach(children, (child) => {
-    if (React.isValidElement(child) && child.type === TextareaCharCounter) {
-      counters.push(child);
-    } else if (child != null && child !== false) {
-      rest.push(child);
-    }
-  });
-
-  return { counters, rest };
-}
+const [TextareaProvider, useTextareaContext] = createComponentContext<{ labels: TextareaLabels }>(
+  "Textarea",
+);
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
-export type TextareaRootProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> & {
-  variant?: TextareaVariant;
-  size?: TextareaSize;
+export type TextareaRootProps = Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "size" | "children"
+> & {
+  size?: ControlSize;
+  /** Invalid state: danger ring and `aria-invalid`. A non-empty `error` implies it. */
+  invalid?: boolean;
+  /**
+   * Draws the focus ring on the field box (default). `false` hides only the visual ring — focus,
+   * keyboard and ARIA are unchanged, the error ring still shows. Turn it off only where focus is
+   * otherwise obvious (a single search field with a caret, e.g. a command palette); WCAG 2.4.7.
+   */
+  focusRing?: boolean;
+  label?: React.ReactNode;
+  /** Shows the muted optional marker after the label text (`labels.optional`). */
+  optional?: boolean;
+  hint?: React.ReactNode;
+  /** Error message; replaces the hint in the same slot and implies `invalid`. */
+  error?: React.ReactNode;
+  /** Right-aligned slot of the support row, e.g. `<Textarea.Counter current={n} max={500} />`. */
+  counter?: React.ReactNode;
+  /** Always render the support row so an appearing error does not shift the layout. */
+  reserveSupportRow?: boolean;
+  /** Height follows the content. `false` → fixed height with native vertical resize. */
   autoResize?: boolean;
+  /** Called with the new string value; native `onChange` still fires. */
+  onValueChange?: (value: string) => void;
+  labels?: Partial<TextareaLabels>;
 };
 
 const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
@@ -75,144 +64,150 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
     {
       id,
       className,
-      variant = "default",
       size = "m",
+      invalid: invalidProp = false,
+      focusRing = true,
+      label,
+      required,
+      optional = false,
+      hint,
+      error,
+      counter,
+      reserveSupportRow = false,
+      autoResize = true,
       disabled,
       readOnly,
-      autoResize = true,
-      "aria-describedby": ariaDescribedBy,
-      "aria-invalid": ariaInvalid,
-      defaultValue,
       value,
       onInput,
-      children,
+      onChange,
+      onValueChange,
+      labels: labelsProp,
+      "aria-describedby": ariaDescribedBy,
       ...rest
     },
     ref,
   ) => {
-    const rawId = React.useId();
-    const inputId = id ?? rawId;
-    const hintId = `${inputId}-hint`;
-    const errorId = `${inputId}-error`;
+    const showError = error != null && error !== false && error !== "";
+    const invalid = invalidProp || showError;
+    const showHint = !showError && hint != null && hint !== false;
+    const { inputId, hintId, errorId, describedBy } = useFieldIds(id, {
+      hasHint: showHint,
+      hasError: showError,
+      extraDescribedBy: ariaDescribedBy,
+    });
+    const labels = React.useMemo(() => ({ ...TEXTAREA_LABELS, ...labelsProp }), [labelsProp]);
+    const showSupport = showHint || showError || counter != null || reserveSupportRow;
 
-    const [hasHint, setHasHint] = React.useState(false);
-    const [hasError, setHasError] = React.useState(false);
+    const innerRef = React.useRef<HTMLTextAreaElement | null>(null);
+    const setRefs = React.useMemo(() => mergeRefs(innerRef, ref), [ref]);
+    const mirrorRef = React.useRef<HTMLDivElement>(null);
 
-    const invalid = variant === "error" || hasError;
-    const resolvedAriaInvalid = ariaInvalid ?? (invalid || undefined);
-
-    const parts = [
-      ariaDescribedBy,
-      hasHint ? hintId : undefined,
-      hasError ? errorId : undefined,
-    ].filter(Boolean);
-    const describedBy = parts.length > 0 ? parts.join(" ") : undefined;
-
-    const registerHint = React.useCallback(() => setHasHint(true), []);
-    const unregisterHint = React.useCallback(() => setHasHint(false), []);
-    const registerError = React.useCallback(() => setHasError(true), []);
-    const unregisterError = React.useCallback(() => setHasError(false), []);
-
-    const wrapperRef = React.useRef<HTMLDivElement>(null);
-    const { counters: counterChildren, rest: otherChildren } = partitionTextareaChildren(children);
-    const showFooter = counterChildren.length > 0;
-
-    // Sync initial value from DOM — handles both controlled and uncontrolled
+    // The auto-resize mirror copies the text; sync it on mount and on controlled value changes.
     React.useLayoutEffect(() => {
-      if (!autoResize || !wrapperRef.current) return;
-      const textarea = wrapperRef.current.querySelector("textarea");
-      if (textarea) {
-        wrapperRef.current.dataset.value = textarea.value;
-      }
-    }, [autoResize]);
-
-    // Sync controlled value changes that happen outside of user input
-    React.useEffect(() => {
-      if (!autoResize || !wrapperRef.current || typeof value !== "string") return;
-      wrapperRef.current.dataset.value = value;
+      if (!autoResize || !mirrorRef.current || !innerRef.current) return;
+      mirrorRef.current.dataset.value = typeof value === "string" ? value : innerRef.current.value;
     }, [autoResize, value]);
 
-    const handleInput = React.useCallback<
-      NonNullable<React.TextareaHTMLAttributes<HTMLTextAreaElement>["onInput"]>
-    >(
-      (e) => {
-        if (autoResize && wrapperRef.current) {
-          wrapperRef.current.dataset.value = (e.currentTarget as HTMLTextAreaElement).value;
-        }
-        onInput?.(e);
-      },
-      [autoResize, onInput],
-    );
+    // Clicking the padding of the field focuses the textarea (the box is a div, not a label,
+    // so the counter and hints never leak into the accessible name).
+    const handleControlMouseDown = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+      const textarea = innerRef.current;
+      if (!textarea || e.target === textarea || textarea.disabled) return;
+      e.preventDefault();
+      textarea.focus();
+    }, []);
 
-    const ctxValue = React.useMemo(
-      () => ({
-        hintId,
-        errorId,
-        size,
-        disabled: Boolean(disabled),
-        readOnly: Boolean(readOnly),
-        registerHint,
-        unregisterHint,
-        registerError,
-        unregisterError,
-      }),
-      [
-        hintId,
-        errorId,
-        size,
-        disabled,
-        readOnly,
-        registerHint,
-        unregisterHint,
-        registerError,
-        unregisterError,
-      ],
-    );
-
-    const textareaEl = (
+    const textarea = (
       <textarea
-        ref={ref}
+        ref={setRefs}
         id={inputId}
         className={cx(styles.textarea, autoResize && styles.textareaAutoResize)}
         disabled={disabled}
         readOnly={readOnly}
-        aria-invalid={resolvedAriaInvalid}
+        required={required}
+        aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
-        defaultValue={defaultValue}
         value={value}
-        onInput={handleInput}
+        onInput={(event) => {
+          if (autoResize && mirrorRef.current) {
+            mirrorRef.current.dataset.value = event.currentTarget.value;
+          }
+          onInput?.(event);
+        }}
+        onChange={(event) => {
+          onChange?.(event);
+          onValueChange?.(event.target.value);
+        }}
         {...rest}
       />
     );
 
-    const textareaBlock = autoResize ? (
-      <div ref={wrapperRef} className={styles.autoResize}>
-        {textareaEl}
-      </div>
-    ) : (
-      textareaEl
-    );
+    const contextValue = React.useMemo(() => ({ labels }), [labels]);
 
     return (
-      <TextareaProvider value={ctxValue}>
+      <TextareaProvider value={contextValue}>
         <ControlSizeProvider value={size}>
-          <div className={styles.field} {...toDataAttributes({ size })}>
-            <label
-              htmlFor={inputId}
-              className={cx(styles.control, className)}
-              {...toDataAttributes({
-                invalid,
-                disabled: Boolean(disabled),
-                readonly: Boolean(readOnly),
-                size,
-              })}
-            >
-              <div className={styles.controlStack}>
-                <div className={styles.textareaRegion}>{textareaBlock}</div>
-                {showFooter ? <div className={styles.controlFooter}>{counterChildren}</div> : null}
+          <div
+            className={styles.field}
+            {...toDataAttributes({ size, invalid: invalid || undefined })}
+          >
+            {label != null ? (
+              <div className={styles.header}>
+                <Label.Root
+                  htmlFor={inputId}
+                  size={size}
+                  disabled={disabled}
+                  required={required}
+                  optional={optional}
+                  labels={{ optional: labels.optional }}
+                >
+                  {label}
+                </Label.Root>
               </div>
-            </label>
-            {otherChildren}
+            ) : null}
+            <div className={styles.body}>
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer convenience only; the textarea itself is the focus target */}
+              <div
+                className={cx(styles.control, className)}
+                onMouseDown={handleControlMouseDown}
+                {...toDataAttributes({
+                  size,
+                  invalid: invalid || undefined,
+                  disabled: disabled || undefined,
+                  readonly: readOnly || undefined,
+                  "focus-ring": focusRing ? undefined : false,
+                })}
+              >
+                {autoResize ? (
+                  <div ref={mirrorRef} className={styles.autoResize} data-value="">
+                    {textarea}
+                  </div>
+                ) : (
+                  textarea
+                )}
+              </div>
+              {showSupport ? (
+                <div className={styles.support} data-reserve={reserveSupportRow || undefined}>
+                  {showError ? (
+                    <Hint.Root id={errorId} size={size} invalid className={styles.supportText}>
+                      {error}
+                    </Hint.Root>
+                  ) : showHint ? (
+                    <Hint.Root
+                      id={hintId}
+                      size={size}
+                      disabled={disabled}
+                      className={styles.supportText}
+                    >
+                      {hint}
+                    </Hint.Root>
+                  ) : (
+                    <span className={styles.supportText} />
+                  )}
+                  {counter != null ? <div className={styles.supportCounter}>{counter}</div> : null}
+                </div>
+              ) : null}
+            </div>
           </div>
         </ControlSizeProvider>
       </TextareaProvider>
@@ -222,75 +217,35 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
 
 TextareaRoot.displayName = "Textarea.Root";
 
-// ─── Hint ────────────────────────────────────────────────────────────────────
+// ─── Counter ─────────────────────────────────────────────────────────────────
 
-export type TextareaHintProps = {
-  children: React.ReactNode;
+export type TextareaCounterProps = {
+  current: number;
+  max: number;
   className?: string;
-} & Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">;
+};
 
-function TextareaHint({ children, className, ...rest }: TextareaHintProps) {
-  const { hintId, registerHint, unregisterHint, size, disabled, readOnly } = useTextareaContext();
-
-  React.useLayoutEffect(() => {
-    registerHint();
-    return () => {
-      unregisterHint();
-    };
-  }, [registerHint, unregisterHint]);
-
+/** Character counter for the `counter` slot; turns danger when `current > max`. */
+function TextareaCounter({ current, max, className }: TextareaCounterProps) {
+  const { labels } = useTextareaContext();
+  const spoken = labels.counter.replace("{current}", String(current)).replace("{max}", String(max));
   return (
-    <Hint.Root
-      id={hintId}
-      size={size as HintSize}
-      variant={disabled || readOnly ? "disabled" : "default"}
-      className={cx(styles.hintSlot, className)}
-      {...rest}
+    <span
+      className={cx(styles.counter, className)}
+      data-invalid={current > max ? "true" : undefined}
+      aria-live="polite"
     >
-      {children}
-    </Hint.Root>
+      <span aria-hidden="true">
+        {current}/{max}
+      </span>
+      <span className={styles.srOnly}>{spoken}</span>
+    </span>
   );
 }
 
-TextareaHint.displayName = "Textarea.Hint";
-
-// ─── Error ───────────────────────────────────────────────────────────────────
-
-export type TextareaErrorProps = {
-  children: React.ReactNode;
-  className?: string;
-} & Omit<React.HTMLAttributes<HTMLParagraphElement>, "id">;
-
-function TextareaError({ children, className, ...rest }: TextareaErrorProps) {
-  const { errorId, registerError, unregisterError, size } = useTextareaContext();
-
-  React.useLayoutEffect(() => {
-    registerError();
-    return () => {
-      unregisterError();
-    };
-  }, [registerError, unregisterError]);
-
-  return (
-    <Hint.Root
-      id={errorId}
-      size={size as HintSize}
-      variant="error"
-      className={cx(styles.hintSlot, className)}
-      {...rest}
-    >
-      {children}
-    </Hint.Root>
-  );
-}
-
-TextareaError.displayName = "Textarea.Error";
-
-// ─── Namespace ───────────────────────────────────────────────────────────────
+TextareaCounter.displayName = "Textarea.Counter";
 
 export const Textarea = {
   Root: TextareaRoot,
-  CharCounter: TextareaCharCounter,
-  Hint: TextareaHint,
-  Error: TextareaError,
+  Counter: TextareaCounter,
 };

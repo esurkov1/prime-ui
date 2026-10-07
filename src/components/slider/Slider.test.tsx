@@ -9,16 +9,22 @@ describe("Slider", () => {
     expect(screen.getByRole("slider", { name: "Level" })).toBeInTheDocument();
   });
 
-  it("calls onChange on input event", () => {
-    const onChange = vi.fn();
+  it("calls onValueChange on input event", () => {
+    const onValueChange = vi.fn();
     render(
-      <Slider.Root defaultValue={10} min={0} max={100} onChange={onChange} aria-label="Volume" />,
+      <Slider.Root
+        defaultValue={10}
+        min={0}
+        max={100}
+        onValueChange={onValueChange}
+        aria-label="Volume"
+      />,
     );
 
     const slider = screen.getByRole("slider", { name: "Volume" });
     fireEvent.input(slider, { target: { value: "50" } });
 
-    expect(onChange).toHaveBeenCalledWith(50);
+    expect(onValueChange).toHaveBeenCalledWith(50);
   });
 
   it("respects min, max, and step", () => {
@@ -36,6 +42,23 @@ describe("Slider", () => {
 
     const slider = screen.getByRole("slider", { name: "Default" }) as HTMLInputElement;
     expect(slider.value).toBe("33");
+  });
+
+  it("clamps a controlled value and shows the formatted value", () => {
+    render(
+      <Slider.Root
+        value={150}
+        label="Temp"
+        showValue
+        formatValue={(v) => `${v} °C`}
+        onValueChange={() => {}}
+      />,
+    );
+
+    const slider = screen.getByRole("slider", { name: "Temp" }) as HTMLInputElement;
+    expect(slider.value).toBe("100");
+    expect(slider).toHaveAttribute("aria-valuetext", "100 °C");
+    expect(screen.getByText("100 °C")).toBeInTheDocument();
   });
 
   it("disables the track", () => {

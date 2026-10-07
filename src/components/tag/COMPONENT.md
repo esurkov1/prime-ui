@@ -1,97 +1,179 @@
 # Tag
 
-**Default sizing:** when designing screens and examples, start with **`m`** for `size` wherever a size axis exists unless the scenario explicitly needs another value.
+**Category:** data-display (Данные)
 
-## About
+> A chip for a selected value, applied filter or keyword, with an optional remove button and a palette color.
 
-A compact chip-style label: optional leading icon (`Tag.Icon`), optional removable close control when `onRemove` is set. Root is a `span` with `data-size` / `data-disabled`; the inner body wraps children in `ControlSizeProvider` so nested icons pick up the same control size tier.
+## When to use
+- Applied filters above a list or table, each one removable.
+- Selected values (cities, people, keywords) shown as chips.
+- Keywords or categories of an item, optionally colored by category.
 
-**When to use**
+## When not to use
+- A read-only status or counter → use [Badge](../badge/COMPONENT.md).
+- Choosing several values from a list in a field → use [TagSelect](../tag-select/COMPONENT.md) (it renders tags itself).
+- A toggle or a choice between options → use [ButtonGroup](../button-group/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md) or [Checkbox](../checkbox/COMPONENT.md).
+- A keyboard shortcut → use [Kbd](../kbd/COMPONENT.md).
 
-- Filter chips and applied facets where each selection should be dismissible in one click.
-- Selected values (recipients, skills, topics) with optional removal.
-- Tight metadata labels (environment, version, channel) when a pill shape reads better than body text; add `Tag.Icon` when a small glyph clarifies meaning.
-
-**When not to use**
-
-- As a toggle or single-choice control — prefer [Checkbox](../checkbox/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), or [Select](../select/COMPONENT.md).
-- When the whole chip must navigate or submit a primary action — prefer [Button](../button/COMPONENT.md) or [LinkButton](../link-button/COMPONENT.md).
-- Expecting localized copy for the remove control without wrapping — the built-in remove `aria-label` is fixed to `"Remove"` in source; name the surrounding group (`aria-label` / `aria-labelledby`) for context.
-- As a numeric or status **badge** — prefer [Badge](../badge/COMPONENT.md) when the UI is count-only or notification-style.
-
-## Composition
-
-- **`Tag.Root`** — outer `span`; holds a **`span`** body with **`ControlSizeProvider`** around **`children`**, then an optional remove **`button`** when **`onRemove`** is defined. Put plain text, **`Tag.Icon`**, or other nodes inside **`Tag.Root`**; place **`Tag.Icon`** before text when both are used so the icon sits on the left.
-- **`Tag.Icon`** — wrapper **`span`** for the icon node; inherits size from the surrounding **`Tag.Root`** context.
-
-### Canonical example
-
+## Import
 ```tsx
 import { Tag } from "prime-ui-kit";
-
-export function Example() {
-  return <Tag.Root>Design systems</Tag.Root>;
-}
 ```
 
-### Scenarios (playground + `examples/`)
-
-Live demos use **`playground/snippets/tag/*.tsx`** (see **`playground/sections/TagSection.tsx`**). The table lists the same scenarios with package-oriented copies under **`examples/`** (aligned with those snippets; playground uses `@/` imports and shared `playground.css` layout classes).
-
-| Scenario | Snippet | Package example |
-|----------|---------|-----------------|
-| Sizes | [`playground/snippets/tag/sizes.tsx`](../../../playground/snippets/tag/sizes.tsx) | [`examples/sizes.tsx`](./examples/sizes.tsx) |
-| States | [`playground/snippets/tag/states.tsx`](../../../playground/snippets/tag/states.tsx) | [`examples/states.tsx`](./examples/states.tsx) |
-| Composition | [`playground/snippets/tag/composition.tsx`](../../../playground/snippets/tag/composition.tsx) | [`examples/composition.tsx`](./examples/composition.tsx) |
-| Basic | [`playground/snippets/tag/basic.tsx`](../../../playground/snippets/tag/basic.tsx) | [`examples/basic.tsx`](./examples/basic.tsx) |
-| Removable (dismiss + restore) | [`playground/snippets/tag/removable.tsx`](../../../playground/snippets/tag/removable.tsx) | [`examples/removable.tsx`](./examples/removable.tsx) |
-| With icon | [`playground/snippets/tag/with-icon.tsx`](../../../playground/snippets/tag/with-icon.tsx) | [`examples/with-icon.tsx`](./examples/with-icon.tsx) |
-| Controlled list | [`playground/snippets/tag/controlled.tsx`](../../../playground/snippets/tag/controlled.tsx) | [`examples/controlled.tsx`](./examples/controlled.tsx) |
-| Disabled | [`playground/snippets/tag/disabled.tsx`](../../../playground/snippets/tag/disabled.tsx) | [`examples/disabled.tsx`](./examples/disabled.tsx) |
-| Context `size` | [`playground/snippets/tag/context-size.tsx`](../../../playground/snippets/tag/context-size.tsx) | [`examples/context-size.tsx`](./examples/context-size.tsx) |
-
-**Additional extended examples** (richer layout / copy, same building blocks):
-
-- [`./examples/01-filter-chips.tsx`](./examples/01-filter-chips.tsx) — Catalog filters: applied facets as removable chips backed by a `Set` in state (`fieldset` + `legend`).
-- [`./examples/02-removable-selected-values.tsx`](./examples/02-removable-selected-values.tsx) — Selected skills: removable tags in a named group for remove-button context.
-- [`./examples/03-status-metadata.tsx`](./examples/03-status-metadata.tsx) — Release-style metadata: read-only chips with `Tag.Icon` + text, no `onRemove`.
-
-**LLM note:** Prefer reading runnable files under `./examples/*.tsx` and matching `playground/snippets/tag/*.tsx` for prop combinations; this page keeps the contract (rules + API tables) authoritative.
-
-## Rules
-
-- Omit **`size`** to follow the nearest ancestor **`ControlSizeProvider`**; context **`xs`** maps to tag size **`s`**. With no provider and no **`size`**, the effective size is **`m`**.
-- **`onRemove`** is optional; when present, a **`type="button"`** remove control is rendered with **`aria-label="Remove"`** and **`aria-hidden`** on the cross SVG. **`disabled`** sets **`aria-disabled`** on the root and disables the remove button.
-- Without **`onRemove`**, there is no focusable control inside the tag; the root is not a button or link.
-- For lists of removable tags, name the group so “Remove” has context — e.g. **`fieldset`** + **`legend`** (as in `./examples`) or **`aria-label`** / **`aria-labelledby`** on a suitable wrapper.
-- **`Tag.Icon`** does not force **`aria-hidden`** on icons; if the icon is decorative, rely on adjacent text or set **`aria-hidden`** on the icon content yourself.
-- There is no **`variant`** prop; appearance follows **`size`** and whether removal is enabled.
+## Anatomy
+```
+Tag.Root              span: fill, tier dimensions
+├── body              text and Tag.Icon (ellipsis area)
+│   ├── Tag.Icon      optional leading icon
+│   └── text
+└── remove button     rendered only with onRemove
+```
 
 ## API
 
 ### Tag.Root
+Forwards `ref` to the root `<span>`. No `asChild`.
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| size | `"s" \| "m" \| "l" \| "xl"` | `"m"` or from `ControlSizeProvider` | No | Visual tier for height, radius, text, and nested icon scale |
-| onRemove | `() => void` | — | No | When set, renders the remove button on the right |
-| disabled | `boolean` | — | No | Disables removal and sets `aria-disabled` on the root |
-| children | `React.ReactNode` | — | No | Text, `Tag.Icon`, or other nodes |
-| className | `string` | — | No | Extra class on the root `span` |
-| …rest | `React.HTMLAttributes<HTMLSpanElement>` | — | No | Other root attributes (`data-*`, `aria-*`, etc.) |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` (`PaletteColor`) | `"gray"` | Palette hue of the fill and text. |
+| `variant` | `"soft" \| "outline"` | `"soft"` | Treatment. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` (`ControlSize`) | — (inherited, else `"m"`) | Badge tier. Without it the tag follows the surrounding control one tier down; outside a control it is `m`. |
+| `onRemove` | `() => void` | — | Shows the remove button; called on its click. |
+| `labels` | `Partial<TagLabels>` | `{ remove: "Удалить" }` | System strings, see Accessibility. |
+| `disabled` | `boolean` | — | Muted look, `aria-disabled` on the root, remove button natively disabled. |
+| `children` | `ReactNode` | — | Text and an optional leading `Tag.Icon`. |
+| `className` | `string` | — | Extra class on the root. |
+
++ native `<span>` props (`HTMLAttributes<HTMLSpanElement>`).
 
 ### Tag.Icon
+No ref forwarding; does not accept other native props.
 
-| Prop | Type | Default | Required | Description |
-|------|------|---------|----------|-------------|
-| children | `React.ReactNode` | — | Yes | Icon or other content |
-| className | `string` | — | No | Extra class on the wrapper |
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The icon; inherits the tag text color, sized to the tag tier. |
+| `className` | `string` | — | Extra class on the wrapper. |
+
+### TagLabels
+| Key | Default | Description |
+|---|---|---|
+| `remove` | `"Удалить"` | Accessible name of the remove button. |
+
+## Variants
+
+### variant
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `soft` | Light palette fill (`palette.<hue>.soft`), hue text, no outline | Selected values and applied filters — the normal case | yes |
+| `outline` | Transparent fill, 1px inset line in the hue text at 32%, hue text | Keywords on a filled area, or secondary tags next to soft ones | |
+
+`solid` and `ghost` are not part of Tag (the type allows only `soft | outline`).
+
+### color
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `gray` | Neutral gray wash and text | Plain values and filters | yes |
+| `blue` | Blue | Category hue | |
+| `green` | Green | Category hue | |
+| `orange` | Orange | Category hue | |
+| `red` | Red | Category hue | |
+| `yellow` | Yellow | Category hue | |
+| `purple` | Purple | Category hue | |
+| `sky` | Sky blue | Category hue | |
+| `pink` | Pink | Category hue | |
+| `teal` | Teal | Category hue | |
+
+Use hues only to group tags by category (one hue per category, consistent across screens). Applied filters stay `gray`.
+
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | 16px high, padding 4, text 12, icon 12 | Inside `xs`/`s` controls | |
+| `s` | 20px high, padding 6, text 12, icon 12 | Inside `m` controls (inherited automatically), dense rows | |
+| `m` | 24px high, padding 8, text 12, icon 14 | Standalone filter rows and lists | yes (outside controls) |
+| `l` | 28px high, padding 10, text 13, icon 16 | Larger filter panels | |
+| `xl` | 32px high, padding 12, text 14, icon 16 | Large headers | |
+
+### removable (visual flag, from `onRemove`)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| no `onRemove` | Text only | Read-only values | yes |
+| `onRemove` set | Trailing × button the size of the tier icon, end padding reduced to 4px (`data-removable`) | The user can drop the value | |
+
+### disabled (visual flag)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `false` / unset | Variant colors | Normal | yes |
+| `true` | Muted fill (`fill-muted`), disabled text, no outline; remove button disabled | The value cannot be changed right now | |
+
+**Combinations**
+- Recommended: `soft` `gray` + `onRemove` for applied filters; `soft` hue for categorized keywords.
+- Allowed but rare: `outline` hue for keywords on a tinted area.
+- Avoid: many different hues in one filter row (noise); `disabled` + `onRemove` when the value will never be removable (drop the button instead).
+
+**Sizes**
+Same tiers as Badge and Kbd. Without `size` inside a control: `xs`/`s` → `xs`, `m` → `s`, `l` → `m`, `xl` → `l`. Outside a control: `m` (24px).
+
+**Hierarchy**
+Tags are secondary content: put the "Сбросить все" action as a `ghost` `s` Button next to them, not as another tag.
+
+## States
+| State / attribute | Driven by | Notes |
+|---|---|---|
+| `data-color` | `color` | Always set (default `gray`). |
+| `data-variant` | `variant` | Always set (default `soft`). |
+| `data-size` | `size`, else surrounding control size, else `m` | Nominal size. |
+| `data-tier` | resolved tier | One step down from the control when inherited. Drives dimensions. |
+| `data-removable="true"` | `onRemove` | Remove button rendered. |
+| `data-disabled="true"` + `aria-disabled` | `disabled` | Muted look; remove button `disabled`. |
+| remove hover | pointer over × | `fill-subtle-active` wash under the icon. |
+| remove focus-visible | keyboard focus on × | Focus ring around the button. |
+
+Tag has no internal state: the list of tags is controlled by the parent (remove the item in `onRemove`).
+
+## Layout & spacing
+- `width: fit-content`, never stretches in a column; `max-width: 100%`, text does not wrap.
+- A row of tags: flex-wrap with `gap: var(--prime-space-2)`.
+- Filter panel: title row and tag row separated by `--prime-space-3`.
+- The × hit area extends 4px (`--prime-space-1`) beyond the visual icon.
+
+## Accessibility
+- The tag itself is static text and not focusable; only the remove `<button type="button">` takes focus.
+- The remove button needs a unique name: pass ``labels={{ remove: `Убрать фильтр «${label}»` }}`` so screen readers do not hear several identical «Удалить».
+- After removing, move focus to a neighbouring tag or to the field the filter came from.
+- `labels.remove` — default `"Удалить"`.
+
+## Examples
+| File | Scenario | When to use this pattern |
+|---|---|---|
+| [sizes.tsx](examples/sizes.tsx) | Removable tags in tiers xs–xl | Matching the density of a row |
+| [colors.tsx](examples/colors.tsx) | Ten hues in `soft` (removable) and `outline` | Categorized tags |
+| [states.tsx](examples/states.tsx) | Read-only, removable, disabled, disabled + removable | Choosing the state of a tag |
+| [with-icon.tsx](examples/with-icon.tsx) | Leading `Tag.Icon`, with and without remove | Value types (email, privacy) |
+| [surfaces.tsx](examples/surfaces.tsx) | Tags on canvas, card and floating layer | Checking contrast on any surface |
+| [applied-filters.tsx](examples/applied-filters.tsx) | Filter panel with per-tag remove and "Сбросить все" | Filters above lists and tables |
+
+```tsx
+import { Tag } from "prime-ui-kit";
+
+export function CityFilter({ onRemove }: { onRemove: () => void }) {
+  return (
+    <Tag.Root labels={{ remove: "Убрать фильтр «Москва»" }} onRemove={onRemove}>
+      Москва
+    </Tag.Root>
+  );
+}
+```
+
+## Mistakes
+- Tag as a read-only status "Оплачен" → use `Badge`.
+- Several tags with the default «Удалить» → pass `labels.remove` with the tag text.
+- A custom × button next to a tag → use `onRemove`.
+- `variant="solid"` on Tag → not supported; use `soft` or `outline`, or `Badge` for emphasis.
+- `<Tag.Root size="m">` inside a control → drop `size`, the tier is inherited one step down.
 
 ## Related
-
-- [Badge](../badge/COMPONENT.md)
-- [Button](../button/COMPONENT.md)
-- [Input](../input/COMPONENT.md)
-- [Select](../select/COMPONENT.md)
-- [LinkButton](../link-button/COMPONENT.md)
-- [SegmentedControl](../segmented-control/COMPONENT.md)
+- [Badge](../badge/COMPONENT.md) — read-only labels with the same tiers.
+- [TagSelect](../tag-select/COMPONENT.md) — multi-select field built on tags.
+- [Kbd](../kbd/COMPONENT.md) — keys and shortcuts.

@@ -1,69 +1,96 @@
+/*
+ * Same choice layout as Checkbox/Radio (grid [control][text] / [ ][hint], label row as subgrid).
+ * Track/thumb from `--prime-switch-<tier>-*`. Thumb inset = (height − thumb) / 2,
+ * travel = width − height.
+ */
 .field {
-  --prime-switch-track-width: var(--prime-sys-size-switch-m-trackWidth);
-  --prime-switch-track-height: var(--prime-sys-size-switch-m-trackHeight);
-  --prime-switch-thumb-size: var(--prime-sys-size-switch-m-thumb);
-  --prime-switch-offset: var(--prime-sys-unit-0p125rem);
-  --prime-switch-col-gap: var(--prime-sys-size-control-m-inputPaddingX);
-  --prime-switch-thumb-translate: var(--prime-sys-unit-0p875rem);
-  --prime-switch-thumb-disabled-size: var(--prime-sys-unit-0p75rem);
-  --prime-switch-hint-offset: calc(var(--prime-switch-track-width) + var(--prime-switch-col-gap));
-  --prime-switch-stack-gap: var(--prime-sys-size-control-m-gap);
+  --prime-switch-w: var(--prime-switch-m-width);
+  --prime-switch-h: var(--prime-switch-m-height);
+  --prime-switch-thumb: var(--prime-switch-m-thumb);
+  --prime-switch-gap: var(--prime-control-m-gap);
+  --prime-switch-text: var(--prime-control-m-text-size);
+  --prime-switch-line-height: var(--prime-control-m-line-height);
+  --prime-switch-inset: calc((var(--prime-switch-h) - var(--prime-switch-thumb)) / 2);
+  --prime-switch-travel: calc(var(--prime-switch-w) - var(--prime-switch-h));
   box-sizing: border-box;
-  width: 100%;
+  /* Shrink to content; text still wraps within the container. `fullWidth` stretches the field. */
+  width: fit-content;
+  max-width: 100%;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--prime-switch-stack-gap);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--prime-switch-gap);
+  row-gap: 0;
+  align-content: start;
+}
+
+.field[data-full-width="true"] {
+  width: 100%;
+}
+
+.field[data-size="xs"] {
+  --prime-switch-w: var(--prime-switch-xs-width);
+  --prime-switch-h: var(--prime-switch-xs-height);
+  --prime-switch-thumb: var(--prime-switch-xs-thumb);
+  --prime-switch-gap: var(--prime-control-xs-gap);
+  --prime-switch-text: var(--prime-control-xs-text-size);
+  --prime-switch-line-height: var(--prime-control-xs-line-height);
 }
 
 .field[data-size="s"] {
-  --prime-switch-track-width: var(--prime-sys-size-switch-s-trackWidth);
-  --prime-switch-track-height: var(--prime-sys-size-switch-s-trackHeight);
-  --prime-switch-thumb-size: var(--prime-sys-size-switch-s-thumb);
-  --prime-switch-col-gap: var(--prime-sys-size-control-s-inputPaddingX);
-  --prime-switch-thumb-translate: var(--prime-sys-unit-0p75rem);
-  --prime-switch-thumb-disabled-size: var(--prime-sys-unit-0p625rem);
+  --prime-switch-w: var(--prime-switch-s-width);
+  --prime-switch-h: var(--prime-switch-s-height);
+  --prime-switch-thumb: var(--prime-switch-s-thumb);
+  --prime-switch-gap: var(--prime-control-s-gap);
+  --prime-switch-text: var(--prime-control-s-text-size);
+  --prime-switch-line-height: var(--prime-control-s-line-height);
 }
 
 .field[data-size="l"] {
-  --prime-switch-track-width: var(--prime-sys-size-switch-l-trackWidth);
-  --prime-switch-track-height: var(--prime-sys-size-switch-l-trackHeight);
-  --prime-switch-thumb-size: var(--prime-sys-size-switch-l-thumb);
-  --prime-switch-col-gap: var(--prime-sys-size-control-l-inputPaddingX);
-  --prime-switch-thumb-translate: var(--prime-sys-unit-1rem);
-  --prime-switch-thumb-disabled-size: var(--prime-sys-unit-0p875rem);
+  --prime-switch-w: var(--prime-switch-l-width);
+  --prime-switch-h: var(--prime-switch-l-height);
+  --prime-switch-thumb: var(--prime-switch-l-thumb);
+  --prime-switch-gap: var(--prime-control-l-gap);
+  --prime-switch-text: var(--prime-control-l-text-size);
+  --prime-switch-line-height: var(--prime-control-l-line-height);
 }
 
 .field[data-size="xl"] {
-  --prime-switch-track-width: var(--prime-sys-size-switch-xl-trackWidth);
-  --prime-switch-track-height: var(--prime-sys-size-switch-xl-trackHeight);
-  --prime-switch-thumb-size: var(--prime-sys-size-switch-xl-thumb);
-  --prime-switch-col-gap: var(--prime-sys-size-control-xl-inputPaddingX);
-  --prime-switch-thumb-translate: var(--prime-sys-unit-1rem);
-  --prime-switch-thumb-disabled-size: var(--prime-sys-unit-1p125rem);
+  --prime-switch-w: var(--prime-switch-xl-width);
+  --prime-switch-h: var(--prime-switch-xl-height);
+  --prime-switch-thumb: var(--prime-switch-xl-thumb);
+  --prime-switch-gap: var(--prime-control-xl-gap);
+  --prime-switch-text: var(--prime-control-xl-text-size);
+  --prime-switch-line-height: var(--prime-control-xl-line-height);
 }
 
 .field .labelRow {
+  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0;
-  row-gap: 0;
-  column-gap: var(--prime-switch-col-gap);
-  align-items: center;
+  grid-template-columns: subgrid;
+  column-gap: var(--prime-switch-gap);
+  align-items: start;
   width: 100%;
+  font-size: var(--prime-switch-text);
+  line-height: var(--prime-switch-line-height);
+  font-weight: var(--prime-font-weight-regular);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .controlCell {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  flex-shrink: 0;
+  height: max(var(--prime-switch-h), var(--prime-switch-line-height));
 }
 
 .input {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   opacity: 0;
   pointer-events: none;
 }
@@ -71,95 +98,103 @@
 .track {
   position: relative;
   box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  width: var(--prime-switch-track-width);
-  height: var(--prime-switch-track-height);
-  border-radius: var(--prime-sys-shape-radius-round);
-  border: var(--prime-sys-border-width-control) solid var(--prime-sys-color-field-border);
-  background: var(--prime-sys-color-action-neutralBackgroundHover);
-  box-shadow: var(--prime-sys-elevation-shadow-surface);
+  flex-shrink: 0;
+  display: block;
+  width: var(--prime-switch-w);
+  height: var(--prime-switch-h);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-strong);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
   transition:
-    background-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    border-color var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .track::before {
   content: "";
-  box-sizing: border-box;
   position: absolute;
-  top: 50%;
-  left: var(--prime-switch-offset);
-  width: var(--prime-switch-thumb-size);
-  height: var(--prime-switch-thumb-size);
-  border-radius: var(--prime-sys-shape-radius-round);
-  background: var(--prime-sys-color-surface-elevated);
-  box-shadow: 0 var(--prime-sys-unit-1px) var(--prime-sys-unit-2px)
-    color-mix(in srgb, var(--prime-sys-color-content-primary) 18%, transparent);
-  transform: translateY(-50%);
-  transition: transform var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+  top: var(--prime-switch-inset);
+  left: var(--prime-switch-inset);
+  width: var(--prime-switch-thumb);
+  height: var(--prime-switch-thumb);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-control-thumb);
+  box-shadow: var(--prime-shadow-raised);
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 .text {
-  line-height: var(--prime-sys-typography-body-lineHeight);
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.controlCell .input:checked + .track {
-  background: var(--prime-sys-color-action-primaryBackground);
-  border-color: var(--prime-sys-color-action-primaryBackground);
-  box-shadow: none;
-}
-
-.controlCell .input:checked + .track::before {
-  transform: translate(var(--prime-switch-thumb-translate), -50%);
-}
-
+/* ---- hover ---- */
 .labelRow:hover .track {
-  border-color: var(--prime-sys-color-field-borderHover);
-  background: var(--prime-sys-color-field-bg);
-  box-shadow: none;
+  background: var(--prime-color-fill-strong-hover);
 }
 
-.labelRow:hover .controlCell .input:checked + .track {
-  background: var(--prime-sys-color-action-primaryBackgroundHover);
-  border-color: var(--prime-sys-color-action-primaryBackgroundHover);
+/* ---- on ---- */
+.input:checked + .track {
+  background: var(--prime-color-accent-default);
 }
 
-.controlCell .input:focus-visible + .track {
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+.labelRow:hover .input:checked + .track {
+  background: var(--prime-color-accent-hover);
 }
 
-.field[data-invalid="true"] .track {
-  border-color: var(--prime-sys-color-field-borderError);
+.input:checked + .track::before {
+  transform: translateX(var(--prime-switch-travel));
 }
 
+/* ---- focus-visible ---- */
+.input:focus-visible + .track {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+/* ---- invalid ---- */
+.field[data-invalid="true"] .input:not(:checked) + .track {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.field[data-invalid="true"] .input:focus-visible + .track {
+  outline-color: var(--prime-color-danger-border);
+}
+
+/* ---- read-only: state is visible, interaction is not ---- */
+.field:has(.input[aria-readonly="true"]) .labelRow {
+  cursor: default;
+}
+
+.field:has(.input[aria-readonly="true"]) .labelRow:hover .track {
+  background: var(--prime-color-fill-strong);
+}
+
+.field:has(.input[aria-readonly="true"]) .labelRow:hover .input:checked + .track {
+  background: var(--prime-color-accent-default);
+}
+
+/* ---- disabled (not dimmed with opacity: fills carry the state) ---- */
 .field[data-disabled="true"] .labelRow {
   cursor: not-allowed;
 }
 
-.field[data-disabled="true"] .track {
-  background: var(--prime-sys-color-surface-raised);
-  border-color: var(--prime-sys-color-border-subtle);
-  box-shadow: 0 0 0 var(--prime-sys-unit-1px) var(--prime-sys-color-border-subtle);
-  opacity: 1;
+.field[data-disabled="true"] .track,
+.field[data-disabled="true"] .labelRow:hover .track {
+  background: var(--prime-color-fill-muted);
+  box-shadow: none;
 }
 
-.field[data-disabled="true"] .controlCell .input:checked + .track {
-  background: var(--prime-sys-color-surface-raised);
-  border-color: var(--prime-sys-color-border-subtle);
+.field[data-disabled="true"] .input:checked + .track,
+.field[data-disabled="true"] .labelRow:hover .input:checked + .track {
+  background: var(--prime-color-accent-soft);
 }
 
 .field[data-disabled="true"] .track::before {
-  --prime-switch-thumb-size: var(--prime-switch-thumb-disabled-size);
-  background: var(--prime-sys-color-border-subtle);
+  box-shadow: none;
 }
 
 .hintSlot {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  padding-inline-start: var(--prime-switch-hint-offset);
-  justify-content: flex-start;
+  grid-column: 2;
+  min-width: 0;
 }

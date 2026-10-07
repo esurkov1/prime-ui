@@ -1,15 +1,23 @@
-import { Tag } from "prime-ui-kit";
+/** Removable tags in the five badge tiers: 16 · 20 · 24 · 28 · 32 px, default `m`. Use to match a tag to the density of its row. */
+import { type ControlSize, Tag, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-/** Size ladder `s` → `xl`; height, radius, type, and icon tier follow control tokens. */
-export default function TagExampleSizes() {
+const sizes: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+
+export default function TagSizesExample() {
   return (
-    <div className={styles.chipRow}>
-      <Tag.Root size="s">Tag s</Tag.Root>
-      <Tag.Root size="m">Tag m</Tag.Root>
-      <Tag.Root size="l">Tag l</Tag.Root>
-      <Tag.Root size="xl">Tag xl</Tag.Root>
+    <div className={styles.sizes}>
+      {sizes.map((size) => (
+        <div key={size} className={styles.sizeCell}>
+          <Tag.Root labels={{ remove: "Убрать «Москва»" }} size={size} onRemove={() => undefined}>
+            Москва
+          </Tag.Root>
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
+          </Typography.Root>
+        </div>
+      ))}
     </div>
   );
 }

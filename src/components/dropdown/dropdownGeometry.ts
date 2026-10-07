@@ -1,8 +1,4 @@
-import type { PositionSide } from "@/hooks/usePosition";
-import {
-  getFloatingPanelOffsetPx,
-  getFloatingViewportPadPx,
-} from "@/internal/layoutPxFromPrimitives";
+import { getPanelOffsetPx, getViewportPadPx, type PositionSide } from "@/hooks/usePosition";
 
 export const DROPDOWN_MIN_MAX_HEIGHT = 120;
 
@@ -25,9 +21,9 @@ export function getDropdownMaxHeightForAnchorSide(
 }
 
 export function getDropdownPanelOffsetPx(): number {
-  return getFloatingPanelOffsetPx();
+  return getPanelOffsetPx();
 }
 
 export function getDropdownViewportPadPx(): number {
-  return getFloatingViewportPadPx();
+  return getViewportPadPx();
 }

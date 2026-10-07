@@ -1,79 +1,98 @@
+/* Layout for the Tabs examples: semantic tokens only. */
+
 .stack {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-m);
-}
-
-.body {
-  margin: 0;
-  color: var(--prime-sys-color-content-secondary);
-}
-
-.settingsRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-sys-spacing-l);
-  align-items: flex-start;
-}
-
-.settingsContent {
-  flex: 1 1 0;
-  min-width: min(100%, 20rem);
-}
-
-.surface {
-  width: 100%;
-  max-width: min(100%, 36rem);
-  padding: var(--prime-sys-spacing-m);
-  border-radius: var(--prime-sys-shape-radius-m);
-  border: var(--prime-sys-unit-1px) solid var(--prime-sys-color-border-subtle);
-}
-
-.fullWidthRoot {
+  gap: var(--prime-space-8);
   width: 100%;
   min-width: 0;
 }
 
-.fullWidthList {
-  width: 100%;
-  min-width: 0;
-}
-
-.flexTab {
-  flex: 1 1 0;
-  min-width: 0;
-  justify-content: center;
-}
-
-.narrowShell {
-  width: 100%;
-  max-width: 12rem;
-  min-width: 0;
-}
-
-.controlledCaption {
-  margin: var(--prime-sys-spacing-s) 0 0;
-  color: var(--prime-sys-color-content-muted);
-  font-size: var(--prime-sys-typography-role-bodySmall-fontSize);
-}
-
-.sizesRow {
+.group {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-x6);
-  align-items: stretch;
-  width: 100%;
-}
-
-.sizesGroup {
+  gap: var(--prime-space-2);
   width: 100%;
   min-width: 0;
 }
 
-.sizesLabel {
-  margin: 0 0 var(--prime-sys-spacing-x2);
-  font-size: var(--prime-sys-size-control-s-supportText);
-  font-weight: var(--prime-sys-typography-weight-medium);
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  color: var(--prime-sys-color-content-secondary);
+.sizes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+/* label · tabs · button of the same tier on one baseline row */
+.sizeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.sizeRow > :nth-child(2) {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.caption {
+  flex: none;
+  width: var(--prime-space-8);
+}
+
+/* ≈375px — a phone-width container. */
+.narrow {
+  width: min(100%, calc(var(--prime-drawer-width-s) + var(--prime-space-4)));
+}
+
+.card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: min(100%, calc(var(--prime-modal-width-l) - var(--prime-space-4)));
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-5);
+  max-width: calc(var(--prime-drawer-width-s) + var(--prime-space-6));
+}
+
+/* Settings panel: the heading row is one control tall, so it lines up with the first tab. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  min-height: var(--prime-control-m-height);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-5);
+}
+
+/* Fleet dashboard: two-line underline tabs across the frame. */
+.fleet {
+  width: 100%;
+  min-width: 0;
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
 }

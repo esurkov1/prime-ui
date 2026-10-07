@@ -1,54 +1,80 @@
-/* Semantic page region inside a padded main (e.g. AppShell); no outer padding — shell provides it. */
+/*
+ * Page column primitives. Edge gutters come from `AppShell.Main`; here only measure and rhythm:
+ * header → body 32, block → block inside the body 40 (section → section, foundation §1.3).
+ */
+
+.root,
 .section {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-8);
   width: 100%;
   min-width: 0;
 }
 
-/* Внешние поля колонки даёт `AppShell.Main` (в составе `AppShell.Template`); здесь только max-width и внутренняя сетка. */
 .root {
-  box-sizing: border-box;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0;
+  margin-inline: auto;
 }
 
 .root[data-max-width="readable"] {
-  max-width: var(--prime-sys-unit-48rem);
+  max-width: var(--prime-layout-reading-max-width);
 }
 
 .root[data-max-width="wide"] {
-  max-width: var(--prime-sys-unit-72rem);
+  max-width: var(--prime-layout-content-max-width);
 }
 
-.header:last-child {
-  margin-bottom: 0;
-}
-
+/*
+ * Heading and actions share a row while the heading keeps at least half a reading measure;
+ * otherwise actions wrap under it (intrinsic wrap, no breakpoint needed).
+ */
 .header {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--prime-space-4) var(--prime-space-6);
+  min-width: 0;
+}
+
+.heading {
+  display: flex;
+  flex: 1 1 calc(var(--prime-layout-reading-max-width) / 2);
   flex-direction: column;
-  gap: var(--prime-sys-spacing-x3);
-  margin-bottom: var(--prime-sys-spacing-5xl);
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
 }
 
 .title {
   margin: 0;
-  color: var(--prime-sys-color-content-primary);
-  font-size: var(--prime-sys-typography-sizeScale-3xl);
-  line-height: var(--prime-sys-typography-lineHeightScale-3xl);
-  font-weight: var(--prime-sys-typography-weight-semibold);
-  letter-spacing: var(--prime-sys-typography-tracking-tight);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-heading-m-size);
+  line-height: var(--prime-text-heading-m-line-height);
+  font-weight: var(--prime-text-heading-m-weight);
+  letter-spacing: var(--prime-text-heading-m-tracking);
+  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
 .description {
   margin: 0;
-  max-width: 65ch;
-  color: var(--prime-sys-color-content-secondary);
-  font-size: var(--prime-sys-typography-sizeScale-s);
-  line-height: var(--prime-sys-typography-lineHeightScale-s);
-  font-weight: var(--prime-sys-typography-weight-regular);
+  max-width: var(--prime-layout-reading-max-width);
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
+  font-weight: var(--prime-text-body-m-weight);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 /* When the content column is already inset by a parent, avoid a second measure column. */
@@ -59,6 +85,6 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-sys-spacing-5xl);
+  gap: var(--prime-space-10);
   min-width: 0;
 }

@@ -1,43 +1,38 @@
-import { ButtonGroup, CodeBlock, Typography } from "prime-ui-kit";
+/** `code` comes from state: a ButtonGroup switches the shown snippet. Use for tabs of alternative snippets (utility / hook, npm / bun). */
+
+import { ButtonGroup, CodeBlock } from "prime-ui-kit";
 import { useState } from "react";
 
-const SNIPPETS: [string, string][] = [
-  [
-    "Утилита",
-    `export function clamp(n: number, min: number, max: number) {
+import styles from "./examples.module.css";
+
+const SNIPPETS = {
+  utility: `export function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
-}
-`,
-  ],
-  [
-    "React",
-    `import { useMemo } from "react";
+}`,
+  hook: `import { useId } from "react";
 
-export function useStableId(prefix: string) {
-  return useMemo(() => \`\${prefix}-\${Math.random().toString(36).slice(2)}\`, [prefix]);
-}
-`,
-  ],
-];
+export function useFieldIds(prefix: string) {
+  const id = useId();
+  return { input: \`\${prefix}-\${id}\`, hint: \`\${prefix}-\${id}-hint\` };
+}`,
+} as const;
 
-/** Проп `code` из состояния родителя: сегменты переключают два разных фрагмента (как в playground `controlled.tsx`). */
+type SnippetKey = keyof typeof SNIPPETS;
+
 export default function CodeBlockControlledExample() {
-  const [index, setIndex] = useState(0);
-  const [label, code] = SNIPPETS[index] ?? SNIPPETS[0];
+  const [active, setActive] = useState<SnippetKey>("utility");
 
   return (
-    <div>
-      <Typography.Root variant="body-compact" tone="muted" as="p">
-        Активный фрагмент: <strong>{label}</strong> (проп <code>code</code> из состояния).
-      </Typography.Root>
-      <ButtonGroup.Root size="s" aria-label="Выбор фрагмента кода">
-        {SNIPPETS.map(([title], i) => (
-          <ButtonGroup.Item key={title} pressed={i === index} onClick={() => setIndex(i)}>
-            {title}
-          </ButtonGroup.Item>
-        ))}
+    <div className={styles.column}>
+      <ButtonGroup.Root size="s" aria-label="Фрагмент">
+        <ButtonGroup.Item pressed={active === "utility"} onClick={() => setActive("utility")}>
+          Утилита
+        </ButtonGroup.Item>
+        <ButtonGroup.Item pressed={active === "hook"} onClick={() => setActive("hook")}>
+          Хук
+        </ButtonGroup.Item>
       </ButtonGroup.Root>
-      <CodeBlock.Root code={code} colorScheme="light" />
+      <CodeBlock.Root code={SNIPPETS[active]} />
     </div>
   );
 }

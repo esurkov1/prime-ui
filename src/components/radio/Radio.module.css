@@ -1,140 +1,191 @@
+/*
+ * Same choice layout as Checkbox (grid [control][text] / [ ][hint], label row as subgrid).
+ * Circle: unchecked = fill-strong, checked = accent with a thumb-colored dot (40%) that pops in.
+ */
 .field {
-  --prime-choice-control-size: var(--prime-sys-size-choice-m-control);
-  --prime-choice-col-gap: var(--prime-sys-size-control-m-inputPaddingX);
-  --prime-choice-hint-offset: calc(var(--prime-choice-control-size) + var(--prime-choice-col-gap));
-  --prime-choice-stack-gap: var(--prime-sys-size-control-m-gap);
+  --prime-choice-size: var(--prime-control-m-choice);
+  --prime-choice-gap: var(--prime-control-m-gap);
+  --prime-choice-text: var(--prime-control-m-text-size);
+  --prime-choice-line-height: var(--prime-control-m-line-height);
   box-sizing: border-box;
-  width: 100%;
+  /* Shrink to content (so choices sit side by side in horizontal groups); text still wraps
+   * within the container. `fullWidth` stretches the field. */
+  width: fit-content;
+  max-width: 100%;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--prime-choice-stack-gap);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--prime-choice-gap);
+  row-gap: 0;
+  align-content: start;
+}
+
+.field[data-full-width="true"] {
+  width: 100%;
+}
+
+.field[data-size="xs"] {
+  --prime-choice-size: var(--prime-control-xs-choice);
+  --prime-choice-gap: var(--prime-control-xs-gap);
+  --prime-choice-text: var(--prime-control-xs-text-size);
+  --prime-choice-line-height: var(--prime-control-xs-line-height);
 }
 
 .field[data-size="s"] {
-  --prime-choice-control-size: var(--prime-sys-size-choice-s-control);
-  --prime-choice-col-gap: var(--prime-sys-size-control-s-inputPaddingX);
+  --prime-choice-size: var(--prime-control-s-choice);
+  --prime-choice-gap: var(--prime-control-s-gap);
+  --prime-choice-text: var(--prime-control-s-text-size);
+  --prime-choice-line-height: var(--prime-control-s-line-height);
 }
 
 .field[data-size="l"] {
-  --prime-choice-control-size: var(--prime-sys-size-choice-l-control);
-  --prime-choice-col-gap: var(--prime-sys-size-control-l-inputPaddingX);
+  --prime-choice-size: var(--prime-control-l-choice);
+  --prime-choice-gap: var(--prime-control-l-gap);
+  --prime-choice-text: var(--prime-control-l-text-size);
+  --prime-choice-line-height: var(--prime-control-l-line-height);
 }
 
 .field[data-size="xl"] {
-  --prime-choice-control-size: var(--prime-sys-size-choice-xl-control);
-  --prime-choice-col-gap: var(--prime-sys-size-control-xl-inputPaddingX);
+  --prime-choice-size: var(--prime-control-xl-choice);
+  --prime-choice-gap: var(--prime-control-xl-gap);
+  --prime-choice-text: var(--prime-control-xl-text-size);
+  --prime-choice-line-height: var(--prime-control-xl-line-height);
 }
 
 .field .labelRow {
+  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0;
-  row-gap: 0;
-  column-gap: var(--prime-choice-col-gap);
-  align-items: center;
+  grid-template-columns: subgrid;
+  column-gap: var(--prime-choice-gap);
+  align-items: start;
   width: 100%;
+  font-size: var(--prime-choice-text);
+  line-height: var(--prime-choice-line-height);
+  font-weight: var(--prime-font-weight-regular);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .controlCell {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: var(--prime-choice-control-size);
-  height: var(--prime-choice-control-size);
+  width: var(--prime-choice-size);
+  height: max(var(--prime-choice-size), var(--prime-choice-line-height));
 }
 
 .input {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   opacity: 0;
   pointer-events: none;
 }
 
-.svg {
-  width: var(--prime-choice-control-size);
-  height: var(--prime-choice-control-size);
+.control {
+  box-sizing: border-box;
   flex-shrink: 0;
-  display: inline-flex;
-  transition: box-shadow var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-}
-
-.outerCircle {
-  fill: var(--prime-sys-color-surface-raised);
-  stroke: var(--prime-sys-color-field-border);
-  stroke-width: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-choice-size);
+  height: var(--prime-choice-size);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-strong);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
   transition:
-    fill var(--prime-sys-motion-medium) var(--prime-sys-motion-standard),
-    stroke var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.innerCircle {
-  fill: var(--prime-sys-color-action-primaryBackground);
-  transform-origin: center;
+.dot {
+  width: 40%;
+  height: 40%;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-control-thumb);
   transform: scale(0);
-  opacity: 0;
-  transition:
-    transform var(--prime-sys-motion-fast) var(--prime-sys-motion-standard),
-    opacity var(--prime-sys-motion-fast) var(--prime-sys-motion-standard);
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
 }
 
-.controlCell .input:checked + .svg .outerCircle {
-  stroke: var(--prime-sys-color-action-primaryBackground);
+.text {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.controlCell .input:checked + .svg .innerCircle {
+/* ---- hover / active ---- */
+.labelRow:hover .control {
+  background: var(--prime-color-fill-strong-hover);
+}
+
+.labelRow:active .control {
+  transform: scale(0.92);
+}
+
+/* ---- checked ---- */
+.input:checked + .control,
+.labelRow:hover .input:checked + .control {
+  background: var(--prime-color-accent-default);
+}
+
+.labelRow:hover .input:checked + .control {
+  background: var(--prime-color-accent-hover);
+}
+
+.input:checked + .control .dot {
   transform: scale(1);
-  opacity: 1;
 }
 
-.labelRow:hover .svg .outerCircle {
-  stroke: var(--prime-sys-color-field-borderHover);
-  fill: var(--prime-sys-color-action-neutralBackgroundHover);
+/* ---- focus-visible ---- */
+.input:focus-visible + .control {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
 }
 
-.labelRow:hover .controlCell .input:checked + .svg .outerCircle {
-  stroke: var(--prime-sys-color-action-primaryBackgroundHover);
+/* ---- invalid ---- */
+.field[data-invalid="true"] .input:not(:checked) + .control {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
-.controlCell .input:focus-visible + .svg {
-  border-radius: var(--prime-sys-shape-radius-round);
-  box-shadow: var(--prime-sys-elevation-shadow-buttonFocus);
+.field[data-invalid="true"] .input:focus-visible + .control {
+  outline-color: var(--prime-color-danger-border);
 }
 
-.controlCell .input:focus-visible + .svg .outerCircle {
-  stroke: var(--prime-sys-color-field-borderFocus);
-}
-
-.field[data-invalid="true"] .svg .outerCircle {
-  stroke: var(--prime-sys-color-field-borderError);
-}
-
-.field[data-invalid="true"] .svg .innerCircle {
-  fill: var(--prime-sys-color-border-danger);
-}
-
+/* ---- disabled ---- */
 .field[data-disabled="true"] .labelRow {
   cursor: not-allowed;
 }
 
-.field[data-disabled="true"] .svg .outerCircle {
-  filter: none;
-  stroke: var(--prime-sys-color-border-subtle);
-  fill: var(--prime-sys-color-surface-accentSoft);
+.field[data-disabled="true"] .control,
+.field[data-disabled="true"] .labelRow:hover .input + .control {
+  background: var(--prime-color-fill-muted);
+  box-shadow: none;
+  transform: none;
 }
 
-.text {
-  line-height: var(--prime-sys-typography-body-lineHeight);
-  min-width: 0;
+.field[data-disabled="true"] .dot {
+  background: var(--prime-color-text-disabled);
 }
 
 .hintSlot {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  padding-inline-start: var(--prime-choice-hint-offset);
-  justify-content: flex-start;
+  grid-column: 2;
+  min-width: 0;
+}
+
+/* ---- Radio.Group: a stack (or wrapping row) of options ---- */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.group[data-orientation="horizontal"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--prime-space-5);
+  row-gap: var(--prime-space-2);
 }

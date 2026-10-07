@@ -27,17 +27,19 @@ const divSlotRows = (element: string): PlaygroundApiPropRow[] => [
 export const fileUploadRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Ярус токенов для зоны, типографики, чипа Browse и контекста Hint.",
+    description:
+      "Ярус: поля и радиус зоны, круг иконки и кнопка «Browse» высотой контрола, кегль заголовка и Hint.",
   },
   {
-    prop: "appearance",
+    prop: "variant",
     type: '"dashed" | "solid"',
     defaultValue: '"dashed"',
     required: "Нет",
-    description: "Пунктирная рамка по умолчанию; сплошная — для встраивания в карточки.",
+    description:
+      "dashed — заливка поля и пунктир border-default; solid — только заливка (встраивание в карточки и модалки).",
   },
   {
     prop: "inputRef",
@@ -63,9 +65,32 @@ export const fileUploadRootApiRows: PlaygroundApiPropRow[] = [
   {
     prop: "disabled",
     type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description:
+      "Блокирует клик по зоне и drag-and-drop; disabled на input, data-disabled на зоне.",
+  },
+  {
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Ошибка (например, отклонённый файл): линия danger-border, aria-invalid на input.",
+  },
+  {
+    prop: "name",
+    type: "string",
     defaultValue: "—",
     required: "Нет",
-    description: "Блокирует клик по зоне и drag-and-drop; aria-disabled на input.",
+    description: "Имя скрытого input внутри формы.",
+  },
+  {
+    prop: "labels",
+    type: "Partial<FileUploadLabels>",
+    defaultValue:
+      '{ title: "Выберите файл или перетащите его сюда", hint: "JPEG, PNG, PDF, MP4 до 50 МБ", browse: "Выбрать файл" }',
+    required: "Нет",
+    description: "Тексты встроенного тела зоны (без children); пустой hint скрывает подсказку.",
   },
   {
     prop: "onFilesChange",
@@ -80,7 +105,8 @@ export const fileUploadRootApiRows: PlaygroundApiPropRow[] = [
     type: "React.ReactNode",
     defaultValue: "—",
     required: "Нет",
-    description: "Кастомное содержимое зоны; иначе встроенный текст и иконка загрузки.",
+    description:
+      "Своё тело зоны (обычно DropBody с Icon, Title, Hint, BrowseLabel). Без children — встроенные тексты из labels и иконка загрузки.",
   },
   {
     prop: "className",
@@ -94,7 +120,8 @@ export const fileUploadRootApiRows: PlaygroundApiPropRow[] = [
     type: 'Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "children">',
     defaultValue: "—",
     required: "Нет",
-    description: "htmlFor, id, aria-*, data-* и прочие атрибуты label.",
+    description:
+      "id, aria-*, data-* и прочие атрибуты label. onDragOver, onDragLeave и onDrop заняты зоной.",
   },
 ];
 
@@ -238,10 +265,11 @@ export const fileUploadFormatBadgeApiRows: PlaygroundApiPropRow[] = [
   },
   {
     prop: "color",
-    type: "FileUploadFormatBadgeColor",
+    type: "PaletteColor",
     defaultValue: '"gray"',
     required: "Нет",
-    description: "Семантика цвета бейджа.",
+    description:
+      "Цвет палитры: текст --prime-color-palette-<hue>-text на полупрозрачной подложке того же оттенка; gray — fill-strong.",
   },
   {
     prop: "className",
@@ -254,18 +282,19 @@ export const fileUploadFormatBadgeApiRows: PlaygroundApiPropRow[] = [
 
 export const fileUploadItemApiRows: PlaygroundApiPropRow[] = [
   {
-    prop: "variant",
-    type: '"default" | "error"',
-    defaultValue: '"default"',
+    prop: "invalid",
+    type: "boolean",
+    defaultValue: "false",
     required: "Нет",
-    description: "Обычная карточка или подсветка ошибки загрузки.",
+    description:
+      "Ошибка загрузки: заливка danger-soft, внутреннее кольцо danger-border и мета цвета danger-text.",
   },
   {
     prop: "size",
-    type: '"s" | "m" | "l" | "xl"',
+    type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Размеры отступов, текста, бейджа и прогресса карточки.",
+    description: "Отступы, кегль имени и меты, бейдж формата высотой контрола яруса.",
   },
   {
     prop: "className",
@@ -342,7 +371,7 @@ export const fileUploadItemMetaSepApiRows: PlaygroundApiPropRow[] = [
     type: "React.HTMLAttributes<HTMLSpanElement>",
     defaultValue: "—",
     required: "Нет",
-    description: "Прочие атрибуты span (aria-hidden по умолчанию не перезаписывается).",
+    description: "Прочие атрибуты span; aria-hidden стоит по умолчанию.",
   },
 ];
 

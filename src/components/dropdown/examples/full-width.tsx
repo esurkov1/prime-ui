@@ -1,27 +1,22 @@
-import { Button } from "@/components/button/Button";
-import { Dropdown } from "@/components/dropdown/Dropdown";
+/** `sameMinWidthAsTrigger`: the menu is at least as wide as a full-width trigger. Use for full-width buttons in a column. */
+import { Button, Dropdown } from "prime-ui-kit";
+import styles from "./examples.module.css";
 
-import styles from "./dropdown-examples.module.css";
-
-/** `sameMinWidthAsTrigger` — как в `playground/snippets/dropdown/full-width.tsx`. */
 export default function DropdownFullWidthExample() {
   return (
-    <Dropdown.Root>
-      <Dropdown.Trigger>
-        <Button.Root
-          type="button"
-          variant="neutral"
-          mode="stroke"
-          aria-label="Действия со строкой"
-          className={styles.iconTriggerMin}
-        >
-          ⋮
-        </Button.Root>
-      </Dropdown.Trigger>
-      <Dropdown.Content sameMinWidthAsTrigger>
-        <Dropdown.Item>Очень длинная подпись пункта меню в одну строку</Dropdown.Item>
-        <Dropdown.Item>Второй пункт</Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown.Root>
+    <div className={styles.wideColumn}>
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <Button.Root variant="soft" tone="neutral" fullWidth>
+            Экспортировать отчёт
+          </Button.Root>
+        </Dropdown.Trigger>
+        <Dropdown.Content sameMinWidthAsTrigger>
+          <Dropdown.Item>PDF</Dropdown.Item>
+          <Dropdown.Item>Excel (.xlsx)</Dropdown.Item>
+          <Dropdown.Item>CSV</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>
+    </div>
   );
 }

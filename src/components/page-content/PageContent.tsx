@@ -53,10 +53,36 @@ export type PageContentHeaderProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-function PageContentHeader({ className, children, ...rest }: PageContentHeaderProps) {
+export type PageContentActionsProps = {
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+/** Page-level actions (buttons) next to the title; wrap below the heading on narrow columns. */
+function PageContentActions({ className, children, ...rest }: PageContentActionsProps) {
   return (
-    <div className={cx(styles.header, className)} {...rest}>
+    <div className={cx(styles.actions, className)} {...rest}>
       {children}
+    </div>
+  );
+}
+PageContentActions.displayName = "PageContent.Actions";
+
+function PageContentHeader({ className, children, ...rest }: PageContentHeaderProps) {
+  const items = React.Children.toArray(children);
+  const isActions = (child: React.ReactNode) =>
+    React.isValidElement(child) && child.type === PageContentActions;
+  const actions = items.filter(isActions);
+  const heading = items.filter((child) => !isActions(child));
+
+  return (
+    <div
+      className={cx(styles.header, className)}
+      data-has-actions={actions.length > 0 ? "true" : undefined}
+      {...rest}
+    >
+      <div className={styles.heading}>{heading}</div>
+      {actions}
     </div>
   );
 }
@@ -126,6 +152,7 @@ export const PageContent = {
   Root: PageContentRoot,
   Section: PageContentSection,
   Header: PageContentHeader,
+  Actions: PageContentActions,
   Title: PageContentTitle,
   Description: PageContentDescription,
   Body: PageContentBody,

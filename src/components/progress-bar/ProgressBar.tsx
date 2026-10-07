@@ -2,17 +2,19 @@ import * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { ProgressBarSize } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./ProgressBar.module.css";
-
-export type { ProgressBarSize };
 
 export type ProgressBarRootProps = {
   value: number;
   max?: number;
   label?: string;
-  size?: ProgressBarSize;
+  size?: ControlSize;
+  /** Цвет заполнения. По умолчанию `accent`. */
+  tone?: Exclude<Tone, "neutral" | "info">;
+  /** Показать значение в процентах справа от подписи. */
+  showValue?: boolean;
   className?: string;
 };
 
@@ -21,17 +23,27 @@ function clampProgress(value: number, max: number): number {
 }
 
 const ProgressBarRoot = React.forwardRef<HTMLProgressElement, ProgressBarRootProps>(
-  ({ value, max = 100, label, size = "m", className }, ref) => {
+  ({ value, max = 100, label, size = "m", tone = "accent", showValue = false, className }, ref) => {
     const safeMax = max > 0 ? max : 100;
     const safeValue = clampProgress(value, safeMax);
     const labelId = React.useId();
+    const percent = Math.round((safeValue / safeMax) * 100);
 
     return (
-      <div className={cx(styles.root, className)} {...toDataAttributes({ size })}>
-        {label ? (
-          <span className={styles.label} id={labelId}>
-            {label}
-          </span>
+      <div className={cx(styles.root, className)} {...toDataAttributes({ size, tone })}>
+        {label || showValue ? (
+          <div className={styles.header}>
+            {label ? (
+              <span className={styles.label} id={labelId}>
+                {label}
+              </span>
+            ) : null}
+            {showValue ? (
+              <span className={styles.value} aria-hidden="true">
+                {percent}%
+              </span>
+            ) : null}
+          </div>
         ) : null}
         <progress
           ref={ref}

@@ -1,29 +1,37 @@
 import * as React from "react";
+
+import { Badge } from "@/components/badge/Badge";
 import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import type { TabsSize } from "@/internal/states";
+import { toDataAttributes } from "@/internal/data-attributes";
+import type { ControlSize, PaletteColor } from "@/internal/states";
 
 import styles from "./Tabs.module.css";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export type TabsOrientation = "horizontal" | "vertical";
-
-export type { TabsSize };
 
 type TabsContextValue = {
   activeValue: string;
   onSelect: (value: string) => void;
-  orientation: TabsOrientation;
+  orientation: "horizontal" | "vertical";
   rootId: string;
-  size: TabsSize;
+  size: ControlSize;
 };
 
-// ─── Context ──────────────────────────────────────────────────────────────────
-
 const [TabsProvider, useTabsContext] = createComponentContext<TabsContextValue>("Tabs");
+
+/** Ids of the trigger's text parts, used to keep the description out of the accessible name. */
+type TriggerContextValue = { triggerId: string };
+
+const TriggerContext = React.createContext<TriggerContextValue | null>(null);
+
+function tabId(rootId: string, value: string) {
+  return `prime-ui-kit-tab-${rootId}-${value}`;
+}
+
+function panelId(rootId: string, value: string) {
+  return `prime-ui-kit-panel-${rootId}-${value}`;
+}
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
@@ -31,11 +39,12 @@ export type TabsRootProps = {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  orientation?: TabsOrientation;
-  size?: TabsSize;
+  /** Default `horizontal`. A vertical list stacks above the panel in containers narrower than 600px. */
+  orientation?: "horizontal" | "vertical";
+  size?: ControlSize;
   children: React.ReactNode;
   className?: string;
-};
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue" | "children">;
 
 function TabsRoot({
   value,
@@ -45,6 +54,7 @@ function TabsRoot({
   size = "m",
   children,
   className,
+  ...rest
 }: TabsRootProps) {
   const rootId = React.useId();
 
@@ -61,8 +71,12 @@ function TabsRoot({
 
   return (
     <TabsProvider value={contextValue}>
-      <div className={cx(styles.root, className)} data-orientation={orientation} data-size={size}>
-        {children}
+      <div
+        {...rest}
+        className={cx(styles.root, className)}
+        {...toDataAttributes({ orientation, size })}
+      >
+        <div className={styles.layout}>{children}</div>
       </div>
     </TabsProvider>
   );
@@ -74,33 +88,57 @@ TabsRoot.displayName = "TabsRoot";
 export type TabsListProps = {
   children: React.ReactNode;
   className?: string;
-};
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
 
-function TabsList({ children, className }: TabsListProps) {
-  const { orientation, rootId, activeValue, onSelect, size } = useTabsContext();
+type IndicatorRect = { left: number; top: number; width: number; height: number };
+
+const EMPTY_RECT: IndicatorRect = { left: 0, top: 0, width: 0, height: 0 };
+
+function TabsList({ children, className, ...rest }: TabsListProps) {
+  const { orientation, activeValue, onSelect, size } = useTabsContext();
   const listRef = React.useRef<HTMLDivElement>(null);
-  const [indicator, setIndicator] = React.useState({
-    left: 0,
-    top: 0,
-    width: 0,
-    height: 0,
-  });
+  const [indicator, setIndicator] = React.useState<IndicatorRect>(EMPTY_RECT);
+  const [overflow, setOverflow] = React.useState({ start: false, end: false });
+
+  const updateOverflow = React.useCallback(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const maxScroll = list.scrollWidth - list.clientWidth;
+    const start = list.scrollLeft > 1;
+    const end = maxScroll - list.scrollLeft > 1;
+    setOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
+  }, []);
 
   const updateIndicator = React.useCallback(() => {
     const list = listRef.current;
     if (!list) return;
+    updateOverflow();
     const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-    if (!active) {
-      setIndicator({ left: 0, top: 0, width: 0, height: 0 });
-      return;
+    let next = EMPTY_RECT;
+    if (active) {
+      next = {
+        left: active.offsetLeft,
+        top: active.offsetTop,
+        width: active.offsetWidth,
+        height: active.offsetHeight,
+      };
+      // The underline bar spans the trigger's content box so it lines up with the text.
+      if (orientation === "horizontal") {
+        const style = getComputedStyle(active);
+        const padStart = Number.parseFloat(style.paddingLeft) || 0;
+        const padEnd = Number.parseFloat(style.paddingRight) || 0;
+        next = { ...next, left: next.left + padStart, width: next.width - padStart - padEnd };
+      }
     }
-    setIndicator({
-      left: active.offsetLeft,
-      top: active.offsetTop,
-      width: active.offsetWidth,
-      height: active.offsetHeight,
-    });
-  }, []);
+    setIndicator((prev) =>
+      prev.left === next.left &&
+      prev.top === next.top &&
+      prev.width === next.width &&
+      prev.height === next.height
+        ? prev
+        : next,
+    );
+  }, [updateOverflow, orientation]);
 
   React.useLayoutEffect(() => {
     const list = listRef.current;
@@ -112,6 +150,7 @@ function TabsList({ children, className }: TabsListProps) {
     mo.observe(list, {
       subtree: true,
       childList: true,
+      characterData: true,
       attributes: true,
       attributeFilter: ["aria-selected", "data-disabled"],
     });
@@ -128,118 +167,168 @@ function TabsList({ children, className }: TabsListProps) {
     };
   }, [updateIndicator]);
 
-  const isHorizontal = orientation === "horizontal";
-  const hasIndicator = isHorizontal ? indicator.width > 0 : indicator.height > 0;
+  // Keep the active tab visible inside a scrolling list.
+  React.useEffect(() => {
+    const list = listRef.current;
+    if (!list || !activeValue) return;
+    const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+    if (!active || typeof active.scrollIntoView !== "function") return;
+    if (list.scrollWidth <= list.clientWidth) return;
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    active.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  }, [activeValue]);
+
+  // Horizontal: a bar on the list edge under the text. Vertical: a pill behind the active item.
+  const isBar = orientation === "horizontal";
+  const hasIndicator = indicator.width > 0 && indicator.height > 0;
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    const listEl = event.currentTarget;
     const tabs = Array.from(
-      listEl.querySelectorAll<HTMLButtonElement>('[role="tab"]:not([data-disabled="true"])'),
+      event.currentTarget.querySelectorAll<HTMLButtonElement>(
+        '[role="tab"]:not([data-disabled="true"])',
+      ),
     );
-
     if (tabs.length === 0) return;
 
-    const currentIndex = tabs.findIndex(
-      (tab) => tab.id === `prime-ui-kit-tab-${rootId}-${activeValue}`,
-    );
+    const currentIndex = tabs.findIndex((tab) => tab.dataset.value === activeValue);
+    // A vertical list may be shown as a horizontal row on narrow containers: accept both axes.
+    const prevKeys = orientation === "horizontal" ? ["ArrowLeft"] : ["ArrowUp", "ArrowLeft"];
+    const nextKeys = orientation === "horizontal" ? ["ArrowRight"] : ["ArrowDown", "ArrowRight"];
 
-    const isHorizontal = orientation === "horizontal";
-    const prevKey = isHorizontal ? "ArrowLeft" : "ArrowUp";
-    const nextKey = isHorizontal ? "ArrowRight" : "ArrowDown";
-
-    let targetTab: HTMLButtonElement | null = null;
-
-    if (event.key === nextKey) {
-      event.preventDefault();
-      targetTab = tabs[(currentIndex + 1) % tabs.length];
-    } else if (event.key === prevKey) {
-      event.preventDefault();
-      targetTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length];
+    let target: HTMLButtonElement | undefined;
+    if (nextKeys.includes(event.key)) {
+      target = tabs[(currentIndex + 1) % tabs.length];
+    } else if (prevKeys.includes(event.key)) {
+      target = tabs[(currentIndex - 1 + tabs.length) % tabs.length];
     } else if (event.key === "Home") {
-      event.preventDefault();
-      targetTab = tabs[0];
+      target = tabs[0];
     } else if (event.key === "End") {
-      event.preventDefault();
-      targetTab = tabs[tabs.length - 1];
+      target = tabs[tabs.length - 1];
     }
 
-    if (targetTab) {
-      const tabValue = targetTab.dataset.value ?? "";
-      onSelect(tabValue);
-      targetTab.focus();
+    if (target) {
+      event.preventDefault();
+      onSelect(target.dataset.value ?? "");
+      target.focus();
     }
   }
 
   return (
     <div
+      {...rest}
       ref={listRef}
       role="tablist"
       aria-orientation={orientation}
-      data-orientation={orientation}
       className={cx(styles.list, className)}
+      {...toDataAttributes({
+        indicator: isBar ? "bar" : "pill",
+        "overflow-start": overflow.start || undefined,
+        "overflow-end": overflow.end || undefined,
+      })}
       onKeyDown={handleKeyDown}
+      onScroll={updateOverflow}
     >
-      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+      {/* First in DOM order so it always paints below the triggers. */}
       <div
-        className={cx(
-          styles.indicator,
-          isHorizontal ? styles.indicatorHorizontal : styles.indicatorVertical,
-        )}
+        className={cx(styles.indicator, isBar ? styles.indicatorBar : styles.indicatorPill)}
         style={
-          isHorizontal
-            ? {
-                transform: `translate3d(${indicator.left}px, 0, 0)`,
-                width: `${indicator.width}px`,
-              }
+          isBar
+            ? { transform: `translateX(${indicator.left}px)`, width: indicator.width }
             : {
-                transform: `translate3d(0, ${indicator.top}px, 0)`,
-                height: `${indicator.height}px`,
+                transform: `translate(${indicator.left}px, ${indicator.top}px)`,
+                width: indicator.width,
+                height: indicator.height,
               }
         }
         aria-hidden="true"
         data-visible={hasIndicator ? "true" : "false"}
       />
+      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
     </div>
   );
 }
 TabsList.displayName = "TabsList";
 
-// ─── Tab ──────────────────────────────────────────────────────────────────────
+// ─── Trigger ──────────────────────────────────────────────────────────────────
 
-export type TabsTabProps = {
+export type TabsTriggerProps = {
   value: string;
   disabled?: boolean;
+  /**
+   * Plain text, or parts: `Tabs.Icon`, `Tabs.Label`, `Tabs.Count`, `Tabs.Description`.
+   * A `Tabs.Description` makes the trigger two-line and becomes its accessible description.
+   */
   children: React.ReactNode;
   className?: string;
-};
+} & Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "value" | "children" | "type" | "role" | "onClick"
+>;
 
-function TabsTab({ value, disabled = false, children, className }: TabsTabProps) {
+function hasChildOfType(children: React.ReactNode, type: React.ElementType): boolean {
+  return React.Children.toArray(children).some(
+    (child) => React.isValidElement(child) && child.type === type,
+  );
+}
+
+/** Plain text children become a `Tabs.Label` so they get truncation and a stable bold width. */
+function wrapText(children: React.ReactNode): React.ReactNode {
+  return React.Children.map(children, (child) =>
+    typeof child === "string" || typeof child === "number" ? (
+      String(child).trim() === "" ? (
+        child
+      ) : (
+        <TabsLabel>{child}</TabsLabel>
+      )
+    ) : (
+      child
+    ),
+  );
+}
+
+function TabsTrigger({ value, disabled = false, children, className, ...rest }: TabsTriggerProps) {
   const { activeValue, onSelect, rootId } = useTabsContext();
   const isSelected = activeValue === value;
+  const id = tabId(rootId, value);
+  const twoLine = hasChildOfType(children, TabsDescription);
+  const hasCount = hasChildOfType(children, TabsCount);
+  const triggerContext = React.useMemo(() => ({ triggerId: id }), [id]);
 
   return (
     <button
+      {...rest}
       role="tab"
-      id={`prime-ui-kit-tab-${rootId}-${value}`}
+      id={id}
       aria-selected={isSelected}
-      aria-controls={`prime-ui-kit-panel-${rootId}-${value}`}
+      aria-controls={panelId(rootId, value)}
+      aria-labelledby={twoLine ? cx(`${id}-label`, hasCount && `${id}-count`) : undefined}
+      aria-describedby={twoLine ? `${id}-description` : undefined}
       tabIndex={isSelected ? 0 : -1}
       data-value={value}
-      data-disabled={disabled ? "true" : undefined}
+      {...toDataAttributes({
+        state: isSelected ? "active" : "inactive",
+        disabled: disabled || undefined,
+        "two-line": twoLine || undefined,
+      })}
       disabled={disabled}
       className={cx(styles.tab, className)}
-      onClick={() => {
-        if (!disabled) onSelect(value);
-      }}
+      onClick={() => onSelect(value)}
       type="button"
     >
-      {children}
+      <TriggerContext.Provider value={triggerContext}>{wrapText(children)}</TriggerContext.Provider>
     </button>
   );
 }
-TabsTab.displayName = "TabsTab";
+TabsTrigger.displayName = "TabsTrigger";
 
-// ─── Icon (слот под глиф, как Button.Icon) ───────────────────────────────────
+// ─── Trigger parts ────────────────────────────────────────────────────────────
 
 export type TabsIconProps = {
   children: React.ReactNode;
@@ -253,25 +342,74 @@ function TabsIcon({ children, className, ...rest }: TabsIconProps) {
     </span>
   );
 }
-
 TabsIcon.displayName = "TabsIcon";
-
-// ─── Label (подпись в триггере; наследует кегль через правила .root .tab * в CSS) ─
 
 export type TabsLabelProps = {
   children: React.ReactNode;
   className?: string;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
+/**
+ * Trigger title; truncates with an ellipsis in a constrained row. Text labels reserve the width of
+ * the medium weight, so the row does not shift when a tab becomes active.
+ */
 function TabsLabel({ children, className, ...rest }: TabsLabelProps) {
+  const trigger = React.useContext(TriggerContext);
+  const text = typeof children === "string" || typeof children === "number" ? String(children) : "";
   return (
-    <span className={cx(styles.label, className)} {...rest}>
+    <span
+      id={trigger ? `${trigger.triggerId}-label` : undefined}
+      className={cx(styles.label, className)}
+      data-text={text || undefined}
+      {...rest}
+    >
+      <span className={styles.labelText}>{children}</span>
+    </span>
+  );
+}
+TabsLabel.displayName = "TabsLabel";
+
+export type TabsCountProps = {
+  /** Badge hue. Default `gray`. */
+  color?: PaletteColor;
+  children: React.ReactNode;
+  className?: string;
+};
+
+/** Counter next to the label: a soft badge one tier below the tabs size. */
+function TabsCount({ color = "gray", children, className }: TabsCountProps) {
+  const trigger = React.useContext(TriggerContext);
+  return (
+    <Badge.Root
+      id={trigger ? `${trigger.triggerId}-count` : undefined}
+      color={color}
+      className={cx(styles.count, className)}
+    >
+      {children}
+    </Badge.Root>
+  );
+}
+TabsCount.displayName = "TabsCount";
+
+export type TabsDescriptionProps = {
+  /** Muted second line; wrap a key value in `<strong>` to emphasize it. */
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+
+function TabsDescription({ children, className, ...rest }: TabsDescriptionProps) {
+  const trigger = React.useContext(TriggerContext);
+  return (
+    <span
+      id={trigger ? `${trigger.triggerId}-description` : undefined}
+      className={cx(styles.description, className)}
+      {...rest}
+    >
       {children}
     </span>
   );
 }
-
-TabsLabel.displayName = "TabsLabel";
+TabsDescription.displayName = "TabsDescription";
 
 // ─── Panel ────────────────────────────────────────────────────────────────────
 
@@ -279,19 +417,20 @@ export type TabsPanelProps = {
   value: string;
   children: React.ReactNode;
   className?: string;
-};
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
 
-function TabsPanel({ value, children, className }: TabsPanelProps) {
+function TabsPanel({ value, children, className, ...rest }: TabsPanelProps) {
   const { activeValue, rootId } = useTabsContext();
-  const isActive = activeValue === value;
-
-  if (!isActive) return null;
+  if (activeValue !== value) return null;
 
   return (
     <div
+      {...rest}
       role="tabpanel"
-      id={`prime-ui-kit-panel-${rootId}-${value}`}
-      aria-labelledby={`prime-ui-kit-tab-${rootId}-${value}`}
+      id={panelId(rootId, value)}
+      aria-labelledby={tabId(rootId, value)}
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: WAI-ARIA APG — a tabpanel is focusable so keyboard users can reach its content
+      tabIndex={0}
       className={cx(styles.panel, className)}
     >
       {children}
@@ -300,13 +439,13 @@ function TabsPanel({ value, children, className }: TabsPanelProps) {
 }
 TabsPanel.displayName = "TabsPanel";
 
-// ─── Export ───────────────────────────────────────────────────────────────────
-
 export const Tabs = {
   Root: TabsRoot,
   List: TabsList,
-  Tab: TabsTab,
+  Trigger: TabsTrigger,
   Icon: TabsIcon,
   Label: TabsLabel,
+  Count: TabsCount,
+  Description: TabsDescription,
   Panel: TabsPanel,
 };

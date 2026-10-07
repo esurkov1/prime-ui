@@ -1,4 +1,6 @@
-import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
+import type * as React from "react";
+
+import styles from "./PlaygroundApiTable.module.css";
 
 export type PlaygroundApiPropRow = {
   prop: string;
@@ -8,25 +10,68 @@ export type PlaygroundApiPropRow = {
   description: string;
 };
 
-type PropRow = PlaygroundApiPropRow;
+/** Marks `` `code` `` fragments inside descriptions. */
+function renderInlineCode(text: string): React.ReactNode {
+  const parts = text.split(/(`[^`]+`)/g);
+  return parts.map((part, i) =>
+    part.startsWith("`") && part.endsWith("`") && part.length > 2 ? (
+      // biome-ignore lint/suspicious/noArrayIndexKey: static split of a constant string
+      <code key={i}>{part.slice(1, -1)}</code>
+    ) : (
+      part
+    ),
+  );
+}
 
-const apiColumns: DataTableColumn<PropRow>[] = [
-  { id: "prop", header: "Проп", accessor: "prop", width: "160px" },
-  { id: "type", header: "Тип", accessor: "type", width: "200px" },
-  { id: "default", header: "По умолчанию", accessor: "defaultValue", width: "120px" },
-  { id: "required", header: "Обяз.", accessor: "required", width: "64px" },
-  { id: "description", header: "Описание", accessor: "description" },
-];
-
-export function PlaygroundApiTable({ rows }: { rows: PropRow[] }) {
+/**
+ * Props table for playground pages. A plain semantic table (not DataTable) so documentation
+ * renders even while components are being reworked; on narrow screens rows become cards.
+ */
+export function PlaygroundApiTable({ rows }: { rows: PlaygroundApiPropRow[] }) {
   return (
-    <DataTable.Root
-      columns={apiColumns}
-      rows={rows}
-      size="s"
-      showPagination={false}
-      pageSize={999}
-      highlightRowOnHover={false}
-    />
+    <div className={styles.root}>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th scope="col">Проп</th>
+            <th scope="col">Тип</th>
+            <th scope="col">По умолчанию</th>
+            <th scope="col">Описание</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => {
+            const required = row.required.trim().toLowerCase().startsWith("да");
+            return (
+              <tr key={row.prop}>
+                <th scope="row" data-label="Проп">
+                  <span className={styles.prop}>
+                    <code>{row.prop}</code>
+                    {required ? (
+                      <span className={styles.required} title="Обязательный">
+                        обяз.
+                      </span>
+                    ) : null}
+                  </span>
+                </th>
+                <td data-label="Тип">
+                  <code className={styles.type}>{row.type}</code>
+                </td>
+                <td data-label="По умолчанию">
+                  {row.defaultValue === "—" || row.defaultValue === "" ? (
+                    <span className={styles.empty}>—</span>
+                  ) : (
+                    <code>{row.defaultValue}</code>
+                  )}
+                </td>
+                <td data-label="Описание" className={styles.description}>
+                  {renderInlineCode(row.description)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }

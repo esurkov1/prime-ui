@@ -1,343 +1,189 @@
 import { Link } from "react-router-dom";
+
+import { CodeBlock } from "@/components/code-block/CodeBlock";
 import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
+
 import { DemoSectionTitle } from "../components/PlaygroundDemoTypography";
 
 const REPO = "https://github.com/esurkov1/prime-ui";
 const README = `${REPO}/blob/main/README.md`;
+const FOUNDATION_DOC = `${REPO}/blob/main/docs/foundation.md`;
 const SKILL = `${REPO}/blob/main/SKILL/SKILL.md`;
-const SKILL_TOKENS = `${REPO}/blob/main/SKILL/design-tokens.md`;
-const SKILL_CATALOG = `${REPO}/blob/main/SKILL/component-catalog.md`;
-const TYPOGRAPHY_DOC = `${REPO}/blob/main/src/components/typography/COMPONENT.md`;
 const NPM = "https://www.npmjs.com/package/prime-ui-kit";
 const ISSUES = `${REPO}/issues`;
 
-export default function IntroPage() {
-  return (
-    <PageContent.Section aria-labelledby="playground-intro">
-      <PageContent.Header>
-        <PageContent.Title id="playground-intro">prime-ui-kit playground</PageContent.Title>
-        <PageContent.Description measure="full">
-          {
-            <>
-              Интерактивная документация библиотеки: живые примеры, код, тёмная и светлая темы и
-              пресеты акцента. Колонка контента использует всю доступную ширину — удобно смотреть
-              таблицы и формы.
-            </>
-          }
-        </PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>
-        <div className="introPage">
-          <Typography.Root as="p" className="introPageLead" variant="body-large">
-            <strong>prime-ui-kit</strong> — React 19, CSS Modules и семантические токены{" "}
-            <code>--prime-sys-*</code>, композиция через подкомпоненты (<code>Modal.Root</code>,{" "}
-            <code>Input.Field</code> и т.д.), ориентация на доступность (react-aria там, где
-            уместно). Здесь собраны те же сценарии, что в{" "}
-            <a className="introPageLink" href={README} rel="noreferrer" target="_blank">
-              README
-            </a>{" "}
-            и в{" "}
-            <a className="introPageLink" href={TYPOGRAPHY_DOC} rel="noreferrer" target="_blank">
-              COMPONENT.md
-            </a>{" "}
-            по каждому компоненту.
-          </Typography.Root>
+const FOUNDATION_LINKS: { to: string; title: string; text: string }[] = [
+  {
+    to: "/color",
+    title: "Цвет",
+    text: "Роли вместо оттенков, светлая и тёмная темы, живая проверка контраста.",
+  },
+  {
+    to: "/typography",
+    title: "Типографика",
+    text: "Golos Text, 14 текстовых ролей, ширина строки и табличные цифры.",
+  },
+  {
+    to: "/spacing",
+    title: "Отступы",
+    text: "Шкала с шагом 4 px и правила близости: подпись, поле, группа, секция.",
+  },
+  {
+    to: "/size-tiers",
+    title: "Размеры",
+    text: "Пять уровней xs–xl. Контролы одного уровня стоят в ряд без подгонки.",
+  },
+  {
+    to: "/radius",
+    title: "Радиусы",
+    text: "8 у контролов, 12 у карточек, 16 у модалок. Вложенный радиус — внешний минус отступ.",
+  },
+  {
+    to: "/elevation",
+    title: "Слои и тени",
+    text: "Фон, карточка, плавающий слой, модалка и порядок z-index.",
+  },
+  {
+    to: "/motion",
+    title: "Движение",
+    text: "Три длительности, три кривые и поведение при reduced motion.",
+  },
+  {
+    to: "/focus",
+    title: "Фокус",
+    text: "Одно кольцо для всего кита: толщина, отступ, контраст.",
+  },
+];
 
-          <div className="introPageSection">
-            <DemoSectionTitle>Что умеет кит</DemoSectionTitle>
-            <div className="introFeatureGrid">
-              <div className="introFeatureCard">
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardTitle"
-                  variant="body-large"
-                  weight="semibold"
-                >
-                  Токены и темы
-                </Typography.Root>
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardText"
-                  tone="muted"
-                  variant="body-default"
-                >
-                  Светлая и тёмная тема через <code>data-theme</code>; цвета и отступы из
-                  переменных, без «магических» литералов в разметке плейграунда.
-                </Typography.Root>
-              </div>
-              <div className="introFeatureCard">
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardTitle"
-                  variant="body-large"
-                  weight="semibold"
-                >
-                  Композиция API
-                </Typography.Root>
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardText"
-                  tone="muted"
-                  variant="body-default"
-                >
-                  Составные части вместо монолитных пропсов: проще читать и сужать бандл через{" "}
-                  <code>prime-ui-kit/components</code>.
-                </Typography.Root>
-              </div>
-              <div className="introFeatureCard">
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardTitle"
-                  variant="body-large"
-                  weight="semibold"
-                >
-                  Формы
-                </Typography.Root>
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardText"
-                  tone="muted"
-                  variant="body-default"
-                >
-                  Поля, выбор, переключатели, загрузка файлов, цвет, OTP, слайдеры — с единой шкалой{" "}
-                  <code>size</code> и <code>ControlSizeProvider</code>.
-                </Typography.Root>
-              </div>
-              <div className="introFeatureCard">
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardTitle"
-                  variant="body-large"
-                  weight="semibold"
-                >
-                  Оверлеи
-                </Typography.Root>
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardText"
-                  tone="muted"
-                  variant="body-default"
-                >
-                  Модалки, drawer, popover, меню, тултипы, командная палитра — порталы, фокус и
-                  скролл согласованы с китом.
-                </Typography.Root>
-              </div>
-              <div className="introFeatureCard">
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardTitle"
-                  variant="body-large"
-                  weight="semibold"
-                >
-                  Навигация и layout
-                </Typography.Root>
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardText"
-                  tone="muted"
-                  variant="body-default"
-                >
-                  Sidebar, хлебные крошки, вкладки, аккордеон, степпер, пагинация, оболочки
-                  страницы.
-                </Typography.Root>
-              </div>
-              <div className="introFeatureCard">
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardTitle"
-                  variant="body-large"
-                  weight="semibold"
-                >
-                  Данные и контент
-                </Typography.Root>
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardText"
-                  tone="muted"
-                  variant="body-default"
-                >
-                  Таблица с сортировкой и прокруткой, баннеры, теги, аватары, прогресс, типографика
-                  с ролями <code>variant</code> (
-                  <Link className="introPageRouterLink" to="/typography">
-                    страница Typography
-                  </Link>
-                  ).
-                </Typography.Root>
-              </div>
-              <div className="introFeatureCard">
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardTitle"
-                  variant="body-large"
-                  weight="semibold"
-                >
-                  Уведомления
-                </Typography.Root>
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardText"
-                  tone="muted"
-                  variant="body-default"
-                >
-                  Очередь тостов: <code>NotificationProvider</code> и{" "}
-                  <code>useNotifications()</code> — см. README раздел Providers.
-                </Typography.Root>
-              </div>
-              <div className="introFeatureCard">
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardTitle"
-                  variant="body-large"
-                  weight="semibold"
-                >
-                  TypeScript и поставка
-                </Typography.Root>
-                <Typography.Root
-                  as="p"
-                  className="introFeatureCardText"
-                  tone="muted"
-                  variant="body-default"
-                >
-                  ESM, <code>.d.ts</code> в пакете, экспорты <code>styles.css</code>,{" "}
-                  <code>bundle.css</code>, отдельные темы — таблица в README «Package exports».
-                </Typography.Root>
-              </div>
-            </div>
-          </div>
+const INSTALL_CODE = `// Один раз в корне приложения
+import "prime-ui-kit/styles.css";  // шрифты, токены, светлая и тёмная темы
+import "prime-ui-kit/bundle.css";  // стили компонентов
 
-          <div className="introPageSection">
-            <DemoSectionTitle>Как устроен плейграунд</DemoSectionTitle>
-            <ul className="introPageList">
-              <li>
-                <Typography.Root as="span" variant="body-default">
-                  Слева — дерево разделов по категориям (Foundations → Overlays); внизу панели:{" "}
-                  <strong>светлая/тёмная тема</strong> и <strong>десять пресетов акцента</strong> (
-                  <code>data-theme</code>, <code>data-theme-preset</code> на{" "}
-                  <code>document.documentElement</code>).
-                </Typography.Root>
-              </li>
-              <li>
-                <Typography.Root as="span" variant="body-default">
-                  У каждого компонента — отдельный маршрут: превью, вкладка с исходником примера,
-                  таблица API там, где она свёрстана в секции.
-                </Typography.Root>
-              </li>
-              <li>
-                <Typography.Root as="span" variant="body-default">
-                  Быстрые переходы:{" "}
-                  <Link className="introPageRouterLink" to="/color">
-                    Color
-                  </Link>
-                  ,{" "}
-                  <Link className="introPageRouterLink" to="/typography">
-                    Typography
-                  </Link>
-                  ,{" "}
-                  <Link className="introPageRouterLink" to="/button">
-                    Button
-                  </Link>
-                  ,{" "}
-                  <Link className="introPageRouterLink" to="/data-table">
-                    DataTable
-                  </Link>
-                  .
-                </Typography.Root>
-              </li>
-            </ul>
-          </div>
-
-          <div className="introPageSection">
-            <DemoSectionTitle>Документация и Cursor Skill</DemoSectionTitle>
-            <ul className="introPageList">
-              <li>
-                <Typography.Root as="span" variant="body-default">
-                  <a className="introPageLink" href={README} rel="noreferrer" target="_blank">
-                    README
-                  </a>{" "}
-                  в репозитории — установка, импорт стилей, провайдеры, каталог компонентов со
-                  ссылками на <code>COMPONENT.md</code>.
-                </Typography.Root>
-              </li>
-              <li>
-                <Typography.Root as="span" variant="body-default">
-                  <a className="introPageLink" href={SKILL} rel="noreferrer" target="_blank">
-                    SKILL/SKILL.md
-                  </a>{" "}
-                  — правила для агентов: только публичный API кита, семантические токены,
-                  mobile-first, рецепты layout. Каталог в{" "}
-                  <a
-                    className="introPageLink"
-                    href={SKILL_CATALOG}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    component-catalog.md
-                  </a>
-                  , шпаргалка по токенам —{" "}
-                  <a className="introPageLink" href={SKILL_TOKENS} rel="noreferrer" target="_blank">
-                    design-tokens.md
-                  </a>
-                  . Папку <code>SKILL/</code> копируют в настройки Cursor; в npm-архив она не
-                  входит.
-                </Typography.Root>
-              </li>
-              <li>
-                <Typography.Root as="span" variant="body-default">
-                  Сравнение шкалы типографики с MD3 / Apple / Polaris —{" "}
-                  <a
-                    className="introPageLink"
-                    href={TYPOGRAPHY_DOC}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    Typography COMPONENT.md
-                  </a>
-                  .
-                </Typography.Root>
-              </li>
-              <li>
-                <Typography.Root as="span" variant="body-default">
-                  Пакет на{" "}
-                  <a className="introPageLink" href={NPM} rel="noreferrer" target="_blank">
-                    npm
-                  </a>
-                  ; баги и обсуждения —{" "}
-                  <a className="introPageLink" href={ISSUES} rel="noreferrer" target="_blank">
-                    Issues
-                  </a>
-                  .
-                </Typography.Root>
-              </li>
-            </ul>
-          </div>
-
-          <div className="introPageSection">
-            <DemoSectionTitle>Минимальный пример в приложении</DemoSectionTitle>
-            <Typography.Root as="p" tone="muted" variant="body-default">
-              Как в README: глобальные стили и бандл CSS, затем компоненты из{" "}
-              <code>prime-ui-kit</code>.
-            </Typography.Root>
-            <pre className="introPageCode">{`import { Button, Input } from "prime-ui-kit";
-// В корне приложения (или layout):
-// import "prime-ui-kit/styles.css";
-// import "prime-ui-kit/bundle.css";
+import { Button, Input } from "prime-ui-kit";
 
 export function Example() {
   return (
-    <>
+    <form>
       <Input.Root label="Email" id="email">
         <Input.Wrapper>
           <Input.Field type="email" placeholder="you@example.com" />
         </Input.Wrapper>
       </Input.Root>
-
-      <Button variant="primary" mode="filled" size="l">
-        Submit
-      </Button>
-    </>
+      <Button.Root>Отправить</Button.Root>
+    </form>
   );
-}`}</pre>
+}
+
+// Тёмная тема: <html data-theme="dark">`;
+
+export default function IntroPage() {
+  return (
+    <PageContent.Section aria-labelledby="playground-intro">
+      <PageContent.Header>
+        <PageContent.Title id="playground-intro">Prime UI</PageContent.Title>
+        <PageContent.Description measure="readable">
+          Библиотека React-компонентов для рабочих интерфейсов: формы, таблицы, панели, оверлеи. Это
+          живая документация. В ней есть примеры, код и API каждого компонента.
+        </PageContent.Description>
+      </PageContent.Header>
+      <PageContent.Body>
+        <div className="introPage">
+          <div className="introPageSection">
+            <DemoSectionTitle>Как устроена система</DemoSectionTitle>
+            <ul className="introPageList">
+              <li>
+                <strong>Глубина через заливку.</strong> Фон приложения серый, карточки белые, поля
+                на карточке чуть темнее. У контролов нет рамок. Линии остаются только там, где нужен
+                разделитель.
+              </li>
+              <li>
+                <strong>Сетка 4 px.</strong> Все отступы, высоты и радиусы кратны четырём. Внутри
+                группы элементы стоят ближе, чем группы между собой.
+              </li>
+              <li>
+                <strong>Одна ось размеров.</strong> <code>xs · s · m · l · xl</code>, по умолчанию{" "}
+                <code>m</code> (36 px). Кнопка, поле, селект и вкладки одного размера выравниваются
+                в ряд.
+              </li>
+              <li>
+                <strong>Только токены.</strong> Компоненты берут значения из семантических
+                переменных <code>--prime-*</code>. Светлая и тёмная темы — это два набора значений
+                для одних и тех же ролей.
+              </li>
+            </ul>
+          </div>
+
+          <div className="introPageSection">
+            <DemoSectionTitle>Основа</DemoSectionTitle>
+            <div className="introFeatureGrid">
+              {FOUNDATION_LINKS.map((item) => (
+                <Link key={item.to} to={item.to} className="introFeatureCard">
+                  <Typography.Root as="span" variant="title-s">
+                    {item.title}
+                  </Typography.Root>
+                  <Typography.Root as="span" variant="body-s" tone="secondary">
+                    {item.text}
+                  </Typography.Root>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="introPageSection">
+            <DemoSectionTitle>Как пользоваться</DemoSectionTitle>
+            <ul className="introPageList">
+              <li>
+                Слева разделы по категориям: от основы до оверлеев. У каждого компонента своя
+                страница с превью, кодом примера и таблицей API.
+              </li>
+              <li>
+                Внизу сайдбара можно переключить <strong>тему</strong> и <strong>фон превью</strong>{" "}
+                (canvas, surface, raised, accent). Так видно, как компонент выглядит на фоне
+                страницы, в карточке и внутри меню.
+              </li>
+              <li>
+                Полный контракт системы описан в{" "}
+                <a className="introPageLink" href={FOUNDATION_DOC} rel="noreferrer" target="_blank">
+                  docs/foundation.md
+                </a>
+                . Здесь он показан вживую.
+              </li>
+            </ul>
+          </div>
+
+          <div className="introPageSection">
+            <DemoSectionTitle>Подключение</DemoSectionTitle>
+            <CodeBlock.Root code={INSTALL_CODE} />
+          </div>
+
+          <div className="introPageSection">
+            <DemoSectionTitle>Ссылки</DemoSectionTitle>
+            <ul className="introPageList">
+              <li>
+                <a className="introPageLink" href={README} rel="noreferrer" target="_blank">
+                  README
+                </a>
+                : установка, экспорты пакета, провайдеры.
+              </li>
+              <li>
+                <a className="introPageLink" href={SKILL} rel="noreferrer" target="_blank">
+                  SKILL/SKILL.md
+                </a>
+                : правила для AI-агентов, которые собирают интерфейсы на ките.
+              </li>
+              <li>
+                Пакет на{" "}
+                <a className="introPageLink" href={NPM} rel="noreferrer" target="_blank">
+                  npm
+                </a>
+                , ошибки и предложения — в{" "}
+                <a className="introPageLink" href={ISSUES} rel="noreferrer" target="_blank">
+                  Issues
+                </a>
+                .
+              </li>
+            </ul>
           </div>
         </div>
       </PageContent.Body>

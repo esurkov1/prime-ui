@@ -1,0 +1,64 @@
+/* Layout for the Popover examples: layout only, text goes through Typography. */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-3);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.narrowColumn {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: calc(var(--prime-space-24) * 2.5);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+}
+
+.panelWidth {
+  width: calc(var(--prime-space-24) * 3.5);
+  max-width: 100%;
+}
+
+/* Measure of plain text inside a panel. */
+.text {
+  max-width: calc(var(--prime-space-24) * 3.5);
+}
+
+/* Unstyled button around a Typography label that reads as a text link. */
+.textLinkTrigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.underline {
+  text-decoration: underline;
+  text-underline-offset: var(--prime-space-1);
+}
+
+.textLinkTrigger:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+  border-radius: var(--prime-radius-xs);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-control-m-label-gap);
+}

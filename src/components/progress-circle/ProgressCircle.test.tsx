@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { ProgressCircleSize } from "./ProgressCircle";
+import type { ControlSize } from "@/internal/states";
+
 import { ProgressCircle } from "./ProgressCircle";
 
 describe("ProgressCircle", () => {
@@ -27,14 +28,35 @@ describe("ProgressCircle", () => {
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", String(value));
   });
 
-  it.each(["s", "m", "l", "xl"] as const)("sets data-size=%s", (size: ProgressCircleSize) => {
+  it.each(["s", "m", "l", "xl"] as const)("sets data-size=%s", (size: ControlSize) => {
     render(<ProgressCircle.Root value={50} size={size} />);
     expect(screen.getByRole("progressbar").parentElement).toHaveAttribute("data-size", size);
+  });
+
+  it("defaults data-tone to accent and reflects tone", () => {
+    const { rerender } = render(<ProgressCircle.Root value={50} />);
+    const root = () => screen.getByRole("progressbar").parentElement;
+    expect(root()).toHaveAttribute("data-tone", "accent");
+    rerender(<ProgressCircle.Root value={50} tone="danger" />);
+    expect(root()).toHaveAttribute("data-tone", "danger");
   });
 
   it("renders children text inside", () => {
     render(<ProgressCircle.Root value={75}>75%</ProgressCircle.Root>);
     expect(screen.getByText("75%")).toBeInTheDocument();
+  });
+
+  it.each([
+    "xs",
+    "s",
+  ] as const)("does not render inner text at size %s, keeps aria-valuetext", (size) => {
+    render(
+      <ProgressCircle.Root value={75} size={size}>
+        75%
+      </ProgressCircle.Root>,
+    );
+    expect(screen.queryByText("75%")).not.toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "75%");
   });
 
   it("merges className on root", () => {

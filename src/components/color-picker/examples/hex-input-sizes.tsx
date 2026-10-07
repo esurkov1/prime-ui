@@ -1,33 +1,53 @@
+/** HexInput in every size tier with a square soft trigger of the same size that opens the panel in a Popover. Use it for a color field inside forms. */
 import { Button, ColorPicker, Popover } from "prime-ui-kit";
-import * as React from "react";
 
-const SIZES = ["s", "m", "l", "xl"] as const;
+import styles from "./examples.module.css";
 
-function HexSizePopover({ size }: { size: (typeof SIZES)[number] }) {
-  const [open, setOpen] = React.useState(false);
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
+function ColorField({ size }: { size: (typeof SIZES)[number] }) {
   return (
-    <ColorPicker.Root defaultValue="#3b82f6">
-      <Popover.Root onOpenChange={setOpen} open={open}>
-        <Popover.Trigger asChild>
-          <Button.Root mode="stroke" size="m" variant="neutral">
-            Hex ({size})
-          </Button.Root>
-        </Popover.Trigger>
-        <Popover.Content align="start" insetGap="x3" insetPadding="x2" side="bottom">
-          <ColorPicker.HexInput label={`Hex (${size})`} size={size} />
-        </Popover.Content>
-      </Popover.Root>
+    <ColorPicker.Root defaultValue="#0090ff">
+      <div className={styles.fieldRow}>
+        <ColorPicker.HexInput label={`Цвет · ${size}`} size={size} />
+        <Popover.Root>
+          <Popover.Trigger>
+            <Button.Root
+              variant="soft"
+              tone="neutral"
+              size={size}
+              aria-label="Открыть палитру"
+              className={styles.swatchTrigger}
+            >
+              <Button.Icon>
+                <ColorPicker.TriggerSwatch className={styles.swatchFill} />
+              </Button.Icon>
+            </Button.Root>
+          </Popover.Trigger>
+          <Popover.Content align="end">
+            <ColorPicker.Panel className={styles.panel}>
+              <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
+                <ColorPicker.AreaThumb />
+              </ColorPicker.Area>
+              <ColorPicker.Slider channel="hue" colorSpace="hsl">
+                <ColorPicker.SliderTrack>
+                  <ColorPicker.Thumb />
+                </ColorPicker.SliderTrack>
+              </ColorPicker.Slider>
+              <ColorPicker.ChannelStrip />
+            </ColorPicker.Panel>
+          </Popover.Content>
+        </Popover.Root>
+      </div>
     </ColorPicker.Root>
   );
 }
 
-/** HexInput `size` axis (`s`–`xl`); each control uses its own popover (playground `hex-input-sizes`). */
-export function HexInputSizesExample() {
+export default function ColorPickerHexInputSizesExample() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: "1rem" }}>
+    <div className={styles.sizes}>
       {SIZES.map((size) => (
-        <HexSizePopover key={size} size={size} />
+        <ColorField key={size} size={size} />
       ))}
     </div>
   );

@@ -5,74 +5,81 @@ import { describe, expect, it } from "vitest";
 import { AppShell } from "./AppShell";
 
 describe("AppShell", () => {
-  it("renders nav and main regions", () => {
+  it("puts Nav in its own column and everything else into the content panel", () => {
     render(
+      <AppShell.Root data-testid="root">
+        <AppShell.Nav>rail</AppShell.Nav>
+        <AppShell.Header>top</AppShell.Header>
+        <AppShell.Main>body</AppShell.Main>
+      </AppShell.Root>,
+    );
+
+    const root = screen.getByTestId("root");
+    const [nav, panel] = Array.from(root.children);
+    expect(nav).toHaveTextContent("rail");
+    expect(panel).toContainElement(screen.getByRole("banner"));
+    expect(panel).toContainElement(screen.getByRole("main"));
+    expect(screen.getByRole("banner").nextElementSibling).toBe(screen.getByRole("main"));
+  });
+
+  it("sets data-fill-viewport and merges className", () => {
+    render(
+      <AppShell.Root fillViewport className="custom" data-testid="root">
+        <AppShell.Main />
+      </AppShell.Root>,
+    );
+    const root = screen.getByTestId("root");
+    expect(root).toHaveAttribute("data-fill-viewport", "true");
+    expect(root).toHaveClass("custom");
+  });
+
+  it("Main is contained by default and supports full width", () => {
+    const { rerender } = render(
       <AppShell.Root>
-        <AppShell.Nav aria-label="Nav">aside</AppShell.Nav>
-        <AppShell.Main>main body</AppShell.Main>
-      </AppShell.Root>,
-    );
-
-    expect(screen.getByText("aside")).toBeInTheDocument();
-    expect(screen.getByRole("main")).toHaveTextContent("main body");
-  });
-
-  it("sets data-fill-viewport when fillViewport is true", () => {
-    render(
-      <AppShell.Root fillViewport>
         <AppShell.Main />
       </AppShell.Root>,
     );
+    // Default is the full panel with gutters; `contained` is opt-in for long-read pages.
+    expect(screen.getByRole("main")).toHaveAttribute("data-content-width", "full");
 
-    expect(screen.getByRole("main").parentElement).toHaveAttribute("data-fill-viewport", "true");
-  });
-
-  it("merges className on root", () => {
-    render(
-      <AppShell.Root className="shell-custom">
-        <AppShell.Main />
+    rerender(
+      <AppShell.Root>
+        <AppShell.Main contentWidth="contained" />
       </AppShell.Root>,
     );
-
-    expect(screen.getByRole("main").parentElement).toHaveClass("shell-custom");
+    expect(screen.getByRole("main")).toHaveAttribute("data-content-width", "contained");
   });
 
-  it("Template composes nav slot and main", () => {
-    render(
+  it("Template composes nav, optional header and main", () => {
+    const { rerender } = render(
+      <MemoryRouter>
+        <AppShell.Template nav={<span>sidebar</span>} header={<span>Crumbs</span>}>
+          <span>page</span>
+        </AppShell.Template>
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("sidebar")).toBeInTheDocument();
+    expect(screen.getByRole("banner")).toHaveTextContent("Crumbs");
+    expect(screen.getByRole("main")).toHaveTextContent("page");
+
+    rerender(
       <MemoryRouter>
         <AppShell.Template nav={<span>sidebar</span>}>
           <span>page</span>
         </AppShell.Template>
       </MemoryRouter>,
     );
-
-    expect(screen.getByText("sidebar")).toBeInTheDocument();
-    expect(screen.getByRole("main")).toHaveTextContent("page");
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
   });
 
-  it("Template sets data-layout-template=app on root", () => {
+  it("Template forwards its ref to main and works outside a router", () => {
+    const ref = { current: null as HTMLElement | null };
     render(
-      <MemoryRouter>
-        <AppShell.Template nav={<span>nav</span>}>
-          <span>c</span>
-        </AppShell.Template>
-      </MemoryRouter>,
+      <AppShell.Template ref={ref} mainProps={{ id: "content" }}>
+        <span>page</span>
+      </AppShell.Template>,
     );
-
-    expect(screen.getByRole("main").parentElement).toHaveAttribute("data-layout-template", "app");
-  });
-
-  it("Main marks padded column with data-app-shell-main-padded and renders route children directly", () => {
-    render(
-      <MemoryRouter>
-        <AppShell.Template nav={<span>nav</span>}>
-          <span>body</span>
-        </AppShell.Template>
-      </MemoryRouter>,
-    );
-
-    const main = screen.getByRole("main");
-    expect(main).toHaveAttribute("data-app-shell-main-padded");
-    expect(main).toHaveTextContent("body");
+    expect(ref.current).toBe(screen.getByRole("main"));
+    expect(screen.getByRole("main")).toHaveAttribute("id", "content");
   });
 });

@@ -1,0 +1,307 @@
+import * as React from "react";
+
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { cx } from "@/internal/cx";
+import { toDataAttributes } from "@/internal/data-attributes";
+import { Slot } from "@/internal/slot";
+import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
+
+import styles from "./Timeline.module.css";
+
+// ─── Root ─────────────────────────────────────────────────────────────────────
+
+export type TimelineRootProps = {
+  /** Tier of text, dots and row rhythm. Default `m` (rows 64px). */
+  size?: ControlSize;
+  /**
+   * Who gets the highlighted look (pill, accent title and dot):
+   * `selected` (default) — the `active` row keeps it; interactive rows get a faint hover wash.
+   * `hover` — the row under the pointer or with keyboard focus, transiently; `active` keeps only
+   * its semantics (`aria-current`), no persistent highlight.
+   */
+  highlight?: "selected" | "hover";
+  /** `Timeline.Group` elements. */
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
+
+const TimelineRoot = React.forwardRef<HTMLDivElement, TimelineRootProps>(function TimelineRoot(
+  { size = "m", highlight = "selected", children, className, ...rest },
+  ref,
+) {
+  return (
+    <ControlSizeProvider value={size}>
+      <div
+        {...rest}
+        ref={ref}
+        className={cx(styles.root, className)}
+        {...toDataAttributes({ size, highlight })}
+      >
+        {children}
+      </div>
+    </ControlSizeProvider>
+  );
+});
+TimelineRoot.displayName = "Timeline.Root";
+
+// ─── Group ────────────────────────────────────────────────────────────────────
+
+export type TimelineGroupProps = {
+  /** Group heading (e.g. «Недавно»); labels the list via `aria-labelledby`. */
+  label?: React.ReactNode;
+  /** `Timeline.Item` and `Timeline.Gap` elements. */
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.OlHTMLAttributes<HTMLOListElement>, "children">;
+
+/** One labelled `<ol>` of events. The connecting line runs from its first dot to its last. */
+const TimelineGroup = React.forwardRef<HTMLOListElement, TimelineGroupProps>(function TimelineGroup(
+  { label, children, className, ...rest },
+  ref,
+) {
+  const labelId = React.useId();
+  const hasLabel = label !== undefined && label !== null && label !== false;
+  return (
+    <div className={styles.group}>
+      {hasLabel ? (
+        <div id={labelId} className={styles.groupLabel}>
+          {label}
+        </div>
+      ) : null}
+      <ol
+        aria-labelledby={hasLabel ? labelId : undefined}
+        {...rest}
+        ref={ref}
+        className={cx(styles.list, className)}
+      >
+        {children}
+      </ol>
+    </div>
+  );
+});
+TimelineGroup.displayName = "Timeline.Group";
+
+// ─── Item ─────────────────────────────────────────────────────────────────────
+
+export type TimelineItemProps = {
+  /** Decorative dot hue (categorization). Default `blue`, shown at reduced emphasis. */
+  color?: PaletteColor;
+  /** Semantic dot color (status). Wins over `color`; shown at full emphasis. */
+  tone?: Tone;
+  /** Highlighted / selected row: soft pill, accent title and dot; `data-state="active"`, `aria-current`. */
+  active?: boolean;
+  /** Renders the row as a link. */
+  href?: string;
+  /** Renders the row as the single child element (router link etc.); the dot is prepended to its children. */
+  asChild?: boolean;
+  /** Renders the row as a `button` (unless `href` / `asChild`). */
+  onClick?: React.MouseEventHandler<HTMLElement>;
+  /** `Timeline.Title`, `Timeline.Meta`, `Timeline.Value`. */
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLElement>, "children" | "color" | "onClick"> &
+  Pick<React.AnchorHTMLAttributes<HTMLAnchorElement>, "target" | "rel" | "download">;
+
+const TimelineItem = React.forwardRef<HTMLElement, TimelineItemProps>(function TimelineItem(
+  { color = "blue", tone, active = false, href, asChild, onClick, children, className, ...rest },
+  ref,
+) {
+  const interactive = Boolean(asChild || href || onClick);
+  const state = active ? "active" : "inactive";
+  const rowProps = {
+    ...rest,
+    className: cx(styles.row, className),
+    "aria-current": active ? ("true" as const) : undefined,
+    ...toDataAttributes({
+      state,
+      color: tone ? undefined : color,
+      tone,
+      interactive: interactive || undefined,
+    }),
+  };
+  const dot = <span className={styles.dot} aria-hidden="true" />;
+
+  let row: React.ReactNode;
+  if (asChild) {
+    const child = React.Children.only(children) as React.ReactElement<{
+      children?: React.ReactNode;
+    }>;
+    row = (
+      <Slot {...rowProps} ref={ref} onClick={onClick}>
+        {React.cloneElement(
+          child,
+          undefined,
+          <>
+            {dot}
+            {child.props.children}
+          </>,
+        )}
+      </Slot>
+    );
+  } else if (href) {
+    row = (
+      <a {...rowProps} ref={ref as React.Ref<HTMLAnchorElement>} href={href} onClick={onClick}>
+        {dot}
+        {children}
+      </a>
+    );
+  } else if (onClick) {
+    row = (
+      <button
+        {...(rowProps as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+        ref={ref as React.Ref<HTMLButtonElement>}
+        type="button"
+        onClick={onClick}
+      >
+        {dot}
+        {children}
+      </button>
+    );
+  } else {
+    row = (
+      <div {...rowProps} ref={ref as React.Ref<HTMLDivElement>}>
+        {dot}
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <li className={styles.item} data-state={state}>
+      {row}
+    </li>
+  );
+});
+TimelineItem.displayName = "Timeline.Item";
+
+// ─── Parts ────────────────────────────────────────────────────────────────────
+
+export type TimelineTitleProps = {
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+
+/** First line: the event. Medium, primary (accent on the active row); wraps when narrow. */
+function TimelineTitle({ children, className, ...rest }: TimelineTitleProps) {
+  return (
+    <span {...rest} className={cx(styles.title, className)}>
+      {children}
+    </span>
+  );
+}
+TimelineTitle.displayName = "Timeline.Title";
+
+export type TimelineMetaProps = {
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+
+/** Second line: date and relative time, muted, tabular numbers. Emphasize a part with `Timeline.MetaPrimary` or `<strong>`. */
+function TimelineMeta({ children, className, ...rest }: TimelineMetaProps) {
+  return (
+    <span {...rest} className={cx(styles.meta, className)}>
+      {children}
+    </span>
+  );
+}
+TimelineMeta.displayName = "Timeline.Meta";
+
+export type TimelineMetaPrimaryProps = {
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+
+/** Emphasized part of the meta line (the date): primary, medium. */
+function TimelineMetaPrimary({ children, className, ...rest }: TimelineMetaPrimaryProps) {
+  return (
+    <span {...rest} className={cx(styles.metaPrimary, className)}>
+      {children}
+    </span>
+  );
+}
+TimelineMetaPrimary.displayName = "Timeline.MetaPrimary";
+
+export type TimelineValueProps = {
+  /** Text color. Default `neutral` (primary text). */
+  tone?: Tone;
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+
+/**
+ * Trailing amount: right-aligned, vertically centered, tabular numbers. Add `Timeline.ValueMeta` for a
+ * muted second line. Moves under the meta below 20rem.
+ */
+function TimelineValue({ tone = "neutral", children, className, ...rest }: TimelineValueProps) {
+  return (
+    <span {...rest} className={cx(styles.value, className)} {...toDataAttributes({ tone })}>
+      {children}
+    </span>
+  );
+}
+TimelineValue.displayName = "Timeline.Value";
+
+export type TimelineValueMetaProps = {
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+
+/** Second line inside `Timeline.Value` (category, unit): meta size, muted, right-aligned under the value. */
+function TimelineValueMeta({ children, className, ...rest }: TimelineValueMetaProps) {
+  return (
+    <span {...rest} className={cx(styles.valueMeta, className)}>
+      {children}
+    </span>
+  );
+}
+TimelineValueMeta.displayName = "Timeline.ValueMeta";
+
+// ─── Gap ──────────────────────────────────────────────────────────────────────
+
+export type TimelineGapProps = {
+  /** Caption color and hollow dot. Default `neutral` (muted); `warning` / `danger` flag a long interval. */
+  tone?: Tone;
+  /** Optional trailing caption on the right (e.g. «сейчас»). */
+  trailing?: React.ReactNode;
+  /** Interval caption, e.g. «40 дней · 2 200 км без обслуживания». */
+  children: React.ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
+
+/**
+ * Interval between two events: a shorter row with a small hollow dot on a dashed segment and a
+ * muted caption. Renders an `li`, so it goes inside `Timeline.Group` between items.
+ */
+const TimelineGap = React.forwardRef<HTMLDivElement, TimelineGapProps>(function TimelineGap(
+  { tone = "neutral", trailing, children, className, ...rest },
+  ref,
+) {
+  const hasTrailing = trailing !== undefined && trailing !== null && trailing !== false;
+  return (
+    <li className={cx(styles.item, styles.gapItem)}>
+      <div
+        {...rest}
+        ref={ref}
+        className={cx(styles.gapRow, className)}
+        {...toDataAttributes({ tone })}
+      >
+        <span className={styles.gapDot} aria-hidden="true" />
+        <span className={styles.gapCaption}>{children}</span>
+        {hasTrailing ? <span className={styles.gapTrailing}>{trailing}</span> : null}
+      </div>
+    </li>
+  );
+});
+TimelineGap.displayName = "Timeline.Gap";
+
+export const Timeline = {
+  Root: TimelineRoot,
+  Group: TimelineGroup,
+  Item: TimelineItem,
+  Title: TimelineTitle,
+  Meta: TimelineMeta,
+  MetaPrimary: TimelineMetaPrimary,
+  Value: TimelineValue,
+  ValueMeta: TimelineValueMeta,
+  Gap: TimelineGap,
+};

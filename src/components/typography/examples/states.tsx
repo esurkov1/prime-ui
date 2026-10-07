@@ -1,26 +1,22 @@
+/** Text has no interactive states; this shows the one boolean style axis, `italic`, on the same variant and weight. Use italic for quotes and titles of works. */
 import { Divider, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-/** Курсив `italic` при том же `variant` и `weight`. Зеркало `playground/snippets/typography/states.tsx`. */
-export default function TypographyExampleStates() {
+export default function TypographyStatesExample() {
   return (
-    <div className={styles.typographyScaleList}>
-      <div className={styles.typographyScaleRow}>
-        <Typography.Root variant="body-default" weight="medium">
-          Заголовок карточки без курсива — обычный акцент.
+    <div className={styles.scaleList}>
+      <div className={styles.scaleRow}>
+        <Typography.Root variant="body-m" weight="medium">
+          Обычный текст без курсива.
         </Typography.Root>
-        <Divider.Root variant="text" align="start">
-          italic не задан (false)
-        </Divider.Root>
+        <Divider.Root align="start">italic не задан (false)</Divider.Root>
       </div>
-      <div className={styles.typographyScaleRow}>
-        <Typography.Root variant="body-default" weight="medium" italic>
+      <div className={styles.scaleRow}>
+        <Typography.Root variant="body-m" weight="medium" italic>
           Тот же размер и вес с курсивом — цитата или название научной работы.
         </Typography.Root>
-        <Divider.Root variant="text" align="start">
-          italic — курсив через data-атрибут и токены
-        </Divider.Root>
+        <Divider.Root align="start">italic — курсив через data-атрибут и токены</Divider.Root>
       </div>
     </div>
   );

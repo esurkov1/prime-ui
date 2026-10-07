@@ -1,0 +1,55 @@
+/* Layout helpers for the Notification examples. Semantic tokens only. */
+
+/* Column of static cards, about as wide as a toast (24rem). */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  width: min(100%, calc(var(--prime-space-24) * 4));
+  min-width: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-2);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-4);
+  width: 100%;
+}
+
+/* 16rem position picker. */
+.select {
+  width: min(100%, calc(var(--prime-space-16) * 4));
+}
+
+/* 26rem settings card. */
+.card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-5);
+  width: min(100%, calc(var(--prime-space-24) * 4 + var(--prime-space-8)));
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+  box-shadow: var(--prime-card-shadow);
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+}

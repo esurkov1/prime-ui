@@ -1,33 +1,28 @@
+/** `side` (bottom · top) and `align` (start · center · end). Near the viewport edge the panel flips and shifts automatically. */
 import { Button, Popover, Typography } from "prime-ui-kit";
 
-import styles from "./popover-examples.module.css";
+import preview from "./examples.module.css";
 
-type Demo = { label: string; side: "top" | "bottom"; align: "start" | "center" | "end" };
+const PLACEMENTS = [
+  { label: "Снизу · начало", side: "bottom", align: "start" },
+  { label: "Снизу · центр", side: "bottom", align: "center" },
+  { label: "Снизу · конец", side: "bottom", align: "end" },
+  { label: "Сверху · начало", side: "top", align: "start" },
+] as const;
 
-const demos: Demo[] = [
-  { label: "Bottom · start", side: "bottom", align: "start" },
-  { label: "Bottom · center", side: "bottom", align: "center" },
-  { label: "Bottom · end", side: "bottom", align: "end" },
-  { label: "Top · start", side: "top", align: "start" },
-];
-
-/**
- * Preferred `side` and `align`; the kit may flip at the viewport edge.
- */
-export default function PlacementExample() {
+export default function PopoverPlacementExample() {
   return (
-    <div className={styles.placementGrid}>
-      {demos.map(({ label, side, align }) => (
+    <div className={preview.row}>
+      {PLACEMENTS.map(({ label, side, align }) => (
         <Popover.Root key={label}>
-          <Popover.Trigger asChild>
-            <Button.Root className={styles.placementTrigger} mode="stroke" variant="neutral">
+          <Popover.Trigger>
+            <Button.Root variant="soft" tone="neutral">
               {label}
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align={align} side={side}>
-            <Typography.Root as="p" variant="body-small">
-              <code>side=&quot;{side}&quot;</code>, <code>align=&quot;{align}&quot;</code>. Near the
-              viewport edge the panel may flip to stay on screen.
+          <Popover.Content side={side} align={align}>
+            <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
+              side=&quot;{side}&quot;, align=&quot;{align}&quot;
             </Typography.Root>
           </Popover.Content>
         </Popover.Root>

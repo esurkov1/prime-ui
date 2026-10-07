@@ -1,80 +1,44 @@
-import { Pagination } from "prime-ui-kit";
+/** Disabled arrows at the edges, no ellipsis up to 7 pages, and the window around the current page set by `siblingCount`. Use to choose the range behaviour. */
+import { Pagination, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-/**
- * Previous disabled on first page, next on last; both disabled when `totalPages` is 1.
- * Parity with `playground/snippets/pagination/states.tsx`.
- */
-export default function PaginationStatesExample() {
-  const [first, setFirst] = React.useState(1);
-  const [last, setLast] = React.useState(10);
-  const [single, setSingle] = React.useState(1);
+import styles from "./examples.module.css";
 
+function Example({
+  label,
+  total,
+  start,
+  siblings,
+}: {
+  label: string;
+  total: number;
+  start: number;
+  siblings?: number;
+}) {
+  const [page, setPage] = React.useState(start);
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--prime-sys-spacing-x4)",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "var(--prime-sys-spacing-x2)",
-          alignItems: "flex-start",
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontSize: "var(--prime-sys-size-control-s-supportText)",
-            color: "var(--prime-sys-color-content-secondary)",
-          }}
-        >
-          First of ten
-        </p>
-        <Pagination.Root page={first} totalPages={10} onPageChange={setFirst} />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "var(--prime-sys-spacing-x2)",
-          alignItems: "flex-start",
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontSize: "var(--prime-sys-size-control-s-supportText)",
-            color: "var(--prime-sys-color-content-secondary)",
-          }}
-        >
-          Last of ten
-        </p>
-        <Pagination.Root page={last} totalPages={10} onPageChange={setLast} />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "var(--prime-sys-spacing-x2)",
-          alignItems: "flex-start",
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontSize: "var(--prime-sys-size-control-s-supportText)",
-            color: "var(--prime-sys-color-content-secondary)",
-          }}
-        >
-          Single page
-        </p>
-        <Pagination.Root page={single} totalPages={1} onPageChange={setSingle} />
-      </div>
+    <div className={styles.group}>
+      <Typography.Root as="span" variant="caption" tone="muted">
+        {label}
+      </Typography.Root>
+      <Pagination.Root
+        value={page}
+        totalPages={total}
+        siblingCount={siblings}
+        onValueChange={setPage}
+      />
+    </div>
+  );
+}
+
+export default function PaginationStatesExample() {
+  return (
+    <div className={styles.stack}>
+      <Example label="первая страница — «назад» отключена" total={12} start={1} />
+      <Example label="последняя — «вперёд» отключена" total={12} start={12} />
+      <Example label="5 страниц — без многоточия" total={5} start={3} />
+      <Example label="середина, siblingCount=1" total={40} start={20} />
+      <Example label="середина, siblingCount=2" total={40} start={20} siblings={2} />
     </div>
   );
 }

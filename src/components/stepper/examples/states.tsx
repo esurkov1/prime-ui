@@ -1,42 +1,48 @@
+/** Explicit `status` on each step (completed, error with a custom indicator, active, pending) and a disabled step. Use when step status comes from the server, e.g. a failed delivery step. */
 import { Stepper } from "prime-ui-kit";
-import * as React from "react";
 
 import styles from "./examples.module.css";
 
-/** Disabled step and `status="error"` with custom `Indicator` content. */
 export default function StepperStatesExample() {
-  const [disabledStep, setDisabledStep] = React.useState(1);
-  const [errorStep, setErrorStep] = React.useState(1);
-
   return (
-    <div className={styles.stackLoose}>
-      <Stepper.Root currentStep={disabledStep}>
-        <Stepper.Step type="button" onClick={() => setDisabledStep(0)}>
+    <div className={styles.vertical}>
+      <Stepper.Root>
+        <Stepper.Step status="completed">
           <Stepper.Indicator />
-          <Stepper.Content title="Done" />
+          <Stepper.Content>
+            <Stepper.Title>Оплата прошла</Stepper.Title>
+            <Stepper.Description>completed</Stepper.Description>
+          </Stepper.Content>
         </Stepper.Step>
-        <Stepper.Step type="button" disabled>
-          <Stepper.Indicator />
-          <Stepper.Content title="Unavailable" description="Opens after verification" />
-        </Stepper.Step>
-        <Stepper.Step type="button" onClick={() => setDisabledStep(2)}>
-          <Stepper.Indicator />
-          <Stepper.Content title="Finish" />
-        </Stepper.Step>
-      </Stepper.Root>
-
-      <Stepper.Root currentStep={errorStep}>
-        <Stepper.Step type="button" onClick={() => setErrorStep(0)}>
-          <Stepper.Indicator />
-          <Stepper.Content title="Payment OK" />
-        </Stepper.Step>
-        <Stepper.Step type="button" status="error" onClick={() => setErrorStep(1)}>
+        <Stepper.Step status="error">
           <Stepper.Indicator>!</Stepper.Indicator>
-          <Stepper.Content title="Delivery error" description="Check address and slot" />
+          <Stepper.Content>
+            <Stepper.Title>Ошибка доставки</Stepper.Title>
+            <Stepper.Description>error · проверьте адрес</Stepper.Description>
+          </Stepper.Content>
+          <Stepper.Arrow />
         </Stepper.Step>
-        <Stepper.Step type="button" onClick={() => setErrorStep(2)}>
+        <Stepper.Step status="active">
           <Stepper.Indicator />
-          <Stepper.Content title="Confirm" />
+          <Stepper.Content>
+            <Stepper.Title>Подтверждение</Stepper.Title>
+            <Stepper.Description>active</Stepper.Description>
+          </Stepper.Content>
+          <Stepper.Arrow />
+        </Stepper.Step>
+        <Stepper.Step status="pending">
+          <Stepper.Indicator />
+          <Stepper.Content>
+            <Stepper.Title>Получение</Stepper.Title>
+            <Stepper.Description>pending</Stepper.Description>
+          </Stepper.Content>
+        </Stepper.Step>
+        <Stepper.Step status="pending" disabled>
+          <Stepper.Indicator />
+          <Stepper.Content>
+            <Stepper.Title>Отзыв</Stepper.Title>
+            <Stepper.Description>disabled</Stepper.Description>
+          </Stepper.Content>
         </Stepper.Step>
       </Stepper.Root>
     </div>

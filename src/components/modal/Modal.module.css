@@ -1,168 +1,71 @@
+/*
+ * Modal — raised surface on a scrim. Header / body / footer (DialogParts.module.css) own their
+ * side padding (`--dialog-padding`) and the inset hairlines. Only the body scrolls. Below 640px of viewport the dialog becomes a bottom sheet.
+ */
+
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--prime-sys-elevation-zIndex-modal);
-  background: var(--prime-sys-color-surface-overlay);
-  backdrop-filter: blur(var(--prime-sys-unit-8px));
+  z-index: var(--prime-z-modal);
   display: grid;
   place-items: center;
-  animation: fadeIn var(--prime-sys-motion-medium) var(--prime-sys-motion-standard);
-  padding-inline: var(--prime-sys-size-modal-overlayPaddingX);
-  padding-block: var(--prime-sys-size-modal-overlayPaddingY);
+  box-sizing: border-box;
+  padding: var(--prime-modal-viewport-padding);
+  background: var(--prime-color-bg-scrim);
+  overflow: hidden;
 }
 
 .content {
+  --modal-width: var(--prime-modal-width-m);
+  /* Fields inside a raised surface use the "on surface" fill. */
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  /* Avatar.Group rings match this surface. */
+  --avatar-ring: var(--prime-color-bg-raised);
+
+  --dialog-padding: var(--prime-modal-padding);
+
   box-sizing: border-box;
-  background: var(--prime-sys-color-surface-elevated);
-  color: var(--prime-sys-color-content-primary);
-  box-shadow: var(--prime-sys-elevation-shadow-modal);
-  display: grid;
-  outline: none;
-  animation: scaleIn var(--prime-sys-motion-slow) var(--prime-sys-motion-standard);
-  width: min(100%, var(--prime-sys-size-modal-maxWidth));
-  border-radius: var(--prime-sys-size-modal-radius);
-  padding-inline: var(--prime-sys-size-modal-paddingX);
-  padding-block: var(--prime-sys-size-modal-paddingY);
-  gap: var(--prime-sys-size-modal-contentGap);
-}
-
-.header,
-.body,
-.footer {
-  width: 100%;
-}
-
-.header {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--prime-sys-size-modal-headerGap);
-}
-
-/* Без описания — заголовок и иконка по вертикали по центру строки шапки. */
-.headerNoDescription {
-  align-items: center;
-}
-
-.title {
-  margin: 0;
-  line-height: 1.2;
-  font-weight: var(--prime-sys-typography-title-weight);
-  font-size: var(--prime-sys-size-control-m-text);
-}
-
-.description {
-  margin: 0;
-  color: var(--prime-sys-color-content-secondary);
-  font-size: var(--prime-sys-size-control-s-text);
-  line-height: 1.4;
-}
-
-/* Как `.titleBlock` в Drawer: только заголовок + дескриптор, без лишнего шага сетки. */
-.headText {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: var(--prime-sys-size-modal-titleGap);
-  min-width: 0;
-  padding-right: var(--prime-sys-size-modal-headTextPaddingRight);
+  width: min(100%, var(--modal-width));
+  max-height: calc(100dvh - 2 * var(--prime-modal-viewport-padding));
+  min-height: 0;
+  overflow: hidden;
+  background: var(--prime-color-bg-raised);
+  color: var(--prime-color-text-primary);
+  border-radius: var(--prime-modal-radius);
+  box-shadow: var(--prime-shadow-modal);
+  outline: none;
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
 }
 
-.headerIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  /* `raised` в светлой теме совпадает с `elevated` у панели — фон не виден; `default` даёт контраст к поднятой поверхности. */
-  background: var(--prime-sys-color-surface-default);
-  color: var(--prime-sys-color-content-secondary);
-  flex: 0 0 auto;
-  width: var(--prime-sys-size-modal-headerIconSize);
-  height: var(--prime-sys-size-modal-headerIconSize);
-  border-radius: var(--prime-sys-size-control-m-radius);
+.content[data-size="s"] {
+  --modal-width: var(--prime-modal-width-s);
 }
 
-.closeButton {
-  position: absolute;
-  right: 0;
-  top: 0;
+.content[data-size="l"] {
+  --modal-width: var(--prime-modal-width-l);
 }
 
-.closeBtn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  padding-inline: 0;
-  gap: 0;
-  width: var(--prime-sys-size-control-m-height);
-  min-width: var(--prime-sys-size-control-m-height);
-  height: var(--prime-sys-size-control-m-height);
+.content[data-size="xl"] {
+  --modal-width: var(--prime-modal-width-xl);
 }
 
-.body,
-.footer {
-  border-top: var(--prime-sys-border-width-control) solid var(--prime-sys-color-border-subtle);
-}
+/* ─── Narrow viewport: bottom sheet ──────────────────────────────────────── */
 
-.body {
-  display: grid;
-  padding-block: var(--prime-sys-size-modal-headerPaddingBottom);
-  gap: var(--prime-sys-size-modal-bodyGap);
-  font-size: var(--prime-sys-size-control-m-text);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+@media (max-width: 639px) {
+  .overlay {
+    place-items: end stretch;
+    padding: var(--prime-modal-viewport-padding) 0 0;
   }
 
-  to {
-    opacity: 1;
+  .content {
+    width: 100%;
+    max-height: calc(100dvh - var(--prime-modal-viewport-padding));
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
   }
 }
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.content[data-state="closed"] {
-  animation: none;
-}
-
-.overlay[data-state="closed"] {
-  animation: none;
-}
-
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  padding-top: var(--prime-sys-size-modal-footerPaddingTop);
-  gap: var(--prime-sys-size-modal-footerGap);
-}
-
-.footer > * {
-  flex: 1;
-  min-width: fit-content;
-}
-
-.headerOnly {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.bodyOnly {
-  padding-top: 0;
-}
-
-.closeButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+/* Motion (scrim fade, dialog scale, bottom-sheet slide) lives in internal/overlayMotion.module.css. */
