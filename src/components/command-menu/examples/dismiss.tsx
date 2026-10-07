@@ -28,6 +28,11 @@ export default function CommandMenuDismissExample() {
             ))}
           </CommandMenu.Group>
         </CommandMenu.List>
+        <CommandMenu.Footer>
+          <CommandMenu.FooterHint keys={["Esc"]}>
+            Закрыть — клик по фону не закрывает
+          </CommandMenu.FooterHint>
+        </CommandMenu.Footer>
       </CommandMenu.Root>
     </>
   );

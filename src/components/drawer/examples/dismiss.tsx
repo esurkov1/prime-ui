@@ -35,6 +35,9 @@ export default function DrawerDismissExample() {
           <Typography.Root variant="body-m" tone="secondary">
             Товары с совпадающим артикулом обновятся, новые добавятся в каталог.
           </Typography.Root>
+          <Typography.Root variant="body-m" tone="secondary">
+            Панель закрывается только кнопками: случайный клик мимо не сбросит настройки импорта.
+          </Typography.Root>
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Close>

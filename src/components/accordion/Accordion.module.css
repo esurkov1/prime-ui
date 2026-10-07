@@ -249,8 +249,9 @@
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  /* Top padding keeps focus rings of the first focusable child inside the clipped `.content`. */
-  padding: var(--prime-focus-space) var(--acc-pad-x) var(--acc-pad-y);
+  /* Same inset above and below, so the body sits clear of the trigger's hover fill; it also keeps
+     focus rings of the first focusable child inside the clipped `.content`. */
+  padding: var(--acc-pad-y) var(--acc-pad-x);
   color: var(--prime-color-text-secondary);
   font-size: var(--acc-content-size);
   line-height: var(--acc-content-line-height);
