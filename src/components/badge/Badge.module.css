@@ -199,21 +199,29 @@
 
 /* ─── Parts ─────────────────────────────────────────────────────────────── */
 
-/* The dot is drawn by ::before, so its box can grow into an edge segment around it. */
+/* The dot is drawn by ::before, so its box can grow into an edge segment around it. Inside a
+   badge the root's `--badge-dot` sizes it; standalone, its own tier does (6px, 8px from `l`). */
 .dot {
+  --dot-size: calc(var(--prime-space-1) + 2 * var(--prime-border-width));
+
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--badge-dot);
-  height: var(--badge-dot);
+  width: var(--badge-dot, var(--dot-size));
+  height: var(--badge-dot, var(--dot-size));
+  border-radius: var(--prime-radius-full);
+}
+
+.dot:is([data-size="l"], [data-size="xl"]) {
+  --dot-size: var(--prime-space-2);
 }
 
 .dot::before {
   content: "";
   flex: none;
-  width: var(--badge-dot);
-  height: var(--badge-dot);
+  width: var(--badge-dot, var(--dot-size));
+  height: var(--badge-dot, var(--dot-size));
   border-radius: var(--prime-radius-full);
   background: currentColor;
 }

@@ -275,7 +275,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-.dot {
+/* `[data-size]` outranks Badge's own `.dot` display whatever order the modules load in. */
+.dot[data-size] {
   display: none;
 }
 
@@ -305,15 +306,13 @@
   white-space: nowrap;
 }
 
+/* `Badge.Dot` (l tier, 8px) on the icon corner, cut out of the icon by a canvas ring. */
 .root[data-mode="compact"]:not([data-mobile]) .dot {
   position: absolute;
   inset-block-start: calc(50% - var(--sb-icon) / 2 - var(--prime-space-1) / 2);
   inset-inline-start: calc(var(--sb-item-pad) + var(--sb-icon) - var(--prime-space-1));
-  display: block;
-  width: var(--prime-space-2);
-  height: var(--prime-space-2);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-accent-default);
+  display: inline-flex;
+  color: var(--prime-color-accent-default);
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-bg-canvas);
 }
 

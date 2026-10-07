@@ -284,7 +284,9 @@ function SidebarItemCount({ children, className }: SidebarItemCountProps) {
   return (
     <>
       <Badge.Root className={cx(styles.count, className)}>{children}</Badge.Root>
-      <span className={styles.dot} aria-hidden="true" />
+      <ControlSizeProvider value="l">
+        <Badge.Dot className={styles.dot} />
+      </ControlSizeProvider>
     </>
   );
 }

@@ -362,7 +362,7 @@ const SegmentedControlItem = React.forwardRef<HTMLButtonElement, SegmentedContro
           if (!isDisabled && !event.defaultPrevented) ctx.onSelect(value);
         }}
       >
-        {color ? <span className={styles.dot} aria-hidden="true" /> : null}
+        {color ? <Badge.Dot className={styles.dot} /> : null}
         <ItemPartsContext.Provider value={parts}>{wrapText(children)}</ItemPartsContext.Provider>
       </button>
     );
