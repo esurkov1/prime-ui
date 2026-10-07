@@ -1,115 +1,28 @@
-/** Two-line full-width segments with Label, Count and Description, scrolling on narrow screens. Use it for status overviews where each option carries a metric. */
-import { type PaletteColor, SegmentedControl, Typography } from "prime-ui-kit";
-import * as React from "react";
+/** A label and a counter on the first line, a metric on the second — `SegmentedControl.Label`, `SegmentedControl.Count`, `SegmentedControl.Description`. */
+import { type PaletteColor, SegmentedControl } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-type Group = {
+const QUEUES: {
   value: string;
   title: string;
   count: number;
   color: PaletteColor;
-  description: React.ReactNode;
-};
-
-const groups: Group[] = [
-  {
-    value: "fleet",
-    title: "В парке",
-    count: 28,
-    color: "blue",
-    description: (
-      <>
-        <strong>1</strong> в подготовке
-      </>
-    ),
-  },
-  {
-    value: "ready",
-    title: "Готовы к выдаче",
-    count: 7,
-    color: "green",
-    description: (
-      <>
-        ещё <strong>3</strong> в сервисе
-      </>
-    ),
-  },
-  {
-    value: "rented",
-    title: "В аренде",
-    count: 17,
-    color: "blue",
-    description: (
-      <>
-        загрузка <strong>63%</strong>
-      </>
-    ),
-  },
-  {
-    value: "releasing",
-    title: "Освобождаются",
-    count: 7,
-    color: "orange",
-    description: (
-      <>
-        ближайший <strong>завтра</strong>
-      </>
-    ),
-  },
-  {
-    value: "service",
-    title: "В сервисе",
-    count: 4,
-    color: "red",
-    description: (
-      <>
-        <strong>2</strong> в ремонте
-      </>
-    ),
-  },
-  {
-    value: "documents",
-    title: "Документы",
-    count: 25,
-    color: "yellow",
-    description: (
-      <>
-        <strong>10</strong> истекли
-      </>
-    ),
-  },
-  {
-    value: "archive",
-    title: "Архив",
-    count: 1,
-    color: "gray",
-    description: (
-      <>
-        <strong>1</strong> продано
-      </>
-    ),
-  },
+  metric: string;
+}[] = [
+  { value: "new", title: "Новые", count: 12, color: "blue", metric: "3 срочных" },
+  { value: "progress", title: "В работе", count: 5, color: "orange", metric: "2 просрочены" },
+  { value: "done", title: "Готово", count: 148, color: "green", metric: "31 за неделю" },
 ];
 
 export default function SegmentedControlTwoLineExample() {
-  const [value, setValue] = React.useState("fleet");
-  const current = groups.find((g) => g.value === value);
-
   return (
-    <div className={styles.fleet}>
-      <SegmentedControl.Root fullWidth value={value} onValueChange={setValue} aria-label="Автопарк">
-        {groups.map((g) => (
-          <SegmentedControl.Item key={g.value} value={g.value}>
-            <SegmentedControl.Label>{g.title}</SegmentedControl.Label>
-            <SegmentedControl.Count color={g.color}>{g.count}</SegmentedControl.Count>
-            <SegmentedControl.Description>{g.description}</SegmentedControl.Description>
-          </SegmentedControl.Item>
-        ))}
-      </SegmentedControl.Root>
-      <Typography.Root variant="caption" tone="muted">
-        {current?.title}: {current?.count} автомобилей.
-      </Typography.Root>
-    </div>
+    <SegmentedControl.Root fullWidth defaultValue="new" aria-label="Очередь заявок">
+      {QUEUES.map((queue) => (
+        <SegmentedControl.Item key={queue.value} value={queue.value}>
+          <SegmentedControl.Label>{queue.title}</SegmentedControl.Label>
+          <SegmentedControl.Count color={queue.color}>{queue.count}</SegmentedControl.Count>
+          <SegmentedControl.Description>{queue.metric}</SegmentedControl.Description>
+        </SegmentedControl.Item>
+      ))}
+    </SegmentedControl.Root>
   );
 }

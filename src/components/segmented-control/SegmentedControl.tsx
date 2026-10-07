@@ -1,13 +1,15 @@
 import * as React from "react";
 
-import { Badge } from "@/components/badge/Badge";
 import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { rovingIndex } from "@/internal/rovingFocus";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 
+import { Badge } from "../badge/Badge";
+import { ScrollContainer } from "../scroll-container/ScrollContainer";
 import styles from "./SegmentedControl.module.css";
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -102,7 +104,10 @@ function revealOffset(viewport: HTMLElement, item: HTMLElement): number {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-export type SegmentedControlRootProps = {
+export type SegmentedControlRootProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "defaultValue" | "onChange"
+> & {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -110,11 +115,6 @@ export type SegmentedControlRootProps = {
   size?: ControlSize;
   /** Stretch to the container width; segments share it equally and truncate their labels. */
   fullWidth?: boolean;
-  /** Accessible name of the radiogroup (or use `aria-labelledby`). */
-  "aria-label"?: string;
-  "aria-labelledby"?: string;
-  children: React.ReactNode;
-  className?: string;
 };
 
 function SegmentedControlRoot({
@@ -124,10 +124,10 @@ function SegmentedControlRoot({
   disabled = false,
   size = "m",
   fullWidth = false,
-  "aria-label": ariaLabel,
-  "aria-labelledby": ariaLabelledBy,
   children,
   className,
+  onKeyDown,
+  ...rest
 }: SegmentedControlRootProps) {
   const [selectedValue, setSelectedValue] = useControllableState<string>({
     value,
@@ -135,7 +135,7 @@ function SegmentedControlRoot({
     onChange: onValueChange,
   });
 
-  const viewportRef = React.useRef<HTMLDivElement>(null);
+  const viewportRef = React.useRef<HTMLElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
   const thumbRef = React.useRef<HTMLDivElement>(null);
   /** Set by a click or arrow key; the next commit glides the thumb and reveals the item. */
@@ -194,21 +194,12 @@ function SegmentedControlRoot({
   }, []);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    onKeyDown?.(event);
     const items = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>(ENABLED_ITEM));
-    if (items.length === 0) return;
     const index = items.indexOf(document.activeElement as HTMLButtonElement);
-
-    let target: HTMLButtonElement | undefined;
-    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-      target = items[(index + 1) % items.length];
-    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-      target = items[(index - 1 + items.length) % items.length];
-    } else if (event.key === "Home") {
-      target = items[0];
-    } else if (event.key === "End") {
-      target = items[items.length - 1];
-    }
-    if (!target) return;
+    const next = rovingIndex(event.key, index, items.length, "both");
+    if (event.defaultPrevented || next === null) return;
+    const target = items[next];
 
     event.preventDefault();
     // The row reveals the segment itself (clear of the edge fades), so focus must not jump-scroll.
@@ -229,9 +220,8 @@ function SegmentedControlRoot({
   return (
     <SegmentedControlProvider value={contextValue}>
       <div
+        {...rest}
         role="radiogroup"
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
         aria-disabled={disabled || undefined}
         className={cx(styles.root, className)}
         onKeyDown={handleKeyDown}
@@ -241,8 +231,11 @@ function SegmentedControlRoot({
           "full-width": fullWidth || undefined,
         })}
       >
-        <div
+        {/* Edge fades are overlays on the still root (see CSS), so the viewport scrolls without a mask. */}
+        <ScrollContainer
           ref={viewportRef}
+          axis="horizontal"
+          scrollbar="hidden"
           className={styles.viewport}
           onScroll={(event) => {
             const viewport = event.currentTarget;
@@ -274,7 +267,7 @@ function SegmentedControlRoot({
             />
             <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
           </div>
-        </div>
+        </ScrollContainer>
       </div>
     </SegmentedControlProvider>
   );
