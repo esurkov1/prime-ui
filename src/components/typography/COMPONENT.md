@@ -71,7 +71,7 @@ Typography       the element from `as` (default <p>); variant, tone, weight, tra
 | `italic` | italic | quotes, titles of works | `false` |
 | `truncate` | one line with an ellipsis | names in fixed-width cells | `false` |
 
-`weight` (`regular` · `medium` · `semibold`) and `tracking` (`normal` · `tight` · `tighter` · `wide`) override the role.
+`weight` (`regular` · `medium` · `semibold`) and `tracking` (`normal` 0 · `tight` −0.01em · `tighter` −0.02em · `wide` +0.01em, from `--prime-font-tracking-*`) override the role.
 
 ## States
 | State | Driven by | DOM |

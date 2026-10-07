@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -31,6 +31,25 @@ describe("generated token styles", () => {
     }
     expect(dark).toContain("--prime-color-bg-canvas:");
     expect(dark).toContain("--prime-shadow-overlay:");
+  });
+
+  it("has no semantic token that the kit does not use", () => {
+    const srcRoot = path.resolve(process.cwd(), "src");
+    const generated = new Set(["tokens.css", "theme-light.css", "theme-dark.css"]);
+    const sources = (readdirSync(srcRoot, { recursive: true }) as string[])
+      .filter((file) => /\.(css|tsx?)$/.test(file) && !/\.test\.tsx?$/.test(file))
+      .filter((file) => !generated.has(path.basename(file)))
+      .map((file) => readFileSync(path.join(srcRoot, file), "utf8"))
+      .join("\n");
+    const declared = new Set(
+      [read("theme-light.css"), read("theme-dark.css")].flatMap((css) =>
+        [...css.matchAll(/^\s+(--prime-[a-z0-9-]+):/gm)].map((m) => m[1]),
+      ),
+    );
+    const unused = [...declared].filter(
+      (name) => !new RegExp(`${name}(?![a-z0-9-])`).test(sources),
+    );
+    expect(unused).toEqual([]);
   });
 
   it("keeps every space token on the 4px grid", () => {

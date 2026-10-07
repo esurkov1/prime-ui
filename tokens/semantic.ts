@@ -182,6 +182,13 @@ export const semanticTokens = {
       medium: "{font.weight.medium}",
       semibold: "{font.weight.semibold}",
     },
+    /** Letter-spacing steps for overriding a role's own tracking (Typography `tracking`). */
+    tracking: {
+      normal: "{font.tracking.normal}",
+      tight: "{font.tracking.tight}",
+      tighter: "{font.tracking.tighter}",
+      wide: "{font.tracking.wide}",
+    },
   },
 
   /**
@@ -286,7 +293,6 @@ export const semanticTokens = {
     6: "{space.6}",
     7: "{space.7}",
     8: "{space.8}",
-    9: "{space.9}",
     10: "{space.10}",
     12: "{space.12}",
     14: "{space.14}",
@@ -301,7 +307,6 @@ export const semanticTokens = {
     m: "{radius.8}",
     l: "{radius.12}",
     xl: "{radius.16}",
-    "2xl": "{radius.20}",
     full: "{radius.full}",
   },
 
@@ -363,7 +368,6 @@ export const semanticTokens = {
   },
 
   z: {
-    base: "{zIndex.base}",
     sticky: "{zIndex.sticky}",
     popover: "{zIndex.popover}",
     dropdown: "{zIndex.dropdown}",
@@ -583,7 +587,6 @@ export const semanticTokens = {
   modal: {
     radius: "{radius.16}",
     padding: "{space.6}",
-    gap: "{space.4}",
     viewportPadding: "{space.4}",
     widthS: "27.5rem",
     widthM: "35rem",
@@ -593,7 +596,6 @@ export const semanticTokens = {
 
   drawer: {
     padding: "{space.6}",
-    gap: "{space.4}",
     widthS: "22.5rem",
     widthM: "30rem",
     widthL: "40rem",

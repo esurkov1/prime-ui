@@ -140,21 +140,20 @@
   --t-weight: var(--prime-font-weight-semibold);
 }
 
-/* Tracking steps reuse the role scale: normal 0 · tight −0.01em · tighter −0.02em · wide +0.01em. */
 .root[data-tracking="normal"] {
-  --t-tracking: var(--prime-text-body-m-tracking);
+  --t-tracking: var(--prime-font-tracking-normal);
 }
 
 .root[data-tracking="tight"] {
-  --t-tracking: var(--prime-text-title-m-tracking);
+  --t-tracking: var(--prime-font-tracking-tight);
 }
 
 .root[data-tracking="tighter"] {
-  --t-tracking: var(--prime-text-heading-m-tracking);
+  --t-tracking: var(--prime-font-tracking-tighter);
 }
 
 .root[data-tracking="wide"] {
-  --t-tracking: var(--prime-text-caption-tracking);
+  --t-tracking: var(--prime-font-tracking-wide);
 }
 
 .root[data-italic="true"] {

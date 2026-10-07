@@ -70,7 +70,7 @@ already carries the page gutters — do not add your own outer padding.
 ## 5. Nested radius (§1.5, §7)
 
 Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Use `--prime-radius-*`
-(`xs 4 · s 6 · m 8 · l 12 · xl 16 · 2xl 20 · full`), `--prime-card-radius`, `--prime-panel-radius`.
+(`xs 4 · s 6 · m 8 · l 12 · xl 16 · full`), `--prime-card-radius`, `--prime-panel-radius`.
 
 ## 6. tone and color (§3, §10)
 
