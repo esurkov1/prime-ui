@@ -195,7 +195,7 @@ export default function IntroPage() {
 
           <div className="introPageSection">
             <DemoSectionTitle>Подключение</DemoSectionTitle>
-            <CodeBlock.Root code={INSTALL_CODE} />
+            <CodeBlock code={INSTALL_CODE} />
           </div>
 
           <div className="introPageSection">

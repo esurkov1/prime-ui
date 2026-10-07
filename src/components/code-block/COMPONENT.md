@@ -1,110 +1,108 @@
 # CodeBlock
 
 **Category:** data-display
+**Kind:** primitive
 
 > A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host.
 
 ## When to use
-- Code samples in docs, settings ("API key usage") and onboarding.
+- Code samples in docs, settings («API key usage») and onboarding.
 - Shell commands and config fragments (long lines scroll inside).
 - An API response sample next to its description.
 
 ## When not to use
 - A keyboard key or shortcut → use [Kbd](../kbd/COMPONENT.md).
 - Editable code or text → use [Textarea](../textarea/COMPONENT.md).
-- An inline identifier inside a sentence → use a plain `<code>` element in text ([Typography](../typography/COMPONENT.md)).
+- An inline identifier inside a sentence → [Typography](../typography/COMPONENT.md) `variant="code"`.
 - A live preview with a code tab → use [ExampleFrame](../example-frame/COMPONENT.md).
 
 ## Import
 ```tsx
 import { CodeBlock } from "prime-ui-kit";
 ```
-Exported types: `CodeBlockRootProps`, `CodeBlockVariant`, `CodeBlockColorScheme`.
+
+## Anatomy
+```
+CodeBlock        <pre>; variant, colorScheme (data-theme)
+└─ code          <code> with highlighted tokens from the `code` string
+```
 
 ## API
 
-### CodeBlock.Root
-Renders `<pre><code>…</code></pre>`. Forwards `ref` to the `<pre>`. No `asChild`. Leaf component.
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+### CodeBlock
+`ref` → `HTMLPreElement`. Renders `<pre><code>`; the markup comes from the escaped, highlighted `code`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `code` | `string` | — (required) | TS/TSX source; trailing whitespace is trimmed, then highlighted (the source is escaped). |
-| `variant` | `"soft" \| "ghost"` (`CodeBlockVariant`) | `"soft"` | Treatment. |
-| `colorScheme` | `"light" \| "dark"` (`CodeBlockColorScheme`) | — (follows the page theme) | Forces a theme for this block only (`data-theme` on the `<pre>`). |
-| `tabIndex` | `number` | `0` for `soft`, none for `ghost` | Keeps a scrolling soft block reachable from the keyboard; pass `-1` when it never overflows. |
-| `className` | `string` | — | Extra class on the `<pre>`. |
-
-+ native `<pre>` props except `children` and `dangerouslySetInnerHTML` (the markup is produced by the component).
+| `code` | `string` | — (required) | TS / TSX source; trailing whitespace is trimmed, then highlighted. |
+| `variant` | `"soft" \| "ghost"` | `"soft"` | `soft` — sunken panel with padding and the `code` text role; `ghost` — bare `pre` that inherits type and background from its host. |
+| `colorScheme` | `"light" \| "dark"` | — | Fixes the theme for this block only (`data-theme`). Omit to follow the page theme. |
+| `tabIndex` | `number` | — | Default `0` for `soft` (a scrolling block stays reachable from the keyboard), none for `ghost`; pass `-1` when it never overflows. |
+| `…rest` | `Omit<HTMLAttributes<HTMLPreElement>, "children" \| "dangerouslySetInnerHTML">` | — | `className`, `aria-label` and the other `<pre>` attributes. |
 
 ## Variants
 
 ### variant
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `soft` | `fill-muted` panel, radius 8, padding 12 × 16, `code` text role (13/20 mono), horizontal scroll, Tab stop | Standalone snippets anywhere | yes |
-| `ghost` | Bare `pre`: no padding, transparent, font size and line height inherited from the host | Inside a host that draws its own panel (a tinted callout, a custom card) | |
+| `soft` | `fill-muted` panel, radius 8, padding 12 × 16, `code` text role, horizontal scroll, Tab stop | standalone snippets anywhere | yes |
+| `ghost` | bare `pre`: no padding, transparent, type inherited from the host | inside a host that draws its own panel | |
 
 ### colorScheme
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| unset | Token colors and fill follow the page theme | Normal case | yes |
-| `light` | Light palette for the block; soft fill switches to `bg-raised` of that scheme | A light code sample inside a dark page | |
-| `dark` | Dark palette for the block; soft fill switches to `bg-raised` of that scheme | A dark "terminal" sample inside a light page | |
+| — (omitted) | token colors and fill follow the page theme | normal case | yes |
+| `light` | light palette; the soft fill becomes that scheme's `bg-raised` | a light sample inside a dark page | |
+| `dark` | dark palette; the soft fill becomes that scheme's `bg-raised` | a terminal-like sample inside a light page | |
 
-Syntax tokens: keywords purple (weight 500), strings teal, numbers orange, JSX tags blue, comments muted italic — all from palette text tokens, so they pass contrast in both themes.
-
-**Combinations**
-- Recommended: `soft` with no `colorScheme`; `aria-label` on blocks that are the only content of a region.
-- Allowed but rare: `soft` + `colorScheme="dark"` for a terminal look; `ghost` inside a custom panel.
-- Avoid: `ghost` on a bare page (no box, no padding, nothing separates the code); several forced schemes on one screen.
-
-**Sizes**
-CodeBlock has no `size`: `soft` uses the `code` text role, `ghost` inherits the host's type.
+Syntax tokens: keywords purple (weight 500), strings teal, numbers orange, JSX tags blue, comments muted italic — palette text tokens, readable in both themes.
 
 ## States
-| State / attribute | Driven by | Notes |
+| State | Driven by | DOM |
 |---|---|---|
-| `data-variant` | `variant` | Always set (default `soft`). |
-| `data-theme="light" \| "dark"` | `colorScheme` | Re-scopes the palette for the block. |
-| focus-visible | keyboard focus on a `soft` block | Inset focus ring. |
-
-No interactive state; `code` is the only content and can come from state (re-highlighted on change).
+| treatment | `variant` | `data-variant` (always set) |
+| fixed scheme | `colorScheme` | `data-theme` re-scopes the palette for the block |
+| focus-visible | keyboard focus on a `soft` block | inset focus ring |
 
 ## Layout & spacing
 - `max-width: 100%`; the block takes the column width and long lines scroll horizontally (`white-space: pre`, tab size 2).
 - Heading / text → code block: `--prime-space-2` to `--prime-space-4`.
-- Width comes from the layout; constrain the column (`max-width: var(--prime-layout-reading-max-width)` for docs), not the block.
+- Constrain the column (`--prime-layout-reading-max-width` for docs), not the block.
 
 ## Accessibility
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Focuses a `soft` block so overflowing code can be scrolled. |
+| `←` · `→` | Scroll a focused block horizontally. |
+
+### ARIA
 - Native `<pre>` / `<code>`; screen readers read the text.
-- A `soft` block is focusable (`tabIndex=0`) so overflowing content can be scrolled with arrow keys; pass `tabIndex={-1}` when it never overflows.
-- Give standalone blocks an `aria-label` ("Команда установки").
-- No `labels` keys.
+- A `soft` block is a Tab stop (`tabIndex=0`); pass `tabIndex={-1}` when it never overflows.
+- Give standalone blocks an `aria-label` («Команда установки»).
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+No `labels`.
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [variants.tsx](examples/variants.tsx) | `soft` vs `ghost` inside a host panel | Choosing the treatment |
-| [color-scheme.tsx](examples/color-scheme.tsx) | `colorScheme="light"` and `"dark"` | A fixed-scheme sample |
-| [surfaces.tsx](examples/surfaces.tsx) | One-line command on canvas, card and floating layer | Checking contrast on any surface |
-| [controlled.tsx](examples/controlled.tsx) | `code` from state switched by a ButtonGroup | Alternative snippets |
-| [long-lines.tsx](examples/long-lines.tsx) | Long shell command scrolling inside a narrow column | Commands and configs |
-| [api-docs.tsx](examples/api-docs.tsx) | Heading, description and response sample | Docs and integration guides |
-
-```tsx
-import { CodeBlock } from "prime-ui-kit";
-
-export function InstallCommand() {
-  return <CodeBlock.Root code="bun add prime-ui-kit" aria-label="Команда установки" />;
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | An API response sample on a sunken panel, named for screen readers — `code`, `aria-label`. |
+| [variants.tsx](examples/variants.tsx) | A sunken panel and a bare block that takes type and background from its host — `variant`. |
+| [color-scheme.tsx](examples/color-scheme.tsx) | A block fixed to one scheme looks the same in both page themes — `colorScheme`. |
+| [narrow.tsx](examples/narrow.tsx) | In a narrow column a long line scrolls inside the block and never wraps; Tab, then arrow keys. |
 
 ## Mistakes
 - Passing JSX children → pass the source string to `code`.
-- `<pre style={{ background: … }}>` for code → use `CodeBlock.Root`.
-- `variant="ghost"` directly on the page → use `soft`, or wrap `ghost` in a panel.
-- Wrapping a soft block in another bordered box → the block is already a filled panel.
+- A hand-styled `<pre>` for code → use `CodeBlock`.
+- `variant="ghost"` directly on the page → use `soft`, or put `ghost` inside a panel.
+- Wrapping a soft block in another box → the block is already a filled panel.
+
 ## Related
-- [Kbd](../kbd/COMPONENT.md) — keys and shortcuts.
-- [ExampleFrame](../example-frame/COMPONENT.md) — live preview with source.
-- [Typography](../typography/COMPONENT.md) — headings and text around code.
+- **Built from:** —
+- **See also:** [Kbd](../kbd/COMPONENT.md), [ExampleFrame](../example-frame/COMPONENT.md), [Typography](../typography/COMPONENT.md)

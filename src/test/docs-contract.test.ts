@@ -37,7 +37,6 @@ const NOT_CONVERTED = new Set([
   "button-group",
   "card",
   "checkbox",
-  "code-block",
   "color-picker",
   "color-swatches",
   "command-menu",

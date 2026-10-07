@@ -106,7 +106,7 @@ export type {
 export { Checkbox } from "./checkbox/Checkbox";
 export type {
   CodeBlockColorScheme,
-  CodeBlockRootProps,
+  CodeBlockProps,
   CodeBlockVariant,
 } from "./code-block/CodeBlock";
 export { CodeBlock } from "./code-block/CodeBlock";
