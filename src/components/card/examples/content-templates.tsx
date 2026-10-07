@@ -1,16 +1,15 @@
-/** Content cards: `cta` (title, text, actions), `list` (header + events with hairlines) and `cover` (media on top). Use for calls to action, activity lists and campaign tiles. */
-
+/** Content templates: a call to action, an events list and a campaign tile with a cover — `Card.CtaBody`, `Card.List`, `Card.Cover`. */
 import { Button, Card, LinkButton, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const events = [
+const EVENTS = [
   { text: "Оплачен заказ № 4821", time: "12:04" },
   { text: "Новый отзыв на «Планшет Pro»", time: "11:47" },
   { text: "Синхронизация складов завершена", time: "10:30" },
 ];
 
-export default function CardContentExample() {
+export default function CardContentTemplatesExample() {
   return (
     <div className={styles.grid}>
       <Card.Root variant="cta">
@@ -34,7 +33,7 @@ export default function CardContentExample() {
           </LinkButton.Root>
         </Card.ListHeader>
         <Card.List>
-          {events.map((e) => (
+          {EVENTS.map((e) => (
             <Card.ListItem key={e.text}>
               <span className={styles.listRow}>
                 <Typography.Root as="span" variant="body-m" truncate>

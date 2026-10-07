@@ -6,14 +6,6 @@
   min-width: 0;
 }
 
-.gridWide {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-24) * 3)), 1fr));
-  gap: var(--prime-space-4);
-  width: 100%;
-  min-width: 0;
-}
-
 .stack {
   display: flex;
   flex-direction: column;

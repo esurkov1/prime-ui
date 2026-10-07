@@ -1,28 +1,14 @@
-/** `panel`: a section header with a period switch, text in `Card.Body` and an edge-to-edge chart in `Card.Chart`. Use for chart widgets on dashboards. */
-
+/** A chart widget: a header with a period switch, a summary line and an edge-to-edge chart — `Card.SectionTrailing`, `Card.Chart`. */
 import { Card, SegmentedControl, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const points = [42, 48, 45, 60, 58, 72, 66, 80, 76, 88, 84, 96];
+const POINTS = [42, 48, 45, 60, 58, 72, 66, 80, 76, 88, 84, 96];
 
-/** An area chart without libraries: stretches over the whole `Card.Chart`. */
-function AreaChart() {
-  const max = 100;
-  const step = 100 / (points.length - 1);
-  const line = points.map((v, i) => `${i === 0 ? "M" : "L"}${i * step} ${max - v}`).join(" ");
-  return (
-    <svg
-      className={styles.chart}
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <path className={styles.chartFill} d={`${line} L100 100 L0 100 Z`} />
-      <path className={styles.chartLine} d={line} />
-    </svg>
-  );
-}
+/** An area chart path in a 100 × 100 box; the SVG stretches over the whole `Card.Chart`. */
+const LINE = POINTS.map(
+  (value, i) => `${i === 0 ? "M" : "L"}${(i * 100) / (POINTS.length - 1)} ${100 - value}`,
+).join(" ");
 
 export default function CardPanelChartExample() {
   return (
@@ -43,7 +29,15 @@ export default function CardPanelChartExample() {
           </Typography.Root>
         </Card.Body>
         <Card.Chart>
-          <AreaChart />
+          <svg
+            className={styles.chart}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path className={styles.chartFill} d={`${LINE} L100 100 L0 100 Z`} />
+            <path className={styles.chartLine} d={LINE} />
+          </svg>
         </Card.Chart>
       </Card.Root>
     </div>

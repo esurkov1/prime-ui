@@ -1,10 +1,9 @@
-/** Settings card: fields inside a card switch to the `field-bg-surface` fill, 20px between fields, actions in the footer on the right. Use for settings and profile forms. */
-
+/** A company settings panel: a section header, fields on the surface fill and actions at the end — `Card.SectionHeader`, `Card.Body`, `Card.Actions`. */
 import { Button, Card, Input, Switch } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-export default function CardSettingsExample() {
+export default function CardOverviewExample() {
   return (
     <div className={styles.panel}>
       <Card.Root variant="panel">

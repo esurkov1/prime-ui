@@ -18,10 +18,7 @@ export type CardRootProps = {
     | "list"
     | "split"
     | "cover";
-  /**
-   * Без лёгкой тени (плоская плитка на фоне страницы).
-   * По умолчанию — тень поверхности для отделения от фона.
-   */
+  /** No raised shadow: a flat tile on the page (dense grids where shadows add noise). */
   flat?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -42,7 +39,7 @@ const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>(function CardRo
     </div>
   );
 });
-CardRoot.displayName = "CardRoot";
+CardRoot.displayName = "Card.Root";
 
 export type CardIconBoxProps = {
   className?: string;
@@ -56,7 +53,7 @@ function CardIconBox({ className, children, ...rest }: CardIconBoxProps) {
     </div>
   );
 }
-CardIconBox.displayName = "CardIconBox";
+CardIconBox.displayName = "Card.IconBox";
 
 export type CardLeadProps = {
   className?: string;
@@ -70,7 +67,7 @@ function CardLead({ className, children, ...rest }: CardLeadProps) {
     </div>
   );
 }
-CardLead.displayName = "CardLead";
+CardLead.displayName = "Card.Lead";
 
 export type CardHeaderRowProps = {
   className?: string;
@@ -84,7 +81,7 @@ function CardHeaderRow({ className, children, ...rest }: CardHeaderRowProps) {
     </div>
   );
 }
-CardHeaderRow.displayName = "CardHeaderRow";
+CardHeaderRow.displayName = "Card.HeaderRow";
 
 export type CardStackProps = {
   className?: string;
@@ -98,7 +95,7 @@ function CardStack({ className, children, ...rest }: CardStackProps) {
     </div>
   );
 }
-CardStack.displayName = "CardStack";
+CardStack.displayName = "Card.Stack";
 
 export type CardLabelProps = {
   className?: string;
@@ -112,7 +109,7 @@ function CardLabel({ className, children, ...rest }: CardLabelProps) {
     </span>
   );
 }
-CardLabel.displayName = "CardLabel";
+CardLabel.displayName = "Card.Label";
 
 export type CardValueProps = {
   className?: string;
@@ -126,7 +123,7 @@ function CardValue({ className, children, ...rest }: CardValueProps) {
     </span>
   );
 }
-CardValue.displayName = "CardValue";
+CardValue.displayName = "Card.Value";
 
 export type CardDescriptionProps = {
   className?: string;
@@ -140,7 +137,7 @@ function CardDescription({ className, children, ...rest }: CardDescriptionProps)
     </p>
   );
 }
-CardDescription.displayName = "CardDescription";
+CardDescription.displayName = "Card.Description";
 
 export type CardMediaProps = {
   className?: string;
@@ -154,7 +151,7 @@ function CardMedia({ className, children, ...rest }: CardMediaProps) {
     </div>
   );
 }
-CardMedia.displayName = "CardMedia";
+CardMedia.displayName = "Card.Media";
 
 export type CardHeadingLevel = "h2" | "h3" | "h4";
 
@@ -172,7 +169,7 @@ function CardTitle({ as: Tag = "h3", className, children, ...rest }: CardTitlePr
     </Tag>
   );
 }
-CardTitle.displayName = "CardTitle";
+CardTitle.displayName = "Card.Title";
 
 export type CardDeltaProps = {
   /** Color of the change: `success` — good, `danger` — bad, `neutral` (default). Independent of the sign. */
@@ -188,7 +185,7 @@ function CardDelta({ className, tone = "neutral", children, ...rest }: CardDelta
     </span>
   );
 }
-CardDelta.displayName = "CardDelta";
+CardDelta.displayName = "Card.Delta";
 
 export type CardActionsProps = {
   className?: string;
@@ -202,7 +199,7 @@ function CardActions({ className, children, ...rest }: CardActionsProps) {
     </div>
   );
 }
-CardActions.displayName = "CardActions";
+CardActions.displayName = "Card.Actions";
 
 export type CardCtaBodyProps = {
   className?: string;
@@ -216,7 +213,7 @@ function CardCtaBody({ className, children, ...rest }: CardCtaBodyProps) {
     </div>
   );
 }
-CardCtaBody.displayName = "CardCtaBody";
+CardCtaBody.displayName = "Card.CtaBody";
 
 export type CardCoverProps = {
   className?: string;
@@ -230,7 +227,7 @@ function CardCover({ className, children, ...rest }: CardCoverProps) {
     </div>
   );
 }
-CardCover.displayName = "CardCover";
+CardCover.displayName = "Card.Cover";
 
 export type CardSplitProps = {
   className?: string;
@@ -244,7 +241,7 @@ function CardSplit({ className, children, ...rest }: CardSplitProps) {
     </div>
   );
 }
-CardSplit.displayName = "CardSplit";
+CardSplit.displayName = "Card.Split";
 
 export type CardSplitCellProps = {
   className?: string;
@@ -258,7 +255,7 @@ function CardSplitCell({ className, children, ...rest }: CardSplitCellProps) {
     </div>
   );
 }
-CardSplitCell.displayName = "CardSplitCell";
+CardSplitCell.displayName = "Card.SplitCell";
 
 export type CardListHeaderProps = {
   className?: string;
@@ -272,7 +269,7 @@ function CardListHeader({ className, children, ...rest }: CardListHeaderProps) {
     </div>
   );
 }
-CardListHeader.displayName = "CardListHeader";
+CardListHeader.displayName = "Card.ListHeader";
 
 export type CardListProps = {
   className?: string;
@@ -289,7 +286,7 @@ const CardList = React.forwardRef<HTMLUListElement, CardListProps>(function Card
     </ul>
   );
 });
-CardList.displayName = "CardList";
+CardList.displayName = "Card.List";
 
 export type CardListItemProps = {
   className?: string;
@@ -306,7 +303,7 @@ const CardListItem = React.forwardRef<HTMLLIElement, CardListItemProps>(function
     </li>
   );
 });
-CardListItem.displayName = "CardListItem";
+CardListItem.displayName = "Card.ListItem";
 
 export type CardSectionHeaderProps = {
   className?: string;
@@ -320,7 +317,7 @@ function CardSectionHeader({ className, children, ...rest }: CardSectionHeaderPr
     </div>
   );
 }
-CardSectionHeader.displayName = "CardSectionHeader";
+CardSectionHeader.displayName = "Card.SectionHeader";
 
 export type CardSectionTitleProps = {
   /** Heading level that fits the page outline (the look does not change). */
@@ -336,7 +333,7 @@ function CardSectionTitle({ as: Tag = "h3", className, children, ...rest }: Card
     </Tag>
   );
 }
-CardSectionTitle.displayName = "CardSectionTitle";
+CardSectionTitle.displayName = "Card.SectionTitle";
 
 export type CardSectionTrailingProps = {
   className?: string;
@@ -350,7 +347,7 @@ function CardSectionTrailing({ className, children, ...rest }: CardSectionTraili
     </div>
   );
 }
-CardSectionTrailing.displayName = "CardSectionTrailing";
+CardSectionTrailing.displayName = "Card.SectionTrailing";
 
 export type CardBodyProps = {
   className?: string;
@@ -364,7 +361,7 @@ function CardBody({ className, children, ...rest }: CardBodyProps) {
     </div>
   );
 }
-CardBody.displayName = "CardBody";
+CardBody.displayName = "Card.Body";
 
 export type CardChartProps = {
   className?: string;
@@ -378,7 +375,7 @@ function CardChart({ className, children, ...rest }: CardChartProps) {
     </div>
   );
 }
-CardChart.displayName = "CardChart";
+CardChart.displayName = "Card.Chart";
 
 export const Card = {
   Root: CardRoot,

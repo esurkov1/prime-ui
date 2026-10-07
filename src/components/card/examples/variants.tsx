@@ -1,11 +1,10 @@
-/** Metric cards: `mini` (icon + title-l value), `metric` (badge + heading-m value), `stat-trend` (large value + delta colored by `tone`). Use for KPI rows on dashboards. */
-
+/** KPI templates: an icon tile with a value, a badge with a value, and a large value with its change — `variant`, `Card.Delta`. */
 import { Users } from "lucide-react";
 import { Badge, Card } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-export default function CardMetricsExample() {
+export default function CardVariantsExample() {
   return (
     <div className={styles.grid}>
       <Card.Root variant="mini">
