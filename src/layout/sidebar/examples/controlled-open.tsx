@@ -1,25 +1,28 @@
-/** Below 768px (`responsive`, default) the rail becomes an off-canvas panel with a scrim, focus trap and Escape, driven by `open` / `onOpenChange` from a menu button. Narrow the window to try it. */
-import { Home, Inbox, Menu, Settings } from "lucide-react";
-import { Button, Sidebar } from "prime-ui-kit";
+/** Below 768px the rail becomes an off-canvas panel with a scrim, opened from a menu button; narrow the window to try it — `open`, `onOpenChange`. */
+import { Button, Icon, Sidebar } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-export default function SidebarResponsiveExample() {
+export default function SidebarControlledOpenExample() {
   const [open, setOpen] = React.useState(false);
 
   return (
     <div className={styles.stage}>
       <Sidebar.Root open={open} onOpenChange={setOpen}>
         <Sidebar.Content>
-          <Sidebar.Item icon={<Home />} href="#home" active>
+          <Sidebar.Item href="#home" current>
+            <Sidebar.ItemIcon>
+              <Icon name="nav.home" />
+            </Sidebar.ItemIcon>
             Главная
           </Sidebar.Item>
-          <Sidebar.Item icon={<Inbox />} href="#inbox" badge={2}>
+          <Sidebar.Item href="#inbox">
+            <Sidebar.ItemIcon>
+              <Icon name="field.email" />
+            </Sidebar.ItemIcon>
             Входящие
-          </Sidebar.Item>
-          <Sidebar.Item icon={<Settings />} href="#settings">
-            Настройки
+            <Sidebar.ItemCount>2</Sidebar.ItemCount>
           </Sidebar.Item>
         </Sidebar.Content>
         <Sidebar.Footer>
@@ -34,7 +37,7 @@ export default function SidebarResponsiveExample() {
           onClick={() => setOpen(true)}
         >
           <Button.Icon>
-            <Menu />
+            <Icon name="nav.sidebarExpand" />
           </Button.Icon>
           Меню
         </Button.Root>

@@ -32,8 +32,11 @@ const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigat
 function PageItem({ page }: { page: PlaygroundPageEntry }) {
   const Icon = page.icon;
   return (
-    <Sidebar.Item asChild icon={<Icon />}>
+    <Sidebar.Item asChild>
       <NavLink to={pageRoute(page.segment)} end={page.segment === ""}>
+        <Sidebar.ItemIcon>
+          <Icon />
+        </Sidebar.ItemIcon>
         {page.label}
       </NavLink>
     </Sidebar.Item>
@@ -186,15 +189,19 @@ export function PlaygroundChromeSidebar({
         <Brand />
       </Sidebar.Header>
       <Sidebar.Item
-        icon={<Search />}
-        shortcut={<Kbd.Root>{isMac ? "⌘K" : "Ctrl K"}</Kbd.Root>}
         aria-haspopup="dialog"
         onClick={() => {
           onOpenChange(false);
           onSearch();
         }}
       >
+        <Sidebar.ItemIcon>
+          <Search />
+        </Sidebar.ItemIcon>
         Поиск
+        <Sidebar.ItemShortcut>
+          <Kbd.Root>{isMac ? "⌘K" : "Ctrl K"}</Kbd.Root>
+        </Sidebar.ItemShortcut>
       </Sidebar.Item>
       <Sidebar.Content ref={contentRef}>
         <Sidebar.Group>

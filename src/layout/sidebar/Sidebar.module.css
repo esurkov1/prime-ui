@@ -17,9 +17,6 @@
   --sb-line-height: var(--prime-control-m-line-height);
   --sb-radius: var(--prime-control-m-radius);
   --sb-gap: var(--prime-control-m-gap);
-  --sb-badge-h: var(--prime-badge-s-height);
-  --sb-badge-px: var(--prime-badge-s-padding-x);
-  --sb-badge-text: var(--prime-badge-s-text-size);
 
   --sb-expanded: var(--prime-layout-sidebar-width);
   --sb-compact: var(--prime-layout-sidebar-collapsed-width);
@@ -51,9 +48,6 @@
   --sb-line-height: var(--prime-control-xs-line-height);
   --sb-radius: var(--prime-control-xs-radius);
   --sb-gap: var(--prime-control-xs-gap);
-  --sb-badge-h: var(--prime-badge-xs-height);
-  --sb-badge-px: var(--prime-badge-xs-padding-x);
-  --sb-badge-text: var(--prime-badge-xs-text-size);
 }
 
 .root[data-size="s"] {
@@ -63,9 +57,6 @@
   --sb-line-height: var(--prime-control-s-line-height);
   --sb-radius: var(--prime-control-s-radius);
   --sb-gap: var(--prime-control-s-gap);
-  --sb-badge-h: var(--prime-badge-xs-height);
-  --sb-badge-px: var(--prime-badge-xs-padding-x);
-  --sb-badge-text: var(--prime-badge-xs-text-size);
 }
 
 .root[data-size="l"] {
@@ -75,9 +66,6 @@
   --sb-line-height: var(--prime-control-l-line-height);
   --sb-radius: var(--prime-control-l-radius);
   --sb-gap: var(--prime-control-l-gap);
-  --sb-badge-h: var(--prime-badge-m-height);
-  --sb-badge-px: var(--prime-badge-m-padding-x);
-  --sb-badge-text: var(--prime-badge-m-text-size);
 }
 
 .root[data-size="xl"] {
@@ -87,9 +75,6 @@
   --sb-line-height: var(--prime-control-xl-line-height);
   --sb-radius: var(--prime-control-xl-radius);
   --sb-gap: var(--prime-control-xl-gap);
-  --sb-badge-h: var(--prime-badge-m-height);
-  --sb-badge-px: var(--prime-badge-m-padding-x);
-  --sb-badge-text: var(--prime-badge-m-text-size);
 }
 
 .root[data-mode="compact"] {
@@ -133,43 +118,23 @@
   overflow: hidden;
 }
 
+/*
+ * A ScrollContainer (edge fade, hidden scrollbar). The scroll edge sits at the panel edge: rows
+ * keep the rail padding as focus space, and the block padding keeps rows clear of the fades at rest.
+ */
 .content {
-  --sb-fade: var(--prime-space-4);
-
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   gap: var(--prime-space-4);
-  min-height: 0;
-  /*
-   * The scroll edge sits at the panel edge (rows keep the rail padding as focus space). Items
-   * scroll under soft fades at both ends; the block padding equals the fade, so at rest nothing
-   * is faded and no row is ever cut by a hard edge.
-   */
   margin-inline: calc(-1 * var(--sb-pad));
-  padding-block: var(--sb-fade);
+  padding-block: var(--prime-space-4);
   padding-inline: var(--sb-pad);
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  /* A classic scrollbar would take width and move the icons; the rail scrolls by wheel/touch. */
-  scrollbar-width: none;
-  mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    black var(--sb-fade),
-    black calc(100% - var(--sb-fade)),
-    transparent
-  );
 }
 
 /* Bare items without groups form one list: item rhythm, not group rhythm. */
 .content:not(:has(> .group)) {
   gap: var(--prime-space-1);
-}
-
-.content::-webkit-scrollbar {
-  display: none;
 }
 
 .footer {
@@ -304,22 +269,14 @@
   transition: opacity var(--sb-duration) var(--sb-ease);
 }
 
-.badge {
-  box-sizing: border-box;
-  display: inline-flex;
+/* The count is a kit Badge (one tier below the items); the dot stands in for it in compact mode. */
+.count {
   flex: none;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--sb-badge-h);
-  height: var(--sb-badge-h);
-  padding-inline: var(--sb-badge-px);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-secondary);
-  font-size: var(--sb-badge-text);
-  line-height: 1;
-  font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
+}
+
+.dot {
+  display: none;
 }
 
 .shortcut {
@@ -337,20 +294,27 @@
   opacity: 0;
 }
 
-/* The badge becomes a dot on the icon's top-end corner. */
-.root[data-mode="compact"]:not([data-mobile]) .badge {
+/* The count leaves the row (still read by screen readers); a dot marks the icon's top-end corner. */
+.root[data-mode="compact"]:not([data-mobile]) .count {
+  position: absolute;
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
+  margin: calc(-1 * var(--prime-border-width));
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.root[data-mode="compact"]:not([data-mobile]) .dot {
   position: absolute;
   inset-block-start: calc(50% - var(--sb-icon) / 2 - var(--prime-space-1) / 2);
   inset-inline-start: calc(var(--sb-item-pad) + var(--sb-icon) - var(--prime-space-1));
-  min-width: 0;
+  display: block;
   width: var(--prime-space-2);
   height: var(--prime-space-2);
-  padding: 0;
-  overflow: hidden;
+  border-radius: var(--prime-radius-full);
   background: var(--prime-color-accent-default);
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-bg-canvas);
-  color: transparent;
-  font-size: 0;
 }
 
 /* --- Off-canvas (responsive, < 768px) ------------------------------------------ */

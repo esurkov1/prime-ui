@@ -1,29 +1,34 @@
-/** Sidebar `size` xs → xl: item height, text and icon of the control tier; the rail width stays the same. Match the density of the app. */
-import { Home, Inbox, Settings } from "lucide-react";
-import { type ControlSize, Sidebar, Typography } from "prime-ui-kit";
+/** Every size tier: item height, text, icon and counter follow the tier; the rail width stays — `size`. */
+import { Icon, Sidebar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const SIZES: ControlSize[] = ["xs", "s", "m", "l", "xl"];
+const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function SidebarSizesExample() {
   return (
     <div className={styles.sizes}>
       {SIZES.map((size) => (
         <div key={size} className={styles.sizeColumn}>
-          <Typography.Root variant="caption" tone="muted">
-            size="{size}"
+          <Typography.Root as="span" variant="caption" tone="muted">
+            {size}
           </Typography.Root>
           <div className={`${styles.stage} ${styles.stageAuto}`}>
             <Sidebar.Root size={size} responsive={false}>
               <Sidebar.Content>
-                <Sidebar.Item icon={<Home />} active>
+                <Sidebar.Item current>
+                  <Sidebar.ItemIcon>
+                    <Icon name="nav.home" />
+                  </Sidebar.ItemIcon>
                   Главная
                 </Sidebar.Item>
-                <Sidebar.Item icon={<Inbox />} badge={4}>
+                <Sidebar.Item>
+                  <Sidebar.ItemIcon>
+                    <Icon name="field.email" />
+                  </Sidebar.ItemIcon>
                   Входящие
+                  <Sidebar.ItemCount>4</Sidebar.ItemCount>
                 </Sidebar.Item>
-                <Sidebar.Item icon={<Settings />}>Настройки</Sidebar.Item>
               </Sidebar.Content>
             </Sidebar.Root>
           </div>

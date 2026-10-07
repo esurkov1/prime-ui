@@ -46,11 +46,18 @@ function Basic(props: React.ComponentProps<typeof Sidebar.Root>) {
     <Sidebar.Root {...props}>
       <Sidebar.Content>
         <Sidebar.Group label="Разделы">
-          <Sidebar.Item icon={<Home />} active>
+          <Sidebar.Item current>
+            <Sidebar.ItemIcon>
+              <Home />
+            </Sidebar.ItemIcon>
             Главная
           </Sidebar.Item>
-          <Sidebar.Item icon={<Settings />} badge={5}>
+          <Sidebar.Item>
+            <Sidebar.ItemIcon>
+              <Settings />
+            </Sidebar.ItemIcon>
             Настройки
+            <Sidebar.ItemCount>5</Sidebar.ItemCount>
           </Sidebar.Item>
         </Sidebar.Group>
       </Sidebar.Content>
@@ -80,7 +87,20 @@ describe("Sidebar", () => {
     expect(screen.getByRole("group", { name: "Разделы" })).toBeInTheDocument();
   });
 
-  it("marks the active item with aria-current and data-state", () => {
+  it("places item parts around the label: hidden icon, count badge in the name", () => {
+    render(<Basic />);
+    const item = screen.getByRole("button", { name: /^Настройки\s*5$/ });
+    expect(item.firstElementChild).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByText("5")).toHaveAttribute("data-color", "gray");
+  });
+
+  it("puts the scrolling region in a ScrollContainer with edge fades", () => {
+    render(<Basic />);
+    const group = screen.getByRole("group", { name: "Разделы" });
+    expect(group.parentElement).toHaveAttribute("data-fade", "vertical");
+  });
+
+  it("marks the current item with aria-current and data-state", () => {
     render(<Basic />);
     const item = screen.getByRole("button", { name: "Главная" });
     expect(item).toHaveAttribute("aria-current", "page");
@@ -108,13 +128,21 @@ describe("Sidebar", () => {
     render(
       <MemoryRouter initialEntries={["/settings"]}>
         <Sidebar.Root responsive={false}>
-          <Sidebar.Item asChild icon={<Home />}>
+          <Sidebar.Item asChild>
             <NavLink to="/" end>
+              <Sidebar.ItemIcon>
+                <Home />
+              </Sidebar.ItemIcon>
               Главная
             </NavLink>
           </Sidebar.Item>
-          <Sidebar.Item asChild icon={<Settings />}>
-            <NavLink to="/settings">Настройки</NavLink>
+          <Sidebar.Item asChild>
+            <NavLink to="/settings">
+              <Sidebar.ItemIcon>
+                <Settings />
+              </Sidebar.ItemIcon>
+              Настройки
+            </NavLink>
           </Sidebar.Item>
         </Sidebar.Root>
       </MemoryRouter>,

@@ -14,14 +14,32 @@ export default function AppShellWithSidebarExample() {
               <Typography.Root variant="title-s">Acme CRM</Typography.Root>
             </Sidebar.Header>
             <Sidebar.Content>
-              <Sidebar.Item icon={<LayoutDashboard />} active>
+              <Sidebar.Item current>
+                <Sidebar.ItemIcon>
+                  <LayoutDashboard />
+                </Sidebar.ItemIcon>
                 Обзор
               </Sidebar.Item>
-              <Sidebar.Item icon={<Users />}>Клиенты</Sidebar.Item>
-              <Sidebar.Item icon={<FileText />}>Отчёты</Sidebar.Item>
+              <Sidebar.Item>
+                <Sidebar.ItemIcon>
+                  <Users />
+                </Sidebar.ItemIcon>
+                Клиенты
+              </Sidebar.Item>
+              <Sidebar.Item>
+                <Sidebar.ItemIcon>
+                  <FileText />
+                </Sidebar.ItemIcon>
+                Отчёты
+              </Sidebar.Item>
             </Sidebar.Content>
             <Sidebar.Footer>
-              <Sidebar.Item icon={<Settings />}>Настройки</Sidebar.Item>
+              <Sidebar.Item>
+                <Sidebar.ItemIcon>
+                  <Settings />
+                </Sidebar.ItemIcon>
+                Настройки
+              </Sidebar.Item>
               <Sidebar.Toggle />
             </Sidebar.Footer>
           </Sidebar.Root>
