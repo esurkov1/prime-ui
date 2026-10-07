@@ -354,11 +354,11 @@ export type {
 export { Pagination } from "./pagination/Pagination";
 export type {
   PopoverActionsProps,
+  PopoverAnchorProps,
+  PopoverCloseProps,
   PopoverContentProps,
   PopoverDescriptionProps,
   PopoverHeaderProps,
-  PopoverInsetGap,
-  PopoverInsetPadding,
   PopoverRootProps,
   PopoverTitleProps,
   PopoverTriggerProps,

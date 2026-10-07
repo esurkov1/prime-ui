@@ -1,16 +1,16 @@
-/** `flush`: no inner padding and no gap, so rows reach the panel edges and Dividers run edge to edge. Each row lays out its own padding; controls inside keep a focus-space inset. Use for notification lists and filter panels made of full-width rows. */
+/** A notification list whose rows and dividers reach the panel edges; each row brings its own padding — `flush`. */
 import { Button, Divider, Popover, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
 const EVENTS = [
-  { id: "1", title: "Счёт № 4821 оплачен", time: "12:04" },
-  { id: "2", title: "Новый отзыв на «Планшет Pro»", time: "11:47" },
-  { id: "3", title: "Синхронизация складов завершена", time: "10:30" },
+  { id: "paid", title: "Счёт № 4821 оплачен", time: "12:04" },
+  { id: "review", title: "Новый отзыв на «Планшет Pro»", time: "11:47" },
+  { id: "sync", title: "Синхронизация складов завершена", time: "10:30" },
 ];
 
-export default function PopoverFlushListExample() {
+export default function PopoverFlushExample() {
   return (
     <Popover.Root>
       <Popover.Trigger>
@@ -35,9 +35,11 @@ export default function PopoverFlushListExample() {
         ))}
         <Divider.Root role="presentation" />
         <div className={styles.flushFooter}>
-          <Button.Root variant="ghost" tone="neutral" size="s">
-            Прочитать все
-          </Button.Root>
+          <Popover.Close>
+            <Button.Root variant="ghost" tone="neutral" size="s">
+              Прочитать все
+            </Button.Root>
+          </Popover.Close>
         </div>
       </Popover.Content>
     </Popover.Root>

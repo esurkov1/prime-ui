@@ -304,7 +304,7 @@ function SmartFilterToolbar({ className }: SmartFilterToolbarProps) {
         </div>
       </Popover.Anchor>
       {hasFilters && (
-        <Popover.Content sameMinWidthAsTrigger flush size={size}>
+        <Popover.Content matchTriggerWidth flush size={size}>
           <Panel />
         </Popover.Content>
       )}

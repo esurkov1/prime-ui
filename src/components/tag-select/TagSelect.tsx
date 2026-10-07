@@ -2,6 +2,7 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Input } from "@/components/input/Input";
+import { DropdownLayerContext } from "@/components/popover/layer";
 import { Popover } from "@/components/popover/Popover";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -363,16 +364,7 @@ function TagOptionManagePopover({
           </svg>
         </button>
       </Popover.Trigger>
-      <Popover.Content
-        side="bottom"
-        align="end"
-        trapFocus={false}
-        insetPadding="none"
-        insetGap="none"
-        size="s"
-        stackAboveDropdown
-        className={styles.managePopoverSurface}
-      >
+      <Popover.Content side="bottom" align="end" size="s" className={styles.managePopoverSurface}>
         <fieldset
           className={styles.managePopoverShell}
           onKeyDown={(e) => {
@@ -1012,143 +1004,145 @@ function TagSelectRoot({
         </div>
 
         <Portal>
-          <ScrollContainer
-            ref={listboxRef}
-            id={listboxId}
-            role="listbox"
-            aria-multiselectable="true"
-            aria-label={ariaLabel}
-            aria-labelledby={ariaLabelledBy}
-            aria-hidden={!open}
-            tabIndex={-1}
-            data-react-aria-top-layer="true"
-            data-overlay-portal-layer={overlayPortalLayer}
-            className={cx(styles.panel, overlayMotion.floating)}
-            onKeyDown={onListboxKeyDown}
-            onAnimationEnd={presence.onExitEnd}
-            style={{ display: presence.mounted ? undefined : "none" }}
-            {...toDataAttributes({ side: resolvedSide, size, state: presence.state })}
-          >
-            {labels.panelHint ? <div className={styles.hint}>{labels.panelHint}</div> : null}
+          <DropdownLayerContext.Provider value>
+            <ScrollContainer
+              ref={listboxRef}
+              id={listboxId}
+              role="listbox"
+              aria-multiselectable="true"
+              aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledBy}
+              aria-hidden={!open}
+              tabIndex={-1}
+              data-react-aria-top-layer="true"
+              data-overlay-portal-layer={overlayPortalLayer}
+              className={cx(styles.panel, overlayMotion.floating)}
+              onKeyDown={onListboxKeyDown}
+              onAnimationEnd={presence.onExitEnd}
+              style={{ display: presence.mounted ? undefined : "none" }}
+              {...toDataAttributes({ side: resolvedSide, size, state: presence.state })}
+            >
+              {labels.panelHint ? <div className={styles.hint}>{labels.panelHint}</div> : null}
 
-            {showCreate ? (
-              <button
-                key={CREATE_VALUE}
-                id={tagOptionDomId(listboxId, CREATE_VALUE)}
-                type="button"
-                role="option"
-                aria-selected={false}
-                tabIndex={-1}
-                className={styles.option}
-                {...toDataAttributes({
-                  value: CREATE_VALUE,
-                  label: inputTrim,
-                  highlighted: highlightedValue === CREATE_VALUE,
-                  disabled: false,
-                })}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                }}
-                onMouseMove={() => setHighlightedValue(CREATE_VALUE)}
-                onClick={() => handleSelectFromList(CREATE_VALUE)}
-              >
-                <span className={styles.optionLead} aria-hidden>
-                  <PlusIcon />
-                </span>
-                <span className={styles.createLabel}>{labels.create}</span>
-                <Badge.Root color={defaultColor} className={styles.chip}>
-                  <span className={styles.chipLabel}>{inputTrim}</span>
-                </Badge.Root>
-              </button>
-            ) : null}
-
-            {filteredForPick.map((o) => {
-              const chip = (
-                <Badge.Root
-                  color={o.color ?? defaultColor}
-                  disabled={o.disabled}
-                  className={styles.chip}
+              {showCreate ? (
+                <button
+                  key={CREATE_VALUE}
+                  id={tagOptionDomId(listboxId, CREATE_VALUE)}
+                  type="button"
+                  role="option"
+                  aria-selected={false}
+                  tabIndex={-1}
+                  className={styles.option}
+                  {...toDataAttributes({
+                    value: CREATE_VALUE,
+                    label: inputTrim,
+                    highlighted: highlightedValue === CREATE_VALUE,
+                    disabled: false,
+                  })}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                  }}
+                  onMouseMove={() => setHighlightedValue(CREATE_VALUE)}
+                  onClick={() => handleSelectFromList(CREATE_VALUE)}
                 >
-                  <span className={styles.chipLabel}>{o.label}</span>
-                </Badge.Root>
-              );
-              const isSelected = selected.includes(o.value);
-              const checkbox = (
-                <span className={styles.optionCheckbox} aria-hidden>
-                  {isSelected ? <CheckIcon /> : null}
-                </span>
-              );
-              const rowData = toDataAttributes({
-                value: o.value,
-                label: o.label,
-                highlighted: highlightedValue === o.value,
-                selected: isSelected,
-                disabled: Boolean(o.disabled),
-              });
-              if (manageable) {
+                  <span className={styles.optionLead} aria-hidden>
+                    <PlusIcon />
+                  </span>
+                  <span className={styles.createLabel}>{labels.create}</span>
+                  <Badge.Root color={defaultColor} className={styles.chip}>
+                    <span className={styles.chipLabel}>{inputTrim}</span>
+                  </Badge.Root>
+                </button>
+              ) : null}
+
+              {filteredForPick.map((o) => {
+                const chip = (
+                  <Badge.Root
+                    color={o.color ?? defaultColor}
+                    disabled={o.disabled}
+                    className={styles.chip}
+                  >
+                    <span className={styles.chipLabel}>{o.label}</span>
+                  </Badge.Root>
+                );
+                const isSelected = selected.includes(o.value);
+                const checkbox = (
+                  <span className={styles.optionCheckbox} aria-hidden>
+                    {isSelected ? <CheckIcon /> : null}
+                  </span>
+                );
+                const rowData = toDataAttributes({
+                  value: o.value,
+                  label: o.label,
+                  highlighted: highlightedValue === o.value,
+                  selected: isSelected,
+                  disabled: Boolean(o.disabled),
+                });
+                if (manageable) {
+                  return (
+                    <div
+                      key={o.value}
+                      id={tagOptionDomId(listboxId, o.value)}
+                      role="option"
+                      tabIndex={-1}
+                      aria-selected={isSelected}
+                      aria-disabled={o.disabled || undefined}
+                      className={cx(styles.option, styles.optionManaged)}
+                      {...rowData}
+                      onMouseMove={() => !o.disabled && setHighlightedValue(o.value)}
+                    >
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        className={styles.optionSelect}
+                        disabled={o.disabled}
+                        onMouseDown={(e) => {
+                          if (!o.disabled) e.preventDefault();
+                        }}
+                        onClick={() => !o.disabled && handleSelectFromList(o.value)}
+                      >
+                        {checkbox}
+                        {chip}
+                      </button>
+                      {!o.disabled ? (
+                        <TagOptionManagePopover
+                          option={o}
+                          open={manageOpenValue === o.value}
+                          onOpenChange={(next) => setManageOpenValue(next ? o.value : null)}
+                          defaultColor={defaultColor}
+                          onUpdate={handleOptionUpdate}
+                          onDelete={handleOptionDelete}
+                          labels={labels}
+                          disabled={disabled}
+                        />
+                      ) : null}
+                    </div>
+                  );
+                }
                 return (
-                  <div
+                  <button
                     key={o.value}
                     id={tagOptionDomId(listboxId, o.value)}
+                    type="button"
                     role="option"
                     tabIndex={-1}
                     aria-selected={isSelected}
-                    aria-disabled={o.disabled || undefined}
-                    className={cx(styles.option, styles.optionManaged)}
+                    disabled={o.disabled}
+                    className={styles.option}
                     {...rowData}
+                    onMouseDown={(e) => {
+                      if (!o.disabled) e.preventDefault();
+                    }}
                     onMouseMove={() => !o.disabled && setHighlightedValue(o.value)}
+                    onClick={() => !o.disabled && handleSelectFromList(o.value)}
                   >
-                    <button
-                      type="button"
-                      tabIndex={-1}
-                      className={styles.optionSelect}
-                      disabled={o.disabled}
-                      onMouseDown={(e) => {
-                        if (!o.disabled) e.preventDefault();
-                      }}
-                      onClick={() => !o.disabled && handleSelectFromList(o.value)}
-                    >
-                      {checkbox}
-                      {chip}
-                    </button>
-                    {!o.disabled ? (
-                      <TagOptionManagePopover
-                        option={o}
-                        open={manageOpenValue === o.value}
-                        onOpenChange={(next) => setManageOpenValue(next ? o.value : null)}
-                        defaultColor={defaultColor}
-                        onUpdate={handleOptionUpdate}
-                        onDelete={handleOptionDelete}
-                        labels={labels}
-                        disabled={disabled}
-                      />
-                    ) : null}
-                  </div>
+                    {checkbox}
+                    {chip}
+                  </button>
                 );
-              }
-              return (
-                <button
-                  key={o.value}
-                  id={tagOptionDomId(listboxId, o.value)}
-                  type="button"
-                  role="option"
-                  tabIndex={-1}
-                  aria-selected={isSelected}
-                  disabled={o.disabled}
-                  className={styles.option}
-                  {...rowData}
-                  onMouseDown={(e) => {
-                    if (!o.disabled) e.preventDefault();
-                  }}
-                  onMouseMove={() => !o.disabled && setHighlightedValue(o.value)}
-                  onClick={() => !o.disabled && handleSelectFromList(o.value)}
-                >
-                  {checkbox}
-                  {chip}
-                </button>
-              );
-            })}
-          </ScrollContainer>
+              })}
+            </ScrollContainer>
+          </DropdownLayerContext.Provider>
         </Portal>
       </ControlSizeProvider>
     </FieldFrame>

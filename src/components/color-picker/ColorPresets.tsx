@@ -302,7 +302,7 @@ function useNarrowViewport() {
 function Content({ label, align = "start", side = "bottom", className }: ColorPresetsContentProps) {
   const { size } = useColorPresetsContext();
   return (
-    <Popover.Content align={align} side={side} size={size} insetGap="x2" className={className}>
+    <Popover.Content align={align} side={side} size={size} className={className}>
       <SwatchList label={label} />
     </Popover.Content>
   );
@@ -372,7 +372,7 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
   };
 
   return (
-    <>
+    <div className={styles.body}>
       {label != null ? (
         <div id={labelId} className={styles.label} data-size={size}>
           {label}
@@ -415,7 +415,7 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
           );
         })}
       </div>
-    </>
+    </div>
   );
 }
 

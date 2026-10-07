@@ -1,32 +1,32 @@
-/** `side` (bottom · top) and `align` (start · center · end). Near the viewport edge the panel flips and shifts automatically. */
+/** Every side and alignment relative to the trigger; near the viewport edge the panel flips and shifts — `side`, `align`. */
 import { Button, Popover, Typography } from "prime-ui-kit";
 
-import preview from "./examples.module.css";
-
 const PLACEMENTS = [
-  { label: "Снизу · начало", side: "bottom", align: "start" },
-  { label: "Снизу · центр", side: "bottom", align: "center" },
-  { label: "Снизу · конец", side: "bottom", align: "end" },
-  { label: "Сверху · начало", side: "top", align: "start" },
+  { side: "bottom", align: "start" },
+  { side: "bottom", align: "center" },
+  { side: "bottom", align: "end" },
+  { side: "top", align: "start" },
+  { side: "top", align: "center" },
+  { side: "top", align: "end" },
 ] as const;
 
 export default function PopoverPlacementExample() {
   return (
-    <div className={preview.row}>
-      {PLACEMENTS.map(({ label, side, align }) => (
-        <Popover.Root key={label}>
+    <>
+      {PLACEMENTS.map(({ side, align }) => (
+        <Popover.Root key={`${side}-${align}`}>
           <Popover.Trigger>
             <Button.Root variant="soft" tone="neutral">
-              {label}
+              {side} · {align}
             </Button.Root>
           </Popover.Trigger>
           <Popover.Content side={side} align={align}>
-            <Typography.Root variant="body-s" tone="secondary" className={preview.text}>
-              side=&quot;{side}&quot;, align=&quot;{align}&quot;
+            <Typography.Root variant="body-s" tone="secondary">
+              Срок оплаты счёта — 5 рабочих дней.
             </Typography.Root>
           </Popover.Content>
         </Popover.Root>
       ))}
-    </div>
+    </>
   );
 }
