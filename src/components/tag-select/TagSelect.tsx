@@ -2,22 +2,22 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Checkbox } from "@/components/checkbox/Checkbox";
-import menu from "@/components/dropdown/menu.module.css";
-import { DropdownLayerContext } from "@/components/popover/layer";
-import surface from "@/components/popover/surface.module.css";
-import { useAnchoredPosition } from "@/components/popover/useAnchoredPosition";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
-import { enabledOptions, handleListboxKeyDown } from "@/components/select/selectListbox";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { usePosition } from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
-import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
+import surface from "@/internal/floatingSurface.module.css";
+import { formatLabel } from "@/internal/formatLabel";
+import { enabledOptions, handleListboxKeyDown } from "@/internal/listbox";
+import menu from "@/internal/menu.module.css";
+import { DropdownLayerContext, useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import type { ControlSize, PaletteColor } from "@/internal/states";
@@ -99,9 +99,6 @@ const CREATE_VALUE = "__prime_tag_select_create__";
 
 const optionDomId = (listboxId: string, value: string) =>
   `${listboxId}-opt-${value.replace(/\s+/g, "_")}`;
-
-const fill = (template: string, token: string, value: string | number) =>
-  template.replace(`{${token}}`, String(value));
 
 /** Matches of the query, the selected ones first: they can be unticked from here too. */
 function listOptions(options: TagSelectOption[], query: string, selected: string[]) {
@@ -239,7 +236,7 @@ export function TagSelect({
   const listboxRef = React.useRef<HTMLElement | null>(null);
 
   const overlayPortalLayer = useOverlayPortalLayer();
-  const position = useAnchoredPosition(open, triggerRef, listboxRef, {
+  const position = usePosition(open, triggerRef, listboxRef, {
     side: "bottom",
     align: "start",
     matchAnchorWidth: true,
@@ -349,7 +346,7 @@ export function TagSelect({
 
   const removeChip = (chip: { value: string; label: string }) => {
     setSelected((prev) => prev.filter((x) => x !== chip.value));
-    setAnnouncement(fill(labels.removed, "label", chip.label));
+    setAnnouncement(formatLabel(labels.removed, { label: chip.label }));
   };
 
   const chipElements = () =>
@@ -482,7 +479,7 @@ export function TagSelect({
         color={chip.color}
         disabled={disabled}
         className={styles.chip}
-        labels={{ remove: fill(labels.remove, "label", chip.label) }}
+        labels={{ remove: formatLabel(labels.remove, { label: chip.label }) }}
         // Reached with the arrow keys from the input (not a tab stop); Delete / Backspace remove.
         tabIndex={live && !disabled ? -1 : undefined}
         data-chip-value={live ? chip.value : undefined}
@@ -636,7 +633,9 @@ export function TagSelect({
                 onPress={() => inputRef.current?.focus()}
               >
                 <span aria-hidden="true">+{hiddenChips.length}</span>
-                <VisuallyHidden>{fill(labels.more, "count", hiddenChips.length)}</VisuallyHidden>
+                <VisuallyHidden>
+                  {formatLabel(labels.more, { count: hiddenChips.length })}
+                </VisuallyHidden>
               </Badge.Root>
             ) : null}
             <input

@@ -55,20 +55,6 @@ function CardIconBox({ className, children, ...rest }: CardIconBoxProps) {
 }
 CardIconBox.displayName = "Card.IconBox";
 
-export type CardLeadProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-function CardLead({ className, children, ...rest }: CardLeadProps) {
-  return (
-    <div className={cx(styles.lead, className)} {...rest}>
-      {children}
-    </div>
-  );
-}
-CardLead.displayName = "Card.Lead";
-
 export type CardHeaderRowProps = {
   className?: string;
   children?: React.ReactNode;
@@ -201,20 +187,6 @@ function CardActions({ className, children, ...rest }: CardActionsProps) {
 }
 CardActions.displayName = "Card.Actions";
 
-export type CardCtaBodyProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-function CardCtaBody({ className, children, ...rest }: CardCtaBodyProps) {
-  return (
-    <div className={cx(styles.ctaBody, className)} {...rest}>
-      {children}
-    </div>
-  );
-}
-CardCtaBody.displayName = "Card.CtaBody";
-
 export type CardCoverProps = {
   className?: string;
   children?: React.ReactNode;
@@ -242,34 +214,6 @@ function CardSplit({ className, children, ...rest }: CardSplitProps) {
   );
 }
 CardSplit.displayName = "Card.Split";
-
-export type CardSplitCellProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-function CardSplitCell({ className, children, ...rest }: CardSplitCellProps) {
-  return (
-    <div className={cx(styles.splitCell, className)} {...rest}>
-      {children}
-    </div>
-  );
-}
-CardSplitCell.displayName = "Card.SplitCell";
-
-export type CardListHeaderProps = {
-  className?: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-function CardListHeader({ className, children, ...rest }: CardListHeaderProps) {
-  return (
-    <div className={cx(styles.listHeader, className)} {...rest}>
-      {children}
-    </div>
-  );
-}
-CardListHeader.displayName = "Card.ListHeader";
 
 export type CardListProps = {
   className?: string;
@@ -380,7 +324,6 @@ CardChart.displayName = "Card.Chart";
 export const Card = {
   Root: CardRoot,
   IconBox: CardIconBox,
-  Lead: CardLead,
   HeaderRow: CardHeaderRow,
   Stack: CardStack,
   Label: CardLabel,
@@ -390,11 +333,8 @@ export const Card = {
   Title: CardTitle,
   Delta: CardDelta,
   Actions: CardActions,
-  CtaBody: CardCtaBody,
   Cover: CardCover,
   Split: CardSplit,
-  SplitCell: CardSplitCell,
-  ListHeader: CardListHeader,
   List: CardList,
   ListItem: CardListItem,
   SectionHeader: CardSectionHeader,

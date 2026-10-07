@@ -1,12 +1,12 @@
 /**
- * Fallback, если нет `document` (SSR) или `getComputedStyle` не дал валидный px
- * (должен совпадать с типичным `font-size` на `:root` в `globals`).
+ * Fallback without a `document` (SSR) or when `getComputedStyle` gives no valid px
+ * (matches the usual `:root` `font-size` in `globals`).
  */
 const FALLBACK_ROOT_FONT_PX = 16;
 
 /**
- * Текущий вычисленный `font-size` корня (`html`) в px — для перевода rem из примитивов
- * в пиксели floating UI / SVG без жёсткой привязки к 16.
+ * The computed root (`html`) `font-size` in px: converts rem primitives to pixels for floating UI
+ * and SVG without assuming 16.
  */
 export function getRootFontSizePx(): number {
   if (typeof document === "undefined") {

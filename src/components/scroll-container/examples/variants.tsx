@@ -1,5 +1,5 @@
 /** A strip that scrolls sideways and a wide schedule that scrolls both ways — `axis`. */
-import { Badge, ScrollContainer, Typography } from "prime-ui-kit";
+import { Badge, Card, ScrollContainer, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -10,7 +10,7 @@ const ROOMS = Array.from({ length: 16 }, (_, index) => `Зал ${index + 1}`);
 export default function ScrollContainerVariantsExample() {
   return (
     <div className={styles.layout}>
-      <section className={styles.card} aria-label="Фильтры">
+      <Card.Root role="region" className={styles.card} aria-label="Фильтры">
         <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
           horizontal
         </Typography.Root>
@@ -21,8 +21,8 @@ export default function ScrollContainerVariantsExample() {
             ))}
           </div>
         </ScrollContainer>
-      </section>
-      <section className={styles.card} aria-label="Расписание залов">
+      </Card.Root>
+      <Card.Root role="region" className={styles.card} aria-label="Расписание залов">
         <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
           both
         </Typography.Root>
@@ -48,7 +48,7 @@ export default function ScrollContainerVariantsExample() {
             )}
           </div>
         </ScrollContainer>
-      </section>
+      </Card.Root>
     </div>
   );
 }

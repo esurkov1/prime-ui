@@ -3,15 +3,14 @@ import * as React from "react";
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
-import { markContrast, sameColor } from "@/internal/colorSwatch";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { mergeRefs } from "@/internal/mergeRefs";
 import { gridIndex } from "@/internal/rovingFocus";
 import type { ControlSize } from "@/internal/states";
+import { markContrast, SwatchCheck, SwatchFill, sameColor, swatchClass } from "@/internal/swatch";
 
 import styles from "./ColorPresets.module.css";
-import { SwatchCheck, SwatchFill, swatchClass } from "./swatch";
 
 export type ColorPreset = {
   /** CSS color stored as the value (`onValueChange` returns it as is). */

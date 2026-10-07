@@ -11,50 +11,17 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { formatLabel } from "@/internal/formatLabel";
 import { DATA_TABLE_INFINITE_ROOT_MARGIN } from "@/internal/runtimeUnits";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./DataTable.module.css";
 import { columnValue, nextSort, sortRows } from "./sort";
+import type { DataTableCellAlign, DataTableColumn, DataTableSortState } from "./types";
 import { useFrozenColumns } from "./useFrozenColumns";
 
-export type DataTableOrder = "asc" | "desc";
-export type DataTableSortState = { columnId: string; order: DataTableOrder } | null;
-type CellAlign = "start" | "center" | "end";
-
-export type DataTableColumn<Row> = {
-  id: string;
-  header: React.ReactNode;
-  accessor?: keyof Row | ((row: Row) => unknown);
-  cell?: (row: Row) => React.ReactNode;
-  sortable?: boolean;
-  sortAccessor?: (row: Row) => unknown;
-  sortComparator?: (a: Row, b: Row, order: DataTableOrder) => number;
-  align?: CellAlign;
-  /**
-   * Header alignment, independent of `align`: headers start at the start edge so every header lines
-   * up, with the sort indicator at the end edge.
-   */
-  headerAlign?: CellAlign;
-  width?: string;
-  minWidth?: string;
-  maxWidth?: string;
-  /** `tabular-nums`, no wrapping, `end` alignment unless `align` is set. */
-  numeric?: boolean;
-  /** One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`. */
-  truncate?: boolean;
-  /**
-   * The column takes the free width of the table and wraps its text (descriptions, comments). With
-   * such a column the table fills its container instead of growing to its content width.
-   */
-  grow?: boolean;
-  onHeaderClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
-  onCellClick?: (
-    row: Row,
-    event: React.MouseEvent<HTMLTableCellElement> | React.KeyboardEvent<HTMLTableCellElement>,
-  ) => void;
-};
+export type { DataTableColumn, DataTableOrder, DataTableSortState } from "./types";
 
 /** System strings; `{from}`, `{to}`, `{total}`, `{label}`, `{count}` are replaced. */
 export type DataTableLabels = {
@@ -92,10 +59,6 @@ const DEFAULT_LABELS: DataTableLabels = {
   expand: "Развернуть строку {label}",
   collapse: "Свернуть строку {label}",
 };
-
-function fill(template: string, values: Record<string, string | number | undefined>): string {
-  return template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? "")).trim();
-}
 
 export type DataTableProps<Row> = {
   columns: DataTableColumn<Row>[];
@@ -173,7 +136,7 @@ export type DataTableProps<Row> = {
   toolbar?: React.ReactNode;
 };
 
-function columnAlign<Row>(column: DataTableColumn<Row>): CellAlign {
+function columnAlign<Row>(column: DataTableColumn<Row>): DataTableCellAlign {
   return column.align ?? (column.numeric ? "end" : "start");
 }
 
@@ -479,7 +442,7 @@ export function DataTable<Row>({
   const commitSelection = (next: Set<React.Key>) => {
     selectedRef.current = next;
     setSelectedKeys(Array.from(next));
-    setAnnouncement(fill(labels.selectedCount, { count: next.size }));
+    setAnnouncement(formatLabel(labels.selectedCount, { count: next.size }));
   };
 
   /** Sets every rendered row between two visible indices (inclusive) to `value`. */
@@ -699,9 +662,7 @@ export function DataTable<Row>({
                         disabled={allKeys.length === 0}
                         onCheckedChange={handleSelectAll}
                         aria-label={labels.selectAll}
-                      >
-                        <Checkbox.Label />
-                      </Checkbox.Root>
+                      />
                     </th>
                   ) : null}
                   {expandEnabled ? <th scope="col" className={leadCells("head").toggle} /> : null}
@@ -860,10 +821,8 @@ export function DataTable<Row>({
                               selectAt(index, value, shiftKeyRef.current);
                               shiftKeyRef.current = false;
                             }}
-                            aria-label={fill(labels.selectRow, { label: rowLabel })}
-                          >
-                            <Checkbox.Label />
-                          </Checkbox.Root>
+                            aria-label={formatLabel(labels.selectRow, { label: rowLabel })}
+                          />
                         </td>
                       ) : null}
                       {expandEnabled ? (
@@ -875,9 +834,12 @@ export function DataTable<Row>({
                               size={TOGGLE_SIZE[size]}
                               aria-expanded={item.expanded}
                               aria-controls={controls || undefined}
-                              aria-label={fill(item.expanded ? labels.collapse : labels.expand, {
-                                label: rowLabel,
-                              })}
+                              aria-label={formatLabel(
+                                item.expanded ? labels.collapse : labels.expand,
+                                {
+                                  label: rowLabel,
+                                },
+                              )}
                               onClick={(event) => {
                                 event.stopPropagation();
                                 toggleExpanded(key);
@@ -991,7 +953,7 @@ export function DataTable<Row>({
           <div className={styles.footer}>
             {showRange ? (
               <p className={styles.meta}>
-                {fill(labels.range, {
+                {formatLabel(labels.range, {
                   from: totalRows === 0 ? 0 : pageOffset + 1,
                   to: pageOffset + displayedRows.length,
                   total: totalRows,

@@ -1,5 +1,4 @@
 /** Optional parts: a visible title and description, a description line and a key hint in items, and a footer with key hints — `CommandMenu.Title`, `CommandMenu.ItemText`, `CommandMenu.ItemShortcut`, `CommandMenu.Footer`. */
-import { FileText, Settings } from "lucide-react";
 import { Button, CommandMenu, Icon } from "prime-ui-kit";
 import * as React from "react";
 
@@ -21,7 +20,7 @@ export default function CommandMenuStructureExample() {
           <CommandMenu.Group label="Документы">
             <CommandMenu.Item value="новый счёт" keywords="invoice" onSelect={close}>
               <CommandMenu.ItemIcon>
-                <FileText />
+                <Icon name="object.document" />
               </CommandMenu.ItemIcon>
               <CommandMenu.ItemText description="Черновик в разделе «Счета»">
                 Новый счёт
@@ -30,7 +29,7 @@ export default function CommandMenuStructureExample() {
             </CommandMenu.Item>
             <CommandMenu.Item value="профиль" keywords="account" onSelect={close}>
               <CommandMenu.ItemIcon>
-                <Settings />
+                <Icon name="action.settings" />
               </CommandMenu.ItemIcon>
               <CommandMenu.ItemText description="Имя, почта, пароль">Профиль</CommandMenu.ItemText>
               <CommandMenu.ItemShortcut>⌘,</CommandMenu.ItemShortcut>

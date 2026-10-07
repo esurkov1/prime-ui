@@ -5,7 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Select } from "@/components/select/Select";
 
-import { DropdownLayerContext } from "./layer";
+import { DropdownLayerContext } from "@/internal/OverlayPortalLayerContext";
+
 import { Popover } from "./Popover";
 
 function BasicPopover({

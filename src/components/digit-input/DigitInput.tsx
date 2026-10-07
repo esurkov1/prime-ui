@@ -4,6 +4,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./DigitInput.module.css";
@@ -193,9 +194,7 @@ export function DigitInput({
               groupSize && index > 0 && index % groupSize === 0 ? "true" : undefined
             }
             value={cell}
-            aria-label={labels.cell
-              .replace("{index}", String(index + 1))
-              .replace("{length}", String(length))}
+            aria-label={formatLabel(labels.cell, { index: index + 1, length })}
             aria-invalid={ids.invalid || undefined}
             onFocus={(event) => {
               if (index > entryIndex) {

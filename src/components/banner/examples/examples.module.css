@@ -17,17 +17,6 @@
   min-width: 0;
 }
 
-.pageFrame {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
-  overflow: hidden;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
-}
-
 .pageBody {
   padding: var(--prime-space-5) var(--prime-space-4) var(--prime-space-8);
 }

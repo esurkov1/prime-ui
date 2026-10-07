@@ -2,17 +2,14 @@ import * as React from "react";
 
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Divider } from "@/components/divider/Divider";
-import menu from "@/components/dropdown/menu.module.css";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
-import { DropdownLayerContext } from "@/components/popover/layer";
-import surface from "@/components/popover/surface.module.css";
-import { useAnchoredPosition } from "@/components/popover/useAnchoredPosition";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Spinner } from "@/components/spinner/Spinner";
 import { Thumbnail, type ThumbnailRootProps } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { usePosition } from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -20,14 +17,16 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import surface from "@/internal/floatingSurface.module.css";
+import { enabledOptions, handleListboxKeyDown } from "@/internal/listbox";
+import menu from "@/internal/menu.module.css";
 import { mergeRefs } from "@/internal/mergeRefs";
-import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
+import { DropdownLayerContext, useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Select.module.css";
-import { enabledOptions, handleListboxKeyDown } from "./selectListbox";
 
 export type SelectLabels = {
   /** Placeholder and accessible name of the search field (`Select.Content searchable`). */
@@ -604,7 +603,7 @@ function SelectContent({ searchable = false, className, children }: SelectConten
   const contentRef = React.useRef<HTMLElement | null>(null);
   const listboxRef = React.useRef<HTMLElement | null>(null);
   const searchRef = React.useRef<HTMLInputElement | null>(null);
-  const position = useAnchoredPosition(isOpen, triggerRef, contentRef, {
+  const position = usePosition(isOpen, triggerRef, contentRef, {
     side: "bottom",
     align: "start",
     matchAnchorWidth: true,
@@ -782,7 +781,7 @@ function SelectContent({ searchable = false, className, children }: SelectConten
           </ScrollContainer>
           {isEmpty && !loading ? (
             <EmptyPage.Root layout="compact" role="status">
-              <EmptyPage.Title>{labels.empty}</EmptyPage.Title>
+              <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
               {query !== "" && labels.emptyHint ? (
                 <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
               ) : null}

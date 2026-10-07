@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "LinkButton",
-      en: "`forwardRef` → `HTMLAnchorElement` (the `<span>` when `disabled`). A native `<a>` styled as a text action; passes its tier to nested icons.",
+      en: "`forwardRef` → `HTMLAnchorElement` (the `<span>` when `disabled`, the child with `asChild`). A native `<a>` styled as a text action; passes its tier to nested icons.",
       ru: "Нативная ссылка `<a>` в виде текстового действия; передаёт ярус вложенным иконкам.",
       props: [
         {
@@ -27,6 +27,13 @@ export const api: ComponentApi = {
           default: "false",
           en: 'Renders `<span role="link" aria-disabled="true" tabIndex={-1}>` without `href`; the native anchor props are not passed.',
           ru: 'Рендерит `<span role="link">` без `href` и вне порядка Tab; атрибуты ссылки не передаются.',
+        },
+        {
+          name: "asChild",
+          type: "boolean",
+          default: "false",
+          en: 'Merges the link look onto its single child instead of rendering `<a>`: a router link, or a `<button type="button">` for an inline action that is not navigation. `disabled` becomes `aria-disabled` and swallows the click.',
+          ru: 'Переносит вид ссылки на единственный дочерний элемент вместо `<a>`: ссылку роутера или `<button type="button">` для действия в тексте. `disabled` становится `aria-disabled` и гасит клик.',
         },
         {
           name: "children",

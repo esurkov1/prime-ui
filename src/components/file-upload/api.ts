@@ -149,11 +149,6 @@ export const api: ComponentApi = {
       props: [],
     },
     {
-      name: "FileUpload.BrowseLink",
-      en: "`forwardRef` → `HTMLButtonElement`. An inline link-styled button inside a custom title; it does not activate the zone, so pass `onClick` (e.g. `inputRef.current?.click()`).",
-      props: [],
-    },
-    {
       name: "FileUpload.Item",
       en: "No ref. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.",
       props: [

@@ -41,7 +41,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 |---|---|---|---|
 | `variant` | `"solid" \| "soft" \| "outline" \| "ghost"` | `"solid"` | Visual treatment. |
 | `tone` | `"accent" \| "neutral" \| "danger"` | `"accent"` | Meaning of the action; `danger` for destructive actions. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
 | `loading` | `boolean` | `false` | Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content. |
 | `asChild` | `boolean` | `false` | Merges Button props and styles onto the single child element instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`. |
@@ -76,7 +76,7 @@ No ref. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
 | `ghost` + `neutral` | transparent, secondary text → primary on hover | toolbar buttons, icon-only buttons | |
 | `ghost` + `danger` | transparent, danger text, `danger-soft` on hover | destructive action set apart in a footer | |
 
-`outline` is the only variant with a visible line. With `asChild` and `aria-current="page"`, `ghost`/`soft` show the `fill-subtle-active` selected look.
+`outline` is the only variant with a visible line. With `aria-current="page"` (usually via `asChild` on a router link), `ghost`/`soft` show the `fill-subtle-active` selected look; soft accent keeps its own accent look, so a current item can be marked with accent explicitly (Pagination).
 
 ### size
 | Value | Looks like | Use when | Default |

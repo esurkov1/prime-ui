@@ -13,12 +13,12 @@ export default function LoginFormNarrowExample() {
         </LoginForm.Header>
         <LoginForm.Body>
           <LoginForm.Form onSubmit={(event) => event.preventDefault()}>
-            <Input.Root size="s" label="Рабочая почта" required>
+            <Input.Root label="Рабочая почта" required>
               <Input.Wrapper>
                 <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
               </Input.Wrapper>
             </Input.Root>
-            <Button.Root type="submit" size="s" fullWidth>
+            <Button.Root type="submit" fullWidth>
               Получить ссылку
             </Button.Root>
           </LoginForm.Form>

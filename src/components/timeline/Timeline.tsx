@@ -258,12 +258,20 @@ TimelineValueMeta.displayName = "Timeline.ValueMeta";
 
 // ─── Gap ──────────────────────────────────────────────────────────────────────
 
+export type TimelineGapMetaProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/** A caption on the right of a gap (e.g. «сейчас»). */
+function TimelineGapMeta({ className, ...rest }: TimelineGapMetaProps) {
+  return <span className={cx(styles.gapTrailing, className)} {...rest} />;
+}
+TimelineGapMeta.displayName = "Timeline.GapMeta";
+
 export type TimelineGapProps = {
   /** Caption color and hollow dot. Default `neutral` (muted); `warning` / `danger` flag a long interval. */
   tone?: Tone;
-  /** Optional trailing caption on the right (e.g. «сейчас»). */
-  trailing?: React.ReactNode;
-  /** Interval caption, e.g. «40 дней · 2 200 км без обслуживания». */
+  /** Interval caption, e.g. «40 дней · 2 200 км без обслуживания», and an optional `Timeline.GapMeta`. */
   children: React.ReactNode;
   className?: string;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
@@ -273,10 +281,14 @@ export type TimelineGapProps = {
  * muted caption. Renders an `li`, so it goes inside `Timeline.Group` between items.
  */
 const TimelineGap = React.forwardRef<HTMLDivElement, TimelineGapProps>(function TimelineGap(
-  { tone = "neutral", trailing, children, className, ...rest },
+  { tone = "neutral", children, className, ...rest },
   ref,
 ) {
-  const hasTrailing = trailing !== undefined && trailing !== null && trailing !== false;
+  const parts = React.Children.toArray(children);
+  const isMeta = (child: React.ReactNode) =>
+    React.isValidElement(child) && child.type === TimelineGapMeta;
+  const caption = parts.filter((child) => !isMeta(child));
+  const meta = parts.filter(isMeta);
   return (
     <li className={cx(styles.item, styles.gapItem)}>
       <div
@@ -286,8 +298,8 @@ const TimelineGap = React.forwardRef<HTMLDivElement, TimelineGapProps>(function 
         {...toDataAttributes({ tone })}
       >
         <span className={styles.gapDot} aria-hidden="true" />
-        <span className={styles.gapCaption}>{children}</span>
-        {hasTrailing ? <span className={styles.gapTrailing}>{trailing}</span> : null}
+        <span className={styles.gapCaption}>{caption}</span>
+        {meta}
       </div>
     </li>
   );
@@ -304,4 +316,5 @@ export const Timeline = {
   Value: TimelineValue,
   ValueMeta: TimelineValueMeta,
   Gap: TimelineGap,
+  GapMeta: TimelineGapMeta,
 };

@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import menu from "@/components/dropdown/menu.module.css";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Kbd } from "@/components/kbd/Kbd";
 import { Modal } from "@/components/modal/Modal";
@@ -10,6 +9,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import menu from "@/internal/menu.module.css";
 import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
@@ -479,7 +479,7 @@ function CommandMenuEmpty({ children, ...rest }: CommandMenuEmptyProps) {
   if (visibleIds.length > 0) return null;
   return (
     <EmptyPage.Root layout="compact" role="status" {...rest}>
-      <EmptyPage.Title>{labels.empty}</EmptyPage.Title>
+      <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
       {labels.emptyHint ? <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description> : null}
       {children ? <EmptyPage.Actions>{children}</EmptyPage.Actions> : null}
     </EmptyPage.Root>

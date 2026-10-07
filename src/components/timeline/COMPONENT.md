@@ -31,6 +31,7 @@ Timeline.Root                    size container, sets the tier
    │  └─ Timeline.Value          trailing amount
    │     └─ Timeline.ValueMeta   second line under the amount
    └─ Timeline.Gap               <li>: interval between events (dashed segment, hollow dot)
+      └─ Timeline.GapMeta        caption on the right («сейчас»)
 ```
 
 ## API
@@ -88,8 +89,14 @@ Timeline.Root                    size container, sets the tier
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Caption and dot color; `warning` / `danger` flag a long interval. |
-| `trailing` | `ReactNode` | — | A caption on the right («сейчас»). |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `children` (the interval caption), `className` and the other div attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `children` (the interval caption and an optional `Timeline.GapMeta`), `className` and the other div attributes. |
+
+### Timeline.GapMeta
+`ref` → `HTMLSpanElement`. A caption on the right of the gap («сейчас»), in the gap tone.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ## Variants
 
@@ -165,7 +172,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | An operations feed: one labelled group, a line through the dots and the current row highlighted — `Timeline.Group`, `current`. |
 | [variants.tsx](examples/variants.tsx) | Dot hues for categories at reduced emphasis, and status tones on items, values and gaps at full emphasis — `color`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier scales text, dot and row rhythm, rows 40 to 76 px — `size`. |
-| [structure.tsx](examples/structure.tsx) | A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `trailing`, `Timeline.ValueMeta`. |
+| [structure.tsx](examples/structure.tsx) | A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `Timeline.GapMeta`, `Timeline.ValueMeta`. |
 | [selectable.tsx](examples/selectable.tsx) | Rows with a click handler become buttons that open a detail view; the open row stays current — `onClick`, `current`. |
 | [hover-highlight.tsx](examples/hover-highlight.tsx) | Link rows highlighted only under the pointer or keyboard focus, with no persistent current row — `highlight`, `href`. |
 | [narrow.tsx](examples/narrow.tsx) | At 375 px the title wraps and the amount stays right; below 20rem of its own width the amount moves under the meta line. |

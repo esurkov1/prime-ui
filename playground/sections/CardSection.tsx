@@ -34,7 +34,7 @@ export const page: ComponentPageConfig = {
       scenario: "content-templates",
       title: "Контентные шаблоны",
       description:
-        "Призыв к действию, список событий и плитка кампании с обложкой — `Card.CtaBody`, `Card.List`, `Card.Cover`.",
+        "Призыв к действию, список событий и плитка кампании с обложкой — `Card.Description`, `Card.List`, `Card.Cover`.",
     },
     {
       scenario: "flat",

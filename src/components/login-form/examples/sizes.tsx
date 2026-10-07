@@ -16,17 +16,17 @@ export default function LoginFormSizesExample() {
           </LoginForm.Header>
           <LoginForm.Body>
             <LoginForm.Form onSubmit={(e) => e.preventDefault()}>
-              <Input.Root size={size} label="Email">
+              <Input.Root label="Email">
                 <Input.Wrapper>
                   <Input.Field type="email" placeholder="name@company.ru" />
                 </Input.Wrapper>
               </Input.Root>
-              <Input.Root size={size} label="Пароль">
+              <Input.Root label="Пароль">
                 <Input.Wrapper>
                   <Input.Field type="password" placeholder="********" />
                 </Input.Wrapper>
               </Input.Root>
-              <Button.Root type="submit" size={size} fullWidth>
+              <Button.Root type="submit" fullWidth>
                 Войти
               </Button.Root>
             </LoginForm.Form>

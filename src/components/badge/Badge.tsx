@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
@@ -167,9 +167,16 @@ function BadgeIcon({ children, className, ...rest }: BadgeIconProps) {
 
 BadgeIcon.displayName = "Badge.Icon";
 
+/**
+ * A status dot in the current text color. Inside a badge it takes the badge tier; standalone (a
+ * marker on an icon, before a label) it takes the tier of the surrounding control.
+ */
 function BadgeDot({ className, ...rest }: BadgeDotProps) {
+  const size = useOptionalControlSize() ?? "m";
   // `data-edge` comes from Badge.Root when the dot sits at an edge of the badge.
-  return <span className={cx(styles.dot, className)} aria-hidden="true" {...rest} />;
+  return (
+    <span className={cx(styles.dot, className)} data-size={size} aria-hidden="true" {...rest} />
+  );
 }
 
 BadgeDot.displayName = "Badge.Dot";

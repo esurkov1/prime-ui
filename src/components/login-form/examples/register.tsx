@@ -1,6 +1,5 @@
 /** Sign-up: five fields in one column, a password mismatch shown as the field error — `error`, `LoginForm.Form`. */
-import { Send } from "lucide-react";
-import { Button, Divider, Input, LinkButton, LoginForm } from "prime-ui-kit";
+import { Button, Divider, Icon, Input, LinkButton, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -15,7 +14,7 @@ export default function LoginFormRegisterExample() {
       <LoginForm.Root>
         <LoginForm.Header>
           <LoginForm.Logo>
-            <Send aria-hidden />
+            <Icon name="action.send" />
           </LoginForm.Logo>
           <LoginForm.Title>Регистрация</LoginForm.Title>
           <LoginForm.Description>Создайте аккаунт за минуту</LoginForm.Description>
@@ -24,7 +23,7 @@ export default function LoginFormRegisterExample() {
           <LoginForm.Actions>
             <Button.Root variant="outline" tone="neutral" fullWidth>
               <Button.Icon>
-                <Send />
+                <Icon name="action.send" />
               </Button.Icon>
               Продолжить через Telegram
             </Button.Root>

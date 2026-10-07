@@ -25,7 +25,7 @@ import { EmptyPage } from "prime-ui-kit";
 ```
 EmptyPage.Root               centered column; size, layout
 ├─ EmptyPage.Icon            tile with one icon; tone
-├─ EmptyPage.Title           <h2>
+├─ EmptyPage.Title           <h2> (as)
 ├─ EmptyPage.Description     <p>
 └─ EmptyPage.Actions         row of buttons
 ```
@@ -52,10 +52,11 @@ A `<div>` tile holding one icon.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the icon), `className` and the other div attributes. |
 
 ### EmptyPage.Title · EmptyPage.Description
-`ref` → the element. `<h2>` and `<p>`, both capped at the reading width.
+`ref` → the element. `<h2>` (or `as`) and `<p>`, both capped at the reading width.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `as` | `"h2" \| "h3" \| "h4" \| "p"` | `"h2"` | Title: tag that fits the outline; the look does not change. `p` inside menus, lists and table cells. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `id` (for `aria-labelledby`), `className` and the other attributes. |
 
 ### EmptyPage.Actions
@@ -106,7 +107,7 @@ A `<div>` row of buttons that wraps when narrow.
 No keyboard interaction.
 
 ### ARIA
-- The title is an `<h2>`; link the root to it with `aria-labelledby` when the empty state replaces a whole region.
+- The title is an `<h2>` (`as` picks `h3` / `h4` by the outline, `p` inside menus, lists and table cells); link the root to it with `aria-labelledby` when the empty state replaces a whole region.
 - In a filtered menu or list set `role="status"`, so screen readers announce «Ничего не найдено».
 - The icon is decorative: pass it with `aria-hidden`.
 
@@ -122,7 +123,7 @@ No `labels`.
 | [sizes.tsx](examples/sizes.tsx) | Every tier changes the icon tile, the title and the padding; buttons in Actions take the same size — `size`. |
 | [icon-tones.tsx](examples/icon-tones.tsx) | The tile tone tells why the area is empty: no data yet, a first run, or a failed load — `tone`. |
 | [data-region.tsx](examples/data-region.tsx) | An empty data region: the empty state stretches over the rest of a card with a header — `layout`. |
-| [compact.tsx](examples/compact.tsx) | The quiet empty state of a search panel: no entrance motion, smaller text, one action — `layout`. |
+| [compact.tsx](examples/compact.tsx) | The quiet empty state of a search panel: no entrance motion, smaller text, a paragraph title, one action — `layout`, `as`. |
 | [narrow.tsx](examples/narrow.tsx) | In a 320 px side panel the text wraps under the tile and the actions wrap to a second line. |
 
 ## Mistakes
@@ -131,6 +132,7 @@ No `labels`.
 - Showing an empty state while data is loading → show loading first.
 - Several primary buttons → one primary, placed last.
 - A default empty state inside a menu → use `layout="compact"`; the entrance motion on every keystroke is noise.
+- An `<h2>` title inside a menu, listbox or table cell → `EmptyPage.Title as="p"`.
 
 ## Related
 - **Built from:** —

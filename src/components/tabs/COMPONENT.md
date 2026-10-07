@@ -39,7 +39,7 @@ Tabs.Root                 value, size, orientation; lays out the list and the pa
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Tabs.Root
-No ref. `<div>` that owns the active value, size and orientation and lays out the list and the panel.
+`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

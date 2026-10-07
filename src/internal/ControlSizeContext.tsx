@@ -16,7 +16,7 @@ export function ControlSizeProvider({ value, children }: ControlSizeProviderProp
 
 ControlSizeProvider.displayName = "ControlSizeProvider";
 
-/** Для `Icon`: если `size` не передан явно, берётся из ближайшего контрола. */
+/** The tier of the nearest control, for parts and leaves whose `size` is not set explicitly. */
 export function useOptionalControlSize(): ControlSize | undefined {
   return React.useContext(ControlSizeContext) ?? undefined;
 }

@@ -36,6 +36,12 @@ export const page: ComponentPageConfig = {
       description:
         "Ссылка из приложения открывает новую вкладку и говорит об этом в тексте — `target`, `rel`.",
     },
+    {
+      scenario: "as-child",
+      title: "Кнопка в виде ссылки",
+      description:
+        "Вид ссылки на кнопке для действия в тексте, которое никуда не ведёт — `asChild`.",
+    },
   ],
   api,
   accessibility: {
@@ -46,6 +52,7 @@ export const page: ComponentPageConfig = {
     aria: [
       "Нативный `<a>`: объявляется как ссылка, имя — её текст.",
       'Неактивная ссылка — `<span role="link" aria-disabled="true">` вне порядка фокуса.',
+      "С `asChild` роль и имя даёт вложенный элемент: ссылка роутера или `<button>` для действия.",
       "Иконки декоративные; о новой вкладке скажите в тексте или в `aria-label`.",
     ],
   },

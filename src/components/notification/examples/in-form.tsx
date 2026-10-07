@@ -1,5 +1,5 @@
 /** Saving a form: the button shows loading, then a success toast or an error toast with a retry action — `notify`, `action`. */
-import { Button, Input, NotificationProvider, useNotifications } from "prime-ui-kit";
+import { Button, Card, Input, NotificationProvider, useNotifications } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -31,24 +31,26 @@ function ReportsForm() {
   };
 
   return (
-    <form
-      className={styles.form}
-      onSubmit={(event) => {
-        event.preventDefault();
-        save();
-      }}
-    >
-      <Input.Root label="Почта для отчётов" hint="Без «@» сохранение завершится ошибкой" required>
-        <Input.Wrapper>
-          <Input.Field value={email} onChange={(event) => setEmail(event.target.value)} />
-        </Input.Wrapper>
-      </Input.Root>
-      <div className={styles.actions}>
-        <Button.Root type="submit" loading={saving}>
-          Сохранить
-        </Button.Root>
-      </div>
-    </form>
+    <Card.Root className={styles.formCard}>
+      <form
+        className={styles.form}
+        onSubmit={(event) => {
+          event.preventDefault();
+          save();
+        }}
+      >
+        <Input.Root label="Почта для отчётов" hint="Без «@» сохранение завершится ошибкой" required>
+          <Input.Wrapper>
+            <Input.Field value={email} onChange={(event) => setEmail(event.target.value)} />
+          </Input.Wrapper>
+        </Input.Root>
+        <div className={styles.actions}>
+          <Button.Root type="submit" loading={saving}>
+            Сохранить
+          </Button.Root>
+        </div>
+      </form>
+    </Card.Root>
   );
 }
 

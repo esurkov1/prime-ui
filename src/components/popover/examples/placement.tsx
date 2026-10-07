@@ -8,6 +8,8 @@ const PLACEMENTS = [
   { side: "top", align: "start" },
   { side: "top", align: "center" },
   { side: "top", align: "end" },
+  { side: "left", align: "center" },
+  { side: "right", align: "center" },
 ] as const;
 
 export default function PopoverPlacementExample() {

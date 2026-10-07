@@ -1,6 +1,6 @@
 const SCROLLABLE = /^(auto|scroll|overlay)$/;
 
-/** window, прокручиваемые предки якоря и visualViewport — для пересчёта fixed при scroll. */
+/** `window` and the scrolling ancestors of the anchor: where a fixed layer listens for scroll. */
 export function getScrollContainers(
   node: Element | null,
 ): Array<Element | Window | VisualViewport> {

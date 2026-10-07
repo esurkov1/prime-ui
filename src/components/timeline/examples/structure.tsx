@@ -1,4 +1,4 @@
-/** A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `trailing`, `Timeline.ValueMeta`. */
+/** A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `Timeline.GapMeta`, `Timeline.ValueMeta`. */
 import { Timeline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -7,7 +7,10 @@ export default function TimelineStructureExample() {
   return (
     <Timeline.Root className={styles.feed}>
       <Timeline.Group label="История работ">
-        <Timeline.Gap trailing="сейчас">Без обслуживания 26 дней · 300 км</Timeline.Gap>
+        <Timeline.Gap>
+          Без обслуживания 26 дней · 300 км
+          <Timeline.GapMeta>сейчас</Timeline.GapMeta>
+        </Timeline.Gap>
         <Timeline.Item color="blue">
           <Timeline.Title>ТО: замена масла</Timeline.Title>
           <Timeline.Meta>

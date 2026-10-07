@@ -2,7 +2,12 @@ import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
-import { getViewportPadPx, readCssLengthPx } from "@/hooks/usePosition";
+import {
+  type PositionAlign,
+  type PositionSide,
+  readCssLengthPx,
+  usePosition,
+} from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -18,8 +23,8 @@ import styles from "./Tooltip.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type TooltipSide = "top" | "bottom" | "left" | "right";
-export type TooltipAlign = "start" | "center" | "end";
+export type TooltipSide = PositionSide;
+export type TooltipAlign = PositionAlign;
 
 const DEFAULT_DELAY_MS = 400;
 const DEFAULT_SKIP_DELAY_MS = 300;
@@ -259,101 +264,12 @@ function TooltipTrigger({ children }: TooltipTriggerProps) {
   });
 }
 
-// ─── Positioning ──────────────────────────────────────────────────────────────
+// ─── Arrow ────────────────────────────────────────────────────────────────────
 
-export type TooltipPlacement = {
-  top: number;
-  left: number;
-  side: TooltipSide;
-  /** Arrow centre along the chip's edge, px from its start (left for top/bottom, top for left/right). */
-  arrow: number;
-};
-
-export type TooltipPlacementInput = {
-  side: TooltipSide;
-  align: TooltipAlign;
-  /** Gap between trigger and chip body (the arrow lives in it). */
-  offset: number;
-  /** Minimum distance from the viewport edge. */
-  pad: number;
-  /** Closest the arrow centre may come to a chip corner (radius + half the arrow). */
-  arrowInset: number;
-};
-
-type Rect = Pick<DOMRectReadOnly, "top" | "left" | "right" | "bottom" | "width" | "height">;
-
-const OPPOSITE: Record<TooltipSide, TooltipSide> = {
-  top: "bottom",
-  bottom: "top",
-  left: "right",
-  right: "left",
-};
-
-const clamp = (value: number, min: number, max: number) =>
-  Math.max(min, Math.min(value, Math.max(min, max)));
-
-/**
- * Places the chip on `side` of the trigger (flipping to the opposite side when it does not fit),
- * aligns it along the cross axis, shifts it inside the viewport, and keeps the arrow pointing at
- * the trigger's centre — clamped so it never leaves the chip's straight edge.
- */
-export function computeTooltipPosition(
-  anchor: Rect,
-  width: number,
-  height: number,
-  viewportWidth: number,
-  viewportHeight: number,
-  { side, align, offset, pad, arrowInset }: TooltipPlacementInput,
-): TooltipPlacement {
-  const mainStart = (s: TooltipSide) => {
-    switch (s) {
-      case "top":
-        return anchor.top - offset - height;
-      case "bottom":
-        return anchor.bottom + offset;
-      case "left":
-        return anchor.left - offset - width;
-      case "right":
-        return anchor.right + offset;
-    }
-  };
-  const fits = (s: TooltipSide) => {
-    const start = mainStart(s);
-    return s === "top" || s === "bottom"
-      ? start >= pad && start + height <= viewportHeight - pad
-      : start >= pad && start + width <= viewportWidth - pad;
-  };
-
-  const resolved = fits(side) || !fits(OPPOSITE[side]) ? side : OPPOSITE[side];
-  const vertical = resolved === "top" || resolved === "bottom";
-
-  const anchorStart = vertical ? anchor.left : anchor.top;
-  const anchorSize = vertical ? anchor.width : anchor.height;
-  const size = vertical ? width : height;
-  const viewport = vertical ? viewportWidth : viewportHeight;
-
-  const crossStart =
-    align === "start"
-      ? anchorStart
-      : align === "end"
-        ? anchorStart + anchorSize - size
-        : anchorStart + anchorSize / 2 - size / 2;
-  const cross = Math.round(clamp(crossStart, pad, viewport - size - pad));
-  const arrow = Math.round(
-    clamp(anchorStart + anchorSize / 2 - cross, arrowInset, size - arrowInset),
-  );
-
-  const main = Math.round(
-    clamp(
-      mainStart(resolved),
-      pad,
-      (vertical ? viewportHeight - height : viewportWidth - width) - pad,
-    ),
-  );
-
-  return vertical
-    ? { top: main, left: cross, side: resolved, arrow }
-    : { top: cross, left: main, side: resolved, arrow };
+/** Closest the arrow centre may come to a chip corner: the chip radius + half the arrow. */
+function arrowInset(chip: HTMLElement): number {
+  const radius = Number.parseFloat(getComputedStyle(chip).borderTopLeftRadius) || 0;
+  return radius + readCssLengthPx("--prime-tooltip-arrow-width", 10) / 2;
 }
 
 /** Arrow shapes per resolved side: base on the chip edge, a softened tip toward the trigger. */
@@ -391,57 +307,25 @@ function TooltipContent({
   const { isOpen, instant, triggerRef, contentId, scheduleClose, cancelPending } =
     useTooltipRootContext();
   const overlayPortalLayer = useOverlayPortalLayer();
-  // State, not a ref: Portal attaches the node one commit later, and placement must rerun then.
-  const [content, setContent] = React.useState<HTMLDivElement | null>(null);
-  const [placement, setPlacement] = React.useState<TooltipPlacement | null>(null);
+  const contentRef = React.useRef<HTMLElement | null>(null);
   const presence = usePresence(isOpen, { exitDuration: "fast" });
   // A tooltip replaced by its neighbour leaves at once instead of fading under the new one.
   const mounted = presence.mounted && (isOpen || !instant);
-  const mergedRef = React.useMemo(() => mergeRefs(setContent, ref), [ref]);
-
-  React.useLayoutEffect(() => {
-    if (!mounted || !content) {
-      setPlacement(null);
-      return;
-    }
-
-    const update = () => {
-      const anchor = triggerRef.current;
-      if (!anchor) return;
-      const radius = Number.parseFloat(getComputedStyle(content).borderTopLeftRadius) || 0;
-      const arrowWidth = readCssLengthPx("--prime-tooltip-arrow-width", 10);
-      setPlacement(
-        computeTooltipPosition(
-          anchor.getBoundingClientRect(),
-          content.offsetWidth,
-          content.offsetHeight,
-          window.innerWidth,
-          window.innerHeight,
-          {
-            side,
-            align,
-            offset: readCssLengthPx("--prime-tooltip-offset", 8),
-            pad: getViewportPadPx(),
-            arrowInset: radius + arrowWidth / 2,
-          },
-        ),
-      );
-    };
-
-    // Measured before paint: the chip never shows up in the wrong place.
-    update();
-    window.addEventListener("resize", update);
-    window.addEventListener("scroll", update, true);
-    return () => {
-      window.removeEventListener("resize", update);
-      window.removeEventListener("scroll", update, true);
-    };
-  }, [mounted, content, triggerRef, side, align]);
+  // Placed before paint, so the chip never shows up in the wrong place.
+  const position = usePosition(mounted, triggerRef, contentRef, {
+    side,
+    align,
+    offsetToken: "--prime-tooltip-offset",
+    arrowInset,
+  });
+  const mergedRef = React.useMemo(
+    () => mergeRefs<HTMLDivElement>(position.attachLayer, ref),
+    [position.attachLayer, ref],
+  );
 
   if (!mounted) return null;
 
-  const resolvedSide = placement?.side ?? side;
-  const arrow = ARROW_PATH[resolvedSide];
+  const arrow = ARROW_PATH[position.side];
 
   return (
     <Portal>
@@ -452,16 +336,7 @@ function TooltipContent({
         role="tooltip"
         data-overlay-portal-layer={overlayPortalLayer}
         className={cx(styles.content, overlayMotion.floating, className)}
-        style={
-          {
-            ...style,
-            top: placement?.top ?? 0,
-            left: placement?.left ?? 0,
-            // The first commit only attaches the node; it is placed before the browser paints.
-            visibility: placement ? undefined : "hidden",
-            "--tt-arrow": placement ? `${placement.arrow}px` : "50%",
-          } as React.CSSProperties
-        }
+        style={style}
         onAnimationEnd={presence.onExitEnd}
         onPointerEnter={cancelPending}
         onPointerLeave={scheduleClose}
@@ -469,7 +344,7 @@ function TooltipContent({
           state: presence.state,
           size,
           /* Resolved side: flips to the opposite one when the requested side does not fit. */
-          side: resolvedSide,
+          side: position.side,
           align,
           instant: instant ? true : undefined,
         })}

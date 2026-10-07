@@ -83,6 +83,20 @@ describe("Badge", () => {
     expect(container.querySelector(`.${styles.dot}`)).toBeInTheDocument();
   });
 
+  it("a standalone Dot takes the tier of the surrounding control", () => {
+    const { container } = render(
+      <>
+        <Badge.Dot data-testid="plain" />
+        <ControlSizeProvider value="l">
+          <Badge.Dot data-testid="large" />
+        </ControlSizeProvider>
+      </>,
+    );
+    expect(screen.getByTestId("plain")).toHaveAttribute("data-size", "m");
+    expect(screen.getByTestId("large")).toHaveAttribute("data-size", "l");
+    expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(2);
+  });
+
   it("merges className on Root", () => {
     render(<Badge.Root className="custom-root">x</Badge.Root>);
     expect(screen.getByText("x")).toHaveClass("custom-root");

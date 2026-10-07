@@ -18,19 +18,19 @@ import {
 } from "date-fns";
 
 /**
- * Логика Datepicker без часовых поясов: все значения — «настенное» время (локальные поля Date).
- * Календарный день — Date на локальную полночь. Перевод в пояс — задача приложения.
+ * Datepicker logic without time zones: every value is wall-clock time (the local Date fields).
+ * A calendar day is a Date at local midnight. Converting to a zone is up to the application.
  */
 
 export type DatepickerRange = {
-  /** null — без нижней границы («Всё время»). */
+  /** `null` — no lower bound («Всё время»). */
   from: Date | null;
   to: Date | null;
 };
 
 export type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Високосный год для ежегодных дат «день + месяц». */
+/** A leap year for yearly "day + month" dates. */
 export const YEARLESS_YEAR = 2000;
 export const DAY_START_MINUTES = 0;
 export const DAY_END_MINUTES = 23 * 60 + 59;
@@ -47,7 +47,7 @@ export function minutesOf(value: Date): number {
   return value.getHours() * 60 + value.getMinutes();
 }
 
-/** День + минуты → Date; `endOfMinute` добивает до 59.999 с. */
+/** Day + minutes → Date; `endOfMinute` fills up to 59.999 s. */
 export function withMinutes(day: Date, minutes: number, endOfMinute = false): Date {
   return new Date(
     day.getFullYear(),
@@ -61,8 +61,8 @@ export function withMinutes(day: Date, minutes: number, endOfMinute = false): Da
 }
 
 /**
- * Клетка сетки месяца. `day` — день этого месяца или null для клетки соседнего месяца;
- * `outside` — дата соседнего месяца в этой клетке (для приглушённого показа).
+ * A cell of the month grid. `day` — a day of this month, or `null` for a cell of the adjacent
+ * month; `outside` — the adjacent month's date in that cell (shown muted).
  */
 export type MonthCell = { day: Date | null; col: number; outside: Date | null };
 
@@ -74,7 +74,7 @@ export function rowsNeeded(month: Date, weekStartsOn: WeekStart): number {
   return Math.ceil((leadingBlanks(month, weekStartsOn) + getDaysInMonth(month)) / 7);
 }
 
-/** Строки месяца по 7 клеток; `rows` выравнивает высоту соседних месяцев. */
+/** Rows of 7 cells for a month; `rows` evens out the height of side-by-side months. */
 export function monthGrid(month: Date, rows: number, weekStartsOn: WeekStart): MonthCell[][] {
   const first = startOfMonth(month);
   const lead = leadingBlanks(first, weekStartsOn);
@@ -93,7 +93,7 @@ export function monthGrid(month: Date, rows: number, weekStartsOn: WeekStart): M
 }
 
 export function weekdayLabels(locale: Locale, weekStartsOn: WeekStart): string[] {
-  // 1 января 2024 — понедельник.
+  // 1 January 2024 is a Monday.
   return Array.from({ length: 7 }, (_, i) => {
     const text = format(new Date(2024, 0, 1 + ((weekStartsOn - 1 + i + 7) % 7)), "EEEEEE", {
       locale,
@@ -107,13 +107,13 @@ export function monthTitle(month: Date, locale: Locale, yearless = false): strin
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-/** «6 окт», «6 окт 2025» — год, только если он не текущий. */
+/** «6 окт», «6 окт 2025»: the year only when it is not the current one. */
 export function formatDayShort(day: Date, today: Date, locale: Locale, yearless = false): string {
   const pattern = yearless || isSameYear(day, today) ? "d MMM" : "d MMM yyyy";
   return format(day, pattern, { locale }).replace(".", "");
 }
 
-/** «HH:mm» → минуты от полуночи; null — неверный формат. */
+/** "HH:mm" → minutes since midnight; `null` for an invalid format. */
 export function parseTime(text: string): number | null {
   const m = /^(\d{1,2}):(\d{2})$/.exec(text.trim());
   if (!m) return null;
@@ -128,18 +128,18 @@ export function formatTime(minutes: number): string {
   return `${String(h).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
 }
 
-/* ─── Пресеты ─── */
+/* ─── Presets ─── */
 
 export type DatepickerPreset = {
   key: string;
   label: string;
-  /** Календарные дни относительно «сегодня»; from = null — без нижней границы. */
+  /** Calendar days relative to today; `from = null` — no lower bound. */
   days: (today: Date) => { from: Date | null; to: Date };
 };
 
 const MONDAY = { weekStartsOn: 1 as const };
 
-/** Готовые пресеты (неделя с понедельника). Подписи можно заменить через `{ ...preset, label }`. */
+/** Ready presets (the week starts on Monday). Replace a label with `{ ...preset, label }`. */
 export const datepickerPresets = {
   today: {
     key: "today",
@@ -190,7 +190,7 @@ export const datepickerPresets = {
       return { from: startOfYear(ref), to: startOfDay(endOfYear(ref)) };
     },
   } satisfies DatepickerPreset,
-  /** «Всё время»: без нижней границы или с явной датой начала. */
+  /** «Всё время»: no lower bound, or an explicit start date. */
   allTime: (start: Date | null = null, label = "Всё время"): DatepickerPreset => ({
     key: "allTime",
     label,
@@ -198,7 +198,7 @@ export const datepickerPresets = {
   }),
 };
 
-/** Набор периодов по умолчанию. */
+/** The default set of periods. */
 export const DEFAULT_DATEPICKER_PRESETS: DatepickerPreset[] = [
   datepickerPresets.today,
   datepickerPresets.yesterday,
@@ -210,7 +210,7 @@ export const DEFAULT_DATEPICKER_PRESETS: DatepickerPreset[] = [
   datepickerPresets.lastYear,
 ];
 
-/** Пресет, ровно совпадающий с выбранными днями. */
+/** The preset that matches the selected days exactly. */
 export function matchPreset(
   presets: DatepickerPreset[],
   fromDay: Date | null,

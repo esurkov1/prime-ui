@@ -225,12 +225,28 @@ export function DialogFooter({ layout, className, ...rest }: DialogFooterProps) 
 }
 DialogFooter.displayName = "Dialog.Footer";
 
-// ─── Close / Confirm (wrap one child) ─────────────────────────────────────────
+// ─── Trigger / Close / Confirm (wrap one child) ───────────────────────────────
 
 type SlotChild = React.ReactElement<{
   onClick?: React.MouseEventHandler;
   ref?: React.Ref<HTMLElement>;
 }>;
+
+export type DialogTriggerProps = { children: SlotChild };
+
+/**
+ * Adds "open the dialog" to the child's click (unless the child prevents default). The Root of
+ * Modal / Drawer passes `onOpen` from its own context.
+ */
+export function DialogTrigger({ children, onOpen }: DialogTriggerProps & { onOpen: () => void }) {
+  const child = React.Children.only(children);
+  return React.cloneElement(child, {
+    onClick: (event: React.MouseEvent) => {
+      child.props.onClick?.(event);
+      if (!event.defaultPrevented) onOpen();
+    },
+  });
+}
 
 export type DialogCloseProps = { children: SlotChild };
 

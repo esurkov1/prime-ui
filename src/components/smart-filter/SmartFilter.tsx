@@ -12,6 +12,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -112,10 +113,6 @@ const DEFAULT_LABELS: SmartFilterLabels = {
   remove: "Убрать фильтр «{value}»",
 };
 
-function fill(template: string, values: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ""));
-}
-
 // Secondary buttons beside the tags (add, clear all, the text-search row) sit one tier below the toolbar.
 const SMALLER: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "xs", l: "s", xl: "m" };
 
@@ -158,6 +155,7 @@ export type SmartFilterRootProps = {
   className?: string;
   /** `SmartFilter.Toolbar` and `SmartFilter.Chips`. */
   children: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 const EMPTY_VALUE: SmartFilterValue = {};
@@ -175,6 +173,7 @@ function SmartFilterRoot({
   labels,
   className,
   children,
+  ref,
 }: SmartFilterRootProps) {
   const [current, setCurrent] = useControllableState<SmartFilterValue>({
     value,
@@ -212,14 +211,14 @@ function SmartFilterRoot({
   return (
     <SmartFilterProvider value={context}>
       <Popover.Root open={open} onOpenChange={setOpen}>
-        <div className={cx(styles.root, className)} data-size={size}>
+        <div ref={ref} className={cx(styles.root, className)} data-size={size}>
           {children}
         </div>
       </Popover.Root>
     </SmartFilterProvider>
   );
 }
-SmartFilterRoot.displayName = "SmartFilterRoot";
+SmartFilterRoot.displayName = "SmartFilter.Root";
 
 // ---------------------------------------------------------------------------------------------
 // Toolbar: filter button + search; the anchor of the panel
@@ -283,7 +282,7 @@ function SmartFilterToolbar({ className }: SmartFilterToolbarProps) {
     </>
   );
 }
-SmartFilterToolbar.displayName = "SmartFilterToolbar";
+SmartFilterToolbar.displayName = "SmartFilter.Toolbar";
 
 /** The matched part of a label, underlined. */
 function Highlighted({ text, query }: { text: string; query: string }) {
@@ -358,7 +357,7 @@ function Panel() {
             <Button.Icon>
               <Icon name="action.search" />
             </Button.Icon>
-            {fill(labels.searchText, { query })}
+            {formatLabel(labels.searchText, { query })}
             <Kbd className={styles.queryKey}>↵</Kbd>
           </Button.Root>
         </div>
@@ -394,7 +393,7 @@ function Panel() {
                 variant="outline"
                 onPress={() => setExpanded((prev) => new Set(prev).add(field.key))}
               >
-                {fill(labels.more, { count: options.length - collapsedLimit })}
+                {formatLabel(labels.more, { count: options.length - collapsedLimit })}
                 <Badge.Icon>
                   <Icon name="nav.chevronDown" />
                 </Badge.Icon>
@@ -411,7 +410,7 @@ function Panel() {
       node: (
         <EmptyPage.Root layout="compact" size={size} role="status">
           <EmptyPage.Description>
-            {fill(labels.noMatches, { fields: empty.join(", ") })}
+            {formatLabel(labels.noMatches, { fields: empty.join(", ") })}
           </EmptyPage.Description>
         </EmptyPage.Root>
       ),
@@ -425,7 +424,7 @@ function Panel() {
           {labels.hint}
         </Typography.Root>
         <Typography.Root as="span" variant="caption" tone="muted">
-          {fill(labels.count, { count: total })}
+          {formatLabel(labels.count, { count: total })}
         </Typography.Root>
         {total > 0 && (
           <Button.Root variant="ghost" tone="neutral" size="xs" onClick={clearAll}>
@@ -475,7 +474,7 @@ function ValueToggle({ option, size, mode, canHide, query, onMode }: ValueToggle
       size={size}
       color={COLOR[mode ?? "none"]}
       pressed={mode === "include"}
-      title={fill(labels.showValue, { value: option.label })}
+      title={formatLabel(labels.showValue, { value: option.label })}
       data-mode={mode ?? undefined}
       onPress={(event) => onMode(event.altKey && canHide ? "exclude" : "include")}
       onKeyDown={(event) => {
@@ -491,7 +490,7 @@ function ValueToggle({ option, size, mode, canHide, query, onMode }: ValueToggle
         <Highlighted text={option.label} query={query} />
       </span>
       <Badge.Action
-        label={fill(mode === "exclude" ? labels.unhideValue : labels.hideValue, {
+        label={formatLabel(mode === "exclude" ? labels.unhideValue : labels.hideValue, {
           value: option.label,
         })}
         pressed={mode === "exclude"}
@@ -525,7 +524,7 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
         if (!selection) return [];
         const labelOf = (v: string) => field.options.find((o) => o.value === v)?.label ?? v;
         const tag = (v: string, negated: boolean) => {
-          const text = fill(negated ? labels.chipExclude : labels.chipInclude, {
+          const text = formatLabel(negated ? labels.chipExclude : labels.chipInclude, {
             field: field.label,
             value: labelOf(v),
           });
@@ -534,7 +533,7 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
               key={`${field.key}:${v}`}
               size={size}
               color={negated ? "red" : "blue"}
-              labels={{ remove: fill(labels.remove, { value: text }) }}
+              labels={{ remove: formatLabel(labels.remove, { value: text }) }}
               onRemove={() => setSelection(field.key, removeSelectionValue(selection, v))}
               data-negated={negated || undefined}
             >
@@ -573,7 +572,7 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
     </div>
   );
 }
-SmartFilterChips.displayName = "SmartFilterChips";
+SmartFilterChips.displayName = "SmartFilter.Chips";
 
 export const SmartFilter = {
   Root: SmartFilterRoot,

@@ -374,16 +374,13 @@
 }
 
 /* Hue dot before the content (same size as Badge.Dot). */
+/* `Badge.Dot` in the option hue. */
 .dot {
-  flex-shrink: 0;
-  width: calc(var(--prime-space-1) + 2 * var(--prime-border-width));
-  height: calc(var(--prime-space-1) + 2 * var(--prime-border-width));
-  border-radius: var(--prime-radius-full);
-  background: var(--seg-hue-text);
+  color: var(--seg-hue-text);
 }
 
 .item[data-disabled="true"] .dot {
-  background: var(--prime-color-text-disabled);
+  color: var(--prime-color-text-disabled);
 }
 
 /* Two-line segment with a dot: the dot gets its own column, the description aligns with the label. */

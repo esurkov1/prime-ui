@@ -37,6 +37,7 @@ export type TabsRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultV
   /** Default `horizontal`. A vertical list stacks above the panel in containers narrower than 600px. */
   orientation?: "horizontal" | "vertical";
   size?: ControlSize;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 function TabsRoot({

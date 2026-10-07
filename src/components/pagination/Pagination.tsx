@@ -5,6 +5,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -120,13 +121,13 @@ export function Pagination({
               ) : (
                 <Button.Root
                   key={item}
-                  variant="ghost"
-                  tone="neutral"
+                  variant={item === current ? "soft" : "ghost"}
+                  tone={item === current ? "accent" : "neutral"}
                   size={size}
                   className={cx(styles.page, styles.pageItem)}
                   onClick={() => go(item)}
                   aria-current={item === current ? "page" : undefined}
-                  aria-label={labels.page.replace("{page}", String(item))}
+                  aria-label={formatLabel(labels.page, { page: item })}
                 >
                   {item}
                 </Button.Root>

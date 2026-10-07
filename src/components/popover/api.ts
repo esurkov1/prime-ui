@@ -70,10 +70,10 @@ export const api: ComponentApi = {
       props: [
         {
           name: "side",
-          type: '"bottom" | "top"',
+          type: '"top" | "right" | "bottom" | "left"',
           default: '"bottom"',
-          en: "Preferred side; flips when there is no room.",
-          ru: "Желаемая сторона; при нехватке места панель переворачивается.",
+          en: "Preferred side; flips to the opposite side when there is no room.",
+          ru: "Желаемая сторона; при нехватке места панель переходит на противоположную.",
         },
         {
           name: "align",

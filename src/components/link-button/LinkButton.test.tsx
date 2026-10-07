@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { LinkButton } from "./LinkButton";
 
@@ -75,5 +75,34 @@ describe("LinkButton", () => {
       </LinkButton>,
     );
     expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-tone", "neutral");
+  });
+
+  it("asChild puts the link look on a button that keeps its role and click", () => {
+    const onClick = vi.fn();
+    render(
+      <LinkButton asChild size="s">
+        <button type="button" onClick={onClick}>
+          Отправить ещё раз
+        </button>
+      </LinkButton>,
+    );
+    const button = screen.getByRole("button", { name: "Отправить ещё раз" });
+    expect(button).toHaveAttribute("data-size", "s");
+    expect(button).toHaveAttribute("data-tone", "accent");
+    fireEvent.click(button);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it("asChild + disabled marks aria-disabled and swallows the click", () => {
+    const onClick = vi.fn();
+    render(
+      <LinkButton asChild disabled onClick={onClick}>
+        <a href="#x">Счета</a>
+      </LinkButton>,
+    );
+    const link = screen.getByRole("link", { name: "Счета" });
+    expect(link).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(link);
+    expect(onClick).not.toHaveBeenCalled();
   });
 });

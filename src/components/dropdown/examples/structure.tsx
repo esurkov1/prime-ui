@@ -1,6 +1,6 @@
 /** Optional parts of an account menu: a header with an avatar, a labelled group, item icons, key hints and separators — `Dropdown.Header`, `Dropdown.Group`, `Dropdown.ItemIcon`, `Dropdown.ItemShortcut`. */
-import { BookOpen, LogOut, Settings, UserRound } from "lucide-react";
-import { Avatar, Badge, Button, Dropdown } from "prime-ui-kit";
+import { BookOpen, LogOut, UserRound } from "lucide-react";
+import { Avatar, Badge, Button, Dropdown, Icon } from "prime-ui-kit";
 
 export default function DropdownStructureExample() {
   return (
@@ -32,7 +32,7 @@ export default function DropdownStructureExample() {
           </Dropdown.Item>
           <Dropdown.Item>
             <Dropdown.ItemIcon>
-              <Settings />
+              <Icon name="action.settings" />
             </Dropdown.ItemIcon>
             Настройки
             <Dropdown.ItemShortcut>⌘,</Dropdown.ItemShortcut>

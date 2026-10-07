@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "SmartFilter.Root",
-      en: "No ref. A `<div>` (flex column) with the state and the context; sets `data-size`.",
+      en: "`ref` → `HTMLDivElement`. A `<div>` (flex column) with the state and the context; sets `data-size`.",
       ru: "`<div>` (колонка) с состоянием и контекстом; ставит `data-size`.",
       props: [
         {

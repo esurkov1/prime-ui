@@ -26,7 +26,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "История обслуживания с промежутками между событиями, подписью справа у промежутка и второй строкой суммы — `Timeline.Gap`, `trailing`, `Timeline.ValueMeta`.",
+        "История обслуживания с промежутками между событиями, подписью справа у промежутка и второй строкой суммы — `Timeline.Gap`, `Timeline.GapMeta`, `Timeline.ValueMeta`.",
     },
     {
       scenario: "selectable",

@@ -10,26 +10,9 @@
   min-width: 0;
 }
 
-/* data-region.tsx: a card with a minimum height that the empty state fills. */
+/* data-region.tsx: the Card's minimum height that the empty state fills. */
 .region {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
   min-height: calc(var(--prime-space-24) * 3);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
-  overflow: hidden;
-}
-
-.regionHeader {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-  padding: var(--prime-space-4) var(--prime-card-padding-m);
 }
 
 /* compact.tsx: a floating panel (menu / listbox) the compact empty state sits in. */
@@ -42,11 +25,7 @@
   box-shadow: var(--prime-shadow-overlay);
 }
 
-/* narrow.tsx: a 320px side panel on the card fill. */
+/* narrow.tsx: a 320px side panel (the Card's width). */
 .narrow {
-  box-sizing: border-box;
   width: min(100%, calc(var(--prime-space-20) * 4));
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
 }

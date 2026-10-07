@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { computeTooltipPosition, Tooltip, type TooltipPlacementInput } from "./Tooltip";
+import { Tooltip } from "./Tooltip";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -325,46 +325,13 @@ describe("Tooltip — overlay contract", () => {
 
 // ─── Placement ────────────────────────────────────────────────────────────────
 
-describe("computeTooltipPosition", () => {
-  const opts: TooltipPlacementInput = {
-    side: "top",
-    align: "center",
-    offset: 8,
-    pad: 8,
-    arrowInset: 11,
-  };
-  const anchor = { top: 300, bottom: 332, left: 200, right: 232, width: 32, height: 32 };
-
-  it("centres above the trigger with the arrow at the trigger's centre", () => {
-    const p = computeTooltipPosition(anchor, 100, 24, 800, 600, opts);
-    expect(p).toEqual({ side: "top", top: 268, left: 166, arrow: 50 });
-  });
-
-  it("flips to the opposite side when there is no room", () => {
-    const top = { ...anchor, top: 4, bottom: 36 };
-    const p = computeTooltipPosition(top, 100, 24, 800, 600, opts);
-    expect(p.side).toBe("bottom");
-    expect(p.top).toBe(44);
-  });
-
-  it("shifts inside the viewport and keeps the arrow on the trigger", () => {
-    const edge = { ...anchor, left: 0, right: 32 };
-    const p = computeTooltipPosition(edge, 100, 24, 800, 600, opts);
-    expect(p.left).toBe(8);
-    expect(p.arrow).toBe(11);
-  });
-
-  it("aligns to the trigger's start and end", () => {
-    expect(
-      computeTooltipPosition(anchor, 100, 24, 800, 600, { ...opts, align: "start" }).left,
-    ).toBe(200);
-    expect(computeTooltipPosition(anchor, 100, 24, 800, 600, { ...opts, align: "end" }).left).toBe(
-      132,
-    );
-  });
-
-  it("places left / right along the vertical axis", () => {
-    const p = computeTooltipPosition(anchor, 100, 24, 800, 600, { ...opts, side: "right" });
-    expect(p).toEqual({ side: "right", top: 304, left: 240, arrow: 12 });
+// The geometry (sides, flip, shift, arrow) is covered by `computeFloatingPosition` in usePosition.
+describe("placement", () => {
+  it("positions the chip with the shared anchored positioning and an arrow offset", () => {
+    render(<BasicTooltip defaultOpen side="right" />);
+    const chip = screen.getByRole("tooltip");
+    expect(chip.style.position).toBe("fixed");
+    expect(chip).toHaveAttribute("data-side", "right");
+    expect(chip.style.getPropertyValue("--float-arrow")).toMatch(/px$/);
   });
 });

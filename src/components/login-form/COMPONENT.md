@@ -45,7 +45,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of padding, gaps and text roles. Pass the same `size` to the fields and buttons inside. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of padding, gaps and text roles; Inputs and Buttons inside without their own `size` take it. |
 | `align` | `"start" \| "center"` | `"start"` | `start` — the Modal header layout (rounded accent tile left, title over description right); `center` — a round logo above centered text. |
 | `flat` | `boolean` | `false` | Removes the card shadow (inside a Modal or on a plain page). No border either way. |
 | `className` | `string` | — | Class on the card. |
@@ -88,7 +88,7 @@ No ref. The secondary line with a `LinkButton` («Нет аккаунта? За�
 | `l` | padding 32, gap 40, field gap 20, heading-s | a standalone sign-in screen on a wide canvas | |
 | `xl` | padding 40, gap 40, field gap 24, heading-m | marketing-grade sign-in, touch-first | |
 
-**Sizes:** pass the same `size` to the fields and buttons inside — LoginForm does not resize them.
+**Sizes:** Inputs and Buttons inside take the Root `size` unless they set their own.
 
 ### align
 | Value | Looks like | Use when | Default |
@@ -102,7 +102,7 @@ No ref. The secondary line with a `LinkButton` («Нет аккаунта? За�
 | `flat` | card fill, no shadow | inside a Modal or any other surface | `false` |
 
 **Combinations**
-- Recommended: one `size` on Root, the fields and the buttons; `hint` / `error` on fields for validation; a danger [Banner](../banner/COMPONENT.md) at the top of `Form` for server errors.
+- Recommended: one `size` on Root only (Inputs and Buttons follow it); `hint` / `error` on fields for validation; a danger [Banner](../banner/COMPONENT.md) at the top of `Form` for server errors.
 - Avoid: more than one primary button; provider buttons in `solid` (they compete with the submit); a Card around LoginForm.
 
 ## States
@@ -155,7 +155,7 @@ No `labels`.
 - `LoginForm.Social` → removed; provider buttons go in `LoginForm.Actions`.
 - A placeholder instead of a field label → pass `label` to the field.
 - A Card around LoginForm → the root already is the card; use `flat` inside another surface.
-- Different sizes on the card and its fields → pass one `size` to all.
+- Repeating the card `size` on every field and button → set it once on Root; Inputs and Buttons follow it.
 
 ## Related
 - **Built from:** [Typography](../typography/COMPONENT.md) (`Title`, `Description`, `Footer`)

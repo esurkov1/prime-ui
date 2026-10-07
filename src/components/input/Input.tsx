@@ -1,14 +1,13 @@
 import * as React from "react";
 
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
+import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
 
-import { FieldCounter, FieldSupportRow } from "./FieldSupport";
 import styles from "./Input.module.css";
 
 export type InputLabels = {
@@ -41,6 +40,7 @@ const [InputProvider, useInputContext] = createComponentContext<InputContextValu
 // ---- InputRoot ----
 
 export type InputRootProps = {
+  /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
   size?: ControlSize;
   /** Invalid state: danger ring on the field and `aria-invalid` on the input. A non-empty `error` implies it. */
   invalid?: boolean;
@@ -70,7 +70,7 @@ export type InputRootProps = {
 };
 
 function InputRoot({
-  size = "m",
+  size: sizeProp,
   invalid,
   focusRing = true,
   label,
@@ -85,6 +85,9 @@ function InputRoot({
   children,
   className,
 }: InputRootProps) {
+  // Without an explicit size the field takes the tier of its host (a form, a panel).
+  const hostSize = useOptionalControlSize();
+  const size = sizeProp ?? hostSize ?? "m";
   const ids = useFieldFrame(id, { hint, error, invalid });
   const labels = React.useMemo(() => ({ ...INPUT_LABELS, ...labelsProp }), [labelsProp]);
   const { invalid: isInvalid, controlId: inputId, describedBy } = ids;
@@ -103,18 +106,14 @@ function InputRoot({
           label={label}
           required={required}
           optional={optional}
+          hint={hint}
+          error={error}
+          counter={counter}
+          reserveSupportRow={reserveSupportRow}
           optionalLabel={labels.optional}
           className={cx(styles.root, className)}
         >
           {children}
-          <FieldSupportRow
-            ids={ids}
-            size={size}
-            hint={hint}
-            error={error}
-            counter={counter}
-            reserve={reserveSupportRow}
-          />
         </FieldFrame>
       </ControlSizeProvider>
     </InputProvider>

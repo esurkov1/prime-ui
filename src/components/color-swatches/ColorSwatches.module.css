@@ -1,5 +1,5 @@
 /*
- * ColorSwatches — inline color choice on the shared swatch (color-picker/swatch.module.css).
+ * ColorSwatches — inline color choice on the shared swatch (internal/swatch.module.css).
  * Tier T: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = control gap, radius steps
  * with size. The swatches wrap to the container width (one row when the container sizes to its
  * content); the arrow keys move by the visual rows.

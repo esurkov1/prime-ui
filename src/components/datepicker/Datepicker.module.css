@@ -87,7 +87,7 @@
   align-items: center;
   /* Icons centered between the edge and the text: edge→icon = icon→text = padX (foundation §6). */
   gap: var(--dp-px);
-  /* Ширина по содержимому, не шире контейнера. */
+  /* As wide as the content, never wider than the container. */
   width: fit-content;
   max-width: 100%;
   min-width: 0;
@@ -312,7 +312,7 @@
   height: var(--dp-cell);
 }
 
-/* Сетка месяца: разметка — таблица (семантика), раскладка — CSS Grid на 7 равных колонок. */
+/* Month grid: a table in markup (semantics), a CSS grid of 7 equal columns in layout. */
 .table {
   display: flex;
   flex-direction: column;
@@ -455,7 +455,7 @@
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 
-/* Нижняя строка и подсказка не расширяют панель: ширину задают месяцы. */
+/* The footer row and the hint never widen the panel: the months set the width. */
 .footer,
 .hint {
   contain: inline-size;

@@ -1,4 +1,4 @@
-/** Примитивная подсветка TS/TSX для плейграунда: комментарии, строки, числа, ключевые слова, JSX-теги. */
+/** Minimal TS/TSX highlighting for the playground: comments, strings, numbers, keywords, JSX tags. */
 
 const KW = new Set(
   "break case catch class const continue debugger default delete do else export extends false finally for from function if import in instanceof let new null return super switch this throw true try typeof var void while with yield async await of type interface implements package private protected public static readonly keyof as is enum namespace module declare abstract satisfies using".split(

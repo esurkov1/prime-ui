@@ -2,9 +2,7 @@ import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it } from "vitest";
 
-import { computeFloatingPosition } from "@/hooks/usePosition";
-
-import { useAnchoredPosition } from "./useAnchoredPosition";
+import { computeFloatingPosition, type PositionSide, usePosition } from "./usePosition";
 
 const OFFSET = 8;
 const PAD = 8;
@@ -15,14 +13,14 @@ function rect(partial: Record<string, number>): DOMRectReadOnly {
   return { ...base, ...partial, toJSON: () => ({}) } as DOMRectReadOnly;
 }
 
-const place = (anchor: DOMRectReadOnly, side: "bottom" | "top", vh: number) =>
+const place = (anchor: DOMRectReadOnly, side: PositionSide, vh: number) =>
   computeFloatingPosition(anchor, 200, 0, 1024, vh, {
-    preferredSide: side,
+    side,
     align: "start",
     offset: OFFSET,
     viewportPad: PAD,
     flip: false,
-    matchTriggerMinWidth: false,
+    matchAnchorWidth: false,
   });
 
 describe("anchored panel max height", () => {
@@ -39,15 +37,31 @@ describe("anchored panel max height", () => {
       Math.floor(Math.max(MIN_MAX_HEIGHT, anchor.top - OFFSET - PAD)),
     );
   });
+
+  it("on a left / right side, caps by the viewport height", () => {
+    const anchor = rect({ top: 400, bottom: 432, left: 500, right: 600 });
+    expect(place(anchor, "right", 800).maxHeight).toBe(800 - PAD * 2);
+  });
 });
 
-function Anchored({ open, matchAnchorWidth }: { open: boolean; matchAnchorWidth: boolean }) {
+const arrowInset = () => 6;
+
+function Anchored({
+  open,
+  matchAnchorWidth,
+  withArrow = false,
+}: {
+  open: boolean;
+  matchAnchorWidth: boolean;
+  withArrow?: boolean;
+}) {
   const anchorRef = React.useRef<HTMLButtonElement>(null);
   const layerRef = React.useRef<HTMLDivElement>(null);
-  const { side, attachLayer } = useAnchoredPosition(open, anchorRef, layerRef, {
+  const { side, attachLayer } = usePosition(open, anchorRef, layerRef, {
     side: "bottom",
     align: "start",
     matchAnchorWidth,
+    arrowInset: withArrow ? arrowInset : undefined,
   });
   return (
     <>
@@ -59,18 +73,24 @@ function Anchored({ open, matchAnchorWidth }: { open: boolean; matchAnchorWidth:
   );
 }
 
-describe("useAnchoredPosition", () => {
+describe("usePosition", () => {
   it("places the layer fixed while enabled and reports the side", () => {
     render(<Anchored open matchAnchorWidth={false} />);
     const layer = screen.getByTestId("layer");
     expect(layer.style.position).toBe("fixed");
     expect(layer).toHaveAttribute("data-side", "bottom");
     expect(layer.style.getPropertyValue("--float-min-w")).toBe("");
+    expect(layer.style.getPropertyValue("--float-arrow")).toBe("");
   });
 
   it("writes the anchor width only when asked", () => {
     render(<Anchored open matchAnchorWidth />);
     expect(screen.getByTestId("layer").style.getPropertyValue("--float-min-w")).not.toBe("");
+  });
+
+  it("writes the arrow position when an arrow inset is given", () => {
+    render(<Anchored open matchAnchorWidth={false} withArrow />);
+    expect(screen.getByTestId("layer").style.getPropertyValue("--float-arrow")).toMatch(/px$/);
   });
 
   it("does nothing while disabled", () => {

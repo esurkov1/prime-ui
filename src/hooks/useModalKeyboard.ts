@@ -41,11 +41,11 @@ export type UseModalKeyboardOptions = {
   onClose: () => void;
   confirmOnEnter: boolean;
   onEnterConfirm?: (event: KeyboardEvent) => void;
-  /** Целевой элемент подтверждения (кнопка из `Modal.Footer` `primary`). */
+  /** The confirm target (the primary button wrapped in `Modal.Confirm`). */
   primaryRef: React.RefObject<HTMLElement | null>;
 };
 
-/** Escape + Enter для `role="dialog"`: Escape закрывает; Enter имитирует `click()` по `primaryRef`. */
+/** Escape + Enter for `role="dialog"`: Escape closes it; Enter calls `click()` on `primaryRef`. */
 export function useModalKeyboard({
   open,
   trapRef,

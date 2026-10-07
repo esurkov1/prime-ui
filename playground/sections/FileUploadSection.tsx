@@ -37,7 +37,7 @@ export const page: ComponentPageConfig = {
       scenario: "custom-body",
       title: "Своё содержимое",
       description:
-        "Своё содержимое: приглушённый заголовок со ссылкой выбора и кнопки источников вместо встроенного — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.BrowseLink`.",
+        "Своё содержимое: приглушённый заголовок со ссылкой выбора и кнопки источников вместо встроенного — `FileUpload.Body`, `FileUpload.Title`.",
     },
     {
       scenario: "upload-progress",

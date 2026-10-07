@@ -65,7 +65,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `side` | `"bottom" \| "top"` | `"bottom"` | Preferred side; flips when there is no room. |
+| `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
 | `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment along the trigger; shifts inside the viewport. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the text, padding and gap; also the size context of the controls inside. |
 | `matchTriggerWidth` | `boolean` | `false` | The panel is exactly as wide as the trigger and its text wraps. |
@@ -95,8 +95,9 @@ Title uses the tier text size with title weight; Description uses the tier label
 |---|---|---|---|
 | `side="bottom"` | Below the trigger, `--prime-panel-offset` away | Default | yes |
 | `side="top"` | Above the trigger | Triggers near the bottom of the screen | |
+| `side="left"` / `"right"` | Beside the trigger, aligned along its height | Triggers in a side rail or a narrow column | |
 | `align="start"` | Start edges aligned | Default | yes |
-| `align="center"` | Centred under the trigger | Small icon triggers | |
+| `align="center"` | Centred on the trigger | Small icon triggers | |
 | `align="end"` | End edges aligned | Triggers at the end of a toolbar | |
 
 ### Flags
@@ -164,7 +165,7 @@ No `labels`.
 | [in-form.tsx](examples/in-form.tsx) | An invite form in a panel: Tab stays inside, the role list does not count as an outside click, and submit closes the panel — `trapFocus`. |
 
 ## Mistakes
-- `side="left"` / `"right"` → Popover supports only `top` and `bottom`.
+- A hint of a few words in a Popover → use Tooltip (hover / focus, no interactive content).
 - A form without `trapFocus` → add it so Tab stays in the panel.
 - Closing from inside through your own `open` state only → wrap the button in `Popover.Close`.
 - A menu of actions built from buttons in a Popover → use Dropdown (roving focus, menu roles).

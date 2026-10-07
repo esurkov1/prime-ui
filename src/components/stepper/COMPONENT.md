@@ -37,7 +37,7 @@ Stepper.Root                 <ol>; current step; chevrons between horizontal ite
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Stepper.Root
-No ref. `<ol>` of items; owns the current step, numbers the items and adds chevrons between horizontal ones.
+`ref` → `HTMLOListElement`. `<ol>` of items; owns the current step, numbers the items and adds chevrons between horizontal ones.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

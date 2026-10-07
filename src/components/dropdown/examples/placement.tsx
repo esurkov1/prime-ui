@@ -8,6 +8,8 @@ const PLACEMENTS = [
   { side: "top", align: "start" },
   { side: "top", align: "center" },
   { side: "top", align: "end" },
+  { side: "left", align: "start" },
+  { side: "right", align: "start" },
 ] as const;
 
 export default function DropdownPlacementExample() {

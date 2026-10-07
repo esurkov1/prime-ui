@@ -75,7 +75,7 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| current page | `value` / `defaultValue` | `aria-current="page"` on the Button: `fill-subtle-active`, primary text |
+| current page | `value` / `defaultValue` | `aria-current="page"` on a soft accent Button: `accent-soft` fill, `accent-text` |
 | hover / active | pointer | `fill-subtle` / `fill-subtle-active`, primary text, press scale |
 | focus-visible | keyboard | outer focus ring of the Button |
 | disabled arrow | first / last page | native `disabled`, `text-disabled` |

@@ -1,6 +1,6 @@
 /*
  * Textarea follows the Input field system (see Input.module.css): fill-based box, tier text. Label
- * row and support row come from FieldFrame and FieldSupport.
+ * row and support row (with the counter) come from FieldFrame.
  * Vertical padding = (control height − line height) / 2, so one line sits exactly like an Input.
  */
 .root {

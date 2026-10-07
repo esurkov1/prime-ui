@@ -11,8 +11,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Tier of padding, gaps and text roles. Pass the same `size` to the fields and buttons inside.",
-          ru: "Ярус отступов, зазоров и текста. Тот же `size` передайте полям и кнопкам.",
+          en: "Tier of padding, gaps and text roles; Inputs and Buttons inside without their own `size` take it.",
+          ru: "Ярус отступов, зазоров и текста; поля и кнопки внутри без своего `size` берут его.",
         },
         {
           name: "align",

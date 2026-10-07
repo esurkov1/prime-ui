@@ -65,15 +65,12 @@ export type {
   CardBodyProps,
   CardChartProps,
   CardCoverProps,
-  CardCtaBodyProps,
   CardDeltaProps,
   CardDescriptionProps,
   CardHeaderRowProps,
   CardHeadingLevel,
   CardIconBoxProps,
   CardLabelProps,
-  CardLeadProps,
-  CardListHeaderProps,
   CardListItemProps,
   CardListProps,
   CardMediaProps,
@@ -81,7 +78,6 @@ export type {
   CardSectionHeaderProps,
   CardSectionTitleProps,
   CardSectionTrailingProps,
-  CardSplitCellProps,
   CardSplitProps,
   CardStackProps,
   CardTitleProps,
@@ -223,7 +219,6 @@ export type {
 export { ExampleFrame } from "./example-frame/ExampleFrame";
 export type {
   FileUploadBodyProps,
-  FileUploadBrowseLinkProps,
   FileUploadDescriptionProps,
   FileUploadFormatBadgeProps,
   FileUploadIconProps,
@@ -433,6 +428,7 @@ export type {
 } from "./thumbnail/Thumbnail";
 export { Thumbnail } from "./thumbnail/Thumbnail";
 export type {
+  TimelineGapMetaProps,
   TimelineGapProps,
   TimelineGroupProps,
   TimelineItemProps,

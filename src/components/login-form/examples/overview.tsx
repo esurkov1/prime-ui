@@ -1,6 +1,5 @@
 /** Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a centered header — `align`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. */
-import { Send } from "lucide-react";
-import { Button, Divider, Input, LinkButton, LoginForm } from "prime-ui-kit";
+import { Button, Divider, Icon, Input, LinkButton, LoginForm } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -10,7 +9,7 @@ export default function LoginFormOverviewExample() {
       <LoginForm.Root align="center">
         <LoginForm.Header>
           <LoginForm.Logo>
-            <Send aria-hidden />
+            <Icon name="action.send" />
           </LoginForm.Logo>
           <LoginForm.Title>Войти в аккаунт</LoginForm.Title>
           <LoginForm.Description>Введите данные для входа в кабинет</LoginForm.Description>
@@ -19,7 +18,7 @@ export default function LoginFormOverviewExample() {
           <LoginForm.Actions>
             <Button.Root variant="outline" tone="neutral" fullWidth>
               <Button.Icon>
-                <Send />
+                <Icon name="action.send" />
               </Button.Icon>
               Продолжить через Telegram
             </Button.Root>

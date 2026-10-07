@@ -93,8 +93,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Dot",
-      en: "An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon.",
-      ru: "Точка цвета текста, `aria-hidden`; у края становится сегментом, как иконка.",
+      en: "An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon. Also usable alone (a marker on an icon, before a label): it takes the tier of the surrounding control (6px, 8px from `l`) and the color set on it.",
+      ru: "Точка цвета текста, `aria-hidden`; у края становится сегментом, как иконка. Работает и отдельно (метка на иконке, перед подписью): размер по ярусу окружающего контрола (6px, с `l` — 8px), цвет — заданный на ней.",
       props: [
         {
           name: "…rest",

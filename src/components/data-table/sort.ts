@@ -1,4 +1,4 @@
-import type { DataTableColumn, DataTableOrder, DataTableSortState } from "./DataTable";
+import type { DataTableColumn, DataTableOrder, DataTableSortState } from "./types";
 
 function comparePrimitive(a: unknown, b: unknown): number {
   if (a == null && b == null) return 0;

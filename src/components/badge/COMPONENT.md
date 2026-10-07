@@ -63,7 +63,7 @@ A `<span>` holding one icon at the tier icon size. At the first or last position
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Badge.Dot
-An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon.
+An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon. Also usable alone (a marker on an icon, before a label): it takes the tier of the surrounding control (6px, 8px from `l`) and the color set on it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

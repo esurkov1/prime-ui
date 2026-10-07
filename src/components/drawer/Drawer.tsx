@@ -9,6 +9,8 @@ import {
   DialogIcon,
   DialogShellProvider,
   DialogTitle,
+  DialogTrigger,
+  type DialogTriggerProps,
   dialogShellClassName,
   useDialogShellValue,
 } from "@/components/modal/DialogParts";
@@ -39,6 +41,7 @@ export type {
   DialogHeaderProps as DrawerHeaderProps,
   DialogIconProps as DrawerIconProps,
   DialogTitleProps as DrawerTitleProps,
+  DialogTriggerProps as DrawerTriggerProps,
 } from "@/components/modal/DialogParts";
 
 export type DrawerSide = "left" | "right";
@@ -109,20 +112,10 @@ DrawerRoot.displayName = "Drawer.Root";
 
 // ─── Trigger ──────────────────────────────────────────────────────────────────
 
-export type DrawerTriggerProps = {
-  children: React.ReactElement<{ onClick?: React.MouseEventHandler }>;
-};
-
 /** Opens the drawer on the child's click (unless the child prevents default). */
-function DrawerTrigger({ children }: DrawerTriggerProps) {
+function DrawerTrigger(props: DialogTriggerProps) {
   const { setOpen } = useDrawerContext();
-  const child = React.Children.only(children);
-  return React.cloneElement(child, {
-    onClick: (event: React.MouseEvent) => {
-      child.props.onClick?.(event);
-      if (!event.defaultPrevented) setOpen(true);
-    },
-  });
+  return <DialogTrigger {...props} onOpen={() => setOpen(true)} />;
 }
 DrawerTrigger.displayName = "Drawer.Trigger";
 

@@ -3,11 +3,12 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
-import menu from "@/components/dropdown/menu.module.css";
 import { Input } from "@/components/input/Input";
 import { Popover } from "@/components/popover/Popover";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { formatLabel } from "@/internal/formatLabel";
+import menu from "@/internal/menu.module.css";
 import type { PaletteColor } from "@/internal/states";
 
 import styles from "./TagSelect.module.css";
@@ -81,7 +82,7 @@ export function TagOptionMenu({
           variant="ghost"
           tone="neutral"
           size="xs"
-          aria-label={labels.edit.replace("{label}", label)}
+          aria-label={formatLabel(labels.edit, { label })}
           disabled={disabled}
           className={styles.menuTrigger}
           // Keeps focus in the field input and the press away from the row (no toggle).

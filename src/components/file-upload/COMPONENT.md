@@ -27,7 +27,7 @@ FileUpload.Root                 field frame: label → drop zone → hint | erro
 └─ <label> drop zone            visually hidden <input type="file">; built-in body or children
    └─ FileUpload.Body           custom body column
       ├─ FileUpload.Icon        round tinted icon slot
-      ├─ FileUpload.Title       zone title (BrowseLink inside for an inline link)
+      ├─ FileUpload.Title       zone title (`<LinkButton asChild><button>` inside for an inline link)
       └─ FileUpload.Description secondary line (the kit Hint)
 
 FileUpload.Item                 file row
@@ -83,9 +83,6 @@ No ref. The zone title `<p>`. Native `<p>` props.
 ### FileUpload.Description
 No ref. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.
 
-### FileUpload.BrowseLink
-`forwardRef` → `HTMLButtonElement`. An inline link-styled button inside a custom title; it does not activate the zone, so pass `onClick` (e.g. `inputRef.current?.click()`).
-
 ### FileUpload.Item
 No ref. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.
 
@@ -138,7 +135,7 @@ No ref. Upload progress across the row: the kit ProgressBar.
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `default` | primary text, medium weight | the main line of the zone | yes |
-| `muted` | secondary text, regular weight | an instruction sentence with an inline `BrowseLink` | |
+| `muted` | secondary text, regular weight | an instruction sentence with an inline `LinkButton asChild` button | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -199,7 +196,7 @@ Also `data-size`, `data-variant` on the zone and `data-size` on Item. Files are 
 | [sizes.tsx](examples/sizes.tsx) | Every size of the zone and of a file row: padding, icon, button and text follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | A default zone, a disabled one and an invalid one without a message — `disabled`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | A required zone with a hint, a rejected file whose error replaces the hint and an optional zone — `required`, `hint`, `error`, `optional`. |
-| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a muted title with a browse link and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.BrowseLink`. |
+| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a muted title with a browse link and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`. |
 | [upload-progress.tsx](examples/upload-progress.tsx) | File rows while uploading, uploaded and failed with a retry — `FileUpload.ItemProgress`, `invalid`, `FileUpload.ItemActions`. |
 | [avatar-upload.tsx](examples/avatar-upload.tsx) | A round zone around an Avatar that takes images and shows a preview; buttons open the same input — `inputRef`, `accept`, `className`. |
 | [in-form.tsx](examples/in-form.tsx) | A contract upload form: the required scan is checked on submit and its error replaces the hint — `required`, `error`, `name`. |
@@ -208,9 +205,9 @@ Also `data-size`, `data-variant` on the zone and `data-size` on Item. Files are 
 ## Mistakes
 - A `Label` and a `Hint` placed around the zone by hand → pass `label`, `hint`, `error`.
 - Nesting `FileUpload.Root` in another `<label>` → it already is one.
-- A plain `<button>` in a custom body expecting it to open the picker → call `inputRef.current?.click()` in its `onClick`.
+- A plain `<button>` in a custom body expecting it to open the picker → call `inputRef.current?.click()` in its `onClick`; an inline «browse» link is `<LinkButton asChild><button type="button" onClick={…}>`.
 - `labels.hint` → the built-in secondary line is `labels.description`; `hint` is the field hint under the zone.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [Button](../button/COMPONENT.md) (built-in browse button), [Badge](../badge/COMPONENT.md) (`FormatBadge`), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), `Icon`
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [Button](../button/COMPONENT.md) (built-in browse button), [LinkButton](../link-button/COMPONENT.md) (inline browse link in a custom body), [Badge](../badge/COMPONENT.md) (`FormatBadge`), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), `Icon`
 - **See also:** [Avatar](../avatar/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

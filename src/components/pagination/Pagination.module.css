@@ -1,6 +1,7 @@
 /*
- * Pagination: ghost Buttons of the tier; the current page is the Button's `aria-current` fill.
- * This file only lays them out and sizes the ellipsis and the compact summary to the tier.
+ * Pagination: ghost neutral Buttons of the tier; the current page is a soft accent Button with
+ * `aria-current="page"`. This file only lays them out, tightens the padding of the numbers and
+ * sizes the ellipsis and the compact summary to the tier.
  */
 .root {
   --pg-size: var(--prime-control-m-height);

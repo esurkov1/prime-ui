@@ -9,7 +9,8 @@ type PortalProps = {
 export function Portal({ children, container }: PortalProps) {
   const [mounted, setMounted] = React.useState(false);
 
-  // useLayoutEffect: портал в DOM до paint и до layout-эффектов родителя (нужно для ref + позиционирования).
+  // Layout effect: the portal reaches the DOM before paint and before the parent's layout effects
+  // (refs and positioning need it).
   React.useLayoutEffect(() => {
     setMounted(true);
     return () => setMounted(false);

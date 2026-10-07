@@ -34,6 +34,7 @@ export type BreadcrumbRootProps = React.HTMLAttributes<HTMLElement> & {
   size?: ControlSize;
   /** Built-in strings. */
   labels?: Partial<BreadcrumbLabels>;
+  ref?: React.Ref<HTMLElement>;
 };
 
 /** From this many levels the middle ones collapse into «…» on narrow containers. */

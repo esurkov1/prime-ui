@@ -16,6 +16,18 @@ describe("EmptyPage", () => {
     expect(screen.getByText("Добавьте записи, чтобы увидеть список.")).toBeInTheDocument();
   });
 
+  it("renders the title with the tag from `as`", () => {
+    render(
+      <EmptyPage.Root>
+        <EmptyPage.Title as="p">Ничего не найдено</EmptyPage.Title>
+        <EmptyPage.Title as="h3">Заказов нет</EmptyPage.Title>
+      </EmptyPage.Root>,
+    );
+    expect(screen.queryByRole("heading", { name: "Ничего не найдено" })).toBeNull();
+    expect(screen.getByText("Ничего не найдено").tagName).toBe("P");
+    expect(screen.getByRole("heading", { level: 3, name: "Заказов нет" })).toBeInTheDocument();
+  });
+
   it("marks the compact layout and leaves the default one unmarked", () => {
     const { rerender } = render(
       <EmptyPage.Root layout="compact" data-testid="empty">

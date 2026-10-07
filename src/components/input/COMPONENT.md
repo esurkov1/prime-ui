@@ -46,7 +46,7 @@ No ref (renders a `<div>`). Does not forward native props. Size, label, support 
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier for height, padding, radius, text, label and hint. Also provided to nested controls via the control-size context. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier for height, padding, radius, text, label and hint. Without it the field takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. Also provided to nested controls via the control-size context. |
 | `label` | `ReactNode` | — | Label above the field, rendered as `<label htmlFor>`. Without it, give `Input.Field` an `aria-label`. |
 | `required` | `boolean` | `false` | Red `*` after the label (`aria-hidden`) and native `required` on `Input.Field`. |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |

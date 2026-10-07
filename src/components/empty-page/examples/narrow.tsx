@@ -1,11 +1,11 @@
 /** In a 320 px side panel the text wraps under the tile and the actions wrap to a second line. */
-import { Button, EmptyPage, Icon } from "prime-ui-kit";
+import { Button, Card, EmptyPage, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 export default function EmptyPageNarrowExample() {
   return (
-    <div className={styles.narrow}>
+    <Card.Root className={styles.narrow}>
       <EmptyPage.Root size="s" aria-labelledby="empty-narrow-title">
         <EmptyPage.Icon>
           <Icon name="action.filter" />
@@ -21,6 +21,6 @@ export default function EmptyPageNarrowExample() {
           <Button.Root size="s">Пригласить поставщика</Button.Root>
         </EmptyPage.Actions>
       </EmptyPage.Root>
-    </div>
+    </Card.Root>
   );
 }

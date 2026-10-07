@@ -25,13 +25,3 @@ export const defaultDndLabels: DndLabels = {
   cancelled: "{label}: перемещение отменено",
   moved: "{label}: позиция {position} из {total}",
 };
-
-export function formatLabel(
-  template: string,
-  values: { label: string; position?: number; total?: number },
-): string {
-  return template
-    .replaceAll("{label}", values.label)
-    .replaceAll("{position}", String(values.position ?? ""))
-    .replaceAll("{total}", String(values.total ?? ""));
-}

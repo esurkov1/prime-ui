@@ -39,7 +39,7 @@ The toolbar and the chips are separate parts so a page can put them in different
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### SmartFilter.Root
-No ref. A `<div>` (flex column) with the state and the context; sets `data-size`.
+`ref` → `HTMLDivElement`. A `<div>` (flex column) with the state and the context; sets `data-size`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
