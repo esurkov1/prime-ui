@@ -51,9 +51,16 @@ export const api: ComponentApi = {
     },
     {
       name: "EmptyPage.Title · EmptyPage.Description",
-      en: "`ref` → the element. `<h2>` and `<p>`, both capped at the reading width.",
-      ru: "`<h2>` и `<p>`, обе ограничены шириной чтения.",
+      en: "`ref` → the element. `<h2>` (or `as`) and `<p>`, both capped at the reading width.",
+      ru: "`<h2>` (или `as`) и `<p>`, обе ограничены шириной чтения.",
       props: [
+        {
+          name: "as",
+          type: '"h2" | "h3" | "h4" | "p"',
+          default: '"h2"',
+          en: "Title: tag that fits the outline; the look does not change. `p` inside menus, lists and table cells.",
+          ru: "Title: тег по структуре страницы; вид не меняется. `p` внутри меню, списков и ячеек таблицы.",
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",

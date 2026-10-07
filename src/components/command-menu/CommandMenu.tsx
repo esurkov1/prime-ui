@@ -479,7 +479,7 @@ function CommandMenuEmpty({ children, ...rest }: CommandMenuEmptyProps) {
   if (visibleIds.length > 0) return null;
   return (
     <EmptyPage.Root layout="compact" role="status" {...rest}>
-      <EmptyPage.Title>{labels.empty}</EmptyPage.Title>
+      <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
       {labels.emptyHint ? <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description> : null}
       {children ? <EmptyPage.Actions>{children}</EmptyPage.Actions> : null}
     </EmptyPage.Root>

@@ -781,7 +781,7 @@ function SelectContent({ searchable = false, className, children }: SelectConten
           </ScrollContainer>
           {isEmpty && !loading ? (
             <EmptyPage.Root layout="compact" role="status">
-              <EmptyPage.Title>{labels.empty}</EmptyPage.Title>
+              <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
               {query !== "" && labels.emptyHint ? (
                 <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
               ) : null}

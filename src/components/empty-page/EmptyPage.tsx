@@ -63,12 +63,23 @@ function EmptyPageIcon({ tone = "neutral", className, ...rest }: EmptyPageIconPr
 }
 EmptyPageIcon.displayName = "EmptyPage.Icon";
 
-export type EmptyPageTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
-  ref?: React.Ref<HTMLHeadingElement>;
+export type EmptyPageTitleProps = React.HTMLAttributes<HTMLElement> & {
+  /**
+   * Tag that fits the outline; the look does not change. `p` inside menus, lists and table cells,
+   * where a heading would break the page outline.
+   */
+  as?: "h2" | "h3" | "h4" | "p";
+  ref?: React.Ref<HTMLElement>;
 };
 
-function EmptyPageTitle({ className, ...rest }: EmptyPageTitleProps) {
-  return <h2 className={cx(styles.title, useEnterClass(), className)} {...rest} />;
+function EmptyPageTitle({ as: Tag = "h2", className, ref, ...rest }: EmptyPageTitleProps) {
+  return (
+    <Tag
+      ref={ref as React.Ref<HTMLHeadingElement & HTMLParagraphElement>}
+      className={cx(styles.title, useEnterClass(), className)}
+      {...rest}
+    />
+  );
 }
 EmptyPageTitle.displayName = "EmptyPage.Title";
 
