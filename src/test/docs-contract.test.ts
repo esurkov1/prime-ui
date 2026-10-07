@@ -63,7 +63,6 @@ const NOT_CONVERTED = new Set([
   "tag-select",
   "textarea",
   "tooltip",
-  "typography",
 ]);
 
 type ComponentDir = { base: "components" | "layout"; dir: string; rel: string };
