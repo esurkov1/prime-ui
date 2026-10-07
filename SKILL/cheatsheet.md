@@ -57,6 +57,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Destructive is `tone="danger"` — never `tone="error"`. Standalone trigger `variant="outline"`, menu item `<Dropdown.Item tone="danger">` last, confirm `solid` in a `<Modal.Root closeOnOutsideClick={false}>`.
 - Going somewhere is a link: `<LinkButton href>` or `<Button.Root asChild><a href>…</a></Button.Root>` — not `onClick={() => location.assign(url)}`.
 - Busy action: `<Button.Root loading>` — not a hand-made spinner or «Загрузка…» text.
+- An action on a coloured host (a solid Banner, an accent strip): `<Button.Root variant="ghost" tone="inherit">` — it takes the host's text colour; never recolour a Button with a CSS override.
 
 ## Cards and surfaces
 
@@ -82,6 +83,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Table states in place: `loading` (+ `loadingRows`), `empty`, `error` on `DataTable` — the head and toolbar stay.
 - First run of a page or region: `EmptyPage.Root` + `EmptyPage.Icon` + `EmptyPage.Title` + `EmptyPage.Description` + `EmptyPage.Actions` with one action — not «Здесь пока ничего нет».
 - Region loading: `aria-busy` on the region + `<Spinner aria-hidden="true" />` in place — not a skeleton or shimmer you draw.
+- A region that switches between loading, data, empty and error: its content in `<Crossfade state={status}>` — the states fade into each other and the height glides; not an instant swap that makes the page jump. DataTable does this itself.
 - Page-level persistent problem: `<Banner.Root tone="danger">` first in `PageContent.Body`; the result of an action: `useNotifications().notify({ tone, title })`.
 
 ## Sidebar

@@ -154,6 +154,8 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a table, pagination, row selection | `DataTable`, `Pagination`, `Checkbox` |
 | screen-reader-only text | `src/internal/VisuallyHidden` |
 | appearance of a part | `src/internal/enterMotion.module.css` (`.enter`, `.enterBase`) |
+| a swap between states of a region (loading / data / empty / error) | `Crossfade` (public) or `useStateSwap` + `src/internal/swapMotion.module.css` inside a component (DataTable) |
+| an action on a coloured host (solid Banner) | `Button` `tone="inherit"` (ghost / soft / outline) — never a host CSS override |
 | overlay enter/exit, stack, focus | `overlayMotion.module.css`, `usePresence`, `useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `OverlayPortalLayerContext` |
 | anchored positioning | `usePosition` (follows the anchor, 4 sides, `align`, arrow) |
 | roving arrow-key focus | `src/internal/rovingFocus.ts` (`rovingIndex`, `gridIndex`) |
@@ -250,7 +252,7 @@ export default function ButtonSection() { return <ComponentPage page={page} />; 
   FileUpload; overlay — Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu,
   Notification; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable,
   Dnd, SmartFilter, Timeline, Card, LoginForm, EmptyPage; layout — AppShell, Sidebar, PageContent,
-  ScrollContainer, ExampleFrame).
+  ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·
   `sizes` «Размеры» · `states` «Состояния» · `with-icon` «С иконкой» · `structure` «Структура» ·
   `group` «Группа» · `orientation` «Ориентация» · `placement` «Расположение» · `overflow`
@@ -346,8 +348,8 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `tokens/` | `primitives.ts` → `semantic.ts` → `themes/{light,dark}.ts`; `bun run tokens:build` generates `src/styles/{tokens,theme-light,theme-dark}.css` (never edit those by hand) |
 | `src/components/<dir>/` | one component: `X.tsx`, `X.module.css`, `X.test.tsx`, `api.ts`, `COMPONENT.md`, `examples/` |
 | `src/layout/` | AppShell, Sidebar (same structure) |
-| `src/internal/` | shared mechanics: `states.ts` (vocabulary types), contexts (`ControlSizeContext`, `OverlayPortalLayerContext`), `FieldFrame`, `ChoiceField`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`, `mergeRefs`; CSS: `overlayMotion`, `enterMotion`, `floatingSurface`, `menu` |
-| `src/hooks/` | overlay stack (`useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `usePresence`, `usePosition`, `useOverlayModal`, `useModalKeyboard`, `useScrollLock`), `useControllableState`, `useMergedRefs`, `useImageStatus` |
+| `src/internal/` | shared mechanics: `states.ts` (vocabulary types), contexts (`ControlSizeContext`, `OverlayPortalLayerContext`), `FieldFrame`, `ChoiceField`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`, `mergeRefs`; CSS: `overlayMotion`, `enterMotion`, `swapMotion`, `floatingSurface`, `menu` |
+| `src/hooks/` | overlay stack (`useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `usePresence`, `usePosition`, `useOverlayModal`, `useModalKeyboard`, `useScrollLock`), `useControllableState`, `useMergedRefs`, `useImageStatus`, `useStateSwap` |
 | `src/icons/` | public `Icon` registry and `Icon*` components on lucide-react — the only icon source for components |
 | `src/index.ts`, `src/components/index.ts`, `src/layout/index.ts` | public exports |
 | `playground/pageStandard.ts` | page kinds, slot vocabulary, `KIND_SLOTS`, `PROP_SLOTS` |
