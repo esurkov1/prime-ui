@@ -1,4 +1,4 @@
-/** Pressable badges with a reveal action: `onPress` + `pressed` make the badge a toggle (show only this value), and `Badge.Action` adds a «−» segment that slides in on hover and focus without changing the badge width. `persistent` keeps it shown while the value is hidden. Use for filter values with show / hide. */
+/** Filter values as toggles with a hide action that slides in without changing the width — `onPress`, `pressed`, `Badge.Action`, `persistent`. */
 import { Badge } from "prime-ui-kit";
 import * as React from "react";
 

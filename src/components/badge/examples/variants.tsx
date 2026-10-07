@@ -1,47 +1,38 @@
-/** The three treatments (`soft` default, `solid`, `outline`) on the same hues, plus a leading `Badge.Dot`. Use to choose emphasis for labels in lists and tables. */
-
+/** Every palette hue in every treatment; the text must read without the color — `variant`, `color`. */
 import { Badge, type PaletteColor, Typography } from "prime-ui-kit";
-import { Fragment } from "react";
 
-import styles from "./examples.module.css";
+const COLORS: PaletteColor[] = [
+  "gray",
+  "blue",
+  "sky",
+  "teal",
+  "green",
+  "yellow",
+  "orange",
+  "red",
+  "pink",
+  "purple",
+];
 
-const variants = ["soft", "solid", "outline"] as const;
-const colors: PaletteColor[] = ["gray", "blue", "green", "orange", "red"];
+const VARIANTS = ["soft", "solid", "outline"] as const;
 
 export default function BadgeVariantsExample() {
   return (
-    <div className={styles.matrix}>
-      {variants.map((variant) => (
-        <Fragment key={variant}>
-          <Typography.Root as="span" variant="caption" tone="muted">
-            {variant}
-          </Typography.Root>
-          <div className={styles.badges}>
-            {colors.map((color) => (
-              <Badge.Root key={color} variant={variant} color={color}>
+    <>
+      {COLORS.map((color) => (
+        <div key={color}>
+          {VARIANTS.map((variant) => (
+            <div key={variant}>
+              <Badge.Root variant={variant} color={color}>
                 {color}
               </Badge.Root>
-            ))}
-          </div>
-        </Fragment>
+              <Typography.Root as="span" variant="caption" tone="muted">
+                {variant}
+              </Typography.Root>
+            </div>
+          ))}
+        </div>
       ))}
-      <Typography.Root as="span" variant="caption" tone="muted">
-        dot
-      </Typography.Root>
-      <div className={styles.badges}>
-        <Badge.Root color="green">
-          <Badge.Dot />
-          Активен
-        </Badge.Root>
-        <Badge.Root color="yellow">
-          <Badge.Dot />
-          На проверке
-        </Badge.Root>
-        <Badge.Root color="red">
-          <Badge.Dot />
-          Отклонён
-        </Badge.Root>
-      </div>
-    </div>
+    </>
   );
 }

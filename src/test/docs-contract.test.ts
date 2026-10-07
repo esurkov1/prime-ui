@@ -31,7 +31,6 @@ const NOT_CONVERTED = new Set([
   "accordion",
   "app-shell",
   "avatar",
-  "badge",
   "banner",
   "breadcrumb",
   "button-group",
