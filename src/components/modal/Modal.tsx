@@ -23,6 +23,8 @@ import {
   DialogIcon,
   DialogShellProvider,
   DialogTitle,
+  DialogTrigger,
+  type DialogTriggerProps,
   dialogShellClassName,
   useDialogShellValue,
 } from "./DialogParts";
@@ -38,6 +40,7 @@ export type {
   DialogHeaderProps as ModalHeaderProps,
   DialogIconProps as ModalIconProps,
   DialogTitleProps as ModalTitleProps,
+  DialogTriggerProps as ModalTriggerProps,
 } from "./DialogParts";
 
 export type ModalLabels = {
@@ -127,20 +130,10 @@ ModalRoot.displayName = "Modal.Root";
 
 // ─── Trigger ──────────────────────────────────────────────────────────────────
 
-export type ModalTriggerProps = {
-  children: React.ReactElement<{ onClick?: React.MouseEventHandler }>;
-};
-
 /** Opens the dialog on the child's click (unless the child prevents default). */
-function ModalTrigger({ children }: ModalTriggerProps) {
+function ModalTrigger(props: DialogTriggerProps) {
   const { setOpen } = useModalContext();
-  const child = React.Children.only(children);
-  return React.cloneElement(child, {
-    onClick: (event: React.MouseEvent) => {
-      child.props.onClick?.(event);
-      if (!event.defaultPrevented) setOpen(true);
-    },
-  });
+  return <DialogTrigger {...props} onOpen={() => setOpen(true)} />;
 }
 ModalTrigger.displayName = "Modal.Trigger";
 
