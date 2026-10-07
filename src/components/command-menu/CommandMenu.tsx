@@ -455,7 +455,9 @@ function CommandMenuItemText({
   return (
     <span className={cx(styles.itemText, className)} {...rest}>
       <span className={styles.itemLabel}>{highlightChildren(children, search)}</span>
-      {description ? <span className={styles.itemDescription}>{description}</span> : null}
+      {description ? (
+        <span className={styles.itemDescription}>{highlightChildren(description, search)}</span>
+      ) : null}
     </span>
   );
 }

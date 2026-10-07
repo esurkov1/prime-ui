@@ -81,6 +81,24 @@ describe("CommandMenu", () => {
     expect(option).toHaveTextContent("Alpha");
   });
 
+  it("marks the match in the description line too", async () => {
+    const user = userEvent.setup();
+    render(
+      <CommandMenu.Root open onOpenChange={vi.fn()}>
+        <CommandMenu.Input aria-label="Поиск команд" />
+        <CommandMenu.List>
+          <CommandMenu.Item value="intro" keywords="что такое система">
+            <CommandMenu.ItemText description="Что такое Prime UI">Введение</CommandMenu.ItemText>
+          </CommandMenu.Item>
+        </CommandMenu.List>
+      </CommandMenu.Root>,
+    );
+    await user.type(screen.getByRole("combobox"), "что");
+    const marks = screen.getByRole("option").querySelectorAll("mark");
+    expect(marks).toHaveLength(1);
+    expect(marks[0]).toHaveTextContent("Что");
+  });
+
   it("не рендерит диалог при open=false", () => {
     render(<TestPalette open={false} />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

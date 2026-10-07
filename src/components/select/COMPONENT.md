@@ -162,7 +162,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the trigger; error text below |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"` |
 | loading | `loading` | `data-loading="true"`, `aria-busy`; status row in the list |
-| searching | typing in the search | panel `data-searching="true"`; groups without matches and separators hide |
+| searching | typing in the search | panel `data-searching="true"`; groups without matches and separators hide; the match in an option's title, description and plain text is a `<mark>` in `accent-text` (not in the trigger) |
 | option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted`, `data-selected` + `aria-selected`, `data-disabled` + `aria-disabled`; highlight is a fill only |
 
 ## Layout & spacing

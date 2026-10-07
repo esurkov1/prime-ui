@@ -835,6 +835,19 @@ describe("Select rich options", () => {
     });
     const options = screen.getAllByRole("option");
     expect(options.map((o) => o.dataset.value)).toEqual(["adv350"]);
+    expect(options[0]?.querySelector("mark")).toHaveTextContent(/максискутер/i);
+  });
+
+  it("marks the match in the option title while searching, never in the trigger", () => {
+    render(<RichSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Поиск" }), {
+      target: { value: "adv" },
+    });
+    for (const option of screen.getAllByRole("option")) {
+      expect(option.querySelector("mark")).toHaveTextContent(/adv/i);
+    }
+    expect(screen.getByRole("combobox").querySelector("mark")).toBeNull();
   });
 
   it("single-line items keep the plain layout", () => {

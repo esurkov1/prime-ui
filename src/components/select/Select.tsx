@@ -18,6 +18,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
 import surface from "@/internal/floatingSurface.module.css";
+import { highlightChildren } from "@/internal/HighlightMatch";
 import { enabledOptions, handleListboxKeyDown } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
 import { mergeRefs } from "@/internal/mergeRefs";
@@ -478,9 +479,15 @@ SelectItemIcon.displayName = "Select.ItemIcon";
 
 export type SelectItemTextProps = { children: React.ReactNode; className?: string };
 
+/** The search query inside an option row; empty in the trigger, so `renderValue` never marks it. */
+const OptionQueryContext = React.createContext("");
+
 /** Title of a rich option; its text is the option label (trigger, typeahead, search). */
 function SelectItemText({ children, className }: SelectItemTextProps) {
-  return <span className={cx(styles.itemTitle, className)}>{children}</span>;
+  const query = React.useContext(OptionQueryContext);
+  return (
+    <span className={cx(styles.itemTitle, className)}>{highlightChildren(children, query)}</span>
+  );
 }
 SelectItemText.displayName = "Select.ItemText";
 
@@ -488,7 +495,12 @@ export type SelectItemDescriptionProps = { children: React.ReactNode; className?
 
 /** Muted second line under `Select.ItemText`; searchable. Makes the row two-line. */
 function SelectItemDescription({ children, className }: SelectItemDescriptionProps) {
-  return <span className={cx(styles.itemDescription, className)}>{children}</span>;
+  const query = React.useContext(OptionQueryContext);
+  return (
+    <span className={cx(styles.itemDescription, className)}>
+      {highlightChildren(children, query)}
+    </span>
+  );
 }
 SelectItemDescription.displayName = "Select.ItemDescription";
 
@@ -875,7 +887,11 @@ function SelectItem({
         <Checkbox.Indicator checked={isSelected} disabled={disabled} size={CHECKBOX_SIZE[size]} />
       ) : null}
       {sizeMedia(parts.leading, size)}
-      <span className={styles.itemText}>{parts.body}</span>
+      <span className={styles.itemText}>
+        <OptionQueryContext.Provider value={query}>
+          {highlightChildren(parts.body, query)}
+        </OptionQueryContext.Provider>
+      </span>
       {parts.meta}
       {multiple ? null : (
         <span className={styles.check} aria-hidden="true">
