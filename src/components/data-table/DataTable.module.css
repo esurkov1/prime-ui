@@ -441,13 +441,30 @@
   border-top: var(--dt-divider-width) solid var(--dt-divider-color);
 }
 
+/*
+ * Height runs through the grid track (0fr ↔ 1fr), like Accordion. Open: the panel opened by an
+ * expand drops in (slow · enter); close: it folds and fades (fast · exit) and unmounts after the
+ * transition (`usePresence`).
+ */
 .detailMotion {
   display: grid;
-  grid-template-rows: 1fr;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
-.detailRow[data-animate="true"] .detailMotion {
-  animation: dt-detail-enter var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;
+.detailRow[data-state="open"] .detailMotion {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+}
+
+.detailRow[data-state="open"][data-animate="true"] .detailMotion {
+  animation: dt-detail-enter var(--prime-motion-duration-slow) var(--prime-motion-easing-enter);
 }
 
 @keyframes dt-detail-enter {
@@ -489,15 +506,6 @@
   --dt-wash: var(--prime-color-fill-subtle-active);
 }
 
-.cell[role="button"] {
-  cursor: pointer;
-}
-
-.cell[role="button"]:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
 /* ---------- Sticky first column ---------- */
 
 .firstColumnSticky {
@@ -532,8 +540,7 @@
   z-index: var(--dt-z-sticky-header);
 }
 
-.root[data-sticky-header="true"][data-sticky-first-column="true"]
-  .headCell[data-first-column="true"],
+/* Sticky head and first column: the leading head cells stick to both edges. */
 .cornerCellSticky {
   position: sticky;
   top: 0;

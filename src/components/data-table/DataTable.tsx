@@ -1,28 +1,28 @@
 import * as React from "react";
 
-import { Button } from "@/components/button/Button";
-import { Checkbox } from "@/components/checkbox/Checkbox";
-import { EmptyPage } from "@/components/empty-page/EmptyPage";
-import { Pagination } from "@/components/pagination/Pagination";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useStateSwap } from "@/hooks/useStateSwap";
-import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { mergeRefs } from "@/internal/mergeRefs";
-import { DATA_TABLE_INFINITE_ROOT_MARGIN } from "@/internal/runtimeUnits";
 import type { ControlSize } from "@/internal/states";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./DataTable.module.css";
-import { columnValue, nextSort, sortRows } from "./sort";
-import type { DataTableCellAlign, DataTableColumn, DataTableSortState } from "./types";
+import { Footer } from "./Footer";
+import { Head } from "./Head";
+import { DataTableRow, MeasureBody, type RowShared } from "./Row";
+import { flatten, nextSort, sortRows } from "./rows";
+import { StateRows } from "./StateRows";
+import type { DataTableColumn, DataTableSortState } from "./types";
+import { useColumnHover } from "./useColumnHover";
 import { useFrozenColumns } from "./useFrozenColumns";
+import { useInfiniteRows } from "./useInfiniteRows";
+import { useRowSelection } from "./useRowSelection";
 
 export type { DataTableColumn, DataTableOrder, DataTableSortState } from "./types";
 
@@ -103,7 +103,6 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   onPageChange?: (page: number) => void;
   /** Rows per page (also the first batch in infinite scroll). */
   pageSize?: number;
-  initialVisibleRows?: number;
   infiniteBatchSize?: number;
   hasMore?: boolean;
   loadingMore?: boolean;
@@ -141,66 +140,11 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   toolbar?: React.ReactNode;
 };
 
-function columnAlign<Row>(column: DataTableColumn<Row>): DataTableCellAlign {
-  return column.align ?? (column.numeric ? "end" : "start");
-}
-
-const ARIA_SORT = { asc: "ascending", desc: "descending" } as const;
-const SORT_ICON = { asc: "sort.ascending", desc: "sort.descending" } as const;
-
-type FlatRow<Row> = {
-  row: Row;
-  key: React.Key;
-  depth: number;
-  /** Ids of the direct sub-rows (empty when none). */
-  childKeys: React.Key[];
-  expandable: boolean;
-  expanded: boolean;
-  /** Mounted by the latest expand, or newly added to `rows`: plays the enter animation. */
-  animate: boolean;
-};
-
 const EMPTY_KEYS: React.Key[] = [];
-
-/** Toggle buttons sit one tier below the table tier (m table → xs button, 28). */
-const TOGGLE_SIZE: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "xs",
-  l: "s",
-  xl: "s",
-};
-
-const domIdPart = (key: React.Key) => String(key).replace(/[^A-Za-z0-9_-]/g, "_");
-
 const SKELETON_ROWS = 5;
 const INFINITE_SCROLL_HEIGHT = 360;
 
-function columnSizeStyle<Row>(column: DataTableColumn<Row>): React.CSSProperties | undefined {
-  const { width, minWidth, maxWidth, grow } = column;
-  if (!width && !minWidth && !maxWidth && !grow) return undefined;
-  return { width: width ?? (grow ? "100%" : undefined), minWidth, maxWidth };
-}
-
-function renderCell<Row>(row: Row, column: DataTableColumn<Row>, withTitle: boolean) {
-  const content = column.cell
-    ? column.cell(row)
-    : ((value) => (value == null ? "—" : String(value)))(columnValue(row, column));
-  if (!column.truncate) return content;
-  return (
-    <span
-      className={styles.truncate}
-      style={{ maxWidth: column.maxWidth ?? column.width }}
-      title={
-        withTitle && (typeof content === "string" || typeof content === "number")
-          ? String(content)
-          : undefined
-      }
-    >
-      {content}
-    </span>
-  );
-}
+const domIdPart = (key: React.Key) => String(key).replace(/[^A-Za-z0-9_-]/g, "_");
 
 export function DataTable<Row>({
   columns,
@@ -225,7 +169,6 @@ export function DataTable<Row>({
   defaultPage = 1,
   onPageChange,
   pageSize = 10,
-  initialVisibleRows,
   infiniteBatchSize = 20,
   hasMore = false,
   loadingMore = false,
@@ -252,13 +195,16 @@ export function DataTable<Row>({
   ref,
   ...rest
 }: DataTableProps<Row>) {
-  const labels = { ...DEFAULT_LABELS, ...labelsProp };
+  const labels = React.useMemo(() => ({ ...DEFAULT_LABELS, ...labelsProp }), [labelsProp]);
   const infinite = paging === "infinite";
-  const [hoveredColumnId, setHoveredColumnId] = React.useState<string | null>(null);
-  const hoverColumn = (columnId: string) => {
-    if (highlightColumnOnHover) setHoveredColumnId(columnId);
-  };
+  const paged = paging === "pages";
+  const safePageSize = Math.max(1, pageSize);
+  const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  const tableRef = React.useRef<HTMLTableElement | null>(null);
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const mergedRootRef = React.useMemo(() => mergeRefs(rootRef, ref), [ref]);
 
+  // ─── Sort and page ───
   const [sortState, setSortState] = useControllableState<DataTableSortState>({
     value: sort,
     defaultValue: defaultSort,
@@ -269,36 +215,38 @@ export function DataTable<Row>({
     defaultValue: defaultPage,
     onChange: onPageChange,
   });
-
-  const safePageSize = Math.max(1, pageSize);
-  const initialVisible = Math.max(1, initialVisibleRows ?? safePageSize);
-  const [visibleRowCount, setVisibleRowCount] = React.useState(initialVisible);
-  const scrollRef = React.useRef<HTMLDivElement | null>(null);
-  const sentinelRef = React.useRef<HTMLDivElement | null>(null);
-  const tableRef = React.useRef<HTMLTableElement | null>(null);
-  const rootRef = React.useRef<HTMLDivElement | null>(null);
-  const mergedRootRef = React.useMemo(() => mergeRefs(rootRef, ref), [ref]);
-
-  const sortColumn =
-    sortState && columns.find((column) => column.sortable && column.id === sortState.columnId);
-
-  /** Sub-rows of a row, sorted like the top level. */
-  const childrenOf = (row: Row): Row[] => {
-    const list = getRowChildren?.(row) ?? [];
-    return sortColumn && sortState && list.length > 1
-      ? sortRows(list, sortColumn, sortState.order)
-      : list;
-  };
-
+  const sortColumn = sortState
+    ? columns.find((column) => column.sortable && column.id === sortState.columnId)
+    : undefined;
+  const sortOrder = sortColumn ? sortState?.order : undefined;
   const sortedRows = React.useMemo(
-    () => (sortColumn && sortState ? sortRows(rows, sortColumn, sortState.order) : rows),
-    [rows, sortColumn, sortState],
+    () => (sortColumn && sortOrder ? sortRows(rows, sortColumn, sortOrder) : rows),
+    [rows, sortColumn, sortOrder],
   );
+  const totalRows = sortedRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / safePageSize));
+  // An out-of-range page (the data shrank) shows the nearest page; nothing is written back.
+  const safePage = paged ? Math.min(Math.max(pageState, 1), totalPages) : 1;
+  const pageOffset = paged ? (safePage - 1) * safePageSize : 0;
 
-  const keyOf = (row: Row, index: number, parentKey: React.Key | null): React.Key => {
-    if (getRowKey) return getRowKey(row, index);
-    return parentKey === null ? index : `${String(parentKey)}.${index}`;
+  // A new sort changes the order of the whole data set: back to page 1.
+  const handleSort = (columnId: string) => {
+    setSortState(nextSort(sortState, columnId));
+    setPageState(1);
   };
+
+  const infiniteRows = useInfiniteRows({
+    enabled: infinite,
+    pageSize: safePageSize,
+    batchSize: infiniteBatchSize,
+    totalRows,
+    hasMore,
+    loadingMore,
+    onLoadMore,
+    scrollRef,
+  });
+  const end = infinite ? infiniteRows.visibleCount : paged ? pageOffset + safePageSize : totalRows;
+  const displayedCount = Math.max(0, Math.min(end, totalRows) - pageOffset);
 
   /*
    * Rows that appeared in `rows` since the previous data (by `getRowKey`; positional ids cannot tell
@@ -323,301 +271,147 @@ export function DataTable<Row>({
     setRowArrival({ rows, added });
   }
 
+  // ─── Expansion ───
   const expandEnabled = Boolean(getRowChildren || renderExpanded);
   const [expandedKeys, setExpandedKeys] = useControllableState<React.Key[]>({
     value: expanded,
     defaultValue: defaultExpanded,
     onChange: onExpandedChange,
   });
-  const expandedSet = new Set(expandedKeys);
+  const expandedSet = React.useMemo(() => new Set(expandedKeys), [expandedKeys]);
   /** Row whose latest expand mounted new rows: only those animate in. */
   const [lastExpandedKey, setLastExpandedKey] = React.useState<React.Key | null>(null);
-
-  const [selectedKeys, setSelectedKeys] = useControllableState<React.Key[]>({
-    value: selected,
-    defaultValue: defaultSelected,
-    onChange: onSelectedChange,
-  });
-  const selectedSet = new Set(selectedKeys);
-
-  const totalRows = sortedRows.length;
-  const totalPages = Math.max(1, Math.ceil(totalRows / safePageSize));
-  const paged = paging === "pages";
-  const safePage = paged ? Math.min(Math.max(pageState, 1), totalPages) : 1;
-
-  React.useEffect(() => {
-    if (paged && safePage !== pageState) setPageState(safePage);
-  }, [paged, pageState, safePage, setPageState]);
-
-  React.useEffect(() => {
-    if (infinite) setVisibleRowCount(initialVisible);
-    else setPageState(1);
-  }, [infinite, initialVisible, setPageState]);
-
-  React.useEffect(() => {
-    if (!infinite) return;
-    setVisibleRowCount((prev) =>
-      Math.min(Math.max(prev, initialVisible), Math.max(initialVisible, totalRows)),
-    );
-  }, [infinite, initialVisible, totalRows]);
-
-  const pageOffset = paged ? (safePage - 1) * safePageSize : 0;
-  const displayedRows = infinite
-    ? sortedRows.slice(0, visibleRowCount)
-    : paged
-      ? sortedRows.slice(pageOffset, pageOffset + safePageSize)
-      : sortedRows;
-
-  /*
-   * Rendered rows in order: page rows plus the sub-rows of expanded rows. `measureRows` are the
-   * sub-rows of collapsed rows: drawn collapsed so the columns are already as wide as they will be
-   * once a row opens.
-   */
-  const flatRows: FlatRow<Row>[] = [];
-  const measureRows: { row: Row; key: React.Key; depth: number }[] = [];
-  const collect = (list: Row[], depth: number, parentKey: React.Key) => {
-    list.forEach((row, i) => {
-      const key = keyOf(row, i, parentKey);
-      measureRows.push({ row, key, depth });
-      collect(childrenOf(row), depth + 1, key);
-    });
-  };
-  const visit = (
-    list: Row[],
-    depth: number,
-    parentKey: React.Key | null,
-    parentAnimate: boolean,
-    offset: number,
-  ) => {
-    list.forEach((row, i) => {
-      const key = keyOf(row, offset + i, parentKey);
-      const children = expandEnabled ? childrenOf(row) : [];
-      const expandable = expandEnabled
-        ? (isRowExpandable?.(row) ?? (children.length > 0 || Boolean(renderExpanded)))
-        : false;
-      const isExpanded = expandable && expandedSet.has(key);
-      flatRows.push({
-        row,
-        key,
-        depth,
-        childKeys: children.map((child, ci) => keyOf(child, ci, key)),
-        expandable,
-        expanded: isExpanded,
-        animate: parentAnimate || (depth === 0 && rowArrival.added.has(key)),
-      });
-      if (isExpanded && children.length > 0) {
-        visit(children, depth + 1, key, parentAnimate || lastExpandedKey === key, 0);
-      } else if (children.length > 0) {
-        collect(children, depth + 1, key);
-      }
-    });
-  };
-  visit(displayedRows, 0, null, false, pageOffset);
-
-  /** Every row id in the data (all pages, all depths): the scope of «select all». */
-  const allKeys: React.Key[] = [];
-  if (selectable) {
-    const gather = (list: Row[], parentKey: React.Key | null) => {
-      list.forEach((row, i) => {
-        const key = keyOf(row, i, parentKey);
-        allKeys.push(key);
-        const children = getRowChildren?.(row);
-        if (children?.length) gather(children, key);
-      });
-    };
-    gather(sortedRows, null);
-  }
-  const selectedInData = allKeys.filter((key) => selectedSet.has(key)).length;
-  const allSelected = allKeys.length > 0 && selectedInData === allKeys.length;
-  const someSelected = selectedInData > 0 && !allSelected;
-
-  // ─── Selection interactions ───
-  const [announcement, setAnnouncement] = React.useState("");
-  const [dragging, setDragging] = React.useState(false);
-  const selectedRef = React.useRef(selectedSet);
-  selectedRef.current = selectedSet;
-  const flatRef = React.useRef(flatRows);
-  flatRef.current = flatRows;
-  const anchorRef = React.useRef<React.Key | null>(null);
-  const shiftKeyRef = React.useRef(false);
-  /** The pointer already applied the change: the click that follows must not toggle again. */
-  const pointerHandledRef = React.useRef(false);
-  /** Set while a cancelled pointer click is dispatched: its checkbox change (if any) is ignored. */
-  const ignoreChangeRef = React.useRef(false);
-  const dragCleanupRef = React.useRef<(() => void) | null>(null);
-  React.useEffect(() => () => dragCleanupRef.current?.(), []);
-
-  const commitSelection = (next: Set<React.Key>) => {
-    selectedRef.current = next;
-    setSelectedKeys(Array.from(next));
-    setAnnouncement(formatLabel(labels.selectedCount, { count: next.size }));
-  };
-
-  /** Sets every rendered row between two visible indices (inclusive) to `value`. */
-  const applyRange = (from: number, to: number, value: boolean) => {
-    const next = new Set(selectedRef.current);
-    for (let i = Math.min(from, to); i <= Math.max(from, to); i += 1) {
-      const item = flatRef.current[i];
-      if (!item) continue;
-      if (value) next.add(item.key);
-      else next.delete(item.key);
-    }
-    commitSelection(next);
-  };
-
-  const selectAt = (index: number, value: boolean, extend: boolean) => {
-    const anchor = anchorRef.current;
-    const anchorIndex =
-      anchor === null ? -1 : flatRef.current.findIndex((item) => item.key === anchor);
-    applyRange(extend && anchorIndex >= 0 ? anchorIndex : index, index, value);
-    anchorRef.current = flatRef.current[index]?.key ?? null;
-  };
-
-  const handleSelectPointerDown = (index: number, event: React.PointerEvent<HTMLElement>) => {
-    if (event.button !== 0 || event.pointerType === "touch") return;
-    // No native text selection and no focus jump while pressing / dragging; focus the box ourselves.
-    event.preventDefault();
-    // `focusVisible: false`: a pointer press shows no ring; Space continues from this box.
-    event.currentTarget
-      .querySelector("input")
-      ?.focus({ preventScroll: true, focusVisible: false } as FocusOptions);
-    pointerHandledRef.current = true;
-    const key = flatRef.current[index]?.key;
-    if (key === undefined) return;
-    const value = !selectedRef.current.has(key);
-    selectAt(index, value, event.shiftKey);
-
-    let last = index;
-    let dragActive = false;
-    const onMove = (moveEvent: PointerEvent) => {
-      const target = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
-      const cell = target?.closest<HTMLElement>("[data-select-index]");
-      if (!cell || !tableRef.current?.contains(cell)) return;
-      const nextIndex = Number(cell.dataset.selectIndex);
-      if (Number.isNaN(nextIndex) || nextIndex === last) return;
-      if (!dragActive) {
-        dragActive = true;
-        setDragging(true);
-      }
-      applyRange(last, nextIndex, value);
-      last = nextIndex;
-      anchorRef.current = flatRef.current[nextIndex]?.key ?? anchorRef.current;
-    };
-    const stop = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", stop);
-      window.removeEventListener("pointercancel", stop);
-      dragCleanupRef.current = null;
-      setDragging(false);
-    };
-    dragCleanupRef.current?.();
-    dragCleanupRef.current = stop;
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", stop);
-    window.addEventListener("pointercancel", stop);
-  };
-
-  const handleSelectClickCapture = (event: React.MouseEvent<HTMLElement>) => {
-    // Pointer clicks were applied on pointerdown (the native toggle lands on the same value), so the
-    // change they cause is ignored; keyboard clicks (detail 0) go through.
-    if (pointerHandledRef.current && event.detail > 0) {
-      pointerHandledRef.current = false;
-      ignoreChangeRef.current = true;
-      window.setTimeout(() => {
-        ignoreChangeRef.current = false;
-      }, 0);
-    }
-  };
-
-  const handleSelectAll = () => {
-    const next = new Set(selectedRef.current);
-    for (const key of allKeys) {
-      if (allSelected) next.delete(key);
-      else next.add(key);
-    }
-    commitSelection(next);
-  };
-
-  const toggleExpanded = (key: React.Key) => {
-    const isOpen = expandedSet.has(key);
+  /** The latest expansion for the stable toggle (memoized rows keep their props). */
+  const expansion = React.useRef({ expandedKeys, setExpandedKeys });
+  expansion.current = { expandedKeys, setExpandedKeys };
+  const toggleExpanded = React.useCallback((key: React.Key) => {
+    const { expandedKeys: keys, setExpandedKeys: setKeys } = expansion.current;
+    const isOpen = keys.includes(key);
     setLastExpandedKey(isOpen ? null : key);
-    setExpandedKeys(isOpen ? expandedKeys.filter((k) => k !== key) : [...expandedKeys, key]);
-  };
+    setKeys(isOpen ? keys.filter((k) => k !== key) : [...keys, key]);
+  }, []);
 
-  const baseId = React.useId();
-  const rowDomId = (key: React.Key) => `${baseId}-row-${domIdPart(key)}`;
-  const detailDomId = (key: React.Key) => `${baseId}-detail-${domIdPart(key)}`;
-  const totalColumns = columns.length + (selectable ? 1 : 0) + (expandEnabled ? 1 : 0);
+  const flat = React.useMemo(
+    () =>
+      flatten(sortedRows, {
+        start: pageOffset,
+        end,
+        getRowKey,
+        getRowChildren,
+        sortColumn,
+        order: sortOrder,
+        expandEnabled,
+        withDetail: Boolean(renderExpanded),
+        isRowExpandable,
+        expanded: expandedSet,
+        arrived: rowArrival.added,
+        lastExpandedKey,
+        collectKeys: selectable,
+      }),
+    [
+      sortedRows,
+      pageOffset,
+      end,
+      getRowKey,
+      getRowChildren,
+      sortColumn,
+      sortOrder,
+      expandEnabled,
+      renderExpanded,
+      isRowExpandable,
+      expandedSet,
+      rowArrival.added,
+      lastExpandedKey,
+      selectable,
+    ],
+  );
+  const visibleKeys = React.useMemo(() => flat.rows.map((item) => item.key), [flat]);
 
-  const hasInternalMore = infinite && displayedRows.length < totalRows;
-  const canRequestMore = infinite && Boolean(onLoadMore) && hasMore && !loadingMore;
+  // ─── Selection ───
+  const selection = useRowSelection({
+    selected,
+    defaultSelected,
+    onSelectedChange,
+    visibleKeys,
+    allKeys: flat.keys,
+    tableRef,
+    announce: (count) => formatLabel(labels.selectedCount, { count }),
+  });
 
-  const reachEndRef = React.useRef(() => {});
-  reachEndRef.current = () => {
-    if (hasInternalMore) {
-      setVisibleRowCount((prev) => Math.min(prev + Math.max(1, infiniteBatchSize), totalRows));
-    } else if (canRequestMore) {
-      void onLoadMore?.();
-    }
-  };
-
-  // Re-observed whenever more rows can appear: a still-visible sentinel then reports again.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the deps are the re-observe triggers.
-  React.useEffect(() => {
-    const root = scrollRef.current;
-    const target = sentinelRef.current;
-    if (!infinite || !root || !target) return;
-    if (typeof IntersectionObserver === "undefined") {
-      const onScroll = () => {
-        if (root.scrollTop + root.clientHeight >= root.scrollHeight - 64) reachEndRef.current();
-      };
-      root.addEventListener("scroll", onScroll);
-      return () => root.removeEventListener("scroll", onScroll);
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) reachEndRef.current();
-      },
-      { root, rootMargin: DATA_TABLE_INFINITE_ROOT_MARGIN, threshold: 0.01 },
-    );
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, [infinite, hasInternalMore, canRequestMore, totalRows]);
-
+  // ─── States ───
   const hasError = error != null && error !== false;
-  const showSkeleton = !hasError && loading && displayedRows.length === 0;
-  const showEmpty = !hasError && !loading && displayedRows.length === 0;
-  /* «Показано 0–0 из 0» means nothing in loading / empty / error states: the body already says it,
-     and «Показано 1–5 из 5» says nothing when every row is already on screen. */
-  const showRange =
-    !hasError && !showSkeleton && !showEmpty && (infinite || (paged && totalPages > 1));
-  const showPagination = paged && totalPages > 1;
-  const showInfiniteStatus =
-    !hasError && infinite && (hasInternalMore || loadingMore || canRequestMore);
-  const bodyRows = hasError ? [] : flatRows;
+  const showSkeleton = !hasError && loading && displayedCount === 0;
+  const showEmpty = !hasError && !loading && displayedCount === 0;
+  const bodyState = hasError ? "error" : showSkeleton ? "loading" : showEmpty ? "empty" : "rows";
   /* Body state swaps (loading → rows → empty / error) cross-fade: the body remounts under its
      state key and fades in; the first render, sorting and paging stay still (same state). */
-  const bodyState = hasError ? "error" : showSkeleton ? "loading" : showEmpty ? "empty" : "rows";
   const bodySwapped = useStateSwap(bodyState);
-  const skeletonCount = Math.max(1, loadingRows ?? Math.min(safePageSize, SKELETON_ROWS));
+  const totalColumns = columns.length + (selectable ? 1 : 0) + (expandEnabled ? 1 : 0);
   const maxHeight = scrollHeight ?? (infinite ? INFINITE_SCROLL_HEIGHT : undefined);
+  const columnHover = useColumnHover(highlightColumnOnHover);
 
   useFrozenColumns(
     tableRef,
     rootRef,
     columns.map((column) => column.id).join("\u0000"),
-    !hasError && !showSkeleton && displayedRows.length > 0,
+    flat,
+    bodyState === "rows",
   );
 
-  const stickyLead = stickyFirstColumn && styles.stickyLead;
-  const leadCells = (kind: "head" | "body" | "skeleton") => {
-    const base = kind === "head" ? styles.headCell : styles.cell;
-    const corner = kind === "head" && stickyHeader && stickyFirstColumn && styles.cornerCellSticky;
-    return {
-      select: cx(base, styles.selectCell, kind !== "skeleton" && stickyLead, corner),
-      toggle: cx(base, styles.toggleCell, kind !== "skeleton" && stickyLead, corner),
-    };
-  };
+  const baseId = React.useId();
+  const rowDomId = React.useCallback(
+    (key: React.Key) => `${baseId}-row-${domIdPart(key)}`,
+    [baseId],
+  );
+  const detailDomId = React.useCallback(
+    (key: React.Key) => `${baseId}-detail-${domIdPart(key)}`,
+    [baseId],
+  );
+
+  const shared = React.useMemo<RowShared<Row>>(
+    () => ({
+      columns,
+      size,
+      labels,
+      selectable,
+      expandEnabled,
+      stickyFirstColumn,
+      striped,
+      totalColumns,
+      getRowLabel,
+      onRowClick,
+      renderExpanded,
+      rowDomId,
+      detailDomId,
+      selection: selection.handlers,
+      toggleExpanded,
+    }),
+    [
+      columns,
+      size,
+      labels,
+      selectable,
+      expandEnabled,
+      stickyFirstColumn,
+      striped,
+      totalColumns,
+      getRowLabel,
+      onRowClick,
+      renderExpanded,
+      rowDomId,
+      detailDomId,
+      selection.handlers,
+      toggleExpanded,
+    ],
+  );
+
+  /* «Показано 0–0 из 0» means nothing in loading / empty / error states: the body already says it,
+     and «Показано 1–5 из 5» says nothing when every row is already on screen. */
+  const showRange = bodyState === "rows" && (infinite || (paged && totalPages > 1));
+  const showInfiniteStatus =
+    !hasError &&
+    infinite &&
+    (infiniteRows.hasInternalMore || loadingMore || infiniteRows.canRequestMore);
 
   return (
     <ControlSizeProvider value={size}>
@@ -638,7 +432,7 @@ export function DataTable<Row>({
           loading: loading || undefined,
           selectable: selectable || undefined,
           expandable: expandEnabled || undefined,
-          dragging: dragging || undefined,
+          dragging: selection.dragging || undefined,
         })}
       >
         {toolbar != null ? <div className={styles.toolbar}>{toolbar}</div> : null}
@@ -654,7 +448,7 @@ export function DataTable<Row>({
             ref={tableRef}
             className={styles.table}
             aria-busy={loading || loadingMore || undefined}
-            onMouseLeave={highlightColumnOnHover ? () => setHoveredColumnId(null) : undefined}
+            {...columnHover}
           >
             <colgroup>
               {selectable ? <col /> : null}
@@ -664,296 +458,77 @@ export function DataTable<Row>({
               ))}
             </colgroup>
             {showHeader ? (
-              <thead>
-                <tr>
-                  {selectable ? (
-                    <th scope="col" className={leadCells("head").select}>
-                      <Checkbox.Root
-                        size={size}
-                        checked={allSelected}
-                        indeterminate={someSelected}
-                        disabled={allKeys.length === 0}
-                        onCheckedChange={handleSelectAll}
-                        aria-label={labels.selectAll}
-                      />
-                    </th>
-                  ) : null}
-                  {expandEnabled ? <th scope="col" className={leadCells("head").toggle} /> : null}
-                  {columns.map((column, columnIndex) => {
-                    const order =
-                      column.sortable && sortState?.columnId === column.id ? sortState.order : null;
-                    const isFirstColumn = columnIndex === 0;
-                    return (
-                      <th
-                        key={column.id}
-                        scope="col"
-                        className={cx(
-                          styles.headCell,
-                          stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
-                          stickyHeader &&
-                            stickyFirstColumn &&
-                            isFirstColumn &&
-                            styles.cornerCellSticky,
-                        )}
-                        style={columnSizeStyle(column)}
-                        data-align={column.headerAlign ?? "start"}
-                        data-sortable={column.sortable ? "true" : undefined}
-                        data-sorted={order ? "true" : undefined}
-                        aria-sort={
-                          column.sortable ? (order ? ARIA_SORT[order] : "none") : undefined
-                        }
-                        data-first-column={isFirstColumn ? "true" : undefined}
-                        data-column-id={column.id}
-                        data-column-hovered={hoveredColumnId === column.id ? "true" : undefined}
-                        onMouseEnter={() => hoverColumn(column.id)}
-                        onClick={(event) => {
-                          column.onHeaderClick?.(event);
-                          if (!column.sortable) return;
-                          setSortState(nextSort(sortState, column.id));
-                          setPageState(1);
-                        }}
-                      >
-                        {column.sortable ? (
-                          // A full-cell button: the head cell draws its inset focus ring (see CSS).
-                          <button type="button" className={styles.sortButton}>
-                            <span className={styles.headLabel}>{column.header}</span>
-                            <Icon
-                              name={order ? SORT_ICON[order] : "sort.none"}
-                              className={styles.sortIcon}
-                              strokeWidth={2}
-                            />
-                          </button>
-                        ) : (
-                          <span className={styles.headLabel}>{column.header}</span>
-                        )}
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
+              <Head
+                columns={columns}
+                size={size}
+                sort={sortState}
+                onSort={handleSort}
+                stickyFirstColumn={stickyFirstColumn}
+                stickyCorner={stickyHeader && stickyFirstColumn}
+                expandEnabled={expandEnabled}
+                selectAll={
+                  selectable
+                    ? {
+                        checked: selection.allSelected,
+                        indeterminate: selection.someSelected,
+                        disabled: flat.keys.length === 0,
+                        label: labels.selectAll,
+                        onToggle: selection.toggleAll,
+                      }
+                    : undefined
+                }
+              />
             ) : null}
 
             <tbody
               key={bodySwapped ? bodyState : undefined}
               className={bodySwapped ? swapMotion.swapIn : undefined}
             >
-              {hasError ? (
-                <tr>
-                  <td colSpan={totalColumns} className={cx(styles.stateCell, styles.stateError)}>
-                    <div className={styles.stateContent} role="alert">
-                      {error}
-                    </div>
-                  </td>
-                </tr>
-              ) : null}
-
-              {showSkeleton
-                ? Array.from({ length: skeletonCount }, (_, rowIndex) => (
-                    <tr
-                      // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
-                      key={rowIndex}
-                      className={cx(styles.row, styles.skeletonRow)}
-                      data-skeleton="true"
-                    >
-                      {selectable ? (
-                        <td className={leadCells("skeleton").select}>
-                          <span className={styles.skeleton} aria-hidden="true" />
-                        </td>
-                      ) : null}
-                      {expandEnabled ? <td className={leadCells("skeleton").toggle} /> : null}
-                      {columns.map((column) => (
-                        <td
-                          key={column.id}
-                          className={styles.cell}
-                          style={columnSizeStyle(column)}
-                          data-align={columnAlign(column)}
-                        >
-                          <span className={styles.skeleton} aria-hidden="true" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                : null}
-
-              {showEmpty ? (
-                <tr>
-                  <td colSpan={totalColumns} className={styles.stateCell}>
-                    {empty == null || typeof empty === "string" ? (
-                      <EmptyPage.Root layout="compact" size={size} role="status">
-                        <EmptyPage.Description>{empty ?? labels.empty}</EmptyPage.Description>
-                      </EmptyPage.Root>
-                    ) : (
-                      <div className={styles.stateContent}>{empty}</div>
-                    )}
-                  </td>
-                </tr>
-              ) : null}
-
-              {bodyRows.map((item, index) => {
-                const { row, key, depth } = item;
-                const isSelected = selectable && selectedSet.has(key);
-                const rowLabel = getRowLabel?.(row);
-                const detail = item.expanded && renderExpanded ? renderExpanded(row) : null;
-                const hasDetail = detail != null && detail !== false;
-                const controls = [
-                  ...(hasDetail ? [detailDomId(key)] : []),
-                  ...(item.expanded ? item.childKeys.map(rowDomId) : []),
-                ].join(" ");
-                const enter = item.animate && enterMotion.enterBase;
-                // One keyed fragment either way, so opening the detail never remounts the row
-                // (the toggle keeps focus).
-                return (
-                  <React.Fragment key={String(key)}>
-                    <tr
-                      id={rowDomId(key)}
-                      className={styles.row}
-                      style={
-                        depth > 0 ? ({ "--dt-depth": depth } as React.CSSProperties) : undefined
-                      }
-                      data-stripe={striped && index % 2 === 1 ? "alt" : undefined}
-                      data-clickable={onRowClick ? "true" : undefined}
-                      data-depth={depth > 0 ? depth : undefined}
-                      data-expanded={item.expanded ? "true" : undefined}
-                      data-animate={item.animate ? "true" : undefined}
-                      aria-selected={selectable ? isSelected : undefined}
-                      onClick={(event) => onRowClick?.(row, index, event)}
-                    >
-                      {selectable ? (
-                        <td
-                          className={cx(leadCells("body").select, enter)}
-                          data-select-index={index}
-                          onPointerDown={(event) => handleSelectPointerDown(index, event)}
-                          onClickCapture={handleSelectClickCapture}
-                          onClick={(event) => event.stopPropagation()}
-                          onKeyDown={(event) => {
-                            shiftKeyRef.current = event.shiftKey;
-                          }}
-                        >
-                          <Checkbox.Root
-                            size={size}
-                            checked={isSelected}
-                            onCheckedChange={(value) => {
-                              if (ignoreChangeRef.current) return;
-                              selectAt(index, value, shiftKeyRef.current);
-                              shiftKeyRef.current = false;
-                            }}
-                            aria-label={formatLabel(labels.selectRow, { label: rowLabel })}
-                          />
-                        </td>
-                      ) : null}
-                      {expandEnabled ? (
-                        <td className={cx(leadCells("body").toggle, enter)}>
-                          {item.expandable ? (
-                            <Button.Root
-                              variant="ghost"
-                              tone="neutral"
-                              size={TOGGLE_SIZE[size]}
-                              aria-expanded={item.expanded}
-                              aria-controls={controls || undefined}
-                              aria-label={formatLabel(
-                                item.expanded ? labels.collapse : labels.expand,
-                                {
-                                  label: rowLabel,
-                                },
-                              )}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                toggleExpanded(key);
-                              }}
-                            >
-                              <Button.Icon>
-                                <Icon name="nav.chevronRight" className={styles.chevron} />
-                              </Button.Icon>
-                            </Button.Root>
-                          ) : null}
-                        </td>
-                      ) : null}
-                      {columns.map((column, columnIndex) => {
-                        const isFirstColumn = columnIndex === 0;
-                        const clickable = Boolean(column.onCellClick);
-                        return (
-                          <td
-                            key={column.id}
-                            className={cx(
-                              styles.cell,
-                              stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
-                              enter,
-                            )}
-                            style={columnSizeStyle(column)}
-                            data-align={columnAlign(column)}
-                            data-numeric={column.numeric ? "true" : undefined}
-                            data-first-column={isFirstColumn ? "true" : undefined}
-                            data-column-id={column.id}
-                            data-column-hovered={hoveredColumnId === column.id ? "true" : undefined}
-                            onMouseEnter={() => hoverColumn(column.id)}
-                            onClick={(event) => column.onCellClick?.(row, event)}
-                            role={clickable ? "button" : undefined}
-                            tabIndex={clickable ? 0 : undefined}
-                            onKeyDown={
-                              clickable
-                                ? (event) => {
-                                    if (event.key === "Enter" || event.key === " ") {
-                                      event.preventDefault();
-                                      column.onCellClick?.(row, event);
-                                    }
-                                  }
-                                : undefined
-                            }
-                          >
-                            {renderCell(row, column, true)}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                    {hasDetail ? (
-                      <tr
-                        id={detailDomId(key)}
-                        className={styles.detailRow}
-                        data-animate={lastExpandedKey === key || item.animate ? "true" : undefined}
-                      >
-                        <td colSpan={totalColumns} className={styles.detailCell}>
-                          <div className={styles.detailMotion}>
-                            <div className={styles.detailContent}>{detail}</div>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : null}
-                  </React.Fragment>
-                );
-              })}
+              {bodyState === "rows" ? (
+                flat.rows.map((item, index) => (
+                  <DataTableRow
+                    key={String(item.key)}
+                    shared={shared}
+                    row={item.row}
+                    rowKey={item.key}
+                    index={index}
+                    depth={item.depth}
+                    expandable={item.expandable}
+                    expanded={item.expanded}
+                    animate={item.animate}
+                    detailAnimate={lastExpandedKey === item.key}
+                    selected={selectable && selection.selectedSet.has(item.key)}
+                    childControls={item.childKeys.map(rowDomId).join(" ")}
+                  />
+                ))
+              ) : (
+                <StateRows
+                  state={bodyState}
+                  columns={columns}
+                  size={size}
+                  totalColumns={totalColumns}
+                  selectable={selectable}
+                  expandEnabled={expandEnabled}
+                  error={error}
+                  empty={empty}
+                  emptyLabel={labels.empty}
+                  skeletonRows={Math.max(1, loadingRows ?? Math.min(safePageSize, SKELETON_ROWS))}
+                />
+              )}
             </tbody>
 
-            {measureRows.length > 0 && !hasError ? (
-              <tbody className={styles.measureBody} aria-hidden="true" inert>
-                {measureRows.map(({ row, key, depth }) => (
-                  <tr
-                    key={String(key)}
-                    className={styles.row}
-                    style={{ "--dt-depth": depth } as React.CSSProperties}
-                    data-depth={depth}
-                  >
-                    {selectable ? <td className={cx(styles.cell, styles.selectCell)} /> : null}
-                    {expandEnabled ? <td className={cx(styles.cell, styles.toggleCell)} /> : null}
-                    {columns.map((column, columnIndex) => (
-                      <td
-                        key={column.id}
-                        className={styles.cell}
-                        style={columnSizeStyle(column)}
-                        data-align={columnAlign(column)}
-                        data-numeric={column.numeric ? "true" : undefined}
-                        data-first-column={columnIndex === 0 ? "true" : undefined}
-                      >
-                        {renderCell(row, column, false)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
+            {flat.measure.length > 0 && !hasError ? (
+              <MeasureBody
+                rows={flat.measure}
+                columns={columns}
+                selectable={selectable}
+                expandEnabled={expandEnabled}
+              />
             ) : null}
           </table>
 
           {infinite ? (
-            <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />
+            <div ref={infiniteRows.sentinelRef} className={styles.sentinel} aria-hidden="true" />
           ) : null}
         </ScrollContainer>
 
@@ -961,40 +536,30 @@ export function DataTable<Row>({
 
         {selectable ? (
           <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-            {announcement}
+            {selection.announcement}
           </VisuallyHidden>
         ) : null}
 
-        {showRange || showPagination || showInfiniteStatus ? (
-          <div className={styles.footer}>
-            {showRange ? (
-              <p className={styles.meta}>
-                {formatLabel(labels.range, {
-                  from: totalRows === 0 ? 0 : pageOffset + 1,
-                  to: pageOffset + displayedRows.length,
+        <Footer
+          size={size}
+          range={
+            showRange
+              ? formatLabel(labels.range, {
+                  from: pageOffset + 1,
+                  to: pageOffset + displayedCount,
                   total: totalRows,
-                })}
-              </p>
-            ) : null}
-
-            {showPagination ? (
-              <Pagination
-                className={styles.pagination}
-                value={safePage}
-                totalPages={totalPages}
-                onValueChange={setPageState}
-                size={size}
-                compact="auto"
-              />
-            ) : null}
-
-            {showInfiniteStatus ? (
-              <p className={styles.meta} aria-live="polite">
-                {loadingMore ? labels.loadingMore : labels.scrollForMore}
-              </p>
-            ) : null}
-          </div>
-        ) : null}
+                })
+              : null
+          }
+          pagination={
+            paged && totalPages > 1
+              ? { page: safePage, totalPages, onPageChange: setPageState }
+              : null
+          }
+          status={
+            showInfiniteStatus ? (loadingMore ? labels.loadingMore : labels.scrollForMore) : null
+          }
+        />
       </div>
     </ControlSizeProvider>
   );

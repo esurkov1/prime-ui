@@ -31,9 +31,4 @@ export type DataTableColumn<Row> = {
    * such a column the table fills its container instead of growing to its content width.
    */
   grow?: boolean;
-  onHeaderClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
-  onCellClick?: (
-    row: Row,
-    event: React.MouseEvent<HTMLTableCellElement> | React.KeyboardEvent<HTMLTableCellElement>,
-  ) => void;
 };

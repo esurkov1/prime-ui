@@ -73,7 +73,6 @@ Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an option
 | `expanded` | `Key[]` | — | Expanded row ids, controlled. |
 | `defaultExpanded` | `Key[]` | `[]` | Initially expanded ids, uncontrolled. |
 | `onExpandedChange` | `(expanded: Key[]) => void` | — | Expansion change. |
-| `initialVisibleRows` | `number` | `pageSize` | Rows shown first with `paging="infinite"`. |
 | `infiniteBatchSize` | `number` | `20` | Rows revealed per scroll step. |
 | `hasMore` | `boolean` | `false` | More rows can be loaded from the server. |
 | `loadingMore` | `boolean` | `false` | A server batch is loading: footer status, `aria-busy`. |
@@ -110,8 +109,6 @@ One column of `columns`: data, not a part.
 | `truncate` | `boolean` | — | One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`. |
 | `grow` | `boolean` | — | Takes the free width and wraps its text; the table then fills its container. With `minWidth` it never gets narrower: below that the table scrolls instead of cells overlapping. |
 | `width · minWidth · maxWidth` | `string` | — | CSS sizes of the column (`"14rem"`). |
-| `onHeaderClick` | `(event: MouseEvent<HTMLTableCellElement>) => void` | — | Head cell click (before sorting). |
-| `onCellClick` | `(row: Row, event: MouseEvent \| KeyboardEvent) => void` | — | Makes the cell a focusable `role="button"`; Enter / Space trigger it. |
 
 ## Variants
 
@@ -168,7 +165,7 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | sorted | `sort` / `defaultSort` | `aria-sort` and `data-sorted` on the head; the sort icon: unsorted `text-disabled`, hover `text-muted`, sorted `text-secondary` — never accent |
 | selected | `selected` / `defaultSelected` | `aria-selected` rows with `accent-soft` fill; polite `labels.selectedCount` |
 | expanded | `expanded` / `defaultExpanded` | `data-expanded` on the parent row (one step darker); toggle `aria-expanded`, chevron turns 90° |
-| new rows | rows mounted by an expand or new in `rows` (by `getRowKey`) | `data-animate`: cells drop in from above (`enterMotion`); detail panels open through `grid-template-rows` |
+| new rows | rows mounted by an expand or new in `rows` (by `getRowKey`) | `data-animate`: cells drop in from above (`enterMotion`); detail panels open and close through `grid-template-rows` (`data-state` on the detail row; it unmounts after the close) |
 | state swap | the body moves between loading, rows, empty and error | the body fades in over `base` (opacity only, the same swap motion as [Crossfade](../crossfade/COMPONENT.md)); the head stays still; nothing moves on the first render |
 
 Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data-sticky-header`, `data-sticky-first-column`, `data-table-width` (`fill` · `auto` · `grow`), `data-highlight-row`, `data-highlight-column`, `data-striped`, `data-loading`, `data-selectable`, `data-expandable`, `data-dragging` (while drag-selecting). Sorting and paging swap rows instantly; everything is still under `prefers-reduced-motion`.
@@ -187,8 +184,8 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 ### Keyboard
 | Key | Action |
 |---|---|
-| `Tab` | Moves through sort buttons, checkboxes, expand toggles and clickable cells. |
-| `Enter` · `Space` | Sorts by the column, toggles the row or presses the clickable cell. |
+| `Tab` | Moves through sort buttons, checkboxes and expand toggles. |
+| `Enter` · `Space` | Sorts by the column or toggles the row. |
 | `Space` | Toggles the focused row checkbox. |
 | `Shift + Space` | Selects the range from the last toggled row. |
 
@@ -198,7 +195,6 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - After a selection change a polite live region announces `labels.selectedCount`; selected rows carry `aria-selected`.
 - The expand toggle is a button with `aria-expanded`, `aria-controls` (detail row or sub-rows) and `labels.expand` / `labels.collapse`.
 - Loading sets `aria-busy` and a `labels.loading` status; the error is `role="alert"`; the default empty state is `role="status"`.
-- `onCellClick` cells are focusable `role="button"` with the inset focus ring.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

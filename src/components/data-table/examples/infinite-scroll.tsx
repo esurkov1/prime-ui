@@ -42,7 +42,7 @@ export default function DataTableInfiniteScrollExample() {
       getRowKey={(row) => row.id}
       paging="infinite"
       stickyHeader
-      initialVisibleRows={10}
+      pageSize={10}
       infiniteBatchSize={10}
       hasMore={hasMore}
       loadingMore={loadingMore}
