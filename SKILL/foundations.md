@@ -72,7 +72,7 @@ Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Us
 
 - `tone` is meaning: `neutral · accent · success · warning · danger · info`. Destructive is `danger`.
 - `color` is decoration from the palette: `gray · blue · green · orange · red · yellow · purple · sky ·
-  pink · teal` — Badge, Tag, Avatar, field badges, SegmentedControl dots. Use one hue per meaning across
+  pink · teal` — Badge, Avatar, field badges, SegmentedControl dots. Use one hue per meaning across
   the product (e.g. «Оплачен» is always green).
 - Never convey meaning by color alone: a status badge has text.
 

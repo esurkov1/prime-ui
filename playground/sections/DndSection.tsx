@@ -371,7 +371,7 @@ export default function DndSection() {
           <div className="demoBlock">
             <DemoSectionTitle>Горизонтальный порядок</DemoSectionTitle>
             <DemoDescription>
-              <code>axis=&quot;x&quot;</code> — одна строка тегов (<code>Tag</code>), которые
+              <code>axis=&quot;x&quot;</code> — одна строка бейджей (<code>Badge</code>), которые
               переставляются движением вбок. Подложка повторяет форму элемента.
             </DemoDescription>
             <PlaygroundExampleFrame.Root code={horizontalSource.trim()} previewLayout="stack">

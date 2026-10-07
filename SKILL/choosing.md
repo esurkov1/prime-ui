@@ -9,8 +9,8 @@ confuse. Links: [components.md](components.md).
 |---|---|
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
 | type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload, LoginForm (sign-in screens) |
-| pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, TagSelect, Datepicker, ColorPicker |
-| see data: status, labels, people, numbers, rows, events | Data display — Badge, Tag, Avatar, Kbd, Card, DataTable, Timeline, CodeBlock |
+| pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, TagSelect, SmartFilter, Datepicker, ColorPicker |
+| see data: status, labels, people, numbers, rows, events | Data display — Badge, Avatar, Kbd, Card, DataTable, Timeline, CodeBlock |
 | learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, SegmentedProgressBar, ProgressCircle, EmptyPage |
 | move between views, places, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper |
 | see something on top of the page | Overlays — Tooltip, Popover, Dropdown, Modal, Drawer, CommandMenu |
@@ -37,11 +37,12 @@ with `Input.Icon` + `type="search"`.
 | exactly one of 2–5 modes that change the view right now | SegmentedControl |
 | one of many (> 5) or a long list | Select |
 | several of many, shown as tags, with search / creation | TagSelect (`Select multiple` when tags are not needed) |
+| narrowing a list or table by several fields, with search and show / hide | SmartFilter |
 | an approximate number in a range | Slider (exact number → Input) |
 | a date or a period | Datepicker |
 | a color | ColorPicker (free color) / ColorPresets (fixed palette) |
 
-**Data.** Static status or count → Badge. Removable value or applied filter → Tag. Person → Avatar.
+**Data.** Status, count, removable value or applied filter → Badge (`onRemove` to remove, `onPress` to toggle). Person → Avatar.
 Keyboard shortcut → Kbd. One block of related numbers/content → Card (pick the template). Rows with
 columns, sorting, selection → DataTable. Chronological events → Timeline. Code → CodeBlock.
 
@@ -57,7 +58,7 @@ SegmentedProgressBar; compact goal / KPI ring → ProgressCircle. Nothing to sho
 | Tabs / SegmentedControl | Tabs switch **panels of content** (navigation inside a screen, underline). SegmentedControl switches a **value or mode** of the same content (period, view mode, filter). |
 | Modal / Drawer / Popover / Tooltip | Modal: blocking decision or a short form that needs full attention. Drawer: long form, filters, record details while keeping page context; side panel. Popover: small non-modal panel anchored to a control (quick edit, filter, explanation with a link). Tooltip: a few words naming or explaining a control, no interactive content. |
 | Select / Dropdown / CommandMenu / TagSelect | Select picks a **value** for a field (form data). Dropdown runs **actions** (Edit, Duplicate, Delete). CommandMenu searches commands and pages across the app. TagSelect picks **several values** as tags. |
-| Badge / Tag | Badge is a read-only label (status, count). Tag is a value the user added or can remove (filter, keyword, selected option). |
+| Badge / Button | A badge labels or holds a value (status, filter, keyword): `onRemove` drops it, `onPress` toggles it. A command (save, open, go) is always a Button. |
 | Banner / Notification / Hint | Banner: persistent message in the page flow about a page/section state (trial ends, maintenance). Notification: transient toast about the result of an action (saved, failed). Hint: help or validation text under one field. |
 | Button / LinkButton | Button does something (submit, open, delete). LinkButton goes somewhere (a URL, «Подробнее», «Все заказы»). |
 | Checkbox / Switch / Radio | Checkbox: choice submitted later with a button, can be multiple. Switch: on/off that applies at once (no Save button). Radio: one of several, submitted later. A privacy toggle inside a create form that is submitted → Checkbox. |

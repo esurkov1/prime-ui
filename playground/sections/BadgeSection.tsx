@@ -1,3 +1,7 @@
+import BadgeAppliedFiltersExample from "@/components/badge/examples/applied-filters";
+import badgeAppliedFiltersSource from "@/components/badge/examples/applied-filters.tsx?raw";
+import BadgeFilterValuesExample from "@/components/badge/examples/filter-values";
+import badgeFilterValuesSource from "@/components/badge/examples/filter-values.tsx?raw";
 import BadgeIconsExample from "@/components/badge/examples/icons";
 import badgeIconsSource from "@/components/badge/examples/icons.tsx?raw";
 import BadgeInControlsExample from "@/components/badge/examples/in-controls";
@@ -6,6 +10,8 @@ import BadgeOrderListExample from "@/components/badge/examples/order-list";
 import badgeOrderListSource from "@/components/badge/examples/order-list.tsx?raw";
 import BadgePaletteExample from "@/components/badge/examples/palette";
 import badgePaletteSource from "@/components/badge/examples/palette.tsx?raw";
+import BadgeRemovableExample from "@/components/badge/examples/removable";
+import badgeRemovableSource from "@/components/badge/examples/removable.tsx?raw";
 import BadgeSizesExample from "@/components/badge/examples/sizes";
 import badgeSizesSource from "@/components/badge/examples/sizes.tsx?raw";
 import BadgeStatesExample from "@/components/badge/examples/states";
@@ -49,11 +55,43 @@ const badgeRootApiRows: PlaygroundApiPropRow[] = [
       "Высота 16 · 20 · 24 · 28 · 32 px. Без size внутри Button, Input и других контролов бейдж на ярус меньше контрола (m → s, xl → l, s/xs → xs). Явный size всегда побеждает.",
   },
   {
+    prop: "onRemove",
+    type: "() => void",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Сегмент удаления на всю высоту в конце бейджа: вся правая часть — зона клика. Для выбранных значений и применённых фильтров.",
+  },
+  {
+    prop: "onPress",
+    type: "(event: React.MouseEvent<HTMLButtonElement>) => void",
+    defaultValue: "—",
+    required: "Нет",
+    description:
+      "Делает тело бейджа кнопкой (переключатель, значение фильтра). Получает событие, чтобы Alt/Shift-клик мог значить другое.",
+  },
+  {
+    prop: "pressed",
+    type: "boolean",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Состояние переключателя: aria-pressed и data-pressed. Вместе с onPress.",
+  },
+  {
+    prop: "labels",
+    type: "Partial<BadgeLabels>",
+    defaultValue: '{ remove: "Удалить" }',
+    required: "Нет",
+    description:
+      "Системные строки. remove — имя кнопки удаления; включайте текст бейджа: «Убрать фильтр «Москва»».",
+  },
+  {
     prop: "disabled",
     type: "boolean",
     defaultValue: "—",
     required: "Нет",
-    description: "Приглушённый вид: fill-muted и text-disabled (data-disabled).",
+    description:
+      "Приглушённый вид: fill-muted и text-disabled (data-disabled, aria-disabled); кнопки внутри — disabled.",
   },
   {
     prop: "children",
@@ -61,7 +99,7 @@ const badgeRootApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "Нет",
     description:
-      "Текст, Badge.Dot, Badge.Icon. Только Badge.Icon без текста — квадратный бейдж (добавьте aria-label).",
+      "Текст, Badge.Dot, Badge.Icon, один Badge.Action. Иконка у края — сегмент на всю высоту. Только Badge.Icon без текста — квадратный бейдж (добавьте aria-label).",
   },
   {
     prop: "…rest",
@@ -99,15 +137,61 @@ const badgeDotApiRows: PlaygroundApiPropRow[] = [
   },
 ];
 
+const badgeActionApiRows: PlaygroundApiPropRow[] = [
+  {
+    prop: "label",
+    type: "string",
+    defaultValue: "—",
+    required: "Да",
+    description: "Доступное имя и подсказка действия: «Скрыть billing».",
+  },
+  {
+    prop: "onClick",
+    type: "(event: React.MouseEvent<HTMLButtonElement>) => void",
+    defaultValue: "—",
+    required: "Да",
+    description: "Нажатие на действие.",
+  },
+  {
+    prop: "persistent",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Показывать всегда, а не только по наведению и фокусу.",
+  },
+  {
+    prop: "pressed",
+    type: "boolean",
+    defaultValue: "—",
+    required: "Нет",
+    description: "Состояние действия-переключателя: aria-pressed.",
+  },
+  {
+    prop: "disabled",
+    type: "boolean",
+    defaultValue: "false",
+    required: "Нет",
+    description: "Действие недоступно.",
+  },
+  {
+    prop: "children",
+    type: "React.ReactNode",
+    defaultValue: "минус",
+    required: "Нет",
+    description: "Свой глиф вместо минуса; размер — иконка яруса.",
+  },
+];
+
 export default function BadgeSection() {
   return (
     <PageContent.Section>
       <PageContent.Header>
         <PageContent.Title>Badge</PageContent.Title>
         <PageContent.Description measure="full">
-          Компактная неинтерактивная метка: статус, категория, окружение, счётчик. По умолчанию
-          мягкая заливка без обводки, цифры моноширинные. Для удаляемых и фильтр-чипов —{" "}
-          <code>Tag</code>, для клавиш — <code>Kbd</code>, для действий — <code>Button</code>.
+          Единственная плашка кита: статус, категория, счётчик, удаляемое значение, применённый
+          фильтр и переключатель с действием по наведению. Иконка у края, крестик и действие —
+          сегменты на всю высоту: вся эта часть кликабельна. Для клавиш — <code>Kbd</code>, для
+          команд — <code>Button</code>.
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
@@ -227,6 +311,52 @@ export default function BadgeSection() {
           </div>
 
           <div className="demoBlock">
+            <DemoSectionTitle>Удаляемые значения</DemoSectionTitle>
+            <DemoDescription>
+              <code>onRemove</code> добавляет сегмент удаления на всю высоту: вся правая часть
+              бейджа — зона клика. Иконка у начала тоже сегмент. <code>labels.remove</code> называет
+              конкретное значение.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={badgeRemovableSource.trim()}>
+              <PlaygroundExampleFrame.Stage>
+                <BadgeRemovableExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Переключатель с действием по наведению</DemoSectionTitle>
+            <DemoDescription>
+              <code>onPress</code> и <code>pressed</code> делают бейдж переключателем «показать
+              только это», а <code>Badge.Action</code> по наведению и фокусу выдвигает «−»: текст
+              отъезжает, ширина не меняется. <code>persistent</code> оставляет действие видимым. На
+              этом построены значения <code>SmartFilter</code>.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root code={badgeFilterValuesSource.trim()}>
+              <PlaygroundExampleFrame.Stage>
+                <BadgeFilterValuesExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
+            <DemoSectionTitle>Композиция: применённые фильтры</DemoSectionTitle>
+            <DemoDescription>
+              Каждый бейдж снимает свой фильтр; «Сбросить все» — ghost-кнопка рядом. После удаления
+              переведите фокус на соседний бейдж или поле, из которого фильтр был добавлен.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={badgeAppliedFiltersSource.trim()}
+              previewLayout="stack-center"
+              surface="canvas"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <BadgeAppliedFiltersExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
             <DemoSectionTitle>API</DemoSectionTitle>
             <DemoApiTitle>Badge.Root</DemoApiTitle>
             <DemoDescription>
@@ -243,6 +373,12 @@ export default function BadgeSection() {
               Декоративная точка внутри метки в цвете текста бейджа.
             </DemoDescription>
             <PlaygroundApiTable rows={badgeDotApiRows} />
+
+            <DemoApiTitle>Badge.Action</DemoApiTitle>
+            <DemoDescription>
+              Сегмент в конце бейджа, появляется по наведению и фокусу; ширина бейджа не меняется.
+            </DemoDescription>
+            <PlaygroundApiTable rows={badgeActionApiRows} />
           </div>
         </div>
       </PageContent.Body>

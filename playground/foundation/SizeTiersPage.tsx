@@ -236,7 +236,7 @@ export default function SizeTiersPage() {
             и тот же кегль.
           </li>
           <li>
-            Badge, Tag и Kbd внутри контрола уровня T берут badge-уровень на ступень ниже: в поле{" "}
+            Badge и Kbd внутри контрола уровня T берут badge-уровень на ступень ниже: в поле{" "}
             <code>m</code> стоит badge <code>s</code>.
           </li>
           <li>Кнопка только с иконкой квадратная: ширина равна высоте.</li>
@@ -253,7 +253,7 @@ export default function SizeTiersPage() {
       </FoundationSection>
 
       <FoundationSection
-        title="Badge, Tag, Kbd"
+        title="Badge, Kbd"
         description={
           <>
             Свои уровни высоты 16 · 20 · 24 · 28 · 32: <code>--prime-badge-&lt;tier&gt;-*</code>.

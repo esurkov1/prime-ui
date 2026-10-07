@@ -1,9 +1,9 @@
 import * as React from "react";
+import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Input } from "@/components/input/Input";
 import { Popover } from "@/components/popover/Popover";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
-import { Tag } from "@/components/tag/Tag";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
@@ -879,7 +879,7 @@ function TagSelectRoot({
     measure = false,
     index = 0,
   ) => (
-    <Tag.Root
+    <Badge.Root
       key={c.value}
       color={c.color}
       disabled={disabled}
@@ -901,7 +901,7 @@ function TagSelectRoot({
       }}
     >
       <span className={styles.chipLabel}>{c.label}</span>
-    </Tag.Root>
+    </Badge.Root>
   );
 
   return (
@@ -952,9 +952,9 @@ function TagSelectRoot({
                 aria-label={labels.more.replace("{count}", String(hiddenChips.length))}
                 title={hiddenChips.map((c) => c.label).join(", ")}
               >
-                <Tag.Root disabled={disabled} className={styles.chipMore} aria-hidden>
+                <Badge.Root disabled={disabled} className={styles.chipMore} aria-hidden>
                   +{hiddenChips.length}
-                </Tag.Root>
+                </Badge.Root>
               </button>
             ) : null}
             <input
@@ -1003,7 +1003,7 @@ function TagSelectRoot({
           {/* Невидимый ряд всех чипов — ширины для расчёта «+N». */}
           <div ref={measureRef} className={styles.measure} aria-hidden inert>
             {chips.map((c) => renderChip(c, true))}
-            <Tag.Root className={styles.chipMore}>+{Math.max(chips.length, 9)}</Tag.Root>
+            <Badge.Root className={styles.chipMore}>+{Math.max(chips.length, 9)}</Badge.Root>
           </div>
 
           <span className={styles.chevronSlot} aria-hidden>
@@ -1056,21 +1056,21 @@ function TagSelectRoot({
                   <PlusIcon />
                 </span>
                 <span className={styles.createLabel}>{labels.create}</span>
-                <Tag.Root color={defaultColor} className={styles.chip}>
+                <Badge.Root color={defaultColor} className={styles.chip}>
                   <span className={styles.chipLabel}>{inputTrim}</span>
-                </Tag.Root>
+                </Badge.Root>
               </button>
             ) : null}
 
             {filteredForPick.map((o) => {
               const chip = (
-                <Tag.Root
+                <Badge.Root
                   color={o.color ?? defaultColor}
                   disabled={o.disabled}
                   className={styles.chip}
                 >
                   <span className={styles.chipLabel}>{o.label}</span>
-                </Tag.Root>
+                </Badge.Root>
               );
               const isSelected = selected.includes(o.value);
               const checkbox = (

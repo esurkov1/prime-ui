@@ -17,9 +17,9 @@ import {
   Code2,
   Command,
   Focus,
-  GripVertical,
   Frame,
   Gauge,
+  GripVertical,
   Hash,
   History,
   Inbox,
@@ -32,6 +32,7 @@ import {
   LayoutTemplate,
   Link2,
   ListChecks,
+  ListFilter,
   ListOrdered,
   LogIn,
   type LucideIcon,
@@ -53,7 +54,6 @@ import {
   SquareRoundCorner,
   StretchHorizontal,
   Table,
-  Tag,
   Tags,
   TextCursorInput,
   ToggleLeft,
@@ -88,8 +88,8 @@ import CommandMenuSection from "./sections/CommandMenuSection";
 import DataTableSection from "./sections/DataTableSection";
 import DatepickerSection from "./sections/DatepickerSection";
 import DigitInputSection from "./sections/DigitInputSection";
-import DndSection from "./sections/DndSection";
 import DividerSection from "./sections/DividerSection";
+import DndSection from "./sections/DndSection";
 import DrawerSection from "./sections/DrawerSection";
 import DropdownSection from "./sections/DropdownSection";
 import EmptyPageSection from "./sections/EmptyPageSection";
@@ -115,10 +115,10 @@ import SegmentedProgressBarSection from "./sections/SegmentedProgressBarSection"
 import SelectSection from "./sections/SelectSection";
 import SidebarSection from "./sections/SidebarSection";
 import SliderSection from "./sections/SliderSection";
+import SmartFilterSection from "./sections/SmartFilterSection";
 import StepperSection from "./sections/StepperSection";
 import SwitchSection from "./sections/SwitchSection";
 import TabsSection from "./sections/TabsSection";
-import TagSection from "./sections/TagSection";
 import TagSelectSection from "./sections/TagSelectSection";
 import TextareaSection from "./sections/TextareaSection";
 import TimelineSection from "./sections/TimelineSection";
@@ -397,6 +397,24 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
       Page: TagSelectSection,
     },
     {
+      segment: "smart-filter",
+      label: "SmartFilter",
+      description: "Умные фильтры: панель значений, поиск и теги применённых фильтров",
+      keywords: [
+        "фильтры",
+        "фильтр",
+        "поиск",
+        "filter",
+        "include",
+        "exclude",
+        "скрыть",
+        "показать",
+        "chips",
+      ],
+      icon: ListFilter,
+      Page: SmartFilterSection,
+    },
+    {
       segment: "datepicker",
       label: "Datepicker",
       description: "Выбор даты и диапазона в календаре",
@@ -417,18 +435,23 @@ const CATEGORY_PAGES: Record<PlaygroundCategoryId, PageDef[]> = {
     {
       segment: "badge",
       label: "Badge",
-      description: "Бейдж: статус, счётчик, цвет",
-      keywords: ["бейдж", "метка", "счётчик", "color", "tone", "variant"],
+      description: "Бейдж и тег: статус, счётчик, удаляемое значение, переключатель",
+      keywords: [
+        "бейдж",
+        "метка",
+        "счётчик",
+        "тег",
+        "чип",
+        "chip",
+        "tag",
+        "фильтр",
+        "onRemove",
+        "onPress",
+        "color",
+        "variant",
+      ],
       icon: Award,
       Page: BadgeSection,
-    },
-    {
-      segment: "tag",
-      label: "Tag",
-      description: "Тег с удалением и цветом",
-      keywords: ["тег", "чип", "chip", "color", "onRemove"],
-      icon: Tag,
-      Page: TagSection,
     },
     {
       segment: "avatar",

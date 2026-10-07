@@ -42,6 +42,7 @@ Choosing from options: toggles, lists, ranges, dates, colors.
 | Slider | A slider for picking an approximate numeric value within a range, with an optional label and value readout. | [COMPONENT.md](../src/components/slider/COMPONENT.md) · [examples](../src/components/slider/examples/) |
 | Select | A dropdown field for choosing one value (or several with `multiple`) from a closed list. | [COMPONENT.md](../src/components/select/COMPONENT.md) · [examples](../src/components/select/examples/) |
 | TagSelect | A multi-select field that shows the chosen values as coloured tags, filters as you type and can create new tags. | [COMPONENT.md](../src/components/tag-select/COMPONENT.md) · [examples](../src/components/tag-select/examples/) |
+| SmartFilter | A filter bar for lists and tables: a filter button and search with a panel of values, applied filters as tags, and a show / hide choice for every value. | [COMPONENT.md](../src/components/smart-filter/COMPONENT.md) · [examples](../src/components/smart-filter/examples/) |
 | Datepicker | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). | [COMPONENT.md](../src/components/datepicker/COMPONENT.md) · [examples](../src/components/datepicker/examples/) |
 | ColorPicker | Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. | [COMPONENT.md](../src/components/color-picker/COMPONENT.md) · [examples](../src/components/color-picker/examples/) |
 
@@ -51,8 +52,7 @@ Showing data and labels: badges, tags, avatars, cards, tables, feeds, code.
 
 | Component | Purpose | Docs |
 |---|---|---|
-| Badge | A compact static label for a status, category or count, in a palette color. | [COMPONENT.md](../src/components/badge/COMPONENT.md) · [examples](../src/components/badge/examples/) |
-| Tag | A chip for a selected value, applied filter or keyword, with an optional remove button and a palette color. | [COMPONENT.md](../src/components/tag/COMPONENT.md) · [examples](../src/components/tag/examples/) |
+| Badge | The kit's one chip: a status, category or count label, a removable value or applied filter, and a pressable toggle with a hover action, in a palette color. | [COMPONENT.md](../src/components/badge/COMPONENT.md) · [examples](../src/components/badge/examples/) |
 | Avatar | A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups. | [COMPONENT.md](../src/components/avatar/COMPONENT.md) · [examples](../src/components/avatar/examples/) |
 | Kbd | A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`. | [COMPONENT.md](../src/components/kbd/COMPONENT.md) · [examples](../src/components/kbd/examples/) |
 | Card | A filled surface block with structural templates for metrics, charts, lists, calls to action and covers. | [COMPONENT.md](../src/components/card/COMPONENT.md) · [examples](../src/components/card/examples/) |

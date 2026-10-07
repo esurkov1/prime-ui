@@ -1,13 +1,13 @@
-/** Applied filters panel: each tag removes its filter, the button clears all; `labels.remove` names the filter. Use above lists and tables with filters. */
+/** Applied filters panel: each removable badge drops its filter, the button clears all; `labels.remove` names the filter. Use above lists and tables with filters. */
 
-import { Button, Tag, Typography } from "prime-ui-kit";
+import { Badge, Button, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
 const INITIAL = ["Москва", "Санкт-Петербург", "Есть в наличии", "До 5 000 ₽"];
 
-export default function TagAppliedFiltersExample() {
+export default function BadgeAppliedFiltersExample() {
   const [filters, setFilters] = React.useState(INITIAL);
   const titleId = React.useId();
 
@@ -27,15 +27,15 @@ export default function TagAppliedFiltersExample() {
         </Button.Root>
       </div>
       {filters.length > 0 ? (
-        <div className={styles.tags}>
+        <div className={styles.badges}>
           {filters.map((label) => (
-            <Tag.Root
+            <Badge.Root
               labels={{ remove: `Убрать фильтр «${label}»` }}
               key={label}
               onRemove={() => setFilters((prev) => prev.filter((item) => item !== label))}
             >
               {label}
-            </Tag.Root>
+            </Badge.Root>
           ))}
         </div>
       ) : (

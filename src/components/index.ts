@@ -180,6 +180,8 @@ export {
 } from "./datepicker/Datepicker";
 export type { DigitInputLabels, DigitInputRootProps } from "./digit-input/DigitInput";
 export { DigitInput } from "./digit-input/DigitInput";
+export type { DividerAlign, DividerOrientation, DividerRootProps } from "./divider/Divider";
+export { Divider } from "./divider/Divider";
 export type {
   Activation,
   DndDraggableProps,
@@ -201,8 +203,6 @@ export { Dnd } from "./dnd/Dnd";
 export { useDraggedItem, useDragSource } from "./dnd/useDragSource";
 export { useDropTarget } from "./dnd/useDropTarget";
 export { moveBefore, useSortableList } from "./dnd/useSortableList";
-export type { DividerAlign, DividerOrientation, DividerRootProps } from "./divider/Divider";
-export { Divider } from "./divider/Divider";
 export * from "./drawer/Drawer";
 export type {
   DropdownBlockProps,
@@ -412,6 +412,22 @@ export { Select } from "./select/Select";
 export type { SliderRootProps } from "./slider/Slider";
 export { Slider } from "./slider/Slider";
 export type {
+  SmartFilterChipsProps,
+  SmartFilterField,
+  SmartFilterLabels,
+  SmartFilterMode,
+  SmartFilterOption,
+  SmartFilterRootProps,
+  SmartFilterSelection,
+  SmartFilterToolbarProps,
+  SmartFilterValue,
+} from "./smart-filter/SmartFilter";
+export {
+  matchesSmartFilter,
+  resolveSmartFilterValues,
+  SmartFilter,
+} from "./smart-filter/SmartFilter";
+export type {
   StepperArrowProps,
   StepperContentProps,
   StepperDescriptionProps,
@@ -430,7 +446,6 @@ export type {
 } from "./switch/Switch";
 export { Switch } from "./switch/Switch";
 export * from "./tabs/Tabs";
-export * from "./tag/Tag";
 export type {
   TagSelectLabels,
   TagSelectOption,

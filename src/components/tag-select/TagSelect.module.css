@@ -3,7 +3,7 @@
  * At rest the field is one row: chips that do not fit collapse into a "+N" button. Focused or open
  * (`data-expanded`) it grows to show every chip on wrapped rows (up to 3, then it scrolls inside)
  * and collapses back on blur / close; the height animates with the motion tokens.
- * Chips are `Tag` in the badge tier one step below the field.
+ * Chips are `Badge` in the badge tier one step below the field.
  */
 
 .control,
@@ -245,7 +245,7 @@
   margin-block-start: calc((var(--ts-row) - var(--ts-icon)) / 2);
 }
 
-/* ─── Chips: `Tag` (soft badge, tier one step below the field) ─────────── */
+/* ─── Chips: `Badge` (soft badge, tier one step below the field) ─────────── */
 
 /* A chip may shrink to an ellipsis; "+N" never does. */
 .chip {
@@ -269,7 +269,7 @@
   outline-offset: var(--prime-focus-offset);
 }
 
-/* "+N" is a real button around a Tag. */
+/* "+N" is a real button around a Badge. */
 .moreButton {
   display: inline-flex;
   flex-shrink: 0;

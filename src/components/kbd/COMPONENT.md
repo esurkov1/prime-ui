@@ -11,7 +11,7 @@
 
 ## When not to use
 - A status, category or counter → use [Badge](../badge/COMPONENT.md).
-- A removable value → use [Tag](../tag/COMPONENT.md).
+- A removable value → use [Badge](../badge/COMPONENT.md) with `onRemove`.
 - A clickable control → use [Button](../button/COMPONENT.md).
 - A block of code → use [CodeBlock](../code-block/COMPONENT.md).
 
@@ -54,7 +54,7 @@ Minimum width equals the height, so single-character keys are square.
 - Avoid: one `Kbd.Root` holding a whole chord with "+" text inside; symbols without an accessible name.
 
 **Sizes**
-Same tiers as Badge and Tag. Without `size` inside a control: `xs`/`s` → `xs`, `m` → `s`, `l` → `m`, `xl` → `l`.
+Same tiers as Badge. Without `size` inside a control: `xs`/`s` → `xs`, `m` → `s`, `l` → `m`, `xl` → `l`.
 
 ## States
 Kbd is static: no hover, focus, disabled or loading.
@@ -109,6 +109,6 @@ export function SaveHint() {
 - `Badge` used for a key → use `Kbd.Root` (monospace, semantic `<kbd>`).
 
 ## Related
-- [Badge](../badge/COMPONENT.md), [Tag](../tag/COMPONENT.md) — same tiers.
+- [Badge](../badge/COMPONENT.md) — same tiers.
 - [CommandMenu](../command-menu/COMPONENT.md) — shortcut hints in the footer.
 - [Dropdown](../dropdown/COMPONENT.md) — shortcuts in menu items.

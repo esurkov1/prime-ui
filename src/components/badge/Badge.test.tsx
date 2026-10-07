@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { IconHouse } from "@/icons";
 import iconStyles from "@/icons/Icon.module.css";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -156,5 +157,145 @@ describe("Badge", () => {
       </Badge.Root>,
     );
     expect(screen.getByTestId("io")).toHaveAttribute("data-icon-only", "true");
+  });
+
+  it("turns an icon at an edge into a segment and leaves middle and icon-only alone", () => {
+    const { container } = render(
+      <>
+        <Badge.Root data-testid="lead">
+          <Badge.Icon>
+            <svg />
+          </Badge.Icon>
+          Готово
+        </Badge.Root>
+        <Badge.Root data-testid="trail">
+          Ссылка
+          <Badge.Icon>
+            <svg />
+          </Badge.Icon>
+        </Badge.Root>
+        <Badge.Root data-testid="only">
+          <Badge.Icon>
+            <svg />
+          </Badge.Icon>
+        </Badge.Root>
+      </>,
+    );
+    const lead = screen.getByTestId("lead");
+    expect(lead).toHaveAttribute("data-icon-start", "true");
+    expect(lead.querySelector("[data-edge]")).toHaveAttribute("data-edge", "start");
+    const trail = screen.getByTestId("trail");
+    expect(trail).toHaveAttribute("data-icon-end", "true");
+    expect(trail.querySelector("[data-edge]")).toHaveAttribute("data-edge", "end");
+    const only = screen.getByTestId("only");
+    expect(only).toHaveAttribute("data-icon-only", "true");
+    expect(only).not.toHaveAttribute("data-icon-start");
+    expect(container.querySelectorAll("[data-edge]")).toHaveLength(2);
+  });
+
+  describe("interactive", () => {
+    it("onRemove adds a named remove segment; disabled disables it", async () => {
+      const onRemove = vi.fn();
+      const { rerender } = render(
+        <Badge.Root data-testid="b" labels={{ remove: "Убрать «Москва»" }} onRemove={onRemove}>
+          Москва
+        </Badge.Root>,
+      );
+      expect(screen.getByTestId("b")).toHaveAttribute("data-removable", "true");
+      await userEvent.click(screen.getByRole("button", { name: "Убрать «Москва»" }));
+      expect(onRemove).toHaveBeenCalledTimes(1);
+      rerender(
+        <Badge.Root disabled onRemove={onRemove}>
+          Москва
+        </Badge.Root>,
+      );
+      expect(screen.getByRole("button", { name: "Удалить" })).toBeDisabled();
+    });
+
+    it("a read-only badge stays one element", () => {
+      render(<Badge.Root data-testid="b">12</Badge.Root>);
+      expect(screen.getByTestId("b").children).toHaveLength(0);
+      expect(screen.queryByRole("button")).toBeNull();
+    });
+
+    it("onPress makes the body a toggle button with aria-pressed", async () => {
+      const onPress = vi.fn();
+      render(
+        <Badge.Root onPress={onPress} pressed>
+          GET
+        </Badge.Root>,
+      );
+      const button = screen.getByRole("button", { name: "GET" });
+      expect(button).toHaveAttribute("aria-pressed", "true");
+      expect(button.closest("[data-pressable]")).toHaveAttribute("data-pressed", "true");
+      await userEvent.click(button);
+      expect(onPress).toHaveBeenCalledTimes(1);
+    });
+
+    it("Badge.Action sits outside the text and reports reveal or persistent", async () => {
+      const onHide = vi.fn();
+      const { rerender } = render(
+        <Badge.Root onPress={() => {}} data-testid="b">
+          billing
+          <Badge.Action label="Скрыть billing" onClick={onHide} />
+        </Badge.Root>,
+      );
+      expect(screen.getByTestId("b")).toHaveAttribute("data-action", "reveal");
+      expect(screen.getByRole("button", { name: "billing" })).not.toHaveTextContent("Скрыть");
+      await userEvent.click(screen.getByRole("button", { name: "Скрыть billing" }));
+      expect(onHide).toHaveBeenCalledTimes(1);
+      rerender(
+        <Badge.Root onPress={() => {}} data-testid="b">
+          billing
+          <Badge.Action label="Скрыть billing" onClick={onHide} persistent disabled />
+        </Badge.Root>,
+      );
+      expect(screen.getByTestId("b")).toHaveAttribute("data-action", "persistent");
+      expect(screen.getByRole("button", { name: "Скрыть billing" })).toBeDisabled();
+    });
+
+    it("tab order: body, then the action", async () => {
+      render(
+        <Badge.Root onPress={() => {}}>
+          GET
+          <Badge.Action label="Скрыть GET" onClick={() => {}} />
+        </Badge.Root>,
+      );
+      await userEvent.tab();
+      expect(screen.getByRole("button", { name: "GET" })).toHaveFocus();
+      await userEvent.tab();
+      expect(screen.getByRole("button", { name: "Скрыть GET" })).toHaveFocus();
+    });
+
+    it("a leading icon is a start segment; the end edge belongs to remove", () => {
+      render(
+        <Badge.Root data-testid="b" onRemove={() => {}}>
+          <Badge.Icon>
+            <svg />
+          </Badge.Icon>
+          Почта
+          <Badge.Icon>
+            <svg />
+          </Badge.Icon>
+        </Badge.Root>,
+      );
+      const badge = screen.getByTestId("b");
+      expect(badge).toHaveAttribute("data-icon-start", "true");
+      expect(badge).not.toHaveAttribute("data-icon-end");
+      expect(badge).not.toHaveAttribute("data-icon-only");
+      expect(badge.querySelectorAll("[data-edge]")).toHaveLength(1);
+    });
+  });
+
+  it("a leading dot is a start segment too", () => {
+    render(
+      <Badge.Root data-testid="b" color="green">
+        <Badge.Dot />
+        Оплачен
+      </Badge.Root>,
+    );
+    const badge = screen.getByTestId("b");
+    expect(badge).toHaveAttribute("data-icon-start", "true");
+    expect(badge.querySelector("[data-edge]")).toHaveAttribute("aria-hidden", "true");
   });
 });

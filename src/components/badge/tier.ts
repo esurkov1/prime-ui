@@ -2,7 +2,7 @@ import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import type { ControlSize } from "@/internal/states";
 
 /**
- * Badge tiers (`--prime-badge-<tier>-*`): 16 · 20 · 24 · 28 · 32. Shared by Badge, Tag and Kbd.
+ * Badge tiers (`--prime-badge-<tier>-*`): 16 · 20 · 24 · 28 · 32. Shared by Badge and Kbd.
  * Pairing rule (foundation §6): inside a control of tier T a badge uses the tier one step down.
  */
 const STEP_DOWN: Record<ControlSize, ControlSize> = {

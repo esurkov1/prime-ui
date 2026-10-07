@@ -15,7 +15,7 @@ export type Variant = (typeof variants)[number];
 export const tones = ["neutral", "accent", "success", "warning", "danger", "info"] as const;
 export type Tone = (typeof tones)[number];
 
-/** Decorative palette color (Badge, Tag, Avatar). */
+/** Decorative palette color (Badge, Avatar). */
 export const paletteColors = [
   "gray",
   "blue",

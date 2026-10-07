@@ -1,5 +1,5 @@
-/** `axis="x"`: a single row of `Tag` chips reordered by dragging sideways. The item wraps a Tag and takes its radius, so the drop gap has the tag's shape. Use for filters, keywords and tag strips whose order matters. */
-import { Dnd, moveBefore, Tag } from "prime-ui-kit";
+/** `axis="x"`: a single row of `Badge` chips reordered by dragging sideways. The item wraps a Badge and takes its radius, so the drop gap has the badge's shape. Use for filters, keywords and tag strips whose order matters. */
+import { Badge, Dnd, moveBefore } from "prime-ui-kit";
 import { useState } from "react";
 
 import styles from "./examples.module.css";
@@ -31,7 +31,7 @@ export default function DndHorizontalExample() {
         }
         renderItem={(tag) => (
           <Dnd.SortableItem id={tag.id} className={styles.tagItem}>
-            <Tag.Root>{tag.title}</Tag.Root>
+            <Badge.Root>{tag.title}</Badge.Root>
           </Dnd.SortableItem>
         )}
       />

@@ -1,7 +1,12 @@
 /*
- * Badge — soft by default, no borders. Dimensions come from `--prime-badge-<tier>-*`,
- * colors from `--prime-color-palette-<hue>-*`. `data-tier` is the visual tier
- * (equals `data-size` unless the size was inherited from a control, see ./tier.ts).
+ * Badge — the one chip of the kit: read-only label, counter, removable value, pressable toggle.
+ * Soft by default, no borders. Dimensions come from `--prime-badge-<tier>-*`, colors from
+ * `--prime-color-palette-<hue>-*`. `data-tier` is the visual tier (equals `data-size` unless the
+ * size was inherited from a control, see ./tier.ts).
+ *
+ * Layout: [start segment?] body [end segment?]. An icon or dot at an edge, the remove button and
+ * Badge.Action are segments — full height, flush with the edge, the glyph centred, the whole
+ * segment is the hit area. A segment takes the side padding of the badge.
  */
 .root {
   --badge-h: var(--prime-badge-m-height);
@@ -12,21 +17,30 @@
   --badge-lh: var(--prime-text-caption-line-height);
   --badge-dot: calc(var(--prime-space-1) + 2 * var(--prime-border-width));
   --prime-icon-size: var(--prime-badge-m-icon);
+  /* Edge paddings are variables: an icon or dot at an edge turns into a segment and takes that side. */
+  --badge-pad-start: var(--badge-px);
+  --badge-pad-end: var(--badge-px);
 
   --hue-soft: var(--prime-color-palette-gray-soft);
   --hue-text: var(--prime-color-palette-gray-text);
   --hue-solid: var(--prime-color-palette-gray-solid);
   --hue-solid-fg: var(--prime-color-palette-gray-solid-fg);
 
+  /* A segment holds its mark with equal space on both sides: (padding + gap) / 2 to the edge and
+     the same to the text. The flex gap next to a segment is cancelled, so nothing is added. */
+  --badge-seg: calc(var(--prime-icon-size) + var(--badge-px) + var(--badge-gap));
+
+  position: relative;
   box-sizing: border-box;
   display: inline-flex;
-  flex-shrink: 0;
   align-items: center;
   gap: var(--badge-gap);
   height: var(--badge-h);
+  /* Do not stretch inside a column flex/grid parent. */
+  width: fit-content;
   min-width: var(--badge-h);
   max-width: 100%;
-  padding-inline: var(--badge-px);
+  padding-inline: var(--badge-pad-start) var(--badge-pad-end);
   border-radius: var(--badge-radius);
   font-size: var(--badge-text);
   line-height: var(--badge-lh);
@@ -77,6 +91,14 @@
   --badge-lh: var(--prime-text-body-m-line-height);
   --badge-dot: var(--prime-space-2);
   --prime-icon-size: var(--prime-badge-xl-icon);
+}
+
+.root[data-icon-start="true"] {
+  --badge-pad-start: 0px;
+}
+
+.root[data-icon-end="true"] {
+  --badge-pad-end: 0px;
 }
 
 .root[data-icon-only="true"] {
@@ -177,8 +199,19 @@
 
 /* ─── Parts ─────────────────────────────────────────────────────────────── */
 
+/* The dot is drawn by ::before, so its box can grow into an edge segment around it. */
 .dot {
+  display: inline-flex;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--badge-dot);
+  height: var(--badge-dot);
+}
+
+.dot::before {
+  content: "";
+  flex: none;
   width: var(--badge-dot);
   height: var(--badge-dot);
   border-radius: var(--prime-radius-full);
@@ -195,6 +228,199 @@
 }
 
 .icon > * {
-  width: 100%;
-  height: 100%;
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+}
+
+/* An icon or dot at an edge is a segment, like remove and Badge.Action: full height, flush with
+   the edge, the mark centred with equal space to the edge and to the text. */
+.icon[data-edge] {
+  align-self: stretch;
+  width: var(--badge-seg);
+  height: auto;
+}
+
+.dot[data-edge] {
+  align-self: stretch;
+  width: calc(var(--badge-dot) + var(--badge-px) + var(--badge-gap));
+  height: auto;
+}
+
+.icon[data-edge="start"],
+.dot[data-edge="start"] {
+  margin-inline-end: calc(-1 * var(--badge-gap));
+}
+
+.icon[data-edge="end"],
+.dot[data-edge="end"] {
+  margin-inline-start: calc(-1 * var(--badge-gap));
+}
+
+/* ─── Body ──────────────────────────────────────────────────────────────── */
+
+.body {
+  display: inline-flex;
+  align-self: stretch;
+  align-items: center;
+  gap: var(--badge-gap);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.root[data-icon-only="true"] > .body {
+  justify-content: center;
+}
+
+/* ─── Segments: remove and Badge.Action ─────────────────────────────────── */
+
+.glyph {
+  display: block;
+  flex: none;
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+}
+
+/* The remove segment carries its own inner space, so the text runs up to it. */
+.root[data-removable="true"] {
+  --badge-pad-end: 0px;
+}
+
+.remove,
+.action {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--badge-seg);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, currentColor 72%, transparent);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* Remove and Badge.Action are segments that take a hover wash, so the text keeps the usual gap
+   before them: the wash never touches the letters. */
+.remove {
+  flex: 0 0 auto;
+  align-self: stretch;
+}
+
+.remove:hover:not(:disabled),
+.action:hover:not(:disabled) {
+  background: var(--prime-color-fill-subtle-active);
+  color: inherit;
+}
+
+.remove:focus-visible,
+.action:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+  color: inherit;
+}
+
+.remove:disabled,
+.action:disabled {
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Any glyph — the default minus or a custom icon — sits at the tier icon size. */
+.action > * {
+  display: block;
+  flex: none;
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+}
+
+/* ─── Pressable: the body is a button covering the whole badge ──────────── */
+
+.root[data-pressable="true"] {
+  padding-inline: 0;
+}
+
+.root[data-pressable="true"] > .body {
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--badge-pad-start) var(--badge-pad-end);
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  transition: padding var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-pressable="true"]:hover:not([data-disabled="true"]) {
+  background-image: linear-gradient(var(--prime-color-fill-subtle), var(--prime-color-fill-subtle));
+}
+
+.root[data-pressable="true"] > .body:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.root[data-pressable="true"] > .body:disabled {
+  cursor: not-allowed;
+}
+
+/* ─── Badge.Action: a segment revealed at the end; the badge keeps its width ─ */
+
+/* The room for the segment is the segment plus the usual gap before it, like the remove segment.
+   Resting: the room is split evenly, so the text sits centred. Revealed: the text slides to the
+   start and the room opens at the end. The sum never changes. */
+.root[data-action] {
+  --badge-action-room: calc(var(--badge-seg) + var(--badge-gap));
+  --badge-pad-start: calc((var(--badge-px) + var(--badge-action-room)) / 2);
+  --badge-pad-end: calc((var(--badge-px) + var(--badge-action-room)) / 2);
+  transition: padding var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-action="persistent"],
+.root[data-action="reveal"]:hover,
+.root[data-action="reveal"]:focus-within {
+  --badge-pad-start: var(--badge-px);
+  --badge-pad-end: var(--badge-action-room);
+}
+
+/* With a leading icon segment the start has no padding of its own: the room moves by
+   (room − px) / 2 at rest and fully to the end when revealed. */
+.root[data-action][data-icon-start="true"] {
+  --badge-pad-start: calc((var(--badge-action-room) - var(--badge-px)) / 2);
+  --badge-pad-end: calc((var(--badge-action-room) + var(--badge-px)) / 2);
+}
+
+.root[data-action="persistent"][data-icon-start="true"],
+.root[data-action="reveal"][data-icon-start="true"]:hover,
+.root[data-action="reveal"][data-icon-start="true"]:focus-within {
+  --badge-pad-start: 0px;
+  --badge-pad-end: var(--badge-action-room);
+}
+
+.action {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(var(--prime-space-1));
+}
+
+.root[data-action="persistent"] .action,
+.root[data-action="reveal"]:hover .action,
+.root[data-action="reveal"]:focus-within .action {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
 }

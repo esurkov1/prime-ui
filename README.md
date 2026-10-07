@@ -192,6 +192,7 @@ accessibility, examples and common mistakes.
 | [**Slider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/slider/COMPONENT.md) | A slider for picking an approximate numeric value within a range, with an optional label and value readout. |
 | [**Select**](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) | A dropdown field for choosing one value (or several with `multiple`) from a closed list. |
 | [**TagSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag-select/COMPONENT.md) | A multi-select field that shows the chosen values as coloured tags, filters as you type and can create new tags. |
+| [**SmartFilter**](https://github.com/esurkov1/prime-ui/blob/main/src/components/smart-filter/COMPONENT.md) | A filter bar for lists and tables: a filter button and search with a panel of values, applied filters as tags, and a show / hide choice for every value. |
 | [**Datepicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/datepicker/COMPONENT.md) | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). |
 | [**ColorPicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-picker/COMPONENT.md) | Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. |
 
@@ -199,8 +200,7 @@ accessibility, examples and common mistakes.
 
 | Component | What it is for |
 |---|---|
-| [**Badge**](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) | A compact static label for a status, category or count, in a palette color. |
-| [**Tag**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag/COMPONENT.md) | A chip for a selected value, applied filter or keyword, with an optional remove button and a palette color. |
+| [**Badge**](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) | The kit's one chip: a status, category or count label, a removable value or applied filter, and a pressable toggle with a hover action, in a palette color. |
 | [**Avatar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) | A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups. |
 | [**Kbd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kbd/COMPONENT.md) | A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`. |
 | [**Card**](https://github.com/esurkov1/prime-ui/blob/main/src/components/card/COMPONENT.md) | A filled surface block with structural templates for metrics, charts, lists, calls to action and covers. |

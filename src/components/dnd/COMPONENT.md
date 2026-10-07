@@ -196,7 +196,7 @@ All motion is on the system tokens: the lift is `--prime-motion-duration-fast`, 
 |---|---|---|
 | [sortable-list.tsx](examples/sortable-list.tsx) | Task list in a card, the whole row is the grip, keyboard hint with `Kbd` | Ordered settings, priorities, menus |
 | [sortable-handle.tsx](examples/sortable-handle.tsx) | `handle` + `Dnd.Handle`, a `Switch` in every row, async `onReorder` | Rows that carry their own controls |
-| [horizontal.tsx](examples/horizontal.tsx) | `axis="x"` single row of `Tag` chips | Filters, keywords, tag strips |
+| [horizontal.tsx](examples/horizontal.tsx) | `axis="x"` single row of `Badge` chips | Filters, keywords, tag strips |
 | [board.tsx](examples/board.tsx) | Connected lists: tickets move between columns to an exact position, `canDrop` limits "В работе" | Boards, any "move between lists" screen |
 | [drop-zones.tsx](examples/drop-zones.tsx) | `Dnd.Draggable` files onto `Dnd.DropZone` folders, a locked folder refuses, `flashOnDrop` | "Put this there" where the target has no inner order |
 

@@ -108,6 +108,34 @@ function PopoverTrigger({ children }: PopoverTriggerProps) {
 }
 PopoverTrigger.displayName = "PopoverTrigger";
 
+export type PopoverAnchorProps = {
+  /** The element the panel is positioned against and that does not count as "outside" for dismissal. */
+  children: React.ReactElement;
+};
+
+/**
+ * An anchor that is not a trigger: positions the panel against an element (a whole toolbar) and keeps
+ * presses on it from closing the panel, but adds no click handler and no ARIA. Open state is driven
+ * by `Popover.Root open`. Use it instead of `Popover.Trigger`, not with it.
+ */
+function PopoverAnchor({ children }: PopoverAnchorProps) {
+  const { triggerRef } = usePopoverContext();
+  const setNode = React.useCallback(
+    (el: HTMLElement | null) => {
+      (triggerRef as React.MutableRefObject<HTMLElement | null>).current = el;
+    },
+    [triggerRef],
+  );
+  // biome-ignore lint/suspicious/noExplicitAny: cloneElement на произвольный элемент
+  const child = children as React.ReactElement<any>;
+  const childRef =
+    (child.props as { ref?: React.Ref<HTMLElement | null> }).ref ??
+    (child as unknown as { ref?: React.Ref<HTMLElement | null> }).ref;
+  const mergedRef = React.useMemo(() => mergeRefs(childRef, setNode), [childRef, setNode]);
+  return React.cloneElement(child, { ref: mergedRef });
+}
+PopoverAnchor.displayName = "PopoverAnchor";
+
 export type PopoverInsetPadding = "none" | "x1" | "x2" | "x3";
 export type PopoverInsetGap = "none" | "pad" | "x2" | "x3" | "x4";
 
@@ -286,6 +314,7 @@ PopoverActions.displayName = "PopoverActions";
 export const Popover = {
   Root: PopoverRoot,
   Trigger: PopoverTrigger,
+  Anchor: PopoverAnchor,
   Content: PopoverContent,
   Header: PopoverHeader,
   Title: PopoverTitle,

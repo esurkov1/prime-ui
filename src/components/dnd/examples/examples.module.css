@@ -37,7 +37,7 @@
   gap: var(--prime-space-2);
 }
 
-/* The item is the tag's own shape (same radius token as Tag), so the gap and the focus ring match it. */
+/* The item is the badge's own shape (same radius token as Badge), so the gap and the focus ring match it. */
 .tagItem {
   display: inline-flex;
   border-radius: var(--prime-badge-m-radius);

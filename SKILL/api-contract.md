@@ -19,7 +19,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Size | `size` | Default `m`. Avatar adds `2xl`; Modal/Drawer use a width subset. |
 | Treatment | `variant` | `solid · soft · outline · ghost`; structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
 | Meaning | `tone` | Button: `accent \| neutral \| danger`. Destructive is `danger`, never `error`. |
-| Decoration | `color` | Badge, Tag, Avatar, field badges, `Select.ItemMedia`, `SegmentedControl.Item`. |
+| Decoration | `color` | Badge, Avatar, field badges, `Select.ItemMedia`, `SegmentedControl.Item`. |
 | Validation | `invalid`, `hint`, `error` | A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |
 | Value | `value` / `defaultValue` / `onValueChange(value)` | Select, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, Radio.Group, DigitInput, Pagination. |
 | Text value | native `value` / `onChange` + `onValueChange(string)` | Input, Textarea. |

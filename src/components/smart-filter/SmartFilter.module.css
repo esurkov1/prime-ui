@@ -1,0 +1,87 @@
+/*
+ * SmartFilter is assembled from kit parts (Button, Badge, Input, Popover, Divider, Typography,
+ * Kbd); this file only lays them out.
+ */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.search {
+  flex: 1;
+  min-width: 0;
+}
+
+/* As wide as the toolbar it hangs from, not capped at the popover's default width. */
+.panel.panel {
+  max-width: var(--float-max-w, 100vw);
+}
+
+/* The key goes to the end; the label keeps to the start. */
+.queryKey {
+  margin-inline-start: auto;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: var(--prime-space-24) minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--prime-space-4);
+}
+
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.match {
+  text-decoration: underline;
+  text-underline-offset: var(--prime-space-1);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.hint {
+  flex: 1;
+  min-width: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.clearAll {
+  margin-inline-start: auto;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

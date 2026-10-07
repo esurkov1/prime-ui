@@ -244,4 +244,28 @@ describe("Popover — overlay contract", () => {
     expect(panel).toHaveAttribute("data-state", "open");
     expect(panel).toHaveAttribute("data-side", "bottom");
   });
+
+  it("Anchor positions the panel without opening it, and presses on it do not dismiss", () => {
+    const onOpenChange = vi.fn();
+    render(
+      <Popover.Root open onOpenChange={onOpenChange}>
+        <Popover.Anchor>
+          <div data-testid="anchor">
+            <input aria-label="field" />
+          </div>
+        </Popover.Anchor>
+        <Popover.Content>
+          <div>Panel content</div>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    fireEvent.pointerDown(screen.getByLabelText("field"));
+    expect(onOpenChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("anchor"));
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId("anchor")).not.toHaveAttribute("aria-expanded");
+    fireEvent.pointerDown(document.body);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
 });

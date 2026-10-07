@@ -315,9 +315,8 @@ export default function ColorsPage() {
         title="Палитра меток"
         description={
           <>
-            <code>color.palette.&lt;hue&gt;</code> раскрашивает Badge, Tag и Avatar. Мягкий вариант
-            (soft + text) используется по умолчанию, сплошной (solid + solidFg) — для редких
-            акцентов.
+            <code>color.palette.&lt;hue&gt;</code> раскрашивает Badge и Avatar. Мягкий вариант (soft
+            + text) используется по умолчанию, сплошной (solid + solidFg) — для редких акцентов.
           </>
         }
       >

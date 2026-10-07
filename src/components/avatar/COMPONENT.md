@@ -12,7 +12,7 @@
 
 ## When not to use
 - A status or category of an item (not a person) → use [Badge](../badge/COMPONENT.md).
-- A removable selected person in a field → use [Tag](../tag/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md).
+- A removable selected person in a field → use [Badge](../badge/COMPONENT.md) with `onRemove` or [TagSelect](../tag-select/COMPONENT.md).
 - A product image or cover → use `Card.Media` / `Card.Cover` from [Card](../card/COMPONENT.md) or a plain `<img>`.
 - An icon-only action → use [Button](../button/COMPONENT.md).
 

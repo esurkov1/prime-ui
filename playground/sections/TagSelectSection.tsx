@@ -49,7 +49,7 @@ const tagSelectRootApiRows: PlaygroundApiPropRow[] = [
     type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultValue: '"m"',
     required: "Нет",
-    description: "Ярус поля и списка; чипы (Tag) — на ярус меньше.",
+    description: "Ярус поля и списка; чипы (Badge) — на ярус меньше.",
   },
   {
     prop: "label / required / optional / hint / error",
@@ -153,7 +153,7 @@ export default function TagSelectSection() {
       <PageContent.Header>
         <PageContent.Title>Tag select</PageContent.Title>
         <PageContent.Description measure="full">
-          Мультивыбор с чипами <code>Tag</code> в поле, панель списка на базе стилей{" "}
+          Мультивыбор с чипами <code>Badge</code> в поле, панель списка на базе стилей{" "}
           <code>Select.Content</code>, фильтр по вводу и опциональное создание нового тега. Для
           выбора из закрытого списка без чипов — <code>Select multiple</code>.
         </PageContent.Description>

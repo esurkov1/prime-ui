@@ -75,3 +75,20 @@
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+.filters {
+  display: grid;
+  gap: var(--prime-space-3);
+  width: 100%;
+  max-width: var(--prime-modal-width-m);
+  padding: var(--prime-card-padding-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-card-bg);
+}
+
+.filtersHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+}

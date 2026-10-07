@@ -256,4 +256,4 @@ export function Example() {
 - Putting a Select-like form value into a CommandMenu → use Select.
 
 ## Related
-[Modal](../modal/COMPONENT.md) · [Dropdown](../dropdown/COMPONENT.md) · [Select](../select/COMPONENT.md) · [Kbd](../kbd/COMPONENT.md) · [Tag](../tag/COMPONENT.md)
+[Modal](../modal/COMPONENT.md) · [Dropdown](../dropdown/COMPONENT.md) · [Select](../select/COMPONENT.md) · [Kbd](../kbd/COMPONENT.md) · [Badge](../badge/COMPONENT.md)

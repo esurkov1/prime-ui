@@ -102,10 +102,10 @@ wrapper that renders exactly this Switch structure.
 
 ### Filter bar above a table
 
-Use the `toolbar` slot of DataTable: search Input + Select + applied filter Tags, all `size="s"`.
+Use the `toolbar` slot of DataTable: search Input + Select + applied filter Badges (`onRemove`), all `size="s"`.
 
 ```tsx
-import { DataTable, type DataTableColumn, Icon, Input, Select, Tag } from "prime-ui-kit";
+import { Badge, DataTable, type DataTableColumn, Icon, Input, Select } from "prime-ui-kit";
 import styles from "./OrdersTable.module.css";
 
 type Order = { id: string; client: string; status: string };
@@ -141,9 +141,9 @@ export function OrdersTable({ rows }: { rows: Order[] }) {
               <Select.Item value="paid">Оплачен</Select.Item>
             </Select.Content>
           </Select.Root>
-          <Tag.Root size="s" onRemove={() => {}}>
+          <Badge.Root size="s" onRemove={() => {}}>
             Москва
-          </Tag.Root>
+          </Badge.Root>
         </div>
       }
     />

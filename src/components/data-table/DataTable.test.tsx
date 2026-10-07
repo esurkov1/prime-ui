@@ -7,7 +7,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Badge } from "@/components/badge/Badge";
 import { Kbd } from "@/components/kbd/Kbd";
-import { Tag } from "@/components/tag/Tag";
 import { CSS_PX_SUFFIX, DATA_TABLE_INFINITE_ROOT_MARGIN } from "@/internal/runtimeUnits";
 
 import { DataTable, type DataTableColumn } from "./DataTable";
@@ -118,7 +117,7 @@ describe("DataTable", () => {
     );
   });
 
-  it("passes table size to Badge, Tag and Kbd without explicit size", () => {
+  it("passes table size to Badge and Kbd without explicit size", () => {
     type ChipRow = { id: number };
     const chipColumns: DataTableColumn<ChipRow>[] = [
       {
@@ -129,7 +128,7 @@ describe("DataTable", () => {
       {
         id: "tag",
         header: "T",
-        cell: () => <Tag.Root>t</Tag.Root>,
+        cell: () => <Badge.Root>t</Badge.Root>,
       },
       {
         id: "kbd",
@@ -142,7 +141,7 @@ describe("DataTable", () => {
       <DataTable.Root size="l" rows={[{ id: 1 }]} columns={chipColumns} showPagination={false} />,
     );
 
-    expect(screen.getByText("b")).toHaveAttribute("data-size", "l");
+    expect(screen.getByText("b").closest("span[data-size]")).toHaveAttribute("data-size", "l");
     expect(screen.getByText("t").closest("span[data-size]")).toHaveAttribute("data-size", "l");
     expect(screen.getByText("⌘")).toHaveAttribute("data-size", "l");
   });

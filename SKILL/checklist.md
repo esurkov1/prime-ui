@@ -29,7 +29,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 
 ## Reuse
 - [ ] Every repeated-looking element is one component (kit or `shared/ui`), not copies.
-- [ ] No `div` where a kit component exists (Divider, Kbd, Badge, Tag, Card, LinkButton, Typography).
+- [ ] No `div` where a kit component exists (Divider, Kbd, Badge, Card, LinkButton, Typography).
 - [ ] Every overlay (Modal, Drawer, Popover, Dropdown, Tooltip, Select) is a kit component.
 
 ## Hierarchy

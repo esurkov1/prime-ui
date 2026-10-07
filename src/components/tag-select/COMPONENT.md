@@ -13,7 +13,7 @@
 - One value → use [Select](../select/COMPONENT.md) instead.
 - A few values from a short closed list where chips are not needed → use [Select](../select/COMPONENT.md) with `multiple` instead.
 - 2–6 independent options that should all be visible → use [Checkbox](../checkbox/COMPONENT.md) instead.
-- Static tags shown outside a field → use [Tag](../tag/COMPONENT.md) or [Badge](../badge/COMPONENT.md) instead.
+- Values shown outside a field → use [Badge](../badge/COMPONENT.md) (`onRemove` for removable ones).
 
 ## Import
 ```tsx
@@ -25,7 +25,7 @@ Single part `TagSelect.Root`. It renders:
 ```
 field frame: label · control · hint/error
 └─ control (field fill)
-   ├─ chips (Tag, one tier below the field) · «+N» chip button when collapsed
+   ├─ chips (Badge with `onRemove`, one tier below the field) · «+N» chip button when collapsed
    ├─ text input (role="combobox")
    └─ chevron
 portal panel (role="listbox"): panel hint · «Создать» row · option rows (checkbox + tag [+ «⋯» menu])
@@ -166,4 +166,4 @@ export function LabelsField() {
 - Expecting `name` / form submission → there is no hidden input; submit `value` from state.
 
 ## Related
-[Select](../select/COMPONENT.md) · [Tag](../tag/COMPONENT.md) · [Input](../input/COMPONENT.md) · [Popover](../popover/COMPONENT.md)
+[Select](../select/COMPONENT.md) · [Badge](../badge/COMPONENT.md) · [Input](../input/COMPONENT.md) · [Popover](../popover/COMPONENT.md)

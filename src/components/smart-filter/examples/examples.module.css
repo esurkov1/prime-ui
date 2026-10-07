@@ -1,0 +1,52 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+.card {
+  width: 100%;
+  min-width: 0;
+}
+
+.rowMain {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.route {
+  flex: 1;
+  min-width: 0;
+}
+
+.dot {
+  flex: none;
+  width: var(--prime-space-2);
+  height: var(--prime-space-2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-text-disabled);
+}
+
+.dot[data-online] {
+  background: var(--prime-color-palette-green-solid);
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-2);
+}
+
+.resolved {
+  margin: 0;
+  padding: var(--prime-space-3) var(--prime-space-4);
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-bg-sunken);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

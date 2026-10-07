@@ -29,7 +29,7 @@
 }
 
 /*
- * No `size` prop: follow the host. A host may set `--prime-icon-size` (Button, Badge, Tag, Kbd…);
+ * No `size` prop: follow the host. A host may set `--prime-icon-size` (Button, Badge, Kbd…);
  * otherwise the icon uses the control tier of the nearest ControlSizeProvider.
  */
 .inherit.sizeXs {

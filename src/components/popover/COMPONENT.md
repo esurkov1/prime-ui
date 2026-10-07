@@ -26,6 +26,7 @@ import { Popover } from "prime-ui-kit";
 ```
 Popover.Root               state (no DOM)
 ├── Popover.Trigger        clones its single child (usually a Button)
+├── Popover.Anchor         instead of Trigger: positions the panel against an element, no click/ARIA
 └── Popover.Content        portaled panel, role="dialog", scrolls (ScrollContainer)
     ├── Popover.Header     title + description, 4 apart
     │   ├── Popover.Title        <h2>, names the dialog
@@ -53,6 +54,13 @@ No DOM of its own: clones the child (`cloneElement`), like `asChild`. Merges the
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactElement` | — (required) | Exactly one element (Button, a `<button>` styled as a link). |
+
+### Popover.Anchor
+No DOM of its own: clones the child and merges its `ref`. Positions the panel against that element and keeps presses on it from counting as "outside", but adds no click handler and no ARIA. Open state is driven by `Popover.Root open` / `onOpenChange`. Use it **instead of** `Popover.Trigger` when the panel belongs to a wider area than the button that opens it (a toolbar of button + search; [SmartFilter](../smart-filter/COMPONENT.md)).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactElement` | — (required) | Exactly one element that takes a `ref`. |
 
 ### Popover.Content
 No ref. Rendered in a portal while open and during its exit animation.
