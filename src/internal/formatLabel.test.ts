@@ -13,11 +13,12 @@ describe("formatLabel", () => {
     expect(formatLabel("{n} → {n}", { n: "a" })).toBe("a → a");
   });
 
-  it("leaves unknown tokens as written", () => {
-    expect(formatLabel("Страница {page} из {total}", { page: 2 })).toBe("Страница 2 из {total}");
+  it("empties missing values and trims the result", () => {
+    expect(formatLabel("Выбрать строку {label}", { label: undefined })).toBe("Выбрать строку");
+    expect(formatLabel("Страница {page} из {total}", { page: 2 })).toBe("Страница 2 из");
   });
 
   it("does not read inherited keys", () => {
-    expect(formatLabel("{toString}", {})).toBe("{toString}");
+    expect(formatLabel("[{toString}]", {})).toBe("[]");
   });
 });

@@ -1,9 +1,10 @@
 import * as React from "react";
 
+import { formatLabel } from "@/internal/formatLabel";
+
 import { useDragController } from "./context";
 import type { Activation, DragItem } from "./dragSession";
 import { type Axis, insertionBefore } from "./geometry";
-import { formatLabel } from "./labels";
 import { useStoreSelector } from "./store";
 import { type DragSourceProps, useDraggedItem, useDragSource } from "./useDragSource";
 import { type DropTargetProps, useDropTarget } from "./useDropTarget";

@@ -11,6 +11,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { formatLabel } from "@/internal/formatLabel";
 import { DATA_TABLE_INFINITE_ROOT_MARGIN } from "@/internal/runtimeUnits";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -92,10 +93,6 @@ const DEFAULT_LABELS: DataTableLabels = {
   expand: "Развернуть строку {label}",
   collapse: "Свернуть строку {label}",
 };
-
-function fill(template: string, values: Record<string, string | number | undefined>): string {
-  return template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? "")).trim();
-}
 
 export type DataTableProps<Row> = {
   columns: DataTableColumn<Row>[];
@@ -479,7 +476,7 @@ export function DataTable<Row>({
   const commitSelection = (next: Set<React.Key>) => {
     selectedRef.current = next;
     setSelectedKeys(Array.from(next));
-    setAnnouncement(fill(labels.selectedCount, { count: next.size }));
+    setAnnouncement(formatLabel(labels.selectedCount, { count: next.size }));
   };
 
   /** Sets every rendered row between two visible indices (inclusive) to `value`. */
@@ -860,7 +857,7 @@ export function DataTable<Row>({
                               selectAt(index, value, shiftKeyRef.current);
                               shiftKeyRef.current = false;
                             }}
-                            aria-label={fill(labels.selectRow, { label: rowLabel })}
+                            aria-label={formatLabel(labels.selectRow, { label: rowLabel })}
                           >
                             <Checkbox.Label />
                           </Checkbox.Root>
@@ -875,9 +872,12 @@ export function DataTable<Row>({
                               size={TOGGLE_SIZE[size]}
                               aria-expanded={item.expanded}
                               aria-controls={controls || undefined}
-                              aria-label={fill(item.expanded ? labels.collapse : labels.expand, {
-                                label: rowLabel,
-                              })}
+                              aria-label={formatLabel(
+                                item.expanded ? labels.collapse : labels.expand,
+                                {
+                                  label: rowLabel,
+                                },
+                              )}
                               onClick={(event) => {
                                 event.stopPropagation();
                                 toggleExpanded(key);
@@ -991,7 +991,7 @@ export function DataTable<Row>({
           <div className={styles.footer}>
             {showRange ? (
               <p className={styles.meta}>
-                {fill(labels.range, {
+                {formatLabel(labels.range, {
                   from: totalRows === 0 ? 0 : pageOffset + 1,
                   to: pageOffset + displayedRows.length,
                   total: totalRows,

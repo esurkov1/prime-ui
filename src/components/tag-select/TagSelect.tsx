@@ -14,6 +14,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
 import surface from "@/internal/floatingSurface.module.css";
+import { formatLabel } from "@/internal/formatLabel";
 import { enabledOptions, handleListboxKeyDown } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
 import { DropdownLayerContext, useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
@@ -98,9 +99,6 @@ const CREATE_VALUE = "__prime_tag_select_create__";
 
 const optionDomId = (listboxId: string, value: string) =>
   `${listboxId}-opt-${value.replace(/\s+/g, "_")}`;
-
-const fill = (template: string, token: string, value: string | number) =>
-  template.replace(`{${token}}`, String(value));
 
 /** Matches of the query, the selected ones first: they can be unticked from here too. */
 function listOptions(options: TagSelectOption[], query: string, selected: string[]) {
@@ -348,7 +346,7 @@ export function TagSelect({
 
   const removeChip = (chip: { value: string; label: string }) => {
     setSelected((prev) => prev.filter((x) => x !== chip.value));
-    setAnnouncement(fill(labels.removed, "label", chip.label));
+    setAnnouncement(formatLabel(labels.removed, { label: chip.label }));
   };
 
   const chipElements = () =>
@@ -481,7 +479,7 @@ export function TagSelect({
         color={chip.color}
         disabled={disabled}
         className={styles.chip}
-        labels={{ remove: fill(labels.remove, "label", chip.label) }}
+        labels={{ remove: formatLabel(labels.remove, { label: chip.label }) }}
         // Reached with the arrow keys from the input (not a tab stop); Delete / Backspace remove.
         tabIndex={live && !disabled ? -1 : undefined}
         data-chip-value={live ? chip.value : undefined}
@@ -635,7 +633,9 @@ export function TagSelect({
                 onPress={() => inputRef.current?.focus()}
               >
                 <span aria-hidden="true">+{hiddenChips.length}</span>
-                <VisuallyHidden>{fill(labels.more, "count", hiddenChips.length)}</VisuallyHidden>
+                <VisuallyHidden>
+                  {formatLabel(labels.more, { count: hiddenChips.length })}
+                </VisuallyHidden>
               </Badge.Root>
             ) : null}
             <input
