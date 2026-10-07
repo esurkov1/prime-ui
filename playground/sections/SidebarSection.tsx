@@ -47,7 +47,7 @@ export const page: ComponentPageConfig = {
       scenario: "account",
       title: "Аккаунт",
       description:
-        "Пункты подвала над блоком пользователя: аватар, имя и почта открывают меню аккаунта; в компактном режиме остаётся только аватар — `Sidebar.Footer`, `Sidebar.Account`, `description`.",
+        "Пункты подвала над блоком пользователя: аватар, имя и почта открывают меню аккаунта; сверните рельс — останется только аватар, на оси иконок — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`.",
     },
     {
       scenario: "router",
@@ -58,7 +58,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "controlled",
       description:
-        "Режим рельса хранит родитель: развёрнут, рельс из иконок с подсказками или скрыт; анимируется только ширина — `mode`, `onModeChange`.",
+        "Режим рельса хранит родитель: развёрнут, рельс из иконок с подсказками или скрыт; каждое переключение — одно синхронное движение — `mode`, `onModeChange`.",
     },
     {
       slot: "controlled-open",

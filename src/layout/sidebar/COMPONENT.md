@@ -279,16 +279,18 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 
 ## Layout & spacing
 - Panel padding: `--prime-space-3` block, `--prime-space-2` inline; regions 8 apart; groups 16 apart, items 4 apart.
-- Item horizontal padding is derived from the compact width so icons, the brand logo and the account avatar sit on one axis in every mode.
+- Item horizontal padding is derived from the compact width so icons and the brand logo sit on one axis in every mode (the account avatar joins that axis on the rail).
 - Header is one row of the item height + 8. The header toggle (xs, 28) sits at its end, 8 from the rail edge; in compact mode it moves half past the edge, scales to 3/4, turns round and gets a canvas ring. The root clips with `clip-path`, reaching past the edge by the toggle's half-width.
 - Collapsible group: heading 28 high with the chevron (14) at its end, aligned with the item trail; items start 4 below.
 - Sub-list: a 1px `border-default` guide line on the parent icon's centre; every child branches off it with an 8 elbow and a 6 bend; child labels line up with the parent label.
 - Trail (count, key hint, trailing icon) sits at the row end; a row action (one tier down) appears there on hover / focus and the trail moves aside.
-- Footer: items 4 apart; the account (item height + 12) is set 8 apart below them. Its avatar is one
-  step above the item icon (xs·s 20, m·l 24, xl 32), centred on the icon axis, and the name starts
-  exactly where item labels start.
+- Footer: items 4 apart; the account is set 8 apart below them. It is its own card-like row: the
+  avatar of the tier (xs 20, s 24, m·l 32, xl 40) sits in an even frame — the inset before it, the
+  gap to the text and the air above and below are one value, the tier gap (xs 4, s·m·l 8, xl 12),
+  so the row is the avatar + 2 × gap high (48 at m). On the compact rail the start inset becomes the
+  one that centres the avatar on the icon axis, as part of the rail motion.
 - Compact flyout: the kit Popover (flush) to the right, aligned with the parent row; the parent's name heads it on the same line, the children follow on the guide line; current child is a `fill-subtle-active` wash.
-- Motion: on collapse labels fade out fast before the rail narrows; on expand they fade in after a short delay, once the rail is wide. Group headings fold to zero height in compact mode. Disclosures animate height through a grid track (open base · enter, close fast · exit), chevrons rotate (base), the header toggle moves and scales with the rail (base); all durations are tokens and collapse under reduced motion.
+- Motion: expanded ↔ compact ↔ hidden is one synchronous movement — everything starts and ends together over `base` with the `standard` easing. The rail width animates while the panel keeps the expanded layout, so labels never re-wrap or re-ellipsize: the moving edge reveals and hides the text while it fades, a row with a fill (current, hovered, open) ends at the edge with its radius, group headings fold, coloured counts turn into dots, the account avatar slides onto the icon axis and the header toggle travels with the edge. The compact layout is applied only once the rail has arrived and dropped at the very start of an expand, where it looks the same. Hidden keeps the look of the last visible mode and is clipped as one piece; the header toggle stays at its place and fades, and coming back from hidden it fades in at its final place as the edge reveals it. Collapsible groups that open for the rail and sub-lists that close for it move on the same clock (grid track height); chevrons rotate (base). All durations are tokens: under reduced motion every mode change is instant.
 - Off-canvas panel width: min(sidebar width, 100% − `--prime-space-12`).
 - Inside `AppShell.Nav` the rail takes the full height.
 
@@ -332,9 +334,9 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 | [brand-header.tsx](examples/brand-header.tsx) | A brand block with the collapse toggle at the end of the header; in compact mode the logo stays and the toggle moves onto the rail edge — `Sidebar.Brand`, `Sidebar.BrandLogo`, `description`, `variant`. |
 | [collapsible-groups.tsx](examples/collapsible-groups.tsx) | Group headings that fold their items away, with a chevron at the end of the heading; in compact mode the items always show — `collapsible`, `defaultOpen`. |
 | [nested-items.tsx](examples/nested-items.tsx) | A parent item with child items on a guide line: a current child opens it and marks the parent; on the compact rail the children open in a flyout — `Sidebar.Sub`, `Sidebar.SubTrigger`, `Sidebar.SubContent`. |
-| [account.tsx](examples/account.tsx) | Footer items above the signed-in person: avatar, name and email open the account menu; in compact mode only the avatar stays — `Sidebar.Footer`, `Sidebar.Account`, `description`. |
+| [account.tsx](examples/account.tsx) | Footer items above the signed-in person: avatar, name and email open the account menu; collapse the rail and only the avatar stays, on the icon axis — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`. |
 | [router.tsx](examples/router.tsx) | A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
-| [controlled.tsx](examples/controlled.tsx) | The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; only the width animates — `mode`, `onModeChange`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; every switch is one synchronous movement — `mode`, `onModeChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | Navigation behind a menu button at any width: the parent opens the off-canvas panel, the scrim, Escape, the header toggle or a navigation closes it — `offCanvas`, `open`, `onOpenChange`. |
 
 ## Mistakes
