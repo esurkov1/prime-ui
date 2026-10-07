@@ -5,10 +5,9 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
+import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
 
-import { FieldCounter, FieldSupportRow } from "./FieldSupport";
 import styles from "./Input.module.css";
 
 export type InputLabels = {
@@ -103,18 +102,14 @@ function InputRoot({
           label={label}
           required={required}
           optional={optional}
+          hint={hint}
+          error={error}
+          counter={counter}
+          reserveSupportRow={reserveSupportRow}
           optionalLabel={labels.optional}
           className={cx(styles.root, className)}
         >
           {children}
-          <FieldSupportRow
-            ids={ids}
-            size={size}
-            hint={hint}
-            error={error}
-            counter={counter}
-            reserve={reserveSupportRow}
-          />
         </FieldFrame>
       </ControlSizeProvider>
     </InputProvider>

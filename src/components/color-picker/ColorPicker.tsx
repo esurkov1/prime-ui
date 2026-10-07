@@ -25,9 +25,9 @@ import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import type { ControlSize } from "@/internal/states";
+import { SwatchFill } from "@/internal/swatch";
 
 import styles from "./ColorPicker.module.css";
-import { SwatchFill } from "./swatch";
 
 export type { Color as ColorPickerColorValue } from "react-aria-components";
 export type ColorValueFormat = "hsl" | "rgb" | "hex";

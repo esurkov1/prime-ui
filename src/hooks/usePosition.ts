@@ -1,28 +1,10 @@
 import * as React from "react";
 
 import { getRootFontSizePx } from "@/internal/layoutPxFromPrimitives";
+import { getScrollContainers } from "@/internal/scrollAncestors";
 
-export type PositionSide = "bottom" | "top";
+export type PositionSide = "top" | "right" | "bottom" | "left";
 export type PositionAlign = "start" | "center" | "end";
-
-type UsePositionOptions = {
-  side?: PositionSide;
-  align?: PositionAlign;
-  offset?: number;
-  /** Отступ контента от краёв вьюпорта при расчёте flip/позиции (px). */
-  viewportPad?: number;
-  flip?: boolean;
-  matchTriggerMinWidth?: boolean;
-};
-
-type PositionStyle = {
-  position: "fixed";
-  top: number;
-  left: number;
-  minWidth?: number;
-  maxWidth?: number;
-  maxHeight?: number;
-};
 
 /**
  * Private custom properties written by `usePosition` on the floating element. Panels combine them
@@ -30,16 +12,27 @@ type PositionStyle = {
  * design limit and the room next to the anchor both apply.
  */
 export const FLOAT_MAX_HEIGHT_VAR = "--float-max-h";
-/** Trigger width (px) when the panel should be at least as wide as its anchor. */
+/** Anchor width (px) when the panel should be at least as wide as its anchor. */
 export const FLOAT_MIN_WIDTH_VAR = "--float-min-w";
-/** Viewport width minus gutters (px): a panel is never wider than the screen. */
+/** Room across the main axis (px): a panel is never wider than the screen or its side. */
 export const FLOAT_MAX_WIDTH_VAR = "--float-max-w";
-
-export type PositionUpdateMeta = { resolvedSide: PositionSide };
+/** Arrow centre along the layer edge that faces the anchor (px), when `arrowInset` is given. */
+export const FLOAT_ARROW_VAR = "--float-arrow";
 
 const MIN_MENU_ESTIMATE = 176;
 const FALLBACK_VIEWPORT_PAD_PX = 8;
 const FALLBACK_PANEL_OFFSET_PX = 4;
+/** Smallest scroll height of a panel on a very small viewport. */
+const MIN_FLOATING_MAX_HEIGHT = 120;
+/** Before the layer has a height, a `top` panel is placed with a rough guess; the next frame fixes it. */
+const FIRST_PAINT_FLOAT_HEIGHT_GUESS_PX = 280;
+
+const OPPOSITE: Record<PositionSide, PositionSide> = {
+  top: "bottom",
+  bottom: "top",
+  left: "right",
+  right: "left",
+};
 
 /**
  * Computed length of a CSS custom property on `:root` in px (rem/px values).
@@ -56,205 +49,260 @@ export function readCssLengthPx(name: string, fallbackPx: number): number {
   return fallbackPx;
 }
 
-/** Gap between anchor and floating panel: `--prime-panel-offset`. */
-export function getPanelOffsetPx(): number {
-  return readCssLengthPx("--prime-panel-offset", FALLBACK_PANEL_OFFSET_PX);
-}
-
 /** Minimum distance from a floating panel to the viewport edge: `--prime-space-2`. */
 export function getViewportPadPx(): number {
   return readCssLengthPx("--prime-space-2", FALLBACK_VIEWPORT_PAD_PX);
 }
-/** Минимальная высота скролла выпадашки при очень маленьком вьюпорте. */
-const MIN_FLOATING_MAX_HEIGHT = 120;
-/** Пока offsetHeight === 0, для side=top задаём top от якоря с грубой оценкой высоты (следующий кадр поправит). */
-const FIRST_PAINT_FLOAT_HEIGHT_GUESS_PX = 280;
 
 export type ComputeFloatingOptions = {
-  preferredSide: PositionSide;
+  side: PositionSide;
   align: PositionAlign;
+  /** Gap between the anchor and the layer (px). */
   offset: number;
-  /** Отступ от краёв вьюпорта (px); по умолчанию 8. */
+  /** Minimum distance from the viewport edge (px); 8 by default. */
   viewportPad?: number;
+  /** Flip to the opposite side (and edge) when the layer does not fit. */
   flip: boolean;
-  matchTriggerMinWidth: boolean;
+  matchAnchorWidth: boolean;
+  /** Closest the arrow centre may come to a layer corner; computes `arrow` when set. */
+  arrowInset?: number;
 };
 
 export type ComputedFloatPosition = {
   top: number;
   left: number;
-  resolvedSide: PositionSide;
+  /** The side after flipping. */
+  side: PositionSide;
   minWidth?: number;
-  /** Ширина вьюпорта минус поля с обеих сторон — панель никогда не шире экрана. */
+  /** Room across: the viewport minus gutters (top / bottom) or the room on the side (left / right). */
   maxWidth: number;
-  /** Доступная высота под контент (px), со стороны открытия. */
-  maxHeight?: number;
+  /** Room along the side the layer opened on (px). */
+  maxHeight: number;
+  /** Arrow centre along the edge facing the anchor (px from the layer's start). */
+  arrow?: number;
 };
 
-function pickSideForFlip(
-  preferred: PositionSide,
-  roomBottom: number,
-  roomTop: number,
-  contentH: number,
-): PositionSide {
-  if (contentH > 0) {
-    const fitsB = roomBottom >= contentH;
-    const fitsT = roomTop >= contentH;
-    if (fitsB && !fitsT) return "bottom";
-    if (fitsT && !fitsB) return "top";
-    if (fitsB && fitsT) return "bottom";
-  }
-  /* Без высоты нельзя сравнивать «куда влезет» и нельзя брать сторону по room*: иначе side=top, а top в px считают как для bottom — панель уезжает, maxHeight берётся от неверной стороны. */
-  if (contentH === 0) return preferred;
-  if (roomBottom > roomTop) return "bottom";
-  if (roomTop > roomBottom) return "top";
-  return preferred;
-}
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(value, Math.max(min, max)));
 
-/** Якорь + размеры слоя + вьюпорт; при flip — сторона с большим запасом / куда влезает контент. */
+/**
+ * Places a layer on `side` of the anchor: flips to the opposite side when it does not fit there
+ * and does on the other (or has more room), aligns it along the cross axis (flipping the edge when
+ * it overflows), keeps it inside the viewport and, with `arrowInset`, points an arrow at the
+ * anchor's centre without leaving the layer's straight edge.
+ */
 export function computeFloatingPosition(
-  anchorRect: DOMRectReadOnly,
+  anchor: Pick<DOMRectReadOnly, "top" | "left" | "right" | "bottom" | "width" | "height">,
   contentW: number,
   contentH: number,
   vw: number,
   vh: number,
   opts: ComputeFloatingOptions,
 ): ComputedFloatPosition {
-  const { preferredSide, align, offset, flip, matchTriggerMinWidth } = opts;
+  const { align, offset, flip, matchAnchorWidth, arrowInset } = opts;
   const pad = opts.viewportPad ?? FALLBACK_VIEWPORT_PAD_PX;
-  const roomBottom = vh - anchorRect.bottom - offset - pad;
-  const roomTop = anchorRect.top - offset - pad;
+  const room: Record<PositionSide, number> = {
+    top: anchor.top - offset - pad,
+    bottom: vh - anchor.bottom - offset - pad,
+    left: anchor.left - offset - pad,
+    right: vw - anchor.right - offset - pad,
+  };
+  const isVertical = (s: PositionSide) => s === "top" || s === "bottom";
 
-  const side = flip ? pickSideForFlip(preferredSide, roomBottom, roomTop, contentH) : preferredSide;
+  const mainSize = isVertical(opts.side) ? contentH : contentW;
+  let side = opts.side;
+  // Without a measured size there is nothing to compare: keep the requested side.
+  if (flip && mainSize > 0 && room[side] < mainSize) {
+    const opposite = OPPOSITE[side];
+    if (room[opposite] >= mainSize || room[opposite] > room[side]) side = opposite;
+  }
+  const vertical = isVertical(side);
 
-  const top =
-    contentH === 0
-      ? side === "bottom"
-        ? anchorRect.bottom + offset
-        : Math.max(pad, anchorRect.top - offset - FIRST_PAINT_FLOAT_HEIGHT_GUESS_PX)
-      : side === "bottom"
-        ? anchorRect.bottom + offset
-        : anchorRect.top - offset - contentH;
-
-  const maxWidth = Math.max(0, Math.floor(vw - pad * 2));
-  const contentWidth = Math.min(
+  const viewportMaxWidth = Math.max(0, Math.floor(vw - pad * 2));
+  const maxWidth = vertical
+    ? viewportMaxWidth
+    : Math.max(0, Math.min(viewportMaxWidth, Math.floor(room[side])));
+  const width = Math.min(
     maxWidth,
     contentW > 0
       ? contentW
-      : matchTriggerMinWidth
-        ? anchorRect.width
-        : Math.max(anchorRect.width, MIN_MENU_ESTIMATE),
+      : matchAnchorWidth
+        ? anchor.width
+        : Math.max(anchor.width, MIN_MENU_ESTIMATE),
   );
 
-  const leftFor = (a: PositionAlign) =>
-    a === "start"
-      ? anchorRect.left
-      : a === "end"
-        ? anchorRect.right - contentWidth
-        : anchorRect.left + anchorRect.width / 2 - contentWidth / 2;
-  const fits = (x: number) => x >= pad && x + contentWidth <= vw - pad;
-  let left = leftFor(align);
-  // Горизонтальный flip: не влезает с выбранного края — пробуем противоположный край якоря.
-  if (flip && !fits(left)) {
-    const opposite: PositionAlign = align === "end" ? "start" : align === "start" ? "end" : align;
-    if (opposite !== align && fits(leftFor(opposite))) left = leftFor(opposite);
-  }
+  let main: number;
+  if (side === "bottom") main = anchor.bottom + offset;
+  else if (side === "right") main = anchor.right + offset;
+  else if (side === "left") main = Math.max(pad, anchor.left - offset - width);
+  else
+    main = Math.max(
+      pad,
+      anchor.top - offset - (contentH > 0 ? contentH : FIRST_PAINT_FLOAT_HEIGHT_GUESS_PX),
+    );
 
-  left = Math.max(pad, Math.min(left, vw - contentWidth - pad));
+  const anchorStart = vertical ? anchor.left : anchor.top;
+  const anchorSize = vertical ? anchor.width : anchor.height;
+  const crossSize = vertical ? width : contentH;
+  const viewport = vertical ? vw : vh;
+  const crossFor = (a: PositionAlign) =>
+    a === "start"
+      ? anchorStart
+      : a === "end"
+        ? anchorStart + anchorSize - crossSize
+        : anchorStart + anchorSize / 2 - crossSize / 2;
+  const fits = (x: number) => x >= pad && x + crossSize <= viewport - pad;
+  let cross = crossFor(align);
+  // Edge flip: does not fit from the chosen edge — try the opposite edge of the anchor.
+  if (flip && !fits(cross)) {
+    const opposite: PositionAlign = align === "end" ? "start" : align === "start" ? "end" : align;
+    if (opposite !== align && fits(crossFor(opposite))) cross = crossFor(opposite);
+  }
+  cross = Math.round(clamp(cross, pad, viewport - crossSize - pad));
 
   const out: ComputedFloatPosition = {
-    top: Math.round(top),
-    left: Math.round(left),
-    resolvedSide: side,
+    top: Math.round(vertical ? main : cross),
+    left: Math.round(vertical ? cross : main),
+    side,
     maxWidth,
+    maxHeight: Math.max(MIN_FLOATING_MAX_HEIGHT, Math.floor(vertical ? room[side] : vh - pad * 2)),
   };
-  if (matchTriggerMinWidth) out.minWidth = Math.min(anchorRect.width, maxWidth);
-  const roomVertical = side === "bottom" ? roomBottom : roomTop;
-  out.maxHeight = Math.max(MIN_FLOATING_MAX_HEIGHT, Math.floor(roomVertical));
+  if (matchAnchorWidth) out.minWidth = Math.min(anchor.width, maxWidth);
+  if (arrowInset !== undefined) {
+    out.arrow = Math.round(
+      clamp(anchorStart + anchorSize / 2 - cross, arrowInset, crossSize - arrowInset),
+    );
+  }
   return out;
 }
 
-type UsePositionResult = {
-  resolvedSide: PositionSide;
-  update: () => PositionUpdateMeta | undefined;
+export type PositionOptions = {
+  side?: PositionSide;
+  align?: PositionAlign;
+  /** Write the anchor width to `--float-min-w` (the panel CSS decides min or exact width). */
+  matchAnchorWidth?: boolean;
+  /** Token of the gap between anchor and layer. Default `--prime-panel-offset`. */
+  offsetToken?: string;
+  /** Closest the arrow may come to a layer corner, read from the layer; writes `--float-arrow`. */
+  arrowInset?: (layer: HTMLElement) => number;
 };
 
+export type Position = {
+  /** The side the layer opened on (after flipping). */
+  side: PositionSide;
+  /** Attach to the layer element (merge with other refs): positioning starts once it is in the DOM. */
+  attachLayer: (node: HTMLElement | null) => void;
+};
+
+/**
+ * Places a floating layer (`position: fixed`) next to its anchor and follows the anchor while
+ * `enabled`: before paint, again on the next frame (fonts), and on window resize, scroll of any
+ * scrolling ancestor of the anchor, visual-viewport changes and size changes of the layer or the
+ * anchor. Shared by every anchored layer (Popover, Dropdown, Select, TagSelect, Tooltip). A
+ * portaled layer reaches the DOM one commit after its owner, so the subscription waits for
+ * `attachLayer` instead of reading the ref too early.
+ */
 export function usePosition(
+  enabled: boolean,
   anchorRef: React.RefObject<HTMLElement | null>,
-  contentRef: React.RefObject<HTMLElement | null>,
-  options: UsePositionOptions = {},
-): UsePositionResult {
-  const {
+  layerRef: React.RefObject<HTMLElement | null>,
+  {
     side: preferredSide = "bottom",
     align = "start",
-    offset: offsetOption,
-    viewportPad: viewportPadOption,
-    flip = true,
-    matchTriggerMinWidth = true,
-  } = options;
-
+    matchAnchorWidth = false,
+    offsetToken = "--prime-panel-offset",
+    arrowInset,
+  }: PositionOptions = {},
+): Position {
+  const [attached, setAttached] = React.useState(false);
   const [resolvedSide, setResolvedSide] = React.useState<PositionSide>(preferredSide);
 
-  const applyPositionStyle = React.useCallback(
-    (pos: PositionStyle) => {
-      const content = contentRef.current;
-      if (!content) return;
-
-      const setVar = (name: string, px: number | undefined) => {
-        const next = px !== undefined ? `${px}px` : "";
-        if (content.style.getPropertyValue(name) !== next) content.style.setProperty(name, next);
-      };
-      const nextTop = `${pos.top}px`;
-      const nextLeft = `${pos.left}px`;
-      /* Без лишних присвоений — меньше layout thrashing при повторных update() с теми же числами. */
-      if (content.style.position !== pos.position) content.style.position = pos.position;
-      if (content.style.top !== nextTop) content.style.top = nextTop;
-      if (content.style.left !== nextLeft) content.style.left = nextLeft;
-      setVar(FLOAT_MIN_WIDTH_VAR, pos.minWidth);
-      setVar(FLOAT_MAX_WIDTH_VAR, pos.maxWidth);
-      setVar(FLOAT_MAX_HEIGHT_VAR, pos.maxHeight);
-    },
-    [contentRef],
-  );
-
-  const update = React.useCallback((): PositionUpdateMeta | undefined => {
+  const update = React.useCallback(() => {
     const anchor = anchorRef.current;
-    const content = contentRef.current;
-    if (!anchor) return undefined;
+    const layer = layerRef.current;
+    if (!anchor || !layer) return;
 
-    const viewportPad = viewportPadOption ?? getViewportPadPx();
-    const offset = offsetOption ?? getPanelOffsetPx();
-    const anchorRect = anchor.getBoundingClientRect();
     const pos = computeFloatingPosition(
-      anchorRect,
-      content?.offsetWidth ?? 0,
-      content?.offsetHeight ?? 0,
+      anchor.getBoundingClientRect(),
+      layer.offsetWidth,
+      layer.offsetHeight,
       window.innerWidth,
       window.innerHeight,
-      { preferredSide, align, offset, viewportPad, flip, matchTriggerMinWidth },
+      {
+        side: preferredSide,
+        align,
+        offset: readCssLengthPx(offsetToken, FALLBACK_PANEL_OFFSET_PX),
+        viewportPad: getViewportPadPx(),
+        flip: true,
+        matchAnchorWidth,
+        arrowInset: arrowInset?.(layer),
+      },
     );
+    setResolvedSide(pos.side);
 
-    setResolvedSide((prev) => (pos.resolvedSide === prev ? prev : pos.resolvedSide));
-    applyPositionStyle({
-      position: "fixed",
-      top: pos.top,
-      left: pos.left,
-      maxWidth: pos.maxWidth,
-      ...(pos.minWidth !== undefined ? { minWidth: pos.minWidth } : {}),
-      ...(pos.maxHeight !== undefined ? { maxHeight: pos.maxHeight } : {}),
-    });
-    return { resolvedSide: pos.resolvedSide };
-  }, [
-    anchorRef,
-    applyPositionStyle,
-    contentRef,
-    preferredSide,
-    align,
-    offsetOption,
-    flip,
-    matchTriggerMinWidth,
-    viewportPadOption,
-  ]);
+    // Only real changes are written: repeated updates with the same numbers cause no layout work.
+    const set = (name: string, value: string) => {
+      if (layer.style.getPropertyValue(name) !== value) layer.style.setProperty(name, value);
+    };
+    const px = (n: number | undefined) => (n === undefined ? "" : `${n}px`);
+    set("position", "fixed");
+    set("top", px(pos.top));
+    set("left", px(pos.left));
+    set(FLOAT_MIN_WIDTH_VAR, px(pos.minWidth));
+    set(FLOAT_MAX_WIDTH_VAR, px(pos.maxWidth));
+    set(FLOAT_MAX_HEIGHT_VAR, px(pos.maxHeight));
+    set(FLOAT_ARROW_VAR, px(pos.arrow));
+  }, [anchorRef, layerRef, preferredSide, align, matchAnchorWidth, offsetToken, arrowInset]);
 
-  return { resolvedSide, update };
+  // `update` changes identity with the options; subscriptions read the latest one.
+  const updateRef = React.useRef(update);
+  updateRef.current = update;
+
+  const attachLayer = React.useCallback(
+    (node: HTMLElement | null) => {
+      layerRef.current = node;
+      setAttached(node !== null);
+    },
+    [layerRef],
+  );
+
+  const active = enabled && attached;
+
+  React.useLayoutEffect(() => {
+    if (!active) return;
+    let frame = 0;
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => updateRef.current());
+    };
+
+    updateRef.current();
+    const followUp = requestAnimationFrame(() => updateRef.current());
+
+    window.addEventListener("resize", schedule);
+    const scrollTargets = getScrollContainers(anchorRef.current);
+    for (const target of scrollTargets) {
+      target.addEventListener("scroll", schedule, { passive: true });
+    }
+    window.visualViewport?.addEventListener("resize", schedule);
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
+    if (layerRef.current) observer?.observe(layerRef.current);
+    if (anchorRef.current) observer?.observe(anchorRef.current);
+
+    return () => {
+      cancelAnimationFrame(followUp);
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", schedule);
+      for (const target of scrollTargets) target.removeEventListener("scroll", schedule);
+      window.visualViewport?.removeEventListener("resize", schedule);
+      observer?.disconnect();
+    };
+  }, [active, anchorRef, layerRef]);
+
+  // New side / align / width options while open take effect at once.
+  React.useLayoutEffect(() => {
+    if (active) update();
+  }, [active, update]);
+
+  return { side: resolvedSide, attachLayer };
 }

@@ -1,11 +1,10 @@
 import * as React from "react";
 
-import { FieldCounter, FieldSupportRow } from "@/components/input/FieldSupport";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
+import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
@@ -146,6 +145,10 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
             required={required}
             optional={optional}
             disabled={disabled}
+            hint={hint}
+            error={error}
+            counter={counter}
+            reserveSupportRow={reserveSupportRow}
             optionalLabel={labels.optional}
             className={styles.root}
           >
@@ -169,15 +172,6 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
                 textarea
               )}
             </div>
-            <FieldSupportRow
-              ids={ids}
-              size={size}
-              hint={hint}
-              error={error}
-              counter={counter}
-              reserve={reserveSupportRow}
-              disabled={disabled}
-            />
           </FieldFrame>
         </ControlSizeProvider>
       </TextareaProvider>

@@ -1,7 +1,7 @@
 /* ─── Menu parts ─────────────────────────────────────────────────────────────
  * The rows every list layer shares: Dropdown menu, Select and TagSelect lists, CommandMenu.
  * `.tier` carries the row metrics of the host's `data-size`; `.menu` is the dropdown-level
- * floating panel on top of the shared surface (`popover/surface.module.css`).
+ * floating panel on top of the shared surface (`floatingSurface.module.css`).
  * Rows radius 8 = panel radius 12 − panel padding 4.
  */
 

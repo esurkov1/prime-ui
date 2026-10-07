@@ -1,11 +1,12 @@
 /* ─── Tooltip ────────────────────────────────────────────────────────────────
  * Inverse chip with caption text and an arrow pointing at the trigger's centre:
  * `--prime-color-tooltip-*`, `--prime-tooltip-*`. Flat — contrast comes from the inverse fill.
- * `--tt-arrow` (set by the component) is the arrow centre along the edge facing the trigger;
- * the chip grows out of that point, so it visibly comes from the trigger.
+ * `--tt-arrow` (`--float-arrow`, written by `usePosition`) is the arrow centre along the edge facing
+ * the trigger; the chip grows out of that point, so it visibly comes from the trigger.
  */
 
 .content {
+  --tt-arrow: var(--float-arrow, 50%);
   --tt-text: var(--prime-text-caption-size);
   --tt-lh: var(--prime-text-caption-line-height);
   --tt-px: var(--prime-tooltip-padding-x);

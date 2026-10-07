@@ -1,13 +1,12 @@
 import * as React from "react";
 
 import { COLOR_PRESETS, type ColorPreset } from "@/components/color-picker/ColorPresets";
-import { SwatchCheck, SwatchFill, swatchClass } from "@/components/color-picker/swatch";
 import { useControllableState } from "@/hooks/useControllableState";
-import { markContrast, sameColor } from "@/internal/colorSwatch";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
 import { gridIndex } from "@/internal/rovingFocus";
 import type { ControlSize } from "@/internal/states";
+import { markContrast, SwatchCheck, SwatchFill, sameColor, swatchClass } from "@/internal/swatch";
 
 import styles from "./ColorSwatches.module.css";
 
@@ -128,6 +127,7 @@ export function ColorSwatches({
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}
+      group
       className={className}
     >
       <div

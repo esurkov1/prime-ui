@@ -3,11 +3,11 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
-import menu from "@/components/dropdown/menu.module.css";
 import { Input } from "@/components/input/Input";
 import { Popover } from "@/components/popover/Popover";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import menu from "@/internal/menu.module.css";
 import type { PaletteColor } from "@/internal/states";
 
 import styles from "./TagSelect.module.css";

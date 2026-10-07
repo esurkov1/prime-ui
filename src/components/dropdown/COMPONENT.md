@@ -66,7 +66,7 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `side` | `"bottom" \| "top"` | `"bottom"` | Preferred side; flips when there is no room. |
+| `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
 | `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment along the trigger; shifts inside the viewport. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: item height, text and icon; key hints one tier down. |
 | `matchTriggerWidth` | `boolean` | `false` | The menu is at least as wide as the trigger. |
@@ -125,8 +125,9 @@ The panel is the shared floating surface: `bg-raised`, `--prime-panel-radius` (1
 |---|---|---|---|
 | `side="bottom"` | Below the trigger | Default | yes |
 | `side="top"` | Above the trigger | Triggers near the bottom of the screen | |
+| `side="left"` / `"right"` | Beside the trigger, aligned along its height | Triggers in a side rail (account menu at the bottom of a sidebar) | |
 | `align="start"` | Start edges aligned | Default | yes |
-| `align="center"` | Centred under the trigger | Small triggers | |
+| `align="center"` | Centred on the trigger | Small triggers | |
 | `align="end"` | End edges aligned | «⋯» buttons at the end of a row | |
 
 ### Flags

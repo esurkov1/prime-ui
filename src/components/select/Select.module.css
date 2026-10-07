@@ -1,7 +1,7 @@
 /* ─── Select ─────────────────────────────────────────────────────────────────
  * Trigger = field system (foundation §4, §6, §8): fill instead of border, tier height,
  * field padding, inset danger ring on error, the single focus ring.
- * Panel = shared floating surface + menu rows (`popover/surface`, `dropdown/menu`).
+ * Panel = shared floating surface + menu rows (`internal/floatingSurface`, `internal/menu`).
  */
 
 .trigger {

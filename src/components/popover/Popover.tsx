@@ -5,22 +5,20 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
-import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import { type PositionAlign, type PositionSide, usePosition } from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import surface from "@/internal/floatingSurface.module.css";
 import { mergeRefs } from "@/internal/mergeRefs";
-import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
+import { DropdownLayerContext, useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import { Slot } from "@/internal/slot";
 import type { ControlSize } from "@/internal/states";
 
-import { DropdownLayerContext } from "./layer";
 import styles from "./Popover.module.css";
-import surface from "./surface.module.css";
-import { useAnchoredPosition } from "./useAnchoredPosition";
 
 type PopoverContextValue = {
   isOpen: boolean;
@@ -197,7 +195,7 @@ function PopoverContent({
   const presence = usePresence(isOpen, { exitDuration: "fast" });
 
   // Keeps its position while the exit animation plays.
-  const position = useAnchoredPosition(presence.mounted, triggerRef, contentRef, {
+  const position = usePosition(presence.mounted, triggerRef, contentRef, {
     side,
     align,
     matchAnchorWidth: matchTriggerWidth,

@@ -2,6 +2,12 @@ import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import {
+  ChoiceField,
+  ChoiceLabel,
+  type ChoiceLabelProps,
+  choiceInputClass,
+} from "@/internal/ChoiceField";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -9,7 +15,6 @@ import { useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Checkbox.module.css";
-import { ChoiceField, ChoiceLabel, type ChoiceLabelProps, choiceInputClass } from "./ChoiceField";
 
 export type CheckboxRootProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,

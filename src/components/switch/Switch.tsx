@@ -1,12 +1,12 @@
 import * as React from "react";
 
+import { useControllableState } from "@/hooks/useControllableState";
 import {
   ChoiceField,
   ChoiceLabel,
   type ChoiceLabelProps,
   choiceInputClass,
-} from "@/components/checkbox/ChoiceField";
-import { useControllableState } from "@/hooks/useControllableState";
+} from "@/internal/ChoiceField";
 import { cx } from "@/internal/cx";
 import { useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";

@@ -64,7 +64,7 @@ describe("CommandMenu", () => {
     const alpha = screen.getByText("Alpha").closest('[role="option"]');
     expect(alpha).toHaveAttribute("hidden");
     const fs = await import("node:fs");
-    const rows = fs.readFileSync("src/components/dropdown/menu.module.css", "utf8");
+    const rows = fs.readFileSync("src/internal/menu.module.css", "utf8");
     const own = fs.readFileSync("src/components/command-menu/CommandMenu.module.css", "utf8");
     expect(rows).toMatch(/\.item\[hidden\]\s*\{\s*display: none;/);
     expect(own).toMatch(/\.group\[hidden\]\s*\{\s*display: none;/);

@@ -1,6 +1,6 @@
 /*
- * Form field system (foundation §4, §6, §7). Label row and support row come from FieldFrame and
- * FieldSupport; this file is the field itself: fill-based, no visible border, tier
+ * Form field system (foundation §4, §6, §7). Label row and support row (with the counter) come
+ * from FieldFrame; this file is the field itself: fill-based, no visible border, tier
  * height / padding / radius / text. Tier variables live on `.root[data-size]` and cascade into
  * Wrapper / Field. Select, Datepicker and TagSelect triggers match it.
  */

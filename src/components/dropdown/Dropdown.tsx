@@ -2,22 +2,21 @@ import * as React from "react";
 
 import { Divider } from "@/components/divider/Divider";
 import { Kbd } from "@/components/kbd/Kbd";
-import { DropdownLayerContext } from "@/components/popover/layer";
-import surface from "@/components/popover/surface.module.css";
-import { useAnchoredPosition } from "@/components/popover/useAnchoredPosition";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
-import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import { type PositionAlign, type PositionSide, usePosition } from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import surface from "@/internal/floatingSurface.module.css";
+import menu from "@/internal/menu.module.css";
 import { mergeRefs } from "@/internal/mergeRefs";
-import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
+import { DropdownLayerContext, useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -25,7 +24,6 @@ import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Dropdown.module.css";
-import menu from "./menu.module.css";
 
 type DropdownContextValue = {
   isOpen: boolean;
@@ -147,7 +145,7 @@ function DropdownContent({
   const presence = usePresence(isOpen, { exitDuration: "fast" });
 
   // Keeps its position while the exit animation plays.
-  const position = useAnchoredPosition(presence.mounted, triggerRef, contentRef, {
+  const position = usePosition(presence.mounted, triggerRef, contentRef, {
     side,
     align,
     matchAnchorWidth: matchTriggerWidth,

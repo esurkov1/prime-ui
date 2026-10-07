@@ -1,6 +1,6 @@
 /*
- * Field frame of Select, TagSelect and Datepicker: the same rhythm as `Input.Root`
- * (label → `label-gap` → field → `hint-gap` → support row).
+ * Field frame of every framed field (Input, Textarea, Select, TagSelect, Datepicker, groups…):
+ * label → `label-gap` → field → `hint-gap` → support row.
  */
 .root {
   --ff-label-gap: var(--prime-control-m-label-gap);
@@ -43,4 +43,63 @@
   flex-direction: column;
   gap: var(--ff-hint-gap);
   min-width: 0;
+}
+
+/* Support row: hint | error (same slot) · counter (right). Tier from `data-size`. */
+.support,
+.counter {
+  --ff-hint-size: var(--prime-control-m-hint-size);
+  --ff-hint-line-height: var(--prime-control-m-hint-line-height);
+}
+
+:is(.support, .counter)[data-size="xs"] {
+  --ff-hint-size: var(--prime-control-xs-hint-size);
+  --ff-hint-line-height: var(--prime-control-xs-hint-line-height);
+}
+
+:is(.support, .counter)[data-size="s"] {
+  --ff-hint-size: var(--prime-control-s-hint-size);
+  --ff-hint-line-height: var(--prime-control-s-hint-line-height);
+}
+
+:is(.support, .counter)[data-size="l"] {
+  --ff-hint-size: var(--prime-control-l-hint-size);
+  --ff-hint-line-height: var(--prime-control-l-hint-line-height);
+}
+
+:is(.support, .counter)[data-size="xl"] {
+  --ff-hint-size: var(--prime-control-xl-hint-size);
+  --ff-hint-line-height: var(--prime-control-xl-hint-line-height);
+}
+
+.support {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.support[data-reserve="true"] {
+  min-height: var(--ff-hint-line-height);
+}
+
+.supportText {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.counter {
+  display: block;
+  flex-shrink: 0;
+  font-size: var(--ff-hint-size);
+  line-height: var(--ff-hint-line-height);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-color-text-muted);
+  white-space: nowrap;
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.counter[data-invalid="true"] {
+  color: var(--prime-color-danger-text);
 }

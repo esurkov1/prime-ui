@@ -1,6 +1,6 @@
 /* ─── CommandMenu ────────────────────────────────────────────────────────────
  * Modal-level search palette on Modal: search row on top (faint hairline below), a scrolling list
- * of sections, a footer with key hints (hairline above). Rows come from `dropdown/menu.module.css`.
+ * of sections, a footer with key hints (hairline above). Rows come from `internal/menu.module.css`.
  */
 
 /* Top-aligned palette: the list grows downwards, the search row never jumps. `[role]` outranks

@@ -1,12 +1,12 @@
 import * as React from "react";
 
+import { useControllableState } from "@/hooks/useControllableState";
 import {
   ChoiceField,
   ChoiceLabel,
   type ChoiceLabelProps,
   choiceInputClass,
-} from "@/components/checkbox/ChoiceField";
-import { useControllableState } from "@/hooks/useControllableState";
+} from "@/internal/ChoiceField";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -118,6 +118,7 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
             error={error}
             disabled={disabled}
             optionalLabel={labelsProp?.optional ?? RADIO_GROUP_LABELS.optional}
+            group
             className={className}
           >
             <div
