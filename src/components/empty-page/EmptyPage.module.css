@@ -78,7 +78,7 @@
 }
 
 /*
- * Rare-state delight: on first render the parts rise in (`enterMotion.enterBase`, set by the parts
+ * Rare-state delight: on first render the parts rise in (`enterMotion.enterBaseChildren` on the root
  * outside `compact`) one after another, `--prime-motion-stagger` apart. Every part is interactive
  * from the first frame; reduced motion collapses it through the tokens.
  */

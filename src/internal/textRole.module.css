@@ -1,0 +1,103 @@
+/*
+ * Text roles (`--prime-text-<role>-*`, foundation §5) as classes: size, line height, weight and
+ * tracking in one place. Typography picks one by `variant`; component modules reuse them with
+ * `composes: titleS from "…/internal/textRole.module.css";` instead of repeating four declarations.
+ */
+.caption {
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-weight: var(--prime-text-caption-weight);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
+
+.bodyS {
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-text-body-s-weight);
+  letter-spacing: var(--prime-text-body-s-tracking);
+}
+
+.bodyM {
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
+  font-weight: var(--prime-text-body-m-weight);
+  letter-spacing: var(--prime-text-body-m-tracking);
+}
+
+.bodyL {
+  font-size: var(--prime-text-body-l-size);
+  line-height: var(--prime-text-body-l-line-height);
+  font-weight: var(--prime-text-body-l-weight);
+  letter-spacing: var(--prime-text-body-l-tracking);
+}
+
+.titleS {
+  font-size: var(--prime-text-title-s-size);
+  line-height: var(--prime-text-title-s-line-height);
+  font-weight: var(--prime-text-title-s-weight);
+  letter-spacing: var(--prime-text-title-s-tracking);
+}
+
+.titleM {
+  font-size: var(--prime-text-title-m-size);
+  line-height: var(--prime-text-title-m-line-height);
+  font-weight: var(--prime-text-title-m-weight);
+  letter-spacing: var(--prime-text-title-m-tracking);
+}
+
+.titleL {
+  font-size: var(--prime-text-title-l-size);
+  line-height: var(--prime-text-title-l-line-height);
+  font-weight: var(--prime-text-title-l-weight);
+  letter-spacing: var(--prime-text-title-l-tracking);
+}
+
+.headingS {
+  font-size: var(--prime-text-heading-s-size);
+  line-height: var(--prime-text-heading-s-line-height);
+  font-weight: var(--prime-text-heading-s-weight);
+  letter-spacing: var(--prime-text-heading-s-tracking);
+}
+
+.headingM {
+  font-size: var(--prime-text-heading-m-size);
+  line-height: var(--prime-text-heading-m-line-height);
+  font-weight: var(--prime-text-heading-m-weight);
+  letter-spacing: var(--prime-text-heading-m-tracking);
+}
+
+.headingL {
+  font-size: var(--prime-text-heading-l-size);
+  line-height: var(--prime-text-heading-l-line-height);
+  font-weight: var(--prime-text-heading-l-weight);
+  letter-spacing: var(--prime-text-heading-l-tracking);
+}
+
+.displayS {
+  font-size: var(--prime-text-display-s-size);
+  line-height: var(--prime-text-display-s-line-height);
+  font-weight: var(--prime-text-display-s-weight);
+  letter-spacing: var(--prime-text-display-s-tracking);
+}
+
+.displayM {
+  font-size: var(--prime-text-display-m-size);
+  line-height: var(--prime-text-display-m-line-height);
+  font-weight: var(--prime-text-display-m-weight);
+  letter-spacing: var(--prime-text-display-m-tracking);
+}
+
+.displayL {
+  font-size: var(--prime-text-display-l-size);
+  line-height: var(--prime-text-display-l-line-height);
+  font-weight: var(--prime-text-display-l-weight);
+  letter-spacing: var(--prime-text-display-l-tracking);
+}
+
+.code {
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--prime-text-code-size);
+  line-height: var(--prime-text-code-line-height);
+  font-weight: var(--prime-text-code-weight);
+  letter-spacing: var(--prime-text-code-tracking);
+}
