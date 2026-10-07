@@ -1,4 +1,4 @@
-/** The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; only the width animates — `mode`, `onModeChange`. */
+/** The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; every switch is one synchronous movement — `mode`, `onModeChange`. */
 import { Icon, SegmentedControl, Sidebar, type SidebarMode } from "prime-ui-kit";
 import * as React from "react";
 

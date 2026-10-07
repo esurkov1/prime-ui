@@ -1,4 +1,4 @@
-/** Footer items above the signed-in person: avatar, name and email open the account menu; in compact mode only the avatar stays — `Sidebar.Footer`, `Sidebar.Account`, `description`. */
+/** Footer items above the signed-in person: avatar, name and email open the account menu; collapse the rail and only the avatar stays, on the icon axis — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`. */
 import { Avatar, Dropdown, Icon, Sidebar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -43,6 +43,7 @@ export default function SidebarAccountExample() {
             </Sidebar.ItemIcon>
             Пригласить команду
           </Sidebar.Item>
+          <Sidebar.Toggle />
           <Dropdown.Root>
             <Dropdown.Trigger>
               <Sidebar.Account description="anna@company.ru">

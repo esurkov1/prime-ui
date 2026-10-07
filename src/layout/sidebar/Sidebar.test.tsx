@@ -238,6 +238,15 @@ describe("Sidebar", () => {
     // Hidden keeps the panel width of the last visible mode and makes the panel inert.
     expect(rootOf(nav)).toHaveAttribute("data-panel-mode", "compact");
     expect(nav).toHaveAttribute("inert");
+    expect(rootOf(nav)).not.toHaveAttribute("data-from-hidden");
+
+    // Back from hidden: marked, so the header toggle starts in place instead of travelling.
+    rerender(<Basic offCanvas="never" mode="expanded" onModeChange={onModeChange} />);
+    expect(rootOf(nav)).toHaveAttribute("data-panel-mode", "expanded");
+    expect(rootOf(nav)).toHaveAttribute("data-from-hidden");
+
+    rerender(<Basic offCanvas="never" mode="compact" onModeChange={onModeChange} />);
+    expect(rootOf(nav)).not.toHaveAttribute("data-from-hidden");
   });
 
   it("hidden → Toggle expands", () => {

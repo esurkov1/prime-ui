@@ -224,6 +224,14 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   );
   if (mode !== "hidden") lastVisibleRef.current = mode;
 
+  // The mode before the current one: coming back from hidden, the header toggle starts in place.
+  const modeRef = React.useRef(mode);
+  const previousModeRef = React.useRef(mode);
+  if (modeRef.current !== mode) {
+    previousModeRef.current = modeRef.current;
+    modeRef.current = mode;
+  }
+
   const close = React.useCallback(() => setOpen(false), [setOpen]);
   const panelRef = useOverlayModal<HTMLElement>(open, close);
 
@@ -252,6 +260,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
           size,
           mode,
           "panel-mode": mode === "hidden" ? lastVisibleRef.current : mode,
+          "from-hidden": (mode !== "hidden" && previousModeRef.current === "hidden") || undefined,
           "off-canvas": offCanvas || undefined,
           state: offCanvas ? (open ? "open" : "closed") : undefined,
           ready: ready || undefined,
@@ -1246,7 +1255,7 @@ const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
 
     if (variant === "header") {
       // One element for both places: it rides the rail edge and changes shape with transforms.
-      const onEdge = !offCanvas && mode !== "expanded";
+      const onEdge = !offCanvas && mode === "compact";
       return (
         <Tooltip.Root>
           <Tooltip.Trigger>
