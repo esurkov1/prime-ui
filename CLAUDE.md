@@ -312,7 +312,9 @@ A component change is done only when all of these agree. Do them in the same cha
 8. **SKILL/** — holds no per-component content: `components.md` is a category tree of links to each
    `COMPONENT.md` and `examples/`. Touch it only when a component is added / removed / renamed (one
    line), when the choice between components changes (`choosing.md`), or when a shared rule changes
-   (`api-contract.md`, `foundations.md`). No symlinks: npm drops them.
+   (`api-contract.md`, `foundations.md`). No symlinks: npm drops them. Every TSX snippet in SKILL must
+   compile against the current kit. A new or changed screen pattern goes to `SKILL/patterns/` with an
+   entry in `playground/composition/patterns.ts` and a row in `SKILL/composition.md`.
 9. **README.md** — when the public surface changes (new component, export, count, install step).
 
 Every page follows the standard; the docs contract has no exclusion list. Do not add one.
@@ -349,7 +351,10 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `playground/foundation/` | token pages (Typography's component docs live here) |
 | `scripts/` | `build-tokens.ts`, `bundle-lib.ts`, `build-docs.ts` + `docs/componentApi.ts` (api schema, markdown) |
 | `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component |
-| `SKILL/` | agent skill for consumer projects (rules, choosing, layouts, anti-slop, checklist) |
+| `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `choosing`, `components` (index), `composition` (screen assembly guide), `layouts`, `api-contract`, `foundations`, `anti-slop`, `checklist` |
+| `SKILL/patterns/` | composition patterns: one working screen per file (`<name>.tsx` + `<name>.module.css`, `export default function <Name>Pattern`); the one source for the skill and the playground «Композиция» pages |
+| `playground/composition/` | composition pages: `patterns.ts` (page text per pattern), `PatternPage.tsx`, `CompositionPage.tsx` (principles), `patternRegistry.ts` (glob loader) |
+| `src/test/patterns-contract.test.ts` | pattern canon, links from `SKILL/composition.md`, playground list, render smoke test |
 
 ## Release
 

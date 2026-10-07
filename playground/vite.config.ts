@@ -7,14 +7,14 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 
 /**
  * The root is `playground/`, so Vite's watcher does not see files added to or removed from `src/`
- * (examples arrive by `import.meta.glob`). Watching `src/` keeps the example registry live: a new
- * or deleted example shows up without restarting the dev server.
+ * and `SKILL/patterns/` (examples and patterns arrive by `import.meta.glob`). Watching them keeps
+ * the registries live: a new or deleted file shows up without restarting the dev server.
  */
 function watchKitSources(): Plugin {
   return {
     name: "prime-watch-kit-sources",
     configureServer(server) {
-      server.watcher.add(path.resolve(rootDir, "src"));
+      server.watcher.add([path.resolve(rootDir, "src"), path.resolve(rootDir, "SKILL/patterns")]);
     },
   };
 }
