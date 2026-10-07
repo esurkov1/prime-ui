@@ -28,9 +28,9 @@ export default function DataTableAppearanceExample() {
           striped
           rowDividers={false}
         />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           striped · rowDividers=&#123;false&#125;
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <DataTable
@@ -39,9 +39,9 @@ export default function DataTableAppearanceExample() {
           getRowKey={(row) => row.day}
           highlightColumnOnHover
         />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           highlightColumnOnHover
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <DataTable
@@ -51,9 +51,9 @@ export default function DataTableAppearanceExample() {
           columnDividers={false}
           showHeader={false}
         />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           columnDividers=&#123;false&#125; · showHeader=&#123;false&#125;
-        </Typography.Root>
+        </Typography>
       </div>
     </>
   );

@@ -40,9 +40,9 @@ export default function SmartFilterControlledExample() {
           Сбросить
         </Button.Root>
       </div>
-      <Typography.Root as="span" variant="code" tone="secondary">
+      <Typography as="span" variant="code" tone="secondary">
         {`method: ${JSON.stringify(resolveSmartFilterValues(value.method, METHODS))}`}
-      </Typography.Root>
+      </Typography>
     </div>
   );
 }

@@ -33,12 +33,12 @@ export default function FileUploadAvatarUploadExample() {
       </FileUpload.Root>
       <div className={styles.avatarText}>
         <div className={styles.avatarCopy}>
-          <Typography.Root as="p" variant="title-s">
+          <Typography as="p" variant="title-s">
             Фото профиля
-          </Typography.Root>
-          <Typography.Root as="p" variant="body-s" tone="secondary">
+          </Typography>
+          <Typography as="p" variant="body-s" tone="secondary">
             PNG или JPG, не меньше 400×400 px. Можно перетащить на аватар.
-          </Typography.Root>
+          </Typography>
         </div>
         <div className={styles.avatarActions}>
           <Button.Root variant="soft" tone="neutral" onClick={() => inputRef.current?.click()}>

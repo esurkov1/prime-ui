@@ -18,9 +18,9 @@ export default function DrawerStructureExample() {
           <Drawer.Description>Справка по отчёту</Drawer.Description>
         </Drawer.Header>
         <Drawer.Body>
-          <Typography.Root variant="body-m" tone="secondary">
+          <Typography variant="body-m" tone="secondary">
             В выручку входят оплаченные заказы за период без возвратов и отменённых доставок.
-          </Typography.Root>
+          </Typography>
         </Drawer.Body>
         <Drawer.Footer layout="fill">
           <Drawer.Close>

@@ -16,9 +16,9 @@ export default function ThumbnailRatiosExample() {
               <Image aria-hidden />
             </Thumbnail.Fallback>
           </Thumbnail.Root>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {ratio}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

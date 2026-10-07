@@ -15,9 +15,9 @@ export default function AccordionVariantsExample() {
     <>
       {LAYOUTS.map((layout) => (
         <div key={layout} className={styles.panel}>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {layout}
-          </Typography.Root>
+          </Typography>
           <Accordion.Root layout={layout} defaultValue="plan">
             {SECTIONS.map((section) => (
               <Accordion.Item key={section.value} value={section.value}>

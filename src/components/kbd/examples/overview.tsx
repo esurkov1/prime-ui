@@ -9,15 +9,15 @@ export default function KbdOverviewExample() {
       <Kbd aria-label="Command" title="Command">
         ⌘
       </Kbd>
-      <Typography.Root as="span" variant="body-m" tone="muted" aria-hidden="true">
+      <Typography as="span" variant="body-m" tone="muted" aria-hidden="true">
         +
-      </Typography.Root>
+      </Typography>
       <Kbd aria-label="Shift" title="Shift">
         ⇧
       </Kbd>
-      <Typography.Root as="span" variant="body-m" tone="muted" aria-hidden="true">
+      <Typography as="span" variant="body-m" tone="muted" aria-hidden="true">
         +
-      </Typography.Root>
+      </Typography>
       <Kbd>P</Kbd>
     </span>
   );

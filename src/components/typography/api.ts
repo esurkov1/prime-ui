@@ -3,7 +3,7 @@ import type { ComponentApi } from "../../../scripts/docs/componentApi";
 export const api: ComponentApi = {
   parts: [
     {
-      name: "Typography.Root",
+      name: "Typography",
       en: "`ref` → the element. Any text element styled by one text role (`--prime-text-<role>-*`); state goes to `data-*`.",
       ru: "Любой текстовый элемент в одной текстовой роли (`--prime-text-<role>-*`); состояние — в `data-*`.",
       props: [

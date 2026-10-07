@@ -8,24 +8,24 @@ const LINE = "Отчёт по выручке за первый квартал";
 export default function TypographyWeightsExample() {
   return (
     <div className={styles.stack}>
-      <Typography.Root variant="body-m" weight="regular">
+      <Typography variant="body-m" weight="regular">
         {LINE} · regular
-      </Typography.Root>
-      <Typography.Root variant="body-m" weight="medium">
+      </Typography>
+      <Typography variant="body-m" weight="medium">
         {LINE} · medium
-      </Typography.Root>
-      <Typography.Root variant="body-m" weight="semibold">
+      </Typography>
+      <Typography variant="body-m" weight="semibold">
         {LINE} · semibold
-      </Typography.Root>
-      <Typography.Root variant="body-m" tracking="tighter">
+      </Typography>
+      <Typography variant="body-m" tracking="tighter">
         {LINE} · tracking tighter
-      </Typography.Root>
-      <Typography.Root variant="body-m" tracking="wide">
+      </Typography>
+      <Typography variant="body-m" tracking="wide">
         {LINE} · tracking wide
-      </Typography.Root>
-      <Typography.Root variant="body-m" italic>
+      </Typography>
+      <Typography variant="body-m" italic>
         {LINE} · italic
-      </Typography.Root>
+      </Typography>
     </div>
   );
 }

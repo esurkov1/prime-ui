@@ -23,9 +23,9 @@ export default function PopoverPlacementExample() {
             </Button.Root>
           </Popover.Trigger>
           <Popover.Content side={side} align={align}>
-            <Typography.Root variant="body-s" tone="secondary">
+            <Typography variant="body-s" tone="secondary">
               Срок оплаты счёта — 5 рабочих дней.
-            </Typography.Root>
+            </Typography>
           </Popover.Content>
         </Popover.Root>
       ))}

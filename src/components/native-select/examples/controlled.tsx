@@ -18,9 +18,9 @@ export default function NativeSelectControlledExample() {
         <option value="pro">Профессиональный</option>
         <option value="team">Командный</option>
       </NativeSelect>
-      <Typography.Root as="p" variant="body-s" tone="secondary">
+      <Typography as="p" variant="body-s" tone="secondary">
         {PRICES[plan]}
-      </Typography.Root>
+      </Typography>
     </>
   );
 }

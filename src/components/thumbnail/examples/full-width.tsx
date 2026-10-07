@@ -30,12 +30,12 @@ export default function ThumbnailFullWidthExample() {
                 </Thumbnail.Fallback>
               </Thumbnail.Root>
               <div className={styles.entityText}>
-                <Typography.Root as="h3" variant="title-s" truncate>
+                <Typography as="h3" variant="title-s" truncate>
                   {bike.title}
-                </Typography.Root>
-                <Typography.Root variant="caption" tone="secondary">
+                </Typography>
+                <Typography variant="caption" tone="secondary">
                   {bike.meta}
-                </Typography.Root>
+                </Typography>
               </div>
             </div>
           </Card.Body>

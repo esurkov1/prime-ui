@@ -18,9 +18,9 @@ export default function ProgressCircleVariantsExample() {
           <ProgressCircle value={value} tone={tone} aria-label={label}>
             {`${value}%`}
           </ProgressCircle>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {tone}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

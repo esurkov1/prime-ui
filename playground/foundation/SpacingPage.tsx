@@ -29,12 +29,12 @@ function SpaceScale() {
     <Panel className={s.spaceScale}>
       {SCALE.map(({ step, varName, px }) => (
         <div key={step} className={s.spaceRow}>
-          <Typography.Root as="span" variant="body-s" weight="medium">
+          <Typography as="span" variant="body-s" weight="medium">
             {step}
-          </Typography.Root>
-          <Typography.Root as="span" variant="body-s" tone="muted" className={s.numeric}>
+          </Typography>
+          <Typography as="span" variant="body-s" tone="muted" className={s.numeric}>
             {formatPx(px)}px
-          </Typography.Root>
+          </Typography>
           <span className={s.spaceTrack}>
             <span className={s.spaceBar} style={{ width: `var(${varName})` }} />
           </span>
@@ -124,9 +124,9 @@ function RulesTable() {
 function Gap({ varName, label }: { varName: string; label: string }) {
   return (
     <div className={s.gap} style={{ height: `var(${varName})` }} data-gap-label={label} aria-hidden>
-      <Typography.Root as="span" variant="caption" tone="accent" className={s.gapLabel}>
+      <Typography as="span" variant="caption" tone="accent" className={s.gapLabel}>
         {label} · {varName.replace("--prime-", "")}
-      </Typography.Root>
+      </Typography>
     </div>
   );
 }
@@ -161,9 +161,9 @@ function ProximityDemo() {
         <Switch.Label>Показать отступы</Switch.Label>
       </Switch.Root>
       <div className={s.proximity} data-show-gaps={show || undefined}>
-        <Typography.Root as="h3" variant="title-m">
+        <Typography as="h3" variant="title-m">
           Профиль
-        </Typography.Root>
+        </Typography>
         <Gap varName={toVarName("space.4")} label="заголовок → группа" />
         <DemoField label="Имя" value="Анна" />
         <Gap varName={toVarName("space.5")} label="поле → поле" />
@@ -177,9 +177,9 @@ function ProximityDemo() {
         <Gap varName={toVarName("space.5")} label="поле → поле" />
         <DemoField label="Должность" />
         <Gap varName={toVarName("space.12")} label="секция → секция" />
-        <Typography.Root as="h3" variant="title-m">
+        <Typography as="h3" variant="title-m">
           Уведомления
-        </Typography.Root>
+        </Typography>
         <Gap varName={toVarName("space.4")} label="заголовок → группа" />
         <DemoField label="Частота писем" value="Раз в неделю" />
       </div>

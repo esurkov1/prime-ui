@@ -47,12 +47,12 @@ export function SurfaceGallery({
       {PLAYGROUND_PREVIEW_SURFACES.filter((s) => surfaces.includes(s.value)).map((s) => (
         <div key={s.value} className={styles.galleryCell}>
           <span className={styles.galleryLabel}>
-            <Typography.Root as="span" variant="caption" weight="medium">
+            <Typography as="span" variant="caption" weight="medium">
               {s.label}
-            </Typography.Root>
-            <Typography.Root as="span" variant="caption" tone="muted" truncate>
+            </Typography>
+            <Typography as="span" variant="caption" tone="muted" truncate>
               {s.hint}
-            </Typography.Root>
+            </Typography>
           </span>
           <ExampleSurface tone={s.value}>
             {typeof children === "function" ? children(s.value) : children}

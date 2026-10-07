@@ -5,16 +5,16 @@ import styles from "./examples.module.css";
 
 export default function TypographyInlineEmphasisExample() {
   return (
-    <Typography.Root as="p" variant="body-m" className={styles.block}>
+    <Typography as="p" variant="body-m" className={styles.block}>
       Заказ № 4821 —{" "}
-      <Typography.Root as="span" variant="body-m" weight="semibold">
+      <Typography as="span" variant="body-m" weight="semibold">
         отправлен
-      </Typography.Root>
+      </Typography>
       , сумма{" "}
-      <Typography.Root as="span" variant="body-m" weight="medium">
+      <Typography as="span" variant="body-m" weight="medium">
         12 400 ₽
-      </Typography.Root>
+      </Typography>
       . Доставка: <LinkButton href="#address">уточнить адрес</LinkButton>.
-    </Typography.Root>
+    </Typography>
   );
 }

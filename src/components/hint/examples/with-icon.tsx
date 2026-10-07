@@ -11,9 +11,9 @@ export default function HintWithIconExample() {
           </Hint.Icon>
           На этот адрес придёт код подтверждения.
         </Hint.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           default
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Hint.Root invalid>
@@ -22,9 +22,9 @@ export default function HintWithIconExample() {
           </Hint.Icon>
           Адрес уже занят другим аккаунтом.
         </Hint.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           invalid
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

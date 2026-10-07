@@ -10,7 +10,7 @@ export default function AppShellOverviewExample() {
         <AppShell.Nav>
           <Sidebar.Root responsive={false}>
             <Sidebar.Header>
-              <Typography.Root variant="title-s">Acme CRM</Typography.Root>
+              <Typography variant="title-s">Acme CRM</Typography>
             </Sidebar.Header>
             <Sidebar.Content>
               <Sidebar.Item current>
@@ -41,9 +41,9 @@ export default function AppShellOverviewExample() {
           <PageContent.Section>
             <PageContent.Header>
               {/* In a real app this is PageContent.Title (the page h1). */}
-              <Typography.Root as="h2" variant="heading-m">
+              <Typography as="h2" variant="heading-m">
                 Обзор
-              </Typography.Root>
+              </Typography>
               <PageContent.Actions>
                 <Button.Root>
                   <Button.Icon>
@@ -54,9 +54,9 @@ export default function AppShellOverviewExample() {
               </PageContent.Actions>
             </PageContent.Header>
             <PageContent.Body>
-              <Typography.Root variant="body-m" tone="secondary">
+              <Typography variant="body-m" tone="secondary">
                 Выручка за месяц — 4,8 млн ₽, 37 сделок в работе.
-              </Typography.Root>
+              </Typography>
             </PageContent.Body>
           </PageContent.Section>
         </AppShell.Main>

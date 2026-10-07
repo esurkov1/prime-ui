@@ -25,9 +25,9 @@ export default function SegmentedControlWithIconExample() {
             Тёмная
           </SegmentedControl.Item>
         </SegmentedControl.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           leading
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <SegmentedControl.Root defaultValue="desktop" aria-label="Предпросмотр письма">
@@ -43,9 +43,9 @@ export default function SegmentedControlWithIconExample() {
             </SegmentedControl.Item>
           ))}
         </SegmentedControl.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           icon-only
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

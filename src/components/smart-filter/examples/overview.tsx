@@ -84,21 +84,21 @@ export default function SmartFilterOverviewExample() {
       <Card.Root variant="list">
         <Card.SectionHeader>
           <Card.SectionTitle>Запросы</Card.SectionTitle>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {found.length} из {REQUESTS.length}
-          </Typography.Root>
+          </Typography>
         </Card.SectionHeader>
         <Card.List>
           {found.map((request) => (
             <Card.ListItem key={request.id}>
               <span className={styles.request}>
                 <Badge.Root color={METHOD_COLOR[request.method]}>{request.method}</Badge.Root>
-                <Typography.Root as="span" variant="code" className={styles.route} truncate>
+                <Typography as="span" variant="code" className={styles.route} truncate>
                   {request.route}
-                </Typography.Root>
-                <Typography.Root as="span" variant="caption" tone="muted">
+                </Typography>
+                <Typography as="span" variant="caption" tone="muted">
                   {request.service}
-                </Typography.Root>
+                </Typography>
               </span>
             </Card.ListItem>
           ))}

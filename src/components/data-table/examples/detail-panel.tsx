@@ -73,24 +73,24 @@ export default function DataTableDetailPanelExample() {
       renderExpanded={(row) => (
         <dl className={styles.details}>
           <dt>
-            <Typography.Root as="span" variant="body-s" tone="muted">
+            <Typography as="span" variant="body-s" tone="muted">
               Адрес доставки
-            </Typography.Root>
+            </Typography>
           </dt>
           <dd>
-            <Typography.Root as="span" variant="body-s">
+            <Typography as="span" variant="body-s">
               {row.address}
-            </Typography.Root>
+            </Typography>
           </dd>
           <dt>
-            <Typography.Root as="span" variant="body-s" tone="muted">
+            <Typography as="span" variant="body-s" tone="muted">
               Состав
-            </Typography.Root>
+            </Typography>
           </dt>
           <dd>
-            <Typography.Root as="span" variant="body-s">
+            <Typography as="span" variant="body-s">
               {row.items}
-            </Typography.Root>
+            </Typography>
           </dd>
         </dl>
       )}

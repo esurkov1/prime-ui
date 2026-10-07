@@ -11,18 +11,18 @@ export default function AvatarStatesExample() {
           <Avatar.Image src={PHOTO} alt="Михаил Котов" />
           <Avatar.Fallback>МК</Avatar.Fallback>
         </Avatar.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           loaded
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Avatar.Root size="xl" color="orange">
           <Avatar.Image src="https://example.com/missing-avatar.png" alt="Сергей Лебедев" />
           <Avatar.Fallback>СЛ</Avatar.Fallback>
         </Avatar.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           error
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Avatar.Root size="xl" aria-label="Гость">
@@ -30,9 +30,9 @@ export default function AvatarStatesExample() {
             <Icon name="field.email" />
           </Avatar.Fallback>
         </Avatar.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           icon
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

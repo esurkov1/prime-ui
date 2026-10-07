@@ -9,9 +9,9 @@ export default function ButtonSizesExample() {
       {SIZES.map((size) => (
         <div key={size}>
           <Button.Root size={size}>Сохранить</Button.Root>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

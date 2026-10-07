@@ -7,12 +7,12 @@ export default function SwitchSettingsRowExample() {
   return (
     <div className={styles.row}>
       <div className={styles.rowText}>
-        <Typography.Root id="two-factor-title" variant="title-s">
+        <Typography id="two-factor-title" variant="title-s">
           Двухфакторная защита
-        </Typography.Root>
-        <Typography.Root id="two-factor-description" variant="body-s" tone="secondary">
+        </Typography>
+        <Typography id="two-factor-description" variant="body-s" tone="secondary">
           Код из приложения при каждом входе
-        </Typography.Root>
+        </Typography>
       </div>
       <Switch.Root
         defaultChecked

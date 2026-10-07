@@ -23,9 +23,9 @@ export default function SelectControlledExample() {
           <Select.Item value="team">Командный</Select.Item>
         </Select.Content>
       </Select.Root>
-      <Typography.Root as="p" variant="body-s" tone="secondary">
+      <Typography as="p" variant="body-s" tone="secondary">
         {PRICES[plan] ?? "Тариф не выбран"}
-      </Typography.Root>
+      </Typography>
       <Button.Root variant="soft" tone="neutral" onClick={() => setPlan("free")}>
         Вернуть бесплатный
       </Button.Root>

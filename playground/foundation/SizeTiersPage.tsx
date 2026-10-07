@@ -64,9 +64,9 @@ function TierTable() {
 function TierRow({ t }: { t: SizeTier }) {
   return (
     <div className={s.tierRow}>
-      <Typography.Root as="span" variant="caption" tone="muted" className={s.tierName}>
+      <Typography as="span" variant="caption" tone="muted" className={s.tierName}>
         {t} · {px(`control.${t}.height`)}
-      </Typography.Root>
+      </Typography>
       <div className={s.tierItems}>
         <Button.Root size={t}>
           <Button.Icon>
@@ -118,9 +118,9 @@ function PairingDemo() {
     <div className={s.pairingGrid}>
       {(["s", "m", "l"] as const).map((t) => (
         <Panel key={t} className={s.pairingCard}>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             Уровень {t}
-          </Typography.Root>
+          </Typography>
           <Select.Root
             size={t}
             defaultValue="msk"

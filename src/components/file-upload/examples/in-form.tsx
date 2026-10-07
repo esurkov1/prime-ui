@@ -18,12 +18,12 @@ export default function FileUploadInFormExample() {
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
       <div className={styles.formHeader}>
-        <Typography.Root as="h3" variant="title-m">
+        <Typography as="h3" variant="title-m">
           Договор поставки
-        </Typography.Root>
-        <Typography.Root as="p" variant="body-s" tone="secondary">
+        </Typography>
+        <Typography as="p" variant="body-s" tone="secondary">
           Подписанный скан нужен до первой отгрузки.
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={styles.column}>
         <FileUpload.Root

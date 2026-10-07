@@ -16,15 +16,15 @@ export default function DataTableStatesExample() {
     <>
       <div>
         <DataTable columns={COLUMNS} rows={NO_PAYMENTS} loading loadingRows={3} />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           loading · loadingRows=&#123;3&#125;
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <DataTable columns={COLUMNS} rows={NO_PAYMENTS} empty="Платежей за выбранный период нет" />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           empty
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <DataTable
@@ -39,9 +39,9 @@ export default function DataTableStatesExample() {
             </>
           }
         />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           error
-        </Typography.Root>
+        </Typography>
       </div>
     </>
   );

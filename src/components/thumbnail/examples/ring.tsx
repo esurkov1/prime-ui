@@ -12,17 +12,17 @@ export default function ThumbnailRingExample() {
         <Thumbnail.Root ratio="4:3" size="xl">
           <Thumbnail.Image src={PHOTO} />
         </Thumbnail.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Без кольца
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={styles.cell}>
         <Thumbnail.Root ratio="4:3" size="xl" ring>
           <Thumbnail.Image src={PHOTO} />
         </Thumbnail.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           С кольцом
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

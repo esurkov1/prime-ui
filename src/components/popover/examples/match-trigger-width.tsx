@@ -13,9 +13,9 @@ export default function PopoverMatchTriggerWidthExample() {
           </Button.Root>
         </Popover.Trigger>
         <Popover.Content matchTriggerWidth>
-          <Typography.Root variant="body-s" tone="secondary">
+          <Typography variant="body-s" tone="secondary">
             До 10 пользователей, 50 ГБ хранилища и приоритетная поддержка.
-          </Typography.Root>
+          </Typography>
         </Popover.Content>
       </Popover.Root>
     </div>

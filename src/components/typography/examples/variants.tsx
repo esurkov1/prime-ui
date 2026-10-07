@@ -26,22 +26,22 @@ export default function TypographyVariantsExample() {
       {ROLES.map((variant) => (
         <div key={variant}>
           <div>
-            <Typography.Root variant={variant}>Выручка за март</Typography.Root>
-            <Typography.Root as="span" variant="caption" tone="muted">
+            <Typography variant={variant}>Выручка за март</Typography>
+            <Typography as="span" variant="caption" tone="muted">
               {variant}
-            </Typography.Root>
+            </Typography>
           </div>
         </div>
       ))}
       {TONES.map((tone) => (
         <div key={tone}>
           <div>
-            <Typography.Root variant="body-m" tone={tone}>
+            <Typography variant="body-m" tone={tone}>
               Оплата по счёту № 4821 получена
-            </Typography.Root>
-            <Typography.Root as="span" variant="caption" tone="muted">
+            </Typography>
+            <Typography as="span" variant="caption" tone="muted">
               body-m · {tone}
-            </Typography.Root>
+            </Typography>
           </div>
         </div>
       ))}

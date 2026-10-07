@@ -8,12 +8,12 @@ const NAME = "Эргономичное кресло с подголовнико�
 export default function TypographyTruncateExample() {
   return (
     <div className={styles.truncateBox}>
-      <Typography.Root variant="title-s" truncate title={NAME}>
+      <Typography variant="title-s" truncate title={NAME}>
         {NAME}
-      </Typography.Root>
-      <Typography.Root variant="body-s" tone="muted">
+      </Typography>
+      <Typography variant="body-s" tone="muted">
         Артикул 48 213
-      </Typography.Root>
+      </Typography>
     </div>
   );
 }

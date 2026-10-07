@@ -10,9 +10,9 @@ export default function AccordionSizesExample() {
     <>
       {SIZES.map((size) => (
         <div key={size} className={styles.panel}>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
           <Accordion.Root size={size}>
             <Accordion.Item value="plan">
               <Accordion.Header>

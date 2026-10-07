@@ -11,9 +11,9 @@ export default function LabelWithIconExample() {
           </Label.Icon>
           Рабочая почта
         </Label.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           m
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Label.Root size="l">
@@ -22,9 +22,9 @@ export default function LabelWithIconExample() {
           </Label.Icon>
           Пароль
         </Label.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           l
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

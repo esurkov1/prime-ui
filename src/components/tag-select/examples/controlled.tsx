@@ -15,9 +15,9 @@ export default function TagSelectControlledExample() {
   return (
     <>
       <TagSelect label="Команда проекта" options={OPTIONS} value={team} onValueChange={setTeam} />
-      <Typography.Root as="p" variant="body-s" tone="secondary">
+      <Typography as="p" variant="body-s" tone="secondary">
         В команде: {team.length}
-      </Typography.Root>
+      </Typography>
       <Button.Root variant="soft" tone="neutral" onClick={() => setTeam(["anna", "igor", "olga"])}>
         Добавить отдел дизайна
       </Button.Root>

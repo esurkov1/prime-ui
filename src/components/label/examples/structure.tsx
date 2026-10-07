@@ -6,24 +6,24 @@ export default function LabelStructureExample() {
     <div>
       <div>
         <Label.Root required>ИНН</Label.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           required
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Label.Root optional>КПП</Label.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           optional
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Label.Root>
           Бюджет
           <Label.Description>₽, без НДС</Label.Description>
         </Label.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Label.Description
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

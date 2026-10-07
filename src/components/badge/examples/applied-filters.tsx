@@ -13,9 +13,9 @@ export default function BadgeAppliedFiltersExample() {
   return (
     <section className={styles.filters} aria-labelledby={titleId}>
       <div className={styles.filtersHeader}>
-        <Typography.Root as="h3" variant="title-s" id={titleId}>
+        <Typography as="h3" variant="title-s" id={titleId}>
           Фильтры
-        </Typography.Root>
+        </Typography>
         <Button.Root
           variant="ghost"
           tone="neutral"
@@ -38,9 +38,9 @@ export default function BadgeAppliedFiltersExample() {
           ))}
         </div>
       ) : (
-        <Typography.Root variant="body-s" tone="muted">
+        <Typography variant="body-s" tone="muted">
           Фильтры не выбраны — показаны все товары.
-        </Typography.Root>
+        </Typography>
       )}
     </section>
   );

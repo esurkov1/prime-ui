@@ -6,12 +6,12 @@ import styles from "./examples.module.css";
 export default function TypographySemanticTagExample() {
   return (
     <section className={styles.block} aria-labelledby="billing-title">
-      <Typography.Root as="h2" id="billing-title" variant="title-s">
+      <Typography as="h2" id="billing-title" variant="title-s">
         Реквизиты для оплаты
-      </Typography.Root>
-      <Typography.Root as="p" variant="body-m" tone="secondary">
+      </Typography>
+      <Typography as="p" variant="body-m" tone="secondary">
         ООО «Прайм», ИНН 7701234567, расчётный счёт в АО «Банк Север».
-      </Typography.Root>
+      </Typography>
     </section>
   );
 }

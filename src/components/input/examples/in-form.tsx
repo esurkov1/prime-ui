@@ -24,12 +24,12 @@ export default function InputInFormExample() {
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
       <div className={styles.formHeader}>
-        <Typography.Root as="h3" variant="title-m">
+        <Typography as="h3" variant="title-m">
           Реквизиты компании
-        </Typography.Root>
-        <Typography.Root as="p" variant="body-s" tone="secondary">
+        </Typography>
+        <Typography as="p" variant="body-s" tone="secondary">
           Используются в счетах и закрывающих документах.
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={styles.formFields}>
         <div className={styles.formWide}>

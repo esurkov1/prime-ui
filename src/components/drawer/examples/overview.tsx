@@ -29,14 +29,14 @@ export default function DrawerOverviewExample() {
             {DETAILS.map(({ term, value }) => (
               <React.Fragment key={term}>
                 <dt>
-                  <Typography.Root as="span" variant="body-m" tone="muted">
+                  <Typography as="span" variant="body-m" tone="muted">
                     {term}
-                  </Typography.Root>
+                  </Typography>
                 </dt>
                 <dd>
-                  <Typography.Root as="span" variant="body-m">
+                  <Typography as="span" variant="body-m">
                     {value}
-                  </Typography.Root>
+                  </Typography>
                 </dd>
               </React.Fragment>
             ))}

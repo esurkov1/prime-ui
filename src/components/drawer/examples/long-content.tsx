@@ -21,9 +21,9 @@ export default function DrawerLongContentExample() {
         </Drawer.Header>
         <Drawer.Body>
           {EVENTS.map((event) => (
-            <Typography.Root key={event.id} variant="body-m" tone="secondary">
+            <Typography key={event.id} variant="body-m" tone="secondary">
               {event.text}
-            </Typography.Root>
+            </Typography>
           ))}
         </Drawer.Body>
         <Drawer.Footer>

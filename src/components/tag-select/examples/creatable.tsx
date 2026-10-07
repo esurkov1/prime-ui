@@ -20,9 +20,9 @@ export default function TagSelectCreatableExample() {
         onCreate={(value) => setCreated((prev) => [...prev, value])}
         placeholder="Найдите или создайте метку"
       />
-      <Typography.Root as="p" variant="body-s" tone="secondary">
+      <Typography as="p" variant="body-s" tone="secondary">
         {created.length ? `Созданы: ${created.join(", ")}` : "Наберите новую метку и нажмите Enter"}
-      </Typography.Root>
+      </Typography>
     </>
   );
 }

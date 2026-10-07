@@ -9,18 +9,18 @@ export default function LinkButtonWithIconExample() {
           <Icon name="field.email" />
           Написать в поддержку
         </LinkButton>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           leading
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <LinkButton href="#projects">
           Все проекты
           <Icon name="nav.chevronRight" />
         </LinkButton>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           trailing
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

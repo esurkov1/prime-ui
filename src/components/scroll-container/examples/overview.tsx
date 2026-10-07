@@ -8,16 +8,16 @@ const EVENTS = Array.from({ length: 16 }, (_, index) => `Заказ № ${1040 +
 export default function ScrollContainerOverviewExample() {
   return (
     <Card.Root role="region" className={styles.card} aria-label="Лента событий">
-      <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
+      <Typography as="h3" variant="title-s" className={styles.cardTitle}>
         Лента событий
-      </Typography.Root>
+      </Typography>
       <ScrollContainer>
         <ul className={styles.list}>
           {EVENTS.map((event) => (
             <li key={event}>
-              <Typography.Root as="span" variant="body-m" tone="secondary">
+              <Typography as="span" variant="body-m" tone="secondary">
                 {event}
-              </Typography.Root>
+              </Typography>
             </li>
           ))}
         </ul>

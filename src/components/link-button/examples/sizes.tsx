@@ -11,9 +11,9 @@ export default function LinkButtonSizesExample() {
           <LinkButton href="#details" size={size}>
             Подробнее
           </LinkButton>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

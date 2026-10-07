@@ -31,9 +31,9 @@ export default function BannerVariantsExample() {
                   <Banner.Title>{title}</Banner.Title>
                 </Banner.Content>
               </Banner.Root>
-              <Typography.Root as="span" variant="caption" tone="muted">
+              <Typography as="span" variant="caption" tone="muted">
                 {variant} · {tone}
-              </Typography.Root>
+              </Typography>
             </div>
           ))}
         </div>

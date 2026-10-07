@@ -10,17 +10,17 @@ export default function ThumbnailStatesExample() {
             <Icon name="object.package" />
           </Thumbnail.Fallback>
         </Thumbnail.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           icon
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Thumbnail.Root ratio="3:4" size="l" color="purple">
           <Thumbnail.Fallback>PDF</Thumbnail.Fallback>
         </Thumbnail.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           label
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Thumbnail.Root ratio="4:3" size="l">
@@ -29,9 +29,9 @@ export default function ThumbnailStatesExample() {
             <Icon name="object.document" />
           </Thumbnail.Fallback>
         </Thumbnail.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           error
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

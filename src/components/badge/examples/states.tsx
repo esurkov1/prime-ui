@@ -10,41 +10,41 @@ export default function BadgeStatesExample() {
         <Badge.Root color="green" disabled>
           Оплачен
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           disabled
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Badge.Root color="blue" onPress={noop} pressed={false}>
           Москва
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           onPress
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Badge.Root color="blue" onPress={noop} pressed>
           Москва
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           pressed
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Badge.Root labels={{ remove: "Убрать «Москва»" }} onRemove={noop}>
           Москва
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           onRemove
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Badge.Root labels={{ remove: "Убрать «Москва»" }} onRemove={noop} disabled>
           Москва
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           onRemove · disabled
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

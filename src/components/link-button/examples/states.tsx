@@ -6,25 +6,25 @@ export default function LinkButtonStatesExample() {
     <div>
       <div>
         <LinkButton href="#export">Скачать выгрузку</LinkButton>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           default
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <LinkButton href="#export" disabled>
           Скачать выгрузку
         </LinkButton>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           disabled
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <LinkButton href="#export" tone="neutral" disabled>
           Скачать выгрузку
         </LinkButton>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           neutral · disabled
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

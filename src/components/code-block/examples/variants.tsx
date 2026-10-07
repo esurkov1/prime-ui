@@ -11,9 +11,9 @@ export default function CodeBlockVariantsExample() {
       {VARIANTS.map((variant) => (
         <div key={variant}>
           <CodeBlock code={SAMPLE} variant={variant} />
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {variant}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

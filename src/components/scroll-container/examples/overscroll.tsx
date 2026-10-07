@@ -8,16 +8,16 @@ const HOURS = Array.from({ length: 12 }, (_, index) => `${String(9 + index).padS
 export default function ScrollContainerOverscrollExample() {
   return (
     <Card.Root role="region" className={styles.card} aria-label="Журнал">
-      <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
+      <Typography as="h3" variant="title-s" className={styles.cardTitle}>
         Журнал выгрузок
-      </Typography.Root>
+      </Typography>
       <ScrollContainer overscrollBehavior="auto" tabIndex={0} aria-label="Журнал выгрузок">
         <ul className={styles.list}>
           {HOURS.map((hour) => (
             <li key={hour}>
-              <Typography.Root as="span" variant="body-m" tone="secondary">
+              <Typography as="span" variant="body-m" tone="secondary">
                 {hour} — отчёт выгружен
-              </Typography.Root>
+              </Typography>
             </li>
           ))}
         </ul>

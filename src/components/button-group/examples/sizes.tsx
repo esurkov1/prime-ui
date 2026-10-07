@@ -12,9 +12,9 @@ export default function ButtonGroupSizesExample() {
             <ButtonGroup.Item pressed>Код</ButtonGroup.Item>
             <ButtonGroup.Item pressed={false}>Превью</ButtonGroup.Item>
           </ButtonGroup.Root>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

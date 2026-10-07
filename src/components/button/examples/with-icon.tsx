@@ -11,9 +11,9 @@ export default function ButtonWithIconExample() {
           </Button.Icon>
           Загрузить файл
         </Button.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           leading
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Button.Root variant="soft" tone="neutral">
@@ -22,9 +22,9 @@ export default function ButtonWithIconExample() {
             <Icon name="nav.chevronRight" />
           </Button.Icon>
         </Button.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           trailing
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Button.Root variant="ghost" tone="neutral" aria-label="Копировать ссылку">
@@ -32,9 +32,9 @@ export default function ButtonWithIconExample() {
             <Icon name="action.copy" />
           </Button.Icon>
         </Button.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           icon-only
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

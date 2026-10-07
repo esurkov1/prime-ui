@@ -69,9 +69,9 @@ export function Panel({
 /** CSS variable name: Typography in the code role, secondary tone. */
 export function TokenName({ children }: { children: string }) {
   return (
-    <Typography.Root as="span" variant="code" tone="secondary" className={s.tokenName}>
+    <Typography as="span" variant="code" tone="secondary" className={s.tokenName}>
       {children}
-    </Typography.Root>
+    </Typography>
   );
 }
 
@@ -82,9 +82,9 @@ export function RuleList({ children }: { children: React.ReactNode }) {
       {React.Children.map(children, (child) =>
         React.isValidElement<{ children?: React.ReactNode }>(child) && child.type === "li" ? (
           <li>
-            <Typography.Root as="span" variant="body-m">
+            <Typography as="span" variant="body-m">
               {child.props.children}
-            </Typography.Root>
+            </Typography>
           </li>
         ) : (
           child

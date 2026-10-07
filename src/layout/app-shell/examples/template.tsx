@@ -31,9 +31,9 @@ export default function AppShellTemplateExample() {
         <PageContent.Section>
           <PageContent.Header>
             {/* In a real app this is PageContent.Title (the page h1). */}
-            <Typography.Root as="h2" variant="heading-m">
+            <Typography as="h2" variant="heading-m">
               Рассылки
-            </Typography.Root>
+            </Typography>
             <PageContent.Description>
               3 активные кампании, следующая — в пятницу.
             </PageContent.Description>

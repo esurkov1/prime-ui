@@ -9,9 +9,9 @@ export default function PaginationSizesExample() {
       {SIZES.map((size) => (
         <div key={size}>
           <Pagination size={size} totalPages={12} defaultValue={4} />
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

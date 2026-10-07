@@ -9,9 +9,9 @@ export default function ProgressBarSizesExample() {
       {SIZES.map((size) => (
         <div key={size}>
           <ProgressBar size={size} value={64} label="Загрузка" showValue />
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

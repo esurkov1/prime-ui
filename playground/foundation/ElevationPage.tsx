@@ -30,13 +30,13 @@ function ShadowCards() {
         const varName = toVarName(`shadow.${key}`);
         return (
           <div key={key} className={s.shadowCard} style={{ boxShadow: `var(${varName})` }}>
-            <Typography.Root as="span" variant="title-s">
+            <Typography as="span" variant="title-s">
               {key}
-            </Typography.Root>
+            </Typography>
             <TokenName>{varName}</TokenName>
-            <Typography.Root as="span" variant="body-s" tone="muted">
+            <Typography as="span" variant="body-s" tone="muted">
               {SHADOW_USE[key] ?? ""}
-            </Typography.Root>
+            </Typography>
           </div>
         );
       })}
@@ -46,9 +46,9 @@ function ShadowCards() {
 
 function LayerTag({ children }: { children: string }) {
   return (
-    <Typography.Root as="span" variant="caption" tone="muted" className={s.layerTag}>
+    <Typography as="span" variant="caption" tone="muted" className={s.layerTag}>
       {children}
-    </Typography.Root>
+    </Typography>
   );
 }
 
@@ -77,12 +77,12 @@ function LayerStack() {
       </Card.Root>
       <div className={s.layerMenu}>
         <LayerTag>bg.raised · shadow.overlay</LayerTag>
-        <Typography.Root as="span" variant="body-m" className={s.nestedItem} data-active>
+        <Typography as="span" variant="body-m" className={s.nestedItem} data-active>
           Пункт меню
-        </Typography.Root>
-        <Typography.Root as="span" variant="body-m" className={s.nestedItem}>
+        </Typography>
+        <Typography as="span" variant="body-m" className={s.nestedItem}>
           Ещё пункт
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={s.layerScrim}>
         <div className={s.layerModal}>

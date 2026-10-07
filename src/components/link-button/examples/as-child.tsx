@@ -6,13 +6,13 @@ export default function LinkButtonAsChildExample() {
   const [sent, setSent] = React.useState(false);
 
   return (
-    <Typography.Root variant="body-m" tone="secondary">
+    <Typography variant="body-m" tone="secondary">
       {sent ? "Письмо отправлено повторно." : "Не пришло письмо со счётом?"}{" "}
       <LinkButton asChild>
         <button type="button" onClick={() => setSent(true)}>
           Отправить ещё раз
         </button>
       </LinkButton>
-    </Typography.Root>
+    </Typography>
   );
 }

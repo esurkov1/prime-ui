@@ -6,17 +6,17 @@ export default function LabelStatesExample() {
     <div>
       <div>
         <Label.Root required>Название проекта</Label.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           default
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Label.Root required disabled>
           Название проекта
         </Label.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           disabled
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

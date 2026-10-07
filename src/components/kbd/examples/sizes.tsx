@@ -9,9 +9,9 @@ export default function KbdSizesExample() {
       {SIZES.map((size) => (
         <div key={size}>
           <Kbd size={size}>Ctrl</Kbd>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

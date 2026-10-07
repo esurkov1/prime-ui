@@ -30,12 +30,12 @@ export default function DndOverviewExample() {
         renderItem={(task) => (
           <Dnd.SortableItem id={task.id} className={styles.row}>
             <span className={styles.rowText}>
-              <Typography.Root as="span" variant="body-m" truncate>
+              <Typography as="span" variant="body-m" truncate>
                 {task.title}
-              </Typography.Root>
-              <Typography.Root as="span" variant="caption" tone="muted">
+              </Typography>
+              <Typography as="span" variant="caption" tone="muted">
                 {task.due}
-              </Typography.Root>
+              </Typography>
             </span>
           </Dnd.SortableItem>
         )}

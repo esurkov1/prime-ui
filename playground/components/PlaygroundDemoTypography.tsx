@@ -5,12 +5,12 @@ import { cx } from "@/internal/cx";
 
 /** Example block title under the page title (h1): `title-l`, h2. */
 export function DemoSectionTitle(props: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <Typography.Root {...props} as="h2" variant="title-l" />;
+  return <Typography {...props} as="h2" variant="title-l" />;
 }
 
 /** API subtitle or nested heading inside a block: `title-s`, h3. */
 export function DemoApiTitle(props: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <Typography.Root {...props} as="h3" variant="title-s" />;
+  return <Typography {...props} as="h3" variant="title-s" />;
 }
 
 /** Lead text under a block title: `body-m`, secondary, reading width. */
@@ -19,7 +19,7 @@ export function DemoDescription({
   ...rest
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <Typography.Root
+    <Typography
       {...rest}
       as="p"
       variant="body-m"

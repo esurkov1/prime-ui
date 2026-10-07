@@ -142,9 +142,9 @@ function TokensTable() {
 /** Muted lead text of a demo panel. */
 function Note({ children }: { children: React.ReactNode }) {
   return (
-    <Typography.Root as="span" variant="body-s" tone="muted">
+    <Typography as="span" variant="body-s" tone="muted">
       {children}
-    </Typography.Root>
+    </Typography>
   );
 }
 
@@ -154,9 +154,9 @@ function EasingCards() {
       {EASINGS.map((e) => (
         <Panel key={e.key} className={s.easingCard}>
           <EasingCurve name={e.key} value={e.value} />
-          <Typography.Root as="span" variant="title-s">
+          <Typography as="span" variant="title-s">
             {e.key}
-          </Typography.Root>
+          </Typography>
           <TokenName>{e.varName}</TokenName>
           <Note>{EASING_USE[e.key] ?? ""}</Note>
         </Panel>
@@ -178,9 +178,9 @@ function MotionTrack({
 }) {
   return (
     <div className={s.motionCell}>
-      <Typography.Root as="span" variant="caption" tone="secondary">
+      <Typography as="span" variant="caption" tone="secondary">
         {label}
-      </Typography.Root>
+      </Typography>
       <span
         className={s.motionTrack}
         data-playing={playing || undefined}
@@ -363,9 +363,9 @@ export default function MotionPage() {
         description={
           <>
             Сейчас в системе{" "}
-            <Typography.Root as="span" variant="body-m" weight="semibold">
+            <Typography as="span" variant="body-m" weight="semibold">
               {reduced ? "включено «уменьшить движение»" : "анимации разрешены"}
-            </Typography.Root>
+            </Typography>
             . При <code>prefers-reduced-motion: reduce</code> файл <code>globals.css</code> обнуляет
             все <code>--prime-motion-duration-*</code> и <code>--prime-motion-stagger</code>, а{" "}
             <code>--prime-motion-press-scale*</code> становится 1 — CSS-переходы срабатывают

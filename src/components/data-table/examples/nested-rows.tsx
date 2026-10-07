@@ -84,9 +84,9 @@ const COLUMNS: DataTableColumn<Entry>[] = [
         ) : null}
         <div className={styles.personText}>
           <span>{row.name}</span>
-          <Typography.Root as="span" variant="caption" tone="muted" truncate>
+          <Typography as="span" variant="caption" tone="muted" truncate>
             {row.note}
-          </Typography.Root>
+          </Typography>
         </div>
       </div>
     ),

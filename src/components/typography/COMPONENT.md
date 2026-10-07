@@ -25,14 +25,14 @@ import { Typography } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Typography.Root          the element from `as` (default <p>); variant, tone, weight, tracking, italic, truncate
+Typography       the element from `as` (default <p>); variant, tone, weight, tracking, italic, truncate
 ```
 
 ## API
 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-### Typography.Root
+### Typography
 `ref` → the element. Any text element styled by one text role (`--prime-text-<role>-*`); state goes to `data-*`.
 
 | Prop | Type | Default | Description |

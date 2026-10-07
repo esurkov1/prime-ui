@@ -6,21 +6,21 @@ export default function ButtonStatesExample() {
     <div>
       <div>
         <Button.Root>Сохранить</Button.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           default
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Button.Root disabled>Сохранить</Button.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           disabled
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Button.Root loading>Сохранить</Button.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           loading
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Button.Root variant="outline" tone="neutral" loading>
@@ -29,9 +29,9 @@ export default function ButtonStatesExample() {
           </Button.Icon>
           Загрузить
         </Button.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           loading · Button.Icon
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

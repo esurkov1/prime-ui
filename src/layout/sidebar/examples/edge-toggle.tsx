@@ -8,9 +8,9 @@ export default function SidebarEdgeToggleExample() {
     <div className={styles.stage}>
       <Sidebar.Root responsive={false}>
         <Sidebar.Header>
-          <Typography.Root as="span" variant="title-s">
+          <Typography as="span" variant="title-s">
             Склад
-          </Typography.Root>
+          </Typography>
           <Sidebar.Toggle variant="edge" />
         </Sidebar.Header>
         <Sidebar.Content>

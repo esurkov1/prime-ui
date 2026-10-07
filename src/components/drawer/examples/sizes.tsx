@@ -24,9 +24,9 @@ export default function DrawerSizesExample() {
               <Drawer.Description>Ширина панели {width}</Drawer.Description>
             </Drawer.Header>
             <Drawer.Body>
-              <Typography.Root variant="body-m" tone="secondary">
+              <Typography variant="body-m" tone="secondary">
                 На экране уже 640 px панель занимает всю ширину и теряет скругления.
-              </Typography.Root>
+              </Typography>
             </Drawer.Body>
           </Drawer.Content>
         </Drawer.Root>

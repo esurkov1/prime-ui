@@ -9,9 +9,9 @@ export default function BadgeWithIconExample() {
           <Badge.Dot />
           Активен
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Badge.Dot
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Badge.Root color="purple">
@@ -20,9 +20,9 @@ export default function BadgeWithIconExample() {
           </Badge.Icon>
           Приватный
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Badge.Icon · start
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Badge.Root color="blue">
@@ -31,9 +31,9 @@ export default function BadgeWithIconExample() {
             <Icon name="nav.chevronRight" />
           </Badge.Icon>
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Badge.Icon · end
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Badge.Root color="sky" aria-label="Почта">
@@ -41,9 +41,9 @@ export default function BadgeWithIconExample() {
             <Icon name="field.email" />
           </Badge.Icon>
         </Badge.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           icon-only
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

@@ -17,9 +17,9 @@ export default function PopoverControlledOpenExample() {
           </Button.Root>
         </Popover.Trigger>
         <Popover.Content>
-          <Typography.Root variant="body-s" tone="secondary">
+          <Typography variant="body-s" tone="secondary">
             Отчёт выгрузится в CSV с текущими фильтрами.
-          </Typography.Root>
+          </Typography>
           <Popover.Actions>
             <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(false)}>
               Понятно

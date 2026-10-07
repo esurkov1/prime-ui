@@ -11,9 +11,9 @@ export default function StepperSizesExample() {
     <>
       {SIZES.map((size) => (
         <div key={size} className={styles.wide}>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
           <Stepper.Root orientation="horizontal" size={size} defaultValue={1}>
             {STEPS.map((title) => (
               <Stepper.Item key={title}>

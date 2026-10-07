@@ -28,9 +28,9 @@ function StackControls() {
       >
         Закрыть все
       </Button.Root>
-      <Typography.Root as="span" variant="body-s" tone="secondary">
+      <Typography as="span" variant="body-s" tone="secondary">
         Активных: {items.length}
-      </Typography.Root>
+      </Typography>
     </div>
   );
 }

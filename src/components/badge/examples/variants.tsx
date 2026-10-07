@@ -26,9 +26,9 @@ export default function BadgeVariantsExample() {
               <Badge.Root variant={variant} color={color}>
                 {color}
               </Badge.Root>
-              <Typography.Root as="span" variant="caption" tone="muted">
+              <Typography as="span" variant="caption" tone="muted">
                 {variant}
-              </Typography.Root>
+              </Typography>
             </div>
           ))}
         </div>

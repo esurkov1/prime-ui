@@ -9,17 +9,17 @@ export default function DividerWithIconExample() {
           <Icon name="status.locked" />
           Безопасность
         </Divider>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           иконка и подпись
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <Divider aria-label="Безопасность">
           <Icon name="status.locked" />
         </Divider>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           только иконка
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );
