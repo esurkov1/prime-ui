@@ -302,12 +302,22 @@
 /*
  * Matrix (variants, sizes, states): every direct child is a row, its children are cells — the
  * specimen above its caption. Rows dissolve into one grid, so cells line up in columns; the column
- * count is the cell count of the first row. A matrix wider than the stage scrolls, never clips.
+ * count is the cell count of the first row (up to 12).
+ *
+ * A column is never narrower than its content and grows, while the stage has room, to
+ * `--matrix-cell`: 320 for one column, 160 for two, 128 from three on. So a specimen without an
+ * intrinsic width (Slider, a block with `container-type: inline-size` and `width: 100%`) fills a
+ * sensible cell instead of collapsing, and small specimens sit in even, compact columns. The grid
+ * is centered; a matrix wider than the stage scrolls.
  */
 .previewInner[data-preview-layout="matrix"] {
   --matrix-columns: 1;
+  --matrix-cell: max(
+    calc(var(--prime-space-16) * 2),
+    calc(var(--prime-space-20) * 4 / var(--matrix-columns))
+  );
   display: grid;
-  grid-template-columns: repeat(var(--matrix-columns), max-content);
+  grid-template-columns: repeat(var(--matrix-columns), minmax(max-content, var(--matrix-cell)));
   align-items: end;
   justify-content: safe center;
   gap: var(--prime-space-5) var(--prime-space-6);
@@ -352,6 +362,22 @@
 
 .previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(8))) {
   --matrix-columns: 8;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(9))) {
+  --matrix-columns: 9;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(10))) {
+  --matrix-columns: 10;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(11))) {
+  --matrix-columns: 11;
+}
+
+.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(12))) {
+  --matrix-columns: 12;
 }
 
 .previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),

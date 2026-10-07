@@ -69,7 +69,7 @@ No DOM. Marks the content rendered in the preview.
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |
 | `row-start` | wrapping row aligned to the start, gap 12 | toolbars, start-aligned controls | |
 | `row-wrap` | centered wrapping row, items aligned to the top, gap 8 | many small items (badges, tags) | |
-| `matrix` | grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns line up across rows, scrolls when wider than the stage | variant, size and state matrices | |
+| `matrix` | centered grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns (up to 12) line up across rows, are never narrower than their content and grow to 320 / 160 / 128px for 1 / 2 / 3+ columns, so width-less specimens (Slider, `width: 100%` blocks) get a real cell; scrolls when wider than the stage | variant, size and state matrices | |
 
 ### viewport
 | Value | Looks like | Use when | Default |
