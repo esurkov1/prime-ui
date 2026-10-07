@@ -48,7 +48,7 @@ A component may define private custom properties (`--btn-h`) that are assigned f
 | `color.focus.ring` | — | the one focus ring |
 | `color.control.thumb` | — | switch / slider thumb |
 | `color.tooltip` | bg, text | — |
-| `color.palette.<hue>` | soft, text, solid, solidFg | Badge/Tag/Avatar colors: gray, blue, green, orange, red, yellow, purple, sky, pink, teal |
+| `color.palette.<hue>` | soft, text, solid, solidFg | Badge/Avatar colors: gray, blue, green, orange, red, yellow, purple, sky, pink, teal |
 
 Light and dark are full themes: in dark, layers get lighter as they go up (canvas 950 → surface 900 →
 raised 875), and accent/status move to lighter steps. All text pairs pass WCAG AA (≥ 4.5:1), focus ring ≥ 3:1.
@@ -118,7 +118,7 @@ Variables: `--prime-control-<tier>-{height,padding-x,field-padding-x,gap,icon,ra
 Pairing rules:
 - A field of tier T uses label/hint values of tier T. Hint/error is always smaller than the field text.
 - A menu/listbox opened from a trigger of tier T uses `item-height` of tier T and the same text size.
-- Badges/Tags/Kbd inside a control of tier T use the badge tier one step down (`m` control → `s` badge).
+- Badges/Kbd inside a control of tier T use the badge tier one step down (`m` control → `s` badge).
 - An icon-only button is square: width = height.
 - Fields (Input, Textarea, Select, TagSelect, Datepicker trigger, ColorPicker fields): an icon (leading or trailing,
   incl. chevrons and clear buttons) sits centered between the edge and the text — edge→icon = icon→text = the tier's
@@ -302,7 +302,7 @@ No backward compatibility, no aliases, no `@deprecated` props, no legacy types. 
 | Size | `size?: "xs" \| "s" \| "m" \| "l" \| "xl"`, default `"m"` | Type `ControlSize` from `src/internal/states.ts`. Overlays that size by width (Modal, Drawer) use the subset they need. Avatar adds `"2xl"`. |
 | Treatment | `variant` | Shared vocabulary: `solid` · `soft` · `outline` · `ghost`. Component-specific structural variants (FileUpload `dashed \| solid`, Card templates). Tabs has no variant: navigation tabs are always underline; choosing a value is SegmentedControl are allowed and documented. |
 | Semantic color | `tone?: "neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | Components use the subset that makes sense (Button: `accent \| neutral \| danger`, default `accent`). Destructive = `danger`, never `error`. |
-| Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Tag, Avatar, and the parts that host a palette hue: field badges (`Input.Badge`, `Select.Badge`, `Datepicker.Badge`), `Select.ItemMedia`, `SegmentedControl.Item` (dot + tinted thumb). |
+| Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Avatar, and the parts that host a palette hue: field badges (`Input.Badge`, `Select.Badge`, `Datepicker.Badge`), `Select.ItemMedia`, `SegmentedControl.Item` (dot + tinted thumb). |
 | Validation | `invalid?: boolean`; fields with a support row also take `hint?: ReactNode` and `error?: ReactNode` | A non-empty `error` implies `invalid`. Sets `aria-invalid`, `data-invalid`. |
 | Value | `value` / `defaultValue` / `onValueChange(value)` | Select, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, RadioGroup, DigitInput, Pagination (`page` → `value`). Native text inputs (Input, Textarea) keep native `value`/`onChange` and add `onValueChange(string)`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch. |

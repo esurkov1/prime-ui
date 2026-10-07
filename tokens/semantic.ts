@@ -24,7 +24,7 @@ const hueRef: Record<Hue, string> = {
   teal: "teal",
 };
 
-/** Light palette for Badge / Tag / Avatar colors: soft fill + readable text + solid fill. */
+/** Light palette for Badge / Avatar colors: soft fill + readable text + solid fill. */
 function lightPalette() {
   const out: Record<string, { soft: string; text: string; solid: string; solidFg: string }> = {
     gray: {
@@ -479,7 +479,7 @@ export const semanticTokens = {
     },
   },
 
-  /** Badge / Tag / Kbd tiers. Inside a control of tier T use the badge tier one step down. */
+  /** Badge / Kbd tiers. Inside a control of tier T use the badge tier one step down. */
   badge: {
     xs: {
       height: "1rem",
