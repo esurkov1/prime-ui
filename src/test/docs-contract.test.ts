@@ -30,7 +30,6 @@ const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
 const NOT_CONVERTED = new Set([
   "accordion",
   "app-shell",
-  "banner",
   "breadcrumb",
   "button-group",
   "card",

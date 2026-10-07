@@ -94,24 +94,12 @@ describe("Banner", () => {
     expect(screen.queryByRole("button", { name: "Закрыть" })).not.toBeInTheDocument();
   });
 
-  it("does not inject dismiss when CloseButton is present", () => {
-    const onDismiss = vi.fn();
-    render(
-      <Banner.Root onDismiss={onDismiss}>
-        <Banner.Content>Text</Banner.Content>
-        <Banner.CloseButton aria-label="Custom close" type="button" />
-      </Banner.Root>,
-    );
-    expect(screen.queryByRole("button", { name: "Закрыть" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Custom close" })).toBeInTheDocument();
-  });
-
   it("renders Icon, Title, Description, Actions inside Content", () => {
     render(
       <Banner.Root>
         <Banner.Content>
-          <Banner.Icon>
-            <svg data-testid="banner-icon" />
+          <Banner.Icon data-testid="banner-icon">
+            <svg />
           </Banner.Icon>
           <Banner.Title>Title text</Banner.Title>
           <Banner.Description>Description text</Banner.Description>
@@ -122,7 +110,7 @@ describe("Banner", () => {
       </Banner.Root>,
     );
 
-    expect(screen.getByTestId("banner-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("banner-icon")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByText("Title text")).toBeInTheDocument();
     expect(screen.getByText("Description text")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Action" })).toBeInTheDocument();
@@ -181,6 +169,8 @@ describe("Banner", () => {
     );
     const root = container.firstElementChild as HTMLElement;
     expect(root.children).toHaveLength(2);
-    expect(root.children[1]).toHaveClass(styles.closeButton);
+    expect(root.children[1]).toHaveClass(styles.close);
+    expect(root.children[1]).toHaveAttribute("data-variant", "ghost");
+    expect(root.children[1]).toHaveAttribute("data-size", "xs");
   });
 });

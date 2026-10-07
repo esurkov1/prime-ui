@@ -37,7 +37,6 @@ export { Avatar } from "./avatar/Avatar";
 export * from "./badge/Badge";
 export type {
   BannerActionsProps,
-  BannerCloseButtonProps,
   BannerContentProps,
   BannerDescriptionProps,
   BannerIconProps,

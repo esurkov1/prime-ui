@@ -1,6 +1,6 @@
 /** Real submit cycle: the button shows `loading` while the request runs, a failed request returns a danger Banner above the fields and marks the password. Use it as the reference for server errors. */
-import { CircleAlert, LogIn } from "lucide-react";
-import { Banner, Button, Input, LoginForm } from "prime-ui-kit";
+import { LogIn } from "lucide-react";
+import { Banner, Button, Icon, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -37,7 +37,9 @@ export default function LoginFormSubmitStatesExample() {
             {failed ? (
               <Banner.Root tone="danger" role="alert">
                 <Banner.Content>
-                  <Banner.Icon as={CircleAlert} aria-hidden />
+                  <Banner.Icon>
+                    <Icon name="status.danger" />
+                  </Banner.Icon>
                   <Banner.Title>Неверный email или пароль</Banner.Title>
                 </Banner.Content>
               </Banner.Root>
