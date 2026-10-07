@@ -1,6 +1,8 @@
 /** A short lookup table sized by its content with a centered column, and a `grow` column that takes the free width and wraps — `fullWidth`, `align`, `grow`. */
 import { DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 
+import styles from "./examples.module.css";
+
 type Task = { id: string; task: string; hours: number; note: string };
 
 const TASKS: Task[] = [
@@ -41,7 +43,7 @@ const NOTE_COLUMNS: DataTableColumn<Task>[] = [
 export default function DataTableContentWidthExample() {
   return (
     <>
-      <div>
+      <div className={styles.specimen}>
         <DataTable
           columns={LOOKUP_COLUMNS}
           rows={TASKS}
@@ -52,7 +54,7 @@ export default function DataTableContentWidthExample() {
           fullWidth=&#123;false&#125; · align="center"
         </Typography.Root>
       </div>
-      <div>
+      <div className={styles.specimen}>
         <DataTable columns={NOTE_COLUMNS} rows={TASKS} getRowKey={(row) => row.id} />
         <Typography.Root as="span" variant="caption" tone="muted">
           grow

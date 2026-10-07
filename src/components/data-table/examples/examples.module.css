@@ -27,6 +27,22 @@
   max-width: calc(var(--prime-space-20) * 4);
 }
 
+/* sizes / appearance / states: a table with its caption under it; specimens kept apart. */
+.specimens {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-6);
+  width: 100%;
+  min-width: 0;
+}
+
+.specimen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
 /* Avatar → name and note in a cell; the cell gap equals the sub-row indent step (avatar + gap). */
 .person {
   display: flex;
