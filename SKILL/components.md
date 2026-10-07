@@ -76,6 +76,7 @@ System messages, progress and empty states.
 | ProgressCircle | Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center. | [COMPONENT.md](../src/components/progress-circle/COMPONENT.md) · [examples](../src/components/progress-circle/examples/) |
 | Spinner | An indeterminate loading indicator: a ring with a gap that turns while a request runs. | [COMPONENT.md](../src/components/spinner/COMPONENT.md) · [examples](../src/components/spinner/examples/) |
 | EmptyPage | Empty state of a page, a block or a menu: icon, title, explanation and an action. | [COMPONENT.md](../src/components/empty-page/COMPONENT.md) · [examples](../src/components/empty-page/examples/) |
+| Crossfade | A region that cross-fades between its states (loading → data → empty → error) and glides to the new height, so the page below does not jump. | [COMPONENT.md](../src/components/crossfade/COMPONENT.md) · [examples](../src/components/crossfade/examples/) |
 
 ## Navigation (`navigation`)
 

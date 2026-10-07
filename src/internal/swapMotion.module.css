@@ -1,0 +1,30 @@
+/*
+ * State swap motion (foundation §7 rule 8: two states replacing each other in place cross-fade).
+ * Opacity only — no shift, so a swapped table body or region never moves and creates no containing
+ * block. Enter takes `base` (the content-swap duration), exit is shorter (`fast`). One-shot
+ * keyframes; reduced motion collapses the durations globally.
+ *
+ *   .swapIn   content of the new state (after `useStateSwap` reports a change)
+ *   .swapOut  the previous state's content while it leaves (Crossfade's outgoing layer)
+ */
+/* `backwards`: once played nothing stays applied, so a table body keeps no stacking context. */
+.swapIn {
+  animation: primeSwapIn var(--prime-motion-duration-base) var(--prime-motion-easing-enter)
+    backwards;
+}
+
+.swapOut {
+  animation: primeSwapOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
+}
+
+@keyframes primeSwapIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes primeSwapOut {
+  to {
+    opacity: 0;
+  }
+}

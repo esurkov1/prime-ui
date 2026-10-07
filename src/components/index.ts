@@ -139,6 +139,8 @@ export type {
   CommandMenuTitleProps,
 } from "./command-menu/CommandMenu";
 export { CommandMenu } from "./command-menu/CommandMenu";
+export type { CrossfadeProps } from "./crossfade/Crossfade";
+export { Crossfade } from "./crossfade/Crossfade";
 export type {
   DataTableColumn,
   DataTableLabels,
