@@ -47,9 +47,9 @@ function RadiusScale() {
       {SCALE.map((r) => (
         <Panel key={r.key} className={s.radiusCard}>
           <span className={s.radiusShape} style={{ borderRadius: `var(${r.varName})` }} />
-          <Typography.Root as="span" variant="title-s">
+          <Typography as="span" variant="title-s">
             {r.key} · {r.label}
-          </Typography.Root>
+          </Typography>
           <TokenName>{r.varName}</TokenName>
         </Panel>
       ))}
@@ -89,7 +89,7 @@ function NestedDemo() {
       <div className={s.nestedCase}>
         <div className={s.nestedPanel}>
           {items.map((item, i) => (
-            <Typography.Root
+            <Typography
               as="span"
               variant="body-m"
               key={item}
@@ -97,17 +97,17 @@ function NestedDemo() {
               data-active={i === 0 || undefined}
             >
               {item}
-            </Typography.Root>
+            </Typography>
           ))}
         </div>
-        <Typography.Root as="p" variant="body-s" tone="success">
+        <Typography as="p" variant="body-s" tone="success">
           Так: {PANEL_R} − {PANEL_P} = {ITEM_R}. Внутренний угол повторяет внешний.
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={s.nestedCase}>
         <div className={s.nestedPanel}>
           {items.map((item, i) => (
-            <Typography.Root
+            <Typography
               as="span"
               variant="body-m"
               key={item}
@@ -116,12 +116,12 @@ function NestedDemo() {
               style={{ borderRadius: "var(--prime-panel-radius)" }}
             >
               {item}
-            </Typography.Root>
+            </Typography>
           ))}
         </div>
-        <Typography.Root as="p" variant="body-s" tone="danger">
+        <Typography as="p" variant="body-s" tone="danger">
           Не так: у пункта тот же радиус {PANEL_R}. В углах зазор становится неровным.
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

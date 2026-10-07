@@ -18,9 +18,9 @@ export default function SegmentedControlControlledExample() {
         <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
         <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
       </SegmentedControl.Root>
-      <Typography.Root variant="body-m" tone="secondary">
+      <Typography variant="body-m" tone="secondary">
         {REVENUE[period]}
-      </Typography.Root>
+      </Typography>
     </>
   );
 }

@@ -38,9 +38,9 @@ export default function DataTableNarrowExample() {
         pageSize={5}
         toolbar={
           <div className={styles.toolbar}>
-            <Typography.Root as="span" variant="body-s" tone="secondary">
+            <Typography as="span" variant="body-s" tone="secondary">
               Открытые: {TICKETS.length}
-            </Typography.Root>
+            </Typography>
             <Button.Root size="xs">Новый тикет</Button.Root>
           </div>
         }

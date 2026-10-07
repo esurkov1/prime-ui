@@ -13,9 +13,9 @@ export default function PaginationOverflowExample() {
       {CASES.map(({ caption, total, page, siblings }) => (
         <div key={caption}>
           <Pagination totalPages={total} defaultValue={page} siblingCount={siblings} />
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {caption}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

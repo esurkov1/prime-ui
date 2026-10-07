@@ -7,9 +7,9 @@ export default function DropdownOverviewExample() {
 
   return (
     <>
-      <Typography.Root as="span" variant="body-m">
+      <Typography as="span" variant="body-m">
         {status}
-      </Typography.Root>
+      </Typography>
       <Dropdown.Root>
         <Dropdown.Trigger>
           <Button.Root variant="ghost" tone="neutral" aria-label="Действия со счётом">

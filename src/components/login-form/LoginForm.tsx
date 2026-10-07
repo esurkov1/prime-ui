@@ -106,14 +106,14 @@ export type LoginFormTitleProps = {
 function LoginFormTitle({ as = "h1", className, children, ...rest }: LoginFormTitleProps) {
   const size = useLoginFormSize();
   return (
-    <Typography.Root
+    <Typography
       as={as}
       variant={TITLE_ROLE[size]}
       className={cx(styles.title, className)}
       {...rest}
     >
       {children}
-    </Typography.Root>
+    </Typography>
   );
 }
 LoginFormTitle.displayName = "LoginForm.Title";
@@ -126,7 +126,7 @@ export type LoginFormDescriptionProps = {
 function LoginFormDescription({ className, children, ...rest }: LoginFormDescriptionProps) {
   const size = useLoginFormSize();
   return (
-    <Typography.Root
+    <Typography
       as="p"
       variant={DESCRIPTION_ROLE[size]}
       tone="secondary"
@@ -134,7 +134,7 @@ function LoginFormDescription({ className, children, ...rest }: LoginFormDescrip
       {...rest}
     >
       {children}
-    </Typography.Root>
+    </Typography>
   );
 }
 LoginFormDescription.displayName = "LoginForm.Description";
@@ -199,7 +199,7 @@ export type LoginFormFooterProps = {
 function LoginFormFooter({ className, children, ...rest }: LoginFormFooterProps) {
   const size = useLoginFormSize();
   return (
-    <Typography.Root
+    <Typography
       as="p"
       variant={FOOTER_ROLE[size]}
       tone="secondary"
@@ -207,7 +207,7 @@ function LoginFormFooter({ className, children, ...rest }: LoginFormFooterProps)
       {...rest}
     >
       {children}
-    </Typography.Root>
+    </Typography>
   );
 }
 LoginFormFooter.displayName = "LoginForm.Footer";

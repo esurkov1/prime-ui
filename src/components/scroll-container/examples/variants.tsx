@@ -11,9 +11,9 @@ export default function ScrollContainerVariantsExample() {
   return (
     <div className={styles.layout}>
       <Card.Root role="region" className={styles.card} aria-label="Фильтры">
-        <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
+        <Typography as="h3" variant="title-s" className={styles.cardTitle}>
           horizontal
-        </Typography.Root>
+        </Typography>
         <ScrollContainer axis="horizontal">
           <div className={styles.strip}>
             {TAGS.map((tag) => (
@@ -23,9 +23,9 @@ export default function ScrollContainerVariantsExample() {
         </ScrollContainer>
       </Card.Root>
       <Card.Root role="region" className={styles.card} aria-label="Расписание залов">
-        <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
+        <Typography as="h3" variant="title-s" className={styles.cardTitle}>
           both
-        </Typography.Root>
+        </Typography>
         <ScrollContainer
           axis="both"
           tabIndex={0}
@@ -35,7 +35,7 @@ export default function ScrollContainerVariantsExample() {
           <div className={styles.grid}>
             {ROOMS.flatMap((room) =>
               HOURS.map((hour) => (
-                <Typography.Root
+                <Typography
                   key={`${room}-${hour}`}
                   as="div"
                   variant="caption"
@@ -43,7 +43,7 @@ export default function ScrollContainerVariantsExample() {
                   className={styles.cell}
                 >
                   {room} · {hour}
-                </Typography.Root>
+                </Typography>
               )),
             )}
           </div>

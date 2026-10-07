@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -47,7 +47,7 @@ export type TypographyAs =
   | "nav"
   | "main";
 
-export type TypographyRootProps = {
+export type TypographyProps = {
   as?: TypographyAs;
   /** Text role (`--prime-text-<role>-*`). */
   variant: TypographyRole;
@@ -62,44 +62,38 @@ export type TypographyRootProps = {
   tone?: TextTone;
   children?: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLElement>;
 } & React.HTMLAttributes<HTMLElement>;
 
-const TypographyRoot = React.forwardRef<HTMLElement, TypographyRootProps>(
-  (
-    {
-      as: Tag = "p",
-      variant,
-      weight,
-      tracking,
-      truncate = false,
-      italic = false,
-      tone = "default",
-      className,
-      children,
-      ...rest
-    },
-    ref,
-  ) => {
-    return (
-      <Tag
-        ref={ref as never}
-        className={cx(styles.root, className)}
-        {...rest}
-        {...toDataAttributes({
-          variant,
-          weight,
-          tracking,
-          tone: tone === "default" ? undefined : tone,
-          ...(italic ? { italic: true } : {}),
-          ...(truncate ? { truncate: true } : {}),
-        })}
-      >
-        {children}
-      </Tag>
-    );
-  },
-);
-
-TypographyRoot.displayName = "Typography.Root";
-
-export const Typography = { Root: TypographyRoot };
+/** Any text element styled by one text role; state goes to `data-*`. */
+export function Typography({
+  as: Tag = "p",
+  variant,
+  weight,
+  tracking,
+  truncate = false,
+  italic = false,
+  tone = "default",
+  className,
+  children,
+  ref,
+  ...rest
+}: TypographyProps) {
+  return (
+    <Tag
+      ref={ref as never}
+      className={cx(styles.root, className)}
+      {...rest}
+      {...toDataAttributes({
+        variant,
+        weight,
+        tracking,
+        tone: tone === "default" ? undefined : tone,
+        ...(italic ? { italic: true } : {}),
+        ...(truncate ? { truncate: true } : {}),
+      })}
+    >
+      {children}
+    </Tag>
+  );
+}

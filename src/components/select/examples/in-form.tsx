@@ -16,12 +16,12 @@ export default function SelectInFormExample() {
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
       <div className={styles.formHeader}>
-        <Typography.Root as="h3" variant="title-m">
+        <Typography as="h3" variant="title-m">
           Региональные настройки
-        </Typography.Root>
-        <Typography.Root as="p" variant="body-s" tone="secondary">
+        </Typography>
+        <Typography as="p" variant="body-s" tone="secondary">
           Влияют на валюту, формат дат и время в отчётах.
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={styles.formFields}>
         <Select.Root

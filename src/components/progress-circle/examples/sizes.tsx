@@ -11,9 +11,9 @@ export default function ProgressCircleSizesExample() {
           <ProgressCircle size={size} value={72} aria-label="Выполнено">
             72%
           </ProgressCircle>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

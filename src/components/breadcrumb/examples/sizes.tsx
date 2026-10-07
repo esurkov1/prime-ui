@@ -10,9 +10,9 @@ export default function BreadcrumbSizesExample() {
     <>
       {SIZES.map((size) => (
         <div key={size} className={styles.wide}>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
           <Breadcrumb.Root size={size}>
             <Breadcrumb.Item href="#orders">Заказы</Breadcrumb.Item>
             <Breadcrumb.Item current>№ 48 213</Breadcrumb.Item>

@@ -24,12 +24,12 @@ export default function PopoverFlushExample() {
           <React.Fragment key={event.id}>
             <Divider role="presentation" />
             <div className={styles.flushRow}>
-              <Typography.Root as="span" variant="body-m">
+              <Typography as="span" variant="body-m">
                 {event.title}
-              </Typography.Root>
-              <Typography.Root as="span" variant="caption" tone="muted">
+              </Typography>
+              <Typography as="span" variant="caption" tone="muted">
                 {event.time}
-              </Typography.Root>
+              </Typography>
             </div>
           </React.Fragment>
         ))}

@@ -45,9 +45,9 @@ export default function DndBoardExample() {
           return (
             <section key={column.status} className={styles.column} aria-label={column.title}>
               <div className={styles.columnHeader}>
-                <Typography.Root as="h4" variant="title-s">
+                <Typography as="h4" variant="title-s">
                   {column.title}
-                </Typography.Root>
+                </Typography>
                 <Badge.Root>{inColumn.length}</Badge.Root>
               </div>
               <Dnd.Sortable
@@ -65,12 +65,12 @@ export default function DndBoardExample() {
                 onReorder={(id, beforeId) => place(id, column.status, beforeId)}
                 renderItem={(ticket) => (
                   <Dnd.SortableItem id={ticket.id} className={styles.ticket}>
-                    <Typography.Root as="span" variant="body-m">
+                    <Typography as="span" variant="body-m">
                       {ticket.title}
-                    </Typography.Root>
-                    <Typography.Root as="span" variant="caption" tone="muted">
+                    </Typography>
+                    <Typography as="span" variant="caption" tone="muted">
                       {ticket.id.toUpperCase()}
-                    </Typography.Root>
+                    </Typography>
                   </Dnd.SortableItem>
                 )}
               />

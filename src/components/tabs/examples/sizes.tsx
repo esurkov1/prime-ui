@@ -8,9 +8,9 @@ export default function TabsSizesExample() {
     <>
       {SIZES.map((size) => (
         <div key={size}>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
           <Tabs.Root size={size} defaultValue="all">
             <Tabs.List aria-label="Заявки">
               <Tabs.Item value="all">Все</Tabs.Item>

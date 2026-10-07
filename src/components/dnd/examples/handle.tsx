@@ -33,9 +33,9 @@ export default function DndHandleExample() {
         renderItem={(channel) => (
           <Dnd.SortableItem id={channel.id} className={styles.handleRow}>
             <Dnd.Handle />
-            <Typography.Root as="span" variant="body-m" className={styles.rowText}>
+            <Typography as="span" variant="body-m" className={styles.rowText}>
               {channel.title}
-            </Typography.Root>
+            </Typography>
             <Switch.Root
               aria-label={channel.title}
               checked={channel.enabled}

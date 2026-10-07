@@ -31,9 +31,9 @@ export default function ModalLongContentExample() {
         </Modal.Header>
         <Modal.Body>
           {TERMS.map((line) => (
-            <Typography.Root key={line} variant="body-m" tone="secondary">
+            <Typography key={line} variant="body-m" tone="secondary">
               {line}
-            </Typography.Root>
+            </Typography>
           ))}
         </Modal.Body>
         <Modal.Footer>

@@ -22,9 +22,9 @@ export default function DrawerControlledOpenExample() {
             <Drawer.Title>Счёт на оплату</Drawer.Title>
           </Drawer.Header>
           <Drawer.Body>
-            <Typography.Root variant="body-m" tone="secondary">
+            <Typography variant="body-m" tone="secondary">
               Счёт формируется 1-го числа по тарифу и числу активных пользователей за прошлый месяц.
-            </Typography.Root>
+            </Typography>
           </Drawer.Body>
         </Drawer.Content>
       </Drawer.Root>

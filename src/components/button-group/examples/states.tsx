@@ -8,25 +8,25 @@ export default function ButtonGroupStatesExample() {
         <ButtonGroup.Root aria-label="Статус задачи">
           <ButtonGroup.Item>Открыта</ButtonGroup.Item>
         </ButtonGroup.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           default
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <ButtonGroup.Root aria-label="Статус задачи">
           <ButtonGroup.Item pressed>В работе</ButtonGroup.Item>
         </ButtonGroup.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           pressed
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <ButtonGroup.Root aria-label="Статус задачи">
           <ButtonGroup.Item disabled>Архив</ButtonGroup.Item>
         </ButtonGroup.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           disabled
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

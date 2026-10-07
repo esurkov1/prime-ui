@@ -12,14 +12,14 @@ export default function TabsStatesExample() {
         </Tabs.Item>
       </Tabs.List>
       <Tabs.Panel value="profile">
-        <Typography.Root variant="body-m" tone="secondary">
+        <Typography variant="body-m" tone="secondary">
           Имя, должность и контакты.
-        </Typography.Root>
+        </Typography>
       </Tabs.Panel>
       <Tabs.Panel value="security">
-        <Typography.Root variant="body-m" tone="secondary">
+        <Typography variant="body-m" tone="secondary">
           Пароль и двухфакторная защита.
-        </Typography.Root>
+        </Typography>
       </Tabs.Panel>
     </Tabs.Root>
   );

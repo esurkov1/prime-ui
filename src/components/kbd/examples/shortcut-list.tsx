@@ -18,9 +18,9 @@ export default function KbdShortcutListExample() {
       {SHORTCUTS.map((item) => (
         <div key={item.action} className={styles.listRow}>
           <dt>
-            <Typography.Root as="span" variant="body-m">
+            <Typography as="span" variant="body-m">
               {item.action}
-            </Typography.Root>
+            </Typography>
           </dt>
           <dd className={styles.chord}>
             {item.keys.map((key) => (
@@ -33,9 +33,9 @@ export default function KbdShortcutListExample() {
       ))}
       <div className={styles.listRow}>
         <dt>
-          <Typography.Root as="span" variant="body-m">
+          <Typography as="span" variant="body-m">
             Закрыть окно
-          </Typography.Root>
+          </Typography>
         </dt>
         <dd className={styles.chord}>
           <Kbd>

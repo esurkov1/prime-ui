@@ -16,12 +16,12 @@ export default function DividerOverviewExample() {
         <div key={row.label}>
           {index > 0 ? <Divider /> : null}
           <div className={styles.listRow}>
-            <Typography.Root as="span" variant="body-m">
+            <Typography as="span" variant="body-m">
               {row.label}
-            </Typography.Root>
-            <Typography.Root as="span" variant="body-m" tone="secondary">
+            </Typography>
+            <Typography as="span" variant="body-m" tone="secondary">
               {row.value}
-            </Typography.Root>
+            </Typography>
           </div>
         </div>
       ))}

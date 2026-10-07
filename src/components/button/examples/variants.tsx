@@ -19,9 +19,9 @@ export default function ButtonVariantsExample() {
               <Button.Root variant={variant} tone={tone}>
                 {label}
               </Button.Root>
-              <Typography.Root as="span" variant="caption" tone="muted">
+              <Typography as="span" variant="caption" tone="muted">
                 {variant} · {tone}
-              </Typography.Root>
+              </Typography>
             </div>
           ))}
         </div>

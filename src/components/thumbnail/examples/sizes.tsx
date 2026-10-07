@@ -13,9 +13,9 @@ export default function ThumbnailSizesExample() {
               <Icon name="object.package" />
             </Thumbnail.Fallback>
           </Thumbnail.Root>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

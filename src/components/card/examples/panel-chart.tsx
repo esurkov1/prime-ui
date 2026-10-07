@@ -24,9 +24,9 @@ export default function CardPanelChartExample() {
           </Card.SectionTrailing>
         </Card.SectionHeader>
         <Card.Body>
-          <Typography.Root variant="body-s" tone="secondary">
+          <Typography variant="body-s" tone="secondary">
             С начала квартала: ₽ 12,6 млн, план выполнен на 84%.
-          </Typography.Root>
+          </Typography>
         </Card.Body>
         <Card.Chart>
           <svg

@@ -27,9 +27,9 @@ export default function TagSelectInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <Typography.Root as="h3" variant="title-m">
+      <Typography as="h3" variant="title-m">
         Новая задача
-      </Typography.Root>
+      </Typography>
       <Input.Root label="Название" required>
         <Input.Wrapper>
           <Input.Field name="title" placeholder="Коротко о задаче" />

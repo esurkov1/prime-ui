@@ -17,9 +17,9 @@ export default function PaginationControlledExample() {
   return (
     <Card.Root>
       <div className={styles.footer}>
-        <Typography.Root as="span" variant="body-s" tone="secondary">
+        <Typography as="span" variant="body-s" tone="secondary">
           Счета {from}–{to} из {TOTAL_INVOICES}
-        </Typography.Root>
+        </Typography>
         <div className={styles.controls}>
           <Select.Root
             size="s"

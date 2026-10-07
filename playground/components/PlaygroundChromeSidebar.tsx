@@ -44,12 +44,12 @@ function Brand() {
         <span />
       </span>
       <span className="playgroundBrandText">
-        <Typography.Root as="span" variant="title-s">
+        <Typography as="span" variant="title-s">
           Prime UI
-        </Typography.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        </Typography>
+        <Typography as="span" variant="caption" tone="muted">
           Graphite · playground
-        </Typography.Root>
+        </Typography>
       </span>
     </Link>
   );

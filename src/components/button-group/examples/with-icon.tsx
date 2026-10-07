@@ -19,9 +19,9 @@ export default function ButtonGroupWithIconExample() {
             Копировать
           </ButtonGroup.Item>
         </ButtonGroup.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           leading
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <ButtonGroup.Root aria-label="Режим просмотра">
@@ -36,9 +36,9 @@ export default function ButtonGroupWithIconExample() {
             </ButtonGroup.Icon>
           </ButtonGroup.Item>
         </ButtonGroup.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           icon-only
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

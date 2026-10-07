@@ -11,9 +11,9 @@ export default function BadgeSizesExample() {
           <Badge.Root size={size} color="blue">
             Бета
           </Badge.Root>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

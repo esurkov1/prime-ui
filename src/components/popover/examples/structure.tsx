@@ -16,9 +16,9 @@ export default function PopoverStructureExample() {
           </Button.Root>
         </Popover.Trigger>
         <Popover.Content className={styles.panel}>
-          <Typography.Root variant="body-s" tone="secondary">
+          <Typography variant="body-s" tone="secondary">
             Ставка для экспорта товаров. Нужны подтверждающие документы в течение 180 дней.
-          </Typography.Root>
+          </Typography>
         </Popover.Content>
       </Popover.Root>
 

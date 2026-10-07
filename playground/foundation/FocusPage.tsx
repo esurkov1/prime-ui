@@ -90,10 +90,10 @@ function KeyboardDemo() {
   const [invalid, setInvalid] = React.useState(false);
   return (
     <Panel className={s.focusDemo}>
-      <Typography.Root as="p" variant="body-s" tone="muted">
+      <Typography as="p" variant="body-s" tone="muted">
         Нажмите Tab. Кольцо появляется только при навигации с клавиатуры (
         <code>:focus-visible</code>). При клике мышью его нет.
-      </Typography.Root>
+      </Typography>
       <div className={s.focusRow}>
         <Button.Root>Сохранить</Button.Root>
         <Button.Root variant="soft" tone="neutral">
@@ -118,9 +118,9 @@ function KeyboardDemo() {
 /** The ring drawn permanently (an illustration, not a state of a component) to compare surfaces. */
 function StaticRing() {
   return (
-    <Typography.Root as="span" variant="body-m" weight="medium" className={s.ringSample}>
+    <Typography as="span" variant="body-m" weight="medium" className={s.ringSample}>
       Фокус
-    </Typography.Root>
+    </Typography>
   );
 }
 

@@ -89,9 +89,9 @@ export function PlaygroundLayout() {
                 <Menu />
               </Button.Icon>
             </Button.Root>
-            <Typography.Root as="span" variant="title-m" truncate className="playgroundMobileTitle">
+            <Typography as="span" variant="title-m" truncate className="playgroundMobileTitle">
               {page?.label ?? "Prime UI"}
-            </Typography.Root>
+            </Typography>
             <Button.Root
               variant="ghost"
               tone="neutral"

@@ -34,10 +34,10 @@ const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
     header: "Проп",
     minWidth: "10rem",
     cell: (row) => (
-      <Typography.Root as="span" variant="body-m">
+      <Typography as="span" variant="body-m">
         <code>{row.prop}</code>{" "}
         {isRequired(row) ? <Badge.Root color="orange">обязательный</Badge.Root> : null}
-      </Typography.Root>
+      </Typography>
     ),
   },
   {
@@ -45,9 +45,9 @@ const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
     header: "Тип",
     minWidth: "10rem",
     cell: (row) => (
-      <Typography.Root as="span" variant="body-m">
+      <Typography as="span" variant="body-m">
         <code>{row.type}</code>
-      </Typography.Root>
+      </Typography>
     ),
   },
   {
@@ -56,13 +56,13 @@ const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
     minWidth: "8rem",
     cell: (row) =>
       row.defaultValue === "—" || row.defaultValue === "" ? (
-        <Typography.Root as="span" variant="body-m" tone="muted">
+        <Typography as="span" variant="body-m" tone="muted">
           —
-        </Typography.Root>
+        </Typography>
       ) : (
-        <Typography.Root as="span" variant="body-m">
+        <Typography as="span" variant="body-m">
           <code>{row.defaultValue}</code>
-        </Typography.Root>
+        </Typography>
       ),
   },
   {
@@ -71,9 +71,9 @@ const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
     grow: true,
     minWidth: "16rem",
     cell: (row) => (
-      <Typography.Root as="span" variant="body-m" tone="secondary">
+      <Typography as="span" variant="body-m" tone="secondary">
         {renderInlineCode(row.description)}
-      </Typography.Root>
+      </Typography>
     ),
   },
 ];

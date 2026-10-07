@@ -11,16 +11,16 @@ export default function AppShellContainedExample() {
           <PageContent.Root maxWidth="readable">
             <PageContent.Header>
               {/* In a real app this is PageContent.Title (the page h1). */}
-              <Typography.Root as="h2" variant="heading-m">
+              <Typography as="h2" variant="heading-m">
                 Как подключить оплату
-              </Typography.Root>
+              </Typography>
               <PageContent.Description>Обновлено 1 октября 2026 года.</PageContent.Description>
             </PageContent.Header>
             <PageContent.Body>
-              <Typography.Root as="p" variant="body-l">
+              <Typography as="p" variant="body-l">
                 Откройте раздел «Настройки», выберите «Оплата» и укажите реквизиты. После проверки
                 банк пришлёт подтверждение, и приём платежей включится автоматически.
-              </Typography.Root>
+              </Typography>
             </PageContent.Body>
           </PageContent.Root>
         </AppShell.Main>

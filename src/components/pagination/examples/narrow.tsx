@@ -9,15 +9,15 @@ export default function PaginationNarrowExample() {
       <Card.Body>
         <div>
           <Pagination compact totalPages={12} defaultValue={3} />
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             compact
-          </Typography.Root>
+          </Typography>
         </div>
         <div>
           <Pagination compact="auto" totalPages={12} defaultValue={3} />
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             compact="auto"
-          </Typography.Root>
+          </Typography>
         </div>
       </Card.Body>
     </Card.Root>

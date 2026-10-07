@@ -9,9 +9,9 @@ export default function SpinnerVariantsExample() {
       {TONES.map((tone) => (
         <div key={tone}>
           <Spinner tone={tone} />
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {tone}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

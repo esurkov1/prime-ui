@@ -27,9 +27,9 @@ export default function DndDropZonesExample() {
       <div className={styles.board}>
         <section className={styles.column} aria-label="Входящие">
           <div className={styles.columnHeader}>
-            <Typography.Root as="h4" variant="title-s">
+            <Typography as="h4" variant="title-s">
               Входящие
-            </Typography.Root>
+            </Typography>
             <Badge.Root>{inFolder("inbox").length}</Badge.Root>
           </div>
           {inFolder("inbox").map((doc) => (
@@ -40,9 +40,9 @@ export default function DndDropZonesExample() {
               label={doc.title}
               className={styles.ticket}
             >
-              <Typography.Root as="span" variant="body-m">
+              <Typography as="span" variant="body-m">
                 {doc.title}
-              </Typography.Root>
+              </Typography>
             </Dnd.Draggable>
           ))}
         </section>
@@ -62,16 +62,16 @@ export default function DndDropZonesExample() {
             }
           >
             <div className={styles.columnHeader}>
-              <Typography.Root as="h4" variant="title-s">
+              <Typography as="h4" variant="title-s">
                 {folder.title}
-              </Typography.Root>
+              </Typography>
               <Badge.Root>{inFolder(folder.id).length}</Badge.Root>
             </div>
             {inFolder(folder.id).map((doc) => (
               <div key={doc.id} className={styles.ticket}>
-                <Typography.Root as="span" variant="body-m">
+                <Typography as="span" variant="body-m">
                   {doc.title}
-                </Typography.Root>
+                </Typography>
               </div>
             ))}
           </Dnd.DropZone>

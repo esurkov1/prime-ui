@@ -24,10 +24,10 @@ export default function ModalSizesExample() {
               <Modal.Description>{width}</Modal.Description>
             </Modal.Header>
             <Modal.Body>
-              <Typography.Root variant="body-m" tone="secondary">
+              <Typography variant="body-m" tone="secondary">
                 Выбирайте самый узкий размер, в который содержимое помещается без переносов строк
                 формы.
-              </Typography.Root>
+              </Typography>
             </Modal.Body>
             <Modal.Footer>
               <Modal.Close>

@@ -27,17 +27,17 @@ export default function ProgressCircleSegmentsExample() {
         <ProgressCircle size="xl" segments={REVIEW} aria-label="Заявки">
           100
         </ProgressCircle>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Заявки
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={styles.item}>
         <ProgressCircle size="xl" segments={SPRINT} max={30} aria-label="Спринт">
           18/30
         </ProgressCircle>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Спринт
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={styles.item}>
         <ProgressCircle
@@ -49,15 +49,15 @@ export default function ProgressCircleSegmentsExample() {
         >
           71%
         </ProgressCircle>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Хранилище
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={styles.item}>
         <ProgressCircle size="xl" segments={[]} aria-label="Нет данных" />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Нет данных
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

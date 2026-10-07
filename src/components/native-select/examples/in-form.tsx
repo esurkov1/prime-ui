@@ -15,9 +15,9 @@ export default function NativeSelectInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <Typography.Root as="h3" variant="title-m">
+      <Typography as="h3" variant="title-m">
         Доставка
-      </Typography.Root>
+      </Typography>
       <NativeSelect
         name="city"
         label="Город"

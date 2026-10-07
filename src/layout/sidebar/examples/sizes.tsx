@@ -10,9 +10,9 @@ export default function SidebarSizesExample() {
     <div className={styles.sizes}>
       {SIZES.map((size) => (
         <div key={size} className={styles.sizeColumn}>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
           <div className={`${styles.stage} ${styles.stageAuto}`}>
             <Sidebar.Root size={size} responsive={false}>
               <Sidebar.Content>

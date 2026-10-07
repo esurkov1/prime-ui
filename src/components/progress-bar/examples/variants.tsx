@@ -22,9 +22,9 @@ export default function ProgressBarVariantsExample() {
           {row.map(({ tone, label, value }) => (
             <div key={tone}>
               <ProgressBar value={value} tone={tone} label={label} showValue />
-              <Typography.Root as="span" variant="caption" tone="muted">
+              <Typography as="span" variant="caption" tone="muted">
                 {tone}
-              </Typography.Root>
+              </Typography>
             </div>
           ))}
         </div>

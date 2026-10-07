@@ -96,40 +96,40 @@ export default function IntroPage() {
             <DemoSectionTitle>Как устроена система</DemoSectionTitle>
             <ul className="introPageList">
               <li>
-                <Typography.Root as="span" variant="body-m">
-                  <Typography.Root as="span" variant="body-m" weight="semibold">
+                <Typography as="span" variant="body-m">
+                  <Typography as="span" variant="body-m" weight="semibold">
                     Глубина через заливку.
-                  </Typography.Root>{" "}
+                  </Typography>{" "}
                   Фон приложения серый, карточки белые, поля на карточке чуть темнее. У контролов
                   нет рамок. Линии остаются только там, где нужен разделитель.
-                </Typography.Root>
+                </Typography>
               </li>
               <li>
-                <Typography.Root as="span" variant="body-m">
-                  <Typography.Root as="span" variant="body-m" weight="semibold">
+                <Typography as="span" variant="body-m">
+                  <Typography as="span" variant="body-m" weight="semibold">
                     Сетка 4 px.
-                  </Typography.Root>{" "}
+                  </Typography>{" "}
                   Все отступы, высоты и радиусы кратны четырём. Внутри группы элементы стоят ближе,
                   чем группы между собой.
-                </Typography.Root>
+                </Typography>
               </li>
               <li>
-                <Typography.Root as="span" variant="body-m">
-                  <Typography.Root as="span" variant="body-m" weight="semibold">
+                <Typography as="span" variant="body-m">
+                  <Typography as="span" variant="body-m" weight="semibold">
                     Одна ось размеров.
-                  </Typography.Root>{" "}
+                  </Typography>{" "}
                   <code>xs · s · m · l · xl</code>, по умолчанию <code>m</code> (36 px). Кнопка,
                   поле, селект и вкладки одного размера выравниваются в ряд.
-                </Typography.Root>
+                </Typography>
               </li>
               <li>
-                <Typography.Root as="span" variant="body-m">
-                  <Typography.Root as="span" variant="body-m" weight="semibold">
+                <Typography as="span" variant="body-m">
+                  <Typography as="span" variant="body-m" weight="semibold">
                     Только токены.
-                  </Typography.Root>{" "}
+                  </Typography>{" "}
                   Компоненты берут значения из семантических переменных <code>--prime-*</code>.
                   Светлая и тёмная темы — это два набора значений для одних и тех же ролей.
-                </Typography.Root>
+                </Typography>
               </li>
             </ul>
           </div>
@@ -162,33 +162,33 @@ export default function IntroPage() {
             <DemoSectionTitle>Как пользоваться</DemoSectionTitle>
             <ul className="introPageList">
               <li>
-                <Typography.Root as="span" variant="body-m">
+                <Typography as="span" variant="body-m">
                   Слева разделы по категориям: от основы до оверлеев. У каждого компонента своя
                   страница с превью, кодом примера и таблицей API.
-                </Typography.Root>
+                </Typography>
               </li>
               <li>
-                <Typography.Root as="span" variant="body-m">
+                <Typography as="span" variant="body-m">
                   Внизу сайдбара можно переключить{" "}
-                  <Typography.Root as="span" variant="body-m" weight="semibold">
+                  <Typography as="span" variant="body-m" weight="semibold">
                     тему
-                  </Typography.Root>{" "}
+                  </Typography>{" "}
                   и{" "}
-                  <Typography.Root as="span" variant="body-m" weight="semibold">
+                  <Typography as="span" variant="body-m" weight="semibold">
                     фон превью
-                  </Typography.Root>{" "}
+                  </Typography>{" "}
                   (canvas, surface, raised, accent). Так видно, как компонент выглядит на фоне
                   страницы, в карточке и внутри меню.
-                </Typography.Root>
+                </Typography>
               </li>
               <li>
-                <Typography.Root as="span" variant="body-m">
+                <Typography as="span" variant="body-m">
                   Полный контракт системы описан в{" "}
                   <LinkButton href={FOUNDATION_DOC} rel="noopener noreferrer" target="_blank">
                     docs/foundation.md
                   </LinkButton>
                   . Здесь он показан вживую.
-                </Typography.Root>
+                </Typography>
               </li>
             </ul>
           </div>
@@ -202,23 +202,23 @@ export default function IntroPage() {
             <DemoSectionTitle>Ссылки</DemoSectionTitle>
             <ul className="introPageList">
               <li>
-                <Typography.Root as="span" variant="body-m">
+                <Typography as="span" variant="body-m">
                   <LinkButton href={README} rel="noopener noreferrer" target="_blank">
                     README
                   </LinkButton>
                   : установка, экспорты пакета, провайдеры.
-                </Typography.Root>
+                </Typography>
               </li>
               <li>
-                <Typography.Root as="span" variant="body-m">
+                <Typography as="span" variant="body-m">
                   <LinkButton href={SKILL} rel="noopener noreferrer" target="_blank">
                     SKILL/SKILL.md
                   </LinkButton>
                   : правила для AI-агентов, которые собирают интерфейсы на ките.
-                </Typography.Root>
+                </Typography>
               </li>
               <li>
-                <Typography.Root as="span" variant="body-m">
+                <Typography as="span" variant="body-m">
                   Пакет на{" "}
                   <LinkButton href={NPM} rel="noopener noreferrer" target="_blank">
                     npm
@@ -228,7 +228,7 @@ export default function IntroPage() {
                     Issues
                   </LinkButton>
                   .
-                </Typography.Root>
+                </Typography>
               </li>
             </ul>
           </div>

@@ -6,15 +6,15 @@ import styles from "./examples.module.css";
 export default function TypographyOverviewExample() {
   return (
     <div className={styles.block}>
-      <Typography.Root as="h3" variant="title-m">
+      <Typography as="h3" variant="title-m">
         Счёт № 4821 оплачен
-      </Typography.Root>
-      <Typography.Root as="p" variant="body-m" tone="secondary">
+      </Typography>
+      <Typography as="p" variant="body-m" tone="secondary">
         Деньги поступили на расчётный счёт. Закрывающие документы придут на почту бухгалтерии.
-      </Typography.Root>
-      <Typography.Root as="span" variant="caption" tone="muted">
+      </Typography>
+      <Typography as="span" variant="caption" tone="muted">
         12 марта, 14:20
-      </Typography.Root>
+      </Typography>
     </div>
   );
 }

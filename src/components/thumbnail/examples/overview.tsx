@@ -16,12 +16,12 @@ export default function ThumbnailOverviewExample() {
         </Thumbnail.Fallback>
       </Thumbnail.Root>
       <div className={styles.entityText}>
-        <Typography.Root variant="body-m" weight="medium" truncate>
+        <Typography variant="body-m" weight="medium" truncate>
           Yamaha NMAX 155 · 2026
-        </Typography.Root>
-        <Typography.Root variant="caption" tone="secondary" truncate>
+        </Typography>
+        <Typography variant="caption" tone="secondary" truncate>
           Серый · Пробег 3 200 км
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

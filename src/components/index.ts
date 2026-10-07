@@ -451,8 +451,8 @@ export type {
 export { Tooltip } from "./tooltip/Tooltip";
 export type {
   TypographyAs,
+  TypographyProps,
   TypographyRole,
-  TypographyRootProps,
   TypographyTracking,
   TypographyWeight,
 } from "./typography/Typography";

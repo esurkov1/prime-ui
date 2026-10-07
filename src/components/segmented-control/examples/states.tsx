@@ -9,18 +9,18 @@ export default function SegmentedControlStatesExample() {
           <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
           <SegmentedControl.Item value="archived">Архив</SegmentedControl.Item>
         </SegmentedControl.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           default
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <SegmentedControl.Root aria-label="Статус кампании">
           <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
           <SegmentedControl.Item value="archived">Архив</SegmentedControl.Item>
         </SegmentedControl.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           empty
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <SegmentedControl.Root defaultValue="active" aria-label="Статус кампании">
@@ -29,18 +29,18 @@ export default function SegmentedControlStatesExample() {
             Архив
           </SegmentedControl.Item>
         </SegmentedControl.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Item disabled
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <SegmentedControl.Root defaultValue="active" disabled aria-label="Статус кампании">
           <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
           <SegmentedControl.Item value="archived">Архив</SegmentedControl.Item>
         </SegmentedControl.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           disabled
-        </Typography.Root>
+        </Typography>
       </div>
     </div>
   );

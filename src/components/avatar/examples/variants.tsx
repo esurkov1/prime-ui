@@ -28,9 +28,9 @@ export default function AvatarVariantsExample() {
               <Avatar.Root color={color}>
                 <Avatar.Fallback>{initials}</Avatar.Fallback>
               </Avatar.Root>
-              <Typography.Root as="span" variant="caption" tone="muted">
+              <Typography as="span" variant="caption" tone="muted">
                 {color}
-              </Typography.Root>
+              </Typography>
             </div>
           ))}
         </div>

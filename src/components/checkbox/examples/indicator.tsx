@@ -43,9 +43,9 @@ export default function CheckboxIndicatorExample() {
             }}
           >
             <Checkbox.Indicator checked={isSelected} />
-            <Typography.Root as="span" variant="body-m">
+            <Typography as="span" variant="body-m">
               {city.label}
-            </Typography.Root>
+            </Typography>
           </div>
         );
       })}

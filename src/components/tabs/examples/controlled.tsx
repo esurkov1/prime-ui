@@ -23,9 +23,9 @@ export default function TabsControlledExample() {
       </Tabs.List>
       {QUEUES.map((item) => (
         <Tabs.Panel key={item.value} value={item.value}>
-          <Typography.Root variant="body-m" tone="secondary">
+          <Typography variant="body-m" tone="secondary">
             Заявок в разделе «{item.label}»: {item.count}.
-          </Typography.Root>
+          </Typography>
         </Tabs.Panel>
       ))}
     </Tabs.Root>

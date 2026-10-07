@@ -36,9 +36,9 @@ export default function DataTableSelectionExample() {
       paging="none"
       toolbar={
         <div className={styles.toolbar}>
-          <Typography.Root as="span" variant="body-s" tone="secondary">
+          <Typography as="span" variant="body-s" tone="secondary">
             Выбрано: {selected.length} из {MEMBERS.length}
-          </Typography.Root>
+          </Typography>
           <div className={styles.filters}>
             <Button.Root
               variant="outline"

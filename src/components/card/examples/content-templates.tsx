@@ -36,17 +36,12 @@ export default function CardContentTemplatesExample() {
           {EVENTS.map((e) => (
             <Card.ListItem key={e.text}>
               <span className={styles.listRow}>
-                <Typography.Root as="span" variant="body-m" truncate>
+                <Typography as="span" variant="body-m" truncate>
                   {e.text}
-                </Typography.Root>
-                <Typography.Root
-                  as="span"
-                  variant="caption"
-                  tone="muted"
-                  className={styles.listMeta}
-                >
+                </Typography>
+                <Typography as="span" variant="caption" tone="muted" className={styles.listMeta}>
                   {e.time}
-                </Typography.Root>
+                </Typography>
               </span>
             </Card.ListItem>
           ))}

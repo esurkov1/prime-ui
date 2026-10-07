@@ -11,9 +11,9 @@ export default function CommandMenuControlledOpenExample() {
       <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(true)}>
         Открыть команды
       </Button.Root>
-      <Typography.Root as="span" variant="body-s" tone="secondary">
+      <Typography as="span" variant="body-s" tone="secondary">
         Запрос: «{query || "…"}»
-      </Typography.Root>
+      </Typography>
       <CommandMenu.Root open={open} onOpenChange={setOpen} aria-label="Команды">
         <CommandMenu.Input placeholder="Начните вводить" value={query} onValueChange={setQuery} />
         <CommandMenu.List>

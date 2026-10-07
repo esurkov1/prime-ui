@@ -44,9 +44,9 @@ export default function DataTableSizesExample() {
             getRowKey={(row) => row.id}
             paging="none"
           />
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

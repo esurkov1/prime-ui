@@ -64,21 +64,21 @@ function RoleScale() {
       {ROLES.map((r) => (
         <div key={r.key} className={s.typeRow}>
           <div className={s.typeMeta}>
-            <Typography.Root as="span" variant="body-s" weight="medium">
+            <Typography as="span" variant="body-s" weight="medium">
               {r.role}
-            </Typography.Root>
-            <Typography.Root as="span" variant="caption" tone="muted" className={s.numeric}>
+            </Typography>
+            <Typography as="span" variant="caption" tone="muted" className={s.numeric}>
               {formatPx(r.sizePx)}/{formatPx(r.lineHeightPx)} · {r.weight} ·{" "}
               {r.tracking === "0" ? "0" : r.tracking}
-            </Typography.Root>
-            <Typography.Root as="span" variant="caption" tone="secondary">
+            </Typography>
+            <Typography as="span" variant="caption" tone="secondary">
               {ROLE_USE[r.role] ?? ""}
-            </Typography.Root>
+            </Typography>
             <TokenName>{`${toVarName(`text.${r.key}`)}-*`}</TokenName>
           </div>
-          <Typography.Root as="p" variant={r.role as TypographyRole} className={s.typeSample}>
+          <Typography as="p" variant={r.role as TypographyRole} className={s.typeSample}>
             {SAMPLE[r.role] ?? HEADING_SAMPLE}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </Panel>
@@ -92,25 +92,25 @@ function FontFamilies() {
     <div className={s.twoCol}>
       <Panel className={s.fontCard}>
         <TokenName>--prime-font-family-sans</TokenName>
-        <Typography.Root as="span" variant="display-s">
+        <Typography as="span" variant="display-s">
           Golos Text
-        </Typography.Root>
+        </Typography>
         <div className={s.weightRow}>
           {WEIGHTS.map(([name, value]) => (
-            <Typography.Root key={name} as="span" variant="body-m" weight={name}>
+            <Typography key={name} as="span" variant="body-m" weight={name}>
               {value} {name}
-            </Typography.Root>
+            </Typography>
           ))}
         </div>
       </Panel>
       <Panel className={s.fontCard}>
         <TokenName>--prime-font-family-mono</TokenName>
-        <Typography.Root as="span" variant="code">
+        <Typography as="span" variant="code">
           JetBrains Mono
-        </Typography.Root>
-        <Typography.Root as="span" variant="code" tone="secondary">
+        </Typography>
+        <Typography as="span" variant="code" tone="secondary">
           ID 4f2a-91c0 · 0O 1lI
-        </Typography.Root>
+        </Typography>
       </Panel>
     </div>
   );
@@ -123,12 +123,12 @@ function ReadingWidth() {
   return (
     <Panel className={s.readingDemo}>
       <div className={s.readingMeasure}>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           <TokenName>--prime-layout-reading-max-width</TokenName> · body-l
-        </Typography.Root>
-        <Typography.Root as="p" variant="body-l">
+        </Typography>
+        <Typography as="p" variant="body-l">
           {READING_TEXT}
-        </Typography.Root>
+        </Typography>
       </div>
     </Panel>
   );
@@ -140,21 +140,21 @@ function TabularNums() {
   return (
     <div className={s.twoCol}>
       <Panel className={s.numbersCard}>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           Пропорциональные цифры
-        </Typography.Root>
+        </Typography>
         {NUMBERS.map((n) => (
-          <Typography.Root key={n} as="span" variant="title-m" className={s.numberLine}>
+          <Typography key={n} as="span" variant="title-m" className={s.numberLine}>
             {n}
-          </Typography.Root>
+          </Typography>
         ))}
       </Panel>
       <Panel className={s.numbersCard}>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           <code>font-variant-numeric: tabular-nums</code>
-        </Typography.Root>
+        </Typography>
         {NUMBERS.map((n) => (
-          <Typography.Root
+          <Typography
             key={n}
             as="span"
             variant="title-m"
@@ -162,7 +162,7 @@ function TabularNums() {
             data-tabular="true"
           >
             {n}
-          </Typography.Root>
+          </Typography>
         ))}
       </Panel>
     </div>

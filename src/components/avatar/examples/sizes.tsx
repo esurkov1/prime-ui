@@ -11,9 +11,9 @@ export default function AvatarSizesExample() {
           <Avatar.Root size={size} color="blue" aria-label="Анна Климова">
             <Avatar.Fallback>АК</Avatar.Fallback>
           </Avatar.Root>
-          <Typography.Root as="span" variant="caption" tone="muted">
+          <Typography as="span" variant="caption" tone="muted">
             {size}
-          </Typography.Root>
+          </Typography>
         </div>
       ))}
     </div>

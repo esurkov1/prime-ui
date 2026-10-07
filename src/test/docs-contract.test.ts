@@ -197,7 +197,7 @@ describe("docs contract", () => {
         expect(css, file).not.toMatch(/--prime-(ref|sys)-/);
         expect(css, file).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
         expect(css, file).not.toMatch(/(?<![\w-])\d*\.?\d+(px|rem)\b/);
-        // Text is styled by Typography.Root, never by example CSS.
+        // Text is styled by Typography, never by example CSS.
         expect(css, file).not.toMatch(
           /^\s*(font-size|font-weight|line-height|letter-spacing|font-family)\s*:/m,
         );

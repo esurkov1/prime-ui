@@ -32,12 +32,12 @@ export default function DrawerDismissExample() {
           <Drawer.Description>catalog-october.xlsx · 1 240 строк</Drawer.Description>
         </Drawer.Header>
         <Drawer.Body>
-          <Typography.Root variant="body-m" tone="secondary">
+          <Typography variant="body-m" tone="secondary">
             Товары с совпадающим артикулом обновятся, новые добавятся в каталог.
-          </Typography.Root>
-          <Typography.Root variant="body-m" tone="secondary">
+          </Typography>
+          <Typography variant="body-m" tone="secondary">
             Панель закрывается только кнопками: случайный клик мимо не сбросит настройки импорта.
-          </Typography.Root>
+          </Typography>
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Close>

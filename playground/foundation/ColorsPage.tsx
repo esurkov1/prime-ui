@@ -67,14 +67,14 @@ function Swatch({ path }: { path: string }) {
         style={{ background: `var(${varName})` }}
       />
       <figcaption className={s.swatchCaption}>
-        <Typography.Root as="span" variant="body-s" weight="medium">
+        <Typography as="span" variant="body-s" weight="medium">
           {path.split(".").slice(2).join(".")}
-        </Typography.Root>
+        </Typography>
         <TokenName>{varName}</TokenName>
-        <Typography.Root as="span" variant="caption" tone="muted" className={s.numeric}>
+        <Typography as="span" variant="caption" tone="muted" className={s.numeric}>
           {color ? (transparent ? "transparent" : toHex(color)) : "…"}
           {ref ? ` · ${ref}` : null}
-        </Typography.Root>
+        </Typography>
       </figcaption>
     </figure>
   );
@@ -86,13 +86,13 @@ function RoleGroups() {
       {ROLE_GROUPS.map((group) => (
         <Panel key={group} className={s.roleGroup}>
           <div className={s.roleGroupHead}>
-            <Typography.Root as="h3" variant="title-s">
+            <Typography as="h3" variant="title-s">
               <code>color.{group}</code>
-            </Typography.Root>
+            </Typography>
             {GROUP_NOTES[group] ? (
-              <Typography.Root as="p" variant="body-s" tone="muted">
+              <Typography as="p" variant="body-s" tone="muted">
                 {GROUP_NOTES[group]}
-              </Typography.Root>
+              </Typography>
             ) : null}
           </div>
           <div className={s.swatchGrid}>
@@ -167,9 +167,9 @@ function PrimitiveRamps() {
     <Panel className={s.ramps}>
       {RAMPS.map((ramp) => (
         <div key={ramp.hue} className={s.ramp}>
-          <Typography.Root as="span" variant="body-s" weight="medium" className={s.rampName}>
+          <Typography as="span" variant="body-s" weight="medium" className={s.rampName}>
             {ramp.hue}
-          </Typography.Root>
+          </Typography>
           <ul className={s.rampSteps} aria-label={`Шкала ${ramp.hue}`}>
             {ramp.steps.map(({ step, hex }) => (
               <li

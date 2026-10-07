@@ -48,15 +48,15 @@ export default function DataTableContentWidthExample() {
           getRowKey={(row) => row.id}
           fullWidth={false}
         />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           fullWidth=&#123;false&#125; · align="center"
-        </Typography.Root>
+        </Typography>
       </div>
       <div>
         <DataTable columns={NOTE_COLUMNS} rows={TASKS} getRowKey={(row) => row.id} />
-        <Typography.Root as="span" variant="caption" tone="muted">
+        <Typography as="span" variant="caption" tone="muted">
           grow
-        </Typography.Root>
+        </Typography>
       </div>
     </>
   );

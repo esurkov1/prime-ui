@@ -21,25 +21,25 @@ export default function ScrollContainerEdgeFadeExample() {
   return (
     <div className={styles.layout}>
       <Card.Root role="region" className={styles.card} aria-label="Лента событий">
-        <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
+        <Typography as="h3" variant="title-s" className={styles.cardTitle}>
           Лента событий
-        </Typography.Root>
+        </Typography>
         <ScrollContainer fade>
           <ul className={styles.list}>
             {EVENTS.map((event) => (
               <li key={event}>
-                <Typography.Root as="span" variant="body-m" tone="secondary">
+                <Typography as="span" variant="body-m" tone="secondary">
                   {event}
-                </Typography.Root>
+                </Typography>
               </li>
             ))}
           </ul>
         </ScrollContainer>
       </Card.Root>
       <Card.Root role="region" className={styles.card} aria-label="Фильтры">
-        <Typography.Root as="h3" variant="title-s" className={styles.cardTitle}>
+        <Typography as="h3" variant="title-s" className={styles.cardTitle}>
           Фильтры
-        </Typography.Root>
+        </Typography>
         <ScrollContainer axis="horizontal" fade scrollbar="hidden">
           <div className={styles.strip}>
             {TAGS.map((tag) => (

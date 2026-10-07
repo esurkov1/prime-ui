@@ -21,12 +21,12 @@ export default function TextareaInFormExample() {
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
       <div className={styles.formHeader}>
-        <Typography.Root as="h3" variant="title-m">
+        <Typography as="h3" variant="title-m">
           Обращение в поддержку
-        </Typography.Root>
-        <Typography.Root as="p" variant="body-s" tone="secondary">
+        </Typography>
+        <Typography as="p" variant="body-s" tone="secondary">
           Ответим в течение рабочего дня.
-        </Typography.Root>
+        </Typography>
       </div>
       <div className={styles.formFields}>
         <Input.Root label="Тема" required>

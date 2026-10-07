@@ -21,14 +21,14 @@ export default function PageContentOverviewExample() {
         </PageContent.Header>
         <PageContent.Body>
           <Card.Root variant="panel">
-            <Typography.Root variant="body-m" tone="secondary">
+            <Typography variant="body-m" tone="secondary">
               Компания «Прайм Софт», часовой пояс Москва (UTC+3), валюта — рубль.
-            </Typography.Root>
+            </Typography>
           </Card.Root>
           <Card.Root variant="panel">
-            <Typography.Root variant="body-m" tone="secondary">
+            <Typography variant="body-m" tone="secondary">
               Письма о новых заказах и сводка по понедельникам включены.
-            </Typography.Root>
+            </Typography>
           </Card.Root>
         </PageContent.Body>
       </PageContent.Section>

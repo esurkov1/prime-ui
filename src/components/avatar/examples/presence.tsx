@@ -22,9 +22,9 @@ export default function AvatarPresenceExample() {
               labels={person.status === "away" ? { away: "Отошёл до 15:00" } : undefined}
             />
           </Avatar.Root>
-          <Typography.Root as="span" variant="body-m">
+          <Typography as="span" variant="body-m">
             {person.name}
-          </Typography.Root>
+          </Typography>
         </li>
       ))}
     </ul>

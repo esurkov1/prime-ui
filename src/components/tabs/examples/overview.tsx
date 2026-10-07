@@ -20,9 +20,9 @@ export default function TabsOverviewExample() {
       </Tabs.List>
       {SECTIONS.map((section) => (
         <Tabs.Panel key={section.value} value={section.value}>
-          <Typography.Root variant="body-m" tone="secondary">
+          <Typography variant="body-m" tone="secondary">
             {section.text}
-          </Typography.Root>
+          </Typography>
         </Tabs.Panel>
       ))}
     </Tabs.Root>

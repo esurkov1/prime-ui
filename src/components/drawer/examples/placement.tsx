@@ -21,9 +21,9 @@ export default function DrawerPlacementExample() {
               <Drawer.Title>{title}</Drawer.Title>
             </Drawer.Header>
             <Drawer.Body>
-              <Typography.Root variant="body-m" tone="secondary">
+              <Typography variant="body-m" tone="secondary">
                 Скругление только со стороны страницы, подложка затемняет остальное.
-              </Typography.Root>
+              </Typography>
             </Drawer.Body>
           </Drawer.Content>
         </Drawer.Root>

@@ -62,15 +62,15 @@ type KeyRow = ComponentAccessibility["keyboard"][number];
 type LabelRow = ApiLabel;
 
 const code = (text: string) => (
-  <Typography.Root as="span" variant="body-m">
+  <Typography as="span" variant="body-m">
     <code>{text}</code>
-  </Typography.Root>
+  </Typography>
 );
 
 const prose = (text: string) => (
-  <Typography.Root as="span" variant="body-m" tone="secondary">
+  <Typography as="span" variant="body-m" tone="secondary">
     {renderInlineCode(text)}
-  </Typography.Root>
+  </Typography>
 );
 
 const KEY_COLUMNS: DataTableColumn<KeyRow>[] = [
@@ -167,9 +167,9 @@ export function ComponentPage({ page }: { page: ComponentPageConfig }) {
             <ul className="demoList">
               {accessibility.aria.map((line) => (
                 <li key={line}>
-                  <Typography.Root as="span" variant="body-m" tone="secondary">
+                  <Typography as="span" variant="body-m" tone="secondary">
                     {renderInlineCode(line)}
-                  </Typography.Root>
+                  </Typography>
                 </li>
               ))}
             </ul>

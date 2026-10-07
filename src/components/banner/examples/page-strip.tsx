@@ -22,9 +22,9 @@ export default function BannerPageStripExample() {
           </Banner.Content>
         </Banner.Root>
         <div className={styles.pageBody}>
-          <Typography.Root as="h3" variant="heading-s">
+          <Typography as="h3" variant="heading-s">
             Отчёты
-          </Typography.Root>
+          </Typography>
         </div>
       </Card.Root>
       <Card.Root variant="panel">

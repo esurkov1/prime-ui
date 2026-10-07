@@ -13,9 +13,9 @@ export default function SpinnerLoadingRegionExample() {
     >
       <Card.Body className={styles.loading}>
         <Spinner size="l" tone="muted" aria-hidden="true" />
-        <Typography.Root as="p" variant="body-s" tone="secondary">
+        <Typography as="p" variant="body-s" tone="secondary">
           Считаем выручку за неделю
-        </Typography.Root>
+        </Typography>
       </Card.Body>
     </Card.Root>
   );

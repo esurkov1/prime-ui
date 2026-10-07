@@ -46,9 +46,9 @@ export default function TabsTwoLineExample() {
       </Tabs.List>
       {SECTIONS.map((section) => (
         <Tabs.Panel key={section.value} value={section.value}>
-          <Typography.Root variant="body-m" tone="secondary">
+          <Typography variant="body-m" tone="secondary">
             {section.title}: {section.count} заказов.
-          </Typography.Root>
+          </Typography>
         </Tabs.Panel>
       ))}
     </Tabs.Root>

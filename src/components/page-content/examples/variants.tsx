@@ -25,9 +25,9 @@ export default function PageContentVariantsExample() {
             <PageContent.Body>
               <Card.Root>
                 <Card.Body>
-                  <Typography.Root variant="body-s" tone="secondary">
+                  <Typography variant="body-s" tone="secondary">
                     {value} — {text}
-                  </Typography.Root>
+                  </Typography>
                 </Card.Body>
               </Card.Root>
             </PageContent.Body>

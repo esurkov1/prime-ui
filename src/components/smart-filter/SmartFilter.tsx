@@ -360,9 +360,9 @@ function Panel() {
       key: `field:${field.key}`,
       node: (
         <div className={styles.row} data-field={field.key}>
-          <Typography.Root as="span" variant="body-s" tone="secondary">
+          <Typography as="span" variant="body-s" tone="secondary">
             {field.label}
-          </Typography.Root>
+          </Typography>
           <div className={styles.values}>
             {shown.map((option) => (
               <ValueToggle
@@ -408,12 +408,12 @@ function Panel() {
     key: "footer",
     node: (
       <div className={styles.footer}>
-        <Typography.Root as="span" variant="caption" tone="muted" className={styles.hint}>
+        <Typography as="span" variant="caption" tone="muted" className={styles.hint}>
           {labels.hint}
-        </Typography.Root>
-        <Typography.Root as="span" variant="caption" tone="muted">
+        </Typography>
+        <Typography as="span" variant="caption" tone="muted">
           {formatLabel(labels.count, { count: total })}
-        </Typography.Root>
+        </Typography>
         {total > 0 && (
           <Button.Root variant="ghost" tone="neutral" size="xs" onClick={clearAll}>
             {labels.reset}
