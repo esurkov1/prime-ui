@@ -35,7 +35,7 @@ function createIcon(IconGlyph: IconComponent) {
        * Otherwise the icon follows its host: the host's `--prime-icon-size` if it sets one
        * (Button, Badge, Kbd…), else `--prime-control-<tier>-icon` of the nearest
        * `ControlSizeProvider`, else the `m` control icon (16px).
-       * Inside `Divider.Root` content the divider sizes the svg itself.
+       * Inside `Divider` content the divider sizes the svg itself.
        */
       const resolvedSize: ControlSize = sizeProp ?? controlSize ?? "m";
       const sizeClass = insideDividerContent
