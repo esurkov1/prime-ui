@@ -1,4 +1,4 @@
-/** A shell without navigation and `AppShell.Main contentWidth="contained"`: the page column is centred and capped at the content max width. Use for docs, articles and other long-read pages. */
+/** A shell without navigation whose main column is centred and capped for long reads — `contentWidth`. */
 import { AppShell, PageContent, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

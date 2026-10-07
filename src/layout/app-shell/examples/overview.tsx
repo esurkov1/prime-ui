@@ -1,10 +1,9 @@
-/** Full app frame: Sidebar in AppShell.Nav on the canvas, breadcrumbs in AppShell.Header, a page with an action and a card in AppShell.Main; with `fillViewport` only main scrolls. Use as the root layout of an app. */
-import { FileText, LayoutDashboard, Plus, Settings, Users } from "lucide-react";
-import { AppShell, Breadcrumb, Button, Card, PageContent, Sidebar, Typography } from "prime-ui-kit";
+/** The app frame: Sidebar in the nav column, breadcrumbs in the sticky header, the page in main; only main scrolls — `fillViewport`. */
+import { AppShell, Breadcrumb, Button, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-export default function AppShellWithSidebarExample() {
+export default function AppShellOverviewExample() {
   return (
     <div className={styles.stage}>
       <AppShell.Root fillViewport className={styles.shell}>
@@ -16,30 +15,18 @@ export default function AppShellWithSidebarExample() {
             <Sidebar.Content>
               <Sidebar.Item current>
                 <Sidebar.ItemIcon>
-                  <LayoutDashboard />
+                  <Icon name="nav.home" />
                 </Sidebar.ItemIcon>
                 Обзор
               </Sidebar.Item>
               <Sidebar.Item>
                 <Sidebar.ItemIcon>
-                  <Users />
-                </Sidebar.ItemIcon>
-                Клиенты
-              </Sidebar.Item>
-              <Sidebar.Item>
-                <Sidebar.ItemIcon>
-                  <FileText />
+                  <Icon name="nav.layoutGrid" />
                 </Sidebar.ItemIcon>
                 Отчёты
               </Sidebar.Item>
             </Sidebar.Content>
             <Sidebar.Footer>
-              <Sidebar.Item>
-                <Sidebar.ItemIcon>
-                  <Settings />
-                </Sidebar.ItemIcon>
-                Настройки
-              </Sidebar.Item>
               <Sidebar.Toggle />
             </Sidebar.Footer>
           </Sidebar.Root>
@@ -60,17 +47,16 @@ export default function AppShellWithSidebarExample() {
               <PageContent.Actions>
                 <Button.Root>
                   <Button.Icon>
-                    <Plus />
+                    <Icon name="action.add" />
                   </Button.Icon>
                   Новая сделка
                 </Button.Root>
               </PageContent.Actions>
             </PageContent.Header>
             <PageContent.Body>
-              <Card.Root variant="metric">
-                <Card.Label>Выручка за месяц</Card.Label>
-                <Card.Value>4,8 млн ₽</Card.Value>
-              </Card.Root>
+              <Typography.Root variant="body-m" tone="secondary">
+                Выручка за месяц — 4,8 млн ₽, 37 сделок в работе.
+              </Typography.Root>
             </PageContent.Body>
           </PageContent.Section>
         </AppShell.Main>
