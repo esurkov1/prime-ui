@@ -1,41 +1,20 @@
-/** Empty, filled, error and disabled fields with labels and hints. Use it as a reference for every field state. */
-import { Datepicker, type DatepickerRange } from "prime-ui-kit";
-import * as React from "react";
+/** An empty field with the default placeholder, a filled one and a disabled one — `disabled`. */
+import { Datepicker } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
+const CONTRACT_DATE = new Date(2026, 8, 15);
 
 export default function DatepickerStatesExample() {
-  const [filled, setFilled] = React.useState<Date | null>(new Date());
-  const [range, setRange] = React.useState<DatepickerRange>({ from: null, to: null });
-
   return (
-    <div className={styles.grid}>
-      <Datepicker.Root mode="single" label="Пусто" hint="Плейсхолдер «Выбрать дату»" fullWidth />
+    <>
+      <Datepicker.Root mode="single" label="empty" fullWidth />
+      <Datepicker.Root mode="single" label="default" defaultValue={CONTRACT_DATE} fullWidth />
       <Datepicker.Root
         mode="single"
-        label="Выбрано"
-        value={filled}
-        onValueChange={setFilled}
-        fullWidth
-      />
-      <Datepicker.Root
-        mode="range"
-        label="Ошибка"
-        required
-        error="Укажите период отпуска"
-        value={range}
-        onValueChange={setRange}
-        placeholder="Выбрать период"
-        fullWidth
-      />
-      <Datepicker.Root
-        mode="single"
-        label="Отключено"
-        value={filled}
-        onValueChange={setFilled}
+        label="disabled"
+        defaultValue={CONTRACT_DATE}
         disabled
         fullWidth
       />
-    </div>
+    </>
   );
 }

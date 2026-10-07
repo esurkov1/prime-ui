@@ -79,6 +79,9 @@
 /* ─── Trigger (field) ───────────────────────────────────────────────────── */
 
 .trigger {
+  /* Kit icons inside follow the field tier. */
+  --prime-icon-size: var(--dp-icon);
+
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -150,8 +153,6 @@
 
 .triggerIcon {
   flex-shrink: 0;
-  width: var(--dp-icon);
-  height: var(--dp-icon);
   color: var(--prime-color-text-muted);
 }
 
@@ -174,17 +175,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-}
-
-/* Datepicker.Badge: after the value, before the chevron (padX on both sides via the gap). */
-.triggerBadge {
-  display: inline-flex;
-  flex-shrink: 0;
-}
-
-/* Gray soft is a wash like the field: a stronger wash keeps a neutral badge visible (§4). */
-.triggerBadge > [data-color="gray"]:not([data-disabled="true"]) {
-  background: var(--prime-color-fill-strong);
 }
 
 .trigger[data-empty="true"]:not(:disabled) .triggerLabel {
@@ -249,44 +239,13 @@
   letter-spacing: var(--prime-text-caption-tracking);
 }
 
-.presetItem {
-  display: flex;
+/* Preset rows are Buttons (ghost; soft accent when pressed); a list reads from the start edge. */
+.presetItem[data-size] {
   flex-shrink: 0;
-  align-items: center;
-  min-height: var(--dp-cell);
-  padding-block: 0;
-  padding-inline: var(--prime-panel-item-padding-x);
-  border: 0;
-  border-radius: var(--prime-panel-item-radius);
-  background: transparent;
-  color: var(--prime-color-text-secondary);
-  font: inherit;
-  text-align: start;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  justify-content: flex-start;
 }
 
-.presetItem:hover {
-  background: var(--prime-color-fill-subtle);
-  color: var(--prime-color-text-primary);
-}
-
-.presetItem:active {
-  background: var(--prime-color-fill-subtle-active);
-  transform: scale(var(--prime-motion-press-scale));
-}
-
-.presetItem[aria-pressed="true"] {
-  background: var(--prime-color-accent-soft);
-  color: var(--prime-color-accent-text);
-  font-weight: var(--prime-font-weight-medium);
-}
-
-/* Narrow: presets become a horizontally scrolling row above the calendar. */
+/* Narrow: presets become a horizontally scrolling row of soft Buttons above the calendar. */
 .panel[data-layout="stacked"] .presets {
   flex-direction: row;
   gap: var(--prime-space-1);
@@ -300,18 +259,6 @@
 
 .panel[data-layout="stacked"] .presetTitle {
   display: none;
-}
-
-.panel[data-layout="stacked"] .presetItem {
-  background: var(--prime-color-fill-muted);
-}
-
-.panel[data-layout="stacked"] .presetItem:hover {
-  background: var(--prime-color-fill-muted-hover);
-}
-
-.panel[data-layout="stacked"] .presetItem[aria-pressed="true"] {
-  background: var(--prime-color-accent-soft);
 }
 
 /* ─── Calendar ───────────────────────────────────────────────────────────── */
@@ -357,42 +304,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-.nav,
+/* Month arrows are ghost icon-only Buttons one tier down (= the day cell); a spacer keeps the
+   title centered where an arrow is absent. */
 .navSpacer {
   flex-shrink: 0;
   width: var(--dp-cell);
   height: var(--dp-cell);
-}
-
-/* Ghost icon button. */
-.nav {
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--dp-radius);
-  background: transparent;
-  color: var(--prime-color-text-muted);
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.nav :global(svg) {
-  width: var(--dp-icon);
-  height: var(--dp-icon);
-}
-
-.nav:hover {
-  background: var(--prime-color-fill-subtle);
-  color: var(--prime-color-text-primary);
-}
-
-.nav:active {
-  background: var(--prime-color-fill-subtle-active);
-  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 /* Сетка месяца: разметка — таблица (семантика), раскладка — CSS Grid на 7 равных колонок. */
@@ -487,9 +404,7 @@
   background: var(--prime-color-fill-subtle-active);
 }
 
-.day:focus-visible,
-.nav:focus-visible,
-.presetItem:focus-visible {
+.day:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }

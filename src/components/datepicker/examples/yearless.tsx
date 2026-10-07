@@ -1,19 +1,20 @@
-/** An annual day-and-month date (yearless) with a value prefix and taken days disabled via isDayDisabled. Use it for birthdays, anniversaries and yearly schedules. */
+/** An annual price change date: day and month without a year, a value prefix and taken days disabled — `yearless`, `valuePrefix`, `isDayDisabled`. */
 import { Datepicker, YEARLESS_YEAR } from "prime-ui-kit";
-import * as React from "react";
+
+const TAKEN_DAYS = [
+  new Date(YEARLESS_YEAR, 9, 1).getTime(),
+  new Date(YEARLESS_YEAR, 9, 31).getTime(),
+];
 
 export default function DatepickerYearlessExample() {
-  const [date, setDate] = React.useState<Date | null>(new Date(YEARLESS_YEAR, 9, 15));
-  const taken = [new Date(YEARLESS_YEAR, 9, 1).getTime(), new Date(YEARLESS_YEAR, 9, 31).getTime()];
   return (
     <Datepicker.Root
       mode="single"
+      label="Ежегодное изменение цены"
       yearless
-      value={date}
-      onValueChange={setDate}
+      defaultValue={new Date(YEARLESS_YEAR, 9, 15)}
       valuePrefix="С"
-      isDayDisabled={(day) => taken.includes(day.getTime())}
-      aria-label="Дата изменения цены"
+      isDayDisabled={(day) => TAKEN_DAYS.includes(day.getTime())}
     />
   );
 }

@@ -167,7 +167,6 @@ export type {
 } from "./data-table/DataTable";
 export { DataTable } from "./data-table/DataTable";
 export type {
-  DatepickerBadgeProps,
   DatepickerLabels,
   DatepickerPanelProps,
   DatepickerPreset,
