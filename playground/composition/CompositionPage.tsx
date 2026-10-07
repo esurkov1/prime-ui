@@ -62,7 +62,7 @@ const TYPE: Row[] = [
     value: "16",
     how: '`Typography as="h2" variant="title-m"`',
   },
-  { what: "заголовок карточки, группы полей", value: "14", how: "`Card.SectionTitle` / `title-s`" },
+  { what: "заголовок карточки, группы полей", value: "14", how: "`Card.Title` / `title-s`" },
   { what: "основной текст, ячейки", value: "14", how: "`body-m`" },
   { what: "пояснение под заголовком", value: "14", how: '`body-m` + `tone="secondary"`' },
   { what: "мета, даты, подписи значений", value: "12", how: '`caption` + `tone="muted"`' },
@@ -227,7 +227,7 @@ export default function CompositionPage() {
             <Card.Root key={pattern.file} variant="cta">
               <Card.Title>{pattern.title}</Card.Title>
               <Card.Description>{renderInlineCode(pattern.description)}</Card.Description>
-              <Card.Actions>
+              <Card.Footer>
                 <LinkButton
                   href={`/${pattern.segment}`}
                   size="s"
@@ -238,7 +238,7 @@ export default function CompositionPage() {
                 >
                   Открыть
                 </LinkButton>
-              </Card.Actions>
+              </Card.Footer>
             </Card.Root>
           ))}
         </div>

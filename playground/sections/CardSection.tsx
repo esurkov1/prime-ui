@@ -12,7 +12,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Панель настроек компании: шапка раздела, поля на заливке поверхности и действия в конце — `Card.SectionHeader`, `Card.Body`, `Card.Actions`.",
+        "Панель настроек компании: шапка, поля на заливке поверхности и кнопки в подвале — `Card.Header`, `Card.Body`, `Card.Footer`.",
     },
     {
       slot: "variants",
@@ -28,13 +28,13 @@ export const page: ComponentPageConfig = {
       scenario: "panel-chart",
       title: "Виджет с графиком",
       description:
-        "Шапка с переключателем периода, строка итога и график от края до края — `Card.SectionTrailing`, `Card.Chart`.",
+        "Шапка с переключателем периода, строка итога и график от края до края — `Card.Header`, `Card.Media`.",
     },
     {
       scenario: "content-templates",
       title: "Контентные шаблоны",
       description:
-        "Призыв к действию, список событий и плитка кампании с обложкой — `Card.Description`, `Card.List`, `Card.Cover`.",
+        "Призыв к действию, список событий и плитка кампании с обложкой — `Card.Footer`, `Card.List`, `Card.Media`.",
     },
     {
       scenario: "flat",
@@ -52,8 +52,8 @@ export const page: ComponentPageConfig = {
     keyboard: [],
     aria: [
       '`Card.Root` — обычный `<div>`; `role="region"` и `aria-labelledby` задавайте, только если блок заслуживает ориентира.',
-      '`Card.Title` и `Card.SectionTitle` — `<h3>`; прямо под заголовком страницы передайте `as="h2"`, чтобы не пропустить уровень.',
-      "Декоративные иконки в `Card.IconBox` и обложки — `aria-hidden`; контролам в `Card.SectionTrailing` нужны свои имена.",
+      '`Card.Title` — `<h3>`; прямо под заголовком страницы передайте `as="h2"`, чтобы не пропустить уровень.',
+      "Декоративные иконки в `Card.Icon` и обложки в `Card.Media` — `aria-hidden`; контролам в `Card.Header` нужны свои имена.",
     ],
   },
 };

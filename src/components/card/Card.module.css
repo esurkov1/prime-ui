@@ -47,23 +47,6 @@
 
 /* ---------- Variants ---------- */
 
-.root[data-variant="mini"] {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--prime-space-3);
-  padding: var(--card-pad);
-}
-
-.root[data-variant="mini-media"] {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  align-content: flex-start;
-  gap: var(--card-gap) var(--prime-space-3);
-  padding: var(--card-pad);
-}
-
 .root[data-variant="metric"],
 .root[data-variant="stat-trend"],
 .root[data-variant="cta"] {
@@ -89,13 +72,52 @@
   overflow: hidden;
 }
 
+.root[data-variant="mini"],
+.root[data-variant="mini-media"],
 .root[data-variant="split"] {
   padding: var(--card-pad);
 }
 
-/* ---------- Slots ---------- */
+/* ---------- Parts ---------- */
 
-.iconBox {
+.header {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--prime-text-title-s-size);
+  line-height: var(--prime-text-title-s-line-height);
+  letter-spacing: var(--prime-text-title-s-tracking);
+  font-weight: var(--prime-text-title-s-weight);
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.root[data-variant="cta"] > .title {
+  font-size: var(--prime-text-title-m-size);
+  line-height: var(--prime-text-title-m-line-height);
+  letter-spacing: var(--prime-text-title-m-tracking);
+  font-weight: var(--prime-text-title-m-weight);
+}
+
+.description {
+  margin: 0;
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-font-weight-regular);
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.icon {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -108,30 +130,10 @@
   color: var(--prime-color-accent-text);
 }
 
-.iconBox svg {
+.icon svg {
   display: block;
   width: var(--card-icon);
   height: var(--card-icon);
-}
-
-.headerRow {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-  width: 100%;
-  min-width: 0;
-}
-
-.stack {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--prime-space-1);
-  min-width: 0;
 }
 
 .label {
@@ -170,66 +172,52 @@
   font-weight: var(--prime-text-heading-l-weight);
 }
 
-/* The leading item (a badge, an icon) and the value keep their size; text between them shrinks. */
-.headerRow > :first-child {
+/* Everything after the title (a control, a caption, the value of `metric`) keeps its size at the end. */
+.header > .title {
+  flex: 1 1 auto;
+}
+
+.header > :not(.title) {
   flex-shrink: 0;
 }
 
-.headerRow > .value {
-  flex-shrink: 0;
+.header > .value {
   text-align: end;
 }
 
-.description {
-  margin: 0;
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  font-weight: var(--prime-font-weight-regular);
-  color: var(--prime-color-text-secondary);
-  overflow-wrap: anywhere;
+/* `panel` and `list`: the header is a zone with the side padding. */
+.root[data-variant="panel"] > .header,
+.root[data-variant="list"] > .header {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  min-height: var(--prime-control-m-height);
+  padding: var(--prime-space-4) var(--card-pad) 0;
 }
 
-.media {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-end;
-  width: 100%;
-  min-width: 0;
-  min-height: var(--prime-space-10);
-}
-
-.root[data-variant="mini-media"] > .iconBox {
-  flex: 0 0 auto;
-}
-
-.root[data-variant="mini-media"] > .stack {
-  flex: 1 1 0;
+/* A KPI cluster — `mini`, `mini-media` and every cell of `split`: the icon tile spans the label and
+ * the value rows; without an icon the text is one column. */
+.root[data-variant="mini"],
+.root[data-variant="mini-media"],
+.root[data-variant="split"] > .body > * {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  align-items: center;
+  justify-items: start;
+  gap: var(--prime-space-1) var(--prime-space-3);
   min-width: 0;
 }
 
-.root[data-variant="mini-media"] > .media {
-  flex: 1 1 100%;
-  min-width: 100%;
+.root[data-variant="mini"]:has(> .icon),
+.root[data-variant="mini-media"]:has(> .icon),
+.root[data-variant="split"] > .body > :has(> .icon) {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
-.title,
-.sectionTitle {
-  margin: 0;
-  min-width: 0;
-  font-size: var(--prime-text-title-s-size);
-  line-height: var(--prime-text-title-s-line-height);
-  letter-spacing: var(--prime-text-title-s-tracking);
-  font-weight: var(--prime-text-title-s-weight);
-  color: var(--prime-color-text-primary);
-  overflow-wrap: anywhere;
-}
-
-.root[data-variant="cta"] .title {
-  font-size: var(--prime-text-title-m-size);
-  line-height: var(--prime-text-title-m-line-height);
-  letter-spacing: var(--prime-text-title-m-tracking);
-  font-weight: var(--prime-text-title-m-weight);
+.root[data-variant="mini"] > .icon,
+.root[data-variant="mini-media"] > .icon,
+.root[data-variant="split"] > .body > * > .icon {
+  grid-row: 1 / span 2;
 }
 
 .delta {
@@ -255,48 +243,6 @@
   color: var(--prime-color-danger-text);
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-2);
-  width: 100%;
-  min-width: 0;
-  padding-top: var(--prime-space-2);
-}
-
-/* ---------- panel ---------- */
-
-.sectionHeader {
-  display: flex;
-  flex-shrink: 0;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-  min-height: var(--prime-control-m-height);
-  padding: var(--prime-space-4) var(--card-pad) 0;
-}
-
-.sectionTitle {
-  flex: 1 1 auto;
-}
-
-.sectionTrailing {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--prime-space-2);
-  color: var(--prime-color-text-secondary);
-}
-
-.sectionTrailing svg {
-  display: block;
-  width: var(--prime-icon-s);
-  height: var(--prime-icon-s);
-}
-
 .body {
   box-sizing: border-box;
   display: flex;
@@ -308,57 +254,85 @@
   padding: var(--card-gap) var(--card-pad) var(--card-pad);
 }
 
-.body > *:only-child,
-.chart > *:only-child {
+.body > *:only-child {
   flex: 1 1 auto;
   align-self: stretch;
   width: 100%;
   min-height: 0;
 }
 
-/* Chart is edge-to-edge under the section header. */
-.chart {
+.media {
   box-sizing: border-box;
   display: flex;
-  flex: 1 1 auto;
   flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  width: 100%;
   min-width: 0;
-  min-height: 0;
-  padding: var(--card-gap) 0 0;
 }
 
-.root[data-variant="panel"] > .sectionHeader + .body:last-child,
-.root[data-variant="panel"] > .sectionHeader + .chart:last-child,
-.root[data-variant="panel"] > .body + .chart {
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  width: 100%;
+  min-width: 0;
+  padding-top: var(--prime-space-2);
+}
+
+/* ---------- mini-media ---------- */
+
+.root[data-variant="mini-media"] > .media {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  min-height: var(--prime-space-10);
+  /* The cluster rows are 4 apart; the media sits a card gap below the value. */
+  margin-top: calc(var(--card-gap) - var(--prime-space-1));
+}
+
+/* ---------- panel ---------- */
+
+/* Media in a panel is an edge-to-edge chart under the header or the body. */
+.root[data-variant="panel"] > .media {
   flex: 1 1 auto;
+  min-height: 0;
+  padding-top: var(--card-gap);
+}
+
+.root[data-variant="panel"] > .media > *:only-child {
+  flex: 1 1 auto;
+  align-self: stretch;
+  width: 100%;
   min-height: 0;
 }
 
 /* Body followed by a chart: the chart brings its own top spacing. */
-.root[data-variant="panel"] > .sectionHeader + .body:has(+ .chart) {
+.root[data-variant="panel"] > .header + .body:has(+ .media) {
   flex: 0 1 auto;
   padding-bottom: 0;
 }
 
 /* Header followed by content: faint inset hairline under the header (charts stay edge-to-edge). */
-.sectionHeader:has(+ .body) {
+.root[data-variant="panel"] > .header:has(+ .body),
+.root[data-variant="list"] > .header:has(+ .list) {
   padding-bottom: var(--prime-space-4);
   background: var(--card-hairline) center bottom / var(--card-hairline-size) no-repeat;
 }
 
-.sectionHeader + .body {
+.root[data-variant="panel"] > .header + .body {
   padding-top: var(--prime-space-4);
 }
 
 /* Content before the footer keeps the same 16px above the hairline as the footer has below it. */
-.root[data-variant="panel"] > .body:has(+ .actions),
-.root[data-variant="list"] > .list:has(+ .actions) {
+.root[data-variant="panel"] > .body:has(+ .footer),
+.root[data-variant="list"] > .list:has(+ .footer) {
   padding-bottom: var(--prime-space-4);
 }
 
-/* Actions as the card's footer: faint hairline above, same side padding. */
-.root[data-variant="panel"] > .actions,
-.root[data-variant="list"] > .actions {
+/* The footer of a zoned card: faint hairline above, same side padding, buttons at the end. */
+.root[data-variant="panel"] > .footer,
+.root[data-variant="list"] > .footer {
   justify-content: flex-end;
   padding: var(--prime-space-4) var(--card-pad) var(--card-pad);
   background: var(--card-hairline) center top / var(--card-hairline-size) no-repeat;
@@ -366,19 +340,13 @@
 
 /* ---------- list ---------- */
 
-/* SectionHeader over a list: the same faint hairline as over a body. */
-.sectionHeader:has(+ .list) {
-  padding-bottom: var(--prime-space-4);
-  background: var(--card-hairline) center bottom / var(--card-hairline-size) no-repeat;
-}
-
 .list {
   margin: 0;
   padding: 0 0 var(--prime-space-2);
   list-style: none;
 }
 
-.sectionHeader + .list {
+.header + .list {
   padding-top: var(--prime-space-2);
 }
 
@@ -394,58 +362,44 @@
   background: var(--card-hairline) center top / var(--card-hairline-size) no-repeat;
 }
 
-/* CTA: title + text is the header, actions are the footer. */
-.root[data-variant="cta"] > .actions {
+/* ---------- cta ---------- */
+
+/* Title + text is the header, the footer sits under a full-width hairline. */
+.root[data-variant="cta"] > .footer {
   padding-top: var(--prime-space-4);
   background: var(--card-hairline) center top / 100% var(--prime-border-width) no-repeat;
 }
 
 /* ---------- split ---------- */
 
-.split {
+/* The body is the grid; each of its two children is a cell. */
+.root[data-variant="split"] > .body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--card-gap) 0;
-  width: 100%;
-  min-width: 0;
+  padding: 0;
 }
 
-/* Every child of Split is a cell. */
-.split > * {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-1);
-  min-width: 0;
-}
-
-.split > * + * {
+.root[data-variant="split"] > .body > * + * {
   padding-inline-start: var(--card-pad);
   border-inline-start: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
-.split > :first-child {
+.root[data-variant="split"] > .body > :first-child {
   padding-inline-end: var(--card-pad);
-}
-
-.split > :has(> .iconBox) {
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--prime-space-3);
 }
 
 /* ---------- cover ---------- */
 
-.cover {
+.root[data-variant="cover"] > .media {
   display: block;
-  width: 100%;
   min-height: calc(var(--prime-space-16) * 2);
   max-height: calc(var(--prime-space-24) * 2);
   overflow: hidden;
   background: var(--prime-color-bg-sunken);
 }
 
-.cover > * {
+.root[data-variant="cover"] > .media > * {
   display: block;
   width: 100%;
   height: 100%;
@@ -453,16 +407,15 @@
   object-fit: cover;
 }
 
-.root[data-variant="cover"] > .stack {
+.root[data-variant="cover"] > .body {
   gap: var(--prime-space-1);
-  padding: var(--card-gap) var(--card-pad) 0;
 }
 
-.root[data-variant="cover"] > .stack:last-child {
-  padding-bottom: var(--card-pad);
+.root[data-variant="cover"] > .body:has(+ .footer) {
+  padding-bottom: 0;
 }
 
-.root[data-variant="cover"] > .actions {
+.root[data-variant="cover"] > .footer {
   padding: var(--card-gap) var(--card-pad) var(--card-pad);
 }
 
@@ -485,22 +438,22 @@
 }
 
 @container (max-width: 22rem) {
-  .split {
+  .root[data-variant="split"] > .body {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .split > :first-child {
+  .root[data-variant="split"] > .body > :first-child {
     padding-inline-end: 0;
   }
 
-  .split > * + * {
+  .root[data-variant="split"] > .body > * + * {
     padding-top: var(--card-gap);
     padding-inline-start: 0;
     border-inline-start: 0;
     border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
   }
 
-  .headerRow {
+  .header {
     flex-wrap: wrap;
   }
 }

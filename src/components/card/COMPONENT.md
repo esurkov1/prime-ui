@@ -8,7 +8,7 @@
 ## When to use
 - KPI tiles on a dashboard (`mini`, `mini-media`, `metric`, `stat-trend`, `split`).
 - A chart or text widget with a header and controls (`panel`).
-- A settings or profile form grouped on its own surface (`panel` + `Body` + `Actions`).
+- A settings or profile form grouped on its own surface (`panel` + `Body` + `Footer`).
 - An activity list (`list`), a call to action (`cta`), a tile with an image on top (`cover`).
 
 ## When not to use
@@ -24,15 +24,15 @@ import { Card } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Card.Root variant="panel"        SectionHeader(SectionTitle, SectionTrailing) · Body · Chart · Actions
-Card.Root variant="mini"         IconBox · Stack(Label, Value)
-Card.Root variant="mini-media"   IconBox · Stack(Label, Value) · Media
-Card.Root variant="metric"       HeaderRow(Badge or Icon, Value) · Description
+Card.Root variant="panel"        Header(Title, …trailing) · Body · Media · Footer
+Card.Root variant="mini"         Icon · Label · Value
+Card.Root variant="mini-media"   Icon · Label · Value · Media
+Card.Root variant="metric"       Header(Badge or Icon, Value) · Description
 Card.Root variant="stat-trend"   Label · Value · Delta
-Card.Root variant="split"        Split(cell × 2: any element, e.g. IconBox + Stack)
-Card.Root variant="cta"          Title · Description · Actions
-Card.Root variant="list"         SectionHeader(SectionTitle, …) · List(ListItem …)
-Card.Root variant="cover"        Cover · Title · Label · Actions
+Card.Root variant="split"        Body(cell × 2: any element, e.g. <div> with Icon · Label · Value)
+Card.Root variant="cta"          Title · Description · Footer
+Card.Root variant="list"         Header(Title, …trailing) · List(ListItem …)
+Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 ```
 
 ## API
@@ -48,46 +48,66 @@ Card.Root variant="cover"        Cover · Title · Label · Actions
 | `flat` | `boolean` | `false` | No raised shadow: a flat tile for dense grids. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
 
-### Card.SectionHeader · Card.SectionTitle · Card.SectionTrailing
-`panel` and `list` header: a row with a faint hairline below, the title (`<h3>`) and a trailing slot for controls.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `as` | `"h2" \| "h3" \| "h4"` | `"h3"` | SectionTitle: Heading level that fits the page outline; the look does not change. |
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
-
-### Card.Body · Card.Actions · Card.Chart
-`panel` zones: the padded body (gap 16), the right-aligned footer row of buttons with a hairline above, and an edge-to-edge chart slot.
+### Card.Header
+`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. In `panel` and `list` it is a padded zone with a faint hairline below; in `metric` it pairs a leading badge or icon with the `Card.Value`. Wraps below 22rem.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Title
-The title of the `cta`, `list` and `cover` templates (`<h3>`, title-m).
+`ref` → `HTMLHeadingElement`. The card heading (`<h3>`, title-s; title-m in `cta`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `as` | `"h2" \| "h3" \| "h4"` | `"h3"` | Heading level that fits the page outline; the look does not change. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
-### Card.Label · Card.Value · Card.Description · Card.Delta
-Metric text: the label (body-s), the value (sized by the template and the card width), a description and the change.
+### Card.Description
+`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s, wraps): under the title of `cta` and `cover`, under the header of `metric`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
+### Card.Body
+`ref` → `HTMLDivElement`. The padded content zone (gap 16). In `split` it is the two-cell grid: each child is a cell (stacked below 22rem); in `cover` it holds the title and the description 4 apart.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
+### Card.Media
+`ref` → `HTMLDivElement`. A chart, an image or a gauge: edge to edge under the header or the body in `panel`, the 128–192px cover on top in `cover`, the full-width bottom slot in `mini-media`. A chart SVG needs a CSS height.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
+### Card.Footer
+`ref` → `HTMLDivElement`. The bottom row of buttons, wrapping: right-aligned under a faint hairline in `panel` and `list`, under a full-width hairline in `cta`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
+### Card.Icon
+`ref` → `HTMLDivElement`. The 40px accent tile of a KPI holding one icon; it spans the label and the value rows in `mini`, `mini-media` and a `split` cell.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
+### Card.Label · Card.Value · Card.Delta
+`ref` → `HTMLSpanElement`. Metric text: the label (body-s, truncates), the value (tabular, sized by the template and the card width) and the change.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Delta: color by meaning, not by sign (churn up is `danger`). |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
-### Card.IconBox · Card.Stack · Card.HeaderRow · Card.Media
-Template layout parts: the 40px accent icon tile, the label + value column, the `metric` header row (a leading badge or icon, the value at the end), and the bottom media slot of `mini-media`.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
-
-### Card.Cover · Card.Split · Card.List · Card.ListItem
-Template parts: the `cover` media, the `split` grid whose two children are the cells (stacked below 22rem), and the `list` `<ul>` / `<li>` items with faint hairlines (head it with `Card.SectionHeader`).
+### Card.List · Card.ListItem
+`ref` → `HTMLUListElement` / `HTMLLIElement`. The `list` template: a `<ul>` of `<li>` rows with faint hairlines between them; head it with `Card.Header`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -98,15 +118,15 @@ Template parts: the `cover` media, the `split` grid whose two children are the c
 ### variant (structural templates)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `panel` | no root padding; header with a faint hairline, padded `Body`, edge-to-edge `Chart`, right-aligned `Actions` | chart widgets, settings forms, any titled block | yes |
-| `mini` | 40px accent icon tile + label and title-l value | a compact KPI tile | |
+| `panel` | no root padding; `Header` with a faint hairline, padded `Body`, edge-to-edge `Media`, right-aligned `Footer` | chart widgets, settings forms, any titled block | yes |
+| `mini` | 40px accent `Icon` tile beside the label and the title-l value | a compact KPI tile | |
 | `mini-media` | `mini` plus a full-width bottom `Media` slot | a KPI with a sparkline or a ProgressBar | |
-| `metric` | header row (lead left, heading-m value right) + description | a KPI with a qualifier badge | |
+| `metric` | `Header` (lead left, heading-m value right) + description | a KPI with a qualifier badge | |
 | `stat-trend` | label, large value (adapts to the card width), delta | the main number of a dashboard row | |
-| `split` | two metric cells with a hairline; stacked below 22rem | two related metrics in one tile | |
-| `cta` | title, body-s text, actions under a hairline | a call to action | |
-| `list` | list header with a hairline, items with faint hairlines | recent events, short lists | |
-| `cover` | 128–192px media on top, title, label, actions | campaign, project or product tiles | |
+| `split` | `Body` with two metric cells and a hairline; stacked below 22rem | two related metrics in one tile | |
+| `cta` | title, body-s text, `Footer` under a hairline | a call to action | |
+| `list` | `Header` with a hairline, items with faint hairlines | recent events, short lists | |
+| `cover` | 128–192px `Media` on top, title and description, `Footer` | campaign, project or product tiles | |
 
 ### tone (Delta)
 | Value | Looks like | Use when | Default |
@@ -126,7 +146,7 @@ Template parts: the `cover` media, the `split` grid whose two children are the c
 |---|---|---|
 | template | `variant` | `data-variant` |
 | flat | `flat` | `data-flat` |
-| card width | container queries | `split` stacks below 22rem, `HeaderRow` wraps below 22rem, the `stat-trend` value changes at 20rem / 36rem |
+| card width | container queries | `split` stacks below 22rem, `Header` wraps below 22rem, the `stat-trend` value changes at 20rem / 36rem |
 
 Card is static: no hover, focus or press of its own.
 
@@ -134,6 +154,7 @@ Card is static: no hover, focus or press of its own.
 - Grid of cards: `repeat(auto-fit, minmax(min(100%, 14rem), 1fr))`, gap `--prime-space-4`.
 - Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, on the surface field fill.
 - Long values wrap, labels truncate; a chart SVG needs a CSS height.
+- In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper.
 
 ## Accessibility
 
@@ -142,8 +163,8 @@ No keyboard interaction.
 
 ### ARIA
 - `Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.
-- `Card.Title` and `Card.SectionTitle` render `<h3>`; directly under the page title pass `as="h2"`.
-- Decorative icons in `IconBox` and covers get `aria-hidden`; controls in `SectionTrailing` need their own names.
+- `Card.Title` renders `<h3>`; directly under the page title pass `as="h2"`.
+- Decorative icons in `Card.Icon` and cover images in `Card.Media` get `aria-hidden`; controls in `Card.Header` need their own names.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -153,11 +174,11 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A company settings panel: a section header, fields on the surface fill and actions at the end — `Card.SectionHeader`, `Card.Body`, `Card.Actions`. |
+| [overview.tsx](examples/overview.tsx) | A company settings panel: a header, fields on the surface fill and buttons in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. |
 | [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value, and a large value with its change — `variant`, `Card.Delta`. |
 | [mini-media.tsx](examples/mini-media.tsx) | A KPI with a sparkline or a fill level in the bottom slot — `Card.Media`. |
-| [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a period switch, a summary line and an edge-to-edge chart — `Card.SectionTrailing`, `Card.Chart`. |
-| [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Description`, `Card.List`, `Card.Cover`. |
+| [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a period switch, a summary line and an edge-to-edge chart — `Card.Header`, `Card.Media`. |
+| [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
 | [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem. |
 
@@ -165,7 +186,8 @@ No `labels`.
 - A `<div>` with a border styled as a card → use `Card.Root`; depth comes from fill, not lines.
 - Wrapping every page section in a card → use PageContent sections.
 - `Card.Delta tone="success"` for every «+» → choose the tone by meaning.
-- Custom padding on a `panel` root → padding belongs to `SectionHeader` / `Body` / `Actions`.
+- Custom padding on a `panel` root → padding belongs to `Header` / `Body` / `Footer`.
+- A wrapper `<div>` around the label and the value of `mini` → put `Icon`, `Label`, `Value` straight into the root (or into a `split` cell); the template lays them out.
 - A chart SVG with only a `viewBox` → give it a CSS height.
 
 ## Related

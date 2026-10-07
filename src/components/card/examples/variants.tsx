@@ -7,20 +7,18 @@ export default function CardVariantsExample() {
   return (
     <div className={styles.grid}>
       <Card.Root variant="mini">
-        <Card.IconBox>
+        <Card.Icon>
           <Icon name="object.users" />
-        </Card.IconBox>
-        <Card.Stack>
-          <Card.Label>Активные сессии</Card.Label>
-          <Card.Value>1 248</Card.Value>
-        </Card.Stack>
+        </Card.Icon>
+        <Card.Label>Активные сессии</Card.Label>
+        <Card.Value>1 248</Card.Value>
       </Card.Root>
 
       <Card.Root variant="metric">
-        <Card.HeaderRow>
+        <Card.Header>
           <Badge.Root color="green">SLA</Badge.Root>
           <Card.Value>99,95%</Card.Value>
-        </Card.HeaderRow>
+        </Card.Header>
         <Card.Description>Доступность API за 30 дней</Card.Description>
       </Card.Root>
 

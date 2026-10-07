@@ -10,13 +10,11 @@ export default function CardMiniMediaExample() {
   return (
     <div className={styles.grid}>
       <Card.Root variant="mini-media">
-        <Card.IconBox>
+        <Card.Icon>
           <Activity aria-hidden />
-        </Card.IconBox>
-        <Card.Stack>
-          <Card.Label>Запросы в минуту</Card.Label>
-          <Card.Value>12 840</Card.Value>
-        </Card.Stack>
+        </Card.Icon>
+        <Card.Label>Запросы в минуту</Card.Label>
+        <Card.Value>12 840</Card.Value>
         <Card.Media>
           {/* The SVG stretches to the card width; CSS sets its height, not the viewBox. */}
           <svg
@@ -31,13 +29,11 @@ export default function CardMiniMediaExample() {
       </Card.Root>
 
       <Card.Root variant="mini-media">
-        <Card.IconBox>
+        <Card.Icon>
           <HardDrive aria-hidden />
-        </Card.IconBox>
-        <Card.Stack>
-          <Card.Label>Хранилище</Card.Label>
-          <Card.Value>72 из 100 ГБ</Card.Value>
-        </Card.Stack>
+        </Card.Icon>
+        <Card.Label>Хранилище</Card.Label>
+        <Card.Value>72 из 100 ГБ</Card.Value>
         <Card.Media>
           <ProgressBar value={72} size="s" label="Занято" showValue />
         </Card.Media>

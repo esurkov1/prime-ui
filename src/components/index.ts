@@ -61,27 +61,21 @@ export type {
 } from "./button-group/ButtonGroup";
 export { ButtonGroup } from "./button-group/ButtonGroup";
 export type {
-  CardActionsProps,
   CardBodyProps,
-  CardChartProps,
-  CardCoverProps,
   CardDeltaProps,
   CardDescriptionProps,
-  CardHeaderRowProps,
+  CardFooterProps,
+  CardHeaderProps,
   CardHeadingLevel,
-  CardIconBoxProps,
+  CardIconProps,
   CardLabelProps,
   CardListItemProps,
   CardListProps,
   CardMediaProps,
   CardRootProps,
-  CardSectionHeaderProps,
-  CardSectionTitleProps,
-  CardSectionTrailingProps,
-  CardSplitProps,
-  CardStackProps,
   CardTitleProps,
   CardValueProps,
+  CardVariant,
 } from "./card/Card";
 export { Card } from "./card/Card";
 export type {

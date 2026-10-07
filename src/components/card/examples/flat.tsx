@@ -7,22 +7,18 @@ export default function CardFlatExample() {
   return (
     <div className={styles.grid}>
       <Card.Root variant="mini">
-        <Card.IconBox>
+        <Card.Icon>
           <Icon name="field.email" strokeWidth={2} />
-        </Card.IconBox>
-        <Card.Stack>
-          <Card.Label>С тенью (по умолчанию)</Card.Label>
-          <Card.Value>42</Card.Value>
-        </Card.Stack>
+        </Card.Icon>
+        <Card.Label>С тенью (по умолчанию)</Card.Label>
+        <Card.Value>42</Card.Value>
       </Card.Root>
       <Card.Root variant="mini" flat>
-        <Card.IconBox>
+        <Card.Icon>
           <Icon name="field.email" strokeWidth={2} />
-        </Card.IconBox>
-        <Card.Stack>
-          <Card.Label>flat</Card.Label>
-          <Card.Value>42</Card.Value>
-        </Card.Stack>
+        </Card.Icon>
+        <Card.Label>flat</Card.Label>
+        <Card.Value>42</Card.Value>
       </Card.Root>
     </div>
   );

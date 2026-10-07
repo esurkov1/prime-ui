@@ -94,14 +94,12 @@ export default function ScreenStatesPattern() {
 
         <div className={styles.panels}>
           <Card.Root variant="panel" aria-busy={status === "loading"}>
-            <Card.SectionHeader>
-              <Card.SectionTitle as="h2">Остатки</Card.SectionTitle>
-              <Card.SectionTrailing>
-                <Typography as="span" variant="caption" tone="muted">
-                  {status === "ready" ? "на 7 октября" : "на 6 октября"}
-                </Typography>
-              </Card.SectionTrailing>
-            </Card.SectionHeader>
+            <Card.Header>
+              <Card.Title as="h2">Остатки</Card.Title>
+              <Typography as="span" variant="caption" tone="muted">
+                {status === "ready" ? "на 7 октября" : "на 6 октября"}
+              </Typography>
+            </Card.Header>
             <Card.Body>
               {status === "loading" ? (
                 <div className={styles.loading}>
@@ -125,9 +123,9 @@ export default function ScreenStatesPattern() {
           </Card.Root>
 
           <Card.Root variant="panel">
-            <Card.SectionHeader>
-              <Card.SectionTitle as="h2">Правила разнесения</Card.SectionTitle>
-            </Card.SectionHeader>
+            <Card.Header>
+              <Card.Title as="h2">Правила разнесения</Card.Title>
+            </Card.Header>
             <Card.Body>
               <EmptyPage.Root size="s" aria-labelledby="rules-empty">
                 <EmptyPage.Icon tone="accent">

@@ -16,26 +16,22 @@ export default function CardNarrowExample() {
         <div key={width.id} className={styles.stack}>
           <div className={width.className}>
             <Card.Root variant="split">
-              <Card.Split>
+              <Card.Body>
                 <div>
-                  <Card.IconBox>
+                  <Card.Icon>
                     <ShoppingCart aria-hidden />
-                  </Card.IconBox>
-                  <Card.Stack>
-                    <Card.Label>Конверсия</Card.Label>
-                    <Card.Value>3,8%</Card.Value>
-                  </Card.Stack>
+                  </Card.Icon>
+                  <Card.Label>Конверсия</Card.Label>
+                  <Card.Value>3,8%</Card.Value>
                 </div>
                 <div>
-                  <Card.IconBox>
+                  <Card.Icon>
                     <Wallet aria-hidden />
-                  </Card.IconBox>
-                  <Card.Stack>
-                    <Card.Label>Средний чек</Card.Label>
-                    <Card.Value>₽ 2 450</Card.Value>
-                  </Card.Stack>
+                  </Card.Icon>
+                  <Card.Label>Средний чек</Card.Label>
+                  <Card.Value>₽ 2 450</Card.Value>
                 </div>
-              </Card.Split>
+              </Card.Body>
             </Card.Root>
           </div>
           <div className={width.className}>

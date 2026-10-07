@@ -139,14 +139,12 @@ export default function DashboardPattern() {
 
         <div className={styles.panels}>
           <Card.Root variant="panel">
-            <Card.SectionHeader>
-              <Card.SectionTitle as="h2">План продаж</Card.SectionTitle>
-              <Card.SectionTrailing>
-                <Typography as="span" variant="caption" tone="muted">
-                  Октябрь
-                </Typography>
-              </Card.SectionTrailing>
-            </Card.SectionHeader>
+            <Card.Header>
+              <Card.Title as="h2">План продаж</Card.Title>
+              <Typography as="span" variant="caption" tone="muted">
+                Октябрь
+              </Typography>
+            </Card.Header>
             <Card.Body>
               <div className={styles.bars}>
                 {PLAN.map((row) => (
@@ -163,14 +161,12 @@ export default function DashboardPattern() {
           </Card.Root>
 
           <Card.Root variant="panel">
-            <Card.SectionHeader>
-              <Card.SectionTitle as="h2">Дебиторка</Card.SectionTitle>
-              <Card.SectionTrailing>
-                <Typography as="span" variant="caption" tone="muted">
-                  ₽ 8,2 млн
-                </Typography>
-              </Card.SectionTrailing>
-            </Card.SectionHeader>
+            <Card.Header>
+              <Card.Title as="h2">Дебиторка</Card.Title>
+              <Typography as="span" variant="caption" tone="muted">
+                ₽ 8,2 млн
+              </Typography>
+            </Card.Header>
             <Card.Body>
               <div className={styles.bars}>
                 <ProgressBar segments={RECEIVABLES} label="По сроку оплаты, млн ₽" />
