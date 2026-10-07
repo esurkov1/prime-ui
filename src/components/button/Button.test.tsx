@@ -39,6 +39,37 @@ describe("Button", () => {
     expect(button).toHaveAttribute("data-size", "m");
   });
 
+  it("takes the host's text color with tone inherit and stays a keyboard button", () => {
+    const onClick = vi.fn();
+    render(
+      <Button.Root variant="ghost" tone="inherit" aria-label="Закрыть" onClick={onClick}>
+        <Button.Icon>x</Button.Icon>
+      </Button.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Закрыть" });
+    expect(button).toHaveAttribute("data-tone", "inherit");
+    expect(button).toHaveAttribute("data-variant", "ghost");
+    button.focus();
+    expect(button).toHaveFocus();
+    fireEvent.click(button);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("allows tone inherit only without the solid treatment", () => {
+    render(
+      <>
+        <Button.Root variant="soft" tone="inherit">
+          Soft
+        </Button.Root>
+        {/* @ts-expect-error inherit has no solid fill: a currentColor wash cannot be a solid */}
+        <Button.Root variant="solid" tone="inherit">
+          Solid
+        </Button.Root>
+      </>,
+    );
+    expect(screen.getByRole("button", { name: "Soft" })).toHaveAttribute("data-variant", "soft");
+  });
+
   it("sets data-disabled when disabled", () => {
     render(<Button.Root disabled>Off</Button.Root>);
     expect(screen.getByRole("button", { name: "Off" })).toHaveAttribute("data-disabled", "true");

@@ -30,7 +30,7 @@ Banner.Root                 <div>; variant, tone, size, placement
 │  ├─ Banner.Title
 │  ├─ Banner.Description
 │  └─ Banner.Actions        buttons; with onDismiss the close button is last here
-└─ close button             with onDismiss and no Actions: ghost icon Button, top-right
+└─ close button             with onDismiss and no Actions: ghost icon Button (tone="inherit"), top-right
 ```
 
 ## API

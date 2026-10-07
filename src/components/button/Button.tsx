@@ -33,22 +33,36 @@ function getButtonLayout(children: React.ReactNode): ButtonLayout {
   };
 }
 
-export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size"> & {
-  /** Visual treatment. Default `solid`. */
-  variant?: Variant;
-  /** Semantic color. Default `accent`; `danger` for destructive actions. */
-  tone?: Extract<Tone, "accent" | "neutral" | "danger">;
-  /** Tier. Default: the tier of the surrounding control (a form, a panel, a field), else `m`. */
-  size?: ControlSize;
-  fullWidth?: boolean;
-  loading?: boolean;
-  /**
-   * Merges Button props onto its single child element instead of rendering `<button>`.
-   * `disabled` / `loading` become `aria-disabled` (a link has no native `disabled`), `type` is
-   * dropped, and no spinner is added — the child owns its content.
-   */
-  asChild?: boolean;
-};
+/**
+ * `tone="inherit"` takes the host's text color (a close button on a solid Banner): fills are a
+ * `currentColor` wash, so it has no `solid` treatment.
+ */
+type ButtonColorProps =
+  | {
+      /** Visual treatment. Default `solid`. */
+      variant?: Variant;
+      /** Semantic color. Default `accent`; `danger` for destructive actions. */
+      tone?: Extract<Tone, "accent" | "neutral" | "danger">;
+    }
+  | {
+      variant: Exclude<Variant, "solid">;
+      /** Takes the host's text color; for actions placed on a colored host. */
+      tone: "inherit";
+    };
+
+export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size"> &
+  ButtonColorProps & {
+    /** Tier. Default: the tier of the surrounding control (a form, a panel, a field), else `m`. */
+    size?: ControlSize;
+    fullWidth?: boolean;
+    loading?: boolean;
+    /**
+     * Merges Button props onto its single child element instead of rendering `<button>`.
+     * `disabled` / `loading` become `aria-disabled` (a link has no native `disabled`), `type` is
+     * dropped, and no spinner is added — the child owns its content.
+     */
+    asChild?: boolean;
+  };
 
 const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
   (

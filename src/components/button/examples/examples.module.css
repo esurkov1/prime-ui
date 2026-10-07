@@ -5,3 +5,28 @@
   display: grid;
   gap: var(--prime-space-5);
 }
+
+/* A colored strip: buttons with tone="inherit" take its text color. */
+.accentHost,
+.inverseHost {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  padding: var(--prime-space-2) var(--prime-space-2) var(--prime-space-2) var(--prime-space-4);
+  border-radius: var(--prime-radius-l);
+}
+
+.accentHost {
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+}
+
+.inverseHost {
+  background: var(--prime-color-bg-inverse);
+  color: var(--prime-color-text-inverse);
+}
+
+.hostText {
+  flex: 1;
+  min-width: 0;
+}

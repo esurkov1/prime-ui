@@ -40,7 +40,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `variant` | `"solid" \| "soft" \| "outline" \| "ghost"` | `"solid"` | Visual treatment. |
-| `tone` | `"accent" \| "neutral" \| "danger"` | `"accent"` | Meaning of the action; `danger` for destructive actions. |
+| `tone` | `"accent" \| "neutral" \| "danger" \| "inherit"` | `"accent"` | Meaning of the action; `danger` for destructive actions. `inherit` takes the host's text color for an action on a colored host (a solid Banner); it needs `variant` `ghost`, `soft` or `outline`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
 | `loading` | `boolean` | `false` | Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content. |
@@ -75,6 +75,11 @@ No ref. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
 | `ghost` + `accent` | transparent, accent text, `fill-subtle` on hover | tertiary accent action in text-heavy areas | |
 | `ghost` + `neutral` | transparent, secondary text → primary on hover | toolbar buttons, icon-only buttons | |
 | `ghost` + `danger` | transparent, danger text, `danger-soft` on hover | destructive action set apart in a footer | |
+| `ghost` + `inherit` | transparent, the host's text color, a `currentColor` wash on hover / press | close or icon action on a colored host (solid Banner, accent strip) | |
+| `soft` + `inherit` | `currentColor` wash fill, the host's text color | a labelled action on a colored host | |
+| `outline` + `inherit` | 1px inset line in a `currentColor` wash, the host's text color | an action with an edge on a colored host | |
+
+`tone="inherit"` has no `solid` (the type requires `ghost`, `soft` or `outline`); its focus ring and disabled look also derive from the host's text color, so it reads on any host fill in both themes. Never recolor a Button from its host with a CSS override — use `inherit`.
 
 `outline` is the only variant with a visible line. With `aria-current="page"` (usually via `asChild` on a router link), `ghost`/`soft` show the `fill-subtle-active` selected look; soft accent keeps its own accent look, so a current item can be marked with accent explicitly (Pagination).
 
@@ -101,7 +106,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | State | Driven by | DOM |
 |---|---|---|
 | hover / active | pointer | hover fill per variant; active `scale(var(--prime-motion-press-scale))` |
-| focus-visible | keyboard | outer focus ring with `--prime-focus-offset` |
+| focus-visible | keyboard | outer focus ring with `--prime-focus-offset`; `tone="inherit"` draws it in `currentColor` |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
 | loading | `loading` (native `<button>`) | `data-loading="true"`, `data-disabled="true"`, `aria-busy="true"`; a `Spinner` (`aria-hidden`) replaces the leading (or only) icon, otherwise it is centered over the hidden label (`data-loading-overlay="true"`) |
 | asChild disabled / loading | `asChild` + `disabled`/`loading` | `aria-disabled="true"`, `pointer-events: none`, click `preventDefault`; no native `disabled`, no automatic spinner |
@@ -140,6 +145,7 @@ No `labels`.
 | [sizes.tsx](examples/sizes.tsx) | Every size tier, 28 to 48 px high — `size`. |
 | [states.tsx](examples/states.tsx) | Disabled and loading next to the default; the spinner keeps the width — `disabled`, `loading`. |
 | [with-icon.tsx](examples/with-icon.tsx) | An icon before or after the label, and a square icon-only button — `Button.Icon`, `aria-label`. |
+| [on-colored-host.tsx](examples/on-colored-host.tsx) | Actions on a colored strip take its text color: a ghost icon close and a soft action — `tone="inherit"`. |
 | [as-child.tsx](examples/as-child.tsx) | The button look on a real link; a disabled link blocks navigation — `asChild`, `disabled`. |
 | [in-form.tsx](examples/in-form.tsx) | A full-width submit button that shows the request in progress — `type`, `loading`, `fullWidth`. |
 

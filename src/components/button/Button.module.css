@@ -204,6 +204,24 @@
   --btn-fg: var(--prime-color-danger-text);
 }
 
+/* inherit: the host's text color (a close button on a solid Banner). Fills are a wash of that
+   color, so the button reads on any host fill; no solid treatment (the type forbids it). */
+.root[data-tone="inherit"] {
+  --btn-fg: currentColor;
+  --btn-bg-hover: color-mix(in srgb, currentColor 12%, transparent);
+  --btn-bg-active: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.root[data-tone="inherit"][data-variant="soft"] {
+  --btn-bg: color-mix(in srgb, currentColor 12%, transparent);
+  --btn-bg-hover: color-mix(in srgb, currentColor 18%, transparent);
+  --btn-bg-active: color-mix(in srgb, currentColor 24%, transparent);
+}
+
+.root[data-tone="inherit"][data-variant="outline"] {
+  --btn-line: color-mix(in srgb, currentColor 32%, transparent);
+}
+
 /* ─── Interaction ───────────────────────────────────────────────────────── */
 
 .root:hover:not([data-disabled="true"]) {
@@ -218,6 +236,11 @@
 .root:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
+}
+
+/* On a colored host the accent ring can vanish (accent fill); the host's text color always reads. */
+.root[data-tone="inherit"]:focus-visible {
+  outline-color: currentColor;
 }
 
 /* Current navigation item (e.g. NavLink sets aria-current): ghost / soft get the active fill.
@@ -243,6 +266,16 @@
 
 .root[data-disabled="true"]:not([data-loading="true"])[data-variant="ghost"] {
   --btn-bg: transparent;
+}
+
+/* inherit stays on its host: a faded host color, the soft wash fades with it. */
+.root[data-tone="inherit"][data-disabled="true"]:not([data-loading="true"]) {
+  --btn-bg: transparent;
+  --btn-fg: color-mix(in srgb, currentColor 48%, transparent);
+}
+
+.root[data-tone="inherit"][data-variant="soft"][data-disabled="true"]:not([data-loading="true"]) {
+  --btn-bg: color-mix(in srgb, currentColor 12%, transparent);
 }
 
 /* asChild: non-button hosts cannot be natively disabled. */
@@ -286,6 +319,17 @@
 /* No leading icon: the auto spinner is centered over the label, which keeps its space. */
 .root[data-loading-overlay="true"] {
   color: transparent;
+}
+
+/* inherit: `color: transparent` would take the spinner's currentColor with it; hide the label's
+   glyphs and the other parts instead. */
+.root[data-tone="inherit"][data-loading-overlay="true"] {
+  color: var(--btn-fg);
+  -webkit-text-fill-color: transparent;
+}
+
+.root[data-tone="inherit"][data-loading-overlay="true"] > :not(.spinner) {
+  visibility: hidden;
 }
 
 .root[data-loading-overlay="true"] > .spinner {

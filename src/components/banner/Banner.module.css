@@ -255,18 +255,14 @@
   order: 1;
 }
 
-/* Corner close (a ghost icon Button): top-right, centered on the first text line without growing
-   the banner; it takes the banner's text color so it reads on solid fills too. */
+/* Corner close (a ghost icon Button, `tone="inherit"`: the banner's text color, so it reads on
+   solid fills too): top-right, centered on the first text line without growing the banner.
+   `.root` scoping outranks Button's own `margin: 0`. */
 .root .close {
   grid-column: 2;
   grid-row: 1;
   align-self: start;
   margin-block: calc((var(--bn-title-line-height) - var(--bn-close)) / 2);
-  color: inherit;
-}
-
-.root[data-variant="solid"] .close:focus-visible {
-  outline-color: currentColor;
 }
 
 /* ---------- Narrow container: actions under the text ---------- */

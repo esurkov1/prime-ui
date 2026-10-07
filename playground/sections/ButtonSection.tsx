@@ -26,6 +26,12 @@ export const page: ComponentPageConfig = {
         "Иконка до или после подписи и квадратная кнопка только с иконкой — `Button.Icon`, `aria-label`.",
     },
     {
+      scenario: "on-colored-host",
+      title: "На цветной подложке",
+      description:
+        'Действия на цветной полосе берут её цвет текста: ghost-крестик и soft-действие — `tone="inherit"`.',
+    },
+    {
       scenario: "as-child",
       title: "Как ссылка",
       description:

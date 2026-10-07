@@ -16,10 +16,10 @@ export const api: ComponentApi = {
         },
         {
           name: "tone",
-          type: '"accent" | "neutral" | "danger"',
+          type: '"accent" | "neutral" | "danger" | "inherit"',
           default: '"accent"',
-          en: "Meaning of the action; `danger` for destructive actions.",
-          ru: "Смысл: главное действие, второстепенное или разрушительное.",
+          en: "Meaning of the action; `danger` for destructive actions. `inherit` takes the host's text color for an action on a colored host (a solid Banner); it needs `variant` `ghost`, `soft` or `outline`.",
+          ru: "Смысл: главное действие, второстепенное или разрушительное. `inherit` берёт цвет текста подложки — для действия на цветном фоне; только с `ghost`, `soft` или `outline`.",
         },
         {
           name: "size",
