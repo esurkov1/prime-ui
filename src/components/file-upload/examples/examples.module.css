@@ -1,64 +1,38 @@
+/* Layout of the FileUpload scenarios: semantic tokens only. */
+
+/* A form column: zone and file rows, row → row 8. */
 .column {
-  display: grid;
-  gap: var(--prime-space-3);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
-/* File rows inside a card: as wide as the drop zone above them. */
-.list {
-  display: grid;
-  gap: var(--prime-space-3);
-  width: 100%;
-}
-
-.zones {
-  display: grid;
-  grid-template-columns: repeat(
-      auto-fit,
-      minmax(min(100%, calc(var(--prime-panel-min-width) * 1.5)), 1fr)
-    );
-  align-items: end;
-  gap: var(--prime-space-4);
-  width: 100%;
-}
-
-.sizeZones {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
-  align-items: end;
-  gap: var(--prime-space-3);
-  width: 100%;
-}
-
-.sizeCell {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--prime-space-2);
-  min-width: 0;
+  width: min(100%, var(--prime-modal-width-s));
 }
 
-/* Title + hint inside a custom zone body. */
-.copy {
-  display: grid;
-  justify-items: center;
-  gap: var(--prime-space-1);
+/* sizes.tsx: a zone and its file row of one tier, then the next tier. */
+.sizeRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  margin-bottom: var(--prime-space-4);
 }
 
-.chipGlyph {
-  display: inline-flex;
-  align-items: center;
+/* structure.tsx: source buttons under the title. */
+.sources {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  width: var(--prime-control-xs-height);
-  height: var(--prime-control-xs-height);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-muted);
+  gap: var(--prime-space-2);
 }
 
-.card {
-  width: 100%;
-  max-width: var(--prime-modal-width-m);
+/* narrow.tsx: a phone-width column. */
+.narrow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  width: min(100%, calc(var(--prime-space-16) * 4));
 }
 
+/* avatar-upload.tsx */
 .avatarRow {
   display: flex;
   align-items: center;
@@ -70,20 +44,21 @@
 /* The whole avatar is the drop target: a round zone that hugs it. */
 .avatarRow .avatarZone {
   width: auto;
-  flex-shrink: 0;
   padding: var(--prime-space-1);
   border-radius: var(--prime-radius-full);
 }
 
 /* Text block → actions: 12; title → description: 4. */
 .avatarText {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--prime-space-3);
   min-width: 0;
 }
 
 .avatarCopy {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--prime-space-1);
   min-width: 0;
 }
@@ -92,18 +67,4 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--prime-space-2);
-}
-
-/* Zones above, file rows below. */
-.stack {
-  display: grid;
-  gap: var(--prime-space-4);
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.caption {
-  width: 100%;
-  text-align: center;
 }

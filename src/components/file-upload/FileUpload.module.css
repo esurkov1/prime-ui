@@ -2,7 +2,8 @@
  * Drop zone: the one place where a visible dashed line is part of the design (affordance for
  * "drop here"). Fill follows the field context (white on canvas, gray inside surfaces).
  * `variant="solid"` drops the line and keeps only the fill. Drag-over is `data-state="active"`.
- * File rows: transparent wash (works on any surface), tier typography, palette format badge.
+ * The field label and support row come from FieldFrame.
+ * File rows: transparent wash (works on any surface), tier typography, a square format Badge.
  */
 .root {
   --fu-pad: var(--prime-space-6);
@@ -10,11 +11,6 @@
   --fu-copy-gap: var(--prime-space-1);
   --fu-title: var(--prime-control-m-text-size);
   --fu-title-line-height: var(--prime-control-m-line-height);
-  --fu-btn-h: var(--prime-control-m-height);
-  --fu-btn-px: var(--prime-control-m-padding-x);
-  --fu-btn-radius: var(--prime-control-m-radius);
-  --fu-btn-text: var(--prime-control-m-text-size);
-  --fu-btn-line-height: var(--prime-control-m-line-height);
   --fu-icon-box: var(--prime-control-m-height);
   --fu-radius: var(--prime-radius-l);
   position: relative;
@@ -43,11 +39,6 @@
   --fu-stack: var(--prime-space-2);
   --fu-title: var(--prime-control-xs-text-size);
   --fu-title-line-height: var(--prime-control-xs-line-height);
-  --fu-btn-h: var(--prime-control-xs-height);
-  --fu-btn-px: var(--prime-control-xs-padding-x);
-  --fu-btn-radius: var(--prime-control-xs-radius);
-  --fu-btn-text: var(--prime-control-xs-text-size);
-  --fu-btn-line-height: var(--prime-control-xs-line-height);
   --fu-icon-box: var(--prime-control-xs-height);
   --fu-radius: var(--prime-radius-m);
 }
@@ -57,11 +48,6 @@
   --fu-stack: var(--prime-space-3);
   --fu-title: var(--prime-control-s-text-size);
   --fu-title-line-height: var(--prime-control-s-line-height);
-  --fu-btn-h: var(--prime-control-s-height);
-  --fu-btn-px: var(--prime-control-s-padding-x);
-  --fu-btn-radius: var(--prime-control-s-radius);
-  --fu-btn-text: var(--prime-control-s-text-size);
-  --fu-btn-line-height: var(--prime-control-s-line-height);
   --fu-icon-box: var(--prime-control-s-height);
   --fu-radius: var(--prime-radius-m);
 }
@@ -71,11 +57,6 @@
   --fu-stack: var(--prime-space-5);
   --fu-title: var(--prime-control-l-text-size);
   --fu-title-line-height: var(--prime-control-l-line-height);
-  --fu-btn-h: var(--prime-control-l-height);
-  --fu-btn-px: var(--prime-control-l-padding-x);
-  --fu-btn-radius: var(--prime-control-l-radius);
-  --fu-btn-text: var(--prime-control-l-text-size);
-  --fu-btn-line-height: var(--prime-control-l-line-height);
   --fu-icon-box: var(--prime-control-l-height);
 }
 
@@ -85,11 +66,6 @@
   --fu-copy-gap: var(--prime-space-2);
   --fu-title: var(--prime-control-xl-text-size);
   --fu-title-line-height: var(--prime-control-xl-line-height);
-  --fu-btn-h: var(--prime-control-xl-height);
-  --fu-btn-px: var(--prime-control-xl-padding-x);
-  --fu-btn-radius: var(--prime-control-xl-radius);
-  --fu-btn-text: var(--prime-control-xl-text-size);
-  --fu-btn-line-height: var(--prime-control-xl-line-height);
   --fu-icon-box: var(--prime-control-xl-height);
   --fu-radius: var(--prime-radius-xl);
 }
@@ -154,16 +130,24 @@
   pointer-events: none;
 }
 
-.inner {
+/* ---- Body: no pointer events (no drag flicker over text), interactive children opt back in ---- */
+.body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--fu-stack);
-  max-width: 100%;
+  justify-content: center;
+  gap: var(--fu-stack, var(--prime-space-4));
+  width: 100%;
   min-width: 0;
+  text-align: center;
+  pointer-events: none;
 }
 
-.iconWrap {
+.body :is(button, a) {
+  pointer-events: auto;
+}
+
+.icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,16 +162,16 @@
     color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.root[data-state="active"] .iconWrap {
+.root[data-state="active"] .icon {
   background: var(--prime-color-bg-surface);
   color: var(--prime-color-accent-text);
 }
 
-.root[data-invalid="true"]:not([data-state="active"]) .iconWrap {
+.root[data-invalid="true"]:not([data-state="active"]) .icon {
   color: var(--prime-color-danger-text);
 }
 
-.root[data-disabled="true"] .iconWrap {
+.root[data-disabled="true"] .icon {
   color: var(--prime-color-text-disabled);
 }
 
@@ -208,42 +192,19 @@
   overflow-wrap: anywhere;
 }
 
-.titleMuted {
+.title[data-tone="muted"] {
   font-weight: var(--prime-font-weight-regular);
   color: var(--prime-color-text-secondary);
 }
 
-.root[data-disabled="true"] :is(.title, .titleMuted) {
+.root[data-disabled="true"] .title {
   color: var(--prime-color-text-disabled);
 }
 
-/* Decorative "Browse" button: neutral filled control of the same tier (the whole zone is the target). */
-.browse {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--fu-btn-h);
-  padding-inline: var(--fu-btn-px);
-  border-radius: var(--fu-btn-radius);
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-primary);
-  font-size: var(--fu-btn-text);
-  line-height: var(--fu-btn-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  white-space: nowrap;
+/* The decorative «browse» Button is a span: it never takes the pointer (the zone does). */
+.body .browse {
   pointer-events: none;
   user-select: none;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.root:hover:not([data-disabled="true"]) .browse {
-  background: var(--prime-color-fill-muted-hover);
-}
-
-.root[data-disabled="true"] .browse {
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-disabled);
 }
 
 .browseLink {
@@ -259,7 +220,7 @@
   text-decoration: underline;
   text-underline-offset: var(--prime-focus-offset);
   cursor: pointer;
-  pointer-events: auto;
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .browseLink:hover {
@@ -271,69 +232,7 @@
   outline-offset: var(--prime-focus-offset);
 }
 
-/* ─── Modal body: no pointer events, interactive children opt back in ─── */
-.dropBody {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--fu-stack, var(--prime-space-4));
-  width: 100%;
-  min-width: 0;
-  text-align: center;
-  pointer-events: none;
-}
-
-.actionsRow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--prime-space-2);
-  pointer-events: auto;
-}
-
-.chip {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-height: var(--fu-btn-h, var(--prime-control-m-height));
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--prime-space-1) var(--prime-space-3);
-  border: 0;
-  border-radius: var(--prime-radius-full);
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.chip:hover {
-  background: var(--prime-color-fill-subtle);
-}
-
-.chip:active {
-  background: var(--prime-color-fill-subtle-active);
-  transform: scale(var(--prime-motion-press-scale));
-}
-
-.chip:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.chipLabel {
-  font-size: var(--fu-btn-text, var(--prime-control-m-text-size));
-  line-height: var(--fu-btn-line-height, var(--prime-control-m-line-height));
-  font-weight: var(--prime-font-weight-medium);
-  color: var(--prime-color-text-secondary);
-}
-
-/* ─── File row ─── */
+/* ─── File row: [badge] name / description [actions], then progress ─── */
 .item {
   --fu-item-pad: var(--prime-space-3);
   --fu-item-gap: var(--prime-space-3);
@@ -343,19 +242,31 @@
   --fu-item-meta-line-height: var(--prime-control-m-hint-line-height);
   --fu-item-badge: var(--prime-control-m-height);
   --fu-item-badge-radius: var(--prime-radius-m);
-  --fu-item-badge-text: var(--prime-badge-s-text-size);
-  --fu-item-icon: var(--prime-control-m-icon);
   --fu-item-radius: var(--prime-radius-l);
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: var(--fu-item-gap);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "badge name actions"
+    "badge description actions"
+    "progress progress progress";
+  align-items: center;
+  column-gap: var(--fu-item-gap);
   width: 100%;
   min-width: 0;
   padding: var(--fu-item-pad);
   border-radius: var(--fu-item-radius);
   background: var(--prime-color-fill-subtle);
   font-family: var(--prime-font-family-sans);
+}
+
+/* Without a badge the name starts at the edge. */
+.item:not(:has(> .formatBadge)) {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "name actions"
+    "description actions"
+    "progress progress";
 }
 
 .item[data-size="xs"] {
@@ -367,8 +278,6 @@
   --fu-item-meta-line-height: var(--prime-control-xs-hint-line-height);
   --fu-item-badge: var(--prime-control-xs-height);
   --fu-item-badge-radius: var(--prime-radius-s);
-  --fu-item-badge-text: var(--prime-badge-xs-text-size);
-  --fu-item-icon: var(--prime-control-xs-icon);
   --fu-item-radius: var(--prime-radius-m);
 }
 
@@ -381,7 +290,6 @@
   --fu-item-meta-line-height: var(--prime-control-s-hint-line-height);
   --fu-item-badge: var(--prime-control-s-height);
   --fu-item-badge-radius: var(--prime-radius-s);
-  --fu-item-icon: var(--prime-control-s-icon);
   --fu-item-radius: var(--prime-radius-m);
 }
 
@@ -392,8 +300,6 @@
   --fu-item-meta: var(--prime-control-l-hint-size);
   --fu-item-meta-line-height: var(--prime-control-l-hint-line-height);
   --fu-item-badge: var(--prime-control-l-height);
-  --fu-item-badge-text: var(--prime-badge-m-text-size);
-  --fu-item-icon: var(--prime-control-l-icon);
 }
 
 .item[data-size="xl"] {
@@ -405,8 +311,6 @@
   --fu-item-meta-line-height: var(--prime-control-xl-hint-line-height);
   --fu-item-badge: var(--prime-control-xl-height);
   --fu-item-badge-radius: var(--prime-radius-l);
-  --fu-item-badge-text: var(--prime-badge-l-text-size);
-  --fu-item-icon: var(--prime-control-xl-icon);
   --fu-item-radius: var(--prime-radius-xl);
 }
 
@@ -415,39 +319,19 @@
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
-.itemRow {
-  display: flex;
-  align-items: center;
-  gap: var(--fu-item-gap);
-  min-width: 0;
-}
-
-.itemMain {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-1);
-}
-
-.itemStack {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--prime-space-2);
-}
-
-.itemTextGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  width: 100%;
-  min-width: 0;
+/* The kit Badge as a square tile of the row tier. */
+.item .formatBadge {
+  grid-area: badge;
+  justify-content: center;
+  width: var(--fu-item-badge);
+  height: var(--fu-item-badge);
+  padding-inline: 0;
+  border-radius: var(--fu-item-badge-radius);
+  font-weight: var(--prime-font-weight-semibold);
 }
 
 .itemName {
+  grid-area: name;
   min-width: 0;
   overflow: hidden;
   font-size: var(--fu-item-name);
@@ -458,132 +342,29 @@
   white-space: nowrap;
 }
 
-.itemMeta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-1);
+.itemDescription {
+  grid-area: description;
   min-width: 0;
+  margin-top: var(--prime-space-1);
   font-size: var(--fu-item-meta);
   line-height: var(--fu-item-meta-line-height);
   font-variant-numeric: tabular-nums;
   color: var(--prime-color-text-muted);
 }
 
-.itemMeta strong {
-  font-weight: var(--prime-font-weight-medium);
-  color: var(--prime-color-text-primary);
-}
-
-.item[data-invalid="true"] .itemMeta {
+.item[data-invalid="true"] .itemDescription {
   color: var(--prime-color-danger-text);
-}
-
-.itemMetaSep {
-  color: var(--prime-color-text-placeholder);
-  user-select: none;
-}
-
-.itemTryAgain {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: var(--prime-radius-xs);
-  background: none;
-  font: inherit;
-  font-size: var(--fu-item-meta);
-  line-height: var(--fu-item-meta-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  color: var(--prime-color-danger-text);
-  text-decoration: underline;
-  text-underline-offset: var(--prime-focus-offset);
-  cursor: pointer;
-}
-
-.itemTryAgain:hover {
-  color: var(--prime-color-danger-hover);
-}
-
-.itemTryAgain:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
 }
 
 .itemActions {
+  grid-area: actions;
   display: flex;
-  flex-shrink: 0;
   align-items: center;
   gap: var(--prime-space-1);
 }
 
-.itemFooter,
 .itemProgress {
-  width: 100%;
+  grid-area: progress;
   min-width: 0;
-}
-
-.formatBadge {
-  box-sizing: border-box;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--fu-item-badge, var(--prime-control-m-height));
-  height: var(--fu-item-badge, var(--prime-control-m-height));
-  padding: 0;
-  border-radius: var(--fu-item-badge-radius, var(--prime-radius-m));
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--fu-item-badge-text, var(--prime-badge-s-text-size));
-  line-height: 1;
-  font-weight: var(--prime-font-weight-semibold);
-  letter-spacing: var(--prime-text-caption-tracking);
-  text-transform: uppercase;
-  /* Neutral badge sits on the row's own wash: a stronger wash keeps it visible (foundation §4). */
-  background: var(--prime-color-fill-strong);
-  color: var(--prime-color-text-secondary);
-}
-
-.formatBadge[data-color="red"] {
-  --fu-hue: var(--prime-color-palette-red-text);
-}
-
-.formatBadge[data-color="blue"] {
-  --fu-hue: var(--prime-color-palette-blue-text);
-}
-
-.formatBadge[data-color="green"] {
-  --fu-hue: var(--prime-color-palette-green-text);
-}
-
-.formatBadge[data-color="orange"] {
-  --fu-hue: var(--prime-color-palette-orange-text);
-}
-
-.formatBadge[data-color="purple"] {
-  --fu-hue: var(--prime-color-palette-purple-text);
-}
-
-.formatBadge[data-color="sky"] {
-  --fu-hue: var(--prime-color-palette-sky-text);
-}
-
-.formatBadge[data-color="yellow"] {
-  --fu-hue: var(--prime-color-palette-yellow-text);
-}
-
-.formatBadge[data-color="pink"] {
-  --fu-hue: var(--prime-color-palette-pink-text);
-}
-
-.formatBadge[data-color="teal"] {
-  --fu-hue: var(--prime-color-palette-teal-text);
-}
-
-/*
- * Hue badges: a translucent wash of the hue text (not the opaque light `soft` tint, which is as light
- * as the row in the light theme), so the badge always steps off the row it sits on (foundation §4).
- */
-.formatBadge:not([data-color="gray"]) {
-  background: color-mix(in srgb, var(--fu-hue) 16%, transparent);
-  color: var(--fu-hue);
+  margin-top: var(--fu-item-gap);
 }

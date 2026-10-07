@@ -46,7 +46,6 @@ const NOT_CONVERTED = new Set([
   "dropdown",
   "empty-page",
   "example-frame",
-  "file-upload",
   "hint",
   "kbd",
   "link-button",
