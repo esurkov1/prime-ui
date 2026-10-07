@@ -366,7 +366,10 @@ export type {
 export { Popover } from "./popover/Popover";
 export type { ProgressBarLabels, ProgressBarProps } from "./progress-bar/ProgressBar";
 export { ProgressBar } from "./progress-bar/ProgressBar";
-export type { ProgressCircleRootProps } from "./progress-circle/ProgressCircle";
+export type {
+  ProgressCircleLabels,
+  ProgressCircleProps,
+} from "./progress-circle/ProgressCircle";
 export { ProgressCircle } from "./progress-circle/ProgressCircle";
 export type {
   RadioErrorProps,

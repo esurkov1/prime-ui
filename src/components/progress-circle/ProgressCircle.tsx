@@ -9,6 +9,7 @@ import {
   resolveSegments,
 } from "@/internal/progressSegments";
 import type { ControlSize, Tone } from "@/internal/states";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./ProgressCircle.module.css";
 
@@ -27,16 +28,15 @@ const SIZES_WITHOUT_INNER: ReadonlySet<ControlSize> = new Set(["xs", "s"]);
 
 export type ProgressCircleLabels = ProgressSegmentsLabels;
 
-type ProgressCircleCommonProps = {
-  /** Accessible name of the ring. Always pass it. */
-  label?: string;
+type ProgressCircleCommonProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  /** Default `m`. */
   size?: ControlSize;
   /**
    * Centered content (number, percent, icon). Not rendered on `xs` / `s`; a string or number
    * child stays available as `aria-valuetext`.
    */
   children?: React.ReactNode;
-  className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 type ProgressCircleValueProps = ProgressCircleCommonProps & {
@@ -44,7 +44,7 @@ type ProgressCircleValueProps = ProgressCircleCommonProps & {
   value: number;
   /** Top of the scale. Default `100`. */
   max?: number;
-  /** Arc color. */
+  /** Arc color. Default `accent`. */
   tone?: Tone;
   segments?: never;
   segmentGap?: never;
@@ -64,7 +64,7 @@ type ProgressCircleSegmentsProps = ProgressCircleCommonProps & {
   tone?: never;
 };
 
-export type ProgressCircleRootProps = ProgressCircleValueProps | ProgressCircleSegmentsProps;
+export type ProgressCircleProps = ProgressCircleValueProps | ProgressCircleSegmentsProps;
 
 type Arc = { start: number; length: number; tone?: Tone; rest?: boolean };
 
@@ -145,102 +145,112 @@ function SegmentArcs({
   );
 }
 
-const ProgressCircleRoot = React.forwardRef<HTMLDivElement, ProgressCircleRootProps>(
-  (props, ref) => {
-    const { label, size = "m", children, className } = props;
-    const descriptionId = React.useId();
-    const showInner = children != null && children !== false && !SIZES_WITHOUT_INNER.has(size);
-    const valueText =
-      typeof children === "string" || typeof children === "number" ? String(children) : undefined;
+/**
+ * A progress ring: a single `value` (`role="progressbar"`) or `segments` — parts of a whole
+ * clockwise from the top (`role="group"` described by the distribution).
+ */
+export function ProgressCircle(props: ProgressCircleProps) {
+  const {
+    size = "m",
+    children,
+    className,
+    "aria-label": label,
+    value: valueProp,
+    max: maxProp,
+    tone: toneProp,
+    segments: segmentsProp,
+    segmentGap = "none",
+    labels,
+    ...rest
+  } = props;
+  const descriptionId = React.useId();
+  const showInner = children != null && children !== false && !SIZES_WITHOUT_INNER.has(size);
+  const valueText =
+    typeof children === "string" || typeof children === "number" ? String(children) : undefined;
 
-    let tone: Tone | undefined;
-    let svg: React.ReactNode;
-    let description: React.ReactNode = null;
+  let tone: Tone | undefined;
+  let svg: React.ReactNode;
+  let description: React.ReactNode = null;
 
-    if (props.segments) {
-      const gap = props.segmentGap ?? "none";
-      const { segments, total, rest, scale, text } = resolveSegments(props.segments, props.max, {
-        ...DEFAULT_PROGRESS_SEGMENTS_LABELS,
-        ...props.labels,
-      });
-      const unit = scale > 0 ? CIRCUMFERENCE / scale : 0;
-      const arcs: Arc[] = [];
-      let cursor = 0;
-      for (const seg of segments) {
-        if (seg.value > 0) arcs.push({ start: cursor, length: seg.value * unit, tone: seg.tone });
-        cursor += seg.value * unit;
-      }
-      if (rest > 0 && total > 0) arcs.push({ start: cursor, length: rest * unit, rest: true });
-      const a11y = label
-        ? { "aria-label": label, "aria-describedby": descriptionId }
-        : { "aria-label": text };
-      if (label) {
-        description = (
-          <span id={descriptionId} className={styles.visuallyHidden}>
-            {text}
-          </span>
-        );
-      }
-
-      svg = (
-        // biome-ignore lint/a11y/useSemanticElements: a distribution is a group of parts, not a fieldset
-        <svg
-          viewBox="0 0 100 100"
-          className={styles.svg}
-          role="group"
-          {...a11y}
-          {...toDataAttributes({ "segment-gap": gap })}
-        >
-          <g className={styles.arcs}>
-            {gap === "none" || total === 0 ? <Ring className={styles.track} /> : null}
-            {total > 0 ? <SegmentArcs arcs={arcs} gap={gap} closed={rest === 0} /> : null}
-          </g>
-        </svg>
-      );
-    } else {
-      const max = props.max !== undefined && props.max > 0 ? props.max : 100;
-      const value = Math.min(max, Math.max(props.value, 0));
-      tone = props.tone ?? "accent";
-      svg = (
-        <svg
-          viewBox="0 0 100 100"
-          className={styles.svg}
-          role="progressbar"
-          aria-valuenow={value}
-          aria-valuemin={0}
-          aria-valuemax={max}
-          aria-label={label}
-          aria-valuetext={valueText}
-        >
-          <g className={styles.arcs}>
-            <Ring className={styles.track} />
-            <Ring
-              className={styles.fill}
-              style={{
-                strokeDasharray: `${CIRCUMFERENCE} ${CIRCUMFERENCE}`,
-                strokeDashoffset: CIRCUMFERENCE * (1 - value / max),
-                opacity: value === 0 ? 0 : undefined,
-              }}
-            />
-          </g>
-        </svg>
-      );
+  if (segmentsProp) {
+    const gap = segmentGap;
+    const {
+      segments,
+      total,
+      rest: free,
+      scale,
+      text,
+    } = resolveSegments(segmentsProp, maxProp, {
+      ...DEFAULT_PROGRESS_SEGMENTS_LABELS,
+      ...labels,
+    });
+    const unit = scale > 0 ? CIRCUMFERENCE / scale : 0;
+    const arcs: Arc[] = [];
+    let cursor = 0;
+    for (const seg of segments) {
+      if (seg.value > 0) arcs.push({ start: cursor, length: seg.value * unit, tone: seg.tone });
+      cursor += seg.value * unit;
     }
+    if (free > 0 && total > 0) arcs.push({ start: cursor, length: free * unit, rest: true });
+    const a11y = label
+      ? { "aria-label": label, "aria-describedby": descriptionId }
+      : { "aria-label": text };
+    if (label) description = <VisuallyHidden id={descriptionId}>{text}</VisuallyHidden>;
 
-    return (
-      <div ref={ref} className={cx(styles.root, className)} {...toDataAttributes({ size, tone })}>
-        {svg}
-        {description}
-        {showInner ? (
-          <div className={styles.inner} aria-hidden={valueText !== undefined ? true : undefined}>
-            {children}
-          </div>
-        ) : null}
-      </div>
+    svg = (
+      // biome-ignore lint/a11y/useSemanticElements: a distribution is a group of parts, not a fieldset
+      <svg
+        viewBox="0 0 100 100"
+        className={styles.svg}
+        role="group"
+        {...a11y}
+        {...toDataAttributes({ "segment-gap": gap })}
+      >
+        <g className={styles.arcs}>
+          {gap === "none" || total === 0 ? <Ring className={styles.track} /> : null}
+          {total > 0 ? <SegmentArcs arcs={arcs} gap={gap} closed={free === 0} /> : null}
+        </g>
+      </svg>
     );
-  },
-);
+  } else {
+    const max = maxProp !== undefined && maxProp > 0 ? maxProp : 100;
+    const value = Math.min(max, Math.max(valueProp ?? 0, 0));
+    tone = toneProp ?? "accent";
+    svg = (
+      <svg
+        viewBox="0 0 100 100"
+        className={styles.svg}
+        role="progressbar"
+        aria-valuenow={value}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-label={label}
+        aria-valuetext={valueText}
+      >
+        <g className={styles.arcs}>
+          <Ring className={styles.track} />
+          <Ring
+            className={styles.fill}
+            style={{
+              strokeDasharray: `${CIRCUMFERENCE} ${CIRCUMFERENCE}`,
+              strokeDashoffset: CIRCUMFERENCE * (1 - value / max),
+              opacity: value === 0 ? 0 : undefined,
+            }}
+          />
+        </g>
+      </svg>
+    );
+  }
 
-ProgressCircleRoot.displayName = "ProgressCircle.Root";
-
-export const ProgressCircle = { Root: ProgressCircleRoot };
+  return (
+    <div className={cx(styles.root, className)} {...rest} {...toDataAttributes({ size, tone })}>
+      {svg}
+      {description}
+      {showInner ? (
+        <div className={styles.inner} aria-hidden={valueText !== undefined ? true : undefined}>
+          {children}
+        </div>
+      ) : null}
+    </div>
+  );
+}

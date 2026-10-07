@@ -57,7 +57,6 @@ const NOT_CONVERTED = new Set([
   "page-content",
   "pagination",
   "popover",
-  "progress-circle",
   "radio",
   "scroll-container",
   "segmented-control",
