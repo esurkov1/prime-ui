@@ -441,7 +441,7 @@ describe("Select (composable)", () => {
     fireEvent.click(screen.getByRole("combobox"));
 
     const options = screen.getAllByRole("option");
-    // Ни один пункт не должен иметь data-highlighted="true"
+    // No option may have data-highlighted="true"
     options.forEach((option) => {
       expect(option).not.toHaveAttribute("data-highlighted", "true");
     });

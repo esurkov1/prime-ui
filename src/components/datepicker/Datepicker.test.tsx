@@ -6,11 +6,11 @@ import { Datepicker, datepickerPresets, YEARLESS_YEAR } from "./Datepicker";
 import { matchPreset, monthGrid, parseTime, rowsNeeded } from "./datepickerModel";
 import { resolvePanelLayout } from "./panelLayout";
 
-const TODAY = new Date(2026, 9, 7); // 7 октября 2026, среда
+const TODAY = new Date(2026, 9, 7); // 7 October 2026, a Wednesday
 
 describe("datepickerModel", () => {
   it("сетка месяца начинается с понедельника и выравнивает строки", () => {
-    const oct = new Date(2026, 9, 1); // четверг
+    const oct = new Date(2026, 9, 1); // a Thursday
     const rows = rowsNeeded(oct, 1);
     const grid = monthGrid(oct, rows, 1);
     expect(grid[0].slice(0, 3).every((c) => c.day == null)).toBe(true);
@@ -166,7 +166,7 @@ describe("Datepicker.Panel — сетка и раскладка", () => {
     const { container } = render(
       <Datepicker.Panel mode="single" value={null} onValueChange={() => {}} today={TODAY} />,
     );
-    // Октябрь 2026 начинается с четверга: 28–30 сентября в первой строке.
+    // October 2026 starts on a Thursday: 28–30 September are in the first row.
     expect(container.querySelector("tbody tr")?.textContent?.startsWith("282930")).toBe(true);
     expect(screen.queryByRole("button", { name: "30 сентября 2026" })).not.toBeInTheDocument();
   });
@@ -357,7 +357,7 @@ describe("Datepicker — overlay contract", () => {
 describe("Datepicker.Panel — доступная ширина", () => {
   it("resolvePanelLayout: 2 месяца при достаточной ширине, 1 — на узкой, compact уже месяца", () => {
     const base = { size: "m" as const, months: 2 as const, hasPresets: false, embedded: true };
-    // m: клетка 32 → месяц 224; 2 месяца + зазор 24 + поля 2 × 16 = 504.
+    // m: cell 32 → month 224; 2 months + gap 24 + padding 2 × 16 = 504.
     expect(resolvePanelLayout({ ...base, available: 1440 }).monthCount).toBe(2);
     expect(resolvePanelLayout({ ...base, available: 504 }).monthCount).toBe(2);
     expect(resolvePanelLayout({ ...base, available: 503 }).monthCount).toBe(1);
@@ -367,9 +367,9 @@ describe("Datepicker.Panel — доступная ширина", () => {
       compact: false,
     });
     expect(resolvePanelLayout({ ...base, available: 250 }).compact).toBe(true);
-    // Ещё не измерено — считаем, что места хватает.
+    // Not measured yet: assume there is room.
     expect(resolvePanelLayout({ ...base, available: null }).monthCount).toBe(2);
-    // Поповер никогда не бывает compact.
+    // The popover is never compact.
     expect(resolvePanelLayout({ ...base, embedded: false, available: 200 }).compact).toBe(false);
   });
 

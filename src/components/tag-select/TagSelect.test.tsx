@@ -67,8 +67,8 @@ describe("TagSelect", () => {
     expect(screen.getByRole("option", { name: "новый" })).toBeInTheDocument();
   });
 
-  // Раньше выбранные прятались из списка; теперь они сверху с галочкой: при многих тегах часть
-  // свёрнута в «+N», и снять их можно прямо в списке.
+  // Selected options used to be hidden from the list; now they come first with a check: with many
+  // tags some are folded into «+N», and they can be unticked right in the list.
   it("все теги выбраны: список открывается, выбранные отмечены; снятие галочки убирает тег", () => {
     render(<BasicTagSelect defaultValue={["a", "b"]} />);
     fireEvent.focus(screen.getByRole("combobox"));
