@@ -1,5 +1,4 @@
-/** Editor toolbar of icon-only buttons: each has an `aria-label`, the tooltip repeats the name and shows the shortcut in Kbd. Use one Tooltip.Provider for a whole toolbar: after the first tooltip, neighbours open instantly. */
-
+/** A formatting toolbar in one group: after the first tooltip the neighbours open at once, each with its name and shortcut — `Tooltip.Provider`. */
 import { Bold, Italic, Link2, List, Underline } from "lucide-react";
 import { Button, Kbd, Tooltip } from "prime-ui-kit";
 
@@ -13,9 +12,9 @@ const TOOLS = [
   { icon: Link2, label: "Ссылка", keys: "⌘K" },
 ] as const;
 
-export default function TooltipCompositionExample() {
+export default function TooltipToolbarExample() {
   return (
-    <Tooltip.Provider delayDuration={300}>
+    <Tooltip.Provider>
       <div className={styles.toolbar} role="toolbar" aria-label="Форматирование">
         {TOOLS.map(({ icon: ToolIcon, label, keys }) => (
           <Tooltip.Root key={label}>
@@ -27,7 +26,7 @@ export default function TooltipCompositionExample() {
               </Button.Root>
             </Tooltip.Trigger>
             <Tooltip.Content size="s" side="bottom">
-              {label} <Kbd.Root size="xs">{keys}</Kbd.Root>
+              {label} <Kbd.Root>{keys}</Kbd.Root>
             </Tooltip.Content>
           </Tooltip.Root>
         ))}

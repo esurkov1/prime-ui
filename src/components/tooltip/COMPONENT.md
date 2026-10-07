@@ -1,13 +1,14 @@
 # Tooltip
 
 **Category:** overlays
+**Kind:** overlay
 
 > A short hint that appears next to an element on hover or keyboard focus.
 
 ## When to use
 - Name and shortcut of an icon-only button.
 - Why a control is disabled (wrap the disabled control in a focusable element).
-- A one-line definition of a term or abbreviation in text.
+- A one-line definition of a term or abbreviation.
 
 ## When not to use
 - Content with links, buttons or fields, or anything the user must read to continue → use [Popover](../popover/COMPONENT.md).
@@ -27,14 +28,26 @@ Tooltip.Provider        optional; delay and skip-delay group for a subtree
 └── Tooltip.Root        state of one tooltip (no DOM)
     ├── Tooltip.Trigger clones its single child element and adds handlers
     └── Tooltip.Content portaled role="tooltip" chip
-        └── arrow        decorative svg pointing at the trigger's centre
+        └── arrow       decorative svg pointing at the trigger's centre
 ```
 
 ## API
 
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+### Tooltip.Root
+No DOM, no ref. State of one tooltip; without a Provider it joins the kit-wide default group (400 / 300).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `open` | `boolean` | — | Controlled visibility; together with `onOpenChange`. |
+| `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on hover, focus, blur, pointer-leave, press, Escape, and when a neighbour in the group opens. |
+| `delayDuration` | `number` | `400` | Show delay in ms for this tooltip (the Provider's when omitted); hiding never waits for it. |
+| `children` | `ReactNode` | — (required) | Tooltip.Trigger and Tooltip.Content. |
+
 ### Tooltip.Provider
-No DOM, no ref. Its tooltips form a group: one is open at a time, and once one has been shown the
-next opens at once and without animation (until `skipDelayDuration` passes with none open).
+No DOM, no ref. Its tooltips form a group: one is open at a time, and once one has been shown the next opens at once and without motion, until `skipDelayDuration` passes with none open.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -42,35 +55,23 @@ next opens at once and without animation (until `skipDelayDuration` passes with 
 | `skipDelayDuration` | `number` | `300` | Window in ms after a tooltip closes during which the next one opens instantly. |
 | `children` | `ReactNode` | — (required) | Subtree. |
 
-### Tooltip.Root
-No DOM, no ref. Works without a Provider: it then joins the kit-wide default group (400 / 300).
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `open` | `boolean` | — | Controlled visibility. |
-| `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
-| `onOpenChange` | `(open: boolean) => void` | — | Called on hover, focus, blur, pointer-leave, press, Escape, and when a neighbour in the group opens. |
-| `delayDuration` | `number` | from Provider (`400`) | Show delay in ms for this tooltip; hiding never waits for it. |
-| `children` | `ReactNode` | — (required) | Tooltip.Trigger and Tooltip.Content. |
-
 ### Tooltip.Trigger
-No DOM of its own: clones the child (`cloneElement`), like `asChild`. Composes its `ref` with the child's own, merges `className`, appends `aria-describedby` while open, sets `data-state`, and chains `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus`, `onBlur`.
+No DOM: clones the single child, composes its `ref`, appends the tooltip id to its `aria-describedby` while open, sets `data-state` and chains `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus`, `onBlur`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactElement` | — (required) | Exactly one focusable element (Button, a `<button>`, a `tabIndex={0}` span around a disabled control). |
-| `className` | `string` | — | Merged with the child's `className`. |
+| `children` | `ReactElement` | — (required) | One focusable element: a Button, or a `tabIndex={0}` wrapper around a disabled control. |
 
 ### Tooltip.Content
-No ref. Rendered in a portal only while open (and during its exit animation).
+`ref` → `HTMLDivElement`. Portaled `role="tooltip"` chip with an arrow; renders while open and during its exit animation, placed before paint.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `side` | `"top" \| "bottom" \| "left" \| "right"` | `"top"` | Preferred side; flips to the opposite side when it does not fit, then shifts inside the viewport. |
-| `align` | `"start" \| "center" \| "end"` | `"center"` | Alignment along the trigger: its start edge, centre or end edge. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text and padding tier; also the size context for controls inside (e.g. Kbd). |
-| `className` | `string` | — | Extra class on the chip. |
+| `side` | `"top" \| "bottom" \| "left" \| "right"` | `"top"` | Preferred side; flips to the opposite one when it does not fit, then shifts inside the viewport. |
+| `align` | `"start" \| "center" \| "end"` | `"center"` | Alignment along the trigger: its start edge, centre or end edge; the arrow keeps pointing at the trigger. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text and padding tier; also the size context of controls inside (a Kbd). |
 | `children` | `ReactNode` | — (required) | Hint text, optionally with a Kbd. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "role" \| "onPointerEnter" \| "onPointerLeave">` | — | `className`, `style` and the other attributes of the chip. |
 
 ## Variants
 Tooltip has no `variant` or `tone`: it is always a flat inverse chip (`tooltip-bg`, `tooltip-text`) with an arrow and no shadow, so it reads the same on canvas, cards and floating layers. The arrow (`--prime-tooltip-arrow-width` × `--prime-tooltip-arrow-height`) always points at the trigger's centre, also after flipping, aligning or shifting, and never slides into the chip's rounded corner.
@@ -78,7 +79,7 @@ Tooltip has no `variant` or `tone`: it is always a flat inverse chip (`tooltip-b
 ### size (Content)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | caption 12/16, padding 4 × 8, radius 6 | Next to xs controls | |
+| `xs` | caption 12/16, padding 4 × 8 | Next to xs controls | |
 | `s` | caption 12/16, padding 4 × 8 | Dense toolbars, s controls | |
 | `m` | caption 12/16, padding 4 × 8 | Most controls | yes |
 | `l` | body-s 13/20, padding 4 × 8 | l controls, longer sentences | |
@@ -87,7 +88,7 @@ Tooltip has no `variant` or `tone`: it is always a flat inverse chip (`tooltip-b
 ### side (Content)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `top` | Centred above the trigger, `--prime-tooltip-offset` away (the arrow sits in the gap) | Default for buttons in content | yes |
+| `top` | Centred above the trigger, `--prime-tooltip-offset` away (the arrow sits in the gap) | Buttons in content | yes |
 | `bottom` | Centred below the trigger | Toolbars at the top of a screen | |
 | `left` | Vertically centred, to the left | Triggers near the right edge | |
 | `right` | Vertically centred, to the right | Sidebar / rail icons | |
@@ -99,55 +100,52 @@ Tooltip has no `variant` or `tone`: it is always a flat inverse chip (`tooltip-b
 | `center` | Chip centred on the trigger | Most triggers | yes |
 | `end` | Chip ends at the trigger's end edge | Triggers at a container's end | |
 
-**Combinations** — size of the tooltip = size of the trigger control; inside the chip use `Kbd` one tier smaller (`size="s"` tooltip → `size="xs"` Kbd).
+**Combinations** — size of the tooltip = size of the trigger control; a Kbd inside takes the tier one step down by itself.
 
 ## States
-- Closed / open: uncontrolled by default; `open` + `onOpenChange` for controlled. Opens after `delayDuration` on pointer-enter (mouse and pen; touch hover is ignored) or focus.
-- Closes on blur, press of the trigger (the focus the press causes does not reopen it), Escape, and shortly after the pointer leaves — unless it moves onto the chip, which keeps it open (hoverable, WCAG 1.4.13).
-- Warm group: within a Provider (or the default group) only one tooltip is open; the next opens instantly with `data-instant="true"` (no motion), and the previous one disappears at once.
-- Content DOM: `data-state="open" | "closed"` (closed during the exit), `data-size`, `data-side` (the resolved side after flipping), `data-align`, `data-instant`, `data-overlay-portal-layer` (z-index layer when inside Modal / Drawer). Measured before paint, so it never appears in the wrong place.
-- Trigger DOM: `data-state="open" | "closed"` on the child.
+| State | Driven by | DOM |
+|---|---|---|
+| open / closed | hover (mouse, pen) or focus after `delayDuration`; `open` / `onOpenChange` | `data-state="open" \| "closed"` on the chip (closed during the exit) and on the trigger |
+| closing | blur, a press on the trigger, Escape, pointer leaving (unless it moves onto the chip) | — |
+| warm group | another tooltip of the Provider was just shown | `data-instant="true"`: opens and leaves without motion |
+| side | `side` and the room around the trigger | `data-side` (resolved), `data-align` |
+| size | `size` | `data-size` |
 
 ## Layout & spacing
 - Max width `--prime-tooltip-max-width`, never wider than the viewport minus `--prime-space-4`; text wraps (`overflow-wrap: anywhere`).
 - Kept `--prime-space-2` from viewport edges; repositions on scroll and resize.
-- Enter / exit motion comes from the shared overlay motion (fade + `--prime-space-1` + scale 0.98, fast), growing from the arrow tip; instant inside a warm group.
+- Enter / exit come from the shared overlay motion (fade + `--prime-space-1` + scale 0.98, fast), growing from the arrow tip; instant inside a warm group.
 
 ## Accessibility
-- Content has `role="tooltip"`; the trigger gets `aria-describedby` pointing at it while open.
-- Opens on keyboard focus, closes on Escape with focus staying on the trigger (WAI-ARIA tooltip pattern).
-- The trigger must be focusable. A natively `disabled` button gets no pointer or focus events: wrap it in `<span tabIndex={0}>`.
-- Icon-only buttons need their own `aria-label`; the tooltip is a description, not the name.
-- No `labels`.
+
+### Keyboard
+| Key | Action |
+|---|---|
+| `Tab` | Focus on the trigger opens the tooltip after the delay. |
+| `Escape` | Hides the tooltip; focus stays on the trigger. |
+
+### ARIA
+- The chip is `role="tooltip"`; while open the trigger points at it with `aria-describedby`.
+- The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.
+- The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, focus does.
+- A natively `disabled` button gets no events: wrap it in `<span tabIndex={0}>`.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+No `labels`.
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [sizes.tsx](examples/sizes.tsx) | `size` xs → xl next to matching buttons | Matching the tooltip to the control tier |
-| [long-content.tsx](examples/long-content.tsx) | Long text wrapping at max width (also shown on canvas, card and floating surfaces) | One-sentence explanations |
-| [states.tsx](examples/states.tsx) | Hover/focus, disabled button in a focusable span, inline term | Explaining unavailable actions and terms |
-| [side.tsx](examples/side.tsx) | `side` top · bottom · left · right | Placing near edges and in toolbars |
-| [align.tsx](examples/align.tsx) | `align` start · center · end on wide triggers | Lining the chip up with a trigger edge |
-| [controlled.tsx](examples/controlled.tsx) | `open` + `onOpenChange` driven by a Switch | Showing the hint programmatically |
-| [composition.tsx](examples/composition.tsx) | Icon-only toolbar with names and Kbd shortcuts; neighbours open instantly | Toolbars |
-| [delay.tsx](examples/delay.tsx) | `delayDuration` 0 · default · 1000 | Tuning the show delay |
-
-```tsx
-import { Button, Tooltip } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        <Button.Root variant="soft" tone="neutral">
-          Экспорт
-        </Button.Root>
-      </Tooltip.Trigger>
-      <Tooltip.Content>Выгрузка займёт около минуты</Tooltip.Content>
-    </Tooltip.Root>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | An icon-only button with a tooltip that repeats its name on hover and keyboard focus — `Tooltip.Trigger`, `Tooltip.Content`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size tier next to buttons of the same tier; take the tier of the control it describes — `size`. |
+| [placement.tsx](examples/placement.tsx) | Every side, and start / end alignment along the trigger; without room the chip flips and shifts, the arrow keeps pointing at the trigger — `side`, `align`. |
+| [toolbar.tsx](examples/toolbar.tsx) | A formatting toolbar in one group: after the first tooltip the neighbours open at once, each with its name and shortcut — `Tooltip.Provider`. |
+| [disabled-trigger.tsx](examples/disabled-trigger.tsx) | Why an action is unavailable: a disabled button inside a focusable wrapper still shows its tooltip on hover and Tab — `Tooltip.Trigger`. |
+| [delay.tsx](examples/delay.tsx) | The show delay of one tooltip: at once, the default 400 ms and one second — `delayDuration`. |
+| [long-content.tsx](examples/long-content.tsx) | A sentence of explanation wraps at the tooltip max width; anything with actions belongs in a Popover — `Tooltip.Content`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state: a switch shows the tooltip from code, hover and focus still work — `open`, `onOpenChange`. |
 
 ## Mistakes
 - Tooltip on a `disabled` button directly → wrap the button in a focusable `span`.
@@ -157,4 +155,5 @@ export function Example() {
 - A Provider per tooltip in a toolbar → one Provider around the toolbar, so neighbours open instantly.
 
 ## Related
-[Popover](../popover/COMPONENT.md) · [Kbd](../kbd/COMPONENT.md) · [Button](../button/COMPONENT.md) · [Hint](../hint/COMPONENT.md)
+- **Built from:** —
+- **See also:** [Popover](../popover/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Button](../button/COMPONENT.md), [Hint](../hint/COMPONENT.md)

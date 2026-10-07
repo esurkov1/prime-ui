@@ -73,7 +73,6 @@ const NOT_CONVERTED = new Set([
   "textarea",
   "thumbnail",
   "timeline",
-  "tooltip",
   "typography",
 ]);
 
