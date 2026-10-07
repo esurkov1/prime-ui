@@ -107,7 +107,8 @@
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
   transition:
     background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .track::before {
@@ -120,7 +121,8 @@
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-control-thumb);
   box-shadow: var(--prime-shadow-raised);
-  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  /* The thumb glides into place in both directions. */
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
 .text {
@@ -131,6 +133,11 @@
 /* ---- hover ---- */
 .labelRow:hover .track {
   background: var(--prime-color-fill-strong-hover);
+}
+
+/* ---- press: small target, so compact; read-only and disabled stay still ---- */
+.field:not([data-disabled="true"]):not(:has(.input[aria-readonly="true"])) .labelRow:active .track {
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 /* ---- on ---- */

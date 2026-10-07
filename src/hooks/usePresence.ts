@@ -5,9 +5,9 @@ export type MotionDurationToken = "fast" | "base" | "slow";
 
 /** Token defaults (foundation §7) used when the CSS variable cannot be read. */
 const DURATION_FALLBACK_MS: Record<MotionDurationToken, number> = {
-  fast: 120,
-  base: 200,
-  slow: 300,
+  fast: 230,
+  base: 380,
+  slow: 570,
 };
 
 /** Slack over the token duration before the timeout fallback unmounts the layer. */

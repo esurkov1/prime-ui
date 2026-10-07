@@ -96,6 +96,8 @@ No ref. + native `<div>` props. Wrapping centered row, gap `--prime-space-2`.
 | fill | `layout="fill"` | `data-layout="fill"` on Root |
 | tone | Icon `tone` | `data-tone` on Icon |
 
+First render: the parts fade and rise in one after another (`--prime-motion-stagger` apart, `base` · `enter`); they are interactive from the first frame, and the motion collapses under reduced motion.
+
 ## Layout & spacing
 - Base gap `--prime-space-2`; icon → title gets `--prime-space-2` more; description → actions `--prime-space-3` more.
 - Text is centered and capped at `--prime-layout-reading-max-width`; long words wrap.

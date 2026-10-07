@@ -46,9 +46,9 @@ type NotificationEntry = NotificationRecord & { dismissing?: true };
 const DEFAULT_DURATION = 5000;
 /** Cards visible in a collapsed stack; older ones are hidden and click-through. */
 const PEEK_VISIBLE = 3;
-/** Collapsed stack: scale step per depth and its floor. */
-const SCALE_STEP = 0.04;
-const MIN_SCALE = 0.88;
+/** Collapsed stack: scale step per depth and its floor (front 1, then 0.95, 0.9). */
+const SCALE_STEP = 0.05;
+const MIN_SCALE = 0.9;
 /** Collapsed stack: opacity of the front card and the two peeking behind it. */
 const PEEK_OPACITY = [1, 0.72, 0.48] as const;
 /** Hover intent: the stack collapses this long after the pointer leaves it. */
@@ -56,10 +56,32 @@ const COLLAPSE_DELAY_MS = 100;
 /** z-index of the front card inside its stack; older cards sit below it. */
 const Z_FRONT = 100;
 
+/** Swipe: a flick faster than this (px/ms) dismisses regardless of distance. */
+const SWIPE_VELOCITY = 0.11;
+/** Swipe against the dismiss direction: resistance grows with distance (damped, never a hard stop). */
+const SWIPE_DAMPING_BASE = 1.5;
+const SWIPE_DAMPING_RANGE = 20;
+
 /** Vertical offset of each peeking card in a collapsed stack and the gap of an expanded one: `space.2`. */
 function space2Px(): number {
   return remToPx(primitiveTokens.space[2]);
 }
+
+/** Swipe distance that dismisses a toast: `space.12`. */
+function swipeThresholdPx(): number {
+  return remToPx(primitiveTokens.space[12]);
+}
+
+type SwipeDirection = { axis: "x" | "y"; sign: 1 | -1 };
+
+/** Toasts swipe out toward the nearest viewport edge: sideways in corners, vertically in the center. */
+function swipeDirection(position: NotificationPosition): SwipeDirection {
+  if (position.endsWith("left")) return { axis: "x", sign: -1 };
+  if (position.endsWith("right")) return { axis: "x", sign: 1 };
+  return { axis: "y", sign: isTop(position) ? -1 : 1 };
+}
+
+const INTERACTIVE_SELECTOR = "button, a, input, select, textarea, [role='button']";
 
 const POSITIONS: readonly NotificationPosition[] = [
   "top-left",
@@ -88,8 +110,9 @@ function isTop(position: NotificationPosition): boolean {
 // ─── NotificationStack ────────────────────────────────────────────────────────
 // Motion without a layout library: every card is absolutely positioned at the stack's anchor edge
 // (top or bottom); its offset, scale and opacity are computed here from measured heights and set
-// as CSS custom properties, which CSS transitions with the motion tokens. Enter / exit are CSS
-// keyframes on an inner wrapper so they never fight the positioning transform.
+// as CSS custom properties, which CSS transitions with the motion tokens. Enter / exit / swipe live
+// on an inner wrapper so they never fight the positioning transform; they are transitions too
+// (enter via `@starting-style`), so rapid adds and dismissals retarget mid-flight.
 
 type ItemLayout = {
   index: number;
@@ -117,20 +140,41 @@ function NotificationStack({
   const [heights, setHeights] = React.useState<Record<string, number>>({});
   const collapseTimerRef = React.useRef<number | null>(null);
   const lastLayoutRef = React.useRef(new Map<string, ItemLayout>());
+  const listRef = React.useRef<HTMLOListElement>(null);
+  const hoveredRef = React.useRef(false);
+  const focusedRef = React.useRef(false);
   const top = isTop(position);
   const step = React.useMemo(space2Px, []);
 
-  const handleHover = React.useCallback((hovered: boolean) => {
+  // Expanded while hovered or while focus is inside (keyboard users see every card they tab to).
+  const syncExpanded = React.useCallback(() => {
     if (collapseTimerRef.current !== null) {
       clearTimeout(collapseTimerRef.current);
       collapseTimerRef.current = null;
     }
-    if (hovered) {
+    if (hoveredRef.current || focusedRef.current) {
       setExpanded(true);
     } else {
       collapseTimerRef.current = window.setTimeout(() => setExpanded(false), COLLAPSE_DELAY_MS);
     }
   }, []);
+
+  const handleHover = React.useCallback(
+    (hovered: boolean) => {
+      hoveredRef.current = hovered;
+      syncExpanded();
+    },
+    [syncExpanded],
+  );
+
+  // A focused card that gets removed takes focus with it without a `blur` event: re-check after
+  // every commit (cheap: a ref read and one `contains`).
+  React.useLayoutEffect(() => {
+    if (!focusedRef.current) return;
+    if (listRef.current?.contains(document.activeElement)) return;
+    focusedRef.current = false;
+    syncExpanded();
+  });
 
   React.useEffect(
     () => () => {
@@ -190,12 +234,22 @@ function NotificationStack({
 
   return (
     <ol
+      ref={listRef}
       className={styles.stack}
       aria-label={labels.regions[position]}
       data-expanded={String(expanded)}
       style={{ "--ntf-stack-height": `${stackHeight}px` } as React.CSSProperties}
       onMouseEnter={() => handleHover(true)}
       onMouseLeave={() => handleHover(false)}
+      onFocus={() => {
+        focusedRef.current = true;
+        syncExpanded();
+      }}
+      onBlur={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+        focusedRef.current = false;
+        syncExpanded();
+      }}
     >
       {items.map((item) => {
         const closing = item.dismissing === true;
@@ -204,6 +258,7 @@ function NotificationStack({
           <NotificationStackItem
             key={item.id}
             item={item}
+            position={position}
             index={layout.index}
             y={layout.y}
             scale={layout.scale}
@@ -225,6 +280,7 @@ function NotificationStack({
 // re-renders when its place in the stack changes.
 const NotificationStackItem = React.memo(function NotificationStackItem({
   item,
+  position,
   index,
   y,
   scale,
@@ -237,6 +293,7 @@ const NotificationStackItem = React.memo(function NotificationStackItem({
   onHeight,
 }: {
   item: NotificationRecord;
+  position: NotificationPosition;
   index: number;
   y: number;
   scale: number;
@@ -263,6 +320,75 @@ const NotificationStackItem = React.memo(function NotificationStackItem({
   }, [id, onHeight]);
 
   const state = closing ? "closed" : "open";
+  const { axis, sign } = swipeDirection(position);
+  const dragRef = React.useRef<{ pointerId: number; origin: number; startedAt: number } | null>(
+    null,
+  );
+  const [swiping, setSwiping] = React.useState(false);
+
+  // Distance toward the dismiss edge (positive) for a pointer at `client`; the opposite way is damped.
+  const swipeAmount = (client: number, origin: number): number => {
+    const toward = (client - origin) * sign;
+    if (toward >= 0) return toward;
+    return toward / (SWIPE_DAMPING_BASE + Math.abs(toward) / SWIPE_DAMPING_RANGE);
+  };
+
+  // Transform is written straight onto the wrapper: no re-render, no style recalc of the stack.
+  const writeOffset = (el: HTMLElement, amount: number) => {
+    el.style.transform = `translate${axis.toUpperCase()}(${amount * sign}px)`;
+  };
+
+  const pointerCoord = (event: React.PointerEvent) =>
+    axis === "x" ? event.clientX : event.clientY;
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    // One pointer at a time (extra touches are ignored); primary button only; controls stay clickable.
+    if (closing || hidden || dragRef.current !== null || event.button !== 0) return;
+    if ((event.target as Element).closest(INTERACTIVE_SELECTOR)) return;
+    const el = event.currentTarget;
+    try {
+      el.setPointerCapture(event.pointerId);
+    } catch {
+      // Pointer already released (synthetic or cancelled) — the drag still works without capture.
+    }
+    dragRef.current = {
+      pointerId: event.pointerId,
+      origin: pointerCoord(event),
+      startedAt: performance.now(),
+    };
+    el.dataset.swipe = "drag";
+    setSwiping(true);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    writeOffset(event.currentTarget, swipeAmount(pointerCoord(event), drag.origin));
+  };
+
+  const endDrag = (event: React.PointerEvent<HTMLDivElement>, cancelled: boolean) => {
+    const drag = dragRef.current;
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    dragRef.current = null;
+    setSwiping(false);
+    const el = event.currentTarget;
+    if (el.hasPointerCapture?.(event.pointerId)) el.releasePointerCapture(event.pointerId);
+
+    const amount = cancelled ? 0 : swipeAmount(pointerCoord(event), drag.origin);
+    const elapsed = Math.max(performance.now() - drag.startedAt, 1);
+    const velocity = amount / elapsed;
+    if (amount > 0 && (amount >= swipeThresholdPx() || velocity > SWIPE_VELOCITY)) {
+      // Keep going the way the finger went, off the edge, while the store fades the card out.
+      el.dataset.swipe = "out";
+      el.style.transform = `translate${axis.toUpperCase()}(calc(${amount * sign}px + ${sign * 100}%))`;
+      onDismiss(id);
+      return;
+    }
+    // Glide back to rest (instant under reduced motion — the tokens collapse to 0).
+    el.style.transform = "";
+    if (amount === 0 || prefersReducedMotion()) delete el.dataset.swipe;
+    else el.dataset.swipe = "return";
+  };
 
   return (
     <li
@@ -283,13 +409,22 @@ const NotificationStackItem = React.memo(function NotificationStackItem({
       <div
         className={styles.motion}
         data-state={state}
-        onAnimationEnd={(event) => {
-          if (closing && event.target === event.currentTarget) onExited(id);
+        data-swipe-axis={axis}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={(event) => endDrag(event, false)}
+        onPointerCancel={(event) => endDrag(event, true)}
+        onTransitionEnd={(event) => {
+          if (event.target !== event.currentTarget) return;
+          if (closing) onExited(id);
+          else if (event.currentTarget.dataset.swipe === "return") {
+            delete event.currentTarget.dataset.swipe;
+          }
         }}
       >
         <NotificationCard
           item={item}
-          paused={expanded || closing}
+          paused={expanded || closing || swiping}
           onDismiss={onDismiss}
           stackDepth={index}
           stackExpanded={expanded}
@@ -399,7 +534,7 @@ export function NotificationProvider({
     };
   }, []);
 
-  // Phase 2: drop the entry once its exit animation ended (or the token-based timeout fired).
+  // Phase 2: drop the entry once its exit transition ended (or the token-based timeout fired).
   const remove = React.useCallback((id: string) => {
     const timer = exitTimersRef.current.get(id);
     if (timer !== undefined) {
@@ -426,7 +561,8 @@ export function NotificationProvider({
       setEntries((prev) =>
         prev.map((n) => (target.has(n.id) && !n.dismissing ? { ...n, dismissing: true } : n)),
       );
-      const timeout = exitTimeoutMs("base");
+      // Exit (fade + slide off the edge, or the swipe continuing) runs on `fast`, quicker than enter.
+      const timeout = exitTimeoutMs("fast");
       for (const id of ids) {
         if (exitTimersRef.current.has(id)) continue;
         exitTimersRef.current.set(

@@ -6,6 +6,7 @@
   --pb-label-line-height: var(--prime-control-m-label-line-height);
   --pb-fill: var(--prime-color-accent-default);
 
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-2);
@@ -95,13 +96,45 @@
   background: var(--prime-color-fill-strong);
 }
 
+/* The native value bar stays invisible (it would jump, and Firefox cannot transition it);
+   `.fill` draws the value over the track instead. */
 .track::-webkit-progress-value {
-  border-radius: var(--prime-radius-full);
-  background: var(--pb-fill);
-  transition: width var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
+  background: transparent;
 }
 
 .track::-moz-progress-bar {
+  background: transparent;
+}
+
+/*
+ * Fill: a full-width pill slid in from the inline start by `translate` inside a pill-shaped clip.
+ * Translate (not scaleX) keeps the rounded leading end undistorted at every value.
+ * The value glides over slow · standard; instant under reduced motion (tokens).
+ */
+.fillClip {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: var(--pb-track-h);
+  overflow: hidden;
+  border-radius: var(--prime-radius-full);
+  pointer-events: none;
+}
+
+.fill {
+  --pb-dir: -1;
+
+  display: block;
+  width: 100%;
+  height: 100%;
   border-radius: var(--prime-radius-full);
   background: var(--pb-fill);
+  translate: calc(var(--pb-dir) * (1 - var(--pb-ratio)) * 100%) 0;
+  transition:
+    translate var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.fill:dir(rtl) {
+  --pb-dir: 1;
 }

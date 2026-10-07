@@ -137,7 +137,12 @@
   outline: none;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.trigger:active:not(:disabled) {
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 .trigger:hover:not(:disabled),
@@ -466,7 +471,8 @@
   cursor: pointer;
   user-select: none;
   outline: none;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-duration-xfast)
+    var(--prime-motion-easing-standard);
 }
 
 .item[data-highlighted="true"] {

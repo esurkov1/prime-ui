@@ -80,6 +80,35 @@
   width: fit-content;
 }
 
+/*
+ * Copy feedback stays on the button: copy ↔ check cross-fade in place with scale 0.96 → 1 and a
+ * 2px blur that bridges the two glyphs. The check returns to copy after 2 s (ExampleFrame.tsx).
+ */
+.copyIcon {
+  display: grid;
+}
+
+.copyIcon > svg {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    filter var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+}
+
+.copyIcon > [data-glyph="check"],
+.copyIcon[data-copy-state="copied"] > [data-glyph="copy"] {
+  opacity: 0;
+  transform: scale(var(--prime-motion-press-scale-compact));
+  filter: blur(calc(var(--prime-space-1) / 2));
+}
+
+.copyIcon[data-copy-state="copied"] > [data-glyph="check"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
 /* Перебить min-width: max-content у SegmentedControl.root, иначе перенос не срабатывает */
 .toolbar .toolbarPaneSegment,
 .toolbar .toolbarViewportSegment {

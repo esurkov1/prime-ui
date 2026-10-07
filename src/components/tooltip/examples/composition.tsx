@@ -1,4 +1,4 @@
-/** Editor toolbar of icon-only buttons: each has an `aria-label`, the tooltip repeats the name and shows the shortcut in Kbd. Use one Tooltip.Provider for a whole toolbar. */
+/** Editor toolbar of icon-only buttons: each has an `aria-label`, the tooltip repeats the name and shows the shortcut in Kbd. Use one Tooltip.Provider for a whole toolbar: after the first tooltip, neighbours open instantly. */
 
 import { Bold, Italic, Link2, List, Underline } from "lucide-react";
 import { Button, Kbd, Tooltip } from "prime-ui-kit";

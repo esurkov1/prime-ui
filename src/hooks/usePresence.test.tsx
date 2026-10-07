@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { usePresence } from "./usePresence";
+import { exitTimeoutMs, usePresence } from "./usePresence";
 
 function stubReducedMotion(reduce: boolean) {
   vi.stubGlobal(
@@ -67,12 +67,12 @@ describe("usePresence", () => {
       expect(screen.getByTestId("layer")).toHaveAttribute("data-state", "closed");
 
       act(() => {
-        vi.advanceTimersByTime(100);
+        vi.advanceTimersByTime(exitTimeoutMs("base") - 1);
       });
       expect(screen.getByTestId("layer")).toBeInTheDocument();
 
       act(() => {
-        vi.advanceTimersByTime(300);
+        vi.advanceTimersByTime(1);
       });
       expect(screen.queryByTestId("layer")).toBeNull();
     });

@@ -212,7 +212,7 @@
 
 .root:active:not([data-disabled="true"]) {
   background-color: var(--btn-bg-active);
-  transform: scale(0.98);
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 .root:focus-visible {

@@ -275,7 +275,9 @@
   color: inherit;
   font: inherit;
   cursor: pointer;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .closeIcon {
@@ -290,6 +292,7 @@
 
 .closeButton:active:not(:disabled) {
   background: color-mix(in srgb, currentColor 18%, transparent);
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .closeButton:focus-visible {

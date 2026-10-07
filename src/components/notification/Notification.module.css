@@ -57,8 +57,9 @@
  * Cards are absolutely positioned at the stack's anchor edge. NotificationStore computes each
  * card's offset / scale / opacity (`--ntf-y`, `--ntf-scale`, `--ntf-opacity`) and the stack height
  * (`--ntf-stack-height`) from measured card heights; CSS transitions them with the motion tokens.
- * Enter / exit play as keyframes on the inner `.motion` wrapper, so they never fight the
- * positioning transform. Durations collapse to 0 under `prefers-reduced-motion` (globals.css).
+ * Enter / exit / swipe live on the inner `.motion` wrapper, so they never fight the positioning
+ * transform. Everything is a transition (enter via `@starting-style`), so rapid adds retarget
+ * instead of restarting. Durations collapse to 0 under `prefers-reduced-motion` (globals.css).
  */
 .stack {
   position: relative;
@@ -96,47 +97,74 @@
   pointer-events: none;
 }
 
+/* Expanded stack: each card's hit area reaches over the gap below it, so hover is not lost between cards. */
+.stack[data-expanded="true"] .item::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: var(--prime-space-2);
+  content: "";
+}
+
+.bottom .stack[data-expanded="true"] .item::after {
+  top: auto;
+  bottom: 100%;
+}
+
 .motion {
-  /* Enter shift: from the anchor edge, two peek steps. */
-  --ntf-enter-shift: calc(-2 * var(--prime-space-2));
+  /* The edge the stack lives on: cards enter from it and leave toward it. */
+  --ntf-edge-from: -100%;
+  --ntf-edge-shift: calc(-1 * var(--prime-space-2));
 
   transform-origin: top center;
+  touch-action: pan-y;
+  transition:
+    transform var(--prime-motion-duration-slow) var(--prime-motion-easing-enter),
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
 }
 
 .bottom .motion {
-  --ntf-enter-shift: calc(2 * var(--prime-space-2));
+  --ntf-edge-from: 100%;
+  --ntf-edge-shift: var(--prime-space-2);
 
   transform-origin: bottom center;
 }
 
-.motion[data-state="open"] {
-  animation:
-    ntfFadeIn var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both,
-    ntfShiftIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;
+@starting-style {
+  .motion {
+    opacity: 0;
+    transform: translateY(var(--ntf-edge-from));
+  }
 }
 
+/* Center stacks swipe vertically; the page can still scroll sideways under them. */
+.motion[data-swipe-axis="y"] {
+  touch-action: pan-x;
+}
+
+/* Swipe: the transform is written inline while dragging; release glides back or flies out. */
+.motion[data-swipe="drag"] {
+  cursor: grabbing;
+  user-select: none;
+  transition: none;
+}
+
+.motion[data-swipe="return"] {
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+/* Exit: faster than enter, back toward the edge; cards behind the front one only fade and nudge. */
 .motion[data-state="closed"] {
-  animation: ntfExit var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
+  opacity: 0;
+  transform: translateY(var(--ntf-edge-shift));
+  transition:
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
-@keyframes ntfFadeIn {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes ntfShiftIn {
-  from {
-    translate: 0 var(--ntf-enter-shift);
-    scale: 0.96;
-  }
-}
-
-@keyframes ntfExit {
-  to {
-    opacity: 0;
-    scale: 0.96;
-  }
+.item[data-stack-index="0"] .motion[data-state="closed"] {
+  transform: translateY(var(--ntf-edge-from));
 }
 
 /* ---------- Card ---------- */
@@ -332,7 +360,8 @@
   cursor: pointer;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .closeButton:hover {
@@ -342,6 +371,7 @@
 
 .closeButton:active {
   background: var(--prime-color-fill-subtle-active);
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .closeButton:focus-visible {

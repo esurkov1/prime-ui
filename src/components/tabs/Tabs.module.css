@@ -156,10 +156,11 @@
   z-index: 0;
   pointer-events: none;
   opacity: 0;
+  /* Position (translate from TS) and size glide to the new tab on one curve. */
   transition:
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    width var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    height var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 

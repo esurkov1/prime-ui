@@ -350,7 +350,8 @@
   cursor: pointer;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .action > svg {
@@ -366,6 +367,7 @@
 
 .action:active {
   background: var(--prime-color-fill-subtle-active);
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .action:focus-visible {
@@ -409,6 +411,7 @@
   font-variant-numeric: tabular-nums;
   color: var(--prime-color-text-muted);
   white-space: nowrap;
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .counter[data-invalid="true"] {

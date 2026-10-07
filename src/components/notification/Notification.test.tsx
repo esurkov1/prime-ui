@@ -1,6 +1,8 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { exitTimeoutMs } from "@/hooks/usePresence";
 
 import { NotificationProvider, useNotifications } from "./NotificationStore";
 
@@ -230,7 +232,8 @@ describe("Notification", () => {
       expect(byIndex(3)).toHaveTextContent("Toast 1");
       expect(byIndex(0).style.getPropertyValue("--ntf-y")).toBe("0px");
       expect(byIndex(1).style.getPropertyValue("--ntf-y")).toBe("8px");
-      expect(byIndex(1).style.getPropertyValue("--ntf-scale")).toBe("0.96");
+      expect(byIndex(1).style.getPropertyValue("--ntf-scale")).toBe("0.95");
+      expect(byIndex(2).style.getPropertyValue("--ntf-scale")).toBe("0.9");
       expect(byIndex(1).style.getPropertyValue("--ntf-opacity")).toBe("0.72");
       expect(byIndex(2).style.getPropertyValue("--ntf-opacity")).toBe("0.48");
       expect(byIndex(3)).toHaveAttribute("data-hidden", "true");
@@ -293,7 +296,30 @@ describe("Notification", () => {
       expect(list).toHaveAttribute("data-expanded", "false");
     });
 
-    it("keeps a dismissed card until its exit animation ends, out of the offsets", () => {
+    it("expands while focus is inside the stack", () => {
+      vi.useFakeTimers();
+      render(
+        <NotificationProvider>
+          <CountingHarness />
+        </NotificationProvider>,
+      );
+      const push = screen.getByRole("button", { name: "push" });
+      for (let i = 0; i < 4; i += 1) fireEvent.click(push);
+      const list = screen.getByRole("list", { name: "Уведомления сверху справа" });
+      const close = within(list).getAllByRole("button", { name: "Закрыть уведомление" });
+
+      act(() => close[3].focus());
+      expect(list).toHaveAttribute("data-expanded", "true");
+      for (const li of stackItems()) expect(li).not.toHaveAttribute("data-hidden");
+
+      act(() => close[3].blur());
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+      expect(list).toHaveAttribute("data-expanded", "false");
+    });
+
+    it("keeps a dismissed card until its exit transition ends, out of the offsets", () => {
       stubMotion();
       render(
         <NotificationProvider>
@@ -311,7 +337,7 @@ describe("Notification", () => {
       expect(remaining).toHaveAttribute("data-stack-index", "0");
       expect(remaining.style.getPropertyValue("--ntf-y")).toBe("0px");
 
-      fireEvent.animationEnd(closing.firstElementChild as HTMLElement);
+      fireEvent.transitionEnd(closing.firstElementChild as HTMLElement);
       expect(screen.queryByText("Toast 2")).not.toBeInTheDocument();
       expect(screen.getByText("Toast 1")).toBeInTheDocument();
     });
@@ -328,7 +354,7 @@ describe("Notification", () => {
       fireEvent.click(screen.getByRole("button", { name: "dismiss newest" }));
       expect(screen.getByText("Toast 1")).toBeInTheDocument();
       act(() => {
-        vi.advanceTimersByTime(300);
+        vi.advanceTimersByTime(exitTimeoutMs("fast"));
       });
       expect(screen.queryByText("Toast 1")).not.toBeInTheDocument();
     });
@@ -343,6 +369,169 @@ describe("Notification", () => {
       fireEvent.click(screen.getByRole("button", { name: "push" }));
       fireEvent.click(screen.getByRole("button", { name: "dismiss newest" }));
       expect(screen.queryByText("Toast 1")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("timers", () => {
+    let visibility: DocumentVisibilityState = "visible";
+
+    afterEach(() => {
+      vi.useRealTimers();
+      // Drop the own-property override; the prototype getter takes over again.
+      delete (document as { visibilityState?: DocumentVisibilityState }).visibilityState;
+      visibility = "visible";
+    });
+
+    function setVisibility(next: DocumentVisibilityState) {
+      visibility = next;
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        get: () => visibility,
+      });
+      act(() => {
+        document.dispatchEvent(new Event("visibilitychange"));
+      });
+    }
+
+    function TimedHarness() {
+      const { notify } = useNotifications();
+      return (
+        <button type="button" onClick={() => notify({ title: "Timed", duration: 1000 })}>
+          push timed
+        </button>
+      );
+    }
+
+    function advance(ms: number) {
+      act(() => {
+        vi.advanceTimersByTime(ms);
+      });
+    }
+
+    function renderTimed() {
+      vi.useFakeTimers({
+        toFake: ["setTimeout", "clearTimeout", "requestAnimationFrame", "cancelAnimationFrame"],
+      });
+      render(
+        <NotificationProvider>
+          <TimedHarness />
+        </NotificationProvider>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "push timed" }));
+      expect(screen.getByText("Timed")).toBeInTheDocument();
+    }
+
+    it("pauses the countdown while the stack is hovered", () => {
+      renderTimed();
+      const list = screen.getByRole("list", { name: "Уведомления сверху справа" });
+
+      fireEvent.mouseEnter(list);
+      advance(2000);
+      expect(screen.getByText("Timed")).toBeInTheDocument();
+
+      fireEvent.mouseLeave(list);
+      advance(100); // collapse delay; the countdown resumes once the stack collapses
+      expect(list).toHaveAttribute("data-expanded", "false");
+      advance(900);
+      expect(screen.getByText("Timed")).toBeInTheDocument();
+      advance(200);
+      expect(screen.queryByText("Timed")).not.toBeInTheDocument();
+    });
+
+    it("pauses while the document is hidden and resumes where it stopped", () => {
+      renderTimed();
+      advance(500);
+
+      setVisibility("hidden");
+      advance(3000);
+      expect(screen.getByText("Timed")).toBeInTheDocument();
+
+      setVisibility("visible");
+      advance(400);
+      expect(screen.getByText("Timed")).toBeInTheDocument();
+      advance(200);
+      expect(screen.queryByText("Timed")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("swipe", () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    function SwipeHarness() {
+      const { notify } = useNotifications();
+      return (
+        <button type="button" onClick={() => notify({ title: "Swipe me", persistent: true })}>
+          push
+        </button>
+      );
+    }
+
+    /** The swipeable wrapper of the only card in the top-right stack. */
+    function renderSwipeable(): HTMLElement {
+      render(
+        <NotificationProvider>
+          <SwipeHarness />
+        </NotificationProvider>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "push" }));
+      return screen.getByText("Swipe me").closest("li")?.firstElementChild as HTMLElement;
+    }
+
+    /** Drags along x from 0 to `distance` px in `ms` (performance.now is mocked). */
+    function drag(el: HTMLElement, distance: number, ms: number) {
+      const now = vi.spyOn(performance, "now").mockReturnValue(1000);
+      fireEvent.pointerDown(el, { pointerId: 1, button: 0, clientX: 0, clientY: 0 });
+      now.mockReturnValue(1000 + ms / 2);
+      fireEvent.pointerMove(el, { pointerId: 1, clientX: distance / 2, clientY: 0 });
+      now.mockReturnValue(1000 + ms);
+      fireEvent.pointerMove(el, { pointerId: 1, clientX: distance, clientY: 0 });
+      fireEvent.pointerUp(el, { pointerId: 1, clientX: distance, clientY: 0 });
+    }
+
+    it("dismisses a short fast flick by velocity", () => {
+      const el = renderSwipeable();
+      // 20 px is under the distance threshold, but 20 px / 100 ms = 0.2 px/ms > 0.11.
+      drag(el, 20, 100);
+      expect(screen.queryByText("Swipe me")).not.toBeInTheDocument();
+    });
+
+    it("dismisses a slow drag past the distance threshold", () => {
+      const el = renderSwipeable();
+      drag(el, 60, 2000);
+      expect(screen.queryByText("Swipe me")).not.toBeInTheDocument();
+    });
+
+    it("returns after a short slow drag", () => {
+      const el = renderSwipeable();
+      drag(el, 20, 1000);
+      expect(screen.getByText("Swipe me")).toBeInTheDocument();
+      expect(el.style.transform).toBe("");
+      expect(el).not.toHaveAttribute("data-swipe");
+    });
+
+    it("damps a drag against the dismiss direction and never dismisses by it", () => {
+      const el = renderSwipeable();
+      vi.spyOn(performance, "now").mockReturnValue(0);
+      fireEvent.pointerDown(el, { pointerId: 1, button: 0, clientX: 0, clientY: 0 });
+      fireEvent.pointerMove(el, { pointerId: 1, clientX: -100, clientY: 0 });
+      const moved = Number.parseFloat(el.style.transform.replace("translateX(", ""));
+      expect(moved).toBeLessThan(0);
+      expect(moved).toBeGreaterThan(-30);
+      fireEvent.pointerUp(el, { pointerId: 1, clientX: -100, clientY: 0 });
+      expect(screen.getByText("Swipe me")).toBeInTheDocument();
+    });
+
+    it("ignores a second pointer while one is dragging", () => {
+      const el = renderSwipeable();
+      vi.spyOn(performance, "now").mockReturnValue(0);
+      fireEvent.pointerDown(el, { pointerId: 1, button: 0, clientX: 0, clientY: 0 });
+      fireEvent.pointerDown(el, { pointerId: 2, button: 0, clientX: 50, clientY: 0 });
+      fireEvent.pointerMove(el, { pointerId: 2, clientX: 200, clientY: 0 });
+      expect(el.style.transform).toBe("");
+      fireEvent.pointerUp(el, { pointerId: 2, clientX: 200, clientY: 0 });
+      expect(screen.getByText("Swipe me")).toBeInTheDocument();
     });
   });
 });

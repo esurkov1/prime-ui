@@ -136,9 +136,10 @@ The card itself is always a raised surface without a border; only the icon, the 
 | tone / size | options | `data-tone`, `data-size` on the card |
 | persistent | `persistent` | `data-persistent="true"` |
 | stack position | store | `data-stack-depth`, `data-stack-expanded` on the card; `data-stack-index`, `data-hidden`, `data-state="open" \| "closed"` on the stack item; `data-expanded` on the stack |
-| paused | hover over the stack | countdown stops while the stack is expanded |
+| paused | hover or focus inside the stack, an active swipe, a hidden tab | countdown stops and resumes where it stopped |
+| swipe | pointer drag on a card | `data-swipe="drag" \| "return" \| "out"` and `data-swipe-axis="x" \| "y"` on the card's motion wrapper |
 
-Collapsed stacks show up to 3 cards peeking behind each other; hover expands the stack and pauses the timers. Under `prefers-reduced-motion` toasts are removed without an exit animation.
+Collapsed stacks show up to 3 cards peeking behind each other, each one step lower and 5 % smaller. Hover or keyboard focus expands the stack and pauses the timers; timers also pause while the tab is hidden. Toasts enter from the edge they live on and leave toward it, faster than they came. Swipe a card toward the nearest edge to dismiss it (sideways in corners, vertically in the center): past `--prime-space-12` or with a quick flick; a shorter swipe glides back, and dragging the other way is damped. Under `prefers-reduced-motion` toasts are removed without an exit animation.
 
 ## Layout & spacing
 - Toasts render in a fixed, portaled viewport; zones are `--prime-space-5` from the viewport edge (`--prime-space-3` below 640px) and at most 24rem wide.

@@ -185,7 +185,8 @@
   appearance: none;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .remove::before {
@@ -197,6 +198,10 @@
 .remove:hover:not(:disabled) {
   background: var(--prime-color-fill-subtle-active);
   color: inherit;
+}
+
+.remove:active:not(:disabled) {
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .remove:focus-visible {

@@ -136,6 +136,20 @@ describe("Accordion", () => {
     expect(region).toHaveAttribute("aria-labelledby", triggerId);
   });
 
+  it("closed content is inert and aria-hidden; open content is not", () => {
+    renderAccordion();
+    const trigger = screen.getByRole("button", { name: /Section 1/ });
+    const contentId = trigger.getAttribute("aria-controls");
+    const content = contentId ? document.getElementById(contentId) : null;
+    expect(content).toHaveAttribute("inert");
+    expect(content).toHaveAttribute("aria-hidden", "true");
+    expect(content).toHaveAttribute("data-state", "closed");
+    fireEvent.click(trigger);
+    expect(content).not.toHaveAttribute("inert");
+    expect(content).toHaveAttribute("aria-hidden", "false");
+    expect(content).toHaveAttribute("data-state", "open");
+  });
+
   it("keyboard Enter opens item", () => {
     renderAccordion();
     const trigger = screen.getByRole("button", { name: /Section 1/ });

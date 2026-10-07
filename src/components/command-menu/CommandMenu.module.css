@@ -237,7 +237,8 @@
   line-height: var(--cm-lh);
   text-align: start;
   cursor: pointer;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-duration-xfast)
+    var(--prime-motion-easing-standard);
 }
 
 .item[data-selected="true"] {

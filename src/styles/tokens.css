@@ -124,11 +124,17 @@
   --prime-ref-duration-0: 0ms;
   --prime-ref-duration-100: 100ms;
   --prime-ref-duration-120: 120ms;
+  --prime-ref-duration-150: 150ms;
   --prime-ref-duration-200: 200ms;
+  --prime-ref-duration-230: 230ms;
   --prime-ref-duration-300: 300ms;
+  --prime-ref-duration-380: 380ms;
   --prime-ref-duration-400: 400ms;
+  --prime-ref-duration-570: 570ms;
+  --prime-ref-duration-80: 80ms;
+  --prime-ref-easing-emphasized: cubic-bezier(0.32, 0.72, 0, 1);
   --prime-ref-easing-enter: cubic-bezier(0, 0, 0, 1);
-  --prime-ref-easing-exit: cubic-bezier(0.3, 0, 1, 1);
+  --prime-ref-easing-exit: cubic-bezier(0.23, 1, 0.32, 1);
   --prime-ref-easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --prime-ref-font-family-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --prime-ref-font-family-sans: "Golos Text", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;

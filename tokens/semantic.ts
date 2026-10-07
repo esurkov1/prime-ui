@@ -338,14 +338,25 @@ export const semanticTokens = {
 
   motion: {
     duration: {
-      fast: "{duration.120}",
-      base: "{duration.200}",
-      slow: "{duration.300}",
+      /** Hover fill on dense, high-frequency rows and cells. */
+      xfast: "{duration.150}",
+      fast: "{duration.230}",
+      base: "{duration.380}",
+      slow: "{duration.570}",
     },
     easing: {
       standard: "{easing.standard}",
       enter: "{easing.enter}",
       exit: "{easing.exit}",
+      /** State that glides into place (thumbs, indicators, checkmarks); pair with `base`. */
+      emphasized: "{easing.emphasized}",
+    },
+    /** Step between items of a staggered first render. */
+    stagger: "{duration.80}",
+    /** `:active` scale of pressable controls; `compact` for icon-only and small targets. */
+    press: {
+      scale: "0.98",
+      scaleCompact: "0.96",
     },
   },
 
@@ -577,6 +588,11 @@ export const semanticTokens = {
     paddingX: "{space.2}",
     paddingY: "{space.1}",
     maxWidth: "17.5rem",
+    /** Arrow base and depth; the arrow points at the trigger's centre. */
+    arrowWidth: "0.625rem",
+    arrowHeight: "0.3125rem",
+    /** Gap from the trigger to the chip body (the arrow sits inside it). */
+    offset: "{space.2}",
   },
 
   table: {

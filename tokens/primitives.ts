@@ -236,16 +236,24 @@ export const primitiveTokens = {
 
   duration: {
     0: "0ms",
+    80: "80ms",
     100: "100ms",
     120: "120ms",
+    150: "150ms",
     200: "200ms",
+    230: "230ms",
     300: "300ms",
+    380: "380ms",
     400: "400ms",
+    570: "570ms",
   },
   easing: {
     standard: "cubic-bezier(0.2, 0, 0, 1)",
     enter: "cubic-bezier(0, 0, 0, 1)",
-    exit: "cubic-bezier(0.3, 0, 1, 1)",
+    /** Strong ease-out: a leaving element responds at once and is gone fast (no ease-in in UI). */
+    exit: "cubic-bezier(0.23, 1, 0.32, 1)",
+    /** iOS sheet curve: decisive start, long soft landing, never past the target. */
+    emphasized: "cubic-bezier(0.32, 0.72, 0, 1)",
   },
 
   /** Stacking order. In-overlay layers sit above their host so nested portals stay on top. */

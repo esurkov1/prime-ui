@@ -8,7 +8,13 @@ import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Notification.module.css";
 
-// Countdown lives in the card so progress re-renders never reach the stack item.
+function isDocumentHidden(): boolean {
+  return typeof document !== "undefined" && document.visibilityState === "hidden";
+}
+
+// Countdown lives in the card so progress re-renders never reach the stack item. It stops while
+// `paused` (hover, focus, swipe) and while the document is hidden; after either it resumes from
+// where it stopped instead of counting the time away.
 function useCountdown(
   item: NotificationRecord,
   paused: boolean,
@@ -35,7 +41,8 @@ function useCountdown(
 
     const tick = (now: number) => {
       if (cancelled) return;
-      if (lastTsRef.current !== null && !pausedRef.current) {
+      const hidden = isDocumentHidden();
+      if (lastTsRef.current !== null && !pausedRef.current && !hidden) {
         const delta = now - lastTsRef.current;
         remainingRef.current = Math.max(0, remainingRef.current - delta);
         setProgress(remainingRef.current / item.duration);
@@ -44,14 +51,22 @@ function useCountdown(
           return;
         }
       }
-      lastTsRef.current = now;
+      lastTsRef.current = hidden ? null : now;
       frame = requestAnimationFrame(tick);
     };
 
+    // Browsers throttle frames in background tabs: restart the delta so the hidden time is not
+    // charged against the toast when the tab comes back.
+    const onVisibilityChange = () => {
+      lastTsRef.current = null;
+    };
+
     frame = requestAnimationFrame(tick);
+    document.addEventListener("visibilitychange", onVisibilityChange);
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [item.id, item.duration, item.persistent]);
 

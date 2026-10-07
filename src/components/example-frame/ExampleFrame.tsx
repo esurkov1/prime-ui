@@ -4,7 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { CodeBlock } from "@/components/code-block/CodeBlock";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
-import { Icon } from "@/icons";
+import { Icon, IconCheck } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { suspendTransitions } from "@/theme/applyTheme";
@@ -287,8 +287,10 @@ function ExampleFrameToolbar() {
             onClick={handleCopy}
             aria-label={copyLabel}
           >
-            <Button.Icon>
-              <Icon name="action.copy" size="s" tone="secondary" />
+            {/* Both glyphs stay mounted and cross-fade in place (see `.copyIcon`). */}
+            <Button.Icon className={styles.copyIcon} data-copy-state={copyState}>
+              <Icon name="action.copy" size="s" tone="secondary" data-glyph="copy" />
+              <IconCheck size="s" tone="secondary" data-glyph="check" />
             </Button.Icon>
           </Button.Root>
         </div>

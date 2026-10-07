@@ -18,6 +18,7 @@
   letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   overflow-wrap: anywhere;
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-size="xs"] {
@@ -42,8 +43,21 @@
   --prime-hint-icon: var(--prime-icon-s);
 }
 
+/*
+ * An error message drops in over `fast` (fade + 4px from above): quick enough to read as instant,
+ * no shake. Only transform/opacity move, so the support row never shifts layout while it plays.
+ * Runs when the message mounts and when a hint turns into an error in the same slot.
+ */
 .root[data-invalid="true"] {
   color: var(--prime-color-danger-text);
+  animation: hintErrorIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+@keyframes hintErrorIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--prime-space-1)));
+  }
 }
 
 .root[data-disabled="true"] {

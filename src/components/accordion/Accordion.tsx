@@ -264,54 +264,25 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
 AccordionTrigger.displayName = "Accordion.Trigger";
 
 const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
-  function AccordionContent({ className, children, style, ...rest }, ref) {
+  function AccordionContent({ className, children, ...rest }, ref) {
     const { size } = useAccordionContext();
     const item = useAccordionItem();
-    const innerRef = React.useRef<HTMLDivElement | null>(null);
-    const [contentHeight, setContentHeight] = React.useState(0);
-
-    React.useLayoutEffect(() => {
-      if (!innerRef.current) return;
-      const target = innerRef.current;
-      setContentHeight(target.scrollHeight);
-
-      if (typeof ResizeObserver === "undefined") return;
-      const observer = new ResizeObserver(() => {
-        setContentHeight(target.scrollHeight);
-      });
-      observer.observe(target);
-      return () => observer.disconnect();
-    }, []);
-
-    const combinedStyle = React.useMemo<React.CSSProperties>(
-      () => ({
-        ...style,
-        "--prime-accordion-content-height": `${contentHeight}px`,
-      }),
-      [contentHeight, style],
-    );
-
-    const setRefs = (node: HTMLDivElement | null) => {
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref) {
-        ref.current = node;
-      }
-    };
 
     return (
       <section
-        ref={setRefs}
+        ref={ref}
         id={item.contentId}
         aria-labelledby={item.triggerId}
         aria-hidden={!item.open}
+        inert={!item.open}
         data-state={item.open ? "open" : "closed"}
         className={styles.content}
-        style={combinedStyle}
         {...rest}
       >
-        <div ref={innerRef} className={cx(styles.contentInner, className)}>
-          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+        <div className={styles.contentClip}>
+          <div className={cx(styles.contentInner, className)}>
+            <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+          </div>
         </div>
       </section>
     );

@@ -52,6 +52,13 @@ const ProgressBarRoot = React.forwardRef<HTMLProgressElement, ProgressBarRootPro
           aria-labelledby={label ? labelId : undefined}
           className={styles.track}
         />
+        {/* The native value bar is hidden; this fill moves by transform in every engine. */}
+        <span className={styles.fillClip} aria-hidden="true">
+          <span
+            className={styles.fill}
+            style={{ "--pb-ratio": safeValue / safeMax } as React.CSSProperties}
+          />
+        </span>
       </div>
     );
   },

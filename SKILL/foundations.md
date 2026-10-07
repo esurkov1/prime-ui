@@ -115,3 +115,8 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
 
 Never remove focus rings, never set `outline: none`. Motion durations come from
 `--prime-motion-duration-*`; the kit already animates overlays — add no animation of your own to them.
+Kit components ship their micro-animations (press, toggle, selection glide, open/close) — never re-implement
+or override them. Own custom elements follow the same rules: `--prime-motion-duration-fast|base|slow` and
+`--prime-motion-easing-standard|enter|exit` only; animate `transform`/`opacity`, never `transition: all`,
+never `ease-in`; press `scale(0.98)`; no movement on keyboard-driven or frequent actions; exit never slower
+than enter.

@@ -89,6 +89,9 @@
 
 .breadcrumbLink {
   color: var(--prime-color-text-muted);
+  transition:
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    text-decoration-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* An icon segment (e.g. «home») takes the tier icon size, not the glyph's intrinsic 24px. */

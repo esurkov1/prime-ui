@@ -105,7 +105,12 @@
   outline: none;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.trigger:active:not(:disabled) {
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 .trigger[data-full-width="true"] {
@@ -261,7 +266,8 @@
   cursor: pointer;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .presetItem:hover {
@@ -271,6 +277,7 @@
 
 .presetItem:active {
   background: var(--prime-color-fill-subtle-active);
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 .presetItem[aria-pressed="true"] {
@@ -369,7 +376,8 @@
   cursor: pointer;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .nav :global(svg) {
@@ -384,6 +392,7 @@
 
 .nav:active {
   background: var(--prime-color-fill-subtle-active);
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 /* Сетка месяца: разметка — таблица (семантика), раскладка — CSS Grid на 7 равных колонок. */
@@ -462,8 +471,8 @@
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
 }
 
 .day:hover:not(:disabled):not([data-edge="true"]) {

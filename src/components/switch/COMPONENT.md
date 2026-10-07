@@ -103,7 +103,7 @@ No `variant`/`tone`/`color`. Axes: `size`, `fullWidth`.
 | State | Driven by | DOM | Looks like |
 |---|---|---|---|
 | off | `checked={false}` / default | `data-state="unchecked"` | track `fill-strong` (hover `fill-strong-hover`), thumb at the start |
-| on | `checked` / `defaultChecked` | `data-state="checked"` | track `accent-default` (hover `accent-hover`), thumb slides to the end |
+| on | `checked` / `defaultChecked` | `data-state="checked"` | track `accent-default` (hover `accent-hover`), thumb glides to the end |
 | invalid | `invalid` or mounted `Switch.Error` | `data-invalid="true"`, `aria-invalid` | off track gets a `danger-border` inset ring; focus ring `danger-border` |
 | disabled | `disabled` | `data-disabled="true"` | off track `fill-muted`, on track `accent-soft`, thumb without shadow, `cursor: not-allowed` |
 | read-only | `readOnly` | `aria-readonly="true"` on the input | normal colours, no hover, default cursor, clicks ignored |

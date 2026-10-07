@@ -80,6 +80,9 @@
   box-sizing: border-box;
   min-width: 0;
   height: var(--seg-track-h);
+  /* Weights move by `flex-grow` on purpose: every segment's start depends on all the weights before
+     it plus the hairline gaps, so a transform version would need JS offsets per segment. The bar is
+     one short row, so the layout cost is negligible. */
   transition:
     flex-grow var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
     background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);

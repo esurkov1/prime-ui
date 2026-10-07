@@ -84,7 +84,7 @@ Frame look: `bg-sunken` chrome with a `border-subtle` hairline and `radius-xl`; 
 | viewport | `viewport` / `defaultViewport` | `data-viewport` on the preview viewport |
 | theme | `colorScheme` / `defaultColorScheme` | `data-theme` on the stage and code pane |
 | layout | `previewLayout` | `data-preview-layout` on the stage |
-| copy | copy button | its `aria-label` switches to `labels.copied` / `labels.copyError` for 2 s |
+| copy | copy button | its `aria-label` switches to `labels.copied` / `labels.copyError` for 2 s; on success the copy glyph cross-fades to a check (`data-copy-state` on the icon) |
 
 Controlled: pass `colorScheme` / `viewport` with their change handlers (e.g. to sync all frames on a page); uncontrolled: `default*` props.
 

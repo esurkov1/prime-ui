@@ -86,7 +86,8 @@
   user-select: none;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .button:hover:not(:disabled) {
@@ -96,6 +97,7 @@
 
 .button:active:not(:disabled) {
   background: var(--prime-color-fill-subtle-active);
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .button:focus-visible {

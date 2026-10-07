@@ -52,6 +52,11 @@ A component change is done only when all of these agree. Do them in the same cha
 
 1. **Code** — `X.tsx`, `X.module.css`, tokens if needed; follow foundation (tokens only, no raw px/hex,
    no `--prime-ref-*`; API names from §10; `data-*` for state).
+   **Motion is part of the code, not a polish step**: when creating or editing a component, work out its
+   micro-animations against `docs/foundation.md` §7 "Motion and micro-animation" (and the `emil-design-eng`
+   skill when available): press, hover/focus fill, selection/toggle, open/close, enter/exit of parts,
+   loading — or consciously leave it still (high-frequency / keyboard). Tokens only, `transform`/`opacity`,
+   no `transition: all`, no `ease-in`, both directions, reduced motion honoured.
 2. **Tests** — `X.test.tsx` for behaviour, keyboard and a11y.
 3. **Exports** — `src/components/index.ts` (or `src/layout/index.ts`) for new parts and types.
 4. **Examples** — `examples/<scenario>.tsx`: one scenario per file, kebab-case name by meaning, first line

@@ -69,7 +69,7 @@ Leaf component. `forwardRef` to the inner `HTMLProgressElement`. No native props
 | State | Driven by | DOM |
 |---|---|---|
 | tone / size | props | `data-tone`, `data-size` on the root |
-| value | `value`, `max` | native `value` / `max` on `<progress>`; the fill width animates (none under `prefers-reduced-motion`) |
+| value | `value`, `max` | native `value` / `max` on `<progress>`; the visible fill is an `aria-hidden` layer over the track that slides by `translate` (inline-start anchored, RTL aware) over `slow` + `standard` in every browser; instant under `prefers-reduced-motion` |
 
 Always controlled: pass the current `value` on every render.
 

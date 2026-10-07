@@ -117,7 +117,8 @@
   overflow: visible;
 }
 
-/* Rounded check / bar, drawn with a stroke reveal and a small pop (scale) on check. */
+/* Rounded check / bar, drawn with a stroke reveal and an emphasized grow (scale) on check.
+   Unchecking leaves quickly on the exit curve. */
 .checkPath,
 .indeterminateLine {
   fill: none;
@@ -132,9 +133,9 @@
   transform: scale(0.6);
   opacity: 0;
   transition:
-    stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    stroke-dashoffset var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
 .field[data-state="checked"] .checkPath,
@@ -142,6 +143,10 @@
   stroke-dashoffset: 0;
   transform: scale(1);
   opacity: 1;
+  transition:
+    stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .text {
@@ -156,7 +161,7 @@
 
 /* ---- active: tactile press ---- */
 .labelRow:active .control {
-  transform: scale(0.92);
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 /* ---- checked / indeterminate ---- */

@@ -216,24 +216,51 @@
 
 /* ---------- Content ---------- */
 
+/*
+ * Height animates through the grid track (0fr → 1fr), so nothing is measured in JS and the panel
+ * follows content that resizes while open. The body fades and settles by --prime-space-1.
+ * Open: base · enter. Close: fast · exit; visibility flips after the exit so closed content leaves
+ * the tab order and the accessibility tree (the element is also `inert`).
+ */
 .content {
+  display: grid;
+  grid-template-rows: 0fr;
   width: 100%;
   min-width: 0;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
   visibility: hidden;
   transition:
-    max-height var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    visibility 0s linear var(--prime-motion-duration-base);
+    grid-template-rows var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    visibility 0s linear var(--prime-motion-duration-fast);
 }
 
 .content[data-state="open"] {
-  max-height: var(--prime-accordion-content-height, none);
-  opacity: 1;
+  grid-template-rows: 1fr;
   visibility: visible;
-  transition-delay: 0s;
+  transition:
+    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    visibility 0s;
+}
+
+.contentClip {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.contentInner {
+  opacity: 0;
+  translate: 0 calc(-1 * var(--prime-space-1));
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    translate var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+}
+
+.content[data-state="open"] .contentInner {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    translate var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
 }
 
 .contentInner {
@@ -254,11 +281,4 @@
 /* Content aligns with the label text when the trigger has a leading icon. */
 .item:has(.trigger > .icon) .contentInner {
   padding-inline-start: calc(var(--acc-pad-x) + var(--acc-icon) + var(--acc-gap));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .content,
-  .arrowIcon {
-    transition: none;
-  }
 }

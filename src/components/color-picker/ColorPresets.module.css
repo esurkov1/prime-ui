@@ -84,7 +84,7 @@
 }
 
 .trigger:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 .trigger:focus-visible {

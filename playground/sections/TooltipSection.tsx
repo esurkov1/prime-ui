@@ -1,4 +1,6 @@
 import { PageContent } from "@/components/page-content/PageContent";
+import TooltipAlignExample from "@/components/tooltip/examples/align";
+import tooltipAlignSource from "@/components/tooltip/examples/align.tsx?raw";
 import TooltipCompositionExample from "@/components/tooltip/examples/composition";
 import tooltipCompositionSource from "@/components/tooltip/examples/composition.tsx?raw";
 import TooltipControlledExample from "@/components/tooltip/examples/controlled";
@@ -29,6 +31,14 @@ const tooltipProviderApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "400",
     required: "нет",
     description: "Задержка перед показом подсказки после наведения или фокуса (мс).",
+  },
+  {
+    prop: "skipDelayDuration",
+    type: "number",
+    defaultValue: "300",
+    required: "нет",
+    description:
+      "Окно (мс) после закрытия подсказки, в которое соседняя открывается сразу и без анимации.",
   },
   {
     prop: "children",
@@ -84,7 +94,7 @@ const tooltipTriggerApiRows: PlaygroundApiPropRow[] = [
     defaultValue: "—",
     required: "да",
     description:
-      "Ровно один дочерний элемент-триггер; ref и обработчики мыши/фокуса накладываются через cloneElement.",
+      "Ровно один фокусируемый элемент; его ref сохраняется, обработчики указателя и фокуса добавляются через cloneElement.",
   },
   {
     prop: "className",
@@ -115,7 +125,15 @@ const tooltipContentApiRows: PlaygroundApiPropRow[] = [
     type: '"top" | "bottom" | "left" | "right"',
     defaultValue: '"top"',
     required: "нет",
-    description: "Сторона относительно якоря; координаты ограничиваются отступом от краёв окна.",
+    description:
+      "Предпочитаемая сторона; без места — противоположная, затем сдвиг внутрь окна. Стрелка всегда смотрит на центр триггера.",
+  },
+  {
+    prop: "align",
+    type: '"start" | "center" | "end"',
+    defaultValue: '"center"',
+    required: "нет",
+    description: "Выравнивание вдоль триггера: по его началу, центру или концу.",
   },
   {
     prop: "className",
@@ -164,9 +182,9 @@ export default function TooltipSection() {
           <div className="demoBlock">
             <DemoSectionTitle>На разных поверхностях</DemoSectionTitle>
             <DemoDescription>
-              Вариантов нет: подсказка — плоская инверсная плашка без стрелки и тени (
-              <code>--prime-color-tooltip-bg</code>), поэтому одинаково читается на холсте, в
-              карточке и на плавающем слое.
+              Вариантов нет: подсказка — плоская инверсная плашка без тени со стрелкой к центру
+              триггера (<code>--prime-color-tooltip-bg</code>), поэтому одинаково читается на
+              холсте, в карточке и на плавающем слое.
             </DemoDescription>
             <SurfaceGallery>
               <TooltipLongContentExample />
@@ -209,6 +227,23 @@ export default function TooltipSection() {
           </div>
 
           <div className="demoBlock">
+            <DemoSectionTitle>Выравнивание</DemoSectionTitle>
+            <DemoDescription>
+              <code>align</code> на <code>Tooltip.Content</code> — <code>start</code>,{" "}
+              <code>center</code>, <code>end</code>: плашка выравнивается по краю или центру
+              триггера, стрелка при этом всегда смотрит на его центр.
+            </DemoDescription>
+            <PlaygroundExampleFrame.Root
+              code={tooltipAlignSource.trim()}
+              previewLayout="stack-center"
+            >
+              <PlaygroundExampleFrame.Stage>
+                <TooltipAlignExample />
+              </PlaygroundExampleFrame.Stage>
+            </PlaygroundExampleFrame.Root>
+          </div>
+
+          <div className="demoBlock">
             <DemoSectionTitle>Контролируемый режим</DemoSectionTitle>
             <DemoDescription>
               <code>open</code> и <code>onOpenChange</code> на <code>Tooltip.Root</code>:
@@ -229,7 +264,9 @@ export default function TooltipSection() {
             <DemoDescription>
               Панель форматирования: квадратные кнопки только с иконкой, у каждой{" "}
               <code>aria-label</code>; подсказка повторяет название и показывает сочетание клавиш в{" "}
-              <code>Kbd</code>. Один <code>Tooltip.Provider</code> на всю панель.
+              <code>Kbd</code>. Один <code>Tooltip.Provider</code> на всю панель: после первой
+              подсказки соседние открываются сразу и без анимации, будто одна подсказка меняет
+              текст.
             </DemoDescription>
             <PlaygroundExampleFrame.Root
               code={tooltipCompositionSource.trim()}

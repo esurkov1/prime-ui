@@ -106,7 +106,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| hover / active | pointer | hover fill per variant; active `scale(0.98)` |
+| hover / active | pointer | hover fill per variant; active `scale(var(--prime-motion-press-scale))` |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset` |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
 | loading | `loading` (native `<button>`) | `data-loading="true"`, `data-disabled="true"`, `aria-busy="true"`; an automatic spinner replaces the leading (or only) icon, otherwise it is centered over the hidden label (`data-loading-overlay="true"`) |

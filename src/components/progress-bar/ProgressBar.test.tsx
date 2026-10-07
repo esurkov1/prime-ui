@@ -51,6 +51,15 @@ describe("ProgressBar", () => {
     expect(root()).toHaveAttribute("data-tone", "danger");
   });
 
+  it("draws the fill from the clamped value ratio, hidden from assistive tech", () => {
+    const { container, rerender } = render(<ProgressBar.Root value={30} max={200} />);
+    const fill = () => container.querySelector<HTMLElement>("[aria-hidden='true'] > span");
+    expect(fill()?.style.getPropertyValue("--pb-ratio")).toBe("0.15");
+    rerender(<ProgressBar.Root value={500} max={200} />);
+    expect(fill()?.style.getPropertyValue("--pb-ratio")).toBe("1");
+    expect(screen.getAllByRole("progressbar")).toHaveLength(1);
+  });
+
   it("merges className on root", () => {
     render(<ProgressBar.Root value={5} className="custom-bar" />);
     expect(screen.getByRole("progressbar").parentElement).toHaveClass("custom-bar");

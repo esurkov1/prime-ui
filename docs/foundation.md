@@ -164,15 +164,71 @@ Base declaration: `outline: var(--prime-focus-width) solid var(--prime-color-foc
 on `:focus-visible`. Fields draw it on the wrapper with `:focus-within` / `:has(:focus-visible)`.
 Error fields use `--prime-color-danger-border` as ring color.
 
-Motion: `--prime-motion-duration-{fast 120, base 200, slow 300}`, `--prime-motion-easing-{standard,enter,exit}`.
-Durations collapse to 0 under `prefers-reduced-motion` globally; JS animations must also check it.
+### Motion and micro-animation
+
+Motion tokens:
+
+| Token | Value | Use |
+|---|---|---|
+| `--prime-motion-duration-xfast` | 150 ms | hover fill on dense rows, cells, options |
+| `--prime-motion-duration-fast` | 230 ms | press, hover, small panels, exits |
+| `--prime-motion-duration-base` | 380 ms | dialogs, toggles, content swaps |
+| `--prime-motion-duration-slow` | 570 ms | drawers, sheets |
+| `--prime-motion-easing-enter` | strong ease-out | appearing, responding |
+| `--prime-motion-easing-exit` | strong ease-out | leaving (shorter duration than enter) |
+| `--prime-motion-easing-standard` | ease-in-out | moving on screen, color/fill |
+| `--prime-motion-easing-emphasized` | decisive start, long soft landing, no overshoot | state gliding into place: thumbs, indicators, checkmarks; with `base` |
+| `--prime-motion-stagger` | 80 ms | step of a staggered first render |
+| `--prime-motion-press-scale` / `-compact` | 0.98 / 0.96 | `:active` scale; compact for icon-only and small targets |
+
+Under `prefers-reduced-motion` durations and stagger collapse to 0 and press scales to 1 (globals.css);
+JS animations must also check it.
+Every component is designed with its micro-animations, not only its static states. Rules (after Emil Kowalski):
+
+1. **Ask first: should it move at all?** By frequency: keyboard-driven or 100+/day actions (option highlight
+   while arrowing, row hover, menu navigation, command palette) get no movement — color/fill change only,
+   at most `fast`. Tens/day (hover, tabs, toggles): small and quick. Occasional (modals, drawers, toasts):
+   standard overlay motion. Rare (empty states, success, onboarding): may carry delight.
+2. **Every motion has a purpose:** feedback (press), state change (check, toggle, selection moving),
+   spatial continuity (a panel grows out of its trigger, an indicator slides between tabs), or preventing a
+   jarring jump (items appearing/disappearing, height changes). "Looks cool" on a frequent element is not one.
+3. **Tokens only.** Durations and easings come from `--prime-motion-*`; never a raw `ms` or `cubic-bezier`
+   in a component (so reduced motion, theme switching and retuning stay global). Nothing above `slow`.
+4. **Easing.** Entering / appearing / responding → `enter`; exiting → `exit`; things moving or morphing on
+   screen and color/fill changes → `standard`; a selection or thumb gliding into place → `emphasized` + `base`. Nothing overshoots its
+   target: no bounce, no springs past the end value.
+   Never `ease-in` for UI. Exit is never slower than enter.
+5. **Animate `transform` and `opacity`** (plus color/fill/shadow for state). Not `width`, `height`, `margin`,
+   `padding`, `top/left`. Where size must animate (accordion, progress), prefer `transform` / `scale` /
+   `grid-template-rows`; never `transition: all` — list the properties.
+6. **Press.** Every pressable control: `:active` → `scale(var(--prime-motion-press-scale))`
+   (`-compact` for icon-only and small targets), over `fast`, `transform` only. Release returns by the same transition. Disabled and loading never scale.
+7. **Never from nothing.** Entrances start from `opacity: 0` + a small offset (`--prime-space-1/2`) or
+   `scale(0.96–0.98)`, never `scale(0)`. Popovers/menus grow from the trigger (`transform-origin` follows
+   `data-side`; Tooltip from its arrow tip); modals stay centered. Layers anchored to a screen edge
+   (Drawer, sheet, Notification stack) travel from that edge and leave toward it.
+8. **State moves, it does not swap.** Checkmark draws/scales in, switch thumb slides, selection indicator
+   (tabs, segmented control) glides to the new item, chevrons rotate, progress fills, counters and fills
+   ease. Two states cross-fade rather than flip when they replace each other in place.
+9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
+   for one-shot enter/exit (overlay presence, spinner, skeleton).
+10. **Hover is for pointers.** Hover transforms/lifts only inside `@media (hover: hover) and (pointer: fine)`;
+    plain color hover is fine. No hover movement on dense rows and cells.
+11. **Lists.** Items entering/leaving fade + shift; stagger only for first-render of short groups
+    (`--prime-motion-stagger` steps, ≤ 6 items) and never blocks interaction.
+12. **Reduced motion** is already global through the tokens. Anything not tokenized (JS, `animation-delay`) must
+    be gated by `prefers-reduced-motion`. Movement may go; opacity/color feedback should stay.
+
+Component checklist for motion: press · hover/focus fill · selection/toggle · open/close · enter/exit of
+parts (items, messages, badges, icons) · loading/progress · reduced motion. Skip what the rules above say
+should stay still, and say so in a CSS comment only when the omission is non-obvious.
 
 ## 8. Components: states recipe
 
 | State | Recipe |
 |---|---|
 | hover | filled: `-hover` token; ghost/stroke/rows: `--prime-color-fill-subtle` |
-| active | filled: same as hover + `transform: scale(0.98)` for buttons only; ghost: `fill-subtle-active` |
+| active | filled: same as hover + `transform: scale(var(--prime-motion-press-scale))`; ghost: `fill-subtle-active` (+ the same press scale on pressable controls, see Motion) |
 | focus-visible | the focus ring (§7) |
 | selected | `accent-soft` bg + `accent-text`, or check icon in `accent-text` |
 | disabled | `fill-muted`/`field-bg-disabled` bg, `text-disabled` color, no shadow, `cursor: not-allowed` |
@@ -216,7 +272,7 @@ holds across the kit.
 | Modal, CommandMenu | fade + scale 0.98 → 1 · base · enter | fast · exit |
 | Modal bottom sheet (< 640px) | slide up · slow · enter | slide down · base · exit |
 | Drawer | slide from its side · slow · enter | base · exit |
-| Popover, Dropdown, Select, TagSelect, Datepicker, Tooltip | fade + 4px (`--prime-space-1`) from the anchor along the resolved `data-side` · fast · enter | fast · exit |
+| Popover, Dropdown, Select, TagSelect, Datepicker, Tooltip | fade + 4px (`--prime-space-1`) + scale 0.98 from the anchor edge along the resolved `data-side` · fast · enter | fast · exit |
 
 Components carry no motion code of their own for these layers.
 

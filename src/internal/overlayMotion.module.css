@@ -9,7 +9,8 @@
  *   dialog    fade + scale 0.98 → 1   base · enter / fast · exit   (bottom sheet < 640px: slide)
  *   sheet     slide up / down         slow · enter / base · exit
  *   drawer    slide from its side     slow · enter / base · exit
- *   floating  fade + 4px from anchor  fast · enter / fast · exit   (popover, menu, listbox, tooltip)
+ *   floating  fade + 4px + scale 0.98 from the anchor edge  fast · enter / fast · exit
+ *                                     (popover, menu, listbox, tooltip)
  */
 
 /* A closing scrim keeps catching pointer events, so the dismissing click never falls through to
@@ -75,18 +76,23 @@
 .floating {
   /* Offset toward the anchor: the panel grows out of its trigger along the resolved side. */
   --overlay-shift: 0 calc(-1 * var(--prime-space-1));
+  /* The panel grows out of the edge that faces its trigger. */
+  transform-origin: top center;
 }
 
 .floating[data-side="top"] {
   --overlay-shift: 0 var(--prime-space-1);
+  transform-origin: bottom center;
 }
 
 .floating[data-side="left"] {
   --overlay-shift: var(--prime-space-1) 0;
+  transform-origin: right center;
 }
 
 .floating[data-side="right"] {
   --overlay-shift: calc(-1 * var(--prime-space-1)) 0;
+  transform-origin: left center;
 }
 
 .floating[data-state="open"] {
@@ -153,6 +159,7 @@
   from {
     opacity: 0;
     translate: var(--overlay-shift);
+    scale: 0.98;
   }
 }
 
@@ -160,5 +167,6 @@
   to {
     opacity: 0;
     translate: var(--overlay-shift);
+    scale: 0.98;
   }
 }

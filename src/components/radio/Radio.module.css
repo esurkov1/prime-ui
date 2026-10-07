@@ -107,8 +107,12 @@
   height: 40%;
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-control-thumb);
-  transform: scale(0);
-  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+  opacity: 0;
+  transform: scale(0.4);
+  /* Leaving: quick exit. Arriving (checked rule below): emphasized glide. */
+  transition:
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
 .text {
@@ -122,7 +126,7 @@
 }
 
 .labelRow:active .control {
-  transform: scale(0.92);
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 /* ---- checked ---- */
@@ -136,7 +140,11 @@
 }
 
 .input:checked + .control .dot {
+  opacity: 1;
   transform: scale(1);
+  transition:
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* ---- focus-visible ---- */

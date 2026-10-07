@@ -2,12 +2,13 @@ import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
-import { getPanelOffsetPx, getViewportPadPx } from "@/hooks/usePosition";
+import { getViewportPadPx, readCssLengthPx } from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { mergeRefs } from "@/internal/mergeRefs";
 import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
@@ -18,52 +19,102 @@ import styles from "./Tooltip.module.css";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type TooltipSide = "top" | "bottom" | "left" | "right";
+export type TooltipAlign = "start" | "center" | "end";
 
-// ─── Provider Context ─────────────────────────────────────────────────────────
+const DEFAULT_DELAY_MS = 400;
+const DEFAULT_SKIP_DELAY_MS = 300;
+/**
+ * Grace period after the pointer leaves the trigger: long enough to cross the gap onto the chip
+ * (WCAG 1.4.13 "hoverable"), short enough to read as an immediate close.
+ */
+const CLOSE_GRACE_MS = 100;
 
-type TooltipProviderContextValue = {
+// ─── Group: one open tooltip at a time, warm skip-delay ───────────────────────
+
+type CloseHandler = () => void;
+
+/**
+ * Tooltips of one group (a Provider, or the kit-wide default) share a "warm" window: once a
+ * tooltip has been shown, the next one opens at once and without animation, and the previous one
+ * disappears instantly. Moving along a toolbar then feels like one tooltip changing its text.
+ */
+type TooltipGroup = {
   delayDuration: number;
+  isWarm: () => boolean;
+  /** Registers the newly opened tooltip and closes the previous one instantly. */
+  opened: (close: CloseHandler) => void;
+  /** Called on close: starts the warm window. */
+  closed: (close: CloseHandler) => void;
 };
 
-const TooltipProviderContext = React.createContext<TooltipProviderContextValue>({
-  delayDuration: 400,
-});
+function createTooltipGroup(delayDuration: number, skipDelayDuration: number): TooltipGroup {
+  let current: CloseHandler | null = null;
+  let warmUntil = 0;
+  return {
+    delayDuration,
+    isWarm: () => current !== null || Date.now() < warmUntil,
+    opened: (close) => {
+      if (current && current !== close) current();
+      current = close;
+    },
+    closed: (close) => {
+      if (current === close) current = null;
+      warmUntil = Date.now() + skipDelayDuration;
+    },
+  };
+}
 
-// ─── Root Context ─────────────────────────────────────────────────────────────
-
-type TooltipRootContextValue = {
-  isOpen: boolean;
-  triggerRef: React.RefObject<HTMLElement | null>;
-  contentId: string;
-  handleOpen: () => void;
-  handleClose: () => void;
-};
-
-const [TooltipRootProvider, useTooltipRootContext] =
-  createComponentContext<TooltipRootContextValue>("Tooltip");
+const defaultGroup = createTooltipGroup(DEFAULT_DELAY_MS, DEFAULT_SKIP_DELAY_MS);
+const TooltipGroupContext = React.createContext<TooltipGroup>(defaultGroup);
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export type TooltipProviderProps = {
+  /** Show delay in ms for every Tooltip.Root inside. */
   delayDuration?: number;
+  /** Window in ms after a tooltip closes during which the next one opens instantly. */
+  skipDelayDuration?: number;
   children: React.ReactNode;
 };
 
-function TooltipProvider({ delayDuration = 400, children }: TooltipProviderProps) {
-  const value = React.useMemo(() => ({ delayDuration }), [delayDuration]);
-  return (
-    <TooltipProviderContext.Provider value={value}>{children}</TooltipProviderContext.Provider>
+function TooltipProvider({
+  delayDuration = DEFAULT_DELAY_MS,
+  skipDelayDuration = DEFAULT_SKIP_DELAY_MS,
+  children,
+}: TooltipProviderProps) {
+  const group = React.useMemo(
+    () => createTooltipGroup(delayDuration, skipDelayDuration),
+    [delayDuration, skipDelayDuration],
   );
+  return <TooltipGroupContext.Provider value={group}>{children}</TooltipGroupContext.Provider>;
 }
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
+
+type TooltipRootContextValue = {
+  isOpen: boolean;
+  /** Opened inside a warm window, or replaced by a sibling: no enter / exit animation. */
+  instant: boolean;
+  triggerRef: React.RefObject<HTMLElement | null>;
+  contentId: string;
+  /** Opens after the delay (or at once when warm). */
+  scheduleOpen: () => void;
+  /** Closes after the hover grace period, so the pointer can move onto the chip. */
+  scheduleClose: () => void;
+  /** Cancels a pending open or close (pointer reached the chip). */
+  cancelPending: () => void;
+  close: () => void;
+};
+
+const [TooltipRootProvider, useTooltipRootContext] =
+  createComponentContext<TooltipRootContextValue>("Tooltip");
 
 export type TooltipRootProps = {
   children: React.ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Задержка показа (мс) для этого тултипа; по умолчанию — из `Tooltip.Provider` (400). */
+  /** Show delay in ms for this tooltip; defaults to the Provider's (400). */
   delayDuration?: number;
 };
 
@@ -74,41 +125,86 @@ function TooltipRoot({
   onOpenChange,
   delayDuration: delayProp,
 }: TooltipRootProps) {
-  const providerDelay = React.useContext(TooltipProviderContext).delayDuration;
-  const delayDuration = delayProp ?? providerDelay;
+  const group = React.useContext(TooltipGroupContext);
+  const delayDuration = delayProp ?? group.delayDuration;
 
   const [isOpen, setIsOpen] = useControllableState<boolean>({
     value: open,
     defaultValue: defaultOpen ?? false,
     onChange: onOpenChange,
   });
+  const [instant, setInstant] = React.useState(false);
 
   const triggerRef = React.useRef<HTMLElement | null>(null);
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
   const contentId = React.useId();
 
-  const handleOpen = React.useCallback(() => {
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setIsOpen(true), delayDuration);
-  }, [delayDuration, setIsOpen]);
+  const cancelPending = React.useCallback(() => clearTimeout(timerRef.current), []);
 
-  const handleClose = React.useCallback(() => {
-    clearTimeout(timeoutRef.current);
+  // Stable identity for the group: the latest setters are read through a ref.
+  const closeInstantlyRef = React.useRef<CloseHandler>(() => {});
+  closeInstantlyRef.current = () => {
+    clearTimeout(timerRef.current);
+    setInstant(true);
+    setIsOpen(false);
+  };
+  const closeInstantly = React.useCallback<CloseHandler>(() => closeInstantlyRef.current(), []);
+
+  const show = React.useCallback(
+    (asInstant: boolean) => {
+      setInstant(asInstant);
+      setIsOpen(true);
+    },
+    [setIsOpen],
+  );
+
+  const scheduleOpen = React.useCallback(() => {
+    clearTimeout(timerRef.current);
+    if (group.isWarm() || delayDuration <= 0) {
+      show(group.isWarm());
+      return;
+    }
+    timerRef.current = setTimeout(() => show(false), delayDuration);
+  }, [delayDuration, group, show]);
+
+  const close = React.useCallback(() => {
+    clearTimeout(timerRef.current);
+    setInstant(false);
     setIsOpen(false);
   }, [setIsOpen]);
 
+  const scheduleClose = React.useCallback(() => {
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(close, CLOSE_GRACE_MS);
+  }, [close]);
+
+  // Group bookkeeping follows the actual state, so controlled tooltips take part too.
   React.useEffect(() => {
-    return () => clearTimeout(timeoutRef.current);
-  }, []);
+    if (!isOpen) return;
+    group.opened(closeInstantly);
+    return () => group.closed(closeInstantly);
+  }, [isOpen, group, closeInstantly]);
 
-  /* WAI-ARIA tooltip: Escape скрывает подсказку, фокус остаётся на триггере. */
-  useEscapeKey({ enabled: isOpen, onEscape: handleClose });
+  React.useEffect(() => () => clearTimeout(timerRef.current), []);
 
-  return (
-    <TooltipRootProvider value={{ isOpen, triggerRef, contentId, handleOpen, handleClose }}>
-      {children}
-    </TooltipRootProvider>
+  /* WAI-ARIA tooltip: Escape hides it, focus stays on the trigger. */
+  useEscapeKey({ enabled: isOpen, onEscape: close });
+
+  const value = React.useMemo(
+    () => ({
+      isOpen,
+      instant,
+      triggerRef,
+      contentId,
+      scheduleOpen,
+      scheduleClose,
+      cancelPending,
+      close,
+    }),
+    [isOpen, instant, contentId, scheduleOpen, scheduleClose, cancelPending, close],
   );
+
+  return <TooltipRootProvider value={value}>{children}</TooltipRootProvider>;
 }
 
 // ─── Trigger ─────────────────────────────────────────────────────────────────
@@ -118,46 +214,73 @@ export type TooltipTriggerProps = {
   className?: string;
 };
 
-function TooltipTrigger({ children, className }: TooltipTriggerProps) {
-  const { isOpen, triggerRef, contentId, handleOpen, handleClose } = useTooltipRootContext();
-  const props = children.props as React.HTMLAttributes<HTMLElement> & {
-    ref?: React.Ref<HTMLElement>;
-  };
+type TriggerChildProps = React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> };
 
-  return React.cloneElement(
-    children as React.ReactElement<
-      React.HTMLAttributes<HTMLElement> & React.RefAttributes<HTMLElement>
-    >,
-    {
-      ref: triggerRef,
-      className: cx(props.className, className) || undefined,
-      "aria-describedby":
-        [props["aria-describedby"], isOpen ? contentId : undefined].filter(Boolean).join(" ") ||
-        undefined,
-      ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
-      onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
-        props.onMouseEnter?.(e);
-        handleOpen();
-      },
-      onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
-        props.onMouseLeave?.(e);
-        handleClose();
-      },
-      onFocus: (e: React.FocusEvent<HTMLElement>) => {
-        props.onFocus?.(e);
-        handleOpen();
-      },
-      onBlur: (e: React.FocusEvent<HTMLElement>) => {
-        props.onBlur?.(e);
-        handleClose();
-      },
+function TooltipTrigger({ children, className }: TooltipTriggerProps) {
+  const { isOpen, triggerRef, contentId, scheduleOpen, scheduleClose, close } =
+    useTooltipRootContext();
+  const props = children.props as TriggerChildProps;
+  /* A press hides the tooltip and the focus it causes must not reopen it (until the pointer leaves). */
+  const pressedRef = React.useRef(false);
+  const ref = React.useMemo(() => mergeRefs(props.ref, triggerRef), [props.ref, triggerRef]);
+
+  return React.cloneElement(children as React.ReactElement<TriggerChildProps>, {
+    ref,
+    className: cx(props.className, className) || undefined,
+    "aria-describedby":
+      [props["aria-describedby"], isOpen ? contentId : undefined].filter(Boolean).join(" ") ||
+      undefined,
+    ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
+    onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
+      props.onPointerEnter?.(e);
+      // Touch has no hover: a tap must not leave a tooltip behind. Focus still opens it.
+      if (e.pointerType === "touch") return;
+      if (!pressedRef.current) scheduleOpen();
     },
-  );
+    onPointerLeave: (e: React.PointerEvent<HTMLElement>) => {
+      props.onPointerLeave?.(e);
+      pressedRef.current = false;
+      scheduleClose();
+    },
+    onPointerDown: (e: React.PointerEvent<HTMLElement>) => {
+      props.onPointerDown?.(e);
+      pressedRef.current = true;
+      close();
+    },
+    onFocus: (e: React.FocusEvent<HTMLElement>) => {
+      props.onFocus?.(e);
+      if (!pressedRef.current) scheduleOpen();
+    },
+    onBlur: (e: React.FocusEvent<HTMLElement>) => {
+      props.onBlur?.(e);
+      pressedRef.current = false;
+      close();
+    },
+  });
 }
 
 // ─── Positioning ──────────────────────────────────────────────────────────────
 
-type TooltipCoords = { top: number; left: number; side: TooltipSide };
+export type TooltipPlacement = {
+  top: number;
+  left: number;
+  side: TooltipSide;
+  /** Arrow centre along the chip's edge, px from its start (left for top/bottom, top for left/right). */
+  arrow: number;
+};
+
+export type TooltipPlacementInput = {
+  side: TooltipSide;
+  align: TooltipAlign;
+  /** Gap between trigger and chip body (the arrow lives in it). */
+  offset: number;
+  /** Minimum distance from the viewport edge. */
+  pad: number;
+  /** Closest the arrow centre may come to a chip corner (radius + half the arrow). */
+  arrowInset: number;
+};
+
+type Rect = Pick<DOMRectReadOnly, "top" | "left" | "right" | "bottom" | "width" | "height">;
 
 const OPPOSITE: Record<TooltipSide, TooltipSide> = {
   top: "bottom",
@@ -166,51 +289,80 @@ const OPPOSITE: Record<TooltipSide, TooltipSide> = {
   right: "left",
 };
 
-/** Позиция по стороне; если не влезает — противоположная сторона; затем сдвиг в пределах вьюпорта. */
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(value, Math.max(min, max)));
+
+/**
+ * Places the chip on `side` of the trigger (flipping to the opposite side when it does not fit),
+ * aligns it along the cross axis, shifts it inside the viewport, and keeps the arrow pointing at
+ * the trigger's centre — clamped so it never leaves the chip's straight edge.
+ */
 export function computeTooltipPosition(
-  ar: Pick<DOMRectReadOnly, "top" | "left" | "right" | "bottom" | "width" | "height">,
-  cw: number,
-  ch: number,
-  vw: number,
-  vh: number,
-  side: TooltipSide,
-  offset: number,
-  pad: number,
-): TooltipCoords {
-  const place = (s: TooltipSide) => {
+  anchor: Rect,
+  width: number,
+  height: number,
+  viewportWidth: number,
+  viewportHeight: number,
+  { side, align, offset, pad, arrowInset }: TooltipPlacementInput,
+): TooltipPlacement {
+  const mainStart = (s: TooltipSide) => {
     switch (s) {
       case "top":
-        return { top: ar.top - ch - offset, left: ar.left + ar.width / 2 - cw / 2 };
+        return anchor.top - offset - height;
       case "bottom":
-        return { top: ar.bottom + offset, left: ar.left + ar.width / 2 - cw / 2 };
+        return anchor.bottom + offset;
       case "left":
-        return { top: ar.top + ar.height / 2 - ch / 2, left: ar.left - cw - offset };
+        return anchor.left - offset - width;
       case "right":
-        return { top: ar.top + ar.height / 2 - ch / 2, left: ar.right + offset };
+        return anchor.right + offset;
     }
   };
-  const fits = (s: TooltipSide, p: { top: number; left: number }) =>
-    s === "top" || s === "bottom"
-      ? p.top >= pad && p.top + ch <= vh - pad
-      : p.left >= pad && p.left + cw <= vw - pad;
-
-  let resolved = side;
-  let pos = place(side);
-  if (!fits(side, pos)) {
-    const alt = OPPOSITE[side];
-    const altPos = place(alt);
-    if (fits(alt, altPos)) {
-      resolved = alt;
-      pos = altPos;
-    }
-  }
-
-  return {
-    top: Math.round(Math.max(pad, Math.min(pos.top, vh - ch - pad))),
-    left: Math.round(Math.max(pad, Math.min(pos.left, vw - cw - pad))),
-    side: resolved,
+  const fits = (s: TooltipSide) => {
+    const start = mainStart(s);
+    return s === "top" || s === "bottom"
+      ? start >= pad && start + height <= viewportHeight - pad
+      : start >= pad && start + width <= viewportWidth - pad;
   };
+
+  const resolved = fits(side) || !fits(OPPOSITE[side]) ? side : OPPOSITE[side];
+  const vertical = resolved === "top" || resolved === "bottom";
+
+  const anchorStart = vertical ? anchor.left : anchor.top;
+  const anchorSize = vertical ? anchor.width : anchor.height;
+  const size = vertical ? width : height;
+  const viewport = vertical ? viewportWidth : viewportHeight;
+
+  const crossStart =
+    align === "start"
+      ? anchorStart
+      : align === "end"
+        ? anchorStart + anchorSize - size
+        : anchorStart + anchorSize / 2 - size / 2;
+  const cross = Math.round(clamp(crossStart, pad, viewport - size - pad));
+  const arrow = Math.round(
+    clamp(anchorStart + anchorSize / 2 - cross, arrowInset, size - arrowInset),
+  );
+
+  const main = Math.round(
+    clamp(
+      mainStart(resolved),
+      pad,
+      (vertical ? viewportHeight - height : viewportWidth - width) - pad,
+    ),
+  );
+
+  return vertical
+    ? { top: main, left: cross, side: resolved, arrow }
+    : { top: cross, left: main, side: resolved, arrow };
 }
+
+/** Arrow shapes per resolved side: base on the chip edge, a softened tip toward the trigger. */
+const ARROW_PATH: Record<TooltipSide, { viewBox: string; d: string }> = {
+  top: { viewBox: "0 0 10 5", d: "M0 0H10L5.8 4.4Q5 5.2 4.2 4.4Z" },
+  bottom: { viewBox: "0 0 10 5", d: "M0 5H10L5.8 0.6Q5 -0.2 4.2 0.6Z" },
+  left: { viewBox: "0 0 5 10", d: "M0 0V10L4.4 5.8Q5.2 5 4.4 4.2Z" },
+  right: { viewBox: "0 0 5 10", d: "M5 0V10L0.6 5.8Q-0.2 5 0.6 4.2Z" },
+};
 
 // ─── Content ─────────────────────────────────────────────────────────────────
 
@@ -218,82 +370,110 @@ export type TooltipContentProps = {
   children: React.ReactNode;
   size?: ControlSize;
   side?: TooltipSide;
+  align?: TooltipAlign;
   className?: string;
 };
 
-function TooltipContent({ children, size = "m", side = "top", className }: TooltipContentProps) {
-  const { isOpen, triggerRef, contentId } = useTooltipRootContext();
+function TooltipContent({
+  children,
+  size = "m",
+  side = "top",
+  align = "center",
+  className,
+}: TooltipContentProps) {
+  const { isOpen, instant, triggerRef, contentId, scheduleClose, cancelPending } =
+    useTooltipRootContext();
   const overlayPortalLayer = useOverlayPortalLayer();
-  const contentRef = React.useRef<HTMLDivElement | null>(null);
-  const [coords, setCoords] = React.useState<TooltipCoords | null>(null);
-  // Pointer-leave / blur / Escape close it with the shared fade-out (Overlay contract).
+  // State, not a ref: Portal attaches the node one commit later, and placement must rerun then.
+  const [content, setContent] = React.useState<HTMLDivElement | null>(null);
+  const [placement, setPlacement] = React.useState<TooltipPlacement | null>(null);
   const presence = usePresence(isOpen, { exitDuration: "fast" });
-  const mounted = presence.mounted;
+  // A tooltip replaced by its neighbour leaves at once instead of fading under the new one.
+  const mounted = presence.mounted && (isOpen || !instant);
 
-  React.useEffect(() => {
-    if (!mounted) {
-      setCoords(null);
+  React.useLayoutEffect(() => {
+    if (!mounted || !content) {
+      setPlacement(null);
       return;
     }
 
     const update = () => {
       const anchor = triggerRef.current;
-      const content = contentRef.current;
-      if (!anchor || !content) return;
-      const cr = content.getBoundingClientRect();
-      setCoords(
+      if (!anchor) return;
+      const radius = Number.parseFloat(getComputedStyle(content).borderTopLeftRadius) || 0;
+      const arrowWidth = readCssLengthPx("--prime-tooltip-arrow-width", 10);
+      setPlacement(
         computeTooltipPosition(
           anchor.getBoundingClientRect(),
-          cr.width,
-          cr.height,
+          content.offsetWidth,
+          content.offsetHeight,
           window.innerWidth,
           window.innerHeight,
-          side,
-          getPanelOffsetPx(),
-          getViewportPadPx(),
+          {
+            side,
+            align,
+            offset: readCssLengthPx("--prime-tooltip-offset", 8),
+            pad: getViewportPadPx(),
+            arrowInset: radius + arrowWidth / 2,
+          },
         ),
       );
     };
 
-    const frameId = requestAnimationFrame(update);
+    // Measured before paint: the chip never shows up in the wrong place.
+    update();
     window.addEventListener("resize", update);
     window.addEventListener("scroll", update, true);
-
     return () => {
-      cancelAnimationFrame(frameId);
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update, true);
     };
-  }, [mounted, triggerRef, side]);
+  }, [mounted, content, triggerRef, side, align]);
 
   if (!mounted) return null;
 
-  const positionStyle: React.CSSProperties = {
-    position: "fixed",
-    top: coords?.top ?? 0,
-    left: coords?.left ?? 0,
-  };
+  const resolvedSide = placement?.side ?? side;
+  const arrow = ARROW_PATH[resolvedSide];
 
   return (
     <Portal>
       <div
-        ref={contentRef}
+        ref={setContent}
         id={contentId}
         role="tooltip"
         data-overlay-portal-layer={overlayPortalLayer}
         className={cx(styles.content, overlayMotion.floating, className)}
-        style={positionStyle}
+        style={
+          {
+            top: placement?.top ?? 0,
+            left: placement?.left ?? 0,
+            // The first commit only attaches the node; it is placed before the browser paints.
+            visibility: placement ? undefined : "hidden",
+            "--tt-arrow": placement ? `${placement.arrow}px` : "50%",
+          } as React.CSSProperties
+        }
         onAnimationEnd={presence.onExitEnd}
+        onPointerEnter={cancelPending}
+        onPointerLeave={scheduleClose}
         {...toDataAttributes({
           state: presence.state,
           size,
           /* Resolved side: flips to the opposite one when the requested side does not fit. */
-          side: coords?.side ?? side,
-          /* До первого измерения прозрачен (CSS), чтобы не мигать в (0, 0). */
-          positioned: coords ? true : undefined,
+          side: resolvedSide,
+          align,
+          instant: instant ? true : undefined,
         })}
       >
         <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+        <svg
+          className={styles.arrow}
+          viewBox={arrow.viewBox}
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d={arrow.d} />
+        </svg>
       </div>
     </Portal>
   );

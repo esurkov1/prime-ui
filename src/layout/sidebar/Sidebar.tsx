@@ -295,7 +295,7 @@ function CompactTooltip({ text, children }: { text: string; children: React.Reac
       onOpenChange={(next) => setOpen(enabled && next)}
       delayDuration={0}
     >
-      {/* Slot keeps the item's own ref: Tooltip.Trigger replaces the child's ref. */}
+      {/* Slot keeps the item's own `data-state="active"`: the trigger would overwrite it. */}
       <Tooltip.Trigger>
         <Slot>{children}</Slot>
       </Tooltip.Trigger>

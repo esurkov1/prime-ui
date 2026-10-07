@@ -173,6 +173,9 @@
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-fill-muted);
   color: var(--prime-color-text-muted);
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-state="active"] .iconWrap {
@@ -304,7 +307,9 @@
   color: inherit;
   font: inherit;
   cursor: pointer;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .chip:hover {
@@ -313,6 +318,7 @@
 
 .chip:active {
   background: var(--prime-color-fill-subtle-active);
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 .chip:focus-visible {

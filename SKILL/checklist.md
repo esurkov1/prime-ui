@@ -12,6 +12,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] Default size `m`, unless the whole region is deliberately dense (`s`) or prominent (`l`).
 - [ ] Every row of controls uses one size; their heights line up.
 - [ ] Icon-only buttons are square and have `aria-label`.
+- [ ] Controls inside table cells are one tier below the table; no CSS sets table row or cell heights.
 
 ## Text
 - [ ] Every text goes through a kit component or `Typography.Root` with a role; no custom font sizes/weights.
@@ -44,6 +45,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] Data blocks have loading, empty and error states (DataTable `loading` / `empty` / `error`, EmptyPage).
 - [ ] Destructive irreversible actions confirm in a Modal; results of submitted actions show a Notification
       (instant toggles show one only on failure).
+- [ ] No hand-written animation on kit parts; custom motion uses motion tokens, `transform`/`opacity` only.
 
 ## Themes and widths
 - [ ] Screen checked with `data-theme="dark"`: no hard-coded colors, everything readable.

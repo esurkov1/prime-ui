@@ -30,7 +30,7 @@ Accordion.Root               frame (grouped) or column of cards (separate)
     │       ├── Accordion.Icon   optional leading icon
     │       ├── <span>label</span>
     │       └── Accordion.Arrow  indicator at the end (chevron or icon / openIcon pair)
-    └── Accordion.Content    <section> panel with height animation
+    └── Accordion.Content    <section> panel; clip <div> → padded body <div>
 ```
 
 ## API
@@ -129,11 +129,11 @@ No ref; renders a `<span>` at the end of the trigger.
 **Hierarchy** — one accordion per content block; do not nest accordions inside accordion panels.
 
 ## States
-- Open/closed: driven by `value` / `defaultValue` + `onValueChange`. `data-state="open" | "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `aria-hidden` on a closed Content.
+- Open/closed: driven by `value` / `defaultValue` + `onValueChange`. `data-state="open" | "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `aria-hidden` and `inert` on a closed Content (its fields leave the tab order).
 - Disabled item: `disabled` on Item → `data-disabled` on Item and Trigger, native `disabled` on the button, text in `text-disabled`, `cursor: not-allowed`.
 - Hover: trigger gets `fill-subtle`; active `fill-subtle-active`; focus-visible: inset focus ring inside the trigger.
 - Root: `data-size`, `data-layout`.
-- Height animates with motion tokens; no transition under `prefers-reduced-motion`.
+- Open/close: the panel height transitions through `grid-template-rows: 0fr → 1fr` (no JS measuring, follows content that resizes while open) and the body fades in while settling by `--prime-space-1`; open uses `base` + `enter`, close `fast` + `exit`. The chevron rotates over `base`. Instant under `prefers-reduced-motion`.
 
 ## Layout & spacing
 - Takes the full width of its parent (`width: 100%`); the parent sets the measure.

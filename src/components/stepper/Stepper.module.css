@@ -150,7 +150,8 @@
   cursor: pointer;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-orientation="horizontal"] .step {
@@ -171,6 +172,10 @@
   gap: var(--st-gap);
   width: 100%;
   padding: var(--st-v-pad);
+}
+
+.step:active:not(:disabled) {
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 .root[data-orientation="vertical"] .step:hover:not(:disabled) {

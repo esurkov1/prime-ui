@@ -75,7 +75,7 @@ Hint has no `variant` or `tone`; its states are flags.
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| error | `invalid` | `data-invalid="true"` |
+| error | `invalid` | `data-invalid="true"`; the message drops in over `fast` (fade + `--prime-space-1` from above, no shake, no layout shift) and the color eases from the hint color |
 | disabled | `disabled` | `data-disabled="true"` |
 | size | `size` | `data-size` |
 

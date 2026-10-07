@@ -231,9 +231,10 @@
   white-space: nowrap;
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--sb-ease),
-    color var(--prime-motion-duration-fast) var(--sb-ease),
-    box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
+    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
+    color var(--prime-motion-duration-xfast) var(--sb-ease),
+    box-shadow var(--prime-motion-duration-fast) var(--sb-ease),
+    transform var(--prime-motion-duration-fast) var(--sb-ease);
 }
 
 .item:hover {
@@ -241,8 +242,9 @@
   color: var(--prime-color-text-primary);
 }
 
-.item:active {
+.item:active:not([data-disabled="true"], :disabled) {
   background: var(--prime-color-fill-subtle-active);
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 .item:focus-visible {
@@ -274,7 +276,7 @@
   width: var(--sb-icon);
   height: var(--sb-icon);
   color: var(--prime-color-text-muted);
-  transition: color var(--prime-motion-duration-fast) var(--sb-ease);
+  transition: color var(--prime-motion-duration-xfast) var(--sb-ease);
 }
 
 .icon > :global(svg) {

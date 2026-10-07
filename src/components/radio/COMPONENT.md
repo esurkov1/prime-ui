@@ -125,7 +125,7 @@ No `variant`/`tone`/`color`. Axes on `Radio.Group`: `size`, `orientation`, `full
 | State | Driven by | DOM | Looks like |
 |---|---|---|---|
 | unselected | group `value` ≠ option `value` | `data-state="unchecked"` on option | circle `fill-strong`, hover `fill-strong-hover` |
-| selected | group `value` = option `value` | `data-state="checked"` | circle `accent-default` (hover `accent-hover`) with a thumb-coloured dot (40%) that pops in |
+| selected | group `value` = option `value` | `data-state="checked"` | circle `accent-default` (hover `accent-hover`) with a thumb-coloured dot (40%) that grows in |
 | invalid | group `invalid`, option `invalid`, or mounted `Radio.Error` | `data-invalid="true"`, `aria-invalid` | unselected circle gets a `danger-border` inset ring; focus ring `danger-border` |
 | disabled | group or option `disabled` | `data-disabled="true"`, `aria-disabled` on group | circle `fill-muted`, dot `text-disabled`, `cursor: not-allowed` |
 | active | pointer press | — | circle scales to 92% |

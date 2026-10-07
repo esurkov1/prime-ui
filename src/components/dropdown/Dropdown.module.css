@@ -118,8 +118,8 @@
   cursor: pointer;
   outline: none;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
 }
 
 /* Клавиатурный фокус = подсветка строки (roving focus внутри меню). */

@@ -90,33 +90,12 @@ input::-moz-focus-inner {
 @media (prefers-reduced-motion: reduce) {
   :root,
   [data-theme] {
+    --prime-motion-duration-xfast: 0ms;
     --prime-motion-duration-fast: 0ms;
     --prime-motion-duration-base: 0ms;
     --prime-motion-duration-slow: 0ms;
-  }
-}
-
-/* Accordion: height is provided by the component via --prime-accordion-content-height */
-@keyframes prime-accordion-down {
-  from {
-    height: 0;
-    opacity: 0;
-  }
-
-  to {
-    height: var(--prime-accordion-content-height);
-    opacity: 1;
-  }
-}
-
-@keyframes prime-accordion-up {
-  from {
-    height: var(--prime-accordion-content-height);
-    opacity: 1;
-  }
-
-  to {
-    height: 0;
-    opacity: 0;
+    --prime-motion-stagger: 0ms;
+    --prime-motion-press-scale: 1;
+    --prime-motion-press-scale-compact: 1;
   }
 }

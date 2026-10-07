@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { ExampleFrame } from "./ExampleFrame";
 
@@ -34,5 +34,18 @@ describe("ExampleFrame", () => {
     );
     expect(screen.getByRole("radio", { name: "Preview" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Copy code" })).toBeInTheDocument();
+  });
+
+  it("swaps the copy glyph to a check next to the button after copying", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    render(<ExampleFrame.Root code="const a = 1;">preview</ExampleFrame.Root>);
+    const button = screen.getByRole("button", { name: "Копировать код" });
+    const icon = button.querySelector("[data-copy-state]");
+    expect(icon).toHaveAttribute("data-copy-state", "idle");
+    fireEvent.click(button);
+    expect(await screen.findByRole("button", { name: "Скопировано" })).toBe(button);
+    expect(writeText).toHaveBeenCalledWith("const a = 1;");
+    expect(icon).toHaveAttribute("data-copy-state", "copied");
   });
 });

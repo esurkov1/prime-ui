@@ -457,6 +457,7 @@ export type {
 } from "./timeline/Timeline";
 export { Timeline } from "./timeline/Timeline";
 export type {
+  TooltipAlign,
   TooltipContentProps,
   TooltipProviderProps,
   TooltipRootProps,
