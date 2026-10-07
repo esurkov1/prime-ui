@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 52 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 53 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines; a strict 4px grid; one size axis
@@ -15,7 +15,10 @@ every screen you build looks like it was drawn by the same hand.
 - **Light and dark as equals.** Full themes, WCAG AA text contrast, a focus ring that is never clipped.
 - **One API everywhere.** `size`, `variant`, `tone`, `color`, `invalid/hint/error`,
   `value/onValueChange`, `checked/onCheckedChange`, `open/onOpenChange`, `labels` — the same names in
-  every component, compound parts `X.Root` + `X.Part`, state in `data-*`.
+  every component, compound parts `X.Root` + `X.Part` for components with parts and a single export
+  for leaves (`<Kbd>`, `<Divider>`), state in `data-*`.
+- **Built from itself.** Components reuse the kit's own Button, Badge, Spinner, Icon, Checkbox,
+  EmptyPage and ScrollContainer instead of private copies, so a fix in one place lands everywhere.
 - **Overlays that behave.** Modal, Drawer, Popover, Dropdown, Select, Tooltip and CommandMenu share
   one stack: one click or one Escape closes exactly the topmost layer, focus goes where it should.
 - **Accessible by default.** Keyboard support, ARIA roles, Russian default strings for every system
@@ -108,7 +111,7 @@ export function App() {
       nav={
         <Sidebar.Root>
           <Sidebar.Content>
-            <Sidebar.Item active>Clients</Sidebar.Item>
+            <Sidebar.Item current>Clients</Sidebar.Item>
           </Sidebar.Content>
         </Sidebar.Root>
       }
@@ -191,6 +194,7 @@ accessibility, examples and common mistakes.
 | [**SegmentedControl**](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-control/COMPONENT.md) | A switch between 2–5 mutually exclusive options or modes that takes effect immediately. |
 | [**Slider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/slider/COMPONENT.md) | A slider for picking an approximate numeric value within a range, with an optional label and value readout. |
 | [**Select**](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) | A dropdown field for choosing one value (or several with `multiple`) from a closed list. |
+| [**NativeSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/native-select/COMPONENT.md) | The system `<select>` in the kit's field frame: plain text options, native picker on phones. |
 | [**TagSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag-select/COMPONENT.md) | A multi-select field that shows the chosen values as coloured tags, filters as you type and can create new tags. |
 | [**SmartFilter**](https://github.com/esurkov1/prime-ui/blob/main/src/components/smart-filter/COMPONENT.md) | A filter bar for lists and tables: a filter button and search with a panel of values, applied filters as tags, and a show / hide choice for every value. |
 | [**Datepicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/datepicker/COMPONENT.md) | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). |

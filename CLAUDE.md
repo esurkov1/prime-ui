@@ -64,8 +64,8 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
 
 **Structure**
 - A component with parts is compound: `X.Root` + `X.Part`. A leaf without parts is a **single export**
-  (`<Kbd>`, `<Spinner>`), never `X.Root` alone (§10). Root-only compounds still in the repo are converted
-  when their group touches them.
+  (`<Kbd>`, `<Spinner>`, `<Typography>`), never `X.Root` alone (§10). `X.Root` therefore appears only
+  next to real parts.
 - `X.Root` is always the outermost element and owns the state. A container of several roots is `X.Group`
   (`Radio.Group`). One level of parts only — no `X.Group.Root`.
 - Part names: `Trigger` opens a layer (a slot, no DOM); `Content` is the floating layer or the disclosed
@@ -74,7 +74,13 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
   row of buttons inside a zone; `Title` heads a surface, `Label` names a control or item, `Description`
   is the secondary text (not `Sub`); `Count` is a number badge, `Counter` a character counter;
   `Separator` divides items; `<Action>Button` is a button the kit renders (`CloseButton`, `ClearButton`),
-  `Close` is a slot around the consumer's button. A group heading is the `label` prop of `X.Group`.
+  `Close` is a slot around the consumer's button. A group heading is the `label` prop of `X.Group`
+  (never an `X.GroupLabel` part). Optional parts of a collection item are `X.ItemIcon`, `X.ItemCount`,
+  `X.ItemShortcut`, `X.ItemText`.
+- A root that draws its own separators or indicators (Breadcrumb chevrons, Stepper lines, Accordion
+  chevron) has no part for them.
+- Choice controls (Checkbox, Radio, Switch): the root renders the `<label>` with the input; `X.Label` is
+  only the text.
 - Icons go in parts (`X.Icon`, `X.ItemIcon`, `X.TriggerIcon`) — never `icon` / `leading` / `trailing` /
   `leadingIcon` props or component-type props (`icon={Comp}`). Only data passed as arrays or options
   (`notify()`, `options`) carries `icon: ReactNode`.
@@ -85,16 +91,19 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
   The new value is always the first callback argument.
 - Event names: `onSelect` activates a menu / command item; `onRemove` takes a value out of a selection;
   `onDelete` destroys an entity; `onDismiss` closes a message (Banner, Notification).
-- Dismiss: every overlay takes `closeOnOutsideClick` and `closeOnEscape` (default `true`, §10). Popover
-  and Dropdown still lack `closeOnEscape` — the overlays group adds it.
+- Dismiss: every overlay takes `closeOnOutsideClick` and `closeOnEscape` (default `true`, §10).
 - Selection mode: `multiple?: boolean` for one vs many (not `type`); `mode` only for structurally
-  different values (Datepicker `single | range`). Status words: `selected` (choice), `current`
+  different values (Datepicker `single | range`). Mutually exclusive behaviours are one enum prop, not
+  a set of booleans with impossible combinations (DataTable `paging: "pages" | "infinite" | "none"`).
+  Status words: `selected` (choice), `current`
   (navigation location, `aria-current`), `pressed` (toggle button). Tone words for statuses
   (`danger`, never `error`). Flags keep §10 names (`fullWidth`, not `fillWidth`).
 - Anchored layers position with `side` (`top | right | bottom | left`) and `align` (`start | center | end`).
 - `color` only on the components §10 lists.
-- `asChild?: boolean` only on single interactive elements that may become a link (Button.Root,
-  Sidebar.Item, Timeline.Item). `Trigger`, `Close`, `Confirm`, `Anchor` are always slots that clone one
+- A visible text label is `label`; a name only for assistive tech is the native `aria-label`, never
+  `label`.
+- `asChild?: boolean` only on single interactive elements that may become a link or another element
+  (Button.Root, LinkButton, Sidebar.Item, Timeline.Item). `Trigger`, `Close`, `Confirm`, `Anchor` are always slots that clone one
   child and take no `className`. `as` only picks a semantic tag for non-interactive elements.
 - Functions: `formatX(value)` for display, `getX(item)` for data accessors, `renderX(item)` to render a
   data item. No function-as-children.
@@ -103,6 +112,9 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
   reorders, segments, presets).
 - Size: `size` lives on the root only; the root provides `ControlSizeProvider`, parts read size from
   context and set `data-size`. Exception: an overlay's `Content` takes `size` for its width.
+  `Button.Root`, `Input.Root`, `Icon` and `Checkbox.Indicator` without `size` take the host tier from
+  context, so a sized host (LoginForm, Popover, Banner) sizes its kit children. A control nested inside
+  another control's row (a checkbox look in a Select option) is one tier smaller.
 - Every part that renders DOM accepts `className`, its native attributes and `ref` (React 19 ref as a
   prop, or `forwardRef`). `displayName` is `X.Part`; behaviour never depends on `displayName` (compare
   element types).
@@ -119,7 +131,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 
 | Need | Use |
 |---|---|
-| a button (close, clear, nav arrow, retry, icon button) | `Button` (`variant="ghost"`, `Button.Icon`), `LinkButton` for links |
+| a button (close, clear, nav arrow, retry, icon button) | `Button` (`variant="ghost"`, `Button.Icon`), `LinkButton` for links (`asChild` + `<button>` for an inline action in text) |
 | a loading indicator | `Spinner` (Button / Select `loading` place it themselves) |
 | a checkbox look inside an option or menu row | `Checkbox.Indicator` (no input; the row carries `aria-selected` / `aria-checked`) |
 | an icon, chevron, check, sort arrow, status glyph | `Icon name="…"` / `Icon*` from `src/icons` — never inline `<svg>` or direct `lucide-react` in components |
@@ -128,17 +140,30 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a separator | `Divider` |
 | a scroll region (thin bar, edge fade, hidden bar) | `ScrollContainer` (`axis`, `fade`, `scrollbar="hidden"`) |
 | an empty result | `EmptyPage` (`layout="compact"` inside menus and lists) |
-| a field label / support row | `Label`, `Hint`, `src/internal/FieldFrame` |
+| a field label / support row / counter | `Label`, `Hint`, `src/internal/FieldFrame` (`useFieldFrame`, `counter`, `reserveSupportRow`, `group` for a labelled group) |
+| a checkbox / radio / switch row (control + text + support) | `src/internal/ChoiceField` |
+| a colour swatch (fill, checkerboard, check) | `src/internal/swatch` |
+| menu / listbox rows, a floating panel | `src/internal/menu.module.css`, `floatingSurface.module.css`, `listbox.ts` (listbox keyboard) |
+| the matched part of a label while searching | `src/internal/HighlightMatch` (`HighlightMatch`, `highlightChildren`) |
+| a `{token}` label template | `src/internal/formatLabel` |
+| a bounded block in an example (panel, card) | `Card` (`Card.Root` + `Card.Body`) — never a hand-drawn card in CSS |
 | a person / object picture | `Avatar` / `Thumbnail`; image load state via `src/hooks/useImageStatus` |
 | a table, pagination, row selection | `DataTable`, `Pagination`, `Checkbox` |
 | screen-reader-only text | `src/internal/VisuallyHidden` |
 | appearance of a part | `src/internal/enterMotion.module.css` (`.enter`, `.enterBase`) |
-| overlay enter/exit, stack, focus | `overlayMotion.module.css`, `usePresence`, `useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `usePosition` |
+| overlay enter/exit, stack, focus | `overlayMotion.module.css`, `usePresence`, `useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `OverlayPortalLayerContext` |
+| anchored positioning | `usePosition` (follows the anchor, 4 sides, `align`, arrow) |
 | roving arrow-key focus | `src/internal/rovingFocus.ts` (`rovingIndex`, `gridIndex`) |
-| controlled / uncontrolled state, ids, refs | `useControllableState`, `useFieldIds`, `useMergedRefs`, `slot`, `cx`, `toDataAttributes` |
+| controlled / uncontrolled state, refs | `useControllableState`, `useMergedRefs` / `mergeRefs`, `slot`, `cx`, `toDataAttributes` |
 
-If the donor lacks a mode you need, extend the donor (with its docs, tests and example) instead of
-copying it. A reuse that needs a donor change outside your scope is reported, not hand-rolled.
+- If the donor lacks a mode you need, extend the donor (with its docs, tests and example) instead of
+  copying it. A reuse that needs a donor change outside your scope is reported, not hand-rolled.
+- Import a donor by its module path (`@/components/badge/Badge`), never through `"prime-ui-kit"` or an
+  index; no circular imports between components (shared types go to a `types.ts`).
+- Configure a donor only through its public API (`size`, `variant`, `tone`, `className` on its root,
+  parts) — no deep selectors into its internals. Its size comes from the host tier.
+- An own copy is allowed only when the donor is semantically wrong (an `option` is not a checkbox),
+  impossible (a `<button>` inside a `<button>`), or would create a cycle — say why in a one-line comment.
 
 ## 3. New components
 
@@ -162,24 +187,26 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   `/** What it shows — \`prop\`, \`prop\`. */`. The backticked names are exactly the ones the page
   description of the example names.
 - Exactly one `export default function <Component><Scenario>Example()` (`ButtonOverviewExample`).
-- Imports: kit only from `"prime-ui-kit"`, then `import * as React from "react"` when hooks are needed,
-  then `./examples.module.css`. Icons from the kit's `Icon`; `lucide-react` only for a glyph the kit lacks.
+- Imports: kit only from `"prime-ui-kit"`, then `import * as React from "react"` (only this form) when
+  hooks are needed, then `./examples.module.css` (the only CSS an example may import). Icons from the
+  kit's `Icon`; `lucide-react` only for a glyph the kit lacks.
 - Data: module-level `UPPER_SNAKE_CASE` constants above the function; pure helpers allowed, no helper
-  components. State is named by meaning: `[query, setQuery]`, `[open, setOpen]`.
+  components — except one inner component for a provider-based API that must call its hook inside the
+  provider (`useNotifications`). State is named by meaning: `[query, setQuery]`, `[open, setOpen]`.
 - Domain: one realistic B2B / product-admin world (orders, invoices, projects, team), Russian text; no
-  lorem, emoji, «Пункт 1/2/3». Size `m` (omit `size`) except in the `sizes` slot; another size only
+  lorem, emoji, «Пункт 1/2/3». Size `m` — omit `size`, never write `size="m"` — except in the `sizes` slot; another size only
   where the scenario itself needs it (a dialog width, a spinner for a whole region, a control paired
   one tier down per foundation §6), never for decoration.
 - Show the component itself — the example is about it, not about its neighbours.
 - Matrices (`variants`, `sizes`, `states`, `with-icon` of primitives and controls) render rows of
   labelled cells and no CSS: every direct child is a row `<div>`, every cell a `<div>` with the specimen
-  and a caption `<Typography.Root as="span" variant="caption" tone="muted">` holding the prop value as
+  and a caption `<Typography as="span" variant="caption" tone="muted">` holding the prop value as
   written in code (`xs`, `solid · danger`, `disabled`). Components with their own visible label
   (fields, checkboxes) are labelled through that label instead. The `matrix` preview layout lines the
-  cells up.
-- `examples.module.css` only for the layout of realistic scenarios (form grid, panel, toolbar spacer):
-  semantic tokens only, no typography, no rows / stacks / matrices (the slot's preview layout provides
-  them). A bounded block takes `--prime-color-card-bg` / `--prime-card-shadow` (foundation §4).
+  cells up (up to 12 columns, cells 128–320 wide); matrix examples import no CSS.
+- `examples.module.css` only for the layout of realistic scenarios (form grid, toolbar spacer, a stage
+  for a layout component): semantic tokens only, no typography, no rows / stacks / matrices (the
+  slot's preview layout provides them). A bounded block is `Card.Root` — CSS only places it.
 - No inline `style={{}}`, no playground imports; the file copies into a consumer project unchanged.
 
 ## 5. Playground page
@@ -211,10 +238,11 @@ export default function ButtonSection() { return <ComponentPage page={page} />; 
 - Page description: 1–2 sentences on purpose; keyboard and behaviour go to `accessibility`.
 - Example description: one Russian sentence «Что показывает — `prop`, `prop`.».
 - **Kind** (the shape of the component, not its sidebar category): `primitive` · `control` · `field` ·
-  `overlay` · `navigation` · `composite` · `layout` (primitive — Button, LinkButton, Badge, Avatar, Thumbnail, Kbd, Divider, Label, Hint, Typography,
-  CodeBlock, ProgressBar, ProgressCircle, Spinner, Banner; control — Checkbox, Radio, Switch, Slider,
-  SegmentedControl, ColorSwatches, ButtonGroup; field — Input, Textarea, DigitInput, Select, TagSelect,
-  Datepicker, ColorPicker, FileUpload; overlay — Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu,
+  `overlay` · `navigation` · `composite` · `layout` (primitive — Button, LinkButton, Badge, Avatar,
+  Thumbnail, Kbd, Divider, Label, Hint, Typography, CodeBlock, ProgressBar, ProgressCircle, Spinner,
+  Banner; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup;
+  field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
+  FileUpload; overlay — Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu,
   Notification; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable,
   Dnd, SmartFilter, Timeline, Card, LoginForm, EmptyPage; layout — AppShell, Sidebar, PageContent,
   ScrollContainer, ExampleFrame).
@@ -227,12 +255,15 @@ export default function ButtonSection() { return <ComponentPage page={page} />; 
   one example; no `surfaces` example (the playground's surface switch checks contrast).
 - `KIND_SLOTS` fixes which slots a kind allows, their order, the position of component-specific
   scenarios and each slot's preview layout. Required: `overview` everywhere; `states` for controls;
-  `sizes`, `states`, `validation`, `controlled`, `in-form` for fields; `narrow` for composites. Prop-driven
+  `sizes`, `states`, `validation`, `in-form` for fields; `narrow` for composites. Prop-driven
   (`PROP_SLOTS`, from the first API part): `size` → `sizes`; `variant`/`tone`/`color` → `variants`;
-  `disabled`/`readOnly`/`loading`/`invalid` → `states`; `value`/`checked` → `controlled`; `open` →
-  `controlled-open`; `closeOnOutsideClick` → `dismiss`.
-- Preview layout and surface are never set per page: the slot sets the layout, the surface is the
-  playground-wide choice.
+  `disabled`/`readOnly`/`loading`/`invalid` → `states`; `onValueChange`/`defaultValue`/
+  `onCheckedChange`/`defaultChecked` → `controlled`; `onOpenChange`/`defaultOpen` → `controlled-open`;
+  `closeOnOutsideClick` → `dismiss`. A required slot the kind does not allow fails the contract — extend
+  `KIND_SLOTS` or change the kind, never work around it in `api.ts`.
+- Preview layout and surface are never set per page: the slot sets the layout (`layout` pages use
+  `full`), the surface is the playground-wide choice. Stack layouts centre their children in a column of
+  at most 640, so container-typed components (Stepper, Breadcrumb) need no width hacks.
 - A new component also gets an entry in `CATEGORY_PAGES` (`playground/playgroundPages.tsx`).
 
 ## 6. COMPONENT.md
@@ -284,9 +315,7 @@ A component change is done only when all of these agree. Do them in the same cha
    (`api-contract.md`, `foundations.md`). No symlinks: npm drops them.
 9. **README.md** — when the public surface changes (new component, export, count, install step).
 
-Pages still on the old layout are listed in `NOT_CONVERTED` (`src/test/docs-contract.test.ts`). A
-component you change gets converted completely — page config, slots, canon examples, `api.ts`,
-template — and leaves the list in the same change. Never add a dir to the list.
+Every page follows the standard; the docs contract has no exclusion list. Do not add one.
 
 ## 8. Definition of done
 
@@ -308,18 +337,18 @@ template — and leaves the list in the same change. Never add a dir to the list
 | `tokens/` | `primitives.ts` → `semantic.ts` → `themes/{light,dark}.ts`; `bun run tokens:build` generates `src/styles/{tokens,theme-light,theme-dark}.css` (never edit those by hand) |
 | `src/components/<dir>/` | one component: `X.tsx`, `X.module.css`, `X.test.tsx`, `api.ts`, `COMPONENT.md`, `examples/` |
 | `src/layout/` | AppShell, Sidebar (same structure) |
-| `src/internal/` | shared mechanics: `states.ts` (vocabulary types), contexts, `FieldFrame`, `slot`, `cx`, `data-attributes`, `overlayMotion` / `enterMotion` CSS, `VisuallyHidden`, `rovingFocus` |
-| `src/hooks/` | overlay stack (`useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `usePresence`, `usePosition`, `useOverlayModal`), `useControllableState`, `useFieldIds`, `useMergedRefs`, `useImageStatus` |
+| `src/internal/` | shared mechanics: `states.ts` (vocabulary types), contexts (`ControlSizeContext`, `OverlayPortalLayerContext`), `FieldFrame`, `ChoiceField`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`, `mergeRefs`; CSS: `overlayMotion`, `enterMotion`, `floatingSurface`, `menu` |
+| `src/hooks/` | overlay stack (`useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `usePresence`, `usePosition`, `useOverlayModal`, `useModalKeyboard`, `useScrollLock`), `useControllableState`, `useMergedRefs`, `useImageStatus` |
 | `src/icons/` | public `Icon` registry and `Icon*` components on lucide-react — the only icon source for components |
 | `src/index.ts`, `src/components/index.ts`, `src/layout/index.ts` | public exports |
 | `playground/pageStandard.ts` | page kinds, slot vocabulary, `KIND_SLOTS`, `PROP_SLOTS` |
 | `playground/components/ComponentPage.tsx` | the one page renderer and `ComponentPageConfig` |
 | `playground/exampleRegistry.ts` | glob loader of every example (lazy module + raw source) |
 | `playground/playgroundPages.tsx` | routes, sidebar categories, search (`CATEGORY_PAGES`) |
-| `playground/sections/<Name>Section.tsx` | one page per component: a config (old pages: hand-built, until converted) |
+| `playground/sections/<Name>Section.tsx` | one page per component: a `ComponentPageConfig` |
 | `playground/foundation/` | token pages (Typography's component docs live here) |
 | `scripts/` | `build-tokens.ts`, `bundle-lib.ts`, `build-docs.ts` + `docs/componentApi.ts` (api schema, markdown) |
-| `src/test/docs-contract.test.ts` | docs / examples / playground / api contract, `NOT_CONVERTED` list |
+| `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component |
 | `SKILL/` | agent skill for consumer projects (rules, choosing, layouts, anti-slop, checklist) |
 
 ## Release
