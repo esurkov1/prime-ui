@@ -4,22 +4,11 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import { Button } from "@/components/button/Button";
 import { Typography } from "@/components/typography/Typography";
-import { AppShell, type SidebarMode } from "@/layout";
+import { AppShell } from "@/layout";
 
 import { PlaygroundChromeSidebar } from "./components/PlaygroundChromeSidebar";
 import { PlaygroundSearch, usePlaygroundSearchHotkey } from "./components/PlaygroundSearch";
 import { PLAYGROUND_PAGES, pageRoute } from "./playgroundPages";
-
-const MODE_KEY = "prime-playground-sidebar-mode";
-
-function readMode(): SidebarMode {
-  try {
-    const value = window.localStorage.getItem(MODE_KEY);
-    return value === "compact" ? "compact" : "expanded";
-  } catch {
-    return "expanded";
-  }
-}
 
 const NARROW = "(max-width: 767.98px)";
 
@@ -40,22 +29,12 @@ function useNarrowViewport(): boolean {
 
 export function PlaygroundLayout() {
   const { pathname } = useLocation();
-  const [mode, setModeState] = React.useState<SidebarMode>(readMode);
   const [navOpen, setNavOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const mainRef = React.useRef<HTMLElement>(null);
   const narrow = useNarrowViewport();
 
   usePlaygroundSearchHotkey(setSearchOpen);
-
-  const setMode = React.useCallback((next: SidebarMode) => {
-    setModeState(next);
-    try {
-      window.localStorage.setItem(MODE_KEY, next);
-    } catch {
-      // Storage unavailable: the mode lives for this session only.
-    }
-  }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to top on route change
   React.useLayoutEffect(() => {
@@ -68,9 +47,8 @@ export function PlaygroundLayout() {
     <>
       <AppShell.Root fillViewport>
         <AppShell.Nav>
+          {/* The sidebar owns its mode: toggling it re-renders the rail, not the page. */}
           <PlaygroundChromeSidebar
-            mode={mode}
-            onModeChange={setMode}
             open={navOpen}
             onOpenChange={setNavOpen}
             onSearch={() => setSearchOpen(true)}

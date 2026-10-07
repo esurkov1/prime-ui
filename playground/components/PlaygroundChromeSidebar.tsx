@@ -90,24 +90,43 @@ function FooterControls() {
   );
 }
 
+const MODE_KEY = "prime-playground-sidebar-mode";
+
+function readMode(): SidebarMode {
+  try {
+    return window.localStorage.getItem(MODE_KEY) === "compact" ? "compact" : "expanded";
+  } catch {
+    return "expanded";
+  }
+}
+
+function saveMode(mode: SidebarMode) {
+  try {
+    window.localStorage.setItem(MODE_KEY, mode);
+  } catch {
+    // Storage unavailable: the mode lives for this session only.
+  }
+}
+
 export type PlaygroundChromeSidebarProps = {
-  mode: SidebarMode;
-  onModeChange: (mode: SidebarMode) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSearch: () => void;
 };
 
-/** Playground navigation built from the kit: brand header, search, collapsible categories, footer. */
+/**
+ * Playground navigation built from the kit: brand header, search, collapsible categories, footer.
+ * The rail mode is uncontrolled (persisted on change), so a toggle re-renders only what reads the
+ * sidebar context — never this tree or the page.
+ */
 export function PlaygroundChromeSidebar({
-  mode,
-  onModeChange,
   open,
   onOpenChange,
   onSearch,
 }: PlaygroundChromeSidebarProps) {
   const { pathname } = useLocation();
   const contentRef = React.useRef<HTMLDivElement>(null);
+  const [defaultMode] = React.useState(readMode);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: keep the current page in view on route change
   React.useLayoutEffect(() => {
@@ -118,8 +137,8 @@ export function PlaygroundChromeSidebar({
 
   return (
     <Sidebar.Root
-      mode={mode}
-      onModeChange={onModeChange}
+      defaultMode={defaultMode}
+      onModeChange={saveMode}
       open={open}
       onOpenChange={onOpenChange}
       labels={{ navigation: "Навигация playground" }}
