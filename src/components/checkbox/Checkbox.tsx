@@ -60,6 +60,7 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
       error,
       size = "m",
       disabled = false,
+      readOnly = false,
       className,
       "aria-describedby": ariaDescribedBy,
       children,
@@ -100,8 +101,12 @@ const CheckboxRoot = React.forwardRef<HTMLInputElement, CheckboxRootProps>(
               className={choiceInputClass}
               disabled={disabled}
               checked={checked}
-              onChange={(event) => setChecked(event.target.checked)}
+              onChange={(event) => {
+                // A native checkbox ignores `readOnly`: the state stays, focus and the value submit.
+                if (!readOnly) setChecked(event.target.checked);
+              }}
               aria-invalid={ids.invalid || undefined}
+              aria-readonly={readOnly || undefined}
               aria-describedby={ids.describedBy}
             />
             <span className={styles.control} aria-hidden="true">

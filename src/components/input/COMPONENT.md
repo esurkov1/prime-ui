@@ -77,7 +77,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `onValueChange` | `(value: string) => void` | — | Called with the new string; native `onChange` still fires first. |
 | `aria-describedby` | `string` | — | Merged with the hint/error ids from the root. |
 | `required` | `boolean` | — | Overrides the root's `required` for the native input. |
-| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size">` | — | `value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`… |
+| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size" \| "id">` | — | `value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`… |
 
 ### Input.Icon
 `ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`), centered between the edge and the text.

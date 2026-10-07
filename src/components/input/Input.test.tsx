@@ -500,6 +500,39 @@ describe("Input field system", () => {
     expect(onClick).toHaveBeenCalledOnce();
     expect(screen.getByPlaceholderText("clear")).toHaveFocus();
   });
+
+  it("ClearButton finds its field through a ref, even outside the document", () => {
+    const host = document.createElement("div");
+    const shadow = host.attachShadow({ mode: "open" });
+    const container = document.createElement("div");
+    shadow.appendChild(container);
+    document.body.appendChild(host);
+    render(
+      <Input.Root>
+        <Input.Wrapper>
+          <Input.Field placeholder="shadow" defaultValue="x" />
+          <Input.ClearButton />
+        </Input.Wrapper>
+      </Input.Root>,
+      { container },
+    );
+    const field = shadow.querySelector("input") as HTMLInputElement;
+    fireEvent.click(shadow.querySelector("button") as HTMLButtonElement);
+    expect(shadow.activeElement).toBe(field);
+    host.remove();
+  });
+
+  it("Field props cannot break the label link or the invalid state", () => {
+    render(
+      <Input.Root label="Почта" error="Неверный адрес">
+        <Input.Wrapper>
+          <Input.Field aria-invalid={false} />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByRole("textbox", { name: "Почта" });
+    expect(field).toHaveAttribute("aria-invalid", "true");
+  });
 });
 
 describe("Input focusRing", () => {

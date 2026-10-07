@@ -26,6 +26,11 @@ describe("Textarea.Root", () => {
     expect(container.firstElementChild).toHaveAttribute("data-invalid", "true");
   });
 
+  it("native props cannot override the invalid state", () => {
+    render(<Root label="Детали" error="Обязательно" aria-invalid={false} />);
+    expect(screen.getByRole("textbox", { name: "Детали" })).toHaveAttribute("aria-invalid", "true");
+  });
+
   it("forwards ref to textarea element", () => {
     const ref = React.createRef<HTMLTextAreaElement>();
     render(<Root ref={ref} placeholder="ref test" />);

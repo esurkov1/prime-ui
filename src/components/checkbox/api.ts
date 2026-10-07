@@ -23,8 +23,8 @@ export const api: ComponentApi = {
         {
           name: "onCheckedChange",
           type: "(checked: boolean) => void",
-          en: "Called with the new state on every toggle.",
-          ru: "Новое состояние при каждом переключении.",
+          en: "Called with the new state on every toggle (not while `readOnly`).",
+          ru: "Новое состояние при каждом переключении (кроме `readOnly`).",
         },
         {
           name: "indeterminate",
@@ -65,6 +65,13 @@ export const api: ComponentApi = {
           default: "false",
           en: "Disabled fill, dimmed label and hint, no toggling.",
           ru: "Неактивный вид, приглушённые подпись и подсказка, без переключения.",
+        },
+        {
+          name: "readOnly",
+          type: "boolean",
+          default: "false",
+          en: "The state is shown and focusable but does not change (`aria-readonly`); no hover or press. The native checkbox ignores `readOnly`, so the root guards the toggle.",
+          ru: "Состояние видно и фокусируется, но не меняется (`aria-readonly`).",
         },
         {
           name: "id",

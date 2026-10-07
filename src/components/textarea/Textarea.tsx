@@ -112,6 +112,7 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
 
     const textarea = (
       <textarea
+        {...rest}
         ref={setRefs}
         id={ids.controlId}
         className={cx(styles.textarea, autoResize && styles.textareaAutoResize)}
@@ -131,7 +132,6 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaRootProps>(
           onChange?.(event);
           onValueChange?.(event.target.value);
         }}
-        {...rest}
       />
     );
 

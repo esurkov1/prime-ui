@@ -20,6 +20,16 @@ describe("DigitInput", () => {
     expect(screen.getByRole("textbox", { name: "Digit 2/2" })).toBeInTheDocument();
   });
 
+  it("renders without crypto.randomUUID (plain http on a LAN)", () => {
+    vi.stubGlobal("crypto", {});
+    try {
+      render(<DigitInput length={3} />);
+      expect(screen.getAllByRole("textbox")).toHaveLength(3);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("renders 6 cells when length is 6", () => {
     render(<DigitInput length={6} />);
 

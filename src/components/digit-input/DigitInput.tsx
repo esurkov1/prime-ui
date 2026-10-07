@@ -64,8 +64,6 @@ export type DigitInputProps = FieldRootDomProps &
 
 const normalizeDigits = (raw: string, length: number) => raw.replace(/\D/g, "").slice(0, length);
 
-const createSlotKeys = (length: number) => Array.from({ length }, () => crypto.randomUUID());
-
 /** A one-time code or PIN split into cells, with the field label, hint and error. */
 export function DigitInput({
   length = 4,
@@ -95,11 +93,6 @@ export function DigitInput({
 }: DigitInputProps) {
   const labels = { ...DIGIT_INPUT_LABELS, ...labelsProp };
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
-
-  // Stable keys per cell position; recreated only when the number of cells changes.
-  const slotKeysRef = React.useRef<string[] | null>(null);
-  if (slotKeysRef.current?.length !== length) slotKeysRef.current = createSlotKeys(length);
-  const slotKeys = slotKeysRef.current;
 
   const [value, setValue] = useControllableState({
     value: valueProp !== undefined ? normalizeDigits(valueProp, length) : undefined,
@@ -183,7 +176,8 @@ export function DigitInput({
         {name ? <input type="hidden" name={name} value={value} /> : null}
         {cells.map((cell, index) => (
           <input
-            key={slotKeys[index]}
+            // biome-ignore lint/suspicious/noArrayIndexKey: a cell is its position; cells are never reordered
+            key={index}
             ref={(el) => {
               inputRefs.current[index] = el;
             }}

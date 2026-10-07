@@ -154,7 +154,7 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "size">',
+          type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "id">',
           en: "`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`…",
           ru: "`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`…",
         },

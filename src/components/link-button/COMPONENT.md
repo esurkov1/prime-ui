@@ -26,7 +26,7 @@ import { LinkButton } from "prime-ui-kit";
 
 ## Anatomy
 ```
-LinkButton   <a> (or <span role="link"> when disabled, or the child with asChild); tone, size; size tier for nested icons
+LinkButton   <a> (without href when disabled, or the child with asChild); tone, size; size tier for nested icons
 └─ children  text and optional Icon before or after it
 ```
 
@@ -35,13 +35,13 @@ LinkButton   <a> (or <span role="link"> when disabled, or the child with asChild
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### LinkButton
-`forwardRef` → `HTMLAnchorElement` (the `<span>` when `disabled`, the child with `asChild`). A native `<a>` styled as a text action; passes its tier to nested icons.
+`ref` → `HTMLAnchorElement` (the child with `asChild`). A native `<a>` styled as a text action; passes its tier to nested icons.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"accent" \| "neutral"` | `"accent"` | `accent` — a regular link; `neutral` — secondary text, primary on hover, for footers and metadata. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text 12 · 13 · 14 · 16 · 18, line height and icon size. |
-| `disabled` | `boolean` | `false` | Renders `<span role="link" aria-disabled="true" tabIndex={-1}>` without `href`; the native anchor props are not passed. |
+| `disabled` | `boolean` | `false` | Renders `<a role="link" aria-disabled="true" tabIndex={-1}>` without `href` and swallows the click; `id`, `aria-*` and the other native props stay. |
 | `asChild` | `boolean` | `false` | Merges the link look onto its single child instead of rendering `<a>`: a router link, or a `<button type="button">` for an inline action that is not navigation. `disabled` becomes `aria-disabled` and swallows the click. |
 | `children` | `ReactNode` | — | Text and optional `Icon`s before or after it; the text is the accessible name. |
 | `…rest` | `AnchorHTMLAttributes<HTMLAnchorElement>` | — | `href`, `target`, `rel`, `download`, `onClick`, `className`, `aria-*` and the other anchor attributes. |
@@ -76,7 +76,7 @@ Match the link size to the surrounding text or to the Button it sits next to. Av
 |---|---|---|
 | hover | pointer | hover color + underline (`text-decoration-color: currentColor`) |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset`, radius `--prime-radius-xs` |
-| disabled | `disabled` | `<span role="link">`, `aria-disabled="true"`, `tabIndex=-1`, `data-disabled="true"` |
+| disabled | `disabled` | `<a role="link">` without `href`, `aria-disabled="true"`, `tabIndex=-1`, `data-disabled="true"` |
 
 Root attributes: `data-size`, `data-tone`, `data-disabled` (only when disabled).
 
@@ -96,7 +96,7 @@ Root attributes: `data-size`, `data-tone`, `data-disabled` (only when disabled).
 
 ### ARIA
 - A native `<a>`: announced as a link, named by its text.
-- The disabled state is a non-focusable `<span role="link" aria-disabled="true">`.
+- The disabled state is a non-focusable `<a role="link" aria-disabled="true">` without `href`; it keeps `id` and `aria-*`.
 - With `asChild` the child gives the role and name: a router link, or a `<button>` for an action.
 - Icons are decorative; say «новая вкладка» in the text or `aria-label` for external links.
 
@@ -118,7 +118,6 @@ No `labels`.
 
 ## Mistakes
 - `<LinkButton onClick={save}>` without `href` → an `<a>` without a URL is not a button: use `<Button.Root variant="ghost">`, or `<LinkButton asChild><button type="button">` inside running text.
-- A disabled link with `aria-label` / `title` → in the disabled state only children render; put the meaning in the text.
 - `target="_blank"` without `rel="noopener noreferrer"` → add `rel`.
 - Wrapping a LinkButton in an `<a>` → pass `href` directly.
 
