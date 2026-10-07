@@ -1,4 +1,4 @@
-/** An empty data region: a card with a header and a minimum height where `layout="fill"` stretches the empty state over the remaining height. Use it instead of a table when there are no rows yet. */
+/** An empty data region: the empty state stretches over the rest of a card with a header — `layout`. */
 import { PackagePlus } from "lucide-react";
 import { Button, EmptyPage, Typography } from "prime-ui-kit";
 

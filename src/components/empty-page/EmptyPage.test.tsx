@@ -31,6 +31,21 @@ describe("EmptyPage", () => {
     expect(screen.getByTestId("empty")).not.toHaveAttribute("data-layout");
   });
 
+  it("parts rise in on first render, but not in the compact layout", () => {
+    const { rerender } = render(
+      <EmptyPage.Root>
+        <EmptyPage.Title>Нет данных</EmptyPage.Title>
+      </EmptyPage.Root>,
+    );
+    expect(screen.getByRole("heading").className).toMatch(/enterBase/);
+    rerender(
+      <EmptyPage.Root layout="compact">
+        <EmptyPage.Title>Нет данных</EmptyPage.Title>
+      </EmptyPage.Root>,
+    );
+    expect(screen.getByRole("heading").className).not.toMatch(/enterBase/);
+  });
+
   it("applies fill layout", () => {
     render(
       <EmptyPage.Root layout="fill" data-testid="empty">

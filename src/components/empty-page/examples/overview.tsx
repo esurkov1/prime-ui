@@ -1,12 +1,11 @@
-/** An empty search result with the basic parts: Icon, Title (`h2`), Description and Actions. Use it when filters or a query return nothing. */
-import { Search } from "lucide-react";
-import { Button, EmptyPage } from "prime-ui-kit";
+/** An empty search result: icon, title, description and two actions — `EmptyPage.Icon`, `EmptyPage.Actions`. */
+import { Button, EmptyPage, Icon } from "prime-ui-kit";
 
-export default function EmptyPageNoResultsExample() {
+export default function EmptyPageOverviewExample() {
   return (
     <EmptyPage.Root aria-labelledby="empty-search-title">
       <EmptyPage.Icon>
-        <Search aria-hidden />
+        <Icon name="action.search" />
       </EmptyPage.Icon>
       <EmptyPage.Title id="empty-search-title">Ничего не найдено</EmptyPage.Title>
       <EmptyPage.Description>

@@ -42,7 +42,6 @@ const NOT_CONVERTED = new Set([
   "digit-input",
   "dnd",
   "dropdown",
-  "empty-page",
   "example-frame",
   "file-upload",
   "hint",

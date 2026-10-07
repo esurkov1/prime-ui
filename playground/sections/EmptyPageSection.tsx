@@ -1,175 +1,58 @@
-import type * as React from "react";
+import { api } from "@/components/empty-page/api";
 
-import EmptyPageCompactExample from "@/components/empty-page/examples/compact";
-import compactSource from "@/components/empty-page/examples/compact.tsx?raw";
-import EmptyPageDataRegionExample from "@/components/empty-page/examples/data-region";
-import regionSource from "@/components/empty-page/examples/data-region.tsx?raw";
-import EmptyPageIconTonesExample from "@/components/empty-page/examples/icon-tones";
-import tonesSource from "@/components/empty-page/examples/icon-tones.tsx?raw";
-import EmptyPageNoResultsExample from "@/components/empty-page/examples/no-results";
-import searchSource from "@/components/empty-page/examples/no-results.tsx?raw";
-import EmptyPageSizesExample from "@/components/empty-page/examples/sizes";
-import sizesSource from "@/components/empty-page/examples/sizes.tsx?raw";
-import { PageContent } from "@/components/page-content/PageContent";
-import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
-import {
-  DemoApiTitle,
-  DemoDescription,
-  DemoSectionTitle,
-} from "../components/PlaygroundDemoTypography";
-import { PlaygroundExampleFrame } from "../components/PlaygroundExampleFrame";
-import type { PlaygroundPreviewSurface } from "../components/PlaygroundPreviewTheme";
+import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
 
-const apiRows: PlaygroundApiPropRow[] = [
-  {
-    prop: "Root · size",
-    type: '"xs" | "s" | "m" | "l" | "xl"',
-    defaultValue: '"m"',
-    required: "Нет",
-    description: "Плитка иконки, кегль и отступы; кнопкам в Actions передайте тот же size.",
+export const page: ComponentPageConfig = {
+  dir: "empty-page",
+  title: "EmptyPage",
+  kind: "composite",
+  description:
+    "Пустое состояние страницы, таблицы, карточки или меню: иконка, заголовок, пояснение и следующее действие.",
+  examples: [
+    {
+      slot: "overview",
+      description:
+        "Пустой результат поиска: иконка, заголовок, пояснение и два действия — `EmptyPage.Icon`, `EmptyPage.Actions`.",
+    },
+    {
+      slot: "sizes",
+      description:
+        "Каждый ярус меняет плашку иконки, заголовок и отступы; кнопки в Actions того же размера — `size`.",
+    },
+    {
+      scenario: "icon-tones",
+      title: "Тон иконки",
+      description:
+        "Тон плашки говорит, почему пусто: данных ещё нет, первый запуск или ошибка загрузки — `tone`.",
+    },
+    {
+      scenario: "data-region",
+      title: "Пустая область данных",
+      description: "Пустое состояние растягивается на остаток карточки с шапкой — `layout`.",
+    },
+    {
+      scenario: "compact",
+      title: "В меню и списке",
+      description:
+        "Тихое пустое состояние панели поиска: без анимации появления, мельче текст, одно действие — `layout`.",
+    },
+    {
+      slot: "narrow",
+      description:
+        "В боковой панели 320 px текст переносится под плашкой, а действия — на вторую строку.",
+    },
+  ],
+  api,
+  accessibility: {
+    keyboard: [],
+    aria: [
+      "Заголовок — `<h2>`; свяжите с ним корень через `aria-labelledby`, когда пустое состояние заменяет целую область.",
+      'В фильтруемом меню или списке задайте `role="status"`, чтобы скринридер объявил «Ничего не найдено».',
+      "Иконка декоративна: передавайте её с `aria-hidden`.",
+    ],
   },
-  {
-    prop: "Root · layout",
-    type: '"default" | "fill" | "compact"',
-    defaultValue: '"default"',
-    required: "Нет",
-    description:
-      "`fill` растягивает блок по высоте flex-родителя и центрирует; `compact` — тихое состояние внутри меню и списков, без анимации.",
-  },
-  {
-    prop: "Icon · tone",
-    type: '"neutral" | "accent" | "danger"',
-    defaultValue: '"neutral"',
-    required: "Нет",
-    description: "Цвет плитки: нет данных / первый запуск / ошибка.",
-  },
-  {
-    prop: "Title",
-    type: "h2",
-    defaultValue: "—",
-    required: "Да",
-    description: "Заголовок; свяжите с Root через `aria-labelledby`.",
-  },
-  {
-    prop: "Description",
-    type: "p",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Пояснение `text-secondary`.",
-  },
-  {
-    prop: "Actions",
-    type: "div",
-    defaultValue: "—",
-    required: "Нет",
-    description: "Ряд кнопок; главное действие последним.",
-  },
-];
-
-function Demo({
-  title,
-  description,
-  code,
-  surface,
-  children,
-}: {
-  title: string;
-  description: React.ReactNode;
-  code: string;
-  surface?: PlaygroundPreviewSurface;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="demoBlock">
-      <DemoSectionTitle>{title}</DemoSectionTitle>
-      <DemoDescription>{description}</DemoDescription>
-      <PlaygroundExampleFrame.Root code={code.trim()} previewLayout="stack" surface={surface}>
-        <PlaygroundExampleFrame.Stage>{children}</PlaygroundExampleFrame.Stage>
-      </PlaygroundExampleFrame.Root>
-    </div>
-  );
-}
+};
 
 export default function EmptyPageSection() {
-  return (
-    <PageContent.Section aria-labelledby="empty-page-heading">
-      <PageContent.Header>
-        <PageContent.Title id="empty-page-heading">EmptyPage</PageContent.Title>
-        <PageContent.Description measure="full">
-          Пустое состояние с иконкой, заголовком, пояснением и действием: нет результатов, первый
-          запуск, ошибка загрузки. Для короткого текста внутри таблицы хватит{" "}
-          <code>DataTable empty</code>.
-        </PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>
-        <div className="demoExamples">
-          <Demo
-            title="Область данных"
-            description={
-              <>
-                Карточка списка без строк: <code>layout="fill"</code> занимает оставшуюся высоту.
-              </>
-            }
-            code={regionSource}
-            surface="canvas"
-          >
-            <EmptyPageDataRegionExample />
-          </Demo>
-
-          <Demo
-            title="Нет результатов"
-            description={<>Базовый состав: Icon, Title, Description, Actions.</>}
-            code={searchSource}
-          >
-            <EmptyPageNoResultsExample />
-          </Demo>
-
-          <Demo
-            title="В панели"
-            description={
-              <>
-                <code>layout="compact"</code> — тихое состояние меню и списков: без анимации
-                появления, текст body-s.
-              </>
-            }
-            code={compactSource}
-          >
-            <EmptyPageCompactExample />
-          </Demo>
-
-          <Demo
-            title="Тон иконки"
-            description={
-              <>
-                <code>neutral</code> — данных нет, <code>accent</code> — первый запуск,{" "}
-                <code>danger</code> — ошибка загрузки.
-              </>
-            }
-            code={tonesSource}
-          >
-            <EmptyPageIconTonesExample />
-          </Demo>
-
-          <Demo
-            title="Размеры"
-            description={
-              <>
-                <code>xs · s · m · l · xl</code>; кнопкам в <code>Actions</code> передайте тот же{" "}
-                <code>size</code>.
-              </>
-            }
-            code={sizesSource}
-          >
-            <EmptyPageSizesExample />
-          </Demo>
-
-          <div className="demoBlock">
-            <DemoSectionTitle>API</DemoSectionTitle>
-            <DemoApiTitle>EmptyPage</DemoApiTitle>
-            <PlaygroundApiTable rows={apiRows} />
-          </div>
-        </div>
-      </PageContent.Body>
-    </PageContent.Section>
-  );
+  return <ComponentPage page={page} />;
 }

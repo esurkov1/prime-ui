@@ -78,12 +78,12 @@
 }
 
 /*
- * Rare-state delight: on first render the parts (icon, title, description, actions) rise in one
- * after another, `--prime-motion-stagger` apart. Opacity + transform only, so nothing reflows, and
- * every part is interactive from the first frame. Collapses to none under reduced motion.
+ * Rare-state delight: on first render the parts rise in (`enterMotion.enterBase`, set by the parts
+ * outside `compact`) one after another, `--prime-motion-stagger` apart. Every part is interactive
+ * from the first frame; reduced motion collapses it through the tokens.
  */
-.root > * {
-  animation: emptyPageIn var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
+.root {
+  --enter-shift: var(--prime-space-2);
 }
 
 .root > :nth-child(2) {
@@ -96,13 +96,6 @@
 
 .root > :nth-child(n + 4) {
   animation-delay: calc(var(--prime-motion-stagger) * 3);
-}
-
-@keyframes emptyPageIn {
-  from {
-    opacity: 0;
-    transform: translateY(var(--prime-space-2));
-  }
 }
 
 .root[data-layout="fill"] {
@@ -129,10 +122,6 @@
   --ep-desc-line-height: var(--prime-text-caption-line-height);
 
   gap: var(--prime-space-1);
-}
-
-.root[data-layout="compact"] > * {
-  animation: none;
 }
 
 .iconWrap {
