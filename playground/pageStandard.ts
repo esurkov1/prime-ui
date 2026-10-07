@@ -211,9 +211,11 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
   layout: [
     { slot: "overview", required: true, layout: "stack" },
     { slot: "variants", layout: "stack" },
+    { slot: "sizes", layout: "stack" },
     { slot: "structure", layout: "stack" },
     { slot: SCENARIOS, layout: "stack" },
     { slot: "controlled", layout: "stack" },
+    { slot: "controlled-open", layout: "stack" },
     { slot: "narrow", layout: "stack" },
   ],
 };
