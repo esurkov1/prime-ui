@@ -13,6 +13,7 @@ import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
+import { HighlightMatch } from "@/internal/HighlightMatch";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -284,19 +285,6 @@ function SmartFilterToolbar({ className }: SmartFilterToolbarProps) {
 }
 SmartFilterToolbar.displayName = "SmartFilter.Toolbar";
 
-/** The matched part of a label, underlined. */
-function Highlighted({ text, query }: { text: string; query: string }) {
-  const at = matchIndex(text, query);
-  if (at < 0) return <>{text}</>;
-  return (
-    <>
-      {text.slice(0, at)}
-      <span className={styles.match}>{text.slice(at, at + query.length)}</span>
-      {text.slice(at + query.length)}
-    </>
-  );
-}
-
 function Panel() {
   const {
     fields,
@@ -487,7 +475,7 @@ function ValueToggle({ option, size, mode, canHide, query, onMode }: ValueToggle
       {mode === "exclude" && `${labels.not} `}
       {option.icon ? <Badge.Icon>{option.icon}</Badge.Icon> : null}
       <span>
-        <Highlighted text={option.label} query={query} />
+        <HighlightMatch text={option.label} query={query} />
       </span>
       <Badge.Action
         label={formatLabel(mode === "exclude" ? labels.unhideValue : labels.hideValue, {

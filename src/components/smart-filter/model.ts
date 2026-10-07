@@ -108,8 +108,4 @@ export function resolveSmartFilterValues(
   return result.length === all.length ? [] : result;
 }
 
-/** Position of `query` in `text`, ignoring case; -1 when absent. */
-export function matchIndex(text: string, query: string): number {
-  if (!query) return -1;
-  return text.toLowerCase().indexOf(query.toLowerCase());
-}
+export { matchIndex } from "@/internal/HighlightMatch";

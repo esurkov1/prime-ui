@@ -136,6 +136,7 @@ One look: `bg-raised`, `--prime-modal-radius`, `shadow-modal`, `--prime-modal-wi
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the dialog (closed while the exit animation plays) |
 | active item | arrows, Home, End, pointer move | `aria-selected="true"`, `data-highlighted="true"`: a fill only, no movement |
 | filtered out | the query | `hidden` on items and on groups without matches |
+| matched text | the query | the first match in the item's text children and in `ItemText` is wrapped in an underlined `<mark>` (same as SmartFilter) |
 | nothing found | the query | `CommandMenu.Empty` with `role="status"` |
 | size | `size` | `data-size` on the tier wrapper |
 

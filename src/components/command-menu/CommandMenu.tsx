@@ -9,6 +9,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { highlightChildren } from "@/internal/HighlightMatch";
 import menu from "@/internal/menu.module.css";
 import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
@@ -374,11 +375,12 @@ function CommandMenuItem({
   onClick,
   onPointerMove,
   ref,
+  children,
   ...rest
 }: CommandMenuItemProps) {
   const id = React.useId();
   const groupId = React.useContext(CommandMenuGroupContext);
-  const { registerItem, activeId, setActiveId, visibleIds } = useCommandMenuContext();
+  const { registerItem, activeId, setActiveId, visibleIds, search } = useCommandMenuContext();
   const nodeRef = React.useRef<HTMLButtonElement>(null);
   const mergedRef = React.useMemo(() => mergeRefs(nodeRef, ref), [ref]);
 
@@ -422,7 +424,9 @@ function CommandMenuItem({
         setActiveId(id);
         onSelect?.();
       }}
-    />
+    >
+      {highlightChildren(children, search)}
+    </button>
   );
 }
 CommandMenuItem.displayName = "CommandMenu.Item";
@@ -447,9 +451,10 @@ function CommandMenuItemText({
   className,
   ...rest
 }: CommandMenuItemTextProps) {
+  const { search } = useCommandMenuContext();
   return (
     <span className={cx(styles.itemText, className)} {...rest}>
-      <span className={styles.itemLabel}>{children}</span>
+      <span className={styles.itemLabel}>{highlightChildren(children, search)}</span>
       {description ? <span className={styles.itemDescription}>{description}</span> : null}
     </span>
   );

@@ -53,11 +53,6 @@
   min-width: 0;
 }
 
-.match {
-  text-decoration: underline;
-  text-underline-offset: var(--prime-space-1);
-}
-
 .footer {
   display: flex;
   align-items: center;

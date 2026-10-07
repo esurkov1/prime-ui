@@ -70,6 +70,17 @@ describe("CommandMenu", () => {
     expect(own).toMatch(/\.group\[hidden\]\s*\{\s*display: none;/);
   });
 
+  it("marks the matched part of item text while a query is typed", async () => {
+    const user = userEvent.setup();
+    render(<TestPalette />);
+    expect(document.querySelector("mark")).toBeNull();
+
+    await user.type(screen.getByRole("combobox"), "LP");
+    const option = screen.getByRole("option", { name: "Alpha" });
+    expect(option.querySelector("mark")).toHaveTextContent("lp");
+    expect(option).toHaveTextContent("Alpha");
+  });
+
   it("не рендерит диалог при open=false", () => {
     render(<TestPalette open={false} />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

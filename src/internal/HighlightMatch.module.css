@@ -1,0 +1,8 @@
+/* The part of a label that matches the search query: underlined, no fill (a <mark> without its yellow). */
+.match {
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: var(--prime-border-width);
+  text-underline-offset: var(--prime-space-1);
+}
