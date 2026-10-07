@@ -10,8 +10,9 @@
  * - The root's inline size animates. The panel keeps the expanded layout for the whole movement,
  *   so no label re-wraps or re-ellipsizes; the root clips it, so text is revealed and hidden by
  *   the moving edge. Item padding is derived from the compact width, so icons never move.
- * - One number for the rest: `--sb-reveal` (1 expanded → 0 compact) drives text opacity, folding
- *   group headings, count → dot and the account inset. It is registered and not inherited: each
+ * - One number for the rest: `--sb-reveal` (1 expanded → 0 compact) drives text opacity, the
+ *   heading → separator cross-fade (headings never change height: nothing moves vertically),
+ *   count → dot and the account inset. It is registered and not inherited: each
  *   part animates its own copy on the same clock, so a frame restyles only those parts and
  *   nothing is promoted to a compositor layer (a hundred opacity layers cost more than they save).
  * - A row with a fill (current, hovered, open) is cut where its fill ends: `::before` draws the
@@ -340,15 +341,35 @@
   gap: var(--sb-gap);
   width: 100%;
   min-width: 0;
-  /* Folds away on the rail, so groups keep only their gap — no empty rows. */
-  height: calc(var(--sb-reveal) * var(--prime-panel-group-label-height));
+  /*
+   * A constant height: nothing below a heading ever moves. On the rail the text fades out (its
+   * colour, so the chevron goes with it) while a short hairline on the icon axis fades in — the
+   * heading becomes a group separator instead of an empty row. Both ride the element's own
+   * `--sb-reveal`.
+   */
+  height: var(--prime-panel-group-label-height);
   margin: 0;
   padding-inline: var(--sb-item-pad);
+  color: color-mix(in srgb, var(--prime-color-text-muted) calc(var(--sb-reveal) * 100%), transparent);
+  background-image: linear-gradient(
+    color-mix(
+      in srgb,
+      var(--prime-color-border-default) calc((1 - var(--sb-reveal)) * 100%),
+      transparent
+    ),
+    color-mix(
+      in srgb,
+      var(--prime-color-border-default) calc((1 - var(--sb-reveal)) * 100%),
+      transparent
+    )
+  );
+  background-repeat: no-repeat;
+  background-size: var(--sb-icon) var(--prime-border-width);
+  background-position: calc(var(--sb-item-pad)) center;
   overflow: hidden;
   border: 0;
   border-radius: var(--sb-radius);
-  background: transparent;
-  color: var(--prime-color-text-muted);
+  background-color: transparent;
   font: inherit;
   font-size: var(--prime-text-caption-size);
   line-height: var(--prime-text-caption-line-height);
@@ -375,8 +396,13 @@
 }
 
 .groupTrigger:hover {
-  background: var(--prime-color-fill-subtle);
+  background-color: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-secondary);
+}
+
+/* On the rail a heading is only a separator: no hover, no click. */
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupTrigger {
+  pointer-events: none;
 }
 
 .groupTrigger:focus-visible {
@@ -389,10 +415,9 @@
   flex: none;
   width: var(--prime-icon-xs);
   height: var(--prime-icon-xs);
-  color: var(--prime-color-text-muted);
-  transition:
-    rotate var(--prime-motion-duration-base) var(--sb-ease),
-    color var(--prime-motion-duration-xfast) var(--sb-ease);
+  /* The heading's colour, so it fades with the text on the rail. */
+  color: inherit;
+  transition: rotate var(--prime-motion-duration-base) var(--sb-ease);
 }
 
 .groupTrigger:hover .groupChevron {
@@ -701,7 +726,6 @@
 .label,
 .trail > :not(.dot),
 .item .chevron,
-.groupLabel,
 .brandText,
 .accountText,
 .accountChevron {
@@ -1010,7 +1034,9 @@
 }
 
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .headerToggle {
-  border-radius: var(--prime-radius-full);
+  /* Half its size, not a huge "full" radius: the corner rounds evenly over the whole move instead
+     of snapping round in the first frames. */
+  border-radius: calc(var(--sb-toggle) / 2);
   box-shadow: 0 0 0 var(--sb-edge-ring) var(--prime-color-bg-canvas);
   translate: calc(var(--sb-compact) - var(--sb-toggle) / 2) 0;
   scale: var(--sb-edge-scale);

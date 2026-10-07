@@ -135,7 +135,7 @@
   --prime-ref-easing-emphasized: cubic-bezier(0.32, 0.72, 0, 1);
   --prime-ref-easing-enter: cubic-bezier(0, 0, 0, 1);
   --prime-ref-easing-exit: cubic-bezier(0.23, 1, 0.32, 1);
-  --prime-ref-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --prime-ref-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --prime-ref-font-family-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --prime-ref-font-family-sans: "Golos Text", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --prime-ref-font-line-height-16: 1rem;

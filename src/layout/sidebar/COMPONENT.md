@@ -100,11 +100,11 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (Groups, Items, Subs), `className` and the other attributes. |
 
 ### Sidebar.Group
-`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail headings fold and the items always show.
+`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail the heading keeps its height and turns into a short separator on the icon axis; the items always show.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `label` | `ReactNode` | — | Group heading (`aria-labelledby`); folds away in compact mode. |
+| `label` | `ReactNode` | — | Group heading (`aria-labelledby`); a separator line in compact mode (same height). |
 | `collapsible` | `boolean` | `false` | The heading shows and hides the items. Needs `label`. |
 | `open` | `boolean` | — | Items shown (controlled). |
 | `onOpenChange` | `(open: boolean) => void` | — | Called with the new open state (click, keyboard, a current page moving inside). |
@@ -290,7 +290,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
   so the row is the avatar + 2 × gap high (48 at m). On the compact rail the start inset becomes the
   one that centres the avatar on the icon axis, as part of the rail motion.
 - Compact flyout: the kit Popover (flush) to the right, aligned with the parent row; the parent's name heads it on the same line, the children follow on the guide line; current child is a `fill-subtle-active` wash.
-- Motion: expanded ↔ compact ↔ hidden is one synchronous movement — everything starts and ends together over `base` with the `standard` easing. The rail width animates while the panel keeps the expanded layout, so labels never re-wrap or re-ellipsize: the moving edge reveals and hides the text while it fades, a row with a fill (current, hovered, open) ends at the edge with its radius, group headings fold, coloured counts turn into dots, the account avatar slides onto the icon axis and the header toggle travels with the edge. The compact layout is applied only once the rail has arrived and dropped at the very start of an expand, where it looks the same. Hidden keeps the look of the last visible mode and is clipped as one piece; the header toggle stays at its place and fades, and coming back from hidden it fades in at its final place as the edge reveals it. Collapsible groups that open for the rail and sub-lists that close for it move on the same clock (grid track height); chevrons rotate (base). All durations are tokens: under reduced motion every mode change is instant.
+- Motion: expanded ↔ compact ↔ hidden is one synchronous movement — everything starts and ends together over `base` with the `standard` (ease-in-out) easing, so text opacity tracks the rail width (half-way: half faded). Nothing moves vertically: group headings keep their height and cross-fade into a short separator on the icon axis. The rail width animates while the panel keeps the expanded layout, so labels never re-wrap or re-ellipsize: the moving edge reveals and hides the text while it fades, a row with a fill (current, hovered, open) ends at the edge with its radius, coloured counts turn into dots, the account avatar slides onto the icon axis and the header toggle travels with the edge. The compact layout is applied only once the rail has arrived and dropped at the very start of an expand, where it looks the same. Hidden keeps the look of the last visible mode and is clipped as one piece; the header toggle stays at its place and fades, and coming back from hidden it fades in at its final place as the edge reveals it. Collapsible groups that open for the rail and sub-lists that close for it move on the same clock (grid track height); chevrons rotate (base). All durations are tokens: under reduced motion every mode change is instant.
 - Off-canvas panel width: min(sidebar width, 100% − `--prime-space-12`).
 - Inside `AppShell.Nav` the rail takes the full height.
 

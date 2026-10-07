@@ -171,14 +171,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Group",
-      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail headings fold and the items always show.',
-      ru: '`<div role="group">`, названная своей подписью. С `collapsible` заголовок — кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце; пункты сворачиваются (inert). В компактном рельсе заголовков нет, пункты видны всегда.',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail the heading keeps its height and turns into a short separator on the icon axis; the items always show.',
+      ru: '`<div role="group">`, названная своей подписью. С `collapsible` заголовок — кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце; пункты сворачиваются (inert). В компактном рельсе заголовок сохраняет высоту и становится короткой чертой-разделителем на оси иконок; пункты видны всегда.',
       props: [
         {
           name: "label",
           type: "ReactNode",
-          en: "Group heading (`aria-labelledby`); folds away in compact mode.",
-          ru: "Заголовок группы (`aria-labelledby`); в компактном режиме сворачивается.",
+          en: "Group heading (`aria-labelledby`); a separator line in compact mode (same height).",
+          ru: "Заголовок группы (`aria-labelledby`); в компактном режиме — черта-разделитель той же высоты.",
         },
         {
           name: "collapsible",

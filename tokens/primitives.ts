@@ -248,7 +248,11 @@ export const primitiveTokens = {
     570: "570ms",
   },
   easing: {
-    standard: "cubic-bezier(0.2, 0, 0, 1)",
+    /**
+     * Ease-in-out (foundation §7): something already on screen moves evenly — no near-instant
+     * start and long crawl, so linked parts (a rail and its labels) read as one motion.
+     */
+    standard: "cubic-bezier(0.4, 0, 0.2, 1)",
     enter: "cubic-bezier(0, 0, 0, 1)",
     /** Strong ease-out: a leaving element responds at once and is gone fast (no ease-in in UI). */
     exit: "cubic-bezier(0.23, 1, 0.32, 1)",
