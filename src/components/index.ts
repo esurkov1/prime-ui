@@ -287,7 +287,7 @@ export type {
   InputWrapperProps,
 } from "./input/Input";
 export { Input } from "./input/Input";
-export type { KbdRootProps } from "./kbd/Kbd";
+export type { KbdProps } from "./kbd/Kbd";
 export { Kbd } from "./kbd/Kbd";
 export type { LabelLabels, LabelRootProps } from "./label/Label";
 export { Label } from "./label/Label";

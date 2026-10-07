@@ -1,57 +1,27 @@
-.stack {
-  display: grid;
-  gap: var(--prime-space-4);
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
+/* Layout of the Kbd scenarios: semantic tokens only. */
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
-}
-
-.sizeRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--prime-space-6);
-}
-
-.sizeCell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
+/* Keys of one chord: tighter than a control gap. */
 .chord {
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-1);
 }
 
-/* Keys of one chord inside a control: tighter than the control gap. */
-.keys {
-  display: inline-flex;
+/* in-controls.tsx: two buttons and a search field. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--prime-space-1);
+  justify-content: center;
+  gap: var(--prime-space-3);
+  width: min(100%, var(--prime-modal-width-s));
 }
 
-.field {
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
-}
-
+/* shortcut-list.tsx: action left, keys right. */
 .list {
   display: grid;
   gap: var(--prime-space-3);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
+  width: min(100%, var(--prime-modal-width-s));
   margin: 0;
 }
 

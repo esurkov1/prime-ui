@@ -24,7 +24,7 @@ export default function CommandMenuCompositionExample() {
         <CommandMenu.InputRow
           trailing={
             <>
-              <Kbd.Root>⌘K</Kbd.Root>
+              <Kbd>⌘K</Kbd>
               <Button.Root
                 variant="ghost"
                 tone="neutral"

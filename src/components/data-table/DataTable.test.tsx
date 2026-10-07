@@ -148,7 +148,7 @@ describe("DataTable", () => {
       {
         id: "kbd",
         header: "K",
-        cell: () => <Kbd.Root>⌘</Kbd.Root>,
+        cell: () => <Kbd>⌘</Kbd>,
       },
     ];
 

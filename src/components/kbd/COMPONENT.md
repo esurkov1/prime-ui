@@ -1,17 +1,17 @@
 # Kbd
 
 **Category:** data-display
+**Kind:** primitive
 
 > A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`.
 
 ## When to use
-- Shortcut hints inside buttons, search fields and menu items ("Найти ⌘K", "/").
+- Shortcut hints inside buttons, search fields and menu items («Найти ⌘K», «/»).
 - Hotkey reference lists in help panels or settings.
 - Keys mentioned in instructions.
 
 ## When not to use
 - A status, category or counter → use [Badge](../badge/COMPONENT.md).
-- A removable value → use [Badge](../badge/COMPONENT.md) with `onRemove`.
 - A clickable control → use [Button](../button/COMPONENT.md).
 - A block of code → use [CodeBlock](../code-block/COMPONENT.md).
 
@@ -20,95 +20,80 @@
 import { Kbd } from "prime-ui-kit";
 ```
 
+## Anatomy
+```
+Kbd              <kbd>; one key, its badge tier, children (text, Icon or both)
+```
+
 ## API
 
-### Kbd.Root
-Forwards `ref` to the `<kbd>` element. No `asChild`. Leaf component: one key per `Kbd.Root`.
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+### Kbd
+`ref` → `HTMLElement`. A native `<kbd>`: one key per `Kbd`; passes its tier to a nested `Icon`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | Key label, an icon, or icon + text. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` (`ControlSize`) | — (inherited, else `"m"`) | Badge tier. Without it the key follows the surrounding control one tier down; outside a control it is `m`. |
-| `className` | `string` | — | Extra class on the `<kbd>`. |
-
-+ native props of `<kbd>` (`HTMLAttributes<HTMLElement>` without `size`), e.g. `title`, `aria-label`. `data-size` / `data-tier` are always set by the component.
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the key follows the surrounding control one tier down (m → s); outside a control it is `m`. |
+| `children` | `ReactNode` | — | Key label, an `Icon`, or an icon and text. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "size">` | — | `className`, `title`, `aria-label` and the other `<kbd>` attributes. |
 
 ## Variants
-
 Kbd has one look: monospace text in `text-secondary` on a translucent `fill-subtle-active` wash, no border, weight 500. No `variant`, `tone` or `color`.
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | 16px high, padding 4, text 12, icon 12 | Inside `xs`/`s` buttons, dense menus | |
-| `s` | 20px high, padding 6, text 12, icon 12 | Inside `m` controls (inherited automatically) | |
-| `m` | 24px high, padding 8, text 12, icon 14 | Standalone keys in lists and text | yes (outside controls) |
-| `l` | 28px high, padding 10, text 13, icon 16 | Larger help panels | |
-| `xl` | 32px high, padding 12, text 14, icon 16 | Onboarding / hero hints | |
+| `xs` | 16px high, text 12, icon 12 | inside `xs` / `s` controls, dense menus | |
+| `s` | 20px high, text 12, icon 12 | inside `m` controls (inherited automatically) | |
+| `m` | 24px high, text 12, icon 14 | standalone keys in lists and text | yes (outside controls) |
+| `l` | 28px high, text 13, icon 16 | larger help panels | |
+| `xl` | 32px high, text 14, icon 16 | onboarding hints | |
+| — (omitted) | one tier below the surrounding control: `xs`/`s` → `xs`, `m` → `s`, `l` → `m`, `xl` → `l` | inside Button, Input, menu items | yes (inside controls) |
 
 Minimum width equals the height, so single-character keys are square.
 
-**Combinations**
-- Recommended: no `size` inside controls; one `Kbd.Root` per key in a chord.
-- Allowed: an explicit smaller `size` inside a control for a secondary hint (`<Kbd.Root size="xs">↵</Kbd.Root>` in an `m` button).
-- Avoid: one `Kbd.Root` holding a whole chord with "+" text inside; symbols without an accessible name.
-
-**Sizes**
-Same tiers as Badge. Without `size` inside a control: `xs`/`s` → `xs`, `m` → `s`, `l` → `m`, `xl` → `l`.
-
 ## States
-Kbd is static: no hover, focus, disabled or loading.
-
-| Attribute | Driven by | Notes |
+| State | Driven by | DOM |
 |---|---|---|
-| `data-size` | `size`, else surrounding control size, else `m` | Nominal size. |
-| `data-tier` | resolved tier | One step down from the control when inherited. Drives dimensions. |
-
-Kbd also provides its tier to children through the control-size context, so a nested `Icon` matches the key.
+| static | — | no hover, focus, disabled or loading |
+| size | `size`, else the surrounding control, else `m` | `data-size` (nominal), `data-tier` (visual tier, drives every dimension) |
 
 ## Layout & spacing
-- Inline-flex, centered content, never shrinks, vertical-align middle.
-- Keys of one chord: `gap: var(--prime-space-1)`; an optional "+" between them is `aria-hidden`.
-- In a hotkey list: action text left, chord right (`justify-content: space-between`), rows `gap: var(--prime-space-3)`.
-- In a field, put Kbd in `Input.InlineAffix side="end"`.
+- Inline-flex, centered content, never shrinks, `vertical-align: middle`.
+- Keys of one chord: `gap: var(--prime-space-1)`; an optional «+» between them is `aria-hidden`.
+- In a hotkey list: action left, keys right (`justify-content: space-between`), rows `gap: var(--prime-space-3)`.
+- In a field, put the key in `Input.InlineAffix side="end"`.
 
 ## Accessibility
+
+### Keyboard
+No keyboard interaction.
+
+### ARIA
 - Renders a native `<kbd>`; its text is read as is.
-- Symbol keys (⌘ ⌥ ⇧ ↵) need `aria-label` and preferably `title` ("Command", "Shift").
-- Visual separators like "+" between keys get `aria-hidden="true"`.
-- No `labels` keys.
+- Symbol keys (⌘ ⌥ ⇧ ↵) need `aria-label` and `title` («Command», «Shift»).
+- A visual «+» between keys gets `aria-hidden="true"`.
+
+### Labels
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+No `labels`.
 
 ## Examples
-| File | Scenario | When to use this pattern |
-|---|---|---|
-| [sizes.tsx](examples/sizes.tsx) | A chord in tiers xs–xl | Standalone shortcuts in text and docs |
-| [in-controls.tsx](examples/in-controls.tsx) | ⌘ + K chord in Button s/m/l, explicit `xs` ↵ with `aria-label`, key in a search field | Shortcut hints inside controls |
-| [modifier-keys.tsx](examples/modifier-keys.tsx) | ⌘ + ⇧ + P with `aria-label` / `title`, hidden "+" | Symbol keys |
-| [shortcut-list.tsx](examples/shortcut-list.tsx) | Hotkey reference list, key with icon and text | Help panels and settings |
-
-```tsx
-import { Kbd } from "prime-ui-kit";
-
-export function SaveHint() {
-  return (
-    <span>
-      <Kbd.Root aria-label="Command" title="Command">
-        ⌘
-      </Kbd.Root>
-      <Kbd.Root>S</Kbd.Root>
-    </span>
-  );
-}
-```
+| Example | Shows |
+|---|---|
+| [overview.tsx](examples/overview.tsx) | A shortcut as one key per `Kbd`; symbol keys get a name — `aria-label`, `title`. |
+| [sizes.tsx](examples/sizes.tsx) | Every badge tier, 16 to 32 px high — `size`. |
+| [in-controls.tsx](examples/in-controls.tsx) | Inside a button or a field the key takes the tier one step down; an explicit `size` overrides it. |
+| [shortcut-list.tsx](examples/shortcut-list.tsx) | A hotkey reference: action on the left, its keys on the right, an icon inside a key. |
 
 ## Mistakes
-- `<Kbd.Root>⌘ + Shift + P</Kbd.Root>` → one `Kbd.Root` per key with an `aria-hidden` "+" between.
-- `<Kbd.Root>⌘</Kbd.Root>` without a name → add `aria-label="Command"`.
-- `<Button.Root>Найти <Kbd.Root size="m">⌘K</Kbd.Root></Button.Root>` → drop `size` and use one key per `Kbd.Root`: `<Kbd.Root aria-label="Command">⌘</Kbd.Root><Kbd.Root>K</Kbd.Root>`; the keys follow the button one tier down.
-- A `<span>` styled as a key → use `Kbd.Root`.
-- `Badge` used for a key → use `Kbd.Root` (monospace, semantic `<kbd>`).
+- `<Kbd>⌘ + Shift + P</Kbd>` → one `Kbd` per key with an `aria-hidden` «+» between.
+- `<Kbd>⌘</Kbd>` without a name → add `aria-label="Command"`.
+- An explicit `size="m"` inside an `m` button → drop `size`; the key follows the button one tier down.
+- A `<span>` styled as a key, or a `Badge` used for a key → use `Kbd`.
 
 ## Related
-- [Badge](../badge/COMPONENT.md) — same tiers.
-- [CommandMenu](../command-menu/COMPONENT.md) — shortcut hints in the footer.
-- [Dropdown](../dropdown/COMPONENT.md) — shortcuts in menu items.
+- **Built from:** —
+- **See also:** [Badge](../badge/COMPONENT.md) (same tiers), [CommandMenu](../command-menu/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md)

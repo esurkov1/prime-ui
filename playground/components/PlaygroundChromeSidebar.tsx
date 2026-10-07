@@ -187,7 +187,7 @@ export function PlaygroundChromeSidebar({
       </Sidebar.Header>
       <Sidebar.Item
         icon={<Search />}
-        shortcut={<Kbd.Root>{isMac ? "⌘K" : "Ctrl K"}</Kbd.Root>}
+        shortcut={<Kbd>{isMac ? "⌘K" : "Ctrl K"}</Kbd>}
         aria-haspopup="dialog"
         onClick={() => {
           onOpenChange(false);

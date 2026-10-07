@@ -387,7 +387,7 @@ function Panel() {
               <Icon name="action.search" />
             </Button.Icon>
             {fill(labels.searchText, { query })}
-            <Kbd.Root className={styles.queryKey}>↵</Kbd.Root>
+            <Kbd className={styles.queryKey}>↵</Kbd>
           </Button.Root>
         </div>
       ),

@@ -10,7 +10,7 @@ export default function SidebarStatesExample() {
       <Sidebar.Root responsive={false}>
         <Sidebar.Content>
           <Sidebar.Group>
-            <Sidebar.Item icon={<Search />} shortcut={<Kbd.Root>⌘K</Kbd.Root>}>
+            <Sidebar.Item icon={<Search />} shortcut={<Kbd>⌘K</Kbd>}>
               Поиск
             </Sidebar.Item>
             <Sidebar.Item icon={<Home />} active>

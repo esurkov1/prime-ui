@@ -45,7 +45,7 @@ export default function DndSortableListExample() {
             )}
           />
           <Typography.Root as="p" variant="caption" tone="muted" className={styles.hint}>
-            С клавиатуры: <Kbd.Root>Alt</Kbd.Root> + <Kbd.Root>↑</Kbd.Root> / <Kbd.Root>↓</Kbd.Root>
+            С клавиатуры: <Kbd>Alt</Kbd> + <Kbd>↑</Kbd> / <Kbd>↓</Kbd>
           </Typography.Root>
         </Card.Body>
       </Card.Root>

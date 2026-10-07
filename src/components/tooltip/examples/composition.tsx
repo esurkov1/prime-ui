@@ -27,7 +27,7 @@ export default function TooltipCompositionExample() {
               </Button.Root>
             </Tooltip.Trigger>
             <Tooltip.Content size="s" side="bottom">
-              {label} <Kbd.Root size="xs">{keys}</Kbd.Root>
+              {label} <Kbd size="xs">{keys}</Kbd>
             </Tooltip.Content>
           </Tooltip.Root>
         ))}
