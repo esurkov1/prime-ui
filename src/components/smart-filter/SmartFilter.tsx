@@ -6,6 +6,7 @@ import { Divider } from "@/components/divider/Divider";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Input } from "@/components/input/Input";
 import { Kbd } from "@/components/kbd/Kbd";
+import { LinkButton } from "@/components/link-button/LinkButton";
 import { Popover } from "@/components/popover/Popover";
 import { Typography } from "@/components/typography/Typography";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -115,7 +116,6 @@ const DEFAULT_LABELS: SmartFilterLabels = {
 };
 
 // Secondary buttons beside the tags (add, clear all, the text-search row) sit one tier below the toolbar.
-const SMALLER: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "xs", l: "s", xl: "m" };
 
 type Ctx = {
   fields: readonly SmartFilterField[];
@@ -451,6 +451,12 @@ type ValueToggleProps = {
 const COLOR = { none: "gray", include: "blue", exclude: "red" } as const;
 
 /**
+ * The LinkButton tier whose text size equals the Badge text of a tag tier (Badge 12 · 12 · 12 ·
+ * 13 · 14, LinkButton 12 · 13 · 14 · 16 · …), so a text action reads as part of the tag row.
+ */
+const TIER_BELOW: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "xs", l: "s", xl: "m" };
+
+/**
  * A value is a pressable Badge: gray, blue = shown, red with «НЕ» = hidden. A press shows it; the «−»
  * Badge.Action (revealed on hover and focus, kept while hidden) hides it. Alt+click and Shift+Enter
  * hide too.
@@ -459,7 +465,7 @@ function ValueToggle({ option, size, mode, canHide, query, onMode }: ValueToggle
   const { labels } = useSmartFilter();
   return (
     <Badge.Root
-      size={size}
+      size={size === "xs" ? "s" : size}
       color={COLOR[mode ?? "none"]}
       pressed={mode === "include"}
       title={formatLabel(labels.showValue, { value: option.label })}
@@ -503,7 +509,8 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
   const { fields, value, setSelection, total, clearAll, setOpen, setSearch, labels, size } =
     useSmartFilter();
   if (total === 0) return null;
-  const buttonSize = SMALLER[size];
+  // Tags stay readable: an xs Badge is too small for «Поле: значение», so the floor is s.
+  const tagSize: ControlSize = size === "xs" ? "s" : size;
 
   return (
     <div className={cx(styles.chips, className)} data-slot="smart-filter-chips">
@@ -519,7 +526,7 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
           return (
             <Badge.Root
               key={`${field.key}:${v}`}
-              size={size}
+              size={tagSize}
               color={negated ? "red" : "blue"}
               labels={{ remove: formatLabel(labels.remove, { value: text }) }}
               onRemove={() => setSelection(field.key, removeSelectionValue(selection, v))}
@@ -534,29 +541,25 @@ function SmartFilterChips({ className }: SmartFilterChipsProps) {
           ...selection.exclude.map((v) => tag(v, true)),
         ];
       })}
-      <Button.Root
-        variant="ghost"
-        tone="neutral"
-        size={buttonSize}
-        onClick={() => {
+      {/* Actions in the tag row are tag-sized: a pressable gray Badge and a text action whose
+          type matches the tags (LinkButton runs one tier larger than Badge). */}
+      <Badge.Root
+        size={tagSize}
+        onPress={() => {
           setSearch("");
           setOpen(true);
         }}
       >
-        <Button.Icon>
+        <Badge.Icon>
           <Icon name="action.add" />
-        </Button.Icon>
+        </Badge.Icon>
         {labels.add}
-      </Button.Root>
-      <Button.Root
-        variant="ghost"
-        tone="neutral"
-        size={buttonSize}
-        className={styles.clearAll}
-        onClick={clearAll}
-      >
-        {labels.clearAll}
-      </Button.Root>
+      </Badge.Root>
+      <LinkButton asChild tone="neutral" size={TIER_BELOW[tagSize]} className={styles.clearAll}>
+        <button type="button" onClick={clearAll}>
+          {labels.clearAll}
+        </button>
+      </LinkButton>
     </div>
   );
 }

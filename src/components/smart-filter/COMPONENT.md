@@ -88,11 +88,15 @@ Helpers. `matchesSmartFilter(selection, value)` checks one value on the client (
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | toolbar 28; value and filter tags 16; secondary buttons `xs` | dense table toolbars | |
-| `s` | toolbar 32; tags 20; buttons `xs` | compact toolbars | |
-| `m` | toolbar 36; tags 24; buttons `xs` | most pages | yes |
-| `l` | toolbar 40; tags 28; buttons `s` | roomier pages | |
-| `xl` | toolbar 48; tags 32; buttons `m` | hero search | |
+| `xs` | toolbar 28; value and filter tags 20 (tags never go below `s`) | dense table toolbars | |
+| `s` | toolbar 32; tags 20 | compact toolbars | |
+| `m` | toolbar 36; tags 24 | most pages | yes |
+| `l` | toolbar 40; tags 28 | roomier pages | |
+| `xl` | toolbar 48; tags 32 | hero search | |
+
+In the tag row «Добавить фильтр» is a pressable gray Badge of the tag tier and «Сбросить все» a
+neutral LinkButton with the tags' text size, at the end of the row: every element of the row has the
+same height and type.
 
 ### field `finite`
 | Value | Looks like | Use when | Default |

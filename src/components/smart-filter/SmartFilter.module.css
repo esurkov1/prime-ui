@@ -74,6 +74,7 @@
   min-width: 0;
 }
 
-.clearAll {
+/* «Сбросить все» sits at the end of the row; the chips-scoped selector outranks LinkButton's reset. */
+.chips .clearAll {
   margin-inline-start: auto;
 }
