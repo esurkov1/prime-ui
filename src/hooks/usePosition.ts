@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { useAnchorRectResolver } from "@/internal/AnchorRectContext";
 import { getRootFontSizePx } from "@/internal/layoutPxFromPrimitives";
 import { getScrollContainers } from "@/internal/scrollAncestors";
 
@@ -216,14 +217,16 @@ export function usePosition(
 ): Position {
   const [attached, setAttached] = React.useState(false);
   const [resolvedSide, setResolvedSide] = React.useState<PositionSide>(preferredSide);
+  const resolveAnchorRect = useAnchorRectResolver();
 
   const update = React.useCallback(() => {
     const anchor = anchorRef.current;
     const layer = layerRef.current;
     if (!anchor || !layer) return;
+    const rect = anchor.getBoundingClientRect();
 
     const pos = computeFloatingPosition(
-      anchor.getBoundingClientRect(),
+      resolveAnchorRect ? resolveAnchorRect(anchor, rect) : rect,
       layer.offsetWidth,
       layer.offsetHeight,
       window.innerWidth,
@@ -252,7 +255,16 @@ export function usePosition(
     set(FLOAT_MAX_WIDTH_VAR, px(pos.maxWidth));
     set(FLOAT_MAX_HEIGHT_VAR, px(pos.maxHeight));
     set(FLOAT_ARROW_VAR, px(pos.arrow));
-  }, [anchorRef, layerRef, preferredSide, align, matchAnchorWidth, offsetToken, arrowInset]);
+  }, [
+    anchorRef,
+    layerRef,
+    preferredSide,
+    align,
+    matchAnchorWidth,
+    offsetToken,
+    arrowInset,
+    resolveAnchorRect,
+  ]);
 
   // `update` changes identity with the options; subscriptions read the latest one.
   const updateRef = React.useRef(update);

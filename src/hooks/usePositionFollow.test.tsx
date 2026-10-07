@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it } from "vitest";
 
+import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
+
 import { computeFloatingPosition, type PositionSide, usePosition } from "./usePosition";
 
 const OFFSET = 8;
@@ -96,5 +98,22 @@ describe("usePosition", () => {
   it("does nothing while disabled", () => {
     render(<Anchored open={false} matchAnchorWidth={false} />);
     expect(screen.getByTestId("layer").style.position).toBe("");
+  });
+
+  it("anchors to the visible part of the anchor when a layout narrows it", () => {
+    const seen: HTMLElement[] = [];
+    const narrow: AnchorRectResolver = (anchor) => {
+      seen.push(anchor);
+      return { top: 100, bottom: 136, left: 8, right: 48, width: 40, height: 36 };
+    };
+    render(
+      <AnchorRectProvider value={narrow}>
+        <Anchored open matchAnchorWidth />
+      </AnchorRectProvider>,
+    );
+    const layer = screen.getByTestId("layer");
+    expect(seen[0]).toBe(screen.getByRole("button", { name: "anchor" }));
+    expect(layer.style.left).toBe("8px");
+    expect(layer.style.getPropertyValue("--float-min-w")).toBe("40px");
   });
 });
