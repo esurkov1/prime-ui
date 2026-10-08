@@ -6,6 +6,7 @@ import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { mergeRefs } from "@/internal/mergeRefs";
 import { gridIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
@@ -225,7 +226,7 @@ function Trigger({
         aria-label={name}
         disabled={disabled}
         data-size={size}
-        className={cx(styles.trigger, className)}
+        className={cx(fieldTierClass, styles.trigger, className)}
         onKeyDown={(e) => {
           onKeyDown?.(e);
           if (e.defaultPrevented) return;

@@ -7,7 +7,6 @@
 
 /* ---- Trigger: square swatch button of the tier height (the shared field tier) ---- */
 .trigger {
-  composes: tier from "../../internal/fieldTier.module.css";
   position: relative;
   box-sizing: border-box;
   display: inline-flex;
