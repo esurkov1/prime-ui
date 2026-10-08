@@ -44,9 +44,9 @@
   --dt-z-sticky-header: 2;
   --dt-z-sticky-corner: 3;
 
-  /* Edge cue: a soft shadow over the edge that hides columns, from the scrim of the theme. */
+  /* Edge cue: a soft shadow over the edge that hides columns, tuned per theme. */
   --dt-edge-depth: var(--prime-space-4);
-  --dt-edge-shadow: color-mix(in srgb, var(--prime-color-bg-scrim) 40%, transparent);
+  --dt-edge-shadow: var(--prime-color-bg-edge-shadow);
   /* Gradient direction from the start edge inward; flipped in RTL. */
   --dt-edge-dir: to right;
 

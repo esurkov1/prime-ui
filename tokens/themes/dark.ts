@@ -47,6 +47,8 @@ export const darkThemeOverrides = {
       sunken: "{color.gray.950}",
       inverse: "{color.gray.100}",
       scrim: "rgba(0, 0, 0, 0.6)",
+      /** Darker than the scrim's share: a shade on a 900 surface needs more ink to read. */
+      edgeShadow: "rgba(0, 0, 0, 0.5)",
       glass: "color-mix(in srgb, var(--prime-ref-color-gray-875) 64%, transparent)",
       glassEdge: "rgba(255, 255, 255, 0.08)",
     },

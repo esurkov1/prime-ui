@@ -62,6 +62,7 @@
   --prime-color-accent-soft-hover: var(--prime-ref-color-cobalt-200);
   --prime-color-accent-text: var(--prime-ref-color-cobalt-700);
   --prime-color-bg-canvas: var(--prime-ref-color-gray-50);
+  --prime-color-bg-edge-shadow: rgba(17, 19, 24, 0.14);
   --prime-color-bg-glass: color-mix(in srgb, var(--prime-ref-color-gray-0) 68%, transparent);
   --prime-color-bg-glass-edge: rgba(255, 255, 255, 0.7);
   --prime-color-bg-inverse: var(--prime-ref-color-gray-925);

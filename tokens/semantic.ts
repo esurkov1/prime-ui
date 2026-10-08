@@ -68,6 +68,8 @@ export const semanticTokens = {
       sunken: "{color.gray.75}",
       inverse: "{color.gray.925}",
       scrim: "rgba(17, 19, 24, 0.44)",
+      /** Soft shade over an edge that hides scrolled content (DataTable columns). */
+      edgeShadow: "rgba(17, 19, 24, 0.14)",
       /** Translucent glass over content (floating BottomNav), always with a backdrop blur. */
       glass: "color-mix(in srgb, var(--prime-ref-color-gray-0) 68%, transparent)",
       /** The bright rim of a glass surface. */
