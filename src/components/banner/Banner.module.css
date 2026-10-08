@@ -58,9 +58,14 @@
   container-type: inline-size;
 }
 
-.root:has(> .close) {
+.root:has(> .close):not(:has(.actions)) {
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: var(--bn-gap);
+}
+
+/* With `Banner.Actions` the dismiss joins that row; the corner close steps aside. */
+.root:has(.actions) > .close {
+  display: none;
 }
 
 /* Full-width page strip: no radius, content follows the page content column. */
@@ -255,10 +260,11 @@
   order: 1;
 }
 
-/* Corner close (a ghost icon Button, `tone="inherit"`: the banner's text color, so it reads on
-   solid fills too): top-right, centered on the first text line without growing the banner.
-   `.root` scoping outranks Button's own `margin: 0`. */
-.root .close {
+/* Corner close slot (holds a ghost icon Button, `tone="inherit"`: the banner's text color, so it
+   reads on solid fills too): top-right, centered on the first text line without growing the
+   banner. The slot carries the placement, so the Button keeps its own box untouched. */
+.close {
+  display: flex;
   grid-column: 2;
   grid-row: 1;
   align-self: start;

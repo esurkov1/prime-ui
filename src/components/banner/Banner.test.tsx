@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Banner } from "./Banner";
@@ -145,10 +145,11 @@ describe("Banner", () => {
       </Banner.Root>,
     );
     const root = container.firstElementChild as HTMLElement;
-    // With actions there is no corner close: dismiss lines up with the other buttons.
-    expect(root.children).toHaveLength(1);
+    // With actions dismiss lines up with the other buttons; CSS hides the corner close slot
+    // (`.root:has(.actions) > .close`), which jsdom does not apply.
     expect(root.children[0]).toHaveClass(styles.content);
-    const close = screen.getByRole("button", { name: "Закрыть" });
+    expect(root.children[1]).toHaveClass(styles.close);
+    const close = within(root.children[0] as HTMLElement).getByRole("button", { name: "Закрыть" });
     expect(close).toHaveClass(styles.actionsClose);
     expect(close.parentElement).toHaveClass(styles.actions);
     expect(screen.getByTestId("icon")).toHaveClass(styles.icon);
@@ -170,9 +171,11 @@ describe("Banner", () => {
     const root = container.firstElementChild as HTMLElement;
     expect(root.children).toHaveLength(2);
     expect(root.children[1]).toHaveClass(styles.close);
-    expect(root.children[1]).toHaveAttribute("data-variant", "ghost");
+    const close = screen.getByRole("button", { name: "Закрыть" });
+    expect(close.parentElement).toBe(root.children[1]);
+    expect(close).toHaveAttribute("data-variant", "ghost");
     // Takes the banner's text color from the host, so it reads on solid fills.
-    expect(root.children[1]).toHaveAttribute("data-tone", "inherit");
-    expect(root.children[1]).toHaveAttribute("data-size", "xs");
+    expect(close).toHaveAttribute("data-tone", "inherit");
+    expect(close).toHaveAttribute("data-size", "xs");
   });
 });
