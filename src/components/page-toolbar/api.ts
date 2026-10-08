@@ -23,8 +23,8 @@ export const api: ComponentApi = {
     },
     {
       name: "PageToolbar.Tools",
-      en: "`ref` → `HTMLDivElement`. Filter button and search (`SmartFilter.Toolbar`): the stretchy item of its row, shrinks to 9rem before anything wraps.",
-      ru: "Кнопка фильтра и поиск (`SmartFilter.Toolbar`): резиновый элемент своей строки, сжимается до 9rem прежде, чем что-то перенесётся.",
+      en: "`ref` → `HTMLDivElement`. Filter button and search (`SmartFilter.Toolbar`): the stretchy item of its row; gives way down to 18rem (the button and a 9rem search on one line), then the View wraps instead.",
+      ru: "Кнопка фильтра и поиск (`SmartFilter.Toolbar`): резиновый элемент своей строки; сжимается до 18rem (кнопка и поиск 9rem в одну строку), дальше переносится слот вида.",
       props: [SLOT_REST],
     },
     {

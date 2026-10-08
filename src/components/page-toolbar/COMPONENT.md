@@ -51,7 +51,7 @@ PageToolbar.Root                 container: its own width picks the layout
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### PageToolbar.Tools
-`ref` → `HTMLDivElement`. Filter button and search (`SmartFilter.Toolbar`): the stretchy item of its row, shrinks to 9rem before anything wraps.
+`ref` → `HTMLDivElement`. Filter button and search (`SmartFilter.Toolbar`): the stretchy item of its row; gives way down to 18rem (the button and a 9rem search on one line), then the View wraps instead.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -84,18 +84,18 @@ PageToolbar has no variants: the layout follows the toolbar's width.
 ### Layout by width
 | Toolbar width | Looks like | Default |
 |---|---|---|
-| `≥ 56rem` | one row: Sections (content width) · Tools (stretch) · View (content width) · Actions | |
+| `≥ 56rem` | one row that never wraps: Sections (content width) · Tools (stretch, at least 18rem) · View (content width) · Actions; short of room the Sections shrink and scroll inside | |
 | `< 56rem` | two rows: Sections (stretch) + Actions on top; Tools (stretch) + View below | yes (mobile first) |
 | any | Chips in their own row under the panel, only while there are chips | |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| wide | container ≥ 56rem | one row, break hidden |
+| wide | container ≥ 56rem | one row, no wrapping, break hidden; Chips rendered under the bar |
 | narrow | container < 56rem | `order` moves Actions to the top row, the break forces the second row |
 | one row empty | a row has no slot | break hidden, no empty gap |
 | alone in a row | Sections without Actions, Tools without View, View without Tools | that slot stretches to the full row; the View's controls share it equally |
-| tight bottom row | Tools would go under 9rem | the View wraps whole onto its own row and stretches there |
+| tight row | Tools would go under 18rem (the filter button and a 9rem search) | the View wraps whole onto its own row and stretches there; the tools stay one line |
 | no chips | `PageToolbar.Chips` empty (`SmartFilter.Chips` renders nothing) | the chips row takes no space |
 
 ## Layout & spacing

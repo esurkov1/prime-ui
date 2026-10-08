@@ -1,4 +1,4 @@
-import type * as React from "react";
+import * as React from "react";
 
 import { cx } from "@/internal/cx";
 
@@ -14,13 +14,19 @@ export type PageToolbarRootProps = DivProps;
  * keep fixed places at any width. Parts may be left out; the JSX order is the Tab order.
  */
 function PageToolbarRoot({ className, children, ref, ...rest }: PageToolbarRootProps) {
+  // The chips row lives under the bar, so the bar can keep one line when wide.
+  const items = React.Children.toArray(children);
+  const isChips = (child: React.ReactNode) =>
+    React.isValidElement(child) && child.type === PageToolbarChips;
+
   return (
     <div {...rest} ref={ref} className={cx(styles.root, className)}>
       <div className={styles.bar}>
-        {children}
+        {items.filter((child) => !isChips(child))}
         {/* The forced line break of the two-row layout; hidden when one row is empty or wide. */}
         <span className={styles.break} aria-hidden="true" />
       </div>
+      {items.filter(isChips)}
     </div>
   );
 }

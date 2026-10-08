@@ -8,15 +8,20 @@
  *   wide (≥ 56rem):    [ Sections ][ Tools ——— stretches ——— ][ View ][ Actions ]
  *                      [ Chips ……………………………………………………… ]
  *
+ * Chips are rendered by Root under the bar (their own row, gone while empty).
  * Rules: the primary action stays at the top row's end and never wraps; one stretchy item per row
  * (Sections on top, Tools below); an item alone in its row stretches to the full width; when the
- * bottom row runs out of room the Tools shrink to 9rem first, then the View wraps whole onto its own
- * row and stretches there. Order changes through `order` and one hidden break element, so the DOM
+ * row runs out of room the Tools give way down to 18rem — the filter button and a 9rem search on one
+ * line — then the View wraps whole onto its own row and stretches there, so the tools never break
+ * into two lines inside a one-row panel. Order changes through `order` and one hidden break element, so the DOM
  * order — and the Tab order — stays the JSX order. All controls share the toolbar tier, so wrapped
  * rows stay level.
  */
 .root {
   container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
   min-width: 0;
 }
 
@@ -66,7 +71,7 @@
    them and stretches only when it ends up alone in a row. */
 .tools {
   order: 4;
-  flex: 999 1 9rem;
+  flex: 999 1 calc(var(--prime-space-24) * 3);
 }
 
 .tools > * {
@@ -86,8 +91,6 @@
 }
 
 .chips {
-  order: 10;
-  flex-basis: 100%;
   min-width: 0;
 }
 
@@ -101,18 +104,24 @@
   display: none;
 }
 
+/* Wide: one line that never wraps, so the primary action cannot drop. When room runs short the
+   Tools give way down to 18rem, then the Sections shrink and scroll inside their switcher. */
 @container (min-width: 56rem) {
+  .bar {
+    flex-wrap: nowrap;
+  }
+
   .break {
     display: none;
   }
 
-  /* Sections keep their content width; the Tools give way first. */
   .sections {
-    flex: none;
+    flex: 0 1 auto;
   }
 
   .tools {
     order: 2;
+    min-width: calc(var(--prime-space-24) * 3);
   }
 
   .view {

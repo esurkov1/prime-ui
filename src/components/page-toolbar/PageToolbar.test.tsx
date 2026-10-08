@@ -39,6 +39,20 @@ describe("PageToolbar", () => {
     expect(last).toBeEmptyDOMElement();
   });
 
+  it("puts the chips row under the bar, whatever its place in JSX", () => {
+    const { container } = render(
+      <PageToolbar.Root>
+        <PageToolbar.Chips data-testid="chips" />
+        <PageToolbar.Tools data-testid="tools" />
+      </PageToolbar.Root>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    const bar = root.firstElementChild as HTMLElement;
+    expect(bar).toContainElement(screen.getByTestId("tools"));
+    expect(bar).not.toContainElement(screen.getByTestId("chips"));
+    expect(root.lastElementChild).toBe(screen.getByTestId("chips"));
+  });
+
   it("leaves the tier to the host: controls inside follow a ControlSizeProvider around it", () => {
     render(
       <ControlSizeProvider value="s">
