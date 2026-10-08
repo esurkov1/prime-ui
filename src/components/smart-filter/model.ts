@@ -33,15 +33,14 @@ export function toggleSelectionMode(
   value: string,
   mode: SmartFilterMode,
 ): SmartFilterSelection {
-  const current = selection ?? EMPTY;
-  const include = current.include.filter((v) => v !== value);
-  const exclude = current.exclude.filter((v) => v !== value);
-  if (selectionModeOf(current, value) === mode) return { include, exclude };
+  const { include, exclude } = removeSelectionValue(selection, value);
+  if (selectionModeOf(selection, value) === mode) return { include, exclude };
   return mode === "include"
     ? { include: [...include, value], exclude }
     : { include, exclude: [...exclude, value] };
 }
 
+/** Drops a value from both lists. */
 export function removeSelectionValue(
   selection: SmartFilterSelection | undefined,
   value: string,
@@ -107,5 +106,3 @@ export function resolveSmartFilterValues(
   const result = base.filter((v) => !selection.exclude.includes(v));
   return result.length === all.length ? [] : result;
 }
-
-export { matchIndex } from "@/internal/HighlightMatch";

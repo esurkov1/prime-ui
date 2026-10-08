@@ -14,13 +14,12 @@ import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
-import { HighlightMatch } from "@/internal/HighlightMatch";
+import { HighlightMatch, matchIndex } from "@/internal/HighlightMatch";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import {
   canExcludeValue,
-  matchIndex,
   removeSelectionValue,
   type SmartFilterMode,
   type SmartFilterSelection,
@@ -320,15 +319,6 @@ function Panel() {
     ? rows.filter((row) => row.options.length === 0).map((row) => row.field.label)
     : [];
 
-  const setMode = (field: SmartFilterField, option: string, mode: SmartFilterMode) => {
-    const selection = value[field.key];
-    const all = field.options.map((o) => o.value);
-    if (mode === "exclude" && field.finite !== false && !canExcludeValue(selection, option, all)) {
-      return;
-    }
-    setSelection(field.key, toggleSelectionMode(selection, option, mode));
-  };
-
   const sections: { key: string; node: React.ReactNode }[] = [];
   if (query) {
     sections.push({
@@ -372,7 +362,9 @@ function Panel() {
                 mode={selectionModeOf(selection, option.value)}
                 canHide={field.finite === false || canExcludeValue(selection, option.value, all)}
                 query={query}
-                onMode={(mode) => setMode(field, option.value, mode)}
+                onMode={(mode) =>
+                  setSelection(field.key, toggleSelectionMode(selection, option.value, mode))
+                }
               />
             ))}
             {collapsible && (
@@ -444,9 +436,12 @@ type ValueToggleProps = {
   mode: SmartFilterMode | null;
   canHide: boolean;
   query: string;
-  /** Asks for a mode; asking for the current one clears it. */
+  /** Asks for a mode; asking for the current one clears it. «Hide» is asked only when `canHide`. */
   onMode: (mode: SmartFilterMode) => void;
 };
+
+/** Tags stay readable: an xs Badge is too small for «Поле: значение», so the floor is s. */
+const tagSizeOf = (size: ControlSize): ControlSize => (size === "xs" ? "s" : size);
 
 const COLOR = { none: "gray", include: "blue", exclude: "red" } as const;
 
@@ -471,7 +466,7 @@ function ValueToggle({ option, size, mode, canHide, query, onMode }: ValueToggle
   const { labels } = useSmartFilter();
   return (
     <Badge.Root
-      size={size === "xs" ? "s" : size}
+      size={tagSizeOf(size)}
       color={COLOR[mode ?? "none"]}
       pressed={mode === "include"}
       title={formatLabel(labels.showValue, { value: option.label })}
@@ -515,8 +510,7 @@ function SmartFilterChips({ className, ...rest }: SmartFilterChipsProps) {
   const { fields, value, setSelection, total, clearAll, setOpen, setSearch, labels, size } =
     useSmartFilter();
   if (total === 0) return null;
-  // Tags stay readable: an xs Badge is too small for «Поле: значение», so the floor is s.
-  const tagSize: ControlSize = size === "xs" ? "s" : size;
+  const tagSize = tagSizeOf(size);
 
   return (
     <div {...rest} className={cx(styles.chips, className)} data-slot="smart-filter-chips">
