@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "PageContent.Root",
-      en: "`forwardRef` → `HTMLDivElement`. The page column inside `main`: header → body 32 apart, centred under its cap.",
+      en: "`ref` → `HTMLDivElement`. The page column inside `main`: header → body 32 apart, centred under its cap.",
       ru: "Колонка страницы внутри `main`: шапка и тело с ритмом 32, по центру под своим ограничением.",
       props: [
         {
@@ -24,7 +24,7 @@ export const api: ComponentApi = {
     },
     {
       name: "PageContent.Section",
-      en: "`forwardRef` → `HTMLElement`. The same column as a `<section>`, without a cap; name it with `aria-labelledby` → the Title `id`.",
+      en: "`ref` → `HTMLElement`. The same column as a `<section>`, without a cap; name it with `aria-labelledby` → the Title `id`.",
       ru: "Та же колонка как `<section>` без ограничения ширины; назовите её через `aria-labelledby` на `id` заголовка.",
       props: [
         {
@@ -50,7 +50,7 @@ export const api: ComponentApi = {
     },
     {
       name: "PageContent.Title",
-      en: "`forwardRef` → `HTMLHeadingElement`. The page `<h1>` in heading-m.",
+      en: "`ref` → `HTMLHeadingElement`. The page `<h1>` in heading-m.",
       ru: "Заголовок страницы `<h1>` стилем heading-m.",
       props: [
         {
@@ -63,7 +63,7 @@ export const api: ComponentApi = {
     },
     {
       name: "PageContent.Description",
-      en: "`forwardRef` → `HTMLParagraphElement`. Intro `<p>` in secondary body-m.",
+      en: "`ref` → `HTMLParagraphElement`. Intro `<p>` in secondary body-m.",
       ru: "Вводный абзац `<p>` вторичным body-m.",
       props: [
         {

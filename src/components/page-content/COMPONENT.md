@@ -36,7 +36,7 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth, Section r
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### PageContent.Root
-`forwardRef` → `HTMLDivElement`. The page column inside `main`: header → body 32 apart, centred under its cap.
+`ref` → `HTMLDivElement`. The page column inside `main`: header → body 32 apart, centred under its cap.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -44,7 +44,7 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth, Section r
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Header, Body), `className` and the other div attributes. |
 
 ### PageContent.Section
-`forwardRef` → `HTMLElement`. The same column as a `<section>`, without a cap; name it with `aria-labelledby` → the Title `id`.
+`ref` → `HTMLElement`. The same column as a `<section>`, without a cap; name it with `aria-labelledby` → the Title `id`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -58,14 +58,14 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth, Section r
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Title, Description, Actions), `className` and the other div attributes. |
 
 ### PageContent.Title
-`forwardRef` → `HTMLHeadingElement`. The page `<h1>` in heading-m.
+`ref` → `HTMLHeadingElement`. The page `<h1>` in heading-m.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `children`, `id`, `className` and the other heading attributes. |
 
 ### PageContent.Description
-`forwardRef` → `HTMLParagraphElement`. Intro `<p>` in secondary body-m.
+`ref` → `HTMLParagraphElement`. Intro `<p>` in secondary body-m.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

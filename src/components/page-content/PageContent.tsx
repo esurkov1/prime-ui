@@ -10,29 +10,27 @@ export type PageContentMaxWidth = "full" | "readable" | "wide";
 
 export type PageContentRootProps = React.HTMLAttributes<HTMLDivElement> & {
   maxWidth?: PageContentMaxWidth;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-const PageContentRoot = React.forwardRef<HTMLDivElement, PageContentRootProps>(
-  function PageContentRoot({ maxWidth = "full", className, ...rest }, forwardedRef) {
-    return (
-      <div
-        ref={forwardedRef}
-        className={cx(styles.root, className)}
-        {...rest}
-        {...toDataAttributes({ "max-width": maxWidth === "full" ? undefined : maxWidth })}
-      />
-    );
-  },
-);
+function PageContentRoot({ maxWidth = "full", className, ...rest }: PageContentRootProps) {
+  return (
+    <div
+      className={cx(styles.root, className)}
+      {...rest}
+      {...toDataAttributes({ "max-width": maxWidth === "full" ? undefined : maxWidth })}
+    />
+  );
+}
 PageContentRoot.displayName = "PageContent.Root";
 
-export type PageContentSectionProps = React.HTMLAttributes<HTMLElement>;
+export type PageContentSectionProps = React.HTMLAttributes<HTMLElement> & {
+  ref?: React.Ref<HTMLElement>;
+};
 
-const PageContentSection = React.forwardRef<HTMLElement, PageContentSectionProps>(
-  function PageContentSection({ className, ...rest }, forwardedRef) {
-    return <section ref={forwardedRef} className={cx(styles.section, className)} {...rest} />;
-  },
-);
+function PageContentSection({ className, ...rest }: PageContentSectionProps) {
+  return <section className={cx(styles.section, className)} {...rest} />;
+}
 PageContentSection.displayName = "PageContent.Section";
 
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
@@ -67,13 +65,13 @@ function PageContentHeader({ className, children, ...rest }: PageContentHeaderPr
 }
 PageContentHeader.displayName = "PageContent.Header";
 
-export type PageContentTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+export type PageContentTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
+  ref?: React.Ref<HTMLHeadingElement>;
+};
 
-const PageContentTitle = React.forwardRef<HTMLHeadingElement, PageContentTitleProps>(
-  function PageContentTitle({ className, ...rest }, forwardedRef) {
-    return <h1 ref={forwardedRef} className={cx(styles.title, className)} {...rest} />;
-  },
-);
+function PageContentTitle({ className, ...rest }: PageContentTitleProps) {
+  return <h1 className={cx(styles.title, className)} {...rest} />;
+}
 PageContentTitle.displayName = "PageContent.Title";
 
 export type PageContentDescriptionMeasure = "readable" | "full";
@@ -81,20 +79,22 @@ export type PageContentDescriptionMeasure = "readable" | "full";
 export type PageContentDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & {
   /** `readable` — max ~65ch; `full` — the full width of the parent (e.g. an already padded `main`). */
   measure?: PageContentDescriptionMeasure;
+  ref?: React.Ref<HTMLParagraphElement>;
 };
 
-const PageContentDescription = React.forwardRef<HTMLParagraphElement, PageContentDescriptionProps>(
-  function PageContentDescription({ className, measure = "readable", ...rest }, forwardedRef) {
-    return (
-      <p
-        ref={forwardedRef}
-        className={cx(styles.description, className)}
-        {...rest}
-        {...toDataAttributes({ measure: measure === "full" ? "full" : undefined })}
-      />
-    );
-  },
-);
+function PageContentDescription({
+  className,
+  measure = "readable",
+  ...rest
+}: PageContentDescriptionProps) {
+  return (
+    <p
+      className={cx(styles.description, className)}
+      {...rest}
+      {...toDataAttributes({ measure: measure === "full" ? "full" : undefined })}
+    />
+  );
+}
 PageContentDescription.displayName = "PageContent.Description";
 
 export type PageContentBodyProps = DivProps;
