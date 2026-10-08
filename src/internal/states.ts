@@ -7,6 +7,11 @@
 export const controlSizes = ["xs", "s", "m", "l", "xl"] as const;
 export type ControlSize = (typeof controlSizes)[number];
 
+/** The tier `n` steps smaller, never below `xs`: a control nested in another (foundation §6 pairing). */
+export function stepDown(size: ControlSize, n = 1): ControlSize {
+  return controlSizes[Math.max(0, controlSizes.indexOf(size) - n)] ?? "xs";
+}
+
 /** Visual treatment. */
 export const variants = ["solid", "soft", "outline", "ghost"] as const;
 export type Variant = (typeof variants)[number];

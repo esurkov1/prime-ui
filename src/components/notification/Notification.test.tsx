@@ -420,36 +420,47 @@ describe("Notification", () => {
       expect(screen.getByText("Timed")).toBeInTheDocument();
     }
 
+    /** The countdown line: a CSS animation of the toast's duration. */
+    function countdownLine() {
+      const line = document.querySelector<HTMLElement>("[class*=progressValue]");
+      if (!line) throw new Error("no countdown line");
+      return line;
+    }
+
+    it("runs the countdown as a CSS animation and expires when it ends", () => {
+      renderTimed();
+      const line = countdownLine();
+      expect(line.style.animationDuration).toBe("1000ms");
+      expect(line.style.animationPlayState).toBe("running");
+      // No per-frame JS: time alone does not dismiss it, the line running out does.
+      advance(5000);
+      expect(screen.getByText("Timed")).toBeInTheDocument();
+      act(() => {
+        fireEvent.animationEnd(line);
+      });
+      advance(exitTimeoutMs("fast"));
+      expect(screen.queryByText("Timed")).not.toBeInTheDocument();
+    });
+
     it("pauses the countdown while the stack is hovered", () => {
       renderTimed();
       const list = screen.getByRole("list", { name: "Уведомления сверху справа" });
 
       fireEvent.mouseEnter(list);
-      advance(2000);
-      expect(screen.getByText("Timed")).toBeInTheDocument();
+      expect(countdownLine().style.animationPlayState).toBe("paused");
 
       fireEvent.mouseLeave(list);
       advance(100); // collapse delay; the countdown resumes once the stack collapses
       expect(list).toHaveAttribute("data-expanded", "false");
-      advance(900);
-      expect(screen.getByText("Timed")).toBeInTheDocument();
-      advance(200);
-      expect(screen.queryByText("Timed")).not.toBeInTheDocument();
+      expect(countdownLine().style.animationPlayState).toBe("running");
     });
 
     it("pauses while the document is hidden and resumes where it stopped", () => {
       renderTimed();
-      advance(500);
-
       setVisibility("hidden");
-      advance(3000);
-      expect(screen.getByText("Timed")).toBeInTheDocument();
-
+      expect(countdownLine().style.animationPlayState).toBe("paused");
       setVisibility("visible");
-      advance(400);
-      expect(screen.getByText("Timed")).toBeInTheDocument();
-      advance(200);
-      expect(screen.queryByText("Timed")).not.toBeInTheDocument();
+      expect(countdownLine().style.animationPlayState).toBe("running");
     });
   });
 
