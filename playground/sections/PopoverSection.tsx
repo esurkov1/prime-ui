@@ -61,7 +61,7 @@ export const page: ComponentPageConfig = {
     keyboard: [
       {
         keys: "Enter · Space",
-        action: "На триггере открывает и закрывает панель.",
+        action: "На триггере открывает панель (фокус переходит в неё) и закрывает.",
       },
       {
         keys: "Escape",
@@ -69,7 +69,8 @@ export const page: ComponentPageConfig = {
       },
       {
         keys: "Tab",
-        action: "Переходит по содержимому панели; с `trapFocus` фокус ходит по кругу внутри неё.",
+        action:
+          "Переходит по содержимому панели; с `trapFocus` ходит по кругу, без него Tab за последний элемент закрывает панель и идёт дальше от триггера.",
       },
     ],
     aria: [

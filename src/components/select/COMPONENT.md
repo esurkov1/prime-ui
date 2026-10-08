@@ -31,7 +31,7 @@ Select.Root                       field frame: label · control · hint/error; v
 ├── Select.Trigger                <button role="combobox">: [icon] [value] [clear] [chevron]
 │   ├── Select.TriggerIcon        optional leading glyph
 │   └── Select.Value              picked label or placeholder (renderValue for a rich trigger)
-└── Select.Content                portaled panel, mounted while closed
+└── Select.Content                portaled panel, mounted while open
     ├── search row                with `searchable`
     ├── role="listbox"
     │   ├── Select.Group          role="group", named by `label`
@@ -95,7 +95,7 @@ Select.Root                       field frame: label · control · hint/error; v
 `ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.
 
 ### Select.Content
-`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel; stays mounted while closed (the items register their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.
+`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -182,7 +182,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | `A–Я` | Typeahead: the highlight jumps to the option starting with the letter or the typed prefix. |
 | `Delete` · `Backspace` | On the trigger with `clearable` clear the value. |
 | `Escape` | Closes the list; focus returns to the trigger. |
-| `Tab` | Closes the list and moves on. |
+| `Tab` | Returns focus to the trigger, closes the list and moves on from the trigger. |
 
 ### ARIA
 - The trigger is `role="combobox"` with `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`; `label` names it.

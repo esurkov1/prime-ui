@@ -67,9 +67,10 @@ export const page: ComponentPageConfig = {
     keyboard: [
       { keys: "ArrowDown · ArrowUp", action: "Открывают список и двигают подсветку по опциям." },
       {
-        keys: "Enter · Space",
-        action: "Отмечают или снимают подсвеченную опцию; на строке «Создать» — создают тег.",
+        keys: "Enter",
+        action: "Отмечает или снимает подсвеченную опцию; на строке «Создать» — создаёт тег.",
       },
+      { keys: "Space", action: "Печатает пробел: в теге может быть несколько слов." },
       { keys: "Backspace", action: "В пустом поле удаляет последний тег." },
       {
         keys: "ArrowLeft · ArrowRight",

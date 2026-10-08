@@ -42,13 +42,16 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query state
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### CommandMenu.Root
-`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; holds the query and the active item while open (a new opening starts empty, focus in the search field).
+`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; owns the query (cleared on close) and the active item (a new opening starts empty, focus in the search field).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `open` | `boolean` | — | Controlled visibility; together with `onOpenChange`. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: Escape, scrim click, code. |
+| `value` | `string` | — | Controlled query; the list filters by it. Together with `onValueChange`. |
+| `defaultValue` | `string` | `""` | Initial query, uncontrolled. |
+| `onValueChange` | `(value: string) => void` | — | Called with the new query: typing, and `""` when the palette closes. |
 | `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the palette; focus returns to the opener. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the palette. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the rows and the search row: item height, text, icon. |
@@ -61,12 +64,10 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query state
 `ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.
 
 ### CommandMenu.Input
-`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; no focus ring (the caret is the indicator). + native input props.
+`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; shows `CommandMenu.Root` `value`; takes focus on open; no focus ring (the caret is the indicator). + native input props except `value` / `defaultValue`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | — | Controlled query; the list filters by it. |
-| `onValueChange` | `(value: string) => void` | — | Called with the new query; native `onChange` still fires. |
 | `placeholder` | `string` | `labels.search` | Placeholder; also the default accessible name comes from `labels.search`. |
 
 ### CommandMenu.List
@@ -87,7 +88,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query state
 | `value` | `string` | — (required) | Text matched against the query together with `keywords`. |
 | `keywords` | `string` | — | Extra words for the query (synonyms, English names). |
 | `onSelect` | `() => void` | — | Runs the command: a click, or Enter while the item is active. |
-| `disabled` | `boolean` | `false` | Never shows in the results. |
+| `disabled` | `boolean` | `false` | Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, does not run. |
 
 ### CommandMenu.ItemIcon · CommandMenu.ItemShortcut
 `ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the tier icon size / a `Kbd` one tier below, pushed to the end of the item — a hint, not a handler. + native props.
@@ -124,7 +125,7 @@ One look: `bg-raised`, `--prime-modal-radius`, `shadow-modal`, `--prime-modal-wi
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `disabled` (Item) | never in the results | The command is unavailable right now | `false` |
+| `disabled` (Item) | muted row, `aria-disabled`, skipped by the arrows | The command is unavailable right now | `false` |
 | `closeOnOutsideClick={false}` | the scrim does not close it | A required pick | |
 | `closeOnEscape={false}` | Escape does nothing | A required pick that must not be skipped | |
 
@@ -138,6 +139,8 @@ One look: `bg-raised`, `--prime-modal-radius`, `shadow-modal`, `--prime-modal-wi
 | filtered out | the query | `hidden` on items and on groups without matches |
 | matched text | the query | the first match in the item's text children and in `ItemText` is wrapped in a `<mark>` in `accent-text`, no fill (same as SmartFilter) |
 | nothing found | the query | `CommandMenu.Empty` with `role="status"` |
+| query | `value` / `defaultValue` / `onValueChange` on Root | the search field's value; cleared when the palette closes |
+| disabled item | `disabled` on Item | `aria-disabled="true"`, `data-disabled`; never active, not runnable |
 | size | `size` | `data-size` on the tier wrapper |
 
 ## Layout & spacing
@@ -176,9 +179,10 @@ One look: `bg-raised`, `--prime-modal-radius`, `shadow-modal`, `--prime-modal-wi
 | [overview.tsx](examples/overview.tsx) | A button or ⌘K opens the palette: the query filters the groups by value and keywords, Enter runs the active command — `CommandMenu.Item`, `keywords`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts: a visible title and description, a description line and a key hint in items, and a footer with key hints — `CommandMenu.Title`, `CommandMenu.ItemText`, `CommandMenu.ItemShortcut`, `CommandMenu.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: rows, text, icons and the search row follow it; match the density of the app — `size`. |
-| [states.tsx](examples/states.tsx) | A disabled item never shows in the results, and an empty result speaks in the words of the task — `disabled`, `labels`. |
+| [states.tsx](examples/states.tsx) | A disabled item stays visible but muted and is skipped by the arrows, and an empty result speaks in the words of the task — `disabled`, `labels`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A required pick during an import: a stray click on the scrim does not close the palette, only Escape or a choice — `closeOnOutsideClick`, `closeOnEscape`. |
-| [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state and the query: it reads the text and a command resets it or closes the palette — `open`, `onOpenChange`, `value`, `onValueChange`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the query: it shows the text outside and a command resets it; the palette clears it on close — `value`, `onValueChange`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state: a button opens the palette and a command closes it — `open`, `onOpenChange`. |
 
 ## Mistakes
 - An icon passed as a component (`as={Icon}`) → put the glyph inside `CommandMenu.ItemIcon`.

@@ -111,7 +111,8 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | Key | Action |
 |---|---|
 | `ArrowDown` · `ArrowUp` | Open the list and move the highlight over the options. |
-| `Enter` · `Space` | Tick or untick the highlighted option; on the Create row, create the tag. |
+| `Enter` | Tick or untick the highlighted option; on the Create row, create the tag. |
+| `Space` | Types a space: a tag may have several words. |
 | `Backspace` | In an empty input removes the last tag. |
 | `ArrowLeft` · `ArrowRight` | From the start of the input move focus over the tags and back to the input. |
 | `Delete` | On a tag removes it; focus moves to the neighbour tag. |

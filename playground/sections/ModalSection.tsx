@@ -61,7 +61,7 @@ export const page: ComponentPageConfig = {
       {
         keys: "Enter",
         action:
-          "Нажимает `Modal.Confirm`, если фокус не в textarea, select, чекбоксе, шапке или на самой кнопке.",
+          "Нажимает `Modal.Confirm` из текстового поля или самого окна; на кнопке или ссылке (включая «Отмена») срабатывает она сама; textarea, select, чекбокс и шапка оставляют Enter себе.",
       },
       { keys: "Tab · Shift+Tab", action: "Переводит фокус по кругу внутри окна." },
     ],
