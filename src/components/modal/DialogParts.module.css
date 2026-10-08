@@ -228,8 +228,25 @@
   gap: var(--prime-space-2);
 }
 
-/* Dialog narrower than 480px: one action per row, full width, DOM order (primary last). */
-@container prime-dialog (max-width: 479px) {
+/*
+ * One action per row, full width, DOM order (primary last): on phones, where a dialog is a bottom
+ * sheet (viewport below 640), and in a dialog narrower than 360px. A small dialog on a desktop keeps
+ * its row.
+ */
+@media (max-width: 639px) {
+  .footer[data-layout] {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--prime-space-2);
+  }
+
+  .footer[data-layout] > * {
+    width: 100%;
+  }
+}
+
+@container prime-dialog (max-width: 359px) {
   .footer[data-layout] {
     display: flex;
     flex-direction: column;
