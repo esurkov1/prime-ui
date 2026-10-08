@@ -135,8 +135,10 @@
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.field:not([data-disabled="true"], [data-readonly="true"]) .row:hover .visual {
-  background: var(--prime-color-fill-strong-hover);
+@media (hover: hover) {
+  .field:not([data-disabled="true"], [data-readonly="true"]) .row:hover .visual {
+    background: var(--prime-color-fill-strong-hover);
+  }
 }
 
 /* Tactile press: a small target, so the compact scale. */
@@ -151,13 +153,15 @@
   background: var(--prime-color-accent-default);
 }
 
-.field:is([data-state="checked"], [data-state="indeterminate"]):not(
-    [data-disabled="true"],
-    [data-readonly="true"]
-  )
-  .row:hover
-  .visual {
-  background: var(--prime-color-accent-hover);
+@media (hover: hover) {
+  .field:is([data-state="checked"], [data-state="indeterminate"]):not(
+      [data-disabled="true"],
+      [data-readonly="true"]
+    )
+    .row:hover
+    .visual {
+    background: var(--prime-color-accent-hover);
+  }
 }
 
 .input:focus-visible + .visual {

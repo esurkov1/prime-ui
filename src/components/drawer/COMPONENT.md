@@ -94,7 +94,7 @@ No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Narrower than 360 px — stacked. |
+| `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Narrower than 480 px — stacked. |
 
 ### Drawer.Trigger · Drawer.Close
 No DOM: clone the single child and chain its `onClick` (unless the child's handler calls `preventDefault()`).

@@ -314,7 +314,6 @@
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .brand,
 .root[data-panel-mode="compact"]:not([data-off-canvas])
   :is(.item, .account):is(
-    :hover,
     :active,
     :focus-visible,
     [aria-current="page"],
@@ -328,10 +327,18 @@
   );
 }
 
+@media (hover: hover) {
+  .root[data-panel-mode="compact"]:not([data-off-canvas]) :is(.item, .account):hover {
+    clip-path: inset(
+      calc(-1 * var(--prime-space-1)) calc(100% - var(--sb-rail-box))
+        calc(-1 * var(--prime-space-1)) calc(-1 * var(--prime-space-1))
+    );
+  }
+}
+
 /* A filled row: its fill and its cut travel with the edge. */
 .root:not([data-off-canvas])
 :is(.item, .account, .brand):is(
-  :hover,
   :active,
   :focus-visible,
   [aria-current="page"],
@@ -343,6 +350,15 @@
     inset-inline-end var(--sb-duration) var(--sb-ease),
     background-color var(--prime-motion-duration-xfast) var(--sb-ease),
     box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
+}
+
+@media (hover: hover) {
+  .root:not([data-off-canvas]) :is(.item, .account, .brand):hover::before {
+    transition:
+      inset-inline-end var(--sb-duration) var(--sb-ease),
+      background-color var(--prime-motion-duration-xfast) var(--sb-ease),
+      box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
+  }
 }
 
 /*
@@ -496,9 +512,11 @@
     color var(--prime-motion-duration-xfast) var(--sb-ease);
 }
 
-.groupTrigger:hover {
-  background-color: var(--prime-color-fill-subtle);
-  color: var(--prime-color-text-secondary);
+@media (hover: hover) {
+  .groupTrigger:hover {
+    background-color: var(--prime-color-fill-subtle);
+    color: var(--prime-color-text-secondary);
+  }
 }
 
 /* On the rail a heading only names the section: no hover fill, no click — its tooltip still opens. */
@@ -506,9 +524,11 @@
   cursor: default;
 }
 
-.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupTrigger:hover {
-  background-color: transparent;
-  color: var(--prime-color-text-muted);
+@media (hover: hover) {
+  .root[data-panel-mode="compact"]:not([data-off-canvas]) .groupTrigger:hover {
+    background-color: transparent;
+    color: var(--prime-color-text-muted);
+  }
 }
 
 .groupTrigger:focus-visible {
@@ -528,8 +548,10 @@
     stroke var(--sb-duration) var(--sb-ease);
 }
 
-.groupTrigger:hover .groupChevron {
-  color: var(--prime-color-text-secondary);
+@media (hover: hover) {
+  .groupTrigger:hover .groupChevron {
+    color: var(--prime-color-text-secondary);
+  }
 }
 
 .groupTrigger[aria-expanded="true"] .groupChevron {
@@ -695,11 +717,18 @@
     clip-path var(--sb-duration) var(--sb-ease);
 }
 
-.item:hover,
 .flyout .item:focus-visible {
   --sb-fill: var(--prime-color-fill-subtle);
 
   color: var(--prime-color-text-primary);
+}
+
+@media (hover: hover) {
+  .item:hover {
+    --sb-fill: var(--prime-color-fill-subtle);
+
+    color: var(--prime-color-text-primary);
+  }
 }
 
 .item:active:not([data-disabled="true"], :disabled) {
@@ -746,7 +775,12 @@
   height: 100%;
 }
 
-.item:hover .icon,
+@media (hover: hover) {
+  .item:hover .icon {
+    color: var(--prime-color-text-primary);
+  }
+}
+
 .item[data-state="active"] .icon,
 .item[aria-current="page"] .icon,
 .item[data-active-path] .icon {
@@ -849,8 +883,10 @@
     color var(--prime-motion-duration-xfast) var(--sb-ease);
 }
 
-.item:hover .chevron {
-  color: var(--prime-color-text-secondary);
+@media (hover: hover) {
+  .item:hover .chevron {
+    color: var(--prime-color-text-secondary);
+  }
 }
 
 .item[aria-expanded="true"] .chevron {
@@ -880,15 +916,36 @@
   transition: opacity var(--prime-motion-duration-fast) var(--sb-ease);
 }
 
-.row:hover > .action,
 .row:focus-within > .action {
   opacity: 1;
   pointer-events: auto;
 }
 
-.row:hover .trail,
 .row:focus-within .trail {
   translate: calc(-1 * var(--sb-action-shift)) 0;
+}
+
+@media (hover: hover) {
+  .row:hover > .action {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .row:hover .trail {
+    translate: calc(-1 * var(--sb-action-shift)) 0;
+  }
+}
+
+/* Without hover nothing reveals the action, so it stays shown. */
+@media (hover: none) {
+  .row > .action {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .row .trail {
+    translate: calc(-1 * var(--sb-action-shift)) 0;
+  }
 }
 
 /* --- Sub-list ------------------------------------------------------------------- */
@@ -1030,9 +1087,14 @@
     clip-path var(--sb-duration) var(--sb-ease);
 }
 
-.account:hover,
 .account[aria-expanded="true"] {
   --sb-fill: var(--prime-color-fill-subtle);
+}
+
+@media (hover: hover) {
+  .account:hover {
+    --sb-fill: var(--prime-color-fill-subtle);
+  }
 }
 
 .account:active {
@@ -1072,9 +1134,14 @@
     -webkit-text-fill-color var(--sb-duration) var(--sb-ease);
 }
 
-.account:hover .accountName,
 .account[aria-expanded="true"] .accountName {
   color: var(--prime-color-text-primary);
+}
+
+@media (hover: hover) {
+  .account:hover .accountName {
+    color: var(--prime-color-text-primary);
+  }
 }
 
 .accountChevron {
@@ -1128,9 +1195,14 @@
     color var(--prime-motion-duration-fast) var(--sb-ease);
 }
 
-.root .headerToggle:hover,
 .root .headerToggle:focus-visible {
   color: var(--prime-color-text-primary);
+}
+
+@media (hover: hover) {
+  .root .headerToggle:hover {
+    color: var(--prime-color-text-primary);
+  }
 }
 
 .headerToggleIcon {
@@ -1147,8 +1219,10 @@
 }
 
 /* On the edge it stays quiet until the pointer is over the rail. */
-.root[data-mode="compact"]:not([data-off-canvas]):hover .headerToggle {
-  color: var(--prime-color-text-primary);
+@media (hover: hover) {
+  .root[data-mode="compact"]:not([data-off-canvas]):hover .headerToggle {
+    color: var(--prime-color-text-primary);
+  }
 }
 
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .headerToggleIcon {

@@ -6,20 +6,26 @@ import { layoutRect } from "./geometry";
 
 /**
  * WAAPI timing from the motion tokens (`--prime-motion-duration-<token>`,
- * `--prime-motion-easing-standard`), read at animation time so theme and app overrides apply;
+ * `--prime-motion-easing-<curve>`), read at animation time so theme and app overrides apply;
  * WAAPI cannot take `var()`.
  */
-export function motionTiming(duration: "fast" | "base"): KeyframeAnimationOptions {
+export function motionTiming(
+  duration: "fast" | "base",
+  curve: "standard" | "enter" = "standard",
+): KeyframeAnimationOptions {
   const easing = getComputedStyle(document.documentElement)
-    .getPropertyValue("--prime-motion-easing-standard")
+    .getPropertyValue(`--prime-motion-easing-${curve}`)
     .trim();
   return easing
     ? { duration: motionDurationMs(duration), easing }
     : { duration: motionDurationMs(duration) };
 }
 
+/** FLIP key of the gap: it glides between places like an item, so the landing spot never jumps. */
+const GAP_KEY = "\u0000gap";
+
 /**
- * Animates layout changes of list items from the position currently on screen. Hit testing still uses
+ * Animates layout changes of list items (`data-dnd-item`) and of the gap (`data-dnd-gap`) from the position currently on screen. Hit testing still uses
  * `layoutRect`, so visual easing never changes a drop decision.
  */
 export function useFlipList(
@@ -47,7 +53,7 @@ export function useFlipList(
     // during a drag) never reads as items moving.
     const box = container.getBoundingClientRect();
     for (const node of container.querySelectorAll<HTMLElement>(selector)) {
-      const id = node.dataset.dndItem;
+      const id = node.dataset.dndItem ?? (node.dataset.dndGap !== undefined ? GAP_KEY : undefined);
       if (id === undefined) continue;
       const rect = layoutRect(node);
       if (rect.width === 0 && rect.height === 0) continue;

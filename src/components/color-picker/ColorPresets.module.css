@@ -34,9 +34,14 @@
   transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.trigger:hover:not(:disabled)::after,
 .trigger[data-state="open"]::after {
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-strong);
+}
+
+@media (hover: hover) {
+  .trigger:hover:not(:disabled)::after {
+    box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-strong);
+  }
 }
 
 .trigger:active:not(:disabled) {

@@ -7,6 +7,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import palette from "@/internal/palette.module.css";
 import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
+import { touchTargetBlockClass } from "@/internal/touchTarget";
 
 import styles from "./Badge.module.css";
 import { markEdgeIcons } from "./edgeIcons";
@@ -188,7 +189,7 @@ function BadgeRoot({
       {onRemove ? (
         <button
           type="button"
-          className={styles.remove}
+          className={cx(styles.remove, touchTargetBlockClass)}
           aria-label={labels?.remove ?? BADGE_LABELS.remove}
           onClick={onRemove}
           disabled={disabled}
@@ -246,7 +247,7 @@ function BadgeAction({
     <button
       {...rest}
       type="button"
-      className={cx(styles.action, className)}
+      className={cx(styles.action, touchTargetBlockClass, className)}
       aria-label={label}
       title={label}
       aria-pressed={pressed}

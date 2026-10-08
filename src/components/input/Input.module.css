@@ -53,8 +53,8 @@
   outline: none;
   box-shadow: none;
   font: inherit;
-  font-size: var(--field-text);
-  line-height: var(--field-lh);
+  font-size: var(--field-input-text);
+  line-height: var(--field-input-lh);
   text-overflow: ellipsis;
 }
 
@@ -147,8 +147,8 @@
   padding-inline: var(--field-px);
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-muted);
-  font-size: var(--field-text);
-  line-height: var(--field-lh);
+  font-size: var(--field-input-text);
+  line-height: var(--field-input-lh);
   white-space: nowrap;
 }
 
@@ -164,8 +164,8 @@
 .inlineAffix {
   flex-shrink: 0;
   color: var(--prime-color-text-muted);
-  font-size: var(--field-text);
-  line-height: var(--field-lh);
+  font-size: var(--field-input-text);
+  line-height: var(--field-input-lh);
   white-space: nowrap;
 }
 
@@ -215,9 +215,11 @@
   height: calc(var(--field-icon) - var(--prime-space-1));
 }
 
-.action:hover {
-  background: var(--prime-color-fill-subtle);
-  color: var(--prime-color-text-primary);
+@media (hover: hover) {
+  .action:hover {
+    background: var(--prime-color-fill-subtle);
+    color: var(--prime-color-text-primary);
+  }
 }
 
 .action:active {

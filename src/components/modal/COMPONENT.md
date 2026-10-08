@@ -96,7 +96,7 @@ No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `layout` | `"fill" \| "end"` | `"fill" (s/m), "end" (l/xl)` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Narrower than 360 px — stacked. |
+| `layout` | `"fill" \| "end"` | `"fill" (s/m), "end" (l/xl)` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Narrower than 480 px — stacked. |
 
 ### Modal.Trigger · Modal.Close · Modal.Confirm
 No DOM: clone the single child and chain its `onClick` (unless the child's handler calls `preventDefault()`).
@@ -124,7 +124,7 @@ Below 640px of viewport every size becomes a full-width bottom sheet.
 | `fill` | Equal-width buttons in one row, gap 12 | Narrow dialogs with two actions | for `s`, `m` |
 | `end` | Auto-width buttons at the end, gap 8 | Wide dialogs | for `l`, `xl` |
 
-When the dialog itself is narrower than 360px, actions stack full width in DOM order (primary last).
+When the dialog itself is narrower than 480px, actions stack full width in DOM order (primary last).
 
 ### tone (Icon)
 | Value | Looks like | Use when | Default |

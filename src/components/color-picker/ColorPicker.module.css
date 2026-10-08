@@ -186,6 +186,13 @@
   outline: none;
 }
 
+/* Touch screens and narrow viewports: at least 16px, or iOS zooms into the focused channel. */
+@media (pointer: coarse), (max-width: 639px) {
+  .channelInput {
+    font-size: max(1em, var(--prime-control-touch-text-size));
+  }
+}
+
 .channelCellHex {
   padding-inline: var(--prime-control-s-field-padding-x);
 }

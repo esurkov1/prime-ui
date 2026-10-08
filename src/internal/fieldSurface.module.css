@@ -25,18 +25,20 @@
     box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.surface:hover:not(
-    :where(
-        :focus-visible,
-        :has(:is(input, textarea):focus-visible),
-        :disabled,
-        [data-disabled="true"],
-        :has(:is(input, textarea):disabled),
-        [data-readonly="true"],
-        :has(> input:read-only)
-      )
-  ) {
-  background: var(--prime-color-field-bg-hover);
+@media (hover: hover) {
+  .surface:hover:not(
+      :where(
+          :focus-visible,
+          :has(:is(input, textarea):focus-visible),
+          :disabled,
+          [data-disabled="true"],
+          :has(:is(input, textarea):disabled),
+          [data-readonly="true"],
+          :has(> input:read-only)
+        )
+    ) {
+    background: var(--prime-color-field-bg-hover);
+  }
 }
 
 .surface:is(:focus-visible, :has(:is(input, textarea):focus-visible)) {

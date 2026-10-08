@@ -253,14 +253,26 @@
 
 /* Highlighted look on the row under the pointer or with keyboard focus: `fill-subtle-active` pill,
  * accent title, accent dot (a `tone` keeps its dot). */
-.row:is(:hover, :focus-visible) {
+.row:focus-visible {
   --tl-title-color: var(--prime-color-accent-text);
 
   background: var(--prime-color-fill-subtle-active);
 }
 
-.row:is(:hover, :focus-visible):not([data-tone]) {
+.row:focus-visible:not([data-tone]) {
   --tl-dot-color: var(--prime-color-accent-default);
+}
+
+@media (hover: hover) {
+  .row:hover {
+    --tl-title-color: var(--prime-color-accent-text);
+
+    background: var(--prime-color-fill-subtle-active);
+  }
+
+  .row:hover:not([data-tone]) {
+    --tl-dot-color: var(--prime-color-accent-default);
+  }
 }
 
 .row[data-interactive="true"] {

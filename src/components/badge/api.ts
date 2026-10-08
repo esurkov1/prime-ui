@@ -106,8 +106,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Action",
-      en: "`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.",
-      ru: "Кнопка-сегмент в конце, появляется при наведении и фокусе; место зарезервировано, ширина не меняется. Одна на бейдж, не вместе с `onRemove`.",
+      en: "`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus, always shown on touch screens; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.",
+      ru: "Кнопка-сегмент в конце, появляется при наведении и фокусе, на сенсорных экранах видна всегда; место зарезервировано, ширина не меняется. Одна на бейдж, не вместе с `onRemove`.",
       props: [
         {
           name: "label",

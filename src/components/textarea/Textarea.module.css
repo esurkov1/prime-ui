@@ -4,9 +4,9 @@
  * Vertical padding = (control height − line height) / 2, so one line sits exactly like an Input.
  */
 .root {
-  --textarea-padding-y: calc((var(--field-h) - var(--field-lh)) / 2);
+  --textarea-padding-y: calc((var(--field-h) - var(--field-input-lh)) / 2);
   /* Minimum content height: three lines. */
-  --textarea-inner-min-height: calc(var(--field-lh) * 3);
+  --textarea-inner-min-height: calc(var(--field-input-lh) * 3);
   width: 100%;
 }
 
@@ -43,9 +43,9 @@
   padding: 0;
   border: 0;
   font-family: inherit;
-  font-size: var(--field-text);
+  font-size: var(--field-input-text);
   font-weight: inherit;
-  line-height: var(--field-lh);
+  line-height: var(--field-input-lh);
   letter-spacing: inherit;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -68,8 +68,8 @@
   box-shadow: none;
   resize: vertical;
   font: inherit;
-  font-size: var(--field-text);
-  line-height: var(--field-lh);
+  font-size: var(--field-input-text);
+  line-height: var(--field-input-lh);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }

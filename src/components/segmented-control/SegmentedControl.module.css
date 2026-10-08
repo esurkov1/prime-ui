@@ -239,8 +239,10 @@
 }
 
 /* Hover is a text step only: the sliding thumb is the only fill, so nothing fights its motion. */
-.item[aria-checked="false"]:not([data-disabled="true"]):hover {
-  color: var(--prime-color-text-primary);
+@media (hover: hover) {
+  .item[aria-checked="false"]:not([data-disabled="true"]):hover {
+    color: var(--prime-color-text-primary);
+  }
 }
 
 .item[aria-checked="true"] {

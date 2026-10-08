@@ -27,9 +27,9 @@
   border: 0;
   border-radius: var(--field-radius);
   font-family: var(--prime-font-family-sans);
-  font-size: var(--field-text);
+  font-size: var(--field-input-text);
   font-weight: var(--prime-font-weight-regular);
-  line-height: var(--field-lh);
+  line-height: var(--field-input-lh);
   cursor: pointer;
   outline: none;
   appearance: none;

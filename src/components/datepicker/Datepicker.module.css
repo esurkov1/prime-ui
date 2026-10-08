@@ -305,12 +305,14 @@
     color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
 }
 
-.day:hover:not(:disabled):not([data-edge="true"]) {
-  background: var(--prime-color-fill-subtle);
-}
+@media (hover: hover) {
+  .day:hover:not(:disabled):not([data-edge="true"]) {
+    background: var(--prime-color-fill-subtle);
+  }
 
-.cell[data-band] .day:hover:not(:disabled):not([data-edge="true"]) {
-  background: var(--prime-color-accent-soft-hover);
+  .cell[data-band] .day:hover:not(:disabled):not([data-edge="true"]) {
+    background: var(--prime-color-accent-soft-hover);
+  }
 }
 
 .day:active:not(:disabled):not([data-edge="true"]) {
@@ -347,8 +349,10 @@
   font-weight: var(--prime-font-weight-medium);
 }
 
-.day[data-edge="true"]:hover {
-  background: var(--prime-color-accent-hover);
+@media (hover: hover) {
+  .day[data-edge="true"]:hover {
+    background: var(--prime-color-accent-hover);
+  }
 }
 
 /* Days of the neighbouring months: context only, not interactive. */
@@ -439,6 +443,15 @@
   font-variant-numeric: tabular-nums;
   text-align: center;
   outline: none;
+}
+
+/* Touch screens and narrow viewports: at least 16px, or iOS zooms into the focused time; the
+   field widens to keep `00:00` whole. */
+@media (pointer: coarse), (max-width: 639px) {
+  .fieldTime {
+    width: max(calc(var(--dp-field-h) * 1.75), calc(5ch + 2 * var(--prime-space-2)));
+    font-size: max(1em, var(--prime-control-touch-text-size));
+  }
 }
 
 .field:has(.fieldTime:focus-visible) {

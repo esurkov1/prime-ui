@@ -194,6 +194,8 @@
   --prime-control-s-radius: var(--prime-ref-radius-8);
   --prime-control-s-text-size: var(--prime-ref-font-size-13);
   --prime-control-s-track: 0.3125rem;
+  --prime-control-touch-target: 2.75rem;
+  --prime-control-touch-text-size: var(--prime-ref-font-size-16);
   --prime-control-xl-choice: var(--prime-ref-icon-24);
   --prime-control-xl-field-padding-x: var(--prime-ref-space-4);
   --prime-control-xl-gap: var(--prime-ref-space-3);

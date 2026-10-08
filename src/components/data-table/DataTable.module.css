@@ -319,8 +319,10 @@
   justify-content: center;
 }
 
-.sortButton:hover {
-  color: var(--prime-color-text-primary);
+@media (hover: hover) {
+  .sortButton:hover {
+    color: var(--prime-color-text-primary);
+  }
 }
 
 /*
@@ -344,9 +346,14 @@
   transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.sortButton:hover .sortIcon,
 .sortButton:focus-visible .sortIcon {
   color: var(--prime-color-text-muted);
+}
+
+@media (hover: hover) {
+  .sortButton:hover .sortIcon {
+    color: var(--prime-color-text-muted);
+  }
 }
 
 .headCell[data-sorted="true"] .sortIcon {
@@ -469,8 +476,10 @@
   --dt-cell-bg: var(--dt-step);
 }
 
-.root[data-highlight-row="true"] .row:hover {
-  --dt-wash: var(--prime-color-fill-subtle);
+@media (hover: hover) {
+  .root[data-highlight-row="true"] .row:hover {
+    --dt-wash: var(--prime-color-fill-subtle);
+  }
 }
 
 .root[data-highlight-column="true"] .cell[data-column-hovered="true"],
@@ -550,8 +559,10 @@
   --dt-wash: transparent;
 }
 
-.root[data-highlight-row="true"] .row[aria-selected="true"]:hover {
-  --dt-cell-bg: var(--prime-color-accent-soft-hover);
+@media (hover: hover) {
+  .root[data-highlight-row="true"] .row[aria-selected="true"]:hover {
+    --dt-cell-bg: var(--prime-color-accent-soft-hover);
+  }
 }
 
 .row[data-clickable="true"] {

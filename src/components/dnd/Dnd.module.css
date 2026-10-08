@@ -88,11 +88,9 @@
   outline-offset: var(--prime-focus-offset);
 }
 
-/* The hole the lifted item leaves, standing where it will land; it fades in on the spot
-   (`enterMotion.enterBase` without a shift). */
+/* The hole the lifted item leaves, standing where it will land. It fades in on the spot and then
+   glides from place to place with the items (FLIP in `useFlipList`). */
 .placeholder {
-  --enter-shift: 0;
-
   flex: none;
   box-sizing: border-box;
   width: var(--dnd-gap-width, 100%);

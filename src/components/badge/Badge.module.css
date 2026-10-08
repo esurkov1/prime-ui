@@ -206,6 +206,9 @@
   padding: 0;
   margin: 0;
   border: 0;
+  /* Both sit at the end edge: the wash takes the chip's end corners itself. */
+  border-start-end-radius: inherit;
+  border-end-end-radius: inherit;
   background: transparent;
   color: color-mix(in srgb, currentColor 72%, transparent);
   font: inherit;
@@ -225,10 +228,19 @@
   align-self: stretch;
 }
 
-.remove:hover:not(:disabled),
-.action:hover:not(:disabled) {
-  background: var(--prime-color-fill-subtle-active);
-  color: inherit;
+/* Coarse pointers: the segments' touch hit area reaches past the chip, so the chip does not clip. */
+@media (pointer: coarse) {
+  .root:has(> .remove, > .action) {
+    overflow: visible;
+  }
+}
+
+@media (hover: hover) {
+  .remove:hover:not(:disabled),
+  .action:hover:not(:disabled) {
+    background: var(--prime-color-fill-subtle-active);
+    color: inherit;
+  }
 }
 
 .remove:focus-visible,
@@ -273,8 +285,13 @@
   transition: padding var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.root[data-pressable="true"]:hover:not([data-disabled="true"]) {
-  background-image: linear-gradient(var(--prime-color-fill-subtle), var(--prime-color-fill-subtle));
+@media (hover: hover) {
+  .root[data-pressable="true"]:hover:not([data-disabled="true"]) {
+    background-image: linear-gradient(
+      var(--prime-color-fill-subtle),
+      var(--prime-color-fill-subtle)
+    );
+  }
 }
 
 .root[data-pressable="true"] > .body:focus-visible {
@@ -299,10 +316,16 @@
 }
 
 .root[data-action="persistent"],
-.root[data-action="reveal"]:hover,
 .root[data-action="reveal"]:focus-within {
   --badge-pad-start: var(--chip-px);
   --badge-pad-end: var(--badge-action-room);
+}
+
+@media (hover: hover) {
+  .root[data-action="reveal"]:hover {
+    --badge-pad-start: var(--chip-px);
+    --badge-pad-end: var(--badge-action-room);
+  }
 }
 
 /* With a leading icon segment the start has no padding of its own: the room moves by
@@ -313,10 +336,16 @@
 }
 
 .root[data-action="persistent"][data-icon-start="true"],
-.root[data-action="reveal"][data-icon-start="true"]:hover,
 .root[data-action="reveal"][data-icon-start="true"]:focus-within {
   --badge-pad-start: 0px;
   --badge-pad-end: var(--badge-action-room);
+}
+
+@media (hover: hover) {
+  .root[data-action="reveal"][data-icon-start="true"]:hover {
+    --badge-pad-start: 0px;
+    --badge-pad-end: var(--badge-action-room);
+  }
 }
 
 .action {
@@ -329,9 +358,34 @@
 }
 
 .root[data-action="persistent"] .action,
-.root[data-action="reveal"]:hover .action,
 .root[data-action="reveal"]:focus-within .action {
   opacity: 1;
   pointer-events: auto;
   transform: none;
+}
+
+@media (hover: hover) {
+  .root[data-action="reveal"]:hover .action {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+}
+
+/* Without hover nothing reveals the segment, so `reveal` shows it like `persistent`. */
+@media (hover: none) {
+  .root[data-action="reveal"] {
+    --badge-pad-start: var(--chip-px);
+    --badge-pad-end: var(--badge-action-room);
+  }
+
+  .root[data-action="reveal"][data-icon-start="true"] {
+    --badge-pad-start: 0px;
+  }
+
+  .root[data-action="reveal"] .action {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
 }

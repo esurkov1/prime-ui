@@ -167,8 +167,10 @@
   padding: var(--prime-space-1);
 }
 
-.root[data-orientation="horizontal"] .step:hover:not(:disabled) {
-  color: var(--prime-color-text-primary);
+@media (hover: hover) {
+  .root[data-orientation="horizontal"] .step:hover:not(:disabled) {
+    color: var(--prime-color-text-primary);
+  }
 }
 
 .root[data-orientation="vertical"] .step {
@@ -184,8 +186,10 @@
   transform: scale(var(--prime-motion-press-scale));
 }
 
-.root[data-orientation="vertical"] .step:hover:not(:disabled) {
-  background: var(--prime-color-fill-subtle);
+@media (hover: hover) {
+  .root[data-orientation="vertical"] .step:hover:not(:disabled) {
+    background: var(--prime-color-fill-subtle);
+  }
 }
 
 .root[data-orientation="vertical"] .step:active:not(:disabled) {

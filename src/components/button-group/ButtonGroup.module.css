@@ -67,9 +67,11 @@
   padding-inline: 0;
 }
 
-.item:hover:not(:disabled) {
-  background: var(--prime-color-fill-muted-hover);
-  color: var(--prime-color-text-primary);
+@media (hover: hover) {
+  .item:hover:not(:disabled) {
+    background: var(--prime-color-fill-muted-hover);
+    color: var(--prime-color-text-primary);
+  }
 }
 
 /* Press (foundation §7 rule 6): compact for icon-only segments; disabled never scales. */
@@ -93,9 +95,11 @@
   color: var(--prime-color-accent-text);
 }
 
-.item[data-state="active"]:hover:not(:disabled) {
-  background: var(--prime-color-accent-soft-hover);
-  color: var(--prime-color-accent-text);
+@media (hover: hover) {
+  .item[data-state="active"]:hover:not(:disabled) {
+    background: var(--prime-color-accent-soft-hover);
+    color: var(--prime-color-accent-text);
+  }
 }
 
 .item:disabled {

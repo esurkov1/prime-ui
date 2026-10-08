@@ -88,10 +88,16 @@
   color: var(--prime-color-text-muted);
 }
 
-.item > a.link:hover,
 .item > a.link:focus-visible {
   color: var(--prime-color-text-primary);
   text-decoration-color: transparent;
+}
+
+@media (hover: hover) {
+  .item > a.link:hover {
+    color: var(--prime-color-text-primary);
+    text-decoration-color: transparent;
+  }
 }
 
 .current {

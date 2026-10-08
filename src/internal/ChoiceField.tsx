@@ -6,6 +6,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { FieldIds } from "@/internal/FieldFrame";
 import type { ControlSize, DataState } from "@/internal/states";
+import { touchTargetClass } from "@/internal/touchTarget";
 
 import styles from "./ChoiceField.module.css";
 
@@ -69,7 +70,7 @@ export function ChoiceField({
         })}
       >
         <label htmlFor={ids.controlId} className={styles.row}>
-          <span className={styles.controlCell}>{control}</span>
+          <span className={cx(styles.controlCell, touchTargetClass)}>{control}</span>
           {children}
         </label>
         {ids.showError ? (

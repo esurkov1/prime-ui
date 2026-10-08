@@ -212,7 +212,8 @@ describe("Timeline", () => {
 
   it("CSS highlights only the row under the pointer or with keyboard focus", () => {
     const css = readFileSync(join(__dirname, "Timeline.module.css"), "utf8");
-    expect(css).toMatch(/^\.row:is\(:hover, :focus-visible\) \{/m);
+    expect(css).toMatch(/^\.row:focus-visible \{/m);
+    expect(css).toMatch(/^@media \(hover: hover\) \{\s*\.row:hover \{/m);
     expect(css).not.toMatch(/data-state|data-highlight/);
   });
 

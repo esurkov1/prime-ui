@@ -329,8 +329,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.ItemAction",
-      en: "`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row while the trail (count, hint) steps aside; hidden on the compact rail.",
-      ru: "Действие в строке (создать, добавить): призрачная кнопка-иконка `Button` на ярус меньше с подсказкой, рядом с элементом пункта — не внутри. Появляется при наведении и фокусе строки, счётчик отодвигается; в компактном рельсе скрыто.",
+      en: "`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row, always on touch screens, while the trail (count, hint) steps aside; hidden on the compact rail.",
+      ru: "Действие в строке (создать, добавить): призрачная кнопка-иконка `Button` на ярус меньше с подсказкой, рядом с элементом пункта — не внутри. Появляется при наведении и фокусе строки, на сенсорных экранах видно всегда, счётчик отодвигается; в компактном рельсе скрыто.",
       props: [
         {
           name: "label",

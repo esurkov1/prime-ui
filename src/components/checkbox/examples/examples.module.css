@@ -57,8 +57,10 @@
     var(--prime-motion-easing-standard);
 }
 
-.option:hover {
-  background: var(--prime-color-fill-subtle);
+@media (hover: hover) {
+  .option:hover {
+    background: var(--prime-color-fill-subtle);
+  }
 }
 
 .option:focus-visible {

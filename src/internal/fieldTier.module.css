@@ -5,6 +5,7 @@
  *   --field-px      field padding-x           --field-radius  corner radius
  *   --field-gap     tier gap (value ↔ unit)   --field-text    text size
  *   --field-lh      line height               --field-button-px  button / segment padding-x
+ *   --field-input-text / --field-input-lh   text of an editable value (input, textarea, select)
  * A CSS module class (not generated CSS): hosts take it with `fieldTierClass` in TSX (never a
  * cross-file `composes`, which the bundler cannot order), so it ships with the components.
  */
@@ -17,6 +18,21 @@
   --field-text: var(--prime-control-m-text-size);
   --field-lh: var(--prime-control-m-line-height);
   --field-button-px: var(--prime-control-m-padding-x);
+  /* Resolved on the same element as the tier rows below, so it follows the tier. */
+  --field-input-text: var(--field-text);
+  --field-input-lh: var(--field-lh);
+}
+
+/*
+ * Touch screens and narrow viewports: iOS zooms the page into any focused field whose text is
+ * under 16px. The editable value takes at least the touch text size (16px) and the `m` line
+ * height; the control height stays the tier height.
+ */
+@media (pointer: coarse), (max-width: 639px) {
+  .tier {
+    --field-input-text: max(var(--field-text), var(--prime-control-touch-text-size));
+    --field-input-lh: max(var(--field-lh), var(--prime-control-m-line-height));
+  }
 }
 
 .tier[data-size="xs"] {

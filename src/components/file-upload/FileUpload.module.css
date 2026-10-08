@@ -99,9 +99,11 @@
   --fu-line-hover: var(--prime-color-accent-default);
 }
 
-.root:hover:not([data-disabled="true"]) {
-  border-color: var(--fu-line-hover);
-  background: var(--prime-color-field-bg-hover);
+@media (hover: hover) {
+  .root:hover:not([data-disabled="true"]) {
+    border-color: var(--fu-line-hover);
+    background: var(--prime-color-field-bg-hover);
+  }
 }
 
 /* Drag-over beats hover (equal specificity, later). */

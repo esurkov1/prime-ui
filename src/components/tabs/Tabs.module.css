@@ -355,10 +355,12 @@
   transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.root[data-orientation="horizontal"]
-  .item:hover:not([data-disabled="true"], [data-state="active"])::before {
-  opacity: 1;
-  transition-duration: var(--prime-motion-duration-xfast);
+@media (hover: hover) {
+  .root[data-orientation="horizontal"]
+    .item:hover:not([data-disabled="true"], [data-state="active"])::before {
+    opacity: 1;
+    transition-duration: var(--prime-motion-duration-xfast);
+  }
 }
 
 /* The focus ring sits above the folder, in the same shape. */
@@ -375,12 +377,15 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-.item:hover:not([data-disabled="true"]) .tab {
-  color: var(--prime-color-text-primary);
-}
+@media (hover: hover) {
+  .item:hover:not([data-disabled="true"]) .tab {
+    color: var(--prime-color-text-primary);
+  }
 
-.root[data-orientation="vertical"] .tab:hover:not([data-disabled="true"], [aria-selected="true"]) {
-  background: var(--prime-color-fill-subtle);
+  .root[data-orientation="vertical"]
+    .tab:hover:not([data-disabled="true"], [aria-selected="true"]) {
+    background: var(--prime-color-fill-subtle);
+  }
 }
 
 .tab[aria-selected="true"] {
@@ -418,8 +423,14 @@
 }
 
 /* Shown on the active tab, on hover and while the tab has focus — always on touch screens. */
-.item:is([data-state="active"], :hover, :focus-within) .remove {
+.item:is([data-state="active"], :focus-within) .remove {
   opacity: 1;
+}
+
+@media (hover: hover) {
+  .item:hover .remove {
+    opacity: 1;
+  }
 }
 
 @media (hover: none) {
@@ -448,9 +459,14 @@
   height: 100%;
 }
 
-.item:hover:not([data-disabled="true"]) .icon,
 .tab[aria-selected="true"] .icon {
   color: inherit;
+}
+
+@media (hover: hover) {
+  .item:hover:not([data-disabled="true"]) .icon {
+    color: inherit;
+  }
 }
 
 .tab[aria-selected="true"] .icon:first-child {

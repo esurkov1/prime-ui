@@ -66,9 +66,11 @@ button.root {
   --prime-icon-size: var(--prime-control-xl-icon);
 }
 
-.root:hover:not([data-disabled="true"]) {
-  color: var(--link-fg-hover);
-  text-decoration-color: currentColor;
+@media (hover: hover) {
+  .root:hover:not([data-disabled="true"]) {
+    color: var(--link-fg-hover);
+    text-decoration-color: currentColor;
+  }
 }
 
 .root:focus-visible {

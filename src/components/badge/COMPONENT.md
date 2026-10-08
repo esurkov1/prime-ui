@@ -30,7 +30,7 @@ Badge.Root          <span>: fill, tier dimensions
 ├─ [start segment]  Badge.Icon or Badge.Dot at the start edge: full height, mark centred
 ├─ body             text, Badge.Dot, inline Badge.Icon
 │                   (a <button> with onPress; a <span> with a trailing segment; none when read-only)
-├─ Badge.Action     optional end segment revealed on hover / focus
+├─ Badge.Action     optional end segment revealed on hover / focus (always shown on touch screens)
 └─ remove segment   with onRemove: full height, the whole end is the hit area (Icon action.close)
 ```
 
@@ -70,7 +70,7 @@ Badge.Root          <span>: fill, tier dimensions
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ### Badge.Action
-`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.
+`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus, always shown on touch screens; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

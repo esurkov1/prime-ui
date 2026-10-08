@@ -178,7 +178,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Sidebar.ItemAction
-`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row while the trail (count, hint) steps aside; hidden on the compact rail.
+`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row, always on touch screens, while the trail (count, hint) steps aside; hidden on the compact rail.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -314,7 +314,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 - Collapsible group: heading 28 high with the chevron (14) at its end, aligned with the item trail; items start 4 below. A folded group's attention dot sits before the chevron.
 - On the rail a heading keeps its 28 and its layout: the text slides 8 toward the edge, scales to 0.85 and is cut at the rail box with a 12 fade into the canvas. A folded group adds one `…` row under its heading.
 - Sub-list: a 1px `border-default` guide line on the parent icon's centre; every child branches off it with an 8 elbow and a 6 bend; child labels line up with the parent label.
-- Trail (count, key hint, trailing icon) sits at the row end; a row action (one tier down) appears there on hover / focus and the trail moves aside.
+- Trail (count, key hint, trailing icon) sits at the row end; a row action (one tier down) appears there on hover / focus (always on touch screens) and the trail moves aside.
 - Footer: items 4 apart; the account is set 8 apart below them. It is its own card-like row: the
   avatar of the tier (xs 20, s 24, m·l 32, xl 40) sits in an even frame — the inset before it, the
   gap to the text and the air above and below are one value, the tier gap (xs 4, s·m·l 8, xl 12),

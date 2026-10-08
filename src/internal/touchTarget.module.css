@@ -1,0 +1,25 @@
+/*
+ * Touch hit area (WCAG 2.5.5): on a coarse pointer an invisible ::after grows the hit area of a
+ * control smaller than `--prime-control-touch-target` (44px) to that size, centred on it; the
+ * visual size stays the tier's. A larger control keeps its own box.
+ *   .target       grows both axes (a standalone control)
+ *   .targetBlock  grows the height only (a segment beside other content of the same host)
+ * The host keeps ::after free and does not clip its overflow. Any position other than static makes
+ * it the containing block; the default `relative` has zero specificity, so a host's own wins.
+ */
+@media (pointer: coarse) {
+  :where(.target, .targetBlock) {
+    position: relative;
+  }
+
+  .target::after,
+  .targetBlock::after {
+    content: "";
+    position: absolute;
+    inset: min(0px, calc((100% - var(--prime-control-touch-target)) / 2));
+  }
+
+  .targetBlock::after {
+    inset-inline: 0;
+  }
+}

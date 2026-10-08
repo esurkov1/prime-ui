@@ -2,9 +2,9 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { prefersReducedMotion } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
-import enterMotion from "@/internal/enterMotion.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { DragControllerContext, useDragController } from "./context";
@@ -16,6 +16,7 @@ import { type DndLabels, defaultDndLabels } from "./labels";
 import { useStoreSelector } from "./store";
 import { useDragSource } from "./useDragSource";
 import { useDropTarget } from "./useDropTarget";
+import { motionTiming } from "./useFlipList";
 import { type ReorderReturn, useSortableList } from "./useSortableList";
 
 export type { DragItem, DragOutcome } from "./dragSession";
@@ -288,11 +289,22 @@ function DndPlaceholder({
   height: number;
   radius: string | null;
 }) {
+  const faded = React.useRef(false);
+  // Fades in once per gap. Not `enterMotion`: React re-inserts the gap's node as it moves through the
+  // list, which restarts a CSS animation, and it may re-attach the ref, so the flag (not the node)
+  // decides; a WAAPI animation keeps running through the move.
+  const ref = React.useCallback((node: HTMLElement | null) => {
+    if (!node || faded.current) return;
+    faded.current = true;
+    if (prefersReducedMotion() || typeof node.animate !== "function") return;
+    node.animate([{ opacity: 0 }, { opacity: 1 }], motionTiming("base", "enter"));
+  }, []);
   return (
     <Tag
+      ref={ref}
       aria-hidden="true"
       data-dnd-gap=""
-      className={cx(styles.placeholder, enterMotion.enterBase)}
+      className={styles.placeholder}
       style={
         {
           "--dnd-gap-width": `${width}px`,

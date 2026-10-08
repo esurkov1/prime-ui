@@ -3,10 +3,14 @@
  * `.tier` carries the row metrics of the host's `data-size`; `.menu` is the dropdown-level
  * floating panel on top of the shared surface (`floatingSurface.module.css`).
  * Rows radius 8 = panel radius 12 − panel padding 4.
+ * `--menu-item-h` (row, search row, status row) is the tier row height `--menu-tier-item-h`; on a
+ * coarse pointer it is at least the touch target (WCAG 2.5.5).
  */
 
 .tier {
-  --menu-item-h: var(--prime-control-m-item-height);
+  /* Resolved on the same element as the tier rows below, so it follows the tier. */
+  --menu-item-h: var(--menu-tier-item-h);
+  --menu-tier-item-h: var(--prime-control-m-item-height);
   --menu-text: var(--prime-control-m-text-size);
   --menu-lh: var(--prime-control-m-line-height);
   --menu-icon: var(--prime-control-m-icon);
@@ -16,7 +20,7 @@
 }
 
 .tier[data-size="xs"] {
-  --menu-item-h: var(--prime-control-xs-item-height);
+  --menu-tier-item-h: var(--prime-control-xs-item-height);
   --menu-text: var(--prime-control-xs-text-size);
   --menu-lh: var(--prime-control-xs-line-height);
   --menu-icon: var(--prime-control-xs-icon);
@@ -26,7 +30,7 @@
 }
 
 .tier[data-size="s"] {
-  --menu-item-h: var(--prime-control-s-item-height);
+  --menu-tier-item-h: var(--prime-control-s-item-height);
   --menu-text: var(--prime-control-s-text-size);
   --menu-lh: var(--prime-control-s-line-height);
   --menu-icon: var(--prime-control-s-icon);
@@ -36,7 +40,7 @@
 }
 
 .tier[data-size="l"] {
-  --menu-item-h: var(--prime-control-l-item-height);
+  --menu-tier-item-h: var(--prime-control-l-item-height);
   --menu-text: var(--prime-control-l-text-size);
   --menu-lh: var(--prime-control-l-line-height);
   --menu-icon: var(--prime-control-l-icon);
@@ -44,11 +48,17 @@
 }
 
 .tier[data-size="xl"] {
-  --menu-item-h: var(--prime-control-xl-item-height);
+  --menu-tier-item-h: var(--prime-control-xl-item-height);
   --menu-text: var(--prime-control-xl-text-size);
   --menu-lh: var(--prime-control-xl-line-height);
   --menu-icon: var(--prime-control-xl-icon);
   --menu-gap: var(--prime-control-xl-gap);
+}
+
+@media (pointer: coarse) {
+  .tier {
+    --menu-item-h: max(var(--menu-tier-item-h), var(--prime-control-touch-target));
+  }
 }
 
 /* Dropdown-level floating panel: panel padding, capped by the design height and the room. */
@@ -202,6 +212,13 @@
   font: inherit;
   outline: none;
   appearance: none;
+}
+
+/* Touch screens and narrow viewports: at least 16px, or iOS zooms into the focused search. */
+@media (pointer: coarse), (max-width: 639px) {
+  .searchInput {
+    font-size: max(1em, var(--prime-control-touch-text-size));
+  }
 }
 
 .searchInput::-webkit-search-cancel-button {

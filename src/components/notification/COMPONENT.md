@@ -136,7 +136,7 @@ The card is always a raised surface without a border; only the icon, the badge a
 Collapsed stacks show up to 3 cards peeking behind each other. Hover or keyboard focus expands the stack. Toasts enter from their edge and leave toward it, faster than they came; a swipe toward the edge dismisses (past `--prime-space-12` or a quick flick). Under `prefers-reduced-motion` toasts are removed without an exit animation.
 
 ## Layout & spacing
-- A fixed, portaled viewport; zones are `--prime-space-5` from the edge (`--prime-space-3` below 640px), at most 24rem wide.
+- A fixed, portaled viewport; zones are `--prime-space-5` from the edge (`--prime-space-3` below 640px) plus the safe-area insets (`env(safe-area-inset-*)`), at most 24rem wide.
 - Cards in an expanded stack are `--prime-space-2` apart.
 - The viewport takes pointer events only over the cards.
 

@@ -114,11 +114,13 @@
   --btn-fg: var(--prime-color-text-secondary);
 }
 
-.root[data-tone="neutral"][data-variant="ghost"]:hover:not(
-    [data-disabled="true"],
-    [data-loading="true"]
-  ) {
-  --btn-fg: var(--prime-color-text-primary);
+@media (hover: hover) {
+  .root[data-tone="neutral"][data-variant="ghost"]:hover:not(
+      [data-disabled="true"],
+      [data-loading="true"]
+    ) {
+    --btn-fg: var(--prime-color-text-primary);
+  }
 }
 
 /* danger */
@@ -170,8 +172,10 @@
 /* ─── Interaction ───────────────────────────────────────────────────────── */
 
 /* Disabled and loading take no hover or press (`data-disabled` marks `disabled` only). */
-.root:hover:not([data-disabled="true"], [data-loading="true"]) {
-  background-color: var(--btn-bg-hover);
+@media (hover: hover) {
+  .root:hover:not([data-disabled="true"], [data-loading="true"]) {
+    background-color: var(--btn-bg-hover);
+  }
 }
 
 .root:active:not([data-disabled="true"], [data-loading="true"]) {

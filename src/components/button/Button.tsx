@@ -6,6 +6,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconLayout } from "@/internal/iconLayout";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
+import { touchTargetClass } from "@/internal/touchTarget";
 
 import { Spinner } from "../spinner/Spinner";
 import styles from "./Button.module.css";
@@ -75,7 +76,7 @@ function ButtonRoot({
     "loading-overlay":
       (loading && !asChild && !layout.leadingIcon && !layout.iconOnly) || undefined,
   });
-  const classes = cx(fieldTierClass, styles.root, className);
+  const classes = cx(fieldTierClass, touchTargetClass, styles.root, className);
 
   if (asChild) {
     return (

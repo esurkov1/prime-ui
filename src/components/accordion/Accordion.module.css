@@ -133,8 +133,10 @@
   transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.trigger:hover:not(:disabled) {
-  background: var(--prime-color-fill-subtle);
+@media (hover: hover) {
+  .trigger:hover:not(:disabled) {
+    background: var(--prime-color-fill-subtle);
+  }
 }
 
 .trigger:active:not(:disabled) {
@@ -180,9 +182,14 @@
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.trigger:hover:not(:disabled) .chevron,
 .trigger[data-state="open"] .chevron {
   color: var(--prime-color-text-secondary);
+}
+
+@media (hover: hover) {
+  .trigger:hover:not(:disabled) .chevron {
+    color: var(--prime-color-text-secondary);
+  }
 }
 
 .trigger[data-state="open"] .chevron {

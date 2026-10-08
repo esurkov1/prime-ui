@@ -60,6 +60,8 @@ export type SortableListHandle = {
 };
 
 const ITEM_SELECTOR = "[data-dnd-item]";
+/** What glides on a layout change: the items and the gap between them. */
+const FLIP_SELECTOR = "[data-dnd-item], [data-dnd-gap]";
 
 // How long the drawn order may run ahead of `items` (reached only when a reorder is silently refused).
 const OPTIMISTIC_TIMEOUT_MS = 2000;
@@ -232,7 +234,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
   useFlipList(
     target.element,
     JSON.stringify([order, dragged?.id ?? null, gapKey]),
-    ITEM_SELECTOR,
+    FLIP_SELECTOR,
     // Only while the item is in the air: after the drop the list already stands in its final order.
     dragged !== null,
   );

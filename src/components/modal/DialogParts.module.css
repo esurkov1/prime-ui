@@ -228,8 +228,8 @@
   gap: var(--prime-space-2);
 }
 
-/* Dialog narrower than 360px: one action per row, full width, DOM order (primary last). */
-@container prime-dialog (max-width: 359px) {
+/* Dialog narrower than 480px: one action per row, full width, DOM order (primary last). */
+@container prime-dialog (max-width: 479px) {
   .footer[data-layout] {
     display: flex;
     flex-direction: column;

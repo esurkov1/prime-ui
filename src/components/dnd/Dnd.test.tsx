@@ -586,10 +586,47 @@ describe("no jump when a drag starts", () => {
       pressOn(screen.getByTestId("row-a"), 10, 55);
       moveTo(10, 56 + 8);
       expect(screen.getByTestId("row-a")).toHaveAttribute("data-lifted");
-      expect(animate).not.toHaveBeenCalled();
+      // Only the gap's fade-in runs; nothing moves.
+      const calls = animate.mock.calls as unknown as Array<[Array<{ transform?: string }>]>;
+      expect(calls.filter(([frames]) => frames.some((frame) => frame.transform))).toEqual([]);
       await act(async () => {
         releaseAt(10, 64);
       });
+    } finally {
+      vi.unstubAllGlobals();
+      Reflect.deleteProperty(HTMLElement.prototype, "animate");
+    }
+  });
+});
+
+describe("gap motion", () => {
+  it("fades the gap in once and glides it to its next place", () => {
+    const animate = vi.fn(function (this: HTMLElement) {
+      return { cancel: () => {}, addEventListener: () => {} };
+    });
+    Object.defineProperty(HTMLElement.prototype, "animate", { configurable: true, value: animate });
+    vi.stubGlobal("matchMedia", () => ({
+      matches: false,
+      addEventListener() {},
+      removeEventListener() {},
+    }));
+    try {
+      render(<Sortable initial={rows("a", "b", "c")} />);
+      pressOn(screen.getByTestId("row-a"), 10, 5);
+      moveTo(10, 15);
+      const gap = document.querySelector<HTMLElement>("[data-dnd-gap]");
+      const on = (node: Element | null) =>
+        (animate.mock.contexts as unknown as Element[]).filter((context) => context === node);
+      expect(on(gap)).toHaveLength(1);
+      animate.mockClear();
+      // Past b: the gap moves one row down and glides there from its old place.
+      moveTo(10, 35);
+      expect(document.querySelector("[data-dnd-gap]")).toBe(gap);
+      const calls = animate.mock.calls as unknown as Array<[Array<{ transform?: string }>]>;
+      const glide = calls.find((_, index) => animate.mock.contexts[index] === gap);
+      expect(glide?.[0][0]?.transform).toBe("translate(0px, -20px)");
+      expect(glide?.[0][1]?.transform).toBe("none");
+      releaseAt(10, 35);
     } finally {
       vi.unstubAllGlobals();
       Reflect.deleteProperty(HTMLElement.prototype, "animate");
