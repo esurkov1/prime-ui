@@ -1,8 +1,17 @@
+import { Megaphone } from "lucide-react";
 import { api } from "@/components/banner/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "feedback",
+  nav: {
+    segment: "banner",
+    label: "Banner",
+    summary: "Баннер: сообщение на всю ширину",
+    keywords: ["баннер", "сообщение", "alert", "tone"],
+    icon: Megaphone,
+    order: 1,
+  },
   dir: "banner",
   title: "Banner",
   kind: "primitive",
@@ -57,7 +66,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function BannerSection() {
-  return <ComponentPage page={page} />;
-}

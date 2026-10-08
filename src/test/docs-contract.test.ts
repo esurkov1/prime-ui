@@ -51,43 +51,16 @@ function walk(relDir: string, ext: RegExp): string[] {
 const pascal = (kebab: string) =>
   kebab.replace(/(^|-)(\w)/g, (_, __: string, char: string) => char.toUpperCase());
 
-/** Category of each component dir, derived from CATEGORY_PAGES: page → page module → its dir. */
-function categoriesByDir() {
-  const pages = read("playground/playgroundPages.tsx");
-  const labels = new Map(
-    [...pages.matchAll(/\{ id: "([\w-]+)", label: "([^"]+)" \}/g)].map((m) => [m[1], m[2]]),
-  );
-  const imports = new Map(
-    [...pages.matchAll(/^import (\w+) from "\.\/([^"]+)";$/gm)].map((m) => [m[1], m[2]]),
-  );
-  const start = pages.indexOf("const CATEGORY_PAGES");
-  const block = pages.slice(start, pages.indexOf("\n};\n", start));
-  const byDir = new Map<string, { id: string; label: string }>();
-  let category = "";
-  for (const line of block.split("\n")) {
-    const key = line.match(/^ {2}"?([\w-]+)"?: \[/);
-    if (key) category = key[1];
-    const page = line.match(/Page: (\w+),/);
-    if (!page) continue;
-    const moduleRel = imports.get(page[1]);
-    if (!moduleRel) continue;
-    const files = [`playground/${moduleRel}.tsx`];
-    const moduleDir = path.posix.dirname(files[0]);
-    for (const m of read(files[0]).matchAll(/from "\.\/(\w+)";/g)) {
-      const local = `${moduleDir}/${m[1]}.tsx`;
-      if (fs.existsSync(path.join(root, local))) files.push(local);
-    }
-    for (const file of files) {
-      const source = read(file);
-      const dirs = [
-        ...[...source.matchAll(/@\/(?:components|layout)\/([\w-]+)\/examples\//g)].map((m) => m[1]),
-        ...[...source.matchAll(/^ {2}dir: "([\w-]+)",$/gm)].map((m) => m[1]),
-      ];
-      for (const dir of dirs) byDir.set(dir, { id: category, label: labels.get(category) ?? "" });
-    }
-  }
-  return byDir;
-}
+/** Every playground section (`playground/sections/<Pascal>Section.tsx`) by its component dir. */
+const sectionsByDir = new Map(
+  Object.entries(
+    import.meta.glob<{ page?: ComponentPageConfig }>("../../playground/sections/*Section.tsx", {
+      eager: true,
+    }),
+  ).flatMap(([file, module]) =>
+    module.page ? [[module.page.dir, { file, page: module.page }]] : [],
+  ),
+);
 
 const ALLOWED_IMPORTS =
   /^(prime-ui-kit|react|react-dom|lucide-react|date-fns(\/.*)?|react-router-dom)$/;
@@ -110,7 +83,6 @@ const ACCESSIBILITY_HEADINGS = ["### Keyboard", "### ARIA", "### Labels"];
 const PLACEHOLDER_TEXT = /lorem|ipsum|Пункт \d|Item \d|Элемент \d|[\u{1F300}-\u{1FAFF}]/iu;
 
 const dirs = exportedDirs();
-const categories = categoriesByDir();
 
 /**
  * Lucide glyphs examples and patterns may still import directly: domain glyphs the kit registry
@@ -144,9 +116,6 @@ const lucideImports = (source: string) =>
       .filter(Boolean),
   );
 
-const sectionModules = import.meta.glob<{ page?: ComponentPageConfig }>(
-  "../../playground/sections/*Section.tsx",
-);
 const apiModules = import.meta.glob<{ api: ComponentApi }>("../{components,layout}/*/api.ts");
 
 /** H2 section `## <title>` of a markdown document, without the heading line. */
@@ -186,9 +155,9 @@ describe("docs contract", () => {
       for (const heading of REQUIRED_HEADINGS) {
         expect(doc, `${docPath}: ${heading}`).toMatch(new RegExp(`^${heading}$`, "m"));
       }
-      const category = categories.get(dir);
-      expect(category, `${dir} is not shown by any CATEGORY_PAGES page`).toBeDefined();
-      expect(doc).toMatch(new RegExp(`^\\*\\*Category:\\*\\* ${category?.id}$`, "m"));
+      const category = sectionsByDir.get(dir)?.page.category;
+      expect(category, `${dir} has no playground section with a category`).toBeDefined();
+      expect(doc).toMatch(new RegExp(`^\\*\\*Category:\\*\\* ${category}$`, "m"));
       expect(doc).not.toMatch(/--prime-(ref|sys)-/);
     });
 
@@ -241,12 +210,14 @@ describe("docs contract", () => {
     describe("page standard", () => {
       let page: ComponentPageConfig;
 
-      beforeAll(async () => {
-        const load = sectionModules[`../../playground/sections/${pascal(dir)}Section.tsx`];
-        expect(load, `playground/sections/${pascal(dir)}Section.tsx`).toBeDefined();
-        const module = await load();
-        expect(module.page, `${pascal(dir)}Section exports no page config`).toBeDefined();
-        page = module.page as ComponentPageConfig;
+      beforeAll(() => {
+        const section = sectionsByDir.get(dir);
+        expect(
+          section,
+          `playground/sections/${pascal(dir)}Section.tsx exports no page`,
+        ).toBeDefined();
+        expect(section?.file).toBe(`../../playground/sections/${pascal(dir)}Section.tsx`);
+        page = section?.page as ComponentPageConfig;
       });
 
       it("page config matches the dir and declares a kind", () => {

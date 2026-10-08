@@ -1,8 +1,17 @@
+import { Tags } from "lucide-react";
 import { api } from "@/components/tag-select/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "tag-select",
+    label: "Tag Select",
+    summary: "Множественный выбор с тегами",
+    keywords: ["теги", "мультиселект", "multiselect", "value", "onValueChange"],
+    icon: Tags,
+    order: 8,
+  },
   dir: "tag-select",
   title: "TagSelect",
   kind: "field",
@@ -86,7 +95,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function TagSelectSection() {
-  return <ComponentPage page={page} />;
-}

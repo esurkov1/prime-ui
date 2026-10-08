@@ -1,8 +1,17 @@
+import { ChevronDown } from "lucide-react";
 import { api } from "@/components/native-select/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "native-select",
+    label: "Native Select",
+    summary: "Системный список выбора в виде поля",
+    keywords: ["native", "select", "option", "системный", "мобильный", "селект"],
+    icon: ChevronDown,
+    order: 7,
+  },
   dir: "native-select",
   title: "NativeSelect",
   kind: "field",
@@ -60,7 +69,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function NativeSelectSection() {
-  return <ComponentPage page={page} />;
-}

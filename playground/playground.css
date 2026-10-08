@@ -53,6 +53,10 @@ body {
   padding-inline-start: var(--prime-space-5);
 }
 
+.demoList li::marker {
+  color: var(--prime-color-text-muted);
+}
+
 /* --- Intro page ---------------------------------------------------------- */
 
 .introPage {
@@ -130,6 +134,13 @@ body {
 .playgroundMobileTitle {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+/* While an example's module and source load: the frame's footprint, no motion. */
+.playgroundFramePending {
+  min-height: calc(var(--prime-space-24) * 2);
+  border-radius: var(--prime-radius-xl);
+  background: var(--prime-color-bg-sunken);
 }
 
 /* --- Preview surfaces ------------------------------------------------------

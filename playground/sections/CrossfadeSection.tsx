@@ -1,8 +1,17 @@
+import { Blend } from "lucide-react";
 import { api } from "@/components/crossfade/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "feedback",
+  nav: {
+    segment: "crossfade",
+    label: "Crossfade",
+    summary: "Плавная смена состояний области: загрузка, данные, пусто, ошибка",
+    keywords: ["переход", "состояние", "загрузка", "смена", "transition", "loading", "state"],
+    icon: Blend,
+    order: 7,
+  },
   dir: "crossfade",
   title: "Crossfade",
   kind: "layout",
@@ -31,7 +40,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function CrossfadeSection() {
-  return <ComponentPage page={page} />;
-}

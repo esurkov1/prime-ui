@@ -1,8 +1,17 @@
+import { Link2 } from "lucide-react";
 import { api } from "@/components/link-button/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "actions",
+  nav: {
+    segment: "link-button",
+    label: "Link Button",
+    summary: "Ссылка, оформленная как текстовое действие",
+    keywords: ["ссылка", "link", "href", "underline"],
+    icon: Link2,
+    order: 3,
+  },
   dir: "link-button",
   title: "LinkButton",
   kind: "primitive",
@@ -57,7 +66,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function LinkButtonSection() {
-  return <ComponentPage page={page} />;
-}

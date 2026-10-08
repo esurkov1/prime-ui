@@ -7,14 +7,8 @@ import { Label } from "@/components/label/Label";
 import { Switch } from "@/components/switch/Switch";
 import { Typography } from "@/components/typography/Typography";
 
-import {
-  FoundationPage,
-  FoundationSection,
-  Panel,
-  RuleList,
-  TokenName,
-  TokenTable,
-} from "./FoundationKit";
+import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
+import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
 import { formatPx, semanticKeys, semanticPx, toVarName } from "./tokenModel";
 
@@ -116,7 +110,7 @@ const RULE_COLUMNS: DataTableColumn<Rule>[] = [
 ];
 
 function RulesTable() {
-  return <TokenTable columns={RULE_COLUMNS} rows={RULES} getRowKey={(rule) => rule.name} />;
+  return <DocTable columns={RULE_COLUMNS} rows={RULES} getRowKey={(rule) => rule.name} />;
 }
 
 /* --- Live example: spacers are real elements so they can be highlighted ------- */
@@ -189,7 +183,7 @@ function ProximityDemo() {
 
 export default function SpacingPage() {
   return (
-    <FoundationPage
+    <DocPage
       title="Отступы"
       description={
         <>
@@ -199,29 +193,29 @@ export default function SpacingPage() {
         </>
       }
     >
-      <FoundationSection
+      <DocBlock
         title="Шкала"
         description="Значения из semanticTokens.space в пикселях при корневом кегле 16 px."
       >
         <SpaceScale />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Близость"
         description="Внутри группы элементы стоят ближе друг к другу, чем группы между собой. По расстоянию пользователь понимает, что к чему относится, ещё до того, как прочитает подписи."
       >
         <RulesTable />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Как это выглядит"
         description="Форма собрана из обычных блоков на токенах. Подсвеченные полосы — это реальные отступы между элементами."
       >
         <ProximityDemo />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Правила">
-        <RuleList>
+      <DocBlock title="Правила">
+        <DocList>
           <li>
             Расстояние между соседями задаёт <code>gap</code> у flex или grid родителя. Margin у
             дочерних элементов не используйте.
@@ -232,8 +226,8 @@ export default function SpacingPage() {
             Поля страницы: <code>--prime-layout-gutter-&#123;s,m,l&#125;</code>. Ширина контента
             ограничена <code>--prime-layout-content-max-width</code>.
           </li>
-        </RuleList>
-      </FoundationSection>
-    </FoundationPage>
+        </DocList>
+      </DocBlock>
+    </DocPage>
   );
 }

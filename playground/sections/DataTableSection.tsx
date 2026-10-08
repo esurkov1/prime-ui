@@ -1,8 +1,17 @@
+import { Table } from "lucide-react";
 import { api } from "@/components/data-table/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "data-display",
+  nav: {
+    segment: "data-table",
+    label: "Data Table",
+    summary: "Таблица данных: сортировка, выбор строк",
+    keywords: ["таблица", "данные", "сортировка", "columns", "rows", "selection"],
+    icon: Table,
+    order: 6,
+  },
   dir: "data-table",
   title: "DataTable",
   kind: "composite",
@@ -111,7 +120,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function DataTableSection() {
-  return <ComponentPage page={page} />;
-}

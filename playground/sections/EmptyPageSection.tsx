@@ -1,8 +1,17 @@
+import { Inbox } from "lucide-react";
 import { api } from "@/components/empty-page/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "feedback",
+  nav: {
+    segment: "empty-page",
+    label: "Empty Page",
+    summary: "Пустое состояние страницы или блока",
+    keywords: ["пусто", "пустое состояние", "empty state"],
+    icon: Inbox,
+    order: 6,
+  },
   dir: "empty-page",
   title: "EmptyPage",
   kind: "composite",
@@ -52,7 +61,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function EmptyPageSection() {
-  return <ComponentPage page={page} />;
-}

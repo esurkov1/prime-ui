@@ -1,8 +1,17 @@
+import { ListOrdered } from "lucide-react";
 import { api } from "@/components/stepper/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "navigation",
+  nav: {
+    segment: "stepper",
+    label: "Stepper",
+    summary: "Шаги процесса",
+    keywords: ["шаги", "мастер", "wizard", "steps", "value"],
+    icon: ListOrdered,
+    order: 4,
+  },
   dir: "stepper",
   title: "Stepper",
   kind: "navigation",
@@ -56,7 +65,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function StepperSection() {
-  return <ComponentPage page={page} />;
-}

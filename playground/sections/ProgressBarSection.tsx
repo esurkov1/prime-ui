@@ -1,8 +1,26 @@
+import { StretchHorizontal } from "lucide-react";
 import { api } from "@/components/progress-bar/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "feedback",
+  nav: {
+    segment: "progress-bar",
+    label: "Progress Bar",
+    summary: "Линейный прогресс: одно значение или части целого",
+    keywords: [
+      "прогресс",
+      "загрузка",
+      "сегменты",
+      "распределение",
+      "квоты",
+      "value",
+      "max",
+      "segments",
+    ],
+    icon: StretchHorizontal,
+    order: 3,
+  },
   dir: "progress-bar",
   title: "ProgressBar",
   kind: "primitive",
@@ -44,7 +62,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ProgressBarSection() {
-  return <ComponentPage page={page} />;
-}

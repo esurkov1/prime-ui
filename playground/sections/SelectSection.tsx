@@ -1,8 +1,17 @@
+import { ChevronDown } from "lucide-react";
 import { api } from "@/components/select/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "select",
+    label: "Select",
+    summary: "Выпадающий список с выбором значения",
+    keywords: ["селект", "список", "выбор", "value", "onValueChange", "open"],
+    icon: ChevronDown,
+    order: 6,
+  },
   dir: "select",
   title: "Select",
   kind: "field",
@@ -105,7 +114,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function SelectSection() {
-  return <ComponentPage page={page} />;
-}

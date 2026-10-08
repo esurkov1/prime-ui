@@ -1,8 +1,17 @@
+import { TextCursorInput } from "lucide-react";
 import { api } from "@/components/input/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "inputs",
+  nav: {
+    segment: "input",
+    label: "Input",
+    summary: "Текстовое поле: подпись, подсказка, ошибка, иконки",
+    keywords: ["поле", "ввод", "инпут", "label", "hint", "error", "invalid", "onValueChange"],
+    icon: TextCursorInput,
+    order: 1,
+  },
   dir: "input",
   title: "Input",
   kind: "field",
@@ -64,7 +73,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function InputSection() {
-  return <ComponentPage page={page} />;
-}

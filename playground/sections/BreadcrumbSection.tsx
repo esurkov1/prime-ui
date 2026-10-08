@@ -1,8 +1,17 @@
+import { ChevronsRight } from "lucide-react";
 import { api } from "@/components/breadcrumb/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "navigation",
+  nav: {
+    segment: "breadcrumb",
+    label: "Breadcrumb",
+    summary: "Хлебные крошки: путь к странице",
+    keywords: ["крошки", "путь", "breadcrumbs"],
+    icon: ChevronsRight,
+    order: 2,
+  },
   dir: "breadcrumb",
   title: "Breadcrumb",
   kind: "navigation",
@@ -52,7 +61,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function BreadcrumbSection() {
-  return <ComponentPage page={page} />;
-}

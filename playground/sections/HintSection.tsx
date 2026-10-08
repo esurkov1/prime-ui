@@ -1,8 +1,17 @@
+import { Info } from "lucide-react";
 import { api } from "@/components/hint/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "inputs",
+  nav: {
+    segment: "hint",
+    label: "Hint",
+    summary: "Подсказка и сообщение об ошибке под полем",
+    keywords: ["подсказка", "ошибка", "hint", "error", "invalid"],
+    icon: Info,
+    order: 7,
+  },
   dir: "hint",
   title: "Hint",
   kind: "primitive",
@@ -45,7 +54,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function HintSection() {
-  return <ComponentPage page={page} />;
-}

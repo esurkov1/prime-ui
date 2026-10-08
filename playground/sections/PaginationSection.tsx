@@ -1,8 +1,17 @@
+import { ChevronsLeftRight } from "lucide-react";
 import { api } from "@/components/pagination/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "navigation",
+  nav: {
+    segment: "pagination",
+    label: "Pagination",
+    summary: "Постраничная навигация",
+    keywords: ["пагинация", "страницы", "value", "onValueChange"],
+    icon: ChevronsLeftRight,
+    order: 3,
+  },
   dir: "pagination",
   title: "Pagination",
   kind: "navigation",
@@ -49,7 +58,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function PaginationSection() {
-  return <ComponentPage page={page} />;
-}

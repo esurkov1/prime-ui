@@ -49,8 +49,6 @@ export function PlaygroundThemeProvider({ children }: { children: React.ReactNod
   React.useLayoutEffect(() => {
     const root = document.documentElement;
     applyTheme(scheme, root);
-    // Brand presets were removed with the Graphite foundation; drop a stale attribute.
-    delete root.dataset.themePreset;
     try {
       window.localStorage.setItem(STORAGE_KEY, scheme);
     } catch {

@@ -4,14 +4,8 @@ import { Card } from "@/components/card/Card";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { Typography } from "@/components/typography/Typography";
-
+import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { renderInlineCode } from "../components/PlaygroundApiTable";
-import {
-  FoundationPage,
-  FoundationSection,
-  RuleList,
-  TokenTable,
-} from "../foundation/FoundationKit";
 import { COMPOSITION_PATTERNS } from "./patterns";
 
 const SKILL_COMPOSITION = "https://github.com/esurkov1/prime-ui/blob/main/SKILL/composition.md";
@@ -73,12 +67,12 @@ const TYPE: Row[] = [
 export default function CompositionPage() {
   const navigate = useNavigate();
   return (
-    <FoundationPage
+    <DocPage
       title="Композиция"
       description="Как собрать экран из кита так, будто его неделями шлифовал автор: каркас, ритм, иерархия, поверхности, действия, формы, данные и состояния. Ниже — готовые экраны: каждый пример один и тот же файл для плейграунда и для скилла агентов."
     >
-      <FoundationSection title="Каркас экрана">
-        <RuleList>
+      <DocBlock title="Каркас экрана">
+        <DocList>
           <li>
             {renderInlineCode(
               "Один раз на приложение — `AppShell.Root` + `Sidebar` в `AppShell.Nav`, страница — в `AppShell.Main`. Экран, который вы отдаёте, рендерит только свою страницу.",
@@ -94,35 +88,35 @@ export default function CompositionPage() {
               "Внешних отступов не добавляйте: поля даёт `AppShell.Main`, расстояния между блоками — `PageContent.Body`. Ваш CSS раскладывает только внутренность блока через `gap`.",
             )}
           </li>
-        </RuleList>
-      </FoundationSection>
+        </DocList>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Ритм: воздух — это иерархия"
         description={renderInlineCode(
           "Внутри группы — теснее, между группами — шире, между разделами — шире всего. Всё на сетке 4 px, только токены `--prime-space-*`, только `gap` на родителе.",
         )}
       >
-        <TokenTable columns={COLUMNS} rows={RHYTHM} getRowKey={(row) => row.what} />
-      </FoundationSection>
+        <DocTable columns={COLUMNS} rows={RHYTHM} getRowKey={(row) => row.what} />
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Иерархия текста"
         description={renderInlineCode(
           "Одна роль на смысл. Своих размеров и жирности нет — только роли `Typography` и части компонентов.",
         )}
       >
-        <TokenTable
+        <DocTable
           columns={COLUMNS.map((column) =>
             column.id === "what" ? { ...column, header: "Что" } : column,
           )}
           rows={TYPE}
           getRowKey={(row) => row.what}
         />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Поверхности">
-        <RuleList>
+      <DocBlock title="Поверхности">
+        <DocList>
           <li>
             {renderInlineCode(
               "Глубина — заливкой, не линиями. Внутри приложения панель контента — поверхность, `Card` на ней — утопленная плитка; кит переключает это сам.",
@@ -138,11 +132,11 @@ export default function CompositionPage() {
               "Не вкладывайте карточку в карточку и не кладите в неё `DataTable`: таблица — уже залитый блок. Разделитель (`Divider`) — только внутри блока.",
             )}
           </li>
-        </RuleList>
-      </FoundationSection>
+        </DocList>
+      </DocBlock>
 
-      <FoundationSection title="Действия">
-        <RuleList>
+      <DocBlock title="Действия">
+        <DocList>
           <li>
             {renderInlineCode(
               'Одно главное действие на область (`solid`, последним в ряду). Остальные — `soft` / `ghost` / `outline` с `tone="neutral"`, редкие — в `Dropdown` за `action.more`.',
@@ -158,11 +152,11 @@ export default function CompositionPage() {
               "Переход — ссылка (`LinkButton`, `Button asChild` с `<a>`), действие — `Button`. Одно действие — одна подпись по всему экрану.",
             )}
           </li>
-        </RuleList>
-      </FoundationSection>
+        </DocList>
+      </DocBlock>
 
-      <FoundationSection title="Формы">
-        <RuleList>
+      <DocBlock title="Формы">
+        <DocList>
           <li>
             {renderInlineCode(
               "Подпись над полем всегда (`label`), плейсхолдер — пример значения. Подсказка — `hint`, ошибка — `error` после ухода с поля или отправки.",
@@ -178,11 +172,11 @@ export default function CompositionPage() {
               "До четырёх полей — `Modal`, длинная форма — `Drawer` или страница. Отправка: `loading` на кнопке, `disabled` на полях, итог — `Notification`.",
             )}
           </li>
-        </RuleList>
-      </FoundationSection>
+        </DocList>
+      </DocBlock>
 
-      <FoundationSection title="Данные и состояния">
-        <RuleList>
+      <DocBlock title="Данные и состояния">
+        <DocList>
           <li>
             {renderInlineCode(
               "Список — `DataTable` с фильтрами в `toolbar` (`SmartFilter`) и встроенной пагинацией; числа — `numeric`, статусы — `Badge` с одним цветом на смысл.",
@@ -198,11 +192,11 @@ export default function CompositionPage() {
               "Сообщение о странице — `Banner`, итог действия — `Notification`, ошибка поля — `error` поля, пустой раздел — `EmptyPage` с одним действием.",
             )}
           </li>
-        </RuleList>
-      </FoundationSection>
+        </DocList>
+      </DocBlock>
 
-      <FoundationSection title="Узкий экран и движение">
-        <RuleList>
+      <DocBlock title="Узкий экран и движение">
+        <DocList>
           <li>
             {renderInlineCode(
               "Раскладки — внутренние: `auto-fit` / `minmax(min(100%, …))` и flex-wrap вместо брейкпоинтов. Экран работает с 320 px, страница вбок не прокручивается — широкая таблица скроллится внутри себя.",
@@ -213,10 +207,10 @@ export default function CompositionPage() {
               "Анимации уже есть в компонентах. Своё движение — только токены `--prime-motion-*`, `transform` / `opacity`, без `transition: all`.",
             )}
           </li>
-        </RuleList>
-      </FoundationSection>
+        </DocList>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Экраны"
         description={renderInlineCode(
           "Каждый экран — один файл в `SKILL/patterns/`: превью и код здесь, ссылка из `SKILL/composition.md` для агентов.",
@@ -249,7 +243,7 @@ export default function CompositionPage() {
           </LinkButton>
           .
         </Typography>
-      </FoundationSection>
-    </FoundationPage>
+      </DocBlock>
+    </DocPage>
   );
 }

@@ -1,8 +1,17 @@
+import { ListChecks } from "lucide-react";
 import { api } from "@/components/dropdown/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "overlays",
+  nav: {
+    segment: "dropdown",
+    label: "Dropdown",
+    summary: "Выпадающее меню действий",
+    keywords: ["выпадающее меню", "меню", "dropdown", "open", "onOpenChange"],
+    icon: ListChecks,
+    order: 3,
+  },
   dir: "dropdown",
   title: "Dropdown",
   kind: "overlay",
@@ -79,7 +88,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function DropdownSection() {
-  return <ComponentPage page={page} />;
-}

@@ -5,7 +5,8 @@ import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Typography } from "@/components/typography/Typography";
 import type { PaletteColor } from "@/internal/states";
 
-import { FoundationPage, FoundationSection, Panel, TokenName, TokenTable } from "./FoundationKit";
+import { DocBlock, DocPage, DocTable } from "../components/Doc";
+import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
 import {
   composite,
@@ -64,7 +65,7 @@ function Swatch({ path }: { path: string }) {
         ref={chip}
         className={s.swatchChip}
         data-transparent={transparent || undefined}
-        style={{ background: `var(${varName})` }}
+        style={{ "--swatch": `var(${varName})` } as React.CSSProperties}
       />
       <figcaption className={s.swatchCaption}>
         <Typography as="span" variant="body-s" weight="medium">
@@ -132,7 +133,7 @@ const PALETTE_COLUMNS: DataTableColumn<string>[] = [
 ];
 
 function PaletteTable() {
-  return <TokenTable columns={PALETTE_COLUMNS} rows={PALETTE_HUES} getRowKey={(hue) => hue} />;
+  return <DocTable columns={PALETTE_COLUMNS} rows={PALETTE_HUES} getRowKey={(hue) => hue} />;
 }
 
 /* --- Primitive ramps --------------------------------------------------------- */
@@ -300,7 +301,7 @@ function ContrastTable() {
 
   return (
     <div ref={host}>
-      <TokenTable columns={columns} rows={rows} getRowKey={({ pair }) => `${pair.fg}|${pair.bg}`} />
+      <DocTable columns={columns} rows={rows} getRowKey={({ pair }) => `${pair.fg}|${pair.bg}`} />
     </div>
   );
 }
@@ -308,7 +309,7 @@ function ContrastTable() {
 export default function ColorsPage() {
   const theme = useDocumentTheme();
   return (
-    <FoundationPage
+    <DocPage
       title="Цвет"
       description={
         <>
@@ -319,7 +320,7 @@ export default function ColorsPage() {
         </>
       }
     >
-      <FoundationSection
+      <DocBlock
         title="Семантические роли"
         description={
           <>
@@ -330,9 +331,9 @@ export default function ColorsPage() {
         }
       >
         <RoleGroups />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Палитра меток"
         description={
           <>
@@ -342,9 +343,9 @@ export default function ColorsPage() {
         }
       >
         <PaletteTable />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Контраст WCAG"
         description={
           <>
@@ -355,9 +356,9 @@ export default function ColorsPage() {
         }
       >
         <ContrastTable />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Примитивы"
         description={
           <>
@@ -368,7 +369,7 @@ export default function ColorsPage() {
         }
       >
         <PrimitiveRamps />
-      </FoundationSection>
-    </FoundationPage>
+      </DocBlock>
+    </DocPage>
   );
 }

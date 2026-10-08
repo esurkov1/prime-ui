@@ -1,8 +1,17 @@
+import { UserRound } from "lucide-react";
 import { api } from "@/components/avatar/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "data-display",
+  nav: {
+    segment: "avatar",
+    label: "Avatar",
+    summary: "Аватар: фото, инициалы, группа",
+    keywords: ["аватар", "фото", "инициалы", "color", "size"],
+    icon: UserRound,
+    order: 2,
+  },
   dir: "avatar",
   title: "Avatar",
   kind: "primitive",
@@ -55,7 +64,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function AvatarSection() {
-  return <ComponentPage page={page} />;
-}

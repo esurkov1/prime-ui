@@ -1,8 +1,17 @@
+import { SwatchBook } from "lucide-react";
 import { api } from "@/components/color-swatches/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "color-swatches",
+    label: "Color Swatches",
+    summary: "Выбор цвета из образцов прямо в форме",
+    keywords: ["цвет", "образцы", "палитра", "swatches", "inline", "value", "onValueChange"],
+    icon: SwatchBook,
+    order: 12,
+  },
   dir: "color-swatches",
   title: "ColorSwatches",
   kind: "control",
@@ -49,7 +58,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ColorSwatchesSection() {
-  return <ComponentPage page={page} />;
-}

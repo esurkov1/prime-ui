@@ -37,18 +37,6 @@
   white-space: nowrap;
 }
 
-.ruleList {
-  display: grid;
-  gap: var(--prime-space-2);
-  max-width: var(--prime-layout-reading-max-width);
-  margin: 0;
-  padding-inline-start: var(--prime-space-5);
-}
-
-.ruleList li::marker {
-  color: var(--prime-color-text-muted);
-}
-
 .measureProbe {
   position: absolute;
   height: 0;
@@ -89,19 +77,26 @@
 }
 
 /* The chip sits on a checkerboard so transparent and translucent roles stay readable. */
+/* `--swatch` is the token shown (set inline). A translucent token sits on a checkerboard: the color
+   is the top layer, so the board shows through exactly as much as the token lets it. */
 .swatchChip {
   height: var(--prime-space-12);
   border-radius: var(--prime-radius-m);
+  background: var(--swatch);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
 }
 
 .swatchChip[data-transparent] {
-  background-image:
-    linear-gradient(45deg, var(--prime-color-fill-muted) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--prime-color-fill-muted) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--prime-color-fill-muted) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--prime-color-fill-muted) 75%) !important;
-  background-size: var(--prime-space-3) var(--prime-space-3) !important;
+  background:
+    linear-gradient(var(--swatch), var(--swatch)),
+    linear-gradient(45deg, var(--prime-color-fill-muted) 25%, transparent 25%) 0 0 /
+      var(--prime-space-3) var(--prime-space-3),
+    linear-gradient(-45deg, var(--prime-color-fill-muted) 25%, transparent 25%) 0 0 /
+      var(--prime-space-3) var(--prime-space-3),
+    linear-gradient(45deg, transparent 75%, var(--prime-color-fill-muted) 75%) 0 0 /
+      var(--prime-space-3) var(--prime-space-3),
+    linear-gradient(-45deg, transparent 75%, var(--prime-color-fill-muted) 75%) 0 0 /
+      var(--prime-space-3) var(--prime-space-3);
 }
 
 .swatchCaption {

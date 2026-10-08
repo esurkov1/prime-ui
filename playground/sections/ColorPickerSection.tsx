@@ -1,8 +1,17 @@
+import { Pipette } from "lucide-react";
 import { api } from "@/components/color-picker/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "color-picker",
+    label: "Color Picker",
+    summary: "Выбор цвета: палитра, HEX, пипетка",
+    keywords: ["выбор цвета", "палитра", "hex", "value", "onValueChange"],
+    icon: Pipette,
+    order: 11,
+  },
   dir: "color-picker",
   title: "ColorPicker",
   kind: "field",
@@ -93,7 +102,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ColorPickerSection() {
-  return <ComponentPage page={page} />;
-}

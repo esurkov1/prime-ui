@@ -1,8 +1,17 @@
+import { Hash } from "lucide-react";
 import { api } from "@/components/digit-input/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "inputs",
+  nav: {
+    segment: "digit-input",
+    label: "Digit Input",
+    summary: "Поле для кода из отдельных цифр (OTP)",
+    keywords: ["код", "otp", "пин", "цифры", "value", "onValueChange"],
+    icon: Hash,
+    order: 3,
+  },
   dir: "digit-input",
   title: "DigitInput",
   kind: "field",
@@ -68,7 +77,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function DigitInputSection() {
-  return <ComponentPage page={page} />;
-}

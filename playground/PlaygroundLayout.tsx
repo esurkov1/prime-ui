@@ -10,28 +10,12 @@ import { PlaygroundChromeSidebar } from "./components/PlaygroundChromeSidebar";
 import { PlaygroundSearch, usePlaygroundSearchHotkey } from "./components/PlaygroundSearch";
 import { PLAYGROUND_PAGES, pageRoute } from "./playgroundPages";
 
-const NARROW = "(max-width: 767.98px)";
-
-/** Whether the viewport is narrow enough for the off-canvas sidebar (the AppShell breakpoint). */
-function useNarrowViewport(): boolean {
-  const [narrow, setNarrow] = React.useState(
-    () => typeof window !== "undefined" && window.matchMedia(NARROW).matches,
-  );
-  React.useEffect(() => {
-    const mq = window.matchMedia(NARROW);
-    const update = () => setNarrow(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return narrow;
-}
-
 export function PlaygroundLayout() {
   const { pathname } = useLocation();
   const [navOpen, setNavOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
-  const narrow = useNarrowViewport();
+  // The mobile bar shows while the Sidebar is off-canvas: its own breakpoint, reported up.
+  const [narrow, setNarrow] = React.useState(false);
 
   usePlaygroundSearchHotkey(setSearchOpen);
 
@@ -49,6 +33,7 @@ export function PlaygroundLayout() {
             open={navOpen}
             onOpenChange={setNavOpen}
             onSearch={() => setSearchOpen(true)}
+            onOffCanvasChange={setNarrow}
           />
         }
         header={

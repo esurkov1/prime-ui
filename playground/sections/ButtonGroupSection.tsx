@@ -1,8 +1,17 @@
+import { LayoutGrid } from "lucide-react";
 import { api } from "@/components/button-group/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "actions",
+  nav: {
+    segment: "button-group",
+    label: "Button Group",
+    summary: "Сгруппированные кнопки и переключатели",
+    keywords: ["группа кнопок", "toolbar", "pressed", "orientation"],
+    icon: LayoutGrid,
+    order: 2,
+  },
   dir: "button-group",
   title: "ButtonGroup",
   kind: "control",
@@ -58,7 +67,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ButtonGroupSection() {
-  return <ComponentPage page={page} />;
-}

@@ -1,8 +1,17 @@
+import { GripVertical } from "lucide-react";
 import { api } from "@/components/dnd/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "layout",
+  nav: {
+    segment: "dnd",
+    label: "Dnd",
+    summary: "Перетаскивание: сортируемые списки, Draggable и DropZone",
+    keywords: ["drag", "drop", "перетаскивание", "сортировка", "порядок", "sortable", "доска"],
+    icon: GripVertical,
+    order: 7,
+  },
   dir: "dnd",
   title: "Dnd",
   kind: "composite",
@@ -56,7 +65,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function DndSection() {
-  return <ComponentPage page={page} />;
-}

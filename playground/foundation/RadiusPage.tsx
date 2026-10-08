@@ -1,14 +1,8 @@
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Typography } from "@/components/typography/Typography";
 
-import {
-  FoundationPage,
-  FoundationSection,
-  Panel,
-  RuleList,
-  TokenName,
-  TokenTable,
-} from "./FoundationKit";
+import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
+import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
 import {
   formatPx,
@@ -73,9 +67,7 @@ const RADII_COLUMNS: DataTableColumn<RadiusRow>[] = [
 ];
 
 function ComponentRadii() {
-  return (
-    <TokenTable columns={RADII_COLUMNS} rows={COMPONENT_RADII} getRowKey={(row) => row.path} />
-  );
+  return <DocTable columns={RADII_COLUMNS} rows={COMPONENT_RADII} getRowKey={(row) => row.path} />;
 }
 
 const PANEL_R = formatPx(semanticPx("panel.radius"));
@@ -129,7 +121,7 @@ function NestedDemo() {
 
 export default function RadiusPage() {
   return (
-    <FoundationPage
+    <DocPage
       title="Радиусы"
       description={
         <>
@@ -138,23 +130,23 @@ export default function RadiusPage() {
         </>
       }
     >
-      <FoundationSection title="Шкала">
+      <DocBlock title="Шкала">
         <RadiusScale />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Вложенный радиус"
         description="Внутренний радиус равен внешнему минус отступ между ними. Плавающая панель: радиус 12, отступ 4, у пунктов 8."
       >
         <NestedDemo />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Радиусы компонентов">
+      <DocBlock title="Радиусы компонентов">
         <ComponentRadii />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Правила">
-        <RuleList>
+      <DocBlock title="Правила">
+        <DocList>
           <li>
             Чем больше элемент, тем больше радиус. Маленький контрол с крупным радиусом становится
             похож на таблетку.
@@ -167,8 +159,8 @@ export default function RadiusPage() {
             Если отступ больше внешнего радиуса, внутренний угол может остаться прямым или получить
             минимальный радиус.
           </li>
-        </RuleList>
-      </FoundationSection>
-    </FoundationPage>
+        </DocList>
+      </DocBlock>
+    </DocPage>
   );
 }

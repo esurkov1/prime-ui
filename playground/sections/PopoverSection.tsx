@@ -1,8 +1,17 @@
+import { MessageSquare } from "lucide-react";
 import { api } from "@/components/popover/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "overlays",
+  nav: {
+    segment: "popover",
+    label: "Popover",
+    summary: "Всплывающая панель у элемента",
+    keywords: ["поповер", "всплывающее окно", "open", "onOpenChange"],
+    icon: MessageSquare,
+    order: 2,
+  },
   dir: "popover",
   title: "Popover",
   kind: "overlay",
@@ -80,7 +89,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function PopoverSection() {
-  return <ComponentPage page={page} />;
-}

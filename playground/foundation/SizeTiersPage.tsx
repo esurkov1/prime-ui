@@ -10,9 +10,11 @@ import { SegmentedControl } from "@/components/segmented-control/SegmentedContro
 import { Select } from "@/components/select/Select";
 import { Typography } from "@/components/typography/Typography";
 
-import { type PlaygroundApiPropRow, PlaygroundApiTable } from "../components/PlaygroundApiTable";
+import type { ApiProp } from "../../scripts/docs/componentApi";
+import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
+import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import { DemoApiTitle, DemoDescription } from "../components/PlaygroundDemoTypography";
-import { FoundationPage, FoundationSection, Panel, RuleList, TokenTable } from "./FoundationKit";
+import { Panel } from "./FoundationKit";
 import s from "./foundation.module.css";
 import { formatPx, SIZE_TIERS, type SizeTier, semanticPx } from "./tokenModel";
 
@@ -57,7 +59,7 @@ const TIER_COLUMNS: DataTableColumn<SizeTier>[] = [
 ];
 
 function TierTable() {
-  return <TokenTable columns={TIER_COLUMNS} rows={[...SIZE_TIERS]} getRowKey={(t) => t} />;
+  return <DocTable columns={TIER_COLUMNS} rows={[...SIZE_TIERS]} getRowKey={(t) => t} />;
 }
 
 /** One row of real kit controls of a tier: heights match, the text shares one baseline. */
@@ -165,29 +167,29 @@ const BADGE_TABLE_COLUMNS: DataTableColumn<SizeTier>[] = [
 ];
 
 function BadgeTable() {
-  return <TokenTable columns={BADGE_TABLE_COLUMNS} rows={[...SIZE_TIERS]} getRowKey={(t) => t} />;
+  return <DocTable columns={BADGE_TABLE_COLUMNS} rows={[...SIZE_TIERS]} getRowKey={(t) => t} />;
 }
 
-const providerRows: PlaygroundApiPropRow[] = [
+const PROVIDER_PROPS: ApiProp[] = [
   {
-    prop: "value",
+    name: "value",
     type: '"xs" | "s" | "m" | "l" | "xl"',
-    defaultValue: "—",
-    required: "Да",
-    description: "Уровень размера, который получат дочерние компоненты без явного `size`.",
+    required: true,
+    en: "The tier children without an explicit `size` take.",
+    ru: "Уровень размера, который получат дочерние компоненты без явного `size`.",
   },
   {
-    prop: "children",
+    name: "children",
     type: "React.ReactNode",
-    defaultValue: "—",
-    required: "Да",
-    description: "Поддерево, в котором действует контекст.",
+    required: true,
+    en: "The subtree the context applies to.",
+    ru: "Поддерево, в котором действует контекст.",
   },
 ];
 
 export default function SizeTiersPage() {
   return (
-    <FoundationPage
+    <DocPage
       title="Размеры"
       description={
         <>
@@ -198,22 +200,22 @@ export default function SizeTiersPage() {
         </>
       }
     >
-      <FoundationSection
+      <DocBlock
         title="Таблица уровней"
         description="Значения в пикселях, прочитаны из semanticTokens.control."
       >
         <TierTable />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="В одну линию"
         description="Каждая строка собрана из настоящих компонентов кита своего уровня. Высоты совпадают, базовая линия текста общая."
       >
         <TierLiveRows />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Правила пар">
-        <RuleList>
+      <DocBlock title="Правила пар">
+        <DocList>
           <li>
             Поле уровня T берёт подпись и подсказку того же уровня. Подсказка и ошибка всегда мельче
             текста поля.
@@ -235,11 +237,11 @@ export default function SizeTiersPage() {
             В кнопке со стороны иконки отступ на 4 px меньше: <code>padX − 4px</code>, но не меньше
             8 px. Так иконка и подпись выглядят одной группой по центру.
           </li>
-        </RuleList>
+        </DocList>
         <PairingDemo />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Badge, Kbd"
         description={
           <>
@@ -248,9 +250,9 @@ export default function SizeTiersPage() {
         }
       >
         <BadgeTable />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="ControlSizeProvider"
         description={
           <>
@@ -262,11 +264,11 @@ export default function SizeTiersPage() {
         }
       >
         <DemoApiTitle>ControlSizeProvider</DemoApiTitle>
-        <PlaygroundApiTable rows={providerRows} />
+        <PlaygroundApiTable props={PROVIDER_PROPS} />
         <DemoDescription>
           Явный <code>size</code> на компоненте всегда важнее контекста.
         </DemoDescription>
-      </FoundationSection>
-    </FoundationPage>
+      </DocBlock>
+    </DocPage>
   );
 }
