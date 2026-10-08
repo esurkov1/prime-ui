@@ -1,5 +1,6 @@
 /** A color field: a hex value and a swatch button that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.TriggerSwatch`. */
-import { Button, ColorPicker, Popover } from "prime-ui-kit";
+import { Button, Popover } from "prime-ui-kit";
+import { ColorPicker } from "prime-ui-kit/color-picker";
 
 import styles from "./examples.module.css";
 

@@ -1,5 +1,5 @@
 /** A disabled area and hue slider keep showing the color but take no input — `disabled`. */
-import { ColorPicker } from "prime-ui-kit";
+import { ColorPicker } from "prime-ui-kit/color-picker";
 
 import styles from "./examples.module.css";
 

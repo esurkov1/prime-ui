@@ -18,8 +18,13 @@
 
 ## Import
 ```tsx
-import { COLOR_PRESETS, ColorPicker, ColorPresets, parseColor } from "prime-ui-kit";
+import { COLOR_PRESETS, ColorPresets } from "prime-ui-kit";
+import { ColorPicker, parseColor } from "prime-ui-kit/color-picker";
 ```
+
+`ColorPicker` has its own entry: it is the only part of the kit built on `react-aria-components`,
+an optional peer dependency — install it only when you use `ColorPicker`. Its styles are already
+in `prime-ui-kit/bundle.css`. `ColorPresets` stays in the main entry and needs no extra package.
 
 ## Anatomy
 ```

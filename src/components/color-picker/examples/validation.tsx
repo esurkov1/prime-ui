@@ -1,5 +1,5 @@
 /** A hint under the hex field and an error that replaces it; invalid text reverts on blur — `hint`, `error`. */
-import { ColorPicker } from "prime-ui-kit";
+import { ColorPicker } from "prime-ui-kit/color-picker";
 
 export default function ColorPickerValidationExample() {
   return (

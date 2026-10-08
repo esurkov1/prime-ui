@@ -9,7 +9,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Import the styles once at the app root: `import "prime-ui-kit/bundle.css"` (tokens, themes, components), plus the opt-in `prime-ui-kit/fonts.css` and `prime-ui-kit/reset.css` when the app has no fonts or reset of its own — not per page, not a copied token file.
 - Switch the theme with `applyTheme("light" | "dark")` — not a class or `style` on `<html>`.
 - Put `NotificationProvider` and `AppShell.Root` in the app root once — not inside a page component.
-- Import everything from `"prime-ui-kit"` — not from `prime-ui-kit/src/...` or `lucide-react` for a glyph the kit has.
+- Import everything from `"prime-ui-kit"` — not from `prime-ui-kit/src/...` or `lucide-react` for a glyph the kit has. The one subpath: `import { ColorPicker, parseColor } from "prime-ui-kit/color-picker"` (needs the optional peer `react-aria-components`); `ColorPresets` and `ColorSwatches` come from the root.
 
 ## Size
 

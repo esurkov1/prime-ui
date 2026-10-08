@@ -1,5 +1,5 @@
 /** The channel strip in each value format; three pickers edit one color — `defaultFormat`, `ColorPicker.ChannelStrip`. */
-import { ColorPicker, type ColorValueFormat, parseColor } from "prime-ui-kit";
+import { ColorPicker, type ColorValueFormat, parseColor } from "prime-ui-kit/color-picker";
 import * as React from "react";
 
 import styles from "./examples.module.css";

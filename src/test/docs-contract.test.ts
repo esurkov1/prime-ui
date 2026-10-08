@@ -47,7 +47,7 @@ const sectionsByDir = new Map(
 );
 
 const ALLOWED_IMPORTS =
-  /^(prime-ui-kit|react|react-dom|lucide-react|date-fns(\/.*)?|react-router-dom)$/;
+  /^(prime-ui-kit(\/color-picker)?|react|react-dom|lucide-react|date-fns(\/.*)?|react-router-dom)$/;
 const REQUIRED_HEADINGS = ["## When to use", "## Import", "## API", "## Examples"];
 const TEMPLATE_HEADINGS = [
   "## When to use",

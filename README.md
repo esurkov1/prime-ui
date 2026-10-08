@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 54 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 56 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines; a strict 4px grid; one size axis
@@ -54,35 +54,19 @@ prime-ui-kit is built to be used by coding agents (Claude Code, Cursor, Codex, �
 
 ---
 
-## What's new in 0.9.0
-
-- **API v1.** One vocabulary across the kit: `size`, `variant`, `tone`, `color`, `invalid/hint/error`,
-  `value/onValueChange`, `checked/onCheckedChange`, `open/onOpenChange`, `closeOnOutsideClick`,
-  `closeOnEscape`, `labels`. No aliases, no deprecated props.
-- **Graphite redesign.** Fill-based depth, borderless fields, lavender accent, soft badges and tags,
-  full dark theme, never-clipped focus ring, one overlay stack with shared dismiss and motion rules.
-- **Docs rewritten from the code.** Every component has a new `COMPONENT.md` (anatomy, every prop with
-  its default, every variant, states, a11y, mistakes) and one-scenario-per-file `examples/` that the
-  playground renders directly — one source for the playground, the npm package and the agent skill.
-- **Agent skill rebuilt** (`SKILL/`): process, design rules, API cheat sheet, choosing guide,
-  composition, page recipes, anti-slop rules and a review checklist — field-tested on real screens.
-- **Docs contract test** keeps docs, examples and the playground from drifting apart.
-- Kit fixes: `Popover.Trigger` keeps the child's `id` (field labels work for Datepicker and
-  ColorPresets), `Card.Title` takes `as` for the heading level, FileUpload `solid`
-  keeps no outline on hover, more prop types exported.
-
 ## Install
 
 ```bash
-npm install prime-ui-kit react react-dom react-aria-components date-fns
+npm install prime-ui-kit react react-dom date-fns
+# using ColorPicker: also react-aria-components
 # or: pnpm add … · bun add …
 ```
 
 | Peer dependency | Version |
 |---|---|
 | `react`, `react-dom` | ^19.0.0 |
-| `react-aria-components` | ^1.16.0 |
 | `date-fns` | ^4.0.0 |
+| `react-aria-components` (optional, only for `prime-ui-kit/color-picker`) | ^1.16.0 |
 
 `lucide-react` (icons) comes with the package. The kit has no router dependency: pass your router's
 pathname to `AppShell.Template scrollResetKey` and use `asChild` for router links.
@@ -140,7 +124,8 @@ export function App() {
 
 Short rules that keep code correct — for people and for AI coding assistants:
 
-1. Import everything from the package root: `import { Button, Input } from "prime-ui-kit"`.
+1. Import everything from the package root: `import { Button, Input } from "prime-ui-kit"`. The one
+   exception is `import { ColorPicker } from "prime-ui-kit/color-picker"`.
 2. Import styles once at the app root: `prime-ui-kit/bundle.css` (plus the optional `fonts.css` and
    `reset.css`).
 3. Compound components are used through parts: `<Button.Root>`, `<Modal.Root>` + `<Modal.Content>`.

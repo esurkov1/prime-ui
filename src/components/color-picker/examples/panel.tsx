@@ -1,5 +1,5 @@
 /** The full raised panel and its part order: format, area, hue and alpha sliders, channels, brand swatches — `ColorPicker.Panel`, `surface`, `ColorPicker.Swatches`. */
-import { ColorPicker } from "prime-ui-kit";
+import { ColorPicker } from "prime-ui-kit/color-picker";
 
 import styles from "./examples.module.css";
 

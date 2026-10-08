@@ -1,8 +1,8 @@
 /**
  * Library bundle via esbuild (no Rollup/treeshake pass that breaks CSS Modules).
- * JS: `src/index.ts` → `dist/index.js`. CSS: the base layer (`src/styles/globals.css`: tokens,
- * themes, focus ring, reduced motion) followed by every component module → `dist/index.css`
- * (`prime-ui-kit/bundle.css`). Types: `tsc --emitDeclarationOnly` → `.dts-stage`, merged into `dist/`.
+ * JS: `src/index.ts` → `dist/index.js`, `src/color-picker.ts` → `dist/color-picker.js`, shared code
+ * in `dist/chunks/`. CSS: the base layer (`src/styles/globals.css`: tokens, themes, focus ring,
+ * reduced motion) followed by every component module → `dist/index.css` (`prime-ui-kit/bundle.css`). Types: `tsc --emitDeclarationOnly` → `.dts-stage`, merged into `dist/`.
  */
 
 import { spawn } from "node:child_process";
@@ -16,20 +16,40 @@ const dist = resolve(root, "dist");
 
 await rm(dist, { recursive: true, force: true });
 
-await esbuild.build({
-  absWorkingDir: root,
-  entryPoints: ["src/index.ts"],
-  outdir: "dist",
-  bundle: true,
-  format: "esm",
-  platform: "neutral",
-  target: "es2022",
-  tsconfig: "tsconfig.json",
-  alias: { "@": resolve(root, "src") },
-  packages: "external",
-  logLevel: "info",
-  loader: { ".module.css": "local-css" },
-});
+/*
+ * Two JS entries: `prime-ui-kit` and `prime-ui-kit/color-picker` (the only code on react-aria).
+ * Splitting puts the shared modules in chunks, so both entries use one copy of every context. A
+ * third, temporary entry imports both: one build keeps CSS Module class names identical, and its
+ * CSS (every component) becomes `bundle.css`; the per-entry CSS files are dropped.
+ */
+const allEntry = resolve(root, ".bundle-all.ts");
+await writeFile(allEntry, 'export * from "./src/index";\nexport * from "./src/color-picker";\n');
+try {
+  await esbuild.build({
+    absWorkingDir: root,
+    entryPoints: [
+      { in: "src/index.ts", out: "index" },
+      { in: "src/color-picker.ts", out: "color-picker" },
+      { in: ".bundle-all.ts", out: "all" },
+    ],
+    outdir: "dist",
+    bundle: true,
+    splitting: true,
+    chunkNames: "chunks/[name]-[hash]",
+    format: "esm",
+    platform: "neutral",
+    target: "es2022",
+    tsconfig: "tsconfig.json",
+    alias: { "@": resolve(root, "src") },
+    packages: "external",
+    logLevel: "info",
+    loader: { ".module.css": "local-css" },
+  });
+} finally {
+  await rm(allEntry, { force: true });
+}
+await rm(resolve(dist, "all.js"), { force: true });
+await rm(resolve(dist, "color-picker.css"), { force: true });
 
 const base = await esbuild.build({
   absWorkingDir: root,
@@ -38,8 +58,11 @@ const base = await esbuild.build({
   write: false,
   logLevel: "warning",
 });
-const componentsCss = resolve(dist, "index.css");
-await writeFile(componentsCss, base.outputFiles[0].text + (await readFile(componentsCss, "utf8")));
+await writeFile(
+  resolve(dist, "index.css"),
+  base.outputFiles[0].text + (await readFile(resolve(dist, "all.css"), "utf8")),
+);
+await rm(resolve(dist, "all.css"), { force: true });
 
 const stage = resolve(root, ".dts-stage");
 await rm(stage, { recursive: true, force: true });

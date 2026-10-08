@@ -9,7 +9,7 @@
 import { render } from "@testing-library/react";
 import type * as React from "react";
 import { describe, expect, it } from "vitest";
-
+import { ColorPicker } from "@/color-picker";
 import {
   Accordion,
   Avatar,
@@ -19,7 +19,6 @@ import {
   Button,
   ButtonGroup,
   Card,
-  ColorPicker,
   ColorPresets,
   ColorSwatches,
   CommandMenu,

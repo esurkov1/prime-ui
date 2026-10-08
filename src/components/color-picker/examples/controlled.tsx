@@ -1,5 +1,6 @@
 /** The parent owns the color: brand swatches and the hex field edit it, a button resets it — `value`, `onValueChange`. */
-import { Button, ColorPicker, parseColor } from "prime-ui-kit";
+import { Button } from "prime-ui-kit";
+import { ColorPicker, parseColor } from "prime-ui-kit/color-picker";
 import * as React from "react";
 
 import styles from "./examples.module.css";

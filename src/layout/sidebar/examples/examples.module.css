@@ -19,9 +19,9 @@
   height: calc(var(--prime-space-24) * 6);
 }
 
-/* A window that hugs its rail (size comparison). */
-.stageAuto {
-  height: auto;
+/* A short window for the size comparison: the rail fills its parent's height, it never hugs. */
+.stageShort {
+  height: calc(var(--prime-space-24) * 2);
 }
 
 /* Content plane next to the rail, like AppShell: surface fill, edge to edge. */

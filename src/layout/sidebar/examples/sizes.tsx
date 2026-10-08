@@ -13,7 +13,7 @@ export default function SidebarSizesExample() {
           <Typography as="span" variant="caption" tone="muted">
             {size}
           </Typography>
-          <div className={`${styles.stage} ${styles.stageAuto}`}>
+          <div className={`${styles.stage} ${styles.stageShort}`}>
             <Sidebar.Root size={size} offCanvas="never">
               <Sidebar.Content>
                 <Sidebar.Item current>

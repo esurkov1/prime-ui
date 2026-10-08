@@ -25,6 +25,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(rootDir, "src"),
+      // The subpath entry first: a plain `prime-ui-kit` key would also catch `prime-ui-kit/…`.
+      "prime-ui-kit/color-picker": path.resolve(rootDir, "src/color-picker.ts"),
       "prime-ui-kit": path.resolve(rootDir, "src/index.ts"),
     },
   },

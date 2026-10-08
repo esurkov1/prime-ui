@@ -1,5 +1,6 @@
 /** Theme settings: the color goes with the form and a too light color fails on save — `value`, `error`. */
-import { Button, ColorPicker, Input, parseColor } from "prime-ui-kit";
+import { Button, Input } from "prime-ui-kit";
+import { ColorPicker, parseColor } from "prime-ui-kit/color-picker";
 import * as React from "react";
 
 import styles from "./examples.module.css";

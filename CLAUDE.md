@@ -390,6 +390,8 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 
 `.github/workflows/ci.yml`: every push to `main` runs `bun run verify`; then, if the `package.json`
 version is not on npm yet, publishes it. Bump `version` to release. `package.json` `files` ships `dist`,
-styles, every `COMPONENT.md` and `examples/**`. One JS entry (`prime-ui-kit`) and `bundle.css`;
-`fonts.css` and `reset.css` are opt-in. Runtime dependency: `lucide-react` only (react-router is a
-playground dev dependency).
+styles, every `COMPONENT.md` and `examples/**`. JS entries: `prime-ui-kit` (`src/index.ts`) and
+`prime-ui-kit/color-picker` (`src/color-picker.ts`, the only code on `react-aria-components`, an
+optional peer); shared code is split into `dist/chunks/`. Nothing in the main entry may import
+react-aria. One `bundle.css` holds every component's styles; `fonts.css` and `reset.css` are opt-in.
+Runtime dependency: `lucide-react` only (react-router is a playground dev dependency).

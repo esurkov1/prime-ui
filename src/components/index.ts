@@ -82,25 +82,7 @@ export type {
   CodeBlockVariant,
 } from "./code-block/CodeBlock";
 export { CodeBlock } from "./code-block/CodeBlock";
-export type {
-  ColorPickerAreaProps,
-  ColorPickerChannelStripProps,
-  ColorPickerColorValue,
-  ColorPickerEyeDropperButtonProps,
-  ColorPickerFormatSelectProps,
-  ColorPickerHexInputProps,
-  ColorPickerLabels,
-  ColorPickerPanelProps,
-  ColorPickerRootProps,
-  ColorPickerSliderMetaProps,
-  ColorPickerSliderProps,
-  ColorPickerSliderTrackProps,
-  ColorPickerSwatchesProps,
-  ColorPickerThumbProps,
-  ColorPickerTriggerSwatchProps,
-  ColorValueFormat,
-} from "./color-picker/ColorPicker";
-export { ColorPicker, parseColor } from "./color-picker/ColorPicker";
+// ColorPicker ships from `prime-ui-kit/color-picker` (src/color-picker.ts): it alone needs react-aria.
 export type {
   ColorPreset,
   ColorPresetsContentProps,

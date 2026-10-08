@@ -1,5 +1,4 @@
 import * as React from "react";
-import { parseColor } from "react-aria-components";
 
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
@@ -113,21 +112,52 @@ export function sameColor(a: string | null, b: string | null): boolean {
   return (a ?? "").trim().toLowerCase() === (b ?? "").trim().toLowerCase();
 }
 
+/**
+ * sRGB channels (0–255) of a hex, `rgb()` or `hsl()` color; `null` for anything else (named colors,
+ * other spaces). Kept dependency-free so the swatches stay out of the ColorPicker entry.
+ */
+export function colorToRgb(value: string): [number, number, number] | null {
+  const input = value.trim().toLowerCase();
+  const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/.exec(input)?.[1];
+  if (hex) {
+    const full = hex.length <= 4 ? [...hex].map((c) => c + c).join("") : hex;
+    return [0, 2, 4].map((i) => Number.parseInt(full.slice(i, i + 2), 16)) as [
+      number,
+      number,
+      number,
+    ];
+  }
+  const fn = /^(rgba?|hsla?)\(([^)]+)\)$/.exec(input);
+  if (!fn) return null;
+  const parts = fn[2].split(/[\s,/]+/).filter(Boolean);
+  if (parts.length < 3) return null;
+  const num = (part: string, scale: number) =>
+    part.endsWith("%") ? (Number.parseFloat(part) / 100) * scale : Number.parseFloat(part);
+  if (fn[1].startsWith("rgb")) {
+    const rgb = parts.slice(0, 3).map((part) => num(part, 255));
+    return rgb.every(Number.isFinite) ? (rgb as [number, number, number]) : null;
+  }
+  const h = Number.parseFloat(parts[0]);
+  const s = num(parts[1], 1);
+  const l = num(parts[2], 1);
+  if (![h, s, l].every(Number.isFinite)) return null;
+  const a = s * Math.min(l, 1 - l);
+  const channel = (n: number) => {
+    const k = (n + h / 30) % 12;
+    return 255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)));
+  };
+  return [channel(0), channel(8), channel(4)];
+}
+
 /** `dark` when a dark mark contrasts better with the color than a light one (WCAG luminance). */
 export function markContrast(value: string): "light" | "dark" {
-  try {
-    const rgb = parseColor(value).toFormat("rgb");
-    const lin = (c: number) => {
-      const s = c / 255;
-      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-    };
-    const l =
-      0.2126 * lin(rgb.getChannelValue("red")) +
-      0.7152 * lin(rgb.getChannelValue("green")) +
-      0.0722 * lin(rgb.getChannelValue("blue"));
-    // Equal contrast against white (L=1) and black (L=0) at L ≈ 0.179.
-    return l > 0.179 ? "dark" : "light";
-  } catch {
-    return "dark";
-  }
+  const rgb = colorToRgb(value);
+  if (!rgb) return "dark";
+  const lin = (c: number) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  const l = 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]);
+  // Equal contrast against white (L=1) and black (L=0) at L ≈ 0.179.
+  return l > 0.179 ? "dark" : "light";
 }

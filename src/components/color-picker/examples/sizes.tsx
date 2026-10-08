@@ -1,5 +1,6 @@
 /** Every size of the hex field with a swatch button of the same tier — `size`. */
-import { Button, ColorPicker } from "prime-ui-kit";
+import { Button } from "prime-ui-kit";
+import { ColorPicker } from "prime-ui-kit/color-picker";
 
 import styles from "./examples.module.css";
 
